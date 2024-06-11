@@ -20,7 +20,6 @@
 
 
 require_once dirname(__FILE__).'/../include/CWebTest.php';
-require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/behaviors/CTableBehavior.php';
 
 /**
@@ -38,7 +37,6 @@ class testFormAlarmNotification extends CWebTest {
 	public function getBehaviors()
 	{
 		return [
-			CMessageBehavior::class,
 			CTableBehavior::class
 		];
 	}
@@ -346,7 +344,10 @@ class testFormAlarmNotification extends CWebTest {
 			// #1 Two problems at once.
 			[
 				[
-					'trigger_name' => ['Not_classified_trigger_2', 'Not_classified_trigger_3']
+					'trigger_name' => [
+						'Not_classified_trigger_2',
+						'Not_classified_trigger_3'
+					]
 				]
 			],
 			// #2 Information.
@@ -408,10 +409,13 @@ class testFormAlarmNotification extends CWebTest {
 	}
 
 	/**
+	 * Check that alarms displayed in alarm notification overlay.
+	 *
 	 * @dataProvider getDisplayedAlarmsData
 	 */
 	public function testFormAlarmNotification_DisplayedAlarms($data) {
-		$this->page->login()->open('zabbix.php?action=problem.view&unacknowledged=1&sort=name&sortorder=ASC&hostids%5B%5D='.
+		$this->page->login()->open('zabbix.php?action=problem.view&filter_reset=1')->waitUntilReady();
+		$this->page->open('zabbix.php?action=problem.view&unacknowledged=1&sort=name&sortorder=ASC&hostids%5B%5D='.
 				self::$hostid)->waitUntilReady();
 
 		// In case some scenarios failed and problems didn't closed at the end.
@@ -435,6 +439,7 @@ class testFormAlarmNotification extends CWebTest {
 		$alarm_dialog = $this->query('xpath://div[@class="overlay-dialogue notif ui-draggable"]')->asOverlayDialog()->
 				waitUntilPresent()->one();
 
+		// Multiple problems for one trigger or one problem for one trigger.
 		if (array_key_exists('multiple_check', $data)) {
 			for ($i = 1; $i <= 4; $i++) {
 				$this->assertTrue($alarm_dialog->query('xpath:(//p/a[text()="Disaster_trigger"])['.$i.']')->one()->isClickable());
@@ -529,10 +534,13 @@ class testFormAlarmNotification extends CWebTest {
 	}
 
 	/**
+	 * Check that turning off alarms, they are not displayed in alarm notification overlay.
+	 *
 	 * @dataProvider getNotDisplayedAlarmsData
 	 */
 	public function testFormAlarmNotification_NotDisplayedAlarms($data) {
 		$this->updateSeverity($data['severity_status']);
+		$this->page->open('zabbix.php?action=problem.view&filter_reset=1')->waitUntilReady();
 		$this->page->open('zabbix.php?action=problem.view&unacknowledged=1&sort=name&sortorder=ASC&hostids%5B%5D='.
 				self::$hostid)->waitUntilReady();
 
@@ -581,10 +589,8 @@ class testFormAlarmNotification extends CWebTest {
 		$this->closeProblem();
 	}
 
-
-
 	/**
-	 * Update Problems severity display.
+	 * Update Problems severity display from user profile page.
 	 */
 	protected function updateSeverity($parameters = null) {
 		$all_severity = [
@@ -625,7 +631,7 @@ class testFormAlarmNotification extends CWebTest {
 	}
 
 	/**
-	 * Get color value from alarm notification overlay. Values collected as array and are in RGBA format. After collecting
+	 * Get color value from alarm notification overlay. Values collected as array in RGBA format. After collecting
 	 * values convert them to HEX and save again as array.
 	 *
 	 * @return array
@@ -648,7 +654,7 @@ class testFormAlarmNotification extends CWebTest {
 		$rgba_alarm_colors = [];
 		foreach ($notification_color_class as $color_class) {
 			$bg_color = $alarm_dialog->query('xpath:.//div[contains(@class, '.CXPathHelper::escapeQuotes($color_class).')]')->
-			one()->getCSSValue('background-color');
+					one()->getCSSValue('background-color');
 			$rgba_alarm_colors[] = $bg_color;
 		}
 
