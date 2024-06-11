@@ -218,10 +218,8 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 
 	/**
 	 * Test delete all.
-	 *
-	 * @return void
 	 */
-	public function testPageAdministrationGeneralRegexp_DeleteAll() {
+	public function testPageAdministrationGeneralRegexp_DeleteAll(): void {
 		$this->page->login()->open('zabbix.php?action=regex.list')->waitUntilReady();
 
 		$this->query('name:all-regexes')->asCheckbox()->one()->check();

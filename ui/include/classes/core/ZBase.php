@@ -74,8 +74,6 @@ class ZBase {
 	/**
 	 * Returns the current instance of APP.
 	 *
-	 * @static
-	 *
 	 * @return APP
 	 */
 	public static function getInstance(): APP {
@@ -923,8 +921,6 @@ class ZBase {
 
 	/**
 	 * Check for High availability override to standalone mode, set server to use for system information checks.
-	 *
-	 * @return void
 	 */
 	private function setServerAddress(): void {
 		global $ZBX_SERVER, $ZBX_SERVER_PORT;

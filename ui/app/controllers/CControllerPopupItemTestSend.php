@@ -450,17 +450,15 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 		}
 
 		if ($this->show_final_result) {
-			$final_result = $steps_data ? $result_preproc : $result_item;
-
-			if (array_key_exists('result', $final_result)) {
+			if (array_key_exists('result', $result_preproc)) {
 				$output['final'] = [
 					'action' => _s('Result converted to %1$s', itemValueTypeString($data['item']['value_type'])),
-					'result' => $final_result['result']
+					'result' => $result_preproc['result']
 				];
 
-				if (array_key_exists('truncated', $final_result) && $final_result['truncated']) {
+				if (array_key_exists('truncated', $result_preproc) && $result_preproc['truncated']) {
 					$output['final']['warning'] = _s('Result is truncated due to its size (%1$s).',
-						convertUnits(['value' => $final_result['original_size'], 'units' => 'B'])
+						convertUnits(['value' => $result_preproc['original_size'], 'units' => 'B'])
 					);
 				}
 
@@ -474,16 +472,16 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 
 				if ($valuemap) {
 					$output['mapped_value'] = CValueMapHelper::applyValueMap($data['item']['value_type'],
-						$final_result['result'], $valuemap
+						$result_preproc['result'], $valuemap
 					);
 				}
 			}
-			elseif (array_key_exists('error', $final_result)) {
+			elseif (array_key_exists('error', $result_preproc)) {
 				$output['final'] = [
 					'action' => $test_outcome['action'] == ZBX_PREPROC_FAIL_SET_ERROR
 						? _('Set error to')
 						: '',
-					'error' => $final_result['error']
+					'error' => $result_preproc['error']
 				];
 			}
 
