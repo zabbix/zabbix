@@ -116,6 +116,7 @@ void	collect_stats_diskdevices(zbx_diskdevices_data *diskdevices)
 {
 	if (diskdevices == NULL)
 	{
+		zabbix_log(LOG_LEVEL_CRIT, "diskdevices is NULL in %s()", __func__);
 		return;
 	}
 

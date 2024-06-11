@@ -457,7 +457,13 @@ ZBX_THREAD_ENTRY(zbx_collector_thread, args)
 		}
 
 		if (0 != diskdevice_collector_started())
+		{
+			if (NULL == diskdevices)
+			{
+				diskstat_shm_init();
+			}
 			collect_stats_diskdevices(diskdevices);
+		}
 
 #ifdef ZBX_PROCSTAT_COLLECTOR
 		zbx_procstat_collect();
