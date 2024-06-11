@@ -384,14 +384,16 @@ int	zbx_get_value_internal_ext_server(const zbx_dc_item_t *item, const char *par
 			goto out;
 		}
 	}
-	else if (0 == strcmp(param1, "proxy group"))		/* zabbix["proxy",<hostname>,"lastaccess" OR "delay"] */
-	{							/* zabbix["proxy","discovery"]                        */
+	/* zabbix["proxy group","discovery"]                                                      */
+	/* zabbix["proxy group",<groupname>,"state" OR "available" OR "pavailable" OR "proxies" ] */
+	else if (0 == strcmp(param1, "proxy group"))
+	{
 		char		*error = NULL;
 		zbx_pg_stats_t	stats;
 
 		/* this item is always processed by server */
 
-		if (3 != nparams)
+		if (2 > nparams || 3 < nparams)
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
 			goto out;
@@ -399,20 +401,38 @@ int	zbx_get_value_internal_ext_server(const zbx_dc_item_t *item, const char *par
 
 		param2 = get_rparam(request, 1);
 
-		if (FAIL == zbx_pg_get_stats(param2, &stats, &error))
+		if (2 == nparams)
 		{
-			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain proxy group statistics: %s", error));
-			zbx_free(error);
+			if (0 == strcmp(param2, "discovery"))
+			{
+				char	*data;
+
+				zbx_proxy_group_discovery_get(&data);
+				SET_STR_RESULT(result, data);
+			}
+			else
+			{
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+				goto out;
+			}
+		}
+		else
+		{
+			if (FAIL == zbx_pg_get_stats(param2, &stats, &error))
+			{
+				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain proxy group statistics: %s",
+						error));
+				zbx_free(error);
+				goto out;
+			}
+
+			param3 = get_rparam(request, 2);
+
+			ret = get_proxy_group_stat(&stats, param3, result);
+			zbx_vector_uint64_destroy(&stats.proxyids);
+
 			goto out;
 		}
-
-		param3 = get_rparam(request, 2);
-
-		ret = get_proxy_group_stat(&stats, param3, result);
-		zbx_vector_uint64_destroy(&stats.proxyids);
-
-		goto out;
-
 	}
 	else if (0 == strcmp(param1, "host")) /* zabbix["host",*] */
 	{

@@ -327,19 +327,24 @@ static zbx_dc_um_handle_t	*dc_um_handle = NULL;
  *               FAIL otherwise                                               *
  *                                                                            *
  * Comments: list of the items, always processed by server                    *
- *           ,------------------+--------------------------------------,      *
- *           | type             | key                                  |      *
- *           +------------------+--------------------------------------+      *
- *           | Zabbix internal  | zabbix[host,,items]                  |      *
- *           | Zabbix internal  | zabbix[host,,items_unsupported]      |      *
- *           | Zabbix internal  | zabbix[host,discovery,interfaces]    |      *
- *           | Zabbix internal  | zabbix[host,,maintenance]            |      *
- *           | Zabbix internal  | zabbix[proxy,discovery]              |      *
- *           | Zabbix internal  | zabbix[proxy,<proxyname>,lastaccess] |      *
- *           | Zabbix internal  | zabbix[proxy,<proxyname>,delay]      |      *
- *           | Zabbix aggregate | *                                    |      *
- *           | Calculated       | *                                    |      *
- *           '------------------+--------------------------------------'      *
+ * ,------------------+-----------------------------------------------------, *
+ * | type             | key                                                 | *
+ * +------------------+-----------------------------------------------------+ *
+ * | Zabbix internal  | zabbix[host,,items]                                 | *
+ * | Zabbix internal  | zabbix[host,,items_unsupported]                     | *
+ * | Zabbix internal  | zabbix[host,discovery,interfaces]                   | *
+ * | Zabbix internal  | zabbix[host,,maintenance]                           | *
+ * | Zabbix internal  | zabbix[proxy,discovery]                             | *
+ * | Zabbix internal  | zabbix[proxy,<proxyname>,lastaccess]                | *
+ * | Zabbix internal  | zabbix[proxy,<proxyname>,delay]                     | *
+ * | Zabbix internal  | zabbix[proxy group,discovery]                       | *
+ * | Zabbix internal  | zabbix[proxy group,<groupname>,state]               | *
+ * | Zabbix internal  | zabbix[proxy group,<groupname>,available]           | *
+ * | Zabbix internal  | zabbix[proxy group,<groupname>,pavailable]          | *
+ * | Zabbix internal  | zabbix[proxy group,<groupname>,proxies]             | *
+ * | Zabbix aggregate | *                                                   | *
+ * | Calculated       | *                                                   | *
+ * '------------------+-----------------------------------------------------' *
  *                                                                            *
  ******************************************************************************/
 int	zbx_is_item_processed_by_server(unsigned char type, const char *key)
@@ -377,8 +382,11 @@ int	zbx_is_item_processed_by_server(unsigned char type, const char *key)
 
 				if (2 == request.nparam)
 				{
-					if (0 == strcmp(arg1, "proxy") && 0 == strcmp(arg2, "discovery"))
+					if ((0 == strcmp(arg1, "proxy") && 0 == strcmp(arg2, "discovery")) ||
+							0 == strcmp(arg1, "proxy group"))
+					{
 						ret = SUCCEED;
+					}
 
 					goto clean;
 				}
@@ -15918,6 +15926,21 @@ static void	dc_proxy_discovery_add_row(struct zbx_json *json, const ZBX_DC_PROXY
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: add proxy group discovery row                                     *
+ *                                                                            *
+ ******************************************************************************/
+static void	dc_proxy_group_discovery_add_row(struct zbx_json *json, const zbx_dc_proxy_group_t *pg) {
+	zbx_json_addobject(json, NULL);
+
+	zbx_json_addstring(json, "name", pg->name, ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(json, "failover_delay", pg->failover_delay, ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(json, "min_online", pg->min_online, ZBX_JSON_TYPE_STRING);
+
+	zbx_json_close(json);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: get data of all proxies from configuration cache and pack into    *
  *          JSON for LLD                                                      *
  *                                                                            *
@@ -15946,6 +15969,41 @@ void	zbx_proxy_discovery_get(char **data)
 	zbx_hashset_iter_reset(&config->proxies, &iter);
 	while (NULL != (dc_proxy = (ZBX_DC_PROXY *)zbx_hashset_iter_next(&iter)))
 		dc_proxy_discovery_add_row(&json, dc_proxy, now);
+
+	UNLOCK_CACHE;
+
+	zbx_json_close(&json);
+	*data = zbx_strdup(NULL, json.buffer);
+
+	zbx_json_free(&json);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get data of all proxy groups from configuration cache and pack    *
+ *          into JSON                                                         *
+ *                                                                            *
+ * Parameter: data - [OUT] JSON with proxy group data                         *
+ *                                                                            *
+ * Comments: Allocates memory.                                                *
+ *           If there are no proxy groups, an empty JSON {"data":[]} is       *
+ *           returned.                                                        *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_proxy_group_discovery_get(char **data) {
+
+	struct zbx_json	json;
+
+	zbx_hashset_iter_t	iter;
+	zbx_dc_proxy_group_t	*dc_proxy_group;
+
+	zbx_json_initarray(&json, ZBX_JSON_STAT_BUF_LEN);
+
+	RDLOCK_CACHE;
+
+	zbx_hashset_iter_reset(&config->proxy_groups, &iter);
+	while (NULL != (dc_proxy_group = (zbx_dc_proxy_group_t *)zbx_hashset_iter_next(&iter)))
+		dc_proxy_group_discovery_add_row(&json, dc_proxy_group);
 
 	UNLOCK_CACHE;
 
