@@ -189,7 +189,7 @@ class testFormAlarmNotification extends CWebTest {
 		$this->page->assertHeader('Problems');
 
 		// Trigger problem.
-		CDBHelper::setTriggerProblem('Not_classified_trigger_4', TRIGGER_VALUE_TRUE);
+		CDBHelper::setTriggerProblem('Not_classified_trigger_4');
 
 		// Find appeared Alarm notification overlay dialog.
 		$this->page->refresh()->waitUntilReady();
@@ -254,6 +254,18 @@ class testFormAlarmNotification extends CWebTest {
 			}
 		}
 
+		$this->page->open('zabbix.php?action=problem.view')->waitUntilReady();
+
+		// Close problem.
+		CDBHelper::setTriggerProblem('Not_classified_trigger_4', TRIGGER_VALUE_FALSE);
+		$this->page->refresh()->waitUntilReady();
+
+		// Check that problem resolved and problem color is green now.
+		$this->assertEquals('Resolved Host for alarm item', $alarm_dialog->query('xpath:.//h4')->one()->getText());
+		$this->assertEquals('rgba(89, 219, 143, 1)', $alarm_dialog->query('xpath:.//div[contains(@class, '.
+				CXPathHelper::escapeQuotes('notif-indic normal-bg').')]')->one()->getCSSValue('background-color')
+		);
+
 		// Check close button.
 		$alarm_dialog->query('xpath:.//button[@title="Close"]')->one()->click();
 		$alarm_dialog->ensureNotPresent();
@@ -294,7 +306,7 @@ class testFormAlarmNotification extends CWebTest {
 
 		// Trigger problem.
 		foreach ($this->all_triggers as $trigger_name) {
-			CDBHelper::setTriggerProblem($trigger_name, TRIGGER_VALUE_TRUE);
+			CDBHelper::setTriggerProblem($trigger_name);
 		}
 
 		// Refresh page for alarm overlay to appear.
@@ -421,7 +433,7 @@ class testFormAlarmNotification extends CWebTest {
 
 		// Trigger problem.
 		foreach ($data['trigger_name'] as $trigger_name) {
-			CDBHelper::setTriggerProblem($trigger_name, TRIGGER_VALUE_TRUE);
+			CDBHelper::setTriggerProblem($trigger_name);
 		}
 
 		// Filter problems by Hosts and refresh page for alarm overlay to appear.
@@ -552,7 +564,7 @@ class testFormAlarmNotification extends CWebTest {
 
 		// Trigger problem.
 		foreach ($this->all_triggers as $trigger_name) {
-			CDBHelper::setTriggerProblem($trigger_name, TRIGGER_VALUE_TRUE);
+			CDBHelper::setTriggerProblem($trigger_name);
 		}
 
 		// Filter problems by Hosts and refresh page for alarm overlay to appear.
