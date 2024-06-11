@@ -41,6 +41,7 @@ static zbx_history_table_compression_options_t	compression_tables[] = {
 	{"history_str",		"itemid",	"clock,ns"},
 	{"history_text",	"itemid",	"clock,ns"},
 	{"history_log",		"itemid",	"clock,ns"},
+	{"history_bin",		"itemid",	"clock,ns"},
 	{"trends",		"itemid",	"clock"},
 	{"trends_uint",		"itemid",	"clock"},
 	{"auditlog",		"auditid",	"clock"}
