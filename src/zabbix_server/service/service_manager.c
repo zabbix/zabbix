@@ -14,8 +14,11 @@
 
 #include "service_server.h"
 
+#include "service_manager_impl.h"
+
 #include "../server_constants.h"
 
+#include "zbxtimekeeper.h"
 #include "zbxlog.h"
 #include "zbxalgo.h"
 #include "zbxdb.h"
@@ -31,8 +34,9 @@
 #include "zbxnum.h"
 #include "zbxtime.h"
 #include "zbxcacheconfig.h"
-#include "zbx_trigger_constants.h"
 #include "zbxrtc.h"
+#include "zbxthreads.h"
+#include "zbx_trigger_constants.h"
 #include "zbx_rtc_constants.h"
 
 ZBX_PTR_VECTOR_IMPL(service_update_ptr, zbx_service_update_t *)

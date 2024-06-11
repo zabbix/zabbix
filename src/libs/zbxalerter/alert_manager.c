@@ -16,6 +16,8 @@
 #include "alerter_defs.h"
 
 #include "alerter_protocol.h"
+
+#include "zbxtimekeeper.h"
 #include "zbxlog.h"
 #include "zbxalgo.h"
 #include "zbxdb.h"
@@ -29,7 +31,6 @@
 #include "zbxstr.h"
 #include "zbxthreads.h"
 #include "zbxtime.h"
-#include "zbxtypes.h"
 #include "zbxxml.h"
 #include "zbxjson.h"
 
@@ -2273,7 +2274,7 @@ static void	am_process_diag_top_sources(zbx_am_t *manager, zbx_ipc_client_t *cli
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static int	am_check_dbstatus()
+static int	am_check_dbstatus(void)
 {
 	int		ret = ZBX_DB_OK;
 	zbx_db_result_t	res;

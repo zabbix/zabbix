@@ -17,12 +17,15 @@
 #include "evalfunc.h"
 #include "datafunc.h"
 
+#ifdef HAVE_LIBXML2
+#	include "zbxxml.h"
+#endif
+
 #include "zbxvariant.h"
 #include "zbxeval.h"
 #include "zbxdbwrap.h"
 #include "zbxcachevalue.h"
 #include "macrofunc.h"
-#include "zbxxml.h"
 #include "zbxstr.h"
 #include "zbxexpr.h"
 #include "zbxparam.h"
@@ -2334,7 +2337,7 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 			{
 				if (INTERFACE_TYPE_UNKNOWN != c_interface->type)
 				{
-					if (FAIL == zbx_is_ip(c_interface->ip_orig))
+					if ('\0' != *c_interface->ip_orig && FAIL == zbx_is_ip(c_interface->ip_orig))
 					{
 						ret = FAIL;
 					}
@@ -2351,7 +2354,8 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 			{
 				if (INTERFACE_TYPE_UNKNOWN != c_interface->type)
 				{
-					if (FAIL == zbx_is_ip(c_interface->dns_orig) &&
+					if ('\0' != *c_interface->dns_orig &&
+							FAIL == zbx_is_ip(c_interface->dns_orig) &&
 							FAIL == zbx_validate_hostname(c_interface->dns_orig))
 					{
 						ret = FAIL;

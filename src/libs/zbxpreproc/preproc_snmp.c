@@ -14,7 +14,10 @@
 
 #include "item_preproc.h"
 #include "preproc_snmp.h"
-#include "pp_manager.h"
+
+#ifdef HAVE_NETSNMP
+#	include "pp_manager.h"
+#endif
 
 #include "zbxjson.h"
 #include "zbxcrypto.h"

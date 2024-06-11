@@ -19,6 +19,7 @@
 #include "../actions/actions.h"
 #include "../audit/audit_server.h"
 
+#include "zbxtimekeeper.h"
 #include "zbxnix.h"
 #include "zbxself.h"
 #include "zbxlog.h"

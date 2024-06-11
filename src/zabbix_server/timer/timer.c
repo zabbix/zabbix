@@ -14,6 +14,7 @@
 
 #include "timer.h"
 
+#include "zbxtimekeeper.h"
 #include "zbxalgo.h"
 #include "zbxdb.h"
 #include "zbxdbhigh.h"

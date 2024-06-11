@@ -15,10 +15,11 @@
 #include "zbxdiag.h"
 #include "diag_proxy.h"
 
-#include "zbxcommon.h"
+#include "zbxshmem.h"
 #include "zbxtime.h"
 #include "zbxproxybuffer.h"
 #include "zbxpreproc.h"
+#include "zbxjson.h"
 
 #define ZBX_DIAG_PROXYBUFFER_MEMORY	0x00000001
 

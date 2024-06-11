@@ -15,7 +15,11 @@
 #include "zbxdbhigh.h"
 #include "dbupgrade.h"
 #include "zbxdbschema.h"
-#include "zbxeval.h"
+#include "zbxdb.h"
+#include "zbxexpr.h"
+#include "zbxnum.h"
+#include "zbxstr.h"
+#include "zbxjson.h"
 
 /*
  * 6.4 development database patches

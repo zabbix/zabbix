@@ -13,7 +13,6 @@
 **/
 
 #include "trigger_linking.h"
-#include "zbxdbwrap.h"
 #include "trigger_dep_linking.h"
 
 #include "zbxeval.h"
@@ -21,6 +20,9 @@
 #include "audit/zbxaudit_trigger.h"
 #include "zbxnum.h"
 #include "zbx_trigger_constants.h"
+#include "zbxdb.h"
+#include "zbxdbhigh.h"
+#include "zbxstr.h"
 
 typedef struct
 {

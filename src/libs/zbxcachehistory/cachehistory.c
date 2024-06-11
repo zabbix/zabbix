@@ -25,7 +25,6 @@
 #include "zbx_item_constants.h"
 #include "zbxtagfilter.h"
 #include "zbxcrypto.h"
-#include "zbxescalations.h"
 #include "zbxalgo.h"
 #include "zbxhistory.h"
 #include "zbxcacheconfig.h"
@@ -37,6 +36,7 @@
 #include "zbxstr.h"
 #include "zbxtime.h"
 #include "zbxvariant.h"
+#include "zbxipcservice.h"
 
 static zbx_shmem_info_t	*hc_index_mem = NULL;
 static zbx_shmem_info_t	*hc_mem = NULL;

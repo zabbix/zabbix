@@ -16,8 +16,10 @@
 
 #include "embed.h"
 #include "duktape.h"
+
 #include "zbxcrypto.h"
 #include "zbxjson.h"
+#include "zbxhash.h"
 
 /******************************************************************************
  *                                                                            *

@@ -57,7 +57,7 @@ For **Send to**: enter any text, as this value is not used, but is required.
 
 [![](images/thumb.06.png?raw=true)](images/06.png)
 
-For more information, use the [Zabbix](https://www.zabbix.com/documentation/7.0/manual/config/notifications) and [Redmine](https://www.redmine.org/projects/redmine/wiki/) documentations.
+For more information, use the [Zabbix](https://www.zabbix.com/documentation/7.2/manual/config/notifications) and [Redmine](https://www.redmine.org/projects/redmine/wiki/) documentations.
 
 ## Supported Versions
 

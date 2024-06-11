@@ -13,20 +13,21 @@
 **/
 
 #include "pg_manager.h"
-#include "zbxcommon.h"
+
 #include "pg_cache.h"
 #include "pg_service.h"
+
+#include "zbxtimekeeper.h"
 #include "zbx_host_constants.h"
 #include "zbxalgo.h"
 #include "zbxcacheconfig.h"
 #include "zbxdb.h"
 #include "zbxdbhigh.h"
 #include "zbxnix.h"
-#include "zbxnum.h"
 #include "zbxself.h"
 #include "zbxstr.h"
 #include "zbxtime.h"
-#include "zbxtypes.h"
+
 /******************************************************************************
  *                                                                            *
  * Purpose: initialize proxy group manager                                    *

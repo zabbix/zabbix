@@ -16,6 +16,7 @@
 
 #include "zbxstr.h"
 #include "zbxtime.h"
+#include "zbxjson.h"
 #include "zbx_dbversion_constants.h"
 
 #if defined(HAVE_MYSQL)

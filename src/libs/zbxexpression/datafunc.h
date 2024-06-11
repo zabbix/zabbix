@@ -17,7 +17,6 @@
 
 #include "evalfunc.h"
 
-#include "zbx_discoverer_constants.h"
 #include "zbxdbhigh.h"
 #include "zbxtime.h"
 

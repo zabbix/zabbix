@@ -18,6 +18,8 @@
 #include "zbxjson.h"
 #include "jsonobj.h"
 
+#include "zbxalgo.h"
+
 typedef struct
 {
 	zbx_jsonobj_t			*root;		/* the root object */

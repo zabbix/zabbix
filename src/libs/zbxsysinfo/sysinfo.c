@@ -17,18 +17,22 @@
 
 #include "alias/alias.h"
 
-#include "zbxlog.h"
-#if !defined(_WINDOWS) && !defined(__MINGW32__)
-#include "zbxnix.h"
+#if !defined(WITH_AGENT2_METRICS)
+#	include "zbxthreads.h"
 #endif
+
+#if (!defined(_WINDOWS) && !defined(__MINGW32__)) && !defined(WITH_AGENT2_METRICS)
+#	include "zbxlog.h"
+#	include "zbxnix.h"
+#	include	"zbxfile.h"
+#endif
+
 #include "zbxalgo.h"
 #include "zbxregexp.h"
 #include "zbxstr.h"
 #include "zbxnum.h"
 #include "zbxparam.h"
 #include "zbxexpr.h"
-#include "zbxfile.h"
-#include "zbxthreads.h"
 #include "zbxtime.h"
 
 #ifdef WITH_AGENT_METRICS

@@ -17,6 +17,10 @@
 #include "zbxnum.h"
 #include "zbxexpr.h"
 #include "zbxdbhigh.h"
+#include "zbxalgo.h"
+#include "zbxdb.h"
+#include "zbxdbschema.h"
+#include "zbxstr.h"
 
 /*
  * 3.2 development database patches

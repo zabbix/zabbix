@@ -54,9 +54,11 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 				);
 			}
 			else {
-			$this->assertEquals($value, $form_field->getValue());
+				$this->assertEquals($value, $form_field->getValue());
 			}
 		}
+
+		$dialog->close();
 	}
 
 	/**
@@ -280,6 +282,8 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 			$result = trim(preg_replace('/\s\s+/', ' ', $get_text));
 			$this->assertEquals($result, $data['error']);
 		}
+
+		COverlayDialogElement::closeAll();
 	}
 
 	/*
@@ -358,6 +362,8 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 
 		// Check error message on posting the form.
 		$this->assertMessage(TEST_BAD, $data['error'], $data['error_details']);
+
+		$dialog->close();
 	}
 
 	public static function getCreateValidationData() {

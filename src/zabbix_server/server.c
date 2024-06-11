@@ -95,12 +95,15 @@
 #include "zbxicmpping.h"
 #include "zbxipcservice.h"
 #include "zbxdiag.h"
-#include "zbxcurl.h"
 #include "zbxpoller.h"
 #include "zbxhttppoller.h"
 #include "zbx_ha_constants.h"
 #include "zbxescalations.h"
 #include "zbxbincommon.h"
+
+#ifdef HAVE_LIBCURL
+#	include "zbxcurl.h"
+#endif
 
 ZBX_GET_CONFIG_VAR2(const char*, const char*, zbx_progname, NULL)
 
@@ -2376,13 +2379,17 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		{
 			zabbix_log(LOG_LEVEL_INFORMATION, "\"%s\" node started in \"%s\" mode", CONFIG_HA_NODE_NAME,
 					zbx_ha_status_str(ha_status));
-
 		}
 	}
 
 	ha_status_old = ha_status;
 
-	if (ZBX_NODE_STATUS_STANDBY == ha_status)
+	if (ZBX_NODE_STATUS_ACTIVE == ha_status)
+	{
+		/* reset ha dispatcher heartbeat timings */
+		zbx_ha_dispatch_message(CONFIG_HA_NODE_NAME, NULL, ZBX_HA_RTC_STATE_RESET, NULL, NULL, NULL);
+	}
+	else if (ZBX_NODE_STATUS_STANDBY == ha_status)
 		standby_warning_time = time(NULL);
 
 	while (ZBX_IS_RUNNING())
@@ -2390,12 +2397,13 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		time_t			now;
 		zbx_ipc_client_t	*client;
 		zbx_ipc_message_t	*message;
+		int			rtc_state;
 
-		(void)zbx_ipc_service_recv(&rtc.service, &rtc_timeout, &client, &message);
+		rtc_state = zbx_ipc_service_recv(&rtc.service, &rtc_timeout, &client, &message);
 
 		if (NULL == message || ZBX_IPC_SERVICE_HA_RTC_FIRST <= message->code)
 		{
-			if (SUCCEED != zbx_ha_dispatch_message(CONFIG_HA_NODE_NAME, message, &ha_status,
+			if (SUCCEED != zbx_ha_dispatch_message(CONFIG_HA_NODE_NAME, message, rtc_state, &ha_status,
 					&ha_failover_delay, &error))
 			{
 				zabbix_log(LOG_LEVEL_CRIT, "HA manager error: %s", error);
@@ -2456,6 +2464,13 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 						server_teardown(&rtc, &listen_sock);
 						ha_status_old = ha_status;
 					}
+					else
+					{
+						/* reset ha dispatcher heartbeat timings */
+						zbx_ha_dispatch_message(CONFIG_HA_NODE_NAME, NULL,
+								ZBX_HA_RTC_STATE_RESET, NULL, NULL, NULL);
+					}
+
 					break;
 				case ZBX_NODE_STATUS_STANDBY:
 					server_teardown(&rtc, &listen_sock);

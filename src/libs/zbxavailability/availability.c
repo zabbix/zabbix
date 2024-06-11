@@ -15,7 +15,12 @@
 #include "zbxavailability.h"
 #include "zbx_availability_constants.h"
 
+#include "zbxalgo.h"
+#include "zbxdb.h"
+#include "zbxdbhigh.h"
+#include "zbxstr.h"
 #include "zbxipcservice.h"
+#include "zbxjson.h"
 
 int	zbx_interface_availability_compare_func(const void *d1, const void *d2)
 {

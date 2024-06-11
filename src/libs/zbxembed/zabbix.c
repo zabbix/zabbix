@@ -17,6 +17,8 @@
 
 #include "zbxstr.h"
 #include "zbxjson.h"
+#include "zbxtime.h"
+
 #include "duktape.h"
 
 /******************************************************************************

@@ -17,6 +17,9 @@
 #include "zbxdbhigh.h"
 #include "zbxsysinfo.h"
 #include "zbxparam.h"
+#include "zbxdb.h"
+#include "zbxdbschema.h"
+#include "zbxstr.h"
 
 /*
  * 3.0 development database patches
