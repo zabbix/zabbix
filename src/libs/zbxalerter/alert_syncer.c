@@ -457,7 +457,7 @@ static void	am_db_update_mediatypes(zbx_am_db_t *amdb, const zbx_uint64_t *media
  * Purpose: reads alerts/mediatypes from database and queues them in alert    *
  *          manager                                                           *
  *                                                                            *
- * Parameters: amdb         - [IN] alert manager cache                        *
+ * Parameters: amdb - [IN] alert manager cache                                *
  *                                                                            *
  * Return value: count of alerts                                              *
  *                                                                            *
