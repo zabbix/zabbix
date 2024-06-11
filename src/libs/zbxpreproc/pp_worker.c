@@ -17,8 +17,6 @@
 #include "pp_queue.h"
 #include "pp_execute.h"
 
-#include "zbxcommon.h"
-#include "zbxself.h"
 #include "zbxpreproc.h"
 #include "zbxalgo.h"
 #include "zbxregexp.h"

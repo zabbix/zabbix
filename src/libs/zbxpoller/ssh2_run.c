@@ -16,10 +16,10 @@
 
 #include <libssh2.h>
 
+#include "zbxcacheconfig.h"
 #include "zbxcomms.h"
-#include "zbxlog.h"
-#include "zbxnum.h"
 #include "zbxfile.h"
+#include "zbxstr.h"
 
 #if !defined(HAVE_LIBSSH2_METHOD_KEX) && !defined(HAVE_LIBSSH2_METHOD_HOSTKEY) && \
 		!defined(HAVE_LIBSSH2_METHOD_CRYPT_CS) && !defined(HAVE_LIBSSH2_METHOD_CRYPT_SC) && \

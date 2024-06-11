@@ -18,13 +18,13 @@ use Zabbix\Widgets\Fields\CWidgetFieldPatternSelect;
 
 abstract class CWidgetFieldPatternSelectView extends CWidgetFieldView {
 
+	protected ?CPatternSelect $patternselect = null;
+
 	protected array $filter_preselect = [];
 
 	protected array $popup_parameters = [];
 
 	protected string $placeholder = '';
-
-	protected bool $wildcard_allowed = false;
 
 	public function __construct(CWidgetFieldPatternSelect $field) {
 		$this->field = $field;
@@ -34,46 +34,47 @@ abstract class CWidgetFieldPatternSelectView extends CWidgetFieldView {
 	abstract protected function getObjectName(): string;
 
 	public function getId(): string {
-		return zbx_formatDomId($this->getName().'[]');
+		return $this->getPatternSelect()->getId();
 	}
 
-	public function getLabel(): ?CLabel {
-		$label = parent::getLabel();
-
-		if ($label !== null) {
-			$label->setFor($this->getId().'_ms');
-		}
-
-		return $label;
+	public function getFocusableElementId(): string {
+		return $this->getId().'_ms';
 	}
 
-	public function getView(): CPatternSelect {
-		$options = [
-			'name' => $this->getName().'[]',
-			'object_name' => $this->getObjectName(),
-			'data' => $this->field->getValue(),
-			'disabled' => $this->isDisabled(),
-			'placeholder' => $this->placeholder,
-			'popup' => [
-				'parameters' => [
-					'dstfrm' => $this->form_name,
-					'dstfld1' => $this->getId()
-				] + $this->getPopupParameters()
-			],
-			'add_post_js' => false
-		];
+	public function getView(): CMultiSelect {
+		return $this->getPatternSelect();
+	}
 
-		if ($this->filter_preselect) {
-			$options['popup']['filter_preselect'] = $this->filter_preselect;
+	public function getPatternSelect(): CPatternSelect {
+		if ($this->patternselect === null) {
+			$patternselect_name = $this->getName().'[]';
+
+			$options = [
+				'name' => $patternselect_name,
+				'object_name' => $this->getObjectName(),
+				'data' => $this->field->getValue(),
+				'disabled' => $this->isDisabled(),
+				'placeholder' => $this->placeholder,
+				'wildcard_allowed' => true,
+				'popup' => [
+					'parameters' => [
+							'dstfrm' => $this->form_name,
+							'dstfld1' => zbx_formatDomId($patternselect_name)
+						] + $this->getPopupParameters()
+				],
+				'add_post_js' => false
+			];
+
+			if ($this->filter_preselect) {
+				$options['popup']['filter_preselect'] = $this->filter_preselect;
+			}
+
+			$this->patternselect = (new CPatternSelect($options))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setAriaRequired($this->isRequired());
 		}
 
-		if ($this->wildcard_allowed) {
-			$options['wildcard_allowed'] = true;
-		}
-
-		return (new CPatternSelect($options))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAriaRequired($this->isRequired());
+		return $this->patternselect;
 	}
 
 	public function getJavaScript(): string {
@@ -98,12 +99,6 @@ abstract class CWidgetFieldPatternSelectView extends CWidgetFieldView {
 
 	public function setPlaceholder(string $placeholder): self {
 		$this->placeholder = $placeholder;
-
-		return $this;
-	}
-
-	public function setWildcardAllowed(bool $wildcard_allowed = true): self {
-		$this->wildcard_allowed = $wildcard_allowed;
 
 		return $this;
 	}

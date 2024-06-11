@@ -16,11 +16,11 @@
 
 #include "zbxjson.h"
 #include "zbxcacheconfig.h"
-#include "zbxsysinfo.h"
 #include "zbxcomms.h"
-#include "zbxtypes.h"
-#include <stddef.h>
 #include "zbxagentget.h"
+#include "zbxversion.h"
+
+#include <stddef.h>
 
 /******************************************************************************
  *                                                                            *

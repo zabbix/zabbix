@@ -31,12 +31,14 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 	private const LABEL_MAX_LINES = 10;
 	private const LABEL_MAX_LINE_LENGTH = 250;
+	private const MAX_ITEMS = 1000;
 
 	protected function init(): void {
 		parent::init();
 
 		$this->addValidationRules([
-			'with_config' => 'in 1'
+			'with_config' => 'in 1',
+			'max_items' => 'int32'
 		]);
 	}
 
@@ -47,7 +49,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'debug_mode' => $this->getDebugMode()
 			],
 			'vars' => [
-				'cells' => $this->getCells()
+				'cells' => $this->getCells($this->getInput('max_items', self::MAX_ITEMS) + 1)
 			]
 		];
 
@@ -58,34 +60,48 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$this->setResponse(new CControllerResponseData($data));
 	}
 
-	private function getCells(): array {
+	private function getCells(int $limit): array {
 		if ($this->isTemplateDashboard() && !$this->fields_values['hostids']) {
 			return [];
 		}
 
-		$groupids = !$this->isTemplateDashboard() && $this->fields_values['groupids']
-			? getSubGroups($this->fields_values['groupids'])
+		$groupids = null;
+		$evaltype = null;
+		$tags = null;
+
+		if (!$this->isTemplateDashboard()) {
+			if ($this->fields_values['groupids']) {
+				$groupids = getSubGroups($this->fields_values['groupids']);
+			}
+
+			if ($this->fields_values['host_tags']) {
+				$evaltype = $this->fields_values['evaltype_host'];
+				$tags = $this->fields_values['host_tags'];
+			}
+		}
+
+		$hostids = $this->fields_values['hostids'] ?: null;
+		$filter = $this->fields_values['maintenance'] != 1
+			? ['maintenance_status' => HOST_MAINTENANCE_STATUS_OFF]
 			: null;
 
-		$hosts = API::Host()->get([
-			'output' => [],
-			'groupids' => $groupids,
-			'hostids' => $this->fields_values['hostids'] ?: null,
-			'evaltype' => !$this->isTemplateDashboard() ? $this->fields_values['evaltype_host'] : null,
-			'tags' => !$this->isTemplateDashboard() && $this->fields_values['host_tags']
-				? $this->fields_values['host_tags']
-				: null,
-			'filter' => [
-				'maintenance_status' => $this->fields_values['maintenance'] != 1
-					? HOST_MAINTENANCE_STATUS_OFF
-					: null
-			],
-			'monitored_hosts' => true,
-			'preservekeys' => true
-		]);
+		if ($groupids !== null || $hostids !== null || $tags !== null || $filter !== null) {
+			$db_hosts = API::Host()->get([
+				'output' => [],
+				'groupids' => $groupids,
+				'hostids' => $hostids,
+				'filter' => $filter,
+				'evaltype' => $evaltype,
+				'tags' => $tags,
+				'monitored_hosts' => true,
+				'preservekeys' => true
+			]);
 
-		if (!$hosts) {
-			return [];
+			if (!$db_hosts) {
+				return [];
+			}
+
+			$hostids = array_keys($db_hosts);
 		}
 
 		$search_field = $this->isTemplateDashboard() ? 'name' : 'name_resolved';
@@ -94,7 +110,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'output' => ['itemid', 'hostid', 'units', 'value_type', 'name_resolved'],
 			'selectHosts' => ['name'],
 			'webitems' => true,
-			'hostids' => array_keys($hosts),
+			'hostids' => $hostids,
 			'evaltype' => $this->fields_values['evaltype_item'],
 			'tags' => $this->fields_values['item_tags'] ?: null,
 			'selectValueMap' => ['mappings'],
@@ -107,13 +123,13 @@ class WidgetView extends CControllerDashboardWidgetView {
 			]
 		];
 
-		$items = API::Item()->get($options);
+		$db_items = API::Item()->get($options);
 
-		if (!$items) {
+		if (!$db_items) {
 			return [];
 		}
 
-		$items = CArrayHelper::renameObjectsKeys($items, ['name_resolved' => 'name']);
+		$items = CArrayHelper::renameObjectsKeys($db_items, ['name_resolved' => 'name']);
 
 		foreach ($items as &$item) {
 			$item['hostname'] = $item['hosts'][0]['name'];
@@ -122,51 +138,59 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		CArrayHelper::sort($items, ['hostname', 'name']);
 
-		$history_period = timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD));
-		$history = Manager::History()->getLastValues($items, 1, $history_period);
-
+		$total_items = count($items);
+		$batches = ceil($total_items / $limit);
 		$show = array_flip($this->fields_values['show']);
-
+		$history_period = timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD));
 		$cells = [];
 
-		foreach ($items as $item) {
-			if (!array_key_exists($item['itemid'], $history)) {
-				continue;
+		for ($batch = 0; $batch < $batches && count($cells) < $limit; $batch++) {
+			$batch_items = array_slice($items, $batch * $limit, $limit);
+			$db_history = Manager::History()->getLastValues($batch_items, 1, $history_period);
+
+			foreach ($batch_items as $item) {
+				if (!array_key_exists($item['itemid'], $db_history)) {
+					continue;
+				}
+
+				$last_value = $db_history[$item['itemid']][0]['value'];
+
+				$primary_label = array_key_exists(WidgetForm::SHOW_PRIMARY_LABEL, $show)
+					? $this->getCellLabel($item, $last_value, [
+						'label' => $this->fields_values['primary_label'],
+						'label_decimal_places' => $this->fields_values['primary_label_decimal_places'],
+						'label_type' => $this->fields_values['primary_label_type'],
+						'label_units' => $this->fields_values['primary_label_units'],
+						'label_units_pos' => $this->fields_values['primary_label_units_pos'],
+						'label_units_show' => $this->fields_values['primary_label_units_show']
+					])
+					: '';
+
+				$secondary_label = array_key_exists(WidgetForm::SHOW_SECONDARY_LABEL, $show)
+					? $this->getCellLabel($item, $last_value, [
+						'label' => $this->fields_values['secondary_label'],
+						'label_decimal_places' => $this->fields_values['secondary_label_decimal_places'],
+						'label_type' => $this->fields_values['secondary_label_type'],
+						'label_units' => $this->fields_values['secondary_label_units'],
+						'label_units_pos' => $this->fields_values['secondary_label_units_pos'],
+						'label_units_show' => $this->fields_values['secondary_label_units_show']
+					])
+					: '';
+
+				$cells[] = [
+					'hostid' => $item['hostid'],
+					'itemid' => $item['itemid'],
+					'primary_label' => $primary_label,
+					'secondary_label' => $secondary_label,
+					'value' => $last_value,
+					'is_numeric' => in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]),
+					'is_binary_units' => isBinaryUnits($item['units'])
+				];
+
+				if (count($cells) == $limit) {
+					break;
+				}
 			}
-
-			$last_value = $history[$item['itemid']][0]['value'];
-
-			$primary_label = array_key_exists(WidgetForm::SHOW_PRIMARY_LABEL, $show)
-				? $this->getCellLabel($item, $last_value, [
-					'label' =>					$this->fields_values['primary_label'],
-					'label_decimal_places' =>	$this->fields_values['primary_label_decimal_places'],
-					'label_type' =>				$this->fields_values['primary_label_type'],
-					'label_units' =>			$this->fields_values['primary_label_units'],
-					'label_units_pos' =>		$this->fields_values['primary_label_units_pos'],
-					'label_units_show' =>		$this->fields_values['primary_label_units_show']
-				])
-				: '';
-
-			$secondary_label = array_key_exists(WidgetForm::SHOW_SECONDARY_LABEL, $show)
-				? $this->getCellLabel($item, $last_value, [
-					'label' =>					$this->fields_values['secondary_label'],
-					'label_decimal_places' =>	$this->fields_values['secondary_label_decimal_places'],
-					'label_type' =>				$this->fields_values['secondary_label_type'],
-					'label_units' =>			$this->fields_values['secondary_label_units'],
-					'label_units_pos' =>		$this->fields_values['secondary_label_units_pos'],
-					'label_units_show' =>		$this->fields_values['secondary_label_units_show']
-				])
-				: '';
-
-			$cells[] = [
-				'hostid' => $item['hostid'],
-				'itemid' => $item['itemid'],
-				'primary_label' => $primary_label,
-				'secondary_label' => $secondary_label,
-				'value' => $last_value,
-				'is_numeric' => in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]),
-				'is_binary_units' => isBinaryUnits($item['units'])
-			];
 		}
 
 		return $cells;

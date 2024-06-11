@@ -365,7 +365,6 @@ class CTriggerGeneralHelper {
 	 * Extracts trigger or trigger prototype dependent triggers or trigger prototypes.
 	 *
 	 * @param array $data
-	 * @return void
 	 */
 	public static function getDependencies(array &$data): void {
 		if ($data['dependencies']) {

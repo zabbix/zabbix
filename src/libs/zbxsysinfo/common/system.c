@@ -12,7 +12,6 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#include "../sysinfo.h"
 #include "zbxsysinfo_common.h"
 
 #include "system.h"

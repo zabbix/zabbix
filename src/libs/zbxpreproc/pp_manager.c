@@ -16,9 +16,7 @@
 #include "pp_worker.h"
 #include "pp_queue.h"
 #include "pp_task.h"
-#include "preproc_snmp.h"
 #include "zbxpreproc.h"
-#include "zbxcommon.h"
 #include "zbxalgo.h"
 #include "zbxtimekeeper.h"
 #include "zbxself.h"
@@ -36,11 +34,16 @@
 #include "zbxthreads.h"
 #include "zbxtime.h"
 #include "zbxrtc.h"
+#include "zbxpreprocbase.h"
 #include "zbx_rtc_constants.h"
 
 #ifdef HAVE_LIBXML2
 #	include <libxml/xpath.h>
 #	include <libxml/parser.h>
+#endif
+
+#ifdef HAVE_NETSNMP
+#	include "preproc_snmp.h"
 #endif
 
 static zbx_prepare_value_func_t	prepare_value_func_cb = NULL;

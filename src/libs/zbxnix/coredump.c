@@ -12,11 +12,12 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#include "zbxnix.h"
-
 #include "zbxcommon.h"
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+
+#include "zbxnix.h"
+
 /******************************************************************************
  *                                                                            *
  * Purpose: disable core dump                                                 *

@@ -292,6 +292,8 @@ class testFormServicesSla extends CWebTest {
 			]
 		];
 		$this->assertTableData($table_data, 'id:excluded-downtimes');
+
+		$dialog->close();
 	}
 
 	public function getSlaData() {
@@ -967,6 +969,8 @@ class testFormServicesSla extends CWebTest {
 		// Check Excluded downtimes were cloned.
 		$form->selectTab('Excluded downtimes');
 		$this->assertEquals($original_downtimes, $form->getField('Excluded downtimes')->asTable()->getRows()->asText());
+
+		$dialog->close();
 	}
 
 	/**
@@ -998,7 +1002,8 @@ class testFormServicesSla extends CWebTest {
 			$this->query('button:Create SLA')->waitUntilClickable()->one()->click();
 		}
 
-		$form = COverlayDialogElement::find()->waitUntilReady()->one()->asForm();
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		$form = $dialog->asForm();
 
 		// Add a prefix to the name of the SLA in case of update scenario to avoid duplicate names.
 		if ($update && CTesTArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_GOOD) {
@@ -1017,7 +1022,8 @@ class testFormServicesSla extends CWebTest {
 				foreach ($data['excluded_downtimes'] as $downtime) {
 					$button = (CTestArrayHelper::get($data, 'downtime_action') === 'edit') ? 'Edit' : 'Add';
 					$downtimes_table->query('button', $button)->waitUntilCLickable()->one()->click();
-					$downtimes_form = COverlayDialogElement::find()->all()->last()->waitUntilReady()->asForm();
+					$downtimes_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+					$downtimes_form = $downtimes_dialog->asForm();
 					$downtimes_form->fill($downtime);
 
 					$downtimes_form->submit();
@@ -1039,6 +1045,8 @@ class testFormServicesSla extends CWebTest {
 			// Excluded downtimes ar validated in their configuration dialog, so the error message should be checked here.
 			if (array_key_exists('downtime_error', $data)) {
 				$this->assertMessage(TEST_BAD, null, $data['downtime_error']);
+				$downtimes_dialog->close();
+				$dialog->close();
 
 				return;
 			}
@@ -1049,6 +1057,8 @@ class testFormServicesSla extends CWebTest {
 		if ($expected === TEST_BAD) {
 			$this->assertMessage(TEST_BAD, null, $data['error']);
 			$this->assertEquals($old_hash, CDBHelper::getHash(self::$sla_sql));
+
+			$dialog->close();
 		}
 		else {
 			$this->assertMessage(TEST_GOOD, ($update ? 'SLA updated' : 'SLA created'));
@@ -1117,6 +1127,8 @@ class testFormServicesSla extends CWebTest {
 					$this->assertEquals([], $downtimes_table->getRows()->asText());
 				}
 			}
+
+			COverlayDialogElement::find()->one()->close();
 		}
 	}
 

@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-05-23 17:05+0000\n"
+"PO-Revision-Date: 2024-06-03 15:57+0000\n"
 "Last-Translator: Kodai <kodai.terashima@zabbix.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -193,12 +193,12 @@ msgstr[0] "%2$s台中%1$s台の要素で障害発生中"
 #: app/views/administration.miscconfig.edit.php:127
 #, c-format
 msgid "%1$s or %2$s - allows the page to be displayed only in a frame on the same origin as the page itself"
-msgstr ""
+msgstr "%1$s または %2$s - フレーム内では同一オリジンページのみ表示できます"
 
 #: app/views/administration.miscconfig.edit.php:130
 #, c-format
 msgid "%1$s or %2$s - prevents the page from being displayed in a frame, regardless of the site attempting to do so"
-msgstr ""
+msgstr "%1$s または %2$s - サイトがフレーム内に表示しようとしたかどうかに関係なく、ページがフレーム内に表示されないようにします"
 
 #: jsLoader.php:341
 #, c-format
@@ -428,7 +428,7 @@ msgstr "オーバーライドの追加"
 
 #: tests/selenium/modules/clock32/Widget.php:46
 msgid "ALARM CLOCK"
-msgstr ""
+msgstr "アラームクロック"
 
 #: app/views/administration.user.list.php:137
 msgid "API access"
@@ -1112,7 +1112,7 @@ msgstr "高度なオプション"
 #: include/views/configuration.host.discovery.list.php:157
 #: include/views/configuration.host.discovery.list.php:172
 msgid "After"
-msgstr ""
+msgstr "以降"
 
 #: app/views/js/mfa.edit.js.php:168
 msgid "After this change, users who have already enrolled in this MFA method will have to complete the enrollment process again because TOTP secrets will be reset."
@@ -1453,11 +1453,11 @@ msgstr "いずれかの文字列が含まれる"
 
 #: app/views/js/popup.import.js.php:109
 msgid "Any existing host entities not present in the import file will be deleted. Click OK to proceed."
-msgstr ""
+msgstr "インポートファイルに含まれない既存のホストは削除されます。続けるにはOKをクリックしてください。"
 
 #: app/views/js/popup.import.js.php:106
 msgid "Any existing template entities not present in the import file will be deleted. Click OK to proceed."
-msgstr ""
+msgstr "インポートファイルに含まれない既存のテンプレートは削除されます。続けるにはOKをクリックしてください。"
 
 #: include/classes/core/CJsonRpc.php:225
 msgid "Application error."
@@ -2133,7 +2133,7 @@ msgstr "CSRFトークンテスト"
 
 #: tests/selenium/modules/module_number_7/actions/CsrfFormUpdate.php:35
 msgid "CSRF token validation succeeded."
-msgstr ""
+msgstr "CSRF トークンの検証が成功しました。"
 
 #: include/items.inc.php:1554
 msgid "CSV to JSON"
@@ -4544,7 +4544,7 @@ msgstr "コマンド"
 
 #: app/views/administration.timeouts.edit.php:138
 msgid "Communication"
-msgstr ""
+msgstr "コミュニケーション"
 
 #: include/items.inc.php:946
 msgctxt "SNMP Community"
@@ -5025,7 +5025,7 @@ msgstr "コンテキスト名"
 
 #: app/views/script.userinput.edit.php:82
 msgid "Continue"
-msgstr ""
+msgstr "続ける"
 
 #: app/views/popup.lldoverride.php:54
 msgid "Continue overrides"
@@ -5606,7 +5606,7 @@ msgstr[0] "ダッシュボードを削除しました"
 
 #: jsLoader.php:200
 msgid "Dashboard is used as data source."
-msgstr ""
+msgstr "ダッシュボードはデータソースとして利用されています。"
 
 #: app/views/monitoring.host.dashboard.view.php:144
 msgid "Dashboard list"
@@ -7113,7 +7113,7 @@ msgstr "除算分母"
 #: include/views/configuration.item.prototype.edit.php:839
 #: include/views/configuration.item.prototype.edit.php:854
 msgid "Do not store"
-msgstr ""
+msgstr "保存しない"
 
 #: jsLoader.php:213 jsLoader.php:358
 msgid "Do you wish to replace the conditional expression?"
@@ -7230,7 +7230,7 @@ msgstr "Duoユニバーサルプロンプト"
 
 #: include/classes/api/services/CUser.php:3493
 msgid "Duo state does not match saved state."
-msgstr ""
+msgstr "Duoの状態が保存された状態と一致しません。"
 
 #: include/classes/api/services/CMap.php:614
 #: include/classes/api/services/CMap.php:1076
@@ -7415,7 +7415,7 @@ msgstr "マップIDが空白です。"
 
 #: widgets/itemhistory/Widget.php:32
 msgid "Empty value."
-msgstr ""
+msgstr "空の値です。"
 
 #: app/views/action.list.php:167 app/views/administration.token.list.php:204
 #: app/views/administration.user.token.list.php:157
@@ -7807,7 +7807,7 @@ msgstr "イベント相関関係"
 #: include/classes/api/services/CCorrelation.php:536
 #, c-format
 msgid "Event correlation \"%1$s\" already exists."
-msgstr ""
+msgstr "イベント相関関係\"%1$s\"はすでに存在しています。"
 
 #: app/controllers/CControllerCorrelationCreate.php:107
 msgid "Event correlation created"
@@ -7863,7 +7863,7 @@ msgstr "イベントリスト [直近20]"
 
 #: include/classes/data/CItemData.php:962
 msgid "Event log monitoring. Returns count of entries"
-msgstr ""
+msgstr "イベントログの監視。エントリの数を返します"
 
 #: include/classes/data/CItemData.php:956
 msgid "Event log monitoring. Returns log"
@@ -17270,12 +17270,12 @@ msgstr "解決理由"
 #: widgets/problems/includes/WidgetProblems.php:251
 #, c-format
 msgid "Resolved by event correlation rule \"%1$s\"."
-msgstr ""
+msgstr "イベント相関関係ルール\"%1$s\"によって復旧。"
 
 #: include/classes/screens/CScreenProblem.php:1401
 #: widgets/problems/includes/WidgetProblems.php:254
 msgid "Resolved by event correlation rule."
-msgstr ""
+msgstr "イベント相関関係ルールによって復旧。"
 
 #: include/classes/screens/CScreenProblem.php:1408
 #: widgets/problems/includes/WidgetProblems.php:261
@@ -17614,7 +17614,7 @@ msgstr "ID\"%1$s\"のSLAは使用できません。"
 
 #: include/classes/html/widgets/fields/CWidgetFieldMultiSelectSlaView.php:35
 msgid "SLAs"
-msgstr ""
+msgstr "SLAs"
 
 #: app/partials/service.info.php:61 app/views/slareport.list.php:164
 msgid "SLI"
@@ -17949,7 +17949,7 @@ msgstr[0] "定期レポートを有効にしました"
 
 #: app/views/administration.timeouts.edit.php:188
 msgid "Scheduled report test"
-msgstr ""
+msgstr "定期レポートのテスト"
 
 #: app/controllers/CControllerScheduledReportUpdate.php:147
 msgid "Scheduled report updated"
@@ -19093,7 +19093,7 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:2855
 msgid "State of proxy memory buffer."
-msgstr ""
+msgstr "プロキシメモリバッファの状態。"
 
 #: widgets/svggraph/includes/WidgetForm.php:304
 #: widgets/svggraph/includes/WidgetForm.php:330
@@ -19313,6 +19313,10 @@ msgstr "文字列"
 msgid "String functions"
 msgstr "文字列関数"
 
+#: widgets/piechart/includes/WidgetForm.php:137
+msgid "Stroke width"
+msgstr ""
+
 #: include/items.inc.php:1545 include/items.inc.php:1549
 #: include/items.inc.php:1553 include/items.inc.php:1557
 msgid "Structured data"
@@ -19346,7 +19350,7 @@ msgstr "サブマップ"
 
 #: tests/selenium/modules/module_number_7/views/csrf.form.view.php:20
 msgid "Submit"
-msgstr ""
+msgstr "送信"
 
 #: app/controllers/CControllerPopupScheduledReportSubscriptionEdit.php:167
 msgid "Subscription"
@@ -19483,7 +19487,7 @@ msgstr "システム情報"
 
 #: include/classes/setup/CFrontendSetup.php:693
 msgid "System locale"
-msgstr ""
+msgstr "システムロケール"
 
 #: include/classes/data/CItemData.php:1463
 msgid "System statistics. Returns integer or float"
@@ -20631,7 +20635,7 @@ msgstr[0] "トリガーをコピーしました"
 
 #: widgets/toptriggers/includes/WidgetForm.php:76
 msgid "Trigger count"
-msgstr ""
+msgstr "トリガー数"
 
 #: app/views/administration.housekeeping.edit.php:50
 msgid "Trigger data storage period"
@@ -23787,7 +23791,7 @@ msgstr "between() - 値が指定された範囲内であるかチェック (1 - 
 #: widgets/tophosts/views/widget.view.php:116
 #: widgets/tophosts/views/widget.view.php:117
 msgid "binary value"
-msgstr ""
+msgstr "バイナリ値"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:405
 msgid "bitand() - Bitwise AND"
@@ -24265,11 +24269,11 @@ msgstr "エラーメッセージ"
 
 #: app/views/js/popup.itemtestedit.view.js.php:479
 msgid "error text"
-msgstr ""
+msgstr "エラーテキスト"
 
 #: include/forms.inc.php:1454 include/views/js/item.preprocessing.js.php:241
 msgid "error-matching"
-msgstr ""
+msgstr "エラーマッチング"
 
 #: app/views/popup.lldoverride.php:104
 #: include/views/configuration.host.discovery.edit.php:820

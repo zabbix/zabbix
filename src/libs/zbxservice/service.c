@@ -15,6 +15,8 @@
 #include "zbxservice.h"
 
 #include "zbxipcservice.h"
+#include "zbxalgo.h"
+#include "zbxdbhigh.h"
 
 void	zbx_event_severity_free(zbx_event_severity_t *event_severity)
 {

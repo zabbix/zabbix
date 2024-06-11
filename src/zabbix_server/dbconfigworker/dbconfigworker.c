@@ -14,7 +14,7 @@
 
 #include "dbconfigworker.h"
 
-#include "zbx_host_constants.h"
+#include "zbxtimekeeper.h"
 #include "zbxlog.h"
 #include "zbxself.h"
 #include "zbxipcservice.h"
@@ -24,6 +24,8 @@
 #include "zbxcacheconfig.h"
 #include "zbxalgo.h"
 #include "zbxdbhigh.h"
+#include "zbxdb.h"
+#include "zbxstr.h"
 
 static void	dbsync_item_rtname(zbx_vector_uint64_t *hostids, int *processed_num, int *updated_num,
 		int *macro_used)

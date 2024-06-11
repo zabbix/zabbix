@@ -16,14 +16,12 @@
 
 #include "zbxnix.h"
 #include "zbxexpression.h"
-#include "zbxregexp.h"
 #include "zbxhttp.h"
 #include "httpmacro.h"
 #include "zbxnum.h"
 #include "zbx_host_constants.h"
 #include "zbx_item_constants.h"
 #include "zbxpreproc.h"
-#include "zbxcurl.h"
 #include "zbxalgo.h"
 #include "zbxcacheconfig.h"
 #include "zbxdb.h"
@@ -32,6 +30,10 @@
 #include "zbxtime.h"
 
 #ifdef HAVE_LIBCURL
+
+#include "zbxregexp.h"
+
+#include "zbxcurl.h"
 
 typedef struct
 {

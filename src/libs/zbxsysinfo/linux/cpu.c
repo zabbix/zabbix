@@ -15,9 +15,9 @@
 #include "zbxsysinfo.h"
 #include "../sysinfo.h"
 
-#include "zbxnum.h"
+#include "../common/cpustat.h"
 
-#include "../common/stats.h"
+#include "zbxnum.h"
 
 int	system_cpu_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 {

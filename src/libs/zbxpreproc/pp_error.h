@@ -16,7 +16,8 @@
 #define ZABBIX_PP_ERROR_H
 
 #include "zbxpreproc.h"
-#include "zbxvariant.h"
+#include "zbxcacheconfig.h"
+#include "zbxpreprocbase.h"
 
 void	pp_result_set(zbx_pp_result_t *result, const zbx_variant_t *value, int action, zbx_variant_t *value_raw);
 void	pp_free_results(zbx_pp_result_t *results, int results_num);
