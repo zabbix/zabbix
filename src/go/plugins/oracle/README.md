@@ -81,6 +81,64 @@ GRANT SELECT ON V_$SGASTAT TO zabbix_mon;
 GRANT SELECT ON V_$SYSMETRIC TO zabbix_mon;
 GRANT SELECT ON V_$SYSTEM_PARAMETER TO zabbix_mon;
 ```
+
+**Important! These privileges grant `SELECT_CATALOG_ROLE` to the monitoring user, which, in turn, gives access to thousands of tables in the database.**
+This role is required to access `V$RESTORE_POINT` dynamic performance view.
+However, there are ways to go around this, if `SELECT_CATALOG_ROLE` assigned to a monitoring user is an issue.
+One way to do this is using **pipelined table functions**:
+
+  1. Log into your database as `SYS` user or make sure that your administration user has the required privileges to execute the steps below;
+  
+  2. Create types for table function:
+    
+      ```sql
+      CREATE OR REPLACE TYPE zbx_mon_restore_point_row AS OBJECT (
+        SCN                           NUMBER,
+        DATABASE_INCARNATION#         NUMBER,
+        GUARANTEE_FLASHBACK_DATABASE  VARCHAR2(3),
+        STORAGE_SIZE                  NUMBER,
+        TIME                          TIMESTAMP(9),
+        RESTORE_POINT_TIME            TIMESTAMP(9),
+        PRESERVED                     VARCHAR2(3),
+        NAME                          VARCHAR2(128),
+        PDB_RESTORE_POINT             VARCHAR2(3),
+        CLEAN_PDB_RESTORE_POINT       VARCHAR2(3),
+        PDB_INCARNATION#              NUMBER,
+        REPLICATED                    VARCHAR2(3),
+        CON_ID                        NUMBER
+      );
+      CREATE OR REPLACE TYPE zbx_mon_restore_point_tab IS TABLE OF zbx_mon_restore_point_row;
+      ```
+  
+  3. Create the pipelined table function:
+  
+      ```sql
+      CREATE OR REPLACE FUNCTION zbx_mon_restore_point RETURN zbx_mon_restore_point_tab PIPELINED AS
+      BEGIN
+        FOR i IN (SELECT * FROM V$RESTORE_POINT) LOOP
+          PIPE ROW (zbx_mon_restore_point_row(i.SCN, i.DATABASE_INCARNATION#, i.GUARANTEE_FLASHBACK_DATABASE, i.STORAGE_SIZE, i.TIME, i.RESTORE_POINT_TIME, i.PRESERVED, i.NAME, i.PDB_RESTORE_POINT, i.CLEAN_PDB_RESTORE_POINT, i.PDB_INCARNATION#, i.REPLICATED, i.CON_ID));
+        END LOOP;
+        RETURN;
+      END;
+      ```
+  
+  4. Grant execute privilege on the created pipelined table function to Zabbix monitoring user:
+
+      ```sql
+      GRANT EXECUTE ON zbx_mon_restore_point TO c##zabbix_mon;
+      ```
+
+  5. Replace monitoring user `V$RESTORE_POINT` view with `SYS` user function (in this example `SYS` user is used to create DB types and function) and finally revoke the `SELECT_CATALOG_ROLE`.
+
+      ```sql
+      CREATE OR REPLACE VIEW c##zabbix_mon.V$RESTORE_POINT AS SELECT * FROM TABLE(SYS.zbx_mon_restore_point);
+      REVOKE SELECT_CATALOG_ROLE FROM c##zabbix_mon;
+      ```
+
+  > Note, that in these examples, monitoring user is named `c##zabbix_mon` and system user - `SYS`. Change example usernames to ones that suit your environment.
+  
+  If this workaround does not suit you, there are more options available, such as __materialized views__, but look out for data refresh as `V$RESTORE_POINT` is a dynamic performance view.
+
 3. Make sure a TNS Listener and an Oracle instance are available for the connection.  
 
 ## Configuration
