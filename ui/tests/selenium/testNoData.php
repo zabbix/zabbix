@@ -230,6 +230,7 @@ class testNoData extends CWebTest {
 						: ['Operation' => $option];
 
 					$dialog->asForm()->fill($fields);
+					$dialog->waitUntilReady();
 					$condition_form = $dialog->query('xpath:.//form')->one()->asForm();
 
 					// Checked multselect field depend on filled option.
