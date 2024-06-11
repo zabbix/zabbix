@@ -4195,24 +4195,6 @@ out:
 	return ret;
 }
 
-static	void	get_item_info(const void *object, zbx_uint64_t *id, int *discovery_flag, int *lastcheck,
-		unsigned char *discovery_status, int *ts_delete, int *ts_disable, unsigned char *object_status,
-		unsigned char *disable_source, char **name)
-{
-	const zbx_lld_item_full_t	*item = (const zbx_lld_item_full_t *)object;
-
-	*id = item->itemid;
-	*discovery_flag = item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED;
-	*lastcheck = item->lastcheck;
-	*discovery_status = item->discovery_status;
-	*ts_delete = item->ts_delete;
-	*ts_disable = item->ts_disable;
-	*object_status = ITEM_STATUS_ACTIVE == item->status ?
-			ZBX_LLD_OBJECT_STATUS_ENABLED : ZBX_LLD_OBJECT_STATUS_DISABLED;
-	*disable_source = item->disable_source;
-	*name = item->name;
-}
-
 static	int	get_item_status_value(int status)
 {
 	if (ZBX_LLD_OBJECT_STATUS_ENABLED == status)
@@ -4502,6 +4484,51 @@ static void	lld_link_dependent_items(zbx_vector_lld_item_full_ptr_t *items, zbx_
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: process lost item resources                                       *
+ *                                                                            *
+ ******************************************************************************/
+static void	lld_process_lost_items(zbx_vector_lld_item_full_ptr_t *items, const zbx_lld_lifetime_t *lifetime,
+		const zbx_lld_lifetime_t *enabled_lifetime, int now)
+{
+	zbx_hashset_t	discoveries;
+
+	zbx_hashset_create(&discoveries, (size_t)items->values_num, ZBX_DEFAULT_UINT64_HASH_FUNC,
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	for (int i = 0; i < items->values_num; i++)
+	{
+		zbx_lld_item_full_t	*item = items->values[i];
+		zbx_lld_discovery_t	*discovery;
+
+		discovery = lld_add_discovery(&discoveries, item->itemid, item->name);
+
+		if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
+		{
+			lld_process_discovered_object(discovery, item->discovery_status, item->ts_delete);
+			lld_enable_discovered_object(discovery, ITEM_STATUS_DISABLED == item->status,
+					item->disable_source, item->ts_disable);
+			continue;
+		}
+
+		/* process lost items */
+
+		lld_process_lost_object(discovery, ITEM_STATUS_DISABLED == item->status, item->lastcheck, now, lifetime,
+				item->discovery_status, item->disable_source, item->ts_delete);
+
+		lld_disable_lost_object(discovery, ITEM_STATUS_DISABLED == item->status, item->lastcheck, now,
+				enabled_lifetime, item->ts_disable);
+	}
+
+	/* TODO: reset delete flags for items used in action conditions, done in separate task */
+
+	lld_flush_discoveries(&discoveries, "itemid", "items", "item_discovery", now, get_item_status_value,
+			zbx_db_delete_items, zbx_audit_item_create_entry, zbx_audit_item_update_json_update_status);
+
+	zbx_hashset_destroy(&discoveries);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: adds or updates discovered items                                  *
  *                                                                            *
  * Return value: SUCCEED - if items were successfully added/updated or        *
@@ -4567,9 +4594,7 @@ int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ll
 
 	lld_item_links_populate(&item_prototypes, lld_rows, &items_index);
 
-	lld_process_lost_objects("item_discovery", "items", "itemid", (zbx_vector_ptr_t *)&items, lifetime,
-			enabled_lifetime, lastcheck, zbx_db_delete_items, get_item_info, get_item_status_value,
-			zbx_audit_item_create_entry, zbx_audit_item_update_json_update_status);
+	lld_process_lost_items(&items, lifetime, enabled_lifetime, lastcheck);
 clean:
 	zbx_hashset_destroy(&items_index);
 
