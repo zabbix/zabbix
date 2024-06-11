@@ -103,7 +103,7 @@ class testNoData extends CWebTest {
 		$this->query('xpath://div[contains(@class, "sysmap_element ")]')->one()->waitUntilClickable()->click();
 		$form = $this->query('id:selementForm')->asForm()->one();
 
-		$cases = [
+		$overlays = [
 			'Trigger' => [
 				'field' => 'New triggers',
 				'title' => 'Triggers',
@@ -116,7 +116,7 @@ class testNoData extends CWebTest {
 			]
 		];
 
-		foreach ($cases as $type => $parameters) {
+		foreach ($overlays as $type => $parameters) {
 			$form->fill(['Type' => $type]);
 			$field = $form->getField($parameters['field']);
 
@@ -219,9 +219,11 @@ class testNoData extends CWebTest {
 			$action_form->selectTab($tab);
 
 			foreach ($fields as $field => $options) {
+				// Open Condition or Operations dialog.
 				$action_form->getFieldContainer($field)->query('button:Add')->one()->waitUntilClickable()->click();
 				$dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
 
+				// Open Conditions, Operations, Recovery or Update overlays one by one and fill corresponding options.
 				foreach ($options as $option) {
 					$fields = ($field === 'Conditions')
 						? ['Type' => $option]
@@ -230,6 +232,7 @@ class testNoData extends CWebTest {
 					$dialog->asForm()->fill($fields);
 					$condition_form = $dialog->query('xpath:.//form')->one()->asForm();
 
+					// Checked multselect field depend on filled option.
 					switch ($option) {
 						case self::SCRIPT:
 							$checked_field = 'Hosts';
@@ -248,16 +251,16 @@ class testNoData extends CWebTest {
 							$checked_field = $option.'s';
 					}
 
+					// Open overlay for testing.
 					$condition_form->getFieldContainer($checked_field)->query('button:Select')->one()->waitUntilClickable()->click();
 					$checked_overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();
 					$this->checkEmptyOverlay($checked_overlay, ($option === 'Proxy' ? 'Proxies' : $checked_field), '');
 					$checked_overlay->close();
 				}
-
 				$dialog->close();
 			}
 		}
-		$this->closeAllDialogs();
+		COverlayDialogElement::closeAll(true);
 	}
 
 	public static function getCheckEmptyStudData() {
@@ -635,7 +638,7 @@ class testNoData extends CWebTest {
 
 		// If form was opened in overlay it should be closed after test.
 		if (CTestArrayHelper::get($data, 'overlay_form', false)) {
-			$this->closeAllDialogs();
+			COverlayDialogElement::closeAll(true);
 		}
 	}
 
@@ -787,7 +790,7 @@ class testNoData extends CWebTest {
 			$this->checkEmptyOverlay($prototype_overlay, 'Item prototypes');
 		}
 
-		$this->closeAllDialogs();
+		COverlayDialogElement::closeAll(true);
 	}
 
 	/**
@@ -817,17 +820,8 @@ class testNoData extends CWebTest {
 			? "Filter is not set\nUse the filter to display results"
 			: 'No data found';
 		$this->assertEquals($text, $overlay->query('class:no-data-message')->one()->getText());
-	}
 
-	/**
-	 * Function for closing all overlays on the page.
-	 */
-	protected function closeAllDialogs() {
-		$dialogs = COverlayDialogElement::find()->all();
-		$dialog_count = $dialogs->count();
-
-		for ($i = $dialog_count - 1; $i >= 0; $i--) {
-			$dialogs->get($i)->close(true);
-		}
+		// Check that opened dialog does not contain any error messages.
+		$this->assertFalse($overlay->query('xpath:.//*[contains(@class, "msg-bad")]')->exists());
 	}
 }
