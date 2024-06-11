@@ -27,7 +27,7 @@ use Zabbix\Widgets\{
 
 use Zabbix\Widgets\Fields\{
 	CWidgetFieldCheckBox,
-	CWidgetFieldHostPatternSelect,
+	CWidgetFieldPatternSelectHost,
 	CWidgetFieldMultiSelectOverrideHost,
 	CWidgetFieldNumericBox,
 	CWidgetFieldRadioButtonList,
@@ -399,7 +399,7 @@ class WidgetForm extends CWidgetForm {
 			)
 			->addField($this->isTemplateDashboard()
 				? null
-				: (new CWidgetFieldHostPatternSelect('problemhosts', _('Problem hosts')))
+				: (new CWidgetFieldPatternSelectHost('problemhosts', _('Problem hosts')))
 					->setFlags(!$this->problems_on ? CWidgetField::FLAG_DISABLED : 0x00)
 			)
 			->addField(
