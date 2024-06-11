@@ -610,9 +610,18 @@ class testNoData extends CWebTest {
 		// Code for checking empty multiselects' overlays.
 		if (array_key_exists('checked_multiselects', $data)) {
 			foreach ($data['checked_multiselects'] as $field) {
-				$form = (CTestArrayHelper::get($data, 'overlay_form'))
-					? $overlay_form
-					: $this->query('name:zbx_filter')->asForm()->one();
+				if (CTestArrayHelper::get($data, 'overlay_form')) {
+					$form = $overlay_form;
+				}
+				else {
+					CFilterElement::find()->one()->setContext(CFilterElement::CONTEXT_RIGHT);
+					$form = $this->query('name:zbx_filter')->asForm()->one();
+				}
+
+//
+//				$form = (CTestArrayHelper::get($data, 'overlay_form'))
+//					? $overlay_form
+//					: $this->query('name:zbx_filter')->asForm()->one();
 
 				$overlay = $form->getField($field)->edit();
 
