@@ -612,9 +612,8 @@ if ($data['display_interfaces']) {
 		else {
 			$item_tab->addItem([
 				(new CLabel(_('Host interface'), 'interface'))->setId('js-item-interface-label'),
-				(new CFormField(
-					new CTextBox('interface', interfaceType2str(INTERFACE_TYPE_OPT), true)
-				))->setId('js-item-interface-field')
+				(new CFormField(new CTextBox('interface', interfaceType2str(INTERFACE_TYPE_OPT), true)))
+					->setId('js-item-interface-field')
 			]);
 		}
 	}
