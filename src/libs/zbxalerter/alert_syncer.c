@@ -1073,6 +1073,7 @@ ZBX_THREAD_ENTRY(zbx_alert_syncer_thread, args)
 		}
 
 		double	sec1 = zbx_time();
+		int	req_alerts = 0;
 		zbx_update_env(get_process_type_string(process_type), sec1);
 
 		if (NULL != message)
@@ -1083,6 +1084,7 @@ ZBX_THREAD_ENTRY(zbx_alert_syncer_thread, args)
 					zbx_setproctitle("%s [queuing alerts]", get_process_type_string(process_type));
 
 					alerts_num = am_db_queue_alerts(&amdb);
+					req_alerts = 1;
 					break;
 				case ZBX_IPC_ALERTER_RESULTS:
 					results_num = am_db_flush_results(&amdb.mediatypes, message->data);
@@ -1100,6 +1102,7 @@ ZBX_THREAD_ENTRY(zbx_alert_syncer_thread, args)
 			zbx_setproctitle("%s [queuing alerts]", get_process_type_string(process_type));
 
 			alerts_num = am_db_queue_alerts(&amdb);
+			req_alerts = 1;
 		}
 		else
 		{
@@ -1107,7 +1110,7 @@ ZBX_THREAD_ENTRY(zbx_alert_syncer_thread, args)
 			break;
 		}
 
-		if (FAIL == zbx_ipc_async_socket_send(&amdb.am, ZBX_IPC_ALERTER_RESULTS, NULL, 0))
+		if (1 == req_alerts && FAIL == zbx_ipc_async_socket_send(&amdb.am, ZBX_IPC_ALERTER_RESULTS, NULL, 0))
 				zabbix_log(LOG_LEVEL_ERR, "failed to request alert results");
 
 		if (time_cleanup + SEC_PER_HOUR < sec1)
