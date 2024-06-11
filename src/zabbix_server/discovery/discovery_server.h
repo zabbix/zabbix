@@ -16,6 +16,7 @@
 #define ZABBIX_DISCOVERY_SERVER_H
 
 #include "zbxdbhigh.h"
+#include "zbxalgo.h"
 
 void	*zbx_discovery_open_server(void);
 void	zbx_discovery_find_host_server(const zbx_uint64_t druleid, const char *ip, zbx_db_dhost *dhost);

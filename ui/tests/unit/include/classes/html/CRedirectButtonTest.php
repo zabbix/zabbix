@@ -20,30 +20,30 @@ class CRedirectButtonTest extends CTagTest {
 		return [
 			[
 				['caption'],
-				'<button type="button">caption</button>'
+				'<button type="button" tabindex="0">caption</button>'
 			],
 			[
 				['caption', 'http://google.com'],
-				'<button type="button" data-url="http://google.com">caption</button>'
+				'<button type="button" tabindex="0" data-url="http://google.com">caption</button>'
 			],
 			[
 				['caption', 'http://google.com', 'Are you sure?'],
-				'<button type="button" data-url="http://google.com" data-confirmation="Are you sure?">caption</button>'
+				'<button type="button" tabindex="0" data-url="http://google.com" data-confirmation="Are you sure?">caption</button>'
 			],
 			// CSRF token argument exists
 			[
 				['caption', (new CUrl('http://localhost'))->setArgument(CCsrfTokenHelper::CSRF_TOKEN_NAME, 'value')],
-				'<button type="button" data-post="1" data-url="http://localhost?_csrf_token=value">caption</button>'
+				'<button type="button" tabindex="0" data-post="1" data-url="http://localhost?_csrf_token=value">caption</button>'
 			],
 			// caption encoding
 			[
 				['</button>'],
-				'<button type="button">&lt;/button&gt;</button>'
+				'<button type="button" tabindex="0">&lt;/button&gt;</button>'
 			],
 			// parameter encoding
 			[
 				['caption', 'url"&"'],
-				'<button type="button" data-url="url&quot;&amp;&quot;">caption</button>'
+				'<button type="button" tabindex="0" data-url="url&quot;&amp;&quot;">caption</button>'
 			]
 		];
 	}

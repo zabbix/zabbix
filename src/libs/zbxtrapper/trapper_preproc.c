@@ -18,6 +18,7 @@
 #include "zbxjson.h"
 #include "zbxpreprocbase.h"
 #include "zbxtime.h"
+#include "zbxvariant.h"
 
 /******************************************************************************
  *                                                                            *

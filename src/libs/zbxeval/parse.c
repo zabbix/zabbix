@@ -15,7 +15,9 @@
 #include "zbxeval.h"
 #include "eval.h"
 
-#include "zbxstr.h"
+#include "zbxalgo.h"
+#include "zbxexpr.h"
+#include "zbxvariant.h"
 
 ZBX_VECTOR_IMPL(eval_token, zbx_eval_token_t)
 

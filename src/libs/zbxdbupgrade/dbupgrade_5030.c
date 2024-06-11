@@ -25,6 +25,11 @@
 #include "zbxexpr.h"
 #include "zbxnum.h"
 #include "zbxparam.h"
+#include "zbxdb.h"
+#include "zbxdbschema.h"
+#include "zbxstr.h"
+#include "zbxtime.h"
+#include "zbxvariant.h"
 #include "zbx_trigger_constants.h"
 #include "zbx_scripts_constants.h"
 

@@ -18,6 +18,7 @@
 #include "zbxcacheconfig.h"
 #include "zbxasyncpoller.h"
 #include "zbxcomms.h"
+#include "zbxalgo.h"
 
 typedef enum
 {

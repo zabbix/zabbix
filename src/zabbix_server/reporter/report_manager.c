@@ -17,14 +17,13 @@
 
 #include "../db_lengths_constants.h"
 
+#include "zbxtimekeeper.h"
 #include "zbxthreads.h"
 #include "zbxalerter.h"
 #include "zbxcrypto.h"
 #include "zbxexpression.h"
 #include "zbxself.h"
 #include "zbxnix.h"
-#include "zbxcrypto.h"
-#include "report_protocol.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
 #include "zbxlog.h"

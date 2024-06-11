@@ -14,11 +14,14 @@
 
 #include "lld.h"
 
+#include "../server_constants.h"
+
 #include "zbxdbhigh.h"
 #include "audit/zbxaudit.h"
 #include "zbxdb.h"
 #include "zbxnum.h"
-#include "../server_constants.h"
+#include "zbxalgo.h"
+#include "zbxstr.h"
 
 ZBX_VECTOR_DECL(id_name_pair, zbx_id_name_pair_t)
 ZBX_VECTOR_IMPL(id_name_pair, zbx_id_name_pair_t)

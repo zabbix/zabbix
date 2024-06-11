@@ -99,6 +99,8 @@ const char	*zbx_result_string(int result);
 
 #define ZBX_SIZE_T_MAX	(~(size_t)0)
 
+#define ZBX_MALLOC_TRIM (128 * ZBX_KIBIBYTE)
+
 /******************************************************************************
  *                                                                            *
  * Macro: ZBX_UNUSED                                                          *
@@ -401,11 +403,20 @@ void	zbx_this_should_never_happen_backtrace(void);
 														\
 do														\
 {														\
-	zbx_error("ERROR [file and function: <%s,%s>, revision:%s, line:%d] Something impossible has just"	\
-			" happened.", __FILE__, __func__, ZABBIX_REVISION, __LINE__);				\
 	zbx_this_should_never_happen_backtrace();								\
+	zbx_error("ERROR [file and function: <%s,%s>, revision:%s, line:%d] Something unexpected has just "	\
+			"happened.", __FILE__, __func__, ZABBIX_REVISION, __LINE__);				\
 }														\
 while (0)
+
+#define THIS_SHOULD_NEVER_HAPPEN_MSG(fmt, ...)									\
+														\
+do														\
+{														\
+	THIS_SHOULD_NEVER_HAPPEN;										\
+	zbx_error(fmt, ##__VA_ARGS__);										\
+}														\
+while(0)
 
 #define ARRSIZE(a)	(sizeof(a) / sizeof(*a))
 
