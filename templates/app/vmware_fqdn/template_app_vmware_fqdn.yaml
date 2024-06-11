@@ -151,7 +151,7 @@ zabbix_export:
               units: '%'
               username: '{$VMWARE.USERNAME}'
               password: '{$VMWARE.PASSWORD}'
-              description: 'VMware datastore space in percentage from total.'
+              description: 'VMware datastore free space in percentage from total.'
               tags:
                 - tag: component
                   value: datastore
@@ -159,23 +159,23 @@ zabbix_export:
                   value: '{#DATASTORE}'
               trigger_prototypes:
                 - uuid: 8eaaf5e25c464162acf2c93c2fab4606
-                  expression: 'last(/VMware FQDN/vmware.datastore.size[{$VMWARE.URL},{#DATASTORE},pfree])>{$VMWARE.DATASTORE.SPACE.CRIT}'
-                  name: '{#DATASTORE}: Disk space is critically low'
-                  event_name: 'Datastore space is critically low ({#DATASTORE} used space > {$VMWARE.DATASTORE.SPACE.CRIT}%)'
+                  expression: 'last(/VMware FQDN/vmware.datastore.size[{$VMWARE.URL},{#DATASTORE},pfree])<{$VMWARE.DATASTORE.SPACE.CRIT}'
+                  name: '{#DATASTORE}: Free space is critically low'
+                  event_name: 'Datastore free space is critically low ({#DATASTORE} free space < {$VMWARE.DATASTORE.SPACE.CRIT}%)'
                   priority: HIGH
-                  description: 'Datastore space exceeded critical threshold.'
+                  description: 'Datastore free space has fallen below critical threshold.'
                   tags:
                     - tag: scope
                       value: capacity
                 - uuid: 574963524fda419baae5d07c32f2fb89
-                  expression: 'last(/VMware FQDN/vmware.datastore.size[{$VMWARE.URL},{#DATASTORE},pfree])>{$VMWARE.DATASTORE.SPACE.WARN}'
-                  name: '{#DATASTORE}: Disk space is low'
-                  event_name: 'Datastore space is low ({#DATASTORE} used space > {$VMWARE.DATASTORE.SPACE.WARN}%)'
+                  expression: 'last(/VMware FQDN/vmware.datastore.size[{$VMWARE.URL},{#DATASTORE},pfree])<{$VMWARE.DATASTORE.SPACE.WARN}'
+                  name: '{#DATASTORE}: Free space is low'
+                  event_name: 'Datastore free space is low ({#DATASTORE} free space < {$VMWARE.DATASTORE.SPACE.WARN}%)'
                   priority: WARNING
-                  description: 'Datastore space exceeded warning threshold.'
+                  description: 'Datastore free space has fallen below warning threshold.'
                   dependencies:
-                    - name: '{#DATASTORE}: Disk space is critically low'
-                      expression: 'last(/VMware FQDN/vmware.datastore.size[{$VMWARE.URL},{#DATASTORE},pfree])>{$VMWARE.DATASTORE.SPACE.CRIT}'
+                    - name: '{#DATASTORE}: Free space is critically low'
+                      expression: 'last(/VMware FQDN/vmware.datastore.size[{$VMWARE.URL},{#DATASTORE},pfree])<{$VMWARE.DATASTORE.SPACE.CRIT}'
                   tags:
                     - tag: scope
                       value: capacity
@@ -278,11 +278,11 @@ zabbix_export:
           value: vmware-fqdn
       macros:
         - macro: '{$VMWARE.DATASTORE.SPACE.CRIT}'
-          value: '90'
-          description: 'The critical threshold of the datastore space utilization.'
+          value: '10'
+          description: 'The critical threshold of the datastore free space.'
         - macro: '{$VMWARE.DATASTORE.SPACE.WARN}'
-          value: '80'
-          description: 'The warning threshold of the datastore space utilization.'
+          value: '20'
+          description: 'The warning threshold of the datastore free space.'
         - macro: '{$VMWARE.HV.SENSOR.DISCOVERY}'
           value: 'false'
           description: 'Set "true"/"false" to enable or disable monitoring of hardware sensors.'
@@ -1455,7 +1455,7 @@ zabbix_export:
               units: '%'
               username: '{$VMWARE.USERNAME}'
               password: '{$VMWARE.PASSWORD}'
-              description: 'VMware datastore space in percentage from total.'
+              description: 'VMware datastore free space in percentage from total.'
               tags:
                 - tag: component
                   value: datastore
@@ -1463,23 +1463,23 @@ zabbix_export:
                   value: '{#DATASTORE}'
               trigger_prototypes:
                 - uuid: 79c83ed72685487a9ef139c42eea1106
-                  expression: 'last(/VMware Hypervisor/vmware.hv.datastore.size[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE},pfree])>{$VMWARE.HV.DATASTORE.SPACE.CRIT}'
-                  name: '{#DATASTORE}: Disk space is critically low'
-                  event_name: 'Datastore space is critically low ({#DATASTORE} used space > {$VMWARE.HV.DATASTORE.SPACE.CRIT}%)'
+                  expression: 'last(/VMware Hypervisor/vmware.hv.datastore.size[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE},pfree])<{$VMWARE.HV.DATASTORE.SPACE.CRIT}'
+                  name: '{#DATASTORE}: Free space is critically low'
+                  event_name: 'Datastore free space is critically low ({#DATASTORE} free space < {$VMWARE.HV.DATASTORE.SPACE.CRIT}%)'
                   priority: HIGH
-                  description: 'Datastore space exceeded critical threshold.'
+                  description: 'Datastore free space has fallen below critical threshold.'
                   tags:
                     - tag: scope
                       value: capacity
                 - uuid: 5bc64ee899444a01a5bc315290256cdf
-                  expression: 'last(/VMware Hypervisor/vmware.hv.datastore.size[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE},pfree])>{$VMWARE.HV.DATASTORE.SPACE.WARN}'
-                  name: '{#DATASTORE}: Disk space is low'
-                  event_name: 'Datastore space is low ({#DATASTORE} used space > {$VMWARE.HV.DATASTORE.SPACE.WARN}%)'
+                  expression: 'last(/VMware Hypervisor/vmware.hv.datastore.size[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE},pfree])<{$VMWARE.HV.DATASTORE.SPACE.WARN}'
+                  name: '{#DATASTORE}: Free space is low'
+                  event_name: 'Datastore free space is low ({#DATASTORE} free space < {$VMWARE.HV.DATASTORE.SPACE.WARN}%)'
                   priority: WARNING
-                  description: 'Datastore space exceeded warning threshold.'
+                  description: 'Datastore free space has fallen below warning threshold.'
                   dependencies:
-                    - name: '{#DATASTORE}: Disk space is critically low'
-                      expression: 'last(/VMware Hypervisor/vmware.hv.datastore.size[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE},pfree])>{$VMWARE.HV.DATASTORE.SPACE.CRIT}'
+                    - name: '{#DATASTORE}: Free space is critically low'
+                      expression: 'last(/VMware Hypervisor/vmware.hv.datastore.size[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE},pfree])<{$VMWARE.HV.DATASTORE.SPACE.CRIT}'
                   tags:
                     - tag: scope
                       value: capacity
@@ -1709,11 +1709,11 @@ zabbix_export:
           value: vmware-hypervisor
       macros:
         - macro: '{$VMWARE.HV.DATASTORE.SPACE.CRIT}'
-          value: '90'
-          description: 'The critical threshold of the datastore space utilization.'
+          value: '10'
+          description: 'The critical threshold of the datastore free space.'
         - macro: '{$VMWARE.HV.DATASTORE.SPACE.WARN}'
-          value: '80'
-          description: 'The warning threshold of the datastore space utilization.'
+          value: '20'
+          description: 'The warning threshold of the datastore free space.'
         - macro: '{$VMWARE.HV.SENSOR.DISCOVERY}'
           value: 'false'
           description: 'Set "true"/"false" to enable or disable monitoring of hardware sensors.'
