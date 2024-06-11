@@ -705,6 +705,7 @@ static void	lld_check_objects_in_db(zbx_hashset_t *discoveries, zbx_vector_uint6
 				discovery->flags &= ~ZBX_LLD_DISCOVERY_UPDATE_OBJECT_STATUS;
 		}
 	}
+	zbx_db_free_result(result);
 
 	/* reset discovery flags for already removed objects */
 	for (int i = 0; i < upd_ids->values_num; i++)
