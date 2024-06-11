@@ -34,15 +34,12 @@ class testFormAlarmNotification extends CWebTest {
 	 *
 	 * @return array
 	 */
-	public function getBehaviors()
-	{
+	public function getBehaviors() {
 		return [
 			CTableBehavior::class
 		];
 	}
 
-	protected static $itemids;
-	protected static $triggersid;
 	protected static $hostid;
 
 	protected $all_triggers = [
@@ -112,7 +109,6 @@ class testFormAlarmNotification extends CWebTest {
 				]
 			]
 		]);
-		self::$itemids = $response['itemids'];
 		self::$hostid = $response['hostids']['Host for alarm item'];
 
 		CDataHelper::call('trigger.create', [
@@ -178,7 +174,6 @@ class testFormAlarmNotification extends CWebTest {
 				'type' => 1
 			]
 		]);
-		self::$triggersid = CDataHelper::getIds('description');
 
 		// Enable Alarm Notification display for user.
 		DBexecute('INSERT INTO profiles (profileid, userid, idx, value_str, source, type)'.
@@ -218,6 +213,7 @@ class testFormAlarmNotification extends CWebTest {
 			if ($field === 'Triggers') {
 				$name = 'Host for alarm item: '.$name;
 			}
+
 			$form->checkValue([$field => $name]);
 		}
 
@@ -450,10 +446,9 @@ class testFormAlarmNotification extends CWebTest {
 			}
 		}
 
-		// Check close button.
+		// Check close button and close the problems.
 		$alarm_dialog->query('xpath:.//button[@title="Close"]')->one()->click();
 		$alarm_dialog->ensureNotPresent();
-
 		$this->closeProblem();
 	}
 
@@ -526,8 +521,14 @@ class testFormAlarmNotification extends CWebTest {
 			// #7 Not classified and High severities turned off.
 			[
 				[
-					'severity_status' => ['Not classified' => false, 'High' => false],
-					'trigger_name' => ['Not_classified_trigger', 'High_trigger']
+					'severity_status' => [
+						'Not classified' => false,
+						'High' => false
+					],
+					'trigger_name' => [
+						'Not_classified_trigger',
+						'High_trigger'
+					]
 				]
 			]
 		];
@@ -590,7 +591,7 @@ class testFormAlarmNotification extends CWebTest {
 	}
 
 	/**
-	 * Update Problems severity display from user profile page.
+	 * Update Problems severity display from user profile page (disable/enable).
 	 */
 	protected function updateSeverity($parameters = null) {
 		$all_severity = [
@@ -605,7 +606,6 @@ class testFormAlarmNotification extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=userprofile.edit')->waitUntilReady();
 		$form = $this->query('id:user-form')->asForm()->one();
 		$form->selectTab('Messaging');
-
 		$form->fill($all_severity);
 
 		if ($parameters !== null) {
