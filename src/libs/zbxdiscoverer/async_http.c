@@ -12,13 +12,15 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#include "async_http.h"
 #include "zbxcommon.h"
+
+#ifdef HAVE_LIBCURL
+
+#include "async_http.h"
+#include "discoverer_int.h"
 #include "zbxsysinc.h"
 #include "zbxip.h"
 #include "zbx_discoverer_constants.h"
-
-#ifdef HAVE_LIBCURL
 
 static int	http_task_process(short event, void *data, int *fd, const char *addr, char *dnserr)
 {

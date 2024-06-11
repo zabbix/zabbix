@@ -16,7 +16,6 @@
 #define ZABBIX_COMMS_H
 
 #include "config.h"
-#include "zbxtime.h"
 
 /* socket polling timeout in milliseconds */
 #define ZBX_SOCKET_POLL_TIMEOUT	1000

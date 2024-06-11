@@ -15,15 +15,18 @@
 #include "httprequest.h"
 #include "embed.h"
 
-#include "zbxstr.h"
-#include "zbxjson.h"
-#include "zbxhttp.h"
 #include "duktape.h"
-#include "zbxalgo.h"
-#include "zbxcurl.h"
-#include "global.h"
 
 #ifdef HAVE_LIBCURL
+
+#include "global.h"
+
+#include "zbxtime.h"
+#include "zbxjson.h"
+#include "zbxstr.h"
+#include "zbxhttp.h"
+#include "zbxcurl.h"
+#include "zbxalgo.h"
 
 #define ZBX_HTTPAUTH_NONE	CURLAUTH_NONE
 #define ZBX_HTTPAUTH_BASIC	CURLAUTH_BASIC

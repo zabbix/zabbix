@@ -15,10 +15,11 @@
 #ifndef ZABBIX_CONFIGCACHE_H
 #define ZABBIX_CONFIGCACHE_H
 
-#include "zbxcommon.h"
 #include "zbxalgo.h"
 #include "dbconfig.h"
 #include "zbxalgo.h"
+
+#include "../../../src/libs/zbxcacheconfig/user_macro.h"
 
 typedef struct
 {

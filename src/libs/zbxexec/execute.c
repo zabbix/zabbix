@@ -15,7 +15,6 @@
 #include "zbxexec.h"
 
 #include "zbxstr.h"
-#include "zbxtime.h"
 #include "zbxthreads.h"
 #include "zbxlog.h"
 

@@ -16,6 +16,7 @@
 
 #include "zbxalgo.h"
 #include "zbxjson.h"
+#include "zbxnum.h"
 
 typedef struct
 {

@@ -13,8 +13,6 @@
 **/
 
 #include "checks_snmp.h"
-#include "zbxcacheconfig.h"
-#include "zbxip.h"
 
 #ifdef HAVE_NETSNMP
 
@@ -24,6 +22,9 @@
 #include "async_poller.h"
 #include "zbxpoller.h"
 
+#include "zbxtimekeeper.h"
+#include "zbxcacheconfig.h"
+#include "zbxip.h"
 #include "zbxcomms.h"
 #include "zbxalgo.h"
 #include "zbxjson.h"
@@ -1617,7 +1618,6 @@ reduce_max_vars:
 					running = 0;
 					break;
 				}
-
 
 				if (SUCCEED != zbx_snmp_choose_index(oid_index, sizeof(oid_index), var->name,
 						var->name_length, root_string_len, root_numeric_len, root_oid))
@@ -3677,10 +3677,24 @@ void	get_values_snmp(zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes,
 
 		if (NULL == (dnsbase = evdns_base_new(snmp_result.base, EVDNS_BASE_INITIALIZE_NAMESERVERS)))
 		{
-			event_base_free(snmp_result.base);
-			SET_MSG_RESULT(&results[j], zbx_strdup(NULL, "cannot initialize asynchronous DNS library"));
-			errcodes[j] = CONFIG_ERROR;
-			goto out;
+			int	ret;
+
+			zabbix_log(LOG_LEVEL_ERR, "cannot initialize asynchronous DNS library with resolv.conf");
+
+			if (NULL == (dnsbase = evdns_base_new(snmp_result.base, 0)))
+			{
+				event_base_free(snmp_result.base);
+				SET_MSG_RESULT(&results[j], zbx_strdup(NULL,
+						"cannot initialize asynchronous DNS library"));
+				errcodes[j] = CONFIG_ERROR;
+				goto out;
+			}
+
+			if (0 != (ret = evdns_base_resolv_conf_parse(dnsbase, DNS_OPTIONS_ALL, ZBX_RES_CONF_FILE)))
+			{
+				zabbix_log(LOG_LEVEL_ERR, "cannot parse resolv.conf result: %s",
+						zbx_resolv_conf_errstr(ret));
+			}
 		}
 
 		zbx_set_snmp_bulkwalk_options(progname);

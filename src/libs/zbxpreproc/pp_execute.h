@@ -19,8 +19,8 @@
 #include "zbxembed.h"
 #include "zbxpreproc.h"
 #include "zbxtime.h"
-#include "zbxvariant.h"
 #include "zbxcacheconfig.h"
+#include "zbxpreprocbase.h"
 
 typedef struct
 {

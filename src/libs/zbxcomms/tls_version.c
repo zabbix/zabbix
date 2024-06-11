@@ -12,12 +12,11 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#include "zbxcomms.h"
 #include "zbxcommon.h"
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 
-#include "zbxcrypto.h"
+#include "zbxcomms.h"
 
 /******************************************************************************
  *                                                                            *

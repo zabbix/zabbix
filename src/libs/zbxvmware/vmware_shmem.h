@@ -15,7 +15,10 @@
 #define ZABBIX_VMWARE_SHMEM_H
 
 #include "zbxvmware.h"
-#include "vmware_internal.h"
+
+#if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
+#	include "vmware_internal.h"
+#endif
 
 #include "zbxshmem.h"
 #include "zbxalgo.h"

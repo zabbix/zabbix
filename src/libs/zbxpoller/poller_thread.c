@@ -20,7 +20,14 @@
 #include "checks_script.h"
 #include "checks_browser.h"
 #include "checks_simple.h"
-#include "checks_snmp.h"
+
+#ifdef HAVE_NETSNMP
+#	include "checks_snmp.h"
+#endif
+
+#ifdef HAVE_LIBCURL
+#	include "checks_http.h"
+#endif
 
 #ifdef HAVE_UNIXODBC
 #	include "checks_db.h"
@@ -28,7 +35,6 @@
 
 #include "checks_java.h"
 #include "checks_calculated.h"
-#include "checks_http.h"
 
 #include "zbxexpression.h"
 #include "zbxalgo.h"

@@ -580,6 +580,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		if ($this->fields_values['draw_type'] == WidgetForm::DRAW_TYPE_DOUGHNUT) {
 			$config['width'] = $this->fields_values['width'];
+			$config['stroke'] = $this->fields_values['stroke'];
 
 			if ($this->fields_values['total_show'] == self::SHOW_TOTAL_ON) {
 				$config['total_value'] = [
