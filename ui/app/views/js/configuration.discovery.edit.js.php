@@ -192,14 +192,20 @@
 				}
 				else {
 					if ($obj.length) {
-						if ($obj.is(':checked')) {
-							jQuery('#' + key + '_' + param[0]).prop('checked', true);
-						}
-
 						$obj.remove();
 					}
 				}
 			});
+		}
+
+		const form = document.getElementById('discoveryForm');
+
+		for (const name of ['uniqueness_criteria', 'host_source', 'name_source']) {
+			const elements = form.querySelectorAll(`input[name="${name}"]`);
+
+			if ([...elements].filter(element => element.checked).length == 0) {
+				elements[0].checked = true;
+			}
 		}
 	}
 
