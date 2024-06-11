@@ -83,6 +83,47 @@ class testNoData extends CWebTest {
 		]);
 	}
 
+	/**
+	 * Test function for checking empty studs in map element.
+	 */
+	public function testNoData_MapElement() {
+		$this->page->login()->open('sysmap.php?sysmapid=1');
+
+		// Click on map element.
+		$this->query('xpath://div[contains(@class, "sysmap_element ")]')->one()->waitUntilClickable()->click();
+		$form = $this->query('id:selementForm')->asForm()->one();
+
+		$cases = [
+			'Trigger' => [
+				'field' => 'New triggers',
+				'title' => 'Triggers',
+				'filter' => 'Host'
+			],
+			'Host' => [
+				'field' => 'Host',
+				'title' => 'Hosts',
+				'filter' => 'Host group'
+			]
+		];
+
+		foreach ($cases as $type => $parameters) {
+			$form->fill(['Type' => $type]);
+			$field = $form->getField($parameters['field']);
+
+			// Checked field should be empty.
+			$this->assertEquals('', $field->getValue());
+
+			// Open overlay dialog.
+			$field->query('button:Select')->one()->waitUntilClickable()->click();
+			$overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+
+			// Check filter label and overlay empty stud.
+			$this->assertEquals($parameters['filter'], $overlay->query('tag:label')->one()->getText());
+			$this->checkEmptyOverlay($overlay, $parameters['title'], '');
+			$overlay->close();
+		}
+	}
+
 	public static function getCheckEmptyStudData() {
 		return [
 			// #0 No filter selected, Proxy field check.
@@ -443,7 +484,7 @@ class testNoData extends CWebTest {
 
 		// If form was opened in overlay it should be closed after test.
 		if (CTestArrayHelper::get($data, 'overlay_form', false)) {
-			$template_overlay->close();
+			$this->closeAllDialogs();
 		}
 	}
 
@@ -588,7 +629,7 @@ class testNoData extends CWebTest {
 				$form->query('xpath:.//button[@id="insert-expression"]')->one()->waitUntilCLickable()->click();
 				$expression_overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();
 				$expression_overlay->query('button:Select')->one()->waitUntilCLickable()->click();
-				$items_overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+				$items_overlay = COverlayDialogElement::find()->all()->last();
 				$this->checkEmptyOverlay($items_overlay, 'Items', [$host]);
 				$form = $expression_overlay;
 				break;
@@ -596,13 +637,13 @@ class testNoData extends CWebTest {
 			case 'graph':
 			case 'graph prototype':
 				$form->getFieldContainer('Items')->query('button:Add')->one()->waitUntilCLickable()->click();
-				$items_overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+				$items_overlay = COverlayDialogElement::find()->all()->last();
 				$this->checkEmptyOverlay($items_overlay, 'Items', [$host]);
 				break;
 
 			case 'host prototype':
 				$form->query('xpath:(.//button[text()="Select"])[1]')->one()->waitUntilCLickable()->click();
-				$templates_overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+				$templates_overlay = COverlayDialogElement::find()->all()->last();
 				$this->checkEmptyOverlay($templates_overlay, 'Templates', '');
 		}
 
@@ -617,13 +658,7 @@ class testNoData extends CWebTest {
 			$this->checkEmptyOverlay($prototype_overlay, 'Item prototypes');
 		}
 
-		// Close all dialogs.
-		$dialogs = COverlayDialogElement::find()->all();
-		$dialog_count = $dialogs->count();
-
-		for ($i = $dialog_count - 1; $i >= 0; $i--) {
-			$dialogs->get($i)->close(true);
-		}
+		$this->closeAllDialogs();
 	}
 
 	/**
@@ -631,27 +666,39 @@ class testNoData extends CWebTest {
 	 *
 	 * @param COverlayDialogElement    $overlay    tested overlay
 	 * @param string                   $title      title of tested overlay
-	 * @param string                   $host       hostname selected in overlay filter
+	 * @param string                   $filter     hostname selected in overlay filter
 	 */
-	protected function checkEmptyOverlay($overlay, $title, $host = null) {
-		$this->assertEquals($title, $overlay->getTitle());
+	protected function checkEmptyOverlay($overlay, $title, $filter = null) {
+		$this->assertEquals($title, $overlay->waitUntilReady()->getTitle());
 
 		// For SLA overlays filter is not multiselect, but input.
-		$filter = (in_array($title, ['SLA', 'Service']))
+		$filter_selector = (in_array($title, ['SLA', 'Service']))
 			? $overlay->query('id:services-filter-name')
 			: $overlay->query('xpath:.//div[@class="multiselect-control"]')->asMultiselect();
 
 		// There are overlays where additional filter exists, and there are some - where it shouldn't exist.
 		if (in_array($title, ['Proxies', 'Proxy groups', 'Value mapping', 'Discovery rules', 'SLA', 'Item prototypes'])) {
-			$this->assertFalse($filter->exists());
+			$this->assertFalse($filter_selector->exists());
 		}
 		else {
-			$this->assertEquals($host, $filter->one()->getValue());
+			$this->assertEquals($filter, $filter_selector->one()->getValue());
 		}
 
-		$text = (in_array($title, ['Templates', 'Hosts']))
+		$text = (in_array($title, ['Templates', 'Hosts', 'Triggers']))
 			? "Filter is not set\nUse the filter to display results"
 			: 'No data found';
 		$this->assertEquals($text, $overlay->query('class:no-data-message')->one()->getText());
+	}
+
+	/**
+	 * Function for closing all overlays on the page.
+	 */
+	protected function closeAllDialogs() {
+		$dialogs = COverlayDialogElement::find()->all();
+		$dialog_count = $dialogs->count();
+
+		for ($i = $dialog_count - 1; $i >= 0; $i--) {
+			$dialogs->get($i)->close(true);
+		}
 	}
 }
