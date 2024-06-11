@@ -29,6 +29,7 @@ class testNoData extends CWebTest {
 	const EMPTY_HOST = 'Empty host for multiselects test';
 	const EMPTY_LLD_HOST = 'Host with empty LLD';
 	const EMPTY_TEMPLATE = 'Empty template for multiselects test';
+	const SCRIPT = 'Script for Actions';
 	public static $empty_hostid;
 	public static $lld_hostid;
 	public static $lldid;
@@ -81,6 +82,15 @@ class testNoData extends CWebTest {
 			'host' => self::EMPTY_TEMPLATE,
 			'groups' => [['groupid' => $template_groupid]]
 		]);
+
+		CDataHelper::call('script.create', [
+			[
+				'name' => self::SCRIPT,
+				'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
+				'scope' => ZBX_SCRIPT_SCOPE_ACTION,
+				'command' => 'test script'
+			]
+		]);
 	}
 
 	/**
@@ -129,7 +139,8 @@ class testNoData extends CWebTest {
 			// #0 No filter selected, Proxy field check.
 			[
 				[
-					'page' => 'Hosts',
+					'object' => 'Hosts',
+					'url' => 'zabbix.php?action=host.list',
 					'checked_multiselects' => [
 						'Templates',
 						'Proxies'
@@ -142,7 +153,8 @@ class testNoData extends CWebTest {
 			// #1 No filter selected, Proxy group field check.
 			[
 				[
-					'page' => 'Hosts',
+					'object' => 'Hosts',
+					'url' => 'zabbix.php?action=host.list',
 					'checked_multiselects' => [
 						'Proxy groups'
 					],
@@ -153,7 +165,8 @@ class testNoData extends CWebTest {
 			// #2 Host's Items page.
 			[
 				[
-					'page' => 'Hosts',
+					'object' => 'Hosts',
+					'url' => 'zabbix.php?action=host.list',
 					'sub_object' => 'Items' ,
 					'check_table' => true,
 					'checked_multiselects' => [
@@ -165,7 +178,8 @@ class testNoData extends CWebTest {
 			// #3 Host's Triggers page.
 			[
 				[
-					'page' => 'Hosts',
+					'object' => 'Hosts',
+					'url' => 'zabbix.php?action=host.list',
 					'sub_object' => 'Triggers' ,
 					'check_table' => true,
 					'checked_multiselects' => [
@@ -176,7 +190,8 @@ class testNoData extends CWebTest {
 			// #4 Host's Graphs page.
 			[
 				[
-					'page' => 'Hosts',
+					'object' => 'Hosts',
+					'url' => 'zabbix.php?action=host.list',
 					'sub_object' => 'Graphs' ,
 					'check_table' => true,
 					'checked_multiselects' => [
@@ -187,7 +202,8 @@ class testNoData extends CWebTest {
 			// #5 Host's LLDs page.
 			[
 				[
-					'page' => 'Hosts',
+					'object' => 'Hosts',
+					'url' => 'zabbix.php?action=host.list',
 					'sub_object' => 'Discovery' ,
 					'check_table' => true,
 					'checked_multiselects' => [
@@ -198,7 +214,8 @@ class testNoData extends CWebTest {
 			// #6 Host's Web scenarios page.
 			[
 				[
-					'page' => 'Hosts',
+					'object' => 'Hosts',
+					'url' => 'zabbix.php?action=host.list',
 					'sub_object' => 'Web',
 					'check_table' => true,
 					'checked_multiselects' => [
@@ -209,7 +226,8 @@ class testNoData extends CWebTest {
 			// #7 Non-existing host filtered.
 			[
 				[
-					'page' => 'Hosts',
+					'object' => 'Hosts',
+					'url' => 'zabbix.php?action=host.list',
 					'filter' => [
 						'Name' => 'zzz',
 						'Monitored by' => 'Proxy group'
@@ -224,7 +242,8 @@ class testNoData extends CWebTest {
 			// #8 Templates: No filter selected.
 			[
 				[
-					'page' => 'Templates',
+					'object' => 'Templates',
+					'url' => 'zabbix.php?action=template.list',
 					'checked_multiselects' => [
 						'Linked templates'
 					]
@@ -233,7 +252,8 @@ class testNoData extends CWebTest {
 			// #9 Templates: Non-existing Template filtered.
 			[
 				[
-					'page' => 'Templates',
+					'object' => 'Templates',
+					'url' => 'zabbix.php?action=template.list',
 					'filter' => ['Name' => 'zzz'],
 					'check_table' => true,
 					'checked_multiselects' => [
@@ -244,7 +264,8 @@ class testNoData extends CWebTest {
 			// #10 Templated Items page.
 			[
 				[
-					'page' => 'Templates',
+					'object' => 'Templates',
+					'url' => 'zabbix.php?action=template.list',
 					'sub_object' => 'Items' ,
 					'check_table' => true,
 					'checked_multiselects' => [
@@ -256,7 +277,8 @@ class testNoData extends CWebTest {
 			// #11 Templated Triggers page.
 			[
 				[
-					'page' => 'Templates',
+					'object' => 'Templates',
+					'url' => 'zabbix.php?action=template.list',
 					'sub_object' => 'Triggers' ,
 					'check_table' => true,
 					'checked_multiselects' => [
@@ -267,7 +289,8 @@ class testNoData extends CWebTest {
 			// #12 Templated Graphs page.
 			[
 				[
-					'page' => 'Templates',
+					'object' => 'Templates',
+					'url' => 'zabbix.php?action=template.list',
 					'sub_object' => 'Graphs' ,
 					'check_table' => true,
 					'checked_multiselects' => [
@@ -278,7 +301,8 @@ class testNoData extends CWebTest {
 			// #13 Templated Dashboards page.
 			[
 				[
-					'page' => 'Templates',
+					'object' => 'Templates',
+					'url' => 'zabbix.php?action=template.list',
 					'sub_object' => 'Dashboards',
 					'check_table' => true,
 					'no_filter' => true
@@ -287,7 +311,8 @@ class testNoData extends CWebTest {
 			// #14 Templated LLD page.
 			[
 				[
-					'page' => 'Templates',
+					'object' => 'Templates',
+					'url' => 'zabbix.php?action=template.list',
 					'sub_object' => 'Discovery',
 					'check_table' => true,
 					'checked_multiselects' => [
@@ -298,7 +323,8 @@ class testNoData extends CWebTest {
 			// #15 Templated Web scenarios rules page.
 			[
 				[
-					'page' => 'Templates',
+					'object' => 'Templates',
+					'url' => 'zabbix.php?action=template.list',
 					'sub_object' => 'Web',
 					'check_table' => true,
 					'checked_multiselects' => [
@@ -309,7 +335,8 @@ class testNoData extends CWebTest {
 			// #16 Discovery rules page.
 			[
 				[
-					'page' => 'Discovery',
+					'object' => 'Discovery',
+					'url' => 'zabbix.php?action=discovery.view',
 					'check_table' => true,
 					'checked_multiselects' => [
 						'Discovery rule'
@@ -319,7 +346,8 @@ class testNoData extends CWebTest {
 			// #17 Host form overlay.
 			[
 				[
-					'page' => 'Host',
+					'object' => 'host',
+					'url' => 'zabbix.php?action=host.list',
 					'checked_multiselects' => [
 						'Templates'
 					],
@@ -329,7 +357,8 @@ class testNoData extends CWebTest {
 			// #18 Template form overlay.
 			[
 				[
-					'page' => 'Template',
+					'object' => 'template',
+					'url' => 'zabbix.php?action=template.list',
 					'checked_multiselects' => [
 						'Templates'
 					],
@@ -339,40 +368,66 @@ class testNoData extends CWebTest {
 			// #19 Item prototypes table.
 			[
 				[
-					'page' => 'Item prototypes',
+					'object' => 'Item prototypes',
+					'url' => 'zabbix.php?action=item.prototype.list&context=host&parent_discoveryid=',
 					'check_table' => true
 				]
 			],
 			// #20 Trigger prototypes table.
 			[
 				[
-					'page' => 'Trigger prototypes',
+					'object' => 'Trigger prototypes',
+					'url' => 'zabbix.php?action=trigger.prototype.list&context=host&parent_discoveryid=',
 					'check_table' => true
 				]
 			],
 			// #21 Graph prototypes table.
 			[
 				[
-					'page' => 'Graph prototypes',
+					'object' => 'Graph prototypes',
+					'url' => 'graphs.php?context=host&parent_discoveryid=',
 					'check_table' => true
 				]
 			],
 			// #22 Host prototypes table.
 			[
 				[
-					'page' => 'Host prototypes',
+					'object' => 'Host prototypes',
+					'url' => 'host_prototypes.php?context=host&parent_discoveryid=',
 					'check_table' => true
 				]
 			],
 			// #23 SLA report page.
 			[
 				[
-					'page' => 'SLA report',
+					'object' => 'SLA report',
+					'url' => 'zabbix.php?action=slareport.list',
 					'check_table' => true,
 					'checked_multiselects' => [
 						'SLA',
 						'Service'
 					]
+				]
+			],
+			// #24 Availability report page.
+			[
+				[
+					'object' => 'Availability report',
+					'url' => 'report2.php',
+					'checked_multiselects' => [
+						'Hosts'
+					]
+				]
+			],
+			// #25 Maintenance period form overlay.
+			[
+				[
+					'object' => 'maintenance period',
+					'url' => 'zabbix.php?action=maintenance.list',
+					'checked_multiselects' => [
+						'Hosts'
+					],
+					'overlay_form' => true
 				]
 			]
 		];
@@ -384,57 +439,23 @@ class testNoData extends CWebTest {
 	 * @dataProvider getCheckEmptyStudData
 	 */
 	public function testNoData_CheckEmptyStud($data) {
-		switch ($data['page']) {
-			case 'Hosts':
-			case 'Host':
-				$url = 'zabbix.php?action=host.list';
-				break;
-
-			case 'Templates':
-			case 'Template':
-				$url = 'zabbix.php?action=template.list';
-				break;
-
-			case 'Discovery':
-				$url = 'zabbix.php?action=discovery.view';
-				break;
-
-			case 'Item prototypes':
-				$url = 'zabbix.php?action=item.prototype.list&context=host&parent_discoveryid='.self::$lldid;
-				break;
-
-			case 'Trigger prototypes':
-				$url = 'zabbix.php?action=trigger.prototype.list&context=host&parent_discoveryid='.self::$lldid;
-				break;
-
-			case 'Graph prototypes':
-				$url = 'graphs.php?context=host&parent_discoveryid='.self::$lldid;
-				break;
-
-			case 'Host prototypes':
-				$url = 'host_prototypes.php?context=host&parent_discoveryid='.self::$lldid;
-				break;
-
-			case 'SLA report':
-				$url = 'zabbix.php?action=slareport.list';
-				break;
-		}
+		$url = (str_contains($data['url'], 'discoveryid='))
+			? $data['url'].self::$lldid
+			: $data['url'];
 
 		$this->page->login()->open($url);
 
 		// Main objects are hosts and templates, but sub-objects are items, triggers, graphs, etc.
 		if (array_key_exists('sub_object', $data)) {
 			$this->query('class:list-table')->asTable()->waitUntilPresent()->one()
-					->findRow('Name', ($data['page'] === 'Hosts') ? self::EMPTY_HOST : self::EMPTY_TEMPLATE)
+					->findRow('Name', ($data['object'] === 'Hosts') ? self::EMPTY_HOST : self::EMPTY_TEMPLATE)
 					->getColumn($data['sub_object'])->query('tag:a')->waitUntilClickable()->one()->click();
 			$this->page->waitUntilReady();
 		}
 
 		// Some forms are opened in overlays, not on standalone pages.
 		if (CTestArrayHelper::get($data, 'overlay_form', false)) {
-			$this->query('class:list-table')->asTable()->waitUntilPresent()->one()
-					->query('link', ($data['page'] === 'Host') ? self::EMPTY_HOST : self::EMPTY_TEMPLATE)
-					->waitUntilClickable()->one()->click();
+			$this->query('button:Create '.$data['object'])->waitUntilClickable()->one()->click();
 			$template_overlay = COverlayDialogElement::find()->waitUntilReady()->one();
 			$overlay_form = $template_overlay->asForm();
 		}
@@ -448,7 +469,7 @@ class testNoData extends CWebTest {
 
 		// Code for checking empty list table.
 		if (CTestArrayHelper::get($data, 'check_table', false)) {
-			if ($data['page'] === 'SLA report') {
+			if ($data['object'] === 'SLA report') {
 				$this->assertEquals('Select SLA to display SLA report.',
 						$this->query('xpath://div[@class="no-data-message"]')->one()->getText()
 				);
@@ -494,6 +515,7 @@ class testNoData extends CWebTest {
 			[
 				[
 					'object' => 'item',
+					'url' => 'zabbix.php?action=item.list&context=host&filter_set=1&filter_hostids%5B0%5D=',
 					'overlay_form' => true,
 					'form' => 'id:item-form',
 					'fields' => [
@@ -505,6 +527,7 @@ class testNoData extends CWebTest {
 			[
 				[
 					'object' => 'discovery rule',
+					'url' => 'host_discovery.php?filter_set=1&context=host&filter_hostids%5B0%5D=',
 					'form' => 'id:host-discovery-form',
 					'fields' => [
 						'Type' => 'Dependent item'
@@ -515,6 +538,7 @@ class testNoData extends CWebTest {
 			[
 				[
 					'object' => 'trigger',
+					'url' => 'zabbix.php?action=trigger.list&filter_set=1&context=host&filter_hostids%5B0%5D=',
 					'overlay_form' => true,
 					'form' => 'id:trigger-form'
 				]
@@ -523,6 +547,7 @@ class testNoData extends CWebTest {
 			[
 				[
 					'object' => 'graph',
+					'url' => 'graphs.php?filter_set=1&context=host&filter_hostids%5B0%5D=',
 					'form' => 'name:graphForm'
 				]
 			],
@@ -530,6 +555,7 @@ class testNoData extends CWebTest {
 			[
 				[
 					'object' => 'item prototype',
+					'url' => 'zabbix.php?action=item.prototype.list&context=host&parent_discoveryid=',
 					'form' => 'id:item-form',
 					'overlay_form' => true,
 					'fields' => [
@@ -541,6 +567,7 @@ class testNoData extends CWebTest {
 			[
 				[
 					'object' => 'trigger prototype',
+					'url' => 'zabbix.php?action=trigger.prototype.list&context=host&parent_discoveryid=',
 					'form' => 'id:trigger-prototype-form',
 					'overlay_form' => true
 				]
@@ -549,6 +576,7 @@ class testNoData extends CWebTest {
 			[
 				[
 					'object' => 'graph prototype',
+					'url' => 'graphs.php?context=host&parent_discoveryid=',
 					'form' => 'name:graphForm'
 				]
 			],
@@ -556,6 +584,7 @@ class testNoData extends CWebTest {
 			[
 				[
 					'object' => 'host prototype',
+					'url' => 'host_prototypes.php?context=host&parent_discoveryid=',
 					'form' => 'id:host-prototype-form'
 				]
 			]
@@ -568,39 +597,9 @@ class testNoData extends CWebTest {
 	 * @dataProvider getCheckEmptyItemsData
 	 */
 	public function testNoData_CheckEmptyItems($data) {
-		switch ($data['object']) {
-			case 'item':
-				$url = 'zabbix.php?action=item.list&context=host&filter_set=1&filter_hostids%5B0%5D='.self::$empty_hostid;
-				break;
-
-			case 'trigger':
-				$url = 'zabbix.php?action=trigger.list&filter_set=1&context=host&filter_hostids%5B0%5D='.self::$empty_hostid;
-				break;
-
-			case 'graph':
-				$url = 'graphs.php?filter_set=1&context=host&filter_hostids%5B0%5D='.self::$empty_hostid;
-				break;
-
-			case 'discovery rule':
-				$url = 'host_discovery.php?filter_set=1&context=host&filter_hostids%5B0%5D='.self::$empty_hostid;
-				break;
-
-			case 'item prototype':
-				$url = 'zabbix.php?action=item.prototype.list&context=host&parent_discoveryid='.self::$lldid;
-				break;
-
-			case 'trigger prototype':
-				$url = 'zabbix.php?action=trigger.prototype.list&context=host&parent_discoveryid='.self::$lldid;
-				break;
-
-			case 'graph prototype':
-				$url = 'graphs.php?context=host&parent_discoveryid='.self::$lldid;
-				break;
-
-			case 'host prototype':
-				$url = 'host_prototypes.php?context=host&parent_discoveryid='.self::$lldid;
-				break;
-		}
+		$url = (str_contains($data['url'], 'discoveryid='))
+			? $data['url'].self::$lldid
+			: $data['url'].self::$empty_hostid;
 
 		$this->page->login()->open($url);
 		$this->query('button:Create '.$data['object'])->one()->waitUntilClickable()->click();
