@@ -756,8 +756,6 @@ class CUserGroup extends CApiService {
 	}
 
 	/**
-	 * @static
-	 *
 	 * @param array $usrgrps
 	 * @param array $db_usrgrps
 	 */
@@ -1546,8 +1544,6 @@ class CUserGroup extends CApiService {
 
 	/**
 	 * Add the existing rights, tag_filters and userids to $db_usrgrps whether these are affected by the update.
-	 *
-	 * @static
 	 *
 	 * @param array $usrgrps
 	 * @param array $db_usrgrps

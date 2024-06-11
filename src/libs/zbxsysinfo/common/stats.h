@@ -15,10 +15,6 @@
 #ifndef ZABBIX_STATS_H
 #define ZABBIX_STATS_H
 
-#include "../sysinfo.h"
-
-#include "zbxthreads.h"
-
 #ifndef _WINDOWS
 #	include "diskdevices.h"
 #	include "zbxnix.h"
@@ -28,10 +24,6 @@
 
 #if defined(HAVE_KSTAT_H) && defined(HAVE_VMINFO_T_UPDATES)	/* Solaris */
 #	include "zbxkstat.h"
-#endif
-
-#ifdef ZBX_PROCSTAT_COLLECTOR
-#	include "procstat.h"
 #endif
 
 typedef struct

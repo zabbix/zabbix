@@ -16,6 +16,9 @@
 
 #include "proc.h"
 
+#include <linux/sysinfo.h>
+#include <sys/sysinfo.h>
+
 static int	vm_memory_total(AGENT_RESULT *result)
 {
 	struct sysinfo	info;

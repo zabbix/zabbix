@@ -15,10 +15,9 @@
 #include "zbxlog.h"
 
 #include "zbxmutexs.h"
-#include "zbxcfg.h"
 #include "zbxstr.h"
 #include "zbxtime.h"
-#include "zbxcommon.h"
+
 #ifdef _WINDOWS
 #	include "messages.h"
 #	include "zbxwinservice.h"

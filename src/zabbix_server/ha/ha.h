@@ -51,13 +51,21 @@ zbx_ha_config_t;
 
 void	zbx_init_library_ha(void);
 
-int	zbx_ha_start(zbx_rtc_t *rtc, zbx_ha_config_t *ha_config, char **error);
+typedef enum
+{
+	ZBX_HA_RTC_STATE_RESET = -1,
+	ZBX_HA_RTC_STATE_IMMEDIATE = ZBX_IPC_RECV_IMMEDIATE,
+	ZBX_HA_RTC_STATE_WAIT = ZBX_IPC_RECV_WAIT,
+	ZBX_HA_RTC_STATE_TIMEOUT = ZBX_IPC_RECV_TIMEOUT
+}
+
+zbx_ha_rtc_state_t;int	zbx_ha_start(zbx_rtc_t *rtc, zbx_ha_config_t *ha_config, char **error);
 int	zbx_ha_pause(char **error);
 int	zbx_ha_stop(char **error);
 void	zbx_ha_kill(void);
 int	zbx_ha_get_status(const char *ha_node_name, int *ha_status, int *ha_failover_delay, char **error);
-int	zbx_ha_dispatch_message(const char *ha_node_name, zbx_ipc_message_t *message, int *ha_status,
-		int *ha_failover_delay, char **error);
+int	zbx_ha_dispatch_message(const char *ha_node_name, zbx_ipc_message_t *message, zbx_ha_rtc_state_t state,
+		int *ha_status, int *ha_failover_delay, char **error);
 
 int	zbx_ha_get_nodes(char **nodes, char **error);
 int	zbx_ha_remove_node(const char *node, char **result, char **error);

@@ -14,11 +14,13 @@
 
 #include "discoverer_taskprep.h"
 
-#include "zbxexpression.h"
-#include "zbx_discoverer_constants.h"
 #include "discoverer_int.h"
+#include "discoverer_queue.h"
+
 #include "zbxdbhigh.h"
 #include "zbxip.h"
+#include "zbxexpression.h"
+#include "zbx_discoverer_constants.h"
 
 #define ZBX_DISCOVERER_IPRANGE_LIMIT	(1 << 16)
 

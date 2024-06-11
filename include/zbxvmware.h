@@ -348,6 +348,25 @@ zbx_vmware_resourcepool_t;
 
 ZBX_PTR_VECTOR_DECL(vmware_resourcepool_ptr, zbx_vmware_resourcepool_t *)
 
+/* vmware event data */
+typedef struct
+{
+	zbx_uint64_t	key;		/* event's key, used to fill logeventid */
+	char		*message;	/* event's fullFormattedMessage */
+	time_t		timestamp;	/* event's time stamp */
+}
+zbx_vmware_event_t;
+
+ZBX_PTR_VECTOR_DECL(vmware_event_ptr, zbx_vmware_event_t *)
+
+/* vmware service event log data object */
+typedef struct
+{
+	char				*error;
+	zbx_vector_vmware_event_ptr_t	events;
+}
+zbx_vmware_eventlog_data_t;
+
 /* vmware eventlog state */
 typedef struct
 {
@@ -361,24 +380,19 @@ typedef struct
 	zbx_hashset_t	evt_severities;	/* severity for event types */
 	unsigned char	oom;		/* no enough memory to store new events */
 	zbx_uint64_t	req_sz;		/* memory size required to store events */
-	time_t		last_ts;	/* timestamp when vmware.eventlog[] item was polled last time */
+	time_t		last_ts;	/* timestamp of last vmware.eventlog[] item */
+	time_t		lastaccess;	/* timestamp when vmware.eventlog[] item was polled last time */
+	time_t		interval;	/* last interval of vmware.eventlog[] item */
+	zbx_uint64_t	owner_itemid;	/* single item that will receive all events */
+
+	/* service event log data object that is swapped with new one during service event log update */
+	zbx_vmware_eventlog_data_t	*data;
 }
 zbx_vmware_eventlog_state_t;
 
 #define ZBX_VMWARE_EVTLOG_SEVERITIES								\
 		ZBX_VMWARE_EVTLOG_SEVERITY_ERR, ZBX_VMWARE_EVTLOG_SEVERITY_WARN,		\
 		ZBX_VMWARE_EVTLOG_SEVERITY_INFO, ZBX_VMWARE_EVTLOG_SEVERITY_USER
-
-/* vmware event data */
-typedef struct
-{
-	zbx_uint64_t	key;		/* event's key, used to fill logeventid */
-	char		*message;	/* event's fullFormattedMessage */
-	time_t		timestamp;	/* event's time stamp */
-}
-zbx_vmware_event_t;
-
-ZBX_PTR_VECTOR_DECL(vmware_event_ptr, zbx_vmware_event_t *)
 
 /* vmware service data object */
 typedef struct
@@ -388,7 +402,6 @@ typedef struct
 	zbx_hashset_t				hvs;
 	zbx_hashset_t				vms_index;
 	zbx_vector_vmware_cluster_ptr_t		clusters;
-	zbx_vector_vmware_event_ptr_t		events;
 	int					max_query_metrics;	/* max count of Datastore      */
 									/* perfCounters in one request */
 	zbx_vector_vmware_datastore_ptr_t	datastores;
@@ -492,6 +505,8 @@ typedef struct
 }
 zbx_vmware_data_tags_t;
 
+typedef struct zbx_vmware_job zbx_vmware_job_t;
+
 /* vmware service data */
 typedef struct
 {
@@ -530,7 +545,7 @@ typedef struct
 	/* service data object that is swapped with new one during service update */
 	zbx_vmware_data_t		*data;
 
-	/* lastlogsize when vmware.eventlog[] item was polled last time and skip old flag*/
+	/* service event log data object and additional info about events system state */
 	zbx_vmware_eventlog_state_t	eventlog;
 
 	/* list of custom queries to monitor */
@@ -539,12 +554,36 @@ typedef struct
 	/* linked jobs count */
 	int				jobs_num;
 
+	/* linked jobs types */
+#define ZBX_VMWARE_REQ				(8*2)
+#define ZBX_VMWARE_REQ_UPDATE_CONF		(ZBX_VMWARE_UPDATE_CONF		<< ZBX_VMWARE_REQ)
+#define ZBX_VMWARE_REQ_UPDATE_PERFCOUNTERS	(ZBX_VMWARE_UPDATE_PERFCOUNTERS	<< ZBX_VMWARE_REQ)
+#define ZBX_VMWARE_REQ_UPDATE_REST_TAGS		(ZBX_VMWARE_UPDATE_REST_TAGS	<< ZBX_VMWARE_REQ)
+#define ZBX_VMWARE_REQ_UPDATE_EVENTLOG		(ZBX_VMWARE_UPDATE_EVENTLOG	<< ZBX_VMWARE_REQ)
+#define ZBX_VMWARE_REQ_UPDATE_ALL										\
+					(ZBX_VMWARE_REQ_UPDATE_CONF | ZBX_VMWARE_REQ_UPDATE_PERFCOUNTERS |	\
+					ZBX_VMWARE_REQ_UPDATE_REST_TAGS | ZBX_VMWARE_REQ_UPDATE_EVENTLOG)
+	int				jobs_type;
+
 	/* vmware entity (vm, hv etc) and linked tags */
 	zbx_vmware_data_tags_t		data_tags;
 }
 zbx_vmware_service_t;
 
 ZBX_PTR_VECTOR_DECL(vmware_service_ptr, zbx_vmware_service_t *)
+
+struct zbx_vmware_job
+{
+	time_t				nextcheck;
+	time_t				ttl;
+#define ZBX_VMWARE_UPDATE_CONF		1
+#define ZBX_VMWARE_UPDATE_PERFCOUNTERS	2
+#define ZBX_VMWARE_UPDATE_REST_TAGS	4
+#define ZBX_VMWARE_UPDATE_EVENTLOG	8
+	int				type;
+	int				expired;
+	zbx_vmware_service_t		*service;
+};
 
 /* vmware collector data */
 typedef struct
@@ -593,6 +632,8 @@ zbx_vmware_cust_query_t *zbx_vmware_service_add_cust_query(zbx_vmware_service_t 
 		zbx_vector_custquery_param_t *query_params);
 zbx_vmware_cust_query_t	*zbx_vmware_service_get_cust_query(zbx_vmware_service_t *service, const char *type,
 		const char *id, const char *key, zbx_vmware_custom_query_type_t query_type, const char *mode);
+
+void	zbx_vmware_eventlog_job_create(zbx_vmware_service_t *service);
 
 /* hypervisor properties */
 #define ZBX_VMWARE_HVPROP_OVERALL_CPU_USAGE		0

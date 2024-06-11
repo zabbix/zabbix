@@ -16,6 +16,8 @@
 #include "alerter_defs.h"
 
 #include "alerter_protocol.h"
+
+#include "zbxtimekeeper.h"
 #include "zbxlog.h"
 #include "zbxcacheconfig.h"
 #include "zbxembed.h"
@@ -27,9 +29,11 @@
 #include "zbxself.h"
 #include "zbxstr.h"
 #include "zbxtime.h"
-#include "zbxtypes.h"
 #include "zbxexpression.h"
 #include "zbxdbwrap.h"
+#include "zbxalgo.h"
+#include "zbxdbhigh.h"
+#include "zbxthreads.h"
 
 #define	ALARM_ACTION_TIMEOUT	40
 

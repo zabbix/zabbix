@@ -172,8 +172,9 @@ static void	hk_history_enable_compression(int age)
 				compression_tables[i].name);
 		if(NULL == res)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Table \"%s\"is not hypertable. Run timescaledb.sql script to "
-					"upgrade configuration.", compression_tables[i].name);
+			zabbix_log(LOG_LEVEL_WARNING, "Table \"%s\" is not a hypertable. Execute TimescaleDB"
+					" configuration step as described in Zabbix documentation to upgrade schema.",
+					compression_tables[i].name);
 			continue;
 		}
 

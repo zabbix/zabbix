@@ -13,15 +13,15 @@
 **/
 
 #include "modbtype.h"
-#include "../sysinfo.h"
+
 #include "zbxsysinfo.h"
+
+#ifdef HAVE_LIBMODBUS
+#include "zbxmutexs.h"
 
 #include "zbxip.h"
 #include "zbxnum.h"
 #include "zbxstr.h"
-
-#ifdef HAVE_LIBMODBUS
-#include "zbxmutexs.h"
 
 /* this block must be defined before <modbus.h> include */
 #ifdef _WINDOWS

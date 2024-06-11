@@ -15,9 +15,7 @@
 #ifndef ZABBIX_PROXYBUFFER_H
 #define ZABBIX_PROXYBUFFER_H
 
-#include "proxybuffer.h"
 #include "zbxalgo.h"
-#include "zbxcommon.h"
 #include "zbxdbhigh.h"
 #include "zbxdbschema.h"
 #include "zbxjson.h"

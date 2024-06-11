@@ -38,15 +38,40 @@ class CWidgetHoneycomb extends CWidget {
 	 */
 	#resize_timeout_id;
 
+	/**
+	 * @type {number}
+	 */
+	#items_max_count = 1000;
+
+	/**
+	 * @type {number}
+	 */
+	#items_loaded_count = 0;
+
+	onActivate() {
+		this.#items_max_count = this.#getItemsMaxCount();
+	}
+
 	isUserInteracting() {
 		return this.#user_interacting || super.isUserInteracting();
 	}
 
 	onResize() {
+		if (this.getState() !== WIDGET_STATE_ACTIVE) {
+			return;
+		}
+
 		clearTimeout(this.#resize_timeout_id);
 
+		const old_items_max_count = this.#items_max_count;
+		this.#items_max_count = this.#getItemsMaxCount();
+
+		if (this.#items_max_count > old_items_max_count && this.#items_loaded_count >= old_items_max_count) {
+			this._startUpdating();
+		}
+
 		this.#resize_timeout_id = setTimeout(() => {
-			if (this.getState() === WIDGET_STATE_ACTIVE && this.#honeycomb !== null) {
+			if (this.#honeycomb !== null) {
 				this.#honeycomb.setSize(super._getContentsSize());
 			}
 		}, 100);
@@ -55,6 +80,7 @@ class CWidgetHoneycomb extends CWidget {
 	getUpdateRequestData() {
 		return {
 			...super.getUpdateRequestData(),
+			max_items: this.#items_max_count,
 			with_config: this.#honeycomb === null ? 1 : undefined
 		};
 	}
@@ -92,6 +118,8 @@ class CWidgetHoneycomb extends CWidget {
 			});
 		}
 
+		this.#items_loaded_count = response.cells.length;
+
 		this.#honeycomb.setValue({
 			cells: response.cells
 		});
@@ -102,6 +130,10 @@ class CWidgetHoneycomb extends CWidget {
 			this.#honeycomb.destroy();
 			this.#honeycomb = null;
 		}
+	}
+
+	onDestroy() {
+		this.clearContents();
 	}
 
 	onFeedback({type, value, descriptor}) {
@@ -151,5 +183,16 @@ class CWidgetHoneycomb extends CWidget {
 
 	hasPadding() {
 		return false;
+	}
+
+	#getItemsMaxCount() {
+		let {width, height} = super._getContentsSize();
+
+		width -= CWidgetHoneycomb.ZBX_STYLE_DASHBOARD_WIDGET_PADDING_H * 2;
+		height -= CWidgetHoneycomb.ZBX_STYLE_DASHBOARD_WIDGET_PADDING_V * 2;
+
+		const {max_rows, max_columns} = CSVGHoneycomb.getContainerMaxParams({width, height});
+
+		return Math.min(this.#items_max_count, max_rows * max_columns);
 	}
 }
