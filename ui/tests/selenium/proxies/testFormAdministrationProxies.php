@@ -522,11 +522,6 @@ class testFormAdministrationProxies extends CWebTest {
 					$this->assertEquals($maxlength, $field->getAttribute('maxlength'));
 				}
 
-//				TODO: Uncomment after ZBX-24571 is fixed.
-//				$empty_dialog = $form->getField('Proxy group')->edit();
-//				$this->assertEquals('No data found', $empty_dialog->query('class:no-data-message')->one()->getText());
-//				$empty_dialog->close();
-
 				// Check that "Address for active agents" field and that it is displayed only when a proxy group is selected.
 				$address_field = $form->getField('Address for active agents');
 				$this->assertFalse($address_field->isDisplayed());
