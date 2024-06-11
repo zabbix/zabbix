@@ -71,7 +71,7 @@ class testMultiselects extends CWebTest {
 	}
 
 	public function testMultiselects_SuggestInOverlay() {
-		$widget = 'Plain text';
+		$widget = 'Item navigator';
 
 		$this->page->login()->open('zabbix.php?action=dashboard.list');
 		$this->query('button:Create dashboard')->one()->click();
@@ -90,7 +90,7 @@ class testMultiselects extends CWebTest {
 			 */
 			$form->getField('Type')->click();
 		}
-		$element = $form->getField('Items')->query('tag:input')->one();
+		$element = $form->getField('Item patterns')->query('tag:input')->one();
 		$element->type('Zab');
 		$this->query('class:multiselect-suggest')->waitUntilVisible();
 		$this->assertScreenshotExcept(null, [
