@@ -221,6 +221,7 @@ static int	webdriver_session_query(zbx_webdriver_t *wd, const char *method, cons
 
 	webdriver_discard_error(wd);
 
+	zbx_rtrim(wd->endpoint, "/");
 	zbx_snprintf_alloc(&url, &url_alloc, &url_offset, "%s/session", wd->endpoint);
 
 	if (NULL != wd->session)
