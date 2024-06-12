@@ -242,7 +242,9 @@ $html_page
 	->show();
 
 (new CScriptTag('
-	view.init();
+	view.init('.json_encode([
+		'timeline' => $data['timeline']
+	]).');
 '))
 	->setOnDocumentReady()
 	->show();

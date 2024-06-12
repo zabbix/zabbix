@@ -20,11 +20,22 @@
 ?>
 
 <script>
-	const view = {
-		init() {
+	const view = new class {
+
+		init({timeline}) {
 			document.getElementById('mode').addEventListener('change', (e) => {
 				e.target.closest('form').submit()
 			});
+
+			timeControl.addObject('availabilityreport', timeline, {
+				id: 'timeline_1',
+				domid: 'availabilityreport',
+				loadSBox: 0,
+				loadImage: 0,
+				dynamic: 0
+			});
+
+			timeControl.processObjects();
 		}
 	}
 </script>
