@@ -592,18 +592,10 @@ elseif (hasRequest('action') && hasRequest('group_itemid')
 	if ($result) {
 		uncheckTableRows(getRequest('parent_discoveryid'));
 
-		$message = $status == ITEM_STATUS_ACTIVE
-			? _n('Item prototype enabled', 'Item prototypes enabled', $updated)
-			: _n('Item prototype disabled', 'Item prototypes disabled', $updated);
-
-		CMessageHelper::setSuccessTitle($message);
+		CMessageHelper::setSuccessTitle(_n('Item prototype updated', 'Item prototypes updated', $updated));
 	}
 	else {
-		$message = $status == ITEM_STATUS_ACTIVE
-			? _n('Cannot enable item prototype', 'Cannot enable item prototypes', $updated)
-			: _n('Cannot disable item prototype', 'Cannot disable item prototypes', $updated);
-
-		CMessageHelper::setErrorTitle($message);
+		CMessageHelper::setErrorTitle(_n('Cannot update item prototype', 'Cannot update item prototypes', $updated));
 	}
 
 	if (hasRequest('backurl')) {

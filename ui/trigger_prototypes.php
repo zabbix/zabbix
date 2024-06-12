@@ -435,18 +435,10 @@ elseif (getRequest('action') && str_in_array(getRequest('action'), ['triggerprot
 	if ($result) {
 		uncheckTableRows(getRequest('parent_discoveryid'));
 
-		$message = $status == TRIGGER_STATUS_ENABLED
-			? _n('Trigger prototype enabled', 'Trigger prototypes enabled', $updated)
-			: _n('Trigger prototype disabled', 'Trigger prototypes disabled', $updated);
-
-		CMessageHelper::setSuccessTitle($message);
+		CMessageHelper::setSuccessTitle(_n('Trigger prototype updated', 'Trigger prototypes updated', $updated));
 	}
 	else {
-		$message = $status == TRIGGER_STATUS_ENABLED
-			? _n('Cannot enable trigger prototype', 'Cannot enable trigger prototypes', $updated)
-			: _n('Cannot disable trigger prototype', 'Cannot disable trigger prototypes', $updated);
-
-		CMessageHelper::setErrorTitle($message);
+		CMessageHelper::setErrorTitle(_n('Cannot update trigger prototype', 'Cannot update trigger prototypes', $updated));
 	}
 
 	if (hasRequest('backurl')) {
