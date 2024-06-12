@@ -319,7 +319,7 @@ function itemCompleteTest(overlay) {
 					$result_row.append(jQuery('<div>')
 						.append(
 							jQuery('<span>', {'class': '<?= ZBX_STYLE_GREY ?>'})
-								.text(<?= _('Result with value map applied') ?>),
+								.text('<?= _('Result with value map applied') ?>'),
 							$mapped_value
 						)
 					);
