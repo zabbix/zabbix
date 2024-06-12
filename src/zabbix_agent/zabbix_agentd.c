@@ -93,9 +93,8 @@ int	zbx_config_heartbeat_frequency	= 60;
 
 #ifdef _WINDOWS
 #	include "zbxwin32.h"
-#else
-#	include "zbxnix.h"
 #endif
+
 #include "active_checks/active_checks.h"
 #include "listener/listener.h"
 

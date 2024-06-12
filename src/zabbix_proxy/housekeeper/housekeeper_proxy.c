@@ -14,6 +14,7 @@
 
 #include "housekeeper_proxy.h"
 
+#include "zbxtimekeeper.h"
 #include "zbxlog.h"
 #include "zbxnix.h"
 #include "zbxself.h"
@@ -25,6 +26,7 @@
 #include "zbxipcservice.h"
 #include "zbxdbhigh.h"
 #include "zbxdb.h"
+#include "zbxstr.h"
 
 /******************************************************************************
  *                                                                            *

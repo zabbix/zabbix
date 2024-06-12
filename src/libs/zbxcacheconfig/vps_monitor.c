@@ -16,6 +16,7 @@
 
 #include "dbconfig.h"
 #include "zbxmutexs.h"
+#include "zbxcacheconfig.h"
 
 static zbx_mutex_t	vps_lock = ZBX_MUTEX_NULL;
 

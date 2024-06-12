@@ -14,6 +14,7 @@
 
 #include "housekeeper_server.h"
 
+#include "zbxtimekeeper.h"
 #include "zbxthreads.h"
 #include "zbxlog.h"
 #include "zbxself.h"

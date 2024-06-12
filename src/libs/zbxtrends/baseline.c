@@ -14,7 +14,8 @@
 #include "zbxtrends.h"
 #include "trends.h"
 
-#include "zbxcommon.h"
+#include "zbxalgo.h"
+#include "zbxtime.h"
 #include "zbxstr.h"
 
 /******************************************************************************

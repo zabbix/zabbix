@@ -14,6 +14,9 @@
 
 #include "housekeeper_server.h"
 
+#include "history_compress.h"
+
+#include "zbxtimekeeper.h"
 #include "zbxlog.h"
 #include "zbxnix.h"
 #include "zbxself.h"
@@ -21,7 +24,6 @@
 #include "zbxrtc.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
-#include "history_compress.h"
 #include "zbx_rtc_constants.h"
 #include "zbx_host_constants.h"
 #include "zbxalgo.h"

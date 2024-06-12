@@ -16,7 +16,6 @@
 #define ZABBIX_ACTIVE_CHECKS_H
 
 #include "zbxthreads.h"
-#include "zbxalgo.h"
 #include "zbxcomms.h"
 #include "zbxcfg.h"
 

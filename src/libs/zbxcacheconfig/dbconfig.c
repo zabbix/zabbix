@@ -58,6 +58,7 @@
 #include "zbxexpression.h"
 #include "zbxpgservice.h"
 #include "zbxinterface.h"
+#include "zbxhistory.h"
 
 ZBX_PTR_VECTOR_IMPL(inventory_value_ptr, zbx_inventory_value_t *)
 ZBX_PTR_VECTOR_IMPL(hc_item_ptr, zbx_hc_item_t *)
@@ -17054,8 +17055,8 @@ void	zbx_dc_get_unused_macro_templates(zbx_hashset_t *templates, const zbx_vecto
 }
 
 #ifdef HAVE_TESTS
-#	include "../../../tests/libs/zbxdbcache/dc_item_poller_type_update_test.c"
-#	include "../../../tests/libs/zbxdbcache/dc_function_calculate_nextcheck_test.c"
+#	include "../../../tests/libs/zbxcacheconfig/dc_item_poller_type_update_test.c"
+#	include "../../../tests/libs/zbxcacheconfig/dc_function_calculate_nextcheck_test.c"
 #endif
 
 void	zbx_recalc_time_period(time_t *ts_from, int table_group)

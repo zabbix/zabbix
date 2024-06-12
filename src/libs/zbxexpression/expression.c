@@ -17,12 +17,15 @@
 #include "evalfunc.h"
 #include "datafunc.h"
 
+#ifdef HAVE_LIBXML2
+#	include "zbxxml.h"
+#endif
+
 #include "zbxvariant.h"
 #include "zbxeval.h"
 #include "zbxdbwrap.h"
 #include "zbxcachevalue.h"
 #include "macrofunc.h"
-#include "zbxxml.h"
 #include "zbxstr.h"
 #include "zbxexpr.h"
 #include "zbxparam.h"

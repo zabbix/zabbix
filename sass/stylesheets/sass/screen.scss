@@ -2773,6 +2773,10 @@ button {
 		color: transparent !important;
 		border-bottom-color: transparent;
 
+		&::before {
+			background-color: transparent;
+		}
+
 		&::after {
 			box-shadow: none;
 			background: none;

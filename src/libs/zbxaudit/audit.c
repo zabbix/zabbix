@@ -19,6 +19,10 @@
 #include "zbxjson.h"
 #include "zbxcacheconfig.h"
 #include "zbxnum.h"
+#include "zbxdb.h"
+#include "zbxdbhigh.h"
+#include "zbxdbschema.h"
+#include "zbxstr.h"
 #include "zbx_scripts_constants.h"
 
 #define AUDIT_USERID		__UINT64_C(0)

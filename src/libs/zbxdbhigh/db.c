@@ -15,10 +15,19 @@
 #include "zbxdbhigh.h"
 
 #include "zbxthreads.h"
-#include "zbxcfg.h"
 #include "zbxcrypto.h"
 #include "zbxnum.h"
 #include "zbx_host_constants.h"
+#include "zbxalgo.h"
+#include "zbxdb.h"
+#include "zbxdbschema.h"
+#include "zbxstr.h"
+
+#if (!(defined(HAVE_MYSQL_TLS) || defined(HAVE_MARIADB_TLS) || defined(HAVE_POSTGRESQL))) || \
+	(!(defined(HAVE_MYSQL_TLS) || defined(HAVE_POSTGRESQL))) || \
+	(!(defined(HAVE_MYSQL_TLS) || defined(HAVE_MARIADB_TLS)))
+#	include "zbxcfg.h"
+#endif
 
 #ifdef HAVE_POSTGRESQL
 #	include "zbx_dbversion_constants.h"

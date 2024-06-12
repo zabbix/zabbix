@@ -15,24 +15,30 @@
 #include "zbxvmware.h"
 
 #include "vmware_internal.h"
-#include "vmware_perfcntr.h"
 #include "vmware_shmem.h"
-#include "vmware_service_cfglists.h"
-#include "vmware_hv.h"
-#include "vmware_ds.h"
-#include "vmware_event.h"
 
-#include "zbxxml.h"
+#if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
+#	include "vmware_hv.h"
+#	include "vmware_ds.h"
+#	include "vmware_event.h"
+#	include "vmware_perfcntr.h"
+#	include "vmware_service_cfglists.h"
+#endif
+
 #ifdef HAVE_LIBXML2
 #	include <libxml/xpath.h>
 #endif
 
 #include "zbxmutexs.h"
 #include "zbxshmem.h"
-#include "zbxstr.h"
 #include "zbxsysinc.h"
 #include "zbxalgo.h"
-#include "zbxcurl.h"
+
+#if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
+#	include "zbxcurl.h"
+#	include "zbxstr.h"
+#	include "zbxxml.h"
+#endif
 
 /*
  * The VMware data (zbx_vmware_service_t structure) are stored in shared memory.

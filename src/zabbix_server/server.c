@@ -95,12 +95,15 @@
 #include "zbxicmpping.h"
 #include "zbxipcservice.h"
 #include "zbxdiag.h"
-#include "zbxcurl.h"
 #include "zbxpoller.h"
 #include "zbxhttppoller.h"
 #include "zbx_ha_constants.h"
 #include "zbxescalations.h"
 #include "zbxbincommon.h"
+
+#ifdef HAVE_LIBCURL
+#	include "zbxcurl.h"
+#endif
 
 ZBX_GET_CONFIG_VAR2(const char*, const char*, zbx_progname, NULL)
 

@@ -13,8 +13,6 @@
 **/
 
 #include "checks_snmp.h"
-#include "zbxcacheconfig.h"
-#include "zbxip.h"
 
 #ifdef HAVE_NETSNMP
 
@@ -24,6 +22,9 @@
 #include "async_poller.h"
 #include "zbxpoller.h"
 
+#include "zbxtimekeeper.h"
+#include "zbxcacheconfig.h"
+#include "zbxip.h"
 #include "zbxcomms.h"
 #include "zbxalgo.h"
 #include "zbxjson.h"

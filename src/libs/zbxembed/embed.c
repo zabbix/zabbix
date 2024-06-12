@@ -20,6 +20,8 @@
 #include "zabbix.h"
 #include "global.h"
 #include "console.h"
+
+#include "zbxjson.h"
 #include "zbxstr.h"
 
 #define ZBX_ES_MEMORY_LIMIT	(1024 * 1024 * 512)
