@@ -282,8 +282,8 @@ class CSVGPie {
 	 * @param {number} height
 	 */
 	setSize({width, height}) {
-		this.#width = width - (this.#padding.horizontal) * 2;
-		this.#height = height - (this.#padding.vertical) * 2;
+		this.#width = Math.max(0, width - (this.#padding.horizontal) * 2);
+		this.#height = Math.max(0, height - (this.#padding.vertical) * 2);
 
 		this.#svg
 			.attr('width', width)
@@ -680,7 +680,7 @@ class CSVGPie {
 
 			const normal_height = available_width * .95
 				/ this.#getMeasuredTextWidth(text, default_size, font_weight) * 100;
-			const min_height = CSVGPie.TOTAL_VALUE_HEIGHT_MIN / this.#scale;
+			const min_height = this.#scale > 0 ? CSVGPie.TOTAL_VALUE_HEIGHT_MIN / this.#scale : 0;
 
 			return Math.max(normal_height, min_height);
 		}
