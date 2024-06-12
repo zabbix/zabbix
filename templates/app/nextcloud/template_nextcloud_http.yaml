@@ -369,7 +369,7 @@ zabbix_export:
               parameters:
                 - ''
           timeout: 10s
-          url: '{$NEXTCLOUD.SCHEMA}://{$NEXTCLOUD.ADDRESS}/ocs/v2.php/apps/serverinfo/api/v1/info'
+          url: '{$NEXTCLOUD.SCHEMA}://{$NEXTCLOUD.ADDRESS}/ocs/v2.php/apps/serverinfo/api/v1/info?skipApps=false'
           status_codes: '200,401'
           http_proxy: '{$NEXTCLOUD.PROXY}'
           headers:
