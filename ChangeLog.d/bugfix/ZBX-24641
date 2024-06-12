@@ -1,0 +1,1 @@
+........S. [ZBX-24641] fixed possible crash when calculating new ids for tables using cache (MVekslers)
