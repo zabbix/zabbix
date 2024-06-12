@@ -59,7 +59,7 @@ static size_t		sql_alloc = 4 * ZBX_KIBIBYTE;
 static zbx_get_program_type_f	get_program_type_cb = NULL;
 static zbx_history_sync_f	sync_history_cb = NULL;
 
-#define ZBX_IDS_SIZE	13
+#define ZBX_IDS_SIZE	ZBX_DB_ID_TABLENAMES_NUM
 
 #define ZBX_HC_ITEMS_INIT_SIZE	1000
 

@@ -517,6 +517,7 @@ int		zbx_db_validate_field_size(const char *tablename, const char *fieldname, co
 
 #define zbx_db_get_maxid(table)	zbx_db_get_maxid_num(table, 1)
 zbx_uint64_t	zbx_db_get_maxid_num(const char *tablename, int num);
+#define		ZBX_DB_ID_TABLENAMES_NUM	14
 
 void	zbx_db_extract_version_info(struct zbx_db_version_info_t *version_info);
 int	zbx_db_check_extension(struct zbx_db_version_info_t *info, int allow_unsupported);
