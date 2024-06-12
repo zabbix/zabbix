@@ -980,9 +980,7 @@ class CSVGHoneycomb {
 	#getMeasuredTextWidth(text, font_size, font_weight = '') {
 		this.#canvas_context.font = `${font_weight} ${font_size}px '${this.#svg.style('font-family')}'`;
 
-		const text_metrics = this.#canvas_context.measureText(text);
-
-		return Math.ceil(Math.abs(text_metrics.actualBoundingBoxRight) + Math.abs(text_metrics.actualBoundingBoxLeft));
+		return this.#canvas_context.measureText(text).width;
 	}
 
 	#getFontSizeByWidth(lines, fit_width, font_weight = '') {

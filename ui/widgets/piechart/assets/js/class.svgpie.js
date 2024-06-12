@@ -646,12 +646,15 @@ class CSVGPie {
 				.attr('class', CSVGPie.ZBX_STYLE_ARC_NO_DATA_INNER)
 				.attr('r', this.#radius_inner);
 
+			let total_value_width = this.#radius_inner * 2;
+			total_value_width -= total_value_width / CSVGPie.TOTAL_VALUE_PADDING;
+
 			if (this.#config.total_value?.show) {
 				this.#total_value_container = this.#container
 					.append('svg:foreignObject')
 					.attr('class', CSVGPie.ZBX_STYLE_TOTAL_VALUE)
-					.attr('x', -this.#radius_inner)
-					.attr('width', `${this.#radius_inner * 2}px`)
+					.attr('x', -total_value_width / 2)
+					.attr('width', `${total_value_width}px`)
 					.style('font-weight', this.#config.total_value.is_bold ? 'bold' : '')
 					.style('color', this.#config.total_value.color !== '' ? this.#config.total_value.color : '')
 					.style('display', 'none');
@@ -675,14 +678,8 @@ class CSVGPie {
 			let available_width = this.#radius_inner * 2 * this.#scale;
 			available_width -= available_width / CSVGPie.TOTAL_VALUE_PADDING;
 
-			const text_width = this.#getMeasuredTextWidth(text, default_size, font_weight);
-
-			const width_ratio = available_width / text_width;
-
-			const default_height = default_size * width_ratio / this.#scale;
-			const max_height = available_width / this.#scale * CSVGPie.TEXT_BASELINE;
-
-			const normal_height = Math.min(default_height, max_height);
+			const normal_height = available_width * .95
+				/ this.#getMeasuredTextWidth(text, default_size, font_weight) * 100;
 			const min_height = CSVGPie.TOTAL_VALUE_HEIGHT_MIN / this.#scale;
 
 			return Math.max(normal_height, min_height);
@@ -692,14 +689,10 @@ class CSVGPie {
 			this.#no_data_container.style('display', 'none');
 
 			if (this.#config.total_value?.show) {
-				let available_width = this.#radius_inner * 2;
-				available_width -= available_width / CSVGPie.TOTAL_VALUE_PADDING;
-
 				this.#total_value_container
 					.select('div')
 					.text(this.#total_value_text)
-					.attr('title', this.#total_value_text)
-					.style('width', `${available_width}px`);
+					.attr('title', this.#total_value_text);
 
 				if (this.#config.total_value.is_custom_size) {
 					this.#total_value_font_size = this.#config.total_value.size * 10;
@@ -868,9 +861,7 @@ class CSVGPie {
 	#getMeasuredTextWidth(text, font_size, font_weight = '') {
 		this.#canvas_context.font = `${font_weight} ${font_size}px ${this.#svg.style('font-family')}`;
 
-		const text_metrics = this.#canvas_context.measureText(text);
-
-		return Math.ceil(Math.abs(text_metrics.actualBoundingBoxRight) + Math.abs(text_metrics.actualBoundingBoxLeft));
+		return this.#canvas_context.measureText(text).width;
 	}
 
 	/**
