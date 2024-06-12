@@ -477,6 +477,7 @@ class CPage {
 	 */
 	public function getAlertText() {
 		try {
+			CElementQuery::wait()->until(WebDriverExpectedCondition::alertIsPresent());
 			return $this->driver->switchTo()->alert()->getText();
 		}
 		catch (NoSuchAlertException $exception) {

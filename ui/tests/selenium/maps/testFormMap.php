@@ -202,14 +202,9 @@ class testFormMap extends CLegacyWebTest {
 		$this->query('button:Edit map')->one()->click();
 		$this->page->waitUntilReady();
 		$this->assertTitleAndHeader('Network maps');
-
 		$this->assertScreenshot($this->query('id:map-area')->waitUntilPresent()->one(), 'edit_'.$sysmapid);
 
 		$this->query('button:Update')->one()->click();
-
-		if ($this->page->isAlertpresent() === false) {
-			sleep(1);
-		}
 
 		$this->assertEquals('Map is updated! Return to map list?', $this->page->getAlertText());
 		$this->page->acceptAlert();
