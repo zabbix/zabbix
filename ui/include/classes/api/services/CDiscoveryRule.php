@@ -2667,7 +2667,7 @@ class CDiscoveryRule extends CItemGeneral {
 			}
 			unset($override);
 
-			$item['overrides'] = $item['overrides'];
+			$item['overrides'] = array_values($item['overrides']);
 		}
 		unset($item);
 
