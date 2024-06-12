@@ -432,10 +432,6 @@ class CItem extends CItemGeneral {
 		}
 
 		if ($result) {
-			if (self::dbDistinct($sqlParts)) {
-				$result = $this->addTextFieldValues($options, $result);
-			}
-
 			self::prepareItemsForApi($result, false);
 
 			$result = $this->addRelatedObjects($options, $result);
