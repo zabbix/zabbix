@@ -1081,10 +1081,8 @@ static void	zbx_check_db(void)
 #ifdef HAVE_ORACLE
 static void	zbx_check_db_tables(void)
 {
-	DBconnect(ZBX_DB_CONNECT_NORMAL);
 	zbx_db_table_prepare("items", NULL);
 	zbx_db_table_prepare("item_preproc", NULL);
-	DBclose();
 }
 #endif
 
@@ -1268,6 +1266,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
+	DBconnect(ZBX_DB_CONNECT_NORMAL);
 	DBinit_autoincrement_options();
 
 	if (ZBX_DB_UNKNOWN == (db_type = zbx_db_get_database_type()))
@@ -1291,6 +1290,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 #ifdef HAVE_ORACLE
 	zbx_check_db_tables();
 #endif
+	DBclose();
 	threads_num = CONFIG_CONFSYNCER_FORKS + CONFIG_HEARTBEAT_FORKS + CONFIG_DATASENDER_FORKS
 			+ CONFIG_POLLER_FORKS + CONFIG_UNREACHABLE_POLLER_FORKS + CONFIG_TRAPPER_FORKS
 			+ CONFIG_PINGER_FORKS + CONFIG_HOUSEKEEPER_FORKS + CONFIG_HTTPPOLLER_FORKS

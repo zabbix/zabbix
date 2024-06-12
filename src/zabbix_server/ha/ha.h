@@ -32,12 +32,22 @@ zbx_cuid_t;
 #define zbx_cuid_compare(a, b)	(0 == memcmp((a).str, (b).str, CUID_LEN) ? SUCCEED : FAIL)
 #define zbx_cuid_clear(a)	memset((a).str, 0, CUID_LEN)
 
+typedef enum
+{
+	ZBX_HA_RTC_STATE_RESET = -1,
+	ZBX_HA_RTC_STATE_IMMEDIATE = ZBX_IPC_RECV_IMMEDIATE,
+	ZBX_HA_RTC_STATE_WAIT = ZBX_IPC_RECV_WAIT,
+	ZBX_HA_RTC_STATE_TIMEOUT = ZBX_IPC_RECV_TIMEOUT
+}
+zbx_ha_rtc_state_t;
+
 int	zbx_ha_start(zbx_rtc_t *rtc, int ha_status, char **error);
 int	zbx_ha_pause(char **error);
 int	zbx_ha_stop(char **error);
 void	zbx_ha_kill(void);
 int	zbx_ha_get_status(int *ha_status, int *ha_failover_delay, char **error);
-int	zbx_ha_dispatch_message(zbx_ipc_message_t *message, int *ha_status, int *ha_failover_delay, char **error);
+int	zbx_ha_dispatch_message(zbx_ipc_message_t *message, zbx_ha_rtc_state_t state, int *ha_status,
+		int *ha_failover_delay, char **error);
 
 int	zbx_ha_check_pid(pid_t pid);
 

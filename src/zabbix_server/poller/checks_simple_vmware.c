@@ -3016,7 +3016,7 @@ int	check_vcenter_vm_memory_size_compressed(AGENT_REQUEST *request, const char *
 	ret = get_vcenter_vmprop(request, username, password, ZBX_VMWARE_VMPROP_MEMORY_SIZE_COMPRESSED, result);
 
 	if (SYSINFO_RET_OK == ret && NULL != GET_UI64_RESULT(result))
-		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
+		result->ui64 = result->ui64 * ZBX_KIBIBYTE;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 
