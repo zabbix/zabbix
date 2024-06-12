@@ -2458,7 +2458,7 @@ int	zbx_db_insert_execute(zbx_db_insert_t *self)
 {
 	int			ret = FAIL, i, j;
 	const zbx_db_field_t	*field;
-	char			*sql_command, delim[2] = {',', '('}, *sql;;
+	char			*sql_command, delim[2] = {',', '('}, *sql;
 	size_t			sql_command_alloc = 512, sql_command_offset = 0,
 				sql_alloc = 16 * ZBX_KIBIBYTE, sql_offset = 0;
 #ifdef HAVE_MYSQL
