@@ -5576,7 +5576,7 @@ td[class] + td.disaster-bg {
   .is-loading::before {
     background-color: rgba(43, 43, 43, 0.8);
     content: 'loading';
-    text-indent: 200%;
+    text-indent: -9999px;
     overflow: hidden;
     position: absolute;
     top: 0;
