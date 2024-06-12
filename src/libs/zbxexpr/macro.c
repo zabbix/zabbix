@@ -30,6 +30,7 @@ int	zbx_is_indexed_macro(const char *str, const zbx_token_t *token)
 		case ZBX_TOKEN_MACRO:
 			p = str + token->loc.r - 1;
 			break;
+		case ZBX_TOKEN_USER_FUNC_MACRO:
 		case ZBX_TOKEN_FUNC_MACRO:
 			p = str + token->data.func_macro.macro.r - 1;
 			break;
