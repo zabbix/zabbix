@@ -858,37 +858,23 @@ static zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 
 zbx_uint64_t	zbx_db_get_maxid_num(const char *tablename, int num)
 {
-#	define BUILD_ERROR_CONDITION(condition) ((void)sizeof(char[1 - 2*!!(condition)]))
-
-	int		i;
-	const char	*db_id_tablenames[] = {
-					"events",
-					"event_tag",
-					"problem_tag",
-					"dservices",
-					"dhosts",
-					"alerts",
-					"escalations",
-					"autoreg_host",
-					"event_suppress",
-					"trigger_queue",
-					"proxy_history",
-					"proxy_dhistory",
-					"proxy_autoreg_host",
-					"host_proxy"
-				};
-
-	BUILD_ERROR_CONDITION(ZBX_DB_ID_TABLENAMES_NUM != ARRSIZE(db_id_tablenames));
-
-	for (i = 0; i < ZBX_DB_ID_TABLENAMES_NUM; i++)
-	{
-		if (0 == strcmp(tablename, db_id_tablenames[i]))
-			return zbx_cb_nextid(tablename, num);
-	}
+	if (0 == strcmp(tablename, "events") ||
+			0 == strcmp(tablename, "event_tag") ||
+			0 == strcmp(tablename, "problem_tag") ||
+			0 == strcmp(tablename, "dservices") ||
+			0 == strcmp(tablename, "dhosts") ||
+			0 == strcmp(tablename, "alerts") ||
+			0 == strcmp(tablename, "escalations") ||
+			0 == strcmp(tablename, "autoreg_host") ||
+			0 == strcmp(tablename, "event_suppress") ||
+			0 == strcmp(tablename, "trigger_queue") ||
+			0 == strcmp(tablename, "proxy_history") ||
+			0 == strcmp(tablename, "proxy_dhistory") ||
+			0 == strcmp(tablename, "proxy_autoreg_host") ||
+			0 == strcmp(tablename, "host_proxy"))
+		return zbx_cb_nextid(tablename, num);
 
 	return DBget_nextid(tablename, num);
-
-#	undef BUILD_ERROR_CONDITION
 }
 
 /******************************************************************************
