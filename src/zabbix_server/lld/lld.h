@@ -382,19 +382,11 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_ptr_t *l
 int	lld_end_of_life(int lastcheck, int lifetime);
 
 typedef void	(*delete_ids_f)(zbx_vector_uint64_t *ids, int audit_context_mode);
-typedef	void	(*get_object_info_f)(const void *object, zbx_uint64_t *id, int *discovery_flag, int *lastcheck,
-		unsigned char *discovery_status, int *ts_delete, int *ts_disable, unsigned char *object_status,
-		unsigned char *disable_source, char **name);
 typedef void	(*object_audit_entry_create_f)(int audit_context_mode, int audit_action, zbx_uint64_t objectid,
 		const char *name, int flags);
 typedef void	(*object_audit_entry_update_status_f)(int audit_context_mode, zbx_uint64_t objectid, int flags,
 		int status_old, int status_new);
 typedef int	(get_object_status_val)(int status);
-void	lld_process_lost_objects(const char *table, const char *table_obj, const char *id_name,
-		zbx_vector_ptr_t *objects, const zbx_lld_lifetime_t *lifetime,
-		const zbx_lld_lifetime_t *enabled_lifetime, int lastcheck, delete_ids_f cb, get_object_info_f cb_info,
-		get_object_status_val cb_status, object_audit_entry_create_f cb_audit_create,
-		object_audit_entry_update_status_f cb_audit_update_status);
 
 int	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, char **error);
 

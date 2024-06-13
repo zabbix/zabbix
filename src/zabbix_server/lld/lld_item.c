@@ -4499,27 +4499,27 @@ static void	lld_process_lost_items(zbx_vector_lld_item_full_ptr_t *items, const 
 	{
 		zbx_lld_item_full_t	*item = items->values[i];
 		zbx_lld_discovery_t	*discovery;
+		unsigned char		object_status;
 
+		object_status = (ITEM_STATUS_DISABLED == item->status ? ZBX_LLD_OBJECT_STATUS_DISABLED :
+				ZBX_LLD_OBJECT_STATUS_ENABLED);
 		discovery = lld_add_discovery(&discoveries, item->itemid, item->name);
 
 		if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
 		{
 			lld_process_discovered_object(discovery, item->discovery_status, item->ts_delete);
-			lld_enable_discovered_object(discovery, ITEM_STATUS_DISABLED == item->status,
-					item->disable_source, item->ts_disable);
+			lld_enable_discovered_object(discovery, object_status, item->disable_source, item->ts_disable);
 			continue;
 		}
 
 		/* process lost items */
 
-		lld_process_lost_object(discovery, ITEM_STATUS_DISABLED == item->status, item->lastcheck, now, lifetime,
+		lld_process_lost_object(discovery, object_status, item->lastcheck, now, lifetime,
 				item->discovery_status, item->disable_source, item->ts_delete);
 
-		lld_disable_lost_object(discovery, ITEM_STATUS_DISABLED == item->status, item->lastcheck, now,
-				enabled_lifetime, item->ts_disable);
+		lld_disable_lost_object(discovery, object_status, item->lastcheck, now, enabled_lifetime,
+				item->ts_disable);
 	}
-
-	/* TODO: reset delete flags for items used in action conditions, done in separate task */
 
 	lld_flush_discoveries(&discoveries, "itemid", "items", "item_discovery", now, get_item_status_value,
 			zbx_db_delete_items, zbx_audit_item_create_entry, zbx_audit_item_update_json_update_status);

@@ -1460,24 +1460,41 @@ out:
 	return ret;
 }
 
-static	void	get_graph_info(const void *object, zbx_uint64_t *id, int *discovery_flag, int *lastcheck,
-		unsigned char *discovery_status, int *ts_delete, int *ts_disable, unsigned char *object_status,
-		unsigned char *disable_source, char **name)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: process lost graph resources                                    *
+ *                                                                            *
+ ******************************************************************************/
+static void	lld_process_lost_graphs(zbx_vector_lld_graph_ptr_t *graphs, const zbx_lld_lifetime_t *lifetime, int now)
 {
-	const zbx_lld_graph_t	*graph;
+	zbx_hashset_t	discoveries;
 
-	ZBX_UNUSED(ts_disable);
-	ZBX_UNUSED(object_status);
-	ZBX_UNUSED(disable_source);
+	zbx_hashset_create(&discoveries, (size_t)graphs->values_num, ZBX_DEFAULT_UINT64_HASH_FUNC,
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	graph = (const zbx_lld_graph_t *)object;
+	for (int i = 0; i < graphs->values_num; i++)
+	{
+		zbx_lld_graph_t	*graph = graphs->values[i];
+		zbx_lld_discovery_t	*discovery;
 
-	*id = graph->graphid;
-	*discovery_flag = graph->flags & ZBX_FLAG_LLD_GRAPH_DISCOVERED;
-	*lastcheck = graph->lastcheck;
-	*discovery_status = graph->discovery_status;
-	*ts_delete = graph->ts_delete;
-	*name = graph->name;
+		discovery = lld_add_discovery(&discoveries, graph->graphid, graph->name);
+
+		if (0 != (graph->flags & ZBX_FLAG_LLD_GRAPH_DISCOVERED))
+		{
+			lld_process_discovered_object(discovery, graph->discovery_status, graph->ts_delete);
+			continue;
+		}
+
+		/* process lost graphs */
+
+		lld_process_lost_object(discovery, ZBX_LLD_OBJECT_STATUS_ENABLED, graph->lastcheck, now, lifetime,
+				graph->discovery_status, 0, graph->ts_delete);
+	}
+
+	lld_flush_discoveries(&discoveries, "graphid", NULL, "graph_discovery", now, NULL, zbx_db_delete_graphs,
+			zbx_audit_graph_create_entry, NULL);
+
+	zbx_hashset_destroy(&discoveries);
 }
 
 /******************************************************************************
@@ -1560,9 +1577,8 @@ int	lld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_ve
 		ret = lld_graphs_save(hostid, parent_graphid, &graphs, width, height, yaxismin, yaxismax,
 				show_work_period, show_triggers, graphtype, show_legend, show_3d, percent_left,
 				percent_right, ymin_type, ymax_type);
-		lld_process_lost_objects("graph_discovery", NULL, "graphid", (zbx_vector_ptr_t *)&graphs, lifetime,
-				NULL, lastcheck, zbx_db_delete_graphs, get_graph_info, NULL,
-				zbx_audit_graph_create_entry, NULL);
+
+		lld_process_lost_graphs(&graphs, lifetime, lastcheck);
 
 		lld_items_free(&items);
 		lld_gitems_free(&gitems_proto);
