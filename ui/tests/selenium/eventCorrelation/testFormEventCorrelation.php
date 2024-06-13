@@ -107,6 +107,7 @@ class testFormEventCorrelation extends CWebTest {
 		$this->query('button:Create correlation')->one()->click();
 		$this->page->waitUntilReady();
 		$this->page->assertHeader('Event correlation rules');
+		$this->page->assertTitle('Event correlation rules');
 		$form = $this->page->query('id:correlation.edit')->one()->asForm();
 
 		// Check form labels.
