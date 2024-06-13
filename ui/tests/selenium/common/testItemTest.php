@@ -141,16 +141,13 @@ class testItemTest extends CWebTest {
 
 				$this->checkTestButtonInPreprocessing($item_type, $enabled, $i);
 
-				/**
-				 * Check "Execute now" button only in host case item saved form and then change type.
-				 * $type variable value is set only at the end of the code block under the if condition, therefore,
-				 * for the last item type this block needs to be accessed also for $i === 1, to check buttons state.
-				 */
-				if ($i === 0 || ($i === 1 && $update['Type'] === end($data)['Type'])) {
+				// Check "Execute now" button only in host case item saved form and then change type.
+				if ($i === 0) {
 					if ($check_now) {
 						if ($type === 'Dependent item') {
 							$enabled = true;
 						}
+
 						if ($item_type !== 'Discovery rule') {
 							$execute_button = $dialog->getFooter()->query('button:Execute now')->waitUntilVisible()->one();
 						}
@@ -161,21 +158,35 @@ class testItemTest extends CWebTest {
 						$this->assertTrue($execute_button->isEnabled($enabled));
 					}
 
-					if ($i === 0) {
-						$item_form->fill($update);
-						// TODO: workaround for ZBXNEXT-5365
-						if ($item_type === 'Item prototype'
-							&& array_key_exists('Master item', $update)) {
-								sleep(2);
-								$item_form->getFieldContainer('Master item')->asMultiselect()->select($update['Master item']);
-						}
-
-						$type = $update['Type'];
+					$item_form->fill($update);
+					// TODO: workaround for ZBXNEXT-5365
+					if ($item_type === 'Item prototype'
+						&& array_key_exists('Master item', $update)) {
+							sleep(2);
+							$item_form->getFieldContainer('Master item')->asMultiselect()->select($update['Master item']);
 					}
+
+					$type = $update['Type'];
 				}
 			}
 
 			$this->saveFormAndCheckMessage($item_type.' updated', $item_type == 'Discovery rule' ? true : false);
+
+			/**
+			 * By design, when changing item type, the "Execute now" doesn't change its state, as these changes have not
+			 * been written to the DB yet. This is why, the above code block actually checks the last saved state of
+			 * the "Execute now" button, which corresponds to the previous iteration in the $data array.
+			 * Therefore, in order to check the "Execute now" button state for the last iteration the item needs to be
+			 * saved and its form should be opened again.
+			 */
+			if ($check_now && $update['Type'] === end($data)['Type']) {
+				$this->query('link', $item_name)->waitUntilClickable()->one()->click();
+				$button = ($item_type == 'Discovery rule')
+					? $this->query('button:Execute now')->waitUntilVisible()->one()
+					: COverlayDialogElement::find()->one()->waitUntilReady()->query('button:Execute now')->one();
+
+				$this->assertTrue($button->isEnabled($enabled));
+			}
 		}
 	}
 
