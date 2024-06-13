@@ -20,6 +20,10 @@
 #include "zbxmutexs.h"
 #include "zbxthreads.h"
 
+#ifdef ZBX_PROCSTAT_COLLECTOR
+#	include "procstat.h"
+#endif
+
 #ifdef _WINDOWS
 #	include "zbxwinservice.h"
 #	include "../win32/perfstat/perfstat.h"

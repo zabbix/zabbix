@@ -15,10 +15,13 @@
 #ifndef ZABBIX_ASYNC_HTTPAGENT_H
 #define ZABBIX_ASYNC_HTTPAGENT_H
 
-#include "zbxcacheconfig.h"
-#include "zbxhttp.h"
+#include "zbxcommon.h"
 
 #ifdef HAVE_LIBCURL
+
+#include "zbxhttp.h"
+#include "zbxcacheconfig.h"
+
 typedef struct
 {
 	zbx_uint64_t	itemid;

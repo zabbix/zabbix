@@ -30,9 +30,9 @@
 #include "zbxavailability.h"
 #include "zbxnum.h"
 #include "zbxsysinfo.h"
-#include "zbx_host_constants.h"
 #include "zbxpreproc.h"
 #include "zbxinterface.h"
+#include "zbxtimekeeper.h"
 
 static int	compare_interfaces(const void *p1, const void *p2)
 {

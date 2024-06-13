@@ -15,6 +15,7 @@
 #include "reporter.h"
 #include "report_protocol.h"
 
+#include "zbxtimekeeper.h"
 #include "zbxthreads.h"
 #include "zbxalerter.h"
 #include "zbxalgo.h"
@@ -26,7 +27,10 @@
 #include "zbxdbhigh.h"
 #include "zbxipcservice.h"
 #include "zbxstr.h"
-#include "zbxcurl.h"
+
+#if defined(HAVE_LIBCURL)
+#	include "zbxcurl.h"
+#endif
 
 typedef struct
 {

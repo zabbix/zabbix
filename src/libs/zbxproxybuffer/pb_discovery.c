@@ -14,7 +14,7 @@
 
 #include "pb_discovery.h"
 #include "zbxcachehistory.h"
-#include "zbxcommon.h"
+#include "zbxstr.h"
 #include "zbxdb.h"
 #include "zbxdbhigh.h"
 #include "zbxjson.h"

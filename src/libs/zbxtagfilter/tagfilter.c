@@ -15,7 +15,7 @@
 #include "zbxtagfilter.h"
 
 #include "zbxexpr.h"
-#include "zbxdbhigh.h"	// for ZBX_CONDITION_EVAL_TYPE_*
+#include "zbxdbhigh.h"
 #include "zbxalgo.h"
 
 ZBX_PTR_VECTOR_IMPL(match_tags_ptr, zbx_match_tag_t*)

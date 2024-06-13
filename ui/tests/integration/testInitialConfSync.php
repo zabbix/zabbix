@@ -20,12 +20,7 @@ require_once dirname(__FILE__) . '/../include/CIntegrationTest.php';
  *
  * @required-components server
  * @configurationDataProvider serverConfigurationProvider
- * @backup actions, config, config_autoreg_tls, functions, globalmacro
- * @backup group_prototype, host_discovery, host_inventory, hostmacro, host_rtdata, hosts, hosts_groups, hosts_templates
- * @backup host_tag, hstgrp, interface, item_condition, item_discovery, item_parameter, item_preproc, item_rtdata, items
- * @backup item_tag, lld_macro_path, lld_override, lld_override_condition, lld_override_opdiscover, lld_override_operation
- * @backup lld_override_opstatus, operations, opgroup, opmessage, opmessage_grp, optemplate, proxy, proxy_rtdata
- * @backup auditlog, changelog, expressions, ha_node, regexps, proxy_group
+ * @backup hosts, regexps, config_autoreg_tls, globalmacro, auditlog, changelog, ha_node, ids
  */
 class testInitialConfSync extends CIntegrationTest
 {

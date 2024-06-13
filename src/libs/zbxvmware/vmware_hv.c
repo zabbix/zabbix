@@ -13,8 +13,13 @@
 **/
 
 #include "vmware_hv.h"
-#include "vmware_internal.h"
+
+#include "zbxcommon.h"
+
+#if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
+
 #include "zbxvmware.h"
+#include "vmware_internal.h"
 
 #include "vmware_ds.h"
 #include "vmware_vm.h"
@@ -28,8 +33,6 @@
 #ifdef HAVE_LIBXML2
 #	include <libxml/xpath.h>
 #endif
-
-#if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 
 #define ZBX_HVPROPMAP_EXT(property, func, ver)								\
 	{property, ZBX_XPATH_PROP_OBJECT(ZBX_VMWARE_SOAP_HV) ZBX_XPATH_PROP_NAME_NODE(property), func, ver}

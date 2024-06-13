@@ -12,22 +12,22 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+#include "embed.h"
+#include "duktape.h"
+
+#include "zbxembed.h"
+
+#ifdef HAVE_LIBCURL
+
 #include "browser_alert.h"
 #include "browser_element.h"
 #include "browser_error.h"
 #include "browser_perf.h"
-#include "config.h"
-#include "duktape.h"
-#include "embed.h"
 #include "webdriver.h"
-#include "zbxalgo.h"
-#include "zbxcommon.h"
-#include "zbxembed.h"
-#include "zbxtime.h"
-#include "zbxtypes.h"
-#include "zbxvariant.h"
 
-#ifdef HAVE_LIBCURL
+#include "zbxalgo.h"
+#include "zbxtime.h"
+#include "zbxvariant.h"
 
 /******************************************************************************
  *                                                                            *

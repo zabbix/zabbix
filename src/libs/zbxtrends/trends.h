@@ -12,7 +12,6 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#include "zbxtrends.h"
 #include "zbxtypes.h"
 
 #ifndef ZABBIX_TRENDS_H

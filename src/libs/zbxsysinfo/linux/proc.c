@@ -16,13 +16,14 @@
 #include "zbxsysinfo.h"
 #include "../sysinfo.h"
 
-#include "../common/stats.h"
+#include "../common/procstat.h"
 
 #include "zbxstr.h"
 #include "zbxregexp.h"
 #include "zbxjson.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
+#include "zbxalgo.h"
 
 #include <linux/version.h>
 

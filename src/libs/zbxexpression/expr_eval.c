@@ -22,9 +22,17 @@
 #include "zbxnum.h"
 #include "zbxparam.h"
 #include "zbxsysinfo.h"
+#include "zbxtime.h"
+#include "zbxalgo.h"
+#include "zbxcacheconfig.h"
+#include "zbxdb.h"
+#include "zbxdbhigh.h"
+#include "zbxexpr.h"
+#include "zbxhistory.h"
+#include "zbxstr.h"
+#include "zbxvariant.h"
 #include "zbx_host_constants.h"
 #include "zbx_item_constants.h"
-#include "zbxtime.h"
 
 #define ZBX_ITEM_QUERY_UNSET		0x0000
 

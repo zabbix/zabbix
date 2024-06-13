@@ -315,6 +315,8 @@ class testDashboardItemNavigatorWidget extends testWidgets {
 				}
 			}
 		}
+
+		COverlayDialogElement::find()->one()->close();
 	}
 
 	public static function getWidgetData() {
@@ -810,6 +812,7 @@ class testDashboardItemNavigatorWidget extends testWidgets {
 		if ($data['expected'] === TEST_BAD) {
 			$this->assertMessage($data['expected'], null, $data['error']);
 			$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
+			COverlayDialogElement::find()->one()->close();
 		}
 		else {
 			// If name is empty string it is replaced by default widget name "Item navigator".

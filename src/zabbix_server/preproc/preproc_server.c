@@ -14,11 +14,14 @@
 
 #include "preproc_server.h"
 
+#include "../lld/lld_protocol.h"
+
 #include "zbxpreproc.h"
 #include "zbxtime.h"
 #include "zbxcachehistory.h"
 #include "zbxvariant.h"
-#include "../lld/lld_protocol.h"
+#include "zbxalgo.h"
+#include "zbxpreprocbase.h"
 
 int	preproc_prepare_value_server(const zbx_variant_t *value, const zbx_pp_value_opt_t *value_opt)
 {

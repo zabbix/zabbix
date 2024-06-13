@@ -13,19 +13,21 @@
 **/
 
 #include "zbxvmware.h"
+#include "zbxthreads.h"
+
+#if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
+
 #include "vmware_internal.h"
 
 #include "vmware_perfcntr.h"
 #include "vmware_event.h"
 
+#include "zbxtimekeeper.h"
 #include "zbxalgo.h"
 #include "zbxnix.h"
 #include "zbxself.h"
 #include "zbxtime.h"
 #include "zbxlog.h"
-#include "zbxthreads.h"
-
-#if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 
 /******************************************************************************
  *                                                                            *

@@ -13,10 +13,12 @@
 **/
 
 #include "async_telnet.h"
-#include "zbxcommon.h"
+
+#include "../../libs/zbxpoller/async_poller.h"
+
+#include "zbxtimekeeper.h"
 #include "zbxcomms.h"
 #include "zbxself.h"
-#include "../../libs/zbxpoller/async_poller.h"
 
 ZBX_VECTOR_IMPL(telnet_recv, unsigned char)
 

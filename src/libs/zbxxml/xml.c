@@ -16,10 +16,10 @@
 
 #include "zbxalgo.h"
 #include "zbxjson.h"
-#include "zbxvariant.h"
-#include "zbxstr.h"
 
 #ifdef HAVE_LIBXML2
+#	include "zbxvariant.h"
+#	include "zbxstr.h"
 #	include <libxml/xpath.h>
 #	include <libxml/parser.h>
 #endif

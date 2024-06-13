@@ -5,11 +5,12 @@
 
 - This template is designed to monitor Microsoft Azure by HTTP.
 - It works without any external scripts and uses the script item.
-- Currently, the template supports the discovery of virtual machines (VMs), Cosmos DB for MongoDB, storage accounts, Microsoft SQL, MySQL, and PostgreSQL servers.
+- Currently, the template supports the discovery of virtual machines (VMs), VM scale sets, Cosmos DB for MongoDB, storage accounts, Microsoft SQL, MySQL, and PostgreSQL servers.
 
 ## Included Monitoring Templates
 
 - *Azure Virtual Machine by HTTP*
+- *Azure VM Scale Set by HTTP*
 - *Azure MySQL Flexible Server by HTTP*
 - *Azure MySQL Single Server by HTTP*
 - *Azure PostgreSQL Flexible Server by HTTP*
@@ -46,16 +47,20 @@ This template has been tested on:
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$AZURE.PROXY}|<p>Sets HTTP proxy value. If this macro is empty then no proxy is used.</p>||
+|{$AZURE.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, then no proxy is used.</p>||
 |{$AZURE.APP.ID}|<p>The App ID of Microsoft Azure.</p>||
 |{$AZURE.PASSWORD}|<p>Microsoft Azure password.</p>||
-|{$AZURE.DATA.TIMEOUT}|<p>A response timeout for API.</p>|`15s`|
+|{$AZURE.DATA.TIMEOUT}|<p>API response timeout.</p>|`15s`|
 |{$AZURE.TENANT.ID}|<p>Microsoft Azure tenant ID.</p>||
 |{$AZURE.SUBSCRIPTION.ID}|<p>Microsoft Azure subscription ID.</p>||
 |{$AZURE.VM.NAME.MATCHES}|<p>This macro is used in virtual machines discovery rule.</p>|`.*`|
 |{$AZURE.VM.NAME.NOT.MATCHES}|<p>This macro is used in virtual machines discovery rule.</p>|`CHANGE_IF_NEEDED`|
 |{$AZURE.VM.LOCATION.MATCHES}|<p>This macro is used in virtual machines discovery rule.</p>|`.*`|
 |{$AZURE.VM.LOCATION.NOT.MATCHES}|<p>This macro is used in virtual machines discovery rule.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.SCALESET.NAME.MATCHES}|<p>This macro is used in virtual machine scale sets discovery rule.</p>|`.*`|
+|{$AZURE.SCALESET.NAME.NOT.MATCHES}|<p>This macro is used in virtual machine scale sets discovery rule.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.SCALESET.LOCATION.MATCHES}|<p>This macro is used in virtual machine scale sets discovery rule.</p>|`.*`|
+|{$AZURE.SCALESET.LOCATION.NOT.MATCHES}|<p>This macro is used in virtual machine scale sets discovery rule.</p>|`CHANGE_IF_NEEDED`|
 |{$AZURE.STORAGE.ACC.NAME.MATCHES}|<p>This macro is used in storage accounts discovery rule.</p>|`.*`|
 |{$AZURE.STORAGE.ACC.NAME.NOT.MATCHES}|<p>This macro is used in storage accounts discovery rule.</p>|`CHANGE_IF_NEEDED`|
 |{$AZURE.STORAGE.ACC.LOCATION.MATCHES}|<p>This macro is used in storage accounts discovery rule.</p>|`.*`|
@@ -170,6 +175,12 @@ This template has been tested on:
 |----|-----------|----|-----------------------|
 |Virtual machines discovery|<p>The list of the virtual machines is provided by the subscription.</p>|Dependent item|azure.vm.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.resources.value`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 
+### LLD rule Virtual machine scale set discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Virtual machine scale set discovery|<p>The list of the virtual machine scale sets provided by the subscription.</p>|Dependent item|azure.scaleset.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.resources.value`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+
 ### LLD rule MySQL servers discovery
 
 |Name|Description|Type|Key and additional info|
@@ -193,6 +204,121 @@ This template has been tested on:
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |Cosmos DB account discovery|<p>The list of the Cosmos databases is provided by the subscription.</p>|Dependent item|azure.cosmos.mongo.db.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.resources.value`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+
+# Azure VM Scale Set by HTTP
+
+## Overview
+
+This template is designed to monitor Microsoft Azure virtual machine scale sets by HTTP.
+It works without any external scripts and uses the script item.
+
+## Requirements
+
+Zabbix version: 7.2 and higher.
+
+## Tested versions
+
+This template has been tested on:
+- Microsoft Azure virtual machine scale sets
+
+## Configuration
+
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.2/manual/config/templates_out_of_the_box) section.
+
+## Setup
+
+1. Create an Azure service principal via the Azure command-line interface (Azure CLI) for your subscription.
+
+      `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
+
+> See [Azure documentation](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli) for more details.
+
+2. Link the template to a host.
+3. Configure the macros: `{$AZURE.APP.ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT.ID}`, `{$AZURE.SUBSCRIPTION.ID}`, and `{$AZURE.RESOURCE.ID}`.
+
+### Macros used
+
+|Name|Description|Default|
+|----|-----------|-------|
+|{$AZURE.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, then no proxy is used.</p>||
+|{$AZURE.APP.ID}|<p>The App ID of Microsoft Azure.</p>||
+|{$AZURE.PASSWORD}|<p>Microsoft Azure password.</p>||
+|{$AZURE.DATA.TIMEOUT}|<p>API response timeout.</p>|`15s`|
+|{$AZURE.TENANT.ID}|<p>Microsoft Azure tenant ID.</p>||
+|{$AZURE.SUBSCRIPTION.ID}|<p>Microsoft Azure subscription ID.</p>||
+|{$AZURE.RESOURCE.ID}|<p>Microsoft Azure virtual machine ID.</p>||
+|{$AZURE.SCALESET.CPU.UTIL.CRIT}|<p>The critical threshold of CPU utilization, expressed in %.</p>|`90`|
+|{$AZURE.SCALESET.VM.COUNT.CRIT}|<p>The critical amount of virtual machines in the scale set.</p>|`100`|
+
+### Items
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Get data|<p>Gathers data of the virtual machine scale set.</p>|Script|azure.scaleset.data.get|
+|Get errors|<p>A list of errors from API requests.</p>|Dependent item|azure.scaleset.data.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to: ``</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Availability state|<p>The availability status of the resource.</p><p>0 - Available - no events detected that affect the health of the resource.</p><p>1 - Degraded  - your resource detected a loss in performance, although it's still available for use.</p><p>2 - Unavailable - the service detected an ongoing platform or non-platform event that affects the health of the resource.</p><p>3 - Unknown - Resource Health hasn't received information about the resource for more than 10 minutes.</p>|Dependent item|azure.scaleset.availability.state<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.health.availabilityState`</p><p>⛔️Custom on fail: Set value to: `3`</p></li><li><p>Replace: `Available -> 0`</p></li><li><p>Replace: `Degraded -> 1`</p></li><li><p>Replace: `Unavailable -> 2`</p></li><li><p>Replace: `Unknown -> 3`</p></li><li><p>In range: `0 -> 3`</p><p>⛔️Custom on fail: Set value to: `3`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Availability status detailed|<p>The summary description of availability status.</p>|Dependent item|azure.scaleset.availability.details<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.health.summary`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Virtual machine count|<p>Current amount of virtual machines in the scale set.</p>|Dependent item|azure.scaleset.vm.count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.capacity`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Available memory|<p>Amount of physical memory, in bytes, immediately available for allocation to a process or for system use in the virtual machine.</p>|Dependent item|azure.scaleset.vm.memory<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.AvailableMemoryBytes.average`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|CPU credits consumed|<p>Total number of credits consumed by the virtual machine. Only available on B-series burstable VMs.</p>|Dependent item|azure.scaleset.cpu.credits.consumed<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.CPUCreditsConsumed.average`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|CPU credits remaining|<p>Total number of credits available to burst. Only available on B-series burstable VMs.</p>|Dependent item|azure.scaleset.cpu.credits.remaining<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.CPUCreditsRemaining.average`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|CPU utilization|<p>The percentage of allocated compute units that are currently in use by the virtual machine(s).</p>|Dependent item|azure.scaleset.cpu.utilization<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.PercentageCPU.average`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Data disk bandwidth consumed|<p>Percentage of data disk bandwidth consumed per minute.</p>|Dependent item|azure.scaleset.data.disk.bandwidth.consumed<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.DataDiskBandwidthConsumedPercentage.average`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Data disk IOPS consumed|<p>Percentage of data disk I/Os consumed per minute.</p>|Dependent item|azure.scaleset.data.disk.iops.consumed<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.DataDiskIOPSConsumedPercentage.average`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Data disk read rate|<p>Bytes/sec read from a single disk during the monitoring period.</p>|Dependent item|azure.scaleset.data.disk.read.bps<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.DataDiskReadBytessec.average`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Data disk IOPS read|<p>Read IOPS from a single disk during the monitoring period.</p>|Dependent item|azure.scaleset.data.disk.read.ops<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.DataDiskReadOperationsSec.average`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Data disk used burst BPS credits|<p>Percentage of data disk burst bandwidth credits used so far.</p>|Dependent item|azure.scaleset.data.disk.bandwidth.burst.used<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.DataDiskUsedBurstBPSCreditsPercentage.average`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Data disk used burst IO credits|<p>Percentage of data disk burst I/O credits used so far.</p>|Dependent item|azure.scaleset.data.disk.iops.burst.used<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.DataDiskUsedBurstIOCreditsPercentage.average`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Data disk write rate|<p>Bytes/sec written to a single disk during the monitoring period.</p>|Dependent item|azure.scaleset.data.disk.write.bps<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.DataDiskWriteBytessec.average`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Data disk IOPS write|<p>Write IOPS from a single disk during the monitoring period.</p>|Dependent item|azure.scaleset.data.disk.write.ops<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.DataDiskWriteOperationsSec.average`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Data disk queue depth|<p>Data disk queue depth (or queue length).</p>|Dependent item|azure.scaleset.data.disk.queue.depth<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.DataDiskQueueDepth.average`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Data disk target bandwidth|<p>Baseline byte-per-second throughput the data disk can achieve without bursting.</p>|Dependent item|azure.scaleset.data.disk.bandwidth.target<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.DataDiskTargetBandwidth.average`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Data disk target IOPS|<p>Baseline IOPS the data disk can achieve without bursting.</p>|Dependent item|azure.scaleset.data.disk.iops.target<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.DataDiskTargetIOPS.average`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Data disk max burst bandwidth|<p>Maximum byte-per-second throughput the data disk can achieve with bursting.</p>|Dependent item|azure.scaleset.data.disk.bandwidth.burst.max<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.DataDiskMaxBurstBandwidth.average`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Data disk max burst IOPS|<p>Maximum IOPS the data disk can achieve with bursting.</p>|Dependent item|azure.scaleset.data.disk.iops.burst.max<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.DataDiskMaxBurstIOPS.average`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Disk read|<p>Bytes read from the disk during the monitoring period.</p>|Dependent item|azure.scaleset.disk.read<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.DiskReadBytes.total`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Disk IOPS read|<p>Disk read IOPS.</p>|Dependent item|azure.scaleset.disk.read.ops<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.DiskReadOperationsSec.average`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Disk write|<p>Bytes written to the disk during the monitoring period.</p>|Dependent item|azure.scaleset.disk.write<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.DiskWriteBytes.total`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Disk IOPS write|<p>Write IOPS from a single disk during the monitoring period.</p>|Dependent item|azure.scaleset.disk.write.ops<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.DiskWriteOperationsSec.average`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Inbound flows|<p>Inbound Flows are the number of current flows in the inbound direction (traffic going into the VMs).</p>|Dependent item|azure.scaleset.flows.inbound<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.InboundFlows.average`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Outbound flows|<p>Outbound Flows are the number of current flows in the outbound direction (traffic going out of the VMs).</p>|Dependent item|azure.scaleset.flows.outbound<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.OutboundFlows.average`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Network in total|<p>The number of bytes received on all network interfaces by the virtual machine(s) (incoming traffic).</p>|Dependent item|azure.scaleset.network.in.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.NetworkInTotal.total`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Network out total|<p>The number of bytes out on all network interfaces by the virtual machine(s) (outgoing traffic).</p>|Dependent item|azure.scaleset.network.out.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.NetworkOutTotal.total`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Inbound flow maximum creation rate|<p>The maximum creation rate of inbound flows (traffic going into the VM).</p>|Dependent item|azure.scaleset.flows.inbound.max<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.InboundFlowsMaximumCreationRate.average`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Outbound flow maximum creation rate|<p>The maximum creation rate of outbound flows (traffic going out of the VM).</p>|Dependent item|azure.scaleset.flows.outbound.max<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.OutboundFlowsMaximumCreationRate.average`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|OS disk read rate|<p>Bytes/sec read from a single disk during the monitoring period - for an OS disk.</p>|Dependent item|azure.scaleset.os.disk.read.bps<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.OSDiskReadBytessec.average`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|OS disk write rate|<p>Bytes/sec written to a single disk during the monitoring period - for an OS disk.</p>|Dependent item|azure.scaleset.os.disk.write.bps<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.OSDiskWriteBytessec.average`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|OS disk IOPS read|<p>Read IOPS from a single disk during the monitoring period - for an OS disk.</p>|Dependent item|azure.scaleset.os.disk.read.ops<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.OSDiskReadOperationsSec.average`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|OS disk IOPS write|<p>Write IOPS from a single disk during the monitoring period - for an OS disk.</p>|Dependent item|azure.scaleset.os.disk.write.ops<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.OSDiskWriteOperationsSec.average`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|OS disk queue depth|<p>OS Disk queue depth (or queue length).</p>|Dependent item|azure.scaleset.os.disk.queue.depth<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.OSDiskQueueDepth.average`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|OS disk bandwidth consumed|<p>Percentage of operating system disk bandwidth consumed per minute.</p>|Dependent item|azure.scaleset.os.disk.bandwidth.consumed<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.OSDiskBandwidthConsumedPercentage.average`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|OS disk IOPS consumed|<p>Percentage of operating system disk I/Os consumed per minute.</p>|Dependent item|azure.scaleset.os.disk.iops.consumed<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.OSDiskIOPSConsumedPercentage.average`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|OS disk target bandwidth|<p>Baseline byte-per-second throughput the OS Disk can achieve without bursting.</p>|Dependent item|azure.scaleset.os.disk.bandwidth.target<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.OSDiskTargetBandwidth.average`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|OS disk target IOPS|<p>Baseline IOPS the OS disk can achieve without bursting.</p>|Dependent item|azure.scaleset.os.disk.iops.target<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.OSDiskTargetIOPS.average`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|OS disk max burst bandwidth|<p>Maximum byte-per-second throughput the OS Disk can achieve with bursting.</p>|Dependent item|azure.scaleset.os.disk.bandwidth.max<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.OSDiskMaxBurstBandwidth.average`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|OS disk max burst IOPS|<p>Maximum IOPS the OS Disk can achieve with bursting.</p>|Dependent item|azure.scaleset.os.disk.iops.max<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.OSDiskMaxBurstIOPS.average`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|OS disk used burst BPS credits|<p>Percentage of OS Disk burst bandwidth credits used so far.</p>|Dependent item|azure.scaleset.os.disk.bandwidth.burst.used<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.OSDiskUsedBurstBPSCreditsPercentage.average`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|OS disk used burst IO credits|<p>Percentage of OS Disk burst I/O credits used so far.</p>|Dependent item|azure.scaleset.os.disk.iops.burst.used<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.OSDiskUsedBurstIOCreditsPercentage.average`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Premium data disk cache read hit in %|<p>Percentage of premium data disk cache read hit.</p>|Dependent item|azure.scaleset.premium.data.disk.cache.read.hit<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.PremiumDataDiskCacheReadHit.average`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Premium data disk cache read miss in %|<p>Percentage of premium data disk cache read miss.</p>|Dependent item|azure.scaleset.premium.data.disk.cache.read.miss<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.PremiumDataDiskCacheReadMiss.average`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Premium OS disk cache read hit in %|<p>Percentage of premium OS disk cache read hit.</p>|Dependent item|azure.scaleset.premium.os.disk.cache.read.hit<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.PremiumOSDiskCacheReadHit.average`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Premium OS disk cache read miss in %|<p>Percentage of premium OS disk cache read miss.</p>|Dependent item|azure.scaleset.premium.os.disk.cache.read.miss<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.PremiumOSDiskCacheReadMiss.average`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|VM cached bandwidth consumed|<p>Percentage of cached disk bandwidth consumed by the VM.</p>|Dependent item|azure.scaleset.vm.cached.bandwidth.consumed<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.VMCachedBandwidthConsumedPercentage.average`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|VM cached IOPS consumed|<p>Percentage of cached disk IOPS consumed by the VM.</p>|Dependent item|azure.scaleset.vm.cached.iops.consumed<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.VMCachedIOPSConsumedPercentage.average`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|VM uncached bandwidth consumed|<p>Percentage of uncached disk bandwidth consumed by the VM.</p>|Dependent item|azure.scaleset.vm.uncached.bandwidth.consumed<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.VMUncachedBandwidthConsumedPercentage.average`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|VM uncached IOPS consumed|<p>Percentage of uncached disk IOPS consumed by the VM.</p>|Dependent item|azure.scaleset.vm.uncached.iops.consumed<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.VMUncachedIOPSConsumedPercentage.average`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|VM availability metric|<p>Measure of availability of the virtual machines over time.</p>|Dependent item|azure.scaleset.availability<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.VmAvailabilityMetric.average`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+
+### Triggers
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|There are errors in requests to API|<p>Zabbix has received errors in response to API requests.</p>|`length(last(/Azure VM Scale Set by HTTP/azure.scaleset.data.errors))>0`|Average||
+|Virtual machine scale set is unavailable|<p>The resource state is unavailable.</p>|`last(/Azure VM Scale Set by HTTP/azure.scaleset.availability.state)=2`|High||
+|Virtual machine scale set is degraded|<p>The resource is in a degraded state.</p>|`last(/Azure VM Scale Set by HTTP/azure.scaleset.availability.state)=1`|Average||
+|Virtual machine scale set is in unknown state|<p>The resource state is unknown.</p>|`last(/Azure VM Scale Set by HTTP/azure.scaleset.availability.state)=3`|Warning||
+|High amount of VMs in the scale set|<p>High amount of VMs in the scale set.</p>|`min(/Azure VM Scale Set by HTTP/azure.scaleset.vm.count,5m)>{$AZURE.SCALESET.VM.COUNT.CRIT}`|High||
+|High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/Azure VM Scale Set by HTTP/azure.scaleset.cpu.utilization,5m)>{$AZURE.SCALESET.CPU.UTIL.CRIT}`|High||
 
 # Azure Virtual Machine by HTTP
 
@@ -229,10 +355,10 @@ This template has been tested on:
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$AZURE.PROXY}|<p>Sets HTTP proxy value. If this macro is empty then no proxy is used.</p>||
+|{$AZURE.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, then no proxy is used.</p>||
 |{$AZURE.APP.ID}|<p>The App ID of Microsoft Azure.</p>||
 |{$AZURE.PASSWORD}|<p>Microsoft Azure password.</p>||
-|{$AZURE.DATA.TIMEOUT}|<p>A response timeout for API.</p>|`15s`|
+|{$AZURE.DATA.TIMEOUT}|<p>API response timeout.</p>|`15s`|
 |{$AZURE.TENANT.ID}|<p>Microsoft Azure tenant ID.</p>||
 |{$AZURE.SUBSCRIPTION.ID}|<p>Microsoft Azure subscription ID.</p>||
 |{$AZURE.RESOURCE.ID}|<p>Microsoft Azure virtual machine ID.</p>||
@@ -260,22 +386,22 @@ This template has been tested on:
 |Data disk queue depth|<p>The number of outstanding IO requests that are waiting to be performed on a disk.</p>|Dependent item|azure.vm.data.disk.queue.depth<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.DataDiskQueueDepth.average`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Data disk bandwidth consumed percentage|<p>The percentage of the data disk bandwidth consumed per minute.</p>|Dependent item|azure.vm.data.disk.bandwidth.consumed.percentage<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.DataDiskBandwidthConsumedPercentage.average`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Data disk IOPS consumed percentage|<p>The percentage of the data disk input/output (I/O) consumed per minute.</p>|Dependent item|azure.vm.data.disk.iops.consumed.percentage<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.DataDiskIOPSConsumedPercentage.average`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Data disk target bandwidth|<p>Baseline bytes per second throughput that the data disk can achieve without bursting.</p>|Dependent item|azure.vm.data.disk.target.bandwidth<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.DataDiskTargetBandwidth.average`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Data disk target bandwidth|<p>Baseline byte-per-second throughput that the data disk can achieve without bursting.</p>|Dependent item|azure.vm.data.disk.target.bandwidth<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.DataDiskTargetBandwidth.average`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Data disk target IOPS|<p>The baseline IOPS that the data disk can achieve without bursting.</p>|Dependent item|azure.vm.data.disk.target.iops<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.DataDiskTargetIOPS.average`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Data disk max burst bandwidth|<p>The maximum bytes per second throughput that the data disk can achieve with bursting.</p>|Dependent item|azure.vm.data.disk.max.bandwidth<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.DataDiskMaxBurstBandwidth.average`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Data disk max burst bandwidth|<p>The maximum byte-per-second throughput that the data disk can achieve with bursting.</p>|Dependent item|azure.vm.data.disk.max.bandwidth<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.DataDiskMaxBurstBandwidth.average`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Data disk max burst IOPS|<p>The maximum IOPS that the data disk can achieve with bursting.</p>|Dependent item|azure.vm.data.disk.max.iops<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.DataDiskMaxBurstIOPS.average`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Data disk used burst BPS credits percentage|<p>The percentage of the data disk burst bandwidth credits used so far.</p>|Dependent item|azure.vm.data.disk.used.burst.bandwidth<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.DataDiskUsedBurstBPSCreditsPercentage.average`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Data disk used burst IO credits percentage|<p>The percentage of the data disk burst I/O credits used so far.</p>|Dependent item|azure.vm.data.disk.used.burst.iops<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.DataDiskUsedBurstIOCreditsPercentage.average`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|OS disk read rate|<p>Bytes per second read from a single disk during the monitoring period for OS disk.</p>|Dependent item|azure.vm.os.disk.read.bps<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.OSDiskReadBytessec.average`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|OS disk write rate|<p>Bytes per second written to a single disk during the monitoring period for OS disk.</p>|Dependent item|azure.vm.os.disk.write.bps<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.OSDiskWriteBytessec.average`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|OS disk read operations/sec|<p>The read IOPS from a single disk during the monitoring period for OS disk.</p>|Dependent item|azure.vm.os.disk.read.ops<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.OSDiskReadOperationsSec.average`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|OS disk write operations/sec|<p>The write IOPS from a single disk during the monitoring period for OS disk.</p>|Dependent item|azure.vm.os.disk.write.ops<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.OSDiskWriteOperationsSec.average`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|OS disk read rate|<p>Bytes per second read from a single disk during the monitoring period - for an OS disk.</p>|Dependent item|azure.vm.os.disk.read.bps<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.OSDiskReadBytessec.average`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|OS disk write rate|<p>Bytes per second written to a single disk during the monitoring period - for an OS disk.</p>|Dependent item|azure.vm.os.disk.write.bps<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.OSDiskWriteBytessec.average`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|OS disk read operations/sec|<p>The read IOPS from a single disk during the monitoring period - for an OS disk.</p>|Dependent item|azure.vm.os.disk.read.ops<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.OSDiskReadOperationsSec.average`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|OS disk write operations/sec|<p>The write IOPS from a single disk during the monitoring period - for an OS disk.</p>|Dependent item|azure.vm.os.disk.write.ops<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.OSDiskWriteOperationsSec.average`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |OS disk queue depth|<p>The OS disk queue depth (or queue length).</p>|Dependent item|azure.vm.os.disk.queue.depth<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.OSDiskQueueDepth.average`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |OS disk bandwidth consumed percentage|<p>The percentage of the operating system's disk bandwidth consumed per minute.</p>|Dependent item|azure.vm.os.disk.bandwidth.consumed.percentage<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.OSDiskBandwidthConsumedPercentage.average`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |OS disk IOPS consumed percentage|<p>The percentage of the operating system's disk I/Os consumed per minute.</p>|Dependent item|azure.vm.os.disk.iops.consumed.percentage<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.OSDiskIOPSConsumedPercentage.average`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|OS disk target bandwidth|<p>Baseline bytes per second throughput that the OS disk can achieve without bursting.</p>|Dependent item|azure.vm.os.disk.target.bandwidth<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.OSDiskTargetBandwidth.average`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|OS disk target bandwidth|<p>Baseline byte-per-second throughput that the OS disk can achieve without bursting.</p>|Dependent item|azure.vm.os.disk.target.bandwidth<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.OSDiskTargetBandwidth.average`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |OS disk target IOPS|<p>Baseline IOPS that the OS disk can achieve without bursting.</p>|Dependent item|azure.vm.os.disk.target.iops<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.OSDiskTargetIOPS.average`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|OS disk max burst bandwidth|<p>Maximum bytes per second throughput that the OS disk can achieve with bursting.</p>|Dependent item|azure.vm.os.disk.max.bandwidth<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.OSDiskMaxBurstBandwidth.average`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|OS disk max burst bandwidth|<p>Maximum byte-per-second throughput that the OS disk can achieve with bursting.</p>|Dependent item|azure.vm.os.disk.max.bandwidth<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.OSDiskMaxBurstBandwidth.average`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |OS disk max burst IOPS|<p>Maximum IOPS that the OS disk can achieve with bursting.</p>|Dependent item|azure.vm.os.disk.max.iops<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.OSDiskMaxBurstIOPS.average`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |OS disk used burst BPS credits percentage|<p>The percentage of the OS disk burst bandwidth credits used so far.</p>|Dependent item|azure.vm.os.disk.used.burst.bandwidth<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.OSDiskUsedBurstBPSCreditsPercentage.average`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |OS disk used burst IO credits percentage|<p>The percentage of the OS disk burst I/O credits used so far.</p>|Dependent item|azure.vm.os.disk.used.burst.iops<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.OSDiskUsedBurstIOCreditsPercentage.average`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
@@ -301,7 +427,7 @@ This template has been tested on:
 |----|-----------|----------|--------|--------------------------------|
 |There are errors in requests to API|<p>Zabbix has received errors in response to API requests.</p>|`length(last(/Azure Virtual Machine by HTTP/azure.vm.data.errors))>0`|Average||
 |Virtual machine is unavailable|<p>The resource state is unavailable.</p>|`last(/Azure Virtual Machine by HTTP/azure.vm.availability.state)=2`|High||
-|Virtual machine is degraded|<p>The resource is in degraded state.</p>|`last(/Azure Virtual Machine by HTTP/azure.vm.availability.state)=1`|Average||
+|Virtual machine is degraded|<p>The resource is in a degraded state.</p>|`last(/Azure Virtual Machine by HTTP/azure.vm.availability.state)=1`|Average||
 |Virtual machine is in unknown state|<p>The resource state is unknown.</p>|`last(/Azure Virtual Machine by HTTP/azure.vm.availability.state)=3`|Warning||
 |High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/Azure Virtual Machine by HTTP/azure.vm.cpu.percentage,5m)>{$AZURE.VM.CPU.UTIL.CRIT}`|High||
 
@@ -340,10 +466,10 @@ This template has been tested on:
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$AZURE.PROXY}|<p>Sets HTTP proxy value. If this macro is empty then no proxy is used.</p>||
+|{$AZURE.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, then no proxy is used.</p>||
 |{$AZURE.APP.ID}|<p>The App ID of Microsoft Azure.</p>||
 |{$AZURE.PASSWORD}|<p>Microsoft Azure password.</p>||
-|{$AZURE.DATA.TIMEOUT}|<p>A response timeout for API.</p>|`15s`|
+|{$AZURE.DATA.TIMEOUT}|<p>API response timeout.</p>|`15s`|
 |{$AZURE.TENANT.ID}|<p>Microsoft Azure tenant ID.</p>||
 |{$AZURE.SUBSCRIPTION.ID}|<p>Microsoft Azure subscription ID.</p>||
 |{$AZURE.RESOURCE.ID}|<p>Microsoft Azure MySQL server ID.</p>||
@@ -383,7 +509,7 @@ This template has been tested on:
 |----|-----------|----------|--------|--------------------------------|
 |There are errors in requests to API|<p>Zabbix has received errors in response to API requests.</p>|`length(last(/Azure MySQL Flexible Server by HTTP/azure.db.mysql.data.errors))>0`|Average||
 |MySQL server is unavailable|<p>The resource state is unavailable.</p>|`last(/Azure MySQL Flexible Server by HTTP/azure.db.mysql.availability.state)=2`|High||
-|MySQL server is degraded|<p>The resource is in degraded state.</p>|`last(/Azure MySQL Flexible Server by HTTP/azure.db.mysql.availability.state)=1`|Average||
+|MySQL server is degraded|<p>The resource is in a degraded state.</p>|`last(/Azure MySQL Flexible Server by HTTP/azure.db.mysql.availability.state)=1`|Average||
 |MySQL server is in unknown state|<p>The resource state is unknown.</p>|`last(/Azure MySQL Flexible Server by HTTP/azure.db.mysql.availability.state)=3`|Warning||
 |High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/Azure MySQL Flexible Server by HTTP/azure.db.mysql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}`|High||
 |Server has aborted connections|<p>The number of failed attempts to connect to the MySQL server is more than `{$AZURE.DB.ABORTED.CONN.MAX.WARN}`.</p>|`min(/Azure MySQL Flexible Server by HTTP/azure.db.mysql.connections.aborted,5m)>{$AZURE.DB.ABORTED.CONN.MAX.WARN}`|Average||
@@ -425,10 +551,10 @@ This template has been tested on:
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$AZURE.PROXY}|<p>Sets HTTP proxy value. If this macro is empty then no proxy is used.</p>||
+|{$AZURE.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, then no proxy is used.</p>||
 |{$AZURE.APP.ID}|<p>The App ID of Microsoft Azure.</p>||
 |{$AZURE.PASSWORD}|<p>Microsoft Azure password.</p>||
-|{$AZURE.DATA.TIMEOUT}|<p>A response timeout for API.</p>|`15s`|
+|{$AZURE.DATA.TIMEOUT}|<p>API response timeout.</p>|`15s`|
 |{$AZURE.TENANT.ID}|<p>Microsoft Azure tenant ID.</p>||
 |{$AZURE.SUBSCRIPTION.ID}|<p>Microsoft Azure subscription ID.</p>||
 |{$AZURE.RESOURCE.ID}|<p>Microsoft Azure MySQL server ID.</p>||
@@ -468,7 +594,7 @@ This template has been tested on:
 |----|-----------|----------|--------|--------------------------------|
 |There are errors in requests to API|<p>Zabbix has received errors in response to API requests.</p>|`length(last(/Azure MySQL Single Server by HTTP/azure.db.mysql.data.errors))>0`|Average||
 |MySQL server is unavailable|<p>The resource state is unavailable.</p>|`last(/Azure MySQL Single Server by HTTP/azure.db.mysql.availability.state)=2`|High||
-|MySQL server is degraded|<p>The resource is in degraded state.</p>|`last(/Azure MySQL Single Server by HTTP/azure.db.mysql.availability.state)=1`|Average||
+|MySQL server is degraded|<p>The resource is in a degraded state.</p>|`last(/Azure MySQL Single Server by HTTP/azure.db.mysql.availability.state)=1`|Average||
 |MySQL server is in unknown state|<p>The resource state is unknown.</p>|`last(/Azure MySQL Single Server by HTTP/azure.db.mysql.availability.state)=3`|Warning||
 |High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/Azure MySQL Single Server by HTTP/azure.db.mysql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}`|High||
 |High memory utilization|<p>The system is running out of free memory.</p>|`min(/Azure MySQL Single Server by HTTP/azure.db.mysql.memory.percentage,5m)>{$AZURE.DB.MEMORY.UTIL.CRIT}`|Average||
@@ -511,10 +637,10 @@ This template has been tested on:
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$AZURE.PROXY}|<p>Sets HTTP proxy value. If this macro is empty then no proxy is used.</p>||
+|{$AZURE.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, then no proxy is used.</p>||
 |{$AZURE.APP.ID}|<p>The App ID of Microsoft Azure.</p>||
 |{$AZURE.PASSWORD}|<p>Microsoft Azure password.</p>||
-|{$AZURE.DATA.TIMEOUT}|<p>A response timeout for API.</p>|`15s`|
+|{$AZURE.DATA.TIMEOUT}|<p>API response timeout.</p>|`15s`|
 |{$AZURE.TENANT.ID}|<p>Microsoft Azure tenant ID.</p>||
 |{$AZURE.SUBSCRIPTION.ID}|<p>Microsoft Azure subscription ID.</p>||
 |{$AZURE.RESOURCE.ID}|<p>Microsoft Azure PostgreSQL server ID.</p>||
@@ -559,7 +685,7 @@ This template has been tested on:
 |----|-----------|----------|--------|--------------------------------|
 |There are errors in requests to API|<p>Zabbix has received errors in response to API requests.</p>|`length(last(/Azure PostgreSQL Flexible Server by HTTP/azure.db.pgsql.data.errors))>0`|Average||
 |PostgreSQL server is unavailable|<p>The resource state is unavailable.</p>|`last(/Azure PostgreSQL Flexible Server by HTTP/azure.db.pgsql.availability.state)=2`|High||
-|PostgreSQL server is degraded|<p>The resource is in degraded state.</p>|`last(/Azure PostgreSQL Flexible Server by HTTP/azure.db.pgsql.availability.state)=1`|Average||
+|PostgreSQL server is degraded|<p>The resource is in a degraded state.</p>|`last(/Azure PostgreSQL Flexible Server by HTTP/azure.db.pgsql.availability.state)=1`|Average||
 |PostgreSQL server is in unknown state|<p>The resource state is unknown.</p>|`last(/Azure PostgreSQL Flexible Server by HTTP/azure.db.pgsql.availability.state)=3`|Warning||
 |High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/Azure PostgreSQL Flexible Server by HTTP/azure.db.pgsql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}`|High||
 |High memory utilization|<p>The system is running out of free memory.</p>|`min(/Azure PostgreSQL Flexible Server by HTTP/azure.db.pgsql.memory.percentage,5m)>{$AZURE.DB.MEMORY.UTIL.CRIT}`|Average||
@@ -601,10 +727,10 @@ This template has been tested on:
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$AZURE.PROXY}|<p>Sets HTTP proxy value. If this macro is empty then no proxy is used.</p>||
+|{$AZURE.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, then no proxy is used.</p>||
 |{$AZURE.APP.ID}|<p>The App ID of Microsoft Azure.</p>||
 |{$AZURE.PASSWORD}|<p>Microsoft Azure password.</p>||
-|{$AZURE.DATA.TIMEOUT}|<p>A response timeout for API.</p>|`15s`|
+|{$AZURE.DATA.TIMEOUT}|<p>API response timeout.</p>|`15s`|
 |{$AZURE.TENANT.ID}|<p>Microsoft Azure tenant ID.</p>||
 |{$AZURE.SUBSCRIPTION.ID}|<p>Microsoft Azure subscription ID.</p>||
 |{$AZURE.RESOURCE.ID}|<p>Microsoft Azure PostgreSQL server ID.</p>||
@@ -644,7 +770,7 @@ This template has been tested on:
 |----|-----------|----------|--------|--------------------------------|
 |There are errors in requests to API|<p>Zabbix has received errors in response to API requests.</p>|`length(last(/Azure PostgreSQL Single Server by HTTP/azure.db.pgsql.data.errors))>0`|Average||
 |PostgreSQL server is unavailable|<p>The resource state is unavailable.</p>|`last(/Azure PostgreSQL Single Server by HTTP/azure.db.pgsql.availability.state)=2`|High||
-|PostgreSQL server is degraded|<p>The resource is in degraded state.</p>|`last(/Azure PostgreSQL Single Server by HTTP/azure.db.pgsql.availability.state)=1`|Average||
+|PostgreSQL server is degraded|<p>The resource is in a degraded state.</p>|`last(/Azure PostgreSQL Single Server by HTTP/azure.db.pgsql.availability.state)=1`|Average||
 |PostgreSQL server is in unknown state|<p>The resource state is unknown.</p>|`last(/Azure PostgreSQL Single Server by HTTP/azure.db.pgsql.availability.state)=3`|Warning||
 |High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/Azure PostgreSQL Single Server by HTTP/azure.db.pgsql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}`|High||
 |High memory utilization|<p>The system is running out of free memory.</p>|`min(/Azure PostgreSQL Single Server by HTTP/azure.db.pgsql.memory.percentage,5m)>{$AZURE.DB.MEMORY.UTIL.CRIT}`|Average||
@@ -686,10 +812,10 @@ This template has been tested on:
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$AZURE.PROXY}|<p>Sets HTTP proxy value. If this macro is empty then no proxy is used.</p>||
+|{$AZURE.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, then no proxy is used.</p>||
 |{$AZURE.APP.ID}|<p>The App ID of Microsoft Azure.</p>||
 |{$AZURE.PASSWORD}|<p>Microsoft Azure password.</p>||
-|{$AZURE.DATA.TIMEOUT}|<p>A response timeout for API.</p>|`15s`|
+|{$AZURE.DATA.TIMEOUT}|<p>API response timeout.</p>|`15s`|
 |{$AZURE.TENANT.ID}|<p>Microsoft Azure tenant ID.</p>||
 |{$AZURE.SUBSCRIPTION.ID}|<p>Microsoft Azure subscription ID.</p>||
 |{$AZURE.RESOURCE.ID}|<p>Microsoft Azure Microsoft SQL database ID.</p>||
@@ -736,7 +862,7 @@ This template has been tested on:
 |----|-----------|----------|--------|--------------------------------|
 |There are errors in requests to API|<p>Zabbix has received errors in response to API requests.</p>|`length(last(/Azure Microsoft SQL Serverless Database by HTTP/azure.db.mssql.data.errors))>0`|Average||
 |Microsoft SQL database is unavailable|<p>The resource state is unavailable.</p>|`last(/Azure Microsoft SQL Serverless Database by HTTP/azure.db.mssql.availability.state)=2`|High||
-|Microsoft SQL database is degraded|<p>The resource is in degraded state.</p>|`last(/Azure Microsoft SQL Serverless Database by HTTP/azure.db.mssql.availability.state)=1`|Average||
+|Microsoft SQL database is degraded|<p>The resource is in a degraded state.</p>|`last(/Azure Microsoft SQL Serverless Database by HTTP/azure.db.mssql.availability.state)=1`|Average||
 |Microsoft SQL database is in unknown state|<p>The resource state is unknown.</p>|`last(/Azure Microsoft SQL Serverless Database by HTTP/azure.db.mssql.availability.state)=3`|Warning||
 |High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/Azure Microsoft SQL Serverless Database by HTTP/azure.db.mssql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}`|High||
 |Storage space is critically low|<p>Critical utilization of the storage space.</p>|`last(/Azure Microsoft SQL Serverless Database by HTTP/azure.db.mssql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}`|Average||
@@ -777,10 +903,10 @@ This template has been tested on:
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$AZURE.PROXY}|<p>Sets HTTP proxy value. If this macro is empty then no proxy is used.</p>||
+|{$AZURE.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, then no proxy is used.</p>||
 |{$AZURE.APP.ID}|<p>The App ID of Microsoft Azure.</p>||
 |{$AZURE.PASSWORD}|<p>Microsoft Azure password.</p>||
-|{$AZURE.DATA.TIMEOUT}|<p>A response timeout for API.</p>|`15s`|
+|{$AZURE.DATA.TIMEOUT}|<p>API response timeout.</p>|`15s`|
 |{$AZURE.TENANT.ID}|<p>Microsoft Azure tenant ID.</p>||
 |{$AZURE.SUBSCRIPTION.ID}|<p>Microsoft Azure subscription ID.</p>||
 |{$AZURE.RESOURCE.ID}|<p>Microsoft Azure Microsoft SQL database ID.</p>||
@@ -828,7 +954,7 @@ This template has been tested on:
 |----|-----------|----------|--------|--------------------------------|
 |There are errors in requests to API|<p>Zabbix has received errors in response to API requests.</p>|`length(last(/Azure Microsoft SQL Database by HTTP/azure.db.mssql.data.errors))>0`|Average||
 |Microsoft SQL database is unavailable|<p>The resource state is unavailable.</p>|`last(/Azure Microsoft SQL Database by HTTP/azure.db.mssql.availability.state)=2`|High||
-|Microsoft SQL database is degraded|<p>The resource is in degraded state.</p>|`last(/Azure Microsoft SQL Database by HTTP/azure.db.mssql.availability.state)=1`|Average||
+|Microsoft SQL database is degraded|<p>The resource is in a degraded state.</p>|`last(/Azure Microsoft SQL Database by HTTP/azure.db.mssql.availability.state)=1`|Average||
 |Microsoft SQL database is in unknown state|<p>The resource state is unknown.</p>|`last(/Azure Microsoft SQL Database by HTTP/azure.db.mssql.availability.state)=3`|Warning||
 |High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/Azure Microsoft SQL Database by HTTP/azure.db.mssql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}`|High||
 |Storage space is critically low|<p>Critical utilization of the storage space.</p>|`last(/Azure Microsoft SQL Database by HTTP/azure.db.mssql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}`|Average||
@@ -868,10 +994,10 @@ This template has been tested on:
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$AZURE.PROXY}|<p>Sets HTTP proxy value. If this macro is empty then no proxy is used.</p>||
+|{$AZURE.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, then no proxy is used.</p>||
 |{$AZURE.APP.ID}|<p>The App ID of Microsoft Azure.</p>||
 |{$AZURE.PASSWORD}|<p>Microsoft Azure password.</p>||
-|{$AZURE.DATA.TIMEOUT}|<p>A response timeout for API.</p>|`15s`|
+|{$AZURE.DATA.TIMEOUT}|<p>API response timeout.</p>|`15s`|
 |{$AZURE.TENANT.ID}|<p>Microsoft Azure tenant ID.</p>||
 |{$AZURE.SUBSCRIPTION.ID}|<p>Microsoft Azure subscription ID.</p>||
 |{$AZURE.RESOURCE.ID}|<p>Microsoft Azure Cosmos DB ID.</p>||
@@ -945,10 +1071,10 @@ This template has been tested on:
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$AZURE.PROXY}|<p>Sets HTTP proxy value. If this macro is empty then no proxy is used.</p>||
+|{$AZURE.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, then no proxy is used.</p>||
 |{$AZURE.APP.ID}|<p>The App ID of Microsoft Azure.</p>||
 |{$AZURE.PASSWORD}|<p>Microsoft Azure password.</p>||
-|{$AZURE.DATA.TIMEOUT}|<p>A response timeout for API.</p>|`60s`|
+|{$AZURE.DATA.TIMEOUT}|<p>API response timeout.</p>|`60s`|
 |{$AZURE.TENANT.ID}|<p>Microsoft Azure tenant ID.</p>||
 |{$AZURE.BILLING.MONTH}|<p>Months to get historical data from Azure Cost Management API, no more than 11 (plus current month). The time period for pulling the data cannot exceed 1 year.</p>|`11`|
 |{$AZURE.LLD.FILTER.SERVICE.MATCHES}|<p>Filter of discoverable services by name.</p>|`.*`|

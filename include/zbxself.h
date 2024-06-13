@@ -15,10 +15,6 @@
 #ifndef ZABBIX_ZBXSELF_H
 #define ZABBIX_ZBXSELF_H
 
-#define ZBX_PROCESS_STATE_IDLE		0
-#define ZBX_PROCESS_STATE_BUSY		1
-#define ZBX_PROCESS_STATE_COUNT		2	/* number of process states */
-
 #define ZBX_SELFMON_AGGR_FUNC_ONE	0
 #define ZBX_SELFMON_AGGR_FUNC_AVG	1
 #define ZBX_SELFMON_AGGR_FUNC_MAX	2
@@ -27,7 +23,6 @@
 #define ZBX_SELFMON_DELAY		1
 
 #ifndef _WINDOWS
-#include "zbxcommon.h"
 #include "zbxthreads.h"
 #include "zbxstats.h"
 

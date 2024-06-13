@@ -20,12 +20,7 @@ require_once dirname(__FILE__) . '/../include/CIntegrationTest.php';
  *
  * @required-components server, proxy
  * @configurationDataProvider configurationProvider
- * @backup config, functions, globalmacro
- * @backup group_prototype, host_discovery, host_inventory, hostmacro, host_rtdata, hosts, hosts_groups, hosts_templates
- * @backup hstgrp, interface, item_condition, item_discovery, item_parameter, item_preproc, item_rtdata, items
- * @backup lld_macro_path, lld_override, lld_override_condition, lld_override_opdiscover, lld_override_operation
- * @backup lld_override_opstatus, proxy, proxy_rtdata, auditlog, changelog, proxy_history, config_autoreg_tls
- * @backup expressions, ha_node, regexps
+ * @backup hosts, regexps, config_autoreg_tls, globalmacro, auditlog, changelog, ha_node, ids
  */
 class testProxyConfSync extends CIntegrationTest
 {
