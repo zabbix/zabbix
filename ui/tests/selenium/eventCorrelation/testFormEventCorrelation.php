@@ -31,6 +31,7 @@ use Facebook\WebDriver\WebDriverBy;
  * @onBefore prepareData
  */
 class testFormEventCorrelation extends CWebTest {
+
 	const HASH_SQL = 'SELECT * FROM correlation c INNER JOIN corr_condition cc ON c.correlationid = cc.correlationid'.
 			' LEFT JOIN corr_condition_group ccg ON cc.corr_conditionid = ccg.corr_conditionid'.
 			' LEFT JOIN corr_condition_tag cct ON cc.corr_conditionid = cct.corr_conditionid'.
