@@ -17,6 +17,8 @@
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 
 /**
+ * Test checks the objects created by LLD and then no more discovered or/and disabled.
+ *
  * @backup hstgrp
  *
  * @onBefore prepareLLDData
@@ -32,7 +34,7 @@ class testLowLevelDiscoveryDisabledObjects extends CWebTest {
 		$hostgroups = CDataHelper::call('hostgroup.create', [['name' => 'Group for LLD hint']]);
 		$hostgroupid = $hostgroups['groupids'][0];
 
-		// Create hosts with low level discoveries.
+		// Create hosts with low level discovery.
 		$hosts = CDataHelper::createHosts([
 			[
 				'host' => self::HINT_HOST,
@@ -97,6 +99,7 @@ class testLowLevelDiscoveryDisabledObjects extends CWebTest {
 		]);
 		self::$hint_hostid = $hosts['hostids'][self::HINT_HOST];
 
+		// Statuses of discovered object in DB.
 		$time = time();
 		$statuses = [
 			// 1 Delete - never, disable - never.
@@ -187,7 +190,7 @@ class testLowLevelDiscoveryDisabledObjects extends CWebTest {
 			$r++;
 		}
 
-		// Emulate item discoveries in DB.
+		// Emulate item discovery in DB.
 		foreach ($discovered_items as $discovered_item) {
 			DBexecute("INSERT INTO items (itemid, type, hostid, name, description, key_, interfaceid, flags, query_fields, ".
 					"params, posts, headers, status) VALUES (".zbx_dbstr($discovered_item['itemid']).", 2, ".
@@ -227,7 +230,7 @@ class testLowLevelDiscoveryDisabledObjects extends CWebTest {
 			$y++;
 		}
 
-		// Emulate triggers discoveries in DB.
+		// Emulate triggers discovery in DB.
 		foreach ($discovered_triggers as $discovered_trigger) {
 			DBexecute("INSERT INTO triggers (triggerid, description, expression, status, value, priority, comments, state, flags)".
 					" VALUES (".zbx_dbstr($discovered_trigger['triggerid']).", ".zbx_dbstr($discovered_trigger['description']).
@@ -278,7 +281,7 @@ class testLowLevelDiscoveryDisabledObjects extends CWebTest {
 			$p++;
 		}
 
-		// Emulate graph discoveries in DB.
+		// Emulate graph discovery in DB.
 		foreach ($discovered_graphs as $discovered_graph) {
 			DBexecute("INSERT INTO graphs (graphid, width, height, name, flags) VALUES (".zbx_dbstr($discovered_graph['graphid']).
 					", 600, 300, ".zbx_dbstr($discovered_graph['name']).", 4)"
@@ -319,7 +322,7 @@ class testLowLevelDiscoveryDisabledObjects extends CWebTest {
 			$m++;
 		}
 
-		// Emulate host discoveries in DB.
+		// Emulate host discovery in DB.
 		foreach ($discovered_hosts as $discovered_host) {
 			DBexecute("INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (".
 					zbx_dbstr($discovered_host['hostid']).", ".zbx_dbstr($discovered_host['discovered_host_name']).
@@ -374,6 +377,8 @@ class testLowLevelDiscoveryDisabledObjects extends CWebTest {
 	 */
 	public function testLowLevelDiscoveryDisabledObjects_TestPages($data) {
 		$url = ($data['object'] !== 'host') ? $data['url'].self::$hint_hostid : $data['url'];
+		$this->page->login()->open($url)->waitUntilReady();
+		$table = $this->query('xpath://form/table')->asTable()->waitUntilVisible()->one();
 
 		$lld_objects = [
 			'1 Delete - never, disable - never' => [
@@ -408,9 +413,6 @@ class testLowLevelDiscoveryDisabledObjects extends CWebTest {
 			]
 		];
 
-		$this->page->login()->open($url)->waitUntilReady();
-		$table = $this->query('xpath://form/table')->asTable()->waitUntilVisible()->one();
-
 		foreach ($lld_objects as $lld => $hint) {
 			$row = $table->findRow('Name', $lld, true);
 			$overlay = $this->query('xpath://div[@data-hintboxid]')->asOverlayDialog();
@@ -434,7 +436,7 @@ class testLowLevelDiscoveryDisabledObjects extends CWebTest {
 				}
 			}
 
-			// Click info button in Info column.
+			// Click button in Info column.
 			$row->getColumn('Info')->query('xpath:.//button[contains(@class, "zi-i-warning")]')
 					->one()->waitUntilCLickable()->click();
 			$hint_overlay = $overlay->all()->last()->waitUntilPresent();
