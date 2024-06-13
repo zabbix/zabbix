@@ -54,8 +54,10 @@ class testItemTest extends CWebTest {
 				['Type' => 'IPMI agent', 'IPMI sensor' => 'Sensor'],
 				['Type' => 'SSH agent', 'Key' => 'ssh.run[Description,127.0.0.1,50,[{#KEY}]]', 'User name' => 'Name', 'Executed script' => 'Script'],
 				['Type' => 'TELNET agent', 'Key' => 'telnet[{#KEY}]'],
-				['Type' => 'JMX agent', 'Key' => 'jmx[{#KEY}]','JMX endpoint' => 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi', 'User name' => ''],
-				['Type' => 'Dependent item', 'Key'=>'dependent[{#KEY}]', 'Master item' => 'Master item']
+				['Type' => 'JMX agent', 'Key' => 'jmx[{#KEY}]', 'JMX endpoint' => 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi', 'User name' => ''],
+				['Type' => 'Dependent item', 'Key' => 'dependent[{#KEY}]', 'Master item' => 'Master item'],
+				['Type' => 'Script', 'Script' => 'return 1;'],
+				['Type' => 'Browser']
 		];
 	}
 
@@ -139,13 +141,17 @@ class testItemTest extends CWebTest {
 
 				$this->checkTestButtonInPreprocessing($item_type, $enabled, $i);
 
-				// Check "Execute now" button only in host case item saved form and then change type.
-				if ($i === 0) {
+				/**
+				 * Check "Execute now" button only in host case item saved form and then change type.
+				 * $type variable value is set only at the end of the code block under the if condition, therefore,
+				 * for the last item type this block needs to be accessed also for $i === 1, to check buttons state.
+				 */
+				if ($i === 0 || ($i === 1 && $update['Type'] === end($data)['Type'])) {
 					if ($check_now) {
+						if ($type === 'Dependent item') {
+							$enabled = true;
+						}
 						if ($item_type !== 'Discovery rule') {
-							if ($type === 'Dependent item') {
-								$enabled = true;
-							}
 							$execute_button = $dialog->getFooter()->query('button:Execute now')->waitUntilVisible()->one();
 						}
 						else {
@@ -155,15 +161,17 @@ class testItemTest extends CWebTest {
 						$this->assertTrue($execute_button->isEnabled($enabled));
 					}
 
-					$item_form->fill($update);
-					// TODO: workaround for ZBXNEXT-5365
-					if ($item_type === 'Item prototype'
-						&& array_key_exists('Master item', $update)) {
-							sleep(2);
-							$item_form->getFieldContainer('Master item')->asMultiselect()->select($update['Master item']);
-					}
+					if ($i === 0) {
+						$item_form->fill($update);
+						// TODO: workaround for ZBXNEXT-5365
+						if ($item_type === 'Item prototype'
+							&& array_key_exists('Master item', $update)) {
+								sleep(2);
+								$item_form->getFieldContainer('Master item')->asMultiselect()->select($update['Master item']);
+						}
 
-					$type = $update['Type'];
+						$type = $update['Type'];
+					}
 				}
 			}
 
@@ -396,6 +404,25 @@ class testItemTest extends CWebTest {
 							'macro' => '{HOST.PORT}',
 							'value' => '12345'
 						]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Type' => 'Script',
+						'Key' => 'test.script',
+						'Script' => 'return 1;'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Type' => 'Browser',
+						'Key' => 'test.browser'
 					]
 				]
 			],
@@ -934,6 +961,8 @@ class testItemTest extends CWebTest {
 					case 'Database monitor':
 					case 'HTTP agent':
 					case 'JMX agent':
+					case 'Script':
+					case 'Browser':
 						$fields_state = [
 							'address' => false,
 							'port' => false,
@@ -997,7 +1026,7 @@ class testItemTest extends CWebTest {
 
 				if ($is_host || array_key_exists('interface', $data) || in_array($data['fields']['Type'],
 						['Zabbix internal', 'External check', 'Database monitor', 'HTTP agent', 'JMX agent',
-						'Calculated'])) {
+						'Calculated', 'Script', 'Browser'])) {
 					$details = 'Connection to Zabbix server "localhost:10051" refused. Possible reasons:';
 				}
 				else {
