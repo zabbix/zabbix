@@ -233,7 +233,7 @@ class testFormEventCorrelation extends CWebTest {
 		$condition_dialog->waitUntilNotVisible();
 
 		// Check Type of calculation and Formula fields are enabled.
-		$this->page->login()->open('zabbix.php?action=correlation.list')->waitUntilReady();
+		$this->page->open('zabbix.php?action=correlation.list')->waitUntilReady();
 		$this->query('link:Event correlation for layout check')->one()->click();
 		$this->page->waitUntilReady();
 		$form->invalidate();
