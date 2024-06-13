@@ -35,7 +35,7 @@ static int	DBpatch_7000001(void)
 			"update profiles"
 				" set value_str='operating_mode'"
 				" where idx='web.proxies.php.sort'"
-				" and value_str='status'"))
+				" and value_str like 'status'"))
 	{
 		return FAIL;
 	}
