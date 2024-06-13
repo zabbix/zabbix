@@ -44,55 +44,54 @@ class testLowLevelDiscoveryDisabledObjects extends CWebTest {
 						'name' => '1 Delete - never, disable - never',
 						'key_' => 'rule1',
 						'type' => ITEM_TYPE_TRAPPER,
-						'lifetime_type' => 1,
-						'enabled_lifetime_type' => 1
+						'lifetime_type' => ZBX_LLD_DELETE_NEVER,
+						'enabled_lifetime_type' => ZBX_LLD_DISABLE_NEVER
 					],
 					[
 						'name' => '2 Delete - never, disable - immediately',
 						'key_' => 'rule2',
 						'type' => ITEM_TYPE_TRAPPER,
-						'lifetime_type' => 1,
-						'enabled_lifetime_type' => 2
+						'lifetime_type' => ZBX_LLD_DELETE_NEVER,
+						'enabled_lifetime_type' => ZBX_LLD_DISABLE_IMMEDIATELY
 					],
 					[
 						'name' => '3 Delete - never, disable - after 2w',
 						'key_' => 'rule3',
 						'type' => ITEM_TYPE_TRAPPER,
-						'lifetime_type' => 1,
-						'enabled_lifetime_type' => 0,
+						'lifetime_type' => ZBX_LLD_DELETE_NEVER,
+						'enabled_lifetime_type' => ZBX_LLD_DISABLE_AFTER,
 						'enabled_lifetime' => '2w'
 					],
 					[
 						'name' => '4 Delete - after 52w, disable - never',
 						'key_' => 'rule4',
 						'type' => ITEM_TYPE_TRAPPER,
-						'lifetime_type' => 0,
+						'lifetime_type' => ZBX_LLD_DELETE_AFTER,
 						'lifetime' => '52w',
-						'enabled_lifetime_type' => 1
+						'enabled_lifetime_type' => ZBX_LLD_DISABLE_NEVER
 					],
 					[
 						'name' => '5 Delete - after 7d, disable - immediately',
 						'key_' => 'rule5',
 						'type' => ITEM_TYPE_TRAPPER,
-						'lifetime_type' => 0,
+						'lifetime_type' => ZBX_LLD_DELETE_AFTER,
 						'lifetime' => '7d',
-						'enabled_lifetime_type' => 2
+						'enabled_lifetime_type' => ZBX_LLD_DISABLE_IMMEDIATELY
 					],
 					[
 						'name' => '6 Delete - after 7d, disable - after 20h',
 						'key_' => 'rule6',
 						'type' => ITEM_TYPE_TRAPPER,
-						'lifetime_type' => 0,
+						'lifetime_type' => ZBX_LLD_DELETE_AFTER,
 						'lifetime' => '7d',
-						'enabled_lifetime_type' => 0,
+						'enabled_lifetime_type' => ZBX_LLD_DISABLE_AFTER,
 						'enabled_lifetime' => '20h'
 					],
 					[
 						'name' => '7 Delete - Immediately',
 						'key_' => 'rule7',
 						'type' => ITEM_TYPE_TRAPPER,
-						'lifetime_type' => 2,
-						'lifetime' => '0'
+						'lifetime_type' => ZBX_LLD_DELETE_IMMEDIATELY
 					]
 				]
 			]
