@@ -331,6 +331,8 @@ void	lld_flush_discoveries(zbx_hashset_t *discoveries, const char *id_field, con
 	zbx_vector_lld_discovery_ptr_t	object_updates, discovery_updates;
 	zbx_hashset_iter_t		iter;
 	zbx_lld_discovery_t		*discovery;
+	char				*sql = NULL;
+	size_t				sql_alloc = 0, sql_offset = 0;
 
 	zbx_vector_lld_discovery_ptr_create(&object_updates);
 	zbx_vector_lld_discovery_ptr_create(&discovery_updates);
@@ -389,9 +391,6 @@ void	lld_flush_discoveries(zbx_hashset_t *discoveries, const char *id_field, con
 
 	if (0 == object_updates.values_num && 0 == discovery_updates.values_num)
 		goto commit;
-
-	char	*sql = NULL;
-	size_t	sql_alloc = 0, sql_offset = 0;
 
 	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
