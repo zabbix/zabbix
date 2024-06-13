@@ -160,6 +160,7 @@ require_once dirname(__FILE__).'/lld/testFormLowLevelDiscovery.php';
 require_once dirname(__FILE__).'/lld/testFormLowLevelDiscoveryOverrides.php';
 require_once dirname(__FILE__).'/lld/testFormTestLowLevelDiscovery.php';
 require_once dirname(__FILE__).'/lld/testInheritanceDiscoveryRule.php';
+require_once dirname(__FILE__).'/lld/testLowLevelDiscoveryDisabledObjects.php';
 require_once dirname(__FILE__).'/lld/testPageLowLevelDiscovery.php';
 
 // Macros.
@@ -490,6 +491,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormLowLevelDiscoveryOverrides');
 		$suite->addTestSuite('testFormTestLowLevelDiscovery');
 		$suite->addTestSuite('testInheritanceDiscoveryRule');
+		$suite->addTestSuite('testLowLevelDiscoveryDisabledObjects');
 		$suite->addTestSuite('testPageLowLevelDiscovery');
 
 		// Macros.
