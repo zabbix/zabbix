@@ -23,7 +23,7 @@ class CControllerAvailabilityReportList extends CController {
 	protected function checkInput(): bool {
 		$fields = [
 			'mode' =>					'in '.AVAILABILITY_REPORT_BY_HOST.','.AVAILABILITY_REPORT_BY_TEMPLATE,
-			'filter_template_groups' => 'array_db hosts_groups.groupid',
+			'filter_template_groups' =>	'array_db hosts_groups.groupid',
 			'filter_templates' =>		'array_db hosts.hostid',
 			'filter_triggers' =>		'array_db triggers.triggerid',
 			'filter_host_groups' =>		'array_db hosts_groups.groupid',
@@ -52,6 +52,7 @@ class CControllerAvailabilityReportList extends CController {
 		$report_mode = $this->getInput('mode',
 			CProfile::get('web.availabilityreport.filter.mode', AVAILABILITY_REPORT_BY_HOST)
 		);
+
 		CProfile::update('web.availabilityreport.filter.mode', $report_mode, PROFILE_TYPE_INT);
 		$prefix = 'web.availabilityreport.filter.'.$report_mode;
 
@@ -68,6 +69,7 @@ class CControllerAvailabilityReportList extends CController {
 			'from' => $this->hasInput('from') ? $this->getInput('from') : null,
 			'to' => $this->hasInput('to') ? $this->getInput('to') : null
 		];
+
 		updateTimeSelectorPeriod($timeselector_options);
 
 		$data = [
@@ -93,21 +95,7 @@ class CControllerAvailabilityReportList extends CController {
 		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 
 		if ($report_mode == AVAILABILITY_REPORT_BY_TEMPLATE) {
-			$data['filter']['template_groups'] = $data['filter']['template_groups']
-				? $this->prepareDataForMultiselect($data['filter']['template_groups'], 'template_groups')
-				: [];
-
-			$data['filter']['templates'] = $data['filter']['templates']
-				? $this->prepareDataForMultiselect($data['filter']['templates'], 'templates')
-				: [];
-
-			$data['filter']['triggers'] = $data['filter']['triggers']
-				? $this->prepareDataForMultiselect($data['filter']['triggers'], 'triggers')
-				: [];
-
-			$data['filter']['host_groups'] = $data['filter']['host_groups']
-				? $this->prepareDataForMultiselect($data['filter']['host_groups'], 'host_groups')
-				: [];
+			$data['filter'] = $this->prepareDataForMultiselectFields($data['filter']);
 
 			$template_groupids = $data['filter']['template_groups']
 				? getTemplateSubGroups(array_keys($data['filter']['template_groups']))
@@ -162,13 +150,7 @@ class CControllerAvailabilityReportList extends CController {
 			}
 		}
 		else {
-			$data['filter']['host_groups'] = $data['filter']['host_groups']
-				? $this->prepareDataForMultiselect($data['filter']['host_groups'], 'host_groups')
-				: [];
-
-			$data['filter']['hosts'] = $data['filter']['hosts']
-				? $this->prepareDataForMultiselect($data['filter']['hosts'], 'hosts')
-				: [];
+			$data['filter'] = $this->prepareDataForMultiselectFields($data['filter']);
 
 			$host_groupids = $data['filter']['host_groups']
 				? getSubGroups(array_keys($data['filter']['host_groups']))
@@ -243,91 +225,83 @@ class CControllerAvailabilityReportList extends CController {
 	/**
 	 * Prepare data for multiselect fields.
 	 *
-	 * @param array  $ids
-	 * @param string $type  Defines data type ('hosts', 'host_groups', 'templates', 'template_groups', 'triggers').
+	 * @param array  $filter
 	 *
 	 * @return array
 	 */
 
-	private function prepareDataForMultiselect(array $ids, string $type): array {
-		$prepared_data = [];
+	private function prepareDataForMultiselectFields(array $filter): array {
+		if (array_key_exists('template_groups', $filter)) {
+			$template_groups = CArrayHelper::renameObjectsKeys(API::TemplateGroup()->get([
+				'output' => ['groupid', 'name'],
+				'groupids' => $filter['template_groups'],
+				'preservekeys' => true
+			]), ['groupid' => 'id']);
 
-		switch ($type) {
-			case 'hosts':
-				$hosts = API::Host()->get([
-					'output' => ['hostid', 'name'],
-					'hostids' => $ids,
-					'preservekeys' => true
-				]);
-
-				if ($hosts) {
-					$prepared_data = CArrayHelper::renameObjectsKeys($hosts, ['hostid' => 'id']);
-				}
-
-				break;
-			case 'host_groups':
-				$host_groups = API::HostGroup()->get([
-					'output' => ['groupid', 'name'],
-					'groupids' => $ids,
-					'with_monitored_hosts' => true,
-					'preservekeys' => true
-				]);
-
-				if ($host_groups) {
-					$prepared_data = CArrayHelper::renameObjectsKeys($host_groups, ['groupid' => 'id']);
-				}
-
-				break;
-			case 'templates':
-				$templates = API::Template()->get([
-					'output' => ['templateid', 'name'],
-					'templateids' => $ids,
-					'preservekeys' => true
-				]);
-
-				if ($templates) {
-					$prepared_data = CArrayHelper::renameObjectsKeys($templates, ['templateid' => 'id']);
-				}
-
-				break;
-			case 'template_groups':
-				$template_groups = API::TemplateGroup()->get([
-					'output' => ['groupid', 'name'],
-					'groupids' => $ids,
-					'preservekeys' => true
-				]);
-
-				if ($template_groups) {
-					$prepared_data = CArrayHelper::renameObjectsKeys($template_groups, ['groupid' => 'id']);
-				}
-
-				break;
-			case 'triggers':
-				$triggers = API::Trigger()->get([
-					'output' => ['triggerid', 'description'],
-					'triggerids' => $ids,
-					'templated' => true,
-					'selectHosts' => ['name'],
-					'filter' => [
-						'status' => TRIGGER_STATUS_ENABLED,
-						'flags' => [ZBX_FLAG_DISCOVERY_NORMAL]
-					],
-					'preservekeys' => true
-				]);
-
-				if ($triggers) {
-					foreach ($triggers as $id => $trigger) {
-						$prepared_data[$id] = [
-							'id' => $id,
-							'name' => $trigger['hosts'][0]['name'].NAME_DELIMITER.$trigger['description']
-						];
-					}
-				}
-
-				break;
+			$prepared_data['template_groups'] = $template_groups ?: [];
 		}
 
-		CArrayHelper::sort($prepared_data, ['name']);
+		if (array_key_exists('templates', $filter)) {
+			$templates = CArrayHelper::renameObjectsKeys(API::Template()->get([
+				'output' => ['templateid', 'name'],
+				'templateids' => $filter['templates'],
+				'preservekeys' => true
+			]), ['templateid' => 'id']);
+
+			$prepared_data['templates'] = $templates ?: [];
+		}
+
+		if (array_key_exists('triggers', $filter)) {
+			$triggers = API::Trigger()->get([
+				'output' => ['triggerid', 'description'],
+				'triggerids' => $filter['triggers'],
+				'templated' => true,
+				'selectHosts' => ['name'],
+				'filter' => [
+					'status' => TRIGGER_STATUS_ENABLED,
+					'flags' => [ZBX_FLAG_DISCOVERY_NORMAL]
+				],
+				'expandDescription' => true,
+				'preservekeys' => true
+			]);
+
+			if ($triggers) {
+				foreach ($triggers as $id => $trigger) {
+					$prepared_data['triggers'][$id] = [
+						'id' => $id,
+						'name' => $trigger['hosts'][0]['name'].NAME_DELIMITER.$trigger['description']
+					];
+				}
+			}
+			else {
+				$prepared_data['triggers'] = [];
+			}
+		}
+
+		if (array_key_exists('host_groups', $filter)) {
+			$host_groups = CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
+				'output' => ['groupid', 'name'],
+				'groupids' => $filter['host_groups'],
+				'with_monitored_hosts' => true,
+				'preservekeys' => true
+			]), ['groupid' => 'id']);
+
+			CArrayHelper::sort($host_groups, ['name']);
+
+			$prepared_data['host_groups'] = $host_groups ?: [];
+		}
+
+		if (array_key_exists('hosts', $filter)) {
+			$hosts = CArrayHelper::renameObjectsKeys(API::Host()->get([
+				'output' => ['hostid', 'name'],
+				'hostids' => $filter['hosts'],
+				'preservekeys' => true
+			]), ['hostid' => 'id']);
+
+			CArrayHelper::sort($hosts, ['name']);
+
+			$prepared_data['hosts'] = $hosts ?: [];
+		}
 
 		return $prepared_data;
 	}
