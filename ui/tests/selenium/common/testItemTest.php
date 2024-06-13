@@ -60,7 +60,8 @@ class testItemTest extends CWebTest {
 				['Type' => 'SSH agent', 'Key' => 'ssh.run[Description,127.0.0.1,50]', 'User name' => 'Name', 'Executed script' => 'Script'],
 				['Type' => 'TELNET agent', 'Key' => 'telnet'],
 				['Type' => 'JMX agent', 'Key' => 'jmx','JMX endpoint' => 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi', 'User name' => ''],
-				['Type' => 'Dependent item', 'Key'=>'dependent', 'Master item' => 'Master item']
+				['Type' => 'Dependent item', 'Key'=>'dependent', 'Master item' => 'Master item'],
+				['Type' => 'Script', 'Script' => 'return 1;']
 		];
 	}
 
@@ -145,6 +146,18 @@ class testItemTest extends CWebTest {
 			}
 
 			$this->saveFormAndCheckMessage($item_type.' updated');
+
+			/**
+			 * By design, when changing item type, the "Check now" doesn't change its state, as these changes have not
+			 * been written to the DB yet. This is why, the above code block actually checks the last saved state of
+			 * the "Check now" button, which corresponds to the previous iteration in the $data array.
+			 * Therefore, in order to check the "Check now" button state for the last iteration the item needs to be
+			 * saved and its form should be opened again.
+			 */
+			if ($check_now && $update['Type'] === end($data)['Type']) {
+				$this->query('link', $item_name)->waitUntilClickable()->one()->click();
+				$this->assertTrue($this->query('id:check_now')->waitUntilVisible()->one()->isEnabled($enabled));
+			}
 		}
 	}
 
@@ -373,6 +386,16 @@ class testItemTest extends CWebTest {
 							'macro' => '{HOST.PORT}',
 							'value' => '12345'
 						]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Type' => 'Script',
+						'Key' => 'test.script',
+						'Script' => 'return 1;'
 					]
 				]
 			],
@@ -886,6 +909,7 @@ class testItemTest extends CWebTest {
 					case 'Database monitor':
 					case 'HTTP agent':
 					case 'JMX agent':
+					case 'Script':
 						$fields_value = [
 							'address' => '',
 							'port' => '',
@@ -918,7 +942,7 @@ class testItemTest extends CWebTest {
 
 				if ($is_host || array_key_exists('interface', $data) || in_array($data['fields']['Type'],
 						['Zabbix internal', 'External check', 'Database monitor', 'HTTP agent', 'JMX agent',
-						'Calculated'])) {
+						'Calculated', 'Script'])) {
 					$details = 'Connection to Zabbix server "localhost" refused. Possible reasons:';
 				}
 				else {
