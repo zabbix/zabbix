@@ -39,6 +39,18 @@ class testFormEventCorrelation extends CWebTest {
 			' LEFT JOIN corr_condition_tagvalue cctv ON cc.corr_conditionid = cctv.corr_conditionid'.
 			' ORDER BY cc.corr_conditionid';
 
+	protected static $update_correlation_id;
+	protected static $update_correlation_initial = [
+		'name' => 'Event correlation for update',
+		'description' => 'Test description update',
+		'filter' => [
+			'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+			'conditions' => [['type' => ZBX_CORR_CONDITION_OLD_EVENT_TAG, 'tag' => '0 update tag']]
+		],
+		'operations' => [['type' => ZBX_CORR_OPERATION_CLOSE_OLD]],
+		'status' => 0
+	];
+
 	/**
 	 * Attach MessageBehavior and TableBehaviour to the test.
 	 *
@@ -98,6 +110,11 @@ class testFormEventCorrelation extends CWebTest {
 				'operations' => [['type' => ZBX_CORR_OPERATION_CLOSE_OLD]]
 			]
 		]);
+
+		// Create the correlation that will be reset each time for the update scenarios.
+		self::$update_correlation_id = CDataHelper::call(
+				'correlation.create', self::$update_correlation_initial
+		)['correlationids'][0];
 	}
 
 	/**
@@ -1082,6 +1099,8 @@ class testFormEventCorrelation extends CWebTest {
 
 	/**
 	 * Test opening an Event Correlation for edit and immediately saving.
+	 *
+	 * @onBefore resetUpdateCorrelation
 	 */
 	public function testFormEventCorrelation_SimpleUpdate() {
 		$this->checkCreateUpdate([], true);
@@ -1090,6 +1109,7 @@ class testFormEventCorrelation extends CWebTest {
 	/**
 	 * Test updating an Event Correlation.
 	 *
+	 * @onBefore     resetUpdateCorrelation
 	 * @dataProvider getEventCorrelationData
 	 */
 	public function testFormEventCorrelation_Update($data) {
@@ -1209,22 +1229,6 @@ class testFormEventCorrelation extends CWebTest {
 	 * @param bool  $update    if an update should be performed
 	 */
 	protected function checkCreateUpdate($data, $update = false) {
-		if ($update) {
-			// Dynamically generate test data for each update scenario, this is faster than restoring from a backup each time.
-			$unique_name = 'Event correlation '.md5(serialize($data));
-			CDataHelper::call('correlation.create', [
-				[
-					'name' => $unique_name,
-					'description' => 'Test description update',
-					'filter' => [
-						'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
-						'conditions' => [['type' => ZBX_CORR_CONDITION_OLD_EVENT_TAG, 'tag' => '0 update tag']]
-					],
-					'operations' => [['type' => ZBX_CORR_OPERATION_CLOSE_OLD]]
-				]
-			]);
-		}
-
 		// Setup for DB data check later.
 		$hash_before = CDBHelper::getHash(self::HASH_SQL);
 		$count_sql = 'SELECT NULL FROM correlation';
@@ -1234,7 +1238,7 @@ class testFormEventCorrelation extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=correlation.list')->waitUntilReady();
 
 		if ($update) {
-			$this->query('link', $unique_name)->one()->click();
+			$this->query('link', self::$update_correlation_initial['name'])->one()->click();
 		}
 		else {
 			$this->query('button:Create correlation')->one()->click();
@@ -1327,7 +1331,7 @@ class testFormEventCorrelation extends CWebTest {
 			if ($update) {
 				// Validate the old Name when updating.
 				if (!CTestArrayHelper::get($data, 'update_name', false)) {
-					$data['fields']['Name'] = $unique_name;
+					$data['fields']['Name'] = self::$update_correlation_initial['name'];
 				}
 
 				// Check the default condition when updating.
@@ -1398,6 +1402,16 @@ class testFormEventCorrelation extends CWebTest {
 			}
 			$this->assertEquals($hash_before, CDBHelper::getHash(self::HASH_SQL));
 		}
+	}
+
+	/**
+	 * Resets the update correlation to the starting state.
+	 */
+	public function resetUpdateCorrelation() {
+		// Data is the inital state + the id of the Correlation that is going to be reset.
+		$data = self::$update_correlation_initial;
+		$data['correlationid'] = self::$update_correlation_id;
+		CDataHelper::call('correlation.update', [$data]);
 	}
 
 	/**
