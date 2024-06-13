@@ -210,7 +210,7 @@ class testLowLevelDiscoveryDisabledObjects extends CWebTest {
 		for ($j = 1; $j <= $lld_count; $j++) {
 			$trigger_protototypes_data[] = [
 				'description' => 'Trigger prototype '.$j.' {#KEY}',
-				'expression' => 'last(/'.self::HINT_HOST.'/trap'.$j.'[{#KEY}])=0',
+				'expression' => 'last(/'.self::HINT_HOST.'/trap'.$j.'[{#KEY}])=0'
 			];
 		}
 		CDataHelper::call('triggerprototype.create', $trigger_protototypes_data);
@@ -302,7 +302,7 @@ class testLowLevelDiscoveryDisabledObjects extends CWebTest {
 			$host_prototype_data[] = [
 				'host' => 'Host prototype '.$l.' {#KEY}',
 				'ruleid' => $lldid,
-				'groupLinks' => [['groupid' => $hostgroupid]],
+				'groupLinks' => [['groupid' => $hostgroupid]]
 			];
 			$l++;
 		}
@@ -391,7 +391,7 @@ class testLowLevelDiscoveryDisabledObjects extends CWebTest {
 			],
 			'3 Delete - never, disable - after 2w' => [
 				'common_hint' => "/^The ".$data['object']." is not discovered anymore and will be disabled in 13d 23h ([0-9]{1,2}m)?, will not be deleted\.$/",
-				'graph_hint' => '/^The graph is not discovered anymore and will not be deleted\.$/',
+				'graph_hint' => '/^The graph is not discovered anymore and will not be deleted\.$/'
 			],
 			'4 Delete - after 52w, disable - never' => [
 				'common_hint' => '/^The '.$data['object'].' is not discovered anymore and will not be disabled, will be deleted in 1y\.$/',
