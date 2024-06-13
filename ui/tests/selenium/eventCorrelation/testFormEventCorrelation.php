@@ -108,7 +108,7 @@ class testFormEventCorrelation extends CWebTest {
 		$this->page->waitUntilReady();
 		$this->page->assertHeader('Event correlation rules');
 		$this->page->assertTitle('Event correlation rules');
-		$form = $this->page->query('id:correlation.edit')->one()->asForm();
+		$form = $this->query('id:correlation.edit')->one()->asForm();
 
 		// Check form labels.
 		$this->assertEquals(['Name', 'Type of calculation', 'Conditions', 'Description', 'Operations', '', 'Enabled'],
@@ -1103,9 +1103,9 @@ class testFormEventCorrelation extends CWebTest {
 		$this->query('link:Event correlation for clone')->one()->click();
 		$this->page->waitUntilReady();
 
-		$this->page->query('button:Clone')->one()->click();
+		$this->query('button:Clone')->one()->click();
 
-		$form = $this->page->query('id:correlation.edit')->one()->asForm();
+		$form = $this->query('id:correlation.edit')->one()->asForm();
 		$values_before = $form->getValues();
 		$form->fill(['Name' => 'Cloned correlation']);
 		$form->submit();
@@ -1156,7 +1156,7 @@ class testFormEventCorrelation extends CWebTest {
 		$name = 'Event correlation for delete';
 		$table->query('link', $name)->one()->click();
 		$this->page->waitUntilReady();
-		$this->page->query('button:Delete')->waitUntilClickable()->one()->click();
+		$this->query('button:Delete')->waitUntilClickable()->one()->click();
 		$this->page->acceptAlert();
 		$this->page->waitUntilReady();
 
@@ -1240,7 +1240,7 @@ class testFormEventCorrelation extends CWebTest {
 		}
 
 		$this->page->waitUntilReady();
-		$form = $this->page->query('id:correlation.edit')->one()->asForm();
+		$form = $this->query('id:correlation.edit')->one()->asForm();
 
 		// Set the default values and fill the form.
 		if (array_key_exists('fields', $data)) {
@@ -1273,7 +1273,7 @@ class testFormEventCorrelation extends CWebTest {
 		}
 
 		// Fill Condition data.
-		$add_button = $this->page->query('id:condition_table')->one()->query('button:Add')->one();
+		$add_button = $this->query('id:condition_table')->one()->query('button:Add')->one();
 
 		foreach (CTestArrayHelper::get($data, 'conditions', []) as $condition) {
 			$add_button->click();
@@ -1413,7 +1413,7 @@ class testFormEventCorrelation extends CWebTest {
 			: 'link:Event correlation for cancel';
 		$this->query($button_selector)->one()->click();
 		$this->page->waitUntilReady();
-		$form = $this->page->query('id:correlation.edit')->one()->asForm();
+		$form = $this->query('id:correlation.edit')->one()->asForm();
 
 		// Press the Clone button in the clone scenario.
 		if ($action === 'clone') {
