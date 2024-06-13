@@ -534,6 +534,14 @@ and {Template Module Interfaces Simple SNMP:net.if.out.errors[ifOutErrors.{#SNMP
                <macro>{$NET.IF.IFTYPE.NOT_MATCHES}</macro>
                <value>CHANGE_IF_NEEDED</value>
             </macro>
+            <macro>
+               <macro>{$NET.IF.IFALIAS.MATCHES}</macro>
+               <value>.*</value>
+            </macro>
+            <macro>
+               <macro>{$NET.IF.IFALIAS.NOT_MATCHES}</macro>
+               <value>CHANGE_IF_NEEDED</value>
+            </macro>
          </macros>
          <screens>
             <screen>
