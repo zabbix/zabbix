@@ -181,11 +181,15 @@ class testItemTest extends CWebTest {
 			 */
 			if ($check_now && $update['Type'] === end($data)['Type']) {
 				$this->query('link', $item_name)->waitUntilClickable()->one()->click();
-				$button = ($item_type == 'Discovery rule')
+				$button = ($item_type === 'Discovery rule')
 					? $this->query('button:Execute now')->waitUntilVisible()->one()
 					: COverlayDialogElement::find()->one()->waitUntilReady()->query('button:Execute now')->one();
 
 				$this->assertTrue($button->isEnabled($enabled));
+
+				if ($item_type !== 'Discovery rule') {
+					COverlayDialogElement::find()->one()->close();
+				}
 			}
 		}
 	}
