@@ -14,6 +14,12 @@
 
 #include "connector_server.h"
 
+#ifdef HAVE_LIBCURL
+#	include "zbxhttp.h"
+#	include "zbxnum.h"
+#endif
+
+#include "zbxtimekeeper.h"
 #include "zbxthreads.h"
 #include "zbxnix.h"
 #include "zbxself.h"
@@ -21,11 +27,9 @@
 #include "zbxipcservice.h"
 #include "zbxconnector.h"
 #include "zbxtime.h"
-#include "zbxhttp.h"
 #include "zbxcacheconfig.h"
 #include "zbxjson.h"
 #include "zbxstr.h"
-#include "zbxnum.h"
 
 static int	connector_object_compare_func(const void *d1, const void *d2)
 {

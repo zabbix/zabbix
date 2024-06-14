@@ -382,6 +382,8 @@ class testDashboardTopTriggersWidget extends CWebTest {
 		$this->assertEquals(['Add', 'Cancel'], $dialog->getFooter()->query('button')->all()
 				->filter(CElementFilter::CLICKABLE)->asText()
 		);
+
+		$dialog->close();
 	}
 
 	public static function getWidgetData() {
@@ -712,6 +714,8 @@ class testDashboardTopTriggersWidget extends CWebTest {
 		if ($expected === TEST_BAD) {
 			$this->assertMessage($data['expected'], null, $data['error']);
 			$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
+
+			COverlayDialogElement::find()->one()->close();
 		}
 		else {
 			// If name is empty string it is replaced by default name "Top triggers".

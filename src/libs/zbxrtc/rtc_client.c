@@ -16,10 +16,12 @@
 #include "zbx_rtc_constants.h"
 #include "rtc.h"
 
-#include "zbxcommon.h"
+#include "zbxtimekeeper.h"
+#include "zbxipcservice.h"
 #include "zbxserialize.h"
 #include "zbxself.h"
 #include "zbxthreads.h"
+#include "zbxjson.h"
 
 /******************************************************************************
  *                                                                            *

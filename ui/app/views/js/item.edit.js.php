@@ -768,7 +768,14 @@ window.item_edit_form = new class {
 	}
 
 	#typeChangeHandler(e) {
-		this.field.inherited_timeout.value = this.inherited_timeouts[e.target.value]||'';
+		this.field.inherited_timeout.value = this.inherited_timeouts[e.target.value] || '';
+
+		const custom_timeout_value = [...this.field.custom_timeout].filter(element => element.checked)[0].value;
+
+		if (this.field.timeout.value === '' && custom_timeout_value != ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED) {
+			this.field.timeout.value = this.field.inherited_timeout.value;
+		}
+
 		this.updateFieldsVisibility();
 	}
 
@@ -801,7 +808,8 @@ window.item_edit_form = new class {
 
 		const overlay = PopUp(parameters.action, parameters, {
 			dialogueid: this.overlay.dialogueid,
-			dialogue_class: 'modal-popup-large'
+			dialogue_class: 'modal-popup-large',
+			prevent_navigation: true
 		});
 
 		this.#proxyDialogueSubmitEvent(overlay);

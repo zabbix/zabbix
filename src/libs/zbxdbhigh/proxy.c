@@ -13,7 +13,7 @@
 **/
 
 #include "zbxdbhigh.h"
-
+#include "zbxjson.h"
 #include "zbxversion.h"
 
 void	zbx_calc_timestamp(const char *line, int *timestamp, const char *format)

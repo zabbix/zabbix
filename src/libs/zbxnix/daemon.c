@@ -15,12 +15,11 @@
 #include "zbxnix.h"
 
 #include "nix_internal.h"
-#include "fatal.h"
 #include "sigcommon.h"
-
-#include "zbxcommon.h"
-#include "zbxlog.h"
 #include "pid.h"
+
+#include "zbxprof.h"
+#include "zbxlog.h"
 #include "zbx_rtc_constants.h"
 #include "zbxthreads.h"
 
