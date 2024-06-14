@@ -220,4 +220,4 @@ $html_page
 	]).');
 '))
 	->setOnDocumentReady()
-	->show();;
+	->show();
