@@ -299,7 +299,8 @@ func (p *Plugin) EventSourceByKey(rawKey string) (es watch.EventSource, err erro
 	var client *mqttClient
 	var ok bool
 
-	opt, err := p.createOptions(getClientID(),
+	opt, err := p.createOptions(
+		getClientID(rand.NewSource(time.Now().UnixNano())),
 		username,
 		password,
 		broker,
@@ -338,19 +339,20 @@ func (p *Plugin) EventSourceByKey(rawKey string) (es watch.EventSource, err erro
 	return sub, nil
 }
 
-func getClientID() string {
-	var (
-		charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-		result  = make([]byte, 8)
-	)
+func getClientID(src rand.Source) string {
+	const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+
+	var result = make([]byte, 8)
+
+	//nolint:gosec
+	// we are okey with using a weaker random number generator as this is not intended to be a secure token
+	r := rand.New(src)
 
 	for i := range result {
-		//nolint:gosec
-		// we are okey with using a weaker random number generator as this is not intended to be a secure token
-		result[i] = charset[rand.Intn(len(charset))]
+		result[i] = charset[r.Intn(len(charset))]
 	}
 
-	return fmt.Sprintf("ZabbixAgent2%s", string(result))
+	return "ZabbixAgent2" + string(result)
 }
 
 func hasWildCards(topic string) bool {

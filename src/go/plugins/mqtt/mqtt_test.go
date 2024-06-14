@@ -27,49 +27,50 @@
 package mqtt
 
 import (
-	"regexp"
+	"math/rand"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
 )
 
-//nolint:paralleltest
 func Test_getClientID(t *testing.T) {
-	ids := map[string]bool{}
-	reg := regexp.MustCompile(`^[a-zA-Z0-9]*$`)
+	t.Parallel()
+
+	type args struct {
+		src rand.Source
+	}
 
 	tests := []struct {
 		name string
+		args args
+		want string
 	}{
-		{"+validOne"},
-		{"+validTwo"},
-		{"+validThree"},
-		{"+validFour"},
+		{
+			"+validSource10",
+			args{rand.NewSource(10)},
+			"ZabbixAgent2wSv9wq3T",
+		},
+		{
+			"+validSource20",
+			args{rand.NewSource(20)},
+			"ZabbixAgent20WYRff63",
+		},
+		{
+			"+validSource30",
+			args{rand.NewSource(30)},
+			"ZabbixAgent2CijUzXBV",
+		},
 	}
-	//nolint:paralleltest
+
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
-			got := getClientID()
+			t.Parallel()
 
-			if !reg.MatchString(got) {
-				t.Fatalf("getClientID() is not alphanumeric = %s", got)
-			}
-
-			if len([]byte(got)) > 23 {
-				t.Fatalf("getClientID() = %s len is over %d", got, 23)
-			}
-
-			if diff := cmp.Diff("ZabbixAgent2", got[:12]); diff != "" {
+			got := getClientID(tt.args.src)
+			if diff := cmp.Diff(tt.want, got); diff != "" {
 				t.Fatalf("getClientID() = %s", diff)
 			}
-
-			set := ids[got]
-			if set {
-				t.Fatalf("getClientID() did not generate a unique clientID= %s", got)
-			}
-
-			ids[got] = true
 		})
 	}
 }
