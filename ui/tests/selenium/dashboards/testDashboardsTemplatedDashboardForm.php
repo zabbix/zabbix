@@ -97,7 +97,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 
 		CDataHelper::call('trigger.create', [
 			[
-				'description' => 'item disabled for enabled trigger',
+				'description' => 'Templated trigger',
 				'expression' => 'last(/'.self::TEMPLATE.'/templ_key[1])=0'
 			]
 		]);
