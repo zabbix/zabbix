@@ -44,7 +44,6 @@ A......... [ZBX-24180] fixed inability to import existing host or template when 
 ...G...... [ZBX-24362] fix Zabbix agent 2 loadable plugin process handling catching all child process exits (rzvejs)
 ..F....... [ZBX-24152] fixed host form submission with Enter button if the form is opened in a popup and focus is in a flexible text area field (Ivo)
 ..F....... [ZBX-24276] fixed inconsistent map element URL opening behavior (esekace)
-..F....... [ZBX-24146] fixed update of item timeout value upon other form field changes (esekace)
 ..F....... [ZBX-24253] fixed subfilter reset when navigating in items list page (esekace)
 ........S. [ZBX-24503] fixed wrong attachment filename in scheduled reports (mprihodko)
 ..F....... [ZBX-24344] fixed selected state sub-filter visibility in latest data page (esekace)
