@@ -198,7 +198,10 @@ zbx_single_diskdevice_data	*collector_diskdevice_add(const char *devname)
 	}
 
 	if (diskdevices->count == diskdevices->max_diskdev)
+	{
 		diskstat_shm_extend();
+		diskdevices = get_diskdevices();
+	}
 
 	device = &(diskdevices->device[diskdevices->count]);
 	memset(device, 0, sizeof(zbx_single_diskdevice_data));
