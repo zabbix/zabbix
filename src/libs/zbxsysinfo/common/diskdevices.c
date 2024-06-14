@@ -112,10 +112,12 @@ static void	process_diskstat(zbx_single_diskdevice_data *device)
 	device->ticks_since_polled++;
 }
 
-void	collect_stats_diskdevices(zbx_diskdevices_data *diskdevices)
+void	collect_stats_diskdevices(void)
 {
 	stats_lock_diskstats();
 	diskstat_shm_reattach();
+
+	zbx_diskdevices_data	*diskdevices = get_diskdevices();
 
 	for (int i = 0; i < diskdevices->count; i++)
 	{
