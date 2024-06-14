@@ -82,14 +82,14 @@ GRANT SELECT ON V_$SYSMETRIC TO zabbix_mon;
 GRANT SELECT ON V_$SYSTEM_PARAMETER TO zabbix_mon;
 ```
 
-**Important! These privileges grant `SELECT_CATALOG_ROLE` to the monitoring user, which, in turn, gives access to thousands of tables in the database.**
-This role is required to access `V$RESTORE_POINT` dynamic performance view.
-However, there are ways to go around this, if `SELECT_CATALOG_ROLE` assigned to a monitoring user is an issue.
+**Important! These privileges grant the monitoring user `SELECT_CATALOG_ROLE`, which, in turn, gives access to thousands of tables in the database.**
+This role is required to access the `V$RESTORE_POINT` dynamic performance view.
+However, there are ways to go around this, if the `SELECT_CATALOG_ROLE` assigned to a monitoring user raises any security issues.
 One way to do this is using **pipelined table functions**:
 
-  1. Log into your database as `SYS` user or make sure that your administration user has the required privileges to execute the steps below;
+  1. Log into your database as the `SYS` user or make sure that your administration user has the required privileges to execute the steps below;
   
-  2. Create types for table function:
+  2. Create types for the table function:
     
       ```sql
       CREATE OR REPLACE TYPE zbx_mon_restore_point_row AS OBJECT (
@@ -122,22 +122,22 @@ One way to do this is using **pipelined table functions**:
       END;
       ```
   
-  4. Grant execute privilege on the created pipelined table function to Zabbix monitoring user:
+  4. Grant the Zabbix monitoring user the Execute privilege on the created pipelined table function:
 
       ```sql
       GRANT EXECUTE ON zbx_mon_restore_point TO c##zabbix_mon;
       ```
 
-  5. Replace monitoring user `V$RESTORE_POINT` view with `SYS` user function (in this example `SYS` user is used to create DB types and function) and finally revoke the `SELECT_CATALOG_ROLE`.
+  5. Replace the monitoring user `V$RESTORE_POINT` view with the `SYS` user function (in this example, the `SYS` user is used to create DB types and function), and finally, revoke the `SELECT_CATALOG_ROLE`.
 
       ```sql
       CREATE OR REPLACE VIEW c##zabbix_mon.V$RESTORE_POINT AS SELECT * FROM TABLE(SYS.zbx_mon_restore_point);
       REVOKE SELECT_CATALOG_ROLE FROM c##zabbix_mon;
       ```
 
-  > Note, that in these examples, monitoring user is named `c##zabbix_mon` and system user - `SYS`. Change example usernames to ones that suit your environment.
+  > Note that in these examples, the monitoring user is named `c##zabbix_mon` and the system user - `SYS`. Change these example usernames to ones that are appropriate for your environment.
   
-  If this workaround does not suit you, there are more options available, such as __materialized views__, but look out for data refresh as `V$RESTORE_POINT` is a dynamic performance view.
+  If this workaround does not work for you, there are more options available, such as __materialized views__, but look out for data refresh as `V$RESTORE_POINT` is a dynamic performance view.
 
 3. Make sure a TNS Listener and an Oracle instance are available for the connection.  
 
