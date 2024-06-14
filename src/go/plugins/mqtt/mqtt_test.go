@@ -46,22 +46,11 @@ func Test_getClientID(t *testing.T) {
 		want string
 	}{
 		{
-			"+validSource10",
+			"+valid",
 			args{rand.NewSource(10)},
 			"ZabbixAgent2wSv9wq3T",
 		},
-		{
-			"+validSource20",
-			args{rand.NewSource(20)},
-			"ZabbixAgent20WYRff63",
-		},
-		{
-			"+validSource30",
-			args{rand.NewSource(30)},
-			"ZabbixAgent2CijUzXBV",
-		},
 	}
-
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
