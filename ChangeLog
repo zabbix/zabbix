@@ -11,7 +11,7 @@ New features:
 .......PS. [ZBXNEXT-8990] extended VMware event log with username (asestakovs)
 
 Bug fixes:
-..F....... [ZBX-24588] fixed CyberArk vault with no certificates (vmurzins)
+..F....... [ZBX-24588] fixed CyberArk Vault connection with no certificates (vmurzins)
 ..F....... [ZBX-23876] fixed incorrect timeout value being used when testing item (agriscenko)
 ..F....... [ZBX-24548] fixed error when updating disabled Map navigation tree widget (apoga)
 ........S. [ZBX-24553] fixed WebDriverURL handling when trailing slash is present (dgoloscapov)
@@ -71,7 +71,7 @@ New features:
 .......PS. [ZBXNEXT-8990] extended VMware event log with username (asestakovs)
 
 Bug fixes:
-..F....... [ZBX-24588] fixed CyberArk vault with no certificates (vmurzins)
+..F....... [ZBX-24588] fixed CyberArk Vault connection with no certificates (vmurzins)
 ..F....... [ZBX-23876] fixed incorrect timeout value being used when testing item (agriscenko)
 ..F....... [ZBX-24548] fixed error when updating disabled Map navigation tree widget (apoga)
 ........S. [ZBX-24553] fixed WebDriverURL handling when trailing slash is present (dgoloscapov)
