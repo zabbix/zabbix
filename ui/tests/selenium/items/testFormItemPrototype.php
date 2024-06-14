@@ -1933,7 +1933,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'key' => 'empty.script[{#KEY}]',
 					'error_msg' => 'Page received incorrect data',
 					'errors' => [
-						'Invalid parameter "/1/params": cannot be empty.'
+						'Incorrect value for field "Script": cannot be empty.'
 					]
 				]
 			],
