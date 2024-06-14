@@ -798,6 +798,7 @@ Changes for 6.4.16rc2
 New features:
 
 Bug fixes:
+..F....... [ZBX-24588] fixed CyberArk vault with no certificates (vmurzins)
 
 --------------------------------------------------------------------------------
 Changes for 6.4.16rc1
