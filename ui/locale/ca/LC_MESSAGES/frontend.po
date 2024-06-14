@@ -19478,6 +19478,10 @@ msgstr "Corda"
 msgid "String functions"
 msgstr "Funcions d'string"
 
+#: widgets/piechart/includes/WidgetForm.php:137
+msgid "Stroke width"
+msgstr ""
+
 #: include/items.inc.php:1545 include/items.inc.php:1549
 #: include/items.inc.php:1553 include/items.inc.php:1557
 msgid "Structured data"
