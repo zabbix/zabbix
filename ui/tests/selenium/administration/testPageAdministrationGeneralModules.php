@@ -444,7 +444,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 					'Description' => '1st Module description',
 					'Directory' => 'modules/module_number_1',
 					'Namespace' => 'Modules\Example_A',
-					'URL' => '1st module URL',
+					'URL' => 'https://www.zabbix.com/documentation/7.0/en/manual/1st module URL',
 					'Enabled' => false
 				]
 			],
@@ -457,7 +457,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 					'Description' => 'Module description !@#$%^&*()_+',
 					'Directory' => 'modules/module_number_2',
 					'Namespace' => 'Modules\Example_B',
-					'URL' => '!@#$%^&*()_+',
+					'URL' => 'https://www.zabbix.com/documentation/7.0/en/manual/!@#$%^&*()_+',
 					'Enabled' => false
 				]
 			],
