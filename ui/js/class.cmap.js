@@ -794,14 +794,7 @@ ZABBIX.apps.map = (function($) {
 					}
 				});
 
-				jQuery(document).on('keydown', (event) => {
-					if (event.which == KEY_ESCAPE) {
-						that.clearSelection();
-						that.toggleForm();
-					}
-				});
-
-				$('.btn-overlay-close, #elementClose').click(function() {
+				$('#map-window .btn-overlay-close, #elementClose').click(function() {
 					that.clearSelection();
 					that.toggleForm();
 				});
@@ -2829,6 +2822,10 @@ ZABBIX.apps.map = (function($) {
 				// Element must first be visible so that outerWidth() and outerHeight() are correct.
 				this.formContainer.positionOverlayDialogue();
 				this.active = true;
+
+				addToOverlaysStack('map-window', document.activeElement, 'map-window');
+
+				document.getElementById('elementType').focus();
 			},
 
 			/**
@@ -2837,6 +2834,8 @@ ZABBIX.apps.map = (function($) {
 			hide: function() {
 				this.domNode.toggle(false);
 				this.active = false;
+
+				removeFromOverlaysStack('map-window');
 			},
 
 			/**
@@ -3342,6 +3341,10 @@ ZABBIX.apps.map = (function($) {
 				// Element must first be visible so that outerWidth() and outerHeight() are correct.
 				this.formContainer.positionOverlayDialogue();
 				this.updateList();
+
+				addToOverlaysStack('map-window', document.activeElement, 'map-window');
+
+				document.getElementById('chkboxLabel').focus();
 			},
 
 			/**
@@ -3355,6 +3358,8 @@ ZABBIX.apps.map = (function($) {
 				});
 				$('textarea', this.domNode).val('');
 				this.actionProcessor.process();
+
+				removeFromOverlaysStack('map-window');
 			},
 
 			/**
@@ -3474,6 +3479,10 @@ ZABBIX.apps.map = (function($) {
 				// Element must first be visible so that outerWidth() and outerHeight() are correct.
 				this.formContainer.positionOverlayDialogue();
 				this.active = true;
+
+				addToOverlaysStack('map-window', document.activeElement, 'map-window');
+
+				document.querySelector('#shapeForm [name="type"]:checked').focus();
 			},
 
 			/**
@@ -3482,6 +3491,8 @@ ZABBIX.apps.map = (function($) {
 			hide: function() {
 				this.domNode.toggle(false);
 				this.active = false;
+
+				removeFromOverlaysStack('map-window');
 			},
 
 			/**
@@ -3604,6 +3615,10 @@ ZABBIX.apps.map = (function($) {
 				// Element must first be visible so that outerWidth() and outerHeight() are correct.
 				this.formContainer.positionOverlayDialogue();
 				this.active = true;
+
+				addToOverlaysStack('map-window', document.activeElement, 'map-window');
+
+				document.getElementById(figures ? 'chkboxType' : 'chkboxBorderType').focus();
 			},
 
 			/**
@@ -3616,6 +3631,8 @@ ZABBIX.apps.map = (function($) {
 				$('textarea, input[type=text]', this.domNode).val('');
 				$('.color-picker input', this.domNode).change();
 				this.actionProcessor.process();
+
+				removeFromOverlaysStack('map-window');
 			},
 
 			/**
