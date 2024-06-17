@@ -247,6 +247,7 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 		& > li {
 			margin-right: 5px;
 			line-height: 24px;
+			white-space: nowrap;
 
 			> ul {
 				display: flex;
@@ -265,6 +266,12 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 			}
 		}
 
+		.wide {
+			li > span {
+				max-width: 500px;
+			}
+		}
+
 		li > span {
 			display: inline-block;
 			padding: 2px 7px;
@@ -275,10 +282,6 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 			text-overflow: ellipsis;
 			overflow: hidden;
 			max-width: 250px;
-
-			&.wide {
-				max-width: 500px;
-			}
 
 			a {
 				margin-top: 2px;

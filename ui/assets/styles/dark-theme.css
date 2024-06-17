@@ -5199,7 +5199,8 @@ pre, pre a, pre td, pre span {
     .host-dashboard-header-navigation > ul > li,
     .header-navigation > ul > li {
       margin-right: 5px;
-      line-height: 24px; }
+      line-height: 24px;
+      white-space: nowrap; }
       .host-dashboard-header-navigation > ul > li > ul,
       .header-navigation > ul > li > ul {
         display: flex; }
@@ -5212,6 +5213,9 @@ pre, pre a, pre td, pre span {
           .host-dashboard-header-navigation > ul > li > ul.breadcrumbs > li:not(:last-child)::after,
           .header-navigation > ul > li > ul.breadcrumbs > li:not(:last-child)::after {
             content: "/"; }
+    .host-dashboard-header-navigation > ul .wide li > span,
+    .header-navigation > ul .wide li > span {
+      max-width: 500px; }
     .host-dashboard-header-navigation > ul li > span,
     .header-navigation > ul li > span {
       display: inline-block;
@@ -5223,9 +5227,6 @@ pre, pre a, pre td, pre span {
       text-overflow: ellipsis;
       overflow: hidden;
       max-width: 250px; }
-      .host-dashboard-header-navigation > ul li > span.wide,
-      .header-navigation > ul li > span.wide {
-        max-width: 580px; }
       .host-dashboard-header-navigation > ul li > span a,
       .header-navigation > ul li > span a {
         margin-top: 2px;
