@@ -1066,11 +1066,8 @@ static int	DBpatch_3010026(void)
 			goto out;
 	}
 
-	if (0 != sql_offset)
-	{
-		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
-			goto out;
-	}
+	if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
+		goto out;
 
 	if (0 != conditionids.values_num)
 	{
@@ -1597,11 +1594,8 @@ static int	DBpatch_3010079(void)
 			goto out;
 	}
 
-	if (0 != sql_offset)
-	{
-		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
-			goto out;
-	}
+	if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
+		goto out;
 
 	ret = SUCCEED;
 out:

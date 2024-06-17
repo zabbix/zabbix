@@ -46,8 +46,7 @@ static void	DBmass_proxy_update_items(zbx_vector_item_diff_ptr_t *item_diff)
 
 	zbx_db_save_item_changes(&sql, &sql_alloc, &sql_offset, item_diff, ZBX_FLAGS_ITEM_DIFF_UPDATE_DB);
 
-	if (0 != sql_offset)
-		zbx_db_execute("%s", sql);
+	(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }

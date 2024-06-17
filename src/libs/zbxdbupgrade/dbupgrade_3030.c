@@ -397,11 +397,8 @@ static int	DBpatch_3030030(void)
 			upd_num++;
 		}
 
-		if (0 != sql_offset)
-		{
-			if (ZBX_DB_OK > zbx_db_execute("%s", sql))
-				ret = FAIL;
-		}
+		if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
+			ret = FAIL;
 out:
 		zbx_db_free_result(result);
 	}
@@ -1089,11 +1086,8 @@ static int	DBpatch_table_convert(const char *table, const char *recid, const DBp
 			goto out;
 	}
 
-	if (0 != sql_offset)
-	{
-		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
-			goto out;
-	}
+	if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
+		goto out;
 
 	ret = SUCCEED;
 out:
@@ -1285,11 +1279,8 @@ static int	DBpatch_3030093(void)
 			goto out;
 	}
 
-	if (0 != sql_offset)
-	{
-		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
-			goto out;
-	}
+	if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
+		goto out;
 
 	ret = SUCCEED;
 out:
@@ -1389,11 +1380,8 @@ static int	DBpatch_3030102(void)
 			goto out;
 	}
 
-	if (0 != sql_offset)
-	{
-		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
-			goto out;
-	}
+	if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
+		goto out;
 
 	ret = SUCCEED;
 out:
@@ -1719,11 +1707,8 @@ static int	DBpatch_trailing_semicolon_remove(const char *table, const char *reci
 			goto out;
 	}
 
-	if (0 != sql_offset)
-	{
-		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
-			goto out;
-	}
+	if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
+		goto out;
 
 	ret = SUCCEED;
 out:

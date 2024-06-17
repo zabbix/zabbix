@@ -1507,6 +1507,19 @@ const char	*zbx_db_sql_id_cmp(zbx_uint64_t id)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: flush SQL request                                                 *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_db_flush_overflowed_sql(char *sql, size_t sql_offset)
+{
+	if (0 != sql_offset)
+		return zbx_db_execute("%s", sql);
+
+	return ZBX_DB_OK;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: execute a set of SQL statements IF it is big enough               *
  *                                                                            *
  ******************************************************************************/
@@ -1942,11 +1955,8 @@ int	zbx_db_execute_multiple_query(const char *query, const char *field_name, zbx
 
 	ret = zbx_db_prepare_multiple_query(query, field_name, ids, &sql, &sql_alloc, &sql_offset);
 
-	if (SUCCEED == ret && 0 != sql_offset)
-	{
-		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
-			ret = FAIL;
-	}
+	if (SUCCEED == ret && ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
+		ret = FAIL;
 
 	zbx_free(sql);
 

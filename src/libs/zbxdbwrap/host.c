@@ -996,8 +996,7 @@ static void	DBdelete_action_conditions(int conditiontype, zbx_uint64_t elementid
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 	}
 
-	if (0 != sql_offset)
-		zbx_db_execute("%s", sql);
+	(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
 
 	zbx_free(sql);
 
@@ -1559,7 +1558,6 @@ static void	DBdelete_httptests(const zbx_vector_uint64_t *httptestids, int audit
 
 	if (FAIL == zbx_audit_DBselect_delete_for_item(audit_context_mode, sql, &itemids))
 		goto clean;
-
 
 	sql_offset = 0;
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select httpstepid from httpstep where");
@@ -3186,7 +3184,6 @@ static void	host_prototype_interfaces_make(zbx_uint64_t hostid, zbx_vector_ptr_t
 out:
 	zbx_vector_interfaces_clear_ext(old_interfaces, DBhost_interface_free);
 }
-
 
 /******************************************************************************
  *                                                                            *
@@ -5328,8 +5325,7 @@ static void	DBsave_httptests(zbx_uint64_t hostid, const zbx_vector_ptr_t *httpte
 		zbx_db_insert_clean(&db_insert_httag);
 	}
 
-	if (0 != sql_offset)
-		zbx_db_execute("%s", sql);
+	(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
 
 	zbx_free(sql);
 
@@ -6763,10 +6759,8 @@ void	zbx_db_delete_groups(zbx_vector_uint64_t *groupids)
 		ret = zbx_db_prepare_multiple_query(update, "hostid", &hgset->hostids, &sql, &sql_alloc, &sql_offset);
 	}
 
-	if (SUCCEED == ret && 0 != sql_offset)
-	{
-		zbx_db_execute("%s", sql);
-	}
+	if (SUCCEED == ret)
+		(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
 
 	/* delete hgsets */
 

@@ -164,6 +164,7 @@ typedef zbx_uint64_t	(*zbx_dc_get_nextid_func_t)(const char *table_name, int num
 #	define ZBX_SQL_SORT_DESC(field)	field " desc nulls last"
 #endif
 
+
 typedef struct
 {
 	zbx_uint64_t	druleid;
@@ -603,7 +604,7 @@ typedef struct
 /* events callbacks end */
 
 int	zbx_db_get_user_names(zbx_uint64_t userid, char **username, char **name, char **surname);
-
+int	zbx_db_flush_overflowed_sql(char *sql, size_t sql_offset);
 int	zbx_db_execute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_offset);
 char	*zbx_db_get_unique_hostname_by_sample(const char *host_name_sample, const char *field_name);
 

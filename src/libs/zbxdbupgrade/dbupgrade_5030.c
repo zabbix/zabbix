@@ -682,7 +682,7 @@ static int	DBpatch_5030046(void)
 {
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
-	int			i, j;
+	int			i, j, ret = SUCCEED;
 	zbx_hashset_t		valuemaps;
 	zbx_hashset_iter_t	iter;
 	zbx_valuemap_t		valuemap_local, *valuemap;
@@ -841,8 +841,8 @@ static int	DBpatch_5030046(void)
 		}
 	}
 
-	if (0 != sql_offset)
-		zbx_db_execute("%s", sql);
+	if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
+		ret = FAIL;
 
 	zbx_free(sql);
 
@@ -866,7 +866,7 @@ static int	DBpatch_5030046(void)
 	zbx_vector_uint64_destroy(&templateids);
 	zbx_vector_uint64_destroy(&discovered_itemids);
 
-	return SUCCEED;
+	return ret;
 }
 
 static int	DBpatch_5030047(void)
@@ -4131,7 +4131,7 @@ static int	DBpatch_5030130(void)
 	}
 	zbx_db_free_result(result);
 
-	if (0 != sql_offset && ZBX_DB_OK > zbx_db_execute("%s", sql))
+	if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
 		ret = FAIL;
 
 	zbx_free(sql);
@@ -4942,11 +4942,9 @@ static int	DBpatch_5030165(void)
 
 	zbx_db_free_result(result);
 
-	if (SUCCEED == ret && 0 != sql_offset)
-	{
-		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
+	if (SUCCEED == ret)
+		if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
 			ret = FAIL;
-	}
 
 	if (SUCCEED == ret)
 		zbx_db_insert_execute(&db_insert_functions);
@@ -5115,11 +5113,9 @@ static int	DBpatch_5030167(void)
 	}
 	zbx_db_free_result(result);
 
-	if (SUCCEED == ret && 0 != sql_offset)
-	{
-		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
+	if (SUCCEED == ret)
+		if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
 			ret = FAIL;
-	}
 
 	zbx_free(sql);
 
@@ -5328,11 +5324,9 @@ static int	DBpatch_5030168(void)
 	zbx_db_free_result(result);
 	zbx_vector_ptr_destroy(&functions);
 
-	if (SUCCEED == ret && 0 != sql_offset)
-	{
-		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
+	if (SUCCEED == ret)
+		if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
 			ret = FAIL;
-	}
 
 	zbx_free(sql);
 
@@ -5488,11 +5482,9 @@ static int	DBpatch_5030169(void)
 
 	zbx_db_free_result(result);
 
-	if (SUCCEED == ret && 0 != sql_offset)
-	{
-		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
+	if (SUCCEED == ret)
+		if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
 			ret = FAIL;
-	}
 
 	zbx_free(params);
 	zbx_free(sql);
@@ -5659,7 +5651,7 @@ static int	DBpatch_5030181(void)
 				goto out;
 		}
 
-		if (0 != sql_offset && ZBX_DB_OK > zbx_db_execute("%s", sql))
+		if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
 			ret = FAIL;
 out:
 		zbx_db_free_result(in_result);
@@ -5816,7 +5808,7 @@ static int	DBpatch_5030190(void)
 			goto out;
 	}
 
-	if (0 != sql_offset && ZBX_DB_OK > zbx_db_execute("%s", sql))
+	if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
 		ret = FAIL;
 out:
 	zbx_db_free_result(result);
@@ -5859,7 +5851,7 @@ static int	DBpatch_5030191(void)
 			goto out;
 	}
 
-	if (0 != sql_offset && ZBX_DB_OK > zbx_db_execute("%s", sql))
+	if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
 		ret = FAIL;
 out:
 	zbx_db_free_result(result);
@@ -5993,7 +5985,7 @@ static int	DBpatch_5030192(void)
 			goto out;
 	}
 
-	if (0 != sql_offset && ZBX_DB_OK > zbx_db_execute("%s", sql))
+	if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
 		ret = FAIL;
 out:
 	zbx_db_free_result(result);
@@ -6059,7 +6051,7 @@ static int	DBpatch_5030193(void)
 			goto out;
 	}
 
-	if (0 != sql_offset && ZBX_DB_OK > zbx_db_execute("%s", sql))
+	if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
 		ret = FAIL;
 out:
 	zbx_db_free_result(result);
@@ -6102,7 +6094,7 @@ static int	DBpatch_5030194(void)
 			goto out;
 	}
 
-	if (0 != sql_offset && ZBX_DB_OK > zbx_db_execute("%s", sql))
+	if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
 		ret = FAIL;
 out:
 	zbx_db_free_result(result);
@@ -6145,7 +6137,7 @@ static int	DBpatch_5030195(void)
 			goto out;
 	}
 
-	if (0 != sql_offset && ZBX_DB_OK > zbx_db_execute("%s", sql))
+	if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
 		ret = FAIL;
 out:
 	zbx_db_free_result(result);
@@ -6188,7 +6180,7 @@ static int	DBpatch_5030196(void)
 			goto out;
 	}
 
-	if (0 != sql_offset && ZBX_DB_OK > zbx_db_execute("%s", sql))
+	if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
 		ret = FAIL;
 out:
 	zbx_db_free_result(result);
@@ -6221,7 +6213,7 @@ static int	DBpatch_5030197(void)
 			goto out;
 	}
 
-	if (0 != sql_offset && ZBX_DB_OK > zbx_db_execute("%s", sql))
+	if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
 		ret = FAIL;
 out:
 	zbx_db_free_result(result);
@@ -6266,7 +6258,7 @@ static int	DBpatch_5030198(void)
 			goto out;
 	}
 
-	if (0 != sql_offset && ZBX_DB_OK > zbx_db_execute("%s", sql))
+	if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
 		ret = FAIL;
 out:
 	zbx_db_free_result(result);
@@ -6346,7 +6338,7 @@ static int	DBpatch_5030199(void)
 			goto out;
 	}
 
-	if (0 != sql_offset && ZBX_DB_OK > zbx_db_execute("%s", sql))
+	if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
 		ret = FAIL;
 out:
 	zbx_db_free_result(result);
@@ -6394,7 +6386,7 @@ static int	DBpatch_5030200(void)
 			goto out;
 	}
 
-	if (0 != sql_offset && ZBX_DB_OK > zbx_db_execute("%s", sql))
+	if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
 		ret = FAIL;
 out:
 	zbx_db_free_result(result);
@@ -6439,7 +6431,7 @@ static int	DBpatch_5030201(void)
 			goto out;
 	}
 
-	if (0 != sql_offset && ZBX_DB_OK > zbx_db_execute("%s", sql))
+	if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
 		ret = FAIL;
 out:
 	zbx_db_free_result(result);

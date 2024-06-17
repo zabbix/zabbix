@@ -838,9 +838,7 @@ static int	am_db_flush_results(zbx_am_db_t *amdb)
 
 			am_db_validate_tags_for_update(&update_events_tags, &db_event, &db_problem);
 
-			if (0 != sql_offset)
-				zbx_db_execute("%s", sql);
-
+			(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
 			zbx_db_insert_autoincrement(&db_event, "eventtagid");
 			zbx_db_insert_execute(&db_event);
 			zbx_db_insert_clean(&db_event);

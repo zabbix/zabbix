@@ -1798,7 +1798,7 @@ static int	check_hostname_metadata_condition(const zbx_vector_db_event_t *esc_ev
 	zbx_vector_uint64_t	objectids;
 	const char		*condition_field;
 
-	switch(condition->op)
+	switch (condition->op)
 	{
 		case ZBX_CONDITION_OPERATOR_LIKE:
 		case ZBX_CONDITION_OPERATOR_NOT_LIKE:
@@ -3333,8 +3333,7 @@ void	process_actions(zbx_vector_db_event_t *events, const zbx_vector_uint64_pair
 			zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 		}
 
-		if (0 != sql_offset)
-			zbx_db_execute("%s", sql);
+		(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
 
 		zbx_free(sql);
 	}

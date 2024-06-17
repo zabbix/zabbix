@@ -144,7 +144,7 @@ static int	DBpatch_4050014(void)
 			goto out;
 	}
 
-	if (0 != sql_offset && ZBX_DB_OK > zbx_db_execute("%s", sql))
+	if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
 		ret = FAIL;
 out:
 	zbx_db_free_result(result);
@@ -1072,10 +1072,8 @@ static int	DBpatch_items_update(zbx_vector_dbu_snmp_if_t *snmp_ifs)
 	}
 
 	if (SUCCEED == ret)
-	{
-		if (0 != sql_offset && ZBX_DB_OK > zbx_db_execute("%s", sql))
+		if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
 			ret = FAIL;
-	}
 
 	zbx_free(sql);
 

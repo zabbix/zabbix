@@ -495,8 +495,7 @@ static void	rm_db_flush_reports(zbx_rm_t *manager)
 		report->flags = 0;
 	}
 
-	if (0 != sql_offset)
-		zbx_db_execute("%s", sql);
+	(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
 
 	zbx_db_commit();
 

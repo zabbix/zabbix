@@ -4823,10 +4823,7 @@ static void	lld_hosts_remove(const zbx_vector_lld_host_ptr_t *hosts, const zbx_l
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 	}
 
-	if (0 != sql_offset)
-	{
-		zbx_db_execute("%s", sql);
-	}
+	(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
 
 	zbx_db_commit();
 
@@ -4980,10 +4977,7 @@ static void	lld_groups_remove(const zbx_vector_lld_group_ptr_t *groups, const zb
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 	}
 
-	if (0 != sql_offset)
-	{
-		zbx_db_execute("%s", sql);
-	}
+	(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
 
 	if (0 != del_ids.values_num)
 	{

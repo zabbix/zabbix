@@ -544,8 +544,7 @@ static int	DBcopy_template_trigger_tags(const zbx_vector_uint64_t *new_triggerid
 
 	if (0 != update_num)
 	{
-		if (0 != sql_offset)
-			zbx_db_execute("%s", sql);
+		(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
 	}
 
 	if (0 != insert_num)
@@ -1178,11 +1177,9 @@ static int	execute_triggers_updates(zbx_hashset_t *zbx_host_triggers_main_data, 
 		}
 	}
 
-	if (0 != sql_offset)
-	{
-		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
-			res = FAIL;
-	}
+	if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
+		res = FAIL;
+
 clean:
 	zbx_free(sql);
 

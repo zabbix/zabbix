@@ -3371,8 +3371,7 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_db_escalat
 			zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 		}
 
-		if (0 != sql_offset)
-			zbx_db_execute("%s", sql);
+		(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
 
 		zbx_free(sql);
 	}

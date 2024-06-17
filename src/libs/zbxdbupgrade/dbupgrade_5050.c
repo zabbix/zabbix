@@ -508,11 +508,9 @@ static int	dbpatch_update_simple_macro(const char *table, const char *field, con
 	}
 	zbx_db_free_result(result);
 
-	if (SUCCEED == ret && 0 != sql_offset)
-	{
-		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
+	if (SUCCEED == ret)
+		if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
 			ret = FAIL;
-	}
 
 	zbx_free(sql);
 
@@ -1205,11 +1203,9 @@ static int	DBpatch_5050114(void)
 
 	zbx_db_free_result(result);
 
-	if (SUCCEED == ret && 0 != sql_offset)
-	{
-		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
+	if (SUCCEED == ret)
+		if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
 			ret = FAIL;
-	}
 
 	zbx_free(params);
 	zbx_free(sql);
@@ -1778,7 +1774,7 @@ static int	DBpatch_5050132(void)
 			goto out;
 	}
 
-	if (0 != sql_offset && ZBX_DB_OK > zbx_db_execute("%s", sql))
+	if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
 		ret = FAIL;
 out:
 	zbx_db_free_result(result);

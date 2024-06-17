@@ -3444,7 +3444,7 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototy
 		if (0 != item->itemid && 0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE))
 		{
 			upd_items++;
-			if(0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_KEY))
+			if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_KEY))
 				zbx_vector_uint64_append(&upd_keys, item->itemid);
 		}
 	}
@@ -3599,8 +3599,7 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototy
 			lld_item_discovery_prepare_update(item_prototype, item, &sql, &sql_alloc, &sql_offset);
 		}
 
-		if (0 != sql_offset)
-			zbx_db_execute("%s", sql);
+		(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
 	}
 out:
 	zbx_free(sql);
@@ -3789,10 +3788,7 @@ static int	lld_items_preproc_save(zbx_uint64_t hostid, zbx_vector_lld_item_full_
 	}
 
 	if (0 != update_preproc_num)
-	{
-		if (0 != sql_offset)
-			zbx_db_execute("%s", sql);
-	}
+		(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
 
 	if (0 != new_preproc_num)
 	{
@@ -3965,10 +3961,7 @@ static int	lld_items_param_save(zbx_uint64_t hostid, zbx_vector_lld_item_full_pt
 	}
 
 	if (0 != update_param_num)
-	{
-		if (0 != sql_offset)
-			zbx_db_execute("%s", sql);
-	}
+		(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
 
 	if (0 != new_param_num)
 	{
@@ -4140,10 +4133,7 @@ static int	lld_items_tags_save(zbx_uint64_t hostid, zbx_vector_lld_item_full_ptr
 	}
 
 	if (0 != update_tag_num)
-	{
-		if (0 != sql_offset)
-			zbx_db_execute("%s", sql);
-	}
+		(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
 
 	if (0 != new_tag_num)
 	{

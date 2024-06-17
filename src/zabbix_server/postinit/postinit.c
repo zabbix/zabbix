@@ -411,11 +411,9 @@ static int	update_event_names(void)
 
 	zbx_dc_close_user_macros(um_handle);
 
-	if (SUCCEED == ret && 0 != sql_offset)
-	{
-		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
+	if (SUCCEED == ret)
+		if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
 			ret = FAIL;
-	}
 
 	zbx_db_free_result(result);
 

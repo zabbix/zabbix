@@ -1342,8 +1342,7 @@ static int	execute_graphs_updates(zbx_hashset_t *host_graphs_main_data, zbx_hash
 					found->flags, host_graphs_items, audit_context_mode);
 		}
 	}
-
-	if (SUCCEED == res && 0 != sql_offset && ZBX_DB_OK > zbx_db_execute("%s", sql))
+	if (SUCCEED == res && ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "failed to execute graphs updates");
 		res = FAIL;
@@ -1351,13 +1350,10 @@ static int	execute_graphs_updates(zbx_hashset_t *host_graphs_main_data, zbx_hash
 
 	zbx_free(sql);
 
-	if (SUCCEED == res)
+	if (SUCCEED == res && ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql2, sql_offset2))
 	{
-		if (0 != sql_offset2 && (ZBX_DB_OK > zbx_db_execute("%s", sql2)))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "failed to execute graphs items updates");
-			res = FAIL;
-		}
+		zabbix_log(LOG_LEVEL_WARNING, "failed to execute graphs items updates");
+		res = FAIL;
 	}
 
 	zbx_free(sql2);

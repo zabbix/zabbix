@@ -631,8 +631,7 @@ static void	dc_trends_fetch_and_update(ZBX_DC_TREND *trends, int trends_num, zbx
 
 	zbx_db_free_result(result);
 
-	if (0 != sql_offset)
-		zbx_db_execute("%s", sql);
+	(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
 }
 
 /******************************************************************************
@@ -1760,8 +1759,7 @@ void	zbx_db_mass_update_items(const zbx_vector_item_diff_ptr_t *item_diff,
 		if (0 != inventory_values->values_num)
 			DCadd_update_inventory_sql(&sql_offset, inventory_values);
 
-		if (0 != sql_offset)
-			zbx_db_execute("%s", sql);
+		(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
 
 		zbx_dc_config_update_inventory_values(inventory_values);
 	}

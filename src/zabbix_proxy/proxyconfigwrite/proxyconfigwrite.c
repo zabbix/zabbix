@@ -914,7 +914,7 @@ static int	proxyconfig_update_rows(zbx_table_data_t *td, char **error)
 			goto out;
 	}
 
-	if (0 != sql_offset && ZBX_DB_OK > zbx_db_execute("%s", sql))
+	if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
 		goto out;
 
 	ret = SUCCEED;

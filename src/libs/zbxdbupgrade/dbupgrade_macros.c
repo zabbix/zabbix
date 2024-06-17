@@ -163,7 +163,7 @@ int	db_rename_macro(zbx_db_result_t result, const char *table, const char *pkey,
 		}
 	}
 
-	if (0 != sql_offset && ZBX_DB_OK > zbx_db_execute("%s", sql))
+	if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
 		ret = FAIL;
 out:
 	zbx_free(value);

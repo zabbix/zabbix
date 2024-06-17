@@ -111,8 +111,7 @@ static void	dbsync_item_rtname(zbx_vector_uint64_t *hostids, int *processed_num,
 		zbx_db_free_result(result);
 	}
 
-	if (0 != sql_offset)
-		zbx_db_execute("%s", sql);
+	(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
 
 	zbx_free(sql_select);
 	zbx_free(sql);

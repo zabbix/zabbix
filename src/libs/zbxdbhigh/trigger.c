@@ -75,8 +75,7 @@ void	zbx_db_save_trigger_changes(const zbx_vector_trigger_diff_ptr_t *trigger_di
 		zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 	}
 
-	if (0 != sql_offset)
-		zbx_db_execute("%s", sql);
+	(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
 
 	zbx_free(sql);
 

@@ -1058,8 +1058,7 @@ static void	save_template_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items, in
 
 	if (0 != upd_items)
 	{
-		if (0 != sql_offset)
-			zbx_db_execute("%s", sql);
+		(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
 
 		zbx_free(sql);
 	}
@@ -1233,8 +1232,7 @@ static void	save_template_lld_rules(zbx_vector_ptr_t *items, zbx_vector_ptr_t *r
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 	}
 
-	if (0 != sql_offset)
-		zbx_db_execute("%s", sql);
+	(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
 
 	if (0 != new_conditions)
 	{
@@ -1659,10 +1657,7 @@ static void	copy_template_items_preproc(const zbx_vector_ptr_t *items, int audit
 	}
 
 	if (0 != update_preproc_num)
-	{
-		if (0 != sql_offset)
-			zbx_db_execute("%s", sql);
-	}
+		(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
 
 	if (0 != new_preproc_num)
 	{
@@ -1807,10 +1802,7 @@ static void	copy_template_item_tags(const zbx_vector_ptr_t *items, int audit_con
 	}
 
 	if (0 != update_tag_num)
-	{
-		if (0 != sql_offset)
-			zbx_db_execute("%s", sql);
-	}
+		(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
 
 	if (0 != new_tag_num)
 	{
@@ -1962,10 +1954,7 @@ static void	copy_template_item_script_params(const zbx_vector_ptr_t *items, int 
 	}
 
 	if (0 != update_param_num)
-	{
-		if (0 != sql_offset)
-			zbx_db_execute("%s", sql);
-	}
+		(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
 
 	if (0 != new_param_num)
 	{
@@ -2130,10 +2119,7 @@ static void	copy_template_lld_macro_paths(const zbx_vector_ptr_t *items, int aud
 	}
 
 	if (0 != update_lld_macro_num)
-	{
-		if (0 != sql_offset)
-			zbx_db_execute("%s", sql);
-	}
+		(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
 
 	if (0 != new_lld_macro_num)
 	{

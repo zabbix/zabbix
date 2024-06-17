@@ -75,7 +75,7 @@ static int	DBpatch_6010002(void)
 			goto out;
 	}
 
-	if (0 != sql_offset && ZBX_DB_OK > zbx_db_execute("%s", sql))
+	if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
 		ret = FAIL;
 out:
 	zbx_db_free_result(result);
@@ -122,7 +122,7 @@ static int	DBpatch_6010005(void)
 			goto out;
 	}
 
-	if (0 != sql_offset && ZBX_DB_OK > zbx_db_execute("%s", sql))
+	if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
 		ret = FAIL;
 out:
 	zbx_db_free_result(result);
@@ -383,11 +383,9 @@ static int	DBpatch_6010024(void)
 	}
 	zbx_db_free_result(result);
 
-	if (SUCCEED == ret && 0 != sql_offset)
-	{
-		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
+	if (SUCCEED == ret)
+		if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
 			ret = FAIL;
-	}
 
 	zbx_free(sql);
 	zbx_free(out);
@@ -448,11 +446,9 @@ static int	DBpatch_6010025(void)
 	}
 	zbx_db_free_result(result);
 
-	if (SUCCEED == ret && 0 != sql_offset)
-	{
-		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
+	if (SUCCEED == ret)
+		if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
 			ret = FAIL;
-	}
 
 	zbx_free(sql);
 	zbx_free(out);
@@ -666,7 +662,7 @@ static int	DBpatch_6010033_create_template_groups(zbx_vector_hstgrp_t *hstgrps)
 	if (SUCCEED != (ret = zbx_db_insert_execute(&db_insert)))
 		goto out;
 
-	if (0 != sql_offset && ZBX_DB_OK > zbx_db_execute("%s", sql))
+	if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
 		ret = FAIL;
 out:
 	zbx_free(sql);

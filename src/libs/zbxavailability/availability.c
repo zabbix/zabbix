@@ -285,9 +285,7 @@ void	zbx_db_update_interface_availabilities(const zbx_vector_availability_ptr_t 
 			zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 		}
 
-		if (0 != sql_offset)
-			zbx_db_execute("%s", sql);
-
+		(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
 		txn_error = zbx_db_commit();
 	}
 	while (ZBX_DB_DOWN == txn_error);
