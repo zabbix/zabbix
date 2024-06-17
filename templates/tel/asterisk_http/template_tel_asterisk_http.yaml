@@ -29,7 +29,6 @@ zabbix_export:
           type: DEPENDENT
           key: asterisk.active_calls
           delay: '0'
-          history: 7d
           description: 'The number of active calls at the moment.'
           preprocessing:
             - type: JSONPATH
@@ -45,7 +44,6 @@ zabbix_export:
           type: DEPENDENT
           key: asterisk.active_channels
           delay: '0'
-          history: 7d
           description: 'The number of active channels at the moment.'
           preprocessing:
             - type: JSONPATH
@@ -61,7 +59,6 @@ zabbix_export:
           type: DEPENDENT
           key: asterisk.calls_processed
           delay: '0'
-          history: 7d
           description: 'The number of calls processed after the last service restart.'
           preprocessing:
             - type: JSONPATH
@@ -77,7 +74,6 @@ zabbix_export:
           type: DEPENDENT
           key: asterisk.calls_processed.rate
           delay: '0'
-          history: 7d
           value_type: FLOAT
           description: 'The number of calls processed per second.'
           preprocessing:
@@ -430,7 +426,6 @@ zabbix_export:
           type: DEPENDENT
           key: asterisk.iax.active_channels
           delay: '0'
-          history: 7d
           description: 'The total number of IAX trunks active channels.'
           preprocessing:
             - type: JSONPATH
@@ -456,7 +451,6 @@ zabbix_export:
           type: DEPENDENT
           key: asterisk.iax.offline
           delay: '0'
-          history: 7d
           description: 'The number of offline IAX peers.'
           preprocessing:
             - type: JSONPATH
@@ -472,7 +466,6 @@ zabbix_export:
           type: DEPENDENT
           key: asterisk.iax.online
           delay: '0'
-          history: 7d
           description: 'The number of online IAX peers.'
           preprocessing:
             - type: JSONPATH
@@ -488,7 +481,6 @@ zabbix_export:
           type: DEPENDENT
           key: asterisk.iax.total
           delay: '0'
-          history: 7d
           description: 'The total number of IAX peers.'
           preprocessing:
             - type: JSONPATH
@@ -504,7 +496,6 @@ zabbix_export:
           type: DEPENDENT
           key: asterisk.iax.unmonitored
           delay: '0'
-          history: 7d
           description: 'The number of unmonitored IAX peers.'
           preprocessing:
             - type: JSONPATH
@@ -520,7 +511,6 @@ zabbix_export:
           type: DEPENDENT
           key: asterisk.pjsip.active_channels
           delay: '0'
-          history: 7d
           description: 'The total number of PJSIP trunks active channels.'
           preprocessing:
             - type: JSONPATH
@@ -546,7 +536,6 @@ zabbix_export:
           type: DEPENDENT
           key: asterisk.pjsip.available
           delay: '0'
-          history: 7d
           description: 'The number of available PJSIP peers.'
           preprocessing:
             - type: JSONPATH
@@ -562,7 +551,6 @@ zabbix_export:
           type: DEPENDENT
           key: asterisk.pjsip.total
           delay: '0'
-          history: 7d
           description: 'The total number of PJSIP peers.'
           preprocessing:
             - type: JSONPATH
@@ -578,7 +566,6 @@ zabbix_export:
           type: DEPENDENT
           key: asterisk.pjsip.unavailable
           delay: '0'
-          history: 7d
           description: 'The number of unavailable PJSIP peers.'
           preprocessing:
             - type: JSONPATH
@@ -594,7 +581,6 @@ zabbix_export:
           type: DEPENDENT
           key: asterisk.sip.active_channels
           delay: '0'
-          history: 7d
           description: 'The total number of SIP trunks active channels.'
           preprocessing:
             - type: JSONPATH
@@ -620,7 +606,6 @@ zabbix_export:
           type: DEPENDENT
           key: asterisk.sip.monitored_offline
           delay: '0'
-          history: 7d
           description: 'The number of monitored offline SIP peers.'
           preprocessing:
             - type: JSONPATH
@@ -636,7 +621,6 @@ zabbix_export:
           type: DEPENDENT
           key: asterisk.sip.monitored_online
           delay: '0'
-          history: 7d
           description: 'The number of monitored online SIP peers.'
           preprocessing:
             - type: JSONPATH
@@ -652,7 +636,6 @@ zabbix_export:
           type: DEPENDENT
           key: asterisk.sip.total
           delay: '0'
-          history: 7d
           description: 'The total number of SIP peers.'
           preprocessing:
             - type: JSONPATH
@@ -668,7 +651,6 @@ zabbix_export:
           type: DEPENDENT
           key: asterisk.sip.unmonitored_offline
           delay: '0'
-          history: 7d
           description: 'The number of unmonitored offline SIP peers.'
           preprocessing:
             - type: JSONPATH
@@ -684,7 +666,6 @@ zabbix_export:
           type: DEPENDENT
           key: asterisk.sip.unmonitored_online
           delay: '0'
-          history: 7d
           description: 'The number of unmonitored online SIP peers.'
           preprocessing:
             - type: JSONPATH
@@ -700,7 +681,6 @@ zabbix_export:
           type: DEPENDENT
           key: asterisk.total_queues
           delay: '0'
-          history: 7d
           description: 'The number of configured queues.'
           preprocessing:
             - type: JSONPATH
@@ -716,7 +696,6 @@ zabbix_export:
           type: DEPENDENT
           key: asterisk.uptime
           delay: '0'
-          history: 7d
           value_type: FLOAT
           units: uptime
           description: 'The system uptime expressed in the following format: "N days, hh:mm:ss".'
@@ -758,7 +737,6 @@ zabbix_export:
           type: DEPENDENT
           key: asterisk.uptime_reload
           delay: '0'
-          history: 7d
           value_type: FLOAT
           units: uptime
           description: 'System uptime after a config reload in ''N days, hh:mm:ss'' format.'
@@ -787,7 +765,6 @@ zabbix_export:
           type: DEPENDENT
           key: asterisk.version
           delay: '0'
-          history: 7d
           trends: '0'
           value_type: CHAR
           description: 'Service version'
@@ -815,7 +792,6 @@ zabbix_export:
           name: 'Service response time'
           type: SIMPLE
           key: 'net.tcp.service.perf["tcp","{$AMI.HOST}","{$AMI.PORT}"]'
-          history: 7d
           value_type: FLOAT
           units: s
           description: 'Asterisk Manager API performance.'
@@ -839,7 +815,6 @@ zabbix_export:
           name: 'Service status'
           type: SIMPLE
           key: 'net.tcp.service["tcp","{$AMI.HOST}","{$AMI.PORT}"]'
-          history: 7d
           description: 'Asterisk Manager API port availability.'
           valuemap:
             name: 'Service state'
@@ -873,7 +848,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'asterisk.iax.trunk.active_channels[{#OBJECTNAME}]'
               delay: '0'
-              history: 7d
               description: 'The total number of active IAX trunk channels.'
               preprocessing:
                 - type: JSONPATH
@@ -921,7 +895,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'asterisk.iax.trunk.status[{#OBJECTNAME}]'
               delay: '0'
-              history: 7d
               trends: '0'
               value_type: CHAR
               description: |
@@ -976,7 +949,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'asterisk.pjsip.trunk.active_channels[{#OBJECTNAME}]'
               delay: '0'
-              history: 7d
               description: 'The total number of active PJSIP trunk channels.'
               preprocessing:
                 - type: JSONPATH
@@ -1004,7 +976,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'asterisk.pjsip.trunk.devicestate[{#OBJECTNAME}]'
               delay: '0'
-              history: 7d
               trends: '0'
               value_type: CHAR
               description: |
@@ -1078,7 +1049,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'asterisk.queue.available[{#QUEUE}]'
               delay: '0'
-              history: 7d
               description: 'The number of available queue members.'
               preprocessing:
                 - type: JSONPATH
@@ -1096,7 +1066,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'asterisk.queue.callers[{#QUEUE}]'
               delay: '0'
-              history: 7d
               description: 'The number incoming calls in queue.'
               preprocessing:
                 - type: JSONPATH
@@ -1144,7 +1113,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'asterisk.queue.loggedin[{#QUEUE}]'
               delay: '0'
-              history: 7d
               description: 'The number of queue members.'
               preprocessing:
                 - type: JSONPATH
@@ -1180,7 +1148,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'asterisk.sip.trunk.active_channels[{#OBJECTNAME}]'
               delay: '0'
-              history: 7d
               description: 'The total number of active SIP trunk channels.'
               preprocessing:
                 - type: JSONPATH
@@ -1228,7 +1195,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'asterisk.sip.trunk.status[{#OBJECTNAME}]'
               delay: '0'
-              history: 7d
               trends: '0'
               value_type: CHAR
               description: |

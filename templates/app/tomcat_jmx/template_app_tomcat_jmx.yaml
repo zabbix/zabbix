@@ -24,7 +24,6 @@ zabbix_export:
           name: Version
           type: JMX
           key: 'jmx["Catalina:type=Server",serverInfo]'
-          history: 7d
           trends: '0'
           value_type: CHAR
           username: '{$TOMCAT.USER}'
@@ -69,7 +68,6 @@ zabbix_export:
               name: '{#JMXVALUE}: Gzip compression status'
               type: JMX
               key: 'jmx[{#JMXOBJ},compression]'
-              history: 7d
               trends: '0'
               value_type: CHAR
               username: '{$TOMCAT.USER}'
@@ -119,7 +117,6 @@ zabbix_export:
               name: '{#JMXNAME}: Bytes received per second'
               type: JMX
               key: 'jmx[{#JMXOBJ},bytesReceived]'
-              history: 7d
               units: B
               username: '{$TOMCAT.USER}'
               password: '{$TOMCAT.PASSWORD}'
@@ -140,7 +137,6 @@ zabbix_export:
               name: '{#JMXNAME}: Bytes sent per second'
               type: JMX
               key: 'jmx[{#JMXOBJ},bytesSent]'
-              history: 7d
               units: B
               username: '{$TOMCAT.USER}'
               password: '{$TOMCAT.PASSWORD}'
@@ -161,7 +157,6 @@ zabbix_export:
               name: '{#JMXNAME}: Errors per second'
               type: JMX
               key: 'jmx[{#JMXOBJ},errorCount]'
-              history: 7d
               username: '{$TOMCAT.USER}'
               password: '{$TOMCAT.PASSWORD}'
               description: 'Error rate of request processor {#JMXNAME}'
@@ -181,7 +176,6 @@ zabbix_export:
               name: '{#JMXNAME}: Requests processing time'
               type: JMX
               key: 'jmx[{#JMXOBJ},processingTime]'
-              history: 7d
               units: s
               username: '{$TOMCAT.USER}'
               password: '{$TOMCAT.PASSWORD}'
@@ -204,7 +198,6 @@ zabbix_export:
               name: '{#JMXNAME}: Requests per second'
               type: JMX
               key: 'jmx[{#JMXOBJ},requestCount]'
-              history: 7d
               username: '{$TOMCAT.USER}'
               password: '{$TOMCAT.PASSWORD}'
               description: 'Rate of requests served by request processor {#JMXNAME}'
@@ -259,7 +252,6 @@ zabbix_export:
               name: '{#JMXHOST}{#JMXCONTEXT}: Sessions active'
               type: JMX
               key: 'jmx[{#JMXOBJ},activeSessions]'
-              history: 7d
               username: '{$TOMCAT.USER}'
               password: '{$TOMCAT.PASSWORD}'
               description: 'Active sessions of the application.'
@@ -275,7 +267,6 @@ zabbix_export:
               name: '{#JMXHOST}{#JMXCONTEXT}: Sessions allowed maximum'
               type: JMX
               key: 'jmx[{#JMXOBJ},maxActiveSessions]'
-              history: 7d
               value_type: FLOAT
               username: '{$TOMCAT.USER}'
               password: '{$TOMCAT.PASSWORD}'
@@ -292,7 +283,6 @@ zabbix_export:
               name: '{#JMXHOST}{#JMXCONTEXT}: Sessions active maximum so far'
               type: JMX
               key: 'jmx[{#JMXOBJ},maxActive]'
-              history: 7d
               username: '{$TOMCAT.USER}'
               password: '{$TOMCAT.PASSWORD}'
               description: 'Maximum number of active sessions so far.'
@@ -308,7 +298,6 @@ zabbix_export:
               name: '{#JMXHOST}{#JMXCONTEXT}: Sessions rejected per second'
               type: JMX
               key: 'jmx[{#JMXOBJ},rejectedSessions]'
-              history: 7d
               username: '{$TOMCAT.USER}'
               password: '{$TOMCAT.PASSWORD}'
               description: 'Rate of sessions we rejected due to maxActive being reached.'
@@ -328,7 +317,6 @@ zabbix_export:
               name: '{#JMXHOST}{#JMXCONTEXT}: Sessions created per second'
               type: JMX
               key: 'jmx[{#JMXOBJ},sessionCounter]'
-              history: 7d
               username: '{$TOMCAT.USER}'
               password: '{$TOMCAT.PASSWORD}'
               description: 'Rate of sessions created by this application per second.'
@@ -395,7 +383,6 @@ zabbix_export:
               name: '{#JMXNAME}: Threads count'
               type: JMX
               key: 'jmx[{#JMXOBJ},currentThreadCount]'
-              history: 7d
               username: '{$TOMCAT.USER}'
               password: '{$TOMCAT.PASSWORD}'
               description: 'Amount of threads the thread pool has right now, both busy and free.'
@@ -415,7 +402,6 @@ zabbix_export:
               name: '{#JMXNAME}: Threads busy'
               type: JMX
               key: 'jmx[{#JMXOBJ},currentThreadsBusy]'
-              history: 7d
               username: '{$TOMCAT.USER}'
               password: '{$TOMCAT.PASSWORD}'
               description: 'Number of the requests that are being currently handled.'
@@ -431,7 +417,6 @@ zabbix_export:
               name: '{#JMXNAME}: Threads limit'
               type: JMX
               key: 'jmx[{#JMXOBJ},maxThreads]'
-              history: 7d
               username: '{$TOMCAT.USER}'
               password: '{$TOMCAT.PASSWORD}'
               description: 'Limit of the threads count. When currentThreadsBusy counter reaches the maxThreads limit, no more requests could be handled, and the application chokes.'

@@ -49,7 +49,6 @@ zabbix_export:
           name: 'Service response time'
           type: SIMPLE
           key: 'net.tcp.service.perf[http,"{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PORT}"]'
-          history: 7d
           value_type: FLOAT
           units: s
           tags:
@@ -74,7 +73,6 @@ zabbix_export:
           name: 'Service status'
           type: SIMPLE
           key: 'net.tcp.service[http,"{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PORT}"]'
-          history: 7d
           valuemap:
             name: 'Service state'
           preprocessing:
@@ -100,7 +98,6 @@ zabbix_export:
           type: DEPENDENT
           key: nginx.connections.accepted.rate
           delay: '0'
-          history: 7d
           value_type: FLOAT
           description: 'The total number of accepted client connections.'
           preprocessing:
@@ -121,7 +118,6 @@ zabbix_export:
           type: DEPENDENT
           key: nginx.connections.active
           delay: '0'
-          history: 7d
           description: 'The current number of active client connections including waiting connections.'
           preprocessing:
             - type: REGEX
@@ -138,7 +134,6 @@ zabbix_export:
           type: DEPENDENT
           key: nginx.connections.dropped.rate
           delay: '0'
-          history: 7d
           value_type: FLOAT
           description: 'The total number of dropped client connections.'
           preprocessing:
@@ -176,7 +171,6 @@ zabbix_export:
           type: DEPENDENT
           key: nginx.connections.handled.rate
           delay: '0'
-          history: 7d
           value_type: FLOAT
           description: 'The total number of handled connections. Generally, the parameter value is the same as for the accepted connections, unless some resource limits have been reached (for example, the `worker_connections limit`).'
           preprocessing:
@@ -197,7 +191,6 @@ zabbix_export:
           type: DEPENDENT
           key: nginx.connections.reading
           delay: '0'
-          history: 7d
           description: 'The current number of connections where Nginx is reading the request header.'
           preprocessing:
             - type: REGEX
@@ -214,7 +207,6 @@ zabbix_export:
           type: DEPENDENT
           key: nginx.connections.waiting
           delay: '0'
-          history: 7d
           description: 'The current number of idle client connections waiting for a request.'
           preprocessing:
             - type: REGEX
@@ -231,7 +223,6 @@ zabbix_export:
           type: DEPENDENT
           key: nginx.connections.writing
           delay: '0'
-          history: 7d
           description: 'The current number of connections where Nginx is writing a response back to the client.'
           preprocessing:
             - type: REGEX
@@ -289,7 +280,6 @@ zabbix_export:
           type: DEPENDENT
           key: nginx.requests.total
           delay: '0'
-          history: 7d
           description: 'The total number of client requests.'
           preprocessing:
             - type: REGEX
@@ -306,7 +296,6 @@ zabbix_export:
           type: DEPENDENT
           key: nginx.requests.total.rate
           delay: '0'
-          history: 7d
           value_type: FLOAT
           description: 'The total number of client requests.'
           preprocessing:
@@ -327,7 +316,6 @@ zabbix_export:
           type: DEPENDENT
           key: nginx.version
           delay: '0'
-          history: 7d
           trends: '0'
           value_type: CHAR
           preprocessing:
