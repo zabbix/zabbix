@@ -187,6 +187,7 @@ type procStatus struct {
 	CtxSwitches   int64   `json:"ctx_switches"`
 	Threads       int64   `json:"threads"`
 	PageFaults    int64   `json:"page_faults"`
+	Pss           int64   `json:"pss"`
 }
 
 type procSummary struct {

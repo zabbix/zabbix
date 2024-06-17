@@ -24,6 +24,7 @@ import "C"
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -48,8 +49,11 @@ func read2k(filename string) (data []byte, err error) {
 	}
 	var n int
 	b := make([]byte, 2048)
-	if n, err = syscall.Read(fd, b); err == nil {
-		data = b[:n]
+	for {
+		if n, err = syscall.Read(fd, b); n == 0 && err == nil {
+			break
+		}
+		data = append(data, b[:n]...)
 	}
 	syscall.Close(fd)
 	return
@@ -154,6 +158,110 @@ func parseStateString(val string, state *string) {
 	}
 }
 
+func parseSmaps(pid string, proc *procStatus) error {
+	const pssAdjust = 512
+
+	var data []byte
+	var err error
+	if data, err = read2k("/proc/" + pid + "/smaps_rollup"); err != nil {
+		if data, err = read2k("/proc/" + pid + "/smaps"); err != nil {
+			return err
+		}
+	}
+
+	s := strings.Split(string(data), "\n")
+	var pos int
+	var tmp, privateHuge, sharedHuge, shared, private, pss int64
+	var havePss bool
+	for _, line := range s {
+		if pos = strings.IndexRune(line, ':'); pos == -1 {
+			continue
+		}
+
+		k := line[:pos]
+		v := strings.TrimSpace(line[pos+1:])
+
+		if trimUnit(v, &tmp); tmp == -1 {
+			continue
+		}
+
+		switch k {
+		case "Private_Hugetlb":
+			privateHuge += tmp
+			continue
+		case "Shared_Hugetlb":
+			sharedHuge += tmp
+			continue
+		case "Pss":
+			havePss = true
+			pss += (tmp + pssAdjust)
+			continue
+		}
+
+		if strings.HasPrefix(k, "Shared") {
+			shared += tmp
+		} else if strings.HasPrefix(k, "Private") {
+			private += tmp
+		}
+	}
+
+	if havePss {
+		shared = pss - private
+	}
+
+	private += privateHuge
+	proc.Pss = shared + private + sharedHuge
+
+	return nil
+}
+
+func parseStatm(pid string, proc *procStatus) error {
+	var shared, private int64
+	var data []byte
+	var err error
+
+	if data, err = os.ReadFile("/proc/" + pid + "/statm"); err != nil {
+		return err
+	}
+
+	psize := int64(os.Getpagesize() / 1024)
+	var lines []string
+	var rss int64
+
+	if lines = strings.Split(string(data), " "); len(lines) < 3 {
+		return errors.New("Invalid statm file format.")
+	}
+
+	if rss, err = strconv.ParseInt(lines[1], 10, 64); err != nil {
+		return errors.New("Failed to parse RSS column.")
+	}
+
+	if shared, err = strconv.ParseInt(lines[2], 10, 64); err != nil {
+		return err
+	}
+
+	shared *= psize
+	private = rss*psize - shared
+	private <<= 10
+	shared <<= 10
+
+	proc.Pss = shared + private
+
+	return nil
+}
+
+func getProcessPss(pid string, proc *procStatus) {
+	if err := parseSmaps(pid, proc); err == nil {
+		return
+	}
+
+	if err := parseStatm(pid, proc); err == nil {
+		return
+	}
+
+	proc.Pss = -1
+}
+
 func getProcessCalculatedMetrics(pid string, proc *procStatus) {
 	addNonNegative(&proc.Size, proc.Exe)
 	addNonNegative(&proc.Size, proc.Data)
@@ -166,6 +274,8 @@ func getProcessCalculatedMetrics(pid string, proc *procStatus) {
 	}
 
 	proc.Pmem = float64(proc.Rss) / float64(mem) * 100.00
+
+	getProcessPss(pid, proc)
 }
 
 func getProcessCpuTimes(pid string, proc *procStatus) {
