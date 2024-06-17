@@ -2279,11 +2279,7 @@ static int	am_check_dbstatus(void)
 	int		ret = ZBX_DB_OK;
 	zbx_db_result_t	res;
 
-#ifdef HAVE_ORACLE
-	res = zbx_db_select_once("select null from dual");
-#else
 	res = zbx_db_select_once("select null");
-#endif
 
 	if ((zbx_db_result_t)ZBX_DB_DOWN == res || NULL == res)
 	{
