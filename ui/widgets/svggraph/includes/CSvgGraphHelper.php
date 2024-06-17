@@ -253,14 +253,23 @@ class CSvgGraphHelper {
 
 				if ($tmp_items) {
 					$items = API::Item()->get([
-						'output' => ['itemid'],
+						'output' => ['itemid', 'templateid'],
 						'hostids' => [$override_hostid],
 						'webitems' => true,
 						'filter' => [
 							'key_' => array_column($tmp_items, 'key_')
 						]
 					]);
-					$data_set['itemids'] = $items ? array_column($items, 'itemid') : null;
+
+					if ($items) {
+						$itemids = array_combine($data_set['itemids'], $data_set['itemids']);
+						$templateids = array_column($items, 'itemid', 'templateid');
+
+						$data_set['itemids'] = array_values(array_replace($itemids, $templateids));
+					}
+					else {
+						$data_set['itemids'] = null;
+					}
 				}
 			}
 
