@@ -246,26 +246,38 @@ class CSvgGraphHelper {
 
 			if ($templateid !== '' && $override_hostid !== '') {
 				$tmp_items = API::Item()->get([
-					'output' => ['key_'],
+					'output' => ['itemid', 'key_'],
 					'itemids' => $data_set['itemids'],
-					'webitems' => true
+					'webitems' => true,
+					'preservekeys' => true
 				]);
 
 				if ($tmp_items) {
+					$keys_index = [];
+
+					foreach ($data_set['itemids'] as $item_index => $itemid) {
+						if (array_key_exists($itemid, $tmp_items)) {
+							$keys_index[$tmp_items[$itemid]['key_']] = $item_index;
+						}
+					}
+
 					$items = API::Item()->get([
-						'output' => ['itemid', 'templateid'],
+						'output' => ['itemid', 'templateid', 'key_'],
 						'hostids' => [$override_hostid],
 						'webitems' => true,
 						'filter' => [
-							'key_' => array_column($tmp_items, 'key_')
+							'key_' => array_keys($keys_index)
 						]
 					]);
 
 					if ($items) {
-						$itemids = array_combine($data_set['itemids'], $data_set['itemids']);
-						$templateids = array_column($items, 'itemid', 'templateid');
+						$data_set['itemids'] = [];
 
-						$data_set['itemids'] = array_values(array_replace($itemids, $templateids));
+						foreach ($items as $item) {
+							$data_set['itemids'][$keys_index[$item['key_']]] = $item['itemid'];
+						}
+
+						ksort($data_set['itemids']);
 					}
 					else {
 						$data_set['itemids'] = null;
@@ -289,21 +301,9 @@ class CSvgGraphHelper {
 				'limit' => $max_metrics
 			]);
 
-			$items = [];
-
-			foreach ($data_set['itemids'] as $itemid) {
-				if (array_key_exists($itemid, $db_items)) {
-					$items[] = $resolve_macros
-						? CArrayHelper::renameKeys($db_items[$itemid], ['name_resolved' => 'name'])
-						: $db_items[$itemid];
-				}
-			}
-
-			if (!$items) {
+			if (!$db_items) {
 				continue;
 			}
-
-			unset($data_set['itemids']);
 
 			// The bigger transparency level, the less visible the metric is.
 			$data_set['transparency'] = 10 - (int) $data_set['transparency'];
@@ -312,12 +312,26 @@ class CSvgGraphHelper {
 				? (int) timeUnitToSeconds($data_set['timeshift'])
 				: 0;
 
-			$colors = $data_set['color'];
+			$itemids = $data_set['itemids'];
+			$itemids_index = array_flip($itemids);
 
-			foreach ($items as $item) {
-				$data_set['color'] = '#'.array_shift($colors);
-				$metrics[] = $item + ['data_set' => $index, 'options' => $data_set];
-				$max_metrics--;
+			unset($data_set['itemids']);
+
+			foreach ($itemids as $itemid) {
+				if (array_key_exists($itemid, $db_items)) {
+					$item = $resolve_macros
+						? CArrayHelper::renameKeys($db_items[$itemid], ['name_resolved' => 'name'])
+						: $db_items[$itemid];
+
+					$metrics[] = $item + [
+						'data_set' => $index,
+						'options' => [
+							'color' => '#'.$data_set['color'][$itemids_index[$itemid]]
+						] + $data_set
+					];
+
+					$max_metrics--;
+				}
 			}
 		}
 	}
