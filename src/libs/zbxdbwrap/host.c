@@ -348,8 +348,7 @@ static int	validate_linked_templates(const zbx_vector_uint64_t *templateids, cha
 	{
 		sql_offset = 0;
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-				/* don't remove "description2 and host2" aliases, the ORACLE needs them */
-				"select t1.description,h1.host,t2.description as description2,h2.host as host2"
+				"select t1.description,h1.host"
 				" from trigger_depends td,triggers t1,functions f1,items i1,hosts h1,"
 					"triggers t2,functions f2,items i2,hosts h2"
 				" where td.triggerid_down=t1.triggerid"
@@ -594,8 +593,7 @@ static int	validate_httptests(zbx_uint64_t hostid, const zbx_vector_uint64_t *te
 
 		sql_offset = 0;
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				/* don't remove "h_httpstepid" alias, the ORACLE needs it */
-				"select t.httpstepid,h.httpstepid as h_httpstepid"
+				"select t.httpstepid,h.httpstepid"
 				" from httpstep t"
 					" left join httpstep h"
 						" on h.httptestid=" ZBX_FS_UI64
@@ -604,7 +602,7 @@ static int	validate_httptests(zbx_uint64_t hostid, const zbx_vector_uint64_t *te
 				" where t.httptestid=" ZBX_FS_UI64
 					" and h.httpstepid is null"
 				" union "
-				"select t.httpstepid,h.httpstepid as h_httpstepid"
+				"select t.httpstepid,h.httpstepid"
 				" from httpstep h"
 					" left outer join httpstep t"
 						" on t.httptestid=" ZBX_FS_UI64
@@ -1370,7 +1368,7 @@ static int	db_get_linked_items(zbx_vector_uint64_t *itemids, int audit_context_m
 
 	zbx_vector_uint64_sort(itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	for(;;)
+	for (;;)
 	{
 		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, field, pitemids->values,
 				pitemids->values_num);
