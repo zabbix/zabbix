@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "zbxconnector.h"
@@ -22,6 +17,13 @@
 #include "zbxipcservice.h"
 #include "zbxserialize.h"
 #include "zbxalgo.h"
+
+ZBX_PTR_VECTOR_IMPL(connector_stat_ptr, zbx_connector_stat_t *)
+
+void     connector_stat_free(zbx_connector_stat_t *connector_stat)
+{
+	zbx_free(connector_stat);
+}
 
 static int	connector_initialized;
 
@@ -208,7 +210,7 @@ void	zbx_connector_unpack_top_request(int *limit, const unsigned char *data)
  *             data            - [IN] memory buffer for packed data           *
  *                                                                            *
  ******************************************************************************/
-static void	connector_unpack_top_result(zbx_vector_ptr_t *connector_stats, const unsigned char *data)
+static void	connector_unpack_top_result(zbx_vector_connector_stat_ptr_t *connector_stats, const unsigned char *data)
 {
 	int	i, connectors_num;
 
@@ -216,7 +218,7 @@ static void	connector_unpack_top_result(zbx_vector_ptr_t *connector_stats, const
 
 	if (0 != connectors_num)
 	{
-		zbx_vector_ptr_reserve(connector_stats, (size_t)connectors_num);
+		zbx_vector_connector_stat_ptr_reserve(connector_stats, (size_t)connectors_num);
 
 		for (i = 0; i < connectors_num; i++)
 		{
@@ -227,7 +229,7 @@ static void	connector_unpack_top_result(zbx_vector_ptr_t *connector_stats, const
 			data += zbx_deserialize_value(data, &connector_stat->values_num);
 			data += zbx_deserialize_value(data, &connector_stat->links_num);
 			data += zbx_deserialize_value(data, &connector_stat->queued_links_num);
-			zbx_vector_ptr_append(connector_stats, connector_stat);
+			zbx_vector_connector_stat_ptr_append(connector_stats, connector_stat);
 		}
 	}
 }
@@ -237,7 +239,8 @@ static void	connector_unpack_top_result(zbx_vector_ptr_t *connector_stats, const
  * Purpose: get the top N connectors by the number of queued values           *
  *                                                                            *
  ******************************************************************************/
-static int	connector_get_top_items(int limit, zbx_vector_ptr_t *items, char **error, zbx_uint32_t code)
+static int	connector_get_top_items(int limit, zbx_vector_connector_stat_ptr_t *items, char **error,
+		zbx_uint32_t code)
 {
 	int		ret;
 	unsigned char	*data, *result;
@@ -272,7 +275,7 @@ out:
  * Purpose: get the top N connectors by the number of queued values           *
  *                                                                            *
  ******************************************************************************/
-int	zbx_connector_get_top_connectors(int limit, zbx_vector_ptr_t *items, char **error)
+int	zbx_connector_get_top_connectors(int limit, zbx_vector_connector_stat_ptr_t *items, char **error)
 {
 	return connector_get_top_items(limit, items, error, ZBX_IPC_CONNECTOR_TOP_CONNECTORS);
 }

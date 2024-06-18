@@ -1,21 +1,16 @@
 <?php declare(strict_types = 0);
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -38,7 +33,7 @@ class CControllerMediatypeMessageEdit extends CController {
 	protected function checkInput(): bool {
 		$fields = [
 			'type' =>				'in '.implode(',', array_keys(CMediatypeHelper::getMediaTypes())),
-			'content_type' =>		'in '.SMTP_MESSAGE_FORMAT_PLAIN_TEXT.','.SMTP_MESSAGE_FORMAT_HTML,
+			'message_format' =>		'in '.ZBX_MEDIA_MESSAGE_FORMAT_TEXT.','.ZBX_MEDIA_MESSAGE_FORMAT_HTML,
 			'message_type' =>		'in -1,'.implode(',', $this->message_types),
 			'old_message_type' =>	'in -1,'.implode(',', $this->message_types),
 			'message_types' =>		'array',
@@ -68,7 +63,7 @@ class CControllerMediatypeMessageEdit extends CController {
 	protected function doAction(): void {
 		$data = [
 			'type' => $this->getInput('type'),
-			'content_type' => $this->getInput('content_type'),
+			'message_format' => $this->getInput('message_format'),
 			'message_type' => $this->getInput('message_type', -1),
 			'old_message_type' => $this->getInput('old_message_type', -1),
 			'message_types' => $this->getInput('message_types', []),
@@ -86,7 +81,7 @@ class CControllerMediatypeMessageEdit extends CController {
 			$diff = reset($diff);
 			$data['message_type'] = $diff ?: CMediatypeHelper::MSG_TYPE_PROBLEM;
 			$message_template = CMediatypeHelper::getMessageTemplate($data['type'], $data['message_type'],
-				$data['content_type']
+				$data['message_format']
 			);
 			$data['subject'] = $message_template['subject'];
 			$data['message'] = $message_template['message'];

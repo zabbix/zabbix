@@ -1,24 +1,23 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "datasender.h"
 
+#include "../taskmanager/taskmanager_proxy.h"
+
+#include "version.h"
+#include "zbxtimekeeper.h"
 #include "zbxcommshigh.h"
 #include "zbxlog.h"
 #include "zbxnix.h"
@@ -27,13 +26,10 @@
 #include "zbxtasks.h"
 #include "zbxcompress.h"
 #include "zbxtime.h"
-#include "../taskmanager/taskmanager_proxy.h"
 #include "zbxjson.h"
 #include "zbxproxybuffer.h"
-#include "version.h"
 #include "zbxcacheconfig.h"
 #include "zbxdbhigh.h"
-#include "zbxtypes.h"
 
 #define ZBX_DATASENDER_AVAILABILITY		0x0001
 #define ZBX_DATASENDER_HISTORY			0x0002
@@ -262,6 +258,8 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state, const z
 					zbx_pb_update_state(*more);
 			}
 		}
+
+		zbx_dc_set_proxy_lastonline(now);
 
 		zbx_disconnect_from_server(&sock);
 	}

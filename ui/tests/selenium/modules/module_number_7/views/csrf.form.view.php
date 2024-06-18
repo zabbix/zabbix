@@ -8,7 +8,7 @@ $form = (new CForm())
 $grid = new CFormGrid();
 
 $grid->addItem([
-	new CLabel(_('Text')),
+	new CLabel('Text'),
 	new CFormField(
 		(new CInput('text', 'text', $data['text']))
 	)
@@ -17,11 +17,11 @@ $grid->addItem([
 $form->addItem((new CTabView())
 	->addTab('default', null, $grid)
 	->setFooter(makeFormFooter(
-		(new CSubmit('preview', _('Submit')))->setAttribute('value', 1)
+		(new CSubmit('preview', 'Submit'))->setAttribute('value', 1)
 	))
 );
 
 (new CHtmlPage())
-	->setTitle(_('CSRF token test'))
+	->setTitle('CSRF token test')
 	->addItem($form)
 	->show();

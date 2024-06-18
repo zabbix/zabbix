@@ -28,4 +28,5 @@ libzbxpreproc_a_SOURCES = \
 
 libzbxpreproc_a_CFLAGS = \
 	$(LIBXML2_CFLAGS) \
-	$(TLS_CFLAGS)
+	$(TLS_CFLAGS) \
+	$(SNMP_CFLAGS)

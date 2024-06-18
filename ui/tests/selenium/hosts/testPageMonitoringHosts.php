@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -103,6 +98,7 @@ class testPageMonitoringHosts extends CWebTest {
 
 	public static function getCheckFilterData() {
 		return [
+			// #0.
 			[
 				[
 					'filter' => [
@@ -113,6 +109,7 @@ class testPageMonitoringHosts extends CWebTest {
 					]
 				]
 			],
+			// #1.
 			[
 				[
 					'filter' => [
@@ -126,6 +123,7 @@ class testPageMonitoringHosts extends CWebTest {
 					]
 				]
 			],
+			// #2.
 			[
 				[
 					'filter' => [
@@ -137,6 +135,7 @@ class testPageMonitoringHosts extends CWebTest {
 					]
 				]
 			],
+			// #3.
 			[
 				[
 					'filter' => [
@@ -151,17 +150,18 @@ class testPageMonitoringHosts extends CWebTest {
 					]
 				]
 			],
+			// #4.
 			[
 				[
 					'filter' => [
 						'Port' => '161'
 					],
 					'expected' => [
-						'Test item host',
-						'Visible host for template linkage'
+						'Test item host'
 					]
 				]
 			],
+			// #5.
 			[
 				[
 					'filter' => [
@@ -175,6 +175,7 @@ class testPageMonitoringHosts extends CWebTest {
 					]
 				]
 			],
+			// #6.
 			[
 				[
 					'filter' => [
@@ -188,6 +189,7 @@ class testPageMonitoringHosts extends CWebTest {
 					]
 				]
 			],
+			// #7.
 			[
 				[
 					'filter' => [
@@ -200,6 +202,7 @@ class testPageMonitoringHosts extends CWebTest {
 					]
 				]
 			],
+			// #8.
 			[
 				[
 					'filter' => [
@@ -212,6 +215,7 @@ class testPageMonitoringHosts extends CWebTest {
 					]
 				]
 			],
+			// #9.
 			[
 				[
 					'filter' => [
@@ -228,6 +232,7 @@ class testPageMonitoringHosts extends CWebTest {
 					]
 				]
 			],
+			// #10.
 			[
 				[
 					'filter' => [
@@ -238,6 +243,7 @@ class testPageMonitoringHosts extends CWebTest {
 					]
 				]
 			],
+			// #11.
 			[
 				[
 					'filter' => [
@@ -245,10 +251,11 @@ class testPageMonitoringHosts extends CWebTest {
 						'Host groups' => ['Zabbix server']
 					],
 					'expected' => [
-						'No data found.'
+						'No data found'
 					]
 				]
 			],
+			// #12.
 			[
 				[
 					'filter' => [
@@ -263,6 +270,7 @@ class testPageMonitoringHosts extends CWebTest {
 					]
 				]
 			],
+			// #13.
 			[
 				[
 					'filter' => [
@@ -277,6 +285,7 @@ class testPageMonitoringHosts extends CWebTest {
 					]
 				]
 			],
+			// #14.
 			[
 				[
 					'filter' => [
@@ -291,6 +300,7 @@ class testPageMonitoringHosts extends CWebTest {
 					]
 				]
 			],
+			// #15.
 			[
 				[
 					'filter' => [
@@ -308,6 +318,7 @@ class testPageMonitoringHosts extends CWebTest {
 					]
 				]
 			],
+			// #16.
 			[
 				[
 					'filter' => [
@@ -330,6 +341,7 @@ class testPageMonitoringHosts extends CWebTest {
 					]
 				]
 			],
+			// #17.
 			[
 				[
 					'filter' => [
@@ -338,7 +350,7 @@ class testPageMonitoringHosts extends CWebTest {
 					'expected' => []
 				]
 			],
-			// With name 'maintenance', exists 3 hosts in maintenance status. Unchecking 'Show hosts in maintenance'.
+			// #18 With name 'maintenance', exists 3 hosts in maintenance status. Unchecking 'Show hosts in maintenance'.
 			[
 				[
 					'filter' => [
@@ -348,6 +360,7 @@ class testPageMonitoringHosts extends CWebTest {
 					'expected' => []
 				]
 			],
+			// #19.
 			[
 				[
 					'filter' => [
@@ -380,6 +393,7 @@ class testPageMonitoringHosts extends CWebTest {
 
 	public static function getTagsFilterData() {
 		return [
+			// #0.
 			[
 				[
 					'tag_options' => [
@@ -393,6 +407,7 @@ class testPageMonitoringHosts extends CWebTest {
 					]
 				]
 			],
+			// #1.
 			[
 				[
 					'tag_options' => [
@@ -406,6 +421,7 @@ class testPageMonitoringHosts extends CWebTest {
 					]
 				]
 			],
+			// #2.
 			[
 				[
 					'tag_options' => [
@@ -421,6 +437,7 @@ class testPageMonitoringHosts extends CWebTest {
 					]
 				]
 			],
+			// #3.
 			[
 				[
 					'tag_options' => [
@@ -436,6 +453,7 @@ class testPageMonitoringHosts extends CWebTest {
 					]
 				]
 			],
+			// #4.
 			[
 				[
 					'tag_options' => [
@@ -450,6 +468,7 @@ class testPageMonitoringHosts extends CWebTest {
 					]
 				]
 			],
+			// #5.
 			[
 				[
 					'tag_options' => [
@@ -467,7 +486,7 @@ class testPageMonitoringHosts extends CWebTest {
 					]
 				]
 			],
-			// Wrote 'template' in lowercase.
+			// #6 Wrote 'template' in lowercase.
 			[
 				[
 					'tag_options' => [
@@ -479,7 +498,7 @@ class testPageMonitoringHosts extends CWebTest {
 					'result' => []
 				]
 			],
-			// Non-existing tag.
+			// #7 Non-existing tag.
 			[
 				[
 					'tag_options' => [
@@ -491,6 +510,7 @@ class testPageMonitoringHosts extends CWebTest {
 					'result' => []
 				]
 			],
+			// #8.
 			[
 				[
 					'tag_options' => [
@@ -504,6 +524,7 @@ class testPageMonitoringHosts extends CWebTest {
 					]
 				]
 			],
+			// #9.
 			[
 				[
 					'tag_options' => [
@@ -517,6 +538,7 @@ class testPageMonitoringHosts extends CWebTest {
 					]
 				]
 			],
+			// #10.
 			[
 				[
 					'tag_options' => [
@@ -531,6 +553,7 @@ class testPageMonitoringHosts extends CWebTest {
 					]
 				]
 			],
+			// #11.
 			[
 				[
 					'tag_options' => [
@@ -547,6 +570,7 @@ class testPageMonitoringHosts extends CWebTest {
 					]
 				]
 			],
+			// #12.
 			[
 				[
 					'tag_options' => [
@@ -560,11 +584,11 @@ class testPageMonitoringHosts extends CWebTest {
 						'Host for tags filtering - update',
 						'Simple form test host',
 						'SLA reports host',
-						'Template inheritance test host',
-						'ЗАББИКС Сервер'
+						'Template inheritance test host'
 					]
 				]
 			],
+			// #13.
 			[
 				[
 					'tag_options' => [
@@ -578,11 +602,11 @@ class testPageMonitoringHosts extends CWebTest {
 						'Host for tags filtering - update',
 						'Simple form test host',
 						'SLA reports host',
-						'Template inheritance test host',
-						'ЗАББИКС Сервер'
+						'Template inheritance test host'
 					]
 				]
 			],
+			// #14.
 			[
 				[
 					'tag_options' => [
@@ -595,11 +619,11 @@ class testPageMonitoringHosts extends CWebTest {
 					'result' => [
 						'Simple form test host',
 						'SLA reports host',
-						'Template inheritance test host',
-						'ЗАББИКС Сервер'
+						'Template inheritance test host'
 					]
 				]
 			],
+			// #15.
 			[
 				[
 					'tag_options' => [
@@ -612,11 +636,11 @@ class testPageMonitoringHosts extends CWebTest {
 					'result' => [
 						'Simple form test host',
 						'SLA reports host',
-						'Template inheritance test host',
-						'ЗАББИКС Сервер'
+						'Template inheritance test host'
 					]
 				]
 			],
+			// #16.
 			[
 				[
 					'tag_options' => [
@@ -630,11 +654,11 @@ class testPageMonitoringHosts extends CWebTest {
 						'Host for tags filtering - update',
 						'Simple form test host',
 						'SLA reports host',
-						'Template inheritance test host',
-						'ЗАББИКС Сервер'
+						'Template inheritance test host'
 					]
 				]
 			],
+			// #17.
 			[
 				[
 					'tag_options' => [
@@ -648,11 +672,11 @@ class testPageMonitoringHosts extends CWebTest {
 						'Host for tags filtering - update',
 						'Simple form test host',
 						'SLA reports host',
-						'Template inheritance test host',
-						'ЗАББИКС Сервер'
+						'Template inheritance test host'
 					]
 				]
 			],
+			// #18.
 			[
 				[
 					'tag_options' => [
@@ -666,11 +690,11 @@ class testPageMonitoringHosts extends CWebTest {
 						'Host for tags filtering - update',
 						'Simple form test host',
 						'SLA reports host',
-						'Template inheritance test host',
-						'ЗАББИКС Сервер'
+						'Template inheritance test host'
 					]
 				]
 			],
+			// #19.
 			[
 				[
 					'tag_options' => [
@@ -686,11 +710,11 @@ class testPageMonitoringHosts extends CWebTest {
 						'Host for tags filtering - update',
 						'Simple form test host',
 						'SLA reports host',
-						'Template inheritance test host',
-						'ЗАББИКС Сервер'
+						'Template inheritance test host'
 					]
 				]
 			],
+			// #20.
 			[
 				[
 					'tag_options' => [
@@ -702,11 +726,11 @@ class testPageMonitoringHosts extends CWebTest {
 					'result' => [
 						'Simple form test host',
 						'SLA reports host',
-						'Template inheritance test host',
-						'ЗАББИКС Сервер'
+						'Template inheritance test host'
 					]
 				]
 			],
+			// #21.
 			[
 				[
 					'tag_options' => [
@@ -718,11 +742,11 @@ class testPageMonitoringHosts extends CWebTest {
 					'result' => [
 						'Simple form test host',
 						'SLA reports host',
-						'Template inheritance test host',
-						'ЗАББИКС Сервер'
+						'Template inheritance test host'
 					]
 				]
 			],
+			// #22.
 			[
 				[
 					'tag_options' => [
@@ -735,11 +759,11 @@ class testPageMonitoringHosts extends CWebTest {
 					'result' => [
 						'Simple form test host',
 						'SLA reports host',
-						'Template inheritance test host',
-						'ЗАББИКС Сервер'
+						'Template inheritance test host'
 					]
 				]
 			],
+			// #23.
 			[
 				[
 					'tag_options' => [
@@ -754,11 +778,11 @@ class testPageMonitoringHosts extends CWebTest {
 						'Host for tags filtering - update',
 						'Simple form test host',
 						'SLA reports host',
-						'Template inheritance test host',
-						'ЗАББИКС Сервер'
+						'Template inheritance test host'
 					]
 				]
 			],
+			// #24.
 			[
 				[
 					'tag_options' => [
@@ -773,6 +797,7 @@ class testPageMonitoringHosts extends CWebTest {
 					]
 				]
 			],
+			// #25.
 			[
 				[
 					'tag_options' => [
@@ -1167,7 +1192,7 @@ class testPageMonitoringHosts extends CWebTest {
 					'counters' => [
 						[
 							'column' => 'Dashboards',
-							'counter' => 4
+							'counter' => 5
 						],
 						[
 							'column' => 'Problems',

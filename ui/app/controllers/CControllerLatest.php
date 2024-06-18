@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -54,6 +49,9 @@ abstract class CControllerLatest extends CController {
 		'subfilter_state' => [],
 		'subfilter_data' => []
 	];
+
+	// Mandatory filter fields.
+	public const MANDATORY_FILTER_FIELDS = ['groupids', 'hostids', 'name', 'tags', 'state'];
 
 	/**
 	 * Prepare the latest data based on the given filter and sorting options.
@@ -564,6 +562,59 @@ abstract class CControllerLatest extends CController {
 	}
 
 	/**
+	 * Clean the filter from non-existing hosts and host group IDs.
+	 *
+	 * @param array $filter
+	 *
+	 * $filter = [
+	 *     'groupids' =>          (array)  Group IDs from filter to check.
+	 *     'hostids' =>           (array)  Host IDs from filter to check.
+	 *     'subfilter_hostids' => (array)  Host IDs from sub-filter to check.
+	 * ]
+	 *
+	 * @return array
+	 */
+	protected static function sanitizeFilter(array $filter): array {
+		if ($filter['hostids']) {
+			$hosts = API::Host()->get([
+				'output' => [],
+				'hostids' => $filter['hostids'],
+				'preservekeys' => true
+			]);
+
+			$filter['hostids'] = array_filter($filter['hostids'], static fn($hostid) =>
+				array_key_exists($hostid, $hosts)
+			);
+		}
+
+		if ($filter['subfilter_hostids']) {
+			$hosts = API::Host()->get([
+				'output' => [],
+				'hostids' => $filter['subfilter_hostids'],
+				'preservekeys' => true
+			]);
+
+			$filter['subfilter_hostids'] = array_filter($filter['subfilter_hostids'], static fn($hostid) =>
+				array_key_exists($hostid, $hosts)
+			);
+		}
+
+		if ($filter['groupids']) {
+			$groups = API::HostGroup()->get([
+				'output' => [],
+				'groupids' => $filter['groupids'],
+				'preservekeys' => true
+			]);
+
+			$filter['groupids'] = array_filter($filter['groupids'], static fn($groupid) =>
+				array_key_exists($groupid, $groups)
+			);
+		}
+
+		return $filter;
+	}
+
+	/**
 	 * Calculate which items retrieved using the primary filter matches selected subfilter options. Results are added to
 	 * the array stored with 'matching_subfilters' key for each retrieved item. Additionally 'has_data' flag is added to
 	 * each of retrieved item to indicate either particular item has data.
@@ -762,5 +813,45 @@ abstract class CControllerLatest extends CController {
 		CArrayHelper::sort($top_priority_fields, ['name']);
 
 		return $top_priority_fields;
+	}
+
+	/**
+	 * Check if at least one of mandatory filter fields is set.
+	 *
+	 * @param array $filter
+	 *
+	 * @return bool
+	 */
+	public static function isMandatoryFilterFieldSet(array $filter): bool {
+		$mandatory_field_defaults = array_intersect_key(
+			self::FILTER_FIELDS_DEFAULT, array_flip(self::MANDATORY_FILTER_FIELDS)
+		);
+
+		foreach ($mandatory_field_defaults as $field => $value) {
+			if ($filter[$field] != $value) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Check if at least one of subfilters is set.
+	 *
+	 * @param array $filter
+	 *
+	 * @return bool
+	 */
+	public static function isSubfilterSet(array $filter): bool {
+		$subfilters = ['subfilter_hostids','subfilter_tagnames','subfilter_tags','subfilter_state','subfilter_data'];
+
+		foreach ($subfilters as $subfilter) {
+			if ($filter[$subfilter]) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 }

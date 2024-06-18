@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -25,10 +20,11 @@ require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
 require_once dirname(__FILE__).'/behaviors/CPreprocessingBehavior.php';
 
 /**
- * @dataSource Services
- * @dataSource EntitiesTags
+ * @dataSource Services, EntitiesTags
  *
- * @backup profiles
+ * @onBefore prepareMediaTypeData
+ *
+ * @backup users
  */
 class testFormTabIndicators extends CWebTest {
 
@@ -41,13 +37,35 @@ class testFormTabIndicators extends CWebTest {
 		return [CPreprocessingBehavior::class];
 	}
 
+	/**
+	 * Enable media types before test.
+	 */
+	public function prepareMediaTypeData() {
+
+		CDataHelper::call('user.update', [
+			[
+				'userid' => 1,
+				'medias' => [
+					[
+						'mediatypeid' => 1, // Email.
+						'sendto' => ['test@zabbix.com'],
+						'active' => MEDIA_TYPE_STATUS_ACTIVE,
+						'severity' => 63,
+						'period' => '1-7,00:00-24:00'
+					]
+				]
+			]
+		]);
+	}
+
 	public function getTabData() {
 		return [
-			// Template configuration form tab data.
+			// #0 Template configuration form tab data.
 			[
 				[
 					'url' => 'zabbix.php?action=template.list',
 					'form' => 'name:templatesForm',
+					'close_dialog' => true,
 					'tabs' => [
 						[
 							'name' => 'Tags',
@@ -97,7 +115,7 @@ class testFormTabIndicators extends CWebTest {
 					]
 				]
 			],
-			// Host configuration form tab data.
+			// #1 Host configuration form tab data.
 			[
 				[
 					'url' => 'zabbix.php?action=host.edit',
@@ -175,7 +193,7 @@ class testFormTabIndicators extends CWebTest {
 					]
 				]
 			],
-			// Host prototype configuration form tab data.
+			// #2 Host prototype configuration form tab data.
 			[
 				[
 					'url' => 'host_prototypes.php?form=create&parent_discoveryid=42275&context=host',
@@ -222,12 +240,13 @@ class testFormTabIndicators extends CWebTest {
 					]
 				]
 			],
-			// Item configuration form tab data.
+			// #3 Item configuration form tab data.
 			[
 				[
 					'url' => 'zabbix.php?action=item.list&filter_set=1&context=host&filter_hostids[0]=10084',
 					'create_button' => 'Create item',
 					'form' => 'name:itemForm',
+					'close_dialog' => true,
 					'tabs' => [
 						[
 							'name' => 'Preprocessing',
@@ -250,12 +269,13 @@ class testFormTabIndicators extends CWebTest {
 					]
 				]
 			],
-			// Item prototype configuration form tab data.
+			// #4 Item prototype configuration form tab data.
 			[
 				[
 					'url' => 'zabbix.php?action=item.prototype.list&parent_discoveryid=42275&context=host',
 					'create_button' => 'Create item prototype',
 					'form' => 'name:itemForm',
+					'close_dialog' => true,
 					'tabs' => [
 						[
 							'name' => 'Preprocessing',
@@ -278,12 +298,13 @@ class testFormTabIndicators extends CWebTest {
 					]
 				]
 			],
-			// Trigger configuration form tab data.
+			// #5 Trigger configuration form tab data.
 			[
 				[
 					'url' => 'zabbix.php?action=trigger.list&filter_set=1&filter_hostids%5B0%5D=40001&context=host',
 					'create_button' => 'Create trigger',
 					'form' => 'id:trigger-edit',
+					'close_dialog' => true,
 					'tabs' => [
 						[
 							'name' => 'Tags',
@@ -313,12 +334,13 @@ class testFormTabIndicators extends CWebTest {
 					]
 				]
 			],
-			// Trigger prototype configuration form tab data.
+			// #6 Trigger prototype configuration form tab data.
 			[
 				[
 					'url' => 'zabbix.php?action=trigger.prototype.list&parent_discoveryid=133800&context=host',
 					'create_button' => 'Create trigger prototype',
 					'form' => 'id:trigger-edit',
+					'close_dialog' => true,
 					'tabs' => [
 						[
 							'name' => 'Tags',
@@ -351,7 +373,7 @@ class testFormTabIndicators extends CWebTest {
 					]
 				]
 			],
-			// LLD rule configuration form tab data.
+			// #7 LLD rule configuration form tab data.
 			[
 				[
 					'url' => 'host_discovery.php?form=create&context=host&hostid=10084',
@@ -419,7 +441,7 @@ class testFormTabIndicators extends CWebTest {
 					]
 				]
 			],
-			// Web scenarios configuration form tab data.
+			// #8 Web scenarios configuration form tab data.
 			[
 				[
 					'url' => 'httpconf.php?form=create&context=host&hostid=10084',
@@ -450,12 +472,13 @@ class testFormTabIndicators extends CWebTest {
 					]
 				]
 			],
-			// Proxy configuration form tab data.
+			// #9 Proxy configuration form tab data.
 			[
 				[
 					'url' => 'zabbix.php?action=proxy.list',
 					'create_button' => 'Create proxy',
 					'form' => 'id:proxy-form',
+					'close_dialog' => true,
 					'tabs' => [
 						[
 							'name' => 'Encryption',
@@ -469,7 +492,7 @@ class testFormTabIndicators extends CWebTest {
 					]
 				]
 			],
-			// Authentication configuration form tab data.
+			// #10 Authentication configuration form tab data.
 			[
 				[
 					'url' => 'zabbix.php?action=authentication.edit',
@@ -505,7 +528,7 @@ class testFormTabIndicators extends CWebTest {
 					]
 				]
 			],
-			// User configuration form tab data.
+			// #11 User configuration form tab data.
 			[
 				[
 					'url' => 'zabbix.php?action=user.edit',
@@ -527,12 +550,13 @@ class testFormTabIndicators extends CWebTest {
 					]
 				]
 			],
-			// Media type configuration form tab data.
+			// #12 Media type configuration form tab data.
 			[
 				[
 					'url' => 'zabbix.php?action=mediatype.list',
 					'create_button' => 'Create media type',
 					'form' => 'id:media-type-form',
+					'close_dialog' => true,
 					'tabs' => [
 						[
 							'name' => 'Message templates',
@@ -554,12 +578,13 @@ class testFormTabIndicators extends CWebTest {
 					]
 				]
 			],
-			// Graph widget configuration form tab data.
+			// #13 Graph widget configuration form tab data.
 			[
 				[
 					'url' => 'zabbix.php?action=dashboard.view',
 					'form' => 'id:widget-dialogue-form',
 					'widget_type' => 'Graph',
+					'close_dialog' => true,
 					'tabs' => [
 						[
 							'name' => 'Data set',
@@ -616,12 +641,13 @@ class testFormTabIndicators extends CWebTest {
 					]
 				]
 			],
-			// Pie chart widget configuration form tab data.
+			// #14 Pie chart widget configuration form tab data.
 			[
 				[
 					'url' => 'zabbix.php?action=dashboard.view',
 					'form' => 'id:widget-dialogue-form',
 					'widget_type' => 'Pie chart',
+					'close_dialog' => true,
 					'tabs' => [
 						[
 							'name' => 'Data set',
@@ -662,7 +688,7 @@ class testFormTabIndicators extends CWebTest {
 					]
 				]
 			],
-			// Map configuration form tab data.
+			// #15 Map configuration form tab data.
 			[
 				[
 					'url' => 'sysmaps.php?form=Create+map',
@@ -680,7 +706,7 @@ class testFormTabIndicators extends CWebTest {
 					]
 				]
 			],
-			// User profile configuration form tab data.
+			// #16 User profile configuration form tab data.
 			[
 				[
 					'url' => 'zabbix.php?action=userprofile.edit',
@@ -698,8 +724,8 @@ class testFormTabIndicators extends CWebTest {
 								]
 							],
 							'field_type' => 'overlay_dialogue',
-							'initial_count' => 5,
-							'count' => 7
+							'initial_count' => 1,
+							'count' => 3
 						],
 						[
 							'name' => 'Frontend notifications',
@@ -775,7 +801,7 @@ class testFormTabIndicators extends CWebTest {
 			$this->assertTabIndicator($tab_selector, $old_value);
 		}
 
-		if (CTestArrayHelper::get($data, 'create_button')) {
+		if (CTestArrayHelper::get($data, 'close_dialog')) {
 			COverlayDialogElement::find()->one()->waitUntilReady()->close();
 		}
 	}
@@ -785,8 +811,8 @@ class testFormTabIndicators extends CWebTest {
 		$this->query('button:Create action')->one()->click()->waitUntilReady();
 
 		// Open Operations tab and check indicator value.
-		$dialog = COverlayDialogElement::find()->waitUntilReady();
-		$form = $dialog->asForm()->one();
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		$form = $dialog->asForm();
 		$form->selectTab('Operations');
 		$tab_selector = $form->query('xpath:.//a[text()="Operations"]')->one()->waitUntilVisible();
 		$this->assertTabIndicator($tab_selector, 0);
@@ -810,6 +836,8 @@ class testFormTabIndicators extends CWebTest {
 		// Remove the previously created operations and check indicator value.
 		$form->query('button:Remove')->all()->click();
 		$this->assertTabIndicator($tab_selector, 0);
+
+		$dialog->close();
 	}
 
 	public function testFormTabIndicators_CheckUserGroupIndicators() {
@@ -880,7 +908,7 @@ class testFormTabIndicators extends CWebTest {
 
 		// Check status indicator in Child services tab.
 		$this->query('button:Create service')->one()->waitUntilClickable()->click();
-		COverlayDialogElement::find()->one()->waitUntilReady();
+		$main_dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$form = $this->query('id:service-form')->asForm()->one();
 		$form->selectTab('Child services');
 		$tab_selector = $form->query('xpath:.//a[text()="Child services"]')->one();
@@ -924,6 +952,8 @@ class testFormTabIndicators extends CWebTest {
 		// Remove the tags and check count indicator.
 		$form->query('class:tags-table')->one()->query('button:Remove')->all()->click();
 		$this->assertTabIndicator($tab_selector, 0);
+
+		$main_dialog->close();
 	}
 
 	/*

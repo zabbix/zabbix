@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 // package resultcache provides result caching component.
@@ -46,9 +41,9 @@ import (
 	"sync"
 	"time"
 
-	"git.zabbix.com/ap/plugin-support/log"
-	"git.zabbix.com/ap/plugin-support/plugin"
-	"zabbix.com/internal/agent"
+	"golang.zabbix.com/agent2/internal/agent"
+	"golang.zabbix.com/sdk/log"
+	"golang.zabbix.com/sdk/plugin"
 )
 
 const (
@@ -88,11 +83,12 @@ type AgentCommands struct {
 
 type AgentDataRequest struct {
 	Request  string           `json:"request"`
-	Data     []*AgentData     `json:"data",omitempty"`
+	Data     []*AgentData     `json:"data,omitempty"`
 	Commands []*AgentCommands `json:"commands,omitempty"`
 	Session  string           `json:"session"`
 	Host     string           `json:"host"`
 	Version  string           `json:"version"`
+	Variant  int              `json:"variant"`
 }
 
 type Uploader interface {

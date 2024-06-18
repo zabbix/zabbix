@@ -1,9 +1,18 @@
 SUBDIRS = \
 	zbxcommon \
+	zbxnum \
+	zbxstr \
+	zbxexpr \
+	zbxvariant \
+	zbxtime \
+	zbxxml \
+	zbxparam \
 	zbxcfg \
-	zbxdbcache \
+	zbxcachevalue \
+	zbxcacheconfig \
 	zbxdbhigh \
 	zbxhistory \
+	zbxicmpping \
 	zbxjson \
 	zbxmodules \
 	zbxpoller \

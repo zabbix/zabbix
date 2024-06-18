@@ -1,21 +1,16 @@
 <?php declare(strict_types = 0);
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -29,7 +24,7 @@ use CControllerDashboardWidgetView,
 class WidgetView extends CControllerDashboardWidgetView {
 
 	protected function doAction(): void {
-		$this->setResponse(new CControllerResponseData([
+		$data = [
 			'name' => $this->getInput('name', $this->widget->getDefaultName()),
 			'system_info' => CSystemInfoHelper::getData(),
 			'info_type' => $this->fields_values['info_type'],
@@ -37,6 +32,12 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
-		]));
+		];
+
+		if ($data['system_info']['is_software_update_check_enabled']) {
+			$data['show_software_update_check_details'] = $this->fields_values['show_software_update_check_details'];
+		}
+
+		$this->setResponse(new CControllerResponseData($data));
 	}
 }

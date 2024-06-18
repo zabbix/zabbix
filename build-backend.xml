@@ -211,6 +211,9 @@
 				<arg line="@{conf}"/>
 			</exec>
 			<exec executable="make" failonerror="on">
+				<arg line="build_test_zbxcommon"/>
+			</exec>
+			<exec executable="make" failonerror="on">
 				<arg line="tests_build"/>
 			</exec>
 			<mkdir dir="tests_results/@{conf-name}"/>

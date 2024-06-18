@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #ifndef ZABBIX_CONNECTOR_H
@@ -55,6 +50,8 @@ typedef struct
 }
 zbx_connector_data_point_t;
 
+ZBX_PTR_VECTOR_DECL(connector_data_point, zbx_connector_data_point_t)
+
 typedef struct
 {
 	zbx_uint64_t	connectorid;
@@ -64,7 +61,9 @@ typedef struct
 }
 zbx_connector_stat_t;
 
-ZBX_PTR_VECTOR_DECL(connector_data_point, zbx_connector_data_point_t)
+ZBX_PTR_VECTOR_DECL(connector_stat_ptr, zbx_connector_stat_t *)
+
+void	connector_stat_free(zbx_connector_stat_t *connector_stat);
 
 void	zbx_connector_serialize_object(unsigned char **data, size_t *data_alloc, size_t *data_offset,
 		const zbx_connector_object_t *connector_object);
@@ -82,7 +81,7 @@ void	zbx_connector_data_point_free(zbx_connector_data_point_t connector_data_poi
 int		zbx_connector_get_diag_stats(zbx_uint64_t *queued, char **error);
 zbx_uint32_t	zbx_connector_pack_diag_stats(unsigned char **data, zbx_uint64_t queued);
 
-int	zbx_connector_get_top_connectors(int limit, zbx_vector_ptr_t *items, char **error);
+int	zbx_connector_get_top_connectors(int limit, zbx_vector_connector_stat_ptr_t *items, char **error);
 void	zbx_connector_unpack_top_request(int *limit, const unsigned char *data);
 zbx_uint32_t	zbx_connector_pack_top_connectors_result(unsigned char **data, zbx_connector_stat_t **connector_stats,
 		int connector_stats_num);

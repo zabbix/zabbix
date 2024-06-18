@@ -1,22 +1,16 @@
 <?php declare(strict_types = 0);
-
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -197,14 +191,14 @@ abstract class CControllerHost extends CController {
 			'symptom' => false
 		]);
 
-		$items = API::Item()->get([
+		$items_count = API::Item()->get([
 			'countOutput' => true,
 			'groupCount' => true,
 			'hostids' => array_keys($hosts),
 			'webitems' =>true,
 			'monitored' => true
 		]);
-		$items_count = array_combine(array_column($items, 'hostid'), array_column($items, 'rowscount'));
+		$items_count = $items_count ? array_column($items_count, 'rowscount', 'hostid') : [];
 
 		// Group all problems per host per severity.
 		$host_problems = [];
@@ -321,6 +315,33 @@ abstract class CControllerHost extends CController {
 		}
 
 		return $data;
+	}
+
+	/**
+	 * Clean the filter from non-existing host group IDs.
+	 *
+	 * @param array $filter
+	 *
+	 * $filter = [
+	 *     'groupids' => (array)  Group IDs from filter to check.
+	 * ]
+	 *
+	 * @return array
+	 */
+	protected static function sanitizeFilter(array $filter): array {
+		if ($filter['groupids']) {
+			$groups = API::HostGroup()->get([
+				'output' => [],
+				'groupids' => $filter['groupids'],
+				'preservekeys' => true
+			]);
+
+			$filter['groupids'] = array_filter($filter['groupids'], static fn($groupid) =>
+				array_key_exists($groupid, $groups)
+			);
+		}
+
+		return $filter;
 	}
 
 	/**

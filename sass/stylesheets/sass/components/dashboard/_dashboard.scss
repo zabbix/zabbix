@@ -247,10 +247,6 @@
 			font-size: $icon-size;
 		}
 
-		.hidden {
-			display: none;
-		}
-
 		div {
 			padding: 0 5px 5px;
 		}
@@ -273,10 +269,6 @@
 		.dashboard-widget-placeholder-box {
 			background-color: rgba($ui-bg-color, .7);
 		}
-	}
-
-	&.hidden {
-		display: none;
 	}
 }
 
@@ -407,6 +399,39 @@
 
 			tfoot {
 				bottom: -8px;
+			}
+		}
+
+		&.no-data {
+			&:not(.no-data-without-icon) {
+				height: 100%;
+
+				thead {
+					th, td {
+						height: 1%;
+					}
+				}
+
+				tbody {
+					tr {
+						td {
+							vertical-align: middle;
+						}
+
+						&:last-child {
+							td {
+								border-bottom: 0;
+							}
+						}
+
+						.no-data-message {
+							&[class^="zi-"], &[class*=" zi-"] {
+								margin-top: 0;
+								margin-bottom: 0;
+							}
+						}
+					}
+				}
 			}
 		}
 	}

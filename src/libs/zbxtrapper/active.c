@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "active.h"
@@ -33,6 +28,7 @@
 #include "zbx_host_constants.h"
 #include "zbx_item_constants.h"
 #include "zbxscripts.h"
+#include "zbxcommshigh.h"
 #include "zbxalgo.h"
 #include "zbxcacheconfig.h"
 #include "zbxexpr.h"
@@ -178,7 +174,7 @@ static int	get_hostid_by_host_or_autoregister(const zbx_socket_t *sock, const ch
 		unsigned short port, const char *host_metadata, zbx_conn_flags_t flag, const char *interface,
 		const zbx_events_funcs_t *events_cbs, int config_timeout,
 		zbx_autoreg_update_host_func_t autoreg_update_host_func_cb, zbx_uint64_t *hostid,
-		zbx_uint64_t *revision, char *error)
+		zbx_uint64_t *revision, zbx_comms_redirect_t *redirect, char *error)
 {
 #define AUTO_REGISTRATION_HEARTBEAT	120
 	char	*ch_error;
@@ -194,7 +190,7 @@ static int	get_hostid_by_host_or_autoregister(const zbx_socket_t *sock, const ch
 	}
 
 	/* if host exists then check host connection permissions */
-	if (FAIL == zbx_dc_check_host_permissions(host, sock, hostid, revision, &ch_error))
+	if (FAIL == zbx_dc_check_host_permissions(host, sock, hostid, revision, redirect, &ch_error))
 	{
 		zbx_snprintf(error, MAX_STRING_LEN, "%s", ch_error);
 		zbx_free(ch_error);
@@ -289,7 +285,7 @@ int	send_list_of_active_checks(zbx_socket_t *sock, char *request, const zbx_even
 
 	/* no host metadata in older versions of agent */
 	if (FAIL == get_hostid_by_host_or_autoregister(sock, host, sock->peer, ZBX_DEFAULT_AGENT_PORT, "", 0, "",
-			events_cbs, config_timeout, autoreg_update_host_cb, &hostid, &revision, error))
+			events_cbs, config_timeout, autoreg_update_host_cb, &hostid, &revision, NULL, error))
 	{
 		goto out;
 	}
@@ -453,7 +449,7 @@ out:
  *                FAIL - an error occurred                                      *
  *                                                                              *
  ********************************************************************************/
-int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *jp,
+int	send_list_of_active_checks_json(zbx_socket_t *sock, zbx_json_parse_t *jp,
 		const zbx_events_funcs_t *events_cbs, int config_timeout,
 		zbx_autoreg_update_host_func_t autoreg_update_host_cb)
 {
@@ -470,6 +466,7 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 	zbx_session_t		*session = NULL;
 	zbx_vector_expression_t	regexps;
 	zbx_vector_str_t	names;
+	zbx_comms_redirect_t	redirect = {0};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -541,7 +538,7 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 	}
 
 	if (FAIL == get_hostid_by_host_or_autoregister(sock, host, ip, port, host_metadata, flag, interface, events_cbs,
-			config_timeout, autoreg_update_host_cb, &hostid, &revision, error))
+			config_timeout, autoreg_update_host_cb, &hostid, &revision, &redirect, error))
 	{
 		goto error;
 	}
@@ -608,8 +605,11 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &dc_items[i].host.hostid, NULL, NULL, NULL,
 					NULL, NULL, NULL, NULL, &dc_items[i].delay, ZBX_MACRO_TYPE_COMMON, NULL, 0);
 
-			if (SUCCEED != zbx_interval_preproc(dc_items[i].delay, &delay, NULL, NULL))
+			if (ZBX_COMPONENT_VERSION(4, 4, 0) > version &&
+					SUCCEED != zbx_interval_preproc(dc_items[i].delay, &delay, NULL, NULL))
+			{
 				continue;
+			}
 
 			dc_items[i].key = zbx_strdup(dc_items[i].key, dc_items[i].key_orig);
 			zbx_substitute_key_macros_unmasked(&dc_items[i].key, NULL, &dc_items[i], NULL, NULL,
@@ -755,7 +755,11 @@ error:
 
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 	zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_FAILED, ZBX_JSON_TYPE_STRING);
-	zbx_json_addstring(&json, ZBX_PROTO_TAG_INFO, error, ZBX_JSON_TYPE_STRING);
+
+	if (0 != redirect.revision || ZBX_REDIRECT_NONE != redirect.reset)
+		zbx_add_redirect_response(&json, &redirect);
+	else
+		zbx_json_addstring(&json, ZBX_PROTO_TAG_INFO, error, ZBX_JSON_TYPE_STRING);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() sending [%s]", __func__, json.buffer);
 

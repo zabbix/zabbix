@@ -1,21 +1,16 @@
 <?php declare(strict_types=0);
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -135,11 +130,16 @@ class CControllerItemEdit extends CControllerItem {
 	 */
 	protected function getHost(): array {
 		[$host] = API::Host()->get([
-			'output' => ['hostid', 'proxyid', 'name', 'flags', 'status'],
+			'output' => ['hostid', 'name', 'monitored_by', 'proxyid', 'assigned_proxyid', 'flags', 'status'],
 			'selectInterfaces' => ['interfaceid', 'ip', 'port', 'dns', 'useip', 'details', 'type', 'main'],
 			'hostids' => !$this->hasInput('itemid') ? [$this->getInput('hostid')] : null,
 			'itemids' => $this->hasInput('itemid') ? [$this->getInput('itemid')] : null
 		]);
+
+		if ($host['monitored_by'] == ZBX_MONITORED_BY_PROXY_GROUP) {
+			$host['proxyid'] = $host['assigned_proxyid'];
+		}
+		unset($host['monitored_by'], $host['assigned_proxyid']);
 
 		$host['interfaces'] = array_column($host['interfaces'], null, 'interfaceid');
 		// Sort interfaces to be listed starting with one selected as 'main'.

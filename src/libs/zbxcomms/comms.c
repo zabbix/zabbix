@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "zbxcomms.h"
@@ -387,6 +382,33 @@ static void	zbx_socket_free(zbx_socket_t *s)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: detach receive buffer                                             *
+ *                                                                            *
+ * Return value: Detached dynamic buffer or copy of static buffer.            *
+ *                                                                            *
+ * Comments: The socket buffer is reset.                                      *
+ *                                                                            *
+ ******************************************************************************/
+char	*zbx_socket_detach_buffer(zbx_socket_t *s)
+{
+	char	*out;
+
+	if (ZBX_BUF_TYPE_DYN == s->buf_type)
+	{
+		out = s->buffer;
+		s->buf_type = ZBX_BUF_TYPE_STAT;
+		s->buffer = s->buf_stat;
+	}
+	else
+		out = zbx_strdup(NULL, s->buf_stat);
+
+	*s->buffer = '\0';
+
+	return out;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: create socket poll error message                                  *
  *                                                                            *
  ******************************************************************************/
@@ -422,14 +444,15 @@ char 	*socket_poll_error(short revents)
  *                                                                            *
  * Purpose: wait for socket to become writable and without errors (connected) *
  *                                                                            *
- * Parameters: s     - [IN] socket descriptor                                 *
- *             error - [OUT] the error message                                *
+ * Parameters: s       - [IN] socket descriptor                               *
+ *             timeout - [OUT]                                                *
+ *             error   - [OUT] error message                                  *
  *                                                                            *
  * Return value: SUCCEED - connected successfully                             *
  *               FAIL - an error occurred                                     *
  *                                                                            *
  ******************************************************************************/
-static int	zbx_socket_pollout(zbx_socket_t *s, char **error)
+int	zbx_socket_pollout(zbx_socket_t *s, int timeout, char **error)
 {
 	int		rc;
 	zbx_pollfd_t	pd;
@@ -437,25 +460,33 @@ static int	zbx_socket_pollout(zbx_socket_t *s, char **error)
 	pd.fd = s->socket;
 	pd.events = POLLOUT;
 
-	while (0 >= (rc = zbx_socket_poll(&pd, 1, ZBX_SOCKET_POLL_TIMEOUT)))
+	while (0 >= (rc = zbx_socket_poll(&pd, 1, timeout)))
 	{
 		if (-1 == rc && SUCCEED != zbx_socket_had_nonblocking_error())
 		{
-			*error = zbx_strdup(NULL, "cannot wait for connection");
+			if (NULL != error)
+				*error = zbx_strdup(NULL, "cannot wait for connection");
+
 			return FAIL;
 		}
 
 		if (SUCCEED != zbx_socket_check_deadline(s))
 		{
-			*error = zbx_strdup(NULL, "connection timed out");
+			if (NULL != error)
+				*error = zbx_strdup(NULL, "connection timed out");
+
 			return FAIL;
 		}
 	}
 
 	if (POLLOUT != (pd.revents & (POLLOUT | POLLERR | POLLHUP | POLLNVAL)))
 	{
-		*error = socket_poll_error(pd.revents);
-		zabbix_log(LOG_LEVEL_DEBUG, "poll(POLLOUT) failed with revents 0x%x", (unsigned)pd.revents);
+		if (NULL != error)
+		{
+			*error = socket_poll_error(pd.revents);
+			zabbix_log(LOG_LEVEL_DEBUG, "poll(POLLOUT) failed with revents 0x%x", (unsigned)pd.revents);
+		}
+
 		return FAIL;
 	}
 
@@ -630,7 +661,7 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 	if (SUCCEED != zbx_socket_connect(s, type, source_ip, ip, port, timeout))
 		goto out;
 
-	if (SUCCEED != zbx_socket_pollout(s, &error))
+	if (SUCCEED != zbx_socket_pollout(s, ZBX_SOCKET_POLL_TIMEOUT, &error))
 	{
 		void		(*func_socket_close)(zbx_socket_t *s);
 
@@ -1509,8 +1540,10 @@ int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen
 
 	if (0 == s->num_socks)
 	{
-		zbx_set_socket_strerror("zbx_tcp_listen() fatal error: unable to serve on any address [[%s]:%hu]",
-				NULL != listen_ip ? listen_ip : "-", listen_port);
+		zbx_set_socket_strerror("zbx_tcp_listen(): "
+				"failed to create listening socket for [[%s]:%hu]: %s",
+				NULL != listen_ip ? listen_ip : "-", listen_port,
+				zbx_strerror_from_system(zbx_socket_last_error()));
 		goto out;
 	}
 

@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "zbxcacheconfig.h"
@@ -989,17 +984,11 @@ static void	dc_assign_maintenance_to_host(zbx_hashset_t *host_maintenances, zbx_
 static void	dc_assign_event_maintenance_to_host(zbx_hashset_t *host_event_maintenances,
 		zbx_dc_maintenance_t *maintenance, zbx_uint64_t hostid)
 {
-	zbx_host_event_maintenance_t	*host_event_maintenance, host_event_maintenance_local;
+	zbx_host_event_maintenance_t	*host_event_maintenance;
 
 	if (NULL == (host_event_maintenance = (zbx_host_event_maintenance_t *)zbx_hashset_search(
 			host_event_maintenances, &hostid)))
 	{
-		host_event_maintenance_local.hostid = hostid;
-		zbx_vector_ptr_create(&host_event_maintenance_local.maintenances);
-		zbx_vector_ptr_append(&host_event_maintenance_local.maintenances, maintenance);
-
-		zbx_hashset_insert(host_event_maintenances, &host_event_maintenance_local,
-				sizeof(host_event_maintenance_local));
 		return;
 	}
 
@@ -1013,8 +1002,8 @@ typedef void	(*assign_maintenance_to_host_f)(zbx_hashset_t *host_maintenances,
  *                                                                            *
  * Purpose: get hosts and their maintenances                                  *
  *                                                                            *
- * Parameters: maintenanceids    - [IN] the maintenance ids                   *
- *             host_maintenances - [OUT] the maintenances running on hosts    *
+ * Parameters: maintenanceids    - [IN] maintenance ids                       *
+ *             host_maintenances - [OUT] maintenances running on hosts        *
  *             cb                - [IN] callback function                     *
  *                                                                            *
  ******************************************************************************/
@@ -1265,7 +1254,7 @@ static int	dc_maintenance_tag_value_match(const zbx_dc_maintenance_tag_t *mt, co
  *               FAIL    - no matching tags found                             *
  *                                                                            *
  ******************************************************************************/
-static int	dc_maintenance_match_tag_range(const zbx_vector_ptr_t *mtags, const zbx_vector_tags_t *etags,
+static int	dc_maintenance_match_tag_range(const zbx_vector_ptr_t *mtags, const zbx_vector_tags_ptr_t *etags,
 		int *mt_pos, int *et_pos)
 {
 	const zbx_dc_maintenance_tag_t	*mtag;
@@ -1357,7 +1346,7 @@ static int	dc_maintenance_match_tag_range(const zbx_vector_ptr_t *mtags, const z
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	dc_maintenance_match_tags_or(const zbx_dc_maintenance_t *maintenance, const zbx_vector_tags_t *tags)
+static int	dc_maintenance_match_tags_or(const zbx_dc_maintenance_t *maintenance, const zbx_vector_tags_ptr_t *tags)
 {
 	int	mt_pos = 0, et_pos = 0;
 
@@ -1381,7 +1370,8 @@ static int	dc_maintenance_match_tags_or(const zbx_dc_maintenance_t *maintenance,
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	dc_maintenance_match_tags_andor(const zbx_dc_maintenance_t *maintenance, const zbx_vector_tags_t *tags)
+static int	dc_maintenance_match_tags_andor(const zbx_dc_maintenance_t *maintenance,
+		const zbx_vector_tags_ptr_t *tags)
 {
 	int	mt_pos = 0, et_pos = 0;
 
@@ -1408,7 +1398,7 @@ static int	dc_maintenance_match_tags_andor(const zbx_dc_maintenance_t *maintenan
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	dc_maintenance_match_tags(const zbx_dc_maintenance_t *maintenance, const zbx_vector_tags_t *tags)
+static int	dc_maintenance_match_tags(const zbx_dc_maintenance_t *maintenance, const zbx_vector_tags_ptr_t *tags)
 {
 	switch (maintenance->tags_evaltype)
 	{
@@ -1457,13 +1447,10 @@ int	zbx_dc_get_event_maintenances(zbx_vector_event_suppress_query_ptr_t *event_q
 	zbx_event_suppress_query_t	*query;
 	ZBX_DC_ITEM			*item;
 	ZBX_DC_FUNCTION			*function;
-	zbx_vector_uint64_t		hostids;
 	zbx_hashset_iter_t		iter;
 	zbx_host_event_maintenance_t	*host_event_maintenance;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	zbx_vector_uint64_create(&hostids);
 
 	zbx_hashset_create_ext(&host_event_maintenances, maintenanceids->values_num, ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC, (zbx_clean_func_t)host_event_maintenance_clean,
@@ -1474,23 +1461,10 @@ int	zbx_dc_get_event_maintenances(zbx_vector_event_suppress_query_ptr_t *event_q
 	{
 		query = event_queries->values[i];
 		if (0 != query->tags.values_num)
-			zbx_vector_tags_sort(&query->tags, zbx_compare_tags);
+			zbx_vector_tags_ptr_sort(&query->tags, zbx_compare_tags);
 	}
 
 	RDLOCK_CACHE;
-
-	dc_get_host_maintenances_by_ids(maintenanceids, &host_event_maintenances, dc_assign_event_maintenance_to_host);
-
-	if (0 == host_event_maintenances.num_data)
-		goto unlock;
-
-	zbx_hashset_iter_reset(&host_event_maintenances, &iter);
-
-	while (NULL != (host_event_maintenance = (zbx_host_event_maintenance_t *)zbx_hashset_iter_next(&iter)))
-	{
-		zbx_vector_ptr_sort(&host_event_maintenance->maintenances, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
-		zbx_vector_ptr_uniq(&host_event_maintenance->maintenances, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
-	}
 
 	for (i = 0; i < event_queries->values_num; i++)
 	{
@@ -1550,21 +1524,58 @@ int	zbx_dc_get_event_maintenances(zbx_vector_event_suppress_query_ptr_t *event_q
 			}
 
 			if (HOST_MAINTENANCE_STATUS_OFF == dc_host->maintenance_status)
-				goto skip;
+			{
+				zbx_vector_uint64_clear(&query->hostids);
+				break;
+			}
 
-			zbx_vector_uint64_append(&hostids, item->hostid);
+			zbx_vector_uint64_append(&query->hostids, item->hostid);
 		}
 
-		zbx_vector_uint64_sort(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-		zbx_vector_uint64_uniq(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		if (0 == query->hostids.values_num)
+			continue;
+
+		zbx_vector_uint64_sort(&query->hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_uint64_uniq(&query->hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+		for (j = 0; j < query->hostids.values_num; j++)
+		{
+			zbx_host_event_maintenance_t	hem_local = {.hostid = query->hostids.values[j]};
+
+			zbx_hashset_insert(&host_event_maintenances, &hem_local, sizeof(hem_local));
+		}
+	}
+
+	zbx_hashset_iter_reset(&host_event_maintenances, &iter);
+	while (NULL != (host_event_maintenance = (zbx_host_event_maintenance_t *)zbx_hashset_iter_next(&iter)))
+	{
+		zbx_vector_ptr_create(&host_event_maintenance->maintenances);
+		zbx_vector_ptr_reserve(&host_event_maintenance->maintenances, (size_t)maintenanceids->values_num);
+	}
+
+	dc_get_host_maintenances_by_ids(maintenanceids, &host_event_maintenances, dc_assign_event_maintenance_to_host);
+
+	if (0 == host_event_maintenances.num_data)
+		goto unlock;
+
+	zbx_hashset_iter_reset(&host_event_maintenances, &iter);
+	while (NULL != (host_event_maintenance = (zbx_host_event_maintenance_t *)zbx_hashset_iter_next(&iter)))
+	{
+		zbx_vector_ptr_sort(&host_event_maintenance->maintenances, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+		zbx_vector_ptr_uniq(&host_event_maintenance->maintenances, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+	}
+
+	for (i = 0; i < event_queries->values_num; i++)
+	{
+		query = (zbx_event_suppress_query_t *)event_queries->values[i];
 
 		/* find matching maintenances */
-		for (j = 0; j < hostids.values_num; j++)
+		for (j = 0; j < query->hostids.values_num; j++)
 		{
 			const zbx_dc_maintenance_t	*maintenance;
 
 			if (NULL == (host_event_maintenance = zbx_hashset_search(&host_event_maintenances,
-					&hostids.values[j])))
+					&query->hostids.values[j])))
 			{
 				continue;
 			}
@@ -1594,13 +1605,10 @@ int	zbx_dc_get_event_maintenances(zbx_vector_event_suppress_query_ptr_t *event_q
 				ret = SUCCEED;
 			}
 		}
-skip:
-		zbx_vector_uint64_clear(&hostids);
 	}
 unlock:
 	UNLOCK_CACHE;
 
-	zbx_vector_uint64_destroy(&hostids);
 	zbx_hashset_destroy(&host_event_maintenances);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -1615,10 +1623,11 @@ unlock:
  ******************************************************************************/
 void	zbx_event_suppress_query_free(zbx_event_suppress_query_t *query)
 {
+	zbx_vector_uint64_destroy(&query->hostids);
 	zbx_vector_uint64_destroy(&query->functionids);
 	zbx_vector_uint64_pair_destroy(&query->maintenances);
-	zbx_vector_tags_clear_ext(&query->tags, zbx_free_tag);
-	zbx_vector_tags_destroy(&query->tags);
+	zbx_vector_tags_ptr_clear_ext(&query->tags, zbx_free_tag);
+	zbx_vector_tags_ptr_destroy(&query->tags);
 	zbx_free(query);
 }
 
@@ -1650,5 +1659,5 @@ int	zbx_dc_get_running_maintenanceids(zbx_vector_uint64_t *maintenanceids)
 }
 
 #ifdef HAVE_TESTS
-#	include "../../../tests/libs/zbxdbcache/dbconfig_maintenance_test.c"
+#	include "../../../tests/libs/zbxcacheconfig/dbconfig_maintenance_test.c"
 #endif

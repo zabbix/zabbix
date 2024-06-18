@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 require_once dirname(__FILE__) . '/../include/CWebTest.php';
@@ -206,11 +201,13 @@ class testFormSetup extends CWebTest {
 			$vaults = [
 				'HashiCorp Vault' => [
 					'Vault API endpoint' => 'https://localhost:8200',
+					'Vault prefix' => '/v1/secret/data/',
 					'Vault secret path' => 'path/to/secret',
 					'Vault authentication token' => ''
 				],
 				'CyberArk Vault' => [
 					'Vault API endpoint' => 'https://localhost:1858',
+					'Vault prefix' => '/AIMWebService/api/Accounts?',
 					'Vault secret query string' => 'AppID=foo&Query=Safe=bar;Object=buzz',
 					'SSL certificate file' => 'conf/certs/cyberark-cert.pem',
 					'SSL key file' => 'conf/certs/cyberark-key.pem'
@@ -234,7 +231,7 @@ class testFormSetup extends CWebTest {
 					$vault_maxlength = ($field_name === 'Vault API endpoint' || $field_name === 'Vault secret path') ? 255 : 2048;
 					$field = $form->getField($field_name);
 					$this->assertEquals($vault_maxlength, $field->getAttribute('maxlength'));
-					if (in_array($field_name, ['Vault secret query string', 'Vault secret path'])) {
+					if (in_array($field_name, ['Vault secret query string', 'Vault secret path', 'Vault prefix'])) {
 						$this->assertEquals($parameter, $field->getAttribute('placeholder'));
 					}
 					else {

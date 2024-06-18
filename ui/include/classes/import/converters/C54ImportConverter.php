@@ -1,21 +1,16 @@
 <?php declare(strict_types = 0);
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -60,8 +55,6 @@ class C54ImportConverter extends CConverter {
 	/**
 	 * Convert function macros "{host:key.func(<param>)}" to expression macros "{?func(/host/key<, param>)}".
 	 *
-	 * @static
-	 *
 	 * @param string $text
 	 *
 	 * @return string
@@ -72,8 +65,6 @@ class C54ImportConverter extends CConverter {
 
 	/**
 	 * Convert hosts.
-	 *
-	 * @static
 	 *
 	 * @param array $hosts
 	 *
@@ -97,8 +88,6 @@ class C54ImportConverter extends CConverter {
 	/**
 	 * Convert templates.
 	 *
-	 * @static
-	 *
 	 * @param array $templates
 	 *
 	 * @return array
@@ -120,8 +109,6 @@ class C54ImportConverter extends CConverter {
 
 	/**
 	 * Convert items.
-	 *
-	 * @static
 	 *
 	 * @param array       $items
 	 *
@@ -146,8 +133,6 @@ class C54ImportConverter extends CConverter {
 
 	/**
 	 * Convert preprocessing steps.
-	 *
-	 * @static
 	 *
 	 * @param array $preprocessing_steps
 	 *
@@ -272,8 +257,6 @@ class C54ImportConverter extends CConverter {
 	/**
 	 * Convert graphs.
 	 *
-	 * @static
-	 *
 	 * @param array $graphs
 	 *
 	 * @return array
@@ -289,8 +272,6 @@ class C54ImportConverter extends CConverter {
 
 	/**
 	 * Convert maps.
-	 *
-	 * @static
 	 *
 	 * @param array $maps
 	 *
@@ -326,8 +307,6 @@ class C54ImportConverter extends CConverter {
 
 	/**
 	 * Convert media types.
-	 *
-	 * @static
 	 *
 	 * @param array $media_types
 	 *

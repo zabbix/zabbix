@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -73,7 +68,7 @@ class testDashboardURLWidget extends CWebTest {
 								'name' => self::$default_widget,
 								'x' => 0,
 								'y' => 0,
-								'width' => 12,
+								'width' => 36,
 								'height' => 5,
 								'fields' => [
 									[
@@ -91,9 +86,9 @@ class testDashboardURLWidget extends CWebTest {
 							[
 								'type' => 'url',
 								'name' => self::$frame_widget,
-								'x' => 12,
+								'x' => 36,
 								'y' => 0,
-								'width' => 12,
+								'width' => 36,
 								'height' => 5,
 								'fields' => [
 									[
@@ -108,7 +103,7 @@ class testDashboardURLWidget extends CWebTest {
 								'name' => self::$delete_widget,
 								'x' => 0,
 								'y' => 5,
-								'width' => 12,
+								'width' => 36,
 								'height' => 5,
 								'fields' => [
 									[
@@ -133,7 +128,7 @@ class testDashboardURLWidget extends CWebTest {
 								'name' => self::$update_widget,
 								'x' => 0,
 								'y' => 0,
-								'width' => 12,
+								'width' => 36,
 								'height' => 5,
 								'fields' => [
 									[
@@ -234,7 +229,7 @@ class testDashboardURLWidget extends CWebTest {
 		$host_selector = $dashboard->getControls()->query('class:multiselect-control')->asMultiselect()->one();
 		$this->assertTrue($host_selector->isVisible());
 		$this->assertEquals('No host selected.', $dashboard->getWidget(self::$default_widget)
-				->query('class:nothing-to-show')->one()->getText());
+				->query('class:no-data-message')->one()->getText());
 		$dashboard->getWidget(self::$default_widget)->edit();
 		$this->assertEquals('Edit widget', $dialog->getTitle());
 		$form->fill(['Override host' => ''])->submit();
@@ -429,14 +424,15 @@ class testDashboardURLWidget extends CWebTest {
 		$form->fill($data['fields']);
 		$values = $form->getValues();
 		$form->submit();
-		$this->page->waitUntilReady();
 
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			$this->assertMessage($data['expected'], null, $data['error']);
 			$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
+
+			// Check that after error and cancellation of the widget, the widget is not available on dashboard.
 			COverlayDialogElement::find()->one()->close();
-			$dashboard->save();
-			$this->page->waitUntilReady();
+			$dashboard->save()->waitUntilReady();
+			$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 			$this->assertFalse($dashboard->getWidget($data['fields']['Name'], false)->isValid());
 		}
 		else {
@@ -450,12 +446,17 @@ class testDashboardURLWidget extends CWebTest {
 			$widget = $dashboard->getWidget($header);
 
 			// Save Dashboard to ensure that widget is correctly saved.
-			$dashboard->save();
-			$this->page->waitUntilReady();
+			$dashboard->save()->waitUntilReady();
 			$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 
 			// Check widget count.
 			$this->assertEquals($old_widget_count + ($update ? 0 : 1), $dashboard->getWidgets()->count());
+
+			// Check new widget update interval.
+			$refresh = (CTestArrayHelper::get($data['fields'], 'Refresh interval') === 'Default (No refresh)')
+					? 'No refresh'
+					: (CTestArrayHelper::get($data['fields'], 'Refresh interval', 'No refresh'));
+			$this->assertEquals($refresh, $widget->getRefreshInterval());
 
 			// Check new widget form fields and values in frontend.
 			$saved_form = $widget->edit();
@@ -465,17 +466,9 @@ class testDashboardURLWidget extends CWebTest {
 				$saved_form->checkValue(['Show header' => $data['fields']['Show header']]);
 			}
 
-			$saved_form->submit();
-			COverlayDialogElement::ensureNotPresent();
-			$dashboard->save();
-			$this->page->waitUntilReady();
-			$this->assertMessage(TEST_GOOD, 'Dashboard updated');
-
-			// Check new widget update interval.
-			$refresh = (CTestArrayHelper::get($data['fields'], 'Refresh interval') === 'Default (No refresh)')
-					? 'No refresh'
-					: (CTestArrayHelper::get($data['fields'], 'Refresh interval', 'No refresh'));
-			$this->assertEquals($refresh, $widget->getRefreshInterval());
+			// Close widget window and cancel editing the dashboard.
+			COverlayDialogElement::find()->one()->close();
+			$dashboard->cancelEditing();
 		}
 	}
 

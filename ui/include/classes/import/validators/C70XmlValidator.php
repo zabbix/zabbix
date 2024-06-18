@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -239,7 +234,8 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 		CXmlConstantValue::ITEM_TYPE_DEPENDENT => CXmlConstantName::DEPENDENT,
 		CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT,
 		CXmlConstantValue::ITEM_TYPE_SNMP => CXmlConstantName::SNMP_AGENT,
-		CXmlConstantValue::ITEM_TYPE_SCRIPT => CXmlConstantName::SCRIPT
+		CXmlConstantValue::ITEM_TYPE_SCRIPT => CXmlConstantName::SCRIPT,
+		CXmlConstantValue::ITEM_TYPE_BROWSER => CXmlConstantName::BROWSER
 	];
 
 	private $ITEM_TYPE_DRULE = [
@@ -257,7 +253,8 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 		CXmlConstantValue::ITEM_TYPE_DEPENDENT => CXmlConstantName::DEPENDENT,
 		CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT,
 		CXmlConstantValue::ITEM_TYPE_SNMP => CXmlConstantName::SNMP_AGENT,
-		CXmlConstantValue::ITEM_TYPE_SCRIPT => CXmlConstantName::SCRIPT
+		CXmlConstantValue::ITEM_TYPE_SCRIPT => CXmlConstantName::SCRIPT,
+		CXmlConstantValue::ITEM_TYPE_BROWSER => CXmlConstantName::BROWSER
 	];
 
 	private $ITEM_VALUE_TYPE = [
@@ -433,7 +430,11 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 					'host' =>					['type' => XML_STRING | XML_REQUIRED],
 					'name' =>					['type' => XML_STRING, 'default' => ''],
 					'description' =>			['type' => XML_STRING, 'default' => ''],
+					'monitored_by' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::SERVER, 'in' => [CXmlConstantValue::SERVER => CXmlConstantName::SERVER, CXmlConstantValue::PROXY => CXmlConstantName::PROXY, CXmlConstantValue::PROXY_GROUP => CXmlConstantName::PROXY_GROUP]],
 					'proxy' =>					['type' => XML_ARRAY, 'rules' => [
+						'name' =>					['type' => XML_STRING | XML_REQUIRED]
+					]],
+					'proxy_group' =>			['type' => XML_ARRAY, 'rules' => [
 						'name' =>					['type' => XML_STRING | XML_REQUIRED]
 					]],
 					'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
@@ -2027,7 +2028,7 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 					'smtp_authentication' =>	['type' => XML_STRING, 'default' => CXmlConstantValue::SMTP_AUTHENTICATION_NONE, 'in' => $this->SMTP_AUTHENTICATION],
 					'username' =>				['type' => XML_STRING, 'default' => ''],
 					'password' =>				['type' => XML_STRING, 'default' => ''],
-					'content_type' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::CONTENT_TYPE_HTML, 'in' => [CXmlConstantValue::CONTENT_TYPE_TEXT => CXmlConstantName::CONTENT_TYPE_TEXT, CXmlConstantValue::CONTENT_TYPE_HTML => CXmlConstantName::CONTENT_TYPE_HTML]],
+					'message_format' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::MESSAGE_FORMAT_HTML, 'in' => [CXmlConstantValue::MESSAGE_FORMAT_TEXT => CXmlConstantName::MESSAGE_FORMAT_TEXT, CXmlConstantValue::MESSAGE_FORMAT_HTML => CXmlConstantName::MESSAGE_FORMAT_HTML]],
 					'script_name' =>			['type' => XML_STRING, 'default' => ''],
 					'parameters' =>				['type' => 0, 'ex_validate' => [$this, 'validateMediaTypeParameters'], 'ex_rules' => [$this, 'getMediaTypeParametersExtendedRules']],
 					'gsm_modem' =>				['type' => XML_STRING, 'default' => ''],

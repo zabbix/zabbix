@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
@@ -292,11 +287,16 @@ class testItemState extends CIntegrationTest {
 	protected function checkItemStateActive($scenario, $state, &$refresh) {
 		$wait = max($scenario['delay_s'], self::REFRESH_ACT_CHKS_INTERVAL) + self::PROCESS_ACT_CHKS_DELAY
 			+ self::LOG_LINE_WAIT_TIME;
-		$key = self::$items[$scenario['name']]['key'];
+		$itemid = self::$items[$scenario['name']]['itemid'];
 
-		// Wait for item to be checked
+		// Wait for first check that happens right after configuration refresh
 		$check = $this->getLogLineTimestamp(self::COMPONENT_SERVER,
-				[',"data":[{"host":"test_host","key":"'.$key.'","value":"'], $wait
+				[',"data":[{"itemid":'.$itemid.',"value":"'], $wait
+		);
+
+		// Wait for first scheduled check
+		$check = $this->getLogLineTimestamp(self::COMPONENT_SERVER,
+				[',"data":[{"itemid":'.$itemid.',"value":"'], $wait
 		);
 
 		// Update last refresh timestamp
@@ -316,9 +316,9 @@ class testItemState extends CIntegrationTest {
 				'Unexpected item state='.$response['result'][0]['state'].' (expected='.$state.')'
 		);
 
-		// Verify item checks intervals
+		// Wait for next scheduled check and verify item checks intervals
 		$next_check = $this->getLogLineTimestamp(self::COMPONENT_SERVER,
-				[',"data":[{"host":"test_host","key":"'.$key.'","value":"'], $wait
+				[',"data":[{"itemid":'.$itemid.',"value":"'], $wait
 		);
 
 		while ($next_check > $refresh + self::REFRESH_ACT_CHKS_INTERVAL) {

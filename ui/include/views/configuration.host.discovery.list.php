@@ -1,26 +1,22 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 require_once dirname(__FILE__).'/js/configuration.host.discovery.list.js.php';
@@ -233,7 +229,8 @@ $discoveryTable = (new CTableInfo())
 		make_sorting_header(_('Type'), 'type', $data['sort'], $data['sortorder'], $url),
 		make_sorting_header(_('Status'), 'status', $data['sort'], $data['sortorder'], $url),
 		($data['context'] === 'host') ? _('Info') : null
-	]);
+	])
+	->setPageNavigation($data['paging']);
 
 $update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
 $csrf_token = CCsrfTokenHelper::get('host_discovery.php');
@@ -398,9 +395,10 @@ $button_list += [
 ];
 
 // Append table to form.
-$discoveryForm->addItem([$discoveryTable, $data['paging'], new CActionButtonList('action', 'g_hostdruleid',
-	$button_list, $data['checkbox_hash']
-)]);
+$discoveryForm->addItem([
+	$discoveryTable,
+	new CActionButtonList('action', 'g_hostdruleid', $button_list, $data['checkbox_hash'])
+]);
 
 $html_page
 	->addItem($discoveryForm)
