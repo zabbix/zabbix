@@ -129,8 +129,10 @@ $translate_strings = [
 	'class.dashboard.js' => [
 		'Actions' => _('Actions'),
 		'Add widget' => _('Add widget'),
-		'Cannot add dashboard page: maximum number of %1$d dashboard pages has been added.' => _('Cannot add dashboard page: maximum number of %1$d dashboard pages has been added.'),
-		'Cannot add widget: not enough free space on the dashboard.' => _('Cannot add widget: not enough free space on the dashboard.'),
+		'Cannot add dashboard page: maximum number of %1$d dashboard pages has been added.' =>
+			_('Cannot add dashboard page: maximum number of %1$d dashboard pages has been added.'),
+		'Cannot add widget: not enough free space on the dashboard.' =>
+			_('Cannot add widget: not enough free space on the dashboard.'),
 		'Copy' => _('Copy'),
 		'Delete' => _('Delete'),
 		'Failed to paste dashboard page.' => _('Failed to paste dashboard page.'),
@@ -285,10 +287,12 @@ $translate_strings = [
 		'S_PASTE' => _('Paste'),
 		'S_PASTE_SIMPLE' => _('Paste without external links'),
 		'S_INCORRECT_ELEMENT_MAP_LINK' => _('All links should have "Name" and "URL" specified'),
-		'S_EACH_URL_SHOULD_HAVE_UNIQUE' => _('Each URL should have a unique name. Please make sure there is only one URL named'),
+		'S_EACH_URL_SHOULD_HAVE_UNIQUE' =>
+			_('Each URL should have a unique name. Please make sure there is only one URL named'),
 		'S_DELETE_LINKS_BETWEEN_SELECTED_ELEMENTS_Q' => _('Delete links between selected elements?'),
 		'S_MACRO_EXPAND_ERROR' => _('Cannot expand macros.'),
-		'S_NO_IMAGES' => 'You need to have at least one image uploaded to create map element. Images can be uploaded in Administration->General->Images section.',
+		'S_NO_IMAGES' =>
+			_('You need to have at least one image uploaded to create map element. Images can be uploaded in Administration->General->Images section.'),
 		'S_COLOR_IS_NOT_CORRECT' => _('Color "%1$s" is not correct: expecting hexadecimal color code (6 symbols).'),
 		'Host is not selected.' => _('Host is not selected.'),
 		'Map is not selected.' => _('Map is not selected.'),
@@ -310,7 +314,8 @@ $translate_strings = [
 		'S_CLOSE' => _('Close')
 	],
 	'class.cookie.js' => [
-		'S_MAX_COOKIE_SIZE_REACHED' => _('We are sorry, the maximum possible number of elements to remember has been reached.')
+		'S_MAX_COOKIE_SIZE_REACHED' =>
+			_('We are sorry, the maximum possible number of elements to remember has been reached.')
 	],
 	'class.coverride.js' => [
 		'S_TIME_SHIFT' => _('time shift')
@@ -354,10 +359,12 @@ $translate_strings = [
 		'%1$s, read only' => _x('%1$s, read only', 'screen reader'),
 		'Cannot be removed' => _x('Cannot be removed', 'screen reader'),
 		'Selected, %1$s in position %2$d of %3$d' => _x('Selected, %1$s in position %2$d of %3$d', 'screen reader'),
-		'Selected, %1$s, read only, in position %2$d of %3$d' => _x('Selected, %1$s, read only, in position %2$d of %3$d', 'screen reader'),
+		'Selected, %1$s, read only, in position %2$d of %3$d' =>
+			_x('Selected, %1$s, read only, in position %2$d of %3$d', 'screen reader'),
 		'More than %1$d matches for %2$s found' => _x('More than %1$d matches for %2$s found', 'screen reader'),
 		'%1$d matches for %2$s found' => _x('%1$d matches for %2$s found', 'screen reader'),
-		'%1$s preselected, use down,up arrow keys and enter to select' => _x('%1$s preselected, use down,up arrow keys and enter to select', 'screen reader')
+		'%1$s preselected, use down,up arrow keys and enter to select' =>
+			_x('%1$s preselected, use down,up arrow keys and enter to select', 'screen reader')
 	],
 	'menupopup.js' => [
 		'500 latest values' => _('500 latest values'),
@@ -409,7 +416,8 @@ $translate_strings = [
 		'Hide debug' => _('Hide debug')
 	],
 	'items.js' => [
-		'To set a host interface select a single item type for all items' => _('To set a host interface select a single item type for all items'),
+		'To set a host interface select a single item type for all items' =>
+			_('To set a host interface select a single item type for all items'),
 		'No interface found' => _('No interface found'),
 		'Item type does not use interface' => _('Item type does not use interface')
 	],
