@@ -196,8 +196,7 @@ func parseSmaps(pid string, proc *procStatus) error {
 		shared = pss - private
 	}
 
-	private += privateHuge
-	proc.Pss = shared + private + sharedHuge
+	proc.Pss = shared + private + privateHuge + sharedHuge
 
 	return nil
 }
@@ -207,7 +206,7 @@ func parseStatm(pid string, proc *procStatus) error {
 	var data []byte
 	var err error
 
-	if data, err = os.ReadFile("/proc/" + pid + "/statm"); err != nil {
+	if data, err = procfs.ReadAll("/proc/" + pid + "/statm"); err != nil {
 		return fmt.Errorf("failed to read statm file: %w", err)
 	}
 
