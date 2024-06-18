@@ -44,7 +44,8 @@ Add the following required permissions to your Zabbix IAM policy in order to col
                 "s3:GetBucketLocation",
                 "elasticloadbalancing:DescribeLoadBalancers",
                 "elasticloadbalancing:DescribeTargetGroups",
-                "ec2:DescribeSecurityGroups"
+                "ec2:DescribeSecurityGroups",
+                "lambda:ListFunctions"
             ],
             "Effect": "Allow",
             "Resource": "*"
@@ -83,7 +84,8 @@ If you are using role-based authorization, add the appropriate permissions:
                 "ec2:ReplaceIamInstanceProfileAssociation",
                 "elasticloadbalancing:DescribeLoadBalancers",
                 "elasticloadbalancing:DescribeTargetGroups",
-                "ec2:DescribeSecurityGroups"
+                "ec2:DescribeSecurityGroups",
+                "lambda:ListFunctions"
             ],
             "Resource": "*"
         }
@@ -145,6 +147,12 @@ Additional information about the metrics and used API methods:
 |{$AWS.ELB.LLD.FILTER.REGION.NOT_MATCHES}|<p>Filter to exclude discovered ELB load balancer by region.</p>|`CHANGE_IF_NEEDED`|
 |{$AWS.ELB.LLD.FILTER.STATE.MATCHES}|<p>Filter of discoverable ELB load balancer by status.</p>|`active`|
 |{$AWS.ELB.LLD.FILTER.STATE.NOT_MATCHES}|<p>Filter to exclude discovered ELB load balancer by status.</p>|`CHANGE_IF_NEEDED`|
+|{$AWS.LAMBDA.LLD.FILTER.REGION.MATCHES}|<p>Filter of discoverable Lambda function by region.</p>|`.*`|
+|{$AWS.LAMBDA.LLD.FILTER.REGION.NOT_MATCHES}|<p>Filter to exclude discovered Lambda function by region.</p>|`CHANGE_IF_NEEDED`|
+|{$AWS.LAMBDA.LLD.FILTER.RUNTIME.MATCHES}|<p>Filter of discoverable Lambda function by Runtime.</p>|`.*`|
+|{$AWS.LAMBDA.LLD.FILTER.RUNTIME.NOT_MATCHES}|<p>Filter to exclude discovered Lambda function by Runtime.</p>|`CHANGE_IF_NEEDED`|
+|{$AWS.LAMBDA.LLD.FILTER.NAME.MATCHES}|<p>Filter of discoverable Lambda function by name.</p>|`.*`|
+|{$AWS.LAMBDA.LLD.FILTER.NAME.NOT_MATCHES}|<p>Filter to exclude discovered Lambda function by name.</p>|`CHANGE_IF_NEEDED`|
 
 ### LLD rule S3 buckets discovery
 
@@ -175,6 +183,12 @@ Additional information about the metrics and used API methods:
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |ELB load balancers discovery|<p>Get ELB load balancers.</p>|Script|aws.elb.discovery|
+
+### LLD rule Lambda discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Lambda discovery|<p>Get Lambda functions.</p>|Script|aws.lambda.discovery|
 
 ## Feedback
 
