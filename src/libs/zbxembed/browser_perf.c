@@ -13,13 +13,13 @@
 **/
 
 #include "browser_perf.h"
-#include "zbxalgo.h"
-#include "zbxcommon.h"
 #include "zbxjson.h"
-#include "zbxnum.h"
-#include "zbxstr.h"
 
 #ifdef HAVE_LIBCURL
+
+#include "zbxalgo.h"
+#include "zbxnum.h"
+#include "zbxstr.h"
 
 #define WD_PERF_TAG_ENTRY_TYPE	"entryType"
 
@@ -639,7 +639,6 @@ static zbx_wd_perf_entry_t	*wd_perf_entry_aggregate_common_data(zbx_wd_perf_entr
 static zbx_wd_perf_entry_t	*wd_perf_entry_aggregate_navigation_data(zbx_wd_perf_entry_t *in)
 {
 	zbx_wd_perf_entry_t	*out;
-	zbx_wd_attr_t		attr;
 
 	out = wd_perf_entry_aggregate_common_data(in);
 	wd_perf_entry_copy_attr(out, WD_PERF_ATTR_TLS_NEGOTIATION_TIME, in, WD_PERF_ATTR_TLS_NEGOTIATION_TIME);
@@ -665,6 +664,9 @@ static void	wd_perf_dump_entry(const char *name, zbx_wd_perf_entry_t *entry)
 	zbx_hashset_iter_t		iter;
 	zbx_vector_wd_attr_ptr_t	attrs;
 	zbx_wd_attr_t			*attr;
+
+	if (NULL == entry)
+		return;
 
 	zbx_vector_wd_attr_ptr_create(&attrs);
 	zbx_hashset_iter_reset(&entry->attrs, &iter);
@@ -725,12 +727,29 @@ static void	wd_perf_dump(zbx_wd_perf_t *perf)
  * Purpose: collect performance entries from json data                        *
  *                                                                            *
  ******************************************************************************/
-void	wd_perf_collect(zbx_wd_perf_t *perf, const char *bookmark_name, const struct zbx_json_parse *jp)
+int	wd_perf_collect(zbx_wd_perf_t *perf, const char *bookmark_name, const struct zbx_json_parse *jp, char **error)
 {
+#define WD_PERF_MAX_ENTRY_COUNT		1000
+#define WD_PERF_MAX_BOOKMARK_LENGTH	1000
 	const char		*p = NULL;
 	zbx_wd_perf_entry_t	*entry, *resource;
 	zbx_wd_perf_details_t	details = {0};
 	zbx_wd_attr_t	attr;
+
+	if (WD_PERF_MAX_ENTRY_COUNT <= perf->details.values_num)
+	{
+		*error = zbx_dsprintf(*error, "maximum count of performance entries has been reached (%d)",
+				WD_PERF_MAX_ENTRY_COUNT);
+
+		return FAIL;
+	}
+
+	if (NULL != bookmark_name && WD_PERF_MAX_BOOKMARK_LENGTH < zbx_strlen_utf8(bookmark_name))
+	{
+		*error = zbx_dsprintf(*error, "maximum allowed mark name length exceeded (%d)",
+				WD_PERF_MAX_BOOKMARK_LENGTH);
+		return FAIL;
+	}
 
 	zbx_vector_wd_perf_entry_ptr_create(&details.user);
 
@@ -808,6 +827,10 @@ void	wd_perf_collect(zbx_wd_perf_t *perf, const char *bookmark_name, const struc
 
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
 		wd_perf_dump(perf);
+
+	return SUCCEED;
+#undef WD_PERF_MAX_ENTRY_COUNT
+#undef WD_PERF_MAX_BOOKMARK_LENGTH
 }
 
 /******************************************************************************

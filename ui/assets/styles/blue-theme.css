@@ -3617,25 +3617,25 @@ section {
     .svg-graph-legend.svg-graph-legend-statistic .svg-graph-legend-item {
       grid-column-start: 1; }
 
-.svg-pie-chart {
+.svg-pie-chart .svg-pie-chart-arc-placeholder {
+  fill: transparent; }
+.svg-pie-chart .svg-pie-chart-space {
+  stroke: #ffffff;
+  stroke-linecap: round; }
+.svg-pie-chart .svg-pie-chart-arc-no-data-outer {
+  fill: #ebebeb; }
+.svg-pie-chart .svg-pie-chart-arc-no-data-inner {
+  fill: #ffffff; }
+.svg-pie-chart .svg-pie-chart-total-value div {
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: auto;
   fill: #1f2c33; }
-  .svg-pie-chart .svg-pie-chart-arcs {
-    stroke-linejoin: round; }
-    .svg-pie-chart .svg-pie-chart-arcs path {
-      vector-effect: non-scaling-stroke;
-      stroke: #ffffff; }
-    .svg-pie-chart .svg-pie-chart-arcs .svg-pie-chart-arc-placeholder {
-      stroke-width: 0;
-      fill: transparent; }
-    .svg-pie-chart .svg-pie-chart-arcs .svg-pie-chart-arc-no-data-outer {
-      fill: #ebebeb; }
-    .svg-pie-chart .svg-pie-chart-arcs .svg-pie-chart-arc-no-data-inner {
-      fill: #ffffff; }
-  .svg-pie-chart .svg-pie-chart-total-value {
-    text-anchor: middle; }
-  .svg-pie-chart .svg-pie-chart-total-value-no-data {
-    text-anchor: middle;
-    fill: #768d99; }
+.svg-pie-chart .svg-pie-chart-total-value-no-data {
+  text-anchor: middle;
+  fill: #768d99; }
 
 .svg-pie-chart-legend {
   position: relative;
@@ -4501,29 +4501,37 @@ div.dashboard-widget-itemhistory .list-table.show-thumbnail tbody td {
   vertical-align: middle; }
 div.dashboard-widget-itemhistory .list-table .has-broadcast-data {
   cursor: pointer; }
-div.dashboard-widget-itemhistory .binary-thumbnail .btn {
+div.dashboard-widget-itemhistory .btn-thumbnail {
   overflow: hidden; }
-  div.dashboard-widget-itemhistory .binary-thumbnail .btn:not(.btn-link) {
+  div.dashboard-widget-itemhistory .btn-thumbnail:not(.btn-link) {
     width: 100px;
     height: 56px;
-    background: transparent var(--thumbnail) no-repeat center top;
+    background: transparent var(--thumbnail) no-repeat center;
     background-size: cover;
     border-color: transparent;
     text-indent: -9999px; }
-    div.dashboard-widget-itemhistory .binary-thumbnail .btn:not(.btn-link):not(.is-loading) {
+    div.dashboard-widget-itemhistory .btn-thumbnail:not(.btn-link):not(.is-loading) {
       border: 1px solid #dfe4e7;
       border-radius: 3px; }
 div.dashboard-widget-itemhistory z-bar-gauge {
   min-width: 64px;
   height: 20px; }
 
-.dashboard-widget-itemhistory-hintbox {
-  max-height: 90vh;
-  overflow: auto; }
-  .dashboard-widget-itemhistory-hintbox img {
-    display: block;
-    max-width: 80vw;
-    max-height: 80vh; }
+.dashboard-widget-itemhistory-hintbox-image .dashboard-widget-itemhistory-hintbox {
+  overflow: hidden; }
+.dashboard-widget-itemhistory-hintbox-image.is-loading {
+  min-width: 100px;
+  min-height: 56px; }
+  .dashboard-widget-itemhistory-hintbox-image.is-loading::before {
+    content: ' '; }
+  .dashboard-widget-itemhistory-hintbox-image.is-loading img {
+    opacity: 0; }
+.dashboard-widget-itemhistory-hintbox-image img {
+  display: block;
+  max-width: 50vw;
+  max-height: 50vh;
+  opacity: 1;
+  transition: opacity 0.3s ease-out; }
 
 form.dashboard-widget-itemnavigator .item-grouping {
   line-height: 1.4em; }
@@ -6087,7 +6095,6 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
     transform: rotate(45deg); }
 
 .overlay-dialogue {
-  display: table;
   position: absolute;
   z-index: 1000;
   padding: 17px 10px 10px;
@@ -6739,7 +6746,7 @@ div.dashboard-widget-itemhistory .list-table td.selected:hover, div.dashboard-wi
   .is-loading::before {
     background-color: rgba(255, 255, 255, 0.8);
     content: 'loading';
-    text-indent: 200%;
+    text-indent: -9999px;
     overflow: hidden;
     position: absolute;
     top: 0;
@@ -6789,6 +6796,8 @@ button.is-loading {
   position: relative;
   color: transparent !important;
   border-bottom-color: transparent; }
+  .link-action.is-loading::before {
+    background-color: transparent; }
   .link-action.is-loading::after {
     box-shadow: none;
     background: none;

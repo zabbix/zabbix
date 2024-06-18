@@ -334,8 +334,6 @@ class CExpressionValidator extends CValidator {
 	 *
 	 * @param array $tokens
 	 *
-	 * @static
-	 *
 	 * @return bool
 	 */
 	private static function hasHistoryFunctions(array $tokens): bool {

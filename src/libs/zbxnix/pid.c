@@ -12,10 +12,9 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#include "zbxnix.h"
-#include "pid.h"
-
 #include "zbxcommon.h"
+
+#include "pid.h"
 
 static FILE	*fpid = NULL;
 static int	fdpid = -1;

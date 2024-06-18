@@ -17,6 +17,7 @@
 #include "zbxalgo.h"
 #include "zbxdb.h"
 #include "zbxnum.h"
+#include "zbxstr.h"
 #include "zbx_trigger_constants.h"
 #include "zbx_host_constants.h"
 

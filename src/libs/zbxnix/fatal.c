@@ -14,10 +14,10 @@
 
 #define _GNU_SOURCE	/* required for getting a CPU program counter and registers in sys/ucontext.h */
 
+#include "zbxnix.h"
+
 #include "fatal.h"
 #include "nix_internal.h"
-
-#include "config.h"
 
 #ifdef HAVE_SIGNAL_H
 #	include <signal.h>
@@ -30,8 +30,6 @@
 #ifdef	HAVE_EXECINFO_H
 #	include <execinfo.h>
 #endif
-
-#include "zbxcommon.h"
 
 const char	*get_signal_name(int sig)
 {

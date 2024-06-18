@@ -14,10 +14,11 @@
 
 #include "checks_http.h"
 
-#include "zbxhttp.h"
-#include "zbxcacheconfig.h"
-
 #ifdef HAVE_LIBCURL
+
+#include "zbxcacheconfig.h"
+#include "zbxhttp.h"
+
 int	get_value_http(const zbx_dc_item_t *item, const char *config_source_ip, const char *config_ssl_ca_location,
 		const char *config_ssl_cert_location, const char *config_ssl_key_location, AGENT_RESULT *result)
 {

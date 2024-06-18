@@ -21,6 +21,7 @@
 #include "zbxcachevalue.h"
 #include "zbxtrends.h"
 #include "zbxconnector.h"
+#include "zbxjson.h"
 
 /******************************************************************************
  *                                                                            *

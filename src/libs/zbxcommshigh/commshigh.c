@@ -14,10 +14,11 @@
 
 #include "zbxcommshigh.h"
 
-#include "zbxcommon.h"
 #include "zbxjson.h"
 #include "zbxlog.h"
 #include "zbxip.h"
+#include "zbxcomms.h"
+#include "zbxnum.h"
 
 #if !defined(_WINDOWS) && !defined(__MINGW32)
 #include "zbxnix.h"

@@ -68,6 +68,7 @@ function getDisplayOptionsTab(CWidgetFormView $form, array $fields): CDiv {
 	$source_field = $form->registerField(new CWidgetFieldRadioButtonListView($fields['source']));
 	$draw_type_field = $form->registerField(new CWidgetFieldRadioButtonListView($fields['draw_type']));
 	$width_field = $form->registerField(new CWidgetFieldRangeControlView($fields['width']));
+	$stroke_field = $form->registerField(new CWidgetFieldRangeControlView($fields['stroke']));
 	$space_field = $form->registerField(new CWidgetFieldRangeControlView($fields['space']));
 	$merge_field = $form->registerField(new CWidgetFieldCheckBoxView($fields['merge']));
 	$merge_percent_field = $form->registerField(new CWidgetFieldIntegerBoxView($fields['merge_percent']));
@@ -97,6 +98,10 @@ function getDisplayOptionsTab(CWidgetFormView $form, array $fields): CDiv {
 				->addItem([
 					$width_field->getLabel()->setId('width_label'),
 					(new CFormField([$width_field->getView(), ' %']))->setId('width_range')
+				])
+				->addItem([
+					$stroke_field->getLabel()->setId('stroke_label'),
+					(new CFormField($stroke_field->getView()))->setId('stroke_range')
 				])
 				->addItem([
 					$space_field->getLabel(),

@@ -12,18 +12,20 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#include "zbxhttp.h"
-#include "zbxtypes.h"
-#include <stddef.h>
-#include "zbxalgo.h"
-
-#include "zbxstr.h"
-#include "zbxdbhigh.h"
-#include "zbxtime.h"
-#include "zbxcurl.h"
-#include "zbxthreads.h"
+#include "zbxcommon.h"
 
 #ifdef HAVE_LIBCURL
+
+#include "zbxhttp.h"
+
+#include "zbxnum.h"
+#include "zbxdbhigh.h"
+#include "zbxstr.h"
+#include "zbxthreads.h"
+#include "zbxjson.h"
+#include "zbxcurl.h"
+
+#include <stddef.h>
 
 size_t	zbx_curl_write_cb(void *ptr, size_t size, size_t nmemb, void *userdata)
 {

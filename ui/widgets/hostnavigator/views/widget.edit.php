@@ -30,7 +30,7 @@ $groupids_field = array_key_exists('groupids', $data['fields'])
 	: null;
 
 $hosts_field = array_key_exists('hosts', $data['fields'])
-	? (new CWidgetFieldHostPatternSelectView($data['fields']['hosts']))
+	? (new CWidgetFieldPatternSelectHostView($data['fields']['hosts']))
 		->setFilterPreselect([
 			'id' => $groupids_field->getId(),
 			'accept' => CMultiSelect::FILTER_PRESELECT_ACCEPT_ID,

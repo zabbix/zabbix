@@ -25,7 +25,6 @@
 #include "zbx_item_constants.h"
 #include "zbxtagfilter.h"
 #include "zbxcrypto.h"
-#include "zbxescalations.h"
 #include "zbxalgo.h"
 #include "zbxhistory.h"
 #include "zbxcacheconfig.h"
@@ -37,6 +36,7 @@
 #include "zbxstr.h"
 #include "zbxtime.h"
 #include "zbxvariant.h"
+#include "zbxipcservice.h"
 
 static zbx_shmem_info_t	*hc_index_mem = NULL;
 static zbx_shmem_info_t	*hc_mem = NULL;
@@ -59,7 +59,7 @@ static size_t		sql_alloc = 4 * ZBX_KIBIBYTE;
 static zbx_get_program_type_f	get_program_type_cb = NULL;
 static zbx_history_sync_f	sync_history_cb = NULL;
 
-#define ZBX_IDS_SIZE	13
+#define ZBX_IDS_SIZE	14
 
 #define ZBX_HC_ITEMS_INIT_SIZE	1000
 
