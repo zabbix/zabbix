@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-05-28 14:36+0000\n"
+"PO-Revision-Date: 2024-06-14 12:51+0000\n"
 "Last-Translator: Albert <albert.przybylski@aplitt.pl>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
@@ -13474,13 +13474,13 @@ msgstr "Pamięć użyta przez proces w bajtach. Zwraca liczbę całkowitą"
 #: app/views/administration.mediatype.edit.php:271
 #: app/views/mediatype.edit.php:342
 msgid "Menu entry URL"
-msgstr "UWL wejścia do menu"
+msgstr "URL elementu menu"
 
 #: app/partials/trigger.edit.trigger.tab.php:268
 #: app/views/administration.mediatype.edit.php:262
 #: app/views/mediatype.edit.php:329
 msgid "Menu entry name"
-msgstr "Nazwa wejścia do menu"
+msgstr "Nazwa elementu menu"
 
 #: app/partials/trigger.edit.trigger.tab.php:269
 msgid "Menu entry name is used as a label for the trigger URL in the event context menu."
@@ -19647,7 +19647,7 @@ msgstr "Funkcje łańcuchów znaków"
 
 #: widgets/piechart/includes/WidgetForm.php:137
 msgid "Stroke width"
-msgstr ""
+msgstr "Grubość konturu"
 
 #: include/items.inc.php:1545 include/items.inc.php:1549
 #: include/items.inc.php:1553 include/items.inc.php:1557
