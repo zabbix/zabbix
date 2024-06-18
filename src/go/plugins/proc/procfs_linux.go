@@ -44,26 +44,9 @@ type processUserInfo struct {
 	gid int64
 }
 
-func read2k(filename string) (data []byte, err error) {
-	fd, err := syscall.Open(filename, syscall.O_RDONLY, 0)
-	if err != nil {
-		return
-	}
-	var n int
-	b := make([]byte, 2048)
-	for {
-		if n, err = syscall.Read(fd, b); n == 0 && err == nil {
-			break
-		}
-		data = append(data, b[:n]...)
-	}
-	syscall.Close(fd)
-	return
-}
-
 func getProcessName(pid string) (name string, err error) {
 	var data []byte
-	if data, err = read2k("/proc/" + pid + "/stat"); err != nil {
+	if data, err = procfs.ReadAll("/proc/" + pid + "/stat"); err != nil {
 		return
 	}
 	var left, right int
@@ -80,7 +63,7 @@ func parseProcessStatus(pid string, proc *procStatus) (err error) {
 	proc.Pid, _ = strconv.ParseUint(pid, 10, 64)
 
 	var data []byte
-	if data, err = read2k("/proc/" + pid + "/status"); err != nil {
+	if data, err = procfs.ReadAll("/proc/" + pid + "/status"); err != nil {
 		return err
 	}
 
@@ -165,8 +148,8 @@ func parseSmaps(pid string, proc *procStatus) error {
 
 	var data []byte
 	var err error
-	if data, err = read2k("/proc/" + pid + "/smaps_rollup"); err != nil {
-		if data, err = read2k("/proc/" + pid + "/smaps"); err != nil {
+	if data, err = procfs.ReadAll("/proc/" + pid + "/smaps_rollup"); err != nil {
+		if data, err = procfs.ReadAll("/proc/" + pid + "/smaps"); err != nil {
 			return err
 		}
 	}
@@ -322,7 +305,7 @@ func getProcessNames(pid string, proc *procStatus) (err error) {
 
 func getProcessState(pid string) (name string, err error) {
 	var data []byte
-	if data, err = read2k("/proc/" + pid + "/status"); err != nil {
+	if data, err = procfs.ReadAll("/proc/" + pid + "/status"); err != nil {
 		return
 	}
 
@@ -382,7 +365,7 @@ func getProcessCmdline(pid string, flags int) (arg0 string, cmdline string, err 
 
 func getProcessStats(pid string, stat *procStat) {
 	var data []byte
-	if data, stat.err = read2k("/proc/" + pid + "/stat"); stat.err != nil {
+	if data, stat.err = procfs.ReadAll("/proc/" + pid + "/stat"); stat.err != nil {
 		return
 	}
 	var pos int
