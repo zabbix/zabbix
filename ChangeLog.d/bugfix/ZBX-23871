@@ -1,0 +1,1 @@
+..F....... [ZBX-23871] fixed incorrect order of "query_fields" and "headers" being sent to server in item test form (Ivo)
