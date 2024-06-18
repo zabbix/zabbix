@@ -83,7 +83,7 @@ class CSegmentedRadioElement extends CElement {
 	 * @inheritdoc
 	 */
 	public function isEnabled($enabled = true) {
-		return (($this->query('xpath:.//input[@type="radio"][not(@disabled)]')->count() > 0) === $enabled);
+		return (($this->query('xpath:.//input[@type="radio"][not(@readonly)]')->count() > 0) === $enabled);
 	}
 
 	/**
