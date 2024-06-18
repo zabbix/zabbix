@@ -528,7 +528,7 @@ window.item_edit_form = new class {
 					messages = exception.error.messages;
 				}
 				else {
-					messages = [t('Unexpected server error.')];
+					messages = [<?= json_encode(_('Unexpected server error.')) ?>];
 				}
 
 				const message_box = makeMessageBox('bad', messages, title)[0];

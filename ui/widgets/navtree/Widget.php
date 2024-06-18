@@ -30,14 +30,15 @@ class Widget extends CWidget {
 	public function getTranslationStrings(): array {
 		return [
 			'class.widget.js' => [
-				'Add' => _s('Add'),
-				'Add child element' => _s('Add child elements'),
-				'Add multiple maps' => _s('Add multiple maps'),
-				'Apply' => _s('Apply'),
-				'Cancel' => _s('Cancel'),
-				'Edit' => _s('Edit'),
-				'Edit tree element' => _s('Edit tree element'),
-				'Remove' => _s('Remove')
+				'Add' => _('Add'),
+				'Add child element' => _('Add child element'),
+				'Add multiple maps' => _('Add multiple maps'),
+				'Apply' => _('Apply'),
+				'Cancel' => _('Cancel'),
+				'Edit' => _('Edit'),
+				'Edit tree element' => _('Edit tree element'),
+				'Remove' => _('Remove'),
+				'root' => _('root')
 			]
 		];
 	}

@@ -284,7 +284,7 @@ $translate_strings = [
 		'S_DELETE_LINKS_BETWEEN_SELECTED_ELEMENTS_Q' => _('Delete links between selected elements?'),
 		'S_MACRO_EXPAND_ERROR' => _('Cannot expand macros.'),
 		'S_NO_IMAGES' =>
-			'You need to have at least one image uploaded to create map element. Images can be uploaded in Administration->General->Images section.',
+			_('You need to have at least one image uploaded to create map element. Images can be uploaded in Administration->General->Images section.'),
 		'S_COLOR_IS_NOT_CORRECT' => _('Color "%1$s" is not correct: expecting hexadecimal color code (6 symbols).'),
 		'Host is not selected.' => _('Host is not selected.'),
 		'Map is not selected.' => _('Map is not selected.'),
