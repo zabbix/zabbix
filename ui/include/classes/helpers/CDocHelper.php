@@ -141,7 +141,7 @@ class CDocHelper {
 	const REPORT_STATUS =										'web_interface/frontend_sections/reports/status_of_zabbix';
 	const REPORT4 =												'web_interface/frontend_sections/reports/notifications';
 	const REPORTS_AUDITLOG_LIST =								'web_interface/frontend_sections/reports/audit_log';
-	const REPORTS_AVAILABILITYREPORT =							'web_interface/frontend_sections/reports/availability';
+	const REPORTS_AVAILABILITYREPORT_LIST =						'web_interface/frontend_sections/reports/availability';
 	const REPORTS_SCHEDULEDREPORT_EDIT =						'config/reports#configuration';
 	const REPORTS_SCHEDULEDREPORT_LIST =						'web_interface/frontend_sections/reports/scheduled';
 	const REPORTS_TOPTRIGGERS =									'web_interface/frontend_sections/reports/triggers_top';

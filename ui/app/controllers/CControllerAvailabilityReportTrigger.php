@@ -16,6 +16,11 @@
 
 class CControllerAvailabilityReportTrigger extends CController {
 
+	/**
+	 * @var array
+	 */
+	private $trigger = [];
+
 	protected function init(): void {
 		$this->disableCsrfValidation();
 	}
@@ -35,23 +40,27 @@ class CControllerAvailabilityReportTrigger extends CController {
 	}
 
 	protected function checkPermissions(): bool {
+		$triggers = API::Trigger()->get([
+			'output' => ['triggerid', 'description'],
+			'triggerids' => $this->getInput('triggerid'),
+			'selectHosts' => ['name'],
+			'expandDescription' => true
+		]);
+
+		if (!$triggers) {
+			return false;
+		}
+
+		$this->trigger = reset($triggers);
+
 		return $this->checkAccess(CRoleHelper::UI_REPORTS_AVAILABILITY_REPORT);
 	}
 
 	protected function doAction(): void {
-		$trigger = API::Trigger()->get([
-			'output' => API_OUTPUT_EXTEND,
-			'triggerids' => $this->getInput('triggerid'),
-			'selectHosts' => API_OUTPUT_EXTEND,
-			'expandDescription' => true
-		]);
-
-		$data = $trigger
-		? [
-			'trigger' => $trigger[0],
-			'host' => $trigger[0]['hosts'][0]
-		]
-		: [];
+		$data = [
+			'trigger' => $this->trigger,
+			'host_name' => $this->trigger['hosts'][0]['name']
+		];
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Availability report graph'));

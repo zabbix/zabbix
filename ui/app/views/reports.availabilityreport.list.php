@@ -26,7 +26,7 @@ $this->includeJsFile('reports.availabilityreport.list.js.php');
 
 $html_page = (new CHtmlPage())
 	->setTitle(_('Availability report'))
-	->setDocUrl(CDocHelper::getUrl(CDocHelper::REPORTS_AVAILABILITYREPORT))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::REPORTS_AVAILABILITYREPORT_LIST))
 	->setControls((new CTag('nav', true,
 		(new CList())
 			->addItem(
