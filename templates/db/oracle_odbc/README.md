@@ -50,6 +50,7 @@ This template has been tested on:
     GRANT SELECT ON v_$log TO c##zabbix_mon;
     GRANT SELECT ON v_$archive_dest TO c##zabbix_mon;
     GRANT SELECT ON v_$asm_diskgroup TO c##zabbix_mon;
+    GRANT SELECT ON v_$asm_diskgroup_stat TO c##zabbix_mon;
     GRANT SELECT ON sys.dba_data_files TO c##zabbix_mon;
     GRANT SELECT ON DBA_TABLESPACES TO c##zabbix_mon;
     GRANT SELECT ON DBA_TABLESPACE_USAGE_METRICS TO c##zabbix_mon;
@@ -80,6 +81,7 @@ This template has been tested on:
     GRANT SELECT ON v_$log TO zabbix_mon;
     GRANT SELECT ON v_$archive_dest TO zabbix_mon;
     GRANT SELECT ON v_$asm_diskgroup TO zabbix_mon;
+    GRANT SELECT ON v_$asm_diskgroup_stat TO zabbix_mon;
     GRANT SELECT ON sys.dba_data_files TO zabbix_mon;
     GRANT SELECT ON DBA_TABLESPACES TO zabbix_mon;
     GRANT SELECT ON DBA_TABLESPACE_USAGE_METRICS TO zabbix_mon;
