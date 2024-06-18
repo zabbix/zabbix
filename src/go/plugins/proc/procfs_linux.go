@@ -37,6 +37,8 @@ import (
 	"golang.zabbix.com/sdk/log"
 )
 
+var errStatmFormat = errors.New("invalid statm file format")
+
 type processUserInfo struct {
 	uid int64
 	gid int64
@@ -181,7 +183,9 @@ func parseSmaps(pid string, proc *procStatus) error {
 		k := line[:pos]
 		v := strings.TrimSpace(line[pos+1:])
 
-		if trimUnit(v, &tmp); tmp == -1 {
+		trimUnit(v, &tmp)
+
+		if tmp == -1 {
 			continue
 		}
 
@@ -216,30 +220,31 @@ func parseSmaps(pid string, proc *procStatus) error {
 }
 
 func parseStatm(pid string, proc *procStatus) error {
-	var shared, private int64
+	const statmMinColumnCount = 3
 	var data []byte
 	var err error
 
 	if data, err = os.ReadFile("/proc/" + pid + "/statm"); err != nil {
-		return err
+		return fmt.Errorf("failed to read statm file: %w", err)
 	}
 
-	psize := int64(os.Getpagesize() / 1024)
 	var lines []string
-	var rss int64
 
-	if lines = strings.Split(string(data), " "); len(lines) < 3 {
-		return errors.New("Invalid statm file format.")
+	if lines = strings.Split(string(data), " "); len(lines) < statmMinColumnCount {
+		return fmt.Errorf("failed to parse memory stats: %w", errStatmFormat)
 	}
+
+	var rss, shared, private int64
 
 	if rss, err = strconv.ParseInt(lines[1], 10, 64); err != nil {
-		return errors.New("Failed to parse RSS column.")
+		return fmt.Errorf("failed to parse RSS count from statm: %w", err)
 	}
 
 	if shared, err = strconv.ParseInt(lines[2], 10, 64); err != nil {
-		return err
+		return fmt.Errorf("failed to parse shared memory count from statm: %w", err)
 	}
 
+	psize := int64(os.Getpagesize() / 1024)
 	shared *= psize
 	private = rss*psize - shared
 	private <<= 10
