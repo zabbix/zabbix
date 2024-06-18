@@ -149,10 +149,12 @@ foreach ($data['mediatypes'] as $media_type) {
 	$status = (MEDIA_TYPE_STATUS_ACTIVE == $media_type['status'])
 		? (new CLink(_('Enabled')))
 			->addClass(ZBX_STYLE_GREEN)
+			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass('js-disable')
 			->setAttribute('data-mediatypeid', (int) $media_type['mediatypeid'])
 		: (new CLink(_('Disabled')))
 			->addClass(ZBX_STYLE_RED)
+			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass('js-enable')
 			->setAttribute('data-mediatypeid', (int) $media_type['mediatypeid']);
 
