@@ -202,7 +202,7 @@ func parseSmaps(pid string, proc *procStatus) error {
 }
 
 func parseStatm(pid string, proc *procStatus) error {
-	const statmMinColumnCount = 3
+	const statmMinColumnCount = 2
 	var data []byte
 	var err error
 
@@ -216,23 +216,13 @@ func parseStatm(pid string, proc *procStatus) error {
 		return fmt.Errorf("failed to parse memory stats: %w", errStatmFormat)
 	}
 
-	var rss, shared, private int64
+	var rss int64
 
 	if rss, err = strconv.ParseInt(lines[1], 10, 64); err != nil {
 		return fmt.Errorf("failed to parse RSS count from statm: %w", err)
 	}
 
-	if shared, err = strconv.ParseInt(lines[2], 10, 64); err != nil {
-		return fmt.Errorf("failed to parse shared memory count from statm: %w", err)
-	}
-
-	psize := int64(os.Getpagesize() / 1024)
-	shared *= psize
-	private = rss*psize - shared
-	private <<= 10
-	shared <<= 10
-
-	proc.Pss = shared + private
+	proc.Pss = rss * int64(os.Getpagesize())
 
 	return nil
 }
