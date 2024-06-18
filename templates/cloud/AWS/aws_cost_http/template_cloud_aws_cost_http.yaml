@@ -526,7 +526,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'aws.monthly.service.cost["{#AWS.BILLING.SERVICE.NAME}", "{#AWS.BILLING.MONTH}"]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               units: '{#AWS.BILLING.UNIT}'
               description: 'The monthly cost by service {#AWS.BILLING.SERVICE.NAME}.'
@@ -592,7 +591,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'aws.daily.service.cost["{#AWS.BILLING.SERVICE.NAME}"]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               units: '{#AWS.BILLING.UNIT}'
               description: 'The daily blended cost of the {#AWS.BILLING.SERVICE.NAME} service for the previous day.'
@@ -640,7 +638,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'aws.monthly.cost["{#AWS.BILLING.MONTH}"]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               units: '{#AWS.BILLING.UNIT}'
               description: 'The blended cost by month {#AWS.BILLING.MONTH}.'
