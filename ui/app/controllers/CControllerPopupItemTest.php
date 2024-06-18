@@ -570,7 +570,7 @@ abstract class CControllerPopupItemTest extends CController {
 						$field_data = [];
 
 						foreach ($input[$field]['sortorder'] as $key => $order) {
-							$field_data[$key] = [
+							$field_data[] = [
 								'sortorder' => $order,
 								'name' => $input[$field]['name'][$key],
 								'value' => $input[$field]['value'][$key]
