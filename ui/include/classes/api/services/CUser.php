@@ -1968,32 +1968,31 @@ class CUser extends CApiService {
 			$result = $relationMap->mapMany($result, $mediaTypes, 'mediatypes');
 		}
 
-		// adding user role
-		if ($options['selectRole'] !== null && $options['selectRole'] !== API_OUTPUT_COUNT) {
-			if ($options['selectRole'] === API_OUTPUT_EXTEND) {
-				$options['selectRole'] = ['roleid', 'name', 'type', 'readonly'];
-			}
-
-			$db_roles = DBselect(
-				'SELECT u.userid'.($options['selectRole'] ? ',r.'.implode(',r.', $options['selectRole']) : '').
-				' FROM users u,role r'.
-				' WHERE u.roleid=r.roleid'.
-				' AND '.dbConditionInt('u.userid', $userIds)
-			);
-
-			foreach ($result as $userid => $user) {
-				$result[$userid]['role'] = [];
-			}
-
-			while ($db_role = DBfetch($db_roles)) {
-				$userid = $db_role['userid'];
-				unset($db_role['userid']);
-
-				$result[$userid]['role'] = $db_role;
-			}
-		}
+		$this->addRelatedRole($options, $result);
 
 		return $result;
+	}
+
+	/**
+	 * @param array $options
+	 * @param array $result
+	 */
+	private function addRelatedRole(array $options, array &$result): void {
+		if ($options['selectRole'] === null) {
+			return;
+		}
+
+		$relation_map = $this->createRelationMap($result, 'userid', 'roleid');
+
+		$db_roles = API::Role()->get([
+			'output' => $options['selectRole'] === API_OUTPUT_EXTEND
+				? array_diff(CRole::OUTPUT_FIELDS, ['roleid'])
+				: $options['selectRole'],
+			'roleids' => $relation_map->getRelatedIds(),
+			'preservekeys' => true
+		]);
+
+		$result = $relation_map->mapOne($result, $db_roles, 'role');
 	}
 
 	/**
