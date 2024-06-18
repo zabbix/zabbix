@@ -24,7 +24,6 @@ zabbix_export:
           type: DEPENDENT
           key: memcached.commands.flush.rate
           delay: '0'
-          history: 7d
           value_type: FLOAT
           description: 'The flush_all command invalidates all items in the database. This operation incurs a performance penalty and shouldn''t take place in production, so check your debug scripts.'
           preprocessing:
@@ -44,7 +43,6 @@ zabbix_export:
           type: DEPENDENT
           key: memcached.commands.get.rate
           delay: '0'
-          history: 7d
           value_type: FLOAT
           description: 'Number of GET requests received by server per second.'
           preprocessing:
@@ -64,7 +62,6 @@ zabbix_export:
           type: DEPENDENT
           key: memcached.commands.set.rate
           delay: '0'
-          history: 7d
           value_type: FLOAT
           description: 'Number of SET requests received by server per second.'
           preprocessing:
@@ -84,7 +81,6 @@ zabbix_export:
           type: DEPENDENT
           key: memcached.config.limit_maxbytes
           delay: '0'
-          history: 7d
           units: B
           description: 'Maximum number of bytes allowed in cache. You can adjust this setting via a config file or the command line while starting your Memcached server.'
           preprocessing:
@@ -104,7 +100,6 @@ zabbix_export:
           type: DEPENDENT
           key: memcached.connections.current
           delay: '0'
-          history: 7d
           description: 'The number of clients presently connected'
           preprocessing:
             - type: JSONPATH
@@ -120,7 +115,6 @@ zabbix_export:
           type: DEPENDENT
           key: memcached.connections.max
           delay: '0'
-          history: 7d
           description: 'Max number of concurrent connections'
           preprocessing:
             - type: JSONPATH
@@ -139,7 +133,6 @@ zabbix_export:
           type: DEPENDENT
           key: memcached.connections.queued.rate
           delay: '0'
-          history: 7d
           value_type: FLOAT
           description: 'Number of times that memcached has hit its connections limit and disabled its listener'
           preprocessing:
@@ -169,7 +162,6 @@ zabbix_export:
           type: DEPENDENT
           key: memcached.connections.rate
           delay: '0'
-          history: 7d
           value_type: FLOAT
           description: 'Number of connections opened per second'
           preprocessing:
@@ -189,7 +181,6 @@ zabbix_export:
           type: DEPENDENT
           key: memcached.connections.structures
           delay: '0'
-          history: 7d
           description: 'Number of  connection structures allocated by the server'
           preprocessing:
             - type: JSONPATH
@@ -205,7 +196,6 @@ zabbix_export:
           type: DEPENDENT
           key: memcached.connections.throttled.rate
           delay: '0'
-          history: 7d
           value_type: FLOAT
           description: 'Number of times a client connection was throttled. When sending GETs in batch mode and the connection contains too many requests (limited by -R parameter) the connection might be throttled to prevent starvation.'
           preprocessing:
@@ -237,7 +227,6 @@ zabbix_export:
           type: DEPENDENT
           key: memcached.cpu.sys
           delay: '0'
-          history: 7d
           value_type: FLOAT
           units: s
           description: 'System CPU consumed by the Memcached server'
@@ -269,7 +258,6 @@ zabbix_export:
           type: DEPENDENT
           key: memcached.cpu.user
           delay: '0'
-          history: 7d
           value_type: FLOAT
           units: s
           description: 'User CPU consumed by the Memcached server'
@@ -285,7 +273,6 @@ zabbix_export:
         - uuid: 57a4c2e763c3430daacd4495b91c3e74
           name: Ping
           key: 'memcached.ping["{$MEMCACHED.CONN.URI}"]'
-          history: 7d
           valuemap:
             name: 'Service state'
           preprocessing:
@@ -309,7 +296,6 @@ zabbix_export:
           type: DEPENDENT
           key: memcached.process_id
           delay: '0'
-          history: 7d
           description: 'PID of the server process'
           preprocessing:
             - type: JSONPATH
@@ -328,7 +314,6 @@ zabbix_export:
           type: DEPENDENT
           key: memcached.stats.bytes
           delay: '0'
-          history: 7d
           value_type: FLOAT
           units: B
           description: 'Current number of bytes used to store items.'
@@ -346,7 +331,6 @@ zabbix_export:
           type: DEPENDENT
           key: memcached.stats.bytes_read.rate
           delay: '0'
-          history: 7d
           value_type: FLOAT
           units: Bps
           description: 'The network''s read rate per second in B/sec'
@@ -367,7 +351,6 @@ zabbix_export:
           type: DEPENDENT
           key: memcached.stats.bytes_written.rate
           delay: '0'
-          history: 7d
           value_type: FLOAT
           units: Bps
           description: 'The network''s read rate per second in B/sec'
@@ -388,7 +371,6 @@ zabbix_export:
           type: DEPENDENT
           key: memcached.stats.curr_items
           delay: '0'
-          history: 7d
           description: 'Current number of items stored by this instance.'
           preprocessing:
             - type: JSONPATH
@@ -404,7 +386,6 @@ zabbix_export:
           type: DEPENDENT
           key: memcached.stats.evictions.rate
           delay: '0'
-          history: 7d
           description: |
             "An eviction is when an item that still has time to live is removed from the cache because a brand new item needs to be allocated.
             The item is selected with a pseudo-LRU mechanism.
@@ -426,7 +407,6 @@ zabbix_export:
           type: DEPENDENT
           key: memcached.stats.hits.rate
           delay: '0'
-          history: 7d
           description: 'Number of successful GET requests (items requested and found) per second.'
           preprocessing:
             - type: JSONPATH
@@ -445,7 +425,6 @@ zabbix_export:
           type: DEPENDENT
           key: memcached.stats.misses.rate
           delay: '0'
-          history: 7d
           description: 'Number of missed GET requests (items requested but not found) per second.'
           preprocessing:
             - type: JSONPATH
@@ -464,7 +443,6 @@ zabbix_export:
           type: DEPENDENT
           key: memcached.stats.threads
           delay: '0'
-          history: 7d
           description: 'Number of worker threads requested'
           preprocessing:
             - type: JSONPATH
@@ -480,7 +458,6 @@ zabbix_export:
           type: DEPENDENT
           key: memcached.stats.total_items.rate
           delay: '0'
-          history: 7d
           description: 'Number of new items stored per second.'
           preprocessing:
             - type: JSONPATH
@@ -508,7 +485,6 @@ zabbix_export:
           type: DEPENDENT
           key: memcached.uptime
           delay: '0'
-          history: 7d
           units: s
           description: 'Number of seconds since Memcached server start'
           preprocessing:
@@ -536,7 +512,6 @@ zabbix_export:
           type: DEPENDENT
           key: memcached.version
           delay: '0'
-          history: 7d
           trends: '0'
           value_type: CHAR
           description: 'Version of the Memcached server'
