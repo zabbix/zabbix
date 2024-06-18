@@ -458,8 +458,7 @@ static void	pgm_rebalance_and_flush_updates(zbx_pg_cache_t *cache)
 			pgm_db_flush_host_proxy_updates(&sql, &sql_alloc, &sql_offset, &hosts_mod);
 			pgm_db_flush_host_proxy_deletes(&sql, &sql_alloc, &sql_offset, &hosts_del);
 
-			if (0 != sql_offset)
-				zbx_db_execute("%s", sql);
+			(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
 
 			pgm_db_flush_host_proxy_inserts(&hosts_new);
 
