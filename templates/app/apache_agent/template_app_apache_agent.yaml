@@ -25,7 +25,6 @@ zabbix_export:
           type: DEPENDENT
           key: apache.bytes
           delay: '0'
-          history: 7d
           value_type: FLOAT
           units: B
           description: 'The total bytes served.'
@@ -46,7 +45,6 @@ zabbix_export:
           type: DEPENDENT
           key: apache.bytes.rate
           delay: '0'
-          history: 7d
           value_type: FLOAT
           units: Bps
           description: |
@@ -73,7 +71,6 @@ zabbix_export:
           type: DEPENDENT
           key: apache.requests
           delay: '0'
-          history: 7d
           description: 'The total number of the Apache server accesses.'
           preprocessing:
             - type: JSONPATH
@@ -89,7 +86,6 @@ zabbix_export:
           type: DEPENDENT
           key: apache.requests.rate
           delay: '0'
-          history: 7d
           value_type: FLOAT
           description: |
             It is calculated as a rate of change for the "Total requests" statistics.
@@ -111,7 +107,6 @@ zabbix_export:
           type: DEPENDENT
           key: apache.uptime
           delay: '0'
-          history: 7d
           units: uptime
           description: 'The service uptime expressed in seconds.'
           preprocessing:
@@ -139,7 +134,6 @@ zabbix_export:
           type: DEPENDENT
           key: apache.version
           delay: '0'
-          history: 7d
           trends: '0'
           value_type: CHAR
           description: 'The Apache service version.'
@@ -171,7 +165,6 @@ zabbix_export:
           type: DEPENDENT
           key: apache.workers.cleanup
           delay: '0'
-          history: 7d
           description: 'The number of workers in cleanup state.'
           preprocessing:
             - type: JSONPATH
@@ -187,7 +180,6 @@ zabbix_export:
           type: DEPENDENT
           key: apache.workers.closing
           delay: '0'
-          history: 7d
           description: 'The number of workers in closing state.'
           preprocessing:
             - type: JSONPATH
@@ -203,7 +195,6 @@ zabbix_export:
           type: DEPENDENT
           key: apache.workers.dnslookup
           delay: '0'
-          history: 7d
           description: 'The number of workers in `dnslookup` state.'
           preprocessing:
             - type: JSONPATH
@@ -219,7 +210,6 @@ zabbix_export:
           type: DEPENDENT
           key: apache.workers.finishing
           delay: '0'
-          history: 7d
           description: 'The number of workers in finishing state.'
           preprocessing:
             - type: JSONPATH
@@ -235,7 +225,6 @@ zabbix_export:
           type: DEPENDENT
           key: apache.workers.keepalive
           delay: '0'
-          history: 7d
           description: 'The number of workers in `keepalive` state.'
           preprocessing:
             - type: JSONPATH
@@ -251,7 +240,6 @@ zabbix_export:
           type: DEPENDENT
           key: apache.workers.logging
           delay: '0'
-          history: 7d
           description: 'The number of workers in logging state.'
           preprocessing:
             - type: JSONPATH
@@ -267,7 +255,6 @@ zabbix_export:
           type: DEPENDENT
           key: apache.workers.reading
           delay: '0'
-          history: 7d
           description: 'The number of workers in reading state.'
           preprocessing:
             - type: JSONPATH
@@ -283,7 +270,6 @@ zabbix_export:
           type: DEPENDENT
           key: apache.workers.sending
           delay: '0'
-          history: 7d
           description: 'The number of workers in sending state.'
           preprocessing:
             - type: JSONPATH
@@ -299,7 +285,6 @@ zabbix_export:
           type: DEPENDENT
           key: apache.workers.slot
           delay: '0'
-          history: 7d
           description: 'The number of slots with no current process.'
           preprocessing:
             - type: JSONPATH
@@ -315,7 +300,6 @@ zabbix_export:
           type: DEPENDENT
           key: apache.workers.starting
           delay: '0'
-          history: 7d
           description: 'The number of workers in starting state.'
           preprocessing:
             - type: JSONPATH
@@ -331,7 +315,6 @@ zabbix_export:
           type: DEPENDENT
           key: apache.workers.waiting
           delay: '0'
-          history: 7d
           description: 'The number of workers in waiting state.'
           preprocessing:
             - type: JSONPATH
@@ -347,7 +330,6 @@ zabbix_export:
           type: DEPENDENT
           key: apache.workers_total.busy
           delay: '0'
-          history: 7d
           description: 'The total number of busy worker threads/processes.'
           preprocessing:
             - type: JSONPATH
@@ -363,7 +345,6 @@ zabbix_export:
           type: DEPENDENT
           key: apache.workers_total.idle
           delay: '0'
-          history: 7d
           description: 'The total number of idle worker threads/processes.'
           preprocessing:
             - type: JSONPATH
@@ -377,7 +358,6 @@ zabbix_export:
         - uuid: 267ca6fe038346e5be1113f3bf9b4023
           name: 'Service response time'
           key: 'net.tcp.service.perf[http,"{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PORT}"]'
-          history: 7d
           value_type: FLOAT
           units: s
           tags:
@@ -388,7 +368,6 @@ zabbix_export:
         - uuid: 369f00e2970048c786ce3bd609e65566
           name: 'Service ping'
           key: 'net.tcp.service[http,"{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PORT}"]'
-          history: 7d
           valuemap:
             name: 'Service state'
           preprocessing:
@@ -476,7 +455,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'apache.bytes[per_request{#SINGLETON}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               units: B
               description: 'The average number of client requests per second.'
@@ -494,7 +472,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'apache.connections[async_closing{#SINGLETON}]'
               delay: '0'
-              history: 7d
               description: 'The number of asynchronous connections in closing state (applicable only to the event MPM).'
               preprocessing:
                 - type: JSONPATH
@@ -510,7 +487,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'apache.connections[async_keep_alive{#SINGLETON}]'
               delay: '0'
-              history: 7d
               description: 'The number of asynchronous connections in keepalive state (applicable only to the event MPM).'
               preprocessing:
                 - type: JSONPATH
@@ -526,7 +502,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'apache.connections[async_writing{#SINGLETON}]'
               delay: '0'
-              history: 7d
               description: 'The number of asynchronous connections in writing state (applicable only to the event MPM).'
               preprocessing:
                 - type: JSONPATH
@@ -542,7 +517,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'apache.connections[total{#SINGLETON}]'
               delay: '0'
-              history: 7d
               description: 'The number of total connections.'
               preprocessing:
                 - type: JSONPATH
@@ -558,7 +532,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'apache.process[num{#SINGLETON}]'
               delay: '0'
-              history: 7d
               description: 'The number of asynchronous processes.'
               preprocessing:
                 - type: JSONPATH
@@ -650,7 +623,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'apache.proc.num[{#APACHE.NAME}]'
               delay: '0'
-              history: 7d
               description: 'The number of running processes {#APACHE.NAME}.'
               preprocessing:
                 - type: JSONPATH
@@ -679,7 +651,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'apache.proc.pmem[{#APACHE.NAME}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               units: '%'
               description: 'The percentage of real memory used by a process {#APACHE.NAME}.'
@@ -698,7 +669,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'apache.proc.rss[{#APACHE.NAME}]'
               delay: '0'
-              history: 7d
               units: B
               description: 'The summary of resident set size memory used by a process {#APACHE.NAME} expressed in bytes.'
               preprocessing:
@@ -716,7 +686,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'apache.proc.vmem[{#APACHE.NAME}]'
               delay: '0'
-              history: 7d
               units: B
               description: 'The summary of virtual memory used by a process {#APACHE.NAME} expressed in bytes.'
               preprocessing:
@@ -732,7 +701,6 @@ zabbix_export:
             - uuid: b73280fb0af64c7899abfc74cc074b13
               name: 'CPU utilization'
               key: 'proc.cpu.util[{#APACHE.NAME}]'
-              history: 7d
               value_type: FLOAT
               units: '%'
               description: 'The percentage of the CPU utilization by a process {#APACHE.NAME}.'

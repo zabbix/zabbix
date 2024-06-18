@@ -78,7 +78,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'custom.proc.mem.locked[{#NAME}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               units: B
               description: 'The size of locked memory {#NAME}.'
@@ -99,7 +98,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'custom.proc.num[{#NAME}]'
               delay: '0'
-              history: 7d
               description: 'The number of running processes {#NAME}.'
               preprocessing:
                 - type: JSONPATH
@@ -131,7 +129,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'custom.proc.page[{#NAME}]'
               delay: '0'
-              history: 7d
               description: 'The number of page faults {#NAME}.'
               preprocessing:
                 - type: JSONPATH
@@ -150,7 +147,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'custom.proc.pmem[{#NAME}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               units: '%'
               description: 'The percentage of real memory used by the process {#NAME}.'
@@ -171,7 +167,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'custom.proc.rss[{#NAME}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               units: B
               description: 'The summary of Resident Set Size (RSS) memory used by the process {#NAME} in bytes.'
@@ -192,7 +187,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'custom.proc.swap[{#NAME}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               units: B
               description: 'The swap space used by {#NAME}.'
@@ -213,7 +207,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'custom.proc.thread[{#NAME}]'
               delay: '0'
-              history: 7d
               description: 'The number of threads {#NAME}.'
               preprocessing:
                 - type: JSONPATH
@@ -232,7 +225,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'custom.proc.vmem[{#NAME}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               units: B
               description: 'The summary of virtual memory used by process {#NAME} in bytes.'

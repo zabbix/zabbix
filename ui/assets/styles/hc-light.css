@@ -6051,7 +6051,6 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
     transform: rotate(45deg); }
 
 .overlay-dialogue {
-  display: table;
   position: absolute;
   z-index: 1000;
   padding: 17px 10px 10px;
@@ -6742,6 +6741,8 @@ button.is-loading {
   position: relative;
   color: transparent !important;
   border-bottom-color: transparent; }
+  .link-action.is-loading::before {
+    background-color: transparent; }
   .link-action.is-loading::after {
     box-shadow: none;
     background: none;

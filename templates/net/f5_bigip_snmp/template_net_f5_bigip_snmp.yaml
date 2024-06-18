@@ -26,7 +26,6 @@ zabbix_export:
           snmp_oid: .1.3.6.1.2.1.1.4.0
           key: bigip.contact
           delay: 1h
-          history: 7d
           trends: '0'
           value_type: CHAR
           description: |
@@ -47,7 +46,6 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3375.2.1.14.3.1.0
           key: bigip.failover
-          history: 7d
           description: |
             MIB: F5-BIGIP-SYSTEM-MIB
             The failover status ID on the system.
@@ -78,7 +76,6 @@ zabbix_export:
           snmp_oid: .1.3.6.1.2.1.1.6.0
           key: bigip.location
           delay: 1h
-          history: 7d
           trends: '0'
           value_type: CHAR
           description: |
@@ -99,7 +96,6 @@ zabbix_export:
           snmp_oid: .1.3.6.1.2.1.1.1.0
           key: bigip.model
           delay: 1h
-          history: 7d
           trends: '0'
           value_type: CHAR
           description: |
@@ -124,7 +120,6 @@ zabbix_export:
           snmp_oid: .1.3.6.1.2.1.1.5.0
           key: bigip.name
           delay: 1h
-          history: 7d
           trends: '0'
           value_type: CHAR
           description: |
@@ -146,7 +141,6 @@ zabbix_export:
           snmp_oid: .1.3.6.1.4.1.3375.2.1.4.3.0
           key: bigip.product.build
           delay: 1h
-          history: 7d
           trends: '0'
           value_type: CHAR
           description: |
@@ -165,7 +159,6 @@ zabbix_export:
           snmp_oid: .1.3.6.1.4.1.3375.2.1.4.5.0
           key: bigip.product.date
           delay: 1h
-          history: 7d
           trends: '0'
           value_type: CHAR
           description: |
@@ -184,7 +177,6 @@ zabbix_export:
           snmp_oid: .1.3.6.1.4.1.3375.2.1.4.4.0
           key: bigip.product.edition
           delay: 1h
-          history: 7d
           trends: '0'
           value_type: CHAR
           description: |
@@ -203,7 +195,6 @@ zabbix_export:
           snmp_oid: .1.3.6.1.4.1.3375.2.1.4.1.0
           key: bigip.product.name
           delay: 1h
-          history: 7d
           trends: '0'
           value_type: CHAR
           description: |
@@ -222,7 +213,6 @@ zabbix_export:
           snmp_oid: .1.3.6.1.4.1.3375.2.1.4.2.0
           key: bigip.product.version
           delay: 1h
-          history: 7d
           trends: '0'
           value_type: CHAR
           description: |
@@ -241,7 +231,6 @@ zabbix_export:
           snmp_oid: .1.3.6.1.4.1.3375.2.1.3.3.3.0
           key: bigip.serialnumber
           delay: 1h
-          history: 7d
           trends: '0'
           value_type: CHAR
           description: |
@@ -271,7 +260,6 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.3375.2.1.14.1.1.0
           key: bigip.syncstatus
-          history: 7d
           description: |
             MIB: F5-BIGIP-SYSTEM-MIB
             The sync status ID on the system.
@@ -318,7 +306,6 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.4.1.3375.2.1.1.2.12.3.0
           key: bigip.tcp.close_wait
-          history: 7d
           description: |
             MIB: F5-BIGIP-SYSTEM-MIB
             The number of current TCP connections in CLOSE-WAIT/LAST-ACK.
@@ -330,7 +317,6 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.4.1.3375.2.1.1.2.12.4.0
           key: bigip.tcp.fin1_wait
-          history: 7d
           description: |
             MIB: F5-BIGIP-SYSTEM-MIB
             The number of current TCP connections in FIN-WAIT-1/CLOSING.
@@ -342,7 +328,6 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.4.1.3375.2.1.1.2.12.20.0
           key: bigip.tcp.fin2_wait
-          history: 7d
           description: |
             MIB: F5-BIGIP-SYSTEM-MIB
             The number of current TCP connections in FIN-WAIT-2.
@@ -354,7 +339,6 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.4.1.3375.2.1.1.2.12.2.0
           key: bigip.tcp.open
-          history: 7d
           description: |
             MIB: F5-BIGIP-SYSTEM-MIB
             The number of current open TCP connections.
@@ -366,7 +350,6 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.4.1.3375.2.1.1.2.12.5.0
           key: bigip.tcp.time_wait
-          history: 7d
           description: |
             MIB: F5-BIGIP-SYSTEM-MIB
             The number of current TCP connections in TIME-WAIT.
@@ -378,7 +361,6 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.4.1.3375.2.1.1.2.13.2.0
           key: bigip.udp.open
-          history: 7d
           description: |
             MIB: F5-BIGIP-SYSTEM-MIB
             The number of current open UDP connections.
@@ -391,7 +373,6 @@ zabbix_export:
           snmp_oid: .1.3.6.1.4.1.3375.2.1.6.6.0
           key: bigip.uptime
           delay: 30s
-          history: 7d
           trends: '0'
           units: uptime
           description: |
@@ -419,7 +400,6 @@ zabbix_export:
           name: 'SNMP agent availability'
           type: INTERNAL
           key: 'zabbix[host,snmp,available]'
-          history: 7d
           valuemap:
             name: 'SNMP available'
           preprocessing:
@@ -453,7 +433,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.3375.2.1.3.2.4.2.1.2.{#SNMPINDEX}'
               key: 'bigip.blade.temp.value[{#SLOT.INDEX},{#TEMP.INDEX}]'
-              history: 7d
               value_type: FLOAT
               units: °C
               description: |
@@ -496,7 +475,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.3375.2.1.3.2.5.2.1.3.{#SNMPINDEX}'
               key: 'bigip.blade.voltage.slot[{#VOLT.INDEX}]'
-              history: 7d
               description: |
                 MIB: F5-BIGIP-SYSTEM-MIB
                 The chassis slot number, if applicable.
@@ -514,7 +492,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.3375.2.1.3.2.4.2.1.2.{#SNMPINDEX}'
               key: 'bigip.blade.voltage.value[{#VOLT.INDEX}]'
-              history: 7d
               value_type: FLOAT
               units: V
               description: |
@@ -560,7 +537,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.3375.2.1.15.1.2.1.5.{#SNMPINDEX}'
               key: 'bigip.cert.expiration.date[{#CERT.NAME}]'
               delay: 12h
-              history: 7d
               trends: '0'
               units: unixtime
               description: |
@@ -596,7 +572,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.3375.2.1.3.2.1.2.1.3.{#SNMPINDEX}'
               key: 'bigip.chassis.fan.speed[{#FAN.INDEX}]'
               delay: 5m
-              history: 7d
               units: '!rpm'
               description: |
                 MIB: F5-BIGIP-SYSTEM-MIB
@@ -619,7 +594,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.3375.2.1.3.2.1.2.1.2.{#SNMPINDEX}'
               key: 'bigip.chassis.fan.status[{#FAN.INDEX}]'
               delay: 5m
-              history: 7d
               description: |
                 MIB: F5-BIGIP-SYSTEM-MIB
                 The status of the indexed chassis fan on the system.,
@@ -680,7 +654,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.3375.2.1.3.2.2.2.1.2.{#SNMPINDEX}'
               key: 'bigip.chassis.power.status[{#POWER.INDEX}]'
               delay: 5m
-              history: 7d
               description: |
                 MIB: F5-BIGIP-SYSTEM-MIB
                 The status of the indexed power supply on the system.,
@@ -731,7 +704,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.3375.2.1.3.2.3.2.1.2.{#SNMPINDEX}'
               key: 'bigip.chassis.temp.value[{#TEMP.INDEX}]'
               delay: 5m
-              history: 7d
               value_type: FLOAT
               units: °C
               description: |
@@ -796,7 +768,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.3375.2.1.7.5.2.1.23.{#SNMPINDEX}'
               key: 'bigip.cpu.idle.1m[{#HOST.ID},{#CPU.ID}]'
               delay: 5m
-              history: 7d
               units: '%'
               description: |
                 MIB: F5-BIGIP-SYSTEM-MIB
@@ -814,7 +785,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.3375.2.1.7.5.2.1.31.{#SNMPINDEX}'
               key: 'bigip.cpu.idle.5m[{#HOST.ID},{#CPU.ID}]'
               delay: 5m
-              history: 7d
               units: '%'
               description: |
                 MIB: F5-BIGIP-SYSTEM-MIB
@@ -832,7 +802,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.3375.2.1.7.5.2.1.15.{#SNMPINDEX}'
               key: 'bigip.cpu.idle.5s[{#HOST.ID},{#CPU.ID}]'
               delay: 5m
-              history: 7d
               units: '%'
               description: |
                 MIB: F5-BIGIP-SYSTEM-MIB
@@ -850,7 +819,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.3375.2.1.7.5.2.1.26.{#SNMPINDEX}'
               key: 'bigip.cpu.iowait.1m[{#HOST.ID},{#CPU.ID}]'
               delay: 5m
-              history: 7d
               units: '%'
               description: |
                 MIB: F5-BIGIP-SYSTEM-MIB
@@ -868,7 +836,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.3375.2.1.7.5.2.1.34.{#SNMPINDEX}'
               key: 'bigip.cpu.iowait.5m[{#HOST.ID},{#CPU.ID}]'
               delay: 5m
-              history: 7d
               units: '%'
               description: |
                 MIB: F5-BIGIP-SYSTEM-MIB
@@ -886,7 +853,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.3375.2.1.7.5.2.1.18.{#SNMPINDEX}'
               key: 'bigip.cpu.iowait.5s[{#HOST.ID},{#CPU.ID}]'
               delay: 5m
-              history: 7d
               units: '%'
               description: |
                 MIB: F5-BIGIP-SYSTEM-MIB
@@ -904,7 +870,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.3375.2.1.7.5.2.1.24.{#SNMPINDEX}'
               key: 'bigip.cpu.irq.1m[{#HOST.ID},{#CPU.ID}]'
               delay: 5m
-              history: 7d
               units: '%'
               description: |
                 MIB: F5-BIGIP-SYSTEM-MIB
@@ -922,7 +887,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.3375.2.1.7.5.2.1.32.{#SNMPINDEX}'
               key: 'bigip.cpu.irq.5m[{#HOST.ID},{#CPU.ID}]'
               delay: 5m
-              history: 7d
               units: '%'
               description: |
                 MIB: F5-BIGIP-SYSTEM-MIB
@@ -940,7 +904,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.3375.2.1.7.5.2.1.16.{#SNMPINDEX}'
               key: 'bigip.cpu.irq.5s[{#HOST.ID},{#CPU.ID}]'
               delay: 5m
-              history: 7d
               units: '%'
               description: |
                 MIB: F5-BIGIP-SYSTEM-MIB
@@ -958,7 +921,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.3375.2.1.7.5.2.1.21.{#SNMPINDEX}'
               key: 'bigip.cpu.nice.1m[{#HOST.ID},{#CPU.ID}]'
               delay: 5m
-              history: 7d
               units: '%'
               description: |
                 MIB: F5-BIGIP-SYSTEM-MIB
@@ -976,7 +938,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.3375.2.1.7.5.2.1.29.{#SNMPINDEX}'
               key: 'bigip.cpu.nice.5m[{#HOST.ID},{#CPU.ID}]'
               delay: 5m
-              history: 7d
               units: '%'
               description: |
                 MIB: F5-BIGIP-SYSTEM-MIB
@@ -994,7 +955,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.3375.2.1.7.5.2.1.13.{#SNMPINDEX}'
               key: 'bigip.cpu.nice.5s[{#HOST.ID},{#CPU.ID}]'
               delay: 5m
-              history: 7d
               units: '%'
               description: |
                 MIB: F5-BIGIP-SYSTEM-MIB
@@ -1012,7 +972,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.3375.2.1.7.5.2.1.25.{#SNMPINDEX}'
               key: 'bigip.cpu.spftirq.1m[{#HOST.ID},{#CPU.ID}]'
               delay: 5m
-              history: 7d
               units: '%'
               description: |
                 MIB: F5-BIGIP-SYSTEM-MIB
@@ -1030,7 +989,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.3375.2.1.7.5.2.1.33.{#SNMPINDEX}'
               key: 'bigip.cpu.spftirq.5m[{#HOST.ID},{#CPU.ID}]'
               delay: 5m
-              history: 7d
               units: '%'
               description: |
                 MIB: F5-BIGIP-SYSTEM-MIB
@@ -1048,7 +1006,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.3375.2.1.7.5.2.1.17.{#SNMPINDEX}'
               key: 'bigip.cpu.spftirq.5s[{#HOST.ID},{#CPU.ID}]'
               delay: 5m
-              history: 7d
               units: '%'
               description: |
                 MIB: F5-BIGIP-SYSTEM-MIB
@@ -1066,7 +1023,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.3375.2.1.7.5.2.1.38.{#SNMPINDEX}'
               key: 'bigip.cpu.stolen.1m[{#HOST.ID},{#CPU.ID}]'
               delay: 5m
-              history: 7d
               units: '%'
               description: |
                 MIB: F5-BIGIP-SYSTEM-MIB
@@ -1084,7 +1040,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.3375.2.1.7.5.2.1.37.{#SNMPINDEX}'
               key: 'bigip.cpu.stolen.1s[{#HOST.ID},{#CPU.ID}]'
               delay: 5m
-              history: 7d
               units: '%'
               description: |
                 MIB: F5-BIGIP-SYSTEM-MIB
@@ -1102,7 +1057,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.3375.2.1.7.5.2.1.39.{#SNMPINDEX}'
               key: 'bigip.cpu.stolen.5m[{#HOST.ID},{#CPU.ID}]'
               delay: 5m
-              history: 7d
               units: '%'
               description: |
                 MIB: F5-BIGIP-SYSTEM-MIB
@@ -1120,7 +1074,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.3375.2.1.7.5.2.1.22.{#SNMPINDEX}'
               key: 'bigip.cpu.system.1m[{#HOST.ID},{#CPU.ID}]'
               delay: 5m
-              history: 7d
               units: '%'
               description: |
                 MIB: F5-BIGIP-SYSTEM-MIB
@@ -1138,7 +1091,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.3375.2.1.7.5.2.1.30.{#SNMPINDEX}'
               key: 'bigip.cpu.system.5m[{#HOST.ID},{#CPU.ID}]'
               delay: 5m
-              history: 7d
               units: '%'
               description: |
                 MIB: F5-BIGIP-SYSTEM-MIB
@@ -1156,7 +1108,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.3375.2.1.7.5.2.1.14.{#SNMPINDEX}'
               key: 'bigip.cpu.system.5s[{#HOST.ID},{#CPU.ID}]'
               delay: 5m
-              history: 7d
               units: '%'
               description: |
                 MIB: F5-BIGIP-SYSTEM-MIB
@@ -1174,7 +1125,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.3375.2.1.7.5.2.1.27.{#SNMPINDEX}'
               key: 'bigip.cpu.usageratio.1m[{#HOST.ID},{#CPU.ID}]'
               delay: 5m
-              history: 7d
               units: '%'
               description: |
                 MIB: F5-BIGIP-SYSTEM-MIB
@@ -1201,7 +1151,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.3375.2.1.7.5.2.1.35.{#SNMPINDEX}'
               key: 'bigip.cpu.usageratio.5m[{#HOST.ID},{#CPU.ID}]'
               delay: 5m
-              history: 7d
               units: '%'
               description: |
                 MIB: F5-BIGIP-SYSTEM-MIB
@@ -1240,7 +1189,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.3375.2.1.7.5.2.1.19.{#SNMPINDEX}'
               key: 'bigip.cpu.usageratio.5s[{#HOST.ID},{#CPU.ID}]'
               delay: 5m
-              history: 7d
               units: '%'
               description: |
                 MIB: F5-BIGIP-SYSTEM-MIB
@@ -1267,7 +1215,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.3375.2.1.7.5.2.1.20.{#SNMPINDEX}'
               key: 'bigip.cpu.user.1m[{#HOST.ID},{#CPU.ID}]'
               delay: 5m
-              history: 7d
               units: '%'
               description: |
                 MIB: F5-BIGIP-SYSTEM-MIB
@@ -1285,7 +1232,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.3375.2.1.7.5.2.1.28.{#SNMPINDEX}'
               key: 'bigip.cpu.user.5m[{#HOST.ID},{#CPU.ID}]'
               delay: 5m
-              history: 7d
               units: '%'
               description: |
                 MIB: F5-BIGIP-SYSTEM-MIB
@@ -1303,7 +1249,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.3375.2.1.7.5.2.1.12.{#SNMPINDEX}'
               key: 'bigip.cpu.user.5s[{#HOST.ID},{#CPU.ID}]'
               delay: 5m
-              history: 7d
               units: '%'
               description: |
                 MIB: F5-BIGIP-SYSTEM-MIB
@@ -1445,7 +1390,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.3375.2.1.3.6.2.1.3.{#SNMPINDEX}'
               key: 'bigip.cpu.sensor.fan[{#CPU.SENSOR.SLOT},{#CPU.SENSOR.INDEX}]'
               delay: 5m
-              history: 7d
               units: '!rpm'
               description: |
                 MIB: F5-BIGIP-SYSTEM-MIB
@@ -1468,7 +1412,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.3375.2.1.3.6.2.1.4.{#SNMPINDEX}'
               key: 'bigip.cpu.sensor.name[{#CPU.SENSOR.SLOT},{#CPU.SENSOR.INDEX}]'
               delay: 1h
-              history: 7d
               trends: '0'
               value_type: CHAR
               description: |
@@ -1489,7 +1432,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.3375.2.1.3.6.2.1.2.{#SNMPINDEX}'
               key: 'bigip.cpu.sensor.temperature[{#CPU.SENSOR.SLOT},{#CPU.SENSOR.INDEX}]'
               delay: 5m
-              history: 7d
               units: °C
               description: |
                 MIB: F5-BIGIP-SYSTEM-MIB
@@ -1549,7 +1491,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.3375.2.1.7.3.2.1.2.{#SNMPINDEX}'
               key: 'bigip.disktable.blocksize[{#PART.NAME}]'
               delay: 1h
-              history: 7d
               units: B
               description: |
                 MIB: F5-BIGIP-SYSTEM-MIB
@@ -1565,7 +1506,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.3375.2.1.7.3.2.1.4.{#SNMPINDEX}'
               key: 'bigip.disktable.freeblocks[{#PART.NAME}]'
               delay: 1h
-              history: 7d
               description: |
                 MIB: F5-BIGIP-SYSTEM-MIB
                 The number of free blocks in the specified partition.
@@ -1580,7 +1520,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.3375.2.1.7.3.2.1.6.{#SNMPINDEX}'
               key: 'bigip.disktable.freenodes[{#PART.NAME}]'
               delay: 1h
-              history: 7d
               description: |
                 MIB: F5-BIGIP-SYSTEM-MIB
                 The number of free file nodes in the specified partition.
@@ -1595,7 +1534,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.3375.2.1.7.3.2.1.3.{#SNMPINDEX}'
               key: 'bigip.disktable.totalblocks[{#PART.NAME}]'
               delay: 1h
-              history: 7d
               description: |
                 MIB: F5-BIGIP-SYSTEM-MIB
                 The number of total blocks in the specified partition.
@@ -1610,7 +1548,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.3375.2.1.7.3.2.1.5.{#SNMPINDEX}'
               key: 'bigip.disktable.totalnodes[{#PART.NAME}]'
               delay: 1h
-              history: 7d
               description: |
                 MIB: F5-BIGIP-SYSTEM-MIB
                 The number of total file nodes in the specified partition.
@@ -1676,7 +1613,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.3375.2.1.7.4.2.1.7.{#SNMPINDEX}'
               key: 'bigip.memory.total.other[{#HOST.ID}]'
               delay: 5m
-              history: 7d
               units: B
               description: |
                 MIB: F5-BIGIP-SYSTEM-MIB
@@ -1694,7 +1630,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.3375.2.1.7.4.2.1.9.{#SNMPINDEX}'
               key: 'bigip.memory.total.swap[{#HOST.ID}]'
               delay: 1d
-              history: 7d
               units: B
               description: |
                 MIB: F5-BIGIP-SYSTEM-MIB
@@ -1708,7 +1643,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.3375.2.1.7.4.2.1.2.{#SNMPINDEX}'
               key: 'bigip.memory.total[{#HOST.ID}]'
               delay: 1d
-              history: 7d
               units: B
               description: |
                 MIB: F5-BIGIP-SYSTEM-MIB
@@ -1722,7 +1656,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.3375.2.1.7.4.2.1.8.{#SNMPINDEX}'
               key: 'bigip.memory.used.other[{#HOST.ID}]'
               delay: 5m
-              history: 7d
               units: B
               description: |
                 MIB: F5-BIGIP-SYSTEM-MIB
@@ -1740,7 +1673,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.3375.2.1.7.4.2.1.10.{#SNMPINDEX}'
               key: 'bigip.memory.used.swap[{#HOST.ID}]'
               delay: 5m
-              history: 7d
               units: B
               description: |
                 MIB: F5-BIGIP-SYSTEM-MIB
@@ -1758,7 +1690,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.3375.2.1.7.4.2.1.3.{#SNMPINDEX}'
               key: 'bigip.memory.used[{#HOST.ID}]'
               delay: 5m
-              history: 7d
               units: B
               description: |
                 MIB: F5-BIGIP-SYSTEM-MIB
@@ -1835,7 +1766,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.3375.2.1.11.1.2.1.4.{#SNMPINDEX}'
               key: 'bigip.module.cpu.ratio[{#MODULE.NAME}]'
-              history: 7d
               description: |
                 MIB: F5-BIGIP-SYSTEM-MIB
                 The ratio of CPU to allocate to this module. Only valid if level is 'custom'
@@ -1853,7 +1783,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.3375.2.1.11.1.2.1.5.{#SNMPINDEX}'
               key: 'bigip.module.disk.ratio[{#MODULE.NAME}]'
-              history: 7d
               description: |
                 MIB: F5-BIGIP-SYSTEM-MIB
                 The ratio of available disk space to allocate to this module. Only valid if level is 'custom'
@@ -1871,7 +1800,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.3375.2.1.11.1.2.1.3.{#SNMPINDEX}'
               key: 'bigip.module.memory.ratio[{#MODULE.NAME}]'
-              history: 7d
               description: |
                 MIB: F5-BIGIP-SYSTEM-MIB
                 The ratio of available memory to allocate. Only valid if level is 'custom'
@@ -1889,7 +1817,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.3375.2.1.11.1.2.1.2.{#SNMPINDEX}'
               key: 'bigip.module.provision.level[{#MODULE.NAME}]'
-              history: 7d
               description: |
                 MIB: F5-BIGIP-SYSTEM-MIB
                 The provisioning level indicates how the systems resources
@@ -1941,7 +1868,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.3375.2.1.2.4.4.3.1.12.{#SNMPINDEX}'
               key: 'bigip.net.collisions[{#IF.NAME}]'
-              history: 7d
               description: |
                 MIB: F5-BIGIP-SYSTEM-MIB
                 The number of collisions on the specified interface, incremented by the
@@ -1962,7 +1888,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.3375.2.1.2.4.4.3.1.3.{#SNMPINDEX}'
               key: 'bigip.net.in.bytes.rate[{#IF.NAME}]'
-              history: 7d
               units: Bps
               description: |
                 MIB: F5-BIGIP-SYSTEM-MIB
@@ -1986,7 +1911,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.3375.2.1.2.4.4.3.1.10.{#SNMPINDEX}'
               key: 'bigip.net.in.drops[{#IF.NAME}]'
-              history: 7d
               description: |
                 MIB: F5-BIGIP-SYSTEM-MIB
                 The number of packets dropped on ingress for various reasons on the specified interface.
@@ -2006,7 +1930,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.3375.2.1.2.4.4.3.1.8.{#SNMPINDEX}'
               key: 'bigip.net.in.error[{#IF.NAME}]'
-              history: 7d
               description: |
                 MIB: F5-BIGIP-SYSTEM-MIB
                 The number of received packets that are either undersized,
@@ -2027,7 +1950,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.3375.2.1.2.4.4.3.1.6.{#SNMPINDEX}'
               key: 'bigip.net.in.multicast.rate[{#IF.NAME}]'
-              history: 7d
               units: pps
               description: |
                 MIB: F5-BIGIP-SYSTEM-MIB
@@ -2051,7 +1973,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.3375.2.1.2.4.4.3.1.2.{#SNMPINDEX}'
               key: 'bigip.net.in.pkts.rate[{#IF.NAME}]'
-              history: 7d
               units: pps
               description: |
                 MIB: F5-BIGIP-SYSTEM-MIB
@@ -2075,7 +1996,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.3375.2.1.2.4.4.3.1.13.{#SNMPINDEX}'
               key: 'bigip.net.in.qq.rate[{#IF.NAME}]'
-              history: 7d
               units: pps
               description: |
                 MIB: F5-BIGIP-SYSTEM-MIB
@@ -2099,7 +2019,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.3375.2.1.2.4.4.3.1.5.{#SNMPINDEX}'
               key: 'bigip.net.out.bytes.rate[{#IF.NAME}]'
-              history: 7d
               units: Bps
               description: |
                 MIB: F5-BIGIP-SYSTEM-MIB
@@ -2123,7 +2042,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.3375.2.1.2.4.4.3.1.11.{#SNMPINDEX}'
               key: 'bigip.net.out.drops[{#IF.NAME}]'
-              history: 7d
               description: |
                 MIB: F5-BIGIP-SYSTEM-MIB
                 The number of packets aged out or with excessive transmission
@@ -2144,7 +2062,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.3375.2.1.2.4.4.3.1.9.{#SNMPINDEX}'
               key: 'bigip.net.out.error[{#IF.NAME}]'
-              history: 7d
               description: |
                 MIB: F5-BIGIP-SYSTEM-MIB
                 The number of excessive collisions, incremented for each
@@ -2166,7 +2083,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.3375.2.1.2.4.4.3.1.7.{#SNMPINDEX}'
               key: 'bigip.net.out.multicast.rate[{#IF.NAME}]'
-              history: 7d
               units: pps
               description: |
                 MIB: F5-BIGIP-SYSTEM-MIB
@@ -2190,7 +2106,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.3375.2.1.2.4.4.3.1.4.{#SNMPINDEX}'
               key: 'bigip.net.out.pkts.rate[{#IF.NAME}]'
-              history: 7d
               units: pps
               description: |
                 MIB: F5-BIGIP-SYSTEM-MIB
@@ -2214,7 +2129,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.3375.2.1.2.4.4.3.1.14.{#SNMPINDEX}'
               key: 'bigip.net.out.qq.rate[{#IF.NAME}]'
-              history: 7d
               units: pps
               description: |
                 MIB: F5-BIGIP-SYSTEM-MIB
@@ -2238,7 +2152,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.3375.2.1.2.4.4.3.1.15.{#SNMPINDEX}'
               key: 'bigip.net.pause[{#IF.NAME}]'
-              history: 7d
               description: |
                 MIB: F5-BIGIP-SYSTEM-MIB
                 The pause state of the specified interface.
@@ -2321,7 +2234,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.3375.2.2.4.2.3.1.9.{#SNMPINDEX}'
               key: 'bigip.node.net.conn[{#NODE.NAME}]'
               delay: 5m
-              history: 7d
               description: |
                 MIB: F5-BIGIP-LOCAL-MIB
                 The current connections from server-side to the specified node address.
@@ -2342,7 +2254,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.3375.2.2.4.2.3.1.4.{#SNMPINDEX}'
               key: 'bigip.node.net.in.bytes.rate[{#NODE.NAME}]'
               delay: 5m
-              history: 7d
               units: Bps
               description: |
                 MIB: F5-BIGIP-LOCAL-MIB
@@ -2367,7 +2278,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.3375.2.2.4.2.3.1.3.{#SNMPINDEX}'
               key: 'bigip.node.net.in.pkts.rate[{#NODE.NAME}]'
               delay: 5m
-              history: 7d
               units: pps
               description: |
                 MIB: F5-BIGIP-LOCAL-MIB
@@ -2392,7 +2302,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.3375.2.2.4.2.3.1.6.{#SNMPINDEX}'
               key: 'bigip.node.net.out.bytes.rate[{#NODE.NAME}]'
               delay: 5m
-              history: 7d
               units: Bps
               description: |
                 MIB: F5-BIGIP-LOCAL-MIB
@@ -2417,7 +2326,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.3375.2.2.4.2.3.1.5.{#SNMPINDEX}'
               key: 'bigip.node.net.out.pkts.rate[{#NODE.NAME}]'
               delay: 5m
-              history: 7d
               units: pps
               description: |
                 MIB: F5-BIGIP-LOCAL-MIB
@@ -2442,7 +2350,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.3375.2.2.4.2.3.1.21.{#SNMPINDEX}'
               key: 'bigip.node.net.sessions[{#NODE.NAME}]'
               delay: 5m
-              history: 7d
               description: |
                 MIB: F5-BIGIP-LOCAL-MIB
                 The number of current sessions going through the specified node address.
@@ -2463,7 +2370,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.3375.2.2.4.2.3.1.22.{#SNMPINDEX}'
               key: 'bigip.node.overlimit[{#NODE.NAME}]'
               delay: 5m
-              history: 7d
               description: |
                 MIB: F5-BIGIP-LOCAL-MIB
                 The last recorded value for the number of connections to the node address when connections hit a rate limit;
@@ -2485,7 +2391,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.3375.2.2.4.2.3.1.23.{#SNMPINDEX}'
               key: 'bigip.node.overtime[{#NODE.NAME}]'
               delay: 5m
-              history: 7d
               units: s
               description: |
                 MIB: F5-BIGIP-LOCAL-MIB
@@ -2545,7 +2450,6 @@ zabbix_export:
               snmp_oid: '1.3.6.1.4.1.3375.2.2.5.5.2.1.2.{#SNMPINDEX}'
               key: 'bigip.pool.available[{#POOL.NAME}]'
               delay: 5m
-              history: 7d
               description: |
                 MIB: F5-BIGIP-LOCAL-MIB
                 none(0),
@@ -2585,7 +2489,6 @@ zabbix_export:
               snmp_oid: '1.3.6.1.4.1.3375.2.2.5.5.2.1.3.{#SNMPINDEX}'
               key: 'bigip.pool.enabled[{#POOL.NAME}]'
               delay: 5m
-              history: 7d
               description: |
                 MIB: F5-BIGIP-LOCAL-MIB
                 The activity status of the specified pool, as specified by the user.
@@ -2621,7 +2524,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.3375.2.2.5.2.3.1.8.{#SNMPINDEX}'
               key: 'bigip.pool.net.conn[{#POOL.NAME}]'
               delay: 5m
-              history: 7d
               description: |
                 MIB: F5-BIGIP-LOCAL-MIB
                 The current connections from server-side to the specified pool.
@@ -2642,7 +2544,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.3375.2.2.5.2.3.1.3.{#SNMPINDEX}'
               key: 'bigip.pool.net.in.bytes.rate[{#POOL.NAME}]'
               delay: 5m
-              history: 7d
               units: Bps
               description: |
                 MIB: F5-BIGIP-LOCAL-MIB
@@ -2667,7 +2568,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.3375.2.2.5.2.3.1.2.{#SNMPINDEX}'
               key: 'bigip.pool.net.in.pkts.rate[{#POOL.NAME}]'
               delay: 5m
-              history: 7d
               units: pps
               description: |
                 MIB: F5-BIGIP-LOCAL-MIB
@@ -2692,7 +2592,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.3375.2.2.5.2.3.1.5.{#SNMPINDEX}'
               key: 'bigip.pool.net.out.bytes.rate[{#POOL.NAME}]'
               delay: 5m
-              history: 7d
               units: Bps
               description: |
                 MIB: F5-BIGIP-LOCAL-MIB
@@ -2717,7 +2616,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.3375.2.2.5.2.3.1.4.{#SNMPINDEX}'
               key: 'bigip.pool.net.out.pkts.rate[{#POOL.NAME}]'
               delay: 5m
-              history: 7d
               units: pps
               description: |
                 MIB: F5-BIGIP-LOCAL-MIB
@@ -2742,7 +2640,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.3375.2.2.5.2.3.1.31.{#SNMPINDEX}'
               key: 'bigip.pool.net.sessions[{#POOL.NAME}]'
               delay: 5m
-              history: 7d
               description: |
                 MIB: F5-BIGIP-LOCAL-MIB
                 The number of current sessions going through the specified pool.
@@ -2763,7 +2660,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.3375.2.2.5.2.3.1.19.{#SNMPINDEX}'
               key: 'bigip.pool.queue.age[{#POOL.NAME}]'
               delay: 5m
-              history: 7d
               units: s
               description: |
                 MIB: F5-BIGIP-LOCAL-MIB
@@ -2788,7 +2684,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.3375.2.2.5.2.3.1.18.{#SNMPINDEX}'
               key: 'bigip.pool.queue[{#POOL.NAME}]'
               delay: 5m
-              history: 7d
               description: |
                 MIB: F5-BIGIP-LOCAL-MIB
                 Number of connections currently in queue, sum.
@@ -2846,7 +2741,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.3375.2.2.10.2.3.1.12.{#SNMPINDEX}'
               key: 'bigip.vserver.net.conn[{#VSERVER.NAME}]'
               delay: 5m
-              history: 7d
               description: |
                 MIB: F5-BIGIP-LOCAL-MIB
                 The current connections from client-side to the specified virtual server.
@@ -2867,7 +2761,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.3375.2.2.10.2.3.1.7.{#SNMPINDEX}'
               key: 'bigip.vserver.net.in.bytes.rate[{#VSERVER.NAME}]'
               delay: 5m
-              history: 7d
               units: Bps
               description: |
                 MIB: F5-BIGIP-LOCAL-MIB
@@ -2892,7 +2785,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.3375.2.2.10.2.3.1.6.{#SNMPINDEX}'
               key: 'bigip.vserver.net.in.pkts.rate[{#VSERVER.NAME}]'
               delay: 5m
-              history: 7d
               units: pps
               description: |
                 MIB: F5-BIGIP-LOCAL-MIB
@@ -2917,7 +2809,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.3375.2.2.10.2.3.1.9.{#SNMPINDEX}'
               key: 'bigip.vserver.net.out.bytes.rate[{#VSERVER.NAME}]'
               delay: 5m
-              history: 7d
               units: Bps
               description: |
                 MIB: F5-BIGIP-LOCAL-MIB
@@ -2942,7 +2833,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.3375.2.2.10.2.3.1.8.{#SNMPINDEX}'
               key: 'bigip.vserver.net.out.pkts.rate[{#VSERVER.NAME}]'
               delay: 5m
-              history: 7d
               units: pps
               description: |
                 MIB: F5-BIGIP-LOCAL-MIB
@@ -2967,7 +2857,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.3375.2.2.10.2.3.1.34.{#SNMPINDEX}'
               key: 'bigip.vserver.overlimit[{#VSERVER.NAME}]'
               delay: 5m
-              history: 7d
               description: |
                 MIB: F5-BIGIP-LOCAL-MIB
                 The last recorded value for the number of connections to the virtual server when connections hit a rate limit;
@@ -2989,7 +2878,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.3375.2.2.10.2.3.1.35.{#SNMPINDEX}'
               key: 'bigip.vserver.overtime[{#VSERVER.NAME}]'
               delay: 5m
-              history: 7d
               units: s
               description: |
                 MIB: F5-BIGIP-LOCAL-MIB
@@ -3011,7 +2899,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.3375.2.2.10.2.3.1.32.{#SNMPINDEX}'
               key: 'bigip.vserver.usage.1m[{#VSERVER.NAME}]'
               delay: 5m
-              history: 7d
               units: '%'
               description: |
                 MIB: F5-BIGIP-LOCAL-MIB
@@ -3033,7 +2920,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.3375.2.2.10.2.3.1.33.{#SNMPINDEX}'
               key: 'bigip.vserver.usage.5m[{#VSERVER.NAME}]'
               delay: 5m
-              history: 7d
               units: '%'
               description: |
                 MIB: F5-BIGIP-LOCAL-MIB
@@ -3055,7 +2941,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.3375.2.2.10.2.3.1.31.{#SNMPINDEX}'
               key: 'bigip.vserver.usage.5s[{#VSERVER.NAME}]'
               delay: 5m
-              history: 7d
               units: '%'
               description: |
                 MIB: F5-BIGIP-LOCAL-MIB
