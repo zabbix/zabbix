@@ -1,26 +1,23 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "zbxalerter.h"
 #include "alerter_defs.h"
 
 #include "alerter_protocol.h"
+
+#include "zbxtimekeeper.h"
 #include "zbxlog.h"
 #include "zbxalgo.h"
 #include "zbxdb.h"
@@ -34,7 +31,6 @@
 #include "zbxstr.h"
 #include "zbxthreads.h"
 #include "zbxtime.h"
-#include "zbxtypes.h"
 #include "zbxxml.h"
 #include "zbxjson.h"
 
@@ -1992,7 +1988,7 @@ static void	am_prepare_dispatch_message(zbx_am_dispatch_t *dispatch, zbx_db_medi
 	{
 		if (MEDIA_TYPE_EMAIL == mt->type)
 		{
-			body = zbx_email_make_body(dispatch->message, mt->message_format, dispatch->message_format,
+			body = zbx_email_make_body(dispatch->message, mt->message_format, dispatch->content_name,
 					dispatch->message_format, dispatch->content, dispatch->content_size);
 			*message_format = ZBX_MEDIA_MESSAGE_FORMAT_MULTI;
 		}
@@ -2280,6 +2276,28 @@ static void	am_process_diag_top_sources(zbx_am_t *manager, zbx_ipc_client_t *cli
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+static int	am_check_dbstatus(void)
+{
+	int		ret = ZBX_DB_OK;
+	zbx_db_result_t	res;
+
+#ifdef HAVE_ORACLE
+	res = zbx_db_select_once("select null from dual");
+#else
+	res = zbx_db_select_once("select null");
+#endif
+
+	if ((zbx_db_result_t)ZBX_DB_DOWN == res || NULL == res)
+	{
+		zbx_db_close();
+		ret = zbx_db_connect(ZBX_DB_CONNECT_ONCE);
+	}
+	else
+		zbx_db_free_result(res);
+
+	return ret;
+}
+
 ZBX_THREAD_ENTRY(zbx_alert_manager_thread, args)
 {
 #define ZBX_DB_PING_FREQUENCY			SEC_PER_MIN
@@ -2309,7 +2327,7 @@ ZBX_THREAD_ENTRY(zbx_alert_manager_thread, args)
 		exit(EXIT_FAILURE);
 	}
 
-	manager.dbstatus = ZBX_DB_OK;
+	manager.dbstatus = zbx_db_connect(ZBX_DB_CONNECT_ONCE);
 
 	/* initialize statistics */
 	time_stat = zbx_time();
@@ -2332,8 +2350,7 @@ ZBX_THREAD_ENTRY(zbx_alert_manager_thread, args)
 
 		if ((time_ping + ZBX_DB_PING_FREQUENCY) < now)
 		{
-			manager.dbstatus = zbx_db_connect(ZBX_DB_CONNECT_ONCE);
-			zbx_db_close();
+			manager.dbstatus = am_check_dbstatus();
 			time_ping = now;
 		}
 		if (ZBX_DB_DOWN == manager.dbstatus)

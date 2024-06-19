@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -152,7 +147,7 @@ class ItemValueWidget {
 								'name' => 'New widget',
 								'x' => 0,
 								'y' => 0,
-								'width' => 12,
+								'width' => 36,
 								'height' => 4,
 								'fields' => [
 									[
@@ -212,7 +207,7 @@ class ItemValueWidget {
 								'name' => 'Widget with thresholds',
 								'x' => 0,
 								'y' => 6,
-								'width' => 10,
+								'width' => 30,
 								'height' => 3,
 								'fields' => [
 									[
@@ -245,9 +240,9 @@ class ItemValueWidget {
 							[
 								'type' => 'item',
 								'name' => 'Widget to delete',
-								'x' => 13,
+								'x' => 39,
 								'y' => 0,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4,
 								'fields' => [
 									[
@@ -288,7 +283,7 @@ class ItemValueWidget {
 								'name' => 'Widget for aggregation function data check',
 								'x' => 0,
 								'y' => 0,
-								'width' => 18,
+								'width' => 54,
 								'height' => 4,
 								'fields' => [
 									[

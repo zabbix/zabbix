@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -240,6 +235,7 @@ class testFormPreprocessingTest extends CWebTest {
 			$this->addPreprocessingSteps([$step]);
 			$this->checkTestOverlay($data, 'name:preprocessing['.$i.'][test]', in_array($step['type'], $this->change_types), $i);
 		}
+		COverlayDialogElement::find()->one()->close();
 	}
 
 	public static function getTestAllStepsData() {
@@ -453,6 +449,8 @@ class testFormPreprocessingTest extends CWebTest {
 			}
 		}
 		$this->checkTestOverlay($data, 'button:Test all steps', $prev_enabled);
+
+		COverlayDialogElement::find()->one()->close();
 	}
 
 	public static function getSortingData() {
@@ -495,7 +493,7 @@ class testFormPreprocessingTest extends CWebTest {
 	 *
 	 * @dataProvider getSortingData
 	 */
-	public function testFormItemPreprocessingTest_Sorting($data) {
+	public function testFormPreprocessingTest_Sorting($data) {
 		// Result order of steps.
 		$preprocessing = [
 			['type' => 'Check for not supported value'],
@@ -528,6 +526,8 @@ class testFormPreprocessingTest extends CWebTest {
 		$this->query('link', self::$name)->one()->click();
 		$form->selectTab('Preprocessing');
 		$this->assertPreprocessingSteps($preprocessing);
+
+		COverlayDialogElement::find()->one()->close();
 	}
 
 	private function openPreprocessing($data) {
@@ -559,7 +559,7 @@ class testFormPreprocessingTest extends CWebTest {
 			case TEST_BAD:
 				$message = $dialog->query('tag:output')->asMessage()->waitUntilPresent()->one();
 				$this->assertTrue($message->isBad());
-				$dialog->query('class:btn-overlay-close')->one()->click();
+				$dialog->close();
 				break;
 
 			case TEST_GOOD:
@@ -652,7 +652,7 @@ class testFormPreprocessingTest extends CWebTest {
 				$message = $form->getOverlayMessage();
 				$this->assertTrue($message->isBad());
 				$this->assertTrue($message->hasLine('Connection to Zabbix server "localhost:10051" refused. Possible reasons:'));
-				$dialog->query('class:btn-overlay-close')->one()->click();
+				$dialog->close();
 				break;
 
 			case 'Cancel':
@@ -660,7 +660,7 @@ class testFormPreprocessingTest extends CWebTest {
 				break;
 
 			default:
-				$dialog->query('class:btn-overlay-close')->one()->click();
+				$dialog->close();
 		}
 	}
 }

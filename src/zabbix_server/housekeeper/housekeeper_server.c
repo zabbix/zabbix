@@ -1,24 +1,22 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "housekeeper_server.h"
 
+#include "history_compress.h"
+
+#include "zbxtimekeeper.h"
 #include "zbxlog.h"
 #include "zbxnix.h"
 #include "zbxself.h"
@@ -26,7 +24,6 @@
 #include "zbxrtc.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
-#include "history_compress.h"
 #include "zbx_rtc_constants.h"
 #include "zbx_host_constants.h"
 #include "zbxalgo.h"
@@ -1312,7 +1309,7 @@ static int	housekeeping_problems(int now, int config_max_hk_delete)
 	int			deleted = 0;
 	zbx_vector_uint64_t	ids_uint64;
 	size_t			sql_alloc = 0, sql_offset;
-	char			buffer[MAX_STRING_LEN], *sql = NULL;;
+	char			buffer[MAX_STRING_LEN], *sql = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() now:%d", __func__, now);
 

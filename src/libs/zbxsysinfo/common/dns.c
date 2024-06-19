@@ -1,27 +1,20 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "dns.h"
 #include "ip_reverse.h"
 #include "../sysinfo.h"
-
-#include "zbxsysinfo.h"
 
 #include "zbxtime.h"
 #include "zbxstr.h"
@@ -380,9 +373,10 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 	}
 	else if (DNS_QUERY_PERF == short_answer)
 	{
-		if (DNS_RCODE_NOERROR != res)
+		if (ERROR_TIMEOUT == res)
 		{
 			SET_DBL_RESULT(result, 0.0);
+			ret = SYSINFO_RET_OK;
 			goto clean_dns;
 		}
 		else
@@ -545,6 +539,19 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 		*buffer = '\0';
 	}
 #else	/* !defined(_WINDOWS) && !defined(__MINGW32__) */
+
+#if defined(HAVE_RES_NINIT) && !defined(_AIX) && (defined(HAVE_RES_U_EXT) || defined(HAVE_RES_U_EXT_EXT))
+
+#ifdef HAVE_RES_NDESTROY
+#	define zbx_free_res(ptr) res_ndestroy(ptr);
+#else
+#	define zbx_free_res(ptr) res_nclose(ptr);
+#endif
+
+#else
+#	define zbx_free_res(ptr)
+#endif
+
 #if defined(HAVE_RES_NINIT) && !defined(_AIX)
 	memset(&res_state_local, 0, sizeof(res_state_local));
 	if (-1 == res_ninit(&res_state_local))	/* initialize always, settings might have changed */
@@ -563,6 +570,9 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 #endif
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot create DNS query: %s", zbx_strerror(errno)));
+
+		zbx_free_res(&res_state_local);
+
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -571,6 +581,9 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 		if (0 == inet_aton(ip, &inaddr))
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid IP address."));
+
+			zbx_free_res(&res_state_local);
+
 			return SYSINFO_RET_FAIL;
 		}
 
@@ -594,6 +607,9 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 		if (0 == inet_pton(ip_type, ip, &in6addr))
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid IPv6 address."));
+
+			zbx_free_res(&res_state_local);
+
 			return SYSINFO_RET_FAIL;
 		}
 
@@ -651,18 +667,15 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 
 	res_state_local.retrans = retrans;
 	res_state_local.retry = retry;
-
+	memset(&answer.buffer, 0, sizeof(answer.buffer));
 	res = res_nsend(&res_state_local, buf, res, answer.buffer, sizeof(answer.buffer));
 
 #	ifdef HAVE_RES_U_EXT	/* Linux */
 	if (NULL != ip && '\0' != *ip && AF_INET6 == ip_type)
 		res_state_local._u._ext.nsaddrs[0] = saved_ns6;
 #	endif
-#	ifdef HAVE_RES_NDESTROY
-	res_ndestroy(&res_state_local);
-#	else
-	res_nclose(&res_state_local);
-#	endif
+	zbx_free_res(&res_state_local);
+
 #else	/* thread-unsafe resolver API */
 	saved_options = _res.options;
 	saved_retrans = _res.retrans;
@@ -707,13 +720,22 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 	if (DNS_QUERY_SHORT == short_answer)
 	{
 		SET_UI64_RESULT(result, dns_is_down ? 0 : 1);
+
 		return SYSINFO_RET_OK;
 	}
 	else if (DNS_QUERY_PERF == short_answer)
 	{
-		if (1 == dns_is_down)
+		/* -1 for res is returned also for REFUSED and SERVFAIL for res_send()          */
+		/* for NXDOMAIN - res is 0 and hp->rcode is set                                 */
+		/* for REFUXED and SERVFAIL res is -1, with hp->rcode set for particular error  */
+		/* for missing connection - res is -1, but hp->rcode it is uninitialized        */
+		/* So, the only to detect the missing connection is to set hp->rcode to 0 first,*/
+		/* and then to check if res is -1 with rcode beting set to 0.                   */
+		if (-1 == res && 0 == hp->rcode)
 		{
 			SET_DBL_RESULT(result, 0.0);
+
+			return SYSINFO_RET_OK;
 		}
 		else
 		{
@@ -730,6 +752,7 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 	if (1 == dns_is_down)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot perform DNS query."));
+
 		return SYSINFO_RET_FAIL;
 	}
 

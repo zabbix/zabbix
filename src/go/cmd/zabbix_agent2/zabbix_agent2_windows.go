@@ -1,33 +1,26 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 package main
 
 import (
 	"os"
-	"os/signal"
 	"path/filepath"
 	"strings"
-	"syscall"
 
 	"golang.zabbix.com/agent2/pkg/pdh"
-	"golang.zabbix.com/sdk/log"
+	"golang.zabbix.com/sdk/errs"
 )
 
 const osDependentUsageMessageFormat = //
@@ -44,14 +37,6 @@ const osDependentUsageMessageFormat = //
   %[1]s [-c config-file] -x [-m]
 `
 
-func loadOSDependentItems() error {
-	if err := pdh.LocateObjectsAndDefaultCounters(true); err != nil {
-		log.Warningf("cannot load objects and default counters: %s", err.Error())
-	}
-
-	return nil
-}
-
 func init() {
 	if path, err := os.Executable(); err == nil {
 		dir, name := filepath.Split(path)
@@ -59,21 +44,11 @@ func init() {
 	}
 }
 
-func createSigsChan() chan os.Signal {
-	sigs := make(chan os.Signal, 1)
-	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
-
-	return sigs
-}
-
-// handleSig() checks received signal and returns true if the signal is handled
-// and can be ignored, false if the program should stop.
-// Needed for consistency with Unix.
-func handleSig(sig os.Signal) bool {
-	switch sig {
-	case syscall.SIGINT, syscall.SIGTERM:
-		sendServiceStop()
+func loadOSDependentItems() error {
+	err := pdh.LocateObjectsAndDefaultCounters(true)
+	if err != nil {
+		return errs.Wrap(err, "failed to load objects and default counters")
 	}
 
-	return false
+	return nil
 }

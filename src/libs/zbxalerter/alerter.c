@@ -1,26 +1,23 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "zbxalerter.h"
 #include "alerter_defs.h"
 
 #include "alerter_protocol.h"
+
+#include "zbxtimekeeper.h"
 #include "zbxlog.h"
 #include "zbxcacheconfig.h"
 #include "zbxembed.h"
@@ -32,9 +29,11 @@
 #include "zbxself.h"
 #include "zbxstr.h"
 #include "zbxtime.h"
-#include "zbxtypes.h"
 #include "zbxexpression.h"
 #include "zbxdbwrap.h"
+#include "zbxalgo.h"
+#include "zbxdbhigh.h"
+#include "zbxthreads.h"
 
 #define	ALARM_ACTION_TIMEOUT	40
 
@@ -222,11 +221,14 @@ static void	alerter_process_email(zbx_ipc_socket_t *socket, zbx_ipc_message_t *i
  *                                                                            *
  * Purpose: processes SMS alert                                               *
  *                                                                            *
- * Parameters: socket      - [IN] connection socket                           *
- *             ipc_message - [IN] ipc message with media type and alert data  *
+ * Parameters: socket             - [IN] connection socket                    *
+ *             ipc_message        - [IN] ipc message with media type and      *
+ *                                       alert data                           *
+ *             config_sms_devices - [IN] allowed list of modem devices        *
  *                                                                            *
  ******************************************************************************/
-static void	alerter_process_sms(zbx_ipc_socket_t *socket, zbx_ipc_message_t *ipc_message)
+static void	alerter_process_sms(zbx_ipc_socket_t *socket, zbx_ipc_message_t *ipc_message,
+		const char *config_sms_devices)
 {
 	zbx_uint64_t	alertid;
 	char		*sendto, *message, *gsm_modem, error[MAX_STRING_LEN];
@@ -234,8 +236,18 @@ static void	alerter_process_sms(zbx_ipc_socket_t *socket, zbx_ipc_message_t *ipc
 
 	zbx_alerter_deserialize_sms(ipc_message->data, &alertid, &sendto, &message, &gsm_modem);
 
-	/* SMS uses its own timeouts */
-	ret = send_sms(gsm_modem, sendto, message, error, sizeof(error));
+	if (NULL != config_sms_devices && SUCCEED == zbx_str_in_list(config_sms_devices, gsm_modem, ','))
+	{
+		/* SMS uses its own timeouts */
+		ret = send_sms(gsm_modem, sendto, message, error, sizeof(error));
+	}
+	else
+	{
+		zbx_snprintf(error, sizeof(error), "SMSDevices not configured for %s", gsm_modem);
+		zabbix_log(LOG_LEVEL_WARNING, "failed to send SMS: %s", error);
+		ret = FAIL;
+	}
+
 	alerter_send_result(socket, NULL, ret, (SUCCEED == ret ? NULL : error), NULL);
 
 	zbx_free(sendto);
@@ -408,7 +420,7 @@ ZBX_THREAD_ENTRY(zbx_alerter_thread, args)
 						alerter_args_in->config_ssl_ca_location);
 				break;
 			case ZBX_IPC_ALERTER_SMS:
-				alerter_process_sms(&alerter_socket, &message);
+				alerter_process_sms(&alerter_socket, &message, alerter_args_in->config_sms_devices);
 				break;
 			case ZBX_IPC_ALERTER_EXEC:
 				alerter_process_exec(&alerter_socket, &message);

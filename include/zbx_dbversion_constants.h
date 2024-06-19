@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #ifndef ZABBIX_ZBX_DBVERSION_CONSTANTS_H
@@ -30,15 +25,15 @@
 #define ZBX_MYSQL_MIN_VERSION_STR				"5.07.28"
 #define ZBX_MYSQL_MIN_SUPPORTED_VERSION				80030
 #define ZBX_MYSQL_MIN_SUPPORTED_VERSION_STR			"8.00.30"
-#define ZBX_MYSQL_MAX_VERSION					80399
-#define ZBX_MYSQL_MAX_VERSION_STR				"8.03.x"
+#define ZBX_MYSQL_MAX_VERSION					80499
+#define ZBX_MYSQL_MAX_VERSION_STR				"8.04.x"
 
 #define ZBX_MARIADB_MIN_VERSION					100200
 #define ZBX_MARIADB_MIN_VERSION_STR				"10.02.00"
 #define ZBX_MARIADB_MIN_SUPPORTED_VERSION			100500
 #define ZBX_MARIADB_MIN_SUPPORTED_VERSION_STR			"10.05.00"
-#define ZBX_MARIADB_MAX_VERSION					110399
-#define ZBX_MARIADB_MAX_VERSION_STR				"11.03.xx"
+#define ZBX_MARIADB_MAX_VERSION					110499
+#define ZBX_MARIADB_MAX_VERSION_STR				"11.04.xx"
 
 #define ZBX_POSTGRESQL_MIN_VERSION				100009
 #define ZBX_POSTGRESQL_MIN_VERSION_STR				"10.9"
@@ -63,8 +58,8 @@
 #define ZBX_TIMESCALE_MIN_VERSION_STR				"2.0.1"
 #define ZBX_TIMESCALE_MIN_SUPPORTED_VERSION 			21000
 #define ZBX_TIMESCALE_MIN_SUPPORTED_VERSION_STR 		"2.10.0"
-#define ZBX_TIMESCALE_MAX_VERSION				21499
-#define ZBX_TIMESCALE_MAX_VERSION_STR				"2.14"
+#define ZBX_TIMESCALE_MAX_VERSION				21599
+#define ZBX_TIMESCALE_MAX_VERSION_STR				"2.15"
 #define ZBX_TIMESCALE_LICENSE_APACHE_STR			"TimescaleDB Apache 2 Edition"
 #define ZBX_TIMESCALE_LICENSE_COMMUNITY				"timescale"
 #define ZBX_TIMESCALE_LICENSE_COMMUNITY_STR			"TimescaleDB Community Edition"

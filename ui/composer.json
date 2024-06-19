@@ -2,7 +2,7 @@
 	"name": "zabbix/ui",
 	"description": "Hosted Zabbix User Interface in PHP",
 	"homepage": "https://www.zabbix.com",
-	"license": "GPL-2.0-or-later",
+	"license": "AGPL-3.0-only",
 	"require": {
 		"symfony/yaml": "v5.1.3",
 		"onelogin/php-saml": "4.0",

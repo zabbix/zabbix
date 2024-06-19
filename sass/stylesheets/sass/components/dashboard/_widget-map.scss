@@ -8,6 +8,18 @@ div.dashboard-widget-map {
 
 		svg {
 			flex-grow: 1;
+
+			.map-selections {
+				ellipse {
+					fill: $map-hover-fill-color;
+
+					&.selected {
+						fill: $map-selected-fill-color;
+						stroke: $map-selected-stroke-color;
+						stroke-width: 1px;
+					}
+				}
+			}
 		}
 	}
 
@@ -70,6 +82,18 @@ div.dashboard-widget-map {
 
 @if $theme-name == 'hc-dark' or $theme-name == 'hc-light' {
 	div.dashboard-widget-map {
+		.sysmap-widget-container {
+			svg {
+				.map-selections {
+					ellipse {
+						&.selected {
+							stroke-width: 2px;
+						}
+					}
+				}
+			}
+		}
+
 		.btn-back-map-container {
 			a {
 				border-bottom: 0;
