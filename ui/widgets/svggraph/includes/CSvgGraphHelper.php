@@ -246,7 +246,7 @@ class CSvgGraphHelper {
 
 			if ($templateid !== '' && $override_hostid !== '') {
 				$tmp_items = API::Item()->get([
-					'output' => ['itemid', 'key_'],
+					'output' => ['key_'],
 					'itemids' => $data_set['itemids'],
 					'webitems' => true,
 					'preservekeys' => true
@@ -262,7 +262,7 @@ class CSvgGraphHelper {
 					}
 
 					$items = API::Item()->get([
-						'output' => ['itemid', 'templateid', 'key_'],
+						'output' => ['itemid', 'key_'],
 						'hostids' => [$override_hostid],
 						'webitems' => true,
 						'filter' => [
