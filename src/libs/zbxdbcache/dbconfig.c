@@ -11328,11 +11328,13 @@ static void	dc_status_update_apply_diff(zbx_dc_status_diff_t *diff)
 
 static void	get_item_statistics(zbx_dc_status_diff_t *diff)
 {
-	zbx_hashset_iter_t	iter;
-	ZBX_DC_HOST		*dc_host;
+	int				delay_last = 0;
+	zbx_uint64_t			master_itemid = 0;
+	zbx_hashset_iter_t		iter;
+	ZBX_DC_HOST			*dc_host;
 	zbx_dc_status_diff_host_t	*host_diff;
 	zbx_dc_status_diff_proxy_t	*proxy_diff;
-	const ZBX_DC_ITEM	*dc_item;
+	const ZBX_DC_ITEM		*dc_item;
 
 	zbx_hashset_iter_reset(&config->items, &iter);
 
@@ -11362,15 +11364,42 @@ static void	get_item_statistics(zbx_dc_status_diff_t *diff)
 				{
 					if (SUCCEED == diff->reset)
 					{
-						int	delay;
+						int			delay = 0;
+						const ZBX_DC_ITEM	*dc_item_local = NULL;
 
-						if (SUCCEED == zbx_interval_preproc(dc_item->delay, &delay, NULL, NULL) &&
-								0 != delay)
+						if (ITEM_TYPE_DEPENDENT == dc_item->type)
+						{
+							if (0 != master_itemid && master_itemid ==
+									dc_item->itemtype.depitem->master_itemid)
+							{
+								delay = delay_last;
+							}
+							else if (NULL != (dc_item_local = (ZBX_DC_ITEM *)
+									zbx_hashset_search(&config->items,
+									&dc_item->itemtype.depitem->master_itemid)) &&
+									ITEM_STATUS_ACTIVE != dc_item_local->status)
+							{
+								dc_item_local = NULL;
+							}
+						}
+						else
+							dc_item_local = dc_item;
+
+						if (0 != delay || (NULL != dc_item_local &&
+								SUCCEED == zbx_interval_preproc(dc_item_local->delay,
+								&delay, NULL, NULL) && 0 != delay))
 						{
 							diff->required_performance += 1.0 / delay;
 
 							if (NULL != proxy_diff)
 								proxy_diff->required_performance += 1.0 / delay;
+
+							if (ITEM_TYPE_DEPENDENT == dc_item->type &&
+									dc_item->itemtype.depitem->master_itemid !=
+									master_itemid)
+							{
+								delay_last = delay;
+							}
 						}
 					}
 
