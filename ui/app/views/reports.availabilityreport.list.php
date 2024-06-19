@@ -27,9 +27,9 @@ $this->includeJsFile('reports.availabilityreport.list.js.php');
 $html_page = (new CHtmlPage())
 	->setTitle(_('Availability report'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::REPORTS_AVAILABILITYREPORT_LIST))
-	->setControls((new CTag('nav', true,
-		(new CList())
-			->addItem(
+	->setControls(
+		(new CTag('nav', true,
+			(new CList())->addItem(
 				(new CForm('get'))
 					->setAttribute('aria-label', _('Main filter'))
 					->addVar('action', 'availabilityreport.list')
@@ -132,7 +132,7 @@ if ($data['mode'] == AVAILABILITY_REPORT_BY_TEMPLATE) {
 				)
 			])
 			->addItem([
-				(new CLabel(_('Host group'), 'filter_host_groups__ms')),
+				new CLabel(_('Host group'), 'filter_host_groups__ms'),
 				new CFormField(
 					(new CMultiSelect([
 						'name' => 'filter_host_groups[]',
@@ -158,7 +158,7 @@ else {
 	$filter->addFilterTab(_('Filter'), [
 		(new CFormGrid())
 			->addItem([
-				(new CLabel(_('Host groups'), 'filter_host_groups__ms')),
+				new CLabel(_('Host groups'), 'filter_host_groups__ms'),
 				new CFormField(
 					(new CMultiSelect([
 						'name' => 'filter_host_groups[]',
@@ -178,7 +178,7 @@ else {
 				)
 			])
 			->addItem([
-				(new CLabel(_('Hosts'), 'filter_hosts__ms')),
+				new CLabel(_('Hosts'), 'filter_hosts__ms'),
 				new CFormField(
 					(new CMultiSelect([
 						'name' => 'filter_hosts[]',
@@ -223,10 +223,10 @@ foreach ($data['triggers'] as $trigger) {
 					->setArgument('triggerids', [$trigger['triggerid']])
 			)
 			: $trigger['description'],
-		($availability['true'] < 0.00005)
+		$availability['true'] < 0.00005
 			? ''
 			: (new CSpan(sprintf('%.4f%%', $availability['true'])))->addClass(ZBX_STYLE_RED),
-		($availability['false'] < 0.00005)
+		$availability['false'] < 0.00005
 			? ''
 			: (new CSpan(sprintf('%.4f%%', $availability['false'])))->addClass(ZBX_STYLE_GREEN),
 		new CLink(_('Show'), (new CUrl('zabbix.php'))

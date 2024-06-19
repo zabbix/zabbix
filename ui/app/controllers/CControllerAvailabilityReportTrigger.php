@@ -40,20 +40,24 @@ class CControllerAvailabilityReportTrigger extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		$triggers = API::Trigger()->get([
+		if (!$this->checkAccess(CRoleHelper::UI_REPORTS_AVAILABILITY_REPORT)) {
+			return false;
+		}
+
+		$this->trigger = API::Trigger()->get([
 			'output' => ['triggerid', 'description'],
 			'triggerids' => $this->getInput('triggerid'),
 			'selectHosts' => ['name'],
 			'expandDescription' => true
 		]);
 
-		if (!$triggers) {
+		if (!$this->trigger) {
 			return false;
 		}
 
-		$this->trigger = reset($triggers);
+		$this->trigger = reset($this->trigger);
 
-		return $this->checkAccess(CRoleHelper::UI_REPORTS_AVAILABILITY_REPORT);
+		return true;
 	}
 
 	protected function doAction(): void {

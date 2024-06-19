@@ -52,9 +52,9 @@ class CControllerAvailabilityReportList extends CController {
 		$report_mode = $this->getInput('mode',
 			CProfile::get('web.availabilityreport.filter.mode', AVAILABILITY_REPORT_BY_HOST)
 		);
+		$prefix = 'web.availabilityreport.filter.'.$report_mode;
 
 		CProfile::update('web.availabilityreport.filter.mode', $report_mode, PROFILE_TYPE_INT);
-		$prefix = 'web.availabilityreport.filter.'.$report_mode;
 
 		if ($this->hasInput('filter_set')) {
 			$this->updateProfiles($report_mode);
@@ -92,11 +92,11 @@ class CControllerAvailabilityReportList extends CController {
 				'hosts' => CProfile::getArray($prefix.'.hosts', $this->getInput('filter_hosts', []))
 			];
 
+		$data['filter'] = $this->prepareDataForMultiselectFields($data['filter']);
+
 		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 
 		if ($report_mode == AVAILABILITY_REPORT_BY_TEMPLATE) {
-			$data['filter'] = $this->prepareDataForMultiselectFields($data['filter']);
-
 			$template_groupids = $data['filter']['template_groups']
 				? getTemplateSubGroups(array_keys($data['filter']['template_groups']))
 				: null;
@@ -150,8 +150,6 @@ class CControllerAvailabilityReportList extends CController {
 			}
 		}
 		else {
-			$data['filter'] = $this->prepareDataForMultiselectFields($data['filter']);
-
 			$host_groupids = $data['filter']['host_groups']
 				? getSubGroups(array_keys($data['filter']['host_groups']))
 				: null;
