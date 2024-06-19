@@ -19,14 +19,10 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../behaviors/CTagBehavior.php';
-require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 require_once dirname(__FILE__).'/../common/testWidgets.php';
 
 /**
- * @backup dashboard, profiles, hosts, globalmacro
+ * @backup dashboard, globalmacro
  *
  * @dataSource AllItemValueTypes
  *
@@ -57,7 +53,6 @@ class testDashboardHoneycombWidget extends testWidgets {
 			' FROM widget_field wf'.
 			' INNER JOIN widget w'.
 			' ON w.widgetid=wf.widgetid'.
-			' WHERE wf.name!=\'reference\''.
 			' ORDER BY wf.widgetid, wf.name, wf.value_int, wf.value_str, wf.value_groupid,'.
 			' wf.value_hostid, wf.value_itemid, wf.value_graphid';
 
@@ -134,12 +129,12 @@ class testDashboardHoneycombWidget extends testWidgets {
 		CDataHelper::call('dashboard.create', [
 			[
 				'name' => 'Dashboard for creating honeycomb widgets',
-				'display_period' => 60,
 				'auto_start' => 0,
 				'pages' => [[]]
 			],
 			[
 				'name' => 'Dashboard for updating honeycomb widget',
+				'auto_start' => 0,
 				'pages' => [
 					[
 						'widgets' => [
@@ -155,6 +150,11 @@ class testDashboardHoneycombWidget extends testWidgets {
 										'type' => 1,
 										'name' => 'items.0',
 										'value' => 'Numeric for honeycomb 1'
+									],
+									[
+										'type' => 1,
+										'name' => 'reference',
+										'value' => 'GZGZG'
 									]
 								]
 							]
@@ -164,6 +164,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 			],
 			[
 				'name' => 'Dashboard for canceling honeycomb widget',
+				'auto_start' => 0,
 				'pages' => [
 					[
 						'widgets' => [
@@ -179,6 +180,11 @@ class testDashboardHoneycombWidget extends testWidgets {
 										'type' => 1,
 										'name' => 'items.0',
 										'value' => 'Numeric for honeycomb 1'
+									],
+									[
+										'type' => 1,
+										'name' => 'reference',
+										'value' => 'BUBUA'
 									]
 								]
 							]
@@ -188,6 +194,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 			],
 			[
 				'name' => 'Dashboard for deleting honeycomb widget',
+				'auto_start' => 0,
 				'pages' => [
 					[
 						'widgets' => [
@@ -211,14 +218,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 				]
 			],
 			[
-				'name' => 'Dashboard for honeycomb display',
-				'display_period' => 60,
-				'auto_start' => 0,
-				'pages' => [[]]
-			],
-			[
 				'name' => 'Dashboard for Honeycomb screenshot',
-				'display_period' => 3600,
 				'auto_start' => 0,
 				'pages' => [
 					[
@@ -579,10 +579,8 @@ class testDashboardHoneycombWidget extends testWidgets {
 				self::$dashboardid['Dashboard for creating honeycomb widgets'])->waitUntilReady();
 
 		$dashboard = CDashboardElement::find()->waitUntilReady()->one();
-		$form = $dashboard->edit()->addWidget()->waitUntilReady()->asForm();
-		if ($form->getField('Type')->getValue() !== 'Honeycomb') {
-			$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Honeycomb')]);
-		}
+		$form = $dashboard->edit()->addWidget()->asForm();
+		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Honeycomb')]);
 
 		// Check fields maxlengths.
 		$maxlengths = [
@@ -612,7 +610,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 			'Host groups' => '',
 			'Hosts' => '',
 			'Host tags' => 'And/Or',
-			'Item pattern' => '',
+			'Item patterns' => '',
 			'Item tags' => 'And/Or',
 			'Show hosts in maintenance' => false,
 			'Advanced configuration' => false,
@@ -620,8 +618,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 			'id:host_tags_0_value' => '',
 			'id:item_tags_0_tag' => '',
 			'id:item_tags_0_value' => '',
-			'id:show_1' => true,
-			'id:show_2' => true,
+			'Show' => ['Primary label', 'Secondary label'],
 			'id:primary_label_type_0' => 'Text',
 			'Text' => '{HOST.NAME}',
 			'id:primary_label_size_type_0' => 'Auto',
@@ -632,24 +629,21 @@ class testDashboardHoneycombWidget extends testWidgets {
 			'id:secondary_label_bold' => true,
 			'id:secondary_label_units' => '',
 			'id:secondary_label_units_pos' => 'After value',
-			'id:interpolation' => true
+			'id:interpolation' => false
 		];
 
 		$form->checkValue($default_values);
 
 		// Check color picker default values.
 		$color_pickers = [
-			// Primary label color.
-			'xpath:.//input[@id="primary_label_color"]/..' => 'id:lbl_primary_label_color',
-			// Secondary label color.
-			'xpath:.//input[@id="secondary_label_color"]/..' => 'id:lbl_secondary_label_color',
-			// Background color.
-			'xpath:.//input[@id="bg_color"]/..' => 'id:lbl_bg_color'
+			'id:lbl_primary_label_color',   // Primary label color.
+			'id:lbl_secondary_label_color', // Secondary label color.
+			'id:lbl_bg_color'				// Background color.
 		];
-
-		foreach ($color_pickers as $selector => $label) {
-			$this->assertEquals('', $form->query($selector)->asColorPicker()->one()->getValue());
-			$this->assertEquals('Use default', $form->query($label)->one()->getAttribute('title'));
+		foreach ($color_pickers as $id) {
+			$color_picker = $form->query($id)->one();
+			$this->assertEquals('', $color_picker->getValue());
+			$this->assertEquals('Use default', $color_picker->query('xpath:./../button')->one()->getAttribute('title'));
 		}
 
 		// Check Select popup dropdowns for Host groups and Hosts.
@@ -661,12 +655,14 @@ class testDashboardHoneycombWidget extends testWidgets {
 			$field = $form->getField($label);
 
 			// Check Select dropdown menu button.
-			$menu = $field->query($popup_menu_selector)->asPopupButton()->one()->getMenu();
-			$this->assertEquals(($label === 'Host groups') ? $host_groups : $hosts, $menu->getItems()->asText());
+			$menu_button = $field->query($popup_menu_selector)->asPopupButton()->one();
+			$this->assertEquals(($label === 'Host groups') ? $host_groups : $hosts,
+					$menu_button->getMenu()->getItems()->asText()
+			);
 
 			// After selecting Dashboard from dropdown menu, check hint and field value.
 			if ($label === 'Hosts') {
-				$field->query($popup_menu_selector)->asPopupButton()->one()->getMenu()->select('Dashboard');
+				$menu_button->select('Dashboard');
 				$form->checkValue(['Hosts' => 'Dashboard']);
 				$this->assertTrue($field->query('xpath:.//span[@data-hintbox-contents="Dashboard is used as data source."]')
 						->one()->isVisible()
@@ -674,32 +670,32 @@ class testDashboardHoneycombWidget extends testWidgets {
 			}
 
 			// After selecting Widget from dropdown menu, check overlay dialog appearance and title.
-			$field->query($popup_menu_selector)->asPopupButton()->one()->getMenu()->select('Widget');
+			$menu_button->select('Widget');
 			$dialogs = COverlayDialogElement::find()->all();
 			$this->assertEquals('Widget', $dialogs->last()->waitUntilReady()->getTitle());
 			$dialogs->last()->close(true);
 		}
 
 		// After clicking on Select button, check overlay dialog appearance and title.
-		foreach (['Host groups', 'Hosts', 'Item pattern'] as $label) {
+		foreach (['Host groups', 'Hosts', 'Item patterns'] as $label) {
 			$field = $form->getField($label);
 			$field->query('button:Select')->waitUntilCLickable()->one()->click();
 			$dialogs = COverlayDialogElement::find()->all();
-			$label = ($label === 'Item pattern') ? 'Items' : $label;
+			$label = ($label === 'Item patterns') ? 'Items' : $label;
 			$this->assertEquals($label, $dialogs->last()->waitUntilReady()->getTitle());
 			$dialogs->last()->close(true);
 		}
 
 		// Check Show checkboxes and their values.
-		$show = $form->getField('Show')->asCheckboxList();
+		$show = $form->getField('Show');
 		$this->assertEquals(['Primary label', 'Secondary label'], $show->getLabels()->asText());
 		$this->assertTrue($show->isEnabled());
 
 		// Check Add/Remove buttons for Hosts and Items tags tables.
-		foreach (['Add', 'Remove'] as $button) {
-			foreach (['tags_table_host_tags', 'tags_table_item_tags'] as $id) {
-				$this->assertTrue($form->query('id', $id)->one()->query('button', $button)->one()->isClickable());
-			}
+		foreach (['tags_table_host_tags', 'tags_table_item_tags'] as $id) {
+			$this->assertEquals(2, $form->query('id', $id)->one()->query('button', ['Add', 'Remove'])
+					->all()->filter(CElementFilter::CLICKABLE)->count()
+			);
 		}
 
 		// Fields layout after Advanced configuration expand.
@@ -713,18 +709,19 @@ class testDashboardHoneycombWidget extends testWidgets {
 		];
 
 		foreach ($advanced_configuration as $label => $text) {
-			$label_fields = $form->getLabel($label)->query('xpath:./following::div[contains(@class, "fields-group ")]')->one();
-			$this->assertTrue($label_fields->isVisible());
+			$container = $form->getFieldContainer($label);
+			$this->assertTrue($container->isVisible());
 
 			// Type radio button. After changing them, some fields appears and other disappear.
-			$type_label = $label_fields->query('xpath:.//ul[contains(@id, "_label_type")]')->asSegmentedRadio()->one();
+			$label_id = ($label === 'Primary label') ? 'primary_label_' : 'secondary_label_';
+			$type_label = $container->query('id', $label_id.'type')->asSegmentedRadio()->one();
 			$this->assertEquals(['Text', 'Value'], $type_label->getLabels()->asText());
 
 			foreach (['Text', 'Value'] as $type_values) {
 				$type_label->select($type_values);
 
 				if ($type_values === 'Text') {
-					$this->assertEquals($text, $label_fields->query('xpath:.//textarea')->one()->getText());
+					$this->assertEquals($text, $container->query('xpath:.//textarea')->one()->getText());
 
 					// Check hintboxes.
 					$hint_text = "Supported macros:".
@@ -741,11 +738,10 @@ class testDashboardHoneycombWidget extends testWidgets {
 				}
 				else {
 					// New fields and check box appears after selecting Type - Value.
-					$units_checkbox = $label_fields->query('xpath:.//input[contains(@id, "label_units_show")]')
-							->asCheckbox()->one();
-					$units_input = $label_fields->query('xpath:.//div[contains(@class, "form-field")]//input[contains(@id,'.
+					$units_checkbox = $container->query('id', $label_id.'units_show')->asCheckbox()->one();
+					$units_input = $container->query('xpath:.//div[contains(@class, "form-field")]//input[contains(@id,'.
 							' "_label_units")]')->one();
-					$position_dropdown = $label_fields->query('tag:z-select')->asDropdown()->one();
+					$position_dropdown = $container->query('id', $label_id.'units_pos')->asDropdown()->one();
 					$this->assertEquals(['Before value', 'After value'], $position_dropdown->getOptions()->asText());
 
 					// Checking out Units checkbox - disable Units fields.
@@ -759,30 +755,30 @@ class testDashboardHoneycombWidget extends testWidgets {
 			}
 
 			// Check size radio button and appearance of new field after clicking on Custom.
-			$size = $label_fields->query('xpath:.//ul[contains(@id, "label_size_type")]')->asSegmentedRadio()->one();
+			$size = $container->query('xpath:.//ul[contains(@id, "label_size_type")]')->asSegmentedRadio()->one();
 			$this->assertEquals(['Auto', 'Custom'], $size->getLabels()->asText());
 
 			// Primary and Secondary label has different values in size custom field.
 			$size_input_value = ($label === 'Primary label') ? '20' : '30';
 
 			// After clicking on Custom button, new input field appears.
+			$size_input_selector = $container->query('id', $label_id.'size')->one();
+			$this->assertFalse($size_input_selector->isVisible());
 			$size->select('Custom');
-			$size_input_selector = 'xpath:.//input[@type="text" and contains(@id, "_label_size")]';
-			$this->assertTrue($label_fields->query($size_input_selector)->one()->isVisible());
-			$this->assertEquals($size_input_value, $label_fields->query($size_input_selector)->one()->getAttribute('value'));
+			$this->assertTrue($size_input_selector->isVisible());
+			$this->assertEquals($size_input_value, $size_input_selector->getAttribute('value'));
 
 			// After clicking on Auto, input field disappear.
 			$size->select('Auto');
-			$this->assertFalse($label_fields->query($size_input_selector)->one()->isVisible());
+			$this->assertFalse($size_input_selector->isVisible());
 
 			// Check Bold checkbox. Primary label bold - unchecked. Secondary label bold - checked-in.
-			$bold = $label_fields->query('xpath:.//input[contains(@id, "_label_bold")]')->asCheckbox()->one();
+			$bold = $container->query('xpath:.//input[contains(@id, "_label_bold")]')->asCheckbox()->one();
 			$this->assertTrue($bold->isChecked($label === 'Secondary label'));
 
 			// Uncheck Primary/Secondary label.
-			$show->query('xpath:.//label[text()='.CXPathHelper::escapeQuotes($label).
-					']/../input')->one()->asCheckbox()->set(false);
-			$this->assertFalse($label_fields->isVisible());
+			$show->set($label, false);
+			$this->assertFalse($container->isVisible());
 		}
 
 		// Thresholds warning message.
@@ -815,6 +811,9 @@ class testDashboardHoneycombWidget extends testWidgets {
 		$this->assertFalse($colorpicker->isVisible());
 		$this->assertFalse($threshold_input->isVisible());
 		$this->assertFalse($remove->isVisible());
+
+		COverlayDialogElement::find()->one()->close();
+		$dashboard->cancelEditing();
 	}
 
 	public static function getCreateData() {
@@ -825,10 +824,10 @@ class testDashboardHoneycombWidget extends testWidgets {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'No item',
-						'Item pattern' => ''
+						'Item patterns' => ''
 					],
 					'error_message' => [
-						'Invalid parameter "Item pattern": cannot be empty.'
+						'Invalid parameter "Item patterns": cannot be empty.'
 					]
 				]
 			],
@@ -837,7 +836,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Item pattern' => 'test',
+						'Item patterns' => 'test',
 						'id:show_1' => false, // Show - Primary label.
 						'id:show_2' => false // Show - Secondary label.
 					],
@@ -851,7 +850,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Item pattern' => 'test',
+						'Item patterns' => 'test',
 						'Background colour' => 'tests1'
 					],
 					'error_message' => [
@@ -864,7 +863,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Item pattern' => 'test',
+						'Item patterns' => 'test',
 					],
 					'thresholds' => [
 						[
@@ -882,7 +881,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Item pattern' => 'test',
+						'Item patterns' => 'test',
 					],
 					'thresholds' => [
 						[
@@ -900,7 +899,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Item pattern' => 'test',
+						'Item patterns' => 'test',
 					],
 					'thresholds' => [
 						[
@@ -922,7 +921,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Item pattern' => 'test',
+						'Item patterns' => 'test',
 					],
 					'thresholds' => [
 						[
@@ -944,7 +943,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Item pattern' => 'test',
+						'Item patterns' => 'test',
 					],
 					'thresholds' => [
 						[
@@ -966,7 +965,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Item pattern' => 'test',
+						'Item patterns' => 'test',
 						'id:primary_label' => '' // Primary label text field.
 					],
 					'error_message' => [
@@ -979,7 +978,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Item pattern' => 'test',
+						'Item patterns' => 'test',
 						'id:primary_label_size_type' => 'Custom', // Primary label Size - custom.
 						'id:primary_label_size' => '' // Primary label Custom size input field.
 					],
@@ -993,7 +992,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Item pattern' => 'test',
+						'Item patterns' => 'test',
 						'id:primary_label_type' => 'Value',
 						'id:primary_label_decimal_places' => 9,
 						'id:secondary_label_type' => 'Value',
@@ -1010,7 +1009,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Item pattern' => 'test',
+						'Item patterns' => 'test',
 						'id:secondary_label_type' => 'Text',
 						'id:primary_label_size_type' => 'Custom', // Primary label Size - custom.
 						'id:secondary_label_size_type' => 'Custom', // Secondary label Size - custom.
@@ -1032,7 +1031,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Item pattern' => '',
+						'Item patterns' => '',
 						'id:secondary_label_type' => 'Text',
 						'id:primary_label_size_type' => 'Custom', // Primary label Size - custom.
 						'id:secondary_label_size_type' => 'Custom', // Secondary label Size - custom.
@@ -1050,7 +1049,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 						]
 					],
 					'error_message' => [
-						'Invalid parameter "Item pattern": cannot be empty.',
+						'Invalid parameter "Item patterns": cannot be empty.',
 						'Invalid parameter "Primary label: Text": cannot be empty.',
 						'Invalid parameter "Primary label: Size": value must be one of 1-100.',
 						'Invalid parameter "Primary label: Colour": a hexadecimal colour code (6 symbols) is expected.',
@@ -1067,7 +1066,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 				[
 					'fields' => [
 						'Name' => 'With existing item, hosts and hostgroup',
-						'Item pattern' => 'Numeric for honeycomb 1',
+						'Item patterns' => 'Numeric for honeycomb 1',
 						'Host groups' => 'Zabbix servers',
 						'Hosts' => 'Host for honeycomb 1'
 					]
@@ -1078,7 +1077,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 				[
 					'fields' => [
 						'Name' => '',
-						'Item pattern' => 'Numeric for honeycomb 1',
+						'Item patterns' => 'Numeric for honeycomb 1',
 						'id:show_2' => false, // Show - Primary label.
 						'id:primary_label' => '{$RANDOM}, some text, {TIME}, 12345, !@#$%^&*, {#WHY}',
 						'id:primary_label_size_type' => 'Custom', // Primary label Size - custom.
@@ -1092,7 +1091,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 				[
 					'fields' => [
 						'Name' => 'Secondary label only with Text, color, custom.',
-						'Item pattern' => 'Numeric for honeycomb 1',
+						'Item patterns' => 'Numeric for honeycomb 1',
 						'id:show_1' => false, // Show - Primary label.
 						'id:secondary_label_type' => 'Text',
 						'id:secondary_label' => '{$RANDOM}, some text, {TIME}, 12345, !@#$%^&*, {#WHY}',
@@ -1107,7 +1106,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 				[
 					'fields' => [
 						'Name' => 'Secondary and primary labels only with values.',
-						'Item pattern' => 'Numeric for honeycomb 1',
+						'Item patterns' => 'Numeric for honeycomb 1',
 						'id:primary_label_type' => 'Value',
 						'id:secondary_label_type' => 'Value',
 						'id:primary_label_decimal_places' => 2,
@@ -1129,7 +1128,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 					'fields' => [
 						'Name' => 'Dashboard in Hosts and enabled show maintenance',
 						'Hosts' => 'Dashboard',
-						'Item pattern' => 'Numeric for honeycomb 1',
+						'Item patterns' => 'Numeric for honeycomb 1',
 						'Show hosts in maintenance' => true
 					]
 				]
@@ -1139,7 +1138,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 				[
 					'fields' => [
 						'Name' => 'Different items pattern',
-						'Item pattern' => [
+						'Item patterns' => [
 							'Numeric for honeycomb 1',
 							'random_value',
 							'*',
@@ -1155,7 +1154,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 				[
 					'fields' => [
 						'Name' => 'Enabled color interpolation',
-						'Item pattern' => 'Numeric for honeycomb 1'
+						'Item patterns' => 'Numeric for honeycomb 1'
 					],
 					'thresholds' => [
 						[
@@ -1174,7 +1173,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 				[
 					'fields' => [
 						'Name' => 'Disabled color interpolation',
-						'Item pattern' => 'Numeric for honeycomb 1',
+						'Item patterns' => 'Numeric for honeycomb 1',
 						'id:interpolation' => false
 					],
 					'thresholds' => [
@@ -1194,7 +1193,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 				[
 					'fields' => [
 						'Name' => 'Correct background color',
-						'Item pattern' => 'Numeric for honeycomb 1',
+						'Item patterns' => 'Numeric for honeycomb 1',
 						'Background colour' => 'B2DFDB'
 					]
 				]
@@ -1204,7 +1203,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 				[
 					'fields' => [
 						'Name' => 'Host and items tags 🙂🙃',
-						'Item pattern' => 'Numeric for honeycomb 1'
+						'Item patterns' => 'Numeric for honeycomb 1'
 					],
 					'tags' => [
 						'item_tags' => [
@@ -1231,7 +1230,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 				[
 					'fields' => [
 						'Name' => 'All available fields filled',
-						'Item pattern' => 'Numeric for honeycomb 1',
+						'Item patterns' => 'Numeric for honeycomb 1',
 						'Refresh interval' => 'No refresh',
 						'Host groups' => 'Zabbix servers',
 						'Hosts' => 'Host for honeycomb 1',
@@ -1286,6 +1285,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 				self::$dashboardid['Dashboard for updating honeycomb widget'])->waitUntilReady();
 		$dashboard = CDashboardElement::find()->one();
 		$dashboard->edit()->getWidget('UpdateHoneycomb')->edit()->submit();
+		$dashboard->getWidget('UpdateHoneycomb');
 		$dashboard->save();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
@@ -1300,7 +1300,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 	 * @dataProvider getCreateData
 	 */
 	public function testDashboardHoneycombWidget_Update($data) {
-		if (!array_key_exists('expected', $data)) {
+		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_GOOD) {
 			$this->updateToDefault();
 		}
 
@@ -1313,23 +1313,24 @@ class testDashboardHoneycombWidget extends testWidgets {
 	 * Delete Honeycomb widget.
 	 */
 	public function testDashboardHoneycombWidget_Delete() {
+		$deleted_dashboard = 'DeleteHoneycomb';
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
 				self::$dashboardid['Dashboard for deleting honeycomb widget'])->waitUntilReady();
 		$dashboard = CDashboardElement::find()->one()->waitUntilReady()->edit();
-		$widget = $dashboard->getWidget('DeleteHoneycomb');
+		$widget = $dashboard->getWidget($deleted_dashboard);
 		$this->assertTrue($widget->isEditable());
-		$dashboard->deleteWidget('DeleteHoneycomb');
+		$dashboard->deleteWidget($deleted_dashboard);
 		$widget->waitUntilNotPresent();
 		$dashboard->save();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 
 		// Check that widget is not present on dashboard and in DB.
-		$this->assertFalse($dashboard->getWidget('DeleteHoneycomb', false)->isValid());
+		$this->assertFalse($dashboard->getWidget($deleted_dashboard, false)->isValid());
 		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM widget_field wf'.
 			' LEFT JOIN widget w'.
 			' ON w.widgetid=wf.widgetid'.
-			' WHERE w.name='.zbx_dbstr('DeleteHoneycomb')
+			' WHERE w.name='.zbx_dbstr($deleted_dashboard)
 		));
 	}
 
@@ -1339,78 +1340,36 @@ class testDashboardHoneycombWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Name' => 'Host name macros',
-						'Item pattern' => 'Display item 1',
+						'Name' => 'Resolved macros',
+						'Item patterns' => 'Display item 1',
 						'id:primary_label_type' => 'Text',
 						'id:secondary_label_type' => 'Text',
-						'id:primary_label' => '{HOST.NAME}',
-						'id:secondary_label' => '{HOST.NAME}'
+						'id:primary_label' => '{HOST.NAME} {ITEM.KEY} {ITEM.LASTVALUE}',
+						'id:secondary_label' => '{HOST.NAME} {ITEM.KEY} {ITEM.LASTVALUE}'
 					],
-					'result' => 'Display'
+					'result' => 'Display honey_display_1 100'
 				]
 			],
 			// #1.
 			[
 				[
 					'fields' => [
-						'Name' => 'Item key macros',
-						'Item pattern' => 'Display item 1',
+						'Name' => 'Emoji and special symbols displayed',
+						'Item patterns' => 'Display item 1',
 						'id:primary_label_type' => 'Text',
 						'id:secondary_label_type' => 'Text',
-						'id:primary_label' => '{ITEM.KEY}',
-						'id:secondary_label' => '{ITEM.KEY}'
+						'id:primary_label' => '🙂🙃 āēīõšŗ$%^&*()',
+						'id:secondary_label' => '🙂🙃 āēīõšŗ$%^&*()'
 					],
-					'result' => 'honey_display_1'
+					'result' => '🙂🙃 āēīõšŗ$%^&*()'
 				]
 			],
 			// #2.
 			[
 				[
 					'fields' => [
-						'Name' => 'Item last value macros {ITEM.LASTVALUE}',
-						'Item pattern' => 'Display item 1',
-						'id:primary_label_type' => 'Text',
-						'id:secondary_label_type' => 'Text',
-						'id:primary_label' => '{ITEM.LASTVALUE}',
-						'id:secondary_label' => '{ITEM.LASTVALUE}'
-					],
-					'result' => '100'
-				]
-			],
-			// #3.
-			[
-				[
-					'fields' => [
-						'Name' => 'Emoji displayed',
-						'Item pattern' => 'Display item 1',
-						'id:primary_label_type' => 'Text',
-						'id:secondary_label_type' => 'Text',
-						'id:primary_label' => '🙂🙃',
-						'id:secondary_label' => '🙂🙃'
-					],
-					'result' => '🙂🙃'
-				]
-			],
-			// #4.
-			[
-				[
-					'fields' => [
-						'Name' => 'Symbols displayed āēīõšŗ$%^&*()',
-						'Item pattern' => 'Display item 1',
-						'id:primary_label_type' => 'Text',
-						'id:secondary_label_type' => 'Text',
-						'id:primary_label' => 'āēīõšŗ$%^&*()',
-						'id:secondary_label' => 'āēīõšŗ$%^&*()'
-					],
-					'result' => 'āēīõšŗ$%^&*()'
-				]
-			],
-			// #5.
-			[
-				[
-					'fields' => [
 						'Name' => 'Simple text displayed',
-						'Item pattern' => 'Display item 1',
+						'Item patterns' => 'Display item 1',
 						'id:primary_label_type' => 'Text',
 						'id:secondary_label_type' => 'Text',
 						'id:primary_label' => 'Text for testing',
@@ -1419,12 +1378,12 @@ class testDashboardHoneycombWidget extends testWidgets {
 					'result' => 'Text for testing'
 				]
 			],
-			// #6.
+			// #3.
 			[
 				[
 					'fields' => [
 						'Name' => 'User macros displayed {$TEXT}',
-						'Item pattern' => 'Display item 1',
+						'Item patterns' => 'Display item 1',
 						'id:primary_label_type' => 'Text',
 						'id:secondary_label_type' => 'Text',
 						'id:primary_label' => '{$TEXT}',
@@ -1433,12 +1392,12 @@ class testDashboardHoneycombWidget extends testWidgets {
 					'result' => 'text_macro'
 				]
 			],
-			// #7.
+			// #4.
 			[
 				[
 					'fields' => [
 						'Name' => 'Secret macros displayed {$SECRET_TEXT}',
-						'Item pattern' => 'Display item 1',
+						'Item patterns' => 'Display item 1',
 						'id:primary_label_type' => 'Text',
 						'id:secondary_label_type' => 'Text',
 						'id:primary_label' => '{$SECRET_TEXT}',
@@ -1447,12 +1406,12 @@ class testDashboardHoneycombWidget extends testWidgets {
 					'result' => '******'
 				]
 			],
-			// #8.
+			// #5.
 			[
 				[
 					'fields' => [
 						'Name' => 'LLD macros displayed {#LLD}',
-						'Item pattern' => 'Display item 1',
+						'Item patterns' => 'Display item 1',
 						'id:primary_label_type' => 'Text',
 						'id:secondary_label_type' => 'Text',
 						'id:primary_label' => '{#LLD}',
@@ -1461,12 +1420,12 @@ class testDashboardHoneycombWidget extends testWidgets {
 					'result' => '{#LLD}'
 				]
 			],
-			// #9.
+			// #6.
 			[
 				[
 					'fields' => [
 						'Name' => 'Non existing global macros displayed {HELLO.WORLD}',
-						'Item pattern' => 'Display item 1',
+						'Item patterns' => 'Display item 1',
 						'id:primary_label_type' => 'Text',
 						'id:secondary_label_type' => 'Text',
 						'id:primary_label' => '{HELLO.WORLD}',
@@ -1475,12 +1434,12 @@ class testDashboardHoneycombWidget extends testWidgets {
 					'result' => '{HELLO.WORLD}'
 				]
 			],
-			// #10.
+			// #7.
 			[
 				[
 					'fields' => [
 						'Name' => '123',
-						'Item pattern' => 'Display item 1',
+						'Item patterns' => 'Display item 1',
 						'id:primary_label_type' => 'Value',
 						'id:secondary_label_type' => 'Value',
 						'id:primary_label_decimal_places' => '6',
@@ -1489,12 +1448,12 @@ class testDashboardHoneycombWidget extends testWidgets {
 					'result' => '100.000000'
 				]
 			],
-			// #11.
+			// #8.
 			[
 				[
 					'fields' => [
 						'Name' => 'Value decimal 0',
-						'Item pattern' => 'Display item 1',
+						'Item patterns' => 'Display item 1',
 						'id:primary_label_type' => 'Value',
 						'id:secondary_label_type' => 'Value',
 						'id:primary_label_decimal_places' => '0',
@@ -1503,12 +1462,12 @@ class testDashboardHoneycombWidget extends testWidgets {
 					'result' => '100'
 				]
 			],
-			// #12.
+			// #9.
 			[
 				[
 					'fields' => [
 						'Name' => 'Before displayed units',
-						'Item pattern' => 'Display item 1',
+						'Item patterns' => 'Display item 1',
 						'id:primary_label_type' => 'Value',
 						'id:secondary_label_type' => 'Value',
 						'id:primary_label_decimal_places' => '0',
@@ -1516,17 +1475,17 @@ class testDashboardHoneycombWidget extends testWidgets {
 						'id:primary_label_units_pos' => 'Before value',
 						'id:secondary_label_units_pos' => 'Before value',
 						'id:primary_label_units' => 'before',
-						'id:secondary_label_units' => 'before',
+						'id:secondary_label_units' => 'before'
 					],
 					'result' => 'before 100'
 				]
 			],
-			// #13.
+			// #10.
 			[
 				[
 					'fields' => [
 						'Name' => 'After displayed units',
-						'Item pattern' => 'Display item 1',
+						'Item patterns' => 'Display item 1',
 						'id:primary_label_type' => 'Value',
 						'id:secondary_label_type' => 'Value',
 						'id:primary_label_decimal_places' => '0',
@@ -1534,89 +1493,83 @@ class testDashboardHoneycombWidget extends testWidgets {
 						'id:primary_label_units_pos' => 'After value',
 						'id:secondary_label_units_pos' => 'After value',
 						'id:primary_label_units' => 'after',
-						'id:secondary_label_units' => 'after',
+						'id:secondary_label_units' => 'after'
 					],
 					'result' => '100 after'
+				]
+			],
+			// #11.
+			[
+				[
+					'fields' => [
+						'Name' => 'Special symbols and emoji check for units',
+						'Item patterns' => 'Display item 1',
+						'id:primary_label_type' => 'Value',
+						'id:secondary_label_type' => 'Value',
+						'id:primary_label_decimal_places' => '0',
+						'id:secondary_label_decimal_places' => '0',
+						'id:primary_label_units_pos' => 'After value',
+						'id:secondary_label_units_pos' => 'After value',
+						'id:primary_label_units' => '🙂🙃 āēīõšŗ$%^&*()',
+						'id:secondary_label_units' => '🙂🙃 āēīõšŗ$%^&*()'
+					],
+					'result' => '100 🙂🙃 āēīõšŗ$%^&*()'
+				]
+			],
+			// #12.
+			[
+				[
+					'fields' => [
+						'Name' => 'User and global macros displayed in units',
+						'Item patterns' => 'Display item 1',
+						'id:primary_label_type' => 'Value',
+						'id:secondary_label_type' => 'Value',
+						'id:primary_label_decimal_places' => '0',
+						'id:secondary_label_decimal_places' => '0',
+						'id:primary_label_units_pos' => 'After value',
+						'id:secondary_label_units_pos' => 'After value',
+						'id:primary_label_units' => '{$TEXT} {HOST.NAME}',
+						'id:secondary_label_units' => '{$TEXT} {HOST.NAME}'
+					],
+					'result' => '100 {$TEXT} {HOST.NAME}'
+				]
+			],
+			// #13.
+			[
+				[
+					'fields' => [
+						'Name' => 'Only primary label displayed',
+						'Item patterns' => 'Display item 1',
+						'id:show_2' => false,
+						'id:primary_label_type' => 'Text',
+						'id:primary_label' => 'Only primary'
+					],
+					'check_label' => 'svg-honeycomb-label-primary',
+					'turned_off_label' => 'svg-honeycomb-label-secondary',
+					'result' => 'Only primary'
 				]
 			],
 			// #14.
 			[
 				[
 					'fields' => [
-						'Name' => 'Emoji displayed units',
-						'Item pattern' => 'Display item 1',
-						'id:primary_label_type' => 'Value',
-						'id:secondary_label_type' => 'Value',
-						'id:primary_label_decimal_places' => '0',
-						'id:secondary_label_decimal_places' => '0',
-						'id:primary_label_units_pos' => 'After value',
-						'id:secondary_label_units_pos' => 'After value',
-						'id:primary_label_units' => '🙂🙃',
-						'id:secondary_label_units' => '🙂🙃',
+						'Name' => 'Only secondary label displayed',
+						'Item patterns' => 'Display item 1',
+						'id:show_1' => false,
+						'id:secondary_label_type' => 'Text',
+						'id:secondary_label' => 'Only secondary'
 					],
-					'result' => '100 🙂🙃'
+					'check_label' => 'svg-honeycomb-label-secondary',
+					'turned_off_label' => 'svg-honeycomb-label-primary',
+					'result' => 'Only secondary'
 				]
 			],
 			// #15.
 			[
 				[
 					'fields' => [
-						'Name' => 'Symbols displayed units',
-						'Item pattern' => 'Display item 1',
-						'id:primary_label_type' => 'Value',
-						'id:secondary_label_type' => 'Value',
-						'id:primary_label_decimal_places' => '0',
-						'id:secondary_label_decimal_places' => '0',
-						'id:primary_label_units_pos' => 'After value',
-						'id:secondary_label_units_pos' => 'After value',
-						'id:primary_label_units' => 'āēīõšŗ$%^&*()',
-						'id:secondary_label_units' => 'āēīõšŗ$%^&*()',
-					],
-					'result' => '100 āēīõšŗ$%^&*()'
-				]
-			],
-			// #16.
-			[
-				[
-					'fields' => [
-						'Name' => 'User macros displayed units',
-						'Item pattern' => 'Display item 1',
-						'id:primary_label_type' => 'Value',
-						'id:secondary_label_type' => 'Value',
-						'id:primary_label_decimal_places' => '0',
-						'id:secondary_label_decimal_places' => '0',
-						'id:primary_label_units_pos' => 'After value',
-						'id:secondary_label_units_pos' => 'After value',
-						'id:primary_label_units' => '{$TEXT}',
-						'id:secondary_label_units' => '{$TEXT}',
-					],
-					'result' => '100 {$TEXT}'
-				]
-			],
-			// #17.
-			[
-				[
-					'fields' => [
-						'Name' => 'Global macros displayed units',
-						'Item pattern' => 'Display item 1',
-						'id:primary_label_type' => 'Value',
-						'id:secondary_label_type' => 'Value',
-						'id:primary_label_decimal_places' => '0',
-						'id:secondary_label_decimal_places' => '0',
-						'id:primary_label_units_pos' => 'After value',
-						'id:secondary_label_units_pos' => 'After value',
-						'id:primary_label_units' => '{HOST.NAME}',
-						'id:secondary_label_units' => '{HOST.NAME}',
-					],
-					'result' => '100 {HOST.NAME}'
-				]
-			],
-			// #18
-			[
-				[
-					'fields' => [
 						'Name' => 'Colors for value and background',
-						'Item pattern' => 'Display item 1',
+						'Item patterns' => 'Display item 1',
 						'id:primary_label_type' => 'Text',
 						'id:secondary_label_type' => 'Text',
 						'id:primary_label' => 'COLOR',
@@ -1627,8 +1580,8 @@ class testDashboardHoneycombWidget extends testWidgets {
 					],
 					'colors' => [
 						'xpath://*[@class="svg-honeycomb-cell"]' => '#D1C4E9',
-						'xpath://*[contains(@class, "svg-honeycomb-label-primary")]' => 'color: rgb(102, 187, 106)',
-						'xpath://*[contains(@class, "svg-honeycomb-label-secondary")]' => 'color: rgb(128, 222, 234)'
+						'svg-honeycomb-label-primary' => 'rgba(102, 187, 106, 1)',
+						'svg-honeycomb-label-secondary' => 'rgba(128, 222, 234, 1)'
 					],
 					'result' => 'COLOR'
 				]
@@ -1646,24 +1599,36 @@ class testDashboardHoneycombWidget extends testWidgets {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
 				self::$dashboardid['Dashboard for updating honeycomb widget'])->waitUntilReady();
 		$this->checkWidgetForm($data, 'update', false);
-		CDashboardElement::find()->waitUntilReady()->one()->save();
+		$dashboard = CDashboardElement::find()->waitUntilReady()->one();
+		$dashboard->save();
 
 		// Check message that dashboard saved.
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 		$this->page->waitUntilReady();
+		$widget = $dashboard->getWidget($data['fields']['Name']);
 
 		// Check that correct value displayed on honeycomb.
-		foreach (['svg-honeycomb-label-primary', 'svg-honeycomb-label-secondary'] as $selector) {
-			$displayed = $this->query('xpath://*[contains(@class, '.CXPathHelper::escapeQuotes($selector).
-					')]/div')->one()->getText();
+		if (array_key_exists('check_label', $data)) {
+			$displayed = $widget->getContent()->query('class', $data['check_label'])->one()->getText();
 			$this->assertEquals($displayed, $data['result']);
+			$this->assertFalse($widget->getContent()->query('class', $data['turned_off_label'])->exists());
+		}
+		else {
+			foreach (['svg-honeycomb-label-primary', 'svg-honeycomb-label-secondary'] as $selector) {
+				$displayed = $widget->getContent()->query('class', $selector)->one()->getText();
+				$this->assertEquals($displayed, $data['result']);
+			}
 		}
 
 		// Check that correct colors displayed.
 		if (array_key_exists('colors', $data)) {
 			foreach ($data['colors'] as $color_selector => $color) {
-				$displayed_color = $this->query($color_selector)->one()->getAttribute('style');
-				$this->assertStringContainsString($color, $displayed_color);
+				if ($color === '#D1C4E9') {
+					$this->assertStringContainsString($color, $this->query($color_selector)->one()->getAttribute('style'));
+				}
+				else {
+					$this->assertEquals($color, $this->query('class', $color_selector)->one()->getCSSValue('color'));
+				}
 			}
 		}
 	}
@@ -1731,15 +1696,13 @@ class testDashboardHoneycombWidget extends testWidgets {
 		}
 		else {
 			$form = $dashboard->addWidget()->asForm();
-
-			if ($form->getField('Type')->getValue() !== 'Honeycomb') {
-				$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Honeycomb')]);
-			}
+			$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Honeycomb')]);
 		}
+
 		$form->fill([
 			'Name' => $new_name,
 			'Advanced configuration' => true,
-			'Item pattern' => 'Test_cancel',
+			'Item patterns' => 'Test_cancel',
 			'Refresh interval' => '15 minutes',
 			'Host groups' => 'Zabbix servers',
 			'Hosts' => 'Host for honeycomb 1',
@@ -1758,7 +1721,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 		}
 		else {
 			$dialog = COverlayDialogElement::find()->one();
-			$dialog->query('button:Cancel')->one()->click();
+			$dialog->close(true);
 			$dialog->ensureNotPresent();
 
 			if (CTestArrayHelper::get($data, 'update', false)) {
@@ -1837,13 +1800,10 @@ class testDashboardHoneycombWidget extends testWidgets {
 		}
 
 		$form = ($action === 'create')
-			? $dashboard->edit()->addWidget()->waitUntilReady()->asForm()
-			: $dashboard->getWidget('UpdateHoneycomb')->edit()->asForm();
+			? $dashboard->edit()->addWidget()->asForm()
+			: $dashboard->getWidget('UpdateHoneycomb')->edit();
 
-		if ($form->getField('Type')->getValue() !== 'Honeycomb') {
-			$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Honeycomb')]);
-		}
-
+		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Honeycomb')]);
 		$form->fill(['Advanced configuration' => true]);
 		$this->query('id:lbl_bg_color')->one()->waitUntilVisible();
 
@@ -1907,7 +1867,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 	}
 
 	/**
-	 * Check created tags.
+	 * Add or Check tags in Honeycomb widget.
 	 *
 	 * @param array  $tags      given tags
 	 * @param boolean $check    check tags' values after creation or not

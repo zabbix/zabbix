@@ -81,7 +81,7 @@ class testWidgets extends CWebTest {
 				break;
 
 			case 'Honeycomb':
-				$select_dialog = $widget_dialog->getFieldContainer('Item pattern');
+				$select_dialog = $widget_form->getFieldContainer('Item patterns');
 
 				// For Honeycomb widget all item types available.
 				$item_types = [
