@@ -103,7 +103,6 @@ zabbix_export:
           type: DEPENDENT
           key: website.metrics.check
           delay: '0'
-          history: 7d
           trends: '0'
           value_type: CHAR
           description: 'Check that the performance counters of the requested website data has been received correctly.'

@@ -95,6 +95,13 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 			]
 		]);
 
+		CDataHelper::call('trigger.create', [
+			[
+				'description' => 'Templated trigger',
+				'expression' => 'last(/'.self::TEMPLATE.'/templ_key[1])=0'
+			]
+		]);
+
 		$item_protototypes = CDataHelper::call('itemprototype.create', [
 			[
 				'hostid' => self::$update_templateid,
@@ -1060,7 +1067,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 								[
 									'field_locator' => 'xpath:.//label[text()="Units"]/../following-sibling::div[1]/input',
 									'attributes' => [
-										'maxlength' => 2048
+										'maxlength' => 255
 									]
 								],
 								[

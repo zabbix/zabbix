@@ -1,12 +1,24 @@
 Changes for 7.2.0alpha1
 
 New features:
+.........T [ZBXNEXT-8868] added discovery and template for Azure VM Scale Sets (abrosimovs)
+.......PS. [ZBXNEXT-9201] updated max supported MySQL version to 8.4 (mprihodko)
+........S. [ZBXNEXT-9225] updated max supported TimescaleDB version to 2.15 (mprihodko)
+.......PS. [ZBXNEXT-9226] updated max supported MariaDB version to 11.4 (mprihodko)
 .........T [ZBXNEXT-9034] added Jira Data Center by JMX template (atocko)
 .........T [ZBXNEXT-9140] added support for custom compartments in Oracle Cloud by HTTP templates (knaglis)
 .......PS. [ZBXNEXT-9145] improved VMware event log retrieval (asestakovs, MVekslers)
 .......PS. [ZBXNEXT-8990] extended VMware event log with username (asestakovs)
 
 Bug fixes:
+..F....... [ZBX-24588] fixed CyberArk Vault connection with no certificates (vmurzins)
+..F....... [ZBX-23876] fixed incorrect timeout value being used when testing item (agriscenko)
+..F....... [ZBX-24548] fixed error when updating disabled Map navigation tree widget (apoga)
+........S. [ZBX-24553] fixed WebDriverURL handling when trailing slash is present (dgoloscapov)
+.........T [ZBX-24635] fixed datastore triggers in VMware templates (abrosimovs)
+..F....... [ZBX-23440] fixed hintbox hiding on parent scroll and on target position changes (apoga, averza)
+...G...... [ZBX-24301] fixed net.dns.perf to return valid response time instead of zero for NXDOMAIN result (arimdjonoks)
+..F....... [ZBX-24550] removed background color from links in loading state (apoga)
 ........S. [ZBX-24560] fixed {HOST.DNS} and {HOST.IP} not being resolved if empty (vso)
 .........T [ZBX-24415] added triggers for datastores in VMware templates (abrosimovs)
 .......PS. [ZBX-24483] improved memory usage in Zabbix server/proxy trappers and in proxy pollers when sending large configuration (vso)
@@ -31,7 +43,6 @@ A......... [ZBX-24180] fixed inability to import existing host or template when 
 ...G...... [ZBX-24362] fix Zabbix agent 2 loadable plugin process handling catching all child process exits (rzvejs)
 ..F....... [ZBX-24152] fixed host form submission with Enter button if the form is opened in a popup and focus is in a flexible text area field (Ivo)
 ..F....... [ZBX-24276] fixed inconsistent map element URL opening behavior (esekace)
-..F....... [ZBX-24146] fixed update of item timeout value upon other form field changes (esekace)
 ..F....... [ZBX-24253] fixed subfilter reset when navigating in items list page (esekace)
 ..F....... [ZBX-24344] fixed selected state sub-filter visibility in latest data page (esekace)
 .......PS. [ZBX-24402] reduced main process connects to database during startup (sboidenko)
@@ -50,12 +61,28 @@ A......... [ZBX-24299] fixed possibility to alter read-only error fields with Ho
 Changes for 7.0.1rc1
 
 New features:
+.........T [ZBXNEXT-8868] added discovery and template for Azure VM Scale Sets (abrosimovs)
+.......PS. [ZBXNEXT-9201] updated max supported MySQL version to 8.4 (mprihodko)
+........S. [ZBXNEXT-9225] updated max supported TimescaleDB version to 2.15 (mprihodko)
+.......PS. [ZBXNEXT-9226] updated max supported MariaDB version to 11.4 (mprihodko)
 .........T [ZBXNEXT-9140] added support for custom compartments in Oracle Cloud by HTTP templates (knaglis)
 .........T [ZBXNEXT-9034] added Jira Data Center by JMX template (atocko)
 .......PS. [ZBXNEXT-9145] improved VMware event log retrieval (asestakovs, MVekslers)
 .......PS. [ZBXNEXT-8990] extended VMware event log with username (asestakovs)
 
 Bug fixes:
+..F....... [ZBX-24588] fixed CyberArk Vault connection with no certificates (vmurzins)
+..F....... [ZBX-23876] fixed incorrect timeout value being used when testing item (agriscenko)
+..F....... [ZBX-24548] fixed error when updating disabled Map navigation tree widget (apoga)
+........S. [ZBX-24553] fixed WebDriverURL handling when trailing slash is present (dgoloscapov)
+.........T [ZBX-24635] fixed datastore triggers in VMware templates (abrosimovs)
+...G...PS. [ZBX-20766] fixed confusing port binding error message (dgoloscapov)
+.......PS. [ZBX-24453] implemented socket file cleanup when shutting down, added blocking of signals during important stages of startup (dgoloscapov)
+........S. [ZBX-24167] fixed template linkage when item prototype collision is found (dgoloscapov)
+........S. [ZBX-24119] fixed possible blocking of alert manager when it periodically pings database (dgoloscapov)
+..F....... [ZBX-23440] fixed hintbox hiding on parent scroll and on target position changes (apoga, averza)
+...G...... [ZBX-24301] fixed net.dns.perf to return valid response time instead of zero for NXDOMAIN result (arimdjonoks)
+..F....... [ZBX-24550] removed background color from links in loading state (apoga)
 ........S. [ZBX-24560] fixed {HOST.DNS} and {HOST.IP} not being resolved if empty (vso)
 .........T [ZBX-24415] added triggers for datastores in VMware templates (abrosimovs)
 ..F....... [ZBX-23435] fixed alert message about unsaved changes appearance in nested modal forms (apoga)
@@ -77,7 +104,6 @@ A......... [ZBX-24180] fixed inability to import existing host or template when 
 ...G...... [ZBX-24362] fix Zabbix agent 2 loadable plugin process handling catching all child process exits (rzvejs)
 ..F....... [ZBX-24152] fixed host form submission with Enter button if the form is opened in a popup and focus is in a flexible text area field (Ivo)
 ..F....... [ZBX-24276] fixed inconsistent map element URL opening behavior (esekace)
-..F....... [ZBX-24146] fixed update of item timeout value upon other form field changes (esekace)
 ..F....... [ZBX-24253] fixed subfilter reset when navigating in items list page (esekace)
 ........S. [ZBX-24503] fixed wrong attachment filename in scheduled reports (mprihodko)
 ..F....... [ZBX-24344] fixed selected state sub-filter visibility in latest data page (esekace)
@@ -840,6 +866,24 @@ Bug fixes:
 ...G...... [ZBX-22147] updated default buffer size to 1000 in Zabbix agent 2 (esneiders)
 .......PS. [ZBX-22587] fixed JSON validation not detecting invalid unicode characters and out-of-bounds access with JSONPath on invalid unicode character (vso)
 A.F....... [ZBX-21976] added support of OneLogin and Azure SCIM, fixed some issues with provisioning (epulke)
+
+--------------------------------------------------------------------------------
+Changes for 6.4.17rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 6.4.16
+
+6.4.16rc2 was released as 6.4.16 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 6.4.16rc2
+
+Bug fixes:
+..F....... [ZBX-24588] fixed CyberArk Vault connection with no certificates (vmurzins)
 
 --------------------------------------------------------------------------------
 Changes for 6.4.16rc1
@@ -2666,6 +2710,18 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 ..F.I..... [ZBXNEXT-7397] removed support for MD5 user passwords (asestakovs, mkrisjanis)
 ........S. [ZBXNEXT-7488] removed zabbix[history*] and zabbix[trends*] internal items (akozlovs)
 ..F....... [ZBXNEXT-7138] added modal form for API tokens in User settings->API tokens and Administration->General->API tokens (epulke)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.32rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 6.0.31
+
+6.0.31rc1 was released as 6.0.31 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 6.0.31rc1
@@ -5765,6 +5821,7 @@ Changes for 5.0.43rc1
 New features:
 
 Bug fixes:
+.........T [ZBX-23788] added SNMP OID ifAlias in Network interfaces discovery (egordymov)
 .....J.... [ZBX-24298] allowed any JNDI service providers back in JMX monitoring (dimir)
 
 --------------------------------------------------------------------------------
