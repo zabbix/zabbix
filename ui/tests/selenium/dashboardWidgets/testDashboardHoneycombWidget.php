@@ -61,8 +61,12 @@ class testDashboardHoneycombWidget extends testWidgets {
 	 */
 	protected static $dashboardid;
 
-	public static function prepareHoneycombWidgetData() {
+	/**
+	 * Id of dashboard for update scenarios.
+	 */
+	protected static $disposable_dashboard_id;
 
+	public static function prepareHoneycombWidgetData() {
 		$response = CDataHelper::createHosts([
 			[
 				'host' => 'Host for honeycomb 1',
@@ -133,7 +137,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 				'pages' => [[]]
 			],
 			[
-				'name' => 'Dashboard for updating honeycomb widget',
+				'name' => 'Dashboard for simple updating honeycomb widget',
 				'auto_start' => 0,
 				'pages' => [
 					[
@@ -1282,7 +1286,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 		$old_hash = CDBHelper::getHash(self::SQL);
 
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
-				self::$dashboardid['Dashboard for updating honeycomb widget'])->waitUntilReady();
+				self::$dashboardid['Dashboard for simple updating honeycomb widget'])->waitUntilReady();
 		$dashboard = CDashboardElement::find()->one();
 		$dashboard->edit()->getWidget('UpdateHoneycomb')->edit()->submit();
 		$dashboard->getWidget('UpdateHoneycomb');
@@ -1295,17 +1299,51 @@ class testDashboardHoneycombWidget extends testWidgets {
 	}
 
 	/**
+	 * Creates the base widget used for the update scenario.
+	 */
+	public function prepareUpdateHoneycomb() {
+		$providedData = $this->getProvidedData();
+		$data = reset($providedData);
+
+		// Create a dashboard with the widget for updating.
+		$response = CDataHelper::call('dashboard.create', [
+			[
+				'name' => 'Dashboard for honeycomb update '.md5(serialize($data)),
+				'pages' => [
+					[
+						'widgets' => [
+							[
+								'type' => 'honeycomb',
+								'name' => 'UpdateHoneycomb',
+								'x' => 0,
+								'y' => 0,
+								'width' => 12,
+								'height' => 5,
+								'fields' => [
+									[
+										'type' => 1,
+										'name' => 'items.0',
+										'value' => 'Numeric for honeycomb 1'
+									]
+								]
+							]
+						]
+					]
+				]
+			]
+		]);
+		self::$disposable_dashboard_id = $response['dashboardids'][0];
+	}
+
+	/**
 	 * Update Honeycomb widget.
 	 *
+	 * @onBefore     prepareUpdateHoneycomb
 	 * @dataProvider getCreateData
 	 */
 	public function testDashboardHoneycombWidget_Update($data) {
-		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_GOOD) {
-			$this->updateToDefault();
-		}
-
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
-				self::$dashboardid['Dashboard for updating honeycomb widget'])->waitUntilReady();
+				self::$disposable_dashboard_id)->waitUntilReady();
 		$this->checkWidgetForm($data, 'update');
 	}
 
@@ -1592,12 +1630,12 @@ class testDashboardHoneycombWidget extends testWidgets {
 	/**
 	 * Check different data display on Honeycomb widget.
 	 *
+	 * @onBefore     prepareUpdateHoneycomb
 	 * @dataProvider getDisplayData
 	 */
 	public function testDashboardHoneycombWidget_Display($data) {
-		$this->updateToDefault();
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
-				self::$dashboardid['Dashboard for updating honeycomb widget'])->waitUntilReady();
+				self::$disposable_dashboard_id)->waitUntilReady();
 		$this->checkWidgetForm($data, 'update', false);
 		$dashboard = CDashboardElement::find()->waitUntilReady()->one();
 		$dashboard->save();
@@ -1882,37 +1920,5 @@ class testDashboardHoneycombWidget extends testWidgets {
 				$this->setTags($values);
 			}
 		}
-	}
-
-	/**
-	 * Update honeycomb to default values.
-	 */
-	protected function updateToDefault() {
-		CDataHelper::call('dashboard.update', [
-			[
-				'dashboardid' => self::$dashboardid['Dashboard for updating honeycomb widget'],
-				'pages' => [
-					[
-						'widgets' => [
-							[
-								'type' => 'honeycomb',
-								'name' => 'UpdateHoneycomb',
-								'x' => 0,
-								'y' => 0,
-								'width' => 12,
-								'height' => 5,
-								'fields' => [
-									[
-										'type' => 1,
-										'name' => 'items.0',
-										'value' => 'Numeric for honeycomb 1'
-									]
-								]
-							]
-						]
-					]
-				]
-			]
-		]);
 	}
 }
