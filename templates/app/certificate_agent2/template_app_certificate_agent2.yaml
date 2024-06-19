@@ -26,7 +26,6 @@ zabbix_export:
           type: DEPENDENT
           key: cert.alternative_names
           delay: '0'
-          history: 7d
           trends: '0'
           value_type: TEXT
           description: 'The subject alternative name extension allows identities to be bound to the subject of the certificate.  These identities may be included in addition to or in place of the identity in the subject field of the certificate.  Defined options include an Internet electronic mail address, a DNS name, an IP address, and a Uniform Resource Identifier (URI).'
@@ -44,7 +43,6 @@ zabbix_export:
           type: DEPENDENT
           key: cert.issuer
           delay: '0'
-          history: 7d
           trends: '0'
           value_type: TEXT
           description: 'The field identifies the entity that has signed and issued the certificate.'
@@ -62,7 +60,6 @@ zabbix_export:
           type: DEPENDENT
           key: cert.message
           delay: '0'
-          history: 7d
           trends: '0'
           value_type: TEXT
           description: 'Last check result message.'
@@ -80,7 +77,6 @@ zabbix_export:
           type: DEPENDENT
           key: cert.not_after
           delay: '0'
-          history: 7d
           units: unixtime
           description: 'The date on which the certificate validity period ends.'
           preprocessing:
@@ -110,7 +106,6 @@ zabbix_export:
           type: DEPENDENT
           key: cert.not_before
           delay: '0'
-          history: 7d
           units: unixtime
           description: 'The date on which the certificate validity period begins.'
           preprocessing:
@@ -127,7 +122,6 @@ zabbix_export:
           type: DEPENDENT
           key: cert.public_key_algorithm
           delay: '0'
-          history: 7d
           trends: '0'
           value_type: CHAR
           description: 'The digital signature algorithm is used to verify the signature of a certificate.'
@@ -145,7 +139,6 @@ zabbix_export:
           type: DEPENDENT
           key: cert.serial_number
           delay: '0'
-          history: 7d
           trends: '0'
           value_type: CHAR
           description: 'The serial number is a positive integer assigned by the CA to each certificate. It is unique for each certificate issued by a given CA. Non-conforming CAs may issue certificates with serial numbers that are negative or zero.'
@@ -163,7 +156,6 @@ zabbix_export:
           type: DEPENDENT
           key: cert.sha1_fingerprint
           delay: '0'
-          history: 7d
           trends: '0'
           value_type: CHAR
           description: 'The Certificate Signature (SHA1 Fingerprint or Thumbprint) is the hash of the entire certificate in DER form.'
@@ -194,7 +186,6 @@ zabbix_export:
           type: DEPENDENT
           key: cert.signature_algorithm
           delay: '0'
-          history: 7d
           trends: '0'
           value_type: CHAR
           description: 'The algorithm identifier for the algorithm used by the CA to sign the certificate.'
@@ -212,7 +203,6 @@ zabbix_export:
           type: DEPENDENT
           key: cert.subject
           delay: '0'
-          history: 7d
           trends: '0'
           value_type: TEXT
           description: 'The field identifies the entity associated with the public key stored in the subject public key field.'
@@ -230,7 +220,6 @@ zabbix_export:
           type: DEPENDENT
           key: cert.validation
           delay: '0'
-          history: 7d
           trends: '0'
           value_type: CHAR
           description: 'The certificate validation result. Possible values: valid/invalid/valid-but-self-signed'
@@ -257,7 +246,6 @@ zabbix_export:
           type: DEPENDENT
           key: cert.version
           delay: '0'
-          history: 7d
           trends: '0'
           value_type: CHAR
           description: 'The version of the encoded certificate.'

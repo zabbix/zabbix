@@ -72,7 +72,7 @@ zbx_wd_perf_t;
 
 void	wd_perf_init(zbx_wd_perf_t *perf);
 void	wd_perf_destroy(zbx_wd_perf_t *perf);
-void	wd_perf_collect(zbx_wd_perf_t *perf, const char *bookmark_name, const struct zbx_json_parse *jp);
+int	wd_perf_collect(zbx_wd_perf_t *perf, const char *bookmark_name, const struct zbx_json_parse *jp, char **error);
 
 #endif
 

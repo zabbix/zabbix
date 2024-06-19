@@ -19645,6 +19645,10 @@ msgstr "Строка"
 msgid "String functions"
 msgstr "Строковые функции"
 
+#: widgets/piechart/includes/WidgetForm.php:137
+msgid "Stroke width"
+msgstr ""
+
 #: include/items.inc.php:1545 include/items.inc.php:1549
 #: include/items.inc.php:1553 include/items.inc.php:1557
 msgid "Structured data"
