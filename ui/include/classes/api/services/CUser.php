@@ -1973,10 +1973,6 @@ class CUser extends CApiService {
 		return $result;
 	}
 
-	/**
-	 * @param array $options
-	 * @param array $result
-	 */
 	private function addRelatedRole(array $options, array &$result): void {
 		if ($options['selectRole'] === null) {
 			return;
