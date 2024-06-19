@@ -28,7 +28,6 @@ zabbix_export:
           type: DEPENDENT
           key: tidb.cpu.util
           delay: '0'
-          history: 7d
           value_type: FLOAT
           units: '%'
           description: 'Total user and system CPU usage ratio.'
@@ -52,7 +51,6 @@ zabbix_export:
           type: DEPENDENT
           key: tidb.ddl_waiting_jobs
           delay: '0'
-          history: 7d
           value_type: FLOAT
           description: 'The number of TiDB operations that resolve locks per second. When TiDB''s read or write request encounters a lock, it tries to resolve the lock.'
           preprocessing:
@@ -80,7 +78,6 @@ zabbix_export:
           type: DEPENDENT
           key: tidb.domain_load_schema.failed.rate
           delay: '0'
-          history: 7d
           value_type: FLOAT
           description: 'The total number of failures to reload the latest schema information in TiDB per second.'
           preprocessing:
@@ -110,7 +107,6 @@ zabbix_export:
           type: DEPENDENT
           key: tidb.domain_load_schema.rate
           delay: '0'
-          history: 7d
           value_type: FLOAT
           description: 'The statistics of the schemas that TiDB obtains from TiKV per second.'
           preprocessing:
@@ -130,7 +126,6 @@ zabbix_export:
           type: DEPENDENT
           key: tidb.execute_error.rate
           delay: '0'
-          history: 7d
           value_type: FLOAT
           description: 'The number of error occurred when executing SQL statements per second (such as syntax errors and primary key conflicts).'
           preprocessing:
@@ -190,7 +185,6 @@ zabbix_export:
           type: DEPENDENT
           key: tidb.goroutines
           delay: '0'
-          history: 7d
           description: 'The number of Goroutines on TiDB instance.'
           preprocessing:
             - type: JSONPATH
@@ -206,7 +200,6 @@ zabbix_export:
           type: DEPENDENT
           key: tidb.heap_bytes
           delay: '0'
-          history: 7d
           value_type: FLOAT
           units: B
           description: 'Number of heap bytes that are in use.'
@@ -233,7 +226,6 @@ zabbix_export:
           type: DEPENDENT
           key: tidb.monitor_keep_alive.rate
           delay: '0'
-          history: 7d
           value_type: FLOAT
           units: Ops
           description: 'The number of times that the metrics are refreshed on TiDB instance per minute.'
@@ -265,7 +257,6 @@ zabbix_export:
           type: DEPENDENT
           key: tidb.monitor_time_jump_back.rate
           delay: '0'
-          history: 7d
           value_type: FLOAT
           units: Ops
           description: 'The number of times that the operating system rewinds every second.'
@@ -295,7 +286,6 @@ zabbix_export:
           type: DEPENDENT
           key: tidb.pd_tso_cmd.rate
           delay: '0'
-          history: 7d
           value_type: FLOAT
           units: Ops
           description: 'The number of TSO commands that TiDB obtains from PD per second.'
@@ -316,7 +306,6 @@ zabbix_export:
           type: DEPENDENT
           key: tidb.pd_tso_request.rate
           delay: '0'
-          history: 7d
           value_type: FLOAT
           units: Ops
           description: 'The number of TSO requests that TiDB obtains from PD per second.'
@@ -337,7 +326,6 @@ zabbix_export:
           type: DEPENDENT
           key: tidb.process_max_fds
           delay: '0'
-          history: 7d
           value_type: FLOAT
           description: 'Maximum number of open file descriptors.'
           preprocessing:
@@ -354,7 +342,6 @@ zabbix_export:
           type: DEPENDENT
           key: tidb.process_open_fds
           delay: '0'
-          history: 7d
           value_type: FLOAT
           description: 'Number of open file descriptors.'
           preprocessing:
@@ -371,7 +358,6 @@ zabbix_export:
           type: DEPENDENT
           key: tidb.rss_bytes
           delay: '0'
-          history: 7d
           value_type: FLOAT
           units: B
           description: 'Resident memory size in bytes.'
@@ -389,7 +375,6 @@ zabbix_export:
           type: DEPENDENT
           key: tidb.server_query.error.rate
           delay: '0'
-          history: 7d
           value_type: FLOAT
           units: Qps
           description: 'The number of queries on TiDB instance per second with failure of command execution results.'
@@ -429,7 +414,6 @@ zabbix_export:
           type: DEPENDENT
           key: tidb.server_query.ok.rate
           delay: '0'
-          history: 7d
           value_type: FLOAT
           units: Qps
           description: 'The number of queries on TiDB instance per second with success of command execution results.'
@@ -450,7 +434,6 @@ zabbix_export:
           type: DEPENDENT
           key: tidb.server_query.rate
           delay: '0'
-          history: 7d
           value_type: FLOAT
           units: Qps
           description: 'The number of queries per second on TiDB instance.'
@@ -471,7 +454,6 @@ zabbix_export:
           type: DEPENDENT
           key: tidb.session_schema_lease_error.change.rate
           delay: '0'
-          history: 7d
           value_type: FLOAT
           description: |
             The number of schema lease errors per second.
@@ -494,7 +476,6 @@ zabbix_export:
           type: DEPENDENT
           key: tidb.session_schema_lease_error.outdate.rate
           delay: '0'
-          history: 7d
           value_type: FLOAT
           description: |
             The number of schema lease errors per second.
@@ -546,7 +527,6 @@ zabbix_export:
           type: DEPENDENT
           key: tidb.statement_total.rate
           delay: '0'
-          history: 7d
           value_type: FLOAT
           description: 'The total number of SQL statements executed per second.'
           preprocessing:
@@ -566,7 +546,6 @@ zabbix_export:
           type: DEPENDENT
           key: tidb.status
           delay: '0'
-          history: 7d
           trends: '0'
           value_type: CHAR
           description: 'Status of PD instance.'
@@ -599,7 +578,6 @@ zabbix_export:
           type: DEPENDENT
           key: tidb.tidb_server_connections
           delay: '0'
-          history: 7d
           description: 'The connection number of current TiDB instance.'
           preprocessing:
             - type: JSONPATH
@@ -615,7 +593,6 @@ zabbix_export:
           type: DEPENDENT
           key: tidb.tidb_server_critical_error_total.rate
           delay: '0'
-          history: 7d
           value_type: FLOAT
           description: 'The number of critical errors occurred in TiDB per second.'
           preprocessing:
@@ -635,7 +612,6 @@ zabbix_export:
           type: DEPENDENT
           key: tidb.tidb_server_panic_total.rate
           delay: '0'
-          history: 7d
           value_type: FLOAT
           description: 'The number of panics occurred in TiDB per second.'
           preprocessing:
@@ -684,7 +660,6 @@ zabbix_export:
           type: DEPENDENT
           key: tidb.tikvclient_backoff.rate
           delay: '0'
-          history: 7d
           value_type: FLOAT
           units: Ops
           description: 'The number of errors returned by TiKV.'
@@ -706,7 +681,6 @@ zabbix_export:
           type: DEPENDENT
           key: tidb.tikvclient_lock_resolver_action.rate
           delay: '0'
-          history: 7d
           value_type: FLOAT
           units: Ops
           description: 'The number of DDL tasks that are waiting.'
@@ -727,7 +701,6 @@ zabbix_export:
           type: DEPENDENT
           key: tidb.tikvclient_region_err.rate
           delay: '0'
-          history: 7d
           value_type: FLOAT
           units: Ops
           description: 'The number of region related errors returned by TiKV per second.'
@@ -757,7 +730,6 @@ zabbix_export:
           type: DEPENDENT
           key: tidb.tikvclient_txn.rate
           delay: '0'
-          history: 7d
           value_type: FLOAT
           units: Ops
           description: 'The number of executed KV commands per second.'
@@ -778,7 +750,6 @@ zabbix_export:
           type: DEPENDENT
           key: tidb.uptime
           delay: '0'
-          history: 7d
           value_type: FLOAT
           units: uptime
           description: 'The runtime of each TiDB instance.'
@@ -810,7 +781,6 @@ zabbix_export:
           type: DEPENDENT
           key: tidb.version
           delay: '0'
-          history: 7d
           trends: '0'
           value_type: CHAR
           description: 'Version of the TiDB instance.'
@@ -850,7 +820,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'tidb.tikvclient_txn.rate[{#TYPE}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               units: Ops
               description: 'The number of executed KV commands per second.'
@@ -919,7 +888,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'tidb.server_query.error.rate[{#TYPE}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               units: Qps
               description: 'The number of queries on TiDB instance per second with failure of command execution results.'
@@ -942,7 +910,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'tidb.server_query.ok.rate[{#TYPE}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               units: Qps
               description: 'The number of queries on TiDB instance per second with success of command execution results.'
@@ -993,7 +960,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'tidb.statement.rate[{#TYPE}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               description: 'The number of SQL statements executed per second.'
               preprocessing:
@@ -1037,7 +1003,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'tidb.tikvclient_backoff.rate[{#TYPE}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               units: Ops
               description: 'The number of TiDB operations that resolve locks per second. When TiDB''s read or write request encounters a lock, it tries to resolve the lock.'
@@ -1086,7 +1051,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'tidb.tikvclient_gc_action.rate[{#TYPE}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               units: Ops
               description: 'The number of results of GC-related operations per second.'
@@ -1159,7 +1123,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'tidb.tikvclient_lock_resolver_action.rate[{#TYPE}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               units: Ops
               description: 'The number of TiDB operations that resolve locks per second. When TiDB''s read or write request encounters a lock, it tries to resolve the lock.'

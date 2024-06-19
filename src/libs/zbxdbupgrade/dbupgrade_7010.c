@@ -23,6 +23,23 @@
 
 static int	DBpatch_7010000(void)
 {
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute(
+			"update profiles"
+				" set value_str='operating_mode'"
+				" where idx='web.proxies.php.sort'"
+				" and value_str like 'status'"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7010001(void)
+{
 	int		i;
 	const char	*values[] = {
 			"web.avail_report.filter.active", "web.availabilityreport.filter.active",
@@ -56,5 +73,6 @@ DBPATCH_START(7010)
 /* version, duplicates flag, mandatory flag */
 
 DBPATCH_ADD(7010000, 0, 1)
+DBPATCH_ADD(7010001, 0, 1)
 
 DBPATCH_END()
