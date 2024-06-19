@@ -7,7 +7,7 @@ This template is designed for the deployment of PostgreSQL monitoring by Zabbix 
 
 ## Requirements
 
-Zabbix version: 7.0 and higher.
+Zabbix version: 7.2 and higher.
 
 ## Tested versions
 
@@ -16,11 +16,11 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.0/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.2/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
-1. Deploy Zabbix agent 2 with the PostgreSQL plugin. Starting with Zabbix versions 6.0.10 / 6.2.4 / 6.4 PostgreSQL metrics are moved to a loadable plugin and require installation of a separate package or [`compilation of the plugin from sources`](https://www.zabbix.com/documentation/7.0/manual/extensions/plugins/build).
+1. Deploy Zabbix agent 2 with the PostgreSQL plugin. Starting with Zabbix versions 6.0.10 / 6.2.4 / 6.4 PostgreSQL metrics are moved to a loadable plugin and require installation of a separate package or [`compilation of the plugin from sources`](https://www.zabbix.com/documentation/7.2/manual/extensions/plugins/build).
 
 2. Create the PostgreSQL user for monitoring (`<password>` at your discretion) and inherit permissions from the default role `pg_monitor`:
 
@@ -44,7 +44,7 @@ For more information please read the PostgreSQL documentation `https://www.postg
 
 **Note:** if you want to use SSL/TLS encryption to protect communications with the remote PostgreSQL instance, a named session must be used. In that case, the instance URI should be specified in the `Plugins.PostgreSQL.Sessions.*.Uri` parameter in the PostgreSQL plugin configuration files alongside all the encryption parameters (type, cerfiticate/key filepaths if needed etc.).
 
-You can check the [`PostgreSQL plugin documentation`](https://git.zabbix.com/projects/AP/repos/postgresql/browse?at=refs%2Fheads%2Frelease%2F7.0) for details about agent plugin parameters and named sessions.
+You can check the [`PostgreSQL plugin documentation`](https://git.zabbix.com/projects/AP/repos/postgresql/browse?at=refs%2Fheads%2Frelease%2F7.2) for details about agent plugin parameters and named sessions.
 
 Also, it is assumed that you set up the PostgreSQL instance to work in the desired encryption mode. Check the [`PostgreSQL documentation`](https://www.postgresql.org/docs/current/ssl-tcp.html) for details.
 
@@ -81,17 +81,17 @@ Then set the `{$PG.CONNSTRING}` macro to `myconn` to use this named session.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|PostgreSQL: Get bgwriter|<p>Collect all metrics from pg_stat_bgwriter:</p><p>https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-BGWRITER-VIEW</p>|Zabbix agent|pgsql.bgwriter["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]|
-|PostgreSQL: Get archive|<p>Collect archive status metrics.</p>|Zabbix agent|pgsql.archive["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]|
-|PostgreSQL: Get dbstat|<p>Collect all metrics from pg_stat_database per database:</p><p>https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-DATABASE-VIEW</p>|Zabbix agent|pgsql.dbstat["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]|
-|PostgreSQL: Get dbstat sum|<p>Collect all metrics from pg_stat_database as sums for all databases:</p><p>https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-DATABASE-VIEW</p>|Zabbix agent|pgsql.dbstat.sum["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]|
-|PostgreSQL: Get connections sum|<p>Collect all metrics from pg_stat_activity:</p><p>https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ACTIVITY-VIEW</p>|Zabbix agent|pgsql.connections["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]|
-|PostgreSQL: Get WAL|<p>Collect write-ahead log (WAL) metrics.</p>|Zabbix agent|pgsql.wal.stat["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]|
-|PostgreSQL: Get locks|<p>Collect all metrics from pg_locks per database:</p><p>https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</p>|Zabbix agent|pgsql.locks["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]|
-|PostgreSQL: Custom queries|<p>Execute custom queries from file *.sql (check for option Plugins.Postgres.CustomQueriesPath at agent configuration).</p>|Zabbix agent|pgsql.custom.query["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}",""]|
-|PostgreSQL: Get replication|<p>Collect metrics from the pg_stat_replication, which contains information about the WAL sender process, showing statistics about replication to that sender's connected standby server.</p>|Zabbix agent|pgsql.replication.process["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]|
-|PostgreSQL: Get queries|<p>Collect all metrics by query execution time.</p>|Zabbix agent|pgsql.queries["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}","{$PG.QUERY_ETIME.MAX.WARN}"]|
-|PostgreSQL: Version|<p>PostgreSQL version.</p>|Zabbix agent|pgsql.version["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Get bgwriter|<p>Collect all metrics from pg_stat_bgwriter:</p><p>https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-BGWRITER-VIEW</p>|Zabbix agent|pgsql.bgwriter["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]|
+|Get archive|<p>Collect archive status metrics.</p>|Zabbix agent|pgsql.archive["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]|
+|Get dbstat|<p>Collect all metrics from pg_stat_database per database:</p><p>https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-DATABASE-VIEW</p>|Zabbix agent|pgsql.dbstat["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]|
+|Get dbstat sum|<p>Collect all metrics from pg_stat_database as sums for all databases:</p><p>https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-DATABASE-VIEW</p>|Zabbix agent|pgsql.dbstat.sum["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]|
+|Get connections sum|<p>Collect all metrics from pg_stat_activity:</p><p>https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ACTIVITY-VIEW</p>|Zabbix agent|pgsql.connections["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]|
+|Get WAL|<p>Collect write-ahead log (WAL) metrics.</p>|Zabbix agent|pgsql.wal.stat["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]|
+|Get locks|<p>Collect all metrics from pg_locks per database:</p><p>https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</p>|Zabbix agent|pgsql.locks["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]|
+|Custom queries|<p>Execute custom queries from file *.sql (check for option Plugins.Postgres.CustomQueriesPath at agent configuration).</p>|Zabbix agent|pgsql.custom.query["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}",""]|
+|Get replication|<p>Collect metrics from the pg_stat_replication, which contains information about the WAL sender process, showing statistics about replication to that sender's connected standby server.</p>|Zabbix agent|pgsql.replication.process["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]|
+|Get queries|<p>Collect all metrics by query execution time.</p>|Zabbix agent|pgsql.queries["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}","{$PG.QUERY_ETIME.MAX.WARN}"]|
+|Version|<p>PostgreSQL version.</p>|Zabbix agent|pgsql.version["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 |WAL: Bytes written|<p>WAL write, in bytes.</p>|Dependent item|pgsql.wal.write<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.write`</p></li><li>Change per second</li></ul>|
 |WAL: Bytes received|<p>WAL receive, in bytes.</p>|Dependent item|pgsql.wal.receive<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.receive`</p></li><li>Change per second</li></ul>|
 |WAL: Segments count|<p>Number of WAL segments.</p>|Dependent item|pgsql.wal.count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.count`</p></li></ul>|
@@ -136,27 +136,27 @@ Then set the `{$PG.CONNSTRING}` macro to `myconn` to use this named session.
 |Connections sum: Waiting|<p>Total number of waiting connections:</p><p>https://www.postgresql.org/docs/current/monitoring-stats.html#WAIT-EVENT-TABLE</p>|Dependent item|pgsql.connections.sum.waiting<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.waiting`</p></li></ul>|
 |Connections sum: Idle in transaction (aborted)|<p>Total number of connections in a transaction state but not executing a query, and where one of the statements in the transaction caused an error.</p>|Dependent item|pgsql.connections.sum.idle_in_transaction_aborted<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.idle_in_transaction_aborted`</p></li></ul>|
 |Connections sum: Disabled|<p>Total number of disabled connections.</p>|Dependent item|pgsql.connections.sum.disabled<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.disabled`</p></li></ul>|
-|PostgreSQL: Age of oldest xid|<p>Age of oldest xid.</p>|Zabbix agent|pgsql.oldest.xid["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]|
-|PostgreSQL: Count of autovacuum workers|<p>Number of autovacuum workers.</p>|Zabbix agent|pgsql.autovacuum.count["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]|
-|PostgreSQL: Cache hit ratio, %|<p>Cache hit ratio.</p>|Calculated|pgsql.cache.hit|
-|PostgreSQL: Uptime|<p>Time since the server started.</p>|Zabbix agent|pgsql.uptime["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]|
-|PostgreSQL: Replication: Lag in bytes|<p>Replication lag with master, in bytes.</p>|Zabbix agent|pgsql.replication.lag.b["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]|
-|PostgreSQL: Replication: Lag in seconds|<p>Replication lag with master, in seconds.</p>|Zabbix agent|pgsql.replication.lag.sec["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]|
-|PostgreSQL: Replication: Recovery role|<p>Replication role: 1 — recovery is still in progress (standby mode), 0 — master mode.</p>|Zabbix agent|pgsql.replication.recovery_role["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]|
-|PostgreSQL: Replication: Standby count|<p>Number of standby servers.</p>|Zabbix agent|pgsql.replication.count["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]|
-|PostgreSQL: Replication: Status|<p>Replication status: 0 — streaming is down, 1 — streaming is up, 2 — master mode.</p>|Zabbix agent|pgsql.replication.status["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]|
-|PostgreSQL: Ping|<p>Used to test a connection to see if it is alive. It is set to 0 if the query is unsuccessful.</p>|Zabbix agent|pgsql.ping["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Age of oldest xid|<p>Age of oldest xid.</p>|Zabbix agent|pgsql.oldest.xid["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]|
+|Count of autovacuum workers|<p>Number of autovacuum workers.</p>|Zabbix agent|pgsql.autovacuum.count["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]|
+|Cache hit ratio, %|<p>Cache hit ratio.</p>|Calculated|pgsql.cache.hit|
+|Uptime|<p>Time since the server started.</p>|Zabbix agent|pgsql.uptime["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]|
+|Replication: Lag in bytes|<p>Replication lag with master, in bytes.</p>|Zabbix agent|pgsql.replication.lag.b["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]|
+|Replication: Lag in seconds|<p>Replication lag with master, in seconds.</p>|Zabbix agent|pgsql.replication.lag.sec["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]|
+|Replication: Recovery role|<p>Replication role: 1 — recovery is still in progress (standby mode), 0 — master mode.</p>|Zabbix agent|pgsql.replication.recovery_role["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]|
+|Replication: Standby count|<p>Number of standby servers.</p>|Zabbix agent|pgsql.replication.count["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]|
+|Replication: Status|<p>Replication status: 0 — streaming is down, 1 — streaming is up, 2 — master mode.</p>|Zabbix agent|pgsql.replication.status["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]|
+|Ping|<p>Used to test a connection to see if it is alive. It is set to 0 if the query is unsuccessful.</p>|Zabbix agent|pgsql.ping["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|PostgreSQL: Version has changed||`last(/PostgreSQL by Zabbix agent 2/pgsql.version["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"],#1)<>last(/PostgreSQL by Zabbix agent 2/pgsql.version["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"],#2) and length(last(/PostgreSQL by Zabbix agent 2/pgsql.version["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]))>0`|Info||
+|Version has changed||`last(/PostgreSQL by Zabbix agent 2/pgsql.version["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"],#1)<>last(/PostgreSQL by Zabbix agent 2/pgsql.version["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"],#2) and length(last(/PostgreSQL by Zabbix agent 2/pgsql.version["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]))>0`|Info||
 |Dbstat: Checksum failures detected|<p>Data page checksum failures were detected on that DB instance:<br>https://www.postgresql.org/docs/current/checksums.html</p>|`last(/PostgreSQL by Zabbix agent 2/pgsql.dbstat.sum.checksum_failures.rate)>0`|Average||
-|PostgreSQL: Total number of connections is too high|<p>Total number of current connections exceeds the limit of {$PG.CONN_TOTAL_PCT.MAX.WARN}% out of the maximum number of concurrent connections to the database server (the "max_connections" setting).</p>|`min(/PostgreSQL by Zabbix agent 2/pgsql.connections.sum.total_pct,5m) > {$PG.CONN_TOTAL_PCT.MAX.WARN}`|Average||
-|PostgreSQL: Oldest xid is too big||`last(/PostgreSQL by Zabbix agent 2/pgsql.oldest.xid["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]) > 18000000`|Average||
-|PostgreSQL: Service has been restarted|<p>PostgreSQL uptime is less than 10 minutes.</p>|`last(/PostgreSQL by Zabbix agent 2/pgsql.uptime["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]) < 10m`|Average||
-|PostgreSQL: Service is down|<p>Last test of a connection was unsuccessful.</p>|`last(/PostgreSQL by Zabbix agent 2/pgsql.ping["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"])=0`|High||
+|Total number of connections is too high|<p>Total number of current connections exceeds the limit of {$PG.CONN_TOTAL_PCT.MAX.WARN}% out of the maximum number of concurrent connections to the database server (the "max_connections" setting).</p>|`min(/PostgreSQL by Zabbix agent 2/pgsql.connections.sum.total_pct,5m) > {$PG.CONN_TOTAL_PCT.MAX.WARN}`|Average||
+|Oldest xid is too big||`last(/PostgreSQL by Zabbix agent 2/pgsql.oldest.xid["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]) > 18000000`|Average||
+|Service has been restarted|<p>PostgreSQL uptime is less than 10 minutes.</p>|`last(/PostgreSQL by Zabbix agent 2/pgsql.uptime["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]) < 10m`|Average||
+|Service is down|<p>Last test of a connection was unsuccessful.</p>|`last(/PostgreSQL by Zabbix agent 2/pgsql.ping["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"])=0`|High||
 
 ### LLD rule Replication discovery
 

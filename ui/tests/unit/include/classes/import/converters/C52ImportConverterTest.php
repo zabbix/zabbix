@@ -1,21 +1,16 @@
 <?php declare(strict_types = 0);
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -404,6 +399,7 @@ class C52ImportConverterTest extends CImportConverterTest {
 				]
 			],
 			$this->getGroupsUuidData(),
+			$this->getTemplateNameUuidData(),
 			$this->getTemplateItemsUuidData(),
 			$this->getTriggerUuidData(),
 			$this->getGraphUuidData(),
@@ -447,34 +443,71 @@ class C52ImportConverterTest extends CImportConverterTest {
 		];
 	}
 
+	/**
+	 * For creation of UUID's, a seed is used by removing the
+	 *  "Template (APP|App|DB|Module|Net|OS|SAN|Server|Tel|VM) "
+	 * prefix from template names if at least 3 characters remain after it.
+	 *
+	 * @see C52ImportConverter::prepareTemplateName()
+	 */
 	protected function getTemplateNameUuidData(): array {
-		/**
-		 * For creation UUID's, template names will have to be updated by removing following part (regex):
-		 *  "Template (APP|App|DB|Module|Net|OS|SAN|Server|Tel|VM) "
-		 * This should be done, only, if at least 3 (warning) letters remain in template name after that.
-		 * Regex is case sensitive, test: "Template MODULE abc"
-		 */
+		$data = [];
+		$expected = [];
+		$seeds = [
+			'Template OS' => 'Template OS',
+			'Template OS ab' => 'Template OS ab',
+			'Template OS abc' => 'abc',
+			'Template MODULE abc' => 'Template MODULE abc',
+			'Template OS ab SNMPv1' => 'ab SNMPv1',
+			'Template OS SNMPv2' => 'SNMP',
+			'Template OS ab SNMPv2' => 'ab SNMP',
+			'Prefixed Template OS unmatched' => 'Prefixed Template OS unmatched',
+			'Template db lowercase' => 'Template db lowercase',
+			'template VM lowercase T' => 'template VM lowercase T',
+			// Samples of template names from 5.0 follow.
+			'Cisco Catalyst 3750V2-48TS SNMP' => 'Cisco Catalyst 3750V2-48TS SNMP',
+			'RabbitMQ cluster by HTTP' => 'RabbitMQ cluster by HTTP',
+			'Template APP Apache Kafka by JMX' => 'Apache Kafka by JMX',
+			'Template APP Systemd by Zabbix agent 2' => 'Systemd by Zabbix agent 2',
+			'Template App Nginx Plus by HTTP' => 'Nginx Plus by HTTP',
+			'Template App PFSense SNMP' => 'PFSense SNMP',
+			'Template App Website certificate by Zabbix agent 2' => 'Website certificate by Zabbix agent 2',
+			'Template DB Apache Cassandra by JMX' => 'Apache Cassandra by JMX',
+			'Template DB MySQL by ODBC' => 'MySQL by ODBC',
+			'Template F5 Big-IP SNMP' => 'Template F5 Big-IP SNMP',
+			'Template Module Generic SNMP' => 'Generic SNMP',
+			'Template Module HOST-RESOURCES-MIB CPU SNMP' => 'HOST-RESOURCES-MIB CPU SNMP',
+			'Template Module Linux block devices by Zabbix agent' => 'Linux block devices by Zabbix agent',
+			'Template Module Zabbix agent' => 'Zabbix agent',
+			'Template Net Alcatel Timetra TiMOS SNMP' => 'Alcatel Timetra TiMOS SNMP',
+			'Template Net Dell Force S-Series SNMP' => 'Dell Force S-Series SNMP',
+			'Template Net Mikrotik SNMP' => 'Mikrotik SNMP',
+			'Template Net Network Generic Device SNMP' => 'Network Generic Device SNMP',
+			'Template Net ZYXEL XGS-4728F SNMP' => 'ZYXEL XGS-4728F SNMP',
+			'Template OS AIX' => 'AIX',
+			'Template OS Linux by Prom' => 'Linux by Prom',
+			'Template OS Mac OS X' => 'Mac OS X',
+			'Template OS Solaris' => 'Solaris',
+			'Template OS Windows SNMP' => 'Windows SNMP',
+			'Template Power APC Smart-UPS 2200 RM SNMP' => 'Template Power APC Smart-UPS 2200 RM SNMP',
+			'Template SAN Huawei OceanStor 5300 V5 SNMP' => 'Huawei OceanStor 5300 V5 SNMP',
+			'Template SAN NetApp AFF A700 by HTTP' => 'NetApp AFF A700 by HTTP',
+			'Template SAN NetApp FAS3220 SNMP' => 'NetApp FAS3220 SNMP',
+			'Template Server Chassis by IPMI' => 'Chassis by IPMI',
+			'Template Server Cisco UCS Manager SNMP' => 'Cisco UCS Manager SNMP',
+			'Template Server Dell iDRAC SNMP' => 'Dell iDRAC SNMP',
+			'Template Server HP iLO SNMP' => 'HP iLO SNMP',
+			'Template VM VMware' => 'VMware'
+		];
+
+		foreach ($seeds as $template_name => &$seed) {
+			$data[] = ['template' => $template_name];
+			$expected[] = ['template' => $template_name, 'uuid' => generateUuidV4($seed)];
+		}
+
 		return [
-			[
-				'templates' => [
-					['template' => 'Template OS'],
-					['template' => 'Template OS ab'],
-					['template' => 'Template OS abc'],
-					['template' => 'Template MODULE abc'],
-					['template' => 'Template OS SNMPv2'],
-					['template' => 'Template OS ab SNMPv1']
-				]
-			],
-			[
-				'templates' => [
-					['template' => 'Template OS', 'uuid' => generateUuidV4('Template OS')],
-					['template' => 'Template OS ab', 'uuid' => generateUuidV4('Template OS ab')],
-					['template' => 'Template OS abc', 'uuid' => generateUuidV4('abc')],
-					['template' => 'Template MODULE abc', 'uuid' => generateUuidV4('Template MODULE abc')],
-					['template' => 'Template OS ab', 'uuid' => generateUuidV4('SNMP')],
-					['template' => 'Template OS ab', 'uuid' => generateUuidV4('ab SNMP')]
-				]
-			]
+			['templates' => $data],
+			['templates' => $expected]
 		];
 	}
 

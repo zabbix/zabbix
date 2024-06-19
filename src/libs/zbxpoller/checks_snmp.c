@@ -1,25 +1,18 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "checks_snmp.h"
-#include "zbxcacheconfig.h"
-#include "zbxip.h"
 
 #ifdef HAVE_NETSNMP
 
@@ -29,6 +22,9 @@
 #include "async_poller.h"
 #include "zbxpoller.h"
 
+#include "zbxtimekeeper.h"
+#include "zbxcacheconfig.h"
+#include "zbxip.h"
 #include "zbxcomms.h"
 #include "zbxalgo.h"
 #include "zbxjson.h"
@@ -98,6 +94,13 @@
  *                                                                            *
  ******************************************************************************/
 typedef void (zbx_snmp_walk_cb_func)(void *arg, const char *snmp_oid, const char *index, const char *value);
+
+typedef enum
+{
+	ZBX_ASN_OCTET_STR_UTF_8,
+	ZBX_ASN_OCTET_STR_HEX
+}
+zbx_snmp_asn_octet_str_t;
 
 typedef struct
 {
@@ -1010,12 +1013,31 @@ static void	zbx_snmp_close_session(zbx_snmp_sess_t	session)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static char	*zbx_snmp_get_octet_string(const struct variable_list *var, unsigned char *string_type)
+static char	*zbx_sprint_asn_octet_str_dyn(const struct variable_list *var)
 {
+	if (var->type != ASN_OCTET_STR || NULL != memchr(var->val.string, '\0', var->val_len))
+		return NULL;
+
+	char	*strval_dyn = (char *)zbx_malloc(NULL, var->val_len + 1);
+
+	memcpy(strval_dyn, var->val.string, var->val_len);
+	strval_dyn[var->val_len] = '\0';
+
+	if (FAIL == zbx_is_utf8(strval_dyn))
+		zbx_free(strval_dyn);
+	else
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() full value:'%s'", __func__, strval_dyn);
+
+	return strval_dyn;
+}
+
+static char	*zbx_snmp_get_octet_string(const struct variable_list *var, unsigned char *string_type,
+		zbx_snmp_asn_octet_str_t snmp_asn_octet_str)
+{
+	struct tree	*subtree;
 	const char	*hint;
 	char		buffer[MAX_BUFFER_LEN];
 	char		*strval_dyn = NULL;
-	struct tree	*subtree;
 	unsigned char	type;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -1023,6 +1045,16 @@ static char	*zbx_snmp_get_octet_string(const struct variable_list *var, unsigned
 	/* find the subtree to get display hint */
 	subtree = get_tree(var->name, var->name_length, get_tree_head());
 	hint = (NULL != subtree ? subtree->hint : NULL);
+
+	if (ZBX_ASN_OCTET_STR_UTF_8 == snmp_asn_octet_str && NULL == hint)
+	{
+		/* avoid convertion to Hex-STRING for valid UTF-8 strings without hints */
+		if (NULL != (strval_dyn = zbx_sprint_asn_octet_str_dyn(var)))
+		{
+			type = ZBX_SNMP_STR_ASCII;
+			goto end;
+		}
+	}
 
 	/* we will decide if we want the value from var->val or what snprint_value() returned later */
 	if (-1 == snprint_value(buffer, sizeof(buffer), var->name, var->name_length, var))
@@ -1060,16 +1092,17 @@ static char	*zbx_snmp_get_octet_string(const struct variable_list *var, unsigned
 		strval_dyn[var->val_len] = '\0';
 		type = ZBX_SNMP_STR_ASCII;
 	}
-
-	if (NULL != string_type)
-		*string_type = type;
 end:
+	if (NULL != string_type && NULL != strval_dyn)
+		*string_type = type;
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():'%s'", __func__, ZBX_NULL2STR(strval_dyn));
 
 	return strval_dyn;
 }
 
-static int	zbx_snmp_set_result(const struct variable_list *var, AGENT_RESULT *result, unsigned char *string_type)
+static int	zbx_snmp_set_result(const struct variable_list *var, AGENT_RESULT *result, unsigned char *string_type,
+		zbx_snmp_asn_octet_str_t snmp_asn_octet_str)
 {
 	char		*strval_dyn;
 	int		ret = SUCCEED;
@@ -1080,7 +1113,7 @@ static int	zbx_snmp_set_result(const struct variable_list *var, AGENT_RESULT *re
 
 	if (ASN_OCTET_STR == var->type || ASN_OBJECT_ID == var->type)
 	{
-		if (NULL == (strval_dyn = zbx_snmp_get_octet_string(var, string_type)))
+		if (NULL == (strval_dyn = zbx_snmp_get_octet_string(var, string_type, snmp_asn_octet_str)))
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot receive string value: out of memory."));
 			ret = NOTSUPPORTED;
@@ -1586,7 +1619,6 @@ reduce_max_vars:
 					break;
 				}
 
-
 				if (SUCCEED != zbx_snmp_choose_index(oid_index, sizeof(oid_index), var->name,
 						var->name_length, root_string_len, root_numeric_len, root_oid))
 				{
@@ -1601,7 +1633,7 @@ reduce_max_vars:
 				str_res = NULL;
 				zbx_init_agent_result(&snmp_result);
 
-				if (SUCCEED == zbx_snmp_set_result(var, &snmp_result, &val_type))
+				if (SUCCEED == zbx_snmp_set_result(var, &snmp_result, &val_type, ZBX_ASN_OCTET_STR_HEX))
 				{
 					if (ZBX_ISSET_TEXT(&snmp_result) && ZBX_SNMP_STR_HEX == val_type)
 						zbx_remove_chars(snmp_result.text, "\r\n");
@@ -1797,9 +1829,9 @@ retry:
 			unsigned char	val_type;
 
 			if (NULL != query_and_ignore_type && 1 == query_and_ignore_type[j])
-				(void)zbx_snmp_set_result(var, &results[j], &val_type);
+				(void)zbx_snmp_set_result(var, &results[j], &val_type, ZBX_ASN_OCTET_STR_HEX);
 			else
-				errcodes[j] = zbx_snmp_set_result(var, &results[j], &val_type);
+				errcodes[j] = zbx_snmp_set_result(var, &results[j], &val_type, ZBX_ASN_OCTET_STR_HEX);
 
 			if (ZBX_ISSET_TEXT(&results[j]) && ZBX_SNMP_STR_HEX == val_type)
 				zbx_remove_chars(results[j].text, "\r\n");
@@ -2341,7 +2373,7 @@ static int	snmp_get_value_from_var(struct variable_list *var, char **results, si
 
 	zbx_init_agent_result(&result);
 
-	if (SUCCEED == zbx_snmp_set_result(var, &result, &val_type))
+	if (SUCCEED == zbx_snmp_set_result(var, &result, &val_type, ZBX_ASN_OCTET_STR_UTF_8))
 	{
 		if (ZBX_ISSET_TEXT(&result) && ZBX_SNMP_STR_HEX == val_type)
 			zbx_remove_chars(result.text, "\r\n");
@@ -2457,6 +2489,28 @@ static int	snmp_quote_string_value(char *buffer, size_t buffer_size, struct vari
 
 	if (0 == strncmp(buf, TYPE_STR_HEX_STRING, sizeof(TYPE_STR_HEX_STRING) - 1))
 	{
+		char		*strval_dyn;
+		struct tree	*subtree;
+		const char	*hint;
+
+		subtree = get_tree(var->name, var->name_length, get_tree_head());
+		hint = (NULL != subtree ? subtree->hint : NULL);
+
+		if (NULL == hint && NULL != (strval_dyn = zbx_sprint_asn_octet_str_dyn(var)))
+		{
+			char	*str = NULL;
+			size_t	str_alloc = 0, str_offset = 0;
+
+			zbx_strncpy_alloc(&str, &str_alloc, &str_offset, buffer, buf - buffer);
+			zbx_strcpy_alloc(&str, &str_alloc, &str_offset, TYPE_STR_STRING);
+			zbx_strquote_alloc_opt(&str, &str_alloc, &str_offset, strval_dyn, ZBX_STRQUOTE_DEFAULT);
+
+			zbx_strlcpy(buffer, str, buffer_size);
+
+			zbx_free(strval_dyn);
+			zbx_free(str);
+		}
+
 		ret = SUCCEED;
 		goto out;
 	}
@@ -3623,10 +3677,24 @@ void	get_values_snmp(zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes,
 
 		if (NULL == (dnsbase = evdns_base_new(snmp_result.base, EVDNS_BASE_INITIALIZE_NAMESERVERS)))
 		{
-			event_base_free(snmp_result.base);
-			SET_MSG_RESULT(&results[j], zbx_strdup(NULL, "cannot initialize asynchronous DNS library"));
-			errcodes[j] = CONFIG_ERROR;
-			goto out;
+			int	ret;
+
+			zabbix_log(LOG_LEVEL_ERR, "cannot initialize asynchronous DNS library with resolv.conf");
+
+			if (NULL == (dnsbase = evdns_base_new(snmp_result.base, 0)))
+			{
+				event_base_free(snmp_result.base);
+				SET_MSG_RESULT(&results[j], zbx_strdup(NULL,
+						"cannot initialize asynchronous DNS library"));
+				errcodes[j] = CONFIG_ERROR;
+				goto out;
+			}
+
+			if (0 != (ret = evdns_base_resolv_conf_parse(dnsbase, DNS_OPTIONS_ALL, ZBX_RES_CONF_FILE)))
+			{
+				zabbix_log(LOG_LEVEL_ERR, "cannot parse resolv.conf result: %s",
+						zbx_resolv_conf_errstr(ret));
+			}
 		}
 
 		zbx_set_snmp_bulkwalk_options(progname);

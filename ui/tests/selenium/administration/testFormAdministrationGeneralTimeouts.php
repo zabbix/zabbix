@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -38,6 +33,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 		'SSH agent' => '3s',
 		'TELNET agent' => '3s',
 		'Script' => '3s',
+		'Browser' => '60s',
 		'Communication' => '3s',
 		'Connection' => '3s',
 		'Media type test' => '65s',
@@ -56,6 +52,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 		'SSH agent' => '123s',
 		'TELNET agent' => '123s',
 		'Script' => '123s',
+		'Browser' => '123s',
 		'Communication' => '123s',
 		'Connection' => '15s',
 		'Media type test' => '123s',
@@ -74,6 +71,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 		'timeout_ssh_agent' => '3s',
 		'timeout_telnet_agent' => '3s',
 		'timeout_script' => '3s',
+		'timeout_browser' => '60s',
 		'socket_timeout' => '3s',
 		'connect_timeout' => '3s',
 		'media_type_test_timeout' => '65s',
@@ -96,6 +94,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 			'SSH agent' => 255,
 			'TELNET agent' => 255,
 			'Script' => 255,
+			'Browser' => 255,
 			'Communication' => 32,
 			'Connection' => 32,
 			'Media type test' => 32,
@@ -249,6 +248,17 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 			[
 				[
 					'fields' => [
+						'Browser' => '15s'
+					],
+					'db' => [
+						'timeout_browser' => '15s'
+					]
+				]
+			],
+			// #10.
+			[
+				[
+					'fields' => [
 						'Communication' => '15s'
 					],
 					'db' => [
@@ -256,7 +266,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #10.
+			// #11.
 			[
 				[
 					'fields' => [
@@ -267,7 +277,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #11.
+			// #12.
 			[
 				[
 					'fields' => [
@@ -278,7 +288,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #12.
+			// #13.
 			[
 				[
 					'fields' => [
@@ -289,7 +299,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #13.
+			// #14.
 			[
 				[
 					'fields' => [
@@ -300,7 +310,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #14.
+			// #15.
 			[
 				[
 					'fields' => [
@@ -311,55 +321,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #15 Update values for all item timeouts.
-			[
-				[
-					'fields' => [
-						'Zabbix agent' => '33s',
-						'Simple check' => '33s',
-						'SNMP agent' => '33s',
-						'External check' => '33s',
-						'Database monitor' => '33s',
-						'HTTP agent' => '33s',
-						'SSH agent' => '33s',
-						'TELNET agent' => '33s',
-						'Script' => '33s'
-					],
-					'db' => [
-						'timeout_zabbix_agent' => '33s',
-						'timeout_simple_check' => '33s',
-						'timeout_snmp_agent' => '33s',
-						'timeout_external_check' => '33s',
-						'timeout_db_monitor' => '33s',
-						'timeout_http_agent' => '33s',
-						'timeout_ssh_agent' => '33s',
-						'timeout_telnet_agent' => '33s',
-						'timeout_script' => '33s'
-					]
-				]
-			],
-			// #16 Update values for all network timeouts.
-			[
-				[
-					'fields' => [
-						'Communication' => '29s',
-						'Connection' => '29s',
-						'Media type test' => '29s',
-						'Script execution' => '29s',
-						'Item test' => '29s',
-						'Scheduled report test' => '29s'
-					],
-					'db' => [
-						'socket_timeout' => '29s',
-						'connect_timeout' => '29s',
-						'media_type_test_timeout' => '29s',
-						'script_timeout' => '29s',
-						'item_test_timeout' => '29s',
-						'report_test_timeout' => '29s'
-					]
-				]
-			],
-			// #17 Update values for all timeouts.
+			// #16 Update values for all item timeouts.
 			[
 				[
 					'fields' => [
@@ -372,12 +334,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 						'SSH agent' => '33s',
 						'TELNET agent' => '33s',
 						'Script' => '33s',
-						'Communication' => '29s',
-						'Connection' => '29s',
-						'Media type test' => '29s',
-						'Script execution' => '29s',
-						'Item test' => '29s',
-						'Scheduled report test' => '29s'
+						'Browser' => '33s'
 					],
 					'db' => [
 						'timeout_zabbix_agent' => '33s',
@@ -389,6 +346,22 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 						'timeout_ssh_agent' => '33s',
 						'timeout_telnet_agent' => '33s',
 						'timeout_script' => '33s',
+						'timeout_browser' => '33s'
+					]
+				]
+			],
+			// #17 Update values for all network timeouts.
+			[
+				[
+					'fields' => [
+						'Communication' => '29s',
+						'Connection' => '29s',
+						'Media type test' => '29s',
+						'Script execution' => '29s',
+						'Item test' => '29s',
+						'Scheduled report test' => '29s'
+					],
+					'db' => [
 						'socket_timeout' => '29s',
 						'connect_timeout' => '29s',
 						'media_type_test_timeout' => '29s',
@@ -402,6 +375,47 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 			[
 				[
 					'fields' => [
+						'Zabbix agent' => '22s',
+						'Simple check' => '22s',
+						'SNMP agent' => '22s',
+						'External check' => '22s',
+						'Database monitor' => '22s',
+						'HTTP agent' => '22s',
+						'SSH agent' => '22s',
+						'TELNET agent' => '22s',
+						'Script' => '22s',
+						'Browser' => '22s',
+						'Communication' => '25s',
+						'Connection' => '25s',
+						'Media type test' => '25s',
+						'Script execution' => '25s',
+						'Item test' => '25s',
+						'Scheduled report test' => '25s'
+					],
+					'db' => [
+						'timeout_zabbix_agent' => '22s',
+						'timeout_simple_check' => '22s',
+						'timeout_snmp_agent' => '22s',
+						'timeout_external_check' => '22s',
+						'timeout_db_monitor' => '22s',
+						'timeout_http_agent' => '22s',
+						'timeout_ssh_agent' => '22s',
+						'timeout_telnet_agent' => '22s',
+						'timeout_script' => '22s',
+						'timeout_browser' => '22s',
+						'socket_timeout' => '25s',
+						'connect_timeout' => '25s',
+						'media_type_test_timeout' => '25s',
+						'script_timeout' => '25s',
+						'item_test_timeout' => '25s',
+						'report_test_timeout' => '25s'
+					]
+				]
+			],
+			// #19 Update values for all timeouts.
+			[
+				[
+					'fields' => [
 						'Zabbix agent' => '33',
 						'Simple check' => '33',
 						'SNMP agent' => '33',
@@ -411,6 +425,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 						'SSH agent' => '33',
 						'TELNET agent' => '33',
 						'Script' => '33',
+						'Browser' => '33',
 						'Communication' => '29',
 						'Connection' => '29',
 						'Media type test' => '29',
@@ -428,6 +443,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 						'timeout_ssh_agent' => '33',
 						'timeout_telnet_agent' => '33',
 						'timeout_script' => '33',
+						'timeout_browser' => '33',
 						'socket_timeout' => '29',
 						'connect_timeout' => '29',
 						'media_type_test_timeout' => '29',
@@ -437,7 +453,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #19 Update values with macros for all item timeouts.
+			// #20 Update values with macros for all item timeouts.
 			[
 				[
 					'fields' => [
@@ -449,7 +465,8 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 						'HTTP agent' => '{$MACROS}',
 						'SSH agent' => '{$MACROS}',
 						'TELNET agent' => '{$MACROS}',
-						'Script' => '{$MACROS}'
+						'Script' => '{$MACROS}',
+						'Browser' => '{$MACROS}'
 					],
 					'db' => [
 						'timeout_zabbix_agent' => '{$MACROS}',
@@ -460,11 +477,12 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 						'timeout_http_agent' => '{$MACROS}',
 						'timeout_ssh_agent' => '{$MACROS}',
 						'timeout_telnet_agent' => '{$MACROS}',
-						'timeout_script' => '{$MACROS}'
+						'timeout_script' => '{$MACROS}',
+						'timeout_browser' => '{$MACROS}'
 					]
 				]
 			],
-			// #20 Update all available timeouts with minutes type.
+			// #21 Update all available timeouts with minutes type.
 			[
 				[
 					'fields' => [
@@ -477,6 +495,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 						'SSH agent' => '10m',
 						'TELNET agent' => '10m',
 						'Script' => '10m',
+						'Browser' => '10m',
 						'Communication' => '1m',
 						'Media type test' => '1m',
 						'Script execution' => '1m',
@@ -493,6 +512,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 						'timeout_ssh_agent' => '10m',
 						'timeout_telnet_agent' => '10m',
 						'timeout_script' => '10m',
+						'timeout_browser' => '10m',
 						'socket_timeout' => '1m',
 						'media_type_test_timeout' => '1m',
 						'script_timeout' => '1m',
@@ -501,7 +521,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #21.
+			// #22.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -511,7 +531,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_zabbix_agent": value must be one of 1-600.'
 				]
 			],
-			// #22.
+			// #23.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -521,7 +541,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_zabbix_agent": value must be one of 1-600.'
 				]
 			],
-			// #23.
+			// #24.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -531,7 +551,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_simple_check": value must be one of 1-600.'
 				]
 			],
-			// #24.
+			// #25.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -541,7 +561,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_simple_check": value must be one of 1-600.'
 				]
 			],
-			// #25.
+			// #26.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -551,7 +571,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_snmp_agent": value must be one of 1-600.'
 				]
 			],
-			// #26.
+			// #27.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -561,7 +581,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_snmp_agent": value must be one of 1-600.'
 				]
 			],
-			// #27.
+			// #28.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -571,7 +591,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_external_check": value must be one of 1-600.'
 				]
 			],
-			// #28.
+			// #29.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -581,7 +601,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_external_check": value must be one of 1-600.'
 				]
 			],
-			// #29.
+			// #30.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -591,7 +611,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_db_monitor": value must be one of 1-600.'
 				]
 			],
-			// #30.
+			// #31.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -601,7 +621,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_db_monitor": value must be one of 1-600.'
 				]
 			],
-			// #31.
+			// #32.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -611,7 +631,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_http_agent": value must be one of 1-600.'
 				]
 			],
-			// #32.
+			// #33.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -621,7 +641,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_http_agent": value must be one of 1-600.'
 				]
 			],
-			// #33.
+			// #34.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -631,7 +651,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_ssh_agent": value must be one of 1-600.'
 				]
 			],
-			// #34.
+			// #35.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -641,7 +661,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_ssh_agent": value must be one of 1-600.'
 				]
 			],
-			// #35.
+			// #36.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -651,7 +671,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_telnet_agent": value must be one of 1-600.'
 				]
 			],
-			// #36.
+			// #37.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -661,7 +681,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_telnet_agent": value must be one of 1-600.'
 				]
 			],
-			// #37.
+			// #38.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -671,7 +691,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_script": value must be one of 1-600.'
 				]
 			],
-			// #38.
+			// #39.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -681,7 +701,27 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_script": value must be one of 1-600.'
 				]
 			],
-			// #39 All network timeouts errors at once - less than available.
+			// #40.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Browser' => '0s'
+					],
+					'details' => 'Invalid parameter "/timeout_browser": value must be one of 1-600.'
+				]
+			],
+			// #41.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Browser' => '601s'
+					],
+					'details' => 'Invalid parameter "/timeout_browser": value must be one of 1-600.'
+				]
+			],
+			// #42 All network timeouts errors at once - less than available.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -703,7 +743,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #40 All network timeouts errors at once - higher than available.
+			// #43 All network timeouts errors at once - higher than available.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -725,7 +765,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #41 All fields empty.
+			// #44 All fields empty.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -739,6 +779,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 						'SSH agent' => '',
 						'TELNET agent' => '',
 						'Script' => '',
+						'Browser' => '',
 						'Communication' => '',
 						'Connection' => '',
 						'Media type test' => '',
@@ -756,6 +797,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 						'Incorrect value for field "timeout_ssh_agent": cannot be empty.',
 						'Incorrect value for field "timeout_telnet_agent": cannot be empty.',
 						'Incorrect value for field "timeout_script": cannot be empty.',
+						'Incorrect value for field "timeout_browser": cannot be empty.',
 						'Incorrect value for field "socket_timeout": cannot be empty.',
 						'Incorrect value for field "connect_timeout": cannot be empty.',
 						'Incorrect value for field "media_type_test_timeout": cannot be empty.',
@@ -765,7 +807,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #42.
+			// #45.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -775,7 +817,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_zabbix_agent": a time unit is expected.'
 				]
 			],
-			// #43.
+			// #46.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -785,7 +827,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_simple_check": a time unit is expected.'
 				]
 			],
-			// #44.
+			// #47.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -795,7 +837,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_snmp_agent": a time unit is expected.'
 				]
 			],
-			// #45.
+			// #48.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -805,7 +847,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_external_check": a time unit is expected.'
 				]
 			],
-			// #46.
+			// #49.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -815,7 +857,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_db_monitor": a time unit is expected.'
 				]
 			],
-			// #47.
+			// #50.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -825,7 +867,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_http_agent": a time unit is expected.'
 				]
 			],
-			// #48.
+			// #51.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -835,7 +877,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_ssh_agent": a time unit is expected.'
 				]
 			],
-			// #49.
+			// #52.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -845,7 +887,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_telnet_agent": a time unit is expected.'
 				]
 			],
-			// #50.
+			// #53.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -855,7 +897,17 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_script": a time unit is expected.'
 				]
 			],
-			// #51 All network timeouts time unit errors at once.
+			// #54.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Browser' => 'test'
+					],
+					'details' => 'Invalid parameter "/timeout_browser": a time unit is expected.'
+				]
+			],
+			// #55 All network timeouts time unit errors at once.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -877,7 +929,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #52 Check 1h time validation.
+			// #56 Check 1h time validation.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -899,7 +951,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #53 Check 1d time validation.
+			// #57 Check 1d time validation.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -921,7 +973,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #54 All network timeouts errors for 1w validation.
+			// #58 All network timeouts errors for 1w validation.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -943,7 +995,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #55 All network timeouts errors for 1M validation.
+			// #59 All network timeouts errors for 1M validation.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -965,7 +1017,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #56 All network timeouts errors for 1y validation.
+			// #60 All network timeouts errors for 1y validation.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -987,7 +1039,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #57.
+			// #61.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -997,7 +1049,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_zabbix_agent": value must be one of 1-600.'
 				]
 			],
-			// #58.
+			// #62.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1007,7 +1059,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_zabbix_agent": value must be one of 1-600.'
 				]
 			],
-			// #59.
+			// #63.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1017,7 +1069,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_zabbix_agent": a time unit is expected.'
 				]
 			],
-			// #60.
+			// #64.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1027,7 +1079,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_simple_check": value must be one of 1-600.'
 				]
 			],
-			// #61.
+			// #65.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1037,7 +1089,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_simple_check": value must be one of 1-600.'
 				]
 			],
-			// #62.
+			// #66.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1047,7 +1099,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_simple_check": a time unit is expected.'
 				]
 			],
-			// #63.
+			// #67.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1057,7 +1109,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_snmp_agent": value must be one of 1-600.'
 				]
 			],
-			// #64.
+			// #68.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1067,7 +1119,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_snmp_agent": value must be one of 1-600.'
 				]
 			],
-			// #65.
+			// #69.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1077,7 +1129,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_snmp_agent": a time unit is expected.'
 				]
 			],
-			// #66.
+			// #70.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1087,7 +1139,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_external_check": value must be one of 1-600.'
 				]
 			],
-			// #67.
+			// #71.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1097,7 +1149,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_external_check": value must be one of 1-600.'
 				]
 			],
-			// #68.
+			// #72.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1107,7 +1159,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_external_check": a time unit is expected.'
 				]
 			],
-			// #69.
+			// #73.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1117,7 +1169,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_db_monitor": value must be one of 1-600.'
 				]
 			],
-			// #70.
+			// #74.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1127,7 +1179,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_db_monitor": value must be one of 1-600.'
 				]
 			],
-			// #71.
+			// #75.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1137,7 +1189,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_db_monitor": a time unit is expected.'
 				]
 			],
-			// #72.
+			// #76.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1147,7 +1199,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_http_agent": value must be one of 1-600.'
 				]
 			],
-			// #73.
+			// #77.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1157,7 +1209,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_http_agent": value must be one of 1-600.'
 				]
 			],
-			// #74.
+			// #78.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1167,7 +1219,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_http_agent": a time unit is expected.'
 				]
 			],
-			// #75.
+			// #79.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1177,7 +1229,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_ssh_agent": value must be one of 1-600.'
 				]
 			],
-			// #76.
+			// #80.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1187,7 +1239,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_ssh_agent": value must be one of 1-600.'
 				]
 			],
-			// #77.
+			// #81.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1197,7 +1249,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_ssh_agent": a time unit is expected.'
 				]
 			],
-			// #78.
+			// #82.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1207,7 +1259,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_telnet_agent": value must be one of 1-600.'
 				]
 			],
-			// #79.
+			// #83.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1217,7 +1269,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_telnet_agent": value must be one of 1-600.'
 				]
 			],
-			// #80.
+			// #84.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1227,7 +1279,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_telnet_agent": a time unit is expected.'
 				]
 			],
-			// #81.
+			// #85.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1237,7 +1289,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_script": value must be one of 1-600.'
 				]
 			],
-			// #82.
+			// #86.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1247,7 +1299,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_script": value must be one of 1-600.'
 				]
 			],
-			// #83.
+			// #87.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1257,7 +1309,37 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_script": a time unit is expected.'
 				]
 			],
-			// #84.
+			// #88.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Browser' => '1d'
+					],
+					'details' => 'Invalid parameter "/timeout_browser": value must be one of 1-600.'
+				]
+			],
+			// #89.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Browser' => '1w'
+					],
+					'details' => 'Invalid parameter "/timeout_browser": value must be one of 1-600.'
+				]
+			],
+			// #90.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Browser' => '1M'
+					],
+					'details' => 'Invalid parameter "/timeout_browser": a time unit is expected.'
+				]
+			],
+			// #91.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1267,7 +1349,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_zabbix_agent": a number is too large.'
 				]
 			],
-			// #85.
+			// #92.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1277,7 +1359,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_simple_check": a number is too large.'
 				]
 			],
-			// #86.
+			// #93.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1287,7 +1369,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_snmp_agent": a number is too large.'
 				]
 			],
-			// #87.
+			// #94.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1297,7 +1379,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_external_check": a number is too large.'
 				]
 			],
-			// #88.
+			// #95.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1307,7 +1389,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_db_monitor": a number is too large.'
 				]
 			],
-			// #89.
+			// #96.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1317,7 +1399,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_http_agent": a number is too large.'
 				]
 			],
-			// #90.
+			// #97.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1327,7 +1409,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_ssh_agent": a number is too large.'
 				]
 			],
-			// #91.
+			// #98.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1337,7 +1419,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_telnet_agent": a number is too large.'
 				]
 			],
-			// #92.
+			// #99.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1347,7 +1429,17 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_script": a number is too large.'
 				]
 			],
-			// #93.
+			// #100.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Browser' => '123456789123456789'
+					],
+					'details' => 'Invalid parameter "/timeout_browser": a number is too large.'
+				]
+			],
+			// #101.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1357,7 +1449,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_zabbix_agent": a time unit is expected.'
 				]
 			],
-			// #94.
+			// #102.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1367,7 +1459,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_zabbix_agent": a time unit is expected.'
 				]
 			],
-			// #95.
+			// #103.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1377,7 +1469,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_simple_check": a time unit is expected.'
 				]
 			],
-			// #96.
+			// #104.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1387,7 +1479,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_simple_check": a time unit is expected.'
 				]
 			],
-			// #97.
+			// #105.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1397,7 +1489,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_snmp_agent": a time unit is expected.'
 				]
 			],
-			// #98.
+			// #106.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1407,7 +1499,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_snmp_agent": a time unit is expected.'
 				]
 			],
-			// #99.
+			// #107.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1417,7 +1509,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_external_check": a time unit is expected.'
 				]
 			],
-			// #100.
+			// #108.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1427,7 +1519,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_external_check": a time unit is expected.'
 				]
 			],
-			// #101.
+			// #109.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1437,7 +1529,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_db_monitor": a time unit is expected.'
 				]
 			],
-			// #102.
+			// #110.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1447,7 +1539,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_db_monitor": a time unit is expected.'
 				]
 			],
-			// #103.
+			// #111.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1457,7 +1549,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_http_agent": a time unit is expected.'
 				]
 			],
-			// #104.
+			// #112.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1467,7 +1559,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_http_agent": a time unit is expected.'
 				]
 			],
-			// #105.
+			// #113.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1477,7 +1569,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_ssh_agent": a time unit is expected.'
 				]
 			],
-			// #106.
+			// #114.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1487,7 +1579,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_ssh_agent": a time unit is expected.'
 				]
 			],
-			// #107.
+			// #115.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1497,7 +1589,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_telnet_agent": a time unit is expected.'
 				]
 			],
-			// #108.
+			// #116.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1507,7 +1599,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_telnet_agent": a time unit is expected.'
 				]
 			],
-			// #109.
+			// #117.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1517,7 +1609,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_script": a time unit is expected.'
 				]
 			],
-			// #110.
+			// #118.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1527,7 +1619,27 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					'details' => 'Invalid parameter "/timeout_script": a time unit is expected.'
 				]
 			],
-			// #111 All network timeouts errors with LLD macros.
+			// #119.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Browser' => '{HOST.HOST}'
+					],
+					'details' => 'Invalid parameter "/timeout_browser": a time unit is expected.'
+				]
+			],
+			// #120.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Browser' => '{#LDD_MACROS}'
+					],
+					'details' => 'Invalid parameter "/timeout_browser": a time unit is expected.'
+				]
+			],
+			// #121 All network timeouts errors with LLD macros.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1549,7 +1661,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #112 All network timeouts errors with global macros.
+			// #122 All network timeouts errors with global macros.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1571,7 +1683,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #113 All network timeouts errors with user macros.
+			// #123 All network timeouts errors with user macros.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1593,7 +1705,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 					]
 				]
 			],
-			// #114.
+			// #124.
 			[
 				[
 					'trim' => true,
@@ -1607,6 +1719,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 						'SSH agent' => '   15s   ',
 						'TELNET agent' => '   15s   ',
 						'Script' => '   15s   ',
+						'Browser' => '   15s   ',
 						'Communication' => '   15s   ',
 						'Connection' => '   15s   ',
 						'Media type test' => '   15s   ',
@@ -1624,6 +1737,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 						'timeout_ssh_agent' => '15s',
 						'timeout_telnet_agent' => '15s',
 						'timeout_script' => '15s',
+						'timeout_browser' => '15s',
 						'socket_timeout' => '15s',
 						'connect_timeout' => '15s',
 						'media_type_test_timeout' => '15s',

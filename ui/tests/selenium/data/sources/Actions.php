@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -24,7 +19,6 @@ class Actions {
 	const ZABBIX_ADMIN_GROUPID = 7;
 	const ADMIN_USERID = 1;
 	const EMAIL_MEDIATYPEID = 1;
-	const REBOOT_SCRIPTID = 4;
 	const CURRENT_HOST = 0;
 
 	/**
@@ -33,6 +27,32 @@ class Actions {
 	 * @return array
 	 */
 	public static function load() {
+		CDataHelper::call('proxy.create',
+			[
+				[
+					'name' => 'Proxy for Actions 1',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE
+				],
+				[
+					'name' => 'Proxy for Actions 2',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE
+				]
+			]
+		);
+		$proxyids = CDataHelper::getIds('name');
+
+		$scripts = CDataHelper::call('script.create', [
+			[
+				'name' => 'Reboot',
+				'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+				'scope' => ZBX_SCRIPT_SCOPE_ACTION,
+				'command' => '/sbin/shutdown -r',
+				'groupid' => 4, // Zabbix servers.
+				'description' => 'This command reboots server.'
+			]
+		]);
+		$reboot_scriptid = $scripts['scriptids'][0];
+
 		CDataHelper::call('action.create', [
 			// Service action.
 			[
@@ -91,7 +111,7 @@ class Actions {
 				'operations' => [
 					[
 						'operationtype' => OPERATION_TYPE_COMMAND,
-						'opcommand' => ['scriptid' => self::REBOOT_SCRIPTID],
+						'opcommand' => ['scriptid' => $reboot_scriptid],
 						'opcommand_hst' => [['hostid' => self::CURRENT_HOST]]
 					]
 				]
@@ -274,12 +294,12 @@ class Actions {
 						[
 							'conditiontype' => ZBX_CONDITION_TYPE_PROXY,
 							'operator' => CONDITION_OPERATOR_NOT_EQUAL,
-							'value' => 20001 // Proxy for Actions.
+							'value' => $proxyids['Proxy for Actions 1']
 						],
 						[
 							'conditiontype' => ZBX_CONDITION_TYPE_PROXY,
 							'operator' => CONDITION_OPERATOR_EQUAL,
-							'value' => 20000 // Proxy for Discovery rule.
+							'value' => $proxyids['Proxy for Actions 2']
 						]
 					]
 				],
@@ -301,7 +321,7 @@ class Actions {
 					],
 					[
 						'operationtype' => OPERATION_TYPE_COMMAND,
-						'opcommand' => ['scriptid' => self::REBOOT_SCRIPTID],
+						'opcommand' => ['scriptid' => $reboot_scriptid],
 						'opcommand_hst' => [['hostid' => self::CURRENT_HOST]]
 					],
 					[
@@ -334,12 +354,12 @@ class Actions {
 						[
 							'conditiontype' => ZBX_CONDITION_TYPE_PROXY,
 							'operator' => CONDITION_OPERATOR_NOT_EQUAL,
-							'value' => 20001 // Proxy for Actions.
+							'value' => $proxyids['Proxy for Actions 1']
 						],
 						[
 							'conditiontype' => ZBX_CONDITION_TYPE_PROXY,
 							'operator' => CONDITION_OPERATOR_EQUAL,
-							'value' => 20000 // Proxy for Discovery rule.
+							'value' => $proxyids['Proxy for Actions 2']
 						]
 					]
 				],
@@ -361,7 +381,7 @@ class Actions {
 					],
 					[
 						'operationtype' => OPERATION_TYPE_COMMAND,
-						'opcommand' => ['scriptid' => self::REBOOT_SCRIPTID],
+						'opcommand' => ['scriptid' => $reboot_scriptid],
 						'opcommand_hst' => [['hostid' => self::CURRENT_HOST]]
 					]
 				]

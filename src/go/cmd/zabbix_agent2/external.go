@@ -1,38 +1,29 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 package main
 
 import (
-	"errors"
-	"fmt"
-	"net"
 	"os"
 	"path/filepath"
 	"time"
 
-	"git.zabbix.com/ap/plugin-support/conf"
-	"git.zabbix.com/ap/plugin-support/errs"
-	"git.zabbix.com/ap/plugin-support/plugin"
-	"git.zabbix.com/ap/plugin-support/plugin/comms"
-	"zabbix.com/internal/agent"
-	"zabbix.com/plugins/external"
+	"golang.zabbix.com/agent2/internal/agent"
+	"golang.zabbix.com/agent2/plugins/external"
+	"golang.zabbix.com/sdk/conf"
+	"golang.zabbix.com/sdk/errs"
+	"golang.zabbix.com/sdk/log"
 )
 
 type pluginOptions struct {
@@ -51,8 +42,8 @@ func initExternalPlugins(options *agent.AgentOptions) (string, error) {
 			continue
 		}
 
-		if err := checkPath(o.System.Path); err != nil {
-			return "", err
+		if !filepath.IsAbs(o.System.Path) {
+			return "", errs.Errorf("path %q not absolute", o.System.Path)
 		}
 
 		paths[name] = o.System.Path
@@ -62,27 +53,37 @@ func initExternalPlugins(options *agent.AgentOptions) (string, error) {
 		return "", nil
 	}
 
-	timeout := parseTimeout()
+	timeout := getTimeout()
 	socket := agent.Options.ExternalPluginsSocket
-	err := removeSocket(socket)
+
+	err := os.RemoveAll(socket)
 	if err != nil {
-		return "", err
+		return "", errs.Wrapf(err, "failed to remove plugin socket, with path %q", socket)
 	}
 
 	listener, err := getListener(socket)
 	if err != nil {
-		return "", err
+		return "", errs.Wrap(err, "failed to get socket listener")
 	}
 
-	for name, p := range paths {
-		accessor := createAccessor(p, socket, timeout, listener)
-		err := initExternalPlugin(name, accessor, options)
-		if err != nil {
-			return "", err
-		}
-		accessor.Initial = false
+	for name, path := range paths {
+		log.Debugf("initializing external plugin %q", name)
 
-		err = plugin.RegisterMetrics(accessor, name, accessor.Params...)
+		// configuratorTask from internal/agent/scheduler/task.go depends
+		// on loadable plugin configs not containing Path field, hence
+		// it needs to removed.
+		config := removePathField(options.Plugins[name])
+		options.Plugins[name] = config
+
+		accessor := external.NewPlugin(
+			name,
+			path,
+			socket,
+			timeout,
+			listener,
+		)
+
+		err := accessor.RegisterMetrics(config)
 		if err != nil {
 			return "", errs.Wrap(err, "failed to register metrics")
 		}
@@ -91,91 +92,15 @@ func initExternalPlugins(options *agent.AgentOptions) (string, error) {
 	return socket, nil
 }
 
-func initExternalPlugin(name string, p *external.Plugin, options *agent.AgentOptions) (err error) {
-	p.ExecutePlugin()
-	defer p.Stop()
-
-	go listenOnPluginFail(p, name)
-
-	var resp *comms.RegisterResponse
-	resp, err = p.Register()
-	if err != nil {
-		return
-	}
-
-	if resp.Error != "" {
-		return errors.New(resp.Error)
-	}
-
-	if name != resp.Name {
-		return fmt.Errorf("mismatch plugin names %s and %s, with plugin path %s", name, resp.Name, p.Path)
-	}
-
-	p.SetBrokerName(name)
-	p.Interfaces = resp.Interfaces
-	p.Params = resp.Metrics
-
-	options.Plugins[name] = removePath(options.Plugins[name])
-
-	err = validate(p, options.Plugins[name])
-	if err != nil {
-		return fmt.Errorf("[%s] %s", name, err.Error())
-	}
-
-	return
-}
-
-func checkPath(path string) error {
-	if !filepath.IsAbs(path) {
-		return fmt.Errorf("failed to start plugin %s, path must be absolute", path)
-	}
-
-	return nil
-}
-
-func validate(p *external.Plugin, options interface{}) error {
-	if !comms.ImplementsConfigurator(p.Interfaces) {
-		return nil
-	}
-
-	return p.Validate(options)
-}
-
-func createAccessor(path, socket string, timeout time.Duration, listener net.Listener) *external.Plugin {
-	accessor := &external.Plugin{
-		Path:     path,
-		Socket:   socket,
-		Initial:  true,
-		Listener: listener,
-		Timeout:  timeout,
-	}
-
-	accessor.SetExternal(true)
-
-	return accessor
-}
-
-func parseTimeout() (timeout time.Duration) {
+func getTimeout() time.Duration {
 	if agent.Options.ExternalPluginTimeout == 0 {
-		timeout = time.Second * time.Duration(agent.Options.Timeout)
-
-		return
+		return time.Second * time.Duration(agent.Options.Timeout)
 	}
 
-	timeout = time.Second * time.Duration(agent.Options.ExternalPluginTimeout)
-
-	return
+	return time.Second * time.Duration(agent.Options.ExternalPluginTimeout)
 }
 
-func removeSocket(socket string) error {
-	if err := os.RemoveAll(socket); err != nil {
-		return fmt.Errorf("failed to drop plugin socket, with path %s, %s", socket, err.Error())
-	}
-
-	return nil
-}
-
-func removePath(privateOptions interface{}) interface{} {
+func removePathField(privateOptions any) any {
 	if root, ok := privateOptions.(*conf.Node); ok {
 		for i, v := range root.Nodes {
 			if node, ok := v.(*conf.Node); ok {
@@ -190,7 +115,7 @@ func removePath(privateOptions interface{}) interface{} {
 	return privateOptions
 }
 
-func remove(s []interface{}, i int) []interface{} {
+func remove(s []any, i int) []any {
 	s[i] = s[len(s)-1]
 	return s[:len(s)-1]
 }

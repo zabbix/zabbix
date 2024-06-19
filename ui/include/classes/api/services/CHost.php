@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -26,10 +21,10 @@ class CHost extends CHostGeneral {
 
 	protected $sortColumns = ['hostid', 'host', 'name', 'status'];
 
-	public const OUTPUT_FIELDS = ['hostid', 'proxyid', 'host', 'status', 'ipmi_authtype', 'ipmi_privilege',
-		'ipmi_username', 'ipmi_password', 'maintenanceid', 'maintenance_status', 'maintenance_type',
-		'maintenance_from', 'name', 'flags', 'description', 'tls_connect', 'tls_accept', 'tls_issuer', 'tls_subject',
-		'inventory_mode', 'active_available'
+	public const OUTPUT_FIELDS = ['hostid', 'host', 'monitored_by', 'proxyid', 'proxy_groupid', 'assigned_proxyid',
+		'status', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'maintenanceid',
+		'maintenance_status', 'maintenance_type', 'maintenance_from', 'name', 'flags', 'description', 'tls_connect',
+		'tls_accept', 'tls_issuer', 'tls_subject', 'inventory_mode', 'active_available'
 	];
 
 	/**
@@ -38,6 +33,8 @@ class CHost extends CHostGeneral {
 	 * @param array         $options
 	 * @param array         $options['groupids']                           Select hosts by group IDs.
 	 * @param array         $options['hostids']                            Select hosts by host IDs.
+	 * @param array         $options['proxyids']                           Select hosts by proxy IDs.
+	 * @param array         $options['proxy_groupids']                     Select hosts by proxy group IDs.
 	 * @param array         $options['templateids']                        Select hosts by template IDs.
 	 * @param array         $options['interfaceids']                       Select hosts by interface IDs.
 	 * @param array         $options['itemids']                            Select hosts by item IDs.
@@ -108,6 +105,7 @@ class CHost extends CHostGeneral {
 			'groupids'							=> null,
 			'hostids'							=> null,
 			'proxyids'							=> null,
+			'proxy_groupids'					=> null,
 			'templateids'						=> null,
 			'interfaceids'						=> null,
 			'itemids'							=> null,
@@ -184,13 +182,13 @@ class CHost extends CHostGeneral {
 			}
 
 			$sqlParts['from'][] = 'host_hgset hh';
-			$sqlParts['from'][] = 'permission p';
+			$sqlParts['from'][] = 'permission p1';
 			$sqlParts['where'][] = 'h.hostid=hh.hostid';
-			$sqlParts['where'][] = 'hh.hgsetid=p.hgsetid';
-			$sqlParts['where'][] = 'p.ugsetid='.self::$userData['ugsetid'];
+			$sqlParts['where'][] = 'hh.hgsetid=p1.hgsetid';
+			$sqlParts['where'][] = 'p1.ugsetid='.self::$userData['ugsetid'];
 
 			if ($options['editable']) {
-				$sqlParts['where'][] = 'p.permission='.PERM_READ_WRITE;
+				$sqlParts['where'][] = 'p1.permission='.PERM_READ_WRITE;
 			}
 		}
 
@@ -218,6 +216,13 @@ class CHost extends CHostGeneral {
 			zbx_value2array($options['proxyids']);
 
 			$sqlParts['where'][] = dbConditionId('h.proxyid', $options['proxyids']);
+		}
+
+		// proxy_groupids
+		if (!is_null($options['proxy_groupids'])) {
+			zbx_value2array($options['proxy_groupids']);
+
+			$sqlParts['where'][] = dbConditionId('h.proxy_groupid', $options['proxy_groupids']);
 		}
 
 		// templateids
@@ -513,6 +518,7 @@ class CHost extends CHostGeneral {
 			$all_keys = array_keys(DB::getSchema($this->tableName())['fields']);
 			$all_keys[] = 'inventory_mode';
 			$all_keys[] = 'active_available';
+			$all_keys[] = 'assigned_proxyid';
 			$options['output'] = array_diff($all_keys, $write_only_keys);
 		}
 		/*
@@ -572,8 +578,9 @@ class CHost extends CHostGeneral {
 	}
 
 	protected function applyQueryFilterOptions($tableName, $tableAlias, array $options, array $sqlParts) {
-		if ($options['filter'] && array_key_exists('inventory_mode', $options['filter'])) {
-			if ($options['filter']['inventory_mode'] !== null) {
+		if (is_array($options['filter'])) {
+			if (array_key_exists('inventory_mode', $options['filter'])
+					&& $options['filter']['inventory_mode'] !== null) {
 				$inventory_mode_query = (array) $options['filter']['inventory_mode'];
 
 				$inventory_mode_where = [];
@@ -592,6 +599,11 @@ class CHost extends CHostGeneral {
 					? '('.implode(' OR ', $inventory_mode_where).')'
 					: $inventory_mode_where[0];
 			}
+
+			if (array_key_exists('assigned_proxyid', $options['filter'])
+					&& $options['filter']['assigned_proxyid'] !== null) {
+				$sqlParts['where'][] = dbConditionId('p.proxyid', $options['filter']['assigned_proxyid']);
+			}
 		}
 
 		return $sqlParts;
@@ -606,11 +618,6 @@ class CHost extends CHostGeneral {
 			unset($sqlParts['select'][$upcased_index]);
 		}
 
-		if (!$options['countOutput'] && $this->outputIsRequested('inventory_mode', $options['output'])) {
-			$sqlParts['select']['inventory_mode'] =
-				dbConditionCoalesce('hinv.inventory_mode', HOST_INVENTORY_DISABLED, 'inventory_mode');
-		}
-
 		if ((!$options['countOutput'] && $this->outputIsRequested('inventory_mode', $options['output']))
 				|| ($options['filter'] && array_key_exists('inventory_mode', $options['filter']))) {
 			$sqlParts['left_join'][] = ['alias' => 'hinv', 'table' => 'host_inventory', 'using' => 'hostid'];
@@ -623,6 +630,17 @@ class CHost extends CHostGeneral {
 			$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
 		}
 
+		if ((!$options['countOutput'] && $this->outputIsRequested('assigned_proxyid', $options['output']))
+				|| (is_array($options['filter']) && array_key_exists('assigned_proxyid', $options['filter'])
+					&& $options['filter']['assigned_proxyid'] !== null)) {
+			$sqlParts['left_join'][] = ['alias' => 'hp', 'table' => 'host_proxy', 'using' => 'hostid'];
+			// Override host_proxy.proxyid with NULL if hosts.proxy_groupid and proxy.proxy_groupid do not match.
+			$sqlParts['left_join'][] = ['alias' => 'p', 'table' => 'proxy', 'use_distinct' => false,
+				'condition' => 'h.proxy_groupid=p.proxy_groupid AND hp.proxyid=p.proxyid'
+			];
+			$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
+		}
+
 		if (!$options['countOutput']) {
 			if ($this->outputIsRequested('inventory_mode', $options['output'])) {
 				$sqlParts['select']['inventory_mode'] =
@@ -631,6 +649,10 @@ class CHost extends CHostGeneral {
 
 			if ($this->outputIsRequested('active_available', $options['output'])) {
 				$sqlParts = $this->addQuerySelect('hr.active_available', $sqlParts);
+			}
+
+			if ($this->outputIsRequested('assigned_proxyid', $options['output'])) {
+				$sqlParts = $this->addQuerySelect('p.proxyid AS assigned_proxyid', $sqlParts);
 			}
 		}
 
@@ -654,7 +676,9 @@ class CHost extends CHostGeneral {
 	 * @param int    $hosts[]['interfaces']['useip']        Interface should use IP (optional).
 	 * @param string $hosts[]['interfaces']['dns']          Interface should use DNS (optional).
 	 * @param int    $hosts[]['interfaces']['details']      Interface additional fields (optional).
-	 * @param int    $hosts[]['proxyid']                    ID of the proxy used to monitor the host (optional).
+	 * @param int    $hosts[]['monitored_by']               Source of monitoring (optional).
+	 * @param string $hosts[]['proxyid']                    ID of the proxy used to monitor the host (optional).
+	 * @param string $hosts[]['proxy_groupid']              ID of the proxy group used to monitor the host (optional).
 	 * @param int    $hosts[]['ipmi_authtype']              IPMI authentication type (optional).
 	 * @param int    $hosts[]['ipmi_privilege']             IPMI privilege (optional).
 	 * @param string $hosts[]['ipmi_username']              IPMI username (optional).
@@ -757,7 +781,9 @@ class CHost extends CHostGeneral {
 	 * @param int    $hosts[]['interfaces']['useip']              Interface should use IP (optional).
 	 * @param string $hosts[]['interfaces']['dns']                Interface should use DNS (optional).
 	 * @param int    $hosts[]['interfaces']['details']            Interface additional fields (optional).
-	 * @param int    $hosts[]['proxyid']                          ID of the proxy used to monitor the host (optional).
+	 * @param int    $hosts[]['monitored_by']                     Source of monitoring (optional).
+	 * @param string $hosts[]['proxyid']                          ID of the proxy used to monitor the host (optional).
+	 * @param string $hosts[]['proxy_groupid']                    ID of the proxy group used to monitor the host (optional).
 	 * @param int    $hosts[]['ipmi_authtype']                    IPMI authentication type (optional).
 	 * @param int    $hosts[]['ipmi_privilege']                   IPMI privilege (optional).
 	 * @param string $hosts[]['ipmi_username']                    IPMI username (optional).
@@ -815,6 +841,8 @@ class CHost extends CHostGeneral {
 		$hosts = $this->extendObjectsByKey($hosts, $db_hosts, 'hostid', ['tls_connect', 'tls_accept', 'tls_issuer',
 			'tls_subject', 'tls_psk_identity', 'tls_psk'
 		]);
+
+		self::addFieldDefaultsByMonitoredBy($hosts, $db_hosts);
 
 		foreach ($hosts as $host) {
 			$host = array_diff_key($host, array_flip(['groups', 'tags', 'macros', 'templates', 'templates_clear']));
@@ -968,7 +996,9 @@ class CHost extends CHostGeneral {
 	 * @param string $hosts['fields']['dns']			DNS. OPTIONAL
 	 * @param string $hosts['fields']['ip']				IP. OPTIONAL
 	 * @param int    $hosts['fields']['details']		Details. OPTIONAL
-	 * @param int    $hosts['fields']['proxyid']		Proxy ID. OPTIONAL
+	 * @param int    $hosts['fields']['monitored_by']	Source of monitoring. OPTIONAL
+	 * @param string $hosts['fields']['proxyid']		Proxy ID. OPTIONAL
+	 * @param string $hosts['fields']['proxy_groupid']	Proxy group ID. OPTIONAL
 	 * @param int    $hosts['fields']['ipmi_authtype']	IPMI authentication type. OPTIONAL
 	 * @param int    $hosts['fields']['ipmi_privilege']	IPMI privilege. OPTIONAL
 	 * @param string $hosts['fields']['ipmi_username']	IPMI username. OPTIONAL
@@ -1093,10 +1123,57 @@ class CHost extends CHostGeneral {
 			$updateInventory['inventory_mode'] = $data['inventory_mode'];
 		}
 
+		$_hosts = $data['hosts'];
+
 		unset($data['hosts'], $data['groups'], $data['interfaces'], $data['templates_clear'], $data['templates'],
 			$data['macros'], $data['inventory'], $data['inventory_mode']);
 
 		if ($data) {
+			foreach ($_hosts as &$host) {
+				$host += array_intersect_key($data, array_flip(['monitored_by', 'proxyid', 'proxy_groupid']));
+			}
+			unset($host);
+
+			$_hosts = $this->extendObjectsByKey($_hosts, $db_hosts, 'hostid', ['monitored_by']);
+
+			self::addDbFieldsByMonitoredBy($_hosts, $db_hosts);
+
+			$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
+				'monitored_by' =>	['type' => API_INT32, 'in' => implode(',', [ZBX_MONITORED_BY_SERVER, ZBX_MONITORED_BY_PROXY, ZBX_MONITORED_BY_PROXY_GROUP])],
+				'proxyid' =>		['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'monitored_by', 'in' => ZBX_MONITORED_BY_PROXY], 'type' => API_ID],
+										['else' => true, 'type' => API_ID, 'in' => '0']
+				]],
+				'proxy_groupid' =>	['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'monitored_by', 'in' => ZBX_MONITORED_BY_PROXY_GROUP], 'type' => API_ID],
+										['else' => true, 'type' => API_ID, 'in' => '0']
+				]]
+			]];
+
+			foreach ($_hosts as $host) {
+				if (!CApiInputValidator::validate($api_input_rules, $host, '/', $error)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+				}
+			}
+
+			self::checkProxiesAndProxyGroups($_hosts, $db_hosts);
+
+			if (array_key_exists('monitored_by', $data)) {
+				switch ($data['monitored_by']) {
+					case ZBX_MONITORED_BY_SERVER:
+						$data += ['proxyid' => 0, 'proxy_groupid' => 0];
+						break;
+
+					case ZBX_MONITORED_BY_PROXY:
+						$data += ['proxy_groupid' => 0];
+						break;
+
+					case ZBX_MONITORED_BY_PROXY_GROUP:
+						$data += ['proxyid' => 0];
+						break;
+				}
+			}
+
 			DB::update('hosts', [
 				'values' => $data,
 				'where' => ['hostid' => $hostids]
@@ -1267,7 +1344,7 @@ class CHost extends CHostGeneral {
 		}
 
 		$db_hosts = $this->get([
-			'output' => ['hostid', 'host', 'flags', 'status', 'name'],
+			'output' => ['hostid', 'host', 'flags', 'status', 'name', 'monitored_by', 'proxyid', 'proxy_groupid'],
 			'hostids' => array_column($data['hosts'], 'hostid'),
 			'editable' => true,
 			'preservekeys' => true
@@ -1667,6 +1744,7 @@ class CHost extends CHostGeneral {
 		DB::delete('hosts_groups', ['hostid' => $hostids]);
 
 		// delete host
+		DB::delete('host_proxy', ['hostid' => $hostids]);
 		DB::delete('host_tag', ['hostid' => $hostids]);
 		DB::update('hosts', [
 			'values' => ['templateid' => 0],
@@ -2053,6 +2131,15 @@ class CHost extends CHostGeneral {
 	 */
 	protected function validateCreate(array &$hosts) {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'fields' => [
+			'monitored_by' =>	['type' => API_INT32, 'in' => implode(',', [ZBX_MONITORED_BY_SERVER, ZBX_MONITORED_BY_PROXY, ZBX_MONITORED_BY_PROXY_GROUP]), 'default' => DB::getDefault('hosts', 'monitored_by')],
+			'proxyid' =>		['type' => API_MULTIPLE, 'rules' => [
+									['if' => ['field' => 'monitored_by', 'in' => ZBX_MONITORED_BY_PROXY], 'type' => API_ID, 'flags' => API_REQUIRED],
+									['else' => true, 'type' => API_ID, 'in' => '0']
+			]],
+			'proxy_groupid' =>	['type' => API_MULTIPLE, 'rules' => [
+									['if' => ['field' => 'monitored_by', 'in' => ZBX_MONITORED_BY_PROXY_GROUP], 'type' => API_ID, 'flags' => API_REQUIRED],
+									['else' => true, 'type' => API_ID, 'in' => '0']
+			]],
 			'groups' =>			['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['groupid']], 'fields' => [
 				'groupid' =>		['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
@@ -2203,6 +2290,8 @@ class CHost extends CHostGeneral {
 			}
 		}
 
+		self::checkProxiesAndProxyGroups($hosts);
+
 		$templates_exists = API::Template()->get([
 			'output' => ['host', 'name'],
 			'filter' => $filter,
@@ -2228,6 +2317,72 @@ class CHost extends CHostGeneral {
 	}
 
 	/**
+	 * @param array      $hosts
+	 * @param array|null $db_hosts
+	 *
+	 * @throws APIException
+	 */
+	private static function checkProxiesAndProxyGroups(array $hosts, array $db_hosts = null): void {
+		$proxyids = [];
+		$proxy_groupids = [];
+
+		foreach ($hosts as $i => $host) {
+			if ($host['monitored_by'] == ZBX_MONITORED_BY_PROXY) {
+				if (!array_key_exists('proxyid', $host)) {
+					continue;
+				}
+
+				if ($host['proxyid'] == 0) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Invalid parameter "%1$s": %2$s.', '/'.($i + 1).'/proxyid', _('cannot be empty'))
+					);
+				}
+
+				if ($db_hosts === null || $host['proxyid'] !== $db_hosts[$host['hostid']]['proxyid']) {
+					$proxyids[$host['proxyid']] = true;
+				}
+			}
+			elseif ($host['monitored_by'] == ZBX_MONITORED_BY_PROXY_GROUP) {
+				if (!array_key_exists('proxy_groupid', $host)) {
+					continue;
+				}
+
+				if ($host['proxy_groupid'] == 0) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Invalid parameter "%1$s": %2$s.', '/'.($i + 1).'/proxy_groupid', _('cannot be empty'))
+					);
+				}
+
+				if ($db_hosts === null || $host['proxy_groupid'] !== $db_hosts[$host['hostid']]['proxy_groupid']) {
+					$proxy_groupids[$host['proxy_groupid']] = true;
+				}
+			}
+		}
+
+		if ($proxyids) {
+			$db_count = API::Proxy()->get([
+				'countOutput' => true,
+				'proxyids' => array_keys($proxyids)
+			]);
+
+			if ($db_count != count($proxyids)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
+			}
+		}
+
+		if ($proxy_groupids) {
+			$db_count = API::ProxyGroup()->get([
+				'countOutput' => true,
+				'proxy_groupids' => array_keys($proxy_groupids)
+			]);
+
+			if ($db_count != count($proxy_groupids)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
+			}
+		}
+	}
+
+	/**
 	 * Validates the input parameters for the update() method.
 	 *
 	 * @param array $hosts			hosts data array
@@ -2237,6 +2392,7 @@ class CHost extends CHostGeneral {
 	 */
 	protected function validateUpdate(array &$hosts, array &$db_hosts = null): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'fields' => [
+			'monitored_by' =>		['type' => API_INT32, 'in' => implode(',', [ZBX_MONITORED_BY_SERVER, ZBX_MONITORED_BY_PROXY, ZBX_MONITORED_BY_PROXY_GROUP])],
 			'groups' =>				['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['groupid']], 'fields' => [
 				'groupid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
@@ -2265,7 +2421,9 @@ class CHost extends CHostGeneral {
 		}
 
 		$db_hosts = $this->get([
-			'output' => ['hostid', 'host', 'flags', 'tls_connect', 'tls_accept', 'tls_issuer', 'tls_subject'],
+			'output' => ['hostid', 'host', 'monitored_by', 'proxyid', 'proxy_groupid', 'flags', 'tls_connect',
+				'tls_accept', 'tls_issuer', 'tls_subject'
+			],
 			'hostids' => array_column($hosts, 'hostid'),
 			'editable' => true,
 			'preservekeys' => true
@@ -2498,7 +2656,77 @@ class CHost extends CHostGeneral {
 			}
 		}
 
+		$hosts = $this->extendObjectsByKey($hosts, $db_hosts, 'hostid', ['monitored_by']);
+
+		self::addDbFieldsByMonitoredBy($hosts, $db_hosts);
+
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
+			'monitored_by' =>	['type' => API_ANY],
+			'proxyid' =>		['type' => API_MULTIPLE, 'rules' => [
+									['if' => ['field' => 'monitored_by', 'in' => ZBX_MONITORED_BY_PROXY], 'type' => API_ID],
+									['else' => true, 'type' => API_ID, 'in' => '0']
+			]],
+			'proxy_groupid' =>	['type' => API_MULTIPLE, 'rules' => [
+									['if' => ['field' => 'monitored_by', 'in' => ZBX_MONITORED_BY_PROXY_GROUP], 'type' => API_ID],
+									['else' => true, 'type' => API_ID, 'in' => '0']
+			]]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $hosts, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		self::checkProxiesAndProxyGroups($hosts, $db_hosts);
+
 		$this->validateEncryption($hosts, $db_hosts);
+	}
+
+	/**
+	 * Add DB fields that became required as the result of the change of "monitored_by".
+	 *
+	 * @param array $hosts
+	 * @param array $db_hosts
+	 */
+	private static function addDbFieldsByMonitoredBy(array &$hosts, array $db_hosts): void {
+		foreach ($hosts as &$host) {
+			if ($host['monitored_by'] != $db_hosts[$host['hostid']]['monitored_by']) {
+				if ($host['monitored_by'] == ZBX_MONITORED_BY_PROXY) {
+					$host += array_intersect_key($db_hosts[$host['hostid']], array_flip(['proxyid']));
+				}
+				elseif ($host['monitored_by'] == ZBX_MONITORED_BY_PROXY_GROUP) {
+					$host += array_intersect_key($db_hosts[$host['hostid']], array_flip(['proxy_groupid']));
+				}
+			}
+		}
+		unset($host);
+	}
+
+	/**
+	 *  Add default values for fields that became unnecessary as the result of the change of "monitored_by".
+	 *
+	 * @param array $hosts
+	 * @param array $db_hosts
+	 */
+	protected static function addFieldDefaultsByMonitoredBy(array &$hosts, array $db_hosts): void {
+		foreach ($hosts as &$host) {
+			if (array_key_exists('monitored_by', $host)
+					&& $host['monitored_by'] != $db_hosts[$host['hostid']]['monitored_by']) {
+				switch ($host['monitored_by']) {
+					case ZBX_MONITORED_BY_SERVER:
+						$host += ['proxyid' => 0, 'proxy_groupid' => 0];
+						break;
+
+					case ZBX_MONITORED_BY_PROXY:
+						$host += ['proxy_groupid' => 0];
+						break;
+
+					case ZBX_MONITORED_BY_PROXY_GROUP:
+						$host += ['proxyid' => 0];
+						break;
+				}
+			}
+		}
+		unset($host);
 	}
 
 	protected function addAffectedObjects(array $hosts, array &$db_hosts): void {

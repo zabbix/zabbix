@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -226,7 +221,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					$warning_button->click();
 
 					// Check hintbox text.
-					$hint_dialog = $this->query('xpath://div[@class="overlay-dialogue"]')->one()->waitUntilVisible();
+					$hint_dialog = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->one()->waitUntilVisible();
 					$this->assertEquals($hint_text, $hint_dialog->getText());
 
 					// Close the hintbox.
@@ -264,10 +259,13 @@ class testDashboardTopHostsWidget extends testWidgets {
 		);
 
 		$thresholds_icon->click();
-		$hint_dialog = $this->query('xpath://div[@class="overlay-dialogue"]')->one()->waitUntilVisible();
+		$hint_dialog = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->one()->waitUntilVisible();
 		$this->assertEquals('This setting applies only to numeric data.', $hint_dialog->getText());
 		$hint_dialog->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click();
 		$hint_dialog->waitUntilNotPresent();
+
+		$column_dialog->close();
+		$dialog->close();
 	}
 
 	public static function getCreateData() {
@@ -1320,7 +1318,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			COverlayDialogElement::find()->one()->close();
 			$dashboard->save();
 
-			// Check message that widget added.
+			// Check that new widget is not added.
 			$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 			$this->assertEquals($old_widget_count, $dashboard->getWidgets()->count());
 		}
@@ -2080,6 +2078,8 @@ class testDashboardTopHostsWidget extends testWidgets {
 
 		// Check that tag/column/threshold removed.
 		$this->assertEquals($amount_before - 1, $table->getRows()->count());
+
+		COverlayDialogElement::closeAll();
 	}
 
 	/**
@@ -2155,6 +2155,8 @@ class testDashboardTopHostsWidget extends testWidgets {
 				}
 			}
 		}
+
+		COverlayDialogElement::find()->one()->close();
 	}
 
 	/**
@@ -2455,7 +2457,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Display' => 'Bar'
 						]
 					],
-					'text' => "column1\nNo data found."
+					'text' => "column1\nNo data found"
 				]
 			],
 			// #3 Text item, display Indicators - value not displayed.
@@ -2472,7 +2474,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Display' => 'Indicators'
 						]
 					],
-					'text' => "column1\nNo data found."
+					'text' => "column1\nNo data found"
 				]
 			],
 			// #4 Text item, Aggregation function max - value not displayed.
@@ -2489,7 +2491,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Aggregation function' => 'max'
 						]
 					],
-					'text' => "column1\nNo data found."
+					'text' => "column1\nNo data found"
 				]
 			],
 			// #5 Text item, Threshold - value is displayed ignoring thresholds.
@@ -2560,7 +2562,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Display' => 'Bar'
 						]
 					],
-					'text' => "column1\nNo data found."
+					'text' => "column1\nNo data found"
 				]
 			],
 			// #9 Log item, display Indicators - value not displayed.
@@ -2577,7 +2579,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Display' => 'Indicators'
 						]
 					],
-					'text' => "column1\nNo data found."
+					'text' => "column1\nNo data found"
 				]
 			],
 			// #10 Log item, Aggregation function max - value not displayed.
@@ -2594,7 +2596,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Aggregation function' => 'max'
 						]
 					],
-					'text' => "column1\nNo data found."
+					'text' => "column1\nNo data found"
 				]
 			],
 			// #11 Log item, Threshold - value is displayed ignoring thresholds.
@@ -2665,7 +2667,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Display' => 'Bar'
 						]
 					],
-					'text' => "column1\nNo data found."
+					'text' => "column1\nNo data found"
 				]
 			],
 			// #15 Char item, display Indicators - value not displayed.
@@ -2682,7 +2684,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Display' => 'Indicators'
 						]
 					],
-					'text' => "column1\nNo data found."
+					'text' => "column1\nNo data found"
 				]
 			],
 			// #16 Char item, Aggregation function max - value not displayed.
@@ -2699,7 +2701,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Aggregation function' => 'max'
 						]
 					],
-					'text' => "column1\nNo data found."
+					'text' => "column1\nNo data found"
 				]
 			],
 			// #17 Char item, Threshold - value is displayed ignoring thresholds.

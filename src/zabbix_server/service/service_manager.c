@@ -1,25 +1,24 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#include "service_manager.h"
+#include "service_server.h"
+
+#include "service_manager_impl.h"
+
 #include "../server_constants.h"
 
+#include "zbxtimekeeper.h"
 #include "zbxlog.h"
 #include "zbxalgo.h"
 #include "zbxdb.h"
@@ -35,8 +34,9 @@
 #include "zbxnum.h"
 #include "zbxtime.h"
 #include "zbxcacheconfig.h"
-#include "zbx_trigger_constants.h"
 #include "zbxrtc.h"
+#include "zbxthreads.h"
+#include "zbx_trigger_constants.h"
 #include "zbx_rtc_constants.h"
 
 ZBX_PTR_VECTOR_IMPL(service_update_ptr, zbx_service_update_t *)
@@ -133,8 +133,8 @@ zbx_service_manager_t;
 
 static void	event_free(zbx_event_t *event)
 {
-	zbx_vector_tags_clear_ext(&event->tags, zbx_free_tag);
-	zbx_vector_tags_destroy(&event->tags);
+	zbx_vector_tags_ptr_clear_ext(&event->tags, zbx_free_tag);
+	zbx_vector_tags_ptr_destroy(&event->tags);
 	zbx_free(event);
 }
 
@@ -275,7 +275,7 @@ static void	db_get_events(zbx_hashset_t *problem_events)
 			event->severity = atoi(row[2]);
 			event->mtime = 0;
 			event->suppressed = 0;
-			zbx_vector_tags_create(&event->tags);
+			zbx_vector_tags_ptr_create(&event->tags);
 			zbx_hashset_insert(problem_events, &event, sizeof(zbx_event_t *));
 		}
 
@@ -286,7 +286,7 @@ static void	db_get_events(zbx_hashset_t *problem_events)
 			tag = (zbx_tag_t *)zbx_malloc(NULL, sizeof(zbx_tag_t));
 			tag->tag = zbx_strdup(NULL, row[3]);
 			tag->value = zbx_strdup(NULL, row[4]);
-			zbx_vector_tags_append(&event->tags, tag);
+			zbx_vector_tags_ptr_append(&event->tags, tag);
 		}
 	}
 	zbx_db_free_result(result);
@@ -2871,7 +2871,7 @@ static void	process_problem_tags(zbx_vector_events_ptr_t *events, zbx_service_ma
 		}
 
 		for (int j = 0; j < event->tags.values_num; j++)
-			zbx_vector_tags_append(&(*ptr)->tags, event->tags.values[j]);
+			zbx_vector_tags_ptr_append(&(*ptr)->tags, event->tags.values[j]);
 
 		event->tags.values_num = 0;
 		event_free(event);

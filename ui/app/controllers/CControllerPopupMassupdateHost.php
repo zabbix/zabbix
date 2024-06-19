@@ -1,21 +1,16 @@
 <?php declare(strict_types = 0);
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -35,7 +30,9 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 			'templates' => 'array',
 			'inventories' => 'array',
 			'description' => 'string',
+			'monitored_by' => 'in '.implode(',', [ZBX_MONITORED_BY_SERVER, ZBX_MONITORED_BY_PROXY, ZBX_MONITORED_BY_PROXY_GROUP]),
 			'proxyid' => 'string',
+			'proxy_groupid' => 'string',
 			'ipmi_username' => 'string',
 			'ipmi_password' => 'string',
 			'tls_issuer' => 'string',
@@ -195,14 +192,23 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 					}
 				}
 
-				$properties = ['description', 'proxyid', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username',
-					'ipmi_password'
-				];
+				$properties = ['description', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password'];
 
 				$new_values = [];
 				foreach ($properties as $property) {
 					if (array_key_exists($property, $visible)) {
 						$new_values[$property] = $this->getInput($property);
+					}
+				}
+
+				if (array_key_exists('monitored_by', $visible)) {
+					$new_values['monitored_by'] = $this->getInput('monitored_by', ZBX_MONITORED_BY_SERVER);
+
+					if ($new_values['monitored_by'] == ZBX_MONITORED_BY_PROXY) {
+						$new_values['proxyid'] = $this->getInput('proxyid', 0);
+					}
+					elseif ($new_values['monitored_by'] == ZBX_MONITORED_BY_PROXY_GROUP) {
+						$new_values['proxy_groupid'] = $this->getInput('proxy_groupid', 0);
 					}
 				}
 
@@ -542,11 +548,6 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 					->setArgument('page', CPagerHelper::loadPage('host.list'))
 					->getUrl()
 			];
-
-			$data['proxies'] = API::Proxy()->get([
-				'output' => ['proxyid', 'name'],
-				'sortfield' => 'name'
-			]);
 
 			$data['discovered_host'] = !(bool) API::Host()->get([
 				'output' => [],

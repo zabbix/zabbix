@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -272,6 +267,9 @@ class CApiInputValidator {
 
 			case API_PROMETHEUS_LABEL:
 				return self::validatePrometheusLabel($rule, $data, $path, $error);
+
+			case API_NUMBER:
+				return self::validateNumber($rule, $data, $path, $error);
 		}
 
 		// This message can be untranslated because warn about incorrect validation rules at a development stage.
@@ -354,6 +352,7 @@ class CApiInputValidator {
 			case API_PREPROC_PARAMS:
 			case API_PROMETHEUS_PATTERN:
 			case API_PROMETHEUS_LABEL:
+			case API_NUMBER:
 				return true;
 
 			case API_OBJECT:
@@ -602,8 +601,6 @@ class CApiInputValidator {
 
 	/**
 	 * Returns unescaped array of "in" rules.
-	 *
-	 * @static
 	 *
 	 * @param string $in  A comma-delimited character string. For example, 'xml,json' or '\,,.,/'.
 	 *
@@ -1237,8 +1234,6 @@ class CApiInputValidator {
 	 * Validate integer ranges.
 	 * Example:
 	 *   -100-0,0-100,200,300-{$MACRO},{$MACRO},{#LLD},400-500
-	 *
-	 * @static
 	 *
 	 * @param array  $rule
 	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY, API_ALLOW_USER_MACRO, API_ALLOW_LLD_MACRO
@@ -4319,5 +4314,38 @@ class CApiInputValidator {
 		}
 
 		return true;
+	}
+
+	/**
+	 * @param array  $rule
+	 *        string $rule['in']      (optional) Supported if value is an integer.
+	 *        int    $rule['length']  (optional) Supported if value is a macro.
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateNumber(array $rule, &$data, string $path, string &$error): bool {
+		if (!is_int($data) && !is_string($data)) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a number is expected'));
+			return false;
+		}
+
+		$data = (string) $data;
+
+		if (preg_match('/^'.ZBX_PREG_INT.'$/', $data)) {
+			if ($data[0] === '0') {
+				$data = ltrim($data, '0');
+
+				if ($data === '') {
+					$data = '0';
+				}
+			}
+
+			return self::checkInt32In($rule, $data, $path, $error);
+		}
+
+		return self::validateUserMacro($rule, $data, $path, $error);
 	}
 }

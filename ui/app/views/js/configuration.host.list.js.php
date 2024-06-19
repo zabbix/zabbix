@@ -1,21 +1,16 @@
 <?php declare(strict_types = 0);
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -39,7 +34,13 @@
 
 			document.addEventListener('click', (e) => {
 				if (e.target.classList.contains('js-edit-template')) {
-					this.editTemplate({templateid: e.target.dataset.templateid})
+					this.editTemplate({templateid: e.target.dataset.templateid});
+				}
+				else if (e.target.classList.contains('js-edit-proxy')) {
+					this.editProxy(e.target.dataset.proxyid);
+				}
+				else if (e.target.classList.contains('js-edit-proxy-group')) {
+					this.editProxyGroup(e.target.dataset.proxy_groupid);
 				}
 			});
 		},
@@ -51,20 +52,39 @@
 				prevent_navigation: true
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
-				uncheckTableRows('hosts');
-				postMessageOk(e.detail.title);
+			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => this.reload(e.detail.success));
+		},
 
-				if ('success' in e.detail) {
-					postMessageOk(e.detail.success.title);
-
-					if ('messages' in e.detail.success) {
-						postMessageDetails('success', e.detail.success.messages);
-					}
-				}
-
-				location.href = location.href;
+		editProxy(proxyid) {
+			const overlay = PopUp('popup.proxy.edit', {proxyid}, {
+				dialogueid: 'proxy_edit',
+				dialogue_class: 'modal-popup-static',
+				prevent_navigation: true
 			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => this.reload(e.detail.success));
+		},
+
+		editProxyGroup(proxy_groupid) {
+			const overlay = PopUp('popup.proxygroup.edit', {proxy_groupid}, {
+				dialogueid: 'proxy-group-edit',
+				dialogue_class: 'modal-popup-static',
+				prevent_navigation: true
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => this.reload(e.detail.success));
+		},
+
+		reload(success) {
+			postMessageOk(success.title);
+
+			if ('messages' in success) {
+				postMessageDetails('success', success.messages);
+			}
+
+			uncheckTableRows('hosts');
+
+			location.href = location.href;
 		},
 
 		initFilter() {
@@ -80,16 +100,27 @@
 				new CTagFilterItem(row);
 			});
 
-			$('#filter_monitored_by').on('change', function() {
-				const filter_monitored_by = $('input[name=filter_monitored_by]:checked').val();
+			$('#filter_monitored_by')
+				.on('change', function() {
+					const filter_monitored_by = $('input[name=filter_monitored_by]:checked').val();
 
-				if (filter_monitored_by == <?= ZBX_MONITORED_BY_PROXY ?>) {
-					$('#filter_proxyids_').multiSelect('enable');
-				}
-				else {
-					$('#filter_proxyids_').multiSelect('disable');
-				}
-			});
+					for (const field of document.querySelectorAll('.js-filter-proxyids')) {
+						field.style.display = filter_monitored_by == <?= ZBX_MONITORED_BY_PROXY ?> ? '' : 'none';
+					}
+
+					$('#filter_proxyids_').multiSelect(
+						filter_monitored_by == <?= ZBX_MONITORED_BY_PROXY ?> ? 'enable' : 'disable'
+					);
+
+					for (const field of document.querySelectorAll('.js-filter-proxy-groupids')) {
+						field.style.display = filter_monitored_by == <?= ZBX_MONITORED_BY_PROXY_GROUP ?> ? '' : 'none';
+					}
+
+					$('#filter_proxy_groupids_').multiSelect(
+						filter_monitored_by == <?= ZBX_MONITORED_BY_PROXY_GROUP ?> ? 'enable' : 'disable'
+					);
+				})
+				.trigger('change');
 		},
 
 		createHost() {

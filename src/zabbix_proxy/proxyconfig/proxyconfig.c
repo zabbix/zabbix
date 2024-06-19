@@ -1,60 +1,69 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "proxyconfig.h"
 
+#include "proxyconfigwrite/proxyconfigwrite.h"
+
+#include "zbxtimekeeper.h"
 #include "zbxlog.h"
 #include "zbxnix.h"
 #include "zbxcachehistory.h"
 #include "zbxself.h"
 #include "zbxtime.h"
-
 #include "zbxcompress.h"
 #include "zbxrtc.h"
 #include "zbxcommshigh.h"
-#include "proxyconfigwrite/proxyconfig_write.h"
 #include "zbx_rtc_constants.h"
 #include "zbx_host_constants.h"
 #include "zbxstr.h"
 #include "zbxalgo.h"
+#include "zbxcacheconfig.h"
+#include "zbxdb.h"
+#include "zbxdbhigh.h"
+#include "zbxipcservice.h"
+#include "zbxnum.h"
+#include "zbxjson.h"
 
 static void	process_configuration_sync(size_t *data_size, zbx_synced_new_config_t *synced,
 		const zbx_thread_info_t *thread_info, zbx_thread_proxyconfig_args *args)
 {
-	zbx_socket_t		sock;
-	struct	zbx_json_parse	jp, jp_kvs_paths = {0};
-	char			value[16], *error = NULL, *buffer = NULL;
-	size_t			buffer_size, reserved;
-	struct zbx_json		j;
-	int			ret = FAIL;
+	zbx_socket_t			sock;
+	struct	zbx_json_parse		jp, jp_kvs_paths = {0};
+	char				value[16], *error = NULL, *buffer = NULL;
+	size_t				buffer_size, reserved;
+	struct zbx_json			j;
+	int				ret = FAIL;
+	zbx_uint64_t			config_revision, hostmap_revision;
+	zbx_proxyconfig_write_status_t	status = ZBX_PROXYCONFIG_WRITE_STATUS_DATA;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	/* reset the performance metric */
 	*data_size = 0;
 
+	zbx_dc_get_upstream_revision(&config_revision, &hostmap_revision);
+
 	zbx_json_init(&j, 128);
 	zbx_json_addstring(&j, "request", ZBX_PROTO_VALUE_PROXY_CONFIG, ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(&j, "host", args->config_hostname, ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(&j, ZBX_PROTO_TAG_VERSION, ZABBIX_VERSION, ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(&j, ZBX_PROTO_TAG_SESSION, zbx_dc_get_session_token(), ZBX_JSON_TYPE_STRING);
-	zbx_json_adduint64(&j, ZBX_PROTO_TAG_CONFIG_REVISION, zbx_dc_get_received_revision());
+	zbx_json_adduint64(&j, ZBX_PROTO_TAG_CONFIG_REVISION, config_revision);
+
+	if (0 != hostmap_revision)
+		zbx_json_adduint64(&j, ZBX_PROTO_TAG_HOSTMAP_REVISION, hostmap_revision);
 
 	if (SUCCEED != zbx_compress(j.buffer, j.buffer_size, &buffer, &buffer_size))
 	{
@@ -66,7 +75,7 @@ static void	process_configuration_sync(size_t *data_size, zbx_synced_new_config_
 	zbx_json_free(&j);
 
 	zbx_update_selfmon_counter(thread_info, ZBX_PROCESS_STATE_IDLE);
-#define CONFIG_PROXYCONFIG_RETRY	120	/* seconds */
+#define CONFIG_PROXYCONFIG_RETRY	10	/* seconds */
 	if (FAIL == zbx_connect_to_server(&sock, args->config_source_ip, args->config_server_addrs, 600,
 			args->config_timeout, CONFIG_PROXYCONFIG_RETRY, LOG_LEVEL_WARNING,
 			args->config_tls)) /* retry till have a connection */
@@ -117,7 +126,7 @@ static void	process_configuration_sync(size_t *data_size, zbx_synced_new_config_
 		goto error;
 	}
 
-	if (SUCCEED == (ret = zbx_proxyconfig_process(sock.peer, &jp, &error)))
+	if (SUCCEED == (ret = zbx_proxyconfig_process(sock.peer, &jp, &status, &error)))
 	{
 		zbx_dc_sync_configuration(ZBX_DBSYNC_UPDATE, *synced, NULL, args->config_vault,
 				args->config_proxyconfig_frequency);
@@ -138,19 +147,25 @@ static void	process_configuration_sync(size_t *data_size, zbx_synced_new_config_
 				sock.peer, error);
 		zbx_free(error);
 	}
+
+	zbx_dc_set_proxy_lastonline((int)time(NULL));
 error:
 	zbx_disconnect_from_server(&sock);
 	if (SUCCEED != ret)
 	{
 		/* reset received config_revision to force full resync after data transfer failure */
-		zbx_dc_update_received_revision(0);
+		zbx_dc_set_upstream_revision(0, 0);
 	}
 
 out:
 	zbx_free(error);
 	zbx_free(buffer);
 	zbx_json_free(&j);
-
+#ifdef	HAVE_MALLOC_TRIM
+	/* avoid memory not being released back to the system if large proxy configuration is retrieved from database */
+	if (ZBX_PROXYCONFIG_WRITE_STATUS_DATA == status)
+		malloc_trim(ZBX_MALLOC_TRIM);
+#endif
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 

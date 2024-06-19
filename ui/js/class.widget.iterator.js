@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -353,7 +348,6 @@ class CWidgetIterator extends CWidget {
 			dashboard_page: this._dashboard_page,
 			cell_width: this._cell_width,
 			cell_height: this._cell_height,
-			min_rows: this._min_rows,
 			is_editable: false,
 			is_edit_mode: false,
 			unique_id: this._createUniqueId()
@@ -428,8 +422,7 @@ class CWidgetIterator extends CWidget {
 	}
 
 	_updateTooSmallState() {
-		const is_too_small = this._pos.width < this._fields.columns
-			|| this._pos.height < this._fields.rows * this._min_rows;
+		const is_too_small = this._pos.width < this._fields.columns || this._pos.height < this._fields.rows;
 
 		this._target.classList.toggle('iterator-too-small', is_too_small);
 	}

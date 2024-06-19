@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -257,6 +252,9 @@ class CHostInterface extends CApiService {
 	 */
 	public function checkInput(array &$interfaces, $method) {
 		$update = ($method == 'update');
+		$allowed_fields = array_flip([
+			'hostid', 'type', 'ip', 'dns', 'port', 'useip', 'main', 'details', 'interface_ref', 'items', 'interfaceid'
+		]);
 
 		// permissions
 		if ($update) {
@@ -289,7 +287,7 @@ class CHostInterface extends CApiService {
 		$check_have_items = [];
 
 		foreach ($interfaces as &$interface) {
-			if (!check_db_fields($interfaceDBfields, $interface)) {
+			if (!check_db_fields($interfaceDBfields, $interface) || array_diff_key($interface, $allowed_fields)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 			}
 

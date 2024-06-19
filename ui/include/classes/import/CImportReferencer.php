@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -52,6 +47,7 @@ class CImportReferencer {
 	protected $group_prototypes = [];
 	protected $host_prototype_macros = [];
 	protected $proxies = [];
+	protected $proxy_groups = [];
 	protected $host_prototypes = [];
 	protected $httptests = [];
 	protected $httpsteps = [];
@@ -78,6 +74,7 @@ class CImportReferencer {
 	protected $db_group_prototypes;
 	protected $db_host_prototype_macros;
 	protected $db_proxies;
+	protected $db_proxy_groups;
 	protected $db_host_prototypes;
 	protected $db_httptests;
 	protected $db_httpsteps;
@@ -763,6 +760,27 @@ class CImportReferencer {
 	}
 
 	/**
+	 * Get proxy group ID by name.
+	 *
+	 * @param string $name
+	 *
+	 * @return string|null
+	 */
+	public function findProxyGroupIdByName(string $name): ?string {
+		if ($this->db_proxy_groups === null) {
+			$this->selectProxyGroups();
+		}
+
+		foreach ($this->db_proxy_groups as $proxy_groupid => $proxy_group) {
+			if ($proxy_group['name'] === $name) {
+				return $proxy_groupid;
+			}
+		}
+
+		return null;
+	}
+
+	/**
 	 * Get host prototype ID by UUID.
 	 *
 	 * @param string $uuid
@@ -1177,6 +1195,15 @@ class CImportReferencer {
 	 */
 	public function addProxies(array $proxies): void {
 		$this->proxies = $proxies;
+	}
+
+	/**
+	 * Add proxy group names that need association with a database proxy group ID.
+	 *
+	 * @param array $proxy_groups
+	 */
+	public function addProxyGroups(array $proxy_groups): void {
+		$this->proxy_groups = $proxy_groups;
 	}
 
 	/**
@@ -1856,6 +1883,25 @@ class CImportReferencer {
 		]);
 
 		$this->proxies = [];
+	}
+
+	/**
+	 * Select proxy group IDs for previously added proxy group names.
+	 */
+	protected function selectProxyGroups(): void {
+		$this->db_proxy_groups = [];
+
+		if (!$this->proxy_groups) {
+			return;
+		}
+
+		$this->db_proxy_groups = API::ProxyGroup()->get([
+			'output' => ['name'],
+			'filter' => ['name' => array_keys($this->proxy_groups)],
+			'preservekeys' => true
+		]);
+
+		$this->proxy_groups = [];
 	}
 
 	/**

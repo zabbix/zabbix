@@ -1,21 +1,16 @@
 <?php declare(strict_types = 0);
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -57,6 +52,7 @@ class CRoleHelper {
 	public const UI_ADMINISTRATION_GENERAL = 'ui.administration.general';
 	public const UI_ADMINISTRATION_AUDIT_LOG = 'ui.administration.audit_log';
 	public const UI_ADMINISTRATION_HOUSEKEEPING = 'ui.administration.housekeeping';
+	public const UI_ADMINISTRATION_PROXY_GROUPS = 'ui.administration.proxy_groups';
 	public const UI_ADMINISTRATION_PROXIES = 'ui.administration.proxies';
 	public const UI_ADMINISTRATION_MACROS = 'ui.administration.macros';
 	public const UI_ADMINISTRATION_AUTHENTICATION = 'ui.administration.authentication';
@@ -104,8 +100,6 @@ class CRoleHelper {
 	 * Array for storing roles data (including rules) loaded from Role API object and converted to one format. The data
 	 * of specific role can be accessed in following way: self::roles[{role ID}].
 	 *
-	 * @static
-	 *
 	 * @var array
 	 */
 	private static $roles = [];
@@ -126,8 +120,6 @@ class CRoleHelper {
 
 	/**
 	 * Checks the access of specific role to specific rule.
-	 *
-	 * @static
 	 *
 	 * @param string $rule_name  Name of the rule to check access for.
 	 * @param string $roleid     ID of the role where check of access is necessary to perform.
@@ -150,8 +142,6 @@ class CRoleHelper {
 	 * Gets list of API methods (with wildcards if that exists) that are considered allowed or denied (depending on
 	 * API access mode) for specific role.
 	 *
-	 * @static
-	 *
 	 * @param string $roleid  Role ID.
 	 *
 	 * @return array  Returns the array of API methods.
@@ -166,8 +156,6 @@ class CRoleHelper {
 
 	/**
 	 * Loads once all rules of specified Role API objects by ID and converts rule data to one format.
-	 *
-	 * @static
 	 *
 	 * @param string $roleid  Role ID.
 	 *
@@ -231,8 +219,6 @@ class CRoleHelper {
 	/**
 	 * Gets all available UI elements rules for specific user type.
 	 *
-	 * @static
-	 *
 	 * @param integer $user_type  User type.
 	 *
 	 * @return array  Returns the array of rule names for specified user type.
@@ -288,6 +274,7 @@ class CRoleHelper {
 				self::UI_ADMINISTRATION_GENERAL,
 				self::UI_ADMINISTRATION_AUDIT_LOG,
 				self::UI_ADMINISTRATION_HOUSEKEEPING,
+				self::UI_ADMINISTRATION_PROXY_GROUPS,
 				self::UI_ADMINISTRATION_PROXIES,
 				self::UI_ADMINISTRATION_MACROS,
 				self::UI_ADMINISTRATION_QUEUE
@@ -299,8 +286,6 @@ class CRoleHelper {
 
 	/**
 	 * Gets all available actions rules for specific user type.
-	 *
-	 * @static
 	 *
 	 * @param integer $user_type  User type.
 	 *
@@ -326,8 +311,6 @@ class CRoleHelper {
 
 	/**
 	 * Gets labels of all available UI sections for specific user type in order as it need to display in UI.
-	 *
-	 * @static
 	 *
 	 * @param integer $user_type  User type.
 	 *
@@ -361,8 +344,6 @@ class CRoleHelper {
 
 	/**
 	 * Gets labels of all available rules for specific UI section and user type in order as it need to display in UI.
-	 *
-	 * @static
 	 *
 	 * @param string  $ui_section_name  UI section name.
 	 * @param integer $user_type        User type.
@@ -507,6 +488,7 @@ class CRoleHelper {
 						self::UI_ADMINISTRATION_GENERAL => _('General'),
 						self::UI_ADMINISTRATION_AUDIT_LOG => _('Audit log'),
 						self::UI_ADMINISTRATION_HOUSEKEEPING => _('Housekeeping'),
+						self::UI_ADMINISTRATION_PROXY_GROUPS => _('Proxy groups'),
 						self::UI_ADMINISTRATION_PROXIES => _('Proxies'),
 						self::UI_ADMINISTRATION_MACROS => _('Macros'),
 						self::UI_ADMINISTRATION_QUEUE => _('Queue')
@@ -522,8 +504,6 @@ class CRoleHelper {
 	/**
 	 * Gets labels of all available actions rules for specific user type in order as it need to display on user roles
 	 * page.
-	 *
-	 * @static
 	 *
 	 * @param integer $user_type  User type.
 	 *
@@ -567,8 +547,6 @@ class CRoleHelper {
 	/**
 	 * Returns a list of all API methods by user type or API methods available only for the given user type.
 	 *
-	 * @static
-	 *
 	 * @param int|null $user_type
 	 *
 	 * @return array
@@ -584,8 +562,6 @@ class CRoleHelper {
 	/**
 	 * Returns a list of API methods with masks for the given user type.
 	 *
-	 * @static
-	 *
 	 * @param int|null $user_type
 	 *
 	 * @return array
@@ -600,8 +576,6 @@ class CRoleHelper {
 
 	/**
 	 * Returns a list of API methods for each method mask for the given user type.
-	 *
-	 * @static
 	 *
 	 * @param int $user_type
 	 *
@@ -622,8 +596,6 @@ class CRoleHelper {
 
 	/**
 	 * Collects all API methods for all user types.
-	 *
-	 * @static
 	 */
 	private static function loadApiMethods(): void {
 		$api_methods = [

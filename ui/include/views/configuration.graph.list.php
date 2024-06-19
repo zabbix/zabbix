@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -172,7 +167,8 @@ $graphTable = (new CTableInfo())
 		make_sorting_header(_('Graph type'), 'graphtype', $this->data['sort'], $this->data['sortorder'], $url),
 		$discover,
 		$info_column
-	]);
+	])
+	->setPageNavigation($data['paging']);
 
 $csrf_token = CCsrfTokenHelper::get('graphs.php');
 
@@ -180,6 +176,7 @@ foreach ($data['graphs'] as $graph) {
 	$graphid = $graph['graphid'];
 
 	$hostList = null;
+
 	if (empty($this->data['hostid'])) {
 		$hostList = [];
 		foreach ($graph['hosts'] as $host) {
@@ -255,6 +252,7 @@ foreach ($data['graphs'] as $graph) {
 
 // buttons
 $buttons = [];
+
 if (!$this->data['parent_discoveryid']) {
 	$buttons['graph.masscopyto'] = [
 		'content' => (new CSimpleButton(_('Copy')))
@@ -263,6 +261,7 @@ if (!$this->data['parent_discoveryid']) {
 			->removeId()
 	];
 }
+
 $buttons['graph.massdelete'] = [
 	'name' => _('Delete'),
 	'confirm_singular' => $this->data['parent_discoveryid']
@@ -277,10 +276,7 @@ $buttons['graph.massdelete'] = [
 // append table to form
 $graphForm->addItem([
 	$graphTable,
-	$data['paging'],
-	new CActionButtonList('action', 'group_graphid', $buttons,
-		$data['parent_discoveryid'] ?: $data['hostid']
-	)
+	new CActionButtonList('action', 'group_graphid', $buttons, $data['parent_discoveryid'] ?: $data['hostid'])
 ]);
 
 (new CScriptTag('
