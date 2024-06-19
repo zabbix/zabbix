@@ -1,23 +1,19 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-class ClassWidgetSelectPopup {
+
+class CWidgetSelectPopup {
 
 	static #table_template = `
 		<table class="${ZBX_STYLE_LIST_TABLE}">
@@ -39,7 +35,7 @@ class ClassWidgetSelectPopup {
 	`;
 
 	static #nothing_to_show_template = `
-		<tr class="${ZBX_STYLE_NOTHING_TO_SHOW}">
+		<tr>
 			<td>${t('No compatible widgets.')}</td>
 		</tr>
 	`;
@@ -50,19 +46,20 @@ class ClassWidgetSelectPopup {
 	#overlay;
 
 	constructor(widgets) {
-		const widgets_table = new Template(ClassWidgetSelectPopup.#table_template).evaluateToElement();
+		const widgets_table = new Template(CWidgetSelectPopup.#table_template).evaluateToElement();
 
 		let rows_html = '';
 
 		if (widgets.length > 0) {
-			const widget_row = new Template(ClassWidgetSelectPopup.#row_template);
+			const widget_row = new Template(CWidgetSelectPopup.#row_template);
 
 			for (const widget of widgets) {
 				rows_html += widget_row.evaluate(widget);
 			}
 		}
 		else {
-			rows_html = ClassWidgetSelectPopup.#nothing_to_show_template;
+			widgets_table.classList.add(ZBX_STYLE_NO_DATA);
+			rows_html = CWidgetSelectPopup.#nothing_to_show_template;
 		}
 
 		widgets_table.querySelector('tbody').innerHTML = rows_html;
@@ -95,7 +92,7 @@ class ClassWidgetSelectPopup {
 	 * @param {function}      listener
 	 * @param {Object|false}  options
 	 *
-	 * @returns {ClassWidgetSelectPopup}
+	 * @returns {CWidgetSelectPopup}
 	 */
 	on(type, listener, options = false) {
 		this.#overlay.$dialogue[0].addEventListener(type, listener, options);
@@ -110,7 +107,7 @@ class ClassWidgetSelectPopup {
 	 * @param {function}      listener
 	 * @param {Object|false}  options
 	 *
-	 * @returns {ClassWidgetSelectPopup}
+	 * @returns {CWidgetSelectPopup}
 	 */
 	off(type, listener, options = false) {
 		this.#overlay.$dialogue[0].removeEventListener(type, listener, options);

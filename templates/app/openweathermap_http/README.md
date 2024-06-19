@@ -7,7 +7,7 @@ This template is designed for the effortless deployment of OpenWeatherMap monito
 
 ## Requirements
 
-Zabbix version: 7.0 and higher.
+Zabbix version: 7.2 and higher.
 
 ## Tested versions
 
@@ -16,7 +16,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.0/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.2/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -55,14 +55,14 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Openweathermap: Get data|<p>JSON array with result of OpenWeatherMap API requests.</p>|Script|openweathermap.get.data|
-|Openweathermap: Get data collection errors|<p>Errors from get data requests by script item.</p>|Dependent item|openweathermap.get.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.errors`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Get data|<p>JSON array with result of OpenWeatherMap API requests.</p>|Script|openweathermap.get.data|
+|Get data collection errors|<p>Errors from get data requests by script item.</p>|Dependent item|openweathermap.get.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.errors`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Openweathermap: There are errors in requests to OpenWeatherMap API|<p>Zabbix has received errors in requests to OpenWeatherMap API.</p>|`length(last(/OpenWeatherMap by HTTP/openweathermap.get.errors))>0`|Average|**Manual close**: Yes|
+|There are errors in requests to OpenWeatherMap API|<p>Zabbix has received errors in requests to OpenWeatherMap API.</p>|`length(last(/OpenWeatherMap by HTTP/openweathermap.get.errors))>0`|Average|**Manual close**: Yes|
 
 ### LLD rule Locations discovery
 

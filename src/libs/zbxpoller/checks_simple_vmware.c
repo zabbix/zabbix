@@ -1,27 +1,22 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#include "checks_simple_vmware.h"
-
-#include "config.h"
+#include "zbxcommon.h"
 
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
+
+#include "checks_simple_vmware.h"
 
 #include "zbxvmware.h"
 #include "zbxxml.h"
@@ -30,6 +25,7 @@
 #include "zbxjson.h"
 #include "zbxnum.h"
 #include "zbxstr.h"
+#include "zbxalgo.h"
 
 #define ZBX_VMWARE_DATASTORE_SIZE_TOTAL		0
 #define ZBX_VMWARE_DATASTORE_SIZE_FREE		1
@@ -1071,7 +1067,7 @@ static void	vmware_get_events(const zbx_vector_vmware_event_ptr_t *events,
 	/* events were retrieved in reverse chronological order */
 	for (int i = events->values_num - 1; i >= 0; i--)
 	{
-		const zbx_vmware_event_t	*event = (zbx_vmware_event_t *)events->values[i];
+		const zbx_vmware_event_t	*event = events->values[i];
 		AGENT_RESULT			*add_result = NULL;
 
 		/* Event id of ESXi will reset when ESXi is rebooted */
@@ -1174,6 +1170,7 @@ int	check_vcenter_eventlog(AGENT_REQUEST *request, const zbx_dc_item_t *item, AG
 	unsigned char		skip_old, severity = 0;
 	zbx_vmware_service_t	*service;
 	int			ret = SYSINFO_RET_FAIL;
+	time_t			lastaccess;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1216,6 +1213,20 @@ int	check_vcenter_eventlog(AGENT_REQUEST *request, const zbx_dc_item_t *item, AG
 	if (NULL == (service = get_vmware_service(url, item->username, item->password, result, &ret)))
 		goto unlock;
 
+	if (0 == (service->jobs_type & ZBX_VMWARE_UPDATE_EVENTLOG))
+	{
+		service->jobs_type |= ZBX_VMWARE_REQ_UPDATE_EVENTLOG;
+		ret = SYSINFO_RET_OK;
+		goto unlock;
+	}
+
+	lastaccess = time(NULL);
+
+	if (0 != service->eventlog.lastaccess)
+		service->eventlog.interval = lastaccess - service->eventlog.lastaccess;
+
+	service->eventlog.lastaccess = lastaccess;
+
 	if (severity != service->eventlog.severity)
 		service->eventlog.severity = severity;
 
@@ -1226,24 +1237,32 @@ int	check_vcenter_eventlog(AGENT_REQUEST *request, const zbx_dc_item_t *item, AG
 		service->eventlog.last_key = request->lastlogsize;
 		service->eventlog.last_ts = 0;
 		service->eventlog.skip_old = skip_old;
+		service->eventlog.owner_itemid = item->itemid;
 	}
 	else if (0 != service->eventlog.oom)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Not enough shared memory to store VMware events."));
 		goto unlock;
 	}
-	else if (request->lastlogsize < service->eventlog.last_key && 0 != request->lastlogsize)
+	else if (NULL != service->eventlog.data->error)
 	{
-		/* This may happen if there are multiple vmware.eventlog items for the same service URL or item has   */
-		/* been polled, but values got stuck in history cache and item's lastlogsize hasn't been updated yet. */
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too old events requested."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, service->eventlog.data->error));
 		goto unlock;
 	}
-	else if (0 < service->data->events.values_num)
+	else if (item->itemid != service->eventlog.owner_itemid)
 	{
-		vmware_get_events(&service->data->events, &service->eventlog, item, add_results);
-		service->eventlog.last_key = ((const zbx_vmware_event_t *)service->data->events.values[0])->key;
-		service->eventlog.last_ts = ((const zbx_vmware_event_t *)service->data->events.values[0])->timestamp;
+		/* To protect against data fragmentation among multiple vmware event items. */
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Duplicate VMware eventlog item is not supported"));
+		goto unlock;
+	}
+	else if (0 < service->eventlog.data->events.values_num)
+	{
+		/* Some times request->lastlogsize value gets stuck due to concurrent update of history cache */
+		/* thereby we can rely to value of the request->lastlogsize and have to return events based on */
+		/* internal state of the service->eventlog */
+		vmware_get_events(&service->eventlog.data->events, &service->eventlog, item, add_results);
+		service->eventlog.last_key = service->eventlog.data->events.values[0]->key;
+		service->eventlog.last_ts = service->eventlog.data->events.values[0]->timestamp;
 	}
 
 	ret = SYSINFO_RET_OK;
@@ -4597,7 +4616,7 @@ int	check_vcenter_vm_memory_size_compressed(AGENT_REQUEST *request, const char *
 	ret = get_vcenter_vmprop(request, username, password, ZBX_VMWARE_VMPROP_MEMORY_SIZE_COMPRESSED, result);
 
 	if (SYSINFO_RET_OK == ret && NULL != ZBX_GET_UI64_RESULT(result))
-		result->ui64 = result->ui64 * ZBX_MEBIBYTE;
+		result->ui64 = result->ui64 * ZBX_KIBIBYTE;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 

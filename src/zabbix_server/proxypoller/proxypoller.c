@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "proxypoller.h"
@@ -25,6 +20,7 @@
 #include "discovery/discovery_server.h"
 #include "autoreg/autoreg_server.h"
 
+#include "zbxtimekeeper.h"
 #include "zbxexpression.h"
 #include "zbxdbwrap.h"
 #include "zbxnix.h"
@@ -264,7 +260,7 @@ static int	proxy_send_configuration(zbx_dc_proxy_t *proxy, const zbx_config_vaul
 	struct zbx_json			j;
 	struct zbx_json_parse		jp;
 	size_t				buffer_size, reserved = 0;
-	zbx_proxyconfig_status_t	status;
+	zbx_proxyconfig_status_t	status = ZBX_PROXYCONFIG_STATUS_DATA;
 
 
 	zbx_json_init(&j, 512 * ZBX_KIBIBYTE);
@@ -352,7 +348,11 @@ out:
 	zbx_free(buffer);
 	zbx_free(error);
 	zbx_json_free(&j);
-
+#ifdef	HAVE_MALLOC_TRIM
+	/* avoid memory not being released back to the system if large proxy configuration is retrieved from database */
+	if (ZBX_PROXYCONFIG_STATUS_DATA == status)
+		malloc_trim(ZBX_MALLOC_TRIM);
+#endif
 	return ret;
 }
 

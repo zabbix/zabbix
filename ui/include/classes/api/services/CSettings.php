@@ -1,21 +1,16 @@
 <?php declare(strict_types = 0);
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -45,7 +40,7 @@ class CSettings extends CApiService {
 		'report_test_timeout', 'auditlog_enabled', 'auditlog_mode', 'ha_failover_delay', 'geomaps_tile_provider',
 		'geomaps_tile_url', 'geomaps_max_zoom', 'geomaps_attribution', 'vault_provider', 'timeout_zabbix_agent',
 		'timeout_simple_check', 'timeout_snmp_agent', 'timeout_external_check', 'timeout_db_monitor',
-		'timeout_http_agent', 'timeout_ssh_agent', 'timeout_telnet_agent', 'timeout_script'
+		'timeout_http_agent', 'timeout_ssh_agent', 'timeout_telnet_agent', 'timeout_script', 'timeout_browser'
 	];
 
 	/**
@@ -96,14 +91,26 @@ class CSettings extends CApiService {
 	 * Get the private settings used in UI.
 	 */
 	public static function getPrivate(): array {
-		$output_fields = ['session_key', 'dbversion_status', 'server_status'];
+		$output_fields = ['session_key', 'dbversion_status', 'server_status', 'software_update_checkid',
+			'software_update_check_data'
+		];
 
 		$db_settings = DB::select('config', ['output' => $output_fields])[0];
 
 		$db_settings['dbversion_status'] = json_decode($db_settings['dbversion_status'], true) ?: [];
 
 		$db_settings['server_status'] = json_decode($db_settings['server_status'], true) ?: [];
-		$db_settings['server_status'] += ['configuration' => ['enable_global_scripts' => true]];
+		$db_settings['server_status'] += ['configuration' => [
+			'enable_global_scripts' => true,
+			'allow_software_update_check' => false
+		]];
+
+		if ($db_settings['software_update_checkid'] !== '') {
+			$db_settings['software_update_checkid'] = hash('sha256', $db_settings['software_update_checkid']);
+		}
+
+		$db_settings['software_update_check_data'] =
+			json_decode($db_settings['software_update_check_data'], true) ?: [];
 
 		return $db_settings;
 	}
@@ -217,7 +224,8 @@ class CSettings extends CApiService {
 			'timeout_http_agent' =>				['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:600'],
 			'timeout_ssh_agent' =>				['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:600'],
 			'timeout_telnet_agent' =>			['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:600'],
-			'timeout_script' =>					['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:600']
+			'timeout_script' =>					['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:600'],
+			'timeout_browser' =>				['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:600']
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $settings, '/', $error)) {
@@ -288,5 +296,21 @@ class CSettings extends CApiService {
 		$output_fields[] = 'configid';
 
 		return DB::select('config', ['output' => $output_fields])[0];
+	}
+
+	public static function updatePrivate(array $settings): array {
+		$settings['software_update_check_data'] = json_encode($settings['software_update_check_data']);
+		$db_settings = DB::select('config', ['output' => ['configid', 'software_update_check_data']])[0];
+
+		$upd_config = DB::getUpdatedValues('config', $settings, $db_settings);
+
+		if ($upd_config) {
+			DB::update('config', [
+				'values' => $upd_config,
+				'where' => ['configid' => $db_settings['configid']]
+			]);
+		}
+
+		return array_keys($settings);
 	}
 }

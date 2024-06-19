@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 package tls
@@ -42,14 +37,14 @@ const char	*tls_crypto_init_msg;
 #include <openssl/rand.h>
 
 #if defined(LIBRESSL_VERSION_NUMBER)
-#	error package zabbix.com/pkg/tls cannot be compiled with LibreSSL. Encryption is supported with OpenSSL.
+#	error package golang.zabbix.com/agent2/pkg/tls cannot be compiled with LibreSSL. Encryption is supported with OpenSSL.
 #elif !defined(HAVE_OPENSSL_WITH_PSK)
-#	error package zabbix.com/pkg/tls cannot be compiled with OpenSSL which has excluded PSK support.
+#	error package golang.zabbix.com/agent2/pkg/tls cannot be compiled with OpenSSL which has excluded PSK support.
 #elif defined(_WINDOWS) && OPENSSL_VERSION_NUMBER < 0x1010100fL	// On MS Windows OpenSSL 1.1.1 is required
-#	error on Microsoft Windows the package zabbix.com/pkg/tls requires OpenSSL 1.1.1 or newer.
+#	error on Microsoft Windows the package golang.zabbix.com/aagent2/pkg/tls requires OpenSSL 1.1.1 or newer.
 #elif OPENSSL_VERSION_NUMBER < 0x1000100fL
 	// OpenSSL before 1.0.1
-#	error package zabbix.com/pkg/tls cannot be compiled with this OpenSSL version.\
+#	error package golang.zabbix.com/agent2/pkg/tls cannot be compiled with this OpenSSL version.\
 		Supported versions are 1.0.1 and newer.
 #endif
 

@@ -1,0 +1,21 @@
+.no-data-message {
+	display: grid;
+	align-content: center;
+	height: 100%;
+	color: $font-alt-color;
+	text-align: center;
+
+	&[class^="zi-"], &[class*=" zi-"] {
+		font-size: 16px;
+
+		&::before {
+			display: block;
+			margin-bottom: 8px;
+		}
+	}
+
+	.no-data-description {
+		font-size: 14px;
+		margin-top: 4px;
+	}
+}

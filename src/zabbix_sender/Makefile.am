@@ -8,7 +8,7 @@ zabbix_sender_SOURCES = \
 	send_buffer.h
 
 zabbix_sender_LDADD = \
-	$(top_builddir)/src/libs/zbxaux/libzbxaux.a \
+	$(top_builddir)/src/libs/zbxbincommon/libzbxbincommon.a \
 	$(top_builddir)/src/libs/zbxjson/libzbxjson.a \
 	$(top_builddir)/src/libs/zbxalgo/libzbxalgo.a \
 	$(top_builddir)/src/libs/zbxregexp/libzbxregexp.a \

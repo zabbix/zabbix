@@ -1,3 +1,17 @@
+/*
+** Copyright (C) 2001-2024 Zabbix SIA
+**
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
+**
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
+**
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
+**/
+
 #include "zbxcommon.h"
 
 #ifdef HAVE_IPCSERVICE
@@ -10,6 +24,7 @@
 #include "zbxipcservice.h"
 #include "zbxalgo.h"
 #include "zbxstr.h"
+#include "zbxtime.h"
 
 #define ZBX_IPC_PATH_MAX	sizeof(((struct sockaddr_un *)0)->sun_path)
 
@@ -1501,7 +1516,7 @@ int	zbx_ipc_service_start(zbx_ipc_service_t *service, const char *service_name, 
 		goto out;
 	}
 
-	service->path = zbx_strdup(NULL, service_name);
+	service->path = zbx_strdup(NULL, socket_path);
 	zbx_vector_ipc_client_ptr_create(&service->clients);
 	zbx_queue_ptr_create(&service->clients_recv);
 
@@ -1535,6 +1550,9 @@ void	zbx_ipc_service_close(zbx_ipc_service_t *service)
 
 	if (0 != close(service->fd))
 		zabbix_log(LOG_LEVEL_DEBUG, "Cannot close path \"%s\": %s", service->path, zbx_strerror(errno));
+
+	if (-1 == unlink(service->path))
+		zabbix_log(LOG_LEVEL_WARNING, "cannot remove socket at %s: %s.", service->path, zbx_strerror(errno));
 
 	for (int i = 0; i < service->clients.values_num; i++)
 		ipc_client_free(service->clients.values[i]);

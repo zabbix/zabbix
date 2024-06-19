@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -135,8 +130,6 @@ class CCorrelation extends CApiService {
 	}
 
 	/**
-	 * @static
-	 *
 	 * @param array $db_conditions
 	 * @param array $condition
 	 *
@@ -185,8 +178,6 @@ class CCorrelation extends CApiService {
 	}
 
 	/**
-	 * @static
-	 *
 	 * @param array      $correlations
 	 * @param string     $method
 	 * @param array|null $db_correlations
@@ -318,8 +309,6 @@ class CCorrelation extends CApiService {
 	}
 
 	/**
-	 * @static
-	 *
 	 * @param array      $correlations
 	 * @param string     $method
 	 * @param array|null $db_correlations
@@ -448,8 +437,6 @@ class CCorrelation extends CApiService {
 	/**
 	 * Validates the input parameters for the delete() method.
 	 *
-	 * @static
-	 *
 	 * @param array      $correlationids
 	 * @param array|null $db_correlations
 	 *
@@ -475,8 +462,6 @@ class CCorrelation extends CApiService {
 
 	/**
 	 * Check for unique event correlation names.
-	 *
-	 * @static
 	 *
 	 * @param array      $correlations
 	 * @param array|null $db_correlations
@@ -516,8 +501,6 @@ class CCorrelation extends CApiService {
 
 	/**
 	 * Returns validation rules for the filter object.
-	 *
-	 * @static
 	 *
 	 * @return array
 	 */
@@ -569,8 +552,6 @@ class CCorrelation extends CApiService {
 	/**
 	 * Validates the input parameters for the create() method.
 	 *
-	 * @static
-	 *
 	 * @param array $correlations
 	 *
 	 * @throws APIException if the input is invalid.
@@ -597,8 +578,6 @@ class CCorrelation extends CApiService {
 
 	/**
 	 * Check host group permissions.
-	 *
-	 * @static
 	 *
 	 * @param array $correlations
 	 */
@@ -632,8 +611,6 @@ class CCorrelation extends CApiService {
 	}
 
 	/**
-	 * @static
-	 *
 	 * @param array      $correlations
 	 * @param array|null $db_correlations
 	 *
@@ -674,8 +651,6 @@ class CCorrelation extends CApiService {
 
 	/**
 	 * Validate correlation condition formula IDs. Check the "formulaid" field and that formula matches the conditions.
-	 *
-	 * @static
 	 *
 	 * @param array $correlations
 	 *
@@ -880,8 +855,6 @@ class CCorrelation extends CApiService {
 	}
 
 	/**
-	 * @static
-	 *
 	 * @param array $correlations
 	 * @param array $db_correlations
 	 */

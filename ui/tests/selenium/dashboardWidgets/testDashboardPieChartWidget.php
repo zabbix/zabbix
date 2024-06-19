@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -94,25 +89,25 @@ class testDashboardPieChartWidget extends testWidgets {
 							'type' => 'piechart',
 							'x' => 0,
 							'y' => 0,
-							'width' => 6,
+							'width' => 18,
 							'height' => 4,
 							'fields' => $fields
 						],
 						[
 							'name' => 'Pie chart for delete',
 							'type' => 'piechart',
-							'x' => 6,
+							'x' => 18,
 							'y' => 0,
-							'width' => 6,
+							'width' => 18,
 							'height' => 4,
 							'fields' => $fields
 						],
 						[
 							'name' => 'Pie chart for cancel',
 							'type' => 'piechart',
-							'x' => 12,
+							'x' => 36,
 							'y' => 0,
-							'width' => 6,
+							'width' => 18,
 							'height' => 4,
 							'fields' => $fields
 						]
@@ -167,6 +162,12 @@ class testDashboardPieChartWidget extends testWidgets {
 					[
 						'name' => 'item-4',
 						'key_' => 'item-4',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_FLOAT
+					],
+					[
+						'name' => 'item-5',
+						'key_' => 'item-5',
 						'type' => ITEM_TYPE_TRAPPER,
 						'value_type' => ITEM_VALUE_TYPE_FLOAT
 					]
@@ -294,7 +295,7 @@ class testDashboardPieChartWidget extends testWidgets {
 			'Space between sectors' => '1',
 			'id:merge' => false,         // 'Merge sectors smaller than' checkbox
 			'id:merge_percent' => '1',   // 'Merge sectors smaller than' input
-			'id:merge_color' => 'FFD54F' // 'Merge sectors smaller than' color picker
+			'id:merge_color' => '768D99' // 'Merge sectors smaller than' color picker
 		];
 		$form->checkValue($expected_values);
 		$expected_labels = ['History data selection', 'Draw', 'Space between sectors', 'Merge sectors smaller than'];
@@ -322,6 +323,7 @@ class testDashboardPieChartWidget extends testWidgets {
 		$form->invalidate();
 		$inputs_enabled = [
 			'Width' => true,
+			'Stroke width' => true,
 			'Show total value' => true,
 			'Size' => false,
 			'Decimal places' => false,
@@ -332,7 +334,8 @@ class testDashboardPieChartWidget extends testWidgets {
 		$expected_labels = array_merge($expected_labels, array_keys($inputs_enabled));
 		$this->assertAllVisibleLabels($displaying_options_tab, $expected_labels);
 		$this->assertRangeSliderParameters($form, 'Width', ['min' => '20', 'max' => '50', 'step' => '10']);
-		$form->checkValue(['Space between sectors' => 1, 'Width' => 50]);
+		$this->assertRangeSliderParameters($form, 'Stroke width', ['min' => '0', 'max' => '10', 'step' => '1']);
+		$form->checkValue(['Space between sectors' => 1, 'Width' => 50, 'Stroke width' => 0]);
 		$expected_values = [
 			'Show total value' => false,
 			'Size' => 'Auto',
@@ -353,7 +356,7 @@ class testDashboardPieChartWidget extends testWidgets {
 			'id:merge_percent' => 2,
 			'id:width' => 2,
 			'Decimal places' => 1,
-			'id:units' => 2048
+			'id:units' => 255
 		];
 		foreach ($field_maxlengths as $field_selector => $maxlength) {
 			$this->assertFieldAttributes($form, $field_selector, ['maxlength' => $maxlength]);
@@ -447,6 +450,8 @@ class testDashboardPieChartWidget extends testWidgets {
 		$this->assertEquals(['Add', 'Cancel'],
 				$dialog->getFooter()->query('button')->all()->filter(CElementFilter::CLICKABLE)->asText()
 		);
+
+		$dialog->close();
 	}
 
 	public function getPieChartData() {
@@ -511,6 +516,7 @@ class testDashboardPieChartWidget extends testWidgets {
 							'History data selection' => 'History',
 							'Draw' => 'Doughnut',
 							'Width' => '40',
+							'Stroke width' => '5',
 							'Space between sectors' => '2',
 							'id:merge' => true,
 							'id:merge_percent' => '10',
@@ -804,7 +810,7 @@ class testDashboardPieChartWidget extends testWidgets {
 						[
 							'name' => 'Edit widget',
 							'type' => 'piechart',
-							'width' => 12,
+							'width' => 36,
 							'height' => 8,
 							'fields' => [
 								['name' => 'ds.0.hosts.0', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'Test Host'],
@@ -898,7 +904,7 @@ class testDashboardPieChartWidget extends testWidgets {
 		$fields['Data set'][1] = $fields['Data set'][0];
 		$fields['Data set'][1]['color'] = 'FF465C';
 		$fields['Data set'][3] = $fields['Data set'][2];
-		$fields['Data set'][3]['items'][0]['il_color'] = '0EC9AC';
+		$fields['Data set'][3]['items'][0]['il_color'] = 'FFD54F';
 
 		// Assert the result.
 		$this->assertEditFormAfterSave($dashboard, ['fields' => $fields]);
@@ -987,8 +993,17 @@ class testDashboardPieChartWidget extends testWidgets {
 			$dashboard->save();
 		}
 
+		$this->page->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboard_id);
+
+		// Check that alert is present in case of saving the widget without saving the dashboard.
+		if ($data['save_widget'] == true && $data['save_dashboard'] == false) {
+			$this->page->acceptAlert();
+		}
+
+		$this->page->waitUntilReady();
+		$dashboard->selectPage(self::PAGE_2);
+
 		// Assert that widget count and DB data has not changed.
-		$dashboard = $this->openDashboard(WITHOUT_LOGIN, self::PAGE_2);
 		$this->assertEquals($old_widget_count, $dashboard->getWidgets()->count());
 		$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
 	}
@@ -1052,7 +1067,7 @@ class testDashboardPieChartWidget extends testWidgets {
 							'name' => $data['widget_name'],
 							'view_mode' => CTestArrayHelper::get($data, 'view_mode', 0),
 							'type' => 'piechart',
-							'width' => 8,
+							'width' => 24,
 							'height' => 6,
 							'fields' => $data['widget_fields']
 						]
@@ -1117,13 +1132,13 @@ class testDashboardPieChartWidget extends testWidgets {
 					]
 				]
 			],
-			// Four items, host and item pattern, custom colors, hide legend and header.
+			// Five items, host and item pattern, custom colors, hide legend and header.
 			[
 				[
-					'widget_name' => 'four-items',
+					'widget_name' => 'five-items',
 					'view_mode' => 1,
 					'widget_fields' => [
-						['name' => 'ds.0.hosts.0', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'pie-chart*'],
+						['name' => 'ds.0.hosts.0', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'pie-chart-display'],
 						['name' => 'ds.0.items.0', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'item-*'],
 						['name' => 'ds.0.color', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'FFA726'],
 						['name' => 'legend', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 0]
@@ -1132,13 +1147,15 @@ class testDashboardPieChartWidget extends testWidgets {
 						'item-1' => 1,
 						'item-2' => 2,
 						'item-3' => 3.0,
-						'item-4' => 4.4
+						'item-4' => 4.4,
+						'item-5' => 5.55
 					],
 					'expected_sectors' => [
-						'item-1' => ['value' => '1', 'color' => '212, 124, 0'],
-						'item-2' => ['value' => '2', 'color' => '255, 209, 80'],
-						'item-3' => ['value' => '3', 'color' => '255, 252, 123'],
-						'item-4' => ['value' => '4.4', 'color' => '255, 255, 165']
+						'item-1' => ['value' => '1', 'color' => '127, 39, 0'],
+						'item-2' => ['value' => '2', 'color' => '178, 90, 0'],
+						'item-3' => ['value' => '3', 'color' => '229, 141, 12'],
+						'item-4' => ['value' => '4.4', 'color' => '255, 192, 63'],
+						'item-5' => ['value' => '5.55', 'color' => '255, 243, 114']
 					]
 				]
 			],
@@ -1151,16 +1168,19 @@ class testDashboardPieChartWidget extends testWidgets {
 						['name' => 'ds.0.dataset_type', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 0],
 						['name' => 'ds.0.itemids.0', 'type' => ZBX_WIDGET_FIELD_TYPE_ITEM, 'value' => 'item-1'],
 						['name' => 'ds.0.type.0', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 1],
-						['name' => 'ds.0.color.0', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'FFEBEE'],
+						['name' => 'ds.0.color.0', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'FF002F'],
 						['name' => 'ds.0.itemids.1', 'type' => ZBX_WIDGET_FIELD_TYPE_ITEM, 'value' => 'item-2'],
 						['name' => 'ds.0.type.1', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 0],
-						['name' => 'ds.0.color.1', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'E53935'],
+						['name' => 'ds.0.color.1', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'FF4265'],
 						['name' => 'ds.0.itemids.2', 'type' => ZBX_WIDGET_FIELD_TYPE_ITEM, 'value' => 'item-3'],
 						['name' => 'ds.0.type.2', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 0],
-						['name' => 'ds.0.color.2', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => '546E7A'],
+						['name' => 'ds.0.color.2', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'FA6984'],
 						['name' => 'ds.0.itemids.3', 'type' => ZBX_WIDGET_FIELD_TYPE_ITEM, 'value' => 'item-4'],
 						['name' => 'ds.0.type.3', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 0],
-						['name' => 'ds.0.color.3', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => '546EAA'],
+						['name' => 'ds.0.color.3', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => '525252'],
+						['name' => 'ds.0.itemids.4', 'type' => ZBX_WIDGET_FIELD_TYPE_ITEM, 'value' => 'item-5'],
+						['name' => 'ds.0.type.4', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 0],
+						['name' => 'ds.0.color.4', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => '525252'],
 						// Drawing and total value options.
 						['name' => 'draw_type', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 1],
 						['name' => 'width', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 50],
@@ -1172,10 +1192,11 @@ class testDashboardPieChartWidget extends testWidgets {
 						['name' => 'units', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => '♥'],
 						['name' => 'value_bold', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 1],
 						['name' => 'value_color', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => '7CB342'],
-						['name' => 'space', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 2],
+						['name' => 'stroke', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 8],
+						['name' => 'space', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 6],
 						['name' => 'merge', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 1],
 						['name' => 'merge_percent', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 10],
-						['name' => 'merge_color', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'B71C1C'],
+						['name' => 'merge_color', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => '69B4FA'],
 						// Legend with values.
 						['name' => 'legend_value', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 1],
 						['name' => 'legend_lines_mode', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 1],
@@ -1183,15 +1204,17 @@ class testDashboardPieChartWidget extends testWidgets {
 					],
 					'item_data' => [
 						'item-1' => 100,
-						'item-2' => 41,
-						'item-3' => 4,
-						'item-4' => 5
+						'item-2' => 25,
+						'item-3' => 35,
+						'item-4' => 4,
+						'item-5' => 5
 					],
 					'expected_total' => '100 ♥',
 					'expected_sectors' => [
-						'item-1' => ['value' => '100 ♥', 'color' => '255, 235, 238'],
-						'item-2' => ['value' => '41 ♥', 'color' => '229, 57, 53'],
-						'Other' => ['value' => '9 ♥', 'color' => '183, 28, 28']
+						'item-1' => ['value' => '100 ♥', 'color' => '255, 0, 47'],
+						'item-2' => ['value' => '25 ♥', 'color' => '255, 66, 101'],
+						'item-3' => ['value' => '35 ♥', 'color' => '250, 105, 132'],
+						'Other' => ['value' => '9 ♥', 'color' => '105, 180, 250']
 					]
 				]
 			]
@@ -1231,9 +1254,9 @@ class testDashboardPieChartWidget extends testWidgets {
 			// Special case - custom legend name.
 			$legend_name = CTestArrayHelper::get($data, 'expected_dataset_name', $legend_name);
 
-			// Locate the correct sector by class and then by the hintbox content.
-			$sector = $widget->query('class:svg-pie-chart-arcs')->
-					query('xpath:./*[contains(@data-hintbox-contents, "'.$legend_name.'")]')->one();
+			// Locate sector for checking.
+			$sector = $widget->query('xpath:.//*[contains(@data-hintbox-contents, '.
+					CXPathHelper::escapeQuotes($legend_name).')]/*[@class="svg-pie-chart-arc"]')->one();
 
 			// Assert sector fill color.
 			$this->assertEquals('rgb('.$expected_sector['color'].')', $sector->getCSSValue('fill'));
@@ -1313,7 +1336,7 @@ class testDashboardPieChartWidget extends testWidgets {
 		// For each hintbox - open, assert text, close.
 		foreach ($hints as $field => $text) {
 			$form->getLabel($field)->query('xpath:./button[@data-hintbox]')->one()->waitUntilClickable()->click();
-			$hint = $this->query('xpath://div[@class="overlay-dialogue"]')->asOverlayDialog()->waitUntilPresent()->one();
+			$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->asOverlayDialog()->waitUntilPresent()->one();
 			$this->assertEquals($text, $hint->getText());
 			$hint->query('xpath:./button')->one()->click();
 		}
@@ -1420,6 +1443,7 @@ class testDashboardPieChartWidget extends testWidgets {
 			$this->assertEquals(0, CDBHelper::getCount($count_sql));
 		}
 
+		COverlayDialogElement::find()->one()->close();
 	}
 
 	/**
@@ -1652,6 +1676,7 @@ class testDashboardPieChartWidget extends testWidgets {
 		$id = $dashboard_id === null ? self::$dashboard_id : $dashboard_id;
 
 		$this->page->open('zabbix.php?action=dashboard.view&dashboardid='.$id)->waitUntilReady();
+
 		$dashboard = CDashboardElement::find()->one();
 		if ($page) {
 			$dashboard->selectPage($page);

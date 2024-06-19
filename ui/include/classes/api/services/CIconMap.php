@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -182,8 +177,6 @@ class CIconMap extends CApiService {
 	}
 
 	/**
-	 * @static
-	 *
 	 * @param array $iconmaps
 	 *
 	 * @throws APIException if the input is invalid.
@@ -247,8 +240,6 @@ class CIconMap extends CApiService {
 	}
 
 	/**
-	 * @static
-	 *
 	 * @param array $iconmaps
 	 *
 	 * @throws APIException if the input is invalid.
@@ -289,8 +280,6 @@ class CIconMap extends CApiService {
 	/**
 	 * Check for duplicated icon maps.
 	 *
-	 * @static
-	 *
 	 * @param array      $iconmaps
 	 * @param array|null $db_iconmaps
 	 *
@@ -326,8 +315,6 @@ class CIconMap extends CApiService {
 
 	/**
 	 * Check icon mappings.
-	 *
-	 * @static
 	 *
 	 * @param array $iconmaps
 	 *
@@ -373,8 +360,6 @@ class CIconMap extends CApiService {
 	/**
 	 * Check icons.
 	 *
-	 * @static
-	 *
 	 * @param array $iconmaps
 	 *
 	 * @throws APIException
@@ -414,8 +399,6 @@ class CIconMap extends CApiService {
 
 	/**
 	 * Update table "icon_mapping".
-	 *
-	 * @static
 	 *
 	 * @param array      $iconmaps
 	 * @param string     $method
@@ -517,8 +500,6 @@ class CIconMap extends CApiService {
 	}
 
 	/**
-	 * @static
-	 *
 	 * @param array      $iconmapids
 	 * @param array|null $db_iconmaps
 	 *
@@ -545,8 +526,6 @@ class CIconMap extends CApiService {
 	}
 
 	/**
-	 * @static
-	 *
 	 * @param array      $iconmapids
 	 * @param array|null $db_iconmaps
 	 *
@@ -588,8 +567,6 @@ class CIconMap extends CApiService {
 
 	/**
 	 * Add the existing mappings to $db_iconmaps whether these are affected by the update.
-	 *
-	 * @static
 	 *
 	 * @param array $iconmaps
 	 * @param array $db_iconmaps
