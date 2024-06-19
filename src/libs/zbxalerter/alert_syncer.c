@@ -98,6 +98,8 @@ static void	am_db_clear(zbx_am_db_t *amdb)
 		zbx_am_db_mediatype_clear(mediatype);
 
 	zbx_hashset_destroy(&amdb->mediatypes);
+
+	zbx_ipc_async_socket_close(&amdb->am);
 }
 
 /******************************************************************************
