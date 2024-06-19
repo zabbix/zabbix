@@ -530,6 +530,17 @@ class CElement extends CBaseElement implements IWaitable {
 	/**
 	 * @inheritdoc
 	 */
+	public function getEnabledCondition() {
+		$target = $this;
+
+		return function () use ($target) {
+			return $target->isEnabled();
+		};
+	}
+
+	/**
+	 * @inheritdoc
+	 */
 	public function click($force = false) {
 		try {
 			return parent::click();
