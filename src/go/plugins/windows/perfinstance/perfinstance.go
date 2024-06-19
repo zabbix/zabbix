@@ -9,10 +9,10 @@ import (
 	"fmt"
 	"time"
 
-	"git.zabbix.com/ap/plugin-support/plugin"
-	"git.zabbix.com/ap/plugin-support/zbxerr"
-	"zabbix.com/pkg/pdh"
-	"zabbix.com/pkg/win32"
+	"golang.zabbix.com/agent2/pkg/pdh"
+	"golang.zabbix.com/agent2/pkg/win32"
+	"golang.zabbix.com/sdk/plugin"
+	"golang.zabbix.com/sdk/zbxerr"
 )
 
 var impl Plugin

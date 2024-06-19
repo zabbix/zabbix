@@ -27,8 +27,8 @@ import (
 	"strings"
 	"time"
 
-	"git.zabbix.com/ap/plugin-support/errs"
-	"git.zabbix.com/ap/plugin-support/log"
+	"golang.zabbix.com/sdk/errs"
+	"golang.zabbix.com/sdk/log"
 )
 
 var _ SmartController = (*SmartCtl)(nil)

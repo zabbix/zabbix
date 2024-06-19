@@ -76,7 +76,7 @@ int	zbx_redirect_stdio(const char *filename)
 import "C"
 
 import (
-	"git.zabbix.com/ap/plugin-support/log"
+	"golang.zabbix.com/sdk/log"
 )
 
 func SetLogLevel(level int) {

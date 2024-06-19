@@ -23,7 +23,7 @@ import (
 	"context"
 	"encoding/json"
 
-	"git.zabbix.com/ap/plugin-support/zbxerr"
+	"golang.zabbix.com/sdk/zbxerr"
 )
 
 func statusVarsHandler(ctx context.Context, conn MyClient, _ map[string]string,

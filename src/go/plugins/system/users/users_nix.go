@@ -26,7 +26,7 @@ import (
 	"strconv"
 	"time"
 
-	"zabbix.com/pkg/zbxcmd"
+	"golang.zabbix.com/agent2/pkg/zbxcmd"
 )
 
 func (p *Plugin) getUsersNum() (num int, err error) {

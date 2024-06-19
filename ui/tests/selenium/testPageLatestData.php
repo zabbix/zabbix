@@ -773,7 +773,7 @@ class testPageLatestData extends CWebTest {
 
 		if (CTestArrayHelper::get($data,'description', false)) {
 			$row->query('class:icon-description')->one()->click()->waitUntilReady();
-			$overlay = $this->query('xpath://div[@class="overlay-dialogue"]')->one();
+			$overlay = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->one();
 
 			// Verify the real description with the expected one.
 			$this->assertEquals($data['description'], $overlay->getText());

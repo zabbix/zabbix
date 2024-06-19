@@ -8,7 +8,7 @@
 ** (at your option) any later version.
 **
 ** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the envied warranty of
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
 ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
@@ -35,6 +35,13 @@
 
 #define ZBX_ES_SCRIPT_HEADER	"function(value){"
 #define ZBX_ES_SCRIPT_FOOTER	"\n}"
+
+typedef struct
+{
+	void	*heapptr;	/* js object heap ptr */
+	void	*data;
+}
+zbx_es_obj_data_t;
 
 /******************************************************************************
  *                                                                            *
@@ -346,6 +353,9 @@ int	zbx_es_init_env(zbx_es_t *es, char **error)
 		goto out;
 
 	es->env->timeout = ZBX_ES_TIMEOUT;
+
+	zbx_hashset_create(&es->env->objmap, 0, ZBX_DEFAULT_PTR_HASH_FUNC, ZBX_DEFAULT_PTR_COMPARE_FUNC);
+
 	ret = SUCCEED;
 out:
 	if (SUCCEED != ret)
@@ -387,6 +397,7 @@ int	zbx_es_destroy_env(zbx_es_t *es, char **error)
 
 	duk_destroy_heap(es->env->ctx);
 	zbx_es_debug_disable(es);
+	zbx_hashset_destroy(&es->env->objmap);
 	zbx_free(es->env->error);
 	zbx_free(es->env);
 
@@ -790,7 +801,81 @@ zbx_es_env_t	*zbx_es_get_env(duk_context *ctx)
 		return NULL;
 
 	env = (zbx_es_env_t *)duk_to_pointer(ctx, -1);
-	duk_pop(ctx);
+	duk_pop_2(ctx);
 
 	return env;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: attach data pointer to current object                             *
+ *                                                                            *
+ * Comments: The object must be on the top of the stack (-1)                  *
+ *           This function must be used only from object constructor          *
+ *                                                                            *
+ ******************************************************************************/
+void	es_obj_attach_data(zbx_es_env_t *env, void *data)
+{
+	zbx_es_obj_data_t	obj_local;
+
+	obj_local.heapptr = duk_require_heapptr(env->ctx, -1);
+
+	obj_local.data = data;
+	zbx_hashset_insert(&env->objmap, &obj_local, sizeof(obj_local));
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get data pointer attached to current object                       *
+ *                                                                            *
+ * Parameters: env  - [IN]                                                    *
+ *             ref  - [IN] pointer reference, returned by es_put_ptr()        *
+ *             type - [IN] pointer type                                       *
+ *                                                                            *
+ * Comments: This function must be used only from object methods.             *
+ *                                                                            *
+ ******************************************************************************/
+void	*es_obj_get_data(zbx_es_env_t *env)
+{
+	zbx_es_obj_data_t	obj_local, *obj;
+
+	duk_push_this(env->ctx);
+	obj_local.heapptr = duk_require_heapptr(env->ctx, -1);
+	duk_pop(env->ctx);
+
+	if (NULL != (obj = zbx_hashset_search(&env->objmap, &obj_local)))
+		return obj->data;
+
+	return NULL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: detach data pointer from current object                           *
+ *                                                                            *
+ * Parameters: env - [IN]                                                     *
+ *             ref - [IN] pointer reference, returned by es_put_ptr()         *
+ *                                                                            *
+ * Return value: detached data pointer                                        *
+ *                                                                            *
+ * Comments: The finalizing object must be on the top of the stack (-1).      *
+ *           If the pointer contains allocated data it must be freed by the   *
+ *           caller.                                                          *
+ *           This function must be used only from object destructor.          *
+ *                                                                            *
+ ******************************************************************************/
+void	*es_obj_detach_data(zbx_es_env_t *env)
+{
+	zbx_es_obj_data_t	obj_local, *obj;
+	void			*data;
+
+	obj_local.heapptr = duk_require_heapptr(env->ctx, -1);
+
+	if (NULL == (obj = zbx_hashset_search(&env->objmap, &obj_local)))
+		return NULL;
+
+	data = obj->data;
+	zbx_hashset_remove_direct(&env->objmap, obj);
+
+	return data;
 }

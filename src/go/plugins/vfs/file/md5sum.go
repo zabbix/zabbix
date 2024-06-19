@@ -26,8 +26,8 @@ import (
 	"io"
 	"time"
 
-	"git.zabbix.com/ap/plugin-support/std"
-	"git.zabbix.com/ap/plugin-support/zbxerr"
+	"golang.zabbix.com/sdk/std"
+	"golang.zabbix.com/sdk/zbxerr"
 )
 
 func md5sum(file std.File, start time.Time, timeout int) (result interface{}, err error) {

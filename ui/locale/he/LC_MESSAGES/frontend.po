@@ -10235,6 +10235,10 @@ msgstr[1] "פריטים מופעלים"
 msgid "Item in \"not supported\" state"
 msgstr "פריט במצב „לא נתמך”"
 
+#: app/views/popup.tophosts.column.edit.php:103
+msgid "Item name"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:1562
 msgid "Item not selected"
 msgstr "לא נבחר פריט"
@@ -15201,6 +15205,12 @@ msgstr "התוצאה היא שקר"
 #: include/classes/helpers/CRegexHelper.php:29
 msgid "Result is TRUE"
 msgstr "התוצאה היא אמת"
+
+#: app/controllers/CControllerPopupItemTestSend.php:433
+#: app/controllers/CControllerPopupItemTestSend.php:461
+#, c-format
+msgid "Result is truncated due to its size (%1$s)."
+msgstr ""
 
 #: app/views/popup.testtriggerexpr.php:30
 msgid "Result type"

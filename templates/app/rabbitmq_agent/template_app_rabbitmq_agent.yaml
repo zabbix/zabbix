@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-01-22T15:15:55Z'
+  date: '2024-04-24T15:42:14Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -925,6 +925,13 @@ zabbix_export:
               path: $.type
             - lld_macro: '{#VHOST}'
               path: $.vhost
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - 'return JSON.stringify(JSON.parse(value),[''name'',''type'',''vhost'']);'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
         - uuid: 406836367f45425fbd181a20dc3d08d7
           name: 'Health Check 3.8.10+ discovery'
           type: DEPENDENT
@@ -989,6 +996,9 @@ zabbix_export:
                       parseInt(value.split('.')[1]) * 100 +
                       parseInt(value.split('.')[2]);
                   return JSON.stringify(rabbit_version >= 30810 ? [{ '{#SINGLETON}': '' }] : []);
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
       tags:
         - tag: class
           value: software
@@ -1575,6 +1585,9 @@ zabbix_export:
               parameters:
                 - '\n\s?\n(.*)'
                 - \1
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           tags:
             - tag: component
               value: raw
@@ -1649,6 +1662,9 @@ zabbix_export:
                       parseInt(value.split('.')[1]) * 100 +
                       parseInt(value.split('.')[2]);
                   return JSON.stringify(rabbit_version < 30810 ? [{ '{#SINGLETON}': '' }] : []);
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
         - uuid: 3c0021a3e57142eb806deb5b47b6700a
           name: 'Health Check 3.8.10+ discovery'
           type: DEPENDENT
@@ -1892,6 +1908,9 @@ zabbix_export:
                       parseInt(value.split('.')[1]) * 100 +
                       parseInt(value.split('.')[2]);
                   return JSON.stringify(rabbit_version >= 30810 ? [{ '{#SINGLETON}': '' }] : []);
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
         - uuid: d1d32fc6ae1f445a98144a31214ca825
           name: 'Queues discovery'
           type: DEPENDENT
@@ -2218,7 +2237,7 @@ zabbix_export:
                 - tag: vhost
                   value: '{#VHOST}'
             - uuid: aabd7d6fe6a047d186504386d3a48ae1
-              name: 'RabbitMQ: Queue [{#VHOST}][{#QUEUE}]: Messages'
+              name: 'RabbitMQ: Queue [{#VHOST}][{#QUEUE}]: Messages total'
               type: DEPENDENT
               key: 'rabbitmq.queue.messages["{#VHOST}/{#QUEUE}"]'
               delay: '0'
@@ -2423,6 +2442,13 @@ zabbix_export:
               path: $.name
             - lld_macro: '{#VHOST}'
               path: $.vhost
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - 'return JSON.stringify(JSON.parse(value),[''node'',''name'',''vhost'']);'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
       tags:
         - tag: class
           value: software

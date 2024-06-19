@@ -29,9 +29,8 @@ import (
 	"time"
 	"unsafe"
 
-	"git.zabbix.com/ap/plugin-support/log"
-
 	"golang.org/x/sys/windows"
+	"golang.zabbix.com/sdk/log"
 )
 
 const (

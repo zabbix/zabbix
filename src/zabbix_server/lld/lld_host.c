@@ -9,7 +9,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -2905,7 +2905,10 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 					d = ",";
 
 					zbx_audit_host_update_json_update_ipmi_password(host->hostid,
-							host->ipmi_password_orig, value_esc);
+							(0 == strcmp("", host->ipmi_password_orig) ?
+							"" : ZBX_MACRO_SECRET_MASK),
+							(0 == strcmp("", ipmi_password) ?
+							"" : ZBX_MACRO_SECRET_MASK));
 
 					zbx_free(value_esc);
 				}
