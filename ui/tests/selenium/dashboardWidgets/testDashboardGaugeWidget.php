@@ -178,7 +178,7 @@ class testDashboardGaugeWidget extends testWidgets {
 
 			// Units.
 			'id:units_show' => ['value' => true, 'enabled' => true, 'visible' => false],
-			'id:units' => ['value' => '', 'maxlength' => 2048, 'enabled' => true, 'visible' => false],
+			'id:units' => ['value' => '', 'maxlength' => 255, 'enabled' => true, 'visible' => false],
 			'id:units_size' => ['value' => 25, 'maxlength' => 3, 'enabled' => true, 'visible' => false],
 			'id:units_pos' => ['value' => 'After value', 'enabled' => true, 'visible' => false],
 			'id:units_bold' => ['value' => false, 'enabled' => true, 'visible' => false],
