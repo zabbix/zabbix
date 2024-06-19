@@ -678,11 +678,17 @@ class CSVGPie {
 			let available_width = this.#radius_inner * 2 * this.#scale;
 			available_width -= available_width / CSVGPie.TOTAL_VALUE_PADDING;
 
-			const normal_height = available_width * .95
-				/ this.#getMeasuredTextWidth(text, default_size, font_weight) * 100;
-			const min_height = this.#scale > 0 ? CSVGPie.TOTAL_VALUE_HEIGHT_MIN / this.#scale : 0;
+			const text_width = this.#getMeasuredTextWidth(text, default_size, font_weight);
 
-			return Math.max(normal_height, min_height);
+			const width_ratio = available_width / text_width;
+
+			const default_height = default_size * width_ratio;
+			const max_height = available_width * CSVGPie.TEXT_BASELINE;
+
+			const normal_height = Math.min(default_height, max_height) * .95;
+			const min_height = CSVGPie.TOTAL_VALUE_HEIGHT_MIN;
+
+			return Math.max(normal_height, min_height) / this.#scale;
 		}
 
 		if (this.#sectors_new.length > 0) {
@@ -698,11 +704,16 @@ class CSVGPie {
 					this.#total_value_font_size = this.#config.total_value.size * 10;
 				}
 				else {
-					const font_weight = this.#config.total_value.is_bold ? 'bold' : '';
+					if (this.#scale > 0) {
+						const font_weight = this.#config.total_value.is_bold ? 'bold' : '';
 
-					this.#total_value_font_size = getAutoFontSize(
-						this.#total_value_text, CSVGPie.TOTAL_VALUE_HEIGHT_MIN, font_weight
-					);
+						this.#total_value_font_size = getAutoFontSize(
+							this.#total_value_text, CSVGPie.TOTAL_VALUE_HEIGHT_MIN, font_weight
+						);
+					}
+					else {
+						this.#total_value_font_size = 0;
+					}
 				}
 
 				this.#total_value_container
