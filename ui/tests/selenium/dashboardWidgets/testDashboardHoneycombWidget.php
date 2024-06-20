@@ -232,7 +232,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 								'type' => 'honeycomb',
 								'x' => 0,
 								'y' => 0,
-								'width' => 2,
+								'width' => 6,
 								'height' => 2,
 								'view_mode' => 0,
 								'fields' => [
@@ -282,7 +282,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 								'type' => 'honeycomb',
 								'x' => 0,
 								'y' => 0,
-								'width' => 3,
+								'width' => 8,
 								'height' => 2,
 								'view_mode' => 0,
 								'fields' => [
@@ -337,7 +337,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 								'type' => 'honeycomb',
 								'x' => 0,
 								'y' => 0,
-								'width' => 5,
+								'width' => 13,
 								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
@@ -407,7 +407,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 								'type' => 'honeycomb',
 								'x' => 0,
 								'y' => 0,
-								'width' => 8,
+								'width' => 29,
 								'height' => 3,
 								'view_mode' => 0,
 								'fields' => [
@@ -517,8 +517,8 @@ class testDashboardHoneycombWidget extends testWidgets {
 								'type' => 'honeycomb',
 								'x' => 0,
 								'y' => 0,
-								'width' => 3,
-								'height' => 6,
+								'width' => 9,
+								'height' => 7,
 								'view_mode' => 0,
 								'fields' => [
 									[
