@@ -442,6 +442,11 @@ class testDashboardHoneycombWidget extends testWidgets {
 										'value' => 'Display item 5'
 									],
 									[
+										'type' => 0,
+										'name' => 'interpolation',
+										'value' => 1
+									],
+									[
 										'type' => 1,
 										'name' => 'thresholds.0.color',
 										'value' => 'FF465C'
