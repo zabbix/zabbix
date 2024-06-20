@@ -401,7 +401,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 						]
 					],
 					[
-						'name' => 'Long horizontal line',
+						'name' => 'Long horizontal line with interpolation',
 						'widgets' => [
 							[
 								'type' => 'honeycomb',
