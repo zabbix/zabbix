@@ -549,7 +549,13 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 	if (0 != (macro_type & (ZBX_MACRO_TYPE_MESSAGE_NORMAL | ZBX_MACRO_TYPE_MESSAGE_RECOVERY |
 			ZBX_MACRO_TYPE_MESSAGE_UPDATE | ZBX_MACRO_TYPE_EVENT_NAME)))
 	{
-		token_search |= ZBX_TOKEN_SEARCH_EXPRESSION_MACRO;
+
+		const zbx_db_event	*c_event;
+
+		c_event = ((NULL != r_event) ? r_event : event);
+
+		if (NULL != c_event && EVENT_SOURCE_TRIGGERS == c_event->source)
+			token_search |= ZBX_TOKEN_SEARCH_EXPRESSION_MACRO;
 	}
 
 	if (SUCCEED != zbx_token_find(*data, pos, &token, token_search))
