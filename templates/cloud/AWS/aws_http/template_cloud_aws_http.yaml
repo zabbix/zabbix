@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-06-17T14:17:03Z'
+  date: '2024-06-20T14:49:43Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -1922,40 +1922,40 @@ zabbix_export:
           description: 'Filter to exclude discovered ECS clusters by status.'
         - macro: '{$AWS.ELB.LLD.FILTER.NAME.MATCHES}'
           value: '.*'
-          description: 'Filter of discoverable ELB load balancer by name.'
+          description: 'Filter of discoverable ELB load balancers by name.'
         - macro: '{$AWS.ELB.LLD.FILTER.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered ELB load balancer by name.'
+          description: 'Filter to exclude discovered ELB load balancers by name.'
         - macro: '{$AWS.ELB.LLD.FILTER.REGION.MATCHES}'
           value: '.*'
-          description: 'Filter of discoverable ELB load balancer by region.'
+          description: 'Filter of discoverable ELB load balancers by region.'
         - macro: '{$AWS.ELB.LLD.FILTER.REGION.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered ELB load balancer by region.'
+          description: 'Filter to exclude discovered ELB load balancers by region.'
         - macro: '{$AWS.ELB.LLD.FILTER.STATE.MATCHES}'
           value: active
-          description: 'Filter of discoverable ELB load balancer by status.'
+          description: 'Filter of discoverable ELB load balancers by status.'
         - macro: '{$AWS.ELB.LLD.FILTER.STATE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'Filter to exclude discovered ELB load balancer by status.'
         - macro: '{$AWS.LAMBDA.LLD.FILTER.NAME.MATCHES}'
           value: '.*'
-          description: 'Filter of discoverable Lambda function by name.'
+          description: 'Filter of discoverable Lambda functions by name.'
         - macro: '{$AWS.LAMBDA.LLD.FILTER.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered Lambda function by name.'
+          description: 'Filter to exclude discovered Lambda functions by name.'
         - macro: '{$AWS.LAMBDA.LLD.FILTER.REGION.MATCHES}'
           value: '.*'
-          description: 'Filter of discoverable Lambda function by region.'
+          description: 'Filter of discoverable Lambda functions by region.'
         - macro: '{$AWS.LAMBDA.LLD.FILTER.REGION.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered Lambda function by region.'
+          description: 'Filter to exclude discovered Lambda functions by region.'
         - macro: '{$AWS.LAMBDA.LLD.FILTER.RUNTIME.MATCHES}'
           value: '.*'
-          description: 'Filter of discoverable Lambda function by Runtime.'
+          description: 'Filter of discoverable Lambda functions by Runtime.'
         - macro: '{$AWS.LAMBDA.LLD.FILTER.RUNTIME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered Lambda function by Runtime.'
+          description: 'Filter to exclude discovered Lambda functions by Runtime.'
         - macro: '{$AWS.PROXY}'
           description: 'Sets HTTP proxy value. If this macro is empty then no proxy is used.'
         - macro: '{$AWS.RDS.LLD.FILTER.NAME.MATCHES}'

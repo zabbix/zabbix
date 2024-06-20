@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-06-17T14:16:37Z'
+  date: '2024-06-20T15:15:33Z'
   groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -44,10 +44,10 @@ zabbix_export:
             - uuid: 77f2bf7f1086488289b1cf1931e8fd90
               expression: 'length(last(/AWS Lambda by HTTP/aws.lambda.alarms.check))>0'
               name: 'AWS Lambda: Failed to get alarms data'
-              event_name: 'AWS Lambda: Failed to get CloudWatch alarms for Lambda function'
+              event_name: 'AWS Lambda: Failed to get CloudWatch alarms for the Lambda function'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
-              description: 'Failed to get CloudWatch alarms for Lambda function.'
+              description: 'Failed to get CloudWatch alarms for the Lambda function.'
               tags:
                 - tag: scope
                   value: availability
@@ -57,7 +57,7 @@ zabbix_export:
           key: aws.lambda.async_events_dropped.sum
           delay: '0'
           history: 7d
-          description: 'The number of events that are dropped without successfully executing the function. If you configure a dead-letter queue (DLQ) or OnFailure destination, then events are sent there before they''re dropped.'
+          description: 'The number of events that are dropped without successfully executing the function. If you configure a dead-letter queue (DLQ) or an `OnFailure` destination, events are sent there before they''re dropped.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -113,7 +113,7 @@ zabbix_export:
           key: aws.lambda.concurrent_executions.max
           delay: '0'
           history: 7d
-          description: 'The number of function instances that are processing events. If this number reaches your concurrent executions quota for the Region, or the reserved concurrency limit on the function, then Lambda throttles additional invocation requests.'
+          description: 'The number of function instances that are processing events. If this number reaches your concurrent executions quota for the Region or the reserved concurrency limit on the function, then Lambda will throttle additional invocation requests.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -149,7 +149,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: s
-          description: 'The amount of time that your function code spends processing an event. The billed duration for an invocation is the value of Duration rounded up to the nearest millisecond. Duration does not include cold start time.'
+          description: 'The amount of time that your function code spends processing an event. The billed duration for an invocation is the value of `Duration` rounded up to the nearest millisecond. Duration does not include cold start time.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -237,12 +237,11 @@ zabbix_export:
             
             				['AccessKeyId', 'SecretAccessKey', 'Token'].forEach(function (field) {
             					if (typeof credentials !== 'object' || typeof credentials[field] === 'undefined' || credentials[field] === '') {
-            						throw 'Required credentials is not set: "' + field + '".';
+            						throw 'Required credentials are not set: "' + field + '".';
             					};
             					AWS.params[field] = credentials[field];
             				});
             				break;
-            			case 'access_key':
             			default:
             				AWS.params['auth_type'] = 'access_key';
             				['AccessKeyId', 'SecretAccessKey'].forEach(function (field) {
@@ -324,11 +323,11 @@ zabbix_export:
             		if (AWS.params.auth_type === 'role_base')
             			request.addHeader('X-Amz-Security-Token: ' + AWS.params.Token);
             
-            		Zabbix.log(4, '[ AWS LAMBDA ] Sending request: ' + url);
+            		Zabbix.log(4, '[ AWS Lambda Alarms ] Sending request: ' + url);
             
             		response = request.get(url);
             
-            		Zabbix.log(4, '[ AWS LAMBDA ] Received response with status code ' + request.getStatus() + ': ' + response);
+            		Zabbix.log(4, '[ AWS Lambda Alarms ] Received response with status code ' + request.getStatus() + ': ' + response);
             
             		if (request.getStatus() !== 200) {
             			throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
@@ -373,7 +372,7 @@ zabbix_export:
             			alarms_list.forEach(function (alarm) {
             				var dimensions = alarm.Dimensions;
             
-            				Zabbix.log(4, '[ AWS LAMBDA ] dimensions: ' + JSON.stringify(dimensions));
+            				Zabbix.log(4, '[ AWS Lambda Alarms ] dimensions: ' + JSON.stringify(dimensions));
             
             				if (Array.isArray(alarm.Metrics)) {
             					alarm.Metrics.forEach(function (metric) {
@@ -404,7 +403,7 @@ zabbix_export:
             }
             catch (error) {
             	error += (String(error).endsWith('.')) ? '' : '.';
-            	Zabbix.log(3, '[ AWS LAMBDA Alarms ] ERROR: ' + error);
+            	Zabbix.log(3, '[ AWS Lambda Alarms ] ERROR: ' + error);
             
             	return JSON.stringify({ 'error': error });
             }
@@ -493,7 +492,6 @@ zabbix_export:
             					AWS.params[field] = credentials[field];
             				});
             				break;
-            			case 'access_key':
             			default:
             				AWS.params['auth_type'] = 'access_key';
             				['AccessKeyId', 'SecretAccessKey'].forEach(function (field) {
@@ -611,9 +609,9 @@ zabbix_export:
             		if (AWS.params.auth_type === 'role_base')
             			request.addHeader('X-Amz-Security-Token: ' + AWS.params.Token);
             
-            		Zabbix.log(4, '[ AWS Lambda ] Sending request: ' + url);
+            		Zabbix.log(4, '[ AWS Lambda Get metrics ] Sending request: ' + url);
             		response = request.post(url, data);
-            		Zabbix.log(4, '[ AWS Lambda ] Received response with status code ' + request.getStatus() + ': ' + response);
+            		Zabbix.log(4, '[ AWS Lambda Get metrics ] Received response with status code ' + request.getStatus() + ': ' + response);
             		if (request.getStatus() !== 200) {
             			throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
             		}
@@ -641,13 +639,13 @@ zabbix_export:
             }
             catch (error) {
             	error += (String(error).endsWith('.')) ? '' : '.';
-            	Zabbix.log(3, '[ AWS Lambda Get metrics] ERROR: ' + error);
+            	Zabbix.log(3, '[ AWS Lambda Get metrics ] ERROR: ' + error);
             
             	return JSON.stringify({ 'error': error });
             }
           description: |
             Get Lambda function metrics.
-            Full metrics list related to Lambda function: https://docs.aws.amazon.com/lambda/latest/dg/monitoring-metrics.html
+            Full metrics list related to the Lambda function: https://docs.aws.amazon.com/lambda/latest/dg/monitoring-metrics.html
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
               parameters:
@@ -675,7 +673,7 @@ zabbix_export:
           key: aws.lambda.invocations.sum
           delay: '0'
           history: 7d
-          description: 'The number of times that your function code is invoked, including successful invocations and invocations that result in a function error. Invocations aren''t recorded if the invocation request is throttled or otherwise results in an invocation error. The value of Invocations equals the number of requests billed.'
+          description: 'The number of times that your function code is invoked, including successful invocations and invocations that result in a function error. Invocations aren''t recorded if the invocation request is throttled or otherwise results in an invocation error. The value of `Invocations` equals the number of requests billed.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -712,10 +710,10 @@ zabbix_export:
             - uuid: 95ed5e8c560f4c6e89ed9d1a754ed032
               expression: 'length(last(/AWS Lambda by HTTP/aws.lambda.metrics.check))>0'
               name: 'AWS Lambda: Failed to get metrics data'
-              event_name: 'AWS Lambda: Failed to get CloudWatch metrics for Lambda function'
+              event_name: 'AWS Lambda: Failed to get CloudWatch metrics for the Lambda function'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
-              description: 'Failed to get CloudWatch metrics for Lambda function.'
+              description: 'Failed to get CloudWatch metrics for the Lambda function.'
               tags:
                 - tag: scope
                   value: availability
@@ -725,7 +723,7 @@ zabbix_export:
           key: aws.lambda.throttles.sum
           delay: '0'
           history: 7d
-          description: 'The number of invocation requests that are throttled. When all function instances are processing requests and no concurrency is available to scale up, Lambda rejects additional requests with a TooManyRequestsException error.'
+          description: 'The number of invocation requests that are throttled. When all function instances are processing requests and no concurrency is available to scale up, Lambda rejects additional requests with a `TooManyRequestsException` error.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -742,7 +740,7 @@ zabbix_export:
           key: aws.lambda.unreserved_concurrent_executions.max
           delay: '0'
           history: 7d
-          description: 'For a Region, the number of events that functions without reserved concurrency are processing.'
+          description: 'For a Region, the number of events that function without reserved concurrency are processing.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -776,7 +774,7 @@ zabbix_export:
                 value: '{$AWS.LAMBDA.LLD.FILTER.ALARM_SERVICE_NAMESPACE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: D
-          description: 'Used for the discovery of alarm lambda functions.'
+          description: 'Used for the discovery of alarm Lambda functions.'
           item_prototypes:
             - uuid: 893819314ae34f31bde78612679da46b
               name: 'AWS Lambda Alarms: [{#ALARM_NAME}]: Get metrics'
