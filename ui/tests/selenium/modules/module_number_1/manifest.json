@@ -6,7 +6,7 @@
 	"description": "1st Module description",
 	"version": "1",
 	"namespace": "Example_A",
-	"url": "1st module URL",
+	"url": "https://www.1st_module_URL.com",
 	"actions": {
 		"first.module": {
 			"class": "Test",
