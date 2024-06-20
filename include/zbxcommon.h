@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #ifndef ZABBIX_COMMON_H
@@ -103,6 +98,8 @@ const char	*zbx_result_string(int result);
 #define ZBX_MAX_DOUBLE_LEN	24
 
 #define ZBX_SIZE_T_MAX	(~(size_t)0)
+
+#define ZBX_MALLOC_TRIM (128 * ZBX_KIBIBYTE)
 
 /******************************************************************************
  *                                                                            *
@@ -406,11 +403,20 @@ void	zbx_this_should_never_happen_backtrace(void);
 														\
 do														\
 {														\
-	zbx_error("ERROR [file and function: <%s,%s>, revision:%s, line:%d] Something impossible has just"	\
-			" happened.", __FILE__, __func__, ZABBIX_REVISION, __LINE__);				\
 	zbx_this_should_never_happen_backtrace();								\
+	zbx_error("ERROR [file and function: <%s,%s>, revision:%s, line:%d] Something unexpected has just "	\
+			"happened.", __FILE__, __func__, ZABBIX_REVISION, __LINE__);				\
 }														\
 while (0)
+
+#define THIS_SHOULD_NEVER_HAPPEN_MSG(fmt, ...)									\
+														\
+do														\
+{														\
+	THIS_SHOULD_NEVER_HAPPEN;										\
+	zbx_error(fmt, ##__VA_ARGS__);										\
+}														\
+while(0)
 
 #define ARRSIZE(a)	(sizeof(a) / sizeof(*a))
 

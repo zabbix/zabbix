@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 package main
@@ -236,7 +231,8 @@ func validateExclusiveFlags(args *Arguments) error {
 
 	if !validateMultipleAgentFlag() {
 		return errors.New(
-			"option -m, --multiple-agents can only be used with one of the service options, see -h, --help for more information")
+			"option -m, --multiple-agents can only be used with one of the service options, see -h, --help for more information",
+		)
 	}
 
 	return nil
@@ -278,7 +274,10 @@ func handleWindowsService(confPath string) error {
 		}
 		hostnames, err := agent.ValidateHostnames(agent.Options.Hostname)
 		if err != nil {
-			return fmt.Errorf("cannot parse the \"Hostname\" parameter: %s", err)
+			return fmt.Errorf(
+				"cannot parse the \"Hostname\" parameter: %s",
+				err,
+			)
 		}
 		agent.FirstHostname = hostnames[0]
 		serviceName = fmt.Sprintf("%s [%s]", serviceName, agent.FirstHostname)
@@ -310,17 +309,29 @@ func resolveWindowsService(confPath string) error {
 	switch true {
 	case svcInstallFlag:
 		if err := svcInstall(confPath); err != nil {
-			return fmt.Errorf("failed to install %s as service: %s", serviceName, err)
+			return fmt.Errorf(
+				"failed to install %s as service: %s",
+				serviceName,
+				err,
+			)
 		}
 		msg = fmt.Sprintf("'%s' installed successfully", serviceName)
 	case svcUninstallFlag:
 		if err := svcUninstall(); err != nil {
-			return fmt.Errorf("failed to uninstall %s as service: %s", serviceName, err)
+			return fmt.Errorf(
+				"failed to uninstall %s as service: %s",
+				serviceName,
+				err,
+			)
 		}
 		msg = fmt.Sprintf("'%s' uninstalled successfully", serviceName)
 	case svcStartFlag:
 		if err := svcStart(confPath); err != nil {
-			return fmt.Errorf("failed to start %s service: %s", serviceName, err)
+			return fmt.Errorf(
+				"failed to start %s service: %s",
+				serviceName,
+				err,
+			)
 		}
 		msg = fmt.Sprintf("'%s' started successfully", serviceName)
 	case svcStopFlag:
@@ -398,7 +409,10 @@ func svcInstall(conf string) error {
 
 	m, err := mgr.Connect()
 	if err != nil {
-		return fmt.Errorf("failed to connect to service manager: %s", err.Error())
+		return fmt.Errorf(
+			"failed to connect to service manager: %s",
+			err.Error(),
+		)
 	}
 	defer m.Disconnect()
 
@@ -409,7 +423,6 @@ func svcInstall(conf string) error {
 	}
 
 	startType, delayedAutoStart, err := svcStartTypeFlagParse()
-
 	if err != nil {
 		return errs.Wrap(err, "failed to get new startup type")
 	}
@@ -433,7 +446,10 @@ func svcInstall(conf string) error {
 	defer s.Close()
 
 	if err = eventlog.InstallAsEventCreate(serviceName, eventlog.Error|eventlog.Warning|eventlog.Info); err != nil {
-		err = fmt.Errorf("failed to report service into the event log: %s", err.Error())
+		err = fmt.Errorf(
+			"failed to report service into the event log: %s",
+			err.Error(),
+		)
 		derr := s.Delete()
 		if derr != nil {
 			return fmt.Errorf("%s and %s", err.Error(), derr.Error())
@@ -447,7 +463,10 @@ func svcInstall(conf string) error {
 func svcUninstall() error {
 	m, err := mgr.Connect()
 	if err != nil {
-		return fmt.Errorf("failed to connect to service manager: %s", err.Error())
+		return fmt.Errorf(
+			"failed to connect to service manager: %s",
+			err.Error(),
+		)
 	}
 	defer m.Disconnect()
 
@@ -462,7 +481,10 @@ func svcUninstall() error {
 	}
 
 	if err = eventlog.Remove(serviceName); err != nil {
-		return fmt.Errorf("failed to remove service from the event log: %s", err.Error())
+		return fmt.Errorf(
+			"failed to remove service from the event log: %s",
+			err.Error(),
+		)
 	}
 
 	return nil
@@ -471,7 +493,10 @@ func svcUninstall() error {
 func svcStart(conf string) error {
 	m, err := mgr.Connect()
 	if err != nil {
-		return fmt.Errorf("failed to connect to service manager: %s", err.Error())
+		return fmt.Errorf(
+			"failed to connect to service manager: %s",
+			err.Error(),
+		)
 	}
 	defer m.Disconnect()
 
@@ -491,7 +516,10 @@ func svcStart(conf string) error {
 func svcStop() error {
 	m, err := mgr.Connect()
 	if err != nil {
-		return fmt.Errorf("failed to connect to service manager: %s", err.Error())
+		return fmt.Errorf(
+			"failed to connect to service manager: %s",
+			err.Error(),
+		)
 	}
 	defer m.Disconnect()
 
@@ -503,7 +531,10 @@ func svcStop() error {
 
 	status, err := s.Control(svc.Stop)
 	if err != nil {
-		return fmt.Errorf("failed to send stop request to service: %s", err.Error())
+		return fmt.Errorf(
+			"failed to send stop request to service: %s",
+			err.Error(),
+		)
 	}
 
 	timeout := time.Now().Add(10 * time.Second)
@@ -521,9 +552,7 @@ func svcStop() error {
 }
 
 func svcStartupTypeSet() error {
-
 	m, err := mgr.Connect()
-
 	if err != nil {
 		return errs.Wrap(err, "failed to connect to service manager")
 	}
@@ -531,7 +560,6 @@ func svcStartupTypeSet() error {
 	defer m.Disconnect()
 
 	s, err := m.OpenService(serviceName)
-
 	if err != nil {
 		return errs.Wrap(err, "failed to open service")
 	}
@@ -539,19 +567,16 @@ func svcStartupTypeSet() error {
 	defer s.Close()
 
 	c, err := s.Config()
-
 	if err != nil {
 		return errs.Wrap(err, "failed to retrieve service config")
 	}
 
 	c.StartType, c.DelayedAutoStart, err = svcStartTypeFlagParse()
-
 	if err != nil {
 		return errs.Wrap(err, "failed to get new startup type")
 	}
 
 	err = s.UpdateConfig(c)
-
 	if err != nil {
 		return errs.Wrap(err, "failed to update service config")
 	}
@@ -581,7 +606,10 @@ func sendServiceStop() {
 
 func runService() {
 	if err := svc.Run(serviceName, &winService{}); err != nil {
-		fatalExit("use foreground option to run Zabbix agent as console application", err)
+		fatalExit(
+			"use foreground option to run Zabbix agent as console application",
+			err,
+		)
 		return
 	}
 }

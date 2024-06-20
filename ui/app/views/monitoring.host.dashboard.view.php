@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -23,6 +18,18 @@
  * @var CView $this
  * @var array $data
  */
+
+$this->addJsFile('class.dashboard.js');
+$this->addJsFile('class.dashboard.page.js');
+$this->addJsFile('class.dashboard.widget.placeholder.js');
+$this->addJsFile('class.form.fieldset.collapsible.js');
+$this->addJsFile('class.widgets-data.js');
+$this->addJsFile('class.widget-base.js');
+$this->addJsFile('class.widget.js');
+$this->addJsFile('class.widget.inaccessible.js');
+$this->addJsFile('class.widget.iterator.js');
+$this->addJsFile('class.widget.misconfigured.js');
+$this->addJsFile('class.widget.paste-placeholder.js');
 
 if (array_key_exists('error', $data)) {
 	show_error_message($data['error']);
@@ -38,28 +45,18 @@ if (array_key_exists('no_data', $data)) {
 	return;
 }
 
-$this->addJsFile('d3.js');
-$this->addJsFile('flickerfreescreen.js');
-$this->addJsFile('gtlc.js');
-$this->addJsFile('leaflet.js');
-$this->addJsFile('leaflet.markercluster.js');
-$this->addJsFile('class.dashboard.js');
-$this->addJsFile('class.dashboard.page.js');
-$this->addJsFile('class.dashboard.widget.placeholder.js');
-$this->addJsFile('class.geomaps.js');
-$this->addJsFile('class.widget-base.js');
-$this->addJsFile('class.widget.js');
-$this->addJsFile('class.widget.inaccessible.js');
-$this->addJsFile('class.widget.iterator.js');
-$this->addJsFile('class.widget.misconfigured.js');
-$this->addJsFile('class.widget.paste-placeholder.js');
-$this->addJsFile('class.form.fieldset.collapsible.js');
 $this->addJsFile('class.calendar.js');
-$this->addJsFile('layout.mode.js');
 $this->addJsFile('class.csvggraph.js');
 $this->addJsFile('class.svg.canvas.js');
 $this->addJsFile('class.svg.map.js');
+$this->addJsFile('d3.js');
+$this->addJsFile('flickerfreescreen.js');
+$this->addJsFile('gtlc.js');
 $this->addJsFile('items.js');
+$this->addJsFile('layout.mode.js');
+$this->addJsFile('leaflet.js');
+$this->addJsFile('leaflet.markercluster.js');
+$this->addJsFile('class.geomaps.js');
 $this->addJsFile('multilineinput.js');
 
 $this->includeJsFile('monitoring.host.dashboard.view.js.php');

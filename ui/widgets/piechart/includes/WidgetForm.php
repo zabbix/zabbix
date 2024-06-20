@@ -1,21 +1,16 @@
 <?php declare(strict_types = 0);
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -62,12 +57,17 @@ class WidgetForm extends CWidgetForm {
 	public const LEGEND_LINES_MODE_FIXED = 0;
 	public const LEGEND_LINES_MODE_VARIABLE = 1;
 
+	public const MERGE_COLOR_DEFAULT = '768D99';
 	public const MERGE_PERCENT_MAX = 10;
 	public const MERGE_PERCENT_MIN = 1;
 
 	public const SPACE_DEFAULT = 1;
 	public const SPACE_MAX = 10;
 	public const SPACE_MIN = 0;
+
+	private const STROKE_DEFAULT = 0;
+	private const STROKE_MAX = 10;
+	private const STROKE_MIN = 0;
 
 	public const VALUE_DECIMALS_DEFAULT = 2;
 	public const VALUE_DECIMALS_MAX = 6;
@@ -134,6 +134,12 @@ class WidgetForm extends CWidgetForm {
 					->setDefault(self::WIDTH_DEFAULT)
 			)
 			->addField(
+				(new CWidgetFieldRangeControl('stroke', _('Stroke width'),
+					self::STROKE_MIN, self::STROKE_MAX
+				))
+					->setDefault(self::STROKE_DEFAULT)
+			)
+			->addField(
 				(new CWidgetFieldRangeControl('space', _('Space between sectors'),
 					self::SPACE_MIN, self::SPACE_MAX
 				))
@@ -177,7 +183,7 @@ class WidgetForm extends CWidgetForm {
 				(new CWidgetFieldCheckBox('units_show', null, _('Units')))
 			)
 			->addField(
-				(new CWidgetFieldTextBox('units'))
+				(new CWidgetFieldTextBox('units'))->setMaxLength(255)
 			)
 			->addField(
 				(new CWidgetFieldCheckBox('value_bold', _('Bold')))

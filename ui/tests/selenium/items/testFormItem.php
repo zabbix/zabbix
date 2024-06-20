@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -415,7 +410,8 @@ class testFormItem extends CLegacyWebTest {
 					'JMX agent',
 					'Calculated',
 					'Dependent item',
-					'Script'
+					'Script',
+					'Browser'
 			]);
 			if (isset($data['type'])) {
 				$type_field->select($data['type']);
@@ -926,6 +922,8 @@ class testFormItem extends CLegacyWebTest {
 				}
 			}
 		}
+
+		$dialog->close();
 	}
 
 	// Returns update data
@@ -1987,9 +1985,12 @@ class testFormItem extends CLegacyWebTest {
 					$this->zbxTestCheckTitle('Configuration of items');
 					$this->assertMessage(TEST_BAD, $data['error_msg'], $data['errors']);
 					$this->zbxTestTextPresent(['Host', 'Name', 'Key']);
+
 					if (isset($data['formula'])) {
 						$this->zbxTestAssertElementValue('formula', $data['formulaValue']);
 					}
+
+					$dialog->close();
 					break;
 				}
 			}
@@ -2074,6 +2075,8 @@ class testFormItem extends CLegacyWebTest {
 				$ipmiValue = $this->zbxTestGetValue("//input[@id='ipmi_sensor']");
 				$this->assertEquals($ipmi_sensor, $ipmiValue);
 			}
+
+			$dialog_check->close();
 		}
 	}
 
@@ -2104,11 +2107,13 @@ class testFormItem extends CLegacyWebTest {
 		$this->zbxTestOpen(self::HOST_LIST_PAGE);
 		$this->filterEntriesAndOpenItems();
 		$this->zbxTestClickLinkTextWait($this->item);
-		$form = COverlayDialogElement::find()->one()->waitUntilReady()->asForm();
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		$form = $dialog->asForm();
 		$form->getLabel('History')->query("xpath:span[@class='js-hint']/button")->one()->click();
 		$this->zbxTestAssertElementText("//div[@class='overlay-dialogue wordbreak']", 'Overridden by global housekeeping settings (99d)');
 		$form->getLabel('Trends')->query("xpath:span[@class='js-hint']/button")->one()->click();
 		$this->zbxTestAssertElementText("//div[@class='overlay-dialogue wordbreak'][2]", 'Overridden by global housekeeping settings (455d)');
+		$dialog->close();
 
 		$this->zbxTestOpen('zabbix.php?action=housekeeping.edit');
 

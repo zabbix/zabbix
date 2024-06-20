@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -262,6 +257,8 @@ var hintBox = {
 	 * Initialize hint box event handlers.
 	 *
 	 * Triggered events:
+	 * - onShowHint.hintBox 	- when show a hintbox.
+	 * - onHideHint.hintBox 	- when hide a hintbox.
 	 * - onDeleteHint.hintBox 	- when removing a hintbox.
 	 */
 	bindEvents: function () {
@@ -355,7 +352,7 @@ var hintBox = {
 		const url = new Curl('zabbix.php');
 		const data = jQuery(target).data('hintbox-preload');
 
-		url.setArgument('action', hintBox.getHintboxAction(data.type));
+		url.setArgument('action', data.action || hintBox.getHintboxAction(data.type));
 
 		const xhr = jQuery.ajax({
 			url: url.getUrl(),
@@ -384,6 +381,10 @@ var hintBox = {
 
 				if (resp.data) {
 					hintbox_contents += resp.data;
+				}
+
+				if (resp.value) {
+					hintbox_contents += resp.value;
 				}
 			}
 
@@ -466,6 +467,20 @@ var hintBox = {
 			if (!isVisible(element)) {
 				hintBox.deleteHint(target);
 			}
+
+			setTimeout(() => {
+				if (target.scroll_observer !== undefined) {
+					const element_rect = element.getBoundingClientRect();
+
+					if ((element_rect.x !== target.scroll_observer.x || element_rect.y !== target.scroll_observer.y)
+							&& element.dataset.hintboxIgnorePositionChange !== '1') {
+						const do_focus_target = document.activeElement === document.body
+							|| element.hintBoxItem[0].contains(document.activeElement);
+
+						hintBox.deleteHint(target, do_focus_target);
+					}
+				}
+			});
 		});
 
 		target.observer.observe(document.body, {
@@ -474,6 +489,9 @@ var hintBox = {
 			subtree: true,
 			childList: true
 		});
+
+		target.resize_observer = new ResizeObserver(() => hintBox.onResize(e, target));
+		target.resize_observer.observe(box[0]);
 
 		return box;
 	},
@@ -496,9 +514,39 @@ var hintBox = {
 					hintBox.positionElement(e, target, target.hintBoxItem);
 				});
 			}
+
+			const element = target instanceof jQuery ? target[0] : target;
+			const element_rect_initial = element.getBoundingClientRect();
+
+			target.scroll_observer = {
+				x: element_rect_initial.x,
+				y: element_rect_initial.y,
+				callback: (e) => hintBox.onScroll(target, e)
+			};
+
+			addEventListener('scroll', target.scroll_observer.callback, {capture: true});
 		}
 
 		addEventListener('resize', target.resizeHandler = e => hintBox.onResize(e, target));
+	},
+
+	onScroll: function(target, e) {
+		const element = target instanceof jQuery ? target[0] : target;
+		const element_rect = element.getBoundingClientRect();
+
+		if (e.target.classList.contains('wrapper')) {
+			target.scroll_observer.x = element_rect.x;
+			target.scroll_observer.y = element_rect.y;
+
+			return;
+		}
+
+		if (element_rect.x !== target.scroll_observer.x || element_rect.y !== target.scroll_observer.y) {
+			const do_focus_target = document.activeElement === document.body
+				|| element.hintBoxItem[0].contains(document.activeElement);
+
+			hintBox.deleteHint(target, do_focus_target);
+		}
 	},
 
 	showHint: function(e, target, hintText, className, isStatic, styles) {
@@ -514,6 +562,8 @@ var hintBox = {
 			Overlay.prototype.recoverFocus.call({'$dialogue': target.hintBoxItem});
 			Overlay.prototype.containFocus.call({'$dialogue': target.hintBoxItem});
 		}
+
+		target.dispatchEvent(new CustomEvent('onShowHint.hintBox'));
 	},
 
 	positionElement: function(e, target, $elem) {
@@ -594,12 +644,13 @@ var hintBox = {
 		}
 
 		hintBox.deleteHint(target);
+		target.dispatchEvent(new CustomEvent('onHideHint.hintBox'));
 	},
 
-	deleteHint: function(target) {
+	deleteHint: function(target, do_focus_target = true) {
 		if (typeof target.hintboxid !== 'undefined') {
 			jQuery(target).removeAttr('data-expanded');
-			removeFromOverlaysStack(target.hintboxid);
+			removeFromOverlaysStack(target.hintboxid, do_focus_target);
 		}
 
 		if (target.hintBoxItem) {
@@ -608,7 +659,7 @@ var hintBox = {
 			delete target.hintBoxItem;
 
 			if (target.isStatic) {
-				if (jQuery(target).data('return-control') !== undefined) {
+				if (jQuery(target).data('return-control') !== undefined && do_focus_target) {
 					jQuery(target).data('return-control').focus();
 				}
 				delete target.isStatic;
@@ -619,6 +670,18 @@ var hintBox = {
 			target.observer.disconnect();
 
 			delete target.observer;
+		}
+
+		if (target.scroll_observer !== undefined) {
+			removeEventListener('scroll', target.scroll_observer.callback, {capture: true});
+
+			delete target.scroll_observer;
+		}
+
+		if (target.resize_observer !== undefined) {
+			target.resize_observer.disconnect();
+
+			delete target.resize_observer;
 		}
 
 		removeEventListener('resize', target.resizeHandler);
@@ -1084,6 +1147,12 @@ document.addEventListener('DOMContentLoaded', () => {
 	// Event hub initialization.
 
 	ZABBIX.EventHub = new CEventHub();
+
+	// Software version check initialization.
+
+	if (typeof CSoftwareVersionCheck !== 'undefined') {
+		ZABBIX.SoftwareVersionCheck = new CSoftwareVersionCheck();
+	}
 });
 
 window.addEventListener('load', () => {

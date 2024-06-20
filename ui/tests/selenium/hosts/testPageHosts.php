@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
@@ -95,9 +90,22 @@ class testPageHosts extends CLegacyWebTest {
 		$this->zbxTestTextPresent('Simple form test host');
 		$this->zbxTestTextNotPresent('Empty host');
 
-		// Check that proxy field is disabled.
-		$this->zbxTestAssertElementNotPresentId('filter_proxyids__ms');
-		$this->zbxTestAssertElementPresentXpath('//div[@id="filter_proxyids_"]/..//button[@disabled]');
+		// Check display of proxy and proxy group multiselects based on value of Monitored by field.
+		$id_mapping = [
+			'Any' => ['filter_proxyids_' => false, 'filter_proxy_groupids_' => false],
+			'Server' => ['filter_proxyids_' => false, 'filter_proxy_groupids_' => false],
+			'Proxy' => ['filter_proxyids_' => true, 'filter_proxy_groupids_' => false],
+			'Proxy group' => ['filter_proxyids_' => false, 'filter_proxy_groupids_' => true]
+		];
+		$monitored_by = $filter->getField('Monitored by');
+
+		foreach (array_keys($id_mapping) as $monitored_by_value) {
+			$monitored_by->select($monitored_by_value);
+
+			foreach ($id_mapping[$monitored_by_value] as $id => $displayed) {
+				$this->assertTrue($filter->query('id', $id)->one()->isDisplayed($displayed));
+			}
+		}
 
 		$this->zbxTestAssertElementPresentXpath("//thead//th/a[text()='Name']");
 		$this->zbxTestAssertElementPresentXpath("//thead//th[contains(text(),'Items')]");
@@ -358,31 +366,75 @@ class testPageHosts extends CLegacyWebTest {
 		$this->assertTableStats(1);
 	}
 
-	public function testPageHosts_FilterByProxy() {
-		$this->zbxTestLogin(self::HOST_LIST_PAGE);
+	public function getProxyFilterData() {
+		return [
+			[
+				[
+					'filter' => [
+						'Host groups' => 'Zabbix servers',
+						'Monitored by' => 'Proxy'
+					],
+					'expected' => [
+						'Host_1 with proxy' => 'Proxy_1 for filter',
+						'Host_2 with proxy' => 'Proxy_2 for filter',
+						'Test item host' => 'Active proxy 1'
+					]
+				]
+			],
+			[
+				[
+					'filter' => [
+						'Monitored by' => 'Proxy group'
+					],
+					'expected' => [
+						'Host linked to proxy group' => 'Group without proxies with linked host',
+						'Host linked to proxy group 2' => 'Online proxy group'
+					]
+				]
+			],
+			[
+				[
+					'filter' => [
+						'Monitored by' => 'Proxy',
+						'xpath:.//div[@id="filter_proxyids_"]/..' => 'passive_proxy1'
+					],
+					'expected' => [
+						'disabled_host1' => 'passive_proxy1'
+					]
+				]
+			],
+			[
+				[
+					'filter' => [
+						'Monitored by' => 'Proxy group',
+						'xpath:.//div[@id="filter_proxy_groupids_"]/..' => 'Group without proxies with linked host'
+					],
+					'expected' => [
+						'Host linked to proxy group' => 'Group without proxies with linked host'
+					]
+				]
+			]
+		];
+	}
+	/**
+	 * @dataProvider getProxyFilterData
+	 */
+	public function testPageHosts_FilterMonitoredBy($data) {
+		$this->page->login()->open(self::HOST_LIST_PAGE)->waitUntilReady();
+
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->query('button:Reset')->one()->click();
-		$filter->getField('Host groups')->fill('Zabbix servers');
+		$filter->fill($data['filter']);
+		$filter->submit();
+		$this->page->waitUntilReady();
 
-		$this->zbxTestClickXpathWait('//label[text()="Proxy"]');
-		$this->zbxTestClickButtonText('Apply');
-		$this->zbxTestAssertElementPresentXpath("//tbody//a[text()='Host_1 with proxy']");
-		$this->zbxTestAssertElementPresentXpath("//tbody//a[text()='Proxy_1 for filter']");
-		$this->zbxTestAssertElementPresentXpath("//tbody//a[text()='Host_2 with proxy']");
-		$this->zbxTestAssertElementPresentXpath("//tbody//a[text()='Proxy_2 for filter']");
-		$this->assertTableStats(3);
-		$this->zbxTestClickButtonMultiselect('filter_proxyids_');
+		$this->assertTableStats(count($data['expected']));
+		$table = $this->query('class:list-table')->asTable()->one();
+		$this->assertEquals(array_keys($data['expected']), $this->getTableColumnData('Name'));
 
-		$proxies_dialog = COverlayDialogElement::find()->waitUntilReady()->one();
-		$this->assertEquals('Proxies', $proxies_dialog->getTitle());
-		$proxies_dialog->query('class:list-table')->one()->asTable()->findRow('Name', 'Proxy_1 for filter')->select();
-		$proxies_dialog->asForm()->submit();
-		$proxies_dialog->ensureNotPresent();
-
-		$this->zbxTestClickButtonText('Apply');
-		$this->zbxTestWaitForPageToLoad();
-		$this->zbxTestAssertElementPresentXpath("//tbody//a[text()='Host_1 with proxy']");
-		$this->assertTableStats(1);
+		foreach($data['expected'] as $host => $proxy) {
+			$this->assertEquals($proxy, $table->findRow('Name', $host)->getColumn('Proxy')->getText());
+		}
 	}
 
 	public function testPageHosts_FilterNone() {

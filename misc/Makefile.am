@@ -3,6 +3,7 @@
 EXTRA_DIST = \
 	init.d \
 	snmptrap \
+	images/docs \
 	images/png_classic \
 	images/png_modern \
 	images/png_to_xml.sh \

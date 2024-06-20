@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "evalfunc.h"
@@ -596,27 +591,6 @@ void	zbx_format_value(char *value, size_t max_len, zbx_uint64_t valuemapid,
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: check if function is to be evaluated for NOTSUPPORTED items.      *
- *                                                                            *
- * Parameters: fn - [IN] function name                                        *
- *                                                                            *
- * Return value: SUCCEED - do evaluate the function for NOTSUPPORTED items    *
- *               FAIL - don't evaluate the function for NOTSUPPORTED items    *
- *                                                                            *
- ******************************************************************************/
-int	zbx_evaluatable_for_notsupported(const char *fn)
-{
-	/* function nodata() are exceptions,                   */
-	/* and should be evaluated for NOTSUPPORTED items, too */
-
-	if (0 == strcmp(fn, "nodata"))
-		return SUCCEED;
-
-	return FAIL;
 }
 
 /******************************************************************************
@@ -3451,7 +3425,7 @@ out:
  *               FAIL - evaluation failed                                     *
  *                                                                            *
  ******************************************************************************/
-int	evaluate_function(zbx_variant_t *value, const zbx_dc_evaluate_item_t *item, const char *function,
+int	zbx_evaluate_function(zbx_variant_t *value, const zbx_dc_evaluate_item_t *item, const char *function,
 		const char *parameter, const zbx_timespec_t *ts, char **error)
 {
 	int		ret;

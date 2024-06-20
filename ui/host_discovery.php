@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -67,7 +62,8 @@ $fields = [
 									IN([-1, ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL,
 										ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR,
 										ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX,
-										ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT
+										ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT,
+										ITEM_TYPE_BROWSER
 									]),
 									'isset({add}) || isset({update})'
 								],
@@ -91,10 +87,17 @@ $fields = [
 										' && {authtype} == '.ITEM_AUTHTYPE_PUBLICKEY
 								],
 	$paramsFieldName =>			[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'(isset({add}) || isset({update}))'.
-									' && isset({type}) && '.IN(ITEM_TYPE_SSH.','.ITEM_TYPE_DB_MONITOR.','.
-										ITEM_TYPE_TELNET.','.ITEM_TYPE_CALCULATED.','.ITEM_TYPE_SCRIPT, 'type'
+									' && isset({type}) && '.IN([
+											ITEM_TYPE_SSH, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_TELNET, ITEM_TYPE_CALCULATED,
+											ITEM_TYPE_SCRIPT
+										],
+										'type'
 									),
 									getParamFieldLabelByType(getRequest('type', 0))
+								],
+	'browser_script' =>			[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'(isset({add}) || isset({update})) '.
+									' && isset({type}) && {type} == '.ITEM_TYPE_BROWSER,
+									_('Script')
 								],
 	'snmp_oid' =>				[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
 									'(isset({add}) || isset({update})) && isset({type})'.
@@ -133,7 +136,7 @@ $fields = [
 									'(isset({add}) || isset({update})) && isset({type})'.
 									' && '.IN([ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_ZABBIX_ACTIVE,
 										ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
-										ITEM_TYPE_SNMP, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SCRIPT
+										ITEM_TYPE_SNMP, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER
 									], 'type'),
 									_('Timeout')
 								],
@@ -236,7 +239,7 @@ $fields = [
 												ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_EXTERNAL,
 												ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
 												ITEM_TYPE_JMX, ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP,
-												ITEM_TYPE_SCRIPT
+												ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER
 											]),
 											null
 										],
@@ -540,6 +543,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'privatekey' => getRequest('privatekey', DB::getDefault('items', 'privatekey'))
 		];
 
+		if ($input['type'] == ITEM_TYPE_BROWSER) {
+			$input['params'] = getRequest('browser_script', '');
+		}
+
 		if ($input['filter']['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
 			foreach ($input['filter']['conditions'] as &$condition) {
 				unset($condition['formulaid']);
@@ -656,20 +663,29 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), ['discoveryru
 
 	$result = (bool) API::DiscoveryRule()->update($lld_rules);
 
-	if ($result) {
-		$filter_hostids ? uncheckTableRows($checkbox_hash) : uncheckTableRows();
-	}
-
 	$updated = count($itemids);
 
-	$messageSuccess = ($status == ITEM_STATUS_ACTIVE)
-		? _n('Discovery rule enabled', 'Discovery rules enabled', $updated)
-		: _n('Discovery rule disabled', 'Discovery rules disabled', $updated);
-	$messageFailed = ($status == ITEM_STATUS_ACTIVE)
-		? _n('Cannot enable discovery rule', 'Cannot enable discovery rules', $updated)
-		: _n('Cannot disable discovery rule', 'Cannot disable discovery rules', $updated);
+	if ($result) {
+		$filter_hostids ? uncheckTableRows($checkbox_hash) : uncheckTableRows();
 
-	show_messages($result, $messageSuccess, $messageFailed);
+		$message = $status == ITEM_STATUS_ACTIVE
+			? _n('Discovery rule enabled', 'Discovery rules enabled', $updated)
+			: _n('Discovery rule disabled', 'Discovery rules disabled', $updated);
+
+		CMessageHelper::setSuccessTitle($message);
+	}
+	else {
+		$message = $status == ITEM_STATUS_ACTIVE
+			? _n('Cannot enable discovery rule', 'Cannot enable discovery rules', $updated)
+			: _n('Cannot disable discovery rule', 'Cannot disable discovery rules', $updated);
+
+		CMessageHelper::setErrorTitle($message);
+	}
+
+	if (hasRequest('backurl')) {
+		$response = new CControllerResponseRedirect(getRequest('backurl'));
+		$response->redirect();
+	}
 }
 elseif (hasRequest('action') && getRequest('action') === 'discoveryrule.massdelete' && hasRequest('g_hostdruleid')) {
 	$result = API::DiscoveryRule()->delete(getRequest('g_hostdruleid'));

@@ -1,52 +1,47 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "zbxtrapper.h"
 #include "zbxdbwrap.h"
 
+#include "active.h"
+#include "trapper_expressions_evaluate.h"
+#include "trapper_item_test.h"
+#include "nodecommand.h"
+#include "version.h"
+
+#include "zbxtimekeeper.h"
 #include "zbxalgo.h"
 #include "zbxcacheconfig.h"
 #include "zbxdb.h"
-#include "zbxipcservice.h"
 #include "zbxjson.h"
 #include "zbxnum.h"
 #include "zbxstr.h"
 #include "zbxlog.h"
 #include "zbxself.h"
-#include "active.h"
-#include "nodecommand.h"
 #include "zbxnix.h"
 #include "zbxcommshigh.h"
 #include "zbxpoller.h"
-#include "trapper_expressions_evaluate.h"
-#include "trapper_item_test.h"
 #include "zbxavailability.h"
 #include "zbx_availability_constants.h"
 #include "zbxxml.h"
 #include "zbxcrypto.h"
 #include "zbxtime.h"
 #include "zbxstats.h"
-#include "zbx_rtc_constants.h"
 #include "zbx_host_constants.h"
 #include "zbx_trigger_constants.h"
 #include "zbx_item_constants.h"
-#include "version.h"
 #include "zbxscripts.h"
 #include "zbxcomms.h"
 #include "zbxdbhigh.h"
@@ -56,6 +51,8 @@
 
 #ifdef HAVE_NETSNMP
 #	include "zbxrtc.h"
+#	include "zbx_rtc_constants.h"
+#	include "zbxipcservice.h"
 #endif
 
 #define ZBX_MAX_SECTION_ENTRIES		4
@@ -116,7 +113,6 @@ typedef struct
 {
 	const char		*name;
 	zbx_entry_type_t	entry_type;
-	zbx_user_type_t		access_level;
 	int			*res;
 	zbx_section_entry_t	entries[ZBX_MAX_SECTION_ENTRIES];
 }
@@ -587,7 +583,7 @@ static void	zbx_status_counters_free(void)
 }
 
 const zbx_status_section_t	status_sections[] = {
-/*	{SECTION NAME,			NUMBER OF SECTION ENTRIES	SECTION ACCESS LEVEL	SECTION READINESS, */
+/*	{SECTION NAME,			NUMBER OF SECTION ENTRIES	SECTION READINESS,                         */
 /*		{                                                                                                  */
 /*			{ENTRY INFORMATION,		COUNTER TYPE,                                              */
 /*				{                                                                                  */
@@ -599,7 +595,7 @@ const zbx_status_section_t	status_sections[] = {
 /*		}                                                                                                  */
 /*	},                                                                                                         */
 /*	...                                                                                                        */
-	{"template stats",		ZBX_SECTION_ENTRY_THE_ONLY,	USER_TYPE_ZABBIX_USER,	&templates_res,
+	{"template stats",		ZBX_SECTION_ENTRY_THE_ONLY,	&templates_res,
 		{
 			{&templates,			ZBX_COUNTER_TYPE_UI64,
 				{
@@ -609,7 +605,7 @@ const zbx_status_section_t	status_sections[] = {
 			{0}
 		}
 	},
-	{"host stats",			ZBX_SECTION_ENTRY_PER_PROXY,	USER_TYPE_ZABBIX_USER,	NULL,
+	{"host stats",			ZBX_SECTION_ENTRY_PER_PROXY,	NULL,
 		{
 			{&hosts_monitored,		ZBX_COUNTER_TYPE_UI64,
 				{
@@ -626,7 +622,7 @@ const zbx_status_section_t	status_sections[] = {
 			{0}
 		}
 	},
-	{"item stats",			ZBX_SECTION_ENTRY_PER_PROXY,	USER_TYPE_ZABBIX_USER,	NULL,
+	{"item stats",			ZBX_SECTION_ENTRY_PER_PROXY,	NULL,
 		{
 			{&items_active_normal,		ZBX_COUNTER_TYPE_UI64,
 				{
@@ -651,7 +647,7 @@ const zbx_status_section_t	status_sections[] = {
 			{0}
 		}
 	},
-	{"trigger stats",		ZBX_SECTION_ENTRY_THE_ONLY,	USER_TYPE_ZABBIX_USER,	NULL,
+	{"trigger stats",		ZBX_SECTION_ENTRY_THE_ONLY,	NULL,
 		{
 			{&triggers_enabled_ok,		ZBX_COUNTER_TYPE_UI64,
 				{
@@ -676,7 +672,7 @@ const zbx_status_section_t	status_sections[] = {
 			{0}
 		}
 	},
-	{"user stats",			ZBX_SECTION_ENTRY_THE_ONLY,	USER_TYPE_ZABBIX_USER,	&users_res,
+	{"user stats",			ZBX_SECTION_ENTRY_THE_ONLY,	&users_res,
 		{
 			{&users_online,			ZBX_COUNTER_TYPE_UI64,
 				{
@@ -693,7 +689,7 @@ const zbx_status_section_t	status_sections[] = {
 			{0}
 		}
 	},
-	{"required performance",	ZBX_SECTION_ENTRY_PER_PROXY,	USER_TYPE_SUPER_ADMIN,	NULL,
+	{"required performance",	ZBX_SECTION_ENTRY_PER_PROXY,	NULL,
 		{
 			{&required_performance,		ZBX_COUNTER_TYPE_DBL,
 				{
@@ -703,7 +699,7 @@ const zbx_status_section_t	status_sections[] = {
 			{0}
 		}
 	},
-	{"server stats",		ZBX_SECTION_ENTRY_SERVER_STATS,	USER_TYPE_ZABBIX_USER,	NULL,
+	{"server stats",		ZBX_SECTION_ENTRY_SERVER_STATS,	NULL,
 		{
 			{0}
 		}
@@ -757,7 +753,7 @@ static void	status_entry_export(struct zbx_json *json, const zbx_section_entry_t
 	zbx_free(tmp);
 }
 
-static void	status_stats_export(struct zbx_json *json, zbx_user_type_t access_level)
+static void	status_stats_export(struct zbx_json *json)
 {
 	const zbx_status_section_t	*section;
 	const zbx_section_entry_t	*entry;
@@ -777,9 +773,6 @@ static void	status_stats_export(struct zbx_json *json, zbx_user_type_t access_le
 	/* add status information to JSON */
 	for (section = status_sections; NULL != section->name; section++)
 	{
-		if (access_level < section->access_level)	/* skip sections user has no rights to access */
-			continue;
-
 		if (NULL != section->res && SUCCEED != *section->res)	/* skip section we have no information for */
 			continue;
 
@@ -884,7 +877,10 @@ static int	recv_getstatus(zbx_socket_t *sock, struct zbx_json_parse *jp, int con
 			zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS,
 					ZBX_JSON_TYPE_STRING);
 			zbx_json_addobject(&json, ZBX_PROTO_TAG_DATA);
-			status_stats_export(&json, user.type);
+
+			if (USER_TYPE_SUPER_ADMIN == user.type)
+				status_stats_export(&json);
+
 			zbx_json_close(&json);
 			break;
 		default:
@@ -1145,7 +1141,8 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 		zbx_get_config_forks_f get_config_forks, const char *config_stats_allowed_ip, const char *progname,
 		const char *config_java_gateway, int config_java_gateway_port, const char *config_externalscripts,
 		int config_enable_global_scripts, zbx_get_value_internal_ext_f zbx_get_value_internal_ext_cb,
-		const char *config_ssh_key_location, zbx_trapper_process_request_func_t trapper_process_request_cb,
+		const char *config_ssh_key_location, const char *config_webdriver_url,
+		zbx_trapper_process_request_func_t trapper_process_request_cb,
 		zbx_autoreg_update_host_func_t autoreg_update_host_cb)
 {
 	int	ret = SUCCEED;
@@ -1232,7 +1229,8 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 				zbx_trapper_item_test(sock, &jp, config_comms, config_startup_time,
 						zbx_get_program_type_cb(), progname, get_config_forks,
 						config_java_gateway, config_java_gateway_port, config_externalscripts,
-						zbx_get_value_internal_ext_cb, config_ssh_key_location);
+						zbx_get_value_internal_ext_cb, config_ssh_key_location,
+						config_webdriver_url);
 			}
 		}
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_ACTIVE_CHECK_HEARTBEAT))
@@ -1336,7 +1334,8 @@ static void	process_trapper_child(zbx_socket_t *sock, zbx_timespec_t *ts,
 		zbx_get_config_forks_f get_config_forks, const char *config_stats_allowed_ip, const char *progname,
 		const char *config_java_gateway, int config_java_gateway_port, const char *config_externalscripts,
 		int config_enable_global_scripts, zbx_get_value_internal_ext_f zbx_get_value_internal_ext_cb,
-		const char *config_ssh_key_location, zbx_trapper_process_request_func_t trapper_process_request_cb,
+		const char *config_ssh_key_location, const char *config_webdriver_url,
+		zbx_trapper_process_request_func_t trapper_process_request_cb,
 		zbx_autoreg_update_host_func_t autoreg_update_host_cb)
 {
 	ssize_t	bytes_received;
@@ -1348,7 +1347,7 @@ static void	process_trapper_child(zbx_socket_t *sock, zbx_timespec_t *ts,
 			events_cbs, proxydata_frequency, get_config_forks, config_stats_allowed_ip, progname,
 			config_java_gateway, config_java_gateway_port, config_externalscripts,
 			config_enable_global_scripts, zbx_get_value_internal_ext_cb, config_ssh_key_location,
-			trapper_process_request_cb, autoreg_update_host_cb);
+			config_webdriver_url, trapper_process_request_cb, autoreg_update_host_cb);
 }
 
 ZBX_THREAD_ENTRY(zbx_trapper_thread, args)
@@ -1452,6 +1451,7 @@ ZBX_THREAD_ENTRY(zbx_trapper_thread, args)
 					trapper_args_in->config_enable_global_scripts,
 					trapper_args_in->zbx_get_value_internal_ext_cb,
 					trapper_args_in->config_ssh_key_location,
+					trapper_args_in->config_webdriver_url,
 					trapper_args_in->trapper_process_request_func_cb,
 					trapper_args_in->autoreg_update_host_cb);
 			sec = zbx_time() - sec;

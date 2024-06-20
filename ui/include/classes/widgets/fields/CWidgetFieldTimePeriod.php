@@ -1,21 +1,16 @@
 <?php declare(strict_types = 0);
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -72,12 +67,6 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 	public function validate(bool $strict = false): array {
 		$validation_rules = $this->getValidationRules($strict);
 
-		$label = $this->label ?? '';
-
-		if ($this->label_prefix !== null) {
-			$label = $this->label_prefix;
-		}
-
 		$value = $this->getValue();
 		$default = $this->getDefault();
 		$data_source = $this->getDataSource();
@@ -85,27 +74,34 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 		$errors = [];
 
 		if ($data_source !== self::DATA_SOURCE_DEFAULT) {
-			$data_source_label = $data_source === self::DATA_SOURCE_DASHBOARD ? _('Dashboard') : _('Widget');
+			$data_source_label = $this->getComponentErrorLabel($data_source === self::DATA_SOURCE_DASHBOARD
+				? _('Dashboard')
+				: _('Widget')
+			);
 
-			$reference_value = array_key_exists(CWidgetField::FOREIGN_REFERENCE_KEY, $value)
-				? $value[CWidgetField::FOREIGN_REFERENCE_KEY]
-				: '';
+			$has_reference_key = array_key_exists(CWidgetField::FOREIGN_REFERENCE_KEY, $value);
+			$reference_value = $has_reference_key ? $value[CWidgetField::FOREIGN_REFERENCE_KEY] : '';
 
 			if (!CApiInputValidator::validate($validation_rules['fields'][CWidgetField::FOREIGN_REFERENCE_KEY],
-					$reference_value, ($label !== '' ? $label.'/' : '').$data_source_label, $error)) {
+					$reference_value, $data_source_label, $error)) {
 				$errors[] = $error;
 			}
-		}
-		elseif (($strict || array_key_exists(self::FOREIGN_REFERENCE_KEY, $default)) && !$value) {
-			$errors[] = _s('Invalid parameter "%1$s": %2$s.', $this->name, _('data is missing'));
+			elseif (!$has_reference_key && ($strict || ($this->getFlags() & self::FLAG_NOT_EMPTY) !== 0)) {
+				$errors[] = _s('Invalid parameter "%1$s": %2$s.', $data_source_label, _('cannot be empty'));
+			}
+			elseif ($strict && $has_reference_key && $reference_value === '') {
+				$errors[] = _s('Invalid parameter "%1$s": %2$s.', $data_source_label,
+					_('referred widget is unavailable')
+				);
+			}
 		}
 		else {
 			$absolute_time_parser = new CAbsoluteTimeParser();
 			$relative_time_parser = new CRelativeTimeParser();
 
 			$field_labels = [
-				'from' => ($label !== '' ? $label.'/' : '').$this->getFromLabel(),
-				'to' => ($label !== '' ? $label.'/' : '').$this->getToLabel()
+				'from' => $this->getComponentErrorLabel($this->getFromLabel()),
+				'to' => $this->getComponentErrorLabel($this->getToLabel())
 			];
 
 			foreach (['from' => 'from_ts', 'to' => 'to_ts'] as $field => $field_ts) {
@@ -283,6 +279,20 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 		return $this;
 	}
 
+	private function getComponentErrorLabel(string $component_label): string {
+		$error_label = $component_label;
+
+		if ($this->label !== null) {
+			$error_label = $this->label.'/'.$error_label;
+		}
+
+		if ($this->label_prefix !== null) {
+			$error_label = $this->label_prefix.': '.$error_label;
+		}
+
+		return $error_label;
+	}
+
 	public function getDefaultPeriod(): array {
 		return $this->default_period;
 	}
@@ -335,14 +345,8 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 		}
 		else {
 			$validation_rules = ['type' => API_OBJECT, 'fields' => [
-				CWidgetField::FOREIGN_REFERENCE_KEY => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED]
+				CWidgetField::FOREIGN_REFERENCE_KEY => ['type' => API_STRING_UTF8]
 			]];
-
-			if (($this->getFlags() & self::FLAG_NOT_EMPTY) !== 0) {
-				self::setValidationRuleFlag($validation_rules['fields'][CWidgetField::FOREIGN_REFERENCE_KEY],
-					API_NOT_EMPTY
-				);
-			}
 		}
 
 		return $validation_rules;

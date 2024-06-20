@@ -1,21 +1,16 @@
 <?php declare(strict_types = 0);
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -203,7 +198,6 @@ class CControllerMenuPopup extends CController {
 
 			if (array_key_exists('urls', $data)) {
 				foreach ($data['urls'] as &$url) {
-					$url['new_window'] = ZBX_SCRIPT_URL_NEW_WINDOW_YES;
 					$url['confirmation'] = '';
 					$url['menu_path'] = '';
 					$url['name'] = $url['label'];
@@ -958,10 +952,14 @@ class CControllerMenuPopup extends CController {
 				'confirmation' => $url['confirmation']
 			];
 
+			$target = array_key_exists('new_window', $url) && $url['new_window'] == ZBX_SCRIPT_URL_NEW_WINDOW_YES
+				? '_blank'
+				: '';
+
 			if (CHtmlUrlValidator::validate($url['url'], ['allow_user_macro' => false])) {
 				$menu_data_parameters += [
 					'url' => $url['url'],
-					'target' => $url['new_window'] == ZBX_SCRIPT_URL_NEW_WINDOW_YES ? '_blank' : ''
+					'target' => $target
 				];
 			}
 			else {

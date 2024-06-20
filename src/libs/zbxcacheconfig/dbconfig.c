@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "dbconfig.h"
@@ -60,9 +55,9 @@
 #include "zbxdb.h"
 #include "zbxmutexs.h"
 #include "zbxautoreg.h"
-#include "zbxexpression.h"
 #include "zbxpgservice.h"
 #include "zbxinterface.h"
+#include "zbxhistory.h"
 
 ZBX_PTR_VECTOR_IMPL(inventory_value_ptr, zbx_inventory_value_t *)
 ZBX_PTR_VECTOR_IMPL(hc_item_ptr, zbx_hc_item_t *)
@@ -2285,14 +2280,21 @@ void	zbx_dc_sync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths, const zbx_
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+#define EXPAND_INTERFACE_MACROS		1
+
 /******************************************************************************
  *                                                                            *
  * Purpose: expand host macros in string                                      *
  *                                                                            *
+ * Parameters: text    - [IN] input string                                    *
+ *             dc_host - [IN]                                                 *
+ *             flags   - [IN] specifies if interface related macros must      *
+ *                            be resolved (EXPAND_INTERFACE_MACROS)           *
+ *                                                                            *
  * Return value: text with resolved macros or NULL if there were no macros    *
  *                                                                            *
  ******************************************************************************/
-static char	*dc_expand_host_macros_dyn(const char *text, const ZBX_DC_HOST *dc_host)
+static char	*dc_expand_host_macros_dyn(const char *text, const ZBX_DC_HOST *dc_host, int flags)
 {
 #define IF_MACRO_HOST		"{HOST."
 #define IF_MACRO_HOST_HOST	IF_MACRO_HOST "HOST}"
@@ -2339,29 +2341,34 @@ static char	*dc_expand_host_macros_dyn(const char *text, const ZBX_DC_HOST *dc_h
 		{
 			value = dc_host->name;
 		}
-		else if (SUCCEED == zbx_strloc_cmp(text, &token.loc, IF_MACRO_HOST_IP, IF_MACRO_HOST_IP_LEN) ||
-				SUCCEED == zbx_strloc_cmp(text, &token.loc, IF_MACRO_IPADDRESS, IF_MACRO_IPADDRESS_LEN))
+		else if (0 != (flags & EXPAND_INTERFACE_MACROS))
 		{
-			if (SUCCEED == zbx_dc_config_get_interface_by_type(&interface, dc_host->hostid,
-					INTERFACE_TYPE_AGENT))
+			if (SUCCEED == zbx_strloc_cmp(text, &token.loc, IF_MACRO_HOST_IP, IF_MACRO_HOST_IP_LEN) ||
+					SUCCEED == zbx_strloc_cmp(text, &token.loc, IF_MACRO_IPADDRESS,
+							IF_MACRO_IPADDRESS_LEN))
 			{
-				value = interface.ip_orig;
+				if (SUCCEED == zbx_dc_config_get_interface_by_type(&interface, dc_host->hostid,
+						INTERFACE_TYPE_AGENT))
+				{
+					value = interface.ip_orig;
+				}
 			}
-		}
-		else if (SUCCEED == zbx_strloc_cmp(text, &token.loc, IF_MACRO_HOST_DNS, IF_MACRO_HOST_DNS_LEN))
-		{
-			if (SUCCEED == zbx_dc_config_get_interface_by_type(&interface, dc_host->hostid,
-					INTERFACE_TYPE_AGENT))
+			else if (SUCCEED == zbx_strloc_cmp(text, &token.loc, IF_MACRO_HOST_DNS, IF_MACRO_HOST_DNS_LEN))
 			{
-				value = interface.dns_orig;
+				if (SUCCEED == zbx_dc_config_get_interface_by_type(&interface, dc_host->hostid,
+						INTERFACE_TYPE_AGENT))
+				{
+					value = interface.dns_orig;
+				}
 			}
-		}
-		else if (SUCCEED == zbx_strloc_cmp(text, &token.loc, IF_MACRO_HOST_CONN, IF_MACRO_HOST_CONN_LEN))
-		{
-			if (SUCCEED == zbx_dc_config_get_interface_by_type(&interface, dc_host->hostid,
-					INTERFACE_TYPE_AGENT))
+			else if (SUCCEED == zbx_strloc_cmp(text, &token.loc, IF_MACRO_HOST_CONN,
+					IF_MACRO_HOST_CONN_LEN))
 			{
-				value = interface.addr;
+				if (SUCCEED == zbx_dc_config_get_interface_by_type(&interface, dc_host->hostid,
+						INTERFACE_TYPE_AGENT))
+				{
+					value = interface.addr;
+				}
 			}
 		}
 
@@ -2575,11 +2582,11 @@ static void	dc_if_update_free(zbx_dc_if_update_t *update)
  * Purpose: resolve host macros in host interface update                      *
  *                                                                            *
  ******************************************************************************/
-static void	dc_if_update_substitute_host_macros(zbx_dc_if_update_t *update, const ZBX_DC_HOST *host)
+static void	dc_if_update_substitute_host_macros(zbx_dc_if_update_t *update, const ZBX_DC_HOST *host, int flags)
 {
 	char	*addr;
 
-	if (NULL != (addr = dc_expand_host_macros_dyn(update->ip, host)))
+	if (NULL != (addr = dc_expand_host_macros_dyn(update->ip, host, flags)))
 	{
 		if (SUCCEED == zbx_is_ip(addr))
 		{
@@ -2590,7 +2597,7 @@ static void	dc_if_update_substitute_host_macros(zbx_dc_if_update_t *update, cons
 			zbx_free(addr);
 	}
 
-	if (NULL != (addr = dc_expand_host_macros_dyn(update->dns, host)))
+	if (NULL != (addr = dc_expand_host_macros_dyn(update->dns, host, flags)))
 	{
 		if (SUCCEED == zbx_is_ip(addr) || SUCCEED == zbx_validate_hostname(addr))
 		{
@@ -2741,7 +2748,7 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync, zbx_uint64_t revision)
 		/* with {HOST.IP} and {HOST.DNS} macros                                */
 		if (1 == interface->main && INTERFACE_TYPE_AGENT == interface->type)
 		{
-			dc_if_update_substitute_host_macros(update, host);
+			dc_if_update_substitute_host_macros(update, host, 0);
 
 			if (SUCCEED == dc_strpool_replace(found, &interface->ip, update->ip))
 				update->modified = 1;
@@ -2783,7 +2790,7 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync, zbx_uint64_t revision)
 
 		if (1 != update->interface->main || INTERFACE_TYPE_AGENT != update->interface->type)
 		{
-			dc_if_update_substitute_host_macros(update, update->host);
+			dc_if_update_substitute_host_macros(update, update->host, EXPAND_INTERFACE_MACROS);
 
 			if (SUCCEED == dc_strpool_replace(update->found, &update->interface->ip, update->ip))
 				update->modified = 1;
@@ -3080,9 +3087,9 @@ do													\
 }													\
 while(0)
 
-static zbx_vector_ptr_t	*dc_item_parameters(const ZBX_DC_ITEM *item)
+static zbx_vector_ptr_t	*dc_item_parameters(const ZBX_DC_ITEM *item, unsigned char type)
 {
-	switch (item->type)
+	switch (type)
 	{
 		case ITEM_TYPE_SCRIPT:
 			return &item->itemtype.scriptitem->params;
@@ -3211,7 +3218,7 @@ static void	dc_item_type_update(int found, ZBX_DC_ITEM *item, zbx_item_type_t *o
 
 	if (1 == found && *old_type != item->type)
 	{
-		if (NULL != (parameters = dc_item_parameters(item)))
+		if (NULL != (parameters = dc_item_parameters(item, *old_type)))
 			parameters_local = *parameters;
 
 		dc_item_type_free(item, *old_type);
@@ -3227,7 +3234,7 @@ static void	dc_item_type_update(int found, ZBX_DC_ITEM *item, zbx_item_type_t *o
 			{
 				if (1 == found)
 				{
-					if (NULL != (parameters = dc_item_parameters(item)))
+					if (NULL != (parameters = dc_item_parameters(item, item->type)))
 						parameters_local = *parameters;
 
 					dc_item_type_free(item, item->type);
@@ -3892,7 +3899,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 
 		zbx_vector_ptr_t	*parameters;
 
-		if (NULL != (parameters = dc_item_parameters(item)))
+		if (NULL != (parameters = dc_item_parameters(item, item->type)))
 			zbx_vector_ptr_destroy(parameters);
 
 		dc_item_type_free(item, item->type);
@@ -6077,10 +6084,8 @@ static void	DCsync_items_param(zbx_dbsync_t *sync, zbx_uint64_t revision)
 	unsigned char		tag;
 	zbx_uint64_t		item_paramid, itemid;
 	int			found, ret, i, index;
-	ZBX_DC_ITEM		*item;
 	zbx_dc_item_param_t	*item_param;
 	zbx_vector_ptr_t	items;
-	ZBX_DC_ITEM		*dc_item;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -6089,6 +6094,7 @@ static void	DCsync_items_param(zbx_dbsync_t *sync, zbx_uint64_t revision)
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
 	{
 		zbx_vector_ptr_t	*params;
+		ZBX_DC_ITEM		*item;
 
 		/* removed rows will be always added at the end */
 		if (ZBX_DBSYNC_ROW_REMOVE == tag)
@@ -6097,7 +6103,7 @@ static void	DCsync_items_param(zbx_dbsync_t *sync, zbx_uint64_t revision)
 		ZBX_STR2UINT64(itemid, row[1]);
 
 		if (NULL == (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &itemid)) ||
-				NULL == (params = dc_item_parameters(item)))
+				NULL == (params = dc_item_parameters(item, item->type)))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG,
 					"cannot find parent item for item parameters (itemid=" ZBX_FS_UI64")", itemid);
@@ -6125,6 +6131,7 @@ static void	DCsync_items_param(zbx_dbsync_t *sync, zbx_uint64_t revision)
 	for (; SUCCEED == ret; ret = zbx_dbsync_next(sync, &rowid, &row, &tag))
 	{
 		zbx_vector_ptr_t	*params;
+		ZBX_DC_ITEM		*item;
 
 		if (NULL == (item_param =
 				(zbx_dc_item_param_t *)zbx_hashset_search(&config->items_params, &rowid)))
@@ -6133,7 +6140,7 @@ static void	DCsync_items_param(zbx_dbsync_t *sync, zbx_uint64_t revision)
 		}
 
 		if (NULL != (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &item_param->itemid)) &&
-				NULL != (params = dc_item_parameters(item)))
+				NULL != (params = dc_item_parameters(item, item->type)))
 		{
 			if (FAIL != (index = zbx_vector_ptr_search(params, item_param, ZBX_DEFAULT_PTR_COMPARE_FUNC)))
 			{
@@ -6155,11 +6162,12 @@ static void	DCsync_items_param(zbx_dbsync_t *sync, zbx_uint64_t revision)
 	for (i = 0; i < items.values_num; i++)
 	{
 		zbx_vector_ptr_t	*params;
+		ZBX_DC_ITEM		*item;
 
-		dc_item = (ZBX_DC_ITEM *)items.values[i];
-		dc_item_update_revision(dc_item, revision);
+		item = (ZBX_DC_ITEM *)items.values[i];
+		dc_item_update_revision(item, revision);
 
-		params = dc_item_parameters(item);
+		params = dc_item_parameters(item, item->type);
 
 		if (NULL != params && 0 < params->values_num)
 			zbx_vector_ptr_sort(params, dc_compare_items_param);
@@ -9846,7 +9854,6 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 	const ZBX_DC_INTERFACE		*dc_interface;
 	int				i;
 	struct zbx_json			json;
-	zbx_vector_ptr_t		*parameters;
 
 	dst_item->type = src_item->type;
 	dst_item->value_type = src_item->value_type;
@@ -10029,32 +10036,26 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 			zbx_json_free(&json);
 
 			dst_item->timeout = 0;
+
 			break;
 		case ITEM_TYPE_BROWSER:
+			zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
+
 			dst_item->params = zbx_strdup(NULL, src_item->itemtype.browseritem->script);
 
-			parameters = dc_item_parameters(src_item);
+			for (i = 0; i < src_item->itemtype.browseritem->params.values_num; i++)
+			{
+				zbx_dc_item_param_t	*params;
+
+				params = (zbx_dc_item_param_t*)(src_item->itemtype.browseritem->params.values[i]);
+				zbx_json_addstring(&json, params->name, params->value, ZBX_JSON_TYPE_STRING);
+			}
+
+			dst_item->script_params = zbx_strdup(NULL, json.buffer);
+			zbx_json_free(&json);
+
 			dst_item->timeout = 0;
 
-			if (NULL != parameters && 0 != parameters->values_num)
-			{
-				dst_item->parameters = (zbx_vector_tags_ptr_t *)zbx_malloc(NULL, sizeof(zbx_vector_tags_ptr_t));
-
-				zbx_vector_tags_ptr_create(dst_item->parameters);
-				zbx_vector_tags_ptr_reserve(dst_item->parameters, parameters->values_num);
-
-				for (i = 0; i < parameters->values_num; i++)
-				{
-					zbx_dc_item_param_t	*param = (zbx_dc_item_param_t*)(parameters->values[i]);
-					zbx_tag_t		*tag = (zbx_tag_t *)zbx_malloc(NULL, sizeof(zbx_tag_t));
-
-					tag->tag = zbx_strdup(NULL, param->name);
-					tag->value = zbx_strdup(NULL, param->value);
-					zbx_vector_tags_ptr_append(dst_item->parameters, tag);
-				}
-			}
-			else
-				dst_item->parameters = NULL;
 			break;
 		case ITEM_TYPE_TELNET:
 			zbx_strscpy(dst_item->username_orig, src_item->itemtype.telnetitem->username);
@@ -10105,20 +10106,12 @@ void	zbx_dc_config_clean_items(zbx_dc_item_t *items, int *errcodes, size_t num)
 
 		switch (items[i].type)
 		{
-			case ITEM_TYPE_BROWSER:
-				zbx_free(items[i].params);
-				if (NULL != items[i].parameters)
-				{
-					zbx_vector_tags_ptr_clear_ext(items[i].parameters, zbx_free_tag);
-					zbx_vector_tags_ptr_destroy(items[i].parameters);
-				}
-				zbx_free(items[i].parameters);
-				break;
 			case ITEM_TYPE_HTTPAGENT:
 				zbx_free(items[i].headers);
 				zbx_free(items[i].posts);
 				break;
 			case ITEM_TYPE_SCRIPT:
+			case ITEM_TYPE_BROWSER:
 				zbx_free(items[i].script_params);
 				ZBX_FALLTHROUGH;
 			case ITEM_TYPE_DB_MONITOR:
@@ -17061,8 +17054,8 @@ void	zbx_dc_get_unused_macro_templates(zbx_hashset_t *templates, const zbx_vecto
 }
 
 #ifdef HAVE_TESTS
-#	include "../../../tests/libs/zbxdbcache/dc_item_poller_type_update_test.c"
-#	include "../../../tests/libs/zbxdbcache/dc_function_calculate_nextcheck_test.c"
+#	include "../../../tests/libs/zbxcacheconfig/dc_item_poller_type_update_test.c"
+#	include "../../../tests/libs/zbxcacheconfig/dc_function_calculate_nextcheck_test.c"
 #endif
 
 void	zbx_recalc_time_period(time_t *ts_from, int table_group)
