@@ -317,6 +317,7 @@ class testUsers extends CAPITest {
 				'expected_result' => [[
 					'userid' => '1',
 					'role' => [
+						'roleid' => '3',
 						'name' => 'Super admin role',
 						'type' => '3', // USER_TYPE_SUPER_ADMIN
 						'readonly' => '1'

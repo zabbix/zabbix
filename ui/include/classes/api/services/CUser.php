@@ -1993,7 +1993,7 @@ class CUser extends CApiService {
 
 		$db_roles = API::Role()->get([
 			'output' => $options['selectRole'] === API_OUTPUT_EXTEND
-				? array_diff(CRole::OUTPUT_FIELDS, ['roleid'])
+				? CRole::OUTPUT_FIELDS
 				: $options['selectRole'],
 			'roleids' => $relation_map->getRelatedIds(),
 			'preservekeys' => true
