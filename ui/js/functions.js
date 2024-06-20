@@ -116,6 +116,10 @@ function validateNumericBox(obj, allowempty, allownegative) {
 				else {
 					obj.value = parseInt(obj.value, 10);
 				}
+
+				if (obj.hasAttribute('data-pads-length')) {
+					obj.value = obj.value.padStart(obj.dataset.padsLength, '0');
+				}
 			}
 		}
 		else {
@@ -124,6 +128,10 @@ function validateNumericBox(obj, allowempty, allownegative) {
 			}
 			else {
 				obj.value = parseInt(obj.value, 10);
+			}
+
+			if (obj.hasAttribute('data-pads-length')) {
+				obj.value = obj.value.padStart(obj.dataset.padsLength, '0');
 			}
 		}
 	}

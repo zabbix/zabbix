@@ -32,4 +32,17 @@ class CNumericBox extends CInput {
 		$this->addStyle('width: '.$value.'px;');
 		return $this;
 	}
+
+	/**
+	 * Set a "data-pads-length" attribute to later use it with JS padStart().
+	 *
+	 * @param int $length  Pad length.
+	 *
+	 * @return CNumericBox
+	 */
+	public function setPad(int $length) {
+		$this->setAttribute('data-pads-length', $length);
+
+		return $this;
+	}
 }
