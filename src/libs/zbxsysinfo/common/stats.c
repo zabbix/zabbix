@@ -55,7 +55,7 @@ int	diskdevice_collector_started(void)
 	return ((NULL != collector) && (ZBX_NONEXISTENT_SHMID != collector->diskstat_shmid));
 }
 
-static int			shm_id;
+static int			shm_id = ZBX_NONEXISTENT_SHMID;
 static int			my_diskstat_shmid = ZBX_NONEXISTENT_SHMID;
 static zbx_diskdevices_data	*diskdevices = NULL;
 zbx_diskdevices_data	*get_diskdevices(void)
@@ -457,7 +457,13 @@ ZBX_THREAD_ENTRY(zbx_collector_thread, args)
 		}
 
 		if (0 != diskdevice_collector_started())
+		{
+			if (NULL == diskdevices)
+			{
+				diskstat_shm_init();
+			}
 			collect_stats_diskdevices(diskdevices);
+		}
 
 #ifdef ZBX_PROCSTAT_COLLECTOR
 		zbx_procstat_collect();

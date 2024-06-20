@@ -114,6 +114,12 @@ static void	process_diskstat(zbx_single_diskdevice_data *device)
 
 void	collect_stats_diskdevices(zbx_diskdevices_data *diskdevices)
 {
+	if (diskdevices == NULL)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "diskdevices is NULL in %s()", __func__);
+		return;
+	}
+
 	stats_lock_diskstats();
 	diskstat_shm_reattach();
 
@@ -196,7 +202,10 @@ zbx_single_diskdevice_data	*collector_diskdevice_add(const char *devname)
 	}
 
 	if (diskdevices->count == diskdevices->max_diskdev)
+	{
 		diskstat_shm_extend();
+		diskdevices = get_diskdevices();
+	}
 
 	device = &(diskdevices->device[diskdevices->count]);
 	memset(device, 0, sizeof(zbx_single_diskdevice_data));
