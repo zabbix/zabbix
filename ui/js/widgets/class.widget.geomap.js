@@ -123,7 +123,7 @@ class CWidgetGeoMap extends CWidget {
 			attribution: config.attribution
 		}).addTo(this._map);
 
-		this.initSeverities(config.colors);
+		this.initSeverities(config.severities);
 
 		// Create cluster layer.
 		this._clusters = this._createClusterLayer();
@@ -495,52 +495,19 @@ class CWidgetGeoMap extends CWidget {
 	/**
 	 * Function creates marker icons and severity-related options.
 	 *
-	 * @param {object} severity_colors
+	 * @param {object} severities
 	 */
-	initSeverities(severity_colors) {
-		this._severity_levels.set(CWidgetGeoMap.SEVERITY_NO_PROBLEMS, {
-			name: t('No problems'),
-			color: severity_colors[CWidgetGeoMap.SEVERITY_NO_PROBLEMS]
-		});
-		this._severity_levels.set(CWidgetGeoMap.SEVERITY_NOT_CLASSIFIED, {
-			name: t('Not classified'),
-			abbr: t('N'),
-			class: 'na-bg',
-			color: severity_colors[CWidgetGeoMap.SEVERITY_NOT_CLASSIFIED]
-		});
-		this._severity_levels.set(CWidgetGeoMap.SEVERITY_INFORMATION, {
-			name: t('Information'),
-			abbr: t('I'),
-			class: 'info-bg',
-			color: severity_colors[CWidgetGeoMap.SEVERITY_INFORMATION]
-		});
-		this._severity_levels.set(CWidgetGeoMap.SEVERITY_WARNING, {
-			name: t('Warning'),
-			abbr: t('W'),
-			class: 'warning-bg',
-			color: severity_colors[CWidgetGeoMap.SEVERITY_WARNING]
-		});
-		this._severity_levels.set(CWidgetGeoMap.SEVERITY_AVERAGE, {
-			name: t('Average'),
-			abbr: t('A'),
-			class: 'average-bg',
-			color: severity_colors[CWidgetGeoMap.SEVERITY_AVERAGE]
-		});
-		this._severity_levels.set(CWidgetGeoMap.SEVERITY_HIGH, {
-			name: t('High'),
-			abbr: t('H'),
-			class: 'high-bg',
-			color: severity_colors[CWidgetGeoMap.SEVERITY_HIGH]
-		});
-		this._severity_levels.set(CWidgetGeoMap.SEVERITY_DISASTER, {
-			name: t('Disaster'),
-			abbr: t('D'),
-			class: 'disaster-bg',
-			color: severity_colors[CWidgetGeoMap.SEVERITY_DISASTER]
-		});
+	initSeverities(severities) {
+		for (let i = CWidgetGeoMap.SEVERITY_NO_PROBLEMS; i <= CWidgetGeoMap.SEVERITY_DISASTER; i++) {
+			const severity = severities[i];
 
-		for (const severity in severity_colors) {
-			const color = severity_colors[severity];
+			this._severity_levels.set(i, {
+				name: severity['name'],
+				color: severity['color'],
+				abbr: severity['name'].charAt(0),
+				class: severity['style']
+			});
+
 			const tmpl = `
 				<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="40px" height="40px" version="1.1" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd" viewBox="0 0 500 500" xmlns:xlink="http://www.w3.org/1999/xlink">
 				<defs>
@@ -549,12 +516,12 @@ class CWidgetGeoMap extends CWidget {
 					]]></style>
 				</defs>
 				<g>
-					<path fill="${color}" d="M254 13c81,0 146,65 146,146 0,40 -16,77 -43,103l-97 233 -11 3 -98 -236c-27,-26 -43,-63 -43,-103 0,-81 65,-146 146,-146zm0 82c84,0 84,127 0,127 -84,0 -84,-127 0,-127z"/>
+					<path fill="${severity['color']}" d="M254 13c81,0 146,65 146,146 0,40 -16,77 -43,103l-97 233 -11 3 -98 -236c-27,-26 -43,-63 -43,-103 0,-81 65,-146 146,-146zm0 82c84,0 84,127 0,127 -84,0 -84,-127 0,-127z"/>
 					<path class="outline" d="M254 6c109,0 182,111 141,211 -8,18 -19,35 -32,49l-98 235 -19 5 -100 -240c-18,-27 -44,-46 -44,-107 0,-84 68,-153 152,-153zm99 54c-132,-132 -327,70 -197,198l97 233 3 -1 97 -232c54,-54 55,-143 0,-198zm-99 29c92,0 92,140 0,140 -92,0 -92,-140 0,-140zm40 29c-53,-53 -134,28 -80,81 53,53 134,-27 80,-81z"/>
 				</g>
 				</svg>`;
 
-			this._icons[severity] = L.icon({
+			this._icons[i] = L.icon({
 				iconUrl: 'data:image/svg+xml;base64,' + btoa(tmpl),
 				shadowUrl: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACkAAAApCAQAAAACach9AAACMUlEQVR4Ae3ShY7jQBAE0Aoz/f9/HTMzhg1zrdKUrJbdx+Kd2nD8VNudfsL/Th/'+'/'+'/dyQN2TH6f3y/BGpC379rV+S+qqetBOxImNQXL8JCAr2V4iMQXHGNJxeCfZXhSRBcQMfvkOWUdtfzlLgAENmZDcmo2TVmt8OSM2eXxBp3DjHSMFutqS7SbmemzBiR+xpKCNUIRkdkkYxhAkyGoBvyQFEJEefwSmmvBfJuJ6aKqKWnAkvGZOaZXTUgFqYULWNSHUckZuR1HIIimUExutRxwzOLROIG4vKmCKQt364mIlhSyzAf1m9lHZHJZrlAOMMztRRiKimp/rpdJDc9Awry5xTZCte7FHtuS8wJgeYGrex28xNTd086Dik7vUMscQOa8y4DoGtCCSkAKlNwpgNtphjrC6MIHUkR6YWxxs6Sc5xqn222mmCRFzIt8lEdKx+ikCtg91qS2WpwVfBelJCiQJwvzixfI9cxZQWgiSJelKnwBElKYtDOb2MFbhmUigbReQBV0Cg4+qMXSxXSyGUn4UbF8l+7qdSGnTC0XLCmahIgUHLhLOhpVCtw4CzYXvLQWQbJNmxoCsOKAxSgBJno75avolkRw8iIAFcsdc02e9iyCd8tHwmeSSoKTowIgvscSGZUOA7PuCN5b2BX9mQM7S0wYhMNU74zgsPBj3HU7wguAfnxxjFQGBE6pwN+GjME9zHY7zGp8wVxMShYX9NXvEWD3HbwJf4giO4CFIQxXScH1/TM+04kkBiAAAAAElFTkSuQmCC',
 				iconSize: [40, 40],
