@@ -40,7 +40,8 @@ This template has been tested on:
 |{$CPU.UTIL.CRIT}||`90`|
 |{$IF.ERRORS.WARN}||`2`|
 |{$IF.UTIL.MAX}||`90`|
-|{$SYSTEM.FUZZYTIME.MAX}||`60`|
+|{$SYSTEM.FUZZYTIME.MAX}|<p>The upper threshold for difference of system time.</p>|`60s`|
+|{$SYSTEM.FUZZYTIME.MIN}|<p>The lower threshold for difference of system time. Used in recovery expression to avoid trigger flapping.</p>|`10s`|
 |{$KERNEL.MAXFILES.MIN}||`256`|
 |{$LOAD_AVG_PER_CPU.MAX.WARN}|<p>Load per CPU considered sustainable. Tune if needed.</p>|`1.5`|
 |{$NODE_EXPORTER_HOST}|<p>The hostname or IP address of the node_exporter host.</p>|`<SET NODE EXPORTER HOST>`|
