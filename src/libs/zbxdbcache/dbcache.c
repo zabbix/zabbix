@@ -1525,11 +1525,11 @@ static void	DCexport_history_and_trends(const ZBX_DC_HISTORY *history, int histo
 
 	zbx_hashset_destroy(&hosts_info);
 clean:
+	zbx_dc_config_clean_history_sync_items(trend_items, trend_errcodes, (size_t)trend_itemids.values_num);
 	zbx_hashset_destroy(&items_info);
 	zbx_vector_uint64_destroy(&item_info_ids);
 	zbx_vector_uint64_destroy(&hostids);
 	zbx_vector_uint64_destroy(&trend_itemids);
-	zbx_dc_config_clean_history_sync_items(trend_items, trend_errcodes, (size_t)trend_itemids.values_num);
 	zbx_free(trend_items);
 	zbx_free(trend_errcodes);
 
