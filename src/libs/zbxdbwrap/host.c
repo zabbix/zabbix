@@ -4021,12 +4021,16 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 
 	if (SUCCEED == res && (NULL != sql1 || new_hosts != host_prototypes->values_num || 0 != upd_group_prototypes ||
 			0 != upd_hostmacros || 0 != upd_inventory_modes))
+	{
 		(void)zbx_db_flush_overflowed_sql(sql1, sql1_offset);
+	}
 
 	if (SUCCEED == res && (NULL != sql2 || 0 != del_hosttemplateids->values_num ||
 			0 != del_hostmacroids->values_num || 0 != del_tagids.values_num ||
 			0 != del_interfaceids->values_num || 0 != del_inventory_modes_hostids.values_num))
+	{
 		(void)zbx_db_flush_overflowed_sql(sql2, sql2_offset);
+	}
 
 	zbx_free(sql1);
 	zbx_free(sql2);
