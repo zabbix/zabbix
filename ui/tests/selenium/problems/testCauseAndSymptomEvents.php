@@ -23,7 +23,7 @@ require_once dirname(__FILE__).'/../../include/CWebTest.php';
 class testCauseAndSymptomEvents extends CWebTest {
 
 	/**
-	 * Attach TagBehavior and TableBehavior to the test.
+	 * Attach TableBehavior to the test.
 	 *
 	 * @return array
 	 */
@@ -42,7 +42,7 @@ class testCauseAndSymptomEvents extends CWebTest {
 		]);
 		self::$groupids = CDataHelper::getIds('name');
 
-		// Create hosts and trapper items for top triggers data test.
+		// Create hosts and trapper items.
 		CDataHelper::createHosts([
 			[
 				'host' => 'Host for Cause and Symptom check',
