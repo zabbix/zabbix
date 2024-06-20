@@ -385,19 +385,6 @@ zabbix_export:
           tags:
             - tag: component
               value: system
-          triggers:
-            - uuid: 10f29c3898cf41a0a2551349cd052413
-              expression: 'fuzzytime(/Linux by Zabbix agent active/system.localtime,{$SYSTEM.FUZZYTIME.MAX})=0'
-              name: 'System time is out of sync'
-              event_name: 'System time is out of sync (diff with Zabbix server > {$SYSTEM.FUZZYTIME.MAX}s)'
-              priority: WARNING
-              description: 'The host''s system time is different from Zabbix server time.'
-              manual_close: 'YES'
-              tags:
-                - tag: scope
-                  value: availability
-                - tag: scope
-                  value: performance
         - uuid: 627cbcb2432a4aeda6e90363d9b0c1db
           name: 'Operating system architecture'
           type: ZABBIX_ACTIVE
@@ -1633,9 +1620,6 @@ zabbix_export:
         - macro: '{$SWAP.PFREE.MIN.WARN}'
           value: '50'
           description: 'The warning threshold of the minimum free swap.'
-        - macro: '{$SYSTEM.FUZZYTIME.MAX}'
-          value: '60'
-          description: 'The threshold for the difference of system time in seconds.'
         - macro: '{$VFS.DEV.DEVNAME.MATCHES}'
           value: .+
           description: 'Used for block device discovery. Can be overridden on the host or linked template level.'
