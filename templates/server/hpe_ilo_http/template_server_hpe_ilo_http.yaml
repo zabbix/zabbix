@@ -235,16 +235,18 @@ zabbix_export:
             								}
             							}
             
-            							var storage_volumes = ilo.apiRequest('redfish/v1/Systems/' + get_systems.Members[i].Id + '/Storage/' + system_storages.Members[j].Id + '/Volumes?$expand=.');
+            							if ('Volumes' in system_storages.Members[j]) {
+            								var storage_volumes = ilo.apiRequest('redfish/v1/Systems/' + get_systems.Members[i].Id + '/Storage/' + system_storages.Members[j].Id + '/Volumes?$expand=.');
             
-            							if (ilo.checkArray(storage_volumes.Members)) {
-            								for (k in storage_volumes.Members) {
-            									storage_volumes.Members[k].systemHostname = get_systems.Members[i].HostName;
-            									storage_volumes.Members[k].systemType = get_systems.Members[i].SystemType;
-            									storage_volumes.Members[k].systemId = get_systems.Members[i].Id;
-            									storage_volumes.Members[k].storageId = system_storages.Members[j].Id;
+            								if (ilo.checkArray(storage_volumes.Members)) {
+            									for (k in storage_volumes.Members) {
+            										storage_volumes.Members[k].systemHostname = get_systems.Members[i].HostName;
+            										storage_volumes.Members[k].systemType = get_systems.Members[i].SystemType;
+            										storage_volumes.Members[k].systemId = get_systems.Members[i].Id;
+            										storage_volumes.Members[k].storageId = system_storages.Members[j].Id;
             
-            									volumes.push(storage_volumes.Members[k]);
+            										volumes.push(storage_volumes.Members[k]);
+            									}
             								}
             							}
             						}
