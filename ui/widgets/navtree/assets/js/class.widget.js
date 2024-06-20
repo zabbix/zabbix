@@ -817,15 +817,14 @@ class CWidgetNavTree extends CWidget {
 												}
 
 												if (response.hierarchy[sysmapid] !== undefined && itemid !== undefined
-													&& depth <= this.#max_depth) {
+														&& depth <= this.#max_depth) {
 													$.each(response.hierarchy[sysmapid], (i, submapid) => {
 														if (response.submaps[submapid] === undefined) {
 															return;
 														}
 
-														const same_consecutive_submap = response.hierarchy[sysmapid].filter(
-															(id, index) => id === submapid && index < i
-														).length;
+														const same_consecutive_submap = response.hierarchy[sysmapid]
+															.filter((id, index) => id === submapid && index < i).length;
 
 														const added_submap = root.querySelectorAll(
 															`:scope>.tree-item[data-sysmapid="${submapid}"]`
