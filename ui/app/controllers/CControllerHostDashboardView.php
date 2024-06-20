@@ -44,15 +44,19 @@ class CControllerHostDashboardView extends CController {
 			return false;
 		}
 
-		$hosts = API::Host()->get([
+		$db_hosts = API::Host()->get([
 			'output' => ['hostid', 'name'],
 			'selectParentTemplates' => ['templateid'],
 			'hostids' => [$this->getInput('hostid')]
 		]);
 
-		$this->host = $hosts[0];
+		if (!$db_hosts) {
+			return false;
+		}
 
-		return (bool) $this->host;
+		$this->host = $db_hosts[0];
+
+		return true;
 	}
 
 	protected function doAction() {
