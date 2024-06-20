@@ -164,6 +164,7 @@ func getManagers() []manager {
 		{"pkgtools", "[ -d /var/log/packages ] && echo true", "ls /var/log/packages", parseRegex},
 		{"rpm", "rpm --version 2> /dev/null", "rpm -qa", parseRegex},
 		{"pacman", "pacman --version 2> /dev/null", "pacman -Q", parseRegex},
+		{"portage", "emerge --version 2> /dev/null", "qlist -IRCv", parseRegex},
 	}
 }
 
