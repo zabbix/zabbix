@@ -650,7 +650,7 @@ zabbix_export:
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'fuzzytime(/Linux by Prom/system.localtime[node_exporter],{$SYSTEM.FUZZYTIME.MIN})=1'
               name: 'System time is out of sync'
-              event_name: 'System time is out of sync (diff with Zabbix server > {$SYSTEM.FUZZYTIME.MAX}s)'
+              event_name: 'System time is out of sync (diff with Zabbix server > {$SYSTEM.FUZZYTIME.MAX})'
               priority: WARNING
               description: 'The host''s system time is different from Zabbix server time.'
               manual_close: 'YES'
