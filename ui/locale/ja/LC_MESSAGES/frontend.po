@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-04-02 17:26+0300\n"
-"PO-Revision-Date: 2024-05-01 02:58+0000\n"
+"PO-Revision-Date: 2024-04-25 07:50+0000\n"
 "Last-Translator: Akira <g42getd@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -15090,6 +15090,12 @@ msgstr "結果が偽"
 #: include/classes/helpers/CRegexHelper.php:29
 msgid "Result is TRUE"
 msgstr "結果が真"
+
+#: app/controllers/CControllerPopupItemTestSend.php:433
+#: app/controllers/CControllerPopupItemTestSend.php:461
+#, c-format
+msgid "Result is truncated due to its size (%1$s)."
+msgstr ""
 
 #: app/views/popup.testtriggerexpr.php:30
 msgid "Result type"

@@ -730,7 +730,9 @@ class CConfigurationImport {
 					$item['interfaceid'] = $interfaceid;
 				}
 
-				if (array_key_exists('valuemap', $item) && $item['valuemap']) {
+				$item['valuemapid'] = 0;
+
+				if ($item['valuemap']) {
 					$valuemapid = $this->referencer->findValuemapidByName($hostid, $item['valuemap']['name']);
 
 					if ($valuemapid === null) {
@@ -743,8 +745,8 @@ class CConfigurationImport {
 					}
 
 					$item['valuemapid'] = $valuemapid;
-					unset($item['valuemap']);
 				}
+				unset($item['valuemap']);
 
 				if ($item['type'] == ITEM_TYPE_DEPENDENT) {
 					if (!array_key_exists('key', $item[$master_item_key])) {
@@ -1171,6 +1173,8 @@ class CConfigurationImport {
 						}
 					}
 
+					$item_prototype['valuemapid'] = 0;
+
 					if ($item_prototype['valuemap']) {
 						$valuemapid = $this->referencer->findValuemapidByName($hostid,
 							$item_prototype['valuemap']['name']
@@ -1187,8 +1191,8 @@ class CConfigurationImport {
 						}
 
 						$item_prototype['valuemapid'] = $valuemapid;
-						unset($item_prototype['valuemap']);
 					}
+					unset($item_prototype['valuemap']);
 
 					if ($item_prototype['type'] == ITEM_TYPE_DEPENDENT) {
 						if (!array_key_exists('key', $item_prototype[$master_item_key])) {
@@ -2387,9 +2391,9 @@ class CConfigurationImport {
 		// Unlike triggers that belong to multiple hosts, trigger prototypes do not, so we just delete them.
 		if ($trigger_prototypes_to_delete) {
 			API::TriggerPrototype()->delete(array_keys($trigger_prototypes_to_delete));
-
-			$this->referencer->refreshTriggers();
 		}
+
+		$this->referencer->refreshTriggers();
 
 		$db_graph_prototypes = API::GraphPrototype()->get([
 			'output' => [],
@@ -2404,9 +2408,9 @@ class CConfigurationImport {
 		// Unlike graphs that belong to multiple hosts, graph prototypes do not, so we just delete them.
 		if ($graph_prototypes_to_delete) {
 			API::GraphPrototype()->delete(array_keys($graph_prototypes_to_delete));
-
-			$this->referencer->refreshGraphs();
 		}
+
+		$this->referencer->refreshGraphs();
 
 		$db_item_prototypes = API::ItemPrototype()->get([
 			'output' => [],
@@ -2420,9 +2424,9 @@ class CConfigurationImport {
 
 		if ($item_prototypes_to_delete) {
 			API::ItemPrototype()->delete(array_keys($item_prototypes_to_delete));
-
-			$this->referencer->refreshItems();
 		}
+
+		$this->referencer->refreshItems();
 	}
 
 	/**

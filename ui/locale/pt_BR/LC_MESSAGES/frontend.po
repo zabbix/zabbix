@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-04-02 17:26+0300\n"
-"PO-Revision-Date: 2024-04-20 17:59+0000\n"
+"PO-Revision-Date: 2024-06-05 16:44+0000\n"
 "Last-Translator: Marco <marcodefreitas@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
@@ -2477,8 +2477,8 @@ msgstr[1] "Não é possível desativar os itens"
 #: app/controllers/CControllerMediatypeDisable.php:75
 msgid "Cannot disable media type"
 msgid_plural "Cannot disable media types"
-msgstr[0] "Não é possível desabilitar o tipo de midia"
-msgstr[1] "Não é possível desabilitar os tipos de midia"
+msgstr[0] "Não é possível desabilitar o tipo de mídia"
+msgstr[1] "Não é possível desabilitar os tipos de mídia"
 
 #: app/controllers/CControllerModuleUpdate.php:148
 msgid "Cannot disable module"
@@ -10687,7 +10687,7 @@ msgstr "Última checagem"
 
 #: jsLoader.php:382
 msgid "Last hour graph"
-msgstr "Gráfico última hora"
+msgstr "Gráfico da última hora"
 
 #: jsLoader.php:383
 msgid "Last month graph"
@@ -10964,7 +10964,7 @@ msgstr "Local"
 #: include/classes/widgets/forms/CWidgetFormClock.php:32
 #: include/views/monitoring.history.php:292
 msgid "Local time"
-msgstr "Hora local"
+msgstr "Horário local"
 
 #: include/hosts.inc.php:214
 msgid "Location"
@@ -11510,7 +11510,7 @@ msgstr "Registro de teste de tipo de mídia"
 
 #: app/controllers/CControllerPopupMediatypeTestSend.php:142
 msgid "Media type test successful."
-msgstr "Teste de tipo de mídia bem-sucedido."
+msgstr "Teste de tipo de mídia bem sucedido."
 
 #: app/controllers/CControllerMediatypeUpdate.php:173
 msgid "Media type updated"
@@ -11526,7 +11526,7 @@ msgstr "O tipo de mídia com o ID \"%1$s\" não está disponível."
 #: include/classes/helpers/CMenuHelper.php:307
 #: include/classes/helpers/CRoleHelper.php:429
 msgid "Media types"
-msgstr ""
+msgstr "Tipos de mídia"
 
 #: include/classes/api/services/CMediatype.php:827
 #, c-format
@@ -14692,7 +14692,7 @@ msgstr "Operações de recuperação"
 #: include/classes/screens/CScreenProblem.php:878
 #: include/classes/screens/CScreenProblem.php:1151 include/events.inc.php:286
 msgid "Recovery time"
-msgstr "Hora da recuperação"
+msgstr "Horário da recuperação"
 
 #: include/views/js/monitoring.sysmaps.js.php:349
 #: include/views/js/monitoring.sysmaps.js.php:503
@@ -15214,6 +15214,12 @@ msgstr "Resultado é FALSO"
 #: include/classes/helpers/CRegexHelper.php:29
 msgid "Result is TRUE"
 msgstr "Resultado VERDADEIRO"
+
+#: app/controllers/CControllerPopupItemTestSend.php:433
+#: app/controllers/CControllerPopupItemTestSend.php:461
+#, c-format
+msgid "Result is truncated due to its size (%1$s)."
+msgstr ""
 
 #: app/views/popup.testtriggerexpr.php:30
 msgid "Result type"
@@ -16063,7 +16069,7 @@ msgstr "Servidor (proxy)"
 
 #: include/classes/widgets/forms/CWidgetFormClock.php:33
 msgid "Server time"
-msgstr "Hora do servidor"
+msgstr "Horário do servidor"
 
 #: app/controllers/CControllerAuditLogList.php:224
 #: app/views/js/slareport.list.js.php:39
@@ -16711,17 +16717,17 @@ msgstr "Iniciar a apresentação de slides automaticamente"
 #: app/views/popup.sla.edit.php:185
 #: app/views/popup.sla.excludeddowntime.edit.php:49
 msgid "Start time"
-msgstr "Hora de início"
+msgstr "Horário de início"
 
 #: include/classes/api/services/CSla.php:566
 #, c-format
 msgid "Start time must be less than end time for SLA \"%1$s\"."
-msgstr "A hora de início deve ser menor que a hora de término do SLA \"%1$s\"."
+msgstr "O horário de início deve ser menor que o de término do SLA \"%1$s\"."
 
 #: include/classes/api/services/CSla.php:593
 #, c-format
 msgid "Start time must be less than end time for excluded downtime \"%2$s\" of SLA \"%1$s\"."
-msgstr "A hora de início deve ser menor que a hora de término para o tempo de inatividade excluído \"%2$s\" do SLA \"%1$s\"."
+msgstr "O horário de início deve ser menor que o de término para o tempo de inatividade excluído \"%2$s\" do SLA \"%1$s\"."
 
 #: include/classes/validators/CLdapAuthValidator.php:81
 msgid "Starting TLS failed."
@@ -16729,7 +16735,7 @@ msgstr "Falha ao inicializar o TLS."
 
 #: include/classes/data/CItemData.php:1618
 msgid "Startup time of Zabbix server, Unix timestamp."
-msgstr "Horário de início do servidor Zabbix, padrão de hora do UNIX."
+msgstr "Horário de início do servidor Zabbix, tiemstamp UNIX."
 
 #: app/partials/configuration.filter.items.php:174 include/forms.inc.php:543
 #: include/views/configuration.host.discovery.list.php:154
@@ -17756,11 +17762,11 @@ msgstr "Até"
 #: include/events.inc.php:192 include/events.inc.php:285
 #: include/views/administration.auditacts.list.php:65
 msgid "Time"
-msgstr "Hora"
+msgstr "Tempo"
 
 #: include/classes/data/CItemData.php:1686
 msgid "Time a particular Zabbix process or a group of processes (identified by <type> and <mode>) spent in <state> in percentage."
-msgstr "Hora de um processo ou grupo de processos Zabbix em particular (identificado pelo <type> e <mode>) utilizado no estado <state> em percentual."
+msgstr "Horário de um processo ou grupo de processos Zabbix em particular (identificado pelo <type> e <mode>) utilizado no estado <state> em percentual."
 
 #: app/views/js/popup.mediatypetest.edit.js.php:103
 #: app/views/js/popup.scriptexec.js.php:44
@@ -17773,7 +17779,7 @@ msgstr "Período padrão do filtro de tempo"
 
 #: include/classes/data/CItemData.php:1690
 msgid "Time of proxy last access. Name - proxy name. Valid params are: lastaccess - Unix timestamp, delay - seconds."
-msgstr "Hora do último acesso ao proxy. Nome - nome do proxy. Os parâmetros válidos são: lastaccess - carimbo de data/hora Unix, delay - segundos."
+msgstr "Horário do último acesso ao proxy. Nome - nome do proxy. Os parâmetros válidos são: lastaccess - carimbo de data/hora Unix, delay - segundos."
 
 #: include/actions.inc.php:51
 #: include/classes/widgets/views/widget.svggraph.form.view.php:309
@@ -17819,7 +17825,7 @@ msgstr "Tempo limite"
 #: include/classes/screens/CScreenHistory.php:443
 #: include/views/monitoring.history.php:291
 msgid "Timestamp"
-msgstr "Hora"
+msgstr "Carimbo de data e hora"
 
 #: app/views/sla.list.php:91
 msgid "Timezone"
@@ -20067,7 +20073,7 @@ msgstr "Cabeçalho HTTP X-Frame-Options"
 
 #: app/views/administration.miscconfig.edit.php:117
 msgid "X-Frame-Options HTTP header supported values:"
-msgstr ""
+msgstr "Valores válidos do cabeçalho HTTP X-Frame-Options:"
 
 #: include/views/js/monitoring.sysmaps.js.php:426
 msgid "X1"
@@ -22106,7 +22112,7 @@ msgstr "deve estar vazio"
 
 #: app/controllers/CControllerPopupItemTestSend.php:197
 msgid "should be less than current time"
-msgstr "deve ser menor que a hora atual"
+msgstr "deve ser menor que o horário atual"
 
 #: include/views/monitoring.sysmap.edit.php:134
 msgid "show icon mappings"
@@ -22268,7 +22274,7 @@ msgstr "mudança de horário"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1033
 msgid "time() - Current time"
-msgstr "time() - Hora atual"
+msgstr "time() - Horário atual"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1039
 msgid "timeleft() - Time to reach threshold estimated based on period T"
@@ -22424,7 +22430,7 @@ msgstr "função não suportada do Prometheus"
 
 #: app/controllers/CControllerPopupItemTestSend.php:192
 msgid "unsupported time suffix"
-msgstr "sufixo de hora não suportado"
+msgstr "sufixo de tempo não suportado"
 
 #: include/classes/import/validators/CXmlValidator.php:64
 msgid "unsupported version number"
