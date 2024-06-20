@@ -348,7 +348,7 @@ static int	validate_linked_templates(const zbx_vector_uint64_t *templateids, cha
 	{
 		sql_offset = 0;
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-				"select t1.description,h1.host"
+				"select t1.description,h1.host,t2.description,h2.host"
 				" from trigger_depends td,triggers t1,functions f1,items i1,hosts h1,"
 					"triggers t2,functions f2,items i2,hosts h2"
 				" where td.triggerid_down=t1.triggerid"
@@ -4021,18 +4021,12 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 
 	if (SUCCEED == res && (NULL != sql1 || new_hosts != host_prototypes->values_num || 0 != upd_group_prototypes ||
 			0 != upd_hostmacros || 0 != upd_inventory_modes))
-	{
-		if (0 != sql1_offset)
-			zbx_db_execute("%s", sql1);
-	}
+		(void)zbx_db_flush_overflowed_sql(sql1, sql1_offset);
 
 	if (SUCCEED == res && (NULL != sql2 || 0 != del_hosttemplateids->values_num ||
 			0 != del_hostmacroids->values_num || 0 != del_tagids.values_num ||
 			0 != del_interfaceids->values_num || 0 != del_inventory_modes_hostids.values_num))
-	{
-		if (0 != sql2_offset)
-			zbx_db_execute("%s", sql2);
-	}
+		(void)zbx_db_flush_overflowed_sql(sql2, sql2_offset);
 
 	zbx_free(sql1);
 	zbx_free(sql2);

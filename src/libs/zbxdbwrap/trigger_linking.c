@@ -1442,9 +1442,9 @@ func_out:
 		res = zbx_db_insert_execute(&db_insert_funcs);
 	zbx_db_insert_clean(&db_insert_funcs);
 
-	if (SUCCEED == res && 0 != sql_update_triggers_expr_offset)
+	if (SUCCEED == res)
 	{
-		if (ZBX_DB_OK > zbx_db_execute("%s", sql_update_triggers_expr))
+		if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql_update_triggers_expr, sql_update_triggers_expr_offset))
 			res = FAIL;
 	}
 

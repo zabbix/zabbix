@@ -1072,8 +1072,10 @@ static int	DBpatch_items_update(zbx_vector_dbu_snmp_if_t *snmp_ifs)
 	}
 
 	if (SUCCEED == ret)
+	{
 		if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
 			ret = FAIL;
+	}
 
 	zbx_free(sql);
 

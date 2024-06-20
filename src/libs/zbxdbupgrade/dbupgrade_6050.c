@@ -1860,8 +1860,10 @@ static int	DBpatch_6050149(void)
 	zbx_db_free_result(result);
 
 	if (SUCCEED == ret)
+	{
 		if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
 			ret = FAIL;
+	}
 
 	zbx_eval_clear(&ctx);
 	zbx_vector_uint32_destroy(&del_idx);
@@ -2073,8 +2075,10 @@ static int	DBpatch_6050165(void)
 
 	zbx_db_free_result(result);
 	if (SUCCEED == ret)
+	{
 		if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
 			ret = FAIL;
+	}
 
 clean:
 	zbx_free(like_condition);
@@ -2191,8 +2195,10 @@ int			ret = SUCCEED;
 
 	zbx_db_free_result(result);
 	if (SUCCEED == ret)
+	{
 		if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
 			ret = FAIL;
+	}
 
 clean:
 	zbx_free(like_condition);
@@ -2346,8 +2352,10 @@ static int	fix_expression_macro_escaping(const char *table, const char *id_col, 
 	zbx_db_free_result(result);
 
 	if (SUCCEED == ret)
+	{
 		if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
 			ret = FAIL;
+	}
 
 clean:
 	zbx_free(like_condition);

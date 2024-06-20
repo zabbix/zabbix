@@ -512,8 +512,10 @@ static int	DBpatch_6030062(void)
 	zbx_db_free_result(result);
 
 	if (SUCCEED == ret)
+	{
 		if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
 			ret = FAIL;
+	}
 
 	zbx_free(sql);
 

@@ -4408,9 +4408,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t
 
 	if (NULL != sql1)
 	{
-		if (0 != sql1_offset)
-			zbx_db_execute("%s", sql1);
-
+		(void)zbx_db_flush_overflowed_sql(sql1, sql1_offset);
 		zbx_free(sql1);
 	}
 
