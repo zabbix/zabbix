@@ -121,24 +121,22 @@ int	zbx_get_value_internal_ext_server(const zbx_dc_item_t *item, const char *par
 
 		if (2 == nparams)
 		{
+			char	*data;
+
 			param2 = get_rparam(request, 1);
 
-			if (0 == strcmp(param2, "discovery"))
-			{
-				char	*data;
-
-				zbx_proxy_discovery_get(&data);
-				SET_STR_RESULT(result, data);
-			}
-			else
+			if (0 != strcmp(param2, "discovery"))
 			{
 				SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
 				goto out;
 			}
+
+			zbx_proxy_discovery_get(&data);
+			SET_STR_RESULT(result, data);
 		}
 		else
 		{
-			time_t		value;
+			time_t	value;
 
 			param3 = get_rparam(request, 2);
 
@@ -390,10 +388,11 @@ int	zbx_get_value_internal_ext_server(const zbx_dc_item_t *item, const char *par
 	{
 		char		*error = NULL;
 		zbx_pg_stats_t	stats;
+		char		*data;
 
 		/* this item is always processed by server */
 
-		if (2 > nparams || 3 < nparams)
+		if (2 != nparams && 3 != nparams)
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
 			goto out;
@@ -401,22 +400,7 @@ int	zbx_get_value_internal_ext_server(const zbx_dc_item_t *item, const char *par
 
 		param2 = get_rparam(request, 1);
 
-		if (2 == nparams)
-		{
-			if (0 == strcmp(param2, "discovery"))
-			{
-				char	*data;
-
-				zbx_proxy_group_discovery_get(&data);
-				SET_STR_RESULT(result, data);
-			}
-			else
-			{
-				SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
-				goto out;
-			}
-		}
-		else
+		if (3 == nparams)
 		{
 			if (FAIL == zbx_pg_get_stats(param2, &stats, &error))
 			{
@@ -433,6 +417,15 @@ int	zbx_get_value_internal_ext_server(const zbx_dc_item_t *item, const char *par
 
 			goto out;
 		}
+
+		if (0 != strcmp(param2, "discovery"))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+			goto out;
+		}
+
+		zbx_proxy_group_discovery_get(&data);
+		SET_STR_RESULT(result, data);
 	}
 	else if (0 == strcmp(param1, "host")) /* zabbix["host",*] */
 	{

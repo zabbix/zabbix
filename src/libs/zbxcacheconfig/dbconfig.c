@@ -15929,7 +15929,8 @@ static void	dc_proxy_discovery_add_row(struct zbx_json *json, const ZBX_DC_PROXY
  * Purpose: add proxy group discovery row                                     *
  *                                                                            *
  ******************************************************************************/
-static void	dc_proxy_group_discovery_add_row(struct zbx_json *json, const zbx_dc_proxy_group_t *pg) {
+static void	dc_proxy_group_discovery_add_row(struct zbx_json *json, const zbx_dc_proxy_group_t *pg)
+{
 	zbx_json_addobject(json, NULL);
 
 	zbx_json_addstring(json, "name", pg->name, ZBX_JSON_TYPE_STRING);
@@ -15990,7 +15991,8 @@ void	zbx_proxy_discovery_get(char **data)
  *           returned.                                                        *
  *                                                                            *
  ******************************************************************************/
-void	zbx_proxy_group_discovery_get(char **data) {
+void	zbx_proxy_group_discovery_get(char **data)
+{
 
 	struct zbx_json	json;
 
