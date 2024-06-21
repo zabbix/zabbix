@@ -21,7 +21,6 @@ zabbix_export:
           name: 'ICMP ping'
           type: SIMPLE
           key: icmpping
-          history: 7d
           valuemap:
             name: 'Service state'
           tags:
@@ -42,7 +41,6 @@ zabbix_export:
           name: 'ICMP loss'
           type: SIMPLE
           key: icmppingloss
-          history: 7d
           value_type: FLOAT
           units: '%'
           tags:
@@ -68,7 +66,6 @@ zabbix_export:
           name: 'ICMP response time'
           type: SIMPLE
           key: icmppingsec
-          history: 7d
           value_type: FLOAT
           units: s
           tags:

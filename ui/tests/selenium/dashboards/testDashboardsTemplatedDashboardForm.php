@@ -1082,7 +1082,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 								[
 									'field_locator' => 'xpath:.//label[text()="Units"]/../following-sibling::div[1]/input',
 									'attributes' => [
-										'maxlength' => 2048
+										'maxlength' => 255
 									]
 								],
 								[

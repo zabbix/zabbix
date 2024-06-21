@@ -34,7 +34,6 @@ zabbix_export:
           name: 'Connector queue'
           type: INTERNAL
           key: 'zabbix[connector_queue]'
-          history: 7d
           description: 'The count of values enqueued in the connector queue.'
           tags:
             - tag: component
@@ -43,7 +42,6 @@ zabbix_export:
           name: 'Discovery queue'
           type: INTERNAL
           key: 'zabbix[discovery_queue]'
-          history: 7d
           description: 'The count of values enqueued in the discovery queue.'
           tags:
             - tag: component
@@ -52,7 +50,6 @@ zabbix_export:
           name: 'LLD queue'
           type: INTERNAL
           key: 'zabbix[lld_queue]'
-          history: 7d
           description: 'The count of values enqueued in the low-level discovery processing queue.'
           tags:
             - tag: component
@@ -61,7 +58,6 @@ zabbix_export:
           name: 'Preprocessing queue'
           type: INTERNAL
           key: 'zabbix[preprocessing_queue]'
-          history: 7d
           description: 'The count of values enqueued in the preprocessing queue.'
           tags:
             - tag: component
@@ -70,7 +66,6 @@ zabbix_export:
           name: 'Utilization of agent poller data collector processes, in %'
           type: INTERNAL
           key: 'zabbix[process,agent poller,avg,busy]'
-          history: 7d
           value_type: FLOAT
           units: '%'
           description: 'The average percentage of the time during which the agent poller processes have been busy for the last minute.'
@@ -92,7 +87,6 @@ zabbix_export:
           name: 'Utilization of alerter internal processes, in %'
           type: INTERNAL
           key: 'zabbix[process,alerter,avg,busy]'
-          history: 7d
           value_type: FLOAT
           units: '%'
           description: 'The average percentage of the time during which the alerter processes have been busy for the last minute.'
@@ -114,7 +108,6 @@ zabbix_export:
           name: 'Utilization of alert manager internal processes, in %'
           type: INTERNAL
           key: 'zabbix[process,alert manager,avg,busy]'
-          history: 7d
           value_type: FLOAT
           units: '%'
           description: 'The average percentage of the time during which the alert manager processes have been busy for the last minute.'
@@ -136,7 +129,6 @@ zabbix_export:
           name: 'Utilization of alert syncer internal processes, in %'
           type: INTERNAL
           key: 'zabbix[process,alert syncer,avg,busy]'
-          history: 7d
           value_type: FLOAT
           units: '%'
           description: 'The average percentage of the time during which the alert syncer processes have been busy for the last minute.'
@@ -158,7 +150,6 @@ zabbix_export:
           name: 'Utilization of availability manager internal processes, in %'
           type: INTERNAL
           key: 'zabbix[process,availability manager,avg,busy]'
-          history: 7d
           value_type: FLOAT
           units: '%'
           description: 'The average percentage of the time during which the availability manager processes have been busy for the last minute.'
@@ -180,7 +171,6 @@ zabbix_export:
           name: 'Utilization of configuration syncer internal processes, in %'
           type: INTERNAL
           key: 'zabbix[process,configuration syncer,avg,busy]'
-          history: 7d
           value_type: FLOAT
           units: '%'
           description: 'The average percentage of the time during which the configuration syncer processes have been busy for the last minute.'
@@ -202,7 +192,6 @@ zabbix_export:
           name: 'Utilization of connector manager internal processes, in %'
           type: INTERNAL
           key: 'zabbix[process,connector manager,avg,busy]'
-          history: 7d
           value_type: FLOAT
           units: '%'
           description: 'The average percentage of the time during which the connector manager processes have been busy for the last minute.'
@@ -224,7 +213,6 @@ zabbix_export:
           name: 'Utilization of connector worker internal processes, in %'
           type: INTERNAL
           key: 'zabbix[process,connector worker,avg,busy]'
-          history: 7d
           value_type: FLOAT
           units: '%'
           description: 'The average percentage of the time during which the connector worker processes have been busy for the last minute.'
@@ -246,7 +234,6 @@ zabbix_export:
           name: 'Utilization of discovery manager internal processes, in %'
           type: INTERNAL
           key: 'zabbix[process,discovery manager,avg,busy]'
-          history: 7d
           value_type: FLOAT
           units: '%'
           description: 'The average percentage of the time during which the discovery manager processes have been busy for the last minute.'
@@ -268,7 +255,6 @@ zabbix_export:
           name: 'Utilization of discovery worker internal processes, in %'
           type: INTERNAL
           key: 'zabbix[process,discovery worker,avg,busy]'
-          history: 7d
           value_type: FLOAT
           units: '%'
           description: 'The average percentage of the time during which the discovery worker processes have been busy for the last minute.'
@@ -290,7 +276,6 @@ zabbix_export:
           name: 'Utilization of escalator internal processes, in %'
           type: INTERNAL
           key: 'zabbix[process,escalator,avg,busy]'
-          history: 7d
           value_type: FLOAT
           units: '%'
           description: 'The average percentage of the time during which the escalator processes have been busy for the last minute.'
@@ -312,7 +297,6 @@ zabbix_export:
           name: 'Utilization of history poller data collector processes, in %'
           type: INTERNAL
           key: 'zabbix[process,history poller,avg,busy]'
-          history: 7d
           value_type: FLOAT
           units: '%'
           description: 'The average percentage of the time during which the history poller processes have been busy for the last minute.'
@@ -334,7 +318,6 @@ zabbix_export:
           name: 'Utilization of history syncer internal processes, in %'
           type: INTERNAL
           key: 'zabbix[process,history syncer,avg,busy]'
-          history: 7d
           value_type: FLOAT
           units: '%'
           description: 'The average percentage of the time during which the history syncer processes have been busy for the last minute.'
@@ -356,7 +339,6 @@ zabbix_export:
           name: 'Utilization of housekeeper internal processes, in %'
           type: INTERNAL
           key: 'zabbix[process,housekeeper,avg,busy]'
-          history: 7d
           value_type: FLOAT
           units: '%'
           description: 'The average percentage of the time during which the housekeeper processes have been busy for the last minute.'
@@ -378,7 +360,6 @@ zabbix_export:
           name: 'Utilization of http agent poller data collector processes, in %'
           type: INTERNAL
           key: 'zabbix[process,http agent poller,avg,busy]'
-          history: 7d
           value_type: FLOAT
           units: '%'
           description: 'The average percentage of the time during which the http agent poller processes have been busy for the last minute.'
@@ -400,7 +381,6 @@ zabbix_export:
           name: 'Utilization of http poller data collector processes, in %'
           type: INTERNAL
           key: 'zabbix[process,http poller,avg,busy]'
-          history: 7d
           value_type: FLOAT
           units: '%'
           description: 'The average percentage of the time during which the http poller processes have been busy for the last minute.'
@@ -422,7 +402,6 @@ zabbix_export:
           name: 'Utilization of icmp pinger data collector processes, in %'
           type: INTERNAL
           key: 'zabbix[process,icmp pinger,avg,busy]'
-          history: 7d
           value_type: FLOAT
           units: '%'
           description: 'The average percentage of the time during which the icmp pinger processes have been busy for the last minute.'
@@ -444,7 +423,6 @@ zabbix_export:
           name: 'Utilization of ipmi manager internal processes, in %'
           type: INTERNAL
           key: 'zabbix[process,ipmi manager,avg,busy]'
-          history: 7d
           value_type: FLOAT
           units: '%'
           description: 'The average percentage of the time during which the ipmi manager processes have been busy for the last minute.'
@@ -466,7 +444,6 @@ zabbix_export:
           name: 'Utilization of ipmi poller data collector processes, in %'
           type: INTERNAL
           key: 'zabbix[process,ipmi poller,avg,busy]'
-          history: 7d
           value_type: FLOAT
           units: '%'
           description: 'The average percentage of the time during which the ipmi poller processes have been busy for the last minute.'
@@ -488,7 +465,6 @@ zabbix_export:
           name: 'Utilization of java poller data collector processes, in %'
           type: INTERNAL
           key: 'zabbix[process,java poller,avg,busy]'
-          history: 7d
           value_type: FLOAT
           units: '%'
           description: 'The average percentage of the time during which the java poller processes have been busy for the last minute.'
@@ -510,7 +486,6 @@ zabbix_export:
           name: 'Utilization of LLD manager internal processes, in %'
           type: INTERNAL
           key: 'zabbix[process,lld manager,avg,busy]'
-          history: 7d
           value_type: FLOAT
           units: '%'
           description: 'The average percentage of the time during which the lld manager processes have been busy for the last minute.'
@@ -532,7 +507,6 @@ zabbix_export:
           name: 'Utilization of LLD worker internal processes, in %'
           type: INTERNAL
           key: 'zabbix[process,lld worker,avg,busy]'
-          history: 7d
           value_type: FLOAT
           units: '%'
           description: 'The average percentage of the time during which the lld worker processes have been busy for the last minute.'
@@ -554,7 +528,6 @@ zabbix_export:
           name: 'Utilization of ODBC poller data collector processes, in %'
           type: INTERNAL
           key: 'zabbix[process,odbc poller,avg,busy]'
-          history: 7d
           value_type: FLOAT
           units: '%'
           description: 'The average percentage of the time during which the ODBC poller processes have been busy for the last minute.'
@@ -576,7 +549,6 @@ zabbix_export:
           name: 'Utilization of poller data collector processes, in %'
           type: INTERNAL
           key: 'zabbix[process,poller,avg,busy]'
-          history: 7d
           value_type: FLOAT
           units: '%'
           description: 'The average percentage of the time during which the poller processes have been busy for the last minute.'
@@ -598,7 +570,6 @@ zabbix_export:
           name: 'Utilization of preprocessing manager internal processes, in %'
           type: INTERNAL
           key: 'zabbix[process,preprocessing manager,avg,busy]'
-          history: 7d
           value_type: FLOAT
           units: '%'
           description: 'The average percentage of the time during which the preprocessing manager processes have been busy for the last minute.'
@@ -620,7 +591,6 @@ zabbix_export:
           name: 'Utilization of preprocessing worker internal processes, in %'
           type: INTERNAL
           key: 'zabbix[process,preprocessing worker,avg,busy]'
-          history: 7d
           value_type: FLOAT
           units: '%'
           description: 'The average percentage of the time during which the preprocessing worker processes have been busy for the last minute.'
@@ -642,7 +612,6 @@ zabbix_export:
           name: 'Utilization of proxy poller data collector processes, in %'
           type: INTERNAL
           key: 'zabbix[process,proxy poller,avg,busy]'
-          history: 7d
           value_type: FLOAT
           units: '%'
           description: 'The average percentage of the time during which the proxy poller processes have been busy for the last minute.'
@@ -664,7 +633,6 @@ zabbix_export:
           name: 'Utilization of report manager internal processes, in %'
           type: INTERNAL
           key: 'zabbix[process,report manager,avg,busy]'
-          history: 7d
           value_type: FLOAT
           units: '%'
           description: 'The average percentage of the time during which the report manager processes have been busy for the last minute.'
@@ -686,7 +654,6 @@ zabbix_export:
           name: 'Utilization of report writer internal processes, in %'
           type: INTERNAL
           key: 'zabbix[process,report writer,avg,busy]'
-          history: 7d
           value_type: FLOAT
           units: '%'
           description: 'The average percentage of the time during which the report writer processes have been busy for the last minute.'
@@ -708,7 +675,6 @@ zabbix_export:
           name: 'Utilization of self-monitoring internal processes, in %'
           type: INTERNAL
           key: 'zabbix[process,self-monitoring,avg,busy]'
-          history: 7d
           value_type: FLOAT
           units: '%'
           description: 'The average percentage of the time during which the self-monitoring processes have been busy for the last minute.'
@@ -730,7 +696,6 @@ zabbix_export:
           name: 'Utilization of service manager internal processes, in %'
           type: INTERNAL
           key: 'zabbix[process,service manager,avg,busy]'
-          history: 7d
           value_type: FLOAT
           units: '%'
           description: 'The average percentage of the time during which the service manager processes have been busy for the last minute.'
@@ -752,7 +717,6 @@ zabbix_export:
           name: 'Utilization of snmp poller data collector processes, in %'
           type: INTERNAL
           key: 'zabbix[process,snmp poller,avg,busy]'
-          history: 7d
           value_type: FLOAT
           units: '%'
           description: 'The average percentage of the time during which the snmp poller processes have been busy for the last minute.'
@@ -774,7 +738,6 @@ zabbix_export:
           name: 'Utilization of snmp trapper data collector processes, in %'
           type: INTERNAL
           key: 'zabbix[process,snmp trapper,avg,busy]'
-          history: 7d
           value_type: FLOAT
           units: '%'
           description: 'The average percentage of the time during which the snmp trapper processes have been busy for the last minute.'
@@ -796,7 +759,6 @@ zabbix_export:
           name: 'Utilization of task manager internal processes, in %'
           type: INTERNAL
           key: 'zabbix[process,task manager,avg,busy]'
-          history: 7d
           value_type: FLOAT
           units: '%'
           description: 'The average percentage of the time during which the task manager processes have been busy for the last minute.'
@@ -818,7 +780,6 @@ zabbix_export:
           name: 'Utilization of timer internal processes, in %'
           type: INTERNAL
           key: 'zabbix[process,timer,avg,busy]'
-          history: 7d
           value_type: FLOAT
           units: '%'
           description: 'The average percentage of the time during which the timer processes have been busy for the last minute.'
@@ -840,7 +801,6 @@ zabbix_export:
           name: 'Utilization of trapper data collector processes, in %'
           type: INTERNAL
           key: 'zabbix[process,trapper,avg,busy]'
-          history: 7d
           value_type: FLOAT
           units: '%'
           description: 'The average percentage of the time during which the trapper processes have been busy for the last minute.'
@@ -862,7 +822,6 @@ zabbix_export:
           name: 'Utilization of trigger housekeeper internal processes, in %'
           type: INTERNAL
           key: 'zabbix[process,trigger housekeeper,avg,busy]'
-          history: 7d
           value_type: FLOAT
           units: '%'
           description: 'The average percentage of the time during which the trigger housekeeper processes have been busy for the last minute.'
@@ -884,7 +843,6 @@ zabbix_export:
           name: 'Utilization of unreachable poller data collector processes, in %'
           type: INTERNAL
           key: 'zabbix[process,unreachable poller,avg,busy]'
-          history: 7d
           value_type: FLOAT
           units: '%'
           description: 'The average percentage of the time during which the unreachable poller processes have been busy for the last minute.'
@@ -906,7 +864,6 @@ zabbix_export:
           name: 'Utilization of vmware data collector processes, in %'
           type: INTERNAL
           key: 'zabbix[process,vmware collector,avg,busy]'
-          history: 7d
           value_type: FLOAT
           units: '%'
           description: 'The average percentage of the time during which the vmware collector processes have been busy for the last minute.'
@@ -939,7 +896,6 @@ zabbix_export:
           name: 'Queue over 10 minutes'
           type: INTERNAL
           key: 'zabbix[queue,10m]'
-          history: 7d
           description: 'The number of monitored items in the queue, which are delayed at least by 10 minutes.'
           tags:
             - tag: component
@@ -957,7 +913,6 @@ zabbix_export:
           name: Queue
           type: INTERNAL
           key: 'zabbix[queue]'
-          history: 7d
           description: 'The number of monitored items in the queue, which are delayed at least by 6 seconds.'
           tags:
             - tag: component
@@ -966,7 +921,6 @@ zabbix_export:
           name: 'Configuration cache, % used'
           type: INTERNAL
           key: 'zabbix[rcache,buffer,pused]'
-          history: 7d
           value_type: FLOAT
           units: '%'
           description: 'The availability statistics of Zabbix configuration cache. The percentage of used data buffer.'
@@ -988,7 +942,6 @@ zabbix_export:
           name: 'Trend function cache, % of unique requests'
           type: INTERNAL
           key: 'zabbix[tcache,cache,pitems]'
-          history: 7d
           value_type: FLOAT
           units: '%'
           description: |
@@ -1001,7 +954,6 @@ zabbix_export:
           name: 'Trend function cache, % of misses'
           type: INTERNAL
           key: 'zabbix[tcache,cache,pmisses]'
-          history: 7d
           value_type: FLOAT
           units: '%'
           description: 'The effectiveness statistics of Zabbix trend function cache. The percentage of cache misses.'
@@ -1012,7 +964,6 @@ zabbix_export:
           name: 'Value cache, % used'
           type: INTERNAL
           key: 'zabbix[vcache,buffer,pused]'
-          history: 7d
           value_type: FLOAT
           units: '%'
           description: 'The availability statistics of Zabbix value cache. The percentage of used data buffer.'
@@ -1034,7 +985,6 @@ zabbix_export:
           name: 'Value cache hits'
           type: INTERNAL
           key: 'zabbix[vcache,cache,hits]'
-          history: 7d
           value_type: FLOAT
           units: vps
           description: 'The effectiveness statistics of Zabbix value cache. The number of cache hits (history values taken from the cache).'
@@ -1049,7 +999,6 @@ zabbix_export:
           name: 'Value cache misses'
           type: INTERNAL
           key: 'zabbix[vcache,cache,misses]'
-          history: 7d
           value_type: FLOAT
           units: vps
           description: 'The effectiveness statistics of Zabbix value cache. The number of cache misses (history values taken from the database).'
@@ -1064,7 +1013,6 @@ zabbix_export:
           name: 'Value cache operating mode'
           type: INTERNAL
           key: 'zabbix[vcache,cache,mode]'
-          history: 7d
           description: 'The operating mode of the value cache.'
           valuemap:
             name: 'Value cache operating mode'
@@ -1086,7 +1034,6 @@ zabbix_export:
           name: Version
           type: INTERNAL
           key: 'zabbix[version]'
-          history: 7d
           trends: '0'
           value_type: CHAR
           description: 'A version of Zabbix server.'
@@ -1112,7 +1059,6 @@ zabbix_export:
           name: 'VMware cache, % used'
           type: INTERNAL
           key: 'zabbix[vmware,buffer,pused]'
-          history: 7d
           value_type: FLOAT
           units: '%'
           description: 'The availability statistics of Zabbix vmware cache. The percentage of used data buffer.'
@@ -1134,7 +1080,6 @@ zabbix_export:
           name: 'Number of values synchronized with the database per second.'
           type: INTERNAL
           key: 'zabbix[vps,written]'
-          history: 7d
           value_type: FLOAT
           description: 'Average quantity of values written to the database, recalculated once per minute.'
           preprocessing:
@@ -1148,7 +1093,6 @@ zabbix_export:
           name: 'History write cache, % used'
           type: INTERNAL
           key: 'zabbix[wcache,history,pused]'
-          history: 7d
           value_type: FLOAT
           units: '%'
           description: |
@@ -1172,7 +1116,6 @@ zabbix_export:
           name: 'History index cache, % used'
           type: INTERNAL
           key: 'zabbix[wcache,index,pused]'
-          history: 7d
           value_type: FLOAT
           units: '%'
           description: |
@@ -1196,7 +1139,6 @@ zabbix_export:
           name: 'Trend write cache, % used'
           type: INTERNAL
           key: 'zabbix[wcache,trend,pused]'
-          history: 7d
           value_type: FLOAT
           units: '%'
           description: |
@@ -1220,7 +1162,6 @@ zabbix_export:
           name: 'Number of processed numeric (float) values per second'
           type: INTERNAL
           key: 'zabbix[wcache,values,float]'
-          history: 7d
           value_type: FLOAT
           description: |
             The statistics and availability of Zabbix write cache.
@@ -1236,7 +1177,6 @@ zabbix_export:
           name: 'Number of processed log values per second'
           type: INTERNAL
           key: 'zabbix[wcache,values,log]'
-          history: 7d
           value_type: FLOAT
           description: |
             The statistics and availability of Zabbix write cache.
@@ -1252,7 +1192,6 @@ zabbix_export:
           name: 'Number of processed not supported values per second'
           type: INTERNAL
           key: 'zabbix[wcache,values,not supported]'
-          history: 7d
           value_type: FLOAT
           description: |
             The statistics and availability of Zabbix write cache.
@@ -1268,7 +1207,6 @@ zabbix_export:
           name: 'Number of processed character values per second'
           type: INTERNAL
           key: 'zabbix[wcache,values,str]'
-          history: 7d
           value_type: FLOAT
           description: |
             The statistics and availability of Zabbix write cache.
@@ -1284,7 +1222,6 @@ zabbix_export:
           name: 'Number of processed text values per second'
           type: INTERNAL
           key: 'zabbix[wcache,values,text]'
-          history: 7d
           value_type: FLOAT
           description: |
             The statistics and availability of Zabbix write cache.
@@ -1300,7 +1237,6 @@ zabbix_export:
           name: 'Number of processed numeric (unsigned) values per second'
           type: INTERNAL
           key: 'zabbix[wcache,values,uint]'
-          history: 7d
           value_type: FLOAT
           description: |
             The statistics and availability of Zabbix write cache.
@@ -1316,7 +1252,6 @@ zabbix_export:
           name: 'Number of processed values per second'
           type: INTERNAL
           key: 'zabbix[wcache,values]'
-          history: 7d
           value_type: FLOAT
           description: |
             The statistics and availability of Zabbix write cache.
@@ -1341,7 +1276,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'zabbix.nodes.address[{#NODE.ID}]'
               delay: '0'
-              history: 7d
               trends: '0'
               value_type: CHAR
               description: 'The IPv4 address of a node.'
@@ -1366,7 +1300,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'zabbix.nodes.lastaccess.age[{#NODE.ID}]'
               delay: '0'
-              history: 7d
               units: uptime
               description: 'The time between the database''s `unix_timestamp()` and the last access time.'
               preprocessing:
@@ -1387,7 +1320,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'zabbix.nodes.lastaccess.time[{#NODE.ID}]'
               delay: '0'
-              history: 7d
               units: unixtime
               description: 'Last access time.'
               preprocessing:
@@ -1432,7 +1364,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'zabbix.nodes.status[{#NODE.ID}]'
               delay: '0'
-              history: 7d
               description: 'The status of a node.'
               valuemap:
                 name: 'Cluster node status'
@@ -1482,7 +1413,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'zabbix.proxy.cert[{#PROXY.NAME}]'
               delay: '0'
-              history: 7d
               description: 'The encryption status for connections from a proxy.'
               valuemap:
                 name: 'Service state'
@@ -1508,7 +1438,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'zabbix.proxy.compatibility[{#PROXY.NAME}]'
               delay: '0'
-              history: 7d
               description: |
                 Version of proxy compared to Zabbix server version.
                 
@@ -1557,7 +1486,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'zabbix.proxy.compression[{#PROXY.NAME}]'
               delay: '0'
-              history: 7d
               description: 'The compression status of a proxy.'
               valuemap:
                 name: 'Service state'
@@ -1583,7 +1511,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'zabbix.proxy.hosts[{#PROXY.NAME}]'
               delay: '0'
-              history: 7d
               description: 'The number of enabled hosts assigned to a proxy.'
               preprocessing:
                 - type: JSONPATH
@@ -1604,7 +1531,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'zabbix.proxy.items[{#PROXY.NAME}]'
               delay: '0'
-              history: 7d
               description: 'The number of enabled items on enabled hosts assigned to a proxy.'
               preprocessing:
                 - type: JSONPATH
@@ -1625,7 +1551,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'zabbix.proxy.last_seen[{#PROXY.NAME}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               description: 'The time when a proxy was last seen by a server.'
               valuemap:
@@ -1666,7 +1591,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'zabbix.proxy.mode[{#PROXY.NAME}]'
               delay: '0'
-              history: 7d
               description: 'The mode of Zabbix proxy.'
               valuemap:
                 name: 'Proxy mode'
@@ -1692,7 +1616,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'zabbix.proxy.psk[{#PROXY.NAME}]'
               delay: '0'
-              history: 7d
               description: 'The encryption status for connections from a proxy.'
               valuemap:
                 name: 'Service state'
@@ -1718,7 +1641,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'zabbix.proxy.requiredperformance[{#PROXY.NAME}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               units: '!vps'
               description: 'The required performance of a proxy (the number of values that need to be collected per second).'
@@ -1763,7 +1685,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'zabbix.proxy.unencrypted[{#PROXY.NAME}]'
               delay: '0'
-              history: 7d
               description: 'The encryption status for connections from a proxy.'
               valuemap:
                 name: 'Service state'
@@ -1789,7 +1710,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'zabbix.proxy.version[{#PROXY.NAME}]'
               delay: '0'
-              history: 7d
               trends: '0'
               value_type: CHAR
               description: 'A version of Zabbix proxy.'
