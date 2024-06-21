@@ -1,12 +1,28 @@
 Changes for 7.0.1rc1
 
 New features:
+.........T [ZBXNEXT-8868] added discovery and template for Azure VM Scale Sets (abrosimovs)
+.......PS. [ZBXNEXT-9201] updated max supported MySQL version to 8.4 (mprihodko)
+........S. [ZBXNEXT-9225] updated max supported TimescaleDB version to 2.15 (mprihodko)
+.......PS. [ZBXNEXT-9226] updated max supported MariaDB version to 11.4 (mprihodko)
 .........T [ZBXNEXT-9140] added support for custom compartments in Oracle Cloud by HTTP templates (knaglis)
 .........T [ZBXNEXT-9034] added Jira Data Center by JMX template (atocko)
 .......PS. [ZBXNEXT-9145] improved VMware event log retrieval (asestakovs, MVekslers)
 .......PS. [ZBXNEXT-8990] extended VMware event log with username (asestakovs)
 
 Bug fixes:
+..F....... [ZBX-24588] fixed CyberArk Vault connection with no certificates (vmurzins)
+..F....... [ZBX-23876] fixed incorrect timeout value being used when testing item (agriscenko)
+..F....... [ZBX-24548] fixed error when updating disabled Map navigation tree widget (apoga)
+........S. [ZBX-24553] fixed WebDriverURL handling when trailing slash is present (dgoloscapov)
+.........T [ZBX-24635] fixed datastore triggers in VMware templates (abrosimovs)
+...G...PS. [ZBX-20766] fixed confusing port binding error message (dgoloscapov)
+.......PS. [ZBX-24453] implemented socket file cleanup when shutting down, added blocking of signals during important stages of startup (dgoloscapov)
+........S. [ZBX-24167] fixed template linkage when item prototype collision is found (dgoloscapov)
+........S. [ZBX-24119] fixed possible blocking of alert manager when it periodically pings database (dgoloscapov)
+..F....... [ZBX-23440] fixed hintbox hiding on parent scroll and on target position changes (apoga, averza)
+...G...... [ZBX-24301] fixed net.dns.perf to return valid response time instead of zero for NXDOMAIN result (arimdjonoks)
+..F....... [ZBX-24550] removed background color from links in loading state (apoga)
 ........S. [ZBX-24560] fixed {HOST.DNS} and {HOST.IP} not being resolved if empty (vso)
 .........T [ZBX-24415] added triggers for datastores in VMware templates (abrosimovs)
 ..F....... [ZBX-23435] fixed alert message about unsaved changes appearance in nested modal forms (apoga)
@@ -28,7 +44,6 @@ A......... [ZBX-24180] fixed inability to import existing host or template when 
 ...G...... [ZBX-24362] fix Zabbix agent 2 loadable plugin process handling catching all child process exits (rzvejs)
 ..F....... [ZBX-24152] fixed host form submission with Enter button if the form is opened in a popup and focus is in a flexible text area field (Ivo)
 ..F....... [ZBX-24276] fixed inconsistent map element URL opening behavior (esekace)
-..F....... [ZBX-24146] fixed update of item timeout value upon other form field changes (esekace)
 ..F....... [ZBX-24253] fixed subfilter reset when navigating in items list page (esekace)
 ........S. [ZBX-24503] fixed wrong attachment filename in scheduled reports (mprihodko)
 ..F....... [ZBX-24344] fixed selected state sub-filter visibility in latest data page (esekace)
@@ -793,6 +808,24 @@ Bug fixes:
 A.F....... [ZBX-21976] added support of OneLogin and Azure SCIM, fixed some issues with provisioning (epulke)
 
 --------------------------------------------------------------------------------
+Changes for 6.4.17rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 6.4.16
+
+6.4.16rc2 was released as 6.4.16 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 6.4.16rc2
+
+Bug fixes:
+..F....... [ZBX-24588] fixed CyberArk Vault connection with no certificates (vmurzins)
+
+--------------------------------------------------------------------------------
 Changes for 6.4.16rc1
 
 New features:
@@ -804,27 +837,27 @@ Bug fixes:
 ........S. [ZBX-24560] fixed {HOST.DNS} and {HOST.IP} not being resolved if empty (vso)
 .......PS. [ZBX-24483] improved memory usage in Zabbix server/proxy trappers and in proxy pollers when sending large configuration (vso)
 ..F....... [ZBX-23073] fixed URL widget resizing and dragging (apoga)
-..F....... [ZBX-23435] fixed alert message about unsaved changes appearance in nested modal forms (apoga)
+..F....... [ZBX-23435] fixed missing alert message about unsaved changes in nested modal forms (apoga)
 ........S. [ZBX-24574] fixed HA node flipping between standby and active states (wiper)
 ........S. [ZBX-24119] fixed possible blocking of alert manager when it periodically pings database (dgoloscapov)
-.......PS. [ZBX-24402] reduced main process connects to database during startup (sboidenko)
+.......PS. [ZBX-24402] reduced main process connections to database during startup (sboidenko)
 .......PS. [ZBX-7998] added VMware service username, password and URL check for empty values (asestakovs)
-..F....... [ZBX-24369] fixed monitoring list pages' filters behavior after deleting filter parameters (esekace)
-..F....... [ZBX-24484] fixed geomap widget console error when dragging map in widget edit mode (esekace)
-..F....... [ZBX-24370] fixed errors on LDAP configuration page when removing provision media mapping (gcalenko)
+..F....... [ZBX-24369] fixed filter behavior in monitoring pages after deleting filter parameters (esekace)
+..F....... [ZBX-24484] fixed Geomap widget console error when dragging map in widget edit mode (esekace)
+..F....... [ZBX-24370] fixed errors on LDAP configuration page when removing provisioned media mapping (gcalenko)
 .D........ [ZBX-23337] improved supported version documentation for Oracle Database plugin and both templates (knaglis)
 A......... [ZBX-24180] fixed inability to import existing host or template when its dependent item prototype, which is used in trigger prototypes or graph prototypes, would have a different master item (jfreibergs, vmaksimovs)
-...G...... [ZBX-24362] fix Zabbix agent 2 loadable plugin process handling catching all child process exits (rzvejs)
-..F....... [ZBX-24276] fixed inconsistent map element URL opening behavior (esekace)
+...G...... [ZBX-24362] fixed wrong Zabbix agent 2 loadable plugin process handling catching all child process exits (rzvejs)
+..F....... [ZBX-24276] fixed inconsistency when opening map element URLs (esekace)
 ..F....... [ZBX-24527] fixed unnecessary loading text being displayed in hintbox preloader (agriscenko)
 .......PS. [ZBX-24540] fixed crash when expanding host interface macros on main Zabbix agent interface (wiper)
 .......PS. [ZBX-24470] fixed scale of VMware vmware.vm.memory.size.compressed key (MVekslers)
 .........T [ZBX-24415] added triggers for datastores in VMware templates (abrosimovs)
-..F....... [ZBX-18094] fixed multiple pie graph issues related with calculation of item angles (miks)
+..F....... [ZBX-18094] fixed multiple pie graph issues related to calculation of item angles (miks)
 ...G...PS. [ZBX-20766] fixed confusing port binding error message (dgoloscapov)
 A......... [ZBX-24481] fixed inability to unset value map from existing item or item prototype by passing a version without valuemap parameter into configuration.import (vmaksimovs)
 ...G...... [ZBX-24531] fixed compile time data not being set for agent2 (jxl)
-........S. [ZBX-23690] optimized maintenance calculations for large number of hosts x maintenances (wiper)
+........S. [ZBX-23690] optimized maintenance calculations for large number of hosts and maintenances (wiper)
 .......PS. [ZBX-24453] implemented socket file cleanup when shutting down, added blocking of signals during important stages of startup (dgoloscapov)
 ..F....... [ZBX-24152] fixed host form submission with Enter button if the form is opened in a popup and focus is in a flexible text area field (Ivo)
 .........T [ZBX-23788] added SNMP OID ifAlias in Network interfaces discovery (egordymov)
@@ -2619,6 +2652,18 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 ..F....... [ZBXNEXT-7138] added modal form for API tokens in User settings->API tokens and Administration->General->API tokens (epulke)
 
 --------------------------------------------------------------------------------
+Changes for 6.0.32rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 6.0.31
+
+6.0.31rc1 was released as 6.0.31 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 6.0.31rc1
 
 New features:
@@ -2632,17 +2677,17 @@ Bug fixes:
 ........S. [ZBX-24574] fixed HA node flipping between standby and active states (wiper)
 ........S. [ZBX-24119] fixed possible blocking of alert manager when it periodically pings database (dgoloscapov)
 .......PS. [ZBX-7998] added VMware service username, password and URL check for empty values (asestakovs)
-.......PS. [ZBX-24402] reduced main process connects to database during startup (sboidenko)
-..F....... [ZBX-24369] fixed monitoring list pages' filters behavior after deleting filter parameters (esekace)
-..F....... [ZBX-24484] fixed geomap widget console error when dragging map in widget edit mode (esekace)
+.......PS. [ZBX-24402] reduced main process connections to database during startup (sboidenko)
+..F....... [ZBX-24369] fixed filter behavior in monitoring pages after deleting filter parameters (esekace)
+..F....... [ZBX-24484] fixed Geomap widget console error when dragging map in widget edit mode (esekace)
 .D........ [ZBX-23337] improved supported version documentation for Oracle Database plugin and both templates (knaglis)
 A......... [ZBX-24180] fixed inability to import existing host or template when its dependent item prototype, which is used in trigger prototypes or graph prototypes, would have a different master item (jfreibergs, vmaksimovs)
 A......... [ZBX-20871] fixed inability to use LLD macro functions in Prometheus pattern and labels used in item prototype preprocessing (jfreibergs)
 ..F....... [ZBX-24527] fixed unnecessary loading text being displayed in hintbox preloader (agriscenko)
-...G...... [ZBX-24362] fix Zabbix agent 2 loadable plugin process handling catching all child process exits (rzvejs)
+...G...... [ZBX-24362] fixed wrong Zabbix agent 2 loadable plugin process handling catching all child process exits (rzvejs)
 .......PS. [ZBX-24470] fixed scale of VMware vmware.vm.memory.size.compressed key (MVekslers)
 .........T [ZBX-24415] added triggers for datastores in VMware templates (abrosimovs)
-..F....... [ZBX-18094] fixed multiple pie graph issues related with calculation of item angles (miks)
+..F....... [ZBX-18094] fixed multiple pie graph issues related to calculation of item angles (miks)
 ...G...PS. [ZBX-20766] fixed confusing port binding error message (dgoloscapov)
 A......... [ZBX-24481] fixed inability to unset value map from existing item or item prototype by passing a version without valuemap parameter into configuration.import (vmaksimovs)
 ...G...... [ZBX-24531] fixed compile time data not being set for agent2 (jxl)
@@ -5716,6 +5761,7 @@ Changes for 5.0.43rc1
 New features:
 
 Bug fixes:
+.........T [ZBX-23788] added SNMP OID ifAlias in Network interfaces discovery (egordymov)
 .....J.... [ZBX-24298] allowed any JNDI service providers back in JMX monitoring (dimir)
 
 --------------------------------------------------------------------------------

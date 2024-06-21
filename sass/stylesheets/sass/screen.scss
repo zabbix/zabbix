@@ -1743,7 +1743,6 @@ select {
 }
 
 .overlay-dialogue {
-	display: table;
 	position: absolute;
 	z-index: 1000;
 	padding: 17px 10px 10px;
@@ -2768,6 +2767,10 @@ button {
 		position: relative;
 		color: transparent !important;
 		border-bottom-color: transparent;
+
+		&::before {
+			background-color: transparent;
+		}
 
 		&::after {
 			box-shadow: none;

@@ -235,16 +235,18 @@ zabbix_export:
             								}
             							}
             
-            							var storage_volumes = ilo.apiRequest('redfish/v1/Systems/' + get_systems.Members[i].Id + '/Storage/' + system_storages.Members[j].Id + '/Volumes?$expand=.');
+            							if ('Volumes' in system_storages.Members[j]) {
+            								var storage_volumes = ilo.apiRequest('redfish/v1/Systems/' + get_systems.Members[i].Id + '/Storage/' + system_storages.Members[j].Id + '/Volumes?$expand=.');
             
-            							if (ilo.checkArray(storage_volumes.Members)) {
-            								for (k in storage_volumes.Members) {
-            									storage_volumes.Members[k].systemHostname = get_systems.Members[i].HostName;
-            									storage_volumes.Members[k].systemType = get_systems.Members[i].SystemType;
-            									storage_volumes.Members[k].systemId = get_systems.Members[i].Id;
-            									storage_volumes.Members[k].storageId = system_storages.Members[j].Id;
+            								if (ilo.checkArray(storage_volumes.Members)) {
+            									for (k in storage_volumes.Members) {
+            										storage_volumes.Members[k].systemHostname = get_systems.Members[i].HostName;
+            										storage_volumes.Members[k].systemType = get_systems.Members[i].SystemType;
+            										storage_volumes.Members[k].systemId = get_systems.Members[i].Id;
+            										storage_volumes.Members[k].storageId = system_storages.Members[j].Id;
             
-            									volumes.push(storage_volumes.Members[k]);
+            										volumes.push(storage_volumes.Members[k]);
+            									}
             								}
             							}
             						}
@@ -341,7 +343,6 @@ zabbix_export:
           type: DEPENDENT
           key: hpe.ilo.get_data.check
           delay: '0'
-          history: 7d
           trends: '0'
           value_type: CHAR
           description: 'The data collection check.'
@@ -397,7 +398,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.ilo.computer_system.bios.current_version[{#SYSTEM_ID}]'
               delay: '0'
-              history: 7d
               trends: '0'
               value_type: CHAR
               description: 'The current BIOS version of the computer system.'
@@ -457,7 +457,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.ilo.computer_system.model[{#SYSTEM_ID}]'
               delay: '0'
-              history: 7d
               trends: '0'
               value_type: CHAR
               description: 'The model name of the computer system.'
@@ -483,7 +482,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.ilo.computer_system.serial_number[{#SYSTEM_ID}]'
               delay: '0'
-              history: 7d
               trends: '0'
               value_type: CHAR
               description: 'The serial number of the computer system.'
@@ -519,7 +517,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.ilo.computer_system.status[{#SYSTEM_ID}]'
               delay: '0'
-              history: 7d
               description: |
                 The overall health state from the view of this computer system. Possible values:
                 
@@ -583,7 +580,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.ilo.computer_system.type[{#SYSTEM_ID}]'
               delay: '0'
-              history: 7d
               description: |
                 The type of the computer system. Possible values:
                 
@@ -629,7 +625,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.ilo.computer_system.usage.cpu_util[{#SYSTEM_ID}]'
               delay: '0'
-              history: 7d
               units: '%'
               description: 'Current CPU utilization of the computer system in percentage.'
               preprocessing:
@@ -653,7 +648,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.ilo.computer_system.usage.io_bus_util[{#SYSTEM_ID}]'
               delay: '0'
-              history: 7d
               units: '%'
               description: 'Current I/O bus utilization of the computer system in percentage.'
               preprocessing:
@@ -677,7 +671,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.ilo.computer_system.usage.memory_bus_util[{#SYSTEM_ID}]'
               delay: '0'
-              history: 7d
               units: '%'
               description: 'Current memory bus utilization of the computer system in percentage.'
               preprocessing:
@@ -803,7 +796,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.ilo.controller.model[{#SYSTEM_ID}, {#STORAGE_ID}, {#CONTROLLER_ID}]'
               delay: '0'
-              history: 7d
               trends: '0'
               value_type: CHAR
               description: 'The model name of the controller.'
@@ -837,7 +829,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.ilo.controller.serial_number[{#SYSTEM_ID}, {#STORAGE_ID}, {#CONTROLLER_ID}]'
               delay: '0'
-              history: 7d
               trends: '0'
               value_type: CHAR
               description: 'The serial number of the controller.'
@@ -881,7 +872,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.ilo.controller.status[{#SYSTEM_ID}, {#STORAGE_ID}, {#CONTROLLER_ID}]'
               delay: '0'
-              history: 7d
               description: |
                 The health state of the controller. Possible values:
                 
@@ -1011,7 +1001,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.ilo.drive.capacity[{#SYSTEM_ID}, {#STORAGE_ID}, {#DRIVE_ID}]'
               delay: '0'
-              history: 7d
               units: B
               description: 'The capacity of the drive.'
               preprocessing:
@@ -1073,7 +1062,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.ilo.drive.media_type[{#SYSTEM_ID}, {#STORAGE_ID}, {#DRIVE_ID}]'
               delay: '0'
-              history: 7d
               description: 'The media type of the drive.'
               valuemap:
                 name: 'Media type'
@@ -1112,7 +1100,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.ilo.drive.model[{#SYSTEM_ID}, {#STORAGE_ID}, {#DRIVE_ID}]'
               delay: '0'
-              history: 7d
               trends: '0'
               value_type: CHAR
               description: 'The model name of the drive.'
@@ -1146,7 +1133,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.ilo.drive.predicted_life_left[{#SYSTEM_ID}, {#STORAGE_ID}, {#DRIVE_ID}]'
               delay: '0'
-              history: 7d
               discover: NO_DISCOVER
               units: '%'
               description: 'The percentage of reads and writes that are predicted to still be available for the drive.'
@@ -1177,7 +1163,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.ilo.drive.serial_number[{#SYSTEM_ID}, {#STORAGE_ID}, {#DRIVE_ID}]'
               delay: '0'
-              history: 7d
               trends: '0'
               value_type: CHAR
               description: 'The serial number of the drive.'
@@ -1221,7 +1206,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.ilo.drive.status_indicator[{#SYSTEM_ID}, {#STORAGE_ID}, {#DRIVE_ID}]'
               delay: '0'
-              history: 7d
               description: |
                 Status of drive. Possible values:
                 
@@ -1394,7 +1378,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.ilo.fan.speed[{#CHASSIS_ID}, {#FAN_ID}]'
               delay: '0'
-              history: 7d
               units: '%'
               description: 'The current speed of the fan.'
               preprocessing:
@@ -1419,7 +1402,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.ilo.fan.status[{#CHASSIS_ID}, {#FAN_ID}]'
               delay: '0'
-              history: 7d
               description: |
                 The health state of the fan. Possible values:
                 
@@ -1534,7 +1516,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.ilo.manager.firmware.current_version[{#MANAGER_ID}]'
               delay: '0'
-              history: 7d
               trends: '0'
               value_type: CHAR
               description: 'The current firmware version of the manager.'
@@ -1594,7 +1575,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.ilo.manager.model[{#MANAGER_ID}]'
               delay: '0'
-              history: 7d
               trends: '0'
               value_type: CHAR
               description: 'The model name of the manager.'
@@ -1620,7 +1600,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.ilo.manager.status[{#MANAGER_ID}]'
               delay: '0'
-              history: 7d
               description: |
                 The health state of the manager. Possible values:
                 
@@ -1684,7 +1663,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.ilo.manager.type[{#MANAGER_ID}]'
               delay: '0'
-              history: 7d
               description: |
                 The manager type. Possible values:
                 
@@ -1783,7 +1761,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.ilo.psu.last_power_output[{#CHASSIS_ID}, {#PSU_ID}]'
               delay: '0'
-              history: 7d
               units: W
               description: 'The average power output of the PSU.'
               preprocessing:
@@ -1806,7 +1783,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.ilo.psu.line_input_voltage[{#CHASSIS_ID}, {#PSU_ID}]'
               delay: '0'
-              history: 7d
               units: V
               description: 'The line input voltage at which the PSU is operating.'
               preprocessing:
@@ -1829,7 +1805,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.ilo.psu.model[{#CHASSIS_ID}, {#PSU_ID}]'
               delay: '0'
-              history: 7d
               trends: '0'
               value_type: CHAR
               description: 'The model name of the PSU.'
@@ -1857,7 +1832,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.ilo.psu.serial_number[{#CHASSIS_ID}, {#PSU_ID}]'
               delay: '0'
-              history: 7d
               trends: '0'
               value_type: CHAR
               description: 'The serial number of the PSU.'
@@ -1895,7 +1869,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.ilo.psu.status[{#CHASSIS_ID}, {#PSU_ID}]'
               delay: '0'
-              history: 7d
               description: |
                 The health state of the PSU. Possible values:
                 
@@ -2060,7 +2033,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.ilo.sensor.status[{#CHASSIS_ID}, {#SENSOR_ID}]'
               delay: '0'
-              history: 7d
               description: |
                 The health state of the sensor. Possible values:
                 
@@ -2130,7 +2102,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.ilo.sensor.temperature[{#CHASSIS_ID}, {#SENSOR_ID}]'
               delay: '0'
-              history: 7d
               units: '!°C'
               description: 'The current temperature reading in Celsius degrees for the sensor.'
               preprocessing:
@@ -2247,7 +2218,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.ilo.storage.status[{#SYSTEM_ID}, {#STORAGE_ID}]'
               delay: '0'
-              history: 7d
               description: |
                 The overall health state from the view of this storage. Possible values:
                 
@@ -2370,7 +2340,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.ilo.volume.capacity[{#SYSTEM_ID}, {#STORAGE_ID}, {#VOLUME_ID}]'
               delay: '0'
-              history: 7d
               units: B
               description: 'The capacity of the volume.'
               preprocessing:
@@ -2428,7 +2397,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.ilo.volume.raid_level[{#SYSTEM_ID}, {#STORAGE_ID}, {#VOLUME_ID}]'
               delay: '0'
-              history: 7d
               description: 'The RAID level of the volume.'
               valuemap:
                 name: 'RAID level'
@@ -2481,7 +2449,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.ilo.volume.status[{#SYSTEM_ID}, {#STORAGE_ID}, {#VOLUME_ID}]'
               delay: '0'
-              history: 7d
               description: |
                 The health state of the volume. Possible values:
                 

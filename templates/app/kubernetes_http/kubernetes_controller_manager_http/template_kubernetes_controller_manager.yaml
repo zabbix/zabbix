@@ -27,7 +27,6 @@ zabbix_export:
           type: DEPENDENT
           key: kubernetes.controller.client_http_requests_200.rate
           delay: '0'
-          history: 7d
           value_type: FLOAT
           description: 'Number of HTTP requests with 2xx status code per second.'
           preprocessing:
@@ -52,7 +51,6 @@ zabbix_export:
           type: DEPENDENT
           key: kubernetes.controller.client_http_requests_300.rate
           delay: '0'
-          history: 7d
           value_type: FLOAT
           description: 'Number of HTTP requests with 3xx status code per second.'
           preprocessing:
@@ -77,7 +75,6 @@ zabbix_export:
           type: DEPENDENT
           key: kubernetes.controller.client_http_requests_400.rate
           delay: '0'
-          history: 7d
           value_type: FLOAT
           description: 'Number of HTTP requests with 4xx status code per second.'
           preprocessing:
@@ -102,7 +99,6 @@ zabbix_export:
           type: DEPENDENT
           key: kubernetes.controller.client_http_requests_500.rate
           delay: '0'
-          history: 7d
           value_type: FLOAT
           description: 'Number of HTTP requests with 5xx status code per second.'
           preprocessing:
@@ -137,7 +133,6 @@ zabbix_export:
           type: DEPENDENT
           key: kubernetes.controller.cpu.util
           delay: '0'
-          history: 7d
           value_type: FLOAT
           units: '%'
           description: 'Total user and system CPU usage ratio.'
@@ -183,7 +178,6 @@ zabbix_export:
           type: DEPENDENT
           key: kubernetes.controller.go_goroutines
           delay: '0'
-          history: 7d
           value_type: FLOAT
           description: 'Number of goroutines that currently exist.'
           preprocessing:
@@ -203,7 +197,6 @@ zabbix_export:
           type: DEPENDENT
           key: kubernetes.controller.go_threads
           delay: '0'
-          history: 7d
           value_type: FLOAT
           description: 'Number of OS threads created.'
           preprocessing:
@@ -223,7 +216,6 @@ zabbix_export:
           type: DEPENDENT
           key: kubernetes.controller.leader_election_master_status
           delay: '0'
-          history: 7d
           value_type: FLOAT
           description: 'Gauge of if the reporting system is master of the relevant lease, 0 indicates backup, 1 indicates master.'
           valuemap:
@@ -245,7 +237,6 @@ zabbix_export:
           type: DEPENDENT
           key: kubernetes.controller.max_fds
           delay: '0'
-          history: 7d
           value_type: FLOAT
           description: 'Maximum allowed open file descriptors.'
           preprocessing:
@@ -265,7 +256,6 @@ zabbix_export:
           type: DEPENDENT
           key: kubernetes.controller.open_fds
           delay: '0'
-          history: 7d
           value_type: FLOAT
           description: 'Number of open file descriptors.'
           preprocessing:
@@ -285,7 +275,6 @@ zabbix_export:
           type: DEPENDENT
           key: kubernetes.controller.process_resident_memory_bytes
           delay: '0'
-          history: 7d
           value_type: FLOAT
           units: B
           description: 'Resident memory size in bytes.'
@@ -306,7 +295,6 @@ zabbix_export:
           type: DEPENDENT
           key: kubernetes.controller.process_virtual_memory_bytes
           delay: '0'
-          history: 7d
           value_type: FLOAT
           units: B
           description: 'Virtual memory size in bytes.'
@@ -382,7 +370,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'kubernetes.controller.workqueue_adds_total["{#NAME}"]'
               delay: '0'
-              history: 7d
               discover: NO_DISCOVER
               value_type: FLOAT
               description: 'Total number of adds handled by workqueue per second.'
@@ -408,7 +395,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'kubernetes.controller.workqueue_depth["{#NAME}"]'
               delay: '0'
-              history: 7d
               discover: NO_DISCOVER
               value_type: FLOAT
               description: 'Current depth of workqueue.'
@@ -431,7 +417,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'kubernetes.controller.workqueue_longest_running_processor_seconds["{#NAME}"]'
               delay: '0'
-              history: 7d
               discover: NO_DISCOVER
               value_type: FLOAT
               units: s
@@ -454,7 +439,6 @@ zabbix_export:
               name: '["{#NAME}"]: Workqueue queue duration, 50p'
               type: CALCULATED
               key: 'kubernetes.controller.workqueue_queue_duration_seconds_p50["{#NAME}"]'
-              history: 7d
               discover: NO_DISCOVER
               value_type: FLOAT
               units: s
@@ -473,7 +457,6 @@ zabbix_export:
               name: '["{#NAME}"]: Workqueue queue duration, p90'
               type: CALCULATED
               key: 'kubernetes.controller.workqueue_queue_duration_seconds_p90["{#NAME}"]'
-              history: 7d
               discover: NO_DISCOVER
               value_type: FLOAT
               units: s
@@ -488,7 +471,6 @@ zabbix_export:
               name: '["{#NAME}"]: Workqueue queue duration, p95'
               type: CALCULATED
               key: 'kubernetes.controller.workqueue_queue_duration_seconds_p95["{#NAME}"]'
-              history: 7d
               discover: NO_DISCOVER
               value_type: FLOAT
               units: s
@@ -503,7 +485,6 @@ zabbix_export:
               name: '["{#NAME}"]: Workqueue queue duration, p99'
               type: CALCULATED
               key: 'kubernetes.controller.workqueue_queue_duration_seconds_p99["{#NAME}"]'
-              history: 7d
               discover: NO_DISCOVER
               value_type: FLOAT
               units: s
@@ -519,7 +500,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'kubernetes.controller.workqueue_retries_total["{#NAME}"]'
               delay: '0'
-              history: 7d
               discover: NO_DISCOVER
               value_type: FLOAT
               description: 'Total number of retries handled by workqueue per second.'
@@ -545,7 +525,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'kubernetes.controller.workqueue_unfinished_work_seconds["{#NAME}"]'
               delay: '0'
-              history: 7d
               discover: NO_DISCOVER
               value_type: FLOAT
               units: s
@@ -568,7 +547,6 @@ zabbix_export:
               name: '["{#NAME}"]: Workqueue work duration, 50p'
               type: CALCULATED
               key: 'kubernetes.controller.workqueue_work_duration_seconds_p50["{#NAME}"]'
-              history: 7d
               discover: NO_DISCOVER
               value_type: FLOAT
               units: s
@@ -583,7 +561,6 @@ zabbix_export:
               name: '["{#NAME}"]: Workqueue work duration, p90'
               type: CALCULATED
               key: 'kubernetes.controller.workqueue_work_duration_seconds_p90["{#NAME}"]'
-              history: 7d
               discover: NO_DISCOVER
               value_type: FLOAT
               units: s
@@ -598,7 +575,6 @@ zabbix_export:
               name: '["{#NAME}"]: Workqueue work duration, p95'
               type: CALCULATED
               key: 'kubernetes.controller.workqueue_work_duration_seconds_p95["{#NAME}"]'
-              history: 7d
               discover: NO_DISCOVER
               value_type: FLOAT
               units: s
@@ -613,7 +589,6 @@ zabbix_export:
               name: '["{#NAME}"]: Workqueue work duration, p99'
               type: CALCULATED
               key: 'kubernetes.controller.workqueue_work_duration_seconds_p99["{#NAME}"]'
-              history: 7d
               discover: NO_DISCOVER
               value_type: FLOAT
               units: s

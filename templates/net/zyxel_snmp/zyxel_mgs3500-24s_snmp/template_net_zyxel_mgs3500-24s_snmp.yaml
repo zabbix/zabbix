@@ -38,7 +38,6 @@ zabbix_export:
           name: 'SNMP agent availability'
           type: INTERNAL
           key: 'zabbix[host,snmp,available]'
-          history: 7d
           valuemap:
             name: 'SNMP available'
           preprocessing:
@@ -64,7 +63,6 @@ zabbix_export:
           snmp_oid: .1.3.6.1.2.1.1.4.0
           key: zyxel.3500_24s.contact
           delay: 1h
-          history: 7d
           trends: '0'
           value_type: CHAR
           description: |
@@ -85,7 +83,6 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.4.1.890.1.15.3.2.4.0
           key: zyxel.3500_24s.cpuusage
-          history: 7d
           value_type: FLOAT
           units: '%'
           description: |
@@ -112,7 +109,6 @@ zabbix_export:
           snmp_oid: .1.3.6.1.4.1.890.1.15.3.1.6.0
           key: zyxel.3500_24s.fwversion
           delay: 1h
-          history: 7d
           trends: '0'
           value_type: CHAR
           description: 'MIB: ZYXEL-ES-COMMON'
@@ -141,7 +137,6 @@ zabbix_export:
           snmp_oid: .1.3.6.1.2.1.25.1.1.0
           key: zyxel.3500_24s.hw.uptime
           delay: 30s
-          history: 7d
           trends: '0'
           units: uptime
           description: |
@@ -168,7 +163,6 @@ zabbix_export:
           snmp_oid: .1.3.6.1.2.1.1.6.0
           key: zyxel.3500_24s.location
           delay: 1h
-          history: 7d
           trends: '0'
           value_type: CHAR
           description: |
@@ -189,7 +183,6 @@ zabbix_export:
           snmp_oid: .1.3.6.1.2.1.2.2.1.6.1
           key: zyxel.3500_24s.mac
           delay: 1h
-          history: 7d
           trends: '0'
           value_type: CHAR
           description: |
@@ -212,7 +205,6 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.4.1.890.1.15.3.2.5.0
           key: zyxel.3500_24s.memusage
-          history: 7d
           description: |
             MIB: ZYXEL-ES-COMMON
             Show device memory usage in %.
@@ -237,7 +229,6 @@ zabbix_export:
           snmp_oid: .1.3.6.1.2.1.1.1.0
           key: zyxel.3500_24s.model
           delay: 1h
-          history: 7d
           trends: '0'
           value_type: CHAR
           description: |
@@ -271,7 +262,6 @@ zabbix_export:
           snmp_oid: .1.3.6.1.2.1.1.5.0
           key: zyxel.3500_24s.name
           delay: 1h
-          history: 7d
           trends: '0'
           value_type: CHAR
           description: |
@@ -293,7 +283,6 @@ zabbix_export:
           snmp_oid: .1.3.6.1.2.1.1.3.0
           key: zyxel.3500_24s.net.uptime
           delay: 30s
-          history: 7d
           trends: '0'
           units: uptime
           description: |
@@ -314,7 +303,6 @@ zabbix_export:
           snmp_oid: .1.3.6.1.4.1.890.1.15.3.1.12.0
           key: zyxel.3500_24s.serialnumber
           delay: 1h
-          history: 7d
           trends: '0'
           value_type: CHAR
           description: |
@@ -353,7 +341,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.890.1.15.3.26.1.1.1.3.{#SNMPINDEX}'
               key: 'zyxel.3500_24s.fan[{#SNMPINDEX}]'
-              history: 7d
               units: '!rpm'
               description: |
                 MIB: ZYXEL-HW-MONITOR-MIB
@@ -414,7 +401,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.2.2.1.7.{#SNMPINDEX}'
               key: 'zyxel.3500_24s.net.if.adminstatus[{#SNMPINDEX}]'
-              history: 7d
               description: |
                 MIB: IF-MIB
                 The desired state of the interface.  The
@@ -438,7 +424,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.2.2.1.2.{#SNMPINDEX}'
               key: 'zyxel.3500_24s.net.if.descr[{#SNMPINDEX}]'
-              history: 7d
               trends: '0'
               value_type: CHAR
               description: |
@@ -460,7 +445,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.31.1.1.1.15.{#SNMPINDEX}'
               key: 'zyxel.3500_24s.net.if.highspeed[{#SNMPINDEX}]'
-              history: 7d
               units: bps
               description: |
                 MIB: IF-MIB
@@ -484,7 +468,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.31.1.1.1.9.{#SNMPINDEX}'
               key: 'zyxel.3500_24s.net.if.in.broadcastpkts[{#SNMPINDEX}]'
-              history: 7d
               units: packets/s
               description: |
                 MIB: IF-MIB
@@ -507,7 +490,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.31.1.1.1.8.{#SNMPINDEX}'
               key: 'zyxel.3500_24s.net.if.in.multicastpkts[{#SNMPINDEX}]'
-              history: 7d
               units: packets/s
               description: |
                 MIB: IF-MIB
@@ -531,7 +513,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.31.1.1.1.6.{#SNMPINDEX}'
               key: 'zyxel.3500_24s.net.if.in.traffic[{#SNMPINDEX}]'
-              history: 7d
               units: bps
               description: |
                 MIB: IF-MIB
@@ -556,7 +537,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.31.1.1.1.7.{#SNMPINDEX}'
               key: 'zyxel.3500_24s.net.if.in.ucastpkts[{#SNMPINDEX}]'
-              history: 7d
               units: packets/s
               description: |
                 MIB: IF-MIB
@@ -578,7 +558,6 @@ zabbix_export:
               name: 'Port {#SNMPINDEX}: Incoming utilization'
               type: CALCULATED
               key: 'zyxel.3500_24s.net.if.in.util[{#SNMPINDEX}]'
-              history: 7d
               value_type: FLOAT
               units: '%'
               params: 'last(//zyxel.3500_24s.net.if.in.traffic[{#SNMPINDEX}]) * (last(//zyxel.3500_24s.net.if.highspeed[{#SNMPINDEX}]) <> 0) / ( last(//zyxel.3500_24s.net.if.highspeed[{#SNMPINDEX}]) + (last(//zyxel.3500_24s.net.if.highspeed[{#SNMPINDEX}]) = 0) ) * 100'
@@ -604,7 +583,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.890.1.15.3.61.2.1.1.2.{#SNMPINDEX}'
               key: 'zyxel.3500_24s.net.if.link_type[{#SNMPINDEX}]'
-              history: 7d
               description: |
                 MIB: ZYXEL-PORT-MIB
                 The entry shows the linkUp cable type (copper, fiber, xfp or cx4) for the combo ports.
@@ -626,7 +604,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.890.1.15.3.61.1.1.1.3.{#SNMPINDEX}'
               key: 'zyxel.3500_24s.net.if.name[{#SNMPINDEX}]'
-              history: 7d
               trends: '0'
               value_type: CHAR
               description: |
@@ -648,7 +625,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.2.2.1.8.{#SNMPINDEX}'
               key: 'zyxel.3500_24s.net.if.operstatus[{#SNMPINDEX}]'
-              history: 7d
               description: |
                 MIB: IF-MIB
                 The current operational state of the interface.
@@ -691,7 +667,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.31.1.1.1.13.{#SNMPINDEX}'
               key: 'zyxel.3500_24s.net.if.out.broadcastpkts[{#SNMPINDEX}]'
-              history: 7d
               units: packets/s
               description: |
                 MIB: IF-MIB
@@ -715,7 +690,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.31.1.1.1.12.{#SNMPINDEX}'
               key: 'zyxel.3500_24s.net.if.out.multicastpkts[{#SNMPINDEX}]'
-              history: 7d
               units: packets/s
               description: |
                 MIB: IF-MIB
@@ -740,7 +714,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.31.1.1.1.10.{#SNMPINDEX}'
               key: 'zyxel.3500_24s.net.if.out.traffic[{#SNMPINDEX}]'
-              history: 7d
               units: bps
               description: |
                 MIB: IF-MIB
@@ -766,7 +739,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.31.1.1.1.11.{#SNMPINDEX}'
               key: 'zyxel.3500_24s.net.if.out.ucastpkts[{#SNMPINDEX}]'
-              history: 7d
               units: packets/s
               description: |
                 MIB: IF-MIB
@@ -789,7 +761,6 @@ zabbix_export:
               name: 'Port {#SNMPINDEX}: Outgoing utilization'
               type: CALCULATED
               key: 'zyxel.3500_24s.net.if.out.util[{#SNMPINDEX}]'
-              history: 7d
               value_type: FLOAT
               units: '%'
               params: 'last(//zyxel.3500_24s.net.if.out.traffic[{#SNMPINDEX}]) * (last(//zyxel.3500_24s.net.if.highspeed[{#SNMPINDEX}]) <> 0) / ( last(//zyxel.3500_24s.net.if.highspeed[{#SNMPINDEX}]) + (last(//zyxel.3500_24s.net.if.highspeed[{#SNMPINDEX}]) = 0) ) * 100'
@@ -815,7 +786,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.890.1.15.3.61.1.1.1.1.{#SNMPINDEX}'
               key: 'zyxel.3500_24s.net.if.speed_duplex[{#SNMPINDEX}]'
-              history: 7d
               description: |
                 MIB: ZYXEL-PORT-MIB
                 Select The speed and the duplex mode of the Ethernet connection on this port. Selecting Auto
@@ -936,7 +906,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.890.1.15.3.84.1.2.1.6.{#SNMPINDEX}'
               key: 'zyxel.3500_24s.sfp.ddm[{#SNMPINDEX}]'
               delay: '{$ZYXEL.LLD.SFP.UPDATE}'
-              history: 7d
               value_type: FLOAT
               units: '!{#ZYXEL.SFP.UNIT}'
               description: |
@@ -1028,7 +997,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.890.1.15.3.84.1.1.1.6.{#SNMPINDEX}'
               key: 'zyxel.3500_24s.sfp.datecode[{#SNMPINDEX}]'
               delay: '{$ZYXEL.LLD.SFP.UPDATE}'
-              history: 7d
               trends: '0'
               value_type: CHAR
               description: |
@@ -1051,7 +1019,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.890.1.15.3.84.1.1.1.3.{#SNMPINDEX}'
               key: 'zyxel.3500_24s.sfp.part[{#SNMPINDEX}]'
               delay: '{$ZYXEL.LLD.SFP.UPDATE}'
-              history: 7d
               trends: '0'
               value_type: CHAR
               description: |
@@ -1074,7 +1041,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.890.1.15.3.84.1.1.1.5.{#SNMPINDEX}'
               key: 'zyxel.3500_24s.sfp.revision[{#SNMPINDEX}]'
               delay: '{$ZYXEL.LLD.SFP.UPDATE}'
-              history: 7d
               trends: '0'
               value_type: CHAR
               description: |
@@ -1097,7 +1063,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.890.1.15.3.84.1.1.1.4.{#SNMPINDEX}'
               key: 'zyxel.3500_24s.sfp.serialnumber[{#SNMPINDEX}]'
               delay: '{$ZYXEL.LLD.SFP.UPDATE}'
-              history: 7d
               trends: '0'
               value_type: CHAR
               description: |
@@ -1131,7 +1096,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.890.1.15.3.84.1.1.1.1.{#SNMPINDEX}'
               key: 'zyxel.3500_24s.sfp.status[{#SNMPINDEX}]'
               delay: '{$ZYXEL.LLD.SFP.UPDATE}'
-              history: 7d
               description: |
                 MIB: ZYXEL-TRANSCEIVER-MIB
                 Transceiver module type.
@@ -1154,7 +1118,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.890.1.15.3.84.1.1.1.7.{#SNMPINDEX}'
               key: 'zyxel.3500_24s.sfp.transceiver[{#SNMPINDEX}]'
               delay: '{$ZYXEL.LLD.SFP.UPDATE}'
-              history: 7d
               trends: '0'
               value_type: CHAR
               description: |
@@ -1177,7 +1140,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.890.1.15.3.84.1.1.1.2.{#SNMPINDEX}'
               key: 'zyxel.3500_24s.sfp.vendor[{#SNMPINDEX}]'
               delay: '{$ZYXEL.LLD.SFP.UPDATE}'
-              history: 7d
               trends: '0'
               value_type: CHAR
               description: |
@@ -1207,7 +1169,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.890.1.15.3.26.1.2.1.3.{#SNMPINDEX}'
               key: 'zyxel.3500_24s.temp[{#SNMPINDEX}]'
-              history: 7d
               units: '!°C'
               description: |
                 MIB: ZYXEL-HW-MONITOR-MIB
@@ -1252,7 +1213,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.890.1.15.3.26.1.3.1.3.{#SNMPINDEX}'
               key: 'zyxel.3500_24s.volt[{#SNMPINDEX}]'
-              history: 7d
               value_type: FLOAT
               units: V
               description: |

@@ -100,7 +100,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'service.jobs.status[''{#SERVICE.NAME}'',''{#SERVICE.JOB}'',completed]'
               delay: '0'
-              history: 7d
               description: 'Gets the number of jobs in the state - `completed`.'
               preprocessing:
                 - type: JSONPATH
@@ -125,7 +124,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'service.jobs.status[''{#SERVICE.NAME}'',''{#SERVICE.JOB}'',error]'
               delay: '0'
-              history: 7d
               description: 'Gets the number of jobs in the state - `error`.'
               preprocessing:
                 - type: JSONPATH
@@ -160,7 +158,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'service.jobs.status[''{#SERVICE.NAME}'',''{#SERVICE.JOB}'',executed]'
               delay: '0'
-              history: 7d
               description: 'Gets the number of jobs in the state - `executed`.'
               preprocessing:
                 - type: JSONPATH
@@ -185,7 +182,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'service.jobs.status[''{#SERVICE.NAME}'',''{#SERVICE.JOB}'',waitCondition]'
               delay: '0'
-              history: 7d
               description: 'Gets the number of jobs in the state - `waitCondition`.'
               preprocessing:
                 - type: JSONPATH
@@ -210,7 +206,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'service.jobs.status[''{#SERVICE.NAME}'',''{#SERVICE.JOB}'',waitHost]'
               delay: '0'
-              history: 7d
               description: 'Gets the number of jobs in the state - `waitHost`.'
               preprocessing:
                 - type: JSONPATH
@@ -235,7 +230,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'service.jobs.status[''{#SERVICE.NAME}'',''{#SERVICE.JOB}'',waitResource]'
               delay: '0'
-              history: 7d
               description: 'Gets the number of jobs in the state - `waitResource`.'
               preprocessing:
                 - type: JSONPATH
@@ -260,7 +254,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'service.jobs.status[''{#SERVICE.NAME}'',''{#SERVICE.JOB}'',waitWorkload]'
               delay: '0'
-              history: 7d
               description: 'Gets the number of jobs in the state - `waitWorkload`.'
               preprocessing:
                 - type: JSONPATH
@@ -308,7 +301,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'service.status[''{#SERVICE.NAME}'',''{#SERVICE.JOB}'']'
               delay: '0'
-              history: 7d
               description: 'Gets the service status.'
               valuemap:
                 name: 'Control-M service status'
@@ -518,7 +510,6 @@ zabbix_export:
           type: DEPENDENT
           key: controlm.jobs.statistics.returned
           delay: '0'
-          history: 7d
           description: 'Gets the count of returned jobs.'
           preprocessing:
             - type: JSONPATH
@@ -537,7 +528,6 @@ zabbix_export:
           type: DEPENDENT
           key: controlm.jobs.statistics.total
           delay: '0'
-          history: 7d
           description: 'Gets the count of total jobs.'
           preprocessing:
             - type: JSONPATH
@@ -577,7 +567,6 @@ zabbix_export:
           type: DEPENDENT
           key: server.message
           delay: '0'
-          history: 7d
           trends: '0'
           value_type: TEXT
           description: 'Gets the metric of the server message.'
@@ -622,7 +611,6 @@ zabbix_export:
           type: DEPENDENT
           key: server.state
           delay: '0'
-          history: 7d
           description: 'Gets the metric of the server state.'
           valuemap:
             name: 'Control-M server status'
@@ -665,7 +653,6 @@ zabbix_export:
           type: DEPENDENT
           key: server.version
           delay: '0'
-          history: 7d
           trends: '0'
           value_type: TEXT
           description: 'Gets the metric of the server version.'
@@ -729,7 +716,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'agent.status[''{#AGENT.NAME}'']'
               delay: '0'
-              history: 7d
               description: 'Gets the status of an agent.'
               valuemap:
                 name: 'Control-M agent status'
@@ -788,7 +774,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'agent.version[''{#AGENT.NAME}'']'
               delay: '0'
-              history: 7d
               trends: '0'
               value_type: TEXT
               description: 'Gets the version number of an agent.'
@@ -858,7 +843,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'job.held[''{#JOB.ID}'']'
               delay: '0'
-              history: 7d
               description: 'Gets the held status of a job.'
               valuemap:
                 name: 'Control-M true-false'
@@ -888,7 +872,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'job.numberOfRuns[''{#JOB.ID}'']'
               delay: '0'
-              history: 7d
               description: 'Gets the number of runs for a job.'
               preprocessing:
                 - type: JSONPATH
@@ -930,7 +913,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'job.status[''{#JOB.ID}'']'
               delay: '0'
-              history: 7d
               description: 'Gets the status of a job.'
               valuemap:
                 name: 'Control-M job status'
@@ -981,7 +963,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'job.type[''{#JOB.ID}'']'
               delay: '0'
-              history: 7d
               description: 'Gets the job type.'
               valuemap:
                 name: 'Control-M job type'
