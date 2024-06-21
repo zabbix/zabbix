@@ -127,8 +127,9 @@ foreach ($data['mediatypes'] as $mediaType) {
 	else {
 		$actionLinks = '';
 	}
-	$actionColumn = new CCol($actionLinks);
-	$actionColumn->setAttribute('style', 'white-space: normal;');
+	$actionColumn = (new CCol($actionLinks))
+		->setAttribute('style', 'white-space: normal;')
+		->addClass(ZBX_STYLE_WORDBREAK);
 
 	$statusLink = 'zabbix.php'.
 		'?action='.($mediaType['status'] == MEDIA_TYPE_STATUS_DISABLED

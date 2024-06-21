@@ -186,10 +186,13 @@ foreach ($data['scripts'] as $script) {
 		(new CCol($script['menu_path'] === '' ? $link : [$script['menu_path'].'/', $link]))
 			->addClass(ZBX_STYLE_WORDBREAK),
 		$scope,
-		$actions,
+		(new CCol($actions))->addClass(ZBX_STYLE_WORDWRAP),
 		$type,
 		$execute_on,
-		(new CCol(zbx_nl2br($script['command'])))->addClass(ZBX_STYLE_MONOSPACE_FONT),
+		(new CCol(zbx_nl2br($script['command'])))
+			->addClass(ZBX_STYLE_MONOSPACE_FONT)
+			->addClass(ZBX_STYLE_WORDWRAP)
+			->addStyle('max-width: 600px'),
 		($script['userGroupName'] === null) ? _('All') : $script['userGroupName'],
 		($script['hostGroupName'] === null) ? _('All') : $script['hostGroupName'],
 		($script['host_access'] == PERM_READ_WRITE) ? _('Write') : _('Read')

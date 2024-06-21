@@ -476,8 +476,8 @@ foreach ($data['hosts'] as $host) {
 			CViewHelper::showNum($host['httpTests'])
 		],
 		getHostInterface($interface),
-		$monitored_by,
-		$hostTemplates,
+		(new CCol($monitored_by))->addClass(ZBX_STYLE_WORDBREAK),
+		(new CCol($hostTemplates))->addClass(ZBX_STYLE_WORDBREAK),
 		$toggle_status_link,
 		getHostAvailabilityTable($host['interfaces']),
 		$encryption,
