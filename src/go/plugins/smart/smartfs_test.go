@@ -27,9 +27,9 @@ import (
 	"testing"
 	"time"
 
-	"golang.zabbix.com/sdk/errs"
 	"github.com/google/go-cmp/cmp"
 	"golang.zabbix.com/agent2/plugins/smart/mock"
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/plugin"
 )
