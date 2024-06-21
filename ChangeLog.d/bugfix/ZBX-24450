@@ -1,1 +1,0 @@
-..F....... [ZBX-24450] fixed issue where graph could differ for data gathered from PostgreSQL and other databases (gcalenko)
