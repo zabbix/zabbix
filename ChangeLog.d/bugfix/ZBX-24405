@@ -1,1 +1,0 @@
-........S. [ZBX-24405] fixed memory leak and possibility to miss alerts under high load in alert syncer main loop (askolmeisters)
