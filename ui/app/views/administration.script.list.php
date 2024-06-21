@@ -218,8 +218,12 @@ foreach ($data['scripts'] as $script) {
 		(new CCol($actions))->addClass(ZBX_STYLE_WORDBREAK),
 		$type,
 		$execute_on,
-		(new CCol(zbx_nl2br($script['command'])))->addClass(ZBX_STYLE_MONOSPACE_FONT),
-		($script['userGroupName'] === null) ? _('All') : $script['userGroupName'],
+		(new CCol(zbx_nl2br($script['command'])))
+			->addClass(ZBX_STYLE_MONOSPACE_FONT)
+			->addClass(ZBX_STYLE_WORDWRAP)
+			->addStyle('max-width: 600px'),
+		(new CCol(($script['userGroupName'] === null) ? _('All') : $script['userGroupName']))
+			->addClass(ZBX_STYLE_WORDWRAP),
 		($script['hostGroupName'] === null) ? _('All') : $script['hostGroupName'],
 		($script['host_access'] == PERM_READ_WRITE) ? _('Write') : _('Read')
 	]);

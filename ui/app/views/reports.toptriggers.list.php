@@ -130,15 +130,17 @@ foreach ($data['triggers'] as $triggerid => $trigger) {
 	array_pop($hosts);
 
 	$table->addRow([
-		$hosts,
-		(new CLinkAction($trigger['description']))->setMenuPopup(
-			CMenuPopupHelper::getTrigger([
-				'triggerid' => $trigger['triggerid'],
-				'backurl' => (new CUrl('zabbix.php'))
-					->setArgument('action', 'toptriggers.list')
-					->getUrl()
-			])
-		),
+		(new CCol($hosts))->addClass(ZBX_STYLE_WORDBREAK),
+		(new CCol(
+			(new CLinkAction($trigger['description']))->setMenuPopup(
+				CMenuPopupHelper::getTrigger([
+					'triggerid' => $trigger['triggerid'],
+					'backurl' => (new CUrl('zabbix.php'))
+						->setArgument('action', 'toptriggers.list')
+						->getUrl()
+				])
+			)
+		))->addClass(ZBX_STYLE_WORDBREAK),
 		CSeverityHelper::makeSeverityCell((int) $trigger['priority']),
 		$trigger['problem_count']
 	]);
