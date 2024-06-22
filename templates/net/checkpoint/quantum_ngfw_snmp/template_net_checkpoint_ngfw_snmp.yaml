@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-02-26T09:53:10Z'
+  date: '2024-06-20T09:26:29Z'
   groups:
     - uuid: 36bff6c29af64692839d077febfc7079
       name: 'Templates/Network devices'
@@ -1286,9 +1286,9 @@ zabbix_export:
                   value: '{#IFNAME}'
               trigger_prototypes:
                 - uuid: 6cdb81b7e49a49a48cfc3f203a08ae6b
-                  expression: '{$NET.IF.CONTROL:"{#IFNAME}"}=1 and last(/Check Point Next Generation Firewall by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=1 and (last(/Check Point Next Generation Firewall by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Check Point Next Generation Firewall by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  expression: '{$NET.IF.CONTROL:"{#IFNAME}"}=1 and last(/Check Point Next Generation Firewall by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Check Point Next Generation Firewall by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Check Point Next Generation Firewall by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'last(/Check Point Next Generation Firewall by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>1 or {$NET.IF.CONTROL:"{#IFNAME}"}=0'
+                  recovery_expression: 'last(/Check Point Next Generation Firewall by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$NET.IF.CONTROL:"{#IFNAME}"}=0'
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   opdata: 'Current status: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -1353,8 +1353,8 @@ zabbix_export:
               manual_close: 'YES'
               dependencies:
                 - name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$NET.IF.CONTROL:"{#IFNAME}"}=1 and last(/Check Point Next Generation Firewall by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=1 and (last(/Check Point Next Generation Firewall by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Check Point Next Generation Firewall by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
-                  recovery_expression: 'last(/Check Point Next Generation Firewall by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>1 or {$NET.IF.CONTROL:"{#IFNAME}"}=0'
+                  expression: '{$NET.IF.CONTROL:"{#IFNAME}"}=1 and last(/Check Point Next Generation Firewall by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Check Point Next Generation Firewall by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Check Point Next Generation Firewall by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  recovery_expression: 'last(/Check Point Next Generation Firewall by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$NET.IF.CONTROL:"{#IFNAME}"}=0'
               tags:
                 - tag: scope
                   value: performance
@@ -1375,8 +1375,8 @@ zabbix_export:
               manual_close: 'YES'
               dependencies:
                 - name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$NET.IF.CONTROL:"{#IFNAME}"}=1 and last(/Check Point Next Generation Firewall by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=1 and (last(/Check Point Next Generation Firewall by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Check Point Next Generation Firewall by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
-                  recovery_expression: 'last(/Check Point Next Generation Firewall by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>1 or {$NET.IF.CONTROL:"{#IFNAME}"}=0'
+                  expression: '{$NET.IF.CONTROL:"{#IFNAME}"}=1 and last(/Check Point Next Generation Firewall by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Check Point Next Generation Firewall by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Check Point Next Generation Firewall by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  recovery_expression: 'last(/Check Point Next Generation Firewall by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$NET.IF.CONTROL:"{#IFNAME}"}=0'
               tags:
                 - tag: scope
                   value: performance
@@ -1396,8 +1396,8 @@ zabbix_export:
               manual_close: 'YES'
               dependencies:
                 - name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$NET.IF.CONTROL:"{#IFNAME}"}=1 and last(/Check Point Next Generation Firewall by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=1 and (last(/Check Point Next Generation Firewall by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Check Point Next Generation Firewall by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
-                  recovery_expression: 'last(/Check Point Next Generation Firewall by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>1 or {$NET.IF.CONTROL:"{#IFNAME}"}=0'
+                  expression: '{$NET.IF.CONTROL:"{#IFNAME}"}=1 and last(/Check Point Next Generation Firewall by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Check Point Next Generation Firewall by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Check Point Next Generation Firewall by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  recovery_expression: 'last(/Check Point Next Generation Firewall by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$NET.IF.CONTROL:"{#IFNAME}"}=0'
               tags:
                 - tag: scope
                   value: availability
