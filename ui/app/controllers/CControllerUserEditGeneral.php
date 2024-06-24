@@ -83,8 +83,8 @@ abstract class CControllerUserEditGeneral extends CController {
 		]);
 
 		foreach ($data['medias'] as &$media) {
-			$media['name'] = $mediatypes[$media['mediatypeid']]['name'];
-			$media['mediatype'] = $mediatypes[$media['mediatypeid']]['type'];
+			$media['name'] = $mediatypes[$media['mediatypeid']]['name'] ?? null;
+			$media['mediatype'] = $mediatypes[$media['mediatypeid']]['type'] ?? null;
 			$media['send_to_sort_field'] = is_array($media['sendto'])
 				? implode(', ', $media['sendto'])
 				: $media['sendto'];
