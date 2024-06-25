@@ -64,14 +64,16 @@ foreach ($data['filter_tabs'] as $tab) {
 
 // Set javascript options for tab filter initialization in monitoring.latest.view.js.php file.
 $data['filter_options'] = $filter->options;
-$html_page->addItem($filter);
 
 $html_page
-	->addItem(new CPartial('monitoring.latest.view.html', array_intersect_key($data,
-		array_flip(['filter', 'sort_field', 'sort_order', 'view_curl', 'paging', 'hosts', 'items', 'history', 'config',
-			'tags', 'maintenances', 'items_rw', 'mandatory_filter_set', 'subfilter_set'
-		])
-	)))
+	->addItem($filter)
+	->addItem(
+		new CPartial('monitoring.latest.view.html', array_intersect_key($data,
+			array_flip(['filter', 'sort_field', 'sort_order', 'view_curl', 'paging', 'hosts', 'items', 'history',
+				'config', 'tags', 'maintenances', 'items_rw', 'mandatory_filter_set', 'subfilter_set'
+			])
+		))
+	)
 	->show();
 
 (new CScriptTag('
