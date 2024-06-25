@@ -23,11 +23,12 @@
 #include "zbxexpr.h"
 #include "zbxregexp.h"
 #include "zbxnum.h"
+#include "zbx_expression_constants.h"
 
 ZBX_PTR_VECTOR_IMPL(um_macro, zbx_um_macro_t *)
 ZBX_PTR_VECTOR_IMPL(um_host, zbx_um_host_t *)
 
-#define ZBX_MACRO_NO_KVS_VALUE	"*UNKNOWN*"
+#define ZBX_MACRO_NO_KVS_VALUE	STR_UNKNOWN_VARIABLE
 
 typedef enum
 {

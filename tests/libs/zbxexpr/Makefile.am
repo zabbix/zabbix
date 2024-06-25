@@ -12,7 +12,9 @@ BINARIES_tests = \
 	is_double_suffix \
 	zbx_user_macro_parse \
 	zbx_get_report_nextcheck \
-	zbx_function_param_parse_ext
+	macro_fmttime \
+	zbx_function_param_parse_ext \
+	zbx_substitute_macros
 
 noinst_PROGRAMS = $(BINARIES_tests)
 
@@ -194,3 +196,31 @@ zbx_function_param_parse_ext_LDADD += @SERVER_LIBS@
 zbx_function_param_parse_ext_LDFLAGS = @SERVER_LDFLAGS@
 
 zbx_function_param_parse_ext_CFLAGS = $(EXPR_COMPILER_FLAGS)
+
+
+macro_fmttime_SOURCES = \
+	macro_fmttime.c \
+	$(COMMON_SRC_FILES)
+
+macro_fmttime_LDADD = \
+	$(EXPR_LIBS)
+
+macro_fmttime_LDADD += @SERVER_LIBS@
+
+macro_fmttime_LDFLAGS = @SERVER_LDFLAGS@ -Wl,--wrap=time
+
+macro_fmttime_CFLAGS = $(EXPR_COMPILER_FLAGS)
+
+
+zbx_substitute_macros_SOURCES = \
+	zbx_substitute_macros.c \
+	$(COMMON_SRC_FILES)
+
+zbx_substitute_macros_LDADD = \
+	$(EXPR_LIBS)
+
+zbx_substitute_macros_LDADD += @SERVER_LIBS@
+
+zbx_substitute_macros_LDFLAGS = @SERVER_LDFLAGS@
+
+zbx_substitute_macros_CFLAGS = $(EXPR_COMPILER_FLAGS)

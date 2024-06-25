@@ -17,10 +17,15 @@
 
 #include "zbxdbhigh.h"
 #include "zbxipcservice.h"
+#include "zbxcacheconfig.h"
+#include "zbxalgo.h"
 
 void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_events_funcs_t *events_cbs,
 		zbx_ipc_async_socket_t *rtc, int config_history_storage_pipelines, int *more);
 
 int	zbx_hc_check_proxy(zbx_uint64_t proxyid);
+
+void	zbx_evaluate_expressions(zbx_vector_dc_trigger_t *triggers, const zbx_vector_uint64_t *history_itemids,
+		const zbx_history_sync_item_t *history_items, const int *history_errcodes);
 
 #endif

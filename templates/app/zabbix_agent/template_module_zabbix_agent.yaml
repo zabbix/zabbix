@@ -21,7 +21,6 @@ zabbix_export:
           name: 'Host name of Zabbix agent running'
           key: agent.hostname
           delay: 1h
-          history: 7d
           trends: '0'
           value_type: CHAR
           preprocessing:
@@ -34,7 +33,6 @@ zabbix_export:
         - uuid: 37a952edc12f47d6ac6f3ca04eb41326
           name: 'Zabbix agent ping'
           key: agent.ping
-          history: 7d
           description: 'The agent always returns "1" for this item. May be used in combination with `nodata()` for the availability check.'
           valuemap:
             name: 'Zabbix agent ping status'
@@ -45,7 +43,6 @@ zabbix_export:
           name: 'Version of Zabbix agent running'
           key: agent.version
           delay: 1h
-          history: 7d
           trends: '0'
           value_type: CHAR
           preprocessing:
@@ -59,7 +56,6 @@ zabbix_export:
           name: 'Zabbix agent availability'
           type: INTERNAL
           key: 'zabbix[host,agent,available]'
-          history: 7d
           description: 'Used for monitoring the availability status of the agent.'
           valuemap:
             name: zabbix.host.available
@@ -174,7 +170,6 @@ zabbix_export:
           type: ZABBIX_ACTIVE
           key: agent.hostname
           delay: 1h
-          history: 7d
           trends: '0'
           value_type: CHAR
           preprocessing:
@@ -188,7 +183,6 @@ zabbix_export:
           name: 'Zabbix agent ping'
           type: ZABBIX_ACTIVE
           key: agent.ping
-          history: 7d
           description: 'The agent always returns "1" for this item. May be used in combination with `nodata()` for the availability check.'
           valuemap:
             name: 'Zabbix agent ping status'
@@ -211,7 +205,6 @@ zabbix_export:
           type: ZABBIX_ACTIVE
           key: agent.version
           delay: 1h
-          history: 7d
           trends: '0'
           value_type: CHAR
           preprocessing:
@@ -225,7 +218,6 @@ zabbix_export:
           name: 'Active agent availability'
           type: INTERNAL
           key: 'zabbix[host,active_agent,available]'
-          history: 7d
           description: |
             Availability of active checks on the host. The value of this item corresponds to availability icons in the host list.
             Possible values:

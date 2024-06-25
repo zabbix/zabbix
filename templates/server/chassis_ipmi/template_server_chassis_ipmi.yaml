@@ -64,7 +64,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'ipmi.state_text[{#SENSOR_ID}]'
               delay: '0'
-              history: 7d
               trends: '0'
               value_type: CHAR
               description: 'It is a state of the discrete IPMI sensor.'
@@ -128,7 +127,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'ipmi.value[{#SENSOR_ID}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               description: 'It is a state of the threshold IPMI sensor.'
               preprocessing:

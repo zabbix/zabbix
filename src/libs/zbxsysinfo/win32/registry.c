@@ -313,7 +313,7 @@ static int	split_fullkey(char **fullkey, HKEY *hive_handle, char **hive_str)
 
 static int	registry_discover(char *key, int mode, AGENT_RESULT *result, const char *regexp)
 {
-	wchar_t		*wkey, *wfullkey = NULL;;
+	wchar_t		*wkey, *wfullkey = NULL;
 	HKEY		hkey, hive_handle;
 	struct zbx_json	j;
 	DWORD		retCode;
