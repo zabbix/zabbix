@@ -65,7 +65,7 @@ $fields = [
 	// filter
 	'filter_set'		=> [T_ZBX_STR, O_OPT, P_SYS,		null,	null],
 	'filter_rst'		=> [T_ZBX_STR, O_OPT, P_SYS,		null,	null],
-	'filter_name'		=> [T_ZBX_STR, O_OPT, null,			null,	null],
+	'filter_name'		=> [T_ZBX_STR, O_OPT, P_NO_TRIM,	null,	null],
 	'filter_templates' =>  [T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,	null],
 	'filter_groups'		=> [T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,	null],
 	'filter_evaltype'	=> [T_ZBX_INT, O_OPT, null,
