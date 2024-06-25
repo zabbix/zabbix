@@ -119,18 +119,22 @@ static duk_ret_t	wd_element_send_keys(duk_context *ctx)
 	zbx_wd_element_t	*el;
 	char			*error = NULL, *keys = NULL;
 	int			err_index = -1;
+	const char		*keys_cesu;
+
+	if (!duk_is_null(ctx, 0) && !duk_is_undefined(ctx, 0))
+		keys_cesu = duk_to_string(ctx, 0);
 
 	if (NULL == (el = wd_element(ctx)))
 		return duk_throw(ctx);
 
-	if (duk_is_null(ctx, 0) || duk_is_undefined(ctx, 0))
+	if (NULL == keys_cesu)
 	{
 		err_index = browser_push_error(ctx,  el->wd, "missing keys parameter");
 
 		goto out;
 	}
 
-	if (SUCCEED != es_duktape_string_decode(duk_to_string(ctx, 0), &keys))
+	if (SUCCEED != es_duktape_string_decode(keys_cesu, &keys))
 	{
 		err_index = browser_push_error(ctx,  el->wd, "cannot convert keys parameter to utf8");
 
@@ -215,18 +219,22 @@ static duk_ret_t	wd_element_get_attribute(duk_context *ctx)
 	zbx_wd_element_t	*el;
 	char			*error = NULL, *name = NULL, *value = NULL;
 	int			err_index = -1;
+	const char		*name_cesu;
+
+	if (!duk_is_null(ctx, 0) && !duk_is_undefined(ctx, 0))
+		name_cesu = duk_to_string(ctx, 0);
 
 	if (NULL == (el = wd_element(ctx)))
 		return duk_throw(ctx);
 
-	if (duk_is_null(ctx, 0) || duk_is_undefined(ctx, 0))
+	if (NULL == name_cesu)
 	{
 		err_index = browser_push_error(ctx,  el->wd, "missing name parameter");
 
 		goto out;
 	}
 
-	if (SUCCEED != es_duktape_string_decode(duk_to_string(ctx, 0), &name))
+	if (SUCCEED != es_duktape_string_decode(name_cesu, &name))
 	{
 		err_index = browser_push_error(ctx, el->wd, "cannot convert name parameter to utf8");
 
@@ -264,18 +272,22 @@ static duk_ret_t	wd_element_get_property(duk_context *ctx)
 	zbx_wd_element_t	*el;
 	char			*error = NULL, *name = NULL, *value = NULL;
 	int			err_index = -1;
+	const char		*name_cesu;
+
+	if (!duk_is_null(ctx, 0) && !duk_is_undefined(ctx, 0))
+		name_cesu = duk_to_string(ctx, 0);
 
 	if (NULL == (el = wd_element(ctx)))
 		return duk_throw(ctx);
 
-	if (duk_is_null(ctx, 0) || duk_is_undefined(ctx, 0))
+	if (NULL == name_cesu)
 	{
 		err_index = browser_push_error(ctx,  el->wd, "missing name parameter");
 
 		goto out;
 	}
 
-	if (SUCCEED != es_duktape_string_decode(duk_to_string(ctx, 0), &name))
+	if (SUCCEED != es_duktape_string_decode(name_cesu, &name))
 	{
 		err_index = browser_push_error(ctx, el->wd, "cannot convert name parameter to utf8");
 
