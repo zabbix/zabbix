@@ -1394,18 +1394,19 @@ static void	proxy_db_init(void)
 	}
 
 	zbx_db_init_autoincrement_options();
+	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
 	if (ZBX_DB_UNKNOWN == (db_type = zbx_db_get_database_type()))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot use database \"%s\": database is not a Zabbix database",
 				zbx_config_dbhigh->config_dbname);
-		exit(EXIT_FAILURE);
+		goto out;
 	}
 	else if (ZBX_DB_PROXY != db_type)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot use database \"%s\": Zabbix proxy cannot work with a"
 				" Zabbix server database", zbx_config_dbhigh->config_dbname);
-		exit(EXIT_FAILURE);
+		goto out;
 	}
 
 	zbx_db_check_character_set();
@@ -1415,7 +1416,7 @@ static void	proxy_db_init(void)
 	{
 #ifdef HAVE_SQLITE3
 		if (NOTSUPPORTED == version_check)
-			exit(EXIT_FAILURE);
+			goto out;
 
 		zabbix_log(LOG_LEVEL_WARNING, "removing database file: \"%s\"", zbx_config_dbhigh->config_dbname);
 		zbx_db_deinit();
@@ -1424,13 +1425,13 @@ static void	proxy_db_init(void)
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot remove database file \"%s\": %s, exiting...",
 					zbx_config_dbhigh->config_dbname, zbx_strerror(errno));
-			exit(EXIT_FAILURE);
+			goto out;
 		}
 
 		proxy_db_init();
 #else
 		ZBX_UNUSED(version_check);
-		exit(EXIT_FAILURE);
+		goto out;
 #endif
 	}
 
@@ -1438,6 +1439,10 @@ static void	proxy_db_init(void)
 	zbx_db_table_prepare("items", NULL);
 	zbx_db_table_prepare("item_preproc", NULL);
 #endif
+	return;
+out:
+	zbx_db_close();
+	exit(EXIT_FAILURE);
 }
 
 int	MAIN_ZABBIX_ENTRY(int flags)
@@ -1712,7 +1717,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
-	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
+
 	proxy_db_init();
 
 	zbx_pb_init();
