@@ -54,6 +54,6 @@ DBPATCH_START(7010)
 /* version, duplicates flag, mandatory flag */
 
 DBPATCH_ADD(7010000, 0, 1)
-DBPATCH_ADD(7010001, 0, 0)
+DBPATCH_ADD(7010001, 0, 1)
 
 DBPATCH_END()
