@@ -44,8 +44,8 @@ class testFormValueMappings extends CWebTest {
 		[
 			'Name' => 'Valuemap for delete',
 			'Value' => "=1010101010101010101010101010101\n⇒\ndefault value1010101010101010101010101010101".
-					"\n424242424242424242424242424242424242424242424242\n⇒\nAnswer to the Ultimate Question of Life, ".
-					"Universe and Everything\n123458945-987653341\n⇒\nfrom 123458945 to 987653341\n…",
+				"\n424242424242424242424242424242424242424242424242\n⇒\nAnswer to the Ultimate Question of Life, ".
+				"Universe and Everything\n123458945-987653341\n⇒\nfrom 123458945 to 987653341\n…",
 			'Action' => 'Remove'
 		],
 		[
@@ -118,7 +118,10 @@ class testFormValueMappings extends CWebTest {
 
 		// Check that both overlay control buttons are clickable.
 		$this->assertEquals(2, $dialog->getFooter()->query('button', ['Add', 'Cancel'])->all()
-				->filter(new CElementFilter(CElementFilter::CLICKABLE))->count());
+			->filter(new CElementFilter(CElementFilter::CLICKABLE))->count());
+
+		$dialog->close();
+		COverlayDialogElement::find()->one()->close();
 	}
 
 	/**
@@ -828,13 +831,14 @@ class testFormValueMappings extends CWebTest {
 		$this->query(($action === 'create')
 			? 'name:valuemap_add'
 			: 'link:'.($expected === TEST_GOOD ? self::$previous_valuemap_name : self::UPDATE_VALUEMAP2
-		))->one()->click();
+			))->one()->click();
 
 		// Fill in the name of the valuemap and the parameters of its mappings.
-		$dialog = COverlayDialogElement::find()->asForm()->waitUntilVisible()->all()->last();
-		$dialog->query('xpath:.//input[@id="name"]')->one()->fill($data['name']);
+		$dialog = COverlayDialogElement::find()->waitUntilVisible()->all()->last();
+		$form = $dialog->asForm();
+		$form->query('xpath:.//input[@id="name"]')->one()->fill($data['name']);
 
-		$mapping_table = $dialog->query('id:mappings-table')->asMultifieldTable()->one();
+		$mapping_table = $form->query('id:mappings-table')->asMultifieldTable()->one();
 		if (CTestArrayHelper::get($data, 'remove_all')) {
 			$mapping_table->clear();
 		}
@@ -845,11 +849,13 @@ class testFormValueMappings extends CWebTest {
 			}
 			$mapping_table->fill($data['mappings']);
 		}
-		$dialog->submit();
+		$form->submit();
 
 		if ($expected === TEST_BAD) {
 			$this->assertMessage(TEST_BAD, null, $data['error_details']);
 			$this->assertEquals($old_hash, CDBHelper::getHash($sql));
+
+			$dialog->close();
 		}
 		else {
 			// Save the configuration of the host with created/updated value mappings.
@@ -873,20 +879,27 @@ class testFormValueMappings extends CWebTest {
 				$this->page->removeFocus();
 				$this->page->updateViewport();
 
+				$mapping_dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
+
 				// Take a screenshot to test draggable object position in overlay dialog.
 				if ($action === 'create') {
-					$dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
-					$this->assertScreenshot($dialog->query('id:mappings-table')->asMultifieldTable()->one(),
-							'Value mappings popup'.$data['screenshot_id']);
+					$this->assertScreenshot($mapping_dialog->query('id:mappings-table')->asMultifieldTable()->one(),
+							'Value mappings popup'.$data['screenshot_id']
+					);
 				}
+
+				$mapping_dialog->close();
+				COverlayDialogElement::find()->one()->close();
 
 				// Check the screenshot of the whole value mappings tab.
 				$this->openValueMappingTab($source, false);
 				$this->assertScreenshot($this->query('id', ($source === 'template' ? 'template-' : '').'valuemap-table')->one(),
-						$action.$source.$data['screenshot_id']);
+					$action.$source.$data['screenshot_id']);
 				COverlayDialogElement::find()->one()->close();
 			}
 		}
+
+		COverlayDialogElement::closeAll();
 	}
 
 	/**
@@ -951,7 +964,7 @@ class testFormValueMappings extends CWebTest {
 	 */
 	public function checkSimpleUpdate($source) {
 		$sql = 'SELECT * FROM valuemap v INNER JOIN valuemap_mapping vm ON vm.valuemapid=v.valuemapid'.
-				' ORDER BY v.name, v.valuemapid, vm.sortorder';
+			' ORDER BY v.name, v.valuemapid, vm.sortorder';
 		$old_hash = CDBHelper::getHash($sql);
 
 		// Open configuration of a value mapping and save it without making any changes.
@@ -993,7 +1006,7 @@ class testFormValueMappings extends CWebTest {
 		];
 
 		$sql = 'SELECT * FROM valuemap v INNER JOIN valuemap_mapping vm ON vm.valuemapid=v.valuemapid'.
-				' ORDER BY v.name, v.valuemapid, vm.sortorder';
+			' ORDER BY v.name, v.valuemapid, vm.sortorder';
 		$old_hash = CDBHelper::getHash($sql);
 
 		// Open value mapping configuration and update its fields.
@@ -1084,6 +1097,8 @@ class testFormValueMappings extends CWebTest {
 
 		// Check that the value mapping data is still populated.
 		$this->assertTableData($reference_valuemaps, 'id:valuemap-formlist');
+
+		COverlayDialogElement::find()->one()->close();
 	}
 
 	/**
@@ -1107,5 +1122,7 @@ class testFormValueMappings extends CWebTest {
 		// It is necessary because of unexpected viewport shift.
 		$this->page->updateViewport();
 		$this->assertScreenshot($mapping_form->query('id:mappings-table')->waitUntilVisible()->one(), 'Value mapping mass update');
+
+		COverlayDialogElement::closeAll();
 	}
 }

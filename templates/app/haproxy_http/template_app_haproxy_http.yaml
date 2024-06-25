@@ -108,7 +108,6 @@ zabbix_export:
           type: DEPENDENT
           key: haproxy.uptime
           delay: '0'
-          history: 7d
           value_type: FLOAT
           units: s
           preprocessing:
@@ -143,7 +142,6 @@ zabbix_export:
           type: DEPENDENT
           key: haproxy.version
           delay: '0'
-          history: 7d
           trends: '0'
           value_type: CHAR
           preprocessing:
@@ -176,7 +174,6 @@ zabbix_export:
           name: 'Service response time'
           type: SIMPLE
           key: 'net.tcp.service.perf["{$HAPROXY.STATS.SCHEME}","{$HAPROXY.STATS.HOST}","{$HAPROXY.STATS.PORT}"]'
-          history: 7d
           value_type: FLOAT
           units: s
           tags:
@@ -201,7 +198,6 @@ zabbix_export:
           name: 'Service status'
           type: SIMPLE
           key: 'net.tcp.service["{$HAPROXY.STATS.SCHEME}","{$HAPROXY.STATS.HOST}","{$HAPROXY.STATS.PORT}"]'
-          history: 7d
           valuemap:
             name: 'Service state'
           preprocessing:
@@ -244,7 +240,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'haproxy.backend.act[{#PXNAME},{#SVNAME}]'
               delay: '0'
-              history: 7d
               description: 'Number of active servers.'
               preprocessing:
                 - type: JSONPATH
@@ -265,7 +260,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'haproxy.backend.bck[{#PXNAME},{#SVNAME}]'
               delay: '0'
-              history: 7d
               description: 'Number of backup servers.'
               preprocessing:
                 - type: JSONPATH
@@ -286,7 +280,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'haproxy.backend.bin.rate[{#PXNAME},{#SVNAME}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               units: bps
               description: 'Number of bits received by the backend'
@@ -312,7 +305,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'haproxy.backend.bout.rate[{#PXNAME},{#SVNAME}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               units: bps
               description: 'Number of bits sent by the backend'
@@ -338,7 +330,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'haproxy.backend.dresp.rate[{#PXNAME},{#SVNAME}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               description: 'Responses denied due to security concerns (ACL-restricted).'
               preprocessing:
@@ -360,7 +351,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'haproxy.backend.econ.rate[{#PXNAME},{#SVNAME}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               description: 'Number of requests that encountered an error attempting to connect to a backend server.'
               preprocessing:
@@ -382,7 +372,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'haproxy.backend.eresp.rate[{#PXNAME},{#SVNAME}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               description: 'Number of requests whose responses yielded an error'
               preprocessing:
@@ -414,7 +403,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'haproxy.backend.hrsp_1xx.rate[{#PXNAME},{#SVNAME}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               description: 'Number of informational HTTP responses per second.'
               preprocessing:
@@ -436,7 +424,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'haproxy.backend.hrsp_2xx.rate[{#PXNAME},{#SVNAME}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               description: 'Number of successful HTTP responses per second.'
               preprocessing:
@@ -458,7 +445,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'haproxy.backend.hrsp_3xx.rate[{#PXNAME},{#SVNAME}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               description: 'Number of HTTP redirections per second.'
               preprocessing:
@@ -480,7 +466,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'haproxy.backend.hrsp_4xx.rate[{#PXNAME},{#SVNAME}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               description: 'Number of HTTP client errors per second.'
               preprocessing:
@@ -502,7 +487,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'haproxy.backend.hrsp_5xx.rate[{#PXNAME},{#SVNAME}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               description: 'Number of HTTP server errors per second.'
               preprocessing:
@@ -524,7 +508,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'haproxy.backend.qcur[{#PXNAME},{#SVNAME}]'
               delay: '0'
-              history: 7d
               description: 'Current number of requests unassigned in queue.'
               preprocessing:
                 - type: JSONPATH
@@ -552,7 +535,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'haproxy.backend.qtime[{#PXNAME},{#SVNAME}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               units: s
               description: 'Average time spent in queue (in ms) for the last 1,024 requests'
@@ -605,7 +587,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'haproxy.backend.rtime[{#PXNAME},{#SVNAME}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               units: s
               description: 'Average backend response time (in ms) for the last 1,024 requests'
@@ -638,7 +619,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'haproxy.backend.status[{#PXNAME},{#SVNAME}]'
               delay: '0'
-              history: 7d
               trends: '0'
               value_type: CHAR
               description: |
@@ -678,7 +658,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'haproxy.backend.stot.rate[{#PXNAME},{#SVNAME}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               description: 'Cumulative number of sessions (end-to-end connections) per second.'
               preprocessing:
@@ -700,7 +679,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'haproxy.backend.weight[{#PXNAME},{#SVNAME}]'
               delay: '0'
-              history: 7d
               description: 'Total effective weight.'
               preprocessing:
                 - type: JSONPATH
@@ -721,7 +699,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'haproxy.backend.wredis.rate[{#PXNAME},{#SVNAME}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               description: 'Number of times a request was redispatched to a different backend.'
               preprocessing:
@@ -743,7 +720,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'haproxy.backend.wretr.rate[{#PXNAME},{#SVNAME}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               description: 'Number of times a connection was retried.'
               preprocessing:
@@ -859,7 +835,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'haproxy.frontend.bin.rate[{#PXNAME},{#SVNAME}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               units: bps
               description: 'Number of bits received by the frontend'
@@ -885,7 +860,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'haproxy.frontend.bout.rate[{#PXNAME},{#SVNAME}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               units: bps
               description: 'Number of bits sent by the frontend'
@@ -911,7 +885,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'haproxy.frontend.dreq.rate[{#PXNAME},{#SVNAME}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               description: 'Requests denied due to security concerns (ACL-restricted) per second.'
               preprocessing:
@@ -943,7 +916,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'haproxy.frontend.ereq.rate[{#PXNAME},{#SVNAME}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               description: 'Number of request errors per second.'
               preprocessing:
@@ -975,7 +947,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'haproxy.frontend.hrsp_1xx.rate[{#PXNAME},{#SVNAME}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               description: 'Number of informational HTTP responses per second.'
               preprocessing:
@@ -997,7 +968,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'haproxy.frontend.hrsp_2xx.rate[{#PXNAME},{#SVNAME}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               description: 'Number of successful HTTP responses per second.'
               preprocessing:
@@ -1019,7 +989,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'haproxy.frontend.hrsp_3xx.rate[{#PXNAME},{#SVNAME}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               description: 'Number of HTTP redirections per second.'
               preprocessing:
@@ -1041,7 +1010,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'haproxy.frontend.hrsp_4xx.rate[{#PXNAME},{#SVNAME}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               description: 'Number of HTTP client errors per second.'
               preprocessing:
@@ -1063,7 +1031,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'haproxy.frontend.hrsp_5xx.rate[{#PXNAME},{#SVNAME}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               description: 'Number of HTTP server errors per second.'
               preprocessing:
@@ -1085,7 +1052,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'haproxy.frontend.rate[{#PXNAME},{#SVNAME}]'
               delay: '0'
-              history: 7d
               description: 'Number of sessions created per second'
               preprocessing:
                 - type: JSONPATH
@@ -1123,7 +1089,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'haproxy.frontend.req_rate[{#PXNAME},{#SVNAME}]'
               delay: '0'
-              history: 7d
               description: 'HTTP requests per second'
               preprocessing:
                 - type: JSONPATH
@@ -1141,7 +1106,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'haproxy.frontend.scur[{#PXNAME},{#SVNAME}]'
               delay: '0'
-              history: 7d
               description: 'The current number of established sessions.'
               preprocessing:
                 - type: JSONPATH
@@ -1159,7 +1123,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'haproxy.frontend.slim[{#PXNAME},{#SVNAME}]'
               delay: '0'
-              history: 7d
               description: 'The most simultaneous sessions that are allowed, as defined by the maxconn setting in the frontend.'
               preprocessing:
                 - type: JSONPATH
@@ -1180,7 +1143,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'haproxy.frontend.status[{#PXNAME},{#SVNAME}]'
               delay: '0'
-              history: 7d
               trends: '0'
               value_type: CHAR
               description: |
@@ -1204,7 +1166,6 @@ zabbix_export:
               name: 'Frontend {#PXNAME}: Session utilization'
               type: CALCULATED
               key: 'haproxy.frontend.sutil[{#PXNAME},{#SVNAME}]'
-              history: 7d
               value_type: FLOAT
               units: '%'
               params: 'last(//haproxy.frontend.scur[{#PXNAME},{#SVNAME}]) / last(//haproxy.frontend.slim[{#PXNAME},{#SVNAME}]) * 100'
@@ -1336,7 +1297,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'haproxy.server.act[{#PXNAME},{#SVNAME}]'
               delay: '0'
-              history: 7d
               description: 'Shows whether the server is active (marked with a Y) or a backup (marked with a -).'
               valuemap:
                 name: 'Server mode'
@@ -1361,7 +1321,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'haproxy.server.bck[{#PXNAME},{#SVNAME}]'
               delay: '0'
-              history: 7d
               description: 'Shows whether the server is a backup (marked with a Y) or active (marked with a -).'
               valuemap:
                 name: 'Server mode'
@@ -1386,7 +1345,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'haproxy.server.bin.rate[{#PXNAME},{#SVNAME}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               units: bps
               description: 'Number of bits received by the backend'
@@ -1414,7 +1372,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'haproxy.server.bout.rate[{#PXNAME},{#SVNAME}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               units: bps
               description: 'Number of bits sent by the backend'
@@ -1442,7 +1399,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'haproxy.server.check_status[{#PXNAME},{#SVNAME}]'
               delay: '0'
-              history: 7d
               trends: '0'
               value_type: CHAR
               description: |
@@ -1496,7 +1452,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'haproxy.server.dresp.rate[{#PXNAME},{#SVNAME}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               description: 'Responses denied due to security concerns (ACL-restricted).'
               preprocessing:
@@ -1520,7 +1475,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'haproxy.server.econ.rate[{#PXNAME},{#SVNAME}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               description: 'Number of requests that encountered an error attempting to connect to a backend server.'
               preprocessing:
@@ -1544,7 +1498,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'haproxy.server.eresp.rate[{#PXNAME},{#SVNAME}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               description: 'Number of requests whose responses yielded an error.'
               preprocessing:
@@ -1578,7 +1531,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'haproxy.server.hrsp_1xx.rate[{#PXNAME},{#SVNAME}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               description: 'Number of informational HTTP responses per second.'
               preprocessing:
@@ -1602,7 +1554,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'haproxy.server.hrsp_2xx.rate[{#PXNAME},{#SVNAME}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               description: 'Number of successful HTTP responses per second.'
               preprocessing:
@@ -1626,7 +1577,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'haproxy.server.hrsp_3xx.rate[{#PXNAME},{#SVNAME}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               description: 'Number of HTTP redirections per second.'
               preprocessing:
@@ -1650,7 +1600,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'haproxy.server.hrsp_4xx.rate[{#PXNAME},{#SVNAME}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               description: 'Number of HTTP client errors per second.'
               preprocessing:
@@ -1674,7 +1623,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'haproxy.server.hrsp_5xx.rate[{#PXNAME},{#SVNAME}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               description: 'Number of HTTP server errors per second.'
               preprocessing:
@@ -1698,7 +1646,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'haproxy.server.lbtot.rate[{#PXNAME},{#SVNAME}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               description: 'Number of times that server was selected.'
               preprocessing:
@@ -1722,7 +1669,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'haproxy.server.qcur[{#PXNAME},{#SVNAME}]'
               delay: '0'
-              history: 7d
               description: 'Current number of requests unassigned in queue.'
               preprocessing:
                 - type: JSONPATH
@@ -1752,7 +1698,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'haproxy.server.qlimit[{#PXNAME},{#SVNAME}]'
               delay: '0'
-              history: 7d
               description: 'Configured maxqueue for the server, or nothing in the value is 0 (default, meaning no limit).'
               preprocessing:
                 - type: JSONPATH
@@ -1780,7 +1725,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'haproxy.server.qtime[{#PXNAME},{#SVNAME}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               units: s
               description: 'Average time spent in queue (in ms) for the last 1,024 requests.'
@@ -1837,7 +1781,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'haproxy.server.rtime[{#PXNAME},{#SVNAME}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               units: s
               description: 'Average server response time (in ms) for the last 1,024 requests.'
@@ -1872,7 +1815,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'haproxy.server.status[{#PXNAME},{#SVNAME}]'
               delay: '0'
-              history: 7d
               trends: '0'
               value_type: CHAR
               preprocessing:
@@ -1906,7 +1848,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'haproxy.server.stot.rate[{#PXNAME},{#SVNAME}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               description: 'Cumulative number of sessions (end-to-end connections) per second.'
               preprocessing:
@@ -1930,7 +1871,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'haproxy.server.weight[{#PXNAME},{#SVNAME}]'
               delay: '0'
-              history: 7d
               description: 'Effective weight.'
               preprocessing:
                 - type: JSONPATH
@@ -1953,7 +1893,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'haproxy.server.wredis.rate[{#PXNAME},{#SVNAME}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               description: 'Number of times a request was redispatched to a different backend.'
               preprocessing:
@@ -1977,7 +1916,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'haproxy.server.wretr.rate[{#PXNAME},{#SVNAME}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               description: 'Number of times a connection was retried.'
               preprocessing:

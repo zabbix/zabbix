@@ -1,0 +1,1 @@
+A......... [ZBX-23886] fixed inability to import items, LLD rules and item prototypes containing redundant conditional fields (jfreibergs, vmaksimovs)

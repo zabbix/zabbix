@@ -86,7 +86,6 @@ zabbix_export:
           type: DEPENDENT
           key: pd.grpc_command.rate
           delay: '0'
-          history: 7d
           value_type: FLOAT
           description: 'The rate at which gRPC commands are completed.'
           preprocessing:
@@ -202,7 +201,6 @@ zabbix_export:
           type: DEPENDENT
           key: pd.status
           delay: '0'
-          history: 7d
           trends: '0'
           value_type: CHAR
           description: 'Status of PD instance.'
@@ -235,7 +233,6 @@ zabbix_export:
           type: DEPENDENT
           key: pd.uptime
           delay: '0'
-          history: 7d
           value_type: FLOAT
           units: uptime
           description: 'The runtime of each PD instance.'
@@ -267,7 +264,6 @@ zabbix_export:
           type: DEPENDENT
           key: pd.version
           delay: '0'
-          history: 7d
           trends: '0'
           value_type: CHAR
           description: 'Version of the PD instance.'
@@ -307,7 +303,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'pd.cluster_status.leader_count[{#SINGLETON}]'
               delay: '0'
-              history: 7d
               description: 'The total count of cluster Regions.'
               preprocessing:
                 - type: JSONPATH
@@ -325,7 +320,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'pd.cluster_status.region_count[{#SINGLETON}]'
               delay: '0'
-              history: 7d
               description: 'The current count of all cluster peers.'
               preprocessing:
                 - type: JSONPATH
@@ -343,7 +337,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'pd.cluster_status.storage_capacity[{#SINGLETON}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               units: B
               description: 'The total storage capacity for this TiDB cluster.'
@@ -366,7 +359,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'pd.cluster_status.storage_size[{#SINGLETON}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               units: B
               description: 'The storage size that is currently used by the TiDB cluster.'
@@ -386,7 +378,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'pd.cluster_status.store_disconnected[{#SINGLETON}]'
               delay: '0'
-              history: 7d
               description: 'The count of disconnected stores.'
               preprocessing:
                 - type: JSONPATH
@@ -416,7 +407,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'pd.cluster_status.store_down[{#SINGLETON}]'
               delay: '0'
-              history: 7d
               description: 'The count of down stores.'
               preprocessing:
                 - type: JSONPATH
@@ -446,7 +436,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'pd.cluster_status.store_low_space[{#SINGLETON}]'
               delay: '0'
-              history: 7d
               description: 'The count of low space stores.'
               preprocessing:
                 - type: JSONPATH
@@ -476,7 +465,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'pd.cluster_status.store_offline[{#SINGLETON}]'
               delay: '0'
-              history: 7d
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -496,7 +484,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'pd.cluster_status.store_tombstone[{#SINGLETON}]'
               delay: '0'
-              history: 7d
               description: 'The count of tombstone stores.'
               preprocessing:
                 - type: JSONPATH
@@ -517,7 +504,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'pd.cluster_status.store_unhealth[{#SINGLETON}]'
               delay: '0'
-              history: 7d
               description: 'The count of unhealthy stores.'
               preprocessing:
                 - type: JSONPATH
@@ -538,7 +524,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'pd.cluster_status.store_up[{#SINGLETON}]'
               delay: '0'
-              history: 7d
               description: 'The count of healthy storage instances.'
               preprocessing:
                 - type: JSONPATH
@@ -635,7 +620,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'pd.grpc_command.rate[{#GRPC_METHOD}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               description: 'The rate per command type at which gRPC commands are completed.'
               preprocessing:
@@ -685,7 +669,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'pd.region_heartbeat.error.rate[{#STORE_ADDRESS}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               description: 'The count of heartbeats with the error status per second.'
               preprocessing:
@@ -730,7 +713,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'pd.region_heartbeat.ok.rate[{#STORE_ADDRESS}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               description: 'The count of heartbeats with the ok status per second.'
               preprocessing:
@@ -754,7 +736,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'pd.region_heartbeat.push.err.rate[{#STORE_ADDRESS}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               preprocessing:
                 - type: JSONPATH
@@ -777,7 +758,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'pd.region_heartbeat.rate[{#STORE_ADDRESS}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               description: 'The count of heartbeats reported to PD per instance per second.'
               preprocessing:
@@ -829,7 +809,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'pd.region_labels[{#TYPE}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               description: 'The number of Regions in different label levels.'
               preprocessing:
@@ -870,7 +849,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'pd.region_status[{#TYPE}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               description: 'The health status of Regions indicated via the count of unusual Regions including pending peers, down peers, extra peers, offline peers, missing peers, learner peers and incorrect namespaces.'
               preprocessing:
@@ -958,7 +936,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'pd.scheduler[{#KIND}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               description: 'The current running schedulers.'
               preprocessing:

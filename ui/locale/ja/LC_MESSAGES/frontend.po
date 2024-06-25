@@ -19313,6 +19313,10 @@ msgstr "文字列"
 msgid "String functions"
 msgstr "文字列関数"
 
+#: widgets/piechart/includes/WidgetForm.php:137
+msgid "Stroke width"
+msgstr ""
+
 #: include/items.inc.php:1545 include/items.inc.php:1549
 #: include/items.inc.php:1553 include/items.inc.php:1557
 msgid "Structured data"

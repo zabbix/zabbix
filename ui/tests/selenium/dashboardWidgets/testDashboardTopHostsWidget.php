@@ -263,6 +263,9 @@ class testDashboardTopHostsWidget extends testWidgets {
 		$this->assertEquals('This setting applies only to numeric data.', $hint_dialog->getText());
 		$hint_dialog->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click();
 		$hint_dialog->waitUntilNotPresent();
+
+		$column_dialog->close();
+		$dialog->close();
 	}
 
 	public static function getCreateData() {
@@ -839,7 +842,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						]
 					],
 					'column_error' => [
-						'Invalid parameter "/1: From": cannot be empty.'
+						'Invalid parameter "/1/From": cannot be empty.'
 					]
 				]
 			],
@@ -861,7 +864,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						]
 					],
 					'column_error' => [
-						'Invalid parameter "/1: From": a time is expected.'
+						'Invalid parameter "/1/From": a time is expected.'
 					]
 				]
 			],
@@ -929,7 +932,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						]
 					],
 					'column_error' => [
-						'Invalid parameter "/1: To": cannot be empty.'
+						'Invalid parameter "/1/To": cannot be empty.'
 					]
 				]
 			],
@@ -951,7 +954,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						]
 					],
 					'column_error' => [
-						'Invalid parameter "/1: To": a time is expected.'
+						'Invalid parameter "/1/To": a time is expected.'
 					]
 				]
 			],
@@ -974,8 +977,8 @@ class testDashboardTopHostsWidget extends testWidgets {
 						]
 					],
 					'column_error' => [
-						'Invalid parameter "/1: From": a time is expected.',
-						'Invalid parameter "/1: To": a time is expected.'
+						'Invalid parameter "/1/From": a time is expected.',
+						'Invalid parameter "/1/To": a time is expected.'
 					]
 				]
 			],
@@ -998,8 +1001,8 @@ class testDashboardTopHostsWidget extends testWidgets {
 						]
 					],
 					'column_error' => [
-						'Invalid parameter "/1: From": cannot be empty.',
-						'Invalid parameter "/1: To": cannot be empty.'
+						'Invalid parameter "/1/From": cannot be empty.',
+						'Invalid parameter "/1/To": cannot be empty.'
 					]
 				]
 			],
@@ -1020,7 +1023,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						]
 					],
 					'column_error' => [
-						'Invalid parameter "/1: Widget": cannot be empty.'
+						'Invalid parameter "/1/Widget": cannot be empty.'
 					]
 				]
 			],
@@ -1474,7 +1477,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						]
 					],
 					'column_error' => [
-						'Invalid parameter "/1: From": cannot be empty.'
+						'Invalid parameter "/1/From": cannot be empty.'
 					]
 				]
 			],
@@ -1491,7 +1494,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						]
 					],
 					'column_error' => [
-						'Invalid parameter "/1: From": a time is expected.'
+						'Invalid parameter "/1/From": a time is expected.'
 					]
 				]
 			],
@@ -1544,7 +1547,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						]
 					],
 					'column_error' => [
-						'Invalid parameter "/1: To": cannot be empty.'
+						'Invalid parameter "/1/To": cannot be empty.'
 					]
 				]
 			],
@@ -1561,7 +1564,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						]
 					],
 					'column_error' => [
-						'Invalid parameter "/1: To": a time is expected.'
+						'Invalid parameter "/1/To": a time is expected.'
 					]
 				]
 			],
@@ -1579,8 +1582,8 @@ class testDashboardTopHostsWidget extends testWidgets {
 						]
 					],
 					'column_error' => [
-						'Invalid parameter "/1: From": a time is expected.',
-						'Invalid parameter "/1: To": a time is expected.'
+						'Invalid parameter "/1/From": a time is expected.',
+						'Invalid parameter "/1/To": a time is expected.'
 					]
 				]
 			],
@@ -1598,8 +1601,8 @@ class testDashboardTopHostsWidget extends testWidgets {
 						]
 					],
 					'column_error' => [
-						'Invalid parameter "/1: From": cannot be empty.',
-						'Invalid parameter "/1: To": cannot be empty.'
+						'Invalid parameter "/1/From": cannot be empty.',
+						'Invalid parameter "/1/To": cannot be empty.'
 					]
 				]
 			],
@@ -1615,7 +1618,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						]
 					],
 					'column_error' => [
-						'Invalid parameter "/1: Widget": cannot be empty.'
+						'Invalid parameter "/1/Widget": cannot be empty.'
 					]
 				]
 			],
@@ -2075,6 +2078,8 @@ class testDashboardTopHostsWidget extends testWidgets {
 
 		// Check that tag/column/threshold removed.
 		$this->assertEquals($amount_before - 1, $table->getRows()->count());
+
+		COverlayDialogElement::closeAll();
 	}
 
 	/**
@@ -2150,6 +2155,8 @@ class testDashboardTopHostsWidget extends testWidgets {
 				}
 			}
 		}
+
+		COverlayDialogElement::find()->one()->close();
 	}
 
 	/**

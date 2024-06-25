@@ -28,7 +28,6 @@ zabbix_export:
           type: DEPENDENT
           key: tikv.commands_pri.high.rate
           delay: '0'
-          history: 7d
           value_type: FLOAT
           description: 'Total count of high priority commands per second.'
           preprocessing:
@@ -48,7 +47,6 @@ zabbix_export:
           type: DEPENDENT
           key: tikv.commands_pri.low.rate
           delay: '0'
-          history: 7d
           value_type: FLOAT
           description: 'Total count of low priority commands per second.'
           preprocessing:
@@ -68,7 +66,6 @@ zabbix_export:
           type: DEPENDENT
           key: tikv.commands_pri.normal.rate
           delay: '0'
-          history: 7d
           value_type: FLOAT
           description: 'Total count of normal priority commands per second.'
           preprocessing:
@@ -88,7 +85,6 @@ zabbix_export:
           type: DEPENDENT
           key: tikv.coprocessor_request.rate
           delay: '0'
-          history: 7d
           value_type: FLOAT
           units: Ops
           description: 'Total number of coprocessor requests per second.'
@@ -128,7 +124,6 @@ zabbix_export:
           type: DEPENDENT
           key: tikv.coprocessor_request_error.rate
           delay: '0'
-          history: 7d
           value_type: FLOAT
           units: Ops
           description: 'Total number of push down request error per second.'
@@ -159,7 +154,6 @@ zabbix_export:
           type: DEPENDENT
           key: tikv.coprocessor_response_bytes.rate
           delay: '0'
-          history: 7d
           value_type: FLOAT
           units: Bps
           description: 'The total size of coprocessor response per second.'
@@ -180,7 +174,6 @@ zabbix_export:
           type: DEPENDENT
           key: tikv.coprocessor_rocksdb_perf.rate
           delay: '0'
-          history: 7d
           value_type: FLOAT
           units: Ops
           description: 'Total number of RocksDB internal operations from PerfContext per second.'
@@ -202,7 +195,6 @@ zabbix_export:
           type: DEPENDENT
           key: tikv.coprocessor_scan_keys_sum.rate
           delay: '0'
-          history: 7d
           value_type: FLOAT
           units: Ops
           description: 'Total number of scan keys observed per request per second.'
@@ -224,7 +216,6 @@ zabbix_export:
           type: DEPENDENT
           key: tikv.cpu.util
           delay: '0'
-          history: 7d
           value_type: FLOAT
           units: '%'
           description: 'The CPU usage ratio on TiKV instance.'
@@ -248,7 +239,6 @@ zabbix_export:
           type: DEPENDENT
           key: tikv.engine_flow_bytes.read
           delay: '0'
-          history: 7d
           value_type: FLOAT
           units: Bps
           description: 'The total bytes of read in TiKV instance.'
@@ -266,7 +256,6 @@ zabbix_export:
           type: DEPENDENT
           key: tikv.engine_flow_bytes.write
           delay: '0'
-          history: 7d
           value_type: FLOAT
           units: Bps
           description: 'The total bytes of write in TiKV instance.'
@@ -284,7 +273,6 @@ zabbix_export:
           type: DEPENDENT
           key: tikv.engine_size
           delay: '0'
-          history: 7d
           value_type: FLOAT
           units: B
           description: 'The storage size of TiKV instance.'
@@ -321,7 +309,6 @@ zabbix_export:
           type: DEPENDENT
           key: tikv.grpc_msg.rate
           delay: '0'
-          history: 7d
           value_type: FLOAT
           units: Ops
           description: 'The total QPS in TiKV instance.'
@@ -361,7 +348,6 @@ zabbix_export:
           type: DEPENDENT
           key: tikv.grpc_msg_fail.rate
           delay: '0'
-          history: 7d
           value_type: FLOAT
           units: Ops
           description: 'The total number of gRPC message handling failure per second.'
@@ -402,7 +388,6 @@ zabbix_export:
           type: DEPENDENT
           key: tikv.messages.failure.rate
           delay: '0'
-          history: 7d
           value_type: FLOAT
           description: 'Total number of reporting failure messages per second.'
           preprocessing:
@@ -423,7 +408,6 @@ zabbix_export:
           type: DEPENDENT
           key: tikv.region_count
           delay: '0'
-          history: 7d
           description: 'The number of regions collected in TiKV instance.'
           preprocessing:
             - type: JSONPATH
@@ -439,7 +423,6 @@ zabbix_export:
           type: DEPENDENT
           key: tikv.region_leader
           delay: '0'
-          history: 7d
           description: 'The number of leaders in TiKV instance.'
           preprocessing:
             - type: JSONPATH
@@ -455,7 +438,6 @@ zabbix_export:
           type: DEPENDENT
           key: tikv.rss_bytes
           delay: '0'
-          history: 7d
           value_type: FLOAT
           units: B
           description: 'Resident memory size in bytes.'
@@ -492,7 +474,6 @@ zabbix_export:
           type: DEPENDENT
           key: tikv.scheduler_commands.rate
           delay: '0'
-          history: 7d
           value_type: FLOAT
           description: 'Total number of commands per second.'
           preprocessing:
@@ -514,7 +495,6 @@ zabbix_export:
           type: DEPENDENT
           key: tikv.scheduler_contex
           delay: '0'
-          history: 7d
           description: 'The total number of pending commands. The scheduler receives commands from clients, executes them against the MVCC layer storage engine.'
           preprocessing:
             - type: JSONPATH
@@ -539,7 +519,6 @@ zabbix_export:
           type: DEPENDENT
           key: tikv.scheduler_too_busy.rate
           delay: '0'
-          history: 7d
           value_type: FLOAT
           description: 'The total count of too busy schedulers per second.'
           preprocessing:
@@ -560,7 +539,6 @@ zabbix_export:
           type: DEPENDENT
           key: tikv.snapshot.applying
           delay: '0'
-          history: 7d
           description: 'The total amount of raftstore snapshot traffic.'
           preprocessing:
             - type: JSONPATH
@@ -577,7 +555,6 @@ zabbix_export:
           type: DEPENDENT
           key: tikv.snapshot.receiving
           delay: '0'
-          history: 7d
           description: 'The total amount of raftstore snapshot traffic.'
           preprocessing:
             - type: JSONPATH
@@ -593,7 +570,6 @@ zabbix_export:
           type: DEPENDENT
           key: tikv.snapshot.sending
           delay: '0'
-          history: 7d
           description: 'The total amount of raftstore snapshot traffic.'
           preprocessing:
             - type: JSONPATH
@@ -609,7 +585,6 @@ zabbix_export:
           type: DEPENDENT
           key: tikv.storage_command.rate
           delay: '0'
-          history: 7d
           value_type: FLOAT
           description: 'Total number of commands received per second.'
           preprocessing:
@@ -629,7 +604,6 @@ zabbix_export:
           type: DEPENDENT
           key: tikv.store_size.available
           delay: '0'
-          history: 7d
           value_type: FLOAT
           units: B
           description: 'The available capacity of TiKV instance.'
@@ -647,7 +621,6 @@ zabbix_export:
           type: DEPENDENT
           key: tikv.store_size.capacity
           delay: '0'
-          history: 7d
           value_type: FLOAT
           units: B
           description: 'The capacity size of TiKV instance.'
@@ -684,7 +657,6 @@ zabbix_export:
           type: DEPENDENT
           key: tikv.uptime
           delay: '0'
-          history: 7d
           value_type: FLOAT
           units: uptime
           description: 'The runtime of each TiKV instance.'
@@ -716,7 +688,6 @@ zabbix_export:
           type: DEPENDENT
           key: tikv.worker_pending_task
           delay: '0'
-          history: 7d
           description: 'The number of tasks currently running by the worker or pending.'
           preprocessing:
             - type: JSONPATH
@@ -770,7 +741,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'tikv.coprocessor_request.rate[{#REQ_TYPE}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               units: Ops
               description: 'Total number of coprocessor requests per second.'
@@ -793,7 +763,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'tikv.coprocessor_request_error.rate[{#REQ_TYPE}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               units: Ops
               description: 'Total number of push down request error per second.'
@@ -817,7 +786,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'tikv.coprocessor_rocksdb_perf.rate[{#REQ_TYPE}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               units: Ops
               description: 'Total number of RocksDB internal operations from PerfContext per second.'
@@ -841,7 +809,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'tikv.coprocessor_scan_keys.rate[{#REQ_TYPE}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               units: Ops
               description: 'Total number of scan keys observed per request per second.'
@@ -886,7 +853,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'tikv.grpc_msg.rate[{#TYPE}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               units: Ops
               description: 'The QPS per command in TiKV instance.'
@@ -929,7 +895,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'tikv.scheduler_stage.rate[{#STAGE}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               description: 'Total number of commands on each stage per second.'
               preprocessing:
@@ -981,7 +946,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'tikv.messages.failure.rate[{#STORE_ID},{#TYPE}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               description: 'Total number of reporting failure messages. The metric has two labels: type and store_id. type represents the failure type, and store_id represents the destination peer store id.'
               preprocessing:

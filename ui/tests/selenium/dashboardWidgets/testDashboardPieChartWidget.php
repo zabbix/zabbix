@@ -450,6 +450,8 @@ class testDashboardPieChartWidget extends testWidgets {
 		$this->assertEquals(['Add', 'Cancel'],
 				$dialog->getFooter()->query('button')->all()->filter(CElementFilter::CLICKABLE)->asText()
 		);
+
+		$dialog->close();
 	}
 
 	public function getPieChartData() {
@@ -991,8 +993,17 @@ class testDashboardPieChartWidget extends testWidgets {
 			$dashboard->save();
 		}
 
+		$this->page->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboard_id);
+
+		// Check that alert is present in case of saving the widget without saving the dashboard.
+		if ($data['save_widget'] == true && $data['save_dashboard'] == false) {
+			$this->page->acceptAlert();
+		}
+
+		$this->page->waitUntilReady();
+		$dashboard->selectPage(self::PAGE_2);
+
 		// Assert that widget count and DB data has not changed.
-		$dashboard = $this->openDashboard(WITHOUT_LOGIN, self::PAGE_2);
 		$this->assertEquals($old_widget_count, $dashboard->getWidgets()->count());
 		$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
 	}
@@ -1432,6 +1443,7 @@ class testDashboardPieChartWidget extends testWidgets {
 			$this->assertEquals(0, CDBHelper::getCount($count_sql));
 		}
 
+		COverlayDialogElement::find()->one()->close();
 	}
 
 	/**
@@ -1664,6 +1676,7 @@ class testDashboardPieChartWidget extends testWidgets {
 		$id = $dashboard_id === null ? self::$dashboard_id : $dashboard_id;
 
 		$this->page->open('zabbix.php?action=dashboard.view&dashboardid='.$id)->waitUntilReady();
+
 		$dashboard = CDashboardElement::find()->one();
 		if ($page) {
 			$dashboard->selectPage($page);

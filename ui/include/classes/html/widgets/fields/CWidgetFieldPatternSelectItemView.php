@@ -20,8 +20,6 @@ class CWidgetFieldPatternSelectItemView extends CWidgetFieldPatternSelectView {
 
 	public function __construct(CWidgetFieldPatternSelectItem $field) {
 		parent::__construct($field);
-
-		$this->setWildcardAllowed();
 	}
 
 	protected function getObjectName(): string {
@@ -38,7 +36,8 @@ class CWidgetFieldPatternSelectItemView extends CWidgetFieldPatternSelectView {
 				'hide_host_filter' => true
 			]
 			: [
-				'real_hosts' => true
+				'real_hosts' => true,
+				'resolve_macros' => true
 			]
 		);
 	}

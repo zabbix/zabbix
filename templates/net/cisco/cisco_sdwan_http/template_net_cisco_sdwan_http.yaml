@@ -34,7 +34,6 @@ zabbix_export:
           type: DEPENDENT
           key: sd_wan.auth.errors
           delay: '0'
-          history: 7d
           trends: '0'
           value_type: TEXT
           description: 'Item for gathering all the data item errors.'
@@ -296,7 +295,6 @@ zabbix_export:
           type: DEPENDENT
           key: sd_wan.get.devices.errors
           delay: '0'
-          history: 7d
           trends: '0'
           value_type: TEXT
           description: 'Item for gathering all the data item errors.'
@@ -325,8 +323,6 @@ zabbix_export:
           type: DEPENDENT
           key: sd_wan.invalid_certificates
           delay: '0'
-          history: 7d
-          trends: 90d
           description: 'Number of invalid certificates.'
           preprocessing:
             - type: JSONPATH
@@ -342,8 +338,6 @@ zabbix_export:
           type: DEPENDENT
           key: sd_wan.total.devices
           delay: '0'
-          history: 7d
-          trends: 90d
           description: 'The total number of all devices.'
           preprocessing:
             - type: JSONPATH
@@ -362,8 +356,6 @@ zabbix_export:
           type: DEPENDENT
           key: sd_wan.vbond.devices
           delay: '0'
-          history: 7d
-          trends: 90d
           description: 'The total number of vBond devices.'
           preprocessing:
             - type: JSONPATH
@@ -382,8 +374,6 @@ zabbix_export:
           type: DEPENDENT
           key: sd_wan.vedge.devices
           delay: '0'
-          history: 7d
-          trends: 90d
           description: 'The total number of vEdge devices.'
           preprocessing:
             - type: JSONPATH
@@ -402,8 +392,6 @@ zabbix_export:
           type: DEPENDENT
           key: sd_wan.vmanage.devices
           delay: '0'
-          history: 7d
-          trends: 90d
           description: 'The total number of vManage devices.'
           preprocessing:
             - type: JSONPATH
@@ -422,8 +410,6 @@ zabbix_export:
           type: DEPENDENT
           key: sd_wan.vsmart.devices
           delay: '0'
-          history: 7d
-          trends: 90d
           description: 'The total number of vSmart devices.'
           preprocessing:
             - type: JSONPATH
@@ -650,7 +636,6 @@ zabbix_export:
           type: DEPENDENT
           key: sd_wan.device.arch
           delay: '0'
-          history: 7d
           trends: '0'
           value_type: CHAR
           description: 'The architecture of the operating system.'
@@ -672,8 +657,6 @@ zabbix_export:
           type: DEPENDENT
           key: sd_wan.device.certificate_validity
           delay: '0'
-          history: 7d
-          trends: 90d
           description: 'Validity status of the device certificate.'
           valuemap:
             name: 'Validity status'
@@ -709,8 +692,6 @@ zabbix_export:
           type: DEPENDENT
           key: sd_wan.device.control_conn
           delay: '0'
-          history: 7d
-          trends: 90d
           description: 'The number of control connections.'
           preprocessing:
             - type: JSONPATH
@@ -733,8 +714,6 @@ zabbix_export:
           type: DEPENDENT
           key: 'sd_wan.device.cpu.load[avg1]'
           delay: '0'
-          history: 7d
-          trends: 90d
           value_type: FLOAT
           description: 'The average number of processes being or waiting executed over past 1 minute.'
           preprocessing:
@@ -751,8 +730,6 @@ zabbix_export:
           type: DEPENDENT
           key: 'sd_wan.device.cpu.load[avg5]'
           delay: '0'
-          history: 7d
-          trends: 90d
           value_type: FLOAT
           description: 'The average number of processes being or waiting executed over past 5 minutes.'
           preprocessing:
@@ -769,8 +746,6 @@ zabbix_export:
           type: DEPENDENT
           key: 'sd_wan.device.cpu.load[avg15]'
           delay: '0'
-          history: 7d
-          trends: 90d
           value_type: FLOAT
           description: 'The average number of processes being or waiting executed over past 15 minutes.'
           preprocessing:
@@ -787,8 +762,6 @@ zabbix_export:
           type: DEPENDENT
           key: sd_wan.device.cpu.num
           delay: '0'
-          history: 7d
-          trends: 90d
           description: 'The total number of CPU.'
           preprocessing:
             - type: JSONPATH
@@ -804,8 +777,6 @@ zabbix_export:
           type: DEPENDENT
           key: sd_wan.device.cpu.util
           delay: '0'
-          history: 7d
-          trends: 90d
           value_type: FLOAT
           units: '%'
           description: 'CPU utilization, expressed in %.'
@@ -840,8 +811,6 @@ zabbix_export:
           type: DEPENDENT
           key: 'sd_wan.device.cpu.util[idle]'
           delay: '0'
-          history: 7d
-          trends: 90d
           value_type: FLOAT
           units: '%'
           description: 'The time the CPU has spent doing nothing.'
@@ -859,8 +828,6 @@ zabbix_export:
           type: DEPENDENT
           key: 'sd_wan.device.cpu.util[system]'
           delay: '0'
-          history: 7d
-          trends: 90d
           value_type: FLOAT
           units: '%'
           description: 'The time the CPU has spent running the kernel and its processes.'
@@ -878,8 +845,6 @@ zabbix_export:
           type: DEPENDENT
           key: 'sd_wan.device.cpu.util[user]'
           delay: '0'
-          history: 7d
-          trends: 90d
           value_type: FLOAT
           units: '%'
           description: 'The time the CPU has spent running users'' processes that are not niced.'
@@ -897,7 +862,6 @@ zabbix_export:
           type: DEPENDENT
           key: sd_wan.device.hostname
           delay: '0'
-          history: 7d
           trends: '0'
           value_type: CHAR
           description: 'The system host name.'
@@ -930,8 +894,6 @@ zabbix_export:
           type: DEPENDENT
           key: sd_wan.device.memory.avail
           delay: '0'
-          history: 7d
-          trends: 90d
           units: B
           description: 'The amount of physical memory (in bytes) immediately available for the allocation to a process or for a system use in the device.'
           preprocessing:
@@ -948,8 +910,6 @@ zabbix_export:
           type: DEPENDENT
           key: sd_wan.device.memory.buffers
           delay: '0'
-          history: 7d
-          trends: 90d
           units: B
           description: 'The amount of physical memory (in bytes) used by the kernel buffers.'
           preprocessing:
@@ -966,8 +926,6 @@ zabbix_export:
           type: DEPENDENT
           key: sd_wan.device.memory.cached
           delay: '0'
-          history: 7d
-          trends: 90d
           units: B
           description: 'The amount of physical memory (in bytes) used by the page cache and slabs.'
           preprocessing:
@@ -984,8 +942,6 @@ zabbix_export:
           type: DEPENDENT
           key: sd_wan.device.memory.total
           delay: '0'
-          history: 7d
-          trends: 90d
           units: B
           description: 'Total memory, expressed in bytes.'
           preprocessing:
@@ -1002,8 +958,6 @@ zabbix_export:
           type: DEPENDENT
           key: sd_wan.device.memory.used
           delay: '0'
-          history: 7d
-          trends: 90d
           units: B
           description: 'The amount of physical memory (in bytes) used by applications on the device.'
           preprocessing:
@@ -1019,8 +973,6 @@ zabbix_export:
           name: 'Memory utilization'
           type: CALCULATED
           key: sd_wan.device.memory.util
-          history: 7d
-          trends: 90d
           value_type: FLOAT
           units: '%'
           params: 'last(//sd_wan.device.memory.used)/last(//sd_wan.device.memory.total)*100'
@@ -1049,7 +1001,6 @@ zabbix_export:
           type: DEPENDENT
           key: sd_wan.device.model
           delay: '0'
-          history: 7d
           trends: '0'
           value_type: CHAR
           description: 'The model name of the device.'
@@ -1068,7 +1019,6 @@ zabbix_export:
           type: DEPENDENT
           key: sd_wan.device.os
           delay: '0'
-          history: 7d
           trends: '0'
           value_type: CHAR
           description: 'The device operating system.'
@@ -1103,8 +1053,6 @@ zabbix_export:
           type: DEPENDENT
           key: sd_wan.device.proc.num
           delay: '0'
-          history: 7d
-          trends: 90d
           description: 'The total number of processes in any state.'
           preprocessing:
             - type: JSONPATH
@@ -1120,8 +1068,6 @@ zabbix_export:
           type: DEPENDENT
           key: sd_wan.device.reachability
           delay: '0'
-          history: 7d
-          trends: 90d
           description: 'Reachability to the vManager and/or the entire network.'
           valuemap:
             name: 'Reachability status'
@@ -1159,7 +1105,6 @@ zabbix_export:
           type: DEPENDENT
           key: sd_wan.device.role
           delay: '0'
-          history: 7d
           trends: '0'
           value_type: CHAR
           description: 'The device role in the network.'
@@ -1181,7 +1126,6 @@ zabbix_export:
           type: DEPENDENT
           key: sd_wan.device.serialnumber
           delay: '0'
-          history: 7d
           trends: '0'
           value_type: CHAR
           description: 'The device serial number.'
@@ -1211,8 +1155,6 @@ zabbix_export:
           type: DEPENDENT
           key: sd_wan.device.state
           delay: '0'
-          history: 7d
-          trends: 90d
           description: 'The device current state.'
           valuemap:
             name: 'Device state'
@@ -1239,7 +1181,6 @@ zabbix_export:
           type: DEPENDENT
           key: sd_wan.device.state_descr
           delay: '0'
-          history: 7d
           trends: '0'
           value_type: CHAR
           description: 'The description of the device current state.'
@@ -1260,8 +1201,6 @@ zabbix_export:
           type: DEPENDENT
           key: sd_wan.device.uptime
           delay: '0'
-          history: 7d
-          trends: 90d
           units: uptime
           description: 'The system uptime is calculated on the basis of boot time.'
           preprocessing:
@@ -1292,7 +1231,6 @@ zabbix_export:
           type: DEPENDENT
           key: sd_wan.device.version
           delay: '0'
-          history: 7d
           trends: '0'
           value_type: CHAR
           description: 'The version of the device software.'
@@ -1427,7 +1365,6 @@ zabbix_export:
           type: DEPENDENT
           key: sd_wan.get.device.errors
           delay: '0'
-          history: 7d
           trends: '0'
           value_type: TEXT
           description: 'Item for gathering errors of the device item.'
@@ -1578,7 +1515,6 @@ zabbix_export:
           type: DEPENDENT
           key: sd_wan.get.interfaces.errors
           delay: '0'
-          history: 7d
           trends: '0'
           value_type: TEXT
           description: 'Item for gathering errors of the device interfaces.'
@@ -1781,7 +1717,6 @@ zabbix_export:
           type: DEPENDENT
           key: sd_wan.get.routes.errors
           delay: '0'
-          history: 7d
           trends: '0'
           value_type: TEXT
           description: 'Item for gathering errors of the device routes.'
@@ -1828,8 +1763,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'sd_wan.device.fs.avail["{#FSNAME}"]'
               delay: '0'
-              history: 7d
-              trends: 90d
               units: B
               description: 'The available size of the storage pool, in bytes.'
               preprocessing:
@@ -1888,8 +1821,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'sd_wan.device.fs.pused["{#FSNAME}"]'
               delay: '0'
-              history: 7d
-              trends: 90d
               value_type: FLOAT
               units: '%'
               description: 'Space utilization, expressed in %.'
@@ -1939,8 +1870,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'sd_wan.device.fs.total["{#FSNAME}"]'
               delay: '0'
-              history: 7d
-              trends: 90d
               units: B
               description: 'The size of the storage pool, in bytes.'
               preprocessing:
@@ -1968,8 +1897,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'sd_wan.device.fs.used["{#FSNAME}"]'
               delay: '0'
-              history: 7d
-              trends: 90d
               units: B
               description: 'The used size of the dataset, in bytes.'
               preprocessing:
@@ -2058,8 +1985,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'sd_wan.device.if.adm.status["{#IFKEY}"]'
               delay: '0'
-              history: 7d
-              trends: 90d
               description: 'Current admin status of the interface.'
               valuemap:
                 name: 'Admin status'
@@ -2112,8 +2037,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'sd_wan.device.if.in.discards["{#IFKEY}"]'
               delay: '0'
-              history: 7d
-              trends: 90d
               description: 'The number of inbound packets that were chosen to be discarded.'
               preprocessing:
                 - type: JSONPATH
@@ -2133,8 +2056,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'sd_wan.device.if.in.errors["{#IFKEY}"]'
               delay: '0'
-              history: 7d
-              trends: 90d
               description: 'The number of inbound packets that were contain errors.'
               preprocessing:
                 - type: JSONPATH
@@ -2154,8 +2075,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'sd_wan.device.if.in.v6.discards["{#IFKEY}"]'
               delay: '0'
-              history: 7d
-              trends: 90d
               value_type: FLOAT
               description: 'The number of inbound IPv6 packets that were chosen to be discarded.'
               valuemap:
@@ -2178,8 +2097,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'sd_wan.device.if.in.v6.errors["{#IFKEY}"]'
               delay: '0'
-              history: 7d
-              trends: 90d
               value_type: FLOAT
               description: 'The number of inbound IPv4 packets that were contain errors.'
               valuemap:
@@ -2202,8 +2119,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'sd_wan.device.if.in["{#IFKEY}"]'
               delay: '0'
-              history: 7d
-              trends: 90d
               units: bps
               description: 'The total number of octets received on the interface.'
               preprocessing:
@@ -2230,8 +2145,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'sd_wan.device.if.out.discards["{#IFKEY}"]'
               delay: '0'
-              history: 7d
-              trends: 90d
               description: 'The number of outbound packets that were chosen to be discarded.'
               preprocessing:
                 - type: JSONPATH
@@ -2251,8 +2164,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'sd_wan.device.if.out.errors["{#IFKEY}"]'
               delay: '0'
-              history: 7d
-              trends: 90d
               description: 'The number of outbound packets that were contain errors.'
               preprocessing:
                 - type: JSONPATH
@@ -2272,8 +2183,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'sd_wan.device.if.out.v6.discards["{#IFKEY}"]'
               delay: '0'
-              history: 7d
-              trends: 90d
               value_type: FLOAT
               description: 'The number of outbound IPv6 packets that were chosen to be discarded.'
               valuemap:
@@ -2296,8 +2205,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'sd_wan.device.if.out.v6.errors["{#IFKEY}"]'
               delay: '0'
-              history: 7d
-              trends: 90d
               value_type: FLOAT
               description: 'The number of outbound IPv6 packets that were contain errors.'
               valuemap:
@@ -2320,8 +2227,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'sd_wan.device.if.out["{#IFKEY}"]'
               delay: '0'
-              history: 7d
-              trends: 90d
               units: bps
               description: 'The total number of octets transmitted out of the interface.'
               preprocessing:
@@ -2348,8 +2253,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'sd_wan.device.if.speed["{#IFKEY}"]'
               delay: '0'
-              history: 7d
-              trends: 90d
               units: bps
               description: 'Current bandwidth of the interface.'
               preprocessing:
@@ -2371,8 +2274,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'sd_wan.device.if.status["{#IFKEY}"]'
               delay: '0'
-              history: 7d
-              trends: 90d
               description: 'Current operational status of the interface.'
               valuemap:
                 name: 'Operational status'
@@ -2625,8 +2526,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'sd_wan.routes.jitter[{#LOCAL},{#REMOTE}]'
               delay: '0'
-              history: 7d
-              trends: 90d
               value_type: FLOAT
               units: ms
               description: 'A change in the time it takes for a data packet to travel through the route.'
@@ -2648,8 +2547,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'sd_wan.routes.latency[{#LOCAL},{#REMOTE}]'
               delay: '0'
-              history: 7d
-              trends: 90d
               value_type: FLOAT
               units: ms
               description: 'The amount of time it takes for a data packet to travel through the route.'
@@ -2671,8 +2568,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'sd_wan.routes.loss[{#LOCAL},{#REMOTE}]'
               delay: '0'
-              history: 7d
-              trends: 90d
               value_type: FLOAT
               units: '%'
               description: 'Lost packets of data not reached the destination after being transmitted through the route.'

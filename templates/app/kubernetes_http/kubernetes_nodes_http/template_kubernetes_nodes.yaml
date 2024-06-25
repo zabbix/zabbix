@@ -417,7 +417,6 @@ zabbix_export:
           type: DEPENDENT
           key: kube.nodes.check
           delay: '0'
-          history: 7d
           trends: '0'
           value_type: CHAR
           description: 'Data collection check.'
@@ -471,7 +470,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'kube.node.addresses.external_ip[{#NAME}]'
               delay: '0'
-              history: 7d
               trends: '0'
               value_type: CHAR
               description: 'Typically the IP address of the node that is externally routable (available from outside the cluster).'
@@ -495,7 +493,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'kube.node.addresses.internal_ip[{#NAME}]'
               delay: '0'
-              history: 7d
               trends: '0'
               value_type: CHAR
               description: 'Typically the IP address of the node that is routable only within the cluster.'
@@ -519,7 +516,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'kube.node.allocatable.cpu[{#NAME}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               description: |
                 Allocatable CPU.
@@ -541,7 +537,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'kube.node.allocatable.memory[{#NAME}]'
               delay: '0'
-              history: 7d
               units: B
               description: |
                 Allocatable Memory.
@@ -563,7 +558,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'kube.node.allocatable.pods[{#NAME}]'
               delay: '0'
-              history: 7d
               description: 'https://kubernetes.io/docs/tasks/administer-cluster/reserve-compute-resources/'
               preprocessing:
                 - type: JSONPATH
@@ -581,7 +575,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'kube.node.capacity.cpu[{#NAME}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               description: |
                 CPU resource capacity.
@@ -603,7 +596,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'kube.node.capacity.memory[{#NAME}]'
               delay: '0'
-              history: 7d
               units: B
               description: |
                 Memory resource capacity.
@@ -625,7 +617,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'kube.node.capacity.pods[{#NAME}]'
               delay: '0'
-              history: 7d
               description: 'https://kubernetes.io/docs/tasks/administer-cluster/reserve-compute-resources/'
               preprocessing:
                 - type: JSONPATH
@@ -643,7 +634,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'kube.node.conditions.diskpressure[{#NAME}]'
               delay: '0'
-              history: 7d
               description: 'True if pressure exists on the disk size - that is, if the disk capacity is low; otherwise False.'
               valuemap:
                 name: 'Node conditions'
@@ -677,7 +667,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'kube.node.conditions.memorypressure[{#NAME}]'
               delay: '0'
-              history: 7d
               description: 'True if pressure exists on the node memory - that is, if the node memory is low; otherwise False.'
               valuemap:
                 name: 'Node conditions'
@@ -711,7 +700,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'kube.node.conditions.networkunavailable[{#NAME}]'
               delay: '0'
-              history: 7d
               description: 'True if the network for the node is not correctly configured, otherwise False.'
               valuemap:
                 name: 'Node conditions'
@@ -745,7 +733,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'kube.node.conditions.pidpressure[{#NAME}]'
               delay: '0'
-              history: 7d
               description: 'True if pressure exists on the processes - that is, if there are too many processes on the node; otherwise False.'
               valuemap:
                 name: 'Node conditions'
@@ -779,7 +766,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'kube.node.conditions.ready[{#NAME}]'
               delay: '0'
-              history: 7d
               description: 'True if the node is healthy and ready to accept pods, False if the node is not healthy and is not accepting pods, and Unknown if the node controller has not heard from the node in the last node-monitor-grace-period (default is 40 seconds).'
               valuemap:
                 name: 'Node conditions'
@@ -835,7 +821,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'kube.node.info.architecture[{#NAME}]'
               delay: '0'
-              history: 7d
               trends: '0'
               value_type: CHAR
               description: 'Node architecture.'
@@ -858,7 +843,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'kube.node.info.containerruntime[{#NAME}]'
               delay: '0'
-              history: 7d
               trends: '0'
               value_type: CHAR
               description: |
@@ -884,7 +868,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'kube.node.info.kernelversion[{#NAME}]'
               delay: '0'
-              history: 7d
               trends: '0'
               value_type: CHAR
               description: 'Node kernel version.'
@@ -907,7 +890,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'kube.node.info.kubeletversion[{#NAME}]'
               delay: '0'
-              history: 7d
               trends: '0'
               value_type: CHAR
               description: 'Version of Kubelet.'
@@ -930,7 +912,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'kube.node.info.kubeproxyversion[{#NAME}]'
               delay: '0'
-              history: 7d
               trends: '0'
               value_type: CHAR
               description: 'Version of KubeProxy.'
@@ -953,7 +934,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'kube.node.info.operatingsystem[{#NAME}]'
               delay: '0'
-              history: 7d
               trends: '0'
               value_type: CHAR
               description: 'Node operating system.'
@@ -976,7 +956,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'kube.node.info.osversion[{#NAME}]'
               delay: '0'
-              history: 7d
               trends: '0'
               value_type: CHAR
               description: 'Node OS image.'
@@ -999,7 +978,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'kube.node.info.roles[{#NAME}]'
               delay: '0'
-              history: 7d
               trends: '0'
               value_type: CHAR
               description: 'Node roles.'
@@ -1022,7 +1000,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'kube.node.limits.cpu[{#NAME}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               description: |
                 Node CPU limits.
@@ -1044,7 +1021,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'kube.node.limits.memory[{#NAME}]'
               delay: '0'
-              history: 7d
               units: B
               description: |
                 Node Memory limits.
@@ -1066,7 +1042,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'kube.node.requests.cpu[{#NAME}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               description: |
                 Node CPU requests.
@@ -1088,7 +1063,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'kube.node.requests.memory[{#NAME}]'
               delay: '0'
-              history: 7d
               units: B
               description: |
                 Node Memory requests.
@@ -1110,7 +1084,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'kube.node.uptime[{#NAME}]'
               delay: '0'
-              history: 7d
               units: s
               description: 'Node uptime.'
               preprocessing:
@@ -1143,7 +1116,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'kube.node.used.pods[{#NAME}]'
               delay: '0'
-              history: 7d
               description: 'Current number of pods on the node.'
               preprocessing:
                 - type: JSONPATH
@@ -1369,7 +1341,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'kube.pod.conditions.containers_ready[{#POD}]'
               delay: '0'
-              history: 7d
               description: |
                 All containers in the Pod are ready.
                 
@@ -1400,7 +1371,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'kube.pod.conditions.initialized[{#POD}]'
               delay: '0'
-              history: 7d
               description: |
                 All init containers have started successfully.
                 
@@ -1431,7 +1401,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'kube.pod.conditions.ready[{#POD}]'
               delay: '0'
-              history: 7d
               description: |
                 The Pod is able to serve requests and should be added to the load balancing pools of all matching Services.
                 
@@ -1462,7 +1431,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'kube.pod.conditions.scheduled[{#POD}]'
               delay: '0'
-              history: 7d
               description: |
                 The Pod has been scheduled to a node.
                 
@@ -1493,7 +1461,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'kube.pod.containers.restartcount[{#POD}]'
               delay: '0'
-              history: 7d
               description: 'The number of times the container has been restarted, currently based on the number of dead containers that have not yet been removed. Note that this is calculated from dead containers. But those containers are subject to garbage collection.'
               preprocessing:
                 - type: JSONPATH
@@ -1547,7 +1514,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'kube.pod.status.phase[{#POD}]'
               delay: '0'
-              history: 7d
               description: |
                 The phase of a Pod is a simple, high-level summary of where the Pod is in its lifecycle.
                 
@@ -1587,7 +1553,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'kube.pod.uptime[{#POD}]'
               delay: '0'
-              history: 7d
               units: s
               description: 'Pod uptime.'
               preprocessing:

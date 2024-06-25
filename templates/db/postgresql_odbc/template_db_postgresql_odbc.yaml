@@ -79,7 +79,6 @@ zabbix_export:
           name: 'Count of autovacuum workers'
           type: ODBC
           key: 'db.odbc.select[pgsql.autovacuum.count,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
-          history: 7d
           value_type: FLOAT
           params: |
             SELECT count(*)
@@ -286,7 +285,6 @@ zabbix_export:
           name: 'Age of oldest xid'
           type: ODBC
           key: 'db.odbc.select[pgsql.oldest.xid,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
-          history: 7d
           value_type: FLOAT
           params: |
             SELECT greatest(max(age(backend_xmin)), max(age(backend_xid)))
@@ -309,7 +307,6 @@ zabbix_export:
           name: Ping
           type: ODBC
           key: 'db.odbc.select[pgsql.ping,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
-          history: 7d
           params: 'SELECT 1'
           username: '{$PG.USER}'
           password: '{$PG.PASSWORD}'
@@ -388,7 +385,6 @@ zabbix_export:
           name: 'Replication: Standby count'
           type: ODBC
           key: 'db.odbc.select[pgsql.replication.count,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
-          history: 7d
           params: 'SELECT count(*) FROM pg_stat_replication'
           username: '{$PG.USER}'
           password: '{$PG.PASSWORD}'
@@ -400,7 +396,6 @@ zabbix_export:
           name: 'Replication: Lag in bytes'
           type: ODBC
           key: 'db.odbc.select[pgsql.replication.lag.b,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
-          history: 7d
           units: B
           params: |
             SELECT
@@ -418,7 +413,6 @@ zabbix_export:
           name: 'Replication: Lag in seconds'
           type: ODBC
           key: 'db.odbc.select[pgsql.replication.lag.sec,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
-          history: 7d
           units: s
           params: |
             SELECT
@@ -463,7 +457,6 @@ zabbix_export:
           name: 'Replication: Recovery role'
           type: ODBC
           key: 'db.odbc.select[pgsql.replication.recovery_role,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
-          history: 7d
           params: 'SELECT pg_is_in_recovery()::int'
           username: '{$PG.USER}'
           password: '{$PG.PASSWORD}'
@@ -477,7 +470,6 @@ zabbix_export:
           name: 'Replication: Status'
           type: ODBC
           key: 'db.odbc.select[pgsql.replication.status,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
-          history: 7d
           params: |
             SELECT
               CASE
@@ -496,7 +488,6 @@ zabbix_export:
           name: Uptime
           type: ODBC
           key: 'db.odbc.select[pgsql.uptime,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
-          history: 7d
           value_type: FLOAT
           units: s
           params: 'SELECT date_part(''epoch'', now() - pg_postmaster_start_time())'
@@ -521,7 +512,6 @@ zabbix_export:
           type: ODBC
           key: 'db.odbc.select[pgsql.version,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
           delay: 15m
-          history: 7d
           trends: '0'
           value_type: CHAR
           params: 'SELECT version()'
@@ -578,7 +568,6 @@ zabbix_export:
           type: DEPENDENT
           key: pgsql.archive.count_archived_files
           delay: '0'
-          history: 7d
           value_type: FLOAT
           description: 'Count of archived files.'
           preprocessing:
@@ -595,7 +584,6 @@ zabbix_export:
           type: DEPENDENT
           key: pgsql.archive.count_files_to_archive
           delay: '0'
-          history: 7d
           value_type: FLOAT
           description: 'Count of files to archive.'
           preprocessing:
@@ -612,7 +600,6 @@ zabbix_export:
           type: DEPENDENT
           key: pgsql.archive.failed_trying_to_archive
           delay: '0'
-          history: 7d
           value_type: FLOAT
           description: 'Count of failed attempts to archive files.'
           preprocessing:
@@ -629,7 +616,6 @@ zabbix_export:
           type: DEPENDENT
           key: pgsql.archive.size_files_to_archive
           delay: '0'
-          history: 7d
           value_type: FLOAT
           description: 'Size of files to archive.'
           preprocessing:
@@ -646,7 +632,6 @@ zabbix_export:
           type: DEPENDENT
           key: pgsql.bgwriter.buffers_alloc.rate
           delay: '0'
-          history: 7d
           value_type: FLOAT
           description: 'Number of buffers allocated per second.'
           preprocessing:
@@ -666,7 +651,6 @@ zabbix_export:
           type: DEPENDENT
           key: pgsql.bgwriter.buffers_backend.rate
           delay: '0'
-          history: 7d
           value_type: FLOAT
           description: 'Number of buffers written directly by a backend per second.'
           preprocessing:
@@ -686,7 +670,6 @@ zabbix_export:
           type: DEPENDENT
           key: pgsql.bgwriter.buffers_backend_fsync.rate
           delay: '0'
-          history: 7d
           value_type: FLOAT
           description: 'Number of times a backend had to execute its own fsync call per second (normally the background writer handles those even when the backend does its own write).'
           preprocessing:
@@ -706,7 +689,6 @@ zabbix_export:
           type: DEPENDENT
           key: pgsql.bgwriter.buffers_checkpoint.rate
           delay: '0'
-          history: 7d
           value_type: FLOAT
           description: 'Number of buffers written during checkpoints per second.'
           preprocessing:
@@ -726,7 +708,6 @@ zabbix_export:
           type: DEPENDENT
           key: pgsql.bgwriter.buffers_clean.rate
           delay: '0'
-          history: 7d
           value_type: FLOAT
           description: 'Number of buffers written by the background writer per second.'
           preprocessing:
@@ -746,7 +727,6 @@ zabbix_export:
           type: DEPENDENT
           key: pgsql.bgwriter.checkpoints_req.rate
           delay: '0'
-          history: 7d
           value_type: FLOAT
           description: 'Number of requested checkpoints that have been performed per second.'
           preprocessing:
@@ -766,7 +746,6 @@ zabbix_export:
           type: DEPENDENT
           key: pgsql.bgwriter.checkpoints_timed.rate
           delay: '0'
-          history: 7d
           value_type: FLOAT
           description: 'Number of scheduled checkpoints that have been performed per second.'
           preprocessing:
@@ -786,7 +765,6 @@ zabbix_export:
           type: DEPENDENT
           key: pgsql.bgwriter.checkpoint_sync_time.rate
           delay: '0'
-          history: 7d
           value_type: FLOAT
           units: s
           description: 'Total amount of time per second that has been spent in the portion of checkpoint processing where files are synchronized to disk.'
@@ -810,7 +788,6 @@ zabbix_export:
           type: DEPENDENT
           key: pgsql.bgwriter.checkpoint_write_time.rate
           delay: '0'
-          history: 7d
           value_type: FLOAT
           units: s
           description: 'Total amount of time per second that has been spent in the portion of checkpoint processing where files are written to disk.'
@@ -834,7 +811,6 @@ zabbix_export:
           type: DEPENDENT
           key: pgsql.bgwriter.maxwritten_clean.rate
           delay: '0'
-          history: 7d
           value_type: FLOAT
           description: 'Number of times the background writer stopped a cleaning scan because it had written too many buffers per second.'
           preprocessing:
@@ -853,7 +829,6 @@ zabbix_export:
           name: 'Cache hit ratio, %'
           type: CALCULATED
           key: pgsql.cache.hit
-          history: 7d
           value_type: FLOAT
           units: '%'
           params: 'last(//pgsql.dbstat.sum.blks_hit.rate) * 100 / (last(//pgsql.dbstat.sum.blks_hit.rate) + last(//pgsql.dbstat.sum.blks_read.rate))'
@@ -866,7 +841,6 @@ zabbix_export:
           type: DEPENDENT
           key: pgsql.connections.sum.active
           delay: '0'
-          history: 7d
           description: 'Total number of connections executing a query.'
           preprocessing:
             - type: JSONPATH
@@ -882,7 +856,6 @@ zabbix_export:
           type: DEPENDENT
           key: pgsql.connections.sum.disabled
           delay: '0'
-          history: 7d
           description: 'Total number of disabled connections.'
           preprocessing:
             - type: JSONPATH
@@ -898,7 +871,6 @@ zabbix_export:
           type: DEPENDENT
           key: pgsql.connections.sum.fastpath_function_call
           delay: '0'
-          history: 7d
           description: 'Total number of connections executing a fast-path function.'
           preprocessing:
             - type: JSONPATH
@@ -914,7 +886,6 @@ zabbix_export:
           type: DEPENDENT
           key: pgsql.connections.sum.idle
           delay: '0'
-          history: 7d
           description: 'Total number of connections waiting for a new client command.'
           preprocessing:
             - type: JSONPATH
@@ -930,7 +901,6 @@ zabbix_export:
           type: DEPENDENT
           key: pgsql.connections.sum.idle_in_transaction
           delay: '0'
-          history: 7d
           description: 'Total number of connections in a transaction state but not executing a query.'
           preprocessing:
             - type: JSONPATH
@@ -946,7 +916,6 @@ zabbix_export:
           type: DEPENDENT
           key: pgsql.connections.sum.idle_in_transaction_aborted
           delay: '0'
-          history: 7d
           description: 'Total number of connections in a transaction state but not executing a query, and where one of the statements in the transaction caused an error.'
           preprocessing:
             - type: JSONPATH
@@ -962,7 +931,6 @@ zabbix_export:
           type: DEPENDENT
           key: pgsql.connections.sum.prepared
           delay: '0'
-          history: 7d
           description: |
             Total number of prepared transactions:
             https://www.postgresql.org/docs/current/sql-prepare-transaction.html
@@ -980,7 +948,6 @@ zabbix_export:
           type: DEPENDENT
           key: pgsql.connections.sum.total
           delay: '0'
-          history: 7d
           description: 'Total number of connections.'
           preprocessing:
             - type: JSONPATH
@@ -996,7 +963,6 @@ zabbix_export:
           type: DEPENDENT
           key: pgsql.connections.sum.total_pct
           delay: '0'
-          history: 7d
           units: '%'
           description: 'Total number of connections, in percentage.'
           preprocessing:
@@ -1023,7 +989,6 @@ zabbix_export:
           type: DEPENDENT
           key: pgsql.connections.sum.waiting
           delay: '0'
-          history: 7d
           description: |
             Total number of waiting connections:
             https://www.postgresql.org/docs/current/monitoring-stats.html#WAIT-EVENT-TABLE
@@ -1041,7 +1006,6 @@ zabbix_export:
           type: DEPENDENT
           key: pgsql.dbstat.sum.blks_hit.rate
           delay: '0'
-          history: 7d
           value_type: FLOAT
           description: 'Number of times per second disk blocks were found already in the buffer cache.'
           preprocessing:
@@ -1061,7 +1025,6 @@ zabbix_export:
           type: DEPENDENT
           key: pgsql.dbstat.sum.blks_read.rate
           delay: '0'
-          history: 7d
           value_type: FLOAT
           description: 'Number of disk blocks read per second.'
           preprocessing:
@@ -1081,7 +1044,6 @@ zabbix_export:
           type: DEPENDENT
           key: pgsql.dbstat.sum.blk_read_time
           delay: '0'
-          history: 7d
           value_type: FLOAT
           units: s
           description: 'Time spent reading data file blocks by backends.'
@@ -1102,7 +1064,6 @@ zabbix_export:
           type: DEPENDENT
           key: pgsql.dbstat.sum.blk_write_time
           delay: '0'
-          history: 7d
           value_type: FLOAT
           units: s
           description: 'Time spent writing data file blocks by backends.'
@@ -1123,7 +1084,6 @@ zabbix_export:
           type: DEPENDENT
           key: pgsql.dbstat.sum.conflicts.rate
           delay: '0'
-          history: 7d
           value_type: FLOAT
           description: 'Number of queries canceled per second due to conflicts with recovery (conflicts occur only on standby servers; see pg_stat_database_conflicts for details).'
           preprocessing:
@@ -1143,7 +1103,6 @@ zabbix_export:
           type: DEPENDENT
           key: pgsql.dbstat.sum.deadlocks.rate
           delay: '0'
-          history: 7d
           value_type: FLOAT
           description: 'Number of deadlocks detected per second.'
           preprocessing:
@@ -1163,7 +1122,6 @@ zabbix_export:
           type: DEPENDENT
           key: pgsql.dbstat.sum.numbackends
           delay: '0'
-          history: 7d
           description: 'Number of connected backends.'
           preprocessing:
             - type: JSONPATH
@@ -1179,7 +1137,6 @@ zabbix_export:
           type: DEPENDENT
           key: pgsql.dbstat.sum.temp_bytes.rate
           delay: '0'
-          history: 7d
           value_type: FLOAT
           units: b
           description: 'Total amount of data written per second to temporary files by queries.'
@@ -1200,7 +1157,6 @@ zabbix_export:
           type: DEPENDENT
           key: pgsql.dbstat.sum.temp_files.rate
           delay: '0'
-          history: 7d
           value_type: FLOAT
           description: 'Number of temporary files created by queries per second.'
           preprocessing:
@@ -1220,7 +1176,6 @@ zabbix_export:
           type: DEPENDENT
           key: pgsql.dbstat.sum.tup_deleted.rate
           delay: '0'
-          history: 7d
           value_type: FLOAT
           description: 'Number of rows deleted by queries per second.'
           preprocessing:
@@ -1240,7 +1195,6 @@ zabbix_export:
           type: DEPENDENT
           key: pgsql.dbstat.sum.tup_fetched.rate
           delay: '0'
-          history: 7d
           value_type: FLOAT
           description: 'Number of rows fetched by queries per second.'
           preprocessing:
@@ -1260,7 +1214,6 @@ zabbix_export:
           type: DEPENDENT
           key: pgsql.dbstat.sum.tup_inserted.rate
           delay: '0'
-          history: 7d
           value_type: FLOAT
           description: 'Number of rows inserted by queries per second.'
           preprocessing:
@@ -1280,7 +1233,6 @@ zabbix_export:
           type: DEPENDENT
           key: pgsql.dbstat.sum.tup_returned.rate
           delay: '0'
-          history: 7d
           value_type: FLOAT
           description: 'Number of rows returned by queries per second.'
           preprocessing:
@@ -1300,7 +1252,6 @@ zabbix_export:
           type: DEPENDENT
           key: pgsql.dbstat.sum.tup_updated.rate
           delay: '0'
-          history: 7d
           value_type: FLOAT
           description: 'Number of rows updated by queries per second.'
           preprocessing:
@@ -1320,7 +1271,6 @@ zabbix_export:
           type: DEPENDENT
           key: pgsql.dbstat.sum.xact_commit.rate
           delay: '0'
-          history: 7d
           value_type: FLOAT
           description: 'Number of transactions that have been committed per second.'
           preprocessing:
@@ -1340,7 +1290,6 @@ zabbix_export:
           type: DEPENDENT
           key: pgsql.dbstat.sum.xact_rollback.rate
           delay: '0'
-          history: 7d
           value_type: FLOAT
           description: 'Number of transactions that have been rolled back per second.'
           preprocessing:
@@ -1360,7 +1309,6 @@ zabbix_export:
           type: DEPENDENT
           key: pgsql.wal.count
           delay: '0'
-          history: 7d
           description: 'Number of WAL segments.'
           preprocessing:
             - type: JSONPATH
@@ -1376,7 +1324,6 @@ zabbix_export:
           type: DEPENDENT
           key: pgsql.wal.receive
           delay: '0'
-          history: 7d
           units: B
           description: 'WAL receive, in bytes.'
           preprocessing:
@@ -1396,7 +1343,6 @@ zabbix_export:
           type: DEPENDENT
           key: pgsql.wal.write
           delay: '0'
-          history: 7d
           units: B
           description: 'WAL write, in bytes.'
           preprocessing:
@@ -1448,7 +1394,6 @@ zabbix_export:
               type: ODBC
               key: 'db.odbc.select[pgsql.db.age,,"Database={#DBNAME};{$PG.CONNSTRING}"]'
               delay: 10m
-              history: 7d
               params: |
                 SELECT age(datfrozenxid)
                   FROM pg_catalog.pg_database
@@ -1465,7 +1410,6 @@ zabbix_export:
               name: 'DB [{#DBNAME}]: Bloating tables'
               type: ODBC
               key: 'db.odbc.select[pgsql.db.bloating_tables,,"Database={#DBNAME};{$PG.CONNSTRING}"]'
-              history: 7d
               params: |
                 SELECT count(*)
                 FROM pg_catalog.pg_stat_all_tables
@@ -1484,7 +1428,6 @@ zabbix_export:
               type: ODBC
               key: 'db.odbc.select[pgsql.db.size,,"Database={#DBNAME};{$PG.CONNSTRING}"]'
               delay: 5m
-              history: 7d
               units: B
               params: 'SELECT pg_database_size(current_database())'
               username: '{$PG.USER}'
@@ -1500,7 +1443,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'pgsql.dbstat.blks_hit.rate["{#DBNAME}"]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               description: 'Total number of times per second disk blocks were found already in the buffer cache, so that a read was not necessary.'
               preprocessing:
@@ -1522,7 +1464,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'pgsql.dbstat.blks_read.rate["{#DBNAME}"]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               description: 'Total number of disk blocks read per second in this database.'
               preprocessing:
@@ -1544,7 +1485,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'pgsql.dbstat.blk_read_time.rate["{#DBNAME}"]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               units: s
               description: 'Time spent reading data file blocks by backends per second.'
@@ -1570,7 +1510,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'pgsql.dbstat.blk_write_time.rate["{#DBNAME}"]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               units: s
               description: 'Time spent writing data file blocks by backends per second.'
@@ -1596,7 +1535,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'pgsql.dbstat.conflicts.rate["{#DBNAME}"]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               description: 'Total number of queries canceled due to conflicts with recovery in this database per second.'
               preprocessing:
@@ -1630,7 +1568,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'pgsql.dbstat.deadlocks.rate["{#DBNAME}"]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               description: 'Total number of detected deadlocks in this database per second.'
               preprocessing:
@@ -1683,7 +1620,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'pgsql.dbstat.numbackends["{#DBNAME}"]'
               delay: '0'
-              history: 7d
               description: 'Number of backends currently connected to this database.'
               preprocessing:
                 - type: JSONPATH
@@ -1701,7 +1637,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'pgsql.dbstat.temp_bytes.rate["{#DBNAME}"]'
               delay: '0'
-              history: 7d
               units: B
               description: 'Total amount of data written to temporary files by queries in this database.'
               preprocessing:
@@ -1723,7 +1658,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'pgsql.dbstat.temp_files.rate["{#DBNAME}"]'
               delay: '0'
-              history: 7d
               description: 'Total number of temporary files created by queries in this database.'
               preprocessing:
                 - type: JSONPATH
@@ -1744,7 +1678,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'pgsql.dbstat.tup_deleted.rate["{#DBNAME}"]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               description: 'Total number of rows deleted by queries in this database per second.'
               preprocessing:
@@ -1766,7 +1699,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'pgsql.dbstat.tup_fetched.rate["{#DBNAME}"]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               description: 'Total number of rows fetched by queries in this database per second.'
               preprocessing:
@@ -1788,7 +1720,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'pgsql.dbstat.tup_inserted.rate["{#DBNAME}"]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               description: 'Total number of rows inserted by queries in this database per second.'
               preprocessing:
@@ -1810,7 +1741,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'pgsql.dbstat.tup_returned.rate["{#DBNAME}"]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               description: 'Number of rows returned by queries in this database per second.'
               preprocessing:
@@ -1832,7 +1762,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'pgsql.dbstat.tup_updated.rate["{#DBNAME}"]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               description: 'Total number of rows updated by queries in this database per second.'
               preprocessing:
@@ -1854,7 +1783,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'pgsql.dbstat.xact_commit.rate["{#DBNAME}"]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               description: 'Number of transactions in this database that have been committed per second.'
               preprocessing:
@@ -1876,7 +1804,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'pgsql.dbstat.xact_rollback.rate["{#DBNAME}"]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               description: 'Total number of transactions in this database that have been rolled back.'
               preprocessing:
@@ -1898,7 +1825,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'pgsql.locks.accessexclusive["{#DBNAME}"]'
               delay: '0'
-              history: 7d
               description: 'Number of accessexclusive locks for this database.'
               preprocessing:
                 - type: JSONPATH
@@ -1916,7 +1842,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'pgsql.locks.accessshare["{#DBNAME}"]'
               delay: '0'
-              history: 7d
               description: 'Number of accessshare locks for this database.'
               preprocessing:
                 - type: JSONPATH
@@ -1934,7 +1859,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'pgsql.locks.exclusive["{#DBNAME}"]'
               delay: '0'
-              history: 7d
               description: 'Number of exclusive locks for this database.'
               preprocessing:
                 - type: JSONPATH
@@ -1973,7 +1897,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'pgsql.locks.rowexclusive["{#DBNAME}"]'
               delay: '0'
-              history: 7d
               description: 'Number of rowexclusive locks for this database.'
               preprocessing:
                 - type: JSONPATH
@@ -1991,7 +1914,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'pgsql.locks.rowshare["{#DBNAME}"]'
               delay: '0'
-              history: 7d
               description: 'Number of rowshare locks for this database.'
               preprocessing:
                 - type: JSONPATH
@@ -2010,7 +1932,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'pgsql.locks.sharerowexclusive["{#DBNAME}"]'
               delay: '0'
-              history: 7d
               description: 'Number of total sharerowexclusive for this database.'
               preprocessing:
                 - type: JSONPATH
@@ -2028,7 +1949,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'pgsql.locks.shareupdateexclusive["{#DBNAME}"]'
               delay: '0'
-              history: 7d
               description: 'Number of shareupdateexclusive locks for this database.'
               preprocessing:
                 - type: JSONPATH
@@ -2046,7 +1966,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'pgsql.locks.share["{#DBNAME}"]'
               delay: '0'
-              history: 7d
               description: 'Number of share locks for this database.'
               preprocessing:
                 - type: JSONPATH
@@ -2064,7 +1983,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'pgsql.locks.total["{#DBNAME}"]'
               delay: '0'
-              history: 7d
               description: 'Total number of locks in this database.'
               preprocessing:
                 - type: JSONPATH
@@ -2103,7 +2021,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'pgsql.queries.mro.slow_count["{#DBNAME}"]'
               delay: '0'
-              history: 7d
               description: 'Slow maintenance query count for this database.'
               preprocessing:
                 - type: JSONPATH
@@ -2121,7 +2038,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'pgsql.queries.mro.time_max["{#DBNAME}"]'
               delay: '0'
-              history: 7d
               units: s
               description: 'Max maintenance query time for this database.'
               preprocessing:
@@ -2140,7 +2056,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'pgsql.queries.mro.time_sum["{#DBNAME}"]'
               delay: '0'
-              history: 7d
               units: s
               description: 'Sum maintenance query time for this database.'
               preprocessing:
@@ -2159,7 +2074,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'pgsql.queries.query.slow_count["{#DBNAME}"]'
               delay: '0'
-              history: 7d
               description: 'Slow query count for this database.'
               preprocessing:
                 - type: JSONPATH
@@ -2187,7 +2101,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'pgsql.queries.query.time_max["{#DBNAME}"]'
               delay: '0'
-              history: 7d
               units: s
               description: 'Max query time for this database.'
               preprocessing:
@@ -2206,7 +2119,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'pgsql.queries.query.time_sum["{#DBNAME}"]'
               delay: '0'
-              history: 7d
               units: s
               description: 'Sum query time for this database.'
               preprocessing:
@@ -2225,7 +2137,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'pgsql.queries.tx.slow_count["{#DBNAME}"]'
               delay: '0'
-              history: 7d
               description: 'Slow transaction query count for this database.'
               preprocessing:
                 - type: JSONPATH
@@ -2243,7 +2154,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'pgsql.queries.tx.time_max["{#DBNAME}"]'
               delay: '0'
-              history: 7d
               units: s
               description: 'Max transaction query time for this database.'
               preprocessing:
@@ -2262,7 +2172,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'pgsql.queries.tx.time_sum["{#DBNAME}"]'
               delay: '0'
-              history: 7d
               units: s
               description: 'Sum transaction query time for this database.'
               preprocessing:
@@ -2509,7 +2418,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'pgsql.replication.process.flush_lag["{#APPLICATION_NAME}"]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               units: s
               description: 'Time elapsed between flushing recent WAL locally and receiving notification that this standby server has written and flushed it (but not yet applied it). This can be used to gauge the delay that synchronous_commit level on incurred while committing if this server was configured as a synchronous standby.'
@@ -2529,7 +2437,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'pgsql.replication.process.replay_lag["{#APPLICATION_NAME}"]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               units: s
               description: 'Time elapsed between flushing recent WAL locally and receiving notification that this standby server has written, flushed and applied it. This can be used to gauge the delay that synchronous_commit level remote_apply incurred while committing if this server was configured as a synchronous standby.'
@@ -2549,7 +2456,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'pgsql.replication.process.write_lag["{#APPLICATION_NAME}"]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               units: s
               description: 'Time elapsed between flushing recent WAL locally and receiving notification that this standby server has written it (but not yet flushed it or applied it). This can be used to gauge the delay that synchronous_commit level remote_write incurred while committing if this server was configured as a synchronous standby.'

@@ -32,7 +32,6 @@ zabbix_export:
           type: DEPENDENT
           key: veeam.get.errors
           delay: '0'
-          history: 7d
           trends: '0'
           value_type: TEXT
           description: 'The errors from API requests.'
@@ -221,7 +220,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'veeam.jobs.last.result[{#ID}]'
               delay: '0'
-              history: 7d
               trends: '0'
               value_type: TEXT
               description: 'The result of the session. The enums used: `None`, `Success`, `Warning`, `Failed`.'
@@ -273,7 +271,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'veeam.jobs.status[{#ID}]'
               delay: '0'
-              history: 7d
               trends: '0'
               value_type: TEXT
               description: 'The current status of the job. The enums used: `running`, `inactive`, `disabled`.'
@@ -341,7 +338,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'veeam.proxy.maxtask[{#NAME}]'
               delay: '0'
-              history: 7d
               description: 'The maximum number of concurrent tasks.'
               preprocessing:
                 - type: JSONPATH
@@ -381,7 +377,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'veeam.proxy.server.name[{#NAME}]'
               delay: '0'
-              history: 7d
               trends: '0'
               value_type: TEXT
               description: 'The name of the proxy server.'
@@ -423,7 +418,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'veeam.proxy.server.type[{#NAME}]'
               delay: '0'
-              history: 7d
               trends: '0'
               value_type: TEXT
               description: 'The type of the proxy server.'
@@ -509,7 +503,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'veeam.repository.capacity[{#NAME}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               units: '!GB'
               description: 'Used space by repositories expressed in gigabytes (GB).'
@@ -529,7 +522,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'veeam.repository.free.space[{#NAME}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               units: '!GB'
               description: 'Free space of repositories expressed in gigabytes (GB).'
@@ -597,7 +589,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'veeam.sessions.message[{#ID}]'
               delay: '0'
-              history: 7d
               trends: '0'
               value_type: TEXT
               description: 'A message that explains the session result.'
@@ -619,7 +610,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'veeam.sessions.progress.percent[{#ID}]'
               delay: '0'
-              history: 7d
               value_type: FLOAT
               units: '%'
               description: 'The progress of the session expressed as percentage.'
@@ -662,7 +652,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'veeam.sessions.result[{#ID}]'
               delay: '0'
-              history: 7d
               trends: '0'
               value_type: TEXT
               description: 'The result of the session. The enums used: `None`, `Success`, `Warning`, `Failed`.'
@@ -694,7 +683,6 @@ zabbix_export:
               type: DEPENDENT
               key: 'veeam.sessions.state[{#ID}]'
               delay: '0'
-              history: 7d
               trends: '0'
               value_type: TEXT
               description: 'The state of the session. The enums used: `Stopped`, `Starting`, `Stopping`, `Working`, `Pausing`, `Resuming`, `WaitingTape`, `Idle`, `Postprocessing`, `WaitingRepository`, `WaitingSlot`.'

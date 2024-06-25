@@ -3556,9 +3556,26 @@ section {
     text-anchor: end; }
   .svg-gauge .svg-gauge-label-center {
     text-anchor: middle; }
-  .svg-gauge .svg-gauge-value,
-  .svg-gauge .svg-gauge-units {
-    text-anchor: middle; }
+  .svg-gauge .svg-gauge-value-and-units {
+    text-align: center;
+    white-space: nowrap;
+    color: #1f2c33; }
+    .svg-gauge .svg-gauge-value-and-units > div {
+      margin: auto;
+      overflow: hidden;
+      text-overflow: ellipsis; }
+      .svg-gauge .svg-gauge-value-and-units > div .svg-gauge-value {
+        overflow: hidden;
+        text-overflow: ellipsis; }
+  .svg-gauge .svg-gauge-value-and-units-horizontal .svg-gauge-value,
+  .svg-gauge .svg-gauge-value-and-units-horizontal .svg-gauge-units {
+    display: inline; }
+  .svg-gauge .svg-gauge-value-and-units-horizontal .svg-gauge-space {
+    display: inline-block; }
+  .svg-gauge .svg-gauge-value-and-units-vertical .svg-gauge-value,
+  .svg-gauge .svg-gauge-value-and-units-vertical .svg-gauge-units {
+    overflow: hidden;
+    text-overflow: ellipsis; }
   .svg-gauge .svg-gauge-no-data {
     text-anchor: middle;
     fill: #768d99; }
@@ -6095,7 +6112,6 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
     transform: rotate(45deg); }
 
 .overlay-dialogue {
-  display: table;
   position: absolute;
   z-index: 1000;
   padding: 17px 10px 10px;
@@ -6797,6 +6813,8 @@ button.is-loading {
   position: relative;
   color: transparent !important;
   border-bottom-color: transparent; }
+  .link-action.is-loading::before {
+    background-color: transparent; }
   .link-action.is-loading::after {
     box-shadow: none;
     background: none;
