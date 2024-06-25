@@ -440,6 +440,8 @@ if ($data['host']['status'] == HOST_STATUS_MONITORED || $data['host']['status'] 
 		? $data['host']['interfaces'][$item['interfaceid']] : [];
 
 	if ($item['discovered']) {
+		$formgrid->addItem(new CVar('interfaceid', $item['interfaceid']));
+
 		$required = $interface && $interface['type'] != INTERFACE_TYPE_OPT;
 		$select_interface = (new CTextBox('interface', $interface ? getHostInterface($interface) : _('None'), true))
 			->setAttribute('disabled', 'disabled');
