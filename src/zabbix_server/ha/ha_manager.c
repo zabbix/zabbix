@@ -1561,7 +1561,8 @@ int	zbx_ha_get_status(int *ha_status, int *ha_failover_delay, char **error)
  *           process to switch to standby mode and initiate teardown process  *
  *                                                                            *
  ******************************************************************************/
-int	zbx_ha_dispatch_message(zbx_ipc_message_t *message, int *ha_status, int *ha_failover_delay, char **error)
+int	zbx_ha_dispatch_message(zbx_ipc_message_t *message, zbx_ha_rtc_state_t state, int *ha_status,
+		int *ha_failover_delay, char **error)
 {
 	static time_t	last_hb;
 	int		ret = SUCCEED, ha_status_old;
@@ -1572,6 +1573,12 @@ int	zbx_ha_dispatch_message(zbx_ipc_message_t *message, int *ha_status, int *ha_
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	now = time(NULL);
+
+	if (ZBX_HA_RTC_STATE_RESET == state)
+	{
+		last_hb = now;
+		goto out;
+	}
 
 	if (NULL != message)
 	{
@@ -1615,6 +1622,8 @@ int	zbx_ha_dispatch_message(zbx_ipc_message_t *message, int *ha_status, int *ha_
 		}
 	}
 out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
 	return ret;
 }
 
