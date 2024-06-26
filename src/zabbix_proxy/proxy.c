@@ -1430,6 +1430,7 @@ static void	proxy_db_init(void)
 		}
 
 		proxy_db_init();
+
 		return;
 #else
 		ZBX_UNUSED(version_check);
@@ -1443,6 +1444,7 @@ static void	proxy_db_init(void)
 #endif
 	zbx_pb_init();
 	zbx_db_close();
+
 	return;
 out:
 	zbx_db_close();
