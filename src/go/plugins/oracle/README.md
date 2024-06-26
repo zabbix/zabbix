@@ -27,10 +27,7 @@ CREATE USER zabbix_mon IDENTIFIED BY <PASSWORD>;
 -- Grant access to the zabbix_mon user.
 GRANT CONNECT, CREATE SESSION TO zabbix_mon;
 GRANT SELECT_CATALOG_ROLE to zabbix_mon;
-GRANT SELECT ON DBA_TABLESPACE_USAGE_METRICS TO zabbix_mon;
-GRANT SELECT ON DBA_TABLESPACES TO zabbix_mon;
 GRANT SELECT ON DBA_USERS TO zabbix_mon;
-GRANT SELECT ON SYS.DBA_DATA_FILES TO zabbix_mon;
 GRANT SELECT ON V_$ACTIVE_SESSION_HISTORY TO zabbix_mon;
 GRANT SELECT ON V_$ARCHIVE_DEST TO zabbix_mon;
 GRANT SELECT ON V_$ASM_DISKGROUP TO zabbix_mon;
@@ -42,7 +39,6 @@ GRANT SELECT ON V_$OSSTAT TO zabbix_mon;
 GRANT SELECT ON V_$PGASTAT TO zabbix_mon;
 GRANT SELECT ON V_$PROCESS TO zabbix_mon;
 GRANT SELECT ON V_$RECOVERY_FILE_DEST TO zabbix_mon;
-GRANT SELECT ON V_$RESTORE_POINT TO zabbix_mon;
 GRANT SELECT ON V_$SESSION TO zabbix_mon;
 GRANT SELECT ON V_$SGASTAT TO zabbix_mon;
 GRANT SELECT ON V_$SYSMETRIC TO zabbix_mon;
@@ -89,18 +85,25 @@ One way to do this is using **pipelined table functions**:
       END;
       ```
   
-  4. Grant the Zabbix monitoring user the Execute privilege on the created pipelined table function:
+  4. Grant the Zabbix monitoring user the Execute privilege on the created pipelined table function and replace the monitoring user `V$RESTORE_POINT` view with the `SYS` user function (in this example, the `SYS` user is used to create DB types and function):
 
       ```sql
       GRANT EXECUTE ON zbx_mon_restore_point TO zabbix_mon;
-      ```
-
-  5. Replace the monitoring user `V$RESTORE_POINT` view with the `SYS` user function (in this example, the `SYS` user is used to create DB types and function), and finally, revoke the `SELECT_CATALOG_ROLE`.
-
-      ```sql
       CREATE OR REPLACE VIEW zabbix_mon.V$RESTORE_POINT AS SELECT * FROM TABLE(SYS.zbx_mon_restore_point);
-      REVOKE SELECT_CATALOG_ROLE FROM zabbix_mon;
       ```
+
+5. Finally, revoke the `SELECT_CATALOG_ROLE` and grant additional permissions that were previously covered by the `SELECT_CATALOG_ROLE`.
+
+    ```sql
+    REVOKE SELECT_CATALOG_ROLE FROM zabbix_mon;
+    GRANT SELECT ON v_$pdbs TO zabbix_mon;
+    GRANT SELECT ON gv_$sort_segment TO zabbix_mon;
+    GRANT SELECT ON v_$parameter TO zabbix_mon;
+    GRANT SELECT ON DBA_TABLESPACES TO zabbix_mon;
+    GRANT SELECT ON DBA_DATA_FILES TO zabbix_mon;
+    GRANT SELECT ON DBA_FREE_SPACE TO zabbix_mon;
+    GRANT SELECT ON DBA_TEMP_FILES TO zabbix_mon;
+    ```
 
   > Note that in these examples, the monitoring user is named `zabbix_mon` and the system user - `SYS`. Change these example usernames to ones that are appropriate for your environment.
   

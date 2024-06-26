@@ -42,7 +42,6 @@ This template has been tested on:
     GRANT SELECT ON v_$recovery_file_dest TO c##zabbix_mon;
     GRANT SELECT ON v_$active_session_history TO c##zabbix_mon;
     GRANT SELECT ON v_$osstat TO c##zabbix_mon;
-    GRANT SELECT ON v_$restore_point TO c##zabbix_mon;
     GRANT SELECT ON v_$process TO c##zabbix_mon;
     GRANT SELECT ON v_$datafile TO c##zabbix_mon;
     GRANT SELECT ON v_$pgastat TO c##zabbix_mon;
@@ -50,9 +49,6 @@ This template has been tested on:
     GRANT SELECT ON v_$log TO c##zabbix_mon;
     GRANT SELECT ON v_$archive_dest TO c##zabbix_mon;
     GRANT SELECT ON v_$asm_diskgroup TO c##zabbix_mon;
-    GRANT SELECT ON sys.dba_data_files TO c##zabbix_mon;
-    GRANT SELECT ON DBA_TABLESPACES TO c##zabbix_mon;
-    GRANT SELECT ON DBA_TABLESPACE_USAGE_METRICS TO c##zabbix_mon;
     GRANT SELECT ON DBA_USERS TO c##zabbix_mon;
     ```
     This is needed because the template uses `CDB_*` views to monitor tablespaces from the CDB and different PDBs - the monitoring user therefore needs access to the container data objects on all PDBs.
@@ -72,7 +68,6 @@ This template has been tested on:
     GRANT SELECT ON v_$recovery_file_dest TO zabbix_mon;
     GRANT SELECT ON v_$active_session_history TO zabbix_mon;
     GRANT SELECT ON v_$osstat TO zabbix_mon;
-    GRANT SELECT ON v_$restore_point TO zabbix_mon;
     GRANT SELECT ON v_$process TO zabbix_mon;
     GRANT SELECT ON v_$datafile TO zabbix_mon;
     GRANT SELECT ON v_$pgastat TO zabbix_mon;
@@ -80,9 +75,6 @@ This template has been tested on:
     GRANT SELECT ON v_$log TO zabbix_mon;
     GRANT SELECT ON v_$archive_dest TO zabbix_mon;
     GRANT SELECT ON v_$asm_diskgroup TO zabbix_mon;
-    GRANT SELECT ON sys.dba_data_files TO zabbix_mon;
-    GRANT SELECT ON DBA_TABLESPACES TO zabbix_mon;
-    GRANT SELECT ON DBA_TABLESPACE_USAGE_METRICS TO zabbix_mon;
     GRANT SELECT ON DBA_USERS TO zabbix_mon;
     ```
     **Important! Ensure that the ODBC connection to Oracle includes the session parameter `NLS_NUMERIC_CHARACTERS= '.,'`. It is important for displaying the float numbers in Zabbix correctly.**
@@ -91,11 +83,11 @@ This template has been tested on:
     This role is required to access the `V$RESTORE_POINT` dynamic performance view.
     However, there are ways to go around this, if the `SELECT_CATALOG_ROLE` assigned to a monitoring user raises any security issues.
     One way to do this is using **pipelined table functions**:
-    
+
       1. Log into your database as the `SYS` user or make sure that your administration user has the required privileges to execute the steps below;
-      
+
       2. Create types for the table function:
-        
+
           ```sql
           CREATE OR REPLACE TYPE zbx_mon_restore_point_row AS OBJECT (
             SCN                           NUMBER,
@@ -114,9 +106,9 @@ This template has been tested on:
           );
           CREATE OR REPLACE TYPE zbx_mon_restore_point_tab IS TABLE OF zbx_mon_restore_point_row;
           ```
-      
+
       3. Create the pipelined table function:
-      
+
           ```sql
           CREATE OR REPLACE FUNCTION zbx_mon_restore_point RETURN zbx_mon_restore_point_tab PIPELINED AS
           BEGIN
@@ -126,18 +118,25 @@ This template has been tested on:
             RETURN;
           END;
           ```
-      
-      4. Grant the Zabbix monitoring user the Execute privilege on the created pipelined table function:
+
+      4. Grant the Zabbix monitoring user the Execute privilege on the created pipelined table function and replace the monitoring user `V$RESTORE_POINT` view with the `SYS` user function (in this example, the `SYS` user is used to create DB types and function):
 
           ```sql
           GRANT EXECUTE ON zbx_mon_restore_point TO c##zabbix_mon;
+          CREATE OR REPLACE VIEW c##zabbix_mon.V$RESTORE_POINT AS SELECT * FROM TABLE(SYS.zbx_mon_restore_point);
           ```
 
-      5. Replace the monitoring user `V$RESTORE_POINT` view with the `SYS` user function (in this example, the `SYS` user is used to create DB types and function), and finally, revoke the `SELECT_CATALOG_ROLE`.
+      5. Finally, revoke the `SELECT_CATALOG_ROLE` and grant additional permissions that were previously covered by the `SELECT_CATALOG_ROLE`.
 
           ```sql
-          CREATE OR REPLACE VIEW c##zabbix_mon.V$RESTORE_POINT AS SELECT * FROM TABLE(SYS.zbx_mon_restore_point);
           REVOKE SELECT_CATALOG_ROLE FROM c##zabbix_mon;
+          GRANT SELECT ON v_$pdbs TO c##zabbix_mon;
+          GRANT SELECT ON v_$sort_segment TO c##zabbix_mon;
+          GRANT SELECT ON v_$parameter TO c##zabbix_mon;
+          GRANT SELECT ON CDB_TABLESPACES TO c##zabbix_mon;
+          GRANT SELECT ON CDB_DATA_FILES TO c##zabbix_mon;
+          GRANT SELECT ON CDB_FREE_SPACE TO c##zabbix_mon;
+          GRANT SELECT ON CDB_TEMP_FILES TO c##zabbix_mon;
           ```
 
       > Note that in these examples, the monitoring user is named `c##zabbix_mon` and the system user - `SYS`. Change these example usernames to ones that are appropriate for your environment.
