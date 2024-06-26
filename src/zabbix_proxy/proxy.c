@@ -1378,48 +1378,45 @@ static int	zbx_check_db(void)
 	return ret;
 }
 
-static int	proxy_db_init(void)
+static void	proxy_db_init(void)
 {
 	char		*error = NULL;
-	int		db_type, version_check, ret;
+	int		db_type, version_check;
 
-	if (SUCCEED != (ret = zbx_db_init(zbx_dc_get_nextid, config_log_slow_queries, &error)))
+	if (SUCCEED != zbx_db_init(zbx_dc_get_nextid, config_log_slow_queries, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database: %s", error);
 		zbx_free(error);
-		goto out;
+		exit(EXIT_FAILURE);
 	}
 
 	zbx_db_init_autoincrement_options();
+	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
 	if (ZBX_DB_UNKNOWN == (db_type = zbx_db_get_database_type()))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot use database \"%s\": database is not a Zabbix database",
 				zbx_config_dbhigh->config_dbname);
-		ret = FAIL;
 		goto out;
 	}
 	else if (ZBX_DB_PROXY != db_type)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot use database \"%s\": Zabbix proxy cannot work with a"
 				" Zabbix server database", zbx_config_dbhigh->config_dbname);
-		ret = FAIL;
 		goto out;
 	}
 
 	zbx_db_check_character_set();
-	if (SUCCEED != (ret = zbx_check_db()))
+	if (SUCCEED != zbx_check_db())
 		goto out;
 
 	if (SUCCEED != (version_check = zbx_db_check_version_and_upgrade(ZBX_HA_MODE_STANDALONE)))
 	{
 #ifdef HAVE_SQLITE3
 		if (NOTSUPPORTED == version_check)
-		{
-			ret = FAIL;
 			goto out;
-		}
 
+		zbx_db_close();
 		zabbix_log(LOG_LEVEL_WARNING, "removing database file: \"%s\"", zbx_config_dbhigh->config_dbname);
 		zbx_db_deinit();
 
@@ -1427,11 +1424,12 @@ static int	proxy_db_init(void)
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot remove database file \"%s\": %s, exiting...",
 					zbx_config_dbhigh->config_dbname, zbx_strerror(errno));
-			ret = FAIL;
-			goto out;
+			exit(EXIT_FAILURE);
 		}
+		zbx_db_close();
+		proxy_db_init();
 
-		ret = proxy_db_init();
+		return;
 #else
 		ZBX_UNUSED(version_check);
 		ret = FAIL;
@@ -1443,8 +1441,13 @@ static int	proxy_db_init(void)
 	zbx_db_table_prepare("items", NULL);
 	zbx_db_table_prepare("item_preproc", NULL);
 #endif
+	zbx_pb_init();
+	zbx_db_close();
+
+	return;
 out:
-	return ret;
+	zbx_db_close();
+	exit(EXIT_FAILURE);
 }
 
 int	MAIN_ZABBIX_ENTRY(int flags)
@@ -1719,15 +1722,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
-	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
-	if (SUCCEED != proxy_db_init())
-	{
-		zbx_db_close();
-		exit(EXIT_FAILURE);
-	}
+	proxy_db_init();
 
-	zbx_pb_init();
-	zbx_db_close();
 	if (0 != config_forks[ZBX_PROCESS_TYPE_DISCOVERYMANAGER])
 		zbx_discoverer_init();
 
