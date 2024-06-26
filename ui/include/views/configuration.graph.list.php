@@ -212,6 +212,12 @@ foreach ($data['graphs'] as $graph) {
 					->setArgument('graphid', $graphid)
 					->setArgument('discover', $nodiscover ? ZBX_PROTOTYPE_DISCOVER : ZBX_PROTOTYPE_NO_DISCOVER)
 					->setArgument('context', $data['context'])
+					->setArgument('backurl',
+						(new CUrl('graphs.php'))
+							->setArgument('parent_discoveryid', $data['parent_discoveryid'])
+							->setArgument('context', $data['context'])
+							->getUrl()
+					)
 					->getUrl()
 			))
 				->addSID()

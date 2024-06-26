@@ -148,6 +148,7 @@ div.dashboard-grid-widget-item {
 		display: flex;
 		align-items: baseline;
 		overflow: hidden;
+		white-space: nowrap;
 	}
 
 	.item-description,

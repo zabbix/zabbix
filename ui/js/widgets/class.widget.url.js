@@ -35,4 +35,44 @@ class CWidgetUrl extends CWidget {
 
 		return Promise.all(readiness);
 	}
+
+	_registerEvents() {
+		super._registerEvents();
+
+		this._events = {
+			...this._events,
+
+			mousedown: () => {
+				if (this._is_edit_mode) {
+					const iframe = this._content_body.querySelector('iframe');
+
+					if (iframe !== null) {
+						iframe.style.pointerEvents = 'none';
+
+						addEventListener('mouseup', this._events.mouseup, {once: true});
+					}
+				}
+			},
+
+			mouseup: () => {
+				const iframe = this._content_body.querySelector('iframe');
+
+				if (iframe !== null) {
+					iframe.style.pointerEvents = '';
+				}
+			}
+		}
+	}
+
+	_activateEvents() {
+		super._activateEvents();
+
+		this._target.addEventListener('mousedown', this._events.mousedown);
+	}
+
+	_deactivateEvents() {
+		super._deactivateEvents();
+
+		this._target.removeEventListener('mousedown', this._events.mousedown);
+	}
 }

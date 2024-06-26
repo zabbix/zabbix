@@ -290,6 +290,7 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 			)
 			->setArgument('g_triggerid[]', $triggerid)
 			->setArgument('context', $data['context'])
+			->setArgument('backurl', $url)
 			->getUrl()
 		))
 		->addClass(ZBX_STYLE_LINK_ACTION)

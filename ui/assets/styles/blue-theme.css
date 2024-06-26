@@ -1565,7 +1565,8 @@ div.dashboard-grid-widget-item {
   div.dashboard-grid-widget-item .item-value-content {
     display: flex;
     align-items: baseline;
-    overflow: hidden; }
+    overflow: hidden;
+    white-space: nowrap; }
   div.dashboard-grid-widget-item .item-description,
   div.dashboard-grid-widget-item .item-time,
   div.dashboard-grid-widget-item .type-text .value {
@@ -5564,7 +5565,7 @@ td[class] + td.disaster-bg {
   .is-loading::before {
     background-color: rgba(255, 255, 255, 0.8);
     content: 'loading';
-    text-indent: 200%;
+    text-indent: -9999px;
     overflow: hidden;
     position: absolute;
     top: 0;

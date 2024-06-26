@@ -472,7 +472,7 @@ void	zbx_audit_host_update_json_add_details(zbx_uint64_t hostid, const char *hos
 			ipmi_privilege, AUDIT_TABLE_NAME, "ipmi_privilege");
 	zbx_audit_update_json_append_string(hostid, AUDIT_HOST_ID, AUDIT_DETAILS_ACTION_ADD, "host.ipmi_username",
 			ipmi_username, AUDIT_TABLE_NAME, "ipmi_username");
-	zbx_audit_update_json_append_string(hostid, AUDIT_HOST_ID, AUDIT_DETAILS_ACTION_ADD, "host.ipmi_password",
+	zbx_audit_update_json_append_string_secret(hostid, AUDIT_HOST_ID, AUDIT_DETAILS_ACTION_ADD, "host.ipmi_password",
 			ipmi_password, AUDIT_TABLE_NAME, "ipmi_password");
 	zbx_audit_update_json_append_int(hostid, AUDIT_HOST_ID, AUDIT_DETAILS_ACTION_ADD, "host.status", status,
 			AUDIT_TABLE_NAME, "status");
