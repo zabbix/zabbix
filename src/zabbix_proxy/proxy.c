@@ -1426,7 +1426,7 @@ static void	proxy_db_init(void)
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot remove database file \"%s\": %s, exiting...",
 					zbx_config_dbhigh->config_dbname, zbx_strerror(errno));
-			goto out;
+			exit(EXIT_FAILURE);
 		}
 
 		proxy_db_init();
