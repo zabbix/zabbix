@@ -34,7 +34,6 @@
 #include "discoverer_taskprep.h"
 #include "discoverer_int.h"
 #include "zbxtimekeeper.h"
-#include "zbxpoller.h"
 #include "zbxalgo.h"
 #include "zbxcomms.h"
 #include "zbxdb.h"
@@ -42,6 +41,10 @@
 #include "zbxipcservice.h"
 #include "zbxstr.h"
 #include "zbxthreads.h"
+
+#ifdef HAVE_NETSNMP
+#	include "zbxpoller.h"
+#endif
 
 #ifdef HAVE_LDAP
 #	include <ldap.h>

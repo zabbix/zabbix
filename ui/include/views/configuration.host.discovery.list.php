@@ -277,6 +277,7 @@ foreach ($data['discoveries'] as $discovery) {
 				: 'discoveryrule.massdisable'
 			)
 			->setArgument('context', $data['context'])
+			->setArgument('backurl', $url)
 			->getUrl()
 		))
 			->addCsrfToken($csrf_token)

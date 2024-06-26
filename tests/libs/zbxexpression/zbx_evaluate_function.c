@@ -20,6 +20,10 @@
 #include "zbxcachevalue.h"
 #include "zbxexpression.h"
 #include "../../src/libs/zbxexpression/evalfunc.h"
+#include "zbxvariant.h"
+#include "zbxtime.h"
+#include "zbxdbhigh.h"
+#include "zbxcacheconfig.h"
 
 #include "zbxnum.h"
 
@@ -106,10 +110,10 @@ void	zbx_mock_test_entry(void **state)
 	evaluate_item.host = item.host.host;
 	evaluate_item.key_orig = item.key_orig;
 
-	if (SUCCEED != (returned_ret = evaluate_function(&returned_value, &evaluate_item, function, params, &ts,
+	if (SUCCEED != (returned_ret = zbx_evaluate_function(&returned_value, &evaluate_item, function, params, &ts,
 			&error)))
 	{
-		printf("evaluate_function returned error: %s\n", error);
+		printf("zbx_evaluate_function returned error: %s\n", error);
 		zbx_free(error);
 	}
 

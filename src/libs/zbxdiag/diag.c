@@ -23,6 +23,7 @@
 #include "zbxmutexs.h"
 #include "zbxtime.h"
 #include "zbxnum.h"
+#include "zbxstr.h"
 
 #define ZBX_DIAG_SECTION_MAX	64
 #define ZBX_DIAG_FIELD_MAX	64

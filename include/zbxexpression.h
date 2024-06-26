@@ -136,9 +136,6 @@ int	zbx_substitute_simple_macros_unmasked(const zbx_uint64_t *actionid, const zb
 
 void	zbx_substitute_simple_macros_allowed_hosts(zbx_history_recv_item_t *item, char **allowed_peers);
 
-void	zbx_evaluate_expressions(zbx_vector_dc_trigger_t *triggers, const zbx_vector_uint64_t *history_itemids,
-		const zbx_history_sync_item_t *history_items, const int *history_errcodes);
-
 void	zbx_format_value(char *value, size_t max_len, zbx_uint64_t valuemapid,
 		const char *units, unsigned char value_type);
 
@@ -158,6 +155,9 @@ int	zbx_evaluate(double *value, const char *expression, char *error, size_t max_
 		zbx_vector_str_t *unknown_msgs);
 int	zbx_evaluate_unknown(const char *expression, double *value, char *error, size_t max_error_len);
 double	zbx_evaluate_string_to_double(const char *in);
+int	zbx_evaluatable_for_notsupported(const char *fn);
+int	zbx_evaluate_function(zbx_variant_t *value, const zbx_dc_evaluate_item_t *item, const char *function,
+		const char *parameter, const zbx_timespec_t *ts, char **error);
 
 int	zbx_substitute_lld_macros(char **data, const struct zbx_json_parse *jp_row,
 		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, int flags, char *error, size_t max_error_len);
@@ -182,8 +182,6 @@ int	zbx_substitute_expression_lld_macros(char **data, zbx_uint64_t rules, const 
 
 void	zbx_count_dbl_vector_with_pattern(zbx_eval_count_pattern_data_t *pdata, char *pattern,
 		zbx_vector_dbl_t *values, int *count);
-
-int	zbx_calculate_macro_function(const char *expression, const zbx_token_func_macro_t *func_macro, char **out);
 
 const char	*zbx_dservice_type_string(zbx_dservice_type_t service);
 #endif

@@ -17,6 +17,8 @@
 
 #include "service_manager_impl.h"
 
+#include "zbxalgo.h"
+
 void	service_update_process_actions(const zbx_service_update_t *update, zbx_hashset_t *actions,
 		zbx_vector_uint64_t *actionids);
 

@@ -86,8 +86,8 @@ window.item_history_column_edit = new class {
 				const name_value = name_field.value.substring(0, 255);
 
 				if (name_value === '' || this.#old_multiselect_item_name === name_value) {
-					name_field.value = ms_item_data[0].name;
-					this.#old_multiselect_item_name = ms_item_data[0].name;
+					name_field.value = ms_item_data[0].prefix + ms_item_data[0].name;
+					this.#old_multiselect_item_name = name_field.value;
 				}
 			}
 			else {

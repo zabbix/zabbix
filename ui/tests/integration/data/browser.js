@@ -1,4 +1,4 @@
-var	parameters = JSON.parse(value);
+parameters = JSON.parse(value);
 
 var	opts = Browser.chromeOptions();
 var	optsFirefox = Browser.firefoxOptions();
@@ -22,7 +22,7 @@ try
 	Zabbix.log(5, "getUrl: '"+ browser.getUrl()+"'")
 
 	browser.setScriptTimeout(5000);
-	browser.setSessionTimeout(1000);
+	browser.setSessionTimeout(2500);
 
 	try
 	{
@@ -92,7 +92,6 @@ try
 	el = browser.findElement("xpath", "//input[@id='name']");
 	el.sendKeys("A");
 	el.sendKeys("d");
-	Zabbix.sleep(3000);
 	try
 	{
 		Zabbix.log(5, "foo:" + el.getAttribute("foo"));
@@ -136,8 +135,7 @@ try
 
 	el.click();
 
-	el = browser.findElement("link text", "Data collection"); // animation
-	Zabbix.sleep(500); // animation
+	el = browser.findElement("link text", "Data collection");
 
 	if (el === null)
 	{
@@ -181,7 +179,6 @@ try
 	Zabbix.log(5, "Web length: " + el.length)
 
 	el = browser.findElement("link text", "Alerts");
-	Zabbix.sleep(500); // animation
 	if (el === null)
 	{
 		throw Error("cannot find Alerts");
@@ -194,8 +191,10 @@ try
 		throw Error("cannot find //li[@id='alerts' and contains(@class,'is-expanded')]");
 	}
 
+	Zabbix.sleep(250); // Alerts is clicked and Media Types slide up
+
 	el = browser.findElement("link text", "Media types");
-	Zabbix.sleep(500); // animation
+
 	if (el === null)
 	{
 		throw Error("cannot find Media types");
@@ -267,9 +266,32 @@ try
 		el = browser2.findElement("link text", "Sign out");
 
 		browser2.collectPerfEntries();
-		raw = browser2.getRawPerfEntries();
+
+		try
+		{
+			raw = browser2.getRawPerfEntries()
+		}
+		catch (error) {
+			Zabbix.log(5, "cannot get getRawPerfEntries: " + error);
+		}
+
+		try
+		{
+			raw = browser2.getRawPerfEntriesByType('\'\+\'navigation');
+		}
+		catch (error)
+		{
+			Zabbix.log(5, "cannot get getRawPerfEntriesByType: " + error);
+		}
+
+		if (null === browser2.getError())
+		{
+			throw Error("injection not handled");
+		}
+
+		var raw = browser2.getRawPerfEntriesByType('navigation');
 		browserDashboardResult = browser2.getResult();
-		browserDashboardResult.raw = raw
+		browserDashboardResult.raw = raw.concat(browser2.getRawPerfEntriesByType('resource'));
 
 		summary = browserDashboardResult.performance_data.summary;
 
@@ -295,11 +317,50 @@ try
 	el.click();
 
 	browser2.navigate(parameters.url);
-	el = browser2.findElement("link text", "Sign out");
+	elSignOut = browser2.findElement("link text", "Sign out");
 
-	if (el != null)
+	if (elSignOut != null)
 	{
 		throw Error("logged in without password after sign out");
+	}
+
+	var bypass = {};
+
+	bypass[atob('//9k')] = 'test';
+	bypass.navigate = browser.navigate;
+
+	try
+	{
+		bypass.navigate('test');
+	}
+	catch (error)
+	{
+		Zabbix.log(5, "navigation bypass handled " + error);
+	}
+
+	var bypass_alert = {};
+
+	bypass_alert.dismiss = alert_window.dismiss
+
+	try
+	{
+		bypass_alert.dismiss();
+	}
+	catch (error)
+	{
+		Zabbix.log(5, "alert bypass handled " + error);
+	}
+
+	var bypass_el = {};
+
+	bypass_el.click = el.click;
+	try
+	{
+		bypass_el.click();
+	}
+	catch (error)
+	{
+		Zabbix.log(5, "alert click handled " + error);
 	}
 }
 catch (err)
@@ -315,7 +376,7 @@ catch (err)
 	}
 
 	result = browser.getResult();
-	result["screenshot"] = browser.getScreenshot();
+	var screenshot = browser.getScreenshot();
 	return JSON.stringify(result);
 
 }

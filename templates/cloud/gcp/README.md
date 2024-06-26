@@ -10,7 +10,7 @@ The template currently supports the discovery of [Compute Engine](https://cloud.
 
 ## Requirements
 
-Zabbix version: 7.0 and higher.
+Zabbix version: 7.2 and higher.
 
 ## Tested versions
 
@@ -19,7 +19,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.0/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.2/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -105,24 +105,24 @@ Additional information about metrics and used API methods:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|GCP: Authorization|<p>Google Cloud Platform REST authorization with service account authentication parameters and temporary-generated RSA-based JWT-token usage.</p><p>The necessary scopes are pre-defined.</p><p>Returns a signed authorization token with 1 hour lifetime; it is required only once, and is used for all the dependent script items.</p><p>Check the template documentation for the details.</p>|Script|gcp.authorization|
+|Authorization|<p>Google Cloud Platform REST authorization with service account authentication parameters and temporary-generated RSA-based JWT-token usage.</p><p>The necessary scopes are pre-defined.</p><p>Returns a signed authorization token with 1 hour lifetime; it is required only once, and is used for all the dependent script items.</p><p>Check the template documentation for the details.</p>|Script|gcp.authorization|
 |Instances get|<p>Get GCP Compute Engine instances.</p>|Dependent item|gcp.gce.instances.get<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
-|GCP: Authorization errors check|<p>A list of errors from API requests.</p>|Dependent item|gcp.auth.err.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to: ``</p></li></ul>|
+|Authorization errors check|<p>A list of errors from API requests.</p>|Dependent item|gcp.auth.err.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to: ``</p></li></ul>|
 |Instances get|<p>GCP Cloud SQL: Instances get.</p>|Dependent item|gcp.cloudsql.instances.get<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
-|Instances total|<p>GCP Cloud SQL instances total count.</p>|Dependent item|gcp.cloudsql.instances.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[*].length()`</p></li></ul>|
-|Instances count|<p>GCP Cloud SQL MSSQL instances count.</p>|Dependent item|gcp.gce.instances.mssql_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.db_type =~ 'SQLSERVER')].length()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Instances count|<p>GCP Cloud SQL MySQL instances count.</p>|Dependent item|gcp.gce.instances.mysql_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.db_type =~ 'MYSQL')].length()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Instances count|<p>GCP Cloud SQL PostgreSQL instances count.</p>|Dependent item|gcp.gce.instances.pgsql_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.db_type =~ 'POSTGRES')].length()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Instances total|<p>GCP Compute Engine instances total count.</p>|Dependent item|gcp.gce.instances.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[*].length()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Regular instances count|<p>GCP Compute Engine: Regular instances count.</p>|Dependent item|gcp.gce.instances.regular_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.i_type == 'regular')].length()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Container-Optimized instances count|<p>GCP Compute Engine: count of instances with Container-Optimized OS used.</p>|Dependent item|gcp.gce.instances.cos_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.i_type == 'container-optimized')].length()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Cloud SQL instances total|<p>GCP Cloud SQL instances total count.</p>|Dependent item|gcp.cloudsql.instances.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[*].length()`</p></li></ul>|
+|MSSQL instances count|<p>GCP Cloud SQL MSSQL instances count.</p>|Dependent item|gcp.cloudsql.instances.mssql_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.db_type =~ 'SQLSERVER')].length()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|MySQL instances count|<p>GCP Cloud SQL MySQL instances count.</p>|Dependent item|gcp.cloudsql.instances.mysql_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.db_type =~ 'MYSQL')].length()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|PostgreSQL instances count|<p>GCP Cloud SQL PostgreSQL instances count.</p>|Dependent item|gcp.cloudsql.instances.pgsql_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.db_type =~ 'POSTGRES')].length()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|GCE instances total|<p>GCP Compute Engine instances total count.</p>|Dependent item|gcp.gce.instances.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[*].length()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Regular GCE instances count|<p>GCP Compute Engine: Regular instances count.</p>|Dependent item|gcp.gce.instances.regular_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.i_type == 'regular')].length()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Container-optimized GCE instances count|<p>GCP Compute Engine: count of instances with Container-Optimized OS used.</p>|Dependent item|gcp.gce.instances.cos_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.i_type == 'container-optimized')].length()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Project quotas get|<p>GCP Compute Engine resource quotas available for the particular project.</p>|Dependent item|gcp.gce.quotas.get<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|GCP: Authorization has failed|<p>GCP: Authorization has failed.<br>Check the authorization parameters and GCP API availability from a network segment, where Zabbix-server/proxy is located.<br></p>|`length(last(/GCP by HTTP/gcp.auth.err.check)) > 0`|Average||
+|Authorization has failed|<p>GCP: Authorization has failed.<br>Check the authorization parameters and GCP API availability from a network segment, where Zabbix-server/proxy is located.<br></p>|`length(last(/GCP by HTTP/gcp.auth.err.check)) > 0`|Average||
 
 ### LLD rule GCP Compute Engine: Instances discovery
 
@@ -180,7 +180,7 @@ This template is designed to monitor Google Cloud Platform Compute Engine instan
 
 ## Requirements
 
-Zabbix version: 7.0 and higher.
+Zabbix version: 7.2 and higher.
 
 ## Tested versions
 
@@ -189,7 +189,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.0/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.2/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -283,7 +283,7 @@ This template is designed to monitor Google Cloud Platform Cloud SQL MySQL insta
 
 ## Requirements
 
-Zabbix version: 7.0 and higher.
+Zabbix version: 7.2 and higher.
 
 ## Tested versions
 
@@ -292,7 +292,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.0/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.2/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -371,7 +371,7 @@ This template is designed to monitor Google Cloud Platform Cloud SQL metrics for
 
 ## Requirements
 
-Zabbix version: 7.0 and higher.
+Zabbix version: 7.2 and higher.
 
 ## Tested versions
 
@@ -380,7 +380,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.0/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.2/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -416,7 +416,7 @@ This template is designed to monitor Google Cloud Platform Cloud SQL PostgreSQL 
 
 ## Requirements
 
-Zabbix version: 7.0 and higher.
+Zabbix version: 7.2 and higher.
 
 ## Tested versions
 
@@ -425,7 +425,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.0/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.2/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -526,7 +526,7 @@ This template is designed to monitor Google Cloud Platform Cloud SQL PostgreSQL 
 
 ## Requirements
 
-Zabbix version: 7.0 and higher.
+Zabbix version: 7.2 and higher.
 
 ## Tested versions
 
@@ -535,7 +535,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.0/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.2/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -573,7 +573,7 @@ This template is designed to monitor Google Cloud Platform Cloud SQL MSSQL insta
 
 ## Requirements
 
-Zabbix version: 7.0 and higher.
+Zabbix version: 7.2 and higher.
 
 ## Tested versions
 
@@ -582,7 +582,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.0/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.2/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -725,7 +725,7 @@ This template is designed to monitor Google Cloud Platform Cloud SQL MSSQL read-
 
 ## Requirements
 
-Zabbix version: 7.0 and higher.
+Zabbix version: 7.2 and higher.
 
 ## Tested versions
 
@@ -734,7 +734,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.0/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.2/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 

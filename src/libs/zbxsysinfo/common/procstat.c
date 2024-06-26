@@ -18,6 +18,8 @@
 #include "zbxnix.h"
 #include "zbxstr.h"
 #include "zbxtime.h"
+#include "zbxmutexs.h"
+#include "zbxsysinfo.h"
 
 #ifdef ZBX_PROCSTAT_COLLECTOR
 

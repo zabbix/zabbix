@@ -1743,7 +1743,6 @@ select {
 }
 
 .overlay-dialogue {
-	display: table;
 	position: absolute;
 	z-index: 1000;
 	padding: 17px 10px 10px;
@@ -2694,15 +2693,15 @@ td.inactive-bg {
 
 	&::before {
 		background-color: rgba($ui-bg-color, .8);
-		content: 'loading'; // For screen-reader
-		text-indent: 200%;  // For screen-reader, for IE 200% instead of 100%
+		content: 'loading';
+		text-indent: -9999px;
 		overflow: hidden;
 		position: absolute;
 		top: 0;
 		bottom: 0;
 		left: 0;
 		right: 0;
-		z-index: 5; // More than z-index of .msg-*.
+		z-index: 5;
 	}
 
 	&::after {
@@ -2768,6 +2767,10 @@ button {
 		position: relative;
 		color: transparent !important;
 		border-bottom-color: transparent;
+
+		&::before {
+			background-color: transparent;
+		}
 
 		&::after {
 			box-shadow: none;

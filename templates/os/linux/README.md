@@ -3,7 +3,7 @@
 
 ## Overview
 
-This is an official Linux template. It requires Zabbix agent 7.0 or newer.
+This is an official Linux template. It requires Zabbix agent 7.2 or newer.
 
 #### Notes on filesystem (FS) discovery:
 - The ext4/3/2 FS reserves space for privileged usage, typically set at 5% by default.
@@ -14,7 +14,7 @@ This is an official Linux template. It requires Zabbix agent 7.0 or newer.
 
 ## Requirements
 
-Zabbix version: 7.0 and higher.
+Zabbix version: 7.2 and higher.
 
 ## Tested versions
 
@@ -23,11 +23,11 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.0/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.2/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
-Install Zabbix agent on Linux OS following Zabbix [documentation](https://www.zabbix.com/documentation/7.0/manual/concepts/agent#agent-on-unix-like-systems).
+Install Zabbix agent on Linux OS following Zabbix [documentation](https://www.zabbix.com/documentation/7.2/manual/concepts/agent#agent-on-unix-like-systems).
 
 ### Macros used
 
@@ -56,7 +56,8 @@ Install Zabbix agent on Linux OS following Zabbix [documentation](https://www.za
 |{$NET.IF.IFNAME.MATCHES}|<p>Used for network interface discovery. Can be overridden on the host or linked template level.</p>|`^.*$`|
 |{$NET.IF.IFNAME.NOT_MATCHES}|<p>Filters out `loopbacks`, `nulls`, docker `veth` links and `docker0` bridge by default.</p>|`Macro too long. Please see the template.`|
 |{$IF.UTIL.MAX}|<p>Used as a threshold in the interface utilization trigger.</p>|`90`|
-|{$SYSTEM.FUZZYTIME.MAX}|<p>The threshold for the difference of system time in seconds.</p>|`60`|
+|{$SYSTEM.FUZZYTIME.MAX}|<p>The upper threshold for difference of system time.</p>|`60s`|
+|{$SYSTEM.FUZZYTIME.MIN}|<p>The lower threshold for difference of system time. Used in recovery expression to avoid trigger flapping.</p>|`10s`|
 |{$KERNEL.MAXPROC.MIN}||`1024`|
 |{$KERNEL.MAXFILES.MIN}||`256`|
 

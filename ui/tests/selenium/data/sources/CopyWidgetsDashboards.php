@@ -81,7 +81,7 @@ class CopyWidgetsDashboards {
 		]);
 		$item_prototypeid = $item_protototypes['itemids'][0];
 
-		$item_protototypes = CDataHelper::call('graphprototype.create', [
+		$graph_protototypes = CDataHelper::call('graphprototype.create', [
 			[
 				'name' => 'Template graph prototype {#KEY}',
 				'width' => 600,
@@ -89,7 +89,7 @@ class CopyWidgetsDashboards {
 				'gitems' => [['itemid' => $item_prototypeid, 'color' => '3333FF']]
 			]
 		]);
-		$graph_prototypeid = $item_protototypes['graphids'][0];
+		$graph_prototypeid = $graph_protototypes['graphids'][0];
 
 		CDataHelper::call('dashboard.create', [
 			[

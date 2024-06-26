@@ -12,11 +12,39 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#ifndef ZABBIX_MACROFUNC_H
-#define ZABBIX_MACROFUNC_H
+#include "dbupgrade.h"
+#include "zbxdbhigh.h"
+#include "zbxdb.h"
 
-#include "zbxexpr.h"
+/*
+ * 7.2 development database patches
+ */
 
-char	*func_get_macro_from_func(const char *str, zbx_token_func_macro_t *fm, int *N_functionid);
+#ifndef HAVE_SQLITE3
+
+static int	DBpatch_7010000(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute(
+			"update profiles"
+				" set value_str='operating_mode'"
+				" where idx='web.proxies.php.sort'"
+				" and value_str like 'status'"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
 
 #endif
+
+DBPATCH_START(7010)
+
+/* version, duplicates flag, mandatory flag */
+
+DBPATCH_ADD(7010000, 0, 1)
+
+DBPATCH_END()

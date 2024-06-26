@@ -16,6 +16,9 @@
 #define ZABBIX_ASYNCPOLLER_H
 
 #include "zbxcommon.h"
+
+#define ZBX_RES_CONF_FILE "/etc/resolv.conf"
+
 #ifdef HAVE_LIBEVENT
 #include <event.h>
 
@@ -49,5 +52,6 @@ typedef void (*zbx_async_task_clear_cb_t)(void *data);
 zbx_async_task_state_t	zbx_async_poller_get_task_state_for_event(short event);
 void			zbx_async_poller_add_task(struct event_base *ev, struct evdns_base *dnsbase, const char *addr,
 		void *data, int timeout, zbx_async_task_process_cb_t process_cb, zbx_async_task_clear_cb_t clear_cb);
+const char		*zbx_resolv_conf_errstr(int error);
 #endif
 #endif

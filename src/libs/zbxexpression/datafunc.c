@@ -27,6 +27,7 @@
 #include "zbxstr.h"
 #include "zbxalgo.h"
 #include "zbxhistory.h"
+#include "zbxip.h"
 
 /******************************************************************************
  *                                                                            *
@@ -305,12 +306,27 @@ int	expr_dc_get_interface_value(zbx_uint64_t hostid, zbx_uint64_t itemid, char *
 	switch (request)
 	{
 		case ZBX_REQUEST_HOST_IP:
+			if ('\0' != *interface.ip_orig && FAIL == zbx_is_ip(interface.ip_orig))
+				return FAIL;
+
 			*replace_to = zbx_strdup(*replace_to, interface.ip_orig);
 			break;
 		case ZBX_REQUEST_HOST_DNS:
+			if ('\0' != *interface.dns_orig && FAIL == zbx_is_ip(interface.dns_orig) &&
+					FAIL == zbx_validate_hostname(interface.dns_orig))
+			{
+				return FAIL;
+			}
+
 			*replace_to = zbx_strdup(*replace_to, interface.dns_orig);
 			break;
 		case ZBX_REQUEST_HOST_CONN:
+			if (FAIL == zbx_is_ip(interface.addr) &&
+					FAIL == zbx_validate_hostname(interface.addr))
+			{
+				return FAIL;
+			}
+
 			*replace_to = zbx_strdup(*replace_to, interface.addr);
 			break;
 		case ZBX_REQUEST_HOST_PORT:

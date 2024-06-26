@@ -14,14 +14,15 @@
 
 #include "jsonpath.h"
 
+#include "json.h"
+
 #include "zbxregexp.h"
 #include "zbxvariant.h"
 #include "zbxnum.h"
 #include "zbxexpr.h"
-#include "json.h"
-#include "json_parser.h"
 #include "jsonobj.h"
 #include "zbxalgo.h"
+#include "zbxstr.h"
 
 typedef struct
 {

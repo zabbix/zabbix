@@ -258,7 +258,7 @@ class WidgetForm extends CWidgetForm {
 				(new CWidgetFieldCheckBox('units_show', _('Units')))->setDefault(self::DEFAULT_UNITS_SHOW)
 			)
 			->addField(
-				new CWidgetFieldTextBox('units', _('Units'))
+				(new CWidgetFieldTextBox('units', _('Units')))->setMaxLength(255)
 			)
 			->addField(
 				(new CWidgetFieldIntegerBox('units_size', _('Size'),self::SIZE_PERCENT_MIN, self::SIZE_PERCENT_MAX))

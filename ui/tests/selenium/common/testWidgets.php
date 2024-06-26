@@ -40,34 +40,29 @@ class testWidgets extends CWebTest {
 		$this->page->login()->open($url)->waitUntilReady();
 
 		// Open widget form dialog.
-		$widget_dialog = CDashboardElement::find()->one()->waitUntilReady()->edit()->addWidget()->asForm();
-		$widget_dialog->fill(['Type' => CFormElement::RELOADABLE_FILL($widget)]);
+		$widget_dialog = CDashboardElement::find()->one()->waitUntilReady()->edit()->addWidget();
+		$widget_form = $widget_dialog->asForm();
+		$widget_form->fill(['Type' => CFormElement::RELOADABLE_FILL($widget)]);
 
 		// Assign the dialog from where the last Select button will be clicked.
 		$select_dialog = $widget_dialog;
 
 		// Item types expected in items table. For the most cases theses are all items except of Binary and dependent.
-		$item_types = [
-			'Character item',
-			'Float item',
-			'Log item',
-			'Text item',
-			'Unsigned item',
-			'Unsigned_dependent item'
-		];
+		$item_types = (in_array($widget, ['Item navigator', 'Item history']))
+			? ['Binary item', 'Character item', 'Float item', 'Log item', 'Text item', 'Unsigned item', 'Unsigned_dependent item']
+			: ['Character item', 'Float item', 'Log item', 'Text item', 'Unsigned item', 'Unsigned_dependent item'];
 
 		switch ($widget) {
 			case 'Top hosts':
-				$widget_dialog->getFieldContainer('Columns')->query('button:Add')->one()->waitUntilClickable()->click();
+			case 'Item history':
+				$widget_form->getFieldContainer('Columns')->query('button:Add')->one()->waitUntilClickable()->click();
 				$column_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
-
-				// For Top hosts widget final dialog is New column dialog.
 				$select_dialog = $column_dialog;
 				break;
 
 			case 'Clock':
-				$widget_dialog->fill(['Time type' => CFormElement::RELOADABLE_FILL('Host time')]);
-				$this->assertTrue($widget_dialog->getField('Item')->isVisible());
+				$widget_form->fill(['Time type' => CFormElement::RELOADABLE_FILL('Host time')]);
+				$this->assertTrue($widget_form->getField('Item')->isVisible());
 				break;
 
 			case 'Graph':
@@ -78,17 +73,23 @@ class testWidgets extends CWebTest {
 				break;
 
 			case 'Graph prototype':
-				$widget_dialog->fill(['Source' => 'Simple graph prototype']);
-				$this->assertTrue($widget_dialog->getField('Item prototype')->isVisible());
+				$widget_form->fill(['Source' => 'Simple graph prototype']);
+				$this->assertTrue($widget_form->getField('Item prototype')->isVisible());
 
 				// For Graph prototype only numeric item prototypes are available.
 				$item_types = ['Float item prototype', 'Unsigned item prototype', 'Unsigned_dependent item prototype'];
 				break;
 		}
 
-		$select_button = ($widget === 'Graph' || $widget === 'Pie chart')
-			? 'xpath:(.//button[text()="Select"])[2]'
-			: 'button:Select';
+		if ($widget === 'Item navigator') {
+			$select_button = 'xpath:(.//button[text()="Select"])[3]';
+		}
+		else {
+			$select_button = ($widget === 'Graph' || $widget === 'Pie chart')
+				? 'xpath:(.//button[text()="Select"])[2]'
+				: 'button:Select';
+		}
+
 		$select_dialog->query($select_button)->one()->waitUntilClickable()->click();
 
 		// Open the dialog where items will be tested.
@@ -102,6 +103,14 @@ class testWidgets extends CWebTest {
 		$items_dialog->query('class:multiselect-control')->asMultiselect()->one()->fill(self::HOST_ALL_ITEMS);
 		$table->waitUntilReloaded();
 		$this->assertTableDataColumn($item_types, 'Name', self::TABLE_SELECTOR);
+
+		// Close all dialogs.
+		$dialogs = COverlayDialogElement::find()->all();
+
+		$dialog_count = $dialogs->count();
+		for ($i = $dialog_count - 1; $i >= 0; $i--) {
+			$dialogs->get($i)->close(true);
+		}
 	}
 
 	/**
@@ -135,5 +144,39 @@ class testWidgets extends CWebTest {
 		unset($item_value);
 
 		return $data;
+	}
+
+	/**
+	 * Check if row with entity name is highlighted on click.
+	 *
+	 * @param string		$widget_name		widget name
+	 * @param string		$entity_name		name of item or host
+	 * @param boolean 		$dashboard_edit		true if dashboard is in edit mode
+	 */
+	public function checkRowHighlight($widget_name, $entity_name, $dashboard_edit = false) {
+		$widget = $dashboard_edit
+			? CDashboardElement::find()->one()->edit()->getWidget($widget_name)
+			: CDashboardElement::find()->one()->getWidget($widget_name);
+
+		$widget->waitUntilReady();
+		$locator = 'xpath://div[contains(@class,"node-is-selected")]';
+		$this->assertFalse($widget->query($locator)->one(false)->isValid());
+		$widget->query('xpath://span[@title="'.$entity_name.'"]')->waitUntilReady()->one()->click();
+		$this->assertTrue($widget->query($locator)->one()->isVisible());
+	}
+
+	/**
+	 * Opens widget edit form and fills in data.
+	 *
+	 * @param string		$dashboardid		dashboard id
+	 * @param string		$widget_name		widget name
+	 * @param array			$configuration    	widget parameter(s)
+	 */
+	public function setWidgetConfiguration($dashboardid, $widget_name, $configuration = []) {
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.$dashboardid)->waitUntilReady();
+		$dashboard = CDashboardElement::find()->one()->edit();
+		$form = $dashboard->getWidget($widget_name)->edit()->asForm();
+		$form->fill($configuration);
+		$form->submit();
 	}
 }

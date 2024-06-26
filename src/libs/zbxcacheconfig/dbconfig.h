@@ -16,10 +16,10 @@
 #define ZABBIX_DBCONFIG_H
 
 #include "zbxcacheconfig.h"
-#include "user_macro.h"
 #include "vps_monitor.h"
 #include "zbxalgo.h"
 #include "zbxversion.h"
+#include "zbxvault.h"
 #include "zbx_trigger_constants.h"
 #include "zbx_host_constants.h"
 

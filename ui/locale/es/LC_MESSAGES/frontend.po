@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-05-15 14:48+0000\n"
+"PO-Revision-Date: 2024-06-15 13:20+0000\n"
 "Last-Translator: Vicente Salvador <vicentesalvadorcubedo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
@@ -6952,11 +6952,11 @@ msgstr "Crítica"
 
 #: include/items.inc.php:1630
 msgid "Discard unchanged"
-msgstr "Descartar no modificados"
+msgstr "Descartar sin cambios"
 
 #: include/items.inc.php:1634
 msgid "Discard unchanged with heartbeat"
-msgstr "Descartar sin cambios con el heartbeat"
+msgstr "Descartar sin cambios con heartbeat"
 
 #: app/views/js/popup.itemtestedit.view.js.php:377 include/forms.inc.php:1598
 #: include/views/js/item.preprocessing.js.php:66
@@ -7525,6 +7525,10 @@ msgstr "Vaciar parámetro de entrada."
 #: include/classes/api/services/CMap.php:1042
 msgid "Empty map ID."
 msgstr "Vaciar identificador de mapa."
+
+#: widgets/itemhistory/Widget.php:32
+msgid "Empty value."
+msgstr "Valor vacío."
 
 #: app/views/action.list.php:167 app/views/administration.token.list.php:204
 #: app/views/administration.user.token.list.php:157
@@ -10153,6 +10157,10 @@ msgstr "Imágen eliminada"
 msgid "Image label type"
 msgstr "Tipo de etiqueta de imagen"
 
+#: widgets/itemhistory/Widget.php:33
+msgid "Image loading error."
+msgstr "Error al cargar la imagen."
+
 #: include/classes/helpers/CUploadFile.php:129
 #, c-format
 msgid "Image size must be less than %1$s."
@@ -12334,7 +12342,7 @@ msgstr "Gráfico de la última semana"
 #: include/views/inventory.host.view.php:145
 #: include/views/inventory.host.view.php:151 jsLoader.php:375
 msgid "Latest data"
-msgstr "Última fecha"
+msgstr "Últimos datos"
 
 #: app/partials/administration.system.info.php:101
 msgid "Latest release"
@@ -15490,7 +15498,7 @@ msgstr "Anular"
 
 #: include/classes/widgets/fields/CWidgetFieldMultiSelectOverrideHost.php:30
 msgid "Override host"
-msgstr "Anular equipo"
+msgstr "Reemplazar equipo"
 
 #: app/partials/administration.system.info.php:210
 #: app/views/administration.housekeeping.edit.php:129
@@ -18048,7 +18056,7 @@ msgstr "Tamaño de escala"
 
 #: app/views/module.list.php:45
 msgid "Scan directory"
-msgstr "Directorio de escaneo"
+msgstr "Escanear carpeta"
 
 #: include/views/mfa.login.php:60
 msgid "Scan this QR code"
@@ -19470,6 +19478,10 @@ msgstr "Cadena"
 #: app/views/popup.triggerexpr.php:133
 msgid "String functions"
 msgstr "Funciones de cadena"
+
+#: widgets/piechart/includes/WidgetForm.php:137
+msgid "Stroke width"
+msgstr "Anchura del trazo"
 
 #: include/items.inc.php:1545 include/items.inc.php:1549
 #: include/items.inc.php:1553 include/items.inc.php:1557
@@ -21725,7 +21737,7 @@ msgstr "Operaciones de actualización"
 #: app/controllers/CControllerPopupAcknowledgeEdit.php:214
 #: app/controllers/CControllerPopup.php:45 jsLoader.php:346
 msgid "Update problem"
-msgstr "Problema de actualización"
+msgstr "Actualización del problema"
 
 #: app/controllers/CControllerAuditLogList.php:387
 #: app/controllers/CControllerPopupImportCompare.php:166

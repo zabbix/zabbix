@@ -275,6 +275,8 @@ class testFormWebScenarioStep extends CWebTest {
 		foreach ($buttons as $button) {
 			$this->assertTrue($dialog->query('button', $button)->one()->isClickable());
 		}
+
+		$dialog->close();
 	}
 
 	public static function getWebScenarioStepData() {
@@ -953,6 +955,8 @@ class testFormWebScenarioStep extends CWebTest {
 					$step_form->getField($field_name)->asMultifieldTable()->checkValue($data[$field_name]);
 				}
 			}
+
+			COverlayDialogElement::find()->one()->close();
 		}
 	}
 
@@ -1132,6 +1136,8 @@ class testFormWebScenarioStep extends CWebTest {
 		else {
 			$this->checkErrorDialog($data['error']);
 		}
+
+		COverlayDialogElement::find()->one()->close();
 	}
 
 	public static function getStepPostData() {
@@ -1295,6 +1301,8 @@ class testFormWebScenarioStep extends CWebTest {
 		else {
 			$this->checkErrorDialog($data['error']);
 		}
+
+		COverlayDialogElement::find()->one()->close();
 	}
 
 	/**

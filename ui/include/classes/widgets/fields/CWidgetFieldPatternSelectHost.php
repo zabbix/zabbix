@@ -16,18 +16,7 @@
 
 namespace Zabbix\Widgets\Fields;
 
-use Zabbix\Widgets\CWidgetField;
+class CWidgetFieldPatternSelectHost extends CWidgetFieldPatternSelect {
 
-class CWidgetFieldHostPatternSelect extends CWidgetField {
-
-	public const DEFAULT_VIEW = \CWidgetFieldHostPatternSelectView::class;
-	public const DEFAULT_VALUE = [];
-
-	public function __construct(string $name, string $label = null) {
-		parent::__construct($name, $label);
-
-		$this
-			->setDefault(self::DEFAULT_VALUE)
-			->setValidationRules(['type' => API_STRINGS_UTF8]);
-	}
+	public const DEFAULT_VIEW = \CWidgetFieldPatternSelectHostView::class;
 }

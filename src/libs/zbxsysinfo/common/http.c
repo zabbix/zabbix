@@ -21,7 +21,6 @@
 #include "zbxregexp.h"
 #include "zbxhttp.h"
 #include "zbxcomms.h"
-#include "zbxcurl.h"
 
 #define HTTP_SCHEME_STR		"http://"
 
@@ -30,6 +29,8 @@
 #define ZBX_MAX_WEBPAGE_SIZE	(1 * 1024 * 1024)
 
 #else
+
+#include "zbxcurl.h"
 
 #define HTTPS_SCHEME_STR	"https://"
 

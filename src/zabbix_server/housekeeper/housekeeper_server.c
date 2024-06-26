@@ -14,6 +14,9 @@
 
 #include "housekeeper_server.h"
 
+#include "history_compress.h"
+
+#include "zbxtimekeeper.h"
 #include "zbxlog.h"
 #include "zbxnix.h"
 #include "zbxself.h"
@@ -21,7 +24,6 @@
 #include "zbxrtc.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
-#include "history_compress.h"
 #include "zbx_rtc_constants.h"
 #include "zbx_host_constants.h"
 #include "zbxalgo.h"
@@ -1307,7 +1309,7 @@ static int	housekeeping_problems(int now, int config_max_hk_delete)
 	int			deleted = 0;
 	zbx_vector_uint64_t	ids_uint64;
 	size_t			sql_alloc = 0, sql_offset;
-	char			buffer[MAX_STRING_LEN], *sql = NULL;;
+	char			buffer[MAX_STRING_LEN], *sql = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() now:%d", __func__, now);
 
