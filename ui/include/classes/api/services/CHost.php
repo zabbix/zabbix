@@ -85,6 +85,7 @@ class CHost extends CHostGeneral {
 	 * @param string        $options['sortfield']                          Field to sort by.
 	 * @param string        $options['sortorder']                          Sort order.
 	 * @param int           $options['limit']                              Limit selection.
+	 * @param int    		$options['offset']                  		   The number of items to skip before returning results.
 	 * @param int           $options['limitSelects']                       Limits the number of records returned by subselects.
 	 *
 	 * @return array|boolean Host data as array or false if error
@@ -167,6 +168,7 @@ class CHost extends CHostGeneral {
 			'sortfield'							=> '',
 			'sortorder'							=> '',
 			'limit'								=> null,
+			'offset'							=> null,
 			'limitSelects'						=> null
 		];
 		$options = zbx_array_merge($defOptions, $options);
@@ -507,6 +509,11 @@ class CHost extends CHostGeneral {
 		// limit
 		if (!zbx_ctype_digit($options['limit']) || !$options['limit']) {
 			$options['limit'] = null;
+		}
+
+		// offset
+		if (!zbx_ctype_digit($options['offset']) || !$options['offset']) {
+			$options['offset'] = null;
 		}
 
 		/*
