@@ -1440,6 +1440,7 @@ static void	proxy_db_init(void)
 	zbx_db_table_prepare("items", NULL);
 	zbx_db_table_prepare("item_preproc", NULL);
 #endif
+	zbx_db_close();
 	return;
 out:
 	zbx_db_close();
@@ -1720,7 +1721,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	}
 
 	proxy_db_init();
-
+	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 	zbx_pb_init();
 	zbx_db_close();
 	if (0 != config_forks[ZBX_PROCESS_TYPE_DISCOVERYMANAGER])
