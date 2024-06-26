@@ -24,7 +24,8 @@ Open Zabbix agent 2 docker configuration file `zabbix_agent2.d/plugins.d/docker.
 set the required parameters.
 
 **Plugins.Docker.Endpoint** — the Docker API endpoint.
-*Default value:* `unix:///var/run/docker.sock`    
+*Default value:* `unix:///var/run/docker.sock`
+*Using a Docker socket TCP proxy:* `tcp://docker-socket-proxy:2375`
  
 **Plugins.Docker.Timeout** — the maximum time (in seconds) for 
 waiting when a request has to be done.
