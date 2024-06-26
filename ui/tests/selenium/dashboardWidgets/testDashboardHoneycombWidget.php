@@ -44,19 +44,6 @@ class testDashboardHoneycombWidget extends testWidgets {
 	}
 
 	/**
-	 * SQL query to get widget and widget_field tables to compare hash values, but without widget_fieldid
-	 * because it can change.
-	 */
-	const SQL = 'SELECT wf.widgetid, wf.type, wf.name, wf.value_int, wf.value_str, wf.value_groupid, wf.value_hostid,'.
-			' wf.value_itemid, wf.value_graphid, wf.value_sysmapid, w.widgetid, w.dashboard_pageid, w.type, w.name, w.x, w.y,'.
-			' w.width, w.height'.
-			' FROM widget_field wf'.
-			' INNER JOIN widget w'.
-			' ON w.widgetid=wf.widgetid'.
-			' ORDER BY wf.widgetid, wf.name, wf.value_int, wf.value_str, wf.value_groupid,'.
-			' wf.value_hostid, wf.value_itemid, wf.value_graphid';
-
-	/**
 	 * Ids of created Dashboards for Honeycomb widget check.
 	 */
 	protected static $dashboardid;
@@ -1343,7 +1330,8 @@ class testDashboardHoneycombWidget extends testWidgets {
 	/**
 	 * Update Honeycomb widget.
 	 *
-	 * @onBefore     prepareUpdateHoneycomb
+	 * @onBefore prepareUpdateHoneycomb
+	 *
 	 * @dataProvider getCreateData
 	 */
 	public function testDashboardHoneycombWidget_Update($data) {
@@ -1356,24 +1344,24 @@ class testDashboardHoneycombWidget extends testWidgets {
 	 * Delete Honeycomb widget.
 	 */
 	public function testDashboardHoneycombWidget_Delete() {
-		$deleted_dashboard = 'DeleteHoneycomb';
+		$widget_name = 'DeleteHoneycomb';
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
 				self::$dashboardid['Dashboard for deleting honeycomb widget'])->waitUntilReady();
 		$dashboard = CDashboardElement::find()->one()->waitUntilReady()->edit();
-		$widget = $dashboard->getWidget($deleted_dashboard);
+		$widget = $dashboard->getWidget($widget_name);
 		$this->assertTrue($widget->isEditable());
-		$dashboard->deleteWidget($deleted_dashboard);
+		$dashboard->deleteWidget($widget_name);
 		$widget->waitUntilNotPresent();
 		$dashboard->save();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 
 		// Check that widget is not present on dashboard and in DB.
-		$this->assertFalse($dashboard->getWidget($deleted_dashboard, false)->isValid());
+		$this->assertFalse($dashboard->getWidget($widget_name, false)->isValid());
 		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM widget_field wf'.
 			' LEFT JOIN widget w'.
 			' ON w.widgetid=wf.widgetid'.
-			' WHERE w.name='.zbx_dbstr($deleted_dashboard)
+			' WHERE w.name='.zbx_dbstr($widget_name)
 		));
 	}
 
@@ -1635,7 +1623,8 @@ class testDashboardHoneycombWidget extends testWidgets {
 	/**
 	 * Check different data display on Honeycomb widget.
 	 *
-	 * @onBefore     prepareUpdateHoneycomb
+	 * @onBefore prepareUpdateHoneycomb
+	 *
 	 * @dataProvider getDisplayData
 	 */
 	public function testDashboardHoneycombWidget_Display($data) {
@@ -1651,14 +1640,15 @@ class testDashboardHoneycombWidget extends testWidgets {
 		$widget = $dashboard->getWidget($data['fields']['Name']);
 
 		// Check that correct value displayed on honeycomb.
+		$content = $widget->getContent();
 		if (array_key_exists('check_label', $data)) {
-			$displayed = $widget->getContent()->query('class', $data['check_label'])->one()->getText();
+			$displayed = $content->query('class', $data['check_label'])->one()->getText();
 			$this->assertEquals($displayed, $data['result']);
-			$this->assertFalse($widget->getContent()->query('class', $data['turned_off_label'])->exists());
+			$this->assertFalse($content->query('class', $data['turned_off_label'])->exists());
 		}
 		else {
 			foreach (['svg-honeycomb-label-primary', 'svg-honeycomb-label-secondary'] as $selector) {
-				$displayed = $widget->getContent()->query('class', $selector)->one()->getText();
+				$displayed = $content->query('class', $selector)->one()->getText();
 				$this->assertEquals($displayed, $data['result']);
 			}
 		}
@@ -1833,7 +1823,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 	protected function checkWidgetForm($data, $action, $check = true) {
 		$dashboard = CDashboardElement::find()->waitUntilReady()->one();
 
-		// Check hash if TEST_BAD and check widget amount if TEST_GOOD
+		// Get hash if expected is TEST_BAD.
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			// Hash before update.
 			$old_hash = CDBHelper::getHash(self::SQL);
@@ -1857,13 +1847,14 @@ class testDashboardHoneycombWidget extends testWidgets {
 		}
 
 		if (array_key_exists('tags', $data)) {
-			$this->checkCreateTags($data['tags'], false);
+			$this->addOrCheckTags($data['tags'], false);
 		}
 
 		$form->fill($data['fields']);
 		$form->submit();
 
 		if ($check) {
+			// Check hash if TEST_BAD and check widget amount if TEST_GOOD.
 			if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 				$this->assertMessage(TEST_BAD, null, $data['error_message']);
 				COverlayDialogElement::find()->one()->close();
@@ -1893,7 +1884,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 				$this->query('id:lbl_bg_color')->one()->waitUntilVisible();
 
 				if (array_key_exists('tags', $data)) {
-					$this->checkCreateTags($data['tags']);
+					$this->addOrCheckTags($data['tags']);
 				}
 
 				// Check Thresholds values.
@@ -1915,13 +1906,14 @@ class testDashboardHoneycombWidget extends testWidgets {
 	 * @param array  $tags      given tags
 	 * @param boolean $check    check tags' values after creation or not
 	 */
-	protected function checkCreateTags($tags, $check = true) {
+	protected function addOrCheckTags($tags, $check = true) {
 		foreach ($tags as $tag => $values) {
 			$this->setTagSelector(($tag === 'item_tags') ? 'id:tags_table_item_tags' : 'id:tags_table_host_tags');
 
 			if ($check) {
 				$this->assertTags($values);
-			} else {
+			}
+			else {
 				$this->setTags($values);
 			}
 		}

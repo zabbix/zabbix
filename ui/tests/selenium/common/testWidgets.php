@@ -48,7 +48,7 @@ class testWidgets extends CWebTest {
 		$select_dialog = $widget_dialog;
 
 		// Item types expected in items table. For the most cases theses are all items except of Binary and dependent.
-		$item_types = (in_array($widget, ['Item navigator', 'Item history']))
+		$item_types = (in_array($widget, ['Item navigator', 'Item history', 'Honeycomb']))
 			? ['Binary item', 'Character item', 'Float item', 'Log item', 'Text item', 'Unsigned item', 'Unsigned_dependent item']
 			: ['Character item', 'Float item', 'Log item', 'Text item', 'Unsigned item', 'Unsigned_dependent item'];
 
@@ -82,17 +82,6 @@ class testWidgets extends CWebTest {
 
 			case 'Honeycomb':
 				$select_dialog = $widget_form->getFieldContainer('Item patterns');
-
-				// For Honeycomb widget all item types available.
-				$item_types = [
-					'Binary item',
-					'Character item',
-					'Float item',
-					'Log item',
-					'Text item',
-					'Unsigned item',
-					'Unsigned_dependent item'
-				];
 				break;
 		}
 
