@@ -1418,6 +1418,7 @@ static void	proxy_db_init(void)
 		if (NOTSUPPORTED == version_check)
 			goto out;
 
+		zbx_db_close();
 		zabbix_log(LOG_LEVEL_WARNING, "removing database file: \"%s\"", zbx_config_dbhigh->config_dbname);
 		zbx_db_deinit();
 
