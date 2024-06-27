@@ -269,7 +269,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 								'type' => 'honeycomb',
 								'x' => 0,
 								'y' => 0,
-								'width' => 8,
+								'width' => 9,
 								'height' => 2,
 								'view_mode' => 0,
 								'fields' => [
