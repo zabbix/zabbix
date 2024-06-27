@@ -25,8 +25,6 @@ require_once dirname(__FILE__).'/behaviors/CTableBehavior.php';
 /**
  * @backup history_uint, profiles
  *
- * @dataSource GlobalMacros
- *
  * @onBefore prepareItemTagsData
  */
 class testPageLatestData extends CWebTest {
