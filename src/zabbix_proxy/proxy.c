@@ -1432,7 +1432,6 @@ static void	proxy_db_init(void)
 		return;
 #else
 		ZBX_UNUSED(version_check);
-		ret = FAIL;
 		goto out;
 #endif
 	}
