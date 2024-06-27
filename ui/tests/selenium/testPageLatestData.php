@@ -25,6 +25,8 @@ require_once dirname(__FILE__).'/behaviors/CTableBehavior.php';
 /**
  * @backup history_uint, profiles
  *
+ * @dataSource GlobalMacros
+ *
  * @onBefore prepareItemTagsData
  */
 class testPageLatestData extends CWebTest {
@@ -591,34 +593,59 @@ class testPageLatestData extends CWebTest {
 	}
 
 	/**
-	 * Test for clicking on particular item tag in table and checking that items are filtered by this tag.
+	 * Test for clicking on particular item tag in table and checking that items are filtered by this tag using normal and kiosk mode.
 	 */
 	public function testPageLatestData_ClickTag() {
 		$tag = ['tag' => 'component: ', 'value' => 'storage'];
 
-		$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE name='.zbx_dbstr('ЗАББИКС Сервер'));
-		$this->page->login()->open('zabbix.php?action=latest.view&hostids%5B%5D='.$hostid)->waitUntilReady();
+		$this->page->login()->open('zabbix.php?action=latest.view')->waitUntilReady();
+		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
+		$table = $this->getTable()->waitUntilPresent();
 
-		$this->getTable()->query('button', $tag['tag'].$tag['value'])->waitUntilClickable()->one()->click();
-		$this->page->waitUntilReady();
+		foreach ([false, true] as $kiosk_mode) {
+			$form->fill(['Hosts' => 'ЗАББИКС Сервер']);
+			$form->submit();
+			$table->waitUntilReloaded();
 
-		// Check that page remained the same.
-		$this->page->assertTitle('Latest data');
-		$this->page->assertHeader('Latest data');
+			if ($kiosk_mode === true) {
+				$this->query('xpath://button[@title="Kiosk mode"]')->one()->click();
+				$this->page->waitUntilReady();
+				$this->assertTrue($this->query('xpath://button[@title="Normal view"]')->exists());
+			}
 
-		// Check that tag value is selected in subfilter under correct header.
-		$this->assertTrue($this->query("xpath://td/h3[text()='Tag values']/..//label[text()=".
-				CXPathHelper::escapeQuotes($tag['tag'])."]/../..//span[@class=".
-				CXPathHelper::fromClass('subfilter-enabled')."]/a[text()=".
-				CXPathHelper::escapeQuotes($tag['value'])."]")->exists()
-		);
+			$this->getTable()->query('button', $tag['tag'].$tag['value'])->waitUntilClickable()->one()->click();
+			$this->page->waitUntilReady();
 
-		$this->assertTableData([
+			if ($kiosk_mode === false) {
+				$this->page->assertTitle('Latest data');
+				$this->page->assertHeader('Latest data');
+			}
+
+			// Check that tag value is selected in subfilter under correct header.
+			$this->assertTrue($this->query("xpath://td/h3[text()='Tag values']/..//label[text()=".
+					CXPathHelper::escapeQuotes($tag['tag'])."]/../..//span[@class=".
+					CXPathHelper::fromClass('subfilter-enabled')."]/a[text()=".
+					CXPathHelper::escapeQuotes($tag['value'])."]")->exists()
+			);
+
+			$data = [
 				['Name' => 'Linux: Free swap space'],
 				['Name' => 'Linux: Free swap space in %'],
 				['Name' => 'Linux: Total swap space']
-			], $this->getTableSelector()
-		);
+			];
+			$this->assertTableData($data, $this->getTableSelector());
+
+			if ($kiosk_mode === false) {
+				$this->query('button:Reset')->one()->click();
+				$table->waitUntilReloaded();
+			}
+			else {
+				$this->query('xpath://button[@title="Normal view"]')->one()->click();
+				$this->page->waitUntilReady();
+				$this->assertTrue($this->query('xpath://button[@title="Kiosk mode"]')->exists());
+				$this->assertTableData($data, $this->getTableSelector());
+			}
+		}
 	}
 
 	/**
