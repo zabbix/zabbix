@@ -41,6 +41,7 @@ import (
 	"golang.zabbix.com/agent2/pkg/zbxlib"
 	_ "golang.zabbix.com/agent2/plugins"
 	"golang.zabbix.com/sdk/conf"
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/plugin/comms"
 	"golang.zabbix.com/sdk/zbxerr"
@@ -196,12 +197,18 @@ func main() { //nolint:funlen,gocognit,gocyclo
 	}
 
 	if args.runtimeCommand != "" {
-		if agent.Options.ControlSocket == "" {
-			log.Errf(
-				"Cannot send runtime command: ControlSocket configuration parameter is not defined",
+		if args.runtimeCommand == "help" {
+			fmt.Fprintf(
+				os.Stdout,
+				runtimeControlHelpMessageFormat,
+				runtimeCommandSendingTimeout.String(),
 			)
 
 			return
+		}
+
+		if agent.Options.ControlSocket == "" {
+			fatalExit("", errs.New("Cannot send remote command: ControlSocket configuration parameter is not defined"))
 		}
 
 		reply, err := runtimecontrol.SendCommand(
@@ -210,12 +217,10 @@ func main() { //nolint:funlen,gocognit,gocyclo
 			runtimeCommandSendingTimeout,
 		)
 		if err != nil {
-			log.Errf("Cannot send runtime command: %s", err)
-
-			return
+			fatalExit("Cannot send remote command", err)
 		}
 
-		log.Infof(reply)
+		fmt.Fprintf(os.Stderr, "%s\n", reply)
 
 		return
 	}
@@ -250,7 +255,12 @@ func main() { //nolint:funlen,gocognit,gocyclo
 		return
 	}
 
+	if args.verbose {
+		fatalExit("", errors.New("verbose parameter can be specified only with test or print parameters"))
+	}
+
 	var logType int
+
 	switch agent.Options.LogType {
 	case "system":
 		logType = log.System
