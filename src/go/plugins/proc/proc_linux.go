@@ -187,6 +187,7 @@ type procStatus struct {
 	CtxSwitches   int64   `json:"ctx_switches"`
 	Threads       int64   `json:"threads"`
 	PageFaults    int64   `json:"page_faults"`
+	Pss           int64   `json:"pss"`
 }
 
 type procSummary struct {
@@ -209,6 +210,7 @@ type procSummary struct {
 	CtxSwitches   int64   `json:"ctx_switches"`
 	Threads       int64   `json:"threads"`
 	PageFaults    int64   `json:"page_faults"`
+	Pss           int64   `json:"pss"`
 }
 
 type thread struct {
@@ -895,7 +897,7 @@ func (p *PluginExport) exportProcGet(params []string) (interface{}, error) {
 				proc.Name, 1, proc.Vsize, proc.Pmem, proc.Rss, proc.Data,
 				proc.Exe, proc.Lck, proc.Lib, proc.Pin, proc.Pte, proc.Size, proc.Stk,
 				proc.Swap, proc.CpuTimeUser, proc.CpuTimeSystem, proc.CtxSwitches, proc.Threads,
-				proc.PageFaults,
+				proc.PageFaults, proc.Pss,
 			}
 
 			if len(array) > i+1 {
@@ -921,6 +923,7 @@ func (p *PluginExport) exportProcGet(params []string) (interface{}, error) {
 					addNonNegativeFloat(&procSum.CpuTimeSystem, procCmp.CpuTimeSystem)
 					addNonNegative(&procSum.CtxSwitches, procCmp.CtxSwitches)
 					addNonNegative(&procSum.PageFaults, procCmp.PageFaults)
+					addNonNegative(&procSum.Pss, procCmp.Pss)
 				}
 			}
 			processed = append(processed, proc.Name)

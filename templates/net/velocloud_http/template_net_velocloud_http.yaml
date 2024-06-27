@@ -257,7 +257,6 @@ zabbix_export:
           type: DEPENDENT
           key: velocloud.get.edges.error
           delay: '0'
-          history: 7d
           trends: '0'
           value_type: TEXT
           description: 'Errors of aggregate script item.'
