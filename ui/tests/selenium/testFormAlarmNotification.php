@@ -339,8 +339,6 @@ class testFormAlarmNotification extends CWebTest {
 		if ($this->query('class:list-table')->asTable()->one()->getRows()->asText() !== ['No data found.']) {
 			$this->closeProblem();
 		}
-
-		$this->page->logout();
 	}
 
 	public static function getDisplayedAlarmsData() {
@@ -464,8 +462,6 @@ class testFormAlarmNotification extends CWebTest {
 		$alarm_dialog->query('xpath:.//button[@title="Close"]')->one()->click();
 		$alarm_dialog->ensureNotPresent();
 		$this->closeProblem();
-
-		$this->page->logout();
 	}
 
 	public static function getNotDisplayedAlarmsData(){
@@ -604,8 +600,6 @@ class testFormAlarmNotification extends CWebTest {
 		}
 
 		$this->closeProblem();
-
-		$this->page->logout();
 	}
 
 	/**
