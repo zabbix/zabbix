@@ -30,7 +30,6 @@ zabbix_export:
           name: 'Host name of Zabbix agent running'
           key: agent.hostname
           delay: 1h
-          trends: '0'
           value_type: CHAR
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -52,7 +51,6 @@ zabbix_export:
           name: 'Version of Zabbix agent running'
           key: agent.version
           delay: 1h
-          trends: '0'
           value_type: CHAR
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -152,8 +150,6 @@ zabbix_export:
           description: 'Number of interrupts processed.'
           preprocessing:
             - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           tags:
             - tag: component
               value: cpu
@@ -198,8 +194,6 @@ zabbix_export:
           description: 'The combined rate at which all processors on the computer are switched from one thread to another.'
           preprocessing:
             - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           tags:
             - tag: component
               value: cpu
@@ -252,7 +246,6 @@ zabbix_export:
           name: 'Host name'
           key: system.hostname
           delay: 1h
-          trends: '0'
           value_type: CHAR
           description: 'The host name of the system.'
           inventory_link: NAME
@@ -320,7 +313,6 @@ zabbix_export:
           name: 'System information'
           key: system.uname
           delay: 1h
-          trends: '0'
           value_type: CHAR
           description: 'Information as normally returned by `uname -a`.'
           inventory_link: OS
@@ -366,7 +358,6 @@ zabbix_export:
           name: 'Checksum of /etc/passwd'
           key: 'vfs.file.cksum[/etc/passwd,sha256]'
           delay: 15m
-          trends: '0'
           value_type: CHAR
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -387,7 +378,6 @@ zabbix_export:
           name: 'Get filesystems'
           key: vfs.fs.get
           history: '0'
-          trends: '0'
           value_type: TEXT
           description: 'The `vfs.fs.get` key acquires raw information set about the filesystems. Later to be extracted by preprocessing in dependent items.'
           tags:
@@ -450,7 +440,6 @@ zabbix_export:
             conditions:
               - macro: '{#IFNAME}'
                 value: '@Network interfaces for discovery'
-                formulaid: A
           description: 'Used for the discovery of network interfaces.'
           item_prototypes:
             - uuid: b1f9e472c6ed467d8cb0cc1739c39b59
@@ -459,8 +448,6 @@ zabbix_export:
               units: bps
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
                 - type: MULTIPLIER
                   parameters:
                     - '8'
@@ -475,8 +462,6 @@ zabbix_export:
               units: bps
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
                 - type: MULTIPLIER
                   parameters:
                     - '8'
@@ -505,31 +490,25 @@ zabbix_export:
           name: 'Mounted filesystem discovery'
           type: DEPENDENT
           key: vfs.fs.dependent.discovery
-          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#FSNAME}'
                 value: '{$VFS.FS.FSNAME.MATCHES}'
-                formulaid: A
               - macro: '{#FSNAME}'
                 value: '{$VFS.FS.FSNAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
               - macro: '{#FSTYPE}'
                 value: '{$VFS.FS.FSTYPE.MATCHES}'
-                formulaid: C
               - macro: '{#FSTYPE}'
                 value: '{$VFS.FS.FSTYPE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: D
           description: 'The discovery of mounted filesystems with different types.'
           item_prototypes:
             - uuid: a5cdfe771122483fa1a88b2ea5c26b36
               name: 'FS [{#FSNAME}]: Inodes: Free, in %'
               type: DEPENDENT
               key: 'vfs.fs.dependent.inode[{#FSNAME},pfree]'
-              delay: '0'
               value_type: FLOAT
               units: '%'
               description: 'Free metadata space expressed in %.'
@@ -578,7 +557,6 @@ zabbix_export:
               name: 'FS [{#FSNAME}]: Space: Available'
               type: DEPENDENT
               key: 'vfs.fs.dependent.size[{#FSNAME},free]'
-              delay: '0'
               units: B
               description: 'Available storage space expressed in bytes.'
               preprocessing:
@@ -598,7 +576,6 @@ zabbix_export:
               name: 'FS [{#FSNAME}]: Space: Available, in %'
               type: DEPENDENT
               key: 'vfs.fs.dependent.size[{#FSNAME},pfree]'
-              delay: '0'
               value_type: FLOAT
               units: '%'
               description: |
@@ -622,7 +599,6 @@ zabbix_export:
               name: 'FS [{#FSNAME}]: Space: Used, in %'
               type: DEPENDENT
               key: 'vfs.fs.dependent.size[{#FSNAME},pused]'
-              delay: '0'
               value_type: FLOAT
               units: '%'
               description: 'Calculated as the percentage of currently used space compared to the maximum available space.'
@@ -679,7 +655,6 @@ zabbix_export:
               name: 'FS [{#FSNAME}]: Space: Total'
               type: DEPENDENT
               key: 'vfs.fs.dependent.size[{#FSNAME},total]'
-              delay: '0'
               units: B
               description: 'Total space expressed in bytes.'
               preprocessing:
@@ -699,7 +674,6 @@ zabbix_export:
               name: 'FS [{#FSNAME}]: Space: Used'
               type: DEPENDENT
               key: 'vfs.fs.dependent.size[{#FSNAME},used]'
-              delay: '0'
               units: B
               description: 'Used storage expressed in bytes.'
               preprocessing:
@@ -719,9 +693,7 @@ zabbix_export:
               name: 'FS [{#FSNAME}]: Get data'
               type: DEPENDENT
               key: 'vfs.fs.dependent[{#FSNAME},data]'
-              delay: '0'
               history: 1h
-              trends: '0'
               value_type: TEXT
               description: 'Intermediate data of `{#FSNAME}` filesystem.'
               preprocessing:
@@ -743,7 +715,6 @@ zabbix_export:
               name: 'FS [{#FSNAME}]: Option: Read-only'
               type: DEPENDENT
               key: 'vfs.fs.dependent[{#FSNAME},readonly]'
-              delay: '0'
               description: 'The filesystem is mounted as read-only. It is available only for Zabbix agents 6.4 and higher.'
               preprocessing:
                 - type: JSONPATH
@@ -849,7 +820,6 @@ zabbix_export:
                 conditions:
                   - macro: '{#FSTYPE}'
                     value: ^(btrfs|zfs)$
-                    formulaid: A
               operations:
                 - operationobject: ITEM_PROTOTYPE
                   operator: LIKE

@@ -18,7 +18,6 @@ zabbix_export:
           name: 'Discovery queue'
           type: DEPENDENT
           key: discovery_queue
-          delay: '0'
           description: 'Count of values enqueued in the discovery queue.'
           preprocessing:
             - type: JSONPATH
@@ -35,7 +34,6 @@ zabbix_export:
           name: 'Preprocessing queue'
           type: DEPENDENT
           key: preprocessing_queue
-          delay: '0'
           description: 'Count of values enqueued in the preprocessing queue.'
           preprocessing:
             - type: JSONPATH
@@ -50,7 +48,6 @@ zabbix_export:
           name: 'Utilization of agent poller data collector processes, in %'
           type: DEPENDENT
           key: process.agent_poller.avg.busy
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'Average percentage of time agent poller processes have been busy in the last minute.'
@@ -80,7 +77,6 @@ zabbix_export:
           name: 'Utilization of availability manager internal processes, in %'
           type: DEPENDENT
           key: process.availability_manager.avg.busy
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'Average percentage of time availability manager processes have been busy in the last minute.'
@@ -110,7 +106,6 @@ zabbix_export:
           name: 'Utilization of configuration syncer internal processes, in %'
           type: DEPENDENT
           key: process.configuration_syncer.avg.busy
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'Average percentage of time configuration syncer processes have been busy in the last minute.'
@@ -140,7 +135,6 @@ zabbix_export:
           name: 'Utilization of data sender internal processes, in %'
           type: DEPENDENT
           key: process.data_sender.avg.busy
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'Average percentage of time data sender processes have been busy in the last minute.'
@@ -170,7 +164,6 @@ zabbix_export:
           name: 'Utilization of discovery manager internal processes, in %'
           type: DEPENDENT
           key: process.discovery_manager.avg.busy
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'Average percentage of time discovery manager processes have been busy in the last minute.'
@@ -200,7 +193,6 @@ zabbix_export:
           name: 'Utilization of discovery worker internal processes, in %'
           type: DEPENDENT
           key: process.discovery_worker.avg.busy
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'Average percentage of time discovery worker processes have been busy in the last minute.'
@@ -230,7 +222,6 @@ zabbix_export:
           name: 'Utilization of history poller data collector processes, in %'
           type: DEPENDENT
           key: process.history_poller.avg.busy
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'Average percentage of time history poller processes have been busy in the last minute.'
@@ -260,7 +251,6 @@ zabbix_export:
           name: 'Utilization of history syncer internal processes, in %'
           type: DEPENDENT
           key: process.history_syncer.avg.busy
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'Average percentage of time history syncer processes have been busy in the last minute.'
@@ -290,7 +280,6 @@ zabbix_export:
           name: 'Utilization of housekeeper internal processes, in %'
           type: DEPENDENT
           key: process.housekeeper.avg.busy
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'Average percentage of time housekeeper processes have been busy in the last minute.'
@@ -320,7 +309,6 @@ zabbix_export:
           name: 'Utilization of http agent poller data collector processes, in %'
           type: DEPENDENT
           key: process.http_agent_poller.avg.busy
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'Average percentage of time http agent poller processes have been busy in the last minute.'
@@ -350,7 +338,6 @@ zabbix_export:
           name: 'Utilization of http poller data collector processes, in %'
           type: DEPENDENT
           key: process.http_poller.avg.busy
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'Average percentage of time http poller processes have been busy in the last minute.'
@@ -380,7 +367,6 @@ zabbix_export:
           name: 'Utilization of icmp pinger data collector processes, in %'
           type: DEPENDENT
           key: process.icmp_pinger.avg.busy
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'Average percentage of time icmp pinger processes have been busy in the last minute.'
@@ -410,7 +396,6 @@ zabbix_export:
           name: 'Utilization of ipmi manager internal processes, in %'
           type: DEPENDENT
           key: process.ipmi_manager.avg.busy
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'Average percentage of time ipmi manager processes have been busy in the last minute.'
@@ -440,7 +425,6 @@ zabbix_export:
           name: 'Utilization of ipmi poller data collector processes, in %'
           type: DEPENDENT
           key: process.ipmi_poller.avg.busy
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'Average percentage of time ipmi poller processes have been busy in the last minute.'
@@ -470,7 +454,6 @@ zabbix_export:
           name: 'Utilization of java poller data collector processes, in %'
           type: DEPENDENT
           key: process.java_poller.avg.busy
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'Average percentage of time java poller processes have been busy in the last minute.'
@@ -500,7 +483,6 @@ zabbix_export:
           name: 'Utilization of ODBC poller data collector processes, in %'
           type: DEPENDENT
           key: process.odbc_poller.avg.busy
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'Average percentage of time ODBC poller processes have been busy in the last minute.'
@@ -528,7 +510,6 @@ zabbix_export:
           name: 'Utilization of poller data collector processes, in %'
           type: DEPENDENT
           key: process.poller.avg.busy
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'Average percentage of time poller processes have been busy in the last minute.'
@@ -558,7 +539,6 @@ zabbix_export:
           name: 'Utilization of preprocessing manager internal processes, in %'
           type: DEPENDENT
           key: process.preprocessing_manager.avg.busy
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'Average percentage of time preprocessing manager processes have been busy in the last minute.'
@@ -588,7 +568,6 @@ zabbix_export:
           name: 'Utilization of preprocessing worker internal processes, in %'
           type: DEPENDENT
           key: process.preprocessing_worker.avg.busy
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'Average percentage of time preprocessing worker processes have been busy in the last minute.'
@@ -618,7 +597,6 @@ zabbix_export:
           name: 'Utilization of self-monitoring internal processes, in %'
           type: DEPENDENT
           key: process.self-monitoring.avg.busy
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'Average percentage of time self-monitoring processes have been busy in the last minute.'
@@ -648,7 +626,6 @@ zabbix_export:
           name: 'Utilization of snmp poller data collector processes, in %'
           type: DEPENDENT
           key: process.snmp_poller.avg.busy
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'Average percentage of time snmp poller processes have been busy in the last minute.'
@@ -678,7 +655,6 @@ zabbix_export:
           name: 'Utilization of snmp trapper data collector processes, in %'
           type: DEPENDENT
           key: process.snmp_trapper.avg.busy
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'Average percentage of time snmp trapper processes have been busy in the last minute.'
@@ -708,7 +684,6 @@ zabbix_export:
           name: 'Utilization of task manager internal processes, in %'
           type: DEPENDENT
           key: process.task_manager.avg.busy
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'Average percentage of time task manager processes have been busy in the last minute.'
@@ -738,7 +713,6 @@ zabbix_export:
           name: 'Utilization of trapper data collector processes, in %'
           type: DEPENDENT
           key: process.trapper.avg.busy
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'Average percentage of time trapper processes have been busy in the last minute.'
@@ -768,7 +742,6 @@ zabbix_export:
           name: 'Utilization of unreachable poller data collector processes, in %'
           type: DEPENDENT
           key: process.unreachable_poller.avg.busy
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'Average percentage of time unreachable poller processes have been busy in the last minute.'
@@ -798,7 +771,6 @@ zabbix_export:
           name: 'Utilization of vmware data collector processes, in %'
           type: DEPENDENT
           key: process.vmware_collector.avg.busy
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'Average percentage of time vmware collector processes have been busy in the last minute.'
@@ -828,7 +800,6 @@ zabbix_export:
           name: 'Proxy memory buffer, % used'
           type: DEPENDENT
           key: proxy_buffer.buffer.pused
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: |
@@ -860,7 +831,6 @@ zabbix_export:
           name: 'Proxy buffer, state changes'
           type: DEPENDENT
           key: proxy_buffer.state.changes
-          delay: '0'
           description: 'The number of state changes between disk/memory buffer modes since proxy start.'
           preprocessing:
             - type: JSONPATH
@@ -880,7 +850,6 @@ zabbix_export:
           name: 'Proxy buffer, state'
           type: DEPENDENT
           key: proxy_buffer.state.current
-          delay: '0'
           description: |
             The current working state of proxy buffer where the new data is being stored. Possible values:
             
@@ -906,7 +875,6 @@ zabbix_export:
           name: 'Configuration cache, % used'
           type: DEPENDENT
           key: rcache.buffer.pused
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'Availability statistics of Zabbix configuration cache. Percentage of used buffer.'
@@ -943,7 +911,6 @@ zabbix_export:
           name: 'Required performance'
           type: DEPENDENT
           key: requiredperformance
-          delay: '0'
           value_type: FLOAT
           description: 'Required performance of Zabbix proxy, in new values per second expected.'
           preprocessing:
@@ -959,7 +926,6 @@ zabbix_export:
           name: Uptime
           type: DEPENDENT
           key: uptime
-          delay: '0'
           units: uptime
           description: 'Uptime of Zabbix proxy process in seconds.'
           preprocessing:
@@ -986,8 +952,6 @@ zabbix_export:
           name: Version
           type: DEPENDENT
           key: version
-          delay: '0'
-          trends: '0'
           value_type: CHAR
           description: 'Version of Zabbix proxy.'
           preprocessing:
@@ -1017,7 +981,6 @@ zabbix_export:
           name: 'VMware cache, % used'
           type: DEPENDENT
           key: vmware.buffer.pused
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'Availability statistics of Zabbix vmware cache. Percentage of used buffer.'
@@ -1047,7 +1010,6 @@ zabbix_export:
           name: 'History write cache, % used'
           type: DEPENDENT
           key: wcache.history.pused
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: |
@@ -1077,7 +1039,6 @@ zabbix_export:
           name: 'History index cache, % used'
           type: DEPENDENT
           key: wcache.index.pused
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: |
@@ -1107,7 +1068,6 @@ zabbix_export:
           name: 'Number of processed values per second'
           type: DEPENDENT
           key: wcache.values
-          delay: '0'
           value_type: FLOAT
           description: |
             Statistics and availability of Zabbix write cache.
@@ -1117,8 +1077,6 @@ zabbix_export:
               parameters:
                 - $.data.wcache.values.all
             - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           master_item:
             key: 'zabbix[stats,{$ZABBIX.PROXY.ADDRESS},{$ZABBIX.PROXY.PORT}]'
           tags:
@@ -1128,7 +1086,6 @@ zabbix_export:
           name: 'Number of processed numeric (float) values per second'
           type: DEPENDENT
           key: wcache.values.float
-          delay: '0'
           value_type: FLOAT
           description: |
             Statistics and availability of Zabbix write cache.
@@ -1138,8 +1095,6 @@ zabbix_export:
               parameters:
                 - $.data.wcache.values.float
             - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           master_item:
             key: 'zabbix[stats,{$ZABBIX.PROXY.ADDRESS},{$ZABBIX.PROXY.PORT}]'
           tags:
@@ -1149,7 +1104,6 @@ zabbix_export:
           name: 'Number of processed log values per second'
           type: DEPENDENT
           key: wcache.values.log
-          delay: '0'
           value_type: FLOAT
           description: |
             Statistics and availability of Zabbix write cache.
@@ -1159,8 +1113,6 @@ zabbix_export:
               parameters:
                 - $.data.wcache.values.log
             - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           master_item:
             key: 'zabbix[stats,{$ZABBIX.PROXY.ADDRESS},{$ZABBIX.PROXY.PORT}]'
           tags:
@@ -1170,7 +1122,6 @@ zabbix_export:
           name: 'Number of processed not supported values per second'
           type: DEPENDENT
           key: wcache.values.not_supported
-          delay: '0'
           value_type: FLOAT
           description: |
             Statistics and availability of Zabbix write cache.
@@ -1180,8 +1131,6 @@ zabbix_export:
               parameters:
                 - '$.data.wcache.values[''not supported'']'
             - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           master_item:
             key: 'zabbix[stats,{$ZABBIX.PROXY.ADDRESS},{$ZABBIX.PROXY.PORT}]'
           tags:
@@ -1191,7 +1140,6 @@ zabbix_export:
           name: 'Number of processed character values per second'
           type: DEPENDENT
           key: wcache.values.str
-          delay: '0'
           value_type: FLOAT
           description: |
             Statistics and availability of Zabbix write cache.
@@ -1201,8 +1149,6 @@ zabbix_export:
               parameters:
                 - $.data.wcache.values.str
             - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           master_item:
             key: 'zabbix[stats,{$ZABBIX.PROXY.ADDRESS},{$ZABBIX.PROXY.PORT}]'
           tags:
@@ -1212,7 +1158,6 @@ zabbix_export:
           name: 'Number of processed text values per second'
           type: DEPENDENT
           key: wcache.values.text
-          delay: '0'
           value_type: FLOAT
           description: |
             Statistics and availability of Zabbix write cache.
@@ -1222,8 +1167,6 @@ zabbix_export:
               parameters:
                 - $.data.wcache.values.text
             - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           master_item:
             key: 'zabbix[stats,{$ZABBIX.PROXY.ADDRESS},{$ZABBIX.PROXY.PORT}]'
           tags:
@@ -1233,7 +1176,6 @@ zabbix_export:
           name: 'Number of processed numeric (unsigned) values per second'
           type: DEPENDENT
           key: wcache.values.uint
-          delay: '0'
           value_type: FLOAT
           description: |
             Statistics and availability of Zabbix write cache.
@@ -1243,8 +1185,6 @@ zabbix_export:
               parameters:
                 - $.data.wcache.values.uint
             - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           master_item:
             key: 'zabbix[stats,{$ZABBIX.PROXY.ADDRESS},{$ZABBIX.PROXY.PORT}]'
           tags:
@@ -1288,7 +1228,6 @@ zabbix_export:
           type: INTERNAL
           key: 'zabbix[stats,{$ZABBIX.PROXY.ADDRESS},{$ZABBIX.PROXY.PORT}]'
           history: '0'
-          trends: '0'
           value_type: TEXT
           description: 'Zabbix server statistics master item.'
           tags:
