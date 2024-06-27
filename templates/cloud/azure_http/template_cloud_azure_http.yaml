@@ -37,8 +37,6 @@ zabbix_export:
           name: 'Get errors'
           type: DEPENDENT
           key: azure.get.errors
-          delay: '0'
-          trends: '0'
           value_type: TEXT
           description: 'A list of errors from API requests.'
           preprocessing:
@@ -69,7 +67,6 @@ zabbix_export:
           key: azure.get.resources
           delay: 10m
           history: '0'
-          trends: '0'
           value_type: TEXT
           params: |
             var Azure = {
@@ -252,7 +249,6 @@ zabbix_export:
           key: azure.get.storage.acc
           delay: 10m
           history: '0'
-          trends: '0'
           value_type: TEXT
           params: |
             var Azure = {
@@ -390,8 +386,6 @@ zabbix_export:
           name: 'Get storage accounts errors'
           type: DEPENDENT
           key: azure.get.storage.acc.errors
-          delay: '0'
-          trends: '0'
           value_type: TEXT
           description: 'The errors from API requests.'
           preprocessing:
@@ -425,34 +419,26 @@ zabbix_export:
           name: 'Cosmos DB account discovery'
           type: DEPENDENT
           key: azure.cosmos.mongo.db.discovery
-          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#GROUP}'
                 value: '{$AZURE.RESOURCE.GROUP.MATCHES}'
-                formulaid: A
               - macro: '{#GROUP}'
                 value: '{$AZURE.RESOURCE.GROUP.NOT.MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
               - macro: '{#LOCATION}'
                 value: '{$AZURE.COSMOS.MONGO.DB.LOCATION.MATCHES}'
-                formulaid: C
               - macro: '{#LOCATION}'
                 value: '{$AZURE.COSMOS.MONGO.DB.LOCATION.NOT.MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: D
               - macro: '{#NAME}'
                 value: '{$AZURE.COSMOS.MONGO.DB.NAME.MATCHES}'
-                formulaid: E
               - macro: '{#NAME}'
                 value: '{$AZURE.COSMOS.MONGO.DB.NAME.NOT.MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: F
               - macro: '{#TYPE}'
                 value: ^Microsoft.DocumentDB/databaseAccounts
-                formulaid: G
           description: 'The list of the Cosmos databases is provided by the subscription.'
           host_prototypes:
             - uuid: 16eec30e921e4627b3599b4d06e48072
@@ -500,7 +486,6 @@ zabbix_export:
                 conditions:
                   - macro: '{#VERSION}'
                     value: ^MongoDB$
-                    formulaid: A
               operations:
                 - operationobject: HOST_PROTOTYPE
                   operator: REGEXP
@@ -510,38 +495,29 @@ zabbix_export:
           name: 'Microsoft SQL databases discovery'
           type: DEPENDENT
           key: azure.mssql.databases.discovery
-          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#GROUP}'
                 value: '{$AZURE.RESOURCE.GROUP.MATCHES}'
-                formulaid: A
               - macro: '{#GROUP}'
                 value: '{$AZURE.RESOURCE.GROUP.NOT.MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
               - macro: '{#LOCATION}'
                 value: '{$AZURE.MSSQL.DB.LOCATION.MATCHES}'
-                formulaid: C
               - macro: '{#LOCATION}'
                 value: '{$AZURE.MSSQL.DB.LOCATION.NOT.MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: D
               - macro: '{#NAME}'
                 value: '{$AZURE.MSSQL.DB.NAME.MATCHES}'
-                formulaid: E
               - macro: '{#NAME}'
                 value: '{$AZURE.MSSQL.DB.NAME.NOT.MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: F
               - macro: '{#SIZE}'
                 value: '{$AZURE.MSSQL.DB.SIZE.NOT.MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: G
               - macro: '{#TYPE}'
                 value: ^Microsoft.Sql/servers/databases
-                formulaid: H
           description: 'The list of the Microsoft SQL databases is provided by the subscription.'
           host_prototypes:
             - uuid: 2aaf7dc7e9f04ccf9dd91fcd803fa076
@@ -593,7 +569,6 @@ zabbix_export:
                 conditions:
                   - macro: '{#VERSION}'
                     value: '^.*serverless$'
-                    formulaid: A
               operations:
                 - operationobject: HOST_PROTOTYPE
                   operator: REGEXP
@@ -605,7 +580,6 @@ zabbix_export:
                 conditions:
                   - macro: '{#VERSION}'
                     value: '^((?!serverless).)*$'
-                    formulaid: A
               operations:
                 - operationobject: HOST_PROTOTYPE
                   operator: REGEXP
@@ -615,34 +589,26 @@ zabbix_export:
           name: 'MySQL servers discovery'
           type: DEPENDENT
           key: azure.mysql.servers.discovery
-          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#GROUP}'
                 value: '{$AZURE.RESOURCE.GROUP.MATCHES}'
-                formulaid: A
               - macro: '{#GROUP}'
                 value: '{$AZURE.RESOURCE.GROUP.NOT.MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
               - macro: '{#LOCATION}'
                 value: '{$AZURE.MYSQL.DB.LOCATION.MATCHES}'
-                formulaid: C
               - macro: '{#LOCATION}'
                 value: '{$AZURE.MYSQL.DB.LOCATION.NOT.MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: D
               - macro: '{#NAME}'
                 value: '{$AZURE.MYSQL.DB.NAME.MATCHES}'
-                formulaid: E
               - macro: '{#NAME}'
                 value: '{$AZURE.MYSQL.DB.NAME.NOT.MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: F
               - macro: '{#TYPE}'
                 value: ^Microsoft.DBforMySQL
-                formulaid: G
           description: 'The list of the MySQL servers is provided by the subscription.'
           host_prototypes:
             - uuid: 55b87078c14c4561b53e64af5ed77d61
@@ -694,7 +660,6 @@ zabbix_export:
                 conditions:
                   - macro: '{#TYPE}'
                     value: Microsoft.DBforMySQL/flexibleServers
-                    formulaid: A
               operations:
                 - operationobject: HOST_PROTOTYPE
                   operator: REGEXP
@@ -706,7 +671,6 @@ zabbix_export:
                 conditions:
                   - macro: '{#TYPE}'
                     value: Microsoft.DBforMySQL/servers
-                    formulaid: A
               operations:
                 - operationobject: HOST_PROTOTYPE
                   operator: REGEXP
@@ -716,34 +680,26 @@ zabbix_export:
           name: 'PostgreSQL servers discovery'
           type: DEPENDENT
           key: azure.pgsql.servers.discovery
-          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#GROUP}'
                 value: '{$AZURE.RESOURCE.GROUP.MATCHES}'
-                formulaid: A
               - macro: '{#GROUP}'
                 value: '{$AZURE.RESOURCE.GROUP.NOT.MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
               - macro: '{#LOCATION}'
                 value: '{$AZURE.PGSQL.DB.LOCATION.MATCHES}'
-                formulaid: C
               - macro: '{#LOCATION}'
                 value: '{$AZURE.PGSQL.DB.LOCATION.NOT.MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: D
               - macro: '{#NAME}'
                 value: '{$AZURE.PGSQL.DB.NAME.MATCHES}'
-                formulaid: E
               - macro: '{#NAME}'
                 value: '{$AZURE.PGSQL.DB.NAME.NOT.MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: F
               - macro: '{#TYPE}'
                 value: ^Microsoft.DBforPostgreSQL
-                formulaid: G
           description: 'The list of the PostgreSQL servers is provided by the subscription.'
           host_prototypes:
             - uuid: 54f0e0ec288f4feb9a2dc58a8726bd1d
@@ -795,7 +751,6 @@ zabbix_export:
                 conditions:
                   - macro: '{#TYPE}'
                     value: Microsoft.DBforPostgreSQL/flexibleServers
-                    formulaid: A
               operations:
                 - operationobject: HOST_PROTOTYPE
                   operator: REGEXP
@@ -807,7 +762,6 @@ zabbix_export:
                 conditions:
                   - macro: '{#TYPE}'
                     value: Microsoft.DBforPostgreSQL/servers
-                    formulaid: A
               operations:
                 - operationobject: HOST_PROTOTYPE
                   operator: REGEXP
@@ -817,34 +771,26 @@ zabbix_export:
           name: 'Virtual machine scale set discovery'
           type: DEPENDENT
           key: azure.scaleset.discovery
-          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#GROUP}'
                 value: '{$AZURE.RESOURCE.GROUP.MATCHES}'
-                formulaid: A
               - macro: '{#GROUP}'
                 value: '{$AZURE.RESOURCE.GROUP.NOT.MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
               - macro: '{#LOCATION}'
                 value: '{$AZURE.SCALESET.LOCATION.MATCHES}'
-                formulaid: C
               - macro: '{#LOCATION}'
                 value: '{$AZURE.SCALESET.LOCATION.NOT.MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: D
               - macro: '{#NAME}'
                 value: '{$AZURE.SCALESET.NAME.MATCHES}'
-                formulaid: E
               - macro: '{#NAME}'
                 value: '{$AZURE.SCALESET.NAME.NOT.MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: F
               - macro: '{#TYPE}'
                 value: ^Microsoft.Compute/virtualMachineScaleSets$
-                formulaid: G
           description: 'The list of the virtual machine scale sets provided by the subscription.'
           host_prototypes:
             - uuid: 1cbeb513fe3648b6829836800952c9c7
@@ -895,31 +841,24 @@ zabbix_export:
           name: 'Storage accounts discovery'
           type: DEPENDENT
           key: azure.storage.acc.discovery
-          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#GROUP}'
                 value: '{$AZURE.RESOURCE.GROUP.MATCHES}'
-                formulaid: A
               - macro: '{#GROUP}'
                 value: '{$AZURE.RESOURCE.GROUP.NOT.MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
               - macro: '{#LOCATION}'
                 value: '{$AZURE.STORAGE.ACC.LOCATION.MATCHES}'
-                formulaid: C
               - macro: '{#LOCATION}'
                 value: '{$AZURE.STORAGE.ACC.LOCATION.NOT.MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: D
               - macro: '{#NAME}'
                 value: '{$AZURE.STORAGE.ACC.NAME.MATCHES}'
-                formulaid: E
               - macro: '{#NAME}'
                 value: '{$AZURE.STORAGE.ACC.NAME.NOT.MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: F
           description: 'The list of all storage accounts available under the subscription.'
           item_prototypes:
             - uuid: 3361508a601748f5aca339f952430889
@@ -927,7 +866,6 @@ zabbix_export:
               type: SCRIPT
               key: 'azure.get.storage.acc[{#NAME}]'
               history: '0'
-              trends: '0'
               value_type: TEXT
               params: |
                 var AzureStorage = {
@@ -1039,7 +977,6 @@ zabbix_export:
               name: 'Storage account [{#NAME}]: Availability'
               type: DEPENDENT
               key: 'azure.storage.availability[{#NAME}]'
-              delay: '0'
               value_type: FLOAT
               units: '%'
               description: |
@@ -1077,7 +1014,6 @@ zabbix_export:
               name: 'Storage account [{#NAME}]: Blob Availability'
               type: DEPENDENT
               key: 'azure.storage.blob.availability[{#NAME}]'
-              delay: '0'
               value_type: FLOAT
               units: '%'
               description: |
@@ -1115,7 +1051,6 @@ zabbix_export:
               name: 'Storage account [{#NAME}]: Blob Capacity'
               type: DEPENDENT
               key: 'azure.storage.blob.capacity[{#NAME}]'
-              delay: '0'
               value_type: FLOAT
               units: B
               description: 'The amount of storage used by the blob service of the storage account with the name `[{#NAME}]`, expressed in bytes.'
@@ -1140,7 +1075,6 @@ zabbix_export:
               name: 'Storage account [{#NAME}]: Blob Container Count'
               type: DEPENDENT
               key: 'azure.storage.blob.container.count[{#NAME}]'
-              delay: '0'
               description: 'The number of containers in the storage account with the name `[{#NAME}]`.'
               preprocessing:
                 - type: JSONPATH
@@ -1163,7 +1097,6 @@ zabbix_export:
               name: 'Storage account [{#NAME}]: Blob Count'
               type: DEPENDENT
               key: 'azure.storage.blob.count[{#NAME}]'
-              delay: '0'
               description: 'The number of blob objects stored in the storage account with the name `[{#NAME}]`.'
               preprocessing:
                 - type: JSONPATH
@@ -1186,7 +1119,6 @@ zabbix_export:
               name: 'Storage account [{#NAME}]: Blob Egress'
               type: DEPENDENT
               key: 'azure.storage.blob.engress[{#NAME}]'
-              delay: '0'
               value_type: FLOAT
               units: B
               description: |
@@ -1213,7 +1145,6 @@ zabbix_export:
               name: 'Storage account [{#NAME}]: Blob Index Capacity'
               type: DEPENDENT
               key: 'azure.storage.blob.index.capacity[{#NAME}]'
-              delay: '0'
               value_type: FLOAT
               units: B
               description: 'The amount of storage with the name `[{#NAME}]` used by the Azure Data Lake Storage Gen2 hierarchical index.'
@@ -1238,7 +1169,6 @@ zabbix_export:
               name: 'Storage account [{#NAME}]: Blob Ingress'
               type: DEPENDENT
               key: 'azure.storage.blob.ingress[{#NAME}]'
-              delay: '0'
               value_type: FLOAT
               units: B
               description: 'The amount of ingress data, expressed in bytes. This number includes ingress from an external client into Azure Storage and also ingress within Azure.'
@@ -1263,7 +1193,6 @@ zabbix_export:
               name: 'Storage account [{#NAME}]: Blob Success E2E Latency'
               type: DEPENDENT
               key: 'azure.storage.blob.success.e2e.latency[{#NAME}]'
-              delay: '0'
               value_type: FLOAT
               units: s
               description: |
@@ -1293,7 +1222,6 @@ zabbix_export:
               name: 'Storage account [{#NAME}]: Blob Success Server Latency'
               type: DEPENDENT
               key: 'azure.storage.blob.success.server.latency[{#NAME}]'
-              delay: '0'
               value_type: FLOAT
               units: s
               description: |
@@ -1323,7 +1251,6 @@ zabbix_export:
               name: 'Storage account [{#NAME}]: Blob Transactions'
               type: DEPENDENT
               key: 'azure.storage.blob.transactions[{#NAME}]'
-              delay: '0'
               description: |
                 The number of requests made to the storage service or a specified API operation.
                 This number includes successful and failed requests and also requests that produced errors.
@@ -1349,7 +1276,6 @@ zabbix_export:
               name: 'Storage account [{#NAME}]: Egress'
               type: DEPENDENT
               key: 'azure.storage.engress[{#NAME}]'
-              delay: '0'
               value_type: FLOAT
               units: B
               description: |
@@ -1376,7 +1302,6 @@ zabbix_export:
               name: 'Storage account [{#NAME}]: File Capacity'
               type: DEPENDENT
               key: 'azure.storage.file.capacity[{#NAME}]'
-              delay: '0'
               value_type: FLOAT
               units: B
               description: 'The amount of file storage used by the storage account with the name `[{#NAME}]`, expressed in bytes.'
@@ -1401,7 +1326,6 @@ zabbix_export:
               name: 'Storage account [{#NAME}]: File Count'
               type: DEPENDENT
               key: 'azure.storage.file.count[{#NAME}]'
-              delay: '0'
               description: 'The number of files in the storage account with the name `[{#NAME}]`.'
               preprocessing:
                 - type: JSONPATH
@@ -1424,7 +1348,6 @@ zabbix_export:
               name: 'Storage account [{#NAME}]: File Egress'
               type: DEPENDENT
               key: 'azure.storage.file.engress[{#NAME}]'
-              delay: '0'
               value_type: FLOAT
               units: B
               description: |
@@ -1451,7 +1374,6 @@ zabbix_export:
               name: 'Storage account [{#NAME}]: File Ingress'
               type: DEPENDENT
               key: 'azure.storage.file.ingress[{#NAME}]'
-              delay: '0'
               value_type: FLOAT
               units: B
               description: 'The amount of ingress data, expressed in bytes. This number includes ingress from an external client into Azure Storage and also ingress within Azure.'
@@ -1476,7 +1398,6 @@ zabbix_export:
               name: 'Storage account [{#NAME}]: File Share Capacity Quota'
               type: DEPENDENT
               key: 'azure.storage.file.share.capacity.quota[{#NAME}]'
-              delay: '0'
               units: B
               description: 'The upper limit on the amount of storage that can be used by Azure Files Service, in bytes.'
               preprocessing:
@@ -1500,7 +1421,6 @@ zabbix_export:
               name: 'Storage account [{#NAME}]: File Share Count'
               type: DEPENDENT
               key: 'azure.storage.file.share.count[{#NAME}]'
-              delay: '0'
               description: 'The number of file shares in the storage account.'
               preprocessing:
                 - type: JSONPATH
@@ -1523,7 +1443,6 @@ zabbix_export:
               name: 'Storage account [{#NAME}]: File Share Snapshot Size'
               type: DEPENDENT
               key: 'azure.storage.file.share.snapshot.size[{#NAME}]'
-              delay: '0'
               units: B
               description: 'The amount of storage used by the snapshots in storage account''s File service, in bytes.'
               preprocessing:
@@ -1547,7 +1466,6 @@ zabbix_export:
               name: 'Storage account [{#NAME}]: File Share Snapshot Count'
               type: DEPENDENT
               key: 'azure.storage.file.shares.snapshot.count[{#NAME}]'
-              delay: '0'
               description: 'The number of snapshots present on the share in storage account''s Files Service.'
               preprocessing:
                 - type: JSONPATH
@@ -1570,7 +1488,6 @@ zabbix_export:
               name: 'Storage account [{#NAME}]: File Success E2E Latency'
               type: DEPENDENT
               key: 'azure.storage.file.success.e2e.latency[{#NAME}]'
-              delay: '0'
               value_type: FLOAT
               units: s
               description: |
@@ -1600,7 +1517,6 @@ zabbix_export:
               name: 'Storage account [{#NAME}]: File Success Server Latency'
               type: DEPENDENT
               key: 'azure.storage.file.success.server.latency[{#NAME}]'
-              delay: '0'
               value_type: FLOAT
               units: s
               description: |
@@ -1630,7 +1546,6 @@ zabbix_export:
               name: 'Storage account [{#NAME}]: File Transactions'
               type: DEPENDENT
               key: 'azure.storage.file.transactions[{#NAME}]'
-              delay: '0'
               description: |
                 The number of requests made to the storage service or a specified API operation.
                 This number includes successful and failed requests and also requests that produced errors.
@@ -1656,7 +1571,6 @@ zabbix_export:
               name: 'Storage account [{#NAME}]: Ingress'
               type: DEPENDENT
               key: 'azure.storage.ingress[{#NAME}]'
-              delay: '0'
               value_type: FLOAT
               units: B
               description: 'The amount of ingress data, expressed in bytes. This number includes ingress from an external client into Azure Storage and also ingress within Azure.'
@@ -1681,7 +1595,6 @@ zabbix_export:
               name: 'Storage account [{#NAME}]: Queue Capacity'
               type: DEPENDENT
               key: 'azure.storage.queue.capacity[{#NAME}]'
-              delay: '0'
               value_type: FLOAT
               units: B
               description: 'The amount of queue storage used by the storage account with the name `[{#NAME}]`, expressed in bytes.'
@@ -1706,7 +1619,6 @@ zabbix_export:
               name: 'Storage account [{#NAME}]: Queue Count'
               type: DEPENDENT
               key: 'azure.storage.queue.count[{#NAME}]'
-              delay: '0'
               description: 'The number of queues in the storage account with the name `[{#NAME}]`.'
               preprocessing:
                 - type: JSONPATH
@@ -1729,7 +1641,6 @@ zabbix_export:
               name: 'Storage account [{#NAME}]: Queue Egress'
               type: DEPENDENT
               key: 'azure.storage.queue.engress[{#NAME}]'
-              delay: '0'
               value_type: FLOAT
               units: B
               description: |
@@ -1756,7 +1667,6 @@ zabbix_export:
               name: 'Storage account [{#NAME}]: Queue Ingress'
               type: DEPENDENT
               key: 'azure.storage.queue.ingress[{#NAME}]'
-              delay: '0'
               value_type: FLOAT
               units: B
               description: 'The amount of ingress data, expressed in bytes. This number includes ingress from an external client into Azure Storage and also ingress within Azure.'
@@ -1781,7 +1691,6 @@ zabbix_export:
               name: 'Storage account [{#NAME}]: Queue Message Count'
               type: DEPENDENT
               key: 'azure.storage.queue.message.count[{#NAME}]'
-              delay: '0'
               description: 'The number of unexpired queue messages in the storage account with the name `[{#NAME}]`.'
               preprocessing:
                 - type: JSONPATH
@@ -1804,7 +1713,6 @@ zabbix_export:
               name: 'Storage account [{#NAME}]: Queue Success E2E Latency'
               type: DEPENDENT
               key: 'azure.storage.queue.success.e2e.latency[{#NAME}]'
-              delay: '0'
               value_type: FLOAT
               units: s
               description: |
@@ -1834,7 +1742,6 @@ zabbix_export:
               name: 'Storage account [{#NAME}]: Queue Success Server Latency'
               type: DEPENDENT
               key: 'azure.storage.queue.success.server.latency[{#NAME}]'
-              delay: '0'
               value_type: FLOAT
               units: s
               description: |
@@ -1864,7 +1771,6 @@ zabbix_export:
               name: 'Storage account [{#NAME}]: Queue Transactions'
               type: DEPENDENT
               key: 'azure.storage.queue.transactions[{#NAME}]'
-              delay: '0'
               description: |
                 The number of requests made to the storage service or a specified API operation.
                 This number includes successful and failed requests and also requests that produced errors.
@@ -1890,7 +1796,6 @@ zabbix_export:
               name: 'Storage account [{#NAME}]: Success E2E Latency'
               type: DEPENDENT
               key: 'azure.storage.success.e2e.latency[{#NAME}]'
-              delay: '0'
               value_type: FLOAT
               units: s
               description: |
@@ -1920,7 +1825,6 @@ zabbix_export:
               name: 'Storage account [{#NAME}]: Success Server Latency'
               type: DEPENDENT
               key: 'azure.storage.success.server.latency[{#NAME}]'
-              delay: '0'
               value_type: FLOAT
               units: s
               description: |
@@ -1950,7 +1854,6 @@ zabbix_export:
               name: 'Storage account [{#NAME}]: Table Availability'
               type: DEPENDENT
               key: 'azure.storage.table.availability[{#NAME}]'
-              delay: '0'
               value_type: FLOAT
               units: '%'
               description: |
@@ -1988,7 +1891,6 @@ zabbix_export:
               name: 'Storage account [{#NAME}]: Table Capacity'
               type: DEPENDENT
               key: 'azure.storage.table.capacity[{#NAME}]'
-              delay: '0'
               value_type: FLOAT
               units: B
               description: 'The amount of storage used by the table service of the storage account with the name `[{#NAME}]`, expressed in bytes.'
@@ -2013,7 +1915,6 @@ zabbix_export:
               name: 'Storage account [{#NAME}]: Table Count'
               type: DEPENDENT
               key: 'azure.storage.table.count[{#NAME}]'
-              delay: '0'
               description: 'The number of tables in the storage account with the name `[{#NAME}]`.'
               preprocessing:
                 - type: JSONPATH
@@ -2036,7 +1937,6 @@ zabbix_export:
               name: 'Storage account [{#NAME}]: Table Egress'
               type: DEPENDENT
               key: 'azure.storage.table.engress[{#NAME}]'
-              delay: '0'
               value_type: FLOAT
               units: B
               description: |
@@ -2063,7 +1963,6 @@ zabbix_export:
               name: 'Storage account [{#NAME}]: Table Entity Count'
               type: DEPENDENT
               key: 'azure.storage.table.entity.count[{#NAME}]'
-              delay: '0'
               description: 'The number of table entities in the storage account with the name `[{#NAME}]`.'
               preprocessing:
                 - type: JSONPATH
@@ -2086,7 +1985,6 @@ zabbix_export:
               name: 'Storage account [{#NAME}]: Table Ingress'
               type: DEPENDENT
               key: 'azure.storage.table.ingress[{#NAME}]'
-              delay: '0'
               value_type: FLOAT
               units: B
               description: 'The amount of ingress data, expressed in bytes. This number includes ingress from an external client into Azure Storage and also ingress within Azure.'
@@ -2111,7 +2009,6 @@ zabbix_export:
               name: 'Storage account [{#NAME}]: Table Success E2E Latency'
               type: DEPENDENT
               key: 'azure.storage.table.success.e2e.latency[{#NAME}]'
-              delay: '0'
               value_type: FLOAT
               units: s
               description: |
@@ -2141,7 +2038,6 @@ zabbix_export:
               name: 'Storage account [{#NAME}]: Table Success Server Latency'
               type: DEPENDENT
               key: 'azure.storage.table.success.server.latency[{#NAME}]'
-              delay: '0'
               value_type: FLOAT
               units: s
               description: |
@@ -2171,7 +2067,6 @@ zabbix_export:
               name: 'Storage account [{#NAME}]: Table Transactions'
               type: DEPENDENT
               key: 'azure.storage.table.transactions[{#NAME}]'
-              delay: '0'
               description: |
                 The number of requests made to the storage service or a specified API operation.
                 This number includes successful and failed requests and also requests that produced errors.
@@ -2197,7 +2092,6 @@ zabbix_export:
               name: 'Storage account [{#NAME}]: Transactions'
               type: DEPENDENT
               key: 'azure.storage.transactions[{#NAME}]'
-              delay: '0'
               description: |
                 The number of requests made to the storage service or a specified API operation.
                 This number includes successful and failed requests and also requests that produced errors.
@@ -2223,7 +2117,6 @@ zabbix_export:
               name: 'Storage account [{#NAME}]: Used Capacity'
               type: DEPENDENT
               key: 'azure.storage.used.capacity[{#NAME}]'
-              delay: '0'
               value_type: FLOAT
               units: B
               description: |
@@ -2377,37 +2270,28 @@ zabbix_export:
           name: 'Virtual machines discovery'
           type: DEPENDENT
           key: azure.vm.discovery
-          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#GROUP}'
                 value: '{$AZURE.RESOURCE.GROUP.MATCHES}'
-                formulaid: A
               - macro: '{#GROUP}'
                 value: '{$AZURE.RESOURCE.GROUP.NOT.MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
               - macro: '{#LOCATION}'
                 value: '{$AZURE.VM.LOCATION.MATCHES}'
-                formulaid: C
               - macro: '{#LOCATION}'
                 value: '{$AZURE.VM.LOCATION.NOT.MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: D
               - macro: '{#NAME}'
                 value: '{$AZURE.VM.NAME.MATCHES}'
-                formulaid: E
               - macro: '{#NAME}'
                 value: '{$AZURE.VM.NAME.NOT.MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: F
               - macro: '{#SCALESET}'
                 operator: NOT_EXISTS
-                formulaid: G
               - macro: '{#TYPE}'
                 value: ^Microsoft.Compute/virtualMachines$
-                formulaid: H
           description: 'The list of the virtual machines is provided by the subscription.'
           host_prototypes:
             - uuid: d08c0ee33c924b28bf1fed571da6c7f4
@@ -2660,7 +2544,6 @@ zabbix_export:
           name: 'Autoscale max throughput'
           type: DEPENDENT
           key: azure.cosmosdb.autoscale.max.throughput
-          delay: '0'
           description: 'The autoscale max throughput.'
           preprocessing:
             - type: JSONPATH
@@ -2676,8 +2559,6 @@ zabbix_export:
           name: 'Get errors'
           type: DEPENDENT
           key: azure.cosmosdb.data.errors
-          delay: '0'
-          trends: '0'
           value_type: TEXT
           description: 'A list of errors from API requests.'
           preprocessing:
@@ -2708,7 +2589,6 @@ zabbix_export:
           type: SCRIPT
           key: azure.cosmosdb.data.get
           history: '0'
-          trends: '0'
           value_type: TEXT
           params: |
             var AzureCosmosDB = {
@@ -2855,7 +2735,6 @@ zabbix_export:
           name: 'Data usage'
           type: DEPENDENT
           key: azure.cosmosdb.data.usage
-          delay: '0'
           units: B
           description: 'The total data usage.'
           preprocessing:
@@ -2872,7 +2751,6 @@ zabbix_export:
           name: 'Document count'
           type: DEPENDENT
           key: azure.cosmosdb.document.count
-          delay: '0'
           description: 'The total document count.'
           preprocessing:
             - type: JSONPATH
@@ -2888,7 +2766,6 @@ zabbix_export:
           name: 'Document quota'
           type: DEPENDENT
           key: azure.cosmosdb.document.quota
-          delay: '0'
           units: B
           description: 'The total storage quota.'
           preprocessing:
@@ -2905,7 +2782,6 @@ zabbix_export:
           name: 'Index usage'
           type: DEPENDENT
           key: azure.cosmosdb.index.usage
-          delay: '0'
           units: B
           description: 'The total index usage.'
           preprocessing:
@@ -2922,7 +2798,6 @@ zabbix_export:
           name: 'Metadata requests'
           type: DEPENDENT
           key: azure.cosmosdb.metadata.requests
-          delay: '0'
           description: |
             The count of metadata requests.
             Cosmos DB maintains system metadata collection for each account, which allows you to enumerate collections, databases, etc., and their configurations, free of charge.
@@ -2940,7 +2815,6 @@ zabbix_export:
           name: 'Mongo requests'
           type: DEPENDENT
           key: azure.cosmosdb.mongo.requests
-          delay: '0'
           description: 'The number of Mongo requests made.'
           preprocessing:
             - type: JSONPATH
@@ -2956,7 +2830,6 @@ zabbix_export:
           name: 'Mongo request charge'
           type: DEPENDENT
           key: azure.cosmosdb.mongo.requests.charge
-          delay: '0'
           description: 'The Mongo request units consumed.'
           preprocessing:
             - type: JSONPATH
@@ -2972,7 +2845,6 @@ zabbix_export:
           name: 'Normalized RU consumption'
           type: DEPENDENT
           key: azure.cosmosdb.normalized.ru.consumption
-          delay: '0'
           units: '%'
           description: 'The max RU consumption percentage per minute.'
           preprocessing:
@@ -2989,7 +2861,6 @@ zabbix_export:
           name: 'Physical partition size'
           type: DEPENDENT
           key: azure.cosmosdb.physical.partition.size
-          delay: '0'
           units: B
           description: 'The physical partition size in bytes.'
           preprocessing:
@@ -3006,7 +2877,6 @@ zabbix_export:
           name: 'Physical partition throughput'
           type: DEPENDENT
           key: azure.cosmosdb.physical.partition.throughput
-          delay: '0'
           description: 'The physical partition throughput.'
           preprocessing:
             - type: JSONPATH
@@ -3022,7 +2892,6 @@ zabbix_export:
           name: 'Provisioned throughput'
           type: DEPENDENT
           key: azure.cosmosdb.provisioned.throughput
-          delay: '0'
           description: 'The provisioned throughput.'
           preprocessing:
             - type: JSONPATH
@@ -3038,7 +2907,6 @@ zabbix_export:
           name: 'Replication latency, P99'
           type: DEPENDENT
           key: azure.cosmosdb.replication.latency
-          delay: '0'
           value_type: FLOAT
           units: s
           description: 'The P99 replication latency across source and target regions for geo-enabled account.'
@@ -3059,7 +2927,6 @@ zabbix_export:
           name: 'Server side latency'
           type: DEPENDENT
           key: azure.cosmosdb.server.side.latency
-          delay: '0'
           value_type: FLOAT
           units: s
           description: 'The server side latency.'
@@ -3080,7 +2947,6 @@ zabbix_export:
           name: 'Server side latency, direct'
           type: DEPENDENT
           key: azure.cosmosdb.server.side.latency.direct
-          delay: '0'
           value_type: FLOAT
           units: s
           description: 'The server side latency in direct connection mode.'
@@ -3101,7 +2967,6 @@ zabbix_export:
           name: 'Server side latency, gateway'
           type: DEPENDENT
           key: azure.cosmosdb.server.side.latency.gateway
-          delay: '0'
           value_type: FLOAT
           units: s
           description: 'The server side latency in gateway connection mode.'
@@ -3122,7 +2987,6 @@ zabbix_export:
           name: 'Service availability'
           type: DEPENDENT
           key: azure.cosmosdb.service.availability
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'The account requests availability at one hour granularity.'
@@ -3149,7 +3013,6 @@ zabbix_export:
           name: 'Total request units'
           type: DEPENDENT
           key: azure.cosmosdb.total.request.units
-          delay: '0'
           value_type: FLOAT
           description: 'The request units consumed per minute.'
           preprocessing:
@@ -3166,7 +3029,6 @@ zabbix_export:
           name: 'Total requests'
           type: DEPENDENT
           key: azure.cosmosdb.total.requests
-          delay: '0'
           description: 'Number of requests per minute.'
           preprocessing:
             - type: JSONPATH
@@ -3359,7 +3221,6 @@ zabbix_export:
           key: azure.get.daily.costs
           delay: 0s;h/5m/30
           history: '0'
-          trends: '0'
           value_type: TEXT
           params: |
             var AzureCost = {
@@ -3561,7 +3422,6 @@ zabbix_export:
           key: azure.get.monthly.costs
           delay: 0s;h/12
           history: '0'
-          trends: '0'
           value_type: TEXT
           params: |
             var AzureCost = {
@@ -3758,38 +3618,30 @@ zabbix_export:
           name: 'Azure daily costs by services discovery'
           type: DEPENDENT
           key: azure.daily.services.costs.discovery
-          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#AZURE.RESOURCE.GROUP}'
                 value: '{$AZURE.LLD.FILTER.RESOURCE.GROUP.MATCHES}'
-                formulaid: A
               - macro: '{#AZURE.RESOURCE.GROUP}'
                 value: '{$AZURE.LLD.FILTER.RESOURCE.GROUP.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
               - macro: '{#AZURE.RESOURCE.LOCATION}'
                 value: '{$AZURE.LLD.FILTER.RESOURCE.LOCATION.MATCHES}'
-                formulaid: C
               - macro: '{#AZURE.RESOURCE.LOCATION}'
                 value: '{$AZURE.LLD.FILTER.RESOURCE.LOCATION.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: D
               - macro: '{#AZURE.SERVICE.NAME}'
                 value: '{$AZURE.LLD.FILTER.SERVICE.MATCHES}'
-                formulaid: E
               - macro: '{#AZURE.SERVICE.NAME}'
                 value: '{$AZURE.LLD.FILTER.SERVICE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: F
           description: 'Discovery of daily costs by services.'
           item_prototypes:
             - uuid: 848ccd4cec2c4902990aa25f90f502a8
               name: 'Service ["{#AZURE.SERVICE.NAME}"]: Meter ["{#AZURE.BILLING.METER}"]: Subcategory ["{#AZURE.BILLING.METER.SUBCATEGORY}"] daily cost'
               type: DEPENDENT
               key: 'azure.daily.cost["{#AZURE.SERVICE.NAME}", "{#AZURE.BILLING.METER}", "{#AZURE.BILLING.METER.SUBCATEGORY}","{#AZURE.RESOURCE.GROUP}"]'
-              delay: '0'
               value_type: FLOAT
               units: '!{#AZURE.BILLING.UNIT}'
               description: 'The daily cost by service {#AZURE.SERVICE.NAME}, meter {#AZURE.BILLING.METER}, subcategory {#AZURE.BILLING.METER.SUBCATEGORY}.'
@@ -3844,14 +3696,12 @@ zabbix_export:
           name: 'Azure monthly costs discovery'
           type: DEPENDENT
           key: azure.monthly.costs.discovery
-          delay: '0'
           description: 'Discovery of monthly costs.'
           item_prototypes:
             - uuid: f91a60d2c1124eb6b297539b0a115c66
               name: 'Month ["{#AZURE.BILLING.MONTH}"] cost'
               type: DEPENDENT
               key: 'azure.monthly.cost["{#AZURE.BILLING.MONTH}"]'
-              delay: '0'
               value_type: FLOAT
               units: '!{#AZURE.BILLING.UNIT}'
               description: 'The monthly cost.'
@@ -3892,24 +3742,20 @@ zabbix_export:
           name: 'Azure monthly costs by location discovery'
           type: DEPENDENT
           key: azure.monthly.location.costs.discovery
-          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#AZURE.RESOURCE.LOCATION}'
                 value: '{$AZURE.LLD.FILTER.RESOURCE.LOCATION.MATCHES}'
-                formulaid: A
               - macro: '{#AZURE.RESOURCE.LOCATION}'
                 value: '{$AZURE.LLD.FILTER.RESOURCE.LOCATION.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
           description: 'Discovery of monthly costs by location.'
           item_prototypes:
             - uuid: 7fb097f81a8445acaa6b17bdc4daaaa6
               name: 'Location: ["{#AZURE.RESOURCE.LOCATION}"]: Month ["{#AZURE.BILLING.MONTH}"] cost'
               type: DEPENDENT
               key: 'azure.monthly.location.cost["{#AZURE.RESOURCE.LOCATION}", "{#AZURE.BILLING.MONTH}"]'
-              delay: '0'
               value_type: FLOAT
               units: '!{#AZURE.BILLING.UNIT}'
               description: 'The monthly cost by location {#AZURE.RESOURCE.LOCATION}.'
@@ -3958,24 +3804,20 @@ zabbix_export:
           name: 'Azure monthly costs by resource group discovery'
           type: DEPENDENT
           key: azure.monthly.resource.group.costs.discovery
-          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#AZURE.RESOURCE.GROUP}'
                 value: '{$AZURE.LLD.FILTER.RESOURCE.GROUP.MATCHES}'
-                formulaid: A
               - macro: '{#AZURE.RESOURCE.GROUP}'
                 value: '{$AZURE.LLD.FILTER.RESOURCE.GROUP.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
           description: 'Discovery of monthly costs by resource group.'
           item_prototypes:
             - uuid: 9a5ed573ac374c08abf81f2b7296f260
               name: 'Resource group: ["{#AZURE.RESOURCE.GROUP}"]: Month ["{#AZURE.BILLING.MONTH}"] cost'
               type: DEPENDENT
               key: 'azure.monthly.resource.group.cost["{#AZURE.RESOURCE.GROUP}", "{#AZURE.BILLING.MONTH}"]'
-              delay: '0'
               value_type: FLOAT
               units: '!{#AZURE.BILLING.UNIT}'
               description: 'The monthly cost by resource group {#AZURE.RESOURCE.GROUP}.'
@@ -4024,24 +3866,20 @@ zabbix_export:
           name: 'Azure monthly costs by services discovery'
           type: DEPENDENT
           key: azure.monthly.services.costs.discovery
-          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#AZURE.SERVICE.NAME}'
                 value: '{$AZURE.LLD.FILTER.SERVICE.MATCHES}'
-                formulaid: A
               - macro: '{#AZURE.SERVICE.NAME}'
                 value: '{$AZURE.LLD.FILTER.SERVICE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
           description: 'Discovery of monthly costs by services.'
           item_prototypes:
             - uuid: dbad6436c70e41268e3b59c2a7f0e2a2
               name: 'Service ["{#AZURE.SERVICE.NAME}"]: Month ["{#AZURE.BILLING.MONTH}"] cost'
               type: DEPENDENT
               key: 'azure.monthly.service.cost["{#AZURE.SERVICE.NAME}", "{#AZURE.BILLING.MONTH}"]'
-              delay: '0'
               value_type: FLOAT
               units: '!{#AZURE.BILLING.UNIT}'
               description: 'The monthly cost by service {#AZURE.SERVICE.NAME}.'
@@ -4243,8 +4081,6 @@ zabbix_export:
           name: 'Availability status detailed'
           type: DEPENDENT
           key: azure.db.mssql.availability.details
-          delay: '0'
-          trends: '0'
           value_type: CHAR
           description: 'The summary description of the availability status.'
           preprocessing:
@@ -4263,7 +4099,6 @@ zabbix_export:
           name: 'Availability state'
           type: DEPENDENT
           key: azure.db.mssql.availability.state
-          delay: '0'
           description: 'The availability status of the resource.'
           valuemap:
             name: 'Azure resource health state'
@@ -4335,7 +4170,6 @@ zabbix_export:
           name: 'Connections failed: System errors'
           type: DEPENDENT
           key: azure.db.mssql.connections.failed.system
-          delay: '0'
           value_type: FLOAT
           description: 'The count of failed connections with system errors.'
           preprocessing:
@@ -4351,7 +4185,6 @@ zabbix_export:
           name: 'Connections successful'
           type: DEPENDENT
           key: azure.db.mssql.connections.successful
-          delay: '0'
           value_type: FLOAT
           description: 'The count of successful connections.'
           preprocessing:
@@ -4367,7 +4200,6 @@ zabbix_export:
           name: 'CPU limit'
           type: DEPENDENT
           key: azure.db.mssql.cpu.limit
-          delay: '0'
           value_type: FLOAT
           description: 'The CPU limit. Applies to the vCore-based databases.'
           preprocessing:
@@ -4384,7 +4216,6 @@ zabbix_export:
           name: 'Percentage CPU'
           type: DEPENDENT
           key: azure.db.mssql.cpu.percentage
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'The CPU percent of a host.'
@@ -4411,7 +4242,6 @@ zabbix_export:
           name: 'CPU used'
           type: DEPENDENT
           key: azure.db.mssql.cpu.used
-          delay: '0'
           value_type: FLOAT
           description: 'The CPU used. Applies to the vCore-based databases.'
           preprocessing:
@@ -4428,8 +4258,6 @@ zabbix_export:
           name: 'Get errors'
           type: DEPENDENT
           key: azure.db.mssql.data.errors
-          delay: '0'
-          trends: '0'
           value_type: TEXT
           description: 'A list of errors from API requests.'
           preprocessing:
@@ -4459,7 +4287,6 @@ zabbix_export:
           type: SCRIPT
           key: azure.db.mssql.data.get
           history: '0'
-          trends: '0'
           value_type: TEXT
           params: |
             var AzureDB = {
@@ -4659,7 +4486,6 @@ zabbix_export:
           name: 'Data IO percentage'
           type: DEPENDENT
           key: azure.db.mssql.data.read.percentage
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'The percentage of physical data read.'
@@ -4676,7 +4502,6 @@ zabbix_export:
           name: Deadlocks
           type: DEPENDENT
           key: azure.db.mssql.deadlocks
-          delay: '0'
           value_type: FLOAT
           description: 'The count of deadlocks. Not applicable to the data warehouses.'
           preprocessing:
@@ -4692,7 +4517,6 @@ zabbix_export:
           name: 'Connections blocked by firewall'
           type: DEPENDENT
           key: azure.db.mssql.firewall.blocked
-          delay: '0'
           value_type: FLOAT
           description: 'The count of connections blocked by firewall.'
           preprocessing:
@@ -4708,7 +4532,6 @@ zabbix_export:
           name: 'Log IO percentage'
           type: DEPENDENT
           key: azure.db.mssql.log.write.percentage
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'The percentage of I/O log. Not applicable to the data warehouses.'
@@ -4725,7 +4548,6 @@ zabbix_export:
           name: 'SQL Server process core percent'
           type: DEPENDENT
           key: azure.db.mssql.server.cpu.percent
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'The CPU usage as a percentage of the SQL DB process. Not applicable to the data warehouses.'
@@ -4745,7 +4567,6 @@ zabbix_export:
           name: 'SQL Server process memory percent'
           type: DEPENDENT
           key: azure.db.mssql.server.memory.percent
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'Memory usage as a percentage of the SQL DB process. Not applicable to data warehouses.'
@@ -4765,7 +4586,6 @@ zabbix_export:
           name: 'Sessions count'
           type: DEPENDENT
           key: azure.db.mssql.sessions.count
-          delay: '0'
           value_type: FLOAT
           description: 'The number of active sessions. Not applicable to Synapse DW Analytics.'
           preprocessing:
@@ -4781,7 +4601,6 @@ zabbix_export:
           name: 'Sessions percentage'
           type: DEPENDENT
           key: azure.db.mssql.sessions.percent
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'The percentage of sessions. Not applicable to the data warehouses.'
@@ -4798,7 +4617,6 @@ zabbix_export:
           name: 'Data space allocated'
           type: DEPENDENT
           key: azure.db.mssql.storage.allocated
-          delay: '0'
           value_type: FLOAT
           units: B
           description: 'The allocated data storage. Not applicable to the data warehouses.'
@@ -4816,7 +4634,6 @@ zabbix_export:
           name: 'Differential backup storage size'
           type: DEPENDENT
           key: azure.db.mssql.storage.backup.diff.size
-          delay: '0'
           value_type: FLOAT
           units: B
           description: 'Cumulative differential backup storage size. Applies to the vCore-based databases. Not applicable to the Hyperscale databases.'
@@ -4836,7 +4653,6 @@ zabbix_export:
           name: 'Log backup storage size'
           type: DEPENDENT
           key: azure.db.mssql.storage.backup.log.size
-          delay: '0'
           value_type: FLOAT
           units: B
           description: 'Cumulative log backup storage size. Applies to the vCore-based and Hyperscale databases.'
@@ -4856,7 +4672,6 @@ zabbix_export:
           name: 'Full backup storage size'
           type: DEPENDENT
           key: azure.db.mssql.storage.backup.size
-          delay: '0'
           value_type: FLOAT
           units: B
           description: 'Cumulative full backup storage size. Applies to the vCore-based databases. Not applicable to the Hyperscale databases.'
@@ -4876,7 +4691,6 @@ zabbix_export:
           name: 'Data space used percent'
           type: DEPENDENT
           key: azure.db.mssql.storage.percent
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'Data space used percent. Not applicable to the data warehouses or Hyperscale databases.'
@@ -4913,7 +4727,6 @@ zabbix_export:
           name: 'Data space used'
           type: DEPENDENT
           key: azure.db.mssql.storage.used
-          delay: '0'
           value_type: FLOAT
           units: B
           description: 'Data space used. Not applicable to the data warehouses.'
@@ -4931,7 +4744,6 @@ zabbix_export:
           name: 'In-Memory OLTP storage percent'
           type: DEPENDENT
           key: azure.db.mssql.storage.xtp.percent
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'In-Memory OLTP storage percent. Not applicable to the data warehouses.'
@@ -4948,7 +4760,6 @@ zabbix_export:
           name: 'Tempdb data file size'
           type: DEPENDENT
           key: azure.db.mssql.tempdb.data.size
-          delay: '0'
           value_type: FLOAT
           units: B
           description: 'The space used in `tempdb` data files, expressed in bytes. Not applicable to the data warehouses.'
@@ -4969,7 +4780,6 @@ zabbix_export:
           name: 'Tempdb log used percent'
           type: DEPENDENT
           key: azure.db.mssql.tempdb.log.percent
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'The percentage of space used in `tempdb` transaction log file. Not applicable to the data warehouses.'
@@ -4987,7 +4797,6 @@ zabbix_export:
           name: 'Tempdb log file size'
           type: DEPENDENT
           key: azure.db.mssql.tempdb.log.size
-          delay: '0'
           value_type: FLOAT
           units: B
           description: 'The space used in `tempdb` transaction log file, expressed in bytes. Not applicable to the data warehouses.'
@@ -5008,7 +4817,6 @@ zabbix_export:
           name: 'Workers percentage'
           type: DEPENDENT
           key: azure.db.mssql.workers.percent
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'The percentage of workers. Not applicable to the data warehouses.'
@@ -5435,7 +5243,6 @@ zabbix_export:
           name: 'App CPU billed'
           type: DEPENDENT
           key: azure.db.mssql.app.cpu.billed
-          delay: '0'
           value_type: FLOAT
           description: 'App CPU billed. Applies to serverless databases.'
           preprocessing:
@@ -5452,7 +5259,6 @@ zabbix_export:
           name: 'App CPU percentage'
           type: DEPENDENT
           key: azure.db.mssql.app.cpu.percent
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'App CPU percentage. Applies to serverless databases.'
@@ -5470,7 +5276,6 @@ zabbix_export:
           name: 'App memory percentage'
           type: DEPENDENT
           key: azure.db.mssql.app.memory.percent
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'App memory percentage. Applies to serverless databases.'
@@ -5488,8 +5293,6 @@ zabbix_export:
           name: 'Availability status detailed'
           type: DEPENDENT
           key: azure.db.mssql.availability.details
-          delay: '0'
-          trends: '0'
           value_type: CHAR
           description: 'The summary description of the availability status.'
           preprocessing:
@@ -5508,7 +5311,6 @@ zabbix_export:
           name: 'Availability state'
           type: DEPENDENT
           key: azure.db.mssql.availability.state
-          delay: '0'
           description: 'The availability status of the resource.'
           valuemap:
             name: 'Azure resource health state'
@@ -5580,7 +5382,6 @@ zabbix_export:
           name: 'Connections failed: System errors'
           type: DEPENDENT
           key: azure.db.mssql.connections.failed.system
-          delay: '0'
           value_type: FLOAT
           description: 'The count of failed connections with system errors.'
           preprocessing:
@@ -5596,7 +5397,6 @@ zabbix_export:
           name: 'Connections successful'
           type: DEPENDENT
           key: azure.db.mssql.connections.successful
-          delay: '0'
           value_type: FLOAT
           description: 'The count of successful connections.'
           preprocessing:
@@ -5612,7 +5412,6 @@ zabbix_export:
           name: 'CPU limit'
           type: DEPENDENT
           key: azure.db.mssql.cpu.limit
-          delay: '0'
           value_type: FLOAT
           description: 'The CPU limit. Applies to the vCore-based databases.'
           preprocessing:
@@ -5629,7 +5428,6 @@ zabbix_export:
           name: 'Percentage CPU'
           type: DEPENDENT
           key: azure.db.mssql.cpu.percentage
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'The CPU percent of a host.'
@@ -5656,7 +5454,6 @@ zabbix_export:
           name: 'CPU used'
           type: DEPENDENT
           key: azure.db.mssql.cpu.used
-          delay: '0'
           value_type: FLOAT
           description: 'The CPU used. Applies to the vCore-based databases.'
           preprocessing:
@@ -5673,8 +5470,6 @@ zabbix_export:
           name: 'Get errors'
           type: DEPENDENT
           key: azure.db.mssql.data.errors
-          delay: '0'
-          trends: '0'
           value_type: TEXT
           description: 'A list of errors from API requests.'
           preprocessing:
@@ -5704,7 +5499,6 @@ zabbix_export:
           type: SCRIPT
           key: azure.db.mssql.data.get
           history: '0'
-          trends: '0'
           value_type: TEXT
           params: |
             var AzureDB = {
@@ -5889,7 +5683,6 @@ zabbix_export:
           name: 'Data IO percentage'
           type: DEPENDENT
           key: azure.db.mssql.data.read.percentage
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'The physical data read percentage.'
@@ -5906,7 +5699,6 @@ zabbix_export:
           name: Deadlocks
           type: DEPENDENT
           key: azure.db.mssql.deadlocks
-          delay: '0'
           value_type: FLOAT
           description: 'The count of deadlocks. Not applicable to the data warehouses.'
           preprocessing:
@@ -5922,7 +5714,6 @@ zabbix_export:
           name: 'Connections blocked by firewall'
           type: DEPENDENT
           key: azure.db.mssql.firewall.blocked
-          delay: '0'
           value_type: FLOAT
           description: 'The count of connections blocked by firewall.'
           preprocessing:
@@ -5938,7 +5729,6 @@ zabbix_export:
           name: 'Log IO percentage'
           type: DEPENDENT
           key: azure.db.mssql.log.write.percentage
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'The percentage of I/O log. Not applicable to the data warehouses.'
@@ -5955,7 +5745,6 @@ zabbix_export:
           name: 'SQL Server process core percent'
           type: DEPENDENT
           key: azure.db.mssql.server.cpu.percent
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'The CPU usage as a percentage of the SQL DB process. Not applicable to the data warehouses.'
@@ -5975,7 +5764,6 @@ zabbix_export:
           name: 'SQL Server process memory percent'
           type: DEPENDENT
           key: azure.db.mssql.server.memory.percent
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'Memory usage as a percentage of the SQL DB process. Not applicable to the data warehouses.'
@@ -5995,7 +5783,6 @@ zabbix_export:
           name: 'Sessions percentage'
           type: DEPENDENT
           key: azure.db.mssql.sessions.percent
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'The percentage of sessions. Not applicable to the data warehouses.'
@@ -6012,7 +5799,6 @@ zabbix_export:
           name: 'Data space allocated'
           type: DEPENDENT
           key: azure.db.mssql.storage.allocated
-          delay: '0'
           value_type: FLOAT
           units: B
           description: 'The allocated data storage. Not applicable to the data warehouses.'
@@ -6030,7 +5816,6 @@ zabbix_export:
           name: 'Data space used percent'
           type: DEPENDENT
           key: azure.db.mssql.storage.percent
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'The percentage of used data space. Not applicable to the data warehouses or Hyperscale databases.'
@@ -6067,7 +5852,6 @@ zabbix_export:
           name: 'Data space used'
           type: DEPENDENT
           key: azure.db.mssql.storage.used
-          delay: '0'
           value_type: FLOAT
           units: B
           description: 'Data space used. Not applicable to the data warehouses.'
@@ -6085,7 +5869,6 @@ zabbix_export:
           name: 'In-Memory OLTP storage percent'
           type: DEPENDENT
           key: azure.db.mssql.storage.xtp.percent
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'In-Memory OLTP storage percent. Not applicable to the data warehouses.'
@@ -6102,7 +5885,6 @@ zabbix_export:
           name: 'Tempdb data file size'
           type: DEPENDENT
           key: azure.db.mssql.tempdb.data.size
-          delay: '0'
           value_type: FLOAT
           units: B
           description: 'Space used in `tempdb` data files, expressed in bytes. Not applicable to the data warehouses.'
@@ -6123,7 +5905,6 @@ zabbix_export:
           name: 'Tempdb log used percent'
           type: DEPENDENT
           key: azure.db.mssql.tempdb.log.percent
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'The percentage of space used in `tempdb` transaction log files. Not applicable to the data warehouses.'
@@ -6141,7 +5922,6 @@ zabbix_export:
           name: 'Tempdb log file size'
           type: DEPENDENT
           key: azure.db.mssql.tempdb.log.size
-          delay: '0'
           value_type: FLOAT
           units: B
           description: 'Space used in `tempdb` transaction log files, expressed in bytes. Not applicable to the data warehouses.'
@@ -6162,7 +5942,6 @@ zabbix_export:
           name: 'Workers percentage'
           type: DEPENDENT
           key: azure.db.mssql.workers.percent
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'The percentage of workers. Not applicable to the data warehouses.'
@@ -6592,8 +6371,6 @@ zabbix_export:
           name: 'Availability status detailed'
           type: DEPENDENT
           key: azure.db.mysql.availability.details
-          delay: '0'
-          trends: '0'
           value_type: CHAR
           description: 'The summary description of the availability status.'
           preprocessing:
@@ -6612,7 +6389,6 @@ zabbix_export:
           name: 'Availability state'
           type: DEPENDENT
           key: azure.db.mysql.availability.state
-          delay: '0'
           description: 'The availability status of the resource.'
           valuemap:
             name: 'Azure resource health state'
@@ -6684,7 +6460,6 @@ zabbix_export:
           name: 'Connections aborted'
           type: DEPENDENT
           key: azure.db.mysql.connections.aborted
-          delay: '0'
           value_type: FLOAT
           description: 'The count of aborted connections.'
           preprocessing:
@@ -6710,7 +6485,6 @@ zabbix_export:
           name: 'Connections active'
           type: DEPENDENT
           key: azure.db.mysql.connections.active
-          delay: '0'
           value_type: FLOAT
           description: 'The count of active connections.'
           preprocessing:
@@ -6726,7 +6500,6 @@ zabbix_export:
           name: 'Connections total'
           type: DEPENDENT
           key: azure.db.mysql.connections.total
-          delay: '0'
           value_type: FLOAT
           description: 'The count of total connections.'
           preprocessing:
@@ -6742,7 +6515,6 @@ zabbix_export:
           name: 'CPU credits consumed'
           type: DEPENDENT
           key: azure.db.mysql.cpu.credits.consumed
-          delay: '0'
           value_type: FLOAT
           description: 'The consumed CPU credits.'
           preprocessing:
@@ -6759,7 +6531,6 @@ zabbix_export:
           name: 'CPU credits remaining'
           type: DEPENDENT
           key: azure.db.mysql.cpu.credits.remaining
-          delay: '0'
           value_type: FLOAT
           description: 'The remaining CPU credits.'
           preprocessing:
@@ -6776,7 +6547,6 @@ zabbix_export:
           name: 'Percentage CPU'
           type: DEPENDENT
           key: azure.db.mysql.cpu.percentage
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'The CPU percent of a host.'
@@ -6803,8 +6573,6 @@ zabbix_export:
           name: 'Get errors'
           type: DEPENDENT
           key: azure.db.mysql.data.errors
-          delay: '0'
-          trends: '0'
           value_type: TEXT
           description: 'A list of errors from API requests.'
           preprocessing:
@@ -6834,7 +6602,6 @@ zabbix_export:
           type: SCRIPT
           key: azure.db.mysql.data.get
           history: '0'
-          trends: '0'
           value_type: TEXT
           params: |
             var AzureDB = {
@@ -7013,7 +6780,6 @@ zabbix_export:
           name: 'IO consumption percent'
           type: DEPENDENT
           key: azure.db.mysql.io.consumption.percent
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'The consumption percent of I/O.'
@@ -7030,7 +6796,6 @@ zabbix_export:
           name: 'Memory utilization'
           type: DEPENDENT
           key: azure.db.mysql.memory.percentage
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'The memory percent of a host.'
@@ -7047,7 +6812,6 @@ zabbix_export:
           name: 'Network out'
           type: DEPENDENT
           key: azure.db.mysql.network.egress
-          delay: '0'
           value_type: FLOAT
           units: bps
           description: 'Network egress of a host, expressed in bytes.'
@@ -7067,7 +6831,6 @@ zabbix_export:
           name: 'Network in'
           type: DEPENDENT
           key: azure.db.mysql.network.ingress
-          delay: '0'
           value_type: FLOAT
           units: bps
           description: 'Network ingress of a host, expressed in bytes.'
@@ -7087,7 +6850,6 @@ zabbix_export:
           name: Queries
           type: DEPENDENT
           key: azure.db.mysql.queries
-          delay: '0'
           value_type: FLOAT
           description: 'The count of queries.'
           preprocessing:
@@ -7103,7 +6865,6 @@ zabbix_export:
           name: 'Replication lag'
           type: DEPENDENT
           key: azure.db.mysql.replication.lag
-          delay: '0'
           value_type: FLOAT
           units: s
           description: 'The replication lag, expressed in seconds.'
@@ -7121,7 +6882,6 @@ zabbix_export:
           name: 'Backup storage used'
           type: DEPENDENT
           key: azure.db.mysql.storage.backup.used
-          delay: '0'
           value_type: FLOAT
           units: B
           description: 'Used backup storage, expressed in bytes.'
@@ -7138,7 +6898,6 @@ zabbix_export:
           name: 'Storage limit'
           type: DEPENDENT
           key: azure.db.mysql.storage.limit
-          delay: '0'
           value_type: FLOAT
           units: B
           description: 'The storage limit, expressed in bytes.'
@@ -7155,7 +6914,6 @@ zabbix_export:
           name: 'Storage percent'
           type: DEPENDENT
           key: azure.db.mysql.storage.percent
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'The storage utilization, expressed in %.'
@@ -7191,7 +6949,6 @@ zabbix_export:
           name: 'Storage used'
           type: DEPENDENT
           key: azure.db.mysql.storage.used
-          delay: '0'
           value_type: FLOAT
           units: B
           description: 'Used storage space, expressed in bytes.'
@@ -7629,8 +7386,6 @@ zabbix_export:
           name: 'Availability status detailed'
           type: DEPENDENT
           key: azure.db.mysql.availability.details
-          delay: '0'
-          trends: '0'
           value_type: CHAR
           description: 'The summary description of the availability status.'
           preprocessing:
@@ -7649,7 +7404,6 @@ zabbix_export:
           name: 'Availability state'
           type: DEPENDENT
           key: azure.db.mysql.availability.state
-          delay: '0'
           description: 'The availability status of the resource.'
           valuemap:
             name: 'Azure resource health state'
@@ -7721,7 +7475,6 @@ zabbix_export:
           name: 'Connections active'
           type: DEPENDENT
           key: azure.db.mysql.connections.active
-          delay: '0'
           value_type: FLOAT
           description: 'The count of active connections.'
           preprocessing:
@@ -7737,7 +7490,6 @@ zabbix_export:
           name: 'Connections failed'
           type: DEPENDENT
           key: azure.db.mysql.connections.failed
-          delay: '0'
           value_type: FLOAT
           description: 'The count of failed connections.'
           preprocessing:
@@ -7764,7 +7516,6 @@ zabbix_export:
           name: 'Percentage CPU'
           type: DEPENDENT
           key: azure.db.mysql.cpu.percentage
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'The CPU percent of a host.'
@@ -7791,8 +7542,6 @@ zabbix_export:
           name: 'Get errors'
           type: DEPENDENT
           key: azure.db.mysql.data.errors
-          delay: '0'
-          trends: '0'
           value_type: TEXT
           description: 'A list of errors from API requests.'
           preprocessing:
@@ -7822,7 +7571,6 @@ zabbix_export:
           type: SCRIPT
           key: azure.db.mysql.data.get
           history: '0'
-          trends: '0'
           value_type: TEXT
           params: |
             var AzureDB = {
@@ -8000,7 +7748,6 @@ zabbix_export:
           name: 'IO consumption percent'
           type: DEPENDENT
           key: azure.db.mysql.io.consumption.percent
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'The consumption percent of I/O.'
@@ -8017,7 +7764,6 @@ zabbix_export:
           name: 'Memory utilization'
           type: DEPENDENT
           key: azure.db.mysql.memory.percentage
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'The memory percent of a host.'
@@ -8044,7 +7790,6 @@ zabbix_export:
           name: 'Network out'
           type: DEPENDENT
           key: azure.db.mysql.network.egress
-          delay: '0'
           value_type: FLOAT
           units: bps
           description: 'The network outbound traffic across the active connections.'
@@ -8065,7 +7810,6 @@ zabbix_export:
           name: 'Network in'
           type: DEPENDENT
           key: azure.db.mysql.network.ingress
-          delay: '0'
           value_type: FLOAT
           units: bps
           description: 'The network inbound traffic across the active connections.'
@@ -8086,7 +7830,6 @@ zabbix_export:
           name: 'Replication lag'
           type: DEPENDENT
           key: azure.db.mysql.replication.lag
-          delay: '0'
           value_type: FLOAT
           units: s
           description: 'The replication lag, expressed in seconds.'
@@ -8104,7 +7847,6 @@ zabbix_export:
           name: 'Backup storage used'
           type: DEPENDENT
           key: azure.db.mysql.storage.backup.used
-          delay: '0'
           value_type: FLOAT
           units: B
           description: 'Used backup storage, expressed in bytes.'
@@ -8121,7 +7863,6 @@ zabbix_export:
           name: 'Storage limit'
           type: DEPENDENT
           key: azure.db.mysql.storage.limit
-          delay: '0'
           value_type: FLOAT
           units: B
           description: 'The storage limit, expressed in bytes.'
@@ -8138,7 +7879,6 @@ zabbix_export:
           name: 'Storage percent'
           type: DEPENDENT
           key: azure.db.mysql.storage.percent
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'The storage utilization, expressed in %.'
@@ -8174,7 +7914,6 @@ zabbix_export:
           name: 'Server log storage limit'
           type: DEPENDENT
           key: azure.db.mysql.storage.server.log.limit
-          delay: '0'
           value_type: FLOAT
           units: B
           description: 'The storage limit of server log, expressed in bytes.'
@@ -8191,7 +7930,6 @@ zabbix_export:
           name: 'Server log storage percent'
           type: DEPENDENT
           key: azure.db.mysql.storage.server.log.percent
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'The storage utilization by server log, expressed in %.'
@@ -8208,7 +7946,6 @@ zabbix_export:
           name: 'Server log storage used'
           type: DEPENDENT
           key: azure.db.mysql.storage.server.log.used
-          delay: '0'
           value_type: FLOAT
           units: B
           description: 'The storage space used by server log, expressed in bytes.'
@@ -8225,7 +7962,6 @@ zabbix_export:
           name: 'Storage used'
           type: DEPENDENT
           key: azure.db.mysql.storage.used
-          delay: '0'
           value_type: FLOAT
           units: B
           description: 'Used storage space, expressed in bytes.'
@@ -8606,8 +8342,6 @@ zabbix_export:
           name: 'Availability status detailed'
           type: DEPENDENT
           key: azure.db.pgsql.availability.details
-          delay: '0'
-          trends: '0'
           value_type: CHAR
           description: 'The summary description of the availability status.'
           preprocessing:
@@ -8626,7 +8360,6 @@ zabbix_export:
           name: 'Availability state'
           type: DEPENDENT
           key: azure.db.pgsql.availability.state
-          delay: '0'
           description: 'The availability status of the resource.'
           valuemap:
             name: 'Azure resource health state'
@@ -8698,7 +8431,6 @@ zabbix_export:
           name: 'Connections active'
           type: DEPENDENT
           key: azure.db.pgsql.connections.active
-          delay: '0'
           value_type: FLOAT
           description: 'The count of active connections.'
           preprocessing:
@@ -8714,7 +8446,6 @@ zabbix_export:
           name: 'Connections failed'
           type: DEPENDENT
           key: azure.db.pgsql.connections.failed
-          delay: '0'
           value_type: FLOAT
           description: 'The count of failed connections.'
           preprocessing:
@@ -8731,7 +8462,6 @@ zabbix_export:
           name: 'Connections succeeded'
           type: DEPENDENT
           key: azure.db.pgsql.connections.succeeded
-          delay: '0'
           value_type: FLOAT
           description: 'The count of succeeded connections.'
           preprocessing:
@@ -8747,7 +8477,6 @@ zabbix_export:
           name: 'CPU credits consumed'
           type: DEPENDENT
           key: azure.db.pgsql.cpu.credits.consumed
-          delay: '0'
           value_type: FLOAT
           description: 'The total number of credits consumed by the database server.'
           preprocessing:
@@ -8764,7 +8493,6 @@ zabbix_export:
           name: 'CPU credits remaining'
           type: DEPENDENT
           key: azure.db.pgsql.cpu.credits.remaining
-          delay: '0'
           value_type: FLOAT
           description: 'The total number of credits available to burst.'
           preprocessing:
@@ -8781,7 +8509,6 @@ zabbix_export:
           name: 'Percentage CPU'
           type: DEPENDENT
           key: azure.db.pgsql.cpu.percentage
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'The CPU percent of a host.'
@@ -8808,8 +8535,6 @@ zabbix_export:
           name: 'Get errors'
           type: DEPENDENT
           key: azure.db.pgsql.data.errors
-          delay: '0'
-          trends: '0'
           value_type: TEXT
           description: 'A list of errors from API requests.'
           preprocessing:
@@ -8839,7 +8564,6 @@ zabbix_export:
           type: SCRIPT
           key: azure.db.pgsql.data.get
           history: '0'
-          trends: '0'
           value_type: TEXT
           params: |
             var AzureDB = {
@@ -9031,7 +8755,6 @@ zabbix_export:
           name: 'Data disk read Bps'
           type: DEPENDENT
           key: azure.db.pgsql.disk.bps.read
-          delay: '0'
           value_type: FLOAT
           units: Bps
           description: 'Bytes read per second from the data disk during the monitoring period.'
@@ -9049,7 +8772,6 @@ zabbix_export:
           name: 'Data disk write Bps'
           type: DEPENDENT
           key: azure.db.pgsql.disk.bps.write
-          delay: '0'
           value_type: FLOAT
           units: Bps
           description: 'Bytes written per second to the data disk during the monitoring period.'
@@ -9067,7 +8789,6 @@ zabbix_export:
           name: 'Data disk queue depth'
           type: DEPENDENT
           key: azure.db.pgsql.disk.queue.depth
-          delay: '0'
           value_type: FLOAT
           description: 'The number of outstanding I/O operations to the data disk.'
           preprocessing:
@@ -9084,7 +8805,6 @@ zabbix_export:
           name: 'Data disk IOPS'
           type: DEPENDENT
           key: azure.db.pgsql.iops
-          delay: '0'
           value_type: FLOAT
           units: '!ops'
           description: 'I/O operations per second.'
@@ -9101,7 +8821,6 @@ zabbix_export:
           name: 'Data disk read IOPS'
           type: DEPENDENT
           key: azure.db.pgsql.iops.read
-          delay: '0'
           value_type: FLOAT
           units: '!ops'
           description: 'The number of the data disk I/O read operations per second.'
@@ -9119,7 +8838,6 @@ zabbix_export:
           name: 'Data disk write IOPS'
           type: DEPENDENT
           key: azure.db.pgsql.iops.write
-          delay: '0'
           value_type: FLOAT
           units: '!ops'
           description: 'The number of the data disk I/O write operations per second.'
@@ -9137,7 +8855,6 @@ zabbix_export:
           name: 'Memory utilization'
           type: DEPENDENT
           key: azure.db.pgsql.memory.percentage
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'The memory percent of a host.'
@@ -9164,7 +8881,6 @@ zabbix_export:
           name: 'Network out'
           type: DEPENDENT
           key: azure.db.pgsql.network.egress
-          delay: '0'
           value_type: FLOAT
           units: bps
           description: 'The network outbound traffic across the active connections.'
@@ -9184,7 +8900,6 @@ zabbix_export:
           name: 'Network in'
           type: DEPENDENT
           key: azure.db.pgsql.network.ingress
-          delay: '0'
           value_type: FLOAT
           units: bps
           description: 'The network inbound traffic across the active connections.'
@@ -9204,7 +8919,6 @@ zabbix_export:
           name: 'Backup storage used'
           type: DEPENDENT
           key: azure.db.pgsql.storage.backup.used
-          delay: '0'
           value_type: FLOAT
           units: B
           description: 'Used backup storage, expressed in bytes.'
@@ -9222,7 +8936,6 @@ zabbix_export:
           name: 'Storage free'
           type: DEPENDENT
           key: azure.db.pgsql.storage.free
-          delay: '0'
           value_type: FLOAT
           units: B
           description: 'Free storage space, expressed in bytes.'
@@ -9239,7 +8952,6 @@ zabbix_export:
           name: 'Storage percent'
           type: DEPENDENT
           key: azure.db.pgsql.storage.percent
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'The storage utilization, expressed in %.'
@@ -9275,7 +8987,6 @@ zabbix_export:
           name: 'Transaction log storage used'
           type: DEPENDENT
           key: azure.db.pgsql.storage.txlogs.used
-          delay: '0'
           value_type: FLOAT
           units: B
           description: 'The storage space used by transaction log, expressed in bytes.'
@@ -9292,7 +9003,6 @@ zabbix_export:
           name: 'Storage used'
           type: DEPENDENT
           key: azure.db.pgsql.storage.used
-          delay: '0'
           value_type: FLOAT
           units: B
           description: 'Used storage space, expressed in bytes.'
@@ -9309,7 +9019,6 @@ zabbix_export:
           name: 'Maximum used transaction IDs'
           type: DEPENDENT
           key: azure.db.pgsql.txid.used.max
-          delay: '0'
           value_type: FLOAT
           description: 'The maximum number of used transaction IDs.'
           preprocessing:
@@ -9743,8 +9452,6 @@ zabbix_export:
           name: 'Availability status detailed'
           type: DEPENDENT
           key: azure.db.pgsql.availability.details
-          delay: '0'
-          trends: '0'
           value_type: CHAR
           description: 'The summary description of the availability status.'
           preprocessing:
@@ -9763,7 +9470,6 @@ zabbix_export:
           name: 'Availability state'
           type: DEPENDENT
           key: azure.db.pgsql.availability.state
-          delay: '0'
           description: 'The availability status of the resource.'
           valuemap:
             name: 'Azure resource health state'
@@ -9835,7 +9541,6 @@ zabbix_export:
           name: 'Connections active'
           type: DEPENDENT
           key: azure.db.pgsql.connections.active
-          delay: '0'
           value_type: FLOAT
           description: 'The count of active connections.'
           preprocessing:
@@ -9851,7 +9556,6 @@ zabbix_export:
           name: 'Connections failed'
           type: DEPENDENT
           key: azure.db.pgsql.connections.failed
-          delay: '0'
           value_type: FLOAT
           description: 'The count of failed connections.'
           preprocessing:
@@ -9868,7 +9572,6 @@ zabbix_export:
           name: 'Percentage CPU'
           type: DEPENDENT
           key: azure.db.pgsql.cpu.percentage
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'The CPU percent of a host.'
@@ -9895,8 +9598,6 @@ zabbix_export:
           name: 'Get errors'
           type: DEPENDENT
           key: azure.db.pgsql.data.errors
-          delay: '0'
-          trends: '0'
           value_type: TEXT
           description: 'A list of errors from API requests.'
           preprocessing:
@@ -9926,7 +9627,6 @@ zabbix_export:
           type: SCRIPT
           key: azure.db.pgsql.data.get
           history: '0'
-          trends: '0'
           value_type: TEXT
           params: |
             var AzureDB = {
@@ -10105,7 +9805,6 @@ zabbix_export:
           name: 'IO consumption percent'
           type: DEPENDENT
           key: azure.db.pgsql.io.consumption.percent
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'The consumption percent of I/O.'
@@ -10122,7 +9821,6 @@ zabbix_export:
           name: 'Memory utilization'
           type: DEPENDENT
           key: azure.db.pgsql.memory.percentage
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'The memory percent of a host.'
@@ -10149,7 +9847,6 @@ zabbix_export:
           name: 'Network out'
           type: DEPENDENT
           key: azure.db.pgsql.network.egress
-          delay: '0'
           value_type: FLOAT
           units: bps
           description: 'The network outbound traffic across the active connections.'
@@ -10170,7 +9867,6 @@ zabbix_export:
           name: 'Network in'
           type: DEPENDENT
           key: azure.db.pgsql.network.ingress
-          delay: '0'
           value_type: FLOAT
           units: bps
           description: 'The network inbound traffic across the active connections.'
@@ -10191,7 +9887,6 @@ zabbix_export:
           name: 'Replication lag'
           type: DEPENDENT
           key: azure.db.pgsql.replica.log.delay
-          delay: '0'
           value_type: FLOAT
           units: s
           description: 'The replication lag, expressed in seconds.'
@@ -10209,7 +9904,6 @@ zabbix_export:
           name: 'Max lag across replicas in bytes'
           type: DEPENDENT
           key: azure.db.pgsql.replica.log.delay.bytes
-          delay: '0'
           value_type: FLOAT
           units: B
           description: 'Lag for the most lagging replica, expressed in bytes.'
@@ -10227,7 +9921,6 @@ zabbix_export:
           name: 'Backup storage used'
           type: DEPENDENT
           key: azure.db.pgsql.storage.backup.used
-          delay: '0'
           value_type: FLOAT
           units: B
           description: 'Used backup storage, expressed in bytes.'
@@ -10244,7 +9937,6 @@ zabbix_export:
           name: 'Storage limit'
           type: DEPENDENT
           key: azure.db.pgsql.storage.limit
-          delay: '0'
           value_type: FLOAT
           units: B
           description: 'The storage limit, expressed in bytes.'
@@ -10261,7 +9953,6 @@ zabbix_export:
           name: 'Storage percent'
           type: DEPENDENT
           key: azure.db.pgsql.storage.percent
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'The storage utilization, expressed in %.'
@@ -10297,7 +9988,6 @@ zabbix_export:
           name: 'Server log storage limit'
           type: DEPENDENT
           key: azure.db.pgsql.storage.server.log.limit
-          delay: '0'
           value_type: FLOAT
           units: B
           description: 'The storage limit of server log, expressed in bytes.'
@@ -10314,7 +10004,6 @@ zabbix_export:
           name: 'Server log storage percent'
           type: DEPENDENT
           key: azure.db.pgsql.storage.server.log.percent
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'The storage utilization by server log, expressed in %.'
@@ -10331,7 +10020,6 @@ zabbix_export:
           name: 'Server log storage used'
           type: DEPENDENT
           key: azure.db.pgsql.storage.server.log.used
-          delay: '0'
           value_type: FLOAT
           units: B
           description: 'The storage space used by server log, expressed in bytes.'
@@ -10348,7 +10036,6 @@ zabbix_export:
           name: 'Storage used'
           type: DEPENDENT
           key: azure.db.pgsql.storage.used
-          delay: '0'
           value_type: FLOAT
           units: B
           description: 'Used storage space, expressed in bytes.'
@@ -10726,8 +10413,6 @@ zabbix_export:
           name: 'Availability status detailed'
           type: DEPENDENT
           key: azure.vm.availability.details
-          delay: '0'
-          trends: '0'
           value_type: CHAR
           description: 'The summary description of availability status.'
           preprocessing:
@@ -10746,7 +10431,6 @@ zabbix_export:
           name: 'Availability state'
           type: DEPENDENT
           key: azure.vm.availability.state
-          delay: '0'
           description: 'The availability status of the resource.'
           valuemap:
             name: 'Azure resource health state'
@@ -10818,7 +10502,6 @@ zabbix_export:
           name: 'VM cached bandwidth consumed percentage'
           type: DEPENDENT
           key: azure.vm.cached.bandwidth.consumed.percentage
-          delay: '0'
           units: '%'
           description: 'The percentage of the cached disk bandwidth consumed by the VM.'
           preprocessing:
@@ -10834,7 +10517,6 @@ zabbix_export:
           name: 'VM cached IOPS consumed percentage'
           type: DEPENDENT
           key: azure.vm.cached.iops.consumed.percentage
-          delay: '0'
           units: '%'
           description: 'The percentage of the cached disk IOPS consumed by the VM.'
           preprocessing:
@@ -10850,7 +10532,6 @@ zabbix_export:
           name: 'CPU credits consumed'
           type: DEPENDENT
           key: azure.vm.cpu.credits.consumed
-          delay: '0'
           value_type: FLOAT
           description: 'The total number of credits consumed by the virtual machine. Only available on B-series burstable VMs.'
           preprocessing:
@@ -10867,7 +10548,6 @@ zabbix_export:
           name: 'CPU credits remaining'
           type: DEPENDENT
           key: azure.vm.cpu.credits.remaining
-          delay: '0'
           value_type: FLOAT
           description: 'The total number of credits available to burst. Available only on B-series burstable VMs.'
           preprocessing:
@@ -10884,7 +10564,6 @@ zabbix_export:
           name: 'Percentage CPU'
           type: DEPENDENT
           key: azure.vm.cpu.percentage
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'The percentage of allocated computing units that are currently in use by VMs.'
@@ -10911,7 +10590,6 @@ zabbix_export:
           name: 'Data disk bandwidth consumed percentage'
           type: DEPENDENT
           key: azure.vm.data.disk.bandwidth.consumed.percentage
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'The percentage of the data disk bandwidth consumed per minute.'
@@ -10929,7 +10607,6 @@ zabbix_export:
           name: 'Data disk IOPS consumed percentage'
           type: DEPENDENT
           key: azure.vm.data.disk.iops.consumed.percentage
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'The percentage of the data disk input/output (I/O) consumed per minute.'
@@ -10947,7 +10624,6 @@ zabbix_export:
           name: 'Data disk max burst bandwidth'
           type: DEPENDENT
           key: azure.vm.data.disk.max.bandwidth
-          delay: '0'
           value_type: FLOAT
           units: Bps
           description: 'The maximum byte-per-second throughput that the data disk can achieve with bursting.'
@@ -10965,7 +10641,6 @@ zabbix_export:
           name: 'Data disk max burst IOPS'
           type: DEPENDENT
           key: azure.vm.data.disk.max.iops
-          delay: '0'
           value_type: FLOAT
           units: '!iops'
           description: 'The maximum IOPS that the data disk can achieve with bursting.'
@@ -10983,7 +10658,6 @@ zabbix_export:
           name: 'Data disk queue depth'
           type: DEPENDENT
           key: azure.vm.data.disk.queue.depth
-          delay: '0'
           value_type: FLOAT
           description: 'The number of outstanding IO requests that are waiting to be performed on a disk.'
           preprocessing:
@@ -11000,7 +10674,6 @@ zabbix_export:
           name: 'Data disk read rate'
           type: DEPENDENT
           key: azure.vm.data.disk.read.bps
-          delay: '0'
           value_type: FLOAT
           units: Bps
           description: 'Bytes per second read from a single disk during the monitoring period.'
@@ -11018,7 +10691,6 @@ zabbix_export:
           name: 'Data disk read operations/sec'
           type: DEPENDENT
           key: azure.vm.data.disk.read.ops
-          delay: '0'
           value_type: FLOAT
           units: '!iops'
           description: 'The read IOPS from a single disk during the monitoring period.'
@@ -11036,7 +10708,6 @@ zabbix_export:
           name: 'Data disk target bandwidth'
           type: DEPENDENT
           key: azure.vm.data.disk.target.bandwidth
-          delay: '0'
           value_type: FLOAT
           units: Bps
           description: 'Baseline byte-per-second throughput that the data disk can achieve without bursting.'
@@ -11054,7 +10725,6 @@ zabbix_export:
           name: 'Data disk target IOPS'
           type: DEPENDENT
           key: azure.vm.data.disk.target.iops
-          delay: '0'
           value_type: FLOAT
           units: '!iops'
           description: 'The baseline IOPS that the data disk can achieve without bursting.'
@@ -11072,7 +10742,6 @@ zabbix_export:
           name: 'Data disk used burst BPS credits percentage'
           type: DEPENDENT
           key: azure.vm.data.disk.used.burst.bandwidth
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'The percentage of the data disk burst bandwidth credits used so far.'
@@ -11090,7 +10759,6 @@ zabbix_export:
           name: 'Data disk used burst IO credits percentage'
           type: DEPENDENT
           key: azure.vm.data.disk.used.burst.iops
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'The percentage of the data disk burst I/O credits used so far.'
@@ -11108,7 +10776,6 @@ zabbix_export:
           name: 'Data disk write rate'
           type: DEPENDENT
           key: azure.vm.data.disk.write.bps
-          delay: '0'
           value_type: FLOAT
           units: Bps
           description: 'Bytes per second written to a single disk during the monitoring period.'
@@ -11126,7 +10793,6 @@ zabbix_export:
           name: 'Data disk write operations/sec'
           type: DEPENDENT
           key: azure.vm.data.disk.write.ops
-          delay: '0'
           value_type: FLOAT
           units: '!iops'
           description: 'The write IOPS from a single disk during the monitoring period.'
@@ -11144,8 +10810,6 @@ zabbix_export:
           name: 'Get errors'
           type: DEPENDENT
           key: azure.vm.data.errors
-          delay: '0'
-          trends: '0'
           value_type: TEXT
           description: 'A list of errors from API requests.'
           preprocessing:
@@ -11175,7 +10839,6 @@ zabbix_export:
           type: SCRIPT
           key: azure.vm.data.get
           history: '0'
-          trends: '0'
           value_type: TEXT
           params: |
             var AzureVM = {
@@ -11388,7 +11051,6 @@ zabbix_export:
           name: 'Disk read rate'
           type: DEPENDENT
           key: azure.vm.disk.read.bytes
-          delay: '0'
           value_type: FLOAT
           units: Bps
           description: 'Bytes read from the disk during the monitoring period (1 minute).'
@@ -11408,7 +11070,6 @@ zabbix_export:
           name: 'Disk read operations/sec'
           type: DEPENDENT
           key: azure.vm.disk.read.ops
-          delay: '0'
           value_type: FLOAT
           units: '!iops'
           description: 'The count of read operations from the disk per second.'
@@ -11425,7 +11086,6 @@ zabbix_export:
           name: 'Disk write rate'
           type: DEPENDENT
           key: azure.vm.disk.write.bytes
-          delay: '0'
           value_type: FLOAT
           units: Bps
           description: 'Bytes written to the disk during the monitoring period (1 minute).'
@@ -11445,7 +11105,6 @@ zabbix_export:
           name: 'Disk write operations/sec'
           type: DEPENDENT
           key: azure.vm.disk.write.ops
-          delay: '0'
           value_type: FLOAT
           units: '!iops'
           description: 'The count of write operations to the disk per second.'
@@ -11462,7 +11121,6 @@ zabbix_export:
           name: 'Inbound flows'
           type: DEPENDENT
           key: azure.vm.flows.inbound
-          delay: '0'
           value_type: FLOAT
           description: 'The number of current flows in the inbound direction (the traffic going into the VM).'
           preprocessing:
@@ -11479,7 +11137,6 @@ zabbix_export:
           name: 'Inbound flows max creation rate'
           type: DEPENDENT
           key: azure.vm.flows.inbound.max
-          delay: '0'
           value_type: FLOAT
           description: 'The maximum creation rate of the inbound flows (the traffic going into the VM).'
           preprocessing:
@@ -11496,7 +11153,6 @@ zabbix_export:
           name: 'Outbound flows'
           type: DEPENDENT
           key: azure.vm.flows.outbound
-          delay: '0'
           value_type: FLOAT
           description: 'The number of current flows in the outbound direction (the traffic going out of the VM).'
           preprocessing:
@@ -11513,7 +11169,6 @@ zabbix_export:
           name: 'Outbound flows max creation rate'
           type: DEPENDENT
           key: azure.vm.flows.outbound.max
-          delay: '0'
           value_type: FLOAT
           description: 'The maximum creation rate of the outbound flows (the traffic going out of the VM).'
           preprocessing:
@@ -11530,7 +11185,6 @@ zabbix_export:
           name: 'Available memory'
           type: DEPENDENT
           key: azure.vm.memory.available
-          delay: '0'
           units: B
           description: 'The amount of physical memory (in bytes) immediately available for the allocation to a process or for a system use in the VM.'
           preprocessing:
@@ -11546,7 +11200,6 @@ zabbix_export:
           name: 'Network in total'
           type: DEPENDENT
           key: azure.vm.network.in.total
-          delay: '0'
           value_type: FLOAT
           units: bps
           description: 'The number of bytes received by the VMs via all network interfaces (incoming traffic).'
@@ -11567,7 +11220,6 @@ zabbix_export:
           name: 'Network out total'
           type: DEPENDENT
           key: azure.vm.network.out.total
-          delay: '0'
           value_type: FLOAT
           units: bps
           description: 'The number of bytes sent by the VMs via all network interfaces (outgoing traffic).'
@@ -11588,7 +11240,6 @@ zabbix_export:
           name: 'OS disk bandwidth consumed percentage'
           type: DEPENDENT
           key: azure.vm.os.disk.bandwidth.consumed.percentage
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'The percentage of the operating system''s disk bandwidth consumed per minute.'
@@ -11606,7 +11257,6 @@ zabbix_export:
           name: 'OS disk IOPS consumed percentage'
           type: DEPENDENT
           key: azure.vm.os.disk.iops.consumed.percentage
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'The percentage of the operating system''s disk I/Os consumed per minute.'
@@ -11624,7 +11274,6 @@ zabbix_export:
           name: 'OS disk max burst bandwidth'
           type: DEPENDENT
           key: azure.vm.os.disk.max.bandwidth
-          delay: '0'
           value_type: FLOAT
           units: Bps
           description: 'Maximum byte-per-second throughput that the OS disk can achieve with bursting.'
@@ -11642,7 +11291,6 @@ zabbix_export:
           name: 'OS disk max burst IOPS'
           type: DEPENDENT
           key: azure.vm.os.disk.max.iops
-          delay: '0'
           value_type: FLOAT
           units: '!iops'
           description: 'Maximum IOPS that the OS disk can achieve with bursting.'
@@ -11660,7 +11308,6 @@ zabbix_export:
           name: 'OS disk queue depth'
           type: DEPENDENT
           key: azure.vm.os.disk.queue.depth
-          delay: '0'
           value_type: FLOAT
           description: 'The OS disk queue depth (or queue length).'
           preprocessing:
@@ -11677,7 +11324,6 @@ zabbix_export:
           name: 'OS disk read rate'
           type: DEPENDENT
           key: azure.vm.os.disk.read.bps
-          delay: '0'
           value_type: FLOAT
           units: Bps
           description: 'Bytes per second read from a single disk during the monitoring period - for an OS disk.'
@@ -11695,7 +11341,6 @@ zabbix_export:
           name: 'OS disk read operations/sec'
           type: DEPENDENT
           key: azure.vm.os.disk.read.ops
-          delay: '0'
           value_type: FLOAT
           units: '!iops'
           description: 'The read IOPS from a single disk during the monitoring period - for an OS disk.'
@@ -11713,7 +11358,6 @@ zabbix_export:
           name: 'OS disk target bandwidth'
           type: DEPENDENT
           key: azure.vm.os.disk.target.bandwidth
-          delay: '0'
           value_type: FLOAT
           units: Bps
           description: 'Baseline byte-per-second throughput that the OS disk can achieve without bursting.'
@@ -11731,7 +11375,6 @@ zabbix_export:
           name: 'OS disk target IOPS'
           type: DEPENDENT
           key: azure.vm.os.disk.target.iops
-          delay: '0'
           value_type: FLOAT
           units: '!iops'
           description: 'Baseline IOPS that the OS disk can achieve without bursting.'
@@ -11749,7 +11392,6 @@ zabbix_export:
           name: 'OS disk used burst BPS credits percentage'
           type: DEPENDENT
           key: azure.vm.os.disk.used.burst.bandwidth
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'The percentage of the OS disk burst bandwidth credits used so far.'
@@ -11767,7 +11409,6 @@ zabbix_export:
           name: 'OS disk used burst IO credits percentage'
           type: DEPENDENT
           key: azure.vm.os.disk.used.burst.iops
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'The percentage of the OS disk burst I/O credits used so far.'
@@ -11785,7 +11426,6 @@ zabbix_export:
           name: 'OS disk write rate'
           type: DEPENDENT
           key: azure.vm.os.disk.write.bps
-          delay: '0'
           value_type: FLOAT
           units: Bps
           description: 'Bytes per second written to a single disk during the monitoring period - for an OS disk.'
@@ -11803,7 +11443,6 @@ zabbix_export:
           name: 'OS disk write operations/sec'
           type: DEPENDENT
           key: azure.vm.os.disk.write.ops
-          delay: '0'
           value_type: FLOAT
           units: '!iops'
           description: 'The write IOPS from a single disk during the monitoring period - for an OS disk.'
@@ -11821,7 +11460,6 @@ zabbix_export:
           name: 'Premium data disk cache read hit'
           type: DEPENDENT
           key: azure.vm.premium.data.disk.cache.read.hit
-          delay: '0'
           units: '%'
           description: 'Premium data disk cache read hit.'
           preprocessing:
@@ -11838,7 +11476,6 @@ zabbix_export:
           name: 'Premium data disk cache read miss'
           type: DEPENDENT
           key: azure.vm.premium.data.disk.cache.read.miss
-          delay: '0'
           units: '%'
           description: 'Premium data disk cache read miss.'
           preprocessing:
@@ -11855,7 +11492,6 @@ zabbix_export:
           name: 'Premium OS disk cache read hit'
           type: DEPENDENT
           key: azure.vm.premium.os.disk.cache.read.hit
-          delay: '0'
           units: '%'
           description: 'Premium OS disk cache read hit.'
           preprocessing:
@@ -11872,7 +11508,6 @@ zabbix_export:
           name: 'Premium OS disk cache read miss'
           type: DEPENDENT
           key: azure.vm.premium.os.disk.cache.read.miss
-          delay: '0'
           units: '%'
           description: 'Premium OS disk cache read miss.'
           preprocessing:
@@ -11889,7 +11524,6 @@ zabbix_export:
           name: 'VM uncached bandwidth consumed percentage'
           type: DEPENDENT
           key: azure.vm.uncached.bandwidth.consumed.percentage
-          delay: '0'
           units: '%'
           description: 'The percentage of the uncached disk bandwidth consumed by the VM.'
           preprocessing:
@@ -11905,7 +11539,6 @@ zabbix_export:
           name: 'VM uncached IOPS consumed percentage'
           type: DEPENDENT
           key: azure.vm.uncached.iops.consumed.percentage
-          delay: '0'
           units: '%'
           description: 'The percentage of the uncached disk IOPS consumed by the VM.'
           preprocessing:
@@ -12303,7 +11936,6 @@ zabbix_export:
           name: 'VM availability metric'
           type: DEPENDENT
           key: azure.scaleset.availability
-          delay: '0'
           value_type: FLOAT
           description: 'Measure of availability of the virtual machines over time.'
           preprocessing:
@@ -12323,8 +11955,6 @@ zabbix_export:
           name: 'Availability status detailed'
           type: DEPENDENT
           key: azure.scaleset.availability.details
-          delay: '0'
-          trends: '0'
           value_type: CHAR
           description: 'The summary description of availability status.'
           preprocessing:
@@ -12344,7 +11974,6 @@ zabbix_export:
           name: 'Availability state'
           type: DEPENDENT
           key: azure.scaleset.availability.state
-          delay: '0'
           description: |
             The availability status of the resource.
             0 - Available - no events detected that affect the health of the resource.
@@ -12421,7 +12050,6 @@ zabbix_export:
           name: 'CPU credits consumed'
           type: DEPENDENT
           key: azure.scaleset.cpu.credits.consumed
-          delay: '0'
           value_type: FLOAT
           description: 'Total number of credits consumed by the virtual machine. Only available on B-series burstable VMs.'
           preprocessing:
@@ -12441,7 +12069,6 @@ zabbix_export:
           name: 'CPU credits remaining'
           type: DEPENDENT
           key: azure.scaleset.cpu.credits.remaining
-          delay: '0'
           value_type: FLOAT
           description: 'Total number of credits available to burst. Only available on B-series burstable VMs.'
           preprocessing:
@@ -12461,7 +12088,6 @@ zabbix_export:
           name: 'CPU utilization'
           type: DEPENDENT
           key: azure.scaleset.cpu.utilization
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'The percentage of allocated compute units that are currently in use by the virtual machine(s).'
@@ -12493,7 +12119,6 @@ zabbix_export:
           name: 'Data disk max burst bandwidth'
           type: DEPENDENT
           key: azure.scaleset.data.disk.bandwidth.burst.max
-          delay: '0'
           value_type: FLOAT
           units: Bps
           description: 'Maximum byte-per-second throughput the data disk can achieve with bursting.'
@@ -12514,7 +12139,6 @@ zabbix_export:
           name: 'Data disk used burst BPS credits'
           type: DEPENDENT
           key: azure.scaleset.data.disk.bandwidth.burst.used
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'Percentage of data disk burst bandwidth credits used so far.'
@@ -12535,7 +12159,6 @@ zabbix_export:
           name: 'Data disk bandwidth consumed'
           type: DEPENDENT
           key: azure.scaleset.data.disk.bandwidth.consumed
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'Percentage of data disk bandwidth consumed per minute.'
@@ -12556,7 +12179,6 @@ zabbix_export:
           name: 'Data disk target bandwidth'
           type: DEPENDENT
           key: azure.scaleset.data.disk.bandwidth.target
-          delay: '0'
           value_type: FLOAT
           units: Bps
           description: 'Baseline byte-per-second throughput the data disk can achieve without bursting.'
@@ -12577,7 +12199,6 @@ zabbix_export:
           name: 'Data disk max burst IOPS'
           type: DEPENDENT
           key: azure.scaleset.data.disk.iops.burst.max
-          delay: '0'
           value_type: FLOAT
           units: '!iops'
           description: 'Maximum IOPS the data disk can achieve with bursting.'
@@ -12598,7 +12219,6 @@ zabbix_export:
           name: 'Data disk used burst IO credits'
           type: DEPENDENT
           key: azure.scaleset.data.disk.iops.burst.used
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'Percentage of data disk burst I/O credits used so far.'
@@ -12619,7 +12239,6 @@ zabbix_export:
           name: 'Data disk IOPS consumed'
           type: DEPENDENT
           key: azure.scaleset.data.disk.iops.consumed
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'Percentage of data disk I/Os consumed per minute.'
@@ -12640,7 +12259,6 @@ zabbix_export:
           name: 'Data disk target IOPS'
           type: DEPENDENT
           key: azure.scaleset.data.disk.iops.target
-          delay: '0'
           value_type: FLOAT
           units: '!iops'
           description: 'Baseline IOPS the data disk can achieve without bursting.'
@@ -12661,7 +12279,6 @@ zabbix_export:
           name: 'Data disk queue depth'
           type: DEPENDENT
           key: azure.scaleset.data.disk.queue.depth
-          delay: '0'
           description: 'Data disk queue depth (or queue length).'
           preprocessing:
             - type: JSONPATH
@@ -12680,7 +12297,6 @@ zabbix_export:
           name: 'Data disk read rate'
           type: DEPENDENT
           key: azure.scaleset.data.disk.read.bps
-          delay: '0'
           value_type: FLOAT
           units: Bps
           description: 'Bytes/sec read from a single disk during the monitoring period.'
@@ -12701,7 +12317,6 @@ zabbix_export:
           name: 'Data disk IOPS read'
           type: DEPENDENT
           key: azure.scaleset.data.disk.read.ops
-          delay: '0'
           value_type: FLOAT
           units: '!iops'
           description: 'Read IOPS from a single disk during the monitoring period.'
@@ -12722,7 +12337,6 @@ zabbix_export:
           name: 'Data disk write rate'
           type: DEPENDENT
           key: azure.scaleset.data.disk.write.bps
-          delay: '0'
           value_type: FLOAT
           units: Bps
           description: 'Bytes/sec written to a single disk during the monitoring period.'
@@ -12743,7 +12357,6 @@ zabbix_export:
           name: 'Data disk IOPS write'
           type: DEPENDENT
           key: azure.scaleset.data.disk.write.ops
-          delay: '0'
           value_type: FLOAT
           units: '!iops'
           description: 'Write IOPS from a single disk during the monitoring period.'
@@ -12764,8 +12377,6 @@ zabbix_export:
           name: 'Get errors'
           type: DEPENDENT
           key: azure.scaleset.data.errors
-          delay: '0'
-          trends: '0'
           value_type: TEXT
           description: 'A list of errors from API requests.'
           preprocessing:
@@ -12796,7 +12407,6 @@ zabbix_export:
           type: SCRIPT
           key: azure.scaleset.data.get
           history: '0'
-          trends: '0'
           value_type: TEXT
           params: |
             var Azure = {
@@ -12949,7 +12559,6 @@ zabbix_export:
           name: 'Disk read'
           type: DEPENDENT
           key: azure.scaleset.disk.read
-          delay: '0'
           value_type: FLOAT
           units: B
           description: 'Bytes read from the disk during the monitoring period.'
@@ -12970,7 +12579,6 @@ zabbix_export:
           name: 'Disk IOPS read'
           type: DEPENDENT
           key: azure.scaleset.disk.read.ops
-          delay: '0'
           value_type: FLOAT
           units: '!iops'
           description: 'Disk read IOPS.'
@@ -12991,7 +12599,6 @@ zabbix_export:
           name: 'Disk write'
           type: DEPENDENT
           key: azure.scaleset.disk.write
-          delay: '0'
           value_type: FLOAT
           units: B
           description: 'Bytes written to the disk during the monitoring period.'
@@ -13012,7 +12619,6 @@ zabbix_export:
           name: 'Disk IOPS write'
           type: DEPENDENT
           key: azure.scaleset.disk.write.ops
-          delay: '0'
           value_type: FLOAT
           units: '!iops'
           description: 'Write IOPS from a single disk during the monitoring period.'
@@ -13033,7 +12639,6 @@ zabbix_export:
           name: 'Inbound flows'
           type: DEPENDENT
           key: azure.scaleset.flows.inbound
-          delay: '0'
           value_type: FLOAT
           description: 'Inbound Flows are the number of current flows in the inbound direction (traffic going into the VMs).'
           preprocessing:
@@ -13053,7 +12658,6 @@ zabbix_export:
           name: 'Inbound flow maximum creation rate'
           type: DEPENDENT
           key: azure.scaleset.flows.inbound.max
-          delay: '0'
           value_type: FLOAT
           description: 'The maximum creation rate of inbound flows (traffic going into the VM).'
           preprocessing:
@@ -13073,7 +12677,6 @@ zabbix_export:
           name: 'Outbound flows'
           type: DEPENDENT
           key: azure.scaleset.flows.outbound
-          delay: '0'
           value_type: FLOAT
           description: 'Outbound Flows are the number of current flows in the outbound direction (traffic going out of the VMs).'
           preprocessing:
@@ -13093,7 +12696,6 @@ zabbix_export:
           name: 'Outbound flow maximum creation rate'
           type: DEPENDENT
           key: azure.scaleset.flows.outbound.max
-          delay: '0'
           value_type: FLOAT
           description: 'The maximum creation rate of outbound flows (traffic going out of the VM).'
           preprocessing:
@@ -13113,7 +12715,6 @@ zabbix_export:
           name: 'Network in total'
           type: DEPENDENT
           key: azure.scaleset.network.in.total
-          delay: '0'
           value_type: FLOAT
           units: B
           description: 'The number of bytes received on all network interfaces by the virtual machine(s) (incoming traffic).'
@@ -13131,7 +12732,6 @@ zabbix_export:
           name: 'Network out total'
           type: DEPENDENT
           key: azure.scaleset.network.out.total
-          delay: '0'
           value_type: FLOAT
           units: B
           description: 'The number of bytes out on all network interfaces by the virtual machine(s) (outgoing traffic).'
@@ -13149,7 +12749,6 @@ zabbix_export:
           name: 'OS disk used burst BPS credits'
           type: DEPENDENT
           key: azure.scaleset.os.disk.bandwidth.burst.used
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'Percentage of OS Disk burst bandwidth credits used so far.'
@@ -13170,7 +12769,6 @@ zabbix_export:
           name: 'OS disk bandwidth consumed'
           type: DEPENDENT
           key: azure.scaleset.os.disk.bandwidth.consumed
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'Percentage of operating system disk bandwidth consumed per minute.'
@@ -13191,7 +12789,6 @@ zabbix_export:
           name: 'OS disk max burst bandwidth'
           type: DEPENDENT
           key: azure.scaleset.os.disk.bandwidth.max
-          delay: '0'
           value_type: FLOAT
           units: Bps
           description: 'Maximum byte-per-second throughput the OS Disk can achieve with bursting.'
@@ -13212,7 +12809,6 @@ zabbix_export:
           name: 'OS disk target bandwidth'
           type: DEPENDENT
           key: azure.scaleset.os.disk.bandwidth.target
-          delay: '0'
           value_type: FLOAT
           units: Bps
           description: 'Baseline byte-per-second throughput the OS Disk can achieve without bursting.'
@@ -13233,7 +12829,6 @@ zabbix_export:
           name: 'OS disk used burst IO credits'
           type: DEPENDENT
           key: azure.scaleset.os.disk.iops.burst.used
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'Percentage of OS Disk burst I/O credits used so far.'
@@ -13254,7 +12849,6 @@ zabbix_export:
           name: 'OS disk IOPS consumed'
           type: DEPENDENT
           key: azure.scaleset.os.disk.iops.consumed
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'Percentage of operating system disk I/Os consumed per minute.'
@@ -13275,7 +12869,6 @@ zabbix_export:
           name: 'OS disk max burst IOPS'
           type: DEPENDENT
           key: azure.scaleset.os.disk.iops.max
-          delay: '0'
           value_type: FLOAT
           units: '!iops'
           description: 'Maximum IOPS the OS Disk can achieve with bursting.'
@@ -13296,7 +12889,6 @@ zabbix_export:
           name: 'OS disk target IOPS'
           type: DEPENDENT
           key: azure.scaleset.os.disk.iops.target
-          delay: '0'
           value_type: FLOAT
           units: '!iops'
           description: 'Baseline IOPS the OS disk can achieve without bursting.'
@@ -13317,7 +12909,6 @@ zabbix_export:
           name: 'OS disk queue depth'
           type: DEPENDENT
           key: azure.scaleset.os.disk.queue.depth
-          delay: '0'
           value_type: FLOAT
           description: 'OS Disk queue depth (or queue length).'
           preprocessing:
@@ -13337,7 +12928,6 @@ zabbix_export:
           name: 'OS disk read rate'
           type: DEPENDENT
           key: azure.scaleset.os.disk.read.bps
-          delay: '0'
           value_type: FLOAT
           units: Bps
           description: 'Bytes/sec read from a single disk during the monitoring period - for an OS disk.'
@@ -13358,7 +12948,6 @@ zabbix_export:
           name: 'OS disk IOPS read'
           type: DEPENDENT
           key: azure.scaleset.os.disk.read.ops
-          delay: '0'
           value_type: FLOAT
           units: '!iops'
           description: 'Read IOPS from a single disk during the monitoring period - for an OS disk.'
@@ -13379,7 +12968,6 @@ zabbix_export:
           name: 'OS disk write rate'
           type: DEPENDENT
           key: azure.scaleset.os.disk.write.bps
-          delay: '0'
           value_type: FLOAT
           units: Bps
           description: 'Bytes/sec written to a single disk during the monitoring period - for an OS disk.'
@@ -13400,7 +12988,6 @@ zabbix_export:
           name: 'OS disk IOPS write'
           type: DEPENDENT
           key: azure.scaleset.os.disk.write.ops
-          delay: '0'
           value_type: FLOAT
           units: '!iops'
           description: 'Write IOPS from a single disk during the monitoring period - for an OS disk.'
@@ -13421,7 +13008,6 @@ zabbix_export:
           name: 'Premium data disk cache read hit in %'
           type: DEPENDENT
           key: azure.scaleset.premium.data.disk.cache.read.hit
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'Percentage of premium data disk cache read hit.'
@@ -13442,7 +13028,6 @@ zabbix_export:
           name: 'Premium data disk cache read miss in %'
           type: DEPENDENT
           key: azure.scaleset.premium.data.disk.cache.read.miss
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'Percentage of premium data disk cache read miss.'
@@ -13463,7 +13048,6 @@ zabbix_export:
           name: 'Premium OS disk cache read hit in %'
           type: DEPENDENT
           key: azure.scaleset.premium.os.disk.cache.read.hit
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'Percentage of premium OS disk cache read hit.'
@@ -13484,7 +13068,6 @@ zabbix_export:
           name: 'Premium OS disk cache read miss in %'
           type: DEPENDENT
           key: azure.scaleset.premium.os.disk.cache.read.miss
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'Percentage of premium OS disk cache read miss.'
@@ -13505,7 +13088,6 @@ zabbix_export:
           name: 'VM cached bandwidth consumed'
           type: DEPENDENT
           key: azure.scaleset.vm.cached.bandwidth.consumed
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'Percentage of cached disk bandwidth consumed by the VM.'
@@ -13526,7 +13108,6 @@ zabbix_export:
           name: 'VM cached IOPS consumed'
           type: DEPENDENT
           key: azure.scaleset.vm.cached.iops.consumed
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'Percentage of cached disk IOPS consumed by the VM.'
@@ -13547,7 +13128,6 @@ zabbix_export:
           name: 'Virtual machine count'
           type: DEPENDENT
           key: azure.scaleset.vm.count
-          delay: '0'
           description: 'Current amount of virtual machines in the scale set.'
           preprocessing:
             - type: JSONPATH
@@ -13576,7 +13156,6 @@ zabbix_export:
           name: 'Available memory'
           type: DEPENDENT
           key: azure.scaleset.vm.memory
-          delay: '0'
           value_type: FLOAT
           units: B
           description: 'Amount of physical memory, in bytes, immediately available for allocation to a process or for system use in the virtual machine.'
@@ -13597,7 +13176,6 @@ zabbix_export:
           name: 'VM uncached bandwidth consumed'
           type: DEPENDENT
           key: azure.scaleset.vm.uncached.bandwidth.consumed
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'Percentage of uncached disk bandwidth consumed by the VM.'
@@ -13618,7 +13196,6 @@ zabbix_export:
           name: 'VM uncached IOPS consumed'
           type: DEPENDENT
           key: azure.scaleset.vm.uncached.iops.consumed
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'Percentage of uncached disk IOPS consumed by the VM.'
