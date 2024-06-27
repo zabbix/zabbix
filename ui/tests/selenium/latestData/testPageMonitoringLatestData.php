@@ -584,62 +584,59 @@ class testPageMonitoringLatestData extends CWebTest {
 		$this->query('button:Reset')->waitUntilClickable()->one()->click();
 	}
 
+	public function testPageMonitoringLatestData_ClickTag() {
+		$this->checkClickTag();
+	}
+
+	public function testPageMonitoringLatestData_ClickTagKiosk() {
+		$this->checkClickTag('kiosk');
+	}
+
 	/**
 	 * Test for clicking on particular item tag in table and checking that items are filtered by this tag using normal and kiosk mode.
+	 *
+	 * @param string $mode	page mode is selected
 	 */
-	public function testPageMonitoringLatestData_ClickTag() {
+	protected function checkClickTag($mode = 'normal') {
 		$tag = ['tag' => 'component: ', 'value' => 'storage'];
+		$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE name='.zbx_dbstr('ЗАББИКС Сервер'));
+		$this->page->login()->open('zabbix.php?action=latest.view&hostids%5B%5D='.$hostid)->waitUntilReady();
 
-		$this->page->login()->open('zabbix.php?action=latest.view')->waitUntilReady();
-		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
-		$table = $this->getTable()->waitUntilPresent();
-
-		foreach ([false, true] as $kiosk_mode) {
-			$form->fill(['Hosts' => 'ЗАББИКС Сервер']);
-			$form->submit();
-			$table->waitUntilReloaded();
-
-			if ($kiosk_mode === true) {
-				$this->query('xpath://button[@title="Kiosk mode"]')->one()->click();
-				$this->page->waitUntilReady();
-				$this->assertTrue($this->query('xpath://button[@title="Normal view"]')->exists());
-			}
-
-			$this->getTable()->query('button', $tag['tag'].$tag['value'])->waitUntilClickable()->one()->click();
+		if ($mode === 'kiosk') {
+			$this->query('xpath://button[@title="Kiosk mode"]')->one()->click();
 			$this->page->waitUntilReady();
+			$this->assertTrue($this->query('xpath://button[@title="Normal view"]')->exists());
+		}
 
-			if ($kiosk_mode === false) {
-				$this->page->assertTitle('Latest data');
-				$this->page->assertHeader('Latest data');
-			}
+		$this->getTable()->query('button', $tag['tag'].$tag['value'])->waitUntilClickable()->one()->click();
+		$this->page->waitUntilReady();
 
-			// Check that tag value is selected in subfilter under correct header.
-			$this->assertTrue($this->query("xpath://td/h3[text()='Tag values']/..//label[text()=".
-					CXPathHelper::escapeQuotes($tag['tag'])."]/../..//span[@class=".
-					CXPathHelper::fromClass('subfilter-enabled')."]/a[text()=".
-					CXPathHelper::escapeQuotes($tag['value'])."]")->exists()
-			);
+		// Check that tag value is selected in subfilter under correct header.
+		$this->assertTrue($this->query('xpath://td/h3[text()="Tag values"]/..//label[text()='.
+				CXPathHelper::escapeQuotes($tag['tag']).']/../..//span[@class='.
+				CXPathHelper::fromClass('subfilter-enabled').']/a[text()='.
+				CXPathHelper::escapeQuotes($tag['value']).']')->exists()
+		);
 
-			$data = [
-				['Name' => 'Free swap space'],
-				['Name' => 'Free swap space in %'],
-				['Name' => 'Total swap space']
-			];
+		$data = [
+			['Name' => 'Free swap space'],
+			['Name' => 'Free swap space in %'],
+			['Name' => 'Total swap space']
+		];
+		$this->assertTableData($data, $this->getTableSelector());
+
+		if ($mode === 'kiosk') {
+			$this->query('xpath://button[@title="Normal view"]')->one()->click();
+			$this->page->waitUntilReady();
+			$this->assertTrue($this->query('xpath://button[@title="Kiosk mode"]')->exists());
 			$this->assertTableData($data, $this->getTableSelector());
-
-			if ($kiosk_mode === false) {
-				$this->query('button:Reset')->one()->click();
-				$this->page->waitUntilReady();
-				$this->assertEquals(['Filter is not set', 'Use the filter to display results'],
-						explode("\n", $this->query('class:no-data-message')->one()->getText())
-				);
-			}
-			else {
-				$this->query('xpath://button[@title="Normal view"]')->one()->click();
-				$this->page->waitUntilReady();
-				$this->assertTrue($this->query('xpath://button[@title="Kiosk mode"]')->exists());
-				$this->assertTableData($data, $this->getTableSelector());
-			}
+		}
+		else {
+			$this->query('button:Reset')->one()->click();
+			$this->page->waitUntilReady();
+			$this->assertEquals(['Filter is not set', 'Use the filter to display results'],
+					explode("\n", $this->query('class:no-data-message')->one()->getText())
+			);
 		}
 	}
 
