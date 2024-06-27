@@ -1669,7 +1669,7 @@ function access_deny($mode = ACCESS_DENY_OBJECT) {
 	}
 	// deny access to a page
 	else {
-		// url to redirect the user to after he logs in
+		// url to redirect the user to after he/she logs in
 		$url = (new CUrl(!empty($_REQUEST['request']) ? $_REQUEST['request'] : ''))
 			->removeArgument(CCsrfTokenHelper::CSRF_TOKEN_NAME);
 
