@@ -181,7 +181,7 @@ class testFormAlarmNotification extends CWebTest {
 	}
 
 	/**
-	 * Check Alarm notification overlay dialog  layout.
+	 * Check Alarm notification overlay dialog layout.
 	 */
 	public function testFormAlarmNotification_Layout() {
 		$this->page->login()->open('zabbix.php?action=problem.view')->waitUntilReady();
@@ -339,6 +339,8 @@ class testFormAlarmNotification extends CWebTest {
 		if ($this->query('class:list-table')->asTable()->one()->getRows()->asText() !== ['No data found.']) {
 			$this->closeProblem();
 		}
+
+		$this->page->logout();
 	}
 
 	public static function getDisplayedAlarmsData() {
@@ -448,7 +450,7 @@ class testFormAlarmNotification extends CWebTest {
 				waitUntilPresent()->one();
 
 		// Multiple problems for one trigger or one problem for one trigger.
-		if (array_key_exists('multiple_check', $data)) {
+		if (CTestArrayHelper::get($data, 'multiple_check', false)) {
 			for ($i = 1; $i <= 4; $i++) {
 				$this->assertTrue($alarm_dialog->query('xpath:(//p/a[text()="Disaster_trigger"])['.$i.']')->one()->isClickable());
 			}
@@ -462,6 +464,8 @@ class testFormAlarmNotification extends CWebTest {
 		$alarm_dialog->query('xpath:.//button[@title="Close"]')->one()->click();
 		$alarm_dialog->ensureNotPresent();
 		$this->closeProblem();
+
+		$this->page->logout();
 	}
 
 	public static function getNotDisplayedAlarmsData(){
@@ -547,7 +551,7 @@ class testFormAlarmNotification extends CWebTest {
 	}
 
 	/**
-	 * Check that turning off alarms, they are not displayed in alarm notification overlay.
+	 * Check that turning off alarms for severity, they are not displayed in alarm notification overlay.
 	 *
 	 * @dataProvider getNotDisplayedAlarmsData
 	 */
@@ -575,7 +579,7 @@ class testFormAlarmNotification extends CWebTest {
 		// Check that problems displayed in table.
 		$this->assertTableDataColumn($this->all_triggers, 'Problem');
 
-		if (array_key_exists('all_off', $data)) {
+		if (CTestArrayHelper::get($data, 'all_off', false)) {
 			$this->assertFalse($this->query('xpath://div[@class="overlay-dialogue notif ui-draggable"]')->one()->isDisplayed());
 		}
 		else {
@@ -600,6 +604,8 @@ class testFormAlarmNotification extends CWebTest {
 		}
 
 		$this->closeProblem();
+
+		$this->page->logout();
 	}
 
 	/**
