@@ -33,17 +33,18 @@ typedef struct
 	const char	*name;
 	const char	*segmentby;
 	const char	*orderby;
+	int		created_before;
 } zbx_history_table_compression_options_t;
 
 static zbx_history_table_compression_options_t	compression_tables[] = {
-	{"history",		"itemid",	"clock,ns"},
-	{"history_uint",	"itemid",	"clock,ns"},
-	{"history_str",		"itemid",	"clock,ns"},
-	{"history_text",	"itemid",	"clock,ns"},
-	{"history_log",		"itemid",	"clock,ns"},
-	{"trends",		"itemid",	"clock"},
-	{"trends_uint",		"itemid",	"clock"},
-	{"auditlog",		"auditid",	"clock"}
+	{"history",		"itemid",	"clock,ns",	0},
+	{"history_uint",	"itemid",	"clock,ns",	0},
+	{"history_str",		"itemid",	"clock,ns",	0},
+	{"history_text",	"itemid",	"clock,ns",	0},
+	{"history_log",		"itemid",	"clock,ns",	0},
+	{"trends",		"itemid",	"clock",	0},
+	{"trends_uint",		"itemid",	"clock",	0},
+	{"auditlog",		"auditid",	"clock",	1}
 };
 
 static unsigned char	compression_status_cache = 0;
@@ -119,6 +120,27 @@ static int	hk_get_table_compression_age(const char *table_name)
 	return age;
 }
 
+static int	hk_get_chunk_compression_age(const char *table_name)
+{
+	int		age = 0;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): table: %s", __func__, table_name);
+
+	result = zbx_db_select("select extract(epoch from (config::json->>'compress_created_before')::interval) from"
+			" timescaledb_information.jobs where application_name like 'Compression%%' and"
+			" hypertable_schema='%s' and hypertable_name='%s'", zbx_db_get_schema_esc(), table_name);
+
+	if (NULL != (row = zbx_db_fetch(result)))
+		age = atoi(row[0]);
+
+	zbx_db_free_result(result);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() age: %d", __func__, age);
+
+	return age;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: ensures that table compression is configured to specified age     *
@@ -127,27 +149,49 @@ static int	hk_get_table_compression_age(const char *table_name)
  *             age        - [IN] compression age                              *
  *                                                                            *
  ******************************************************************************/
-static void	hk_check_table_compression_age(const char *table_name, int age)
+static void	hk_check_table_compression_age(const char *table_name, int age, int created_before)
 {
-	int	compress_after;
+	int		compress_after;
+	zbx_db_result_t	res;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): table: %s age %d", __func__, table_name, age);
 
-	if (age != (compress_after = hk_get_table_compression_age(table_name)))
+	if (0 == created_before)
 	{
-		zbx_db_result_t	res;
+		if (age != (compress_after = hk_get_table_compression_age(table_name)))
+		{
+			if (0 != compress_after)
+				zbx_db_free_result(zbx_db_select("select %s('%s')", COMPRESSION_POLICY_REMOVE,
+						table_name));
 
-		if (0 != compress_after)
-			zbx_db_free_result(zbx_db_select("select %s('%s')", COMPRESSION_POLICY_REMOVE, table_name));
+			zabbix_log(LOG_LEVEL_DEBUG, "adding compression policy to table: %s age %d", table_name, age);
 
-		zabbix_log(LOG_LEVEL_DEBUG, "adding compression policy to table: %s age %d", table_name, age);
+			res = zbx_db_select("select %s('%s', integer '%d')", COMPRESSION_POLICY_ADD, table_name, age);
 
-		res = zbx_db_select("select %s('%s', integer '%d')", COMPRESSION_POLICY_ADD, table_name, age);
+			if (NULL == res)
+				zabbix_log(LOG_LEVEL_ERR, "failed to add compression policy to table '%s'", table_name);
+			else
+				zbx_db_free_result(res);
+		}
+	}
+	else
+	{
+		if (age != (compress_after = hk_get_chunk_compression_age(table_name)))
+		{
+			if (0 != compress_after)
+				zbx_db_free_result(zbx_db_select("select %s('%s')", COMPRESSION_POLICY_REMOVE,
+						table_name));
 
-		if (NULL == res)
-			zabbix_log(LOG_LEVEL_ERR, "failed to add compression policy to table '%s'", table_name);
-		else
-			zbx_db_free_result(res);
+			zabbix_log(LOG_LEVEL_DEBUG, "adding compression policy for chunks in: %s age %d", table_name, age);
+
+			res = zbx_db_select("select %s('%s', compress_created_before => interval '%d')",
+					COMPRESSION_POLICY_ADD, table_name, age);
+
+			if (NULL == res)
+				zabbix_log(LOG_LEVEL_ERR, "failed to add compression policy to table '%s'", table_name);
+			else
+				zbx_db_free_result(res);
+		}
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -166,22 +210,28 @@ static void	hk_history_enable_compression(int age)
 
 	for (size_t i = 0; i < ARRSIZE(compression_tables); i++)
 	{
-		zbx_db_result_t	res;
+		zbx_history_table_compression_options_t	*table = &compression_tables[i];
 
-		res = zbx_db_select("select set_integer_now_func('%s', '"ZBX_TS_UNIX_NOW"', true)",
-				compression_tables[i].name);
-		if(NULL == res)
+		if (0 == table->created_before)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Table \"%s\" is not a hypertable. Execute TimescaleDB"
-					" configuration step as described in Zabbix documentation to upgrade schema.",
-					compression_tables[i].name);
-			continue;
+			zbx_db_result_t	res;
+
+			res = zbx_db_select("select set_integer_now_func('%s', '"ZBX_TS_UNIX_NOW"', true)",
+					table->name);
+			if(NULL == res)
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "Table \"%s\" is not a hypertable. Execute TimescaleDB"
+						" configuration step as described in Zabbix documentation to upgrade"
+						" schema.", table->name);
+				continue;
+			}
+
+			zbx_db_free_result(res);
 		}
 
-		zbx_db_free_result(res);
-		hk_check_table_segmentation(compression_tables[i].name, compression_tables[i].segmentby,
-				compression_tables[i].orderby);
-		hk_check_table_compression_age(compression_tables[i].name, age);
+		hk_check_table_segmentation(table->name, table->segmentby, table->orderby);
+
+		hk_check_table_compression_age(table->name, age, table->created_before);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -198,11 +248,20 @@ static void	hk_history_disable_compression(void)
 
 	for (size_t i = 0; i < ARRSIZE(compression_tables); i++)
 	{
-		if (0 == hk_get_table_compression_age(compression_tables[i].name))
-			continue;
+		zbx_history_table_compression_options_t	*table = &compression_tables[i];
 
-		zbx_db_free_result(zbx_db_select("select %s('%s')", COMPRESSION_POLICY_REMOVE,
-				compression_tables[i].name));
+		if (0 == table->created_before)
+		{
+			if (0 == hk_get_table_compression_age(table->name))
+				continue;
+		}
+		else
+		{
+			if (0 == hk_get_chunk_compression_age(table->name))
+				continue;
+		}
+
+		zbx_db_free_result(zbx_db_select("select %s('%s')", COMPRESSION_POLICY_REMOVE, table->name));
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
