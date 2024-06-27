@@ -609,7 +609,7 @@ class testScheduledReportPermissions extends CWebTest {
 		$this->page->query('button:Create report')->waitUntilClickable()->one()->click();
 		$form = $this->query('id:scheduledreport-form')->waitUntilVisible()->asForm()->one();
 		$form->checkValue(['Owner' => $data['alias']]);
-		$form->getField('Owner')->isEnabled($state);
+		$this->assertTrue($form->getField('Owner')->isEnabled($state));
 
 		// Check create form on dashboard.
 		$this->page->open('zabbix.php?action=dashboard.view&dashboardid=1')->waitUntilReady();
