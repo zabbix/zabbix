@@ -87,7 +87,7 @@ abstract class CControllerUserEditGeneral extends CController {
 				? $mediatypes[$media['mediatypeid']]['name']
 				: null;
 			$media['mediatype'] = array_key_exists($media['mediatypeid'], $mediatypes)
-				? $mediatypes[$media['mediatypeid']]['type']
+				? (int) $mediatypes[$media['mediatypeid']]['type']
 				: null;
 			$media['send_to_sort_field'] = is_array($media['sendto'])
 				? implode(', ', $media['sendto'])

@@ -319,11 +319,18 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 			'dstfrm' => $user_form->getName(),
 			'media' => $index,
 			'mediatypeid' => $media['mediatypeid'],
-			($media['mediatype'] == MEDIA_TYPE_EMAIL) ? 'sendto_emails' : 'sendto' => $media['sendto'],
 			'period' => $media['period'],
 			'severity' => $media['severity'],
 			'active' => $media['active']
 		];
+
+		if ($media['mediatype'] === MEDIA_TYPE_EMAIL) {
+			$parameters['sendto_emails'] = $media['sendto'];
+		}
+		else {
+			$parameters['sendto'] = $media['sendto'];
+		}
+
 		$media_severity = [];
 
 		for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
@@ -339,7 +346,7 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 				);
 		}
 
-		if ($media['mediatype'] == MEDIA_TYPE_EMAIL) {
+		if (is_array($media['sendto'])) {
 			$media['sendto'] = implode(', ', $media['sendto']);
 		}
 
