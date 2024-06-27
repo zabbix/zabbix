@@ -1525,6 +1525,15 @@ else {
 			: [];
 	}
 
+	// remove items from search if they are disabled when subfiltered by state
+	if (getRequest('subfilter_state')) {
+		foreach ($data['items'] as $key => $item) {
+			if ($item['status'] == ITEM_STATUS_DISABLED) {
+				unset($data['items'][$key]);
+			}
+		}
+	}
+
 	$data['subfilter'] = makeItemSubfilter($data['filter_data'], $data['items'], $data['context']);
 
 	if (!$data['filter_data']['filter_tags']) {

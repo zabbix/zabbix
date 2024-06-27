@@ -297,7 +297,7 @@ function makeItemSubfilter(array &$filter_data, array $items, string $context) {
 					break;
 				}
 			}
-			if ($show_item) {
+			if ($show_item && $item['status'] == ITEM_STATUS_ACTIVE) {
 				$item_params['state'][$item['state']]['count']++;
 			}
 		}
