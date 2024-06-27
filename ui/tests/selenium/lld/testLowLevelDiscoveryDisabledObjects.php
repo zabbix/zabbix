@@ -31,8 +31,7 @@ class testLowLevelDiscoveryDisabledObjects extends CWebTest {
 
 	public static function prepareLLDData() {
 		// Create hostgroup for hosts with LLD.
-		$hostgroups = CDataHelper::call('hostgroup.create', [['name' => 'Group for LLD hint']]);
-		$hostgroupid = $hostgroups['groupids'][0];
+		$hostgroupid = CDataHelper::call('hostgroup.create', [['name' => 'Group for LLD hint']])['groupids'][0];
 
 		// Create hosts with low level discovery.
 		$hosts = CDataHelper::createHosts([
@@ -191,16 +190,16 @@ class testLowLevelDiscoveryDisabledObjects extends CWebTest {
 
 		// Emulate item discovery in DB.
 		foreach ($discovered_items as $discovered_item) {
-			DBexecute("INSERT INTO items (itemid, type, hostid, name, description, key_, interfaceid, flags, query_fields, ".
-					"params, posts, headers, status) VALUES (".zbx_dbstr($discovered_item['itemid']).", 2, ".
-					zbx_dbstr(self::$hint_hostid).", ".zbx_dbstr($discovered_item['item_name']).", '', ".
-					zbx_dbstr($discovered_item['key_']).", NULL, 4, '', '', '', '', ".zbx_dbstr($discovered_item['status']).")"
+			DBexecute('INSERT INTO items (itemid, type, hostid, name, description, key_, interfaceid, flags, query_fields,'.
+					' params, posts, headers, status) VALUES ('.zbx_dbstr($discovered_item['itemid']).', 2, '.
+					zbx_dbstr(self::$hint_hostid).', '.zbx_dbstr($discovered_item['item_name']).', \'\', '.
+					zbx_dbstr($discovered_item['key_']).', NULL, 4, \'\', \'\', \'\', \'\', '.zbx_dbstr($discovered_item['status']).')'
 			);
-			DBexecute("INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid, lastcheck, ts_delete, disable_source, ".
-					" ts_disable, status) VALUES (".zbx_dbstr($discovered_item['itemdiscoveryid']).", ".
-					zbx_dbstr($discovered_item['itemid']).", ".zbx_dbstr($discovered_item['item_prototypeid']).", ".
-					zbx_dbstr($discovered_item['lastcheck']).", ".zbx_dbstr($discovered_item['ts_delete']).", ".
-					zbx_dbstr($discovered_item['disable_source']).", ".zbx_dbstr($discovered_item['ts_disable']).", 1);"
+			DBexecute('INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid, lastcheck, ts_delete, disable_source,'.
+					' ts_disable, status) VALUES ('.zbx_dbstr($discovered_item['itemdiscoveryid']).', '.
+					zbx_dbstr($discovered_item['itemid']).', '.zbx_dbstr($discovered_item['item_prototypeid']).', '.
+					zbx_dbstr($discovered_item['lastcheck']).', '.zbx_dbstr($discovered_item['ts_delete']).', '.
+					zbx_dbstr($discovered_item['disable_source']).', '.zbx_dbstr($discovered_item['ts_disable']).', 1);'
 			);
 		}
 
@@ -231,20 +230,20 @@ class testLowLevelDiscoveryDisabledObjects extends CWebTest {
 
 		// Emulate triggers discovery in DB.
 		foreach ($discovered_triggers as $discovered_trigger) {
-			DBexecute("INSERT INTO triggers (triggerid, description, expression, status, value, priority, comments, state, flags)".
-					" VALUES (".zbx_dbstr($discovered_trigger['triggerid']).", ".zbx_dbstr($discovered_trigger['description']).
-					", ".zbx_dbstr('{'.$discovered_trigger['functionid'].'}=0').", ".$discovered_trigger['status'].", 0, 0, '', 0, 4)"
+			DBexecute('INSERT INTO triggers (triggerid, description, expression, status, value, priority, comments, state, flags)'.
+					' VALUES ('.zbx_dbstr($discovered_trigger['triggerid']).', '.zbx_dbstr($discovered_trigger['description']).
+					', '.zbx_dbstr('{'.$discovered_trigger['functionid'].'}=0').', '.$discovered_trigger['status'].', 0, 0, \'\', 0, 4)'
 			);
 
-			DBexecute("INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES ".
-					"(".zbx_dbstr($discovered_trigger['functionid']).", ".zbx_dbstr($discovered_trigger['itemid']).", ".
-					zbx_dbstr($discovered_trigger['triggerid']).", 'last', '$')"
+			DBexecute('INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES ('.
+					zbx_dbstr($discovered_trigger['functionid']).', '.zbx_dbstr($discovered_trigger['itemid']).', '.
+					zbx_dbstr($discovered_trigger['triggerid']).', \'last\', \'$\')'
 			);
 
-			DBexecute("INSERT INTO trigger_discovery (triggerid, parent_triggerid, lastcheck, ts_delete, disable_source, ts_disable, status) VALUES (".
-					zbx_dbstr($discovered_trigger['triggerid']).", ".zbx_dbstr($discovered_trigger['parent_prototypeid']).", ".
-					zbx_dbstr($discovered_trigger['lastcheck']).", ".zbx_dbstr($discovered_trigger['ts_delete']).", ".
-					zbx_dbstr($discovered_trigger['disable_source']).", ".zbx_dbstr($discovered_trigger['ts_disable']).", 1)"
+			DBexecute('INSERT INTO trigger_discovery (triggerid, parent_triggerid, lastcheck, ts_delete, disable_source, ts_disable, status) VALUES ('.
+					zbx_dbstr($discovered_trigger['triggerid']).', '.zbx_dbstr($discovered_trigger['parent_prototypeid']).', '.
+					zbx_dbstr($discovered_trigger['lastcheck']).', '.zbx_dbstr($discovered_trigger['ts_delete']).', '.
+					zbx_dbstr($discovered_trigger['disable_source']).', '.zbx_dbstr($discovered_trigger['ts_disable']).', 1)'
 			);
 		}
 
@@ -282,16 +281,16 @@ class testLowLevelDiscoveryDisabledObjects extends CWebTest {
 
 		// Emulate graph discovery in DB.
 		foreach ($discovered_graphs as $discovered_graph) {
-			DBexecute("INSERT INTO graphs (graphid, width, height, name, flags) VALUES (".zbx_dbstr($discovered_graph['graphid']).
-					", 600, 300, ".zbx_dbstr($discovered_graph['name']).", 4)"
+			DBexecute('INSERT INTO graphs (graphid, width, height, name, flags) VALUES ('.zbx_dbstr($discovered_graph['graphid']).
+					', 600, 300, '.zbx_dbstr($discovered_graph['name']).', 4)'
 			);
-			DBexecute("INSERT INTO graphs_items (gitemid, graphid, itemid, color) VALUES (".
-					zbx_dbstr($discovered_graph['graph_itemid']).", ".zbx_dbstr($discovered_graph['graphid']).", ".
-					zbx_dbstr($discovered_graph['itemid']).", ".zbx_dbstr('5C6BC0').")"
+			DBexecute('INSERT INTO graphs_items (gitemid, graphid, itemid, color) VALUES ('.
+					zbx_dbstr($discovered_graph['graph_itemid']).', '.zbx_dbstr($discovered_graph['graphid']).', '.
+					zbx_dbstr($discovered_graph['itemid']).', '.zbx_dbstr('5C6BC0').')'
 			);
-			DBexecute("INSERT INTO graph_discovery (graphid, parent_graphid, lastcheck, ts_delete, status)".
-					" VALUES (".zbx_dbstr($discovered_graph['graphid']).", ".zbx_dbstr($discovered_graph['graph_prototypeid']).", ".
-					zbx_dbstr($discovered_graph['lastcheck']).", ".zbx_dbstr($discovered_graph['ts_delete']).", 1)"
+			DBexecute('INSERT INTO graph_discovery (graphid, parent_graphid, lastcheck, ts_delete, status)'.
+					' VALUES ('.zbx_dbstr($discovered_graph['graphid']).', '.zbx_dbstr($discovered_graph['graph_prototypeid']).', '.
+					zbx_dbstr($discovered_graph['lastcheck']).', '.zbx_dbstr($discovered_graph['ts_delete']).', 1)'
 			);
 		}
 
@@ -311,29 +310,28 @@ class testLowLevelDiscoveryDisabledObjects extends CWebTest {
 		$discovered_hosts = [];
 		$m = 1;
 		foreach ($host_prototypes['hostids'] as $host_prototypeid) {
-			$discovered_hosts[] = array_merge($statuses[$m - 1],
-				[
-					'discovered_host_name' => 'Host prototype '.$m.' KEY1',
-					'hostid' => $m + 7090000,
-					'host_prototypeid' => $host_prototypeid,
-					'host_groupid' => $m + 9090000
-				]);
+			$discovered_hosts[] = array_merge($statuses[$m - 1], [
+				'discovered_host_name' => 'Host prototype '.$m.' KEY1',
+				'hostid' => $m + 7090000,
+				'host_prototypeid' => $host_prototypeid,
+				'host_groupid' => $m + 9090000
+			]);
 			$m++;
 		}
 
 		// Emulate host discovery in DB.
 		foreach ($discovered_hosts as $discovered_host) {
-			DBexecute("INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (".
-					zbx_dbstr($discovered_host['hostid']).", ".zbx_dbstr($discovered_host['discovered_host_name']).
-					", ".zbx_dbstr($discovered_host['discovered_host_name']).", ".$discovered_host['status'].", 4, '')"
+			DBexecute('INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES ('.
+					zbx_dbstr($discovered_host['hostid']).', '.zbx_dbstr($discovered_host['discovered_host_name']).
+					', '.zbx_dbstr($discovered_host['discovered_host_name']).', '.$discovered_host['status'].', 4, \'\')'
 			);
-			DBexecute("INSERT INTO host_discovery (hostid, parent_hostid, lastcheck, ts_delete, disable_source, ts_disable, status)".
-					"VALUES (".zbx_dbstr($discovered_host['hostid']).", ".zbx_dbstr($discovered_host['host_prototypeid']).", ".
-					zbx_dbstr($discovered_host['lastcheck']).", ".zbx_dbstr($discovered_host['ts_delete']).", ".
-					zbx_dbstr($discovered_host['disable_source']).", ".zbx_dbstr($discovered_host['ts_disable']).", 1)"
+			DBexecute('INSERT INTO host_discovery (hostid, parent_hostid, lastcheck, ts_delete, disable_source, ts_disable, status)'.
+					' VALUES ('.zbx_dbstr($discovered_host['hostid']).', '.zbx_dbstr($discovered_host['host_prototypeid']).', '.
+					zbx_dbstr($discovered_host['lastcheck']).', '.zbx_dbstr($discovered_host['ts_delete']).', '.
+					zbx_dbstr($discovered_host['disable_source']).', '.zbx_dbstr($discovered_host['ts_disable']).', 1)'
 			);
-			DBexecute("INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (".zbx_dbstr($discovered_host['host_groupid']).
-					", ".zbx_dbstr($discovered_host['hostid']).", 4)"
+			DBexecute('INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES ('.zbx_dbstr($discovered_host['host_groupid']).
+					', '.zbx_dbstr($discovered_host['hostid']).', 4)'
 			);
 		}
 	}
@@ -375,40 +373,48 @@ class testLowLevelDiscoveryDisabledObjects extends CWebTest {
 	 * @dataProvider getTestPagesData
 	 */
 	public function testLowLevelDiscoveryDisabledObjects_TestPages($data) {
-		$url = ($data['object'] !== 'host') ? $data['url'].self::$hint_hostid : $data['url'];
+		$url = ($data['object'] === 'host') ? $data['url'] : $data['url'].self::$hint_hostid;
 		$this->page->login()->open($url)->waitUntilReady();
 		$table = $this->query('xpath://form/table')->asTable()->waitUntilVisible()->one();
 
 		$lld_objects = [
 			'1 Delete - never, disable - never' => [
-				'common_hint' => '/^The '.$data['object'].' is not discovered anymore and will not be disabled, will not be deleted\.$/',
+				'common_hint' => '/^The '.$data['object'].' is not discovered anymore and will not be disabled,'.
+						' will not be deleted\.$/',
 				'graph_hint' => '/^The graph is not discovered anymore and will not be deleted\.$/'
 			],
 			'2 Delete - never, disable - immediately' => [
-				'common_hint' => '/^The '.$data['object'].' is not discovered anymore and has been disabled, will not be deleted\.$/',
+				'common_hint' => '/^The '.$data['object'].' is not discovered anymore and has been disabled,'.
+						' will not be deleted\.$/',
 				'graph_hint' => '/^The graph is not discovered anymore and will not be deleted\.$/',
 				'disabled' => true
 			],
 			'3 Delete - never, disable - after 2w' => [
-				'common_hint' => "/^The ".$data['object']." is not discovered anymore and will be disabled in 13d 23h ([0-9]{1,2}m)?, will not be deleted\.$/",
+				'common_hint' => "/^The ".$data['object']." is not discovered anymore and will be disabled in".
+						" 13d 23h ([0-9]{1,2}m)?, will not be deleted\.$/",
 				'graph_hint' => '/^The graph is not discovered anymore and will not be deleted\.$/'
 			],
 			'4 Delete - after 52w, disable - never' => [
-				'common_hint' => '/^The '.$data['object'].' is not discovered anymore and will not be disabled, will be deleted in 1y\.$/',
+				'common_hint' => '/^The '.$data['object'].' is not discovered anymore and will not be disabled,'.
+						' will be deleted in 1y\.$/',
 				'graph_hint' => '/^The graph is not discovered anymore and will be deleted in 1y\.$/'
 			],
 			'5 Delete - after 7d, disable - immediately' => [
-				'common_hint' => "/^The ".$data['object']." is not discovered anymore and has been disabled, will be deleted in 6d 23h ([0-9]{1,2}m)?\.$/",
+				'common_hint' => "/^The ".$data['object']." is not discovered anymore and has been disabled,".
+						" will be deleted in 6d 23h ([0-9]{1,2}m)?\.$/",
 				'graph_hint' => "/^The graph is not discovered anymore and will be deleted in 6d 23h ([0-9]{1,2}m)?\.$/",
 				'disabled' => true
 			],
 			'6 Delete - after 7d, disable - after 20h' => [
-				'common_hint' => "/^The ".$data['object']." is not discovered anymore and will be disabled in 19h ([0-9]{1,2}m)? ([0-9]{1,2}s)?, will be deleted in 6d 23h ([0-9]{1,2}m)?\.$/",
+				'common_hint' => "/^The ".$data['object']." is not discovered anymore and will be disabled in 19h".
+						" ([0-9]{1,2}m)? ([0-9]{1,2}s)?, will be deleted in 6d 23h ([0-9]{1,2}m)?\.$/",
 				'graph_hint' => "/^The graph is not discovered anymore and will be deleted in 6d 23h ([0-9]{1,2}m)?\.$/"
 			],
 			'7 Delete - Immediately' => [
-				'common_hint' => '/^The '.$data['object'].' is not discovered anymore and will be deleted the next time discovery rule is processed\.$/',
-				'graph_hint' => '/^The graph is not discovered anymore and will be deleted the next time discovery rule is processed\.$/'
+				'common_hint' => '/^The '.$data['object'].' is not discovered anymore and will be deleted'.
+						' the next time discovery rule is processed\.$/',
+				'graph_hint' => '/^The graph is not discovered anymore and will be deleted the next time'.
+						' discovery rule is processed\.$/'
 			]
 		];
 
