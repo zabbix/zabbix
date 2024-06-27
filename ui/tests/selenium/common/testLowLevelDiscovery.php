@@ -20,8 +20,6 @@
 
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../../include/helpers/CDBHelper.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 /**
  * Common class for LLD form testing.
@@ -31,7 +29,6 @@ class testLowLevelDiscovery extends CWebTest {
 
 	protected static $templateid;
 	protected static $hostid;
-
 	protected static $update_lld;
 
 	/**
@@ -53,7 +50,7 @@ class testLowLevelDiscovery extends CWebTest {
 	public function checkFormLayout($context = 'host') {
 		$url = ($context === 'template')
 			? static::$templateid.'&context=template'
-			: static::$hostid.'&context=host';
+			: static::$empty_hostid.'&context=host';
 
 		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.$url);
 		$this->query('button:Create discovery rule')->one()->waitUntilClickable()->click();
@@ -63,7 +60,7 @@ class testLowLevelDiscovery extends CWebTest {
 		$this->assertEquals(['Discovery rule', 'Preprocessing', 'LLD macros', 'Filters', 'Overrides'], $form->getTabs());
 
 		// Check form footer buttons clickability.
-		foreach (['xpath://div[@class="form-actions"]/button[@id="add"]', 'button:Test', 'button:Cancel'] as $query) {
+		foreach (['id:add', 'button:Test', 'button:Cancel'] as $query) {
 			$this->assertTrue($form->query($query)->one()->isClickable());
 		}
 
@@ -107,7 +104,9 @@ class testLowLevelDiscovery extends CWebTest {
 					$preprocessing_container = $form->getFieldContainer('Preprocessing steps');
 					$preprocessing_container->query('button:Add')->one()->waitUntilCLickable()->click();
 					$this->assertTrue($preprocessing_container->query('id:preprocessing')->one()->isVisible());
-					$this->assertTrue($preprocessing_container->query('button', ['Add', 'Test', 'Remove'])->one()->isClickable());
+					$this->assertTrue($preprocessing_container->query('button', ['Add', 'Test', 'Remove', 'Test all steps'])
+							->one()->isClickable()
+					);
 
 					$preprocessing_fields = [
 						'id:preprocessing_0_type' => ['value' => 'Regular expression'],
@@ -203,7 +202,7 @@ class testLowLevelDiscovery extends CWebTest {
 			'SSL key file' => ['maxlength' => 255],
 			'SSL key password' => ['maxlength' => 64],
 			'Master item' => ['value' => ''],
-			'Host interface' => ['value' => '127.0.0.1:10050'],
+			'Host interface' => ['value' => 'None'],
 			'id:snmp_oid' => ['placeholder' => 'walk[OID1,OID2,...]', 'maxlength' => 512],
 			'id:ipmi_sensor' => ['maxlength' => 128],
 			'Authentication method' => ['options' => ['Password', 'Public key'], 'value' => 'Password'],
@@ -259,34 +258,8 @@ class testLowLevelDiscovery extends CWebTest {
 		// Check visible fields depending on LLD type.
 		$permanent_fields = ['Name', 'Type', 'Key', 'Delete lost resources', 'Disable lost resources', 'Description', 'Enabled'];
 
-		$depending_fields = [
-			'Zabbix agent' => ['Host interface', 'Update interval', 'Custom intervals', 'Timeout'],
-			'Zabbix agent (active)' => ['Update interval', 'Custom intervals', 'Timeout'],
-			'Simple check' => ['Host interface', 'User name', 'Password', 'Update interval', 'Custom intervals', 'Timeout'],
-			'SNMP agent' => ['Host interface', 'SNMP OID', 'Update interval', 'Custom intervals'],
-			'Zabbix internal' => ['Update interval', 'Custom intervals'],
-			'Zabbix trapper' => ['Allowed hosts'],
-			'External check' => ['Host interface', 'Update interval', 'Custom intervals', 'Timeout'],
-			'Database monitor' => ['User name', 'Password', 'SQL query', 'Update interval', 'Custom intervals', 'Timeout'],
-			'HTTP agent' => ['URL', 'Query fields', 'Request type', 'Request body type', 'Request body', 'Headers',
-				'Required status codes', 'Follow redirects', 'Retrieve mode', 'HTTP proxy', 'HTTP authentication',
-				'SSL verify peer', 'SSL verify host', 'SSL certificate file', 'SSL key file', 'SSL key password',
-				'Host interface', 'Update interval', 'Custom intervals', 'Timeout', 'Enable trapping'
-			],
-			'IPMI agent' => ['Host interface', 'IPMI sensor', 'Update interval', 'Custom intervals'],
-			'SSH agent' => ['Host interface', 'Authentication method', 'User name', 'Password',
-				'Executed script', 'Update interval', 'Custom intervals', 'Timeout'
-			],
-			'TELNET agent' => ['Host interface', 'User name', 'Password', 'Executed script',
-				'Update interval', 'Custom intervals', 'Timeout'
-			],
-			'JMX agent' => ['Host interface', 'JMX endpoint', 'User name', 'Password', 'Update interval', 'Custom intervals'],
-			'Dependent item' => ['Master item'],
-			'Script' => ['Parameters', 'Script', 'Update interval', 'Custom intervals', 'Timeout']
-		];
-
 		if ($context === 'template') {
-			$depending_fields =[
+			$depending_fields = [
 				'Zabbix agent' => ['Update interval', 'Custom intervals', 'Timeout'],
 				'Zabbix agent (active)' => ['Update interval', 'Custom intervals', 'Timeout'],
 				'Simple check' => ['User name', 'Password', 'Update interval', 'Custom intervals', 'Timeout'],
@@ -308,6 +281,33 @@ class testLowLevelDiscovery extends CWebTest {
 					'Update interval', 'Custom intervals', 'Timeout'
 				],
 				'JMX agent' => ['JMX endpoint', 'User name', 'Password', 'Update interval', 'Custom intervals'],
+				'Dependent item' => ['Master item'],
+				'Script' => ['Parameters', 'Script', 'Update interval', 'Custom intervals', 'Timeout']
+			];
+		}
+		else {
+			$depending_fields = [
+				'Zabbix agent' => ['Host interface', 'Update interval', 'Custom intervals', 'Timeout'],
+				'Zabbix agent (active)' => ['Update interval', 'Custom intervals', 'Timeout'],
+				'Simple check' => ['Host interface', 'User name', 'Password', 'Update interval', 'Custom intervals', 'Timeout'],
+				'SNMP agent' => ['Host interface', 'SNMP OID', 'Update interval', 'Custom intervals'],
+				'Zabbix internal' => ['Update interval', 'Custom intervals'],
+				'Zabbix trapper' => ['Allowed hosts'],
+				'External check' => ['Host interface', 'Update interval', 'Custom intervals', 'Timeout'],
+				'Database monitor' => ['User name', 'Password', 'SQL query', 'Update interval', 'Custom intervals', 'Timeout'],
+				'HTTP agent' => ['URL', 'Query fields', 'Request type', 'Request body type', 'Request body', 'Headers',
+					'Required status codes', 'Follow redirects', 'Retrieve mode', 'HTTP proxy', 'HTTP authentication',
+					'SSL verify peer', 'SSL verify host', 'SSL certificate file', 'SSL key file', 'SSL key password',
+					'Host interface', 'Update interval', 'Custom intervals', 'Timeout', 'Enable trapping'
+				],
+				'IPMI agent' => ['Host interface', 'IPMI sensor', 'Update interval', 'Custom intervals'],
+				'SSH agent' => ['Host interface', 'Authentication method', 'User name', 'Password',
+					'Executed script', 'Update interval', 'Custom intervals', 'Timeout'
+				],
+				'TELNET agent' => ['Host interface', 'User name', 'Password', 'Executed script',
+					'Update interval', 'Custom intervals', 'Timeout'
+				],
+				'JMX agent' => ['Host interface', 'JMX endpoint', 'User name', 'Password', 'Update interval', 'Custom intervals'],
 				'Dependent item' => ['Master item'],
 				'Script' => ['Parameters', 'Script', 'Update interval', 'Custom intervals', 'Timeout']
 			];
@@ -340,6 +340,11 @@ class testLowLevelDiscovery extends CWebTest {
 
 			switch ($type) {
 				case 'SNMP agent':
+					foreach (['walk[]' => true, '' => false] as $oid => $status) {
+						$form->fill(['SNMP OID' => $oid]);
+						$this->assertTrue($form->getField('Timeout')->isVisible($status));
+					}
+
 					// Check hints and texts.
 					foreach ($hints as $label => $hint_text) {
 						$form->getLabel($label)->query('xpath:./button[@data-hintbox]')->one()->click();
@@ -348,6 +353,7 @@ class testLowLevelDiscovery extends CWebTest {
 						$hint->query('xpath:.//button[@title="Close"]')->waitUntilClickable()->one()->click();
 					}
 
+				case 'Zabbix agent';
 				case 'JMX agent':
 				case 'IPMI agent':
 					if ($context === 'host') {
@@ -664,9 +670,9 @@ class testLowLevelDiscovery extends CWebTest {
 						'Type' => 'Zabbix agent',
 						'Key' => 'test1',
 						'id:delay_flex_0_type' => 'Scheduling',
-						'id:delay_flex_0_schedule' => 'qd1-8h9-18'
+						'id:delay_flex_0_schedule' => 'wd1-8h9-18'
 					],
-					'error_details' => 'Invalid interval "qd1-8h9-18".'
+					'error_details' => 'Invalid interval "wd1-8h9-18".'
 				]
 			],
 			// #10.
@@ -678,9 +684,9 @@ class testLowLevelDiscovery extends CWebTest {
 						'Type' => 'Zabbix agent',
 						'Key' => 'test1',
 						'id:delay_flex_0_type' => 'Scheduling',
-						'id:delay_flex_0_schedule' => 'qd1-5h9-25'
+						'id:delay_flex_0_schedule' => 'wd1-5h9-25'
 					],
-					'error_details' => 'Invalid interval "qd1-5h9-25".'
+					'error_details' => 'Invalid interval "wd1-5h9-25".'
 				]
 			],
 			// #11.
@@ -1051,6 +1057,20 @@ class testLowLevelDiscovery extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
+						'Name' => 'Database monitor',
+						'Type' => 'Database monitor',
+						'Key' => 'db.odbc.select[<unique short description>,<dsn>,<connection string>]',
+						'SQL query' => 'test'
+					],
+					'error' => 'Page received incorrect data',
+					'error_details' => 'Check the key, please. Default example was passed.'
+				]
+			],
+			// #37.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
 						'Name' => 'HTTP check',
 						'Type' => 'HTTP agent',
 						'Key' => 'http.check',
@@ -1060,7 +1080,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'error_details' => 'Incorrect value for field "URL": cannot be empty.'
 				]
 			],
-			// #37.
+			// #38.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1075,7 +1095,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/query_fields/1/name": cannot be empty.'
 				]
 			],
-			// #38.
+			// #39.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1090,7 +1110,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/headers/1/name": cannot be empty.'
 				]
 			],
-			// #39.
+			// #40.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1100,22 +1120,6 @@ class testLowLevelDiscovery extends CWebTest {
 						'Key' => 'http_check[2]',
 						'URL' => 'www.test.com/search',
 						'Request body type' => 'JSON data',
-						'Request body' => ''
-					],
-					'error_details' => 'Invalid parameter "/1/posts": cannot be empty.'
-				]
-			],
-			// #40.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'HTTP check',
-						'Type' => 'HTTP agent',
-						'Key' => 'http.check',
-						'URL' => 'test',
-						'Request type' => 'PUT',
-						'Request body type' => 'XML data',
 						'Request body' => ''
 					],
 					'error_details' => 'Invalid parameter "/1/posts": cannot be empty.'
@@ -1132,12 +1136,28 @@ class testLowLevelDiscovery extends CWebTest {
 						'URL' => 'test',
 						'Request type' => 'PUT',
 						'Request body type' => 'XML data',
+						'Request body' => ''
+					],
+					'error_details' => 'Invalid parameter "/1/posts": cannot be empty.'
+				]
+			],
+			// #42.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'HTTP check',
+						'Type' => 'HTTP agent',
+						'Key' => 'http.check',
+						'URL' => 'test',
+						'Request type' => 'PUT',
+						'Request body type' => 'XML data',
 						'Request body' => 'test'
 					],
 					'error_details' => 'Invalid parameter "/1/posts": (4) Start tag expected, '<' not found [Line: 1 | Column: 1].'
 				]
 			],
-			// #42.
+			// #43.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1150,7 +1170,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/ipmi_sensor": cannot be empty.'
 				]
 			],
-			// #43.
+			// #44.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1168,7 +1188,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #44.
+			// #45.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1186,7 +1206,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #45.
+			// #46.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1202,7 +1222,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'error_details' => 'Incorrect value for field "jmx_endpoint": cannot be empty.'
 				]
 			],
-			// #46.
+			// #47.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1216,7 +1236,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'error_details' => 'Field "Master item" is mandatory.'
 				]
 			],
-			// #47.
+			// #48.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1231,7 +1251,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'error_details' => 'Invalid parameter "/1": both username and password should be either present or empty.'
 				]
 			],
-			// #48.
+			// #49.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1246,7 +1266,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'error_details' => 'Invalid parameter "/1": both username and password should be either present or empty.'
 				]
 			],
-			// #49.
+			// #50.
 			[
 				[
 					'fields' => [
@@ -1256,7 +1276,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #50.
+			// #51.
 			[
 				[
 					'fields' => [
@@ -1277,7 +1297,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'trim' => true
 				]
 			],
-			// #51.
+			// #52.
 			[
 				[
 					'fields' => [
@@ -1292,7 +1312,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'trim' => true
 				]
 			],
-			// #52.
+			// #53.
 			[
 				[
 					'fields' => [
@@ -1310,7 +1330,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'trim' => true
 				]
 			],
-			// #53.
+			// #54.
 			[
 				[
 					'fields' => [
@@ -1325,7 +1345,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #54.
+			// #55.
 			[
 				[
 					'fields' => [
@@ -1337,7 +1357,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'trim' => true
 				]
 			],
-			// #55.
+			// #56.
 			[
 				[
 					'fields' => [
@@ -1348,7 +1368,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #56.
+			// #57.
 			[
 				[
 					'fields' => [
@@ -1359,7 +1379,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #57.
+			// #58.
 			[
 				[
 					'fields' => [
@@ -1369,7 +1389,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #58.
+			// #59.
 			[
 				[
 					'fields' => [
@@ -1382,7 +1402,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'trim' => true
 				]
 			],
-			// #59.
+			// #60.
 			[
 				[
 					'fields' => [
@@ -1392,7 +1412,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #60.
+			// #61.
 			[
 				[
 					'fields' => [
@@ -1404,7 +1424,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'trim' => true
 				]
 			],
-			// #61.
+			// #62.
 			[
 				[
 					'fields' => [
@@ -1415,7 +1435,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #62.
+			// #63.
 			[
 				[
 					'fields' => [
@@ -1428,7 +1448,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #63.
+			// #64.
 			[
 				[
 					'fields' => [
@@ -1441,7 +1461,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #64.
+			// #65.
 			[
 				[
 					'fields' => [
@@ -1466,7 +1486,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #65.
+			// #66.
 			[
 				[
 					'fields' => [
@@ -1511,7 +1531,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'trim' => true
 				]
 			],
-			// #66.
+			// #67.
 			[
 				[
 					'fields' => [
@@ -1537,7 +1557,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #67.
+			// #68.
 			[
 				[
 					'fields' => [
@@ -1563,7 +1583,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #68.
+			// #69.
 			[
 				[
 					'fields' => [
@@ -1575,7 +1595,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #69.
+			// #70.
 			[
 				[
 					'fields' => [
@@ -1588,7 +1608,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #70.
+			// #71.
 			[
 				[
 					'fields' => [
@@ -1602,7 +1622,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'trim' => true
 				]
 			],
-			// #71.
+			// #72.
 			[
 				[
 					'fields' => [
@@ -1615,7 +1635,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #72.
+			// #73.
 			[
 				[
 					'fields' => [
@@ -1629,7 +1649,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'trim' => true
 				]
 			],
-			// #73.
+			// #74.
 			[
 				[
 					'fields' => [
@@ -1644,7 +1664,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'trim' => true
 				]
 			],
-			// #74.
+			// #75.
 			[
 				[
 					'fields' => [
@@ -1655,7 +1675,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #75.
+			// #76.
 			[
 				[
 					'fields' => [
@@ -1671,7 +1691,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'trim' => true
 				]
 			],
-			// #76.
+			// #77.
 			[
 				[
 					'fields' => [
@@ -1689,7 +1709,7 @@ class testLowLevelDiscovery extends CWebTest {
 				]
 			],
 			// LLD Macros tab.
-			// #77.
+			// #78.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1704,7 +1724,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/lld_macro_paths/1/path": cannot be empty.'
 				]
 			],
-			// #78.
+			// #79.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1719,7 +1739,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/lld_macro_paths/1/lld_macro": a low-level discovery macro is expected.'
 				]
 			],
-			// #79.
+			// #80.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1734,7 +1754,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/lld_macro_paths/1/lld_macro": a low-level discovery macro is expected.'
 				]
 			],
-			// #80.
+			// #81.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1749,7 +1769,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/lld_macro_paths/1/lld_macro": a low-level discovery macro is expected.'
 				]
 			],
-			// #81.
+			// #82.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1764,7 +1784,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/lld_macro_paths/1/lld_macro": cannot be empty.'
 				]
 			],
-			// #82.
+			// #83.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1779,7 +1799,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/lld_macro_paths/1/lld_macro": a low-level discovery macro is expected.'
 				]
 			],
-			// #83.
+			// #84.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1795,7 +1815,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/lld_macro_paths/2": value (lld_macro)=({#MACRO}) already exists.'
 				]
 			],
-			// #84.
+			// #85.
 			[
 				[
 					'fields' => [
@@ -1810,7 +1830,7 @@ class testLowLevelDiscovery extends CWebTest {
 				]
 			],
 			// Filters tab.
-			// #85.
+			// #86.
 			[
 				[
 					'fields' => [
@@ -1825,7 +1845,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #86.
+			// #87.
 			[
 				[
 					'fields' => [
@@ -1840,7 +1860,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #87.
+			// #88.
 			[
 				[
 					'fields' => [
@@ -1857,7 +1877,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #88.
+			// #89.
 			[
 				[
 					'fields' => [
@@ -1874,7 +1894,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #89.
+			// #90.
 			[
 				[
 					'fields' => [
@@ -1891,7 +1911,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #90.
+			// #91.
 			[
 				[
 					'fields' => [
@@ -1910,7 +1930,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #91.
+			// #92.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1927,7 +1947,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/filter/conditions/1/macro": a low-level discovery macro is expected.'
 				]
 			],
-			// #92.
+			// #93.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1947,7 +1967,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/filter/formula": cannot be empty.'
 				]
 			],
-			// #93.
+			// #94.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1967,7 +1987,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/filter/formula": missing filter condition "F".'
 				]
 			],
-			// #94.
+			// #95.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1989,7 +2009,7 @@ class testLowLevelDiscovery extends CWebTest {
 							'defined in the formula.'
 				]
 			],
-			// #95.
+			// #96.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2009,7 +2029,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/filter/formula": incorrect syntax near "Wrong formula".'
 				]
 			],
-			// #96.
+			// #97.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2029,7 +2049,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/filter/formula": incorrect syntax near "Not B"'
 				]
 			],
-			// #97.
+			// #98.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2049,7 +2069,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/filter/formula": incorrect syntax near " A and not B".'
 				]
 			],
-			// #98.
+			// #99.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2300,7 +2320,7 @@ class testLowLevelDiscovery extends CWebTest {
 			$this->query('button:Create discovery rule')->one()->waitUntilClickable()->click();
 		}
 		else {
-			$this->query('link',$lld_name)->one()->waitUntilClickable()->click();
+			$this->query('link', $lld_name)->one()->waitUntilClickable()->click();
 
 			if ($data['action'] === 'Clone') {
 				$this->query('button:Clone')->one()->waitUntilClickable()->click();
@@ -2380,7 +2400,7 @@ class testLowLevelDiscovery extends CWebTest {
 			$form->selectTab('Filters');
 			$form->fill($fields['filters_fields']);
 
-			// Change Filters.
+			// Change Overrides.
 			$form->selectTab('Overrides');
 
 			if ($data['action'] === 'Add') {
@@ -2455,11 +2475,11 @@ class testLowLevelDiscovery extends CWebTest {
 				$form->getField($id)->getValue()
 			);
 
-			$this->assertEquals(CTestArrayHelper::get($parameters, 'placeholder', null),
+			$this->assertEquals(CTestArrayHelper::get($parameters, 'placeholder'),
 				$form->getField($id)->getAttribute('placeholder')
 			);
 
-			$this->assertEquals(CTestArrayHelper::get($parameters, 'maxlength', null),
+			$this->assertEquals(CTestArrayHelper::get($parameters, 'maxlength'),
 				$form->getField($id)->getAttribute('maxlength')
 			);
 
@@ -2501,7 +2521,6 @@ class testLowLevelDiscovery extends CWebTest {
 	protected function fillComplexFields($data, $form, $label, $locator) {
 		$table = $form->getField($label);
 		$add_button = $table->query('button:Add')->one();
-		$last = count($data) - 1;
 
 		foreach ($data as $i => $data_row) {
 			$table_row = $table->getRows()->get($i);
@@ -2515,7 +2534,7 @@ class testLowLevelDiscovery extends CWebTest {
 				}
 			}
 
-			if ($i !== $last) {
+			if ($i !== (count($data) - 1)) {
 				$add_button->click();
 			}
 		}

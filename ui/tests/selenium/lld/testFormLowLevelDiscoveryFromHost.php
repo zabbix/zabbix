@@ -31,6 +31,7 @@ class testFormLowLevelDiscoveryFromHost extends testLowLevelDiscovery {
 	const SQL = 'SELECT * FROM items WHERE flags=1 ORDER BY itemid';
 
 	protected static $hostid;
+	protected static $empty_hostid;
 	protected static $interfaces_hostid;
 
 	protected static $update_lld = 'LLD for update scenario';
@@ -107,6 +108,10 @@ class testFormLowLevelDiscoveryFromHost extends testLowLevelDiscovery {
 						'delay' => 30
 					]
 				]
+			],
+			[
+				'host' => 'Empty host without interfaces',
+				'groups' => ['groupid' => 4], // Zabbix servers.
 			],
 			[
 				'host' => 'Host for LLD form test',
@@ -255,6 +260,7 @@ class testFormLowLevelDiscoveryFromHost extends testLowLevelDiscovery {
 		]);
 
 		self::$hostid = $result['hostids']['Host for LLD form test'];
+		self::$empty_hostid = $result['hostids']['Empty host without interfaces'];
 		self::$interfaces_hostid = $result['hostids']['Host for LLD form test with all interfaces'];
 	}
 
@@ -290,5 +296,28 @@ class testFormLowLevelDiscoveryFromHost extends testLowLevelDiscovery {
 	public function testFormLowLevelDiscoveryFromHost_Delete() {
 		$this->checkDelete();
 	}
-}
 
+	/**
+	 * Test checks that Host interface field is filled with existing interface automatically
+	 * depending on LLD type.
+	 */
+	public function testFormLowLevelDiscoveryFromHost_CheckInterfaces() {
+		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.
+				self::$interfaces_hostid.'&context=host'
+		);
+		$this->query('button:Create discovery rule')->one()->waitUntilClickable()->click();
+		$form = $this->query('id:host-discovery-form')->asForm()->one()->waitUntilVisible();
+
+		$interfaces = [
+			'Zabbix agent' => '127.0.0.1:10050',
+			'SNMP agent' => '127.0.0.2:161',
+			'IPMI agent' => '127.0.0.4:12345',
+			'JMX agent' => 'text.jmx.com:12345'
+		];
+
+		foreach ($interfaces as $type => $interface) {
+			$form->fill(['Type' => $type]);
+			$form->checkValue(['Host interface' => $interface]);
+		}
+	}
+}
