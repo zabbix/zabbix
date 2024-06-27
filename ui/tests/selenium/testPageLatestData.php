@@ -595,20 +595,20 @@ class testPageLatestData extends CWebTest {
 	}
 
 	public function testPageLatestData_ClickTagKiosk() {
-		$this->checkClickTag('kiosk');
+		$this->checkClickTag(true);
 	}
 
 	/**
 	 * Test for clicking on particular item tag in table and checking that items are filtered by this tag using normal and kiosk mode.
 	 *
-	 * @param string $mode	page mode is selected
+	 * @param boolean $kiosk_mode	page mode is selected
 	 */
-	protected function checkClickTag($mode = 'normal') {
+	protected function checkClickTag($kiosk_mode = false) {
 		$tag = ['tag' => 'component: ', 'value' => 'storage'];
 		$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE name='.zbx_dbstr('ЗАББИКС Сервер'));
 		$this->page->login()->open('zabbix.php?action=latest.view&hostids%5B%5D='.$hostid)->waitUntilReady();
 
-		if ($mode === 'kiosk') {
+		if ($kiosk_mode) {
 			$this->query('xpath://button[@title="Kiosk mode"]')->one()->click();
 			$this->page->waitUntilReady();
 			$this->assertTrue($this->query('xpath://button[@title="Normal view"]')->exists());
@@ -631,7 +631,7 @@ class testPageLatestData extends CWebTest {
 		];
 		$this->assertTableData($data, $this->getTableSelector());
 
-		if ($mode === 'kiosk') {
+		if ($kiosk_mode) {
 			$this->query('xpath://button[@title="Normal view"]')->one()->click();
 			$this->page->waitUntilReady();
 			$this->assertTrue($this->query('xpath://button[@title="Kiosk mode"]')->exists());
