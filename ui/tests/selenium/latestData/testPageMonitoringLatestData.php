@@ -21,6 +21,8 @@ require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 /**
  * @backup history_uint, profiles
  *
+ * @dataSource GlobalMacros
+ *
  * @onBefore prepareItemTagsData
  */
 class testPageMonitoringLatestData extends CWebTest {
@@ -618,12 +620,12 @@ class testPageMonitoringLatestData extends CWebTest {
 					CXPathHelper::escapeQuotes($tag['value'])."]")->exists()
 			);
 
-			$this->assertTableData([
-					['Name' => 'Free swap space'],
-					['Name' => 'Free swap space in %'],
-					['Name' => 'Total swap space']
-				], $this->getTableSelector()
-			);
+			$data = [
+				['Name' => 'Free swap space'],
+				['Name' => 'Free swap space in %'],
+				['Name' => 'Total swap space']
+			];
+			$this->assertTableData($data, $this->getTableSelector());
 
 			if ($kiosk_mode === false) {
 				$this->query('button:Reset')->one()->click();
@@ -631,6 +633,12 @@ class testPageMonitoringLatestData extends CWebTest {
 				$this->assertEquals(['Filter is not set', 'Use the filter to display results'],
 						explode("\n", $this->query('class:no-data-message')->one()->getText())
 				);
+			}
+			else {
+				$this->query('xpath://button[@title="Normal view"]')->one()->click();
+				$this->page->waitUntilReady();
+				$this->assertTrue($this->query('xpath://button[@title="Kiosk mode"]')->exists());
+				$this->assertTableData($data, $this->getTableSelector());
 			}
 		}
 	}
