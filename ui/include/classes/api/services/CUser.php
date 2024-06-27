@@ -367,7 +367,7 @@ class CUser extends CApiService {
 
 			/*
 			 * If user is created without a password (e.g. for GROUP_GUI_ACCESS_LDAP), store an empty string
-			 * as his password in database.
+			 * as his/her password in database.
 			 */
 			$user['passwd'] = array_key_exists('passwd', $user)
 				? password_hash($user['passwd'], PASSWORD_BCRYPT, ['cost' => ZBX_BCRYPT_COST])
@@ -617,7 +617,7 @@ class CUser extends CApiService {
 		$this->checkUserGroups($users, $db_users);
 		$db_mediatypes = $this->checkMediaTypes($users);
 		$this->validateMediaRecipients($users, $db_mediatypes);
-		$this->checkHimself($users);
+		$this->checkOneself($users);
 	}
 
 	/**
@@ -937,14 +937,14 @@ class CUser extends CApiService {
 	}
 
 	/**
-	 * Additional check to exclude an opportunity to deactivate himself.
+	 * Additional check to exclude an opportunity to deactivate oneself.
 	 *
 	 * @param array  $users
 	 * @param array  $users[]['usrgrps']  (optional)
 	 *
 	 * @throws APIException
 	 */
-	private function checkHimself(array $users) {
+	private function checkOneself(array $users) {
 		foreach ($users as $user) {
 			if (bccomp($user['userid'], self::$userData['userid']) == 0) {
 				if (array_key_exists('roleid', $user) && $user['roleid'] != self::$userData['roleid']) {
@@ -961,7 +961,7 @@ class CUser extends CApiService {
 						if ($db_usrgrp['gui_access'] == GROUP_GUI_ACCESS_DISABLED
 								|| $db_usrgrp['users_status'] == GROUP_STATUS_DISABLED) {
 							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_('User cannot add himself to a disabled group or a group with disabled GUI access.')
+								_('User cannot add oneself to a disabled group or a group with disabled GUI access.')
 							);
 						}
 					}
@@ -1222,7 +1222,7 @@ class CUser extends CApiService {
 			$db_user = $db_users[$userid];
 
 			if (bccomp($userid, self::$userData['userid']) == 0) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('User is not allowed to delete himself.'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('User is not allowed to delete oneself.'));
 			}
 
 			if ($db_user['username'] == ZBX_GUEST_USER) {
