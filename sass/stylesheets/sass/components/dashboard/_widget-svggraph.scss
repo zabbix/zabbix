@@ -187,6 +187,27 @@ form.dashboard-widget-svggraph {
 		tbody:not(:empty) + tfoot td {
 			padding-top: 0;
 		}
+
+		.reference-hint {
+			margin-right: 3px;
+
+			&::before {
+				font-size: $icon-medium-size;
+				color: $link-color;
+			}
+		}
+
+		.unavailable-widget {
+			.reference-hint {
+				&::before {
+					color: $form-disabled-font-color;
+				}
+			}
+
+			a {
+				color: $form-disabled-font-color;
+			}
+		}
 	}
 
 	.overrides-list {

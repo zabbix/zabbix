@@ -84,7 +84,7 @@ window.widget_pie_chart_form = new class {
 					jQuery.colorpicker('hide');
 				}
 
-				if (e.target.classList.contains('js-click-expend')
+				if (e.target.classList.contains('js-click-expand')
 						|| e.target.classList.contains('color-picker-preview')
 						|| e.target.classList.contains('<?= ZBX_STYLE_BTN_GREY ?>')) {
 					jQuery('#data_sets').zbx_vertical_accordion('expandNth',

@@ -4980,6 +4980,15 @@ form.dashboard-widget-svggraph .single-item-table tfoot td {
   padding: 5px 5px 5px 10px; }
 form.dashboard-widget-svggraph .single-item-table tbody:not(:empty) + tfoot td {
   padding-top: 0; }
+form.dashboard-widget-svggraph .single-item-table .reference-hint {
+  margin-right: 3px; }
+  form.dashboard-widget-svggraph .single-item-table .reference-hint::before {
+    font-size: 16px;
+    color: #f8f8f8; }
+form.dashboard-widget-svggraph .single-item-table .unavailable-widget .reference-hint::before {
+  color: #7d7d7d; }
+form.dashboard-widget-svggraph .single-item-table .unavailable-widget a {
+  color: #7d7d7d; }
 form.dashboard-widget-svggraph .overrides-list {
   position: relative;
   margin: -5px 0 -5px 15px; }

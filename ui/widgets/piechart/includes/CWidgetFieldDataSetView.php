@@ -346,7 +346,7 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 			(new CCol(
 				(new CLink($name))
 					->setId('items_'.$ds_num.'_'.$row_num.'_name')
-					->addClass('js-click-expend')
+					->addClass('js-click-expand')
 			))->addClass('table-col-name'),
 			(new CCol([
 				(new CSelect($this->field->getName().'['.$ds_num.'][type][]'))
