@@ -601,7 +601,7 @@ class testPageLatestData extends CWebTest {
 	/**
 	 * Test for clicking on particular item tag in table and checking that items are filtered by this tag using normal and kiosk mode.
 	 *
-	 * @param boolean $kiosk_mode	page mode is selected
+	 * @param boolean $kiosk_mode	is kiosk mode applied on the page or not
 	 */
 	protected function checkClickTag($kiosk_mode = false) {
 		$tag = ['tag' => 'component: ', 'value' => 'storage'];
