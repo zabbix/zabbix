@@ -672,16 +672,16 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids, 
 			" where ir.itemid=id.parent_itemid and i.itemid=id.itemid and ih.hostid=" ZBX_FS_UI64 " and "
 			" (ihr.key_ is null or ihr.key_<>ir.key_) and", hostid);
 
-	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.hostid", templateids->values,
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.hostid", templateids->values,
 			templateids->values_num);
 
-	tresult = zbx_db_select("%s", sql);
+	tresult = DBselect("%s", sql);
 
-	if (NULL != (trow = zbx_db_fetch(tresult)))
+	if (NULL != (trow = DBfetch(tresult)))
 	{
 		ret = FAIL;
 
-		if (SUCCEED == zbx_db_is_null(trow[3]))
+		if (SUCCEED == DBis_null(trow[3]))
 		{
 			zbx_snprintf(error, max_error_len, "cannot inherit item prototype with key \"%s\" of "
 					"template \"%s\" and LLD rule \"%s\", because an item with the same key already"
@@ -695,10 +695,10 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids, 
 					trow[3]);
 		}
 
-		zbx_db_free_result(tresult);
+		DBfree_result(tresult);
 		goto out;
 	}
-	zbx_db_free_result(tresult);
+	DBfree_result(tresult);
 	sql_offset = 0;
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
