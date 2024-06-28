@@ -249,25 +249,26 @@ class CWidgetItemHistory extends CWidget {
 				container.innerHTML = '';
 				container.append(content);
 
+				e.target.resize_observer = new ResizeObserver((entries) => {
+					entries.forEach(entry => {
+						if (entry.devicePixelContentBoxSize) {
+							const overlay = content.closest('.dashboard-widget-itemhistory-hintbox-image');
+							const size = entry.contentBoxSize[0];
+
+							overlay.style.width = `${size.inlineSize}px`;
+							overlay.style.height = `${size.blockSize}px`;
+
+							requestAnimationFrame(() => hintBox.onResize(e, button));
+						}
+					})
+				});
+				e.target.resize_observer.observe(content);
+
 				if (!content.complete) {
 					hint_box.classList.add('is-loading');
 
 					content.addEventListener('load', () => {
 						hint_box.classList.remove('is-loading');
-						e.target.resize_observer = new ResizeObserver((entries) => {
-							entries.forEach(entry => {
-								if (entry.devicePixelContentBoxSize) {
-									const overlay = content.closest('.dashboard-widget-itemhistory-hintbox-image');
-									const size = entry.contentBoxSize[0];
-
-									overlay.style.width = `${size.inlineSize}px`;
-									overlay.style.height = `${size.blockSize}px`;
-
-									requestAnimationFrame(() => hintBox.onResize(e, button));
-								}
-							})
-						});
-						e.target.resize_observer.observe(content);
 					});
 
 					content.addEventListener('error', () => {
