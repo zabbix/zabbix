@@ -190,6 +190,13 @@ class testFormLowLevelDiscoveryFromTemplate extends testLowLevelDiscovery {
 		$this->checkFormLayout('template');
 	}
 
+	/**
+	 * @dataProvider getTypeDependingData
+	 */
+	public function testFormLowLevelDiscoveryFromTemplate_TypeDependingLayout($data) {
+		$this->checkLayoutDependingOnType($data, 'template');
+	}
+
 	public function testFormLowLevelDiscoveryFromTemplate_SimpleUpdate() {
 		$this->checkSimpleUpdate('template');
 	}

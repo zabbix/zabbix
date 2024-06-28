@@ -38,7 +38,8 @@ class testLowLevelDiscovery extends CWebTest {
 	 */
 	public function getBehaviors() {
 		return [
-			CMessageBehavior::class
+			CMessageBehavior::class,
+			CPreprocessingBehavior::class
 		];
 	}
 
@@ -47,7 +48,7 @@ class testLowLevelDiscovery extends CWebTest {
 	 *
 	 * @param string $context    is LLD created on Host or on Template
 	 */
-	public function checkFormLayout($context = 'host') {
+	protected function checkFormLayout($context = 'host') {
 		$url = ($context === 'template')
 			? static::$templateid.'&context=template'
 			: static::$empty_hostid.'&context=host';
@@ -66,13 +67,17 @@ class testLowLevelDiscovery extends CWebTest {
 
 		// Check the whole form required labels.
 		$required_labels = ['Name', 'Key', 'URL', 'Script', 'Master item', 'Host interface', 'SNMP OID', 'JMX endpoint',
-				'Public key file', 'Private key file', 'Executed script', 'SQL query', 'Update interval', 'Timeout',
-				'Delete lost resources', 'Disable lost resources'
+			'Public key file', 'Private key file', 'Executed script', 'SQL query', 'Update interval', 'Timeout',
+			'Delete lost resources', 'Disable lost resources'
 		];
 
 		if ($context === 'template') {
 			$required_labels = array_values(array_diff($required_labels, ['Host interface']));
 		}
+
+		$this->assertEquals($required_labels, array_values($form->getLabels(CElementFilter::CLASSES_PRESENT,
+				'form-label-asterisk')->asText())
+		);
 
 		// Check initial visible fields for each tab.
 		$visible_fields = [
@@ -102,7 +107,7 @@ class testLowLevelDiscovery extends CWebTest {
 					$preprocessing_container->query('button:Add')->one()->waitUntilCLickable()->click();
 					$this->assertTrue($preprocessing_container->query('id:preprocessing')->one()->isVisible());
 					$this->assertTrue($preprocessing_container->query('button', ['Add', 'Test', 'Remove', 'Test all steps'])
-							->one()->isClickable()
+						->one()->isClickable()
 					);
 
 					$preprocessing_fields = [
@@ -140,7 +145,7 @@ class testLowLevelDiscovery extends CWebTest {
 					$this->assertTrue($form->query('id:conditions')->one()->isVisible());
 					$this->assertTrue($filters_field->query('button', ['Add', 'Remove'])->one()->isClickable());
 					$this->assertEquals(['Label', 'Macro', '', 'Regular expression', 'Action'],
-							$filters_field->query('id:conditions')->asTable()->one()->getHeadersText()
+						$filters_field->query('id:conditions')->asTable()->one()->getHeadersText()
 					);
 
 					$filter_fields = [
@@ -162,7 +167,7 @@ class testLowLevelDiscovery extends CWebTest {
 					$filters_container = $form->getFieldContainer('Overrides');
 					$this->assertTrue($filters_container->query('button:Add')->one()->isClickable());
 					$this->assertEquals(['', '', 'Name', 'Stop processing', 'Action'],
-							$filters_container->query('id:lld-overrides-table')->asTable()->one()->getHeadersText()
+						$filters_container->query('id:lld-overrides-table')->asTable()->one()->getHeadersText()
 					);
 					break;
 			}
@@ -251,63 +256,127 @@ class testLowLevelDiscovery extends CWebTest {
 		}
 
 		$this->checkFieldsParameters($fields);
+	}
+
+	public static function getTypeDependingData() {
+		return [
+			// #0.
+			[
+				[
+					'type' => 'Zabbix agent',
+					'fields' => ['Host interface', 'Update interval', 'Custom intervals', 'Timeout']
+				]
+			],
+			[
+				[
+					'type' => 'Zabbix agent (active)',
+					'fields' => ['Update interval', 'Custom intervals', 'Timeout']
+				]
+			],
+			[
+				[
+					'type' => 'Simple check',
+					'fields' => ['Host interface', 'User name', 'Password', 'Update interval', 'Custom intervals', 'Timeout']
+				]
+			],
+			[
+				[
+					'type' => 'SNMP agent',
+					'fields' => ['Host interface', 'SNMP OID', 'Update interval', 'Custom intervals']
+				]
+			],
+			[
+				[
+					'type' => 'Zabbix internal',
+					'fields' => ['Update interval', 'Custom intervals']
+				]
+			],
+			[
+				[
+					'type' => 'Zabbix trapper',
+					'fields' => ['Allowed hosts']
+				]
+			],
+			[
+				[
+					'type' => 'External check',
+					'fields' => ['Host interface', 'Update interval', 'Custom intervals', 'Timeout']
+				]
+			],
+			[
+				[
+					'type' => 'Database monitor',
+					'fields' => ['User name', 'Password', 'SQL query', 'Update interval', 'Custom intervals', 'Timeout']
+				]
+			],
+			[
+				[
+					'type' => 'HTTP agent',
+					'fields' => ['URL', 'Query fields', 'Request type', 'Request body type', 'Request body', 'Headers',
+							'Required status codes', 'Follow redirects', 'Retrieve mode', 'HTTP proxy', 'HTTP authentication',
+							'SSL verify peer', 'SSL verify host', 'SSL certificate file', 'SSL key file', 'SSL key password',
+							'Host interface', 'Update interval', 'Custom intervals', 'Timeout', 'Enable trapping'
+					]
+				]
+			],
+			[
+				[
+					'type' => 'IPMI agent',
+					'fields' => ['Host interface', 'IPMI sensor', 'Update interval', 'Custom intervals']
+				]
+			],
+			[
+				[
+					'type' => 'SSH agent',
+					'fields' => ['Host interface', 'Authentication method', 'User name', 'Password',
+							'Executed script', 'Update interval', 'Custom intervals', 'Timeout'
+					]
+				]
+			],
+			[
+				[
+					'type' => 'TELNET agent',
+					'fields' => ['Host interface', 'User name', 'Password', 'Executed script',
+							'Update interval', 'Custom intervals', 'Timeout'
+					]
+				]
+			],
+			[
+				[
+					'type' => 'JMX agent',
+					'fields' => ['Host interface', 'JMX endpoint', 'User name', 'Password', 'Update interval', 'Custom intervals']
+				]
+			],
+			[
+				[
+					'type' => 'Dependent item',
+					'fields' => ['Master item']
+				]
+			],
+			[
+				[
+					'type' => 'Script',
+					'fields' =>  ['Parameters', 'Script', 'Update interval', 'Custom intervals', 'Timeout']
+				]
+			]
+		];
+	}
+
+	protected function checkLayoutDependingOnType($data, $context = 'host') {
+		$url = ($context === 'template')
+			? static::$templateid.'&context=template'
+			: static::$empty_hostid.'&context=host';
+
+		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.$url);
+		$this->query('button:Create discovery rule')->one()->waitUntilClickable()->click();
+		$form = $this->query('id:host-discovery-form')->asForm()->one()->waitUntilVisible();
 
 		// Check visible fields depending on LLD type.
 		$permanent_fields = ['Name', 'Type', 'Key', 'Delete lost resources', 'Disable lost resources', 'Description', 'Enabled'];
 
+		// Host interface field doesn't exist for Template.
 		if ($context === 'template') {
-			$depending_fields = [
-				'Zabbix agent' => ['Update interval', 'Custom intervals', 'Timeout'],
-				'Zabbix agent (active)' => ['Update interval', 'Custom intervals', 'Timeout'],
-				'Simple check' => ['User name', 'Password', 'Update interval', 'Custom intervals', 'Timeout'],
-				'SNMP agent' => ['SNMP OID', 'Update interval', 'Custom intervals'],
-				'Zabbix internal' => ['Update interval', 'Custom intervals'],
-				'Zabbix trapper' => ['Allowed hosts'],
-				'External check' => ['Update interval', 'Custom intervals', 'Timeout'],
-				'Database monitor' => ['User name', 'Password', 'SQL query', 'Update interval', 'Custom intervals', 'Timeout'],
-				'HTTP agent' => ['URL', 'Query fields', 'Request type', 'Request body type', 'Request body', 'Headers',
-					'Required status codes', 'Follow redirects', 'Retrieve mode', 'HTTP proxy', 'HTTP authentication',
-					'SSL verify peer', 'SSL verify host', 'SSL certificate file', 'SSL key file', 'SSL key password',
-					'Update interval', 'Custom intervals', 'Timeout', 'Enable trapping'
-				],
-				'IPMI agent' => ['IPMI sensor', 'Update interval', 'Custom intervals'],
-				'SSH agent' => ['Authentication method', 'User name', 'Password',
-					'Executed script', 'Update interval', 'Custom intervals', 'Timeout'
-				],
-				'TELNET agent' => ['User name', 'Password', 'Executed script',
-					'Update interval', 'Custom intervals', 'Timeout'
-				],
-				'JMX agent' => ['JMX endpoint', 'User name', 'Password', 'Update interval', 'Custom intervals'],
-				'Dependent item' => ['Master item'],
-				'Script' => ['Parameters', 'Script', 'Update interval', 'Custom intervals', 'Timeout']
-			];
-		}
-		else {
-			$depending_fields = [
-				'Zabbix agent' => ['Host interface', 'Update interval', 'Custom intervals', 'Timeout'],
-				'Zabbix agent (active)' => ['Update interval', 'Custom intervals', 'Timeout'],
-				'Simple check' => ['Host interface', 'User name', 'Password', 'Update interval', 'Custom intervals', 'Timeout'],
-				'SNMP agent' => ['Host interface', 'SNMP OID', 'Update interval', 'Custom intervals'],
-				'Zabbix internal' => ['Update interval', 'Custom intervals'],
-				'Zabbix trapper' => ['Allowed hosts'],
-				'External check' => ['Host interface', 'Update interval', 'Custom intervals', 'Timeout'],
-				'Database monitor' => ['User name', 'Password', 'SQL query', 'Update interval', 'Custom intervals', 'Timeout'],
-				'HTTP agent' => ['URL', 'Query fields', 'Request type', 'Request body type', 'Request body', 'Headers',
-					'Required status codes', 'Follow redirects', 'Retrieve mode', 'HTTP proxy', 'HTTP authentication',
-					'SSL verify peer', 'SSL verify host', 'SSL certificate file', 'SSL key file', 'SSL key password',
-					'Host interface', 'Update interval', 'Custom intervals', 'Timeout', 'Enable trapping'
-				],
-				'IPMI agent' => ['Host interface', 'IPMI sensor', 'Update interval', 'Custom intervals'],
-				'SSH agent' => ['Host interface', 'Authentication method', 'User name', 'Password',
-					'Executed script', 'Update interval', 'Custom intervals', 'Timeout'
-				],
-				'TELNET agent' => ['Host interface', 'User name', 'Password', 'Executed script',
-					'Update interval', 'Custom intervals', 'Timeout'
-				],
-				'JMX agent' => ['Host interface', 'JMX endpoint', 'User name', 'Password', 'Update interval', 'Custom intervals'],
-				'Dependent item' => ['Master item'],
-				'Script' => ['Parameters', 'Script', 'Update interval', 'Custom intervals', 'Timeout']
-			];
+			$data['fields'] = array_values(array_diff($data['fields'], ['Host interface']));
 		}
 
 		$hints = [
@@ -318,188 +387,186 @@ class testLowLevelDiscovery extends CWebTest {
 			'Disable lost resources' => 'The value should be greater than LLD rule update interval.'
 		];
 
-		foreach ($depending_fields as $type => $fields) {
-			$form->fill(['Type' => $type]);
+		$form->fill(['Type' => $data['type']]);
 
-			// Get expected visible fields.
-			$form_fields = array_merge($permanent_fields, array_values($fields));
-			usort($form_fields, function ($a, $b) {
-				return strcasecmp($a, $b);
-			});
+		// Get expected visible fields.
+		$form_fields = array_merge($permanent_fields, array_values($data['fields']));
+		usort($form_fields, function ($a, $b) {
+			return strcasecmp($a, $b);
+		});
 
-			// Get actual visible fields.
-			$present_fields = $form->getLabels()->filter(CElementFilter::VISIBLE)->asText();
-			usort($present_fields, function ($a, $b) {
-				return strcasecmp($a, $b);
-			});
+		// Get actual visible fields.
+		$present_fields = $form->getLabels()->filter(CElementFilter::VISIBLE)->asText();
+		usort($present_fields, function ($a, $b) {
+			return strcasecmp($a, $b);
+		});
 
-			$this->assertEquals($form_fields, $present_fields);
+		$this->assertEquals($form_fields, $present_fields);
 
-			switch ($type) {
-				case 'SNMP agent':
-					foreach (['walk[]' => true, '' => false] as $oid => $status) {
-						$form->fill(['SNMP OID' => $oid]);
-						$this->assertTrue($form->getField('Timeout')->isVisible($status));
-					}
+		switch ($data['type']) {
+			case 'SNMP agent':
+				foreach (['walk[]' => true, '' => false] as $oid => $status) {
+					$form->fill(['SNMP OID' => $oid]);
+					$this->assertTrue($form->getField('Timeout')->isVisible($status));
+				}
 
-					// Check hints and texts.
-					foreach ($hints as $label => $hint_text) {
-						$form->getLabel($label)->query('xpath:./button[@data-hintbox]')->one()->click();
-						$hint = $this->query('xpath://div[@class="overlay-dialogue"]')->waitUntilPresent()->all()->last();
-						$this->assertEquals($hint_text, $hint->getText());
-						$hint->query('xpath:.//button[@title="Close"]')->waitUntilClickable()->one()->click();
-					}
+				// Check hints and texts.
+				foreach ($hints as $label => $hint_text) {
+					$form->getLabel($label)->query('xpath:./button[@data-hintbox]')->one()->click();
+					$hint = $this->query('xpath://div[@class="overlay-dialogue"]')->waitUntilPresent()->all()->last();
+					$this->assertEquals($hint_text, $hint->getText());
+					$hint->query('xpath:.//button[@title="Close"]')->waitUntilClickable()->one()->click();
+				}
 
-				case 'Zabbix agent';
-				case 'JMX agent':
-				case 'IPMI agent':
-					if ($context === 'host') {
-						// Check red interface info message.
-						$this->assertTrue($form->query('xpath:.//span[@class="red" and text()="No interface found"]')
-								->one()->isVisible()
-						);
-					}
-					break;
+			case 'Zabbix agent';
+			case 'JMX agent':
+			case 'IPMI agent':
+				if ($context === 'host') {
+					// Check red interface info message.
+					$this->assertTrue($form->query('xpath:.//span[@class="red" and text()="No interface found"]')
+							->one()->isVisible()
+					);
+				}
+				break;
 
-				case 'HTTP agent':
-					// Check common buttons clickability.
-					$buttons = [
-						'Query fields' => ['Add', 'Remove'],
-						'Headers' => ['Add', 'Remove'],
-						'Custom intervals' => ['Add', 'Remove'],
-						'URL' => 'Parse'
-					];
+			case 'HTTP agent':
+				// Check common buttons clickability.
+				$buttons = [
+					'Query fields' => ['Add', 'Remove'],
+					'Headers' => ['Add', 'Remove'],
+					'Custom intervals' => ['Add', 'Remove'],
+					'URL' => 'Parse'
+				];
 
-					foreach ($buttons as $label => $query) {
-						$this->assertTrue($form->getFieldContainer($label)->query('button', $query)->one()->isClickable());
-					}
+				foreach ($buttons as $label => $query) {
+					$this->assertTrue($form->getFieldContainer($label)->query('button', $query)->one()->isClickable());
+				}
 
-					// Request type and Retrieve mode fields dependency.
-					$request_type_array = [
-						'HEAD' => ['enabled' => false, 'visible' => true],
-						'GET' => ['enabled' => true, 'visible' => true],
-						'POST' => ['enabled' => true, 'visible' => true],
-						'PUT' => ['enabled' => true, 'visible' => true]
-					];
+				// Request type and Retrieve mode fields dependency.
+				$request_type_array = [
+					'HEAD' => ['enabled' => false, 'visible' => true],
+					'GET' => ['enabled' => true, 'visible' => true],
+					'POST' => ['enabled' => true, 'visible' => true],
+					'PUT' => ['enabled' => true, 'visible' => true]
+				];
 
-					foreach ($request_type_array as $request_type => $status) {
-						$this->checkFieldsDependency($form, ['Request type' => $request_type], ['Retrieve mode' => $status]);
-					}
+				foreach ($request_type_array as $request_type => $status) {
+					$this->checkFieldsDependency($form, ['Request type' => $request_type], ['Retrieve mode' => $status]);
+				}
 
-					// HTTP authentication and User name/Password fields dependency.
-					$http_fields = [
-						'Basic' => ['enabled' => true, 'visible' => true],
-						'NTLM' => ['enabled' => true, 'visible' => true],
-						'Kerberos' => ['enabled' => true, 'visible' => true],
-						'Digest' => ['enabled' => true, 'visible' => true],
-						'None' => ['enabled' => true, 'visible' => false],
-					];
+				// HTTP authentication and User name/Password fields dependency.
+				$http_fields = [
+					'Basic' => ['enabled' => true, 'visible' => true],
+					'NTLM' => ['enabled' => true, 'visible' => true],
+					'Kerberos' => ['enabled' => true, 'visible' => true],
+					'Digest' => ['enabled' => true, 'visible' => true],
+					'None' => ['enabled' => true, 'visible' => false],
+				];
 
-					foreach ($http_fields as $http_auth => $status) {
-						$this->checkFieldsDependency($form, ['HTTP authentication' => $http_auth],
-								['User name' => $status, 'Password' => $status]
-						);
-					}
+				foreach ($http_fields as $http_auth => $status) {
+					$this->checkFieldsDependency($form, ['HTTP authentication' => $http_auth],
+							['User name' => $status, 'Password' => $status]
+					);
+				}
 
-					// Custom intervals field's type and intervals dependency.
-					$scheduling_fields = [
-						'id:delay_flex_0_schedule' => ['enabled' => true, 'visible' => true],
-						'id:delay_flex_0_delay' => ['enabled' => true, 'visible' => false],
-						'id:delay_flex_0_period' => ['enabled' => true, 'visible' => false]
-					];
-					$this->checkFieldsDependency($form, ['id:delay_flex_0_type' => 'Scheduling'], $scheduling_fields);
+				// Custom intervals field's type and intervals dependency.
+				$scheduling_fields = [
+					'id:delay_flex_0_schedule' => ['enabled' => true, 'visible' => true],
+					'id:delay_flex_0_delay' => ['enabled' => true, 'visible' => false],
+					'id:delay_flex_0_period' => ['enabled' => true, 'visible' => false]
+				];
+				$this->checkFieldsDependency($form, ['id:delay_flex_0_type' => 'Scheduling'], $scheduling_fields);
 
-					$flexible_fields = [
-						'id:delay_flex_0_schedule' => ['enabled' => true, 'visible' => false],
-						'id:delay_flex_0_delay' => ['enabled' => true, 'visible' => true],
-						'id:delay_flex_0_period' => ['enabled' => true, 'visible' => true]
-					];
-					$this->checkFieldsDependency($form, ['id:delay_flex_0_type' => 'Flexible'], $flexible_fields);
+				$flexible_fields = [
+					'id:delay_flex_0_schedule' => ['enabled' => true, 'visible' => false],
+					'id:delay_flex_0_delay' => ['enabled' => true, 'visible' => true],
+					'id:delay_flex_0_period' => ['enabled' => true, 'visible' => true]
+				];
+				$this->checkFieldsDependency($form, ['id:delay_flex_0_type' => 'Flexible'], $flexible_fields);
 
-					// Timeout fields' dependency.
-					$timeout_array = [
-						'Global' => ['enabled' => false, 'visible' => true],
-						'Override' => ['enabled' => true, 'visible' => true],
-					];
-					foreach ($timeout_array as $timeout => $status) {
-						$this->checkFieldsDependency($form, ['id:custom_timeout' => $timeout], ['id:timeout' => $status]);
-					}
+				// Timeout fields' dependency.
+				$timeout_array = [
+					'Global' => ['enabled' => false, 'visible' => true],
+					'Override' => ['enabled' => true, 'visible' => true],
+				];
+				foreach ($timeout_array as $timeout => $status) {
+					$this->checkFieldsDependency($form, ['id:custom_timeout' => $timeout], ['id:timeout' => $status]);
+				}
 
-					// Check Timeouts link.
-					$this->assertTrue($form->query('link:Timeouts')->one()->isClickable());
+				// Check Timeouts link.
+				$this->assertTrue($form->query('link:Timeouts')->one()->isClickable());
 
-					$lifetime_array = [
-						'Never' => ['enabled' => true, 'visible' => false],
-						'Immediately' => ['enabled' => true, 'visible' => false],
-						'After' => ['enabled' => true, 'visible' => true]
-					];
+				$lifetime_array = [
+					'Never' => ['enabled' => true, 'visible' => false],
+					'Immediately' => ['enabled' => true, 'visible' => false],
+					'After' => ['enabled' => true, 'visible' => true]
+				];
 
-					// Delete lost resources input dependency.
-					foreach ($lifetime_array as $lifetime => $status) {
-						$this->checkFieldsDependency($form, ['id:lifetime_type' => $lifetime], ['id:lifetime' => $status]);
-					}
+				// Delete lost resources input dependency.
+				foreach ($lifetime_array as $lifetime => $status) {
+					$this->checkFieldsDependency($form, ['id:lifetime_type' => $lifetime], ['id:lifetime' => $status]);
+				}
 
-					// Disable lost resources input dependency.
-					foreach ($lifetime_array as $lifetime => $status) {
-						$this->checkFieldsDependency($form, ['id:enabled_lifetime_type' => $lifetime],
-								['id:enabled_lifetime' => $status]
-						);
-					}
+				// Disable lost resources input dependency.
+				foreach ($lifetime_array as $lifetime => $status) {
+					$this->checkFieldsDependency($form, ['id:enabled_lifetime_type' => $lifetime],
+							['id:enabled_lifetime' => $status]
+					);
+				}
 
-					$disabled_lifetime_array = [
-						'Never' => ['enabled' => true, 'visible' => true],
-						'Immediately' => ['enabled' => true, 'visible' => false],
-						'After' => ['enabled' => true, 'visible' => true]
-					];
+				$disabled_lifetime_array = [
+					'Never' => ['enabled' => true, 'visible' => true],
+					'Immediately' => ['enabled' => true, 'visible' => false],
+					'After' => ['enabled' => true, 'visible' => true]
+				];
 
-					// Disable lost resources visibility dependency.
-					foreach ($disabled_lifetime_array as $disabled_lifetime => $status) {
-						$this->checkFieldsDependency($form, ['id:lifetime_type' => $disabled_lifetime],
-								['id:enabled_lifetime_type' => $status]
-						);
-					}
+				// Disable lost resources visibility dependency.
+				foreach ($disabled_lifetime_array as $disabled_lifetime => $status) {
+					$this->checkFieldsDependency($form, ['id:lifetime_type' => $disabled_lifetime],
+							['id:enabled_lifetime_type' => $status]
+					);
+				}
 
-					// Allowed hosts field's dependency.
-					$allowed_hosts = $form->getField('Allowed hosts');
-					foreach ([true, false] as $status) {
-						$form->fill(['Enable trapping' => $status]);
-						$this->assertTrue($allowed_hosts->isVisible($status));
-						$this->assertTrue($allowed_hosts->isEnabled());
-					}
-					break;
+				// Allowed hosts field's dependency.
+				$allowed_hosts = $form->getField('Allowed hosts');
+				foreach ([true, false] as $status) {
+					$form->fill(['Enable trapping' => $status]);
+					$this->assertTrue($allowed_hosts->isVisible($status));
+					$this->assertTrue($allowed_hosts->isEnabled());
+				}
+				break;
 
-				case 'SSH agent':
-					// User/password and public/private keys fields dependency on "Authentication method".
-					$key_fields = [
-						'id:username' => ['enabled' => true, 'visible' => true],
-						'id:password' => ['enabled' => true, 'visible' => true],
-						'id:publickey' => ['enabled' => true, 'visible' => true],
-						'id:privatekey' => ['enabled' => true, 'visible' => true]
-					];
-					$this->checkFieldsDependency($form, ['Authentication method' => 'Public key'], $key_fields);
+			case 'SSH agent':
+				// User/password and public/private keys fields dependency on "Authentication method".
+				$key_fields = [
+					'id:username' => ['enabled' => true, 'visible' => true],
+					'id:password' => ['enabled' => true, 'visible' => true],
+					'id:publickey' => ['enabled' => true, 'visible' => true],
+					'id:privatekey' => ['enabled' => true, 'visible' => true]
+				];
+				$this->checkFieldsDependency($form, ['Authentication method' => 'Public key'], $key_fields);
 
-					$password_fields = [
-						'id:username' => ['enabled' => true, 'visible' => true],
-						'id:password' => ['enabled' => true, 'visible' => true],
-						'id:publickey' => ['enabled' => false, 'visible' => false],
-						'id:privatekey' => ['enabled' => false, 'visible' => false]
-					];
-					$this->checkFieldsDependency($form, ['Authentication method' => 'Password'], $password_fields);
-					break;
+				$password_fields = [
+					'id:username' => ['enabled' => true, 'visible' => true],
+					'id:password' => ['enabled' => true, 'visible' => true],
+					'id:publickey' => ['enabled' => false, 'visible' => false],
+					'id:privatekey' => ['enabled' => false, 'visible' => false]
+				];
+				$this->checkFieldsDependency($form, ['Authentication method' => 'Password'], $password_fields);
+				break;
 
-				case 'Script':
-					$buttons = [
-						'Parameters' => 'button:Add',
-						'Parameters' => 'button:Remove',
-						// Pencil icon button.
-						'Script' => 'xpath:.//button[@title="Click to view or edit"]'
-					];
+			case 'Script':
+				$buttons = [
+					'Parameters' => 'button:Add',
+					'Parameters' => 'button:Remove',
+					// Pencil icon button.
+					'Script' => 'xpath:.//button[@title="Click to view or edit"]'
+				];
 
-					foreach ($buttons as $label => $query) {
-						$this->assertTrue($form->getFieldContainer($label)->query($query)->one()->isClickable());
-					}
-					break;
-			}
+				foreach ($buttons as $label => $query) {
+					$this->assertTrue($form->getFieldContainer($label)->query($query)->one()->isClickable());
+				}
+				break;
 		}
 	}
 
@@ -1158,6 +1225,21 @@ class testLowLevelDiscovery extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
+						'Name' => 'HTTP check',
+						'Type' => 'HTTP agent',
+						'Key' => 'http.check',
+						'URL' => 'test',
+						'Enable trapping' => true,
+						'Allowed hosts' => '::ffff:127.0.0.1'
+					],
+					'error_details' => 'Invalid parameter "/1/trapper_hosts": incorrect address starting from ".0.0.1".'
+				]
+			],
+			// #44.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
 						'Name' => 'IPMI agent LLD',
 						'Type' => 'IPMI agent',
 						'Key' => 'ipmi_check[]',
@@ -1166,7 +1248,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/ipmi_sensor": cannot be empty.'
 				]
 			],
-			// #44.
+			// #45.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1174,25 +1256,7 @@ class testLowLevelDiscovery extends CWebTest {
 						'Name' => 'SSH agent LLD',
 						'Type' => 'SSH agent',
 						'Key' => 'ssh_check[]',
-						'id:username' => '',
-						'Executed script' => ''
-					],
-					'error' => 'Page received incorrect data',
-					'error_details' => [
-						'Incorrect value for field "User name": cannot be empty.',
-						'Incorrect value for field "Executed script": cannot be empty.'
-					]
-				]
-			],
-			// #45.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'TELNET agent LLD',
-						'Type' => 'TELNET agent',
-						'Key' => 'telnet_check[]',
-						'id:username' => '',
+						'User name' => '',
 						'Executed script' => ''
 					],
 					'error' => 'Page received incorrect data',
@@ -1207,18 +1271,36 @@ class testLowLevelDiscovery extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
+						'Name' => 'TELNET agent LLD',
+						'Type' => 'TELNET agent',
+						'Key' => 'telnet_check[]',
+						'User name' => '',
+						'Executed script' => ''
+					],
+					'error' => 'Page received incorrect data',
+					'error_details' => [
+						'Incorrect value for field "User name": cannot be empty.',
+						'Incorrect value for field "Executed script": cannot be empty.'
+					]
+				]
+			],
+			// #47.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
 						'Name' => 'JMX agent LLD empty',
 						'Type' => 'JMX agent',
 						'Key' => 'jmx_check[]',
 						'JMX endpoint' => '',
-						'id:username' => '',
+						'User name' => '',
 						'Password' => ''
 					],
 					'error' => 'Page received incorrect data',
 					'error_details' => 'Incorrect value for field "jmx_endpoint": cannot be empty.'
 				]
 			],
-			// #47.
+			// #48.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1232,21 +1314,6 @@ class testLowLevelDiscovery extends CWebTest {
 					'error_details' => 'Field "Master item" is mandatory.'
 				]
 			],
-			// #48.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'JMX agent',
-						'Type' => 'JMX agent',
-						'Key' => 'jmx_check[]',
-						'id:username' => 'Test',
-						'Password' => '',
-						'JMX endpoint' => 'test'
-					],
-					'error_details' => 'Invalid parameter "/1": both username and password should be either present or empty.'
-				]
-			],
 			// #49.
 			[
 				[
@@ -1255,14 +1322,29 @@ class testLowLevelDiscovery extends CWebTest {
 						'Name' => 'JMX agent',
 						'Type' => 'JMX agent',
 						'Key' => 'jmx_check[]',
-						'id:username' => '',
-						'Password' => 'Test',
+						'User name' => 'Test',
+						'Password' => '',
 						'JMX endpoint' => 'test'
 					],
 					'error_details' => 'Invalid parameter "/1": both username and password should be either present or empty.'
 				]
 			],
 			// #50.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'JMX agent',
+						'Type' => 'JMX agent',
+						'Key' => 'jmx_check[]',
+						'User name' => '',
+						'Password' => 'Test',
+						'JMX endpoint' => 'test'
+					],
+					'error_details' => 'Invalid parameter "/1": both username and password should be either present or empty.'
+				]
+			],
+			// #51.
 			[
 				[
 					'fields' => [
@@ -1272,7 +1354,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #51.
+			// #52.
 			[
 				[
 					'fields' => [
@@ -1293,7 +1375,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'trim' => true
 				]
 			],
-			// #52.
+			// #53.
 			[
 				[
 					'fields' => [
@@ -1308,13 +1390,14 @@ class testLowLevelDiscovery extends CWebTest {
 					'trim' => true
 				]
 			],
-			// #53.
+			// #54.
 			[
 				[
 					'fields' => [
 						'Name' => 'SNMP LLD 1',
 						'Type' => 'SNMP agent',
 						'Key' => 'snmp.test',
+						'Update interval' => '24h',
 						'Host interface' => '127.0.0.3:161SNMPv1, Community: {$SNMP_COMMUNITY}',
 						'SNMP OID' => '.1.3.6.1.2.1.1.1.0',
 						'id:lifetime_type' => 'After',
@@ -1326,13 +1409,14 @@ class testLowLevelDiscovery extends CWebTest {
 					'trim' => true
 				]
 			],
-			// #54.
+			// #55.
 			[
 				[
 					'fields' => [
 						'Name' => 'SNMP LLD 2',
 						'Type' => 'SNMP agent',
 						'Key' => 'snmp.test[1]',
+						'Update interval' => '1d',
 						'SNMP OID' => 'walk[.1.3.6.1.4.1,.1.3.6.1.2.1.1.1.0,.1.3.6.1.2.1.7.3.0]',
 						'id:lifetime_type' => 'After',
 						'id:lifetime' => 788400000,
@@ -1341,7 +1425,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #55.
+			// #56.
 			[
 				[
 					'fields' => [
@@ -1353,7 +1437,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'trim' => true
 				]
 			],
-			// #56.
+			// #57.
 			[
 				[
 					'fields' => [
@@ -1364,7 +1448,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #57.
+			// #58.
 			[
 				[
 					'fields' => [
@@ -1375,7 +1459,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #58.
+			// #59.
 			[
 				[
 					'fields' => [
@@ -1385,7 +1469,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #59.
+			// #60.
 			[
 				[
 					'fields' => [
@@ -1398,7 +1482,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'trim' => true
 				]
 			],
-			// #60.
+			// #61.
 			[
 				[
 					'fields' => [
@@ -1408,7 +1492,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #61.
+			// #62.
 			[
 				[
 					'fields' => [
@@ -1420,7 +1504,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'trim' => true
 				]
 			],
-			// #62.
+			// #63.
 			[
 				[
 					'fields' => [
@@ -1431,7 +1515,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #63.
+			// #64.
 			[
 				[
 					'fields' => [
@@ -1444,7 +1528,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #64.
+			// #65.
 			[
 				[
 					'fields' => [
@@ -1457,7 +1541,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #65.
+			// #66.
 			[
 				[
 					'fields' => [
@@ -1482,7 +1566,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #66.
+			// #67.
 			[
 				[
 					'fields' => [
@@ -1527,7 +1611,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'trim' => true
 				]
 			],
-			// #67.
+			// #68.
 			[
 				[
 					'fields' => [
@@ -1553,7 +1637,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #68.
+			// #69.
 			[
 				[
 					'fields' => [
@@ -1579,7 +1663,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #69.
+			// #70.
 			[
 				[
 					'fields' => [
@@ -1591,68 +1675,68 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #70.
+			// #71.
 			[
 				[
 					'fields' => [
 						'Name' => 'SSH agent LLD no password',
 						'Type' => 'SSH agent',
 						'Key' => 'ssh_check[]',
-						'id:username' => 'test_username',
+						'User name' => 'test_username',
 						'Password' => '',
 						'Executed script' => 'test script'
 					]
-				]
-			],
-			// #71.
-			[
-				[
-					'fields' => [
-						'Name' => '      SSH agent LLD 🙂🙃み け め 𒁥      ',
-						'Type' => 'SSH agent',
-						'Key' => 'ssh_check[🙂🙃み け め 𒁥]       ',
-						'id:username' => '         🙂🙃み け め 𒁥        ',
-						'Password' => '       🙂🙃み け め 𒁥       ',
-						'Executed script' => '        🙂🙃み け め 𒁥         '
-					],
-					'trim' => true
 				]
 			],
 			// #72.
 			[
 				[
 					'fields' => [
-						'Name' => 'SSH agent LLD {$MACRO}',
+						'Name' => '      SSH agent LLD 🙂🙃み け め 𒁥      ',
 						'Type' => 'SSH agent',
-						'Key' => 'ssh_check[2]',
-						'id:username' => '{$MACRO}',
-						'Password' => '{$MACRO}',
-						'Executed script' => '{$MACRO}'
-					]
+						'Key' => 'ssh_check[🙂🙃み け め 𒁥]       ',
+						'User name' => '         🙂🙃み け め 𒁥        ',
+						'Password' => '       🙂🙃み け め 𒁥       ',
+						'Executed script' => '        🙂🙃み け め 𒁥         '
+					],
+					'trim' => true
 				]
 			],
 			// #73.
 			[
 				[
 					'fields' => [
-						'Name' => 'TELNET agent LLD {$MACRO}',
-						'Type' => 'TELNET agent',
-						'Key' => 'telnet_check[{$MACRO}]',
-						'id:username' => '  {$MACRO}     ',
-						'Password' => '   {$MACRO}       ',
-						'Executed script' => '      {$MACRO}  🙂🙃み け め 𒁥     '
-					],
-					'trim' => true
+						'Name' => 'SSH agent LLD {$MACRO}',
+						'Type' => 'SSH agent',
+						'Key' => 'ssh_check[2]',
+						'User name' => '{$MACRO}',
+						'Password' => '{$MACRO}',
+						'Executed script' => '{$MACRO}'
+					]
 				]
 			],
 			// #74.
 			[
 				[
 					'fields' => [
+						'Name' => 'TELNET agent LLD {$MACRO}',
+						'Type' => 'TELNET agent',
+						'Key' => 'telnet_check[{$MACRO}]',
+						'User name' => '  {$MACRO}     ',
+						'Password' => '   {$MACRO}       ',
+						'Executed script' => '      {$MACRO}  🙂🙃み け め 𒁥     '
+					],
+					'trim' => true
+				]
+			],
+			// #75.
+			[
+				[
+					'fields' => [
 						'Name' => 'JMX agent LLD {$MACRO}',
 						'Type' => 'JMX agent',
 						'Key' => 'jmx_check[{$MACRO}]',
-						'id:username' => '',
+						'User name' => '',
 						'Password' => '',
 						'JMX endpoint' => '      service:jmx:{$MACRO}:///jndi/[🙂🙃み け め 𒁥]'.
 								'://{HOST.CONN}:{HOST.PORT}/jmxrmi          '
@@ -1660,7 +1744,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'trim' => true
 				]
 			],
-			// #75.
+			// #76.
 			[
 				[
 					'fields' => [
@@ -1671,7 +1755,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #76.
+			// #77.
 			[
 				[
 					'fields' => [
@@ -1687,7 +1771,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'trim' => true
 				]
 			],
-			// #77.
+			// #78.
 			[
 				[
 					'fields' => [
@@ -1704,8 +1788,38 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
+			// #79.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Empty script',
+						'Type' => 'Script',
+						'Key' => 'script_check[3]',
+						'Script' => ""
+					],
+					'error' => 'Page received incorrect data',
+					'error_details' => 'Incorrect value for field "Script": cannot be empty.'
+				]
+			],
+			// #80.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Empty script',
+						'Type' => 'Script',
+						'Key' => 'script_check[4]',
+						'Script' => 'wait(2000).then(() => goToPage());'
+					],
+					'Parameters' => [
+						['Name' => '', 'Value' => 'value_1']
+					],
+					'error_details' => 'Invalid parameter "/1/parameters/1/name": cannot be empty.'
+				]
+			],
 			// LLD Macros tab.
-			// #78.
+			// #81.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1720,7 +1834,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/lld_macro_paths/1/path": cannot be empty.'
 				]
 			],
-			// #79.
+			// #82.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1735,7 +1849,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/lld_macro_paths/1/lld_macro": a low-level discovery macro is expected.'
 				]
 			],
-			// #80.
+			// #83.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1750,7 +1864,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/lld_macro_paths/1/lld_macro": a low-level discovery macro is expected.'
 				]
 			],
-			// #81.
+			// #84.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1765,7 +1879,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/lld_macro_paths/1/lld_macro": a low-level discovery macro is expected.'
 				]
 			],
-			// #82.
+			// #85.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1780,7 +1894,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/lld_macro_paths/1/lld_macro": cannot be empty.'
 				]
 			],
-			// #83.
+			// #86.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1795,7 +1909,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/lld_macro_paths/1/lld_macro": a low-level discovery macro is expected.'
 				]
 			],
-			// #84.
+			// #87.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1811,7 +1925,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/lld_macro_paths/2": value (lld_macro)=({#MACRO}) already exists.'
 				]
 			],
-			// #85.
+			// #88.
 			[
 				[
 					'fields' => [
@@ -1826,7 +1940,7 @@ class testLowLevelDiscovery extends CWebTest {
 				]
 			],
 			// Filters tab.
-			// #86.
+			// #89.
 			[
 				[
 					'fields' => [
@@ -1841,7 +1955,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #87.
+			// #90.
 			[
 				[
 					'fields' => [
@@ -1856,7 +1970,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #88.
+			// #91.
 			[
 				[
 					'fields' => [
@@ -1873,7 +1987,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #89.
+			// #92.
 			[
 				[
 					'fields' => [
@@ -1890,7 +2004,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #90.
+			// #93.
 			[
 				[
 					'fields' => [
@@ -1907,7 +2021,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #91.
+			// #94.
 			[
 				[
 					'fields' => [
@@ -1926,7 +2040,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #92.
+			// #95.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1943,7 +2057,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/filter/conditions/1/macro": a low-level discovery macro is expected.'
 				]
 			],
-			// #93.
+			// #96.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1963,7 +2077,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/filter/formula": cannot be empty.'
 				]
 			],
-			// #94.
+			// #97.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1983,7 +2097,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/filter/formula": missing filter condition "F".'
 				]
 			],
-			// #95.
+			// #98.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2005,7 +2119,7 @@ class testLowLevelDiscovery extends CWebTest {
 							'defined in the formula.'
 				]
 			],
-			// #96.
+			// #99.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2025,7 +2139,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/filter/formula": incorrect syntax near "Wrong formula".'
 				]
 			],
-			// #97.
+			// #100.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2045,7 +2159,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/filter/formula": incorrect syntax near "Not B"'
 				]
 			],
-			// #98.
+			// #101.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2065,7 +2179,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/filter/formula": incorrect syntax near " A and not B".'
 				]
 			],
-			// #99.
+			// #102.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2353,8 +2467,10 @@ class testLowLevelDiscovery extends CWebTest {
 					'Enabled' => false
 				],
 				'preprocessing_fields' => [
-					'id:preprocessing_0_type' => 'Prometheus to JSON',
-					'id:preprocessing_0_params_0' => '{label_name!~"name"}'
+					[
+						'type' => 'Prometheus to JSON',
+						'parameter_1' => '{label_name!~"name"}'
+					]
 				],
 				'lld_macros_fields' => [
 					'id:lld_macro_paths_0_lld_macro' => '{#NEW_LLDMACRO}',
@@ -2387,7 +2503,7 @@ class testLowLevelDiscovery extends CWebTest {
 				$form->query('id:param_add')->waitUntilClickable()->one()->click();
 			}
 
-			$form->fill($fields['preprocessing_fields']);
+			$this->addPreprocessingSteps($fields['preprocessing_fields']);
 
 			// Change LLD Macros.
 			$form->selectTab('LLD macros');
@@ -2497,7 +2613,7 @@ class testLowLevelDiscovery extends CWebTest {
 	 * Check inputs are visible/editable depending on other field's value.
 	 *
 	 * @param CFormElement $form                  LLD edit form
-	 * @param string       $master_field_value    input which is being changed
+	 * @param array        $master_field_value    field => value array which is being filled to cause dependency
 	 * @param array        $dependant_array       given array of changed labels
 	 */
 	protected function checkFieldsDependency($form, $master_field_value, $dependant_array) {

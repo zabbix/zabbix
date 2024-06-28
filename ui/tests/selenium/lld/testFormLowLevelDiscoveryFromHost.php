@@ -263,8 +263,15 @@ class testFormLowLevelDiscoveryFromHost extends testLowLevelDiscovery {
 		self::$interfaces_hostid = $result['hostids']['Host for LLD form test with all interfaces'];
 	}
 
-	public function testFormLowLevelDiscoveryFromHost_Layout() {
+	public function testFormLowLevelDiscoveryFromHost_InitialLayout() {
 		$this->checkFormLayout();
+	}
+
+	/**
+	 * @dataProvider getTypeDependingData
+	 */
+	public function testFormLowLevelDiscoveryFromHost_TypeDependingLayout($data) {
+		$this->checkLayoutDependingOnType($data);
 	}
 
 	public function testFormLowLevelDiscoveryFromHost_SimpleUpdate() {
