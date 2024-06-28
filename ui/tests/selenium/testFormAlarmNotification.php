@@ -561,6 +561,7 @@ class testFormAlarmNotification extends CWebTest {
 		$this->page->open('zabbix.php?action=problem.view&unacknowledged=1&sort=name&sortorder=ASC&hostids%5B%5D='.
 				self::$hostid)->waitUntilReady();
 
+		var_dump('start we ar logged on page 1 - '.microtime());
 		// In case some scenarios failed and problems didn't closed at the end.
 		if ($this->query('class:list-table')->asTable()->one()->getRows()->asText() !== ['No data found.']) {
 			$this->closeProblem();
@@ -576,6 +577,7 @@ class testFormAlarmNotification extends CWebTest {
 		$this->query('name:zbx_filter')->asForm()->one()->fill(['Hosts' => 'Host for alarm item'])->submit();
 		$this->query('class:list-table')->asTable()->one()->waitUntilReloaded();
 
+		var_dump('middle after triggering and finding overlay 2 - '.microtime());
 		// Check that problems displayed in table.
 		$this->assertTableDataColumn($this->all_triggers, 'Problem');
 
