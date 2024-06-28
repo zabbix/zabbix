@@ -114,6 +114,11 @@ class CControllerItemList extends CControllerItem {
 		unset($data['types'][ITEM_TYPE_HTTPTEST]);
 
 		$items = $this->getItems($data['context'], $filter);
+
+		if (getRequest('subfilter_state')) {
+			$items = $this->removeNonEligibleItemsForStateSubfilter($items);
+		}
+
 		$data['filtered_count'] = count($items);
 		[$items, $subfilter_fields] = $this->getItemsAndSubfilter($items, $this->getSubfilter($items, $filter));
 		$data['subfilter'] = static::sortSubfilter($subfilter_fields);
@@ -694,6 +699,12 @@ class CControllerItemList extends CControllerItem {
 					continue;
 				}
 
+				if ($column === 'subfilter_state'
+					&& (int) $item_values['subfilter_status'][0] === ITEM_STATUS_DISABLED
+				) {
+					continue;
+				}
+
 				foreach ($values as $value) {
 					$schema[$column]['values'][$value]++;
 				}
@@ -940,5 +951,16 @@ class CControllerItemList extends CControllerItem {
 		CProfile::deleteIdx($prefix.'filter.tags.operator');
 		CProfile::deleteIdx($prefix.'filter.evaltype');
 		CProfile::deleteIdx($prefix.'filter_valuemapids');
+	}
+
+	private function removeNonEligibleItemsForStateSubfilter(array $items): array
+	{
+		foreach ($items as $key => $item) {
+			if ($item['status'] === (string) ITEM_STATUS_DISABLED) {
+				unset($items[$key]);
+			}
+		}
+
+		return $items;
 	}
 }
