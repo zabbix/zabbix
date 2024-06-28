@@ -526,6 +526,21 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 								'y' => 16,
 								'width' => 12,
 								'height' => 4
+							],
+							[
+								'type' => 'honeycomb',
+								'name' => 'UpdateHoneycomb',
+								'x' => 0,
+								'y' => 20,
+								'width' => 12,
+								'height' => 5,
+								'fields' => [
+									[
+										'type' => 1,
+										'name' => 'items.0',
+										'value' => 'Test dashboard honeycomb'
+									]
+								]
 							]
 						]
 					]

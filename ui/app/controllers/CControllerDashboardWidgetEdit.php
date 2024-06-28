@@ -108,6 +108,12 @@ class CControllerDashboardWidgetEdit extends CController {
 			$field->setValuesCaptions($captions);
 		}
 
+		$url = $this->widget->getUrl();
+
+		if ($url !== '' && parse_url($url, PHP_URL_HOST) === null) {
+			$url = CDocHelper::getUrl($url);
+		}
+
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', ''),
 			'type' => $this->getInput('type'),
@@ -120,7 +126,7 @@ class CControllerDashboardWidgetEdit extends CController {
 			'dashboard_page_unique_id' => $this->hasInput('dashboard_page_unique_id')
 				? $this->getInput('dashboard_page_unique_id')
 				: null,
-			'url' => $this->widget->getUrl(),
+			'url' => $url,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]

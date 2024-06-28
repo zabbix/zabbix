@@ -4,7 +4,7 @@ if SERVER
 SERVER_tests = \
 	zbx_evaluate \
 	zbx_evaluate_unknown \
-	evaluate_function \
+	zbx_evaluate_function \
 	zbx_STL \
 	zbx_get_percentage_of_deviations_in_stl_remainder \
 	zbx_substitute_lld_macros \
@@ -49,7 +49,6 @@ EVALUATE_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxmedia/libzbxmedia.a \
 	$(top_srcdir)/src/libs/zbxserialize/libzbxserialize.a \
 	$(top_srcdir)/src/libs/zbxcommshigh/libzbxcommshigh.a \
-	$(top_srcdir)/src/libs/zbxregexp/libzbxregexp.a \
 	$(top_srcdir)/src/libs/zbxicmpping/libzbxicmpping.a \
 	$(top_srcdir)/src/libs/zbxdbupgrade/libzbxdbupgrade.a \
 	$(top_srcdir)/src/libs/zbxjson/libzbxjson.a \
@@ -83,6 +82,7 @@ EVALUATE_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxfile/libzbxfile.a \
 	$(top_srcdir)/src/libs/zbxparam/libzbxparam.a \
 	$(top_srcdir)/src/libs/zbxexpr/libzbxexpr.a \
+	$(top_srcdir)/src/libs/zbxregexp/libzbxregexp.a \
 	$(top_srcdir)/src/libs/zbxcfg/libzbxcfg.a \
 	$(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a \
 	$(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
@@ -191,18 +191,19 @@ zbx_substitute_simple_macros_CFLAGS = $(COMMON_COMPILER_FLAGS) $(TLS_CFLAGS) \
 	-I@top_srcdir@/src/libs/zbxcachevalue \
 	-I@top_srcdir@/src/libs/zbxexpression
 
-evaluate_function_SOURCES = \
-	evaluate_function.c \
+zbx_evaluate_function_SOURCES = \
+	zbx_evaluate_function.c \
 	$(COMMON_SRC_FILES)
 
-evaluate_function_LDADD = \
+zbx_evaluate_function_LDADD = \
 	$(top_srcdir)/tests/mocks/valuecache/libvaluecachemock.a
 
-evaluate_function_LDADD += $(EVALUATE_LIB_FILES) $(TLS_LIBS)
+zbx_evaluate_function_LDADD += $(EVALUATE_LIB_FILES) $(TLS_LIBS)
 
-evaluate_function_LDADD += @SERVER_LIBS@
+zbx_evaluate_function_LDADD += @SERVER_LIBS@
 
-evaluate_function_LDFLAGS = @SERVER_LDFLAGS@ $(VALUECACHE_WRAP_FUNCS) $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
+zbx_evaluate_function_LDFLAGS = @SERVER_LDFLAGS@ \
+	$(VALUECACHE_WRAP_FUNCS) $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
 zbx_STL_SOURCES = \
 	zbx_STL.c \
@@ -260,7 +261,7 @@ VALUECACHE_WRAP_FUNCS = \
 	-Wl,--wrap=zbx_dc_get_data_expected_from \
 	-Wl,--wrap=zbx_timespec
 
-evaluate_function_CFLAGS = $(COMMON_COMPILER_FLAGS) $(TLS_CFLAGS) \
+zbx_evaluate_function_CFLAGS = $(COMMON_COMPILER_FLAGS) $(TLS_CFLAGS) \
 	-I@top_srcdir@/src/libs/zbxalgo \
 	-I@top_srcdir@/src/libs/zbxcacheconfig \
 	-I@top_srcdir@/src/libs/zbxcachehistory \

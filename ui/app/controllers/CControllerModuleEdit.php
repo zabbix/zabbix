@@ -67,6 +67,12 @@ class CControllerModuleEdit extends CController {
 		$manifest = $module_manager->addModule($this->module['relative_path']);
 
 		if ($manifest !== null) {
+			$url = $manifest['url'];
+
+			if ($url !== '' && parse_url($url, PHP_URL_HOST) === null) {
+				$url = CDocHelper::getUrl($url);
+			}
+
 			$data = [
 				'moduleid' => $this->getInput('moduleid'),
 				'name' => $manifest['name'],
@@ -75,7 +81,7 @@ class CControllerModuleEdit extends CController {
 				'description' => $manifest['description'],
 				'relative_path' => $this->module['relative_path'],
 				'namespace' => $manifest['namespace'],
-				'url' => $manifest['url'],
+				'url' => $url,
 				'status' => $this->module['status'],
 				'user' => [
 					'debug_mode' => $this->getDebugMode()
