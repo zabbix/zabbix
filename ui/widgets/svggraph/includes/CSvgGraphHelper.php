@@ -112,8 +112,10 @@ class CSvgGraphHelper {
 					'w' => $graph->getCanvasWidth(),
 					'h' => $graph->getCanvasHeight()
 				],
-				'spp' => ($options['time_period']['time_to'] - $options['time_period']['time_from'])
-					/ $graph->getCanvasWidth()
+				'spp' => $graph->getCanvasWidth() === 0
+					? 0
+					: ($options['time_period']['time_to'] - $options['time_period']['time_from'])
+						/ $graph->getCanvasWidth()
 			],
 			'errors' => $errors
 		];
