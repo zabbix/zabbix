@@ -186,7 +186,7 @@ class testFormLowLevelDiscoveryFromTemplate extends testLowLevelDiscovery {
 		self::$templateid = $templates['templateids']['Template with LLD'];
 	}
 
-	public function testFormLowLevelDiscoveryFromTemplate_Layout() {
+	public function testFormLowLevelDiscoveryFromTemplate_InitialLayout() {
 		$this->checkFormLayout('template');
 	}
 

@@ -107,7 +107,7 @@ class testLowLevelDiscovery extends CWebTest {
 					$preprocessing_container->query('button:Add')->one()->waitUntilCLickable()->click();
 					$this->assertTrue($preprocessing_container->query('id:preprocessing')->one()->isVisible());
 					$this->assertTrue($preprocessing_container->query('button', ['Add', 'Test', 'Remove', 'Test all steps'])
-						->one()->isClickable()
+							->one()->isClickable()
 					);
 
 					$preprocessing_fields = [
@@ -167,7 +167,7 @@ class testLowLevelDiscovery extends CWebTest {
 					$filters_container = $form->getFieldContainer('Overrides');
 					$this->assertTrue($filters_container->query('button:Add')->one()->isClickable());
 					$this->assertEquals(['', '', 'Name', 'Stop processing', 'Action'],
-						$filters_container->query('id:lld-overrides-table')->asTable()->one()->getHeadersText()
+							$filters_container->query('id:lld-overrides-table')->asTable()->one()->getHeadersText()
 					);
 					break;
 			}
@@ -573,8 +573,7 @@ class testLowLevelDiscovery extends CWebTest {
 				$buttons = [
 					'Parameters' => 'button:Add',
 					'Parameters' => 'button:Remove',
-					// Pencil icon button.
-					'Script' => 'xpath:.//button[@title="Click to view or edit"]'
+					'Script' => 'xpath:.//button[@title="Click to view or edit"]' // Pencil icon button.
 				];
 
 				foreach ($buttons as $label => $query) {
