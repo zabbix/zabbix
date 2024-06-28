@@ -2197,6 +2197,11 @@ class testLowLevelDiscovery extends CWebTest {
 				$data = CTestArrayHelper::trim($data);
 			}
 
+			// Write new LLD name for the next update case.
+			if ($update) {
+				static::$update_lld = $data['fields']['Name'];
+			}
+
 			$this->assertEquals(1, CDBHelper::getCount(
 				'SELECT * FROM items'.
 				' WHERE name='.zbx_dbstr($data['fields']['Name']).
@@ -2280,11 +2285,6 @@ class testLowLevelDiscovery extends CWebTest {
 						$form->checkValue(['id:formula' => $data['Filters']['formula']]);
 					}
 				}
-			}
-
-			// Write new LLD name for the next update case.
-			if ($update) {
-				static::$update_lld = $data['fields']['Name'];
 			}
 		}
 	}
