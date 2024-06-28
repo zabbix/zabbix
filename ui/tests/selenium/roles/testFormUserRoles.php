@@ -831,6 +831,9 @@ class testFormUserRoles extends CWebTest {
 					$form->getField($field)->fill('Service list');
 				}
 			}
+
+			// Scroll up after filling the form to take the correct screenshot.
+			$this->page->scrollToTop();
 			$this->assertScreenshotExcept($screenshot_area, ['query' => 'xpath://input[@id="name"]'], $role);
 		}
 
