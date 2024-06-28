@@ -426,7 +426,7 @@ class testFormAlarmNotification extends CWebTest {
 		$this->page->open('zabbix.php?action=problem.view&unacknowledged=1&sort=name&sortorder=ASC&hostids%5B%5D='.
 				self::$hostid)->waitUntilReady();
 
-		var_dump('start we ar logged on page 1 - '.date("H:i:s"));
+		var_dump('start we ar logged on page 1 - '.microtime());
 
 		// In case some scenarios failed and problems didn't closed at the end.
 		if ($this->query('class:list-table')->asTable()->one()->getRows()->asText() !== ['No data found.']) {
@@ -449,7 +449,7 @@ class testFormAlarmNotification extends CWebTest {
 		$alarm_dialog = $this->query('xpath://div[@class="overlay-dialogue notif ui-draggable"]')->asOverlayDialog()->
 				waitUntilPresent()->one();
 
-		var_dump('middle after triggering and finding overlay 2 - '.date("H:i:s"));
+		var_dump('middle after triggering and finding overlay 2 - '.microtime());
 		// Multiple problems for one trigger or one problem for one trigger.
 		if (CTestArrayHelper::get($data, 'multiple_check', false)) {
 			for ($i = 1; $i <= 4; $i++) {
