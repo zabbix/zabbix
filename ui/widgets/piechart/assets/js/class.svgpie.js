@@ -685,7 +685,7 @@ class CSVGPie {
 			const default_height = default_size * width_ratio;
 			const max_height = available_width * CSVGPie.TEXT_BASELINE;
 
-			const normal_height = Math.min(default_height, max_height) * .95;
+			const normal_height = Math.min(default_height, max_height) * .875;
 			const min_height = CSVGPie.TOTAL_VALUE_HEIGHT_MIN;
 
 			return Math.max(normal_height, min_height) / this.#scale;
