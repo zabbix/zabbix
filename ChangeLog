@@ -2718,6 +2718,13 @@ New features:
 .........T [ZBXNEXT-8868] added discovery and template for Azure VM Scale Sets (abrosimovs)
 
 Bug fixes:
+........S. [ZBX-24167] fixed template linkage when item prototype collision is found (dgoloscapov)
+.D........ [ZBX-23770] improved monitoring user permissions documentation for Oracle Database plugin and Oracle by ODBC template (knaglis)
+.......... [ZBX-24565] removed redundant kernel header include, fixed musl compatibility issues (thanks to Alpine Linux maintainers for spotting this) (dgoloscapov)
+..F....... [ZBX-24610] fixed interface field appearance for discovered items without interface set (jfreibergs)
+..F....... [ZBX-24562] fixed incorrect problem order in the "Problems by severity" widget's hintbox (Ivo)
+A......... [ZBX-23751] fixed inability to pass an action filter condition without an "operator" property, implying a default value of "Equal" (jfreibergs)
+A......... [ZBX-21429] prevented ability to disable all UI element access via role.update API (jfreibergs)
 ..F....... [ZBX-19271] fixed inconsistent tag row rendering in different edit forms (miks)
 .........T [ZBX-24539] fixed an incorrect threshold in trigger expression of Check Point Next Generation Firewall by SNMP template (aiantsen)
 ...G...... [ZBX-24667] fixed vm.memory.size[pused] item on Solaris (MVekslers)
