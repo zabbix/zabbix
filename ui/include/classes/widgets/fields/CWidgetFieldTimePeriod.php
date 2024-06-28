@@ -230,7 +230,8 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 			case self::DATA_SOURCE_WIDGET:
 			case self::DATA_SOURCE_DASHBOARD:
 				if (!array_key_exists(self::FOREIGN_REFERENCE_KEY, $default)
-						|| $value[self::FOREIGN_REFERENCE_KEY] !== $default[self::FOREIGN_REFERENCE_KEY]) {
+						|| (array_key_exists(self::FOREIGN_REFERENCE_KEY, $value)
+							&& $value[self::FOREIGN_REFERENCE_KEY] !== $default[self::FOREIGN_REFERENCE_KEY])) {
 					$widget_fields[] = [
 						'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 						'name' => $this->name.'.'.self::FOREIGN_REFERENCE_KEY,

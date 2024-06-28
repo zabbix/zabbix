@@ -117,6 +117,9 @@ class CWidgetFieldTimePeriod {
 
 			this.#selectTypedReference(value[CWidgetBase.FOREIGN_REFERENCE_KEY]);
 		}
+		else if (value.data_source == CWidgetFieldTimePeriod.DATA_SOURCE_WIDGET) {
+			this.#data_source = CWidgetFieldTimePeriod.DATA_SOURCE_WIDGET;
+		}
 		else {
 			this.#data_source = CWidgetFieldTimePeriod.DATA_SOURCE_DEFAULT;
 			this.#date_from_input.value = value.from;
