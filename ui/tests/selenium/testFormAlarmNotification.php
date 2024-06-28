@@ -426,31 +426,30 @@ class testFormAlarmNotification extends CWebTest {
 		$this->page->open('zabbix.php?action=problem.view&unacknowledged=1&sort=name&sortorder=ASC&hostids%5B%5D='.
 				self::$hostid)->waitUntilReady();
 
+		var_dump('start we ar logged on page 1 - '.date("H:i:s"));
+
 		// In case some scenarios failed and problems didn't closed at the end.
 		if ($this->query('class:list-table')->asTable()->one()->getRows()->asText() !== ['No data found.']) {
 			$this->closeProblem();
 		}
-		var_dump('time after problem close 1 - '.date("H:i:s"));
 
 		// Trigger problem.
 		foreach ($data['trigger_name'] as $trigger_name) {
 			CDBHelper::setTriggerProblem($trigger_name);
 		}
-		var_dump('time triggering problem 2 - '.date("H:i:s"));
 
 		// Filter problems by Hosts and refresh page for alarm overlay to appear.
 		$this->page->refresh()->waitUntilReady();
-		var_dump('time refreshing page 3 - '.date("H:i:s"));
 		$this->query('xpath:(//tbody//a[text()="Host for alarm item"])[1]')->one()->waitUntilClickable();
 
 		// Check that problems displayed in table.
 		$this->assertTableDataColumn($data['trigger_name'], 'Problem');
-		var_dump('time problem displayed 4 - '.date("H:i:s"));
 
 		// Find appeared Alarm notification overlay dialog.
 		$alarm_dialog = $this->query('xpath://div[@class="overlay-dialogue notif ui-draggable"]')->asOverlayDialog()->
 				waitUntilPresent()->one();
 
+		var_dump('middle after triggering and finding overlay 2 - '.date("H:i:s"));
 		// Multiple problems for one trigger or one problem for one trigger.
 		if (CTestArrayHelper::get($data, 'multiple_check', false)) {
 			for ($i = 1; $i <= 4; $i++) {
@@ -465,10 +464,7 @@ class testFormAlarmNotification extends CWebTest {
 		// Check close button and close the problems.
 		$alarm_dialog->query('xpath:.//button[@title="Close"]')->one()->click();
 		$alarm_dialog->ensureNotPresent();
-		var_dump('time close overlay with notification 5 - '.date("H:i:s"));
 		$this->closeProblem();
-		var_dump('time close problem the last 6 - '.date("H:i:s"));
-		var_dump('------------END------------');
 	}
 
 	public static function getNotDisplayedAlarmsData(){
