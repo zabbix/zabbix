@@ -115,19 +115,13 @@ class CControllerTabFilterProfileUpdate extends CController {
 
 			case 'expanded':
 				$filter->expanded = ($data['value_int'] > 0);
-
-				if ($filter->expanded) {
-					$filter->expanded_timeselector = false;
-				}
+				$filter->expanded_timeselector = false;
 
 				break;
 
 			case 'expanded_timeselector':
 				$filter->expanded_timeselector = ($data['value_int'] > 0);
-
-				if ($filter->expanded_timeselector) {
-					$filter->expanded = false;
-				}
+				$filter->expanded = false;
 
 				break;
 		}
