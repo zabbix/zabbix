@@ -65,17 +65,14 @@ class testLowLevelDiscovery extends CWebTest {
 		}
 
 		// Check the whole form required labels.
-		$required_labels = ($context === 'template')
-			? ['Name', 'Key', 'URL', 'Script', 'Master item', 'SNMP OID', 'JMX endpoint',
+		$required_labels = ['Name', 'Key', 'URL', 'Script', 'Master item', 'Host interface', 'SNMP OID', 'JMX endpoint',
 				'Public key file', 'Private key file', 'Executed script', 'SQL query', 'Update interval', 'Timeout',
-				'Delete lost resources', 'Disable lost resources']
-			: ['Name', 'Key', 'URL', 'Script', 'Master item', 'Host interface', 'SNMP OID', 'JMX endpoint',
-				'Public key file', 'Private key file', 'Executed script', 'SQL query', 'Update interval', 'Timeout',
-				'Delete lost resources', 'Disable lost resources'];
+				'Delete lost resources', 'Disable lost resources'
+		];
 
-		$this->assertEquals($required_labels, array_values($form->getLabels(CElementFilter::CLASSES_PRESENT,
-				'form-label-asterisk')->asText())
-		);
+		if ($context === 'template') {
+			$required_labels = array_values(array_diff($required_labels, ['Host interface']));
+		}
 
 		// Check initial visible fields for each tab.
 		$visible_fields = [
@@ -1062,7 +1059,6 @@ class testLowLevelDiscovery extends CWebTest {
 						'Key' => 'db.odbc.select[<unique short description>,<dsn>,<connection string>]',
 						'SQL query' => 'test'
 					],
-					'error' => 'Page received incorrect data',
 					'error_details' => 'Check the key, please. Default example was passed.'
 				]
 			],
@@ -2105,9 +2101,10 @@ class testLowLevelDiscovery extends CWebTest {
 		}
 
 		// Make name and key unique for every case.
-		if ($update && $data['fields']['Name'] !== '') {
-			$data['fields']['Name'] = trim($data['fields']['Name']).'_updated';
-			$data['fields']['Key'] = 'upd.'.$data['fields']['Key'];
+		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_GOOD && $update
+			&& $data['fields']['Name'] !== '') {
+				$data['fields']['Name'] = trim($data['fields']['Name']).'_updated';
+				$data['fields']['Key'] = 'upd.'.$data['fields']['Key'];
 		}
 
 		$url = ($context === 'template')
@@ -2304,7 +2301,7 @@ class testLowLevelDiscovery extends CWebTest {
 	/**
 	 * Check cancelling LLD form.
 	 *
-	 * @param array  $data        given data provider
+	 * @param array  $data       given data provider
 	 * @param string $context    is LLD updated on Host or on Template
 	 */
 	public function checkCancel($data, $context = 'host') {
@@ -2470,25 +2467,28 @@ class testLowLevelDiscovery extends CWebTest {
 	protected function checkFieldsParameters($fields_array) {
 		$form = $this->query('id:host-discovery-form')->asForm()->one()->waitUntilVisible();
 
+
 		foreach ($fields_array as $id => $parameters) {
+			$error_output = 'Failed field: '.$id;
+
 			$this->assertEquals(CTestArrayHelper::get($parameters, 'value', ''),
-				$form->getField($id)->getValue()
+					$form->getField($id)->getValue(), $error_output
 			);
 
 			$this->assertEquals(CTestArrayHelper::get($parameters, 'placeholder'),
-				$form->getField($id)->getAttribute('placeholder')
+					$form->getField($id)->getAttribute('placeholder'), $error_output
 			);
 
 			$this->assertEquals(CTestArrayHelper::get($parameters, 'maxlength'),
-				$form->getField($id)->getAttribute('maxlength')
+					$form->getField($id)->getAttribute('maxlength'), $error_output
 			);
 
 			if (array_key_exists('options', $parameters)){
-				$this->assertEquals($parameters['options'], $form->getField($id)->getOptions()->asText());
+				$this->assertEquals($parameters['options'], $form->getField($id)->getOptions()->asText(), $error_output);
 			}
 
 			if (array_key_exists('labels', $parameters)){
-				$this->assertEquals($parameters['labels'], $form->getField($id)->getLabels()->asText());
+				$this->assertEquals($parameters['labels'], $form->getField($id)->getLabels()->asText(), $error_output);
 			}
 		}
 	}

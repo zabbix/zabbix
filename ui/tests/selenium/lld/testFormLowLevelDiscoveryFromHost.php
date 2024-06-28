@@ -33,7 +33,6 @@ class testFormLowLevelDiscoveryFromHost extends testLowLevelDiscovery {
 	protected static $hostid;
 	protected static $empty_hostid;
 	protected static $interfaces_hostid;
-
 	protected static $update_lld = 'LLD for update scenario';
 
 	public function prepareLLDData() {
