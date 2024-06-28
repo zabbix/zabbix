@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-06-26T12:45:42Z'
+  date: '2024-06-28T12:28:42Z'
   groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -10814,7 +10814,7 @@ zabbix_export:
         - name: Templates/Cloud
       items:
         - uuid: 86f996df859a445994ed671feab6012f
-          name: 'Azure: VM Availability Metric'
+          name: 'Azure: VM availability metric'
           type: DEPENDENT
           key: azure.vm.availability
           delay: '0'
@@ -10830,7 +10830,7 @@ zabbix_export:
             key: azure.vm.data.get
           tags:
             - tag: component
-              value: storage
+              value: health
         - uuid: c299999d69904340acd44fead6c7672c
           name: 'Azure: Availability status detailed'
           type: DEPENDENT
@@ -11028,7 +11028,7 @@ zabbix_export:
             - uuid: 9e6d9394570641418b4291befb1e38e5
               expression: 'min(/Azure Virtual Machine by HTTP/azure.vm.cpu.utilization,5m)>{$AZURE.VM.CPU.UTIL.CRIT}'
               name: 'Azure: High CPU utilization'
-              event_name: 'CPU utilization is high (over {$AZURE.VM.CPU.UTIL.CRIT}% for last 5m)'
+              event_name: 'Azure: CPU utilization is high (over {$AZURE.VM.CPU.UTIL.CRIT}% for last 5m)'
               opdata: '{ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'The CPU utilization is too high. The system might be slow to respond.'
@@ -11087,6 +11087,9 @@ zabbix_export:
               parameters:
                 - $.metrics.DataDiskMaxBurstBandwidth.average
               error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           master_item:
             key: azure.vm.data.get
           tags:
@@ -11106,6 +11109,9 @@ zabbix_export:
               parameters:
                 - $.metrics.DataDiskTargetBandwidth.average
               error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           master_item:
             key: azure.vm.data.get
           tags:
@@ -11163,6 +11169,9 @@ zabbix_export:
               parameters:
                 - $.metrics.DataDiskMaxBurstIOPS.average
               error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           master_item:
             key: azure.vm.data.get
           tags:
@@ -11182,6 +11191,9 @@ zabbix_export:
               parameters:
                 - $.metrics.DataDiskTargetIOPS.average
               error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           master_item:
             key: azure.vm.data.get
           tags:
@@ -11225,7 +11237,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: cc31283ab96548b7bdcc88e89dfae53c
-          name: 'Azure: Data disk read operations/sec'
+          name: 'Azure: Data disk IOPS read'
           type: DEPENDENT
           key: azure.vm.data.disk.read.ops
           delay: '0'
@@ -11263,7 +11275,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 87794f5a502b4e2db91f820483e38fb3
-          name: 'Azure: Data disk write operations/sec'
+          name: 'Azure: Data disk IOPS write'
           type: DEPENDENT
           key: azure.vm.data.disk.write.ops
           delay: '0'
@@ -11379,7 +11391,7 @@ zabbix_export:
             
             		request.addHeader('Content-Type: application/json');
             		request.addHeader('Authorization: Bearer ' + Azure.token);
-            		Zabbix.log(4, '[ AzureVMSS ] request url: ' + url);
+            		Zabbix.log(4, '[ AzureVM ] request url: ' + url);
             
             		response = request.get(url);
             
@@ -11442,7 +11454,7 @@ zabbix_export:
             }
             catch (error) {
             	error += (String(error).endsWith('.')) ? '' : '.';
-            	Zabbix.log(3, '[ AzureVMSS ] ERROR: ' + error);
+            	Zabbix.log(3, '[ AzureVM ] ERROR: ' + error);
             	return JSON.stringify({ 'error': error });
             }
           description: 'The result of API requests is expressed in the JSON.'
@@ -11464,14 +11476,14 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 903b8b2724924d5e8627253d851f09e5
-          name: 'Azure: Data Disk Latency'
+          name: 'Azure: Data disk latency'
           type: DEPENDENT
           key: azure.vm.disk.latency
           delay: '0'
           history: 7d
           value_type: FLOAT
           units: s
-          description: 'Average time to complete each IO during monitoring period for Data Disk.'
+          description: 'Average time to complete each IO during the monitoring period for Data Disk.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -11742,6 +11754,9 @@ zabbix_export:
               parameters:
                 - $.metrics.OSDiskMaxBurstBandwidth.average
               error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           master_item:
             key: azure.vm.data.get
           tags:
@@ -11761,6 +11776,9 @@ zabbix_export:
               parameters:
                 - $.metrics.OSDiskTargetBandwidth.average
               error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           master_item:
             key: azure.vm.data.get
           tags:
@@ -11818,6 +11836,9 @@ zabbix_export:
               parameters:
                 - $.metrics.OSDiskMaxBurstIOPS.average
               error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           master_item:
             key: azure.vm.data.get
           tags:
@@ -11837,20 +11858,23 @@ zabbix_export:
               parameters:
                 - $.metrics.OSDiskTargetIOPS.average
               error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           master_item:
             key: azure.vm.data.get
           tags:
             - tag: component
               value: storage
         - uuid: 3932b607cff14ee0a891c96587438807
-          name: 'Azure: OS Disk Latency'
+          name: 'Azure: OS disk latency'
           type: DEPENDENT
           key: azure.vm.os.disk.latency
           delay: '0'
           history: 7d
           value_type: FLOAT
           units: s
-          description: 'Average time to complete each IO during monitoring period for OS Disk.'
+          description: 'Average time to complete each IO during the monitoring period for OS Disk.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -12035,14 +12059,14 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 7d2ca29fce9a4c9ba60279f07de73089
-          name: 'Azure: Temp Disk Latency'
+          name: 'Azure: Temp disk latency'
           type: DEPENDENT
           key: azure.vm.temp.disk.latency
           delay: '0'
           history: 7d
           value_type: FLOAT
           units: s
-          description: 'Average time to complete each IO during monitoring period for temp disk.'
+          description: 'Average time to complete each IO during the monitoring period for temp disk.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -12057,7 +12081,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 67638ce2228e4f5d9f4aae44d9c4a47f
-          name: 'Azure: Temp Disk queue depth'
+          name: 'Azure: Temp disk queue depth'
           type: DEPENDENT
           key: azure.vm.temp.disk.queue.depth
           delay: '0'
@@ -12075,14 +12099,14 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: f07200debf2d49dba3c0a63102258c6c
-          name: 'Azure: Temp Disk Read Bytes/sec'
+          name: 'Azure: Temp disk read rate'
           type: DEPENDENT
           key: azure.vm.temp.disk.read.bps
           delay: '0'
           history: 7d
           value_type: FLOAT
           units: Bps
-          description: 'Bytes/Sec read from a single disk during monitoring period for temp disk.'
+          description: 'Bytes/Sec read from a single disk during the monitoring period for temp disk.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -12094,14 +12118,14 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 4b7b661391ac46179913a0e1bf012e76
-          name: 'Azure: Temp Disk Read Operations/Sec'
+          name: 'Azure: Temp disk IOPS read'
           type: DEPENDENT
           key: azure.vm.temp.disk.read.ops
           delay: '0'
           history: 7d
           value_type: FLOAT
           units: '!iops'
-          description: 'Read IOPS from a single disk during monitoring period for temp disk.'
+          description: 'Read IOPS from a single disk during the monitoring period for temp disk.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -12113,14 +12137,14 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: dc3601128000423b8b46ef1046562105
-          name: 'Azure: Temp Disk Write Bytes/sec'
+          name: 'Azure: Temp disk write rate'
           type: DEPENDENT
           key: azure.vm.temp.disk.write.bps
           delay: '0'
           history: 7d
           value_type: FLOAT
           units: Bps
-          description: 'Bytes/Sec written to a single disk during monitoring period for temp disk.'
+          description: 'Bytes/Sec written to a single disk during the monitoring period for temp disk.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -12132,14 +12156,14 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: d03cdea05ae549ffb63c6db4a7e40c13
-          name: 'Azure: Temp Disk Write Operations/Sec'
+          name: 'Azure: Temp disk IOPS write'
           type: DEPENDENT
           key: azure.vm.temp.disk.write.ops
           delay: '0'
           history: 7d
           value_type: FLOAT
           units: '!iops'
-          description: 'Bytes/Sec written to a single disk during monitoring period for temp disk.'
+          description: 'Bytes/Sec written to a single disk during the monitoring period for temp disk.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -12732,7 +12756,7 @@ zabbix_export:
             - uuid: a3706a6c3349429b89b6915a6b0fb5c1
               expression: 'min(/Azure VM Scale Set by HTTP/azure.scaleset.cpu.utilization,5m)>{$AZURE.SCALESET.CPU.UTIL.CRIT}'
               name: 'Azure VMSS: High CPU utilization'
-              event_name: 'CPU utilization is high (over {$AZURE.SCALESET.CPU.UTIL.CRIT}% for last 5m)'
+              event_name: 'Azure: CPU utilization is high (over {$AZURE.SCALESET.CPU.UTIL.CRIT}% for last 5m)'
               opdata: '{ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'The CPU utilization is too high. The system might be slow to respond.'
@@ -13859,7 +13883,7 @@ zabbix_export:
             - uuid: cd77906ed04a42f28bb702bc513504a0
               expression: 'min(/Azure VM Scale Set by HTTP/azure.scaleset.vm.count,5m)>{$AZURE.SCALESET.VM.COUNT.CRIT}'
               name: 'Azure VMSS: High amount of VMs in the scale set'
-              event_name: 'Number of VMs is high (over {$AZURE.SCALESET.VM.COUNT.CRIT} for last 5m)'
+              event_name: 'Azure: Number of VMs is high (over {$AZURE.SCALESET.VM.COUNT.CRIT} for last 5m)'
               opdata: '{ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'High amount of VMs in the scale set.'
