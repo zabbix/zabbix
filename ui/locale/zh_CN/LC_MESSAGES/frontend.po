@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-04-02 17:26+0300\n"
-"PO-Revision-Date: 2024-06-13 14:00+0000\n"
+"PO-Revision-Date: 2024-06-17 06:25+0000\n"
 "Last-Translator: NoYoWiFi <1284524409@qq.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_CN\n"
@@ -2906,7 +2906,7 @@ msgstr "无法设置 \"%1$s\" 为监控项 \"%2$s\"."
 #: include/classes/api/services/CHost.php:2026
 #: include/classes/api/services/CHost.php:2229
 msgid "Cannot set inventory fields for disabled inventory."
-msgstr "无法设置审计字段为已经禁止的审计."
+msgstr "无法设置资产字段为已经禁止的资产."
 
 #: include/classes/api/services/CService.php:1429
 #, c-format
@@ -8526,7 +8526,7 @@ msgstr "已成功导入"
 #: hostinventories.php:188
 #, c-format
 msgid "Impossible to filter by inventory field \"%1$s\", which does not exist."
-msgstr "无法按库存字段“%1$s”过滤，该字段不存在。"
+msgstr "无法按资产字段“%1$s”过滤，该字段不存在。"
 
 #: include/html.inc.php:309 include/maps.inc.php:415
 msgid "In maintenance"
@@ -8980,7 +8980,7 @@ msgstr "资产字段“%1$s”不正确。"
 
 #: app/controllers/CControllerActionOperationValidate.php:176
 msgid "Incorrect inventory mode in action operation."
-msgstr "要执行的动作库存方式是不正确的。"
+msgstr "要执行的动作资产模式是不正确的。"
 
 #: include/classes/api/services/CTriggerGeneral.php:2000
 #, c-format
@@ -8995,7 +8995,7 @@ msgstr "项目的数据类型不正确"
 #: include/classes/api/services/CTriggerGeneral.php:2007
 #, c-format
 msgid "Incorrect item value type \"%1$s\" provided for trigger function \"%2$s\"."
-msgstr "提供错误的项目值类型\"%1$s\"给触发器函数\"%2$s\"."
+msgstr "提供错误的监控项值类型\"%1$s\"给触发器函数\"%2$s\"."
 
 #: include/forms.inc.php:1579
 msgid "Incorrect list of items."
@@ -10037,12 +10037,12 @@ msgstr "主机\"%1$s\"的资产记录被禁用."
 
 #: app/views/administration.iconmap.edit.php:58
 msgid "Inventory field"
-msgstr "资产纪录栏位"
+msgstr "资产字段"
 
 #: app/partials/popup.operations.php:227
 #: app/views/popup.massupdate.host.php:169
 msgid "Inventory mode"
-msgstr "资产纪录模式"
+msgstr "资产模式"
 
 #: app/views/administration.user.list.php:111
 msgid "Is online?"
@@ -10243,7 +10243,7 @@ msgstr "监控项值"
 
 #: chart.php:102 chart.php:105
 msgid "Item values"
-msgstr "项目值"
+msgstr "监控项值"
 
 #: include/items.inc.php:2240
 msgid "Item will not be refreshed. Please enter a correct update interval."
@@ -12332,7 +12332,7 @@ msgstr "没有定义接口。"
 
 #: app/controllers/CControllerActionOperationValidate.php:169
 msgid "No inventory mode specified for action operation."
-msgstr "要执行的动作的库存模式没有被设定。"
+msgstr "要执行的动作的资产模式没有被设定。"
 
 #: chart3.php:146 chart7.php:57
 msgid "No items defined."
@@ -13981,7 +13981,7 @@ msgstr "波兰(pl_PL)"
 
 #: include/views/configuration.item.edit.php:991
 msgid "Populates host inventory field"
-msgstr "填入主机资产纪录栏位"
+msgstr "填入主机资字段"
 
 #: app/controllers/CControllerPopupItemTest.php:1343
 #: app/partials/monitoring.host.filter.php:113
@@ -16089,7 +16089,7 @@ msgstr "设置到期日期和时间"
 
 #: include/actions.inc.php:1037
 msgid "Set host inventory mode"
-msgstr "设置主机清单模式"
+msgstr "设置主机资产模式"
 
 #: include/classes/html/CInputSecret.php:80 jsLoader.php:421
 msgid "Set new value"
@@ -18189,7 +18189,7 @@ msgstr "土耳其语 (tr_TR)"
 #: include/classes/api/services/CItem.php:1033
 #, c-format
 msgid "Two items (\"%1$s\" and \"%2$s\") cannot populate one host inventory field \"%3$s\", this would lead to a conflict."
-msgstr "两个项目 (\"%1$s\"和\"%2$s\")不能填入一个主机资产纪录栏位\"%3$s\", 这会造成冲突."
+msgstr "两个项目 (\"%1$s\"和\"%2$s\")不能填入一个主机资产字段位\"%3$s\", 这会造成冲突."
 
 #: jsLoader.php:276
 msgid "Two map elements should be selected"
@@ -21537,11 +21537,11 @@ msgstr "mod() - 除法的余数"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:822
 msgid "monodec() - Check for continuous item value decrease (1 - data is monotonic, 0 - otherwise), Mode (strict - require strict monotonicity)"
-msgstr "monodec() - 检查项目值是否连续减少（1 - 数据是单调的，0 - 否则），模式（严格 - 要求严格的单调性）"
+msgstr "monodec() - 检查监控项值是否连续减少（1 - 数据是单调的，0 - 否则），模式（严格 - 要求严格的单调性）"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:829
 msgid "monoinc() - Check for continuous item value increase (1 - data is monotonic, 0 - otherwise), Mode (strict - require strict monotonicity)"
-msgstr "monoinc() - 检查项目值是否连续增加（1 - 数据是单调的，0 - 否则），模式（严格 - 要求严格的单调性）"
+msgstr "monoinc() - 检查监控项值是否连续增加（1 - 数据是单调的，0 - 否则），模式（严格 - 要求严格的单调性）"
 
 #: include/func.inc.php:597
 msgctxt "millisecond short"
