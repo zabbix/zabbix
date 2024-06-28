@@ -430,18 +430,22 @@ class testFormAlarmNotification extends CWebTest {
 		if ($this->query('class:list-table')->asTable()->one()->getRows()->asText() !== ['No data found.']) {
 			$this->closeProblem();
 		}
+		var_dump('time after problem close 1 - '.date("H:i:s"));
 
 		// Trigger problem.
 		foreach ($data['trigger_name'] as $trigger_name) {
 			CDBHelper::setTriggerProblem($trigger_name);
 		}
+		var_dump('time triggering problem 2 - '.date("H:i:s"));
 
 		// Filter problems by Hosts and refresh page for alarm overlay to appear.
 		$this->page->refresh()->waitUntilReady();
+		var_dump('time refreshing page 3 - '.date("H:i:s"));
 		$this->query('xpath:(//tbody//a[text()="Host for alarm item"])[1]')->one()->waitUntilClickable();
 
 		// Check that problems displayed in table.
 		$this->assertTableDataColumn($data['trigger_name'], 'Problem');
+		var_dump('time problem displayed 4 - '.date("H:i:s"));
 
 		// Find appeared Alarm notification overlay dialog.
 		$alarm_dialog = $this->query('xpath://div[@class="overlay-dialogue notif ui-draggable"]')->asOverlayDialog()->
@@ -461,7 +465,10 @@ class testFormAlarmNotification extends CWebTest {
 		// Check close button and close the problems.
 		$alarm_dialog->query('xpath:.//button[@title="Close"]')->one()->click();
 		$alarm_dialog->ensureNotPresent();
+		var_dump('time close overlay with notification 5 - '.date("H:i:s"));
 		$this->closeProblem();
+		var_dump('time close problem the last 6 - '.date("H:i:s"));
+		var_dump('------------END------------');
 	}
 
 	public static function getNotDisplayedAlarmsData(){
@@ -561,24 +568,19 @@ class testFormAlarmNotification extends CWebTest {
 		if ($this->query('class:list-table')->asTable()->one()->getRows()->asText() !== ['No data found.']) {
 			$this->closeProblem();
 		}
-		var_dump('time after problem close 1 - '.date("H:i:s"));
 
 		// Trigger problem.
 		foreach ($this->all_triggers as $trigger_name) {
 			CDBHelper::setTriggerProblem($trigger_name);
 		}
-		var_dump('time triggering problem 2 - '.date("H:i:s"));
 
 		// Filter problems by Hosts and refresh page for alarm overlay to appear.
 		$this->page->refresh()->waitUntilReady();
-		var_dump('time refreshing page 3 - '.date("H:i:s"));
-
 		$this->query('name:zbx_filter')->asForm()->one()->fill(['Hosts' => 'Host for alarm item'])->submit();
 		$this->query('class:list-table')->asTable()->one()->waitUntilReloaded();
 
 		// Check that problems displayed in table.
 		$this->assertTableDataColumn($this->all_triggers, 'Problem');
-		var_dump('time problem displayed 4 - '.date("H:i:s"));
 
 		if (CTestArrayHelper::get($data, 'all_off', false)) {
 			$this->assertFalse($this->query('xpath://div[@class="overlay-dialogue notif ui-draggable"]')->one()->isDisplayed());
@@ -602,12 +604,9 @@ class testFormAlarmNotification extends CWebTest {
 			// Check close button.
 			$alarm_dialog->query('xpath:.//button[@title="Close"]')->one()->click();
 			$alarm_dialog->ensureNotPresent();
-			var_dump('time close overlay with notification 5 - '.date("H:i:s"));
 		}
 
 		$this->closeProblem();
-		var_dump('time close problem the last 6 - '.date("H:i:s"));
-		var_dump('------------END------------');
 	}
 
 	/**
