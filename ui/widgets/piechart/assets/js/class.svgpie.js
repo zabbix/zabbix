@@ -282,8 +282,8 @@ class CSVGPie {
 	 * @param {number} height
 	 */
 	setSize({width, height}) {
-		this.#width = Math.max(0, width - (this.#padding.horizontal) * 2);
-		this.#height = Math.max(0, height - (this.#padding.vertical) * 2);
+		this.#width = Math.max(0, width - this.#padding.horizontal * 2);
+		this.#height = Math.max(0, height - this.#padding.vertical * 2);
 
 		this.#svg
 			.attr('width', width)
