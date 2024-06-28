@@ -958,6 +958,10 @@ window.widget_svggraph_form = new class {
 		fields.time_period = this.#resolveTimePeriod(fields.time_period);
 
 		for (const [dataset_key, dataset] of Object.entries(fields.ds)) {
+			if (dataset.dataset_type != '<?= CWidgetFieldDataSet::DATASET_TYPE_SINGLE_ITEM ?>') {
+				continue;
+			}
+
 			const dataset_new = {
 				...dataset,
 				itemids: [],

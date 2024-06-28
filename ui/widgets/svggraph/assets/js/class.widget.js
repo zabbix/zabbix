@@ -15,6 +15,8 @@
 
 class CWidgetSvgGraph extends CWidget {
 
+	static DATASET_TYPE_SINGLE_ITEM = 0;
+
 	onInitialize() {
 		this._has_contents = false;
 		this._svg_options = {};
@@ -66,6 +68,10 @@ class CWidgetSvgGraph extends CWidget {
 		const request_data = super.getUpdateRequestData();
 
 		for (const [dataset_key, dataset] of request_data.fields.ds.entries()) {
+			if (dataset.dataset_type != CWidgetSvgGraph.DATASET_TYPE_SINGLE_ITEM) {
+				continue;
+			}
+
 			const dataset_new = {
 				...dataset,
 				itemids: [],
