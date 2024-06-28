@@ -267,48 +267,56 @@ class testLowLevelDiscovery extends CWebTest {
 					'fields' => ['Host interface', 'Update interval', 'Custom intervals', 'Timeout']
 				]
 			],
+			// #1.
 			[
 				[
 					'type' => 'Zabbix agent (active)',
 					'fields' => ['Update interval', 'Custom intervals', 'Timeout']
 				]
 			],
+			// #2.
 			[
 				[
 					'type' => 'Simple check',
 					'fields' => ['Host interface', 'User name', 'Password', 'Update interval', 'Custom intervals', 'Timeout']
 				]
 			],
+			// #3.
 			[
 				[
 					'type' => 'SNMP agent',
 					'fields' => ['Host interface', 'SNMP OID', 'Update interval', 'Custom intervals']
 				]
 			],
+			// #4.
 			[
 				[
 					'type' => 'Zabbix internal',
 					'fields' => ['Update interval', 'Custom intervals']
 				]
 			],
+			// #5.
 			[
 				[
 					'type' => 'Zabbix trapper',
 					'fields' => ['Allowed hosts']
 				]
 			],
+			// #6.
 			[
 				[
 					'type' => 'External check',
 					'fields' => ['Host interface', 'Update interval', 'Custom intervals', 'Timeout']
 				]
 			],
+			// #7.
 			[
 				[
 					'type' => 'Database monitor',
 					'fields' => ['User name', 'Password', 'SQL query', 'Update interval', 'Custom intervals', 'Timeout']
 				]
 			],
+			// #8.
 			[
 				[
 					'type' => 'HTTP agent',
@@ -319,12 +327,14 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
+			// #9.
 			[
 				[
 					'type' => 'IPMI agent',
 					'fields' => ['Host interface', 'IPMI sensor', 'Update interval', 'Custom intervals']
 				]
 			],
+			// #10.
 			[
 				[
 					'type' => 'SSH agent',
@@ -333,6 +343,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
+			// #11.
 			[
 				[
 					'type' => 'TELNET agent',
@@ -341,18 +352,21 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
+			// #12.
 			[
 				[
 					'type' => 'JMX agent',
 					'fields' => ['Host interface', 'JMX endpoint', 'User name', 'Password', 'Update interval', 'Custom intervals']
 				]
 			],
+			// #13.
 			[
 				[
 					'type' => 'Dependent item',
 					'fields' => ['Master item']
 				]
 			],
+			// #14.
 			[
 				[
 					'type' => 'Script',
@@ -575,7 +589,7 @@ class testLowLevelDiscovery extends CWebTest {
 	 *
 	 * @param string $context    is LLD updated on Host or on Template
 	 */
-	public function checkSimpleUpdate($context = 'host') {
+	protected function checkSimpleUpdate($context = 'host') {
 		$old_hash = CDBHelper::getHash(self::SQL);
 
 		$url = ($context === 'template')
@@ -2209,7 +2223,7 @@ class testLowLevelDiscovery extends CWebTest {
 	 * @param boolean $update     true for update scenario, false for create
 	 * @param string  $context    is LLD updated on Host or on Template
 	 */
-	public function checkForm($data, $update = false, $context = 'host') {
+	protected function checkForm($data, $update = false, $context = 'host') {
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			$old_hash = CDBHelper::getHash(self::SQL);
 		}
@@ -2418,7 +2432,7 @@ class testLowLevelDiscovery extends CWebTest {
 	 * @param array  $data       given data provider
 	 * @param string $context    is LLD updated on Host or on Template
 	 */
-	public function checkCancel($data, $context = 'host') {
+	protected function checkCancel($data, $context = 'host') {
 		$url = ($context === 'template')
 			? static::$templateid.'&context=template'
 			: static::$hostid.'&context=host';
@@ -2545,7 +2559,7 @@ class testLowLevelDiscovery extends CWebTest {
 	 *
 	 * @param string $context    is LLD deleted from Host or from Template
 	 */
-	public function checkDelete($context = 'host') {
+	protected function checkDelete($context = 'host') {
 		$url = ($context === 'template')
 			? static::$templateid.'&context=template'
 			: static::$hostid.'&context=host';
