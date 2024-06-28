@@ -1,6 +1,7 @@
 Changes for 7.2.0alpha1
 
 New features:
+...G...... [ZBXNEXT-9194] extended proc.get[] in Zabbix agent 2 to get PSS (proportional set size) memory on Linux (dgoloscapov)
 ........S. [ZBXNEXT-9260] updated soft minimal TimescaleDB version to 2.13 (mprihodko)
 ...G...... [ZBXNEXT-9081] Add scsi device type support to Zabbix agent 2 smart plugin (rzvejs)
 .........T [ZBXNEXT-6445] added recovery expression for fuzzytime triggers in Linux and Windows templates, removed fuzzytime triggers from active agent templates (drasikhov)
@@ -14,6 +15,21 @@ New features:
 .......PS. [ZBXNEXT-8990] extended VMware event log with username (asestakovs)
 
 Bug fixes:
+..F....... [ZBX-23403] fixed frontend not showing pre-requisites page if PHP mbstring extension is not installed (Ivo)
+..F....... [ZBX-24610] fixed Host interface field appearance for discovered items (jfreibergs)
+..F....... [ZBX-24638] fixed item order in Graph widget (apoga, averza)
+.D........ [ZBX-23770] improved monitoring user permissions documentation for Oracle Database plugin and Oracle by ODBC template (knaglis)
+..F....... [ZBX-24083] fixed media types list status column styling (ddauksa)
+..F....... [ZBX-24235] fixed value misalignment in Item value widget (apoga)
+..F....... [ZBX-23073] fixed URL widget resizing and dragging (apoga)
+.......P.. [ZBX-24682] fixed SQLite database creation (sboidenko)
+A......... [ZBX-23751] fixed inability to pass an action filter condition without an "operator" property, implying a default value of "Equal" (jfreibergs)
+..F....... [ZBX-24562] fixed incorrect problem order in the "Problems by severity" widget's hintbox (Ivo)
+A......... [ZBX-24646] fixed inability to update evaltype property of LLD rule's filter on a linked template (vmaksimovs)
+A......... [ZBX-24622] fixed inability to inherit a template with multiple items to multiple hosts when the total amount of inherited items exceeds, but is not a multiple of batch size (vmaksimovs)
+A......... [ZBX-23886] fixed inability to import items, LLD rules and item prototypes containing redundant conditional fields (jfreibergs, vmaksimovs)
+..F....... [ZBX-24609] fixed host interface not being suggested for discovered item test (jfreibergs)
+A......... [ZBX-21429] prevented ability to disable all UI element access via role.update API (jfreibergs)
 ..F....... [ZBX-19271] fixed inconsistent tag row rendering in different edit forms (miks)
 ........S. [ZBX-24671] fixed problems not inheriting tags of templates linked to discovered hosts (wiper)
 .........T [ZBX-24539] fixed an incorrect threshold in trigger expression of Check Point Next Generation Firewall by SNMP template (aiantsen)
