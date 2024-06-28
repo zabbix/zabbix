@@ -440,7 +440,8 @@ class testFormAlarmNotification extends CWebTest {
 
 		// Filter problems by Hosts and refresh page for alarm overlay to appear.
 		$this->page->refresh()->waitUntilReady();
-		$this->query('xpath:(//tbody//a[text()="Host for alarm item"])[1]')->one()->waitUntilClickable();
+		$this->query('name:zbx_filter')->asForm()->one()->fill(['Hosts' => 'Host for alarm item'])->submit();
+		$this->query('class:list-table')->asTable()->one()->waitUntilReloaded();
 
 		// Check that problems displayed in table.
 		$this->assertTableDataColumn($data['trigger_name'], 'Problem');
