@@ -154,7 +154,7 @@ linters-settings:
   tagliatelle:
     case:
       rules:
-        json: camel
+        json: snake
         yaml: camel
         xml: camel
         bson: camel
@@ -177,7 +177,7 @@ linters-settings:
       # zabbix'es custom errors
       - errs.New(
       - errs.WrapConst(
-      - errs.Wrap()
+      - errs.Wrap(
 
 linters:
   enable-all: true
@@ -246,6 +246,7 @@ issues:
         - goerr113
         - revive
         - wrapcheck
+        - maintidx
 
 severity:
   default-severity: error

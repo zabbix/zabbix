@@ -213,6 +213,8 @@ function getSystemStatusData(array $filter) {
 
 		$visible_problems = [];
 
+		$problems = CScreenProblem::sortData(['problems' => $problems], 'clock', ZBX_SORT_DOWN)['problems'];
+
 		foreach ($problems as $eventid => $problem) {
 			$trigger = $data['triggers'][$problem['objectid']];
 
@@ -352,6 +354,19 @@ function getSystemStatusTotals(array $data) {
 			}
 		}
 	}
+
+	foreach ($groups_totals[0]['stats'] as &$stat) {
+		if ($stat['count'] > 0) {
+			$stat['problems'] =
+				CScreenProblem::sortData(['problems' => $stat['problems']], 'clock', ZBX_SORT_DOWN)['problems'];
+		}
+
+		if ($stat['count_unack'] > 0) {
+			$stat['problems_unack'] =
+				CScreenProblem::sortData(['problems' => $stat['problems_unack']], 'clock', ZBX_SORT_DOWN)['problems'];
+		}
+	}
+	unset($stat);
 
 	return $groups_totals;
 }
