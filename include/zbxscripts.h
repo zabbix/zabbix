@@ -57,6 +57,6 @@ zbx_uint64_t	zbx_script_create_task(const zbx_script_t *script, const zbx_dc_hos
 int	zbx_init_remote_commands_cache(char **error);
 void	zbx_deinit_remote_commands_cache(void);
 void	zbx_process_command_results(struct zbx_json_parse *jp);
-void	zbx_remote_commans_prepare_to_send(struct zbx_json *json, zbx_uint64_t hostid);
+void	zbx_remote_commans_prepare_to_send(struct zbx_json *json, zbx_uint64_t hostid, int config_timeout);
 
 #endif

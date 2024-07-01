@@ -277,7 +277,7 @@ out:
 			parsed_num, values_num, results_num);
 }
 
-void	zbx_remote_commans_prepare_to_send(struct zbx_json *json, zbx_uint64_t hostid)
+void	zbx_remote_commans_prepare_to_send(struct zbx_json *json, zbx_uint64_t hostid, int config_timeout)
 {
 	zbx_hashset_iter_t	iter_comands;
 	zbx_rc_command_t	*command;
@@ -311,6 +311,8 @@ void	zbx_remote_commans_prepare_to_send(struct zbx_json *json, zbx_uint64_t host
 				wait = 1;
 
 			zbx_json_adduint64(json, ZBX_PROTO_TAG_WAIT, (zbx_uint64_t)wait);
+
+			zbx_json_addint64(json, ZBX_PROTO_TAG_TIMEOUT, config_timeout);
 			zbx_json_close(json);
 
 			remote_commands->commands_num--;
