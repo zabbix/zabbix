@@ -475,7 +475,7 @@ foreach ($data['hosts'] as $host) {
 			),
 			CViewHelper::showNum($host['httpTests'])
 		],
-		getHostInterface($interface),
+		(new CCol(getHostInterface($interface)))->addClass(ZBX_STYLE_WORDBREAK),
 		(new CCol($monitored_by))->addClass(ZBX_STYLE_WORDBREAK),
 		(new CCol($hostTemplates))->addClass(ZBX_STYLE_WORDBREAK),
 		$toggle_status_link,

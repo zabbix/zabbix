@@ -299,6 +299,7 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 
 	// hosts
 	$hosts = null;
+
 	if ($data['single_selected_hostid'] == 0) {
 		foreach ($trigger['hosts'] as $hostid => $host) {
 			if (!empty($hosts)) {
@@ -306,6 +307,8 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 			}
 			$hosts[] = $host['name'];
 		}
+
+		$hosts = (new CCol($hosts))->addClass(ZBX_STYLE_WORDBREAK);
 	}
 
 	if ($trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
@@ -329,7 +332,7 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 		new CCheckBox('g_triggerid['.$triggerid.']', $triggerid),
 		CSeverityHelper::makeSeverityCell((int) $trigger['priority']),
 		$data['show_value_column'] ? $trigger_value : null,
-		(new CCol($hosts))->addClass(ZBX_STYLE_WORDBREAK),
+		$hosts,
 		(new CCol($description))->addClass(ZBX_STYLE_WORDBREAK),
 		(new CCol($trigger['opdata']))->addClass(ZBX_STYLE_WORDBREAK),
 		(new CDiv($expression))->addClass(ZBX_STYLE_WORDWRAP),
