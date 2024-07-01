@@ -22,7 +22,7 @@ try
 	Zabbix.log(5, "getUrl: '"+ browser.getUrl()+"'")
 
 	browser.setScriptTimeout(5000);
-	browser.setSessionTimeout(2500);
+	browser.setSessionTimeout(1000);
 
 	try
 	{
