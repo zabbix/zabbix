@@ -91,13 +91,13 @@ if (!defined('PHPUNIT_BASEDIR')) {
 	set_error_handler(function ($errno, $errstr, $errfile, $errline) {
 		// Check if error control operator was used.
 		if (error_reporting() & $errno) {
-			file_put_contents(PHPUNIT_ERROR_LOG, $errstr.' ['.formatCallStack()."]\n".'error 1 added at - '.microtime(), FILE_APPEND);
+			file_put_contents(PHPUNIT_ERROR_LOG, $errstr.' ['.formatCallStack()."]\n", FILE_APPEND);
 		}
 
 		return zbx_err_handler($errno, $errstr, $errfile, $errline);
 	}, E_ALL | E_STRICT);
 
 	set_exception_handler(function ($exception) {
-		file_put_contents(PHPUNIT_ERROR_LOG, $exception."\n".'error 2 added at - '.microtime(), FILE_APPEND);
+		file_put_contents(PHPUNIT_ERROR_LOG, $exception."\n", FILE_APPEND);
 	});
 }

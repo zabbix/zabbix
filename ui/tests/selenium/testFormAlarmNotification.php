@@ -20,7 +20,6 @@
 
 
 require_once dirname(__FILE__).'/../include/CWebTest.php';
-require_once dirname(__FILE__).'/behaviors/CTableBehavior.php';
 
 /**
  * @backup events, problem, hosts, profiles
@@ -42,6 +41,9 @@ class testFormAlarmNotification extends CWebTest {
 
 	protected static $hostid;
 
+	/**
+	 * Trigger names.
+	 */
 	protected $all_triggers = [
 		'Average_trigger',
 		'Disaster_trigger',
@@ -184,16 +186,14 @@ class testFormAlarmNotification extends CWebTest {
 	 * Check Alarm notification overlay dialog layout.
 	 */
 	public function testFormAlarmNotification_Layout() {
+		// Trigger problem.
+		CDBHelper::setTriggerProblem('Not_classified_trigger_4');
+
 		$this->page->login()->open('zabbix.php?action=problem.view')->waitUntilReady();
 		$this->page->assertTitle('Problems');
 		$this->page->assertHeader('Problems');
 
-		// Trigger problem.
-		CDBHelper::setTriggerProblem('Not_classified_trigger_4');
-		sleep(1);
-
 		// Find appeared Alarm notification overlay dialog.
-		$this->page->refresh()->waitUntilReady();
 		$alarm_dialog = $this->query('xpath://div[@class="overlay-dialogue notif ui-draggable"]')->asOverlayDialog()->
 				waitUntilPresent()->one();
 
@@ -294,6 +294,11 @@ class testFormAlarmNotification extends CWebTest {
 			$this->closeProblem();
 		}
 
+		// Trigger problem.
+		foreach ($this->all_triggers as $trigger_name) {
+			CDBHelper::setTriggerProblem($trigger_name);
+		}
+
 		// Open Trigger displaying options page for color check and change.
 		$this->page->open('zabbix.php?action=trigdisplay.edit')->waitUntilReady();
 		$form = $this->query('id:trigdisplay-form')->asForm()->one();
@@ -305,12 +310,6 @@ class testFormAlarmNotification extends CWebTest {
 			$color_value = $field->query('xpath:./following::div[@class="color-picker"]')->asColorPicker()->one()->getText();
 			$default_colors[] = '#'.$color_value;
 		}
-
-		// Trigger problem.
-		foreach ($this->all_triggers as $trigger_name) {
-			CDBHelper::setTriggerProblem($trigger_name);
-		}
-		sleep(1);
 
 		// Refresh page for alarm overlay to appear.
 		$this->page->refresh()->waitUntilReady();
@@ -429,8 +428,6 @@ class testFormAlarmNotification extends CWebTest {
 		$this->page->open('zabbix.php?action=problem.view&unacknowledged=1&sort=name&sortorder=ASC&hostids%5B%5D='.
 				self::$hostid)->waitUntilReady();
 
-		var_dump('start we ar logged on page 1 - '.microtime());
-
 		// In case some scenarios failed and problems didn't closed at the end.
 		if ($this->query('class:list-table')->asTable()->one()->getRows()->asText() !== ['No data found.']) {
 			$this->closeProblem();
@@ -440,12 +437,11 @@ class testFormAlarmNotification extends CWebTest {
 		foreach ($data['trigger_name'] as $trigger_name) {
 			CDBHelper::setTriggerProblem($trigger_name);
 		}
-		sleep(1);
 
 		// Filter problems by Hosts and refresh page for alarm overlay to appear.
-		$this->page->refresh()->waitUntilReady();
 		$this->query('name:zbx_filter')->asForm()->one()->fill(['Hosts' => 'Host for alarm item'])->submit();
 		$this->query('class:list-table')->asTable()->one()->waitUntilReloaded();
+		$this->page->refresh()->waitUntilReady();
 
 		// Check that problems displayed in table.
 		$this->assertTableDataColumn($data['trigger_name'], 'Problem');
@@ -454,7 +450,6 @@ class testFormAlarmNotification extends CWebTest {
 		$alarm_dialog = $this->query('xpath://div[@class="overlay-dialogue notif ui-draggable"]')->asOverlayDialog()->
 				waitUntilPresent()->one();
 
-		var_dump('middle after triggering and finding overlay 2 - '.microtime());
 		// Multiple problems for one trigger or one problem for one trigger.
 		if (CTestArrayHelper::get($data, 'multiple_check', false)) {
 			for ($i = 1; $i <= 4; $i++) {
@@ -565,7 +560,6 @@ class testFormAlarmNotification extends CWebTest {
 		$this->page->open('zabbix.php?action=problem.view&unacknowledged=1&sort=name&sortorder=ASC&hostids%5B%5D='.
 				self::$hostid)->waitUntilReady();
 
-		var_dump('start we ar logged on page 1 - '.microtime());
 		// In case some scenarios failed and problems didn't closed at the end.
 		if ($this->query('class:list-table')->asTable()->one()->getRows()->asText() !== ['No data found.']) {
 			$this->closeProblem();
@@ -575,14 +569,12 @@ class testFormAlarmNotification extends CWebTest {
 		foreach ($this->all_triggers as $trigger_name) {
 			CDBHelper::setTriggerProblem($trigger_name);
 		}
-		sleep(1);
 
 		// Filter problems by Hosts and refresh page for alarm overlay to appear.
-		$this->page->refresh()->waitUntilReady();
 		$this->query('name:zbx_filter')->asForm()->one()->fill(['Hosts' => 'Host for alarm item'])->submit();
 		$this->query('class:list-table')->asTable()->one()->waitUntilReloaded();
+		$this->page->refresh()->waitUntilReady();
 
-		var_dump('middle after triggering and finding overlay 2 - '.microtime());
 		// Check that problems displayed in table.
 		$this->assertTableDataColumn($this->all_triggers, 'Problem');
 
