@@ -35,7 +35,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.4.0
           key: 'cisco.ucs.contact[sysContact.0]'
           delay: 15m
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -56,7 +55,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.1.0
           key: 'cisco.ucs.descr[sysDescr.0]'
           delay: 15m
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -102,7 +100,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.6.0
           key: 'cisco.ucs.location[sysLocation.0]'
           delay: 15m
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -122,7 +119,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.5.0
           key: 'cisco.ucs.name[sysName.0]'
           delay: 15m
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -173,7 +169,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.2.0
           key: 'cisco.ucs.objectid[sysObjectID.0]'
           delay: 15m
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -194,8 +189,6 @@ zabbix_export:
           name: 'SNMP traps (fallback)'
           type: SNMP_TRAP
           key: snmptrap.fallback
-          delay: '0'
-          trends: '0'
           value_type: LOG
           description: 'The item is used to collect all SNMP traps unmatched by other snmptrap items'
           logtimefmt: 'hh:mm:sszyyyy/MM/dd'
@@ -302,7 +295,6 @@ zabbix_export:
               snmp_oid: '1.3.6.1.4.1.9.9.719.1.45.1.1.5.{#SNMPINDEX}'
               key: 'cisco.ucs.hw.diskarray.model[cucsStorageControllerModel.{#SNMPINDEX}]'
               delay: 1d
-              trends: '0'
               value_type: CHAR
               description: 'MIB: CISCO-UNIFIED-COMPUTING-STORAGE-MIB'
               preprocessing:
@@ -443,46 +435,34 @@ zabbix_export:
             conditions:
               - macro: '{#IFADMINSTATUS}'
                 value: '{$NET.IFADMINSTATUS.MATCHES}'
-                formulaid: A
               - macro: '{#IFADMINSTATUS}'
                 value: '{$NET.IFADMINSTATUS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
               - macro: '{#IFALIAS}'
                 value: '{$NET.IFALIAS.MATCHES}'
-                formulaid: C
               - macro: '{#IFALIAS}'
                 value: '{$NET.IFALIAS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: D
               - macro: '{#IFDESCR}'
                 value: '{$NET.IFDESCR.MATCHES}'
-                formulaid: E
               - macro: '{#IFDESCR}'
                 value: '{$NET.IFDESCR.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: F
               - macro: '{#IFNAME}'
                 value: '{$NET.IFNAME.MATCHES}'
-                formulaid: G
               - macro: '{#IFNAME}'
                 value: '{$NET.IFNAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: H
               - macro: '{#IFOPERSTATUS}'
                 value: '{$NET.IFOPERSTATUS.MATCHES}'
-                formulaid: I
               - macro: '{#IFOPERSTATUS}'
                 value: '{$NET.IFOPERSTATUS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: J
               - macro: '{#IFTYPE}'
                 value: '{$NET.IFTYPE.MATCHES}'
-                formulaid: K
               - macro: '{#IFTYPE}'
                 value: '{$NET.IFTYPE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: L
           description: 'Discovering interfaces from IF-MIB.'
           item_prototypes:
             - uuid: 361a4c5a4b04432b84f4e6bfcd7775c6
@@ -491,7 +471,6 @@ zabbix_export:
               snmp_oid: '1.3.6.1.2.1.2.2.1.2.{#SNMPINDEX}'
               key: 'cisco.ucs.if.descr[ifDescr.{#SNMPINDEX}]'
               delay: 1h
-              trends: '0'
               value_type: CHAR
               description: |
                 MIB: IF-MIB
@@ -528,8 +507,6 @@ zabbix_export:
                 times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               tags:
                 - tag: component
                   value: network
@@ -552,8 +529,6 @@ zabbix_export:
                 and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               tags:
                 - tag: component
                   value: network
@@ -572,8 +547,6 @@ zabbix_export:
                 For packet-oriented interfaces, the number of inbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.  For character-oriented or fixed-length interfaces, the number of inbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               tags:
                 - tag: component
                   value: network
@@ -600,8 +573,6 @@ zabbix_export:
                 times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               tags:
                 - tag: component
                   value: network
@@ -621,8 +592,6 @@ zabbix_export:
                 The total number of octets received on the interface, including framing characters. This object is a 64-bit version of ifInOctets. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
                 - type: MULTIPLIER
                   parameters:
                     - '8'
@@ -652,8 +621,6 @@ zabbix_export:
                 times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               tags:
                 - tag: component
                   value: network
@@ -676,8 +643,6 @@ zabbix_export:
                 and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               tags:
                 - tag: component
                   value: network
@@ -696,8 +661,6 @@ zabbix_export:
                 For packet-oriented interfaces, the number of outbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.  For character-oriented or fixed-length interfaces, the number of outbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               tags:
                 - tag: component
                   value: network
@@ -725,8 +688,6 @@ zabbix_export:
                 times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               tags:
                 - tag: component
                   value: network
@@ -746,8 +707,6 @@ zabbix_export:
                 The total number of octets transmitted out of the interface, including framing characters. This object is a 64-bit version of ifOutOctets.Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
                 - type: MULTIPLIER
                   parameters:
                     - '8'
@@ -943,7 +902,6 @@ zabbix_export:
               snmp_oid: '1.3.6.1.4.1.9.9.719.1.45.4.1.17.{#SNMPINDEX}'
               key: 'cisco.ucs.hw.physicaldisk.media_type[cucsStorageLocalDiskDeviceType.{#SNMPINDEX}]'
               delay: 1h
-              trends: '0'
               value_type: CHAR
               description: |
                 MIB: CISCO-UNIFIED-COMPUTING-STORAGE-MIB
@@ -965,7 +923,6 @@ zabbix_export:
               snmp_oid: '1.3.6.1.4.1.9.9.719.1.45.4.1.7.{#SNMPINDEX}'
               key: 'cisco.ucs.hw.physicaldisk.model[cucsStorageLocalDiskModel.{#SNMPINDEX}]'
               delay: 1h
-              trends: '0'
               value_type: CHAR
               description: |
                 MIB: CISCO-UNIFIED-COMPUTING-STORAGE-MIB
@@ -985,7 +942,6 @@ zabbix_export:
               snmp_oid: '1.3.6.1.4.1.9.9.719.1.45.4.1.12.{#SNMPINDEX}'
               key: 'cisco.ucs.hw.physicaldisk.serialnumber[cucsStorageLocalDiskSerial.{#SNMPINDEX}]'
               delay: 1h
-              trends: '0'
               value_type: CHAR
               description: |
                 MIB: CISCO-UNIFIED-COMPUTING-STORAGE-MIB
@@ -1414,7 +1370,6 @@ zabbix_export:
               snmp_oid: '1.3.6.1.4.1.9.9.719.1.9.35.1.32.{#SNMPINDEX}'
               key: 'cisco.ucs.hw.model[cucsComputeRackUnitModel.{#SNMPINDEX}]'
               delay: 1h
-              trends: '0'
               value_type: CHAR
               description: |
                 MIB: CISCO-UNIFIED-COMPUTING-COMPUTE-MIB
@@ -1432,7 +1387,6 @@ zabbix_export:
               snmp_oid: '1.3.6.1.4.1.9.9.719.1.9.35.1.47.{#SNMPINDEX}'
               key: 'cisco.ucs.hw.serialnumber[cucsComputeRackUnitSerial.{#SNMPINDEX}]'
               delay: 1h
-              trends: '0'
               value_type: CHAR
               description: |
                 MIB: CISCO-UNIFIED-COMPUTING-COMPUTE-MIB
