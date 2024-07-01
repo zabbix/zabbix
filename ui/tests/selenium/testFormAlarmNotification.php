@@ -190,6 +190,7 @@ class testFormAlarmNotification extends CWebTest {
 
 		// Trigger problem.
 		CDBHelper::setTriggerProblem('Not_classified_trigger_4');
+		sleep(1);
 
 		// Find appeared Alarm notification overlay dialog.
 		$this->page->refresh()->waitUntilReady();
@@ -258,6 +259,7 @@ class testFormAlarmNotification extends CWebTest {
 
 		// Close problem.
 		CDBHelper::setTriggerProblem('Not_classified_trigger_4', TRIGGER_VALUE_FALSE);
+		sleep(1);
 		$this->page->refresh()->waitUntilReady();
 
 		// Check that problem resolved and problem color is green now.
@@ -308,6 +310,7 @@ class testFormAlarmNotification extends CWebTest {
 		foreach ($this->all_triggers as $trigger_name) {
 			CDBHelper::setTriggerProblem($trigger_name);
 		}
+		sleep(1);
 
 		// Refresh page for alarm overlay to appear.
 		$this->page->refresh()->waitUntilReady();
@@ -437,6 +440,7 @@ class testFormAlarmNotification extends CWebTest {
 		foreach ($data['trigger_name'] as $trigger_name) {
 			CDBHelper::setTriggerProblem($trigger_name);
 		}
+		sleep(1);
 
 		// Filter problems by Hosts and refresh page for alarm overlay to appear.
 		$this->page->refresh()->waitUntilReady();
@@ -571,6 +575,7 @@ class testFormAlarmNotification extends CWebTest {
 		foreach ($this->all_triggers as $trigger_name) {
 			CDBHelper::setTriggerProblem($trigger_name);
 		}
+		sleep(1);
 
 		// Filter problems by Hosts and refresh page for alarm overlay to appear.
 		$this->page->refresh()->waitUntilReady();
