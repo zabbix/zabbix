@@ -311,6 +311,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageUsers');
 		$suite->addTestSuite('testPageMonitoringWeb');
 		$suite->addTestSuite('testPasswordComplexity');
+		$suite->addTestSuite('testFormAlarmNotification');
 		$suite->addTestSuite('testExpandExpressionMacros');
 		$suite->addTestSuite('testFormAction');
 		$suite->addTestSuite('testFormAdministrationAuthenticationSaml');
@@ -331,7 +332,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormAdministrationMediaTypeWebhook');
 		$suite->addTestSuite('testFormAdministrationScripts');
 		$suite->addTestSuite('testFormAdministrationUserGroups');
-		$suite->addTestSuite('testFormAlarmNotification');
 		$suite->addTestSuite('testFormApiTokensAdministrationGeneral');
 		$suite->addTestSuite('testFormApiTokensUserSettings');
 		$suite->addTestSuite('testFormEventCorrelation');
