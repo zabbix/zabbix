@@ -94,12 +94,6 @@
 			graph.off('mouseup', makeHintboxStatic);
 			graph.removeData('hintbox');
 			hbox.remove();
-
-			if (graph.observer !== undefined) {
-				graph.observer.disconnect();
-
-				delete graph.observer;
-			}
 		}
 	}
 
@@ -124,6 +118,8 @@
 			graph.hintBoxItem = hintBox.createBox(e, graph, content, '', true, 'top: 0; left: 0',
 				graph.closest('.dashboard-grid-widget-container')
 			);
+
+			fixHintBox(graph);
 
 			if (graph.data('simpleTriggersHintbox')) {
 				data.isTriggerHintBoxFrozen = true;
@@ -675,6 +671,9 @@
 				hbox = hintBox.createBox(e, graph, html, '', false, false,
 					graph.closest('.dashboard-grid-widget-container')
 				);
+
+				fixHintBox(graph);
+
 				graph
 					.off('mouseup', makeHintboxStatic)
 					.on('mouseup', {graph: graph}, makeHintboxStatic);
@@ -863,6 +862,9 @@
 				hbox = hintBox.createBox(e, graph, html, '', false, false,
 					graph.closest('.dashboard-grid-widget-container')
 				);
+
+				fixHintBox(graph);
+
 				graph
 					.off('mouseup', makeHintboxStatic)
 					.on('mouseup', {graph: graph}, makeHintboxStatic);
@@ -905,6 +907,19 @@
 		}
 
 		return triggers;
+	}
+
+	// Adjust hintBox class - remove or add necessary things.
+	function fixHintBox(target) {
+		if (target.observer !== undefined) {
+			target.observer.disconnect();
+			delete target.observer;
+		}
+
+		if (target.resize_observer !== undefined) {
+			target.resize_observer.disconnect();
+			delete target.resize_observer;
+		}
 	}
 
 	jQuery.fn.svggraph = function(method) {
