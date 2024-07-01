@@ -399,7 +399,7 @@ class testFormAlarmNotification extends CWebTest {
 						'High_trigger',
 						'Information_trigger',
 						'Not_classified_trigger',
-						'Warning_trigger',
+						'Warning_trigger'
 					]
 				]
 			],
