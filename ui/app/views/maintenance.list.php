@@ -123,7 +123,7 @@ foreach ($data['maintenances'] as $maintenanceid => $maintenance) {
 		$maintenance_status,
 		(new CCol($maintenance['description']))
 			->addClass(ZBX_STYLE_WORDBREAK)
-			->addStyle('max-width: 1000px')
+			->addStyle('max-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 	]);
 }
 

@@ -349,7 +349,7 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 		$hosts,
 		(new CCol($description))->addClass(ZBX_STYLE_WORDBREAK),
 		(new CCol($trigger['opdata']))->addClass(ZBX_STYLE_WORDBREAK),
-		(new CDiv($expression))->addClass(ZBX_STYLE_WORDWRAP),
+		(new CDiv($expression))->addClass(ZBX_STYLE_WORDBREAK),
 		(new CDiv([
 			$status,
 			$disabled_by_lld ? makeDescriptionIcon(_('Disabled automatically by an LLD rule.')) : null
