@@ -46,6 +46,10 @@ class CWidgetItemHistory extends CWidget {
 			this.#markSelected(this.#selected_itemid, this.#selected_clock);
 
 			this.#values_table.addEventListener('click', (e) => {
+				if (e.target.closest('[data-hintbox="1"]') !== null) {
+					return;
+				}
+
 				const element = e.target.closest('.has-broadcast-data');
 
 				if (element !== null) {
