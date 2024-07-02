@@ -1692,7 +1692,7 @@ out:
 static int	macro_report_resolv(zbx_macro_resolv_data_t *p, va_list args, char **replace_to, char **data,
 		char *error, size_t maxerrlen)
 {
-	// Passed arguments
+	/* Passed arguments */
 	const char	*tz = va_arg(args, const char *);
 
 	ZBX_UNUSED(data);

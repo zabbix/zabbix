@@ -22,7 +22,7 @@
 static int	macro_resolv_func(zbx_macro_resolv_data_t *p, va_list args, char **replace_to, char **data, char *error,
 		size_t maxerrlen)
 {
-	// Passed arguments
+	/* Passed arguments */
 	const char	*param1 = va_arg(args, const char *);
 
 	ZBX_UNUSED(data);
