@@ -143,7 +143,7 @@ static int	hk_get_compression_age(const char *table_name, int compression_policy
 static void	hk_check_table_compression_age(const char *table_name, int age, int compression_policy)
 {
 	int		compress_after;
-	zbx_db_result_t	res;
+	zbx_db_result_t	res = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): table: %s age %d", __func__, table_name, age);
 
