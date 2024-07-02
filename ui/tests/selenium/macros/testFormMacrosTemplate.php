@@ -228,7 +228,8 @@ class testFormMacrosTemplate extends testFormMacros {
 	 */
 	public function testFormMacrosTemplate_RemoveInheritedMacro($data) {
 		$this->checkRemoveInheritedMacros($data, 'template', self::$templateid_remove_inherited,
-				false, null, 'Template for Inherited macros removing');
+				false, null, 'Template for Inherited macros removing'
+		);
 	}
 
 	public function getCreateSecretMacrosData() {
@@ -292,7 +293,8 @@ class testFormMacrosTemplate extends testFormMacros {
 	public function testFormMacrosTemplate_RevertSecretMacroChanges($data) {
 		$this->revertSecretMacroChanges($data, 'zabbix.php?action=template.list&filter_name='.
 				'Template with secret macros&filter_set=1',
-				'templates', 'Template with secret macros');
+				'templates', 'Template with secret macros'
+		);
 	}
 
 	public function getUpdateSecretMacrosData() {
@@ -337,7 +339,8 @@ class testFormMacrosTemplate extends testFormMacros {
 	 */
 	public function testFormMacrosTemplate_UpdateSecretMacros($data) {
 		$this->updateSecretMacros($data, 'zabbix.php?action=template.list&filter_name=Template with secret macros&filter_set=1',
-				'templates', 'Template with secret macros');
+				'templates', 'Template with secret macros'
+		);
 	}
 
 	/**
@@ -345,7 +348,8 @@ class testFormMacrosTemplate extends testFormMacros {
 	 */
 	public function testFormMacrosTemplate_CheckVaultValidation() {
 		$this->checkVaultValidation('zabbix.php?action=template.list&filter_name=Template with vault macro&filter_set=1',
-			'templates', 'Template with vault macro');
+			'templates', 'Template with vault macro'
+		);
 	}
 
 	/**
@@ -354,7 +358,8 @@ class testFormMacrosTemplate extends testFormMacros {
 	public function testFormMacrosTemplate_CreateVaultMacros($data) {
 		$template_name = ($data['vault'] === 'Hashicorp') ? 'Template for creating Vault macros' : 'Empty Template without macros';
 		$this->createVaultMacros($data, 'zabbix.php?action=template.list&filter_name='.$template_name.'&filter_set=1',
-				'templates', $template_name);
+				'templates', $template_name
+		);
 	}
 
 	/**

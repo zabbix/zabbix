@@ -110,13 +110,13 @@ class testPageMonitoringLatestData extends CWebTest {
 		]);
 		$maintenanceid = $maintenances['maintenanceids'][0];
 
-		DBexecute("INSERT INTO maintenances_hosts (maintenance_hostid, maintenanceid, hostid) VALUES (1000000, "
-				.zbx_dbstr($maintenanceid).",".zbx_dbstr($maintenace_hostid).")"
+		DBexecute('INSERT INTO maintenances_hosts (maintenance_hostid, maintenanceid, hostid) VALUES (1000000, '.
+				zbx_dbstr($maintenanceid).','.zbx_dbstr($maintenace_hostid).')'
 		);
 
-		DBexecute("UPDATE hosts SET maintenanceid=".zbx_dbstr($maintenanceid).
-				", maintenance_status=1, maintenance_type=".MAINTENANCE_TYPE_NORMAL.", maintenance_from=".zbx_dbstr(time()-1000).
-				" WHERE hostid=".zbx_dbstr($maintenace_hostid)
+		DBexecute('UPDATE hosts SET maintenanceid='.zbx_dbstr($maintenanceid).
+				', maintenance_status=1, maintenance_type='.MAINTENANCE_TYPE_NORMAL.', maintenance_from='.zbx_dbstr(time()-1000).
+				' WHERE hostid='.zbx_dbstr($maintenace_hostid)
 		);
 	}
 

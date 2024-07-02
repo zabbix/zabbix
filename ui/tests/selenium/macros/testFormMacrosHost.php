@@ -138,13 +138,13 @@ class testFormMacrosHost extends testFormMacros {
 						'macro' => '{$SECRET_HOST_MACRO_2_TEXT_REVERT}',
 						'value' => 'Secret host value 2 text',
 						'description' => 'Secret host macro that will be changed to text',
-						'type' =>  ZBX_MACRO_TYPE_SECRET
+						'type' => ZBX_MACRO_TYPE_SECRET
 					],
 					[
 						'macro' => '{$SECRET_HOST_MACRO_UPDATE_2_TEXT}',
 						'value' => 'Secret host value 2 B updated',
 						'description' => 'Secret host macro that is going to be updated',
-						'type' =>  ZBX_MACRO_TYPE_SECRET
+						'type' => ZBX_MACRO_TYPE_SECRET
 					],
 					[
 						'macro' => '{$TEXT_HOST_MACRO_2_SECRET}',
@@ -155,7 +155,7 @@ class testFormMacrosHost extends testFormMacros {
 						'macro' => '{$SECRET_HOST_MACRO_UPDATE}',
 						'value' => 'Secret host macro value',
 						'description' => 'Secret host macro that is going to stay secret',
-						'type' =>  ZBX_MACRO_TYPE_SECRET
+						'type' => ZBX_MACRO_TYPE_SECRET
 					],
 					[
 						'macro' => '{$X_SECRET_HOST_MACRO_2_RESOLVE}',
@@ -191,7 +191,7 @@ class testFormMacrosHost extends testFormMacros {
 						'macro' => '{$SECRET_HOST_MACRO}',
 						'value' => 'some secret value',
 						'description' => '',
-						'type' =>  ZBX_MACRO_TYPE_SECRET
+						'type' => ZBX_MACRO_TYPE_SECRET
 					],
 					[
 						'macro' => '{$TEXT_HOST_MACRO}',
@@ -202,7 +202,7 @@ class testFormMacrosHost extends testFormMacros {
 						'macro' => '{$VAULT_HOST_MACRO3}',
 						'value' => 'secret/path:key',
 						'description' => 'Change name, value, description',
-						'type' =>  ZBX_MACRO_TYPE_VAULT
+						'type' => ZBX_MACRO_TYPE_VAULT
 					]
 				]
 			]

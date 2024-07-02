@@ -64,7 +64,7 @@ class testFormMacrosHostPrototype extends testFormMacros {
 			[
 				'host' => 'Host prototype for Inherited {#MACROS} removing',
 				'ruleid' => self::$lldid,
-				'groupLinks' =>  [['groupid'=> self::ZABBIX_SERVERS_GROUPID]],
+				'groupLinks' => [['groupid'=> self::ZABBIX_SERVERS_GROUPID]],
 				'macros' => [
 					[
 						'macro' => '{$TEST_MACRO123}',
@@ -101,7 +101,7 @@ class testFormMacrosHostPrototype extends testFormMacros {
 			[
 				'host' => self::HOSTMACROS_UPDATE,
 				'ruleid' => self::$lldid,
-				'groupLinks' =>  [['groupid'=> self::ZABBIX_SERVERS_GROUPID]],
+				'groupLinks' => [['groupid'=> self::ZABBIX_SERVERS_GROUPID]],
 				'macros' => [
 					[
 						'macro' => '{$UPDATE_MACRO_1}',
@@ -118,7 +118,7 @@ class testFormMacrosHostPrototype extends testFormMacros {
 			[
 				'host' => self::HOSTMACROS_REMOVE,
 				'ruleid' => self::$lldid,
-				'groupLinks' =>  [['groupid'=> self::ZABBIX_SERVERS_GROUPID]],
+				'groupLinks' => [['groupid'=> self::ZABBIX_SERVERS_GROUPID]],
 				'macros' => [
 					[
 						'macro' => '{$DELETE_MACRO_1}',
@@ -135,12 +135,12 @@ class testFormMacrosHostPrototype extends testFormMacros {
 			[
 				'host' => 'Host prototype for {#SECRET_MACROS} create',
 				'ruleid' => self::$lldid,
-				'groupLinks' =>  [['groupid'=> self::ZABBIX_SERVERS_GROUPID]]
+				'groupLinks' => [['groupid'=> self::ZABBIX_SERVERS_GROUPID]]
 			],
 			[
 				'host' => 'Host prototype for {#SECRET_MACROS} update',
 				'ruleid' => self::$lldid,
-				'groupLinks' =>  [['groupid'=> self::ZABBIX_SERVERS_GROUPID]],
+				'groupLinks' => [['groupid'=> self::ZABBIX_SERVERS_GROUPID]],
 				'macros' => [
 					[
 						'macro' => '{$PROTOTYPE_SECRET_2_SECRET}',
@@ -177,7 +177,7 @@ class testFormMacrosHostPrototype extends testFormMacros {
 			[
 				'host' => 'Host prototype for {#VAULT_MACROS} validation',
 				'ruleid' => self::$lldid,
-				'groupLinks' =>  [['groupid'=> self::ZABBIX_SERVERS_GROUPID]],
+				'groupLinks' => [['groupid'=> self::ZABBIX_SERVERS_GROUPID]],
 				'macros' => [
 					[
 						'macro' => '{$NEWMACROS}',
@@ -189,17 +189,17 @@ class testFormMacrosHostPrototype extends testFormMacros {
 			[
 				'host' => 'Empty prototype for {#VAULT_MACROS} create',
 				'ruleid' => self::$lldid,
-				'groupLinks' =>  [['groupid'=> self::ZABBIX_SERVERS_GROUPID]]
+				'groupLinks' => [['groupid'=> self::ZABBIX_SERVERS_GROUPID]]
 			],
 			[
 				'host' => 'Empty prototype for {#VAULT_MACROS} create Hashicorp',
 				'ruleid' => self::$lldid,
-				'groupLinks' =>  [['groupid'=> self::ZABBIX_SERVERS_GROUPID]]
+				'groupLinks' => [['groupid'=> self::ZABBIX_SERVERS_GROUPID]]
 			],
 			[
 				'host' => 'Host prototype for {#VAULT_MACROS} update',
 				'ruleid' => self::$lldid,
-				'groupLinks' =>  [['groupid'=> self::ZABBIX_SERVERS_GROUPID]],
+				'groupLinks' => [['groupid'=> self::ZABBIX_SERVERS_GROUPID]],
 				'macros' => [
 					[
 						'macro' => '{$VAULT_HOST_MACRO}',
@@ -208,7 +208,7 @@ class testFormMacrosHostPrototype extends testFormMacros {
 						'type' => ZBX_MACRO_TYPE_VAULT
 					]
 				]
-			],
+			]
 		]);
 		$host_prototypes = CDataHelper::getIds('host');
 
@@ -233,9 +233,7 @@ class testFormMacrosHostPrototype extends testFormMacros {
 	 * @dataProvider getUpdateMacrosCommonData
 	 */
 	public function testFormMacrosHostPrototype_Update($data) {
-		$this->checkMacros($data, 'host prototype', self::HOSTMACROS_UPDATE, true, true,
-				self::$lldid
-		);
+		$this->checkMacros($data, 'host prototype', self::HOSTMACROS_UPDATE, true, true, self::$lldid);
 	}
 
 	public function testFormMacrosHostPrototype_RemoveAll() {
@@ -254,7 +252,8 @@ class testFormMacrosHostPrototype extends testFormMacros {
 	 */
 	public function testFormMacrosHostPrototype_RemoveInheritedMacro($data) {
 		$this->checkRemoveInheritedMacros($data, 'host prototype', self::$inherited_macros_prototypeid,
-				true, self::$lldid);
+				true, self::$lldid
+		);
 	}
 
 	public function getCreateSecretMacrosData() {

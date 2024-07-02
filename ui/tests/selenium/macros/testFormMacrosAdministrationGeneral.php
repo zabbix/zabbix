@@ -319,7 +319,7 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 			'SELECT globalmacroid FROM globalmacro'.
 			' WHERE macro='.zbx_dbstr(self::NEW_MACRO).
 				' AND value='.zbx_dbstr(self::NEW_VALUE).
-					' AND description='.zbx_dbstr(self::NEW_DESCRIPTION)
+				' AND description='.zbx_dbstr(self::NEW_DESCRIPTION)
 		);
 		$this->assertEquals(1, $count, 'Chuck Norris: Macro has not been created in the DB.');
 	}
@@ -496,7 +496,7 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 		$this->openGlobalMacros();
 
 		for ($i = 0; $i < $countGlobalMacros; $i++) {
-			if ($this->zbxTestGetValue("//input[@id='macros_".$i."_globalmacroid']") == self::OLD_GLOBAL_MACROID) {
+			if ($this->zbxTestGetValue('//input[@id=\'macros_'.$i.'_globalmacroid\']') === self::OLD_GLOBAL_MACROID) {
 				break;
 			}
 		}
@@ -515,8 +515,8 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 			'SELECT globalmacroid FROM globalmacro'.
 			' WHERE globalmacroid='.self::OLD_GLOBAL_MACROID.
 				' AND macro='.zbx_dbstr(self::UPDATE_MACRO).
-					' AND value='.zbx_dbstr('').
-						' AND description='.zbx_dbstr('')
+				' AND value='.zbx_dbstr('').
+				' AND description='.zbx_dbstr('')
 		);
 		$this->assertEquals(1, $count,
 				'Chuck Norris: Value of the macro has not been updated in the DB.'.
@@ -533,7 +533,7 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 		$this->openGlobalMacros();
 
 		for ($i = 0; $i < $countGlobalMacros; $i++) {
-			if ($this->zbxTestGetValue("//input[@id='macros_".$i."_globalmacroid']") == self::OLD_GLOBAL_MACROID) {
+			if ($this->zbxTestGetValue('//input[@id=\'macros_'.$i.'_globalmacroid\']') == self::OLD_GLOBAL_MACROID) {
 				break;
 			}
 		}
@@ -562,7 +562,7 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 		$this->openGlobalMacros();
 
 		for ($i = 0; $i < $countGlobalMacros; $i++) {
-			if ($this->zbxTestGetValue("//input[@id='macros_".$i."_globalmacroid']") == self::OLD_GLOBAL_MACROID) {
+			if ($this->zbxTestGetValue('//input[@id=\'macros_'.$i.'_globalmacroid\']') == self::OLD_GLOBAL_MACROID) {
 				break;
 			}
 		}
@@ -592,7 +592,7 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 		$this->openGlobalMacros();
 
 		for ($i = 0; $i < $countGlobalMacros; $i++) {
-			if ($this->zbxTestGetValue("//input[@id='macros_".$i."_globalmacroid']") == self::OLD_GLOBAL_MACROID) {
+			if ($this->zbxTestGetValue('//input[@id=\'macros_'.$i.'_globalmacroid\']') == self::OLD_GLOBAL_MACROID) {
 				break;
 			}
 		}
