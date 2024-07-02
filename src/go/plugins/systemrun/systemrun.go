@@ -68,10 +68,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		return nil, fmt.Errorf("Invalid first parameter.")
 	}
 
-	fmt.Printf("CTX IS NIL 2: %t", ctx==nil)
-	fmt.Printf("CTX TIMEOUT 2: %d", ctx.Timeout())
-
-	if p.options.LogRemoteCommands == 1 && (ctx == nil || ctx.ClientID() != agent.LocalChecksClientID) {
+	if p.options.LogRemoteCommands == 1 && (ctx.ClientID() != agent.LocalChecksClientID) {
 		p.Warningf("Executing command:'%s'", params[0])
 	} else {
 		p.Debugf("Executing command:'%s'", params[0])

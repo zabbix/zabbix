@@ -734,7 +734,7 @@ static void	parse_list_of_commands(char *str, int config_timeout)
 			else if (FAIL == zbx_validate_item_timeout(tmp, &timeout, error, sizeof(error)))
 			{
 
-				zabbix_log(LOG_LEVEL_ERR, "failed to validate timeout \"%d\", error: %s ",timeout,
+				zabbix_log(LOG_LEVEL_ERR, "failed to validate timeout \"%d\", error: %s ", timeout,
 						error);
 
 				continue;

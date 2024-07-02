@@ -586,11 +586,10 @@ func (t *commandTask) Delay() string {
         return ""
 }
 
-
-
 func (t *commandTask) isRecurring() bool {
 	return false
 }
+
 func (t *commandTask) perform(s Scheduler) {
 	// execute remote command
 	go func() {

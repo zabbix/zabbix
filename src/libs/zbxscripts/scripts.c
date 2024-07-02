@@ -285,8 +285,8 @@ void	zbx_remote_commans_prepare_to_send(struct zbx_json *json, zbx_uint64_t host
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-			zabbix_log(LOG_LEVEL_INFORMATION, "AGS SS 0: %d", config_timeout);
 	commands_lock();
+
 	if (0 == remote_commands->commands_num)
 		goto out;
 
@@ -294,7 +294,6 @@ void	zbx_remote_commans_prepare_to_send(struct zbx_json *json, zbx_uint64_t host
 
 	while (NULL != (command = (zbx_rc_command_t *)zbx_hashset_iter_next(&iter_comands)))
 	{
-	zabbix_log(LOG_LEVEL_INFORMATION, "OMEGA Z");
 		if (hostid == command->hostid)
 		{
 			int	wait = 0;
@@ -314,8 +313,6 @@ void	zbx_remote_commans_prepare_to_send(struct zbx_json *json, zbx_uint64_t host
 
 			zbx_json_adduint64(json, ZBX_PROTO_TAG_WAIT, (zbx_uint64_t)wait);
 
-			config_timeout = 89;
-			zabbix_log(LOG_LEVEL_INFORMATION, "AGS SSX_TRATA: %d", config_timeout);
 			zbx_json_adduint64(json, ZBX_PROTO_TAG_TIMEOUT, config_timeout);
 
 			zbx_json_close(json);
