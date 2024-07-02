@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-07-02T09:47:05Z'
+  date: '2024-07-02T13:47:48Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -604,7 +604,7 @@ zabbix_export:
           type: INTERNAL
           key: 'zabbix[uptime]'
           history: 7d
-          units: s
+          units: uptime
           description: 'Uptime of Zabbix proxy process in seconds.'
           tags:
             - tag: component

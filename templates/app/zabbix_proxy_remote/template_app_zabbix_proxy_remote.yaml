@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-07-02T09:47:28Z'
+  date: '2024-07-02T13:47:53Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -800,7 +800,7 @@ zabbix_export:
           key: uptime
           delay: '0'
           history: 7d
-          units: s
+          units: uptime
           description: 'Uptime of Zabbix proxy process in seconds.'
           preprocessing:
             - type: JSONPATH
