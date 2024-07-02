@@ -35,6 +35,7 @@
 #include "zbxipcservice.h"
 #include "zbxjson.h"
 #include "zbxstr.h"
+#include "zbx_expression_constants.h"
 
 #define ZBX_REPORT_STATUS_ENABLED	0
 #define ZBX_REPORT_STATUS_DISABLED	1
@@ -1675,6 +1676,39 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: resolves macros in report (ZBX_MACRO_TYPE_REPORT) context         *
+ *                                                                            *
+ * Parameters: p          - [IN] macro resolver data structure                *
+ *             args       - [IN] list of variadic parameters                  *
+ *                               Mandatory content:                           *
+ *                                - const char *tz: name of timezone          *
+ *             replace_to - [OUT] pointer to value to replace macro with      *
+ *             data       - [IN/OUT] pointer to input data string             *
+ *             error      - [OUT] pointer to pre-allocated error message      *
+ *                                buffer                                      *
+ *             maxerrlen  - [IN] size of error message buffer                 *
+ *                                                                            *
+ ******************************************************************************/
+static int	macro_report_resolv(zbx_macro_resolv_data_t *p, va_list args, char **replace_to, char **data,
+		char *error, size_t maxerrlen)
+{
+	// Passed arguments
+	const char	*tz = va_arg(args, const char *);
+
+	ZBX_UNUSED(data);
+	ZBX_UNUSED(error);
+	ZBX_UNUSED(maxerrlen);
+
+	if (0 == strcmp(p->macro, MVAR_TIME))
+	{
+		*replace_to = zbx_strdup(*replace_to, zbx_time2str(time(NULL), tz));
+	}
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: creates jobs to process report                                    *
  *                                                                            *
  * Parameters: manager - [IN]                                                 *
@@ -1711,8 +1745,7 @@ static int	rm_report_create_jobs(zbx_rm_t *manager, zbx_rm_report_t *report, int
 
 		if (0 == strcmp(pair.first, ZBX_REPORT_PARAM_BODY) || 0 == strcmp(pair.first, ZBX_REPORT_PARAM_SUBJECT))
 		{
-			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-					NULL, (char **)&pair.second, ZBX_MACRO_TYPE_REPORT, NULL, 0);
+			zbx_substitute_macros((char **)&pair.second, NULL, 0, macro_report_resolv, NULL);
 		}
 
 		zbx_vector_ptr_pair_append(&params, pair);
@@ -2039,8 +2072,7 @@ static int	rm_test_report(zbx_rm_t *manager, zbx_ipc_client_t *client, zbx_ipc_m
 		if (0 == strcmp(params.values[i].first, ZBX_REPORT_PARAM_BODY) ||
 				0 == strcmp(params.values[i].first, ZBX_REPORT_PARAM_SUBJECT))
 		{
-			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-					NULL, (char **)&params.values[i].second, ZBX_MACRO_TYPE_REPORT, NULL, 0);
+			zbx_substitute_macros((char **)&params.values[i].second, NULL, 0, macro_report_resolv, NULL);
 		}
 	}
 
