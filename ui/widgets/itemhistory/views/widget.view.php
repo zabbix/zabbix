@@ -207,8 +207,9 @@ function makeValueCell(array $column, array $item_value, string $cell_class = nu
 						->setAttribute('data-itemid', $item_value['itemid'])
 						->setAttribute('data-clock', $item_value['clock'].'.'.$item_value['ns']),
 					(new CCol(
-						(new CSpan($item_value['formatted_value']))
-							->setHint((new CDiv($item_value['value']))->addClass(ZBX_STYLE_HINTBOX_WRAP))
+						(new CSpan($item_value['formatted_value']))->setHint(
+								(new CDiv($item_value['value']))->addClass(ZBX_STYLE_HINTBOX_WRAP)
+							)
 					))
 						->addClass($cell_class)
 						->setAttribute('data-itemid', $item_value['itemid'])
@@ -234,8 +235,9 @@ function makeValueCell(array $column, array $item_value, string $cell_class = nu
 
 				return [
 					(new CCol(
-						(new CSpan($item_value['formatted_value']))
-							->setHint((new CSpan($item_value['value']))->addClass(ZBX_STYLE_HINTBOX_WRAP))
+						(new CSpan($item_value['formatted_value']))->setHint(
+								(new CSpan($item_value['value']))->addClass(ZBX_STYLE_HINTBOX_WRAP)
+							)
 					))
 						->addClass($cell_class)
 						->setAttribute('data-itemid', $item_value['itemid'])
@@ -264,7 +266,9 @@ function makeValueCell(array $column, array $item_value, string $cell_class = nu
 
 			return [
 				(new CCol($column['display'] != CWidgetFieldColumnsList::DISPLAY_HTML
-					? (new CSpan($value))->setHint((new CDiv($item_value['value']))->addClass(ZBX_STYLE_HINTBOX_WRAP))
+					? (new CSpan($value))->setHint(
+							(new CDiv($item_value['value']))->addClass(ZBX_STYLE_HINTBOX_WRAP)
+						)
 					: new CJsScript($value)
 				))
 					->addClass($column['display'] == CWidgetFieldColumnsList::DISPLAY_SINGLE_LINE
