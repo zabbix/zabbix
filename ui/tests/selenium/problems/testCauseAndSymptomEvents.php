@@ -13,6 +13,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 
 /**
@@ -34,6 +35,7 @@ class testCauseAndSymptomEvents extends CWebTest {
 	}
 
 	protected static $groupids;
+	protected static $triggerids;
 
 	public function prepareData() {
 		// Create hostgroups for hosts.
@@ -83,6 +85,7 @@ class testCauseAndSymptomEvents extends CWebTest {
 				'priority' => TRIGGER_SEVERITY_DISASTER
 			]
 		]);
+		self::$triggerids = CDataHelper::getIds('description');
 
 		// Create problems.
 		CDBHelper::setTriggerProblem('Problem trap>10 [Symptom]', TRIGGER_VALUE_TRUE);
@@ -94,6 +97,74 @@ class testCauseAndSymptomEvents extends CWebTest {
 		DBexecute('UPDATE problem SET cause_eventid='.$causeid.' WHERE name='.zbx_dbstr('Problem trap>10 [Symptom]'));
 		DBexecute('INSERT INTO event_symptom (eventid, cause_eventid) VALUES ('.$symptomid.','.$causeid.')');
 		DBexecute('UPDATE event_symptom SET cause_eventid='.$causeid.' WHERE eventid='.$symptomid);
+	}
+
+	public function testCauseAndSymptomEvents_Layout() {
+		$this->page->login()->open('zabbix.php?action=problem.view');
+		$form = CFilterElement::find()->one()->getForm();
+		$table = $this->query('class:list-table')->asTable()->waitUntilPresent()->one();
+
+		$form->fill(['Hosts' => 'Host for Cause and Symptom check']);
+		$form->submit();
+		$table->waitUntilReloaded();
+
+		$result = [
+			['Problem' => 'Problem trap>100 [Cause]'],
+			['Problem' => 'Problem trap>10 [Symptom]']
+		];
+		$this->assertTableData($result);
+
+		// Check collapsed symptom count.
+		$this->assertTrue($table->getRow(0)->query('class:entity-count')->one()->isVisible());
+		$this->assertEquals(1, $table->getRow(0)->query('class:entity-count')->one()->getText());
+
+		// Check 'Event details' rank value for 'Cause' event.
+		$table->getRow(0)->query('xpath:.//a[contains(@href, "tr_events.php?triggerid='.
+				self::$triggerids['Problem trap>100 [Cause]'].'&eventid")]')->one()->click();
+		$this->page->waitUntilReady();
+		$event_table = $this->query('xpath://section[@id="hat_eventdetails"]')->asTable()->waitUntilPresent()->one();
+		$this->assertEquals('Cause', $event_table->getRow(7)->getColumn(1)->getText());
+
+		$this->page->navigateBack();
+		$this->checkState(true);
+		$table->getRow(0)->query('xpath:.//button[(@title="Expand")]')->one()->click();
+		$this->checkState();
+
+		// Check 'Event details' rank value for 'Symptom' event and possibility to navigate to 'Cause' event.
+		$table->query('xpath:.//a[contains(@href, "tr_events.php?triggerid='.
+				self::$triggerids['Problem trap>10 [Symptom]'].'&eventid")]')->one()->click();
+		$this->page->waitUntilReady();
+		$this->assertEquals('Symptom (Problem trap>100 [Cause])', $event_table->getRow(7)->getColumn(1)->getText());
+		$this->assertTrue($event_table->query('link:Problem trap>100 [Cause]')->one()->isClickable());
+		$event_table->query('link:Problem trap>100 [Cause]')->one()->Click();
+		$this->assertEquals('Cause', $event_table->getRow(7)->getColumn(1)->getText());
+
+		// Check collapsed and expanded state via clicking on corresponded buttons.
+		$this->page->login()->open('zabbix.php?action=problem.view');
+		$this->checkState(true);
+		$table->getRow(0)->query('xpath:.//button[(@title="Expand")]')->one()->click();
+		$this->checkState();
+		$table->getRow(0)->query('xpath:.//button[(@title="Collapse")]')->one()->click();
+		$this->checkState(true);
+	}
+
+	/**
+	 * @param boolean $collapsed	are symptom events in collapsed state or not
+	 */
+	protected function checkState($collapsed = false) {
+		$table = $this->query('class:list-table')->asTable()->waitUntilPresent()->one();
+
+		if ($collapsed) {
+			// Check collapsed state.
+			$this->assertTrue($table->getRow(0)->query('xpath:.//button[(@title="Expand")]')->one()->isVisible());
+			$this->assertFalse($table->getRow(0)->query('xpath:.//button[(@title="Collapse")]')->exists());
+		}
+		else {
+			// Check expanded state.
+			$this->assertTrue($table->getRow(0)->query('xpath:.//button[(@title="Collapse")]')->one()->isVisible());
+			$this->assertFalse($table->getRow(0)->query('xpath:.//button[(@title="Expand")]')->exists());
+			$this->assertTrue($table->getRow(1)->query('xpath:.//span[(@title="Symptom")]')->one()->isVisible());
+		}
 	}
 
 	public static function getCauseSymptomsData() {

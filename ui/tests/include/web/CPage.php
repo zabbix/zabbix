@@ -662,4 +662,11 @@ class CPage {
 	public function scrollToTop() {
 		$this->getDriver()->executeScript('document.getElementsByClassName(\'wrapper\')[0].scrollTo(0, 0)');
 	}
+
+	/**
+	 * Navigates back to the previous page.
+	 */
+	public function navigateBack() {
+		$this->driver->navigate()->back();
+	}
 }
