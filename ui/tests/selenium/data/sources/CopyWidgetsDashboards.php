@@ -2385,7 +2385,7 @@ class CopyWidgetsDashboards {
 							[
 								'type' => 'discovery',
 								'name' => 'Discovery status widget',
-								'x' => 8,
+								'x' => 5,
 								'y' => 10,
 								'width' => 12,
 								'height' => 4
