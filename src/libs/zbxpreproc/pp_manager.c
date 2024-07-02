@@ -1239,7 +1239,7 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 	while (ZBX_IS_RUNNING())
 	{
 		double		time_now = zbx_time();
-		zbx_uint64_t	direct_num = 0;			
+		zbx_uint64_t	direct_num = 0;
 
 		if (STAT_INTERVAL < time_now - time_stat)
 		{
