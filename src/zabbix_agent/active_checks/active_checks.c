@@ -84,6 +84,7 @@ struct _zbx_active_command_t
 {
 	zbx_uint64_t		command_id;
 	char			*key;
+	int			timeout;
 };
 ZBX_PTR_VECTOR_IMPL(active_command_ptr, zbx_active_command_t *)
 
@@ -390,12 +391,12 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static void	add_command(const char *key, zbx_uint64_t id)
+static void	add_command(const char *key, zbx_uint64_t id, int timeout)
 {
 	zbx_active_command_t	*command;
 	zbx_cmd_hash_t		cmd_hash_loc;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s' id:" ZBX_FS_UI64, __func__, key, id);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s' id:" ZBX_FS_UI64 " timeout: %d", __func__, key, id, timeout);
 
 	if (NULL == zbx_hashset_search(&commands_hash, &id))
 	{
@@ -408,6 +409,7 @@ static void	add_command(const char *key, zbx_uint64_t id)
 
 		command->key = zbx_strdup(NULL, key);
 		command->command_id = id;
+		command->timeout = timeout;
 		zbx_vector_active_command_ptr_append(&active_commands, command);
 	}
 
@@ -677,11 +679,11 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static void	parse_list_of_commands(char *str)
+static void	parse_list_of_commands(char *str, int config_timeout)
 {
 	const char		*p;
-	char			*cmd = NULL, tmp[MAX_STRING_LEN], *key = NULL;
-	int			commands_num = 0;
+	char			*cmd = NULL, tmp[MAX_STRING_LEN], error[MAX_STRING_LEN], *key = NULL;
+	int			timeout, commands_num = 0;
 	zbx_uint64_t		command_id;
 	struct zbx_json_parse	jp, jp_data, jp_row;
 	size_t			cmd_alloc = 0, key_alloc;
@@ -724,6 +726,20 @@ static void	parse_list_of_commands(char *str)
 				continue;
 			}
 
+			if (SUCCEED != zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_TIMEOUT, tmp, sizeof(tmp), NULL) ||
+				'\0' == *tmp)
+			{
+				timeout = config_timeout;
+			}
+			else if (FAIL == zbx_validate_item_timeout(tmp, &timeout, error, sizeof(error)))
+			{
+
+				zabbix_log(LOG_LEVEL_ERR, "failed to validate timeout \"%d\", error: %s ",timeout,
+						error);
+
+				continue;
+			}
+
 			if (SUCCEED != zbx_quote_key_param(&cmd, 0))
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "Invalid command \"%s\"", cmd);
@@ -745,7 +761,7 @@ static void	parse_list_of_commands(char *str)
 				continue;
 			}
 
-			add_command(key, command_id);
+			add_command(key, command_id, timeout);
 
 			commands_num++;
 		}
@@ -911,7 +927,7 @@ static int	refresh_active_checks(zbx_vector_addr_ptr_t *addrs, const zbx_config_
 				config_revision_local, config_timeout, config_hostname, addrs, config_tls,
 				config_source_ip, config_buffer_send, config_buffer_size);
 
-		parse_list_of_commands(data);
+		parse_list_of_commands(data, config_timeout);
 
 		zbx_free(data);
 	}
@@ -1527,7 +1543,7 @@ static void	process_command(zbx_active_command_t *command)
 
 	zbx_init_agent_result(&result);
 
-	if (SUCCEED != zbx_execute_agent_check(command->key, 0, &result, ZBX_CHECK_TIMEOUT_UNDEFINED))
+	if (SUCCEED != zbx_execute_agent_check(command->key, 0, &result, command->timeout))
 	{
 		state = ITEM_STATE_NOTSUPPORTED;
 		if (NULL == (pvalue = ZBX_GET_MSG_RESULT(&result)))
