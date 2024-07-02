@@ -367,7 +367,7 @@ class CUser extends CApiService {
 
 			/*
 			 * If user is created without a password (e.g. for GROUP_GUI_ACCESS_LDAP), store an empty string
-			 * as his/her password in database.
+			 * as their password in database.
 			 */
 			$user['passwd'] = array_key_exists('passwd', $user)
 				? password_hash($user['passwd'], PASSWORD_BCRYPT, ['cost' => ZBX_BCRYPT_COST])
