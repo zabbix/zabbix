@@ -313,7 +313,7 @@ void	zbx_remote_commands_prepare_to_send(struct zbx_json *json, zbx_uint64_t hos
 
 			zbx_json_adduint64(json, ZBX_PROTO_TAG_WAIT, (zbx_uint64_t)wait);
 
-			zbx_json_adduint64(json, ZBX_PROTO_TAG_TIMEOUT, config_timeout);
+			zbx_json_adduint64(json, ZBX_PROTO_TAG_TIMEOUT, (zbx_uint64_t)config_timeout);
 
 			zbx_json_close(json);
 
