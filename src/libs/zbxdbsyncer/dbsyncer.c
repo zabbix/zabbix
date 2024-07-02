@@ -221,6 +221,7 @@ ZBX_THREAD_ENTRY(zbx_dbsyncer_thread, args)
 			switch (rtc_cmd)
 			{
 				case ZBX_RTC_HISTORY_SYNC_NOTIFY:
+				zabbix_log(LOG_LEVEL_INFORMATION, "ZBX_RTC_HISTORY_SYNC_NOTIFY");
 					sleeptime = 0;
 				case ZBX_RTC_SHUTDOWN:
 					break;
