@@ -29,9 +29,9 @@
 #define COMPRESSION_POLICY_ADD		"add_compression_policy"
 
 /* Compression policy: chunks containing data older than provided data are compressed. */
-#define COMPRESSION_POLICY_AFTER	0
+#define POLICY_COMPRESS_AFTER		0
 /* Compression policy: chunks with creation time older than this cut-off point are compressed. */
-#define COMPRESSION_POLICY_BEFORE	1
+#define POLICY_COMPRESS_CREATED_BEFORE	1
 
 typedef struct
 {
@@ -42,16 +42,16 @@ typedef struct
 } zbx_history_table_compression_options_t;
 
 static zbx_history_table_compression_options_t	compression_tables[] = {
-	{"history",		"itemid",	"clock,ns",	COMPRESSION_POLICY_AFTER},
-	{"history_uint",	"itemid",	"clock,ns",	COMPRESSION_POLICY_AFTER},
-	{"history_str",		"itemid",	"clock,ns",	COMPRESSION_POLICY_AFTER},
-	{"history_text",	"itemid",	"clock,ns",	COMPRESSION_POLICY_AFTER},
-	{"history_log",		"itemid",	"clock,ns",	COMPRESSION_POLICY_AFTER},
-	{"trends",		"itemid",	"clock",	COMPRESSION_POLICY_AFTER},
-	{"trends_uint",		"itemid",	"clock",	COMPRESSION_POLICY_AFTER},
+	{"history",		"itemid",	"clock,ns",	POLICY_COMPRESS_AFTER},
+	{"history_uint",	"itemid",	"clock,ns",	POLICY_COMPRESS_AFTER},
+	{"history_str",		"itemid",	"clock,ns",	POLICY_COMPRESS_AFTER},
+	{"history_text",	"itemid",	"clock,ns",	POLICY_COMPRESS_AFTER},
+	{"history_log",		"itemid",	"clock,ns",	POLICY_COMPRESS_AFTER},
+	{"trends",		"itemid",	"clock",	POLICY_COMPRESS_AFTER},
+	{"trends_uint",		"itemid",	"clock",	POLICY_COMPRESS_AFTER},
 	/* Since auditlog table uses CUID from auditid field to partition table into chunks we need to use different */
 	/* compression policy due to internal TimescaleDB bug. */
-	{"auditlog",		"auditid",	"clock",	COMPRESSION_POLICY_BEFORE}
+	{"auditlog",		"auditid",	"clock",	POLICY_COMPRESS_CREATED_BEFORE}
 };
 
 static unsigned char	compression_status_cache = 0;
@@ -116,7 +116,7 @@ static int	hk_get_compression_age(const char *table_name, int compression_policy
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): table: %s", __func__, table_name);
 
-	field = compression_policy == COMPRESSION_POLICY_AFTER ? "compress_after" : "compress_created_before";
+	field = compression_policy == POLICY_COMPRESS_AFTER ? "compress_after" : "compress_created_before";
 
 	result = zbx_db_select("select extract(epoch from (config::json->>'%s')::interval) from"
 			" timescaledb_information.jobs where application_name like 'Compression%%' and"
@@ -159,11 +159,11 @@ static void	hk_check_table_compression_age(const char *table_name, int age, int 
 
 		switch(compression_policy)
 		{
-			case COMPRESSION_POLICY_AFTER:
+			case POLICY_COMPRESS_AFTER:
 				res = zbx_db_select("select %s('%s', integer '%d')", COMPRESSION_POLICY_ADD, table_name,
 						age);
 				break;
-			case COMPRESSION_POLICY_BEFORE:
+			case POLICY_COMPRESS_CREATED_BEFORE:
 				res = zbx_db_select("select %s('%s', compress_created_before => interval '%d')",
 						COMPRESSION_POLICY_ADD, table_name, age);
 				break;
@@ -202,7 +202,7 @@ static void	hk_history_enable_compression(int age)
 	{
 		zbx_history_table_compression_options_t	*table = &compression_tables[i];
 
-		if (COMPRESSION_POLICY_AFTER == table->compression_policy)
+		if (POLICY_COMPRESS_AFTER == table->compression_policy)
 		{
 			zbx_db_result_t	res;
 
