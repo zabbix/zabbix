@@ -2441,10 +2441,10 @@ void	zbx_dc_add_history_variant(zbx_uint64_t itemid, unsigned char value_type, u
 	}
 }
 
-void	zbx_dc_flush_history(void)
+size_t	zbx_dc_flush_history(void)
 {
 	if (0 == item_values_num)
-		return;
+		return 0;
 
 	LOCK_CACHE;
 
@@ -2456,8 +2456,12 @@ void	zbx_dc_flush_history(void)
 
 	zbx_vps_monitor_add_collected((zbx_uint64_t)item_values_num);
 
+	size_t	count = item_values_num;
+
 	item_values_num = 0;
 	string_values_offset = 0;
+
+	return count;
 }
 
 /******************************************************************************

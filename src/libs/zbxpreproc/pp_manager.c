@@ -1309,8 +1309,6 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 		{
 			processed_num += (unsigned int)tasks.values_num;
 			preprocessor_flush_tasks(manager, &tasks);
-			zbx_rtc_notify_generic(&manager->rtc, ZBX_PROCESS_TYPE_HISTSYNCER, 1,
-					ZBX_RTC_HISTORY_SYNC_NOTIFY, NULL, 0);
 			zbx_pp_tasks_clear(&tasks);
 		}
 
@@ -1325,11 +1323,15 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 			timeout.ns = PP_MANAGER_DELAY_NS;
 		}
 
-		/* flush local history cache when there is nothing more to process or one second after last flush */
-		if (0 == pending_num + processing_num + finished_num || 1 < sec - time_flush)
+		if (0.1 <= sec - time_flush)
 		{
-			zbx_dc_flush_history();
-			time_flush = sec;
+			if (0 != zbx_dc_flush_history())
+			{
+				time_flush = sec;
+
+				zbx_rtc_notify_generic(&manager->rtc, ZBX_PROCESS_TYPE_HISTSYNCER, 1,
+						ZBX_RTC_HISTORY_SYNC_NOTIFY, NULL, 0);
+			}
 		}
 
 		/* trigger vps monitor update at least once per second */
