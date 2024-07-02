@@ -8,4 +8,6 @@ libzbxexpr_a_SOURCES = \
 	function.c \
 	expr.c \
 	interval.c \
-	token.c
+	token.c \
+	substitute.c \
+	macrofunc.c

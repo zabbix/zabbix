@@ -3561,9 +3561,26 @@ section {
     text-anchor: end; }
   .svg-gauge .svg-gauge-label-center {
     text-anchor: middle; }
-  .svg-gauge .svg-gauge-value,
-  .svg-gauge .svg-gauge-units {
-    text-anchor: middle; }
+  .svg-gauge .svg-gauge-value-and-units {
+    text-align: center;
+    white-space: nowrap;
+    color: #f2f2f2; }
+    .svg-gauge .svg-gauge-value-and-units > div {
+      margin: auto;
+      overflow: hidden;
+      text-overflow: ellipsis; }
+      .svg-gauge .svg-gauge-value-and-units > div .svg-gauge-value {
+        overflow: hidden;
+        text-overflow: ellipsis; }
+  .svg-gauge .svg-gauge-value-and-units-horizontal .svg-gauge-value,
+  .svg-gauge .svg-gauge-value-and-units-horizontal .svg-gauge-units {
+    display: inline; }
+  .svg-gauge .svg-gauge-value-and-units-horizontal .svg-gauge-space {
+    display: inline-block; }
+  .svg-gauge .svg-gauge-value-and-units-vertical .svg-gauge-value,
+  .svg-gauge .svg-gauge-value-and-units-vertical .svg-gauge-units {
+    overflow: hidden;
+    text-overflow: ellipsis; }
   .svg-gauge .svg-gauge-no-data {
     text-anchor: middle;
     fill: #737373; }
@@ -3625,25 +3642,25 @@ section {
     .svg-graph-legend.svg-graph-legend-statistic .svg-graph-legend-item {
       grid-column-start: 1; }
 
-.svg-pie-chart {
+.svg-pie-chart .svg-pie-chart-arc-placeholder {
+  fill: transparent; }
+.svg-pie-chart .svg-pie-chart-space {
+  stroke: #2b2b2b;
+  stroke-linecap: round; }
+.svg-pie-chart .svg-pie-chart-arc-no-data-outer {
+  fill: #383838; }
+.svg-pie-chart .svg-pie-chart-arc-no-data-inner {
+  fill: #2b2b2b; }
+.svg-pie-chart .svg-pie-chart-total-value div {
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: auto;
   fill: #f2f2f2; }
-  .svg-pie-chart .svg-pie-chart-arcs {
-    stroke-linejoin: round; }
-    .svg-pie-chart .svg-pie-chart-arcs path {
-      vector-effect: non-scaling-stroke;
-      stroke: #2b2b2b; }
-    .svg-pie-chart .svg-pie-chart-arcs .svg-pie-chart-arc-placeholder {
-      stroke-width: 0;
-      fill: transparent; }
-    .svg-pie-chart .svg-pie-chart-arcs .svg-pie-chart-arc-no-data-outer {
-      fill: #383838; }
-    .svg-pie-chart .svg-pie-chart-arcs .svg-pie-chart-arc-no-data-inner {
-      fill: #2b2b2b; }
-  .svg-pie-chart .svg-pie-chart-total-value {
-    text-anchor: middle; }
-  .svg-pie-chart .svg-pie-chart-total-value-no-data {
-    text-anchor: middle;
-    fill: #737373; }
+.svg-pie-chart .svg-pie-chart-total-value-no-data {
+  text-anchor: middle;
+  fill: #737373; }
 
 .svg-pie-chart-legend {
   position: relative;
@@ -4448,7 +4465,8 @@ div.dashboard-widget-item .dashboard-grid-widget-body .item-value {
 div.dashboard-widget-item .dashboard-grid-widget-body .item-value-content {
   display: flex;
   align-items: baseline;
-  overflow: hidden; }
+  overflow: hidden;
+  white-space: nowrap; }
 div.dashboard-widget-item .dashboard-grid-widget-body .item-description,
 div.dashboard-widget-item .dashboard-grid-widget-body .item-time,
 div.dashboard-widget-item .dashboard-grid-widget-body .type-text .value {
@@ -6103,7 +6121,6 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
     transform: rotate(45deg); }
 
 .overlay-dialogue {
-  display: table;
   position: absolute;
   z-index: 1000;
   padding: 17px 10px 10px;
@@ -6805,6 +6822,8 @@ button.is-loading {
   position: relative;
   color: transparent !important;
   border-bottom-color: transparent; }
+  .link-action.is-loading::before {
+    background-color: transparent; }
   .link-action.is-loading::after {
     box-shadow: none;
     background: none;

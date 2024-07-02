@@ -22,7 +22,7 @@ See https://github.com/prometheus/node_exporter/releases/tag/v0.16.0 for details
 
 ## Requirements
 
-Zabbix version: 7.0 and higher.
+Zabbix version: 7.2 and higher.
 
 ## Tested versions
 
@@ -33,7 +33,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.0/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.2/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -48,7 +48,8 @@ This template has been tested on:
 |{$CPU.UTIL.CRIT}|<p>Critical threshold of CPU utilization expressed in %.</p>|`90`|
 |{$IF.ERRORS.WARN}|<p>Warning threshold of error packet rate. Can be used with interface name as context.</p>|`2`|
 |{$IF.UTIL.MAX}|<p>Used as a threshold in the interface utilization trigger.</p>|`90`|
-|{$SYSTEM.FUZZYTIME.MAX}|<p>The threshold for difference of system time in seconds.</p>|`60`|
+|{$SYSTEM.FUZZYTIME.MAX}|<p>The upper threshold for difference of system time.</p>|`60s`|
+|{$SYSTEM.FUZZYTIME.MIN}|<p>The lower threshold for difference of system time. Used in recovery expression to avoid trigger flapping.</p>|`10s`|
 |{$KERNEL.MAXFILES.MIN}||`256`|
 |{$LOAD_AVG_PER_CPU.MAX.WARN}|<p>Load per CPU considered sustainable. Tune if needed.</p>|`1.5`|
 |{$NODE_EXPORTER_HOST}|<p>The hostname or IP address of the node_exporter host.</p>|`<SET NODE EXPORTER HOST>`|

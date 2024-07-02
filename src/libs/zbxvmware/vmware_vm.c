@@ -12,9 +12,12 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#include "config.h"
-
 #include "vmware_vm.h"
+
+#include "zbxcommon.h"
+
+#if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
+
 #include "vmware_shmem.h"
 
 #include "zbxtime.h"
@@ -26,8 +29,6 @@
 #include "zbxalgo.h"
 #include "zbxjson.h"
 #include "zbxnum.h"
-
-#if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 
 #define ZBX_VMPROPMAP(property)										\
 	{property, ZBX_XPATH_PROP_OBJECT(ZBX_VMWARE_SOAP_VM) ZBX_XPATH_PROP_NAME_NODE(property), NULL, 0}

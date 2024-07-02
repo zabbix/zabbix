@@ -94,7 +94,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			}
 		}
 
-		if ($override_hostid === '' && !$this->isTemplateDashboard()) {
+		if ($override_hostid === '') {
 			$groupids = $this->fields_values['groupids'] ? getSubGroups($this->fields_values['groupids']) : null;
 
 			$db_hosts = API::Host()->get([
@@ -110,7 +110,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'sortfield' => 'hostid'
 			]);
 		}
-		elseif ($override_hostid !== '') {
+		else {
 			$db_hosts = API::Host()->get([
 				'output' => $group_by_host_name ? ['hostid', 'name'] : [],
 				'hostids' => [$override_hostid],
@@ -125,28 +125,28 @@ class WidgetView extends CControllerDashboardWidgetView {
 			return $no_data;
 		}
 
+		$search_field = $this->isTemplateDashboard() ? 'name' : 'name_resolved';
+
 		$options = [
-			'output' => ['itemid', 'hostid'],
+			'output' => ['itemid', 'hostid', 'name_resolved'],
 			'webitems' => true,
 			'evaltype' => $this->fields_values['item_tags_evaltype'],
 			'tags' => $this->fields_values['item_tags'] ?: null,
 			'filter' => [
 				'state' => $this->fields_values['state'] == WidgetForm::STATE_ALL ? null : $this->fields_values['state']
 			],
-			'search' => [
-				'name' => in_array('*', $this->fields_values['items'], true) ? null : $this->fields_values['items']
-			],
 			'searchWildcardsEnabled' => true,
 			'searchByAny' => true,
+			'search' => [
+				$search_field => in_array('*', $this->fields_values['items'], true)
+					? null
+					: $this->fields_values['items']
+			],
 			'selectTags' => $item_tags_to_keep ? ['tag', 'value'] : null,
 			'preservekeys' => true,
 			'sortfield' => 'name',
 			'sortorder' => ZBX_SORT_UP
 		];
-
-		$resolve_macros = $override_hostid !== '' || !$this->isTemplateDashboard();
-
-		$options['output'][] = $resolve_macros ? 'name_resolved' : 'name';
 
 		$limit_extended = $this->fields_values['show_lines'] + 1;
 		$selected_items_cnt = 0;
@@ -183,9 +183,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			return $no_data;
 		}
 
-		if ($resolve_macros) {
-			$items = CArrayHelper::renameObjectsKeys($items, ['name_resolved' => 'name']);
-		}
+		$items = CArrayHelper::renameObjectsKeys($items, ['name_resolved' => 'name']);
 
 		CArrayHelper::sort($items, ['name']);
 

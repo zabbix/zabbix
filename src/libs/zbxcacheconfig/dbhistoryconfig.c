@@ -25,6 +25,7 @@
 #include "proxy_group.h"
 #include "zbxstr.h"
 #include "zbxtime.h"
+#include "zbxcomms.h"
 
 ZBX_PTR_VECTOR_IMPL(connector_filter, zbx_connector_filter_t)
 ZBX_PTR_VECTOR_IMPL(action_eval_ptr, zbx_action_eval_t *)

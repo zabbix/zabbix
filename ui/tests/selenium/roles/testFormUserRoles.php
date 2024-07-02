@@ -831,12 +831,14 @@ class testFormUserRoles extends CWebTest {
 					$form->getField($field)->fill('Service list');
 				}
 			}
+
+			// Scroll up after filling the form to take the correct screenshot.
+			$this->page->scrollToTop();
 			$this->assertScreenshotExcept($screenshot_area, ['query' => 'xpath://input[@id="name"]'], $role);
 		}
 
-		// Screens for super admin.
+		// Screen for the existing super admin role.
 		$this->page->open('zabbix.php?action=userrole.edit&roleid=3');
-		$this->page->removeFocus();
 		$this->assertScreenshotExcept($screenshot_area, ['query' => 'xpath://input[@id="name"]']);
 		foreach (['Clone' => true, 'Cancel' => true, 'Update' => false, 'Delete' => false] as $button => $clickable) {
 			$this->assertEquals($clickable, $this->query('button', $button)->one()->isClickable());

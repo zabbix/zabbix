@@ -592,6 +592,28 @@ class CDashboard {
 	}
 
 	addDashboardPage({dashboard_pageid, name, display_period, widgets}) {
+		const references = new Set();
+
+		for (const widget of widgets) {
+			if ('reference' in widget.fields) {
+				references.add(widget.fields.reference);
+			}
+		}
+
+		for (const widget of widgets) {
+			for (const accessor of CWidgetBase.getFieldsReferencesAccessors(widget.fields).values()) {
+				const {reference} = CWidgetBase.parseTypedReference(accessor.getTypedReference());
+
+				if (reference === CDashboard.REFERENCE_DASHBOARD) {
+					continue;
+				}
+
+				if (!references.has(reference)) {
+					accessor.setTypedReference(CWidgetBase.createTypedReference({reference: ''}));
+				}
+			}
+		}
+
 		const dashboard_page = new CDashboardPage(this._containers.grid, {
 			data: {
 				dashboard_pageid,
@@ -1454,7 +1476,8 @@ class CDashboard {
 			...properties
 		}, {
 			dialogueid: 'widget_properties',
-			dialogue_class: 'modal-widget-configuration'
+			dialogue_class: 'modal-widget-configuration',
+			prevent_navigation: true
 		});
 
 		overlay.xhr.then(() => {

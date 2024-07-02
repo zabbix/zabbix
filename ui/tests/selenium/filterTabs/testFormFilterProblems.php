@@ -19,6 +19,8 @@ require_once dirname(__FILE__).'/../common/testFormFilter.php';
 /**
  * @backup profiles, hosts
  *
+ * @dataSource UserPermissions
+ *
  * @onBefore prepareProblemsData
  */
 class testFormFilterProblems extends testFormFilter {

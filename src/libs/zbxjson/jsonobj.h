@@ -17,6 +17,8 @@
 
 #include "zbxjson.h"
 
+#include "zbxalgo.h"
+
 typedef struct
 {
 	char		*name;

@@ -3,11 +3,11 @@
 
 ## Overview
 
-This is an official Windows template. It requires Zabbix agent 7.0 or newer.
+This is an official Windows template. It requires Zabbix agent 7.2 or newer.
 
 ## Requirements
 
-Zabbix version: 7.0 and higher.
+Zabbix version: 7.2 and higher.
 
 ## Tested versions
 
@@ -17,7 +17,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.0/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.2/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -50,7 +50,6 @@ Install Zabbix agent on Windows OS according to Zabbix documentation.
 |{$VFS.DEV.UTIL.MAX.WARN}|<p>The warning threshold of disk time utilization in percent.</p>|`95`|
 |{$VFS.DEV.READ.AWAIT.WARN}|<p>Disk read average response time (in s) before the trigger fires.</p>|`0.02`|
 |{$VFS.DEV.WRITE.AWAIT.WARN}|<p>Disk write average response time (in s) before the trigger fires.</p>|`0.02`|
-|{$SYSTEM.FUZZYTIME.MAX}|<p>The threshold for the difference of system time in seconds.</p>|`60`|
 |{$IFCONTROL}|<p>Macro for the interface operational state for the "link down" trigger. Can be used with interface name as context.</p>|`1`|
 |{$NET.IF.IFNAME.MATCHES}|<p>Used in Network interface discovery. Can be overridden on the host or linked template level.</p>|`.*`|
 |{$NET.IF.IFNAME.NOT_MATCHES}|<p>Used in Network interface discovery. Can be overridden on the host or linked template level.</p>|`Macro too long. Please see the template.`|
@@ -119,7 +118,6 @@ Install Zabbix agent on Windows OS according to Zabbix documentation.
 |Number of free system page table entries is too low|<p>`Memory\Free System Page Table Entries` has been less than `{$MEM.PAGE_TABLE_CRIT.MIN}` for 5 minutes. If the number is less than 5,000, there may be a memory leak.</p>|`max(/Windows by Zabbix agent active/perf_counter_en["\Memory\Free System Page Table Entries"],5m)<{$MEM.PAGE_TABLE_CRIT.MIN}`|Warning|**Depends on**:<br><ul><li>High memory utilization</li></ul>|
 |The Memory Pages/sec is too high|<p>The Memory Pages/sec in the last 5 minutes exceeds `{$MEM.PAGE_SEC.CRIT.MAX}`. If the value is greater than 1,000, as a result of excessive paging, there may be a memory leak.</p>|`min(/Windows by Zabbix agent active/perf_counter_en["\Memory\Pages/sec"],5m)>{$MEM.PAGE_SEC.CRIT.MAX}`|Warning|**Depends on**:<br><ul><li>High memory utilization</li></ul>|
 |Host has been restarted|<p>The device uptime is less than 10 minutes.</p>|`last(/Windows by Zabbix agent active/system.uptime)<10m`|Warning|**Manual close**: Yes|
-|System time is out of sync|<p>The host's system time is different from Zabbix server time.</p>|`fuzzytime(/Windows by Zabbix agent active/system.localtime,{$SYSTEM.FUZZYTIME.MAX})=0`|Warning|**Manual close**: Yes|
 |System name has changed|<p>The name of the system has changed. Acknowledge to close the problem manually.</p>|`change(/Windows by Zabbix agent active/system.hostname) and length(last(/Windows by Zabbix agent active/system.hostname))>0`|Info|**Manual close**: Yes|
 |Operating system description has changed|<p>The description of the operating system has changed. Possible reasons are that the system has been updated or replaced. Acknowledge to close the problem manually.</p>|`change(/Windows by Zabbix agent active/system.sw.os) and length(last(/Windows by Zabbix agent active/system.sw.os))>0`|Info|**Manual close**: Yes<br>**Depends on**:<br><ul><li>System name has changed</li></ul>|
 

@@ -13,11 +13,13 @@
 **/
 
 #include "trends.h"
+#include "zbxtrends.h"
 
-#include "zbxcommon.h"
+#include "zbxtime.h"
 #include "zbxdbhigh.h"
 #include "zbxdb.h"
 #include "zbxcacheconfig.h"
+#include "zbxvariant.h"
 
 static char	*trends_errors[ZBX_TREND_STATE_COUNT] = {
 		"unknown error",

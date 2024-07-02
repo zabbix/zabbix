@@ -14,7 +14,7 @@
 **/
 
 
-require_once dirname(__FILE__) . '/../../include/CWebTest.php';
+require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 
@@ -213,7 +213,7 @@ class testDashboardCopyWidgets extends CWebTest {
 		// Wait until widget is pasted and loading spinner disappeared.
 		sleep(1);
 		$this->query('xpath://div[contains(@class, "is-loading")]')->waitUntilNotPresent();
-		$copied_widget = $dashboard->getWidgets()->last();
+		$copied_widget = $dashboard->getWidgets()->last()->waitUntilReady();
 
 		// For Other dashboard and Map from Navigation tree case - add map source, because it is not being copied by design.
 		if (($new_dashboard || $new_page) && stristr($widget_name, 'Map from tree')) {
@@ -312,6 +312,12 @@ class testDashboardCopyWidgets extends CWebTest {
 			],
 			[
 				[
+					'name' => 'Honeycomb widget',
+					'copy to' => 'same page'
+				]
+			],
+			[
+				[
 					'name' => 'Clock widget',
 					'copy to' => 'another page'
 				]
@@ -378,6 +384,12 @@ class testDashboardCopyWidgets extends CWebTest {
 			],
 			[
 				[
+					'name' => 'Honeycomb widget',
+					'copy to' => 'another page'
+				]
+			],
+			[
+				[
 					'name' => 'Clock widget',
 					'copy to' => 'another dashboard'
 				]
@@ -404,6 +416,12 @@ class testDashboardCopyWidgets extends CWebTest {
 				[
 					'name' => 'Item history widget',
 					'copy to' => 'another dashboard'
+				]
+			],
+			[
+				[
+					'name' => 'Honeycomb widget',
+					'copy to' => 'another page'
 				]
 			],
 			[
@@ -451,6 +469,12 @@ class testDashboardCopyWidgets extends CWebTest {
 			[
 				[
 					'name' => 'Pie chart widget',
+					'copy to' => 'another template'
+				]
+			],
+			[
+				[
+					'name' => 'Honeycomb widget',
 					'copy to' => 'another template'
 				]
 			]

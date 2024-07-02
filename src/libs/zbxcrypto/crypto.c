@@ -15,6 +15,7 @@
 #include "zbxcrypto.h"
 
 #include "zbxtime.h"
+#include "zbxhash.h"
 
 /******************************************************************************
  *                                                                            *

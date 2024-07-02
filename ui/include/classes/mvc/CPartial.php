@@ -23,8 +23,6 @@ class CPartial {
 	/**
 	 * Directory list of MVC partials ordered by search priority.
 	 *
-	 * @static
-	 *
 	 * @var array
 	 */
 	private static $directories = ['local/app/partials', 'app/partials'];

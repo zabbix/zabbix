@@ -18,6 +18,7 @@
 #include "zbxmutexs.h"
 #include "zbxstr.h"
 #include "zbxnix.h"
+#include "zbxnum.h"
 #include "zbxbincommon.h"
 
 ZBX_GET_CONFIG_VAR2(const char *, const char *, zbx_progname, NULL)

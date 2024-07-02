@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-05-28 08:39+0000\n"
+"PO-Revision-Date: 2024-06-09 15:05+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -19477,6 +19477,10 @@ msgstr "Corda"
 #: app/views/popup.triggerexpr.php:133
 msgid "String functions"
 msgstr "Funcions d'string"
+
+#: widgets/piechart/includes/WidgetForm.php:137
+msgid "Stroke width"
+msgstr "Amplada del traç"
 
 #: include/items.inc.php:1545 include/items.inc.php:1549
 #: include/items.inc.php:1553 include/items.inc.php:1557

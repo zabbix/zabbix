@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-05-28 19:22+0000\n"
+"PO-Revision-Date: 2024-06-08 10:31+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -8415,7 +8415,7 @@ msgstr "Nom du champ"
 #: include/views/configuration.item.edit.php:633
 #: include/views/configuration.item.prototype.edit.php:604
 msgid "Field requirements:"
-msgstr "Exigences du terrain :"
+msgstr "Formats du champ :"
 
 #: include/classes/data/CItemData.php:1607
 msgid "File checksum, calculated by the UNIX cksum algorithm. Returns integer for crc32 (default) and string for md5, sha256"
@@ -19478,6 +19478,10 @@ msgstr "Chaîne de caractères"
 #: app/views/popup.triggerexpr.php:133
 msgid "String functions"
 msgstr "Fonctions de chaîne de caractères"
+
+#: widgets/piechart/includes/WidgetForm.php:137
+msgid "Stroke width"
+msgstr "Largeur du trait"
 
 #: include/items.inc.php:1545 include/items.inc.php:1549
 #: include/items.inc.php:1553 include/items.inc.php:1557

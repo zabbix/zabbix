@@ -13,11 +13,13 @@
 **/
 
 #include "zbxnix.h"
+
+#include "fatal.h"
 #include "sigcommon.h"
 
-#include "zbxcommon.h"
-#include "fatal.h"
-#include "zbxcomms.h"
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#	include "zbxcomms.h"
+#endif
 
 #define ZBX_EXIT_NONE		0
 #define ZBX_EXIT_SUCCESS	1

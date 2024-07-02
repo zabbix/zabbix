@@ -17,6 +17,9 @@
 
 #include "zbxcacheconfig.h"
 
+#include "zbxcomms.h"
+#include "zbxvault.h"
+
 typedef enum {
 	ZBX_PROXYCONFIG_STATUS_EMPTY,
 	ZBX_PROXYCONFIG_STATUS_DATA

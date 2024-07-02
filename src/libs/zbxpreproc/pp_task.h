@@ -24,6 +24,7 @@
 #include "zbxipcservice.h"
 #include "zbxcacheconfig.h"
 #include "zbxcachehistory.h"
+#include "zbxpreprocbase.h"
 
 #define PP_TASK_DATA(x)		(&x->data)
 
