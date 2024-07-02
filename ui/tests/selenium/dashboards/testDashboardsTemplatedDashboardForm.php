@@ -529,11 +529,11 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							],
 							[
 								'type' => 'honeycomb',
-								'name' => 'UpdateHoneycomb',
-								'x' => 0,
-								'y' => 20,
+								'name' => 'Honeycomb widget',
+								'x' => 48,
+								'y' => 16,
 								'width' => 12,
-								'height' => 5,
+								'height' => 4,
 								'fields' => [
 									[
 										'type' => 1,
