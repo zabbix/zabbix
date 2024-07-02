@@ -21,7 +21,6 @@
 #include "zbxthreads.h"
 #include "zbxalerter.h"
 #include "zbxcrypto.h"
-#include "zbxexpression.h"
 #include "zbxself.h"
 #include "zbxnix.h"
 #include "zbxnum.h"
