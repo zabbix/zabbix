@@ -982,7 +982,7 @@ class testPasswordComplexity extends CWebTest {
 	}
 
 	/**
-	 * Check if user changes their password according to complexity rules.
+	 * Check if user changes their own password according to complexity rules.
 	 *
 	 * @dataProvider getCommonPasswordData
 	 * @dataProvider getUserPasswordData
@@ -994,7 +994,7 @@ class testPasswordComplexity extends CWebTest {
 	}
 
 	/**
-	 * Check if Admin changes their own password according to complexity rule.
+	 * Check if Admin changes their own password according to complexity rules.
 	 *
 	 * @dataProvider getCommonPasswordData
 	 * @dataProvider getAdminPasswordData
