@@ -145,7 +145,7 @@ class testLowLevelDiscovery extends CWebTest {
 					$this->assertTrue($form->query('id:conditions')->one()->isVisible());
 					$this->assertTrue($filters_field->query('button', ['Add', 'Remove'])->one()->isClickable());
 					$this->assertEquals(['Label', 'Macro', '', 'Regular expression', 'Action'],
-						$filters_field->query('id:conditions')->asTable()->one()->getHeadersText()
+							$filters_field->query('id:conditions')->asTable()->one()->getHeadersText()
 					);
 
 					$filter_fields = [
@@ -1360,6 +1360,36 @@ class testLowLevelDiscovery extends CWebTest {
 			// #51.
 			[
 				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Empty script',
+						'Type' => 'Script',
+						'Key' => 'script_check[3]',
+						'Script' => ""
+					],
+					'error' => 'Page received incorrect data',
+					'error_details' => 'Incorrect value for field "Script": cannot be empty.'
+				]
+			],
+			// #52.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Empty script',
+						'Type' => 'Script',
+						'Key' => 'script_check[4]',
+						'Script' => 'wait(2000).then(() => goToPage());'
+					],
+					'Parameters' => [
+						['Name' => '', 'Value' => 'value_1']
+					],
+					'error_details' => 'Invalid parameter "/1/parameters/1/name": cannot be empty.'
+				]
+			],
+			// #53.
+			[
+				[
 					'fields' => [
 						'Name' => 'Simple LLD',
 						'Type' => 'Zabbix agent',
@@ -1367,7 +1397,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #52.
+			// #54.
 			[
 				[
 					'fields' => [
@@ -1388,7 +1418,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'trim' => true
 				]
 			],
-			// #53.
+			// #55.
 			[
 				[
 					'fields' => [
@@ -1403,7 +1433,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'trim' => true
 				]
 			],
-			// #54.
+			// #56.
 			[
 				[
 					'fields' => [
@@ -1422,7 +1452,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'trim' => true
 				]
 			],
-			// #55.
+			// #57.
 			[
 				[
 					'fields' => [
@@ -1438,7 +1468,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #56.
+			// #58.
 			[
 				[
 					'fields' => [
@@ -1450,7 +1480,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'trim' => true
 				]
 			],
-			// #57.
+			// #59.
 			[
 				[
 					'fields' => [
@@ -1461,7 +1491,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #58.
+			// #60
 			[
 				[
 					'fields' => [
@@ -1472,7 +1502,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #59.
+			// #61.
 			[
 				[
 					'fields' => [
@@ -1482,7 +1512,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #60.
+			// #62.
 			[
 				[
 					'fields' => [
@@ -1495,7 +1525,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'trim' => true
 				]
 			],
-			// #61.
+			// #63.
 			[
 				[
 					'fields' => [
@@ -1505,7 +1535,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #62.
+			// #64.
 			[
 				[
 					'fields' => [
@@ -1517,7 +1547,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'trim' => true
 				]
 			],
-			// #63.
+			// #65.
 			[
 				[
 					'fields' => [
@@ -1528,7 +1558,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #64.
+			// #66.
 			[
 				[
 					'fields' => [
@@ -1541,7 +1571,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #65.
+			// #67.
 			[
 				[
 					'fields' => [
@@ -1554,7 +1584,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #66.
+			// #68.
 			[
 				[
 					'fields' => [
@@ -1579,7 +1609,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #67.
+			// #69.
 			[
 				[
 					'fields' => [
@@ -1624,7 +1654,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'trim' => true
 				]
 			],
-			// #68.
+			// #70.
 			[
 				[
 					'fields' => [
@@ -1650,7 +1680,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #69.
+			// #71.
 			[
 				[
 					'fields' => [
@@ -1676,7 +1706,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #70.
+			// #72.
 			[
 				[
 					'fields' => [
@@ -1688,7 +1718,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #71.
+			// #73.
 			[
 				[
 					'fields' => [
@@ -1701,7 +1731,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #72.
+			// #74.
 			[
 				[
 					'fields' => [
@@ -1715,7 +1745,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'trim' => true
 				]
 			],
-			// #73.
+			// #75.
 			[
 				[
 					'fields' => [
@@ -1728,7 +1758,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #74.
+			// #76.
 			[
 				[
 					'fields' => [
@@ -1742,7 +1772,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'trim' => true
 				]
 			],
-			// #75.
+			// #77.
 			[
 				[
 					'fields' => [
@@ -1757,7 +1787,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'trim' => true
 				]
 			],
-			// #76.
+			// #78.
 			[
 				[
 					'fields' => [
@@ -1768,7 +1798,7 @@ class testLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
-			// #77.
+			// #79.
 			[
 				[
 					'fields' => [
@@ -1784,7 +1814,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'trim' => true
 				]
 			],
-			// #78.
+			// #80.
 			[
 				[
 					'fields' => [
@@ -1799,36 +1829,6 @@ class testLowLevelDiscovery extends CWebTest {
 						['Name' => 'param_1', 'Value' => 'value_1'],
 						['Name' => 'param_2', 'Value' => 'value_2']
 					]
-				]
-			],
-			// #79.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Empty script',
-						'Type' => 'Script',
-						'Key' => 'script_check[3]',
-						'Script' => ""
-					],
-					'error' => 'Page received incorrect data',
-					'error_details' => 'Incorrect value for field "Script": cannot be empty.'
-				]
-			],
-			// #80.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Empty script',
-						'Type' => 'Script',
-						'Key' => 'script_check[4]',
-						'Script' => 'wait(2000).then(() => goToPage());'
-					],
-					'Parameters' => [
-						['Name' => '', 'Value' => 'value_1']
-					],
-					'error_details' => 'Invalid parameter "/1/parameters/1/name": cannot be empty.'
 				]
 			],
 			// LLD Macros tab.
@@ -2595,7 +2595,6 @@ class testLowLevelDiscovery extends CWebTest {
 	 */
 	protected function checkFieldsParameters($fields_array) {
 		$form = $this->query('id:host-discovery-form')->asForm()->one()->waitUntilVisible();
-
 
 		foreach ($fields_array as $id => $parameters) {
 			$error_output = 'Failed field: '.$id;

@@ -28,8 +28,6 @@ require_once dirname(__FILE__).'/../common/testLowLevelDiscovery.php';
  */
 class testFormLowLevelDiscoveryFromHost extends testLowLevelDiscovery {
 
-	const SQL = 'SELECT * FROM items WHERE flags=1 ORDER BY itemid';
-
 	protected static $hostid;
 	protected static $empty_hostid;
 	protected static $interfaces_hostid;
