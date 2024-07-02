@@ -1,1 +1,0 @@
-.......... [ZBX-24565] removed redundant kernel header include, fixed musl compatibility issues (thanks to Alpine Linux maintainers for spotting this) (dgoloscapov)

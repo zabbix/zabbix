@@ -105,6 +105,7 @@ $fields = [
 	'cancel'			=> [T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'form'				=> [T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'form_refresh'		=> [T_ZBX_INT, O_OPT, P_SYS,	null,		null],
+	'backurl'			=> [T_ZBX_STR, O_OPT, null,		null,		null],
 	// sort and sortorder
 	'sort'				=> [T_ZBX_STR, O_OPT, P_SYS, IN('"hostname","name","status"'),				null],
 	'sortorder'			=> [T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
@@ -131,6 +132,11 @@ if (hasRequest('httptestid')) {
 	}
 }
 elseif (getRequest('hostid') && !isWritableHostTemplates([getRequest('hostid')])) {
+	access_deny();
+}
+
+// Validate backurl.
+if (hasRequest('backurl') && !CHtmlUrlValidator::validateSameSite(getRequest('backurl'))) {
 	access_deny();
 }
 
@@ -355,11 +361,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 }
 elseif (hasRequest('action') && str_in_array(getRequest('action'), ['httptest.massenable', 'httptest.massdisable'])
 		&& hasRequest('group_httptestid') && is_array(getRequest('group_httptestid'))) {
-	$enable = (getRequest('action') === 'httptest.massenable');
-	$status = $enable ? HTTPTEST_STATUS_ACTIVE : HTTPTEST_STATUS_DISABLED;
-	$updated = 0;
-	$result = true;
-
+	$status = getRequest('action') === 'httptest.massenable' ? HTTPTEST_STATUS_ACTIVE : HTTPTEST_STATUS_DISABLED;
 	$upd_httptests = [];
 
 	foreach (getRequest('group_httptestid') as $httptestid) {
@@ -369,24 +371,31 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), ['httptest.ma
 		];
 	}
 
-	if ($upd_httptests) {
-		$result = (bool) API::HttpTest()->update($upd_httptests);
-	}
+	$result = (bool) API::HttpTest()->update($upd_httptests);
 
 	$updated = count($upd_httptests);
 
-	$messageSuccess = $enable
-		? _n('Web scenario enabled', 'Web scenarios enabled', $updated)
-		: _n('Web scenario disabled', 'Web scenarios disabled', $updated);
-	$messageFailed = $enable
-		? _n('Cannot enable web scenario', 'Cannot enable web scenarios', $updated)
-		: _n('Cannot disable web scenario', 'Cannot disable web scenarios', $updated);
-
 	if ($result) {
 		uncheckTableRows(getRequest('hostid'));
+
+		$message = $status == HTTPTEST_STATUS_ACTIVE
+			? _n('Web scenario enabled', 'Web scenarios enabled', $updated)
+			: _n('Web scenario disabled', 'Web scenarios disabled', $updated);
+
+		CMessageHelper::setSuccessTitle($message);
+	}
+	else {
+		$message = $status == HTTPTEST_STATUS_ACTIVE
+			? _n('Cannot enable web scenario', 'Cannot enable web scenarios', $updated)
+			: _n('Cannot disable web scenario', 'Cannot disable web scenarios', $updated);
+
+		CMessageHelper::setErrorTitle($message);
 	}
 
-	show_messages($result, $messageSuccess, $messageFailed);
+	if (hasRequest('backurl')) {
+		$response = new CControllerResponseRedirect(getRequest('backurl'));
+		$response->redirect();
+	}
 }
 elseif (hasRequest('action') && getRequest('action') === 'httptest.massclearhistory'
 		&& hasRequest('group_httptestid') && is_array(getRequest('group_httptestid'))

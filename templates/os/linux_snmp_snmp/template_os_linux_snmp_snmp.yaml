@@ -113,7 +113,6 @@ zabbix_export:
           snmp_oid: 'walk[1.3.6.1.2.1.10.7.2.1.19,1.3.6.1.2.1.2.2.1.8,1.3.6.1.2.1.31.1.1.1.18,1.3.6.1.2.1.31.1.1.1.1,1.3.6.1.2.1.2.2.1.2]'
           key: net.if.duplex.walk
           history: '0'
-          trends: '0'
           value_type: TEXT
           description: 'Discovering interfaces from IF-MIB and EtherLike-MIB. Interfaces with `up(1)` Operational Status are discovered.'
           tags:
@@ -125,7 +124,6 @@ zabbix_export:
           snmp_oid: 'walk[1.3.6.1.2.1.2.2.1.8,1.3.6.1.2.1.2.2.1.7,1.3.6.1.2.1.31.1.1.1.18,1.3.6.1.2.1.31.1.1.1.1,1.3.6.1.2.1.2.2.1.2,1.3.6.1.2.1.2.2.1.3,1.3.6.1.2.1.31.1.1.1.6,1.3.6.1.2.1.31.1.1.1.10,1.3.6.1.2.1.2.2.1.14,1.3.6.1.2.1.2.2.1.20,1.3.6.1.2.1.2.2.1.19,1.3.6.1.2.1.2.2.1.13,1.3.6.1.2.1.31.1.1.1.15]'
           key: net.if.walk
           history: '0'
-          trends: '0'
           value_type: TEXT
           description: 'Discovering interfaces from IF-MIB.'
           tags:
@@ -135,8 +133,6 @@ zabbix_export:
           name: 'SNMP traps (fallback)'
           type: SNMP_TRAP
           key: snmptrap.fallback
-          delay: '0'
-          trends: '0'
           value_type: LOG
           description: 'The item is used to collect all SNMP traps unmatched by other snmptrap items'
           logtimefmt: 'hh:mm:sszyyyy/MM/dd'
@@ -149,7 +145,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.4.0
           key: 'system.contact[sysContact.0]'
           delay: 15m
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -171,8 +166,6 @@ zabbix_export:
           description: 'Number of interrupts processed.'
           preprocessing:
             - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           tags:
             - tag: component
               value: cpu
@@ -210,7 +203,6 @@ zabbix_export:
           name: 'Number of CPUs'
           type: DEPENDENT
           key: 'system.cpu.num[snmp]'
-          delay: '0'
           description: 'Count the number of CPU cores by counting number of cores discovered in hrProcessorTable using LLD.'
           preprocessing:
             - type: SNMP_WALK_TO_JSON
@@ -235,8 +227,6 @@ zabbix_export:
           description: 'The combined rate at which all processors on the computer are switched from one thread to another.'
           preprocessing:
             - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           tags:
             - tag: component
               value: cpu
@@ -246,7 +236,6 @@ zabbix_export:
           snmp_oid: 'walk[1.3.6.1.2.1.25.3.3.1.1,1.3.6.1.4.1.2021.11.53.0,1.3.6.1.4.1.2021.11.52.0,1.3.6.1.4.1.2021.11.50.0,1.3.6.1.4.1.2021.11.64.0,1.3.6.1.4.1.2021.11.61.0,1.3.6.1.4.1.2021.11.51.0,1.3.6.1.4.1.2021.11.54.0,1.3.6.1.4.1.2021.11.56.0,1.3.6.1.4.1.2021.11.65.0,1.3.6.1.4.1.2021.11.66.0]'
           key: system.cpu.walk
           history: '0'
-          trends: '0'
           value_type: TEXT
           description: |
             MIB: HOST-RESOURCES-MIB
@@ -260,7 +249,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.1.0
           key: 'system.descr[sysDescr.0]'
           delay: 15m
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -303,7 +291,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.6.0
           key: 'system.location[sysLocation.0]'
           delay: 15m
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -322,7 +309,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.5.0
           key: system.name
           delay: 15m
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -372,7 +358,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.2.0
           key: 'system.objectid[sysObjectID.0]'
           delay: 15m
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -439,7 +424,6 @@ zabbix_export:
           snmp_oid: 'walk[1.3.6.1.4.1.2021.13.15.1.1.2,1.3.6.1.4.1.2021.13.15.1.1.5,1.3.6.1.4.1.2021.13.15.1.1.6,1.3.6.1.4.1.2021.13.15.1.1.9]'
           key: vfs.dev.walk
           history: '0'
-          trends: '0'
           value_type: TEXT
           description: 'Block devices are discovered from UCD-DISKIO-MIB::diskIOTable (http://net-snmp.sourceforge.net/docs/mibs/ucdDiskIOMIB.html#diskIOTable).'
           tags:
@@ -451,7 +435,6 @@ zabbix_export:
           snmp_oid: 'walk[1.3.6.1.4.1.2021.9.1.1,1.3.6.1.4.1.2021.9.1.2,1.3.6.1.4.1.2021.9.1.3,1.3.6.1.4.1.2021.9.1.10,1.3.6.1.4.1.2021.9.1.11,1.3.6.1.4.1.2021.9.1.12,1.3.6.1.4.1.2021.9.1.13,1.3.6.1.4.1.2021.9.1.14,1.3.6.1.4.1.2021.9.1.15,1.3.6.1.4.1.2021.9.1.16]'
           key: vfs.fs.walk
           history: '0'
-          trends: '0'
           value_type: TEXT
           description: |
             MIB: UCD-SNMP-MIB
@@ -627,14 +610,12 @@ zabbix_export:
           name: 'CPU discovery'
           type: DEPENDENT
           key: 'cpu.discovery[snmp]'
-          delay: '0'
           description: 'This discovery will create set of per core CPU metrics from UCD-SNMP-MIB, using {#CPU.COUNT} in preprocessing. That''s the only reason why LLD is used.'
           item_prototypes:
             - uuid: 528c02f7e0414cb5a97def6702fceb2a
               name: 'CPU guest time'
               type: DEPENDENT
               key: 'system.cpu.guest[ssCpuRawGuest.{#SNMPINDEX}]'
-              delay: '0'
               value_type: FLOAT
               units: '%'
               description: |
@@ -646,8 +627,6 @@ zabbix_export:
                     - 1.3.6.1.4.1.2021.11.65.0
                     - '0'
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
                 - type: JAVASCRIPT
                   parameters:
                     - 'return value/{#CPU.COUNT}'
@@ -660,7 +639,6 @@ zabbix_export:
               name: 'CPU guest nice time'
               type: DEPENDENT
               key: 'system.cpu.guest_nice[ssCpuRawGuestNice.{#SNMPINDEX}]'
-              delay: '0'
               value_type: FLOAT
               units: '%'
               description: |
@@ -672,8 +650,6 @@ zabbix_export:
                     - 1.3.6.1.4.1.2021.11.66.0
                     - '0'
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
                 - type: JAVASCRIPT
                   parameters:
                     - 'return value/{#CPU.COUNT}'
@@ -686,7 +662,6 @@ zabbix_export:
               name: 'CPU idle time'
               type: DEPENDENT
               key: 'system.cpu.idle[ssCpuRawIdle.{#SNMPINDEX}]'
-              delay: '0'
               value_type: FLOAT
               units: '%'
               description: |
@@ -698,8 +673,6 @@ zabbix_export:
                     - 1.3.6.1.4.1.2021.11.53.0
                     - '0'
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
                 - type: JAVASCRIPT
                   parameters:
                     - 'return value/{#CPU.COUNT}'
@@ -712,7 +685,6 @@ zabbix_export:
               name: 'CPU interrupt time'
               type: DEPENDENT
               key: 'system.cpu.interrupt[ssCpuRawInterrupt.{#SNMPINDEX}]'
-              delay: '0'
               value_type: FLOAT
               units: '%'
               description: |
@@ -724,8 +696,6 @@ zabbix_export:
                     - 1.3.6.1.4.1.2021.11.56.0
                     - '0'
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
                 - type: JAVASCRIPT
                   parameters:
                     - 'return value/{#CPU.COUNT}'
@@ -738,7 +708,6 @@ zabbix_export:
               name: 'CPU iowait time'
               type: DEPENDENT
               key: 'system.cpu.iowait[ssCpuRawWait.{#SNMPINDEX}]'
-              delay: '0'
               value_type: FLOAT
               units: '%'
               description: |
@@ -750,8 +719,6 @@ zabbix_export:
                     - 1.3.6.1.4.1.2021.11.54.0
                     - '0'
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
                 - type: JAVASCRIPT
                   parameters:
                     - 'return value/{#CPU.COUNT}'
@@ -764,7 +731,6 @@ zabbix_export:
               name: 'CPU nice time'
               type: DEPENDENT
               key: 'system.cpu.nice[ssCpuRawNice.{#SNMPINDEX}]'
-              delay: '0'
               value_type: FLOAT
               units: '%'
               description: |
@@ -776,8 +742,6 @@ zabbix_export:
                     - 1.3.6.1.4.1.2021.11.51.0
                     - '0'
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
                 - type: JAVASCRIPT
                   parameters:
                     - 'return value/{#CPU.COUNT}'
@@ -790,7 +754,6 @@ zabbix_export:
               name: 'CPU softirq time'
               type: DEPENDENT
               key: 'system.cpu.softirq[ssCpuRawSoftIRQ.{#SNMPINDEX}]'
-              delay: '0'
               value_type: FLOAT
               units: '%'
               description: |
@@ -802,8 +765,6 @@ zabbix_export:
                     - 1.3.6.1.4.1.2021.11.61.0
                     - '0'
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
                 - type: JAVASCRIPT
                   parameters:
                     - 'return value/{#CPU.COUNT}'
@@ -816,7 +777,6 @@ zabbix_export:
               name: 'CPU steal time'
               type: DEPENDENT
               key: 'system.cpu.steal[ssCpuRawSteal.{#SNMPINDEX}]'
-              delay: '0'
               value_type: FLOAT
               units: '%'
               description: |
@@ -828,8 +788,6 @@ zabbix_export:
                     - 1.3.6.1.4.1.2021.11.64.0
                     - '0'
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
                 - type: JAVASCRIPT
                   parameters:
                     - 'return value/{#CPU.COUNT}'
@@ -842,7 +800,6 @@ zabbix_export:
               name: 'CPU system time'
               type: DEPENDENT
               key: 'system.cpu.system[ssCpuRawSystem.{#SNMPINDEX}]'
-              delay: '0'
               value_type: FLOAT
               units: '%'
               description: |
@@ -854,8 +811,6 @@ zabbix_export:
                     - 1.3.6.1.4.1.2021.11.52.0
                     - '0'
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
                 - type: JAVASCRIPT
                   parameters:
                     - 'return value/{#CPU.COUNT}'
@@ -868,7 +823,6 @@ zabbix_export:
               name: 'CPU user time'
               type: DEPENDENT
               key: 'system.cpu.user[ssCpuRawUser.{#SNMPINDEX}]'
-              delay: '0'
               value_type: FLOAT
               units: '%'
               description: |
@@ -880,8 +834,6 @@ zabbix_export:
                     - 1.3.6.1.4.1.2021.11.50.0
                     - '0'
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
                 - type: JAVASCRIPT
                   parameters:
                     - 'return value/{#CPU.COUNT}'
@@ -894,7 +846,6 @@ zabbix_export:
               name: 'CPU utilization'
               type: DEPENDENT
               key: 'system.cpu.util[snmp,{#SNMPINDEX}]'
-              delay: '0'
               value_type: FLOAT
               units: '%'
               description: 'CPU utilization expressed in %.'
@@ -989,59 +940,45 @@ zabbix_export:
           name: 'Network interfaces discovery'
           type: DEPENDENT
           key: net.if.discovery
-          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#IFADMINSTATUS}'
                 value: '{$NET.IF.IFADMINSTATUS.MATCHES}'
-                formulaid: A
               - macro: '{#IFADMINSTATUS}'
                 value: '{$NET.IF.IFADMINSTATUS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
               - macro: '{#IFALIAS}'
                 value: '{$NET.IF.IFALIAS.MATCHES}'
-                formulaid: C
               - macro: '{#IFALIAS}'
                 value: '{$NET.IF.IFALIAS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: D
               - macro: '{#IFDESCR}'
                 value: '{$NET.IF.IFDESCR.MATCHES}'
-                formulaid: E
               - macro: '{#IFDESCR}'
                 value: '{$NET.IF.IFDESCR.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: F
               - macro: '{#IFNAME}'
                 value: '{$NET.IF.IFNAME.MATCHES}'
-                formulaid: G
               - macro: '{#IFNAME}'
                 value: '{$NET.IF.IFNAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: H
               - macro: '{#IFOPERSTATUS}'
                 value: '{$NET.IF.IFOPERSTATUS.MATCHES}'
-                formulaid: I
               - macro: '{#IFOPERSTATUS}'
                 value: '{$NET.IF.IFOPERSTATUS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: J
               - macro: '{#IFTYPE}'
                 value: '{$NET.IF.IFTYPE.MATCHES}'
-                formulaid: K
               - macro: '{#IFTYPE}'
                 value: '{$NET.IF.IFTYPE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: L
           description: 'Discovering interfaces from IF-MIB.'
           item_prototypes:
             - uuid: 772ca56d1df84c33847fb3de9a2fa048
               name: 'Interface {#IFNAME}({#IFALIAS}): Inbound packets discarded'
               type: DEPENDENT
               key: 'net.if.in.discards[ifInDiscards.{#SNMPINDEX}]'
-              delay: '0'
               description: |
                 MIB: IF-MIB
                 The number of inbound packets which were chosen to be discarded
@@ -1055,8 +992,6 @@ zabbix_export:
                     - '1.3.6.1.2.1.2.2.1.13.{#SNMPINDEX}'
                     - '0'
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 3m
@@ -1073,7 +1008,6 @@ zabbix_export:
               name: 'Interface {#IFNAME}({#IFALIAS}): Inbound packets with errors'
               type: DEPENDENT
               key: 'net.if.in.errors[ifInErrors.{#SNMPINDEX}]'
-              delay: '0'
               description: |
                 MIB: IF-MIB
                 For packet-oriented interfaces, the number of inbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.  For character-oriented or fixed-length interfaces, the number of inbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
@@ -1083,8 +1017,6 @@ zabbix_export:
                     - '1.3.6.1.2.1.2.2.1.14.{#SNMPINDEX}'
                     - '0'
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 3m
@@ -1101,7 +1033,6 @@ zabbix_export:
               name: 'Interface {#IFNAME}({#IFALIAS}): Bits received'
               type: DEPENDENT
               key: 'net.if.in[ifHCInOctets.{#SNMPINDEX}]'
-              delay: '0'
               units: bps
               description: |
                 MIB: IF-MIB
@@ -1112,8 +1043,6 @@ zabbix_export:
                     - '1.3.6.1.2.1.31.1.1.1.6.{#SNMPINDEX}'
                     - '0'
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
                 - type: MULTIPLIER
                   parameters:
                     - '8'
@@ -1130,7 +1059,6 @@ zabbix_export:
               name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets discarded'
               type: DEPENDENT
               key: 'net.if.out.discards[ifOutDiscards.{#SNMPINDEX}]'
-              delay: '0'
               description: |
                 MIB: IF-MIB
                 The number of outbound packets which were chosen to be discarded
@@ -1144,8 +1072,6 @@ zabbix_export:
                     - '1.3.6.1.2.1.2.2.1.19.{#SNMPINDEX}'
                     - '0'
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 3m
@@ -1162,7 +1088,6 @@ zabbix_export:
               name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets with errors'
               type: DEPENDENT
               key: 'net.if.out.errors[ifOutErrors.{#SNMPINDEX}]'
-              delay: '0'
               description: |
                 MIB: IF-MIB
                 For packet-oriented interfaces, the number of outbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.  For character-oriented or fixed-length interfaces, the number of outbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
@@ -1172,8 +1097,6 @@ zabbix_export:
                     - '1.3.6.1.2.1.2.2.1.20.{#SNMPINDEX}'
                     - '0'
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 3m
@@ -1190,7 +1113,6 @@ zabbix_export:
               name: 'Interface {#IFNAME}({#IFALIAS}): Bits sent'
               type: DEPENDENT
               key: 'net.if.out[ifHCOutOctets.{#SNMPINDEX}]'
-              delay: '0'
               units: bps
               description: |
                 MIB: IF-MIB
@@ -1201,8 +1123,6 @@ zabbix_export:
                     - '1.3.6.1.2.1.31.1.1.1.10.{#SNMPINDEX}'
                     - '0'
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
                 - type: MULTIPLIER
                   parameters:
                     - '8'
@@ -1219,7 +1139,6 @@ zabbix_export:
               name: 'Interface {#IFNAME}({#IFALIAS}): Speed'
               type: DEPENDENT
               key: 'net.if.speed[ifHighSpeed.{#SNMPINDEX}]'
-              delay: '0'
               trends: '0'
               units: bps
               description: |
@@ -1251,7 +1170,6 @@ zabbix_export:
               name: 'Interface {#IFNAME}({#IFALIAS}): Operational status'
               type: DEPENDENT
               key: 'net.if.status[ifOperStatus.{#SNMPINDEX}]'
-              delay: '0'
               trends: '0'
               description: |
                 MIB: IF-MIB
@@ -1301,7 +1219,6 @@ zabbix_export:
               name: 'Interface {#IFNAME}({#IFALIAS}): Interface type'
               type: DEPENDENT
               key: 'net.if.type[ifType.{#SNMPINDEX}]'
-              delay: '0'
               trends: '0'
               description: |
                 MIB: IF-MIB
@@ -1471,26 +1388,21 @@ zabbix_export:
           name: 'EtherLike-MIB Discovery'
           type: DEPENDENT
           key: net.if.duplex.discovery
-          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#IFOPERSTATUS}'
                 value: '1'
-                formulaid: A
               - macro: '{#SNMPVALUE}'
                 value: (2|3)
-                formulaid: B
               - macro: '{#SNMPVALUE}'
                 operator: EXISTS
-                formulaid: C
           description: 'Discovering interfaces from IF-MIB and EtherLike-MIB. Interfaces with `up(1)` Operational Status are discovered.'
           item_prototypes:
             - uuid: cc55ecff67a044b3a6cd17136757fc32
               name: 'Interface {#IFNAME}({#IFALIAS}): Duplex status'
               type: DEPENDENT
               key: 'net.if.duplex[dot3StatsDuplexStatus.{#SNMPINDEX}]'
-              delay: '0'
               description: |
                 MIB: EtherLike-MIB
                 The current mode of operation of the MAC entity. `unknown` indicates that the current duplex mode could not be determined.
@@ -1550,24 +1462,20 @@ zabbix_export:
           name: 'Block devices discovery'
           type: DEPENDENT
           key: 'vfs.dev.discovery[snmp]'
-          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#DEVNAME}'
                 value: '{$VFS.DEV.DEVNAME.MATCHES}'
-                formulaid: A
               - macro: '{#DEVNAME}'
                 value: '{$VFS.DEV.DEVNAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
           description: 'Block devices are discovered from UCD-DISKIO-MIB::diskIOTable (http://net-snmp.sourceforge.net/docs/mibs/ucdDiskIOMIB.html#diskIOTable)'
           item_prototypes:
             - uuid: b136adad88154c31a123b46522b41191
               name: '{#DEVNAME}: Disk read rate'
               type: DEPENDENT
               key: 'vfs.dev.read.rate[diskIOReads.{#SNMPINDEX}]'
-              delay: '0'
               value_type: FLOAT
               units: '!r/s'
               description: |
@@ -1579,8 +1487,6 @@ zabbix_export:
                     - '1.3.6.1.4.1.2021.13.15.1.1.5.{#SNMPINDEX}'
                     - '0'
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               master_item:
                 key: vfs.dev.walk
               tags:
@@ -1592,7 +1498,6 @@ zabbix_export:
               name: '{#DEVNAME}: Disk utilization'
               type: DEPENDENT
               key: 'vfs.dev.util[diskIOLA1.{#SNMPINDEX}]'
-              delay: '0'
               value_type: FLOAT
               units: '%'
               description: |
@@ -1614,7 +1519,6 @@ zabbix_export:
               name: '{#DEVNAME}: Disk write rate'
               type: DEPENDENT
               key: 'vfs.dev.write.rate[diskIOWrites.{#SNMPINDEX}]'
-              delay: '0'
               value_type: FLOAT
               units: '!w/s'
               description: |
@@ -1626,8 +1530,6 @@ zabbix_export:
                     - '1.3.6.1.4.1.2021.13.15.1.1.6.{#SNMPINDEX}'
                     - '0'
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               master_item:
                 key: vfs.dev.walk
               tags:
@@ -1664,31 +1566,25 @@ zabbix_export:
           name: 'Mounted filesystem discovery'
           type: DEPENDENT
           key: 'vfs.fs.discovery[snmp]'
-          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#FSDEVICE}'
                 value: '{$VFS.FS.FSDEVICE.MATCHES}'
-                formulaid: A
               - macro: '{#FSDEVICE}'
                 value: '{$VFS.FS.FSDEVICE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
               - macro: '{#FSNAME}'
                 value: '{$VFS.FS.FSNAME.MATCHES}'
-                formulaid: C
               - macro: '{#FSNAME}'
                 value: '{$VFS.FS.FSNAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: D
           description: 'UCD-SNMP-MIB::dskEntry table discovery with storage filter'
           item_prototypes:
             - uuid: eb734d1738e24cbaaacf48fe1396e0f0
               name: 'FS [{#FSNAME}]: Space: Available'
               type: DEPENDENT
               key: 'vfs.fs.free[dskAvail.{#SNMPINDEX}]'
-              delay: '0'
               value_type: FLOAT
               units: B
               description: |
@@ -1718,7 +1614,6 @@ zabbix_export:
               name: 'FS [{#FSNAME}]: Inodes: Free, in %'
               type: DEPENDENT
               key: 'vfs.fs.inode.pfree[{#SNMPINDEX}]'
-              delay: '0'
               value_type: FLOAT
               units: '%'
               description: |
@@ -1771,7 +1666,6 @@ zabbix_export:
               name: 'FS [{#FSNAME}]: Space: Used, in %'
               type: DEPENDENT
               key: 'vfs.fs.pused[{#SNMPINDEX}]'
-              delay: '0'
               value_type: FLOAT
               units: '%'
               description: |
@@ -1843,7 +1737,6 @@ zabbix_export:
               name: 'FS [{#FSNAME}]: Space: Total'
               type: DEPENDENT
               key: 'vfs.fs.total[dskTotal.{#SNMPINDEX}]'
-              delay: '0'
               value_type: FLOAT
               units: B
               description: |
@@ -1873,7 +1766,6 @@ zabbix_export:
               name: 'FS [{#FSNAME}]: Space: Used'
               type: DEPENDENT
               key: 'vfs.fs.used[dskUsed.{#SNMPINDEX}]'
-              delay: '0'
               value_type: FLOAT
               units: B
               description: |
@@ -1904,9 +1796,7 @@ zabbix_export:
               name: 'FS [{#FSNAME}]: Get data'
               type: DEPENDENT
               key: 'vfs.fs.walk.data[dskEntry.{#SNMPINDEX}]'
-              delay: '0'
               history: 1h
-              trends: '0'
               value_type: TEXT
               description: |
                 MIB: UCD-SNMP-MIB

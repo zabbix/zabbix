@@ -70,6 +70,7 @@ require_once dirname(__FILE__).'/dashboardWidgets/testDashboardGeomapWidgetScree
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardGraphPrototypeWidget.php';
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardGraphWidget.php';
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardGraphWidgetSelectedHosts.php';
+require_once dirname(__FILE__).'/dashboardWidgets/testDashboardHoneycombWidget.php';
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardHostAvailabilityWidget.php';
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardHostNavigatorWidget.php';
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardItemHistoryWidget.php';
@@ -160,6 +161,7 @@ require_once dirname(__FILE__).'/lld/testFormLowLevelDiscovery.php';
 require_once dirname(__FILE__).'/lld/testFormLowLevelDiscoveryOverrides.php';
 require_once dirname(__FILE__).'/lld/testFormTestLowLevelDiscovery.php';
 require_once dirname(__FILE__).'/lld/testInheritanceDiscoveryRule.php';
+require_once dirname(__FILE__).'/lld/testLowLevelDiscoveryDisabledObjects.php';
 require_once dirname(__FILE__).'/lld/testPageLowLevelDiscovery.php';
 
 // Macros.
@@ -401,6 +403,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testDashboardGraphPrototypeWidget');
 		$suite->addTestSuite('testDashboardGraphWidget');
 		$suite->addTestSuite('testDashboardGraphWidgetSelectedHosts');
+		$suite->addTestSuite('testDashboardHoneycombWidget');
 		$suite->addTestSuite('testDashboardHostAvailabilityWidget');
 		$suite->addTestSuite('testDashboardHostNavigatorWidget');
 		$suite->addTestSuite('testDashboardItemHistoryWidget');
@@ -491,6 +494,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormLowLevelDiscoveryOverrides');
 		$suite->addTestSuite('testFormTestLowLevelDiscovery');
 		$suite->addTestSuite('testInheritanceDiscoveryRule');
+		$suite->addTestSuite('testLowLevelDiscoveryDisabledObjects');
 		$suite->addTestSuite('testPageLowLevelDiscovery');
 
 		// Macros.
