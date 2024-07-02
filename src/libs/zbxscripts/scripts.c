@@ -277,7 +277,7 @@ out:
 			parsed_num, values_num, results_num);
 }
 
-void	zbx_remote_commans_prepare_to_send(struct zbx_json *json, zbx_uint64_t hostid, int config_timeout)
+void	zbx_remote_commands_prepare_to_send(struct zbx_json *json, zbx_uint64_t hostid, int config_timeout)
 {
 	zbx_hashset_iter_t	iter_comands;
 	zbx_rc_command_t	*command;
