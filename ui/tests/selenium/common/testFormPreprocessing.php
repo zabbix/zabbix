@@ -182,6 +182,10 @@ abstract class testFormPreprocessing extends CWebTest {
 
 	/*
 	 * Preprocessing validation data for Item and Item prototype.
+	 *
+	 * For easier navigation the comments are formated like this:
+	 * {Preprocessing step type} - {Preprocessting step name}.
+	 * Both, the type and the name are shown inside the Preprocessing step dropdown.
 	 */
 	public function getItemPreprocessingValidationData() {
 		return array_merge($this->getCommonPreprocessingValidationData(), [
@@ -514,6 +518,10 @@ abstract class testFormPreprocessing extends CWebTest {
 
 	/*
 	 * Preprocessing validation data for item, item prototype and LLD.
+	 *
+	 * For easier navigation the comments are formated like this:
+	 * {Preprocessing step type} - {Preprocessting step name}.
+	 * Both, the type and the name are shown inside the Preprocessing step dropdown.
 	 */
 	public static function getCommonPreprocessingValidationData() {
 		return [
@@ -820,6 +828,10 @@ abstract class testFormPreprocessing extends CWebTest {
 
 	/*
 	 * Preprocessing data for item and item prototype successful creation.
+	 *
+	 * For easier navigation the comments are formated like this:
+	 * {Preprocessing step type} - {Preprocessting step name}.
+	 * Both, the type and the name are shown inside the Preprocessing step dropdown.
 	 */
 	public static function getItemPreprocessingCreateData() {
 		return [
