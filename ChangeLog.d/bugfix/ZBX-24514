@@ -1,0 +1,1 @@
+.......PS. [ZBX-24514] fixed standalone Zabbix server and Zabbix proxy not stopping when database is read only (vso)
