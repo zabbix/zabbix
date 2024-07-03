@@ -3148,7 +3148,7 @@ abstract class testFormPreprocessing extends CWebTest {
 
 	public static function getCustomOnFailValidationData() {
 		$cases = [
-			// #0 'Set value to' validation.
+			// Custom on fail - Set value to.
 			[
 				'expected' => TEST_GOOD,
 				'fields' => [
@@ -3160,7 +3160,6 @@ abstract class testFormPreprocessing extends CWebTest {
 					'error_handler_params' => ''
 				]
 			],
-			// #1
 			[
 				'expected' => TEST_GOOD,
 				'fields' => [
@@ -3172,7 +3171,6 @@ abstract class testFormPreprocessing extends CWebTest {
 					'error_handler_params' => '500'
 				]
 			],
-			// #2
 			[
 				'expected' => TEST_GOOD,
 				'fields' => [
@@ -3184,7 +3182,6 @@ abstract class testFormPreprocessing extends CWebTest {
 					'error_handler_params' => 'String'
 				]
 			],
-			// #3
 			[
 				'expected' => TEST_GOOD,
 				'fields' => [
@@ -3196,7 +3193,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'error_handler_params' => '!@#$%^&*()_+<>,.\/'
 				]
 			],
-			// #4 'Set error to' validation.
+			// Custom on fail - Set error to.
 			[
 				'expected' => TEST_BAD,
 				'fields' => [
@@ -3209,7 +3206,6 @@ abstract class testFormPreprocessing extends CWebTest {
 				],
 				'error' => 'Invalid parameter "/1/preprocessing/1/error_handler_params": cannot be empty.'
 			],
-			// #5
 			[
 				'expected' => TEST_GOOD,
 				'fields' => [
@@ -3221,7 +3217,6 @@ abstract class testFormPreprocessing extends CWebTest {
 					'error_handler_params' => 'Test error'
 				]
 			],
-			// #6
 			[
 				'expected' => TEST_GOOD,
 				'fields' => [
@@ -3233,7 +3228,6 @@ abstract class testFormPreprocessing extends CWebTest {
 					'error_handler_params' => '999'
 				]
 			],
-			// #7
 			[
 				'expected' => TEST_GOOD,
 				'fields' => [
