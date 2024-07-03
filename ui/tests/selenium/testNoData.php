@@ -15,7 +15,7 @@
 
 
 require_once dirname(__FILE__).'/../include/CWebTest.php';
-require_once dirname(__FILE__).'/behaviors/CTableBehavior.php';
+require_once dirname(__FILE__).'/common/testMultiselectDialogs.php';
 
 /**
  * Test for checking empty pages, overlays and tables.
@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/behaviors/CTableBehavior.php';
  *
  * @backup profiles, hstgrp, scripts
  */
-class testNoData extends CWebTest {
+class testNoData extends testMultiselectDialogs {
 
 	const EMPTY_HOST = 'Empty host for multiselects test';
 	const EMPTY_LLD_HOST = 'Host with empty LLD';
@@ -125,12 +125,12 @@ class testNoData extends CWebTest {
 			'Trigger' => [
 				'field' => 'New triggers',
 				'title' => 'Triggers',
-				'filter' => 'Host'
+				'filter' => ['Host' => '']
 			],
 			'Host' => [
 				'field' => 'Host',
 				'title' => 'Hosts',
-				'filter' => 'Host group'
+				'filter' => ['Host group' => '']
 			]
 		];
 
@@ -141,14 +141,10 @@ class testNoData extends CWebTest {
 			// Checked field should be empty.
 			$this->assertEquals('', $field->getValue());
 
-			// Open overlay dialog.
-			$field->query('button:Select')->one()->waitUntilClickable()->click();
-			$overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();
-
-			// Check filter label and overlay empty stud.
-			$this->assertEquals($parameters['filter'], $overlay->query('tag:label')->one()->getText());
-			$this->checkEmptyOverlay($overlay, $parameters['title'], '');
-			$overlay->close();
+			// Check overlay dialog.
+			$this->checkMultiselectDialogs($form, [[$parameters['field'] => $parameters['title']]],
+					true, true, $parameters['filter']
+			);
 		}
 	}
 
@@ -160,12 +156,16 @@ class testNoData extends CWebTest {
 					'url' => 'zabbix.php?action=action.list&filter_rst=1&eventsource=0',
 					'tabs' => [
 						'Action' => [
-							'Conditions' => ['Trigger', 'Host', 'Template']
+							'Conditions' => [
+								'Trigger' => ['multiselect' => 'Triggers', 'filter' => 'Host'],
+								'Host' => ['multiselect' => 'Hosts', 'filter' => 'Host group'],
+								'Template'  => ['multiselect' => 'Templates', 'filter' => 'Template group']
+							]
 						],
 						'Operations' => [
-							'Operations' => [self::SCRIPT],
-							'Recovery operations' => [self::SCRIPT],
-							'Update operations' => [self::SCRIPT]
+							'Operations' => [self::SCRIPT => ['multiselect' => 'Hosts', 'filter' => 'Host group']],
+							'Recovery operations' => [self::SCRIPT => ['multiselect' => 'Hosts', 'filter' => 'Host group']],
+							'Update operations' => [self::SCRIPT => ['multiselect' => 'Hosts', 'filter' => 'Host group']]
 						]
 					]
 				]
@@ -176,7 +176,7 @@ class testNoData extends CWebTest {
 					'url' => 'zabbix.php?action=action.list&filter_rst=1&eventsource=4',
 					'tabs' => [
 						'Action' => [
-							'Conditions' => ['Service']
+							'Conditions' => ['Service' => ['multiselect' => 'Services', 'filter' => 'Name']]
 						]
 					]
 				]
@@ -187,10 +187,14 @@ class testNoData extends CWebTest {
 					'url' => 'zabbix.php?action=action.list&filter_rst=1&eventsource=1',
 					'tabs' => [
 						'Action' => [
-							'Conditions' => ['Proxy']
+							'Conditions' => ['Proxy' => ['multiselect' => 'Proxy']]
 						],
 						'Operations' => [
-							'Operations' => ['Link template', 'Unlink template', self::SCRIPT]
+							'Operations' => [
+								'Link template' => ['multiselect' => 'Templates', 'filter' => 'Template group'],
+								'Unlink template' => ['multiselect' => 'Templates', 'filter' => 'Template group'],
+								self::SCRIPT => ['multiselect' => 'Hosts', 'filter' => 'Host group']
+							]
 						]
 					]
 				]
@@ -201,10 +205,14 @@ class testNoData extends CWebTest {
 					'url' => 'zabbix.php?action=action.list&filter_rst=1&eventsource=2',
 					'tabs' => [
 						'Action' => [
-							'Conditions' => ['Proxy']
+							'Conditions' => ['Proxy' => ['multiselect' => 'Proxy']]
 						],
 						'Operations' => [
-							'Operations' => ['Link template', 'Unlink template', self::SCRIPT]
+							'Operations' => [
+								'Link template' => ['multiselect' => 'Templates', 'filter' => 'Template group'],
+								'Unlink template' => ['multiselect' => 'Templates', 'filter' => 'Template group'],
+								self::SCRIPT => ['multiselect' => 'Hosts', 'filter' => 'Host group']
+							]
 						]
 					]
 				]
@@ -215,7 +223,10 @@ class testNoData extends CWebTest {
 					'url' => 'zabbix.php?action=action.list&filter_rst=1&eventsource=3',
 					'tabs' => [
 						'Action' => [
-							'Conditions' => ['Host', 'Template']
+							'Conditions' => [
+								'Host' => ['multiselect' => 'Hosts', 'filter' => 'Host group'],
+								'Template'  => ['multiselect' => 'Templates', 'filter' => 'Template group']
+							]
 						]
 					]
 				]
@@ -242,7 +253,7 @@ class testNoData extends CWebTest {
 				$dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
 
 				// Open Conditions, Operations, Recovery or Update overlays one by one and fill corresponding options.
-				foreach ($options as $option) {
+				foreach ($options as $option => $parameters) {
 					$fields = ($field === 'Conditions')
 						? ['Type' => $option]
 						: ['Operation' => $option];
@@ -251,30 +262,15 @@ class testNoData extends CWebTest {
 					$dialog->waitUntilReady();
 					$condition_form = $dialog->query('xpath:.//form')->one()->asForm();
 
-					// Checked multselect field depend on filled option.
-					switch ($option) {
-						case self::SCRIPT:
-							$checked_field = 'Hosts';
-							break;
-
-						case 'Proxy':
-							$checked_field = 'Proxy';
-							break;
-
-						case 'Link template':
-						case 'Unlink template':
-							$checked_field = 'Templates';
-							break;
-
-						default:
-							$checked_field = $option.'s';
-					}
-
 					// Open overlay for testing.
-					$condition_form->getFieldContainer($checked_field)->query('button:Select')->one()->waitUntilClickable()->click();
-					$checked_overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();
-					$this->checkEmptyOverlay($checked_overlay, ($option === 'Proxy' ? 'Proxies' : $checked_field), '');
-					$checked_overlay->close();
+					$title = $parameters['multiselect'] === 'Proxy' ? 'Proxies' : $parameters['multiselect'];
+					$filter = (CTestArrayHelper::get($parameters, 'filter'))
+						? [$parameters['filter'] => '']
+						: null;
+
+					$this->checkMultiselectDialogs($condition_form, [[$parameters['multiselect'] => $title]],
+						true, true, $filter
+					);
 				}
 				$dialog->close();
 			}
@@ -887,35 +883,35 @@ class testNoData extends CWebTest {
 		COverlayDialogElement::closeAll(true);
 	}
 
-	/**
-	 * Function for testing opened overlay's title and contents.
-	 *
-	 * @param COverlayDialogElement    $overlay    tested overlay
-	 * @param string                   $title      title of tested overlay
-	 * @param string                   $filter     hostname selected in overlay filter
-	 */
-	protected function checkEmptyOverlay($overlay, $title, $filter = null) {
-		$this->assertEquals($title, $overlay->waitUntilReady()->getTitle());
-
-		// For SLA overlays filter is not multiselect, but input.
-		$filter_selector = (in_array($title, ['SLA', 'Service', 'Services']))
-			? $overlay->query('id:services-filter-name')
-			: $overlay->query('xpath:.//div[@class="multiselect-control"]')->asMultiselect();
-
-		// There are overlays where additional filter exists, and there are some - where it shouldn't exist.
-		if (in_array($title, ['Proxies', 'Proxy groups', 'Value mapping', 'Discovery rules', 'SLA', 'Item prototypes'])) {
-			$this->assertFalse($filter_selector->exists());
-		}
-		else {
-			$this->assertEquals($filter, $filter_selector->one()->getValue());
-		}
-
-		$text = (in_array($title, ['Templates', 'Hosts', 'Triggers']))
-			? "Filter is not set\nUse the filter to display results"
-			: 'No data found';
-		$this->assertEquals($text, $overlay->query('class:no-data-message')->one()->getText());
-
-		// Check that opened dialog does not contain any error messages.
-		$this->assertFalse($overlay->query('xpath:.//*[contains(@class, "msg-bad")]')->exists());
-	}
+//	/**
+//	 * Function for testing opened overlay's title and contents.
+//	 *
+//	 * @param COverlayDialogElement    $overlay    tested overlay
+//	 * @param string                   $title      title of tested overlay
+//	 * @param string                   $filter     hostname selected in overlay filter
+//	 */
+//	protected function checkEmptyOverlay($overlay, $title, $filter = null) {
+//		$this->assertEquals($title, $overlay->waitUntilReady()->getTitle());
+//
+//		// For SLA overlays filter is not multiselect, but input.
+//		$filter_selector = (in_array($title, ['SLA', 'Service', 'Services']))
+//			? $overlay->query('id:services-filter-name')
+//			: $overlay->query('xpath:.//div[@class="multiselect-control"]')->asMultiselect();
+//
+//		// There are overlays where additional filter exists, and there are some - where it shouldn't exist.
+//		if (in_array($title, ['Proxies', 'Proxy groups', 'Value mapping', 'Discovery rules', 'SLA', 'Item prototypes'])) {
+//			$this->assertFalse($filter_selector->exists());
+//		}
+//		else {
+//			$this->assertEquals($filter, $filter_selector->one()->getValue());
+//		}
+//
+//		$text = (in_array($title, ['Templates', 'Hosts', 'Triggers']))
+//			? "Filter is not set\nUse the filter to display results"
+//			: 'No data found';
+//		$this->assertEquals($text, $overlay->query('class:no-data-message')->one()->getText());
+//
+//		// Check that opened dialog does not contain any error messages.
+//		$this->assertFalse($overlay->query('xpath:.//*[contains(@class, "msg-bad")]')->exists());
+//	}
 }
