@@ -951,35 +951,37 @@ window.widget_svggraph_form = new class {
 		fields.override_hostid = this.#resolveOverrideHostId();
 		fields.time_period = this.#resolveTimePeriod(fields.time_period);
 
-		for (const [dataset_key, dataset] of Object.entries(fields.ds)) {
-			if (dataset.dataset_type != '<?= CWidgetFieldDataSet::DATASET_TYPE_SINGLE_ITEM ?>') {
-				continue;
-			}
+		if (fields.ds !== undefined) {
+			for (const [dataset_key, dataset] of Object.entries(fields.ds)) {
+				if (dataset.dataset_type != '<?= CWidgetFieldDataSet::DATASET_TYPE_SINGLE_ITEM ?>') {
+					continue;
+				}
 
-			const dataset_new = {
-				...dataset,
-				itemids: [],
-				color: []
-			};
+				const dataset_new = {
+					...dataset,
+					itemids: [],
+					color: []
+				};
 
-			for (const [item_index, itemid] of dataset.itemids.entries()) {
-				if (itemid === '0') {
-					const resolved_itemid = this.#resolveWidget(dataset.references[item_index]);
+				for (const [item_index, itemid] of dataset.itemids.entries()) {
+					if (itemid === '0') {
+						const resolved_itemid = this.#resolveWidget(dataset.references[item_index]);
 
-					if (resolved_itemid !== null) {
-						dataset_new.itemids.push(resolved_itemid);
+						if (resolved_itemid !== null) {
+							dataset_new.itemids.push(resolved_itemid);
+							dataset_new.color.push(dataset.color[item_index]);
+						}
+					}
+					else {
+						dataset_new.itemids.push(itemid);
 						dataset_new.color.push(dataset.color[item_index]);
 					}
 				}
-				else {
-					dataset_new.itemids.push(itemid);
-					dataset_new.color.push(dataset.color[item_index]);
-				}
+
+				delete dataset_new.references;
+
+				fields.ds[dataset_key] = dataset_new;
 			}
-
-			delete dataset_new.references;
-
-			fields.ds[dataset_key] = dataset_new;
 		}
 
 		const data = {
