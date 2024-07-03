@@ -143,16 +143,16 @@ class CWidgetFieldDataSet extends CWidgetField {
 					}
 				}
 
-				$validation_rules_by_type['fields']['itemids']['flags'] |= API_REQUIRED;
-				$validation_rules_by_type['fields']['references']['flags'] |= API_REQUIRED;
+				$validation_rules_by_type['fields']['itemids']['flags'] = API_REQUIRED;
+				$validation_rules_by_type['fields']['references']['flags'] = API_REQUIRED;
 				$validation_rules_by_type['fields']['color']['type'] = API_COLORS;
 				$validation_rules_by_type['fields']['type']['flags'] |= API_REQUIRED;
 
 				unset($data['hosts'], $data['items']);
 			}
 			else {
-				$validation_rules_by_type['fields']['hosts']['flags'] |= API_REQUIRED;
-				$validation_rules_by_type['fields']['items']['flags'] |= API_REQUIRED;
+				$validation_rules_by_type['fields']['hosts']['flags'] = API_REQUIRED;
+				$validation_rules_by_type['fields']['items']['flags'] = API_REQUIRED;
 
 				unset($data['itemids'], $data['type'], $data['references']);
 			}

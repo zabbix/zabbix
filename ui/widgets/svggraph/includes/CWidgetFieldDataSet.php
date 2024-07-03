@@ -157,15 +157,15 @@ class CWidgetFieldDataSet extends CWidgetField {
 			$validation_rules_by_type = $validation_rules;
 
 			if ($data['dataset_type'] == self::DATASET_TYPE_SINGLE_ITEM) {
-				$validation_rules_by_type['fields']['itemids']['flags'] |= API_REQUIRED;
-				$validation_rules_by_type['fields']['references']['flags'] |= API_REQUIRED;
+				$validation_rules_by_type['fields']['itemids']['flags'] = API_REQUIRED;
+				$validation_rules_by_type['fields']['references']['flags'] = API_REQUIRED;
 				$validation_rules_by_type['fields']['color']['type'] = API_COLORS;
 
 				unset($data['hosts'], $data['items']);
 			}
 			else {
-				$validation_rules_by_type['fields']['hosts']['flags'] |= API_REQUIRED;
-				$validation_rules_by_type['fields']['items']['flags'] |= API_REQUIRED;
+				$validation_rules_by_type['fields']['hosts']['flags'] = API_REQUIRED;
+				$validation_rules_by_type['fields']['items']['flags'] = API_REQUIRED;
 
 				unset($data['itemids'], $data['references']);
 			}
