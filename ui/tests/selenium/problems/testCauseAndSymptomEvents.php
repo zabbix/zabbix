@@ -36,6 +36,9 @@ class testCauseAndSymptomEvents extends CWebTest {
 
 	protected static $groupids;
 	protected static $triggerids;
+	const COLLAPSE_XPATH = 'xpath:.//button[(@title="Collapse")]';
+	const EXPAND_XPATH = 'xpath:.//button[(@title="Expand")]';
+	const SYMPTOM_XPATH = 'xpath:.//span[(@title="Symptom")]';
 
 	public function prepareData() {
 		// Create hostgroups for hosts.
@@ -127,7 +130,7 @@ class testCauseAndSymptomEvents extends CWebTest {
 
 		$this->page->navigateBack();
 		$this->checkState(true);
-		$table->getRow(0)->query('xpath:.//button[(@title="Expand")]')->one()->click();
+		$table->getRow(0)->query(self::EXPAND_XPATH)->one()->click();
 		$this->checkState();
 
 		// Check 'Event details' rank value for 'Symptom' event and possibility to navigate to 'Cause' event.
@@ -142,9 +145,9 @@ class testCauseAndSymptomEvents extends CWebTest {
 		// Check collapsed and expanded state via clicking on corresponded buttons.
 		$this->page->login()->open('zabbix.php?action=problem.view');
 		$this->checkState(true);
-		$table->getRow(0)->query('xpath:.//button[(@title="Expand")]')->one()->click();
+		$table->getRow(0)->query(self::EXPAND_XPATH)->one()->click();
 		$this->checkState();
-		$table->getRow(0)->query('xpath:.//button[(@title="Collapse")]')->one()->click();
+		$table->getRow(0)->query(self::COLLAPSE_XPATH)->one()->click();
 		$this->checkState(true);
 	}
 
@@ -156,14 +159,14 @@ class testCauseAndSymptomEvents extends CWebTest {
 
 		if ($collapsed) {
 			// Check collapsed state.
-			$this->assertTrue($table->getRow(0)->query('xpath:.//button[(@title="Expand")]')->one()->isVisible());
-			$this->assertFalse($table->getRow(0)->query('xpath:.//button[(@title="Collapse")]')->exists());
+			$this->assertTrue($table->getRow(0)->query(self::EXPAND_XPATH)->one()->isVisible());
+			$this->assertFalse($table->getRow(0)->query(self::COLLAPSE_XPATH)->exists());
 		}
 		else {
 			// Check expanded state.
-			$this->assertTrue($table->getRow(0)->query('xpath:.//button[(@title="Collapse")]')->one()->isVisible());
-			$this->assertFalse($table->getRow(0)->query('xpath:.//button[(@title="Expand")]')->exists());
-			$this->assertTrue($table->getRow(1)->query('xpath:.//span[(@title="Symptom")]')->one()->isVisible());
+			$this->assertTrue($table->getRow(0)->query(self::COLLAPSE_XPATH)->one()->isVisible());
+			$this->assertFalse($table->getRow(0)->query(self::EXPAND_XPATH)->exists());
+			$this->assertTrue($table->getRow(1)->query(self::SYMPTOM_XPATH)->one()->isVisible());
 		}
 	}
 
@@ -224,17 +227,17 @@ class testCauseAndSymptomEvents extends CWebTest {
 				'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags'], $table->getHeadersText()
 		);
 
-		$symptom_xpath = 'xpath:.//span[(@title="Symptom")]';
+//		$symptom_xpath = 'xpath:.//span[(@title="Symptom")]';
 
 		// For Cause problem arrow icon is not present at all.
-		$this->assertFalse($table->getRow(0)->query($symptom_xpath)->exists());
+		$this->assertFalse($table->getRow(0)->query(self::SYMPTOM_XPATH)->exists());
 
 		// For both cases Symptom arrow icon is not visible for the collapsed problem.
-		$this->assertFalse($table->getRow(1)->query($symptom_xpath)->one()->isVisible());
+		$this->assertFalse($table->getRow(1)->query(self::SYMPTOM_XPATH)->one()->isVisible());
 
 		// When Symptom is present in the table it is marked with Symptom arrow icon.
 		if ($data['fields']['Show symptoms']) {
-			$this->assertTrue($table->getRow(2)->query($symptom_xpath)->one()->isVisible());
+			$this->assertTrue($table->getRow(2)->query(self::SYMPTOM_XPATH)->one()->isVisible());
 		}
 	}
 }
