@@ -28,7 +28,6 @@ zabbix_export:
           key: sharepoint.get_dir
           delay: '{$SHAREPOINT.GET_INTERVAL}'
           history: '0'
-          trends: '0'
           value_type: TEXT
           params: |
             try {
@@ -151,7 +150,6 @@ zabbix_export:
           name: 'Get directory structure: Status'
           type: DEPENDENT
           key: sharepoint.get_dir.status
-          delay: '0'
           description: 'HTTP response (status) code. Indicates whether the HTTP request was successfully completed. Additional information is available in the server log file.'
           valuemap:
             name: 'HTTP response status code'
@@ -184,7 +182,6 @@ zabbix_export:
           name: 'Get directory structure: Exec time'
           type: DEPENDENT
           key: sharepoint.get_dir.time
-          delay: '0'
           units: '!ms'
           description: 'The time taken to execute the script for obtaining the data structure (in ms). Less is better.'
           preprocessing:
@@ -326,31 +323,24 @@ zabbix_export:
             conditions:
               - macro: '{#SHAREPOINT.LLD.FULL_PATH}'
                 value: '{$SHAREPOINT.LLD.FILTER.FULL_PATH.MATCHES}'
-                formulaid: A
               - macro: '{#SHAREPOINT.LLD.FULL_PATH}'
                 value: '{$SHAREPOINT.LLD.FILTER.FULL_PATH.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
               - macro: '{#SHAREPOINT.LLD.NAME}'
                 value: '{$SHAREPOINT.LLD.FILTER.NAME.MATCHES}'
-                formulaid: C
               - macro: '{#SHAREPOINT.LLD.NAME}'
                 value: '{$SHAREPOINT.LLD.FILTER.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: D
               - macro: '{#SHAREPOINT.LLD.TYPE}'
                 value: '{$SHAREPOINT.LLD.FILTER.TYPE.MATCHES}'
-                formulaid: E
               - macro: '{#SHAREPOINT.LLD.TYPE}'
                 value: '{$SHAREPOINT.LLD.FILTER.TYPE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: F
           item_prototypes:
             - uuid: 337493ed37424be98abd4c0550279a0b
               name: 'Created ({#SHAREPOINT.LLD.FULL_PATH})'
               type: DEPENDENT
               key: 'sharepoint.created["{#SHAREPOINT.LLD.FULL_PATH}"]'
-              delay: '0'
               units: unixtime
               description: |
                 Date of creation:
@@ -374,7 +364,6 @@ zabbix_export:
               name: 'Modified ({#SHAREPOINT.LLD.FULL_PATH})'
               type: DEPENDENT
               key: 'sharepoint.modified["{#SHAREPOINT.LLD.FULL_PATH}"]'
-              delay: '0'
               units: unixtime
               description: |
                 Date of change:
@@ -409,7 +398,6 @@ zabbix_export:
               name: 'Size ({#SHAREPOINT.LLD.FULL_PATH})'
               type: DEPENDENT
               key: 'sharepoint.size["{#SHAREPOINT.LLD.FULL_PATH}"]'
-              delay: '0'
               units: B
               description: |
                 Size of:
