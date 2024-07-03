@@ -4898,6 +4898,15 @@ form.dashboard-widget-piechart {
     padding: 5px 5px 5px 10px; }
   form.dashboard-widget-piechart .single-item-table tbody:not(:empty) + tfoot td {
     padding-top: 0; }
+  form.dashboard-widget-piechart .single-item-table .reference-hint {
+    margin-right: 4px; }
+    form.dashboard-widget-piechart .single-item-table .reference-hint::before {
+      font-size: 16px;
+      color: #4796c4; }
+  form.dashboard-widget-piechart .single-item-table .unavailable-widget .reference-hint::before {
+    color: #525252; }
+  form.dashboard-widget-piechart .single-item-table .unavailable-widget a {
+    color: #525252; }
   form.dashboard-widget-piechart .no-items-message {
     display: none;
     line-height: 24px;
@@ -5025,7 +5034,7 @@ form.dashboard-widget-svggraph .single-item-table tfoot td {
 form.dashboard-widget-svggraph .single-item-table tbody:not(:empty) + tfoot td {
   padding-top: 0; }
 form.dashboard-widget-svggraph .single-item-table .reference-hint {
-  margin-right: 3px; }
+  margin-right: 4px; }
   form.dashboard-widget-svggraph .single-item-table .reference-hint::before {
     font-size: 16px;
     color: #4796c4; }

@@ -470,9 +470,8 @@ window.widget_svggraph_form = new class {
 				multiselect: 1,
 				with_webitems: 1,
 				real_hosts: 1,
-				resolve_macros: 1,
-				dialogue_class: 'modal-popup-generic'
-			});
+				resolve_macros: 1
+			}, {dialogue_class: 'modal-popup-generic'});
 		}
 		else {
 			PopUp('popup.generic', {
@@ -485,9 +484,8 @@ window.widget_svggraph_form = new class {
 				multiselect: 1,
 				with_webitems: 1,
 				hostid: this._templateid,
-				hide_host_filter: 1,
-				dialogue_class: 'modal-popup-generic'
-			});
+				hide_host_filter: 1
+			}, {dialogue_class: 'modal-popup-generic'});
 		}
 	}
 
@@ -503,12 +501,11 @@ window.widget_svggraph_form = new class {
 		if (itemid_input.value !== '0') {
 			const excludeids = [];
 
-			dataset.querySelectorAll('.single-item-table-row input[name$="[itemids][]"]')
-				.forEach(input => {
-					if (input.value !== '0') {
-						excludeids.push(input.value);
-					}
-				});
+			for (const input of dataset.querySelectorAll('.single-item-table-row input[name$="[itemids][]"]')) {
+				if (input.value !== '0') {
+					excludeids.push(input.value);
+				}
+			}
 
 			if (this._templateid === null) {
 				PopUp('popup.generic', {
@@ -523,9 +520,8 @@ window.widget_svggraph_form = new class {
 					with_webitems: 1,
 					real_hosts: 1,
 					resolve_macros: 1,
-					dialogue_class: 'modal-popup-generic',
 					excludeids
-				});
+				}, {dialogue_class: 'modal-popup-generic'});
 			}
 			else {
 				PopUp('popup.generic', {
@@ -540,20 +536,18 @@ window.widget_svggraph_form = new class {
 					with_webitems: 1,
 					hostid: this._templateid,
 					hide_host_filter: 1,
-					dialogue_class: 'modal-popup-generic',
 					excludeids
-				});
+				}, {dialogue_class: 'modal-popup-generic'});
 			}
 		}
 		else {
 			const exclude_typed_references = [];
 
-			dataset.querySelectorAll('.single-item-table-row input[name$="[references][]"]')
-				.forEach(input => {
-					if (input.value !== '') {
-						exclude_typed_references.push(input.value);
-					}
-				});
+			for (const input of dataset.querySelectorAll('.single-item-table-row input[name$="[references][]"]')) {
+				if (input.value !== '') {
+					exclude_typed_references.push(input.value);
+				}
+			}
 
 			this._selectWidget(row, exclude_typed_references);
 		}
