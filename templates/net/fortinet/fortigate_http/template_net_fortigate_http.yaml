@@ -34,9 +34,6 @@ zabbix_export:
           name: 'API availability status'
           type: DEPENDENT
           key: fgate.api.status
-          delay: '0'
-          history: 7d
-          trends: 90d
           description: 'Checking API availability by response.'
           valuemap:
             name: 'Service state'
@@ -75,9 +72,6 @@ zabbix_export:
           name: 'Number of CPUs'
           type: DEPENDENT
           key: fgate.cpu.num
-          delay: '0'
-          history: 7d
-          trends: 90d
           description: 'Number of processors according to the current license.'
           preprocessing:
             - type: JSONPATH
@@ -95,9 +89,6 @@ zabbix_export:
           name: 'CPU utilization'
           type: DEPENDENT
           key: fgate.cpu.util
-          delay: '0'
-          history: 7d
-          trends: 90d
           value_type: FLOAT
           units: '%'
           description: 'CPU utilization, expressed in %.'
@@ -138,9 +129,6 @@ zabbix_export:
           name: 'Device firmware version'
           type: DEPENDENT
           key: fgate.device.firmware
-          delay: '0'
-          history: 7d
-          trends: '0'
           value_type: CHAR
           description: 'Current version of the device firmware.'
           preprocessing:
@@ -164,9 +152,6 @@ zabbix_export:
           name: 'Available firmware versions'
           type: DEPENDENT
           key: fgate.device.firmwares_avail
-          delay: '0'
-          history: 7d
-          trends: 90d
           description: 'Number of available firmware versions to download.'
           preprocessing:
             - type: JSONPATH
@@ -200,9 +185,6 @@ zabbix_export:
           name: 'Device model name'
           type: DEPENDENT
           key: fgate.device.model
-          delay: '0'
-          history: 7d
-          trends: '0'
           value_type: CHAR
           description: 'The model name of the device.'
           preprocessing:
@@ -226,9 +208,6 @@ zabbix_export:
           name: 'Device serial number'
           type: DEPENDENT
           key: fgate.device.serialnumber
-          delay: '0'
-          history: 7d
-          trends: '0'
           value_type: CHAR
           description: 'The device serial number.'
           preprocessing:
@@ -260,9 +239,6 @@ zabbix_export:
           name: 'Current VDOM'
           type: DEPENDENT
           key: fgate.device.vdom
-          delay: '0'
-          history: 7d
-          trends: '0'
           value_type: CHAR
           description: 'Name of the current Virtual Domain.'
           preprocessing:
@@ -281,9 +257,6 @@ zabbix_export:
           name: 'Device firmware info item errors'
           type: DEPENDENT
           key: fgate.firmware.data_errors
-          delay: '0'
-          history: 7d
-          trends: '0'
           value_type: TEXT
           description: 'Item for gathering errors of the device firmware info.'
           preprocessing:
@@ -315,7 +288,6 @@ zabbix_export:
           type: HTTP_AGENT
           key: fgate.firmware.get_data
           history: '0'
-          trends: '0'
           value_type: TEXT
           description: 'Item for gathering device firmware info from FortiGate API.'
           preprocessing:
@@ -337,9 +309,6 @@ zabbix_export:
           name: 'Free disk space'
           type: DEPENDENT
           key: fgate.fs.free
-          delay: '0'
-          history: 7d
-          trends: 90d
           units: B
           description: 'The free space of the current disk, in bytes.'
           preprocessing:
@@ -355,9 +324,6 @@ zabbix_export:
           name: 'Total disk space'
           type: DEPENDENT
           key: fgate.fs.total
-          delay: '0'
-          history: 7d
-          trends: 90d
           units: B
           description: 'The total space of the current disk, in bytes.'
           preprocessing:
@@ -376,9 +342,6 @@ zabbix_export:
           name: 'Used disk space'
           type: DEPENDENT
           key: fgate.fs.used
-          delay: '0'
-          history: 7d
-          trends: 90d
           units: B
           description: 'The used space of the current disk, in bytes.'
           preprocessing:
@@ -394,9 +357,6 @@ zabbix_export:
           name: 'Disk utilization'
           type: DEPENDENT
           key: fgate.fs.util
-          delay: '0'
-          history: 7d
-          trends: 90d
           value_type: FLOAT
           units: '%'
           description: 'Disk utilization, expressed in %.'
@@ -439,9 +399,6 @@ zabbix_export:
           name: 'Firewall data item errors'
           type: DEPENDENT
           key: fgate.fwp.data_errors
-          delay: '0'
-          history: 7d
-          trends: '0'
           value_type: TEXT
           description: 'Item for gathering errors of firewall policies.'
           preprocessing:
@@ -473,7 +430,6 @@ zabbix_export:
           type: SCRIPT
           key: fgate.fwp.get_data
           history: '0'
-          trends: '0'
           value_type: TEXT
           params: |
             var params = JSON.parse(value),
@@ -585,9 +541,6 @@ zabbix_export:
           name: 'Total memory'
           type: DEPENDENT
           key: fgate.memory.total
-          delay: '0'
-          history: 7d
-          trends: 90d
           units: B
           description: 'Total memory, expressed in bytes.'
           preprocessing:
@@ -606,9 +559,6 @@ zabbix_export:
           name: 'Memory utilization'
           type: DEPENDENT
           key: fgate.memory.util
-          delay: '0'
-          history: 7d
-          trends: 90d
           value_type: FLOAT
           units: '%'
           description: 'Memory utilization, expressed in %.'
@@ -653,9 +603,6 @@ zabbix_export:
           name: 'System name'
           type: DEPENDENT
           key: fgate.name
-          delay: '0'
-          history: 7d
-          trends: '0'
           value_type: CHAR
           description: 'The system host name.'
           preprocessing:
@@ -687,9 +634,6 @@ zabbix_export:
           name: 'Device interfaces item errors'
           type: DEPENDENT
           key: fgate.netif.data_errors
-          delay: '0'
-          history: 7d
-          trends: '0'
           value_type: TEXT
           description: 'Item for gathering errors of network interfaces.'
           preprocessing:
@@ -721,7 +665,6 @@ zabbix_export:
           type: SCRIPT
           key: fgate.netif.get_data
           history: '0'
-          trends: '0'
           value_type: TEXT
           params: |
             var params = JSON.parse(value),
@@ -837,9 +780,6 @@ zabbix_export:
           name: 'Device resources item errors'
           type: DEPENDENT
           key: fgate.resources.data_errors
-          delay: '0'
-          history: 7d
-          trends: '0'
           value_type: TEXT
           description: 'Item for gathering errors of the device resources.'
           preprocessing:
@@ -871,7 +811,6 @@ zabbix_export:
           type: SCRIPT
           key: fgate.resources.get_data
           history: '0'
-          trends: '0'
           value_type: TEXT
           params: |
             var params = JSON.parse(value),
@@ -979,9 +918,6 @@ zabbix_export:
           name: 'Get SD-WAN item errors'
           type: DEPENDENT
           key: fgate.sdwan.data_errors
-          delay: '0'
-          history: 7d
-          trends: '0'
           value_type: TEXT
           description: 'Item for gathering errors of SD-WAN.'
           preprocessing:
@@ -1013,7 +949,6 @@ zabbix_export:
           type: SCRIPT
           key: fgate.sdwan.get_data
           history: '0'
-          trends: '0'
           value_type: TEXT
           params: |
             var params = JSON.parse(value),
@@ -1165,9 +1100,6 @@ zabbix_export:
           name: 'Service licenses item errors'
           type: DEPENDENT
           key: fgate.service.data_errors
-          delay: '0'
-          history: 7d
-          trends: '0'
           value_type: TEXT
           description: 'Item for gathering errors of the service licenses data.'
           preprocessing:
@@ -1199,7 +1131,6 @@ zabbix_export:
           type: SCRIPT
           key: fgate.service.get_data
           history: '0'
-          trends: '0'
           value_type: TEXT
           params: |
             var params = JSON.parse(value),
@@ -1326,9 +1257,6 @@ zabbix_export:
           name: 'Device system info item errors'
           type: DEPENDENT
           key: fgate.system.data_errors
-          delay: '0'
-          history: 7d
-          trends: '0'
           value_type: TEXT
           description: 'Item for gathering errors of the device system info.'
           preprocessing:
@@ -1360,7 +1288,6 @@ zabbix_export:
           type: HTTP_AGENT
           key: fgate.system.get_data
           history: '0'
-          trends: '0'
           value_type: TEXT
           description: 'Item for gathering device system info from FortiGate API.'
           preprocessing:
@@ -1382,9 +1309,6 @@ zabbix_export:
           name: 'System uptime'
           type: DEPENDENT
           key: fgate.uptime
-          delay: '0'
-          history: 7d
-          trends: 90d
           units: uptime
           description: 'The system uptime is calculated on the basis of boot time.'
           preprocessing:
@@ -1414,8 +1338,6 @@ zabbix_export:
           name: 'Check port availability'
           type: SIMPLE
           key: 'net.tcp.service["{$FGATE.SCHEME}","{$FGATE.API.FQDN}","{$FGATE.API.PORT}"]'
-          history: 7d
-          trends: 90d
           valuemap:
             name: 'Service state'
           preprocessing:
@@ -1441,40 +1363,30 @@ zabbix_export:
           name: 'Firewall policies discovery'
           type: DEPENDENT
           key: fgate.fwp.discovery
-          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#FWACTION}'
                 value: '{$FWP.FWACTION.MATCHES}'
-                formulaid: A
               - macro: '{#FWACTION}'
                 value: '{$FWP.FWACTION.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
               - macro: '{#FWNAME}'
                 value: '{$FWP.FWNAME.MATCHES}'
-                formulaid: C
               - macro: '{#FWNAME}'
                 value: '{$FWP.FWNAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: D
               - macro: '{#FWTYPE}'
                 value: '{$FWP.FWTYPE.MATCHES}'
-                formulaid: E
               - macro: '{#FWTYPE}'
                 value: '{$FWP.FWTYPE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: F
           description: 'Discovery for FortiGate firewall policies.'
           item_prototypes:
             - uuid: 19b27ab621a1417f86ddbd52d93f6c55
               name: 'FW Policy [{#FWNAME}]: Action'
               type: DEPENDENT
               key: 'fgate.fwp.action[{#FWUUID}]'
-              delay: '0'
-              history: 7d
-              trends: 90d
               description: 'The firewall policy action (accept / deny / ipsec).'
               valuemap:
                 name: 'Firewall policy action'
@@ -1505,9 +1417,6 @@ zabbix_export:
               name: 'FW Policy [{#FWNAME}]: Total bytes processed'
               type: DEPENDENT
               key: 'fgate.fwp.bytes[{#FWUUID}]'
-              delay: '0'
-              history: 7d
-              trends: 90d
               units: B
               description: 'Number of bytes processed by both the software and hardware (ASIC) firewall.'
               preprocessing:
@@ -1515,8 +1424,6 @@ zabbix_export:
                   parameters:
                     - $.bytes
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               master_item:
                 key: 'fgate.fwp.get_data[{#FWUUID}]'
               tags:
@@ -1528,9 +1435,7 @@ zabbix_export:
               name: 'FW Policy [{#FWNAME}]: Get data'
               type: DEPENDENT
               key: 'fgate.fwp.get_data[{#FWUUID}]'
-              delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
               description: 'Item for gathering data for the {#FWNAME} firewall policy.'
               preprocessing:
@@ -1549,9 +1454,6 @@ zabbix_export:
               name: 'FW Policy [{#FWNAME}]: Hits into the policy'
               type: DEPENDENT
               key: 'fgate.fwp.hits[{#FWUUID}]'
-              delay: '0'
-              history: 7d
-              trends: 90d
               description: 'Number of packets hit into the firewall policy per second.'
               preprocessing:
                 - type: JSONPATH
@@ -1560,8 +1462,6 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               master_item:
                 key: 'fgate.fwp.get_data[{#FWUUID}]'
               tags:
@@ -1573,9 +1473,6 @@ zabbix_export:
               name: 'FW Policy [{#FWNAME}]: Hardware processed bytes'
               type: DEPENDENT
               key: 'fgate.fwp.hw_bytes[{#FWUUID}]'
-              delay: '0'
-              history: 7d
-              trends: 90d
               units: B
               description: 'Number of bytes processed only by the hardware (ASIC) firewall.'
               preprocessing:
@@ -1583,8 +1480,6 @@ zabbix_export:
                   parameters:
                     - $.asic_bytes
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               master_item:
                 key: 'fgate.fwp.get_data[{#FWUUID}]'
               tags:
@@ -1596,9 +1491,6 @@ zabbix_export:
               name: 'FW Policy [{#FWNAME}]: Last using time'
               type: DEPENDENT
               key: 'fgate.fwp.last_used[{#FWUUID}]'
-              delay: '0'
-              history: 7d
-              trends: 90d
               units: unixtime
               description: 'The time at which the firewall policy was used the last time.'
               preprocessing:
@@ -1617,9 +1509,6 @@ zabbix_export:
               name: 'FW Policy [{#FWNAME}]: Active sessions'
               type: DEPENDENT
               key: 'fgate.fwp.sessions[{#FWUUID}]'
-              delay: '0'
-              history: 7d
-              trends: 90d
               description: 'Number of active sessions covered by this rule.'
               preprocessing:
                 - type: JSONPATH
@@ -1636,9 +1525,6 @@ zabbix_export:
               name: 'FW Policy [{#FWNAME}]: Status'
               type: DEPENDENT
               key: 'fgate.fwp.status[{#FWUUID}]'
-              delay: '0'
-              history: 7d
-              trends: 90d
               description: 'The firewall policy status.'
               valuemap:
                 name: 'Firewall policy status'
@@ -1668,9 +1554,6 @@ zabbix_export:
               name: 'FW Policy [{#FWNAME}]: Software processed bytes'
               type: DEPENDENT
               key: 'fgate.fwp.sw_bytes[{#FWUUID}]'
-              delay: '0'
-              history: 7d
-              trends: 90d
               units: B
               description: 'Number of bytes processed only by the software firewall.'
               preprocessing:
@@ -1678,8 +1561,6 @@ zabbix_export:
                   parameters:
                     - $.software_bytes
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               master_item:
                 key: 'fgate.fwp.get_data[{#FWUUID}]'
               tags:
@@ -1748,54 +1629,41 @@ zabbix_export:
           name: 'Network interfaces discovery'
           type: DEPENDENT
           key: fgate.netif.discovery
-          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#IFALIAS}'
                 value: '{$NET.IF.IFALIAS.MATCHES}'
-                formulaid: A
               - macro: '{#IFALIAS}'
                 value: '{$NET.IF.IFALIAS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
               - macro: '{#IFDESCR}'
                 value: '{$NET.IF.IFDESCR.MATCHES}'
-                formulaid: C
               - macro: '{#IFDESCR}'
                 value: '{$NET.IF.IFDESCR.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: D
               - macro: '{#IFNAME}'
                 value: '{$NET.IF.IFNAME.MATCHES}'
-                formulaid: E
               - macro: '{#IFNAME}'
                 value: '{$NET.IF.IFNAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: F
               - macro: '{#IFSTATUS}'
                 value: '{$NET.IF.IFSTATUS.MATCHES}'
-                formulaid: G
               - macro: '{#IFSTATUS}'
                 value: '{$NET.IF.IFSTATUS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: H
               - macro: '{#IFTYPE}'
                 value: '{$NET.IF.IFTYPE.MATCHES}'
-                formulaid: I
               - macro: '{#IFTYPE}'
                 value: '{$NET.IF.IFTYPE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: J
           description: 'Discovery for FortiGate network interfaces.'
           item_prototypes:
             - uuid: afb2dec9321a4eb1821b366c5219ce60
               name: 'Interface [{#IFNAME}({#IFALIAS})]: Get data'
               type: DEPENDENT
               key: 'fgate.netif.get_data[{#IFKEY}]'
-              delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
               description: 'Item for gathering data for the {#IFKEY} interface.'
               preprocessing:
@@ -1816,9 +1684,6 @@ zabbix_export:
               name: 'Interface [{#IFNAME}({#IFALIAS})]: Bits received'
               type: DEPENDENT
               key: 'fgate.netif.in[{#IFKEY}]'
-              delay: '0'
-              history: 7d
-              trends: 90d
               units: bps
               description: 'The total number of octets received on the interface per second.'
               preprocessing:
@@ -1828,8 +1693,6 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
                 - type: MULTIPLIER
                   parameters:
                     - '8'
@@ -1846,9 +1709,6 @@ zabbix_export:
               name: 'Interface [{#IFNAME}({#IFALIAS})]: Inbound packets with errors'
               type: DEPENDENT
               key: 'fgate.netif.in_errors[{#IFKEY}]'
-              delay: '0'
-              history: 7d
-              trends: 90d
               description: 'The total number of errors received.'
               preprocessing:
                 - type: JSONPATH
@@ -1857,8 +1717,6 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               master_item:
                 key: 'fgate.netif.get_data[{#IFKEY}]'
               tags:
@@ -1892,9 +1750,6 @@ zabbix_export:
               name: 'Interface [{#IFNAME}({#IFALIAS})]: Inbound packets'
               type: DEPENDENT
               key: 'fgate.netif.in_packets[{#IFKEY}]'
-              delay: '0'
-              history: 7d
-              trends: 90d
               description: 'The total number of packets received on the interface per second.'
               preprocessing:
                 - type: JSONPATH
@@ -1903,8 +1758,6 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               master_item:
                 key: 'fgate.netif.get_data[{#IFKEY}]'
               tags:
@@ -1918,9 +1771,6 @@ zabbix_export:
               name: 'Interface [{#IFNAME}({#IFALIAS})]: Bits sent'
               type: DEPENDENT
               key: 'fgate.netif.out[{#IFKEY}]'
-              delay: '0'
-              history: 7d
-              trends: 90d
               units: bps
               description: 'The total number of octets transmitted out of the interface.'
               preprocessing:
@@ -1930,8 +1780,6 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
                 - type: MULTIPLIER
                   parameters:
                     - '8'
@@ -1948,9 +1796,6 @@ zabbix_export:
               name: 'Interface [{#IFNAME}({#IFALIAS})]: Outbound packets with errors'
               type: DEPENDENT
               key: 'fgate.netif.out_errors[{#IFKEY}]'
-              delay: '0'
-              history: 7d
-              trends: 90d
               description: 'The total number of errors transmitted.'
               preprocessing:
                 - type: JSONPATH
@@ -1959,8 +1804,6 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               master_item:
                 key: 'fgate.netif.get_data[{#IFKEY}]'
               tags:
@@ -1974,9 +1817,6 @@ zabbix_export:
               name: 'Interface [{#IFNAME}({#IFALIAS})]: Outbound packets'
               type: DEPENDENT
               key: 'fgate.netif.out_packets[{#IFKEY}]'
-              delay: '0'
-              history: 7d
-              trends: 90d
               description: 'The total number of packets transmitted out of the interface per second.'
               preprocessing:
                 - type: JSONPATH
@@ -1985,8 +1825,6 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               master_item:
                 key: 'fgate.netif.get_data[{#IFKEY}]'
               tags:
@@ -2000,9 +1838,6 @@ zabbix_export:
               name: 'Interface [{#IFNAME}({#IFALIAS})]: Speed'
               type: DEPENDENT
               key: 'fgate.netif.speed[{#IFKEY}]'
-              delay: '0'
-              history: 7d
-              trends: 90d
               units: bps
               description: 'Speed of the interface.'
               preprocessing:
@@ -2030,9 +1865,6 @@ zabbix_export:
               name: 'Interface [{#IFNAME}({#IFALIAS})]: Link status'
               type: DEPENDENT
               key: 'fgate.netif.status[{#IFKEY}]'
-              delay: '0'
-              history: 7d
-              trends: 90d
               description: 'Current link status of the interface.'
               valuemap:
                 name: 'Link state'
@@ -2041,8 +1873,6 @@ zabbix_export:
                   parameters:
                     - $.link
                 - type: BOOL_TO_DECIMAL
-                  parameters:
-                    - ''
               master_item:
                 key: 'fgate.netif.get_data[{#IFKEY}]'
               tags:
@@ -2075,9 +1905,6 @@ zabbix_export:
               name: 'Interface [{#IFNAME}({#IFALIAS})]: Interface type'
               type: DEPENDENT
               key: 'fgate.netif.type[{#IFKEY}]'
-              delay: '0'
-              history: 7d
-              trends: 90d
               description: 'Type of the interface.'
               valuemap:
                 name: 'Interface type'
@@ -2229,47 +2056,36 @@ zabbix_export:
           name: 'SD-WAN health-checks discovery'
           type: DEPENDENT
           key: fgate.sdwan_health.discovery
-          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#IFNAME}'
                 value: '{$SDWAN.HEALTH.IFNAME.MATCHES}'
-                formulaid: A
               - macro: '{#IFNAME}'
                 value: '{$SDWAN.HEALTH.IFNAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
               - macro: '{#MID}'
                 value: '{$SDWAN.HEALTH.ID.MATCHES}'
-                formulaid: C
               - macro: '{#MID}'
                 value: '{$SDWAN.HEALTH.ID.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: D
               - macro: '{#NAME}'
                 value: '{$SDWAN.HEALTH.NAME.MATCHES}'
-                formulaid: E
               - macro: '{#NAME}'
                 value: '{$SDWAN.HEALTH.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: F
               - macro: '{#STATUS}'
                 value: '{$SDWAN.HEALTH.STATUS.MATCHES}'
-                formulaid: G
               - macro: '{#STATUS}'
                 value: '{$SDWAN.HEALTH.STATUS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: H
           description: 'Discovery for FortiGate SD-WAN health-checks.'
           item_prototypes:
             - uuid: 292228d1456f41b094b36edc2e22d24e
               name: 'SD-WAN [{#NAME}]:[{#IFNAME}]: Get data'
               type: DEPENDENT
               key: 'fgate.sdwan_health.get_data["{#HID}.{#MID}"]'
-              delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
               description: 'Item for gathering data about the {#IFNAME} interface in the {#NAME} health-check.'
               preprocessing:
@@ -2290,9 +2106,6 @@ zabbix_export:
               name: 'SD-WAN [{#NAME}]:[{#IFNAME}]: Jitter'
               type: DEPENDENT
               key: 'fgate.sdwan_health.jitter["{#HID}.{#MID}"]'
-              delay: '0'
-              history: 7d
-              trends: 90d
               value_type: FLOAT
               description: 'Current jitter value for the {#IFNAME} interface in the {#NAME} health-check.'
               preprocessing:
@@ -2313,9 +2126,6 @@ zabbix_export:
               name: 'SD-WAN [{#NAME}]:[{#IFNAME}]: Latency'
               type: DEPENDENT
               key: 'fgate.sdwan_health.latency["{#HID}.{#MID}"]'
-              delay: '0'
-              history: 7d
-              trends: 90d
               value_type: FLOAT
               units: ms
               description: 'Current latency value for the {#IFNAME} interface in the {#NAME} health-check.'
@@ -2337,9 +2147,6 @@ zabbix_export:
               name: 'SD-WAN [{#NAME}]:[{#IFNAME}]: Packets loss'
               type: DEPENDENT
               key: 'fgate.sdwan_health.loss["{#HID}.{#MID}"]'
-              delay: '0'
-              history: 7d
-              trends: 90d
               value_type: FLOAT
               units: '%'
               description: 'Percent of lost packets for the {#IFNAME} interface in the {#NAME} health-check.'
@@ -2371,9 +2178,6 @@ zabbix_export:
               name: 'SD-WAN [{#NAME}]:[{#IFNAME}]: Packets received per second'
               type: DEPENDENT
               key: 'fgate.sdwan_health.received["{#HID}.{#MID}"]'
-              delay: '0'
-              history: 7d
-              trends: 90d
               value_type: FLOAT
               description: 'Number of packets received from the {#IFNAME} interface in the {#NAME} health-check per second.'
               preprocessing:
@@ -2382,8 +2186,6 @@ zabbix_export:
                     - $.packet_received
                   error_handler: DISCARD_VALUE
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               master_item:
                 key: 'fgate.sdwan_health.get_data["{#HID}.{#MID}"]'
               tags:
@@ -2397,9 +2199,6 @@ zabbix_export:
               name: 'SD-WAN [{#NAME}]:[{#IFNAME}]: Packets sent per second'
               type: DEPENDENT
               key: 'fgate.sdwan_health.sent["{#HID}.{#MID}"]'
-              delay: '0'
-              history: 7d
-              trends: 90d
               value_type: FLOAT
               description: 'Number of packets sent through the {#IFNAME} interface in the {#NAME} health-check per second.'
               preprocessing:
@@ -2408,8 +2207,6 @@ zabbix_export:
                     - $.packet_sent
                   error_handler: DISCARD_VALUE
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               master_item:
                 key: 'fgate.sdwan_health.get_data["{#HID}.{#MID}"]'
               tags:
@@ -2423,9 +2220,6 @@ zabbix_export:
               name: 'SD-WAN [{#NAME}]:[{#IFNAME}]: Interface status'
               type: DEPENDENT
               key: 'fgate.sdwan_health.status["{#HID}.{#MID}"]'
-              delay: '0'
-              history: 7d
-              trends: 90d
               description: 'Current status of the {#IFNAME} interface in the {#NAME} health-check.'
               valuemap:
                 name: 'Interface status'
@@ -2545,47 +2339,36 @@ zabbix_export:
           name: 'SD-WAN members discovery'
           type: DEPENDENT
           key: fgate.sdwan_member.discovery
-          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#ID}'
                 value: '{$SDWAN.MEMBER.ID.MATCHES}'
-                formulaid: A
               - macro: '{#ID}'
                 value: '{$SDWAN.MEMBER.ID.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
               - macro: '{#NAME}'
                 value: '{$SDWAN.MEMBER.NAME.MATCHES}'
-                formulaid: C
               - macro: '{#NAME}'
                 value: '{$SDWAN.MEMBER.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: D
               - macro: '{#STATUS}'
                 value: '{$SDWAN.MEMBER.STATUS.MATCHES}'
-                formulaid: E
               - macro: '{#STATUS}'
                 value: '{$SDWAN.MEMBER.STATUS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: F
               - macro: '{#ZONE}'
                 value: '{$SDWAN.MEMBER.ZONE.MATCHES}'
-                formulaid: G
               - macro: '{#ZONE}'
                 value: '{$SDWAN.MEMBER.ZONE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: H
           description: 'Discovery for FortiGate SD-WAN members.'
           item_prototypes:
             - uuid: 376cf1ce322a4de5af3f86323f411b46
               name: 'SD-WAN [{#ZONE}]:[{#NAME}]: Get data'
               type: DEPENDENT
               key: 'fgate.sdwan_member.get_data[{#ID}]'
-              delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
               description: 'Item for gathering data about the {#NAME} interface in the {#ZONE} zone.'
               preprocessing:
@@ -2606,9 +2389,6 @@ zabbix_export:
               name: 'SD-WAN [{#ZONE}]:[{#NAME}]: Link status'
               type: DEPENDENT
               key: 'fgate.sdwan_member.link_status[{#ID}]'
-              delay: '0'
-              history: 7d
-              trends: 90d
               description: 'Current link status of the {#NAME} interface in the {#ZONE} zone.'
               valuemap:
                 name: 'Interface status'
@@ -2657,9 +2437,6 @@ zabbix_export:
               name: 'SD-WAN [{#ZONE}]:[{#NAME}]: Input bandwidth'
               type: DEPENDENT
               key: 'fgate.sdwan_member.rx_bandwidth[{#ID}]'
-              delay: '0'
-              history: 7d
-              trends: 90d
               value_type: FLOAT
               units: Bps
               description: 'Receiving bandwidth of the {#NAME} interface in the {#ZONE} zone.'
@@ -2670,8 +2447,6 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               master_item:
                 key: 'fgate.sdwan_member.get_data[{#ID}]'
               tags:
@@ -2685,9 +2460,6 @@ zabbix_export:
               name: 'SD-WAN [{#ZONE}]:[{#NAME}]: Bytes received per second'
               type: DEPENDENT
               key: 'fgate.sdwan_member.rx_bytes[{#ID}]'
-              delay: '0'
-              history: 7d
-              trends: 90d
               value_type: FLOAT
               units: Bps
               description: 'Bytes received from the {#NAME} interface in the {#ZONE} zone per second.'
@@ -2698,8 +2470,6 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               master_item:
                 key: 'fgate.sdwan_member.get_data[{#ID}]'
               tags:
@@ -2713,9 +2483,6 @@ zabbix_export:
               name: 'SD-WAN [{#ZONE}]:[{#NAME}]: Sessions'
               type: DEPENDENT
               key: 'fgate.sdwan_member.sessions[{#ID}]'
-              delay: '0'
-              history: 7d
-              trends: 90d
               description: 'Number of active sessions opened through the {#NAME} interface in the {#ZONE} zone.'
               preprocessing:
                 - type: JSONPATH
@@ -2734,9 +2501,6 @@ zabbix_export:
               name: 'SD-WAN [{#ZONE}]:[{#NAME}]: Member status'
               type: DEPENDENT
               key: 'fgate.sdwan_member.status[{#ID}]'
-              delay: '0'
-              history: 7d
-              trends: 90d
               description: 'Current status of the {#NAME} interface in the {#ZONE} zone.'
               valuemap:
                 name: 'Service status'
@@ -2768,9 +2532,6 @@ zabbix_export:
               name: 'SD-WAN [{#ZONE}]:[{#NAME}]: Output bandwidth'
               type: DEPENDENT
               key: 'fgate.sdwan_member.tx_bandwidth[{#ID}]'
-              delay: '0'
-              history: 7d
-              trends: 90d
               value_type: FLOAT
               units: Bps
               description: 'Transmitting bandwidth of the {#NAME} interface in the {#ZONE} zone.'
@@ -2781,8 +2542,6 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               master_item:
                 key: 'fgate.sdwan_member.get_data[{#ID}]'
               tags:
@@ -2796,9 +2555,6 @@ zabbix_export:
               name: 'SD-WAN [{#ZONE}]:[{#NAME}]: Bytes sent per second'
               type: DEPENDENT
               key: 'fgate.sdwan_member.tx_bytes[{#ID}]'
-              delay: '0'
-              history: 7d
-              trends: 90d
               value_type: FLOAT
               units: Bps
               description: 'Bytes sent through the {#NAME} interface in the {#ZONE} zone per second.'
@@ -2809,8 +2565,6 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               master_item:
                 key: 'fgate.sdwan_member.get_data[{#ID}]'
               tags:
@@ -2824,9 +2578,6 @@ zabbix_export:
               name: 'SD-WAN [{#ZONE}]:[{#NAME}]: State changing time'
               type: DEPENDENT
               key: 'fgate.service.state_changed[{#ID}]'
-              delay: '0'
-              history: 7d
-              trends: 90d
               units: unixtime
               description: 'Last state changing time of the {#NAME} interface in the {#ZONE} zone.'
               preprocessing:
@@ -2895,40 +2646,30 @@ zabbix_export:
           name: 'Service discovery'
           type: DEPENDENT
           key: fgate.service.discovery
-          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#KEY}'
                 value: '{$SERVICE.KEY.MATCHES}'
-                formulaid: A
               - macro: '{#KEY}'
                 value: '{$SERVICE.KEY.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
               - macro: '{#STATUS}'
                 value: '{$SERVICE.STATUS.MATCHES}'
-                formulaid: C
               - macro: '{#STATUS}'
                 value: '{$SERVICE.STATUS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: D
               - macro: '{#TYPE}'
                 value: '{$SERVICE.TYPE.MATCHES}'
-                formulaid: E
               - macro: '{#TYPE}'
                 value: '{$SERVICE.TYPE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: F
           description: 'Discovery for FortiGate services.'
           item_prototypes:
             - uuid: c759d226d28143da977879550e913d5e
               name: 'Service [{#NAME}]: Expiration date'
               type: DEPENDENT
               key: 'fgate.service.expire["{#KEY}"]'
-              delay: '0'
-              history: 7d
-              trends: 90d
               units: unixtime
               description: 'Expiration date for the license of the current service.'
               preprocessing:
@@ -2965,9 +2706,7 @@ zabbix_export:
               name: 'Service [{#NAME}]: Get data'
               type: DEPENDENT
               key: 'fgate.service.get_data["{#KEY}"]'
-              delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
               description: 'Item for gathering data about license for the {#NAME} service.'
               preprocessing:
@@ -2986,9 +2725,6 @@ zabbix_export:
               name: 'Service [{#NAME}]: License status'
               type: DEPENDENT
               key: 'fgate.service.license["{#KEY}"]'
-              delay: '0'
-              history: 7d
-              trends: 90d
               description: 'Current license status of the {#NAME} service.'
               valuemap:
                 name: 'License status'
@@ -3061,9 +2797,6 @@ zabbix_export:
               name: 'Service [{#NAME}]: Service type'
               type: DEPENDENT
               key: 'fgate.service.type["{#KEY}"]'
-              delay: '0'
-              history: 7d
-              trends: '0'
               value_type: CHAR
               description: 'Current type of the {#NAME} service.'
               preprocessing:
@@ -3085,9 +2818,6 @@ zabbix_export:
               name: 'Service [{#NAME}]: Last attempt to update'
               type: DEPENDENT
               key: 'fgate.service.update_attempt["{#KEY}"]'
-              delay: '0'
-              history: 7d
-              trends: 90d
               units: unixtime
               description: 'Last update attempt time of the current service.'
               preprocessing:
@@ -3109,9 +2839,6 @@ zabbix_export:
               name: 'Service [{#NAME}]: Update method'
               type: DEPENDENT
               key: 'fgate.service.update_method["{#KEY}"]'
-              delay: '0'
-              history: 7d
-              trends: '0'
               value_type: CHAR
               description: 'Current update method of the {#NAME} service.'
               preprocessing:
@@ -3133,9 +2860,6 @@ zabbix_export:
               name: 'Service [{#NAME}]: Update result'
               type: DEPENDENT
               key: 'fgate.service.update_result["{#KEY}"]'
-              delay: '0'
-              history: 7d
-              trends: '0'
               value_type: CHAR
               description: 'Last update result of the {#NAME} service.'
               preprocessing:
@@ -3157,9 +2881,6 @@ zabbix_export:
               name: 'Service [{#NAME}]: Last update time'
               type: DEPENDENT
               key: 'fgate.service.update_time["{#KEY}"]'
-              delay: '0'
-              history: 7d
-              trends: 90d
               units: unixtime
               description: 'Last update time of the current service.'
               preprocessing:
@@ -3181,9 +2902,6 @@ zabbix_export:
               name: 'Service [{#NAME}]: Service version'
               type: DEPENDENT
               key: 'fgate.service.version["{#KEY}"]'
-              delay: '0'
-              history: 7d
-              trends: '0'
               value_type: CHAR
               description: 'Current version of the {#NAME} service.'
               preprocessing:
@@ -3226,7 +2944,6 @@ zabbix_export:
                 conditions:
                   - macro: '{#TYPE}'
                     value: ^(cloud_service_status|platform|other)$
-                    formulaid: A
               operations:
                 - operationobject: ITEM_PROTOTYPE
                   operator: LIKE

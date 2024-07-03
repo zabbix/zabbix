@@ -2663,7 +2663,7 @@ class CDiscoveryRule extends CItemGeneral {
 			}
 			unset($override);
 
-			$item['overrides'] = $item['overrides'];
+			$item['overrides'] = array_values($item['overrides']);
 		}
 		unset($item);
 
@@ -3020,7 +3020,7 @@ class CDiscoveryRule extends CItemGeneral {
 			unset($lld_macro_path);
 		}
 
-		if (array_key_exists('filter', $item)) {
+		if (array_key_exists('filter', $item) && array_key_exists('conditions', $item['filter'])) {
 			foreach ($item['filter']['conditions'] as &$condition) {
 				unset($condition['item_conditionid']);
 			}
@@ -3031,7 +3031,7 @@ class CDiscoveryRule extends CItemGeneral {
 			foreach ($item['overrides'] as &$override) {
 				unset($override['lld_overrideid']);
 
-				if (array_key_exists('filter', $override)) {
+				if (array_key_exists('filter', $override) && array_key_exists('conditions', $override['filter'])) {
 					foreach ($override['filter']['conditions'] as &$condition) {
 						unset($condition['lld_override_conditionid']);
 					}

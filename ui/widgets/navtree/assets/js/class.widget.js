@@ -709,18 +709,25 @@ class CWidgetNavTree extends CWidget {
 			},
 			dataType: 'json',
 			success: (response) => {
+				let content = response.body;
+
+				if (response.error !== undefined) {
+					content = makeMessageBox('bad', response.error.messages, response.error.title, false)[0];
+				}
+
 				if (response.debug !== undefined) {
-					response.body += response.debug;
+					content += response.debug;
 				}
 
 				overlayDialogue({
 					'title': t('Edit tree element'),
 					'class': 'modal-popup',
-					'content': response.body,
+					'content': content,
 					'buttons': [
 						{
 							'title': item_edit ? t('Apply') : t('Add'),
 							'class': 'dialogue-widget-save',
+							'enabled': response.error === undefined,
 							'action': (overlay) => {
 								const form = document.getElementById('widget-dialogue-form');
 								const form_inputs = form.elements;

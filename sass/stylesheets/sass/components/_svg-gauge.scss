@@ -51,9 +51,40 @@
 		text-anchor: middle;
 	}
 
-	.svg-gauge-value,
-	.svg-gauge-units {
-		text-anchor: middle;
+	.svg-gauge-value-and-units {
+		text-align: center;
+		white-space: nowrap;
+		color: $font-color;
+
+		> div {
+			margin: auto;
+			overflow: hidden;
+			text-overflow: ellipsis;
+
+			.svg-gauge-value {
+				overflow: hidden;
+				text-overflow: ellipsis;
+			}
+		}
+	}
+
+	.svg-gauge-value-and-units-horizontal {
+		.svg-gauge-value,
+		.svg-gauge-units {
+			display: inline;
+		}
+
+		.svg-gauge-space {
+			display: inline-block;
+		}
+	}
+
+	.svg-gauge-value-and-units-vertical {
+		.svg-gauge-value,
+		.svg-gauge-units {
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
 	}
 
 	.svg-gauge-no-data {

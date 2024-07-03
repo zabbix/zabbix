@@ -1301,7 +1301,7 @@ static int	housekeeping_problems(int now, int config_max_hk_delete)
 	int			deleted = 0;
 	zbx_vector_uint64_t	ids_uint64;
 	size_t			sql_alloc = 0, sql_offset;
-	char			buffer[MAX_STRING_LEN], *sql = NULL;;
+	char			buffer[MAX_STRING_LEN], *sql = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() now:%d", __func__, now);
 
