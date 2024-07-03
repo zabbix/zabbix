@@ -588,7 +588,7 @@ int	DBget_proxy_lastaccess(const char *hostname, int *lastaccess, char **error)
 #ifdef HAVE_MYSQL
 static size_t	get_string_field_size(const ZBX_FIELD *field)
 {
-	switch(field->type)
+	switch (field->type)
 	{
 		case ZBX_TYPE_LONGTEXT:
 			return ZBX_SIZE_T_MAX;
@@ -606,7 +606,7 @@ static size_t	get_string_field_size(const ZBX_FIELD *field)
 #elif defined(HAVE_ORACLE)
 static size_t	get_string_field_size(const ZBX_FIELD *field)
 {
-	switch(field->type)
+	switch (field->type)
 	{
 		case ZBX_TYPE_LONGTEXT:
 		case ZBX_TYPE_TEXT:
@@ -882,9 +882,7 @@ zbx_uint64_t	DBget_maxid_num(const char *tablename, int num)
  ******************************************************************************/
 void	zbx_db_extract_version_info(struct zbx_db_version_info_t *version_info)
 {
-	DBconnect(ZBX_DB_CONNECT_NORMAL);
 	zbx_dbms_version_info_extract(version_info);
-	DBclose();
 }
 
 /******************************************************************************
@@ -898,14 +896,12 @@ void	zbx_db_extract_dbextension_info(struct zbx_db_version_info_t *version_info)
 	DB_RESULT	result;
 	DB_ROW		row;
 
-	DBconnect(ZBX_DB_CONNECT_NORMAL);
-
 	/* in case of major upgrade, db_extension may be missing */
 	if (FAIL == DBfield_exists("config", "db_extension"))
-		goto out;
+		return;
 
 	if (NULL == (result = DBselect("select db_extension from config")))
-		goto out;
+		return;
 
 	if (NULL == (row = DBfetch(result)) || '\0' == *row[0])
 		goto clean;
@@ -915,8 +911,6 @@ void	zbx_db_extract_dbextension_info(struct zbx_db_version_info_t *version_info)
 	zbx_tsdb_info_extract(version_info);
 clean:
 	DBfree_result(result);
-out:
-	DBclose();
 #else
 	ZBX_UNUSED(version_info);
 #endif
@@ -2728,7 +2722,6 @@ void	DBcheck_character_set(void)
 	DB_ROW		row;
 
 	database_name_esc = DBdyn_escape_string(CONFIG_DBNAME);
-	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 	result = DBselect(
 			"select default_character_set_name,default_collation_name"
@@ -2785,13 +2778,11 @@ void	DBcheck_character_set(void)
 	}
 
 	DBfree_result(result);
-	DBclose();
 	zbx_free(database_name_esc);
 #elif defined(HAVE_ORACLE)
 	DB_RESULT	result;
 	DB_ROW		row;
 
-	DBconnect(ZBX_DB_CONNECT_NORMAL);
 	result = DBselect(
 			"select parameter,value"
 			" from NLS_DATABASE_PARAMETERS"
@@ -2828,7 +2819,6 @@ void	DBcheck_character_set(void)
 	}
 
 	DBfree_result(result);
-	DBclose();
 #elif defined(HAVE_POSTGRESQL)
 #define OID_LENGTH_MAX		20
 
@@ -2838,7 +2828,6 @@ void	DBcheck_character_set(void)
 
 	database_name_esc = DBdyn_escape_string(CONFIG_DBNAME);
 
-	DBconnect(ZBX_DB_CONNECT_NORMAL);
 	result = DBselect(
 			"select pg_encoding_to_char(encoding)"
 			" from pg_database"
@@ -2927,7 +2916,6 @@ void	DBcheck_character_set(void)
 	}
 out:
 	DBfree_result(result);
-	DBclose();
 	zbx_free(database_name_esc);
 #endif
 }
@@ -3533,8 +3521,6 @@ int	zbx_db_get_database_type(void)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	DBconnect(ZBX_DB_CONNECT_NORMAL);
-
 	if (NULL == (result = DBselectN("select userid from users", 1)))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot select records from \"users\" table");
@@ -3554,8 +3540,6 @@ int	zbx_db_get_database_type(void)
 
 	DBfree_result(result);
 out:
-	DBclose();
-
 	switch (ret)
 	{
 		case ZBX_DB_SERVER:
@@ -4026,8 +4010,6 @@ int	zbx_db_check_instanceid(void)
 	DB_ROW		row;
 	int		ret = SUCCEED;
 
-	DBconnect(ZBX_DB_CONNECT_NORMAL);
-
 	result = DBselect("select configid,instanceid from config order by configid");
 	if (NULL != (row = DBfetch(result)))
 	{
@@ -4050,8 +4032,6 @@ int	zbx_db_check_instanceid(void)
 		ret = FAIL;
 	}
 	DBfree_result(result);
-
-	DBclose();
 
 	return ret;
 }
