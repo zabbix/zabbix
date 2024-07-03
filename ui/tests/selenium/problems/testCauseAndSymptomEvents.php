@@ -36,6 +36,7 @@ class testCauseAndSymptomEvents extends CWebTest {
 
 	protected static $groupids;
 	protected static $triggerids;
+	protected static $hostsids;
 	const COLLAPSE_XPATH = 'xpath:.//button[(@title="Collapse")]';
 	const EXPAND_XPATH = 'xpath:.//button[(@title="Expand")]';
 	const SYMPTOM_XPATH = 'xpath:.//span[(@title="Symptom")]';
@@ -48,7 +49,7 @@ class testCauseAndSymptomEvents extends CWebTest {
 		self::$groupids = CDataHelper::getIds('name');
 
 		// Create hosts and trapper items.
-		CDataHelper::createHosts([
+		self::$hostsids = CDataHelper::createHosts([
 			[
 				'host' => 'Host for Cause and Symptom check',
 				'interfaces' => [
@@ -72,6 +73,30 @@ class testCauseAndSymptomEvents extends CWebTest {
 						'value_type' => ITEM_VALUE_TYPE_FLOAT
 					]
 				]
+			],
+			[
+				'host' => 'Host for Cause and Symptom check2',
+				'interfaces' => [
+					[
+						'type' => INTERFACE_TYPE_AGENT,
+						'main' => INTERFACE_PRIMARY,
+						'useip' => INTERFACE_USE_IP,
+						'ip' => '127.0.7.1',
+						'dns' => '',
+						'port' => '10772'
+					]
+				],
+				'groups' => [
+					'groupid' => self::$groupids['Group for Cause and Symptom check']
+				],
+				'items' => [
+					[
+						'name' => 'Accumulated energy',
+						'key_' => 'trap',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_FLOAT
+					]
+				]
 			]
 		]);
 
@@ -83,8 +108,13 @@ class testCauseAndSymptomEvents extends CWebTest {
 				'priority' => TRIGGER_SEVERITY_WARNING
 			],
 			[
-				'description' => 'Problem trap>100 [Cause]',
+				'description' => 'Problem trap>150 [Cause]',
 				'expression' => 'last(/Host for Cause and Symptom check/trap)>150',
+				'priority' => TRIGGER_SEVERITY_DISASTER
+			],
+			[
+				'description' => 'Problem trap<100 [Cause2]',
+				'expression' => 'last(/Host for Cause and Symptom check2/trap)<100',
 				'priority' => TRIGGER_SEVERITY_DISASTER
 			]
 		]);
@@ -92,10 +122,11 @@ class testCauseAndSymptomEvents extends CWebTest {
 
 		// Create problems.
 		CDBHelper::setTriggerProblem('Problem trap>10 [Symptom]', TRIGGER_VALUE_TRUE);
-		CDBHelper::setTriggerProblem('Problem trap>100 [Cause]', TRIGGER_VALUE_TRUE);
+		CDBHelper::setTriggerProblem('Problem trap>150 [Cause]', TRIGGER_VALUE_TRUE);
+		CDBHelper::setTriggerProblem('Problem trap<100 [Cause2]', TRIGGER_VALUE_TRUE);
 
 		// Set cause and symptoms.
-		$causeid = CDBHelper::getValue('SELECT eventid FROM problem WHERE name='.zbx_dbstr('Problem trap>100 [Cause]'));
+		$causeid = CDBHelper::getValue('SELECT eventid FROM problem WHERE name='.zbx_dbstr('Problem trap>150 [Cause]'));
 		$symptomid = CDBHelper::getValue('SELECT eventid FROM problem WHERE name='.zbx_dbstr('Problem trap>10 [Symptom]'));
 		DBexecute('UPDATE problem SET cause_eventid='.$causeid.' WHERE name='.zbx_dbstr('Problem trap>10 [Symptom]'));
 		DBexecute('INSERT INTO event_symptom (eventid, cause_eventid) VALUES ('.$symptomid.','.$causeid.')');
@@ -103,16 +134,13 @@ class testCauseAndSymptomEvents extends CWebTest {
 	}
 
 	public function testCauseAndSymptomEvents_Layout() {
-		$this->page->login()->open('zabbix.php?action=problem.view');
-		$form = CFilterElement::find()->one()->getForm();
+		$this->page->login()->open('zabbix.php?action=problem.view&hostids[]='.
+				self::$hostsids['hostids']['Host for Cause and Symptom check']
+		);
 		$table = $this->query('class:list-table')->asTable()->waitUntilPresent()->one();
 
-		$form->fill(['Hosts' => 'Host for Cause and Symptom check']);
-		$form->submit();
-		$table->waitUntilReloaded();
-
 		$result = [
-			['Problem' => 'Problem trap>100 [Cause]'],
+			['Problem' => 'Problem trap>150 [Cause]'],
 			['Problem' => 'Problem trap>10 [Symptom]']
 		];
 		$this->assertTableData($result);
@@ -123,7 +151,7 @@ class testCauseAndSymptomEvents extends CWebTest {
 
 		// Check 'Event details' rank value for 'Cause' event.
 		$table->getRow(0)->query('xpath:.//a[contains(@href, "tr_events.php?triggerid='.
-				self::$triggerids['Problem trap>100 [Cause]'].'&eventid")]')->one()->click();
+				self::$triggerids['Problem trap>150 [Cause]'].'&eventid")]')->one()->click();
 		$this->page->waitUntilReady();
 		$event_table = $this->query('xpath://section[@id="hat_eventdetails"]')->asTable()->waitUntilPresent()->one();
 		$this->assertEquals('Cause', $event_table->getRow(7)->getColumn(1)->getText());
@@ -137,13 +165,15 @@ class testCauseAndSymptomEvents extends CWebTest {
 		$table->query('xpath:.//a[contains(@href, "tr_events.php?triggerid='.
 				self::$triggerids['Problem trap>10 [Symptom]'].'&eventid")]')->one()->click();
 		$this->page->waitUntilReady();
-		$this->assertEquals('Symptom (Problem trap>100 [Cause])', $event_table->getRow(7)->getColumn(1)->getText());
-		$this->assertTrue($event_table->query('link:Problem trap>100 [Cause]')->one()->isClickable());
-		$event_table->query('link:Problem trap>100 [Cause]')->one()->Click();
+		$this->assertEquals('Symptom (Problem trap>150 [Cause])', $event_table->getRow(7)->getColumn(1)->getText());
+		$this->assertTrue($event_table->query('link:Problem trap>150 [Cause]')->one()->isClickable());
+		$event_table->query('link:Problem trap>150 [Cause]')->one()->Click();
 		$this->assertEquals('Cause', $event_table->getRow(7)->getColumn(1)->getText());
 
 		// Check collapsed and expanded state via clicking on corresponded buttons.
-		$this->page->login()->open('zabbix.php?action=problem.view');
+		$this->page->open('zabbix.php?action=problem.view&hostids[]='.
+				self::$hostsids['hostids']['Host for Cause and Symptom check']
+		);
 		$this->checkState(true);
 		$table->getRow(0)->query(self::EXPAND_XPATH)->one()->click();
 		$this->checkState();
@@ -170,6 +200,98 @@ class testCauseAndSymptomEvents extends CWebTest {
 		}
 	}
 
+	public function getContextMenuData() {
+		return [
+			[
+				[
+					'locator' => 'Problem trap>150 [Cause]',
+					'options' => [
+						'Mark as cause' => 'menu-popup-item disabled',
+						'Mark selected as symptoms' => 'menu-popup-item disabled'
+					]
+				]
+			],
+			[
+				[
+					'symptom_to_cause' => true,
+					'locator' => 'Problem trap>10 [Symptom]',
+					'options' => [
+						'Mark as cause' => 'menu-popup-item',
+						'Mark selected as symptoms' => 'menu-popup-item disabled'
+					]
+				]
+			],
+			[
+				[
+					'cause_to_symptom' => true,
+					'locator' => 'Problem trap<100 [Cause2]',
+					'options' => [
+						'Mark as cause' => 'menu-popup-item disabled',
+						'Mark selected as symptoms' => 'menu-popup-item'
+					]
+				]
+			],
+			[
+				[
+					'cause_to_symptom' => true,
+					'locator' => 'Problem trap>10 [Symptom]',
+					'selected_events' => ['Problem trap>150 [Cause]', 'Problem trap>10 [Symptom]'],
+					'options' => [
+						'Mark as cause' => 'menu-popup-item',
+						'Mark selected as symptoms' => 'menu-popup-item'
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getContextMenuData
+	 */
+	public function testCauseAndSymptomEvents_ContextMenu($data) {
+		$this->page->login()->open('zabbix.php?action=problem.view&groupids[]='.self::$groupids['Group for Cause and Symptom check']);
+		$table = $this->query('class:list-table')->asTable()->waitUntilPresent()->one();
+
+		if (array_key_exists('symptom_to_cause', $data)) {
+			$table->query(self::EXPAND_XPATH)->one()->click();
+		}
+
+		if (array_key_exists('cause_to_symptom', $data)) {
+			$selected_events = CTestArrayHelper::get($data, 'selected_events', []);
+
+			if ($selected_events !== []) {
+				$table->query(self::EXPAND_XPATH)->one()->click();
+			}
+
+			$this->selectTableRows($selected_events, 'Problem');
+		}
+
+		$this->checkContextMenuLinks($data);
+	}
+
+	/**
+	 * Check context menu links.
+	 *
+	 * @param array $data	data provider with fields values
+	 */
+	protected function checkContextMenuLinks($data) {
+		$this->query('link', $data['locator'])->one()->waitUntilClickable()->click();
+		$context_menu = CPopupMenuElement::find()->waitUntilVisible()->one();
+		$this->assertTrue($context_menu->hasTitles(['VIEW', 'CONFIGURATION', 'PROBLEM']));
+
+		// Check that problem options are available in context menu.
+		$this->assertTrue($context_menu->hasItems(array_keys($data['options'])));
+
+		foreach ($data['options'] as $problem_options => $link) {
+			if ($link === 'menu-popup-item disabled') {
+				$this->assertFalse($context_menu->getItem($problem_options)->isEnabled());
+			}
+			else {
+				$this->assertTrue($context_menu->getItem($problem_options)->isEnabled());
+			}
+		}
+	}
+
 	public static function getCauseSymptomsData() {
 		return [
 			// #0 Show symptoms false.
@@ -181,7 +303,7 @@ class testCauseAndSymptomEvents extends CWebTest {
 						'Show timeline' => false
 					],
 					'result' => [
-						['Problem' => 'Problem trap>100 [Cause]'],
+						['Problem' => 'Problem trap>150 [Cause]'],
 						['Problem' => 'Problem trap>10 [Symptom]']
 					]
 				]
@@ -195,7 +317,7 @@ class testCauseAndSymptomEvents extends CWebTest {
 						'Show timeline' => false
 					],
 					'result' => [
-						['Problem' => 'Problem trap>100 [Cause]'],
+						['Problem' => 'Problem trap>150 [Cause]'],
 						['Problem' => 'Problem trap>10 [Symptom]'],
 						['Problem' => 'Problem trap>10 [Symptom]']
 					]
@@ -226,8 +348,6 @@ class testCauseAndSymptomEvents extends CWebTest {
 		$this->assertEquals(['', '', '', 'Time', 'Severity', 'Recovery time', 'Status', 'Info',
 				'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags'], $table->getHeadersText()
 		);
-
-//		$symptom_xpath = 'xpath:.//span[(@title="Symptom")]';
 
 		// For Cause problem arrow icon is not present at all.
 		$this->assertFalse($table->getRow(0)->query(self::SYMPTOM_XPATH)->exists());
