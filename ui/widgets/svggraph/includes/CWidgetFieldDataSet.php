@@ -175,14 +175,16 @@ class CWidgetFieldDataSet extends CWidgetField {
 				break;
 			}
 
-			foreach ($data['itemids'] as $i => &$item_spec) {
-				if ($item_spec == 0) {
-					$item_spec = [CWidgetField::FOREIGN_REFERENCE_KEY => $data['references'][$i]];
+			if ($data['dataset_type'] == self::DATASET_TYPE_SINGLE_ITEM) {
+				foreach ($data['itemids'] as $i => &$item_spec) {
+					if ($item_spec == 0) {
+						$item_spec = [CWidgetField::FOREIGN_REFERENCE_KEY => $data['references'][$i]];
+					}
 				}
-			}
-			unset($item_spec);
+				unset($item_spec);
 
-			unset($data['references']);
+				unset($data['references']);
+			}
 		}
 		unset($data);
 
