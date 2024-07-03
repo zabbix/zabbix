@@ -60,7 +60,6 @@ zabbix_export:
           snmp_oid: .1.3.6.1.2.1.1.4.0
           key: zyxel.3712.contact
           delay: 1h
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: RFC1213-MIB
@@ -106,7 +105,6 @@ zabbix_export:
           snmp_oid: 'discovery[{#SNMP.ARRAY},.1.3.6.1.4.1.890.1.5.8.47.1]'
           key: zyxel.3712.fwversion
           delay: 1h
-          trends: '0'
           value_type: CHAR
           description: 'MIB: ZYXEL-MGS3712F-MIB'
           inventory_link: SOFTWARE_FULL
@@ -172,7 +170,6 @@ zabbix_export:
           snmp_oid: .1.3.6.1.2.1.1.6.0
           key: zyxel.3712.location
           delay: 1h
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: RFC1213-MIB
@@ -192,7 +189,6 @@ zabbix_export:
           snmp_oid: .1.3.6.1.2.1.2.2.1.6.1
           key: zyxel.3712.mac
           delay: 1h
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: IF-MIB
@@ -215,7 +211,6 @@ zabbix_export:
           snmp_oid: .1.3.6.1.2.1.1.1.0
           key: zyxel.3712.model
           delay: 1h
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: RFC1213-MIB
@@ -248,7 +243,6 @@ zabbix_export:
           snmp_oid: .1.3.6.1.2.1.1.5.0
           key: zyxel.3712.name
           delay: 1h
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: RFC1213-MIB
@@ -289,7 +283,6 @@ zabbix_export:
           snmp_oid: .1.3.6.1.4.1.890.1.5.8.47.1.10.0
           key: zyxel.3712.serialnumber
           delay: 1h
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: ZYXEL-MGS3712F-MIB
@@ -369,18 +362,14 @@ zabbix_export:
             conditions:
               - macro: '{#ZYXEL.IF.LINKUPTYPE}'
                 value: '{$ZYXEL.LLD.FILTER.IF.LINKUPTYPE.MATCHES}'
-                formulaid: A
               - macro: '{#ZYXEL.IF.LINKUPTYPE}'
                 value: '{$ZYXEL.LLD.FILTER.IF.LINKUPTYPE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
               - macro: '{#ZYXEL.IF.NAME}'
                 value: '{$ZYXEL.LLD.FILTER.IF.NAME.MATCHES}'
-                formulaid: C
               - macro: '{#ZYXEL.IF.NAME}'
                 value: '{$ZYXEL.LLD.FILTER.IF.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: D
           item_prototypes:
             - uuid: 9a97d9e95dba4ba88e08ccbd48acce07
               name: 'Port {#SNMPINDEX}: Administrative status'
@@ -410,7 +399,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.2.2.1.2.{#SNMPINDEX}'
               key: 'zyxel.3712.net.if.descr[{#SNMPINDEX}]'
-              trends: '0'
               value_type: CHAR
               description: |
                 MIB: IF-MIB
@@ -462,8 +450,6 @@ zabbix_export:
                 address at this sub-layer.
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               tags:
                 - tag: component
                   value: network
@@ -485,8 +471,6 @@ zabbix_export:
                 includes both Group and Functional addresses.
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               tags:
                 - tag: component
                   value: network
@@ -509,8 +493,6 @@ zabbix_export:
                   parameters:
                     - '8'
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               tags:
                 - tag: component
                   value: network
@@ -531,8 +513,6 @@ zabbix_export:
                 or broadcast address at this sub-layer
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               tags:
                 - tag: component
                   value: network
@@ -590,7 +570,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.890.1.5.8.47.22.1.1.3.{#SNMPINDEX}'
               key: 'zyxel.3712.net.if.name[{#SNMPINDEX}]'
-              trends: '0'
               value_type: CHAR
               description: |
                 MIB: ZYXEL-MGS3712F-MIB
@@ -662,8 +641,6 @@ zabbix_export:
                 were discarded or not sent.
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               tags:
                 - tag: component
                   value: network
@@ -686,8 +663,6 @@ zabbix_export:
                 includes both Group and Functional addresses.
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               tags:
                 - tag: component
                   value: network
@@ -711,8 +686,6 @@ zabbix_export:
                   parameters:
                     - '8'
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               tags:
                 - tag: component
                   value: network
@@ -734,8 +707,6 @@ zabbix_export:
                 those that were discarded or not sent.
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               tags:
                 - tag: component
                   value: network
@@ -855,7 +826,6 @@ zabbix_export:
                   - macro: '{#ZYXEL.IF.NAME}'
                     value: '{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES}'
                     operator: NOT_MATCHES_REGEX
-                    formulaid: A
               operations:
                 - operationobject: TRIGGER_PROTOTYPE
                   operator: REGEXP
@@ -872,11 +842,9 @@ zabbix_export:
             conditions:
               - macro: '{#ZYXEL.SFP.DESCRIPTION}'
                 value: '{$ZYXEL.LLD.FILTER.SFPDDM.DESC.MATCHES}'
-                formulaid: A
               - macro: '{#ZYXEL.SFP.DESCRIPTION}'
                 value: '{$ZYXEL.LLD.FILTER.SFPDDM.DESC.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
           description: 'SFP DDM module discovery.'
           item_prototypes:
             - uuid: cd2434237f264fd0aa57a9816eb9cdb1
@@ -963,11 +931,9 @@ zabbix_export:
             conditions:
               - macro: '{#ZYXEL.SFP.STATUS}'
                 value: '{$ZYXEL.LLD.FILTER.SFP.STATUS.MATCHES}'
-                formulaid: A
               - macro: '{#ZYXEL.SFP.STATUS}'
                 value: '{$ZYXEL.LLD.FILTER.SFP.STATUS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
           description: 'SFP module discovery.'
           item_prototypes:
             - uuid: 434d614d231d41c49810342cb3d09797
@@ -976,7 +942,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.890.1.5.8.47.117.1.1.7.{#SNMPINDEX}'
               key: 'zyxel.3712.sfp.datecode[{#SNMPINDEX}]'
               delay: '{$ZYXEL.LLD.SFP.UPDATE}'
-              trends: '0'
               value_type: CHAR
               description: |
                 MIB: ZYXEL-MGS3712F-MIB
@@ -998,7 +963,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.890.1.5.8.47.117.1.1.4.{#SNMPINDEX}'
               key: 'zyxel.3712.sfp.part[{#SNMPINDEX}]'
               delay: '{$ZYXEL.LLD.SFP.UPDATE}'
-              trends: '0'
               value_type: CHAR
               description: |
                 MIB: ZYXEL-MGS3712F-MIB
@@ -1020,7 +984,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.890.1.5.8.47.117.1.1.6.{#SNMPINDEX}'
               key: 'zyxel.3712.sfp.revision[{#SNMPINDEX}]'
               delay: '{$ZYXEL.LLD.SFP.UPDATE}'
-              trends: '0'
               value_type: CHAR
               description: |
                 MIB: ZYXEL-MGS3712F-MIB
@@ -1042,7 +1005,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.890.1.5.8.47.117.1.1.5.{#SNMPINDEX}'
               key: 'zyxel.3712.sfp.serialnumber[{#SNMPINDEX}]'
               delay: '{$ZYXEL.LLD.SFP.UPDATE}'
-              trends: '0'
               value_type: CHAR
               description: |
                 MIB: ZYXEL-MGS3712F-MIB
@@ -1097,7 +1059,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.890.1.5.8.47.117.1.1.8.{#SNMPINDEX}'
               key: 'zyxel.3712.sfp.transceiver[{#SNMPINDEX}]'
               delay: '{$ZYXEL.LLD.SFP.UPDATE}'
-              trends: '0'
               value_type: CHAR
               description: |
                 MIB: ZYXEL-MGS3712F-MIB
@@ -1119,7 +1080,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.890.1.5.8.47.117.1.1.3.{#SNMPINDEX}'
               key: 'zyxel.3712.sfp.vendor[{#SNMPINDEX}]'
               delay: '{$ZYXEL.LLD.SFP.UPDATE}'
-              trends: '0'
               value_type: CHAR
               description: |
                 MIB: ZYXEL-MGS3712F-MIB

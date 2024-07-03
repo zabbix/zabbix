@@ -487,15 +487,15 @@ $item_tab
 		))->setId('js-item-master-item-field')
 	]);
 
-// Append interfaces to form list.
-$select_interface = getInterfaceSelect($data['interfaces'])
-	->setId('interface-select')
-	->setValue($data['interfaceid'])
-	->addClass(ZBX_STYLE_ZSELECT_HOST_INTERFACE)
-	->setFocusableElementId('interfaceid')
-	->setAriaRequired();
-
 if ($data['display_interfaces']) {
+	// Append interfaces to form list.
+	$select_interface = getInterfaceSelect($data['interfaces'])
+		->setId('interface-select')
+		->setValue($data['interfaceid'])
+		->addClass(ZBX_STYLE_ZSELECT_HOST_INTERFACE)
+		->setFocusableElementId('interfaceid')
+		->setAriaRequired();
+
 	$item_tab->addItem([
 		(new CLabel(_('Host interface'), $select_interface->getFocusableElementId()))
 			->setAsteriskMark()
@@ -508,7 +508,6 @@ if ($data['display_interfaces']) {
 				->setAttribute('style', 'display: none;')
 		]))->setId('js-item-interface-field')
 	]);
-	$form->addVar('selectedInterfaceId', $data['interfaceid']);
 }
 
 $item_tab
