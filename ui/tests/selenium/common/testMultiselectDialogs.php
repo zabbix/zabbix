@@ -36,11 +36,11 @@ class testMultiselectDialogs extends CWebTest {
 				$this->checkErrorsAndTitle($dialog, $title);
 
 				if ($check_filter) {
-					$this->checkMultiselectFilter($dialog, $title, $filter);
+					$this->checkOverlayFilter($dialog, $title, $filter);
 				}
 
 				if ($check_stud) {
-					$this->checkMultiselectStud($dialog, $title);
+					$this->checkOverlayStud($dialog, $title);
 				}
 
 				// Set form element of current overlay dialog if multiple dialogs layers are opened.
@@ -78,7 +78,7 @@ class testMultiselectDialogs extends CWebTest {
 	 * @param string                   $title     title of a dialog
 	 * @param array                    $filter    filter parameters passed in format: ['<filter_label>' => '<filter_value>']
 	 */
-	protected function checkMultiselectFilter($dialog, $title, $filter) {
+	protected function checkOverlayFilter($dialog, $title, $filter = null) {
 		// For some overlays filter has special selector.
 		$filter_selector = (in_array($title, ['SLA', 'Service', 'Services']))
 			? $dialog->query('id:services-filter-name')
@@ -99,7 +99,7 @@ class testMultiselectDialogs extends CWebTest {
 	 * @param COverlayDialogElement    $dialog    dialog form where checks are performed
 	 * @param string                   $title     title of a dialog
 	 */
-	protected function checkMultiselectStud($dialog, $title) {
+	protected function checkOverlayStud($dialog, $title) {
 		$text = (in_array($title, ['Templates', 'Hosts', 'Triggers']))
 			? "Filter is not set\nUse the filter to display results"
 			: 'No data found';

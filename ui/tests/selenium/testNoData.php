@@ -761,7 +761,8 @@ class testNoData extends testMultiselectDialogs {
 					'object' => 'trigger',
 					'url' => 'zabbix.php?action=trigger.list&filter_set=1&context=template&filter_hostids%5B0%5D=',
 					'overlay_form' => true,
-					'form' => 'id:trigger-form'
+					'form' => 'id:trigger-form',
+					'filter_label' => 'Template'
 				]
 			],
 			// #11.
@@ -790,7 +791,8 @@ class testNoData extends testMultiselectDialogs {
 					'object' => 'trigger prototype',
 					'url' => 'zabbix.php?action=trigger.prototype.list&context=template&parent_discoveryid=',
 					'form' => 'id:trigger-prototype-form',
-					'overlay_form' => true
+					'overlay_form' => true,
+					'filter_label' => 'Template'
 				]
 			],
 			// #14.
@@ -836,23 +838,27 @@ class testNoData extends testMultiselectDialogs {
 			? ($context_host ? self::EMPTY_LLD_HOST : self::EMPTY_LLD_TEMPLATE)
 			: ($context_host ? self::EMPTY_HOST : self::EMPTY_TEMPLATE);
 
+		$filter_label = CTestArrayHelper::get($data, 'filter_label', 'Host');
+
 		switch ($data['object']) {
 			case 'item':
 			case 'item prototype':
 			case 'discovery rule':
 				$form->fill(['Type' => 'Dependent item']);
-				$form->getFieldContainer('Master item')->query('button:Select')->one()->waitUntilClickable()->click();
-				$items_overlay = COverlayDialogElement::find()->all()->last();
-				$this->checkEmptyOverlay($items_overlay, 'Items', [$host]);
+				$this->checkMultiselectDialogs($form, [['Master item' => 'Items']], true, true,
+						[$filter_label => [$host]]
+				);
 				break;
 
 			case 'trigger':
 			case 'trigger prototype':
 				$form->query('xpath:.//button[@id="insert-expression"]')->one()->waitUntilCLickable()->click();
 				$expression_overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+
+				// Item selection in trigger's expression is not multiselect element, but just input and buttons.
 				$expression_overlay->query('button:Select')->one()->waitUntilCLickable()->click();
 				$items_overlay = COverlayDialogElement::find()->all()->last();
-				$this->checkEmptyOverlay($items_overlay, 'Items', [$host]);
+				$this->checkEmptyOverlay($items_overlay, 'Items', [$filter_label => [$host]]);
 				$form = $expression_overlay;
 				break;
 
@@ -860,58 +866,72 @@ class testNoData extends testMultiselectDialogs {
 			case 'graph prototype':
 				$form->getFieldContainer('Items')->query('button:Add')->one()->waitUntilCLickable()->click();
 				$items_overlay = COverlayDialogElement::find()->all()->last();
-				$this->checkEmptyOverlay($items_overlay, 'Items', [$host]);
+				$this->checkEmptyOverlay($items_overlay, 'Items', [$filter_label => [$host]]);
 				break;
 
 			case 'host prototype':
-				$form->query('xpath:(.//button[text()="Select"])[1]')->one()->waitUntilCLickable()->click();
-				$templates_overlay = COverlayDialogElement::find()->all()->last();
-				$this->checkEmptyOverlay($templates_overlay, 'Templates', '');
+				$form = $this->query($data['form'])->asForm(['normalized' => true])->one();
+				$this->checkMultiselectDialogs($form, [['Templates' => 'Templates']], true, true,
+						['Template group' => '']
+				);
 		}
 
 		if (in_array($data['object'], ['item prototype', 'trigger prototype', 'graph prototype'])) {
-			$items_overlay->close();
 			$button = (str_contains($data['object'], 'graph'))
 				? 'Add prototype'
 				: 'Select prototype';
 
 			$form->query('button', $button)->one()->waitUntilClickable()->click();
-			$prototype_overlay = COverlayDialogElement::find()->all()->last();
+			$prototype_overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();
 			$this->checkEmptyOverlay($prototype_overlay, 'Item prototypes');
 		}
 
 		COverlayDialogElement::closeAll(true);
 	}
 
-//	/**
-//	 * Function for testing opened overlay's title and contents.
-//	 *
-//	 * @param COverlayDialogElement    $overlay    tested overlay
-//	 * @param string                   $title      title of tested overlay
-//	 * @param string                   $filter     hostname selected in overlay filter
-//	 */
-//	protected function checkEmptyOverlay($overlay, $title, $filter = null) {
-//		$this->assertEquals($title, $overlay->waitUntilReady()->getTitle());
-//
-//		// For SLA overlays filter is not multiselect, but input.
-//		$filter_selector = (in_array($title, ['SLA', 'Service', 'Services']))
-//			? $overlay->query('id:services-filter-name')
-//			: $overlay->query('xpath:.//div[@class="multiselect-control"]')->asMultiselect();
-//
-//		// There are overlays where additional filter exists, and there are some - where it shouldn't exist.
-//		if (in_array($title, ['Proxies', 'Proxy groups', 'Value mapping', 'Discovery rules', 'SLA', 'Item prototypes'])) {
-//			$this->assertFalse($filter_selector->exists());
-//		}
-//		else {
-//			$this->assertEquals($filter, $filter_selector->one()->getValue());
-//		}
-//
-//		$text = (in_array($title, ['Templates', 'Hosts', 'Triggers']))
-//			? "Filter is not set\nUse the filter to display results"
-//			: 'No data found';
-//		$this->assertEquals($text, $overlay->query('class:no-data-message')->one()->getText());
-//
-//		// Check that opened dialog does not contain any error messages.
-//		$this->assertFalse($overlay->query('xpath:.//*[contains(@class, "msg-bad")]')->exists());
-//	}
+	/**
+	 * Function for testing opened overlay's title and contents.
+	 *
+	 * @param COverlayDialogElement    $overlay    tested overlay
+	 * @param string                   $title      title of tested overlay
+	 * @param string                   $filter     hostname selected in overlay filter
+	 */
+	protected function checkEmptyOverlay($overlay, $title, $filter = null) {
+		$this->checkErrorsAndTitle($overlay, $title);
+		$this->checkOverlayFilter($overlay, $title, $filter);
+		$this->checkOverlayStud($overlay, $title);
+		$overlay->close();
+	}
+
+	/**
+	 * Function for testing opened overlay's title and contents.
+	 *
+	 * @param COverlayDialogElement    $overlay    tested overlay
+	 * @param string                   $title      title of tested overlay
+	 * @param string                   $filter     hostname selected in overlay filter
+	 */
+	protected function checkEmptyOverlay2($overlay, $title, $filter = null) {
+		$this->assertEquals($title, $overlay->waitUntilReady()->getTitle());
+
+		// For SLA overlays filter is not multiselect, but input.
+		$filter_selector = (in_array($title, ['SLA', 'Service', 'Services']))
+			? $overlay->query('id:services-filter-name')
+			: $overlay->query('xpath:.//div[@class="multiselect-control"]')->asMultiselect();
+
+		// There are overlays where additional filter exists, and there are some - where it shouldn't exist.
+		if (in_array($title, ['Proxies', 'Proxy groups', 'Value mapping', 'Discovery rules', 'SLA', 'Item prototypes'])) {
+			$this->assertFalse($filter_selector->exists());
+		}
+		else {
+			$this->assertEquals($filter, $filter_selector->one()->getValue());
+		}
+
+		$text = (in_array($title, ['Templates', 'Hosts', 'Triggers']))
+			? "Filter is not set\nUse the filter to display results"
+			: 'No data found';
+		$this->assertEquals($text, $overlay->query('class:no-data-message')->one()->getText());
+
+		// Check that opened dialog does not contain any error messages.
+		$this->assertFalse($overlay->query('xpath:.//*[contains(@class, "msg-bad")]')->exists());
+	}
 }
