@@ -963,18 +963,20 @@ window.widget_svggraph_form = new class {
 					color: []
 				};
 
-				for (const [item_index, itemid] of dataset.itemids.entries()) {
-					if (itemid === '0') {
-						const resolved_itemid = this.#resolveWidget(dataset.references[item_index]);
+				if (dataset.itemids !== undefined) {
+					for (const [item_index, itemid] of dataset.itemids.entries()) {
+						if (itemid === '0') {
+							const resolved_itemid = this.#resolveWidget(dataset.references[item_index]);
 
-						if (resolved_itemid !== null) {
-							dataset_new.itemids.push(resolved_itemid);
+							if (resolved_itemid !== null) {
+								dataset_new.itemids.push(resolved_itemid);
+								dataset_new.color.push(dataset.color[item_index]);
+							}
+						}
+						else {
+							dataset_new.itemids.push(itemid);
 							dataset_new.color.push(dataset.color[item_index]);
 						}
-					}
-					else {
-						dataset_new.itemids.push(itemid);
-						dataset_new.color.push(dataset.color[item_index]);
 					}
 				}
 
