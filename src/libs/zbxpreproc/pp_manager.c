@@ -1330,11 +1330,11 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 		{
 			if (0 != zbx_dc_flush_history())
 			{
-				time_flush = sec;
-
 				zbx_rtc_notify_generic(&manager->rtc, ZBX_PROCESS_TYPE_HISTSYNCER, 1,
 						ZBX_RTC_HISTORY_SYNC_NOTIFY, NULL, 0);
 			}
+
+			time_flush = sec;
 		}
 
 		/* trigger vps monitor update at least once per second */
