@@ -555,7 +555,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		$total_value['value'] = $raw_total_value;
 
-		if ($raw_total_value !== null && $raw_total_value !== 0) {
+		if ($raw_total_value !== null) {
 			$total_value['formatted_value'] = $formatted_total_value;
 		}
 	}
@@ -640,7 +640,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 	}
 
 	private function getSVGData(array $sectors, array $total_value): array {
-		if ($total_value['value'] === null || $total_value['value'] === 0) {
+		if ($total_value['value'] === null) {
 			return [
 				'svg_sectors' => [],
 				'svg_total_value' => $total_value
@@ -650,10 +650,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$sector_total_value = 0;
 		$non_total_sectors = [];
 		$has_total_item = false;
-
-		$sectors = array_filter($sectors, function ($sector) {
-			return $sector['value'] != 0;
-		});
 
 		// Move total sector to the end.
 		foreach ($sectors as $key => $sector) {
@@ -668,7 +664,12 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$svg_sectors = array_values($sectors);
 
 		foreach ($svg_sectors as &$sector) {
-			$sector['percent_of_total'] = (abs($sector['value']) / $total_value['value']) * 100;
+			if ($total_value['value']) {
+				$sector['percent_of_total'] = (abs($sector['value']) / $total_value['value']) * 100;
+			}
+			else {
+				$sector['percent_of_total'] = 0;
+			}
 
 			if (!$sector['is_total']) {
 				$sector_total_value += abs($sector['value']);
