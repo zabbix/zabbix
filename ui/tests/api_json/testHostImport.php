@@ -62,7 +62,7 @@ class testHostImport extends CAPITest {
 		));
 	}
 
-	public function testHostWithCOnditionalDefaults() {
+	public function testHostWithConditionalDefaults() {
 		$source = file_get_contents(__DIR__.'/xml/testHostWithConditionalDefaults.xml');
 
 		$rules = [
