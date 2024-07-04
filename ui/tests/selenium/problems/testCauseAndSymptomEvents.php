@@ -44,7 +44,8 @@ class testCauseAndSymptomEvents extends CWebTest {
 	public function prepareData() {
 		// Create hostgroups for hosts.
 		CDataHelper::call('hostgroup.create', [
-			['name' => 'Group for Cause and Symptom check']
+			['name' => 'Group for Cause and Symptom check'],
+			['name' => 'Group for Cause and Symptom update']
 		]);
 		self::$groupids = CDataHelper::getIds('name');
 
@@ -68,7 +69,7 @@ class testCauseAndSymptomEvents extends CWebTest {
 				'items' => [
 					[
 						'name' => 'Consumed energy',
-						'key_' => 'trap',
+						'key_' => 'kWh',
 						'type' => ITEM_TYPE_TRAPPER,
 						'value_type' => ITEM_VALUE_TYPE_FLOAT
 					]
@@ -92,7 +93,31 @@ class testCauseAndSymptomEvents extends CWebTest {
 				'items' => [
 					[
 						'name' => 'Accumulated energy',
-						'key_' => 'trap',
+						'key_' => 'kWh',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_FLOAT
+					]
+				]
+			],
+			[
+				'host' => 'Host for Cause and Symptom update',
+				'interfaces' => [
+					[
+						'type' => INTERFACE_TYPE_AGENT,
+						'main' => INTERFACE_PRIMARY,
+						'useip' => INTERFACE_USE_IP,
+						'ip' => '127.0.7.1',
+						'dns' => '',
+						'port' => '10770'
+					]
+				],
+				'groups' => [
+					'groupid' => self::$groupids['Group for Cause and Symptom update']
+				],
+				'items' => [
+					[
+						'name' => 'Accumulated energy',
+						'key_' => 'kWh',
 						'type' => ITEM_TYPE_TRAPPER,
 						'value_type' => ITEM_VALUE_TYPE_FLOAT
 					]
@@ -104,28 +129,33 @@ class testCauseAndSymptomEvents extends CWebTest {
 		CDataHelper::call('trigger.create', [
 			[
 				'description' => 'Problem trap>10 [Symptom]',
-				'expression' => 'last(/Host for Cause and Symptom check/trap)>10',
+				'expression' => 'last(/Host for Cause and Symptom check/kWh)>10',
 				'priority' => TRIGGER_SEVERITY_WARNING
 			],
 			[
 				'description' => 'Problem trap>150 [Cause]',
-				'expression' => 'last(/Host for Cause and Symptom check/trap)>150',
-				'priority' => TRIGGER_SEVERITY_DISASTER
+				'expression' => 'last(/Host for Cause and Symptom check/kWh)>150',
+				'priority' => TRIGGER_SEVERITY_AVERAGE
 			],
 			[
-				'description' => 'Problem trap<100 [Cause2]',
-				'expression' => 'last(/Host for Cause and Symptom check2/trap)<100',
+				'description' => 'Information trap<100 [Cause]',
+				'expression' => 'last(/Host for Cause and Symptom check2/kWh)<100',
+				'priority' => TRIGGER_SEVERITY_INFORMATION
+			],
+			[
+				'description' => 'Battery problem trap [Cause]',
+				'expression' => 'last(/Host for Cause and Symptom update/kWh)<10',
 				'priority' => TRIGGER_SEVERITY_DISASTER
 			]
 		]);
 		self::$triggerids = CDataHelper::getIds('description');
 
 		// Create problems.
-		CDBHelper::setTriggerProblem('Problem trap>10 [Symptom]', TRIGGER_VALUE_TRUE);
-		CDBHelper::setTriggerProblem('Problem trap>150 [Cause]', TRIGGER_VALUE_TRUE);
-		CDBHelper::setTriggerProblem('Problem trap<100 [Cause2]', TRIGGER_VALUE_TRUE);
+		foreach (self::$triggerids as $name => $id) {
+			CDBHelper::setTriggerProblem($name, TRIGGER_VALUE_TRUE);
+		}
 
-		// Set cause and symptoms.
+		// Set cause and symptoms for predefined problems.
 		$causeid = CDBHelper::getValue('SELECT eventid FROM problem WHERE name='.zbx_dbstr('Problem trap>150 [Cause]'));
 		$symptomid = CDBHelper::getValue('SELECT eventid FROM problem WHERE name='.zbx_dbstr('Problem trap>10 [Symptom]'));
 		DBexecute('UPDATE problem SET cause_eventid='.$causeid.' WHERE name='.zbx_dbstr('Problem trap>10 [Symptom]'));
@@ -224,7 +254,7 @@ class testCauseAndSymptomEvents extends CWebTest {
 			[
 				[
 					'cause_to_symptom' => true,
-					'locator' => 'Problem trap<100 [Cause2]',
+					'locator' => 'Information trap<100 [Cause]',
 					'options' => [
 						'Mark as cause' => 'menu-popup-item disabled',
 						'Mark selected as symptoms' => 'menu-popup-item'
@@ -266,15 +296,6 @@ class testCauseAndSymptomEvents extends CWebTest {
 			$this->selectTableRows($selected_events, 'Problem');
 		}
 
-		$this->checkContextMenuLinks($data);
-	}
-
-	/**
-	 * Check context menu links.
-	 *
-	 * @param array $data	data provider with fields values
-	 */
-	protected function checkContextMenuLinks($data) {
 		$this->query('link', $data['locator'])->one()->waitUntilClickable()->click();
 		$context_menu = CPopupMenuElement::find()->waitUntilVisible()->one();
 		$this->assertTrue($context_menu->hasTitles(['VIEW', 'CONFIGURATION', 'PROBLEM']));
