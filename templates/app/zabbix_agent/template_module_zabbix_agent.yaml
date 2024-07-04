@@ -21,7 +21,6 @@ zabbix_export:
           name: 'Host name of Zabbix agent running'
           key: agent.hostname
           delay: 1h
-          trends: '0'
           value_type: CHAR
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -43,7 +42,6 @@ zabbix_export:
           name: 'Version of Zabbix agent running'
           key: agent.version
           delay: 1h
-          trends: '0'
           value_type: CHAR
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -170,7 +168,6 @@ zabbix_export:
           type: ZABBIX_ACTIVE
           key: agent.hostname
           delay: 1h
-          trends: '0'
           value_type: CHAR
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -205,7 +202,6 @@ zabbix_export:
           type: ZABBIX_ACTIVE
           key: agent.version
           delay: 1h
-          trends: '0'
           value_type: CHAR
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT

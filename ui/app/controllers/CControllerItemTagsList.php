@@ -14,6 +14,8 @@
 **/
 
 
+require 'include/forms.inc.php';
+
 class CControllerItemTagsList extends CController {
 
 	protected function init(): void {

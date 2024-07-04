@@ -708,7 +708,8 @@ window.trigger_edit_popup = new class {
 			? this.expression
 			: this.recovery_expression;
 
-		if (element.value.length > 0 && !confirm(t('Do you wish to replace the conditional expression?'))) {
+		if (element.value.length > 0
+				&& !confirm(<?= json_encode(_('Do you wish to replace the conditional expression?')) ?>)) {
 			return;
 		}
 
