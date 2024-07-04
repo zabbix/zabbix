@@ -649,7 +649,7 @@ int	zbx_rtc_wait_for_sync_finish(zbx_rtc_t *rtc, zbx_rtc_process_request_ex_func
 					if (ZBX_IPC_RTC_MAX >= message->code)
 					{
 						const char *rtc_error = "Cannot perform specified runtime control"
-								" command during initial configuration cache sync\n";
+								" command during startup\n";
 						zbx_ipc_client_send(client, message->code,
 								(const unsigned char *)rtc_error,
 								(zbx_uint32_t)strlen(rtc_error) + 1);

@@ -223,7 +223,6 @@ ZBX_THREAD_ENTRY(zbx_dbsyncer_thread, args)
 				case ZBX_RTC_HISTORY_SYNC_NOTIFY:
 					sleeptime = 0;
 				case ZBX_RTC_SHUTDOWN:
-					break;
 				default:
 					break;
 			}

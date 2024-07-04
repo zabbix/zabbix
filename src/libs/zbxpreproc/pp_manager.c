@@ -853,8 +853,9 @@ static void	preprocessing_flush_value(zbx_pp_manager_t *manager, zbx_uint64_t it
  *                                                                            *
  * Purpose: handle new preprocessing request                                  *
  *                                                                            *
- * Parameters: manager - [IN] preprocessing manager                           *
- *             message - [IN] packed preprocessing request                    *
+ * Parameters: manager    - [IN] preprocessing manager                        *
+ *             message    - [IN] packed preprocessing request                 *
+ *             direct_num - [OUT] number of directly flushed values           *
  *                                                                            *
  *  Return value: The number of requests queued for preprocessing             *
  *                                                                            *
