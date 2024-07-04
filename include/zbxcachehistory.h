@@ -168,6 +168,8 @@ void	zbx_dbcache_lock(void);
 void	zbx_dbcache_unlock(void);
 void	zbx_dbcache_set_history_num(int num);
 int	zbx_dbcache_get_history_num(void);
+void	zbx_dbcache_process_start(void);
+void	zbx_dbcache_process_finish(void);
 
 zbx_shmem_info_t	*zbx_dbcache_get_hc_mem(void);
 

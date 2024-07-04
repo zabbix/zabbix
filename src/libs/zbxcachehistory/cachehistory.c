@@ -108,6 +108,7 @@ typedef struct
 	unsigned char		db_trigger_queue_lock;
 
 	zbx_hc_proxyqueue_t	proxyqueue;
+	int			processing_num;
 }
 ZBX_DC_CACHE;
 
@@ -2443,6 +2444,8 @@ void	zbx_dc_add_history_variant(zbx_uint64_t itemid, unsigned char value_type, u
 
 size_t	zbx_dc_flush_history(void)
 {
+	int	processing_num;
+
 	if (0 == item_values_num)
 		return 0;
 
@@ -2451,6 +2454,7 @@ size_t	zbx_dc_flush_history(void)
 	hc_add_item_values(item_values, item_values_num);
 
 	cache->history_num += item_values_num;
+	processing_num = cache->processing_num;
 
 	UNLOCK_CACHE;
 
@@ -2460,6 +2464,9 @@ size_t	zbx_dc_flush_history(void)
 
 	item_values_num = 0;
 	string_values_offset = 0;
+
+	if (0 != processing_num)
+		return 0;
 
 	return count;
 }
@@ -3172,6 +3179,7 @@ int	zbx_init_database_cache(zbx_get_program_type_f get_program_type, zbx_history
 			goto out;
 	}
 
+	cache->processing_num = 0;
 	cache->history_num_total = 0;
 	cache->history_progress_ts = 0;
 
@@ -3497,6 +3505,16 @@ void	zbx_dbcache_lock(void)
 void	zbx_dbcache_unlock(void)
 {
 	UNLOCK_CACHE;
+}
+
+void	zbx_dbcache_process_start(void)
+{
+	cache->processing_num++;
+}
+
+void	zbx_dbcache_process_finish(void)
+{
+	cache->processing_num--;
 }
 
 void	zbx_dbcache_set_history_num(int num)
