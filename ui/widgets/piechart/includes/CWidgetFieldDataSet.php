@@ -143,16 +143,19 @@ class CWidgetFieldDataSet extends CWidgetField {
 					}
 				}
 
-				$validation_rules_by_type['fields']['itemids']['flags'] = API_REQUIRED;
-				$validation_rules_by_type['fields']['references']['flags'] = API_REQUIRED;
+				$validation_rules_by_type['fields']['itemids']['flags'] |= API_REQUIRED;
+				$validation_rules_by_type['fields']['references']['flags'] |= API_REQUIRED;
 				$validation_rules_by_type['fields']['color']['type'] = API_COLORS;
 				$validation_rules_by_type['fields']['type']['flags'] |= API_REQUIRED;
 
 				unset($data['hosts'], $data['items']);
 			}
 			else {
-				$validation_rules_by_type['fields']['hosts']['flags'] = API_REQUIRED;
-				$validation_rules_by_type['fields']['items']['flags'] = API_REQUIRED;
+				if (!$this->isTemplateDashboard()) {
+					$validation_rules_by_type['fields']['hosts']['flags'] |= API_REQUIRED;
+				}
+
+				$validation_rules_by_type['fields']['items']['flags'] |= API_REQUIRED;
 
 				unset($data['itemids'], $data['type'], $data['references']);
 			}
@@ -173,6 +176,7 @@ class CWidgetFieldDataSet extends CWidgetField {
 				unset($data['references']);
 			}
 		}
+		unset($data);
 
 		if ($total_item_count > 1) {
 			$errors[] = _('Cannot add more than one item with type "Total" to the chart.');
