@@ -1320,10 +1320,6 @@ void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_event
 
 		zbx_dbcache_lock();
 		zbx_hc_pop_items(&history_items);		/* select and take items out of history cache */
-
-		if (0 != history_items.values_num)
-			zbx_dbcache_process_start();
-
 		zbx_dbcache_unlock();
 
 		if (0 != history_items.values_num)
@@ -1333,7 +1329,6 @@ void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_event
 			{
 				zbx_dbcache_lock();
 				zbx_hc_push_items(&history_items);
-				zbx_dbcache_process_finish();
 				zbx_dbcache_unlock();
 				zbx_vector_hc_item_ptr_clear(&history_items);
 			}
@@ -1528,7 +1523,6 @@ void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_event
 		{
 			zbx_dbcache_lock();
 			zbx_hc_push_items(&history_items);	/* return items to history cache */
-			zbx_dbcache_process_finish();
 			zbx_dbcache_set_history_num(zbx_dbcache_get_history_num() - history_num);
 
 			if (0 != zbx_hc_queue_get_size())

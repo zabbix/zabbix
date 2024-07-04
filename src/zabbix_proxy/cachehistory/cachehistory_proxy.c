@@ -381,8 +381,6 @@ void	zbx_sync_proxy_history(int *values_num, int *triggers_num, const zbx_events
 
 		zbx_hc_pop_items(&history_items);		/* select and take items out of history cache */
 		history_num = history_items.values_num;
-		if (0 != history_items.values_num)
-			zbx_dbcache_process_start();
 
 		zbx_dbcache_unlock();
 
@@ -407,7 +405,6 @@ void	zbx_sync_proxy_history(int *values_num, int *triggers_num, const zbx_events
 		zbx_dbcache_lock();
 
 		zbx_hc_push_items(&history_items);	/* return items to history cache */
-		zbx_dbcache_process_finish();
 
 		if (ZBX_DB_FAIL != txn_rc)
 		{

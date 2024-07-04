@@ -2962,6 +2962,9 @@ void	zbx_hc_pop_items(zbx_vector_hc_item_ptr_t *history_items)
 
 		zbx_binary_heap_remove_min(&cache->history_queue);
 	}
+
+	if (0 != history_items->values_num)
+		cache->processing_num++;
 }
 
 /******************************************************************************
@@ -3031,6 +3034,8 @@ void	zbx_hc_push_items(zbx_vector_hc_item_ptr_t *history_items)
 				break;
 		}
 	}
+
+	cache->processing_num--;
 }
 
 /******************************************************************************
@@ -3505,16 +3510,6 @@ void	zbx_dbcache_lock(void)
 void	zbx_dbcache_unlock(void)
 {
 	UNLOCK_CACHE;
-}
-
-void	zbx_dbcache_process_start(void)
-{
-	cache->processing_num++;
-}
-
-void	zbx_dbcache_process_finish(void)
-{
-	cache->processing_num--;
 }
 
 void	zbx_dbcache_set_history_num(int num)
