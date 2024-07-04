@@ -1,0 +1,1 @@
+..F....... [ZBX-21815] fixed issue with undefined offset for media type when it was deleted before saving the user (wczerneha)
