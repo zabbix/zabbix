@@ -156,7 +156,7 @@ class CControllerDiscoveryEdit extends CController {
 			'filter' => ['eventsource' => EVENT_SOURCE_DISCOVERY],
 			'search' => [
 				'conditions' => [
-					'conditiontype' => 19,
+					'conditiontype' => ZBX_CONDITION_TYPE_DCHECK,
 					'value' => $dcheckids
 				]
 			],
