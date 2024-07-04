@@ -52,7 +52,7 @@ class testDiscoveryRules extends CIntegrationTest {
 	const SNMPSIM_PRIV_KEY = 'zabbixPriv';
 	const SNMPSIM_PROCESS_USER = 'nobody';
 	const SNMPSIM_PROCESS_GROUP = 'nogroup';
-	const SNMPSIM_DATA_DIR = '$HOME/snmp_sim/data';
+	const SNMPSIM_DATA_DIR_REL_PATH = 'data/snmpsim';
 
 	private static $discoveryActionId;
 	private static $discoveredHostId;
@@ -63,6 +63,8 @@ class testDiscoveryRules extends CIntegrationTest {
 	private static $proxies = array();
 
 	private static function snmpsimStart(): void {
+		$datadir = realpath(dirname(__FILE__)) . '/' . self::SNMPSIM_DATA_DIR_REL_PATH;
+
 		$cmd = 'snmpsimd';
 		$cmd .= ' --v3-user=' . self::SNMPSIM_USERNAME;
 		$cmd .= ' --v3-auth-key=' . self::SNMPSIM_AUTH_KEY;
@@ -72,7 +74,7 @@ class testDiscoveryRules extends CIntegrationTest {
 		$cmd .= ' --process-user=' . self::SNMPSIM_PROCESS_USER;
 		$cmd .= ' --process-group=' . self::SNMPSIM_PROCESS_GROUP;
 		$cmd .= ' --agent-udpv4-endpoint=' . self::SNMPSIM_DRULE_IP_RANGE . ':' . self::SNMPSIM_HOST_PORT;
-		$cmd .= ' --data-dir=' . self::SNMPSIM_DATA_DIR;
+		$cmd .= ' --data-dir=' . $datadir;
 		$cmd .= ' > /dev/null 2>&1 &';
 		shell_exec($cmd);
 	}
