@@ -567,22 +567,7 @@ abstract class CControllerPopupItemTest extends CController {
 					}
 
 					if ($input[$field] && array_key_exists('sortorder', $input[$field])) {
-						$field_data = [];
-
-						foreach ($input[$field]['sortorder'] as $key => $order) {
-							$field_data[] = [
-								'sortorder' => $order,
-								'name' => $input[$field]['name'][$key],
-								'value' => $input[$field]['value'][$key]
-							];
-						}
-
-						usort($field_data, static function ($a, $b) {
-							return $a['sortorder'] <=> $b['sortorder'];
-						});
-
-						$input[$field]['name'] = array_values(array_column($field_data, 'name'));
-						$input[$field]['value'] = array_values(array_column($field_data, 'value'));
+						array_multisort($input[$field]['sortorder'], $input[$field]['name'], $input[$field]['value']);
 					}
 				}
 
