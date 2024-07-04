@@ -378,7 +378,6 @@ void	zbx_sync_proxy_history(int *values_num, int *triggers_num, const zbx_events
 		*more = ZBX_SYNC_DONE;
 
 		zbx_dbcache_lock();
-		
 
 		zbx_hc_pop_items(&history_items);		/* select and take items out of history cache */
 		history_num = history_items.values_num;
