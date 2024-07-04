@@ -116,7 +116,7 @@ class CControllerDiscoveryEdit extends CController {
 		$this->drule['dchecks'] = array_values($this->drule['dchecks']);
 
 		$concurrency_max_type = ($this->drule['concurrency_max'] == ZBX_DISCOVERY_CHECKS_UNLIMITED
-			|| $this->drule['concurrency_max'] == ZBX_DISCOVERY_CHECKS_ONE)
+				|| $this->drule['concurrency_max'] == ZBX_DISCOVERY_CHECKS_ONE)
 			? $this->drule['concurrency_max']
 			: ZBX_DISCOVERY_CHECKS_CUSTOM;
 
@@ -124,11 +124,14 @@ class CControllerDiscoveryEdit extends CController {
 			$this->drule['concurrency_max'] = ZBX_DISCOVERY_CHECKS_UNLIMITED;
 		}
 
+		$dcheck_warnings = $this->drule['druleid'] ? $this->getCheckWarningMessages() : [];
+
 		$data = [
 			'drule' => $this->drule,
 			'discovery_by' => (int) ($this->drule['proxyid'] != 0),
 			'ms_proxy' => [],
 			'concurrency_max_type' => $concurrency_max_type,
+			'dcheck_warnings' => $dcheck_warnings,
 			'user' => ['debug_mode' => $this->getDebugMode()]
 		];
 
@@ -142,6 +145,47 @@ class CControllerDiscoveryEdit extends CController {
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of discovery rules'));
 		$this->setResponse($response);
+	}
+
+	private function getCheckWarningMessages(): array {
+		$dcheckids = array_column($this->drule['dchecks'], 'dcheckid');
+
+		$actions =  API::Action()->get([
+			'output' => [],
+			'filter' => ['eventsource' => EVENT_SOURCE_DISCOVERY],
+			'search' => [
+				'conditions' => [
+					'conditiontype' => 19,
+					'value' => $dcheckids
+				]
+			],
+			'selectConditions' => ['conditiontype', 'value'],
+			'selectFilter' => ['conditions']
+		]);
+
+		$checkid_usage_count = array_fill_keys($dcheckids, 0);
+
+		foreach ($actions as $action) {
+			foreach ($action['filter']['conditions'] as $condition) {
+				if ($condition['conditiontype'] == ZBX_CONDITION_TYPE_DCHECK
+						&& array_key_exists($condition['value'], $checkid_usage_count)) {
+					$checkid_usage_count[$condition['value']]++;
+				}
+			}
+		}
+
+		$error_messages = [];
+
+		foreach ($checkid_usage_count as $id => $usage_count) {
+			if ($usage_count > 0) {
+				$error_messages[$id] = _s(
+					'This check cannot be removed, as it is used as a condition in %1$s discovery %2$s.', $usage_count,
+					$usage_count === 1 ? _('action') : _('actions')
+				);
+			}
+		}
+
+		return $error_messages;
 	}
 
 	/**

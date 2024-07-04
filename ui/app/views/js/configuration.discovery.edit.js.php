@@ -21,7 +21,7 @@
 
 window.drule_edit_popup = new class {
 
-	init({druleid, dchecks, drule}) {
+	init({druleid, dchecks, drule, dcheck_warnings}) {
 		this.overlay = overlays_stack.getById('discoveryForm');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
@@ -29,8 +29,8 @@ window.drule_edit_popup = new class {
 		this.druleid = druleid;
 		this.drule = drule;
 		this.dcheckid = getUniqueId();
-
 		this.available_device_types = [<?= SVC_AGENT ?>, <?= SVC_SNMPv1 ?>, <?= SVC_SNMPv2c ?>, <?= SVC_SNMPv3 ?>];
+		this.dcheck_warnings = dcheck_warnings;
 
 		document.getElementById('discovery_by').addEventListener('change', () => this.#updateForm());
 
@@ -215,10 +215,24 @@ window.drule_edit_popup = new class {
 				.querySelector('#dcheckList tbody')
 				.insertAdjacentHTML('beforeend', template.evaluate(input));
 
+			this.#updateCheckWarningIcon(input);
 			this.#addInputFields(input);
 		}
 
 		this.#updateRadioButtonRows(input, update, row);
+	}
+
+	#updateCheckWarningIcon(input) {
+		const row = document.getElementById(`dcheckRow_${input.dcheckid}`);
+		const warning_icon = row.querySelector('.dcheck-warning');
+
+		if (this.dcheck_warnings[input.dcheckid]) {
+			warning_icon.setAttribute('data-hintbox-contents', this.dcheck_warnings[input.dcheckid]);
+			row.querySelector('.js-remove').disabled = true;
+		}
+		else {
+			warning_icon.remove();
+		}
 	}
 
 	#addInputFields(input) {
