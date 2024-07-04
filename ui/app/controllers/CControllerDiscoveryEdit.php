@@ -116,7 +116,8 @@ class CControllerDiscoveryEdit extends CController {
 		$this->drule['dchecks'] = array_values($this->drule['dchecks']);
 
 		$concurrency_max_type = ($this->drule['concurrency_max'] == ZBX_DISCOVERY_CHECKS_UNLIMITED
-				|| $this->drule['concurrency_max'] == ZBX_DISCOVERY_CHECKS_ONE)
+			|| $this->drule['concurrency_max'] == ZBX_DISCOVERY_CHECKS_ONE
+		)
 			? $this->drule['concurrency_max']
 			: ZBX_DISCOVERY_CHECKS_CUSTOM;
 
