@@ -1181,7 +1181,7 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 	char					*error = NULL;
 	zbx_ipc_client_t			*client;
 	zbx_ipc_message_t			*message;
-	double					time_stat, time_idle = 0, time_flush, time_vps_update;
+	double					time_stat, time_idle = 0, time_flush, time_vps_update, time_notify = 0;
 	zbx_timespec_t				timeout = {PP_MANAGER_DELAY_SEC, PP_MANAGER_DELAY_NS};
 	const zbx_thread_info_t			*info = &((zbx_thread_args_t *)args)->info;
 	int					server_num = ((zbx_thread_args_t *)args)->info.server_num,
@@ -1332,8 +1332,12 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 			{
 				time_flush = sec;
 
-				zbx_rtc_notify_generic(&manager->rtc, ZBX_PROCESS_TYPE_HISTSYNCER, 1,
-						ZBX_RTC_HISTORY_SYNC_NOTIFY, NULL, 0);
+				if (0.001 < sec - time_notify)
+				{
+					zbx_rtc_notify_generic(&manager->rtc, ZBX_PROCESS_TYPE_HISTSYNCER, 1,
+							ZBX_RTC_HISTORY_SYNC_NOTIFY, NULL, 0);
+					time_notify = sec;
+				}
 			}
 		}
 
