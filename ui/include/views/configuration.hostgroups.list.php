@@ -181,7 +181,9 @@ foreach ($this->data['groups'] as $group) {
 
 	$hostGroupTable->addRow([
 		new CCheckBox('groups['.$group['groupid'].']', $group['groupid']),
-		(new CCol($name))->addClass(ZBX_STYLE_WORDBREAK),
+		(new CCol($name))
+			->addClass(ZBX_STYLE_WORDBREAK)
+			->setWidth('15%'),
 		[
 			$data['allowed_ui_conf_hosts']
 				? new CLink(_('Hosts'), (new CUrl('zabbix.php'))
