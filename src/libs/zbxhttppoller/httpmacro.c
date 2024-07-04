@@ -13,10 +13,13 @@
 **/
 
 #include "httpmacro.h"
-
 #include "zbxregexp.h"
 #include "zbxhttp.h"
 #include "zbxstr.h"
+#include "zbxexpr.h"
+#include "zbxexpression.h"
+
+#define ZBX_MACRO_UNKNOWN	"*UNKNOWN*"
 
 /******************************************************************************
  *                                                                            *
@@ -36,6 +39,33 @@ static int 	httpmacro_cmp_func(const void *d1, const void *d2)
 	const zbx_ptr_pair_t	*pair2 = (const zbx_ptr_pair_t *)d2;
 
 	return strcmp((char *)pair1->first, (char *)pair2->first);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: find macros                                                       *
+ *                                                                            *
+ * Parameters: pmacro - [IN] macro values                                     *
+ *             key    - [IN] searching value data                             *
+ *             loc    - [IN] searching value location in key                  *
+ *                                                                            *
+ * Return value: index in pmacro                                              *
+ *                   FAIL - not found                                         *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_macro_variable_search(const zbx_vector_ptr_pair_t *pmacro,
+			const char *key, const zbx_strloc_t loc)
+{
+	size_t length;
+	for (int i = 0; i < pmacro->values_num; i++)
+	{
+		length = strlen(pmacro->values[i].first);
+		if (length == loc.r - loc.l + 1 &&
+				0 == memcmp(key + loc.l, pmacro->values[i].first, length))
+			return i;
+
+	}
+	return FAIL;
 }
 
 /******************************************************************************
@@ -163,84 +193,46 @@ out:
  ******************************************************************************/
 int	http_substitute_variables(const zbx_httptest_t *httptest, char **data)
 {
-	char		replace_char, *substitute;
-	size_t		left, right, len, offset;
+	char		*substitute = NULL;
 	int		index, ret = SUCCEED;
-	zbx_ptr_pair_t	pair = {NULL, NULL};
+	size_t		pos = 0, len;
+	zbx_token_t	token;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() data:'%s'", __func__, *data);
-
-	for (left = 0; '\0' != (*data)[left]; left++)
+	for (; SUCCEED == zbx_token_find(*data, (int)pos, &token, ZBX_TOKEN_SEARCH_VAR_MACRO); pos++)
 	{
-		if ('{' != (*data)[left])
-			continue;
-
-		offset = ('{' == (*data)[left + 1] ? 1 : 0);
-
-		for (right = left + 1; '\0' != (*data)[right] && '}' != (*data)[right]; right++)
-			;
-
-		if ('}' != (*data)[right])
-			break;
-
-		replace_char = (*data)[right + 1];
-		(*data)[right + 1] = '\0';
-
-		pair.first = *data + left + offset;
-		index = zbx_vector_ptr_pair_search(&httptest->macros, pair, httpmacro_cmp_func);
-
-		(*data)[right + 1] = replace_char;
-
-		if (FAIL == index)
-			continue;
-
-		substitute = (char *)httptest->macros.values[index].second;
-
-		if ('.' == replace_char && 1 == offset)
+		if (ZBX_TOKEN_VAR_FUNC_MACRO == token.type)
 		{
-			right += 2;
-			offset = right;
-
-			for (; '\0' != (*data)[right] && '}' != (*data)[right]; right++)
-				;
-
-			if ('}' != (*data)[right])
-				break;
-
-			len = right - offset;
-
-			if (ZBX_CONST_STRLEN("urlencode()") == len && 0 == strncmp(*data + offset, "urlencode()", len))
+			index = zbx_macro_variable_search(&httptest->macros, *data, token.data.var_func_macro.macro);
+			if (FAIL == index)
+				continue;
+			len = strlen(httptest->macros.values[index].second) + 1;
+			substitute = (char *)zbx_malloc(NULL, len);
+			memcpy(substitute, httptest->macros.values[index].second, len);
+			if (SUCCEED != zbx_calculate_macro_function(*data, &token.data.var_func_macro,
+							&substitute))
 			{
-				/* http_variable_urlencode cannot fail (except for "out of memory") */
-				/* so no check is needed */
-				substitute = NULL;
-				zbx_http_url_encode((char *)httptest->macros.values[index].second, &substitute);
-			}
-			else if (ZBX_CONST_STRLEN("urldecode()") == len &&
-					0 == strncmp(*data + offset, "urldecode()", len))
-			{
-				/* on error substitute will remain unchanged */
-				substitute = NULL;
-				if (FAIL == (ret = zbx_http_url_decode((char *)httptest->macros.values[index].second,
-						&substitute)))
-				{
-					break;
-				}
+				zbx_replace_string(data, token.loc.l, &token.loc.r, ZBX_MACRO_UNKNOWN);
+				ret = FAIL;
 			}
 			else
+			{
+				zbx_replace_string(data, token.loc.l, &token.loc.r, substitute);
+			}
+			zbx_free(substitute);
+			pos = token.loc.r;
+		}
+		else if (ZBX_TOKEN_VAR_MACRO == token.type)
+		{
+			index = zbx_macro_variable_search(&httptest->macros, *data, token.loc);
+			if (FAIL == index)
 				continue;
 
+			zbx_replace_string(data, token.loc.l, &token.loc.r,
+						(char *)httptest->macros.values[index].second);
+			pos = token.loc.r;
 		}
-		else
-			left += offset;
-
-		zbx_replace_string(data, left, &right, substitute);
-		if (substitute != (char *)httptest->macros.values[index].second)
-			zbx_free(substitute);
-
-		left = right;
 	}
-
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() data:'%s'", __func__, *data);
 
 	return ret;
