@@ -221,6 +221,7 @@ static int	webdriver_session_query(zbx_webdriver_t *wd, const char *method, cons
 
 	webdriver_discard_error(wd);
 
+	zbx_rtrim(wd->endpoint, "/");
 	zbx_snprintf_alloc(&url, &url_alloc, &url_offset, "%s/session", wd->endpoint);
 
 	if (NULL != wd->session)
@@ -1079,9 +1080,7 @@ int	webdriver_collect_perf_data(zbx_webdriver_t *wd, const char *bookmark, char 
 	if (SUCCEED != webdriver_get_perf_data(wd, &jp, error))
 		goto out;
 
-	wd_perf_collect(&wd->perf, bookmark, &jp);
-
-	ret = SUCCEED;
+	ret = wd_perf_collect(&wd->perf, bookmark, &jp, error);
 out:
 	return ret;
 }

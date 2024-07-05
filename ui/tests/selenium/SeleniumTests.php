@@ -63,6 +63,7 @@ require_once dirname(__FILE__).'/dashboards/testDashboardsWidgetsPage.php';
 // Dashboard widgets.
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardClockWidget.php';
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardCopyWidgets.php';
+require_once dirname(__FILE__).'/dashboardWidgets/testDashboardDiscoveryStatusWidget.php';
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardDynamicItemWidgets.php';
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardFavoriteGraphsWidget.php';
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardFavoriteMapsWidget.php';
@@ -72,6 +73,7 @@ require_once dirname(__FILE__).'/dashboardWidgets/testDashboardGeomapWidgetScree
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardGraphPrototypeWidget.php';
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardGraphWidget.php';
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardGraphWidgetSelectedHosts.php';
+require_once dirname(__FILE__).'/dashboardWidgets/testDashboardHoneycombWidget.php';
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardHostAvailabilityWidget.php';
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardHostNavigatorWidget.php';
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardItemHistoryWidget.php';
@@ -162,6 +164,7 @@ require_once dirname(__FILE__).'/lld/testFormLowLevelDiscovery.php';
 require_once dirname(__FILE__).'/lld/testFormLowLevelDiscoveryOverrides.php';
 require_once dirname(__FILE__).'/lld/testFormTestLowLevelDiscovery.php';
 require_once dirname(__FILE__).'/lld/testInheritanceDiscoveryRule.php';
+require_once dirname(__FILE__).'/lld/testLowLevelDiscoveryDisabledObjects.php';
 require_once dirname(__FILE__).'/lld/testPageLowLevelDiscovery.php';
 
 // Macros.
@@ -396,6 +399,7 @@ class SeleniumTests {
 		// Dashboard widgets.
 		$suite->addTestSuite('testDashboardClockWidget');
 		$suite->addTestSuite('testDashboardCopyWidgets');
+		$suite->addTestSuite('testDashboardDiscoveryStatusWidget');
 		$suite->addTestSuite('testDashboardDynamicItemWidgets');
 		$suite->addTestSuite('testDashboardFavoriteGraphsWidget');
 		$suite->addTestSuite('testDashboardFavoriteMapsWidget');
@@ -405,6 +409,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testDashboardGraphPrototypeWidget');
 		$suite->addTestSuite('testDashboardGraphWidget');
 		$suite->addTestSuite('testDashboardGraphWidgetSelectedHosts');
+		$suite->addTestSuite('testDashboardHoneycombWidget');
 		$suite->addTestSuite('testDashboardHostAvailabilityWidget');
 		$suite->addTestSuite('testDashboardHostNavigatorWidget');
 		$suite->addTestSuite('testDashboardItemHistoryWidget');
@@ -495,6 +500,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormLowLevelDiscoveryOverrides');
 		$suite->addTestSuite('testFormTestLowLevelDiscovery');
 		$suite->addTestSuite('testInheritanceDiscoveryRule');
+		$suite->addTestSuite('testLowLevelDiscoveryDisabledObjects');
 		$suite->addTestSuite('testPageLowLevelDiscovery');
 
 		// Macros.

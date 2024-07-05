@@ -24,6 +24,7 @@ import "C"
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -36,28 +37,16 @@ import (
 	"golang.zabbix.com/sdk/log"
 )
 
+var errStatmFormat = errors.New("invalid statm file format")
+
 type processUserInfo struct {
 	uid int64
 	gid int64
 }
 
-func read2k(filename string) (data []byte, err error) {
-	fd, err := syscall.Open(filename, syscall.O_RDONLY, 0)
-	if err != nil {
-		return
-	}
-	var n int
-	b := make([]byte, 2048)
-	if n, err = syscall.Read(fd, b); err == nil {
-		data = b[:n]
-	}
-	syscall.Close(fd)
-	return
-}
-
 func getProcessName(pid string) (name string, err error) {
 	var data []byte
-	if data, err = read2k("/proc/" + pid + "/stat"); err != nil {
+	if data, err = procfs.ReadAll("/proc/" + pid + "/stat"); err != nil {
 		return
 	}
 	var left, right int
@@ -74,7 +63,7 @@ func parseProcessStatus(pid string, proc *procStatus) (err error) {
 	proc.Pid, _ = strconv.ParseUint(pid, 10, 64)
 
 	var data []byte
-	if data, err = read2k("/proc/" + pid + "/status"); err != nil {
+	if data, err = procfs.ReadAll("/proc/" + pid + "/status"); err != nil {
 		return err
 	}
 
@@ -154,6 +143,102 @@ func parseStateString(val string, state *string) {
 	}
 }
 
+func parseSmaps(pid string, proc *procStatus) error {
+	const pssAdjust = 512
+
+	var data []byte
+	var err error
+	if data, err = procfs.ReadAll("/proc/" + pid + "/smaps_rollup"); err != nil {
+		if data, err = procfs.ReadAll("/proc/" + pid + "/smaps"); err != nil {
+			return err
+		}
+	}
+
+	s := strings.Split(string(data), "\n")
+	var pos int
+	var tmp, privateHuge, sharedHuge, shared, private, pss int64
+	var havePss bool
+	for _, line := range s {
+		if pos = strings.IndexRune(line, ':'); pos == -1 {
+			continue
+		}
+
+		k := line[:pos]
+		v := strings.TrimSpace(line[pos+1:])
+
+		trimUnit(v, &tmp)
+
+		if tmp == -1 {
+			continue
+		}
+
+		switch k {
+		case "Private_Hugetlb":
+			privateHuge += tmp
+			continue
+		case "Shared_Hugetlb":
+			sharedHuge += tmp
+			continue
+		case "Pss":
+			havePss = true
+			pss += (tmp + pssAdjust)
+			continue
+		}
+
+		if strings.HasPrefix(k, "Shared") {
+			shared += tmp
+		} else if strings.HasPrefix(k, "Private") {
+			private += tmp
+		}
+	}
+
+	if havePss {
+		shared = pss - private
+	}
+
+	proc.Pss = shared + private + privateHuge + sharedHuge
+
+	return nil
+}
+
+func parseStatm(pid string, proc *procStatus) error {
+	const statmMinColumnCount = 2
+	var data []byte
+	var err error
+
+	if data, err = procfs.ReadAll("/proc/" + pid + "/statm"); err != nil {
+		return fmt.Errorf("failed to read statm file: %w", err)
+	}
+
+	var lines []string
+
+	if lines = strings.Split(string(data), " "); len(lines) < statmMinColumnCount {
+		return fmt.Errorf("failed to parse memory stats: %w", errStatmFormat)
+	}
+
+	var rss int64
+
+	if rss, err = strconv.ParseInt(lines[1], 10, 64); err != nil {
+		return fmt.Errorf("failed to parse RSS count from statm: %w", err)
+	}
+
+	proc.Pss = rss * int64(os.Getpagesize())
+
+	return nil
+}
+
+func getProcessPss(pid string, proc *procStatus) {
+	if err := parseSmaps(pid, proc); err == nil {
+		return
+	}
+
+	if err := parseStatm(pid, proc); err == nil {
+		return
+	}
+
+	proc.Pss = -1
+}
+
 func getProcessCalculatedMetrics(pid string, proc *procStatus) {
 	addNonNegative(&proc.Size, proc.Exe)
 	addNonNegative(&proc.Size, proc.Data)
@@ -166,6 +251,8 @@ func getProcessCalculatedMetrics(pid string, proc *procStatus) {
 	}
 
 	proc.Pmem = float64(proc.Rss) / float64(mem) * 100.00
+
+	getProcessPss(pid, proc)
 }
 
 func getProcessCpuTimes(pid string, proc *procStatus) {
@@ -207,7 +294,7 @@ func getProcessNames(pid string, proc *procStatus) (err error) {
 
 func getProcessState(pid string) (name string, err error) {
 	var data []byte
-	if data, err = read2k("/proc/" + pid + "/status"); err != nil {
+	if data, err = procfs.ReadAll("/proc/" + pid + "/status"); err != nil {
 		return
 	}
 
@@ -267,7 +354,7 @@ func getProcessCmdline(pid string, flags int) (arg0 string, cmdline string, err 
 
 func getProcessStats(pid string, stat *procStat) {
 	var data []byte
-	if data, stat.err = read2k("/proc/" + pid + "/stat"); stat.err != nil {
+	if data, stat.err = procfs.ReadAll("/proc/" + pid + "/stat"); stat.err != nil {
 		return
 	}
 	var pos int

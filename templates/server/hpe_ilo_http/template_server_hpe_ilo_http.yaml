@@ -33,7 +33,6 @@ zabbix_export:
           key: hpe.ilo.get_data
           delay: '{$ILO.INTERVAL}'
           history: '0'
-          trends: '0'
           value_type: TEXT
           params: |
             var ilo = {
@@ -235,16 +234,18 @@ zabbix_export:
             								}
             							}
             
-            							var storage_volumes = ilo.apiRequest('redfish/v1/Systems/' + get_systems.Members[i].Id + '/Storage/' + system_storages.Members[j].Id + '/Volumes?$expand=.');
+            							if ('Volumes' in system_storages.Members[j]) {
+            								var storage_volumes = ilo.apiRequest('redfish/v1/Systems/' + get_systems.Members[i].Id + '/Storage/' + system_storages.Members[j].Id + '/Volumes?$expand=.');
             
-            							if (ilo.checkArray(storage_volumes.Members)) {
-            								for (k in storage_volumes.Members) {
-            									storage_volumes.Members[k].systemHostname = get_systems.Members[i].HostName;
-            									storage_volumes.Members[k].systemType = get_systems.Members[i].SystemType;
-            									storage_volumes.Members[k].systemId = get_systems.Members[i].Id;
-            									storage_volumes.Members[k].storageId = system_storages.Members[j].Id;
+            								if (ilo.checkArray(storage_volumes.Members)) {
+            									for (k in storage_volumes.Members) {
+            										storage_volumes.Members[k].systemHostname = get_systems.Members[i].HostName;
+            										storage_volumes.Members[k].systemType = get_systems.Members[i].SystemType;
+            										storage_volumes.Members[k].systemId = get_systems.Members[i].Id;
+            										storage_volumes.Members[k].storageId = system_storages.Members[j].Id;
             
-            									volumes.push(storage_volumes.Members[k]);
+            										volumes.push(storage_volumes.Members[k]);
+            									}
             								}
             							}
             						}
@@ -340,9 +341,6 @@ zabbix_export:
           name: 'Get data check'
           type: DEPENDENT
           key: hpe.ilo.get_data.check
-          delay: '0'
-          history: 7d
-          trends: '0'
           value_type: CHAR
           description: 'The data collection check.'
           preprocessing:
@@ -372,33 +370,25 @@ zabbix_export:
           name: 'HPE iLO: Computer systems discovery'
           type: DEPENDENT
           key: hpe.ilo.computer_systems.discovery
-          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#SYSTEM_HOSTNAME}'
                 value: '{$ILO.COMPUTER_SYSTEM.DISCOVERY.HOSTNAME.MATCHES:"System"}'
-                formulaid: A
               - macro: '{#SYSTEM_HOSTNAME}'
                 value: '{$ILO.COMPUTER_SYSTEM.DISCOVERY.HOSTNAME.NOT_MATCHES:"System"}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
               - macro: '{#SYSTEM_TYPE}'
                 value: '{$ILO.COMPUTER_SYSTEM.DISCOVERY.TYPE.MATCHES:"System"}'
-                formulaid: C
               - macro: '{#SYSTEM_TYPE}'
                 value: '{$ILO.COMPUTER_SYSTEM.DISCOVERY.TYPE.NOT_MATCHES:"System"}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: D
           description: 'Discovers computer systems.'
           item_prototypes:
             - uuid: 2815e03a856e4c0389ee2fb545d6c97f
               name: 'Computer system [{#SYSTEM_HOSTNAME}]: BIOS current version'
               type: DEPENDENT
               key: 'hpe.ilo.computer_system.bios.current_version[{#SYSTEM_ID}]'
-              delay: '0'
-              history: 7d
-              trends: '0'
               value_type: CHAR
               description: 'The current BIOS version of the computer system.'
               preprocessing:
@@ -433,9 +423,7 @@ zabbix_export:
               name: 'Computer system [{#SYSTEM_HOSTNAME}]: Get data'
               type: DEPENDENT
               key: 'hpe.ilo.computer_system.get_data[{#SYSTEM_ID}]'
-              delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
               description: 'Get data about the computer system.'
               preprocessing:
@@ -456,9 +444,6 @@ zabbix_export:
               name: 'Computer system [{#SYSTEM_HOSTNAME}]: Model'
               type: DEPENDENT
               key: 'hpe.ilo.computer_system.model[{#SYSTEM_ID}]'
-              delay: '0'
-              history: 7d
-              trends: '0'
               value_type: CHAR
               description: 'The model name of the computer system.'
               preprocessing:
@@ -482,9 +467,6 @@ zabbix_export:
               name: 'Computer system [{#SYSTEM_HOSTNAME}]: Serial number'
               type: DEPENDENT
               key: 'hpe.ilo.computer_system.serial_number[{#SYSTEM_ID}]'
-              delay: '0'
-              history: 7d
-              trends: '0'
               value_type: CHAR
               description: 'The serial number of the computer system.'
               preprocessing:
@@ -518,8 +500,6 @@ zabbix_export:
               name: 'Computer system [{#SYSTEM_HOSTNAME}]: Status'
               type: DEPENDENT
               key: 'hpe.ilo.computer_system.status[{#SYSTEM_ID}]'
-              delay: '0'
-              history: 7d
               description: |
                 The overall health state from the view of this computer system. Possible values:
                 
@@ -582,8 +562,6 @@ zabbix_export:
               name: 'Computer system [{#SYSTEM_HOSTNAME}]: System type'
               type: DEPENDENT
               key: 'hpe.ilo.computer_system.type[{#SYSTEM_ID}]'
-              delay: '0'
-              history: 7d
               description: |
                 The type of the computer system. Possible values:
                 
@@ -628,8 +606,6 @@ zabbix_export:
               name: 'Computer system [{#SYSTEM_HOSTNAME}]: CPU utilization, in %'
               type: DEPENDENT
               key: 'hpe.ilo.computer_system.usage.cpu_util[{#SYSTEM_ID}]'
-              delay: '0'
-              history: 7d
               units: '%'
               description: 'Current CPU utilization of the computer system in percentage.'
               preprocessing:
@@ -652,8 +628,6 @@ zabbix_export:
               name: 'Computer system [{#SYSTEM_HOSTNAME}]: I/O bus utilization, in %'
               type: DEPENDENT
               key: 'hpe.ilo.computer_system.usage.io_bus_util[{#SYSTEM_ID}]'
-              delay: '0'
-              history: 7d
               units: '%'
               description: 'Current I/O bus utilization of the computer system in percentage.'
               preprocessing:
@@ -676,8 +650,6 @@ zabbix_export:
               name: 'Computer system [{#SYSTEM_HOSTNAME}]: Memory bus utilization, in %'
               type: DEPENDENT
               key: 'hpe.ilo.computer_system.usage.memory_bus_util[{#SYSTEM_ID}]'
-              delay: '0'
-              history: 7d
               units: '%'
               description: 'Current memory bus utilization of the computer system in percentage.'
               preprocessing:
@@ -747,33 +719,26 @@ zabbix_export:
           name: 'HPE iLO: Controllers discovery'
           type: DEPENDENT
           key: hpe.ilo.controllers.discovery
-          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#SYSTEM_HOSTNAME}'
                 value: '{$ILO.COMPUTER_SYSTEM.DISCOVERY.HOSTNAME.MATCHES:"Controller"}'
-                formulaid: A
               - macro: '{#SYSTEM_HOSTNAME}'
                 value: '{$ILO.COMPUTER_SYSTEM.DISCOVERY.HOSTNAME.NOT_MATCHES:"Controller"}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
               - macro: '{#SYSTEM_TYPE}'
                 value: '{$ILO.COMPUTER_SYSTEM.DISCOVERY.TYPE.MATCHES:"Controller"}'
-                formulaid: C
               - macro: '{#SYSTEM_TYPE}'
                 value: '{$ILO.COMPUTER_SYSTEM.DISCOVERY.TYPE.NOT_MATCHES:"Controller"}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: D
           description: 'Discovers storage controllers.'
           item_prototypes:
             - uuid: aa246b9ca7454479b9396851f4be67aa
               name: 'Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Controller [{#CONTROLLER_ID}]: Get data'
               type: DEPENDENT
               key: 'hpe.ilo.controller.get_data[{#SYSTEM_ID}, {#STORAGE_ID}, {#CONTROLLER_ID}]'
-              delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
               description: 'Get data about the controller.'
               preprocessing:
@@ -802,9 +767,6 @@ zabbix_export:
               name: 'Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Controller [{#CONTROLLER_ID}]: Model'
               type: DEPENDENT
               key: 'hpe.ilo.controller.model[{#SYSTEM_ID}, {#STORAGE_ID}, {#CONTROLLER_ID}]'
-              delay: '0'
-              history: 7d
-              trends: '0'
               value_type: CHAR
               description: 'The model name of the controller.'
               preprocessing:
@@ -836,9 +798,6 @@ zabbix_export:
               name: 'Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Controller [{#CONTROLLER_ID}]: Serial number'
               type: DEPENDENT
               key: 'hpe.ilo.controller.serial_number[{#SYSTEM_ID}, {#STORAGE_ID}, {#CONTROLLER_ID}]'
-              delay: '0'
-              history: 7d
-              trends: '0'
               value_type: CHAR
               description: 'The serial number of the controller.'
               preprocessing:
@@ -880,8 +839,6 @@ zabbix_export:
               name: 'Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Controller [{#CONTROLLER_ID}]: Status'
               type: DEPENDENT
               key: 'hpe.ilo.controller.status[{#SYSTEM_ID}, {#STORAGE_ID}, {#CONTROLLER_ID}]'
-              delay: '0'
-              history: 7d
               description: |
                 The health state of the controller. Possible values:
                 
@@ -986,32 +943,25 @@ zabbix_export:
           name: 'HPE iLO: Drives discovery'
           type: DEPENDENT
           key: hpe.ilo.drives.discovery
-          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#SYSTEM_HOSTNAME}'
                 value: '{$ILO.COMPUTER_SYSTEM.DISCOVERY.HOSTNAME.MATCHES:"Drive"}'
-                formulaid: A
               - macro: '{#SYSTEM_HOSTNAME}'
                 value: '{$ILO.COMPUTER_SYSTEM.DISCOVERY.HOSTNAME.NOT_MATCHES:"Drive"}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
               - macro: '{#SYSTEM_TYPE}'
                 value: '{$ILO.COMPUTER_SYSTEM.DISCOVERY.TYPE.MATCHES:"Drive"}'
-                formulaid: C
               - macro: '{#SYSTEM_TYPE}'
                 value: '{$ILO.COMPUTER_SYSTEM.DISCOVERY.TYPE.NOT_MATCHES:"Drive"}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: D
           description: 'Discovers storage drives.'
           item_prototypes:
             - uuid: c3935598d1b14f8a9ceaadd315ffd64e
               name: 'Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Drive [{#DRIVE_ID}]: Capacity'
               type: DEPENDENT
               key: 'hpe.ilo.drive.capacity[{#SYSTEM_ID}, {#STORAGE_ID}, {#DRIVE_ID}]'
-              delay: '0'
-              history: 7d
               units: B
               description: 'The capacity of the drive.'
               preprocessing:
@@ -1041,9 +991,7 @@ zabbix_export:
               name: 'Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Drive [{#DRIVE_ID}]: Get data'
               type: DEPENDENT
               key: 'hpe.ilo.drive.get_data[{#SYSTEM_ID}, {#STORAGE_ID}, {#DRIVE_ID}]'
-              delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
               description: 'Get data about the drive.'
               preprocessing:
@@ -1072,8 +1020,6 @@ zabbix_export:
               name: 'Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Drive [{#DRIVE_ID}]: Media type'
               type: DEPENDENT
               key: 'hpe.ilo.drive.media_type[{#SYSTEM_ID}, {#STORAGE_ID}, {#DRIVE_ID}]'
-              delay: '0'
-              history: 7d
               description: 'The media type of the drive.'
               valuemap:
                 name: 'Media type'
@@ -1111,9 +1057,6 @@ zabbix_export:
               name: 'Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Drive [{#DRIVE_ID}]: Model'
               type: DEPENDENT
               key: 'hpe.ilo.drive.model[{#SYSTEM_ID}, {#STORAGE_ID}, {#DRIVE_ID}]'
-              delay: '0'
-              history: 7d
-              trends: '0'
               value_type: CHAR
               description: 'The model name of the drive.'
               preprocessing:
@@ -1145,8 +1088,6 @@ zabbix_export:
               name: 'Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Drive [{#DRIVE_ID}]: Predicted media life left, in %'
               type: DEPENDENT
               key: 'hpe.ilo.drive.predicted_life_left[{#SYSTEM_ID}, {#STORAGE_ID}, {#DRIVE_ID}]'
-              delay: '0'
-              history: 7d
               discover: NO_DISCOVER
               units: '%'
               description: 'The percentage of reads and writes that are predicted to still be available for the drive.'
@@ -1176,9 +1117,6 @@ zabbix_export:
               name: 'Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Drive [{#DRIVE_ID}]: Serial number'
               type: DEPENDENT
               key: 'hpe.ilo.drive.serial_number[{#SYSTEM_ID}, {#STORAGE_ID}, {#DRIVE_ID}]'
-              delay: '0'
-              history: 7d
-              trends: '0'
               value_type: CHAR
               description: 'The serial number of the drive.'
               preprocessing:
@@ -1220,8 +1158,6 @@ zabbix_export:
               name: 'Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Drive [{#DRIVE_ID}]: Status indicator'
               type: DEPENDENT
               key: 'hpe.ilo.drive.status_indicator[{#SYSTEM_ID}, {#STORAGE_ID}, {#DRIVE_ID}]'
-              delay: '0'
-              history: 7d
               description: |
                 Status of drive. Possible values:
                 
@@ -1342,7 +1278,6 @@ zabbix_export:
                 conditions:
                   - macro: '{#DRIVE_TYPE}'
                     value: SSD
-                    formulaid: A
               operations:
                 - operationobject: ITEM_PROTOTYPE
                   operator: REGEXP
@@ -1352,23 +1287,19 @@ zabbix_export:
           name: 'HPE iLO: Fans discovery'
           type: DEPENDENT
           key: hpe.ilo.fans.discovery
-          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#FAN_STATE}'
                 value: Absent
                 operator: NOT_MATCHES_REGEX
-                formulaid: A
           description: 'Discovers chassis fans.'
           item_prototypes:
             - uuid: bd8bceea000a4677b982b56a119ece7e
               name: 'Chassis [{#CHASSIS_ID}]: Fan [{#FAN_NAME}]: Get data'
               type: DEPENDENT
               key: 'hpe.ilo.fan.get_data[{#CHASSIS_ID}, {#FAN_ID}]'
-              delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
               description: 'Get data about the fan.'
               preprocessing:
@@ -1393,8 +1324,6 @@ zabbix_export:
               name: 'Chassis [{#CHASSIS_ID}]: Fan [{#FAN_NAME}]: Speed, in %'
               type: DEPENDENT
               key: 'hpe.ilo.fan.speed[{#CHASSIS_ID}, {#FAN_ID}]'
-              delay: '0'
-              history: 7d
               units: '%'
               description: 'The current speed of the fan.'
               preprocessing:
@@ -1418,8 +1347,6 @@ zabbix_export:
               name: 'Chassis [{#CHASSIS_ID}]: Fan [{#FAN_NAME}]: Status'
               type: DEPENDENT
               key: 'hpe.ilo.fan.status[{#CHASSIS_ID}, {#FAN_ID}]'
-              delay: '0'
-              history: 7d
               description: |
                 The health state of the fan. Possible values:
                 
@@ -1526,16 +1453,12 @@ zabbix_export:
           name: 'HPE iLO: Managers discovery'
           type: DEPENDENT
           key: hpe.ilo.managers.discovery
-          delay: '0'
           description: 'Discovers managers.'
           item_prototypes:
             - uuid: 822317e3e16741c88cc749d5f5b7e67c
               name: 'Manager [{#MANAGER_ID}]: Current firmware version'
               type: DEPENDENT
               key: 'hpe.ilo.manager.firmware.current_version[{#MANAGER_ID}]'
-              delay: '0'
-              history: 7d
-              trends: '0'
               value_type: CHAR
               description: 'The current firmware version of the manager.'
               preprocessing:
@@ -1570,9 +1493,7 @@ zabbix_export:
               name: 'Manager [{#MANAGER_ID}]: Get data'
               type: DEPENDENT
               key: 'hpe.ilo.manager.get_data[{#MANAGER_ID}]'
-              delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
               description: 'Get data about the manager.'
               preprocessing:
@@ -1593,9 +1514,6 @@ zabbix_export:
               name: 'Manager [{#MANAGER_ID}]: Model'
               type: DEPENDENT
               key: 'hpe.ilo.manager.model[{#MANAGER_ID}]'
-              delay: '0'
-              history: 7d
-              trends: '0'
               value_type: CHAR
               description: 'The model name of the manager.'
               preprocessing:
@@ -1619,8 +1537,6 @@ zabbix_export:
               name: 'Manager [{#MANAGER_ID}]: Status'
               type: DEPENDENT
               key: 'hpe.ilo.manager.status[{#MANAGER_ID}]'
-              delay: '0'
-              history: 7d
               description: |
                 The health state of the manager. Possible values:
                 
@@ -1683,8 +1599,6 @@ zabbix_export:
               name: 'Manager [{#MANAGER_ID}]: Manager type'
               type: DEPENDENT
               key: 'hpe.ilo.manager.type[{#MANAGER_ID}]'
-              delay: '0'
-              history: 7d
               description: |
                 The manager type. Possible values:
                 
@@ -1743,23 +1657,19 @@ zabbix_export:
           name: 'HPE iLO: PSU discovery'
           type: DEPENDENT
           key: hpe.ilo.psu.discovery
-          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#PSU_STATE}'
                 value: Absent
                 operator: NOT_MATCHES_REGEX
-                formulaid: A
           description: 'Discovers chassis power supply units (PSU).'
           item_prototypes:
             - uuid: adb24bee15a341ffbe51047c0798a906
               name: 'Chassis [{#CHASSIS_ID}]: PSU [{#PSU_ID}]: Get data'
               type: DEPENDENT
               key: 'hpe.ilo.psu.get_data[{#CHASSIS_ID}, {#PSU_ID}]'
-              delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
               description: 'Get data about the PSU.'
               preprocessing:
@@ -1782,8 +1692,6 @@ zabbix_export:
               name: 'Chassis [{#CHASSIS_ID}]: PSU [{#PSU_ID}]: Last power output'
               type: DEPENDENT
               key: 'hpe.ilo.psu.last_power_output[{#CHASSIS_ID}, {#PSU_ID}]'
-              delay: '0'
-              history: 7d
               units: W
               description: 'The average power output of the PSU.'
               preprocessing:
@@ -1805,8 +1713,6 @@ zabbix_export:
               name: 'Chassis [{#CHASSIS_ID}]: PSU [{#PSU_ID}]: Line input voltage'
               type: DEPENDENT
               key: 'hpe.ilo.psu.line_input_voltage[{#CHASSIS_ID}, {#PSU_ID}]'
-              delay: '0'
-              history: 7d
               units: V
               description: 'The line input voltage at which the PSU is operating.'
               preprocessing:
@@ -1828,9 +1734,6 @@ zabbix_export:
               name: 'Chassis [{#CHASSIS_ID}]: PSU [{#PSU_ID}]: Model'
               type: DEPENDENT
               key: 'hpe.ilo.psu.model[{#CHASSIS_ID}, {#PSU_ID}]'
-              delay: '0'
-              history: 7d
-              trends: '0'
               value_type: CHAR
               description: 'The model name of the PSU.'
               preprocessing:
@@ -1856,9 +1759,6 @@ zabbix_export:
               name: 'Chassis [{#CHASSIS_ID}]: PSU [{#PSU_ID}]: Serial number'
               type: DEPENDENT
               key: 'hpe.ilo.psu.serial_number[{#CHASSIS_ID}, {#PSU_ID}]'
-              delay: '0'
-              history: 7d
-              trends: '0'
               value_type: CHAR
               description: 'The serial number of the PSU.'
               preprocessing:
@@ -1894,8 +1794,6 @@ zabbix_export:
               name: 'Chassis [{#CHASSIS_ID}]: PSU [{#PSU_ID}]: Status'
               type: DEPENDENT
               key: 'hpe.ilo.psu.status[{#CHASSIS_ID}, {#PSU_ID}]'
-              delay: '0'
-              history: 7d
               description: |
                 The health state of the PSU. Possible values:
                 
@@ -2002,37 +1900,29 @@ zabbix_export:
           name: 'HPE iLO: Temperature sensors discovery'
           type: DEPENDENT
           key: hpe.ilo.sensors.discovery
-          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#SENSOR_CONTEXT}'
                 value: '{$ILO.SENSOR.DISCOVERY.CONTEXT.MATCHES}'
-                formulaid: A
               - macro: '{#SENSOR_CONTEXT}'
                 value: '{$ILO.SENSOR.DISCOVERY.CONTEXT.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
               - macro: '{#SENSOR_NAME}'
                 value: '{$ILO.SENSOR.DISCOVERY.NAME.MATCHES}'
-                formulaid: C
               - macro: '{#SENSOR_NAME}'
                 value: '{$ILO.SENSOR.DISCOVERY.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: D
               - macro: '{#SENSOR_STATE}'
                 value: Absent
                 operator: NOT_MATCHES_REGEX
-                formulaid: E
           description: 'Discovers chassis temperature sensors.'
           item_prototypes:
             - uuid: 0067035f746a4317988d70844e71dd7a
               name: 'Chassis [{#CHASSIS_ID}]: Sensor [{#SENSOR_NAME}]: Get data'
               type: DEPENDENT
               key: 'hpe.ilo.sensor.get_data[{#CHASSIS_ID}, {#SENSOR_ID}]'
-              delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
               description: 'Get data about the sensor.'
               preprocessing:
@@ -2059,8 +1949,6 @@ zabbix_export:
               name: 'Chassis [{#CHASSIS_ID}]: Sensor [{#SENSOR_NAME}]: Status'
               type: DEPENDENT
               key: 'hpe.ilo.sensor.status[{#CHASSIS_ID}, {#SENSOR_ID}]'
-              delay: '0'
-              history: 7d
               description: |
                 The health state of the sensor. Possible values:
                 
@@ -2129,8 +2017,6 @@ zabbix_export:
               name: 'Chassis [{#CHASSIS_ID}]: Sensor [{#SENSOR_NAME}]: Temperature'
               type: DEPENDENT
               key: 'hpe.ilo.sensor.temperature[{#CHASSIS_ID}, {#SENSOR_ID}]'
-              delay: '0'
-              history: 7d
               units: '!°C'
               description: 'The current temperature reading in Celsius degrees for the sensor.'
               preprocessing:
@@ -2197,33 +2083,26 @@ zabbix_export:
           name: 'HPE iLO: Storages discovery'
           type: DEPENDENT
           key: hpe.ilo.storages.discovery
-          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#SYSTEM_HOSTNAME}'
                 value: '{$ILO.COMPUTER_SYSTEM.DISCOVERY.HOSTNAME.MATCHES:"Storage"}'
-                formulaid: A
               - macro: '{#SYSTEM_HOSTNAME}'
                 value: '{$ILO.COMPUTER_SYSTEM.DISCOVERY.HOSTNAME.NOT_MATCHES:"Storage"}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
               - macro: '{#SYSTEM_TYPE}'
                 value: '{$ILO.COMPUTER_SYSTEM.DISCOVERY.TYPE.MATCHES:"Storage"}'
-                formulaid: C
               - macro: '{#SYSTEM_TYPE}'
                 value: '{$ILO.COMPUTER_SYSTEM.DISCOVERY.TYPE.NOT_MATCHES:"Storage"}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: D
           description: 'Discovers computer system storages.'
           item_prototypes:
             - uuid: 51a5467f6d5948da803123a360ca2973
               name: 'Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Get data'
               type: DEPENDENT
               key: 'hpe.ilo.storage.get_data[{#SYSTEM_ID}, {#STORAGE_ID}]'
-              delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
               description: 'Get data about the storage.'
               preprocessing:
@@ -2246,8 +2125,6 @@ zabbix_export:
               name: 'Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Status'
               type: DEPENDENT
               key: 'hpe.ilo.storage.status[{#SYSTEM_ID}, {#STORAGE_ID}]'
-              delay: '0'
-              history: 7d
               description: |
                 The overall health state from the view of this storage. Possible values:
                 
@@ -2345,32 +2222,25 @@ zabbix_export:
           name: 'HPE iLO: Volumes discovery'
           type: DEPENDENT
           key: hpe.ilo.volumes.discovery
-          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#SYSTEM_HOSTNAME}'
                 value: '{$ILO.COMPUTER_SYSTEM.DISCOVERY.HOSTNAME.MATCHES:"Volume"}'
-                formulaid: A
               - macro: '{#SYSTEM_HOSTNAME}'
                 value: '{$ILO.COMPUTER_SYSTEM.DISCOVERY.HOSTNAME.NOT_MATCHES:"Volume"}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
               - macro: '{#SYSTEM_TYPE}'
                 value: '{$ILO.COMPUTER_SYSTEM.DISCOVERY.TYPE.MATCHES:"Volume"}'
-                formulaid: C
               - macro: '{#SYSTEM_TYPE}'
                 value: '{$ILO.COMPUTER_SYSTEM.DISCOVERY.TYPE.NOT_MATCHES:"Volume"}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: D
           description: 'Discovers storage volumes.'
           item_prototypes:
             - uuid: 9128fbbb6f0a450abb03f427cf22210f
               name: 'Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Volume [{#VOLUME_ID}]: Capacity'
               type: DEPENDENT
               key: 'hpe.ilo.volume.capacity[{#SYSTEM_ID}, {#STORAGE_ID}, {#VOLUME_ID}]'
-              delay: '0'
-              history: 7d
               units: B
               description: 'The capacity of the volume.'
               preprocessing:
@@ -2398,9 +2268,7 @@ zabbix_export:
               name: 'Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Volume [{#VOLUME_ID}]: Get data'
               type: DEPENDENT
               key: 'hpe.ilo.volume.get_data[{#SYSTEM_ID}, {#STORAGE_ID}, {#VOLUME_ID}]'
-              delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
               description: 'Get data about the volume.'
               preprocessing:
@@ -2427,8 +2295,6 @@ zabbix_export:
               name: 'Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Volume [{#VOLUME_ID}]: RAID level'
               type: DEPENDENT
               key: 'hpe.ilo.volume.raid_level[{#SYSTEM_ID}, {#STORAGE_ID}, {#VOLUME_ID}]'
-              delay: '0'
-              history: 7d
               description: 'The RAID level of the volume.'
               valuemap:
                 name: 'RAID level'
@@ -2480,8 +2346,6 @@ zabbix_export:
               name: 'Computer system [{#SYSTEM_HOSTNAME}]: Storage [{#STORAGE_ID}]: Volume [{#VOLUME_ID}]: Status'
               type: DEPENDENT
               key: 'hpe.ilo.volume.status[{#SYSTEM_ID}, {#STORAGE_ID}, {#VOLUME_ID}]'
-              delay: '0'
-              history: 7d
               description: |
                 The health state of the volume. Possible values:
                 

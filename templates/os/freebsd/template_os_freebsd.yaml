@@ -30,8 +30,6 @@ zabbix_export:
           name: 'Host name of Zabbix agent running'
           key: agent.hostname
           delay: 1h
-          history: 7d
-          trends: '0'
           value_type: CHAR
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -43,7 +41,6 @@ zabbix_export:
         - uuid: da59d099f7614653b37b8eaaa518ebd2
           name: 'Zabbix agent ping'
           key: agent.ping
-          history: 7d
           description: 'The agent always returns "1" for this item. May be used in combination with `nodata()` for the availability check.'
           valuemap:
             name: 'Zabbix agent ping status'
@@ -54,8 +51,6 @@ zabbix_export:
           name: 'Version of Zabbix agent running'
           key: agent.version
           delay: 1h
-          history: 7d
-          trends: '0'
           value_type: CHAR
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -68,7 +63,6 @@ zabbix_export:
           name: 'Maximum number of opened files'
           key: kernel.maxfiles
           delay: 1h
-          history: 7d
           description: 'May be increased by using the `sysctl` utility or modifying the file `/etc/sysctl.conf`.'
           tags:
             - tag: component
@@ -87,7 +81,6 @@ zabbix_export:
           name: 'Maximum number of processes'
           key: kernel.maxproc
           delay: 1h
-          history: 7d
           description: 'May be increased by using the `sysctl` utility or modifying the file `/etc/sysctl.conf`.'
           tags:
             - tag: component
@@ -107,7 +100,6 @@ zabbix_export:
         - uuid: 448c6de07b244281a4b1defe2e811773
           name: 'Number of running processes'
           key: 'proc.num[,,run]'
-          history: 7d
           description: 'Number of processes in a running state.'
           tags:
             - tag: component
@@ -127,7 +119,6 @@ zabbix_export:
         - uuid: 5fd5b351d8214eac8f4f4649594c27eb
           name: 'Number of processes'
           key: 'proc.num[]'
-          history: 7d
           description: 'Total number of processes in any state.'
           tags:
             - tag: component
@@ -148,7 +139,6 @@ zabbix_export:
           name: 'Host boot time'
           key: system.boottime
           delay: 10m
-          history: 7d
           units: unixtime
           tags:
             - tag: component
@@ -156,20 +146,16 @@ zabbix_export:
         - uuid: db555e8318cf4e7aa7beb85aa0250697
           name: 'Interrupts per second'
           key: system.cpu.intr
-          history: 7d
           units: ips
           description: 'Number of interrupts processed.'
           preprocessing:
             - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           tags:
             - tag: component
               value: cpu
         - uuid: 2336b2ec03a846f3bed1e64384b2532e
           name: 'Processor load (1 min average per core)'
           key: 'system.cpu.load[percpu,avg1]'
-          history: 7d
           value_type: FLOAT
           description: 'Calculated as the system CPU load divided by the number of CPU cores.'
           tags:
@@ -188,7 +174,6 @@ zabbix_export:
         - uuid: de68f40fc96648c0925c1f6a4ca6776e
           name: 'Processor load (5 min average per core)'
           key: 'system.cpu.load[percpu,avg5]'
-          history: 7d
           value_type: FLOAT
           description: 'Calculated as the system CPU load divided by the number of CPU cores.'
           tags:
@@ -197,7 +182,6 @@ zabbix_export:
         - uuid: ad9ebf859f7346ca885c1edcb7333d78
           name: 'Processor load (15 min average per core)'
           key: 'system.cpu.load[percpu,avg15]'
-          history: 7d
           value_type: FLOAT
           description: 'Calculated as the system CPU load divided by the number of CPU cores.'
           tags:
@@ -206,20 +190,16 @@ zabbix_export:
         - uuid: 0a140185a5114dd29451bfac68abdde5
           name: 'Context switches per second'
           key: system.cpu.switches
-          history: 7d
           units: sps
           description: 'The combined rate at which all processors on the computer are switched from one thread to another.'
           preprocessing:
             - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           tags:
             - tag: component
               value: cpu
         - uuid: 7612803821c845889bda84b7f1ac9ae5
           name: 'CPU idle time'
           key: 'system.cpu.util[,idle]'
-          history: 7d
           value_type: FLOAT
           units: '%'
           description: 'Time the CPU has spent doing nothing.'
@@ -229,7 +209,6 @@ zabbix_export:
         - uuid: f2acc3cd432546e5a223095a0ea2f096
           name: 'CPU interrupt time'
           key: 'system.cpu.util[,interrupt]'
-          history: 7d
           value_type: FLOAT
           units: '%'
           description: 'Time the CPU has spent servicing hardware interrupts.'
@@ -239,7 +218,6 @@ zabbix_export:
         - uuid: efa92492bec0437ba74f47d694500cab
           name: 'CPU nice time'
           key: 'system.cpu.util[,nice]'
-          history: 7d
           value_type: FLOAT
           units: '%'
           description: 'Time the CPU has spent running users'' processes that have been niced.'
@@ -249,7 +227,6 @@ zabbix_export:
         - uuid: c9479b02b04141128b1ce7c8f3726c09
           name: 'CPU system time'
           key: 'system.cpu.util[,system]'
-          history: 7d
           value_type: FLOAT
           units: '%'
           description: 'Time the CPU has spent running the kernel and its processes.'
@@ -259,7 +236,6 @@ zabbix_export:
         - uuid: 1f3bc82009e04b59845a0e15004637ad
           name: 'CPU user time'
           key: 'system.cpu.util[,user]'
-          history: 7d
           value_type: FLOAT
           units: '%'
           description: 'Time the CPU has spent running users'' processes that are not niced.'
@@ -270,8 +246,6 @@ zabbix_export:
           name: 'Host name'
           key: system.hostname
           delay: 1h
-          history: 7d
-          trends: '0'
           value_type: CHAR
           description: 'The host name of the system.'
           inventory_link: NAME
@@ -293,7 +267,6 @@ zabbix_export:
         - uuid: 4095ed7d606a47439294097a98af2c4f
           name: 'Host local time'
           key: system.localtime
-          history: 7d
           units: unixtime
           description: 'The local system time of the host.'
           tags:
@@ -302,7 +275,6 @@ zabbix_export:
         - uuid: 63fc1259011f4250901889979cdf472c
           name: 'Free swap space'
           key: 'system.swap.size[,free]'
-          history: 7d
           units: B
           description: 'The free space of the swap volume/file expressed in bytes.'
           tags:
@@ -311,7 +283,6 @@ zabbix_export:
         - uuid: 187d11e610b94b468d18b88ca38f2c32
           name: 'Free swap space in %'
           key: 'system.swap.size[,pfree]'
-          history: 7d
           value_type: FLOAT
           units: '%'
           description: 'The free space of the swap volume/file expressed in %.'
@@ -333,7 +304,6 @@ zabbix_export:
           name: 'Total swap space'
           key: 'system.swap.size[,total]'
           delay: 1h
-          history: 7d
           units: B
           description: 'Total space of the swap volume/file expressed in bytes.'
           tags:
@@ -343,8 +313,6 @@ zabbix_export:
           name: 'System information'
           key: system.uname
           delay: 1h
-          history: 7d
-          trends: '0'
           value_type: CHAR
           description: 'Information as normally returned by `uname -a`.'
           inventory_link: OS
@@ -367,7 +335,6 @@ zabbix_export:
           name: 'System uptime'
           key: system.uptime
           delay: 10m
-          history: 7d
           units: uptime
           tags:
             - tag: component
@@ -383,7 +350,6 @@ zabbix_export:
         - uuid: fec3e877764e4bfd98e77da9d8c73606
           name: 'Number of logged in users'
           key: system.users.num
-          history: 7d
           description: 'The number of users who are currently logged in.'
           tags:
             - tag: component
@@ -392,8 +358,6 @@ zabbix_export:
           name: 'Checksum of /etc/passwd'
           key: 'vfs.file.cksum[/etc/passwd,sha256]'
           delay: 15m
-          history: 7d
-          trends: '0'
           value_type: CHAR
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -414,7 +378,6 @@ zabbix_export:
           name: 'Get filesystems'
           key: vfs.fs.get
           history: '0'
-          trends: '0'
           value_type: TEXT
           description: 'The `vfs.fs.get` key acquires raw information set about the filesystems. Later to be extracted by preprocessing in dependent items.'
           tags:
@@ -423,7 +386,6 @@ zabbix_export:
         - uuid: 561c7a383b944bca9ec5f7c44e322fed
           name: 'Available memory'
           key: 'vm.memory.size[available]'
-          history: 7d
           units: B
           description: 'Defined as free + cached + buffers.'
           tags:
@@ -443,7 +405,6 @@ zabbix_export:
           name: 'Total memory'
           key: 'vm.memory.size[total]'
           delay: 1h
-          history: 7d
           units: B
           description: 'Total memory expressed in bytes.'
           tags:
@@ -453,7 +414,6 @@ zabbix_export:
           name: 'Zabbix agent availability'
           type: INTERNAL
           key: 'zabbix[host,agent,available]'
-          history: 7d
           description: 'Used for monitoring the availability status of the agent.'
           valuemap:
             name: zabbix.host.available
@@ -480,18 +440,14 @@ zabbix_export:
             conditions:
               - macro: '{#IFNAME}'
                 value: '@Network interfaces for discovery'
-                formulaid: A
           description: 'Used for the discovery of network interfaces.'
           item_prototypes:
             - uuid: b1f9e472c6ed467d8cb0cc1739c39b59
               name: 'Interface {#IFNAME}: Incoming network traffic'
               key: 'net.if.in[{#IFNAME}]'
-              history: 7d
               units: bps
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
                 - type: MULTIPLIER
                   parameters:
                     - '8'
@@ -503,12 +459,9 @@ zabbix_export:
             - uuid: ac93068d05084aa0a32a1bee78df3bd8
               name: 'Interface {#IFNAME}: Outgoing network traffic'
               key: 'net.if.out[{#IFNAME}]'
-              history: 7d
               units: bps
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
                 - type: MULTIPLIER
                   parameters:
                     - '8'
@@ -537,32 +490,25 @@ zabbix_export:
           name: 'Mounted filesystem discovery'
           type: DEPENDENT
           key: vfs.fs.dependent.discovery
-          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#FSNAME}'
                 value: '{$VFS.FS.FSNAME.MATCHES}'
-                formulaid: A
               - macro: '{#FSNAME}'
                 value: '{$VFS.FS.FSNAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
               - macro: '{#FSTYPE}'
                 value: '{$VFS.FS.FSTYPE.MATCHES}'
-                formulaid: C
               - macro: '{#FSTYPE}'
                 value: '{$VFS.FS.FSTYPE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: D
           description: 'The discovery of mounted filesystems with different types.'
           item_prototypes:
             - uuid: a5cdfe771122483fa1a88b2ea5c26b36
               name: 'FS [{#FSNAME}]: Inodes: Free, in %'
               type: DEPENDENT
               key: 'vfs.fs.dependent.inode[{#FSNAME},pfree]'
-              delay: '0'
-              history: 7d
               value_type: FLOAT
               units: '%'
               description: 'Free metadata space expressed in %.'
@@ -611,8 +557,6 @@ zabbix_export:
               name: 'FS [{#FSNAME}]: Space: Available'
               type: DEPENDENT
               key: 'vfs.fs.dependent.size[{#FSNAME},free]'
-              delay: '0'
-              history: 7d
               units: B
               description: 'Available storage space expressed in bytes.'
               preprocessing:
@@ -632,8 +576,6 @@ zabbix_export:
               name: 'FS [{#FSNAME}]: Space: Available, in %'
               type: DEPENDENT
               key: 'vfs.fs.dependent.size[{#FSNAME},pfree]'
-              delay: '0'
-              history: 7d
               value_type: FLOAT
               units: '%'
               description: |
@@ -657,8 +599,6 @@ zabbix_export:
               name: 'FS [{#FSNAME}]: Space: Used, in %'
               type: DEPENDENT
               key: 'vfs.fs.dependent.size[{#FSNAME},pused]'
-              delay: '0'
-              history: 7d
               value_type: FLOAT
               units: '%'
               description: 'Calculated as the percentage of currently used space compared to the maximum available space.'
@@ -715,8 +655,6 @@ zabbix_export:
               name: 'FS [{#FSNAME}]: Space: Total'
               type: DEPENDENT
               key: 'vfs.fs.dependent.size[{#FSNAME},total]'
-              delay: '0'
-              history: 7d
               units: B
               description: 'Total space expressed in bytes.'
               preprocessing:
@@ -736,8 +674,6 @@ zabbix_export:
               name: 'FS [{#FSNAME}]: Space: Used'
               type: DEPENDENT
               key: 'vfs.fs.dependent.size[{#FSNAME},used]'
-              delay: '0'
-              history: 7d
               units: B
               description: 'Used storage expressed in bytes.'
               preprocessing:
@@ -757,9 +693,7 @@ zabbix_export:
               name: 'FS [{#FSNAME}]: Get data'
               type: DEPENDENT
               key: 'vfs.fs.dependent[{#FSNAME},data]'
-              delay: '0'
               history: 1h
-              trends: '0'
               value_type: TEXT
               description: 'Intermediate data of `{#FSNAME}` filesystem.'
               preprocessing:
@@ -781,8 +715,6 @@ zabbix_export:
               name: 'FS [{#FSNAME}]: Option: Read-only'
               type: DEPENDENT
               key: 'vfs.fs.dependent[{#FSNAME},readonly]'
-              delay: '0'
-              history: 7d
               description: 'The filesystem is mounted as read-only. It is available only for Zabbix agents 6.4 and higher.'
               preprocessing:
                 - type: JSONPATH
@@ -888,7 +820,6 @@ zabbix_export:
                 conditions:
                   - macro: '{#FSTYPE}'
                     value: ^(btrfs|zfs)$
-                    formulaid: A
               operations:
                 - operationobject: ITEM_PROTOTYPE
                   operator: LIKE
