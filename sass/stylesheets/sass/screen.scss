@@ -1172,6 +1172,10 @@ form {
 		@extend %form-disabled;
 	}
 
+	&[aria-readonly] {
+		@extend %form-readonly;
+	}
+
 	input[type="text"] {
 		border: 0;
 		background: none;
@@ -1244,6 +1248,14 @@ form {
 			background-color: $multiselect-item-disabled-bg-color;
 			color: $multiselect-item-disabled-color;
 			-webkit-text-fill-color: $multiselect-item-disabled-color;
+		}
+	}
+
+	[aria-readonly] {
+		.subfilter-enabled,
+		.subfilter-disable-btn {
+			cursor: default;
+			background-color: $multiselect-item-disabled-bg-color;
 		}
 	}
 
@@ -1816,6 +1828,12 @@ select {
 				border-color: $form-border-color !important;
 			}
 		}
+
+		&:checked[readonly] + label span {
+			&::after {
+				border-color: $font-color !important;
+			}
+		}
 	}
 
 	&[type="radio"] {
@@ -1840,6 +1858,12 @@ select {
 		&:checked[disabled] + label span {
 			&::after {
 				background-color: $form-border-color !important;
+			}
+		}
+
+		&:checked[readonly] + label span {
+			&::after {
+				background-color: $font-color !important;
 			}
 		}
 	}
@@ -6352,7 +6376,7 @@ $range-input-width: 31px;
 	.table-col-function { width: 85px; }
 	.table-col-draw-style { width: 85px; }
 	.table-col-y-axis-side { width: 85px; }
-	.table-col-colour { width: 55px; }
+	.table-col-color { width: 55px; }
 	.table-col-action { width: 55px; }
 }
 

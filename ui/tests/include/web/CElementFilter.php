@@ -47,6 +47,10 @@ class CElementFilter {
 	const SELECTED = 'selected';
 	const NOT_SELECTED = 'not selected';
 	const KEY = 'key';
+	const ENABLED = 'enabled';
+	const NOT_ENABLED = 'not enabled';
+	const DISABLED = 'disabled';
+	const NOT_DISABLED = 'not disabled';
 
 	private $type;
 	private $params = [];
@@ -122,7 +126,11 @@ class CElementFilter {
 			static::CLICKABLE => 'getClickableCondition',
 			static::NOT_CLICKABLE => 'getNotClickableCondition',
 			static::SELECTED => 'getSelectedCondition',
-			static::NOT_SELECTED => 'getNotSelectedCondition'
+			static::NOT_SELECTED => 'getNotSelectedCondition',
+			static::ENABLED => 'getEnabledCondition',
+			static::NOT_ENABLED => 'getNotEnabledCondition',
+			static::DISABLED => 'getNotEnabledCondition',
+			static::NOT_DISABLED => 'getEnabledCondition'
 		];
 
 		if (!array_key_exists($condition, $conditions)) {
