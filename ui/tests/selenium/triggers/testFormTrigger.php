@@ -461,7 +461,7 @@ class testFormTrigger extends CLegacyWebTest {
 			);
 			$this->assertFalse($dialog_footer->query('button:Delete')->one()->isClickable());
 			$this->assertTrue($this->zbxTestCheckboxSelected('recovery_mode_0'));
-			$this->zbxTestAssertElementPresentXpath("//input[@id='recovery_mode_0'][@disabled]");
+			$this->zbxTestAssertElementPresentXpath("//input[@id='recovery_mode_0'][@readonly]");
 		}
 		else {
 			$this->assertEquals(2, $dialog_footer->query('button', ['Add', 'Cancel'])->all()
