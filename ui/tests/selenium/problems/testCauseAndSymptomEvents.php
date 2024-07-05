@@ -143,6 +143,11 @@ class testCauseAndSymptomEvents extends CWebTest {
 				'priority' => TRIGGER_SEVERITY_INFORMATION
 			],
 			[
+				'description' => 'Information trap<75 [Cause]',
+				'expression' => 'last(/Host for Cause and Symptom check2/kWh)<75',
+				'priority' => TRIGGER_SEVERITY_INFORMATION
+			],
+			[
 				'description' => 'Battery problem trap [Cause]',
 				'expression' => 'last(/Host for Cause and Symptom update/kWh)<10',
 				'priority' => TRIGGER_SEVERITY_DISASTER
@@ -163,6 +168,10 @@ class testCauseAndSymptomEvents extends CWebTest {
 		DBexecute('UPDATE event_symptom SET cause_eventid='.$causeid.' WHERE eventid='.$symptomid);
 	}
 
+	/**
+	 * Test scenario checks 'Problems' and 'Event details' page layout.
+	 * This test checks only elements and table data that are related to 'cause and symptom' events.
+	 */
 	public function testCauseAndSymptomEvents_Layout() {
 		$this->page->login()->open('zabbix.php?action=problem.view&hostids[]='.
 				self::$hostsids['hostids']['Host for Cause and Symptom check']
@@ -232,6 +241,7 @@ class testCauseAndSymptomEvents extends CWebTest {
 
 	public function getContextMenuData() {
 		return [
+			// #0 Both menu options are disabled.
 			[
 				[
 					'locator' => 'Problem trap>150 [Cause]',
@@ -241,9 +251,32 @@ class testCauseAndSymptomEvents extends CWebTest {
 					]
 				]
 			],
+			// #1 Both menu options are disabled in expanded state.
 			[
 				[
-					'symptom_to_cause' => true,
+					'linked_events' => true,
+					'locator' => 'Problem trap>150 [Cause]',
+					'options' => [
+						'Mark as cause' => 'menu-popup-item disabled',
+						'Mark selected as symptoms' => 'menu-popup-item disabled'
+					]
+				]
+			],
+			// #2 Both menu options are disabled if only cause event is selected and no symptoms are linked to that.
+			[
+				[
+					'locator' => 'Information trap<100 [Cause]',
+					'selected_events' => ['Information trap<100 [Cause]'],
+					'options' => [
+						'Mark as cause' => 'menu-popup-item disabled',
+						'Mark selected as symptoms' => 'menu-popup-item disabled'
+					]
+				]
+			],
+			// #3 Symptom event is not selected and can be marked as cause ('Mark as cause' is enabled).
+			[
+				[
+					'linked_events' => true,
 					'locator' => 'Problem trap>10 [Symptom]',
 					'options' => [
 						'Mark as cause' => 'menu-popup-item',
@@ -251,23 +284,72 @@ class testCauseAndSymptomEvents extends CWebTest {
 					]
 				]
 			],
+			// #4 Symptom event is selected and can be marked as cause ('Mark as cause' is enabled).
 			[
 				[
-					'cause_to_symptom' => true,
+					'linked_events' => true,
+					'locator' => 'Problem trap>10 [Symptom]',
+					'selected_events' => ['Problem trap>10 [Symptom]'],
+					'options' => [
+						'Mark as cause' => 'menu-popup-item',
+						'Mark selected as symptoms' => 'menu-popup-item disabled'
+					]
+				]
+			],
+			// #5 Cause event can be marked as symptom (reverse logic).
+			[
+				[
+					'linked_events' => true,
+					'locator' => 'Problem trap>10 [Symptom]',
+					'selected_events' => ['Problem trap>150 [Cause]'],
+					'options' => [
+						'Mark as cause' => 'menu-popup-item',
+						'Mark selected as symptoms' => 'menu-popup-item'
+					]
+				]
+			],
+			// #6 Cause event can be marked as symptom (reverse logic) when linked events are selected.
+			[
+				[
+					'linked_events' => true,
+					'locator' => 'Problem trap>10 [Symptom]',
+					'selected_events' => ['Problem trap>150 [Cause]', 'Problem trap>10 [Symptom]'],
+					'options' => [
+						'Mark as cause' => 'menu-popup-item',
+						'Mark selected as symptoms' => 'menu-popup-item'
+					]
+				]
+			],
+			// #7 Cause event can be marked as symptom when two cause events are not linked.
+			[
+				[
 					'locator' => 'Information trap<100 [Cause]',
+					'selected_events' => ['Information trap<75 [Cause]'],
 					'options' => [
 						'Mark as cause' => 'menu-popup-item disabled',
 						'Mark selected as symptoms' => 'menu-popup-item'
 					]
 				]
 			],
+			// #8 Cause event can be marked as symptom when two cause events are selected but not linked.
 			[
 				[
-					'cause_to_symptom' => true,
-					'locator' => 'Problem trap>10 [Symptom]',
-					'selected_events' => ['Problem trap>150 [Cause]', 'Problem trap>10 [Symptom]'],
+					'locator' => 'Information trap<75 [Cause]',
+					'selected_events' => ['Information trap<75 [Cause]', 'Information trap<100 [Cause]'],
 					'options' => [
-						'Mark as cause' => 'menu-popup-item',
+						'Mark as cause' => 'menu-popup-item disabled',
+						'Mark selected as symptoms' => 'menu-popup-item'
+					]
+				]
+			],
+			// #9 Cause event can be marked as symptom when all rows are selected.
+			[
+				[
+					'linked_events' => true,
+					'locator' => 'Information trap<100 [Cause]',
+					'selected_events' => [],
+					'options' => [
+						'Mark as cause' => 'menu-popup-item disabled',
 						'Mark selected as symptoms' => 'menu-popup-item'
 					]
 				]
@@ -282,18 +364,12 @@ class testCauseAndSymptomEvents extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=problem.view&groupids[]='.self::$groupids['Group for Cause and Symptom check']);
 		$table = $this->query('class:list-table')->asTable()->waitUntilPresent()->one();
 
-		if (array_key_exists('symptom_to_cause', $data)) {
+		if (array_key_exists('linked_events', $data)) {
 			$table->query(self::EXPAND_XPATH)->one()->click();
 		}
 
-		if (array_key_exists('cause_to_symptom', $data)) {
-			$selected_events = CTestArrayHelper::get($data, 'selected_events', []);
-
-			if ($selected_events !== []) {
-				$table->query(self::EXPAND_XPATH)->one()->click();
-			}
-
-			$this->selectTableRows($selected_events, 'Problem');
+		if (array_key_exists('selected_events', $data)) {
+			$this->selectTableRows($data['selected_events'], 'Problem');
 		}
 
 		$this->query('link', $data['locator'])->one()->waitUntilClickable()->click();
