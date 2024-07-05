@@ -950,7 +950,7 @@ class testUsers extends CAPITest {
 			],
 			'Can create user without role' => [
 				'user' => [[
-					'username' => 'API user roleid can be 0',
+					'username' => 'Can create user without role',
 					'passwd' => 'zabbix123456',
 					'usrgrps' => [['usrgrpid' => 7]],
 					'roleid' => 0

@@ -738,15 +738,6 @@ class testUserGroup extends CAPITest {
 				'usergroup' => ['16', '16'],
 				'expected_error' => 'Invalid parameter "/2": value (16) already exists.'
 			],
-			// Check users without groups
-			'Cannot delete group havig user with signle group' => [
-				'usergroup' => [':user_group:user group 2'],
-				'expected_error' => 'User "usergroup_delete_single_group_user" cannot be without user group.'
-			],
-			[
-				'usergroup' => ['16','17'],
-				'expected_error' => 'User "user-in-two-groups" cannot be without user group.'
-			],
 			// Check user group used in actions
 			[
 				'usergroup' => ['20'],
@@ -764,11 +755,11 @@ class testUserGroup extends CAPITest {
 			],
 			// Check successfully delete of user group.
 			[
-				'usergroup' => ['17'],
+				'usergroup' => ['18', '19'],
 				'expected_error' => null
 			],
-			[
-				'usergroup' => ['18', '19'],
+			'Can delete group havig user with signle group' => [
+				'usergroup' => [':user_group:user group 2'],
 				'expected_error' => null
 			]
 		];
