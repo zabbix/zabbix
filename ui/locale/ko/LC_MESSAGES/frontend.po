@@ -4383,6 +4383,10 @@ msgstr "연락 방법 작성"
 msgid "Create new"
 msgstr "새 작성"
 
+#: jsLoader.php:363
+msgid "Create new report"
+msgstr ""
+
 #: app/views/administration.proxy.list.php:37
 msgid "Create proxy"
 msgstr "프록시 작성"
@@ -6783,6 +6787,10 @@ msgstr ""
 msgid "Failed to update dashboard properties."
 msgstr ""
 
+#: app/views/js/popup.dashboard.share.edit.js.php:86
+msgid "Failed to update dashboard sharing."
+msgstr ""
+
 #: jsLoader.php:142
 msgid "Failed to update widget properties."
 msgstr ""
@@ -7899,6 +7907,10 @@ msgstr ""
 msgid "Host group elements"
 msgstr "호스트 그룹내의 호스트"
 
+#: jsLoader.php:287
+msgid "Host group is not selected."
+msgstr ""
+
 #: include/views/monitoring.sysmap.edit.php:165
 msgid "Host group label type"
 msgstr "호스트 그룹의 라벨타입"
@@ -7972,6 +7984,10 @@ msgstr "호스트 인벤토리"
 #: hostinventoriesoverview.php:26 hostinventoriesoverview.php:146
 msgid "Host inventory overview"
 msgstr "호스트 인벤토리의 개요"
+
+#: jsLoader.php:284
+msgid "Host is not selected."
+msgstr ""
 
 #: include/views/monitoring.sysmap.edit.php:180
 msgid "Host label type"
@@ -11148,6 +11164,10 @@ msgstr "맵 요소의 레이블 위치"
 #: include/views/monitoring.sysmap.edit.php:240
 msgid "Map element label type"
 msgstr "맵 요소의 레이블 타입"
+
+#: jsLoader.php:285
+msgid "Map is not selected."
+msgstr ""
 
 #: sysmap.php:128
 msgid "Map is updated! Return to map list?"
@@ -17978,6 +17998,10 @@ msgstr "트리거가 \"불명\" 상태"
 msgid "Trigger in template \"%1$s\" has dependency with trigger in template \"%2$s\"."
 msgstr "템플릿\"%1$s\"의 트리거는 템플릿\"%2$s\"의 트리거 와 의존관계가 설정되어있습니다."
 
+#: jsLoader.php:286
+msgid "Trigger is not selected."
+msgstr ""
+
 #: include/views/monitoring.sysmap.edit.php:195
 msgid "Trigger label type"
 msgstr "트리거 라벨 타입"
@@ -19618,6 +19642,10 @@ msgstr ""
 msgid "View as"
 msgstr "표시형식"
 
+#: jsLoader.php:397
+msgid "View related reports"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1234
 msgid "Virtual space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr "가상 메모리 사이즈의 바이트 단위 혹은 전체에서 퍼센트값. 바이트 단위라면 integer를 리턴, 퍼센트라면 float를 리턴"
@@ -20154,6 +20182,10 @@ msgstr "이 페이지를 표시하는 권한이 없습니다."
 #: include/func.inc.php:1724
 msgid "You must login to view this page."
 msgstr "이 페이지를 표시하기 위해서는 로그인이 필요합니다."
+
+#: jsLoader.php:282
+msgid "You need to have at least one image uploaded to create map element. Images can be uploaded in Administration->General->Images section."
+msgstr ""
 
 #: include/classes/db/DB.php:135
 msgid "Your database is not working properly. Please wait a few minutes and try to repeat this action. If the problem still persists, please contact system administrator. The problem might be caused by long running transaction or row level lock accomplished by your database management system."
@@ -21871,6 +21903,10 @@ msgstr "오른쪽"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:924
 msgid "right() - Returns the rightmost count characters"
+msgstr ""
+
+#: jsLoader.php:199
+msgid "root"
 msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:937

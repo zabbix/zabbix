@@ -4552,6 +4552,10 @@ msgstr "Vytvořit typ média"
 msgid "Create new"
 msgstr "Vytvořit nové"
 
+#: jsLoader.php:363
+msgid "Create new report"
+msgstr ""
+
 #: app/views/administration.proxy.list.php:37
 msgid "Create proxy"
 msgstr "Vytvořit proxy"
@@ -6960,6 +6964,10 @@ msgstr "Nepodařilo se aktualizovat vlastnosti stránky dashboardu."
 msgid "Failed to update dashboard properties."
 msgstr "Nepodařilo se aktualizovat vlastnosti dashboardu."
 
+#: app/views/js/popup.dashboard.share.edit.js.php:86
+msgid "Failed to update dashboard sharing."
+msgstr ""
+
 #: jsLoader.php:142
 msgid "Failed to update widget properties."
 msgstr "Aktualizace vlastností widgetu se nezdařila."
@@ -8086,6 +8094,10 @@ msgstr "Skupina hostů \"%1$s\" je interní a nemůže byt smazána."
 msgid "Host group elements"
 msgstr "Prvky skupiny hostů"
 
+#: jsLoader.php:287
+msgid "Host group is not selected."
+msgstr ""
+
 #: include/views/monitoring.sysmap.edit.php:165
 msgid "Host group label type"
 msgstr "Typ popisku skupiny"
@@ -8159,6 +8171,10 @@ msgstr "Inventář hosta"
 #: hostinventoriesoverview.php:26 hostinventoriesoverview.php:146
 msgid "Host inventory overview"
 msgstr "Přehled inventáře hosta"
+
+#: jsLoader.php:284
+msgid "Host is not selected."
+msgstr ""
 
 #: include/views/monitoring.sysmap.edit.php:180
 msgid "Host label type"
@@ -11361,6 +11377,10 @@ msgstr "Umístění štítku prvku na mapě"
 #: include/views/monitoring.sysmap.edit.php:240
 msgid "Map element label type"
 msgstr "Typ štítku na mapě"
+
+#: jsLoader.php:285
+msgid "Map is not selected."
+msgstr ""
 
 #: sysmap.php:128
 msgid "Map is updated! Return to map list?"
@@ -18240,6 +18260,10 @@ msgstr "Spouštěč je v \"unknown\" stavu"
 msgid "Trigger in template \"%1$s\" has dependency with trigger in template \"%2$s\"."
 msgstr "Spouštěč v šabloně \"%1$s\" má závislost na spouštěči v šabloně \"%2$s\"."
 
+#: jsLoader.php:286
+msgid "Trigger is not selected."
+msgstr ""
+
 #: include/views/monitoring.sysmap.edit.php:195
 msgid "Trigger label type"
 msgstr "Typ popisku spouštěče"
@@ -19894,6 +19918,10 @@ msgstr "Pohled"
 msgid "View as"
 msgstr "Pohled jako"
 
+#: jsLoader.php:397
+msgid "View related reports"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1234
 msgid "Virtual space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr "Virtuální velikost prostoru v bytech nebo v procentech z celkového počtu. Vrací celé číslo v bytech; float v procentech"
@@ -20434,6 +20462,10 @@ msgstr "Nemáte oprávnění pro přístup k této stránce."
 #: include/func.inc.php:1724
 msgid "You must login to view this page."
 msgstr "Pro zobrazení této stránky musíte být přihlášen(a)."
+
+#: jsLoader.php:282
+msgid "You need to have at least one image uploaded to create map element. Images can be uploaded in Administration->General->Images section."
+msgstr ""
 
 #: include/classes/db/DB.php:135
 msgid "Your database is not working properly. Please wait a few minutes and try to repeat this action. If the problem still persists, please contact system administrator. The problem might be caused by long running transaction or row level lock accomplished by your database management system."
@@ -22154,6 +22186,10 @@ msgstr "pravý"
 #: app/controllers/CControllerPopupTriggerExpr.php:924
 msgid "right() - Returns the rightmost count characters"
 msgstr "right() - Vrátí počet znaků zprava"
+
+#: jsLoader.php:199
+msgid "root"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:937
 msgid "round() - Rounds a value to decimal places"

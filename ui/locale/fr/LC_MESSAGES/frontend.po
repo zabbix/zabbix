@@ -4471,6 +4471,10 @@ msgstr "Créer un type de média"
 msgid "Create new"
 msgstr "Créer un nouveau"
 
+#: jsLoader.php:363
+msgid "Create new report"
+msgstr ""
+
 #: app/views/administration.proxy.list.php:37
 msgid "Create proxy"
 msgstr "Créer un proxy"
@@ -6874,6 +6878,10 @@ msgstr "Échec de la mise à jour des propriétés de la page du tableau de bord
 msgid "Failed to update dashboard properties."
 msgstr "Échec de la mise à jour des propriétés du tableau de bord."
 
+#: app/views/js/popup.dashboard.share.edit.js.php:86
+msgid "Failed to update dashboard sharing."
+msgstr ""
+
 #: jsLoader.php:142
 msgid "Failed to update widget properties."
 msgstr "Échec de la mise à jour des propriétés du widget."
@@ -7995,6 +8003,10 @@ msgstr "Le groupe d'hôtes \"%1$s\" est interne et ne peut pas être supprimé."
 msgid "Host group elements"
 msgstr "Éléments du groupe d'hôtes"
 
+#: jsLoader.php:287
+msgid "Host group is not selected."
+msgstr ""
+
 #: include/views/monitoring.sysmap.edit.php:165
 msgid "Host group label type"
 msgstr "Type d'étiquette du groupe d'hôtes"
@@ -8068,6 +8080,10 @@ msgstr "Inventaire d'hôtes"
 #: hostinventoriesoverview.php:26 hostinventoriesoverview.php:146
 msgid "Host inventory overview"
 msgstr "Aperçu d'inventaire d'hôtes"
+
+#: jsLoader.php:284
+msgid "Host is not selected."
+msgstr ""
 
 #: include/views/monitoring.sysmap.edit.php:180
 msgid "Host label type"
@@ -11257,6 +11273,10 @@ msgstr "Emplacement de l'étiquette de l'élément de carte"
 #: include/views/monitoring.sysmap.edit.php:240
 msgid "Map element label type"
 msgstr "Type d'étiquette de l'élément de carte"
+
+#: jsLoader.php:285
+msgid "Map is not selected."
+msgstr ""
 
 #: sysmap.php:128
 msgid "Map is updated! Return to map list?"
@@ -18111,6 +18131,10 @@ msgstr "Déclencheur dans l'état \"inconnu\""
 msgid "Trigger in template \"%1$s\" has dependency with trigger in template \"%2$s\"."
 msgstr "Le déclencheur du modèle \"%1$s\" a une dépendance au déclencheur du modèle \"%2$s\"."
 
+#: jsLoader.php:286
+msgid "Trigger is not selected."
+msgstr ""
+
 #: include/views/monitoring.sysmap.edit.php:195
 msgid "Trigger label type"
 msgstr "Type d'étiquette de déclencheur"
@@ -19758,6 +19782,10 @@ msgstr "Vue"
 msgid "View as"
 msgstr "Afficher comme"
 
+#: jsLoader.php:397
+msgid "View related reports"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1234
 msgid "Virtual space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr "Taille de l'espace virtuel en octets ou en pourcentage du toutal. Retourne un entier pour les octets; un flottant pour les pourcentages"
@@ -20296,6 +20324,10 @@ msgstr "Vous n'avez pas la permission d'accéder à cette page."
 #: include/func.inc.php:1724
 msgid "You must login to view this page."
 msgstr "Vous devez vous identifier pour accéder à cette page."
+
+#: jsLoader.php:282
+msgid "You need to have at least one image uploaded to create map element. Images can be uploaded in Administration->General->Images section."
+msgstr ""
 
 #: include/classes/db/DB.php:135
 msgid "Your database is not working properly. Please wait a few minutes and try to repeat this action. If the problem still persists, please contact system administrator. The problem might be caused by long running transaction or row level lock accomplished by your database management system."
@@ -22016,6 +22048,10 @@ msgstr "droite"
 #: app/controllers/CControllerPopupTriggerExpr.php:924
 msgid "right() - Returns the rightmost count characters"
 msgstr "right() - Retourne le nombre de caractères le plus à droite"
+
+#: jsLoader.php:199
+msgid "root"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:937
 msgid "round() - Rounds a value to decimal places"
