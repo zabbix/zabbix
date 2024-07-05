@@ -1,6 +1,9 @@
 Changes for 7.0.1rc1
 
 New features:
+..F....... [ZBXNEXT-9215] implemented item connectivity to another widgets in Graph and Pie chart widgets (ashubin, averza)
+.........T [ZBXNEXT-8657] updated Zabbix health templates with new items and visualization (atocko)
+........S. [ZBXNEXT-9143] added index on auditlog recordsetid (arimdjonoks)
 ...G...... [ZBXNEXT-9194] extended proc.get[] in Zabbix agent 2 to get PSS (proportional set size) memory on Linux (dgoloscapov)
 ........S. [ZBXNEXT-9260] updated soft minimal TimescaleDB version to 2.13 (mprihodko)
 ...G...... [ZBXNEXT-9081] Add scsi device type support to Zabbix agent 2 smart plugin (rzvejs)
@@ -15,6 +18,20 @@ New features:
 .......PS. [ZBXNEXT-8990] extended VMware event log with username (asestakovs)
 
 Bug fixes:
+..F....... [ZBX-23936] fixed the state and styling of readonly fields (ddauksa)
+........S. [ZBX-24643] fixed auditlog compression by changing compression policy (askolmeisters)
+.......PS. [ZBX-24712] fixed high memory usage in preprocessing manager and main process (vso)
+..F....... [ZBX-22920] fixed undefined array key error when host under maintenance in dashboard Problems widget (ddauksa)
+........S. [ZBX-24649] removed logging of critical message when failing to convert value to uint64 in preprocessing (dgoloscapov)
+..F....... [ZBX-24520] fixed an issue with incorrect translations used in several frontend places (Ivo)
+..F....... [ZBX-24598] fixed previous value field being updated to current value in item testing from host (jfreibergs)
+..F....... [ZBX-24404] fixed single escape closing all opened modal windows in map constructor (agriscenko)
+..F....... [ZBX-24108] fixed error in dashboard if map widget contains map element that user doesn't have access to (agriscenko)
+........S. [ZBX-24559] fixed nextcheck update for web scenarios (dgoloscapov)
+.........T [ZBX-24569] fixed old and added new items to Azure Virtual Machine template (abrosimovs)
+........S. [ZBX-24689] fixed crash when using binary item value in calculated items or expression macros (dgoloscapov)
+..F....... [ZBX-24577] fixed error when closing graph widget hintbox (esekace)
+..F....... [ZBX-24537] fixed tags subfilter in latest data kiosk mode (esekace)
 ..F....... [ZBX-23403] fixed frontend not showing pre-requisites page if PHP mbstring extension is not installed (Ivo)
 ..F....... [ZBX-24610] fixed Host interface field appearance for discovered items (jfreibergs)
 ..F....... [ZBX-24638] fixed item order in Graph widget (apoga, averza)
@@ -858,6 +875,7 @@ A.F....... [ZBX-21976] added support of OneLogin and Azure SCIM, fixed some issu
 Changes for 6.4.17rc1
 
 New features:
+........S. [ZBXNEXT-9143] added index on auditlog recordsetid (arimdjonoks)
 ...G...... [ZBXNEXT-9081] Add scsi device type support to Zabbix agent 2 smart plugin (rzvejs)
 .........T [ZBXNEXT-6445] added recovery expression for fuzzytime triggers in Linux and Windows templates, removed fuzzytime triggers from active agent templates (drasikhov)
 .......PS. [ZBXNEXT-9201] updated max supported MySQL version to 8.4 (mprihodko)
@@ -866,6 +884,8 @@ New features:
 .........T [ZBXNEXT-8868] added discovery and template for Azure VM Scale Sets (abrosimovs)
 
 Bug fixes:
+..F....... [ZBX-23936] fixed the state and styling of readonly fields (ddauksa)
+..F....... [ZBX-22920] fixed undefined array key error when host under maintenance in dashboard Problems widget (ddauksa)
 ........S. [ZBX-24167] fixed template linkage when item prototype collision is found (dgoloscapov)
 ..F....... [ZBX-24610] fixed interface field appearance for discovered items without interface set (jfreibergs)
 .D........ [ZBX-23770] improved monitoring user permissions documentation for Oracle Database plugin and Oracle by ODBC template (knaglis)
@@ -2737,6 +2757,8 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 Changes for 6.0.32rc1
 
 New features:
+.........T [ZBXNEXT-8657] updated Zabbix health templates with new visualization (atocko)
+........S. [ZBXNEXT-9143] added index on auditlog recordsetid (arimdjonoks)
 ...G...... [ZBXNEXT-9081] Add scsi device type support to Zabbix agent 2 smart plugin (rzvejs)
 .........T [ZBXNEXT-6445] added recovery expression for fuzzytime triggers in Linux and Windows templates, removed fuzzytime triggers from active agent templates (drasikhov)
 .......PS. [ZBXNEXT-9201] updated max supported MySQL version to 8.4 (mprihodko)
@@ -2745,6 +2767,12 @@ New features:
 .........T [ZBXNEXT-8868] added discovery and template for Azure VM Scale Sets (abrosimovs)
 
 Bug fixes:
+..F....... [ZBX-23936] fixed the state and styling of readonly fields (ddauksa)
+..F....... [ZBX-24520] fixed an issue with incorrect translations used in several frontend places (Ivo)
+..F....... [ZBX-21815] fixed issue with undefined offset for media type when it was deleted before saving the user (wczerneha)
+..F....... [ZBX-24108] fixed error in dashboard if map widget contains map element that user doesn't have access to (agriscenko)
+.........T [ZBX-24569] fixed old and added new items to Azure Virtual Machine template (abrosimovs)
+..F....... [ZBX-24537] fixed tags subfilter in latest data kiosk mode (esekace)
 ........S. [ZBX-24167] fixed template linkage when item prototype collision is found (dgoloscapov)
 .D........ [ZBX-23770] improved monitoring user permissions documentation for Oracle Database plugin and Oracle by ODBC template (knaglis)
 .......... [ZBX-24565] removed redundant kernel header include, fixed musl compatibility issues (thanks to Alpine Linux maintainers for spotting this) (dgoloscapov)
