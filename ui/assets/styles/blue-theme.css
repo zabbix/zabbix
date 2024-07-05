@@ -4457,7 +4457,8 @@ div.dashboard-widget-item .dashboard-grid-widget-body .item-value {
 div.dashboard-widget-item .dashboard-grid-widget-body .item-value-content {
   display: flex;
   align-items: baseline;
-  overflow: hidden; }
+  overflow: hidden;
+  white-space: nowrap; }
 div.dashboard-widget-item .dashboard-grid-widget-body .item-description,
 div.dashboard-widget-item .dashboard-grid-widget-body .item-time,
 div.dashboard-widget-item .dashboard-grid-widget-body .type-text .value {

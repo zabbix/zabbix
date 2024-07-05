@@ -30,32 +30,25 @@ zabbix_export:
             conditions:
               - macro: '{#UNIT.ACTIVESTATE}'
                 value: '{$SYSTEMD.ACTIVESTATE.SERVICE.MATCHES}'
-                formulaid: A
               - macro: '{#UNIT.ACTIVESTATE}'
                 value: '{$SYSTEMD.ACTIVESTATE.SERVICE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
               - macro: '{#UNIT.NAME}'
                 value: '{$SYSTEMD.NAME.SERVICE.MATCHES}'
-                formulaid: C
               - macro: '{#UNIT.NAME}'
                 value: '{$SYSTEMD.NAME.SERVICE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: D
               - macro: '{#UNIT.UNITFILESTATE}'
                 value: '{$SYSTEMD.UNITFILESTATE.SERVICE.MATCHES}'
-                formulaid: E
               - macro: '{#UNIT.UNITFILESTATE}'
                 value: '{$SYSTEMD.UNITFILESTATE.SERVICE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: F
           description: 'Discover systemd service units and their details.'
           item_prototypes:
             - uuid: 78587e9b16b5431bbccd2855998171fa
               name: '{#UNIT.NAME}: Active state'
               type: DEPENDENT
               key: 'systemd.service.active_state["{#UNIT.NAME}"]'
-              delay: '0'
               description: 'State value that reflects whether the unit is currently active or not. The following states are currently defined: "active", "reloading", "inactive", "failed", "activating", and "deactivating".'
               valuemap:
                 name: 'Unit Active State'
@@ -84,7 +77,6 @@ zabbix_export:
               name: '{#UNIT.NAME}: Load state'
               type: DEPENDENT
               key: 'systemd.service.load_state["{#UNIT.NAME}"]'
-              delay: '0'
               description: 'State value that reflects whether the configuration file of this unit has been loaded. The following states are currently defined: "loaded", "error", and "masked".'
               valuemap:
                 name: 'Unit Load State'
@@ -104,7 +96,6 @@ zabbix_export:
               name: '{#UNIT.NAME}: Unit file state'
               type: DEPENDENT
               key: 'systemd.service.unitfile_state["{#UNIT.NAME}"]'
-              delay: '0'
               description: 'Encodes the install state of the unit file of FragmentPath. It currently knows the following states: "enabled", "enabled-runtime", "linked", "linked-runtime", "masked", "masked-runtime", "static", "disabled", and "invalid".'
               valuemap:
                 name: 'Unit File State'
@@ -124,7 +115,6 @@ zabbix_export:
               name: '{#UNIT.NAME}: Active time'
               type: DEPENDENT
               key: 'systemd.service.uptime["{#UNIT.NAME}"]'
-              delay: '0'
               value_type: FLOAT
               units: s
               description: 'Number of seconds since unit entered the active state.'
@@ -157,7 +147,6 @@ zabbix_export:
               name: '{#UNIT.NAME}: Get unit info'
               key: 'systemd.unit.get["{#UNIT.NAME}"]'
               history: '0'
-              trends: '0'
               value_type: TEXT
               description: |
                 Returns all properties of a systemd service unit.
@@ -176,40 +165,31 @@ zabbix_export:
             conditions:
               - macro: '{#UNIT.ACTIVESTATE}'
                 value: '{$SYSTEMD.ACTIVESTATE.SOCKET.MATCHES}'
-                formulaid: A
               - macro: '{#UNIT.ACTIVESTATE}'
                 value: '{$SYSTEMD.ACTIVESTATE.SOCKET.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
               - macro: '{#UNIT.NAME}'
                 value: '{$SYSTEMD.NAME.SOCKET.MATCHES}'
-                formulaid: C
               - macro: '{#UNIT.NAME}'
                 value: '{$SYSTEMD.NAME.SOCKET.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: D
               - macro: '{#UNIT.UNITFILESTATE}'
                 value: '{$SYSTEMD.UNITFILESTATE.SOCKET.MATCHES}'
-                formulaid: E
               - macro: '{#UNIT.UNITFILESTATE}'
                 value: '{$SYSTEMD.UNITFILESTATE.SOCKET.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: F
           description: 'Discover systemd socket units and their details.'
           item_prototypes:
             - uuid: 462ee6b9e70146c8ab6a917c182f3ce7
               name: '{#UNIT.NAME}: Connections accepted per sec'
               type: DEPENDENT
               key: 'systemd.socket.conn_accepted.rate["{#UNIT.NAME}"]'
-              delay: '0'
               description: 'The number of accepted socket connections (NAccepted) per second.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
                     - $.NAccepted
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               master_item:
                 key: 'systemd.unit.get["{#UNIT.NAME}",Socket]'
               tags:
@@ -219,7 +199,6 @@ zabbix_export:
               name: '{#UNIT.NAME}: Connections connected'
               type: DEPENDENT
               key: 'systemd.socket.conn_count["{#UNIT.NAME}"]'
-              delay: '0'
               description: 'The current number of socket connections (NConnections).'
               preprocessing:
                 - type: JSONPATH
@@ -234,7 +213,6 @@ zabbix_export:
               name: '{#UNIT.NAME}: Get unit info'
               key: 'systemd.unit.get["{#UNIT.NAME}",Socket]'
               history: '0'
-              trends: '0'
               value_type: TEXT
               description: |
                 Returns all properties of a systemd socket unit.

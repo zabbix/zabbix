@@ -14,6 +14,7 @@
 
 #include "dbupgrade.h"
 #include "zbxdbhigh.h"
+#include "zbxdb.h"
 
 /*
  * 7.2 development database patches
@@ -39,6 +40,14 @@ static int	DBpatch_7010000(void)
 }
 
 static int	DBpatch_7010001(void)
+{
+	if (FAIL == zbx_db_index_exists("auditlog", "auditlog_4"))
+		return DBcreate_index("auditlog", "auditlog_4", "recordsetid", 0);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7010002(void)
 {
 	int		i;
 	const char	*values[] = {
@@ -74,5 +83,6 @@ DBPATCH_START(7010)
 
 DBPATCH_ADD(7010000, 0, 1)
 DBPATCH_ADD(7010001, 0, 1)
+DBPATCH_ADD(7010002, 0, 1)
 
 DBPATCH_END()
