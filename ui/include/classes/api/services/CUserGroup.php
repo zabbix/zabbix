@@ -416,7 +416,6 @@ class CUserGroup extends CApiService {
 		}
 		$this->checkUsers($usrgrps, $db_usrgrps);
 		$this->checkHimself($usrgrps, __FUNCTION__, $db_usrgrps);
-		$this->checkUsersWithoutGroups($usrgrps);
 		$this->checkTemplateGroups($usrgrps);
 		$this->checkHostGroups($usrgrps);
 		$this->checkTagFilters($usrgrps);
