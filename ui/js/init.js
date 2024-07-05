@@ -252,12 +252,14 @@ jQuery(function($) {
 					my: 'left top',
 					at: 'left bottom',
 					using: (pos, data) => {
+						let wrapper_rect = document.querySelector('.wrapper').getBoundingClientRect();
+
 						let max_left = data.horizontal === 'left'
-							? document.querySelector('.wrapper').clientWidth
-							: document.querySelector('.wrapper').clientWidth - data.element.width;
+							? wrapper_rect.right
+							: wrapper_rect.right - data.element.width;
 
 						pos.top = Math.max(0, pos.top);
-						pos.left = Math.max(0, Math.min(max_left, pos.left));
+						pos.left = Math.max(wrapper_rect.left, Math.min(max_left, pos.left));
 
 						data.element.element[0].style.top = `${pos.top}px`;
 						data.element.element[0].style.left = `${pos.left}px`;

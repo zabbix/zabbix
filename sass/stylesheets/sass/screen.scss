@@ -3004,15 +3004,19 @@ $form-icon-btn: (
 }
 
 .menu-popup {
-	position: absolute;
+	position: fixed;
+	overflow-y: auto;
 	z-index: 1001;
 	padding: 5px 15px 5px 25px;
 	min-width: 166px;
 	max-width: 250px;
+	max-height: calc(100vh - 50px);
 	background-color: $ui-bg-color;
 	border: 1px solid $overlay-border-color;
 	border-bottom-color: darken($overlay-border-color, 1%);
 	box-shadow: 0 4px 20px 0 $action-shadow-color;
+
+	@extend %webkit-scrollbar;
 
 	&:focus {
 		outline: none;
