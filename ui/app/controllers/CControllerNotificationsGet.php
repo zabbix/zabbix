@@ -302,7 +302,8 @@ class CControllerNotificationsGet extends CController {
 					TRIGGER_SEVERITY_NOT_CLASSIFIED => $this->settings['sounds.'.TRIGGER_SEVERITY_NOT_CLASSIFIED],
 					TRIGGER_SEVERITY_WARNING => $this->settings['sounds.'.TRIGGER_SEVERITY_WARNING]
 				]
-			]
+			],
+			CCsrfTokenHelper::CSRF_TOKEN_NAME => CCsrfTokenHelper::get('notifications')
 		]);
 	}
 }

@@ -49,6 +49,7 @@ function ZBX_Notifications(store, tab) {
 	}
 
 	this.active = false;
+	this.csrf_token = null;
 
 	this.poll_interval = ZBX_Notifications.POLL_INTERVAL;
 
@@ -492,8 +493,14 @@ ZBX_Notifications.prototype.handleSnoozeClicked = function() {
  * @param {MouseEvent} e
  */
 ZBX_Notifications.prototype.handleMuteClicked = function(e) {
+	const data = {muted: this.alarm.muted ? 0 : 1};
+
+	if (this.csrf_token !== null) {
+		data[window.CSRF_TOKEN_NAME] = this.csrf_token;
+	}
+
 	this
-		.fetch('notifications.mute', {muted: this.alarm.muted ? 0 : 1})
+		.fetch('notifications.mute', data)
 		.then((resp) => {
 			if ('error' in resp) {
 				throw {error: resp.error};
@@ -543,6 +550,7 @@ ZBX_Notifications.prototype.handleMainLoopResp = function(resp) {
 
 	this.consumeUserSettings(resp.settings);
 	this.consumeList(resp.notifications);
+	this.csrf_token = resp[window.CSRF_TOKEN_NAME];
 	this.render();
 
 	this.pushUpdates();
