@@ -24,23 +24,22 @@ class testMultiselectDialogs extends CWebTest {
 	 * @param CFormElement    $form            form where checks are performed
 	 * @param array           $multiselects    multiselect fields to be checked
 	 */
-	protected function checkMultiselectDialogs($form, $multiselects,  $check_stud = false, $check_filter = false,
-			$filter = null) {
+	protected function checkMultiselectDialogs($form, $multiselects) {
 		foreach ($multiselects as $multiselect) {
 			$count = count($multiselect);
 			$multiselect_form = $form;
 
-			foreach ($multiselect as $field => $title) {
+			foreach ($multiselect as $field => $parameters) {
 				// Open multiselect dialog.
 				$dialog = $multiselect_form->getField($field)->edit();
-				$this->checkErrorsAndTitle($dialog, $title);
+				$this->checkErrorsAndTitle($dialog, $parameters['title']);
 
-				if ($check_filter) {
-					$this->checkOverlayFilter($dialog, $title, $filter);
+				if (array_key_exists('filter', $parameters)) {
+					$this->checkOverlayFilter($dialog, $parameters['title'], $parameters['filter']);
 				}
 
-				if ($check_stud) {
-					$this->checkOverlayStud($dialog, $title);
+				if (CTestArrayHelper::get($parameters, 'empty', false)) {
+					$this->checkOverlayStud($dialog, $parameters['title']);
 				}
 
 				// Set form element of current overlay dialog if multiple dialogs layers are opened.

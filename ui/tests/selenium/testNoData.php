@@ -123,28 +123,21 @@ class testNoData extends testMultiselectDialogs {
 
 		$overlays = [
 			'Trigger' => [
-				'field' => 'New triggers',
-				'title' => 'Triggers',
-				'filter' => ['Host' => '']
+				'New triggers' => ['title' => 'Triggers', 'empty' => true, 'filter' => ['Host' => '']]
 			],
 			'Host' => [
-				'field' => 'Host',
-				'title' => 'Hosts',
-				'filter' => ['Host group' => '']
+				'Host' => ['title' => 'Hosts', 'empty' => true, 'filter' => ['Host group' => '']]
 			]
 		];
 
-		foreach ($overlays as $type => $parameters) {
+		foreach ($overlays as $type => $multiselect) {
 			$form->fill(['Type' => $type]);
-			$field = $form->getField($parameters['field']);
 
 			// Checked field should be empty.
-			$this->assertEquals('', $field->getValue());
+			$this->assertEquals('', $form->getField(key($multiselect))->getValue());
 
 			// Check overlay dialog.
-			$this->checkMultiselectDialogs($form, [[$parameters['field'] => $parameters['title']]],
-					true, true, $parameters['filter']
-			);
+			$this->checkMultiselectDialogs($form, [$multiselect]);
 		}
 	}
 
@@ -157,15 +150,33 @@ class testNoData extends testMultiselectDialogs {
 					'tabs' => [
 						'Action' => [
 							'Conditions' => [
-								'Trigger' => ['multiselect' => 'Triggers', 'filter' => 'Host'],
-								'Host' => ['multiselect' => 'Hosts', 'filter' => 'Host group'],
-								'Template'  => ['multiselect' => 'Templates', 'filter' => 'Template group']
+								'Trigger' => [
+									'Triggers' => ['title' => 'Triggers', 'empty' => true, 'filter' => ['Host' => '']]
+								],
+								'Host' => [
+									'Hosts' => ['title' => 'Hosts', 'empty' => true, 'filter' => ['Host group' => '']]
+								],
+								'Template'  => [
+									'Templates' => ['title' => 'Templates', 'empty' => true, 'filter' => ['Template group' => '']]
+								]
 							]
 						],
 						'Operations' => [
-							'Operations' => [self::SCRIPT => ['multiselect' => 'Hosts', 'filter' => 'Host group']],
-							'Recovery operations' => [self::SCRIPT => ['multiselect' => 'Hosts', 'filter' => 'Host group']],
-							'Update operations' => [self::SCRIPT => ['multiselect' => 'Hosts', 'filter' => 'Host group']]
+							'Operations' => [
+								self::SCRIPT => [
+									'Hosts' => ['title' => 'Hosts', 'empty' => true, 'filter' => ['Host group' => '']]
+								]
+							],
+							'Recovery operations' => [
+								self::SCRIPT => [
+									'Hosts' => ['title' => 'Hosts', 'empty' => true, 'filter' => ['Host group' => '']]
+								]
+							],
+							'Update operations' => [
+								self::SCRIPT => [
+									'Hosts' => ['title' => 'Hosts', 'empty' => true, 'filter' => ['Host group' => '']]
+								]
+							]
 						]
 					]
 				]
@@ -176,7 +187,11 @@ class testNoData extends testMultiselectDialogs {
 					'url' => 'zabbix.php?action=action.list&filter_rst=1&eventsource=4',
 					'tabs' => [
 						'Action' => [
-							'Conditions' => ['Service' => ['multiselect' => 'Services', 'filter' => 'Name']]
+							'Conditions' => [
+								'Service' => [
+									'Services' => ['title' => 'Services', 'empty' => true, 'filter' => ['Name' => '']]
+								]
+							]
 						]
 					]
 				]
@@ -187,13 +202,23 @@ class testNoData extends testMultiselectDialogs {
 					'url' => 'zabbix.php?action=action.list&filter_rst=1&eventsource=1',
 					'tabs' => [
 						'Action' => [
-							'Conditions' => ['Proxy' => ['multiselect' => 'Proxy']]
+							'Conditions' => [
+								'Proxy' => [
+									'Proxy' => ['title' => 'Proxies', 'empty' => true, 'filter' => null]
+								]
+							]
 						],
 						'Operations' => [
 							'Operations' => [
-								'Link template' => ['multiselect' => 'Templates', 'filter' => 'Template group'],
-								'Unlink template' => ['multiselect' => 'Templates', 'filter' => 'Template group'],
-								self::SCRIPT => ['multiselect' => 'Hosts', 'filter' => 'Host group']
+								'Link template' => [
+									'Templates' => ['title' => 'Templates', 'empty' => true, 'filter' => ['Template group' => '']]
+								],
+								'Unlink template' => [
+									'Templates' => ['title' => 'Templates', 'empty' => true, 'filter' => ['Template group' => '']]
+								],
+								self::SCRIPT => [
+									'Hosts' => ['title' => 'Hosts', 'empty' => true, 'filter' => ['Host group' => '']]
+								]
 							]
 						]
 					]
@@ -205,13 +230,23 @@ class testNoData extends testMultiselectDialogs {
 					'url' => 'zabbix.php?action=action.list&filter_rst=1&eventsource=2',
 					'tabs' => [
 						'Action' => [
-							'Conditions' => ['Proxy' => ['multiselect' => 'Proxy']]
+							'Conditions' => [
+								'Proxy' => [
+									'Proxy' => ['title' => 'Proxies', 'empty' => true, 'filter' => null]
+								]
+							]
 						],
 						'Operations' => [
 							'Operations' => [
-								'Link template' => ['multiselect' => 'Templates', 'filter' => 'Template group'],
-								'Unlink template' => ['multiselect' => 'Templates', 'filter' => 'Template group'],
-								self::SCRIPT => ['multiselect' => 'Hosts', 'filter' => 'Host group']
+								'Link template' => [
+									'Templates' => ['title' => 'Templates', 'empty' => true, 'filter' => ['Template group' => '']]
+								],
+								'Unlink template' => [
+									'Templates' => ['title' => 'Templates', 'empty' => true, 'filter' => ['Template group' => '']]
+								],
+								self::SCRIPT => [
+									'Hosts' => ['title' => 'Hosts', 'empty' => true, 'filter' => ['Host group' => '']]
+								]
 							]
 						]
 					]
@@ -224,8 +259,12 @@ class testNoData extends testMultiselectDialogs {
 					'tabs' => [
 						'Action' => [
 							'Conditions' => [
-								'Host' => ['multiselect' => 'Hosts', 'filter' => 'Host group'],
-								'Template'  => ['multiselect' => 'Templates', 'filter' => 'Template group']
+								'Host' => [
+									'Hosts' => ['title' => 'Hosts', 'empty' => true, 'filter' => ['Host group' => '']]
+								],
+								'Template'  => [
+									'Templates' => ['title' => 'Templates', 'empty' => true, 'filter' => ['Template group' => '']]
+								]
 							]
 						]
 					]
@@ -253,7 +292,7 @@ class testNoData extends testMultiselectDialogs {
 				$dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
 
 				// Open Conditions, Operations, Recovery or Update overlays one by one and fill corresponding options.
-				foreach ($options as $option => $parameters) {
+				foreach ($options as $option => $multiselect) {
 					$fields = ($field === 'Conditions')
 						? ['Type' => $option]
 						: ['Operation' => $option];
@@ -261,16 +300,7 @@ class testNoData extends testMultiselectDialogs {
 					$dialog->asForm()->fill($fields);
 					$dialog->waitUntilReady();
 					$condition_form = $dialog->query('xpath:.//form')->one()->asForm();
-
-					// Open overlay for testing.
-					$title = $parameters['multiselect'] === 'Proxy' ? 'Proxies' : $parameters['multiselect'];
-					$filter = (CTestArrayHelper::get($parameters, 'filter'))
-						? [$parameters['filter'] => '']
-						: null;
-
-					$this->checkMultiselectDialogs($condition_form, [[$parameters['multiselect'] => $title]],
-						true, true, $filter
-					);
+					$this->checkMultiselectDialogs($condition_form, [$multiselect]);
 				}
 				$dialog->close();
 			}
@@ -278,20 +308,19 @@ class testNoData extends testMultiselectDialogs {
 		COverlayDialogElement::closeAll(true);
 	}
 
-	public static function getCheckEmptyStudData() {
+	public static function getCheckEmptyMultiselectsData() {
 		return [
 			// #0 No filter selected, Proxy field check.
 			[
 				[
 					'object' => 'Hosts',
 					'url' => 'zabbix.php?action=host.list&filter_rst=1',
-					'checked_multiselects' => [
-						'Templates',
-						'Proxies'
-					],
 					// Fill this filter to enable 'Proxy' multiselect.
 					'filter' => ['Monitored by' => 'Proxy'],
-					'check_table' => true
+					'checked_multiselects' => [
+						['Templates' => ['title' => 'Templates', 'empty' => true, 'filter' => ['Template group' => '']]],
+						['Proxies' => ['title' => 'Proxies', 'empty' => true]]
+					]
 				]
 			],
 			// #1 No filter selected, Proxy group field check.
@@ -299,11 +328,11 @@ class testNoData extends testMultiselectDialogs {
 				[
 					'object' => 'Hosts',
 					'url' => 'zabbix.php?action=host.list&filter_rst=1',
-					'checked_multiselects' => [
-						'Proxy groups'
-					],
 					// Fill this filter to enable 'Proxy groups' multiselect.
-					'filter' => ['Monitored by' => 'Proxy group']
+					'filter' => ['Monitored by' => 'Proxy group'],
+					'checked_multiselects' => [
+						['Proxy groups' => ['title' => 'Proxy groups', 'empty' => true, 'filter' => null]]
+					]
 				]
 			],
 			// #2 Host's Items page.
@@ -311,11 +340,10 @@ class testNoData extends testMultiselectDialogs {
 				[
 					'object' => 'Hosts',
 					'url' => 'zabbix.php?action=host.list&filter_rst=1',
-					'sub_object' => 'Items' ,
-					'check_table' => true,
+					'sub_object' => 'Items',
 					'checked_multiselects' => [
-						'Hosts',
-						'Value mapping'
+						['Hosts' => ['title' => 'Hosts', 'empty' => true, 'filter' => ['Host group' => '']]],
+						['Value mapping' => ['title' => 'Value mapping', 'empty' => true, 'filter' => null]]
 					]
 				]
 			],
@@ -325,9 +353,8 @@ class testNoData extends testMultiselectDialogs {
 					'object' => 'Hosts',
 					'url' => 'zabbix.php?action=host.list&filter_rst=1',
 					'sub_object' => 'Triggers' ,
-					'check_table' => true,
 					'checked_multiselects' => [
-						'Hosts'
+						['Hosts' => ['title' => 'Hosts', 'empty' => true, 'filter' => ['Host group' => '']]]
 					]
 				]
 			],
@@ -337,9 +364,8 @@ class testNoData extends testMultiselectDialogs {
 					'object' => 'Hosts',
 					'url' => 'zabbix.php?action=host.list&filter_rst=1',
 					'sub_object' => 'Graphs' ,
-					'check_table' => true,
 					'checked_multiselects' => [
-						'Hosts'
+						['Hosts' => ['title' => 'Hosts', 'empty' => true, 'filter' => ['Host group' => '']]]
 					]
 				]
 			],
@@ -349,9 +375,8 @@ class testNoData extends testMultiselectDialogs {
 					'object' => 'Hosts',
 					'url' => 'zabbix.php?action=host.list&filter_rst=1',
 					'sub_object' => 'Discovery' ,
-					'check_table' => true,
 					'checked_multiselects' => [
-						'Hosts'
+						['Hosts' => ['title' => 'Hosts', 'empty' => true, 'filter' => ['Host group' => '']]]
 					]
 				]
 			],
@@ -361,9 +386,8 @@ class testNoData extends testMultiselectDialogs {
 					'object' => 'Hosts',
 					'url' => 'zabbix.php?action=host.list&filter_rst=1',
 					'sub_object' => 'Web',
-					'check_table' => true,
 					'checked_multiselects' => [
-						'Hosts'
+						['Hosts' => ['title' => 'Hosts', 'empty' => true, 'filter' => ['Host group' => '']]]
 					]
 				]
 			],
@@ -376,10 +400,9 @@ class testNoData extends testMultiselectDialogs {
 						'Name' => 'zzz',
 						'Monitored by' => 'Proxy group'
 					],
-					'check_table' => true,
 					'checked_multiselects' => [
-						'Templates',
-						'Proxy groups'
+						['Templates' => ['title' => 'Templates', 'empty' => true, 'filter' => ['Template group' => '']]],
+						['Proxy groups' => ['title' => 'Proxy groups', 'empty' => true, 'filter' => null]]
 					]
 				]
 			],
@@ -389,7 +412,7 @@ class testNoData extends testMultiselectDialogs {
 					'object' => 'Templates',
 					'url' => 'zabbix.php?action=template.list&filter_rst=1',
 					'checked_multiselects' => [
-						'Linked templates'
+						['Linked templates' => ['title' => 'Templates', 'empty' => true, 'filter' => ['Template group' => '']]]
 					]
 				]
 			],
@@ -399,9 +422,8 @@ class testNoData extends testMultiselectDialogs {
 					'object' => 'Templates',
 					'url' => 'zabbix.php?action=template.list&filter_rst=1',
 					'filter' => ['Name' => 'zzz'],
-					'check_table' => true,
 					'checked_multiselects' => [
-						'Linked templates'
+						['Linked templates' => ['title' => 'Templates', 'empty' => true, 'filter' => ['Template group' => '']]]
 					]
 				]
 			],
@@ -411,22 +433,20 @@ class testNoData extends testMultiselectDialogs {
 					'object' => 'Templates',
 					'url' => 'zabbix.php?action=template.list&filter_rst=1',
 					'sub_object' => 'Items' ,
-					'check_table' => true,
 					'checked_multiselects' => [
-						'Templates',
-						'Value mapping'
+						['Templates' => ['title' => 'Templates', 'empty' => true, 'filter' => ['Template group' => '']]],
+						['Value mapping' => ['title' => 'Value mapping', 'empty' => true, 'filter' => null]]
 					]
 				]
 			],
-			// #11 Templated Triggers page&filter_rst=1.
+			// #11 Templated Triggers page.
 			[
 				[
 					'object' => 'Templates',
-					'url' => 'zabbix.php?action=template.list',
+					'url' => 'zabbix.php?action=template.list&filter_rst=1',
 					'sub_object' => 'Triggers' ,
-					'check_table' => true,
 					'checked_multiselects' => [
-						'Templates'
+						['Templates' => ['title' => 'Templates', 'empty' => true, 'filter' => ['Template group' => '']]]
 					]
 				]
 			],
@@ -436,129 +456,93 @@ class testNoData extends testMultiselectDialogs {
 					'object' => 'Templates',
 					'url' => 'zabbix.php?action=template.list&filter_rst=1',
 					'sub_object' => 'Graphs' ,
-					'check_table' => true,
 					'checked_multiselects' => [
-						'Templates'
+						['Templates' => ['title' => 'Templates', 'empty' => true, 'filter' => ['Template group' => '']]]
 					]
 				]
 			],
-			// #13 Templated Dashboards page.
-			[
-				[
-					'object' => 'Templates',
-					'url' => 'zabbix.php?action=template.list&filter_rst=1',
-					'sub_object' => 'Dashboards',
-					'check_table' => true
-				]
-			],
-			// #14 Templated LLD page.
+			// #13 Templated LLD page.
 			[
 				[
 					'object' => 'Templates',
 					'url' => 'zabbix.php?action=template.list&filter_rst=1',
 					'sub_object' => 'Discovery',
-					'check_table' => true,
 					'checked_multiselects' => [
-						'Templates'
+						['Templates' => ['title' => 'Templates', 'empty' => true, 'filter' => ['Template group' => '']]]
 					]
 				]
 			],
-			// #15 Templated Web scenarios rules page.
+			// #14 Templated Web scenarios rules page.
 			[
 				[
 					'object' => 'Templates',
 					'url' => 'zabbix.php?action=template.list&filter_rst=1',
 					'sub_object' => 'Web',
-					'check_table' => true,
 					'checked_multiselects' => [
-						'Templates'
+						['Templates' => ['title' => 'Templates', 'empty' => true, 'filter' => ['Template group' => '']]]
 					]
 				]
 			],
-			// #16 Discovery rules page.
+			// #15 Discovery rules page.
 			[
 				[
 					'object' => 'Discovery',
 					'url' => 'zabbix.php?action=discovery.view&filter_rst=1',
-					'check_table' => true,
 					'checked_multiselects' => [
-						'Discovery rule'
+						['Discovery rule' => ['title' => 'Discovery rules', 'empty' => true, 'filter' => null]]
 					]
 				]
 			],
-			// #17 Host form overlay.
+			// #16 Host form overlay.
 			[
 				[
 					'object' => 'host',
 					'url' => 'zabbix.php?action=host.list',
 					'checked_multiselects' => [
-						'Templates'
+						['Templates' => ['title' => 'Templates', 'empty' => true, 'filter' => ['Template group' => '']]]
 					],
 					'overlay_form' => true
 				]
 			],
-			// #18 Template form overlay.
+			// #17 Template form overlay.
 			[
 				[
 					'object' => 'template',
 					'url' => 'zabbix.php?action=template.list',
 					'checked_multiselects' => [
-						'Templates'
+						['Templates' => ['title' => 'Templates', 'empty' => true, 'filter' => ['Template group' => '']]]
 					],
 					'overlay_form' => true
 				]
 			],
-			// #19 Item prototypes table.
-			[
-				[
-					'object' => 'Item prototypes',
-					'url' => 'zabbix.php?action=item.prototype.list&context=host&parent_discoveryid=',
-					'check_table' => true
-				]
-			],
-			// #20 Trigger prototypes table.
-			[
-				[
-					'object' => 'Trigger prototypes',
-					'url' => 'zabbix.php?action=trigger.prototype.list&context=host&parent_discoveryid=',
-					'check_table' => true
-				]
-			],
-			// #21 Graph prototypes table.
-			[
-				[
-					'object' => 'Graph prototypes',
-					'url' => 'graphs.php?context=host&parent_discoveryid=',
-					'check_table' => true
-				]
-			],
-			// #22 Host prototypes table.
-			[
-				[
-					'object' => 'Host prototypes',
-					'url' => 'host_prototypes.php?context=host&parent_discoveryid=',
-					'check_table' => true
-				]
-			],
-			// #23 SLA report page.
+			// #18 SLA report page.
 			[
 				[
 					'object' => 'SLA report',
 					'url' => 'zabbix.php?action=slareport.list&filter_rst=1',
-					'check_table' => true,
 					'checked_multiselects' => [
-						'SLA',
-						'Service'
+						['SLA' => ['title' => 'SLA', 'empty' => true, 'filter' => null]],
+						['Service' => ['title' => 'Service', 'empty' => true, 'filter' => ['Name' => '']]]
 					]
 				]
 			],
-			// #24 Availability report page.
+			// #19 Availability report page.
 			[
 				[
 					'object' => 'Availability report',
 					'url' => 'report2.php?filter_rst=1',
 					'checked_multiselects' => [
-						'Hosts'
+						['Hosts' => ['title' => 'Hosts', 'empty' => true, 'filter' => ['Host group' => '']]]
+					]
+				]
+			],
+			// #20 Top 100 triggers.
+			[
+				[
+					'object' => 'Top 100 triggers',
+					'url' => 'zabbix.php?action=toptriggers.list&filter_rst=1',
+					'checked_multiselects' => [
+						['Hosts' => ['title' => 'Hosts', 'empty' => true, 'filter' => ['Host group' => '']]]
 					]
 				]
 			],
@@ -568,7 +552,7 @@ class testNoData extends testMultiselectDialogs {
 					'object' => 'maintenance period',
 					'url' => 'zabbix.php?action=maintenance.list&filter_rst=1',
 					'checked_multiselects' => [
-						'Hosts'
+						['Hosts' => ['title' => 'Hosts', 'empty' => true, 'filter' => ['Host group' => '']]]
 					],
 					'overlay_form' => true
 				]
@@ -577,16 +561,12 @@ class testNoData extends testMultiselectDialogs {
 	}
 
 	/**
-	 * Test function for checking empty list tables and empty multiselects' overlays, when there is no available data.
+	 * Test function for checking empty multiselects' overlays, when there is no available data.
 	 *
-	 * @dataProvider getCheckEmptyStudData
+	 * @dataProvider getCheckEmptyMultiselectsData
 	 */
-	public function testNoData_CheckEmptyStud($data) {
-		$url = (str_contains($data['url'], 'discoveryid='))
-			? $data['url'].self::$host_lldid
-			: $data['url'];
-
-		$this->page->login()->open($url);
+	public function testNoData_CheckEmptyMultiselects($data) {
+		$this->page->login()->open($data['url']);
 
 		// Main objects are hosts and templates, but sub-objects are items, triggers, graphs, etc.
 		if (array_key_exists('sub_object', $data)) {
@@ -599,55 +579,214 @@ class testNoData extends testMultiselectDialogs {
 		// Some forms are opened in overlays, not on standalone pages.
 		if (CTestArrayHelper::get($data, 'overlay_form', false)) {
 			$this->query('button:Create '.$data['object'])->waitUntilClickable()->one()->click();
-			$template_overlay = COverlayDialogElement::find()->waitUntilReady()->one();
-			$overlay_form = $template_overlay->asForm();
+			$overlay = COverlayDialogElement::find()->waitUntilReady()->one();
+			$form = $overlay->asForm();
+		}
+		else {
+			$form = $this->query('name:zbx_filter')->asForm()->one();
+			CFilterElement::find()->one()->selectTab('Filter');
 		}
 
 		// Fill filter to enable dependent multiselects.
 		if (array_key_exists('filter', $data)) {
+			$form->fill($data['filter']);
+			$form->submit();
+			$form->invalidate();
+		}
+
+		$this->checkMultiselectDialogs($form, $data['checked_multiselects']);
+
+		if (CTestArrayHelper::get($data, 'overlay_form', false)) {
+			$overlay->close();
+		}
+	}
+
+	public static function getCheckEmptyPagesData() {
+		return [
+			//Hosts.
+			// #0 Empty hosts table.
+			[
+				[
+					'page' => 'Hosts',
+					'url' => 'zabbix.php?action=host.list&filter_rst=1',
+					'filter' => ['Name' => 'zzz']
+				]
+			],
+			// #1 Empty hosts' items table.
+			[
+				[
+					'url' => 'zabbix.php?action=item.list&context=host&filter_set=1&filter_hostids%5B0%5D='
+				]
+			],
+			// #2 Empty hosts' triggers table.
+			[
+				[
+					'url' => 'zabbix.php?action=trigger.list&context=host&filter_set=1&filter_hostids%5B0%5D='
+				]
+			],
+			// #3 Empty hosts' graphs table.
+			[
+				[
+					'url' => 'graphs.php?filter_set=1&context=host&filter_hostids%5B0%5D='
+				]
+			],
+			// #4 Empty hosts' LLD table.
+			[
+				[
+					'url' => 'host_discovery.php?filter_set=1&context=host&filter_hostids%5B0%5D='
+				]
+			],
+			// #5 Empty hosts' Web scenarios table.
+			[
+				[
+					'url' => 'httpconf.php?filter_set=1&context=host&filter_hostids%5B0%5D='
+				]
+			],
+			// #6 Item prototypes table.
+			[
+				[
+					'url' => 'zabbix.php?action=item.prototype.list&context=host&parent_discoveryid='
+				]
+			],
+			// #7 Trigger prototypes table.
+			[
+				[
+					'url' => 'zabbix.php?action=trigger.prototype.list&context=host&parent_discoveryid='
+				]
+			],
+			// #8 Graph prototypes table.
+			[
+				[
+					'url' => 'graphs.php?context=host&parent_discoveryid='
+				]
+			],
+			// #9 Host prototypes table.
+			[
+				[
+					'url' => 'host_prototypes.php?context=host&parent_discoveryid='
+				]
+			],
+			//Templates.
+			// #10 Empty templates table.
+			[
+				[
+					'page' => 'Templates',
+					'url' => 'zabbix.php?action=template.list&filter_rst=1',
+					'filter' => ['Name' => 'zzz']
+				]
+			],
+			// #11 Empty templates' items table.
+			[
+				[
+					'url' => 'zabbix.php?action=item.list&context=template&filter_set=1&filter_hostids%5B0%5D='
+				]
+			],
+			// #12 Empty templates' triggers table.
+			[
+				[
+					'url' => 'zabbix.php?action=trigger.list&filter_set=1&context=template&filter_hostids%5B0%5D='
+				]
+			],
+			// #13 Empty templates' graphs table.
+			[
+				[
+					'url' => 'graphs.php?filter_set=1&context=template&filter_hostids%5B0%5D='
+				]
+			],
+			// #14 Empty templates' LLD table.
+			[
+				[
+					'url' => 'host_discovery.php?filter_set=1&context=template&filter_hostids%5B0%5D='
+				]
+			],
+			// #15 Empty templates' Web scenarios table.
+			[
+				[
+					'url' => 'httpconf.php?filter_set=1&context=template&filter_hostids%5B0%5D='
+				]
+			],
+			// #16 Empty templates' dashboards table.
+			[
+				[
+					'url' => 'zabbix.php?action=template.dashboard.list&templateid='
+				]
+			],
+			//Other pages.
+			// #17 Discovery rules table.
+			[
+				[
+					'page' => 'Status of discovery',
+					'url' => 'zabbix.php?action=discovery.view'
+				]
+			],
+			// #18 Empty SLA page.
+			[
+				[
+					'page' => 'SLA',
+					'url' => 'zabbix.php?action=sla.list',
+				]
+			],
+			// #19 Empty SLA report page.
+			[
+				[
+					'page' => 'SLA report',
+					'url' => 'zabbix.php?action=slareport.list',
+				]
+			],
+			// #20 Empty Top 100 triggers page.
+			[
+				[
+					'page' => 'Top 100 triggers',
+					'url' => 'zabbix.php?action=toptriggers.list'
+				]
+			],
+			// #21 Empty Maintenances page.
+			[
+				[
+					'page' => 'Maintenance periods',
+					'url' => 'zabbix.php?action=maintenance.list',
+					'filter' => ['Name' => 'zzz']
+				]
+			]
+		];
+	}
+
+	/**
+	 * Test function for checking empty list tables.
+	 *
+	 * @dataProvider getCheckEmptyPagesData
+	 */
+	public function testNoData_CheckEmptyPages($data) {
+		$context_host = str_contains($data['url'], 'context=host');
+
+		if  (in_array(CTestArrayHelper::get($data, 'page'), ['Hosts', 'Templates', 'SLA', 'SLA report',
+				'Top 100 triggers', 'Maintenance periods', 'Status of discovery'])) {
+			$url = $data['url'];
+		}
+		else {
+			$url = (str_contains($data['url'], 'discoveryid='))
+				? ($data['url'].($context_host ? self::$host_lldid :self::$template_lldid))
+				: ($data['url'].($context_host ? self::$empty_hostid : self::$empty_templateid));
+		}
+
+		$this->page->login()->open($url);
+
+		if (array_key_exists('filter', $data)) {
 			$form = $this->query('name:zbx_filter')->asForm()->one();
+			CFilterElement::find()->one()->selectTab('Filter');
 			$form->fill($data['filter']);
 			$form->submit();
 		}
 
-		// Code for checking empty list table.
-		if (CTestArrayHelper::get($data, 'check_table', false)) {
-			if ($data['object'] === 'SLA report') {
-				$this->assertEquals('Select SLA to display SLA report.',
-						$this->query('xpath://div[@class="no-data-message"]')->one()->getText()
-				);
-			}
-			else {
-				$this->assertEquals(['No data found'],
+		if (CTestArrayHelper::get($data, 'page') === 'SLA report') {
+			$this->assertEquals('Select SLA to display SLA report.',
+					$this->query('xpath://div[@class="no-data-message"]')->one()->getText()
+			);
+		}
+		else {
+			$this->assertEquals(['No data found'],
 					$this->getTable('xpath://table[@class="list-table no-data"]')->getRows()->asText()
-				);
-			}
-		}
-
-		// Code for checking empty multiselects' overlays.
-		if (array_key_exists('checked_multiselects', $data)) {
-			foreach ($data['checked_multiselects'] as $field) {
-				if (CTestArrayHelper::get($data, 'overlay_form')) {
-					$form = $overlay_form;
-				}
-				else {
-					CFilterElement::find()->one()->selectTab('Filter');
-					$form = $this->query('name:zbx_filter')->asForm()->one();
-				}
-
-				$overlay = $form->getField($field)->edit();
-
-				$title = ($field === 'Linked templates')
-					? 'Templates'
-					: ($field === 'Discovery rule' ? 'Discovery rules' : $field);
-				$this->checkEmptyOverlay($overlay, $title, '');
-				$overlay->close();
-			}
-		}
-
-		// If form was opened in overlay it should be closed after test.
-		if (CTestArrayHelper::get($data, 'overlay_form', false)) {
-			COverlayDialogElement::closeAll(true);
+			);
 		}
 	}
 
@@ -839,15 +978,14 @@ class testNoData extends testMultiselectDialogs {
 			: ($context_host ? self::EMPTY_HOST : self::EMPTY_TEMPLATE);
 
 		$filter_label = CTestArrayHelper::get($data, 'filter_label', 'Host');
+		$filter = ['filter' => [$filter_label => '']];
 
 		switch ($data['object']) {
 			case 'item':
 			case 'item prototype':
 			case 'discovery rule':
 				$form->fill(['Type' => 'Dependent item']);
-				$this->checkMultiselectDialogs($form, [['Master item' => 'Items']], true, true,
-						[$filter_label => [$host]]
-				);
+				$this->checkMultiselectDialogs($form, [['Master item' => ['title' => 'Items', 'empty' => true, $filter]]]);
 				break;
 
 			case 'trigger':
@@ -857,7 +995,8 @@ class testNoData extends testMultiselectDialogs {
 
 				// Item selection in trigger's expression is not multiselect element, but just input and buttons.
 				$expression_overlay->query('button:Select')->one()->waitUntilCLickable()->click();
-				$items_overlay = COverlayDialogElement::find()->all()->last();
+				$items_overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();;
+
 				$this->checkEmptyOverlay($items_overlay, 'Items', [$filter_label => [$host]]);
 				$form = $expression_overlay;
 				break;
@@ -865,14 +1004,14 @@ class testNoData extends testMultiselectDialogs {
 			case 'graph':
 			case 'graph prototype':
 				$form->getFieldContainer('Items')->query('button:Add')->one()->waitUntilCLickable()->click();
-				$items_overlay = COverlayDialogElement::find()->all()->last();
+				$items_overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();
 				$this->checkEmptyOverlay($items_overlay, 'Items', [$filter_label => [$host]]);
 				break;
 
 			case 'host prototype':
 				$form = $this->query($data['form'])->asForm(['normalized' => true])->one();
-				$this->checkMultiselectDialogs($form, [['Templates' => 'Templates']], true, true,
-						['Template group' => '']
+				$this->checkMultiselectDialogs($form,
+						[['Templates' => ['title' => 'Templates', 'empty' => true, 'filter' => ['Template group' => '']]]]
 				);
 		}
 
@@ -901,37 +1040,5 @@ class testNoData extends testMultiselectDialogs {
 		$this->checkOverlayFilter($overlay, $title, $filter);
 		$this->checkOverlayStud($overlay, $title);
 		$overlay->close();
-	}
-
-	/**
-	 * Function for testing opened overlay's title and contents.
-	 *
-	 * @param COverlayDialogElement    $overlay    tested overlay
-	 * @param string                   $title      title of tested overlay
-	 * @param string                   $filter     hostname selected in overlay filter
-	 */
-	protected function checkEmptyOverlay2($overlay, $title, $filter = null) {
-		$this->assertEquals($title, $overlay->waitUntilReady()->getTitle());
-
-		// For SLA overlays filter is not multiselect, but input.
-		$filter_selector = (in_array($title, ['SLA', 'Service', 'Services']))
-			? $overlay->query('id:services-filter-name')
-			: $overlay->query('xpath:.//div[@class="multiselect-control"]')->asMultiselect();
-
-		// There are overlays where additional filter exists, and there are some - where it shouldn't exist.
-		if (in_array($title, ['Proxies', 'Proxy groups', 'Value mapping', 'Discovery rules', 'SLA', 'Item prototypes'])) {
-			$this->assertFalse($filter_selector->exists());
-		}
-		else {
-			$this->assertEquals($filter, $filter_selector->one()->getValue());
-		}
-
-		$text = (in_array($title, ['Templates', 'Hosts', 'Triggers']))
-			? "Filter is not set\nUse the filter to display results"
-			: 'No data found';
-		$this->assertEquals($text, $overlay->query('class:no-data-message')->one()->getText());
-
-		// Check that opened dialog does not contain any error messages.
-		$this->assertFalse($overlay->query('xpath:.//*[contains(@class, "msg-bad")]')->exists());
 	}
 }

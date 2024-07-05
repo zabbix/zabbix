@@ -61,7 +61,10 @@ class testMultiselectsLatestData extends testMultiselectDialogs {
 			$empty_dialog->close();
 		}
 
-		$multiselects = [['Host groups' => 'Host groups'], ['Hosts' => 'Hosts', 'Host group' => 'Host groups']];
+		$multiselects = [
+			['Host groups' => ['title' => 'Host groups']],
+			['Hosts' => ['title' => 'Hosts'], 'Host group' => ['title' => 'Host groups']]
+		];
 
 		// Check all multiselects in filter before the first multiselect is filled.
 		$this->checkMultiselectDialogs($filter_form, $multiselects);
