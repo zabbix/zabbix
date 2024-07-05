@@ -1,1 +1,0 @@
-........S. [ZBX-24649] removed logging of critical message when failing to convert value to uint64 in preprocessing (dgoloscapov)
