@@ -18,6 +18,7 @@
 #include "zbxstr.h"
 #include "zbxexpr.h"
 #include "zbxexpression.h"
+#include "zbxxml.h"
 
 #define ZBX_MACRO_UNKNOWN	"*UNKNOWN*"
 
@@ -95,10 +96,14 @@ static int	httpmacro_append_pair(zbx_httptest_t *httptest, const char *pkey, siz
 {
 #define REGEXP_PREFIX		"regex:"
 #define REGEXP_PREFIX_SIZE	ZBX_CONST_STRLEN(REGEXP_PREFIX)
+#define JSONPATH_PREFIX		"jsonpath:"
+#define JSONPATH_PREFIX_SIZE	ZBX_CONST_STRLEN(JSONPATH_PREFIX)
+#define XMLXPATH_PREFIX		"xmlxpath:"
+#define XMLXPATH_PREFIX_SIZE	ZBX_CONST_STRLEN(XMLXPATH_PREFIX)
 	char 		*value_str = NULL;
 	size_t		key_size = 0, key_offset = 0, value_size = 0, value_offset = 0;
 	zbx_ptr_pair_t	pair = {NULL, NULL};
-	int		index, ret = FAIL;
+	int		index, ret = FAIL, rc;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() pkey:'%.*s' pvalue:'%.*s'",
 			__func__, (int)nkey, pkey, (int)nvalue, pvalue);
@@ -131,7 +136,6 @@ static int	httpmacro_append_pair(zbx_httptest_t *httptest, const char *pkey, siz
 	zbx_strncpy_alloc(&value_str, &value_size, &value_offset, pvalue, nvalue);
 	if (0 == strncmp(REGEXP_PREFIX, value_str, REGEXP_PREFIX_SIZE))
 	{
-		int	rc;
 		/* The value contains regexp pattern, retrieve the first captured group or fail.  */
 		/* The \@ sequence is a special construct to fail if the pattern matches but does */
 		/* not contain groups to capture.                                                 */
@@ -139,22 +143,59 @@ static int	httpmacro_append_pair(zbx_httptest_t *httptest, const char *pkey, siz
 		rc = zbx_mregexp_sub(data, value_str + REGEXP_PREFIX_SIZE, "\\@", (char **)&pair.second);
 		zbx_free(value_str);
 
-		if (SUCCEED != rc || NULL == pair.second)
+		if (SUCCEED != rc)
+			zbx_free(pair.second);
+	}
+	else if (0 == strncmp(JSONPATH_PREFIX, value_str, JSONPATH_PREFIX_SIZE))
+	{
+		zbx_jsonobj_t	obj;
+
+		if (SUCCEED == (rc = zbx_jsonobj_open(data, &obj)))
+			rc = zbx_jsonobj_query(&obj, value_str + JSONPATH_PREFIX_SIZE, (char **)&pair.second);
+		if (SUCCEED != rc)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot extract the value of \"%.*s\" from response",
-					__func__, (int)nkey, pkey);
-
-			if (NULL != err_str && NULL == *err_str)
-			{
-				*err_str = zbx_dsprintf(*err_str, "cannot extract the value of \"%.*s\""
-						" from response", (int)nkey, pkey);
-			}
-
-			goto out;
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot parse json: %s", __func__, zbx_json_strerror());
+			zbx_free(pair.second);
 		}
+		zbx_jsonobj_clear(&obj);
+		zbx_free(value_str);
+	}
+	else if (0 == strncmp(XMLXPATH_PREFIX, value_str, XMLXPATH_PREFIX_SIZE))
+	{
+		zbx_variant_t	value;
+		int		is_empty;
+		char		*errmsg = NULL;
+
+		zbx_variant_set_str(&value, zbx_strdup(NULL, data));
+		rc = zbx_query_xpath_contents(&value, value_str + XMLXPATH_PREFIX_SIZE, &is_empty, &errmsg);
+		if (SUCCEED == rc && SUCCEED != is_empty)
+		{
+			pair.second = zbx_strdup(NULL, value.data.str);
+		}
+		else
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() %s", __func__, errmsg);
+		}
+		zbx_free(errmsg);
+		zbx_free(value_str);
+		zbx_variant_clear(&value);
 	}
 	else
 		pair.second = value_str;
+
+	if (NULL == pair.second)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot extract the value of \"%.*s\" from response",
+				__func__, (int)nkey, pkey);
+
+		if (NULL != err_str && NULL == *err_str)
+		{
+			*err_str = zbx_dsprintf(*err_str, "cannot extract the value of \"%.*s\""
+					" from response", (int)nkey, pkey);
+		}
+
+		goto out;
+	}
 
 	/* get macro name */
 	zbx_strncpy_alloc((char **)&pair.first, &key_size, &key_offset, pkey, nkey);
@@ -180,6 +221,10 @@ out:
 	return ret;
 #undef REGEXP_PREFIX
 #undef REGEXP_PREFIX_SIZE
+#undef JSONPATH_PREFIX
+#undef JSONPATH_PREFIX_SIZE
+#undef XMLXPATH_PREFIX
+#undef XMLXPATH_PREFIX_SIZE
 }
 
 /******************************************************************************
