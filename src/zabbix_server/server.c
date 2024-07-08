@@ -633,6 +633,9 @@ static void	zbx_set_defaults(void)
 {
 	config_startup_time = (int)time(NULL);
 
+	if (NULL != CONFIG_HA_NODE_NAME && '\0' != *CONFIG_HA_NODE_NAME)
+		zbx_config_dbhigh->read_only_recoverable = 1;
+
 	if (NULL == zbx_config_dbhigh->config_dbhost)
 		zbx_config_dbhigh->config_dbhost = zbx_strdup(zbx_config_dbhigh->config_dbhost, "localhost");
 
