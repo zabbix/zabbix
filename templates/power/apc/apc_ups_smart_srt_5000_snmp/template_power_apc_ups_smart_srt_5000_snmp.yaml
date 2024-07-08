@@ -1038,8 +1038,7 @@ zabbix_export:
                   - macro: '{#EXTERNAL_SENSOR1_NAME}'
                     value: Temp
               operations:
-                - operationobject: ITEM_PROTOTYPE
-                  operator: LIKE
+                - operator: LIKE
                   value: Humidity
                   discover: NO_DISCOVER
         - uuid: 415a43bfe1d845f88f0ac15e80a0dc14
@@ -1147,8 +1146,7 @@ zabbix_export:
                   - macro: '{#EXTERNAL_SENSOR2_NAME}'
                     value: Temp
               operations:
-                - operationobject: ITEM_PROTOTYPE
-                  operator: LIKE
+                - operator: LIKE
                   value: Humidity
                   discover: NO_DISCOVER
         - uuid: 5971a05073b84056bf4e30dfa3e2e18e
