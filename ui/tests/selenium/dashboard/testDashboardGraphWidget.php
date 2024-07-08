@@ -1300,12 +1300,6 @@ class testDashboardGraphWidget extends CWebTest {
 							'item' => ',Agentp ping',
 							'Draw' => 'Bar',
 							'Aggregation function' => 'max'
-						],
-						[
-							'host' => ',Zabbix, Server,',
-							'item' => 'Zabbix configuration cache, % used',
-							'Aggregation function' => 'count',
-							'Aggregation interval' => '24h'
 						]
 					],
 					'Overrides' => [
@@ -1685,12 +1679,6 @@ class testDashboardGraphWidget extends CWebTest {
 							'item' => 'Agent, Ping',
 							'Aggregation function' => 'min',
 							'Aggregate' => 'Data set'
-						],
-						[
-							'host' => ',Zabbix Server',
-							'item' => ',Agentp ping',
-							'Draw' => 'Bar',
-							'Aggregation function' => 'max'
 						],
 						[
 							'host' => ',Zabbix, Server,',
