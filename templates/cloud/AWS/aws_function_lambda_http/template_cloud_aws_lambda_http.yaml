@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-06-20T15:15:33Z'
+  date: '2024-07-08T13:57:43Z'
   groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -1014,7 +1014,7 @@ zabbix_export:
                       value:
                         host: 'AWS Lambda by HTTP'
                         name: 'AWS Lambda: Async dropped events'
-            - name: 'AWS Lambda: Concurrency metrics metrics'
+            - name: 'AWS Lambda: Concurrency metrics'
               widgets:
                 - type: GRAPH_CLASSIC
                   width: '12'
