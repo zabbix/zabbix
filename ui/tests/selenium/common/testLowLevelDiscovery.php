@@ -66,9 +66,9 @@ class testLowLevelDiscovery extends CWebTest {
 		}
 
 		// Check the whole form required labels.
-		$required_labels = ['Name', 'Key', 'URL', 'Script', 'Master item', 'Host interface', 'SNMP OID', 'JMX endpoint',
-			'Public key file', 'Private key file', 'Executed script', 'SQL query', 'Update interval', 'Timeout',
-			'Delete lost resources', 'Disable lost resources'
+		$required_labels = ['Name', 'Key', 'URL', 'Script', 'Script', 'Master item', 'Host interface', 'SNMP OID', 'JMX endpoint',
+				'Public key file', 'Private key file', 'Executed script', 'SQL query', 'Update interval', 'Timeout',
+				'Delete lost resources', 'Disable lost resources'
 		];
 
 		if ($context === 'template') {
@@ -86,13 +86,13 @@ class testLowLevelDiscovery extends CWebTest {
 			'Filters' => ['Filters'],
 			'Overrides' => ['Overrides'],
 			'Discovery rule' => ['Name', 'Type', 'Key', 'Host interface', 'Update interval', 'Custom intervals',
-				'Timeout', 'Delete lost resources', 'Disable lost resources', 'Description', 'Enabled'
+					'Timeout', 'Delete lost resources', 'Disable lost resources', 'Description', 'Enabled'
 			]
 		];
 
 		if ($context === 'template') {
 			$visible_fields['Discovery rule'] = ['Name', 'Type', 'Key', 'Update interval', 'Custom intervals',
-				'Timeout', 'Delete lost resources', 'Disable lost resources', 'Description', 'Enabled'
+					'Timeout', 'Delete lost resources', 'Disable lost resources', 'Description', 'Enabled'
 			];
 		}
 
@@ -177,7 +177,10 @@ class testLowLevelDiscovery extends CWebTest {
 		$fields = [
 			// Discovery rule.
 			'Name' => ['maxlength' => 255],
-			'Type' => ['value' => 'Zabbix agent'],
+			'Type' => ['value' => 'Zabbix agent', 'options' => ['Zabbix agent', 'Zabbix agent (active)', 'Simple check',
+					'SNMP agent', 'Zabbix internal', 'Zabbix trapper', 'External check', 'Database monitor', 'HTTP agent',
+					'IPMI agent', 'SSH agent', 'TELNET agent', 'JMX agent', 'Dependent item', 'Script', 'Browser']
+			],
 			'Key' => ['maxlength' => 2048],
 			'URL' => ['maxlength' => 2048],
 			'Query fields' => ['value' => [['name' => '', 'value' => '']]],
@@ -370,6 +373,13 @@ class testLowLevelDiscovery extends CWebTest {
 			[
 				[
 					'type' => 'Script',
+					'fields' =>  ['Parameters', 'Script', 'Update interval', 'Custom intervals', 'Timeout']
+				]
+			],
+			// #15.
+			[
+				[
+					'type' => 'Browser',
 					'fields' =>  ['Parameters', 'Script', 'Update interval', 'Custom intervals', 'Timeout']
 				]
 			]
@@ -2210,6 +2220,50 @@ class testLowLevelDiscovery extends CWebTest {
 						]
 					],
 					'error_details' => 'Invalid parameter "/1/filter/formula": incorrect syntax near " not B".'
+				]
+			],
+			// #103.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Empty script in Browser item',
+						'Type' => 'Browser',
+						'Key' => 'browser_check[2]',
+						'Script' => ''
+					],
+					'error' => 'Page received incorrect data',
+					'error_details' => 'Incorrect value for field "Script": cannot be empty.'
+				]
+			],
+			// #104.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Empty parameters in Browser item',
+						'Type' => 'Browser',
+						'Key' => 'browser_check[2]',
+						'Script' => 'test sript'
+					],
+					'Parameters' => [
+						['Name' => '', 'Value' => 'value_1']
+					],
+					'error_details' => 'Invalid parameter "/1/parameters/1/name": cannot be empty.'
+				]
+			],
+			// #105.
+			[
+				[
+					'fields' => [
+						'Name' => 'Browser item',
+						'Type' => 'Browser',
+						'Key' => 'browser_check[3]',
+						'Script' => 'test sript'
+					],
+					'Parameters' => [
+						['Name' => 'param_1', 'Value' => 'value_1']
+					]
 				]
 			]
 		];
