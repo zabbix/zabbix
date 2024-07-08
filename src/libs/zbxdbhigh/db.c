@@ -1,29 +1,33 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "zbxdbhigh.h"
 
 #include "zbxthreads.h"
-#include "zbxcfg.h"
 #include "zbxcrypto.h"
 #include "zbxnum.h"
 #include "zbx_host_constants.h"
+#include "zbxalgo.h"
+#include "zbxdb.h"
+#include "zbxdbschema.h"
+#include "zbxstr.h"
+
+#if (!(defined(HAVE_MYSQL_TLS) || defined(HAVE_MARIADB_TLS) || defined(HAVE_POSTGRESQL))) || \
+	(!(defined(HAVE_MYSQL_TLS) || defined(HAVE_POSTGRESQL))) || \
+	(!(defined(HAVE_MYSQL_TLS) || defined(HAVE_MARIADB_TLS)))
+#	include "zbxcfg.h"
+#endif
 
 #ifdef HAVE_POSTGRESQL
 #	include "zbx_dbversion_constants.h"
@@ -249,7 +253,7 @@ void	zbx_db_init_autoincrement_options(void)
  *                    ZBX_DB_CONNECT_EXIT (exit on failure) or                *
  *                    ZBX_DB_CONNECT_NORMAL (retry until connected)           *
  *                                                                            *
- * Return value: same as zbx_db_connect_basic()                                     *
+ * Return value: same as zbx_db_connect_basic()                               *
  *                                                                            *
  ******************************************************************************/
 int	zbx_db_connect(int flag)
@@ -501,6 +505,27 @@ int	zbx_db_is_null(const char *field)
 zbx_db_row_t	zbx_db_fetch(zbx_db_result_t result)
 {
 	return zbx_db_fetch_basic(result);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: execute a select statement                                        *
+ *                                                                            *
+ * Comments: don't retry until DB is up                                       *
+ *                                                                            *
+ ******************************************************************************/
+zbx_db_result_t	zbx_db_select_once(const char *fmt, ...)
+{
+	va_list		args;
+	zbx_db_result_t	rc;
+
+	va_start(args, fmt);
+
+	rc = zbx_db_vselect(fmt, args);
+
+	va_end(args);
+
+	return rc;
 }
 
 /******************************************************************************
@@ -868,9 +893,7 @@ zbx_uint64_t	zbx_db_get_maxid_num(const char *tablename, int num)
  ******************************************************************************/
 void	zbx_db_extract_version_info(struct zbx_db_version_info_t *version_info)
 {
-	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 	zbx_dbms_version_info_extract(version_info);
-	zbx_db_close();
 }
 
 #ifdef HAVE_POSTGRESQL
@@ -923,8 +946,6 @@ int	zbx_db_check_extension(struct zbx_db_version_info_t *info, int allow_unsuppo
 	int		ret = SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
 	/* in case of major upgrade, db_extension may be missing */
 	if (FAIL == zbx_db_field_exists("config", "db_extension"))
@@ -1023,7 +1044,6 @@ int	zbx_db_check_extension(struct zbx_db_version_info_t *info, int allow_unsuppo
 	zbx_tsdb_set_compression_availability(ON);
 out:
 	zbx_free(tsdb_lic);
-	zbx_db_close();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
@@ -2369,7 +2389,6 @@ void	zbx_db_check_character_set(void)
 	zbx_db_row_t	row;
 
 	database_name_esc = zbx_db_dyn_escape_string(zbx_cfg_dbhigh->config_dbname);
-	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
 	result = zbx_db_select(
 			"select default_character_set_name,default_collation_name"
@@ -2427,13 +2446,11 @@ void	zbx_db_check_character_set(void)
 	}
 
 	zbx_db_free_result(result);
-	zbx_db_close();
 	zbx_free(database_name_esc);
 #elif defined(HAVE_ORACLE)
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
 
-	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 	result = zbx_db_select(
 			"select parameter,value"
 			" from NLS_DATABASE_PARAMETERS"
@@ -2470,7 +2487,6 @@ void	zbx_db_check_character_set(void)
 	}
 
 	zbx_db_free_result(result);
-	zbx_db_close();
 #elif defined(HAVE_POSTGRESQL)
 #define OID_LENGTH_MAX		20
 
@@ -2480,7 +2496,6 @@ void	zbx_db_check_character_set(void)
 
 	database_name_esc = zbx_db_dyn_escape_string(zbx_cfg_dbhigh->config_dbname);
 
-	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 	result = zbx_db_select(
 			"select pg_encoding_to_char(encoding)"
 			" from pg_database"
@@ -2573,7 +2588,6 @@ void	zbx_db_check_character_set(void)
 	}
 out:
 	zbx_db_free_result(result);
-	zbx_db_close();
 	zbx_free(database_name_esc);
 #endif
 }
@@ -3151,7 +3165,6 @@ retry_oracle:
 					zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, '\'');
 #if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
 					decode_and_escape_binary_value_for_sql(&(value->str));
-					/* Oracle converts base64 to binary when it formats prepared statement */
 #endif
 					zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, value->str);
 					zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, '\'');
@@ -3270,8 +3283,6 @@ int	zbx_db_get_database_type(void)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
-
 	if (NULL == (result = zbx_db_select_n("select userid from users", 1)))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot select records from \"users\" table");
@@ -3291,8 +3302,6 @@ int	zbx_db_get_database_type(void)
 
 	zbx_db_free_result(result);
 out:
-	zbx_db_close();
-
 	switch (ret)
 	{
 		case ZBX_DB_SERVER:
@@ -3597,8 +3606,6 @@ int	zbx_db_check_instanceid(void)
 	zbx_db_row_t	row;
 	int		ret = SUCCEED;
 
-	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
-
 	result = zbx_db_select("select configid,instanceid from config order by configid");
 	if (NULL != (row = zbx_db_fetch(result)))
 	{
@@ -3622,8 +3629,6 @@ int	zbx_db_check_instanceid(void)
 	}
 	zbx_db_free_result(result);
 
-	zbx_db_close();
-
 	return ret;
 }
 
@@ -3632,8 +3637,6 @@ int	zbx_db_update_software_update_checkid(void)
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
 	int		ret = SUCCEED;
-
-	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
 	result = zbx_db_select("select software_update_checkid from config");
 	if (NULL != (row = zbx_db_fetch(result)))
@@ -3657,8 +3660,6 @@ int	zbx_db_update_software_update_checkid(void)
 		ret = FAIL;
 	}
 	zbx_db_free_result(result);
-
-	zbx_db_close();
 
 	return ret;
 }

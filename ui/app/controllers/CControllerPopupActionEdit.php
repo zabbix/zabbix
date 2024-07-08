@@ -1,21 +1,16 @@
 <?php declare(strict_types = 0);
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -138,19 +133,6 @@ class CControllerPopupActionEdit extends CController {
 				'formula' => $formula,
 				'allowedOperations' => getAllowedOperations($eventsource)
 			];
-
-			CArrayHelper::sort($data['action']['filter']['conditions'], [
-				['field' => 'conditiontype', 'order' => ZBX_SORT_DOWN],
-				['field' => 'value', 'order' => ZBX_SORT_DOWN]
-			]);
-
-			$data['action']['filter']['conditions'] = array_values($data['action']['filter']['conditions']);
-
-			if ($data['action']['filter']['formula'] !== '') {
-				$data['action']['filter']['conditions'] = array_values(CConditionHelper::sortConditionsByFormulaId(
-					$data['action']['filter']['conditions']
-				));
-			}
 
 			foreach ($data['action']['filter']['conditions'] as $row_index => &$condition) {
 				$condition_names = actionConditionValueToString([$data['action']]);

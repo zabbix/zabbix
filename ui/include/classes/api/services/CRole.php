@@ -1,21 +1,16 @@
 <?php declare(strict_types = 0);
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -34,6 +29,8 @@ class CRole extends CApiService {
 	protected $tableName = 'role';
 	protected $tableAlias = 'r';
 	protected $sortColumns = ['roleid', 'name'];
+
+	public const OUTPUT_FIELDS = ['roleid', 'name', 'type', 'readonly'];
 
 	/**
 	 * Rule types.
@@ -71,7 +68,7 @@ class CRole extends CApiService {
 			'excludeSearch' =>			['type' => API_FLAG, 'default' => false],
 			'searchWildcardsEnabled' =>	['type' => API_BOOLEAN, 'default' => false],
 			// output
-			'output' =>					['type' => API_OUTPUT, 'in' => implode(',', ['roleid', 'name', 'type', 'readonly']), 'default' => API_OUTPUT_EXTEND],
+			'output' =>					['type' => API_OUTPUT, 'in' => implode(',', self::OUTPUT_FIELDS), 'default' => API_OUTPUT_EXTEND],
 			'countOutput' =>			['type' => API_FLAG, 'default' => false],
 			'selectRules' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['ui', 'ui.default_access', 'services.read.mode', 'services.read.list', 'services.read.tag', 'services.write.mode', 'services.write.list', 'services.write.tag', 'modules', 'modules.default_access', 'api.access', 'api.mode', 'api', 'actions', 'actions.default_access']), 'default' => null],
 			'selectUsers' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['userid', 'username', 'name', 'surname', 'url', 'autologin', 'autologout', 'lang', 'refresh', 'theme', 'attempt_failed', 'attempt_ip', 'attempt_clock', 'rows_per_page', 'timezone', 'roleid']), 'default' => null],
@@ -428,7 +425,7 @@ class CRole extends CApiService {
 
 			$db_rules = $db_roles !== null ? $db_roles[$role['roleid']]['rules'] : null;
 
-			$this->checkUiRules($name, (int) $type, $role['rules'], $db_rules);
+			self::checkUiRules($name, (int) $type, $role['rules'], $db_rules);
 			$this->checkServicesRules($name, (int) $type, $role['rules'], $db_rules);
 			$this->checkModulesRules($name, $role['rules']);
 			$this->checkApiRules($name, $role['rules']);
@@ -444,7 +441,7 @@ class CRole extends CApiService {
 
 	 * @throws APIException
 	 */
-	private function checkUiRules(string $name, int $type, array $rules, array $db_rules = null): void {
+	private static function checkUiRules(string $name, int $type, array $rules, array $db_rules = null): void {
 		if (!array_key_exists('ui', $rules)) {
 			return;
 		}
@@ -460,10 +457,13 @@ class CRole extends CApiService {
 		}
 
 		$ui_rules = [];
+		$db_ui_rules = $db_rules !== null ? array_column($db_rules['ui'], 'status', 'name') : [];
 
 		foreach (CRoleHelper::getUiElementsByUserType($type) as $ui_element) {
 			$ui_rule_name = substr($ui_element, strlen('ui.'));
-			$ui_rules[$ui_rule_name] = $default_access == ZBX_ROLE_RULE_ENABLED;
+			$ui_rules[$ui_rule_name] = array_key_exists($ui_rule_name, $db_ui_rules)
+				? $db_ui_rules[$ui_rule_name]
+				: $default_access;
 		}
 
 		foreach ($rules['ui'] as $ui_rule) {
@@ -473,10 +473,10 @@ class CRole extends CApiService {
 				);
 			}
 
-			$ui_rules[$ui_rule['name']] = $ui_rule['status'] == ZBX_ROLE_RULE_ENABLED;
+			$ui_rules[$ui_rule['name']] = $ui_rule['status'];
 		}
 
-		if (!in_array(true, $ui_rules)) {
+		if (!in_array(ZBX_ROLE_RULE_ENABLED, $ui_rules)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
 				_s('At least one UI element must be enabled for user role "%1$s".', $name)
 			);

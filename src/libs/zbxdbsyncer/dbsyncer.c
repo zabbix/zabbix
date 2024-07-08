@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "zbxdbsyncer.h"
@@ -106,9 +101,9 @@ static void	db_trigger_queue_cleanup(void)
 ZBX_THREAD_ENTRY(zbx_dbsyncer_thread, args)
 {
 	int			sleeptime = -1, total_values_num = 0, values_num, more, total_triggers_num = 0,
-				triggers_num, sleeptime_after_notify = 0;
+				triggers_num;
 	double			sec, total_sec = 0.0;
-	time_t			last_stat_time, wait_start_time;
+	time_t			last_stat_time;
 	char			*stats = NULL;
 	const char		*process_name;
 	size_t			stats_alloc = 0, stats_offset = 0;
@@ -157,9 +152,6 @@ ZBX_THREAD_ENTRY(zbx_dbsyncer_thread, args)
 
 	for (;;)
 	{
-		unsigned char	*rtc_data = NULL;
-		int		ret;
-
 		sec = zbx_time();
 
 		zbx_prof_update(get_process_type_string(process_type), sec);
@@ -221,42 +213,28 @@ ZBX_THREAD_ENTRY(zbx_dbsyncer_thread, args)
 			last_stat_time = time(NULL);
 		}
 
+		zbx_uint32_t	rtc_cmd;
+		unsigned char	*rtc_data = NULL;
+
+		while (SUCCEED == zbx_rtc_wait(&rtc, info, &rtc_cmd, &rtc_data, sleeptime) && 0 != rtc_cmd)
+		{
+			switch (rtc_cmd)
+			{
+				case ZBX_RTC_HISTORY_SYNC_NOTIFY:
+					sleeptime = 0;
+				case ZBX_RTC_SHUTDOWN:
+				default:
+					break;
+			}
+		}
+
 		if (ZBX_SYNC_MORE == more)
 			continue;
 
 		if (!ZBX_IS_RUNNING())
 			break;
-
-		wait_start_time = time(NULL);
-		do
-		{
-			zbx_uint32_t	rtc_cmd;
-
-			if (0 == sleeptime_after_notify)
-				sleeptime_after_notify = sleeptime;
-
-			zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
-			ret = zbx_rtc_wait(&rtc, info, &rtc_cmd, &rtc_data, sleeptime_after_notify);
-			zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
-			sleeptime_after_notify -= (int)(time(NULL) - wait_start_time);
-
-			if (0 > sleeptime_after_notify)
-				sleeptime_after_notify = 0;
-
-			zbx_free(rtc_data);
-
-			if (SUCCEED == ret && 0 != rtc_cmd)
-			{
-				if (ZBX_RTC_SHUTDOWN == rtc_cmd)
-					goto end_loop;
-
-				if (ZBX_RTC_HISTORY_SYNC_NOTIFY == rtc_cmd)
-					break;
-			}
-		}
-		while (0 != sleeptime_after_notify);
 	}
-end_loop:
+
 	if (SUCCEED != zbx_ipc_async_socket_flush(&rtc, dbsyncer_args->config_timeout))
 		zabbix_log(LOG_LEVEL_WARNING, "%s #%d cannot flush RTC socket", process_name, process_num);
 

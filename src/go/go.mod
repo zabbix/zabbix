@@ -27,7 +27,7 @@ require (
 	golang.org/x/net v0.18.0
 	golang.org/x/sys v0.14.0
 	golang.org/x/text v0.14.0
-	golang.zabbix.com/sdk v1.2.2-0.20240422113804-afdee2611563
+	golang.zabbix.com/sdk v1.2.2-0.20240702115045-0662e6ff78cc
 )
 
 require (
@@ -46,6 +46,6 @@ require (
 	golang.org/x/sync v0.3.0 // indirect
 	golang.org/x/tools v0.11.0 // indirect
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
-	google.golang.org/protobuf v1.27.1 // indirect
+	google.golang.org/protobuf v1.34.1 // indirect
 	gopkg.in/asn1-ber.v1 v1.0.0-20181015200546-f715ec2f112d // indirect
 )

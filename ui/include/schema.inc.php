@@ -1535,7 +1535,7 @@ return [
 				'length' => 32,
 				'default' => '10s'
 			],
-			'content_type' => [
+			'message_format' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
@@ -3096,6 +3096,12 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => ''
+			],
+			'timeout_browser' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '60s'
 			]
 		]
 	],
@@ -3797,6 +3803,14 @@ return [
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 1024,
 				'default' => '1-7,00:00-24:00'
+			],
+			'userdirectory_mediaid' => [
+				'null' => true,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'default' => NULL,
+				'ref_table' => 'userdirectory_media',
+				'ref_field' => 'userdirectory_mediaid'
 			]
 		]
 	],
@@ -9736,6 +9750,24 @@ return [
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
 				'default' => ''
+			],
+			'active' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
+			'severity' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '63'
+			],
+			'period' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 1024,
+				'default' => '1-7,00:00-24:00'
 			]
 		]
 	],
@@ -10205,6 +10237,12 @@ return [
 				'length' => 20,
 				'ref_table' => 'proxy_group',
 				'ref_field' => 'proxy_groupid'
+			],
+			'timeout_browser' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => ''
 			]
 		]
 	],

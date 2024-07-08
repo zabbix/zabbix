@@ -1,24 +1,20 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "zbxhttppoller.h"
 
+#include "zbxtimekeeper.h"
 #include "zbxdbhigh.h"
 #include "zbxlog.h"
 #include "zbxnix.h"
@@ -75,14 +71,18 @@ ZBX_THREAD_ENTRY(zbx_httppoller_thread, args)
 
 		if ((int)sec >= nextcheck)
 		{
+			time_t	now;
+
 			httptests_count += process_httptests((int)sec, httppoller_args_in->config_source_ip,
 					httppoller_args_in->config_ssl_ca_location,
 					httppoller_args_in->config_ssl_cert_location,
 					httppoller_args_in->config_ssl_key_location, &nextcheck);
 			total_sec += zbx_time() - sec;
 
-			if (0 == nextcheck)
-				nextcheck = time(NULL) + POLLER_DELAY;
+			now = time(NULL);
+
+			if (0 == nextcheck || nextcheck > now + POLLER_DELAY)
+				nextcheck = now + POLLER_DELAY;
 		}
 
 		sleeptime = zbx_calculate_sleeptime(nextcheck, POLLER_DELAY);

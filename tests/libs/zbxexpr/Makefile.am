@@ -1,3 +1,5 @@
+include ../Makefile.include
+
 BINARIES_tests = \
 	zbx_function_find \
 	parse_key \
@@ -10,52 +12,17 @@ BINARIES_tests = \
 	is_double_suffix \
 	zbx_user_macro_parse \
 	zbx_get_report_nextcheck \
-	zbx_function_param_parse_ext
+	macro_fmttime \
+	zbx_function_param_parse_ext \
+	zbx_substitute_macros
 
 noinst_PROGRAMS = $(BINARIES_tests)
 
 COMMON_SRC_FILES = \
 	../../zbxmocktest.h
 
-# 1) zbxexpr depends only on zbxnum, zbxstr, zbxtime and zbxcommon
-# 2) zbxcommon currently needs zbxnix, which also needs zbxlog, zbxnum, zbxthreads, zbxcomms and zbxcommon
-#
-# 1) mockdata needs zbxtime, zbxalgo, zbxstr, zbxnum and zbxcommon
-# 2) mocktest needs zbxnix, which also needs zbxlog, zbxnum, zbxthreads, zbxcomms and zbxcommon
-
-COMMON_LIB_DEPS = \
-	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
-	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
-	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
-	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
-	$(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a \
-	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
-	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
-
-MOCK_DATA_DEPS = \
-	$(top_srcdir)/tests/libzbxmockdata.a \
-	$(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
-	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
-	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
-	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
-	$(COMMON_LIB_DEPS) \
-	$(CMOCKA_LIBS) $(YAML_LIBS) $(TLS_LIBS)
-
-MOCK_TEST_DEPS = \
-	$(top_srcdir)/tests/libzbxmocktest.a \
-	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
-	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
-	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
-	$(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a \
-	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
-	$(COMMON_LIB_DEPS)
-
-EXPR_LIB_FILES = \
-	$(top_srcdir)/src/libs/zbxexpr/libzbxexpr.a \
-	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
-	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
-	$(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
-	$(COMMON_LIB_DEPS) \
+EXPR_LIBS = \
+	$(EXPR_DEPS) \
 	$(MOCK_DATA_DEPS) \
 	$(MOCK_TEST_DEPS)
 
@@ -68,7 +35,7 @@ zbx_function_find_SOURCES = \
 	$(COMMON_SRC_FILES)
 
 zbx_function_find_LDADD = \
-	$(EXPR_LIB_FILES)
+	$(EXPR_LIBS)
 
 zbx_function_find_LDADD += @SERVER_LIBS@
 
@@ -82,7 +49,7 @@ parse_key_SOURCES = \
 	$(COMMON_SRC_FILES)
 
 parse_key_LDADD = \
-	$(EXPR_LIB_FILES)
+	$(EXPR_LIBS)
 
 parse_key_LDADD += @SERVER_LIBS@
 
@@ -96,7 +63,7 @@ calculate_item_nextcheck_SOURCES = \
 	$(COMMON_SRC_FILES)
 
 calculate_item_nextcheck_LDADD = \
-	$(EXPR_LIB_FILES)
+	$(EXPR_LIBS)
 
 calculate_item_nextcheck_LDADD += @SERVER_LIBS@
 
@@ -109,7 +76,7 @@ calculate_item_nextcheck_unreachable_SOURCES = \
 	$(COMMON_SRC_FILES)
 
 calculate_item_nextcheck_unreachable_LDADD = \
-	$(EXPR_LIB_FILES)
+	$(EXPR_LIBS)
 
 calculate_item_nextcheck_unreachable_LDADD += @SERVER_LIBS@
 
@@ -123,7 +90,7 @@ zbx_function_get_param_dyn_SOURCES = \
 	$(COMMON_SRC_FILES)
 
 zbx_function_get_param_dyn_LDADD = \
-	$(EXPR_LIB_FILES)
+	$(EXPR_LIBS)
 
 zbx_function_get_param_dyn_LDADD += @SERVER_LIBS@
 
@@ -137,7 +104,7 @@ zbx_token_find_SOURCES = \
 	$(COMMON_SRC_FILES)
 
 zbx_token_find_LDADD = \
-	$(EXPR_LIB_FILES)
+	$(EXPR_LIBS)
 
 zbx_token_find_LDADD += @SERVER_LIBS@
 
@@ -150,7 +117,7 @@ zbx_interval_preproc_SOURCES = \
 	$(COMMON_SRC_FILES)
 
 zbx_interval_preproc_LDADD = \
-	$(EXPR_LIB_FILES)
+	$(EXPR_LIBS)
 
 zbx_interval_preproc_LDADD += @SERVER_LIBS@
 
@@ -164,7 +131,7 @@ zbx_validate_interval_SOURCES = \
 	$(COMMON_SRC_FILES)
 
 zbx_validate_interval_LDADD = \
-	$(EXPR_LIB_FILES)
+	$(EXPR_LIBS)
 
 zbx_validate_interval_LDADD += @SERVER_LIBS@
 
@@ -178,7 +145,7 @@ is_double_suffix_SOURCES = \
 	$(COMMON_SRC_FILES)
 
 is_double_suffix_LDADD = \
-	$(EXPR_LIB_FILES)
+	$(EXPR_LIBS)
 
 is_double_suffix_LDADD += @SERVER_LIBS@
 
@@ -192,7 +159,7 @@ zbx_user_macro_parse_SOURCES = \
 	$(COMMON_SRC_FILES)
 
 zbx_user_macro_parse_LDADD = \
-	$(EXPR_LIB_FILES)
+	$(EXPR_LIBS)
 
 zbx_user_macro_parse_LDADD += @SERVER_LIBS@
 
@@ -208,7 +175,7 @@ zbx_get_report_nextcheck_SOURCES = \
 	$(COMMON_SRC_FILES)
 
 zbx_get_report_nextcheck_LDADD = \
-	$(EXPR_LIB_FILES)
+	$(EXPR_LIBS)
 
 zbx_get_report_nextcheck_LDADD += @SERVER_LIBS@
 
@@ -222,10 +189,38 @@ zbx_function_param_parse_ext_SOURCES = \
 	$(COMMON_SRC_FILES)
 
 zbx_function_param_parse_ext_LDADD = \
-	$(EXPR_LIB_FILES)
+	$(EXPR_LIBS)
 
 zbx_function_param_parse_ext_LDADD += @SERVER_LIBS@
 
 zbx_function_param_parse_ext_LDFLAGS = @SERVER_LDFLAGS@
 
 zbx_function_param_parse_ext_CFLAGS = $(EXPR_COMPILER_FLAGS)
+
+
+macro_fmttime_SOURCES = \
+	macro_fmttime.c \
+	$(COMMON_SRC_FILES)
+
+macro_fmttime_LDADD = \
+	$(EXPR_LIBS)
+
+macro_fmttime_LDADD += @SERVER_LIBS@
+
+macro_fmttime_LDFLAGS = @SERVER_LDFLAGS@ -Wl,--wrap=time
+
+macro_fmttime_CFLAGS = $(EXPR_COMPILER_FLAGS)
+
+
+zbx_substitute_macros_SOURCES = \
+	zbx_substitute_macros.c \
+	$(COMMON_SRC_FILES)
+
+zbx_substitute_macros_LDADD = \
+	$(EXPR_LIBS)
+
+zbx_substitute_macros_LDADD += @SERVER_LIBS@
+
+zbx_substitute_macros_LDFLAGS = @SERVER_LDFLAGS@
+
+zbx_substitute_macros_CFLAGS = $(EXPR_COMPILER_FLAGS)

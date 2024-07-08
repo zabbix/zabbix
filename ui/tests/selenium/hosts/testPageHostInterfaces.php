@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
@@ -23,6 +18,7 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 
 /**
  * @backup hosts
+ *
  * @onBefore prepareInterfacesData
  */
 class testPageHostInterfaces extends CWebTest {
@@ -32,7 +28,6 @@ class testPageHostInterfaces extends CWebTest {
 	const ORANGE = 'rgba(241, 165, 11, 1)';
 	const GREY = 'rgba(235, 235, 235, 1)';
 
-
 	public static function prepareInterfacesData() {
 		$interfaces = [
 			[
@@ -41,8 +36,7 @@ class testPageHostInterfaces extends CWebTest {
 				'useip' => 0,
 				'ip' => '127.1.1.1',
 				'dns' => '1available.zabbix.com',
-				'port' => '10050',
-				'available' => 1
+				'port' => '10050'
 			],
 			[
 				'type' => 1,
@@ -50,8 +44,7 @@ class testPageHostInterfaces extends CWebTest {
 				'useip' => 0,
 				'ip' => '127.1.1.2',
 				'dns' => '2available.zabbix.com',
-				'port' => '10051',
-				'available' => 1
+				'port' => '10051'
 			],
 			[
 				'type' => 2,
@@ -65,8 +58,7 @@ class testPageHostInterfaces extends CWebTest {
 					'bulk' => '1',
 					'securityname' => 'zabbix',
 					'max_repetitions' => 10
-				],
-				'available' => 1
+				]
 			],
 			[
 				'type' => 2,
@@ -82,8 +74,7 @@ class testPageHostInterfaces extends CWebTest {
 					'authprotocol' => 2,
 					'privprotocol' => 4,
 					'max_repetitions' => 10
-				],
-				'available' => 1
+				]
 			],
 			[
 				'type' => 2,
@@ -97,8 +88,7 @@ class testPageHostInterfaces extends CWebTest {
 					'bulk' => '1',
 					'community' => '{$SNMP_COMMUNITY}',
 					'max_repetitions' => 10
-				],
-				'available' => 2
+				]
 			],
 			[
 				'type' => 3,
@@ -106,9 +96,7 @@ class testPageHostInterfaces extends CWebTest {
 				'useip' => 0,
 				'ip' => '127.0.0.1',
 				'dns' => '1unavail.IPMI.zabbix.com',
-				'port' => '623',
-				'available' => 2,
-				'error' => '1 Error IPMI'
+				'port' => '623'
 			],
 			[
 				'type' => 3,
@@ -116,9 +104,7 @@ class testPageHostInterfaces extends CWebTest {
 				'useip' => 0,
 				'ip' => '127.0.0.1',
 				'dns' => '2unavail.IPMI.zabbix.com',
-				'port' => '624',
-				'available' => 2,
-				'error' => '2 Error IPMI'
+				'port' => '624'
 			]
 		];
 
@@ -138,6 +124,23 @@ class testPageHostInterfaces extends CWebTest {
 				'status' => HOST_STATUS_MONITORED
 			]
 		]);
+
+		$interfaces_availability = [
+			'1available.zabbix.com' => ['available' => 1],
+			'2available.zabbix.com' => ['available' => 1],
+			'snmpv3zabbix.com' => ['available' => 1],
+			'snmpv3auth.com' => ['available' => 1],
+			'snmpv2zabbix.com' => ['available' => 2],
+			'1unavail.IPMI.zabbix.com' => ['available' => 2, 'error' => '1 Error IPMI'],
+			'2unavail.IPMI.zabbix.com' => ['available' => 2, 'error' => '2 Error IPMI']
+		];
+
+		foreach ($interfaces_availability as $dns => $parameters) {
+			DBexecute('UPDATE interface SET available='.zbx_dbstr($parameters['available']).','.
+					' error='.zbx_dbstr(CTestArrayHelper::get($parameters, 'error', '')).
+					' WHERE dns='.zbx_dbstr($dns)
+			);
+		}
 	}
 
 	public function getCheckInterfacesData() {
@@ -474,7 +477,7 @@ class testPageHostInterfaces extends CWebTest {
 			$this->assertEquals($data['interfaces'][$interface_name]['color'], $interface->getCSSValue('background-color'));
 			// Open interface popup.
 			$interface->waitUntilClickable()->click();
-			$overlay = $this->query('xpath://div[@class="overlay-dialogue"]')->asOverlayDialog()->waitUntilPresent()->one();
+			$overlay = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->asOverlayDialog()->waitUntilPresent()->one();
 			$interface_table = $overlay->query('xpath:.//table[@class="list-table"]')->asTable()->one();
 			// Check table headers in popup.
 			$this->assertSame(['Interface', 'Status', 'Error'], $interface_table->getHeadersText());

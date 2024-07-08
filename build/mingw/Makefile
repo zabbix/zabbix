@@ -13,6 +13,7 @@ CC = gcc
 WINDRES = windres.exe
 
 OBJS = \
+	$(OUTPUTDIR)\bincommon.o \
 	$(OUTPUTDIR)\threads.o \
 	$(OUTPUTDIR)\interval.o \
 	$(OUTPUTDIR)\num.o \
@@ -111,7 +112,7 @@ endif
 CGO_CFLAGS += $(CFLAGS)
 CGO_LDFLAGS += $(LDFLAGS)
 
-PKG=zabbix.com/pkg/version
+PKG=golang.zabbix.com/agent2/pkg/version
 
 GOLDFLAGS = -X $(PKG).compileOs=windows
 GOLDFLAGS += -X $(PKG).compileArch=$(GOARCH)
@@ -119,6 +120,9 @@ GOLDFLAGS += -X main.confDefault=zabbix_agent2.win.conf
 GOLDFLAGS += -X main.applicationName=zabbix_agent2
 
 all: $(TARGETBIN)
+
+$(OUTPUTDIR)\bincommon.o: $(TOPDIR)\src\libs\zbxbincommon\bincommon.c
+	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
 $(OUTPUTDIR)\misc.o: $(TOPDIR)\src\libs\zbxcommon\misc.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@

@@ -1,25 +1,20 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
-require_once dirname(__FILE__) . '/../../include/CWebTest.php';
+require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 
@@ -45,7 +40,7 @@ class testDashboardCopyWidgets extends CWebTest {
 
 	// Values for replacing widgets.
 	private static $replaced_widget_name = "Test widget for replace";
-	const REPLACED_WIDGET_SIZE = [ 'width' => '13', 'height' => '8'];
+	const REPLACED_WIDGET_SIZE = [ 'width' => '21', 'height' => '3'];
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -218,7 +213,7 @@ class testDashboardCopyWidgets extends CWebTest {
 		// Wait until widget is pasted and loading spinner disappeared.
 		sleep(1);
 		$this->query('xpath://div[contains(@class, "is-loading")]')->waitUntilNotPresent();
-		$copied_widget = $dashboard->getWidgets()->last();
+		$copied_widget = $dashboard->getWidgets()->last()->waitUntilReady();
 
 		// For Other dashboard and Map from Navigation tree case - add map source, because it is not being copied by design.
 		if (($new_dashboard || $new_page) && stristr($widget_name, 'Map from tree')) {
@@ -287,6 +282,12 @@ class testDashboardCopyWidgets extends CWebTest {
 			],
 			[
 				[
+					'name' => 'Discovery status widget',
+					'copy to' => 'same page'
+				]
+			],
+			[
+				[
 					'name' => 'Graph (classic) widget',
 					'copy to' => 'same page'
 				]
@@ -299,13 +300,7 @@ class testDashboardCopyWidgets extends CWebTest {
 			],
 			[
 				[
-					'name' => 'Plain text widget',
-					'copy to' => 'same page'
-				]
-			],
-			[
-				[
-					'name' => 'URL widget',
+					'name' => 'Item history widget',
 					'copy to' => 'same page'
 				]
 			],
@@ -317,7 +312,19 @@ class testDashboardCopyWidgets extends CWebTest {
 			],
 			[
 				[
+					'name' => 'Honeycomb widget',
+					'copy to' => 'same page'
+				]
+			],
+			[
+				[
 					'name' => 'Clock widget',
+					'copy to' => 'another page'
+				]
+			],
+			[
+				[
+					'name' => 'Discovery status widget',
 					'copy to' => 'another page'
 				]
 			],
@@ -335,13 +342,7 @@ class testDashboardCopyWidgets extends CWebTest {
 			],
 			[
 				[
-					'name' => 'Plain text widget',
-					'copy to' => 'another page'
-				]
-			],
-			[
-				[
-					'name' => 'URL widget',
+					'name' => 'Item history widget',
 					'copy to' => 'another page'
 				]
 			],
@@ -365,6 +366,12 @@ class testDashboardCopyWidgets extends CWebTest {
 			],
 			[
 				[
+					'name' => 'Item navigator widget',
+					'copy to' => 'another page'
+				]
+			],
+			[
+				[
 					'name' => 'Pie chart widget',
 					'copy to' => 'another page'
 				]
@@ -377,7 +384,19 @@ class testDashboardCopyWidgets extends CWebTest {
 			],
 			[
 				[
+					'name' => 'Honeycomb widget',
+					'copy to' => 'another page'
+				]
+			],
+			[
+				[
 					'name' => 'Clock widget',
+					'copy to' => 'another dashboard'
+				]
+			],
+			[
+				[
+					'name' => 'Discovery status widget',
 					'copy to' => 'another dashboard'
 				]
 			],
@@ -395,14 +414,14 @@ class testDashboardCopyWidgets extends CWebTest {
 			],
 			[
 				[
-					'name' => 'Plain text widget',
+					'name' => 'Item history widget',
 					'copy to' => 'another dashboard'
 				]
 			],
 			[
 				[
-					'name' => 'URL widget',
-					'copy to' => 'another dashboard'
+					'name' => 'Honeycomb widget',
+					'copy to' => 'another page'
 				]
 			],
 			[
@@ -414,6 +433,12 @@ class testDashboardCopyWidgets extends CWebTest {
 			[
 				[
 					'name' => 'Clock widget',
+					'copy to' => 'another template'
+				]
+			],
+			[
+				[
+					'name' => 'Discovery status widget',
 					'copy to' => 'another template'
 				]
 			],
@@ -431,6 +456,12 @@ class testDashboardCopyWidgets extends CWebTest {
 			],
 			[
 				[
+					'name' => 'Item navigator widget',
+					'copy to' => 'another template'
+				]
+			],
+			[
+				[
 					'name' => 'Top triggers widget',
 					'copy to' => 'another template'
 				]
@@ -438,6 +469,12 @@ class testDashboardCopyWidgets extends CWebTest {
 			[
 				[
 					'name' => 'Pie chart widget',
+					'copy to' => 'another template'
+				]
+			],
+			[
+				[
+					'name' => 'Honeycomb widget',
 					'copy to' => 'another template'
 				]
 			]
@@ -569,8 +606,8 @@ class testDashboardCopyWidgets extends CWebTest {
 			],
 			[
 				[
-					'module_name' => 'Plain text',
-					'widget_name' => 'Plain text widget',
+					'module_name' => 'Item history',
+					'widget_name' => 'Item history widget',
 					'action' => 'copy widget',
 					'template' => true
 				]

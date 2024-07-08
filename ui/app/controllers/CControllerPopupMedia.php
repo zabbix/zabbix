@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -26,15 +21,17 @@ class CControllerPopupMedia extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'dstfrm' =>			'required|string',
-			'media' =>			'int32',
-			'mediatypeid' =>	'db media_type.mediatypeid',
-			'sendto' =>			'string',
-			'sendto_emails'	=>	'array',
-			'period' =>			'time_periods',
-			'active' =>			'in '.implode(',', [MEDIA_STATUS_ACTIVE, MEDIA_STATUS_DISABLED]),
-			'severity' =>		'',
-			'add' =>			'in 1'
+			'dstfrm' =>					'required|string',
+			'media' =>					'int32',
+			'mediaid' =>				'id',
+			'mediatypeid' =>			'db media_type.mediatypeid',
+			'sendto' =>					'string',
+			'sendto_emails'	=>			'array',
+			'period' =>					'time_periods',
+			'active' =>					'in '.implode(',', [MEDIA_STATUS_ACTIVE, MEDIA_STATUS_DISABLED]),
+			'severity' =>				'',
+			'userdirectory_mediaid' =>	'id',
+			'add' =>					'in 1'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -65,11 +62,13 @@ class CControllerPopupMedia extends CController {
 		$page_options = [
 			'dstfrm' => $this->getInput('dstfrm'),
 			'media' => $this->getInput('media', -1),
+			'mediaid' => $this->getInput('mediaid', 0),
 			'sendto' => $this->getInput('sendto', ''),
 			'mediatypeid' => $this->getInput('mediatypeid', 0),
 			'active' => $this->getInput('active', MEDIA_STATUS_ACTIVE),
 			'period' => $this->getInput('period', ZBX_DEFAULT_INTERVAL),
-			'sendto_emails' => array_values($this->getInput('sendto_emails', ['']))
+			'sendto_emails' => array_values($this->getInput('sendto_emails', [''])),
+			'userdirectory_mediaid' => $this->getInput('userdirectory_mediaid', 0)
 		];
 
 		// Validation before adding Media to user's Media tab.

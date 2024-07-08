@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -25,6 +20,8 @@ require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 
 /**
  * @backup history_uint, profiles
+ *
+ * @dataSource GlobalMacros
  *
  * @onBefore prepareItemTagsData
  */
@@ -129,7 +126,7 @@ class testPageMonitoringLatestData extends CWebTest {
 		// Subfilter is not visible if filter isn't set.
 		$this->assertFalse($this->query('id:latest-data-subfilter')->exists());
 		$this->assertEquals(['Filter is not set', 'Use the filter to display results'],
-				explode("\n", $this->query('class:nothing-to-show')->one()->getText())
+				explode("\n", $this->query('class:no-data-message')->one()->getText())
 		);
 
 		$form->fill(['Hosts' => self::HOSTNAME]);
@@ -167,7 +164,7 @@ class testPageMonitoringLatestData extends CWebTest {
 		$this->query('button:Reset')->waitUntilClickable()->one()->click();
 		$this->assertFalse($this->query('id:latest-data-subfilter')->waitUntilNotVisible()->exists());
 		$this->assertEquals(['Filter is not set', 'Use the filter to display results'],
-				explode("\n", $this->query('class:nothing-to-show')->one()->getText())
+				explode("\n", $this->query('class:no-data-message')->one()->getText())
 		);
 
 		// Check filter collapse/expand.
@@ -587,35 +584,60 @@ class testPageMonitoringLatestData extends CWebTest {
 		$this->query('button:Reset')->waitUntilClickable()->one()->click();
 	}
 
-	/**
-	 * Test for clicking on particular item tag in table and checking that items are filtered by this tag.
-	 */
 	public function testPageMonitoringLatestData_ClickTag() {
-		$tag = ['tag' => 'component: ', 'value' => 'storage'];
+		$this->checkClickTag();
+	}
 
+	public function testPageMonitoringLatestData_ClickTagKiosk() {
+		$this->checkClickTag(true);
+	}
+
+	/**
+	 * Test for clicking on particular item tag in table and checking that items are filtered by this tag using normal and kiosk mode.
+	 *
+	 * @param boolean $kiosk_mode	is kiosk mode applied on the page or not
+	 */
+	protected function checkClickTag($kiosk_mode = false) {
+		$tag = ['tag' => 'component: ', 'value' => 'storage'];
 		$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE name='.zbx_dbstr('ЗАББИКС Сервер'));
 		$this->page->login()->open('zabbix.php?action=latest.view&hostids%5B%5D='.$hostid)->waitUntilReady();
+
+		if ($kiosk_mode) {
+			$this->query('xpath://button[@title="Kiosk mode"]')->one()->click();
+			$this->page->waitUntilReady();
+			$this->assertTrue($this->query('xpath://button[@title="Normal view"]')->exists());
+		}
 
 		$this->getTable()->query('button', $tag['tag'].$tag['value'])->waitUntilClickable()->one()->click();
 		$this->page->waitUntilReady();
 
-		// Check that page remained the same.
-		$this->page->assertTitle('Latest data');
-		$this->page->assertHeader('Latest data');
-
 		// Check that tag value is selected in subfilter under correct header.
-		$this->assertTrue($this->query("xpath://td/h3[text()='Tag values']/..//label[text()=".
-				CXPathHelper::escapeQuotes($tag['tag'])."]/../..//span[@class=".
-				CXPathHelper::fromClass('subfilter-enabled')."]/a[text()=".
-				CXPathHelper::escapeQuotes($tag['value'])."]")->exists()
+		$this->assertTrue($this->query('xpath://td/h3[text()="Tag values"]/..//label[text()='.
+				CXPathHelper::escapeQuotes($tag['tag']).']/../..//span[@class='.
+				CXPathHelper::fromClass('subfilter-enabled').']/a[text()='.
+				CXPathHelper::escapeQuotes($tag['value']).']')->exists()
 		);
 
-		$this->assertTableData([
-				['Name' => 'Linux: Free swap space'],
-				['Name' => 'Linux: Free swap space in %'],
-				['Name' => 'Linux: Total swap space']
-			], $this->getTableSelector()
-		);
+		$data = [
+			['Name' => 'Free swap space'],
+			['Name' => 'Free swap space in %'],
+			['Name' => 'Total swap space']
+		];
+		$this->assertTableData($data, $this->getTableSelector());
+
+		if ($kiosk_mode) {
+			$this->query('xpath://button[@title="Normal view"]')->one()->click();
+			$this->page->waitUntilReady();
+			$this->assertTrue($this->query('xpath://button[@title="Kiosk mode"]')->exists());
+			$this->assertTableData($data, $this->getTableSelector());
+		}
+		else {
+			$this->query('button:Reset')->one()->click();
+			$this->page->waitUntilReady();
+			$this->assertEquals(['Filter is not set', 'Use the filter to display results'],
+					explode("\n", $this->query('class:no-data-message')->one()->getText())
+			);
+		}
 	}
 
 	/**
@@ -780,7 +802,7 @@ class testPageMonitoringLatestData extends CWebTest {
 
 		if (CTestArrayHelper::get($data,'description', false)) {
 			$row->query('class:zi-alert-with-content')->one()->click()->waitUntilReady();
-			$overlay = $this->query('xpath://div[@class="overlay-dialogue"]')->one();
+			$overlay = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->one();
 
 			// Verify the real description with the expected one.
 			$this->assertEquals($data['description'], $overlay->getText());

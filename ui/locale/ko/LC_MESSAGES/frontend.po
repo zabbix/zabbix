@@ -87,6 +87,11 @@ msgstr "%2$s의 %1$d 건이 발견되었습니다."
 msgid "%1$d of %1$d+ hosts are shown"
 msgstr ""
 
+#: widgets/itemnavigator/Widget.php:39
+#, c-format
+msgid "%1$d of %1$d+ items are shown"
+msgstr ""
+
 #: widgets/problems/actions/WidgetView.php:78
 #, c-format
 msgid "%1$d of %3$d%2$s problem is shown"
@@ -928,6 +933,10 @@ msgstr ""
 msgid "Add a new widget"
 msgstr "새로운 위젯을 추가"
 
+#: widgets/navtree/Widget.php:34
+msgid "Add child element"
+msgstr ""
+
 #: widgets/navtree/Widget.php:39
 msgid "Add child elements"
 msgstr "하위 요소 추가"
@@ -961,6 +970,11 @@ msgstr ""
 #: app/views/trigger.massupdate.php:155
 msgid "Add host trigger"
 msgstr "호스트 트리거 추가"
+
+#: widgets/piechart/includes/CWidgetFieldDataSetView.php:260
+#: widgets/svggraph/includes/CWidgetFieldDataSetView.php:263
+msgid "Add item"
+msgstr ""
 
 #: app/partials/massupdate.macros.tab.php:96
 #: app/partials/massupdate.valuemaps.tab.php:38
@@ -1447,6 +1461,14 @@ msgstr ""
 msgid "Any character string included"
 msgstr "어떤 문자열이 포함됨"
 
+#: app/views/js/popup.import.js.php:109
+msgid "Any existing host entities not present in the import file will be deleted. Click OK to proceed."
+msgstr ""
+
+#: app/views/js/popup.import.js.php:106
+msgid "Any existing template entities not present in the import file will be deleted. Click OK to proceed."
+msgstr ""
+
 #: include/classes/core/CJsonRpc.php:225
 msgid "Application error."
 msgstr "어플리케이션 에러."
@@ -1856,6 +1878,10 @@ msgstr ""
 msgid "Avoid easy-to-guess passwords"
 msgstr "추측하기 쉬운 암호를 피하십시오"
 
+#: jsLoader.php:172
+msgid "Awaiting data"
+msgstr ""
+
 #: widgets/svggraph/views/widget.edit.php:51
 msgid "Axes"
 msgstr "축"
@@ -2040,6 +2066,11 @@ msgstr "앞면으로"
 #: jsLoader.php:265
 msgid "Bring to front"
 msgstr "가장 앞면으로"
+
+#: app/views/administration.timeouts.edit.php:130
+#: app/views/popup.proxy.edit.php:342 include/items.inc.php:99
+msgid "Browser"
+msgstr ""
 
 #: include/locales.inc.php:35
 msgid "Bulgarian (bg_BG)"
@@ -2834,6 +2865,11 @@ msgstr "사용자 디렉터리 \"%1$s\"을(를) 삭제할 수 없습니다."
 msgid "Cannot delete user group"
 msgid_plural "Cannot delete user groups"
 msgstr[0] "사용자 그룹을 삭제할 수 없습니다."
+
+#: include/classes/api/services/CUserGroup.php:1397
+#, c-format
+msgid "Cannot delete user group \"%1$s\", because it is used by provisioned user \"%2$s\"."
+msgstr ""
 
 #: app/controllers/CControllerUserroleDelete.php:59
 msgid "Cannot delete user role"
@@ -5302,6 +5338,10 @@ msgstr "연락 방법 생성"
 msgid "Create new"
 msgstr "신규 생성"
 
+#: jsLoader.php:372
+msgid "Create new report"
+msgstr ""
+
 #: app/views/administration.proxy.list.php:239
 msgid "Create proxy"
 msgstr "프록시 생성"
@@ -5557,6 +5597,10 @@ msgstr ""
 #: include/classes/helpers/CSlaHelper.php:39 report4.php:90
 msgid "Daily"
 msgstr "일간"
+
+#: include/locales.inc.php:40
+msgid "Danish (da_DK)"
+msgstr ""
 
 #: include/classes/core/ZBase.php:381
 msgid "Dark"
@@ -7052,6 +7096,10 @@ msgstr "복구트리거 표시기간"
 msgid "Display graph"
 msgstr "그래프 표시"
 
+#: widgets/itemhistory/views/column.edit.php:241
+msgid "Display local time"
+msgstr ""
+
 #: widgets/svggraph/includes/WidgetForm.php:364
 msgid "Display min/avg/max"
 msgstr ""
@@ -7401,6 +7449,10 @@ msgstr "입력 파라미터가 공백입니다"
 #: include/classes/api/services/CMap.php:1042
 msgid "Empty map ID."
 msgstr "맵ID가 공백입니다."
+
+#: widgets/itemhistory/Widget.php:32
+msgid "Empty value."
+msgstr ""
 
 #: app/views/action.list.php:167 app/views/administration.token.list.php:204
 #: app/views/administration.user.token.list.php:157
@@ -8369,6 +8421,11 @@ msgstr "필터"
 msgid "Filter deleted"
 msgstr "필터 삭제됨"
 
+#: app/partials/monitoring.latest.view.html.php:36
+#: app/views/popup.generic.php:180
+msgid "Filter is not set"
+msgstr ""
+
 #: app/controllers/CControllerPopupTabFilterEdit.php:115
 msgid "Filter properties"
 msgstr "필터 속성"
@@ -9137,6 +9194,10 @@ msgstr "High-contrast light"
 msgid "Highlight whole row"
 msgstr "행을 강조표시"
 
+#: widgets/itemhistory/views/column.edit.php:132
+msgid "Highlights"
+msgstr ""
+
 #: app/controllers/CControllerAuditLogList.php:232
 #: app/controllers/CControllerPopupLldOperation.php:218
 #: app/partials/configuration.filter.items.php:158
@@ -9394,6 +9455,10 @@ msgstr[0] "호스트 그룹이 삭제됨"
 msgid "Host group elements"
 msgstr "호스트 그룹내의 호스트"
 
+#: jsLoader.php:292
+msgid "Host group is not selected."
+msgstr ""
+
 #: include/views/monitoring.sysmap.edit.php:168
 msgid "Host group label type"
 msgstr "호스트 그룹의 라벨타입"
@@ -9473,6 +9538,10 @@ msgstr "호스트 인벤토리"
 msgid "Host inventory overview"
 msgstr "호스트 인벤토리의 개요"
 
+#: jsLoader.php:289
+msgid "Host is not selected."
+msgstr ""
+
 #: include/views/monitoring.sysmap.edit.php:183
 msgid "Host label type"
 msgstr "호스트의 라벨 타입"
@@ -9513,6 +9582,10 @@ msgstr ""
 #: include/hosts.inc.php:284
 msgid "Host networks"
 msgstr "호스트 네트워크"
+
+#: widgets/hostnavigator/includes/WidgetForm.php:65
+msgid "Host patterns"
+msgstr ""
 
 #: app/views/usergroup.edit.php:270
 msgid "Host permissions"
@@ -9592,6 +9665,14 @@ msgstr ""
 #: include/hosts.inc.php:289
 msgid "Host subnet mask"
 msgstr "호스트 서브넷 마스크"
+
+#: widgets/itemnavigator/Widget.php:43
+msgid "Host tag"
+msgstr ""
+
+#: widgets/itemnavigator/includes/CWidgetFieldItemGroupingView.php:80
+msgid "Host tag value"
+msgstr ""
 
 #: widgets/tophosts/includes/WidgetForm.php:125
 msgid "Host tags"
@@ -9995,6 +10076,10 @@ msgstr "이미지를 삭제하였습니다"
 #: include/views/monitoring.sysmap.edit.php:228
 msgid "Image label type"
 msgstr "이미지라벨 타입"
+
+#: widgets/itemhistory/Widget.php:33
+msgid "Image loading error."
+msgstr ""
 
 #: include/classes/helpers/CUploadFile.php:129
 #, c-format
@@ -11660,9 +11745,17 @@ msgid "Item enabled"
 msgid_plural "Items enabled"
 msgstr[0] "아이템을 활성화 하였습니다"
 
+#: widgets/itemhistory/Widget.php:26
+msgid "Item history"
+msgstr ""
+
 #: include/actions.inc.php:1074
 msgid "Item in \"not supported\" state"
 msgstr "아이템이 \"습득불가\" 상태"
+
+#: widgets/itemnavigator/includes/WidgetForm.php:107
+msgid "Item limit"
+msgstr ""
 
 #: widgets/piechart/views/widget.edit.js.php:209
 #: widgets/svggraph/views/widget.edit.js.php:287
@@ -11673,6 +11766,10 @@ msgstr "아이템 리스트"
 msgid "Item name"
 msgstr ""
 
+#: widgets/itemnavigator/Widget.php:29
+msgid "Item navigator"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:1622
 msgid "Item not selected"
 msgstr "아이템이 선택되어 있지 않습니다"
@@ -11681,6 +11778,13 @@ msgstr "아이템이 선택되어 있지 않습니다"
 #: widgets/svggraph/views/widget.edit.js.php:281
 msgid "Item pattern"
 msgstr "아이템 패턴"
+
+#: widgets/honeycomb/includes/WidgetForm.php:90
+#: widgets/itemnavigator/includes/WidgetForm.php:78
+#: widgets/piechart/views/widget.edit.js.php:208
+#: widgets/svggraph/views/widget.edit.js.php:279
+msgid "Item patterns"
+msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:241
 #: app/views/popup.lldoperation.php:49 app/views/popup.massupdate.item.php:512
@@ -11723,6 +11827,14 @@ msgstr "ID \"%1$s\"의 아이템의 프로토타입은 사용할 수 없습니�
 #: include/views/configuration.item.prototype.list.php:29
 msgid "Item prototypes"
 msgstr "아이템 프로토타입"
+
+#: widgets/itemnavigator/Widget.php:44
+msgid "Item tag"
+msgstr ""
+
+#: widgets/itemnavigator/includes/CWidgetFieldItemGroupingView.php:81
+msgid "Item tag value"
+msgstr ""
 
 #: app/partials/configuration.tags.tab.php:165
 #: widgets/dataover/includes/WidgetForm.php:51
@@ -12141,6 +12253,10 @@ msgstr "최근 1주일의 그래프"
 #: include/views/inventory.host.view.php:151 jsLoader.php:375
 msgid "Latest data"
 msgstr "최근 데이터"
+
+#: app/partials/administration.system.info.php:101
+msgid "Latest release"
+msgstr ""
 
 #: jsLoader.php:376
 msgid "Latest values"
@@ -12730,6 +12846,10 @@ msgstr "맵 요소의 레이블 위치"
 msgid "Map element label type"
 msgstr "맵 요소의 레이블 타입"
 
+#: jsLoader.php:290
+msgid "Map is not selected."
+msgstr ""
+
 #: sysmap.php:128
 msgid "Map is updated! Return to map list?"
 msgstr "맵이 업데이트되었습니다! 목록으로 돌아가시겠습니까?"
@@ -13080,6 +13200,10 @@ msgstr "미디어 타입"
 #: app/views/popup.media.php:75
 msgid "Media types disabled by Administration."
 msgstr "관리에서 비활성화된 미디어 유형."
+
+#: app/views/popup.media.php:78
+msgid "Media types disabled in Alerts."
+msgstr ""
 
 #: include/classes/api/services/CMediatype.php:873
 #, c-format
@@ -13957,8 +14081,17 @@ msgstr ""
 msgid "New triggers"
 msgstr "신규 트리거"
 
+#: app/partials/administration.system.info.php:58
+#: app/partials/administration.system.info.php:63
+msgid "New update available"
+msgstr ""
+
 #: app/views/popup.usergroupmapping.edit.php:112
 msgid "New user group mapping"
+msgstr ""
+
+#: widgets/itemhistory/includes/WidgetForm.php:96
+msgid "New values"
 msgstr ""
 
 #: app/views/monitoring.host.dashboard.view.php:146
@@ -14037,6 +14170,12 @@ msgstr "데이터 없음"
 #: app/views/maintenance.edit.php:138 app/views/maintenance.list.php:122
 msgid "No data collection"
 msgstr "데이터수집 없음"
+
+#: app/views/search.php:48 app/views/search.php:209 app/views/search.php:289
+#: app/views/search.php:394 include/classes/html/CTableInfo.php:72
+#: widgets/hostnavigator/Widget.php:40
+msgid "No data found"
+msgstr ""
 
 #: include/classes/html/CTableInfo.php:35
 msgid "No data found."
@@ -15867,6 +16006,14 @@ msgstr ""
 msgid "Please select two elements"
 msgstr "2개의 요소를 선택하여 주십시오"
 
+#: jsLoader.php:194
+msgid "Please update configuration"
+msgstr ""
+
+#: app/partials/administration.system.info.php:47
+msgid "Please upgrade to latest major release."
+msgstr ""
+
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:312
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:179
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:244
@@ -16688,6 +16835,10 @@ msgstr ""
 msgid "Referred widget became unavailable. Please update configuration."
 msgstr ""
 
+#: jsLoader.php:195
+msgid "Referred widget is unavailable"
+msgstr ""
+
 #: app/views/administration.user.edit.php:309
 msgid "Refresh"
 msgstr "새로고침"
@@ -16760,6 +16911,10 @@ msgstr "정규표현식"
 #: app/controllers/CControllerPopupScheduledReportList.php:54
 msgid "Related reports"
 msgstr "관련 보고서"
+
+#: app/partials/administration.system.info.php:72
+msgid "Release notes"
+msgstr ""
 
 #: jsLoader.php:158
 msgid "Release to create a widget."
@@ -18517,6 +18672,10 @@ msgstr ""
 msgid "Show arc"
 msgstr ""
 
+#: widgets/itemhistory/includes/WidgetForm.php:105
+msgid "Show column header"
+msgstr ""
+
 #: widgets/hostavail/includes/WidgetForm.php:62
 #: widgets/tophosts/includes/WidgetForm.php:136
 #: widgets/web/includes/WidgetForm.php:66
@@ -18587,6 +18746,10 @@ msgstr "선택 항목 보이기"
 msgid "Show sidebar"
 msgstr "사이드바 표시"
 
+#: widgets/systeminfo/includes/WidgetForm.php:42
+msgid "Show software update check details"
+msgstr ""
+
 #: app/partials/monitoring.host.filter.php:147
 #: app/partials/monitoring.problem.filter.php:135
 #: app/views/administration.user.edit.php:814
@@ -18618,11 +18781,19 @@ msgstr "기술적 오류 표시"
 msgid "Show text as HTML"
 msgstr "HTML로 텍스트 보이기"
 
+#: widgets/itemhistory/views/column.edit.php:251
+msgid "Show thumbnail"
+msgstr ""
+
 #: app/partials/monitoring.problem.filter.php:297
 #: widgets/problemsbysv/includes/WidgetForm.php:122
 #: widgets/problems/includes/WidgetForm.php:149
 msgid "Show timeline"
 msgstr "타임라인을 표시"
+
+#: widgets/itemhistory/includes/WidgetForm.php:102
+msgid "Show timestamp"
+msgstr ""
 
 #: widgets/piechart/includes/WidgetForm.php:150
 msgid "Show total value"
@@ -18658,6 +18829,10 @@ msgstr "표시"
 
 #: app/views/mfa.edit.php:67
 msgid "Shown as the account name to all MFA users in authenticator apps."
+msgstr ""
+
+#: app/views/mfa.edit.php:67
+msgid "Shown as the label to all MFA users in authenticator apps."
 msgstr ""
 
 #: include/classes/html/CHtmlPage.php:148
@@ -18718,6 +18893,14 @@ msgstr "단순 트리거"
 #: app/partials/trigger.edit.trigger.tab.php:239
 msgid "Single"
 msgstr "싱글"
+
+#: widgets/itemhistory/views/column.edit.php:150
+msgid "Single line"
+msgstr ""
+
+#: widgets/itemhistory/views/column.edit.php:140
+msgid "Single line - result will be displayed in a single line and truncated to specified length."
+msgstr ""
 
 #: include/hosts.inc.php:364
 msgid "Site ZIP / postal"
@@ -18825,6 +19008,10 @@ msgstr "소프트웨어 어플리케이션E"
 #: include/classes/data/CItemData.php:1471
 msgid "Software architecture information. Returns string"
 msgstr "소프트웨어의 아키텍쳐 정보. string을 리턴."
+
+#: app/partials/administration.system.info.php:96
+msgid "Software update last checked"
+msgstr ""
 
 #: include/classes/api/managers/CHistoryManager.php:1343
 msgid "Some of the history for this item may be compressed, deletion is not available."
@@ -19184,6 +19371,10 @@ msgstr ""
 #: app/views/popup.triggerexpr.php:133
 msgid "String functions"
 msgstr "문자열 함수"
+
+#: widgets/piechart/includes/WidgetForm.php:137
+msgid "Stroke width"
+msgstr ""
 
 #: include/items.inc.php:1545 include/items.inc.php:1549
 #: include/items.inc.php:1553 include/items.inc.php:1557
@@ -20033,6 +20224,10 @@ msgstr "기록 테이블에 압축된 청크가 포함되어 있으므로 이 �
 msgid "This setting should be enabled, because trend tables contain compressed chunks."
 msgstr "트렌드 테이블에는 압축된 청크가 포함되어 있으므로 이 설정을 활성화해야 합니다."
 
+#: widgets/itemhistory/views/column.edit.php:242
+msgid "This setting will display local time instead of the timestamp. \"Show timestamp\" must also be checked in the advanced configuration."
+msgstr ""
+
 #: include/views/configuration.item.edit.php:129
 #: include/views/configuration.item.prototype.edit.php:114
 msgid "This type of information may not match the key."
@@ -20547,6 +20742,10 @@ msgstr "트리거가 \"불명\" 상태"
 msgid "Trigger in template \"%1$s\" has dependency with trigger in template \"%2$s\"."
 msgstr "템플릿\"%1$s\"의 트리거는 템플릿\"%2$s\"의 트리거 와 의존관계가 설정되어있습니다."
 
+#: jsLoader.php:291
+msgid "Trigger is not selected."
+msgstr ""
+
 #: include/views/monitoring.sysmap.edit.php:198
 msgid "Trigger label type"
 msgstr "트리거 라벨 타입"
@@ -21010,6 +21209,10 @@ msgstr "장애대응 코멘트 미입력 항목만"
 msgid "Unavailable"
 msgstr ""
 
+#: jsLoader.php:206 jsLoader.php:211
+msgid "Unavailable widget"
+msgstr ""
+
 #: app/views/administration.user.list.php:309
 msgid "Unblock"
 msgstr "블록을 해제"
@@ -21309,6 +21512,11 @@ msgctxt "discovery status"
 msgid "Up"
 msgstr "Up"
 
+#: app/partials/administration.system.info.php:59
+#: app/partials/administration.system.info.php:64
+msgid "Up to date"
+msgstr ""
+
 #: app/controllers/CControllerAuditLogList.php:205
 #: app/partials/massupdate.macros.tab.php:126
 #: app/partials/massupdate.valuemaps.tab.php:94
@@ -21490,6 +21698,15 @@ msgstr "심각도 선택"
 
 #: app/views/administration.miscconfig.edit.php:127
 msgid "Use iframe sandboxing"
+msgstr ""
+
+#: widgets/itemhistory/views/column.edit.php:232
+msgid "Use monospace font"
+msgstr ""
+
+#: app/partials/monitoring.latest.view.html.php:36
+#: app/views/popup.generic.php:180
+msgid "Use the filter to display results"
 msgstr ""
 
 #: app/views/administration.script.list.php:93 app/views/mediatype.list.php:98
@@ -21717,6 +21934,10 @@ msgstr ""
 #: widgets/gauge/views/widget.edit.php:116
 #: widgets/item/views/widget.edit.php:90
 msgid "User macros"
+msgstr ""
+
+#: app/views/popup.mediatypemapping.edit.php:73
+msgid "User media"
 msgstr ""
 
 #: app/partials/layout.htmlpage.aside.php:94
@@ -22478,6 +22699,13 @@ msgstr ""
 msgid "Vault connection failed."
 msgstr ""
 
+#: include/classes/setup/CSetupWizard.php:609
+#: include/classes/setup/CSetupWizard.php:640
+#: include/classes/setup/CSetupWizard.php:843
+#: include/classes/setup/CSetupWizard.php:863
+msgid "Vault prefix"
+msgstr ""
+
 #: app/views/administration.miscconfig.edit.php:100
 msgid "Vault provider"
 msgstr ""
@@ -22562,6 +22790,10 @@ msgstr ""
 #: include/views/monitoring.history.php:86
 msgid "View as"
 msgstr "표시형식"
+
+#: jsLoader.php:417
+msgid "View related reports"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1735
 msgid "Virtual space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
@@ -22768,6 +23000,10 @@ msgstr ""
 
 #: jsLoader.php:187
 msgid "Widget is too small for the specified number of columns and rows."
+msgstr ""
+
+#: jsLoader.php:205
+msgid "Widgets"
 msgstr ""
 
 #: graphs.php:39 include/views/configuration.graph.edit.php:100
@@ -23142,6 +23378,10 @@ msgstr "이 페이지를 표시하는 권한이 없습니다."
 msgid "You must login to view this page."
 msgstr "이 페이지를 표시하기 위해서는 로그인이 필요합니다."
 
+#: jsLoader.php:287
+msgid "You need to have at least one image uploaded to create map element. Images can be uploaded in Administration->General->Images section."
+msgstr ""
+
 #: include/classes/db/DB.php:133
 msgid "Your database is not working properly. Please wait a few minutes and try to repeat this action. If the problem still persists, please contact system administrator. The problem might be caused by long running transaction or row level lock accomplished by your database management system."
 msgstr "데이터베이스가 정상으로 동작하지 않습니다. 잠시 기다렸다가 다시 시도해주세요. 그래도 문제가 해결되지 않는 경우, 시스템 관리자에게 연락해주십시오. 이 문제는 장시간 사용중인 트랜젝션이나 DBMS에 의해 row level lock이 발생하였을 가능성도 있습니다."
@@ -23475,6 +23715,10 @@ msgstr "배열이나 문자열로 지정해주세요"
 
 #: include/classes/validators/CApiInputValidator.php:2969
 msgid "an array or object is expected"
+msgstr ""
+
+#: include/classes/api/services/CUser.php:990
+msgid "an email address is expected"
 msgstr ""
 
 #: include/classes/import/validators/C10XmlValidator.php:363
@@ -23874,6 +24118,15 @@ msgstr "검색된 개체의 읽기 전용 매개변수 \"%1$s\"을(를) 업데�
 msgid "cannot update readonly parameter \"%1$s\" of inherited object"
 msgstr "상속된 개체의 읽기 전용 매개변수 \"%1$s\"을(를) 업데이트할 수 없습니다."
 
+#: include/classes/api/services/CUserGroup.php:501
+#: include/classes/api/services/CUser.php:451
+#: include/classes/api/services/CUser.php:614
+#: include/classes/api/services/CUser.php:794
+#: include/classes/api/services/CUser.php:1066
+#, c-format
+msgid "cannot update readonly parameter \"%1$s\" of provisioned user"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:491
 msgid "cbrt() - Cube root"
 msgstr "cbrt() - 큐브 루트"
@@ -24242,6 +24495,13 @@ msgstr ""
 msgid "host pattern"
 msgstr "호스트 패턴"
 
+#: widgets/piechart/includes/CWidgetFieldDataSetView.php:155
+#: widgets/svggraph/includes/CWidgetFieldDataSetView.php:159
+#: widgets/svggraph/includes/CWidgetFieldOverrideView.php:284
+#: widgets/svggraph/views/widget.edit.php:292
+msgid "host patterns"
+msgstr ""
+
 #: include/classes/api/services/CHostPrototype.php:1249
 msgid "host prototype with the same UUID already exists"
 msgstr ""
@@ -24479,6 +24739,15 @@ msgstr ""
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:329
 msgid "item pattern"
 msgstr "아이템 패턴"
+
+#: widgets/piechart/includes/CWidgetFieldDataSetView.php:134
+#: widgets/piechart/includes/CWidgetFieldDataSetView.php:172
+#: widgets/svggraph/includes/CWidgetFieldDataSetView.php:138
+#: widgets/svggraph/includes/CWidgetFieldDataSetView.php:176
+#: widgets/svggraph/includes/CWidgetFieldOverrideView.php:261
+#: widgets/svggraph/includes/CWidgetFieldOverrideView.php:303
+msgid "item patterns"
+msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:545
 msgid "item prototype with the same UUID already exists"
@@ -24997,6 +25266,11 @@ msgstr "출력"
 msgid "pattern"
 msgstr "패턴"
 
+#: include/classes/html/widgets/fields/CWidgetFieldHostPatternSelectView.php:32
+#: include/classes/html/widgets/fields/CWidgetFieldPatternSelectView.php:36
+msgid "patterns"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:878
 msgid "percentile() - Percentile P of a period T"
 msgstr "percentile() - 기간 T의 퍼센테일 P"
@@ -25060,6 +25334,11 @@ msgstr ""
 msgid "referred object does not exist"
 msgstr "참조된 개체가 존재하지 않습니다"
 
+#: include/classes/widgets/fields/CWidgetFieldMultiSelect.php:81
+#: include/classes/widgets/fields/CWidgetFieldTimePeriod.php:99
+msgid "referred widget is unavailable"
+msgstr ""
+
 #: app/controllers/CControllerQueueDetails.php:104
 #: app/controllers/CControllerQueueOverview.php:82
 #: app/controllers/CControllerQueueOverviewProxy.php:73
@@ -25111,6 +25390,10 @@ msgstr "오른쪽"
 #: app/controllers/CControllerPopupTriggerExpr.php:953
 msgid "right() - Returns the rightmost count characters"
 msgstr "right() - 가장 오른쪽 카운트 문자를 반환합니다."
+
+#: widgets/navtree/Widget.php:41
+msgid "root"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:966
 msgid "round() - Rounds a value to decimal places"

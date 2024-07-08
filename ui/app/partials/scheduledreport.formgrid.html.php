@@ -1,26 +1,22 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
 /**
  * @var CPartial $this
+ * @var array    $data
  */
 
 $form_grid = new CFormGrid();
@@ -29,7 +25,7 @@ $user_multiselect = (new CMultiSelect([
 	'name' => 'userid',
 	'object_name' => 'users',
 	'multiple' => false,
-	'disabled' => (CWebUser::getType() != USER_TYPE_SUPER_ADMIN) || !$data['allowed_edit'],
+	'readonly' => (CWebUser::getType() != USER_TYPE_SUPER_ADMIN) || !$data['allowed_edit'],
 	'data' => $data['ms_user'],
 	'popup' => [
 		'parameters' => [
@@ -47,7 +43,7 @@ $dashboard_multiselect = (new CMultiSelect([
 	'name' => 'dashboardid',
 	'object_name' => 'dashboard',
 	'multiple' => false,
-	'disabled' => !$data['allowed_edit'],
+	'readonly' => !$data['allowed_edit'],
 	'data' => $data['ms_dashboard'],
 	'popup' => [
 		'parameters' => [
@@ -87,7 +83,7 @@ $form_grid
 				->addValue(_('Previous week'), ZBX_REPORT_PERIOD_WEEK)
 				->addValue(_('Previous month'), ZBX_REPORT_PERIOD_MONTH)
 				->addValue(_('Previous year'), ZBX_REPORT_PERIOD_YEAR)
-				->setEnabled($data['allowed_edit'])
+				->setReadonly(!$data['allowed_edit'])
 				->setModern(true)
 		)
 	])
@@ -99,7 +95,7 @@ $form_grid
 				->addValue(_('Weekly'), ZBX_REPORT_CYCLE_WEEKLY)
 				->addValue(_('Monthly'), ZBX_REPORT_CYCLE_MONTHLY)
 				->addValue(_('Yearly'), ZBX_REPORT_CYCLE_YEARLY)
-				->setEnabled($data['allowed_edit'])
+				->setReadonly(!$data['allowed_edit'])
 				->setModern(true)
 		)
 	])
@@ -109,11 +105,11 @@ $form_grid
 			(new CDiv([
 				(new CNumericBox('hours', $data['hours'], 2))
 					->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
-					->setEnabled($data['allowed_edit']),
+					->setReadonly(!$data['allowed_edit']),
 				' : ',
 				(new CNumericBox('minutes', $data['minutes'], 2))
 					->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
-					->setEnabled($data['allowed_edit'])
+					->setReadonly(!$data['allowed_edit'])
 			]))->addClass(ZBX_STYLE_FORM_FIELDS_INLINE)
 		)
 	]);
@@ -142,7 +138,7 @@ $form_grid
 				->setVertical(true)
 				->setColumns(3)
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-				->setEnabled($data['allowed_edit'])
+				->setReadonly(!$data['allowed_edit'])
 		))
 			->setId('weekdays')
 			->addClass($show_weekdays ? null : ZBX_STYLE_DISPLAY_NONE)
@@ -153,7 +149,7 @@ $form_grid
 			(new CDateSelector('active_since', $data['active_since']))
 				->setDateFormat(ZBX_DATE)
 				->setPlaceholder(_('YYYY-MM-DD'))
-				->setEnabled($data['allowed_edit'])
+				->setReadonly(!$data['allowed_edit'])
 		)
 	])
 	->addItem([
@@ -162,7 +158,7 @@ $form_grid
 			(new CDateSelector('active_till', $data['active_till']))
 				->setDateFormat(ZBX_DATE)
 				->setPlaceholder(_('YYYY-MM-DD'))
-				->setEnabled($data['allowed_edit'])
+				->setReadonly(!$data['allowed_edit'])
 		)
 	])
 	->addItem([
@@ -171,7 +167,7 @@ $form_grid
 			(new CTextBox('subject', $data['subject']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAttribute('maxlength', DB::getFieldLength('media_type_message', 'subject'))
-				->setEnabled($data['allowed_edit'])
+				->setReadonly(!$data['allowed_edit'])
 		)
 	])
 	->addItem([
@@ -180,7 +176,7 @@ $form_grid
 			(new CTextArea('message', $data['message']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAttribute('maxlength', DB::getFieldLength('report_param', 'value'))
-				->setEnabled($data['allowed_edit'])
+				->setReadonly(!$data['allowed_edit'])
 		)
 	])
 	->addItem([
@@ -193,7 +189,7 @@ $form_grid
 			(new CTextArea('description', $data['description']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setMaxLength(DB::getFieldLength('report', 'description'))
-				->setEnabled($data['allowed_edit'])
+				->setReadonly(!$data['allowed_edit'])
 				->setAriaRequired()
 		)
 	])
@@ -203,7 +199,7 @@ $form_grid
 			(new CCheckBox('status', ZBX_REPORT_STATUS_ENABLED))
 				->setChecked($data['status'] == ZBX_REPORT_STATUS_ENABLED)
 				->setUncheckedValue(ZBX_REPORT_STATUS_DISABLED)
-				->setEnabled($data['allowed_edit'])
+				->setReadonly(!$data['allowed_edit'])
 		)
 	]);
 

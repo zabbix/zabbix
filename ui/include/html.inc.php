@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -298,10 +293,7 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 
 	if ($is_template) {
 		$template = new CSpan(
-			(new CLink($db_host['name'], (new CUrl('zabbix.php'))
-				->setArgument('action', 'template.edit')
-				->setArgument('templateid', $db_host['templateid'])
-			))
+			(new CLink($db_host['name']))
 				->setAttribute('data-templateid', $db_host['templateid'])
 				->onClick('view.editTemplate(event, this.dataset.templateid);')
 		);
@@ -1011,12 +1003,12 @@ function makeSuppressedProblemIcon(array $icon_data, bool $blink = false): CSimp
 		if (array_key_exists('maintenance_name', $suppression)) {
 			$maintenance_names[] = $suppression['maintenance_name'];
 		}
-		else {
+		elseif (array_key_exists('username', $suppression)) {
 			$username = $suppression['username'];
 		}
 	}
 
-	$maintenances = implode(',', $maintenance_names);
+	$maintenances = implode(', ', $maintenance_names);
 
 	return (new CButtonIcon(ZBX_ICON_EYE_OFF))
 		->addClass(ZBX_STYLE_COLOR_ICON)

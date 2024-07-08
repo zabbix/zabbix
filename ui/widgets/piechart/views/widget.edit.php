@@ -1,21 +1,16 @@
 <?php declare(strict_types = 0);
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -73,6 +68,7 @@ function getDisplayOptionsTab(CWidgetFormView $form, array $fields): CDiv {
 	$source_field = $form->registerField(new CWidgetFieldRadioButtonListView($fields['source']));
 	$draw_type_field = $form->registerField(new CWidgetFieldRadioButtonListView($fields['draw_type']));
 	$width_field = $form->registerField(new CWidgetFieldRangeControlView($fields['width']));
+	$stroke_field = $form->registerField(new CWidgetFieldRangeControlView($fields['stroke']));
 	$space_field = $form->registerField(new CWidgetFieldRangeControlView($fields['space']));
 	$merge_field = $form->registerField(new CWidgetFieldCheckBoxView($fields['merge']));
 	$merge_percent_field = $form->registerField(new CWidgetFieldIntegerBoxView($fields['merge_percent']));
@@ -102,6 +98,10 @@ function getDisplayOptionsTab(CWidgetFormView $form, array $fields): CDiv {
 				->addItem([
 					$width_field->getLabel()->setId('width_label'),
 					(new CFormField([$width_field->getView(), ' %']))->setId('width_range')
+				])
+				->addItem([
+					$stroke_field->getLabel()->setId('stroke_label'),
+					(new CFormField($stroke_field->getView()))->setId('stroke_range')
 				])
 				->addItem([
 					$space_field->getLabel(),

@@ -1,0 +1,4576 @@
+## smartctl -j -V
+{
+  "json_format_version": [
+    1,
+    0
+  ],
+  "smartctl": {
+    "version": [
+      7,
+      2
+    ],
+    "svn_revision": "5155",
+    "platform_info": "x86_64-linux-5.10.0-27-amd64",
+    "build_info": "(local build)",
+    "argv": [
+      "smartctl",
+      "-j",
+      "-V"
+    ],
+    "exit_status": 0
+  }
+}
+
+## smartctl --scan -j
+{
+  "json_format_version": [
+    1,
+    0
+  ],
+  "smartctl": {
+    "version": [
+      7,
+      2
+    ],
+    "svn_revision": "5155",
+    "platform_info": "x86_64-linux-5.10.0-27-amd64",
+    "build_info": "(local build)",
+    "argv": [
+      "smartctl",
+      "--scan",
+      "-j"
+    ],
+    "exit_status": 0
+  },
+  "devices": [
+    {
+      "name": "/dev/sda",
+      "info_name": "/dev/sda",
+      "type": "scsi",
+      "protocol": "SCSI"
+    },
+    {
+      "name": "/dev/sdb",
+      "info_name": "/dev/sdb",
+      "type": "scsi",
+      "protocol": "SCSI"
+    },
+    {
+      "name": "/dev/sdc",
+      "info_name": "/dev/sdc",
+      "type": "scsi",
+      "protocol": "SCSI"
+    },
+    {
+      "name": "/dev/sdd",
+      "info_name": "/dev/sdd",
+      "type": "scsi",
+      "protocol": "SCSI"
+    },
+    {
+      "name": "/dev/sde",
+      "info_name": "/dev/sde",
+      "type": "scsi",
+      "protocol": "SCSI"
+    },
+    {
+      "name": "/dev/sdf",
+      "info_name": "/dev/sdf",
+      "type": "scsi",
+      "protocol": "SCSI"
+    },
+    {
+      "name": "/dev/sdg",
+      "info_name": "/dev/sdg",
+      "type": "scsi",
+      "protocol": "SCSI"
+    },
+    {
+      "name": "/dev/sdh",
+      "info_name": "/dev/sdh",
+      "type": "scsi",
+      "protocol": "SCSI"
+    },
+    {
+      "name": "/dev/sdi",
+      "info_name": "/dev/sdi",
+      "type": "scsi",
+      "protocol": "SCSI"
+    },
+    {
+      "name": "/dev/sdj",
+      "info_name": "/dev/sdj",
+      "type": "scsi",
+      "protocol": "SCSI"
+    },
+    {
+      "name": "/dev/sdk",
+      "info_name": "/dev/sdk",
+      "type": "scsi",
+      "protocol": "SCSI"
+    },
+    {
+      "name": "/dev/sdl",
+      "info_name": "/dev/sdl",
+      "type": "scsi",
+      "protocol": "SCSI"
+    },
+    {
+      "name": "/dev/sdm",
+      "info_name": "/dev/sdm",
+      "type": "scsi",
+      "protocol": "SCSI"
+    },
+    {
+      "name": "/dev/bus/0",
+      "info_name": "/dev/bus/0 [megaraid_disk_10]",
+      "type": "megaraid,10",
+      "protocol": "SCSI"
+    },
+    {
+      "name": "/dev/bus/0",
+      "info_name": "/dev/bus/0 [megaraid_disk_11]",
+      "type": "megaraid,11",
+      "protocol": "SCSI"
+    },
+    {
+      "name": "/dev/bus/0",
+      "info_name": "/dev/bus/0 [megaraid_disk_12]",
+      "type": "megaraid,12",
+      "protocol": "SCSI"
+    },
+    {
+      "name": "/dev/bus/0",
+      "info_name": "/dev/bus/0 [megaraid_disk_13]",
+      "type": "megaraid,13",
+      "protocol": "SCSI"
+    },
+    {
+      "name": "/dev/bus/0",
+      "info_name": "/dev/bus/0 [megaraid_disk_14]",
+      "type": "megaraid,14",
+      "protocol": "SCSI"
+    },
+    {
+      "name": "/dev/bus/0",
+      "info_name": "/dev/bus/0 [megaraid_disk_15]",
+      "type": "megaraid,15",
+      "protocol": "SCSI"
+    },
+    {
+      "name": "/dev/bus/0",
+      "info_name": "/dev/bus/0 [megaraid_disk_16]",
+      "type": "megaraid,16",
+      "protocol": "SCSI"
+    },
+    {
+      "name": "/dev/bus/0",
+      "info_name": "/dev/bus/0 [megaraid_disk_17]",
+      "type": "megaraid,17",
+      "protocol": "SCSI"
+    },
+    {
+      "name": "/dev/bus/0",
+      "info_name": "/dev/bus/0 [megaraid_disk_18]",
+      "type": "megaraid,18",
+      "protocol": "SCSI"
+    },
+    {
+      "name": "/dev/bus/0",
+      "info_name": "/dev/bus/0 [megaraid_disk_19]",
+      "type": "megaraid,19",
+      "protocol": "SCSI"
+    },
+    {
+      "name": "/dev/nvme0",
+      "info_name": "/dev/nvme0",
+      "type": "nvme",
+      "protocol": "NVMe"
+    },
+    {
+      "name": "/dev/nvme1",
+      "info_name": "/dev/nvme1",
+      "type": "nvme",
+      "protocol": "NVMe"
+    }
+  ]
+}
+
+
+## smartctl --scan -d sat -j
+{
+  "json_format_version": [
+    1,
+    0
+  ],
+  "smartctl": {
+    "version": [
+      7,
+      2
+    ],
+    "svn_revision": "5155",
+    "platform_info": "x86_64-linux-5.10.0-27-amd64",
+    "build_info": "(local build)",
+    "argv": [
+      "smartctl",
+      "--scan",
+      "-d",
+      "sat",
+      "-j"
+    ],
+    "exit_status": 0
+  },
+  "devices": [
+    {
+      "name": "/dev/sda",
+      "info_name": "/dev/sda",
+      "type": "scsi",
+      "protocol": "SCSI"
+    },
+    {
+      "name": "/dev/sdb",
+      "info_name": "/dev/sdb",
+      "type": "scsi",
+      "protocol": "SCSI"
+    },
+    {
+      "name": "/dev/sdc",
+      "info_name": "/dev/sdc",
+      "type": "scsi",
+      "protocol": "SCSI"
+    },
+    {
+      "name": "/dev/sdd",
+      "info_name": "/dev/sdd",
+      "type": "scsi",
+      "protocol": "SCSI"
+    },
+    {
+      "name": "/dev/sde",
+      "info_name": "/dev/sde",
+      "type": "scsi",
+      "protocol": "SCSI"
+    },
+    {
+      "name": "/dev/sdf",
+      "info_name": "/dev/sdf",
+      "type": "scsi",
+      "protocol": "SCSI"
+    },
+    {
+      "name": "/dev/sdg",
+      "info_name": "/dev/sdg",
+      "type": "scsi",
+      "protocol": "SCSI"
+    },
+    {
+      "name": "/dev/sdh",
+      "info_name": "/dev/sdh",
+      "type": "scsi",
+      "protocol": "SCSI"
+    },
+    {
+      "name": "/dev/sdi",
+      "info_name": "/dev/sdi",
+      "type": "scsi",
+      "protocol": "SCSI"
+    },
+    {
+      "name": "/dev/sdj",
+      "info_name": "/dev/sdj",
+      "type": "scsi",
+      "protocol": "SCSI"
+    },
+    {
+      "name": "/dev/sdk",
+      "info_name": "/dev/sdk",
+      "type": "scsi",
+      "protocol": "SCSI"
+    },
+    {
+      "name": "/dev/sdl",
+      "info_name": "/dev/sdl",
+      "type": "scsi",
+      "protocol": "SCSI"
+    },
+    {
+      "name": "/dev/sdm",
+      "info_name": "/dev/sdm",
+      "type": "scsi",
+      "protocol": "SCSI"
+    },
+    {
+      "name": "/dev/bus/0",
+      "info_name": "/dev/bus/0 [megaraid_disk_10]",
+      "type": "megaraid,10",
+      "protocol": "SCSI"
+    },
+    {
+      "name": "/dev/bus/0",
+      "info_name": "/dev/bus/0 [megaraid_disk_11]",
+      "type": "megaraid,11",
+      "protocol": "SCSI"
+    },
+    {
+      "name": "/dev/bus/0",
+      "info_name": "/dev/bus/0 [megaraid_disk_12]",
+      "type": "megaraid,12",
+      "protocol": "SCSI"
+    },
+    {
+      "name": "/dev/bus/0",
+      "info_name": "/dev/bus/0 [megaraid_disk_13]",
+      "type": "megaraid,13",
+      "protocol": "SCSI"
+    },
+    {
+      "name": "/dev/bus/0",
+      "info_name": "/dev/bus/0 [megaraid_disk_14]",
+      "type": "megaraid,14",
+      "protocol": "SCSI"
+    },
+    {
+      "name": "/dev/bus/0",
+      "info_name": "/dev/bus/0 [megaraid_disk_15]",
+      "type": "megaraid,15",
+      "protocol": "SCSI"
+    },
+    {
+      "name": "/dev/bus/0",
+      "info_name": "/dev/bus/0 [megaraid_disk_16]",
+      "type": "megaraid,16",
+      "protocol": "SCSI"
+    },
+    {
+      "name": "/dev/bus/0",
+      "info_name": "/dev/bus/0 [megaraid_disk_17]",
+      "type": "megaraid,17",
+      "protocol": "SCSI"
+    },
+    {
+      "name": "/dev/bus/0",
+      "info_name": "/dev/bus/0 [megaraid_disk_18]",
+      "type": "megaraid,18",
+      "protocol": "SCSI"
+    },
+    {
+      "name": "/dev/bus/0",
+      "info_name": "/dev/bus/0 [megaraid_disk_19]",
+      "type": "megaraid,19",
+      "protocol": "SCSI"
+    }
+  ]
+}
+
+
+## smartctl -a $DEVICE_NAME -j
+{
+  "json_format_version": [
+    1,
+    0
+  ],
+  "smartctl": {
+    "version": [
+      7,
+      2
+    ],
+    "svn_revision": "5155",
+    "platform_info": "x86_64-linux-5.10.0-27-amd64",
+    "build_info": "(local build)",
+    "argv": [
+      "smartctl",
+      "-a",
+      "-j",
+      "/dev/sda"
+    ],
+    "exit_status": 4
+  },
+  "device": {
+    "name": "/dev/sda",
+    "info_name": "/dev/sda",
+    "type": "scsi",
+    "protocol": "SCSI"
+  },
+  "vendor": "AVAGO",
+  "product": "MR9380-8e",
+  "model_name": "AVAGO MR9380-8e",
+  "revision": "4.68",
+  "scsi_version": "SPC-3",
+  "user_capacity": {
+    "blocks": 156254601216,
+    "bytes": 80002355822592
+  },
+  "logical_block_size": 512,
+  "physical_block_size": 4096,
+  "serial_number": "00f32e146d8215e82470c6f20eb00506",
+  "device_type": {
+    "scsi_value": 0,
+    "name": "disk"
+  },
+  "local_time": {
+    "time_t": 1705567880,
+    "asctime": "Thu Jan 18 09:51:20 2024 CET"
+  },
+  "temperature": {
+    "current": 0,
+    "drive_trip": 0
+  }
+}
+{
+  "json_format_version": [
+    1,
+    0
+  ],
+  "smartctl": {
+    "version": [
+      7,
+      2
+    ],
+    "svn_revision": "5155",
+    "platform_info": "x86_64-linux-5.10.0-27-amd64",
+    "build_info": "(local build)",
+    "argv": [
+      "smartctl",
+      "-a",
+      "-j",
+      "/dev/sdb"
+    ],
+    "exit_status": 0
+  },
+  "device": {
+    "name": "/dev/sdb",
+    "info_name": "/dev/sdb",
+    "type": "scsi",
+    "protocol": "SCSI"
+  },
+  "vendor": "SEAGATE",
+  "product": "ST12000NM002G",
+  "model_name": "SEAGATE ST12000NM002G",
+  "revision": "E003",
+  "scsi_version": "SPC-5",
+  "user_capacity": {
+    "blocks": 23437770752,
+    "bytes": 12000138625024
+  },
+  "logical_block_size": 512,
+  "physical_block_size": 4096,
+  "rotation_rate": 7200,
+  "form_factor": {
+    "scsi_value": 2,
+    "name": "3.5 inches"
+  },
+  "serial_number": "ZLW2GVJY0000C2231WWJ",
+  "device_type": {
+    "scsi_value": 0,
+    "name": "disk"
+  },
+  "local_time": {
+    "time_t": 1705567880,
+    "asctime": "Thu Jan 18 09:51:20 2024 CET"
+  },
+  "smart_status": {
+    "passed": true
+  },
+  "temperature": {
+    "current": 30,
+    "drive_trip": 60
+  },
+  "power_on_time": {
+    "hours": 15840,
+    "minutes": 1
+  },
+  "scsi_grown_defect_list": 0,
+  "scsi_error_counter_log": {
+    "read": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "33621.587",
+      "total_uncorrected_errors": 0
+    },
+    "write": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "2742.278",
+      "total_uncorrected_errors": 0
+    },
+    "verify": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "0.689",
+      "total_uncorrected_errors": 0
+    }
+  }
+}
+{
+  "json_format_version": [
+    1,
+    0
+  ],
+  "smartctl": {
+    "version": [
+      7,
+      2
+    ],
+    "svn_revision": "5155",
+    "platform_info": "x86_64-linux-5.10.0-27-amd64",
+    "build_info": "(local build)",
+    "argv": [
+      "smartctl",
+      "-a",
+      "-j",
+      "/dev/sdc"
+    ],
+    "exit_status": 0
+  },
+  "device": {
+    "name": "/dev/sdc",
+    "info_name": "/dev/sdc",
+    "type": "scsi",
+    "protocol": "SCSI"
+  },
+  "vendor": "SEAGATE",
+  "product": "ST12000NM002G",
+  "model_name": "SEAGATE ST12000NM002G",
+  "revision": "E003",
+  "scsi_version": "SPC-5",
+  "user_capacity": {
+    "blocks": 23437770752,
+    "bytes": 12000138625024
+  },
+  "logical_block_size": 512,
+  "physical_block_size": 4096,
+  "rotation_rate": 7200,
+  "form_factor": {
+    "scsi_value": 2,
+    "name": "3.5 inches"
+  },
+  "serial_number": "ZLW2GVA10000C2231WUM",
+  "device_type": {
+    "scsi_value": 0,
+    "name": "disk"
+  },
+  "local_time": {
+    "time_t": 1705567881,
+    "asctime": "Thu Jan 18 09:51:21 2024 CET"
+  },
+  "smart_status": {
+    "passed": true
+  },
+  "temperature": {
+    "current": 32,
+    "drive_trip": 60
+  },
+  "power_on_time": {
+    "hours": 15840,
+    "minutes": 19
+  },
+  "scsi_grown_defect_list": 0,
+  "scsi_error_counter_log": {
+    "read": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "33627.791",
+      "total_uncorrected_errors": 0
+    },
+    "write": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "2750.804",
+      "total_uncorrected_errors": 0
+    },
+    "verify": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "0.669",
+      "total_uncorrected_errors": 0
+    }
+  }
+}
+{
+  "json_format_version": [
+    1,
+    0
+  ],
+  "smartctl": {
+    "version": [
+      7,
+      2
+    ],
+    "svn_revision": "5155",
+    "platform_info": "x86_64-linux-5.10.0-27-amd64",
+    "build_info": "(local build)",
+    "argv": [
+      "smartctl",
+      "-a",
+      "-j",
+      "/dev/sdd"
+    ],
+    "exit_status": 0
+  },
+  "device": {
+    "name": "/dev/sdd",
+    "info_name": "/dev/sdd",
+    "type": "scsi",
+    "protocol": "SCSI"
+  },
+  "vendor": "SEAGATE",
+  "product": "ST12000NM002G",
+  "model_name": "SEAGATE ST12000NM002G",
+  "revision": "E003",
+  "scsi_version": "SPC-5",
+  "user_capacity": {
+    "blocks": 23437770752,
+    "bytes": 12000138625024
+  },
+  "logical_block_size": 512,
+  "physical_block_size": 4096,
+  "rotation_rate": 7200,
+  "form_factor": {
+    "scsi_value": 2,
+    "name": "3.5 inches"
+  },
+  "serial_number": "ZTN102FW0000C2233L0B",
+  "device_type": {
+    "scsi_value": 0,
+    "name": "disk"
+  },
+  "local_time": {
+    "time_t": 1705567882,
+    "asctime": "Thu Jan 18 09:51:22 2024 CET"
+  },
+  "smart_status": {
+    "passed": true
+  },
+  "temperature": {
+    "current": 31,
+    "drive_trip": 60
+  },
+  "power_on_time": {
+    "hours": 15840,
+    "minutes": 1
+  },
+  "scsi_grown_defect_list": 0,
+  "scsi_error_counter_log": {
+    "read": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "33624.876",
+      "total_uncorrected_errors": 0
+    },
+    "write": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "2710.962",
+      "total_uncorrected_errors": 0
+    },
+    "verify": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "0.653",
+      "total_uncorrected_errors": 0
+    }
+  }
+}
+{
+  "json_format_version": [
+    1,
+    0
+  ],
+  "smartctl": {
+    "version": [
+      7,
+      2
+    ],
+    "svn_revision": "5155",
+    "platform_info": "x86_64-linux-5.10.0-27-amd64",
+    "build_info": "(local build)",
+    "argv": [
+      "smartctl",
+      "-a",
+      "-j",
+      "/dev/sde"
+    ],
+    "exit_status": 0
+  },
+  "device": {
+    "name": "/dev/sde",
+    "info_name": "/dev/sde",
+    "type": "scsi",
+    "protocol": "SCSI"
+  },
+  "vendor": "SEAGATE",
+  "product": "ST12000NM002G",
+  "model_name": "SEAGATE ST12000NM002G",
+  "revision": "E003",
+  "scsi_version": "SPC-5",
+  "user_capacity": {
+    "blocks": 23437770752,
+    "bytes": 12000138625024
+  },
+  "logical_block_size": 512,
+  "physical_block_size": 4096,
+  "rotation_rate": 7200,
+  "form_factor": {
+    "scsi_value": 2,
+    "name": "3.5 inches"
+  },
+  "serial_number": "ZTN102Y70000C2235UN6",
+  "device_type": {
+    "scsi_value": 0,
+    "name": "disk"
+  },
+  "local_time": {
+    "time_t": 1705567882,
+    "asctime": "Thu Jan 18 09:51:22 2024 CET"
+  },
+  "smart_status": {
+    "passed": true
+  },
+  "temperature": {
+    "current": 31,
+    "drive_trip": 60
+  },
+  "power_on_time": {
+    "hours": 15840,
+    "minutes": 5
+  },
+  "scsi_grown_defect_list": 0,
+  "scsi_error_counter_log": {
+    "read": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "33623.456",
+      "total_uncorrected_errors": 0
+    },
+    "write": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "2710.877",
+      "total_uncorrected_errors": 0
+    },
+    "verify": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "0.659",
+      "total_uncorrected_errors": 0
+    }
+  }
+}
+{
+  "json_format_version": [
+    1,
+    0
+  ],
+  "smartctl": {
+    "version": [
+      7,
+      2
+    ],
+    "svn_revision": "5155",
+    "platform_info": "x86_64-linux-5.10.0-27-amd64",
+    "build_info": "(local build)",
+    "argv": [
+      "smartctl",
+      "-a",
+      "-j",
+      "/dev/sdf"
+    ],
+    "exit_status": 0
+  },
+  "device": {
+    "name": "/dev/sdf",
+    "info_name": "/dev/sdf",
+    "type": "scsi",
+    "protocol": "SCSI"
+  },
+  "vendor": "SEAGATE",
+  "product": "ST12000NM002G",
+  "model_name": "SEAGATE ST12000NM002G",
+  "revision": "E003",
+  "scsi_version": "SPC-5",
+  "user_capacity": {
+    "blocks": 23437770752,
+    "bytes": 12000138625024
+  },
+  "logical_block_size": 512,
+  "physical_block_size": 4096,
+  "rotation_rate": 7200,
+  "form_factor": {
+    "scsi_value": 2,
+    "name": "3.5 inches"
+  },
+  "serial_number": "ZTN101R60000C2179K5S",
+  "device_type": {
+    "scsi_value": 0,
+    "name": "disk"
+  },
+  "local_time": {
+    "time_t": 1705567883,
+    "asctime": "Thu Jan 18 09:51:23 2024 CET"
+  },
+  "smart_status": {
+    "passed": true
+  },
+  "temperature": {
+    "current": 29,
+    "drive_trip": 60
+  },
+  "power_on_time": {
+    "hours": 15839,
+    "minutes": 59
+  },
+  "scsi_grown_defect_list": 0,
+  "scsi_error_counter_log": {
+    "read": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "33615.532",
+      "total_uncorrected_errors": 0
+    },
+    "write": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "2728.557",
+      "total_uncorrected_errors": 0
+    },
+    "verify": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "0.659",
+      "total_uncorrected_errors": 0
+    }
+  }
+}
+{
+  "json_format_version": [
+    1,
+    0
+  ],
+  "smartctl": {
+    "version": [
+      7,
+      2
+    ],
+    "svn_revision": "5155",
+    "platform_info": "x86_64-linux-5.10.0-27-amd64",
+    "build_info": "(local build)",
+    "argv": [
+      "smartctl",
+      "-a",
+      "-j",
+      "/dev/sdg"
+    ],
+    "exit_status": 0
+  },
+  "device": {
+    "name": "/dev/sdg",
+    "info_name": "/dev/sdg",
+    "type": "scsi",
+    "protocol": "SCSI"
+  },
+  "vendor": "SEAGATE",
+  "product": "ST12000NM002G",
+  "model_name": "SEAGATE ST12000NM002G",
+  "revision": "E003",
+  "scsi_version": "SPC-5",
+  "user_capacity": {
+    "blocks": 23437770752,
+    "bytes": 12000138625024
+  },
+  "logical_block_size": 512,
+  "physical_block_size": 4096,
+  "rotation_rate": 7200,
+  "form_factor": {
+    "scsi_value": 2,
+    "name": "3.5 inches"
+  },
+  "serial_number": "ZTN0X61Y0000C2180BAM",
+  "device_type": {
+    "scsi_value": 0,
+    "name": "disk"
+  },
+  "local_time": {
+    "time_t": 1705567884,
+    "asctime": "Thu Jan 18 09:51:24 2024 CET"
+  },
+  "smart_status": {
+    "passed": true
+  },
+  "temperature": {
+    "current": 27,
+    "drive_trip": 60
+  },
+  "power_on_time": {
+    "hours": 15839,
+    "minutes": 50
+  },
+  "scsi_grown_defect_list": 0,
+  "scsi_error_counter_log": {
+    "read": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "33621.646",
+      "total_uncorrected_errors": 0
+    },
+    "write": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "2708.366",
+      "total_uncorrected_errors": 0
+    },
+    "verify": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "0.686",
+      "total_uncorrected_errors": 0
+    }
+  }
+}
+{
+  "json_format_version": [
+    1,
+    0
+  ],
+  "smartctl": {
+    "version": [
+      7,
+      2
+    ],
+    "svn_revision": "5155",
+    "platform_info": "x86_64-linux-5.10.0-27-amd64",
+    "build_info": "(local build)",
+    "argv": [
+      "smartctl",
+      "-a",
+      "-j",
+      "/dev/sdh"
+    ],
+    "exit_status": 0
+  },
+  "device": {
+    "name": "/dev/sdh",
+    "info_name": "/dev/sdh",
+    "type": "scsi",
+    "protocol": "SCSI"
+  },
+  "vendor": "SEAGATE",
+  "product": "ST12000NM002G",
+  "model_name": "SEAGATE ST12000NM002G",
+  "revision": "E003",
+  "scsi_version": "SPC-5",
+  "user_capacity": {
+    "blocks": 23437770752,
+    "bytes": 12000138625024
+  },
+  "logical_block_size": 512,
+  "physical_block_size": 4096,
+  "rotation_rate": 7200,
+  "form_factor": {
+    "scsi_value": 2,
+    "name": "3.5 inches"
+  },
+  "serial_number": "ZTN102T80000C2235Z2H",
+  "device_type": {
+    "scsi_value": 0,
+    "name": "disk"
+  },
+  "local_time": {
+    "time_t": 1705567885,
+    "asctime": "Thu Jan 18 09:51:25 2024 CET"
+  },
+  "smart_status": {
+    "passed": true
+  },
+  "temperature": {
+    "current": 30,
+    "drive_trip": 60
+  },
+  "power_on_time": {
+    "hours": 15839,
+    "minutes": 59
+  },
+  "scsi_grown_defect_list": 0,
+  "scsi_error_counter_log": {
+    "read": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "33624.478",
+      "total_uncorrected_errors": 0
+    },
+    "write": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "2714.312",
+      "total_uncorrected_errors": 0
+    },
+    "verify": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "0.635",
+      "total_uncorrected_errors": 0
+    }
+  }
+}
+{
+  "json_format_version": [
+    1,
+    0
+  ],
+  "smartctl": {
+    "version": [
+      7,
+      2
+    ],
+    "svn_revision": "5155",
+    "platform_info": "x86_64-linux-5.10.0-27-amd64",
+    "build_info": "(local build)",
+    "argv": [
+      "smartctl",
+      "-a",
+      "-j",
+      "/dev/sdi"
+    ],
+    "exit_status": 0
+  },
+  "device": {
+    "name": "/dev/sdi",
+    "info_name": "/dev/sdi",
+    "type": "scsi",
+    "protocol": "SCSI"
+  },
+  "vendor": "SEAGATE",
+  "product": "ST12000NM002G",
+  "model_name": "SEAGATE ST12000NM002G",
+  "revision": "E003",
+  "scsi_version": "SPC-5",
+  "user_capacity": {
+    "blocks": 23437770752,
+    "bytes": 12000138625024
+  },
+  "logical_block_size": 512,
+  "physical_block_size": 4096,
+  "rotation_rate": 7200,
+  "form_factor": {
+    "scsi_value": 2,
+    "name": "3.5 inches"
+  },
+  "serial_number": "ZTN102XG0000C2235WTW",
+  "device_type": {
+    "scsi_value": 0,
+    "name": "disk"
+  },
+  "local_time": {
+    "time_t": 1705567885,
+    "asctime": "Thu Jan 18 09:51:25 2024 CET"
+  },
+  "smart_status": {
+    "passed": true
+  },
+  "temperature": {
+    "current": 31,
+    "drive_trip": 60
+  },
+  "power_on_time": {
+    "hours": 15840,
+    "minutes": 11
+  },
+  "scsi_grown_defect_list": 0,
+  "scsi_error_counter_log": {
+    "read": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "33614.203",
+      "total_uncorrected_errors": 0
+    },
+    "write": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "2705.450",
+      "total_uncorrected_errors": 0
+    },
+    "verify": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "0.657",
+      "total_uncorrected_errors": 0
+    }
+  }
+}
+{
+  "json_format_version": [
+    1,
+    0
+  ],
+  "smartctl": {
+    "version": [
+      7,
+      2
+    ],
+    "svn_revision": "5155",
+    "platform_info": "x86_64-linux-5.10.0-27-amd64",
+    "build_info": "(local build)",
+    "argv": [
+      "smartctl",
+      "-a",
+      "-j",
+      "/dev/sdj"
+    ],
+    "exit_status": 0
+  },
+  "device": {
+    "name": "/dev/sdj",
+    "info_name": "/dev/sdj",
+    "type": "scsi",
+    "protocol": "SCSI"
+  },
+  "vendor": "SEAGATE",
+  "product": "ST12000NM002G",
+  "model_name": "SEAGATE ST12000NM002G",
+  "revision": "E003",
+  "scsi_version": "SPC-5",
+  "user_capacity": {
+    "blocks": 23437770752,
+    "bytes": 12000138625024
+  },
+  "logical_block_size": 512,
+  "physical_block_size": 4096,
+  "rotation_rate": 7200,
+  "form_factor": {
+    "scsi_value": 2,
+    "name": "3.5 inches"
+  },
+  "serial_number": "ZTN0X6040000C2180A21",
+  "device_type": {
+    "scsi_value": 0,
+    "name": "disk"
+  },
+  "local_time": {
+    "time_t": 1705567886,
+    "asctime": "Thu Jan 18 09:51:26 2024 CET"
+  },
+  "smart_status": {
+    "passed": true
+  },
+  "temperature": {
+    "current": 31,
+    "drive_trip": 60
+  },
+  "power_on_time": {
+    "hours": 15839,
+    "minutes": 50
+  },
+  "scsi_grown_defect_list": 0,
+  "scsi_error_counter_log": {
+    "read": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "33626.607",
+      "total_uncorrected_errors": 0
+    },
+    "write": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "2741.291",
+      "total_uncorrected_errors": 0
+    },
+    "verify": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "0.638",
+      "total_uncorrected_errors": 0
+    }
+  }
+}
+{
+  "json_format_version": [
+    1,
+    0
+  ],
+  "smartctl": {
+    "version": [
+      7,
+      2
+    ],
+    "svn_revision": "5155",
+    "platform_info": "x86_64-linux-5.10.0-27-amd64",
+    "build_info": "(local build)",
+    "argv": [
+      "smartctl",
+      "-a",
+      "-j",
+      "/dev/sdk"
+    ],
+    "exit_status": 0
+  },
+  "device": {
+    "name": "/dev/sdk",
+    "info_name": "/dev/sdk",
+    "type": "scsi",
+    "protocol": "SCSI"
+  },
+  "vendor": "SEAGATE",
+  "product": "ST12000NM002G",
+  "model_name": "SEAGATE ST12000NM002G",
+  "revision": "E003",
+  "scsi_version": "SPC-5",
+  "user_capacity": {
+    "blocks": 23437770752,
+    "bytes": 12000138625024
+  },
+  "logical_block_size": 512,
+  "physical_block_size": 4096,
+  "rotation_rate": 7200,
+  "form_factor": {
+    "scsi_value": 2,
+    "name": "3.5 inches"
+  },
+  "serial_number": "ZTN102WT0000C2235WUR",
+  "device_type": {
+    "scsi_value": 0,
+    "name": "disk"
+  },
+  "local_time": {
+    "time_t": 1705567887,
+    "asctime": "Thu Jan 18 09:51:27 2024 CET"
+  },
+  "smart_status": {
+    "passed": true
+  },
+  "temperature": {
+    "current": 30,
+    "drive_trip": 60
+  },
+  "power_on_time": {
+    "hours": 15840,
+    "minutes": 0
+  },
+  "scsi_grown_defect_list": 0,
+  "scsi_error_counter_log": {
+    "read": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "33627.048",
+      "total_uncorrected_errors": 0
+    },
+    "write": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "2732.919",
+      "total_uncorrected_errors": 0
+    },
+    "verify": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "0.668",
+      "total_uncorrected_errors": 0
+    }
+  }
+}
+{
+  "json_format_version": [
+    1,
+    0
+  ],
+  "smartctl": {
+    "version": [
+      7,
+      2
+    ],
+    "svn_revision": "5155",
+    "platform_info": "x86_64-linux-5.10.0-27-amd64",
+    "build_info": "(local build)",
+    "argv": [
+      "smartctl",
+      "-a",
+      "-j",
+      "/dev/sdl"
+    ],
+    "exit_status": 0
+  },
+  "device": {
+    "name": "/dev/sdl",
+    "info_name": "/dev/sdl",
+    "type": "scsi",
+    "protocol": "SCSI"
+  },
+  "vendor": "SEAGATE",
+  "product": "ST12000NM002G",
+  "model_name": "SEAGATE ST12000NM002G",
+  "revision": "E003",
+  "scsi_version": "SPC-5",
+  "user_capacity": {
+    "blocks": 23437770752,
+    "bytes": 12000138625024
+  },
+  "logical_block_size": 512,
+  "physical_block_size": 4096,
+  "rotation_rate": 7200,
+  "form_factor": {
+    "scsi_value": 2,
+    "name": "3.5 inches"
+  },
+  "serial_number": "ZTN102GC0000C2236M68",
+  "device_type": {
+    "scsi_value": 0,
+    "name": "disk"
+  },
+  "local_time": {
+    "time_t": 1705567888,
+    "asctime": "Thu Jan 18 09:51:28 2024 CET"
+  },
+  "smart_status": {
+    "passed": true
+  },
+  "temperature": {
+    "current": 29,
+    "drive_trip": 60
+  },
+  "power_on_time": {
+    "hours": 15840,
+    "minutes": 2
+  },
+  "scsi_grown_defect_list": 0,
+  "scsi_error_counter_log": {
+    "read": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "33617.767",
+      "total_uncorrected_errors": 0
+    },
+    "write": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "2717.217",
+      "total_uncorrected_errors": 0
+    },
+    "verify": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "0.673",
+      "total_uncorrected_errors": 0
+    }
+  }
+}
+{
+  "json_format_version": [
+    1,
+    0
+  ],
+  "smartctl": {
+    "version": [
+      7,
+      2
+    ],
+    "svn_revision": "5155",
+    "platform_info": "x86_64-linux-5.10.0-27-amd64",
+    "build_info": "(local build)",
+    "argv": [
+      "smartctl",
+      "-a",
+      "-j",
+      "/dev/sdm"
+    ],
+    "exit_status": 0
+  },
+  "device": {
+    "name": "/dev/sdm",
+    "info_name": "/dev/sdm",
+    "type": "scsi",
+    "protocol": "SCSI"
+  },
+  "vendor": "SEAGATE",
+  "product": "ST12000NM002G",
+  "model_name": "SEAGATE ST12000NM002G",
+  "revision": "E003",
+  "scsi_version": "SPC-5",
+  "user_capacity": {
+    "blocks": 23437770752,
+    "bytes": 12000138625024
+  },
+  "logical_block_size": 512,
+  "physical_block_size": 4096,
+  "rotation_rate": 7200,
+  "form_factor": {
+    "scsi_value": 2,
+    "name": "3.5 inches"
+  },
+  "serial_number": "ZTN102W90000C2235WML",
+  "device_type": {
+    "scsi_value": 0,
+    "name": "disk"
+  },
+  "local_time": {
+    "time_t": 1705567889,
+    "asctime": "Thu Jan 18 09:51:29 2024 CET"
+  },
+  "smart_status": {
+    "passed": true
+  },
+  "temperature": {
+    "current": 27,
+    "drive_trip": 60
+  },
+  "power_on_time": {
+    "hours": 15840,
+    "minutes": 4
+  },
+  "scsi_grown_defect_list": 0,
+  "scsi_error_counter_log": {
+    "read": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "33619.963",
+      "total_uncorrected_errors": 0
+    },
+    "write": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "2701.985",
+      "total_uncorrected_errors": 0
+    },
+    "verify": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "0.672",
+      "total_uncorrected_errors": 0
+    }
+  }
+}
+{
+  "json_format_version": [
+    1,
+    0
+  ],
+  "smartctl": {
+    "version": [
+      7,
+      2
+    ],
+    "svn_revision": "5155",
+    "platform_info": "x86_64-linux-5.10.0-27-amd64",
+    "build_info": "(local build)",
+    "argv": [
+      "smartctl",
+      "-a",
+      "-j",
+      "/dev/bus/0"
+    ],
+    "messages": [
+      {
+        "string": "/dev/bus/0: Unable to detect device type",
+        "severity": "error"
+      }
+    ],
+    "exit_status": 1
+  }
+}
+{
+  "json_format_version": [
+    1,
+    0
+  ],
+  "smartctl": {
+    "version": [
+      7,
+      2
+    ],
+    "svn_revision": "5155",
+    "platform_info": "x86_64-linux-5.10.0-27-amd64",
+    "build_info": "(local build)",
+    "argv": [
+      "smartctl",
+      "-a",
+      "-j",
+      "/dev/bus/0"
+    ],
+    "messages": [
+      {
+        "string": "/dev/bus/0: Unable to detect device type",
+        "severity": "error"
+      }
+    ],
+    "exit_status": 1
+  }
+}
+{
+  "json_format_version": [
+    1,
+    0
+  ],
+  "smartctl": {
+    "version": [
+      7,
+      2
+    ],
+    "svn_revision": "5155",
+    "platform_info": "x86_64-linux-5.10.0-27-amd64",
+    "build_info": "(local build)",
+    "argv": [
+      "smartctl",
+      "-a",
+      "-j",
+      "/dev/bus/0"
+    ],
+    "messages": [
+      {
+        "string": "/dev/bus/0: Unable to detect device type",
+        "severity": "error"
+      }
+    ],
+    "exit_status": 1
+  }
+}
+{
+  "json_format_version": [
+    1,
+    0
+  ],
+  "smartctl": {
+    "version": [
+      7,
+      2
+    ],
+    "svn_revision": "5155",
+    "platform_info": "x86_64-linux-5.10.0-27-amd64",
+    "build_info": "(local build)",
+    "argv": [
+      "smartctl",
+      "-a",
+      "-j",
+      "/dev/bus/0"
+    ],
+    "messages": [
+      {
+        "string": "/dev/bus/0: Unable to detect device type",
+        "severity": "error"
+      }
+    ],
+    "exit_status": 1
+  }
+}
+{
+  "json_format_version": [
+    1,
+    0
+  ],
+  "smartctl": {
+    "version": [
+      7,
+      2
+    ],
+    "svn_revision": "5155",
+    "platform_info": "x86_64-linux-5.10.0-27-amd64",
+    "build_info": "(local build)",
+    "argv": [
+      "smartctl",
+      "-a",
+      "-j",
+      "/dev/bus/0"
+    ],
+    "messages": [
+      {
+        "string": "/dev/bus/0: Unable to detect device type",
+        "severity": "error"
+      }
+    ],
+    "exit_status": 1
+  }
+}
+{
+  "json_format_version": [
+    1,
+    0
+  ],
+  "smartctl": {
+    "version": [
+      7,
+      2
+    ],
+    "svn_revision": "5155",
+    "platform_info": "x86_64-linux-5.10.0-27-amd64",
+    "build_info": "(local build)",
+    "argv": [
+      "smartctl",
+      "-a",
+      "-j",
+      "/dev/bus/0"
+    ],
+    "messages": [
+      {
+        "string": "/dev/bus/0: Unable to detect device type",
+        "severity": "error"
+      }
+    ],
+    "exit_status": 1
+  }
+}
+{
+  "json_format_version": [
+    1,
+    0
+  ],
+  "smartctl": {
+    "version": [
+      7,
+      2
+    ],
+    "svn_revision": "5155",
+    "platform_info": "x86_64-linux-5.10.0-27-amd64",
+    "build_info": "(local build)",
+    "argv": [
+      "smartctl",
+      "-a",
+      "-j",
+      "/dev/bus/0"
+    ],
+    "messages": [
+      {
+        "string": "/dev/bus/0: Unable to detect device type",
+        "severity": "error"
+      }
+    ],
+    "exit_status": 1
+  }
+}
+{
+  "json_format_version": [
+    1,
+    0
+  ],
+  "smartctl": {
+    "version": [
+      7,
+      2
+    ],
+    "svn_revision": "5155",
+    "platform_info": "x86_64-linux-5.10.0-27-amd64",
+    "build_info": "(local build)",
+    "argv": [
+      "smartctl",
+      "-a",
+      "-j",
+      "/dev/bus/0"
+    ],
+    "messages": [
+      {
+        "string": "/dev/bus/0: Unable to detect device type",
+        "severity": "error"
+      }
+    ],
+    "exit_status": 1
+  }
+}
+{
+  "json_format_version": [
+    1,
+    0
+  ],
+  "smartctl": {
+    "version": [
+      7,
+      2
+    ],
+    "svn_revision": "5155",
+    "platform_info": "x86_64-linux-5.10.0-27-amd64",
+    "build_info": "(local build)",
+    "argv": [
+      "smartctl",
+      "-a",
+      "-j",
+      "/dev/bus/0"
+    ],
+    "messages": [
+      {
+        "string": "/dev/bus/0: Unable to detect device type",
+        "severity": "error"
+      }
+    ],
+    "exit_status": 1
+  }
+}
+{
+  "json_format_version": [
+    1,
+    0
+  ],
+  "smartctl": {
+    "version": [
+      7,
+      2
+    ],
+    "svn_revision": "5155",
+    "platform_info": "x86_64-linux-5.10.0-27-amd64",
+    "build_info": "(local build)",
+    "argv": [
+      "smartctl",
+      "-a",
+      "-j",
+      "/dev/bus/0"
+    ],
+    "messages": [
+      {
+        "string": "/dev/bus/0: Unable to detect device type",
+        "severity": "error"
+      }
+    ],
+    "exit_status": 1
+  }
+}
+{
+  "json_format_version": [
+    1,
+    0
+  ],
+  "smartctl": {
+    "version": [
+      7,
+      2
+    ],
+    "svn_revision": "5155",
+    "platform_info": "x86_64-linux-5.10.0-27-amd64",
+    "build_info": "(local build)",
+    "argv": [
+      "smartctl",
+      "-a",
+      "-j",
+      "/dev/nvme0"
+    ],
+    "exit_status": 0
+  },
+  "device": {
+    "name": "/dev/nvme0",
+    "info_name": "/dev/nvme0",
+    "type": "nvme",
+    "protocol": "NVMe"
+  },
+  "model_name": "Micron_2200_MTFDHBA256TCK",
+  "serial_number": "19292D86AB6C",
+  "firmware_version": "P1MU003",
+  "nvme_pci_vendor": {
+    "id": 4932,
+    "subsystem_id": 4932
+  },
+  "nvme_ieee_oui_identifier": 41077,
+  "nvme_controller_id": 0,
+  "nvme_version": {
+    "string": "1.2.1",
+    "value": 66049
+  },
+  "nvme_number_of_namespaces": 1,
+  "nvme_namespaces": [
+    {
+      "id": 1,
+      "size": {
+        "blocks": 500118192,
+        "bytes": 256060514304
+      },
+      "capacity": {
+        "blocks": 500118192,
+        "bytes": 256060514304
+      },
+      "utilization": {
+        "blocks": 500118192,
+        "bytes": 256060514304
+      },
+      "formatted_lba_size": 512,
+      "eui64": {
+        "oui": 41077,
+        "ext_id": 5058767724
+      }
+    }
+  ],
+  "user_capacity": {
+    "blocks": 500118192,
+    "bytes": 256060514304
+  },
+  "logical_block_size": 512,
+  "local_time": {
+    "time_t": 1705567889,
+    "asctime": "Thu Jan 18 09:51:29 2024 CET"
+  },
+  "smart_status": {
+    "passed": true,
+    "nvme": {
+      "value": 0
+    }
+  },
+  "nvme_smart_health_information_log": {
+    "critical_warning": 0,
+    "temperature": 35,
+    "available_spare": 100,
+    "available_spare_threshold": 5,
+    "percentage_used": 6,
+    "data_units_read": 12020390,
+    "data_units_written": 13682990,
+    "host_reads": 47358412,
+    "host_writes": 151438288,
+    "controller_busy_time": 2974,
+    "power_cycles": 26,
+    "power_on_hours": 2357,
+    "unsafe_shutdowns": 3,
+    "media_errors": 0,
+    "num_err_log_entries": 0,
+    "warning_temp_time": 0,
+    "critical_comp_time": 0,
+    "temperature_sensors": [
+      35,
+      37
+    ]
+  },
+  "temperature": {
+    "current": 35
+  },
+  "power_cycle_count": 26,
+  "power_on_time": {
+    "hours": 2357
+  }
+}
+{
+  "json_format_version": [
+    1,
+    0
+  ],
+  "smartctl": {
+    "version": [
+      7,
+      2
+    ],
+    "svn_revision": "5155",
+    "platform_info": "x86_64-linux-5.10.0-27-amd64",
+    "build_info": "(local build)",
+    "argv": [
+      "smartctl",
+      "-a",
+      "-j",
+      "/dev/nvme1"
+    ],
+    "exit_status": 0
+  },
+  "device": {
+    "name": "/dev/nvme1",
+    "info_name": "/dev/nvme1",
+    "type": "nvme",
+    "protocol": "NVMe"
+  },
+  "model_name": "Micron_2200_MTFDHBA256TCK",
+  "serial_number": "19292D86AB48",
+  "firmware_version": "P1MU003",
+  "nvme_pci_vendor": {
+    "id": 4932,
+    "subsystem_id": 4932
+  },
+  "nvme_ieee_oui_identifier": 41077,
+  "nvme_controller_id": 0,
+  "nvme_version": {
+    "string": "1.2.1",
+    "value": 66049
+  },
+  "nvme_number_of_namespaces": 1,
+  "nvme_namespaces": [
+    {
+      "id": 1,
+      "size": {
+        "blocks": 500118192,
+        "bytes": 256060514304
+      },
+      "capacity": {
+        "blocks": 500118192,
+        "bytes": 256060514304
+      },
+      "utilization": {
+        "blocks": 500118192,
+        "bytes": 256060514304
+      },
+      "formatted_lba_size": 512,
+      "eui64": {
+        "oui": 41077,
+        "ext_id": 5058767688
+      }
+    }
+  ],
+  "user_capacity": {
+    "blocks": 500118192,
+    "bytes": 256060514304
+  },
+  "logical_block_size": 512,
+  "local_time": {
+    "time_t": 1705567889,
+    "asctime": "Thu Jan 18 09:51:29 2024 CET"
+  },
+  "smart_status": {
+    "passed": true,
+    "nvme": {
+      "value": 0
+    }
+  },
+  "nvme_smart_health_information_log": {
+    "critical_warning": 0,
+    "temperature": 38,
+    "available_spare": 100,
+    "available_spare_threshold": 5,
+    "percentage_used": 7,
+    "data_units_read": 11102372,
+    "data_units_written": 14172228,
+    "host_reads": 43255583,
+    "host_writes": 152013097,
+    "controller_busy_time": 2959,
+    "power_cycles": 26,
+    "power_on_hours": 2356,
+    "unsafe_shutdowns": 3,
+    "media_errors": 0,
+    "num_err_log_entries": 0,
+    "warning_temp_time": 0,
+    "critical_comp_time": 0,
+    "temperature_sensors": [
+      38,
+      40
+    ]
+  },
+  "temperature": {
+    "current": 38
+  },
+  "power_cycle_count": 26,
+  "power_on_time": {
+    "hours": 2356
+  }
+}
+
+
+## smartctl -a $DEVICE_NAME -d scsi -j
+{
+  "json_format_version": [
+    1,
+    0
+  ],
+  "smartctl": {
+    "version": [
+      7,
+      2
+    ],
+    "svn_revision": "5155",
+    "platform_info": "x86_64-linux-5.10.0-27-amd64",
+    "build_info": "(local build)",
+    "argv": [
+      "smartctl",
+      "-a",
+      "-j",
+      "/dev/sda",
+      "-d",
+      "scsi"
+    ],
+    "exit_status": 4
+  },
+  "device": {
+    "name": "/dev/sda",
+    "info_name": "/dev/sda",
+    "type": "scsi",
+    "protocol": "SCSI"
+  },
+  "vendor": "AVAGO",
+  "product": "MR9380-8e",
+  "model_name": "AVAGO MR9380-8e",
+  "revision": "4.68",
+  "scsi_version": "SPC-3",
+  "user_capacity": {
+    "blocks": 156254601216,
+    "bytes": 80002355822592
+  },
+  "logical_block_size": 512,
+  "physical_block_size": 4096,
+  "serial_number": "00f32e146d8215e82470c6f20eb00506",
+  "device_type": {
+    "scsi_value": 0,
+    "name": "disk"
+  },
+  "local_time": {
+    "time_t": 1705568131,
+    "asctime": "Thu Jan 18 09:55:31 2024 CET"
+  },
+  "temperature": {
+    "current": 0,
+    "drive_trip": 0
+  }
+}
+{
+  "json_format_version": [
+    1,
+    0
+  ],
+  "smartctl": {
+    "version": [
+      7,
+      2
+    ],
+    "svn_revision": "5155",
+    "platform_info": "x86_64-linux-5.10.0-27-amd64",
+    "build_info": "(local build)",
+    "argv": [
+      "smartctl",
+      "-a",
+      "-j",
+      "/dev/sdb",
+      "-d",
+      "scsi"
+    ],
+    "exit_status": 0
+  },
+  "device": {
+    "name": "/dev/sdb",
+    "info_name": "/dev/sdb",
+    "type": "scsi",
+    "protocol": "SCSI"
+  },
+  "vendor": "SEAGATE",
+  "product": "ST12000NM002G",
+  "model_name": "SEAGATE ST12000NM002G",
+  "revision": "E003",
+  "scsi_version": "SPC-5",
+  "user_capacity": {
+    "blocks": 23437770752,
+    "bytes": 12000138625024
+  },
+  "logical_block_size": 512,
+  "physical_block_size": 4096,
+  "rotation_rate": 7200,
+  "form_factor": {
+    "scsi_value": 2,
+    "name": "3.5 inches"
+  },
+  "serial_number": "ZLW2GVJY0000C2231WWJ",
+  "device_type": {
+    "scsi_value": 0,
+    "name": "disk"
+  },
+  "local_time": {
+    "time_t": 1705568131,
+    "asctime": "Thu Jan 18 09:55:31 2024 CET"
+  },
+  "smart_status": {
+    "passed": true
+  },
+  "temperature": {
+    "current": 30,
+    "drive_trip": 60
+  },
+  "power_on_time": {
+    "hours": 15840,
+    "minutes": 5
+  },
+  "scsi_grown_defect_list": 0,
+  "scsi_error_counter_log": {
+    "read": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "33621.587",
+      "total_uncorrected_errors": 0
+    },
+    "write": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "2742.278",
+      "total_uncorrected_errors": 0
+    },
+    "verify": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "0.689",
+      "total_uncorrected_errors": 0
+    }
+  }
+}
+{
+  "json_format_version": [
+    1,
+    0
+  ],
+  "smartctl": {
+    "version": [
+      7,
+      2
+    ],
+    "svn_revision": "5155",
+    "platform_info": "x86_64-linux-5.10.0-27-amd64",
+    "build_info": "(local build)",
+    "argv": [
+      "smartctl",
+      "-a",
+      "-j",
+      "/dev/sdc",
+      "-d",
+      "scsi"
+    ],
+    "exit_status": 0
+  },
+  "device": {
+    "name": "/dev/sdc",
+    "info_name": "/dev/sdc",
+    "type": "scsi",
+    "protocol": "SCSI"
+  },
+  "vendor": "SEAGATE",
+  "product": "ST12000NM002G",
+  "model_name": "SEAGATE ST12000NM002G",
+  "revision": "E003",
+  "scsi_version": "SPC-5",
+  "user_capacity": {
+    "blocks": 23437770752,
+    "bytes": 12000138625024
+  },
+  "logical_block_size": 512,
+  "physical_block_size": 4096,
+  "rotation_rate": 7200,
+  "form_factor": {
+    "scsi_value": 2,
+    "name": "3.5 inches"
+  },
+  "serial_number": "ZLW2GVA10000C2231WUM",
+  "device_type": {
+    "scsi_value": 0,
+    "name": "disk"
+  },
+  "local_time": {
+    "time_t": 1705568131,
+    "asctime": "Thu Jan 18 09:55:31 2024 CET"
+  },
+  "smart_status": {
+    "passed": true
+  },
+  "temperature": {
+    "current": 32,
+    "drive_trip": 60
+  },
+  "power_on_time": {
+    "hours": 15840,
+    "minutes": 23
+  },
+  "scsi_grown_defect_list": 0,
+  "scsi_error_counter_log": {
+    "read": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "33627.791",
+      "total_uncorrected_errors": 0
+    },
+    "write": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "2750.804",
+      "total_uncorrected_errors": 0
+    },
+    "verify": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "0.669",
+      "total_uncorrected_errors": 0
+    }
+  }
+}
+{
+  "json_format_version": [
+    1,
+    0
+  ],
+  "smartctl": {
+    "version": [
+      7,
+      2
+    ],
+    "svn_revision": "5155",
+    "platform_info": "x86_64-linux-5.10.0-27-amd64",
+    "build_info": "(local build)",
+    "argv": [
+      "smartctl",
+      "-a",
+      "-j",
+      "/dev/sdd",
+      "-d",
+      "scsi"
+    ],
+    "exit_status": 0
+  },
+  "device": {
+    "name": "/dev/sdd",
+    "info_name": "/dev/sdd",
+    "type": "scsi",
+    "protocol": "SCSI"
+  },
+  "vendor": "SEAGATE",
+  "product": "ST12000NM002G",
+  "model_name": "SEAGATE ST12000NM002G",
+  "revision": "E003",
+  "scsi_version": "SPC-5",
+  "user_capacity": {
+    "blocks": 23437770752,
+    "bytes": 12000138625024
+  },
+  "logical_block_size": 512,
+  "physical_block_size": 4096,
+  "rotation_rate": 7200,
+  "form_factor": {
+    "scsi_value": 2,
+    "name": "3.5 inches"
+  },
+  "serial_number": "ZTN102FW0000C2233L0B",
+  "device_type": {
+    "scsi_value": 0,
+    "name": "disk"
+  },
+  "local_time": {
+    "time_t": 1705568132,
+    "asctime": "Thu Jan 18 09:55:32 2024 CET"
+  },
+  "smart_status": {
+    "passed": true
+  },
+  "temperature": {
+    "current": 31,
+    "drive_trip": 60
+  },
+  "power_on_time": {
+    "hours": 15840,
+    "minutes": 6
+  },
+  "scsi_grown_defect_list": 0,
+  "scsi_error_counter_log": {
+    "read": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "33624.876",
+      "total_uncorrected_errors": 0
+    },
+    "write": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "2710.963",
+      "total_uncorrected_errors": 0
+    },
+    "verify": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "0.653",
+      "total_uncorrected_errors": 0
+    }
+  }
+}
+{
+  "json_format_version": [
+    1,
+    0
+  ],
+  "smartctl": {
+    "version": [
+      7,
+      2
+    ],
+    "svn_revision": "5155",
+    "platform_info": "x86_64-linux-5.10.0-27-amd64",
+    "build_info": "(local build)",
+    "argv": [
+      "smartctl",
+      "-a",
+      "-j",
+      "/dev/sde",
+      "-d",
+      "scsi"
+    ],
+    "exit_status": 0
+  },
+  "device": {
+    "name": "/dev/sde",
+    "info_name": "/dev/sde",
+    "type": "scsi",
+    "protocol": "SCSI"
+  },
+  "vendor": "SEAGATE",
+  "product": "ST12000NM002G",
+  "model_name": "SEAGATE ST12000NM002G",
+  "revision": "E003",
+  "scsi_version": "SPC-5",
+  "user_capacity": {
+    "blocks": 23437770752,
+    "bytes": 12000138625024
+  },
+  "logical_block_size": 512,
+  "physical_block_size": 4096,
+  "rotation_rate": 7200,
+  "form_factor": {
+    "scsi_value": 2,
+    "name": "3.5 inches"
+  },
+  "serial_number": "ZTN102Y70000C2235UN6",
+  "device_type": {
+    "scsi_value": 0,
+    "name": "disk"
+  },
+  "local_time": {
+    "time_t": 1705568133,
+    "asctime": "Thu Jan 18 09:55:33 2024 CET"
+  },
+  "smart_status": {
+    "passed": true
+  },
+  "temperature": {
+    "current": 31,
+    "drive_trip": 60
+  },
+  "power_on_time": {
+    "hours": 15840,
+    "minutes": 9
+  },
+  "scsi_grown_defect_list": 0,
+  "scsi_error_counter_log": {
+    "read": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "33623.456",
+      "total_uncorrected_errors": 0
+    },
+    "write": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "2710.877",
+      "total_uncorrected_errors": 0
+    },
+    "verify": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "0.659",
+      "total_uncorrected_errors": 0
+    }
+  }
+}
+{
+  "json_format_version": [
+    1,
+    0
+  ],
+  "smartctl": {
+    "version": [
+      7,
+      2
+    ],
+    "svn_revision": "5155",
+    "platform_info": "x86_64-linux-5.10.0-27-amd64",
+    "build_info": "(local build)",
+    "argv": [
+      "smartctl",
+      "-a",
+      "-j",
+      "/dev/sdf",
+      "-d",
+      "scsi"
+    ],
+    "exit_status": 0
+  },
+  "device": {
+    "name": "/dev/sdf",
+    "info_name": "/dev/sdf",
+    "type": "scsi",
+    "protocol": "SCSI"
+  },
+  "vendor": "SEAGATE",
+  "product": "ST12000NM002G",
+  "model_name": "SEAGATE ST12000NM002G",
+  "revision": "E003",
+  "scsi_version": "SPC-5",
+  "user_capacity": {
+    "blocks": 23437770752,
+    "bytes": 12000138625024
+  },
+  "logical_block_size": 512,
+  "physical_block_size": 4096,
+  "rotation_rate": 7200,
+  "form_factor": {
+    "scsi_value": 2,
+    "name": "3.5 inches"
+  },
+  "serial_number": "ZTN101R60000C2179K5S",
+  "device_type": {
+    "scsi_value": 0,
+    "name": "disk"
+  },
+  "local_time": {
+    "time_t": 1705568134,
+    "asctime": "Thu Jan 18 09:55:34 2024 CET"
+  },
+  "smart_status": {
+    "passed": true
+  },
+  "temperature": {
+    "current": 29,
+    "drive_trip": 60
+  },
+  "power_on_time": {
+    "hours": 15840,
+    "minutes": 3
+  },
+  "scsi_grown_defect_list": 0,
+  "scsi_error_counter_log": {
+    "read": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "33615.532",
+      "total_uncorrected_errors": 0
+    },
+    "write": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "2728.558",
+      "total_uncorrected_errors": 0
+    },
+    "verify": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "0.659",
+      "total_uncorrected_errors": 0
+    }
+  }
+}
+{
+  "json_format_version": [
+    1,
+    0
+  ],
+  "smartctl": {
+    "version": [
+      7,
+      2
+    ],
+    "svn_revision": "5155",
+    "platform_info": "x86_64-linux-5.10.0-27-amd64",
+    "build_info": "(local build)",
+    "argv": [
+      "smartctl",
+      "-a",
+      "-j",
+      "/dev/sdg",
+      "-d",
+      "scsi"
+    ],
+    "exit_status": 0
+  },
+  "device": {
+    "name": "/dev/sdg",
+    "info_name": "/dev/sdg",
+    "type": "scsi",
+    "protocol": "SCSI"
+  },
+  "vendor": "SEAGATE",
+  "product": "ST12000NM002G",
+  "model_name": "SEAGATE ST12000NM002G",
+  "revision": "E003",
+  "scsi_version": "SPC-5",
+  "user_capacity": {
+    "blocks": 23437770752,
+    "bytes": 12000138625024
+  },
+  "logical_block_size": 512,
+  "physical_block_size": 4096,
+  "rotation_rate": 7200,
+  "form_factor": {
+    "scsi_value": 2,
+    "name": "3.5 inches"
+  },
+  "serial_number": "ZTN0X61Y0000C2180BAM",
+  "device_type": {
+    "scsi_value": 0,
+    "name": "disk"
+  },
+  "local_time": {
+    "time_t": 1705568135,
+    "asctime": "Thu Jan 18 09:55:35 2024 CET"
+  },
+  "smart_status": {
+    "passed": true
+  },
+  "temperature": {
+    "current": 27,
+    "drive_trip": 60
+  },
+  "power_on_time": {
+    "hours": 15839,
+    "minutes": 54
+  },
+  "scsi_grown_defect_list": 0,
+  "scsi_error_counter_log": {
+    "read": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "33621.646",
+      "total_uncorrected_errors": 0
+    },
+    "write": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "2708.366",
+      "total_uncorrected_errors": 0
+    },
+    "verify": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "0.686",
+      "total_uncorrected_errors": 0
+    }
+  }
+}
+{
+  "json_format_version": [
+    1,
+    0
+  ],
+  "smartctl": {
+    "version": [
+      7,
+      2
+    ],
+    "svn_revision": "5155",
+    "platform_info": "x86_64-linux-5.10.0-27-amd64",
+    "build_info": "(local build)",
+    "argv": [
+      "smartctl",
+      "-a",
+      "-j",
+      "/dev/sdh",
+      "-d",
+      "scsi"
+    ],
+    "exit_status": 0
+  },
+  "device": {
+    "name": "/dev/sdh",
+    "info_name": "/dev/sdh",
+    "type": "scsi",
+    "protocol": "SCSI"
+  },
+  "vendor": "SEAGATE",
+  "product": "ST12000NM002G",
+  "model_name": "SEAGATE ST12000NM002G",
+  "revision": "E003",
+  "scsi_version": "SPC-5",
+  "user_capacity": {
+    "blocks": 23437770752,
+    "bytes": 12000138625024
+  },
+  "logical_block_size": 512,
+  "physical_block_size": 4096,
+  "rotation_rate": 7200,
+  "form_factor": {
+    "scsi_value": 2,
+    "name": "3.5 inches"
+  },
+  "serial_number": "ZTN102T80000C2235Z2H",
+  "device_type": {
+    "scsi_value": 0,
+    "name": "disk"
+  },
+  "local_time": {
+    "time_t": 1705568136,
+    "asctime": "Thu Jan 18 09:55:36 2024 CET"
+  },
+  "smart_status": {
+    "passed": true
+  },
+  "temperature": {
+    "current": 30,
+    "drive_trip": 60
+  },
+  "power_on_time": {
+    "hours": 15840,
+    "minutes": 3
+  },
+  "scsi_grown_defect_list": 0,
+  "scsi_error_counter_log": {
+    "read": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "33624.478",
+      "total_uncorrected_errors": 0
+    },
+    "write": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "2714.312",
+      "total_uncorrected_errors": 0
+    },
+    "verify": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "0.635",
+      "total_uncorrected_errors": 0
+    }
+  }
+}
+{
+  "json_format_version": [
+    1,
+    0
+  ],
+  "smartctl": {
+    "version": [
+      7,
+      2
+    ],
+    "svn_revision": "5155",
+    "platform_info": "x86_64-linux-5.10.0-27-amd64",
+    "build_info": "(local build)",
+    "argv": [
+      "smartctl",
+      "-a",
+      "-j",
+      "/dev/sdi",
+      "-d",
+      "scsi"
+    ],
+    "exit_status": 0
+  },
+  "device": {
+    "name": "/dev/sdi",
+    "info_name": "/dev/sdi",
+    "type": "scsi",
+    "protocol": "SCSI"
+  },
+  "vendor": "SEAGATE",
+  "product": "ST12000NM002G",
+  "model_name": "SEAGATE ST12000NM002G",
+  "revision": "E003",
+  "scsi_version": "SPC-5",
+  "user_capacity": {
+    "blocks": 23437770752,
+    "bytes": 12000138625024
+  },
+  "logical_block_size": 512,
+  "physical_block_size": 4096,
+  "rotation_rate": 7200,
+  "form_factor": {
+    "scsi_value": 2,
+    "name": "3.5 inches"
+  },
+  "serial_number": "ZTN102XG0000C2235WTW",
+  "device_type": {
+    "scsi_value": 0,
+    "name": "disk"
+  },
+  "local_time": {
+    "time_t": 1705568136,
+    "asctime": "Thu Jan 18 09:55:36 2024 CET"
+  },
+  "smart_status": {
+    "passed": true
+  },
+  "temperature": {
+    "current": 31,
+    "drive_trip": 60
+  },
+  "power_on_time": {
+    "hours": 15840,
+    "minutes": 15
+  },
+  "scsi_grown_defect_list": 0,
+  "scsi_error_counter_log": {
+    "read": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "33614.203",
+      "total_uncorrected_errors": 0
+    },
+    "write": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "2705.450",
+      "total_uncorrected_errors": 0
+    },
+    "verify": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "0.657",
+      "total_uncorrected_errors": 0
+    }
+  }
+}
+{
+  "json_format_version": [
+    1,
+    0
+  ],
+  "smartctl": {
+    "version": [
+      7,
+      2
+    ],
+    "svn_revision": "5155",
+    "platform_info": "x86_64-linux-5.10.0-27-amd64",
+    "build_info": "(local build)",
+    "argv": [
+      "smartctl",
+      "-a",
+      "-j",
+      "/dev/sdj",
+      "-d",
+      "scsi"
+    ],
+    "exit_status": 0
+  },
+  "device": {
+    "name": "/dev/sdj",
+    "info_name": "/dev/sdj",
+    "type": "scsi",
+    "protocol": "SCSI"
+  },
+  "vendor": "SEAGATE",
+  "product": "ST12000NM002G",
+  "model_name": "SEAGATE ST12000NM002G",
+  "revision": "E003",
+  "scsi_version": "SPC-5",
+  "user_capacity": {
+    "blocks": 23437770752,
+    "bytes": 12000138625024
+  },
+  "logical_block_size": 512,
+  "physical_block_size": 4096,
+  "rotation_rate": 7200,
+  "form_factor": {
+    "scsi_value": 2,
+    "name": "3.5 inches"
+  },
+  "serial_number": "ZTN0X6040000C2180A21",
+  "device_type": {
+    "scsi_value": 0,
+    "name": "disk"
+  },
+  "local_time": {
+    "time_t": 1705568137,
+    "asctime": "Thu Jan 18 09:55:37 2024 CET"
+  },
+  "smart_status": {
+    "passed": true
+  },
+  "temperature": {
+    "current": 31,
+    "drive_trip": 60
+  },
+  "power_on_time": {
+    "hours": 15839,
+    "minutes": 54
+  },
+  "scsi_grown_defect_list": 0,
+  "scsi_error_counter_log": {
+    "read": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "33626.607",
+      "total_uncorrected_errors": 0
+    },
+    "write": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "2741.292",
+      "total_uncorrected_errors": 0
+    },
+    "verify": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "0.638",
+      "total_uncorrected_errors": 0
+    }
+  }
+}
+{
+  "json_format_version": [
+    1,
+    0
+  ],
+  "smartctl": {
+    "version": [
+      7,
+      2
+    ],
+    "svn_revision": "5155",
+    "platform_info": "x86_64-linux-5.10.0-27-amd64",
+    "build_info": "(local build)",
+    "argv": [
+      "smartctl",
+      "-a",
+      "-j",
+      "/dev/sdk",
+      "-d",
+      "scsi"
+    ],
+    "exit_status": 0
+  },
+  "device": {
+    "name": "/dev/sdk",
+    "info_name": "/dev/sdk",
+    "type": "scsi",
+    "protocol": "SCSI"
+  },
+  "vendor": "SEAGATE",
+  "product": "ST12000NM002G",
+  "model_name": "SEAGATE ST12000NM002G",
+  "revision": "E003",
+  "scsi_version": "SPC-5",
+  "user_capacity": {
+    "blocks": 23437770752,
+    "bytes": 12000138625024
+  },
+  "logical_block_size": 512,
+  "physical_block_size": 4096,
+  "rotation_rate": 7200,
+  "form_factor": {
+    "scsi_value": 2,
+    "name": "3.5 inches"
+  },
+  "serial_number": "ZTN102WT0000C2235WUR",
+  "device_type": {
+    "scsi_value": 0,
+    "name": "disk"
+  },
+  "local_time": {
+    "time_t": 1705568138,
+    "asctime": "Thu Jan 18 09:55:38 2024 CET"
+  },
+  "smart_status": {
+    "passed": true
+  },
+  "temperature": {
+    "current": 30,
+    "drive_trip": 60
+  },
+  "power_on_time": {
+    "hours": 15840,
+    "minutes": 4
+  },
+  "scsi_grown_defect_list": 0,
+  "scsi_error_counter_log": {
+    "read": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "33627.048",
+      "total_uncorrected_errors": 0
+    },
+    "write": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "2732.920",
+      "total_uncorrected_errors": 0
+    },
+    "verify": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "0.668",
+      "total_uncorrected_errors": 0
+    }
+  }
+}
+{
+  "json_format_version": [
+    1,
+    0
+  ],
+  "smartctl": {
+    "version": [
+      7,
+      2
+    ],
+    "svn_revision": "5155",
+    "platform_info": "x86_64-linux-5.10.0-27-amd64",
+    "build_info": "(local build)",
+    "argv": [
+      "smartctl",
+      "-a",
+      "-j",
+      "/dev/sdl",
+      "-d",
+      "scsi"
+    ],
+    "exit_status": 0
+  },
+  "device": {
+    "name": "/dev/sdl",
+    "info_name": "/dev/sdl",
+    "type": "scsi",
+    "protocol": "SCSI"
+  },
+  "vendor": "SEAGATE",
+  "product": "ST12000NM002G",
+  "model_name": "SEAGATE ST12000NM002G",
+  "revision": "E003",
+  "scsi_version": "SPC-5",
+  "user_capacity": {
+    "blocks": 23437770752,
+    "bytes": 12000138625024
+  },
+  "logical_block_size": 512,
+  "physical_block_size": 4096,
+  "rotation_rate": 7200,
+  "form_factor": {
+    "scsi_value": 2,
+    "name": "3.5 inches"
+  },
+  "serial_number": "ZTN102GC0000C2236M68",
+  "device_type": {
+    "scsi_value": 0,
+    "name": "disk"
+  },
+  "local_time": {
+    "time_t": 1705568139,
+    "asctime": "Thu Jan 18 09:55:39 2024 CET"
+  },
+  "smart_status": {
+    "passed": true
+  },
+  "temperature": {
+    "current": 29,
+    "drive_trip": 60
+  },
+  "power_on_time": {
+    "hours": 15840,
+    "minutes": 6
+  },
+  "scsi_grown_defect_list": 0,
+  "scsi_error_counter_log": {
+    "read": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "33617.767",
+      "total_uncorrected_errors": 0
+    },
+    "write": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "2717.217",
+      "total_uncorrected_errors": 0
+    },
+    "verify": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "0.673",
+      "total_uncorrected_errors": 0
+    }
+  }
+}
+{
+  "json_format_version": [
+    1,
+    0
+  ],
+  "smartctl": {
+    "version": [
+      7,
+      2
+    ],
+    "svn_revision": "5155",
+    "platform_info": "x86_64-linux-5.10.0-27-amd64",
+    "build_info": "(local build)",
+    "argv": [
+      "smartctl",
+      "-a",
+      "-j",
+      "/dev/sdm",
+      "-d",
+      "scsi"
+    ],
+    "exit_status": 0
+  },
+  "device": {
+    "name": "/dev/sdm",
+    "info_name": "/dev/sdm",
+    "type": "scsi",
+    "protocol": "SCSI"
+  },
+  "vendor": "SEAGATE",
+  "product": "ST12000NM002G",
+  "model_name": "SEAGATE ST12000NM002G",
+  "revision": "E003",
+  "scsi_version": "SPC-5",
+  "user_capacity": {
+    "blocks": 23437770752,
+    "bytes": 12000138625024
+  },
+  "logical_block_size": 512,
+  "physical_block_size": 4096,
+  "rotation_rate": 7200,
+  "form_factor": {
+    "scsi_value": 2,
+    "name": "3.5 inches"
+  },
+  "serial_number": "ZTN102W90000C2235WML",
+  "device_type": {
+    "scsi_value": 0,
+    "name": "disk"
+  },
+  "local_time": {
+    "time_t": 1705568140,
+    "asctime": "Thu Jan 18 09:55:40 2024 CET"
+  },
+  "smart_status": {
+    "passed": true
+  },
+  "temperature": {
+    "current": 27,
+    "drive_trip": 60
+  },
+  "power_on_time": {
+    "hours": 15840,
+    "minutes": 8
+  },
+  "scsi_grown_defect_list": 0,
+  "scsi_error_counter_log": {
+    "read": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "33619.963",
+      "total_uncorrected_errors": 0
+    },
+    "write": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "2701.985",
+      "total_uncorrected_errors": 0
+    },
+    "verify": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "0.672",
+      "total_uncorrected_errors": 0
+    }
+  }
+}
+{
+  "json_format_version": [
+    1,
+    0
+  ],
+  "smartctl": {
+    "version": [
+      7,
+      2
+    ],
+    "svn_revision": "5155",
+    "platform_info": "x86_64-linux-5.10.0-27-amd64",
+    "build_info": "(local build)",
+    "argv": [
+      "smartctl",
+      "-a",
+      "-j",
+      "/dev/bus/0",
+      "-d",
+      "scsi"
+    ],
+    "messages": [
+      {
+        "string": "Smartctl open device: /dev/bus/0 failed: No such device",
+        "severity": "error"
+      }
+    ],
+    "exit_status": 2
+  }
+}
+{
+  "json_format_version": [
+    1,
+    0
+  ],
+  "smartctl": {
+    "version": [
+      7,
+      2
+    ],
+    "svn_revision": "5155",
+    "platform_info": "x86_64-linux-5.10.0-27-amd64",
+    "build_info": "(local build)",
+    "argv": [
+      "smartctl",
+      "-a",
+      "-j",
+      "/dev/bus/0",
+      "-d",
+      "scsi"
+    ],
+    "messages": [
+      {
+        "string": "Smartctl open device: /dev/bus/0 failed: No such device",
+        "severity": "error"
+      }
+    ],
+    "exit_status": 2
+  }
+}
+{
+  "json_format_version": [
+    1,
+    0
+  ],
+  "smartctl": {
+    "version": [
+      7,
+      2
+    ],
+    "svn_revision": "5155",
+    "platform_info": "x86_64-linux-5.10.0-27-amd64",
+    "build_info": "(local build)",
+    "argv": [
+      "smartctl",
+      "-a",
+      "-j",
+      "/dev/bus/0",
+      "-d",
+      "scsi"
+    ],
+    "messages": [
+      {
+        "string": "Smartctl open device: /dev/bus/0 failed: No such device",
+        "severity": "error"
+      }
+    ],
+    "exit_status": 2
+  }
+}
+{
+  "json_format_version": [
+    1,
+    0
+  ],
+  "smartctl": {
+    "version": [
+      7,
+      2
+    ],
+    "svn_revision": "5155",
+    "platform_info": "x86_64-linux-5.10.0-27-amd64",
+    "build_info": "(local build)",
+    "argv": [
+      "smartctl",
+      "-a",
+      "-j",
+      "/dev/bus/0",
+      "-d",
+      "scsi"
+    ],
+    "messages": [
+      {
+        "string": "Smartctl open device: /dev/bus/0 failed: No such device",
+        "severity": "error"
+      }
+    ],
+    "exit_status": 2
+  }
+}
+{
+  "json_format_version": [
+    1,
+    0
+  ],
+  "smartctl": {
+    "version": [
+      7,
+      2
+    ],
+    "svn_revision": "5155",
+    "platform_info": "x86_64-linux-5.10.0-27-amd64",
+    "build_info": "(local build)",
+    "argv": [
+      "smartctl",
+      "-a",
+      "-j",
+      "/dev/bus/0",
+      "-d",
+      "scsi"
+    ],
+    "messages": [
+      {
+        "string": "Smartctl open device: /dev/bus/0 failed: No such device",
+        "severity": "error"
+      }
+    ],
+    "exit_status": 2
+  }
+}
+{
+  "json_format_version": [
+    1,
+    0
+  ],
+  "smartctl": {
+    "version": [
+      7,
+      2
+    ],
+    "svn_revision": "5155",
+    "platform_info": "x86_64-linux-5.10.0-27-amd64",
+    "build_info": "(local build)",
+    "argv": [
+      "smartctl",
+      "-a",
+      "-j",
+      "/dev/bus/0",
+      "-d",
+      "scsi"
+    ],
+    "messages": [
+      {
+        "string": "Smartctl open device: /dev/bus/0 failed: No such device",
+        "severity": "error"
+      }
+    ],
+    "exit_status": 2
+  }
+}
+{
+  "json_format_version": [
+    1,
+    0
+  ],
+  "smartctl": {
+    "version": [
+      7,
+      2
+    ],
+    "svn_revision": "5155",
+    "platform_info": "x86_64-linux-5.10.0-27-amd64",
+    "build_info": "(local build)",
+    "argv": [
+      "smartctl",
+      "-a",
+      "-j",
+      "/dev/bus/0",
+      "-d",
+      "scsi"
+    ],
+    "messages": [
+      {
+        "string": "Smartctl open device: /dev/bus/0 failed: No such device",
+        "severity": "error"
+      }
+    ],
+    "exit_status": 2
+  }
+}
+{
+  "json_format_version": [
+    1,
+    0
+  ],
+  "smartctl": {
+    "version": [
+      7,
+      2
+    ],
+    "svn_revision": "5155",
+    "platform_info": "x86_64-linux-5.10.0-27-amd64",
+    "build_info": "(local build)",
+    "argv": [
+      "smartctl",
+      "-a",
+      "-j",
+      "/dev/bus/0",
+      "-d",
+      "scsi"
+    ],
+    "messages": [
+      {
+        "string": "Smartctl open device: /dev/bus/0 failed: No such device",
+        "severity": "error"
+      }
+    ],
+    "exit_status": 2
+  }
+}
+{
+  "json_format_version": [
+    1,
+    0
+  ],
+  "smartctl": {
+    "version": [
+      7,
+      2
+    ],
+    "svn_revision": "5155",
+    "platform_info": "x86_64-linux-5.10.0-27-amd64",
+    "build_info": "(local build)",
+    "argv": [
+      "smartctl",
+      "-a",
+      "-j",
+      "/dev/bus/0",
+      "-d",
+      "scsi"
+    ],
+    "messages": [
+      {
+        "string": "Smartctl open device: /dev/bus/0 failed: No such device",
+        "severity": "error"
+      }
+    ],
+    "exit_status": 2
+  }
+}
+{
+  "json_format_version": [
+    1,
+    0
+  ],
+  "smartctl": {
+    "version": [
+      7,
+      2
+    ],
+    "svn_revision": "5155",
+    "platform_info": "x86_64-linux-5.10.0-27-amd64",
+    "build_info": "(local build)",
+    "argv": [
+      "smartctl",
+      "-a",
+      "-j",
+      "/dev/bus/0",
+      "-d",
+      "scsi"
+    ],
+    "messages": [
+      {
+        "string": "Smartctl open device: /dev/bus/0 failed: No such device",
+        "severity": "error"
+      }
+    ],
+    "exit_status": 2
+  }
+}
+{
+  "json_format_version": [
+    1,
+    0
+  ],
+  "smartctl": {
+    "version": [
+      7,
+      2
+    ],
+    "svn_revision": "5155",
+    "platform_info": "x86_64-linux-5.10.0-27-amd64",
+    "build_info": "(local build)",
+    "argv": [
+      "smartctl",
+      "-a",
+      "-j",
+      "/dev/nvme0",
+      "-d",
+      "scsi"
+    ],
+    "exit_status": 2
+  },
+  "device": {
+    "name": "/dev/nvme0",
+    "info_name": "/dev/nvme0",
+    "type": "scsi",
+    "protocol": "SCSI"
+  }
+}
+{
+  "json_format_version": [
+    1,
+    0
+  ],
+  "smartctl": {
+    "version": [
+      7,
+      2
+    ],
+    "svn_revision": "5155",
+    "platform_info": "x86_64-linux-5.10.0-27-amd64",
+    "build_info": "(local build)",
+    "argv": [
+      "smartctl",
+      "-a",
+      "-j",
+      "/dev/nvme1",
+      "-d",
+      "scsi"
+    ],
+    "exit_status": 2
+  },
+  "device": {
+    "name": "/dev/nvme1",
+    "info_name": "/dev/nvme1",
+    "type": "scsi",
+    "protocol": "SCSI"
+  }
+}
+
+
+## smartctl -a $DEVICE_NAME -d scsi -j
+{
+  "json_format_version": [
+    1,
+    0
+  ],
+  "smartctl": {
+    "version": [
+      7,
+      2
+    ],
+    "svn_revision": "5155",
+    "platform_info": "x86_64-linux-5.10.0-27-amd64",
+    "build_info": "(local build)",
+    "argv": [
+      "smartctl",
+      "-a",
+      "-j",
+      "/dev/bus/0",
+      "-d",
+      "megaraid,10"
+    ],
+    "exit_status": 0
+  },
+  "device": {
+    "name": "/dev/bus/0",
+    "info_name": "/dev/bus/0 [megaraid_disk_10]",
+    "type": "megaraid,10",
+    "protocol": "SCSI"
+  },
+  "vendor": "SEAGATE",
+  "product": "ST10000NM0096",
+  "model_name": "SEAGATE ST10000NM0096",
+  "revision": "E005",
+  "scsi_version": "SPC-4",
+  "user_capacity": {
+    "blocks": 19532873728,
+    "bytes": 10000831348736
+  },
+  "logical_block_size": 512,
+  "physical_block_size": 4096,
+  "rotation_rate": 7200,
+  "form_factor": {
+    "scsi_value": 2,
+    "name": "3.5 inches"
+  },
+  "serial_number": "ZA2AG78L0000C921NXN4",
+  "device_type": {
+    "scsi_value": 0,
+    "name": "disk"
+  },
+  "local_time": {
+    "time_t": 1705568286,
+    "asctime": "Thu Jan 18 09:58:06 2024 CET"
+  },
+  "smart_status": {
+    "passed": true
+  },
+  "temperature": {
+    "current": 25,
+    "drive_trip": 60
+  },
+  "power_on_time": {
+    "hours": 38877,
+    "minutes": 12
+  },
+  "scsi_grown_defect_list": 3,
+  "scsi_error_counter_log": {
+    "read": {
+      "errors_corrected_by_eccfast": 1283198485,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 1283198485,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "902572.220",
+      "total_uncorrected_errors": 0
+    },
+    "write": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "88370.406",
+      "total_uncorrected_errors": 0
+    },
+    "verify": {
+      "errors_corrected_by_eccfast": 116017892,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 116017892,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "880908.542",
+      "total_uncorrected_errors": 0
+    }
+  }
+}
+{
+  "json_format_version": [
+    1,
+    0
+  ],
+  "smartctl": {
+    "version": [
+      7,
+      2
+    ],
+    "svn_revision": "5155",
+    "platform_info": "x86_64-linux-5.10.0-27-amd64",
+    "build_info": "(local build)",
+    "argv": [
+      "smartctl",
+      "-a",
+      "-j",
+      "/dev/bus/0",
+      "-d",
+      "megaraid,11"
+    ],
+    "exit_status": 0
+  },
+  "device": {
+    "name": "/dev/bus/0",
+    "info_name": "/dev/bus/0 [megaraid_disk_11]",
+    "type": "megaraid,11",
+    "protocol": "SCSI"
+  },
+  "vendor": "SEAGATE",
+  "product": "ST10000NM0096",
+  "model_name": "SEAGATE ST10000NM0096",
+  "revision": "E005",
+  "scsi_version": "SPC-4",
+  "user_capacity": {
+    "blocks": 19532873728,
+    "bytes": 10000831348736
+  },
+  "logical_block_size": 512,
+  "physical_block_size": 4096,
+  "rotation_rate": 7200,
+  "form_factor": {
+    "scsi_value": 2,
+    "name": "3.5 inches"
+  },
+  "serial_number": "ZA2AMGFF0000C921NUGM",
+  "device_type": {
+    "scsi_value": 0,
+    "name": "disk"
+  },
+  "local_time": {
+    "time_t": 1705568303,
+    "asctime": "Thu Jan 18 09:58:23 2024 CET"
+  },
+  "smart_status": {
+    "passed": true
+  },
+  "temperature": {
+    "current": 26,
+    "drive_trip": 60
+  },
+  "power_on_time": {
+    "hours": 38877,
+    "minutes": 4
+  },
+  "scsi_grown_defect_list": 0,
+  "scsi_error_counter_log": {
+    "read": {
+      "errors_corrected_by_eccfast": 1198956605,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 1198956605,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "902199.364",
+      "total_uncorrected_errors": 0
+    },
+    "write": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 1,
+      "total_errors_corrected": 1,
+      "correction_algorithm_invocations": 1,
+      "gigabytes_processed": "88534.851",
+      "total_uncorrected_errors": 0
+    },
+    "verify": {
+      "errors_corrected_by_eccfast": 112322121,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 112322121,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "880142.825",
+      "total_uncorrected_errors": 0
+    }
+  }
+}
+{
+  "json_format_version": [
+    1,
+    0
+  ],
+  "smartctl": {
+    "version": [
+      7,
+      2
+    ],
+    "svn_revision": "5155",
+    "platform_info": "x86_64-linux-5.10.0-27-amd64",
+    "build_info": "(local build)",
+    "argv": [
+      "smartctl",
+      "-a",
+      "-j",
+      "/dev/bus/0",
+      "-d",
+      "megaraid,12"
+    ],
+    "exit_status": 0
+  },
+  "device": {
+    "name": "/dev/bus/0",
+    "info_name": "/dev/bus/0 [megaraid_disk_12]",
+    "type": "megaraid,12",
+    "protocol": "SCSI"
+  },
+  "vendor": "SEAGATE",
+  "product": "ST10000NM0096",
+  "model_name": "SEAGATE ST10000NM0096",
+  "revision": "E005",
+  "scsi_version": "SPC-4",
+  "user_capacity": {
+    "blocks": 19532873728,
+    "bytes": 10000831348736
+  },
+  "logical_block_size": 512,
+  "physical_block_size": 4096,
+  "rotation_rate": 7200,
+  "form_factor": {
+    "scsi_value": 2,
+    "name": "3.5 inches"
+  },
+  "serial_number": "ZA2AMGTB0000C9247XMZ",
+  "device_type": {
+    "scsi_value": 0,
+    "name": "disk"
+  },
+  "local_time": {
+    "time_t": 1705568307,
+    "asctime": "Thu Jan 18 09:58:27 2024 CET"
+  },
+  "smart_status": {
+    "passed": true
+  },
+  "temperature": {
+    "current": 26,
+    "drive_trip": 60
+  },
+  "power_on_time": {
+    "hours": 38877,
+    "minutes": 10
+  },
+  "scsi_grown_defect_list": 0,
+  "scsi_error_counter_log": {
+    "read": {
+      "errors_corrected_by_eccfast": 880144598,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 880144598,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "901433.905",
+      "total_uncorrected_errors": 0
+    },
+    "write": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "88543.630",
+      "total_uncorrected_errors": 0
+    },
+    "verify": {
+      "errors_corrected_by_eccfast": 4288742820,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 4288742820,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "880141.556",
+      "total_uncorrected_errors": 0
+    }
+  }
+}
+{
+  "json_format_version": [
+    1,
+    0
+  ],
+  "smartctl": {
+    "version": [
+      7,
+      2
+    ],
+    "svn_revision": "5155",
+    "platform_info": "x86_64-linux-5.10.0-27-amd64",
+    "build_info": "(local build)",
+    "argv": [
+      "smartctl",
+      "-a",
+      "-j",
+      "/dev/bus/0",
+      "-d",
+      "megaraid,13"
+    ],
+    "exit_status": 0
+  },
+  "device": {
+    "name": "/dev/bus/0",
+    "info_name": "/dev/bus/0 [megaraid_disk_13]",
+    "type": "megaraid,13",
+    "protocol": "SCSI"
+  },
+  "vendor": "SEAGATE",
+  "product": "ST10000NM0096",
+  "model_name": "SEAGATE ST10000NM0096",
+  "revision": "E005",
+  "scsi_version": "SPC-4",
+  "user_capacity": {
+    "blocks": 19532873728,
+    "bytes": 10000831348736
+  },
+  "logical_block_size": 512,
+  "physical_block_size": 4096,
+  "rotation_rate": 7200,
+  "form_factor": {
+    "scsi_value": 2,
+    "name": "3.5 inches"
+  },
+  "serial_number": "ZA2AM77G0000C927BC4C",
+  "device_type": {
+    "scsi_value": 0,
+    "name": "disk"
+  },
+  "local_time": {
+    "time_t": 1705568312,
+    "asctime": "Thu Jan 18 09:58:32 2024 CET"
+  },
+  "smart_status": {
+    "passed": true
+  },
+  "temperature": {
+    "current": 25,
+    "drive_trip": 60
+  },
+  "power_on_time": {
+    "hours": 38877,
+    "minutes": 20
+  },
+  "scsi_grown_defect_list": 0,
+  "scsi_error_counter_log": {
+    "read": {
+      "errors_corrected_by_eccfast": 1010793754,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 1010793754,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "901403.221",
+      "total_uncorrected_errors": 0
+    },
+    "write": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "148460.147",
+      "total_uncorrected_errors": 0
+    },
+    "verify": {
+      "errors_corrected_by_eccfast": 125055476,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 125055476,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "880142.334",
+      "total_uncorrected_errors": 0
+    }
+  }
+}
+{
+  "json_format_version": [
+    1,
+    0
+  ],
+  "smartctl": {
+    "version": [
+      7,
+      2
+    ],
+    "svn_revision": "5155",
+    "platform_info": "x86_64-linux-5.10.0-27-amd64",
+    "build_info": "(local build)",
+    "argv": [
+      "smartctl",
+      "-a",
+      "-j",
+      "/dev/bus/0",
+      "-d",
+      "megaraid,14"
+    ],
+    "exit_status": 0
+  },
+  "device": {
+    "name": "/dev/bus/0",
+    "info_name": "/dev/bus/0 [megaraid_disk_14]",
+    "type": "megaraid,14",
+    "protocol": "SCSI"
+  },
+  "vendor": "SEAGATE",
+  "product": "ST10000NM0096",
+  "model_name": "SEAGATE ST10000NM0096",
+  "revision": "E005",
+  "scsi_version": "SPC-4",
+  "user_capacity": {
+    "blocks": 19532873728,
+    "bytes": 10000831348736
+  },
+  "logical_block_size": 512,
+  "physical_block_size": 4096,
+  "rotation_rate": 7200,
+  "form_factor": {
+    "scsi_value": 2,
+    "name": "3.5 inches"
+  },
+  "serial_number": "ZA2AMG4W0000C928BHGZ",
+  "device_type": {
+    "scsi_value": 0,
+    "name": "disk"
+  },
+  "local_time": {
+    "time_t": 1705568317,
+    "asctime": "Thu Jan 18 09:58:37 2024 CET"
+  },
+  "smart_status": {
+    "passed": true
+  },
+  "temperature": {
+    "current": 26,
+    "drive_trip": 60
+  },
+  "power_on_time": {
+    "hours": 38876,
+    "minutes": 50
+  },
+  "scsi_grown_defect_list": 0,
+  "scsi_error_counter_log": {
+    "read": {
+      "errors_corrected_by_eccfast": 1247384389,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 1247384389,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "902571.689",
+      "total_uncorrected_errors": 0
+    },
+    "write": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "88523.496",
+      "total_uncorrected_errors": 0
+    },
+    "verify": {
+      "errors_corrected_by_eccfast": 82726066,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 82726066,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "880144.128",
+      "total_uncorrected_errors": 0
+    }
+  }
+}
+{
+  "json_format_version": [
+    1,
+    0
+  ],
+  "smartctl": {
+    "version": [
+      7,
+      2
+    ],
+    "svn_revision": "5155",
+    "platform_info": "x86_64-linux-5.10.0-27-amd64",
+    "build_info": "(local build)",
+    "argv": [
+      "smartctl",
+      "-a",
+      "-j",
+      "/dev/bus/0",
+      "-d",
+      "megaraid,15"
+    ],
+    "exit_status": 0
+  },
+  "device": {
+    "name": "/dev/bus/0",
+    "info_name": "/dev/bus/0 [megaraid_disk_15]",
+    "type": "megaraid,15",
+    "protocol": "SCSI"
+  },
+  "vendor": "SEAGATE",
+  "product": "ST10000NM0096",
+  "model_name": "SEAGATE ST10000NM0096",
+  "revision": "E005",
+  "scsi_version": "SPC-4",
+  "user_capacity": {
+    "blocks": 19532873728,
+    "bytes": 10000831348736
+  },
+  "logical_block_size": 512,
+  "physical_block_size": 4096,
+  "rotation_rate": 7200,
+  "form_factor": {
+    "scsi_value": 2,
+    "name": "3.5 inches"
+  },
+  "serial_number": "ZA2AMGDC0000C9273U49",
+  "device_type": {
+    "scsi_value": 0,
+    "name": "disk"
+  },
+  "local_time": {
+    "time_t": 1705568322,
+    "asctime": "Thu Jan 18 09:58:42 2024 CET"
+  },
+  "smart_status": {
+    "passed": true
+  },
+  "temperature": {
+    "current": 26,
+    "drive_trip": 60
+  },
+  "power_on_time": {
+    "hours": 38877,
+    "minutes": 26
+  },
+  "scsi_grown_defect_list": 0,
+  "scsi_error_counter_log": {
+    "read": {
+      "errors_corrected_by_eccfast": 872867626,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 872867626,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "901390.470",
+      "total_uncorrected_errors": 0
+    },
+    "write": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "88517.852",
+      "total_uncorrected_errors": 0
+    },
+    "verify": {
+      "errors_corrected_by_eccfast": 4289653649,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 4289653649,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "880144.233",
+      "total_uncorrected_errors": 0
+    }
+  }
+}
+{
+  "json_format_version": [
+    1,
+    0
+  ],
+  "smartctl": {
+    "version": [
+      7,
+      2
+    ],
+    "svn_revision": "5155",
+    "platform_info": "x86_64-linux-5.10.0-27-amd64",
+    "build_info": "(local build)",
+    "argv": [
+      "smartctl",
+      "-a",
+      "-j",
+      "/dev/bus/0",
+      "-d",
+      "megaraid,16"
+    ],
+    "exit_status": 0
+  },
+  "device": {
+    "name": "/dev/bus/0",
+    "info_name": "/dev/bus/0 [megaraid_disk_16]",
+    "type": "megaraid,16",
+    "protocol": "SCSI"
+  },
+  "vendor": "SEAGATE",
+  "product": "ST10000NM0096",
+  "model_name": "SEAGATE ST10000NM0096",
+  "revision": "E005",
+  "scsi_version": "SPC-4",
+  "user_capacity": {
+    "blocks": 19532873728,
+    "bytes": 10000831348736
+  },
+  "logical_block_size": 512,
+  "physical_block_size": 4096,
+  "rotation_rate": 7200,
+  "form_factor": {
+    "scsi_value": 2,
+    "name": "3.5 inches"
+  },
+  "serial_number": "ZA2AMGB10000C922T3F4",
+  "device_type": {
+    "scsi_value": 0,
+    "name": "disk"
+  },
+  "local_time": {
+    "time_t": 1705568327,
+    "asctime": "Thu Jan 18 09:58:47 2024 CET"
+  },
+  "smart_status": {
+    "passed": true
+  },
+  "temperature": {
+    "current": 25,
+    "drive_trip": 60
+  },
+  "power_on_time": {
+    "hours": 38877,
+    "minutes": 13
+  },
+  "scsi_grown_defect_list": 0,
+  "scsi_error_counter_log": {
+    "read": {
+      "errors_corrected_by_eccfast": 1014489580,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 1014489580,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "901982.173",
+      "total_uncorrected_errors": 0
+    },
+    "write": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "148525.210",
+      "total_uncorrected_errors": 0
+    },
+    "verify": {
+      "errors_corrected_by_eccfast": 4289105028,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 4289105028,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "880142.936",
+      "total_uncorrected_errors": 0
+    }
+  }
+}
+{
+  "json_format_version": [
+    1,
+    0
+  ],
+  "smartctl": {
+    "version": [
+      7,
+      2
+    ],
+    "svn_revision": "5155",
+    "platform_info": "x86_64-linux-5.10.0-27-amd64",
+    "build_info": "(local build)",
+    "argv": [
+      "smartctl",
+      "-a",
+      "-j",
+      "/dev/bus/0",
+      "-d",
+      "megaraid,17"
+    ],
+    "exit_status": 0
+  },
+  "device": {
+    "name": "/dev/bus/0",
+    "info_name": "/dev/bus/0 [megaraid_disk_17]",
+    "type": "megaraid,17",
+    "protocol": "SCSI"
+  },
+  "vendor": "SEAGATE",
+  "product": "ST10000NM0096",
+  "model_name": "SEAGATE ST10000NM0096",
+  "revision": "E005",
+  "scsi_version": "SPC-4",
+  "user_capacity": {
+    "blocks": 19532873728,
+    "bytes": 10000831348736
+  },
+  "logical_block_size": 512,
+  "physical_block_size": 4096,
+  "rotation_rate": 7200,
+  "form_factor": {
+    "scsi_value": 2,
+    "name": "3.5 inches"
+  },
+  "serial_number": "ZA2AMGN90000C910M9XG",
+  "device_type": {
+    "scsi_value": 0,
+    "name": "disk"
+  },
+  "local_time": {
+    "time_t": 1705568332,
+    "asctime": "Thu Jan 18 09:58:52 2024 CET"
+  },
+  "smart_status": {
+    "passed": true
+  },
+  "temperature": {
+    "current": 26,
+    "drive_trip": 60
+  },
+  "power_on_time": {
+    "hours": 38877,
+    "minutes": 7
+  },
+  "scsi_grown_defect_list": 0,
+  "scsi_error_counter_log": {
+    "read": {
+      "errors_corrected_by_eccfast": 936969963,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 936969963,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "901544.777",
+      "total_uncorrected_errors": 0
+    },
+    "write": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "88381.926",
+      "total_uncorrected_errors": 0
+    },
+    "verify": {
+      "errors_corrected_by_eccfast": 19944726,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 19944726,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "880141.730",
+      "total_uncorrected_errors": 0
+    }
+  }
+}
+{
+  "json_format_version": [
+    1,
+    0
+  ],
+  "smartctl": {
+    "version": [
+      7,
+      2
+    ],
+    "svn_revision": "5155",
+    "platform_info": "x86_64-linux-5.10.0-27-amd64",
+    "build_info": "(local build)",
+    "argv": [
+      "smartctl",
+      "-a",
+      "-j",
+      "/dev/bus/0",
+      "-d",
+      "megaraid,18"
+    ],
+    "exit_status": 0
+  },
+  "device": {
+    "name": "/dev/bus/0",
+    "info_name": "/dev/bus/0 [megaraid_disk_18]",
+    "type": "megaraid,18",
+    "protocol": "SCSI"
+  },
+  "vendor": "SEAGATE",
+  "product": "ST10000NM002G",
+  "model_name": "SEAGATE ST10000NM002G",
+  "revision": "E003",
+  "scsi_version": "SPC-5",
+  "user_capacity": {
+    "blocks": 19532873728,
+    "bytes": 10000831348736
+  },
+  "logical_block_size": 512,
+  "physical_block_size": 4096,
+  "rotation_rate": 7200,
+  "form_factor": {
+    "scsi_value": 2,
+    "name": "3.5 inches"
+  },
+  "serial_number": "ZS51D1030000C2309XX0",
+  "device_type": {
+    "scsi_value": 0,
+    "name": "disk"
+  },
+  "local_time": {
+    "time_t": 1705568338,
+    "asctime": "Thu Jan 18 09:58:58 2024 CET"
+  },
+  "smart_status": {
+    "passed": true
+  },
+  "temperature": {
+    "current": 25,
+    "drive_trip": 60
+  },
+  "power_on_time": {
+    "hours": 2184,
+    "minutes": 17
+  },
+  "scsi_grown_defect_list": 0,
+  "scsi_error_counter_log": {
+    "read": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "119107.050",
+      "total_uncorrected_errors": 0
+    },
+    "write": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "16631.791",
+      "total_uncorrected_errors": 0
+    },
+    "verify": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "110032.086",
+      "total_uncorrected_errors": 0
+    }
+  }
+}
+{
+  "json_format_version": [
+    1,
+    0
+  ],
+  "smartctl": {
+    "version": [
+      7,
+      2
+    ],
+    "svn_revision": "5155",
+    "platform_info": "x86_64-linux-5.10.0-27-amd64",
+    "build_info": "(local build)",
+    "argv": [
+      "smartctl",
+      "-a",
+      "-j",
+      "/dev/bus/0",
+      "-d",
+      "megaraid,19"
+    ],
+    "exit_status": 0
+  },
+  "device": {
+    "name": "/dev/bus/0",
+    "info_name": "/dev/bus/0 [megaraid_disk_19]",
+    "type": "megaraid,19",
+    "protocol": "SCSI"
+  },
+  "vendor": "SEAGATE",
+  "product": "ST10000NM002G",
+  "model_name": "SEAGATE ST10000NM002G",
+  "revision": "E003",
+  "scsi_version": "SPC-5",
+  "user_capacity": {
+    "blocks": 19532873728,
+    "bytes": 10000831348736
+  },
+  "logical_block_size": 512,
+  "physical_block_size": 4096,
+  "rotation_rate": 7200,
+  "form_factor": {
+    "scsi_value": 2,
+    "name": "3.5 inches"
+  },
+  "serial_number": "ZTN11VNZ0000C232CP2D",
+  "device_type": {
+    "scsi_value": 0,
+    "name": "disk"
+  },
+  "local_time": {
+    "time_t": 1705568344,
+    "asctime": "Thu Jan 18 09:59:04 2024 CET"
+  },
+  "smart_status": {
+    "passed": true
+  },
+  "temperature": {
+    "current": 26,
+    "drive_trip": 60
+  },
+  "power_on_time": {
+    "hours": 2184,
+    "minutes": 19
+  },
+  "scsi_grown_defect_list": 0,
+  "scsi_error_counter_log": {
+    "read": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "119225.025",
+      "total_uncorrected_errors": 0
+    },
+    "write": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "16698.240",
+      "total_uncorrected_errors": 0
+    },
+    "verify": {
+      "errors_corrected_by_eccfast": 0,
+      "errors_corrected_by_eccdelayed": 0,
+      "errors_corrected_by_rereads_rewrites": 0,
+      "total_errors_corrected": 0,
+      "correction_algorithm_invocations": 0,
+      "gigabytes_processed": "110032.463",
+      "total_uncorrected_errors": 0
+    }
+  }
+}

@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -125,22 +120,14 @@ class CRadioButtonList extends CList {
 			$this->addClass($this->orientation === self::ORIENTATION_HORIZONTAL ? ZBX_STYLE_HOR_LIST : null);
 		}
 
-		if ($this->readonly) {
-			$this->addItem(
-				(new CVar($this->name, $this->value))
-					->setEnabled($this->enabled)
-					->removeId()
-			);
-		}
-
 		foreach ($this->values as $key => $value) {
 			if ($value['id'] === null) {
 				$value['id'] = zbx_formatDomId($this->name).'_'.$key;
 			}
 
 			$radio = (new CInput('radio', $this->name, $value['value']))
-				// Read-only for radioboxes is simulated by disabling control and adding CVar with value.
-				->setEnabled($this->enabled && !$this->readonly && !$value['disabled'])
+				->setAttribute('tabindex', '0')
+				->setEnabled($this->enabled && !$value['disabled'])
 				->onChange($value['on_change'])
 				->setId($value['id']);
 
@@ -154,6 +141,10 @@ class CRadioButtonList extends CList {
 
 			if (!$this->autocomplete) {
 				$radio->setAttribute('autocomplete', 'off');
+			}
+
+			if ($this->readonly) {
+				$radio->setAttribute('readonly', 'readonly');
 			}
 
 			if ($this->modern) {

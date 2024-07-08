@@ -1,21 +1,16 @@
 <?php declare(strict_types = 0);
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -38,15 +33,17 @@
 		_refresh_message_box: null,
 		_popup_message_box: null,
 		active_filter: null,
+		layout_mode: null,
 
 		checkbox_object: null,
 
-		init({refresh_url, refresh_data, refresh_interval, filter_options, checkbox_object, filter_set}) {
+		init({refresh_url, refresh_data, refresh_interval, filter_options, checkbox_object, filter_set, layout_mode}) {
 			this.refresh_url = new Curl(refresh_url);
 			this.refresh_data = refresh_data;
 			this.refresh_interval = refresh_interval;
 			this.checkbox_object = checkbox_object;
 			this.filter_set = filter_set;
+			this.layout_mode = layout_mode;
 
 			const url = new Curl('zabbix.php');
 			url.setArgument('action', 'latest.view.refresh');
@@ -64,13 +61,15 @@
 		},
 
 		initTabFilter(filter_options) {
-			if (!filter_options) {
-				return;
-			}
+			const filter = document.getElementById('monitoring_latest_filter');
 
 			this.refresh_counters = this.createCountersRefresh(1);
-			this.filter = new CTabFilter(document.getElementById('monitoring_latest_filter'), filter_options);
+			this.filter = new CTabFilter(filter, filter_options);
 			this.active_filter = this.filter._active_item;
+
+			if (this.layout_mode == <?= ZBX_LAYOUT_KIOSKMODE ?>) {
+				filter.style.display = 'none';
+			}
 
 			this.filter.on(TABFILTER_EVENT_URLSET, () => {
 				this.reloadPartialAndTabCounters();
@@ -449,7 +448,8 @@
 			const overlay = PopUp('item.edit', data, {
 				dialogueid: 'item-edit',
 				dialogue_class: 'modal-popup-large',
-				trigger_element: target
+				trigger_element: target,
+				prevent_navigation: true
 			});
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess, {once: true});

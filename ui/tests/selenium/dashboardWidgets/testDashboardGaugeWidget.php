@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -26,7 +21,7 @@ require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 /**
  * @backup config, widget
  *
- * @dataSource AllItemValueTypes
+ * @dataSource AllItemValueTypes, GlobalMacros
  *
  * @onBefore prepareDashboardData
  */
@@ -183,7 +178,7 @@ class testDashboardGaugeWidget extends testWidgets {
 
 			// Units.
 			'id:units_show' => ['value' => true, 'enabled' => true, 'visible' => false],
-			'id:units' => ['value' => '', 'maxlength' => 2048, 'enabled' => true, 'visible' => false],
+			'id:units' => ['value' => '', 'maxlength' => 255, 'enabled' => true, 'visible' => false],
 			'id:units_size' => ['value' => 25, 'maxlength' => 3, 'enabled' => true, 'visible' => false],
 			'id:units_pos' => ['value' => 'After value', 'enabled' => true, 'visible' => false],
 			'id:units_bold' => ['value' => false, 'enabled' => true, 'visible' => false],
@@ -306,8 +301,8 @@ class testDashboardGaugeWidget extends testWidgets {
 
 		// Check fields' labels and required fields.
 		$this->assertEquals(['Type', 'Show header', 'Name', 'Refresh interval', 'Item', 'Min', 'Max', 'Colours',
-				'Show', 'Advanced configuration', 'Angle', 'Description', 'Value', 'Value arc', 'Needle', 'Scale',
-				'Thresholds', 'Override host'],
+				'Show', 'Override host', 'Advanced configuration', 'Angle', 'Description', 'Value', 'Value arc', 'Needle', 'Scale',
+				'Thresholds'],
 				$form->getLabels()->asText()
 		);
 
@@ -975,6 +970,8 @@ class testDashboardGaugeWidget extends testWidgets {
 				self::$update_gauge = $header;
 			}
 		}
+
+		COverlayDialogElement::find()->one()->close();
 	}
 
 	public function testDashboardGaugeWidget_SimpleUpdate() {
@@ -1003,7 +1000,7 @@ class testDashboardGaugeWidget extends testWidgets {
 			[
 				[
 					'cancel_form' => false,
-					'create_widget' => false,
+					'create_widget' => true,
 					'save_dashboard' => false
 				]
 			],
@@ -1091,6 +1088,7 @@ class testDashboardGaugeWidget extends testWidgets {
 		// Check that updating widget form values did not change in frontend.
 		if (!$create && !$save_dashboard) {
 			$this->assertEquals($values, $dashboard->getWidget(self::$update_gauge)->edit()->getValues());
+			COverlayDialogElement::find()->one()->close();
 		}
 
 		// Check that DB hash is not changed.
@@ -1268,8 +1266,8 @@ class testDashboardGaugeWidget extends testWidgets {
 		$widget = $dashboard->waitUntilReady()->getWidget($header)->waitUntilReady();
 		$this->page->removeFocus();
 
-		// Sleep waits until the gauge is animated.
-		sleep(1);
+		// Wait until the gauge is animated.
+		$this->query('xpath://div['.CXPathHelper::fromClass('is-ready').']')->waitUntilVisible();
 		$this->assertScreenshot($widget->query('class:dashboard-grid-widget-container')->one(), $data['screenshot_id']);
 	}
 }

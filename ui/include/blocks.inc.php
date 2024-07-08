@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -210,6 +205,9 @@ function getSystemStatusData(array $filter) {
 
 		$visible_problems = [];
 
+		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
+		$problems = CScreenProblem::sortData(['problems' => $problems], $limit, 'clock', ZBX_SORT_DOWN)['problems'];
+
 		foreach ($problems as $eventid => $problem) {
 			$trigger = $data['triggers'][$problem['objectid']];
 
@@ -352,6 +350,25 @@ function getSystemStatusTotals(array $data) {
 		}
 	}
 
+	foreach ($groups_totals[0]['stats'] as &$stat) {
+		if ($stat['count'] > 0 || $stat['count_unack'] > 0) {
+			$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
+
+			if ($stat['count'] > 0) {
+				$stat['problems'] = CScreenProblem::sortData(['problems' => $stat['problems']], $limit, 'clock',
+					ZBX_SORT_DOWN
+				)['problems'];
+			}
+
+			if ($stat['count_unack'] > 0) {
+				$stat['problems_unack'] = CScreenProblem::sortData(['problems' => $stat['problems_unack']], $limit,
+					'clock', ZBX_SORT_DOWN
+				)['problems'];
+			}
+		}
+	}
+	unset($stat);
+
 	return $groups_totals;
 }
 
@@ -400,7 +417,9 @@ function makeSeverityTable(array $data, $hide_empty_groups = false, CUrl $groupu
 			$row[] = getSeverityTableCell($severity, $data, $stat);
 		}
 
-		$table->addRow($row);
+		$table->addRow(
+			(new CRow($row))->setAttribute('data-hostgroupid', $group['groupid'])
+		);
 	}
 
 	return $table;

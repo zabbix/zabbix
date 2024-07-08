@@ -50,7 +50,6 @@
 			</and>
 		</condition>
 		<property environment="env"/>
-		<property name="phpunit_browser_log_dir" value="${PHPUNIT_BROWSER_LOG_DIR}"/>
 
 		<!-- Create bootstrap.php -->
 		<copy overwrite="true" file="ui/tests/bootstrap.php.template" tofile="ui/tests/bootstrap.php"/>
@@ -66,7 +65,6 @@
 		<replace file="ui/tests/bootstrap.php" token="{SCREENSHOT_REFERENCES_DIR}" value="${screenshot_references_dir}"/>
 		<replace file="ui/tests/bootstrap.php" token="{PHPUNIT_DRIVER_ADDRESS}" value="${phpunit_driver_address}"/>
 		<replace file="ui/tests/bootstrap.php" token="{PHPUNIT_DATA_SOURCES_DIR}" value="${basedir}/ui/tests/selenium/data/sources/"/>
-		<replace file="ui/tests/bootstrap.php" token="{PHPUNIT_BROWSER_LOG_DIR}" value="${phpunit_browser_log_dir}"/>
 	</target>
 
 	<target name="show-browser-info">
@@ -115,6 +113,14 @@
 		</exec>
 		<!-- Copy agent2 configuration file -->
 		<copy overwrite="true" file="src/go/conf/zabbix_agent2.conf" tofile="conf/zabbix_agent2.conf"/>
+	</target>
+
+	<target name="apply-custom-patches">
+		<!-- Reducing the delay for multiselect suggestions -->
+		<exec executable="git" failonerror="on">
+			<arg line="apply"/>
+			<arg line="ui/tests/selenium/patches/ms_delay.patch"/>
+		</exec>
 	</target>
 
 	<target name="init-frontend-modules">
@@ -352,7 +358,7 @@
 		</exec>
 	</target>
 
-	<target name="init-frontend-postgresql" depends="create-configs,create-saml-configs,create-ldap-configs,make-dbschema,make-gettext,create-db-postgresql,init-frontend-modules">
+	<target name="init-frontend-postgresql" depends="create-configs,create-saml-configs,create-ldap-configs,make-dbschema,make-gettext,create-db-postgresql,apply-custom-patches,init-frontend-modules">
 		<exec executable="psql" input="ui/tests/selenium/data/data_test.sql" failonerror="on">
 			<env key="PGPASSWORD" value="${dbpassword}"/>
 			<arg line="-q"/>
@@ -392,6 +398,8 @@
 	</target>
 
 	<target name="init-integration-tsdb" depends="create-configs,init-integration,make-binary-agent-3.0,make-binaries-postgresql,create-db-tsdb,init-proxy-postgresql"/>
+
+	<target name="init-dast-postgresql" depends="create-frontend-configs,make-dbschema,create-db-postgresql"/>
 
 	<target name="make-binaries-mysql">
 		<!-- Binaries for integration tests -->
@@ -511,7 +519,7 @@
 		</exec>
 	</target>
 
-	<target name="init-frontend-mysql" depends="create-configs,create-saml-configs,create-ldap-configs,make-dbschema,make-gettext,create-db-mysql,init-frontend-modules">
+	<target name="init-frontend-mysql" depends="create-configs,create-saml-configs,create-ldap-configs,make-dbschema,make-gettext,create-db-mysql,apply-custom-patches,init-frontend-modules">
 		<exec executable="mysql" input="ui/tests/selenium/data/data_test.sql" failonerror="on">
 			<env key="MYSQL_PWD" value="${dbpassword}"/>
 			<arg line="--host=${dbhost}"/>
@@ -540,6 +548,8 @@
 			<arg line="${dbname}"/>
 		</exec>
 	</target>
+
+	<target name="init-dast-mysql" depends="create-frontend-configs,make-dbschema,create-db-mysql"/>
 
 	<target name="test-phpunit" depends="init-common">
 		<exec executable="phpunit" dir="ui/tests/unit" failonerror="off">
@@ -590,6 +600,8 @@
 	<target name="build-integration-mysql" depends="init-integration-mysql,test-integration"/>
 	<target name="build-integration-postgresql" depends="init-integration-postgresql,test-integration"/>
 	<target name="build-integration-tsdb" depends="init-integration-tsdb,test-integration"/>
+	<target name="build-dast-mysql" depends="init-dast-mysql"/>
+	<target name="build-dast-postgresql" depends="init-dast-postgresql"/>
 
 	<!-- Default target -->
 	<target name="build" depends="build-phpunit,build-mysql,build-postgresql,build-integration-mysql,build-integration-postgresql,build-integration-tsdb"/>

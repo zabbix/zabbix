@@ -1,29 +1,22 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "pp_manager.h"
 #include "pp_worker.h"
 #include "pp_queue.h"
 #include "pp_task.h"
-#include "preproc_snmp.h"
 #include "zbxpreproc.h"
-#include "zbxcommon.h"
 #include "zbxalgo.h"
 #include "zbxtimekeeper.h"
 #include "zbxself.h"
@@ -41,11 +34,16 @@
 #include "zbxthreads.h"
 #include "zbxtime.h"
 #include "zbxrtc.h"
+#include "zbxpreprocbase.h"
 #include "zbx_rtc_constants.h"
 
 #ifdef HAVE_LIBXML2
 #	include <libxml/xpath.h>
 #	include <libxml/parser.h>
+#endif
+
+#ifdef HAVE_NETSNMP
+#	include "preproc_snmp.h"
 #endif
 
 static zbx_prepare_value_func_t	prepare_value_func_cb = NULL;
@@ -855,13 +853,15 @@ static void	preprocessing_flush_value(zbx_pp_manager_t *manager, zbx_uint64_t it
  *                                                                            *
  * Purpose: handle new preprocessing request                                  *
  *                                                                            *
- * Parameters: manager - [IN] preprocessing manager                           *
- *             message - [IN] packed preprocessing request                    *
+ * Parameters: manager    - [IN] preprocessing manager                        *
+ *             message    - [IN] packed preprocessing request                 *
+ *             direct_num - [OUT] number of directly flushed values           *
  *                                                                            *
  *  Return value: The number of requests queued for preprocessing             *
  *                                                                            *
  ******************************************************************************/
-static zbx_uint64_t	preprocessor_add_request(zbx_pp_manager_t *manager, zbx_ipc_message_t *message)
+static zbx_uint64_t	preprocessor_add_request(zbx_pp_manager_t *manager, zbx_ipc_message_t *message,
+		zbx_uint64_t *direct_num)
 {
 	zbx_uint32_t			offset = 0;
 	zbx_preproc_item_value_t	value;
@@ -887,6 +887,7 @@ static zbx_uint64_t	preprocessor_add_request(zbx_pp_manager_t *manager, zbx_ipc_
 
 		if (NULL == (task = zbx_pp_manager_create_task(manager, value.itemid, &var, ts, &var_opt)))
 		{
+			(*direct_num)++;
 			/* allow empty values */
 			preprocessing_flush_value(manager, value.itemid, value.item_value_type, value.item_flags,
 					&var, ts, &var_opt);
@@ -1238,7 +1239,8 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 
 	while (ZBX_IS_RUNNING())
 	{
-		double	time_now = zbx_time();
+		double		time_now = zbx_time();
+		zbx_uint64_t	direct_num = 0;
 
 		if (STAT_INTERVAL < time_now - time_stat)
 		{
@@ -1271,7 +1273,7 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 			switch (message->code)
 			{
 				case ZBX_IPC_PREPROCESSOR_REQUEST:
-					queued_num += preprocessor_add_request(manager, message);
+					queued_num += preprocessor_add_request(manager, message, &direct_num);
 					break;
 				case ZBX_IPC_PREPROCESSOR_QUEUE:
 					preprocessor_reply_queue_size(manager, client);
@@ -1311,12 +1313,10 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 		{
 			processed_num += (unsigned int)tasks.values_num;
 			preprocessor_flush_tasks(manager, &tasks);
-			zbx_rtc_notify_generic(&manager->rtc, ZBX_PROCESS_TYPE_HISTSYNCER, 1,
-					ZBX_RTC_HISTORY_SYNC_NOTIFY, NULL, 0);
 			zbx_pp_tasks_clear(&tasks);
 		}
 
-		if (0 != finished_num)
+		if (0 != finished_num || 0 != direct_num)
 		{
 			timeout.sec = 0;
 			timeout.ns = 0;
@@ -1327,10 +1327,14 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 			timeout.ns = PP_MANAGER_DELAY_NS;
 		}
 
-		/* flush local history cache when there is nothing more to process or one second after last flush */
-		if (0 == pending_num + processing_num + finished_num || 1 < sec - time_flush)
+		if (0 == pending_num + processing_num + finished_num + direct_num || 1 < sec - time_flush)
 		{
-			zbx_dc_flush_history();
+			if (0 != zbx_dc_flush_history())
+			{
+				zbx_rtc_notify_generic(&manager->rtc, ZBX_PROCESS_TYPE_HISTSYNCER, 1,
+						ZBX_RTC_HISTORY_SYNC_NOTIFY, NULL, 0);
+			}
+
 			time_flush = sec;
 		}
 

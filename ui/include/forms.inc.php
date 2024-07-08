@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -27,6 +22,18 @@
  * @return array
  */
 function getItemFormData(array $item = []) {
+	// Default script value for browser type items.
+	$browser_script = <<<'JAVASCRIPT'
+var browser = new Browser(Browser.chromeOptions());
+
+try {
+	browser.navigate("https://example.com");
+	browser.collectPerfEntries();
+}
+finally {
+	return JSON.stringify(browser.getResult());
+}
+JAVASCRIPT;
 	$data = [
 		'form' => getRequest('form'),
 		'form_refresh' => getRequest('form_refresh', 0),
@@ -50,6 +57,7 @@ function getItemFormData(array $item = []) {
 		'units' => getRequest('units', ''),
 		'valuemapid' => getRequest('valuemapid', 0),
 		'params' => getRequest('params', ''),
+		'browser_script' => getRequest('browser_script', $browser_script),
 		'trends' => getRequest('trends', DB::getDefault('items', 'trends')),
 		'delay_flex' => array_values(getRequest('delay_flex', [])),
 		'ipmi_sensor' => getRequest('ipmi_sensor', ''),
@@ -128,7 +136,7 @@ function getItemFormData(array $item = []) {
 		$data['query_fields'] = [];
 	}
 
-	if ($data['type'] == ITEM_TYPE_SCRIPT) {
+	if (in_array($data['type'], [ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER])) {
 		CArrayHelper::sort($data['parameters'], ['name']);
 		$data['parameters'] = array_values($data['parameters']);
 	}
@@ -203,7 +211,6 @@ function getItemFormData(array $item = []) {
 		$data['units'] = $data['item']['units'];
 		$data['valuemapid'] = $data['item']['valuemapid'];
 		$data['hostid'] = $data['item']['hostid'];
-		$data['params'] = $data['item']['params'];
 		$data['ipmi_sensor'] = $data['item']['ipmi_sensor'];
 		$data['authtype'] = $data['item']['authtype'];
 		$data['username'] = $data['item']['username'];
@@ -235,7 +242,14 @@ function getItemFormData(array $item = []) {
 		$data['http_username'] = $data['item']['username'];
 		$data['http_password'] = $data['item']['password'];
 
-		if ($data['type'] == ITEM_TYPE_SCRIPT && $data['parameters']) {
+		if ($data['item']['type'] == ITEM_TYPE_BROWSER) {
+			$data['browser_script'] = $data['item']['params'];
+		}
+		else {
+			$data['params'] = $data['item']['params'];
+		}
+
+		if (in_array($data['type'], [ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER]) && $data['parameters']) {
 			CArrayHelper::sort($data['parameters'], ['name']);
 			$data['parameters'] = array_values($data['parameters']);
 		}
@@ -663,12 +677,12 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 
 			case ZBX_PREPROC_VALIDATE_NOT_SUPPORTED:
 				$on_fail
-					->setEnabled(false)
+					->setReadonly(true)
 					->setChecked(true);
 				break;
 
 			default:
-				$on_fail->setEnabled(!$readonly);
+				$on_fail->setReadonly($readonly);
 
 				if ($step['error_handler'] != ZBX_PREPROC_FAIL_DEFAULT) {
 					$on_fail->setChecked(true);
@@ -886,43 +900,126 @@ function getTriggerMassupdateFormData() {
  * Renders tag table row.
  *
  * @param int|string $index
- * @param string     $tag        (optional)
- * @param string     $value      (optional)
- * @param int        $automatic  (optional)
- * @param array      $options    (optional)
+ * @param array	     $tag
+ * @param string     $tag['tag']                      Tag name.
+ * @param string     $tag['value']                    Tag value.
+ * @param int        $tag['type']                     (optional) Tag ownership type.
+ * @param int        $tag['automatic']                (optional) Tag automatic flag.
+ * @param array      $tag['parent_templates']         (optional) List of templates that tags are inherited from.
+ * @param array      $options
+ * @param bool       $options['add_post_js']          (optional) Parameter passed to CTextAreaFlexible.
+ * @param bool       $options['show_inherited_tags']  (optional) Render row in inherited tag mode. This enables usage of $tag['type'].
+ * @param bool       $options['with_automatic']       (optional) Render row with 'automatic' input. This enables usage of $tag['automatic'].
+ * @param string     $options['field_name']           (optional) Re-define default field name.
+ * @param bool       $options['readonly']             (optional) Render row in read-only mode.
+ * @param string     $options['source']               (optional) The origin of tag.
  *
  * @return CRow
  */
-function renderTagTableRow($index, $tag = '', $value = '', int $automatic = ZBX_TAG_MANUAL, array $options = []) {
+function renderTagTableRow($index, array $tag, array $options = []) {
 	$options += [
 		'readonly' => false,
 		'field_name' => 'tags',
-		'with_automatic' => false
+		'with_automatic' => false,
+		'show_inherited_tags' => false,
+		'source' => null
 	];
 
-	return (new CRow([
-		(new CCol([
-			(new CTextAreaFlexible($options['field_name'].'['.$index.'][tag]', $tag, $options))
-				->setAdaptiveWidth(ZBX_TEXTAREA_TAG_WIDTH)
-				->setAttribute('placeholder', _('tag')),
-			$options['with_automatic']
-				? new CVar($options['field_name'].'['.$index.'][automatic]', $automatic)
-				: null
-		]))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
-		(new CCol(
-			(new CTextAreaFlexible($options['field_name'].'['.$index.'][value]', $value, $options))
-				->setAdaptiveWidth(ZBX_TEXTAREA_TAG_VALUE_WIDTH)
-				->setAttribute('placeholder', _('value'))
-		))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
-		(new CCol(
-			(new CButton($options['field_name'].'['.$index.'][remove]', _('Remove')))
+	if ($options['with_automatic'] && !array_key_exists('automatic', $tag)) {
+		$tag['automatic'] = ZBX_TAG_MANUAL;
+	}
+
+	$textarea_options = array_intersect_key($options, array_flip(['readonly', 'add_post_js']));
+
+	$tag += [
+		'type' => ZBX_PROPERTY_OWN,
+		'parent_templates' => []
+	];
+
+	$tag_field = (new CTextAreaFlexible($options['field_name'].'['.$index.'][tag]', $tag['tag'], $textarea_options))
+		->setAdaptiveWidth(ZBX_TEXTAREA_TAG_WIDTH)
+		->setAttribute('placeholder', _('tag'));
+
+	$type_field = $options['show_inherited_tags']
+		? new CVar($options['field_name'].'['.$index.'][type]', $tag['type'])
+		: null;
+
+	$automatic_field = $options['with_automatic']
+		? new CVar($options['field_name'].'['.$index.'][automatic]', $tag['automatic'])
+		: null;
+
+	$value_field = (new CTextAreaFlexible($options['field_name'].'['.$index.'][value]', $tag['value'],
+			$textarea_options
+		))
+		->setAdaptiveWidth(ZBX_TEXTAREA_TAG_VALUE_WIDTH)
+		->setAttribute('placeholder', _('value'));
+
+	if ($options['with_automatic'] && $tag['automatic'] == ZBX_TAG_AUTOMATIC) {
+		switch ($options['source']) {
+			case 'host':
+				$actions = (new CSpan(_('(created by host discovery)')))->addClass(ZBX_STYLE_GREY);
+				break;
+
+			default:
+				$actions = null;
+				break;
+		}
+	}
+	else {
+		$actions = $options['show_inherited_tags'] && ($tag['type'] & ZBX_PROPERTY_INHERITED) != 0
+			? (new CButton($options['field_name'].'['.$index.'][disable]', _('Remove')))
+				->addClass(ZBX_STYLE_BTN_LINK)
+				->addClass('element-table-disable')
+				->setEnabled(!$options['readonly'])
+			: (new CButton($options['field_name'].'['.$index.'][remove]', _('Remove')))
 				->addClass(ZBX_STYLE_BTN_LINK)
 				->addClass('element-table-remove')
-				->setEnabled(!$options['readonly'])
-		))
+				->setEnabled(!$options['readonly']);
+	}
+
+	return (new CRow([
+		(new CCol([$tag_field, $type_field, $automatic_field]))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
+		(new CCol($value_field))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
+		(new CCol($actions))
 			->addClass(ZBX_STYLE_NOWRAP)
-			->addClass(ZBX_STYLE_TOP)
+			->addClass(ZBX_STYLE_TOP),
+		$options['show_inherited_tags']
+			? new CCol(makeParentTemplatesList($tag['parent_templates']))
+			: null
 	]))->addClass('form_row');
+}
+
+/**
+ * Function to render templates as HTML links or span tags, based on user permissions to edit each particular template.
+ */
+function makeParentTemplatesList(array $parent_templates): array {
+	if (!$parent_templates) {
+		return [];
+	}
+
+	CArrayHelper::sort($parent_templates, ['name']);
+
+	$allowed_ui_conf_templates = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
+	$template_list = [];
+
+	foreach ($parent_templates as $templateid => $template) {
+		if ($allowed_ui_conf_templates && $template['permission'] == PERM_READ_WRITE) {
+			$template_list[] = (new CLink($template['name'],
+				(new CUrl('templates.php'))
+					->setArgument('form', 'update')
+					->setArgument('templateid', $templateid)
+			))->setTarget('_blank');
+		}
+		else {
+			$template_list[] = (new CSpan($template['name']))->addClass(ZBX_STYLE_GREY);
+		}
+
+		$template_list[] = ', ';
+	}
+
+	array_pop($template_list);
+
+	return $template_list;
 }
 
 /**
@@ -952,9 +1049,9 @@ function renderTagTable(array $tags, $readonly = false, array $options = []) {
 	}
 
 	foreach ($tags as $index => $tag) {
-		$table->addRow(renderTagTableRow($index, $tag['tag'], $tag['value'],
-			$with_automatic ? $tag['automatic'] : ZBX_TAG_MANUAL, $row_options
-		));
+		$tag = ['automatic' => $with_automatic ? $tag['automatic'] : ZBX_TAG_MANUAL] + $tag;
+
+		$table->addRow(renderTagTableRow($index, $tag, $row_options));
 	}
 
 	return $table->setFooter(new CCol(

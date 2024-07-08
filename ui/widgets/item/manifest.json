@@ -7,14 +7,18 @@
 	"version": "1.0",
 	"author": "Zabbix",
 	"description": "Displays the value of a single item prominently.",
-	"url": "https://www.zabbix.com/documentation/7.0/en/manual/web_interface/frontend_sections/dashboards/widgets/item_value",
+	"url": "web_interface/frontend_sections/dashboards/widgets/item_value",
 	"widget": {
 		"size": {
-			"width": 4,
+			"width": 12,
 			"height": 3
 		},
 		"js_class": "CWidgetItem",
 		"in": {
+			"itemid": {
+				"type": "_itemid",
+				"required": true
+			},
 			"time_period": {
 				"type": "_timeperiod"
 			}

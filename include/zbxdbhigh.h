@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #ifndef ZABBIX_DBHIGH_H
@@ -129,7 +124,7 @@
 #define ZBX_HISTORY_LOG_VALUE_LEN		65535
 
 /* Binary item type can only be as a dependent item. */
-#define ZBX_HISTORY_BIN_VALUE_LEN		MAX(ZBX_HISTORY_TEXT_VALUE_LEN, ZBX_HISTORY_LOG_VALUE_LEN)
+#define ZBX_HISTORY_BIN_VALUE_LEN		(ZBX_MEBIBYTE * 16)
 
 #define ZBX_HISTORY_LOG_SOURCE_LEN		64
 #define ZBX_HISTORY_LOG_SOURCE_LEN_MAX		(ZBX_HISTORY_LOG_SOURCE_LEN + 1)
@@ -366,7 +361,7 @@ typedef struct ZBX_DB_MEDIATYPE
 	unsigned char		smtp_verify_peer;
 	unsigned char		smtp_verify_host;
 	unsigned char		smtp_authentication;
-	unsigned char		content_type;
+	unsigned char		message_format;
 	int			maxsessions;
 	int			maxattempts;
 }
@@ -506,6 +501,7 @@ int	zbx_db_check_oracle_colum_type(const char *table_name, const char *column_na
 #endif
 int		zbx_db_execute(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
 int		zbx_db_execute_once(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
+zbx_db_result_t	zbx_db_select_once(const char *fmt, ...)__zbx_attr_format_printf(1, 2);
 zbx_db_result_t	zbx_db_select(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
 zbx_db_result_t	zbx_db_select_n(const char *query, int n);
 zbx_db_row_t	zbx_db_fetch(zbx_db_result_t result);

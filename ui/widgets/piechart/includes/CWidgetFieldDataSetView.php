@@ -1,21 +1,16 @@
 <?php declare(strict_types = 0);
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -29,6 +24,7 @@ use CButton,
 	CDiv,
 	CFormField,
 	CFormGrid,
+	CHorList,
 	CItemHelper,
 	CLabel,
 	CLink,
@@ -47,6 +43,8 @@ use CButton,
 	CVar,
 	CWidgetFieldView;
 
+use Zabbix\Widgets\CWidgetField;
+
 class CWidgetFieldDataSetView extends CWidgetFieldView {
 
 	public function __construct(CWidgetFieldDataSet $field) {
@@ -62,11 +60,20 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 			$values[] = CWidgetFieldDataSet::getDefaults();
 		}
 
-		$itemids = array_merge(...array_column($values, 'itemids'));
-		$item_names = [];
-		if ($itemids) {
-			$item_names = CWidgetFieldDataSet::getItemNames($itemids, !$this->field->isTemplateDashboard());
+		// Get item names for single item datasets.
+		$itemids = [];
+
+		foreach (array_column($values, 'itemids') as $items_spec) {
+			foreach ($items_spec as $item_spec) {
+				if (!is_array($item_spec)) {
+					$itemids[$item_spec] = true;
+				}
+			}
 		}
+
+		$item_names = $itemids
+			? CWidgetFieldDataSet::getItemNames(array_keys($itemids), !$this->field->isTemplateDashboard())
+			: [];
 
 		foreach ($values as $i => $value) {
 			if ($value['dataset_type'] == CWidgetFieldDataSet::DATASET_TYPE_SINGLE_ITEM) {
@@ -131,7 +138,7 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 					'name' => $field_name.'['.$row_num.'][items][]',
 					'object_name' => 'items',
 					'data' => $value['items'],
-					'placeholder' => _('item pattern'),
+					'placeholder' => _('item patterns'),
 					'wildcard_allowed' => 1,
 					'popup' => [
 						'parameters' => [
@@ -152,7 +159,7 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 					'name' => $field_name.'['.$row_num.'][hosts][]',
 					'object_name' => 'hosts',
 					'data' => $value['hosts'],
-					'placeholder' => _('host pattern'),
+					'placeholder' => _('host patterns'),
 					'wildcard_allowed' => 1,
 					'popup' => [
 						'parameters' => [
@@ -169,7 +176,7 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 					'name' => $field_name.'['.$row_num.'][items][]',
 					'object_name' => 'items',
 					'data' => $value['items'],
-					'placeholder' => _('item pattern'),
+					'placeholder' => _('item patterns'),
 					'wildcard_allowed' => 1,
 					'popup' => [
 						'parameters' => [
@@ -214,13 +221,21 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 		}
 		else {
 			$item_rows = [];
-			foreach ($value['itemids'] as $i => $itemid) {
-				$item_name = array_key_exists($itemid, $value['item_names'])
-					? $value['item_names'][$itemid]
-					: '';
 
-				$item_rows[] = $this->getItemRowTemplate($row_num, $i + 1, $itemid, $item_name, $value['color'][$i],
-					$value['type'][$i]
+			foreach ($value['itemids'] as $i => $item_spec) {
+				if (is_array($item_spec)) {
+					$itemid = '0';
+					$item_reference = $item_spec[CWidgetField::FOREIGN_REFERENCE_KEY];
+					$item_name = '';
+				}
+				else {
+					$itemid = $item_spec;
+					$item_reference = '';
+					$item_name = array_key_exists($itemid, $value['item_names']) ? $value['item_names'][$itemid] : '';
+				}
+
+				$item_rows[] = $this->getItemRowTemplate($row_num, ($i + 1), $itemid, $item_reference, $item_name,
+					$value['color'][$i], $value['type'][$i]
 				);
 			}
 
@@ -237,19 +252,17 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 					(new CTableColumn(_('Type')))->addClass('table-col-type'),
 					(new CTableColumn(_('Action')))->addClass('table-col-action')
 				])
-				->addItem([
-					$item_rows,
-					(new CTag('tfoot', true))
-						->addItem(
-							(new CCol(
-								(new CList())
-									->addClass(ZBX_STYLE_INLINE_FILTER_FOOTER)
-									->addItem(
-										(new CButtonLink(_('Add')))->addClass('js-add')
-									)
-							))->setColSpan(5)
-						)
-				]);
+				->addItem($item_rows)
+				->addItem(
+					(new CTag('tfoot', true,
+						(new CCol(
+							new CHorList([
+								(new CButtonLink(_('Add item')))->addClass('js-add-item'),
+								(new CButtonLink(_('Add widget')))->addClass('js-add-widget')
+							])
+						))->setColSpan(5)
+					))
+				);
 
 			$dataset_head = array_merge($dataset_head, [
 				(new CDiv([$empty_msg_block, $items_list]))->addClass('items-list table-forms-separator')
@@ -337,7 +350,7 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 	}
 
 	private function getItemRowTemplate($ds_num = '#{dsNum}', $row_num = '#{rowNum}', $itemid = '#{itemid}',
-			$name = '#{name}', $color = '#{color}', $type = '#{type}'): CRow {
+			$reference = '#{reference}', $name = '#{name}', $color = '#{color}', $type = '#{type}'): CRow {
 		return (new CRow([
 			(new CCol((new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)))
 				->addClass('table-col-handle')
@@ -348,11 +361,16 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 				))->appendColorPickerJs(false)
 			))->addClass('table-col-color'),
 			(new CCol(new CSpan($row_num.':')))->addClass('table-col-no'),
-			(new CCol(
+			(new CCol([
+				(new CSpan())
+					->addClass('reference-hint')
+					->addClass(ZBX_ICON_REFERENCE)
+					->addClass(ZBX_STYLE_DISPLAY_NONE)
+					->setHint(_('Another widget is used as data source.')),
 				(new CLink($name))
 					->setId('items_'.$ds_num.'_'.$row_num.'_name')
-					->addClass('js-click-expend')
-			))->addClass('table-col-name'),
+					->addClass('js-click-expand')
+			]))->addClass('table-col-name'),
 			(new CCol([
 				(new CSelect($this->field->getName().'['.$ds_num.'][type][]'))
 					->setId('items_'.$ds_num.'_'.$row_num.'_type')
@@ -367,7 +385,10 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 					->addClass(ZBX_STYLE_BTN_LINK)
 					->addClass('element-table-remove'),
 				new CVar($this->field->getName().'['.$ds_num.'][itemids][]', $itemid,
-					'items_'.$ds_num.'_'.$row_num.'_input'
+					'items_'.$ds_num.'_'.$row_num.'_itemid'
+				),
+				new CVar($this->field->getName().'['.$ds_num.'][references][]', $reference,
+					'items_'.$ds_num.'_'.$row_num.'_reference'
 				)
 			]))
 				->addClass('table-col-action')
