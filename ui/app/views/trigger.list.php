@@ -293,7 +293,7 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 	if ($data['show_info_column']) {
 		$info_icons = [];
 		if ($trigger['status'] == TRIGGER_STATUS_ENABLED && $trigger['error']) {
-			$info_icons[] = makeErrorIcon((new CDiv($trigger['error']))->addClass(ZBX_STYLE_WORDWRAP));
+			$info_icons[] = makeErrorIcon((new CDiv($trigger['error']))->addClass(ZBX_STYLE_WORDBREAK));
 		}
 
 		if (array_key_exists('status', $trigger['triggerDiscovery'])
@@ -349,7 +349,7 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 		$hosts,
 		$description,
 		$trigger['opdata'],
-		(new CDiv($expression))->addClass(ZBX_STYLE_WORDWRAP),
+		(new CDiv($expression))->addClass(ZBX_STYLE_WORDBREAK),
 		(new CDiv([
 			$status,
 			$disabled_by_lld ? makeDescriptionIcon(_('Disabled automatically by an LLD rule.')) : null

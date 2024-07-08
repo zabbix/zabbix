@@ -155,7 +155,7 @@ foreach ($data['triggers'] as $trigger) {
 		CSeverityHelper::makeSeverityCell((int) $trigger['priority']),
 		$description,
 		$trigger['opdata'],
-		(new CDiv($expression))->addClass(ZBX_STYLE_WORDWRAP),
+		(new CDiv($expression))->addClass(ZBX_STYLE_WORDBREAK),
 		$status,
 		$discover,
 		$data['tags'][$triggerid]
