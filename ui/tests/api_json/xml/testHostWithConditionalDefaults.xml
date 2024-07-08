@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+    <version>7.0</version>
+    <host_groups>
+        <host_group>
+            <uuid>fe615ff07fad412eb8639cef449779c5</uuid>
+            <name>imported_hosts</name>
+        </host_group>
+    </host_groups>
+    <hosts>
+        <host>
+            <host>Host for testing defaults on conditional fields</host>
+            <name>Host for testing defaults on conditional fields</name>
+            <groups>
+                <group>
+                    <name>imported_hosts</name>
+                </group>
+            </groups>
+            <interfaces>
+                <interface>
+                    <interface_ref>if1</interface_ref>
+                </interface>
+            </interfaces>
+            <items>
+                <item>
+                    <name>dependent-binary</name>
+                    <type>DEPENDENT</type>
+                    <key>binary</key>
+                    <value_type>BINARY</value_type>
+                    <master_item>
+                        <key>master-item</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>browser-item</name>
+                    <type>BROWSER</type>
+                    <key>browser-item</key>
+                    <units>1s</units>
+                    <params>var browser = new Browser(Browser.chromeOptions());
+
+try {
+	browser.navigate(&quot;https://example.com&quot;);
+	browser.collectPerfEntries();
+}
+finally {
+	return JSON.stringify(browser.getResult());
+}</params>
+                    <inventory_link>ALIAS</inventory_link>
+                </item>
+                <item>
+                    <name>master-item</name>
+                    <key>master-item</key>
+                    <value_type>TEXT</value_type>
+                    <interface_ref>if1</interface_ref>
+                </item>
+            </items>
+            <inventory_mode>DISABLED</inventory_mode>
+        </host>
+    </hosts>
+</zabbix_export>
