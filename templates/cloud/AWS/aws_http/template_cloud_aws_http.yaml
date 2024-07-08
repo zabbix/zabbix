@@ -1258,25 +1258,19 @@ zabbix_export:
             conditions:
               - macro: '{#AWS.LAMBDA.NAME}'
                 value: '{$AWS.LAMBDA.LLD.FILTER.NAME.MATCHES}'
-                formulaid: A
               - macro: '{#AWS.LAMBDA.NAME}'
                 value: '{$AWS.LAMBDA.LLD.FILTER.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
               - macro: '{#AWS.LAMBDA.REGION}'
                 value: '{$AWS.LAMBDA.LLD.FILTER.REGION.MATCHES}'
-                formulaid: C
               - macro: '{#AWS.LAMBDA.REGION}'
                 value: '{$AWS.LAMBDA.LLD.FILTER.REGION.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: D
               - macro: '{#AWS.LAMBDA.RUNTIME}'
                 value: '{$AWS.LAMBDA.LLD.FILTER.RUNTIME.MATCHES}'
-                formulaid: E
               - macro: '{#AWS.LAMBDA.RUNTIME}'
                 value: '{$AWS.LAMBDA.LLD.FILTER.RUNTIME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: F
           description: 'Get Lambda functions.'
           host_prototypes:
             - uuid: 7b468bda682c402b96fd55210aa85155
