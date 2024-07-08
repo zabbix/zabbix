@@ -2932,7 +2932,7 @@ final class CItemData {
 				]
 			],
 			'zabbix[proxy group,discovery]' => [
-				'description' => _('List of Zabbix proxy groups with proxy group name, failover delay, and minimum number of online proxies required for the group to be online. Returns JSON.'),
+				'description' => _('List of Zabbix proxy groups configuration data and real-time data. Configuration data includes proxy group name, failover delay, and minimum number of online proxies required for the group to be online. Real-time data includes number of online proxies, percentage of online proxies, and state of proxy group (unknown, offline, recovering, online, degrading). This item does not return groupless proxies. Returns JSON.'),
 				'value_type' => ITEM_VALUE_TYPE_TEXT,
 				'documentation_link' => [
 					ITEM_TYPE_INTERNAL => 'config/items/itemtypes/internal#proxy.group.e'

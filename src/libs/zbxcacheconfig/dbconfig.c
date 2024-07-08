@@ -15926,10 +15926,10 @@ static void	dc_proxy_discovery_add_row(struct zbx_json *json, const ZBX_DC_PROXY
 
 /******************************************************************************
  *                                                                            *
- * Purpose: add proxy group discovery row                                     *
+ * Purpose: add proxy group configuration row                                     *
  *                                                                            *
  ******************************************************************************/
-static void	dc_proxy_group_discovery_add_row(struct zbx_json *json, const zbx_dc_proxy_group_t *pg)
+static void	dc_proxy_group_discovery_add_group(struct zbx_json *json, const zbx_dc_proxy_group_t *pg)
 {
 	zbx_json_addobject(json, NULL);
 
@@ -15937,6 +15937,41 @@ static void	dc_proxy_group_discovery_add_row(struct zbx_json *json, const zbx_dc
 	zbx_json_addstring(json, "failover_delay", pg->failover_delay, ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(json, "min_online", pg->min_online, ZBX_JSON_TYPE_STRING);
 
+	zbx_json_close(json);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: add proxy group real-time statistics row                          *
+ *                                                                            *
+ ******************************************************************************/
+static void	dc_proxy_group_discovery_add_group_stats(struct zbx_json *json, const zbx_dc_proxy_group_t *pg)
+{
+	char		*error = NULL;
+	zbx_pg_stats_t	stats;
+
+	zbx_json_addobject(json, pg->name);
+
+	if (FAIL == zbx_pg_get_stats(pg->name, &stats, &error))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Cannot obtain proxy group statistics: %s", error);
+		zbx_free(error);
+
+		goto out;
+	}
+
+	zbx_json_addint64(json, "state", stats.status);
+	zbx_json_addint64(json, "available", stats.proxy_online_num);
+
+	double	perc;
+
+	if (0 != stats.proxyids.values_num)
+		perc = (double)stats.proxy_online_num / stats.proxyids.values_num * 100;
+	else
+		perc = 0;
+
+	zbx_json_adddouble(json, "pavailable", perc);
+out:
 	zbx_json_close(json);
 }
 
@@ -15981,34 +16016,58 @@ void	zbx_proxy_discovery_get(char **data)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get data of all proxy groups from configuration cache and pack    *
+ * Purpose: get configuration and realtime data of all proxy groups and pack  *
  *          into JSON                                                         *
  *                                                                            *
  * Parameter: data - [OUT] JSON with proxy group data                         *
  *                                                                            *
  * Comments: Allocates memory.                                                *
- *           If there are no proxy groups, an empty JSON {"data":[]} is       *
- *           returned.                                                        *
+ *           Configuration data is taken from configuration cache.            *
+ *           Real-time data is taken from proxy group manager via IPC.        *
+ *                                                                            *
+ * Output JSON example:                                                       *
+ * {                                                                          *
+ *     "data": [                                                              *
+ *        { "name": "Riga", "failover_delay": 60, "min_online": 1 },          *
+ *        { "name": "Tokyo", "failover_delay": 60, "min_online": 2 },         *
+ *        { "name": "Porto Alegre", "failover_delay": 60, "min_online": 3 }   *
+ *     ],                                                                     *
+ *     "rtdata": {                                                            *
+ *         "Riga": { "state": 3, "available": 10, "pavailable": 20 },         *
+ *         "Tokyo": { "state": 3, "available": 10, "pavailable": 20 },        *
+ *         "Porto Alegre": { "state": 1, "available": 0, "pavailable": 0 }    *
+ *     }                                                                      *
+ * }                                                                          *
  *                                                                            *
  ******************************************************************************/
 void	zbx_proxy_group_discovery_get(char **data)
 {
-
 	struct zbx_json	json;
 
 	zbx_hashset_iter_t	iter;
 	zbx_dc_proxy_group_t	*dc_proxy_group;
 
-	zbx_json_initarray(&json, ZBX_JSON_STAT_BUF_LEN);
+	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
+
+	zbx_json_addarray(&json, "data");
 
 	RDLOCK_CACHE;
 
 	zbx_hashset_iter_reset(&config->proxy_groups, &iter);
 	while (NULL != (dc_proxy_group = (zbx_dc_proxy_group_t *)zbx_hashset_iter_next(&iter)))
-		dc_proxy_group_discovery_add_row(&json, dc_proxy_group);
+		dc_proxy_group_discovery_add_group(&json, dc_proxy_group);
+
+	zbx_json_close(&json);
+
+	zbx_json_addobject(&json, "rtdata");
+
+	zbx_hashset_iter_reset(&config->proxy_groups, &iter);
+	while (NULL != (dc_proxy_group = (zbx_dc_proxy_group_t *)zbx_hashset_iter_next(&iter)))
+		dc_proxy_group_discovery_add_group_stats(&json, dc_proxy_group);
 
 	UNLOCK_CACHE;
 
+	zbx_json_close(&json);
 	zbx_json_close(&json);
 	*data = zbx_strdup(NULL, json.buffer);
 
