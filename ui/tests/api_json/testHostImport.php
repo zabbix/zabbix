@@ -102,6 +102,7 @@ class testHostImport extends CAPITest {
 
 		$this->assertArrayHasKey('items', $host);
 		CArrayHelper::sort($host['items'], ['key_']);
+		$host['items'] = array_values($host['items']);
 
 		$this->assertEquals($host, [
 			'host' => 'Host for testing defaults on conditional fields',
