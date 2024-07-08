@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -484,7 +479,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'NTLM' => ['enabled' => true, 'visible' => true],
 					'Kerberos' => ['enabled' => true, 'visible' => true],
 					'Digest' => ['enabled' => true, 'visible' => true],
-					'None' => ['enabled' => true, 'visible' => false],
+					'None' => ['enabled' => true, 'visible' => false]
 				];
 
 				foreach ($http_fields as $http_auth => $status) {
@@ -511,7 +506,7 @@ class testLowLevelDiscovery extends CWebTest {
 				// Timeout fields' dependency.
 				$timeout_array = [
 					'Global' => ['enabled' => false, 'visible' => true],
-					'Override' => ['enabled' => true, 'visible' => true],
+					'Override' => ['enabled' => true, 'visible' => true]
 				];
 				foreach ($timeout_array as $timeout => $status) {
 					$this->checkFieldsDependency($form, ['id:custom_timeout' => $timeout], ['id:timeout' => $status]);
@@ -1092,7 +1087,7 @@ class testLowLevelDiscovery extends CWebTest {
 						'id:lifetime_type' => 'After',
 						'id:lifetime' => '1h',
 						'id:enabled_lifetime_type' => 'After',
-						'id:enabled_lifetime' => '1d',
+						'id:enabled_lifetime' => '1d'
 					],
 					'error_details' => 'Incorrect value for field "Disable lost resources":'.
 						' cannot be greater than or equal to the value of field "Delete lost resources".'
@@ -1577,7 +1572,7 @@ class testLowLevelDiscovery extends CWebTest {
 						'Key' => 'http_check[2]',
 						'URL' => 'www.test.com/search',
 						'Request body type' => 'JSON data',
-						'Request body' => '{"export": {"version": "6.0","date": "2024-03-20T20:05:14Z"}}',
+						'Request body' => '{"export": {"version": "6.0","date": "2024-03-20T20:05:14Z"}}'
 					]
 				]
 			],
@@ -1590,7 +1585,7 @@ class testLowLevelDiscovery extends CWebTest {
 						'Key' => 'http_check[3]',
 						'URL' => 'www.test.com/search',
 						'Request body type' => 'XML data',
-						'Request body' => '<export><version>6.0</version><date>2024-03-20T20:05:14Z</date></export>',
+						'Request body' => '<export><version>6.0</version><date>2024-03-20T20:05:14Z</date></export>'
 					]
 				]
 			],
@@ -1603,7 +1598,7 @@ class testLowLevelDiscovery extends CWebTest {
 						'Key' => 'http_check[]',
 						'URL' => 'https://www.test.com/search?q=cat&rlz=1C1GCEU_enLV1043LV1043',
 						'Required status codes' => '200,200-{$M},{$M},200-400',
-						'HTTP authentication' => 'NTLM',
+						'HTTP authentication' => 'NTLM'
 					],
 					'parse' => true,
 					'parsed' => [
@@ -2541,7 +2536,7 @@ class testLowLevelDiscovery extends CWebTest {
 				],
 				'lld_macros_fields' => [
 					'id:lld_macro_paths_0_lld_macro' => '{#NEW_LLDMACRO}',
-					'id:lld_macro_paths_0_path' => '$.new.path.to.node',
+					'id:lld_macro_paths_0_path' => '$.new.path.to.node'
 				],
 				'filters_fields' => [
 					'id:conditions_0_macro' => '{#NEW_FILTERMACRO}',
