@@ -1838,8 +1838,7 @@ zabbix_export:
                   - macro: '{#PROXY.GROUP}'
                     operator: EXISTS
               operations:
-                - operationobject: ITEM_PROTOTYPE
-                  operator: REGEXP
+                - operator: REGEXP
                   tags:
                     - tag: proxy-group
                       value: '{#PROXY.GROUP}'

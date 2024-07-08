@@ -667,8 +667,7 @@ zabbix_export:
                   - macro: '{#TYPE}'
                     value: buckets
               operations:
-                - operationobject: ITEM_PROTOTYPE
-                  operator: LIKE
+                - operator: LIKE
                   value: bucket
                   discover: DISCOVER
             - name: 'total item'
@@ -678,8 +677,7 @@ zabbix_export:
                   - macro: '{#TYPE}'
                     value: totals
               operations:
-                - operationobject: ITEM_PROTOTYPE
-                  operator: NOT_LIKE
+                - operator: NOT_LIKE
                   value: bucket
                   discover: DISCOVER
       tags:
