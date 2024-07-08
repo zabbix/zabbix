@@ -525,7 +525,7 @@ class testDashboardGraphWidget extends CWebTest {
 				[
 					'Time period' => [
 						'Set custom time period' => true,
-						'From' => '2022-07-04 15:53:07',
+						'From' => '2024-05-04 15:53:07',
 						'To' => ''
 					],
 					'error' => 'Invalid parameter "To": cannot be empty.'
@@ -562,7 +562,7 @@ class testDashboardGraphWidget extends CWebTest {
 				[
 					'Time period' => [
 						'Set custom time period' => true,
-						'From' => '2022-07-04 15:53:07',
+						'From' => '2024-05-04 15:53:07',
 						'To' => 'abc'
 					],
 					'error' => 'Invalid parameter "To": a time range is expected.'
@@ -624,7 +624,7 @@ class testDashboardGraphWidget extends CWebTest {
 				[
 					'Time period' => [
 						'Set custom time period' => true,
-						'From' => '2022-07-04 12:53:00',
+						'From' => '2024-05-04 15:53:07',
 						'To' => 'now-s'
 					],
 					'error' => 'Invalid parameter "To": a time range is expected.'
