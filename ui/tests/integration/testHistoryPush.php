@@ -626,7 +626,7 @@ class testHistoryPush extends CIntegrationTest {
 		$response = $this->call('history.get', [
 			'output' => ['itemid', 'value', 'clock', 'ns'],
 			'itemids' => self::$itemids['trapper_uint'],
-			'sortfield' => 'value',
+			'sortfield' => ['clock', 'ns'],
 			'limit' => 1,
 			'sortorder' => 'DESC'
 		]);
