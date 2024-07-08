@@ -432,7 +432,8 @@ class testLowLevelDiscovery extends CWebTest {
 				// Check hints and texts.
 				foreach ($hints as $label => $hint_text) {
 					$form->getLabel($label)->query('xpath:./button[@data-hintbox]')->one()->click();
-					$hint = $this->query('xpath://div[@class="overlay-dialogue"]')->waitUntilPresent()->all()->last();
+					$hint = $this->query('xpath://div[contains(@class, "overlay-dialogue")]')->waitUntilPresent()
+							->all()->last();
 					$this->assertEquals($hint_text, $hint->getText());
 					$hint->query('xpath:.//button[@title="Close"]')->waitUntilClickable()->one()->click();
 				}
