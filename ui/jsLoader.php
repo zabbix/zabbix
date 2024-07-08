@@ -23,7 +23,6 @@ setupLocale(array_key_exists('lang', $_GET) ? (string) $_GET['lang'] : ZBX_DEFAU
 
 require_once dirname(__FILE__).'/include/js.inc.php';
 require_once dirname(__FILE__).'/include/classes/helpers/CCookieHelper.php';
-require_once dirname(__FILE__).'/include/classes/helpers/CCsrfTokenHelper.php';
 
 // available scripts 'scriptFileName' => 'path relative to js/'
 $available_js = [
@@ -525,7 +524,6 @@ if (empty($_GET['files'])) {
 		$files[] = 'class.notifications.audio.js';
 		$files[] = 'class.notification.js';
 		$files[] = 'class.notifications.js';
-		$js .= 'window.CSRF_TOKEN_NAME = '.json_encode(CCsrfTokenHelper::CSRF_TOKEN_NAME).";\n";
 	}
 
 	$js .= 'ZBX_NOREFERER = '.ZBX_NOREFERER.";\n";

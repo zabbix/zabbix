@@ -49,7 +49,7 @@ function ZBX_Notifications(store, tab) {
 	}
 
 	this.active = false;
-	this.csrf_token = null;
+	this._csrf_token = null;
 
 	this.poll_interval = ZBX_Notifications.POLL_INTERVAL;
 
@@ -452,9 +452,14 @@ ZBX_Notifications.prototype.handleSnoozeClicked = function() {
 	}
 
 	const latest_event = Math.max(...this.collection.getRawList().map(event => parseInt(event.eventid, 10)));
+	const data = {eventid: latest_event};
+
+	if (this._csrf_token !== null) {
+		data._csrf_token = this._csrf_token;
+	}
 
 	this
-		.fetch('notifications.snooze', {eventid: latest_event})
+		.fetch('notifications.snooze', data)
 		.then((response) => {
 			if ('error' in response) {
 				throw {error: response.error};
@@ -495,8 +500,8 @@ ZBX_Notifications.prototype.handleSnoozeClicked = function() {
 ZBX_Notifications.prototype.handleMuteClicked = function(e) {
 	const data = {muted: this.alarm.muted ? 0 : 1};
 
-	if (this.csrf_token !== null) {
-		data[window.CSRF_TOKEN_NAME] = this.csrf_token;
+	if (this._csrf_token !== null) {
+		data._csrf_token = this._csrf_token;
 	}
 
 	this
@@ -550,7 +555,7 @@ ZBX_Notifications.prototype.handleMainLoopResp = function(resp) {
 
 	this.consumeUserSettings(resp.settings);
 	this.consumeList(resp.notifications);
-	this.csrf_token = resp[window.CSRF_TOKEN_NAME];
+	this._csrf_token = resp._csrf_token;
 	this.render();
 
 	this.pushUpdates();

@@ -29,4 +29,6 @@ foreach ($data['vars'] as $name => $value) {
 	}
 }
 
-$view->show();
+$view
+	->addCsrfToken()
+	->show();
