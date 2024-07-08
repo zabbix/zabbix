@@ -61,7 +61,6 @@ zabbix_export:
           snmp_oid: .1.3.6.1.2.1.1.4.0
           key: zyxel.ies6000.contact
           delay: 1h
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: RFC1213-MIB
@@ -108,7 +107,6 @@ zabbix_export:
           snmp_oid: .1.3.6.1.2.1.1.6.0
           key: zyxel.ies6000.location
           delay: 1h
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: RFC1213-MIB
@@ -128,7 +126,6 @@ zabbix_export:
           snmp_oid: .1.3.6.1.2.1.2.2.1.6.1
           key: zyxel.ies6000.mac
           delay: 1h
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: IF-MIB
@@ -151,7 +148,6 @@ zabbix_export:
           snmp_oid: .1.3.6.1.2.1.1.1.0
           key: zyxel.ies6000.model
           delay: 1h
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: RFC1213-MIB
@@ -184,7 +180,6 @@ zabbix_export:
           snmp_oid: .1.3.6.1.2.1.1.5.0
           key: zyxel.ies6000.name
           delay: 1h
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: RFC1213-MIB
@@ -440,21 +435,16 @@ zabbix_export:
             conditions:
               - macro: '{#ZYXEL.IF.DESC}'
                 value: '{$ZYXEL.LLD.FILTER.IF.DESC.MATCHES}'
-                formulaid: A
               - macro: '{#ZYXEL.IF.DESC}'
                 value: '{$ZYXEL.LLD.FILTER.IF.DESC.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
               - macro: '{#ZYXEL.IF.LINKSTATUS}'
                 value: '{$ZYXEL.LLD.FILTER.IF.LINKSTATUS.MATCHES}'
-                formulaid: C
               - macro: '{#ZYXEL.IF.LINKSTATUS}'
                 value: '{$ZYXEL.LLD.FILTER.IF.LINKSTATUS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: D
               - macro: '{#ZYXEL.IF.NAME}'
                 value: adsl
-                formulaid: E
           item_prototypes:
             - uuid: d8a6e995233245cd8ac684232add71f0
               name: 'Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}: Administrative status'
@@ -678,7 +668,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.31.1.1.1.18.{#SNMPINDEX}'
               key: 'zyxel.ies6000.net.adsl.descr[{#SNMPINDEX}]'
-              trends: '0'
               value_type: CHAR
               description: |
                 MIB: IF-MIB
@@ -707,8 +696,6 @@ zabbix_export:
                 address at this sub-layer.
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               tags:
                 - tag: component
                   value: network
@@ -730,8 +717,6 @@ zabbix_export:
                 includes both Group and Functional addresses.
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               tags:
                 - tag: component
                   value: network
@@ -754,8 +739,6 @@ zabbix_export:
                   parameters:
                     - '8'
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               tags:
                 - tag: component
                   value: network
@@ -776,8 +759,6 @@ zabbix_export:
                 or broadcast address at this sub-layer
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               tags:
                 - tag: component
                   value: network
@@ -790,7 +771,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.31.1.1.1.1.{#SNMPINDEX}'
               key: 'zyxel.ies6000.net.adsl.name[{#SNMPINDEX}]'
-              trends: '0'
               value_type: CHAR
               description: |
                 MIB: IF-MIB
@@ -862,8 +842,6 @@ zabbix_export:
                 were discarded or not sent.
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               tags:
                 - tag: component
                   value: network
@@ -886,8 +864,6 @@ zabbix_export:
                 includes both Group and Functional addresses.
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               tags:
                 - tag: component
                   value: network
@@ -911,8 +887,6 @@ zabbix_export:
                   parameters:
                     - '8'
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               tags:
                 - tag: component
                   value: network
@@ -934,8 +908,6 @@ zabbix_export:
                 those that were discarded or not sent.
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               tags:
                 - tag: component
                   value: network
@@ -1008,7 +980,6 @@ zabbix_export:
                   - macro: '{#ZYXEL.IF.NAME}'
                     value: '{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES}'
                     operator: NOT_MATCHES_REGEX
-                    formulaid: A
               operations:
                 - operationobject: TRIGGER_PROTOTYPE
                   operator: REGEXP
@@ -1025,21 +996,16 @@ zabbix_export:
             conditions:
               - macro: '{#ZYXEL.IF.DESC}'
                 value: '{$ZYXEL.LLD.FILTER.IF.DESC.MATCHES}'
-                formulaid: A
               - macro: '{#ZYXEL.IF.DESC}'
                 value: '{$ZYXEL.LLD.FILTER.IF.DESC.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
               - macro: '{#ZYXEL.IF.LINKSTATUS}'
                 value: '{$ZYXEL.LLD.FILTER.IF.LINKSTATUS.MATCHES}'
-                formulaid: C
               - macro: '{#ZYXEL.IF.LINKSTATUS}'
                 value: '{$ZYXEL.LLD.FILTER.IF.LINKSTATUS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: D
               - macro: '{#ZYXEL.IF.NAME}'
                 value: enet
-                formulaid: E
           item_prototypes:
             - uuid: c96f6a48c03f4a92a5a75a6e6d603079
               name: 'Port {#SNMPINDEX}: Administrative status'
@@ -1069,7 +1035,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.31.1.1.1.18.{#SNMPINDEX}'
               key: 'zyxel.ies6000.net.if.descr[{#SNMPINDEX}]'
-              trends: '0'
               value_type: CHAR
               description: |
                 MIB: IF-MIB
@@ -1121,8 +1086,6 @@ zabbix_export:
                 address at this sub-layer.
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               tags:
                 - tag: component
                   value: network
@@ -1144,8 +1107,6 @@ zabbix_export:
                 includes both Group and Functional addresses.
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               tags:
                 - tag: component
                   value: network
@@ -1168,8 +1129,6 @@ zabbix_export:
                   parameters:
                     - '8'
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               tags:
                 - tag: component
                   value: network
@@ -1190,8 +1149,6 @@ zabbix_export:
                 or broadcast address at this sub-layer
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               tags:
                 - tag: component
                   value: network
@@ -1228,7 +1185,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.31.1.1.1.1.{#SNMPINDEX}'
               key: 'zyxel.ies6000.net.if.name[{#SNMPINDEX}]'
-              trends: '0'
               value_type: CHAR
               description: |
                 MIB: IF-MIB
@@ -1300,8 +1256,6 @@ zabbix_export:
                 were discarded or not sent.
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               tags:
                 - tag: component
                   value: network
@@ -1324,8 +1278,6 @@ zabbix_export:
                 includes both Group and Functional addresses.
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               tags:
                 - tag: component
                   value: network
@@ -1349,8 +1301,6 @@ zabbix_export:
                   parameters:
                     - '8'
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               tags:
                 - tag: component
                   value: network
@@ -1372,8 +1322,6 @@ zabbix_export:
                 those that were discarded or not sent.
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               tags:
                 - tag: component
                   value: network
@@ -1472,7 +1420,6 @@ zabbix_export:
                   - macro: '{#ZYXEL.IF.NAME}'
                     value: '{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES}'
                     operator: NOT_MATCHES_REGEX
-                    formulaid: A
               operations:
                 - operationobject: TRIGGER_PROTOTYPE
                   operator: REGEXP
@@ -1489,11 +1436,9 @@ zabbix_export:
             conditions:
               - macro: '{#ZYXEL.SLOTSTATUS}'
                 value: '{$ZYXEL.LLD.FILTER.SLOT.STATUS.MATCHES}'
-                formulaid: A
               - macro: '{#ZYXEL.SLOTSTATUS}'
                 value: '{$ZYXEL.LLD.FILTER.SLOT.STATUS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
           description: 'The table which contains the slot information in a chassis.'
           item_prototypes:
             - uuid: 7be6d40418f94284902c742fef1ada43
@@ -1501,7 +1446,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.890.1.5.13.5.6.3.1.8.{#SNMPINDEX}'
               key: 'zyxel.ies6000.slot.alarm[{#SNMPINDEX}]'
-              trends: '0'
               value_type: CHAR
               description: |
                 MIB: ZYXEL-IES5000-MIB
@@ -1576,7 +1520,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.890.1.5.13.5.6.3.1.6.{#SNMPINDEX}'
               key: 'zyxel.ies6000.slot.cv.ver[{#SNMPINDEX}]'
               delay: 1h
-              trends: '0'
               value_type: CHAR
               description: |
                 MIB: ZYXEL-IES5000-MIB
@@ -1608,7 +1551,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.890.1.5.13.5.6.3.1.3.{#SNMPINDEX}'
               key: 'zyxel.ies6000.slot.desc[{#SNMPINDEX}]'
-              trends: '0'
               value_type: CHAR
               description: |
                 MIB: ZYXEL-IES5000-MIB
@@ -1628,7 +1570,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.890.1.5.13.5.6.3.1.5.{#SNMPINDEX}'
               key: 'zyxel.ies6000.slot.dv.ver[{#SNMPINDEX}]'
               delay: 1h
-              trends: '0'
               value_type: CHAR
               description: |
                 MIB: ZYXEL-IES5000-MIB
@@ -1661,7 +1602,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.890.1.5.13.5.6.3.1.4.{#SNMPINDEX}'
               key: 'zyxel.ies6000.slot.fw.ver[{#SNMPINDEX}]'
               delay: 1h
-              trends: '0'
               value_type: CHAR
               description: |
                 MIB: ZYXEL-IES5000-MIB
@@ -1694,7 +1634,6 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.890.1.5.13.5.6.3.1.10.{#SNMPINDEX}'
               key: 'zyxel.ies6000.slot.hw.ver[{#SNMPINDEX}]'
               delay: 1h
-              trends: '0'
               value_type: CHAR
               description: |
                 MIB: ZYXEL-IES5000-MIB
@@ -1726,7 +1665,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.890.1.5.13.5.6.3.1.12.{#SNMPINDEX}'
               key: 'zyxel.ies6000.slot.mac1[{#SNMPINDEX}]'
-              trends: '0'
               value_type: CHAR
               description: |
                 MIB: ZYXEL-IES5000-MIB
@@ -1745,7 +1683,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.890.1.5.13.5.6.3.1.13.{#SNMPINDEX}'
               key: 'zyxel.ies6000.slot.mac2[{#SNMPINDEX}]'
-              trends: '0'
               value_type: CHAR
               description: |
                 MIB: ZYXEL-IES5000-MIB
@@ -1764,7 +1701,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.4.1.890.1.5.13.5.6.3.1.9.{#SNMPINDEX}'
               key: 'zyxel.ies6000.slot.serial[{#SNMPINDEX}]'
-              trends: '0'
               value_type: CHAR
               description: |
                 MIB: ZYXEL-IES5000-MIB

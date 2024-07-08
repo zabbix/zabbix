@@ -644,6 +644,9 @@ var hintBox = {
 		}
 
 		hintBox.deleteHint(target);
+
+		target = target instanceof jQuery ? target[0] : target;
+
 		target.dispatchEvent(new CustomEvent('onHideHint.hintBox'));
 	},
 

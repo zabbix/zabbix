@@ -25,9 +25,7 @@ zabbix_export:
           name: 'Check mountpoint discovery'
           type: DEPENDENT
           key: vault.check_mountpoint_discovery
-          delay: '0'
           history: '0'
-          trends: '0'
           value_type: TEXT
           preprocessing:
             - type: PROMETHEUS_TO_JSON
@@ -67,9 +65,7 @@ zabbix_export:
           name: 'Check replication discovery'
           type: DEPENDENT
           key: vault.check_replication_discovery
-          delay: '0'
           history: '0'
-          trends: '0'
           value_type: TEXT
           preprocessing:
             - type: PROMETHEUS_TO_JSON
@@ -93,9 +89,7 @@ zabbix_export:
           name: 'Check storage discovery'
           type: DEPENDENT
           key: vault.check_storage_discovery
-          delay: '0'
           history: '0'
-          trends: '0'
           value_type: TEXT
           preprocessing:
             - type: PROMETHEUS_TO_JSON
@@ -136,9 +130,7 @@ zabbix_export:
           name: 'Check WAL discovery'
           type: DEPENDENT
           key: vault.check_wal_discovery
-          delay: '0'
           history: '0'
-          trends: '0'
           value_type: TEXT
           preprocessing:
             - type: PROMETHEUS_TO_JSON
@@ -162,9 +154,7 @@ zabbix_export:
           name: 'Clear metrics'
           type: DEPENDENT
           key: vault.clear_metrics
-          delay: '0'
           history: '0'
-          trends: '0'
           value_type: TEXT
           preprocessing:
             - type: CHECK_JSON_ERROR
@@ -183,7 +173,6 @@ zabbix_export:
           type: HTTP_AGENT
           key: vault.get_health
           history: '0'
-          trends: '0'
           value_type: TEXT
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
@@ -206,7 +195,6 @@ zabbix_export:
           type: HTTP_AGENT
           key: vault.get_leader
           history: '0'
-          trends: '0'
           value_type: TEXT
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
@@ -226,7 +214,6 @@ zabbix_export:
           type: HTTP_AGENT
           key: vault.get_metrics
           history: '0'
-          trends: '0'
           value_type: TEXT
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
@@ -246,8 +233,6 @@ zabbix_export:
           name: 'Get metrics error'
           type: DEPENDENT
           key: vault.get_metrics.error
-          delay: '0'
-          trends: '0'
           value_type: CHAR
           description: 'Get metrics error.'
           preprocessing:
@@ -283,7 +268,6 @@ zabbix_export:
           key: vault.get_tokens
           delay: 15m
           history: '0'
-          trends: '0'
           value_type: TEXT
           params: |
             var params = JSON.parse(value);
@@ -364,7 +348,6 @@ zabbix_export:
           name: Healthcheck
           type: DEPENDENT
           key: vault.health.check
-          delay: '0'
           description: 'Vault healthcheck.'
           valuemap:
             name: 'Service state'
@@ -394,7 +377,6 @@ zabbix_export:
           name: Initialized
           type: DEPENDENT
           key: vault.health.initialized
-          delay: '0'
           description: 'Initialization status.'
           valuemap:
             name: 'Vault flag'
@@ -404,8 +386,6 @@ zabbix_export:
                 - $.initialized
               error_handler: DISCARD_VALUE
             - type: BOOL_TO_DECIMAL
-              parameters:
-                - ''
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
@@ -418,7 +398,6 @@ zabbix_export:
           name: 'Performance standby'
           type: DEPENDENT
           key: vault.health.performance_standby
-          delay: '0'
           description: 'Performance standby status.'
           valuemap:
             name: 'Vault flag'
@@ -428,8 +407,6 @@ zabbix_export:
                 - $.performance_standby
               error_handler: DISCARD_VALUE
             - type: BOOL_TO_DECIMAL
-              parameters:
-                - ''
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
@@ -442,8 +419,6 @@ zabbix_export:
           name: 'Disaster Recovery replication'
           type: DEPENDENT
           key: vault.health.replication_dr_mode
-          delay: '0'
-          trends: '0'
           value_type: CHAR
           description: |
             Disaster recovery replication mode
@@ -465,8 +440,6 @@ zabbix_export:
           name: 'Performance replication'
           type: DEPENDENT
           key: vault.health.replication_performance_mode
-          delay: '0'
-          trends: '0'
           value_type: CHAR
           description: |
             Performance replication mode
@@ -488,7 +461,6 @@ zabbix_export:
           name: Sealed
           type: DEPENDENT
           key: vault.health.sealed
-          delay: '0'
           description: 'Seal status.'
           valuemap:
             name: 'Vault flag'
@@ -498,8 +470,6 @@ zabbix_export:
                 - $.sealed
               error_handler: DISCARD_VALUE
             - type: BOOL_TO_DECIMAL
-              parameters:
-                - ''
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
@@ -521,7 +491,6 @@ zabbix_export:
           name: Standby
           type: DEPENDENT
           key: vault.health.standby
-          delay: '0'
           description: 'Standby status.'
           valuemap:
             name: 'Vault flag'
@@ -531,8 +500,6 @@ zabbix_export:
                 - $.standby
               error_handler: DISCARD_VALUE
             - type: BOOL_TO_DECIMAL
-              parameters:
-                - ''
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
@@ -545,8 +512,6 @@ zabbix_export:
           name: Version
           type: DEPENDENT
           key: vault.health.version
-          delay: '0'
-          trends: '0'
           value_type: CHAR
           description: 'Server version.'
           preprocessing:
@@ -577,7 +542,6 @@ zabbix_export:
           name: 'HA enabled'
           type: DEPENDENT
           key: vault.leader.ha_enabled
-          delay: '0'
           description: 'HA enabled status.'
           valuemap:
             name: 'Vault flag'
@@ -586,8 +550,6 @@ zabbix_export:
               parameters:
                 - $.ha_enabled
             - type: BOOL_TO_DECIMAL
-              parameters:
-                - ''
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
@@ -600,7 +562,6 @@ zabbix_export:
           name: 'Is leader'
           type: DEPENDENT
           key: vault.leader.is_self
-          delay: '0'
           description: 'Leader status.'
           valuemap:
             name: 'Vault flag'
@@ -609,8 +570,6 @@ zabbix_export:
               parameters:
                 - $.is_self
             - type: BOOL_TO_DECIMAL
-              parameters:
-                - ''
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
@@ -623,7 +582,6 @@ zabbix_export:
           name: 'Audit log request failures, rate'
           type: DEPENDENT
           key: vault.metrics.audit.log.request.failure.rate
-          delay: '0'
           value_type: FLOAT
           description: 'Number of audit log request failures.'
           preprocessing:
@@ -634,8 +592,6 @@ zabbix_export:
                 - ''
               error_handler: DISCARD_VALUE
             - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           master_item:
             key: vault.clear_metrics
           tags:
@@ -645,7 +601,6 @@ zabbix_export:
           name: 'Audit log requests, rate'
           type: DEPENDENT
           key: vault.metrics.audit.log.request.rate
-          delay: '0'
           value_type: FLOAT
           units: rps
           description: 'Number of all audit log requests across all audit log devices.'
@@ -657,8 +612,6 @@ zabbix_export:
                 - ''
               error_handler: DISCARD_VALUE
             - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           master_item:
             key: vault.clear_metrics
           tags:
@@ -668,7 +621,6 @@ zabbix_export:
           name: 'Audit log response failures, rate'
           type: DEPENDENT
           key: vault.metrics.audit.log.response.failure.rate
-          delay: '0'
           value_type: FLOAT
           description: 'Number of audit log response failures.'
           preprocessing:
@@ -679,8 +631,6 @@ zabbix_export:
                 - ''
               error_handler: DISCARD_VALUE
             - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           master_item:
             key: vault.clear_metrics
           tags:
@@ -690,7 +640,6 @@ zabbix_export:
           name: 'Audit log response, rate'
           type: DEPENDENT
           key: vault.metrics.audit.log.response.rate
-          delay: '0'
           value_type: FLOAT
           units: rps
           description: 'Number of audit log responses across all audit log devices.'
@@ -702,8 +651,6 @@ zabbix_export:
                 - ''
               error_handler: DISCARD_VALUE
             - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           master_item:
             key: vault.clear_metrics
           tags:
@@ -713,7 +660,6 @@ zabbix_export:
           name: 'Barrier DELETE ops, rate'
           type: DEPENDENT
           key: vault.metrics.barrier.delete.rate
-          delay: '0'
           value_type: FLOAT
           description: 'Number of DELETE operations at the barrier.'
           preprocessing:
@@ -724,8 +670,6 @@ zabbix_export:
                 - ''
               error_handler: DISCARD_VALUE
             - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           master_item:
             key: vault.clear_metrics
           tags:
@@ -735,7 +679,6 @@ zabbix_export:
           name: 'Barrier LIST ops, rate'
           type: DEPENDENT
           key: vault.metrics.barrier.list.rate
-          delay: '0'
           value_type: FLOAT
           description: 'Number of LIST operations at the barrier.'
           preprocessing:
@@ -746,8 +689,6 @@ zabbix_export:
                 - ''
               error_handler: DISCARD_VALUE
             - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           master_item:
             key: vault.clear_metrics
           tags:
@@ -757,7 +698,6 @@ zabbix_export:
           name: 'Barrier PUT ops, rate'
           type: DEPENDENT
           key: vault.metrics.barrier.put.rate
-          delay: '0'
           value_type: FLOAT
           description: 'Number of PUT operations at the barrier.'
           preprocessing:
@@ -768,8 +708,6 @@ zabbix_export:
                 - ''
               error_handler: DISCARD_VALUE
             - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           master_item:
             key: vault.clear_metrics
           tags:
@@ -779,7 +717,6 @@ zabbix_export:
           name: 'Cache hit, rate'
           type: DEPENDENT
           key: vault.metrics.cache.hit.rate
-          delay: '0'
           value_type: FLOAT
           description: 'Number of times a value was retrieved from the LRU cache.'
           preprocessing:
@@ -790,8 +727,6 @@ zabbix_export:
                 - ''
               error_handler: DISCARD_VALUE
             - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           master_item:
             key: vault.clear_metrics
           tags:
@@ -801,7 +736,6 @@ zabbix_export:
           name: 'Cache miss, rate'
           type: DEPENDENT
           key: vault.metrics.cache.miss.rate
-          delay: '0'
           value_type: FLOAT
           description: 'Number of times a value was not in the LRU cache. The results in a read from the configured storage.'
           preprocessing:
@@ -812,8 +746,6 @@ zabbix_export:
                 - ''
               error_handler: DISCARD_VALUE
             - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           master_item:
             key: vault.clear_metrics
           tags:
@@ -823,7 +755,6 @@ zabbix_export:
           name: 'Cache write, rate'
           type: DEPENDENT
           key: vault.metrics.cache.write.rate
-          delay: '0'
           value_type: FLOAT
           description: 'Number of times a value was written to the LRU cache.'
           preprocessing:
@@ -834,8 +765,6 @@ zabbix_export:
                 - ''
               error_handler: DISCARD_VALUE
             - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           master_item:
             key: vault.clear_metrics
           tags:
@@ -845,7 +774,6 @@ zabbix_export:
           name: 'Check token, rate'
           type: DEPENDENT
           key: vault.metrics.core.check.token.rate
-          delay: '0'
           value_type: FLOAT
           description: 'Number of token checks handled by Vault core.'
           preprocessing:
@@ -856,8 +784,6 @@ zabbix_export:
                 - ''
               error_handler: DISCARD_VALUE
             - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           master_item:
             key: vault.clear_metrics
           tags:
@@ -867,7 +793,6 @@ zabbix_export:
           name: 'Fetch ACL and token, rate'
           type: DEPENDENT
           key: vault.metrics.core.fetch.acl_and_token
-          delay: '0'
           value_type: FLOAT
           description: 'Number of ACL and corresponding token entry fetches handled by Vault core.'
           preprocessing:
@@ -878,8 +803,6 @@ zabbix_export:
                 - ''
               error_handler: DISCARD_VALUE
             - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           master_item:
             key: vault.clear_metrics
           tags:
@@ -889,7 +812,6 @@ zabbix_export:
           name: 'Requests, rate'
           type: DEPENDENT
           key: vault.metrics.core.handle.request
-          delay: '0'
           value_type: FLOAT
           description: 'Number of requests handled by Vault core.'
           preprocessing:
@@ -900,8 +822,6 @@ zabbix_export:
                 - ''
               error_handler: DISCARD_VALUE
             - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           master_item:
             key: vault.clear_metrics
           tags:
@@ -911,7 +831,6 @@ zabbix_export:
           name: 'Leadership setup failed, counter'
           type: DEPENDENT
           key: vault.metrics.core.leadership.setup_failed
-          delay: '0'
           description: 'Cluster leadership setup failures which have occurred in a highly available Vault cluster.'
           preprocessing:
             - type: PROMETHEUS_TO_JSON
@@ -941,7 +860,6 @@ zabbix_export:
           name: 'Leadership setup lost, counter'
           type: DEPENDENT
           key: vault.metrics.core.leadership_lost
-          delay: '0'
           description: 'Cluster leadership losses which have occurred in a highly available Vault cluster.'
           preprocessing:
             - type: PROMETHEUS_TO_JSON
@@ -971,7 +889,6 @@ zabbix_export:
           name: 'Post-unseal ops, counter'
           type: DEPENDENT
           key: vault.metrics.core.post_unseal
-          delay: '0'
           description: 'Duration of time taken by post-unseal operations handled by Vault core.'
           preprocessing:
             - type: PROMETHEUS_PATTERN
@@ -989,7 +906,6 @@ zabbix_export:
           name: 'Pre-seal ops, counter'
           type: DEPENDENT
           key: vault.metrics.core.pre_seal
-          delay: '0'
           description: 'Duration of time taken by pre-seal operations.'
           preprocessing:
             - type: PROMETHEUS_PATTERN
@@ -1007,7 +923,6 @@ zabbix_export:
           name: 'Seal ops, counter'
           type: DEPENDENT
           key: vault.metrics.core.seal
-          delay: '0'
           value_type: FLOAT
           description: 'Duration of time taken by seal operations.'
           preprocessing:
@@ -1026,7 +941,6 @@ zabbix_export:
           name: 'Internal seal ops, counter'
           type: DEPENDENT
           key: vault.metrics.core.seal_internal
-          delay: '0'
           description: 'Duration of time taken by internal seal operations.'
           preprocessing:
             - type: PROMETHEUS_PATTERN
@@ -1044,7 +958,6 @@ zabbix_export:
           name: 'Requested seal ops, counter'
           type: DEPENDENT
           key: vault.metrics.core.seal_with_request
-          delay: '0'
           description: 'Duration of time taken by requested seal operations.'
           preprocessing:
             - type: PROMETHEUS_PATTERN
@@ -1062,7 +975,6 @@ zabbix_export:
           name: 'Leadership step downs, counter'
           type: DEPENDENT
           key: vault.metrics.core.step_down
-          delay: '0'
           description: 'Cluster leadership step down.'
           preprocessing:
             - type: PROMETHEUS_TO_JSON
@@ -1092,7 +1004,6 @@ zabbix_export:
           name: 'Unseal ops, counter'
           type: DEPENDENT
           key: vault.metrics.core.unseal
-          delay: '0'
           description: 'Duration of time taken by unseal operations.'
           preprocessing:
             - type: PROMETHEUS_PATTERN
@@ -1110,7 +1021,6 @@ zabbix_export:
           name: 'Fetch lease times, counter'
           type: DEPENDENT
           key: vault.metrics.expire.fetch.lease.times
-          delay: '0'
           description: 'Time taken to fetch lease times.'
           preprocessing:
             - type: PROMETHEUS_PATTERN
@@ -1128,7 +1038,6 @@ zabbix_export:
           name: 'Fetch lease times by token, counter'
           type: DEPENDENT
           key: vault.metrics.expire.fetch.lease.times.by_token
-          delay: '0'
           description: 'Time taken to fetch lease times by token.'
           preprocessing:
             - type: PROMETHEUS_PATTERN
@@ -1146,7 +1055,6 @@ zabbix_export:
           name: 'Number of expiring leases'
           type: DEPENDENT
           key: vault.metrics.expire.num_leases
-          delay: '0'
           description: 'Number of all leases which are eligible for eventual expiry.'
           preprocessing:
             - type: PROMETHEUS_PATTERN
@@ -1164,7 +1072,6 @@ zabbix_export:
           name: 'Register ops, count'
           type: DEPENDENT
           key: vault.metrics.expire.register
-          delay: '0'
           value_type: FLOAT
           description: 'Time taken for register operations.'
           preprocessing:
@@ -1183,7 +1090,6 @@ zabbix_export:
           name: 'Register auth ops, count'
           type: DEPENDENT
           key: vault.metrics.expire.register.auth
-          delay: '0'
           value_type: FLOAT
           description: 'Time taken for register authentication operations which create lease entries without lease ID.'
           preprocessing:
@@ -1202,7 +1108,6 @@ zabbix_export:
           name: 'Expire renew, count'
           type: DEPENDENT
           key: vault.metrics.expire.renew
-          delay: '0'
           value_type: FLOAT
           description: 'Time taken to renew a lease.'
           preprocessing:
@@ -1221,7 +1126,6 @@ zabbix_export:
           name: 'Renew token, count'
           type: DEPENDENT
           key: vault.metrics.expire.renew_token
-          delay: '0'
           value_type: FLOAT
           description: 'Time taken to renew a token which does not need to invoke a logical backend.'
           preprocessing:
@@ -1240,7 +1144,6 @@ zabbix_export:
           name: 'Expire revoke, count'
           type: DEPENDENT
           key: vault.metrics.expire.revoke
-          delay: '0'
           value_type: FLOAT
           description: 'Time taken to revoke a token.'
           preprocessing:
@@ -1259,7 +1162,6 @@ zabbix_export:
           name: 'Revoke secrets by token, count'
           type: DEPENDENT
           key: vault.metrics.expire.revoke.by_token
-          delay: '0'
           value_type: FLOAT
           description: 'Time taken to revoke all secrets issued with a given token.'
           preprocessing:
@@ -1278,7 +1180,6 @@ zabbix_export:
           name: 'Expire revoke force, count'
           type: DEPENDENT
           key: vault.metrics.expire.revoke.force
-          delay: '0'
           value_type: FLOAT
           description: 'Time taken to forcibly revoke a token.'
           preprocessing:
@@ -1297,7 +1198,6 @@ zabbix_export:
           name: 'Expire revoke prefix, count'
           type: DEPENDENT
           key: vault.metrics.expire.revoke.prefix
-          delay: '0'
           value_type: FLOAT
           description: 'Tokens revoke on a prefix.'
           preprocessing:
@@ -1316,7 +1216,6 @@ zabbix_export:
           name: 'Policy DELETE ops, rate'
           type: DEPENDENT
           key: vault.metrics.policy.delete_policy.rate
-          delay: '0'
           value_type: FLOAT
           description: 'Number of operations to delete a policy.'
           preprocessing:
@@ -1327,8 +1226,6 @@ zabbix_export:
                 - ''
               error_handler: DISCARD_VALUE
             - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           master_item:
             key: vault.clear_metrics
           tags:
@@ -1338,7 +1235,6 @@ zabbix_export:
           name: 'Policy GET ops, rate'
           type: DEPENDENT
           key: vault.metrics.policy.get_policy.rate
-          delay: '0'
           value_type: FLOAT
           description: 'Number of operations to get a policy.'
           preprocessing:
@@ -1349,8 +1245,6 @@ zabbix_export:
                 - ''
               error_handler: DISCARD_VALUE
             - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           master_item:
             key: vault.clear_metrics
           tags:
@@ -1360,7 +1254,6 @@ zabbix_export:
           name: 'Policy LIST ops, rate'
           type: DEPENDENT
           key: vault.metrics.policy.list_policies.rate
-          delay: '0'
           value_type: FLOAT
           description: 'Number of operations to list policies.'
           preprocessing:
@@ -1371,8 +1264,6 @@ zabbix_export:
                 - ''
               error_handler: DISCARD_VALUE
             - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           master_item:
             key: vault.clear_metrics
           tags:
@@ -1382,7 +1273,6 @@ zabbix_export:
           name: 'Policy SET ops, rate'
           type: DEPENDENT
           key: vault.metrics.policy.set_policy.rate
-          delay: '0'
           value_type: FLOAT
           description: 'Number of operations to set a policy.'
           preprocessing:
@@ -1393,8 +1283,6 @@ zabbix_export:
                 - ''
               error_handler: DISCARD_VALUE
             - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           master_item:
             key: vault.clear_metrics
           tags:
@@ -1404,7 +1292,6 @@ zabbix_export:
           name: 'Process CPU seconds, total'
           type: DEPENDENT
           key: vault.metrics.process.cpu.seconds.total
-          delay: '0'
           value_type: FLOAT
           units: s
           description: 'Total user and system CPU time spent in seconds.'
@@ -1424,7 +1311,6 @@ zabbix_export:
           name: 'Open file descriptors, max'
           type: DEPENDENT
           key: vault.metrics.process.max.fds
-          delay: '0'
           value_type: FLOAT
           description: 'Maximum number of open file descriptors.'
           preprocessing:
@@ -1446,7 +1332,6 @@ zabbix_export:
           name: 'Open file descriptors, current'
           type: DEPENDENT
           key: vault.metrics.process.open.fds
-          delay: '0'
           value_type: FLOAT
           description: 'Number of open file descriptors.'
           preprocessing:
@@ -1465,7 +1350,6 @@ zabbix_export:
           name: 'Process resident memory'
           type: DEPENDENT
           key: vault.metrics.process.resident_memory.bytes
-          delay: '0'
           value_type: FLOAT
           units: B
           description: 'Resident memory size in bytes.'
@@ -1485,7 +1369,6 @@ zabbix_export:
           name: Uptime
           type: DEPENDENT
           key: vault.metrics.process.uptime
-          delay: '0'
           units: s
           description: 'Server uptime.'
           preprocessing:
@@ -1518,7 +1401,6 @@ zabbix_export:
           name: 'Process virtual memory, current'
           type: DEPENDENT
           key: vault.metrics.process.virtual_memory.bytes
-          delay: '0'
           value_type: FLOAT
           units: B
           description: 'Virtual memory size in bytes.'
@@ -1538,7 +1420,6 @@ zabbix_export:
           name: 'Process virtual memory, max'
           type: DEPENDENT
           key: vault.metrics.process.virtual_memory.max.bytes
-          delay: '0'
           value_type: FLOAT
           units: B
           description: 'Maximum amount of virtual memory available in bytes.'
@@ -1561,7 +1442,6 @@ zabbix_export:
           name: 'Runtime allocated bytes'
           type: DEPENDENT
           key: vault.metrics.runtime.alloc.bytes
-          delay: '0'
           value_type: FLOAT
           units: B
           description: 'Number of bytes allocated by the Vault process. This could burst from time to time, but should return to a steady state value.'
@@ -1581,7 +1461,6 @@ zabbix_export:
           name: 'Runtime freed objects'
           type: DEPENDENT
           key: vault.metrics.runtime.free.count
-          delay: '0'
           value_type: FLOAT
           description: 'Number of freed objects.'
           preprocessing:
@@ -1600,7 +1479,6 @@ zabbix_export:
           name: 'Runtime heap objects'
           type: DEPENDENT
           key: vault.metrics.runtime.heap.objects
-          delay: '0'
           value_type: FLOAT
           description: 'Number of objects on the heap. This is a good general memory pressure indicator worth establishing a baseline and thresholds for alerting.'
           preprocessing:
@@ -1619,7 +1497,6 @@ zabbix_export:
           name: 'Runtime malloc count'
           type: DEPENDENT
           key: vault.metrics.runtime.malloc.count
-          delay: '0'
           value_type: FLOAT
           description: 'Cumulative count of allocated heap objects.'
           preprocessing:
@@ -1638,7 +1515,6 @@ zabbix_export:
           name: 'Runtime num goroutines'
           type: DEPENDENT
           key: vault.metrics.runtime.num_goroutines
-          delay: '0'
           value_type: FLOAT
           description: 'Number of goroutines. This serves as a general system load indicator worth establishing a baseline and thresholds for alerting.'
           preprocessing:
@@ -1657,7 +1533,6 @@ zabbix_export:
           name: 'Runtime sys bytes'
           type: DEPENDENT
           key: vault.metrics.runtime.sys.bytes
-          delay: '0'
           value_type: FLOAT
           units: B
           description: 'Number of bytes allocated to Vault. This includes what is being used by Vault''s heap and what has been reclaimed but not given back to the operating system.'
@@ -1677,7 +1552,6 @@ zabbix_export:
           name: 'Runtime GC runs, total'
           type: DEPENDENT
           key: vault.metrics.runtime.total.gc.runs
-          delay: '0'
           description: 'Total number of garbage collection runs since Vault was last started.'
           preprocessing:
             - type: PROMETHEUS_PATTERN
@@ -1695,7 +1569,6 @@ zabbix_export:
           name: 'Secret kv entries'
           type: DEPENDENT
           key: vault.metrics.secret.kv.count
-          delay: '0'
           description: 'Number of entries in each key-value secret engine.'
           preprocessing:
             - type: PROMETHEUS_TO_JSON
@@ -1715,7 +1588,6 @@ zabbix_export:
           name: 'Token secret lease creation, rate'
           type: DEPENDENT
           key: vault.metrics.secret.lease.creation.rate
-          delay: '0'
           value_type: FLOAT
           description: 'Counts the number of leases created by secret engines.'
           preprocessing:
@@ -1728,8 +1600,6 @@ zabbix_export:
               error_handler: CUSTOM_VALUE
               error_handler_params: '0'
             - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           master_item:
             key: vault.clear_metrics
           tags:
@@ -1739,7 +1609,6 @@ zabbix_export:
           name: 'Token count, total'
           type: DEPENDENT
           key: vault.metrics.token
-          delay: '0'
           description: 'Total number of service tokens available for use; counts all un-expired and un-revoked tokens in Vault''s token store. This measurement is performed every 10 minutes.'
           preprocessing:
             - type: PROMETHEUS_TO_JSON
@@ -1759,7 +1628,6 @@ zabbix_export:
           name: 'Token count by auth, total'
           type: DEPENDENT
           key: vault.metrics.token.by_auth
-          delay: '0'
           description: 'Total number of service tokens that were created by an auth method.'
           preprocessing:
             - type: PROMETHEUS_TO_JSON
@@ -1779,7 +1647,6 @@ zabbix_export:
           name: 'Token count by policy, total'
           type: DEPENDENT
           key: vault.metrics.token.by_policy
-          delay: '0'
           description: 'Total number of service tokens that have a policy attached.'
           preprocessing:
             - type: PROMETHEUS_TO_JSON
@@ -1799,7 +1666,6 @@ zabbix_export:
           name: 'Token count by ttl, total'
           type: DEPENDENT
           key: vault.metrics.token.by_ttl
-          delay: '0'
           description: 'Number of service tokens, grouped by the TTL range they were assigned at creation.'
           preprocessing:
             - type: PROMETHEUS_TO_JSON
@@ -1819,7 +1685,6 @@ zabbix_export:
           name: 'Token create, count'
           type: DEPENDENT
           key: vault.metrics.token.create
-          delay: '0'
           value_type: FLOAT
           description: 'The time taken to create a token.'
           preprocessing:
@@ -1838,7 +1703,6 @@ zabbix_export:
           name: 'Token createAccessor, count'
           type: DEPENDENT
           key: vault.metrics.token.createAccessor
-          delay: '0'
           value_type: FLOAT
           description: 'The time taken to create a token accessor.'
           preprocessing:
@@ -1857,7 +1721,6 @@ zabbix_export:
           name: 'Token creation, rate'
           type: DEPENDENT
           key: vault.metrics.token.creation.rate
-          delay: '0'
           value_type: FLOAT
           description: 'Number of service or batch tokens created.'
           preprocessing:
@@ -1870,8 +1733,6 @@ zabbix_export:
               error_handler: CUSTOM_VALUE
               error_handler_params: '0'
             - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           master_item:
             key: vault.clear_metrics
           tags:
@@ -1881,7 +1742,6 @@ zabbix_export:
           name: 'Token lookup, rate'
           type: DEPENDENT
           key: vault.metrics.token.lookup.rate
-          delay: '0'
           value_type: FLOAT
           description: 'Number of token look up.'
           preprocessing:
@@ -1892,8 +1752,6 @@ zabbix_export:
                 - ''
               error_handler: DISCARD_VALUE
             - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           master_item:
             key: vault.clear_metrics
           tags:
@@ -1903,7 +1761,6 @@ zabbix_export:
           name: 'Token revoke, count'
           type: DEPENDENT
           key: vault.metrics.token.revoke
-          delay: '0'
           value_type: FLOAT
           description: 'The time taken to look up a token.'
           preprocessing:
@@ -1922,7 +1779,6 @@ zabbix_export:
           name: 'Token revoke tree, count'
           type: DEPENDENT
           key: vault.metrics.token.revoke.tree
-          delay: '0'
           value_type: FLOAT
           description: 'Time taken to revoke a token tree.'
           preprocessing:
@@ -1941,7 +1797,6 @@ zabbix_export:
           name: 'Token store, count'
           type: DEPENDENT
           key: vault.metrics.token.store
-          delay: '0'
           value_type: FLOAT
           description: 'Time taken to store an updated token entry without writing to the secondary index.'
           preprocessing:
@@ -1960,7 +1815,6 @@ zabbix_export:
           name: 'Runtime GC pause, total'
           type: DEPENDENT
           key: vault.metrics.total.gc.pause
-          delay: '0'
           units: s
           description: 'The total garbage collector pause time since Vault was last started.'
           preprocessing:
@@ -1982,7 +1836,6 @@ zabbix_export:
           name: 'Barrier GET ops, rate'
           type: DEPENDENT
           key: vault.metrics.vault.barrier.get.rate
-          delay: '0'
           value_type: FLOAT
           description: 'Number of GET operations at the barrier.'
           preprocessing:
@@ -1993,8 +1846,6 @@ zabbix_export:
                 - ''
               error_handler: DISCARD_VALUE
             - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           master_item:
             key: vault.clear_metrics
           tags:
@@ -2005,14 +1856,12 @@ zabbix_export:
           name: 'Mountpoint metrics discovery'
           type: DEPENDENT
           key: vault.mountpoint.discovery
-          delay: '0'
           description: 'Mountpoint metrics discovery.'
           item_prototypes:
             - uuid: 3956d1e526d944c7b68d09a1cf52f11e
               name: 'Rollback attempt [{#MOUNTPOINT}] ops, rate'
               type: DEPENDENT
               key: 'vault.metrics.rollback.attempt.rate[{#MOUNTPOINT}]'
-              delay: '0'
               value_type: FLOAT
               description: 'Number of operations to perform a rollback operation on the given mount point.'
               preprocessing:
@@ -2023,8 +1872,6 @@ zabbix_export:
                     - ''
                   error_handler: DISCARD_VALUE
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               master_item:
                 key: vault.clear_metrics
               tags:
@@ -2036,7 +1883,6 @@ zabbix_export:
               name: 'Route rollback [{#MOUNTPOINT}] ops, rate'
               type: DEPENDENT
               key: 'vault.metrics.route.rollback.rate[{#MOUNTPOINT}]'
-              delay: '0'
               value_type: FLOAT
               description: 'Number of operations to dispatch a rollback operation to a backend, and for that backend to process it. Rollback operations are automatically scheduled to clean up partial errors.'
               preprocessing:
@@ -2047,8 +1893,6 @@ zabbix_export:
                     - ''
                   error_handler: DISCARD_VALUE
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               master_item:
                 key: vault.clear_metrics
               tags:
@@ -2062,14 +1906,12 @@ zabbix_export:
           name: 'Replication metrics discovery'
           type: DEPENDENT
           key: vault.replication.discovery
-          delay: '0'
           description: 'Discovery for replication metrics.'
           item_prototypes:
             - uuid: af047eca9606472680288e5b5703bca9
               name: 'Stream WAL guard found, count{#SINGLETON}'
               type: DEPENDENT
               key: 'vault.metrics.logshipper.streamWALs.guard_found[{#SINGLETON}]'
-              delay: '0'
               value_type: FLOAT
               description: 'Number of incidences where the starting Merkle Tree index used to begin streaming WAL entries is matched/found.'
               preprocessing:
@@ -2088,7 +1930,6 @@ zabbix_export:
               name: 'Stream WAL missing guard, count{#SINGLETON}'
               type: DEPENDENT
               key: 'vault.metrics.logshipper.streamWALs.missing_guard[{#SINGLETON}]'
-              delay: '0'
               value_type: FLOAT
               description: 'Number of incidences where the starting Merkle Tree index used to begin streaming WAL entries is not matched/found.'
               preprocessing:
@@ -2107,7 +1948,6 @@ zabbix_export:
               name: 'Last remote WAL{#SINGLETON}'
               type: DEPENDENT
               key: 'vault.metrics.replication.fsm.last_remote_wal[{#SINGLETON}]'
-              delay: '0'
               value_type: FLOAT
               description: 'The index of the last remote WAL.'
               preprocessing:
@@ -2126,7 +1966,6 @@ zabbix_export:
               name: 'Merkle commit index{#SINGLETON}'
               type: DEPENDENT
               key: 'vault.metrics.replication.merkle.commit_index[{#SINGLETON}]'
-              delay: '0'
               value_type: FLOAT
               description: 'The last committed index in the Merkle Tree.'
               preprocessing:
@@ -2145,7 +1984,6 @@ zabbix_export:
               name: 'Last DR WAL{#SINGLETON}'
               type: DEPENDENT
               key: 'vault.metrics.replication.wal.last_dr_wal[{#SINGLETON}]'
-              delay: '0'
               value_type: FLOAT
               description: 'The index of the last DR WAL.'
               preprocessing:
@@ -2164,7 +2002,6 @@ zabbix_export:
               name: 'Last performance WAL{#SINGLETON}'
               type: DEPENDENT
               key: 'vault.metrics.replication.wal.last_performance_wal[{#SINGLETON}]'
-              delay: '0'
               value_type: FLOAT
               description: 'The index of the last Performance WAL.'
               preprocessing:
@@ -2183,7 +2020,6 @@ zabbix_export:
               name: 'Last WAL{#SINGLETON}'
               type: DEPENDENT
               key: 'vault.metrics.replication.wal.last_wal[{#SINGLETON}]'
-              delay: '0'
               value_type: FLOAT
               description: 'The index of the last WAL.'
               preprocessing:
@@ -2204,20 +2040,17 @@ zabbix_export:
           name: 'Storage metrics discovery'
           type: DEPENDENT
           key: vault.storage.discovery
-          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#STORAGE}'
                 value: '{$VAULT.LLD.FILTER.STORAGE.MATCHES}'
-                formulaid: A
           description: 'Storage backend metrics discovery.'
           item_prototypes:
             - uuid: 0cdb0bcf0ff448ff8c5d673f9b66d17a
               name: 'Storage [{#STORAGE}] {#OPERATION} ops, rate'
               type: DEPENDENT
               key: 'vault.metrics.storage.rate[{#STORAGE}, {#OPERATION}]'
-              delay: '0'
               value_type: FLOAT
               description: 'Number of a {#OPERATION} operation against the {#STORAGE} storage backend.'
               preprocessing:
@@ -2228,8 +2061,6 @@ zabbix_export:
                     - ''
                   error_handler: DISCARD_VALUE
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               master_item:
                 key: vault.clear_metrics
               tags:
@@ -2245,15 +2076,12 @@ zabbix_export:
           name: 'Token metrics discovery'
           type: DEPENDENT
           key: vault.tokens.discovery
-          delay: '0'
           description: 'Tokens metrics discovery.'
           item_prototypes:
             - uuid: 9a9359e74c3a48b1bbada84d772e665a
               name: 'Token [{#TOKEN_NAME}] error'
               type: DEPENDENT
               key: 'vault.token_via_accessor.error["{#ACCESSOR}"]'
-              delay: '0'
-              trends: '0'
               value_type: CHAR
               description: 'Token lookup error text.'
               valuemap:
@@ -2287,7 +2115,6 @@ zabbix_export:
               name: 'Token [{#TOKEN_NAME}] has TTL'
               type: DEPENDENT
               key: 'vault.token_via_accessor.has_ttl["{#ACCESSOR}"]'
-              delay: '0'
               description: 'The Token has TTL.'
               valuemap:
                 name: 'Vault flag'
@@ -2296,8 +2123,6 @@ zabbix_export:
                   parameters:
                     - '$.[?(@.accessor == "{#ACCESSOR}")].has_ttl.first()'
                 - type: BOOL_TO_DECIMAL
-                  parameters:
-                    - ''
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
@@ -2312,7 +2137,6 @@ zabbix_export:
               name: 'Token [{#TOKEN_NAME}] TTL'
               type: DEPENDENT
               key: 'vault.token_via_accessor.ttl["{#ACCESSOR}"]'
-              delay: '0'
               units: s
               description: 'The TTL period of the token.'
               preprocessing:
@@ -2357,14 +2181,12 @@ zabbix_export:
           name: 'WAL metrics discovery'
           type: DEPENDENT
           key: vault.wal.discovery
-          delay: '0'
           description: 'Discovery for WAL metrics.'
           item_prototypes:
             - uuid: 7e21309d1778466cae08e6424108d0e9
               name: 'Delete WALs, count{#SINGLETON}'
               type: DEPENDENT
               key: 'vault.metrics.wal.deletewals[{#SINGLETON}]'
-              delay: '0'
               value_type: FLOAT
               description: 'Time taken to delete a Write Ahead Log (WAL).'
               preprocessing:
@@ -2383,7 +2205,6 @@ zabbix_export:
               name: 'Flush ready WAL, count{#SINGLETON}'
               type: DEPENDENT
               key: 'vault.metrics.wal.flushready[{#SINGLETON}]'
-              delay: '0'
               value_type: FLOAT
               description: 'Time taken to flush a ready Write Ahead Log (WAL) to storage.'
               preprocessing:
@@ -2402,7 +2223,6 @@ zabbix_export:
               name: 'GC deleted WAL{#SINGLETON}'
               type: DEPENDENT
               key: 'vault.metrics.wal.gc.deleted[{#SINGLETON}]'
-              delay: '0'
               value_type: FLOAT
               description: 'Number of Write Ahead Logs (WAL) deleted during each garbage collection run.'
               preprocessing:
@@ -2421,7 +2241,6 @@ zabbix_export:
               name: 'WALs on disk, total{#SINGLETON}'
               type: DEPENDENT
               key: 'vault.metrics.wal.gc.total[{#SINGLETON}]'
-              delay: '0'
               value_type: FLOAT
               description: 'Total Number of Write Ahead Logs (WAL) on disk.'
               preprocessing:
@@ -2440,7 +2259,6 @@ zabbix_export:
               name: 'Load WALs, count{#SINGLETON}'
               type: DEPENDENT
               key: 'vault.metrics.wal.loadWAL[{#SINGLETON}]'
-              delay: '0'
               value_type: FLOAT
               description: 'Time taken to load a Write Ahead Log (WAL).'
               preprocessing:
@@ -2459,7 +2277,6 @@ zabbix_export:
               name: 'Persist WALs, count{#SINGLETON}'
               type: DEPENDENT
               key: 'vault.metrics.wal.persistwals[{#SINGLETON}]'
-              delay: '0'
               value_type: FLOAT
               description: 'Time taken to persist a Write Ahead Log (WAL).'
               preprocessing:

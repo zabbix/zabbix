@@ -35,7 +35,6 @@ zabbix_export:
           name: 'Failed Job Runs'
           type: DEPENDENT
           key: veeam.manager.failed.jobs
-          delay: '0'
           description: 'Informs about the failed job runs.'
           preprocessing:
             - type: JSONPATH
@@ -64,8 +63,6 @@ zabbix_export:
           name: 'Get errors'
           type: DEPENDENT
           key: veeam.manager.get.errors
-          delay: '0'
-          trends: '0'
           value_type: TEXT
           description: 'The errors from API requests.'
           preprocessing:
@@ -97,7 +94,6 @@ zabbix_export:
           key: veeam.manager.get.metrics
           delay: 5m
           history: '0'
-          trends: '0'
           value_type: TEXT
           params: |
             var Veeam = {
@@ -186,7 +182,6 @@ zabbix_export:
           name: 'Running Jobs'
           type: DEPENDENT
           key: veeam.manager.running.jobs
-          delay: '0'
           description: 'Informs about the running jobs.'
           preprocessing:
             - type: JSONPATH
@@ -205,7 +200,6 @@ zabbix_export:
           name: 'Scheduled Backup Jobs'
           type: DEPENDENT
           key: veeam.manager.scheduled.backup.jobs
-          delay: '0'
           description: 'Informs about the scheduled backup jobs.'
           preprocessing:
             - type: JSONPATH
@@ -224,7 +218,6 @@ zabbix_export:
           name: 'Scheduled Jobs'
           type: DEPENDENT
           key: veeam.manager.scheduled.jobs
-          delay: '0'
           description: 'Informs about the scheduled jobs.'
           preprocessing:
             - type: JSONPATH
@@ -243,7 +236,6 @@ zabbix_export:
           name: 'Scheduled Replica Jobs'
           type: DEPENDENT
           key: veeam.manager.scheduled.replica.jobs
-          delay: '0'
           description: 'Informs about the scheduled replica jobs.'
           preprocessing:
             - type: JSONPATH
@@ -262,7 +254,6 @@ zabbix_export:
           name: 'Total Job Runs'
           type: DEPENDENT
           key: veeam.manager.scheduled.total.jobs
-          delay: '0'
           description: 'Informs about the total job runs.'
           preprocessing:
             - type: JSONPATH
@@ -281,7 +272,6 @@ zabbix_export:
           name: 'Warnings Job Runs'
           type: DEPENDENT
           key: veeam.manager.warning.jobs
-          delay: '0'
           description: 'Informs about the warning job runs.'
           preprocessing:
             - type: JSONPATH
@@ -311,31 +301,25 @@ zabbix_export:
           name: 'Backup Files discovery'
           type: DEPENDENT
           key: veeam.backup.files.discovery
-          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#NAME}'
                 value: '{$BACKUP.NAME.MATCHES}'
-                formulaid: A
               - macro: '{#NAME}'
                 value: '{$BACKUP.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
               - macro: '{#TYPE}'
                 value: '{$BACKUP.TYPE.MATCHES}'
-                formulaid: C
               - macro: '{#TYPE}'
                 value: '{$BACKUP.TYPE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: D
           description: 'Discovery of all backup files created on, or imported to the backup servers that are connected to Veeam Backup Enterprise Manager.'
           item_prototypes:
             - uuid: d3f87401602c48d3a837504ed08902db
               name: 'Compression ratio [{#NAME}]'
               type: DEPENDENT
               key: 'veeam.backup.compress.ratio[{#NAME}]'
-              delay: '0'
               description: 'Gets the data compression ratio with the name `[{#NAME}]`.'
               preprocessing:
                 - type: JSONPATH
@@ -353,7 +337,6 @@ zabbix_export:
               name: 'Data Size [{#NAME}]'
               type: DEPENDENT
               key: 'veeam.backup.data.size[{#NAME}]'
-              delay: '0'
               value_type: FLOAT
               units: B
               description: 'Gets the data size with the name `[{#NAME}]`.'
@@ -373,7 +356,6 @@ zabbix_export:
               name: 'Deduplication Ratio [{#NAME}]'
               type: DEPENDENT
               key: 'veeam.backup.deduplication.ratio[{#NAME}]'
-              delay: '0'
               description: 'Gets the data deduplication ratio with the name `[{#NAME}]`.'
               preprocessing:
                 - type: JSONPATH
@@ -391,7 +373,6 @@ zabbix_export:
               name: 'Backup Size [{#NAME}]'
               type: DEPENDENT
               key: 'veeam.backup.file.size[{#NAME}]'
-              delay: '0'
               value_type: FLOAT
               units: B
               description: 'Gets the backup size with the name `[{#NAME}]`.'

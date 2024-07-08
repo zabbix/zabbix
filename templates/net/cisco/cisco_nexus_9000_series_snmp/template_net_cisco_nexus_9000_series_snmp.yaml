@@ -107,8 +107,6 @@ zabbix_export:
           name: 'SNMP traps (fallback)'
           type: SNMP_TRAP
           key: snmptrap.fallback
-          delay: '0'
-          trends: '0'
           value_type: LOG
           description: 'The item is used to collect all the SNMP traps unmatched by the other snmptrap items.'
           logtimefmt: 'hh:mm:sszyyyy/MM/dd'
@@ -121,7 +119,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.4.0
           key: system.contact
           delay: 1h
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB.
@@ -140,7 +137,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.1.0
           key: system.descr
           delay: 1h
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB.
@@ -158,7 +154,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.47.1.1.1.1.13.149
           key: system.hw.model
           delay: 1h
-          trends: '0'
           value_type: CHAR
           description: 'MIB: ENTITY-MIB.'
           inventory_link: MODEL
@@ -175,7 +170,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.47.1.1.1.1.11.149
           key: system.hw.serialnumber
           delay: 1h
-          trends: '0'
           value_type: CHAR
           description: 'MIB: ENTITY-MIB.'
           inventory_link: SERIALNO_A
@@ -203,7 +197,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.6.0
           key: system.location
           delay: 1h
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB.
@@ -223,7 +216,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.5.0
           key: system.name
           delay: 1h
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB.
@@ -252,7 +244,6 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.2.0
           key: system.objectid
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB.
@@ -271,7 +262,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.4.1.9.9.25.1.1.1.2.5
           key: system.sw.os
           delay: 1h
-          trends: '0'
           value_type: CHAR
           description: 'MIB: CISCO-IMAGE-MIB'
           inventory_link: OS
@@ -413,10 +403,8 @@ zabbix_export:
               - macro: '{#ENT_CLASS}'
                 value: '{$ENT_CLASS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: A
               - macro: '{#ENT_SN}'
                 value: '{$ENT_SN.MATCHES}'
-                formulaid: B
           description: 'The discovery of serial numbers of the entities from ENTITY-MIB.'
           item_prototypes:
             - uuid: 873d648619bf45168d8008ea32596838
@@ -425,7 +413,6 @@ zabbix_export:
               snmp_oid: '1.3.6.1.2.1.47.1.1.1.1.11.{#SNMPINDEX}'
               key: 'system.hw.serialnumber[{#SNMPINDEX}]'
               delay: 1h
-              trends: '0'
               value_type: CHAR
               description: |
                 MIB: ENTITY-MIB.
@@ -465,7 +452,6 @@ zabbix_export:
             conditions:
               - macro: '{#SNMPVALUE}'
                 value: '{$CISCO.LLD.FILTER.FAN.NAME.MATCHES}'
-                formulaid: A
           description: 'The discovery of metrics for the fan''s status from ENTITY-MIB and CISCO-ENTITY-FRU-CONTROL-MIB.'
           item_prototypes:
             - uuid: 16047f29242444f284e81f6b87a22c50
@@ -623,46 +609,34 @@ zabbix_export:
             conditions:
               - macro: '{#IFADMINSTATUS}'
                 value: '{$NET.IF.IFADMINSTATUS.MATCHES}'
-                formulaid: A
               - macro: '{#IFADMINSTATUS}'
                 value: '{$NET.IF.IFADMINSTATUS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
               - macro: '{#IFALIAS}'
                 value: '{$NET.IF.IFALIAS.MATCHES}'
-                formulaid: C
               - macro: '{#IFALIAS}'
                 value: '{$NET.IF.IFALIAS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: D
               - macro: '{#IFDESCR}'
                 value: '{$NET.IF.IFDESCR.MATCHES}'
-                formulaid: E
               - macro: '{#IFDESCR}'
                 value: '{$NET.IF.IFDESCR.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: F
               - macro: '{#IFNAME}'
                 value: '{$NET.IF.IFNAME.MATCHES}'
-                formulaid: G
               - macro: '{#IFNAME}'
                 value: '{$NET.IF.IFNAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: H
               - macro: '{#IFOPERSTATUS}'
                 value: '{$NET.IF.IFOPERSTATUS.MATCHES}'
-                formulaid: I
               - macro: '{#IFOPERSTATUS}'
                 value: '{$NET.IF.IFOPERSTATUS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: J
               - macro: '{#IFTYPE}'
                 value: '{$NET.IF.IFTYPE.MATCHES}'
-                formulaid: K
               - macro: '{#IFTYPE}'
                 value: '{$NET.IF.IFTYPE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: L
           description: 'The discovery of interfaces from IF-MIB.'
           item_prototypes:
             - uuid: ad58c092ed604092a06ba518779c3294
@@ -677,8 +651,6 @@ zabbix_export:
                 Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of the ifCounterDiscontinuityTime.
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               tags:
                 - tag: component
                   value: network
@@ -698,8 +670,6 @@ zabbix_export:
                 Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of the ifCounterDiscontinuityTime.
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               tags:
                 - tag: component
                   value: network
@@ -739,8 +709,6 @@ zabbix_export:
                 Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of the ifCounterDiscontinuityTime.
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
                 - type: MULTIPLIER
                   parameters:
                     - '8'
@@ -763,8 +731,6 @@ zabbix_export:
                 Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of the ifCounterDiscontinuityTime.
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               tags:
                 - tag: component
                   value: network
@@ -784,8 +750,6 @@ zabbix_export:
                 Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of the ifCounterDiscontinuityTime.
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               tags:
                 - tag: component
                   value: network
@@ -825,8 +789,6 @@ zabbix_export:
                 Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of the ifCounterDiscontinuityTime.
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
                 - type: MULTIPLIER
                   parameters:
                     - '8'
@@ -1052,10 +1014,8 @@ zabbix_export:
             conditions:
               - macro: '{#IFOPERSTATUS}'
                 value: '1'
-                formulaid: A
               - macro: '{#SNMPVALUE}'
                 value: (2|3)
-                formulaid: B
           description: 'The discovery of interfaces from IF-MIB and EtherLike-MIB. The interfaces that have up (1) operational status are discovered.'
           item_prototypes:
             - uuid: 17792bed5be34b21a4c8a4069374d7f7
@@ -1125,7 +1085,6 @@ zabbix_export:
             conditions:
               - macro: '{#SNMPVALUE}'
                 value: '{$CISCO.LLD.FILTER.PSU.NAME.MATCHES}'
-                formulaid: A
           description: 'The discovery of power supplies from ENTITY-MIB and CISCO-ENTITY-FRU-CONTROL-MIB.'
           item_prototypes:
             - uuid: 8a083945d7e244099095b022169de86c

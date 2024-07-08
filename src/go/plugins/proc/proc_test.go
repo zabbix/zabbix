@@ -22,12 +22,6 @@ import (
 	"testing"
 )
 
-func BenchmarkRead2k(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		_, _ = read2k("/proc/self/stat")
-	}
-}
-
 func BenchmarkSyscallRead(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		buffer := make([]byte, 2048)
