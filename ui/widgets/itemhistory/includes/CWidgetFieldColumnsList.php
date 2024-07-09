@@ -45,8 +45,8 @@ class CWidgetFieldColumnsList extends CWidgetField {
 	// Predefined colors for thresholds and highlights. Each next threshold/highlight takes next sequential value
 	// from palette.
 	public const DEFAULT_COLOR_PALETTE = [
-		'FF465C', 'FFD54F', '0EC9AC', '524BBC', 'ED1248', 'D1E754', '2AB5FF', '385CC7', 'EC1594', 'BAE37D',
-		'6AC8FF', 'EE2B29', '3CA20D', '6F4BBC', '00A1FF', 'F3601B', '1CAE59', '45CFDB', '894BBC', '6D6D6D'
+		'E65660', 'FCCB1D', '3BC97D', '2ED3B7', '19D0D7', '29C2FA', '58B0FE', '5D98FE', '859AFA', 'E580FA',
+		'F773C7', 'FC5F7E', 'FC738E', 'FF6D2E', 'F48D48', 'F89C3A', 'FBB318', 'FECF62', '87CE40', 'A3E86D'
 	];
 
 	public function __construct(string $name, string $label = null) {
