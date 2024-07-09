@@ -210,7 +210,6 @@ window.drule_edit_popup = new class {
 		if (row !== null) {
 			row.insertAdjacentHTML('afterend', template.evaluate(input));
 			this.#addInputFields(input);
-
 		}
 		else {
 			document

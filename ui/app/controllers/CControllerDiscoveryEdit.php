@@ -113,7 +113,8 @@ class CControllerDiscoveryEdit extends CController {
 		];
 
 		CArrayHelper::sort($this->drule['dchecks'], ['name']);
-		$this->drule['dchecks'] = array_values($this->drule['dchecks']);
+
+		$this->drule['dchecks'] = $this->addCheckWarningMessages();
 
 		$concurrency_max_type = ($this->drule['concurrency_max'] == ZBX_DISCOVERY_CHECKS_UNLIMITED
 			|| $this->drule['concurrency_max'] == ZBX_DISCOVERY_CHECKS_ONE
@@ -124,8 +125,6 @@ class CControllerDiscoveryEdit extends CController {
 		if ($concurrency_max_type != ZBX_DISCOVERY_CHECKS_CUSTOM) {
 			$this->drule['concurrency_max'] = ZBX_DISCOVERY_CHECKS_UNLIMITED;
 		}
-
-		$this->drule['dchecks'] = $this->addCheckWarningMessages();
 
 		$data = [
 			'drule' => $this->drule,

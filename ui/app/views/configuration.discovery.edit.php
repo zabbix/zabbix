@@ -232,7 +232,7 @@ $form
 		(new CScriptTag('
 			drule_edit_popup.init('.json_encode([
 				'druleid' => $data['drule']['druleid'],
-				'dchecks' => $data['drule']['dchecks'],
+				'dchecks' => array_values($data['drule']['dchecks']),
 				'drule' => $data['drule']
 			], JSON_THROW_ON_ERROR).');
 		'))->setOnDocumentReady()
