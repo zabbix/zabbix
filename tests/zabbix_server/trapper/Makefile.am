@@ -56,14 +56,14 @@ TRAPPER_LIBS = \
 	$(top_srcdir)/src/libs/zbxcommshigh/libzbxcommshigh.a \
 	$(top_srcdir)/src/libs/zbxcompress/libzbxcompress.a \
 	$(top_srcdir)/src/libs/zbxregexp/libzbxregexp.a \
-	$(top_srcdir)/src/libs/zbxcrypto/libzbxcrypto.a \
 	$(top_srcdir)/src/libs/zbxhash/libzbxhash.a \
 	$(top_srcdir)/src/libs/zbxprometheus/libzbxprometheus.a \
 	$(top_srcdir)/src/libs/zbxeval/libzbxeval.a \
 	$(top_srcdir)/src/libs/zbxserialize/libzbxserialize.a \
-	$(top_srcdir)/src/libs/zbxcurl/libzbxcurl.a \
-	$(top_srcdir)/src/libs/zbxhttp/libzbxhttp.a \
 	$(top_srcdir)/src/libs/zbxexpr/libzbxexpr.a \
+	$(top_srcdir)/src/libs/zbxcrypto/libzbxcrypto.a \
+	$(top_srcdir)/src/libs/zbxhttp/libzbxhttp.a \
+	$(top_srcdir)/src/libs/zbxcurl/libzbxcurl.a \
 	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
 	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
 	$(top_srcdir)/src/libs/zbxcfg/libzbxcfg.a \
