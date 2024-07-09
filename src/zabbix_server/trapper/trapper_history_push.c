@@ -146,19 +146,19 @@ static zbx_hp_item_value_t	*create_item_value(const char *pnext, zbx_timespec_t 
 	}
 	else
 	{
-		hp->ts.ns = unique_shift->ns++;
+		if (0 == hp->ts.sec)
+			hp->ts.sec = ts->sec;
 
-		if (unique_shift->ns > 999999999)
+		hp->ts.ns = ts->ns + unique_shift->ns++;
+
+		if (hp->ts.ns > 999999999)
 		{
 			unique_shift->sec++;
-			unique_shift->ns = 0;
+			unique_shift->ns = hp->ts.ns = 0;
 		}
-	}
 
-	if (0 == hp->ts.sec)
-		hp->ts.sec = ts->sec + unique_shift->sec;
-	else
 		hp->ts.sec += unique_shift->sec;
+	}
 
 	if (SUCCEED != zbx_json_value_by_name_dyn(&jp, ZBX_PROTO_TAG_VALUE, &str, &str_alloc, NULL))
 	{
@@ -689,7 +689,7 @@ static int	process_history_push(zbx_socket_t *sock, const struct zbx_json_parse 
 	int				ret = FAIL, ns_offset = 0, hostkeys_num = 0, itemids_num = 0,
 					processed_num = 0, failed_num = 0;
 	const char			*pnext = NULL;
-	zbx_timespec_t			ts, unique_offset = {0, 0};
+	zbx_timespec_t			ts, unique_shift = {0, 0};
 	zbx_vector_hp_item_value_ptr_t	values;
 	double				time_start;
 
@@ -739,7 +739,7 @@ static int	process_history_push(zbx_socket_t *sock, const struct zbx_json_parse 
 		char			*errmsg = NULL;
 		zbx_hp_item_value_t	*hp;
 
-		if (NULL == (hp = create_item_value(pnext, &ts, &unique_offset, &errmsg)))
+		if (NULL == (hp = create_item_value(pnext, &ts, &unique_shift, &errmsg)))
 		{
 			*error = zbx_dsprintf(NULL, "Cannot parse item #%d data: %s.", hostkeys_num + itemids_num + 1,
 					errmsg);
