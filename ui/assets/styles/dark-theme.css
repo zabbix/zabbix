@@ -7218,7 +7218,7 @@ svg {
   align-items: center;
   display: flex;
   column-gap: 5px;
-  line-height: 18px;
+  line-height: 20px;
   overflow: hidden;
   padding: 0 10px;
   position: relative; }
@@ -7236,8 +7236,9 @@ svg {
 .totals-list.totals-list-vertical {
   flex-direction: column; }
   .totals-list.totals-list-vertical > div {
-    min-height: 21px;
-    padding-top: 3px; }
+    min-height: 20px;
+    padding-top: 2px;
+    padding-bottom: 2px; }
   .totals-list.totals-list-vertical .count {
     flex-shrink: 0; }
     .totals-list.totals-list-vertical .count .count-part {
