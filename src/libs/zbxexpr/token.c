@@ -428,7 +428,6 @@ static int	token_parse_macro(const char *expression, const char *macro, zbx_toke
  ******************************************************************************/
 static int	token_parse_var_macro(const char *expression, const char *macro, zbx_token_t *token)
 {
-	zbx_strloc_t		loc;
 	zbx_token_macro_t	*data;
 	const char		*ptr;
 
@@ -936,7 +935,6 @@ int	zbx_token_parse_nested_macro(const char *expression, const char *macro, zbx_
 	}
 	else
 	{
-		zbx_strloc_t	loc;
 		zbx_token_t	inner_token;
 
 		if (0 != (token_search & ZBX_TOKEN_SEARCH_VAR_MACRO))
