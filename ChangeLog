@@ -11,6 +11,7 @@ New features:
 .........T [ZBXNEXT-8868] added discovery and template for Azure VM Scale Sets (abrosimovs)
 
 Bug fixes:
+.......PS. [ZBX-24514] fixed standalone Zabbix server and Zabbix proxy not stopping when database is read only (vso)
 ..F....... [ZBX-23936] fixed the state and styling of readonly fields (ddauksa)
 ..F....... [ZBX-24520] fixed an issue with incorrect translations used in several frontend places (Ivo)
 ..F....... [ZBX-21815] fixed issue with undefined offset for media type when it was deleted before saving the user (wczerneha)
