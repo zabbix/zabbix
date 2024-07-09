@@ -563,21 +563,21 @@ class CProxy extends CApiService {
 			]],
 			'tls_psk_identity' =>	['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'status', 'in' => HOST_STATUS_PROXY_PASSIVE], 'type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'tls_connect', 'in' => HOST_ENCRYPTION_PSK], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('hosts', 'tls_psk_identity')],
+											['if' => ['field' => 'tls_connect', 'in' => HOST_ENCRYPTION_PSK], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('hosts', 'tls_psk_identity')],
 											['else' => true, 'type' => API_STRING_UTF8, 'in' => '']
 										]],
 										['if' => ['field' => 'status', 'in' => HOST_STATUS_PROXY_ACTIVE], 'type' => API_MULTIPLE, 'rules' => [
-											['if' => static function ($data) { return ($data['tls_accept'] & HOST_ENCRYPTION_PSK) != 0; }, 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('hosts', 'tls_psk_identity')],
+											['if' => static function ($data) { return ($data['tls_accept'] & HOST_ENCRYPTION_PSK) != 0; }, 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('hosts', 'tls_psk_identity')],
 											['else' => true, 'type' => API_STRING_UTF8, 'in' => '']
 										]]
 									]],
 			'tls_psk' =>			['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'status', 'in' => HOST_STATUS_PROXY_PASSIVE], 'type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'tls_connect', 'in' => HOST_ENCRYPTION_PSK], 'type' => API_PSK, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('hosts', 'tls_psk')],
+											['if' => ['field' => 'tls_connect', 'in' => HOST_ENCRYPTION_PSK], 'type' => API_PSK, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('hosts', 'tls_psk')],
 											['else' => true, 'type' => API_STRING_UTF8, 'in' => '']
 										]],
 										['if' => ['field' => 'status', 'in' => HOST_STATUS_PROXY_ACTIVE], 'type' => API_MULTIPLE, 'rules' => [
-											['if' => static function ($data) { return ($data['tls_accept'] & HOST_ENCRYPTION_PSK) != 0; }, 'type' => API_PSK, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('hosts', 'tls_psk')],
+											['if' => static function ($data) { return ($data['tls_accept'] & HOST_ENCRYPTION_PSK) != 0; }, 'type' => API_PSK, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('hosts', 'tls_psk')],
 											['else' => true, 'type' => API_STRING_UTF8, 'in' => '']
 										]]
 									]],
@@ -611,6 +611,57 @@ class CProxy extends CApiService {
 		self::checkHosts($proxies);
 		self::checkProxyAddress($proxies);
 		self::checkInterface($proxies, 'create');
+		self::checkTlsPsk($proxies);
+	}
+
+	/**
+	 * Check there are no multiple rows having same value tls_psk_identity and different value of tls_psk.
+	 *
+	 * @param array $proxies
+	 *
+	 * @throws CAPIException
+	 */
+	protected static function checkTlsPsk(array $proxies): void {
+		$psk_identity_index = [];
+
+		foreach ($proxies as $i => $proxy) {
+			if ($proxy['status'] == HOST_STATUS_PROXY_PASSIVE && $proxy['tls_connect'] != HOST_ENCRYPTION_PSK) {
+				continue;
+			}
+			elseif ($proxy['status'] == HOST_STATUS_PROXY_ACTIVE && ($proxy['tls_accept'] & HOST_ENCRYPTION_PSK) == 0) {
+				continue;
+			}
+
+			$tls_psk_identity = $proxy['tls_psk_identity'];
+
+			if (array_key_exists($tls_psk_identity, $psk_identity_index)
+					&& $proxies[$psk_identity_index[$tls_psk_identity]]['tls_psk'] !== $proxy['tls_psk']) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+					'/'.($i + 1).'/tls_psk', _('another value of tls_psk exists for same tls_psk_identity'))
+				);
+			}
+
+			$psk_identity_index[$tls_psk_identity] = $i;
+		}
+
+		if (!$psk_identity_index) {
+			return;
+		}
+
+		$cursor = DBselect(
+			'SELECT tls_psk_identity,tls_psk FROM hosts'.
+			' WHERE '.dbConditionString('tls_psk_identity', array_keys($psk_identity_index))
+		);
+
+		while ($db_row = DBfetch($cursor)) {
+			$i = $psk_identity_index[$db_row['tls_psk_identity']];
+
+			if ($proxies[$i]['tls_psk'] !== $db_row['tls_psk']) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+					'/'.($i + 1).'/tls_psk', _('another value of tls_psk exists for same tls_psk_identity'))
+				);
+			}
+		}
 	}
 
 	/**
