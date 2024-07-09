@@ -1031,11 +1031,10 @@ int	zbx_mregexp_sub_precompiled(const char *string, const zbx_regexp_t *regexp, 
 int	zbx_regexp_repl(const char *string, const char *pattern, const char *repl_template, char **out)
 {
 	zbx_regexp_t	*regexp = NULL;
-	int		i, shift = 0;
+	int		mi, shift = 0;
 	char		*repleaced = zbx_strdup(NULL, string), *ptr = repleaced, *error = NULL;
 	zbx_regrepl_t	*prepl;
 	zbx_vector_regrepl_t	matches;
-	size_t		 endof;
 
 	zbx_free(*out);
 	if (FAIL == regexp_prepare(pattern, ZBX_REGEXP_MULTILINE, &regexp, &error))
@@ -1047,6 +1046,7 @@ int	zbx_regexp_repl(const char *string, const char *pattern, const char *repl_te
 
 	zbx_vector_regrepl_create(&matches);
 
+	/* collect all matches */
 	for (;;)
 	{
 		size_t	i;
@@ -1060,8 +1060,8 @@ int	zbx_regexp_repl(const char *string, const char *pattern, const char *repl_te
 			zbx_free(prepl);
 			break;
 		}
-		endof = (size_t)prepl->match[0].rm_eo;
-		ptr = ptr + endof;
+
+		ptr = ptr + (size_t)prepl->match[0].rm_eo;
 		for (i = 0; i < ARRSIZE(prepl->match); i++)
 			if (prepl->match[i].rm_eo != -1)
 			{
@@ -1075,20 +1075,22 @@ int	zbx_regexp_repl(const char *string, const char *pattern, const char *repl_te
 			break;
 	}
 
-	for (i = matches.values_num - 1; i >= 0; i--)
+	/* create pattern based string for each match and relplace matched string with this string */
+	for (mi = matches.values_num - 1; mi >= 0; mi--)
 	{
-		size_t	endof = (size_t)matches.values[i]->match[0].rm_eo - 1;
+		zbx_regmatch_t *match = matches.values[mi]->match;
+		size_t	endof = (size_t)match[0].rm_eo - 1;
 		char	*repl, *empty = zbx_strdup(NULL, string);
+
 		if (NULL == repl_template || '\0' == *repl_template)
 		{
 			repl = zbx_strdup(NULL, "");
 		}
 		else
 		{
-			repl = regexp_sub_replace(empty, repl_template, matches.values[i]->match,
-							ZBX_REGEXP_GROUPS_MAX, 0);
+			repl = regexp_sub_replace(empty, repl_template, match, ZBX_REGEXP_GROUPS_MAX, 0);
 		}
-		zbx_replace_string(&repleaced, matches.values[i]->match[0].rm_so, &endof, repl);
+		zbx_replace_string(&repleaced, (size_t)match[0].rm_so, &endof, repl);
 		zbx_free(empty);
 		zbx_free(repl);
 	}
