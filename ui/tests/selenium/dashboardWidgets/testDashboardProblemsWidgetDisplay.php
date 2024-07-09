@@ -221,7 +221,7 @@ class testDashboardProblemsWidgetDisplay extends testWidgets  {
 			'eventids' => self::$eventid_for_widget_unsigned,
 			'selectAcknowledges' => ['clock']
 		]);
-		self::$acktime = CTestArrayHelper::get($event, '0.acknowledges.0.clock');
+		static::$acktime = CTestArrayHelper::get($event, '0.acknowledges.0.clock');
 	}
 
 	public static function getCheckWidgetTableData() {

@@ -154,13 +154,13 @@ class testDashboardTopHostsWidgetDisplay extends testWidgets {
 					'headers' => ['Host', 'Column1']
 				]
 			],
-			// #1 Filtered by host group, Host count is set less than filtered result.
+			// #1 Filtered by host group, Host limit is set less than filtered result.
 			[
 				[
 					'fields' => [
 						'Name' => 'Show lines < then possible result',
 						'Host groups' => ['Top Hosts test host group'],
-						'Host count' => 2
+						'Host limit' => 2
 					],
 					'Columns' => [
 						[

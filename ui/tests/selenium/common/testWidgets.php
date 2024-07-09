@@ -292,8 +292,8 @@ class testWidgets extends CWebTest {
 							// Check rows in hint's table.
 							foreach ($hint_table->getRows() as $i => $row) {
 								$hint_rows[$i]['Time'] = ($hint_rows[$i]['Time'] === 'acknowledged')
-									? date('Y-m-d H:i:s', self::$acktime)
-									: date('Y-m-d H:i:s', self::$time);
+									? date('Y-m-d H:i:s', static::$acktime)
+									: date('Y-m-d H:i:s', static::$time);
 								$row->assertValues($hint_rows[$i]);
 							}
 
@@ -329,7 +329,7 @@ class testWidgets extends CWebTest {
 			}
 		}
 
-		// When there are shown less lines than filtered, table appears unusual and doesn't fit for framework functions.
+		// When there are shown fewer lines than filtered, table appears unusual and doesn't fit for framework functions.
 		if (CTestArrayHelper::get($data['fields'], 'Show lines')) {
 			$this->assertEquals(count($data['result']) + 1, $table->getRows()->count());
 
