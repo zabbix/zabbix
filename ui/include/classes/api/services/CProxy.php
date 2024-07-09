@@ -615,21 +615,33 @@ class CProxy extends CApiService {
 	}
 
 	/**
-	 * Check there are no multiple rows having same value tls_psk_identity and different value of tls_psk.
+	 * Check there are no multiple proxies having same value tls_psk_identity and different value of tls_psk.
 	 *
 	 * @param array $proxies
+	 * @param array $db_proxies
 	 *
 	 * @throws CAPIException
 	 */
-	protected static function checkTlsPsk(array $proxies): void {
+	protected static function checkTlsPsk(array $proxies, array $db_proxies = null): void {
 		$psk_identity_index = [];
+		$updated_proxyids = [];
+		$tls_psk_fields = array_flip(['tls_psk_identity', 'tls_psk']);
 
 		foreach ($proxies as $i => $proxy) {
-			if ($proxy['status'] == HOST_STATUS_PROXY_PASSIVE && $proxy['tls_connect'] != HOST_ENCRYPTION_PSK) {
+			if (!array_intersect_key($proxy, $tls_psk_fields)) {
+				continue;
+			}
+			elseif ($proxy['status'] == HOST_STATUS_PROXY_PASSIVE && $proxy['tls_connect'] != HOST_ENCRYPTION_PSK) {
 				continue;
 			}
 			elseif ($proxy['status'] == HOST_STATUS_PROXY_ACTIVE && ($proxy['tls_accept'] & HOST_ENCRYPTION_PSK) == 0) {
 				continue;
+			}
+
+			if ($db_proxies !== null) {
+				$proxy += array_intersect_key($db_proxies[$proxy['proxyid']], $tls_psk_fields);
+				$proxies[$i] = $proxy;
+				$updated_proxyids[] = $proxy['proxyid'];
 			}
 
 			$tls_psk_identity = $proxy['tls_psk_identity'];
@@ -650,7 +662,9 @@ class CProxy extends CApiService {
 
 		$cursor = DBselect(
 			'SELECT tls_psk_identity,tls_psk FROM hosts'.
-			' WHERE '.dbConditionString('tls_psk_identity', array_keys($psk_identity_index))
+			' WHERE '.dbConditionInt('status', [HOST_STATUS_PROXY_ACTIVE, HOST_STATUS_PROXY_PASSIVE]).
+				' AND '.dbConditionId('hostid', $updated_proxyids, true).
+				' AND '.dbConditionString('tls_psk_identity', array_keys($psk_identity_index))
 		);
 
 		while ($db_row = DBfetch($cursor)) {
@@ -992,6 +1006,7 @@ class CProxy extends CApiService {
 		self::checkHosts($proxies, $db_proxies);
 		self::checkProxyAddress($proxies);
 		self::checkInterface($proxies, 'update');
+		self::checkTlsPsk($proxies, $db_proxies);
 	}
 
 	/**

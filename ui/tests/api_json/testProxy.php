@@ -31,16 +31,48 @@ class testProxy extends CAPITest {
 	public static $proxyids = [];
 
 	public static function prepareTestData(): void {
+		$proxies = [];
+		$interface = [
+			'useip' => INTERFACE_USE_DNS,
+			'dns' => 'example.com',
+			'port' => 123
+		];
+
 		// dataProviderInvalidProxyCreate: Field "tls_psk" cannot have different values for same "tls_psk_identity"
-		$proxy = [
+		$proxies[] = [
 			'host' => 'test.example.com',
 			'status' => HOST_STATUS_PROXY_ACTIVE,
 			'tls_accept' => HOST_ENCRYPTION_PSK,
 			'tls_psk_identity' => 'public',
 			'tls_psk' => '79cbf232a3ad3bfe38dee29861f8ba6b'
 		];
-		$result = CDataHelper::call('proxy.create', $proxy);
-		self::$proxyids += [$proxy['host'] => $result['proxyids'][0]];
+
+		// dataProviderInvalidProxyUpdate, dataProviderValidProxyUpdate
+		$proxies[] = [
+			'host' => 'psk1.example.com',
+			'status' => HOST_STATUS_PROXY_ACTIVE,
+			'tls_accept' => HOST_ENCRYPTION_PSK,
+			'tls_psk_identity' => 'example.com',
+			'tls_psk' => '79cbf232a3ad3bfe38dee29861f8ba6b'
+		];
+		$proxies[] = [
+			'host' => 'psk2.example.com',
+			'status' => HOST_STATUS_PROXY_ACTIVE,
+			'tls_accept' => HOST_ENCRYPTION_PSK,
+			'tls_psk_identity' => 'example.com',
+			'tls_psk' => '79cbf232a3ad3bfe38dee29861f8ba6b'
+		];
+		$proxies[] = [
+			'host' => 'psk3.example.com',
+			'status' => HOST_STATUS_PROXY_PASSIVE,
+			'tls_connect' => HOST_ENCRYPTION_PSK,
+			'tls_psk_identity' => 'psk3.example.com',
+			'tls_psk' => 'de4f735c561e5444b0932f7ebd636b85',
+			'interface' => $interface
+		];
+
+		$result = CDataHelper::call('proxy.create', $proxies);
+		self::$proxyids += array_combine(array_column($proxies, 'host'), $result['proxyids']);
 	}
 
 	public static function cleanTestData(): void {
@@ -320,11 +352,65 @@ class testProxy extends CAPITest {
 	 * @dataProvider dataProviderInvalidProxyCreate
 	 * @dataProvider dataProviderValidProxyCreate
 	 */
-	public function testProxy_Create($proxy, $expected_error = null) {
-		$response = $this->call('proxy.create', $proxy, $expected_error);
+	public function testProxy_Create($proxies, $expected_error = null) {
+		$response = $this->call('proxy.create', $proxies, $expected_error);
 
 		if ($expected_error === null) {
-			self::$proxyids += array_combine(array_column($proxy, 'host'), $response['result']['proxyids']);
+			self::$proxyids += array_combine(array_column($proxies, 'host'), $response['result']['proxyids']);
 		}
+	}
+
+	public static function dataProviderInvalidProxyUpdate() {
+		return [
+			'Field "tls_psk_identity" cannot be empty when "tls_connect" is HOST_ENCRYPTION_PSK' => [
+				'proxy' => [
+					['proxyid' => 'psk1.example.com', 'tls_psk_identity' => '']
+				],
+				'expected_error' => 'Invalid parameter "/1/tls_psk_identity": cannot be empty.'
+			],
+			'Field "tls_psk" cannot have different values for same "tls_psk_identity" on change "tls_psk_identity"' => [
+				'proxy' => [
+					['proxyid' => 'psk3.example.com', 'tls_psk_identity' => 'example.com']
+				],
+				'expected_error' => 'Incorrect value for field "/1/tls_psk": another value of tls_psk exists for same tls_psk_identity.'
+			],
+			'Field "tls_psk" cannot be empty when "tls_connect" is HOST_ENCRYPTION_PSK' => [
+				'proxy' => [
+					['proxyid' => 'psk1.example.com', 'tls_psk' => '']
+				],
+				'expected_error' => 'Invalid parameter "/1/tls_psk": cannot be empty.'
+			],
+			'Field "tls_psk" cannot have different values for same "tls_psk_identity" on change "tls_psk"' => [
+				'proxy' => [
+					['proxyid' => 'psk1.example.com', 'tls_psk' => 'de4f735c561e5444b0932f7ebd636b85']
+				],
+				'expected_error' => 'Incorrect value for field "/1/tls_psk": another value of tls_psk exists for same tls_psk_identity.'
+			]
+		];
+	}
+
+	public static function dataProviderValidProxyUpdate() {
+		return [
+			'Can change "tls_psk_identity" and "tls_psk"' => [
+				'proxy' => [
+					['proxyid' => 'psk1.example.com', 'tls_psk_identity' => 'psk3.example.com', 'tls_psk' => 'de4f735c561e5444b0932f7ebd636b85']
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider dataProviderInvalidProxyUpdate
+	 * @dataProvider dataProviderValidProxyUpdate
+	 */
+	public function testProxy_Update($proxies, $expected_error = null) {
+		foreach ($proxies as &$proxy) {
+			if (array_key_exists('proxyid', $proxy) && array_key_exists($proxy['proxyid'], self::$proxyids)) {
+				$proxy['proxyid'] = self::$proxyids[$proxy['proxyid']];
+			}
+		}
+		unset($proxy);
+
+		$this->call('proxy.update', $proxies, $expected_error);
 	}
 }
