@@ -73,6 +73,8 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 
 	protected function doAction() {
 		$fields = $this->getForm()->getFieldsData();
+		$fields = self::toggleYAxes($fields);
+
 		$edit_mode = $this->getInput('edit_mode', 0);
 		$width = (int) $this->getInput('content_width', self::GRAPH_WIDTH_MIN);
 		$height = (int) $this->getInput('content_height', self::GRAPH_HEIGHT_MIN);
@@ -166,6 +168,34 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 				'debug_mode' => $this->getDebugMode()
 			]
 		]));
+	}
+
+	/**
+	 * Show the left and right Y axis only if the value of the "lefty/righty" parameter is 1 and one or more datasets
+	 * are assigned to this axis.
+	 */
+	private static function toggleYAxes(array $fields): array {
+		$ds_left_y_axis_count = 0;
+		$ds_right_y_axis_count = 0;
+
+		foreach ($fields['ds'] as $data_set) {
+			if ($data_set['axisy'] == GRAPH_YAXIS_SIDE_LEFT) {
+				$ds_left_y_axis_count++;
+			}
+			else {
+				$ds_right_y_axis_count++;
+			}
+		}
+
+		if ($fields['lefty'] == SVG_GRAPH_AXIS_SHOW && $ds_left_y_axis_count == 0) {
+			$fields['lefty'] = 0;
+		}
+
+		if ($fields['righty'] == SVG_GRAPH_AXIS_SHOW && $ds_right_y_axis_count == 0) {
+			$fields['righty'] = 0;
+		}
+
+		return $fields;
 	}
 
 	/**
