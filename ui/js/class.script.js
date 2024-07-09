@@ -157,7 +157,7 @@ class Script {
 					overlay.recoverFocus();
 					overlay.containFocus();
 
-					const messages = [t('Invalid URL: %1$s').replace('%1$s', e.detail.url)];
+					const messages = [sprintf(t('Invalid URL: %1$s'), e.detail.url)];
 					const title = t('Cannot open URL');
 					const message_box = makeMessageBox('bad', messages, title)[0];
 

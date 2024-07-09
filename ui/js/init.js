@@ -48,6 +48,14 @@ window.ZABBIX = Object.create({
 	}
 });
 
+document.addEventListener('click', e => {
+	const element = e.target;
+
+	if (element.matches('input[type="radio"][readonly], input[type="checkbox"][readonly]')) {
+		e.preventDefault();
+	}
+});
+
 jQuery(function($) {
 
 	$.propHooks.disabled = {

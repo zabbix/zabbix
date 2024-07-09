@@ -1471,12 +1471,10 @@ zabbix_export:
                   - macro: '{#TYPE}'
                     value: aggregated_status
               operations:
-                - operationobject: ITEM_PROTOTYPE
-                  operator: LIKE
+                - operator: LIKE
                   value: 'Aggregated status'
                   discover: DISCOVER
-                - operationobject: ITEM_PROTOTYPE
-                  operator: LIKE
+                - operator: LIKE
                   value: State
                   discover: DISCOVER
             - name: checks
@@ -1486,8 +1484,7 @@ zabbix_export:
                   - macro: '{#TYPE}'
                     value: service_check
               operations:
-                - operationobject: ITEM_PROTOTYPE
-                  operator: LIKE
+                - operator: LIKE
                   value: Check
                   discover: DISCOVER
         - uuid: 6ff39fd6911945b2baa9b762d5a86df2
