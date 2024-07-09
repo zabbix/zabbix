@@ -686,8 +686,8 @@ static int	process_history_push(zbx_socket_t *sock, const struct zbx_json_parse 
 	struct zbx_json_parse		jp_data;
 	char				clientip[MAX_STRING_LEN];
 	struct addrinfo			hints, *ai = NULL;
-	int				ret = FAIL, ns_offset = 0, hostkeys_num = 0, itemids_num = 0,
-					processed_num = 0, failed_num = 0;
+	int				ret = FAIL, hostkeys_num = 0, itemids_num = 0, processed_num = 0,
+					failed_num = 0;
 	const char			*pnext = NULL;
 	zbx_timespec_t			ts, unique_shift = {0, 0};
 	zbx_vector_hp_item_value_ptr_t	values;
