@@ -21,16 +21,16 @@
 
 window.drule_edit_popup = new class {
 
-	init({druleid, dchecks, drule, dcheck_warnings}) {
+	init({druleid, dchecks, drule}) {
 		this.overlay = overlays_stack.getById('discoveryForm');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 
 		this.druleid = druleid;
+		this.dchecks = dchecks;
 		this.drule = drule;
 		this.dcheckid = getUniqueId();
 		this.available_device_types = [<?= SVC_AGENT ?>, <?= SVC_SNMPv1 ?>, <?= SVC_SNMPv2c ?>, <?= SVC_SNMPv3 ?>];
-		this.dcheck_warnings = dcheck_warnings;
 
 		document.getElementById('discovery_by').addEventListener('change', () => this.#updateForm());
 
@@ -94,6 +94,7 @@ window.drule_edit_popup = new class {
 
 		this.#addCheck(input, row, true);
 		row.remove();
+		this.#updateCheckWarningIcon(input);
 		this.#addInputFields(input);
 	}
 
@@ -209,6 +210,7 @@ window.drule_edit_popup = new class {
 		if (row !== null) {
 			row.insertAdjacentHTML('afterend', template.evaluate(input));
 			this.#addInputFields(input);
+
 		}
 		else {
 			document
@@ -224,15 +226,17 @@ window.drule_edit_popup = new class {
 
 	#updateCheckWarningIcon(input) {
 		const row = document.getElementById(`dcheckRow_${input.dcheckid}`);
-		const warning_icon = row.querySelector('.dcheck-warning');
+		const warning_icon = row.querySelector('.btn-icon');
 
-		if (this.dcheck_warnings[input.dcheckid]) {
-			warning_icon.setAttribute('data-hintbox-contents', this.dcheck_warnings[input.dcheckid]);
-			row.querySelector('.js-remove').disabled = true;
-		}
-		else {
+		if (input.dcheckid.includes('new')) {
 			warning_icon.remove();
 		}
+
+		this.dchecks.forEach(dcheck => {
+			if (dcheck.dcheckid === input.dcheckid) {
+				dcheck.warning === '' ? warning_icon.remove() : row.querySelector('.js-remove').disabled = true;
+			}
+		});
 	}
 
 	#addInputFields(input) {
@@ -347,6 +351,12 @@ window.drule_edit_popup = new class {
 
 	clone({title, buttons}) {
 		this.druleid = null;
+
+		// Remove all warning icons and enable all Remove buttons in Checks table.
+		const table = document.getElementById('dcheckList');
+
+		table.querySelectorAll('.js-remove').forEach(element => element.disabled = false);
+		table.querySelectorAll('.btn-icon').forEach(element => element.remove());
 
 		this.overlay.setProperties({title, buttons});
 		this.overlay.unsetLoading();

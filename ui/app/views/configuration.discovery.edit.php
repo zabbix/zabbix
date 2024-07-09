@@ -214,7 +214,7 @@ $check_template_default = (new CTemplateTag('dcheck-row-tmpl'))->addItem(
 			(new CButtonLink(_('Edit')))->addClass('js-edit'),
 			[
 				(new CButtonLink(_('Remove')))->addClass('js-remove'),
-				makeWarningIcon('')->addClass('dcheck-warning')
+				makeWarningIcon('#{warning}')
 			]
 		])
 	]))
@@ -233,8 +233,7 @@ $form
 			drule_edit_popup.init('.json_encode([
 				'druleid' => $data['drule']['druleid'],
 				'dchecks' => $data['drule']['dchecks'],
-				'drule' => $data['drule'],
-				'dcheck_warnings' => $data['dcheck_warnings']
+				'drule' => $data['drule']
 			], JSON_THROW_ON_ERROR).');
 		'))->setOnDocumentReady()
 	);

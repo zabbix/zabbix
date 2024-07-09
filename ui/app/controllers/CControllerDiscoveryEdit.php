@@ -125,14 +125,13 @@ class CControllerDiscoveryEdit extends CController {
 			$this->drule['concurrency_max'] = ZBX_DISCOVERY_CHECKS_UNLIMITED;
 		}
 
-		$dcheck_warnings = $this->drule['druleid'] ? $this->getCheckWarningMessages() : [];
+		$this->drule['dchecks'] = $this->addCheckWarningMessages();
 
 		$data = [
 			'drule' => $this->drule,
 			'discovery_by' => (int) ($this->drule['proxyid'] != 0),
 			'ms_proxy' => [],
 			'concurrency_max_type' => $concurrency_max_type,
-			'dcheck_warnings' => $dcheck_warnings,
 			'user' => ['debug_mode' => $this->getDebugMode()]
 		];
 
@@ -148,18 +147,12 @@ class CControllerDiscoveryEdit extends CController {
 		$this->setResponse($response);
 	}
 
-	private function getCheckWarningMessages(): array {
+	private function addCheckWarningMessages(): array {
 		$dcheckids = array_column($this->drule['dchecks'], 'dcheckid');
 
 		$actions =  API::Action()->get([
 			'output' => [],
 			'filter' => ['eventsource' => EVENT_SOURCE_DISCOVERY],
-			'search' => [
-				'conditions' => [
-					'conditiontype' => ZBX_CONDITION_TYPE_DCHECK,
-					'value' => $dcheckids
-				]
-			],
 			'selectConditions' => ['conditiontype', 'value'],
 			'selectFilter' => ['conditions']
 		]);
@@ -175,18 +168,22 @@ class CControllerDiscoveryEdit extends CController {
 			}
 		}
 
-		$error_messages = [];
-
-		foreach ($checkid_usage_count as $id => $usage_count) {
-			if ($usage_count > 0) {
-				$error_messages[$id] = _s(
-					'This check cannot be removed, as it is used as a condition in %1$s discovery %2$s.', $usage_count,
-					$usage_count === 1 ? _('action') : _('actions')
-				);
+		foreach ($checkid_usage_count as $dcheck_id => $usage_count) {
+			foreach($this->drule['dchecks'] as &$dcheck) {
+				if ($dcheck['dcheckid'] == $dcheck_id) {
+					$dcheck['warning'] = $usage_count > 0
+						? _n(
+							'This check cannot be removed, as it is used as a condition in %1$s discovery action.',
+							'This check cannot be removed, as it is used as a condition in %1$s discovery actions.',
+							$usage_count,
+						)
+						: '';
+				}
 			}
+			unset($dcheck);
 		}
 
-		return $error_messages;
+		return $this->drule['dchecks'];
 	}
 
 	/**
