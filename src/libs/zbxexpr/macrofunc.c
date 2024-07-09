@@ -30,8 +30,8 @@
 
 typedef struct
 {
-	char character;
-	const char* html_entity;
+	char		character;
+	const char*	html_entity;
 }
 zbx_htmlentity_t;
 
@@ -61,7 +61,10 @@ static int	macrofunc_regsub(char **params, size_t nparam, char **out)
 	char	*value = NULL;
 
 	if (2 != nparam)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s invalid parameters number", __func__);
 		return FAIL;
+	}
 
 	if (FAIL == zbx_regexp_sub(*out, params[0], params[1], &value))
 		return FAIL;
@@ -88,18 +91,17 @@ static int	macrofunc_regsub(char **params, size_t nparam, char **out)
  ******************************************************************************/
 static int	zbx_tr_rule_create(const char *param, char *dst)
 {
-	char c, range_from = 0, *ptr = (char *)param;
-	const char *ptr_end = param + strlen(param);
-	int i, len = 0;
+	char		c, range_from = 0, *ptr = (char *)param;
+	int		i, len = 0;
 
-	if (ptr == ptr_end)
+	if ('\0' == *ptr)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "%s empty parameter", __func__);
 		return FAIL;
 	}
 
 	/* construct string to replace */
-	for (; ptr < ptr_end; ptr++)
+	for (; '\0' != *ptr; ptr++)
 	{
 		if (*ptr == '\\')
 		{
@@ -198,9 +200,9 @@ static int	zbx_tr_rule_create(const char *param, char *dst)
  ******************************************************************************/
 static int	macrofunc_tr(char **params, size_t nparam, char **out)
 {
-	char translate[UCHAR_MAX+1], *ptr, buff_from[ZBX_RULE_BUFF_LEN], buff_to[ZBX_RULE_BUFF_LEN];
-	int buff_from_len, buff_to_len;
-	size_t i;
+	char	translate[UCHAR_MAX+1], *ptr, buff_from[ZBX_RULE_BUFF_LEN], buff_to[ZBX_RULE_BUFF_LEN];
+	int	buff_from_len, buff_to_len;
+	size_t	i;
 
 	if (2 != nparam)
 	{
@@ -229,11 +231,12 @@ static int	macrofunc_tr(char **params, size_t nparam, char **out)
 	}
 
 	/* translate */
-	for (ptr = *out; ptr < *out + strlen(*out); ptr++)
+	ptr = *out;
+	while ('\0' != *ptr)
 	{
 		*ptr = translate[(unsigned)*ptr];
+		ptr++;
 	}
-
 	return SUCCEED;
 }
 
@@ -254,7 +257,10 @@ static int	macrofunc_btoa(char **params, size_t nparam, char **out)
 
 	ZBX_UNUSED(params);
 	if (0 != nparam)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s invalid parameters number", __func__);
 		return FAIL;
+	}
 
 	zbx_base64_encode_dyn(*out, &buffer, strlen(*out));
 	zbx_free(*out);
@@ -278,7 +284,10 @@ static int	macrofunc_urlencode(char **params, size_t nparam, char **out)
 {
 	ZBX_UNUSED(params);
 	if (0 != nparam)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s invalid parameters number", __func__);
 		return FAIL;
+	}
 
 	zbx_http_url_encode(*out, out);
 
@@ -300,7 +309,10 @@ static int	macrofunc_urldecode(char **params, size_t nparam, char **out)
 {
 	ZBX_UNUSED(params);
 	if (0 != nparam)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s invalid parameters number", __func__);
 		return FAIL;
+	}
 
 	zbx_http_url_decode(*out, out);
 
@@ -322,7 +334,10 @@ static int	macrofunc_lowercase(char **params, size_t nparam, char **out)
 {
 	ZBX_UNUSED(params);
 	if (0 != nparam)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s invalid parameters number", __func__);
 		return FAIL;
+	}
 
 	zbx_strlower(*out);
 
@@ -344,7 +359,10 @@ static int	macrofunc_uppercase(char **params, size_t nparam, char **out)
 {
 	ZBX_UNUSED(params);
 	if (0 != nparam)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s invalid parameters number", __func__);
 		return FAIL;
+	}
 
 	zbx_strupper(*out);
 
@@ -364,33 +382,28 @@ static int	macrofunc_uppercase(char **params, size_t nparam, char **out)
  ******************************************************************************/
 static int	macrofunc_htmlencode(char **params, size_t nparam, char **out)
 {
+	zbx_htmlentity_t *pentity;
+	char	ch;
+
 	ZBX_UNUSED(params);
 
 	if (0 != nparam)
-		return FAIL;
-
-	for (zbx_htmlentity_t *pentity = (zbx_htmlentity_t *)zbx_html_translation;
-		pentity < zbx_html_translation + sizeof(zbx_html_translation) / sizeof(zbx_htmlentity_t);
-		pentity++)
 	{
-		const char character = pentity->character;
-		for (size_t idx = 0; idx < strlen(*out); idx++)
+		zabbix_log(LOG_LEVEL_DEBUG, "%s invalid parameters number", __func__);
+		return FAIL;
+	}
+
+	for (pentity = (zbx_htmlentity_t *)zbx_html_translation;
+		pentity < zbx_html_translation + ARRSIZE(zbx_html_translation); pentity++)
+	{
+		ch = pentity->character;
+		for (size_t idx = 0; '\0' != (*out)[idx]; idx++)
 		{
-			if ((*out)[idx] == character)
+			if ((*out)[idx] == ch)
 				zbx_replace_string(out, idx, &idx, pentity->html_entity);
 		}
 
 	}
-	for (size_t i = 0; i < sizeof(zbx_html_translation) / sizeof(zbx_htmlentity_t); ++i)
-	{
-		const char character = zbx_html_translation[i].character;
-		for (size_t idx = 0; idx < strlen(*out); idx++)
-		{
-			if ((*out)[idx] == character)
-				zbx_replace_string(out, idx, &idx, zbx_html_translation[i].html_entity);
-		}
-	}
-
 	return SUCCEED;
 }
 
@@ -407,22 +420,62 @@ static int	macrofunc_htmlencode(char **params, size_t nparam, char **out)
  ******************************************************************************/
 static int	macrofunc_htmldecode(char **params, size_t nparam, char **out)
 {
+	char	*entity, *found, ch;
+
 	ZBX_UNUSED(params);
 
 	if (0 != nparam)
-		return FAIL;
-
-	for (size_t i = 0; i < sizeof(zbx_html_translation) / sizeof(zbx_html_translation[0]); ++i)
 	{
-		const char* entity = zbx_html_translation[i].html_entity;
-		const char character = zbx_html_translation[i].character;
-		char* found = strstr(*out, entity);
-		while (found)
+		zabbix_log(LOG_LEVEL_DEBUG, "%s invalid parameters number", __func__);
+		return FAIL;
+	}
+
+	for (size_t i = 0; i < ARRSIZE(zbx_html_translation); ++i)
+	{
+		entity = zbx_html_translation[i].html_entity;
+		ch = zbx_html_translation[i].character;
+		found = strstr(*out, entity);
+		while (NULL != found)
 		{
-			*found = character;
+			*found = ch;
 			memmove(found + 1, found + strlen(entity), strlen(found + strlen(entity)) + 1);
 			found = strstr(*out, entity);
 		}
+	}
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: calculates case insensitive regular expression replacement.       *
+ *                                                                            *
+ * Parameters: params - [IN] function parameters                              *
+ *             nparam - [IN] function parameter count                         *
+ *             out    - [IN/OUT] input/output value                           *
+ *                                                                            *
+ * Return value: SUCCEED - function was calculated successfully               *
+ *                                                                            *
+ ******************************************************************************/
+static int	macrofunc_regrepl(char **params, size_t nparam, char **out)
+{
+	char	*value = NULL;
+	size_t	i;
+
+	if (0 == nparam || 0 != nparam % 2)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s invalid parameters number", __func__);
+		return FAIL;
+	}
+
+	for (i = 0; i < nparam; i += 2)
+	{
+		if (FAIL == zbx_regexp_repl(*out, params[i], params[i + 1], &value))
+			return FAIL;
+
+		zbx_free(*out);
+		*out = value;
+		value = NULL;
 	}
 
 	return SUCCEED;
@@ -445,7 +498,10 @@ static int	macrofunc_iregsub(char **params, size_t nparam, char **out)
 	char	*value = NULL;
 
 	if (2 != nparam)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s invalid parameters number", __func__);
 		return FAIL;
+	}
 
 	if (FAIL == zbx_iregexp_sub(*out, params[0], params[1], &value))
 		return FAIL;
@@ -478,7 +534,10 @@ static int	macrofunc_fmttime(char **params, size_t nparam, char **out)
 	char		*buf = NULL;
 
 	if (0 == nparam || 2 < nparam)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s invalid parameters number", __func__);
 		return FAIL;
+	}
 
 	time_new = time(&time_new);
 	localtime_r(&time_new, &local_time);
@@ -646,7 +705,8 @@ int	zbx_calculate_macro_function(const char *expression, const zbx_token_func_ma
 		macrofunc = macrofunc_htmlencode;
 	else if (ZBX_CONST_STRLEN("htmldecode") == len && 0 == strncmp(ptr, "htmldecode", len))
 		macrofunc = macrofunc_htmldecode;
-
+	else if (ZBX_CONST_STRLEN("regrepl") == len && 0 == strncmp(ptr, "regrepl", len))
+		macrofunc = macrofunc_regrepl;
 	else
 		return FAIL;
 
