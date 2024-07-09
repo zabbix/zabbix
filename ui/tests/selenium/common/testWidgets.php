@@ -309,7 +309,7 @@ class testWidgets extends CWebTest {
 
 			if (CTestArrayHelper::get($data, 'check_tag_ellipsis')) {
 				foreach ($data['check_tag_ellipsis'] as $problem => $ellipsis_text) {
-					$table->findRow('Problem • Severity', $problem)->getColumn('Tags')->query('class:icon-wizard-action')
+					$table->findRow('Problem • Severity', $problem)->getColumn('Tags')->query('class:zi-more')
 							->waitUntilClickable()->one()->click();
 					$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->asOverlayDialog()
 							->waitUntilVisible()->one();
@@ -321,7 +321,7 @@ class testWidgets extends CWebTest {
 			// Check eye icon for suppressed problem.
 			if (CTestArrayHelper::get($data, 'check_suppressed_icon')) {
 				$table->findRow('Problem • Severity', $data['check_suppressed_icon']['problem'])->getColumn('Info')
-						->query('class:icon-action-suppress')->waitUntilClickable()->one()->click();
+						->query('class:zi-eye-off')->waitUntilClickable()->one()->click();
 				$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->asOverlayDialog()
 						->waitUntilVisible()->one();
 				$this->assertEquals($data['check_suppressed_icon']['text'], $hint->getText());

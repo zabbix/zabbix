@@ -169,9 +169,9 @@ class testDashboardProblemsWidgetDisplay extends testWidgets  {
 		}
 
 		// Create events and problems.
-		self::$time = time();
+		static::$time = time();
 		foreach (CDataHelper::getIds('description') as $name => $id) {
-			CDBHelper::setTriggerProblem($name, TRIGGER_VALUE_TRUE, ['clock' => self::$time]);
+			CDBHelper::setTriggerProblem($name, TRIGGER_VALUE_TRUE, ['clock' => static::$time]);
 		}
 
 		// Manual close is true for the problem: Trigger for widget 1 char.
