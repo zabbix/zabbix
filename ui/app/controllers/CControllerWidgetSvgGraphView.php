@@ -171,7 +171,7 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 	}
 
 	/**
-	 * Show the left and right Y axis only if the value of the "lefty/righty" parameter is 1 and one or more datasets
+	 * Show the left and right Y axes only if the value of the "lefty/righty" parameter is 1 and one or more datasets
 	 * are assigned to this axis.
 	 */
 	private static function toggleYAxes(array $fields): array {
