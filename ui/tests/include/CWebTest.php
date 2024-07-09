@@ -17,6 +17,7 @@ require_once 'vendor/autoload.php';
 
 require_once __DIR__.'/CTest.php';
 require_once __DIR__.'/web/CPage.php';
+require_once __DIR__.'/helpers/CDataHelper.php';
 require_once __DIR__.'/helpers/CXPathHelper.php';
 require_once __DIR__.'/helpers/CImageHelper.php';
 require_once __DIR__.'/../../include/classes/helpers/CMessageHelper.php';

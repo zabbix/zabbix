@@ -14,29 +14,16 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
+require_once dirname(__FILE__).'/../common/testWidgets.php';
 
 /**
  * @backup config, hstgrp, widget
  *
+ * @dataSource UserPermissions
+ *
  * @onBefore prepareDashboardData, prepareProblemsData
  */
-class testDashboardProblemsWidgetDisplay extends CWebTest {
-
-	/**
-	 * Attach MessageBehavior and TableBehavior to the test.
-	 *
-	 * @return array
-	 */
-	public function getBehaviors() {
-		return [
-			CMessageBehavior::class,
-			CTableBehavior::class
-		];
-	}
+class testDashboardProblemsWidgetDisplay extends testWidgets  {
 
 	protected static $dashboardid;
 	protected static $time;
@@ -768,131 +755,9 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 	 * @onAfter deleteWidgets
 	 */
 	public function testDashboardProblemsWidgetDisplay_CheckTable($data) {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
-		$dashboard = CDashboardElement::find()->one();
-		$dialog = CDashboardElement::find()->one()->edit()->addWidget();
-		$form = $dialog->asForm();
-
-		// Fill Problems widget filter.
-		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Problems')]);
-		$form->fill($data['fields']);
-
-		if (array_key_exists('Tags', $data)) {
-			$form->getField('id:evaltype')->fill(CTestArrayHelper::get($data['Tags'], 'evaluation', 'And/Or'));
-			$form->getField('id:tags_table_tags')->asMultifieldTable()->fill($data['Tags']['tags']);
-		}
-
-		$form->submit();
-
-		// Check saved dashboard.
-		$dialog->ensureNotPresent();
-		$dashboard->save();
-		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
-
-		// Assert Problems widget's table.
-		$dashboard->getWidget($data['fields']['Name'])->waitUntilReady();
-		$table = $this->query('class:list-table')->asTable()->one();
-
-		// Change time for actual value, because it cannot be used in data provider.
-		foreach ($data['result'] as &$row) {
-			if (CTestArrayHelper::get($row, 'Time')) {
-				$row['Time'] = date('H:i:s', self::$time);
-			}
-			unset($row);
-		}
-
-		// Check clicks on Acknowledge and Actions icons and hints' contents.
-		if (CTestArrayHelper::get($data, 'actions')) {
-			foreach ($data['actions'] as $problem => $action) {
-				$action_cell = $table->findRow('Problem • Severity', $problem)->getColumn('Actions');
-
-				foreach ($action as $class => $hint_rows) {
-					$icon = $action_cell->query('xpath:.//*['.CXPathHelper::fromClass($class).']')->one();
-					$this->assertTrue($icon->isVisible());
-
-					if ($class !== 'color-positive') {
-						// Click on icon and open hint.
-						$icon->click();
-						$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->asOverlayDialog()
-								->waitUntilReady()->one();
-						$hint_table = $hint->query('class:list-table')->asTable()->waitUntilVisible()->one();
-
-						// Check rows in hint's table.
-						foreach ($hint_table->getRows() as $i => $row) {
-							$hint_rows[$i]['Time'] = ($hint_rows[$i]['Time'] === 'acknowledged')
-								? date('Y-m-d H:i:s', self::$acktime)
-								: date('Y-m-d H:i:s', self::$time);
-							$row->assertValues($hint_rows[$i]);
-						}
-
-						$hint->close();
-					}
-				}
-			}
-		}
-
-		// When there are shown less lines than filtered, table appears unusual and doesn't fit for framework functions.
-		if (CTestArrayHelper::get($data['fields'], 'Show lines')) {
-			$this->assertEquals(count($data['result']) + 1, $table->getRows()->count());
-
-			// Assert table rows.
-			$result = [];
-			for ($i = 0; $i < count($data['result']); $i++) {
-				$result[] = $table->getRow($i)->getColumn('Problem • Severity')->getText();
-			}
-
-			$this->assertEquals($data['result'], $result);
-
-			// Assert table stats.
-			$this->assertEquals($data['stats'], $table->getRow(count($data['result']))->getText());
-		}
-		elseif (empty($data['result'])) {
-			$this->assertTableData();
-		}
-		else {
-			$this->assertTableHasData($data['result']);
-		}
-
-		// Assert table headers depending on widget settings.
 		$headers = (CTestArrayHelper::get($data, 'headers', ['Time', '', '', 'Recovery time', 'Status', 'Info',
 				'Host', 'Problem • Severity', 'Duration', 'Update', 'Actions']
 		));
-		$this->assertEquals($headers, $table->getHeadersText());
-
-		if (CTestArrayHelper::get($data['fields'], 'Show timeline')) {
-			$this->assertTrue($table->query('class:timeline-td')->exists());
-		}
-
-		if (CTestArrayHelper::get($data, 'check_tag_ellipsis')) {
-			foreach ($data['check_tag_ellipsis'] as $problem => $ellipsis_text) {
-				$table->findRow('Problem • Severity', $problem)->getColumn('Tags')->query('class:zi-more')
-						->waitUntilClickable()->one()->click();
-				$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->asOverlayDialog()->waitUntilVisible()->one();
-				$this->assertEquals($ellipsis_text, $hint->getText());
-				$hint->close();
-			}
-		}
-
-		// Check eye icon for suppressed problem.
-		if (CTestArrayHelper::get($data, 'check_suppressed_icon')) {
-			$table->findRow('Problem • Severity', $data['check_suppressed_icon']['problem'])->getColumn('Info')
-					->query('class:zi-eye-off')->waitUntilClickable()->one()->click();
-			$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->asOverlayDialog()->waitUntilVisible()->one();
-			$this->assertEquals($data['check_suppressed_icon']['text'], $hint->getText());
-			$hint->close();
-		}
-	}
-
-	/**
-	 * Function for deletion widgets from test dashboard after case.
-	 */
-	public static function deleteWidgets() {
-		DBexecute('DELETE FROM widget'.
-				' WHERE dashboard_pageid'.
-				' IN (SELECT dashboard_pageid'.
-					' FROM dashboard_page'.
-					' WHERE dashboardid='.self::$dashboardid.
-				')'
-		);
+		$this->checkWidgetDisplay($data, 'Problems', $headers);
 	}
 }

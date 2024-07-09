@@ -14,9 +14,27 @@
 **/
 
 
+require_once dirname(__FILE__).'/../../include/CWebTest.php';
+
 class testWidgets extends CWebTest {
 	const HOST_ALL_ITEMS = 'Host for all item value types';
 	const TABLE_SELECTOR = 'xpath://form[@name="itemform"]//table';
+
+	protected static $dashboardid;
+	protected static $acktime;
+	protected static $time;
+
+	/**
+	 * Attach MessageBehavior and TableBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [
+			CMessageBehavior::class,
+			CTableBehavior::class
+		];
+	}
 
 	/**
 	 * Gets widget and widget_field tables to compare hash values, excludes widget_fieldid because it can change.
@@ -182,5 +200,171 @@ class testWidgets extends CWebTest {
 		$form = $dashboard->getWidget($widget_name)->edit()->asForm();
 		$form->fill($configuration);
 		$form->submit();
+	}
+
+	/**
+	 * Function which checks widget contents depending on its settings.
+	 *
+	 * @param string    $data       data provider
+	 * @param string    $widget     widget type
+	 * @param array     $headers    array of headers in widget table
+	 */
+	protected function checkWidgetDisplay($data, $widget, $headers) {
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.static::$dashboardid);
+		$dashboard = CDashboardElement::find()->one();
+		$dialog = CDashboardElement::find()->one()->edit()->addWidget();
+		$form = $dialog->asForm();
+
+		// Fill widget filter.
+		$form->fill(['Type' => CFormElement::RELOADABLE_FILL($widget)]);
+		$form->fill($data['fields']);
+
+		if (array_key_exists('Tags', $data)) {
+			$form->getField('id:evaltype')->fill(CTestArrayHelper::get($data['Tags'], 'evaluation', 'And/Or'));
+			$form->getField('id:tags_table_tags')->asMultifieldTable()->fill($data['Tags']['tags']);
+		}
+
+		// Fill Columns field.
+		if (array_key_exists('Columns', $data)) {
+			foreach ($data['Columns'] as $column) {
+				$form->getFieldContainer('Columns')->query('button:Add')->one()->waitUntilClickable()->click();
+				$column_overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+				$column_overlay_form = $column_overlay->asForm();
+				$column_overlay_form->fill($column['fields']);
+
+				foreach (['Highlights', 'Thresholds'] as $table_field) {
+					if (array_key_exists($table_field, $column)) {
+						foreach ($column[$table_field] as $highlight) {
+							$column_overlay_form->getFieldContainer($table_field)->query('button:Add')->one()
+									->waitUntilClickable()->click();
+							$column_overlay_form->fill($highlight);
+						}
+					}
+				}
+
+				$column_overlay->getFooter()->query('button:Add')->waitUntilClickable()->one()->click();
+
+				if (array_key_exists('column_error', $data)) {
+					break;
+				}
+
+				$column_overlay->waitUntilNotVisible();
+				$form->waitUntilReloaded();
+			}
+		}
+
+		$form->submit();
+
+		// Check saved dashboard.
+		$dialog->ensureNotPresent();
+		$dashboard->save();
+		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
+
+		// Assert widget's table.
+		$dashboard->getWidget($data['fields']['Name'])->waitUntilReady();
+		$table = $this->query('class:list-table')->asTable()->one();
+
+		// Change time for actual value, because it cannot be used in data provider.
+		if ($widget === 'Problems') {
+			foreach ($data['result'] as &$row) {
+				if (CTestArrayHelper::get($row, 'Time')) {
+					$row['Time'] = date('H:i:s', static::$time);
+				}
+				unset($row);
+			}
+
+			// Check clicks on Acknowledge and Actions icons and hints' contents.
+			if (CTestArrayHelper::get($data, 'actions')) {
+				foreach ($data['actions'] as $problem => $action) {
+					$action_cell = $table->findRow('Problem • Severity', $problem)->getColumn('Actions');
+
+					foreach ($action as $class => $hint_rows) {
+						$icon = $action_cell->query('xpath:.//*['.CXPathHelper::fromClass($class).']')->one();
+						$this->assertTrue($icon->isVisible());
+
+						if ($class !== 'color-positive') {
+							// Click on icon and open hint.
+							$icon->click();
+							$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->asOverlayDialog()
+									->waitUntilReady()->one();
+							$hint_table = $hint->query('class:list-table')->asTable()->waitUntilVisible()->one();
+
+							// Check rows in hint's table.
+							foreach ($hint_table->getRows() as $i => $row) {
+								$hint_rows[$i]['Time'] = ($hint_rows[$i]['Time'] === 'acknowledged')
+									? date('Y-m-d H:i:s', self::$acktime)
+									: date('Y-m-d H:i:s', self::$time);
+								$row->assertValues($hint_rows[$i]);
+							}
+
+							$hint->close();
+						}
+					}
+				}
+			}
+
+			if (CTestArrayHelper::get($data['fields'], 'Show timeline')) {
+				$this->assertTrue($table->query('class:timeline-td')->exists());
+			}
+
+			if (CTestArrayHelper::get($data, 'check_tag_ellipsis')) {
+				foreach ($data['check_tag_ellipsis'] as $problem => $ellipsis_text) {
+					$table->findRow('Problem • Severity', $problem)->getColumn('Tags')->query('class:icon-wizard-action')
+							->waitUntilClickable()->one()->click();
+					$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->asOverlayDialog()
+							->waitUntilVisible()->one();
+					$this->assertEquals($ellipsis_text, $hint->getText());
+					$hint->close();
+				}
+			}
+
+			// Check eye icon for suppressed problem.
+			if (CTestArrayHelper::get($data, 'check_suppressed_icon')) {
+				$table->findRow('Problem • Severity', $data['check_suppressed_icon']['problem'])->getColumn('Info')
+						->query('class:icon-action-suppress')->waitUntilClickable()->one()->click();
+				$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->asOverlayDialog()
+						->waitUntilVisible()->one();
+				$this->assertEquals($data['check_suppressed_icon']['text'], $hint->getText());
+				$hint->close();
+			}
+		}
+
+		// When there are shown less lines than filtered, table appears unusual and doesn't fit for framework functions.
+		if (CTestArrayHelper::get($data['fields'], 'Show lines')) {
+			$this->assertEquals(count($data['result']) + 1, $table->getRows()->count());
+
+			// Assert table rows.
+			$result = [];
+			for ($i = 0; $i < count($data['result']); $i++) {
+				$result[] = $table->getRow($i)->getColumn('Problem • Severity')->getText();
+			}
+
+			$this->assertEquals($data['result'], $result);
+
+			// Assert table stats.
+			$this->assertEquals($data['stats'], $table->getRow(count($data['result']))->getText());
+		}
+		elseif (empty($data['result'])) {
+			$this->assertTableData();
+		}
+		else {
+			$this->assertTableHasData($data['result']);
+		}
+
+		// Assert table headers depending on widget settings.
+		$this->assertEquals($headers, $table->getHeadersText());
+	}
+
+	/**
+	 * Function for deletion widgets from test dashboard after case.
+	 */
+	public static function deleteWidgets() {
+		DBexecute('DELETE FROM widget'.
+			' WHERE dashboard_pageid'.
+			' IN (SELECT dashboard_pageid'.
+				' FROM dashboard_page'.
+				' WHERE dashboardid='.static::$dashboardid.
+			')'
+		);
 	}
 }
