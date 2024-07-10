@@ -1,4 +1,11 @@
 ---
+test case: "No data"
+in:
+  expression: ""
+out:
+  result: ""
+  return: SUCCEED
+---
 test case: "Empty data"
 in:
   expression: "empty"
@@ -19,6 +26,22 @@ in:
   param1: ""
 out:
   result: "empty "
+  return: SUCCEED
+---
+test case: "Value"
+in:
+  expression: "{VALUE}"
+  param1: "value"
+out:
+  result: "value"
+  return: SUCCEED
+---
+test case: "Value and one"
+in:
+  expression: "{VALUE} one"
+  param1: "value"
+out:
+  result: "value one"
   return: SUCCEED
 ---
 test case: "One value"
