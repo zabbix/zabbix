@@ -3800,11 +3800,9 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 				{
 						zbx_timespec_t	ts = {now, 0};
 
-						error = zbx_strdup(NULL, "StartIPMIPollers is set to 0");
-
 						zbx_dc_add_history(item->itemid, item->value_type, 0, NULL, &ts,
-								ITEM_STATE_NOTSUPPORTED, error);
-						zbx_free(error);
+								ITEM_STATE_NOTSUPPORTED,
+								"StartIPMIPollers is set to 0");
 				}
 				else if (FAIL == DCitem_nextcheck_update(item, interface, flags, now, &error))
 				{
