@@ -1184,8 +1184,8 @@ class CMacrosResolverGeneral {
 							break;
 
 						case 'ITEM.LOG.SEVERITY':
-							$macro_values[$key][$token]
-								= get_item_logtype_description($history[$itemid][0]['severity']);
+							$macro_values[$key][$token] =
+								get_item_logtype_description($history[$itemid][0]['severity']);
 							break;
 
 						case 'ITEM.LOG.NSEVERITY':
