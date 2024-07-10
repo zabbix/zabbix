@@ -47,8 +47,8 @@ const ZBX_STYLE_NO_DATA_MESSAGE = 'no-data-message';
 
 const ZBX_STYLE_TOTALS_LIST = 'totals-list';
 const ZBX_STYLE_TOTALS_LIST_COUNT = 'count';
-const ZBX_STYLE_TOTALS_LIST_NUMBER = 'number';
-const ZBX_STYLE_TOTALS_LIST_OF = 'of';
+const ZBX_STYLE_TOTALS_LIST_COUNT_PART = 'count-part';
+const ZBX_STYLE_TOTALS_LIST_ELLIPSIS = 'ellipsis';
 
 const ZBX_STYLE_LINK_ACTION = 'link-action';
 
@@ -141,3 +141,7 @@ const GROUP_GUI_ACCESS_SYSTEM = 0;
 const GROUP_GUI_ACCESS_INTERNAL = 1;
 const GROUP_GUI_ACCESS_LDAP = 2;
 const GROUP_GUI_ACCESS_DISABLED = 3;
+
+const EXTACK_OPTION_ALL = 0;
+const EXTACK_OPTION_UNACK = 1;
+const EXTACK_OPTION_BOTH = 2;

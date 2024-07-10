@@ -7183,6 +7183,8 @@ svg {
     flex-shrink: 0; }
     .totals-list.totals-list-vertical .count .count-part {
       display: block; }
+      .totals-list.totals-list-vertical .count .count-part .ellipsis::after {
+        content: '…'; }
   .totals-list.totals-list-vertical .name {
     flex-grow: 1; }
 

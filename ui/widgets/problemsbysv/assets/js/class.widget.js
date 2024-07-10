@@ -91,23 +91,52 @@ class CWidgetProblemsBySv extends CWidget {
 	#adjustSize() {
 		if (this.getFields().show_type === CWidgetProblemsBySv.SHOW_TOTALS
 				&& this.getFields().layout === CWidgetProblemsBySv.LAYOUT_VERTICAL) {
-			const number_elements = this._contents.querySelectorAll(
-				`.${ZBX_STYLE_TOTALS_LIST} .${ZBX_STYLE_TOTALS_LIST_COUNT} .${ZBX_STYLE_TOTALS_LIST_NUMBER},
-					.${ZBX_STYLE_TOTALS_LIST} .${ZBX_STYLE_TOTALS_LIST_COUNT} .${ZBX_STYLE_TOTALS_LIST_OF}`
-			);
+			const parts_elements = this._contents.querySelectorAll(`.${ZBX_STYLE_TOTALS_LIST_COUNT_PART}`);
+			for (const part_element of parts_elements) {
+				part_element.style.display = null;
+			}
+
+			const number_elements = this._contents.querySelectorAll(`.${ZBX_STYLE_TOTALS_LIST_COUNT_PART} > span`);
+			for (const number_element of number_elements) {
+				number_element.classList.remove(ZBX_STYLE_TOTALS_LIST_ELLIPSIS);
+			}
+
+			const cell_element = this._contents.querySelector(`.${ZBX_STYLE_TOTALS_LIST} > div`);
+			const count_elements = this._contents.querySelectorAll(`.${ZBX_STYLE_TOTALS_LIST_COUNT}`);
+
+			if (this.getFields().ext_ack === EXTACK_OPTION_BOTH) {
+				const lines_min = 1;
+				const lines_max = 3;
+				const cell_height = parseFloat(getComputedStyle(cell_element).height);
+				const count_element_height = parseFloat(getComputedStyle(count_elements[0]).height) / lines_max;
+				const lines = Math.max(lines_min, Math.min(lines_max, Math.floor(cell_height / count_element_height)));
+
+				if (lines < lines_max) {
+					for (const count_element of count_elements) {
+						const count_part_elements = count_element.querySelectorAll(
+							`.${ZBX_STYLE_TOTALS_LIST_COUNT_PART}`
+						);
+
+						for (let i = lines_max - 1; i > lines - 1; i--) {
+							count_part_elements[i].style.display = 'none';
+						}
+
+						count_part_elements[lines - 1].querySelector(':scope > span').classList.add(
+							ZBX_STYLE_TOTALS_LIST_ELLIPSIS
+						);
+					}
+				}
+			}
+
 			const number_widths = [];
 
 			for (const number_element of number_elements) {
 				number_widths.push(number_element.getBoundingClientRect().width);
 			}
 
-			const cell_element = this._contents.querySelector(`.${ZBX_STYLE_TOTALS_LIST} > div`);
 			const cell_width = parseFloat(getComputedStyle(cell_element).width);
 			const min_name_width = 30;
 			const max_count_width = cell_width - min_name_width;
-			const count_elements = this._contents.querySelectorAll(
-				`.${ZBX_STYLE_TOTALS_LIST} .${ZBX_STYLE_TOTALS_LIST_COUNT}`
-			);
 			const count_width = Math.max(0, Math.min(Math.max(...number_widths), max_count_width));
 
 			for (const count_element of count_elements) {

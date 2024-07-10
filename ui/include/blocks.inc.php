@@ -466,9 +466,6 @@ function getSeverityTableCell($severity, array $data, array $stat, $is_total = f
 		return '';
 	}
 
-	$severity_name = $is_total ? CSeverityHelper::getName($severity) : '';
-	$ext_ack = array_key_exists('ext_ack', $data['filter']) ? $data['filter']['ext_ack'] : EXTACK_OPTION_ALL;
-
 	$allTriggersNum = $stat['count'];
 	if ($allTriggersNum) {
 		$allTriggersNum = (new CLinkAction($allTriggersNum))
@@ -485,12 +482,15 @@ function getSeverityTableCell($severity, array $data, array $stat, $is_total = f
 			));
 	}
 
+	$ext_ack = array_key_exists('ext_ack', $data['filter']) ? $data['filter']['ext_ack'] : EXTACK_OPTION_ALL;
+	$severity_name = $is_total ? CSeverityHelper::getName($severity) : '';
+
 	switch ($ext_ack) {
 		case EXTACK_OPTION_ALL:
 			return CSeverityHelper::makeSeverityCell($severity, [
 				(new CSpan(
 					(new CSpan(
-						(new CSpan($allTriggersNum))->addClass(ZBX_STYLE_TOTALS_LIST_NUMBER)
+						(new CSpan($allTriggersNum))
 					))->addClass(ZBX_STYLE_TOTALS_LIST_COUNT_PART)
 				))->addClass(ZBX_STYLE_TOTALS_LIST_COUNT),
 				(new CSpan($severity_name))->addClass(ZBX_STYLE_TOTALS_LIST_NAME)->setTitle($severity_name)
@@ -500,23 +500,26 @@ function getSeverityTableCell($severity, array $data, array $stat, $is_total = f
 			return CSeverityHelper::makeSeverityCell($severity, [
 				(new CSpan(
 					(new CSpan(
-						(new CSpan($unackTriggersNum))->addClass(ZBX_STYLE_TOTALS_LIST_NUMBER)
+						(new CSpan($unackTriggersNum))
 					))->addClass(ZBX_STYLE_TOTALS_LIST_COUNT_PART)
 				))->addClass(ZBX_STYLE_TOTALS_LIST_COUNT),
 				(new CSpan($severity_name))->addClass(ZBX_STYLE_TOTALS_LIST_NAME)->setTitle($severity_name)
 			], false, $is_total);
 
 		case EXTACK_OPTION_BOTH:
+			$layout = array_key_exists('layout', $data['filter']) ? $data['filter']['layout'] : STYLE_HORIZONTAL;
+			$of = $layout == STYLE_HORIZONTAL ? ' '._('of').' ' : _('of');
+
 			return CSeverityHelper::makeSeverityCell($severity, [
 				(new CSpan([
 					(new CSpan(
-						(new CSpan($unackTriggersNum))->addClass(ZBX_STYLE_TOTALS_LIST_NUMBER)
+						(new CSpan($unackTriggersNum))
 					))->addClass(ZBX_STYLE_TOTALS_LIST_COUNT_PART),
 					(new CSpan(
-						(new CSpan(' '._('of').' '))->addClass(ZBX_STYLE_TOTALS_LIST_OF)
+						(new CSpan($of))
 					))->addClass(ZBX_STYLE_TOTALS_LIST_COUNT_PART),
 					(new CSpan(
-						(new CSpan($allTriggersNum))->addClass(ZBX_STYLE_TOTALS_LIST_NUMBER)
+						(new CSpan($allTriggersNum))
 					))->addClass(ZBX_STYLE_TOTALS_LIST_COUNT_PART)
 				]))->addClass(ZBX_STYLE_TOTALS_LIST_COUNT),
 				(new CSpan($severity_name))->addClass(ZBX_STYLE_TOTALS_LIST_NAME)->setTitle($severity_name)

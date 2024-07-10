@@ -2208,8 +2208,6 @@ define('ZBX_STYLE_TOTALS_LIST_HORIZONTAL', 'totals-list-horizontal');
 define('ZBX_STYLE_TOTALS_LIST_VERTICAL', 'totals-list-vertical');
 define('ZBX_STYLE_TOTALS_LIST_COUNT', 'count');
 define('ZBX_STYLE_TOTALS_LIST_COUNT_PART', 'count-part');
-define('ZBX_STYLE_TOTALS_LIST_NUMBER', 'number');
-define('ZBX_STYLE_TOTALS_LIST_OF', 'of');
 define('ZBX_STYLE_TOTALS_LIST_NAME', 'name');
 define('ZBX_STYLE_TREEVIEW', 'treeview');
 define('ZBX_STYLE_UPPERCASE', 'uppercase');
