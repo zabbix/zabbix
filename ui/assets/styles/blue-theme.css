@@ -7238,7 +7238,8 @@ svg {
       .totals-list.totals-list-vertical .count .count-part .ellipsis::after {
         content: '…'; }
   .totals-list.totals-list-vertical .name {
-    flex-grow: 1; }
+    flex-grow: 1;
+    margin-bottom: -2.5px; }
 
 .macro-input-group {
   position: relative;
