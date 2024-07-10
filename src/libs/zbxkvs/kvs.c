@@ -14,6 +14,9 @@
 
 #include "zbxkvs.h"
 
+#include "zbxjson.h"
+#include "zbxalgo.h"
+
 static zbx_hash_t	zbx_kv_hash(const void *data)
 {
 	const zbx_kv_t	*kv = (const zbx_kv_t *)data;

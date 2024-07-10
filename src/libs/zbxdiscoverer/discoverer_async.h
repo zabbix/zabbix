@@ -15,9 +15,11 @@
 #ifndef ZABBIX_DISCOVERER_ASYNC_H
 #define ZABBIX_DISCOVERER_ASYNC_H
 
-#include <event2/dns.h>
 #include "discoverer_int.h"
 #include "discoverer_job.h"
+#include "discoverer_queue.h"
+
+#include <event2/dns.h>
 
 typedef struct
 {

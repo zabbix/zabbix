@@ -61,6 +61,7 @@ $fields = [
 	'cancel' =>					[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'form' =>					[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'form_refresh' =>			[T_ZBX_INT, O_OPT, P_SYS,	null,		null],
+	'backurl' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
 	// sort and sortorder
 	'sort' =>					[T_ZBX_STR, O_OPT, P_SYS,	IN('"name","status","discover"'),				null],
 	'sortorder' =>				[T_ZBX_STR, O_OPT, P_SYS,	IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
@@ -102,6 +103,11 @@ if (getRequest('parent_discoveryid')) {
 	}
 }
 else {
+	access_deny();
+}
+
+// Validate backurl.
+if (hasRequest('backurl') && !CHtmlUrlValidator::validateSameSite(getRequest('backurl'))) {
 	access_deny();
 }
 
@@ -272,14 +278,23 @@ elseif ($hostid != 0 && getRequest('action', '') === 'hostprototype.updatediscov
 		'discover' => getRequest('discover', DB::getDefault('hosts', 'discover'))
 	]);
 
-	show_messages($result, _('Host prototype updated'), _('Cannot update host prototype'));
+	if ($result) {
+		CMessageHelper::setSuccessTitle(_('Host prototype updated'));
+	}
+	else {
+		CMessageHelper::setErrorTitle(_('Cannot update host prototype'));
+	}
+
+	if (hasRequest('backurl')) {
+		$response = new CControllerResponseRedirect(getRequest('backurl'));
+		$response->redirect();
+	}
 }
 // GO
 elseif (hasRequest('action') && str_in_array(getRequest('action'), ['hostprototype.massenable', 'hostprototype.massdisable']) && hasRequest('group_hostid')) {
 	$status = (getRequest('action') == 'hostprototype.massenable') ? HOST_STATUS_MONITORED : HOST_STATUS_NOT_MONITORED;
 	$update = [];
 
-	DBstart();
 	foreach ((array) getRequest('group_hostid') as $hostPrototypeId) {
 		$update[] = [
 			'hostid' => $hostPrototypeId,
@@ -287,18 +302,23 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), ['hostprototy
 		];
 	}
 
-	$result = API::HostPrototype()->update($update);
-	$result = DBend($result);
+	$result = (bool) API::HostPrototype()->update($update);
 
 	$updated = count($update);
 
-	$messageSuccess = _n('Host prototype updated', 'Host prototypes updated', $updated);
-	$messageFailed = _n('Cannot update host prototype', 'Cannot update host prototypes', $updated);
-
 	if ($result) {
 		uncheckTableRows($discoveryRule['itemid']);
+
+		CMessageHelper::setSuccessTitle(_n('Host prototype updated', 'Host prototypes updated', $updated));
 	}
-	show_messages($result, $messageSuccess, $messageFailed);
+	else {
+		CMessageHelper::setErrorTitle(_n('Cannot update host prototype', 'Cannot update host prototypes', $updated));
+	}
+
+	if (hasRequest('backurl')) {
+		$response = new CControllerResponseRedirect(getRequest('backurl'));
+		$response->redirect();
+	}
 }
 elseif (hasRequest('action') && getRequest('action') == 'hostprototype.massdelete' && getRequest('group_hostid')) {
 	DBstart();

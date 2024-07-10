@@ -17,13 +17,16 @@
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
+require_once dirname(__FILE__).'/../common/testWidgets.php';
 
 /**
  * @backup dashboard
  *
  * @onBefore prepareData
+ *
+ * @dataSource AllItemValueTypes
  */
-class testDashboardItemHistoryWidget extends CWebTest {
+class testDashboardItemHistoryWidget extends testWidgets {
 
 	/**
 	 * Attach MessageBehavior and TableBehavior to the test.
@@ -37,26 +40,14 @@ class testDashboardItemHistoryWidget extends CWebTest {
 		];
 	}
 
-	protected static $dashboardid;
-	protected static $dashboard_create;
-	protected static $dashboard_data;
-	protected static $update_widget = 'Update Item history Widget';
 	const DEFAULT_WIDGET = 'Default Item history Widget';
 	const DELETE_WIDGET = 'Widget for delete';
 	const DATA_WIDET = 'Widget for data check';
 
-	/**
-	 * SQL query to get widget and widget_field tables to compare hash values, but without widget_fieldid
-	 * because it can change.
-	 */
-	protected $sql = 'SELECT wf.widgetid, wf.type, wf.name, wf.value_int, wf.value_str, wf.value_groupid, wf.value_hostid,'.
-			' wf.value_itemid, wf.value_graphid, wf.value_sysmapid, w.widgetid, w.dashboard_pageid, w.type, w.name, w.x, w.y,'.
-			' w.width, w.height'.
-			' FROM widget_field wf'.
-			' INNER JOIN widget w'.
-			' ON w.widgetid=wf.widgetid'.
-			' ORDER BY wf.widgetid, wf.name, wf.value_int, wf.value_str, wf.value_groupid,'.
-			' wf.value_itemid, wf.value_graphid';
+	protected static $dashboardid;
+	protected static $dashboard_create;
+	protected static $dashboard_data;
+	protected static $update_widget = 'Update Item history Widget';
 
 	public static function prepareData() {
 		// Create host for widget header and data tests.
@@ -175,6 +166,31 @@ class testDashboardItemHistoryWidget extends CWebTest {
 										'value' => 'EDCBA'
 									]
 								]
+							],
+							[
+								'type' => 'graph',
+								'name' => 'Classic graph for time period reference',
+								'x' => 12,
+								'y' => 0,
+								'width' => 24,
+								'height' => 5,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'source_type',
+										'value' => 1
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
+										'name' => 'itemid.0',
+										'value' => $itemids['Test Item history']
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'reference',
+										'value' => 'FEDCB'
+									]
+								]
 							]
 						]
 					]
@@ -191,13 +207,23 @@ class testDashboardItemHistoryWidget extends CWebTest {
 								'name' => self::DATA_WIDET,
 								'x' => 0,
 								'y' => 0,
-								'width' => 12,
+								'width' => 60,
 								'height' => 6,
 								'fields' => [
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'show_timestamp',
 										'value' => 1
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'time_period.from',
+										'value' => 'now-1y'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'time_period.to',
+										'value' => 'now'
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -215,6 +241,11 @@ class testDashboardItemHistoryWidget extends CWebTest {
 										'value' => 'Available memory'
 									],
 									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'columns.1.history',
+										'value' => 1
+									],
+									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
 										'name' => 'columns.1.itemid',
 										'value' => '42243' // item name in widget 'ЗАББИКС Сервер: Linux: Available memory'.
@@ -223,6 +254,11 @@ class testDashboardItemHistoryWidget extends CWebTest {
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'columns.2.name',
 										'value' => 'Available memory in %'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'columns.2.history',
+										'value' => 1
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
@@ -240,9 +276,19 @@ class testDashboardItemHistoryWidget extends CWebTest {
 										'value' => $itemids['Test Item history'] // item name in widget 'Simple host with item for Item history widget: Test Item history'.
 									],
 									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'columns.3.history',
+										'value' => 1
+									],
+									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'columns.4.name',
 										'value' => 'Master item'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'columns.4.history',
+										'value' => 1
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
@@ -282,10 +328,14 @@ class testDashboardItemHistoryWidget extends CWebTest {
 			'Refresh interval' => 'Default (1 minute)',
 			'Columns' => [],
 			'Show lines' => '25',
+			'Override host' => '',
 			'New values' => 'Top',
 			'Show timestamp' => false,
 			'Show column header' => 'Vertical',
-			'Override host' => ''
+			'Time period' => 'Dashboard',
+			'Widget' => '',
+			'id:time_period_from' => 'now-1h',
+			'id:time_period_to' => 'now'
 		];
 		$form->checkValue($default_state);
 
@@ -303,6 +353,14 @@ class testDashboardItemHistoryWidget extends CWebTest {
 			],
 			'id:override_hostid_ms' => [
 				'placeholder' => 'type here to search'
+			],
+			'id:time_period_from' => [
+				'maxlength' => '255',
+				'placeholder' => 'YYYY-MM-DD hh:mm:ss'
+			],
+			'id:time_period_to' => [
+				'maxlength' => '255',
+				'placeholder' => 'YYYY-MM-DD hh:mm:ss'
 			]
 		];
 
@@ -311,16 +369,190 @@ class testDashboardItemHistoryWidget extends CWebTest {
 		}
 
 		// Check radio buttons.
-		$this->assertEquals(['Top', 'Bottom'], $form->getField('New values')->getLabels()->asText());
+		$radiobuttons = [
+			'Layout' => ['Horizontal', 'Vertical'],
+			'New values' => ['Top', 'Bottom'],
+			'Show column header' => ['Off', 'Horizontal', 'Vertical'],
+			'Time period' => ['Dashboard', 'Widget', 'Custom']
+		];
+
+		foreach ($radiobuttons as $field => $labels) {
+			$this->assertEquals($labels, $form->getField($field)->getLabels()->asText());
+		}
 
 		$refresh_interval = ['Default (1 minute)', 'No refresh', '10 seconds', '30 seconds', '1 minute',
-				'2 minutes', '10 minutes', '15 minutes'];
+				'2 minutes', '10 minutes', '15 minutes'
+		];
 		$this->assertEquals($refresh_interval, $form->getField('Refresh interval')->getOptions()->asText());
+
+		// Check Column popup.
+		$form->getFieldContainer('Columns')->query('button:Add')->waitUntilClickable()->one()->click();
+		$column_overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+		$this->assertEquals('New column', $column_overlay->getTitle());
+		$column_form = $column_overlay->asForm();
+		$this->assertEquals(['Name', 'Item', 'Base colour', 'Highlights', 'Display', 'Min', 'Max', 'Thresholds',
+				'History data', 'Use monospace font', 'Display local time', 'Show thumbnail'],
+				$column_form->getLabels()->asText()
+		);
+		$this->assertEquals(['Name', 'Item'], $column_form->getRequiredLabels());
+
+		$defaults = [
+			'Name' => ['value' => '', 'maxlength' => 255],
+			'Item' => ['value' => ''],
+			'xpath://input[@id="base_color"]/..' => ['value' => ''],
+			'Display' => ['value' => 'As is', 'lables' => ['As is', 'HTML', 'Single line']],
+			'Min' => ['value' => '', 'placeholder' => 'calculated', 'maxlength' => 255],
+			'Max' => ['value' => '', 'placeholder' => 'calculated', 'maxlength' => 255],
+			'History data' => ['value' => 'Auto', 'lables' => ['Auto', 'History', 'Trends']],
+			'id:max_length' => ['value' => 100, 'maxlength' => 3],
+			'Use monospace font' => ['value' => false],
+			'Display local time' => ['value' => false],
+			'Show thumbnail' => ['value' => false]
+		];
+
+		foreach ($defaults as $label => $attributes) {
+			$field = $column_form->getField($label);
+			$this->assertEquals($attributes['value'], $field->getValue());
+
+			foreach (['maxlength', 'placeholder'] as $attribute) {
+				if (array_key_exists($attribute, $attributes)) {
+					$this->assertEquals($attributes[$attribute], $field->getAttribute($attribute));
+				}
+			}
+
+			if (array_key_exists('labels', $attributes)) {
+				$this->assertEquals($attributes['labels'], $field->asSegmentedRadio()->getLabels()->asText());
+			}
+		}
+
+		// Check buttons in column dialog.
+		$this->assertEquals(['Add', 'Cancel'], $column_overlay->getFooter()->query('button')->all()
+				->filter(CElementFilter::CLICKABLE)->asText()
+		);
+
+		// Check initial visible fields.
+		foreach (['Name', 'Item', 'Base colour'] as $label) {
+			$field = $column_form->getField($label);
+			$this->assertTrue($field->isEnabled());
+			$this->assertTrue($field->isVisible());
+		}
+
+		// Check fields for binary item.
+		$column_form->fill(['Item' => 'Binary item']);
+
+		// Check that name is filled automatically.
+		$this->assertEquals('Host for all item value types: Binary item', $column_form->getField('Name')->getValue());
+		$this->assertEquals(['Name', 'Item', 'Base colour', 'Show thumbnail'],
+				array_values($column_form->getLabels()->filter(CElementFilter::VISIBLE)->asText())
+		);
+
+		// Check fields for character, text and log items.
+		foreach (['Character item', 'Text item', 'Log item'] as $i => $item) {
+			$column_form->fill(['Item' => $item]);
+			$this->assertEquals('Host for all item value types: '.$item, $column_form->getField('Name')->getValue());
+
+			$labels = ($item === 'Log item')
+				? ['Name', 'Item', 'Base colour', 'Highlights', 'Display', 'Use monospace font', 'Display local time']
+				: ['Name', 'Item', 'Base colour', 'Highlights', 'Display', 'Use monospace font'];
+
+			$this->assertEquals($labels, array_values($column_form->getLabels()->filter(CElementFilter::VISIBLE)->asText()));
+			$this->checkThresholdsHighlights($column_form, 'Highlights', $i, '_pattern');
+			$this->checkHint($column_form, 'Display',
+					'Single line - result will be displayed in a single line and truncated to specified length.'
+			);
+
+			$display_maxlength_dependencies = [
+				'As is' => false,
+				'HTML' => false,
+				'Single line' => true
+			];
+			foreach ($display_maxlength_dependencies as $label => $status) {
+				$column_form->fill(['Display' => $label]);
+				$max_length = $column_form->getField('id:max_length');
+				$this->assertTrue($max_length->isEnabled($status));
+				$this->assertTrue($max_length->isVisible($status));
+			}
+
+			if ($item === 'Log item') {
+				$this->checkHint($column_form, 'Display local time', 'This setting will display local time'.
+						' instead of the timestamp. "Show timestamp" must also be checked in the advanced configuration.'
+				);
+			}
+		}
+
+		// Check fields for float and unsigned item.
+		foreach (['Float item', 'Unsigned item'] as $j => $item) {
+			$column_form->fill(['Item' => $item]);
+			$this->assertEquals(['Name', 'Item', 'Base colour', 'Display', 'Thresholds', 'History data'],
+					array_values($column_form->getLabels()->filter(CElementFilter::VISIBLE)->asText())
+			);
+
+			$display_fields = [
+				'Bar' => true,
+				'Indicators' => true,
+				'As is' => false
+			];
+			foreach ($display_fields as $label => $status) {
+				$column_form->fill(['Display' => $label]);
+
+				foreach (['Min', 'Max'] as $display_input) {
+					$input = $column_form->getField($display_input);
+					$this->assertTrue($input->isEnabled($status));
+					$this->assertTrue($input->isVisible($status));
+				}
+			}
+
+			$this->checkThresholdsHighlights($column_form, 'Thresholds', $j, '_threshold');
+		}
+
+		$column_overlay->close();
 
 		// Check if buttons present and clickable.
 		$this->assertEquals(['Add', 'Cancel'], $dialog->getFooter()->query('button')->all()
 				->filter(CElementFilter::CLICKABLE)->asText()
 		);
+
+		$visible_labels = ['Type', 'Show header', 'Name', 'Refresh interval', 'Layout', 'Columns', 'Show lines',
+				'Override host', 'Advanced configuration'
+		];
+		$hidden_labels = ['New values', 'Show timestamp', 'Show column header', 'Time period', 'Widget', 'From', 'To'];
+		$this->assertEquals($visible_labels, array_values($form->getLabels()->filter(CElementFilter::VISIBLE)->asText()));
+		$this->assertEquals($hidden_labels, array_values($form->getLabels()->filter(CElementFilter::NOT_VISIBLE)->asText()));
+
+		$expanded_labels = ['New values', 'Show timestamp', 'Show column header', 'Time period'];
+		$form->fill(['Advanced configuration' => true]);
+		$this->assertEquals(array_merge($visible_labels, $expanded_labels),
+				array_values($form->getLabels()->filter(CElementFilter::VISIBLE)->asText())
+		);
+
+		$time_period_fields = [
+			'Dashboard' => ['Widget' => false, 'From' => false, 'To' => false],
+			'Widget' => ['Widget' => true, 'From' => false, 'To' => false],
+			'Custom' => ['Widget' => false, 'From' => true, 'To' => true]
+		];
+
+		foreach ($time_period_fields as $label => $visibility) {
+			$form->fill(['Time period' => $label]);
+
+			foreach ($visibility as $field => $status) {
+				$this->assertTrue($form->getField($field)->isEnabled($status));
+			}
+
+			// Check Widget multiselect's placeholder.
+			if ($label === 'Widget') {
+				$this->assertTrue($form->getField('id:time_period_reference_ms')
+						->isAttributePresent(['placeholder' => 'type here to search'])
+				);
+			}
+
+			// Check calendar buttons.
+			if ($label === 'Custom') {
+				foreach (['time_period_from_calendar', 'time_period_to_calendar'] as $button) {
+					$this->assertTrue($form->query('id', $button)->one()->isClickable());
+				}
+			}
+		}
+
 		$dialog->close();
 		$dashboard->save();
 
@@ -352,10 +584,12 @@ class testDashboardItemHistoryWidget extends CWebTest {
 					],
 					'Columns' => [
 						[
-							'Name' => 'Column1',
-							'Item' => [
-								'values' =>  'Available memory in %',
-								'context' => ['values' => 'ЗАББИКС Сервер']
+							'fields' => [
+								'Name' => 'Column1',
+								'Item' => [
+									'values' => 'Available memory in %',
+									'context' => ['values' => 'ЗАББИКС Сервер']
+								]
 							]
 						]
 					],
@@ -371,10 +605,12 @@ class testDashboardItemHistoryWidget extends CWebTest {
 					],
 					'Columns' => [
 						[
-							'Name' => 'Column1',
-							'Item' => [
-								'values' =>  'Available memory in %',
-								'context' => ['values' => 'ЗАББИКС Сервер']
+							'fields' => [
+								'Name' => 'Column1',
+								'Item' => [
+									'values' => 'Available memory in %',
+									'context' => ['values' => 'ЗАББИКС Сервер']
+								]
 							]
 						]
 					],
@@ -390,10 +626,12 @@ class testDashboardItemHistoryWidget extends CWebTest {
 					],
 					'Columns' => [
 						[
-							'Name' => 'Column1',
-							'Item' => [
-								'values' =>  'Available memory in %',
-								'context' => ['values' => 'ЗАББИКС Сервер']
+							'fields' => [
+								'Name' => 'Column1',
+								'Item' => [
+									'values' => 'Available memory in %',
+									'context' => ['values' => 'ЗАББИКС Сервер']
+								]
 							]
 						]
 					],
@@ -409,10 +647,12 @@ class testDashboardItemHistoryWidget extends CWebTest {
 					],
 					'Columns' => [
 						[
-							'Name' => 'Column1',
-							'Item' => [
-								'values' =>  'Available memory in %',
-								'context' => ['values' => 'ЗАББИКС Сервер']
+							'fields' => [
+								'Name' => 'Column1',
+								'Item' => [
+									'values' => 'Available memory in %',
+									'context' => ['values' => 'ЗАББИКС Сервер']
+								]
 							]
 						]
 					],
@@ -435,7 +675,6 @@ class testDashboardItemHistoryWidget extends CWebTest {
 			// #6.
 			[
 				[
-					'flag' => true,
 					'expected' => TEST_GOOD,
 					'same_host' => 'ЗАББИКС Сервер',
 					'fields' => [
@@ -443,17 +682,21 @@ class testDashboardItemHistoryWidget extends CWebTest {
 					],
 					'Columns' => [
 						[
-							'Name' => 'Column1',
-							'Item' => [
-								'values' =>  'Available memory in %',
-								'context' => ['values' => 'ЗАББИКС Сервер']
+							'fields' => [
+								'Name' => 'Column1',
+								'Item' => [
+									'values' => 'Available memory in %',
+									'context' => ['values' => 'ЗАББИКС Сервер']
+								]
 							]
 						],
 						[
-							'Name' => 'Column2',
-							'Item' => [
-								'values' =>  'Available memory',
-								'context' => ['values' => 'ЗАББИКС Сервер']
+							'fields' => [
+								'Name' => 'Column2',
+								'Item' => [
+									'values' => 'Available memory',
+									'context' => ['values' => 'ЗАББИКС Сервер']
+								]
 							]
 						]
 					]
@@ -462,24 +705,27 @@ class testDashboardItemHistoryWidget extends CWebTest {
 			// #7 Test case with items from two different hosts.
 			[
 				[
-					'flag' => true,
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => ''
 					],
 					'Columns' => [
 						[
-							'Name' => 'Column1',
-							'Item' => [
-								'values' =>  'Available memory in %',
-								'context' => ['values' => 'ЗАББИКС Сервер']
+							'fields' => [
+								'Name' => 'Column1',
+								'Item' => [
+									'values' => 'Available memory in %',
+									'context' => ['values' => 'ЗАББИКС Сервер']
+								]
 							]
 						],
 						[
-							'Name' => 'Column2',
-							'Item' => [
-								'values' => 'Test Item history',
-								'context' => ['values' => 'Simple host with item for Item history widget']
+							'fields' => [
+								'Name' => 'Column2',
+								'Item' => [
+									'values' => 'Test Item history',
+									'context' => ['values' => 'Simple host with item for Item history widget']
+								]
 							]
 						]
 					]
@@ -494,17 +740,21 @@ class testDashboardItemHistoryWidget extends CWebTest {
 					],
 					'Columns' => [
 						[
-							'Name' => 'Column1',
-							'Item' => [
-								'values' =>  'Available memory in %',
-								'context' => ['values' => 'ЗАББИКС Сервер']
+							'fields' => [
+								'Name' => 'Column1',
+								'Item' => [
+									'values' => 'Available memory in %',
+									'context' => ['values' => 'ЗАББИКС Сервер']
+								]
 							]
 						],
 						[
-							'Name' => 'Column2',
-							'Item' => [
-								'values' =>  'Available memory',
-								'context' => ['values' => 'ЗАББИКС Сервер']
+							'fields' => [
+								'Name' => 'Column2',
+								'Item' => [
+									'values' => 'Available memory',
+									'context' => ['values' => 'ЗАББИКС Сервер']
+								]
 							]
 						]
 					]
@@ -519,17 +769,21 @@ class testDashboardItemHistoryWidget extends CWebTest {
 					],
 					'Columns' => [
 						[
-							'Name' => 'Column1',
-							'Item' => [
-								'values' =>  'Available memory in %',
-								'context' => ['values' => 'ЗАББИКС Сервер']
+							'fields' => [
+								'Name' => 'Column1',
+								'Item' => [
+									'values' => 'Available memory in %',
+									'context' => ['values' => 'ЗАББИКС Сервер']
+								]
 							]
 						],
 						[
-							'Name' => 'Column2',
-							'Item' => [
-								'values' => 'Test Item history',
-								'context' => ['values' => 'Simple host with item for Item history widget']
+							'fields' => [
+								'Name' => 'Column2',
+								'Item' => [
+									'values' => 'Test Item history',
+									'context' => ['values' => 'Simple host with item for Item history widget']
+								]
 							]
 						]
 					]
@@ -545,10 +799,12 @@ class testDashboardItemHistoryWidget extends CWebTest {
 					],
 					'Columns' => [
 						[
-							'Name' => 'Column1',
-							'Item' => [
-								'values' => 'Test Item history',
-								'context' => ['values' => 'Simple host with item for Item history widget']
+							'fields' => [
+								'Name' => 'Column1',
+								'Item' => [
+									'values' => 'Test Item history',
+									'context' => ['values' => 'Simple host with item for Item history widget']
+								]
 							]
 						]
 					]
@@ -561,14 +817,21 @@ class testDashboardItemHistoryWidget extends CWebTest {
 					'fields' => [
 						'Name' => 'Header is hidden',
 						'Show header' => false,
-						'Refresh interval' => 'No refresh'
+						'Refresh interval' => 'No refresh',
+						'Layout' => 'Vertical',
+						'Advanced configuration' => true,
+						'New values' => 'Bottom',
+						'Show timestamp' => true,
+						'Show column header' => 'Horizontal'
 					],
 					'Columns' => [
 						[
-							'Name' => 'Column1',
-							'Item' => [
-								'values' =>  'Available memory',
-								'context' => ['values' => 'ЗАББИКС Сервер']
+							'fields' => [
+								'Name' => 'Column1',
+								'Item' => [
+									'values' => 'Available memory',
+									'context' => ['values' => 'ЗАББИКС Сервер']
+								]
 							]
 						]
 					]
@@ -581,14 +844,18 @@ class testDashboardItemHistoryWidget extends CWebTest {
 					'fields' => [
 						'Name' => 'Header appears',
 						'Show header' => true,
-						'Refresh interval' => '10 seconds'
+						'Refresh interval' => '10 seconds',
+						'Advanced configuration' => true,
+						'Show column header' => 'Off'
 					],
 					'Columns' => [
 						[
-							'Name' => 'Column1',
-							'Item' => [
-								'values' =>  'Available memory',
-								'context' => ['values' => 'ЗАББИКС Сервер']
+							'fields' => [
+								'Name' => 'Column1',
+								'Item' => [
+									'values' => 'Available memory',
+									'context' => ['values' => 'ЗАББИКС Сервер']
+								]
 							]
 						]
 					]
@@ -603,10 +870,12 @@ class testDashboardItemHistoryWidget extends CWebTest {
 					],
 					'Columns' => [
 						[
-							'Name' => 'Column1',
-							'Item' => [
-								'values' =>  'Available memory',
-								'context' => ['values' => 'ЗАББИКС Сервер']
+							'fields' => [
+								'Name' => 'Column1',
+								'Item' => [
+									'values' => 'Available memory',
+									'context' => ['values' => 'ЗАББИКС Сервер']
+								]
 							]
 						]
 					]
@@ -621,10 +890,12 @@ class testDashboardItemHistoryWidget extends CWebTest {
 					],
 					'Columns' => [
 						[
-							'Name' => 'Column1',
-							'Item' => [
-								'values' =>  'Available memory',
-								'context' => ['values' => 'ЗАББИКС Сервер']
+							'fields' => [
+								'Name' => 'Column1',
+								'Item' => [
+									'values' => 'Available memory',
+									'context' => ['values' => 'ЗАББИКС Сервер']
+								]
 							]
 						]
 					]
@@ -640,10 +911,12 @@ class testDashboardItemHistoryWidget extends CWebTest {
 					],
 					'Columns' => [
 						[
-							'Name' => 'Column1',
-							'Item' => [
-								'values' =>  'Available memory',
-								'context' => ['values' => 'ЗАББИКС Сервер']
+							'fields' => [
+								'Name' => 'Column1',
+								'Item' => [
+									'values' => 'Available memory',
+									'context' => ['values' => 'ЗАББИКС Сервер']
+								]
 							]
 						]
 					]
@@ -659,10 +932,12 @@ class testDashboardItemHistoryWidget extends CWebTest {
 					],
 					'Columns' => [
 						[
-							'Name' => 'Column1',
-							'Item' => [
-								'values' =>  'Available memory',
-								'context' => ['values' => 'ЗАББИКС Сервер']
+							'fields' => [
+								'Name' => 'Column1',
+								'Item' => [
+									'values' => 'Available memory',
+									'context' => ['values' => 'ЗАББИКС Сервер']
+								]
 							]
 						]
 					]
@@ -677,10 +952,12 @@ class testDashboardItemHistoryWidget extends CWebTest {
 					],
 					'Columns' => [
 						[
-							'Name' => 'Column1',
-							'Item' => [
-								'values' =>  'Available memory',
-								'context' => ['values' => 'ЗАББИКС Сервер']
+							'fields' => [
+								'Name' => 'Column1',
+								'Item' => [
+									'values' => 'Available memory',
+									'context' => ['values' => 'ЗАББИКС Сервер']
+								]
 							]
 						]
 					]
@@ -695,10 +972,12 @@ class testDashboardItemHistoryWidget extends CWebTest {
 					],
 					'Columns' => [
 						[
-							'Name' => 'Column1',
-							'Item' => [
-								'values' =>  'Available memory',
-								'context' => ['values' => 'ЗАББИКС Сервер']
+							'fields' => [
+								'Name' => 'Column1',
+								'Item' => [
+									'values' => 'Available memory',
+									'context' => ['values' => 'ЗАББИКС Сервер']
+								]
 							]
 						]
 					]
@@ -714,10 +993,12 @@ class testDashboardItemHistoryWidget extends CWebTest {
 					],
 					'Columns' => [
 						[
-							'Name' => 'Column1',
-							'Item' => [
-								'values' =>  'Available memory',
-								'context' => ['values' => 'ЗАББИКС Сервер']
+							'fields' => [
+								'Name' => 'Column1',
+								'Item' => [
+									'values' => 'Available memory',
+									'context' => ['values' => 'ЗАББИКС Сервер']
+								]
 							]
 						]
 					]
@@ -733,10 +1014,12 @@ class testDashboardItemHistoryWidget extends CWebTest {
 					],
 					'Columns' => [
 						[
-							'Name' => 'Column1',
-							'Item' => [
-								'values' =>  'Available memory',
-								'context' => ['values' => 'ЗАББИКС Сервер']
+							'fields' => [
+								'Name' => 'Column1',
+								'Item' => [
+									'values' => 'Available memory',
+									'context' => ['values' => 'ЗАББИКС Сервер']
+								]
 							]
 						]
 					]
@@ -753,10 +1036,12 @@ class testDashboardItemHistoryWidget extends CWebTest {
 					],
 					'Columns' => [
 						[
-							'Name' => 'Column1',
-							'Item' => [
-								'values' => 'Test Item history',
-								'context' => ['values' => 'Simple host with item for Item history widget']
+							'fields' => [
+								'Name' => 'Column1',
+								'Item' => [
+									'values' => 'Test Item history',
+									'context' => ['values' => 'Simple host with item for Item history widget']
+								]
 							]
 						]
 					],
@@ -776,10 +1061,805 @@ class testDashboardItemHistoryWidget extends CWebTest {
 					],
 					'Columns' => [
 						[
-							'Name' => 'Column1',
-							'Item' => [
-								'values' =>  'Available memory',
-								'context' => ['values' => 'ЗАББИКС Сервер']
+							'fields' => [
+								'Name' => 'Column1',
+								'Item' => [
+									'values' => 'Available memory',
+									'context' => ['values' => 'ЗАББИКС Сервер']
+								]
+							]
+						]
+					]
+				]
+			],
+			// #23.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Empty name in column'
+					],
+					'Columns' => [
+						[
+							'fields' => [
+								'Item' => [
+									'values' => 'Available memory',
+									'context' => ['values' => 'ЗАББИКС Сервер']
+								],
+								'Name' => ''
+							]
+						]
+					],
+					'column_error' => 'Invalid parameter "/1/name": cannot be empty.'
+				]
+			],
+			// #24.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Binary column with color'
+					],
+					'Columns' => [
+						[
+							'fields' => [
+								'Item' => [
+									'values' => 'Binary item',
+									'context' => ['values' => 'Host for all item value types']
+								]
+							],
+							'xpath://input[@id="base_color"]/..' => '90CAF9',
+							'Show thumbnail' => true
+						]
+					]
+				]
+			],
+			// #25.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Character column with color and highlights'
+					],
+					'Columns' => [
+						[
+							'fields' => [
+								'Item' => [
+									'values' => 'Character item',
+									'context' => ['values' => 'Host for all item value types']
+								],
+								'xpath://input[@id="base_color"]/..' => 'AFB42B',
+								'Display' => 'HTML',
+								'Use monospace font' => true
+							],
+							'Highlights' => [
+								[
+									'xpath://input[@id="highlights_0_color"]/..' => '00ACC1',
+									'id:highlights_0_pattern' => 'pattern_1'
+								],
+								[
+									'xpath://input[@id="highlights_1_color"]/..' => '00ACC1',
+									'id:highlights_1_pattern' => 12345
+								]
+							]
+						]
+					]
+				]
+			],
+			// #26.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Duplicated highlights'
+					],
+					'Columns' => [
+						[
+							'fields' => [
+								'Item' => [
+									'values' => 'Character item',
+									'context' => ['values' => 'Host for all item value types']
+								],
+								'Display' => 'HTML'
+							],
+							'Highlights' => [
+								[
+									'xpath://input[@id="highlights_0_color"]/..' => '00ACC1',
+									'id:highlights_0_pattern' => 'pattern_1'
+								],
+								[
+									'xpath://input[@id="highlights_1_color"]/..' => '0288D1',
+									'id:highlights_1_pattern' => 'pattern_1'
+								]
+							]
+						]
+					],
+					'column_error' => 'Invalid parameter "/1/highlights/2": value (pattern)=(pattern_1) already exists.'
+				]
+			],
+			// #27.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Character column with empty Highlight'
+					],
+					'Columns' => [
+						[
+							'fields' => [
+								'Item' => [
+									'values' => 'Character item',
+									'context' => ['values' => 'Host for all item value types']
+								],
+								'Display' => 'HTML',
+								'Use monospace font' => true
+							],
+							'Highlights' => [
+								[
+									'xpath://input[@id="highlights_0_color"]/..' => '00ACC1'
+								]
+							]
+						]
+					],
+					'column_error' => 'Invalid parameter "/1/highlights/1/pattern": cannot be empty.'
+				]
+			],
+			// #28.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Character column with 0 max length'
+					],
+					'Columns' => [
+						[
+							'fields' => [
+								'Item' => [
+									'values' => 'Character item',
+									'context' => ['values' => 'Host for all item value types']
+								],
+								'Display' => 'Single line',
+								'Use monospace font' => true,
+								'id:max_length' => 0
+							]
+						]
+					],
+					'column_error' => 'Invalid parameter "/1/max_length": value must be one of 1-500.'
+				]
+			],
+			// #29.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Character column with text in max length'
+					],
+					'Columns' => [
+						[
+							'fields' => [
+								'Item' => [
+									'values' => 'Character item',
+									'context' => ['values' => 'Host for all item value types']
+								],
+								'Display' => 'Single line',
+								'Use monospace font' => true,
+								'id:max_length' => 'text'
+							]
+						]
+					],
+					'column_error' => 'Invalid parameter "/1/max_length": value must be one of 1-500.'
+				]
+			],
+			// #30.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Character column with too large max length'
+					],
+					'Columns' => [
+						[
+							'fields' => [
+								'Item' => [
+									'values' => 'Character item',
+									'context' => ['values' => 'Host for all item value types']
+								],
+								'Display' => 'Single line',
+								'id:max_length' => 599
+							]
+						]
+					],
+					'column_error' => 'Invalid parameter "/1/max_length": value must be one of 1-500.'
+				]
+			],
+			// #31.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Float column with text in min'
+					],
+					'Columns' => [
+						[
+							'fields' => [
+								'Item' => [
+									'values' => 'Float item',
+									'context' => ['values' => 'Host for all item value types']
+								],
+								'Display' => 'Bar',
+								'id:min' => 'min'
+							]
+						]
+					],
+					'column_error' => 'Invalid parameter "/1/min": a number is expected.'
+				]
+			],
+			// #32.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Float column with text in max'
+					],
+					'Columns' => [
+						[
+							'fields' => [
+								'Item' => [
+									'values' => 'Float item',
+									'context' => ['values' => 'Host for all item value types']
+								],
+								'Display' => 'Bar',
+								'id:max' => 'max'
+							]
+						]
+					],
+					'column_error' => 'Invalid parameter "/1/max": a number is expected.'
+				]
+			],
+			// #33.
+			[
+				[
+					'fields' => [
+						'Name' => 'Float column with Bar display and calculated min/max'
+					],
+					'Columns' => [
+						[
+							'fields' => [
+								'Item' => [
+									'values' => 'Float item',
+									'context' => ['values' => 'Host for all item value types']
+								],
+								'Display' => 'Bar'
+							]
+						]
+					]
+				]
+			],
+			// #34.
+			[
+				[
+					'fields' => [
+						'Name' => 'Float column with Bar display and negative min/max'
+					],
+					'Columns' => [
+						[
+							'fields' => [
+								'Item' => [
+									'values' => 'Float item',
+									'context' => ['values' => 'Host for all item value types']
+								],
+								'Display' => 'Bar',
+								'id:min' => -9999,
+								'id:max' => -20
+							]
+						]
+					]
+				]
+			],
+			// #35.
+			[
+				[
+					'fields' => [
+						'Name' => 'Float column with Bar display and float min/max'
+					],
+					'Columns' => [
+						[
+							'fields' => [
+								'Item' => [
+									'values' => 'Float item',
+									'context' => ['values' => 'Host for all item value types']
+								],
+								'Display' => 'Bar',
+								'id:min' => -1.5000009,
+								'id:max' => -30
+							]
+						]
+					]
+				]
+			],
+			// #36.
+			[
+				[
+					'fields' => [
+						'Name' => 'Unsigned column with Indicators display and float min/max'
+					],
+					'Columns' => [
+						[
+							'fields' => [
+								'Item' => [
+									'values' => 'Float item',
+									'context' => ['values' => 'Host for all item value types']
+								],
+								'Display' => 'Indicators',
+								'id:min' => -1.5000009,
+								'id:max' => -500.999
+							]
+						]
+					]
+				]
+			],
+			// #37.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Float column with Indicators display and text in min'
+					],
+					'Columns' => [
+						[
+							'fields' => [
+								'Item' => [
+									'values' => 'Float item',
+									'context' => ['values' => 'Host for all item value types']
+								],
+								'Display' => 'Indicators',
+								'id:min' => 'minimal'
+							]
+						]
+					],
+					'column_error' => 'Invalid parameter "/1/min": a number is expected.'
+				]
+			],
+			// #38.
+			[
+				[
+					'fields' => [
+						'Name' => 'Unsigned column with Indicators display and calculated min/max'
+					],
+					'Columns' => [
+						[
+							'fields' => [
+								'Item' => [
+									'values' => 'Unsigned item',
+									'context' => ['values' => 'Host for all item value types']
+								],
+								'Display' => 'Indicators'
+							]
+						]
+					]
+				]
+			],
+			// #39.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Duplicated Thresholds'
+					],
+					'Columns' => [
+						[
+							'fields' => [
+								'Item' => [
+									'values' => 'Float item',
+									'context' => ['values' => 'Host for all item value types']
+								]
+							],
+							'Thresholds' => [
+								[
+									'id:thresholds_0_threshold' => 12
+								],
+								[
+									'id:thresholds_1_threshold' => 12
+								]
+							]
+						]
+					],
+					'column_error' => 'Invalid parameter "/1/thresholds/2": value (threshold)=(12) already exists.'
+				]
+			],
+			// #40.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Text in Thresholds'
+					],
+					'Columns' => [
+						[
+							'fields' => [
+								'Item' => [
+									'values' => 'Float item',
+									'context' => ['values' => 'Host for all item value types']
+								]
+							],
+							'Thresholds' => [
+								[
+									'id:thresholds_0_threshold' => 'text'
+								]
+							]
+						]
+					],
+					'column_error' => 'Invalid parameter "/1/thresholds/1/threshold": a number is expected.'
+				]
+			],
+			// #41.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Float with negative Thresholds'
+					],
+					'Columns' => [
+						[
+							'fields' => [
+								'Item' => [
+									'values' => 'Float item',
+									'context' => ['values' => 'Host for all item value types']
+								],
+								'Display' => 'Bar',
+								'id:min' => 0,
+								'id:max' => 0,
+								'History data' => 'History'
+							],
+							'Thresholds' => [
+								[
+									'xpath://input[@id="thresholds_0_color"]/..' => '039BE5',
+									'id:thresholds_0_threshold' => -12
+								],
+								[
+									'xpath://input[@id="thresholds_1_color"]/..' => '039BE5',
+									'id:thresholds_1_threshold' => -500.99
+								],
+								[
+									'xpath://input[@id="thresholds_2_color"]/..' => '00ACC1',
+									'id:thresholds_2_threshold' => 20.0099
+								]
+							]
+						]
+					]
+				]
+			],
+			// #42.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Float with different colors Thresholds'
+					],
+					'Columns' => [
+						[
+							'fields' => [
+								'Item' => [
+									'values' => 'Float item',
+									'context' => ['values' => 'Host for all item value types']
+								],
+								'Display' => 'Indicators',
+								'id:min' => 9999999,
+								'id:max' => 9999999999999,
+								'History data' => 'Trends'
+							],
+							'Thresholds' => [
+								[
+									'xpath://input[@id="thresholds_0_color"]/..' => 'E91E63',
+									'id:thresholds_0_threshold' => 158
+								],
+								[
+									'xpath://input[@id="thresholds_1_color"]/..' => '039BE5',
+									'id:thresholds_1_threshold' => 19.20
+								]
+							]
+						]
+					]
+				]
+			],
+			// #43.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Float with empty Threshold'
+					],
+					'Columns' => [
+						[
+							'fields' => [
+								'Item' => [
+									'values' => 'Float item',
+									'context' => ['values' => 'Host for all item value types']
+								]
+							],
+							'Thresholds' => [
+								[
+									'xpath://input[@id="thresholds_0_color"]/..' => 'E91E63'
+								]
+							]
+						]
+					]
+				]
+			],
+			// #44.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Log item column'
+					],
+					'Columns' => [
+						[
+							'fields' => [
+								'Item' => [
+									'values' => 'Log item',
+									'context' => ['values' => 'Host for all item value types']
+								],
+								'Use monospace font' => true,
+								'Display local time' => true
+							]
+						]
+					]
+				]
+			],
+			// #45.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Text item column'
+					],
+					'Columns' => [
+						[
+							'fields' => [
+								'Item' => [
+									'values' => 'Text item',
+									'context' => ['values' => 'Host for all item value types']
+								],
+								'Use monospace font' => true
+							]
+						]
+					]
+				]
+			],
+			// TODO: Uncomment after ZBX-24554 (4) is fixed.
+//			[
+//				[
+//					'expected' => TEST_BAD,
+//					'fields' => [
+//						'Name' => 'Time period = empty widget',
+//						'Advanced configuration' => true,
+//						'Time period' => 'Widget'
+//					],
+//					'Columns' => [
+//						[
+//							'fields' => [
+//								'Item' => [
+//									'values' => 'Text item',
+//									'context' => ['values' => 'Host for all item value types']
+//								]
+//							]
+//						]
+//					],
+//					'error' => 'Invalid parameter "Time period/Widget": cannot be empty.'
+//				]
+//			],
+			// #46.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Time period = Custom, empty from/to',
+						'Advanced configuration' => true,
+						'Time period' => 'Custom',
+						'From' => '',
+						'To' => ''
+					],
+					'Columns' => [
+						[
+							'fields' => [
+								'Item' => [
+									'values' => 'Text item',
+									'context' => ['values' => 'Host for all item value types']
+								]
+							]
+						]
+					],
+					'error' => [
+						'Invalid parameter "Time period/From": cannot be empty.',
+						'Invalid parameter "Time period/To": cannot be empty.'
+					]
+				]
+			],
+			// #47.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Time period = Custom, wrong from/to',
+						'Advanced configuration' => true,
+						'Time period' => 'Custom',
+						'From' => 'test_1',
+						'To' => 'test_2'
+					],
+					'Columns' => [
+						[
+							'fields' => [
+								'Item' => [
+									'values' => 'Text item',
+									'context' => ['values' => 'Host for all item value types']
+								]
+							]
+						]
+					],
+					'error' => [
+						'Invalid parameter "Time period/From": a time is expected.',
+						'Invalid parameter "Time period/To": a time is expected.'
+					]
+				]
+			],
+			// #48.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Time period = Custom, Default from/to',
+						'Advanced configuration' => true,
+						'Time period' => 'Custom'
+					],
+					'Columns' => [
+						[
+							'fields' => [
+								'Item' => [
+									'values' => 'Text item',
+									'context' => ['values' => 'Host for all item value types']
+								]
+							]
+						]
+					]
+				]
+			],
+			// #49.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Time period = Custom',
+						'Advanced configuration' => true,
+						'Time period' => 'Custom',
+						'From' => 'now-1y',
+						'To' => 'now-1M'
+					],
+					'Columns' => [
+						[
+							'fields' => [
+								'Item' => [
+									'values' => 'Text item',
+									'context' => ['values' => 'Host for all item value types']
+								]
+							]
+						]
+					],
+					'check_time' => 'now-1y – now-1M'
+				]
+			],
+			// #50.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Time period = Custom, To in future',
+						'Advanced configuration' => true,
+						'Time period' => 'Custom'
+					],
+					'Columns' => [
+						[
+							'fields' => [
+								'Item' => [
+									'values' => 'Text item',
+									'context' => ['values' => 'Host for all item value types']
+								]
+							]
+						]
+					],
+					'time_shift' => true,
+					'check_time' => 'future'
+				]
+			],
+			// #51.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Time period = Custom, human readable in the past',
+						'Advanced configuration' => true,
+						'Time period' => 'Custom'
+					],
+					'Columns' => [
+						[
+							'fields' => [
+								'Item' => [
+									'values' => 'Text item',
+									'context' => ['values' => 'Host for all item value types']
+								]
+							]
+						]
+					],
+					'time_shift' => true,
+					'check_time' => 'past'
+				]
+			],
+			// #52.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Time period = Custom, To < From',
+						'Advanced configuration' => true,
+						'Time period' => 'Custom',
+						'From' => 'now-1M',
+						'To' => 'now-2M'
+					],
+					'Columns' => [
+						[
+							'fields' => [
+								'Item' => [
+									'values' => 'Text item',
+									'context' => ['values' => 'Host for all item value types']
+								]
+							]
+						]
+					],
+					'error' => 'Minimum time period to display is 1 minute.'
+				]
+			],
+			// #53.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Time period = Custom, period 30s',
+						'Advanced configuration' => true,
+						'Time period' => 'Custom'
+					],
+					'Columns' => [
+						[
+							'fields' => [
+								'Item' => [
+									'values' => 'Text item',
+									'context' => ['values' => 'Host for all item value types']
+								]
+							]
+						]
+					],
+					'time_shift' => true,
+					'check_time' => 'custom',
+					'error' => 'Minimum time period to display is 1 minute.'
+				]
+			],
+			// #54.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Time period = widget',
+						'Advanced configuration' => true,
+						'Time period' => 'Widget',
+						'Widget' => 'Classic graph for time period reference'
+					],
+					'clear_custom' => true,
+					'Columns' => [
+						[
+							'fields' => [
+								'Item' => [
+									'values' => 'Text item',
+									'context' => ['values' => 'Host for all item value types']
+								]
 							]
 						]
 					]
@@ -796,7 +1876,7 @@ class testDashboardItemHistoryWidget extends CWebTest {
 	}
 
 	public function testDashboardItemHistoryWidget_SimpleUpdate() {
-		$old_hash = CDBHelper::getHash($this->sql);
+		$old_hash = CDBHelper::getHash(self::SQL);
 
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboard_create)->waitUntilReady();
 		$dashboard = CDashboardElement::find()->one();
@@ -805,7 +1885,7 @@ class testDashboardItemHistoryWidget extends CWebTest {
 		$this->page->waitUntilReady();
 
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
-		$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
+		$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
 	}
 
 	/**
@@ -818,11 +1898,14 @@ class testDashboardItemHistoryWidget extends CWebTest {
 	/**
 	 * Perform Item history widget creation or update and verify the result.
 	 *
-	 * @param boolean $update	updating is performed
+	 * @param array   $data      data provider
+	 * @param boolean $update    updating is performed
 	 */
 	protected function checkWidgetForm($data, $update = false) {
-		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
-			$old_hash = CDBHelper::getHash($this->sql);
+		$expected = CTestArrayHelper::get($data, 'expected', TEST_GOOD);
+
+		if ($expected === TEST_BAD) {
+			$old_hash = CDBHelper::getHash(self::SQL);
 		}
 
 		$data['fields']['Name'] = CTestArrayHelper::get($data, 'fields.Name', 'Item history widget '.microtime());
@@ -837,8 +1920,7 @@ class testDashboardItemHistoryWidget extends CWebTest {
 		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Item history')]);
 
 		if ($update) {
-			$table = $form->query('id:list_columns')->asTable()->one();
-			$button_remove = $table->query('button:Remove');
+			$button_remove = $form->query('id:list_columns')->asTable()->one()->query('button:Remove');
 			$remove_count = $button_remove->count();
 
 			for ($i = 0; $i < $remove_count; $i++) {
@@ -847,22 +1929,82 @@ class testDashboardItemHistoryWidget extends CWebTest {
 			}
 		}
 
+		// Reset custom period fields to defaults, because they are saved from previous cases.
+		if ($update && CTestArrayHelper::get($data, 'clear_custom')) {
+			$form->fill([
+				'Advanced configuration' => true,
+				'Time period' => 'Custom',
+				'From' => 'now-1h',
+				'To' => 'now'
+			]);
+		}
+
+		$form->fill($data['fields']);
+
+		// Fill time period with data From: now, To: now +/- time shift in human-readable format.
+		if (CTestArrayHelper::get($data, 'time_shift', false)) {
+			$time = time();
+			switch ($data['check_time']) {
+				case 'future':
+					$period = [
+						'From' => date('Y-m-d H:i:s', $time), // Now.
+						'To' => date('Y-m-d H:i:s', ($time + 31536000)) // Now + 1 year.
+					];
+					break;
+
+				case 'past':
+					$period = [
+						'From' => date('Y-m-d H:i:s', $time - 31536000), // Now - 1 Year.
+						'To' => date('Y-m-d H:i:s', ($time)) // Now.
+					];
+					break;
+
+				case 'custom':
+					$period = [
+						'From' => date('Y-m-d H:i:s', $time - 30), // Now - 30 seconds.
+						'To' => date('Y-m-d H:i:s', ($time)) // Now.
+					];
+					break;
+			}
+			$form->fill($period);
+
+			$data['check_time'] = $period['From'].' – '.$period['To'];
+		}
+
+		$values = $form->getValues();
+
 		// Fill Columns field.
 		if (array_key_exists('Columns', $data)) {
 			foreach ($data['Columns'] as $column) {
-				$form->getFieldContainer('Columns')->query('button:Add')->waitUntilClickable()->one()->click();
+				$form->getFieldContainer('Columns')->query('button:Add')->one()->waitUntilClickable()->click();
 				$column_overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();
-				$column_form = $column_overlay->asForm();
-				$column_form->fill($column);
+				$column_overlay_form = $column_overlay->asForm();
+				$column_overlay_form->fill($column['fields']);
+
+				foreach (['Highlights', 'Thresholds'] as $table_field) {
+					if (array_key_exists($table_field, $column)) {
+						foreach ($column[$table_field] as $highlight) {
+							$column_overlay_form->getFieldContainer($table_field)->query('button:Add')->one()
+								->waitUntilClickable()->click();
+							$column_overlay_form->fill($highlight);
+						}
+					}
+				}
+
 				$column_overlay->getFooter()->query('button:Add')->waitUntilClickable()->one()->click();
+
+				if (array_key_exists('column_error', $data)) {
+					break;
+				}
+
 				$column_overlay->waitUntilNotVisible();
 				$form->waitUntilReloaded();
 			}
 		}
 
-		$form->fill($data['fields']);
-		$values = $form->getValues();
-		$form->submit();
+		if (!array_key_exists('column_error', $data)) {
+			$form->submit();
+		}
 
 		// Trim leading and trailing spaces from expected results if necessary.
 		if (array_key_exists('trim', $data)) {
@@ -872,12 +2014,22 @@ class testDashboardItemHistoryWidget extends CWebTest {
 			}
 		}
 
-		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
+		if ($expected === TEST_BAD) {
+			if (array_key_exists('column_error', $data)) {
+				$data['error'] = $data['column_error'];
+			}
+
 			$this->assertMessage($data['expected'], null, $data['error']);
-			$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
+			$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
 
 			// Check that after error and cancellation of the widget, the widget is not available on dashboard.
-			COverlayDialogElement::find()->one()->close();
+			$dialogs = COverlayDialogElement::find()->all();
+			$dialog_count = $dialogs->count();
+
+			for ($i = $dialog_count - 1; $i >= 0; $i--) {
+				$dialogs->get($i)->close(true);
+			}
+
 			$dashboard->save()->waitUntilReady();
 			$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 			$this->assertFalse($dashboard->getWidget($data['fields']['Name'], false)->isValid());
@@ -899,17 +2051,30 @@ class testDashboardItemHistoryWidget extends CWebTest {
 			$dashboard->save()->waitUntilReady();
 			$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 
+			if ($update) {
+				self::$update_widget = $header;
+			}
+
 			// Check widgets count.
 			$this->assertEquals($old_widget_count + ($update ? 0 : 1), $dashboard->getWidgets()->count());
 
+			if (array_key_exists('check_time', $data)) {
+				$this->assertEquals($data['check_time'], $widget->getTimeInterval());
+			}
+
 			// Check new widget update interval.
-			$refresh = (CTestArrayHelper::get($data['fields'], 'Refresh interval') === 'Default (1 minute)')
+			$refresh = (CTestArrayHelper::get($data['fields'], 'Refresh interval', 'Default (1 minute)') === 'Default (1 minute)')
 				? '1 minute'
-				: (CTestArrayHelper::get($data['fields'], 'Refresh interval', '1 minute'));
+				: $data['fields']['Refresh interval'];
 			$this->assertEquals($refresh, $widget->getRefreshInterval());
 
 			// Check new widget form fields and values in frontend.
 			$saved_form = $widget->edit();
+
+			// 'Advanced configuration' is always collapsed after save.
+			$values['Advanced configuration'] = false;
+			$data['fields']['Advanced configuration'] = false;
+
 			$this->assertEquals($values, $saved_form->getValues());
 			$table = $saved_form->query('id:list_columns')->asTable()->one();
 
@@ -918,9 +2083,15 @@ class testDashboardItemHistoryWidget extends CWebTest {
 			$this->assertEquals(count($data['Columns']), $columns_count);
 
 			foreach ($data['Columns'] as $i => $column) {
-				$this->assertEquals($column['Name'], $table->getRow($i)->getColumn('Name')->getText());
-				$this->assertEquals($column['Item']['context']['values'].': '.$column['Item']['values'],
-						$table->getRow($i)->getColumn('Data')->getText()
+				$row = $table->getRow($i);
+
+				$column_name = (array_key_exists('Name', $column['fields']))
+					? $column['fields']['Name']
+					: $column['fields']['Item']['context']['values'].': '.$column['fields']['Item']['values'];
+
+				$this->assertEquals($column_name, $row->getColumn('Name')->getText());
+				$this->assertEquals($column['fields']['Item']['context']['values'].': '.$column['fields']['Item']['values'],
+						$row->getColumn('Data')->getText()
 				);
 			}
 
@@ -929,10 +2100,6 @@ class testDashboardItemHistoryWidget extends CWebTest {
 			// Close widget window and cancel editing the dashboard.
 			COverlayDialogElement::find()->one()->close();
 			$dashboard->cancelEditing();
-
-			if ($update) {
-				self::$update_widget = $header;
-			}
 		}
 	}
 
@@ -973,7 +2140,7 @@ class testDashboardItemHistoryWidget extends CWebTest {
 	 * @dataProvider getCancelData
 	 */
 	public function testDashboardItemHistoryWidget_Cancel($data) {
-		$old_hash = CDBHelper::getHash($this->sql);
+		$old_hash = CDBHelper::getHash(self::SQL);
 		$new_name = 'Widget to be cancelled';
 
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
@@ -996,12 +2163,12 @@ class testDashboardItemHistoryWidget extends CWebTest {
 
 		$form->getFieldContainer('Columns')->query('button:Add')->waitUntilClickable()->one()->click();
 		$column_overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();
-		$column_form = $column_overlay->asForm();
-		$column_form->fill([
+		$column_overlay->asForm()->fill([
 			'Item' => [
 				'values' => 'Test Item history',
 				'context' => ['values' => 'Simple host with item for Item history widget']
-		]]);
+			]
+		]);
 		$column_overlay->getFooter()->query('button:Add')->waitUntilClickable()->one()->click();
 		$column_overlay->waitUntilNotVisible();
 		$form->waitUntilReloaded();
@@ -1036,7 +2203,7 @@ class testDashboardItemHistoryWidget extends CWebTest {
 		}
 
 		// Check that no changes were made to the widget.
-		$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
+		$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
 	}
 
 	public function testDashboardItemHistoryWidget_Delete() {
@@ -1077,9 +2244,9 @@ class testDashboardItemHistoryWidget extends CWebTest {
 				[
 					'initial_data' => [
 						[
-							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('now')),
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('now')),
 							'Name' => 'Host name',
-							'Value'=> 'Zabbix Item history'
+							'Value' => 'Zabbix Item history'
 						],
 						[
 							'Timestamp' => date('Y-m-d H:i:s', strtotime('-1 minute')),
@@ -1104,29 +2271,29 @@ class testDashboardItemHistoryWidget extends CWebTest {
 				[
 					'initial_data' => [
 						[
-							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('now')),
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('now')),
 							'Name' => 'Available memory',
 							'Value' => '9.37 GB' // value rounding is expected.
 						],
 						[
-							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('-30 seconds')),
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('-30 seconds')),
 							'Name' => 'Available memory in %',
-							'Value'=> '82.0618 %' // value rounding is expected.
+							'Value' => '82.0618 %' // value rounding is expected.
 						],
 						[
-							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('-1 minute')),
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('-1 minute')),
 							'Name' => 'Available memory in %',
 							'Value' => '72.0618 %' // value rounding is expected.
 						],
 						[
-							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('-1 hour')),
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('-1 hour')),
 							'Name' => 'Available memory',
 							'Value' => '8.44 GB' // value rounding is expected.
 						],
 						[
 							'Timestamp' => date('Y-m-d H:i:s', strtotime('-2 hours')),
 							'Name' => 'Available memory',
-							'Value'=> '7.51 GB' // value rounding is expected.
+							'Value' => '7.51 GB' // value rounding is expected.
 						]
 					],
 					'item_data' => [
@@ -1142,25 +2309,25 @@ class testDashboardItemHistoryWidget extends CWebTest {
 			[
 				[
 					'fields' => [
-							'Show lines' => '1'
-						],
+						'Show lines' => '1'
+					],
 					'initial_data' => [
 						[
 							'Timestamp' => date('Y-m-d H:i:s', strtotime('today + 9 hours')),
 							'Name' => 'Available memory',
-							'Value'=> '9.37 GB' // value rounding is expected.
+							'Value' => '9.37 GB' // Value rounding is expected.
+						],
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('yesterday')),
+							'Name' => 'Available memory',
+							'Value' => '8.44 GB' // Value rounding is expected.
 						]
-						// TODO: ZBX-24488 Sub-issue (6).
-//						[
-//							'Timestamp' => date('Y-m-d H:i:s', strtotime('yesterday')),
-//							'Available memory' => '8.44 GB' // value rounding is expected.
-//						]
 					],
 					'result' => [
 						[
 							'Timestamp' => date('Y-m-d H:i:s', strtotime('today + 9 hours')),
 							'Name' => 'Available memory',
-							'Value' => '9.37 GB' // value rounding is expected.
+							'Value' => '9.37 GB' // Value rounding is expected.
 						]
 					],
 					'item_data' => [
@@ -1168,117 +2335,289 @@ class testDashboardItemHistoryWidget extends CWebTest {
 						['itemid' => '42243', 'values' => '9061078528', 'time' => strtotime('yesterday')]
 					]
 				]
-			]
+			],
 			// #4 Test case for 'Items location' and 'Show text as HTML' options check.
-//			[
-//				[
-//					'fields' => ['Layout' => 'Vertical'],
-//					'edit_columns' => ['Host name' => ['Display' => 'HTML']],
-//					'initial_data' => [
-//						[
-//							'Timestamp' => date('Y-m-d H:i:s', strtotime('now')),
-//							'Master item' => '1' // value rounding is expected.
-//						],
-//						[
-//							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('-15 hours')),
-//							'Host name' => '<b>'.STRING_128.'</b>'
-//						],
-//						[
-//							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('-16 hours')),
-//							'Host name' => '<span style="text-transform:uppercase;">'.'test'.'</span>'
-//						],
-//                          TODO: ZBX-24488 Sub-issue (6).
-////						[
-////							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('-25 hours')),
-////							'Host name' => STRING_255
-////						]
-//					],
-//					'result' => [
-//						[
-//							'Timestamp' => date('Y-m-d H:i:s', strtotime('now')),
-//							'Name' => 'Master item',
-//							'Value' => '1'
-//						],
-//						[
-//							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('-15 hours')),
-//							'Name' => 'Host name',
-//							'Value' => STRING_128
-//						],
-//						[
-//							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('-16 hours')),
-//							'Name' => 'Host name',
-//							'Value' => 'TEST'
-//						],
-//                          TODO: ZBX-24488 Sub-issue (6).
-////						[
-////							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('-25 hours')),
-////							'Name' => 'Host name',
-////							'Value' => 'STRING_255'
-////						]
-//					],
-//					'item_data' => [
-//						['itemid' => '99142', 'values' => '1.00001', 'time' => strtotime('now')],
-//						['itemid' => '42227', 'values' => '<b>'.STRING_128.'</b>', 'time' => strtotime('-15 hours')],
-//						['itemid' => '42227', 'values' => '<span style="text-transform:uppercase;">'.'test'.'</span>',
-//								'time' => strtotime('-16 hours')],
-//						['itemid' => '42227', 'values' => STRING_255, 'time' => strtotime('-25 hours')]
-//					]
-//				]
-//			],
-//			// #5 Test case for host selection check.
-//			[
-//				[
-//					'host_select' => [
-//						'without_data' => 'Simple host with item for Item history widget',
-//						'with_data' =>'ЗАББИКС Сервер'
-//						],
-//					'initial_data' => [
-//						[
-//							'Timestamp' => date('Y-m-d H:i:s', strtotime('now')),
-//							'Name' => 'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running',
-//							'Value' => 'Zabbix Item history'
-//						],
-//						[
-//							'Timestamp' => date('Y-m-d H:i:s', strtotime('-80 seconds')),
-//							'Name' => 'Test item host: Master item',
-//							'Value' => '7.7778' // value rounding is expected.
-//						],
-//						[
-//							'Timestamp' => date('Y-m-d H:i:s', strtotime('-1 week')),
-//							'Name' => 'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running',
-//							'Value' => STRING_255
-//						],
-//						[
-//							'Timestamp' => date('Y-m-d H:i:s', strtotime('-1 month')),
-//							'Name' => 'ЗАББИКС Сервер: Linux: Available memory in %',
-//							'Value' => '82.0618 %' // value rounding is expected.
-//						]
-//					],
-//					'result' => [
-//						[
-//							'Timestamp' => date('Y-m-d H:i:s', strtotime('now')),
-//							'Name' =>  'Host name of Zabbix agent running',
-//							'Value' => 'Zabbix Item history'
-//						],
-//						[
-//							'Timestamp' => date('Y-m-d H:i:s', strtotime('-1 week')),
-//							'Name' =>  'Host name of Zabbix agent running',
-//							'Value' => STRING_255
-//						],
-//						[
-//							'Timestamp' => date('Y-m-d H:i:s', strtotime('-1 month')),
-//							'Name' =>  'Available memory in %',
-//							'Value' => '82.0618 %' // value rounding is expected.
-//						]
-//					],
-//					'item_data' => [
-//						['itemid' => '42227', 'values' => 'Zabbix Item history', 'time' => strtotime('now')],
-//						['itemid' => '99142', 'values' => '7.777777', 'time' => strtotime('-80 seconds')],
-//						['itemid' => '42227', 'values' => STRING_255, 'time' => strtotime('-1 week')],
-//						['itemid' => '42244', 'values' => '82.061797', 'time' => strtotime('-1 month')]
-//					]
-//				]
-//			]
+			[
+				[
+					'fields' => ['Layout' => 'Vertical'],
+					'edit_columns' => [
+						'Host name' => ['Display' => 'HTML']
+					],
+					'initial_data' => [
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('now')),
+							'Name' => 'Master item',
+							'Value' => '1' // Value rounding is expected.
+						],
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('-15 hours')),
+							'Name' => 'Host name',
+							'Value' => '<b>'.STRING_128.'</b>'
+						],
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('-16 hours')),
+							'Name' => 'Host name',
+							'Value' => '<span style="text-transform:uppercase;">'.'test'.'</span>'
+						],
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('-25 hours')),
+							'Name' => 'Host name',
+							'Value' => STRING_255
+						]
+					],
+					'result' => [
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('now')),
+							'Master item' => '1' // Value rounding is expected.
+						],
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('-15 hours')),
+							'Host name' => STRING_128
+						],
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('-16 hours')),
+							'Host name' => 'TEST'
+						],
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('-25 hours')),
+							'Host name' => STRING_255
+						]
+					],
+					'item_data' => [
+						['itemid' => '99142', 'values' => '1.00001', 'time' => strtotime('now')],
+						['itemid' => '42227', 'values' => '<b>'.STRING_128.'</b>', 'time' => strtotime('-15 hours')],
+						['itemid' => '42227', 'values' => '<span style="text-transform:uppercase;">'.'test'.'</span>',
+								'time' => strtotime('-16 hours')
+						],
+						['itemid' => '42227', 'values' => STRING_255, 'time' => strtotime('-25 hours')]
+					]
+				]
+			],
+			// #5 Test case for 'Items location' and 'Show text as Single line' options check.
+			[
+				[
+					'fields' => [
+						'Advanced configuration' => true,
+						'New values' => 'Bottom',
+						'Show timestamp' => false
+					],
+					'edit_columns' => [
+						'Host name' => ['Display' => 'Single line', 'id:max_length' => 3]
+					],
+					'initial_data' => [
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('now')),
+							'Name' => 'Master item',
+							'Value' => '1' // Value rounding is expected.
+						],
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('-15 hours')),
+							'Name' => 'Host name',
+							'Value' => '<b>'.STRING_128.'</b>'
+						],
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('-16 hours')),
+							'Name' => 'Host name',
+							'Value' => '<span style="text-transform:uppercase;">'.'test'.'</span>'
+						],
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('-25 hours')),
+							'Name' => 'Host name',
+							'Value' => STRING_255
+						]
+					],
+					'result' => [
+						[
+							'Name' => 'Host name',
+							'Value' => 'lon'
+						],
+						[
+							'Name' => 'Host name',
+							'Value' => '<sp'
+						],
+						[
+							'Name' => 'Host name',
+							'Value' => '<b>'
+						],
+						[
+							'Name' => 'Master item',
+							'Value' => '1' // Value rounding is expected.
+						]
+					],
+					'item_data' => [
+						['itemid' => '99142', 'values' => '1.00001', 'time' => strtotime('now')],
+						['itemid' => '42227', 'values' => '<b>'.STRING_128.'</b>', 'time' => strtotime('-15 hours')],
+						['itemid' => '42227', 'values' => '<span style="text-transform:uppercase;">'.'test'.'</span>',
+								'time' => strtotime('-16 hours')
+						],
+						['itemid' => '42227', 'values' => STRING_255, 'time' => strtotime('-25 hours')]
+					]
+				]
+			],
+			// #6 Test case for host selection check.
+			[
+				[
+					'host_select' => [
+						'without_data' => 'Simple host with item for Item history widget',
+						'with_data' => 'ЗАББИКС Сервер'
+					],
+					'initial_data' => [
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('now')),
+							'Name' => 'Host name',
+							'Value' => 'Zabbix Item history'
+						],
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('-80 seconds')),
+							'Name' => 'Master item',
+							'Value' => '7.7778' // Value rounding is expected.
+						],
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('-1 week')),
+							'Name' => 'Host name',
+							'Value' => STRING_255
+						],
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('-1 month')),
+							'Name' => 'Available memory in %',
+							'Value' => '82.0618 %' // Value rounding is expected.
+						]
+					],
+					'result' => [
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('now')),
+							'Name' => 'Host name',
+							'Value' => 'Zabbix Item history'
+						],
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('-1 week')),
+							'Name' => 'Host name',
+							'Value' => STRING_255
+						],
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('-1 month')),
+							'Name' => 'Available memory in %',
+							'Value' => '82.0618 %' // Value rounding is expected.
+						]
+					],
+					'item_data' => [
+						['itemid' => '42227', 'values' => 'Zabbix Item history', 'time' => strtotime('now')],
+						['itemid' => '99142', 'values' => '7.777777', 'time' => strtotime('-80 seconds')],
+						['itemid' => '42227', 'values' => STRING_255, 'time' => strtotime('-1 week')],
+						['itemid' => '42244', 'values' => '82.061797', 'time' => strtotime('-1 month')]
+					]
+				]
+			],
+			// #7 Test case for Auto/History options check.
+			[
+				[
+					'fields' => [
+						'Advanced configuration' => true,
+						'Time period' => 'Custom'
+					],
+					'edit_columns' => [
+						'Master item' => ['History data' => 'Auto']
+					],
+					'initial_data' => [
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('now')),
+							'Name' => 'Master item',
+							'Value' => '1' // Value rounding is expected.
+						],
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('-15 hours')),
+							'Name' => 'Host name',
+							'Value' => '<b>'.STRING_128.'</b>'
+						],
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('-16 hours')),
+							'Name' => 'Host name',
+							'Value' => '<span style="text-transform:uppercase;">'.'test'.'</span>'
+						],
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('-25 hours')),
+							'Name' => 'Host name',
+							'Value' => STRING_255
+						]
+					],
+					'result' => [
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('-15 hours')),
+							'Name' => 'Host name',
+							'Value' => '<b>'.STRING_128.'</b>'
+						],
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('-16 hours')),
+							'Name' => 'Host name',
+							'Value' => '<span style="text-transform:uppercase;">'.'test'.'</span>'
+						],
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('-25 hours')),
+							'Name' => 'Host name',
+							'Value' => STRING_255
+						]
+					],
+					'item_data' => [
+						['itemid' => '99142', 'values' => '1.00001', 'time' => strtotime('now')],
+						['itemid' => '42227', 'values' => '<b>'.STRING_128.'</b>', 'time' => strtotime('-15 hours')],
+						['itemid' => '42227', 'values' => '<span style="text-transform:uppercase;">'.'test'.'</span>',
+							'time' => strtotime('-16 hours')
+						],
+						['itemid' => '42227', 'values' => STRING_255, 'time' => strtotime('-25 hours')]
+					]
+				]
+			],
+			// #8 Test case for Time period check.
+			[
+				[
+					'fields' => [
+						'Advanced configuration' => true,
+						'Time period' => 'Custom',
+						'From' => 'now-5d',
+						'To' => 'now'
+					],
+					'initial_data' => [
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('now')),
+							'Name' => 'Host name',
+							'Value' => 'Zabbix Item history'
+						],
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('-80 seconds')),
+							'Name' => 'Master item',
+							'Value' => '7.7778' // Value rounding is expected.
+						],
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('-1 week')),
+							'Name' => 'Host name',
+							'Value' => STRING_255
+						],
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('-1 month')),
+							'Name' => 'Available memory in %',
+							'Value' => '82.0618 %' // Value rounding is expected.
+						]
+					],
+					'result' => [
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('now')),
+							'Name' => 'Host name',
+							'Value' => 'Zabbix Item history'
+						],
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('-80 seconds')),
+							'Name' => 'Master item',
+							'Value' => '7.7778' // Value rounding is expected.
+						]
+					],
+					'item_data' => [
+						['itemid' => '42227', 'values' => 'Zabbix Item history', 'time' => strtotime('now')],
+						['itemid' => '99142', 'values' => '7.777777', 'time' => strtotime('-80 seconds')],
+						['itemid' => '42227', 'values' => STRING_255, 'time' => strtotime('-1 week')],
+						['itemid' => '42244', 'values' => '82.061797', 'time' => strtotime('-1 month')]
+					]
+				]
+			]
 		];
 	}
 
@@ -1298,14 +2637,28 @@ class testDashboardItemHistoryWidget extends CWebTest {
 		$this->assertTableData($data['initial_data']);
 
 		$default_values = [
-			'Layout' => 'Horizontal',
-			'Show lines' => '25'
+			'fields' => [
+				'Layout' => 'Horizontal',
+				'Show lines' => '25',
+				'Advanced configuration' => true,
+				'New values' => 'Top',
+				'Show timestamp' => true,
+				'Time period' => 'Custom',
+				'From' => 'now-1y',
+				'To' => 'now'
+			],
+			'columns' => [
+				'Host name' => ['id:display' => 'As is'],
+				'Master item' => ['History data' => 'History']
+			]
 		];
 
 		if (array_key_exists('fields', $data)) {
-			$this->widgetConfigurationChange($data['fields'], $dashboard);
+			$this->widgetConfigurationChange($data['fields'], $dashboard,
+					CTestArrayHelper::get($data, 'edit_columns', [])
+			);
 			$this->assertTableData($data['result']);
-			$this->widgetConfigurationChange($default_values, $dashboard);
+			$this->widgetConfigurationChange($default_values['fields'], $dashboard, $default_values['columns']);
 		}
 
 		if (array_key_exists('host_select', $data)) {
@@ -1326,16 +2679,75 @@ class testDashboardItemHistoryWidget extends CWebTest {
 	}
 
 	/**
+	 * Test function for assuring that all items are available in Item History widget.
+	 */
+	public function testDashboardItemHistoryWidget_CheckAvailableItems() {
+		$this->checkAvailableItems('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid,
+				'Item history'
+		);
+	}
+
+	/**
 	 * Change Item history widget configuration.
 	 *
-	 * @param CDashboardElement		$dashboard			dashboard element
-	 * @param array 				$configuration    	widget parameter(s)
+	 * @param CDashboardElement $dashboard        dashboard element
+	 * @param array             $configuration    widget parameter(s)
+	 * @param array             $edit_columns     array of columns to be changed in test
 	 */
-	protected function widgetConfigurationChange($configuration, $dashboard) {
+	protected function widgetConfigurationChange($configuration, $dashboard, $edit_columns = []) {
 		$form = $dashboard->getWidget(self::DATA_WIDET)->edit();
 		$form->fill($configuration);
+
+		if ($edit_columns !== []) {
+			foreach ($edit_columns as $name => $settings) {
+				$form->getFieldContainer('Columns')->asTable()->findRow('Name', $name)
+						->query('button:Edit')->one()->click();
+				$column_overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+				$column_overlay->asForm()->fill($settings);
+				$column_overlay->getFooter()->query('button:Update')->waitUntilClickable()->one()->click();
+				$column_overlay->waitUntilNotVisible();
+				$form->waitUntilReloaded();
+			}
+		}
+
 		$form->submit();
 		$dashboard->save();
 		$dashboard->waitUntilReady();
+	}
+
+	/**
+	 * Check field's hint text.
+	 *
+	 * @param CFormElement $form         given form
+	 * @param string       $label        checked field's label
+	 * @param string       $hint_text    text of the hint
+	 */
+	protected function checkHint($form, $label, $hint_text) {
+		$form->getLabel($label)->query('xpath:./button[@data-hintbox]')->one()->click();
+		$hint = $this->query('xpath://div[@data-hintboxid]')->waitUntilVisible();
+		$this->assertEquals($hint_text, $hint->one()->getText());
+		$hint->one()->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click();
+		$hint->waitUntilNotPresent();
+	}
+
+	/**
+	 * Check Thresholds or Highlights field inputs and color-pickers.
+	 *
+	 * @param CFormElement $form        given form
+	 * @param string       $label       checked field's label
+	 * @param int          $i           input counter
+	 * @param string       $selector    selector of tested input
+	 */
+	protected function checkThresholdsHighlights($form, $label, $i, $selector) {
+		$container = $form->getFieldContainer($label);
+		$container->query('button:Add')->one()->click();
+		$input = $form->query('xpath:.//input[contains(@id, '.CXPathHelper::escapeQuotes($i.$selector).')]')->one();
+		$this->assertTrue($input->isVisible());
+		$this->assertEquals('FF465C', $container->query('xpath:.//div[@class="color-picker"]')
+				->asColorPicker()->one()->getValue()
+		);
+		$container->query('xpath:.//button[contains(@id, '.CXPathHelper::escapeQuotes($i.'_remove').')]')
+				->one()->click();
+		$this->assertFalse($input->isVisible());
 	}
 }

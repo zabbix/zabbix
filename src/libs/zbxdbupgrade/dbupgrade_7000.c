@@ -12,11 +12,25 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#ifndef ZABBIX_MACROFUNC_H
-#define ZABBIX_MACROFUNC_H
+#include "dbupgrade.h"
 
-#include "zbxexpr.h"
+/*
+ * 7.0 maintenance database patches
+ */
 
-char	*func_get_macro_from_func(const char *str, zbx_token_func_macro_t *fm, int *N_functionid);
+#ifndef HAVE_SQLITE3
+
+static int	DBpatch_7000000(void)
+{
+	return SUCCEED;
+}
 
 #endif
+
+DBPATCH_START(7000)
+
+/* version, duplicates flag, mandatory flag */
+
+DBPATCH_ADD(7000000, 0, 1)
+
+DBPATCH_END()

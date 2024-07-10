@@ -475,7 +475,7 @@ class CControllerAuthenticationUpdate extends CController {
 
 			if (array_key_exists('userdirectoryid', $ldap_server)) {
 				$userdirectoryid_map[$row_index] = $ldap_server['userdirectoryid'];
-				$upd_ldap_servers[] = $ldap_server;
+				$upd_ldap_servers[] = $ldap_server + ['provision_media' => []];
 			}
 			else {
 				$userdirectoryid_map[$row_index] = null;

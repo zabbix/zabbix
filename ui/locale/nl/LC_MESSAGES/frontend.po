@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-05-28 13:11+0000\n"
+"PO-Revision-Date: 2024-06-09 19:59+0000\n"
 "Last-Translator: Patrik @ Open-Future <patrik@open-future.be>\n"
 "Language-Team: NL\n"
 "Language: nl\n"
@@ -343,7 +343,7 @@ msgstr "(legacy) om één enkele waarde synchroon op te halen, eventueel gecombi
 
 #: include/views/configuration.host.discovery.edit.php:553
 msgid "(legacy) to retrieve a subtree in JSON"
-msgstr ""
+msgstr "(verouderd) om een subboom in JSON op te halen"
 
 #: app/partials/configuration.host.edit.html.php:133
 msgid "(linked by host discovery)"
@@ -454,7 +454,7 @@ msgstr "API-toegang"
 
 #: app/views/mfa.edit.php:102
 msgid "API hostname"
-msgstr ""
+msgstr "API hostnaam"
 
 #: app/controllers/CControllerPopupGeneric.php:422
 #: app/views/administration.userrole.edit.php:310
@@ -684,11 +684,10 @@ msgid "Action class %1$s must extend %2$s class."
 msgstr "Actieklasse %1$s moet klasse %2$s uitbreiden."
 
 #: app/controllers/CControllerActionDelete.php:79
-#, fuzzy
 msgid "Action deleted"
 msgid_plural "Actions deleted"
 msgstr[0] "Actie verwijderd"
-msgstr[1] "Actie verwijderd"
+msgstr[1] "Acties verwijderd"
 
 #: app/controllers/CControllerActionDisable.php:84
 msgid "Action disabled"
@@ -951,11 +950,15 @@ msgstr "Toevoegen (berichttype limiet bereikt)"
 
 #: widgets/tophosts/views/widget.edit.php:63
 msgid "Add a column"
-msgstr ""
+msgstr "Voeg een kolom toe"
 
 #: jsLoader.php:156
 msgid "Add a new widget"
 msgstr "Voeg een nieuwe widget toe"
+
+#: widgets/navtree/Widget.php:34
+msgid "Add child element"
+msgstr ""
 
 #: widgets/navtree/Widget.php:39
 msgid "Add child elements"
@@ -990,6 +993,11 @@ msgstr "Voeg host labels toe"
 #: app/views/trigger.massupdate.php:155
 msgid "Add host trigger"
 msgstr "Hosttrigger toevoegen"
+
+#: widgets/piechart/includes/CWidgetFieldDataSetView.php:260
+#: widgets/svggraph/includes/CWidgetFieldDataSetView.php:263
+msgid "Add item"
+msgstr ""
 
 #: app/partials/massupdate.macros.tab.php:96
 #: app/partials/massupdate.valuemaps.tab.php:38
@@ -1105,7 +1113,7 @@ msgstr "Adres"
 #: app/controllers/CControllerProxyUpdate.php:75
 #: app/views/popup.proxy.edit.php:90
 msgid "Address for active agents"
-msgstr ""
+msgstr "Adres voor actieve agenten"
 
 #: include/hosts.inc.php:63 include/users.inc.php:53
 msgid "Admin"
@@ -1137,11 +1145,11 @@ msgstr "Geavanceerde opties"
 #: include/views/configuration.host.discovery.list.php:157
 #: include/views/configuration.host.discovery.list.php:172
 msgid "After"
-msgstr ""
+msgstr "Na"
 
 #: app/views/js/mfa.edit.js.php:168
 msgid "After this change, users who have already enrolled in this MFA method will have to complete the enrollment process again because TOTP secrets will be reset."
-msgstr ""
+msgstr "Na deze wijziging moeten gebruikers die zich al hebben ingeschreven voor deze MFA-methode het inschrijvingsproces opnieuw voltooien omdat TOTP-geheimen opnieuw worden ingesteld."
 
 #: widgets/gauge/includes/WidgetForm.php:266
 #: widgets/item/includes/WidgetForm.php:210
@@ -1164,11 +1172,11 @@ msgstr "Agent"
 
 #: widgets/hostavail/views/widget.view.php:82
 msgid "Agent (active)"
-msgstr ""
+msgstr "Agent (actief)"
 
 #: widgets/hostavail/views/widget.view.php:83
 msgid "Agent (passive)"
-msgstr ""
+msgstr "Agent (passief)"
 
 #: include/classes/data/CItemData.php:911
 msgid "Agent availability check. Returns nothing - unavailable; 1 - available"
@@ -1204,11 +1212,11 @@ msgstr "Geaggregeerde functies"
 
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:283
 msgid "Aggregates each item in the data set."
-msgstr ""
+msgstr "Voegt elk item in de gegevensset samen."
 
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:305
 msgid "Aggregates the whole data set."
-msgstr ""
+msgstr "Voegt de hele gegevensset samen."
 
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:282
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:384
@@ -1444,7 +1452,7 @@ msgstr "Jaarlijks"
 
 #: jsLoader.php:201
 msgid "Another widget is used as data source."
-msgstr ""
+msgstr "Een andere widget wordt gebruikt als gegevensbron."
 
 #: app/partials/monitoring.host.filter.php:134 app/views/action.list.php:95
 #: app/views/administration.proxy.list.php:53
@@ -1469,7 +1477,7 @@ msgstr "Iedere"
 #: app/views/js/trigger.edit.js.php:886
 #: app/views/js/trigger.massupdate.js.php:67
 msgid "Any changes made in the current form will be lost."
-msgstr ""
+msgstr "Eventuele wijzigingen in het huidige formulier gaan verloren."
 
 #: app/views/js/administration.regex.edit.js.php:164
 #: include/classes/helpers/CRegexHelper.php:27
@@ -1478,11 +1486,11 @@ msgstr "Elke karakter tekenreeks meegenomen"
 
 #: app/views/js/popup.import.js.php:109
 msgid "Any existing host entities not present in the import file will be deleted. Click OK to proceed."
-msgstr ""
+msgstr "Alle bestaande host entiteiten die niet aanwezig zijn in het importbestand, worden verwijderd. Klik op OK om door te gaan."
 
 #: app/views/js/popup.import.js.php:106
 msgid "Any existing template entities not present in the import file will be deleted. Click OK to proceed."
-msgstr ""
+msgstr "Alle bestaande sjabloon entiteiten die niet aanwezig zijn in het importbestand, worden verwijderd. Klik op OK om door te gaan."
 
 #: include/classes/core/CJsonRpc.php:225
 msgid "Application error."
@@ -1580,31 +1588,31 @@ msgstr "Asset label"
 
 #: app/partials/configuration.host.edit.html.php:331
 msgid "Assigned proxy"
-msgstr ""
+msgstr "Toegewezen proxy"
 
 #: include/classes/helpers/CMaintenanceHelper.php:86
 #, c-format
 msgid "At %1$s %2$s of every %3$s week"
 msgid_plural "At %1$s %2$s of every %3$s weeks"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Op %1$s %2$s van elke %3$s week"
+msgstr[1] "Op %1$s %2$s van alle %3$s weken"
 
 #: include/classes/helpers/CMaintenanceHelper.php:71
 #, c-format
 msgid "At %1$s every %2$s day"
 msgid_plural "At %1$s every %2$s days"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Om %1$s elke %2$s dag"
+msgstr[1] "Om %1$s elke %2$s dagen"
 
 #: include/classes/helpers/CMaintenanceHelper.php:114
 #, c-format
 msgid "At %1$s on %2$s %3$s of every %4$s"
-msgstr ""
+msgstr "Op %1$s op %2$s %3$s van elke %4$s"
 
 #: include/classes/helpers/CMaintenanceHelper.php:119
 #, c-format
 msgid "At %1$s on day %2$s of every %3$s"
-msgstr ""
+msgstr "Om %1$s op dag %2$s van elke %3$s"
 
 #: app/views/maintenance.timeperiod.edit.php:189
 msgid "At (hour:minute)"
@@ -1616,7 +1624,7 @@ msgstr "Er moet ten minste één LDAP-server bestaan."
 
 #: include/classes/api/services/CAuthentication.php:234
 msgid "At least one MFA method must exist."
-msgstr ""
+msgstr "Er moet ten minste één MFA methode bestaan."
 
 #: app/views/administration.userrole.edit.php:137
 msgid "At least one UI element must be checked."
@@ -1668,7 +1676,7 @@ msgstr "Ten minste één parameter \"%1$s\" of \"%2$s\" moet ingeschakeld zijn."
 
 #: widgets/gauge/views/widget.edit.php:50
 msgid "At least one parameter must be enabled."
-msgstr ""
+msgstr "Er moet ten minste één parameter zijn ingeschakeld."
 
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:283
 msgid "At least one update operation or message is mandatory"
@@ -1895,6 +1903,10 @@ msgstr "Gemiddeld aantal uitstaande schrijfverzoeken naar de virtuele schijf ged
 msgid "Avoid easy-to-guess passwords"
 msgstr "Vermijd gemakkelijk te raden wachtwoorden"
 
+#: jsLoader.php:172
+msgid "Awaiting data"
+msgstr ""
+
 #: widgets/svggraph/views/widget.edit.php:51
 msgid "Axes"
 msgstr "Assen"
@@ -2083,7 +2095,7 @@ msgstr "Breng naar voren"
 #: app/views/administration.timeouts.edit.php:130
 #: app/views/popup.proxy.edit.php:342 include/items.inc.php:99
 msgid "Browser"
-msgstr ""
+msgstr "Browser"
 
 #: include/locales.inc.php:35
 msgid "Bulgarian (bg_BG)"
@@ -2132,15 +2144,15 @@ msgstr "CPU-gebruik als percentage tijdens het interval is afhankelijk van energ
 
 #: include/classes/data/CItemData.php:1925
 msgid "CPU usage as a percentage during the interval, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "CPU gebruik als percentage tijdens de interval, \"url\" - URL van de VMware-service, \"uuid\" - Global Unique Identifier van de VMware-hypervisor"
 
 #: include/classes/data/CItemData.php:2289
 msgid "CPU usage as a percentage during the interval, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "CPU gebruik als percentage tijdens het interval, \"url\" - VMware-service-URL, \"uuid\" - globale unieke identificatie van de virtuele VMware-machine"
 
 #: include/classes/data/CItemData.php:2205
 msgid "CPU usage in hertz during the interval on VMware Resource Pool, \"url\" - VMware service URL, \"rpid\" - VMware resource pool id"
-msgstr ""
+msgstr "CPU gebruik in hertz tijdens het interval op de VMware Resource Pool, \"url\" - URL van de VMware-service, \"rpid\" - ID van de VMware-resourcepool"
 
 #: include/classes/data/CItemData.php:1399
 msgid "CPU utilization percentage. Returns float"
@@ -2152,15 +2164,15 @@ msgstr "CRLF"
 
 #: tests/selenium/modules/module_number_7/Module.php:17
 msgid "CSRF test"
-msgstr ""
+msgstr "CSRF test"
 
 #: tests/selenium/modules/module_number_7/views/csrf.form.view.php:25
 msgid "CSRF token test"
-msgstr ""
+msgstr "CSRF tokentest"
 
 #: tests/selenium/modules/module_number_7/actions/CsrfFormUpdate.php:35
 msgid "CSRF token validation succeeded."
-msgstr ""
+msgstr "CSRF tokenvalidatie geslaagd."
 
 #: include/items.inc.php:1554
 msgid "CSV to JSON"
@@ -2320,7 +2332,7 @@ msgstr "Kan niet meer dan één item met type \"Graph sum\" op de grafiek-protot
 
 #: widgets/piechart/includes/CWidgetFieldDataSet.php:168
 msgid "Cannot add more than one item with type \"Total\" to the chart."
-msgstr ""
+msgstr "Kan niet meer dan één item met het type \"Totaal\" aan het diagram toevoegen."
 
 #: sysmaps.php:219
 msgid "Cannot add network map"
@@ -2334,7 +2346,7 @@ msgstr "Kan proxy niet toevoegen"
 #: app/controllers/CControllerProxyGroupCreate.php:42
 #: app/controllers/CControllerProxyGroupCreate.php:74
 msgid "Cannot add proxy group"
-msgstr ""
+msgstr "Kan proxygroep niet toevoegen"
 
 #: app/controllers/CControllerRegExCreate.php:41
 #: app/controllers/CControllerRegExCreate.php:72
@@ -2394,17 +2406,17 @@ msgstr "Kan widget niet toevoegen: geen widgets beschikbaar."
 
 #: jsLoader.php:134
 msgid "Cannot add widget: not enough free space on the dashboard."
-msgstr ""
+msgstr "Kan widget niet toevoegen: onvoldoende vrije ruimte op het dashboard."
 
 #: include/classes/api/services/CItem.php:1542
 #, c-format
 msgid "Cannot assign the inventory field \"%1$s\" to the item with key \"%2$s\" of host \"%3$s\", because it is already populated by the item with key \"%4$s\"."
-msgstr ""
+msgstr "Kan het inventaris veld \"%1$s\" niet toewijzen aan het item met sleutel \"%2$s\" van host \"%3$s\", omdat het al is gevuld door het item met sleutel \"%4$s\"."
 
 #: include/classes/api/services/CItem.php:1541
 #, c-format
 msgid "Cannot assign the inventory field \"%1$s\" to the item with key \"%2$s\" of template \"%3$s\", because it is already populated by the item with key \"%4$s\"."
-msgstr ""
+msgstr "Kan het inventaris veld \"%1$s\" niet toewijzen aan het item met sleutel \"%2$s\" van sjabloon \"%3$s\", omdat het al is ingevuld door het item met sleutel \"%4$s\"."
 
 #: jsLoader.php:336
 msgctxt "screen reader"
@@ -2433,7 +2445,7 @@ msgstr "Kan het gebruikerstype van de eigen rol niet wijzigen."
 
 #: httpconf.php:190 httpconf.php:406 items.php:687 items.php:723
 msgid "Cannot clear history and trends"
-msgstr ""
+msgstr "Kan de geschiedenis en trends niet wissen"
 
 #: include/classes/api/services/CDiscoveryRule.php:3834
 msgid "Cannot clone graph prototypes."
@@ -2484,59 +2496,59 @@ msgstr "Kan grafiek \"%1$s\" niet kopiëren, omdat het item met sleutel \"%2$s\"
 #: include/classes/helpers/CGraphGeneralHelper.php:96
 #, c-format
 msgid "Cannot copy graph prototype \"%1$s\", because the item with key \"%2$s\" does not exist on the host \"%3$s\"."
-msgstr ""
+msgstr "Kan het grafiek prototype \"%1$s\" niet kopiëren, omdat het item met de sleutel \"%2$s\" niet bestaat op de host \"%3$s\"."
 
 #: include/classes/helpers/CGraphGeneralHelper.php:97
 #, c-format
 msgid "Cannot copy graph prototype \"%1$s\", because the item with key \"%2$s\" does not exist on the template \"%3$s\"."
-msgstr ""
+msgstr "Kan grafiek prototype \"%1$s\" niet kopiëren, omdat het item met de sleutel \"%2$s\" niet bestaat in de sjabloon \"%3$s\"."
 
 #: app/controllers/CControllerCopyCreate.php:161
 msgid "Cannot copy item"
 msgid_plural "Cannot copy items"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Kan item niet kopiëren"
+msgstr[1] "Kan items niet kopiëren"
 
 #: include/classes/api/services/CDiscoveryRule.php:3643
 #, c-format
 msgid "Cannot copy item prototype with key \"%1$s\" without its master item with key \"%2$s\"."
-msgstr ""
+msgstr "Kan het item prototype met sleutel \"%1$s\" niet kopiëren zonder het hoofditem met sleutel \"%2$s\"."
 
 #: include/classes/helpers/CItemGeneralHelper.php:278
 #, c-format
 msgid "Cannot copy item with key \"%1$s\" without its master item with key \"%2$s\"."
-msgstr ""
+msgstr "Kan item met sleutel \"%1$s\" niet kopiëren zonder het hoofditem met sleutel \"%2$s\"."
 
 #: app/controllers/CControllerCopyCreate.php:172
 msgid "Cannot copy trigger"
 msgid_plural "Cannot copy triggers"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Kan trigger niet kopiëren"
+msgstr[1] "Kan triggers niet kopiëren"
 
 #: include/classes/helpers/CTriggerGeneralHelper.php:196
 #, c-format
 msgid "Cannot copy trigger \"%1$s\" without the trigger \"%2$s\", on which it depends, to the host \"%3$s\"."
-msgstr ""
+msgstr "Kan trigger \"%1$s\" niet kopiëren zonder de trigger \"%2$s\", waarvan deze afhankelijk is, naar de host \"%3$s\"."
 
 #: include/classes/helpers/CTriggerGeneralHelper.php:197
 #, c-format
 msgid "Cannot copy trigger \"%1$s\" without the trigger \"%2$s\", on which it depends, to the template \"%3$s\"."
-msgstr ""
+msgstr "Kan trigger \"%1$s\" niet kopiëren zonder de trigger \"%2$s\", waarvan deze afhankelijk is, naar de sjabloon \"%3$s\"."
 
 #: include/classes/helpers/CTriggerHelper.php:76
 #, c-format
 msgid "Cannot copy trigger \"%1$s\", because it has multiple hosts in the expression."
-msgstr ""
+msgstr "Kan trigger \"%1$s\" niet kopiëren, omdat er meerde hosts in de expressie aanwezig zijn."
 
 #: include/classes/helpers/CTriggerHelper.php:75
 #, c-format
 msgid "Cannot copy trigger \"%1$s\", because it has multiple templates in the expression."
-msgstr ""
+msgstr "Kan trigger \"%1$s\" niet kopiëren, omdat er meerde hosts in de expressie aanwezig zijn."
 
 #: app/controllers/CControllerSlaCreate.php:69
 #: app/controllers/CControllerSlaCreate.php:127
 msgid "Cannot create SLA"
-msgstr ""
+msgstr "Kan geen SLA maken"
 
 #: include/classes/api/services/CHostPrototype.php:1291
 #, c-format
@@ -2550,7 +2562,7 @@ msgstr "Kan geen andere database verbinding opzetten."
 #: app/controllers/CControllerConnectorCreate.php:82
 #: app/controllers/CControllerConnectorCreate.php:155
 msgid "Cannot create connector"
-msgstr ""
+msgstr "Kan geen connector maken"
 
 #: app/controllers/CControllerDiscoveryCreate.php:47
 #: app/controllers/CControllerDiscoveryCreate.php:95
@@ -2560,7 +2572,7 @@ msgstr "Kan discovery regel niet aanmaken"
 #: app/controllers/CControllerCorrelationCreate.php:48
 #: app/controllers/CControllerCorrelationCreate.php:115
 msgid "Cannot create event correlation"
-msgstr ""
+msgstr "Kan geen gebeurtenis correlatie creëren"
 
 #: app/controllers/CControllerIconMapCreate.php:56
 msgid "Cannot create icon map"
@@ -2569,57 +2581,57 @@ msgstr "Kan icoon map niet aanmaken"
 #: app/controllers/CControllerMaintenanceCreate.php:72
 #: app/controllers/CControllerMaintenanceCreate.php:150
 msgid "Cannot create maintenance period"
-msgstr ""
+msgstr "Kan geen onderhoudsperiode aanmaken"
 
 #: app/controllers/CControllerProxyConfigRefresh.php:79
 msgid "Cannot create request"
-msgstr ""
+msgstr "Kan verzoek niet aanmaken"
 
 #: app/controllers/CControllerPopupScheduledReportCreate.php:136
 #: app/controllers/CControllerScheduledReportCreate.php:59
 msgid "Cannot create scheduled report"
-msgstr ""
+msgstr "Kan geen gepland rapport maken"
 
 #: app/controllers/CControllerServiceCreate.php:77
 #: app/controllers/CControllerServiceCreate.php:159
 msgid "Cannot create service"
-msgstr ""
+msgstr "Kan geen service maken"
 
 #: include/classes/api/services/CService.php:2403
 #: include/classes/api/services/CService.php:2427
 #, c-format
 msgid "Cannot create service \"%1$s\": %2$s."
-msgstr ""
+msgstr "Kan service \"%1$s\": %2$s niet maken."
 
 #: include/classes/setup/CSetupWizard.php:1030
 msgid "Cannot create the configuration file."
-msgstr ""
+msgstr "Kan het configuratiebestand niet maken."
 
 #: app/controllers/CControllerUserroleCreate.php:114
 #: app/controllers/CControllerUserroleCreate.php:161
 msgid "Cannot create user role"
-msgstr ""
+msgstr "Kan gebruikersrol niet aanmaken"
 
 #: app/controllers/CControllerWebScenarioStepCheck.php:56
 msgid "Cannot create web scenario step"
-msgstr ""
+msgstr "Kan webscenario stap niet maken"
 
 #: app/controllers/CControllerTokenDelete.php:72
 msgid "Cannot delete API token"
 msgid_plural "Cannot delete API tokens"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Kan API token niet verwijderen"
+msgstr[1] "Kan API tokens niet verwijderen"
 
 #: include/classes/api/services/CMfa.php:459
 #, c-format
 msgid "Cannot delete MFA method \"%1$s\", because it is used by user group \"%2$s\"."
-msgstr ""
+msgstr "Kan MFA methode \"%1$s\" niet verwijderen, omdat deze wordt gebruikt door gebruikersgroep \"%2$s\"."
 
 #: app/controllers/CControllerSlaDelete.php:72
 msgid "Cannot delete SLA"
 msgid_plural "Cannot delete SLAs"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Kan SLA niet verwijderen"
+msgstr[1] "Kan SLA niet verwijderen"
 
 #: include/classes/api/services/CUser.php:1287
 #, c-format
@@ -2627,42 +2639,40 @@ msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
 msgstr "Kan de Zabbix gebruiker \"%1$s\" niet verwijderen, probeer de gebruiker uit te schakelen."
 
 #: app/controllers/CControllerActionDelete.php:87
-#, fuzzy
 msgid "Cannot delete action"
 msgid_plural "Cannot delete actions"
 msgstr[0] "Kan actie niet verwijderen"
-msgstr[1] "Kan actie niet verwijderen"
+msgstr[1] "Kan acties niet verwijderen"
 
 #: include/classes/api/services/CRole.php:368
 #, c-format
 msgid "Cannot delete assigned user role \"%1$s\"."
-msgstr ""
+msgstr "Kan toegewezen gebruikersrol \"%1$s\" niet verwijderen."
 
 #: app/controllers/CControllerConnectorDelete.php:68
 msgid "Cannot delete connector"
 msgid_plural "Cannot delete connectors"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Kan connector niet verwijderen"
+msgstr[1] "Kan connectors niet verwijderen"
 
 #: app/controllers/CControllerDashboardDelete.php:63
 #: app/controllers/CControllerTemplateDashboardDelete.php:61
 msgid "Cannot delete dashboard"
 msgid_plural "Cannot delete dashboards"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Kan dashboard niet verwijderen"
+msgstr[1] "Kan dashboards niet verwijderen"
 
 #: include/classes/api/services/CMfa.php:446
 msgid "Cannot delete default MFA method."
-msgstr ""
+msgstr "Kan de standaard MFA methode niet verwijderen."
 
 #: include/classes/api/services/CUserDirectory.php:944
 #: include/classes/api/services/CUserDirectory.php:949
 msgid "Cannot delete default user directory."
-msgstr ""
+msgstr "Kan de standaard gebruikersmap niet verwijderen."
 
 #: app/controllers/CControllerDiscoveryDelete.php:68 host_discovery.php:390
 #: host_discovery.php:597
-#, fuzzy
 msgid "Cannot delete discovery rule"
 msgid_plural "Cannot delete discovery rules"
 msgstr[0] "Kan discovery regel niet verwijderen"
@@ -2671,60 +2681,57 @@ msgstr[1] "Kan discovery regel niet verwijderen"
 #: app/controllers/CControllerCorrelationDelete.php:68
 msgid "Cannot delete event correlation"
 msgid_plural "Cannot delete event correlations"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Kan gebeurtenis correlatie niet verwijderen"
+msgstr[1] "Kan geen gebeurtenis correlaties verwijderen."
 
 #: graphs.php:281 graphs.php:338
-#, fuzzy
 msgid "Cannot delete graph"
 msgid_plural "Cannot delete graphs"
 msgstr[0] "Kan grafiek niet verwijderen"
-msgstr[1] "Kan grafiek niet verwijderen"
+msgstr[1] "Kan grafieken niet verwijderen"
 
 #: graphs.php:273 graphs.php:317
-#, fuzzy
 msgid "Cannot delete graph prototype"
 msgid_plural "Cannot delete graph prototypes"
 msgstr[0] "Kan grafiek prototype niet verwijderen"
-msgstr[1] "Kan grafiek prototype niet verwijderen"
+msgstr[1] "Kan grafiek prototypes niet verwijderen"
 
 #: app/controllers/CControllerHostMassDelete.php:76
-#, fuzzy
 msgid "Cannot delete host"
 msgid_plural "Cannot delete hosts"
 msgstr[0] "Kan host niet verwijderen"
-msgstr[1] "Kan host niet verwijderen"
+msgstr[1] "Kan hosts niet verwijderen"
 
 #: include/classes/api/services/CHost.php:1461
 #, c-format
 msgid "Cannot delete host %1$s because maintenance \"%2$s\" must contain at least one host or host group."
 msgid_plural "Cannot delete hosts %1$s because maintenance \"%2$s\" must contain at least one host or host group."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Kan hosts %1$s niet verwijderen omdat onderhoud \"%2$s\" ten minste één host of host groep moet bevatten."
+msgstr[1] "Kan hosts %1$s niet verwijderen omdat onderhoud \"%2$s\" ten minste één host of hostgroep moet bevatten."
 
 #: app/controllers/CControllerHostGroupDelete.php:75
 msgid "Cannot delete host group"
 msgid_plural "Cannot delete host groups"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Kan hostgroep niet verwijderen"
+msgstr[1] "Kan host groepen niet verwijderen"
 
 #: include/classes/api/services/CHostGroup.php:858
 #, c-format
 msgid "Cannot delete host group %1$s because maintenance \"%2$s\" must contain at least one host or host group."
 msgid_plural "Cannot delete host groups %1$s because maintenance \"%2$s\" must contain at least one host or host group."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Kan host groep %1$s niet verwijderen omdat onderhoud \"%2$s\" ten minste één host of host groep moet bevatten."
+msgstr[1] "Kan host groep %1$s niet verwijderen omdat onderhoud \"%2$s\" minstens één host of host groep moet bevatten."
 
 #: app/controllers/CControllerHostGroupDelete.php:39
 #: app/controllers/CControllerTemplateGroupDelete.php:39
 msgid "Cannot delete host groups"
-msgstr ""
+msgstr "Kan host groepen niet verwijderen"
 
 #: host_prototypes.php:319
 msgid "Cannot delete host prototype"
 msgid_plural "Cannot delete host prototypes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Kan host prototype niet verwijderen"
+msgstr[1] "Kan host prototypes niet verwijderen."
 
 #: host_prototypes.php:139
 msgid "Cannot delete host prototypes"
@@ -2741,21 +2748,19 @@ msgstr "Kan afbeelding niet verwijderen"
 #: include/classes/api/services/CHostInterface.php:631
 #, c-format
 msgid "Cannot delete interface for discovered host \"%1$s\"."
-msgstr ""
+msgstr "Kan interface van ontdekte host \"%1$s\" niet verwijderen."
 
 #: include/classes/api/services/CHost.php:1190
 msgid "Cannot delete inventory."
 msgstr "Kan inventarisatie niet verwijderen"
 
 #: items.php:524 items.php:736
-#, fuzzy
 msgid "Cannot delete item"
 msgid_plural "Cannot delete items"
 msgstr[0] "Kan item niet verwijderen"
 msgstr[1] "Kan item niet verwijderen"
 
 #: disc_prototypes.php:302 disc_prototypes.php:500
-#, fuzzy
 msgid "Cannot delete item prototype"
 msgid_plural "Cannot delete item prototypes"
 msgstr[0] "Kan item prototype niet verwijderen"
@@ -2764,8 +2769,8 @@ msgstr[1] "Kan item prototype niet verwijderen"
 #: app/controllers/CControllerMaintenanceDelete.php:71
 msgid "Cannot delete maintenance period"
 msgid_plural "Cannot delete maintenance periods"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Kan onderhoudsperiode niet verwijderen"
+msgstr[1] "Kan onderhoudsperiodes niet verwijderen"
 
 #: app/controllers/CControllerMediatypeDelete.php:69
 msgid "Cannot delete media type"
@@ -2777,19 +2782,18 @@ msgstr[1] "Kan het mediatype niet verwijderen"
 #, c-format
 msgid "Cannot delete module: %1$s."
 msgid_plural "Cannot delete modules: %1$s."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Kan module: %1$s niet verwijderen."
+msgstr[1] "Kan module: %1$s niet verwijderen."
 
 #: sysmaps.php:266
-#, fuzzy
 msgid "Cannot delete network map"
 msgid_plural "Cannot delete network maps"
 msgstr[0] "Kan netwerk kaart niet verwijderen"
-msgstr[1] "Kan netwerk kaart niet verwijderen"
+msgstr[1] "Kan netwerk kaarten niet verwijderen"
 
 #: app/controllers/CControllerProxyDelete.php:39
 msgid "Cannot delete proxies"
-msgstr ""
+msgstr "Kan proxy's niet verwijderen"
 
 #: app/controllers/CControllerProxyDelete.php:79
 msgid "Cannot delete proxy"
@@ -2800,17 +2804,17 @@ msgstr[1] "Kan proxy niet verwijderen"
 #: app/controllers/CControllerProxyGroupDelete.php:78
 msgid "Cannot delete proxy group"
 msgid_plural "Cannot delete proxy groups"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Kan proxy groep niet verwijderen"
+msgstr[1] "Kan proxy groepen niet verwijderen"
 
 #: app/controllers/CControllerProxyGroupDelete.php:39
 msgid "Cannot delete proxy groups"
-msgstr ""
+msgstr "Kan proxy groepen niet verwijderen"
 
 #: include/classes/api/services/CRole.php:362
 #, c-format
 msgid "Cannot delete readonly user role \"%1$s\"."
-msgstr ""
+msgstr "Kan alleen lezen gebruikersrol \"%1$s\" niet verwijderen."
 
 #: app/controllers/CControllerRegExDelete.php:55
 msgid "Cannot delete regular expression"
@@ -2821,8 +2825,8 @@ msgstr[1] "Kan reguliere expressies niet verwijderen"
 #: app/controllers/CControllerScheduledReportDelete.php:71
 msgid "Cannot delete scheduled report"
 msgid_plural "Cannot delete scheduled reports"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Kan gepland rapport niet verwijderen"
+msgstr[1] "Kan geplande rapporten niet verwijderen"
 
 #: app/controllers/CControllerScriptDelete.php:72
 msgid "Cannot delete script"
@@ -2836,38 +2840,36 @@ msgid "Cannot delete scripts. Script \"%1$s\" is used in action operation \"%2$s
 msgstr "Kan de scripts niet verwijderen. Het script \"%1$s\" wordt gebruikt in een handeling voor actie \"%2$s\"."
 
 #: app/controllers/CControllerServiceDelete.php:72
-#, fuzzy
 msgid "Cannot delete service"
 msgid_plural "Cannot delete services"
 msgstr[0] "Kan service niet verwijderen"
-msgstr[1] "Kan service niet verwijderen"
+msgstr[1] "Kan services niet verwijderen"
 
 #: include/classes/api/services/CService.php:455
 #: include/classes/api/services/CService.php:470
 #, c-format
 msgid "Cannot delete service \"%1$s\": %2$s."
-msgstr ""
+msgstr "Kan dienst \"%1$s\": %2$s niet verwijderen."
 
 #: app/controllers/CControllerTemplateDelete.php:143
-#, fuzzy
 msgid "Cannot delete template"
 msgid_plural "Cannot delete templates"
 msgstr[0] "Kan template niet verwijderen"
-msgstr[1] "Kan template niet verwijderen"
+msgstr[1] "Kan sjabloonen niet verwijderen"
 
 #: app/controllers/CControllerTemplateGroupDelete.php:75
 msgid "Cannot delete template group"
 msgid_plural "Cannot delete template groups"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Kan sjabloon groep niet verwijderen"
+msgstr[1] "Kan sjabloon groepen niet verwijderen"
 
 #: include/classes/api/services/CGraphPrototype.php:350
 msgid "Cannot delete templated graph prototype."
-msgstr ""
+msgstr "Kan gesjabloneerde grafiek prototype niet verwijderen."
 
 #: include/classes/api/services/CGraph.php:350
 msgid "Cannot delete templated graph."
-msgstr ""
+msgstr "Kan gesjabloneerde grafiek niet verwijderen."
 
 #: include/classes/api/services/CTrigger.php:618
 #, c-format
@@ -2877,7 +2879,7 @@ msgstr "Kan de template trigger \"%1$s:%2$s\" niet verwijderen."
 #: include/classes/api/services/CTriggerPrototype.php:510
 #, c-format
 msgid "Cannot delete templated trigger prototype \"%1$s:%2$s\"."
-msgstr ""
+msgstr "Kan het trigger prototype \"%1$s:%2$s\" niet verwijderen."
 
 #: include/classes/api/services/CHttpTest.php:677
 #, c-format
@@ -2885,65 +2887,62 @@ msgid "Cannot delete templated web scenario \"%1$s\"."
 msgstr "Kan web scenario \"%1$s in template niet verwijderen."
 
 #: app/controllers/CControllerTriggerDelete.php:70
-#, fuzzy
 msgid "Cannot delete trigger"
 msgid_plural "Cannot delete triggers"
 msgstr[0] "Kan trigger niet verwijderen"
-msgstr[1] "Kan trigger niet verwijderen"
+msgstr[1] "Kan triggers niet verwijderen"
 
 #: app/controllers/CControllerTriggerPrototypeDelete.php:72
-#, fuzzy
 msgid "Cannot delete trigger prototype"
 msgid_plural "Cannot delete trigger prototypes"
 msgstr[0] "Kan trigger prototype niet verwijderen"
-msgstr[1] "Kan trigger prototype niet verwijderen"
+msgstr[1] "Kan trigger prototypes niet verwijderen"
 
 #: app/controllers/CControllerUserDelete.php:59
 msgid "Cannot delete user"
 msgid_plural "Cannot delete users"
 msgstr[0] "Kan gebruiker niet verwijderen"
-msgstr[1] ""
+msgstr[1] "Kan gebruikers niet verwijderen"
 
 #: include/classes/api/services/CUserDirectory.php:964
 #, c-format
 msgid "Cannot delete user directory \"%1$s\"."
-msgstr ""
+msgstr "Kan gebruikersmap \"%1$s\" niet verwijderen."
 
 #: app/controllers/CControllerUsergroupDelete.php:59
 msgid "Cannot delete user group"
 msgid_plural "Cannot delete user groups"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Kan gebruikersgroep niet verwijderen"
+msgstr[1] "Kan gebruikersgroepen niet verwijderen"
 
 #: include/classes/api/services/CUserGroup.php:1397
 #, c-format
 msgid "Cannot delete user group \"%1$s\", because it is used by provisioned user \"%2$s\"."
-msgstr ""
+msgstr "Kan gebruikersgroep \"%1$s\" niet verwijderen, omdat deze wordt gebruikt door de ingerichte gebruiker \"%2$s\"."
 
 #: app/controllers/CControllerUserroleDelete.php:59
 msgid "Cannot delete user role"
 msgid_plural "Cannot delete user roles"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Kan gebruikersrol niet verwijderen"
+msgstr[1] "Kan gebruikersrollen niet verwijderen"
 
 #: httpconf.php:178 httpconf.php:418
-#, fuzzy
 msgid "Cannot delete web scenario"
 msgid_plural "Cannot delete web scenarios"
 msgstr[0] "Kan web scenario niet verwijderen"
-msgstr[1] "Kan web scenario niet verwijderen"
+msgstr[1] "Kan web scenarios niet verwijderen"
 
 #: app/controllers/CControllerTokenDisable.php:66
 msgid "Cannot disable API token"
 msgid_plural "Cannot disable API tokens"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Kan API token niet uitschakelen"
+msgstr[1] "Kan API tokens niet uitschakelen"
 
 #: app/controllers/CControllerSlaDisable.php:81
 msgid "Cannot disable SLA"
 msgid_plural "Cannot disable SLAs"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Kan SLA niet uitschakelen"
+msgstr[1] "Kan SLAs niet uitschakelen"
 
 #: app/controllers/CControllerActionDisable.php:92
 msgid "Cannot disable action"
@@ -2954,8 +2953,8 @@ msgstr[1] "Kan acties niet uitschakelen."
 #: app/controllers/CControllerConnectorDisable.php:77
 msgid "Cannot disable connector"
 msgid_plural "Cannot disable connectors"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Kan connector niet uitschakelen"
+msgstr[1] "Kan connectors niet uitschakelen"
 
 #: app/controllers/CControllerDiscoveryDisable.php:76 host_discovery.php:584
 msgid "Cannot disable discovery rule"
@@ -2966,8 +2965,8 @@ msgstr[1] "Kan ontdekkings regels niet uitschakelen"
 #: app/controllers/CControllerCorrelationDisable.php:76
 msgid "Cannot disable event correlation"
 msgid_plural "Cannot disable event correlations"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Kan gebeurtenis correlatie niet uitschakelen"
+msgstr[1] "Kan gebeurtenis correlaties niet uitschakelen"
 
 #: app/controllers/CControllerHostGroupDisable.php:91
 #: app/controllers/CControllerPopupMassupdateHost.php:498
@@ -2992,14 +2991,14 @@ msgstr[1] "Kan mediatypes niet uitschakelen"
 #: app/controllers/CControllerModuleDisable.php:75
 msgid "Cannot disable module"
 msgid_plural "Cannot disable modules"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Kan module niet uitschakelen"
+msgstr[1] "Kan modules niet uitschakelen"
 
 #: app/controllers/CControllerScheduledReportDisable.php:78
 msgid "Cannot disable scheduled report"
 msgid_plural "Cannot disable scheduled reports"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Kan gepland rapport niet uitschakelen"
+msgstr[1] "Kan geplande rapporten niet uitschakelen"
 
 #: app/controllers/CControllerTriggerDisable.php:75
 msgid "Cannot disable trigger"
@@ -3026,14 +3025,14 @@ msgstr "Kan niet meer dan één item weergeven met type \"Graph sum\"."
 #: app/controllers/CControllerTokenEnable.php:66
 msgid "Cannot enable API token"
 msgid_plural "Cannot enable API tokens"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Kan API token niet inschakelen"
+msgstr[1] "Kan API tokens niet inschakelen"
 
 #: app/controllers/CControllerSlaEnable.php:81
 msgid "Cannot enable SLA"
 msgid_plural "Cannot enable SLAs"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Kan SLA niet inschakelen"
+msgstr[1] "Kan SLAs niet inschakelen"
 
 #: app/controllers/CControllerActionEnable.php:92
 msgid "Cannot enable action"
@@ -3044,8 +3043,8 @@ msgstr[1] "Kan acties niet activeren"
 #: app/controllers/CControllerConnectorEnable.php:77
 msgid "Cannot enable connector"
 msgid_plural "Cannot enable connectors"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Kan connector niet inschakelen"
+msgstr[1] "Kan connectors niet inschakelen"
 
 #: app/controllers/CControllerDiscoveryEnable.php:76 host_discovery.php:583
 msgid "Cannot enable discovery rule"
@@ -3056,8 +3055,8 @@ msgstr[1] "Kan ontdekking regels niet activeren"
 #: app/controllers/CControllerCorrelationEnable.php:76
 msgid "Cannot enable event correlation"
 msgid_plural "Cannot enable event correlations"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Kan gebeurtenis correlatie niet inschakelen"
+msgstr[1] "Kan gebeurtenis correlaties niet inschakelen"
 
 #: app/controllers/CControllerHostGroupEnable.php:91
 #: app/controllers/CControllerPopupMassupdateHost.php:497
@@ -3082,14 +3081,14 @@ msgstr[1] "Kan mediatypen niet inschakelen"
 #: app/controllers/CControllerModuleEnable.php:99
 msgid "Cannot enable module"
 msgid_plural "Cannot enable modules"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Kan module niet inschakelen"
+msgstr[1] "Kan modules niet inschakelen"
 
 #: app/controllers/CControllerScheduledReportEnable.php:78
 msgid "Cannot enable scheduled report"
 msgid_plural "Cannot enable scheduled reports"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Kan gepland rapport niet inschakelen"
+msgstr[1] "Kan geplande rapporten niet inschakelen"
 
 #: app/controllers/CControllerTriggerEnable.php:75
 msgid "Cannot enable trigger"
@@ -3105,34 +3104,34 @@ msgstr[1] "Kan webdraaiboeken niet inschakelen"
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:198
 msgid "Cannot evaluate expression"
-msgstr ""
+msgstr "Kan expressie niet evalueren"
 
 #: include/classes/api/services/CScript.php:1042
 msgid "Cannot execute URL type script."
-msgstr ""
+msgstr "Kan URL type script niet uitvoeren."
 
 #: app/controllers/CControllerItemMassCheckNow.php:243
 #: app/controllers/CControllerItemMassCheckNow.php:251
 msgid "Cannot execute operation"
-msgstr ""
+msgstr "Kan actie niet uitvoeren"
 
 #: app/controllers/CControllerPopupScriptExec.php:122
 msgid "Cannot execute script."
-msgstr ""
+msgstr "Kan script niet uitvoeren."
 
 #: jsLoader.php:277
 msgid "Cannot expand macros."
-msgstr ""
+msgstr "Kan macro's niet uitbreiden."
 
 #: include/classes/import/importers/CTemplateDashboardImporter.php:217
 #, c-format
 msgid "Cannot find SLA \"%1$s\" used in dashboard \"%2$s\"."
-msgstr ""
+msgstr "Kan SLA \"%1$s\" niet vinden die wordt gebruikt in dashboard \"%2$s\"."
 
 #: include/classes/import/importers/CTemplateDashboardImporter.php:241
 #, c-format
 msgid "Cannot find action \"%1$s\" used in dashboard \"%2$s\"."
-msgstr ""
+msgstr "Kan actie \"%1$s\" niet vinden die wordt gebruikt in dashboard \"%2$s\"."
 
 #: include/classes/import/importers/CMapImporter.php:270
 #, c-format
@@ -3142,7 +3141,7 @@ msgstr "Kan achtergrondafbeelding \"%1$s\" gebruikt in map \"%2$s niet terugvind
 #: include/classes/import/importers/CTemplateDashboardImporter.php:181
 #, c-format
 msgid "Cannot find graph \"%1$s\" used in dashboard \"%2$s\"."
-msgstr ""
+msgstr "Kan grafiek \"%1$s\" die wordt gebruikt in dashboard \"%2$s\" niet vinden."
 
 #: include/classes/import/importers/CMapImporter.php:152
 #, c-format
@@ -3152,7 +3151,7 @@ msgstr "Kan groep \"%1$s\" gebruikt in map \"%2$s\" niet terugvinden."
 #: include/classes/import/importers/CTemplateDashboardImporter.php:151
 #, c-format
 msgid "Cannot find host \"%1$s\" used in dashboard \"%2$s\"."
-msgstr ""
+msgstr "Kan host \"%1$s\" die wordt gebruikt in dashboard \"%2$s\" niet vinden."
 
 #: include/classes/import/importers/CMapImporter.php:164
 #, c-format
@@ -3172,12 +3171,12 @@ msgstr "Kan de host interface op \"%1$s\" voor item key \"%2$s\" niet vinden."
 #: include/classes/api/services/CDiscoveryRule.php:3685
 #, c-format
 msgid "Cannot find host interface on \"%1$s\" for item prototype with key \"%2$s\"."
-msgstr ""
+msgstr "Kan de host interface op \"%1$s\" voor item key \"%2$s\" niet vinden."
 
 #: include/classes/helpers/CItemGeneralHelper.php:203
 #, c-format
 msgid "Cannot find host interface on \"%1$s\" for item with key \"%2$s\"."
-msgstr ""
+msgstr "Kan host interface op \"%1$s\" voor item key \"%2$s\" niet vinden."
 
 #: include/classes/import/importers/CMapImporter.php:207
 #, c-format
@@ -3192,17 +3191,17 @@ msgstr "Kan de icoon map \"%1$s\" gebruikt in map \"%2$s\" niet vinden."
 #: include/classes/import/CConfigurationImport.php:1131
 #, c-format
 msgid "Cannot find interface \"%1$s\" used for discovery rule \"%2$s\" on \"%3$s\"."
-msgstr ""
+msgstr "Kan interface \"%1$s\" gebruikt voor detectie regel \"%2$s\" niet vinden op \"%3$s\"."
 
 #: include/classes/import/CConfigurationImport.php:833
 #, c-format
 msgid "Cannot find interface \"%1$s\" used for item \"%2$s\" on \"%3$s\"."
-msgstr ""
+msgstr "Kan interface \"%1$s\" gebruikt voor item \"%2$s\" niet vinden op \"%3$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1323
 #, c-format
 msgid "Cannot find interface \"%1$s\" used for item prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
-msgstr ""
+msgstr "Kan interface \"%1$s\" gebruikt voor item prototype \"%2$s\" van detectie regel \"%3$s\" niet vinden op \"%4$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1852
 #, c-format
@@ -3237,7 +3236,7 @@ msgstr "Kan item \"%1$s\" niet vinden op \"%2$s\" gebruikt in de grafiek prototy
 #: include/classes/import/importers/CTemplateDashboardImporter.php:166
 #, c-format
 msgid "Cannot find item \"%1$s\" used in dashboard \"%2$s\"."
-msgstr ""
+msgstr "Kan item \"%1$s\" gebruikt in dashboard \"%2$s\" niet vinden."
 
 #: include/classes/import/importers/CTemplateDashboardImporter.php:193
 #, c-format
@@ -5426,6 +5425,10 @@ msgstr "Maak media type aan"
 #: app/views/popup.import.php:143 jsLoader.php:349
 msgid "Create new"
 msgstr "Nieuwe aanmaken"
+
+#: jsLoader.php:372
+msgid "Create new report"
+msgstr ""
 
 #: app/views/administration.proxy.list.php:239
 msgid "Create proxy"
@@ -9555,6 +9558,10 @@ msgstr[1] ""
 msgid "Host group elements"
 msgstr "Host groep elementen"
 
+#: jsLoader.php:292
+msgid "Host group is not selected."
+msgstr ""
+
 #: include/views/monitoring.sysmap.edit.php:168
 msgid "Host group label type"
 msgstr "Hostgroep typeplaatje"
@@ -9633,6 +9640,10 @@ msgstr "Host inventaris"
 #: hostinventoriesoverview.php:26 hostinventoriesoverview.php:146
 msgid "Host inventory overview"
 msgstr "Host inventaris overzicht"
+
+#: jsLoader.php:289
+msgid "Host is not selected."
+msgstr ""
 
 #: include/views/monitoring.sysmap.edit.php:183
 msgid "Host label type"
@@ -12957,6 +12968,10 @@ msgstr ""
 
 #: include/views/monitoring.sysmap.edit.php:243
 msgid "Map element label type"
+msgstr ""
+
+#: jsLoader.php:290
+msgid "Map is not selected."
 msgstr ""
 
 #: sysmap.php:128
@@ -19503,6 +19518,10 @@ msgstr ""
 msgid "String functions"
 msgstr ""
 
+#: widgets/piechart/includes/WidgetForm.php:137
+msgid "Stroke width"
+msgstr ""
+
 #: include/items.inc.php:1545 include/items.inc.php:1549
 #: include/items.inc.php:1553 include/items.inc.php:1557
 msgid "Structured data"
@@ -20874,6 +20893,10 @@ msgstr ""
 #: include/classes/api/services/CHostBase.php:1615
 #, c-format
 msgid "Trigger in template \"%1$s\" has dependency with trigger in template \"%2$s\"."
+msgstr ""
+
+#: jsLoader.php:291
+msgid "Trigger is not selected."
 msgstr ""
 
 #: include/views/monitoring.sysmap.edit.php:198
@@ -22929,6 +22952,10 @@ msgstr ""
 msgid "View as"
 msgstr ""
 
+#: jsLoader.php:417
+msgid "View related reports"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1735
 msgid "Virtual space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr ""
@@ -23136,6 +23163,10 @@ msgstr ""
 
 #: jsLoader.php:187
 msgid "Widget is too small for the specified number of columns and rows."
+msgstr ""
+
+#: jsLoader.php:205
+msgid "Widgets"
 msgstr ""
 
 #: graphs.php:39 include/views/configuration.graph.edit.php:100
@@ -23509,6 +23540,10 @@ msgstr ""
 #: include/classes/core/ZBase.php:763 include/func.inc.php:1709
 msgid "You must login to view this page."
 msgstr "Je moet inloggen om deze pagina te bekijken."
+
+#: jsLoader.php:287
+msgid "You need to have at least one image uploaded to create map element. Images can be uploaded in Administration->General->Images section."
+msgstr ""
 
 #: include/classes/db/DB.php:133
 msgid "Your database is not working properly. Please wait a few minutes and try to repeat this action. If the problem still persists, please contact system administrator. The problem might be caused by long running transaction or row level lock accomplished by your database management system."
@@ -25513,6 +25548,10 @@ msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:953
 msgid "right() - Returns the rightmost count characters"
+msgstr ""
+
+#: widgets/navtree/Widget.php:41
+msgid "root"
 msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:966

@@ -18,6 +18,11 @@
 #include "zbxdbhigh.h"
 #include "zbxcrypto.h"
 #include "zbxnum.h"
+#include "zbxalgo.h"
+#include "zbxdb.h"
+#include "zbxdbschema.h"
+#include "zbxexpr.h"
+#include "zbxstr.h"
 
 /*
  * 6.0 development database patches

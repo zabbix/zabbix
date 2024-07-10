@@ -119,8 +119,6 @@ class CTemplateScreenConverter extends CConverter {
 	/**
 	 * Filter screen items by valid resourcetype.
 	 *
-	 * @static
-	 *
 	 * @param array $screen_items
 	 *
 	 * @return array  valid screen items
@@ -137,8 +135,6 @@ class CTemplateScreenConverter extends CConverter {
 
 	/**
 	 * Remove empty rows and columns and simplify rowspan and colspan usage in the screen items.
-	 *
-	 * @static
 	 *
 	 * @param array $screen_items
 	 *
@@ -199,8 +195,6 @@ class CTemplateScreenConverter extends CConverter {
 	/**
 	 * Get final dashboard dimensions for screen table rows and columns.
 	 *
-	 * @static
-	 *
 	 * @param array $screen_items
 	 *
 	 * @return array  Dashboard dimensions
@@ -260,8 +254,6 @@ class CTemplateScreenConverter extends CConverter {
 
 	/**
 	 * Get axis dimensions based on prepared items.
-	 *
-	 * @static
 	 *
 	 * @param array $items                Prepared items.
 	 * @param int   $items[]['position']  Item starting position.
@@ -333,8 +325,6 @@ class CTemplateScreenConverter extends CConverter {
 	/**
 	 * Adjust axis dimensions to the target summary size whether possible.
 	 *
-	 * @static
-	 *
 	 * @param array $dimensions      Preferred axis dimensions.
 	 * @param array $dimensions_min  Minimal axis dimensions.
 	 * @param int   $target          Target summary size.
@@ -380,8 +370,6 @@ class CTemplateScreenConverter extends CConverter {
 	/**
 	 * Get preferred widget size on dashboard for given screen item type and size.
 	 *
-	 * @static
-	 *
 	 * @param array $screen_item
 	 *
 	 * @return array
@@ -416,8 +404,6 @@ class CTemplateScreenConverter extends CConverter {
 	/**
 	 * Get minimal widget size on dashboard for given screen item type.
 	 *
-	 * @static
-	 *
 	 * @param int $resourcetype
 	 *
 	 * @return array
@@ -451,8 +437,6 @@ class CTemplateScreenConverter extends CConverter {
 	/**
 	 * Limit widget size not to exceed the size of dashboard.
 	 *
-	 * @static
-	 *
 	 * @param array $size
 	 * @param int   $size['width']
 	 * @param int   $size['height']
@@ -468,8 +452,6 @@ class CTemplateScreenConverter extends CConverter {
 
 	/**
 	 * Make widget definition based on screen item.
-	 *
-	 * @static
 	 *
 	 * @param array $screen_item
 	 *

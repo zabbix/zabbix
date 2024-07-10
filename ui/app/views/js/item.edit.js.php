@@ -186,7 +186,7 @@ window.item_edit_form = new class {
 		node.classList.add(ZBX_STYLE_BTN_GREY);
 		node.setAttribute('name', 'master-item-prototype');
 		node.disabled = this.form_readonly;
-		node.textContent = t('Select prototype');
+		node.textContent = <?= json_encode(_('Select prototype')) ?>;
 		master_item.append(node);
 	}
 
@@ -404,11 +404,11 @@ window.item_edit_form = new class {
 
 	#showErrorDialog(body, trigger_element) {
 		overlayDialogue({
-			title: t('Error'),
+			title: <?= json_encode(_('Error')) ?>,
 			class: 'modal-popup position-middle',
 			content: jQuery('<span>').html(body),
 			buttons: [{
-				title: t('Ok'),
+				title: <?= json_encode(_('Ok')) ?>,
 				class: 'btn-alt',
 				focused: true,
 				action: function() {}
@@ -523,7 +523,7 @@ window.item_edit_form = new class {
 					messages = exception.error.messages;
 				}
 				else {
-					messages = [t('Unexpected server error.')];
+					messages = [<?= json_encode(_('Unexpected server error.')) ?>];
 				}
 
 				const message_box = makeMessageBox('bad', messages, title)[0];
@@ -559,7 +559,7 @@ window.item_edit_form = new class {
 	}
 
 	#isConfirmed() {
-		return window.confirm(t('Any changes made in the current form will be lost.'));
+		return window.confirm(<?= json_encode(_('Any changes made in the current form will be lost.')) ?>);
 	}
 
 	#updateActionButtons() {
@@ -674,13 +674,15 @@ window.item_edit_form = new class {
 	}
 
 	#updateRetrieveModeVisibility() {
-		const disable = this.field.request_method.value == HTTPCHECK_REQUEST_HEAD;
+		const is_readonly = this.field.request_method.value == HTTPCHECK_REQUEST_HEAD;
 
-		if (disable) {
-			this.field.retrieve_mode.item(0).checked = true;
-		}
+		this.field.retrieve_mode.forEach(radio => {
+			if (is_readonly && radio.value == <?= HTTPTEST_STEP_RETRIEVE_MODE_HEADERS ?>) {
+				radio.checked = true;
+			}
 
-		this.field.retrieve_mode.forEach(radio => radio.disabled = disable);
+			radio.readOnly = is_readonly || this.form_readonly;
+		});
 	}
 
 	#updateValueTypeHintVisibility(preprocessing_active) {
@@ -695,7 +697,7 @@ window.item_edit_form = new class {
 
 	#updateHistoryModeVisibility() {
 		const mode_field = [].filter.call(this.field.history_mode, e => e.matches(':checked')).pop();
-		const disabled = mode_field.value == ITEM_STORAGE_OFF;
+		const disabled = mode_field.value == ITEM_STORAGE_OFF && !mode_field.readOnly;
 
 		this.field.history.toggleAttribute('disabled', disabled);
 		this.field.history.classList.toggle(ZBX_STYLE_DISPLAY_NONE, disabled);
@@ -704,7 +706,7 @@ window.item_edit_form = new class {
 
 	#updateTrendsModeVisibility() {
 		const mode_field = [].filter.call(this.field.trends_mode, e => e.matches(':checked')).pop();
-		const disabled = mode_field.value == ITEM_STORAGE_OFF;
+		const disabled = mode_field.value == ITEM_STORAGE_OFF && !mode_field.readOnly;
 
 		this.field.trends.toggleAttribute('disabled', disabled);
 		this.field.trends.classList.toggle(ZBX_STYLE_DISPLAY_NONE, disabled);
@@ -747,7 +749,7 @@ window.item_edit_form = new class {
 	#intervalTypeChangeHandler(e) {
 		const target = e.target;
 
-		if (!target.matches('[name$="[type]"]')) {
+		if (!target.matches('[name$="[type]"]') || target.hasAttribute('readonly')) {
 			return;
 		}
 
@@ -766,7 +768,14 @@ window.item_edit_form = new class {
 	}
 
 	#typeChangeHandler(e) {
-		this.field.inherited_timeout.value = this.inherited_timeouts[e.target.value]||'';
+		this.field.inherited_timeout.value = this.inherited_timeouts[e.target.value] || '';
+
+		const custom_timeout_value = [...this.field.custom_timeout].filter(element => element.checked)[0].value;
+
+		if (this.field.timeout.value === '' && custom_timeout_value != ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED) {
+			this.field.timeout.value = this.field.inherited_timeout.value;
+		}
+
 		this.updateFieldsVisibility();
 	}
 
@@ -799,7 +808,8 @@ window.item_edit_form = new class {
 
 		const overlay = PopUp(parameters.action, parameters, {
 			dialogueid: this.overlay.dialogueid,
-			dialogue_class: 'modal-popup-large'
+			dialogue_class: 'modal-popup-large',
+			prevent_navigation: true
 		});
 
 		this.#proxyDialogueSubmitEvent(overlay);

@@ -16,6 +16,7 @@
 
 #include "zbxstr.h"
 #include "zbxtime.h"
+#include "zbxjson.h"
 #include "zbx_dbversion_constants.h"
 
 #if defined(HAVE_MYSQL)
@@ -108,6 +109,7 @@ static int			ZBX_TSDB_VERSION = -1;
 static zbx_uint32_t		ZBX_PG_SVERSION = ZBX_DBVERSION_UNDEFINED;
 char				ZBX_PG_ESCAPE_BACKSLASH = 1;
 static int 			ZBX_TIMESCALE_COMPRESSION_AVAILABLE = OFF;
+static int			ZBX_PG_READ_ONLY_RECOVERABLE;
 #elif defined(HAVE_SQLITE3)
 static sqlite3			*conn = NULL;
 static zbx_mutex_t		sqlite_access = ZBX_MUTEX_NULL;
@@ -386,8 +388,11 @@ static int	is_recoverable_postgresql_error(const PGconn *pg_conn, const PGresult
 	if (0 == zbx_strcmp_null(PQresultErrorField(pg_result, PG_DIAG_SQLSTATE), ZBX_PG_DEADLOCK))
 		return SUCCEED;
 
-	if (0 == zbx_strcmp_null(PQresultErrorField(pg_result, PG_DIAG_SQLSTATE), ZBX_PG_READ_ONLY))
+	if (1 == ZBX_PG_READ_ONLY_RECOVERABLE &&
+			0 == zbx_strcmp_null(PQresultErrorField(pg_result, PG_DIAG_SQLSTATE), ZBX_PG_READ_ONLY))
+	{
 		return SUCCEED;
+	}
 
 	return FAIL;
 }
@@ -843,6 +848,8 @@ int	zbx_db_connect_basic(const zbx_config_dbhigh_t *cfg)
 		if (0 < (ret = zbx_db_execute_basic("set bytea_output=escape")))
 			ret = ZBX_DB_OK;
 	}
+
+	ZBX_PG_READ_ONLY_RECOVERABLE = cfg->read_only_recoverable;
 out:
 #elif defined(HAVE_SQLITE3)
 #ifdef HAVE_FUNCTION_SQLITE3_OPEN_V2

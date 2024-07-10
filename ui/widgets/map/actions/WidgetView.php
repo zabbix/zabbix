@@ -68,13 +68,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$error = _('No permissions to referred object or it does not exist!');
 		}
 
-		// Rewrite actions to force Submaps be opened in same widget, instead of separate window.
-		foreach ($sysmap_data['elements'] as &$element) {
-			$actions = json_decode($element['actions'], true);
-			$element['actions'] = json_encode($actions);
-		}
-		unset($element);
-
 		// Pass variables to view.
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', $this->widget->getDefaultName()),

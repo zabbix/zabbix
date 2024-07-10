@@ -26,6 +26,8 @@
 #include "zbxstr.h"
 #include "zbxhash.h"
 #include "zbxcrypto.h"
+#include "zbxdb.h"
+#include "zbxnum.h"
 
 /*
  * 7.0 development database patches

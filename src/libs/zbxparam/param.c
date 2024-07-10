@@ -15,7 +15,6 @@
 #include "zbxparam.h"
 
 #include "zbxexpr.h"
-#include "zbxnum.h"
 #include "zbxstr.h"
 
 /******************************************************************************

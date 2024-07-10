@@ -48,7 +48,7 @@ var chkbxRange = {
 
 			// check if checkboxes should be selected from session storage
 			if (!jQuery.isEmptyObject(selected_ids)) {
-				var objectIds = jQuery.map(selected_ids, function(id) { return id });
+				var objectIds = Object.keys(selected_ids);
 			}
 			// no checkboxes selected, check browser cache if checkboxes are still checked and update state
 			else {
