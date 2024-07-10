@@ -22,7 +22,7 @@
 require_once dirname(__FILE__).'/../common/testWidgets.php';
 
 /**
- * @backup config, hstgrp, dashboard
+ * @backup config, hstgrp, dashboard, maintenances
  *
  * @dataSource GlobalMacros
  *
@@ -120,6 +120,46 @@ class testDashboardTopHostsWidgetDisplay extends testWidgets {
 		foreach ($itemids as $i => $itemid) {
 			CDataHelper::addItemData($itemid, $i);
 		}
+
+		// Create item on host in maintenance and add data to it.
+		$response = CDataHelper::createHosts([
+			[
+				'host' => 'Host in maintenance',
+				'groups' => [['groupid' => $host_group]],
+				'items' => [
+					[
+						'name' => 'Maintenance trapper',
+						'key_' => 'maintenance_trap',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_UINT64
+					]
+				]
+			]
+		]);
+
+		$maintenance_itemid = $response['itemids']['Host in maintenance:maintenance_trap'];
+		$maintenance_hostid = $response['hostids']['Host in maintenance'];
+
+		CDataHelper::addItemData($maintenance_itemid, 100);
+
+		// Create Maintenance and host in maintenance.
+		$maintenances = CDataHelper::call('maintenance.create', [
+			[
+				'name' => 'Maintenance for Top Hosts widget',
+				'maintenance_type' => MAINTENANCE_TYPE_NORMAL,
+				'description' => 'Maintenance for icon check in Top Hosts widget',
+				'active_since' => time() - 100,
+				'active_till' => time() + 31536000,
+				'hosts' => [['hostid' => $maintenance_hostid]],
+				'timeperiods' => [[]]
+			]
+		]);
+		$maintenanceid = $maintenances['maintenanceids'][0];
+
+		DBexecute('UPDATE hosts SET maintenanceid='.zbx_dbstr($maintenanceid).
+				', maintenance_status=1, maintenance_type='.MAINTENANCE_TYPE_NORMAL.', maintenance_from='.zbx_dbstr(time()-1000).
+				' WHERE hostid='.zbx_dbstr($maintenance_hostid)
+		);
 	}
 
 	public static function getCheckTopHostsTableData() {
@@ -184,26 +224,26 @@ class testDashboardTopHostsWidgetDisplay extends testWidgets {
 			],
 			// #2 Filtered so that widget shows No data.
 			// TODO: This case is failing until ZBX-24828 is fixed.
-			[
-				[
-					'fields' => [
-						'Name' => 'No data'
-					],
-					'Columns' => [
-						[
-							'fields' => [
-								'Name' => 'Item2',
-								'Item name' => [
-									'values' => 'Item2',
-									'context' => ['values' => 'HostA']
-								]
-							]
-						]
-					],
-					'result' => [],
-					'headers' => ['Item2']
-				]
-			],
+//			[
+//				[
+//					'fields' => [
+//						'Name' => 'No data'
+//					],
+//					'Columns' => [
+//						[
+//							'fields' => [
+//								'Name' => 'Item2',
+//								'Item name' => [
+//									'values' => 'Item2',
+//									'context' => ['values' => 'HostA']
+//								]
+//							]
+//						]
+//					],
+//					'result' => [],
+//					'headers' => ['Item2']
+//				]
+//			],
 			// #3 Filtered by tags, columns: text and item, order newest in bottom.
 			[
 				[
@@ -339,6 +379,96 @@ class testDashboardTopHostsWidgetDisplay extends testWidgets {
 					],
 					'headers' => ['Host name', 'Text: Macro in host', '{#LLD_MACRO}', '{HOST.HOST}',
 							'{$USERMACRO}', '{$1} Resolved'
+					]
+				]
+			],
+			// #5 Filtered by Host group, not including Host in maintenance.
+			[
+				[
+					'fields' => [
+						'Name' => 'Hosts group without maintenance',
+						'Host groups' => 'Top Hosts test host group'
+					],
+					'Columns' => [
+						[
+							'fields' => [
+								'Name' => 'Host',
+								'Data' => 'Host name'
+							]
+						],
+						[
+							'fields' => [
+								'Name' => 'Maintenance Trapper',
+								'Item name' => [
+									'values' => 'Maintenance trapper',
+									'context' => ['values' => 'Host in maintenance']
+								]
+							]
+						],
+						[
+							'fields' => [
+								'Name' => 'Item1',
+								'Item name' => [
+									'values' => 'Item1',
+									'context' => ['values' => 'HostA']
+								],
+								'Decimal places' => 5
+							]
+						]
+					],
+					'result' => [
+						['Host' => 'HostA', 'Maintenance Trapper' => '', 'Item1' => '0.00000'],
+						['Host' => 'HostB', 'Maintenance Trapper' => '', 'Item1' => '1.00000'],
+						['Host' => 'HostC', 'Maintenance Trapper' => '', 'Item1' => '2.00000']
+					],
+					'headers' => ['Host', 'Maintenance Trapper', 'Item1']
+				]
+			],
+			// #6 Filtered by Host group, including Host in maintenance.
+			[
+				[
+					'fields' => [
+						'Name' => 'Hosts group with maintenance',
+						'Host groups' => 'Top Hosts test host group',
+						'Show hosts in maintenance' => true
+					],
+					'Columns' => [
+						[
+							'fields' => [
+								'Name' => 'Host',
+								'Data' => 'Host name'
+							]
+						],
+						[
+							'fields' => [
+								'Name' => 'Maintenance Trapper',
+								'Item name' => [
+									'values' => 'Maintenance trapper',
+									'context' => ['values' => 'Host in maintenance']
+								],
+								'Decimal places' => 4
+							]
+						],
+						[
+							'fields' => [
+								'Name' => 'Item1',
+								'Item name' => [
+									'values' => 'Item1',
+									'context' => ['values' => 'HostA']
+								]
+							]
+						]
+					],
+					'result' => [
+						['Host' => 'HostA', 'Maintenance Trapper' => '', 'Item1' => '0.00'],
+						['Host' => 'HostB', 'Maintenance Trapper' => '', 'Item1' => '1.00'],
+						['Host' => 'HostC', 'Maintenance Trapper' => '', 'Item1' => '2.00'],
+						['Host' => 'Host in maintenance', 'Maintenance Trapper' => '100.0000', 'Item1' => '']
+					],
+					'headers' => ['Host', 'Maintenance Trapper', 'Item1'],
+					'check_maintenance' => [
+						'Host in maintenance' => "Maintenance for Top Hosts widget [Maintenance with data collection]\n".
+							"Maintenance for icon check in Top Hosts widget"
 					]
 				]
 			]

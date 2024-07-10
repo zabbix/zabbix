@@ -353,6 +353,18 @@ class testWidgets extends CWebTest {
 
 		// Assert table headers depending on widget settings.
 		$this->assertEquals($headers, $table->getHeadersText());
+
+		// Check maintenance icon and hint text.
+		if (CTestArrayHelper::get($data, 'check_maintenance')) {
+			foreach ($data['check_maintenance'] as $host => $hint_text) {
+				$this->query('xpath://td/a[text()='.CXPathHelper::escapeQuotes($host).
+						']/..//button[contains(@class,"wrench")]')->waitUntilClickable()->one()->click();
+				$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->waitUntilPresent();
+				$this->assertEquals($hint_text, $hint->one()->getText());
+				$hint->one()->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click();
+				$hint->waitUntilNotPresent();
+			}
+		}
 	}
 
 	/**
