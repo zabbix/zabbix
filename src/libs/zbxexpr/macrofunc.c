@@ -91,17 +91,11 @@ static int	macrofunc_regsub(char **params, size_t nparam, char **out)
  ******************************************************************************/
 static int	zbx_tr_rule_create(const char *param, char *dst)
 {
-	char		c, range_from = 0, *ptr = (char *)param;
+	char		c, range_from = 0, *ptr;
 	int		i, len = 0;
 
-	if ('\0' == *ptr)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s empty parameter", __func__);
-		return FAIL;
-	}
-
 	/* construct string to replace */
-	for (; '\0' != *ptr; ptr++)
+	for (ptr = (char *)param; '\0' != *ptr; ptr++)
 	{
 		if (*ptr == '\\')
 		{
@@ -137,36 +131,43 @@ static int	zbx_tr_rule_create(const char *param, char *dst)
 					c = *ptr;
 					break;
 			}
+			if (*(ptr + 1) == '-' && *(ptr + 2) != '\0')
+			{
+				range_from = c;
+				ptr++;
+				/* continue allow last range char to be escaped */
+				continue;
+			}
+
 		}
 		else
 		{
 			c = *ptr;
-			if (*(ptr + 1) == '-' && *(ptr + 1) != 0)
+			if (*(ptr + 1) == '-' && *(ptr + 2) != '\0')
 			{
-				if (*(ptr + 2) != 0)
-				{
-					range_from = c;
-					ptr++;
-					continue;
-				}
-				zabbix_log(LOG_LEVEL_DEBUG,
-					"%s range-endpoints are in reverse collating sequence order %s",
-					__func__, param);
-				return FAIL;
+				range_from = c;
+				ptr++;
+				/* continue allow last range char to be escaped */
+				continue;
 			}
 		}
 
-		if (0 != range_from)
+		if ('\0'!= range_from)
 		{
 			if (range_from > c)
+			{
+				zabbix_log(LOG_LEVEL_DEBUG,
+					"%s range-endpoints are in reverse collating sequence order: %s",
+					__func__, param);
 				return FAIL;
+			}
 
 			for (i = 0; i < c - range_from + 1; i++)
 			{
 				dst[len++] = range_from + i;
 				if (ZBX_RULE_BUFF_LEN <= len)
 				{
-					zabbix_log(LOG_LEVEL_DEBUG, "%s too big parameter rule %s", __func__, param);
+					zabbix_log(LOG_LEVEL_DEBUG, "%s too big parameter rule: %s", __func__, param);
 					return FAIL;
 				}
 			}
@@ -210,14 +211,13 @@ static int	macrofunc_tr(char **params, size_t nparam, char **out)
 		return FAIL;
 	}
 
-	zbx_unquote_key_param(params[0]);
-	zbx_unquote_key_param(params[1]);
-
 	if (FAIL == (buff_from_len = zbx_tr_rule_create(params[0], buff_from)))
 		return FAIL;
 	if (FAIL == (buff_to_len = zbx_tr_rule_create(params[1], buff_to)))
 		return FAIL;
 
+	if (0 == buff_from_len || 0 == buff_to_len)
+		return SUCCEED;
 	/* prepare and fill translation table according rules */
 	for (i = 0; i < sizeof(translate); i++)
 		translate[i] = i;
