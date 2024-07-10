@@ -13131,8 +13131,30 @@ static void	dc_status_update_apply_diff(zbx_dc_status_diff_t *diff)
 	config->status->last_update = time(NULL);
 }
 
-static void	update_required_performance(ZBX_DC_HOST *dc_host, const ZBX_DC_ITEM *dc_item,
-		zbx_dc_status_diff_proxy_t *proxy_diff, zbx_dc_status_diff_t *diff)
+static int	get_active_item_count_rec(const ZBX_DC_ITEM *dc_item)
+{
+	int	count = 1;
+
+	if (NULL != dc_item->master_item)
+	{
+		for (int i = 0; i < dc_item->master_item->dep_itemids.values_num; i++)
+		{
+			ZBX_DC_ITEM	*dep_item;
+
+			if (NULL != (dep_item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items,
+					&dc_item->master_item->dep_itemids.values[i].first)) &&
+					ITEM_STATUS_ACTIVE == dep_item->status)
+			{
+				count += get_active_item_count_rec(dep_item);
+			}
+		}
+	}
+
+	return count;
+}
+
+static void	update_required_performance(const ZBX_DC_ITEM *dc_item, zbx_dc_status_diff_proxy_t *proxy_diff,
+		zbx_dc_status_diff_t *diff)
 {
 	int	delay;
 	char	*delay_s;
@@ -13141,33 +13163,15 @@ static void	update_required_performance(ZBX_DC_HOST *dc_host, const ZBX_DC_ITEM 
 
 	if (SUCCEED == zbx_interval_preproc(delay_s, &delay, NULL, NULL) && 0 != delay)
 	{
-		int	item_count = 1;
+		int	item_count;
 
-		if (NULL != dc_item->master_item)
+		if (0 < (item_count = get_active_item_count_rec(dc_item)))
 		{
-			for (int j = 0; j < dc_item->master_item->dep_itemids.values_num; j++)
-			{
-				int			k;
-				const ZBX_DC_ITEM	*dep_item, item_tmp =
-						{.itemid = dc_item->master_item->dep_itemids.values[j].first};
+			diff->required_performance += 1.0 / delay * item_count;
 
-				if (FAIL == (k = zbx_vector_dc_item_ptr_search(&dc_host->items, &item_tmp,
-						ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
-				{
-					continue;
-				}
-
-				dep_item = dc_host->items.values[k];
-
-				if (ITEM_TYPE_DEPENDENT == dep_item->type && ITEM_STATUS_ACTIVE == dep_item->status)
-					item_count++;
-			}
+			if (NULL != proxy_diff)
+				proxy_diff->required_performance += 1.0 / delay * item_count;
 		}
-
-		diff->required_performance += 1.0 / delay * item_count;
-
-		if (NULL != proxy_diff)
-			proxy_diff->required_performance += 1.0 / delay * item_count;
 	}
 
 	zbx_free(delay_s);
@@ -13193,7 +13197,7 @@ static void	get_host_statistics(ZBX_DC_HOST *dc_host, zbx_dc_status_diff_host_t 
 				if (HOST_STATUS_MONITORED == dc_host->status)
 				{
 					if (SUCCEED == diff->reset && ITEM_TYPE_DEPENDENT != dc_item->type)
-						update_required_performance(dc_host, dc_item, proxy_diff, diff);
+						update_required_performance(dc_item, proxy_diff, diff);
 
 					switch (dc_item->state)
 					{
