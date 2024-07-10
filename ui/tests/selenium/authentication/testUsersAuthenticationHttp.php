@@ -184,8 +184,8 @@ class testUsersAuthenticationHttp extends CLegacyWebTest {
 						// Login after logout.
 						[
 							'page' => 'index.php?reconnect=1&form=default',
-							'action' => self::LOGIN_USER,
-							'target' => 'Global view'
+							'error' => 'Zabbix has received an incorrect request.',
+							'no_login' => true
 						]
 					],
 					'db_check' => [
@@ -234,8 +234,8 @@ class testUsersAuthenticationHttp extends CLegacyWebTest {
 						// Sign in through zabbix login form after logout.
 						[
 							'page' => 'index.php?reconnect=1&form=default',
-							'action' => self::LOGIN_USER,
-							'target' => 'Global view'
+							'error' => 'Zabbix has received an incorrect request.',
+							'no_login' => true
 						],
 						// Couldn't open Hosts page due access.
 						[
@@ -370,7 +370,8 @@ class testUsersAuthenticationHttp extends CLegacyWebTest {
 						],
 						[
 							'page' => 'zabbix.php?action=user.list',
-							'error' => 'Access denied'
+							'error' => 'Access denied',
+							'no_login' => true
 						],
 //						// Redirect to HTTP login form and user is signed on hosts page.
 //						// wait for ZBX-14774.
@@ -425,7 +426,8 @@ class testUsersAuthenticationHttp extends CLegacyWebTest {
 						],
 						[
 							'page' => 'zabbix.php?action=user.list',
-							'error' => 'Access denied'
+							'error' => 'Access denied',
+							'no_login' => true
 						],
 //						// wait for ZBX-14774.
 //						[
@@ -524,7 +526,7 @@ class testUsersAuthenticationHttp extends CLegacyWebTest {
 			case self::LOGIN_GUEST:
 				$this->page->open($page['page']);
 
-				if ($page['page'] !== 'zabbix.php?action=user.list') {
+				if (CTestArrayHelper::get($page, 'no_login', false) === false) {
 					$this->query('button:Login')->one()->click();
 					$this->page->waitUntilReady();
 					$this->query('link:sign in as guest')->one()->click();

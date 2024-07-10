@@ -526,6 +526,21 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 								'y' => 16,
 								'width' => 12,
 								'height' => 4
+							],
+							[
+								'type' => 'honeycomb',
+								'name' => 'Honeycomb widget',
+								'x' => 48,
+								'y' => 16,
+								'width' => 12,
+								'height' => 4,
+								'fields' => [
+									[
+										'type' => 1,
+										'name' => 'items.0',
+										'value' => 'Test dashboard honeycomb'
+									]
+								]
 							]
 						]
 					]
@@ -1067,7 +1082,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 								[
 									'field_locator' => 'xpath:.//label[text()="Units"]/../following-sibling::div[1]/input',
 									'attributes' => [
-										'maxlength' => 2048
+										'maxlength' => 255
 									]
 								],
 								[

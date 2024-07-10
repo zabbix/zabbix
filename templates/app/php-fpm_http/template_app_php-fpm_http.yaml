@@ -21,8 +21,6 @@ zabbix_export:
           name: 'Accepted connections per second'
           type: DEPENDENT
           key: php-fpm.conn_accepted.rate
-          delay: '0'
-          history: 7d
           value_type: FLOAT
           description: 'The number of accepted requests per second.'
           preprocessing:
@@ -30,8 +28,6 @@ zabbix_export:
               parameters:
                 - '$.[''accepted conn'']'
             - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           master_item:
             key: php-fpm.get_status
           tags:
@@ -42,7 +38,6 @@ zabbix_export:
           type: HTTP_AGENT
           key: php-fpm.get_ping
           history: '0'
-          trends: '0'
           value_type: TEXT
           url: '{$PHP_FPM.SCHEME}://{$PHP_FPM.HOST}:{$PHP_FPM.PORT}/{$PHP_FPM.PING.PAGE}'
           retrieve_mode: BOTH
@@ -54,7 +49,6 @@ zabbix_export:
           type: HTTP_AGENT
           key: php-fpm.get_status
           history: '0'
-          trends: '0'
           value_type: TEXT
           url: '{$PHP_FPM.SCHEME}://{$PHP_FPM.HOST}:{$PHP_FPM.PORT}/{$PHP_FPM.STATUS.PAGE}?json'
           tags:
@@ -64,8 +58,6 @@ zabbix_export:
           name: 'Listen queue'
           type: DEPENDENT
           key: php-fpm.listen_queue
-          delay: '0'
-          history: 7d
           description: 'The current number of connections that have been initiated but not yet accepted.'
           preprocessing:
             - type: JSONPATH
@@ -80,8 +72,6 @@ zabbix_export:
           name: 'Listen queue, len'
           type: DEPENDENT
           key: php-fpm.listen_queue_len
-          delay: '0'
-          history: 7d
           description: 'The size of the socket queue of pending connections.'
           preprocessing:
             - type: JSONPATH
@@ -96,8 +86,6 @@ zabbix_export:
           name: 'Listen queue, max'
           type: DEPENDENT
           key: php-fpm.listen_queue_max
-          delay: '0'
-          history: 7d
           description: 'The maximum number of requests in the queue of pending connections since this FPM pool was started.'
           preprocessing:
             - type: JSONPATH
@@ -112,7 +100,6 @@ zabbix_export:
           name: 'Queue usage'
           type: CALCULATED
           key: php-fpm.listen_queue_usage
-          history: 7d
           value_type: FLOAT
           units: '%'
           params: 'last(//php-fpm.listen_queue)/(last(//php-fpm.listen_queue_len)+(last(//php-fpm.listen_queue_len)=0))*100'
@@ -136,16 +123,12 @@ zabbix_export:
           name: 'Max children reached'
           type: DEPENDENT
           key: php-fpm.max_children
-          delay: '0'
-          history: 7d
           description: 'The number of times that `pm.max_children` has been reached since the PHP-FPM pool was started.'
           preprocessing:
             - type: JSONPATH
               parameters:
                 - '$.[''max children reached'']'
             - type: SIMPLE_CHANGE
-              parameters:
-                - ''
           master_item:
             key: php-fpm.get_status
           tags:
@@ -155,9 +138,6 @@ zabbix_export:
           name: 'Pool name'
           type: DEPENDENT
           key: php-fpm.name
-          delay: '0'
-          history: 7d
-          trends: '0'
           value_type: CHAR
           description: 'The name of the current pool.'
           preprocessing:
@@ -176,8 +156,6 @@ zabbix_export:
           name: Ping
           type: DEPENDENT
           key: php-fpm.ping
-          delay: '0'
-          history: 7d
           valuemap:
             name: 'Service state'
           preprocessing:
@@ -205,8 +183,6 @@ zabbix_export:
           name: 'Processes, active'
           type: DEPENDENT
           key: php-fpm.processes_active
-          delay: '0'
-          history: 7d
           description: 'The total number of active processes.'
           preprocessing:
             - type: JSONPATH
@@ -221,8 +197,6 @@ zabbix_export:
           name: 'Processes, idle'
           type: DEPENDENT
           key: php-fpm.processes_idle
-          delay: '0'
-          history: 7d
           description: 'The total number of idle processes.'
           preprocessing:
             - type: JSONPATH
@@ -237,8 +211,6 @@ zabbix_export:
           name: 'Processes, max active'
           type: DEPENDENT
           key: php-fpm.processes_max_active
-          delay: '0'
-          history: 7d
           description: 'The highest value of "active processes" since the PHP-FPM server was started.'
           preprocessing:
             - type: JSONPATH
@@ -253,8 +225,6 @@ zabbix_export:
           name: 'Processes, total'
           type: DEPENDENT
           key: php-fpm.processes_total
-          delay: '0'
-          history: 7d
           description: 'The total number of server processes currently running.'
           preprocessing:
             - type: JSONPATH
@@ -269,9 +239,6 @@ zabbix_export:
           name: 'Process manager'
           type: DEPENDENT
           key: php-fpm.process_manager
-          delay: '0'
-          history: 7d
-          trends: '0'
           value_type: CHAR
           description: 'The method used by the process manager to control the number of child processes for this pool.'
           preprocessing:
@@ -301,16 +268,12 @@ zabbix_export:
           name: 'Slow requests'
           type: DEPENDENT
           key: php-fpm.slow_requests
-          delay: '0'
-          history: 7d
           description: 'The number of requests that has exceeded your `request_slowlog_timeout` value.'
           preprocessing:
             - type: JSONPATH
               parameters:
                 - '$.[''slow requests'']'
             - type: SIMPLE_CHANGE
-              parameters:
-                - ''
           master_item:
             key: php-fpm.get_status
           tags:
@@ -331,8 +294,6 @@ zabbix_export:
           name: 'Start time'
           type: DEPENDENT
           key: php-fpm.start_time
-          delay: '0'
-          history: 7d
           units: unixtime
           description: 'The time when this pool was started.'
           preprocessing:
@@ -348,8 +309,6 @@ zabbix_export:
           name: Uptime
           type: DEPENDENT
           key: php-fpm.uptime
-          delay: '0'
-          history: 7d
           units: s
           description: 'It indicates how long has this pool been running.'
           preprocessing:
@@ -389,9 +348,6 @@ zabbix_export:
           name: Version
           type: DEPENDENT
           key: php-fpm.version
-          delay: '0'
-          history: 7d
-          trends: '0'
           value_type: CHAR
           description: 'The current version of the PHP. You can get it from the HTTP-Header "X-Powered-By"; it may not work if you have changed the default HTTP-headers.'
           preprocessing:
