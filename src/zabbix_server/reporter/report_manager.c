@@ -1679,10 +1679,12 @@ out:
  *                                                                            *
  * Parameters: p            - [IN] macro resolver data structure              *
  *             args         - [IN] list of variadic parameters                *
- *                                 Mandatory content (can be NULL):           *
+ *                                 Expected content:                          *
  *                                  - const char *tz: name of timezone        *
+ *                                      (can be NULL)                         *
  *             replace_with - [OUT] pointer to value to replace macro with    *
- *             data         - [IN/OUT] pointer to input data string           *
+ *             data         - [IN/OUT] pointer to original input raw string   *
+ *                                  (for macro in macro resolving)            *
  *             error        - [OUT] pointer to pre-allocated error message    *
  *                                  buffer                                    *
  *             maxerrlen    - [IN] size of error message buffer               *
