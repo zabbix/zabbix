@@ -335,7 +335,7 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 	foreach ($data['medias'] as $index => $media) {
 		if (!array_key_exists($media['mediatypeid'], $data['mediatypes'])) {
 			$media_name = (new CSpan(_('Unknown')))->addClass(ZBX_STYLE_DISABLED);
-			$status = (new CSpan(_('Deleted')))->addClass(ZBX_STYLE_RED);
+			$status = (new CSpan(_('Disabled')))->addClass(ZBX_STYLE_RED);
 		}
 		elseif ($data['mediatypes'][$media['mediatypeid']]['status'] == MEDIA_TYPE_STATUS_ACTIVE) {
 			$media_name = $media['name'];
