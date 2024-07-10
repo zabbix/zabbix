@@ -623,8 +623,7 @@ zabbix_export:
                   - macro: '{#FSTYPE}'
                     value: hfs
               operations:
-                - operationobject: ITEM_PROTOTYPE
-                  operator: REGEXP
+                - operator: REGEXP
                   value: .+
                   discover: NO_DISCOVER
             - name: 'Skip metadata collection for dynamic FS'
@@ -634,8 +633,7 @@ zabbix_export:
                   - macro: '{#FSTYPE}'
                     value: ^(btrfs|zfs)$
               operations:
-                - operationobject: ITEM_PROTOTYPE
-                  operator: LIKE
+                - operator: LIKE
                   value: Inodes
                   discover: NO_DISCOVER
       tags:

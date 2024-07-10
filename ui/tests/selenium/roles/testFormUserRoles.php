@@ -830,10 +830,11 @@ class testFormUserRoles extends CWebTest {
 				foreach (['Read-write access to services', 'Read-only access to services'] as $field) {
 					$form->getField($field)->fill('Service list');
 				}
+
+				// Scroll up after filling the form to take the correct screenshot.
+				$this->page->scrollToTop();
 			}
 
-			// Scroll up after filling the form to take the correct screenshot.
-			$this->page->scrollToTop();
 			$this->assertScreenshotExcept($screenshot_area, ['query' => 'xpath://input[@id="name"]'], $role);
 		}
 
