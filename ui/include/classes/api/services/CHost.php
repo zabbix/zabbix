@@ -1783,7 +1783,7 @@ class CHost extends CHostGeneral {
 		$min_accept_type = HOST_ENCRYPTION_NONE;
 		$max_accept_type = HOST_ENCRYPTION_NONE | HOST_ENCRYPTION_PSK | HOST_ENCRYPTION_CERTIFICATE;
 
-		foreach ($hosts as $host) {
+		foreach ($hosts as &$host) {
 			foreach (['tls_connect', 'tls_accept'] as $field_name) {
 				$$field_name = array_key_exists($field_name, $host)
 					? $host[$field_name]
@@ -1861,6 +1861,74 @@ class CHost extends CHostGeneral {
 						_s('Incorrect value for field "%1$s": %2$s.', 'tls_subject', _('should be empty'))
 					);
 				}
+			}
+
+			$host['tls_connect'] = $tls_connect;
+			$host['tls_accept'] = $tls_accept;
+		}
+		unset($host);
+
+		self::checkTlsPsk($hosts, $db_hosts);
+	}
+
+	/**
+	 * Check there are no multiple hosts having same value tls_psk_identity and different value of tls_psk.
+	 *
+	 * @param array $hosts
+	 * @param array $db_hosts
+	 *
+	 * @throws CAPIException
+	 */
+	protected static function checkTlsPsk(array $hosts, array $db_hosts = null): void {
+		$psk_identity_index = [];
+		$updated_hostids = [];
+		$tls_psk_fields = array_flip(['tls_psk_identity', 'tls_psk']);
+
+		foreach ($hosts as $i => $host) {
+			if (!array_intersect_key($host, $tls_psk_fields)) {
+				continue;
+			}
+
+			if ($host['tls_connect'] != HOST_ENCRYPTION_PSK && ($host['tls_accept'] & HOST_ENCRYPTION_PSK) == 0) {
+				continue;
+			}
+
+			if ($db_hosts !== null) {
+				$host += array_intersect_key($db_hosts[$host['hostid']], $tls_psk_fields);
+				$hosts[$i] = $host;
+				$updated_hostids[] = $host['hostid'];
+			}
+
+			$tls_psk_identity = $host['tls_psk_identity'];
+
+			if (array_key_exists($tls_psk_identity, $psk_identity_index)
+					&& $hosts[$psk_identity_index[$tls_psk_identity]]['tls_psk'] !== $host['tls_psk']) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+					'/'.($i + 1).'/tls_psk', _('another value of tls_psk exists for same tls_psk_identity'))
+				);
+			}
+
+			$psk_identity_index[$tls_psk_identity] = $i;
+		}
+
+		if (!$psk_identity_index) {
+			return;
+		}
+
+		$cursor = DBselect(
+			'SELECT tls_psk_identity,tls_psk FROM hosts'.
+			' WHERE '.dbConditionInt('status', [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]).
+				' AND '.dbConditionId('hostid', $updated_hostids, true).
+				' AND '.dbConditionString('tls_psk_identity', array_keys($psk_identity_index))
+		);
+
+		while ($db_row = DBfetch($cursor)) {
+			$i = $psk_identity_index[$db_row['tls_psk_identity']];
+
+			if ($hosts[$i]['tls_psk'] !== $db_row['tls_psk']) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+					'/'.($i + 1).'/tls_psk', _('another value of tls_psk exists for same tls_psk_identity'))
+				);
 			}
 		}
 	}

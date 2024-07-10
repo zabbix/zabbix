@@ -28,7 +28,9 @@ require_once dirname(__FILE__).'/../include/CAPITest.php';
  */
 class testProxy extends CAPITest {
 
-	public static $proxyids = [];
+	public static $data = [
+		'proxy' => []
+	];
 
 	public static function prepareTestData(): void {
 		$proxies = [];
@@ -72,11 +74,30 @@ class testProxy extends CAPITest {
 		];
 
 		$result = CDataHelper::call('proxy.create', $proxies);
-		self::$proxyids += array_combine(array_column($proxies, 'host'), $result['proxyids']);
+		self::$data['proxy'] += array_combine(array_column($proxies, 'host'), $result['proxyids']);
 	}
 
 	public static function cleanTestData(): void {
-		CDataHelper::call('proxy.delete', array_values(self::$proxyids));
+		CDataHelper::call('proxy.delete', array_values(self::$data['proxy']));
+	}
+
+	public static function resolveIds(array $rows) {
+		foreach ($rows as &$value) {
+			if (is_array($value)) {
+				$value = self::resolveIds($value);
+			}
+			else {
+				// Whitespaces in $key are not trimmed.
+				[$api, $key] = sscanf((string) $value, ':%[^: ]:%[^\0]');
+
+				if ($api !== null && $key !== null && array_key_exists($key, self::$data[$api])) {
+					$value = self::$data[$api][$key];
+				}
+			}
+		}
+		unset($value);
+
+		return $rows;
 	}
 
 	public static function proxy_delete() {
@@ -356,7 +377,7 @@ class testProxy extends CAPITest {
 		$response = $this->call('proxy.create', $proxies, $expected_error);
 
 		if ($expected_error === null) {
-			self::$proxyids += array_combine(array_column($proxies, 'host'), $response['result']['proxyids']);
+			self::$data['proxy'] += array_combine(array_column($proxies, 'host'), $response['result']['proxyids']);
 		}
 	}
 
@@ -364,25 +385,25 @@ class testProxy extends CAPITest {
 		return [
 			'Field "tls_psk_identity" cannot be empty when "tls_connect" is HOST_ENCRYPTION_PSK' => [
 				'proxy' => [
-					['proxyid' => 'psk1.example.com', 'tls_psk_identity' => '']
+					['proxyid' => ':proxy:psk1.example.com', 'tls_psk_identity' => '']
 				],
 				'expected_error' => 'Invalid parameter "/1/tls_psk_identity": cannot be empty.'
 			],
 			'Field "tls_psk" cannot have different values for same "tls_psk_identity" on change "tls_psk_identity"' => [
 				'proxy' => [
-					['proxyid' => 'psk3.example.com', 'tls_psk_identity' => 'example.com']
+					['proxyid' => ':proxy:psk3.example.com', 'tls_psk_identity' => 'example.com']
 				],
 				'expected_error' => 'Incorrect value for field "/1/tls_psk": another value of tls_psk exists for same tls_psk_identity.'
 			],
 			'Field "tls_psk" cannot be empty when "tls_connect" is HOST_ENCRYPTION_PSK' => [
 				'proxy' => [
-					['proxyid' => 'psk1.example.com', 'tls_psk' => '']
+					['proxyid' => ':proxy:psk1.example.com', 'tls_psk' => '']
 				],
 				'expected_error' => 'Invalid parameter "/1/tls_psk": cannot be empty.'
 			],
 			'Field "tls_psk" cannot have different values for same "tls_psk_identity" on change "tls_psk"' => [
 				'proxy' => [
-					['proxyid' => 'psk1.example.com', 'tls_psk' => 'de4f735c561e5444b0932f7ebd636b85']
+					['proxyid' => ':proxy:psk1.example.com', 'tls_psk' => 'de4f735c561e5444b0932f7ebd636b85']
 				],
 				'expected_error' => 'Incorrect value for field "/1/tls_psk": another value of tls_psk exists for same tls_psk_identity.'
 			]
@@ -393,7 +414,7 @@ class testProxy extends CAPITest {
 		return [
 			'Can change "tls_psk_identity" and "tls_psk"' => [
 				'proxy' => [
-					['proxyid' => 'psk1.example.com', 'tls_psk_identity' => 'psk3.example.com', 'tls_psk' => 'de4f735c561e5444b0932f7ebd636b85']
+					['proxyid' => ':proxy:psk1.example.com', 'tls_psk_identity' => 'psk3.example.com', 'tls_psk' => 'de4f735c561e5444b0932f7ebd636b85']
 				]
 			]
 		];
@@ -404,13 +425,6 @@ class testProxy extends CAPITest {
 	 * @dataProvider dataProviderValidProxyUpdate
 	 */
 	public function testProxy_Update($proxies, $expected_error = null) {
-		foreach ($proxies as &$proxy) {
-			if (array_key_exists('proxyid', $proxy) && array_key_exists($proxy['proxyid'], self::$proxyids)) {
-				$proxy['proxyid'] = self::$proxyids[$proxy['proxyid']];
-			}
-		}
-		unset($proxy);
-
-		$this->call('proxy.update', $proxies, $expected_error);
+		$this->call('proxy.update', self::resolveIds($proxies), $expected_error);
 	}
 }

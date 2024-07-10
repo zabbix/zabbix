@@ -22,9 +22,83 @@
 require_once dirname(__FILE__).'/../include/CAPITest.php';
 
 /**
- * @backup hosts
+ * @backup   hosts
+ * @onBefore prepareTestData
+ * @onAfter  cleanTestData
  */
 class testHost extends CAPITest {
+
+	public static $data = [
+		'host' => [],
+		'hostgroup' => []
+	];
+
+	public static function prepareTestData(): void {
+		$hostgroups = [];
+		// dataProviderInvalidHostCreate
+		$hostgroups[] = ['name' => 'API tests hosts group'];
+		$result = CDataHelper::call('hostgroup.create', $hostgroups);
+		self::$data['hostgroup'] = array_combine(array_column($hostgroups, 'name'), $result['groupids']);
+
+		$hosts = [];
+		// dataProviderInvalidHostCreate: Field "tls_psk" cannot have different values for same "tls_psk_identity"
+		$hosts[] = [
+			'host' => 'test.example.com',
+			'groups' => [['groupid' => ':hostgroup:API tests hosts group']],
+			'tls_accept' => HOST_ENCRYPTION_PSK,
+			'tls_psk_identity' => 'public',
+			'tls_psk' => '79cbf232a3ad3bfe38dee29861f8ba6b'
+		];
+		// dataProviderInvalidHostUpdate, dataProviderValidHostUpdate
+		$hosts[] = [
+			'host' => 'psk1.example.com',
+			'groups' => [['groupid' => ':hostgroup:API tests hosts group']],
+			'tls_accept' => HOST_ENCRYPTION_PSK,
+			'tls_psk_identity' => 'example.com',
+			'tls_psk' => '79cbf232a3ad3bfe38dee29861f8ba6b'
+		];
+		$hosts[] = [
+			'host' => 'psk2.example.com',
+			'groups' => [['groupid' => ':hostgroup:API tests hosts group']],
+			'tls_accept' => HOST_ENCRYPTION_PSK,
+			'tls_psk_identity' => 'example.com',
+			'tls_psk' => '79cbf232a3ad3bfe38dee29861f8ba6b'
+		];
+		$hosts[] = [
+			'host' => 'psk3.example.com',
+			'groups' => [['groupid' => ':hostgroup:API tests hosts group']],
+			'tls_connect' => HOST_ENCRYPTION_PSK,
+			'tls_psk_identity' => 'psk3.example.com',
+			'tls_psk' => 'de4f735c561e5444b0932f7ebd636b85',
+		];
+
+		$result = CDataHelper::call('host.create', self::resolveIds($hosts));
+		self::$data['host'] = array_combine(array_column($hosts, 'host'), $result['hostids']);
+	}
+
+	public static function cleanTestData(): void {
+		CDataHelper::call('host.delete', array_values(self::$data['host']));
+		CDataHelper::call('hostgroup.delete', array_values(self::$data['hostgroup']));
+	}
+
+	public static function resolveIds(array $rows) {
+		foreach ($rows as &$value) {
+			if (is_array($value)) {
+				$value = self::resolveIds($value);
+			}
+			else {
+				// Whitespaces in $key are not trimmed.
+				[$api, $key] = sscanf((string) $value, ':%[^: ]:%[^\0]');
+
+				if ($api !== null && $key !== null && array_key_exists($key, self::$data[$api])) {
+					$value = self::$data[$api][$key];
+				}
+			}
+		}
+		unset($value);
+
+		return $rows;
+	}
 
 	public static function host_delete() {
 		return [
@@ -77,25 +151,6 @@ class testHost extends CAPITest {
 					'groups' => [
 						'groupid' => 4
 					],
-					'host' => 'new host 2'
-				],
-				'expected_error' => null
-			],
-			[
-				'request' => [
-					'groups' => [
-						'groupid' => 4
-					],
-					'host' => 'new host 3',
-					'interfaces' => []
-				],
-				'expected_error' => null
-			],
-			[
-				'request' => [
-					'groups' => [
-						'groupid' => 4
-					],
 					'host' => 'new host 4',
 					'interfaces' => ''
 				],
@@ -124,11 +179,215 @@ class testHost extends CAPITest {
 		];
 	}
 
+	public static function dataProviderInvalidHostCreate() {
+		return [
+			'Field "tls_psk_identity" is required when "tls_connect" is HOST_ENCRYPTION_PSK' => [
+				'host' => [
+					[
+						'host' => 'example.com',
+						'groups' => [['groupid' => ':hostgroup:API tests hosts group']],
+						'tls_connect' => HOST_ENCRYPTION_PSK,
+						'tls_psk' => '5fce1b3e34b520afeffb37ce08c7cd66'
+					]
+				],
+				'expected_error' => 'Incorrect value for field "tls_psk_identity": cannot be empty.'
+			],
+			'Field "tls_psk_identity" cannot be empty when "tls_connect" is HOST_ENCRYPTION_PSK' => [
+				'host' => [
+					[
+						'host' => 'example.com',
+						'groups' => [['groupid' => ':hostgroup:API tests hosts group']],
+						'tls_connect' => HOST_ENCRYPTION_PSK,
+						'tls_psk_identity' => ''
+					]
+				],
+				'expected_error' => 'Incorrect value for field "tls_psk_identity": cannot be empty.'
+			],
+			'Field "tls_psk_identity" cannot be set when "tls_connect" is not set to HOST_ENCRYPTION_PSK' => [
+				'host' => [
+					[
+						'host' => 'example.com',
+						'groups' => [['groupid' => ':hostgroup:API tests hosts group']],
+						'tls_psk_identity' => 'identity'
+					]
+				],
+				'expected_error' => 'Incorrect value for field "tls_psk_identity": should be empty.'
+			],
+			'Field "tls_psk_identity" is required when "tls_accept" HOST_ENCRYPTION_PSK flag is set' => [
+				'host' => [
+					[
+						'host' => 'example.com',
+						'groups' => [['groupid' => ':hostgroup:API tests hosts group']],
+						'tls_accept' => HOST_ENCRYPTION_PSK,
+						'tls_psk' => '5fce1b3e34b520afeffb37ce08c7cd66'
+					]
+				],
+				'expected_error' => 'Incorrect value for field "tls_psk_identity": cannot be empty.'
+			],
+			'Field "tls_psk_identity" cannot be empty when "tls_accept" HOST_ENCRYPTION_PSK flag is set' => [
+				'host' => [
+					[
+						'host' => 'example.com',
+						'groups' => [['groupid' => ':hostgroup:API tests hosts group']],
+						'tls_accept' => HOST_ENCRYPTION_PSK,
+						'tls_psk_identity' => ''
+					]
+				],
+				'expected_error' => 'Incorrect value for field "tls_psk_identity": cannot be empty.'
+			],
+			'Field "tls_psk" is required when "tls_connect" is HOST_ENCRYPTION_PSK' => [
+				'host' => [
+					[
+						'host' => 'example.com',
+						'groups' => [['groupid' => ':hostgroup:API tests hosts group']],
+						'tls_connect' => HOST_ENCRYPTION_PSK,
+						'tls_psk_identity' => 'example'
+					]
+				],
+				'expected_error' => 'Incorrect value for field "tls_psk": cannot be empty.'
+			],
+			'Field "tls_psk" cannot be empty when "tls_connect" is HOST_ENCRYPTION_PSK' => [
+				'host' => [
+					[
+						'host' => 'example.com',
+						'groups' => [['groupid' => ':hostgroup:API tests hosts group']],
+						'tls_connect' => HOST_ENCRYPTION_PSK,
+						'tls_psk_identity' => 'public',
+						'tls_psk' => ''
+					]
+				],
+				'expected_error' => 'Incorrect value for field "tls_psk": cannot be empty.'
+			],
+			'Field "tls_psk" cannot be set when "tls_connect" is not set to HOST_ENCRYPTION_PSK' => [
+				'host' => [
+					[
+						'host' => 'example.com',
+						'groups' => [['groupid' => ':hostgroup:API tests hosts group']],
+						'tls_psk' => '5fce1b3e34b520afeffb37ce08c7cd66'
+					]
+				],
+				'expected_error' => 'Incorrect value for field "tls_psk": should be empty.'
+			],
+			'Field "tls_psk" is required when "tls_accept" HOST_ENCRYPTION_PSK flag is set' => [
+				'host' => [
+					[
+						'host' => 'example.com',
+						'groups' => [['groupid' => ':hostgroup:API tests hosts group']],
+						'tls_accept' => HOST_ENCRYPTION_PSK,
+						'tls_psk_identity' => 'example'
+					]
+				],
+				'expected_error' => 'Incorrect value for field "tls_psk": cannot be empty.'
+			],
+			'Field "tls_psk" cannot be empty when "tls_accept" HOST_ENCRYPTION_PSK flag is set' => [
+				'host' => [
+					[
+						'host' => 'example.com',
+						'groups' => [['groupid' => ':hostgroup:API tests hosts group']],
+						'tls_accept' => HOST_ENCRYPTION_PSK,
+						'tls_psk_identity' => 'public',
+						'tls_psk' => ''
+					]
+				],
+				'expected_error' => 'Incorrect value for field "tls_psk": cannot be empty.'
+			],
+			'Field "tls_psk" should have correct format' => [
+				'host' => [
+					[
+						'host' => 'example.com',
+						'groups' => [['groupid' => ':hostgroup:API tests hosts group']],
+						'tls_accept' => HOST_ENCRYPTION_PSK,
+						'tls_psk_identity' => 'public',
+						'tls_psk' => 'fb48829a6f9ebbb70294a75ca09167rr'
+					]
+				],
+				'expected_error' => 'Incorrect value for field "tls_psk": an even number of hexadecimal characters is expected.'
+			],
+			'Field "tls_psk" cannot have different values for same "tls_psk_identity"' => [
+				'host' => [
+					[
+						'host' => 'bca.example.com',
+						'groups' => [['groupid' => ':hostgroup:API tests hosts group']],
+						'tls_accept' => HOST_ENCRYPTION_PSK,
+						'tls_psk_identity' => 'public',
+						'tls_psk' => '5fce1b3e34b520afeffb37ce08c7cd66'
+					],
+					[
+						'host' => 'abc.example.com',
+						'groups' => [['groupid' => ':hostgroup:API tests hosts group']],
+						'tls_connect' => HOST_ENCRYPTION_PSK,
+						'tls_psk_identity' => 'public',
+						'tls_psk' => 'fb48829a6f9ebbb70294a75ca0916772'
+					]
+				],
+				'expected_error' => 'Incorrect value for field "/2/tls_psk": another value of tls_psk exists for same tls_psk_identity.'
+			],
+			'Field "tls_psk" cannot have different values for same "tls_psk_identity"' => [
+				'host' => [
+					[
+						'host' => 'bca.example.com',
+						'groups' => [['groupid' => ':hostgroup:API tests hosts group']],
+						'tls_accept' => HOST_ENCRYPTION_PSK,
+						'tls_psk_identity' => 'public',
+						'tls_psk' => '5fce1b3e34b520afeffb37ce08c7cd66'
+					]
+				],
+				'expected_error' => 'Incorrect value for field "/1/tls_psk": another value of tls_psk exists for same tls_psk_identity.'
+			]
+		];
+	}
+
+	public static function dataProviderValidHostCreate() {
+		return [
+			'Create host without "interfaces"' => [
+				'host' => [
+					[
+						'host' => 'new host 2',
+						'groups' => [['groupid' => ':hostgroup:API tests hosts group']]
+					]
+				]
+			],
+			'Create host with "interfaces" set to empty array' => [
+				'host' => [
+					[
+						'host' => 'new host 3',
+						'groups' => [['groupid' => ':hostgroup:API tests hosts group']],
+						'interfaces' => []
+					]
+				]
+			],
+			'Create hosts with "tls_psk"' => [
+				'host' => [
+					[
+						'host' => 'three.example.com',
+						'groups' => [['groupid' => ':hostgroup:API tests hosts group']],
+						'tls_connect' => HOST_ENCRYPTION_PSK,
+						'tls_psk_identity' => 'three.example.com',
+						'tls_psk' => '6bc6d37628314e1331a21af0be9b4f22'
+					],
+					[
+						'host' => 'four.example.com',
+						'groups' => [['groupid' => ':hostgroup:API tests hosts group']],
+						'tls_accept' => HOST_ENCRYPTION_NONE | HOST_ENCRYPTION_PSK,
+						'tls_psk_identity' => 'four.example.com',
+						'tls_psk' => '10c0086085d3323b4f77af52060ecb24'
+					]
+				]
+			]
+		];
+	}
+
 	/**
 	 * @dataProvider host_create
+	 * @dataProvider dataProviderInvalidHostCreate
+	 * @dataProvider dataProviderValidHostCreate
 	 */
-	public function testHost_Create($request, $expected_error) {
-		$this->call('host.create', $request, $expected_error);
+	public function testHost_Create($request, $expected_error = null) {
+		$response = $this->call('host.create', self::resolveIds($request), $expected_error);
+
+		if ($expected_error === null) {
+			self::$data['host'] += array_combine(array_column($request, 'host'), $response['result']['hostids']);
+		}
 	}
 
 	/**
@@ -265,5 +524,52 @@ class testHost extends CAPITest {
 				}
 			}
 		}
+	}
+
+	public static function dataProviderInvalidHostUpdate() {
+		return [
+			'Field "tls_psk_identity" cannot be empty when "tls_connect" is HOST_ENCRYPTION_PSK' => [
+				'host' => [
+					['hostid' => ':host:psk1.example.com', 'tls_psk_identity' => '']
+				],
+				'expected_error' => 'Incorrect value for field "tls_psk_identity": cannot be empty.'
+			],
+			'Field "tls_psk" cannot have different values for same "tls_psk_identity" on change "tls_psk_identity"' => [
+				'host' => [
+					['hostid' => ':host:psk3.example.com', 'tls_psk_identity' => 'example.com']
+				],
+				'expected_error' => 'Incorrect value for field "/1/tls_psk": another value of tls_psk exists for same tls_psk_identity.'
+			],
+			'Field "tls_psk" cannot be empty when "tls_connect" is HOST_ENCRYPTION_PSK' => [
+				'host' => [
+					['hostid' => ':host:psk1.example.com', 'tls_psk' => '']
+				],
+				'expected_error' => 'Incorrect value for field "tls_psk": cannot be empty.'
+			],
+			'Field "tls_psk" cannot have different values for same "tls_psk_identity" on change "tls_psk"' => [
+				'host' => [
+					['hostid' => ':host:psk1.example.com', 'tls_psk' => 'de4f735c561e5444b0932f7ebd636b85']
+				],
+				'expected_error' => 'Incorrect value for field "/1/tls_psk": another value of tls_psk exists for same tls_psk_identity.'
+			]
+		];
+	}
+
+	public static function dataProviderValidHostUpdate() {
+		return [
+			'Can change "tls_psk_identity" and "tls_psk"' => [
+				'host' => [
+					['hostid' => ':host:psk1.example.com', 'tls_psk_identity' => 'psk3.example.com', 'tls_psk' => 'de4f735c561e5444b0932f7ebd636b85']
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider dataProviderInvalidHostUpdate
+	 * @dataProvider dataProviderValidHostUpdate
+	 */
+	public function testHost_Update($hosts, $expected_error = null) {
+		$this->call('host.update', self::resolveIds($hosts), $expected_error);
 	}
 }
