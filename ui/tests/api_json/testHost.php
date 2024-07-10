@@ -69,7 +69,7 @@ class testHost extends CAPITest {
 			'groups' => [['groupid' => ':hostgroup:API tests hosts group']],
 			'tls_connect' => HOST_ENCRYPTION_PSK,
 			'tls_psk_identity' => 'psk3.example.com',
-			'tls_psk' => 'de4f735c561e5444b0932f7ebd636b85',
+			'tls_psk' => 'de4f735c561e5444b0932f7ebd636b85'
 		];
 
 		$result = CDataHelper::call('host.create', self::resolveIds($hosts));
