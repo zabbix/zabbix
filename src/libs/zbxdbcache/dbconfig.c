@@ -11333,16 +11333,13 @@ static const ZBX_DC_ITEM	*get_active_master_item_rec(const ZBX_DC_ITEM *dc_item)
 	if (ITEM_TYPE_DEPENDENT != dc_item->type)
 		return dc_item;
 
-	if (NULL != (dc_item_local = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items,
-			&dc_item->itemtype.depitem->master_itemid)))
+	if (NULL == (dc_item_local = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items,
+			&dc_item->itemtype.depitem->master_itemid)) || ITEM_STATUS_ACTIVE != dc_item_local->status)
 	{
-		if (ITEM_STATUS_ACTIVE == dc_item_local->status)
-			dc_item_local = get_active_master_item_rec(dc_item_local);
-		else
-			dc_item_local = NULL;
+		return NULL;
 	}
 
-	return dc_item_local;
+	return get_active_master_item_rec(dc_item_local);
 }
 
 static void	get_item_statistics(zbx_dc_status_diff_t *diff)
