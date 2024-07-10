@@ -3795,7 +3795,18 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 			{
 				char	*error = NULL;
 
-				if (FAIL == DCitem_nextcheck_update(item, interface, flags, now, &error))
+				if (ITEM_TYPE_IPMI == item->type &&
+						0 == get_config_forks_cb(ZBX_PROCESS_TYPE_IPMIPOLLER))
+				{
+						zbx_timespec_t	ts = {now, 0};
+
+						error = zbx_strdup(NULL, "StartIPMIPollers is set to 0");
+
+						zbx_dc_add_history(item->itemid, item->value_type, 0, NULL, &ts,
+								ITEM_STATE_NOTSUPPORTED, error);
+						zbx_free(error);
+				}
+				else if (FAIL == DCitem_nextcheck_update(item, interface, flags, now, &error))
 				{
 					zbx_timespec_t	ts = {now, 0};
 
