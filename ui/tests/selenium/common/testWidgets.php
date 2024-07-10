@@ -215,9 +215,8 @@ class testWidgets extends CWebTest {
 		$dialog = CDashboardElement::find()->one()->edit()->addWidget();
 		$form = $dialog->asForm();
 
-		// Fill widget filter.
+		// Fill widget type.
 		$form->fill(['Type' => CFormElement::RELOADABLE_FILL($widget)]);
-		$form->fill($data['fields']);
 
 		if (array_key_exists('Tags', $data)) {
 			$form->getField('id:evaltype')->fill(CTestArrayHelper::get($data['Tags'], 'evaluation', 'And/Or'));
@@ -253,6 +252,7 @@ class testWidgets extends CWebTest {
 			}
 		}
 
+		$form->fill($data['fields']);
 		$form->submit();
 
 		// Check saved dashboard.

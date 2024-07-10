@@ -24,6 +24,8 @@ require_once dirname(__FILE__).'/../common/testWidgets.php';
 /**
  * @backup config, hstgrp, dashboard
  *
+ * @dataSource GlobalMacros
+ *
  * @onBefore prepareTopHostsDisplayData
  */
 class testDashboardTopHostsWidgetDisplay extends testWidgets {
@@ -181,6 +183,7 @@ class testDashboardTopHostsWidgetDisplay extends testWidgets {
 				]
 			],
 			// #2 Filtered so that widget shows No data.
+			// TODO: This case is failing until ZBX-24828 is fixed.
 			[
 				[
 					'fields' => [
@@ -189,6 +192,7 @@ class testDashboardTopHostsWidgetDisplay extends testWidgets {
 					'Columns' => [
 						[
 							'fields' => [
+								'Name' => 'Item2',
 								'Item name' => [
 									'values' => 'Item2',
 									'context' => ['values' => 'HostA']
@@ -197,7 +201,7 @@ class testDashboardTopHostsWidgetDisplay extends testWidgets {
 						]
 					],
 					'result' => [],
-					'headers' => ['']
+					'headers' => ['Item2']
 				]
 			],
 			// #3 Filtered by tags, columns: text and item, order newest in bottom.
@@ -246,7 +250,8 @@ class testDashboardTopHostsWidgetDisplay extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Name' => 'Hosts filtered by tag, macros in columns'
+						'Name' => 'Hosts filtered by tag, macros in columns',
+						'Order by' => 'Host name'
 					],
 					'Tags' => [
 						'evaluation' => 'Or',
@@ -316,24 +321,24 @@ class testDashboardTopHostsWidgetDisplay extends testWidgets {
 					],
 					'result' => [
 						[
-							'Host name' => 'HostC',
-							'Text: Macro in host' => 'HostC', // Resolved global macro.
-							'{#LLD_MACRO}' => '2.00',
-							'{HOST.HOST}' => '2.00',
-							'{$USERMACRO}' => '',
-							'{$1} Resolved' => 'Numeric macro' // Resolved user macro.
-						],
-						[
 							'Host name' => 'HostB',
 							'Text: Macro in host' => 'HostB',  // Resolved global macro.
 							'{#LLD_MACRO}' => '1.00',
 							'{HOST.HOST}' => '1.00',
 							'{$USERMACRO}' => '',
 							'{$1} Resolved' => 'Numeric macro' // Resolved user macro.
+						],
+						[
+							'Host name' => 'HostC',
+							'Text: Macro in host' => 'HostC', // Resolved global macro.
+							'{#LLD_MACRO}' => '2.00',
+							'{HOST.HOST}' => '2.00',
+							'{$USERMACRO}' => '',
+							'{$1} Resolved' => 'Numeric macro' // Resolved user macro.
 						]
 					],
 					'headers' => ['Host name', 'Text: Macro in host', '{#LLD_MACRO}', '{HOST.HOST}',
-						'{$USERMACRO}', '{$1} Resolved'
+							'{$USERMACRO}', '{$1} Resolved'
 					]
 				]
 			]
