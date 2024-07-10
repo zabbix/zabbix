@@ -428,7 +428,7 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 					->filter(CElementFilter::NOT_CLICKABLE)->count()
 			);
 			$this->assertTrue($this->zbxTestCheckboxSelected('recovery_mode_0'));
-			$this->zbxTestAssertElementPresentXpath("//input[@id='recovery_mode_0'][@disabled]");
+			$this->zbxTestAssertElementPresentXpath("//input[@id='recovery_mode_0'][@readonly]");
 		}
 		else {
 			$this->assertEquals(2, $dialog_footer->query('button', ['Add', 'Cancel'])->all()

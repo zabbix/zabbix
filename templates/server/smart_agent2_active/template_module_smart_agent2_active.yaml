@@ -667,8 +667,7 @@ zabbix_export:
                   - macro: '{#DISKTYPE}'
                     value: nvme
               operations:
-                - operationobject: ITEM_PROTOTYPE
-                  operator: LIKE
+                - operator: LIKE
                   value: Self-test
                   discover: NO_DISCOVER
             - name: 'Not NVMe'
@@ -679,8 +678,7 @@ zabbix_export:
                     value: nvme
                     operator: NOT_MATCHES_REGEX
               operations:
-                - operationobject: ITEM_PROTOTYPE
-                  operator: REGEXP
+                - operator: REGEXP
                   value: Media|Percentage|Critical
                   discover: NO_DISCOVER
             - name: Raw_Read_Error_Rate
@@ -690,8 +688,7 @@ zabbix_export:
                   - macro: '{#ATTRIBUTES}'
                     value: Raw_Read_Error_Rate
               operations:
-                - operationobject: ITEM_PROTOTYPE
-                  operator: REGEXP
+                - operator: REGEXP
                   value: Raw_Read_Error_Rate
                   discover: DISCOVER
             - name: Spin_Up_Time
@@ -701,8 +698,7 @@ zabbix_export:
                   - macro: '{#ATTRIBUTES}'
                     value: Spin_Up_Time
               operations:
-                - operationobject: ITEM_PROTOTYPE
-                  operator: REGEXP
+                - operator: REGEXP
                   value: Spin_Up_Time
                   discover: DISCOVER
             - name: Start_Stop_Count
@@ -712,8 +708,7 @@ zabbix_export:
                   - macro: '{#ATTRIBUTES}'
                     value: Start_Stop_Count
               operations:
-                - operationobject: ITEM_PROTOTYPE
-                  operator: REGEXP
+                - operator: REGEXP
                   value: Start_Stop_Count
                   discover: DISCOVER
             - name: Power_Cycle_Count
@@ -723,8 +718,7 @@ zabbix_export:
                   - macro: '{#ATTRIBUTES}'
                     value: Power_Cycle_Count
               operations:
-                - operationobject: ITEM_PROTOTYPE
-                  operator: REGEXP
+                - operator: REGEXP
                   value: Power_Cycle_Count
                   discover: DISCOVER
             - name: Reported_Uncorrect
@@ -734,8 +728,7 @@ zabbix_export:
                   - macro: '{#ATTRIBUTES}'
                     value: Reported_Uncorrect
               operations:
-                - operationobject: ITEM_PROTOTYPE
-                  operator: REGEXP
+                - operator: REGEXP
                   value: Reported_Uncorrect
                   discover: DISCOVER
             - name: Seek_Error_Rate
@@ -745,8 +738,7 @@ zabbix_export:
                   - macro: '{#ATTRIBUTES}'
                     value: Seek_Error_Rate
               operations:
-                - operationobject: ITEM_PROTOTYPE
-                  operator: REGEXP
+                - operator: REGEXP
                   value: Seek_Error_Rate
                   discover: DISCOVER
             - name: Bad_Block_Rate
@@ -756,8 +748,7 @@ zabbix_export:
                   - macro: '{#ATTRIBUTES}'
                     value: Bad_Block_Rate
               operations:
-                - operationobject: ITEM_PROTOTYPE
-                  operator: REGEXP
+                - operator: REGEXP
                   value: Bad_Block_Rate
                   discover: DISCOVER
             - name: Program_Fail_Count_Chip
@@ -767,8 +758,7 @@ zabbix_export:
                   - macro: '{#ATTRIBUTES}'
                     value: Program_Fail_Count_Chip
               operations:
-                - operationobject: ITEM_PROTOTYPE
-                  operator: REGEXP
+                - operator: REGEXP
                   value: Program_Fail_Count_Chip
                   discover: DISCOVER
             - name: Reallocated_Sector_Ct
@@ -778,8 +768,7 @@ zabbix_export:
                   - macro: '{#ATTRIBUTES}'
                     value: Reallocated_Sector_Ct
               operations:
-                - operationobject: ITEM_PROTOTYPE
-                  operator: REGEXP
+                - operator: REGEXP
                   value: Reallocated_Sector_Ct
                   discover: DISCOVER
       tags:

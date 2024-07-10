@@ -21,7 +21,7 @@ class CImportDataNormalizer {
 
 	protected $rules;
 
-	private $value_mode = null;
+	private $preview = false;
 
 	public const EOL_LF = 0x01;
 	public const LOWERCASE = 0x02;
@@ -30,8 +30,24 @@ class CImportDataNormalizer {
 		$this->rules = $schema;
 	}
 
-	public function setValueMode(string $value_mode): self {
-		$this->value_mode = $value_mode;
+	/**
+	 * On import preview validation should not change content.
+	 *
+	 * @return bool
+	 */
+	public function isPreview(): bool {
+		return $this->preview;
+	}
+
+	/**
+	 * On import preview validation should not change content.
+	 *
+	 * @param bool $preview
+	 *
+	 * @return self
+	 */
+	public function setPreview(bool $preview): self {
+		$this->preview = $preview;
 
 		return $this;
 	}
@@ -64,25 +80,12 @@ class CImportDataNormalizer {
 		}
 
 		if ($rules['type'] & XML_ARRAY) {
+			if (!$data) {
+				return $data;
+			}
+
 			foreach ($rules['rules'] as $tag => $tag_rules) {
-				while ($tag_rules['type'] & XML_MULTIPLE) {
-					$matched_multiple_rule = null;
-
-					foreach ($tag_rules['rules'] as $multiple_rule) {
-						if ($this->multipleRuleMatched($multiple_rule, $data)) {
-							$matched_multiple_rule =
-								$multiple_rule + array_intersect_key($tag_rules, array_flip(['flags']));
-							break;
-						}
-					}
-
-					if ($matched_multiple_rule === null) {
-						// For use by developers. Do not translate.
-						throw new Exception('Incorrect XML_MULTIPLE validation rules.');
-					}
-
-					$tag_rules = $matched_multiple_rule;
-				}
+				$tag_rules = $this->getResultRule($tag_rules, $data, $rules['rules']);
 
 				if ($tag_rules['type'] & XML_IGNORE_TAG) {
 					continue;
@@ -127,22 +130,50 @@ class CImportDataNormalizer {
 		return $data;
 	}
 
-	private function multipleRuleMatched(array $multiple_rule, array $data): bool {
+	private function getResultRule(array $tag_rules, array $data, array $parent_rules): array {
+		while ($tag_rules['type'] & XML_MULTIPLE) {
+			$matched_multiple_rule = null;
+
+			foreach ($tag_rules['rules'] as $multiple_rule) {
+				if ($this->multipleRuleMatched($multiple_rule, $data, $parent_rules)) {
+					$multiple_rule['type'] = ($tag_rules['type'] & XML_REQUIRED) | $multiple_rule['type'];
+					$matched_multiple_rule =
+						$multiple_rule + array_intersect_key($tag_rules, array_flip(['default']));
+					break;
+				}
+			}
+
+			if ($matched_multiple_rule === null) {
+				// For use by developers. Do not translate.
+				throw new Exception('Incorrect XML_MULTIPLE validation rules.');
+			}
+
+			$tag_rules = $matched_multiple_rule;
+		}
+
+		return $tag_rules;
+	}
+
+	private function multipleRuleMatched(array $multiple_rule, array $data, array $rules): bool {
 		if (array_key_exists('else', $multiple_rule)) {
 			return true;
 		}
 		elseif (is_array($multiple_rule['if'])) {
 			$field_name = $multiple_rule['if']['tag'];
 
-			if (!array_key_exists($field_name, $data)) {
-				return false;
+			if ($this->isPreview()) {
+				if (array_key_exists($field_name, $data)) {
+					return in_array($data[$field_name], $multiple_rule['if']['in']);
+				}
+				else {
+					$tag_rules = self::getResultRule($rules[$field_name], $data, $rules);
+
+					return array_key_exists($tag_rules['default'], $multiple_rule['if']['in']);
+				}
 			}
-
-			$field_value = $data[$field_name];
-
-			return $this->value_mode === CXmlConstantValue::class
-				? array_key_exists($field_value, $multiple_rule['if']['in'])
-				: in_array($field_value, $multiple_rule['if']['in']);
+			else {
+				return array_key_exists($data[$field_name], $multiple_rule['if']['in']);
+			}
 		}
 		elseif ($multiple_rule['if'] instanceof Closure) {
 			return call_user_func($multiple_rule['if'], $data);
