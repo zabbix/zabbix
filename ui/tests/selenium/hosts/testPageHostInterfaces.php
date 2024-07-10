@@ -137,7 +137,7 @@ class testPageHostInterfaces extends CWebTest {
 
 		foreach ($interfaces_availability as $dns => $parameters) {
 			DBexecute('UPDATE interface SET available='.zbx_dbstr($parameters['available']).','.
-					' error='.zbx_dbstr(CTestArrayHelper::get($parameters, 'error', null)).
+					' error='.zbx_dbstr(CTestArrayHelper::get($parameters, 'error', '')).
 					' WHERE dns='.zbx_dbstr($dns)
 			);
 		}

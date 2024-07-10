@@ -107,10 +107,10 @@ window.trigger_edit_popup = new class {
 					{dialogue_class: 'modal-popup-generic'}
 				);
 			}
-			else if (e.target.name === 'correlation_mode') {
+			else if (e.target.name === 'correlation_mode' && !e.target.readOnly) {
 				this.#changeCorrelationMode();
 			}
-			else if (e.target.name === 'recovery_mode') {
+			else if (e.target.name === 'recovery_mode' && !e.target.readOnly) {
 				this.#changeRecoveryMode();
 			}
 			else if (e.target.id === 'recovery-expression-constructor'
@@ -708,7 +708,8 @@ window.trigger_edit_popup = new class {
 			? this.expression
 			: this.recovery_expression;
 
-		if (element.value.length > 0 && !confirm(t('Do you wish to replace the conditional expression?'))) {
+		if (element.value.length > 0
+				&& !confirm(<?= json_encode(_('Do you wish to replace the conditional expression?')) ?>)) {
 			return;
 		}
 

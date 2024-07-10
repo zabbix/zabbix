@@ -24,7 +24,6 @@ zabbix_export:
           type: ZABBIX_ACTIVE
           key: agent.hostname
           delay: 1h
-          trends: '0'
           value_type: CHAR
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -59,7 +58,6 @@ zabbix_export:
           type: ZABBIX_ACTIVE
           key: agent.version
           delay: 1h
-          trends: '0'
           value_type: CHAR
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -286,7 +284,6 @@ zabbix_export:
           type: ZABBIX_ACTIVE
           key: system.hostname
           delay: 1h
-          trends: '0'
           value_type: CHAR
           description: 'The host name of the system.'
           inventory_link: NAME
@@ -317,23 +314,11 @@ zabbix_export:
           tags:
             - tag: component
               value: system
-          triggers:
-            - uuid: c5c52f75d4214a68b095e8bf55a6a934
-              expression: 'fuzzytime(/Windows by Zabbix agent active/system.localtime,{$SYSTEM.FUZZYTIME.MAX})=0'
-              name: 'System time is out of sync'
-              event_name: 'System time is out of sync (diff with Zabbix server > {$SYSTEM.FUZZYTIME.MAX}s)'
-              priority: WARNING
-              description: 'The host''s system time is different from Zabbix server time.'
-              manual_close: 'YES'
-              tags:
-                - tag: scope
-                  value: notice
         - uuid: 16a7ae509f0c4f9d8631efae88fe6324
           name: 'Operating system architecture'
           type: ZABBIX_ACTIVE
           key: system.sw.arch
           delay: 1h
-          trends: '0'
           value_type: CHAR
           description: 'The architecture of the operating system.'
           preprocessing:
@@ -348,7 +333,6 @@ zabbix_export:
           type: ZABBIX_ACTIVE
           key: system.sw.os
           delay: 1h
-          trends: '0'
           value_type: CHAR
           inventory_link: OS
           preprocessing:
@@ -387,7 +371,6 @@ zabbix_export:
           name: 'Free swap space in %'
           type: DEPENDENT
           key: system.swap.pfree
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'The free space of the swap volume/file expressed in %.'
@@ -418,7 +401,6 @@ zabbix_export:
           type: ZABBIX_ACTIVE
           key: system.uname
           delay: 15m
-          trends: '0'
           value_type: CHAR
           description: 'System description of the host.'
           preprocessing:
@@ -455,7 +437,6 @@ zabbix_export:
           type: ZABBIX_ACTIVE
           key: vfs.fs.get
           history: '0'
-          trends: '0'
           value_type: TEXT
           description: 'The `vfs.fs.get` key acquires raw information set about the filesystems. Later to be extracted by preprocessing in dependent items.'
           tags:
@@ -507,7 +488,6 @@ zabbix_export:
           type: ZABBIX_ACTIVE
           key: 'wmi.getall[root\cimv2,"select Name,Description,NetConnectionID,Speed,AdapterTypeId,NetConnectionStatus,GUID from win32_networkadapter where PhysicalAdapter=True and NetConnectionStatus>0"]'
           history: '0'
-          trends: '0'
           value_type: TEXT
           description: 'Raw data of `win32_networkadapter.`'
           preprocessing:
@@ -557,31 +537,24 @@ zabbix_export:
           name: 'Network interfaces discovery'
           type: DEPENDENT
           key: net.if.discovery
-          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#IFALIAS}'
                 value: '{$NET.IF.IFALIAS.MATCHES}'
-                formulaid: A
               - macro: '{#IFALIAS}'
                 value: '{$NET.IF.IFALIAS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
               - macro: '{#IFDESCR}'
                 value: '{$NET.IF.IFDESCR.MATCHES}'
-                formulaid: C
               - macro: '{#IFDESCR}'
                 value: '{$NET.IF.IFDESCR.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: D
               - macro: '{#IFNAME}'
                 value: '{$NET.IF.IFNAME.MATCHES}'
-                formulaid: E
               - macro: '{#IFNAME}'
                 value: '{$NET.IF.IFNAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: F
           description: 'Discovery of installed network interfaces.'
           item_prototypes:
             - uuid: 344f0ce5ba5244cb90cc08db556e6f9c
@@ -592,8 +565,6 @@ zabbix_export:
               description: 'The number of incoming packets dropped on the network interface.'
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               tags:
                 - tag: component
                   value: network
@@ -609,8 +580,6 @@ zabbix_export:
               description: 'The number of incoming packets with errors on the network interface.'
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               tags:
                 - tag: component
                   value: network
@@ -627,8 +596,6 @@ zabbix_export:
               description: 'Incoming traffic on the network interface.'
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
                 - type: MULTIPLIER
                   parameters:
                     - '8'
@@ -647,8 +614,6 @@ zabbix_export:
               description: 'The number of outgoing packets dropped on the network interface.'
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               tags:
                 - tag: component
                   value: network
@@ -664,8 +629,6 @@ zabbix_export:
               description: 'The number of outgoing packets with errors on the network interface.'
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               tags:
                 - tag: component
                   value: network
@@ -682,8 +645,6 @@ zabbix_export:
               description: 'Outgoing traffic on the network interface.'
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
                 - type: MULTIPLIER
                   parameters:
                     - '8'
@@ -698,7 +659,6 @@ zabbix_export:
               name: 'Interface {#IFNAME}({#IFALIAS}): Speed'
               type: DEPENDENT
               key: 'net.if.speed["{#IFGUID}"]'
-              delay: '0'
               trends: '0'
               units: bps
               description: 'Estimated bandwidth of the network interface if any.'
@@ -727,7 +687,6 @@ zabbix_export:
               name: 'Interface {#IFNAME}({#IFALIAS}): Operational status'
               type: DEPENDENT
               key: 'net.if.status["{#IFGUID}"]'
-              delay: '0'
               trends: '0'
               description: 'The operational status of the network interface.'
               valuemap:
@@ -772,7 +731,6 @@ zabbix_export:
               name: 'Interface {#IFNAME}({#IFALIAS}): Interface type'
               type: DEPENDENT
               key: 'net.if.type["{#IFGUID}"]'
-              delay: '0'
               trends: '0'
               description: 'The type of the network interface.'
               valuemap:
@@ -920,11 +878,9 @@ zabbix_export:
             conditions:
               - macro: '{#DEVNAME}'
                 value: '{$VFS.DEV.DEVNAME.MATCHES}'
-                formulaid: A
               - macro: '{#DEVNAME}'
                 value: '{$VFS.DEV.DEVNAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
           description: 'Discovery of installed physical disks.'
           item_prototypes:
             - uuid: 714bbd069d34400895df413fe4627543
@@ -1130,18 +1086,14 @@ zabbix_export:
             conditions:
               - macro: '{#SERVICE.NAME}'
                 value: '{$SERVICE.NAME.MATCHES}'
-                formulaid: A
               - macro: '{#SERVICE.NAME}'
                 value: '{$SERVICE.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
               - macro: '{#SERVICE.STARTUPNAME}'
                 value: '{$SERVICE.STARTUPNAME.MATCHES}'
-                formulaid: C
               - macro: '{#SERVICE.STARTUPNAME}'
                 value: '{$SERVICE.STARTUPNAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: D
           description: 'Used for the discovery of Windows services of different types as defined in the template''s macros.'
           item_prototypes:
             - uuid: d6379e85f1974734abbe60fef1a6ca1d
@@ -1171,38 +1123,30 @@ zabbix_export:
           name: 'Mounted filesystem discovery'
           type: DEPENDENT
           key: vfs.fs.dependent.discovery
-          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#FSDRIVETYPE}'
                 value: '{$VFS.FS.FSDRIVETYPE.MATCHES}'
-                formulaid: A
               - macro: '{#FSDRIVETYPE}'
                 value: '{$VFS.FS.FSDRIVETYPE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
               - macro: '{#FSNAME}'
                 value: '{$VFS.FS.FSNAME.MATCHES}'
-                formulaid: C
               - macro: '{#FSNAME}'
                 value: '{$VFS.FS.FSNAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: D
               - macro: '{#FSTYPE}'
                 value: '{$VFS.FS.FSTYPE.MATCHES}'
-                formulaid: E
               - macro: '{#FSTYPE}'
                 value: '{$VFS.FS.FSTYPE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: F
           description: 'Discovery of filesystems of different types.'
           item_prototypes:
             - uuid: 821daa0e25a2456ca637e441a844dfe6
               name: 'FS [{#FSLABEL}({#FSNAME})]: Space: Available'
               type: DEPENDENT
               key: 'vfs.fs.dependent.size[{#FSNAME},free]'
-              delay: '0'
               units: B
               description: 'Available storage space expressed in bytes.'
               preprocessing:
@@ -1222,7 +1166,6 @@ zabbix_export:
               name: 'FS [{#FSLABEL}({#FSNAME})]: Space: Used, in %'
               type: DEPENDENT
               key: 'vfs.fs.dependent.size[{#FSNAME},pused]'
-              delay: '0'
               value_type: FLOAT
               units: '%'
               description: 'Calculated as the percentage of currently used space compared to the maximum available space.'
@@ -1279,7 +1222,6 @@ zabbix_export:
               name: 'FS [{#FSLABEL}({#FSNAME})]: Space: Total'
               type: DEPENDENT
               key: 'vfs.fs.dependent.size[{#FSNAME},total]'
-              delay: '0'
               units: B
               description: 'Total space expressed in bytes.'
               preprocessing:
@@ -1299,7 +1241,6 @@ zabbix_export:
               name: 'FS [{#FSLABEL}({#FSNAME})]: Space: Used'
               type: DEPENDENT
               key: 'vfs.fs.dependent.size[{#FSNAME},used]'
-              delay: '0'
               units: B
               description: 'Used storage expressed in bytes.'
               preprocessing:
@@ -1319,9 +1260,7 @@ zabbix_export:
               name: 'FS [{#FSLABEL}({#FSNAME})]: Get data'
               type: DEPENDENT
               key: 'vfs.fs.dependent[{#FSNAME},data]'
-              delay: '0'
               history: 1h
-              trends: '0'
               value_type: TEXT
               description: 'Intermediate data of `{#FSNAME}` filesystem.'
               preprocessing:
@@ -1483,9 +1422,6 @@ zabbix_export:
         - macro: '{$SWAP.PFREE.MIN.WARN}'
           value: '20'
           description: 'The warning threshold of the minimum free swap.'
-        - macro: '{$SYSTEM.FUZZYTIME.MAX}'
-          value: '60'
-          description: 'The threshold for the difference of system time in seconds.'
         - macro: '{$VFS.DEV.DEVNAME.MATCHES}'
           value: '.*'
           description: 'Used in physical disk discovery. Can be overridden on the host or linked template level.'
