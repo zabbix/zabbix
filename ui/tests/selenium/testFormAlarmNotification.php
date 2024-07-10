@@ -22,7 +22,7 @@
 require_once dirname(__FILE__).'/../include/CWebTest.php';
 
 /**
- * @backup events, problem, hosts, profiles
+ * @backup problem, hosts, profiles
  *
  * @onBefore prepareAlarmData
  */
@@ -40,11 +40,12 @@ class testFormAlarmNotification extends CWebTest {
 	}
 
 	protected static $hostid;
+	protected const DEFAULT_COLORPICKER = 'xpath:./following::div[@class="color-picker"]';
 
 	/**
 	 * Trigger names.
 	 */
-	protected $all_triggers = [
+	protected const ALL_TRIGGERS = [
 		'Average_trigger',
 		'Disaster_trigger',
 		'High_trigger',
@@ -180,6 +181,8 @@ class testFormAlarmNotification extends CWebTest {
 		// Enable Alarm Notification display for user.
 		DBexecute('INSERT INTO profiles (profileid, userid, idx, value_str, source, type)'.
 				' VALUES (555,1,'.zbx_dbstr('web.messages').',1,'.zbx_dbstr('enabled').',3)');
+		DBexecute('INSERT INTO profiles (profileid, userid, idx, value_str, source, type)'.
+				' VALUES (556,1,'.zbx_dbstr('web.messages').',180,'.zbx_dbstr('timeout').',3)');
 	}
 
 	/**
@@ -190,12 +193,9 @@ class testFormAlarmNotification extends CWebTest {
 		CDBHelper::setTriggerProblem('Not_classified_trigger_4');
 
 		$this->page->login()->open('zabbix.php?action=problem.view')->waitUntilReady();
-		$this->page->assertTitle('Problems');
-		$this->page->assertHeader('Problems');
 
 		// Find appeared Alarm notification overlay dialog.
-		$alarm_dialog = $this->query('xpath://div[@class="overlay-dialogue notif ui-draggable"]')->asOverlayDialog()->
-				waitUntilPresent()->one();
+		$alarm_dialog = $this->getAlarmOverlay();
 
 		// Check that Problem on text exists.
 		$this->assertEquals('Problem on Host for alarm item', $alarm_dialog->query('xpath:.//h4')->one()->getText());
@@ -236,8 +236,8 @@ class testFormAlarmNotification extends CWebTest {
 				// After clicking on button it changes status to off and become Unmute.
 				$alarm_dialog->query($selector)->one()->click();
 				$alarm_dialog->query('xpath:.//button[@title="Unmute"]')->waitUntilVisible()->one();
-				$this->assertEquals($class.'-off', $alarm_dialog->query('xpath:.//button[@title="Unmute"]')->
-						one()->getAttribute('class')
+				$this->assertEquals($class.'-off', $alarm_dialog->query('xpath:.//button[@title="Unmute"]')
+						->one()->getAttribute('class')
 				);
 
 				// Check that after clicking on Unmute button, Mute icon changed back.
@@ -276,7 +276,7 @@ class testFormAlarmNotification extends CWebTest {
 	/**
 	 * Check that colors displayed in alarm notification overlay are the same as in configuration.
 	 */
-	public function testFormAlarmNotification_checkColorChange() {
+	public function testFormAlarmNotification_CheckColorChange() {
 		$severity_names = [
 			'Disaster' => '00FF00',
 			'High' => '00FF00',
@@ -290,12 +290,12 @@ class testFormAlarmNotification extends CWebTest {
 				self::$hostid)->waitUntilReady();
 
 		// In case some scenarios failed and problems didn't closed at the end.
-		if ($this->query('class:list-table')->asTable()->one()->getRows()->asText() !== ['No data found.']) {
-			$this->closeProblem();
+		if ($this->getEmptyTableCondition()) {
+			$this->closeProblems();
 		}
 
 		// Trigger problem.
-		foreach ($this->all_triggers as $trigger_name) {
+		foreach (self::ALL_TRIGGERS as $trigger_name) {
 			CDBHelper::setTriggerProblem($trigger_name);
 		}
 
@@ -307,7 +307,7 @@ class testFormAlarmNotification extends CWebTest {
 		$default_colors = [];
 		foreach ($severity_names as $severity_name => $hexa_color) {
 			$field = $form->getField($severity_name);
-			$color_value = $field->query('xpath:./following::div[@class="color-picker"]')->asColorPicker()->one()->getText();
+			$color_value = $field->query(self::DEFAULT_COLORPICKER)->asColorPicker()->one()->getText();
 			$default_colors[] = '#'.$color_value;
 		}
 
@@ -322,8 +322,7 @@ class testFormAlarmNotification extends CWebTest {
 		// Change color for every severity.
 		$changed_colors = [];
 		foreach ($severity_names as $severity_name => $hexa_color) {
-			$field = $form->getField($severity_name);
-			$field->query('xpath:./following::div[@class="color-picker"]')->asColorPicker()->one()->fill($hexa_color);
+			$form->getField($severity_name)->query(self::DEFAULT_COLORPICKER)->asColorPicker()->one()->fill($hexa_color);
 			$changed_colors[] = '#'.$hexa_color;
 		}
 
@@ -338,8 +337,8 @@ class testFormAlarmNotification extends CWebTest {
 		$this->page->open('zabbix.php?action=problem.view&unacknowledged=1&sort=name&sortorder=ASC&hostids%5B%5D='.
 				self::$hostid)->waitUntilReady();
 
-		if ($this->query('class:list-table')->asTable()->one()->getRows()->asText() !== ['No data found.']) {
-			$this->closeProblem();
+		if ($this->getEmptyTableCondition()) {
+			$this->closeProblems();
 		}
 	}
 
@@ -429,8 +428,8 @@ class testFormAlarmNotification extends CWebTest {
 				self::$hostid)->waitUntilReady();
 
 		// In case some scenarios failed and problems didn't closed at the end.
-		if ($this->query('class:list-table')->asTable()->one()->getRows()->asText() !== ['No data found.']) {
-			$this->closeProblem();
+		if ($this->getEmptyTableCondition()) {
+			$this->closeProblems();
 		}
 
 		// Trigger problem.
@@ -439,23 +438,27 @@ class testFormAlarmNotification extends CWebTest {
 		}
 
 		// Filter problems by Hosts and refresh page for alarm overlay to appear.
+		$table = $this->query('class:list-table')->asTable()->one();
 		$this->query('name:zbx_filter')->asForm()->one()->fill(['Hosts' => 'Host for alarm item'])->submit();
-		$this->query('class:list-table')->asTable()->one()->waitUntilReloaded();
+		$table->waitUntilReloaded();
 		$this->page->refresh()->waitUntilReady();
 
 		// Check that problems displayed in table.
 		$this->assertTableDataColumn($data['trigger_name'], 'Problem');
 
 		// Find appeared Alarm notification overlay dialog.
-		$alarm_dialog = $this->query('xpath://div[@class="overlay-dialogue notif ui-draggable"]')->asOverlayDialog()->
-				waitUntilPresent()->one();
+		$alarm_dialog = $this->getAlarmOverlay();
 
 		// Multiple problems for one trigger or one problem for one trigger.
 		if (CTestArrayHelper::get($data, 'multiple_check', false)) {
-			for ($i = 1; $i <= 4; $i++) {
+			for ($i = 1; $i <= count($data['trigger_name']); $i++) {
 				$this->assertTrue($alarm_dialog->query('xpath:(//p/a[text()="Disaster_trigger"])['.$i.']')->one()->isClickable());
 			}
-		} else {
+
+			$this->assertEquals(count($data['trigger_name']),
+					$alarm_dialog->query('xpath://p/a[text()="Disaster_trigger"]')->all()->count());
+		}
+		else {
 			foreach ($data['trigger_name'] as $trigger_name) {
 				$this->assertTrue($alarm_dialog->query('link', $trigger_name)->one()->isClickable());
 			}
@@ -464,7 +467,7 @@ class testFormAlarmNotification extends CWebTest {
 		// Check close button and close the problems.
 		$alarm_dialog->query('xpath:.//button[@title="Close"]')->one()->click();
 		$alarm_dialog->ensureNotPresent();
-		$this->closeProblem();
+		$this->closeProblems();
 	}
 
 	public static function getNotDisplayedAlarmsData(){
@@ -555,18 +558,34 @@ class testFormAlarmNotification extends CWebTest {
 	 * @dataProvider getNotDisplayedAlarmsData
 	 */
 	public function testFormAlarmNotification_NotDisplayedAlarms($data) {
-		$this->updateSeverity($data['severity_status']);
+		$all_severity = [
+			'Not classified' => true,
+			'Information' => true,
+			'Warning' => true,
+			'Average' => true,
+			'High' => true,
+			'Disaster' => true
+		];
+
+		$this->page->login()->open('zabbix.php?action=userprofile.edit')->waitUntilReady();
+		$form = $this->query('id:user-form')->asForm()->one();
+		$form->selectTab('Messaging');
+		$form->fill($all_severity);
+		$form->fill($data['severity_status']);
+		$form->submit();
+		$this->page->waitUntilReady();
+
 		$this->page->open('zabbix.php?action=problem.view&filter_reset=1')->waitUntilReady();
 		$this->page->open('zabbix.php?action=problem.view&unacknowledged=1&sort=name&sortorder=ASC&hostids%5B%5D='.
 				self::$hostid)->waitUntilReady();
 
 		// In case some scenarios failed and problems didn't closed at the end.
-		if ($this->query('class:list-table')->asTable()->one()->getRows()->asText() !== ['No data found.']) {
-			$this->closeProblem();
+		if ($this->getEmptyTableCondition()) {
+			$this->closeProblems();
 		}
 
 		// Trigger problem.
-		foreach ($this->all_triggers as $trigger_name) {
+		foreach (self::ALL_TRIGGERS as $trigger_name) {
 			CDBHelper::setTriggerProblem($trigger_name);
 		}
 
@@ -576,18 +595,17 @@ class testFormAlarmNotification extends CWebTest {
 		$this->page->refresh()->waitUntilReady();
 
 		// Check that problems displayed in table.
-		$this->assertTableDataColumn($this->all_triggers, 'Problem');
+		$this->assertTableDataColumn(self::ALL_TRIGGERS, 'Problem');
 
 		if (CTestArrayHelper::get($data, 'all_off', false)) {
 			$this->assertFalse($this->query('xpath://div[@class="overlay-dialogue notif ui-draggable"]')->one()->isDisplayed());
 		}
 		else {
 			// Create new trigger name array without turned off severity.
-			$new_severity = array_diff($this->all_triggers, $data['trigger_name']);
+			$new_severity = array_diff(self::ALL_TRIGGERS, $data['trigger_name']);
 
 			// Find appeared Alarm notification overlay dialog.
-			$alarm_dialog = $this->query('xpath://div[@class="overlay-dialogue notif ui-draggable"]')->asOverlayDialog()->
-					waitUntilPresent()->one();
+			$alarm_dialog = $this->getAlarmOverlay();
 
 			foreach ($new_severity as $trigger_name) {
 				$this->assertTrue($alarm_dialog->query('link', $trigger_name)->one()->isClickable());
@@ -602,7 +620,7 @@ class testFormAlarmNotification extends CWebTest {
 			$alarm_dialog->ensureNotPresent();
 		}
 
-		$this->closeProblem();
+		$this->closeProblems();
 	}
 
 	/**
@@ -634,7 +652,7 @@ class testFormAlarmNotification extends CWebTest {
 	/**
 	 * Manually close problem from Problems page.
 	 */
-	protected function closeProblem() {
+	protected function closeProblems() {
 		$this->selectTableRows();
 		$this->query('button:Mass update')->one()->click();
 
@@ -662,18 +680,17 @@ class testFormAlarmNotification extends CWebTest {
 		];
 
 		// Find appeared Alarm notification overlay dialog.
-		$alarm_dialog = $this->query('xpath://div[@class="overlay-dialogue notif ui-draggable"]')->asOverlayDialog()->
-				waitUntilPresent()->one();
+		$alarm_dialog = $this->getAlarmOverlay();
 
 		// Get alarm color codes. It will be in RGBA format.
 		$rgba_alarm_colors = [];
 		foreach ($notification_color_class as $color_class) {
-			$bg_color = $alarm_dialog->query('xpath:.//div[contains(@class, '.CXPathHelper::escapeQuotes($color_class).')]')->
-					one()->getCSSValue('background-color');
+			$bg_color = $alarm_dialog->query('xpath:.//div[contains(@class, '.CXPathHelper::escapeQuotes($color_class).')]')
+					->one()->getCSSValue('background-color');
 			$rgba_alarm_colors[] = $bg_color;
 		}
 
-		// Convert RGBA colors to hexa
+		// Convert RGBA colors to HEXA.
 		$hexa_alarm_colors = [];
 		foreach ($rgba_alarm_colors as $rgba_color) {
 			if (preg_match('/^rgba?\((\d+),[ ]*(\d+),[ ]*(\d+)[, )]+/', $rgba_color, $matches) === 1) {
@@ -684,5 +701,14 @@ class testFormAlarmNotification extends CWebTest {
 		}
 
 		return $hexa_alarm_colors;
+	}
+
+	protected function getAlarmOverlay() {
+		return $this->query('xpath://div[@ class="overlay-dialogue notif ui-draggable"]')->asOverlayDialog()
+				->waitUntilPresent()->one();
+	}
+
+	protected function getEmptyTableCondition() {
+		return $this->query('class:list-table')->asTable()->one()->getRows()->asText() !== ['No data found.'];
 	}
 }

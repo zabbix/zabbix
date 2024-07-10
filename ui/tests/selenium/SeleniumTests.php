@@ -67,7 +67,6 @@ require_once dirname(__FILE__).'/testPageMonitoringHosts.php';
 require_once dirname(__FILE__).'/networkDiscovery/testPageNetworkDiscovery.php';
 require_once dirname(__FILE__).'/lld/testPageLowLevelDiscovery.php';
 require_once dirname(__FILE__).'/testPasswordComplexity.php';
-require_once dirname(__FILE__).'/testFormAlarmNotification.php';
 /*
 require_once dirname(__FILE__).'/testPageQueueDetails.php';
 require_once dirname(__FILE__).'/testPageQueueOverview.php';
@@ -98,6 +97,7 @@ require_once dirname(__FILE__).'/mediaTypes/testFormAdministrationMediaTypes.php
 require_once dirname(__FILE__).'/mediaTypes/testFormAdministrationMediaTypeMessageTemplates.php';
 require_once dirname(__FILE__).'/mediaTypes/testFormAdministrationMediaTypeWebhook.php';
 require_once dirname(__FILE__).'/testFormAdministrationUserGroups.php';
+require_once dirname(__FILE__).'/testFormAlarmNotification.php';
 require_once dirname(__FILE__).'/testFormApiTokensAdministrationGeneral.php';
 require_once dirname(__FILE__).'/testFormApiTokensUserSettings.php';
 require_once dirname(__FILE__).'/eventCorrelation/testFormEventCorrelation.php';
@@ -312,7 +312,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageUsers');
 		$suite->addTestSuite('testPageMonitoringWeb');
 		$suite->addTestSuite('testPasswordComplexity');
-		$suite->addTestSuite('testFormAlarmNotification');
 		$suite->addTestSuite('testExpandExpressionMacros');
 		$suite->addTestSuite('testFormAction');
 		$suite->addTestSuite('testFormAdministrationAuthenticationSaml');
@@ -333,6 +332,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormAdministrationMediaTypeWebhook');
 		$suite->addTestSuite('testFormAdministrationScripts');
 		$suite->addTestSuite('testFormAdministrationUserGroups');
+		$suite->addTestSuite('testFormAlarmNotification');
 		$suite->addTestSuite('testFormApiTokensAdministrationGeneral');
 		$suite->addTestSuite('testFormApiTokensUserSettings');
 		$suite->addTestSuite('testFormEventCorrelation');
