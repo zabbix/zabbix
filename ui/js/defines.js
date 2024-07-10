@@ -50,8 +50,6 @@ const ZBX_STYLE_TOTALS_LIST_COUNT = 'count';
 const ZBX_STYLE_TOTALS_LIST_COUNT_PART = 'count-part';
 const ZBX_STYLE_TOTALS_LIST_ELLIPSIS = 'ellipsis';
 
-const ZBX_STYLE_LINK_ACTION = 'link-action';
-
 const ZBX_ICON_BELL = 'zi-bell';
 const ZBX_ICON_BELL_OFF = 'zi-bell-off';
 const ZBX_ICON_CHECK = 'zi-check';
