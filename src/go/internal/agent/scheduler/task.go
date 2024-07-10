@@ -559,7 +559,7 @@ type commandTask struct {
 }
 
 func (t *commandTask) ClientID() (clientid uint64) {
-        return 0
+        return agent.MaxBuiltinClientID;
 }
 
 func (t *commandTask) Output() (output plugin.ResultWriter) {
