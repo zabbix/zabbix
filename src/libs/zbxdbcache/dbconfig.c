@@ -11326,6 +11326,25 @@ static void	dc_status_update_apply_diff(zbx_dc_status_diff_t *diff)
 	config->status->last_update = time(NULL);
 }
 
+static const ZBX_DC_ITEM	*get_active_master_item_rec(const ZBX_DC_ITEM *dc_item)
+{
+	const ZBX_DC_ITEM	*dc_item_local;
+
+	if (ITEM_TYPE_DEPENDENT != dc_item->type)
+		return dc_item;
+
+	if (NULL != (dc_item_local = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items,
+			&dc_item->itemtype.depitem->master_itemid)))
+	{
+		if (ITEM_STATUS_ACTIVE == dc_item_local->status)
+			dc_item_local = get_active_master_item_rec(dc_item_local);
+		else
+			dc_item_local = NULL;
+	}
+
+	return dc_item_local;
+}
+
 static void	get_item_statistics(zbx_dc_status_diff_t *diff)
 {
 	int				delay_last = 0;
@@ -11362,43 +11381,31 @@ static void	get_item_statistics(zbx_dc_status_diff_t *diff)
 			case ITEM_STATUS_ACTIVE:
 				if (HOST_STATUS_MONITORED == dc_host->status)
 				{
-					if (SUCCEED == diff->reset)
-					{
-						int			delay = 0;
-						const ZBX_DC_ITEM	*dc_item_local = NULL;
+					int			delay = 0;
+					const ZBX_DC_ITEM	*dc_item_local;
 
-						if (ITEM_TYPE_DEPENDENT == dc_item->type)
+					if (SUCCEED == diff->reset &&
+							NULL != (dc_item_local = get_active_master_item_rec(dc_item)))
+					{
+						if (0 == master_itemid || master_itemid != dc_item_local->itemid)
 						{
-							if (0 != master_itemid && master_itemid ==
-									dc_item->itemtype.depitem->master_itemid)
-							{
-								delay = delay_last;
-							}
-							else if (NULL != (dc_item_local = (ZBX_DC_ITEM *)
-									zbx_hashset_search(&config->items,
-									&dc_item->itemtype.depitem->master_itemid)) &&
-									ITEM_STATUS_ACTIVE != dc_item_local->status)
-							{
-								dc_item_local = NULL;
-							}
+							(void)zbx_interval_preproc(dc_item_local->delay, &delay,
+									NULL, NULL);
 						}
 						else
-							dc_item_local = dc_item;
+							delay = delay_last;
 
-						if (0 != delay || (NULL != dc_item_local &&
-								SUCCEED == zbx_interval_preproc(dc_item_local->delay,
-								&delay, NULL, NULL) && 0 != delay))
+						if (0 != delay)
 						{
 							diff->required_performance += 1.0 / delay;
 
 							if (NULL != proxy_diff)
 								proxy_diff->required_performance += 1.0 / delay;
 
-							if (ITEM_TYPE_DEPENDENT == dc_item->type &&
-									dc_item->itemtype.depitem->master_itemid !=
-									master_itemid)
+							if (master_itemid != dc_item_local->itemid)
 							{
 								delay_last = delay;
+								master_itemid = dc_item_local->itemid;
 							}
 						}
 					}
