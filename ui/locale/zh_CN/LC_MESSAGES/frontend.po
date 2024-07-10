@@ -4393,6 +4393,10 @@ msgstr "创建媒介类型"
 msgid "Create new"
 msgstr "创建新的"
 
+#: jsLoader.php:363
+msgid "Create new report"
+msgstr ""
+
 #: app/views/administration.proxy.list.php:37
 msgid "Create proxy"
 msgstr "创建Proxy"
@@ -6791,6 +6795,10 @@ msgstr "仪表盘页面属性更新失败。"
 msgid "Failed to update dashboard properties."
 msgstr "仪表盘属性更新失败。"
 
+#: app/views/js/popup.dashboard.share.edit.js.php:86
+msgid "Failed to update dashboard sharing."
+msgstr ""
+
 #: jsLoader.php:142
 msgid "Failed to update widget properties."
 msgstr "小组件属性更新失败。"
@@ -7908,6 +7916,10 @@ msgstr "主机群组 \"%1$s\" 为内建的且不能被删除"
 msgid "Host group elements"
 msgstr "主机群组组件"
 
+#: jsLoader.php:287
+msgid "Host group is not selected."
+msgstr ""
+
 #: include/views/monitoring.sysmap.edit.php:165
 msgid "Host group label type"
 msgstr "主机群组标签类型"
@@ -7981,6 +7993,10 @@ msgstr "主机资产记录"
 #: hostinventoriesoverview.php:26 hostinventoriesoverview.php:146
 msgid "Host inventory overview"
 msgstr "主机资产记录概览"
+
+#: jsLoader.php:284
+msgid "Host is not selected."
+msgstr ""
 
 #: include/views/monitoring.sysmap.edit.php:180
 msgid "Host label type"
@@ -11157,6 +11173,10 @@ msgstr "拓扑元素标签位置"
 #: include/views/monitoring.sysmap.edit.php:240
 msgid "Map element label type"
 msgstr "拓扑元素标签类型"
+
+#: jsLoader.php:285
+msgid "Map is not selected."
+msgstr ""
 
 #: sysmap.php:128
 msgid "Map is updated! Return to map list?"
@@ -17986,6 +18006,10 @@ msgstr "触发器在\"未知\"状态"
 msgid "Trigger in template \"%1$s\" has dependency with trigger in template \"%2$s\"."
 msgstr "模板\"%1$s\"中的触发器依赖模板\"%2$s\"中的触发器"
 
+#: jsLoader.php:286
+msgid "Trigger is not selected."
+msgstr ""
+
 #: include/views/monitoring.sysmap.edit.php:195
 msgid "Trigger label type"
 msgstr "触发器标签类型"
@@ -19626,6 +19650,10 @@ msgstr "视图"
 msgid "View as"
 msgstr "以视图"
 
+#: jsLoader.php:397
+msgid "View related reports"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1234
 msgid "Virtual space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr "虚拟空间大小（以字节计）或百分比（总计）。 返回整型字节; 浮点百分比"
@@ -20162,6 +20190,10 @@ msgstr "你没有权限来访问这个页面."
 #: include/func.inc.php:1724
 msgid "You must login to view this page."
 msgstr "您必需登录才能浏览此页面."
+
+#: jsLoader.php:282
+msgid "You need to have at least one image uploaded to create map element. Images can be uploaded in Administration->General->Images section."
+msgstr ""
 
 #: include/classes/db/DB.php:135
 msgid "Your database is not working properly. Please wait a few minutes and try to repeat this action. If the problem still persists, please contact system administrator. The problem might be caused by long running transaction or row level lock accomplished by your database management system."
@@ -21882,6 +21914,10 @@ msgstr "正确"
 #: app/controllers/CControllerPopupTriggerExpr.php:924
 msgid "right() - Returns the rightmost count characters"
 msgstr "right() - 返回最右边指定个数字符"
+
+#: jsLoader.php:199
+msgid "root"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:937
 msgid "round() - Rounds a value to decimal places"

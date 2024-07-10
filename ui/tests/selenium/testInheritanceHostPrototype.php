@@ -79,13 +79,13 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 					' AND name='.zbx_dbstr($data['discovery']).
 				')'
 		);
-		$this->zbxTestAssertElementPresentXpath('//ul[@id="interfaces_'.$interface.'_useip"]//input[@value="0"][@disabled]');
-		$this->zbxTestAssertElementPresentXpath('//ul[@id="interfaces_'.$interface.'_useip"]//input[@value="1"][@disabled]');
+		$this->zbxTestAssertElementPresentXpath('//ul[@id="interfaces_'.$interface.'_useip"]//input[@value="0"][@readonly]');
+		$this->zbxTestAssertElementPresentXpath('//ul[@id="interfaces_'.$interface.'_useip"]//input[@value="1"][@readonly]');
 		$this->zbxTestAssertElementPresentXpath('//div[contains(@class,"interface-cell-port")]/input[@type="text"][@readonly]');
 		$this->zbxTestAssertElementPresentXpath('//input[@id="proxy_hostid"][@readonly]');
 
 		// Check layout at Groups tab.
-		$this->zbxTestAssertElementPresentXpath('//div[@id="group_links_"]//ul[@class="multiselect-list disabled"]');
+		$this->zbxTestAssertElementPresentXpath('//div[@id="group_links_"]//ul[@class="multiselect-list"][@aria-readonly="true"]');
 		$this->zbxTestAssertElementPresentXpath('//button[@class="btn-grey"][@disabled]');
 		$this->zbxTestAssertElementPresentXpath('//input[@name="group_prototypes[0][name]"][@readonly]');
 
@@ -144,13 +144,13 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		// Check layout at Host Inventory tab.
 		$this->zbxTestTabSwitch('Inventory');
 		for ($i = 0; $i < 3; $i++) {
-			$this->zbxTestAssertElementPresentXpath('//input[@id="inventory_mode_'.$i.'"][@disabled]');
+			$this->zbxTestAssertElementPresentXpath('//input[@id="inventory_mode_'.$i.'"][@readonly]');
 		}
 
 		// Check layout at Encryption tab.
 		$this->zbxTestTabSwitch('Encryption');
 		foreach (['tls_connect_0', 'tls_connect_1', 'tls_connect_2', 'tls_in_none', 'tls_in_cert', 'tls_in_psk'] as $id) {
-			$this->zbxTestAssertElementPresentXpath('//input[@id="'.$id.'"][@disabled]');
+			$this->zbxTestAssertElementPresentXpath('//input[@id="'.$id.'"][@readonly]');
 		}
 
 		$this->zbxTestAssertAttribute('//button[@id="delete"]', 'disabled');
