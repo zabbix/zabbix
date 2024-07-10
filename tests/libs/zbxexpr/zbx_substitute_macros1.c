@@ -29,12 +29,11 @@ static int	macro_resolv_func(zbx_macro_resolv_data_t *p, va_list args, char **re
 	ZBX_UNUSED(error);
 	ZBX_UNUSED(maxerrlen);
 
-	if (NULL == param1) param1 = "(null)";
+	if (NULL == param1)
+		param1 = "(null)";
 
 	if (0 == strcmp(p->macro, "{VALUE}"))
-	{
 		*replace_to = zbx_strdup(*replace_to, param1);
-	}
 
 	return SUCCEED;
 }

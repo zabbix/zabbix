@@ -1573,7 +1573,7 @@ static int	rm_jobs_add_user(zbx_rm_t *manager, zbx_rm_report_t *report, zbx_uint
 		char **error)
 {
 	int		i;
-	zbx_rm_job_t	*job;
+	zbx_rm_job_t	*job = NULL;
 
 	if (FAIL != zbx_vector_uint64_search(&report->users_excl, userid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
 		return SUCCEED;
@@ -1677,18 +1677,18 @@ out:
  *                                                                            *
  * Purpose: resolves macros in report (ZBX_MACRO_TYPE_REPORT) context         *
  *                                                                            *
- * Parameters: p          - [IN] macro resolver data structure                *
- *             args       - [IN] list of variadic parameters                  *
- *                               Mandatory content:                           *
- *                                - const char *tz: name of timezone          *
- *             replace_to - [OUT] pointer to value to replace macro with      *
- *             data       - [IN/OUT] pointer to input data string             *
- *             error      - [OUT] pointer to pre-allocated error message      *
- *                                buffer                                      *
- *             maxerrlen  - [IN] size of error message buffer                 *
+ * Parameters: p            - [IN] macro resolver data structure              *
+ *             args         - [IN] list of variadic parameters                *
+ *                                 Mandatory content (can be NULL):           *
+ *                                  - const char *tz: name of timezone        *
+ *             replace_with - [OUT] pointer to value to replace macro with    *
+ *             data         - [IN/OUT] pointer to input data string           *
+ *             error        - [OUT] pointer to pre-allocated error message    *
+ *                                  buffer                                    *
+ *             maxerrlen    - [IN] size of error message buffer               *
  *                                                                            *
  ******************************************************************************/
-static int	macro_report_resolv(zbx_macro_resolv_data_t *p, va_list args, char **replace_to, char **data,
+static int	macro_report_resolv(zbx_macro_resolv_data_t *p, va_list args, char **replace_with, char **data,
 		char *error, size_t maxerrlen)
 {
 	/* Passed arguments */
@@ -1700,7 +1700,7 @@ static int	macro_report_resolv(zbx_macro_resolv_data_t *p, va_list args, char **
 
 	if (0 == strcmp(p->macro, MVAR_TIME))
 	{
-		*replace_to = zbx_strdup(*replace_to, zbx_time2str(time(NULL), tz));
+		*replace_with = zbx_strdup(*replace_with, zbx_time2str(time(NULL), tz));
 	}
 
 	return SUCCEED;
