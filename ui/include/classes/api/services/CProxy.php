@@ -623,12 +623,13 @@ class CProxy extends CApiService {
 	 * @throws CAPIException
 	 */
 	protected static function checkTlsPsk(array $proxies, array $db_proxies = null): void {
-		$psk_identity_index = [];
-		$updated_proxyids = [];
+		$psk_pairs = [];
 		$tls_psk_fields = array_flip(['tls_psk_identity', 'tls_psk']);
 
 		foreach ($proxies as $i => $proxy) {
-			if (!array_intersect_key($proxy, $tls_psk_fields)) {
+			$psk_pair = array_intersect_key($proxy, $tls_psk_fields);
+
+			if (!$psk_pair) {
 				continue;
 			}
 			elseif ($proxy['status'] == HOST_STATUS_PROXY_PASSIVE && $proxy['tls_connect'] != HOST_ENCRYPTION_PSK) {
@@ -639,42 +640,15 @@ class CProxy extends CApiService {
 			}
 
 			if ($db_proxies !== null) {
-				$proxy += array_intersect_key($db_proxies[$proxy['proxyid']], $tls_psk_fields);
-				$proxies[$i] = $proxy;
-				$updated_proxyids[] = $proxy['proxyid'];
+				$psk_pair += array_intersect_key($db_proxies[$proxy['proxyid']], $tls_psk_fields);
+				$psk_pair['hostid'] = $proxy['proxyid'];
 			}
 
-			$tls_psk_identity = $proxy['tls_psk_identity'];
-
-			if (array_key_exists($tls_psk_identity, $psk_identity_index)
-					&& $proxies[$psk_identity_index[$tls_psk_identity]]['tls_psk'] !== $proxy['tls_psk']) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-					'/'.($i + 1).'/tls_psk', _('another value of tls_psk exists for same tls_psk_identity'))
-				);
-			}
-
-			$psk_identity_index[$tls_psk_identity] = $i;
+			$psk_pairs[$i] = $psk_pair;
 		}
 
-		if (!$psk_identity_index) {
-			return;
-		}
-
-		$cursor = DBselect(
-			'SELECT tls_psk_identity,tls_psk FROM hosts'.
-			' WHERE '.dbConditionInt('status', [HOST_STATUS_PROXY_ACTIVE, HOST_STATUS_PROXY_PASSIVE]).
-				' AND '.dbConditionId('hostid', $updated_proxyids, true).
-				' AND '.dbConditionString('tls_psk_identity', array_keys($psk_identity_index))
-		);
-
-		while ($db_row = DBfetch($cursor)) {
-			$i = $psk_identity_index[$db_row['tls_psk_identity']];
-
-			if ($proxies[$i]['tls_psk'] !== $db_row['tls_psk']) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-					'/'.($i + 1).'/tls_psk', _('another value of tls_psk exists for same tls_psk_identity'))
-				);
-			}
+		if ($psk_pairs) {
+			CApiPskHelper::checkPskIndentityPskPairs($psk_pairs);
 		}
 	}
 
