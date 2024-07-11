@@ -515,7 +515,20 @@ class testFormAlarmNotification extends CWebTest {
 					'trigger_name' => ['Disaster_trigger']
 				]
 			],
-			// #6 All turned off.
+			// #6 Not classified and High severities turned off.
+			[
+				[
+					'severity_status' => [
+						'Not classified' => false,
+						'High' => false
+					],
+					'trigger_name' => [
+						'Not_classified_trigger',
+						'High_trigger'
+					]
+				]
+			],
+			// #7 All turned off.
 			[
 				[
 					'severity_status' => [
@@ -536,19 +549,6 @@ class testFormAlarmNotification extends CWebTest {
 					],
 					'all_off' => true
 				]
-			],
-			// #7 Not classified and High severities turned off.
-			[
-				[
-					'severity_status' => [
-						'Not classified' => false,
-						'High' => false
-					],
-					'trigger_name' => [
-						'Not_classified_trigger',
-						'High_trigger'
-					]
-				]
 			]
 		];
 	}
@@ -556,27 +556,20 @@ class testFormAlarmNotification extends CWebTest {
 	/**
 	 * Check that turning off alarms for severity, they are not displayed in alarm notification overlay.
 	 *
+	 * @onBefore resetTriggerSeverities
+	 *
 	 * @dataProvider getNotDisplayedAlarmsData
 	 */
 	public function testFormAlarmNotification_NotDisplayedAlarms($data) {
-		$all_severity = [
-			'Not classified' => true,
-			'Information' => true,
-			'Warning' => true,
-			'Average' => true,
-			'High' => true,
-			'Disaster' => true
-		];
-
+		// Set checked trigger severity in messaging settings.
 		$this->page->login()->open('zabbix.php?action=userprofile.edit')->waitUntilReady();
 		$form = $this->query('id:user-form')->asForm()->one();
 		$form->selectTab('Messaging');
-		$form->fill($all_severity);
 		$form->fill($data['severity_status']);
 		$form->submit();
 		$this->page->waitUntilReady();
 
-		$this->page->open('zabbix.php?action=problem.view&filter_reset=1')->waitUntilReady();
+		$this->page->login()->open('zabbix.php?action=problem.view&filter_reset=1')->waitUntilReady();
 		$this->page->open('zabbix.php?action=problem.view&unacknowledged=1&sort=name&sortorder=ASC&hostids%5B%5D='.
 				self::$hostid)->waitUntilReady();
 
@@ -591,8 +584,9 @@ class testFormAlarmNotification extends CWebTest {
 		}
 
 		// Filter problems by Hosts and refresh page for alarm overlay to appear.
+		$table = $this->query('class:list-table')->asTable()->one();
 		$this->query('name:zbx_filter')->asForm()->one()->fill(['Hosts' => 'Host for alarm item'])->submit();
-		$this->query('class:list-table')->asTable()->one()->waitUntilReloaded();
+		$table->waitUntilReloaded();
 		$this->page->refresh()->waitUntilReady();
 
 		// Check that problems displayed in table.
@@ -625,29 +619,18 @@ class testFormAlarmNotification extends CWebTest {
 	}
 
 	/**
-	 * Update Problems severity display from user profile page (disable/enable).
+	 * Update Frontend notifications settings, set all severities checkboxes => true.
 	 */
-	protected function updateSeverity($parameters = null) {
-		$all_severity = [
-			'Not classified' => true,
-			'Information' => true,
-			'Warning' => true,
-			'Average' => true,
-			'High' => true,
-			'Disaster' => true
-		];
+	protected function resetTriggerSeverities() {
+		// Delete old setting whatever it was.
+		DBexecute('DELETE FROM profiles WHERE source='.zbx_dbstr('triggers.severities').' AND userid=1');
 
-		$this->page->login()->open('zabbix.php?action=userprofile.edit')->waitUntilReady();
-		$form = $this->query('id:user-form')->asForm()->one();
-		$form->selectTab('Messaging');
-		$form->fill($all_severity);
-
-		if ($parameters !== null) {
-			$form->fill($parameters);
-		}
-
-		$form->submit();
-		$this->page->waitUntilReady();
+		// Insert new row where value_str field means that all severities are checked.
+		DBexecute('INSERT INTO profiles (profileid, userid, idx, value_str, source, type)'.
+				' VALUES (9950, 1, '.zbx_dbstr('web.messages').', '.
+				zbx_dbstr('a:6:{i:0;s:1:"1";i:1;s:1:"1";i:2;s:1:"1";i:3;s:1:"1";i:4;s:1:"1";i:5;s:1:"1";}').', '.
+				zbx_dbstr('triggers.severities').', 3)'
+		);
 	}
 
 	/**
