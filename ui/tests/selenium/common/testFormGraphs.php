@@ -1113,6 +1113,7 @@ class testFormGraphs extends CWebTest {
 
 		if (!str_contains($button, 'add_protoitem')) {
 			$dialog->query('xpath:.//div[@class="multiselect-control"]')->asMultiselect()->one()->fill($host);
+			$table->query('class:no-data-message')->one(false)->waitUntilNotVisible();
 			$table->waitUntilReloaded();
 			$expected_items =['Float item', 'Unsigned item', 'Unsigned_dependent item'];
 		}
