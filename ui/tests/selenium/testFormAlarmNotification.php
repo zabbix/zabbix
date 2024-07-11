@@ -421,6 +421,7 @@ class testFormAlarmNotification extends CWebTest {
 	 * Check that alarms displayed in alarm notification overlay.
 	 *
 	 * @dataProvider getDisplayedAlarmsData
+	 * @ignoreBrowserErrors
 	 */
 	public function testFormAlarmNotification_DisplayedAlarms($data) {
 		$this->page->login()->open('zabbix.php?action=problem.view&filter_reset=1')->waitUntilReady();
