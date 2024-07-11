@@ -282,6 +282,12 @@ class testDashboardCopyWidgets extends CWebTest {
 			],
 			[
 				[
+					'name' => 'Discovery status widget',
+					'copy to' => 'same page'
+				]
+			],
+			[
+				[
 					'name' => 'Graph (classic) widget',
 					'copy to' => 'same page'
 				]
@@ -295,12 +301,6 @@ class testDashboardCopyWidgets extends CWebTest {
 			[
 				[
 					'name' => 'Item history widget',
-					'copy to' => 'same page'
-				]
-			],
-			[
-				[
-					'name' => 'URL widget',
 					'copy to' => 'same page'
 				]
 			],
@@ -324,6 +324,12 @@ class testDashboardCopyWidgets extends CWebTest {
 			],
 			[
 				[
+					'name' => 'Discovery status widget',
+					'copy to' => 'another page'
+				]
+			],
+			[
+				[
 					'name' => 'Graph (classic) widget',
 					'copy to' => 'another page'
 				]
@@ -337,12 +343,6 @@ class testDashboardCopyWidgets extends CWebTest {
 			[
 				[
 					'name' => 'Item history widget',
-					'copy to' => 'another page'
-				]
-			],
-			[
-				[
-					'name' => 'URL widget',
 					'copy to' => 'another page'
 				]
 			],
@@ -396,6 +396,12 @@ class testDashboardCopyWidgets extends CWebTest {
 			],
 			[
 				[
+					'name' => 'Discovery status widget',
+					'copy to' => 'another dashboard'
+				]
+			],
+			[
+				[
 					'name' => 'Graph (classic) widget',
 					'copy to' => 'another dashboard'
 				]
@@ -414,12 +420,6 @@ class testDashboardCopyWidgets extends CWebTest {
 			],
 			[
 				[
-					'name' => 'URL widget',
-					'copy to' => 'another dashboard'
-				]
-			],
-			[
-				[
 					'name' => 'Honeycomb widget',
 					'copy to' => 'another page'
 				]
@@ -433,6 +433,12 @@ class testDashboardCopyWidgets extends CWebTest {
 			[
 				[
 					'name' => 'Clock widget',
+					'copy to' => 'another template'
+				]
+			],
+			[
+				[
+					'name' => 'Discovery status widget',
 					'copy to' => 'another template'
 				]
 			],

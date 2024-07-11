@@ -56,10 +56,6 @@ database/mysql/data.sql
 database/mysql/schema.sql
 database/mysql/option-patches
 !database/mysql/option-patches/double.sql
-database/oracle/data.sql
-database/oracle/schema.sql
-database/oracle/option-patches
-!database/oracle/option-patches/double.sql
 database/postgresql/data.sql
 database/postgresql/schema.sql
 database/postgresql/option-patches

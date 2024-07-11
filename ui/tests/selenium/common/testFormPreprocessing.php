@@ -3483,7 +3483,7 @@ abstract class testFormPreprocessing extends CWebTest {
 				}
 			}
 
-			$this->assertNotNull($step['on_fail']->getAttribute('disabled'));
+			$this->assertFalse($step['on_fail']->isEnabled());
 
 			switch ($options['type']) {
 				case 'Regular expression':

@@ -100,7 +100,7 @@ if ($data['action'] === 'user.edit') {
 				'name' => 'user_groups[]',
 				'object_name' => 'usersGroups',
 				'data' => $data['groups'],
-				'disabled' => $data['readonly'],
+				'readonly' => $data['readonly'],
 				'popup' => [
 					'parameters' => [
 						'srctbl' => 'usrgrp',
@@ -445,7 +445,7 @@ if ($data['action'] === 'user.edit') {
 		'object_name' => 'roles',
 		'data' => $data['role'],
 		'multiple' => false,
-		'disabled' => $role_disabled,
+		'readonly' => $role_disabled,
 		'popup' => [
 			'parameters' => [
 				'srctbl' => 'roles',

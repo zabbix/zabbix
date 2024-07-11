@@ -27,11 +27,7 @@ void	zbx_mock_test_entry(void **state)
 #if defined(HAVE_SQLITE3)
 #	define RESULT	"out.sqlite_regex"
 #else
-#if defined(HAVE_ORACLE)
-#	define RESULT	"out.sqlora_regex"
-#else
 #	define RESULT	"out.sql_regex"
-#endif
 #endif
 	const char		*sql_where, *sql_rgx, *field_name;
 	zbx_vector_uint64_t	in_ids;

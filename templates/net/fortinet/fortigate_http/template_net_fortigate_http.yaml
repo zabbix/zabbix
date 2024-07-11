@@ -2945,28 +2945,22 @@ zabbix_export:
                   - macro: '{#TYPE}'
                     value: ^(cloud_service_status|platform|other)$
               operations:
-                - operationobject: ITEM_PROTOTYPE
-                  operator: LIKE
+                - operator: LIKE
                   value: ': Expiration date'
                   discover: NO_DISCOVER
-                - operationobject: ITEM_PROTOTYPE
-                  operator: LIKE
+                - operator: LIKE
                   value: ': Last attempt to update'
                   discover: NO_DISCOVER
-                - operationobject: ITEM_PROTOTYPE
-                  operator: LIKE
+                - operator: LIKE
                   value: ': Last update time'
                   discover: NO_DISCOVER
-                - operationobject: ITEM_PROTOTYPE
-                  operator: LIKE
+                - operator: LIKE
                   value: ': Service version'
                   discover: NO_DISCOVER
-                - operationobject: ITEM_PROTOTYPE
-                  operator: LIKE
+                - operator: LIKE
                   value: ': Update method'
                   discover: NO_DISCOVER
-                - operationobject: ITEM_PROTOTYPE
-                  operator: LIKE
+                - operator: LIKE
                   value: ': Update result'
                   discover: NO_DISCOVER
       tags:

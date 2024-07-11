@@ -1003,12 +1003,12 @@ function makeSuppressedProblemIcon(array $icon_data, bool $blink = false): CSimp
 		if (array_key_exists('maintenance_name', $suppression)) {
 			$maintenance_names[] = $suppression['maintenance_name'];
 		}
-		else {
+		elseif (array_key_exists('username', $suppression)) {
 			$username = $suppression['username'];
 		}
 	}
 
-	$maintenances = implode(',', $maintenance_names);
+	$maintenances = implode(', ', $maintenance_names);
 
 	return (new CButtonIcon(ZBX_ICON_EYE_OFF))
 		->addClass(ZBX_STYLE_COLOR_ICON)
