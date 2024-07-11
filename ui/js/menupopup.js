@@ -1180,6 +1180,15 @@ function getMenuPopupScriptData(scripts, trigger_element, hostid, eventid) {
 }
 
 jQuery(function($) {
+	const SUBMENU_PADDING_LEFT = 25;
+	const SUBMENU_PADDING_RIGHT = 15;
+	const SUBMENU_PADDING_Y = 5;
+	const SUBMENU_BORDER = 1;
+	const WRAPPER_MARGIN_TOP = 46;
+	const WRAPPER_MARGIN_BOTTOM = 36;
+	const DELTA_Y = 15;
+
+	const SUBMENU_DELAY = 600;
 
 	/**
 	 * Menu popup.
@@ -1249,9 +1258,6 @@ jQuery(function($) {
 		closeCallback: function() {},
 		background_layer: true
 	};
-
-	let submenu_direction_x = 1;
-	let submenu_direction_y = 1;
 
 	var methods = {
 		init: function(sections, event, options) {
@@ -1328,9 +1334,13 @@ jQuery(function($) {
 
 			const menu_rect = $menu_popup[0].getBoundingClientRect();
 
-			$menu_popup.css('top',
-				Math.max(0, Math.min(menu_rect.top, wrapper_rect.bottom - menu_rect.height - 10))
-			);
+			$menu_popup.css('top', Math.max(WRAPPER_MARGIN_TOP,
+				Math.min(menu_rect.top, wrapper_rect.bottom - menu_rect.height - WRAPPER_MARGIN_BOTTOM)
+			));
+
+			$menu_popup.on('scroll', () => {
+				$menu_popup.actionMenuItemCollapse();
+			});
 
 			// Hide all action menu sub-levels, including the topmost, for fade effect to work.
 			$menu_popup.add('.menu-popup', $menu_popup).hide();
@@ -1350,6 +1360,8 @@ jQuery(function($) {
 			});
 
 			$menu_popup.focus();
+
+			$(window).on('resize', handleWindowResize);
 		},
 
 		close: function(trigger_elem, return_focus) {
@@ -1366,6 +1378,8 @@ jQuery(function($) {
 				$(document)
 					.off('click dragstart', menuPopupDocumentCloseHandler)
 					.off('keydown', menuPopupKeyDownHandler);
+
+				$(window).off('resize', handleWindowResize);
 
 				const overlay = removeFromOverlaysStack('menu-popup', return_focus);
 
@@ -1420,55 +1434,32 @@ jQuery(function($) {
 					const $submenu = $('ul:first', item[0]);
 
 					if ($submenu.length) {
-						const wrapper_rect = $('.wrapper')[0].getBoundingClientRect();
-						const max_relative_top = wrapper_rect.bottom - $submenu.outerHeight() - 5;
-						const max_relative_left = wrapper_rect.right;
-
-						let position_top = pos.top - 6;
-						let position_left = submenu_direction_x === 1
-							? pos.right + 15 + $submenu.outerWidth()
-							: pos.left - $submenu.outerWidth() - 25;
-
-						if (position_left < wrapper_rect.left || position_left > max_relative_left) {
-							submenu_direction_x *= -1;
-							if (!$submenu.parent().parent().hasClass('menu-popup-top')) {
-								position_top += submenu_direction_y * 15;
-
-								if (max_relative_top < position_top	|| 0 > position_top) {
-									submenu_direction_y *= -1;
-									position_top = pos.top + submenu_direction_y * 15 - 6;
-								}
-							}
-						}
-
-						position_left = submenu_direction_x === 1
-							? pos.right + 15
-							: pos.left - $submenu.outerWidth() - 25;
-
-						const position = {
-							'top': Math.max(0, Math.min(position_top, max_relative_top)),
-							'left': position_left
-						};
+						const submenu_data = $submenu.data('pos') ?? calculateSubmenuPosition($submenu, pos);
 
 						$submenu
-							.css(position)
+							.css({
+								'top': submenu_data.top,
+								'left': submenu_data.left
+							})
 							.css('display', 'block')
+							.data('pos', submenu_data)
 							.prev('[role="menuitem"]')
 							.attr({'aria-expanded': 'true'});
 					}
 				}
 				else {
-					const $submenu_child = $('ul:visible > li > ul:visible', item[0]);
+					// Collapses the submenus deeper than +2 level of targeted submenu
+					const $submenu_link = $('ul:visible > li > a', item[0]);
 
-					if ($('ul:visible > li > a', item[0]).hasClass('highlighted')) {
-						$('ul:visible > li > a', item[0]).removeClass('highlighted').blur();
+					if ($submenu_link.hasClass('highlighted')) {
+						$submenu_link.removeClass('highlighted').blur();
 					}
 
-					if ($submenu_child[0] !== undefined) {
+					const $submenu_child = $('ul:visible > li > ul:visible', item[0]);
+
+					if ($submenu_child.length) {
 						$submenu_child.prev('[role="menuitem"]').removeClass('highlighted');
 						$submenu_child.prev('[role="menuitem"]').attr({'aria-expanded': 'false'});
-
-						actionMenuResetDirection($submenu_child.first());
 
 						$submenu_child.css({'display': 'none'});
 					}
@@ -1487,8 +1478,6 @@ jQuery(function($) {
 					$submenu.prev('[role="menuitem"]').removeClass('highlighted');
 					$submenu.prev('[role="menuitem"]').attr({'aria-expanded': 'false'});
 
-					actionMenuResetDirection($submenu.first());
-
 					$submenu.css({'display': 'none'});
 				}
 			}
@@ -1498,26 +1487,68 @@ jQuery(function($) {
 	};
 
 	/**
-	 * Resets the direction of the next context menu
-	 * @param {object} $submenu    jQuery node of submenu
+	 * Calculate submenu position based on <li> parent element
+	 *
+	 * @param {object}  $submenu
+	 * @param {DOMRect} pos
+	 *
+	 * @return object
 	 */
-	function actionMenuResetDirection($submenu) {
-		if ($submenu.parents('ul')[1] !== undefined) {
-			const submenu_parent_parent_rect = $submenu.parents('ul')[1].getBoundingClientRect();
-			const submenu_rect = $submenu[0].getBoundingClientRect();
-			const submenu_parent_rect = $submenu.parents('ul')[0].getBoundingClientRect();
+	function calculateSubmenuPosition($submenu, pos) {
+		const wrapper_rect = $('.wrapper')[0].getBoundingClientRect();
+		const max_relative_top = wrapper_rect.bottom - $submenu.outerHeight() - WRAPPER_MARGIN_BOTTOM;
+		const max_relative_left = wrapper_rect.right - $submenu.outerWidth();
 
-			if (submenu_rect.left >= submenu_parent_rect.left
-				&& submenu_parent_rect.left >= submenu_parent_parent_rect.left) {
-				submenu_direction_x = 1;
-			}
-			else if (submenu_parent_rect.left <= submenu_parent_parent_rect.left) {
-				submenu_direction_x = -1;
-			}
-			else {
-				submenu_direction_x = 1;
+		// Will use parent directions, if the parent is not menu-popup-top
+		// If the directions are not defined, will use default direction: x - right, y - bottom
+		let submenu_direction_x = 1;
+		let submenu_direction_y = 1;
+
+		const is_first_child = $submenu.parents('ul').first().hasClass('menu-popup-top');
+
+		if (!is_first_child) {
+			const parent_menu_data = $submenu.parents('ul').first().data('pos');
+
+			submenu_direction_x = parent_menu_data.direction_x;
+			submenu_direction_y = parent_menu_data.direction_y;
+		}
+
+		console.log(pos);
+
+		const submenu_data = {
+			'top': pos.top - (SUBMENU_PADDING_Y + SUBMENU_BORDER),
+			'left': submenu_direction_x == 1
+				? pos.right + SUBMENU_PADDING_RIGHT
+				: pos.left - ($submenu.outerWidth() + SUBMENU_PADDING_LEFT),
+			'direction_x': submenu_direction_x,
+			'direction_y': submenu_direction_y
+		}
+
+		if (submenu_data.left < wrapper_rect.left || submenu_data.left > max_relative_left) {
+			// Reverse the direction on X asis
+			submenu_data.direction_x *= -1;
+
+			submenu_data.left = submenu_data.direction_x == 1
+				? pos.right + SUBMENU_PADDING_RIGHT
+				: pos.left - ($submenu.outerWidth() + SUBMENU_PADDING_LEFT);
+
+			if (!is_first_child) {
+				if (Math.abs($submenu.parents('ul')[1].getBoundingClientRect().top - submenu_data.top) < 15) {
+					const pos_top = submenu_data.top + (submenu_data.direction_y * DELTA_Y);
+
+					if (max_relative_top < pos_top || 0 > pos_top) {
+						// Reverse the direction on Y asis
+						submenu_data.direction_y *= -1;
+					}
+
+					submenu_data.top += submenu_direction_y * DELTA_Y;
+				}
 			}
 		}
+
+		submenu_data.top = Math.max(WRAPPER_MARGIN_TOP, Math.min(submenu_data.top, max_relative_top));
+
+		return submenu_data;
 	}
 
 	/**
@@ -1528,14 +1559,18 @@ jQuery(function($) {
 		const parent_menu = $(this).closest('.menu-popup');
 		$('.highlighted', parent_menu).removeClass('highlighted');
 		$('[aria-expanded]', parent_menu).attr({'aria-expanded': 'false'});
-		$('.menu-popup', parent_menu).css({'display': 'none'});
+		$('.menu-popup', parent_menu).css({'display': 'none'}).removeData('pos');
 
 		// Close actual menu level.
-		parent_menu.not('.menu-popup-top').css({'display': 'none'});
+		parent_menu.not('.menu-popup-top').css({'display': 'none'}).removeData('pos');
 		parent_menu.prev('[role="menuitem"]').attr({'aria-expanded': 'false'});
 
 		return this;
 	};
+
+	function handleWindowResize() {
+		$('.menu-popup-top').menuPopup('close', null, false)
+	}
 
 	function menuPopupDocumentCloseHandler(event) {
 		$(event.data.menu[0]).menuPopup('close', event.data.opener);
@@ -1574,8 +1609,6 @@ jQuery(function($) {
 				if (selected !== undefined && selected.has('.menu-popup')) {
 					if (level !== menu_popup) {
 						selected.actionMenuItemCollapse();
-						actionMenuResetDirection(selected.parent('ul'));
-
 						// Must focus previous element, otherwise screen reader will exit menu.
 						selected.closest('.menu-popup').prev('[role="menuitem"]').addClass('highlighted').focus();
 					}
@@ -1743,7 +1776,7 @@ jQuery(function($) {
 				role: 'menu'
 			})
 			.on('mouseover', function(e) {
-				// Prevent 'mouseenter' event in parent item, that would call actionMenuItemExpand() for parent.
+				// Prevent 'mouseover' event in parent item, that would call actionMenuItemExpand() for parent.
 				e.stopPropagation();
 			});
 
@@ -1752,11 +1785,28 @@ jQuery(function($) {
 			});
 
 			item.append(menu);
+
+			menu.on('scroll', (e) => {
+				e.stopPropagation();
+				$('ul', menu).actionMenuItemCollapse();
+			});
 		}
 
+		let menu_timer;
+
 		item.on('mouseover', function(e) {
+			// Prevent 'mouseover' event in parent item, that would call actionMenuItemExpand() for parent.
 			e.stopPropagation();
-			$(this).actionMenuItemExpand();
+
+			const $current_item = $(this);
+
+			menu_timer = setTimeout(() => {
+				$current_item.actionMenuItemExpand();
+			}, SUBMENU_DELAY);
+		});
+
+		item.on('mouseleave', () => {
+			clearTimeout(menu_timer);
 		});
 
 		return item;

@@ -4552,7 +4552,7 @@ z-select[readonly] .focusable,
   padding: 5px 15px 5px 25px;
   min-width: 166px;
   max-width: 250px;
-  max-height: calc(100vh - 50px);
+  max-height: calc(100vh - 90px);
   background-color: #ffffff;
   border: 1px solid #383838;
   border-bottom-color: #353535;
