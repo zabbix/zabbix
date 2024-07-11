@@ -85,7 +85,7 @@ window.item_history_column_edit = new class {
 				const name_field = this.#form.querySelector('[name=name]');
 
 				if (name_field.value === '' || this.#old_multiselect_item_name === name_field.value) {
-					name_field.value = (ms_item_data[0].prefix + ms_item_data[0].name).substring(0, 255);
+					name_field.value = `${ms_item_data[0].prefix}${ms_item_data[0].name}`.substring(0, 255).trim();
 					this.#old_multiselect_item_name = name_field.value;
 				}
 			}
