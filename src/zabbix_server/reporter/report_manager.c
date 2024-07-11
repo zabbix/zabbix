@@ -1686,8 +1686,9 @@ out:
  *             data         - [IN/OUT] pointer to original input raw string   *
  *                                  (for macro in macro resolving)            *
  *             error        - [OUT] pointer to pre-allocated error message    *
- *                                  buffer                                    *
- *             maxerrlen    - [IN] size of error message buffer               *
+ *                                  buffer (can be NULL)                      *
+ *             maxerrlen    - [IN] size of error message buffer (can be 0 if  *
+ *                                 'error' is NULL)                           *
  *                                                                            *
  ******************************************************************************/
 static int	macro_report_resolv(zbx_macro_resolv_data_t *p, va_list args, char **replace_with, char **data,
