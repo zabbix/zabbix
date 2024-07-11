@@ -27,7 +27,7 @@ use Facebook\WebDriver\WebDriverKeys;
  */
 class testDocumentationLinks extends CWebTest {
 
-	// LLD and host prototype for case #129.
+	// LLD and host prototype for case 'Host LLD host prototype edit form'.
 	protected static $lldid;
 	protected static $host_prototypeid;
 
@@ -111,8 +111,8 @@ class testDocumentationLinks extends CWebTest {
 		CDataHelper::call('hostprototype.create', [
 			[
 				'host' => 'Host prototype for documentation links test {#H}',
-				'ruleid' => self::$lldid ,
-				'groupLinks' => [['groupid'=> 4]], // Zabbix servers.
+				'ruleid' => self::$lldid,
+				'groupLinks' => [['groupid'=> 4]] // Zabbix servers.
 			]
 		]);
 		$prototype_hostids = CDataHelper::getIds('host');
@@ -1417,7 +1417,7 @@ class testDocumentationLinks extends CWebTest {
 			// #129 Host LLD host prototype edit form.
 			[
 				[
-					'url' => 'complex',
+					'url' => 'host_prototype',
 					'doc_link' => '/en/manual/vm_monitoring#host-prototypes'
 				]
 			],
@@ -2703,7 +2703,7 @@ class testDocumentationLinks extends CWebTest {
 	 * @dataProvider getGeneralDocumentationLinkData
 	 */
 	public function testDocumentationLinks_checkGeneralLinks($data) {
-		if ($data['url'] === 'complex') {
+		if ($data['url'] === 'host_prototype') {
 			$data['url'] = 'host_prototypes.php?form=update&parent_discoveryid='.self::$lldid.
 					'&hostid='.self::$host_prototypeid.'&context=host';
 		}
