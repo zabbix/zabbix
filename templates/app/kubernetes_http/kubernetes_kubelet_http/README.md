@@ -28,7 +28,7 @@ This template has been tested on:
 ## Setup
 
 Internal service metrics are collected from /metrics endpoint.
-Template needs to use Authorization via API token. 
+Template needs to use Authorization via API token.
 
 Don't forget change macros {$KUBE.KUBELET.URL}, {$KUBE.API.TOKEN}.
 
@@ -52,7 +52,8 @@ Don't forget change macros {$KUBE.KUBELET.URL}, {$KUBE.API.TOKEN}.
 |Get cadvisor metrics|<p>Collecting raw Kubelet metrics from /metrics/cadvisor endpoint.</p>|HTTP agent|kube.cadvisor.metrics|
 |Get pods|<p>Collecting raw Kubelet metrics from /pods endpoint.</p>|HTTP agent|kube.pods|
 |Pods running|<p>The number of running pods.</p>|Dependent item|kube.kubelet.pods.running<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.items[?(@.status.phase == "Running")].length()`</p></li></ul>|
-|Containers running|<p>The number of running containers.</p>|Dependent item|kube.kubelet.containers.running<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.items[*].status.containerStatuses[*].restartCount.sum()`</p></li></ul>|
+|Containers started|<p>The number of started containers.</p>|Dependent item|kube.kubelet.containers.started<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
+|Containers ready|<p>The number of ready containers.</p>|Dependent item|kube.kubelet.containers.ready<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
 |Containers last state terminated|<p>The number of containers that were previously terminated.</p>|Dependent item|kube.kublet.containers.terminated<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
 |Containers restarts|<p>The number of times the container has been restarted.</p>|Dependent item|kube.kubelet.containers.restarts<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.items[*].status.containerStatuses[*].restartCount.sum()`</p></li></ul>|
 |CPU cores, total|<p>The number of cores in this machine (available until kubernetes v1.18).</p>|Dependent item|kube.kubelet.cpu.cores<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `VALUE(machine_cpu_cores)`</p></li></ul>|

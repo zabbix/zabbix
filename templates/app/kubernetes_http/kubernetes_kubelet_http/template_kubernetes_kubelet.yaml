@@ -38,6 +38,21 @@ zabbix_export:
           tags:
             - tag: component
               value: raw
+        - uuid: 35783053a41646ffb6420f8d41880b39
+          name: 'Containers ready'
+          type: DEPENDENT
+          key: kube.kubelet.containers.ready
+          value_type: FLOAT
+          description: 'The number of ready containers.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.items[*].status.containerStatuses[?(@.ready == ''true'')].length()'
+          master_item:
+            key: kube.pods
+          tags:
+            - tag: component
+              value: containers
         - uuid: bc395860d45b45cb89401fc7e50bc015
           name: 'Containers restarts'
           type: DEPENDENT
@@ -54,15 +69,15 @@ zabbix_export:
             - tag: component
               value: containers
         - uuid: e524234eea87438d9ee2a1db9f24cfbb
-          name: 'Containers running'
+          name: 'Containers started'
           type: DEPENDENT
-          key: kube.kubelet.containers.running
+          key: kube.kubelet.containers.started
           value_type: FLOAT
-          description: 'The number of running containers.'
+          description: 'The number of started containers.'
           preprocessing:
             - type: JSONPATH
               parameters:
-                - '$.items[*].status.containerStatuses[*].restartCount.sum()'
+                - '$.items[*].status.containerStatuses[?(@.started == ''true'')].length()'
           master_item:
             key: kube.pods
           tags:
