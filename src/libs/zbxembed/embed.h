@@ -16,9 +16,11 @@
 #define ZABBIX_EMBED_H
 
 #include "zbxembed.h"
-#include "duktape.h"
+
 #include "zbxtime.h"
 #include "zbxalgo.h"
+
+#include "duktape.h"
 
 #define ZBX_ES_LOG_MEMORY_LIMIT	(ZBX_MEBIBYTE * 8)
 #define ZBX_ES_LOG_MSG_LIMIT	8000

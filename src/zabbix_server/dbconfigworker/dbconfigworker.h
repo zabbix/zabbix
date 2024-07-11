@@ -15,11 +15,8 @@
 #ifndef ZABBIX_DBCONFIG_WORKER_H
 #define ZABBIX_DBCONFIG_WORKER_H
 
-#include "zbxtypes.h"
-#include "zbxipcservice.h"
-
-#include "zbxcacheconfig.h"
 #include "zbxthreads.h"
+#include "zbxalgo.h"
 
 #define ZBX_IPC_SERVICE_DBCONFIG_WORKER		"config"
 #define ZBX_IPC_DBCONFIG_WORKER_REQUEST		1

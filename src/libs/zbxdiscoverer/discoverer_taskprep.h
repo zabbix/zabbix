@@ -16,8 +16,10 @@
 #define ZABBIX_DISCOVERER_TASKPREP_H_
 
 #include "discoverer_job.h"
+
 #include "zbxalgo.h"
 #include "zbxcacheconfig.h"
+#include "zbxdiscovery.h"
 
 void	process_rule(zbx_dc_drule_t *drule, zbx_hashset_t *tasks, zbx_hashset_t *check_counts,
 		zbx_vector_ds_dcheck_ptr_t *ds_dchecks_common, zbx_vector_iprange_t *ipranges,

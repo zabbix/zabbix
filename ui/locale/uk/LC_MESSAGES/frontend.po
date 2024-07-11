@@ -1,7 +1,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Zabbix 7.0\n"
+"Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
 "PO-Revision-Date: 2023-10-12 06:04+0000\n"
@@ -979,6 +979,10 @@ msgstr "Додати стовпчик"
 msgid "Add a new widget"
 msgstr "Додати новий віджет"
 
+#: widgets/navtree/Widget.php:34
+msgid "Add child element"
+msgstr ""
+
 #: widgets/navtree/Widget.php:39
 msgid "Add child elements"
 msgstr "Додати дочірні елементи"
@@ -1012,6 +1016,11 @@ msgstr "Додайте теги вузла мережі"
 #: app/views/trigger.massupdate.php:155
 msgid "Add host trigger"
 msgstr "Додати тригер вузла мережі"
+
+#: widgets/piechart/includes/CWidgetFieldDataSetView.php:260
+#: widgets/svggraph/includes/CWidgetFieldDataSetView.php:263
+msgid "Add item"
+msgstr ""
 
 #: app/partials/massupdate.macros.tab.php:96
 #: app/partials/massupdate.valuemaps.tab.php:38
@@ -1918,6 +1927,10 @@ msgstr "Середня кількість невиконаних запитів 
 #: app/views/administration.authentication.edit.php:131
 msgid "Avoid easy-to-guess passwords"
 msgstr "Уникайте паролів, які легко вгадати"
+
+#: jsLoader.php:172
+msgid "Awaiting data"
+msgstr ""
 
 #: widgets/svggraph/views/widget.edit.php:51
 msgid "Axes"
@@ -5540,6 +5553,10 @@ msgstr "Створити метод повідомлень"
 #: app/views/popup.import.php:143 jsLoader.php:349
 msgid "Create new"
 msgstr "Створити нові"
+
+#: jsLoader.php:372
+msgid "Create new report"
+msgstr ""
 
 #: app/views/administration.proxy.list.php:239
 msgid "Create proxy"
@@ -9684,6 +9701,10 @@ msgstr[2] "Видалено групи вузлів мережі"
 msgid "Host group elements"
 msgstr "Елементи групи вузлів мережі"
 
+#: jsLoader.php:292
+msgid "Host group is not selected."
+msgstr ""
+
 #: include/views/monitoring.sysmap.edit.php:168
 msgid "Host group label type"
 msgstr "Тип ярлика до групи вузлів мережі"
@@ -9762,6 +9783,10 @@ msgstr "Інвентарні дані вузла мережі"
 #: hostinventoriesoverview.php:26 hostinventoriesoverview.php:146
 msgid "Host inventory overview"
 msgstr "Огляд інвентарних даних вузла мережі"
+
+#: jsLoader.php:289
+msgid "Host is not selected."
+msgstr ""
 
 #: include/views/monitoring.sysmap.edit.php:183
 msgid "Host label type"
@@ -13104,6 +13129,10 @@ msgstr "Розміщення підпису до елементу карти м�
 #: include/views/monitoring.sysmap.edit.php:243
 msgid "Map element label type"
 msgstr "Тип підпису до елементу карти мережі"
+
+#: jsLoader.php:290
+msgid "Map is not selected."
+msgstr ""
 
 #: sysmap.php:128
 msgid "Map is updated! Return to map list?"
@@ -19671,6 +19700,10 @@ msgstr ""
 msgid "String functions"
 msgstr ""
 
+#: widgets/piechart/includes/WidgetForm.php:137
+msgid "Stroke width"
+msgstr ""
+
 #: include/items.inc.php:1545 include/items.inc.php:1549
 #: include/items.inc.php:1553 include/items.inc.php:1557
 msgid "Structured data"
@@ -21054,6 +21087,10 @@ msgstr "Тригер в \"невідомому\" стані"
 #, c-format
 msgid "Trigger in template \"%1$s\" has dependency with trigger in template \"%2$s\"."
 msgstr "Тригер з шаблону \"%1$s\" має залежність від тригера з шаблону \"%2$s\"."
+
+#: jsLoader.php:291
+msgid "Trigger is not selected."
+msgstr ""
 
 #: include/views/monitoring.sysmap.edit.php:198
 msgid "Trigger label type"
@@ -23118,6 +23155,10 @@ msgstr ""
 msgid "View as"
 msgstr "Переглянути як"
 
+#: jsLoader.php:417
+msgid "View related reports"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1735
 msgid "Virtual space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr "Розмір віртуального простору в байтах або відсотках від загального. Повертає ціле число для байт; дробове для відсотків"
@@ -23329,6 +23370,10 @@ msgstr ""
 
 #: jsLoader.php:187
 msgid "Widget is too small for the specified number of columns and rows."
+msgstr ""
+
+#: jsLoader.php:205
+msgid "Widgets"
 msgstr ""
 
 #: graphs.php:39 include/views/configuration.graph.edit.php:100
@@ -23702,6 +23747,10 @@ msgstr "У вас недостатньо прав для доступу до ц�
 #: include/classes/core/ZBase.php:763 include/func.inc.php:1709
 msgid "You must login to view this page."
 msgstr "Ви маєте увійти в систему для перегляду цієї сторінки."
+
+#: jsLoader.php:287
+msgid "You need to have at least one image uploaded to create map element. Images can be uploaded in Administration->General->Images section."
+msgstr ""
 
 #: include/classes/db/DB.php:133
 msgid "Your database is not working properly. Please wait a few minutes and try to repeat this action. If the problem still persists, please contact system administrator. The problem might be caused by long running transaction or row level lock accomplished by your database management system."
@@ -25706,6 +25755,10 @@ msgstr "справа"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:953
 msgid "right() - Returns the rightmost count characters"
+msgstr ""
+
+#: widgets/navtree/Widget.php:41
+msgid "root"
 msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:966

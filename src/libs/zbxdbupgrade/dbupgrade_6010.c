@@ -17,6 +17,9 @@
 #include "zbxdbhigh.h"
 #include "zbxalgo.h"
 #include "zbxnum.h"
+#include "zbxdb.h"
+#include "zbxdbschema.h"
+#include "zbxstr.h"
 #include "zbx_availability_constants.h"
 #include "zbx_host_constants.h"
 
@@ -59,8 +62,6 @@ static int	DBpatch_6010002(void)
 		" from triggers"
 		" where " ZBX_DB_CHAR_LENGTH(description) ">%d", 255);
 
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		row[1][zbx_strlen_utf8_nchars(row[1], 255)] = '\0';
@@ -74,9 +75,7 @@ static int	DBpatch_6010002(void)
 			goto out;
 	}
 
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (16 < sql_offset && ZBX_DB_OK > zbx_db_execute("%s", sql))
+	if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
 		ret = FAIL;
 out:
 	zbx_db_free_result(result);
@@ -87,7 +86,7 @@ out:
 
 static int	DBpatch_6010003(void)
 {
-	const zbx_db_field_t	old_field = {"description", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	old_field = {"description", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 	const zbx_db_field_t	field = {"description", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBmodify_field_type("triggers", &field, &old_field);
@@ -113,8 +112,6 @@ static int	DBpatch_6010005(void)
 		" from hosts_templates ht, hosts h"
 		" where ht.hostid=h.hostid and h.flags=4"); /* ZBX_FLAG_DISCOVERY_CREATED */
 
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		/* set ZBX_TEMPLATE_LINK_LLD as link_type */
@@ -125,9 +122,7 @@ static int	DBpatch_6010005(void)
 			goto out;
 	}
 
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (16 < sql_offset && ZBX_DB_OK > zbx_db_execute("%s", sql))
+	if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
 		ret = FAIL;
 out:
 	zbx_db_free_result(result);
@@ -143,7 +138,7 @@ static int	DBpatch_6010006(void)
 				{
 					{"userdirectoryid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"name", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-					{"description", "", NULL, NULL, 255, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
+					{"description", "", NULL, NULL, 255, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0},
 					{"host", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 					{"port", "389", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 					{"base_dn", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
@@ -349,8 +344,6 @@ static int	DBpatch_6010024(void)
 	if (ZBX_PROGRAM_TYPE_SERVER != DBget_program_type())
 		return SUCCEED;
 
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	result = zbx_db_select(
 			"select hi.itemid,hi.type,ht.name"
 			" from httptestitem hi,httptest ht"
@@ -390,11 +383,9 @@ static int	DBpatch_6010024(void)
 	}
 	zbx_db_free_result(result);
 
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (SUCCEED == ret && 16 < sql_offset)
+	if (SUCCEED == ret)
 	{
-		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
+		if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
 			ret = FAIL;
 	}
 
@@ -415,8 +406,6 @@ static int	DBpatch_6010025(void)
 
 	if (ZBX_PROGRAM_TYPE_SERVER != DBget_program_type())
 		return SUCCEED;
-
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = zbx_db_select(
 			"select hi.itemid,hi.type,hs.name,ht.name"
@@ -459,11 +448,9 @@ static int	DBpatch_6010025(void)
 	}
 	zbx_db_free_result(result);
 
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (SUCCEED == ret && 16 < sql_offset)
+	if (SUCCEED == ret)
 	{
-		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
+		if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
 			ret = FAIL;
 	}
 
@@ -643,7 +630,6 @@ static int	DBpatch_6010033_create_template_groups(zbx_vector_hstgrp_t *hstgrps)
 
 	zbx_db_insert_clean(&db_insert);
 	zbx_db_insert_prepare(&db_insert, "rights", "rightid", "groupid", "permission", "id", (char *)NULL);
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	for (i = 0; i < hstgrps->values_num; i++)
 	{
@@ -677,12 +663,10 @@ static int	DBpatch_6010033_create_template_groups(zbx_vector_hstgrp_t *hstgrps)
 	}
 
 	zbx_db_insert_autoincrement(&db_insert, "rightid");
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	if (SUCCEED != (ret = zbx_db_insert_execute(&db_insert)))
 		goto out;
 
-	if (16 < sql_offset && ZBX_DB_OK > zbx_db_execute("%s", sql))
+	if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
 		ret = FAIL;
 out:
 	zbx_free(sql);
@@ -1006,20 +990,12 @@ static int	DBpatch_6010045(void)
 
 static int	DBpatch_6010046(void)
 {
-#ifdef HAVE_ORACLE
-	return DBcreate_serial_sequence("changelog");
-#else
 	return SUCCEED;
-#endif
 }
 
 static int	DBpatch_6010047(void)
 {
-#ifdef HAVE_ORACLE
-	return DBcreate_serial_trigger("changelog", "changelogid");
-#else
 	return SUCCEED;
-#endif
 }
 
 static int	DBpatch_6010048(void)

@@ -19,6 +19,7 @@
 #include "../actions/actions.h"
 #include "../audit/audit_server.h"
 
+#include "zbxtimekeeper.h"
 #include "zbxnix.h"
 #include "zbxself.h"
 #include "zbxlog.h"
@@ -733,7 +734,6 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 		zbx_dc_reschedule_items(&itemids, time(NULL), proxyids);
 
 		sql_offset = 0;
-		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		for (int i = 0; i < tasks.values_num; i++)
 		{
@@ -767,10 +767,7 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 			zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 		}
 
-		zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-		if (16 < sql_offset)	/* in ORACLE always present begin..end; */
-			zbx_db_execute("%s", sql);
+		(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
 
 		zbx_vector_uint64_destroy(&itemids);
 		zbx_free(proxyids);

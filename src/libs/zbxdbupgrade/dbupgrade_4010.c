@@ -14,8 +14,9 @@
 
 #include "dbupgrade.h"
 
-#include "zbxnum.h"
 #include "zbxdbhigh.h"
+#include "zbxdb.h"
+#include "zbxdbschema.h"
 
 /*
  * 4.2 development database patches
@@ -122,7 +123,7 @@ static int	DBpatch_4010011(void)
 
 static int	DBpatch_4010012(void)
 {
-	const zbx_db_field_t	field = {"params", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"params", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 
 	return DBmodify_field_type("item_preproc", &field, NULL);
 }

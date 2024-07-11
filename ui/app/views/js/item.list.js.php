@@ -197,7 +197,8 @@
 			const overlay = PopUp('item.edit', parameters, {
 				dialogueid: 'item-edit',
 				dialogue_class: 'modal-popup-large',
-				trigger_element: target
+				trigger_element: target,
+				prevent_navigation: true
 			});
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit', this.elementSuccess.bind(this), {once: true});
@@ -299,7 +300,7 @@
 				.catch(() => {
 					clearMessages();
 
-					const message_box = makeMessageBox('bad', [t('Unexpected server error.')]);
+					const message_box = makeMessageBox('bad', [<?= json_encode(_('Unexpected server error.')) ?>]);
 
 					addMessage(message_box);
 				});

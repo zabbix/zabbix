@@ -23,7 +23,6 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.33333.3.57.0
           key: 'array.sweep_pmax[arrayMaxPowerSweep.0]'
-          history: 7d
           value_type: FLOAT
           units: W
           description: |
@@ -49,7 +48,6 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.33333.3.56.0
           key: 'array.sweep_vmp[arrayVmp.0]'
-          history: 7d
           value_type: FLOAT
           units: V
           description: |
@@ -75,7 +73,6 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.33333.3.58.0
           key: 'array.sweep_voc[arrayVoc.0]'
-          history: 7d
           value_type: FLOAT
           units: V
           description: |
@@ -101,7 +98,6 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.33333.3.31.0
           key: 'array.voltage[arrayVoltage.0]'
-          history: 7d
           value_type: FLOAT
           units: V
           description: |
@@ -148,7 +144,6 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.33333.3.33.0
           key: 'charge.current[chargeCurrent.0]'
-          history: 7d
           value_type: FLOAT
           units: A
           description: |
@@ -174,7 +169,6 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.33333.3.39.0
           key: 'charge.state[chargeState.0]'
-          history: 7d
           value_type: FLOAT
           description: |
             MIB: SUNSAVER-MPPT
@@ -224,7 +218,6 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.33333.3.43.0
           key: 'counter.charge_amp_hours[ahChargeResettable.0]'
-          history: 7d
           value_type: FLOAT
           units: Ah
           description: |
@@ -246,7 +239,6 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.33333.3.45.0
           key: 'counter.charge_kw_hours[kwhCharge.0]'
-          history: 7d
           units: '!kWh'
           description: 'MIB: SUNSAVER-MPPT'
           tags:
@@ -257,7 +249,6 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.33333.3.49.0
           key: 'counter.load_amp_hours[ahLoadResettable.0]'
-          history: 7d
           value_type: FLOAT
           units: Ah
           description: |
@@ -279,7 +270,6 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.33333.3.34.0
           key: 'load.current[loadCurrent.0]'
-          history: 7d
           value_type: FLOAT
           units: A
           description: |
@@ -305,7 +295,6 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.33333.3.46.0
           key: 'load.state[loadState.0]'
-          history: 7d
           value_type: FLOAT
           description: |
             MIB: SUNSAVER-MPPT
@@ -355,7 +344,6 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.33333.3.32.0
           key: 'load.voltage[loadVoltage.0]'
-          history: 7d
           value_type: FLOAT
           units: V
           description: |
@@ -382,7 +370,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.4.1.33333.3.52.0
           key: 'status.alarms[alarms.0]'
           history: 1h
-          trends: '0'
           value_type: TEXT
           description: |
             MIB: SUNSAVER-MPPT
@@ -540,7 +527,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.4.1.33333.3.40.0
           key: 'status.array_faults[arrayFaults.0]'
           history: 1h
-          trends: '0'
           value_type: TEXT
           description: |
             MIB: SUNSAVER-MPPT
@@ -656,7 +642,6 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.25.1.1.0
           key: status.hw.uptime
-          history: 7d
           units: uptime
           description: 'The amount of time since this host was last initialized. Note that this is different from sysUpTime in the SNMPv2-MIB [RFC1907] because sysUpTime is the uptime of the network management portion of the system.'
           preprocessing:
@@ -677,7 +662,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.4.1.33333.3.47.0
           key: 'status.load_faults[loadFaults.0]'
           history: 1h
-          trends: '0'
           value_type: TEXT
           description: |
             MIB: SUNSAVER-MPPT
@@ -784,7 +768,6 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.3.0
           key: status.net.uptime
-          history: 7d
           units: uptime
           description: 'The time (in hundredths of a second) since the network management portion of the system was last re-initialized.'
           preprocessing:
@@ -810,7 +793,6 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.33333.3.42.0
           key: 'target.voltage[targetVoltage.0]'
-          history: 7d
           value_type: FLOAT
           units: V
           description: |
@@ -836,7 +818,6 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.33333.3.37.0
           key: 'temp.ambient[ambientTemperature.0]'
-          history: 7d
           value_type: FLOAT
           units: C
           description: |
@@ -854,7 +835,6 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.33333.3.36.0
           key: 'temp.battery[batteryTemperature.0]'
-          history: 7d
           value_type: FLOAT
           units: C
           description: |
@@ -915,7 +895,6 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.33333.3.35.0
           key: 'temp.heatsink[heatsinkTemperature.0]'
-          history: 7d
           value_type: FLOAT
           units: C
           description: |
@@ -933,7 +912,6 @@ zabbix_export:
           name: 'Battery voltage discovery'
           type: DEPENDENT
           key: battery.voltage.discovery
-          delay: '0'
           description: 'Discovery for battery voltage triggers'
           item_prototypes:
             - uuid: 903b96b7eb37482da469fc802d3da1b0
@@ -941,7 +919,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: 1.3.6.1.4.1.33333.3.30.0
               key: 'battery.voltage[batteryVoltage.0{#SINGLETON}]'
-              history: 7d
               value_type: FLOAT
               units: V
               description: |

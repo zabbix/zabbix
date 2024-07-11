@@ -12,11 +12,12 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#include "zbxcomms.h"
-
-#include "zbxstr.h"
+#include "zbxcommon.h"
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+
+#include "zbxcomms.h"
+#include "zbxstr.h"
 
 static zbx_get_program_type_f		zbx_get_program_type_cb = NULL;
 

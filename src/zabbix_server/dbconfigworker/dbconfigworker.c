@@ -14,7 +14,7 @@
 
 #include "dbconfigworker.h"
 
-#include "zbx_host_constants.h"
+#include "zbxtimekeeper.h"
 #include "zbxlog.h"
 #include "zbxself.h"
 #include "zbxipcservice.h"
@@ -24,6 +24,8 @@
 #include "zbxcacheconfig.h"
 #include "zbxalgo.h"
 #include "zbxdbhigh.h"
+#include "zbxdb.h"
+#include "zbxstr.h"
 
 static void	dbsync_item_rtname(zbx_vector_uint64_t *hostids, int *processed_num, int *updated_num,
 		int *macro_used)
@@ -53,7 +55,6 @@ static void	dbsync_item_rtname(zbx_vector_uint64_t *hostids, int *processed_num,
 	um_handle = zbx_dc_open_user_macros();
 
 	zbx_db_begin();
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	for (zbx_uint64_t *batch = hostids->values; batch < hostids->values + hostids->values_num;
 			batch += ZBX_DBCONFIG_BATCH_SIZE)
@@ -110,10 +111,7 @@ static void	dbsync_item_rtname(zbx_vector_uint64_t *hostids, int *processed_num,
 		zbx_db_free_result(result);
 	}
 
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
-		zbx_db_execute("%s", sql);
+	(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
 
 	zbx_free(sql_select);
 	zbx_free(sql);

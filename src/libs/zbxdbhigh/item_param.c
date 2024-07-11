@@ -14,6 +14,9 @@
 
 #include "zbxdbhigh.h"
 
+#include "zbxalgo.h"
+#include "zbxstr.h"
+
 ZBX_PTR_VECTOR_IMPL(item_param_ptr, zbx_item_param_t *)
 
 zbx_item_param_t	*zbx_item_param_create(const char *item_param_name,

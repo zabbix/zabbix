@@ -45,7 +45,7 @@ dnl *****************************************************************
 
 AC_PROG_EGREP
 
-AC_CHECK_HEADERS(stdio.h stdlib.h string.h unistd.h netdb.h signal.h \
+AC_CHECK_HEADERS(stdio.h stdlib.h string.h unistd.h netdb.h signal.h malloc.h \
   syslog.h time.h errno.h sys/types.h sys/stat.h netinet/in.h \
   math.h sys/socket.h dirent.h ctype.h \
   fcntl.h sys/param.h arpa/inet.h \
@@ -54,7 +54,7 @@ AC_CHECK_HEADERS(stdio.h stdlib.h string.h unistd.h netdb.h signal.h \
   sys/time.h kstat.h sys/syscall.h sys/sysmacros.h \
   stdint.h mach/host_info.h mach/mach_host.h pwd.h \
   sys/var.h arpa/nameser.h assert.h sys/dkstat.h sys/disk.h sys/sched.h \
-  zone.h nlist.h kvm.h linux/kernel.h linux/version.h procinfo.h sys/dk.h \
+  zone.h nlist.h kvm.h linux/version.h procinfo.h sys/dk.h \
   sys/resource.h pthread.h windows.h process.h conio.h sys/wait.h \
   stdarg.h winsock2.h pdh.h psapi.h sys/sem.h sys/ipc.h sys/shm.h Winldap.h \
   Winber.h lber.h ws2tcpip.h inttypes.h sys/file.h grp.h \
@@ -891,6 +891,7 @@ AC_CHECK_FUNCS(tzset)
 AC_CHECK_FUNCS(unsetenv)
 AC_CHECK_FUNCS(sigqueue)
 AC_CHECK_FUNCS(round)
+AC_CHECK_FUNCS(malloc_trim)
 
 dnl *****************************************************************
 dnl *                                                               *
@@ -1283,26 +1284,6 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 		fi
 	fi
 
-	dnl Checking for Oracle support
-	AX_LIB_ORACLE_OCI([10.0])
-	if test "x$want_oracle_oci" = "xyes"; then
-		if test "x$have_db" != "xno"; then
-			AC_MSG_ERROR([You can configure for only one database.])
-		fi
-
-		if test "x$HAVE_ORACLE_OCI" = "xyes"; then
-			have_db="Oracle"
-
-			ORACLE_CPPFLAGS="$ORACLE_OCI_CFLAGS"
-			ORACLE_LDFLAGS="$ORACLE_OCI_LDFLAGS"
-			ORACLE_LIBS="$ORACLE_OCI_LIBS"
-
-			AC_DEFINE(HAVE_ORACLE,1,[Define to 1 if Oracle should be enabled.])
-		else
-			AC_MSG_ERROR([Oracle OCI library not found])
-		fi
-	fi
-
 	dnl Checking for PostgreSQL support
 	AX_LIB_POSTGRESQL("9.2")
 	if test "x$want_postgresql" = "xyes"; then
@@ -1362,7 +1343,7 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 	AC_MSG_CHECKING(for Zabbix server/proxy database selection)
 	if test "x$have_db" = "xno"; then
 		AC_MSG_RESULT(error)
-		AC_MSG_ERROR([No database selected for Zabbix server/proxy. Use --with-mysql or --with-oracle or --with-postgresql or --with-sqlite3.])
+		AC_MSG_ERROR([No database selected for Zabbix server/proxy. Use --with-mysql or --with-postgresql or --with-sqlite3.])
 	else
 		AC_MSG_RESULT(ok)
 	fi
@@ -1375,9 +1356,9 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 		AC_MSG_RESULT(no)
 	fi
 
-	DB_CFLAGS="$MYSQL_CFLAGS $ORACLE_CPPFLAGS $POSTGRESQL_CFLAGS $SQLITE3_CPPFLAGS"
-	DB_LDFLAGS="$MYSQL_LDFLAGS $ORACLE_LDFLAGS $POSTGRESQL_LDFLAGS $SQLITE3_LDFLAGS"
-	DB_LIBS="$MYSQL_LIBS $ORACLE_LIBS $POSTGRESQL_LIBS $SQLITE3_LIBS"
+	DB_CFLAGS="$MYSQL_CFLAGS $POSTGRESQL_CFLAGS $SQLITE3_CPPFLAGS"
+	DB_LDFLAGS="$MYSQL_LDFLAGS $POSTGRESQL_LDFLAGS $SQLITE3_LDFLAGS"
+	DB_LIBS="$MYSQL_LIBS $POSTGRESQL_LIBS $SQLITE3_LIBS"
 
 	AC_SUBST(DB_CFLAGS)
 	AC_SUBST(DB_LDFLAGS)
@@ -1977,8 +1958,6 @@ AC_CONFIG_FILES([
 	database/Makefile
 	database/mysql/Makefile
 	database/mysql/option-patches/Makefile
-	database/oracle/Makefile
-	database/oracle/option-patches/Makefile
 	database/postgresql/Makefile
 	database/postgresql/option-patches/Makefile
 	database/postgresql/timescaledb/Makefile

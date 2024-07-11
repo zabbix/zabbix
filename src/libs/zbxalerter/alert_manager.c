@@ -16,6 +16,8 @@
 #include "alerter_defs.h"
 
 #include "alerter_protocol.h"
+
+#include "zbxtimekeeper.h"
 #include "zbxlog.h"
 #include "zbxalgo.h"
 #include "zbxdb.h"
@@ -29,7 +31,6 @@
 #include "zbxstr.h"
 #include "zbxthreads.h"
 #include "zbxtime.h"
-#include "zbxtypes.h"
 #include "zbxxml.h"
 #include "zbxjson.h"
 
@@ -1038,8 +1039,6 @@ static zbx_am_alerter_t	*am_get_alerter_by_client(zbx_am_t *manager, zbx_ipc_cli
 
 #if defined(HAVE_MYSQL)
 #	define ZBX_DATABASE_TYPE "MySQL"
-#elif defined(HAVE_ORACLE)
-#	define ZBX_DATABASE_TYPE "Oracle"
 #elif defined(HAVE_POSTGRESQL)
 #	define ZBX_DATABASE_TYPE "PostgreSQL"
 #else
@@ -2275,6 +2274,24 @@ static void	am_process_diag_top_sources(zbx_am_t *manager, zbx_ipc_client_t *cli
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+static int	am_check_dbstatus(void)
+{
+	int		ret = ZBX_DB_OK;
+	zbx_db_result_t	res;
+
+	res = zbx_db_select_once("select null");
+
+	if ((zbx_db_result_t)ZBX_DB_DOWN == res || NULL == res)
+	{
+		zbx_db_close();
+		ret = zbx_db_connect(ZBX_DB_CONNECT_ONCE);
+	}
+	else
+		zbx_db_free_result(res);
+
+	return ret;
+}
+
 ZBX_THREAD_ENTRY(zbx_alert_manager_thread, args)
 {
 #define ZBX_DB_PING_FREQUENCY			SEC_PER_MIN
@@ -2304,7 +2321,7 @@ ZBX_THREAD_ENTRY(zbx_alert_manager_thread, args)
 		exit(EXIT_FAILURE);
 	}
 
-	manager.dbstatus = ZBX_DB_OK;
+	manager.dbstatus = zbx_db_connect(ZBX_DB_CONNECT_ONCE);
 
 	/* initialize statistics */
 	time_stat = zbx_time();
@@ -2327,8 +2344,7 @@ ZBX_THREAD_ENTRY(zbx_alert_manager_thread, args)
 
 		if ((time_ping + ZBX_DB_PING_FREQUENCY) < now)
 		{
-			manager.dbstatus = zbx_db_connect(ZBX_DB_CONNECT_ONCE);
-			zbx_db_close();
+			manager.dbstatus = am_check_dbstatus();
 			time_ping = now;
 		}
 		if (ZBX_DB_DOWN == manager.dbstatus)

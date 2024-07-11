@@ -178,7 +178,7 @@ class testDashboardGaugeWidget extends testWidgets {
 
 			// Units.
 			'id:units_show' => ['value' => true, 'enabled' => true, 'visible' => false],
-			'id:units' => ['value' => '', 'maxlength' => 2048, 'enabled' => true, 'visible' => false],
+			'id:units' => ['value' => '', 'maxlength' => 255, 'enabled' => true, 'visible' => false],
 			'id:units_size' => ['value' => 25, 'maxlength' => 3, 'enabled' => true, 'visible' => false],
 			'id:units_pos' => ['value' => 'After value', 'enabled' => true, 'visible' => false],
 			'id:units_bold' => ['value' => false, 'enabled' => true, 'visible' => false],
@@ -970,6 +970,8 @@ class testDashboardGaugeWidget extends testWidgets {
 				self::$update_gauge = $header;
 			}
 		}
+
+		COverlayDialogElement::find()->one()->close();
 	}
 
 	public function testDashboardGaugeWidget_SimpleUpdate() {
@@ -998,7 +1000,7 @@ class testDashboardGaugeWidget extends testWidgets {
 			[
 				[
 					'cancel_form' => false,
-					'create_widget' => false,
+					'create_widget' => true,
 					'save_dashboard' => false
 				]
 			],
@@ -1086,6 +1088,7 @@ class testDashboardGaugeWidget extends testWidgets {
 		// Check that updating widget form values did not change in frontend.
 		if (!$create && !$save_dashboard) {
 			$this->assertEquals($values, $dashboard->getWidget(self::$update_gauge)->edit()->getValues());
+			COverlayDialogElement::find()->one()->close();
 		}
 
 		// Check that DB hash is not changed.

@@ -20,11 +20,12 @@
 #include "zbxgetopt.h"
 #include "zbxjson.h"
 #include "zbxmutexs.h"
-#include "zbxcrypto.h"
 #include "zbxstr.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
 #include "zbxfile.h"
+#include "zbxalgo.h"
+#include "zbxcomms.h"
 #include "zbxbincommon.h"
 
 #if !defined(_WINDOWS)

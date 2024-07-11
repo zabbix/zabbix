@@ -18,6 +18,7 @@
 
 #include "../events/events.h"
 
+#include "zbxtimekeeper.h"
 #include "zbxnix.h"
 #include "zbxlog.h"
 #include "zbxipcservice.h"
@@ -25,7 +26,6 @@
 #include "zbxtime.h"
 #include "zbx_item_constants.h"
 #include "zbxstr.h"
-#include "zbxalgo.h"
 #include "zbxcacheconfig.h"
 #include "zbxdbhigh.h"
 
@@ -147,12 +147,9 @@ static void	lld_process_task(const zbx_ipc_message_t *message)
 		diff.itemid = itemid;
 		zbx_vector_item_diff_ptr_append(&diffs, &diff);
 
-		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 		zbx_db_save_item_changes(&sql, &sql_alloc, &sql_offset, &diffs, ZBX_FLAGS_ITEM_DIFF_UPDATE_DB);
-		zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-		if (16 < sql_offset)
-			zbx_db_execute("%s", sql);
+		(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
 
 		zbx_dc_config_items_apply_changes(&diffs);
 

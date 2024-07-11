@@ -18,6 +18,11 @@
 #include "zbxdbhigh.h"
 #include "zbxcrypto.h"
 #include "zbxnum.h"
+#include "zbxalgo.h"
+#include "zbxdb.h"
+#include "zbxdbschema.h"
+#include "zbxexpr.h"
+#include "zbxstr.h"
 
 /*
  * 6.0 development database patches
@@ -435,12 +440,7 @@ static int	DBpatch_5050050(void)
 #define DBPATCH_SYSMAPS_LABEL_LEN		255
 #define DBPATCH_SYSMAPS_ELEMENTS_LABEL_LEN	2048
 #define DBPATCH_SYSMAPS_LINKS_LABEL_LEN		2048
-
-#if defined(HAVE_ORACLE)
-#	define DBPATCH_SHORTTEXT_LEN		2048
-#else
-#	define DBPATCH_SHORTTEXT_LEN		65535
-#endif
+#define DBPATCH_SHORTTEXT_LEN			65535
 
 static int	dbpatch_update_simple_macro(const char *table, const char *field, const char *id, size_t field_len,
 		const char *descr)
@@ -455,8 +455,6 @@ static int	dbpatch_update_simple_macro(const char *table, const char *field, con
 		return SUCCEED;
 
 	sql = zbx_malloc(NULL, sql_alloc);
-
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = zbx_db_select("select %s,%s from %s", id, field, table);
 
@@ -510,11 +508,9 @@ static int	dbpatch_update_simple_macro(const char *table, const char *field, con
 	}
 	zbx_db_free_result(result);
 
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (SUCCEED == ret && 16 < sql_offset)
+	if (SUCCEED == ret)
 	{
-		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
+		if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
 			ret = FAIL;
 	}
 
@@ -717,7 +713,7 @@ static int	DBpatch_5050068(void)
 
 static int	DBpatch_5050070(void)
 {
-	const zbx_db_field_t	old_field = {"params", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	old_field = {"params", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 	const zbx_db_field_t	field = {"params", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 
 	return DBmodify_field_type("item_preproc", &field, &old_field);
@@ -726,14 +722,14 @@ static int	DBpatch_5050070(void)
 static int	DBpatch_5050071(void)
 {
 	const zbx_db_field_t	old_field = {"description", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
-	const zbx_db_field_t	field = {"description", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"description", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 
 	return DBmodify_field_type("triggers", &field, &old_field);
 }
 
 static int	DBpatch_5050072(void)
 {
-	const zbx_db_field_t	old_field = {"message", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	old_field = {"message", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 	const zbx_db_field_t	field = {"message", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 
 	return DBmodify_field_type("media_type_message", &field, &old_field);
@@ -1090,7 +1086,7 @@ static int	DBpatch_5050103(void)
 static int	DBpatch_5050104(void)
 {
 	const zbx_db_field_t	old_field = {"dbversion_status", "", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
-	const zbx_db_field_t	new_field = {"dbversion_status", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	new_field = {"dbversion_status", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 
 	return DBmodify_field_type("config", &new_field, &old_field);
 }
@@ -1186,8 +1182,6 @@ static int	DBpatch_5050114(void)
 	/* 22 - ZBX_PREPROC_PROMETHEUS_PATTERN */
 	result = zbx_db_select("select item_preprocid,params from item_preproc where type=22");
 
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	while (SUCCEED == ret && NULL != (row = zbx_db_fetch(result)))
 	{
 		char	*params_esc;
@@ -1211,11 +1205,9 @@ static int	DBpatch_5050114(void)
 
 	zbx_db_free_result(result);
 
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (SUCCEED == ret && 16 < sql_offset)
+	if (SUCCEED == ret)
 	{
-		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
+		if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
 			ret = FAIL;
 	}
 
@@ -1237,7 +1229,7 @@ static int	DBpatch_5050115(void)
 					{"effective_date", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 					{"timezone", "UTC", NULL, NULL, 50, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 					{"status", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-					{"description", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
+					{"description", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0},
 					{0}
 				},
 				NULL
@@ -1345,7 +1337,7 @@ static int	DBpatch_5050125(void)
 
 static int	DBpatch_5050126(void)
 {
-	const zbx_db_field_t	field = {"description", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"description", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("services", &field);
 }
@@ -1773,8 +1765,6 @@ static int	DBpatch_5050132(void)
 	zbx_db_row_t	row;
 	zbx_db_result_t	result;
 
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	result = zbx_db_select("select serviceid,name from services");
 
 	while (NULL != (row = zbx_db_fetch(result)))
@@ -1788,9 +1778,7 @@ static int	DBpatch_5050132(void)
 			goto out;
 	}
 
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (16 < sql_offset && ZBX_DB_OK > zbx_db_execute("%s", sql))
+	if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
 		ret = FAIL;
 out:
 	zbx_db_free_result(result);
@@ -1877,7 +1865,7 @@ static int	DBpatch_5050142(void)
 
 static int	DBpatch_5050143(void)
 {
-	const zbx_db_field_t	old_field = {"parameters", "{}", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	old_field = {"parameters", "{}", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 	const zbx_db_field_t	field = {"parameters", "{}", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 
 	return DBmodify_field_type("alerts", &field, &old_field);

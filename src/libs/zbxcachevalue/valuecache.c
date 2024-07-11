@@ -17,6 +17,9 @@
 #include "zbxmutexs.h"
 #include "zbxtime.h"
 #include "zbxvariant.h"
+#include "zbxalgo.h"
+#include "zbxhistory.h"
+#include "zbxshmem.h"
 
 /*
  * The cache (zbx_vc_cache_t) is organized as a hashset of item records (zbx_vc_item_t).
@@ -2611,6 +2614,9 @@ int	zbx_vc_get_values(zbx_uint64_t itemid, unsigned char value_type, zbx_vector_
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64 " value_type:%d count:%d period:%d end_timestamp"
 			" '%s'", __func__, itemid, value_type, count, seconds, zbx_timespec_str(ts));
+
+	if (ITEM_VALUE_TYPE_BIN == value_type)
+		return FAIL;
 
 	RDLOCK_CACHE;
 

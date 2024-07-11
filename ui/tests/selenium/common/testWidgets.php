@@ -40,29 +40,29 @@ class testWidgets extends CWebTest {
 		$this->page->login()->open($url)->waitUntilReady();
 
 		// Open widget form dialog.
-		$widget_dialog = CDashboardElement::find()->one()->waitUntilReady()->edit()->addWidget()->asForm();
-		$widget_dialog->fill(['Type' => CFormElement::RELOADABLE_FILL($widget)]);
+		$widget_dialog = CDashboardElement::find()->one()->waitUntilReady()->edit()->addWidget();
+		$widget_form = $widget_dialog->asForm();
+		$widget_form->fill(['Type' => CFormElement::RELOADABLE_FILL($widget)]);
 
 		// Assign the dialog from where the last Select button will be clicked.
 		$select_dialog = $widget_dialog;
 
 		// Item types expected in items table. For the most cases theses are all items except of Binary and dependent.
-		$item_types = ($widget === 'Item navigator')
+		$item_types = (in_array($widget, ['Item navigator', 'Item history', 'Honeycomb']))
 			? ['Binary item', 'Character item', 'Float item', 'Log item', 'Text item', 'Unsigned item', 'Unsigned_dependent item']
 			: ['Character item', 'Float item', 'Log item', 'Text item', 'Unsigned item', 'Unsigned_dependent item'];
 
 		switch ($widget) {
 			case 'Top hosts':
-				$widget_dialog->getFieldContainer('Columns')->query('button:Add')->one()->waitUntilClickable()->click();
+			case 'Item history':
+				$widget_form->getFieldContainer('Columns')->query('button:Add')->one()->waitUntilClickable()->click();
 				$column_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
-
-				// For Top hosts widget final dialog is New column dialog.
 				$select_dialog = $column_dialog;
 				break;
 
 			case 'Clock':
-				$widget_dialog->fill(['Time type' => CFormElement::RELOADABLE_FILL('Host time')]);
-				$this->assertTrue($widget_dialog->getField('Item')->isVisible());
+				$widget_form->fill(['Time type' => CFormElement::RELOADABLE_FILL('Host time')]);
+				$this->assertTrue($widget_form->getField('Item')->isVisible());
 				break;
 
 			case 'Graph':
@@ -73,11 +73,15 @@ class testWidgets extends CWebTest {
 				break;
 
 			case 'Graph prototype':
-				$widget_dialog->fill(['Source' => 'Simple graph prototype']);
-				$this->assertTrue($widget_dialog->getField('Item prototype')->isVisible());
+				$widget_form->fill(['Source' => 'Simple graph prototype']);
+				$this->assertTrue($widget_form->getField('Item prototype')->isVisible());
 
 				// For Graph prototype only numeric item prototypes are available.
 				$item_types = ['Float item prototype', 'Unsigned item prototype', 'Unsigned_dependent item prototype'];
+				break;
+
+			case 'Honeycomb':
+				$select_dialog = $widget_form->getFieldContainer('Item patterns');
 				break;
 		}
 
@@ -103,6 +107,14 @@ class testWidgets extends CWebTest {
 		$items_dialog->query('class:multiselect-control')->asMultiselect()->one()->fill(self::HOST_ALL_ITEMS);
 		$table->waitUntilReloaded();
 		$this->assertTableDataColumn($item_types, 'Name', self::TABLE_SELECTOR);
+
+		// Close all dialogs.
+		$dialogs = COverlayDialogElement::find()->all();
+
+		$dialog_count = $dialogs->count();
+		for ($i = $dialog_count - 1; $i >= 0; $i--) {
+			$dialogs->get($i)->close(true);
+		}
 	}
 
 	/**

@@ -55,9 +55,9 @@
 #include "zbxdb.h"
 #include "zbxmutexs.h"
 #include "zbxautoreg.h"
-#include "zbxexpression.h"
 #include "zbxpgservice.h"
 #include "zbxinterface.h"
+#include "zbxhistory.h"
 
 ZBX_PTR_VECTOR_IMPL(inventory_value_ptr, zbx_inventory_value_t *)
 ZBX_PTR_VECTOR_IMPL(hc_item_ptr, zbx_hc_item_t *)
@@ -7844,15 +7844,6 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 
 	zbx_dbsync_init_changelog(&proxy_sync, changelog_sync_mode);
 
-
-#ifdef HAVE_ORACLE
-	/* With Oracle fetch statements can fail before all data has been fetched. */
-	/* In such cache next sync will need to do full scan rather than just      */
-	/* applying changelog diff. To detect this problem configuration is synced */
-	/* in transaction and error is checked at the end.                         */
-	zbx_db_begin();
-#endif
-
 	sec = zbx_time();
 	if (FAIL == zbx_dbsync_compare_config(&config_sync))
 		goto out;
@@ -8065,6 +8056,12 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 
 	/* sync item data to support item lookups when resolving macros during configuration sync */
 
+	/* fetch prototype items before items to avoid item fetch consuming prototype changelog records */
+	sec = zbx_time();
+	if (FAIL == zbx_dbsync_compare_prototype_items(&prototype_items_sync))
+		goto out;
+	pisec = zbx_time() - sec;
+
 	sec = zbx_time();
 	if (FAIL == zbx_dbsync_compare_interfaces(&if_sync))
 		goto out;
@@ -8079,11 +8076,6 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 	if (FAIL == zbx_dbsync_compare_template_items(&template_items_sync))
 		goto out;
 	tisec = zbx_time() - sec;
-
-	sec = zbx_time();
-	if (FAIL == zbx_dbsync_compare_prototype_items(&prototype_items_sync))
-		goto out;
-	pisec = zbx_time() - sec;
 
 	sec = zbx_time();
 	if (FAIL == zbx_dbsync_compare_item_discovery(&item_discovery_sync))
@@ -8115,16 +8107,16 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 	/* relies on hosts, proxies and interfaces, must be after DCsync_{hosts,interfaces}() */
 
 	sec = zbx_time();
+	DCsync_prototype_items(&prototype_items_sync);
+	pisec2 = zbx_time() - sec;
+
+	sec = zbx_time();
 	DCsync_items(&items_sync, new_revision, flags, synced, deleted_itemids, pnew_items);
 	isec2 = zbx_time() - sec;
 
 	sec = zbx_time();
 	DCsync_template_items(&template_items_sync);
 	tisec2 = zbx_time() - sec;
-
-	sec = zbx_time();
-	DCsync_prototype_items(&prototype_items_sync);
-	pisec2 = zbx_time() - sec;
 
 	sec = zbx_time();
 	DCsync_item_discovery(&item_discovery_sync);
@@ -8643,12 +8635,6 @@ out:
 
 	FINISH_SYNC;
 
-#ifdef HAVE_ORACLE
-	if (ZBX_DB_OK == dberr)
-		dberr = zbx_db_commit();
-	else
-		zbx_db_rollback();
-#endif
 	switch (dberr)
 	{
 		case ZBX_DB_OK:
@@ -17054,8 +17040,8 @@ void	zbx_dc_get_unused_macro_templates(zbx_hashset_t *templates, const zbx_vecto
 }
 
 #ifdef HAVE_TESTS
-#	include "../../../tests/libs/zbxdbcache/dc_item_poller_type_update_test.c"
-#	include "../../../tests/libs/zbxdbcache/dc_function_calculate_nextcheck_test.c"
+#	include "../../../tests/libs/zbxcacheconfig/dc_item_poller_type_update_test.c"
+#	include "../../../tests/libs/zbxcacheconfig/dc_function_calculate_nextcheck_test.c"
 #endif
 
 void	zbx_recalc_time_period(time_t *ts_from, int table_group)

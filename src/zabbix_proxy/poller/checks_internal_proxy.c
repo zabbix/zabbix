@@ -12,9 +12,9 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#include "zbxcommon.h"
 #include "poller_proxy.h"
 #include "zbxproxybuffer.h"
+#include "zbxcacheconfig.h"
 
 /******************************************************************************
  *                                                                            *

@@ -26,6 +26,8 @@
 #include "zbxstr.h"
 #include "zbxhash.h"
 #include "zbxcrypto.h"
+#include "zbxdb.h"
+#include "zbxnum.h"
 
 /*
  * 7.0 development database patches
@@ -97,10 +99,7 @@ static int	DBpatch_6050008(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-#if defined(HAVE_ORACLE)
-	if (SUCCEED == zbx_db_check_oracle_colum_type("history", "value", ZBX_TYPE_FLOAT))
-		return SUCCEED;
-#elif defined(HAVE_POSTGRESQL)
+#if defined(HAVE_POSTGRESQL)
 	if (SUCCEED == DBcheck_field_type("history", &field))
 		return SUCCEED;
 #endif
@@ -120,10 +119,7 @@ static int	DBpatch_6050009(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-#if defined(HAVE_ORACLE)
-	if (SUCCEED == zbx_db_check_oracle_colum_type("trends", "value_min", ZBX_TYPE_FLOAT))
-		return SUCCEED;
-#elif defined(HAVE_POSTGRESQL)
+#if defined(HAVE_POSTGRESQL)
 	if (SUCCEED == DBcheck_field_type("trends", &field))
 		return SUCCEED;
 #endif
@@ -138,10 +134,7 @@ static int	DBpatch_6050010(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-#if defined(HAVE_ORACLE)
-	if (SUCCEED == zbx_db_check_oracle_colum_type("trends", "value_avg", ZBX_TYPE_FLOAT))
-		return SUCCEED;
-#elif defined(HAVE_POSTGRESQL)
+#if defined(HAVE_POSTGRESQL)
 	if (SUCCEED == DBcheck_field_type("trends", &field))
 		return SUCCEED;
 #endif
@@ -160,13 +153,10 @@ static int	DBpatch_6050011(void)
 	const zbx_db_field_t	field = {"value_max", "0.0000", NULL, NULL, 0, ZBX_TYPE_FLOAT, ZBX_NOTNULL, 0};
 	int			ret;
 
-#if defined(HAVE_ORACLE)
-	if (SUCCEED == zbx_db_check_oracle_colum_type("trends", "value_max", ZBX_TYPE_FLOAT))
-		return SUCCEED;
-#elif defined(HAVE_POSTGRESQL)
+#if defined(HAVE_POSTGRESQL)
 	if (SUCCEED == DBcheck_field_type("trends", &field))
 		return SUCCEED;
-#endif /* defined(HAVE_ORACLE) */
+#endif
 
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -422,7 +412,7 @@ static int	DBpatch_6050034(void)
 				{"proxyid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 				{"name", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 				{"operating_mode", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-				{"description", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
+				{"description", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0},
 				{"tls_connect", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 				{"tls_accept", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 				{"tls_issuer", "", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
@@ -958,7 +948,7 @@ static int	DBpatch_6050087(void)
 
 static int	DBpatch_6050090(void)
 {
-	const zbx_db_field_t	old_field = {"info", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	old_field = {"info", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 	const zbx_db_field_t	field = {"info", "", NULL, NULL, 0, ZBX_TYPE_LONGTEXT, ZBX_NOTNULL, 0};
 
 	return DBmodify_field_type("task_remote_command_result", &field, &old_field);
@@ -1464,8 +1454,6 @@ static int	DBpatch_6050133(void)
 		goto out;
 	}
 
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	result = zbx_db_select("select widget_fieldid,name from widget_field where name like '%%.%%.%%'");
 
 	while (NULL != (row = zbx_db_fetch(result)))
@@ -1510,10 +1498,8 @@ static int	DBpatch_6050133(void)
 	}
 	zbx_db_free_result(result);
 
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
-		zbx_db_execute("%s", sql);
+	if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
+		goto out;
 
 	ret = SUCCEED;
 out:
@@ -1806,8 +1792,6 @@ static int	DBpatch_6050149(void)
 	zbx_eval_init(&ctx);
 	zbx_vector_uint32_create(&del_idx);
 
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	/* ITEM_TYPE_CALCULATED = 15 */
 	result = zbx_db_select("select itemid,params from items where type=15 and params like '%%%s%%'", LAST_FOREACH);
 
@@ -1875,11 +1859,9 @@ static int	DBpatch_6050149(void)
 	}
 	zbx_db_free_result(result);
 
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (SUCCEED == ret && 16 < sql_offset)
+	if (SUCCEED == ret)
 	{
-		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
+		if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
 			ret = FAIL;
 	}
 
@@ -2023,8 +2005,6 @@ static int	DBpatch_6050165(void)
 	char		*sql = NULL, *buf = NULL, *like_condition;
 	size_t		sql_alloc = 0, sql_offset = 0, buf_alloc;
 
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	/* functions table contains history functions used in trigger expressions */
 	like_condition = zbx_db_dyn_escape_like_pattern(BACKSLASH_MATCH_PATTERN);
 	if (NULL == (result = zbx_db_select("select functionid,parameter,triggerid"
@@ -2094,13 +2074,12 @@ static int	DBpatch_6050165(void)
 	}
 
 	zbx_db_free_result(result);
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (SUCCEED == ret && 16 < sql_offset)
+	if (SUCCEED == ret)
 	{
-		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
+		if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
 			ret = FAIL;
 	}
+
 clean:
 	zbx_free(like_condition);
 	zbx_free(buf);
@@ -2183,8 +2162,6 @@ int			ret = SUCCEED;
 	char			*sql = NULL, *error = NULL, *like_condition;
 	size_t			sql_alloc = 0, sql_offset = 0;
 
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	like_condition = zbx_db_dyn_escape_like_pattern(BACKSLASH_MATCH_PATTERN);
 
 	if (NULL == (result = zbx_db_select("select itemid,params from items "
@@ -2217,13 +2194,12 @@ int			ret = SUCCEED;
 	}
 
 	zbx_db_free_result(result);
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (SUCCEED == ret && 16 < sql_offset)
+	if (SUCCEED == ret)
 	{
-		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
+		if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
 			ret = FAIL;
 	}
+
 clean:
 	zbx_free(like_condition);
 	zbx_free(error);
@@ -2302,8 +2278,6 @@ static int	fix_expression_macro_escaping(const char *table, const char *id_col, 
 	char			*sql = NULL, *like_condition;
 	size_t			sql_alloc = 0, sql_offset = 0;
 
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	like_condition = zbx_db_dyn_escape_like_pattern(BACKSLASH_MATCH_PATTERN);
 
 	if (NULL == (result = zbx_db_select("select %s,%s from %s where %s like '%%%s%%'",
@@ -2376,13 +2350,13 @@ static int	fix_expression_macro_escaping(const char *table, const char *id_col, 
 	}
 
 	zbx_db_free_result(result);
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	if (SUCCEED == ret && 16 < sql_offset)
+	if (SUCCEED == ret)
 	{
-		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
+		if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
 			ret = FAIL;
 	}
+
 clean:
 	zbx_free(like_condition);
 	zbx_free(sql);
@@ -2622,8 +2596,6 @@ static int	DBpatch_6050176_update(zbx_vector_wiget_field_t *time_from, zbx_vecto
 	size_t	sql_alloc = 0, sql_offset = 0;
 	int	i, ret = SUCCEED;
 
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	for (i = 0; i < time_from->values_num; i++)
 	{
 		zbx_wiget_field_t	*val = time_from->values[i];
@@ -2652,13 +2624,8 @@ static int	DBpatch_6050176_update(zbx_vector_wiget_field_t *time_from, zbx_vecto
 		zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 	}
 
-	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
-	{
-		zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
-			ret = FAIL;
-	}
+	if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
+		ret = FAIL;
 
 	zbx_free(sql);
 
@@ -3658,7 +3625,7 @@ static int	DBpatch_6050257(void)
 			{
 				{"proxy_groupid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 				{"name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-				{"description", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
+				{"description", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0},
 				{"failover_delay", "1m", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 				{"min_online", "1", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 				{0}
@@ -3863,7 +3830,7 @@ static int	DBpatch_6050284(void)
 
 static int	DBpatch_6050285(void)
 {
-	const zbx_db_field_t	field = {"software_update_check_data", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT,
+	const zbx_db_field_t	field = {"software_update_check_data", "", NULL, NULL, 0, ZBX_TYPE_TEXT,
 			ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);

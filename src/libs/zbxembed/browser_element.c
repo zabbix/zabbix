@@ -13,16 +13,17 @@
 **/
 
 #include "browser_element.h"
-#include "browser_error.h"
+
 #include "duktape.h"
-#include "embed.h"
-#include "webdriver.h"
-#include "zbxalgo.h"
-#include "zbxcommon.h"
-#include "zbxembed.h"
-#include "zbxtypes.h"
 
 #ifdef HAVE_LIBCURL
+
+#include "browser_error.h"
+#include "embed.h"
+#include "webdriver.h"
+
+#include "zbxembed.h"
+#include "zbxalgo.h"
 
 typedef struct
 {

@@ -14,6 +14,7 @@
 
 #include "zbxhttppoller.h"
 
+#include "zbxtimekeeper.h"
 #include "zbxdbhigh.h"
 #include "zbxlog.h"
 #include "zbxnix.h"
@@ -70,14 +71,18 @@ ZBX_THREAD_ENTRY(zbx_httppoller_thread, args)
 
 		if ((int)sec >= nextcheck)
 		{
+			time_t	now;
+
 			httptests_count += process_httptests((int)sec, httppoller_args_in->config_source_ip,
 					httppoller_args_in->config_ssl_ca_location,
 					httppoller_args_in->config_ssl_cert_location,
 					httppoller_args_in->config_ssl_key_location, &nextcheck);
 			total_sec += zbx_time() - sec;
 
-			if (0 == nextcheck)
-				nextcheck = time(NULL) + POLLER_DELAY;
+			now = time(NULL);
+
+			if (0 == nextcheck || nextcheck > now + POLLER_DELAY)
+				nextcheck = now + POLLER_DELAY;
 		}
 
 		sleeptime = zbx_calculate_sleeptime(nextcheck, POLLER_DELAY);

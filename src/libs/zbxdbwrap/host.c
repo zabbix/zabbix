@@ -348,8 +348,7 @@ static int	validate_linked_templates(const zbx_vector_uint64_t *templateids, cha
 	{
 		sql_offset = 0;
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-				/* don't remove "description2 and host2" aliases, the ORACLE needs them */
-				"select t1.description,h1.host,t2.description as description2,h2.host as host2"
+				"select t1.description,h1.host,t2.description,h2.host"
 				" from trigger_depends td,triggers t1,functions f1,items i1,hosts h1,"
 					"triggers t2,functions f2,items i2,hosts h2"
 				" where td.triggerid_down=t1.triggerid"
@@ -594,8 +593,7 @@ static int	validate_httptests(zbx_uint64_t hostid, const zbx_vector_uint64_t *te
 
 		sql_offset = 0;
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				/* don't remove "h_httpstepid" alias, the ORACLE needs it */
-				"select t.httpstepid,h.httpstepid as h_httpstepid"
+				"select t.httpstepid,h.httpstepid"
 				" from httpstep t"
 					" left join httpstep h"
 						" on h.httptestid=" ZBX_FS_UI64
@@ -604,7 +602,7 @@ static int	validate_httptests(zbx_uint64_t hostid, const zbx_vector_uint64_t *te
 				" where t.httptestid=" ZBX_FS_UI64
 					" and h.httpstepid is null"
 				" union "
-				"select t.httpstepid,h.httpstepid as h_httpstepid"
+				"select t.httpstepid,h.httpstepid"
 				" from httpstep h"
 					" left outer join httpstep t"
 						" on t.httptestid=" ZBX_FS_UI64
@@ -662,7 +660,7 @@ static void	zbx_graph_valid_free(zbx_template_graph_valid_t *graph)
 static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids, char *error, size_t max_error_len)
 {
 	int				ret = SUCCEED, i, j;
-	char				*sql;
+	char				*sql = NULL;
 	unsigned char			t_flags, h_flags, type;
 	zbx_db_result_t			tresult;
 	zbx_db_row_t			trow;
@@ -685,6 +683,44 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids, 
 
 	sql = (char *)zbx_malloc(NULL, sql_alloc);
 
+	sql_offset = 0;
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select i.key_,h.name,ir.key_,ihr.key_ from items ir,item_discovery id,items i"
+			" inner join hosts h on i.hostid=h.hostid"
+			" left join items ih on ih.key_=i.key_"
+			" left join item_discovery ihd on ih.itemid=ihd.itemid"
+			" left join items ihr on ihr.itemid=ihd.parent_itemid"
+			" where ir.itemid=id.parent_itemid and i.itemid=id.itemid and ih.hostid=" ZBX_FS_UI64 " and "
+			" (ihr.key_ is null or ihr.key_<>ir.key_) and", hostid);
+
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.hostid", templateids->values,
+			templateids->values_num);
+
+	tresult = zbx_db_select("%s", sql);
+
+	if (NULL != (trow = zbx_db_fetch(tresult)))
+	{
+		ret = FAIL;
+
+		if (SUCCEED == zbx_db_is_null(trow[3]))
+		{
+			zbx_snprintf(error, max_error_len, "cannot inherit item prototype with key \"%s\" of "
+					"template \"%s\" and LLD rule \"%s\", because an item with the same key already"
+					" exists", trow[0], trow[1], trow[2]);
+		}
+		else
+		{
+			zbx_snprintf(error, max_error_len, "cannot inherit item prototype with key \"%s\" of "
+					"template \"%s\" and LLD rule \"%s\", because an item prototype with the "
+					"same key already belongs to LLD rule \"%s\"", trow[0], trow[1], trow[2],
+					trow[3]);
+		}
+
+		zbx_db_free_result(tresult);
+		goto out;
+	}
+	zbx_db_free_result(tresult);
 	sql_offset = 0;
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
@@ -894,12 +930,11 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids, 
 		zbx_db_free_result(tresult);
 	}
 
-	zbx_free(sql);
-
 	zbx_vector_graph_valid_ptr_clear_ext(&graphs, zbx_graph_valid_free);
 	zbx_vector_graph_valid_ptr_destroy(&graphs);
 	zbx_vector_uint64_destroy(&graphids);
 out:
+	zbx_free(sql);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
@@ -937,8 +972,6 @@ static void	DBdelete_action_conditions(int conditiontype, zbx_uint64_t elementid
 
 	zbx_db_free_result(result);
 
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	if (0 != actionids.values_num)
 	{
 		zbx_vector_uint64_sort(&actionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
@@ -961,11 +994,7 @@ static void	DBdelete_action_conditions(int conditiontype, zbx_uint64_t elementid
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 	}
 
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	/* in ORACLE always present begin..end; */
-	if (16 < sql_offset)
-		zbx_db_execute("%s", sql);
+	(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
 
 	zbx_free(sql);
 
@@ -1039,8 +1068,6 @@ void	zbx_db_delete_triggers(zbx_vector_uint64_t *triggerids, int audit_context_m
 	zbx_vector_uint64_create(&selementids);
 
 	sql_offset = 0;
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	DBget_sysmapelements_by_element_type_ids(&selementids, SYSMAP_ELEMENT_TYPE_TRIGGER, triggerids);
 	if (0 != selementids.values_num)
 	{
@@ -1071,8 +1098,6 @@ void	zbx_db_delete_triggers(zbx_vector_uint64_t *triggerids, int audit_context_m
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "triggerid", triggerids->values,
 			triggerids->values_num);
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	zbx_db_execute("%s", sql);
 
@@ -1190,8 +1215,6 @@ void	zbx_db_delete_graphs(zbx_vector_uint64_t *graphids, int audit_context_mode)
 
 	zbx_vector_uint64_create(&profileids);
 
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	/* delete from profiles */
 	DBget_profiles_by_source_idxs_values(&profileids, "graphid", &profile_idx, 1, graphids);
 	if (0 != profileids.values_num)
@@ -1206,8 +1229,6 @@ void	zbx_db_delete_graphs(zbx_vector_uint64_t *graphids, int audit_context_mode)
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from graphs where");
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "graphid", graphids->values, graphids->values_num);
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	zbx_db_execute("%s", sql);
 
@@ -1347,7 +1368,7 @@ static int	db_get_linked_items(zbx_vector_uint64_t *itemids, int audit_context_m
 
 	zbx_vector_uint64_sort(itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	for(;;)
+	for (;;)
 	{
 		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, field, pitemids->values,
 				pitemids->values_num);
@@ -1444,8 +1465,6 @@ void	zbx_db_delete_items(zbx_vector_uint64_t *itemids, int audit_context_mode)
 	DBadd_to_housekeeper(itemids, "lldruleid", event_tables, ARRSIZE(event_tables));
 
 	sql_offset = 0;
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	/* delete from profiles */
 	DBget_profiles_by_source_idxs_values(&profileids, "itemid", &profile_idx, 1, itemids);
 	if (0 != profileids.values_num)
@@ -1482,8 +1501,6 @@ void	zbx_db_delete_items(zbx_vector_uint64_t *itemids, int audit_context_mode)
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from items where");
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids->values, itemids->values_num);
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	zbx_db_execute("%s", sql);
 	zbx_vector_uint64_destroy(&profileids);
@@ -1540,7 +1557,6 @@ static void	DBdelete_httptests(const zbx_vector_uint64_t *httptestids, int audit
 	if (FAIL == zbx_audit_DBselect_delete_for_item(audit_context_mode, sql, &itemids))
 		goto clean;
 
-
 	sql_offset = 0;
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select httpstepid from httpstep where");
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "httptestid",
@@ -1548,8 +1564,6 @@ static void	DBdelete_httptests(const zbx_vector_uint64_t *httptestids, int audit
 	zbx_db_select_uint64(sql, &httpstepids);
 
 	sql_offset = 0;
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from httptest_field where");
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "httptestid",
 			httptestids->values, httptestids->values_num);
@@ -1574,8 +1588,6 @@ static void	DBdelete_httptests(const zbx_vector_uint64_t *httptestids, int audit
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "httpstepid",
 			httpstepids.values, httpstepids.values_num);
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	zbx_db_execute("%s", sql);
 
@@ -1689,8 +1701,6 @@ static void	DBdelete_host_prototypes(const zbx_vector_uint64_t *host_prototype_i
 	/* delete host prototypes */
 
 	sql_offset = 0;
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from host_tag where");
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid",
 			host_prototype_ids->values, host_prototype_ids->values_num);
@@ -1701,8 +1711,6 @@ static void	DBdelete_host_prototypes(const zbx_vector_uint64_t *host_prototype_i
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid",
 			host_prototype_ids->values, host_prototype_ids->values_num);
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	zbx_db_execute("%s", sql);
 
@@ -3175,7 +3183,6 @@ out:
 	zbx_vector_interfaces_clear_ext(old_interfaces, DBhost_interface_free);
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Purpose: prepares interfaces to be added, updated or removed from DB       *
@@ -3543,7 +3550,6 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 			0 != upd_tags.values_num)
 	{
 		sql1 = (char *)zbx_malloc(sql1, sql1_alloc);
-		zbx_db_begin_multiple_update(&sql1, &sql1_alloc, &sql1_offset);
 	}
 
 	if (0 != new_hosts_templates)
@@ -3553,7 +3559,6 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 			0 != del_interfaceids->values_num || 0 != del_inventory_modes_hostids.values_num)
 	{
 		sql2 = (char *)zbx_malloc(sql2, sql2_alloc);
-		zbx_db_begin_multiple_update(&sql2, &sql2_alloc, &sql2_offset);
 	}
 
 	if (0 != del_hosttemplateids->values_num)
@@ -4017,22 +4022,14 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 	if (SUCCEED == res && (NULL != sql1 || new_hosts != host_prototypes->values_num || 0 != upd_group_prototypes ||
 			0 != upd_hostmacros || 0 != upd_inventory_modes))
 	{
-		zbx_db_end_multiple_update(&sql1, &sql1_alloc, &sql1_offset);
-
-		/* in ORACLE always present begin..end; */
-		if (16 < sql1_offset)
-			zbx_db_execute("%s", sql1);
+		(void)zbx_db_flush_overflowed_sql(sql1, sql1_offset);
 	}
 
 	if (SUCCEED == res && (NULL != sql2 || 0 != del_hosttemplateids->values_num ||
 			0 != del_hostmacroids->values_num || 0 != del_tagids.values_num ||
 			0 != del_interfaceids->values_num || 0 != del_inventory_modes_hostids.values_num))
 	{
-		zbx_db_end_multiple_update(&sql2, &sql2_alloc, &sql2_offset);
-
-		/* in ORACLE always present begin..end; */
-		if (16 < sql2_offset)
-			zbx_db_execute("%s", sql2);
+		(void)zbx_db_flush_overflowed_sql(sql2, sql2_offset);
 	}
 
 	zbx_free(sql1);
@@ -5026,8 +5023,6 @@ static void	DBsave_httptests(zbx_uint64_t hostid, const zbx_vector_ptr_t *httpte
 				(char *)NULL);
 	}
 
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	for (i = 0; i < httptests->values_num; i++)
 	{
 		httptest = (httptest_t *)httptests->values[i];
@@ -5326,10 +5321,7 @@ static void	DBsave_httptests(zbx_uint64_t hostid, const zbx_vector_ptr_t *httpte
 		zbx_db_insert_clean(&db_insert_httag);
 	}
 
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (16 < sql_offset)
-		zbx_db_execute("%s", sql);
+	(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
 
 	zbx_free(sql);
 
@@ -5882,7 +5874,6 @@ void	zbx_db_delete_hosts(const zbx_vector_uint64_t *hostids, const zbx_vector_st
 	}
 
 	sql_offset = 0;
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	/* delete host from maps */
 	DBget_sysmapelements_by_element_type_ids(&selementids, SYSMAP_ELEMENT_TYPE_HOST, hostids);
@@ -5923,8 +5914,6 @@ void	zbx_db_delete_hosts(const zbx_vector_uint64_t *hostids, const zbx_vector_st
 				hgsetids_del.values_num);
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 	}
-
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	zbx_db_execute("%s", sql);
 
@@ -6553,7 +6542,6 @@ void	zbx_db_delete_groups(zbx_vector_uint64_t *groupids)
 
 	if (0 == hgsets.values_num)
 	{
-		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 		goto skip_permissions;
 	}
 
@@ -6751,7 +6739,6 @@ void	zbx_db_delete_groups(zbx_vector_uint64_t *groupids)
 	/* update hosts to use new hgsets */
 
 	sql_offset = 0;
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	for (i = 0; i < hgsets.values_num; i ++)
 	{
@@ -6768,16 +6755,12 @@ void	zbx_db_delete_groups(zbx_vector_uint64_t *groupids)
 		ret = zbx_db_prepare_multiple_query(update, "hostid", &hgset->hostids, &sql, &sql_alloc, &sql_offset);
 	}
 
-	if (SUCCEED == ret && sql_offset > 16)	/* in ORACLE always present begin..end; */
-	{
-		zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-		zbx_db_execute("%s", sql);
-	}
+	if (SUCCEED == ret)
+		(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
 
 	/* delete hgsets */
 
 	sql_offset = 0;
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from hgset where");
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hgsetid", hgsetids.values,
@@ -6799,8 +6782,6 @@ skip_permissions:
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from hstgrp where");
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "groupid", groupids->values, groupids->values_num);
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	zbx_db_execute("%s", sql);
 

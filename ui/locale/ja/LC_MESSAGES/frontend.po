@@ -1,11 +1,11 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Zabbix 7.0\n"
+"Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-05-23 17:05+0000\n"
-"Last-Translator: Kodai <kodai.terashima@zabbix.com>\n"
+"PO-Revision-Date: 2024-06-08 07:44+0000\n"
+"Last-Translator: suuei <zab@notr.app>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -193,12 +193,12 @@ msgstr[0] "%2$s台中%1$s台の要素で障害発生中"
 #: app/views/administration.miscconfig.edit.php:127
 #, c-format
 msgid "%1$s or %2$s - allows the page to be displayed only in a frame on the same origin as the page itself"
-msgstr ""
+msgstr "%1$s または %2$s - フレーム内では同一オリジンページのみ表示できます"
 
 #: app/views/administration.miscconfig.edit.php:130
 #, c-format
 msgid "%1$s or %2$s - prevents the page from being displayed in a frame, regardless of the site attempting to do so"
-msgstr ""
+msgstr "%1$s または %2$s - サイトがフレーム内に表示しようとしたかどうかに関係なく、ページがフレーム内に表示されないようにします"
 
 #: jsLoader.php:341
 #, c-format
@@ -428,7 +428,7 @@ msgstr "オーバーライドの追加"
 
 #: tests/selenium/modules/clock32/Widget.php:46
 msgid "ALARM CLOCK"
-msgstr ""
+msgstr "アラームクロック"
 
 #: app/views/administration.user.list.php:137
 msgid "API access"
@@ -932,6 +932,10 @@ msgstr "列を追加"
 msgid "Add a new widget"
 msgstr "新しいウィジェットを追加"
 
+#: widgets/navtree/Widget.php:34
+msgid "Add child element"
+msgstr ""
+
 #: widgets/navtree/Widget.php:39
 msgid "Add child elements"
 msgstr "子の要素を追加"
@@ -965,6 +969,11 @@ msgstr "ホストタグを追加"
 #: app/views/trigger.massupdate.php:155
 msgid "Add host trigger"
 msgstr "ホストトリガーを追加"
+
+#: widgets/piechart/includes/CWidgetFieldDataSetView.php:260
+#: widgets/svggraph/includes/CWidgetFieldDataSetView.php:263
+msgid "Add item"
+msgstr ""
 
 #: app/partials/massupdate.macros.tab.php:96
 #: app/partials/massupdate.valuemaps.tab.php:38
@@ -1112,7 +1121,7 @@ msgstr "高度なオプション"
 #: include/views/configuration.host.discovery.list.php:157
 #: include/views/configuration.host.discovery.list.php:172
 msgid "After"
-msgstr ""
+msgstr "以降"
 
 #: app/views/js/mfa.edit.js.php:168
 msgid "After this change, users who have already enrolled in this MFA method will have to complete the enrollment process again because TOTP secrets will be reset."
@@ -1453,11 +1462,11 @@ msgstr "いずれかの文字列が含まれる"
 
 #: app/views/js/popup.import.js.php:109
 msgid "Any existing host entities not present in the import file will be deleted. Click OK to proceed."
-msgstr ""
+msgstr "インポートファイルに含まれない既存のホストは削除されます。続けるにはOKをクリックしてください。"
 
 #: app/views/js/popup.import.js.php:106
 msgid "Any existing template entities not present in the import file will be deleted. Click OK to proceed."
-msgstr ""
+msgstr "インポートファイルに含まれない既存のテンプレートは削除されます。続けるにはOKをクリックしてください。"
 
 #: include/classes/core/CJsonRpc.php:225
 msgid "Application error."
@@ -1868,6 +1877,10 @@ msgstr "収集間隔内の仮想ディスクへの未処理の書き込みリク
 msgid "Avoid easy-to-guess passwords"
 msgstr "推測されやすいパスワードの回避"
 
+#: jsLoader.php:172
+msgid "Awaiting data"
+msgstr ""
+
 #: widgets/svggraph/views/widget.edit.php:51
 msgid "Axes"
 msgstr "軸"
@@ -2133,7 +2146,7 @@ msgstr "CSRFトークンテスト"
 
 #: tests/selenium/modules/module_number_7/actions/CsrfFormUpdate.php:35
 msgid "CSRF token validation succeeded."
-msgstr ""
+msgstr "CSRF トークンの検証が成功しました。"
 
 #: include/items.inc.php:1554
 msgid "CSV to JSON"
@@ -4544,7 +4557,7 @@ msgstr "コマンド"
 
 #: app/views/administration.timeouts.edit.php:138
 msgid "Communication"
-msgstr ""
+msgstr "コミュニケーション"
 
 #: include/items.inc.php:946
 msgctxt "SNMP Community"
@@ -5025,7 +5038,7 @@ msgstr "コンテキスト名"
 
 #: app/views/script.userinput.edit.php:82
 msgid "Continue"
-msgstr ""
+msgstr "続ける"
 
 #: app/views/popup.lldoverride.php:54
 msgid "Continue overrides"
@@ -5306,6 +5319,10 @@ msgstr "メディアタイプの作成"
 #: app/views/popup.import.php:143 jsLoader.php:349
 msgid "Create new"
 msgstr "新規作成"
+
+#: jsLoader.php:372
+msgid "Create new report"
+msgstr ""
 
 #: app/views/administration.proxy.list.php:239
 msgid "Create proxy"
@@ -5606,7 +5623,7 @@ msgstr[0] "ダッシュボードを削除しました"
 
 #: jsLoader.php:200
 msgid "Dashboard is used as data source."
-msgstr ""
+msgstr "ダッシュボードはデータソースとして利用されています。"
 
 #: app/views/monitoring.host.dashboard.view.php:144
 msgid "Dashboard list"
@@ -7113,7 +7130,7 @@ msgstr "除算分母"
 #: include/views/configuration.item.prototype.edit.php:839
 #: include/views/configuration.item.prototype.edit.php:854
 msgid "Do not store"
-msgstr ""
+msgstr "保存しない"
 
 #: jsLoader.php:213 jsLoader.php:358
 msgid "Do you wish to replace the conditional expression?"
@@ -7230,7 +7247,7 @@ msgstr "Duoユニバーサルプロンプト"
 
 #: include/classes/api/services/CUser.php:3493
 msgid "Duo state does not match saved state."
-msgstr ""
+msgstr "Duoの状態が保存された状態と一致しません。"
 
 #: include/classes/api/services/CMap.php:614
 #: include/classes/api/services/CMap.php:1076
@@ -7415,7 +7432,7 @@ msgstr "マップIDが空白です。"
 
 #: widgets/itemhistory/Widget.php:32
 msgid "Empty value."
-msgstr ""
+msgstr "空の値です。"
 
 #: app/views/action.list.php:167 app/views/administration.token.list.php:204
 #: app/views/administration.user.token.list.php:157
@@ -7807,7 +7824,7 @@ msgstr "イベント相関関係"
 #: include/classes/api/services/CCorrelation.php:536
 #, c-format
 msgid "Event correlation \"%1$s\" already exists."
-msgstr ""
+msgstr "イベント相関関係\"%1$s\"はすでに存在しています。"
 
 #: app/controllers/CControllerCorrelationCreate.php:107
 msgid "Event correlation created"
@@ -7863,7 +7880,7 @@ msgstr "イベントリスト [直近20]"
 
 #: include/classes/data/CItemData.php:962
 msgid "Event log monitoring. Returns count of entries"
-msgstr ""
+msgstr "イベントログの監視。エントリの数を返します"
 
 #: include/classes/data/CItemData.php:956
 msgid "Event log monitoring. Returns log"
@@ -9415,6 +9432,10 @@ msgstr[0] "ホストグループを削除しました"
 msgid "Host group elements"
 msgstr "ホストグループ内のホスト"
 
+#: jsLoader.php:292
+msgid "Host group is not selected."
+msgstr ""
+
 #: include/views/monitoring.sysmap.edit.php:168
 msgid "Host group label type"
 msgstr "ホストグループのラベルタイプ"
@@ -9493,6 +9514,10 @@ msgstr "ホストインベントリ"
 #: hostinventoriesoverview.php:26 hostinventoriesoverview.php:146
 msgid "Host inventory overview"
 msgstr "ホストインベントリの概要"
+
+#: jsLoader.php:289
+msgid "Host is not selected."
+msgstr ""
 
 #: include/views/monitoring.sysmap.edit.php:183
 msgid "Host label type"
@@ -12792,6 +12817,10 @@ msgstr "アイコンのラベルの位置"
 #: include/views/monitoring.sysmap.edit.php:243
 msgid "Map element label type"
 msgstr "アイコンのラベルのタイプ"
+
+#: jsLoader.php:290
+msgid "Map is not selected."
+msgstr ""
 
 #: sysmap.php:128
 msgid "Map is updated! Return to map list?"
@@ -17270,12 +17299,12 @@ msgstr "解決理由"
 #: widgets/problems/includes/WidgetProblems.php:251
 #, c-format
 msgid "Resolved by event correlation rule \"%1$s\"."
-msgstr ""
+msgstr "イベント相関関係ルール\"%1$s\"によって復旧。"
 
 #: include/classes/screens/CScreenProblem.php:1401
 #: widgets/problems/includes/WidgetProblems.php:254
 msgid "Resolved by event correlation rule."
-msgstr ""
+msgstr "イベント相関関係ルールによって復旧。"
 
 #: include/classes/screens/CScreenProblem.php:1408
 #: widgets/problems/includes/WidgetProblems.php:261
@@ -17614,7 +17643,7 @@ msgstr "ID\"%1$s\"のSLAは使用できません。"
 
 #: include/classes/html/widgets/fields/CWidgetFieldMultiSelectSlaView.php:35
 msgid "SLAs"
-msgstr ""
+msgstr "SLAs"
 
 #: app/partials/service.info.php:61 app/views/slareport.list.php:164
 msgid "SLI"
@@ -17949,7 +17978,7 @@ msgstr[0] "定期レポートを有効にしました"
 
 #: app/views/administration.timeouts.edit.php:188
 msgid "Scheduled report test"
-msgstr ""
+msgstr "定期レポートのテスト"
 
 #: app/controllers/CControllerScheduledReportUpdate.php:147
 msgid "Scheduled report updated"
@@ -19093,7 +19122,7 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:2855
 msgid "State of proxy memory buffer."
-msgstr ""
+msgstr "プロキシメモリバッファの状態。"
 
 #: widgets/svggraph/includes/WidgetForm.php:304
 #: widgets/svggraph/includes/WidgetForm.php:330
@@ -19313,6 +19342,10 @@ msgstr "文字列"
 msgid "String functions"
 msgstr "文字列関数"
 
+#: widgets/piechart/includes/WidgetForm.php:137
+msgid "Stroke width"
+msgstr ""
+
 #: include/items.inc.php:1545 include/items.inc.php:1549
 #: include/items.inc.php:1553 include/items.inc.php:1557
 msgid "Structured data"
@@ -19346,7 +19379,7 @@ msgstr "サブマップ"
 
 #: tests/selenium/modules/module_number_7/views/csrf.form.view.php:20
 msgid "Submit"
-msgstr ""
+msgstr "送信"
 
 #: app/controllers/CControllerPopupScheduledReportSubscriptionEdit.php:167
 msgid "Subscription"
@@ -19483,7 +19516,7 @@ msgstr "システム情報"
 
 #: include/classes/setup/CFrontendSetup.php:693
 msgid "System locale"
-msgstr ""
+msgstr "システムロケール"
 
 #: include/classes/data/CItemData.php:1463
 msgid "System statistics. Returns integer or float"
@@ -20631,7 +20664,7 @@ msgstr[0] "トリガーをコピーしました"
 
 #: widgets/toptriggers/includes/WidgetForm.php:76
 msgid "Trigger count"
-msgstr ""
+msgstr "トリガー数"
 
 #: app/views/administration.housekeeping.edit.php:50
 msgid "Trigger data storage period"
@@ -20675,6 +20708,10 @@ msgstr "トリガーが\"不明\"の状態"
 #, c-format
 msgid "Trigger in template \"%1$s\" has dependency with trigger in template \"%2$s\"."
 msgstr "テンプレート\"%1$s\"のトリガーはテンプレート\"%2$s\"のトリガーと依存関係が設定されています。"
+
+#: jsLoader.php:291
+msgid "Trigger is not selected."
+msgstr ""
 
 #: include/views/monitoring.sysmap.edit.php:198
 msgid "Trigger label type"
@@ -22719,6 +22756,10 @@ msgstr "ビュー"
 msgid "View as"
 msgstr "表示形式"
 
+#: jsLoader.php:417
+msgid "View related reports"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1735
 msgid "Virtual space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr "バイト単位もしくはトータルからのパーセンテージでの仮想メモリサイズ。バイト単位であれば整数値を返し、パーセンテージであれば浮動小数点値を返す。"
@@ -22924,6 +22965,10 @@ msgstr "ウィジェットは廃止予定です。"
 #: jsLoader.php:187
 msgid "Widget is too small for the specified number of columns and rows."
 msgstr "指定された列と行の数に対してウィジェットが小さすぎます。"
+
+#: jsLoader.php:205
+msgid "Widgets"
+msgstr ""
 
 #: graphs.php:39 include/views/configuration.graph.edit.php:100
 #: include/views/configuration.graph.list.php:170
@@ -23296,6 +23341,10 @@ msgstr "このページを表示する権限がありません。"
 #: include/classes/core/ZBase.php:763 include/func.inc.php:1709
 msgid "You must login to view this page."
 msgstr "このページを表示するためにはログインする必要があります"
+
+#: jsLoader.php:287
+msgid "You need to have at least one image uploaded to create map element. Images can be uploaded in Administration->General->Images section."
+msgstr ""
 
 #: include/classes/db/DB.php:133
 msgid "Your database is not working properly. Please wait a few minutes and try to repeat this action. If the problem still persists, please contact system administrator. The problem might be caused by long running transaction or row level lock accomplished by your database management system."
@@ -23787,7 +23836,7 @@ msgstr "between() - 値が指定された範囲内であるかチェック (1 - 
 #: widgets/tophosts/views/widget.view.php:116
 #: widgets/tophosts/views/widget.view.php:117
 msgid "binary value"
-msgstr ""
+msgstr "バイナリ値"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:405
 msgid "bitand() - Bitwise AND"
@@ -24265,11 +24314,11 @@ msgstr "エラーメッセージ"
 
 #: app/views/js/popup.itemtestedit.view.js.php:479
 msgid "error text"
-msgstr ""
+msgstr "エラーテキスト"
 
 #: include/forms.inc.php:1454 include/views/js/item.preprocessing.js.php:241
 msgid "error-matching"
-msgstr ""
+msgstr "エラーマッチング"
 
 #: app/views/popup.lldoverride.php:104
 #: include/views/configuration.host.discovery.edit.php:820
@@ -25304,6 +25353,10 @@ msgstr "右"
 #: app/controllers/CControllerPopupTriggerExpr.php:953
 msgid "right() - Returns the rightmost count characters"
 msgstr "right() - 右端の文字を返す"
+
+#: widgets/navtree/Widget.php:41
+msgid "root"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:966
 msgid "round() - Rounds a value to decimal places"

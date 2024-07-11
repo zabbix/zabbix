@@ -16,6 +16,8 @@
 
 #include "zbxdbhigh.h"
 #include "zbxalgo.h"
+#include "zbxdb.h"
+#include "zbxdbschema.h"
 
 /*
  * 5.2 development database patches
@@ -245,7 +247,7 @@ static int	DBpatch_5010026(void)
 
 static int	DBpatch_5010027(void)
 {
-	const zbx_db_field_t	old_field = {"data", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	old_field = {"data", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 	const zbx_db_field_t	field = {"data", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 
 	return DBmodify_field_type("task_data", &field, &old_field);
@@ -253,7 +255,7 @@ static int	DBpatch_5010027(void)
 
 static int	DBpatch_5010028(void)
 {
-	const zbx_db_field_t	old_field = {"info", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	old_field = {"info", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 	const zbx_db_field_t	field = {"info", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 
 	return DBmodify_field_type("task_result", &field, &old_field);
@@ -261,7 +263,7 @@ static int	DBpatch_5010028(void)
 
 static int	DBpatch_5010029(void)
 {
-	const zbx_db_field_t	old_field = {"params", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	old_field = {"params", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 	const zbx_db_field_t	field = {"params", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 
 	return DBmodify_field_type("items", &field, &old_field);
@@ -269,7 +271,7 @@ static int	DBpatch_5010029(void)
 
 static int	DBpatch_5010030(void)
 {
-	const zbx_db_field_t	old_field = {"description", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	old_field = {"description", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 	const zbx_db_field_t	field = {"description", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 
 	return DBmodify_field_type("items", &field, &old_field);
@@ -277,7 +279,7 @@ static int	DBpatch_5010030(void)
 
 static int	DBpatch_5010031(void)
 {
-	const zbx_db_field_t	old_field = {"posts", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	old_field = {"posts", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 	const zbx_db_field_t	field = {"posts", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 
 	return DBmodify_field_type("items", &field, &old_field);
@@ -285,7 +287,7 @@ static int	DBpatch_5010031(void)
 
 static int	DBpatch_5010032(void)
 {
-	const zbx_db_field_t	old_field = {"headers", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	old_field = {"headers", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 	const zbx_db_field_t	field = {"headers", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 
 	return DBmodify_field_type("items", &field, &old_field);
@@ -300,7 +302,7 @@ static int	DBpatch_5010033(void)
 
 static int	DBpatch_5010034(void)
 {
-	const zbx_db_field_t	old_field = {"value_str", "", NULL, NULL, 255, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	old_field = {"value_str", "", NULL, NULL, 255, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 	const zbx_db_field_t	field = {"value_str", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 
 	return DBmodify_field_type("profiles", &field, &old_field);

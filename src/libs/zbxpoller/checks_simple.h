@@ -18,7 +18,6 @@
 #include "zbxpoller.h"
 
 #include "zbxcacheconfig.h"
-#include "zbxalgo.h"
 
 int	get_value_simple(const zbx_dc_item_t *item, AGENT_RESULT *result, zbx_vector_agent_result_ptr_t *add_results,
 		zbx_get_config_forks_f get_config_forks);

@@ -17,6 +17,9 @@
 #include "zbxnum.h"
 #include "zbxdbhigh.h"
 #include "zbxalgo.h"
+#include "zbxdb.h"
+#include "zbxdbschema.h"
+#include "zbxstr.h"
 
 /*
  * 5.0 development database patches
@@ -77,8 +80,6 @@ static int	DBpatch_4050011(void)
 	const char *cast_value_str = "bigint";
 #elif defined(HAVE_MYSQL)
 	const char *cast_value_str = "unsigned";
-#elif defined(HAVE_ORACLE)
-	const char *cast_value_str = "number(20)";
 #endif
 
 	if (ZBX_DB_OK > zbx_db_execute(
@@ -113,8 +114,6 @@ static int	DBpatch_4050014(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	result = zbx_db_select(
 			"select wf.widget_fieldid,wf.name"
 			" from widget_field wf,widget w"
@@ -145,9 +144,7 @@ static int	DBpatch_4050014(void)
 			goto out;
 	}
 
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (16 < sql_offset && ZBX_DB_OK > zbx_db_execute("%s", sql))
+	if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
 		ret = FAIL;
 out:
 	zbx_db_free_result(result);
@@ -207,7 +204,7 @@ static int	DBpatch_4050016(void)
 					{"eventsource", NULL, NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 					{"recovery", NULL, NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 					{"subject", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-					{"message", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
+					{"message", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0},
 					{0}
 				},
 				NULL
@@ -505,7 +502,7 @@ static int	DBpatch_4050028(void)
 					{"id", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 					{"relative_path", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 					{"status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-					{"config", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
+					{"config", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0},
 					{0}
 				},
 				NULL
@@ -526,7 +523,7 @@ static int	DBpatch_4050031(void)
 				{
 					{"taskid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-					{"data", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
+					{"data", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0},
 					{"parent_taskid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{0}
 				},
@@ -551,7 +548,7 @@ static int	DBpatch_4050033(void)
 					{"taskid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 					{"parent_taskid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-					{"info", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
+					{"info", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0},
 					{0}
 				},
 				NULL
@@ -1035,7 +1032,6 @@ static int	DBpatch_items_update(zbx_vector_dbu_snmp_if_t *snmp_ifs)
 	size_t	sql_alloc = snmp_ifs->values_num * ZBX_KIBIBYTE / 3 , sql_offset = 0;
 
 	sql = (char *)zbx_malloc(NULL, sql_alloc);
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	for (i = 0; i < snmp_ifs->values_num && SUCCEED == ret; i++)
 	{
@@ -1050,39 +1046,11 @@ static int	DBpatch_items_update(zbx_vector_dbu_snmp_if_t *snmp_ifs)
 			item_type = ITEM_TYPE_SNMPv3;
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-#ifdef HAVE_ORACLE
-				"update items i set type=%d, interfaceid=" ZBX_FS_UI64
-				" where exists (select 1 from hosts h"
-					" where i.hostid=h.hostid and"
-					" i.type=%d and h.status <> 3 and"
-					" i.interfaceid=" ZBX_FS_UI64 " and"
-					" (('%s' is null and i.snmp_community is null) or"
-						" i.snmp_community='%s') and"
-					" (('%s' is null and i.snmpv3_securityname is null) or"
-						" i.snmpv3_securityname='%s') and"
-					" i.snmpv3_securitylevel=%d and"
-					" (('%s' is null and i.snmpv3_authpassphrase is null) or"
-						" i.snmpv3_authpassphrase='%s') and"
-					" (('%s' is null and i.snmpv3_privpassphrase is null) or"
-						" i.snmpv3_privpassphrase='%s') and"
-					" i.snmpv3_authprotocol=%d and"
-					" i.snmpv3_privprotocol=%d and"
-					" (('%s' is null and i.snmpv3_contextname is null) or"
-						" i.snmpv3_contextname='%s') and"
-					" (('%s' is null and i.port is null) or"
-						" i.port='%s'));\n",
-				ITEM_TYPE_SNMP, s->interfaceid, item_type,
-				s->item_interfaceid, s->community, s->community, s->securityname, s->securityname,
-				(int)s->securitylevel, s->authpassphrase, s->authpassphrase, s->privpassphrase,
-				s->privpassphrase, (int)s->authprotocol, (int)s->privprotocol, s->contextname,
-				s->contextname, s->item_port, s->item_port);
-
-#else
-#	ifdef HAVE_MYSQL
+#ifdef HAVE_MYSQL
 				"update items i, hosts h set i.type=%d, i.interfaceid=" ZBX_FS_UI64
-#	else
+#else
 				"update items i set type=%d, interfaceid=" ZBX_FS_UI64 " from hosts h"
-#	endif
+#endif
 				" where i.hostid=h.hostid and"
 					" type=%d and h.status <> 3 and"
 					" interfaceid=" ZBX_FS_UI64 " and"
@@ -1100,15 +1068,12 @@ static int	DBpatch_items_update(zbx_vector_dbu_snmp_if_t *snmp_ifs)
 				s->item_interfaceid, s->community, s->securityname, (int)s->securitylevel,
 				s->authpassphrase, s->privpassphrase, (int)s->authprotocol, (int)s->privprotocol,
 				s->contextname, s->item_port);
-#endif
 		ret = zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 	}
 
 	if (SUCCEED == ret)
 	{
-		zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-		if (16 < sql_offset && ZBX_DB_OK > zbx_db_execute("%s", sql))
+		if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
 			ret = FAIL;
 	}
 
@@ -1714,7 +1679,7 @@ static int	DBpatch_4050079(void)
 
 static int	DBpatch_4050080(void)
 {
-	const zbx_db_field_t	old_field = {"script", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	old_field = {"script", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 	const zbx_db_field_t	field = {"script", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 
 	return DBmodify_field_type("media_type", &field, &old_field);
@@ -1722,7 +1687,7 @@ static int	DBpatch_4050080(void)
 
 static int	DBpatch_4050081(void)
 {
-	const zbx_db_field_t	old_field = {"oldvalue", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	old_field = {"oldvalue", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 	const zbx_db_field_t	field = {"oldvalue", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 
 	return DBmodify_field_type("auditlog_details", &field, &old_field);
@@ -1730,7 +1695,7 @@ static int	DBpatch_4050081(void)
 
 static int	DBpatch_4050082(void)
 {
-	const zbx_db_field_t	old_field = {"newvalue", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	old_field = {"newvalue", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 	const zbx_db_field_t	field = {"newvalue", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 
 	return DBmodify_field_type("auditlog_details", &field, &old_field);
