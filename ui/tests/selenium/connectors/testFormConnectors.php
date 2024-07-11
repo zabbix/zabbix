@@ -1375,7 +1375,7 @@ class testFormConnectors extends CWebTest {
 	 * @param string $expected		expected result after connector form submit, TEST_GOOD or TEST_BAD
 	 */
 	private function assertUriScheme($form, $data, $expected = TEST_GOOD) {
-		$this->query('link', self::DEFAULT_CONNECTOR)->->waitUntilClickable()->one()->click();
+		$this->query('link', self::DEFAULT_CONNECTOR)->waitUntilClickable()->one()->click();
 
 		foreach ($data as $scheme) {
 			$form->fill(['URL' => $scheme]);
