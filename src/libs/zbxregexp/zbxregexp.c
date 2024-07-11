@@ -1050,6 +1050,7 @@ int	zbx_regexp_repl(const char *string, const char *pattern, const char *repl_te
 	for (;;)
 	{
 		size_t	i;
+		int	newshift;
 		prepl = zbx_malloc(NULL, sizeof(zbx_regrepl_t));
 		/* -1 is special pcre value for unused patterns */
 		for (i = 0; i < ARRSIZE(prepl->match); i++)
@@ -1062,17 +1063,24 @@ int	zbx_regexp_repl(const char *string, const char *pattern, const char *repl_te
 		}
 
 		ptr = ptr + (size_t)prepl->match[0].rm_eo;
+		newshift = prepl->match[0].rm_eo;
 		for (i = 0; i < ARRSIZE(prepl->match); i++)
 			if (prepl->match[i].rm_eo != -1)
 			{
 				prepl->match[i].rm_eo += shift;
 				prepl->match[i].rm_so += shift;
 			}
-		shift += prepl->match[0].rm_eo;
+		shift += newshift;
 		zbx_vector_regrepl_append(&matches, prepl);
 
-		if (strlen(ptr) <= 0)
+		if ('\0' == *ptr)
 			break;
+
+		if (prepl->match[0].rm_eo == prepl->match[0].rm_so)
+		{
+			ptr++;
+			shift += 1;
+		}
 	}
 
 	/* create pattern based string for each match and relplace matched string with this string */
@@ -1080,6 +1088,9 @@ int	zbx_regexp_repl(const char *string, const char *pattern, const char *repl_te
 	{
 		zbx_regmatch_t *match = matches.values[mi]->match;
 		size_t	endof = (size_t)match[0].rm_eo - 1;
+
+		if (match[0].rm_eo == match[0].rm_so)
+			endof = (size_t)match[0].rm_eo;
 		char	*repl, *empty = zbx_strdup(NULL, string);
 
 		if (NULL == repl_template || '\0' == *repl_template)

@@ -13,6 +13,7 @@ BINARIES_tests = \
 	zbx_user_macro_parse \
 	zbx_get_report_nextcheck \
 	macro_fmttime \
+	macro_regrepl \
 	macro_tr \
 	zbx_function_param_parse_ext \
 	zbx_substitute_macros
@@ -211,6 +212,19 @@ macro_tr_LDADD += @SERVER_LIBS@
 macro_tr_LDFLAGS = @SERVER_LDFLAGS@
 
 macro_tr_CFLAGS = $(EXPR_COMPILER_FLAGS)
+
+macro_regrepl_SOURCES = \
+	macro_regrepl.c \
+	$(COMMON_SRC_FILES)
+
+macro_regrepl_LDADD = \
+	$(EXPR_LIBS)
+
+macro_regrepl_LDADD += @SERVER_LIBS@
+
+macro_regrepl_LDFLAGS = @SERVER_LDFLAGS@
+
+macro_regrepl_CFLAGS = $(EXPR_COMPILER_FLAGS)
 
 
 macro_fmttime_SOURCES = \
