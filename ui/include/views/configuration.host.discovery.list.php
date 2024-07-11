@@ -249,6 +249,7 @@ foreach ($data['discoveries'] as $discovery) {
 				: 'discoveryrule.massdisable'
 			)
 			->setArgument('context', $data['context'])
+			->setArgument('backurl', $url)
 			->getUrl()
 		))
 			->addClass(ZBX_STYLE_LINK_ACTION)

@@ -232,7 +232,7 @@
 
 		jQuery('#clone').click(function() {
 			jQuery('#update')
-				.text(t('Add'))
+				.text(<?= json_encode(_('Add')) ?>)
 				.val('discovery.create')
 				.attr({id: 'add'});
 			jQuery('#druleid, #delete, #clone').remove();

@@ -130,10 +130,6 @@
 #	include <sys/times.h>
 #endif
 
-#ifdef HAVE_LINUX_KERNEL_H
-#	include <linux/kernel.h>
-#endif
-
 #ifdef HAVE_ARPA_NAMESER_H
 #	ifdef MAC_OS_X
 #		define BIND_8_COMPAT 1

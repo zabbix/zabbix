@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-04-02 17:26+0300\n"
-"PO-Revision-Date: 2024-06-13 14:00+0000\n"
+"PO-Revision-Date: 2024-06-27 02:38+0000\n"
 "Last-Translator: NoYoWiFi <1284524409@qq.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_CN\n"
@@ -2906,7 +2906,7 @@ msgstr "无法设置 \"%1$s\" 为监控项 \"%2$s\"."
 #: include/classes/api/services/CHost.php:2026
 #: include/classes/api/services/CHost.php:2229
 msgid "Cannot set inventory fields for disabled inventory."
-msgstr "无法设置审计字段为已经禁止的审计."
+msgstr "无法设置资产字段为已经禁止的资产."
 
 #: include/classes/api/services/CService.php:1429
 #, c-format
@@ -2973,7 +2973,7 @@ msgstr "由于触发器“%4$s”的表达式，无法取消没有模板“%2$s�
 #: include/classes/api/services/CHostGeneral.php:1077
 #, c-format
 msgid "Cannot unlink trigger \"%1$s\", it has items from template that is left linked to host."
-msgstr "无法取消链接触发器“%1$s”，它有来自模板的项目仍链接到主机。"
+msgstr "无法取消链接触发器“%1$s”，它有来自模板的监控项仍链接到主机。"
 
 #: include/classes/api/services/CAction.php:2628
 #, c-format
@@ -3533,7 +3533,7 @@ msgstr "清除历史和趋势"
 
 #: include/views/configuration.item.list.php:293
 msgid "Clear history and trends of selected items?"
-msgstr "清除所选项目的历史和趋势？"
+msgstr "清除所选监控项的历史和趋势？"
 
 #: include/views/configuration.httpconf.list.php:218
 msgid "Clear history and trends of selected web scenarios?"
@@ -4371,11 +4371,11 @@ msgstr "创建监控项原型"
 
 #: include/views/configuration.item.prototype.list.php:202
 msgid "Create items from selected prototypes as disabled?"
-msgstr "您想通过使所选原型中的禁用监控项来创建项目吗？"
+msgstr "从选定的原型中创建监控项时默认禁用？"
 
 #: include/views/configuration.item.prototype.list.php:199
 msgid "Create items from selected prototypes as enabled?"
-msgstr "您想通过使所选原型中的启用项目来创建项目吗？"
+msgstr "从选定的原型中创建监控项时默认启用？"
 
 #: include/views/configuration.maintenance.list.php:30
 msgid "Create maintenance period"
@@ -4392,6 +4392,10 @@ msgstr "创建媒介类型"
 #: app/views/popup.import.php:97 jsLoader.php:361
 msgid "Create new"
 msgstr "创建新的"
+
+#: jsLoader.php:363
+msgid "Create new report"
+msgstr ""
 
 #: app/views/administration.proxy.list.php:37
 msgid "Create proxy"
@@ -5076,7 +5080,7 @@ msgstr "删除图标映射?"
 
 #: include/views/configuration.item.prototype.edit.php:927
 msgid "Delete item prototype?"
-msgstr "删除监控项目模板?"
+msgstr "删除监控项原型?"
 
 #: include/views/configuration.item.edit.php:1091
 msgid "Delete item?"
@@ -6791,6 +6795,10 @@ msgstr "仪表盘页面属性更新失败。"
 msgid "Failed to update dashboard properties."
 msgstr "仪表盘属性更新失败。"
 
+#: app/views/js/popup.dashboard.share.edit.js.php:86
+msgid "Failed to update dashboard sharing."
+msgstr ""
+
 #: jsLoader.php:142
 msgid "Failed to update widget properties."
 msgstr "小组件属性更新失败。"
@@ -7291,7 +7299,7 @@ msgstr "图形\"%1$s\"已存在于\"%2$s\"中 (继承自其它的模板)."
 #: include/classes/api/services/CGraphGeneral.php:1346
 #, c-format
 msgid "Graph \"%1$s\" already exists on \"%2$s\" (items are not identical)."
-msgstr "图形\"%1$s\"已存在于\"%2$s\"中 (项目不一致)."
+msgstr "图形\"%1$s\"已存在于\"%2$s\"中 (监控项不一致)."
 
 #: include/classes/api/services/CGraphGeneral.php:1294
 #, c-format
@@ -7308,7 +7316,7 @@ msgstr "图形\"%1$s\"已存在于\"%2$s\"中."
 #: include/classes/api/services/CGraph.php:38
 #, c-format
 msgid "Graph \"%1$s\" with templated items cannot contain items from other hosts."
-msgstr "含模板项目的图形\"%1$s\"不能包含其它主机的项目."
+msgstr "含模板监控项的图形\"%1$s\"不能包含其它主机的监控项."
 
 #: include/classes/widgets/CWidgetConfig.php:60
 msgid "Graph (classic)"
@@ -7341,17 +7349,17 @@ msgstr "图形原型"
 #: include/classes/api/services/CGraphGeneral.php:662
 #, c-format
 msgid "Graph prototype \"%1$s\" contains item prototypes from multiple discovery rules."
-msgstr "数据图模板 \"%1$s\" 包含来自多个自动发现规则上的监控项目模板"
+msgstr "数据图模板 \"%1$s\" 包含来自多个自动发现规则上的监控项模板"
 
 #: include/classes/api/services/CGraphGeneral.php:668
 #, c-format
 msgid "Graph prototype \"%1$s\" must have at least one item prototype."
-msgstr "数据图模板\"%1$s\"必须要有至少一个监控项目模板"
+msgstr "数据图模板\"%1$s\"必须要有至少一个监控项模板"
 
 #: include/classes/api/services/CGraphPrototype.php:38
 #, c-format
 msgid "Graph prototype \"%1$s\" with templated items cannot contain items from other hosts."
-msgstr "含模板项目的图形原型\"%1$s\"不能包含其它主机的项目."
+msgstr "含模板监控项的图形原型\"%1$s\"不能包含其它主机的监控项."
 
 #: graphs.php:234
 msgid "Graph prototype added"
@@ -7908,6 +7916,10 @@ msgstr "主机群组 \"%1$s\" 为内建的且不能被删除"
 msgid "Host group elements"
 msgstr "主机群组组件"
 
+#: jsLoader.php:287
+msgid "Host group is not selected."
+msgstr ""
+
 #: include/views/monitoring.sysmap.edit.php:165
 msgid "Host group label type"
 msgstr "主机群组标签类型"
@@ -7981,6 +7993,10 @@ msgstr "主机资产记录"
 #: hostinventoriesoverview.php:26 hostinventoriesoverview.php:146
 msgid "Host inventory overview"
 msgstr "主机资产记录概览"
+
+#: jsLoader.php:284
+msgid "Host is not selected."
+msgstr ""
 
 #: include/views/monitoring.sysmap.edit.php:180
 msgid "Host label type"
@@ -8526,7 +8542,7 @@ msgstr "已成功导入"
 #: hostinventories.php:188
 #, c-format
 msgid "Impossible to filter by inventory field \"%1$s\", which does not exist."
-msgstr "无法按库存字段“%1$s”过滤，该字段不存在。"
+msgstr "无法按资产字段“%1$s”过滤，该字段不存在。"
 
 #: include/html.inc.php:309 include/maps.inc.php:415
 msgid "In maintenance"
@@ -8980,22 +8996,22 @@ msgstr "资产字段“%1$s”不正确。"
 
 #: app/controllers/CControllerActionOperationValidate.php:176
 msgid "Incorrect inventory mode in action operation."
-msgstr "要执行的动作库存方式是不正确的。"
+msgstr "要执行的动作资产模式是不正确的。"
 
 #: include/classes/api/services/CTriggerGeneral.php:2000
 #, c-format
 msgid "Incorrect item key \"%1$s\" provided for trigger expression on \"%2$s\"."
-msgstr "提供错误的项目键值\"%1$s\"给\"%2$s\"上的触发器表达式."
+msgstr "提供错误的监控项键值\"%1$s\"给\"%2$s\"上的触发器表达式."
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:50
 #: include/triggers.inc.php:1150
 msgid "Incorrect item value type"
-msgstr "项目的数据类型不正确"
+msgstr "监控项的数据类型不正确"
 
 #: include/classes/api/services/CTriggerGeneral.php:2007
 #, c-format
 msgid "Incorrect item value type \"%1$s\" provided for trigger function \"%2$s\"."
-msgstr "提供错误的项目值类型\"%1$s\"给触发器函数\"%2$s\"."
+msgstr "提供错误的监控项值类型\"%1$s\"给触发器函数\"%2$s\"."
 
 #: include/forms.inc.php:1579
 msgid "Incorrect list of items."
@@ -10037,12 +10053,12 @@ msgstr "主机\"%1$s\"的资产记录被禁用."
 
 #: app/views/administration.iconmap.edit.php:58
 msgid "Inventory field"
-msgstr "资产纪录栏位"
+msgstr "资产字段"
 
 #: app/partials/popup.operations.php:227
 #: app/views/popup.massupdate.host.php:169
 msgid "Inventory mode"
-msgstr "资产纪录模式"
+msgstr "资产模式"
 
 #: app/views/administration.user.list.php:111
 msgid "Is online?"
@@ -10114,7 +10130,7 @@ msgstr "监控项已添加"
 
 #: app/views/popup.itemtestedit.view.php:423
 msgid "Item contains user-defined macros with secret values. Values of these macros should be entered manually."
-msgstr "项目包含具有秘密值的用户定义的宏。这些宏的值应手动输入。"
+msgstr "监控项包含具有秘密值的用户定义的宏。这些宏的值应手动输入。"
 
 #: items.php:971
 msgid "Item copied"
@@ -10149,7 +10165,7 @@ msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1562
 msgid "Item not selected"
-msgstr "项目未被选择"
+msgstr "监控项未被选择"
 
 #: include/classes/api/services/CItemGeneral.php:1424
 #, c-format
@@ -10182,7 +10198,7 @@ msgstr "\"%2$s\"上的项目模板\"%1$s\"已经存在."
 
 #: disc_prototypes.php:561
 msgid "Item prototype added"
-msgstr "项目模板已经添加"
+msgstr "监控项模板已经添加"
 
 #: disc_prototypes.php:316
 msgid "Item prototype deleted"
@@ -10197,7 +10213,7 @@ msgstr[0] "项目模板已更新"
 #: include/classes/api/services/CDashboardGeneral.php:482
 #, c-format
 msgid "Item prototype with ID \"%1$s\" is not available."
-msgstr "ID为 \"%1$s\" 的项目原型不可用。"
+msgstr "ID为 \"%1$s\" 的监控项原型不可用。"
 
 #: app/controllers/CControllerPopupGeneric.php:279
 #: app/controllers/CControllerPopupImportCompare.php:177
@@ -10243,7 +10259,7 @@ msgstr "监控项值"
 
 #: chart.php:102 chart.php:105
 msgid "Item values"
-msgstr "项目值"
+msgstr "监控项值"
 
 #: include/items.inc.php:2240
 msgid "Item will not be refreshed. Please enter a correct update interval."
@@ -10261,7 +10277,7 @@ msgstr "监控项不会被刷新。更新间隔应该在 1s 到 1d 之间。还�
 #: include/classes/api/services/CDashboardGeneral.php:454
 #, c-format
 msgid "Item with ID \"%1$s\" is not available."
-msgstr "ID为 \"%1$s\" 的项目不可用。"
+msgstr "ID为 \"%1$s\" 的监控项不可用。"
 
 #: include/classes/api/services/CItemGeneral.php:787
 #, c-format
@@ -11157,6 +11173,10 @@ msgstr "拓扑元素标签位置"
 #: include/views/monitoring.sysmap.edit.php:240
 msgid "Map element label type"
 msgstr "拓扑元素标签类型"
+
+#: jsLoader.php:285
+msgid "Map is not selected."
+msgstr ""
 
 #: sysmap.php:128
 msgid "Map is updated! Return to map list?"
@@ -12332,7 +12352,7 @@ msgstr "没有定义接口。"
 
 #: app/controllers/CControllerActionOperationValidate.php:169
 msgid "No inventory mode specified for action operation."
-msgstr "要执行的动作的库存模式没有被设定。"
+msgstr "要执行的动作的资产模式没有被设定。"
 
 #: chart3.php:146 chart7.php:57
 msgid "No items defined."
@@ -12831,7 +12851,7 @@ msgstr "队列中延迟到秒（包含）的监控项数。"
 #: include/classes/data/CItemData.php:1610
 #: include/classes/data/CItemData.php:1710
 msgid "Number of items in the queue which are delayed in Zabbix server or proxy by \"from\" till \"to\" seconds, inclusive."
-msgstr "队列中在 Zabbix 服务器或proxy中延迟 \"from\" 到 \"to\" 秒的项目数，包括在内。"
+msgstr "队列中在 Zabbix 服务器或proxy中延迟 \"from\" 到 \"to\" 秒的监控项数，包括在内。"
 
 #: include/classes/data/CItemData.php:1662
 msgid "Number of monitored hosts"
@@ -13144,7 +13164,7 @@ msgstr "只允许超级管理员可以设置报告所有者。"
 
 #: app/partials/administration.system.info.php:68
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
-msgstr "只计算指派给启用的主机的和相依于启用的项目的触发器"
+msgstr "只计算指派给启用的主机的和相依于启用的监控项的触发器"
 
 #: app/views/popup.mediatypetest.edit.php:52 app/views/popup.scriptexec.php:41
 msgid "Open log"
@@ -13981,7 +14001,7 @@ msgstr "波兰(pl_PL)"
 
 #: include/views/configuration.item.edit.php:991
 msgid "Populates host inventory field"
-msgstr "填入主机资产纪录栏位"
+msgstr "填入主机资产字段"
 
 #: app/controllers/CControllerPopupItemTest.php:1343
 #: app/partials/monitoring.host.filter.php:113
@@ -16089,7 +16109,7 @@ msgstr "设置到期日期和时间"
 
 #: include/actions.inc.php:1037
 msgid "Set host inventory mode"
-msgstr "设置主机清单模式"
+msgstr "设置主机资产模式"
 
 #: include/classes/html/CInputSecret.php:80 jsLoader.php:421
 msgid "Set new value"
@@ -17468,11 +17488,11 @@ msgstr[0] "图片被应用于拓扑图 %1$s上."
 #: include/html.inc.php:777
 #, c-format
 msgid "The item is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
-msgstr "已无法自动发现此项目了, 将删除于%1$s (在%2$s在%3$s)."
+msgstr "已无法自动发现此监控项了, 将于%1$s删除(在%2$s %3$s)."
 
 #: include/html.inc.php:772
 msgid "The item is not discovered anymore and will be deleted the next time discovery rule is processed."
-msgstr "被发现的监控项目丢失它将在下次自动发现规则执行时被删除."
+msgstr "被发现的监控项丢失它将在下次自动发现规则执行时被删除."
 
 #: include/classes/widgets/views/widget.geomap.form.view.php:72
 #, c-format
@@ -17975,7 +17995,7 @@ msgstr[0] "触发器已启用"
 #: include/classes/api/services/CHostBase.php:1666
 #, c-format
 msgid "Trigger has items from template \"%1$s\" that is not linked to host."
-msgstr "触发器有项目来自于模板\"%1$s\"其并未链接到主机."
+msgstr "触发器有监控项来自于模板\"%1$s\"其并未链接到主机."
 
 #: include/actions.inc.php:1267
 msgid "Trigger in \"unknown\" state"
@@ -17985,6 +18005,10 @@ msgstr "触发器在\"未知\"状态"
 #, c-format
 msgid "Trigger in template \"%1$s\" has dependency with trigger in template \"%2$s\"."
 msgstr "模板\"%1$s\"中的触发器依赖模板\"%2$s\"中的触发器"
+
+#: jsLoader.php:286
+msgid "Trigger is not selected."
+msgstr ""
 
 #: include/views/monitoring.sysmap.edit.php:195
 msgid "Trigger label type"
@@ -18075,7 +18099,7 @@ msgstr "触发器原型“%1$s”不能依赖触发器原型“%2$s”，因为�
 #: include/classes/api/services/CTriggerGeneral.php:2084
 #, c-format
 msgid "Trigger prototype \"%1$s\" contains item prototypes from multiple discovery rules."
-msgstr "触发器模板\"%1$s\"中包含了来自多个自动发现规则的项目模板."
+msgstr "触发器模板\"%1$s\"中包含了来自多个自动发现规则的监控项模板."
 
 #: include/classes/import/CConfigurationImport.php:1570
 #, c-format
@@ -18085,7 +18109,7 @@ msgstr "触发器模板 \"%1$s\" 依赖于触发器 \"%2$s\" ,但它不存在。
 #: include/classes/api/services/CTriggerGeneral.php:2079
 #, c-format
 msgid "Trigger prototype \"%1$s\" must contain at least one item prototype."
-msgstr "触发器模板 \"%1$s\"必须至少包含一个项目模板."
+msgstr "触发器模板 \"%1$s\"必须至少包含一个监控项模板."
 
 #: trigger_prototypes.php:254
 msgid "Trigger prototype added"
@@ -18189,7 +18213,7 @@ msgstr "土耳其语 (tr_TR)"
 #: include/classes/api/services/CItem.php:1033
 #, c-format
 msgid "Two items (\"%1$s\" and \"%2$s\") cannot populate one host inventory field \"%3$s\", this would lead to a conflict."
-msgstr "两个项目 (\"%1$s\"和\"%2$s\")不能填入一个主机资产纪录栏位\"%3$s\", 这会造成冲突."
+msgstr "两个项目 (\"%1$s\"和\"%2$s\")不能填入一个主机资产字段位\"%3$s\", 这会造成冲突."
 
 #: jsLoader.php:276
 msgid "Two map elements should be selected"
@@ -19626,6 +19650,10 @@ msgstr "视图"
 msgid "View as"
 msgstr "以视图"
 
+#: jsLoader.php:397
+msgid "View related reports"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1234
 msgid "Virtual space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr "虚拟空间大小（以字节计）或百分比（总计）。 返回整型字节; 浮点百分比"
@@ -19868,7 +19896,7 @@ msgstr "异常设备"
 
 #: app/views/popup.tophosts.column.edit.php:119
 msgid "With this setting only numeric items will be displayed in this column."
-msgstr "使用此设置，此列中将仅显示数字项目。"
+msgstr "使用此设置，此列中将仅显示数字监控项。"
 
 #: include/forms.inc.php:339 include/forms.inc.php:557
 msgid "With triggers"
@@ -20162,6 +20190,10 @@ msgstr "你没有权限来访问这个页面."
 #: include/func.inc.php:1724
 msgid "You must login to view this page."
 msgstr "您必需登录才能浏览此页面."
+
+#: jsLoader.php:282
+msgid "You need to have at least one image uploaded to create map element. Images can be uploaded in Administration->General->Images section."
+msgstr ""
 
 #: include/classes/db/DB.php:135
 msgid "Your database is not working properly. Please wait a few minutes and try to repeat this action. If the problem still persists, please contact system administrator. The problem might be caused by long running transaction or row level lock accomplished by your database management system."
@@ -21537,11 +21569,11 @@ msgstr "mod() - 除法的余数"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:822
 msgid "monodec() - Check for continuous item value decrease (1 - data is monotonic, 0 - otherwise), Mode (strict - require strict monotonicity)"
-msgstr "monodec() - 检查项目值是否连续减少（1 - 数据是单调的，0 - 否则），模式（严格 - 要求严格的单调性）"
+msgstr "monodec() - 检查监控项值是否连续减少（1 - 数据是单调的，0 - 否则），模式（严格 - 要求严格的单调性）"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:829
 msgid "monoinc() - Check for continuous item value increase (1 - data is monotonic, 0 - otherwise), Mode (strict - require strict monotonicity)"
-msgstr "monoinc() - 检查项目值是否连续增加（1 - 数据是单调的，0 - 否则），模式（严格 - 要求严格的单调性）"
+msgstr "monoinc() - 检查监控项值是否连续增加（1 - 数据是单调的，0 - 否则），模式（严格 - 要求严格的单调性）"
 
 #: include/func.inc.php:597
 msgctxt "millisecond short"
@@ -21882,6 +21914,10 @@ msgstr "正确"
 #: app/controllers/CControllerPopupTriggerExpr.php:924
 msgid "right() - Returns the rightmost count characters"
 msgstr "right() - 返回最右边指定个数字符"
+
+#: jsLoader.php:199
+msgid "root"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:937
 msgid "round() - Rounds a value to decimal places"
