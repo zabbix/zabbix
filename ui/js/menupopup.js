@@ -1563,10 +1563,15 @@ jQuery(function($) {
 		const parent_menu = $(this).closest('.menu-popup');
 		$('.highlighted', parent_menu).removeClass('highlighted');
 		$('[aria-expanded]', parent_menu).attr({'aria-expanded': 'false'});
-		$('.menu-popup', parent_menu).css({'display': 'none'}).removeData('pos');
+		$('.menu-popup', parent_menu)
+			.css({'display': 'none'})
+			.removeData('pos');
 
 		// Close actual menu level.
-		parent_menu.not('.menu-popup-top').css({'display': 'none'}).removeData('pos');
+		parent_menu.not('.menu-popup-top')
+			.css({'display': 'none'})
+			.removeData('pos');
+
 		parent_menu.prev('[role="menuitem"]').attr({'aria-expanded': 'false'});
 
 		return this;
