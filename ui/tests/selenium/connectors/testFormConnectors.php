@@ -1335,8 +1335,8 @@ class testFormConnectors extends CWebTest {
 			'mailto://zabbix.com', 'tel://zabbix.com', 'ssh://zabbix.com'
 		];
 
-		$this->page->login()->open('zabbix.php?action=connector.list');
-		$this->query('link', self::DEFAULT_CONNECTOR)->one()->click();
+		$this->page->login()->open('zabbix.php?action=connector.list')->waitUntilReady();
+		$this->query('link', self::DEFAULT_CONNECTOR)->waitUntilClickable()->one()->click();
 
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$form = $dialog->asForm();
@@ -1363,7 +1363,7 @@ class testFormConnectors extends CWebTest {
 		$config_form->submit();
 		$this->assertMessage(TEST_GOOD, 'Configuration updated');
 
-		$this->page->open('zabbix.php?action=connector.list');
+		$this->page->open('zabbix.php?action=connector.list')->waitUntilReady();
 		$this->assertUriScheme($form, array_merge($default_valid_schemes, $invalid_schemes));
 	}
 
@@ -1375,7 +1375,7 @@ class testFormConnectors extends CWebTest {
 	 * @param string $expected		expected result after connector form submit, TEST_GOOD or TEST_BAD
 	 */
 	private function assertUriScheme($form, $data, $expected = TEST_GOOD) {
-		$this->query('link', self::DEFAULT_CONNECTOR)->one()->click();
+		$this->query('link', self::DEFAULT_CONNECTOR)->->waitUntilClickable()->one()->click();
 
 		foreach ($data as $scheme) {
 			$form->fill(['URL' => $scheme]);
