@@ -36,12 +36,6 @@ class testProxy extends CAPITest {
 
 	public static function prepareTestData(): void {
 		$proxies = [];
-		$interface = [
-			'useip' => INTERFACE_USE_DNS,
-			'dns' => 'example.com',
-			'port' => 123
-		];
-
 		// dataProviderInvalidProxyCreate: Field "tls_psk" cannot have different values for same "tls_psk_identity"
 		$proxies[] = [
 			'host' => 'test.example.com',
@@ -72,7 +66,11 @@ class testProxy extends CAPITest {
 			'tls_connect' => HOST_ENCRYPTION_PSK,
 			'tls_psk_identity' => 'psk3.example.com',
 			'tls_psk' => 'de4f735c561e5444b0932f7ebd636b85',
-			'interface' => $interface
+			'interface' => [
+				'useip' => INTERFACE_USE_DNS,
+				'dns' => 'example.com',
+				'port' => 123
+			]
 		];
 
 		$result = CDataHelper::call('proxy.create', $proxies);
@@ -95,12 +93,19 @@ class testProxy extends CAPITest {
 		];
 		$result = CDataHelper::call('host.create', self::resolveIds($hosts));
 		self::$data['host'] += array_combine(array_column($hosts, 'host'), $result['hostids']);
+
+		CDataHelper::call('autoregistration.update', [
+			'tls_accept' => HOST_ENCRYPTION_PSK,
+			'tls_psk_identity' => 'autoregistration',
+			'tls_psk' => 'ec30a947e6776ae9efb77f46aefcba04'
+		]);
 	}
 
 	public static function cleanTestData(): void {
 		CDataHelper::call('proxy.delete', array_values(self::$data['proxy']));
 		CDataHelper::call('host.delete', array_values(self::$data['host']));
 		CDataHelper::call('hostgroup.delete', array_values(self::$data['hostgroup']));
+		CDataHelper::call('autoregistration.update', ['tls_accept' => HOST_ENCRYPTION_NONE]);
 	}
 
 	public static function resolveIds(array $rows) {
@@ -352,13 +357,25 @@ class testProxy extends CAPITest {
 				],
 				'expected_error' => 'Incorrect value for field "/1/tls_psk": another value of tls_psk exists for same tls_psk_identity.'
 			],
-			'Field "tls_psk_identity" should have same value of "tls_psk" across all hosts, proxies and autoregistration' => [
+			'Field "tls_psk_identity" should have same value of "tls_psk" across all proxies and hosts' => [
 				'proxy' => [
 					[
 						'host' => 'bca.example.com',
 						'status' => HOST_STATUS_PROXY_ACTIVE,
 						'tls_accept' => HOST_ENCRYPTION_PSK,
 						'tls_psk_identity' => 'psk4.example.com',
+						'tls_psk' => '5fce1b3e34b520afeffb37ce08c7cd66'
+					]
+				],
+				'expected_error' => 'Incorrect value for field "/1/tls_psk": another value of tls_psk exists for same tls_psk_identity.'
+			],
+			'Field "tls_psk_identity" should have same value of "tls_psk" across all proxies and autoregistration' => [
+				'proxy' => [
+					[
+						'host' => 'bca.example.com',
+						'status' => HOST_STATUS_PROXY_ACTIVE,
+						'tls_accept' => HOST_ENCRYPTION_PSK,
+						'tls_psk_identity' => 'autoregistration',
 						'tls_psk' => '5fce1b3e34b520afeffb37ce08c7cd66'
 					]
 				],
@@ -441,9 +458,15 @@ class testProxy extends CAPITest {
 				],
 				'expected_error' => 'Incorrect value for field "/1/tls_psk": another value of tls_psk exists for same tls_psk_identity.'
 			],
-			'Field "tls_psk_identity" should have same value of "tls_psk" across all hosts, proxies and autoregistration' => [
+			'Field "tls_psk_identity" should have same value of "tls_psk" across all proxies and hosts' => [
 				'proxy' => [
 					['proxyid' => ':proxy:psk1.example.com', 'tls_psk_identity' => 'psk4.example.com']
+				],
+				'expected_error' => 'Incorrect value for field "/1/tls_psk": another value of tls_psk exists for same tls_psk_identity.'
+			],
+			'Field "tls_psk_identity" should have same value of "tls_psk" across all proxies and autoregistration' => [
+				'proxy' => [
+					['proxyid' => ':proxy:psk1.example.com', 'tls_psk_identity' => 'autoregistration']
 				],
 				'expected_error' => 'Incorrect value for field "/1/tls_psk": another value of tls_psk exists for same tls_psk_identity.'
 			]

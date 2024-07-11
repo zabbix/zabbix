@@ -1880,12 +1880,13 @@ class CHost extends CHostGeneral {
 	 * @throws CAPIException
 	 */
 	protected static function checkTlsPsk(array $hosts, array $db_hosts = null): void {
-		$psk_identity_index = [];
-		$updated_hostids = [];
+		$psk_pairs = [];
 		$tls_psk_fields = array_flip(['tls_psk_identity', 'tls_psk']);
 
 		foreach ($hosts as $i => $host) {
-			if (!array_intersect_key($host, $tls_psk_fields)) {
+			$psk_pair = array_intersect_key($host, $tls_psk_fields);
+
+			if (!$psk_pair) {
 				continue;
 			}
 
@@ -1894,42 +1895,15 @@ class CHost extends CHostGeneral {
 			}
 
 			if ($db_hosts !== null) {
-				$host += array_intersect_key($db_hosts[$host['hostid']], $tls_psk_fields);
-				$hosts[$i] = $host;
-				$updated_hostids[] = $host['hostid'];
+				$psk_pair += array_intersect_key($db_hosts[$host['hostid']], $tls_psk_fields);
+				$psk_pair['hostid'] = $host['hostid'];
 			}
 
-			$tls_psk_identity = $host['tls_psk_identity'];
-
-			if (array_key_exists($tls_psk_identity, $psk_identity_index)
-					&& $hosts[$psk_identity_index[$tls_psk_identity]]['tls_psk'] !== $host['tls_psk']) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-					'/'.($i + 1).'/tls_psk', _('another value of tls_psk exists for same tls_psk_identity'))
-				);
-			}
-
-			$psk_identity_index[$tls_psk_identity] = $i;
+			$psk_pairs[$i] = $psk_pair;
 		}
 
-		if (!$psk_identity_index) {
-			return;
-		}
-
-		$cursor = DBselect(
-			'SELECT tls_psk_identity,tls_psk FROM hosts'.
-			' WHERE '.dbConditionInt('status', [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]).
-				' AND '.dbConditionId('hostid', $updated_hostids, true).
-				' AND '.dbConditionString('tls_psk_identity', array_keys($psk_identity_index))
-		);
-
-		while ($db_row = DBfetch($cursor)) {
-			$i = $psk_identity_index[$db_row['tls_psk_identity']];
-
-			if ($hosts[$i]['tls_psk'] !== $db_row['tls_psk']) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-					'/'.($i + 1).'/tls_psk', _('another value of tls_psk exists for same tls_psk_identity'))
-				);
-			}
+		if ($psk_pairs) {
+			CApiPskHelper::checkPskIndentityPskPairs($psk_pairs);
 		}
 	}
 

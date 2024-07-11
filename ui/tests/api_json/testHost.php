@@ -30,7 +30,7 @@ class testHost extends CAPITest {
 
 	public static $data = [
 		'host' => [],
-		'hostgroup' => []
+		'hostgroup' => [],
 	];
 
 	public static function prepareTestData(): void {
@@ -74,11 +74,18 @@ class testHost extends CAPITest {
 
 		$result = CDataHelper::call('host.create', self::resolveIds($hosts));
 		self::$data['host'] = array_combine(array_column($hosts, 'host'), $result['hostids']);
+
+		CDataHelper::call('autoregistration.update', [
+			'tls_accept' => HOST_ENCRYPTION_PSK,
+			'tls_psk_identity' => 'autoregistration',
+			'tls_psk' => 'ec30a947e6776ae9efb77f46aefcba04'
+		]);
 	}
 
 	public static function cleanTestData(): void {
 		CDataHelper::call('host.delete', array_values(self::$data['host']));
 		CDataHelper::call('hostgroup.delete', array_values(self::$data['hostgroup']));
+		CDataHelper::call('autoregistration.update', ['tls_accept' => HOST_ENCRYPTION_NONE]);
 	}
 
 	public static function resolveIds(array $rows) {
@@ -333,6 +340,18 @@ class testHost extends CAPITest {
 					]
 				],
 				'expected_error' => 'Incorrect value for field "/1/tls_psk": another value of tls_psk exists for same tls_psk_identity.'
+			],
+			'Field "tls_psk_identity" should have same value of "tls_psk" across all hosts and autoregistration' => [
+				'host' => [
+					[
+						'host' => 'bca.example.com',
+						'groups' => [['groupid' => ':hostgroup:API tests hosts group']],
+						'tls_accept' => HOST_ENCRYPTION_PSK,
+						'tls_psk_identity' => 'autoregistration',
+						'tls_psk' => '5fce1b3e34b520afeffb37ce08c7cd66'
+					]
+				],
+				'expected_error' => 'Incorrect value for field "/1/tls_psk": another value of tls_psk exists for same tls_psk_identity.'
 			]
 		];
 	}
@@ -549,6 +568,12 @@ class testHost extends CAPITest {
 			'Field "tls_psk" cannot have different values for same "tls_psk_identity" on change "tls_psk"' => [
 				'host' => [
 					['hostid' => ':host:psk1.example.com', 'tls_psk' => 'de4f735c561e5444b0932f7ebd636b85']
+				],
+				'expected_error' => 'Incorrect value for field "/1/tls_psk": another value of tls_psk exists for same tls_psk_identity.'
+			],
+			'Field "tls_psk_identity" should have same value of "tls_psk" across all hosts and autoregistration' => [
+				'host' => [
+					['hostid' => ':host:psk1.example.com', 'tls_psk_identity' => 'autoregistration']
 				],
 				'expected_error' => 'Incorrect value for field "/1/tls_psk": another value of tls_psk exists for same tls_psk_identity.'
 			]
