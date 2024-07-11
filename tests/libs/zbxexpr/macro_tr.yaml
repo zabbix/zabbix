@@ -225,5 +225,13 @@ in:
 out:
   value: "-A-"
   return: SUCCEED
-
+---
+test case: triple range spechar usage
+in:
+  data: '1234567890'
+  param1: '0-9'
+  param2: '*---a-z'
+out:
+  value: '+,--abcde*'
+  return: SUCCEED
 ...
