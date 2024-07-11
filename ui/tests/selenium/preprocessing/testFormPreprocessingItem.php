@@ -99,6 +99,7 @@ class testFormPreprocessingItem extends testFormPreprocessing {
 	public function testFormItemPreprocessing_RepeatedNotSupported() {
 		$this->checkRepeatedNotSupported();
 	}
+
 	/**
 	 * @dataProvider getItemPreprocessingTrailingSpacesData
 	 */

@@ -525,6 +525,19 @@ abstract class testFormPreprocessing extends CWebTest {
 	 */
 	public static function getCommonPreprocessingValidationData() {
 		return [
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Check for not supported value - two checks',
+						'Key' => 'check-for-not-supported-value-two-checks[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Check for not supported value'],
+						['type' => 'Check for not supported value', 'parameter_1' => 'error matches', 'parameter_2' => '^test.*$']
+					]
+				]
+			],
 			// Text - Regular expression.
 			[
 				[
@@ -675,7 +688,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
 				]
 			],
-			// #6 Validation - Does not match regular expression.
+			// Validation - Does not match regular expression.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -701,6 +714,21 @@ abstract class testFormPreprocessing extends CWebTest {
 						['type' => 'Check for error in JSON']
 					],
 					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
+				]
+			],
+			// Validation - Check for not supported value.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Check for not supported value - duplicate',
+						'Key' => 'check-for-not-supported-duplicate[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Check for not supported value'],
+						['type' => 'Check for not supported value']
+					],
+					'error' => 'Invalid parameter "/1/preprocessing/2": value (type, params)=(26, -1) already exists.'
 				]
 			],
 			// Throttling - Discard unchanged with heartbeat.
@@ -1390,6 +1418,19 @@ abstract class testFormPreprocessing extends CWebTest {
 					],
 					'preprocessing' => [
 						['type' => 'Check for not supported value', 'parameter_1' => 'error does not match', 'parameter_2' => '^test.*$']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Check for not supported value - two checks',
+						'Key' => 'check-for-not-supported-value-two-checks[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Check for not supported value'],
+						['type' => 'Check for not supported value', 'parameter_1' => 'error matches', 'parameter_2' => '^test.*$']
 					]
 				]
 			],
