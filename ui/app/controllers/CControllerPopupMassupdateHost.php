@@ -79,6 +79,19 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 			}
 		}
 
+		if ($ret) {
+			$hosts = API::Host()->get([
+				'output' => [],
+				'hostids' => $this->getInput('hostids'),
+				'editable' => true
+			]);
+
+			if (!$hosts) {
+				error(_('No permissions to referred object or it does not exist!'));
+				$ret = false;
+			}
+		}
+
 		if (!$ret) {
 			$this->setResponse(
 				(new CControllerResponseData(['main_block' => json_encode([
@@ -93,13 +106,7 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 	}
 
 	protected function checkPermissions(): bool {
-		$hosts = API::Host()->get([
-			'output' => [],
-			'hostids' => $this->getInput('hostids'),
-			'editable' => true
-		]);
-
-		return count($hosts) > 0;
+		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS);
 	}
 
 	protected function doAction(): void {
@@ -466,9 +473,9 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 				}
 				unset($host);
 
-				$result = $hosts ? (bool) API::Host()->update($hosts) : true;
+				$result = (bool) API::Host()->update($hosts);
 
-				if ($result === false) {
+				if (!$result) {
 					throw new Exception();
 				}
 
@@ -477,7 +484,7 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 					$this->updateValueMaps($hostids);
 				}
 
-				DBend(true);
+				DBend();
 			}
 			catch (Exception $e) {
 				DBend(false);
@@ -488,20 +495,19 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 			if ($this->hasInput('backurl')) {
 				$upd_status = ($this->getInput('status', HOST_STATUS_NOT_MONITORED) == HOST_STATUS_MONITORED);
 				$backurl = new CUrl($this->getInput('backurl'));
-				$cnt = count($hostids);
 
 				if ($result) {
 					$backurl->setArgument('uncheck', 1);
 
 					CMessageHelper::setSuccessTitle($upd_status
-						? _n('Host enabled', 'Hosts enabled', $cnt)
-						: _n('Host disabled', 'Hosts disabled', $cnt)
+						? _n('Host enabled', 'Hosts enabled', $hosts_count)
+						: _n('Host disabled', 'Hosts disabled', $hosts_count)
 					);
 				}
 				else {
 					CMessageHelper::setErrorTitle($upd_status
-						? _n('Cannot enable host', 'Cannot enable hosts', $cnt)
-						: _n('Cannot disable host', 'Cannot disable hosts', $cnt)
+						? _n('Cannot enable host', 'Cannot enable hosts', $hosts_count)
+						: _n('Cannot disable host', 'Cannot disable hosts', $hosts_count)
 					);
 				}
 

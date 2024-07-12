@@ -16,26 +16,6 @@
 
 class CRouter {
 	/**
-	 * Layout used for view rendering.
-	 */
-	private ?string $layout = null;
-
-	/**
-	 * Controller class for action handling.
-	 */
-	private ?string $controller = null;
-
-	/**
-	 * View used to generate HTML, CSV, JSON and other content.
-	 */
-	private ?string $view = null;
-
-	/**
-	 * Unique action (request) identifier.
-	 */
-	private ?string $action = null;
-
-	/**
 	 * Mapping between action and corresponding controller, layout and view.
 	 */
 	private array $routes = [
@@ -116,7 +96,9 @@ class CRouter {
 		'hintbox.eventlist'							=> ['CControllerHintboxEventlist',						'layout.json',			'hintbox.eventlist'],
 		'host.create'								=> ['CControllerHostCreate',							'layout.json',			null],
 		'host.dashboard.view'						=> ['CControllerHostDashboardView',						'layout.htmlpage',		'monitoring.host.dashboard.view'],
+		'host.disable'								=> ['CControllerHostDisable',							'layout.json',			null],
 		'host.edit'									=> ['CControllerHostEdit',								'layout.htmlpage',		'configuration.host.edit'],
+		'host.enable'								=> ['CControllerHostEnable',							'layout.json',			null],
 		'host.list'									=> ['CControllerHostList',								'layout.htmlpage',		'configuration.host.list'],
 		'host.massdelete'							=> ['CControllerHostMassDelete',						'layout.json',			null],
 		'host.update'								=> ['CControllerHostUpdate',							'layout.json',			null],
@@ -419,6 +401,26 @@ class CRouter {
 		'sysmaps.php'					=> ['CLegacyAction', null, null],
 		'tr_events.php'					=> ['CLegacyAction', null, null]
 	];
+
+	/**
+	 * Layout used for view rendering.
+	 */
+	private ?string $layout = null;
+
+	/**
+	 * Controller class for action handling.
+	 */
+	private ?string $controller = null;
+
+	/**
+	 * View used to generate HTML, CSV, JSON and other content.
+	 */
+	private ?string $view = null;
+
+	/**
+	 * Unique action (request) identifier.
+	 */
+	private ?string $action = null;
 
 	private const DASHBOARD_ACTIONS = [
 		'dashboard.print',

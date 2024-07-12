@@ -27,8 +27,10 @@
 	const view = {
 		applied_filter_groupids: [],
 
-		init({applied_filter_groupids}) {
+		init({applied_filter_groupids, form_name, token}) {
 			this.applied_filter_groupids = applied_filter_groupids;
+			this.form = document.forms[form_name];
+			this.token = token;
 
 			this.initFilter();
 
@@ -43,6 +45,87 @@
 					this.editProxyGroup(e.target.dataset.proxy_groupid);
 				}
 			});
+
+			this.form.addEventListener('click', (e) => {
+				const target = e.target;
+				const hostids = Object.keys(chkbxRange.getSelectedIds());
+
+				if (target.classList.contains('js-enable-host')) {
+					this.enable(null, {hostids: [target.dataset.hostid]});
+				}
+				if (target.classList.contains('js-disable-host')) {
+					this.disable(null, {hostids: [target.dataset.hostid]});
+				}
+                if (target.classList.contains('js-massenable-host')) {
+					this.enable(target, {hostids: hostids});
+                }
+				if (target.classList.contains('js-massdisable-host')) {
+					this.disable(target, {hostids: hostids});
+				}
+            });
+		},
+
+		enable(target, parameters) {
+			const curl = new Curl('zabbix.php');
+			curl.setArgument('action', 'host.enable');
+
+			if (target !== null) {
+				this.confirmAction(curl, parameters, target);
+			}
+			else {
+				this.postAction(curl, parameters);
+			}
+		},
+
+		disable(target, parameters) {
+			const curl = new Curl('zabbix.php');
+			curl.setArgument('action', 'host.disable');
+
+			if (target !== null) {
+				this.confirmAction(curl, parameters, target);
+			}
+			else {
+				this.postAction(curl, parameters);
+			}
+		},
+
+		confirmAction(curl, data, target) {
+			const confirm_messages = {
+				'host.enable': <?= json_encode([_('Enable selected host?'), _('Enable selected hosts?')]) ?>,
+				'host.disable': <?= json_encode([_('Disable selected host?'), _('Disable selected hosts?')]) ?>
+			};
+			const confirm = confirm_messages[curl.getArgument('action')];
+			const message = confirm ? confirm[data.hostids.length > 1 ? 1 : 0] : null;
+
+			if (message !== null && !window.confirm(message)) {
+				return;
+			}
+
+			target.classList.add('is-loading');
+			this.postAction(curl, data)
+				.finally(() => {
+					target.classList.remove('is-loading');
+					target.blur();
+				});
+		},
+
+		postAction(curl, data) {
+			const action = curl.getArgument('action');
+
+			return fetch(curl.getUrl(), {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({...this.token, ...data})
+			})
+				.then((response) => response.json())
+				.then((response) => this.events.elementSuccess({detail: {action, ...response}}))
+				.catch(() => {
+					clearMessages();
+
+					const message_box = makeMessageBox('bad', [<?= json_encode(_('Unexpected server error.')) ?>]);
+
+					addMessage(message_box);
+				});
 		},
 
 		editTemplate(parameters) {
@@ -213,7 +296,14 @@
 			elementSuccess(e) {
 				const data = e.detail;
 
-				if ('success' in data) {
+				if ('error' in data) {
+					if ('title' in data.error) {
+						postMessageError(data.error.title);
+					}
+
+					postMessageDetails('error', data.error.messages);
+				}
+				else if ('success' in data) {
 					postMessageOk(data.success.title);
 
 					if ('messages' in data.success) {

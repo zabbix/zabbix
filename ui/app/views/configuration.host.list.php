@@ -289,17 +289,6 @@ foreach ($data['hosts'] as $host) {
 		->onClick('view.editHost(event, this.dataset.hostid);');
 
 	$maintenance_icon = false;
-	$status_toggle_url = (new CUrl('zabbix.php'))
-		->setArgument('action', 'popup.massupdate.host')
-		->setArgument('hostids', [$host['hostid']])
-		->setArgument('visible[status]', 1)
-		->setArgument('update', 1)
-		->setArgument('backurl',
-			(new CUrl('zabbix.php'))
-				->setArgument('action', 'host.list')
-				->setArgument('page', CPagerHelper::loadPage('host.list', null))
-				->getUrl()
-		);
 
 	if ($host['status'] == HOST_STATUS_MONITORED) {
 		if ($host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
@@ -314,20 +303,16 @@ foreach ($data['hosts'] as $host) {
 			}
 		}
 
-		$status_toggle_url->setArgument('status', HOST_STATUS_NOT_MONITORED);
-		$toggle_status_link = (new CLink(_('Enabled'), $status_toggle_url->getUrl()))
-			->addClass(ZBX_STYLE_LINK_ACTION)
+		$toggle_status_link = (new CLinkAction(_('Enabled')))
 			->addClass(ZBX_STYLE_GREEN)
-			->addConfirmation(_('Disable host?'))
-			->addCsrfToken($csrf_token_massupdate);
+			->addClass('js-disable-host')
+			->setAttribute('data-hostid', $host['hostid']);
 	}
 	else {
-		$status_toggle_url->setArgument('status', HOST_STATUS_MONITORED);
-		$toggle_status_link = (new CLink(_('Disabled'), $status_toggle_url->getUrl()))
-			->addClass(ZBX_STYLE_LINK_ACTION)
+		$toggle_status_link = (new CLinkAction(_('Disabled')))
 			->addClass(ZBX_STYLE_RED)
-			->addConfirmation(_('Enable host?'))
-			->addCsrfToken($csrf_token_massupdate);
+			->addClass('js-enable-host')
+			->setAttribute('data-hostid', $host['hostid']);
 	}
 
 	if ($maintenance_icon) {
@@ -574,21 +559,15 @@ $status_toggle_url =  (new CUrl('zabbix.php'))
 $form->addItem([
 	$table,
 	new CActionButtonList('action', 'hostids', [
-		'enable-hosts' => [
-			'name' => _('Enable'),
-			'confirm_singular' => _('Enable selected host?'),
-			'confirm_plural' => _('Enable selected hosts?'),
-			'redirect' => $status_toggle_url
-				->setArgument('status', HOST_STATUS_MONITORED)
-				->getUrl()
+		'host.enable' => [
+			'content' => (new CSimpleButton(_('Enable')))
+				->addClass(ZBX_STYLE_BTN_ALT)
+				->addClass('js-massenable-host')
 		],
-		'disable-hosts' => [
-			'name' => _('Disable'),
-			'confirm_singular' => _('Disable selected host?'),
-			'confirm_plural' => _('Disable selected hosts?'),
-			'redirect' => $status_toggle_url
-				->setArgument('status', HOST_STATUS_NOT_MONITORED)
-				->getUrl()
+		'host.disable' => [
+			'content' => (new CSimpleButton(_('Disable')))
+				->addClass(ZBX_STYLE_BTN_ALT)
+				->addClass('js-massdisable-host')
 		],
 		'host.export' => [
 			'content' => new CButtonExport('export.hosts', $action_url
@@ -625,7 +604,9 @@ $html_page
 
 (new CScriptTag('
 	view.init('.json_encode([
-		'applied_filter_groupids' => array_keys($data['filter']['groups'])
+		'applied_filter_groupids' => array_keys($data['filter']['groups']),
+		'form_name' => $form->getName(),
+		'token' => [CCsrfTokenHelper::CSRF_TOKEN_NAME => $csrf_token_massupdate]
 	]).');
 '))
 	->setOnDocumentReady()
