@@ -56,13 +56,13 @@
 				if (target.classList.contains('js-disable-host')) {
 					this.disable(null, {hostids: [target.dataset.hostid]});
 				}
-                if (target.classList.contains('js-massenable-host')) {
+				if (target.classList.contains('js-massenable-host')) {
 					this.enable(target, {hostids: hostids});
-                }
+				}
 				if (target.classList.contains('js-massdisable-host')) {
 					this.disable(target, {hostids: hostids});
 				}
-            });
+			});
 		},
 
 		enable(target, parameters) {
