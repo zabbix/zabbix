@@ -79,19 +79,6 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 			}
 		}
 
-		if ($ret) {
-			$hosts = API::Host()->get([
-				'output' => [],
-				'hostids' => $this->getInput('hostids'),
-				'editable' => true
-			]);
-
-			if (!$hosts) {
-				error(_('No permissions to referred object or it does not exist!'));
-				$ret = false;
-			}
-		}
-
 		if (!$ret) {
 			$this->setResponse(
 				(new CControllerResponseData(['main_block' => json_encode([
@@ -136,7 +123,8 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 				$options = [
 					'output' => ['hostid', 'host', 'inventory_mode', 'flags'],
 					'hostids' => $hostids,
-					'filter' => ['flags' => [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]]
+					'filter' => ['flags' => [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]],
+					'editable' => true
 				];
 
 				if (array_key_exists('groups', $visible)) {
@@ -163,6 +151,11 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 				}
 
 				$hosts = API::Host()->get($options);
+
+				if (!$hosts) {
+					error(_('No permissions to referred object or it does not exist!'));
+					throw new Exception();
+				}
 
 				if (array_key_exists('groups', $visible)) {
 					$new_groupids = [];
