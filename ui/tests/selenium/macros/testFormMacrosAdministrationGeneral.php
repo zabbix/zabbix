@@ -496,7 +496,7 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 		$this->openGlobalMacros();
 
 		for ($i = 0; $i < $countGlobalMacros; $i++) {
-			if ($this->zbxTestGetValue('//input[@id=\'macros_'.$i.'_globalmacroid\']') === self::OLD_GLOBAL_MACROID) {
+			if (intval($this->zbxTestGetValue('//input[@id=\'macros_'.$i.'_globalmacroid\']')) === self::OLD_GLOBAL_MACROID) {
 				break;
 			}
 		}
@@ -533,7 +533,7 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 		$this->openGlobalMacros();
 
 		for ($i = 0; $i < $countGlobalMacros; $i++) {
-			if ($this->zbxTestGetValue('//input[@id=\'macros_'.$i.'_globalmacroid\']') === self::OLD_GLOBAL_MACROID) {
+			if (intval($this->zbxTestGetValue('//input[@id=\'macros_'.$i.'_globalmacroid\']')) === self::OLD_GLOBAL_MACROID) {
 				break;
 			}
 		}
@@ -562,7 +562,7 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 		$this->openGlobalMacros();
 
 		for ($i = 0; $i < $countGlobalMacros; $i++) {
-			if ($this->zbxTestGetValue('//input[@id=\'macros_'.$i.'_globalmacroid\']') === self::OLD_GLOBAL_MACROID) {
+			if (intval($this->zbxTestGetValue('//input[@id=\'macros_'.$i.'_globalmacroid\']')) === self::OLD_GLOBAL_MACROID) {
 				break;
 			}
 		}
@@ -592,7 +592,7 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 		$this->openGlobalMacros();
 
 		for ($i = 0; $i < $countGlobalMacros; $i++) {
-			if ($this->zbxTestGetValue('//input[@id=\'macros_'.$i.'_globalmacroid\']') === self::OLD_GLOBAL_MACROID) {
+			if (intval($this->zbxTestGetValue('//input[@id=\'macros_'.$i.'_globalmacroid\']')) === self::OLD_GLOBAL_MACROID) {
 				break;
 			}
 		}
