@@ -103,8 +103,10 @@ static int	zbx_tr_rule_create(const char *param, char *dst)
 			ptr++;
 			switch (*ptr)
 			{
-				case '\\':
 				case '\0':
+					dst[len++] = '\\';
+					return len;
+				case '\\':
 					c = '\\';
 					break;
 				case 'a':

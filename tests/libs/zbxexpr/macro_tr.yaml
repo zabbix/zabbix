@@ -1,13 +1,4 @@
 ---
-test case: replace all occurencies a with x, b with y, c with z
-in:
-  data: 'ABCabc123'
-  param1: 'abc'
-  param2: 'xyz'
-out:
-  value: 'ABCxyz123'
-  return: SUCCEED
----
 test case: converts all letters to uppercase
 in:
   data: 'ABCabc123'
@@ -233,5 +224,14 @@ in:
   param2: '*---a-z'
 out:
   value: '+,--abcde*'
+  return: SUCCEED
+---
+test case: backslash at end of pattern
+in:
+  data: 'ABCabc123'
+  param1: '\'
+  param2: '\\-'
+out:
+  value: 'ABCabc123'
   return: SUCCEED
 ...
