@@ -96,7 +96,7 @@ class testPageMonitoringLatestData extends CWebTest {
 
 		// Add data to one item to see "With data"/"Without data" subfilter.
 		$time = time() - 100;
-		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".zbx_dbstr($data_item_id).", ".zbx_dbstr($time).", 1, 0)");
+		DBexecute('INSERT INTO history (itemid, clock, value, ns) VALUES ('.zbx_dbstr($data_item_id).', '.zbx_dbstr($time).', 1, 0)');
 
 		// Create maintenance for wrench icon checking in Latest data page.
 		$maintenances = CDataHelper::call('maintenance.create', [
@@ -579,8 +579,8 @@ class testPageMonitoringLatestData extends CWebTest {
 
 		foreach ($data['subfilter'] as $header => $values) {
 			foreach ($values as $value) {
-				$this->query("xpath://h3[text()=".CXPathHelper::escapeQuotes($header)."]/..//a[text()=".
-						CXPathHelper::escapeQuotes($value)."]")->waitUntilClickable()->one()->click();
+				$this->query('xpath://h3[text()='.CXPathHelper::escapeQuotes($header).']/..//a[text()='.
+						CXPathHelper::escapeQuotes($value).']')->waitUntilClickable()->one()->click();
 				$this->page->waitUntilReady();
 			}
 		}
@@ -857,7 +857,7 @@ class testPageMonitoringLatestData extends CWebTest {
 		$itemid = CDBHelper::getValue('SELECT itemid FROM items WHERE name='.zbx_dbstr('4_item'));
 		$time = time();
 		$value = '15';
-		$true_time = date("Y-m-d H:i:s", $time);
+		$true_time = date('Y-m-d H:i:s', $time);
 
 		DBexecute('INSERT INTO history_uint (itemid, clock, value, ns) VALUES ('.zbx_dbstr($itemid).
 				', '.zbx_dbstr($time).', '.zbx_dbstr($value).', 0)'
