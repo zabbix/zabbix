@@ -167,7 +167,10 @@ static int	httpmacro_append_pair(zbx_httptest_t *httptest, const char *pkey, siz
 		}
 		else
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() %s", __func__, errmsg);
+			if (NULL != errmsg)
+				zabbix_log(LOG_LEVEL_DEBUG, "%s() %s", __func__, errmsg);
+			else
+				zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot parse xml", __func__);
 		}
 		zbx_free(value_str);
 		zbx_variant_clear(&value);
@@ -182,13 +185,16 @@ static int	httpmacro_append_pair(zbx_httptest_t *httptest, const char *pkey, siz
 
 		if (NULL != err_str && NULL == *err_str)
 		{
-			*err_str = zbx_dsprintf(*err_str, "cannot extract the value of \"%.*s\""
-					" from response", (int)nkey, pkey);
-		}
-		if (NULL != errmsg)
-		{
-			*err_str = zbx_dsprintf(*err_str, "%s\n%s", *err_str, errmsg);
-			zbx_free(errmsg);
+			if (NULL != errmsg)
+			{
+				*err_str = zbx_dsprintf(*err_str, "cannot extract the value of \"%.*s\""
+						" from response\n%s", (int)nkey, pkey, errmsg);
+			}
+			else
+			{
+				*err_str = zbx_dsprintf(*err_str, "cannot extract the value of \"%.*s\""
+						" from response", (int)nkey, pkey);
+			}
 		}
 		goto out;
 	}
@@ -213,6 +219,7 @@ static int	httpmacro_append_pair(zbx_httptest_t *httptest, const char *pkey, siz
 	ret = SUCCEED;
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+	zbx_free(errmsg);
 
 	return ret;
 #undef REGEXP_PREFIX
