@@ -280,7 +280,7 @@ function makeItemSubfilter(array &$filter_data, array $items, string $context) {
 		}
 
 		// state
-		if ($context === 'host' && $filter_data['filter_state'] == -1) {
+		if ($context === 'host' && $filter_data['filter_state'] == -1 && $item['status'] == ITEM_STATUS_ACTIVE) {
 			if (!isset($item_params['state'][$item['state']])) {
 				$item_params['state'][$item['state']] = [
 					'name' => itemState($item['state']),
@@ -297,7 +297,7 @@ function makeItemSubfilter(array &$filter_data, array $items, string $context) {
 					break;
 				}
 			}
-			if ($show_item && $item['status'] == ITEM_STATUS_ACTIVE) {
+			if ($show_item) {
 				$item_params['state'][$item['state']]['count']++;
 			}
 		}

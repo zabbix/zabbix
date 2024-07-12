@@ -1402,8 +1402,8 @@ else {
 					|| uint_in_array($item['value_type'], $_REQUEST['subfilter_value_types']),
 				'subfilter_status' => empty($_REQUEST['subfilter_status'])
 					|| uint_in_array($item['status'], $_REQUEST['subfilter_status']),
-				'subfilter_state' => empty($_REQUEST['subfilter_state'])
-					|| uint_in_array($item['state'], $_REQUEST['subfilter_state']),
+				'subfilter_state' => empty(getRequest('subfilter_state'))
+					|| (uint_in_array($item['state'], getRequest('subfilter_state')) && $item['status'] == ITEM_STATUS_ACTIVE),
 				'subfilter_inherited' =>  !getRequest('subfilter_inherited')
 					|| ($item['templateid'] == 0 && uint_in_array(0, getRequest('subfilter_inherited'))
 					|| ($item['templateid'] > 0 && uint_in_array(1, getRequest('subfilter_inherited')))),
@@ -1523,15 +1523,6 @@ else {
 				'valuemapids' => $data['filter_data']['filter_valuemapids']
 			]), ['valuemapid' => 'id'])
 			: [];
-	}
-
-	// remove items from search if they are disabled when subfiltered by state
-	if (getRequest('subfilter_state')) {
-		foreach ($data['items'] as $key => $item) {
-			if ($item['status'] == ITEM_STATUS_DISABLED) {
-				unset($data['items'][$key]);
-			}
-		}
 	}
 
 	$data['subfilter'] = makeItemSubfilter($data['filter_data'], $data['items'], $data['context']);
