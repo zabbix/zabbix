@@ -242,7 +242,7 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 			}
 			else {
 				$form = $dashboard->addWidget()->asForm();
-				$form->getField('Type')->fill('System information');
+				$form->fill(['Type' => CFormElement::RELOADABLE_FILL('System information')]);
 			}
 			$form->fill($widget_data['fields']);
 			$form->submit();
