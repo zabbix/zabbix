@@ -419,6 +419,8 @@ class testFormAlarmNotification extends CWebTest {
 
 	/**
 	 * Check that alarms displayed in alarm notification overlay.
+	 * Ignore browser errors annotation is required due to - sometimes errors appears when triggering problems
+	 * and events directly from database after refreshing browser.
 	 *
 	 * @dataProvider getDisplayedAlarmsData
 	 * @ignoreBrowserErrors
