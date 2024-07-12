@@ -1371,6 +1371,7 @@ class testFormUserRoles extends CWebTest {
 				$this->page->waitUntilReady();
 
 				$this->assertMessage(TEST_GOOD, 'Modules enabled');
+				CMessageElement::find()->one()->close();
 			}
 			else {
 				foreach ($modules as $module) {
