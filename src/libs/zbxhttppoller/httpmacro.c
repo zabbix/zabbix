@@ -238,9 +238,8 @@ out:
  ******************************************************************************/
 int	http_substitute_variables(const zbx_httptest_t *httptest, char **data)
 {
-	char		*substitute = NULL;
 	int		index, ret = SUCCEED;
-	size_t		pos = 0, len;
+	size_t		pos = 0;
 	zbx_token_t	token;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() data:'%s'", __func__, *data);
@@ -248,12 +247,12 @@ int	http_substitute_variables(const zbx_httptest_t *httptest, char **data)
 	{
 		if (ZBX_TOKEN_VAR_FUNC_MACRO == token.type)
 		{
+			char	*substitute;
+
 			index = zbx_macro_variable_search(&httptest->macros, *data, token.data.var_func_macro.macro);
 			if (FAIL == index)
 				continue;
-			len = strlen(httptest->macros.values[index].second) + 1;
-			substitute = (char *)zbx_malloc(NULL, len);
-			memcpy(substitute, httptest->macros.values[index].second, len);
+			substitute = zbx_strdup(NULL, httptest->macros.values[index].second);
 			if (SUCCEED != zbx_calculate_macro_function(*data, &token.data.var_func_macro,
 							&substitute))
 			{
