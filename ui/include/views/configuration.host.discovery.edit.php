@@ -714,9 +714,8 @@ $item_tab->addItem([
 			->setReadonly($data['limited'])
 			->setModern(),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CTextBox('timeout', $data['timeout'],
-			$data['limited'] || $data['custom_timeout'] == ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED)
-		)
+		(new CTextBox('inherited_timeout', $data['inherited_timeout'], true))->setWidth(ZBX_TEXTAREA_TINY_WIDTH),
+		(new CTextBox('timeout', $data['timeout'], $data['limited']))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 			->setAriaRequired(),
 		$edit_source_timeouts_link
