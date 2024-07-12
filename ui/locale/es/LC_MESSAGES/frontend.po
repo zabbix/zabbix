@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-06-15 13:20+0000\n"
+"PO-Revision-Date: 2024-07-05 18:30+0000\n"
 "Last-Translator: Vicente Salvador <vicentesalvadorcubedo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
@@ -957,7 +957,7 @@ msgstr "Agregar un nuevo widget"
 
 #: widgets/navtree/Widget.php:34
 msgid "Add child element"
-msgstr ""
+msgstr "Añadir un elemento hijo"
 
 #: widgets/navtree/Widget.php:39
 msgid "Add child elements"
@@ -996,7 +996,7 @@ msgstr "Añadir iniciador de equipo"
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:260
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:263
 msgid "Add item"
-msgstr ""
+msgstr "Añadir una métrica"
 
 #: app/partials/massupdate.macros.tab.php:96
 #: app/partials/massupdate.valuemaps.tab.php:38
@@ -1656,6 +1656,10 @@ msgstr "Debe ser especificado al menos un día de la semana o del mes."
 msgid "At least one host group or host must be selected."
 msgstr "Debe ser seleccionado al menos un equipo o grupo de equipos."
 
+#: include/classes/setup/CFrontendSetup.php:252
+msgid "At least one of MySQL or PostgreSQL should be supported."
+msgstr ""
+
 #: include/classes/setup/CFrontendSetup.php:241
 msgid "At least one of MySQL, PostgreSQL or Oracle should be supported."
 msgstr "Debe estar soportado al menos uno de éstos: MySQL, PostgreSQL u Oracle."
@@ -1904,7 +1908,7 @@ msgstr "Evite contraseñas fáciles de adivinar"
 
 #: jsLoader.php:172
 msgid "Awaiting data"
-msgstr ""
+msgstr "En espera de datos"
 
 #: widgets/svggraph/views/widget.edit.php:51
 msgid "Axes"
@@ -5431,7 +5435,7 @@ msgstr "Crear nuevo"
 
 #: jsLoader.php:372
 msgid "Create new report"
-msgstr ""
+msgstr "Crear nuevo informe"
 
 #: app/views/administration.proxy.list.php:239
 msgid "Create proxy"
@@ -9559,7 +9563,7 @@ msgstr "Elementos del grupo de equipos"
 
 #: jsLoader.php:292
 msgid "Host group is not selected."
-msgstr ""
+msgstr "El grupo de equipos no está seleccionado."
 
 #: include/views/monitoring.sysmap.edit.php:168
 msgid "Host group label type"
@@ -9642,7 +9646,7 @@ msgstr "Vista general del inventario de equipos"
 
 #: jsLoader.php:289
 msgid "Host is not selected."
-msgstr ""
+msgstr "El equipo no está seleccionado."
 
 #: include/views/monitoring.sysmap.edit.php:183
 msgid "Host label type"
@@ -12964,7 +12968,7 @@ msgstr "Tipo de etiqueta de elemento de mapa"
 
 #: jsLoader.php:290
 msgid "Map is not selected."
-msgstr ""
+msgstr "El mapa no está seleccionado."
 
 #: sysmap.php:128
 msgid "Map is updated! Return to map list?"
@@ -20886,7 +20890,7 @@ msgstr "El iniciador en la plantilla \"%1$s\" tiene dependencias con un iniciado
 
 #: jsLoader.php:291
 msgid "Trigger is not selected."
-msgstr ""
+msgstr "El iniciador no está seleccionado."
 
 #: include/views/monitoring.sysmap.edit.php:198
 msgid "Trigger label type"
@@ -22942,7 +22946,7 @@ msgstr "Mostrar como"
 
 #: jsLoader.php:417
 msgid "View related reports"
-msgstr ""
+msgstr "Ver informes relacionados"
 
 #: include/classes/data/CItemData.php:1735
 msgid "Virtual space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
@@ -23155,7 +23159,7 @@ msgstr "El widget es demasiado pequeño para el número especificado de filas y 
 
 #: jsLoader.php:205
 msgid "Widgets"
-msgstr ""
+msgstr "Widgets"
 
 #: graphs.php:39 include/views/configuration.graph.edit.php:100
 #: include/views/configuration.graph.list.php:170
@@ -23531,7 +23535,7 @@ msgstr "Debes iniciar sesión para ver esta página."
 
 #: jsLoader.php:287
 msgid "You need to have at least one image uploaded to create map element. Images can be uploaded in Administration->General->Images section."
-msgstr ""
+msgstr "Debe tener al menos una imagen cargada para crear un elemento de mapa. Las imágenes se pueden cargar en la sección Administración->General->Imágenes."
 
 #: include/classes/db/DB.php:133
 msgid "Your database is not working properly. Please wait a few minutes and try to repeat this action. If the problem still persists, please contact system administrator. The problem might be caused by long running transaction or row level lock accomplished by your database management system."
@@ -25543,7 +25547,7 @@ msgstr "right() - Devuelve los caracteres más a la derecha del contador"
 
 #: widgets/navtree/Widget.php:41
 msgid "root"
-msgstr ""
+msgstr "root"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:966
 msgid "round() - Rounds a value to decimal places"
