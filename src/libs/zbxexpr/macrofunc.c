@@ -91,11 +91,12 @@ static int	macrofunc_regsub(char **params, size_t nparam, char **out)
  ******************************************************************************/
 static int	zbx_tr_rule_create(const char *param, char *dst)
 {
-	char		c, range_from = 0, *ptr;
+	char		c, range_from = 0;
+	const char	*ptr;
 	int		i, len = 0;
 
 	/* construct string to replace */
-	for (ptr = (char *)param; '\0' != *ptr; ptr++)
+	for (ptr = param; '\0' != *ptr; ptr++)
 	{
 		if (*ptr == '\\')
 		{
