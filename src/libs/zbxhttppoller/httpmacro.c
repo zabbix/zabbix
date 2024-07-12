@@ -142,9 +142,6 @@ static int	httpmacro_append_pair(zbx_httptest_t *httptest, const char *pkey, siz
 
 		rc = zbx_mregexp_sub(data, value_str + REGEXP_PREFIX_SIZE, "\\@", (char **)&pair.second);
 		zbx_free(value_str);
-
-		if (SUCCEED != rc)
-			zbx_free(pair.second);
 	}
 	else if (0 == strncmp(JSONPATH_PREFIX, value_str, JSONPATH_PREFIX_SIZE))
 	{
