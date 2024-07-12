@@ -369,14 +369,13 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 			'userdirectory_mediaid' => $media['userdirectory_mediaid']
 		];
 
-		if (is_array($media['sendto'])) {
-			$media['sendto'] = implode(', ', $media['sendto']);
-		}
-
 		if ($media['mediatype'] === MEDIA_TYPE_EMAIL) {
 			$parameters['sendto_emails'] = $media['sendto'];
 		}
 		else {
+			if (is_array($media['sendto'])) {
+				$media['sendto'] = implode(', ', $media['sendto']);
+			}
 			$parameters['sendto'] = $media['sendto'];
 		}
 
@@ -397,6 +396,10 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 					? CSeverityHelper::getStatusStyle($severity)
 					: ZBX_STYLE_STATUS_DISABLED
 				);
+		}
+
+		if (is_array($media['sendto'])) {
+			$media['sendto'] = implode(', ', $media['sendto']);
 		}
 
 		if (mb_strlen($media['sendto']) > 50) {
