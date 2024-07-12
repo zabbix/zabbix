@@ -96,7 +96,7 @@ static int	httpmacro_append_pair(zbx_httptest_t *httptest, const char *pkey, siz
 #define JSONPATH_PREFIX_SIZE	ZBX_CONST_STRLEN(JSONPATH_PREFIX)
 #define XMLXPATH_PREFIX		"xmlxpath:"
 #define XMLXPATH_PREFIX_SIZE	ZBX_CONST_STRLEN(XMLXPATH_PREFIX)
-	char 		*value_str = NULL;
+	char 		*value_str = NULL, *errmsg = NULL;
 	size_t		key_size = 0, key_offset = 0, value_size = 0, value_offset = 0;
 	zbx_ptr_pair_t	pair = {NULL, NULL};
 	int		index, ret = FAIL, rc;
@@ -136,7 +136,7 @@ static int	httpmacro_append_pair(zbx_httptest_t *httptest, const char *pkey, siz
 		/* The \@ sequence is a special construct to fail if the pattern matches but does */
 		/* not contain groups to capture.                                                 */
 
-		rc = zbx_mregexp_sub(data, value_str + REGEXP_PREFIX_SIZE, "\\@", (char **)&pair.second);
+		zbx_mregexp_sub(data, value_str + REGEXP_PREFIX_SIZE, "\\@", (char **)&pair.second);
 		zbx_free(value_str);
 	}
 	else if (0 == strncmp(JSONPATH_PREFIX, value_str, JSONPATH_PREFIX_SIZE))
@@ -147,7 +147,8 @@ static int	httpmacro_append_pair(zbx_httptest_t *httptest, const char *pkey, siz
 			rc = zbx_jsonobj_query(&obj, value_str + JSONPATH_PREFIX_SIZE, (char **)&pair.second);
 		if (SUCCEED != rc)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot parse json: %s", __func__, zbx_json_strerror());
+			errmsg = zbx_strdup(NULL, zbx_json_strerror());
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot parse json: %s", __func__, errmsg);
 			zbx_free(pair.second);
 		}
 		zbx_jsonobj_clear(&obj);
@@ -157,7 +158,6 @@ static int	httpmacro_append_pair(zbx_httptest_t *httptest, const char *pkey, siz
 	{
 		zbx_variant_t	value;
 		int		is_empty;
-		char		*errmsg = NULL;
 
 		zbx_variant_set_str(&value, zbx_strdup(NULL, data));
 		rc = zbx_query_xpath_contents(&value, value_str + XMLXPATH_PREFIX_SIZE, &is_empty, &errmsg);
@@ -169,7 +169,6 @@ static int	httpmacro_append_pair(zbx_httptest_t *httptest, const char *pkey, siz
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() %s", __func__, errmsg);
 		}
-		zbx_free(errmsg);
 		zbx_free(value_str);
 		zbx_variant_clear(&value);
 	}
@@ -186,7 +185,11 @@ static int	httpmacro_append_pair(zbx_httptest_t *httptest, const char *pkey, siz
 			*err_str = zbx_dsprintf(*err_str, "cannot extract the value of \"%.*s\""
 					" from response", (int)nkey, pkey);
 		}
-
+		if (NULL != errmsg)
+		{
+			*err_str = zbx_dsprintf(*err_str, "%s\n%s", *err_str, errmsg);
+			zbx_free(errmsg);
+		}
 		goto out;
 	}
 
