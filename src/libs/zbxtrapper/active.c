@@ -670,7 +670,7 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, zbx_json_parse_t *jp,
 
 	zbx_json_close(&json);
 
-	zbx_remote_commans_prepare_to_send(&json, hostid);
+	zbx_remote_commands_prepare_to_send(&json, hostid, config_timeout);
 
 	if (SUCCEED == zbx_vps_monitor_capped())
 	{
