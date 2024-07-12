@@ -57,14 +57,10 @@ static int 	httpmacro_cmp_func(const void *d1, const void *d2)
 static int	zbx_macro_variable_search(const zbx_vector_ptr_pair_t *pmacro,
 			const char *key, const zbx_strloc_t loc)
 {
-	size_t length;
 	for (int i = 0; i < pmacro->values_num; i++)
 	{
-		length = strlen(pmacro->values[i].first);
-		if (length == loc.r - loc.l + 1 &&
-				0 == memcmp(key + loc.l, pmacro->values[i].first, length))
+		if (SUCCEED == zbx_strloc_cmp(key, &loc, pmacro->values[i].first, strlen(pmacro->values[i].first)))
 			return i;
-
 	}
 	return FAIL;
 }
