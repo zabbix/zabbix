@@ -1,6 +1,8 @@
 Changes for 7.2.0alpha1
 
 New features:
+A.F.I..PS. [ZBXNEXT-9176] removed support of Oracle DB (agriscenko, sboidenko)
+........S. [ZBXNEXT-9285] added {EVENT.UPDATE.STATUS} support for Service update notifications (MVekslers)
 ..F....... [ZBXNEXT-9215] added option to specify widgets as data sources for items in Graph and Pie chart widgets (ashubin, averza)
 .........T [ZBXNEXT-8657] updated Zabbix health templates with new items and visualization (atocko)
 ........S. [ZBXNEXT-9143] added index on auditlog recordsetid (arimdjonoks)
@@ -18,6 +20,7 @@ New features:
 .......PS. [ZBXNEXT-8990] extended VMware event log with username (asestakovs)
 
 Bug fixes:
+...G....S. [ZBX-24719] fixed Zabbix agent 2 crashing when executing global script (arimdjonoks)
 .......PS. [ZBX-24514] fixed standalone Zabbix server and Zabbix proxy not stopping when database is read-only (vso)
 ........S. [ZBX-24632] fixed perf entry collection on Firefox in browser monitoring, added filtering of unserializable properties (wiper)
 ..F....... [ZBX-23936] fixed state and styling of readonly fields (ddauksa)
