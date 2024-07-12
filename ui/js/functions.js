@@ -103,43 +103,68 @@ jQuery.escapeHtml = function(html) {
 	return jQuery('<div>').text(html).html();
 }
 
-function validateNumericBox(obj, allowempty, allownegative) {
+/**
+ * Validates and processes the numeric value in an HTML input element. Leaves negative numbers without leading zeroes.
+ *
+ * @param {HTMLElement} obj      The HTML input element containing the numeric value.
+ * @param {bool} allow_empty     If true, the field can be empty; otherwise, empty fields are replaced with "0".
+ * @param {bool} allow_negative  If true, negative numbers are allowed; otherwise, negative numbers are converted to
+ *                               positive.
+ */
+function validateNumericBox(obj, allow_empty, allow_negative) {
+	let num;
+
 	if (obj != null) {
-		if (allowempty) {
-			if (obj.value.length == 0 || obj.value == null) {
-				obj.value = '';
-			}
-			else {
-				if (isNaN(parseInt(obj.value, 10))) {
-					obj.value = 0;
-				}
-				else {
-					obj.value = parseInt(obj.value, 10);
-				}
+		num = parseInt(obj.value, 10);
 
-				if (obj.hasAttribute('data-pads-length')) {
-					obj.value = obj.value.padStart(obj.dataset.padsLength, '0');
-				}
-			}
+		if (isNaN(num)) {
+			num = allow_empty ? '' : '0';
 		}
-		else {
-			if (isNaN(parseInt(obj.value, 10))) {
-				obj.value = 0;
+
+		if (num !== '') {
+			if (num < 0) {
+				if (!allow_negative) {
+					num = Math.abs(num);
+					num = addPads(num, obj);
+				}
 			}
 			else {
-				obj.value = parseInt(obj.value, 10);
-			}
-
-			if (obj.hasAttribute('data-pads-length')) {
-				obj.value = obj.value.padStart(obj.dataset.padsLength, '0');
+				num = addPads(num, obj);
 			}
 		}
 	}
-	if (!allownegative) {
-		if (obj.value < 0) {
-			obj.value = obj.value * -1;
+
+	obj.value = num;
+}
+
+/**
+ * Adds leading zeroes for the given number. If number of leading zeroes is is greater than field maxlength, it is a
+ * misconfiguration. In that case limit the leading zeroes to maxlength and show a warning message in console.
+ *
+ * @param {number} num       The number to proccess and add leading zeroes.
+ * @param {HTMLElement} obj  The HTML input element containing the numeric value. Checks for "data-pads-length" and
+ *                           "maxlength" attributes.
+ *
+ * @return {string}          To add leading zeroes, returned number has to be in string format.
+ */
+function addPads(num, obj) {
+	num = num.toString();
+
+	if (obj.hasAttribute('data-pads-length')) {
+		let pads_length = obj.dataset.padsLength;
+
+		if (num.length < pads_length) {
+			if (obj.hasAttribute('maxlength') && pads_length > obj.maxLength) {
+				pads_length = obj.maxLength;
+
+				console.warn('Pads length exceed "maxlength" attribute for object: ', obj);
+			}
+
+			num = num.padStart(pads_length, '0');
 		}
 	}
+
+	return num;
 }
 
 /**
