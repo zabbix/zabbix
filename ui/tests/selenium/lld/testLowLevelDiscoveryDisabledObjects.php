@@ -444,7 +444,7 @@ class testLowLevelDiscoveryDisabledObjects extends CWebTest {
 			// Click button in Info column.
 			$row->getColumn('Info')->query('xpath:.//button[contains(@class, "zi-i-warning")]')
 					->one()->waitUntilCLickable()->click();
-			$hint_overlay = $overlay->all()->last()->waitUntilPresent();
+			$hint_overlay = $overlay->all()->last()->waitUntilReady();
 
 			// Hints are different for graphs.
 			$hint_text = ($data['object'] === 'graph') ? $hint['graph_hint'] : $hint['common_hint'];
