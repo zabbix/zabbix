@@ -62,7 +62,7 @@ class testFormLowLevelDiscoveryFromTemplate extends testLowLevelDiscovery {
 						'name' => 'LLD for simple update scenario',
 						'key_' => 'update_key',
 						'type' => ITEM_TYPE_HTTPAGENT,
-						'delay' => "1h;wd1-2h7-14",
+						'delay' => '1h;wd1-2h7-14',
 						'url' => 'https://www.test.com/search',
 						'query_fields' => [['name' => 'test_name1', 'value' => 'value1'], ['name' => '2', 'value' => 'value2']],
 						'request_method' => HTTPCHECK_REQUEST_HEAD,

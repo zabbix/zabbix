@@ -27,7 +27,7 @@ class testLowLevelDiscovery extends CWebTest {
 	protected static $update_lld;
 
 	/**
-	 * Attach MessageBehavior to the test.
+	 * Attach MessageBehavior and PreprocessingBehavior to the test.
 	 *
 	 * @return array
 	 */
@@ -49,15 +49,15 @@ class testLowLevelDiscovery extends CWebTest {
 			: static::$empty_hostid.'&context=host';
 
 		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.$url);
-		$this->query('button:Create discovery rule')->one()->waitUntilClickable()->click();
-		$form = $this->query('id:host-discovery-form')->asForm()->one()->waitUntilVisible();
+		$this->query('button:Create discovery rule')->waitUntilClickable()->one()->click();
+		$form = $this->query('id:host-discovery-form')->asForm()->waitUntilVisible()->one();
 		$this->page->assertHeader('Discovery rules');
 		$this->page->assertTitle('Configuration of discovery rules');
 		$this->assertEquals(['Discovery rule', 'Preprocessing', 'LLD macros', 'Filters', 'Overrides'], $form->getTabs());
 
 		// Check form footer buttons clickability.
-		foreach (['id:add', 'button:Test', 'button:Cancel'] as $query) {
-			$this->assertTrue($form->query($query)->one()->isClickable());
+		foreach (['id:add', 'button:Test', 'button:Cancel'] as $button) {
+			$this->assertTrue($form->query($button)->one()->isClickable());
 		}
 
 		// Check the whole form required labels.
@@ -74,107 +74,13 @@ class testLowLevelDiscovery extends CWebTest {
 				'form-label-asterisk')->asText())
 		);
 
-		// Check initial visible fields for each tab.
-		$visible_fields = [
-			'Preprocessing' => ['Preprocessing steps'],
-			'LLD macros' => ['LLD macros'],
-			'Filters' => ['Filters'],
-			'Overrides' => ['Overrides'],
-			'Discovery rule' => ['Name', 'Type', 'Key', 'Host interface', 'Update interval', 'Custom intervals',
-					'Timeout', 'Delete lost resources', 'Disable lost resources', 'Description', 'Enabled'
-			]
-		];
-
-		if ($context === 'template') {
-			$visible_fields['Discovery rule'] = ['Name', 'Type', 'Key', 'Update interval', 'Custom intervals',
-					'Timeout', 'Delete lost resources', 'Disable lost resources', 'Description', 'Enabled'
-			];
-		}
-
-		foreach ($visible_fields as $tab => $fields) {
-			$form->selectTab($tab);
-			$this->assertEquals($fields, array_values($form->getLabels()->filter(CElementFilter::VISIBLE)->asText()));
-
-			// Check buttons default values and parameters in fields in every tab.
-			switch ($tab) {
-				case 'Preprocessing':
-					$preprocessing_container = $form->getFieldContainer('Preprocessing steps');
-					$preprocessing_container->query('button:Add')->one()->waitUntilCLickable()->click();
-					$this->assertTrue($preprocessing_container->query('id:preprocessing')->one()->isVisible());
-					$this->assertTrue($preprocessing_container->query('button', ['Add', 'Test', 'Remove', 'Test all steps'])
-							->one()->isClickable()
-					);
-
-					$preprocessing_fields = [
-						'id:preprocessing_0_type' => ['value' => 'Regular expression'],
-						'id:preprocessing_0_params_0' => ['value' => '', 'placeholder' => 'pattern', 'maxlength' => 255],
-						'id:preprocessing_0_params_1' => ['value' => '', 'placeholder' => 'output', 'maxlength' => 255],
-						'id:preprocessing_0_on_fail' => ['value' => false]
-					];
-					$this->checkFieldsParameters($preprocessing_fields);
-
-					foreach (array_keys($preprocessing_fields) as $key) {
-						$this->assertTrue($form->getField($key)->isEnabled());
-					}
-					break;
-
-				case 'LLD macros':
-					$macros_table = $form->query('id:lld_macro_paths')->asTable()->one();
-					$this->assertTrue($macros_table->isVisible());
-					$this->assertTrue($macros_table->query('button', ['Add', 'Remove'])->one()->isClickable());
-					$this->assertEquals(['LLD macro', 'JSONPath', ''], $macros_table->getHeadersText());
-
-					$macros_fields = [
-						'id:lld_macro_paths_0_lld_macro' => ['value' => '', 'placeholder' => '{#MACRO}', 'maxlength' => 255],
-						'id:lld_macro_paths_0_path' => ['value' => '', 'placeholder' => '$.path.to.node', 'maxlength' => 255]
-					];
-					$this->checkFieldsParameters($macros_fields);
-
-					foreach (array_keys($macros_fields) as $key) {
-						$this->assertTrue($form->getField($key)->isEnabled());
-					}
-					break;
-
-				case 'Filters':
-					$filters_field = $form->getFieldContainer('Filters');
-					$this->assertTrue($form->query('id:conditions')->one()->isVisible());
-					$this->assertTrue($filters_field->query('button', ['Add', 'Remove'])->one()->isClickable());
-					$this->assertEquals(['Label', 'Macro', '', 'Regular expression', 'Action'],
-							$filters_field->query('id:conditions')->asTable()->one()->getHeadersText()
-					);
-
-					$filter_fields = [
-						'id:conditions_0_macro' => ['value' => '', 'placeholder' => '{#MACRO}', 'maxlength' => 64],
-						'id:conditions_0_value' => ['value' => '', 'placeholder' => 'regular expression', 'maxlength' => 255],
-						'name:conditions[0][operator]' => [
-							'value' => 'matches',
-							'options' => ['matches', 'does not match', 'exists', 'does not exist']
-						]
-					];
-					$this->checkFieldsParameters($filter_fields);
-
-					foreach (array_keys($filter_fields) as $key) {
-						$this->assertTrue($form->getField($key)->isEnabled());
-					}
-					break;
-
-				case 'Overrides':
-					$filters_container = $form->getFieldContainer('Overrides');
-					$this->assertTrue($filters_container->query('button:Add')->one()->isClickable());
-					$this->assertEquals(['', '', 'Name', 'Stop processing', 'Action'],
-							$filters_container->query('id:lld-overrides-table')->asTable()->one()->getHeadersText()
-					);
-					break;
-			}
-		}
-
 		// Check default fields' values.
 		$fields = [
 			// Discovery rule.
 			'Name' => ['maxlength' => 255],
 			'Type' => ['value' => 'Zabbix agent', 'options' => ['Zabbix agent', 'Zabbix agent (active)', 'Simple check',
-					'SNMP agent', 'Zabbix internal', 'Zabbix trapper', 'External check', 'Database monitor', 'HTTP agent',
-					'IPMI agent', 'SSH agent', 'TELNET agent', 'JMX agent', 'Dependent item', 'Script', 'Browser']
+				'SNMP agent', 'Zabbix internal', 'Zabbix trapper', 'External check', 'Database monitor', 'HTTP agent',
+				'IPMI agent', 'SSH agent', 'TELNET agent', 'JMX agent', 'Dependent item', 'Script', 'Browser']
 			],
 			'Key' => ['maxlength' => 2048],
 			'URL' => ['maxlength' => 2048],
@@ -254,6 +160,129 @@ class testLowLevelDiscovery extends CWebTest {
 		}
 
 		$this->checkFieldsParameters($fields);
+
+		// Check initial visible fields for each tab.
+		$visible_fields = [
+			'Preprocessing' => ['Preprocessing steps'],
+			'LLD macros' => ['LLD macros'],
+			'Filters' => ['Filters'],
+			'Overrides' => ['Overrides'],
+			'Discovery rule' => ['Name', 'Type', 'Key', 'Host interface', 'Update interval', 'Custom intervals',
+					'Timeout', 'Delete lost resources', 'Disable lost resources', 'Description', 'Enabled'
+			]
+		];
+
+		if ($context === 'template') {
+			$visible_fields['Discovery rule'] = array_values(array_diff($visible_fields['Discovery rule'], ['Host interface']));
+		}
+
+		foreach ($visible_fields as $tab => $fields) {
+			$form->selectTab($tab);
+			$this->assertEquals($fields, array_values($form->getLabels()->filter(CElementFilter::VISIBLE)->asText()));
+
+			// Check buttons default values and parameters in fields in every tab.
+			switch ($tab) {
+				case 'Preprocessing':
+					$preprocessing_container = $form->getFieldContainer('Preprocessing steps');
+					$preprocessing_container->query('button:Add')->waitUntilClickable()->one()->click();
+					$this->assertTrue($preprocessing_container->query('id:preprocessing')->one()->isVisible());
+					$this->assertTrue($preprocessing_container->query('button', ['Add', 'Test', 'Remove', 'Test all steps'])
+							->one()->isClickable()
+					);
+
+					$preprocessing_fields = [
+						'id:preprocessing_0_type' => ['value' => 'Regular expression', 'options' => ['Regular expression',
+								'Replace', 'XML XPath', 'JSONPath', 'CSV to JSON', 'XML to JSON', 'SNMP walk value',
+								'SNMP walk to JSON', 'SNMP get value', 'JavaScript', 'Matches regular expression',
+								'Does not match regular expression', 'Check for error in JSON', 'Check for error in XML',
+								'Discard unchanged with heartbeat', 'Prometheus to JSON'
+							]
+						],
+						'id:preprocessing_0_params_0' => ['value' => '', 'placeholder' => 'pattern', 'maxlength' => 255],
+						'id:preprocessing_0_params_1' => ['value' => '', 'placeholder' => 'output', 'maxlength' => 255],
+						'id:preprocessing_0_on_fail' => ['value' => false]
+					];
+
+					$this->checkFieldsParameters($preprocessing_fields);
+
+					foreach (array_keys($preprocessing_fields) as $key) {
+						$this->assertTrue($form->getField($key)->isEnabled());
+					}
+					break;
+
+				case 'LLD macros':
+					$macros_table = $form->query('id:lld_macro_paths')->asTable()->one();
+					$this->assertTrue($macros_table->isVisible());
+					$this->assertTrue($macros_table->query('button', ['Add', 'Remove'])->one()->isClickable());
+					$this->assertEquals(['LLD macro', 'JSONPath', ''], $macros_table->getHeadersText());
+
+					$macros_fields = [
+						'id:lld_macro_paths_0_lld_macro' => ['value' => '', 'placeholder' => '{#MACRO}', 'maxlength' => 255],
+						'id:lld_macro_paths_0_path' => ['value' => '', 'placeholder' => '$.path.to.node', 'maxlength' => 255]
+					];
+					$this->checkFieldsParameters($macros_fields);
+
+					foreach (array_keys($macros_fields) as $key) {
+						$this->assertTrue($form->getField($key)->isEnabled());
+					}
+					break;
+
+				case 'Filters':
+					$filters_container = $form->getFieldContainer('Filters');
+					$this->assertTrue($form->query('id:conditions')->one()->isVisible());
+					$this->assertTrue($filters_container->query('button', ['Add', 'Remove'])->one()->isClickable());
+					$filter_table = $filters_container->query('id:conditions')->asTable()->one();
+					$this->assertEquals(['Label', 'Macro', '', 'Regular expression', 'Action'],
+							$filter_table->getHeadersText()
+					);
+					$this->assertFalse($filters_container->query('id:evaltype')->exists());
+					$filters_container->query('button:Add')->waitUntilClickable()->one()->click();
+					$evaluation_type = $form->getField('id:evaltype');
+					$form->checkValue(['id:evaltype' => 'And/Or']);
+					$evaluation_type->fill('Custom expression');
+
+					$filter_fields = [
+						'id:evaltype' => ['value' => 'Custom expression', 'options' => ['And/Or', 'And', 'Or', 'Custom expression']],
+						'id:formula' => ['value' => '', 'placeholder' => 'A or (B and C) ...', 'maxlength' => 255],
+						'id:conditions_0_macro' => ['value' => '', 'placeholder' => '{#MACRO}', 'maxlength' => 64],
+						'id:conditions_0_value' => ['value' => '', 'placeholder' => 'regular expression', 'maxlength' => 255],
+						'name:conditions[0][operator]' => [
+							'value' => 'matches',
+							'options' => ['matches', 'does not match', 'exists', 'does not exist']
+						]
+					];
+					$this->checkFieldsParameters($filter_fields);
+
+					foreach (array_keys($filter_fields) as $key) {
+						$this->assertTrue($form->getField($key)->isEnabled());
+					}
+
+					$calculation_types = [
+						'And/Or' => 'A or B',
+						'And' => 'A and B',
+						'Or' => 'A or B'
+					];
+					foreach ($calculation_types as $type => $formula) {
+						$evaluation_type->fill($type);
+						$this->assertEquals($formula, $form->query('xpath:.//div[@class="cell expression-cell"]')
+								->one()->getText()
+						);
+					}
+
+					foreach (['A', 'B'] as $i => $letter) {
+						$this->assertEquals($letter, $filter_table->getRow($i)->query('tag:span')->one()->getText());
+					}
+					break;
+
+				case 'Overrides':
+					$overrides_container = $form->getFieldContainer('Overrides');
+					$this->assertTrue($overrides_container->query('button:Add')->one()->isClickable());
+					$this->assertEquals(['', '', 'Name', 'Stop processing', 'Action'],
+							$overrides_container->query('id:lld-overrides-table')->asTable()->one()->getHeadersText()
+					);
+					break;
+			}
+		}
 	}
 
 	public static function getTypeDependingData() {
@@ -387,8 +416,8 @@ class testLowLevelDiscovery extends CWebTest {
 			: static::$empty_hostid.'&context=host';
 
 		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.$url);
-		$this->query('button:Create discovery rule')->one()->waitUntilClickable()->click();
-		$form = $this->query('id:host-discovery-form')->asForm()->one()->waitUntilVisible();
+		$this->query('button:Create discovery rule')->waitUntilClickable()->one()->click();
+		$form = $this->query('id:host-discovery-form')->asForm()->waitUntilVisible()->one();
 
 		// Check visible fields depending on LLD type.
 		$permanent_fields = ['Name', 'Type', 'Key', 'Delete lost resources', 'Disable lost resources', 'Description', 'Enabled'];
@@ -602,7 +631,7 @@ class testLowLevelDiscovery extends CWebTest {
 			: static::$hostid.'&context=host';
 
 		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.$url);
-		$this->query('link:LLD for simple update scenario')->one()->waitUntilClickable()->click();
+		$this->query('link:LLD for simple update scenario')->waitUntilClickable()->one()->click();
 		$this->query('button:Update')->waitUntilClickable()->one()->click();
 		$this->assertMessage(TEST_GOOD, 'Discovery rule updated');
 		$this->page->assertTitle('Configuration of discovery rules');
@@ -1618,7 +1647,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'parse' => true,
 					'parsed' => [
 						'url' => 'https://www.test.com/search',
-						'fields' =>[
+						'fields' => [
 							['Name' => 'q', 'Value' => 'cat'],
 							['Name' => 'rlz', 'Value' => '1C1GCEU_enLV1043LV1043']
 						]
@@ -2011,7 +2040,7 @@ class testLowLevelDiscovery extends CWebTest {
 						'Key' => 'two-macros-and-or-key',
 						'Type' => 'Zabbix agent'
 					],
-					'Filters'=> [
+					'Filters' => [
 						'calculation' => 'And/Or',
 						'filters' => [
 							['Macro' => '{#TEST_MACRO1}', 'operator' => 'matches', 'Regular expression' => 'Test expression 1'],
@@ -2028,11 +2057,11 @@ class testLowLevelDiscovery extends CWebTest {
 						'Key' => 'two-macros-and-key',
 						'Type' => 'Zabbix agent'
 					],
-					'Filters'=> [
+					'Filters' => [
 						'calculation' => 'And',
 						'filters' => [
 							['Macro' => '{#TEST_MACRO1}', 'operator' => 'matches', 'Regular expression' => 'Test expression 1'],
-							['Macro' => '{#TEST_MACRO2}', 'operator' => 'does not exist' ]
+							['Macro' => '{#TEST_MACRO2}', 'operator' => 'does not exist']
 						]
 					]
 				]
@@ -2045,7 +2074,7 @@ class testLowLevelDiscovery extends CWebTest {
 						'Key' => 'two-macros-or-key',
 						'Type' => 'Zabbix agent'
 					],
-					'Filters'=> [
+					'Filters' => [
 						'calculation' => 'Or',
 						'filters' => [
 							['Macro' => '{#TEST_MACRO1}', 'operator' => 'exists'],
@@ -2062,13 +2091,13 @@ class testLowLevelDiscovery extends CWebTest {
 						'Key' => 'three-macros-custom-expression-key',
 						'Type' => 'Zabbix agent'
 					],
-					'Filters'=> [
+					'Filters' => [
 						'calculation' => 'Custom expression',
 						'formula' => 'not A or not (B and C)',
 						'filters' => [
 							['Macro' => '{#TEST_MACRO1}', 'operator' => 'matches', 'Regular expression' => 'Test expression 1'],
-							['Macro' => '{#TEST_MACRO2}', 'operator' => 'exists' ],
-							['Macro' => '{#TEST_MACRO3}', 'operator' => 'does not exist' ]
+							['Macro' => '{#TEST_MACRO2}', 'operator' => 'exists'],
+							['Macro' => '{#TEST_MACRO3}', 'operator' => 'does not exist']
 						]
 					]
 				]
@@ -2082,7 +2111,7 @@ class testLowLevelDiscovery extends CWebTest {
 						'Key' => 'macro-wrong-key',
 						'Type' => 'Zabbix agent'
 					],
-					'Filters'=> [
+					'Filters' => [
 						'filters' => [
 							['Macro' => '{TEST_MACRO}', 'operator' => 'does not match', 'Regular expression' => 'Test expression']
 						]
@@ -2099,7 +2128,7 @@ class testLowLevelDiscovery extends CWebTest {
 						'Key' => 'macro-empty-formula-key',
 						'Type' => 'Zabbix agent'
 					],
-					'Filters'=> [
+					'Filters' => [
 						'calculation' => 'Custom expression',
 						'formula' => '',
 						'filters' => [
@@ -2119,7 +2148,7 @@ class testLowLevelDiscovery extends CWebTest {
 						'Key' => 'macro-extra-argument-key',
 						'Type' => 'Zabbix agent'
 					],
-					'Filters'=> [
+					'Filters' => [
 						'calculation' => 'Custom expression',
 						'formula' => 'A and B or F',
 						'filters' => [
@@ -2139,7 +2168,7 @@ class testLowLevelDiscovery extends CWebTest {
 						'Key' => 'macro-missing-argument-key',
 						'Type' => 'Zabbix agent'
 					],
-					'Filters'=> [
+					'Filters' => [
 						'calculation' => 'Custom expression',
 						'formula' => 'A and B',
 						'filters' => [
@@ -2148,8 +2177,8 @@ class testLowLevelDiscovery extends CWebTest {
 							['Macro' => '{#TEST_MACRO3}', 'operator' => 'does not exist']
 						]
 					],
-					'error_details' => 'Invalid parameter "/1/filter/conditions/3/formulaid": an identifier is not '.
-							'defined in the formula.'
+					'error_details' => 'Invalid parameter "/1/filter/conditions/3/formulaid": an identifier is not'.
+						' defined in the formula.'
 				]
 			],
 			// #100.
@@ -2161,7 +2190,7 @@ class testLowLevelDiscovery extends CWebTest {
 						'Key' => 'macro-wrong-formula-key',
 						'Type' => 'Zabbix agent'
 					],
-					'Filters'=> [
+					'Filters' => [
 						'calculation' => 'Custom expression',
 						'formula' => 'Wrong formula',
 						'filters' => [
@@ -2181,7 +2210,7 @@ class testLowLevelDiscovery extends CWebTest {
 						'Key' => 'macro-not-in-formula-key',
 						'Type' => 'Zabbix agent'
 					],
-					'Filters'=> [
+					'Filters' => [
 						'calculation' => 'Custom expression',
 						'formula' => 'A and Not B',
 						'filters' => [
@@ -2201,7 +2230,7 @@ class testLowLevelDiscovery extends CWebTest {
 						'Key' => 'macro-wrong-operator-key',
 						'Type' => 'Zabbix agent'
 					],
-					'Filters'=> [
+					'Filters' => [
 						'calculation' => 'Custom expression',
 						'formula' => 'NOT A and not B',
 						'filters' => [
@@ -2221,7 +2250,7 @@ class testLowLevelDiscovery extends CWebTest {
 						'Key' => 'macro-not-formula',
 						'Type' => 'Zabbix agent'
 					],
-					'Filters'=> [
+					'Filters' => [
 						'calculation' => 'Custom expression',
 						'formula' => 'not A not B',
 						'filters' => [
@@ -2310,9 +2339,9 @@ class testLowLevelDiscovery extends CWebTest {
 
 		// Make name and key unique for every case.
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_GOOD && $update
-			&& $data['fields']['Name'] !== '') {
-				$data['fields']['Name'] = trim($data['fields']['Name']).'_updated';
-				$data['fields']['Key'] = 'upd.'.$data['fields']['Key'];
+				&& $data['fields']['Name'] !== '') {
+			$data['fields']['Name'] = trim($data['fields']['Name']).'_updated';
+			$data['fields']['Key'] = 'upd.'.$data['fields']['Key'];
 		}
 
 		$url = ($context === 'template')
@@ -2322,7 +2351,7 @@ class testLowLevelDiscovery extends CWebTest {
 		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.$url);
 		$this->query($update ? 'link:'.static::$update_lld : 'button:Create discovery rule')->one()
 				->waitUntilClickable()->click();
-		$form = $this->query('id:host-discovery-form')->asForm()->one()->waitUntilVisible();
+		$form = $this->query('id:host-discovery-form')->asForm()->waitUntilVisible()->one();
 
 		if ($context === 'template') {
 			unset($data['fields']['Host interface']);
@@ -2413,7 +2442,7 @@ class testLowLevelDiscovery extends CWebTest {
 			$this->assertEquals(1, CDBHelper::getCount(
 				'SELECT * FROM items'.
 				' WHERE name='.zbx_dbstr($data['fields']['Name']).
-					'AND flags=1'
+					' AND flags=1'
 			));
 
 			$this->query('link', $data['fields']['Name'])->waitUntilClickable()->one()->click();
@@ -2522,13 +2551,13 @@ class testLowLevelDiscovery extends CWebTest {
 		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.$url);
 
 		if ($data['action'] === 'Add') {
-			$this->query('button:Create discovery rule')->one()->waitUntilClickable()->click();
+			$this->query('button:Create discovery rule')->waitUntilClickable()->one()->click();
 		}
 		else {
-			$this->query('link', $lld_name)->one()->waitUntilClickable()->click();
+			$this->query('link', $lld_name)->waitUntilClickable()->one()->click();
 
 			if ($data['action'] === 'Clone') {
-				$this->query('button:Clone')->one()->waitUntilClickable()->click();
+				$this->query('button:Clone')->waitUntilClickable()->one()->click();
 			}
 
 			if ($data['action'] === 'Delete') {
@@ -2540,7 +2569,7 @@ class testLowLevelDiscovery extends CWebTest {
 		}
 
 		if ($data['action'] !== 'Delete') {
-			$form = $this->query('id:host-discovery-form')->asForm()->one()->waitUntilVisible();
+			$form = $this->query('id:host-discovery-form')->asForm()->waitUntilVisible()->one();
 
 			$fields = [
 				'lld_fields' => [
@@ -2646,7 +2675,7 @@ class testLowLevelDiscovery extends CWebTest {
 
 		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.$url);
 		$lld_name = 'LLD for delete scenario';
-		$this->query('link', $lld_name)->one()->waitUntilClickable()->click();
+		$this->query('link', $lld_name)->waitUntilClickable()->one()->click();
 		$this->query('button:Delete')->waitUntilClickable()->one()->click();
 
 		// Check alert.
@@ -2659,7 +2688,7 @@ class testLowLevelDiscovery extends CWebTest {
 		$this->assertEquals(0, CDBHelper::getCount(
 			'SELECT * FROM items'.
 			' WHERE name='.zbx_dbstr($lld_name).
-				'AND flags=1'
+				' AND flags=1'
 		));
 
 		// Check frontend table.
@@ -2675,7 +2704,7 @@ class testLowLevelDiscovery extends CWebTest {
 	 * @param array $fields_array    given fields
 	 */
 	protected function checkFieldsParameters($fields_array) {
-		$form = $this->query('id:host-discovery-form')->asForm()->one()->waitUntilVisible();
+		$form = $this->query('id:host-discovery-form')->asForm()->waitUntilVisible()->one();
 
 		foreach ($fields_array as $id => $parameters) {
 			$error_output = 'Failed field: '.$id;
@@ -2692,11 +2721,11 @@ class testLowLevelDiscovery extends CWebTest {
 					$form->getField($id)->getAttribute('maxlength'), $error_output
 			);
 
-			if (array_key_exists('options', $parameters)){
+			if (array_key_exists('options', $parameters)) {
 				$this->assertEquals($parameters['options'], $form->getField($id)->getOptions()->asText(), $error_output);
 			}
 
-			if (array_key_exists('labels', $parameters)){
+			if (array_key_exists('labels', $parameters)) {
 				$this->assertEquals($parameters['labels'], $form->getField($id)->getLabels()->asText(), $error_output);
 			}
 		}

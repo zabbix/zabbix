@@ -135,7 +135,7 @@ class testFormLowLevelDiscoveryFromHost extends testLowLevelDiscovery {
 						'name' => 'LLD for simple update scenario',
 						'key_' => 'update_key',
 						'type' => ITEM_TYPE_HTTPAGENT,
-						'delay' => "1h;wd1-2h7-14",
+						'delay' => '1h;wd1-2h7-14',
 						'url' => 'https://www.test.com/search',
 						'query_fields' => [['name' => 'test_name1', 'value' => 'value1'], ['name' => '2', 'value' => 'value2']],
 						'request_method' => HTTPCHECK_REQUEST_HEAD,
@@ -304,8 +304,8 @@ class testFormLowLevelDiscoveryFromHost extends testLowLevelDiscovery {
 		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.
 				self::$interfaces_hostid.'&context=host'
 		);
-		$this->query('button:Create discovery rule')->one()->waitUntilClickable()->click();
-		$form = $this->query('id:host-discovery-form')->asForm()->one()->waitUntilVisible();
+		$this->query('button:Create discovery rule')->waitUntilClickable()->one()->click();
+		$form = $this->query('id:host-discovery-form')->asForm()->waitUntilVisible()->one();
 
 		$interfaces = [
 			'Zabbix agent' => '127.0.0.1:10050',
