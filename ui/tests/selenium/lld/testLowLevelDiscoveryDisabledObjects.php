@@ -450,7 +450,8 @@ class testLowLevelDiscoveryDisabledObjects extends CWebTest {
 			$hint_text = ($data['object'] === 'graph') ? $hint['graph_hint'] : $hint['common_hint'];
 
 			// Assert hint text for every object depending on LLD configuration.
-			$this->assertEquals(1, preg_match($hint_text, $hint_overlay->getText()));
+			$this->assertEquals(1, preg_match($hint_text, $hint_overlay->getText()), 'Hint text "'.
+					$hint_overlay->getText().'" does not match with expected "'.$hint_text.'"');
 			$hint_overlay->close();
 		}
 	}

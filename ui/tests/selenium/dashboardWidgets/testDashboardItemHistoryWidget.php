@@ -2711,6 +2711,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 		}
 
 		$form->submit();
+		$dashboard->getWidget(self::DATA_WIDGET);
 		$dashboard->save();
 		$dashboard->waitUntilReady();
 	}
