@@ -151,8 +151,8 @@ class testFormUserProfile extends CLegacyWebTest {
 		$sqlHashUsers = "select * from users where username<>'".PHPUNIT_LOGIN_NAME."' order by userid";
 		$oldHashUsers = CDBHelper::getHash($sqlHashUsers);
 
-		$this->zbxTestLogin('zabbix.php?action=userprofile.edit');
-		$this->page->waitUntilReady();
+		$this->page->login();
+		$this->page->open('zabbix.php?action=userprofile.edit')->waitUntilReady();
 
 		$this->zbxTestDropdownSelect('theme', 'Blue');
 		$this->zbxTestClickWait('update');

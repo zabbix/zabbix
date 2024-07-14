@@ -1113,8 +1113,12 @@ class testFormGraphs extends CWebTest {
 
 		if (!str_contains($button, 'add_protoitem')) {
 			$dialog->query('xpath:.//div[@class="multiselect-control"]')->asMultiselect()->one()->fill($host);
-			$table->query('class:no-data-message')->one(false)->waitUntilNotVisible();
 			$table->waitUntilReloaded();
+			// Test fails on Jenkins when change host in multiselect - Rows count does not match results count in data provider.
+			$no_data = $table->query('class:no-data-message')->one(false);
+			if ($no_data->isValid()) {
+				$no_data->waitUntilNotVisible();
+			}
 			$expected_items =['Float item', 'Unsigned item', 'Unsigned_dependent item'];
 		}
 		else {
