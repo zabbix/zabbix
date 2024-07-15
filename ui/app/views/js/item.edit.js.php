@@ -204,10 +204,6 @@ window.item_edit_form = new class {
 
 			switch (target.getAttribute('name')) {
 				case 'custom_timeout':
-					if (this.field.timeout.value === '') {
-						this.field.timeout.value = this.field.inherited_timeout.value;
-					}
-
 					this.updateFieldsVisibility();
 
 					break;

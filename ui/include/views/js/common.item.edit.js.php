@@ -222,10 +222,6 @@
 
 		item_form.custom_timeout.addEventListener('change', () => {
 			if (item_form.custom_timeout.querySelector(':checked').value == <?= ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED ?>) {
-				if (item_form.timeout.value === '') {
-					item_form.timeout.value = item_form.inherited_timeouts[item_form.type.value] || '';
-				}
-
 				item_form.timeout.disabled = false;
 				item_form.timeout.style.display = '';
 				item_form.inherited_timeout.style.display = 'none';
