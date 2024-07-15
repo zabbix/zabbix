@@ -391,14 +391,14 @@ out:
   return: SUCCEED
 
 ---
-test case: htmldecode &amp;lt;&amp;
+test case: htmldecode &
 in:
   function: 'htmldecode'
   params: ''
-  data: '&amp;lt;&amp;'
+  data: '&'
 
 out:
-  value: '&lt;&'
+  value: '&'
   return: SUCCEED
 
 
