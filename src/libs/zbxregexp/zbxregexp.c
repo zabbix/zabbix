@@ -749,7 +749,7 @@ static char	*regexp_sub_replace(const char *text, const char *output_template, z
 		switch (*(++pgroup))
 		{
 			case '\\':
-				strncpy_alloc(&ptr, &size, &offset, pstart, pgroup - pstart, limit);
+				strncpy_alloc(&ptr, &size, &offset, pstart, (size_t)(pgroup - pstart), limit);
 				pstart = pgroup + 1;
 				continue;
 
@@ -763,12 +763,13 @@ static char	*regexp_sub_replace(const char *text, const char *output_template, z
 			case '7':
 			case '8':
 			case '9':
-				strncpy_alloc(&ptr, &size, &offset, pstart, pgroup - pstart - 1, limit);
+				strncpy_alloc(&ptr, &size, &offset, pstart, (size_t)(pgroup - pstart - 1), limit);
 				group_index = *pgroup - '0';
 				if (group_index < nmatch && -1 != match[group_index].rm_so)
 				{
 					strncpy_alloc(&ptr, &size, &offset, text + match[group_index].rm_so,
-							match[group_index].rm_eo - match[group_index].rm_so, limit);
+							(size_t)(match[group_index].rm_eo - match[group_index].rm_so),
+							limit);
 				}
 				pstart = pgroup + 1;
 				continue;
@@ -783,13 +784,13 @@ static char	*regexp_sub_replace(const char *text, const char *output_template, z
 				}
 
 				strncpy_alloc(&ptr, &size, &offset, text + match[1].rm_so,
-						match[1].rm_eo - match[1].rm_so, limit);
+						(size_t)(match[1].rm_eo - match[1].rm_so), limit);
 
 				pstart = pgroup + 1;
 				continue;
 
 			default:
-				strncpy_alloc(&ptr, &size, &offset, pstart, pgroup - pstart, limit);
+				strncpy_alloc(&ptr, &size, &offset, pstart, (size_t)(pgroup - pstart), limit);
 				pstart = pgroup;
 		}
 
@@ -1084,14 +1085,14 @@ int	zbx_regexp_repl(const char *string, const char *pattern, const char *repl_te
 	}
 
 	/* create pattern based string for each match and relplace matched string with this string */
-	for (mi = matches.values_num - 1; mi >= 0; mi--)
+	for (mi = matches.values_num - 1; 0 <= mi; mi--)
 	{
-		zbx_regmatch_t *match = matches.values[mi]->match;
+		zbx_regmatch_t	*match = matches.values[mi]->match;
 		size_t	endof = (size_t)match[0].rm_eo - 1;
+		char	*repl, *empty = zbx_strdup(NULL, string);
 
 		if (match[0].rm_eo == match[0].rm_so)
 			endof = (size_t)match[0].rm_eo;
-		char	*repl, *empty = zbx_strdup(NULL, string);
 
 		if (NULL == repl_template || '\0' == *repl_template)
 		{

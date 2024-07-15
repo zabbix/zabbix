@@ -98,7 +98,7 @@ static int	zbx_tr_rule_create(const char *param, char *dst)
 	/* construct string to replace */
 	for (ptr = param; '\0' != *ptr; ptr++)
 	{
-		if (*ptr == '\\')
+		if ('\\' == *ptr)
 		{
 			ptr++;
 			switch (*ptr)
@@ -134,7 +134,7 @@ static int	zbx_tr_rule_create(const char *param, char *dst)
 					c = *ptr;
 					break;
 			}
-			if (*(ptr + 1) == '-' && *(ptr + 2) != '\0' && 0 == range_from)
+			if ('-' == *(ptr + 1) && '\0' != *(ptr + 2) && 0 == range_from)
 			{
 				range_from = c;
 				ptr++;
@@ -146,7 +146,7 @@ static int	zbx_tr_rule_create(const char *param, char *dst)
 		else
 		{
 			c = *ptr;
-			if (*(ptr + 1) == '-' && *(ptr + 2) != '\0' && 0 == range_from)
+			if ('-' == *(ptr + 1) && '\0' != *(ptr + 2) && 0 == range_from)
 			{
 				range_from = c;
 				ptr++;
