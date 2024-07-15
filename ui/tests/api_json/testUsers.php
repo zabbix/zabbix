@@ -1284,7 +1284,7 @@ class testUsers extends CAPITest {
 				]],
 				'expected_error' => 'Invalid parameter "/1/usrgrps/2": value (usrgrpid)=(7) already exists.'
 			],
-			'Groups can be removed when updaing user' => [
+			'Groups can be removed when updating user' => [
 				'user' => [[
 					'userid' => '9',
 					'username' => 'User without user groups',

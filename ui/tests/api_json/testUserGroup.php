@@ -758,7 +758,7 @@ class testUserGroup extends CAPITest {
 				'usergroup' => ['18', '19'],
 				'expected_error' => null
 			],
-			'Can delete group havig user with signle group' => [
+			'Can delete group havig user with single group' => [
 				'usergroup' => [':user_group:user group 2'],
 				'expected_error' => null
 			]
