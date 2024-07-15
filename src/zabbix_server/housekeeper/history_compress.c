@@ -124,7 +124,7 @@ static int	hk_get_compression_age(const char *table_name, int compression_policy
 
 	if (NULL != (row = zbx_db_fetch(result)))
 	{
-		/* extraction from json may return empty field when json exists but field doesn't */
+		/* extraction from JSON may return empty field when JSON exists but field doesn't */
 		if (NULL == row[0])
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "The %s table has different compression policy than '%s'",
