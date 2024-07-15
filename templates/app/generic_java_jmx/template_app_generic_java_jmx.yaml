@@ -63,7 +63,6 @@ zabbix_export:
           name: 'Compilation: Name of the current JIT compiler'
           type: JMX
           key: 'jmx["java.lang:type=Compilation","Name"]'
-          trends: '0'
           value_type: CHAR
           username: '{$JMX.USER}'
           password: '{$JMX.PASSWORD}'
@@ -294,7 +293,6 @@ zabbix_export:
           type: JMX
           key: 'jmx["java.lang:type=Runtime","VmName"]'
           delay: 1h
-          trends: '0'
           value_type: CHAR
           username: '{$JMX.USER}'
           password: '{$JMX.PASSWORD}'
@@ -320,7 +318,6 @@ zabbix_export:
           type: JMX
           key: 'jmx["java.lang:type=Runtime","VmVersion"]'
           delay: 1h
-          trends: '0'
           value_type: CHAR
           username: '{$JMX.USER}'
           password: '{$JMX.PASSWORD}'
@@ -400,8 +397,6 @@ zabbix_export:
               description: 'Displays the total number of collections that have occurred per second.'
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 - tag: collection
@@ -450,7 +445,6 @@ zabbix_export:
             conditions:
               - macro: '{#JMXNAME}'
                 value: '{$JMX.MEM.POOL.NAME.MATCHES}'
-                formulaid: A
           description: 'Memory pools metrics discovery.'
           item_prototypes:
             - uuid: 8b3da0f9b0b64b58b25ffed71a679ed0

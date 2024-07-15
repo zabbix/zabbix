@@ -31,7 +31,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.4.0
           key: 'hp.server.contact[sysContact]'
           delay: 1h
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -50,7 +49,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.1.0
           key: 'hp.server.descr[sysDescr]'
           delay: 1h
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -69,7 +67,6 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.232.2.2.4.2.0
           key: 'hp.server.hw.model[cpqSiProductName]'
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: CPQSINFO-MIB
@@ -87,7 +84,6 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.232.2.2.2.1.0
           key: 'hp.server.hw.serialnumber[cpqSiSysSerialNum]'
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: CPQSINFO-MIB
@@ -139,7 +135,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.6.0
           key: 'hp.server.location[sysLocation]'
           delay: 15m
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -158,7 +153,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.5.0
           key: 'hp.server.name[sysName]'
           delay: 15m
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -205,7 +199,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.2.0
           key: 'hp.server.objectid[sysObjectID]'
           delay: 15m
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -286,8 +279,6 @@ zabbix_export:
           name: 'SNMP traps (fallback)'
           type: SNMP_TRAP
           key: snmptrap.fallback
-          delay: '0'
-          trends: '0'
           value_type: LOG
           description: 'The item is used to collect all SNMP traps unmatched by other snmptrap items.'
           logtimefmt: 'hh:mm:sszyyyy/MM/dd'
@@ -705,7 +696,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.3.2.5.1.1.3.{#SNMPINDEX}'
               key: 'hp.server.hw.physicaldisk.model[cpqDaPhyDrvModel.{#SNMPINDEX}]'
-              trends: '0'
               value_type: CHAR
               description: |
                 MIB: CPQIDA-MIB
@@ -727,7 +717,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.3.2.5.1.1.51.{#SNMPINDEX}'
               key: 'hp.server.hw.physicaldisk.serialnumber[cpqDaPhyDrvSerialNum.{#SNMPINDEX}]'
-              trends: '0'
               value_type: CHAR
               description: |
                 MIB: CPQIDA-MIB
@@ -936,10 +925,8 @@ zabbix_export:
             conditions:
               - macro: '{#SENSOR_LOCALE}'
                 value: '11'
-                formulaid: A
               - macro: '{#SNMPINDEX}'
                 value: 0\.1
-                formulaid: B
           description: |
             Scanning table of Temperature Sensor Entries:
             CPQHLTH-MIB::cpqHeTemperatureTable with ambient(11) and 0.1 index filter
@@ -1029,7 +1016,6 @@ zabbix_export:
             conditions:
               - macro: '{#SENSOR_LOCALE}'
                 value: '6'
-                formulaid: A
           description: |
             Scanning table of Temperature Sensor Entries:
             CPQHLTH-MIB::cpqHeTemperatureTable with cpu(6) filter
@@ -1123,7 +1109,6 @@ zabbix_export:
             conditions:
               - macro: '{#SENSOR_LOCALE}'
                 value: (4|8|9|12|13)
-                formulaid: A
           description: |
             Scanning table of Temperature Sensor Entries:
             CPQHLTH-MIB::cpqHeTemperatureTable
@@ -1230,7 +1215,6 @@ zabbix_export:
             conditions:
               - macro: '{#SENSOR_LOCALE}'
                 value: '5'
-                formulaid: A
           description: |
             Scanning table of Temperature Sensor Entries:
             CPQHLTH-MIB::cpqHeTemperatureTable with ioBoard(5) filter
@@ -1320,7 +1304,6 @@ zabbix_export:
             conditions:
               - macro: '{#SENSOR_LOCALE}'
                 value: '7'
-                formulaid: A
           description: |
             Scanning table of Temperature Sensor Entries:
             CPQHLTH-MIB::cpqHeTemperatureTable with memory(7) filter
@@ -1414,7 +1397,6 @@ zabbix_export:
             conditions:
               - macro: '{#SENSOR_LOCALE}'
                 value: '10'
-                formulaid: A
           description: |
             Scanning table of Temperature Sensor Entries:
             CPQHLTH-MIB::cpqHeTemperatureTable with powerSupply(10) filter
@@ -1508,7 +1490,6 @@ zabbix_export:
             conditions:
               - macro: '{#SENSOR_LOCALE}'
                 value: '3'
-                formulaid: A
           description: |
             Scanning table of Temperature Sensor Entries:
             CPQHLTH-MIB::cpqHeTemperatureTable with system(3) filter

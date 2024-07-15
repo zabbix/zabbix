@@ -278,8 +278,8 @@ $item_tab
 			->addValue(_('Raw data'), ZBX_POSTTYPE_RAW)
 			->addValue(_('JSON data'), ZBX_POSTTYPE_JSON)
 			->addValue(_('XML data'), ZBX_POSTTYPE_XML)
-			->setEnabled(!$data['limited'])
-			->setModern(true)
+			->setReadonly($data['limited'])
+			->setModern()
 		))->setId('js-item-post-type-field')
 	])
 	// Append ITEM_TYPE_HTTPAGENT Request body to form list.
@@ -348,7 +348,7 @@ $item_tab
 	->addItem([
 		(new CLabel(_('Follow redirects'), 'follow_redirects'))->setId('js-item-follow-redirects-label'),
 		(new CFormField((new CCheckBox('follow_redirects', HTTPTEST_STEP_FOLLOW_REDIRECTS_ON))
-			->setEnabled(!$data['limited'])
+			->setReadonly($data['limited'])
 			->setChecked($data['follow_redirects'] == HTTPTEST_STEP_FOLLOW_REDIRECTS_ON)
 		))->setId('js-item-follow-redirects-field')
 	])
@@ -359,8 +359,8 @@ $item_tab
 			->addValue(_('Body'), HTTPTEST_STEP_RETRIEVE_MODE_CONTENT)
 			->addValue(_('Headers'), HTTPTEST_STEP_RETRIEVE_MODE_HEADERS)
 			->addValue(_('Body and headers'), HTTPTEST_STEP_RETRIEVE_MODE_BOTH)
-			->setEnabled(!($data['limited'] || $data['request_method'] == HTTPCHECK_REQUEST_HEAD))
-			->setModern(true)
+			->setReadonly($data['limited'] || $data['request_method'] == HTTPCHECK_REQUEST_HEAD)
+			->setModern()
 		))->setId('js-item-retrieve-mode-field')
 	])
 	// Append ITEM_TYPE_HTTPAGENT HTTP proxy to form list.
@@ -410,7 +410,7 @@ $item_tab
 	->addItem([
 		(new CLabel(_('SSL verify peer'), 'verify_peer'))->setId('js-item-verify-peer-label'),
 		(new CFormField((new CCheckBox('verify_peer', ZBX_HTTP_VERIFY_PEER_ON))
-			->setEnabled(!$data['limited'])
+			->setReadonly($data['limited'])
 			->setChecked($data['verify_peer'] == ZBX_HTTP_VERIFY_PEER_ON)
 		))->setId('js-item-verify-peer-field')
 	])
@@ -419,7 +419,7 @@ $item_tab
 		(new CLabel(_('SSL verify host'), 'verify_host'))->setId('js-item-verify-host-label'),
 		(new CFormField(
 			(new CCheckBox('verify_host', ZBX_HTTP_VERIFY_HOST_ON))
-				->setEnabled(!$data['limited'])
+				->setReadonly($data['limited'])
 				->setChecked($data['verify_host'] == ZBX_HTTP_VERIFY_HOST_ON)
 		))->setId('js-item-verify-host-field')
 	])
@@ -461,7 +461,7 @@ $item_tab
 				'name' => 'master_itemid',
 				'object_name' => 'items',
 				'multiple' => false,
-				'disabled' => $data['limited'],
+				'readonly' => $data['limited'],
 				'data' => ($data['master_itemid'] > 0)
 					? [
 						[
@@ -487,15 +487,15 @@ $item_tab
 		))->setId('js-item-master-item-field')
 	]);
 
-// Append interfaces to form list.
-$select_interface = getInterfaceSelect($data['interfaces'])
-	->setId('interface-select')
-	->setValue($data['interfaceid'])
-	->addClass(ZBX_STYLE_ZSELECT_HOST_INTERFACE)
-	->setFocusableElementId('interfaceid')
-	->setAriaRequired();
-
 if ($data['display_interfaces']) {
+	// Append interfaces to form list.
+	$select_interface = getInterfaceSelect($data['interfaces'])
+		->setId('interface-select')
+		->setValue($data['interfaceid'])
+		->addClass(ZBX_STYLE_ZSELECT_HOST_INTERFACE)
+		->setFocusableElementId('interfaceid')
+		->setAriaRequired();
+
 	$item_tab->addItem([
 		(new CLabel(_('Host interface'), $select_interface->getFocusableElementId()))
 			->setAsteriskMark()
@@ -508,7 +508,6 @@ if ($data['display_interfaces']) {
 				->setAttribute('style', 'display: none;')
 		]))->setId('js-item-interface-field')
 	]);
-	$form->addVar('selectedInterfaceId', $data['interfaceid']);
 }
 
 $item_tab
@@ -641,7 +640,7 @@ foreach ($data['delay_flex'] as $i => $delay_flex) {
 	$type_input = (new CRadioButtonList('delay_flex['.$i.'][type]', (int) $delay_flex['type']))
 		->addValue(_('Flexible'), ITEM_DELAY_FLEXIBLE)
 		->addValue(_('Scheduling'), ITEM_DELAY_SCHEDULING)
-		->setModern(true);
+		->setModern();
 
 	if ($delay_flex['type'] == ITEM_DELAY_FLEXIBLE) {
 		$delay_input = (new CTextBox('delay_flex['.$i.'][delay]', $delay_flex['delay']))
