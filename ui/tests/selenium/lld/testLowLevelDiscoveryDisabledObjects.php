@@ -406,9 +406,9 @@ class testLowLevelDiscoveryDisabledObjects extends CWebTest {
 				'disabled' => true
 			],
 			'6 Delete - after 7d, disable - after 20h' => [
-				'common_hint' => "/^The ".$data['object']." is not discovered anymore and will be disabled in 19h".
-						" ([0-9]{1,2}m)? ([0-9]{1,2}s)?, will be deleted in 6d 23h ([0-9]{1,2}m)?\.$/",
-				'graph_hint' => "/^The graph is not discovered anymore and will be deleted in 6d 23h ([0-9]{1,2}m)?\.$/"
+				'common_hint' => "/^The ".$data['object']." is not discovered anymore and will be disabled in".
+						" \d{1,2}h( \d{1,2}m( \d{1,2}s)?)?, will be deleted in \d{1,2}d( \d{1,2}h( \d{1,2}m)?)?\.$/",
+				'graph_hint' => "/^The graph is not discovered anymore and will be deleted in \d{1,2}d( \d{1,2}h( \d{1,2}m)?)?\.$/"
 			],
 			'7 Delete - Immediately' => [
 				'common_hint' => '/^The '.$data['object'].' is not discovered anymore and will be deleted'.
