@@ -238,7 +238,7 @@ out:
 test case: different characters
 in:
   data: 'ыABCabc123ыы'
-  param1: 'ыц'
+  param1: 'ы'
   param2: 'в'
 out:
   value: 'вABCabc123вв'

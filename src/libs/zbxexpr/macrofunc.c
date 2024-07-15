@@ -398,16 +398,18 @@ static int	macrofunc_htmlencode(char **params, size_t nparam, char **out)
 		return FAIL;
 	}
 
-	for (pentity = (zbx_htmlentity_t *)zbx_html_translation;
-		pentity < zbx_html_translation + ARRSIZE(zbx_html_translation); pentity++)
+	for (size_t idx = 0; '\0' != (*out)[idx]; idx++)
 	{
-		ch = pentity->character;
-		for (size_t idx = 0; '\0' != (*out)[idx]; idx++)
+		for (pentity = (zbx_htmlentity_t *)zbx_html_translation;
+			pentity < zbx_html_translation + ARRSIZE(zbx_html_translation); pentity++)
 		{
+			ch = pentity->character;
 			if ((*out)[idx] == ch)
+			{
 				zbx_replace_string(out, idx, &idx, pentity->html_entity);
+				break;
+			}
 		}
-
 	}
 	return SUCCEED;
 }
