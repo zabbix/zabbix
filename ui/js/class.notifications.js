@@ -414,8 +414,14 @@ ZBX_Notifications.prototype.handleTabFocusIn = function() {
  * @param {MouseEvent} e
  */
 ZBX_Notifications.prototype.handleCloseClicked = function(e) {
+	const data = {ids: this.getEventIds()};
+
+	if (this._csrf_token !== null) {
+		data._csrf_token = this._csrf_token;
+	}
+
 	this
-		.fetch('notifications.read', {ids: this.getEventIds()})
+		.fetch('notifications.read', data)
 		.then((resp) => {
 			if ('error' in resp) {
 				throw {error: resp.error};
