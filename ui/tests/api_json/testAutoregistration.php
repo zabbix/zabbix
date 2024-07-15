@@ -22,7 +22,6 @@
 require_once dirname(__FILE__).'/../include/CAPITest.php';
 
 /**
- * @backup   hosts
  * @onBefore prepareTestData
  * @onAfter  cleanTestData
  */
