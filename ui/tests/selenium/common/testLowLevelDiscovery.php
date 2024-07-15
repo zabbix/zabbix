@@ -39,11 +39,11 @@ class testLowLevelDiscovery extends CWebTest {
 	}
 
 	/**
-	 * Test for LLD Form layout check.
+	 * Test for LLD Form initial layout check without changing the LLD type.
 	 *
 	 * @param string $context    is LLD created on Host or on Template
 	 */
-	protected function checkFormLayout($context = 'host') {
+	protected function checkInitialLayout($context = 'host') {
 		$url = ($context === 'template')
 			? static::$templateid.'&context=template'
 			: static::$empty_hostid.'&context=host';
@@ -186,8 +186,8 @@ class testLowLevelDiscovery extends CWebTest {
 					$preprocessing_container = $form->getFieldContainer('Preprocessing steps');
 					$preprocessing_container->query('button:Add')->waitUntilClickable()->one()->click();
 					$this->assertTrue($preprocessing_container->query('id:preprocessing')->one()->isVisible());
-					$this->assertTrue($preprocessing_container->query('button', ['Add', 'Test', 'Remove', 'Test all steps'])
-							->one()->isClickable()
+					$this->assertEquals(4, $preprocessing_container->query('button', ['Add', 'Test', 'Remove', 'Test all steps'])
+							->all()->filter(new CElementFilter(CElementFilter::CLICKABLE))->count()
 					);
 
 					$preprocessing_fields = [
@@ -213,7 +213,9 @@ class testLowLevelDiscovery extends CWebTest {
 				case 'LLD macros':
 					$macros_table = $form->query('id:lld_macro_paths')->asTable()->one();
 					$this->assertTrue($macros_table->isVisible());
-					$this->assertTrue($macros_table->query('button', ['Add', 'Remove'])->one()->isClickable());
+					$this->assertEquals(2, $macros_table->query('button', ['Add', 'Remove'])->all()
+							->filter(new CElementFilter(CElementFilter::CLICKABLE))->count()
+					);
 					$this->assertEquals(['LLD macro', 'JSONPath', ''], $macros_table->getHeadersText());
 
 					$macros_fields = [
@@ -230,7 +232,9 @@ class testLowLevelDiscovery extends CWebTest {
 				case 'Filters':
 					$filters_container = $form->getFieldContainer('Filters');
 					$this->assertTrue($form->query('id:conditions')->one()->isVisible());
-					$this->assertTrue($filters_container->query('button', ['Add', 'Remove'])->one()->isClickable());
+					$this->assertEquals(2, $filters_container->query('button', ['Add', 'Remove'])->all()
+							->filter(new CElementFilter(CElementFilter::CLICKABLE))->count()
+					);
 					$filter_table = $filters_container->query('id:conditions')->asTable()->one();
 					$this->assertEquals(['Label', 'Macro', '', 'Regular expression', 'Action'],
 							$filter_table->getHeadersText()
@@ -410,6 +414,12 @@ class testLowLevelDiscovery extends CWebTest {
 		];
 	}
 
+	/**
+	 * Test for LLD Form's layout check depending on LLD type.
+	 *
+	 * @param array $data        data provider
+	 * @param string $context    is LLD created on Host or on Template
+	 */
 	protected function checkLayoutDependingOnType($data, $context = 'host') {
 		$url = ($context === 'template')
 			? static::$templateid.'&context=template'
@@ -2326,7 +2336,7 @@ class testLowLevelDiscovery extends CWebTest {
 	}
 
 	/**
-	 * Check LLD edit form fields.
+	 * Check LLD create or update form fields.
 	 *
 	 * @param array   $data       data provider
 	 * @param boolean $update     true for update scenario, false for create
@@ -2646,19 +2656,19 @@ class testLowLevelDiscovery extends CWebTest {
 				$form->query('link:Cancel override')->waitUntilClickable()->one()->click();
 			}
 
-			$overlay_dialog = COverlayDialogElement::find()->all()->last()->asForm()->waitUntilReady();
-			$overlay_dialog->fill($fields['overrides_fields']['filters']);
-			$overlay_dialog->getFieldContainer('Operations')->query('button:Add')->waitUntilClickable()->one()->click();
-			$operation_dialog = COverlayDialogElement::find()->all()->last()->asForm()->waitUntilReady();
-			$operation_dialog->fill($fields['overrides_fields']['operations']);
-			$operation_dialog->submit();
-			$operation_dialog->waitUntilNotVisible();
-			$overlay_dialog->submit();
-			$operation_dialog->waitUntilNotVisible();
+			$overlay_dialog_form = COverlayDialogElement::find()->all()->last()->asForm()->waitUntilReady();
+			$overlay_dialog_form->fill($fields['overrides_fields']['filters']);
+			$overlay_dialog_form->getFieldContainer('Operations')->query('button:Add')->waitUntilClickable()->one()->click();
+			$operation_dialog_form = COverlayDialogElement::find()->all()->last()->asForm()->waitUntilReady();
+			$operation_dialog_form->fill($fields['overrides_fields']['operations']);
+			$operation_dialog_form->submit();
+			$operation_dialog_form->waitUntilNotVisible();
+			$overlay_dialog_form->submit();
+			$operation_dialog_form->waitUntilNotVisible();
 		}
 
 		$this->query('button:Cancel')->waitUntilClickable()->one()->click();
-		$this->page->assertTitle('Configuration of discovery rules');
+		$this->page->waitUntilReady();
 		$this->assertTrue($this->query('link', $lld_name)->one()->isVisible());
 		$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
 	}
@@ -2713,13 +2723,11 @@ class testLowLevelDiscovery extends CWebTest {
 					$form->getField($id)->getValue(), $error_output
 			);
 
-			$this->assertEquals(CTestArrayHelper::get($parameters, 'placeholder'),
-					$form->getField($id)->getAttribute('placeholder'), $error_output
-			);
-
-			$this->assertEquals(CTestArrayHelper::get($parameters, 'maxlength'),
-					$form->getField($id)->getAttribute('maxlength'), $error_output
-			);
+			foreach (['placeholder', 'maxlength'] as $attribute) {
+				$this->assertEquals(CTestArrayHelper::get($parameters, $attribute),
+						$form->getField($id)->getAttribute($attribute), $error_output
+				);
+			}
 
 			if (array_key_exists('options', $parameters)) {
 				$this->assertEquals($parameters['options'], $form->getField($id)->getOptions()->asText(), $error_output);

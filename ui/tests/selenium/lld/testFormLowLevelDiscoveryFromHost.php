@@ -140,7 +140,7 @@ class testFormLowLevelDiscoveryFromHost extends testLowLevelDiscovery {
 						'query_fields' => [['name' => 'test_name1', 'value' => 'value1'], ['name' => '2', 'value' => 'value2']],
 						'request_method' => HTTPCHECK_REQUEST_HEAD,
 						'post_type' => ZBX_POSTTYPE_JSON,
-						'posts' => "{\"zabbix_export\": {\"version\": \"6.0\",\"date\": \"2024-03-20T20:05:14Z\"}}",
+						'posts' => '{"zabbix_export": {"version": "6.0","date": "2024-03-20T20:05:14Z"}}',
 						'headers' => [['name' => 'name1', 'value' => 'value']],
 						'status_codes' => '400, 600',
 						'follow_redirects' => 1,
@@ -200,7 +200,7 @@ class testFormLowLevelDiscoveryFromHost extends testLowLevelDiscovery {
 						'name' => 'LLD for cancel scenario',
 						'key_' => 'ssh.run[test]',
 						'type' => ITEM_TYPE_SSH,
-						'delay' => "3h;20s/1-3,00:02-14:30",
+						'delay' => '3h;20s/1-3,00:02-14:30',
 						'authtype' => ITEM_AUTHTYPE_PUBLICKEY,
 						'username' => 'username',
 						'password' => 'passphrase',
@@ -257,7 +257,7 @@ class testFormLowLevelDiscoveryFromHost extends testLowLevelDiscovery {
 	}
 
 	public function testFormLowLevelDiscoveryFromHost_InitialLayout() {
-		$this->checkFormLayout();
+		$this->checkInitialLayout();
 	}
 
 	/**
