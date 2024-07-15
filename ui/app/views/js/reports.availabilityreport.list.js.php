@@ -1,3 +1,4 @@
+<?php declare(strict_types = 0);
 /*
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
@@ -13,17 +14,29 @@
 **/
 
 
-$(() => {
-	const $form = $(document.forms['report2']),
-		$filter_form = $(document.forms['zbx_filter']);
+/**
+ * @var CView $this
+ */
 
-	$form.find('[name="mode"]').on('change', (e) => {
-		$form.submit();
-	})
+?>
 
-	$filter_form
-		.find('[name="filter_groups"],[name="filter_templateid"],[name="tpl_triggerid"],[name="hostgroupid"]')
-		.on('change', (e) => {
-			$filter_form.submit();
-		})
-});
+<script>
+	const view = new class {
+
+		init({timeline}) {
+			document.getElementById('mode').addEventListener('change', (e) => {
+				e.target.closest('form').submit()
+			});
+
+			timeControl.addObject('availabilityreport', timeline, {
+				id: 'timeline_1',
+				domid: 'availabilityreport',
+				loadSBox: 0,
+				loadImage: 0,
+				dynamic: 0
+			});
+
+			timeControl.processObjects();
+		}
+	}
+</script>

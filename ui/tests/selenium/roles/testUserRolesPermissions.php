@@ -618,7 +618,7 @@ class testUserRolesPermissions extends CWebTest {
 						'Action log',
 						'Notifications'
 					],
-					'link' => ['report2.php']
+					'link' => ['zabbix.php?action=availabilityreport.list']
 				]
 			],
 			[
@@ -648,7 +648,7 @@ class testUserRolesPermissions extends CWebTest {
 						'Action log',
 						'Notifications'
 					],
-					'link' => ['report2.php']
+					'link' => ['zabbix.php?action=availabilityreport.list']
 				]
 			],
 			[

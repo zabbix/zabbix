@@ -475,7 +475,7 @@ class testDocumentationLinks extends CWebTest {
 			// #40 Availability report view.
 			[
 				[
-					'url' => 'report2.php',
+					'url' => 'zabbix.php?action=availabilityreport.list',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/reports/availability'
 				]
 			],
