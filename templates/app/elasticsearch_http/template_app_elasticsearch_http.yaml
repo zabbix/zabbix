@@ -34,8 +34,6 @@ zabbix_export:
           name: 'Delayed unassigned shards'
           type: DEPENDENT
           key: es.cluster.delayed_unassigned_shards
-          delay: '0'
-          history: 7d
           description: 'The number of shards whose allocation has been delayed by the timeout settings.'
           preprocessing:
             - type: JSONPATH
@@ -51,7 +49,6 @@ zabbix_export:
           type: HTTP_AGENT
           key: es.cluster.get_health
           history: '0'
-          trends: '0'
           value_type: TEXT
           authtype: BASIC
           username: '{$ELASTICSEARCH.USERNAME}'
@@ -67,7 +64,6 @@ zabbix_export:
           type: HTTP_AGENT
           key: es.cluster.get_stats
           history: '0'
-          trends: '0'
           value_type: TEXT
           authtype: BASIC
           username: '{$ELASTICSEARCH.USERNAME}'
@@ -82,8 +78,6 @@ zabbix_export:
           name: 'Inactive shards percentage'
           type: DEPENDENT
           key: es.cluster.inactive_shards_percent_as_number
-          delay: '0'
-          history: 7d
           value_type: FLOAT
           units: '%'
           description: 'The ratio of inactive shards in the cluster expressed as a percentage.'
@@ -103,8 +97,6 @@ zabbix_export:
           name: 'Number of initializing shards'
           type: DEPENDENT
           key: es.cluster.initializing_shards
-          delay: '0'
-          history: 7d
           description: 'The number of shards that are under initialization.'
           preprocessing:
             - type: JSONPATH
@@ -128,8 +120,6 @@ zabbix_export:
           name: 'Number of data nodes'
           type: DEPENDENT
           key: es.cluster.number_of_data_nodes
-          delay: '0'
-          history: 7d
           description: 'The number of nodes that are dedicated to data nodes.'
           preprocessing:
             - type: JSONPATH
@@ -147,8 +137,6 @@ zabbix_export:
           name: 'Number of nodes'
           type: DEPENDENT
           key: es.cluster.number_of_nodes
-          delay: '0'
-          history: 7d
           description: 'The number of nodes within the cluster.'
           preprocessing:
             - type: JSONPATH
@@ -183,8 +171,6 @@ zabbix_export:
           name: 'Number of pending tasks'
           type: DEPENDENT
           key: es.cluster.number_of_pending_tasks
-          delay: '0'
-          history: 7d
           description: 'The number of cluster-level changes that have not yet been executed.'
           preprocessing:
             - type: JSONPATH
@@ -199,8 +185,6 @@ zabbix_export:
           name: 'Number of relocating shards'
           type: DEPENDENT
           key: es.cluster.relocating_shards
-          delay: '0'
-          history: 7d
           description: 'The number of shards that are under relocation.'
           preprocessing:
             - type: JSONPATH
@@ -215,8 +199,6 @@ zabbix_export:
           name: 'Cluster health status'
           type: DEPENDENT
           key: es.cluster.status
-          delay: '0'
-          history: 7d
           description: |
             Health status of the cluster, based on the state of its primary and replica shards. Statuses are:
             green
@@ -278,8 +260,6 @@ zabbix_export:
           name: 'Task max waiting in queue'
           type: DEPENDENT
           key: es.cluster.task_max_waiting_in_queue
-          delay: '0'
-          history: 7d
           value_type: FLOAT
           units: s
           description: 'The time expressed in seconds since the earliest initiated task is waiting for being performed.'
@@ -299,8 +279,6 @@ zabbix_export:
           name: 'Number of unassigned shards'
           type: DEPENDENT
           key: es.cluster.unassigned_shards
-          delay: '0'
-          history: 7d
           description: 'The number of shards that are not allocated.'
           preprocessing:
             - type: JSONPATH
@@ -324,8 +302,6 @@ zabbix_export:
           name: 'Indices with shards assigned to nodes'
           type: DEPENDENT
           key: es.indices.count
-          delay: '0'
-          history: 7d
           description: 'The total number of indices with shards assigned to the selected nodes.'
           preprocessing:
             - type: JSONPATH
@@ -343,8 +319,6 @@ zabbix_export:
           name: 'Number of non-deleted documents'
           type: DEPENDENT
           key: es.indices.docs.count
-          delay: '0'
-          history: 7d
           description: |
             The total number of non-deleted documents across all primary shards assigned to the selected nodes.
             This number is based on the documents in Lucene segments and may include the documents from nested fields.
@@ -364,8 +338,6 @@ zabbix_export:
           name: 'Nodes with the data role'
           type: DEPENDENT
           key: es.nodes.count.data
-          delay: '0'
-          history: 7d
           description: 'The number of selected nodes with the data role.'
           preprocessing:
             - type: JSONPATH
@@ -383,8 +355,6 @@ zabbix_export:
           name: 'Nodes with the ingest role'
           type: DEPENDENT
           key: es.nodes.count.ingest
-          delay: '0'
-          history: 7d
           description: 'The number of selected nodes with the ingest role.'
           preprocessing:
             - type: JSONPATH
@@ -402,8 +372,6 @@ zabbix_export:
           name: 'Nodes with the master role'
           type: DEPENDENT
           key: es.nodes.count.master
-          delay: '0'
-          history: 7d
           description: 'The number of selected nodes with the master role.'
           preprocessing:
             - type: JSONPATH
@@ -430,8 +398,6 @@ zabbix_export:
           name: 'Total available size to JVM in all file stores'
           type: DEPENDENT
           key: es.nodes.fs.available_in_bytes
-          delay: '0'
-          history: 7d
           units: B
           description: |
             The total number of bytes available to JVM in the file stores across all selected nodes.
@@ -453,8 +419,6 @@ zabbix_export:
           name: 'Total size of all file stores'
           type: DEPENDENT
           key: es.nodes.fs.total_in_bytes
-          delay: '0'
-          history: 7d
           units: B
           description: 'The total size in bytes of all file stores across all selected nodes.'
           preprocessing:
@@ -474,7 +438,6 @@ zabbix_export:
           type: HTTP_AGENT
           key: es.nodes.get_stats
           history: '0'
-          trends: '0'
           value_type: TEXT
           authtype: BASIC
           username: '{$ELASTICSEARCH.USERNAME}'
@@ -489,8 +452,6 @@ zabbix_export:
           name: 'Cluster uptime'
           type: DEPENDENT
           key: es.nodes.jvm.max_uptime
-          delay: '0'
-          history: 7d
           value_type: FLOAT
           units: s
           description: 'Uptime duration in seconds since JVM has last started.'
@@ -521,7 +482,6 @@ zabbix_export:
           name: 'Service response time'
           type: SIMPLE
           key: 'net.tcp.service.perf["{$ELASTICSEARCH.SCHEME}","{$ELASTICSEARCH.HOST}","{$ELASTICSEARCH.PORT}"]'
-          history: 7d
           value_type: FLOAT
           units: s
           description: 'Checks performance of the TCP service.'
@@ -546,7 +506,6 @@ zabbix_export:
           name: 'Service status'
           type: SIMPLE
           key: 'net.tcp.service["{$ELASTICSEARCH.SCHEME}","{$ELASTICSEARCH.HOST}","{$ELASTICSEARCH.PORT}"]'
-          history: 7d
           description: 'Checks if the service is running and accepting TCP connections.'
           valuemap:
             name: 'Service state'
@@ -584,8 +543,6 @@ zabbix_export:
               name: 'ES {#ES.NODE}: Total available size'
               type: DEPENDENT
               key: 'es.node.fs.total.available_in_bytes[{#ES.NODE}]'
-              delay: '0'
-              history: 7d
               units: B
               description: |
                 The total number of bytes available to this Java virtual machine on all file stores.
@@ -609,8 +566,6 @@ zabbix_export:
               name: 'ES {#ES.NODE}: Total size'
               type: DEPENDENT
               key: 'es.node.fs.total.total_in_bytes[{#ES.NODE}]'
-              delay: '0'
-              history: 7d
               units: B
               description: 'Total size (in bytes) of all file stores.'
               preprocessing:
@@ -631,9 +586,7 @@ zabbix_export:
               name: 'ES {#ES.NODE}: Get data'
               type: DEPENDENT
               key: 'es.node.get.data[{#ES.NODE}]'
-              delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
               description: 'Returns cluster nodes statistics.'
               preprocessing:
@@ -651,8 +604,6 @@ zabbix_export:
               name: 'ES {#ES.NODE}: Number of open HTTP connections'
               type: DEPENDENT
               key: 'es.node.http.current_open[{#ES.NODE}]'
-              delay: '0'
-              history: 7d
               description: 'The number of currently open HTTP connections for the node.'
               preprocessing:
                 - type: JSONPATH
@@ -672,8 +623,6 @@ zabbix_export:
               name: 'ES {#ES.NODE}: Rate of HTTP connections opened'
               type: DEPENDENT
               key: 'es.node.http.opened.rate[{#ES.NODE}]'
-              delay: '0'
-              history: 7d
               value_type: FLOAT
               units: rps
               description: 'The number of HTTP connections opened for the node per second.'
@@ -682,8 +631,6 @@ zabbix_export:
                   parameters:
                     - $..http.total_opened.first()
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               master_item:
                 key: 'es.node.get.data[{#ES.NODE}]'
               tags:
@@ -695,7 +642,6 @@ zabbix_export:
               name: 'ES {#ES.NODE}: Flush latency'
               type: CALCULATED
               key: 'es.node.indices.flush.latency[{#ES.NODE}]'
-              history: 7d
               value_type: FLOAT
               units: ms
               params: 'change(//es.node.indices.flush.total_time_in_millis[{#ES.NODE}]) / ( change(//es.node.indices.flush.total[{#ES.NODE}]) + (change(//es.node.indices.flush.total[{#ES.NODE}]) = 0) )'
@@ -721,8 +667,6 @@ zabbix_export:
               name: 'ES {#ES.NODE}: Total number of index flushes to disk'
               type: DEPENDENT
               key: 'es.node.indices.flush.total[{#ES.NODE}]'
-              delay: '0'
-              history: 7d
               description: 'The total number of flush operations.'
               preprocessing:
                 - type: JSONPATH
@@ -742,8 +686,6 @@ zabbix_export:
               name: 'ES {#ES.NODE}: Total time spent on flushing indices to disk'
               type: DEPENDENT
               key: 'es.node.indices.flush.total_time_in_millis[{#ES.NODE}]'
-              delay: '0'
-              history: 7d
               units: ms
               description: 'Total time in milliseconds spent performing flush operations.'
               preprocessing:
@@ -764,8 +706,6 @@ zabbix_export:
               name: 'ES {#ES.NODE}: Current indexing operations'
               type: DEPENDENT
               key: 'es.node.indices.indexing.index_current[{#ES.NODE}]'
-              delay: '0'
-              history: 7d
               description: 'The number of indexing operations currently running.'
               preprocessing:
                 - type: JSONPATH
@@ -785,7 +725,6 @@ zabbix_export:
               name: 'ES {#ES.NODE}: Indexing latency'
               type: CALCULATED
               key: 'es.node.indices.indexing.index_latency[{#ES.NODE}]'
-              history: 7d
               value_type: FLOAT
               units: ms
               params: 'change(//es.node.indices.indexing.index_time_in_millis[{#ES.NODE}]) / ( change(//es.node.indices.indexing.index_total[{#ES.NODE}]) + (change(//es.node.indices.indexing.index_total[{#ES.NODE}]) = 0) )'
@@ -811,8 +750,6 @@ zabbix_export:
               name: 'ES {#ES.NODE}: Total time spent performing indexing'
               type: DEPENDENT
               key: 'es.node.indices.indexing.index_time_in_millis[{#ES.NODE}]'
-              delay: '0'
-              history: 7d
               units: ms
               description: 'Total time in milliseconds spent performing indexing operations.'
               preprocessing:
@@ -833,8 +770,6 @@ zabbix_export:
               name: 'ES {#ES.NODE}: Total number of indexing'
               type: DEPENDENT
               key: 'es.node.indices.indexing.index_total[{#ES.NODE}]'
-              delay: '0'
-              history: 7d
               description: 'The total number of indexing operations.'
               preprocessing:
                 - type: JSONPATH
@@ -854,8 +789,6 @@ zabbix_export:
               name: 'ES {#ES.NODE}: Time spent throttling operations'
               type: DEPENDENT
               key: 'es.node.indices.indexing.throttle_time[{#ES.NODE}]'
-              delay: '0'
-              history: 7d
               value_type: FLOAT
               units: s
               description: 'Time in seconds spent throttling operations for the last measuring span.'
@@ -867,8 +800,6 @@ zabbix_export:
                   parameters:
                     - '0.001'
                 - type: SIMPLE_CHANGE
-                  parameters:
-                    - ''
               master_item:
                 key: 'es.node.get.data[{#ES.NODE}]'
               tags:
@@ -880,8 +811,6 @@ zabbix_export:
               name: 'ES {#ES.NODE}: Time spent throttling merge operations'
               type: DEPENDENT
               key: 'es.node.indices.merges.total_throttled_time[{#ES.NODE}]'
-              delay: '0'
-              history: 7d
               value_type: FLOAT
               units: s
               description: 'Time in seconds spent throttling merge operations for the last measuring span.'
@@ -893,8 +822,6 @@ zabbix_export:
                   parameters:
                     - '0.001'
                 - type: SIMPLE_CHANGE
-                  parameters:
-                    - ''
               master_item:
                 key: 'es.node.get.data[{#ES.NODE}]'
               tags:
@@ -906,8 +833,6 @@ zabbix_export:
               name: 'ES {#ES.NODE}: Time spent throttling recovery operations'
               type: DEPENDENT
               key: 'es.node.indices.recovery.throttle_time[{#ES.NODE}]'
-              delay: '0'
-              history: 7d
               value_type: FLOAT
               units: s
               description: 'Time in seconds spent throttling recovery operations for the last measuring span.'
@@ -919,8 +844,6 @@ zabbix_export:
                   parameters:
                     - '0.001'
                 - type: SIMPLE_CHANGE
-                  parameters:
-                    - ''
               master_item:
                 key: 'es.node.get.data[{#ES.NODE}]'
               tags:
@@ -932,8 +855,6 @@ zabbix_export:
               name: 'ES {#ES.NODE}: Rate of index refreshes'
               type: DEPENDENT
               key: 'es.node.indices.refresh.rate[{#ES.NODE}]'
-              delay: '0'
-              history: 7d
               value_type: FLOAT
               units: rps
               description: 'The number of refresh operations per second.'
@@ -942,8 +863,6 @@ zabbix_export:
                   parameters:
                     - $..indices.refresh.total.first()
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               master_item:
                 key: 'es.node.get.data[{#ES.NODE}]'
               tags:
@@ -955,8 +874,6 @@ zabbix_export:
               name: 'ES {#ES.NODE}: Time spent performing refresh'
               type: DEPENDENT
               key: 'es.node.indices.refresh.time[{#ES.NODE}]'
-              delay: '0'
-              history: 7d
               value_type: FLOAT
               units: s
               description: 'Time in seconds spent performing refresh operations for the last measuring span.'
@@ -968,8 +885,6 @@ zabbix_export:
                   parameters:
                     - '0.001'
                 - type: SIMPLE_CHANGE
-                  parameters:
-                    - ''
               master_item:
                 key: 'es.node.get.data[{#ES.NODE}]'
               tags:
@@ -981,8 +896,6 @@ zabbix_export:
               name: 'ES {#ES.NODE}: Rate of fetch'
               type: DEPENDENT
               key: 'es.node.indices.search.fetch.rate[{#ES.NODE}]'
-              delay: '0'
-              history: 7d
               value_type: FLOAT
               units: rps
               description: 'The number of fetch operations per second.'
@@ -991,8 +904,6 @@ zabbix_export:
                   parameters:
                     - $..indices.search.fetch_total.first()
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               master_item:
                 key: 'es.node.get.data[{#ES.NODE}]'
               tags:
@@ -1004,8 +915,6 @@ zabbix_export:
               name: 'ES {#ES.NODE}: Current fetch operations'
               type: DEPENDENT
               key: 'es.node.indices.search.fetch_current[{#ES.NODE}]'
-              delay: '0'
-              history: 7d
               description: 'The number of fetch operations currently running.'
               preprocessing:
                 - type: JSONPATH
@@ -1022,7 +931,6 @@ zabbix_export:
               name: 'ES {#ES.NODE}: Fetch latency'
               type: CALCULATED
               key: 'es.node.indices.search.fetch_latency[{#ES.NODE}]'
-              history: 7d
               value_type: FLOAT
               units: ms
               params: 'change(//es.node.indices.search.fetch_time_in_millis[{#ES.NODE}]) / ( change(//es.node.indices.search.fetch_total[{#ES.NODE}]) + (change(//es.node.indices.search.fetch_total[{#ES.NODE}]) = 0) )'
@@ -1049,8 +957,6 @@ zabbix_export:
               name: 'ES {#ES.NODE}: Time spent performing fetch'
               type: DEPENDENT
               key: 'es.node.indices.search.fetch_time[{#ES.NODE}]'
-              delay: '0'
-              history: 7d
               value_type: FLOAT
               units: s
               description: 'Time in seconds spent performing fetch operations for the last measuring span.'
@@ -1062,8 +968,6 @@ zabbix_export:
                   parameters:
                     - '0.001'
                 - type: SIMPLE_CHANGE
-                  parameters:
-                    - ''
               master_item:
                 key: 'es.node.get.data[{#ES.NODE}]'
               tags:
@@ -1075,8 +979,6 @@ zabbix_export:
               name: 'ES {#ES.NODE}: Total time spent performing fetch'
               type: DEPENDENT
               key: 'es.node.indices.search.fetch_time_in_millis[{#ES.NODE}]'
-              delay: '0'
-              history: 7d
               units: ms
               description: 'Time in milliseconds spent performing fetch operations.'
               preprocessing:
@@ -1097,8 +999,6 @@ zabbix_export:
               name: 'ES {#ES.NODE}: Total number of fetch'
               type: DEPENDENT
               key: 'es.node.indices.search.fetch_total[{#ES.NODE}]'
-              delay: '0'
-              history: 7d
               description: 'The total number of fetch operations.'
               preprocessing:
                 - type: JSONPATH
@@ -1118,8 +1018,6 @@ zabbix_export:
               name: 'ES {#ES.NODE}: Rate of queries'
               type: DEPENDENT
               key: 'es.node.indices.search.query.rate[{#ES.NODE}]'
-              delay: '0'
-              history: 7d
               value_type: FLOAT
               units: rps
               description: 'The number of query operations per second.'
@@ -1128,8 +1026,6 @@ zabbix_export:
                   parameters:
                     - $..indices.search.query_total.first()
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               master_item:
                 key: 'es.node.get.data[{#ES.NODE}]'
               tags:
@@ -1141,8 +1037,6 @@ zabbix_export:
               name: 'ES {#ES.NODE}: Current query operations'
               type: DEPENDENT
               key: 'es.node.indices.search.query_current[{#ES.NODE}]'
-              delay: '0'
-              history: 7d
               description: 'The number of query operations currently running.'
               preprocessing:
                 - type: JSONPATH
@@ -1159,7 +1053,6 @@ zabbix_export:
               name: 'ES {#ES.NODE}: Query latency'
               type: CALCULATED
               key: 'es.node.indices.search.query_latency[{#ES.NODE}]'
-              history: 7d
               value_type: FLOAT
               units: ms
               params: |
@@ -1185,8 +1078,6 @@ zabbix_export:
               name: 'ES {#ES.NODE}: Time spent performing query'
               type: DEPENDENT
               key: 'es.node.indices.search.query_time[{#ES.NODE}]'
-              delay: '0'
-              history: 7d
               value_type: FLOAT
               units: s
               description: 'Time in seconds spent performing query operations for the last measuring span.'
@@ -1198,8 +1089,6 @@ zabbix_export:
                   parameters:
                     - '0.001'
                 - type: SIMPLE_CHANGE
-                  parameters:
-                    - ''
               master_item:
                 key: 'es.node.get.data[{#ES.NODE}]'
               tags:
@@ -1211,8 +1100,6 @@ zabbix_export:
               name: 'ES {#ES.NODE}: Total time spent performing query'
               type: DEPENDENT
               key: 'es.node.indices.search.query_time_in_millis[{#ES.NODE}]'
-              delay: '0'
-              history: 7d
               units: ms
               description: 'Time in milliseconds spent performing query operations.'
               preprocessing:
@@ -1233,8 +1120,6 @@ zabbix_export:
               name: 'ES {#ES.NODE}: Total number of query'
               type: DEPENDENT
               key: 'es.node.indices.search.query_total[{#ES.NODE}]'
-              delay: '0'
-              history: 7d
               description: 'The total number of query operations.'
               preprocessing:
                 - type: JSONPATH
@@ -1254,8 +1139,6 @@ zabbix_export:
               name: 'ES {#ES.NODE}: Amount of JVM heap committed'
               type: DEPENDENT
               key: 'es.node.jvm.mem.heap_committed_in_bytes[{#ES.NODE}]'
-              delay: '0'
-              history: 7d
               units: B
               description: 'The amount of memory, in bytes, available for use by the heap.'
               preprocessing:
@@ -1276,8 +1159,6 @@ zabbix_export:
               name: 'ES {#ES.NODE}: Maximum JVM memory available for use'
               type: DEPENDENT
               key: 'es.node.jvm.mem.heap_max_in_bytes[{#ES.NODE}]'
-              delay: '0'
-              history: 7d
               units: B
               description: 'The maximum amount of memory, in bytes, available for use by the heap.'
               preprocessing:
@@ -1298,8 +1179,6 @@ zabbix_export:
               name: 'ES {#ES.NODE}: Amount of JVM heap currently in use'
               type: DEPENDENT
               key: 'es.node.jvm.mem.heap_used_in_bytes[{#ES.NODE}]'
-              delay: '0'
-              history: 7d
               units: B
               description: 'The memory, in bytes, currently in use by the heap.'
               preprocessing:
@@ -1320,8 +1199,6 @@ zabbix_export:
               name: 'ES {#ES.NODE}: Percent of JVM heap currently in use'
               type: DEPENDENT
               key: 'es.node.jvm.mem.heap_used_percent[{#ES.NODE}]'
-              delay: '0'
-              history: 7d
               value_type: FLOAT
               units: '%'
               description: 'The percentage of memory currently in use by the heap.'
@@ -1371,8 +1248,6 @@ zabbix_export:
               name: 'ES {#ES.NODE}: Node uptime'
               type: DEPENDENT
               key: 'es.node.jvm.uptime[{#ES.NODE}]'
-              delay: '0'
-              history: 7d
               value_type: FLOAT
               units: s
               description: 'JVM uptime in seconds.'
@@ -1405,8 +1280,6 @@ zabbix_export:
               name: 'ES {#ES.NODE}: Refresh thread pool active threads'
               type: DEPENDENT
               key: 'es.node.thread_pool.refresh.active[{#ES.NODE}]'
-              delay: '0'
-              history: 7d
               description: 'The number of active threads in the refresh thread pool.'
               preprocessing:
                 - type: JSONPATH
@@ -1423,8 +1296,6 @@ zabbix_export:
               name: 'ES {#ES.NODE}: Refresh thread pool executor tasks completed'
               type: DEPENDENT
               key: 'es.node.thread_pool.refresh.completed.rate[{#ES.NODE}]'
-              delay: '0'
-              history: 7d
               value_type: FLOAT
               units: rps
               description: 'The number of tasks completed by the refresh thread pool executor.'
@@ -1433,8 +1304,6 @@ zabbix_export:
                   parameters:
                     - $..thread_pool.refresh.completed.first()
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               master_item:
                 key: 'es.node.get.data[{#ES.NODE}]'
               tags:
@@ -1446,8 +1315,6 @@ zabbix_export:
               name: 'ES {#ES.NODE}: Refresh thread pool tasks in queue'
               type: DEPENDENT
               key: 'es.node.thread_pool.refresh.queue[{#ES.NODE}]'
-              delay: '0'
-              history: 7d
               description: 'The number of tasks in queue for the refresh thread pool.'
               preprocessing:
                 - type: JSONPATH
@@ -1464,8 +1331,6 @@ zabbix_export:
               name: 'ES {#ES.NODE}: Refresh thread pool executor tasks rejected'
               type: DEPENDENT
               key: 'es.node.thread_pool.refresh.rejected.rate[{#ES.NODE}]'
-              delay: '0'
-              history: 7d
               value_type: FLOAT
               units: rps
               description: 'The number of tasks rejected by the refresh thread pool executor.'
@@ -1474,8 +1339,6 @@ zabbix_export:
                   parameters:
                     - $..thread_pool.refresh.rejected.first()
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               master_item:
                 key: 'es.node.get.data[{#ES.NODE}]'
               tags:
@@ -1497,8 +1360,6 @@ zabbix_export:
               name: 'ES {#ES.NODE}: Search thread pool active threads'
               type: DEPENDENT
               key: 'es.node.thread_pool.search.active[{#ES.NODE}]'
-              delay: '0'
-              history: 7d
               description: 'The number of active threads in the search thread pool.'
               preprocessing:
                 - type: JSONPATH
@@ -1515,8 +1376,6 @@ zabbix_export:
               name: 'ES {#ES.NODE}: Search thread pool executor tasks completed'
               type: DEPENDENT
               key: 'es.node.thread_pool.search.completed.rate[{#ES.NODE}]'
-              delay: '0'
-              history: 7d
               value_type: FLOAT
               units: rps
               description: 'The number of tasks completed by the search thread pool executor.'
@@ -1525,8 +1384,6 @@ zabbix_export:
                   parameters:
                     - $..thread_pool.search.completed.first()
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               master_item:
                 key: 'es.node.get.data[{#ES.NODE}]'
               tags:
@@ -1538,8 +1395,6 @@ zabbix_export:
               name: 'ES {#ES.NODE}: Search thread pool tasks in queue'
               type: DEPENDENT
               key: 'es.node.thread_pool.search.queue[{#ES.NODE}]'
-              delay: '0'
-              history: 7d
               description: 'The number of tasks in queue for the search thread pool.'
               preprocessing:
                 - type: JSONPATH
@@ -1556,8 +1411,6 @@ zabbix_export:
               name: 'ES {#ES.NODE}: Search thread pool executor tasks rejected'
               type: DEPENDENT
               key: 'es.node.thread_pool.search.rejected.rate[{#ES.NODE}]'
-              delay: '0'
-              history: 7d
               value_type: FLOAT
               units: rps
               description: 'The number of tasks rejected by the search thread pool executor.'
@@ -1566,8 +1419,6 @@ zabbix_export:
                   parameters:
                     - $..thread_pool.search.rejected.first()
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               master_item:
                 key: 'es.node.get.data[{#ES.NODE}]'
               tags:
@@ -1589,8 +1440,6 @@ zabbix_export:
               name: 'ES {#ES.NODE}: Write thread pool active threads'
               type: DEPENDENT
               key: 'es.node.thread_pool.write.active[{#ES.NODE}]'
-              delay: '0'
-              history: 7d
               description: 'The number of active threads in the write thread pool.'
               preprocessing:
                 - type: JSONPATH
@@ -1607,8 +1456,6 @@ zabbix_export:
               name: 'ES {#ES.NODE}: Write thread pool executor tasks completed'
               type: DEPENDENT
               key: 'es.node.thread_pool.write.completed.rate[{#ES.NODE}]'
-              delay: '0'
-              history: 7d
               value_type: FLOAT
               units: rps
               description: 'The number of tasks completed by the write thread pool executor.'
@@ -1617,8 +1464,6 @@ zabbix_export:
                   parameters:
                     - $..thread_pool.write.completed.first()
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               master_item:
                 key: 'es.node.get.data[{#ES.NODE}]'
               tags:
@@ -1630,8 +1475,6 @@ zabbix_export:
               name: 'ES {#ES.NODE}: Write thread pool tasks in queue'
               type: DEPENDENT
               key: 'es.node.thread_pool.write.queue[{#ES.NODE}]'
-              delay: '0'
-              history: 7d
               description: 'The number of tasks in queue for the write thread pool.'
               preprocessing:
                 - type: JSONPATH
@@ -1648,8 +1491,6 @@ zabbix_export:
               name: 'ES {#ES.NODE}: Write thread pool executor tasks rejected'
               type: DEPENDENT
               key: 'es.node.thread_pool.write.rejected.rate[{#ES.NODE}]'
-              delay: '0'
-              history: 7d
               value_type: FLOAT
               units: rps
               description: 'The number of tasks rejected by the write thread pool executor.'
@@ -1658,8 +1499,6 @@ zabbix_export:
                   parameters:
                     - $..thread_pool.write.rejected.first()
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               master_item:
                 key: 'es.node.get.data[{#ES.NODE}]'
               tags:

@@ -31,9 +31,6 @@ zabbix_export:
           name: 'Get errors'
           type: DEPENDENT
           key: veeam.get.errors
-          delay: '0'
-          history: 7d
-          trends: '0'
           value_type: TEXT
           description: 'The errors from API requests.'
           preprocessing:
@@ -65,7 +62,6 @@ zabbix_export:
           key: veeam.get.metrics
           delay: 5m
           history: '0'
-          trends: '0'
           value_type: TEXT
           params: |
             var Veeam = {
@@ -189,40 +185,30 @@ zabbix_export:
           name: 'Jobs states discovery'
           type: DEPENDENT
           key: veeam.job.state.discovery
-          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#JOB.STATUS}'
                 value: '{$JOB.STATUS.MATCHES}'
-                formulaid: A
               - macro: '{#JOB.STATUS}'
                 value: '{$JOB.STATUS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
               - macro: '{#NAME}'
                 value: '{$JOB.NAME.MATCHES}'
-                formulaid: C
               - macro: '{#NAME}'
                 value: '{$JOB.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: D
               - macro: '{#TYPE}'
                 value: '{$JOB.TYPE.MATCHES}'
-                formulaid: E
               - macro: '{#TYPE}'
                 value: '{$JOB.TYPE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: F
           description: 'Discovery of the jobs states.'
           item_prototypes:
             - uuid: 120a6bf888e74e0c9b054c3bdd50473f
               name: 'Job states [{#NAME}] [{#TYPE}]: Last result'
               type: DEPENDENT
               key: 'veeam.jobs.last.result[{#ID}]'
-              delay: '0'
-              history: 7d
-              trends: '0'
               value_type: TEXT
               description: 'The result of the session. The enums used: `None`, `Success`, `Warning`, `Failed`.'
               preprocessing:
@@ -252,9 +238,7 @@ zabbix_export:
               name: 'Job states [{#NAME}] [{#TYPE}]: Get data'
               type: DEPENDENT
               key: 'veeam.jobs.states.raw[{#ID}]'
-              delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
               description: 'Gets raw data from the job states with the name `[{#NAME}]`.'
               preprocessing:
@@ -272,9 +256,6 @@ zabbix_export:
               name: 'Job states [{#NAME}] [{#TYPE}]: Status'
               type: DEPENDENT
               key: 'veeam.jobs.status[{#ID}]'
-              delay: '0'
-              history: 7d
-              trends: '0'
               value_type: TEXT
               description: 'The current status of the job. The enums used: `running`, `inactive`, `disabled`.'
               preprocessing:
@@ -316,32 +297,25 @@ zabbix_export:
           name: 'Proxies discovery'
           type: DEPENDENT
           key: veeam.proxies.discovery
-          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#NAME}'
                 value: '{$PROXIES.NAME.MATCHES}'
-                formulaid: A
               - macro: '{#NAME}'
                 value: '{$PROXIES.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
               - macro: '{#TYPE}'
                 value: '{$PROXIES.TYPE.MATCHES}'
-                formulaid: C
               - macro: '{#TYPE}'
                 value: '{$PROXIES.TYPE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: D
           description: 'Discovery of proxies.'
           item_prototypes:
             - uuid: 1daea1ba8ac144fc9e22296720af0b22
               name: 'Proxy [{#NAME}] [{#TYPE}]: Max Task Count'
               type: DEPENDENT
               key: 'veeam.proxy.maxtask[{#NAME}]'
-              delay: '0'
-              history: 7d
               description: 'The maximum number of concurrent tasks.'
               preprocessing:
                 - type: JSONPATH
@@ -358,9 +332,7 @@ zabbix_export:
               name: 'Proxy [{#NAME}] [{#TYPE}]: Get data'
               type: DEPENDENT
               key: 'veeam.proxy.raw[{#NAME}]'
-              delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
               description: 'Gets raw data collected by the proxy with the name `[{#NAME}]`, `[{#TYPE}]`.'
               preprocessing:
@@ -380,9 +352,6 @@ zabbix_export:
               name: 'Proxy [{#NAME}] [{#TYPE}]: Host name'
               type: DEPENDENT
               key: 'veeam.proxy.server.name[{#NAME}]'
-              delay: '0'
-              history: 7d
-              trends: '0'
               value_type: TEXT
               description: 'The name of the proxy server.'
               preprocessing:
@@ -400,9 +369,7 @@ zabbix_export:
               name: 'Server [{#NAME}]: Get data'
               type: DEPENDENT
               key: 'veeam.proxy.server.raw[{#NAME}]'
-              delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
               description: 'Gets raw data collected by the proxy server.'
               preprocessing:
@@ -422,9 +389,6 @@ zabbix_export:
               name: 'Proxy [{#NAME}] [{#TYPE}]: Host type'
               type: DEPENDENT
               key: 'veeam.proxy.server.type[{#NAME}]'
-              delay: '0'
-              history: 7d
-              trends: '0'
               value_type: TEXT
               description: 'The type of the proxy server.'
               preprocessing:
@@ -462,33 +426,26 @@ zabbix_export:
           name: 'Repositories discovery'
           type: DEPENDENT
           key: veeam.repositories.discovery
-          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#NAME}'
                 value: '{$REPOSITORIES.NAME.MATCHES}'
-                formulaid: A
               - macro: '{#NAME}'
                 value: '{$REPOSITORIES.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
               - macro: '{#TYPE}'
                 value: '{$REPOSITORIES.TYPE.MATCHES}'
-                formulaid: C
               - macro: '{#TYPE}'
                 value: '{$REPOSITORIES.TYPE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: D
           description: 'Discovery of repositories.'
           item_prototypes:
             - uuid: 1c925cfa0a2b46838588471aa58a1591
               name: 'Repository [{#NAME}] [{#TYPE}]: Get data'
               type: DEPENDENT
               key: 'veeam.repositories.raw[{#NAME}]'
-              delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
               description: 'Gets raw data from repository with the name: `[{#NAME}]`, `[{#TYPE}]`.'
               preprocessing:
@@ -508,8 +465,6 @@ zabbix_export:
               name: 'Repository [{#NAME}] [{#TYPE}]: Used space [{#PATH}]'
               type: DEPENDENT
               key: 'veeam.repository.capacity[{#NAME}]'
-              delay: '0'
-              history: 7d
               value_type: FLOAT
               units: '!GB'
               description: 'Used space by repositories expressed in gigabytes (GB).'
@@ -528,8 +483,6 @@ zabbix_export:
               name: 'Repository [{#NAME}] [{#TYPE}]: Free space [{#PATH}]'
               type: DEPENDENT
               key: 'veeam.repository.free.space[{#NAME}]'
-              delay: '0'
-              history: 7d
               value_type: FLOAT
               units: '!GB'
               description: 'Free space of repositories expressed in gigabytes (GB).'
@@ -572,33 +525,25 @@ zabbix_export:
           name: 'Sessions discovery'
           type: DEPENDENT
           key: veeam.sessions.discovery
-          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#NAME}'
                 value: '{$SESSION.NAME.MATCHES}'
-                formulaid: A
               - macro: '{#NAME}'
                 value: '{$SESSION.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
               - macro: '{#TYPE}'
                 value: '{$SESSION.TYPE.MATCHES}'
-                formulaid: C
               - macro: '{#TYPE}'
                 value: '{$SESSION.TYPE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: D
           description: 'Discovery of sessions.'
           item_prototypes:
             - uuid: 7224f41e5c614268bf6997ad8a49710b
               name: 'Session [{#NAME}] [{#TYPE}]: Message'
               type: DEPENDENT
               key: 'veeam.sessions.message[{#ID}]'
-              delay: '0'
-              history: 7d
-              trends: '0'
               value_type: TEXT
               description: 'A message that explains the session result.'
               preprocessing:
@@ -618,8 +563,6 @@ zabbix_export:
               name: 'Session progress percent [{#NAME}] [{#TYPE}]'
               type: DEPENDENT
               key: 'veeam.sessions.progress.percent[{#ID}]'
-              delay: '0'
-              history: 7d
               value_type: FLOAT
               units: '%'
               description: 'The progress of the session expressed as percentage.'
@@ -640,9 +583,7 @@ zabbix_export:
               name: 'Session [{#NAME}] [{#TYPE}]: Get data'
               type: DEPENDENT
               key: 'veeam.sessions.raw[{#ID}]'
-              delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
               description: 'Gets raw data from session with the name: `[{#NAME}]`, `[{#TYPE}]`.'
               preprocessing:
@@ -661,9 +602,6 @@ zabbix_export:
               name: 'Session [{#NAME}] [{#TYPE}]: Result'
               type: DEPENDENT
               key: 'veeam.sessions.result[{#ID}]'
-              delay: '0'
-              history: 7d
-              trends: '0'
               value_type: TEXT
               description: 'The result of the session. The enums used: `None`, `Success`, `Warning`, `Failed`.'
               preprocessing:
@@ -693,9 +631,6 @@ zabbix_export:
               name: 'Session [{#NAME}] [{#TYPE}]: State'
               type: DEPENDENT
               key: 'veeam.sessions.state[{#ID}]'
-              delay: '0'
-              history: 7d
-              trends: '0'
               value_type: TEXT
               description: 'The state of the session. The enums used: `Stopped`, `Starting`, `Stopping`, `Working`, `Pausing`, `Resuming`, `WaitingTape`, `Idle`, `Postprocessing`, `WaitingRepository`, `WaitingSlot`.'
               preprocessing:

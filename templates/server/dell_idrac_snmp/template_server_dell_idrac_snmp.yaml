@@ -26,7 +26,6 @@ zabbix_export:
           name: 'ICMP ping'
           type: SIMPLE
           key: icmpping
-          history: 7d
           valuemap:
             name: 'Service state'
           tags:
@@ -47,7 +46,6 @@ zabbix_export:
           name: 'ICMP loss'
           type: SIMPLE
           key: icmppingloss
-          history: 7d
           value_type: FLOAT
           units: '%'
           tags:
@@ -73,7 +71,6 @@ zabbix_export:
           name: 'ICMP response time'
           type: SIMPLE
           key: icmppingsec
-          history: 7d
           value_type: FLOAT
           units: s
           tags:
@@ -102,9 +99,6 @@ zabbix_export:
           name: 'SNMP traps (fallback)'
           type: SNMP_TRAP
           key: snmptrap.fallback
-          delay: '0'
-          history: 7d
-          trends: '0'
           value_type: LOG
           description: 'The item is used to collect all SNMP traps unmatched by other snmptrap items'
           logtimefmt: 'hh:mm:sszyyyy/MM/dd'
@@ -117,8 +111,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.4.0
           key: 'system.contact[sysContact.0]'
           delay: 15m
-          history: 7d
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -137,8 +129,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.1.0
           key: 'system.descr[sysDescr.0]'
           delay: 15m
-          history: 7d
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -158,8 +148,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.4.1.674.10892.5.1.1.8.0
           key: system.hw.firmware
           delay: 1h
-          history: 7d
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: IDRAC-MIB-SMIv2
@@ -188,8 +176,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.4.1.674.10892.5.1.3.12.0
           key: system.hw.model
           delay: 1h
-          history: 7d
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: IDRAC-MIB-SMIv2
@@ -208,8 +194,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.4.1.674.10892.5.1.3.2.0
           key: system.hw.serialnumber
           delay: 1h
-          history: 7d
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: IDRAC-MIB-SMIv2
@@ -239,7 +223,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.25.1.1.0
           key: 'system.hw.uptime[hrSystemUptime.0]'
           delay: 30s
-          history: 7d
           trends: '0'
           units: uptime
           description: |
@@ -263,8 +246,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.6.0
           key: 'system.location[sysLocation.0]'
           delay: 15m
-          history: 7d
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -283,8 +264,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.5.0
           key: system.name
           delay: 15m
-          history: 7d
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -316,7 +295,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.3.0
           key: 'system.net.uptime[sysUpTime.0]'
           delay: 30s
-          history: 7d
           trends: '0'
           units: uptime
           description: |
@@ -335,8 +313,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.2.0
           key: 'system.objectid[sysObjectID.0]'
           delay: 15m
-          history: 7d
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -354,7 +330,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.4.1.674.10892.5.2.1.0
           key: 'system.status[globalSystemStatus.0]'
           delay: 30s
-          history: 7d
           trends: '0'
           description: |
             MIB: IDRAC-MIB-SMIv2
@@ -412,8 +387,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.4.1.674.10892.5.1.3.6.0
           key: 'system.sw.os[systemOSName]'
           delay: 1h
-          history: 7d
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: IDRAC-MIB-SMIv2
@@ -443,7 +416,6 @@ zabbix_export:
           name: 'SNMP agent availability'
           type: INTERNAL
           key: 'zabbix[host,snmp,available]'
-          history: 7d
           description: |
             Availability of SNMP checks on the host. The value of this item corresponds to availability icons in the host list.
             Possible values:
@@ -484,7 +456,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.15.1.4.{#SNMPINDEX}'
               key: 'system.hw.diskarray.cache.battery.status[batteryState.{#SNMPINDEX}]'
-              history: 7d
               trends: '0'
               description: |
                 MIB: IDRAC-MIB-SMIv2
@@ -558,7 +529,6 @@ zabbix_export:
             conditions:
               - macro: '{#TYPE}'
                 value: '3'
-                formulaid: A
           description: 'IDRAC-MIB-SMIv2::coolingDeviceTable'
           item_prototypes:
             - uuid: bf61401efbc44ed39bedc92b97ff563a
@@ -566,7 +536,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.700.12.1.6.{#SNMPINDEX}'
               key: 'sensor.fan.speed[coolingDeviceReading.{#SNMPINDEX}]'
-              history: 7d
               units: rpm
               description: |
                 MIB: IDRAC-MIB-SMIv2
@@ -585,7 +554,6 @@ zabbix_export:
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.700.12.1.5.{#SNMPINDEX}'
               key: 'sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}]'
               delay: 3m
-              history: 7d
               trends: '0'
               description: |
                 MIB: IDRAC-MIB-SMIv2
@@ -635,8 +603,6 @@ zabbix_export:
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.1.1.2.{#SNMPINDEX}'
               key: 'system.hw.diskarray.model[controllerName.{#SNMPINDEX}]'
               delay: 1d
-              history: 7d
-              trends: '0'
               value_type: CHAR
               description: |
                 MIB: IDRAC-MIB-SMIv2
@@ -653,7 +619,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.1.1.38.{#SNMPINDEX}'
               key: 'system.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}]'
-              history: 7d
               trends: '0'
               description: |
                 MIB: IDRAC-MIB-SMIv2
@@ -730,7 +695,6 @@ zabbix_export:
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.35.{#SNMPINDEX}'
               key: 'system.hw.physicaldisk.media_type[physicalDiskMediaType.{#SNMPINDEX}]'
               delay: 1h
-              history: 7d
               trends: '0'
               description: |
                 MIB: IDRAC-MIB-SMIv2
@@ -751,8 +715,6 @@ zabbix_export:
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.6.{#SNMPINDEX}'
               key: 'system.hw.physicaldisk.model[physicalDiskProductID.{#SNMPINDEX}]'
               delay: 1h
-              history: 7d
-              trends: '0'
               value_type: CHAR
               description: |
                 MIB: IDRAC-MIB-SMIv2
@@ -768,8 +730,6 @@ zabbix_export:
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.27.{#SNMPINDEX}'
               key: 'system.hw.physicaldisk.part_number[physicalDiskPartNumber.{#SNMPINDEX}]'
               delay: 1h
-              history: 7d
-              trends: '0'
               value_type: CHAR
               description: |
                 MIB: IDRAC-MIB-SMIv2
@@ -785,8 +745,6 @@ zabbix_export:
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.7.{#SNMPINDEX}'
               key: 'system.hw.physicaldisk.serialnumber[physicalDiskSerialNo.{#SNMPINDEX}]'
               delay: 1d
-              history: 7d
-              trends: '0'
               value_type: CHAR
               description: |
                 MIB: IDRAC-MIB-SMIv2
@@ -813,7 +771,6 @@ zabbix_export:
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.11.{#SNMPINDEX}'
               key: 'system.hw.physicaldisk.size[physicalDiskCapacityInMB.{#SNMPINDEX}]'
               delay: 1h
-              history: 7d
               trends: '0'
               units: B
               description: |
@@ -834,7 +791,6 @@ zabbix_export:
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.31.{#SNMPINDEX}'
               key: 'system.hw.physicaldisk.smart_status[physicalDiskSmartAlertIndication.{#SNMPINDEX}]'
               delay: 3m
-              history: 7d
               trends: '0'
               description: |
                 MIB: IDRAC-MIB-SMIv2
@@ -867,7 +823,6 @@ zabbix_export:
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.24.{#SNMPINDEX}'
               key: 'system.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}]'
               delay: 3m
-              history: 7d
               trends: '0'
               description: |
                 MIB: IDRAC-MIB-SMIv2
@@ -926,7 +881,6 @@ zabbix_export:
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.600.12.1.5.{#SNMPINDEX}'
               key: 'sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}]'
               delay: 3m
-              history: 7d
               trends: '0'
               description: |
                 MIB: IDRAC-MIB-SMIv2
@@ -972,7 +926,6 @@ zabbix_export:
             conditions:
               - macro: '{#SENSOR_LOCALE}'
                 value: '.*Inlet Temp.*'
-                formulaid: A
           description: 'Scanning table of Temperature Probe Table IDRAC-MIB-SMIv2::temperatureProbeTable'
           item_prototypes:
             - uuid: 050e4ce134df4ec9b35dbb470b89811b
@@ -981,7 +934,6 @@ zabbix_export:
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.700.20.1.5.{#SNMPINDEX}'
               key: 'sensor.temp.status[temperatureProbeStatus.Ambient.{#SNMPINDEX}]'
               delay: 3m
-              history: 7d
               trends: '0'
               description: |
                 MIB: IDRAC-MIB-SMIv2
@@ -997,7 +949,6 @@ zabbix_export:
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.700.20.1.6.{#SNMPINDEX}'
               key: 'sensor.temp.value[temperatureProbeReading.Ambient.{#SNMPINDEX}]'
               delay: 3m
-              history: 7d
               value_type: FLOAT
               units: °C
               description: |
@@ -1082,7 +1033,6 @@ zabbix_export:
             conditions:
               - macro: '{#SENSOR_LOCALE}'
                 value: '.*CPU.*'
-                formulaid: A
           description: 'Scanning table of Temperature Probe Table IDRAC-MIB-SMIv2::temperatureProbeTable'
           item_prototypes:
             - uuid: dfc1f114d3de4e9f98254116f5958025
@@ -1091,7 +1041,6 @@ zabbix_export:
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.700.20.1.5.{#SNMPINDEX}'
               key: 'sensor.temp.status[temperatureProbeStatus.CPU.{#SNMPINDEX}]'
               delay: 3m
-              history: 7d
               trends: '0'
               description: |
                 MIB: IDRAC-MIB-SMIv2
@@ -1107,7 +1056,6 @@ zabbix_export:
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.700.20.1.6.{#SNMPINDEX}'
               key: 'sensor.temp.value[temperatureProbeReading.CPU.{#SNMPINDEX}]'
               delay: 3m
-              history: 7d
               value_type: FLOAT
               units: °C
               description: |
@@ -1196,7 +1144,6 @@ zabbix_export:
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.13.{#SNMPINDEX}'
               key: 'system.hw.virtualdisk.layout[virtualDiskLayout.{#SNMPINDEX}]'
               delay: 1h
-              history: 7d
               description: |
                 MIB: IDRAC-MIB-SMIv2
                 The virtual disk's RAID type.
@@ -1224,7 +1171,6 @@ zabbix_export:
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.11.{#SNMPINDEX}'
               key: 'system.hw.virtualdisk.readpolicy[virtualDiskReadPolicy.{#SNMPINDEX}]'
               delay: 1h
-              history: 7d
               description: |
                 MIB: IDRAC-MIB-SMIv2
                 The read policy used by the controller for read operations on this virtual disk.
@@ -1243,7 +1189,6 @@ zabbix_export:
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.6.{#SNMPINDEX}'
               key: 'system.hw.virtualdisk.size[virtualDiskSizeInMB.{#SNMPINDEX}]'
               delay: 1h
-              history: 7d
               trends: '0'
               units: B
               description: |
@@ -1264,7 +1209,6 @@ zabbix_export:
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.30.{#SNMPINDEX}'
               key: 'system.hw.virtualdisk.state[virtualDiskOperationalState.{#SNMPINDEX}]'
               delay: 3m
-              history: 7d
               description: |
                 MIB: IDRAC-MIB-SMIv2
                 The state of the virtual disk when there are progressive operations ongoing.
@@ -1287,7 +1231,6 @@ zabbix_export:
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.4.{#SNMPINDEX}'
               key: 'system.hw.virtualdisk.status[virtualDiskState.{#SNMPINDEX}]'
               delay: 3m
-              history: 7d
               description: |
                 MIB: IDRAC-MIB-SMIv2
                 The current state of this virtual disk (which includes any member physical disks.)
@@ -1336,7 +1279,6 @@ zabbix_export:
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.10.{#SNMPINDEX}'
               key: 'system.hw.virtualdisk.writepolicy[virtualDiskWritePolicy.{#SNMPINDEX}]'
               delay: 1h
-              history: 7d
               description: |
                 MIB: IDRAC-MIB-SMIv2
                 The write policy used by the controller for write operations on this virtual disk.

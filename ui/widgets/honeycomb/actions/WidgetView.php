@@ -104,40 +104,48 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$hostids = array_keys($db_hosts);
 		}
 
-		$db_items = API::Item()->get([
-			'output' => ['itemid', 'hostid', 'name', 'units', 'value_type'],
+		$search_field = $this->isTemplateDashboard() ? 'name' : 'name_resolved';
+
+		$options = [
+			'output' => ['itemid', 'hostid', 'units', 'value_type', 'name_resolved'],
 			'selectHosts' => ['name'],
 			'webitems' => true,
 			'hostids' => $hostids,
 			'evaltype' => $this->fields_values['evaltype_item'],
 			'tags' => $this->fields_values['item_tags'] ?: null,
 			'selectValueMap' => ['mappings'],
-			'search' => [
-				'name' => in_array('*', $this->fields_values['items']) ? null : $this->fields_values['items']
-			],
 			'searchWildcardsEnabled' => true,
-			'searchByAny' => true
-		]);
+			'searchByAny' => true,
+			'search' => [
+				$search_field => in_array('*', $this->fields_values['items'], true)
+					? null
+					: $this->fields_values['items']
+			]
+		];
+
+		$db_items = API::Item()->get($options);
 
 		if (!$db_items) {
 			return [];
 		}
 
-		foreach ($db_items as &$item) {
+		$items = CArrayHelper::renameObjectsKeys($db_items, ['name_resolved' => 'name']);
+
+		foreach ($items as &$item) {
 			$item['hostname'] = $item['hosts'][0]['name'];
 		}
 		unset($item);
 
-		CArrayHelper::sort($db_items, ['hostname', 'name']);
+		CArrayHelper::sort($items, ['hostname', 'name']);
 
-		$total_items = count($db_items);
+		$total_items = count($items);
 		$batches = ceil($total_items / $limit);
 		$show = array_flip($this->fields_values['show']);
 		$history_period = timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD));
 		$cells = [];
 
 		for ($batch = 0; $batch < $batches && count($cells) < $limit; $batch++) {
-			$batch_items = array_slice($db_items, $batch * $limit, $limit);
+			$batch_items = array_slice($items, $batch * $limit, $limit);
 			$db_history = Manager::History()->getLastValues($batch_items, 1, $history_period);
 
 			foreach ($batch_items as $item) {

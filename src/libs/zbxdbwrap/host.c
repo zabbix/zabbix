@@ -662,7 +662,7 @@ static void	zbx_graph_valid_free(zbx_template_graph_valid_t *graph)
 static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids, char *error, size_t max_error_len)
 {
 	int				ret = SUCCEED, i, j;
-	char				*sql;
+	char				*sql = NULL;
 	unsigned char			t_flags, h_flags, type;
 	zbx_db_result_t			tresult;
 	zbx_db_row_t			trow;
@@ -685,6 +685,44 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids, 
 
 	sql = (char *)zbx_malloc(NULL, sql_alloc);
 
+	sql_offset = 0;
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select i.key_,h.name,ir.key_,ihr.key_ from items ir,item_discovery id,items i"
+			" inner join hosts h on i.hostid=h.hostid"
+			" left join items ih on ih.key_=i.key_"
+			" left join item_discovery ihd on ih.itemid=ihd.itemid"
+			" left join items ihr on ihr.itemid=ihd.parent_itemid"
+			" where ir.itemid=id.parent_itemid and i.itemid=id.itemid and ih.hostid=" ZBX_FS_UI64 " and "
+			" (ihr.key_ is null or ihr.key_<>ir.key_) and", hostid);
+
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.hostid", templateids->values,
+			templateids->values_num);
+
+	tresult = zbx_db_select("%s", sql);
+
+	if (NULL != (trow = zbx_db_fetch(tresult)))
+	{
+		ret = FAIL;
+
+		if (SUCCEED == zbx_db_is_null(trow[3]))
+		{
+			zbx_snprintf(error, max_error_len, "cannot inherit item prototype with key \"%s\" of "
+					"template \"%s\" and LLD rule \"%s\", because an item with the same key already"
+					" exists", trow[0], trow[1], trow[2]);
+		}
+		else
+		{
+			zbx_snprintf(error, max_error_len, "cannot inherit item prototype with key \"%s\" of "
+					"template \"%s\" and LLD rule \"%s\", because an item prototype with the "
+					"same key already belongs to LLD rule \"%s\"", trow[0], trow[1], trow[2],
+					trow[3]);
+		}
+
+		zbx_db_free_result(tresult);
+		goto out;
+	}
+	zbx_db_free_result(tresult);
 	sql_offset = 0;
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
@@ -894,12 +932,11 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids, 
 		zbx_db_free_result(tresult);
 	}
 
-	zbx_free(sql);
-
 	zbx_vector_graph_valid_ptr_clear_ext(&graphs, zbx_graph_valid_free);
 	zbx_vector_graph_valid_ptr_destroy(&graphs);
 	zbx_vector_uint64_destroy(&graphids);
 out:
+	zbx_free(sql);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;

@@ -280,13 +280,13 @@ class testFormTrigger extends CLegacyWebTest {
 		if (isset($data['constructor'])) {
 			switch ($data['constructor']) {
 				case 'open':
-					$this->zbxTestClickButtonText('Expression constructor');
+					$form->query('button:Expression constructor')->waitUntilClickable()->one()->click();
 					$form->query('id:expression')->waitUntilNotVisible();
 					break;
 				case 'open_close':
-					$this->zbxTestClickButtonText('Expression constructor');
+					$form->query('button:Expression constructor')->waitUntilClickable()->one()->click();
 					$form->query('id:expression')->waitUntilNotVisible();
-					$this->zbxTestClickButtonText('Close expression constructor');
+					$form->query('button:Close expression constructor')->waitUntilClickable()->one()->click();
 					$form->query('id:expression')->waitUntilVisible();
 					break;
 			}
@@ -461,7 +461,7 @@ class testFormTrigger extends CLegacyWebTest {
 			);
 			$this->assertFalse($dialog_footer->query('button:Delete')->one()->isClickable());
 			$this->assertTrue($this->zbxTestCheckboxSelected('recovery_mode_0'));
-			$this->zbxTestAssertElementPresentXpath("//input[@id='recovery_mode_0'][@disabled]");
+			$this->zbxTestAssertElementPresentXpath("//input[@id='recovery_mode_0'][@readonly]");
 		}
 		else {
 			$this->assertEquals(2, $dialog_footer->query('button', ['Add', 'Cancel'])->all()

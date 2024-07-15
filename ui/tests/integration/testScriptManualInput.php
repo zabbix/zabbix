@@ -322,7 +322,7 @@ class testScriptManualInput extends CIntegrationTest {
 	/**
 	 * Delete data objects created for this test suite
 	 */
-	public function deleteData(): void {
+	public static function deleteData(): void {
 		CDataHelper::call('script.delete', self::$scriptids);
 		CDataHelper::call('host.delete', [self::$hostid]);
 		CDataHelper::call('hostgroup.delete', [self::$hostgroupid]);
