@@ -1661,7 +1661,7 @@ zabbix_export:
           value: access_key
           description: 'Authorization method. Possible values: role_base, access_key.'
         - macro: '{$AWS.BASE.GROUP}'
-          value: Cloud/AWS/
+          value: Cloud/AWS
           description: 'The base group to add resources to. Region and Type is appended to this.'
         - macro: '{$AWS.DATA.TIMEOUT}'
           value: 60s
