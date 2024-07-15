@@ -234,4 +234,13 @@ in:
 out:
   value: 'ABCabc123'
   return: SUCCEED
+---
+test case: different characters
+in:
+  data: 'ыABCabc123ыы'
+  param1: 'ыц'
+  param2: 'в'
+out:
+  value: 'вABCabc123вв'
+  return: SUCCEED
 ...

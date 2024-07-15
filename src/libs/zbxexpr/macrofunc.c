@@ -89,10 +89,10 @@ static int	macrofunc_regsub(char **params, size_t nparam, char **out)
  *               FAIL    - the function calculation failed                    *
  *                                                                            *
  ******************************************************************************/
-static int	zbx_tr_rule_create(const char *param, char *dst)
+static int	zbx_tr_rule_create(const unsigned char *param, unsigned char *dst)
 {
-	char		c, range_from = 0;
-	const char	*ptr;
+	unsigned char		c, range_from = 0;
+	const unsigned char	*ptr;
 	int		i, len = 0;
 
 	/* construct string to replace */
@@ -204,7 +204,7 @@ static int	zbx_tr_rule_create(const char *param, char *dst)
  ******************************************************************************/
 static int	macrofunc_tr(char **params, size_t nparam, char **out)
 {
-	char	translate[UCHAR_MAX+1], *ptr, buff_from[ZBX_RULE_BUFF_LEN], buff_to[ZBX_RULE_BUFF_LEN];
+	unsigned char	translate[UCHAR_MAX+1], *ptr, buff_from[ZBX_RULE_BUFF_LEN], buff_to[ZBX_RULE_BUFF_LEN];
 	int	buff_from_len, buff_to_len;
 	size_t	i;
 
@@ -214,9 +214,9 @@ static int	macrofunc_tr(char **params, size_t nparam, char **out)
 		return FAIL;
 	}
 
-	if (FAIL == (buff_from_len = zbx_tr_rule_create(params[0], buff_from)))
+	if (FAIL == (buff_from_len = zbx_tr_rule_create((unsigned char*)params[0], buff_from)))
 		return FAIL;
-	if (FAIL == (buff_to_len = zbx_tr_rule_create(params[1], buff_to)))
+	if (FAIL == (buff_to_len = zbx_tr_rule_create((unsigned char*)params[1], buff_to)))
 		return FAIL;
 
 	if (0 == buff_from_len || 0 == buff_to_len)
@@ -234,12 +234,14 @@ static int	macrofunc_tr(char **params, size_t nparam, char **out)
 	}
 
 	/* translate */
-	ptr = *out;
+	ptr = (unsigned char*)*out;
 	while ('\0' != *ptr)
 	{
-		*ptr = translate[(unsigned)*ptr];
+		*ptr = translate[*ptr];
 		ptr++;
 	}
+
+	zbx_replace_invalid_utf8(*out);
 	return SUCCEED;
 }
 
