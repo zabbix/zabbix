@@ -411,11 +411,11 @@ class testLowLevelDiscoveryDisabledObjects extends CWebTest {
 				'graph_hint' => "/^The graph is not discovered anymore and will be deleted in \d{1,2}d( \d{1,2}h( \d{1,2}m)?)?\.$/"
 			],
 			'7 Delete - Immediately' => [
-				'common_hint' => '/^The '.$data['object'].' is not discovered anymore and will be deleted'.
-						' the next time discovery rule is processed\.$/',
-				'graph_hint' => '/^The graph is not discovered anymore and will be deleted the next time'.
-						' discovery rule is processed\.$/'
-			]
+				'common_hint' => '/^The '.$data['object'].' is not discovered anymore and will'.
+						' (be deleted the next time discovery rule is processed|not be disabled, will be deleted in 0)\.$/',
+				'graph_hint' => '/^The graph is not discovered anymore and will'.
+						' (be deleted the next time discovery rule is processed|not be disabled, will be deleted in 0)\.$/'
+				]
 		];
 
 		foreach ($lld_objects as $lld => $hint) {
