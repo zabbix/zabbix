@@ -66,13 +66,9 @@ typedef struct
 }
 zbx_pg_rtdata_t;
 
-ZBX_VECTOR_DECL(pg_rtdata, zbx_pg_rtdata_t)
-
-void	zbx_pg_rtdata_free(zbx_pg_rtdata_t *pg_rtdata);
-
 void	zbx_pg_update_object_relocations(zbx_uint32_t code, zbx_vector_objmove_t *updates);
 int	zbx_pg_get_stats(const char *pg_name, zbx_pg_stats_t *pg_stats, char **error);
-int	zbx_pg_get_all_rtdata(zbx_vector_pg_rtdata_t *pgroups_rtdata, char **error);
+int	zbx_pg_get_all_rtdata(zbx_hashset_t *pgroups_rtdata, char **error);
 void	zbx_pg_update_proxy_rtdata(zbx_uint64_t proxyid, int lastaccess, int version);
 
 #endif

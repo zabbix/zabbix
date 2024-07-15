@@ -15926,10 +15926,10 @@ static void	dc_proxy_discovery_add_row(struct zbx_json *json, const ZBX_DC_PROXY
 
 /******************************************************************************
  *                                                                            *
- * Purpose: add proxy group configuration row                                     *
+ * Purpose: add proxy group configuration data row                            *
  *                                                                            *
  ******************************************************************************/
-static void	dc_proxy_group_discovery_add_group(struct zbx_json *json, const zbx_dc_proxy_group_t *pg)
+static void	dc_proxy_group_discovery_add_group_cfg(struct zbx_json *json, const zbx_dc_proxy_group_t *pg)
 {
 	zbx_json_addobject(json, NULL);
 
@@ -15945,25 +15945,14 @@ static void	dc_proxy_group_discovery_add_group(struct zbx_json *json, const zbx_
  * Purpose: add proxy group real-time statistics row                          *
  *                                                                            *
  ******************************************************************************/
-static void	dc_proxy_group_discovery_add_group_stats(const zbx_dc_proxy_group_t *pg,
-		const zbx_vector_pg_rtdata_t *pgroups_rtdata, struct zbx_json *json)
+static void	dc_proxy_group_discovery_add_group_rtdata(const zbx_dc_proxy_group_t *pg, zbx_hashset_t *pgroups_rtdata,
+		struct zbx_json *json)
 {
-	zbx_pg_rtdata_t	*rtdata = NULL;
+	zbx_pg_rtdata_t		*rtdata;
 
 	zbx_json_addobject(json, pg->name);
 
-	for (int i = 0; i < pgroups_rtdata->values_num; i++)
-	{
-		zbx_pg_rtdata_t	*tmp_rtdata = (zbx_pg_rtdata_t *)&pgroups_rtdata->values[i];
-
-		if (pg->proxy_groupid == tmp_rtdata->proxy_groupid)
-		{
-			rtdata = tmp_rtdata;
-			break;
-		}
-	}
-
-	if (NULL == rtdata)
+	if (NULL == (rtdata = (zbx_pg_rtdata_t *)zbx_hashset_search(pgroups_rtdata, &pg->proxy_groupid)))
 		goto out;
 
 	zbx_json_addint64(json, "state", rtdata->status);
@@ -16062,9 +16051,9 @@ void	zbx_proxy_group_discovery_get(char **data)
 	struct zbx_json		json;
 	zbx_hashset_iter_t	iter;
 	zbx_dc_proxy_group_t	*dc_proxy_group;
-	zbx_vector_pg_rtdata_t	pgroups_rtdata;
+	zbx_hashset_t		pgroups_rtdata;
 
-	zbx_vector_pg_rtdata_create(&pgroups_rtdata);
+	zbx_hashset_create(&pgroups_rtdata, 0, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 
 	zbx_json_addarray(&json, "data");
@@ -16073,7 +16062,7 @@ void	zbx_proxy_group_discovery_get(char **data)
 
 	zbx_hashset_iter_reset(&config->proxy_groups, &iter);
 	while (NULL != (dc_proxy_group = (zbx_dc_proxy_group_t *)zbx_hashset_iter_next(&iter)))
-		dc_proxy_group_discovery_add_group(&json, dc_proxy_group);
+		dc_proxy_group_discovery_add_group_cfg(&json, dc_proxy_group);
 
 	zbx_json_close(&json);
 
@@ -16087,11 +16076,11 @@ void	zbx_proxy_group_discovery_get(char **data)
 
 	zbx_hashset_iter_reset(&config->proxy_groups, &iter);
 	while (NULL != (dc_proxy_group = (zbx_dc_proxy_group_t *)zbx_hashset_iter_next(&iter)))
-		dc_proxy_group_discovery_add_group_stats(dc_proxy_group, &pgroups_rtdata, &json);
+		dc_proxy_group_discovery_add_group_rtdata(dc_proxy_group, &pgroups_rtdata, &json);
 
 	UNLOCK_CACHE;
 
-	zbx_vector_pg_rtdata_destroy(&pgroups_rtdata);
+	zbx_hashset_destroy(&pgroups_rtdata);
 
 	zbx_json_close(&json);
 	zbx_json_close(&json);

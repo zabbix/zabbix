@@ -22,7 +22,6 @@
 static ZBX_THREAD_LOCAL	zbx_ipc_socket_t	pgservice_sock;
 
 ZBX_VECTOR_IMPL(objmove, zbx_objmove_t)
-ZBX_VECTOR_IMPL(pg_rtdata, zbx_pg_rtdata_t)
 
 /******************************************************************************
  *                                                                            *
@@ -188,7 +187,7 @@ out:
  * Comments: used only by server                                              *
  *                                                                            *
  ******************************************************************************/
-int	zbx_pg_get_all_rtdata(zbx_vector_pg_rtdata_t *pgroups_rtdata, char **error)
+int	zbx_pg_get_all_rtdata(zbx_hashset_t *pgroups_rtdata, char **error)
 {
 	zbx_ipc_socket_t	sock, *psock;
 	int			ret = FAIL, pgroups_num;
@@ -222,19 +221,16 @@ int	zbx_pg_get_all_rtdata(zbx_vector_pg_rtdata_t *pgroups_rtdata, char **error)
 	ptr = message.data;
 	ptr += zbx_deserialize_value(ptr, &pgroups_num);
 
-	if (0 != pgroups_num)
+	for (int i = 0; i < pgroups_num; i++)
 	{
-		for (int i = 0; i < pgroups_num; i++)
-		{
-			zbx_pg_rtdata_t	pg_rtdata;
+		zbx_pg_rtdata_t	pg_rtdata;
 
-			ptr += zbx_deserialize_value(ptr, &pg_rtdata.proxy_groupid);
-			ptr += zbx_deserialize_value(ptr, &pg_rtdata.status);
-			ptr += zbx_deserialize_value(ptr, &pg_rtdata.proxy_online_num);
-			ptr += zbx_deserialize_value(ptr, &pg_rtdata.proxy_num);
+		ptr += zbx_deserialize_value(ptr, &pg_rtdata.proxy_groupid);
+		ptr += zbx_deserialize_value(ptr, &pg_rtdata.status);
+		ptr += zbx_deserialize_value(ptr, &pg_rtdata.proxy_online_num);
+		ptr += zbx_deserialize_value(ptr, &pg_rtdata.proxy_num);
 
-			zbx_vector_pg_rtdata_append(pgroups_rtdata, pg_rtdata);
-		}
+		(void)zbx_hashset_insert(pgroups_rtdata, &pg_rtdata, sizeof(pg_rtdata));
 	}
 
 	ret = SUCCEED;
