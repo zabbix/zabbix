@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-06-27 02:53+0000\n"
+"PO-Revision-Date: 2024-07-06 13:02+0000\n"
 "Last-Translator: NoYoWiFi <1284524409@qq.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_CN\n"
@@ -937,7 +937,7 @@ msgstr "添加新小组件"
 
 #: widgets/navtree/Widget.php:34
 msgid "Add child element"
-msgstr ""
+msgstr "添加子节点元素"
 
 #: widgets/navtree/Widget.php:39
 msgid "Add child elements"
@@ -976,7 +976,7 @@ msgstr "添加主机触发器"
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:260
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:263
 msgid "Add item"
-msgstr ""
+msgstr "添加监控项"
 
 #: app/partials/massupdate.macros.tab.php:96
 #: app/partials/massupdate.valuemaps.tab.php:38
@@ -1634,6 +1634,10 @@ msgstr "至少须指定一周或一个月中的某一天。"
 msgid "At least one host group or host must be selected."
 msgstr "至少选择一个主机组或主机。"
 
+#: include/classes/setup/CFrontendSetup.php:252
+msgid "At least one of MySQL or PostgreSQL should be supported."
+msgstr ""
+
 #: include/classes/setup/CFrontendSetup.php:241
 msgid "At least one of MySQL, PostgreSQL or Oracle should be supported."
 msgstr "应该至少支持MySQL，PostgreSQL或Oracle之一。"
@@ -1882,7 +1886,7 @@ msgstr "避免弱密码"
 
 #: jsLoader.php:172
 msgid "Awaiting data"
-msgstr ""
+msgstr "等待数据"
 
 #: widgets/svggraph/views/widget.edit.php:51
 msgid "Axes"
@@ -5325,7 +5329,7 @@ msgstr "创建新的"
 
 #: jsLoader.php:372
 msgid "Create new report"
-msgstr ""
+msgstr "创建新报表"
 
 #: app/views/administration.proxy.list.php:239
 msgid "Create proxy"
@@ -9437,7 +9441,7 @@ msgstr "主机群组组件"
 
 #: jsLoader.php:292
 msgid "Host group is not selected."
-msgstr ""
+msgstr "主机组未被选择。"
 
 #: include/views/monitoring.sysmap.edit.php:168
 msgid "Host group label type"
@@ -9520,7 +9524,7 @@ msgstr "主机资产记录概览"
 
 #: jsLoader.php:289
 msgid "Host is not selected."
-msgstr ""
+msgstr "主机未被选择。"
 
 #: include/views/monitoring.sysmap.edit.php:183
 msgid "Host label type"
@@ -12823,7 +12827,7 @@ msgstr "拓扑元素标签类型"
 
 #: jsLoader.php:290
 msgid "Map is not selected."
-msgstr ""
+msgstr "拓扑图未被选择。"
 
 #: sysmap.php:128
 msgid "Map is updated! Return to map list?"
@@ -20714,7 +20718,7 @@ msgstr "模板\"%1$s\"中的触发器依赖模板\"%2$s\"中的触发器"
 
 #: jsLoader.php:291
 msgid "Trigger is not selected."
-msgstr ""
+msgstr "触发器未被选择。"
 
 #: include/views/monitoring.sysmap.edit.php:198
 msgid "Trigger label type"
@@ -22761,7 +22765,7 @@ msgstr "以视图"
 
 #: jsLoader.php:417
 msgid "View related reports"
-msgstr ""
+msgstr "查看相关报表"
 
 #: include/classes/data/CItemData.php:1735
 msgid "Virtual space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
@@ -22971,7 +22975,7 @@ msgstr "对于指定的列数和行数而言小组件太小。"
 
 #: jsLoader.php:205
 msgid "Widgets"
-msgstr ""
+msgstr "部件"
 
 #: graphs.php:39 include/views/configuration.graph.edit.php:100
 #: include/views/configuration.graph.list.php:170
@@ -23347,7 +23351,7 @@ msgstr "您必需登录才能浏览此页面."
 
 #: jsLoader.php:287
 msgid "You need to have at least one image uploaded to create map element. Images can be uploaded in Administration->General->Images section."
-msgstr ""
+msgstr "您需要至少上传一张图片才能创建地图元素。图片可以在\"管理\"->\"常规\"->\"图片\"部分上传。"
 
 #: include/classes/db/DB.php:133
 msgid "Your database is not working properly. Please wait a few minutes and try to repeat this action. If the problem still persists, please contact system administrator. The problem might be caused by long running transaction or row level lock accomplished by your database management system."
@@ -25359,7 +25363,7 @@ msgstr "right() - 返回最右边指定个数字符"
 
 #: widgets/navtree/Widget.php:41
 msgid "root"
-msgstr ""
+msgstr "root"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:966
 msgid "round() - Rounds a value to decimal places"

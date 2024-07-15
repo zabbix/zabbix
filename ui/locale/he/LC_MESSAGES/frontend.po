@@ -1656,6 +1656,10 @@ msgstr "יש לציין לפחות אחד מימי השבוע או החודש."
 msgid "At least one host group or host must be selected."
 msgstr "חובה לבחור לפחות קבוצת מארחים אחת."
 
+#: include/classes/setup/CFrontendSetup.php:252
+msgid "At least one of MySQL or PostgreSQL should be supported."
+msgstr ""
+
 #: include/classes/setup/CFrontendSetup.php:241
 msgid "At least one of MySQL, PostgreSQL or Oracle should be supported."
 msgstr "אמורה להיות תמיכה באחד לפחות מבין MySQL,‏ PostgreSQL או Oracle."

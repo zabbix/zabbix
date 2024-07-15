@@ -1149,8 +1149,6 @@ static int	execute_graphs_updates(zbx_hashset_t *host_graphs_main_data, zbx_hash
 	zbx_graph_copy_t	*found;
 
 	zbx_hashset_iter_reset(host_graphs_main_data, &iter1);
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-	zbx_db_begin_multiple_update(&sql2, &sql_alloc2, &sql_offset2);
 
 	while (SUCCEED == res && NULL != (found = (zbx_graph_copy_t *)zbx_hashset_iter_next(&iter1)))
 	{
@@ -1344,10 +1342,7 @@ static int	execute_graphs_updates(zbx_hashset_t *host_graphs_main_data, zbx_hash
 					found->flags, host_graphs_items, audit_context_mode);
 		}
 	}
-
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (SUCCEED == res && 16 < sql_offset && ZBX_DB_OK > zbx_db_execute("%s", sql))
+	if (SUCCEED == res && ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "failed to execute graphs updates");
 		res = FAIL;
@@ -1355,15 +1350,10 @@ static int	execute_graphs_updates(zbx_hashset_t *host_graphs_main_data, zbx_hash
 
 	zbx_free(sql);
 
-	if (SUCCEED == res)
+	if (SUCCEED == res && ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql2, sql_offset2))
 	{
-		zbx_db_end_multiple_update(&sql2, &sql_alloc2, &sql_offset2);
-
-		if (16 < sql_offset2 && (ZBX_DB_OK > zbx_db_execute("%s", sql2)))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "failed to execute graphs items updates");
-			res = FAIL;
-		}
+		zabbix_log(LOG_LEVEL_WARNING, "failed to execute graphs items updates");
+		res = FAIL;
 	}
 
 	zbx_free(sql2);

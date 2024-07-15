@@ -2478,22 +2478,6 @@ abstract class CItemGeneral extends CApiService {
 	}
 
 	/**
-	 * Remove NCLOB value type fields from resulting query SELECT part if DISTINCT will be used.
-	 *
-	 * @param string $table_name     Table name.
-	 * @param string $table_alias    Table alias value.
-	 * @param array  $options        Array of query options.
-	 * @param array  $sql_parts      Array of query parts already initialized from $options.
-	 *
-	 * @return array    The resulting SQL parts array.
-	 */
-	protected function applyQueryOutputOptions($table_name, $table_alias, array $options, array $sql_parts) {
-		$this->unsetNclobFieldsFromOutput($options, $sql_parts);
-
-		return parent::applyQueryOutputOptions($table_name, $table_alias, $options, $sql_parts);
-	}
-
-	/**
 	 * Check that valuemap belong to same host as item.
 	 *
 	 * @param array      $items

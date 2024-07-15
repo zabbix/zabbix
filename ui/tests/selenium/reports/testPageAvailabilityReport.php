@@ -112,10 +112,10 @@ class testPageAvailabilityReport extends CLegacyWebTest {
 		$args = [
 			'from' => date('Y-m-d H:i:s', strtotime($start_time)),
 			'to' => date('Y-m-d H:i:s', strtotime($end_time)),
-			'filter_hostids' => [50014]
+			'filter_hosts' => [50014]
 		];
 
-		$this->zbxTestLogin('report2.php?'.http_build_query($args));
+		$this->zbxTestLogin('zabbix.php?action=availabilityreport.list&'.http_build_query($args));
 		$table_rows =$this->webDriver->findElements(WebDriverBy::xpath('//table[@class="list-table"]/tbody/tr'));
 		if (!$table_rows) {
 			$this->fail("Failed to get SLA reports table.");
@@ -135,7 +135,7 @@ class testPageAvailabilityReport extends CLegacyWebTest {
 	}
 
 	public function testPageAvailabilityReport_ByHost_CheckLayout() {
-		$this->zbxTestLogin('report2.php?config=0');
+		$this->zbxTestLogin('zabbix.php?action=availabilityreport.list&mode=0');
 		$this->zbxTestCheckTitle('Availability report');
 		$this->zbxTestCheckHeader('Availability report');
 		$this->zbxTestTextPresent('Mode');
@@ -145,13 +145,13 @@ class testPageAvailabilityReport extends CLegacyWebTest {
 
 // Check that no real host or template names displayed
 	public function testPageAvailabilityReport_ByHost_NoHostNames() {
-		$this->zbxTestLogin('report2.php?config=0');
+		$this->zbxTestLogin('zabbix.php?action=availabilityreport.list&mode=0');
 		$this->zbxTestCheckTitle('Availability report');
 		$this->zbxTestCheckNoRealHostnames();
 	}
 
 	public function testPageAvailabilityReport_ByTriggerTemplate_CheckLayout() {
-		$this->zbxTestLogin('report2.php?config=1');
+		$this->zbxTestLogin('zabbix.php?action=availabilityreport.list&mode=1');
 		$this->zbxTestCheckTitle('Availability report');
 		$this->zbxTestCheckHeader('Availability report');
 		$this->zbxTestTextPresent('Mode');
@@ -161,7 +161,7 @@ class testPageAvailabilityReport extends CLegacyWebTest {
 
 // Check that no real host or template names displayed
 	public function testPageAvailabilityReport_ByTriggerTemplate_NoHostNames() {
-		$this->zbxTestLogin('report2.php?config=1');
+		$this->zbxTestLogin('zabbix.php?action=availabilityreport.list&mode=1');
 		$this->zbxTestCheckNoRealHostnames();
 	}
 }

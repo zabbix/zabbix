@@ -1397,7 +1397,6 @@ static int	its_write_status_and_alarms(const zbx_vector_status_update_ptr_t *ala
 	}
 
 	/* write service status changes into database */
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (0 != updates.values_num)
 	{
@@ -1427,13 +1426,8 @@ static int	its_write_status_and_alarms(const zbx_vector_status_update_ptr_t *ala
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 	}
 
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (16 < sql_offset)
-	{
-		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
-			goto out;
-	}
+	if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
+		goto out;
 
 	ret = SUCCEED;
 
@@ -1788,7 +1782,6 @@ static void	service_add_cause(zbx_vector_service_severity_ptr_t *causes, zbx_ser
 	cause->severity = severity;
 	zbx_vector_service_severity_ptr_append(causes, cause);
 }
-
 
 /******************************************************************************
  *                                                                            *
@@ -2338,7 +2331,6 @@ static void	db_resolve_service_events(zbx_service_manager_t *manager,
 	/* update problems, escalations and link problems with recovery events */
 
 	sql_offset = 0;
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	zbx_db_insert_prepare(&db_insert_recovery, "event_recovery", "eventid", "r_eventid", (char *)NULL);
 
@@ -2363,10 +2355,7 @@ static void	db_resolve_service_events(zbx_service_manager_t *manager,
 		zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 	}
 
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
-		zbx_db_execute("%s", sql);
+	(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
 
 	zbx_db_insert_execute(&db_insert_recovery);
 	zbx_db_insert_clean(&db_insert_recovery);
@@ -3092,7 +3081,6 @@ static int	db_update_service_problems(const zbx_vector_event_severity_ptr_t *eve
 		size_t	sql_offset = 0;
 
 		zbx_db_begin();
-		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		for (int i = 0; i < event_severities->values_num; i++)
 		{
@@ -3104,10 +3092,7 @@ static int	db_update_service_problems(const zbx_vector_event_severity_ptr_t *eve
 			zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 		}
 
-		zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-		if (16 < sql_offset)
-			zbx_db_execute("%s", sql);
+		(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
 	}
 	while (ZBX_DB_DOWN == (txn_rc = zbx_db_commit()));
 
@@ -3520,7 +3505,6 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 				zabbix_log(LOG_LEVEL_WARNING, "finished forced reloading of the service manager cache");
 				service_cache_reload_requested = 0;
 			}
-
 
 			service_update_num += updated;
 			time_flush = time_now;

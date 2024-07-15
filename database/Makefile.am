@@ -2,7 +2,6 @@
 
 SUBDIRS = \
 	mysql \
-	oracle \
 	postgresql \
 	sqlite3
 
