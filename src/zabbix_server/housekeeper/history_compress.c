@@ -122,9 +122,14 @@ static int	hk_get_compression_age(const char *table_name, int compression_policy
 			" hypertable_schema='%s' and hypertable_name='%s'", field, zbx_db_get_schema_esc(), table_name);
 
 	if (NULL != (row = zbx_db_fetch(result)))
-		age = atoi(row[0]);
+	{
+		/* extraction from json may return empty field */
+		if (NULL != row[0])
+			age = atoi(row[0]);
+	}
 
 	zbx_db_free_result(result);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() age: %d", __func__, age);
 
 	return age;
