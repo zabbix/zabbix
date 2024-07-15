@@ -25,10 +25,6 @@
 
 #include "zbxtagfilter.h"
 
-#define ZBX_DB_CONNECT_NORMAL	0
-#define ZBX_DB_CONNECT_EXIT	1
-#define ZBX_DB_CONNECT_ONCE	2
-
 /* type of database */
 #define ZBX_DB_UNKNOWN	0
 #define ZBX_DB_SERVER	1
@@ -449,49 +445,6 @@ typedef struct
 }
 zbx_service_alarm_t;
 
-zbx_config_dbhigh_t	*zbx_config_dbhigh_new(void);
-void			zbx_config_dbhigh_free(zbx_config_dbhigh_t *config_dbhigh);
-
-void	zbx_init_library_dbhigh(const zbx_config_dbhigh_t *config_dbhigh);
-int	zbx_db_init(zbx_dc_get_nextid_func_t cb_nextid, int log_slow_queries, char **error);
-void	zbx_db_deinit(void);
-
-void	zbx_db_init_autoincrement_options(void);
-
-int	zbx_db_connect(int flag);
-void	zbx_db_close(void);
-
-int	zbx_db_validate_config_features(unsigned char program_type, const zbx_config_dbhigh_t *config_dbhigh);
-#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
-void	zbx_db_validate_config(const zbx_config_dbhigh_t *config_dbhigh);
-#endif
-
-int		zbx_db_execute(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
-int		zbx_db_execute_once(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
-zbx_db_result_t	zbx_db_select_once(const char *fmt, ...)__zbx_attr_format_printf(1, 2);
-zbx_db_result_t	zbx_db_select(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
-zbx_db_result_t	zbx_db_select_n(const char *query, int n);
-zbx_db_row_t	zbx_db_fetch(zbx_db_result_t result);
-int		zbx_db_is_null(const char *field);
-void		zbx_db_begin(void);
-int		zbx_db_commit(void);
-void		zbx_db_rollback(void);
-int		zbx_db_end(int ret);
-
-const zbx_db_table_t	*zbx_db_get_table(const char *tablename);
-const zbx_db_field_t	*zbx_db_get_field(const zbx_db_table_t *table, const char *fieldname);
-int		zbx_db_validate_field_size(const char *tablename, const char *fieldname, const char *str);
-
-#define zbx_db_get_maxid(table)	zbx_db_get_maxid_num(table, 1)
-zbx_uint64_t	zbx_db_get_maxid_num(const char *tablename, int num);
-
-void	zbx_db_extract_version_info(struct zbx_db_version_info_t *version_info);
-int	zbx_db_check_extension(struct zbx_db_version_info_t *info, int allow_unsupported);
-void	zbx_db_flush_version_requirements(const char *version);
-#ifdef HAVE_POSTGRESQL
-char	*zbx_db_get_schema_esc(void);
-#endif
-
 /******************************************************************************
  *                                                                            *
  * Type: ZBX_GRAPH_ITEMS                                                      *
@@ -547,16 +500,6 @@ void	zbx_trigger_diff_free(zbx_trigger_diff_t *diff);
 void	zbx_append_trigger_diff(zbx_vector_trigger_diff_ptr_t *trigger_diff, zbx_uint64_t triggerid,
 		unsigned char priority, zbx_uint64_t flags, unsigned char value, unsigned char state, int lastchange,
 		const char *error);
-
-char	*zbx_db_dyn_escape_field(const char *table_name, const char *field_name, const char *src);
-char	*zbx_db_dyn_escape_string(const char *src);
-char	*zbx_db_dyn_escape_string_len(const char *src, size_t length);
-char	*zbx_db_dyn_escape_like_pattern(const char *src);
-
-void	zbx_db_add_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *fieldname,
-		const zbx_uint64_t *values, const int num);
-void	zbx_db_add_str_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *fieldname,
-		const char * const *values, const int num);
 
 int	zbx_check_user_permissions(const zbx_uint64_t *userid, const zbx_uint64_t *recipient_userid);
 
@@ -650,37 +593,6 @@ int	zbx_db_lock_ids(const char *table_name, const char *field_name, zbx_vector_u
 void	zbx_db_select_uint64(const char *sql, zbx_vector_uint64_t *ids);
 
 void	zbx_db_check_character_set(void);
-
-ZBX_PTR_VECTOR_DECL(db_field_ptr, zbx_db_field_t *)
-ZBX_PTR_VECTOR_DECL(db_value_ptr, zbx_db_value_t *)
-
-/* bulk insert support */
-
-/* database bulk insert data */
-typedef struct
-{
-	/* the target table */
-	const zbx_db_table_t		*table;
-	/* the fields to insert (pointers to the zbx_db_field_t structures from database schema) */
-	zbx_vector_db_field_ptr_t	fields;
-	/* the values rows to insert (pointers to arrays of zbx_db_value_t structures) */
-	zbx_vector_db_value_ptr_t	rows;
-	/* index of autoincrement field */
-	int				autoincrement;
-	/* the last id assigned by autoincrement */
-	zbx_uint64_t			lastid;
-}
-zbx_db_insert_t;
-
-void	zbx_db_insert_prepare_dyn(zbx_db_insert_t *self, const zbx_db_table_t *table, const zbx_db_field_t **fields,
-		int fields_num);
-void	zbx_db_insert_prepare(zbx_db_insert_t *self, const char *table, ...);
-void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *self, zbx_db_value_t **values, int values_num);
-void	zbx_db_insert_add_values(zbx_db_insert_t *self, ...);
-int	zbx_db_insert_execute(zbx_db_insert_t *self);
-void	zbx_db_insert_clean(zbx_db_insert_t *self);
-void	zbx_db_insert_autoincrement(zbx_db_insert_t *self, const char *field_name);
-zbx_uint64_t	zbx_db_insert_get_lastid(zbx_db_insert_t *self);
 
 int	zbx_db_get_database_type(void);
 
