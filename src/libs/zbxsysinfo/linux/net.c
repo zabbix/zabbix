@@ -112,15 +112,31 @@ static int	find_tcp_port_by_state_nl(unsigned short port, int state, int *found)
 
 	struct sockaddr_nl	s_sa = { AF_NETLINK, 0, 0, 0 };
 	struct iovec		s_io[1] = { { &request, sizeof(request) } };
-	struct msghdr		s_msg = { (void *)&s_sa, sizeof(struct sockaddr_nl), s_io, 1, NULL, 0, 0};
+	struct msghdr		s_msg;
 
 	char			buffer[BUFSIZ] = { 0 };
 
 	struct sockaddr_nl	r_sa = { AF_NETLINK, 0, 0, 0 };
 	struct iovec		r_io[1] = { { buffer, BUFSIZ } };
-	struct msghdr		r_msg = { (void *)&r_sa, sizeof(struct sockaddr_nl), r_io, 1, NULL, 0, 0};
+	struct msghdr		r_msg;
 
 	struct nlmsghdr		*r_hdr;
+
+	s_msg.msg_name = (void *)&s_sa;
+	s_msg.msg_namelen = sizeof(struct sockaddr_nl);
+	s_msg.msg_iov = s_io;
+	s_msg.msg_iovlen = 1;
+	s_msg.msg_control = NULL;
+	s_msg.msg_controllen = 0;
+	s_msg.msg_flags = 0;
+
+	r_msg.msg_name = (void *)&r_sa;
+	r_msg.msg_namelen = sizeof(struct sockaddr_nl);
+	r_msg.msg_iov = r_io;
+	r_msg.msg_iovlen = 1;
+	r_msg.msg_control = NULL;
+	r_msg.msg_controllen = 0;
+	r_msg.msg_flags = 0;
 
 	*found = 0;
 
@@ -836,8 +852,8 @@ static int	scan_ipv6_addr(const char *addr, struct sockaddr_in6 *sa6)
 	return SUCCEED;
 }
 
-static int	get_proc_net_count_ipv6(const char *filename, unsigned char state, net_count_info_t *exp_l,
-		net_count_info_t *exp_r, zbx_uint64_t *count, char **error)
+static void	get_proc_net_count_ipv6(const char *filename, unsigned char state, net_count_info_t *exp_l,
+		net_count_info_t *exp_r, zbx_uint64_t *count)
 {
 	char			line[MAX_STRING_LEN], *p;
 	unsigned short		lport, rport;
@@ -847,10 +863,7 @@ static int	get_proc_net_count_ipv6(const char *filename, unsigned char state, ne
 	struct sockaddr_in6	*sa_l, *sa_r;
 
 	if (NULL == (f = fopen(filename, "r")))
-	{
-		*error = zbx_dsprintf(NULL, "Cannot open %s: %s", filename, zbx_strerror(errno));
-		return FAIL;
-	}
+		return;
 
 	sa_l = (struct sockaddr_in6 *)&sockaddr_l;
 	sa_r = (struct sockaddr_in6 *)&sockaddr_r;
@@ -906,13 +919,11 @@ static int	get_proc_net_count_ipv6(const char *filename, unsigned char state, ne
 	}
 
 	zbx_fclose(f);
-
-	return SUCCEED;
 }
 #endif
 
-static int	get_proc_net_count_ipv4(const char *filename, unsigned char state, net_count_info_t *exp_l,
-		net_count_info_t *exp_r, zbx_uint64_t *count, char **error)
+static void	get_proc_net_count_ipv4(const char *filename, unsigned char state, net_count_info_t *exp_l,
+		net_count_info_t *exp_r, zbx_uint64_t *count)
 {
 	char			line[MAX_STRING_LEN], *p;
 	unsigned short		lport, rport;
@@ -923,8 +934,7 @@ static int	get_proc_net_count_ipv4(const char *filename, unsigned char state, ne
 
 	if (NULL == (f = fopen(filename, "r")))
 	{
-		*error = zbx_dsprintf(NULL, "Cannot open %s: %s", filename, zbx_strerror(errno));
-		return FAIL;
+		return;
 	}
 
 	sa_l = (struct sockaddr_in *)&sockaddr_l;
@@ -966,8 +976,6 @@ static int	get_proc_net_count_ipv4(const char *filename, unsigned char state, ne
 	}
 
 	zbx_fclose(f);
-
-	return SUCCEED;
 }
 
 static int	get_addr_info(const char *addr_in, const char *port_in, struct addrinfo *hints, net_count_info_t *info,
@@ -1133,20 +1141,12 @@ static int	net_socket_count(int conn_type, AGENT_REQUEST *request, AGENT_RESULT 
 		goto err;
 	}
 
-	if (SUCCEED != get_proc_net_count_ipv4(NET_CONN_TYPE_TCP == conn_type ? "/proc/net/tcp" : "/proc/net/udp",
-			state_num, &info_l, &info_r, &count, &error))
-	{
-		SET_MSG_RESULT(result, error);
-		goto err;
-	}
+	get_proc_net_count_ipv4(NET_CONN_TYPE_TCP == conn_type ? "/proc/net/tcp" : "/proc/net/udp",
+			state_num, &info_l, &info_r, &count);
 
 #ifdef HAVE_IPV6
-	if (SUCCEED != get_proc_net_count_ipv6(NET_CONN_TYPE_TCP == conn_type ? "/proc/net/tcp6" : "/proc/net/udp6",
-			state_num, &info_l, &info_r,  &count, &error))
-	{
-		SET_MSG_RESULT(result, error);
-		goto err;
-	}
+	get_proc_net_count_ipv6(NET_CONN_TYPE_TCP == conn_type ? "/proc/net/tcp6" : "/proc/net/udp6",
+			state_num, &info_l, &info_r, &count);
 #endif
 
 	SET_UI64_RESULT(result, count);
