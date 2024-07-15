@@ -381,7 +381,7 @@ static void	*pg_service_entry(void *data)
 					pg_update_proxy_rtdata(pgs, message);
 					break;
 				case ZBX_IPC_PGM_GET_ALL_PGROUP_RTDATA:
-					pg_get_all_pgroup_rtdata(pgs, client, message);
+					pg_get_all_pgroup_rtdata(pgs, client);
 					break;
 				case ZBX_IPC_PGM_STOP:
 					goto out;
