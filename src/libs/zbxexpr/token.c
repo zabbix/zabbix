@@ -895,11 +895,11 @@ int	zbx_token_parse_nested_macro(const char *expression, const char *macro, zbx_
 
 	if (0 != (token_search & ZBX_TOKEN_SEARCH_VAR_MACRO))
 	{
-		if (SUCCEED == token_parse_var_macro(expression, macro + 1, &inner_token))
-		{
-			token_type = ZBX_TOKEN_VAR_FUNC_MACRO;
-			ptr = expression + inner_token.loc.r;
-		}
+		if (SUCCEED != token_parse_var_macro(expression, macro + 1, &inner_token))
+			return FAIL;
+
+		token_type = ZBX_TOKEN_VAR_FUNC_MACRO;
+		ptr = expression + inner_token.loc.r;
 	}
 	else if ('#' == macro[2])
 	{
