@@ -111,6 +111,19 @@ static zbx_es_httprequest_t *es_httprequest(duk_context *ctx)
 	return request;
 }
 
+void	es_httorequest_free(void *data)
+{
+	zbx_es_httprequest_t	*request = (zbx_es_httprequest_t *)data;
+
+	if (NULL != request->headers)
+		curl_slist_free_all(request->headers);
+	if (NULL != request->handle)
+		curl_easy_cleanup(request->handle);
+	zbx_free(request->data);
+	zbx_free(request->headers_in);
+	zbx_free(request);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: CurlHttpRequest destructor                                        *
@@ -127,14 +140,7 @@ static duk_ret_t	es_httprequest_dtor(duk_context *ctx)
 	if (NULL != (request = (zbx_es_httprequest_t *)es_obj_detach_data(env)))
 	{
 		env->http_req_objects--;
-
-		if (NULL != request->headers)
-			curl_slist_free_all(request->headers);
-		if (NULL != request->handle)
-			curl_easy_cleanup(request->handle);
-		zbx_free(request->data);
-		zbx_free(request->headers_in);
-		zbx_free(request);
+		es_httorequest_free(request);
 	}
 
 	return 0;

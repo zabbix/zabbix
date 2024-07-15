@@ -371,6 +371,18 @@ out:
 	return ret;
 }
 
+static void	es_objmap_destroy(zbx_hashset_t *objmap)
+{
+	zbx_hashset_iter_t	iter;
+	zbx_es_obj_data_t	*obj;
+
+	zbx_hashset_iter_reset(objmap, &iter);
+	while (NULL != (obj = (zbx_es_obj_data_t *)zbx_hashset_iter_next(&iter)))
+		es_httorequest_free(obj->data);
+
+	zbx_hashset_destroy(objmap);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: destroys initialized embedded scripting engine environment        *
@@ -396,8 +408,9 @@ int	zbx_es_destroy_env(zbx_es_t *es, char **error)
 	}
 
 	duk_destroy_heap(es->env->ctx);
+	es_objmap_destroy(&es->env->objmap);
+
 	zbx_es_debug_disable(es);
-	zbx_hashset_destroy(&es->env->objmap);
 	zbx_free(es->env->error);
 	zbx_free(es->env);
 
