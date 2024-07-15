@@ -104,7 +104,8 @@ static void	hk_check_table_segmentation(const char *table_name, const char *segm
  * Parameters: table_name         - [IN] hypertable name                      *
  *             compression_policy - [IN]                                      *
  *                                                                            *
- * Return value: data compression age in seconds                              *
+ * Return value: >=0 - data compression age in seconds                        *
+ *               <0  - hypertable has different compression policy            *
  *                                                                            *
  ******************************************************************************/
 static int	hk_get_compression_age(const char *table_name, int compression_policy)
@@ -123,7 +124,7 @@ static int	hk_get_compression_age(const char *table_name, int compression_policy
 
 	if (NULL != (row = zbx_db_fetch(result)))
 	{
-		/* extraction from json may return empty field */
+		/* extraction from json may return empty field when json exists but field doesn't */
 		if (NULL == row[0])
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "The %s table has different compression policy than '%s'",
