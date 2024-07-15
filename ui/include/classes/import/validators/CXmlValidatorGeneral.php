@@ -162,25 +162,7 @@ abstract class CXmlValidatorGeneral {
 
 			// validation of the values type
 			foreach ($rules['rules'] as $tag => $tag_rules) {
-				while ($tag_rules['type'] & XML_MULTIPLE) {
-					$matched_multiple_rule = null;
-
-					foreach ($tag_rules['rules'] as $multiple_rule) {
-						if ($this->multipleRuleMatched($multiple_rule, $data, $rules['rules'])) {
-							$multiple_rule['type'] = ($tag_rules['type'] & XML_REQUIRED) | $multiple_rule['type'];
-							$matched_multiple_rule = $multiple_rule
-								+ array_intersect_key($tag_rules, array_flip(['default']));
-							break;
-						}
-					}
-
-					if ($matched_multiple_rule === null) {
-						// For use by developers. Do not translate.
-						throw new Exception('Incorrect XML_MULTIPLE validation rules.');
-					}
-
-					$tag_rules = $matched_multiple_rule;
-				}
+				$tag_rules = $this->getResultRule($tag_rules, $data, $rules['rules']);
 
 				if ($tag_rules['type'] & XML_IGNORE_TAG) {
 					continue;
@@ -316,7 +298,31 @@ abstract class CXmlValidatorGeneral {
 		}
 	}
 
-	private function multipleRuleMatched(array $multiple_rule, array $data, array $rules): bool {
+	private function getResultRule(array $tag_rules, array &$data, array $parent_rules): array {
+		while ($tag_rules['type'] & XML_MULTIPLE) {
+			$matched_multiple_rule = null;
+
+			foreach ($tag_rules['rules'] as $multiple_rule) {
+				if ($this->multipleRuleMatched($multiple_rule, $data, $parent_rules)) {
+					$multiple_rule['type'] = ($tag_rules['type'] & XML_REQUIRED) | $multiple_rule['type'];
+					$matched_multiple_rule =
+						$multiple_rule + array_intersect_key($tag_rules, array_flip(['default']));
+					break;
+				}
+			}
+
+			if ($matched_multiple_rule === null) {
+				// For use by developers. Do not translate.
+				throw new Exception('Incorrect XML_MULTIPLE validation rules.');
+			}
+
+			$tag_rules = $matched_multiple_rule;
+		}
+
+		return $tag_rules;
+	}
+
+	private function multipleRuleMatched(array $multiple_rule, array &$data, array $rules): bool {
 		if (array_key_exists('else', $multiple_rule)) {
 			return true;
 		}
@@ -324,10 +330,18 @@ abstract class CXmlValidatorGeneral {
 			$field_name = $multiple_rule['if']['tag'];
 
 			if (array_key_exists($field_name, $data)) {
-				return array_key_exists($data[$field_name], $multiple_rule['if']['in']);
+				return in_array($data[$field_name], $multiple_rule['if']['in']);
 			}
-			elseif (array_key_exists('default', $rules[$field_name])) {
-				return array_key_exists($rules[$field_name]['default'], $multiple_rule['if']['in']);
+			else {
+				$tag_rules = $this->getResultRule($rules[$field_name], $data, $rules);
+
+				if (!$this->isPreview()) {
+					$data[$field_name] = array_key_exists('in', $tag_rules)
+						? $tag_rules['in'][$tag_rules['default']]
+						: $tag_rules['default'];
+				}
+
+				return array_key_exists($tag_rules['default'], $multiple_rule['if']['in']);
 			}
 		}
 		elseif ($multiple_rule['if'] instanceof Closure) {

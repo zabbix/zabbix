@@ -2186,6 +2186,7 @@ class testDataDisplayInGraphs extends CWebTest {
 			}
 
 			$filter_form->submit();
+			$this->page->waitUntilReady();
 
 			// Switch to kiosk mode if screenshot needs to be checked in Kiosk mode.
 			if (CTestArrayHelper::get($data, 'kiosk_mode')) {

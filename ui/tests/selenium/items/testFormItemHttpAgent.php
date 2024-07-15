@@ -1322,15 +1322,16 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 			switch ($action) {
 				case 'update':
 					$name .= ' (updated)';
-					$form->getField('Name')->fill('$name');
-					$dialog->getFooter()->query('button:Cancel')->one()->click();
+					$form->getField('Name')->fill($name);
+					$dialog->close(true);
 					break;
 
 				case 'clone':
 					$name .= ' (cloned)';
-					$form->getField('Name')->fill('$name');
+					$form->getField('Name')->fill($name);
 					$dialog->getFooter()->query('button:Clone')->one()->click();
-					$dialog->getFooter()->query('button:Cancel')->one()->click();
+					$dialog->query('xpath:.//h4[text()="New item"]')->waitUntilVisible()->one();
+					$dialog->close(true);
 					break;
 
 				case 'delete':

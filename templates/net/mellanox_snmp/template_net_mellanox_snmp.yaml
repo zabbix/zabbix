@@ -101,8 +101,6 @@ zabbix_export:
           name: 'SNMP traps (fallback)'
           type: SNMP_TRAP
           key: snmptrap.fallback
-          delay: '0'
-          trends: '0'
           value_type: LOG
           description: 'The item is used to collect all SNMP traps unmatched by other snmptrap items'
           logtimefmt: 'hh:mm:sszyyyy/MM/dd'
@@ -115,7 +113,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.4.0
           key: 'system.contact[sysContact.0]'
           delay: 15m
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -163,7 +160,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.1.0
           key: 'system.descr[sysDescr.0]'
           delay: 15m
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -206,7 +202,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.6.0
           key: 'system.location[sysLocation.0]'
           delay: 15m
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -225,7 +220,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.5.0
           key: system.name
           delay: 15m
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -275,7 +269,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.2.0
           key: 'system.objectid[sysObjectID.0]'
           delay: 15m
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -328,7 +321,6 @@ zabbix_export:
             conditions:
               - macro: '{#ENT_CLASS}'
                 value: '3'
-                formulaid: A
           item_prototypes:
             - uuid: d3643a044d4544e8a3487ed79c3a5390
               name: '{#ENT_NAME}: Hardware model name'
@@ -336,7 +328,6 @@ zabbix_export:
               snmp_oid: '1.3.6.1.2.1.47.1.1.1.1.13.{#SNMPINDEX}'
               key: 'system.hw.model[entPhysicalModelName.{#SNMPINDEX}]'
               delay: 1h
-              trends: '0'
               value_type: CHAR
               description: 'MIB: ENTITY-MIB'
               preprocessing:
@@ -352,7 +343,6 @@ zabbix_export:
               snmp_oid: '1.3.6.1.2.1.47.1.1.1.1.11.{#SNMPINDEX}'
               key: 'system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}]'
               delay: 1h
-              trends: '0'
               value_type: CHAR
               description: 'MIB: ENTITY-MIB'
               preprocessing:
@@ -388,7 +378,6 @@ zabbix_export:
             conditions:
               - macro: '{#SNMPVALUE}'
                 value: '10'
-                formulaid: A
           description: 'ENTITY-SENSORS-MIB::EntitySensorDataType discovery with rpm filter'
           item_prototypes:
             - uuid: 284de830d5924f528b0c86abe5dbc48d
@@ -455,46 +444,34 @@ zabbix_export:
             conditions:
               - macro: '{#IFADMINSTATUS}'
                 value: '{$NET.IF.IFADMINSTATUS.MATCHES}'
-                formulaid: A
               - macro: '{#IFADMINSTATUS}'
                 value: '{$NET.IF.IFADMINSTATUS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
               - macro: '{#IFALIAS}'
                 value: '{$NET.IF.IFALIAS.MATCHES}'
-                formulaid: C
               - macro: '{#IFALIAS}'
                 value: '{$NET.IF.IFALIAS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: D
               - macro: '{#IFDESCR}'
                 value: '{$NET.IF.IFDESCR.MATCHES}'
-                formulaid: E
               - macro: '{#IFDESCR}'
                 value: '{$NET.IF.IFDESCR.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: F
               - macro: '{#IFNAME}'
                 value: '{$NET.IF.IFNAME.MATCHES}'
-                formulaid: G
               - macro: '{#IFNAME}'
                 value: '{$NET.IF.IFNAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: H
               - macro: '{#IFOPERSTATUS}'
                 value: '{$NET.IF.IFOPERSTATUS.MATCHES}'
-                formulaid: I
               - macro: '{#IFOPERSTATUS}'
                 value: '{$NET.IF.IFOPERSTATUS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: J
               - macro: '{#IFTYPE}'
                 value: '{$NET.IF.IFTYPE.MATCHES}'
-                formulaid: K
               - macro: '{#IFTYPE}'
                 value: '{$NET.IF.IFTYPE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: L
           description: 'Discovering interfaces from IF-MIB.'
           item_prototypes:
             - uuid: 8f6e736b5c9c48a68e16122d592534b2
@@ -512,8 +489,6 @@ zabbix_export:
                 and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               tags:
                 - tag: component
                   value: network
@@ -532,8 +507,6 @@ zabbix_export:
                 For packet-oriented interfaces, the number of inbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.  For character-oriented or fixed-length interfaces, the number of inbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               tags:
                 - tag: component
                   value: network
@@ -553,8 +526,6 @@ zabbix_export:
                 The total number of octets received on the interface, including framing characters. This object is a 64-bit version of ifInOctets. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
                 - type: MULTIPLIER
                   parameters:
                     - '8'
@@ -580,8 +551,6 @@ zabbix_export:
                 and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               tags:
                 - tag: component
                   value: network
@@ -600,8 +569,6 @@ zabbix_export:
                 For packet-oriented interfaces, the number of outbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.  For character-oriented or fixed-length interfaces, the number of outbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               tags:
                 - tag: component
                   value: network
@@ -621,8 +588,6 @@ zabbix_export:
                 The total number of octets transmitted out of the interface, including framing characters. This object is a 64-bit version of ifOutOctets.Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
                 - type: MULTIPLIER
                   parameters:
                     - '8'
@@ -854,7 +819,6 @@ zabbix_export:
             conditions:
               - macro: '{#ENT_CLASS}'
                 value: '6'
-                formulaid: A
           item_prototypes:
             - uuid: 38a00c9f9f9447d0a0c9788ca9dcc9f2
               name: '{#ENT_NAME}: Power supply status'
@@ -896,10 +860,8 @@ zabbix_export:
             conditions:
               - macro: '{#SENSOR_PRECISION}'
                 value: '1'
-                formulaid: A
               - macro: '{#SENSOR_TYPE}'
                 value: '8'
-                formulaid: B
           description: 'ENTITY-SENSORS-MIB::EntitySensorDataType discovery with temperature filter'
           item_prototypes:
             - uuid: 4f298c0f2b6547b7b1827b3faebd1089
@@ -1013,18 +975,14 @@ zabbix_export:
             conditions:
               - macro: '{#FSNAME}'
                 value: '{$VFS.FS.FSNAME.MATCHES}'
-                formulaid: A
               - macro: '{#FSNAME}'
                 value: '{$VFS.FS.FSNAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
               - macro: '{#FSTYPE}'
                 value: '{$VFS.FS.FSTYPE.MATCHES}'
-                formulaid: C
               - macro: '{#FSTYPE}'
                 value: '{$VFS.FS.FSTYPE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: D
           description: 'HOST-RESOURCES-MIB::hrStorage discovery with storage filter.'
           item_prototypes:
             - uuid: 84e47981247243bd888a870700da8be3
@@ -1157,18 +1115,14 @@ zabbix_export:
             conditions:
               - macro: '{#MEMNAME}'
                 value: '{$MEMORY.NAME.MATCHES}'
-                formulaid: A
               - macro: '{#MEMNAME}'
                 value: '{$MEMORY.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
               - macro: '{#MEMTYPE}'
                 value: '{$MEMORY.TYPE.MATCHES}'
-                formulaid: C
               - macro: '{#MEMTYPE}'
                 value: '{$MEMORY.TYPE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: D
           description: 'HOST-RESOURCES-MIB::hrStorage discovery with memory filter'
           item_prototypes:
             - uuid: 70918ede8bff4f76be467a806a015b21
