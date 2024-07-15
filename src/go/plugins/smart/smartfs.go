@@ -134,13 +134,16 @@ type singelRequestTables struct {
 }
 
 type singelRequestRaw struct {
-	Name string   `json:"name"`
-	Raw  rawField `json:"raw"`
+	Value int      `json:"value"`
+	Name  string   `json:"name"`
+	Raw   rawField `json:"raw"`
+	Id    int      `json:"id"`
 }
-
 type singleRequestAttribute struct {
-	Value int    `json:"value"`
-	Raw   string `json:"raw"`
+	Value           int    `json:"value"`
+	Raw             string `json:"raw"`
+	NormalizedValue int    `json:"normalizedValue"`
+	Id              int    `json:"id"`
 }
 
 type rawField struct {
