@@ -444,7 +444,7 @@ static int	macrofunc_htmldecode(char **params, size_t nparam, char **out)
 			for (size_t i = 0; i < ARRSIZE(zbx_html_translation); i++)
 			{
 				entity = (char *)zbx_html_translation[i].html_entity;
-				if (0 == memcmp(ptr, entity, strlen(entity)))
+				if (0 == strncmp(ptr, entity, strlen(entity)))
 				{
 					*ptr = zbx_html_translation[i].character;
 					memmove(ptr + 1, ptr + strlen(entity), strlen(ptr + strlen(entity)) + 1);
