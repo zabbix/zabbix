@@ -57,6 +57,13 @@ abstract class CMapElement extends CApiService {
 				}
 			}
 
+			if (array_key_exists('label', $selement)
+					&& mb_strlen($selement['label']) > DB::getFieldLength('sysmaps_elements', 'label')) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+					'label', _('value is too long')
+				));
+			}
+
 			if (array_key_exists('urls', $selement)) {
 				$url_validate_options = ['allow_user_macro' => false];
 				if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST) {
@@ -74,11 +81,6 @@ abstract class CMapElement extends CApiService {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong value for "url" field.'));
 					}
 				}
-			}
-
-			if ($update && array_key_exists('selementid', $selement)
-						&& array_key_exists($selement['selementid'], $db_selements)) {
-				$db_selement = $db_selements[$selement['selementid']];
 			}
 
 			if (!$elementtype_validator->validate($selement['elementtype'])) {

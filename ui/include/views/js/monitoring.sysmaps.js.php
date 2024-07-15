@@ -137,6 +137,7 @@ function createFontSelect(string $name): CSelect {
 							->setId('elementLabel')
 							->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 							->setRows(2)
+							->setMaxlength(DB::getFieldLength('sysmaps_elements', 'label'))
 							->disableSpellcheck()
 					)
 					->addRow(new CLabel(_('Label location'), 'label-label-location'),
