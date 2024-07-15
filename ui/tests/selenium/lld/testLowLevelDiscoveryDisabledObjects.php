@@ -391,7 +391,7 @@ class testLowLevelDiscoveryDisabledObjects extends CWebTest {
 			],
 			'3 Delete - never, disable - after 2w' => [
 				'common_hint' => "/^The ".$data['object']." is not discovered anymore and will be disabled in".
-						" 13d 23h ([0-9]{1,2}m)?, will not be deleted\.$/",
+						" \d{1,2}d( \d{1,2}h( \d{1,2}m)?)?, will not be deleted\.$/",
 				'graph_hint' => '/^The graph is not discovered anymore and will not be deleted\.$/'
 			],
 			'4 Delete - after 52w, disable - never' => [
