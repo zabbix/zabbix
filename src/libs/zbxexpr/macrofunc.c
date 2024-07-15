@@ -427,7 +427,7 @@ static int	macrofunc_htmlencode(char **params, size_t nparam, char **out)
  ******************************************************************************/
 static int	macrofunc_htmldecode(char **params, size_t nparam, char **out)
 {
-	char	*entity, *found, ch;
+	char	*entity, *ptr;
 
 	ZBX_UNUSED(params);
 
@@ -437,19 +437,23 @@ static int	macrofunc_htmldecode(char **params, size_t nparam, char **out)
 		return FAIL;
 	}
 
-	for (size_t i = 0; i < ARRSIZE(zbx_html_translation); ++i)
+	for (ptr = *out; '\0' != *ptr; ptr++)
 	{
-		entity = (char *)zbx_html_translation[i].html_entity;
-		ch = zbx_html_translation[i].character;
-		found = strstr(*out, entity);
-		while (NULL != found)
+		if ('&' == *ptr)
 		{
-			*found = ch;
-			memmove(found + 1, found + strlen(entity), strlen(found + strlen(entity)) + 1);
-			found = strstr(*out, entity);
+			for (size_t i = 0; i < ARRSIZE(zbx_html_translation); i++)
+			{
+				entity = (char *)zbx_html_translation[i].html_entity;
+				if (0 == memcmp(ptr, entity, strlen(entity)))
+				{
+					*ptr = zbx_html_translation[i].character;
+					memmove(ptr + 1, ptr + strlen(entity), strlen(ptr + strlen(entity)) + 1);
+					break;
+				}
+			}
+
 		}
 	}
-
 	return SUCCEED;
 }
 

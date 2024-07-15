@@ -379,5 +379,27 @@ out:
   value: ''
   return: SUCCEED
 
+---
+test case: htmldecode &amp;lt;
+in:
+  function: 'htmldecode'
+  params: ''
+  data: '&amp;lt;'
+
+out:
+  value: '&lt;'
+  return: SUCCEED
+
+---
+test case: htmldecode &amp;lt;&amp;
+in:
+  function: 'htmldecode'
+  params: ''
+  data: '&amp;lt;&amp;'
+
+out:
+  value: '&lt;&'
+  return: SUCCEED
+
 
 ...
