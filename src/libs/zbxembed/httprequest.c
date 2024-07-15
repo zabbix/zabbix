@@ -232,7 +232,10 @@ static duk_ret_t	es_httprequest_add_header(duk_context *ctx)
 	}
 
 	if (NULL == (request = es_httprequest(ctx)))
-		return duk_throw(ctx);
+	{
+		err_index = 0;
+		goto out;
+	}
 
 	header_sz = strlen(utf8);
 
