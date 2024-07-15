@@ -415,7 +415,7 @@ class testLowLevelDiscoveryDisabledObjects extends CWebTest {
 						' (be deleted the next time discovery rule is processed|not be disabled, will be deleted in 0)\.$/',
 				'graph_hint' => '/^The graph is not discovered anymore and will'.
 						' (be deleted the next time discovery rule is processed|not be disabled, will be deleted in 0)\.$/'
-				]
+			]
 		];
 
 		foreach ($lld_objects as $lld => $hint) {
