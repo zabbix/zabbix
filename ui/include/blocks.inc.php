@@ -512,7 +512,7 @@ function getSeverityTableCell($severity, array $data, array $stat, $is_total = f
 			return CSeverityHelper::makeSeverityCell($severity, [
 				(new CSpan(
 					(new CSpan(
-						(new CSpan($allTriggersNum))
+						new CSpan($allTriggersNum)
 					))->addClass(ZBX_STYLE_TOTALS_LIST_COUNT_PART)
 				))->addClass(ZBX_STYLE_TOTALS_LIST_COUNT),
 				(new CSpan($severity_name))->addClass(ZBX_STYLE_TOTALS_LIST_NAME)->setTitle($severity_name)
@@ -522,7 +522,7 @@ function getSeverityTableCell($severity, array $data, array $stat, $is_total = f
 			return CSeverityHelper::makeSeverityCell($severity, [
 				(new CSpan(
 					(new CSpan(
-						(new CSpan($unackTriggersNum))
+						new CSpan($unackTriggersNum)
 					))->addClass(ZBX_STYLE_TOTALS_LIST_COUNT_PART)
 				))->addClass(ZBX_STYLE_TOTALS_LIST_COUNT),
 				(new CSpan($severity_name))->addClass(ZBX_STYLE_TOTALS_LIST_NAME)->setTitle($severity_name)
@@ -535,13 +535,13 @@ function getSeverityTableCell($severity, array $data, array $stat, $is_total = f
 			return CSeverityHelper::makeSeverityCell($severity, [
 				(new CSpan([
 					(new CSpan(
-						(new CSpan($unackTriggersNum))
+						new CSpan($unackTriggersNum)
 					))->addClass(ZBX_STYLE_TOTALS_LIST_COUNT_PART),
 					(new CSpan(
-						(new CSpan($of))
+						new CSpan($of)
 					))->addClass(ZBX_STYLE_TOTALS_LIST_COUNT_PART),
 					(new CSpan(
-						(new CSpan($allTriggersNum))
+						new CSpan($allTriggersNum)
 					))->addClass(ZBX_STYLE_TOTALS_LIST_COUNT_PART)
 				]))->addClass(ZBX_STYLE_TOTALS_LIST_COUNT),
 				(new CSpan($severity_name))->addClass(ZBX_STYLE_TOTALS_LIST_NAME)->setTitle($severity_name)
