@@ -100,11 +100,11 @@ class testAutoregistration extends CAPITest {
 
 	public static function dataProviderInvalidAutoregistrationUpdate() {
 		return [
-			'Cannot set HOST_ENCRYPTION_PSK without tls_psk_identity' => [
+			'Cannot set "tls_accept" to HOST_ENCRYPTION_PSK without tls_psk_identity' => [
 				'data' => ['tls_accept' => HOST_ENCRYPTION_PSK],
 				'expected_error' => 'Invalid parameter "/": the parameter "tls_psk_identity" is missing.'
 			],
-			'Cannot set HOST_ENCRYPTION_PSK without tls_psk' => [
+			'Cannot set "tls_accept" to HOST_ENCRYPTION_PSK without tls_psk' => [
 				'data' => ['tls_accept' => HOST_ENCRYPTION_PSK, 'tls_psk_identity' => 'uniquestring'],
 				'expected_error' => 'Invalid parameter "/": the parameter "tls_psk" is missing.'
 			],
@@ -137,11 +137,11 @@ class testAutoregistration extends CAPITest {
 
 	public static function dataProviderInvalidAutoregistrationWithHostEncryptionUpdate() {
 		return [
-			'Cannot update tls_psk_identity when host uses same tls_psk_identity with different tls_psk key' => [
+			'Cannot update "tls_psk_identity" when host uses same "tls_psk_identity" with different tls_psk key' => [
 				'data' => ['tls_psk_identity' => 'hostidentity'],
 				'expected_error' => 'Incorrect value for field "/1/tls_psk": another value of tls_psk exists for same tls_psk_identity.'
 			],
-			'Cannot update tls_psk_identity when proxy uses same tls_psk_identity with different tls_psk key' => [
+			'Cannot update "tls_psk_identity" when proxy uses same "tls_psk_identity" with different tls_psk key' => [
 				'data' => ['tls_psk_identity' => 'proxyidentity'],
 				'expected_error' => 'Incorrect value for field "/1/tls_psk": another value of tls_psk exists for same tls_psk_identity.'
 			]
@@ -150,18 +150,18 @@ class testAutoregistration extends CAPITest {
 
 	public static function dataProviderValidAutoregistrationWithHostEncryptionUpdate() {
 		return [
-			'Can update tls_psk' => [
+			'Can update "tls_psk"' => [
 				'data' => [
 					'tls_psk' => '3f19f5a49cf97e5fe1487aa60547d5fc'
 				]
 			],
-			'Can update tls_psk_identity and tls_psk from existing host' => [
+			'Can update "tls_psk_identity" and "tls_psk" from existing host' => [
 				'data' => [
 					'tls_psk_identity' => 'hostidentity',
 					'tls_psk' => '0d59887b3a4f2a2e6866985491699034'
 				]
 			],
-			'Can update tls_psk_identity and tls_psk from existing proxy' => [
+			'Can update "tls_psk_identity" and "tls_psk" from existing proxy' => [
 				'data' => [
 					'tls_psk_identity' => 'proxyidentity',
 					'tls_psk' => '486a9e7b43740b3619e42636cb1c24bf'
