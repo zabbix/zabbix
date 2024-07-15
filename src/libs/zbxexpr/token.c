@@ -772,6 +772,11 @@ int	zbx_token_find(const char *expression, int pos, zbx_token_t *token, zbx_toke
 		if ('\0' == ptr[1])
 			return FAIL;
 
+		if (0 != (token_search & ZBX_TOKEN_SEARCH_VAR_MACRO) && '{' != ptr[1])
+		{
+			if (SUCCEED == (ret = token_parse_var_macro(expression, ptr, token)))
+				continue;
+		}
 		switch (ptr[1])
 		{
 			case '$':
@@ -801,12 +806,6 @@ int	zbx_token_find(const char *expression, int pos, zbx_token_t *token, zbx_toke
 					break;
 				ZBX_FALLTHROUGH;
 			default:
-				if (0 != (token_search & ZBX_TOKEN_SEARCH_VAR_MACRO))
-				{
-					if (SUCCEED == (ret = token_parse_var_macro(expression, ptr, token)))
-						continue;
-				}
-
 				if (SUCCEED != (ret = token_parse_macro(expression, ptr, token)) &&
 						0 != (token_search & ZBX_TOKEN_SEARCH_SIMPLE_MACRO))
 				{
