@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-03-14T12:02:16Z'
+  date: '2024-06-12T12:07:44Z'
   groups:
     - uuid: 846977d1dfed4968bc5f8bdb363285bc
       name: 'Templates/Operating systems'
@@ -658,8 +658,10 @@ zabbix_export:
           triggers:
             - uuid: e91c10be1c4a4c3fadfe06aec6c1e4e4
               expression: 'fuzzytime(/Linux by Prom/system.localtime[node_exporter],{$SYSTEM.FUZZYTIME.MAX})=0'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'fuzzytime(/Linux by Prom/system.localtime[node_exporter],{$SYSTEM.FUZZYTIME.MIN})=1'
               name: 'Linux: System time is out of sync'
-              event_name: 'Linux: System time is out of sync (diff with Zabbix server > {$SYSTEM.FUZZYTIME.MAX}s)'
+              event_name: 'Linux: System time is out of sync (diff with Zabbix server > {$SYSTEM.FUZZYTIME.MAX})'
               priority: WARNING
               description: 'The host''s system time is different from Zabbix server time.'
               manual_close: 'YES'
@@ -1784,6 +1786,22 @@ zabbix_export:
                   value: storage
                 - tag: filesystem
                   value: '{#FSNAME}'
+              trigger_prototypes:
+                - uuid: d5687d7aa0484b389f0bd168d50ee1e6
+                  expression: 'last(/Linux by Prom/vfs.fs.pused[node_exporter,"{#FSNAME}"])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}'
+                  name: '{#FSNAME}: Disk space is critically low'
+                  event_name: '{#FSNAME}: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)'
+                  priority: AVERAGE
+                  manual_close: 'YES'
+                - uuid: 8f765148cfd64d5ebda93f39d0b20e36
+                  expression: 'last(/Linux by Prom/vfs.fs.pused[node_exporter,"{#FSNAME}"])>{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}'
+                  name: '{#FSNAME}: Disk space is low'
+                  event_name: '{#FSNAME}: Disk space is low (used > {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%)'
+                  priority: WARNING
+                  manual_close: 'YES'
+                  dependencies:
+                    - name: '{#FSNAME}: Disk space is critically low'
+                      expression: 'last(/Linux by Prom/vfs.fs.pused[node_exporter,"{#FSNAME}"])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}'
             - uuid: acb3d42ae23b48cbacd0e99c27697798
               name: '{#FSNAME}: Total space'
               type: DEPENDENT
@@ -1820,52 +1838,6 @@ zabbix_export:
                   value: storage
                 - tag: filesystem
                   value: '{#FSNAME}'
-          trigger_prototypes:
-            - uuid: d5687d7aa0484b389f0bd168d50ee1e6
-              expression: |
-                last(/Linux by Prom/vfs.fs.pused[node_exporter,"{#FSNAME}"])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
-                ((last(/Linux by Prom/vfs.fs.total[node_exporter,"{#FSNAME}"])-last(/Linux by Prom/vfs.fs.used[node_exporter,"{#FSNAME}"]))<{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or timeleft(/Linux by Prom/vfs.fs.pused[node_exporter,"{#FSNAME}"],1h,100)<1d)
-              name: '{#FSNAME}: Disk space is critically low'
-              event_name: '{#FSNAME}: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)'
-              opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
-              priority: AVERAGE
-              description: |
-                Two conditions should match:
-                1. The first condition - utilization of the space should be above `{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}`.
-                2. The second condition should be one of the following:
-                - the disk free space is less than `{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"}`;
-                - the disk will be full in less than 24 hours.
-              manual_close: 'YES'
-              tags:
-                - tag: scope
-                  value: availability
-                - tag: scope
-                  value: capacity
-            - uuid: 8f765148cfd64d5ebda93f39d0b20e36
-              expression: |
-                last(/Linux by Prom/vfs.fs.pused[node_exporter,"{#FSNAME}"])>{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and
-                ((last(/Linux by Prom/vfs.fs.total[node_exporter,"{#FSNAME}"])-last(/Linux by Prom/vfs.fs.used[node_exporter,"{#FSNAME}"]))<{$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"} or timeleft(/Linux by Prom/vfs.fs.pused[node_exporter,"{#FSNAME}"],1h,100)<1d)
-              name: '{#FSNAME}: Disk space is low'
-              event_name: '{#FSNAME}: Disk space is low (used > {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%)'
-              opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
-              priority: WARNING
-              description: |
-                Two conditions should match:
-                1. The first condition - utilization of the space should be above `{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}`.
-                2. The second condition should be one of the following:
-                - the disk free space is less than `{$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"}`;
-                - the disk will be full in less than 24 hours.
-              manual_close: 'YES'
-              dependencies:
-                - name: '{#FSNAME}: Disk space is critically low'
-                  expression: |
-                    last(/Linux by Prom/vfs.fs.pused[node_exporter,"{#FSNAME}"])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
-                    ((last(/Linux by Prom/vfs.fs.total[node_exporter,"{#FSNAME}"])-last(/Linux by Prom/vfs.fs.used[node_exporter,"{#FSNAME}"]))<{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or timeleft(/Linux by Prom/vfs.fs.pused[node_exporter,"{#FSNAME}"],1h,100)<1d)
-              tags:
-                - tag: scope
-                  value: availability
-                - tag: scope
-                  value: capacity
           graph_prototypes:
             - uuid: aa350a426fcd40af96cd15f778cdf62d
               name: '{#FSNAME}: Disk space usage'
@@ -1947,7 +1919,11 @@ zabbix_export:
         - macro: '{$SWAP.PFREE.MIN.WARN}'
           value: '50'
         - macro: '{$SYSTEM.FUZZYTIME.MAX}'
-          value: '60'
+          value: 60s
+          description: 'The upper threshold for difference of system time.'
+        - macro: '{$SYSTEM.FUZZYTIME.MIN}'
+          value: 10s
+          description: 'The lower threshold for difference of system time. Used in recovery expression to avoid trigger flapping.'
         - macro: '{$VFS.DEV.DEVNAME.MATCHES}'
           value: .+
           description: 'This macro is used in block devices discovery. Can be overridden on the host or linked template level.'
@@ -1960,12 +1936,6 @@ zabbix_export:
         - macro: '{$VFS.DEV.WRITE.AWAIT.WARN}'
           value: '20'
           description: 'Disk write average response time (in ms) before the trigger would fire.'
-        - macro: '{$VFS.FS.FREE.MIN.CRIT}'
-          value: 5G
-          description: 'The critical threshold of the filesystem utilization.'
-        - macro: '{$VFS.FS.FREE.MIN.WARN}'
-          value: 10G
-          description: 'The warning threshold of the filesystem utilization.'
         - macro: '{$VFS.FS.FSDEVICE.MATCHES}'
           value: ^.+$
           description: 'This macro is used in filesystems discovery. Can be overridden on the host or linked template level.'

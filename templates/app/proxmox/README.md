@@ -169,9 +169,9 @@ Please provide the necessary access levels for both the User and the Token:
 |Proxmox: VM [{#NODE.NAME}/{#QEMU.NAME} ({#QEMU.ID})]: Incoming data, rate|<p>Incoming data rate.</p>|Dependent item|proxmox.qemu.netin[{#QEMU.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.netin`</p></li><li>Change per second</li><li><p>Custom multiplier: `8`</p></li><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
 |Proxmox: VM [{#NODE.NAME}/{#QEMU.NAME} ({#QEMU.ID})]: Outgoing data, rate|<p>Outgoing data rate.</p>|Dependent item|proxmox.qemu.netout[{#QEMU.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.netout`</p></li><li>Change per second</li><li><p>Custom multiplier: `8`</p></li><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
 |Proxmox: VM [{#NODE.NAME}/{#QEMU.NAME} ({#QEMU.ID})]: CPU usage|<p>CPU load.</p>|Dependent item|proxmox.qemu.cpu[{#QEMU.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.cpu`</p></li><li><p>Custom multiplier: `100`</p></li><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
-|Proxmox: VM [{#NODE.NAME}/{#QEMU.NAME}]: Status|<p>Read VM status.</p>|HTTP agent|proxmox.qemu.status[{#QEMU.ID}]|
+|Proxmox: VM [{#NODE.NAME}/{#QEMU.NAME}]: Get data|<p>Get VM status data.</p>|HTTP agent|proxmox.qemu.get.data[{#QEMU.ID}]|
 |Proxmox: VM [{#NODE.NAME}/{#QEMU.NAME} ({#QEMU.ID})]: Uptime|<p>The system uptime expressed in the following format: "N days, hh:mm:ss".</p>|Dependent item|proxmox.qemu.uptime[{#QEMU.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.uptime`</p></li></ul>|
-|Proxmox: VM [{#NODE.NAME}/{#QEMU.NAME} ({#QEMU.ID})]: Status||Dependent item|proxmox.qemu.vmstatus[{#QEMU.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.status`</p></li></ul>|
+|Proxmox: VM [{#NODE.NAME}/{#QEMU.NAME} ({#QEMU.ID})]: Status|<p>Status of Virtual Machine.</p>|Dependent item|proxmox.qemu.vmstatus[{#QEMU.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.status`</p></li></ul>|
 
 ### Trigger prototypes for QEMU discovery
 
@@ -192,9 +192,9 @@ Please provide the necessary access levels for both the User and the Token:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Proxmox: LXC [{#LXC.NAME}/{#LXC.NAME}]: Status|<p>Read LXC status.</p>|HTTP agent|proxmox.lxc.status[{#LXC.ID}]|
+|Proxmox: LXC [{#NODE.NAME}/{#LXC.NAME}]: Get data|<p>Get LXC status data.</p>|HTTP agent|proxmox.lxc.get.data[{#LXC.ID}]|
 |Proxmox: LXC [{#NODE.NAME}/{#LXC.NAME} ({#LXC.ID})]: Uptime|<p>The system uptime expressed in the following format: "N days, hh:mm:ss".</p>|Dependent item|proxmox.lxc.uptime[{#LXC.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.uptime`</p></li></ul>|
-|Proxmox: LXC [{#NODE.NAME}/{#LXC.NAME} ({#LXC.ID})]: Status||Dependent item|proxmox.lxc.vmstatus[{#LXC.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.status`</p></li></ul>|
+|Proxmox: LXC [{#NODE.NAME}/{#LXC.NAME} ({#LXC.ID})]: Status|<p>Status of LXC container.</p>|Dependent item|proxmox.lxc.vmstatus[{#LXC.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.status`</p></li></ul>|
 |Proxmox: LXC [{#NODE.NAME}/{#LXC.NAME} ({#LXC.ID})]: Disk write, rate|<p>Disk write.</p>|Dependent item|proxmox.lxc.diskwrite[{#LXC.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.diskwrite`</p></li><li>Change per second</li><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
 |Proxmox: LXC [{#NODE.NAME}/{#LXC.NAME} ({#LXC.ID})]: Disk read, rate|<p>Disk read.</p>|Dependent item|proxmox.lxc.diskread[{#LXC.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.diskread`</p></li><li>Change per second</li><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
 |Proxmox: LXC [{#NODE.NAME}/{#LXC.NAME} ({#LXC.ID})]: Memory usage|<p>Used memory in bytes.</p>|Dependent item|proxmox.lxc.mem[{#LXC.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.mem`</p></li><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|

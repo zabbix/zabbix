@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-04-02 17:26+0300\n"
-"PO-Revision-Date: 2024-04-16 12:16+0000\n"
+"PO-Revision-Date: 2024-06-14 12:51+0000\n"
 "Last-Translator: Albert <albert.przybylski@aplitt.pl>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
@@ -4552,6 +4552,10 @@ msgstr "Utwórz typ mediów"
 msgid "Create new"
 msgstr "Utwórz nowy"
 
+#: jsLoader.php:363
+msgid "Create new report"
+msgstr ""
+
 #: app/views/administration.proxy.list.php:37
 msgid "Create proxy"
 msgstr "Utwórz proxy"
@@ -6960,6 +6964,10 @@ msgstr "Nie udało się zaktualizować właściwości strony pulpitu."
 msgid "Failed to update dashboard properties."
 msgstr "Nie udało się zaktualizować właściwości pulpitu."
 
+#: app/views/js/popup.dashboard.share.edit.js.php:86
+msgid "Failed to update dashboard sharing."
+msgstr ""
+
 #: jsLoader.php:142
 msgid "Failed to update widget properties."
 msgstr "Nie udało się zaktualizować właściwości widżetu."
@@ -8086,6 +8094,10 @@ msgstr "Grupa hostów \"%1$s\" jest wewnętrzna i nie może zostać usunięta."
 msgid "Host group elements"
 msgstr "Elementy grupy hostów"
 
+#: jsLoader.php:287
+msgid "Host group is not selected."
+msgstr ""
+
 #: include/views/monitoring.sysmap.edit.php:165
 msgid "Host group label type"
 msgstr "Typ etykiety grupy hostów"
@@ -8159,6 +8171,10 @@ msgstr "Inwentarz hosta"
 #: hostinventoriesoverview.php:26 hostinventoriesoverview.php:146
 msgid "Host inventory overview"
 msgstr "Przegląd inwentarza hosta"
+
+#: jsLoader.php:284
+msgid "Host is not selected."
+msgstr ""
 
 #: include/views/monitoring.sysmap.edit.php:180
 msgid "Host label type"
@@ -11362,6 +11378,10 @@ msgstr "Lokalizacja etykiety elementu mapy"
 msgid "Map element label type"
 msgstr "Typ elementu etykiety mapy"
 
+#: jsLoader.php:285
+msgid "Map is not selected."
+msgstr ""
+
 #: sysmap.php:128
 msgid "Map is updated! Return to map list?"
 msgstr "Mapa zaktualizowana! Wrócić do listy map?"
@@ -11655,11 +11675,11 @@ msgstr "Pamięć użyta przez proces w bajtach. Zwraca liczbę całkowitą"
 
 #: app/views/administration.mediatype.edit.php:256
 msgid "Menu entry URL"
-msgstr "UWL wejścia do menu"
+msgstr "URL elementu menu"
 
 #: app/views/administration.mediatype.edit.php:247
 msgid "Menu entry name"
-msgstr "Nazwa wejścia do menu"
+msgstr "Nazwa elementu menu"
 
 #: app/views/administration.script.edit.php:107
 msgid "Menu path"
@@ -15323,6 +15343,12 @@ msgstr "Wynik jest NIEPRAWDZIWY"
 msgid "Result is TRUE"
 msgstr "Wynik jest PRAWDZIWY"
 
+#: app/controllers/CControllerPopupItemTestSend.php:433
+#: app/controllers/CControllerPopupItemTestSend.php:461
+#, c-format
+msgid "Result is truncated due to its size (%1$s)."
+msgstr ""
+
 #: app/views/popup.testtriggerexpr.php:30
 msgid "Result type"
 msgstr "Typ wyniku"
@@ -18234,6 +18260,10 @@ msgstr "Wyzwalacz w stanie \"nieznany\""
 msgid "Trigger in template \"%1$s\" has dependency with trigger in template \"%2$s\"."
 msgstr "Wyzwalacz w szablonie \"%1$s\" jest zależny od wyzwalacza w szablonie \"%2$s\"."
 
+#: jsLoader.php:286
+msgid "Trigger is not selected."
+msgstr ""
+
 #: include/views/monitoring.sysmap.edit.php:195
 msgid "Trigger label type"
 msgstr "Typ etykiety wyzwalacza"
@@ -19888,6 +19918,10 @@ msgstr "Podgląd"
 msgid "View as"
 msgstr "Podgląd jako"
 
+#: jsLoader.php:397
+msgid "View related reports"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1234
 msgid "Virtual space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr "Rozmiar przestrzeni wirtualnej w bajtach lub procentach ogółem. Zwraca liczbę całkowitą dla bajtów; liczbę zmiennoprzecinkową dla procentów"
@@ -20428,6 +20462,10 @@ msgstr "Nie masz uprawnień do dostępu do tej strony."
 #: include/func.inc.php:1724
 msgid "You must login to view this page."
 msgstr "Należy się zalogować, aby zobaczyć tą stronę."
+
+#: jsLoader.php:282
+msgid "You need to have at least one image uploaded to create map element. Images can be uploaded in Administration->General->Images section."
+msgstr ""
 
 #: include/classes/db/DB.php:135
 msgid "Your database is not working properly. Please wait a few minutes and try to repeat this action. If the problem still persists, please contact system administrator. The problem might be caused by long running transaction or row level lock accomplished by your database management system."
@@ -22148,6 +22186,10 @@ msgstr "prawidłowy"
 #: app/controllers/CControllerPopupTriggerExpr.php:924
 msgid "right() - Returns the rightmost count characters"
 msgstr "right() - Zwraca określoną liczę znaków z prawej strony ciągu"
+
+#: jsLoader.php:199
+msgid "root"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:937
 msgid "round() - Rounds a value to decimal places"

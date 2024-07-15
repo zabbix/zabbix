@@ -92,7 +92,7 @@ endif
 CGO_CFLAGS += $(CFLAGS)
 CGO_LDFLAGS += $(LDFLAGS)
 
-PKG=zabbix.com/pkg/version
+PKG=golang.zabbix.com/agent2/pkg/version
 
 GOLDFLAGS = -X $(PKG).compileOs=windows
 GOLDFLAGS += -X $(PKG).compileArch=$(GOARCH)

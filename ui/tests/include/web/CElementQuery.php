@@ -458,6 +458,17 @@ class CElementQuery implements IWaitable {
 	/**
 	 * @inheritdoc
 	 */
+	public function getEnabledCondition() {
+		$target = $this;
+
+		return function () use ($target) {
+			return $target->one(false)->isEnabled();
+		};
+	}
+
+	/**
+	 * @inheritdoc
+	 */
 	public function getReadyCondition() {
 		$driver = static::getDriver();
 

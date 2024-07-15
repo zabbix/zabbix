@@ -530,6 +530,17 @@ class CElement extends CBaseElement implements IWaitable {
 	/**
 	 * @inheritdoc
 	 */
+	public function getEnabledCondition() {
+		$target = $this;
+
+		return function () use ($target) {
+			return $target->isEnabled();
+		};
+	}
+
+	/**
+	 * @inheritdoc
+	 */
 	public function click($force = false) {
 		try {
 			return parent::click();
@@ -772,6 +783,8 @@ class CElement extends CBaseElement implements IWaitable {
 	 */
 	public function scrollIntoView() {
 		CElementQuery::getDriver()->executeScript('arguments[0].scrollIntoView({behavior:\'instant\',block:\'end\',inline:\'nearest\'});', [$this]);
+
+		return $this;
 	}
 
 	/**

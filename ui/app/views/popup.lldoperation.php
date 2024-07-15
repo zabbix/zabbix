@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 $output = [
@@ -232,7 +233,7 @@ $operations_popup_form_list
 			'object_name' => 'templates',
 			'multiselect_id' => 'optemplate-field',
 			'data' => $field_values['optemplate'],
-			'disabled' => (bool) $options['templated'],
+			'readonly' => (bool) $options['templated'],
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'templates',
