@@ -39,7 +39,7 @@ class CWidgetItemNavigator extends CWidget {
 	/**
 	 * CSRF token for navigation.tree.toggle action.
 	 *
-	 * @type {string}
+	 * @type {string|null}
 	 */
 	#csrf_token = null;
 
