@@ -1,1 +1,1 @@
-..F....... [ZBX-24691] fixed snmpv3 authentication protocol and privacy protocol were not sent when testing item (gcalenko)
+..F....... [ZBX-24691] fixed issue with SNMPv3 authentication protocol and privacy protocol values not getting sent to server for item testing (gcalenko)
