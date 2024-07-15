@@ -288,12 +288,11 @@ static void	pg_get_proxy_group_stats(zbx_pg_service_t *pgs, zbx_ipc_client_t *cl
  *                                                                            *
  * Parameter: pgs     - [IN] proxy group service                              *
  *            client  - [IN] IPC client                                       *
- *            message - [IN] IPC message                                      *
  *                                                                            *
  * Comments: skips standalone proxies                                         *
  *                                                                            *
  ******************************************************************************/
-static void	pg_get_all_pgroup_rtdata(zbx_pg_service_t *pgs, zbx_ipc_client_t *client, zbx_ipc_message_t *message)
+static void	pg_get_all_pgroup_rtdata(zbx_pg_service_t *pgs, zbx_ipc_client_t *client)
 {
 #define PROXY_GROUP_LEN	(sizeof(zbx_uint64_t) + 3 * sizeof(int))
 	int			num_pgroups = 0;
@@ -339,7 +338,7 @@ static void	pg_get_all_pgroup_rtdata(zbx_pg_service_t *pgs, zbx_ipc_client_t *cl
 	zbx_ipc_client_send(client, ZBX_IPC_PGM_ALL_PGROUP_RTDATA, data, data_len);
 
 	zbx_free(data);
-out:
+
 	pg_cache_unlock(pgs->cache);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
