@@ -651,4 +651,53 @@ out:
   func: 'func(param)'
   param: '(param)'
   return: SUCCEED
+---
+test case: 'Success: var: {{2}.func(param)}'
+in:
+  expression: 'var: {{2}.func(param)}'
+  token_search: ZBX_TOKEN_SEARCH_VAR_MACRO
+out:
+  token: '{{2}.func(param)}'
+  token_type: ZBX_TOKEN_VAR_FUNC_MACRO
+  macro: '{2}'
+  func: 'func(param)'
+  param: '(param)'
+  return: SUCCEED
+---
+test case: 'Success: var: {{$2}.func(param)}'
+in:
+  expression: 'var: {{$2}.func(param)}'
+  token_search: ZBX_TOKEN_SEARCH_VAR_MACRO
+out:
+  token: '{{$2}.func(param)}'
+  token_type: ZBX_TOKEN_VAR_FUNC_MACRO
+  macro: '{$2}'
+  func: 'func(param)'
+  param: '(param)'
+  return: SUCCEED
+---
+test case: 'Success: var: {{#2}.func(param)}'
+in:
+  expression: 'var: {{#2}.func(param)}'
+  token_search: ZBX_TOKEN_SEARCH_VAR_MACRO
+out:
+  token: '{{#2}.func(param)}'
+  token_type: ZBX_TOKEN_VAR_FUNC_MACRO
+  macro: '{#2}'
+  func: 'func(param)'
+  param: '(param)'
+  return: SUCCEED
+---
+test case: 'Success: var: {{?2}.func(param)}'
+in:
+  expression: 'var: {{?2}.func(param)}'
+  token_search: ZBX_TOKEN_SEARCH_VAR_MACRO
+out:
+  token: '{{?2}.func(param)}'
+  token_type: ZBX_TOKEN_VAR_FUNC_MACRO
+  macro: '{?2}'
+  func: 'func(param)'
+  param: '(param)'
+  return: SUCCEED
+
 ...

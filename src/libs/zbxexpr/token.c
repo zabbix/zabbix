@@ -772,6 +772,7 @@ int	zbx_token_find(const char *expression, int pos, zbx_token_t *token, zbx_toke
 		if ('\0' == ptr[1])
 			return FAIL;
 
+		/* ZBX_TOKEN_SEARCH_VAR_MACRO will never return other macro types (except var func macro) */
 		if (0 != (token_search & ZBX_TOKEN_SEARCH_VAR_MACRO) && '{' != ptr[1])
 		{
 			if (SUCCEED == (ret = token_parse_var_macro(expression, ptr, token)))
@@ -890,8 +891,17 @@ int	zbx_token_parse_nested_macro(const char *expression, const char *macro, zbx_
 {
 	const char	*ptr;
 	int		token_type = ZBX_TOKEN_UNKNOWN;
+	zbx_token_t	inner_token;
 
-	if ('#' == macro[2])
+	if (0 != (token_search & ZBX_TOKEN_SEARCH_VAR_MACRO))
+	{
+		if (SUCCEED == token_parse_var_macro(expression, macro + 1, &inner_token))
+		{
+			token_type = ZBX_TOKEN_VAR_FUNC_MACRO;
+			ptr = expression + inner_token.loc.r;
+		}
+	}
+	else if ('#' == macro[2])
 	{
 		/* find the end of the nested macro by validating its name until the closing bracket '}' */
 		for (ptr = macro + 3; '}' != *ptr; ptr++)
@@ -934,21 +944,10 @@ int	zbx_token_parse_nested_macro(const char *expression, const char *macro, zbx_
 	}
 	else
 	{
-		zbx_token_t	inner_token;
+		if (SUCCEED != token_parse_macro(expression, macro + 1, &inner_token))
+			return FAIL;
 
-		if (0 != (token_search & ZBX_TOKEN_SEARCH_VAR_MACRO))
-		{
-			if (SUCCEED == token_parse_var_macro(expression, macro + 1, &inner_token))
-				token_type = ZBX_TOKEN_VAR_FUNC_MACRO;
-		}
-
-		if (ZBX_TOKEN_UNKNOWN == token_type)
-		{
-			if (SUCCEED != token_parse_macro(expression, macro + 1, &inner_token))
-				return FAIL;
-
-			token_type = ZBX_TOKEN_FUNC_MACRO;
-		}
+		token_type = ZBX_TOKEN_FUNC_MACRO;
 
 		ptr = expression + inner_token.loc.r;
 	}
