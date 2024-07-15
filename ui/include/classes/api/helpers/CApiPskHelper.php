@@ -43,9 +43,11 @@ class CApiPskHelper {
 		}
 
 		$check_psk_identities = array_keys($psk_pair_index);
+		$exclude_autoregid = array_unique(array_column($psk_pairs, 'autoreg_tlsid'));
 		$autoreg = DBfetch(DBselect(
 			'SELECT tls_psk_identity,tls_psk FROM config_autoreg_tls'.
-			' WHERE '.dbConditionString('tls_psk_identity', $check_psk_identities)
+			' WHERE '.dbConditionId('autoreg_tlsid', $exclude_autoregid, true).
+				' AND '.dbConditionString('tls_psk_identity', $check_psk_identities)
 		));
 
 		if ($autoreg) {
