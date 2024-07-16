@@ -1039,7 +1039,7 @@ int	zbx_regexp_repl(const char *string, const char *pattern, const char *repl_te
 
 	zbx_free(*out);
 
-	if ('\0' == *pattern || '\0' == *repl_template || '\0' == *string)
+	if ('\0' == *pattern || '\0' == *repl_template)
 	{
 		*out = repleaced;
 		return SUCCEED;
@@ -1109,9 +1109,21 @@ int	zbx_regexp_repl(const char *string, const char *pattern, const char *repl_te
 		{
 			repl = regexp_sub_replace(empty, repl_template, match, ZBX_REGEXP_GROUPS_MAX, 0);
 		}
-		zbx_replace_string(&repleaced, (size_t)match[0].rm_so, &endof, repl);
+		if (NULL != repl)
+		{
+			if ('\0' == *repleaced)
+			{
+				zbx_free(repleaced);
+				repleaced = repl;
+			}
+			else
+			{
+				zbx_replace_string(&repleaced, (size_t)match[0].rm_so, &endof, repl);
+				zbx_free(repl);
+			}
+		}
 		zbx_free(empty);
-		zbx_free(repl);
+
 	}
 	zbx_vector_regrepl_clear_ext(&matches, (zbx_regrepl_free_func_t)zbx_ptr_free);
 	zbx_vector_regrepl_destroy(&matches);
