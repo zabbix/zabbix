@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-06-19 18:12+0000\n"
-"Last-Translator: Felix Solcher <felix.solcher@proton.me>\n"
+"PO-Revision-Date: 2024-07-05 14:22+0000\n"
+"Last-Translator: Dirk Franz <dirk.franz@dbi-services.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
@@ -86,12 +86,12 @@ msgstr "%1$d Übereinstimmungen für %2$s gefunden"
 #: widgets/hostnavigator/Widget.php:39
 #, c-format
 msgid "%1$d of %1$d+ hosts are shown"
-msgstr ""
+msgstr "%1$d von %1$d+ Hosts werden angezeigt"
 
 #: widgets/itemnavigator/Widget.php:39
 #, c-format
 msgid "%1$d of %1$d+ items are shown"
-msgstr ""
+msgstr "%1$d von %1$d+ Datenpunkten werden angezeigt"
 
 #: widgets/problems/actions/WidgetView.php:78
 #, c-format
@@ -208,7 +208,7 @@ msgstr ""
 #: app/views/administration.miscconfig.edit.php:130
 #, c-format
 msgid "%1$s or %2$s - prevents the page from being displayed in a frame, regardless of the site attempting to do so"
-msgstr ""
+msgstr "%1$s oder %2$s - verhindert, dass die Seite in einem Frame angezeigt wird, unabhängig davon, welche Site dies versucht."
 
 #: jsLoader.php:341
 #, c-format
@@ -289,7 +289,7 @@ msgstr "php-Klasse %1$s muss das Modul %2$s unter %3$s erweitern."
 #: app/controllers/CControllerMediatypeEnable.php:105
 #, c-format
 msgid "%1$s: %2$s"
-msgstr ""
+msgstr "%1$s: %2$s"
 
 #: include/classes/graph/CSvgGraph.php:1418
 #, c-format
@@ -338,11 +338,11 @@ msgstr "(erstellt durch Hosterkennung)"
 #: include/views/configuration.item.edit.php:648
 #: include/views/configuration.item.prototype.edit.php:619
 msgid "(legacy) to retrieve a single value synchronously, optionally combined with other values"
-msgstr ""
+msgstr "(Legacy) um einen einzelnen Wert synchron abzurufen, optional kombiniert mit anderen Werten"
 
 #: include/views/configuration.host.discovery.edit.php:553
 msgid "(legacy) to retrieve a subtree in JSON"
-msgstr ""
+msgstr "(Legacy) um einen Teilbaum in JSON abzurufen"
 
 #: app/partials/configuration.host.edit.html.php:133
 msgid "(linked by host discovery)"
@@ -453,7 +453,7 @@ msgstr "API Zugriff"
 
 #: app/views/mfa.edit.php:102
 msgid "API hostname"
-msgstr ""
+msgstr "API-Hostname"
 
 #: app/controllers/CControllerPopupGeneric.php:422
 #: app/views/administration.userrole.edit.php:310
@@ -538,7 +538,7 @@ msgstr "Zugriff auf die API"
 #: app/views/administration.user.edit.php:525
 #: app/views/administration.userrole.edit.php:88
 msgid "Access to UI elements"
-msgstr "Zugriff auf UI ELemente"
+msgstr "Zugriff auf UI-Elemente"
 
 #: app/views/administration.user.edit.php:702
 #: app/views/administration.userrole.edit.php:345
@@ -683,11 +683,10 @@ msgid "Action class %1$s must extend %2$s class."
 msgstr "Aktionsklasse %1$s muss die Klasse %2$s erweitern."
 
 #: app/controllers/CControllerActionDelete.php:79
-#, fuzzy
 msgid "Action deleted"
 msgid_plural "Actions deleted"
 msgstr[0] "Aktion gelöscht"
-msgstr[1] "Aktion gelöscht"
+msgstr[1] "Aktionen gelöscht"
 
 #: app/controllers/CControllerActionDisable.php:84
 msgid "Action disabled"
@@ -950,11 +949,15 @@ msgstr "Hinzufügen (Begrenzung für Nachrichtentyp erreicht)"
 
 #: widgets/tophosts/views/widget.edit.php:63
 msgid "Add a column"
-msgstr ""
+msgstr "Fügen Sie eine Spalte hinzu"
 
 #: jsLoader.php:156
 msgid "Add a new widget"
 msgstr "Neues Widget hinzufügen"
+
+#: widgets/navtree/Widget.php:34
+msgid "Add child element"
+msgstr ""
 
 #: widgets/navtree/Widget.php:39
 msgid "Add child elements"
@@ -982,13 +985,18 @@ msgstr "Host hinzufügen"
 
 #: include/actions.inc.php:653 include/actions.inc.php:871
 msgid "Add host tags"
-msgstr ""
+msgstr "Host-Tags hinzufügen"
 
 #: app/partials/trigger.edit.dependencies.tab.php:65
 #: app/partials/trigger.edit.dependencies.tab.php:91
 #: app/views/trigger.massupdate.php:155
 msgid "Add host trigger"
-msgstr "Host-auslöser hinzufügen"
+msgstr "Host-Auslöser hinzufügen"
+
+#: widgets/piechart/includes/CWidgetFieldDataSetView.php:260
+#: widgets/svggraph/includes/CWidgetFieldDataSetView.php:263
+msgid "Add item"
+msgstr ""
 
 #: app/partials/massupdate.macros.tab.php:96
 #: app/partials/massupdate.valuemaps.tab.php:38
@@ -1104,7 +1112,7 @@ msgstr "Adresse"
 #: app/controllers/CControllerProxyUpdate.php:75
 #: app/views/popup.proxy.edit.php:90
 msgid "Address for active agents"
-msgstr ""
+msgstr "Adresse für aktive Agenten"
 
 #: include/hosts.inc.php:63 include/users.inc.php:53
 msgid "Admin"
@@ -1136,11 +1144,11 @@ msgstr "Erweiterte Optionen"
 #: include/views/configuration.host.discovery.list.php:157
 #: include/views/configuration.host.discovery.list.php:172
 msgid "After"
-msgstr ""
+msgstr "Nach"
 
 #: app/views/js/mfa.edit.js.php:168
 msgid "After this change, users who have already enrolled in this MFA method will have to complete the enrollment process again because TOTP secrets will be reset."
-msgstr ""
+msgstr "Nach dieser Änderung müssen Benutzer, die sich bereits für diese MFA-Methode registriert haben, den Registrierungsprozess erneut abschließen, da die TOTP-Geheimnisse zurückgesetzt werden."
 
 #: widgets/gauge/includes/WidgetForm.php:266
 #: widgets/item/includes/WidgetForm.php:210
@@ -1163,11 +1171,11 @@ msgstr "Agent"
 
 #: widgets/hostavail/views/widget.view.php:82
 msgid "Agent (active)"
-msgstr ""
+msgstr "Agent (aktiv)"
 
 #: widgets/hostavail/views/widget.view.php:83
 msgid "Agent (passive)"
-msgstr ""
+msgstr "Agent (passiv)"
 
 #: include/classes/data/CItemData.php:911
 msgid "Agent availability check. Returns nothing - unavailable; 1 - available"
@@ -1203,11 +1211,11 @@ msgstr "Zusammenfassende Funktionen"
 
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:283
 msgid "Aggregates each item in the data set."
-msgstr ""
+msgstr "Aggregiert jedes Element im Datensatz."
 
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:305
 msgid "Aggregates the whole data set."
-msgstr ""
+msgstr "Aggregiert den gesamten Datensatz."
 
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:282
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:384
@@ -1435,7 +1443,7 @@ msgstr "Und/Oder"
 
 #: widgets/gauge/includes/WidgetForm.php:170
 msgid "Angle"
-msgstr ""
+msgstr "Winkel"
 
 #: app/views/popup.sla.edit.php:79 include/classes/helpers/CSlaHelper.php:43
 msgid "Annually"
@@ -1443,7 +1451,7 @@ msgstr "Jährlich"
 
 #: jsLoader.php:201
 msgid "Another widget is used as data source."
-msgstr ""
+msgstr "Ein anderes Widget wird als Datenquelle verwendet."
 
 #: app/partials/monitoring.host.filter.php:134 app/views/action.list.php:95
 #: app/views/administration.proxy.list.php:53
@@ -1468,7 +1476,7 @@ msgstr "Jeden"
 #: app/views/js/trigger.edit.js.php:886
 #: app/views/js/trigger.massupdate.js.php:67
 msgid "Any changes made in the current form will be lost."
-msgstr ""
+msgstr "Alle im aktuellen Formular vorgenommenen Änderungen gehen verloren."
 
 #: app/views/js/administration.regex.edit.js.php:164
 #: include/classes/helpers/CRegexHelper.php:27
@@ -1477,11 +1485,11 @@ msgstr "Beliebige Zeichenfolge enthalten"
 
 #: app/views/js/popup.import.js.php:109
 msgid "Any existing host entities not present in the import file will be deleted. Click OK to proceed."
-msgstr ""
+msgstr "Alle vorhandenen Host-Entitäten, die nicht in der Importdatei vorhanden sind, werden gelöscht. Klicken Sie auf „OK“, um fortzufahren."
 
 #: app/views/js/popup.import.js.php:106
 msgid "Any existing template entities not present in the import file will be deleted. Click OK to proceed."
-msgstr ""
+msgstr "Alle vorhandenen Vorlagenentitäten, die in der Importdatei nicht vorhanden sind, werden gelöscht. Klicken Sie auf „OK“, um fortzufahren."
 
 # Achtung: Hier ist NICHT die Zabbix "item application" gemeint.
 #: include/classes/core/CJsonRpc.php:225
@@ -1530,7 +1538,7 @@ msgstr "April"
 
 #: widgets/gauge/includes/WidgetForm.php:246
 msgid "Arc background"
-msgstr ""
+msgstr "Arc Hintergrund"
 
 #: widgets/gauge/includes/WidgetForm.php:305
 msgid "Arc size"
@@ -1581,21 +1589,21 @@ msgstr "Inventarnummer"
 
 #: app/partials/configuration.host.edit.html.php:331
 msgid "Assigned proxy"
-msgstr ""
+msgstr "Zugewiesener Proxy"
 
 #: include/classes/helpers/CMaintenanceHelper.php:86
 #, c-format
 msgid "At %1$s %2$s of every %3$s week"
 msgid_plural "At %1$s %2$s of every %3$s weeks"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Um %1$s:%2$s jede %3$s Woche"
+msgstr[1] "Um %1$s:%2$s jede %3$s Woche"
 
 #: include/classes/helpers/CMaintenanceHelper.php:71
 #, c-format
 msgid "At %1$s every %2$s day"
 msgid_plural "At %1$s every %2$s days"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Um %1$s jeden %2$s Tag"
+msgstr[1] "Um %1$s jeden %2$s Tag"
 
 #: include/classes/helpers/CMaintenanceHelper.php:114
 #, c-format
@@ -1617,7 +1625,7 @@ msgstr "Es muss mindestens ein LDAP-Server vorhanden sein."
 
 #: include/classes/api/services/CAuthentication.php:234
 msgid "At least one MFA method must exist."
-msgstr ""
+msgstr "Mindestens eine MFA Methode muss existieren."
 
 #: app/views/administration.userrole.edit.php:137
 msgid "At least one UI element must be checked."
@@ -1650,6 +1658,10 @@ msgstr "Mindestens ein Wochentag oder Tag des Monats muss angegeben werden."
 msgid "At least one host group or host must be selected."
 msgstr "Mindestens eine Host-Gruppe oder ein Host muss ausgewählt sein."
 
+#: include/classes/setup/CFrontendSetup.php:252
+msgid "At least one of MySQL or PostgreSQL should be supported."
+msgstr ""
+
 #: include/classes/setup/CFrontendSetup.php:241
 msgid "At least one of MySQL, PostgreSQL or Oracle should be supported."
 msgstr "Mindestens eine der Datenbanken MySQL, PostgreSQL oder Oracle sollte unterstützt sein."
@@ -1669,7 +1681,7 @@ msgstr "Mindestens ein Parameter „%1$s“ oder „%2$s“ muss aktiviert sein.
 
 #: widgets/gauge/views/widget.edit.php:50
 msgid "At least one parameter must be enabled."
-msgstr ""
+msgstr "Mindestens ein Parameter muss ausgewählt sein."
 
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:283
 msgid "At least one update operation or message is mandatory"
@@ -1896,6 +1908,10 @@ msgstr "Durchschnittliche Anzahl ausstehender Schreibanforderungen an die virtue
 msgid "Avoid easy-to-guess passwords"
 msgstr "Vermeiden Sie leicht zu erratende Passwörter"
 
+#: jsLoader.php:172
+msgid "Awaiting data"
+msgstr ""
+
 #: widgets/svggraph/views/widget.edit.php:51
 msgid "Axes"
 msgstr "Achsen"
@@ -2085,7 +2101,7 @@ msgstr "In den Vordergrund"
 #: app/views/administration.timeouts.edit.php:130
 #: app/views/popup.proxy.edit.php:342 include/items.inc.php:99
 msgid "Browser"
-msgstr ""
+msgstr "Browser"
 
 #: include/locales.inc.php:35
 msgid "Bulgarian (bg_BG)"
@@ -2098,7 +2114,7 @@ msgstr "Nach Host"
 #: app/partials/monitoring.problem.filter.php:154
 #: widgets/problems/includes/WidgetForm.php:137
 msgid "By me"
-msgstr ""
+msgstr "Von mir"
 
 #: report2.php:192
 msgid "By trigger template"
@@ -2154,15 +2170,15 @@ msgstr "CRLF"
 
 #: tests/selenium/modules/module_number_7/Module.php:17
 msgid "CSRF test"
-msgstr ""
+msgstr "CSRF-Test"
 
 #: tests/selenium/modules/module_number_7/views/csrf.form.view.php:25
 msgid "CSRF token test"
-msgstr ""
+msgstr "CSRF-Token-Test"
 
 #: tests/selenium/modules/module_number_7/actions/CsrfFormUpdate.php:35
 msgid "CSRF token validation succeeded."
-msgstr ""
+msgstr "Die Validierung des CSRF-Tokens erfolgreich."
 
 #: include/items.inc.php:1554
 msgid "CSV to JSON"
@@ -2322,7 +2338,7 @@ msgstr "Diagrammprototyp \"%1$s\" darf nicht mehr als einen Datenpunkt vom Typ \
 
 #: widgets/piechart/includes/CWidgetFieldDataSet.php:168
 msgid "Cannot add more than one item with type \"Total\" to the chart."
-msgstr ""
+msgstr "Dem Diagramm kann nicht mehr als ein Element vom Typ „Total“ hinzugefügt werden."
 
 #: sysmaps.php:219
 msgid "Cannot add network map"
@@ -2336,7 +2352,7 @@ msgstr "Kann Proxy nicht hinzufügen"
 #: app/controllers/CControllerProxyGroupCreate.php:42
 #: app/controllers/CControllerProxyGroupCreate.php:74
 msgid "Cannot add proxy group"
-msgstr ""
+msgstr "Proxy Gruppe kann nicht hinzugefügt werden"
 
 #: app/controllers/CControllerRegExCreate.php:41
 #: app/controllers/CControllerRegExCreate.php:72
@@ -2435,7 +2451,7 @@ msgstr "Der Benutzertyp der eigenen Rolle kann nicht geändert werden."
 
 #: httpconf.php:190 httpconf.php:406 items.php:687 items.php:723
 msgid "Cannot clear history and trends"
-msgstr ""
+msgstr "Historie und Trends können nicht gelöscht werden"
 
 #: include/classes/api/services/CDiscoveryRule.php:3834
 msgid "Cannot clone graph prototypes."
@@ -2518,12 +2534,12 @@ msgstr[1] "Kann Auslöser nicht kopieren"
 #: include/classes/helpers/CTriggerGeneralHelper.php:196
 #, c-format
 msgid "Cannot copy trigger \"%1$s\" without the trigger \"%2$s\", on which it depends, to the host \"%3$s\"."
-msgstr ""
+msgstr "Der Auslöser \"%1$s\" kann nicht ohne den Auslöser \"%2$s\", von dem er abhängt, auf den Host \"%3$s\" kopiert werden."
 
 #: include/classes/helpers/CTriggerGeneralHelper.php:197
 #, c-format
 msgid "Cannot copy trigger \"%1$s\" without the trigger \"%2$s\", on which it depends, to the template \"%3$s\"."
-msgstr ""
+msgstr "Der Auslöser \"%1$s\" kann nicht ohne den Auslöser \"%2$s\", von dem er abhängt, auf die Vorlage \"%3$s\" kopiert werden."
 
 #: include/classes/helpers/CTriggerHelper.php:76
 #, c-format
@@ -2533,7 +2549,7 @@ msgstr "Auslöser \"%1$s\" kann nicht kopiert werden, da er mehrere Hosts im Aus
 #: include/classes/helpers/CTriggerHelper.php:75
 #, c-format
 msgid "Cannot copy trigger \"%1$s\", because it has multiple templates in the expression."
-msgstr ""
+msgstr "Auslöser \"%1$s\" kann nicht kopiert werden, da er mehrere Vorlagen im Ausdruck enthält."
 
 #: app/controllers/CControllerSlaCreate.php:69
 #: app/controllers/CControllerSlaCreate.php:127
@@ -2885,18 +2901,16 @@ msgid "Cannot delete templated web scenario \"%1$s\"."
 msgstr "Kann vorlagenbasiertes Web-Szenario \"%1$s\" nicht löschen."
 
 #: app/controllers/CControllerTriggerDelete.php:70
-#, fuzzy
 msgid "Cannot delete trigger"
 msgid_plural "Cannot delete triggers"
 msgstr[0] "Kann Auslöser nicht löschen"
 msgstr[1] "Kann Auslöser nicht löschen"
 
 #: app/controllers/CControllerTriggerPrototypeDelete.php:72
-#, fuzzy
 msgid "Cannot delete trigger prototype"
 msgid_plural "Cannot delete trigger prototypes"
 msgstr[0] "Kann Auslöserprototyp nicht löschen"
-msgstr[1] "Kann Auslöserprototyp nicht löschen"
+msgstr[1] "Kann Auslöserprototypen nicht löschen"
 
 #: app/controllers/CControllerUserDelete.php:59
 msgid "Cannot delete user"
@@ -3657,7 +3671,7 @@ msgstr "Es können keine doppelten Vorlagen-IDs für die Verknüpfung: %1$s übe
 
 #: jsLoader.php:136
 msgid "Cannot paste inaccessible widget."
-msgstr ""
+msgstr "Unerreichbares Widget kann nicht eingefügt werden."
 
 #: include/classes/db/DB.php:856
 #, c-format
@@ -4156,7 +4170,6 @@ msgstr "Vorlagengruppe kann nicht aktualisiert werden"
 #: app/controllers/CControllerTriggerMassupdate.php:212
 #: app/controllers/CControllerTriggerUpdate.php:58
 #: app/controllers/CControllerTriggerUpdate.php:155
-#, fuzzy
 msgid "Cannot update trigger"
 msgid_plural "Cannot update triggers"
 msgstr[0] "Kann Auslöser nicht ändern"
@@ -5435,6 +5448,10 @@ msgstr "Neuer Medientyp"
 #: app/views/popup.import.php:143 jsLoader.php:349
 msgid "Create new"
 msgstr "Erstelle neues"
+
+#: jsLoader.php:372
+msgid "Create new report"
+msgstr ""
 
 #: app/views/administration.proxy.list.php:239
 msgid "Create proxy"
@@ -9574,6 +9591,10 @@ msgstr[1] "Hostgruppe gelöscht"
 msgid "Host group elements"
 msgstr "Elemente der Hostgruppe"
 
+#: jsLoader.php:292
+msgid "Host group is not selected."
+msgstr ""
+
 #: include/views/monitoring.sysmap.edit.php:168
 msgid "Host group label type"
 msgstr "Beschriftung Hostgruppe"
@@ -9652,6 +9673,10 @@ msgstr "Hostinventar"
 #: hostinventoriesoverview.php:26 hostinventoriesoverview.php:146
 msgid "Host inventory overview"
 msgstr "Überblick Hostinventar"
+
+#: jsLoader.php:289
+msgid "Host is not selected."
+msgstr ""
 
 #: include/views/monitoring.sysmap.edit.php:183
 msgid "Host label type"
@@ -10370,13 +10395,13 @@ msgstr "Unerreichbare Benutzergruppe"
 
 #: jsLoader.php:153
 msgid "Inaccessible widget"
-msgstr ""
+msgstr "Unerreichbares Widget"
 
 #: app/controllers/CControllerDashboardWidgetCheck.php:53
 #: app/controllers/CControllerDashboardWidgetEdit.php:58
 #: include/classes/helpers/CDashboardHelper.php:596
 msgid "Inaccessible widget type."
-msgstr ""
+msgstr "Unerreichbarer Widgettyp."
 
 #: jsLoader.php:144
 msgid "Inaccessible widgets were not copied."
@@ -12977,6 +13002,10 @@ msgstr "Ort der Beschriftung des Tafel-Elements"
 msgid "Map element label type"
 msgstr "Tafel-Element Beschriftungstyp"
 
+#: jsLoader.php:290
+msgid "Map is not selected."
+msgstr ""
+
 #: sysmap.php:128
 msgid "Map is updated! Return to map list?"
 msgstr "Tafel ist aktualisiert! Zur Tafel-Liste zurück gehen?"
@@ -13377,7 +13406,7 @@ msgstr "Menüeintrag Name"
 
 #: app/partials/trigger.edit.trigger.tab.php:269
 msgid "Menu entry name is used as a label for the trigger URL in the event context menu."
-msgstr ""
+msgstr "Der Name des Menüeintrags wird als Bezeichnung für die Auslöser-URL im Kontextmenü des Ereignisses verwendet."
 
 #: app/views/administration.script.edit.php:90
 msgid "Menu path"
@@ -14209,11 +14238,11 @@ msgstr "Neue Vorlagengruppe"
 
 #: app/views/trigger.edit.php:144
 msgid "New trigger"
-msgstr ""
+msgstr "Neuer Auslöser"
 
 #: app/views/trigger.prototype.edit.php:144
 msgid "New trigger prototype"
-msgstr ""
+msgstr "Neuer Auslöserprototyp"
 
 #: include/views/js/monitoring.sysmaps.js.php:191
 msgid "New triggers"
@@ -14297,7 +14326,7 @@ msgstr "Keine Änderungen"
 
 #: jsLoader.php:194
 msgid "No compatible widgets."
-msgstr ""
+msgstr "Keine kompatiblen Widgets."
 
 #: jsLoader.php:412 tests/selenium/modules/clock32/views/widget.view.php:83
 #: widgets/clock/views/widget.view.php:83
@@ -20658,7 +20687,7 @@ msgstr "Oben"
 #: include/classes/helpers/CMenuHelper.php:144
 #: include/classes/helpers/CRoleHelper.php:424
 msgid "Top 100 triggers"
-msgstr ""
+msgstr "Top 100 Auslöser"
 
 #: widgets/tophosts/includes/WidgetForm.php:145
 msgid "Top N"
@@ -20670,7 +20699,7 @@ msgstr "Top Hosts"
 
 #: widgets/toptriggers/Widget.php:29
 msgid "Top triggers"
-msgstr ""
+msgstr "Top-Auslöser"
 
 #: app/views/administration.queue.overview.proxy.php:98
 #: widgets/hostavail/views/widget.view.php:44
@@ -20868,18 +20897,17 @@ msgstr[1] "Auslöser kopiert"
 
 #: widgets/toptriggers/includes/WidgetForm.php:76
 msgid "Trigger count"
-msgstr ""
+msgstr "Auslöseranzahl"
 
 #: app/views/administration.housekeeping.edit.php:50
 msgid "Trigger data storage period"
 msgstr "Speicherdauer der Auslöserdaten"
 
 #: app/controllers/CControllerTriggerDelete.php:62
-#, fuzzy
 msgid "Trigger deleted"
 msgid_plural "Triggers deleted"
 msgstr[0] "Auslöser wurde gelöscht"
-msgstr[1] "Auslöser wurde gelöscht"
+msgstr[1] "Auslöser wurden gelöscht"
 
 #: tr_events.php:169
 msgid "Trigger details"
@@ -20916,6 +20944,10 @@ msgstr "Auslöser im Zustand \"unbekannt\""
 #, c-format
 msgid "Trigger in template \"%1$s\" has dependency with trigger in template \"%2$s\"."
 msgstr "Auslöser in Vorlage \"%1$s\" hängt ab von Auslöser in Vorlage \"%2$s\"."
+
+#: jsLoader.php:291
+msgid "Trigger is not selected."
+msgstr ""
 
 #: include/views/monitoring.sysmap.edit.php:198
 msgid "Trigger label type"
@@ -21027,11 +21059,10 @@ msgid "Trigger prototype added"
 msgstr "Auslöser-Prototyp hinzugefügt"
 
 #: app/controllers/CControllerTriggerPrototypeDelete.php:62
-#, fuzzy
 msgid "Trigger prototype deleted"
 msgid_plural "Trigger prototypes deleted"
 msgstr[0] "Auslöser-Prototyp gelöscht"
-msgstr[1] "Auslöser-Prototyp gelöscht"
+msgstr[1] "Auslöser-Prototypen gelöscht"
 
 #: app/controllers/CControllerTriggerMassupdate.php:219
 #: app/controllers/CControllerTriggerPrototypeDisable.php:76
@@ -21071,7 +21102,6 @@ msgstr "Auslöser-Marker"
 
 #: app/controllers/CControllerTriggerMassupdate.php:220
 #: app/controllers/CControllerTriggerUpdate.php:147
-#, fuzzy
 msgid "Trigger updated"
 msgid_plural "Triggers updated"
 msgstr[0] "Auslöser geändert"
@@ -22971,6 +23001,10 @@ msgstr "Ansicht"
 msgid "View as"
 msgstr "Ansicht als"
 
+#: jsLoader.php:417
+msgid "View related reports"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1735
 msgid "Virtual space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr ""
@@ -23167,7 +23201,7 @@ msgstr "Aktiv um"
 #: include/classes/widgets/fields/CWidgetFieldTimePeriod.php:83
 #: jsLoader.php:195 jsLoader.php:199
 msgid "Widget"
-msgstr ""
+msgstr "Widget"
 
 #: include/classes/api/services/CDashboardGeneral.php:352
 #, c-format
@@ -23181,6 +23215,10 @@ msgstr "Widget ist veraltet."
 #: jsLoader.php:187
 msgid "Widget is too small for the specified number of columns and rows."
 msgstr "Das Widget ist zu klein für die angegebene Anzahl von Spalten und Zeilen."
+
+#: jsLoader.php:205
+msgid "Widgets"
+msgstr ""
 
 #: graphs.php:39 include/views/configuration.graph.edit.php:100
 #: include/views/configuration.graph.list.php:170
@@ -23553,6 +23591,10 @@ msgstr "Sie haben keine Berechtigungen zum Zugriff auf diese Seite."
 #: include/classes/core/ZBase.php:763 include/func.inc.php:1709
 msgid "You must login to view this page."
 msgstr "Sie müssen sich anmelden um diese Seite sehen zu können."
+
+#: jsLoader.php:287
+msgid "You need to have at least one image uploaded to create map element. Images can be uploaded in Administration->General->Images section."
+msgstr ""
 
 #: include/classes/db/DB.php:133
 msgid "Your database is not working properly. Please wait a few minutes and try to repeat this action. If the problem still persists, please contact system administrator. The problem might be caused by long running transaction or row level lock accomplished by your database management system."
@@ -25558,6 +25600,10 @@ msgstr "rechts"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:953
 msgid "right() - Returns the rightmost count characters"
+msgstr ""
+
+#: widgets/navtree/Widget.php:41
+msgid "root"
 msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:966

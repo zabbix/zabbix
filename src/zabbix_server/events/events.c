@@ -575,8 +575,6 @@ static void	save_event_recovery(void)
 	if (0 == event_recovery.num_data)
 		return;
 
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	zbx_db_insert_prepare(&db_insert, "event_recovery", "eventid", "r_eventid", "correlationid", "c_eventid",
 			"userid", (char *)NULL);
 
@@ -612,10 +610,7 @@ static void	save_event_recovery(void)
 	zbx_db_insert_execute(&db_insert);
 	zbx_db_insert_clean(&db_insert);
 
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
-		zbx_db_execute("%s", sql);
+	(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
 
 	zbx_free(sql);
 }

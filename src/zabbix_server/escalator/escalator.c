@@ -1160,7 +1160,8 @@ static void	execute_commands(const zbx_db_event *event, const zbx_db_event *r_ev
 		const zbx_service_alarm_t *service_alarm, const zbx_db_service *service, zbx_uint64_t actionid,
 		zbx_uint64_t operationid, int esc_step, int macro_type, const char *default_timezone,
 		int config_timeout, int config_trapper_timeout, const char *config_source_ip,
-		const char *config_ssh_key_location, zbx_get_config_forks_f get_config_forks, int config_enable_global_scripts, unsigned char program_type)
+		const char *config_ssh_key_location, zbx_get_config_forks_f get_config_forks,
+		int config_enable_global_scripts, unsigned char program_type)
 {
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
@@ -3323,8 +3324,6 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_db_escalat
 
 		zbx_vector_escalation_diff_ptr_sort(&diffs, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
-		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 		for (int i = 0; i < diffs.values_num; i++)
 		{
 			char	separator = ' ';
@@ -3372,10 +3371,7 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_db_escalat
 			zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 		}
 
-		zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-		if (16 < sql_offset)	/* in ORACLE always present begin..end; */
-			zbx_db_execute("%s", sql);
+		(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
 
 		zbx_free(sql);
 	}

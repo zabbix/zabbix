@@ -445,7 +445,6 @@ static void	rm_db_flush_reports(zbx_rm_t *manager)
 	zbx_vector_uint64_uniq(&manager->flush_queue, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	zbx_db_begin();
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	for (int i = 0; i < manager->flush_queue.values_num; i++)
 	{
@@ -496,10 +495,7 @@ static void	rm_db_flush_reports(zbx_rm_t *manager)
 		report->flags = 0;
 	}
 
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
-		zbx_db_execute("%s", sql);
+	(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
 
 	zbx_db_commit();
 

@@ -64,7 +64,7 @@ class CConstantImportConverter extends CConverter {
 					$matched_multiple_rule = null;
 
 					foreach ($tag_rules['rules'] as $multiple_rule) {
-						if ($this->multipleRuleMatched($multiple_rule, $data, $rules['rules'])) {
+						if ($this->multipleRuleMatched($multiple_rule, $data)) {
 							$matched_multiple_rule =
 								$multiple_rule + array_intersect_key($tag_rules, array_flip(['default']));
 							break;
@@ -103,19 +103,12 @@ class CConstantImportConverter extends CConverter {
 		return $data;
 	}
 
-	private function multipleRuleMatched(array $multiple_rule, array $data, array $rules): bool {
+	private function multipleRuleMatched(array $multiple_rule, array $data): bool {
 		if (array_key_exists('else', $multiple_rule)) {
 			return true;
 		}
 		elseif (is_array($multiple_rule['if'])) {
-			$field_name = $multiple_rule['if']['tag'];
-
-			if (array_key_exists($field_name, $data)) {
-				return array_key_exists($data[$field_name], $multiple_rule['if']['in']);
-			}
-			elseif (array_key_exists('default', $rules[$field_name])) {
-				return array_key_exists($rules[$field_name]['default'], $multiple_rule['if']['in']);
-			}
+			return array_key_exists($data[$multiple_rule['if']['tag']], $multiple_rule['if']['in']);
 		}
 		elseif ($multiple_rule['if'] instanceof Closure) {
 			return call_user_func($multiple_rule['if'], $data);

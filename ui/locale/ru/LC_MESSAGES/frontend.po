@@ -978,6 +978,10 @@ msgstr "Добавьте колонку"
 msgid "Add a new widget"
 msgstr "Добавить новый виджет"
 
+#: widgets/navtree/Widget.php:34
+msgid "Add child element"
+msgstr ""
+
 #: widgets/navtree/Widget.php:39
 msgid "Add child elements"
 msgstr "Добавить дочерние элементы"
@@ -1011,6 +1015,11 @@ msgstr "Добавить теги узла сети"
 #: app/views/trigger.massupdate.php:155
 msgid "Add host trigger"
 msgstr "Добавить триггер узла сети"
+
+#: widgets/piechart/includes/CWidgetFieldDataSetView.php:260
+#: widgets/svggraph/includes/CWidgetFieldDataSetView.php:263
+msgid "Add item"
+msgstr ""
 
 #: app/partials/massupdate.macros.tab.php:96
 #: app/partials/massupdate.valuemaps.tab.php:38
@@ -1672,6 +1681,10 @@ msgstr "Должен быть указан хотя бы один день не�
 msgid "At least one host group or host must be selected."
 msgstr "Должна быть выбрана по крайней мере одна группа узлов сети или узел сети."
 
+#: include/classes/setup/CFrontendSetup.php:252
+msgid "At least one of MySQL or PostgreSQL should be supported."
+msgstr ""
+
 #: include/classes/setup/CFrontendSetup.php:241
 msgid "At least one of MySQL, PostgreSQL or Oracle should be supported."
 msgstr "Должна поддерживаться по крайней мере одна база данных из MySQL, PostgreSQL или Oracle."
@@ -1917,6 +1930,10 @@ msgstr "Среднее количество ожидающих запросов 
 #: app/views/administration.authentication.edit.php:131
 msgid "Avoid easy-to-guess passwords"
 msgstr "Избегать легко угадываемых паролей"
+
+#: jsLoader.php:172
+msgid "Awaiting data"
+msgstr ""
 
 #: widgets/svggraph/views/widget.edit.php:51
 msgid "Axes"
@@ -5524,6 +5541,10 @@ msgstr "Создать способ оповещения"
 #: app/views/popup.import.php:143 jsLoader.php:349
 msgid "Create new"
 msgstr "Создать новое"
+
+#: jsLoader.php:372
+msgid "Create new report"
+msgstr ""
 
 #: app/views/administration.proxy.list.php:239
 msgid "Create proxy"
@@ -9665,6 +9686,10 @@ msgstr[2] "Группы узлов сети удалены"
 msgid "Host group elements"
 msgstr "Элементы группы узлов сети"
 
+#: jsLoader.php:292
+msgid "Host group is not selected."
+msgstr ""
+
 #: include/views/monitoring.sysmap.edit.php:168
 msgid "Host group label type"
 msgstr "Тип подписи к группе узлов сети"
@@ -9743,6 +9768,10 @@ msgstr "Инвентарные данные узла сети"
 #: hostinventoriesoverview.php:26 hostinventoriesoverview.php:146
 msgid "Host inventory overview"
 msgstr "Обзор инвентарных данных узла сети"
+
+#: jsLoader.php:289
+msgid "Host is not selected."
+msgstr ""
 
 #: include/views/monitoring.sysmap.edit.php:183
 msgid "Host label type"
@@ -13080,6 +13109,10 @@ msgstr "Размещение подписи к элементам карты"
 #: include/views/monitoring.sysmap.edit.php:243
 msgid "Map element label type"
 msgstr "Тип подписи к элементам карты"
+
+#: jsLoader.php:290
+msgid "Map is not selected."
+msgstr ""
 
 #: sysmap.php:128
 msgid "Map is updated! Return to map list?"
@@ -21030,6 +21063,10 @@ msgstr "Триггер в \"неизвестном\" состоянии"
 msgid "Trigger in template \"%1$s\" has dependency with trigger in template \"%2$s\"."
 msgstr "У триггера из шаблона \"%1$s\" есть зависимость от триггера из шаблона \"%2$s\"."
 
+#: jsLoader.php:291
+msgid "Trigger is not selected."
+msgstr ""
+
 #: include/views/monitoring.sysmap.edit.php:198
 msgid "Trigger label type"
 msgstr "Тип подписи к триггеру"
@@ -23091,6 +23128,10 @@ msgstr "Просмотр"
 msgid "View as"
 msgstr "Просмотр как"
 
+#: jsLoader.php:417
+msgid "View related reports"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1735
 msgid "Virtual space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr "Размер виртуального пространства в байтах или в процентах от общего размера. Возвращает целое число для байт; число с плавающей точкой для процентов"
@@ -23302,6 +23343,10 @@ msgstr "Устаревший виджет."
 #: jsLoader.php:187
 msgid "Widget is too small for the specified number of columns and rows."
 msgstr "Виджет слишком маленький для заданного количества колонок и строк."
+
+#: jsLoader.php:205
+msgid "Widgets"
+msgstr ""
 
 #: graphs.php:39 include/views/configuration.graph.edit.php:100
 #: include/views/configuration.graph.list.php:170
@@ -23674,6 +23719,10 @@ msgstr "У вас нет полномочий для доступа к этой 
 #: include/classes/core/ZBase.php:763 include/func.inc.php:1709
 msgid "You must login to view this page."
 msgstr "Для просмотра этой страницы вы должны войти в систему."
+
+#: jsLoader.php:287
+msgid "You need to have at least one image uploaded to create map element. Images can be uploaded in Administration->General->Images section."
+msgstr ""
 
 #: include/classes/db/DB.php:133
 msgid "Your database is not working properly. Please wait a few minutes and try to repeat this action. If the problem still persists, please contact system administrator. The problem might be caused by long running transaction or row level lock accomplished by your database management system."
@@ -25682,6 +25731,10 @@ msgstr "справа"
 #: app/controllers/CControllerPopupTriggerExpr.php:953
 msgid "right() - Returns the rightmost count characters"
 msgstr "right() - Возвращает количество самых правых символов"
+
+#: widgets/navtree/Widget.php:41
+msgid "root"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:966
 msgid "round() - Rounds a value to decimal places"

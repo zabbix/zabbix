@@ -636,6 +636,9 @@ static void	zbx_set_defaults(void)
 {
 	config_startup_time = (int)time(NULL);
 
+	if (NULL != CONFIG_HA_NODE_NAME && '\0' != *CONFIG_HA_NODE_NAME)
+		zbx_config_dbhigh->read_only_recoverable = 1;
+
 	if (NULL == zbx_config_dbhigh->config_dbhost)
 		zbx_config_dbhigh->config_dbhost = zbx_strdup(zbx_config_dbhigh->config_dbhost, "localhost");
 
@@ -1462,13 +1465,6 @@ static int	zbx_check_db(void)
 			zabbix_log(LOG_LEVEL_WARNING, "database could be upgraded to use primary keys in history tables");
 		}
 
-#ifdef HAVE_ORACLE
-		zbx_json_init(&db_version_info.tables_json, ZBX_JSON_STAT_BUF_LEN);
-
-		zbx_db_table_prepare("items", &db_version_info.tables_json);
-		zbx_db_table_prepare("item_preproc", &db_version_info.tables_json);
-		zbx_json_close(&db_version_info.tables_json);
-#endif
 		zbx_db_version_json_create(&db_version_json, &db_version_info);
 
 		if (SUCCEED == ret)
@@ -2213,11 +2209,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_free(smtp_auth_feature_status);
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "using configuration file: %s", config_file);
-
-#ifdef HAVE_ORACLE
-	zabbix_log(LOG_LEVEL_INFORMATION, "Support for Oracle DB is deprecated since Zabbix 7.0 and will be removed in "
-			"future versions");
-#endif
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	if (SUCCEED != zbx_coredump_disable())

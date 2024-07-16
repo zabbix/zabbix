@@ -67,7 +67,10 @@ class CWidgetSelectPopup {
 		widgets_table.addEventListener('click', (e) => {
 			if (e.target.classList.contains('js-select-reference')) {
 				overlayDialogueDestroy(this.#overlay.dialogueid);
-				this.fire('dialogue.submit', {reference: e.target.dataset.reference});
+				this.fire('dialogue.submit', {
+					name: e.target.textContent,
+					reference: e.target.dataset.reference
+				});
 			}
 		});
 
