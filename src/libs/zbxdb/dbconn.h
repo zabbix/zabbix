@@ -70,6 +70,13 @@ struct zbx_dbconn
 #endif
 };
 
+int	dbconn_init(char **error);
+void	dbconn_deinit(void);
+
+char	*db_dyn_escape_field_len(const zbx_db_field_t *field, const char *src, zbx_escape_sequence_t flag);
+int	db_is_escape_sequence(char c);
+
+
 
 #endif
 

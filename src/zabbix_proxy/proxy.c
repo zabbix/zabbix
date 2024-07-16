@@ -818,7 +818,7 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		}
 	}
 
-	err |= (FAIL == zbx_db_validate_config_features(zbx_program_type, zbx_db_config));
+	err |= (FAIL == zbx_db_config_validate_features(zbx_db_config, zbx_program_type));
 
 	if (0 != err)
 		exit(EXIT_FAILURE);
@@ -1122,7 +1122,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 	}
 
 #if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
-	zbx_db_validate_config(zbx_db_config);
+	zbx_db_config_validate(zbx_db_config);
 #endif
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_validate_config(zbx_config_tls, config_forks[ZBX_PROCESS_TYPE_ACTIVE_CHECKS],
@@ -1232,7 +1232,7 @@ int	main(int argc, char **argv)
 	argv = zbx_setproctitle_init(argc, argv);
 	zbx_progname = get_program_name(argv[0]);
 	zbx_config_tls = zbx_config_tls_new();
-	zbx_db_config = zbx_db_config_new();
+	zbx_db_config = zbx_db_config_create();
 
 	/* initialize libraries before using */
 	zbx_init_library_common(zbx_log_impl, get_zbx_progname, zbx_backtrace);
@@ -1383,7 +1383,7 @@ static void	proxy_db_init(void)
 	char		*error = NULL;
 	int		db_type, version_check;
 
-	if (SUCCEED != zbx_db_init(zbx_dc_get_nextid, config_log_slow_queries, &error))
+	if (SUCCEED != zbx_db_init(&error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database: %s", error);
 		zbx_free(error);

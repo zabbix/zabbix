@@ -283,7 +283,7 @@ void	zbx_dbconn_extract_version_info(zbx_dbconn_t *db, struct zbx_db_version_inf
 	version_info->flag = DB_VERSION_SUPPORTED;
 	version_info->friendly_current_version = NULL;
 #endif
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() version:%lu", __func__, (unsigned long)zbx_dbms_version_get());
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() version:%lu", __func__, (unsigned long)dbconn_version_get(db));
 }
 
 #ifdef HAVE_POSTGRESQL

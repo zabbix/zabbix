@@ -945,6 +945,7 @@ out:
 
 	return ret;
 #else
+	ZBX_UNUSED(db);
 	ZBX_UNUSED(info);
 	ZBX_UNUSED(allow_unsupported);
 

@@ -190,7 +190,7 @@ void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *db_insert, zbx_db_value_t **v
 			case ZBX_TYPE_TEXT:
 			case ZBX_TYPE_CUID:
 			case ZBX_TYPE_BLOB:
-				row[i].str = DBdyn_escape_field_len(field, value->str, ESCAPE_SEQUENCE_ON);
+				row[i].str = db_dyn_escape_field_len(field, value->str, ESCAPE_SEQUENCE_ON);
 				break;
 			case ZBX_TYPE_INT:
 			case ZBX_TYPE_FLOAT:
@@ -275,6 +275,18 @@ void	zbx_db_insert_add_values(zbx_db_insert_t *db_insert, ...)
 }
 
 #if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
+
+static void	dbconn_escape_bin(zbx_dbconn_t *db, const char *src, char **dst, size_t size)
+{
+#if defined(HAVE_MYSQL)
+	mysql_real_escape_string(db->conn, *dst, src, size);
+#elif defined(HAVE_POSTGRESQL)
+	size_t	dst_size;
+
+	*dst = (char*)PQescapeByteaConn(db->conn, (const unsigned char*)src, size, &dst_size);
+#endif
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: decodes Base64 encoded binary data and escapes it allowing it to  *
@@ -305,6 +317,12 @@ static void	decode_and_escape_binary_value_for_sql(zbx_dbconn_t *db, char **sql_
 	zbx_free(binary_data);
 	zbx_free(*sql_insert_data);
 	*sql_insert_data = escaped_binary;
+}
+#else
+static void	decode_and_escape_binary_value_for_sql(zbx_dbconn_t *db, char **sql_insert_data)
+{
+	ZBX_UNUSED(db);
+	ZBX_UNUSED(sql_insert_data);
 }
 #endif
 
@@ -441,9 +459,7 @@ int	zbx_db_insert_execute(zbx_db_insert_t *db_insert)
 					break;
 				case ZBX_TYPE_BLOB:
 					zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, '\'');
-#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
 					decode_and_escape_binary_value_for_sql(db_insert->db, &(value->str));
-#endif
 					zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, value->str);
 					zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, '\'');
 					break;

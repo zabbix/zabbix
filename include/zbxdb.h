@@ -198,7 +198,6 @@ struct zbx_db_version_info_t
 	int			trends_compressed_chunks;
 };
 
-void	zbx_dbms_version_info_extract(struct zbx_db_version_info_t *version_info);
 #ifdef HAVE_POSTGRESQL
 void	zbx_tsdb_info_extract(struct zbx_db_version_info_t *version_info);
 void	zbx_tsdb_set_compression_availability(int compression_availabile);
@@ -274,10 +273,17 @@ int	zbx_dbconn_end(zbx_dbconn_t *db, int ret);
 
 zbx_uint64_t	zbx_dbconn_get_maxid_num(zbx_dbconn_t *db, const char *tablename, int num);
 
+/* bulk insert support */
 void	zbx_dbconn_prepare_insert_dyn(zbx_dbconn_t *db, zbx_db_insert_t *db_insert, const zbx_db_table_t *table,
 		const zbx_db_field_t **fields, int fields_num);
 void	zbx_dbconn_prepare_vinsert(zbx_dbconn_t *db, zbx_db_insert_t *db_insert, const char *table, va_list args);
 void	zbx_dbconn_prepare_insert(zbx_dbconn_t *db, zbx_db_insert_t *db_insert, const char *table, ...);
+void	zbx_db_insert_add_values(zbx_db_insert_t *db_insert, ...);
+void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *db_insert, zbx_db_value_t **values, int values_num);
+int	zbx_db_insert_execute(zbx_db_insert_t *db_insert);
+void	zbx_db_insert_autoincrement(zbx_db_insert_t *db_insert, const char *field_name);
+zbx_uint64_t	zbx_db_insert_get_lastid(zbx_db_insert_t *self);
+void	zbx_db_insert_clean(zbx_db_insert_t *db_insert);
 
 void	zbx_dbconn_extract_version_info(zbx_dbconn_t *db, struct zbx_db_version_info_t *version_info);
 
@@ -323,9 +329,16 @@ int		zbx_db_validate_field_size(const char *tablename, const char *fieldname, co
 #define zbx_db_get_maxid(table)	zbx_db_get_maxid_num(table, 1)
 zbx_uint64_t	zbx_db_get_maxid_num(const char *tablename, int num);
 
+int	zbx_db_get_row_num(zbx_db_result_t result);
+
+int	zbx_db_is_null(const char *field);
+
 #if defined(HAVE_POSTGRESQL)
 char	*zbx_db_get_schema_esc(void);
 #endif
+
+int	zbx_dbconn_execute_overflowed_sql(zbx_dbconn_t *db, char **sql, size_t *sql_alloc, size_t *sql_offset);
+int	zbx_dbconn_flush_overflowed_sql(zbx_dbconn_t *db, char *sql, size_t sql_offset);
 
 /* compatibility wrappers */
 void	zbx_db_init_autoincrement_options(void);
@@ -343,6 +356,7 @@ zbx_uint64_t	zbx_db_get_maxid_num(const char *tablename, int num);
 void	zbx_db_insert_prepare_dyn(zbx_db_insert_t *db_insert, const zbx_db_table_t *table, const zbx_db_field_t **fields,
 		int fields_num);
 void	zbx_db_insert_prepare(zbx_db_insert_t *self, const char *table, ...);
+
 void	zbx_db_extract_version_info(struct zbx_db_version_info_t *version_info);
 void	zbx_tsdb_extract_compressed_chunk_flags(struct zbx_db_version_info_t *version_info);
 void	zbx_tsdb_info_extract(struct zbx_db_version_info_t *version_info);
