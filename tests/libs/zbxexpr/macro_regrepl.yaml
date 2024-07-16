@@ -198,7 +198,7 @@ in:
   params: '"(.*)_([0-9]+)",""'
 
 out:
-  value: ''
+  value: 'customername_1'
   return: SUCCEED
 
 ---
