@@ -1782,8 +1782,9 @@ class CHost extends CHostGeneral {
 		$available_connect_types = [HOST_ENCRYPTION_NONE, HOST_ENCRYPTION_PSK, HOST_ENCRYPTION_CERTIFICATE];
 		$min_accept_type = HOST_ENCRYPTION_NONE;
 		$max_accept_type = HOST_ENCRYPTION_NONE | HOST_ENCRYPTION_PSK | HOST_ENCRYPTION_CERTIFICATE;
+		$psk_pairs = [];
 
-		foreach ($hosts as &$host) {
+		foreach ($hosts as $i => $host) {
 			foreach (['tls_connect', 'tls_accept'] as $field_name) {
 				$$field_name = array_key_exists($field_name, $host)
 					? $host[$field_name]
@@ -1833,6 +1834,15 @@ class CHost extends CHostGeneral {
 						_s('minimum length is %1$s characters', PSK_MIN_LEN)
 					));
 				}
+
+				$psk_pairs[$i] = [
+					'tls_psk_identity' => $tls_psk_identity,
+					'tls_psk' => $tls_psk
+				];
+
+				if ($db_hosts !== null) {
+					$psk_pairs[$i]['hostid'] = $host['hostid'];
+				}
 			}
 			else {
 				if ($tls_psk_identity !== '') {
@@ -1862,44 +1872,6 @@ class CHost extends CHostGeneral {
 					);
 				}
 			}
-
-			$host['tls_connect'] = $tls_connect;
-			$host['tls_accept'] = $tls_accept;
-		}
-		unset($host);
-
-		self::checkTlsPsk($hosts, $db_hosts);
-	}
-
-	/**
-	 * Check there are no multiple hosts having same value tls_psk_identity and different value of tls_psk.
-	 *
-	 * @param array $hosts
-	 * @param array $db_hosts
-	 *
-	 * @throws CAPIException
-	 */
-	protected static function checkTlsPsk(array $hosts, array $db_hosts = null): void {
-		$psk_pairs = [];
-		$tls_psk_fields = array_flip(['tls_psk_identity', 'tls_psk']);
-
-		foreach ($hosts as $i => $host) {
-			$psk_pair = array_intersect_key($host, $tls_psk_fields);
-
-			if (!$psk_pair) {
-				continue;
-			}
-
-			if ($host['tls_connect'] != HOST_ENCRYPTION_PSK && ($host['tls_accept'] & HOST_ENCRYPTION_PSK) == 0) {
-				continue;
-			}
-
-			if ($db_hosts !== null) {
-				$psk_pair += array_intersect_key($db_hosts[$host['hostid']], $tls_psk_fields);
-				$psk_pair['hostid'] = $host['hostid'];
-			}
-
-			$psk_pairs[$i] = $psk_pair;
 		}
 
 		if ($psk_pairs) {
