@@ -29,22 +29,25 @@ Add the following required permissions to your Zabbix IAM policy in order to col
     "Statement": [
         {
             "Action": [
+				"ce:GetCostAndUsage",
+                "ce:GetDimensionValues",
                 "cloudwatch:DescribeAlarms",
                 "cloudwatch:GetMetricData",
                 "ec2:DescribeInstances",
-                "ec2:DescribeVolumes",
                 "ec2:DescribeRegions",
-                "rds:DescribeEvents",
-                "rds:DescribeDBInstances",
+                "ec2:DescribeSecurityGroups",
+                "ec2:DescribeVolumes",
                 "ecs:DescribeClusters",
+                "ecs:ListClusters",
                 "ecs:ListServices",
                 "ecs:ListTasks",
-                "ecs:ListClusters",
-                "s3:ListAllMyBuckets",
-                "s3:GetBucketLocation",
                 "elasticloadbalancing:DescribeLoadBalancers",
                 "elasticloadbalancing:DescribeTargetGroups",
-                "ec2:DescribeSecurityGroups"
+                "rds:DescribeDBInstances",
+                "rds:DescribeEvents",
+                "s3:GetBucketLocation",
+                "s3:GetMetricsConfiguration",
+                "s3:ListAllMyBuckets"
             ],
             "Effect": "Allow",
             "Resource": "*"
@@ -66,24 +69,27 @@ If you are using role-based authorization, add the appropriate permissions:
             "Sid": "VisualEditor1",
             "Effect": "Allow",
             "Action": [
+				"ce:GetCostAndUsage",
+                "ce:GetDimensionValues",
                 "cloudwatch:DescribeAlarms",
                 "cloudwatch:GetMetricData",
+                "ec2:AssociateIamInstanceProfile",
                 "ec2:DescribeInstances",
-                "ec2:DescribeVolumes",
                 "ec2:DescribeRegions",
-                "rds:DescribeEvents",
-                "rds:DescribeDBInstances",
+                "ec2:DescribeSecurityGroups"
+                "ec2:DescribeVolumes",
+                "ec2:ReplaceIamInstanceProfileAssociation",
                 "ecs:DescribeClusters",
+                "ecs:ListClusters",
                 "ecs:ListServices",
                 "ecs:ListTasks",
-                "ecs:ListClusters",
-                "s3:ListAllMyBuckets",
-                "s3:GetBucketLocation",
-                "ec2:AssociateIamInstanceProfile",
-                "ec2:ReplaceIamInstanceProfileAssociation",
                 "elasticloadbalancing:DescribeLoadBalancers",
                 "elasticloadbalancing:DescribeTargetGroups",
-                "ec2:DescribeSecurityGroups"
+                "rds:DescribeDBInstances",
+                "rds:DescribeEvents",
+                "s3:GetBucketLocation",
+                "s3:GetMetricsConfiguration",
+                "s3:ListAllMyBuckets"
             ],
             "Resource": "*"
         }
