@@ -43,6 +43,7 @@ class testItemTest extends CWebTest {
 	 */
 	public function getCommonTestButtonStateData() {
 		return [
+				['Type' => 'Zabbix agent'],
 				['Type' => 'Zabbix agent (active)'],
 				['Type' => 'Simple check'],
 				['Type' => 'SNMP agent','SNMP OID' => '[IF-MIB::]ifInOctets.1'],
@@ -113,8 +114,6 @@ class testItemTest extends CWebTest {
 			'Type' => 'Zabbix agent',
 			'Key' => 'key[{#KEY}]'
 		]);
-		// Check Test item button.
-		$this->checkTestButtonInPreprocessing($item_type);
 		$this->saveFormAndCheckMessage($item_type.$success_text);
 		$itemid = CDBHelper::getValue('SELECT itemid FROM items WHERE name='.zbx_dbstr($item_name));
 
@@ -141,29 +140,13 @@ class testItemTest extends CWebTest {
 
 				$this->checkTestButtonInPreprocessing($item_type, $enabled, $i);
 
-				// Check "Execute now" button only in host case item saved form and then change type.
+				// Change item type.
 				if ($i === 0) {
-					if ($check_now) {
-						if ($type === 'Dependent item') {
-							$enabled = true;
-						}
-
-						if ($item_type !== 'Discovery rule') {
-							$execute_button = $dialog->getFooter()->query('button:Execute now')->waitUntilVisible()->one();
-						}
-						else {
-							$execute_button = $this->query('button:Execute now')->waitUntilVisible()->one();
-						}
-
-						$this->assertTrue($execute_button->isEnabled($enabled));
-					}
-
 					$item_form->fill($update);
-					// TODO: workaround for ZBXNEXT-5365
-					if ($item_type === 'Item prototype'
-						&& array_key_exists('Master item', $update)) {
-							sleep(2);
-							$item_form->getFieldContainer('Master item')->asMultiselect()->select($update['Master item']);
+					// TODO: workaround for DEV-3855
+					if ($item_type === 'Item prototype' && array_key_exists('Master item', $update)) {
+						sleep(2);
+						$item_form->getFieldContainer('Master item')->asMultiselect()->select($update['Master item']);
 					}
 
 					$type = $update['Type'];
@@ -174,12 +157,14 @@ class testItemTest extends CWebTest {
 
 			/**
 			 * By design, when changing item type, the "Execute now" doesn't change its state, as these changes have not
-			 * been written to the DB yet. This is why, the above code block actually checks the last saved state of
-			 * the "Execute now" button, which corresponds to the previous iteration in the $data array.
-			 * Therefore, in order to check the "Execute now" button state for the last iteration the item needs to be
-			 * saved and its form should be opened again.
+			 * been written to the DB yet. To check the "Execute now" button state the item needs to be saved and
+			 * its form should be opened again.
 			 */
-			if ($check_now && $update['Type'] === end($data)['Type']) {
+			if ($check_now) {
+				if ($type === 'Dependent item') {
+					$enabled = true;
+				}
+
 				$this->query('link', $item_name)->waitUntilClickable()->one()->click();
 				$button = ($item_type === 'Discovery rule')
 					? $this->query('button:Execute now')->waitUntilVisible()->one()
