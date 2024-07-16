@@ -1041,6 +1041,7 @@ int	zbx_regexp_repl(const char *string, const char *pattern, const char *repl_te
 	if (FAIL == regexp_prepare(pattern, ZBX_REGEXP_MULTILINE, &regexp, &error))
 	{
 		*out = repleaced;
+		zbx_free(repleaced);
 		zbx_free(error);
 		return FAIL;
 	}
@@ -1106,7 +1107,7 @@ int	zbx_regexp_repl(const char *string, const char *pattern, const char *repl_te
 		zbx_free(empty);
 		zbx_free(repl);
 	}
-
+	zbx_vector_regrepl_clear_ext(&matches, (zbx_regrepl_free_func_t)zbx_ptr_free);
 	zbx_vector_regrepl_destroy(&matches);
 	*out = repleaced;
 	return SUCCEED;
