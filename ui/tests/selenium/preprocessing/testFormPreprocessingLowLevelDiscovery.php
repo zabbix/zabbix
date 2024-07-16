@@ -490,4 +490,8 @@ class testFormPreprocessingLowLevelDiscovery extends testFormPreprocessing {
 		];
 		$this->checkParameters($data, $steps);
 	}
+
+	public function testFormPreprocessingLowLevelDiscovery_CheckLayout() {
+		$this->checkPreprocessingLayout(false);
+	}
 }

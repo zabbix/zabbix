@@ -3203,4 +3203,32 @@ abstract class testFormPreprocessing extends CWebTest {
 			}
 		}
 	}
+
+	/**
+	 * Check initial layout of preprocessing steps tab.
+	 *
+	 * @param bollean $hint    true if hint icon presents and needs to be checked
+	 */
+	protected function checkPreprocessingLayout($hint = true) {
+		$this->page->login()->open($this->link);
+		$this->query('button:'.$this->button)->waitUntilPresent()->one()->click();
+		$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
+		$form->fill(
+			[
+				'Name' => 'Item for preprocessing layout check',
+				'Key' => 'preproc-layout-check'
+			]
+		);
+
+		$form->selectTab('Preprocessing');
+
+		// Check initial layout.
+		$list_step = $this->query('xpath://li[contains(@class, "preprocessing-list-item")]');
+		$this->assertFalse($list_step->exists());
+		$this->query('id:param_add')->one()->click();
+		$this->assertTrue($list_step->one()->isVisible());
+
+//		$table = $this->query('id:preprocessing')->asTable()->one();
+//		var_dump($table->getHeadersText());
+	}
 }
