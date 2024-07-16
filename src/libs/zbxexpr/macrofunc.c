@@ -24,7 +24,6 @@
 #include "zbxnum.h"
 #include "zbxhttp.h"
 #include "zbxcrypto.h"
-#include "zbxparam.h"
 
 #define ZBX_RULE_BUFF_LEN 512
 

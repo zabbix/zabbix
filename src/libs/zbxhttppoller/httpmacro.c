@@ -14,10 +14,9 @@
 
 #include "httpmacro.h"
 #include "zbxregexp.h"
-#include "zbxhttp.h"
 #include "zbxstr.h"
 #include "zbxexpr.h"
-#include "zbxexpression.h"
+#include "zbxvariant.h"
 #include "zbxxml.h"
 
 #define ZBX_MACRO_UNKNOWN	"*UNKNOWN*"
