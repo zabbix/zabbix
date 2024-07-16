@@ -57,6 +57,9 @@ static zbx_mutex_t		db_sqlite_access = ZBX_MUTEX_NULL;
 
 static int	dbconn_execute(zbx_dbconn_t *db, const char *fmt, ...);
 static zbx_db_result_t	dbconn_select(zbx_dbconn_t *db, const char *fmt, ...);
+static int	dbconn_open(zbx_dbconn_t *db);
+static void	dbconn_errlog(zbx_dbconn_t *db, zbx_err_codes_t zbx_errno, int db_errno, const char *db_error,
+		const char *context);
 
 /*
  * Private API
@@ -83,7 +86,7 @@ int	dbconn_init(char **error)
 
 		if (ZBX_DB_OK != (ret = dbconn_open(db)))
 		{
-			zbx_db_errlog(ERR_Z3002, 0, sqlite3_errmsg(db->conn), db_config->dbname);
+			dbconn_errlog(db, ERR_Z3002, 0, sqlite3_errmsg(db->conn), db_config->dbname);
 			*error = zbx_strdup(*error, "cannot open database");
 			return FAIL;
 		}
@@ -91,6 +94,7 @@ int	dbconn_init(char **error)
 		{
 			zbx_dbconn_execute(db, "%s", zbx_dbschema_get_schema());
 			zbx_dbconn_close(db);
+			zbx_dbconn_free(db);
 		}
 
 		return (ZBX_DB_OK == ret ? SUCCEED : FAIL);
@@ -291,7 +295,7 @@ static void	dbconn_close(zbx_dbconn_t *db)
 		db->conn = NULL;
 	}
 #elif defined(HAVE_SQLITE3)
-	if (NULL != conn)
+	if (NULL != db->conn)
 	{
 		sqlite3_close(db->conn);
 		db->conn = NULL;
@@ -637,18 +641,18 @@ static int	dbconn_open(zbx_dbconn_t *db)
 out:
 #elif defined(HAVE_SQLITE3)
 #ifdef HAVE_FUNCTION_SQLITE3_OPEN_V2
-	if (SQLITE_OK != sqlite3_open_v2(db->config->dbname, &conn, SQLITE_OPEN_READWRITE, NULL))
+	if (SQLITE_OK != sqlite3_open_v2(db->config->dbname, &db->conn, SQLITE_OPEN_READWRITE, NULL))
 #else
-	if (SQLITE_OK != sqlite3_open(db->config->dbname, &conn))
+	if (SQLITE_OK != sqlite3_open(db->config->dbname, &db->conn))
 #endif
 	{
-		dbconn_errlog(db, ERR_Z3001, 0, sqlite3_errmsg(conn), db->config->dbname);
+		dbconn_errlog(db, ERR_Z3001, 0, sqlite3_errmsg(db->conn), db->config->dbname);
 		ret = ZBX_DB_DOWN;
 		goto out;
 	}
 
 	/* do not return SQLITE_BUSY immediately, wait for N ms */
-	sqlite3_busy_timeout(conn, SEC_PER_MIN * 1000);
+	sqlite3_busy_timeout(db->conn, SEC_PER_MIN * 1000);
 
 	if (0 < (ret = dbconn_execute(db, "pragma synchronous=0")))
 		ret = ZBX_DB_OK;
@@ -829,7 +833,7 @@ static int	dbconn_vexecute(zbx_dbconn_t *db, const char *fmt, va_list args)
 	PQclear(result);
 #elif defined(HAVE_SQLITE3)
 	if (0 == db->txn_level)
-		zbx_mutex_lock(db->sqlite_access);
+		zbx_mutex_lock(*db->sqlite_access);
 
 lbl_exec:
 	if (SQLITE_OK != (err = sqlite3_exec(db->conn, sql, NULL, 0, &error)))
@@ -860,7 +864,7 @@ lbl_exec:
 		ret = sqlite3_changes(db->conn);
 
 	if (0 == db->txn_level)
-		zbx_mutex_unlock(db->sqlite_access);
+		zbx_mutex_unlock(*db->sqlite_access);
 #endif	/* HAVE_SQLITE3 */
 
 	if (0 != db->config->log_slow_queries)
@@ -1114,7 +1118,7 @@ static zbx_db_result_t	dbconn_vselect(zbx_dbconn_t *db, const char *fmt, va_list
 		result->row_num = PQntuples(result->pg_result);
 #elif defined(HAVE_SQLITE3)
 	if (0 == db->txn_level)
-		zbx_mutex_lock(db->sqlite_access);
+		zbx_mutex_lock(*db->sqlite_access);
 
 	result = zbx_malloc(NULL, sizeof(struct zbx_db_result));
 	result->curow = 0;
@@ -1146,7 +1150,7 @@ lbl_get_table:
 	}
 
 	if (0 == db->txn_level)
-		zbx_mutex_unlock(db->sqlite_access);
+		zbx_mutex_unlock(*db->sqlite_access);
 #endif	/* HAVE_SQLITE3 */
 	if (0 != db->config->log_slow_queries)
 	{
