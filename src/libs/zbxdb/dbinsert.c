@@ -31,7 +31,7 @@ void	zbx_db_insert_clean(zbx_db_insert_t *db_insert)
 
 		for (int j = 0; j < db_insert->fields.values_num; j++)
 		{
-			zbx_db_field_t	*field = db_insert->fields.values[j];
+			const zbx_db_field_t	*field = db_insert->fields.values[j];
 
 			switch (field->type)
 			{
@@ -50,7 +50,7 @@ void	zbx_db_insert_clean(zbx_db_insert_t *db_insert)
 
 	zbx_vector_db_value_ptr_destroy(&db_insert->rows);
 
-	zbx_vector_db_field_ptr_destroy(&db_insert->fields);
+	zbx_vector_const_db_field_ptr_destroy(&db_insert->fields);
 }
 
 /******************************************************************************
@@ -77,7 +77,7 @@ void	zbx_db_insert_clean(zbx_db_insert_t *db_insert)
  *                                                                            *
  ******************************************************************************/
 void	zbx_dbconn_prepare_insert_dyn(zbx_dbconn_t *db, zbx_db_insert_t *db_insert, const zbx_db_table_t *table,
-		const zbx_db_field_t **fields, int fields_num)
+		const zbx_db_field_t * const *fields, int fields_num)
 {
 	if (0 == fields_num)
 	{
@@ -89,13 +89,13 @@ void	zbx_dbconn_prepare_insert_dyn(zbx_dbconn_t *db, zbx_db_insert_t *db_insert,
 	db_insert->autoincrement = -1;
 	db_insert->lastid = 0;
 
-	zbx_vector_db_field_ptr_create(&db_insert->fields);
+	zbx_vector_const_db_field_ptr_create(&db_insert->fields);
 	zbx_vector_db_value_ptr_create(&db_insert->rows);
 
 	db_insert->table = table;
 
 	for (int i = 0; i < fields_num; i++)
-		zbx_vector_db_field_ptr_append(&db_insert->fields, (zbx_db_field_t *)fields[i]);
+		zbx_vector_const_db_field_ptr_append(&db_insert->fields, fields[i]);
 }
 
 /******************************************************************************
@@ -108,10 +108,10 @@ void	zbx_dbconn_prepare_insert_dyn(zbx_dbconn_t *db, zbx_db_insert_t *db_insert,
  ******************************************************************************/
 void	zbx_dbconn_prepare_vinsert(zbx_dbconn_t *db, zbx_db_insert_t *db_insert, const char *table, va_list args)
 {
-	zbx_vector_ptr_t	fields;
-	char			*field;
-	const zbx_db_table_t	*ptable;
-	const zbx_db_field_t	*pfield;
+	zbx_vector_const_db_field_ptr_t	fields;
+	char				*field;
+	const zbx_db_table_t		*ptable;
+	const zbx_db_field_t		*pfield;
 
 	/* find the table and fields in database schema */
 	if (NULL == (ptable = zbx_db_get_table(table)))
@@ -120,7 +120,7 @@ void	zbx_dbconn_prepare_vinsert(zbx_dbconn_t *db, zbx_db_insert_t *db_insert, co
 		exit(EXIT_FAILURE);
 	}
 
-	zbx_vector_ptr_create(&fields);
+	zbx_vector_const_db_field_ptr_create(&fields);
 
 	while (NULL != (field = va_arg(args, char *)))
 	{
@@ -131,12 +131,14 @@ void	zbx_dbconn_prepare_vinsert(zbx_dbconn_t *db, zbx_db_insert_t *db_insert, co
 			THIS_SHOULD_NEVER_HAPPEN;
 			exit(EXIT_FAILURE);
 		}
-		zbx_vector_ptr_append(&fields, (zbx_db_field_t *)pfield);
+
+		zbx_vector_const_db_field_ptr_append(&fields, pfield);
 	}
 
-	zbx_dbconn_prepare_insert_dyn(db, db_insert, ptable, (const zbx_db_field_t **)fields.values, fields.values_num);
+	zbx_dbconn_prepare_insert_dyn(db, db_insert, ptable, (const zbx_db_field_t * const *)fields.values,
+			fields.values_num);
 
-	zbx_vector_ptr_destroy(&fields);
+	zbx_vector_const_db_field_ptr_destroy(&fields);
 }
 
 /******************************************************************************
@@ -176,11 +178,11 @@ void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *db_insert, zbx_db_value_t **v
 		exit(EXIT_FAILURE);
 	}
 
-	row = (zbx_db_value_t *)zbx_malloc(NULL, db_insert->fields.values_num * sizeof(zbx_db_value_t));
+	row = (zbx_db_value_t *)zbx_malloc(NULL, (size_t)db_insert->fields.values_num * sizeof(zbx_db_value_t));
 
 	for (i = 0; i < db_insert->fields.values_num; i++)
 	{
-		zbx_db_field_t		*field = db_insert->fields.values[i];
+		const zbx_db_field_t	*field = db_insert->fields.values[i];
 		const zbx_db_value_t	*value = values[i];
 
 		switch (field->type)
@@ -226,7 +228,7 @@ void	zbx_db_insert_add_values(zbx_db_insert_t *db_insert, ...)
 	zbx_vector_ptr_t	values;
 	va_list			args;
 	int			i;
-	zbx_db_field_t		*field;
+	const zbx_db_field_t	*field;
 	zbx_db_value_t		*value;
 
 	va_start(args, db_insert);
@@ -235,7 +237,7 @@ void	zbx_db_insert_add_values(zbx_db_insert_t *db_insert, ...)
 
 	for (i = 0; i < db_insert->fields.values_num; i++)
 	{
-		field = (zbx_db_field_t *)db_insert->fields.values[i];
+		field = (const zbx_db_field_t *)db_insert->fields.values[i];
 
 		value = (zbx_db_value_t *)zbx_malloc(NULL, sizeof(zbx_db_value_t));
 
@@ -387,7 +389,7 @@ int	zbx_db_insert_execute(zbx_db_insert_t *db_insert)
 
 	for (i = 0; i < db_insert->fields.values_num; i++)
 	{
-		field = (zbx_db_field_t *)db_insert->fields.values[i];
+		field = (const zbx_db_field_t *)db_insert->fields.values[i];
 
 		zbx_chrcpy_alloc(&sql_command, &sql_command_alloc, &sql_command_offset, delim[0 == i]);
 		zbx_strcpy_alloc(&sql_command, &sql_command_alloc, &sql_command_offset, field->name);
@@ -402,7 +404,7 @@ int	zbx_db_insert_execute(zbx_db_insert_t *db_insert)
 			case ZBX_TYPE_TEXT:
 			case ZBX_TYPE_LONGTEXT:
 			case ZBX_TYPE_CUID:
-				if (FAIL != zbx_vector_db_field_ptr_search(&db_insert->fields, (void *)field,
+				if (FAIL != zbx_vector_const_db_field_ptr_search(&db_insert->fields, field,
 						ZBX_DEFAULT_PTR_COMPARE_FUNC))
 				{
 					continue;
@@ -529,7 +531,7 @@ void	zbx_db_insert_autoincrement(zbx_db_insert_t *db_insert, const char *field_n
 
 	for (i = 0; i < db_insert->fields.values_num; i++)
 	{
-		zbx_db_field_t	*field = (zbx_db_field_t *)db_insert->fields.values[i];
+		const zbx_db_field_t	*field = (const zbx_db_field_t *)db_insert->fields.values[i];
 
 		if (ZBX_TYPE_ID == field->type && 0 == strcmp(field_name, field->name))
 		{

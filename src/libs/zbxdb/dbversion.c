@@ -205,8 +205,8 @@ void	zbx_dbconn_extract_version_info(zbx_dbconn_t *db, struct zbx_db_version_inf
 			&client_minor_version, &client_release_version, &server_major_version,
 			&server_minor_version, &server_release_version))
 	{
-		db->ZBX_MYSQL_SVERSION = server_major_version * 10000 + server_minor_version * 100 +
-				server_release_version;
+		db->ZBX_MYSQL_SVERSION = (zbx_uint32_t)(server_major_version * 10000 + server_minor_version * 100 +
+				server_release_version);
 		zabbix_log(LOG_LEVEL_DEBUG, "MariaDB subversion detected");
 	}
 	else

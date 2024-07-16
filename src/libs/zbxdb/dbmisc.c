@@ -28,7 +28,7 @@
 #error ZBX_MAX_OVERFLOW_SQL_SIZE is out of range
 #endif
 
-ZBX_PTR_VECTOR_IMPL(db_field_ptr, zbx_db_field_t *)
+ZBX_PTR_VECTOR_IMPL(const_db_field_ptr, const zbx_db_field_t *)
 ZBX_PTR_VECTOR_IMPL(db_value_ptr, zbx_db_value_t *)
 
 const char	*idcache_tables[] = {"events", "event_tag", "problem_tag", "dservices", "dhosts", "alerts",
@@ -90,12 +90,12 @@ void	zbx_db_deinit(void)
  * Purpose: get next id for requested table from cache                        *
  *                                                                            *
  ******************************************************************************/
-static zbx_uint64_t	dbconn_get_cached_nextid(zbx_dbconn_t *db, int index, int num)
+static zbx_uint64_t	dbconn_get_cached_nextid(zbx_dbconn_t *db, size_t index, zbx_uint64_t num)
 {
 	zbx_uint64_t	nextid, lastid;
 	const char	*table_name = idcache_tables[index];
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() table:'%s' num:%d", __func__, table_name, num);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() table:'%s' num:" ZBX_FS_UI64, __func__, table_name, num);
 
 	zbx_mutex_lock(idcache_mutex);
 
@@ -142,7 +142,7 @@ out:
  * Purpose: get next id for requested table from database                     *
  *                                                                            *
  ******************************************************************************/
-static zbx_uint64_t	dbconn_get_nextid(zbx_dbconn_t *db, const char *tablename, int num)
+static zbx_uint64_t	dbconn_get_nextid(zbx_dbconn_t *db, const char *tablename, zbx_uint64_t num)
 {
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
@@ -222,7 +222,7 @@ static zbx_uint64_t	dbconn_get_nextid(zbx_dbconn_t *db, const char *tablename, i
 				continue;
 			}
 
-			zbx_dbconn_execute(db, "update ids set nextid=nextid+%d where table_name='%s' and"
+			zbx_dbconn_execute(db, "update ids set nextid=nextid+" ZBX_FS_UI64 " where table_name='%s' and"
 					" field_name='%s'", num, table->table, table->recid);
 
 			result = zbx_dbconn_select(db, "select nextid from ids where table_name='%s' and"
@@ -260,10 +260,10 @@ zbx_uint64_t	zbx_dbconn_get_maxid_num(zbx_dbconn_t *db, const char *tablename, i
 	if (NULL != (ptr = (const char **)bsearch(&tablename, idcache_tables, ZBX_IDS_SIZE, sizeof(idcache_tables[0]),
 			compare_table_names)))
 	{
-		return dbconn_get_cached_nextid(db, ptr - idcache_tables, num);
+		return dbconn_get_cached_nextid(db, (size_t)(ptr - idcache_tables), (zbx_uint64_t)num);
 	}
 
-	return dbconn_get_nextid(db, tablename, num);
+	return dbconn_get_nextid(db, tablename, (zbx_uint64_t)num);
 }
 
 /******************************************************************************
@@ -438,9 +438,9 @@ char	*zbx_db_dyn_escape_string(const char *src)
  * Comments: sync changes with 'db_escape_like_pattern'                       *
  *                                                                            *
  ******************************************************************************/
-static int	db_get_escape_like_pattern_len(const char *src)
+static size_t	db_get_escape_like_pattern_len(const char *src)
 {
-	int		len;
+	size_t		len;
 	const char	*s;
 
 	len = db_get_escape_string_len(src, ZBX_SIZE_T_MAX, ZBX_SIZE_T_MAX, ESCAPE_SEQUENCE_ON) - 1; /* minus '\0' */
@@ -479,7 +479,7 @@ static int	db_get_escape_like_pattern_len(const char *src)
  *           Hence '!' instead of backslash.                                  *
  *                                                                            *
  ******************************************************************************/
-static void	db_escape_like_pattern(const char *src, char *dst, int len)
+static void	db_escape_like_pattern(const char *src, char *dst, size_t len)
 {
 	char		*d;
 	char		*tmp = NULL;
@@ -518,7 +518,7 @@ static void	db_escape_like_pattern(const char *src, char *dst, int len)
  ******************************************************************************/
 char	*zbx_db_dyn_escape_like_pattern(const char *src)
 {
-	int	len;
+	size_t	len;
 	char	*dst = NULL;
 
 	len = db_get_escape_like_pattern_len(src);
@@ -538,7 +538,7 @@ char	*zbx_db_dyn_escape_like_pattern(const char *src)
  * Return value: the string length in bytes                                   *
  *                                                                            *
  ******************************************************************************/
-int	zbx_db_strlen_n(const char *text_loc, size_t maxlen)
+size_t	zbx_db_strlen_n(const char *text_loc, size_t maxlen)
 {
 	return zbx_strlen_utf8_nchars(text_loc, maxlen);
 }
@@ -556,7 +556,7 @@ static zbx_db_table_t	*db_get_table(const char *tablename)
 	return NULL;
 }
 
-static zbx_db_field_t	*db_get_field(zbx_db_table_t *table, const char *fieldname)
+static const zbx_db_field_t	*db_get_field(const zbx_db_table_t *table, const char *fieldname)
 {
 	int	f;
 
@@ -576,7 +576,7 @@ const zbx_db_table_t	*zbx_db_get_table(const char *tablename)
 
 const zbx_db_field_t	*zbx_db_get_field(const zbx_db_table_t *table, const char *fieldname)
 {
-	return db_get_field((zbx_db_table_t *)table, fieldname);
+	return db_get_field(table, fieldname);
 }
 
 #ifdef HAVE_MYSQL

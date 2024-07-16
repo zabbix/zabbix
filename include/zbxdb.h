@@ -44,21 +44,21 @@ zbx_db_value_t;
 
 typedef struct
 {
-	char	*dbhost;
-	char	*dbname;
-	char	*dbschema;
-	char	*dbuser;
-	char	*dbpassword;
-	char	*dbsocket;
-	char	*db_tls_connect;
-	char	*db_tls_cert_file;
-	char	*db_tls_key_file;
-	char	*db_tls_ca_file;
-	char	*db_tls_cipher;
-	char	*db_tls_cipher_13;
-	int	dbport;
-	int	log_slow_queries;
-	int	read_only_recoverable;
+	char		*dbhost;
+	char		*dbname;
+	char		*dbschema;
+	char		*dbuser;
+	char		*dbpassword;
+	char		*dbsocket;
+	char		*db_tls_connect;
+	char		*db_tls_cert_file;
+	char		*db_tls_key_file;
+	char		*db_tls_ca_file;
+	char		*db_tls_cipher;
+	char		*db_tls_cipher_13;
+	unsigned int	dbport;
+	int		log_slow_queries;
+	int		read_only_recoverable;
 }
 zbx_db_config_t;
 
@@ -113,7 +113,7 @@ zbx_escape_sequence_t;
 #define ZBX_SQL_LIKE_ESCAPE_CHAR '!'
 char		*zbx_db_dyn_escape_like_pattern(const char *src);
 
-int		zbx_db_strlen_n(const char *text_loc, size_t maxlen);
+size_t		zbx_db_strlen_n(const char *text_loc, size_t maxlen);
 
 #define ZBX_DB_EXTENSION_TIMESCALEDB	"timescaledb"
 
@@ -224,7 +224,7 @@ void	zbx_db_version_json_create(struct zbx_json *json, struct zbx_db_version_inf
 #define ZBX_DB_CONNECT_EXIT	1
 #define ZBX_DB_CONNECT_ONCE	2
 
-ZBX_PTR_VECTOR_DECL(db_field_ptr, zbx_db_field_t *)
+ZBX_PTR_VECTOR_DECL(const_db_field_ptr, const zbx_db_field_t *)
 ZBX_PTR_VECTOR_DECL(db_value_ptr, zbx_db_value_t *)
 
 typedef struct
@@ -234,7 +234,7 @@ typedef struct
 	/* the target table */
 	const zbx_db_table_t		*table;
 	/* the fields to insert (pointers to the zbx_db_field_t structures from database schema) */
-	zbx_vector_db_field_ptr_t	fields;
+	zbx_vector_const_db_field_ptr_t	fields;
 	/* the values rows to insert (pointers to arrays of zbx_db_value_t structures) */
 	zbx_vector_db_value_ptr_t	rows;
 	/* index of autoincrement field */
@@ -275,7 +275,7 @@ zbx_uint64_t	zbx_dbconn_get_maxid_num(zbx_dbconn_t *db, const char *tablename, i
 
 /* bulk insert support */
 void	zbx_dbconn_prepare_insert_dyn(zbx_dbconn_t *db, zbx_db_insert_t *db_insert, const zbx_db_table_t *table,
-		const zbx_db_field_t **fields, int fields_num);
+		const zbx_db_field_t * const *fields, int fields_num);
 void	zbx_dbconn_prepare_vinsert(zbx_dbconn_t *db, zbx_db_insert_t *db_insert, const char *table, va_list args);
 void	zbx_dbconn_prepare_insert(zbx_dbconn_t *db, zbx_db_insert_t *db_insert, const char *table, ...);
 void	zbx_db_insert_add_values(zbx_db_insert_t *db_insert, ...);

@@ -1031,7 +1031,7 @@ static int	dbconn_rollback(zbx_dbconn_t *db)
  * Return value: data, NULL (on error) or (zbx_db_result_t)ZBX_DB_DOWN        *
  *                                                                            *
  ******************************************************************************/
-zbx_db_result_t	dbconn_vselect(zbx_dbconn_t *db, const char *fmt, va_list args)
+static zbx_db_result_t	dbconn_vselect(zbx_dbconn_t *db, const char *fmt, va_list args)
 {
 	char		*sql = NULL;
 	zbx_db_result_t	result = NULL;
