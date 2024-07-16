@@ -1,0 +1,188 @@
+[
+    {
+        "value": "*myitem*_\"value\"",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["([^a-z])", "\\\\\\1"]
+        },
+        "result": "\\*myitem\\*\\_\\\"value\\\""
+    },
+    {
+        "value": "*myitem*_\"value\"",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["myitem", "test"]
+        },
+        "result": "*test*_\"value\""
+    },
+    {
+        "value": "*myitem*_\"value\"",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["myitem", "test", "e", "es"]
+        },
+        "result": "*tesst*_\"values\""
+    },
+    {
+        "value": "*myitem*_\"value\"",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["myitem", "test", "e", "es", "tesst", "www123"]
+        },
+        "result": "*www123*_\"values\""
+    },
+    {
+        "value": "ABC123 ABC 123",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["([A-Z]+)([0-9]+)", "321", "([A-Z]+)", "!!!", "([0-9]+)", "+++"]
+        },
+        "result": "+++ !!! +++"
+    },
+    {
+        "value": "ABC123 ABC 123",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["([A-Z]+)([0-9]+)", "321", "([A-Z]+)", "!!!", "([0-9]+)", "+++", "!!!", "stop", "stop",
+                "end"
+            ]
+        },
+        "result": "+++ end +++"
+    },
+    {
+        "value": "abc_def_ghi",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["_", "-"]
+        },
+        "result": "abc-def-ghi"
+    },
+    {
+        "value": "abc_def_ghi",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["_", ""]
+        },
+        "result": "abcdefghi"
+    },
+    {
+        "value": "abc_def_ghi",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["_", "\\\\_"]
+        },
+        "result": "abc\\_def\\_ghi"
+    },
+    {
+        "value": "abc_def_ghi123",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["[^a-z]", "-"]
+        },
+        "result": "abc-def-ghi---"
+    },
+    {
+        "value": "test_value",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["/a{2,1}/", "123"]
+        },
+        "result": "*UNKNOWN*"
+    },
+    {
+        "value": "test_value",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["myitem"]
+        },
+        "result": "*UNKNOWN*"
+    },
+    {
+        "value": "test_value",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["myitem", "test", "abc"]
+        },
+        "result": "*UNKNOWN*"
+    },
+    {
+        "value": "123Log line test657",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["^[0-9]+", "Problem"]
+        },
+        "result": "ProblemLog line test657"
+    },
+    {
+        "value": "123 Log line",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["^([0-9]+)", "Problem ID: \\1"]
+        },
+        "result": "Problem ID: 123 Log line"
+    },
+    {
+        "value": "Log line",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["Log line", "Problem ID:"]
+        },
+        "result": "Problem ID:"
+    },
+    {
+        "value": "Log line",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": [".*", "Problem ID:\\1"]
+        },
+        "result": "Problem ID:Problem ID:"
+    },
+    {
+        "value": "MySQL crashed err no 123 ORACLE not supported 0",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["(\\w+).*?([0-9]+)", "Problem ID: \\1_\\2"]
+        },
+        "result": "Problem ID: MySQL_123 Problem ID: ORACLE_0"
+    },
+    {
+        "value": "Log line",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["([1-9]+", "Problem ID: \\1"]
+        },
+        "result": "*UNKNOWN*"
+    },
+    {
+        "value": "customername_1",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["(.*)_([0-9]+)", "\\1"]
+        },
+        "result": "customername"
+    },
+    {
+        "value": "customername_1",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["(.*)_([0-9]+)", ""]
+        },
+        "result": ""
+    },
+    {
+        "value": "customername_1",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["''", "''"]
+        },
+        "result": "customername_1"
+    },
+    {
+        "value": "customername_1",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["(.*)_([0-9]+)", "\\\\"]
+        },
+        "result": "\\"
+    }
+]

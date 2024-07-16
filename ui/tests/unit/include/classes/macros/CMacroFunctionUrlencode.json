@@ -1,0 +1,50 @@
+[
+    {
+        "value": "%",
+        "macrofunc": {
+            "function": "urlencode",
+            "parameters": []
+        },
+        "result": "%25"
+    },
+    {
+        "value": "",
+        "macrofunc": {
+            "function": "urlencode",
+            "parameters": []
+        },
+        "result": ""
+    },
+    {
+        "value": "encode_this:&<>",
+        "macrofunc": {
+            "function": "urlencode",
+            "parameters": []
+        },
+        "result": "encode_this%3A%26%3C%3E"
+    },
+    {
+        "value": "special_characters:?=&#%",
+        "macrofunc": {
+            "function": "urlencode",
+            "parameters": []
+        },
+        "result": "special_characters%3A%3F%3D%26%23%25"
+    },
+    {
+        "value": "test",
+        "macrofunc": {
+            "function": "urlencode",
+            "parameters": ["123"]
+        },
+        "result": "*UNKNOWN*"
+    },
+    {
+        "value": "test",
+        "macrofunc": {
+            "function": "urlencode",
+            "parameters": ["123", "456", "789"]
+        },
+        "result": "*UNKNOWN*"
+    }
+]

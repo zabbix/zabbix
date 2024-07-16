@@ -137,19 +137,24 @@ class CMacroFunction {
 			return UNRESOLVED_MACRO_STRING;
 		}
 
-		for ($i = 0; $i < $parameter_count; $i += 2) {
-			$pattern = $parameters[$i];
-			$replacement = $parameters[$i + 1];
+		try {
+			for ($i = 0; $i < $parameter_count; $i += 2) {
+				$pattern = $parameters[$i];
+				$replacement = $parameters[$i + 1];
 
-			if (!is_string($replacement)) {
-				return UNRESOLVED_MACRO_STRING;
+				if (!is_string($replacement)) {
+					return UNRESOLVED_MACRO_STRING;
+				}
+
+				$value = preg_replace('/' . $pattern . '/i', $replacement, $value, -1);
+
+				if ($value === null || preg_last_error() !== PREG_NO_ERROR) {
+					return UNRESOLVED_MACRO_STRING;
+				}
 			}
-
-			$value = preg_replace('/' . $pattern . '/i', $replacement, $value, -1);
-
-			if ($value === null || preg_last_error() !== PREG_NO_ERROR) {
-				return UNRESOLVED_MACRO_STRING;
-			}
+		}
+		catch (Exception $e) {
+			return UNRESOLVED_MACRO_STRING;
 		}
 
 		return $value;
@@ -305,8 +310,13 @@ class CMacroFunction {
 	 * @return string
 	 */
 	private static function macrofuncHtmlencode(string $value, array $parameters): string {
+		$encoded = htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
+
+		// Replace encoded '&#039;' with '&#39;' to align with server-side encoding.
+		$encoded = str_replace('&#039;', '&#39;', $encoded);
+
 		return self::removeDefaultParameter($parameters) === []
-			? htmlspecialchars($value, ENT_QUOTES, 'UTF-8')
+			? $encoded
 			: UNRESOLVED_MACRO_STRING;
 	}
 

@@ -1,0 +1,50 @@
+[
+    {
+        "value": "Testing The Value",
+        "macrofunc": {
+            "function": "lowercase",
+            "parameters": []
+        },
+        "result": "testing the value"
+    },
+    {
+        "value": "UPPERCASE123",
+        "macrofunc": {
+            "function": "lowercase",
+            "parameters": []
+        },
+        "result": "uppercase123"
+    },
+    {
+        "value": "ÁÇĞİÖÜ",
+        "macrofunc": {
+            "function": "lowercase",
+            "parameters": []
+        },
+        "result": "ÁÇĞİÖÜ"
+    },
+    {
+        "value": "",
+        "macrofunc": {
+            "function": "lowercase",
+            "parameters": []
+        },
+        "result": ""
+    },
+    {
+        "value": "Testing",
+        "macrofunc": {
+            "function": "lowercase",
+            "parameters": ["123"]
+        },
+        "result": "*UNKNOWN*"
+    },
+    {
+        "value": "12345",
+        "macrofunc": {
+            "function": "lowercase",
+            "parameters": []
+        },
+        "result": "12345"
+    }
+]
