@@ -251,7 +251,7 @@ static int	dbconn_is_recoverable_error(zbx_dbconn_t *db, const PGresult *pg_resu
 	if (0 == zbx_strcmp_null(PQresultErrorField(pg_result, PG_DIAG_SQLSTATE), ZBX_PG_DEADLOCK))
 		return SUCCEED;
 
-	if (1 == ZBX_PG_READ_ONLY_RECOVERABLE &&
+	if (1 == db->ZBX_PG_READ_ONLY_RECOVERABLE &&
 			0 == zbx_strcmp_null(PQresultErrorField(pg_result, PG_DIAG_SQLSTATE), ZBX_PG_READ_ONLY))
 	{
 		return SUCCEED;
@@ -594,7 +594,7 @@ static int	dbconn_open(zbx_dbconn_t *db)
 	{
 		char	*dbschema_esc;
 
-		dbschema_esc = zbx_db_dyn_escape_string_basic(db->config->dbschema, ZBX_SIZE_T_MAX, ZBX_SIZE_T_MAX,
+		dbschema_esc = db_dyn_escape_string(db->config->dbschema, ZBX_SIZE_T_MAX, ZBX_SIZE_T_MAX,
 				ESCAPE_SEQUENCE_ON);
 		if (ZBX_DB_DOWN == (rc = dbconn_execute(db, "set schema '%s'", dbschema_esc)) || ZBX_DB_FAIL == rc)
 			ret = rc;
@@ -630,14 +630,12 @@ static int	dbconn_open(zbx_dbconn_t *db)
 		ZBX_PG_ESCAPE_BACKSLASH = (0 == strcmp(row[0], "off"));
 	zbx_db_free_result(result);
 
-	if (90000 <= ZBX_PG_SVERSION)
+	if (90000 <= db->ZBX_PG_SVERSION)
 	{
 		/* change the output format for values of type bytea from hex (the default) to escape */
 		if (0 < (ret = dbconn_execute(db, "set bytea_output=escape")))
 			ret = ZBX_DB_OK;
 	}
-
-	ZBX_PG_READ_ONLY_RECOVERABLE = cfg->read_only_recoverable;
 out:
 #elif defined(HAVE_SQLITE3)
 #ifdef HAVE_FUNCTION_SQLITE3_OPEN_V2
@@ -812,7 +810,7 @@ static int	dbconn_vexecute(zbx_dbconn_t *db, const char *fmt, va_list args)
 	{
 		zbx_err_codes_t	errcode;
 
-		zbx_postgresql_error(&error, result);
+		db_get_postgresql_error(&error, result);
 
 		if (0 == zbx_strcmp_null(PQresultErrorField(result, PG_DIAG_SQLSTATE), ZBX_PG_UNIQUE_VIOLATION))
 			errcode = ERR_Z3008;
@@ -1099,7 +1097,7 @@ static zbx_db_result_t	dbconn_vselect(zbx_dbconn_t *db, const char *fmt, va_list
 
 	if (PGRES_TUPLES_OK != PQresultStatus(result->pg_result))
 	{
-		zbx_postgresql_error(&error, result->pg_result);
+		db_get_postgresql_error(&error, result->pg_result);
 		dbconn_errlog(db, ERR_Z3005, 0, error, sql);
 		zbx_free(error);
 
@@ -1940,4 +1938,24 @@ out:
 	zbx_free(database_name_esc);
 #endif
 }
+
+#if defined(HAVE_POSTGRESQL)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: returns escaped DB schema name                                    *
+ *                                                                            *
+ ******************************************************************************/
+char	*zbx_db_get_schema_esc(void)
+{
+	static char	*name;
+
+	if (NULL == name)
+	{
+		name = zbx_db_dyn_escape_string(NULL == db_config->dbschema ||
+				'\0' == *db_config->dbschema ? "public" : db_config->dbschema);
+	}
+
+	return name;
+}
+#endif
 

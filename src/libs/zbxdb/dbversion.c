@@ -302,7 +302,7 @@ static int	dbconn_tsdb_table_has_compressed_chunks(zbx_dbconn_t *db, const char 
 		goto out;
 	}
 
-	if (NULL != zbx_db_fetch_basic(result))
+	if (NULL != zbx_db_fetch(result))
 		ret = SUCCEED;
 	else
 		ret = FAIL;
@@ -409,15 +409,15 @@ int	zbx_dbconn_tsdb_get_version(zbx_dbconn_t *db)
 			ver = major * 10000;
 			ver += minor * 100;
 			ver += patch;
-			ZBX_TSDB_VERSION = ver;
+			db->ZBX_TSDB_VERSION = ver;
 		}
 		else
-			ver = ZBX_TSDB_VERSION = 0;
+			ver = db->ZBX_TSDB_VERSION = 0;
 
 		zbx_db_free_result(result);
 	}
 	else
-		ver = ZBX_TSDB_VERSION;
+		ver = db->ZBX_TSDB_VERSION;
 out:
 	return ver;
 }

@@ -407,7 +407,7 @@ static size_t	db_get_escape_string_len(const char *s, size_t max_bytes, size_t m
  * Return value: escaped string                                               *
  *                                                                            *
  ******************************************************************************/
-static char	*db_dyn_escape_string(const char *src, size_t max_bytes, size_t max_chars, zbx_escape_sequence_t flag)
+char	*db_dyn_escape_string(const char *src, size_t max_bytes, size_t max_chars, zbx_escape_sequence_t flag)
 {
 	char	*dst = NULL;
 	size_t	len;
@@ -1334,23 +1334,3 @@ void	zbx_db_add_str_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_o
 
 #undef MAX_EXPRESSIONS
 }
-
-#if defined(HAVE_POSTGRESQL)
-/******************************************************************************
- *                                                                            *
- * Purpose: returns escaped DB schema name                                    *
- *                                                                            *
- ******************************************************************************/
-char	*zbx_db_get_schema_esc(void)
-{
-	static char	*name;
-
-	if (NULL == name)
-	{
-		name = zbx_db_dyn_escape_string(NULL == db_config->dbschema ||
-				'\0' == *db_config->dbschema ? "public" : db_config->dbschema);
-	}
-
-	return name;
-}
-#endif
