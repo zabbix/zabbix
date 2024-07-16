@@ -30,7 +30,7 @@ class testHost extends CAPITest {
 
 	public static $data = [
 		'host' => [],
-		'hostgroup' => [],
+		'hostgroup' => []
 	];
 
 	public static function prepareTestData(): void {
