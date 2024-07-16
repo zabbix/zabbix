@@ -83,6 +83,7 @@ type Plugin struct {
 	addCounters  []perfCounterAddInfo
 	query        win32.PDH_HQUERY
 	collectError error
+	stop         chan bool
 }
 
 type historyIndex int
@@ -154,8 +155,6 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 
 		for _, addCnt := range p.addCounters {
 			if addCnt.index == index {
-				addCnt.interval = interval
-
 				return nil, nil
 			}
 		}
@@ -172,7 +171,35 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	return counter.getHistory(int(interval))
 }
 
-func (p *Plugin) Collect() error {
+func (p *Plugin) Start() {
+	p.stop = make(chan bool)
+
+	go func() {
+		var lastCheck time.Time
+
+		for {
+			select {
+			case <-p.stop:
+				return
+			default:
+				time.Sleep(lastCheck.Add(1 * time.Second).Sub(time.Now()))
+
+				err := p.collectCounterData()
+				lastCheck = time.Now()
+
+				if err != nil {
+					p.Warningf("failed to get performance counters data: '%s'", err)
+				}
+			}
+		}
+	}()
+}
+
+func (p *Plugin) Stop() {
+	p.stop <- true
+}
+
+func (p *Plugin) collectCounterData() error {
 	p.mutex.Lock()
 	defer p.mutex.Unlock()
 
@@ -243,17 +270,8 @@ func (p *Plugin) Collect() error {
 	return nil
 }
 
-func (p *Plugin) Period() int {
-	return 1
-}
-
-func (p *Plugin) Start() {
-}
-
-func (p *Plugin) Stop() {
-}
-
 func (p *Plugin) setCounterData() error {
+
 	errCollect := win32.PdhCollectQueryData(p.query)
 	if errCollect != nil {
 		errCollect = fmt.Errorf("cannot collect value %s", errCollect)
