@@ -240,4 +240,13 @@ in:
 out:
   value: 'customername_1'
   return: SUCCEED
+---
+test case: empty regular expression and empty data
+in:
+  data: ' '
+  params: ',a'
+
+out:
+  value: ' '
+  return: SUCCEED
 ...
