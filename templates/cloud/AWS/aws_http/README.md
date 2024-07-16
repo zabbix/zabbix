@@ -29,7 +29,7 @@ Add the following required permissions to your Zabbix IAM policy in order to col
     "Statement": [
         {
             "Action": [
-				"ce:GetCostAndUsage",
+                "ce:GetCostAndUsage",
                 "ce:GetDimensionValues",
                 "cloudwatch:DescribeAlarms",
                 "cloudwatch:GetMetricData",
@@ -69,7 +69,7 @@ If you are using role-based authorization, add the appropriate permissions:
             "Sid": "VisualEditor1",
             "Effect": "Allow",
             "Action": [
-				"ce:GetCostAndUsage",
+                "ce:GetCostAndUsage",
                 "ce:GetDimensionValues",
                 "cloudwatch:DescribeAlarms",
                 "cloudwatch:GetMetricData",
