@@ -1039,7 +1039,7 @@ int	zbx_regexp_repl(const char *string, const char *pattern, const char *repl_te
 
 	zbx_free(*out);
 
-	if ('\0' == *pattern)
+	if ('\0' == *pattern || '\0' == *repl_template || '\0' == *string)
 	{
 		*out = repleaced;
 		return SUCCEED;
