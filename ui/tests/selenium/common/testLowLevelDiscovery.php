@@ -2359,8 +2359,8 @@ class testLowLevelDiscovery extends CWebTest {
 			: static::$interfaces_hostid.'&context=host';
 
 		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.$url);
-		$this->query($update ? 'link:'.static::$update_lld : 'button:Create discovery rule')->one()
-				->waitUntilClickable()->click();
+		$this->query($update ? 'link:'.static::$update_lld : 'button:Create discovery rule')->waitUntilClickable()
+				->one()->click();
 		$form = $this->query('id:host-discovery-form')->asForm()->waitUntilVisible()->one();
 
 		if ($context === 'template') {
