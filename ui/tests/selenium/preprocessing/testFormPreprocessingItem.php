@@ -248,6 +248,14 @@ class testFormPreprocessingItem extends testFormPreprocessing {
 	 * @dataProvider getItemsParametersData
 	 */
 	public function testFormPreprocessingItem_CheckParametersPlaceholders($data) {
-		$this->checkParameters($data);
+		$steps = ['Regular expression', 'Replace', 'Trim', 'Right trim', 'Left trim', 'XML XPath', 'JSONPath', 'CSV to JSON',
+				'XML to JSON', 'SNMP walk value', 'SNMP walk to JSON', 'SNMP get value', 'Custom multiplier',
+				'Simple change', 'Change per second', 'Boolean to decimal', 'Octal to decimal', 'Hexadecimal to decimal',
+				'JavaScript', 'In range', 'Matches regular expression', 'Does not match regular expression',
+				'Check for error in JSON', 'Check for error in XML', 'Check for error using regular expression',
+				'Check for not supported value', 'Discard unchanged', 'Discard unchanged with heartbeat',
+				'Prometheus pattern', 'Prometheus to JSON'
+		];
+		$this->checkParameters($data, $steps);
 	}
 }

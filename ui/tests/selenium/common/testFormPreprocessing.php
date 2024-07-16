@@ -2950,52 +2950,52 @@ abstract class testFormPreprocessing extends CWebTest {
 					[
 						'type' => 'Regular expression',
 						'parameters' => [
-							['placeholder' => 'pattern'],
-							['placeholder' => 'output']
+							['placeholder' => 'pattern', 'maxlength' => 255],
+							['placeholder' => 'output', 'maxlength' => 255]
 						]
 					],
 					[
 						'type' => 'Replace',
 						'parameters' => [
-							['placeholder' => 'search string'],
-							['placeholder' => 'replacement']
+							['placeholder' => 'search string', 'maxlength' => 255],
+							['placeholder' => 'replacement', 'maxlength' => 255]
 						]
 					],
 					[
 						'type' => 'Trim',
 						'parameters' => [
-							['placeholder' => 'list of characters']
+							['placeholder' => 'list of characters', 'maxlength' => 255]
 						]
 					],
 					[
 						'type' => 'Right trim',
 						'parameters' => [
-							['placeholder' => 'list of characters']
+							['placeholder' => 'list of characters', 'maxlength' => 255]
 						]
 					],
 					[
 						'type' => 'Left trim',
 						'parameters' => [
-							['placeholder' => 'list of characters']
+							['placeholder' => 'list of characters', 'maxlength' => 255]
 						]
 					],
 					[
 						'type' => 'XML XPath',
 						'parameters' => [
-							['placeholder' => 'XPath']
+							['placeholder' => 'XPath', 'maxlength' => 255]
 						]
 					],
 					[
 						'type' => 'JSONPath',
 						'parameters' => [
-							['placeholder' => '$.path.to.node']
+							['placeholder' => '$.path.to.node', 'maxlength' => 255]
 						]
 					],
 					[
 						'type' => 'CSV to JSON',
 						'parameters' => [
-							['placeholder' => 'delimiter', 'value' => ','],
-							['placeholder' => 'qualifier', 'value' => '"'],
+							['placeholder' => 'delimiter', 'value' => ',', 'maxlength' => 1],
+							['placeholder' => 'qualifier', 'value' => '"', 'maxlength' => 1],
 							['value' => true]
 						]
 					],
@@ -3003,9 +3003,50 @@ abstract class testFormPreprocessing extends CWebTest {
 						'type' => 'XML to JSON'
 					],
 					[
+						'type' => 'SNMP walk value',
+						'parameters' => [
+							['placeholder' => 'OID', 'value' => '', 'maxlength' => 255],
+							[
+								'selector' => 'xpath:.//z-select[@name="preprocessing[0][params][1]"]',
+								'options' => ['Unchanged', 'UTF-8 from Hex-STRING', 'MAC from Hex-STRING', 'Integer from BITS'],
+								'value' => 'Unchanged'
+							]
+						]
+					],
+					[
+						'type' => 'SNMP walk to JSON',
+						'parameters' => [
+							[
+								'selector' => 'xpath:(.//input[@name="preprocessing[0][params][]"])[1]',
+								'placeholder' => 'Field name',
+								'maxlength' => 255
+							],
+							[
+								'selector' => 'xpath:(.//input[@name="preprocessing[0][params][]"])[2]',
+								'placeholder' => 'OID prefix',
+								'maxlength' => 255
+							],
+							[
+								'selector' => 'xpath:.//z-select[@name="preprocessing[0][params][]"]',
+								'options' => ['Unchanged', 'UTF-8 from Hex-STRING', 'MAC from Hex-STRING', 'Integer from BITS'],
+								'value' => 'Unchanged'
+							]
+						]
+					],
+					[
+						'type' => 'SNMP get value',
+						'parameters' => [
+							[
+								'selector' => 'xpath:.//z-select[@name="preprocessing[0][params][0]"]',
+								'options' => ['UTF-8 from Hex-STRING', 'MAC from Hex-STRING', 'Integer from BITS'],
+								'value' => 'UTF-8 from Hex-STRING'
+							]
+						]
+					],
+					[
 						'type' => 'Custom multiplier',
 						'parameters' => [
-							['placeholder' => 'number']
+							['placeholder' => 'number', 'maxlength' => 255]
 						]
 					],
 					[
@@ -3035,43 +3076,50 @@ abstract class testFormPreprocessing extends CWebTest {
 					[
 						'type' => 'In range',
 						'parameters' => [
-							['placeholder' => 'min'],
-							['placeholder' => 'max']
+							['placeholder' => 'min', 'maxlength' => 255],
+							['placeholder' => 'max', 'maxlength' => 255]
 						]
 					],
 					[
 						'type' => 'Matches regular expression',
 						'parameters' => [
-							['placeholder' => 'pattern']
+							['placeholder' => 'pattern', 'maxlength' => 255]
 						]
 					],
 					[
 						'type' => 'Does not match regular expression',
 						'parameters' => [
-							['placeholder' => 'pattern']
+							['placeholder' => 'pattern', 'maxlength' => 255]
 						]
 					],
 					[
 						'type' => 'Check for error in JSON',
 						'parameters' => [
-							['placeholder' => '$.path.to.node']
+							['placeholder' => '$.path.to.node', 'maxlength' => 255]
 						]
 					],
 					[
 						'type' => 'Check for error in XML',
 						'parameters' => [
-							['placeholder' => 'XPath']
+							['placeholder' => 'XPath', 'maxlength' => 255]
 						]
 					],
 					[
 						'type' => 'Check for error using regular expression',
 						'parameters' => [
-							['placeholder' => 'pattern'],
-							['placeholder' => 'output']
+							['placeholder' => 'pattern', 'maxlength' => 255],
+							['placeholder' => 'output', 'maxlength' => 255]
 						]
 					],
 					[
-						'type' => 'Check for not supported value'
+						'type' => 'Check for not supported value',
+						'parameters' => [
+							[
+								'selector' => 'xpath:.//z-select[@name="preprocessing[0][params][0]"]',
+								'options' => ['any error', 'error matches', 'error does not match'],
+								'value' => 'any error'
+							]
+						]
 					],
 					[
 						'type' => 'Discard unchanged'
@@ -3079,21 +3127,21 @@ abstract class testFormPreprocessing extends CWebTest {
 					[
 						'type' => 'Discard unchanged with heartbeat',
 						'parameters' => [
-							['placeholder' => 'seconds']
+							['placeholder' => 'seconds', 'maxlength' => 255]
 						]
 					],
 					[
 						'type' => 'Prometheus pattern',
 						'parameters' => [
-							['placeholder' => '<metric name>{<label name>="<label value>", ...} == <value>'],
+							['placeholder' => '<metric name>{<label name>="<label value>", ...} == <value>', 'maxlength' => 255],
 							['selector' => 'xpath:.//z-select[contains(@class, "preproc-param")]', 'value' => 'value'],
-							['placeholder' => '<label name>']
+							['placeholder' => '<label name>', 'maxlength' => 255]
 						]
 					],
 					[
 						'type' => 'Prometheus to JSON',
 						'parameters' => [
-							['placeholder' => '<metric name>{<label name>="<label value>", ...} == <value>']
+							['placeholder' => '<metric name>{<label name>="<label value>", ...} == <value>', 'maxlength' => 255]
 						]
 					]
 				]
@@ -3104,9 +3152,10 @@ abstract class testFormPreprocessing extends CWebTest {
 	/**
 	 * Check placeholders and default values in preprocessing parameters.
 	 *
-	 * @param array $data    given preprocessing steps
+	 * @param array $data     given preprocessing steps
+	 * @param array $steps    list of steps options
 	 */
-	protected function checkParameters($data) {
+	protected function checkParameters($data, $steps) {
 		$this->page->login()->open($this->link);
 		$this->query('button:'.$this->button)->waitUntilPresent()->one()->click();
 		$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
@@ -3120,19 +3169,30 @@ abstract class testFormPreprocessing extends CWebTest {
 		$form->selectTab('Preprocessing');
 		$this->query('id:param_add')->one()->click();
 		$container = $this->query('xpath://li[contains(@class, "preprocessing-list-item")][1]')->waitUntilPresent()->one();
+		$step_type_field = $container->query('xpath:.//z-select[contains(@id, "_type")]')->asDropdown()->one();
+		$this->assertEquals($steps, $step_type_field->getOptions()->asText());
 
 		foreach ($data as $step) {
-			$container->query('xpath:.//z-select[contains(@id, "_type")]')->asDropdown()->one()->fill($step['type']);
+			$step_type_field->fill($step['type']);
 
 			if (array_key_exists('parameters', $step)) {
 				foreach ($step['parameters'] as $i => $parameter) {
 					$parameter['selector'] = CTestArrayHelper::get($parameter, 'selector',
-							'xpath:.//input[@id="preprocessing_0_params_'.$i.'"]'
+						'xpath:.//input[@id="preprocessing_0_params_'.$i.'"]'
 					);
 					$field = $container->query($parameter['selector'])->waitUntilPresent()->one();
 
 					if (array_key_exists('placeholder', $parameter)) {
 						$this->assertEquals($parameter['placeholder'], $field->getAttribute('placeholder'));
+					}
+
+					if (array_key_exists('maxlength', $parameter)) {
+						$this->assertEquals($parameter['maxlength'], $field->getAttribute('maxlength'));
+					}
+
+					if (array_key_exists('options', $parameter)) {
+						$field = $field->asDropdown();
+						$this->assertEquals($parameter['options'], $field->getOptions()->asText());
 					}
 
 					$this->assertEquals(CTestArrayHelper::get($parameter, 'value', ''), $field->getValue());

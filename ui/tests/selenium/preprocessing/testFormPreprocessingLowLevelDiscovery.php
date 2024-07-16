@@ -352,39 +352,80 @@ class testFormPreprocessingLowLevelDiscovery extends testFormPreprocessing {
 					[
 						'type' => 'Regular expression',
 						'parameters' => [
-							['placeholder' => 'pattern'],
-							['placeholder' => 'output']
+							['placeholder' => 'pattern', 'maxlength' => 255],
+							['placeholder' => 'output', 'maxlength' => 255]
 						]
 					],
 					[
 						'type' => 'Replace',
 						'parameters' => [
-							['placeholder' => 'search string'],
-							['placeholder' => 'replacement']
+							['placeholder' => 'search string', 'maxlength' => 255],
+							['placeholder' => 'replacement', 'maxlength' => 255]
 						]
 					],
 					[
 						'type' => 'XML XPath',
 						'parameters' => [
-							['placeholder' => 'XPath']
+							['placeholder' => 'XPath', 'maxlength' => 255]
 						]
 					],
 					[
 						'type' => 'JSONPath',
 						'parameters' => [
-							['placeholder' => '$.path.to.node']
+							['placeholder' => '$.path.to.node', 'maxlength' => 255]
 						]
 					],
 					[
 						'type' => 'CSV to JSON',
 						'parameters' => [
-							['placeholder' => 'delimiter', 'value' => ','],
-							['placeholder' => 'qualifier', 'value' => '"'],
+							['placeholder' => 'delimiter', 'value' => ',', 'maxlength' => 1],
+							['placeholder' => 'qualifier', 'value' => '"', 'maxlength' => 1],
 							['value' => true]
 						]
 					],
 					[
 						'type' => 'XML to JSON'
+					],
+					[
+						'type' => 'SNMP walk value',
+						'parameters' => [
+							['placeholder' => 'OID', 'value' => '', 'maxlength' => 255],
+							[
+								'selector' => 'xpath:.//z-select[@name="preprocessing[0][params][1]"]',
+								'options' => ['Unchanged', 'UTF-8 from Hex-STRING', 'MAC from Hex-STRING', 'Integer from BITS'],
+								'value' => 'Unchanged'
+							]
+						]
+					],
+					[
+						'type' => 'SNMP walk to JSON',
+						'parameters' => [
+							[
+								'selector' => 'xpath:(.//input[@name="preprocessing[0][params][]"])[1]',
+								'placeholder' => 'Field name',
+								'maxlength' => 255
+							],
+							[
+								'selector' => 'xpath:(.//input[@name="preprocessing[0][params][]"])[2]',
+								'placeholder' => 'OID prefix',
+								'maxlength' => 255
+							],
+							[
+								'selector' => 'xpath:.//z-select[@name="preprocessing[0][params][]"]',
+								'options' => ['Unchanged', 'UTF-8 from Hex-STRING', 'MAC from Hex-STRING', 'Integer from BITS'],
+								'value' => 'Unchanged'
+							]
+						]
+					],
+					[
+						'type' => 'SNMP get value',
+						'parameters' => [
+							[
+								'selector' => 'xpath:.//z-select[@name="preprocessing[0][params][0]"]',
+								'options' => ['UTF-8 from Hex-STRING', 'MAC from Hex-STRING', 'Integer from BITS'],
+								'value' => 'UTF-8 from Hex-STRING'
+							]
+						]
 					],
 					[
 						'type' => 'JavaScript',
@@ -396,33 +437,42 @@ class testFormPreprocessingLowLevelDiscovery extends testFormPreprocessing {
 						]
 					],
 					[
+						'type' => 'Matches regular expression',
+						'parameters' => [
+							['placeholder' => 'pattern', 'maxlength' => 255]
+						]
+					],
+					[
 						'type' => 'Does not match regular expression',
 						'parameters' => [
-							['placeholder' => 'pattern']
+							['placeholder' => 'pattern', 'maxlength' => 255]
 						]
 					],
 					[
 						'type' => 'Check for error in JSON',
 						'parameters' => [
-							['placeholder' => '$.path.to.node']
+							['placeholder' => '$.path.to.node', 'maxlength' => 255]
 						]
 					],
 					[
 						'type' => 'Check for error in XML',
 						'parameters' => [
-							['placeholder' => 'XPath']
+							['placeholder' => 'XPath', 'maxlength' => 255]
 						]
 					],
 					[
 						'type' => 'Discard unchanged with heartbeat',
 						'parameters' => [
-							['placeholder' => 'seconds']
+							['placeholder' => 'seconds', 'maxlength' => 255]
 						]
 					],
 					[
 						'type' => 'Prometheus to JSON',
 						'parameters' => [
-							['placeholder' => '<metric name>{<label name>="<label value>", ...} == <value>']
+							[
+								'placeholder' => '<metric name>{<label name>="<label value>", ...} == <value>',
+								'maxlength' => 255
+							]
 						]
 					]
 				]
@@ -434,6 +484,10 @@ class testFormPreprocessingLowLevelDiscovery extends testFormPreprocessing {
 	 * @dataProvider getLLDParametersData
 	 */
 	public function testFormPreprocessingLowLevelDiscovery_CheckParametersPlaceholders($data) {
-		$this->checkParameters($data);
+		$steps = ['Regular expression', 'Replace', 'XML XPath', 'JSONPath', 'CSV to JSON', 'XML to JSON', 'SNMP walk value',
+			'SNMP walk to JSON', 'SNMP get value', 'JavaScript', 'Matches regular expression', 'Does not match regular expression',
+			'Check for error in JSON', 'Check for error in XML', 'Discard unchanged with heartbeat', 'Prometheus to JSON'
+		];
+		$this->checkParameters($data, $steps);
 	}
 }
