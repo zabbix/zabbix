@@ -255,7 +255,7 @@ class CWidgetItemHistory extends CWidget {
 
 				e.target.resize_observer = new ResizeObserver((entries) => {
 					entries.forEach(entry => {
-						if (entry.devicePixelContentBoxSize) {
+						if (entry.contentBoxSize) {
 							const overlay = content.closest('.dashboard-widget-itemhistory-hintbox-image');
 							const size = entry.contentBoxSize[0];
 
