@@ -2574,7 +2574,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 						'Advanced configuration' => true,
 						'Time period' => 'Custom',
 						'From' => date('Y-m-d H:i:s', strtotime('-5 days')),
-						'To' => date('Y-m-d H:i:s', strtotime('now')),
+						'To' => date('Y-m-d H:i:s', strtotime('now'))
 					],
 					'initial_data' => [
 						[
