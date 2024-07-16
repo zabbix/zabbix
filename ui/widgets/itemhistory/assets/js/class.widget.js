@@ -261,8 +261,6 @@ class CWidgetItemHistory extends CWidget {
 
 							overlay.style.width = `${size.inlineSize}px`;
 							overlay.style.height = `${size.blockSize}px`;
-
-							requestAnimationFrame(() => hintBox.onResize(e, button));
 						}
 					})
 				});
