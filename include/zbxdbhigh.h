@@ -123,44 +123,6 @@
 #define ZBX_DSERVICE_VALUE_LEN			255
 #define ZBX_MAX_DISCOVERED_VALUE_SIZE	(ZBX_DSERVICE_VALUE_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1)
 
-typedef zbx_uint64_t	(*zbx_dc_get_nextid_func_t)(const char *table_name, int num);
-
-#ifdef HAVE_MYSQL
-#	define	ZBX_SQL_STRCMP			"%s binary '%s'"
-#else
-#	define	ZBX_SQL_STRCMP			"%s'%s'"
-#endif
-#define	ZBX_SQL_STRVAL_EQ(str)			"=", str
-#define	ZBX_SQL_STRVAL_NE(str)			"<>", str
-
-#ifdef HAVE_MYSQL
-#	define ZBX_SQL_CONCAT()		"concat(%s,%s)"
-#else
-#	define ZBX_SQL_CONCAT()		"%s||%s"
-#endif
-
-#define ZBX_SQL_NULLCMP(f1, f2)	"((" f1 " is null and " f2 " is null) or " f1 "=" f2 ")"
-
-#define ZBX_DBROW2UINT64(uint, row)			\
-	do {						\
-		if (SUCCEED == zbx_db_is_null(row))	\
-			uint = 0;			\
-		else					\
-			zbx_is_uint64(row, &uint);	\
-	}						\
-	while (0)
-
-#define ZBX_DB_MAX_ID	(zbx_uint64_t)__UINT64_C(0x7fffffffffffffff)
-
-#ifdef HAVE_MYSQL
-#	define ZBX_SQL_SORT_ASC(field)	field " asc"
-#	define ZBX_SQL_SORT_DESC(field)	field " desc"
-#else
-#	define ZBX_SQL_SORT_ASC(field)	field " asc nulls first"
-#	define ZBX_SQL_SORT_DESC(field)	field " desc nulls last"
-#endif
-
-
 typedef struct
 {
 	zbx_uint64_t	druleid;
@@ -551,9 +513,6 @@ int	zbx_db_flush_overflowed_sql(char *sql, size_t sql_offset);
 int	zbx_db_execute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_offset);
 char	*zbx_db_get_unique_hostname_by_sample(const char *host_name_sample, const char *field_name);
 
-const char	*zbx_db_sql_id_ins(zbx_uint64_t id);
-const char	*zbx_db_sql_id_cmp(zbx_uint64_t id);
-
 typedef enum
 {
 	ZBX_CONN_DEFAULT = 0,
@@ -563,21 +522,6 @@ typedef enum
 zbx_conn_flags_t;
 
 const char	*zbx_db_get_inventory_field(unsigned char inventory_link);
-
-int	zbx_db_table_exists(const char *table_name);
-int	zbx_db_field_exists(const char *table_name, const char *field_name);
-#ifndef HAVE_SQLITE3
-int	zbx_db_trigger_exists(const char *table_name, const char *trigger_name);
-int	zbx_db_index_exists(const char *table_name, const char *index_name);
-int	zbx_db_pk_exists(const char *table_name);
-#endif
-
-int	zbx_db_prepare_multiple_query(const char *query, const char *field_name, zbx_vector_uint64_t *ids, char **sql,
-		size_t	*sql_alloc, size_t *sql_offset);
-int	zbx_db_execute_multiple_query(const char *query, const char *field_name, zbx_vector_uint64_t *ids);
-int	zbx_db_lock_record(const char *table, zbx_uint64_t id, const char *add_field, zbx_uint64_t add_id);
-int	zbx_db_lock_records(const char *table, const zbx_vector_uint64_t *ids);
-int	zbx_db_lock_ids(const char *table_name, const char *field_name, zbx_vector_uint64_t *ids);
 
 #define zbx_db_lock_hostid(id)			zbx_db_lock_record("hosts", id, NULL, 0)
 #define zbx_db_lock_triggerid(id)		zbx_db_lock_record("triggers", id, NULL, 0)
@@ -589,10 +533,6 @@ int	zbx_db_lock_ids(const char *table_name, const char *field_name, zbx_vector_u
 #define zbx_db_lock_itemids(ids)		zbx_db_lock_records("items", ids)
 #define zbx_db_lock_group_prototypeids(ids)	zbx_db_lock_records("group_prototype", ids)
 #define zbx_db_lock_hgsetids(ids)		zbx_db_lock_records("hgset", ids)
-
-void	zbx_db_select_uint64(const char *sql, zbx_vector_uint64_t *ids);
-
-void	zbx_db_check_character_set(void);
 
 int	zbx_db_get_database_type(void);
 

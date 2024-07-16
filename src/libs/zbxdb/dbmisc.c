@@ -1106,29 +1106,6 @@ int	zbx_dbconn_lock_ids(zbx_dbconn_t *db, const char *table_name, const char *fi
 	return (0 != ids->values_num ? SUCCEED : FAIL);
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: construct where condition                                         *
- *                                                                            *
- * Return value: "=<id>" if id not equal zero,                                *
- *               otherwise " is null"                                         *
- *                                                                            *
- * Comments: NB! Do not use this function more than once in same SQL query    *
- *                                                                            *
- ******************************************************************************/
-const char	*zbx_db_sql_id_cmp(zbx_uint64_t id)
-{
-	static char		buf[22];	/* 1 - '=', 20 - value size, 1 - '\0' */
-	static const char	is_null[9] = " is null";
-
-	if (0 == id)
-		return is_null;
-
-	zbx_snprintf(buf, sizeof(buf), "=" ZBX_FS_UI64, id);
-
-	return buf;
-}
-
 #if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
 #define MAX_EXPRESSIONS	1000	/* tune according to batch size to avoid unnecessary or conditions */
 #else
@@ -1333,4 +1310,51 @@ void	zbx_db_add_str_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_o
 		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, ')');
 
 #undef MAX_EXPRESSIONS
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: construct insert statement                                        *
+ *                                                                            *
+ * Return value: "<id>" if id not equal zero,                                 *
+ *               otherwise "null"                                             *
+ *                                                                            *
+ ******************************************************************************/
+const char	*zbx_db_sql_id_ins(zbx_uint64_t id)
+{
+	static unsigned char	n = 0;
+	static char		buf[4][21];	/* 20 - value size, 1 - '\0' */
+	static const char	null[5] = "null";
+
+	if (0 == id)
+		return null;
+
+	n = (n + 1) & 3;
+
+	zbx_snprintf(buf[n], sizeof(buf[n]), ZBX_FS_UI64, id);
+
+	return buf[n];
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: construct where condition                                         *
+ *                                                                            *
+ * Return value: "=<id>" if id not equal zero,                                *
+ *               otherwise " is null"                                         *
+ *                                                                            *
+ * Comments: NB! Do not use this function more than once in same SQL query    *
+ *                                                                            *
+ ******************************************************************************/
+const char	*zbx_db_sql_id_cmp(zbx_uint64_t id)
+{
+	static char		buf[22];	/* 1 - '=', 20 - value size, 1 - '\0' */
+	static const char	is_null[9] = " is null";
+
+	if (0 == id)
+		return is_null;
+
+	zbx_snprintf(buf, sizeof(buf), "=" ZBX_FS_UI64, id);
+
+	return buf;
 }

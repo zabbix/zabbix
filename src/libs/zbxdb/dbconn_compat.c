@@ -533,3 +533,136 @@ int	zbx_db_execute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_off
 	return zbx_dbconn_execute_overflowed_sql(dbconn, sql, sql_alloc, sql_offset);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check if table exists                                             *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_db_table_exists(const char *table_name)
+{
+	if (NULL == dbconn)
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		return ZBX_DB_FAIL;
+	}
+
+	return zbx_dbconn_table_exists(dbconn, table_name);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check if table field exists                                       *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_db_field_exists(const char *table_name, const char *field_name)
+{
+	if (NULL == dbconn)
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		return ZBX_DB_FAIL;
+	}
+
+	return zbx_dbconn_field_exists(dbconn, table_name, field_name);
+}
+
+#if !defined(HAVE_SQLITE3)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check if table trigger exists                                     *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_db_trigger_exists(const char *table_name, const char *trigger_name)
+{
+	if (NULL == dbconn)
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		return ZBX_DB_FAIL;
+	}
+
+	return zbx_dbconn_trigger_exists(dbconn, table_name, trigger_name);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check if table index exists                                       *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_db_index_exists(const char *table_name, const char *index_name)
+{
+	if (NULL == dbconn)
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		return ZBX_DB_FAIL;
+	}
+
+	return zbx_dbconn_index_exists(dbconn, table_name, index_name);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check if table primary key exists                                 *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_db_pk_exists(const char *table_name)
+{
+	if (NULL == dbconn)
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		return ZBX_DB_FAIL;
+	}
+
+	return zbx_dbconn_pk_exists(dbconn, table_name);
+}
+#endif /* !defined(HAVE_SQLITE3) */
+
+/******************************************************************************
+ *                                                                            *
+ * Parameters: sql - [IN] sql statement                                       *
+ *             ids - [OUT] sorted list of selected uint64 values              *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_db_select_uint64(const char *sql, zbx_vector_uint64_t *ids)
+{
+	if (NULL == dbconn)
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		return;
+	}
+
+	zbx_dbconn_select_uint64(dbconn, sql, ids);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: execute query with large number of primary key matches in smaller *
+ *          batches (last batch is not executed)                              *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_db_prepare_multiple_query(const char *query, const char *field_name, zbx_vector_uint64_t *ids, char **sql,
+		size_t	*sql_alloc, size_t *sql_offset)
+{
+	if (NULL == dbconn)
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		return ZBX_DB_FAIL;
+	}
+
+	return zbx_dbconn_prepare_multiple_query(dbconn, query, field_name, ids, sql, sql_alloc, sql_offset);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: execute query with large number of primary key matches in smaller *
+ *          batches                                                           *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_db_execute_multiple_query(const char *query, const char *field_name, zbx_vector_uint64_t *ids)
+{
+	if (NULL == dbconn)
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		return ZBX_DB_FAIL;
+	}
+
+	return zbx_dbconn_execute_multiple_query(dbconn, query, field_name, ids);
+}

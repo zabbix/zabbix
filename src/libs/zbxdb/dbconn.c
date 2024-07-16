@@ -1959,3 +1959,303 @@ char	*zbx_db_get_schema_esc(void)
 }
 #endif
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check if table exists                                             *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dbconn_table_exists(zbx_dbconn_t *db, const char *table_name)
+{
+	char		*table_name_esc;
+	zbx_db_result_t	result;
+	int		ret;
+
+	table_name_esc = zbx_db_dyn_escape_string(table_name);
+
+#if defined(HAVE_MYSQL)
+	result = zbx_db_select("show tables like '%s'", table_name_esc);
+#elif defined(HAVE_POSTGRESQL)
+	result = zbx_dbconn_select(db,
+			"select 1"
+			" from information_schema.tables"
+			" where table_name='%s'"
+				" and table_schema='%s'",
+			table_name_esc, zbx_db_get_schema_esc());
+#elif defined(HAVE_SQLITE3)
+	result = zbx_dbconn_select(db,
+			"select 1"
+			" from sqlite_master"
+			" where tbl_name='%s'"
+				" and type='table'",
+			table_name_esc);
+#endif
+
+	zbx_free(table_name_esc);
+
+	ret = (NULL == zbx_db_fetch(result) ? FAIL : SUCCEED);
+
+	zbx_db_free_result(result);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check if table field exists                                       *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dbconn_field_exists(zbx_dbconn_t *db, const char *table_name, const char *field_name)
+{
+#if (defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL) || defined(HAVE_SQLITE3))
+	zbx_db_result_t	result;
+#endif
+#if defined(HAVE_MYSQL)
+	char		*field_name_esc;
+	int		ret;
+#elif defined(HAVE_POSTGRESQL)
+	char		*table_name_esc, *field_name_esc;
+	int		ret;
+#elif defined(HAVE_SQLITE3)
+	char		*table_name_esc;
+	zbx_db_row_t	row;
+	int		ret = FAIL;
+#endif
+
+#if defined(HAVE_MYSQL)
+	field_name_esc = zbx_db_dyn_escape_string(field_name);
+
+	result = zbx_dbconn_select(db, "show columns from %s like '%s'",
+			table_name, field_name_esc);
+
+	zbx_free(field_name_esc);
+
+	ret = (NULL == zbx_db_fetch(result) ? FAIL : SUCCEED);
+
+	zbx_db_free_result(result);
+#elif defined(HAVE_POSTGRESQL)
+	table_name_esc = zbx_db_dyn_escape_string(table_name);
+	field_name_esc = zbx_db_dyn_escape_string(field_name);
+
+	result = zbx_dbconn_select(db,
+			"select 1"
+			" from information_schema.columns"
+			" where table_name='%s'"
+				" and column_name='%s'"
+				" and table_schema='%s'",
+			table_name_esc, field_name_esc, zbx_db_get_schema_esc());
+
+	zbx_free(field_name_esc);
+	zbx_free(table_name_esc);
+
+	ret = (NULL == zbx_db_fetch(result) ? FAIL : SUCCEED);
+
+	zbx_db_free_result(result);
+#elif defined(HAVE_SQLITE3)
+	table_name_esc = zbx_db_dyn_escape_string(table_name);
+
+	result = zbx_dbconn_select(db, "PRAGMA table_info('%s')", table_name_esc);
+
+	zbx_free(table_name_esc);
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		if (0 != strcmp(field_name, row[1]))
+			continue;
+
+		ret = SUCCEED;
+		break;
+	}
+	zbx_db_free_result(result);
+#endif
+
+	return ret;
+}
+
+#if !defined(HAVE_SQLITE3)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check if table trigger exists                                     *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dbconn_trigger_exists(zbx_dbconn_t *db, const char *table_name, const char *trigger_name)
+{
+	char		*table_name_esc, *trigger_name_esc;
+	zbx_db_result_t	result;
+	int		ret;
+
+	table_name_esc = zbx_db_dyn_escape_string(table_name);
+	trigger_name_esc = zbx_db_dyn_escape_string(trigger_name);
+
+#if defined(HAVE_MYSQL)
+	result = zbx_dbconn_select(db,
+			"show triggers where `table`='%s'"
+			" and `trigger`='%s'",
+			table_name_esc, trigger_name_esc);
+#elif defined(HAVE_POSTGRESQL)
+	result = zbx_dbconn_select(db,
+			"select 1"
+			" from information_schema.triggers"
+			" where event_object_table='%s'"
+			" and trigger_name='%s'"
+			" and trigger_schema='%s'",
+			table_name_esc, trigger_name_esc, zbx_db_get_schema_esc());
+#endif
+	ret = (NULL == zbx_db_fetch(result) ? FAIL : SUCCEED);
+
+	zbx_db_free_result(result);
+
+	zbx_free(table_name_esc);
+	zbx_free(trigger_name_esc);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check if table index exists                                       *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dbconn_index_exists(zbx_dbconn_t *db, const char *table_name, const char *index_name)
+{
+	char		*table_name_esc, *index_name_esc;
+	zbx_db_result_t	result;
+	int		ret;
+
+	table_name_esc = zbx_db_dyn_escape_string(table_name);
+	index_name_esc = zbx_db_dyn_escape_string(index_name);
+
+#if defined(HAVE_MYSQL)
+	result = zbx_dbconn_select(db,
+			"show index from %s"
+			" where key_name='%s'",
+			table_name_esc, index_name_esc);
+#elif defined(HAVE_POSTGRESQL)
+	result = zbx_dbconn_select(db,
+			"select 1"
+			" from pg_indexes"
+			" where tablename='%s'"
+				" and indexname='%s'"
+				" and schemaname='%s'",
+			table_name_esc, index_name_esc, zbx_db_get_schema_esc());
+#endif
+
+	ret = (NULL == zbx_db_fetch(result) ? FAIL : SUCCEED);
+
+	zbx_db_free_result(result);
+
+	zbx_free(table_name_esc);
+	zbx_free(index_name_esc);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check if table primary key exists                                 *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dbconn_pk_exists(zbx_dbconn_t *db, const char *table_name)
+{
+	zbx_db_result_t	result;
+	int		ret;
+
+#if defined(HAVE_MYSQL)
+	result = zbx_dbconn_select(db,
+			"show index from %s"
+			" where key_name='PRIMARY'",
+			table_name);
+#elif defined(HAVE_POSTGRESQL)
+	result = zbx_dbconn_select(db,
+			"select 1"
+			" from information_schema.table_constraints"
+			" where table_name='%s'"
+				" and constraint_type='PRIMARY KEY'"
+				" and constraint_schema='%s'",
+			table_name, zbx_db_get_schema_esc());
+#endif
+	ret = (NULL == zbx_db_fetch(result) ? FAIL : SUCCEED);
+
+	zbx_db_free_result(result);
+
+	return ret;
+}
+
+#endif /* !defined(HAVE_SQLITE3) */
+
+/******************************************************************************
+ *                                                                            *
+ * Parameters: sql - [IN] sql statement                                       *
+ *             ids - [OUT] sorted list of selected uint64 values              *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dbconn_select_uint64(zbx_dbconn_t *db, const char *sql, zbx_vector_uint64_t *ids)
+{
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
+	zbx_uint64_t	id;
+
+	result = zbx_dbconn_select(db, "%s", sql);
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		ZBX_STR2UINT64(id, row[0]);
+
+		zbx_vector_uint64_append(ids, id);
+	}
+	zbx_db_free_result(result);
+
+	zbx_vector_uint64_sort(ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: execute query with large number of primary key matches in smaller *
+ *          batches (last batch is not executed)                              *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dbconn_prepare_multiple_query(zbx_dbconn_t *db, const char *query, const char *field_name,
+		zbx_vector_uint64_t *ids, char **sql, size_t *sql_alloc, size_t *sql_offset)
+{
+#define ZBX_MAX_IDS	950
+	int	i, ret = SUCCEED;
+
+	for (i = 0; i < ids->values_num; i += ZBX_MAX_IDS)
+	{
+		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, query);
+		zbx_db_add_condition_alloc(sql, sql_alloc, sql_offset, field_name, &ids->values[i],
+				MIN(ZBX_MAX_IDS, ids->values_num - i));
+		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ";\n");
+
+		if (SUCCEED != (ret = zbx_dbconn_execute_overflowed_sql(db, sql, sql_alloc, sql_offset)))
+			break;
+	}
+
+	return ret;
+
+#undef ZBX_MAX_IDS
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: execute query with large number of primary key matches in smaller *
+ *          batches                                                           *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dbconn_execute_multiple_query(zbx_dbconn_t *db, const char *query, const char *field_name,
+		zbx_vector_uint64_t *ids)
+{
+	char	*sql = NULL;
+	size_t	sql_alloc = ZBX_KIBIBYTE, sql_offset = 0;
+	int	ret = SUCCEED;
+
+	sql = (char *)zbx_malloc(sql, sql_alloc);
+
+	ret = zbx_dbconn_prepare_multiple_query(db, query, field_name, ids, &sql, &sql_alloc, &sql_offset);
+
+	if (SUCCEED == ret && ZBX_DB_OK > zbx_dbconn_flush_overflowed_sql(db, sql, sql_offset))
+		ret = FAIL;
+
+	zbx_free(sql);
+
+	return ret;
+}

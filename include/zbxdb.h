@@ -75,9 +75,43 @@ zbx_db_config_t;
 #	define ZBX_FOR_UPDATE	" for update"
 #endif
 
+#ifdef HAVE_MYSQL
+#	define	ZBX_SQL_STRCMP			"%s binary '%s'"
+#else
+#	define	ZBX_SQL_STRCMP			"%s'%s'"
+#endif
+#define	ZBX_SQL_STRVAL_EQ(str)			"=", str
+#define	ZBX_SQL_STRVAL_NE(str)			"<>", str
+
+#ifdef HAVE_MYSQL
+#	define ZBX_SQL_CONCAT()		"concat(%s,%s)"
+#else
+#	define ZBX_SQL_CONCAT()		"%s||%s"
+#endif
+
+#define ZBX_SQL_NULLCMP(f1, f2)	"((" f1 " is null and " f2 " is null) or " f1 "=" f2 ")"
+
+#define ZBX_DBROW2UINT64(uint, row)			\
+	do {						\
+		if (SUCCEED == zbx_db_is_null(row))	\
+			uint = 0;			\
+		else					\
+			zbx_is_uint64(row, &uint);	\
+	}						\
+	while (0)
+
+#ifdef HAVE_MYSQL
+#	define ZBX_SQL_SORT_ASC(field)	field " asc"
+#	define ZBX_SQL_SORT_DESC(field)	field " desc"
+#else
+#	define ZBX_SQL_SORT_ASC(field)	field " asc nulls first"
+#	define ZBX_SQL_SORT_DESC(field)	field " desc nulls last"
+#endif
+
+#define ZBX_DB_MAX_ID	(zbx_uint64_t)__UINT64_C(0x7fffffffffffffff)
+
 int	zbx_db_init(char **error);
 void	zbx_db_deinit(void);
-
 
 typedef enum
 {
@@ -303,13 +337,27 @@ void	zbx_db_config_validate(zbx_db_config_t *config);
 
 int	zbx_dbconn_check_extension(zbx_dbconn_t *db, struct zbx_db_version_info_t *info, int allow_unsupported);
 
-#ifdef HAVE_POSTGRESQL
+#if defined(HAVE_POSTGRESQL)
 void	zbx_dbconn_tsdb_extract_compressed_chunk_flags(zbx_dbconn_t *db, struct zbx_db_version_info_t *version_info);
 void	zbx_dbconn_tsdb_info_extract(zbx_dbconn_t *db, struct zbx_db_version_info_t *version_info);
 int	zbx_dbconn_tsdb_get_version(zbx_dbconn_t *db);
 void	zbx_dbconn_tsdb_set_compression_availability(zbx_dbconn_t *db, int compression_availabile);
 int	zbx_dbconn_tsdb_get_compression_availability(zbx_dbconn_t *db);
 #endif
+int	zbx_dbconn_table_exists(zbx_dbconn_t *db, const char *table_name);
+int	zbx_dbconn_field_exists(zbx_dbconn_t *db, const char *table_name, const char *field_name);
+
+#if !defined(HAVE_SQLITE3)
+int	zbx_dbconn_trigger_exists(zbx_dbconn_t *db, const char *table_name, const char *trigger_name);
+int	zbx_dbconn_index_exists(zbx_dbconn_t *db, const char *table_name, const char *index_name);
+int	zbx_dbconn_pk_exists(zbx_dbconn_t *db, const char *table_name);
+#endif
+
+void	zbx_dbconn_select_uint64(zbx_dbconn_t *db, const char *sql, zbx_vector_uint64_t *ids);
+int	zbx_dbconn_prepare_multiple_query(zbx_dbconn_t *db, const char *query, const char *field_name,
+		zbx_vector_uint64_t *ids, char **sql, size_t	*sql_alloc, size_t *sql_offset);
+int	zbx_dbconn_execute_multiple_query(zbx_dbconn_t *db, const char *query, const char *field_name,
+		zbx_vector_uint64_t *ids);
 
 char	*zbx_db_dyn_escape_field(const char *table_name, const char *field_name, const char *src);
 char	*zbx_db_dyn_escape_string(const char *src);
@@ -340,7 +388,13 @@ char	*zbx_db_get_schema_esc(void);
 int	zbx_dbconn_execute_overflowed_sql(zbx_dbconn_t *db, char **sql, size_t *sql_alloc, size_t *sql_offset);
 int	zbx_dbconn_flush_overflowed_sql(zbx_dbconn_t *db, char *sql, size_t sql_offset);
 
+const char	*zbx_db_sql_id_ins(zbx_uint64_t id);
+const char	*zbx_db_sql_id_cmp(zbx_uint64_t id);
+
+void	zbx_db_check_character_set(void);
+
 /* compatibility wrappers */
+
 void	zbx_db_init_autoincrement_options(void);
 int	zbx_db_connect(int flag);
 void	zbx_db_close(void);
@@ -356,7 +410,6 @@ zbx_uint64_t	zbx_db_get_maxid_num(const char *tablename, int num);
 void	zbx_db_insert_prepare_dyn(zbx_db_insert_t *db_insert, const zbx_db_table_t *table, const zbx_db_field_t **fields,
 		int fields_num);
 void	zbx_db_insert_prepare(zbx_db_insert_t *self, const char *table, ...);
-
 void	zbx_db_extract_version_info(struct zbx_db_version_info_t *version_info);
 void	zbx_tsdb_extract_compressed_chunk_flags(struct zbx_db_version_info_t *version_info);
 void	zbx_tsdb_info_extract(struct zbx_db_version_info_t *version_info);
@@ -371,5 +424,17 @@ int	zbx_db_lock_ids(const char *table_name, const char *field_name, zbx_vector_u
 int	zbx_db_check_extension(struct zbx_db_version_info_t *info, int allow_unsupported);
 int	zbx_db_flush_overflowed_sql(char *sql, size_t sql_offset);
 int	zbx_db_execute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_offset);
+int	zbx_db_table_exists(const char *table_name);
+int	zbx_db_field_exists(const char *table_name, const char *field_name);
+#if !defined(HAVE_SQLITE3)
+int	zbx_db_trigger_exists(const char *table_name, const char *trigger_name);
+int	zbx_db_index_exists(const char *table_name, const char *index_name);
+int	zbx_db_pk_exists(const char *table_name);
+#endif
+void	zbx_db_select_uint64(const char *sql, zbx_vector_uint64_t *ids);
+int	zbx_db_prepare_multiple_query(const char *query, const char *field_name, zbx_vector_uint64_t *ids, char **sql,
+		size_t *sql_alloc, size_t *sql_offset);
+int	zbx_db_execute_multiple_query(const char *query, const char *field_name, zbx_vector_uint64_t *ids);
+
 
 #endif
