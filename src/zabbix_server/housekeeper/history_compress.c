@@ -127,8 +127,8 @@ static int	hk_get_compression_age(const char *table_name, int compression_policy
 		/* extraction from JSON may return empty field when JSON exists but field doesn't */
 		if (NULL == row[0])
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "The %s table has different compression policy than '%s'",
-					table_name, field);
+			zabbix_log(LOG_LEVEL_ERR, "Unexpected TimescaleDB configuration: the %s table does not have %s "
+					"compression policy", table_name, field);
 			age = -1;
 		}
 		else
@@ -159,7 +159,7 @@ static void	hk_set_table_compression_age(const char *table_name, int age, int co
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): table: %s age %d", __func__, table_name, age);
 
-	if (age != (compress_after = hk_get_compression_age(table_name, compression_policy)))
+	if (age != (compress_after = hk_get_compression_age(table_name, compression_policy)) && -1 != compress_after)
 	{
 		zbx_db_result_t	res = NULL;
 
@@ -247,7 +247,7 @@ static void	hk_history_disable_compression(void)
 	{
 		const zbx_history_table_compression_options_t	*table = &compression_tables[i];
 
-		if (0 == hk_get_compression_age(table->name, table->compression_policy))
+		if (0 <= hk_get_compression_age(table->name, table->compression_policy))
 			continue;
 
 		zbx_db_free_result(zbx_db_select("select %s('%s')", COMPRESSION_POLICY_REMOVE, table->name));
