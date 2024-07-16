@@ -4470,6 +4470,10 @@ msgstr "Crea un tipus de suport"
 msgid "Create new"
 msgstr "Crea'n un de nou"
 
+#: jsLoader.php:363
+msgid "Create new report"
+msgstr ""
+
 #: app/views/administration.proxy.list.php:37
 msgid "Create proxy"
 msgstr "Crea un proxy"
@@ -6873,6 +6877,10 @@ msgstr "No s'han pogut pas actualitzar les propietats de la pàgina del tauler."
 msgid "Failed to update dashboard properties."
 msgstr "No s'han pogut actualitzar les propietats del tauler."
 
+#: app/views/js/popup.dashboard.share.edit.js.php:86
+msgid "Failed to update dashboard sharing."
+msgstr ""
+
 #: jsLoader.php:142
 msgid "Failed to update widget properties."
 msgstr "No s'han pogut actualitzar les propietats del giny."
@@ -7994,6 +8002,10 @@ msgstr "El grup d'equips \"%1$s\" és intern i no es pot pas esborrar."
 msgid "Host group elements"
 msgstr "Elements del grup d'equips"
 
+#: jsLoader.php:287
+msgid "Host group is not selected."
+msgstr ""
+
 #: include/views/monitoring.sysmap.edit.php:165
 msgid "Host group label type"
 msgstr "Tipus d'etiqueta del grup d'equips"
@@ -8067,6 +8079,10 @@ msgstr "Inventari d'equips"
 #: hostinventoriesoverview.php:26 hostinventoriesoverview.php:146
 msgid "Host inventory overview"
 msgstr "Visió general de l'inventari d'equips"
+
+#: jsLoader.php:284
+msgid "Host is not selected."
+msgstr ""
 
 #: include/views/monitoring.sysmap.edit.php:180
 msgid "Host label type"
@@ -11256,6 +11272,10 @@ msgstr "Ubicació de l'etiqueta de l'element del mapa"
 #: include/views/monitoring.sysmap.edit.php:240
 msgid "Map element label type"
 msgstr "Tipus d'etiqueta d'element del mapa"
+
+#: jsLoader.php:285
+msgid "Map is not selected."
+msgstr ""
 
 #: sysmap.php:128
 msgid "Map is updated! Return to map list?"
@@ -18110,6 +18130,10 @@ msgstr "Trigger en estat \"desconegut\"."
 msgid "Trigger in template \"%1$s\" has dependency with trigger in template \"%2$s\"."
 msgstr "El trigger de la plantilla \"%1$s\" té una dependència amb el trigger de la plantilla \"%2$s\"."
 
+#: jsLoader.php:286
+msgid "Trigger is not selected."
+msgstr ""
+
 #: include/views/monitoring.sysmap.edit.php:195
 msgid "Trigger label type"
 msgstr "Tipus d'etiqueta del trigger"
@@ -19757,6 +19781,10 @@ msgstr "Veure"
 msgid "View as"
 msgstr "Veure com a"
 
+#: jsLoader.php:397
+msgid "View related reports"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1234
 msgid "Virtual space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr "Mida de l'espai virtual en octets o en percentatge respecte al total. Retorna els octets en enters, i els percentatges en flotants"
@@ -20295,6 +20323,10 @@ msgstr "No teniu pas permís per accedir a aquesta pàgina."
 #: include/func.inc.php:1724
 msgid "You must login to view this page."
 msgstr "Heu d'iniciar sessió per veure aquesta pàgina."
+
+#: jsLoader.php:282
+msgid "You need to have at least one image uploaded to create map element. Images can be uploaded in Administration->General->Images section."
+msgstr ""
 
 #: include/classes/db/DB.php:135
 msgid "Your database is not working properly. Please wait a few minutes and try to repeat this action. If the problem still persists, please contact system administrator. The problem might be caused by long running transaction or row level lock accomplished by your database management system."
@@ -22015,6 +22047,10 @@ msgstr "dreta"
 #: app/controllers/CControllerPopupTriggerExpr.php:924
 msgid "right() - Returns the rightmost count characters"
 msgstr "right() - Retorna els caràcters de recompte més a la dreta"
+
+#: jsLoader.php:199
+msgid "root"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:937
 msgid "round() - Rounds a value to decimal places"

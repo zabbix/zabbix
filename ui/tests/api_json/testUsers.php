@@ -268,6 +268,113 @@ class testUsers extends CAPITest {
 		self::$data['tokens']['valid_for_user_with_disabled_usergroup'] = $tokens[3]['token'];
 	}
 
+	public static function getUserData(): array {
+		return [
+			'Test user.get: "selectRole" (null)' => [
+				'request' => [
+					'output' => [],
+					'selectRole' => null,
+					'userids' => ['1']
+				],
+				'expected_result' => [[
+					'userid' => '1'
+				]],
+				'expected_error' => null
+			],
+			'Test user.get: "selectRole" (empty string)' => [
+				'request' => [
+					'output' => [],
+					'selectRole' => '',
+					'userids' => ['1']
+				],
+				'expected_result' => [],
+				'expected_error' => 'Invalid parameter "/output": value must be "extend".'
+			],
+			'Test user.get: "selectRole" (invalid parameter "abc")' => [
+				'request' => [
+					'output' => [],
+					'selectRole' => 'abc',
+					'userids' => ['1']
+				],
+				'expected_result' => [],
+				'expected_error' => 'Invalid parameter "/output": value must be "extend".'
+			],
+			'Test user.get: "selectRole" (unsupported parameter "count")' => [
+				'request' => [
+					'output' => [],
+					'selectRole' => 'count',
+					'userids' => ['1']
+				],
+				'expected_result' => [],
+				'expected_error' => 'Invalid parameter "/output": value must be "extend".'
+			],
+			'Test user.get: "selectRole" with extended output' => [
+				'request' => [
+					'output' => [],
+					'selectRole' => 'extend',
+					'userids' => ['1']
+				],
+				'expected_result' => [[
+					'userid' => '1',
+					'role' => [
+						'roleid' => '3',
+						'name' => 'Super admin role',
+						'type' => '3', // USER_TYPE_SUPER_ADMIN
+						'readonly' => '1'
+					]
+				]],
+				'expected_error' => null
+			],
+			'Test user.get: "selectRole" (empty array)' => [
+				'request' => [
+					'output' => [],
+					'selectRole' => [],
+					'userids' => ['1']
+				],
+				'expected_result' => [[
+					'userid' => '1',
+					'role' => []
+				]],
+				'expected_error' => null
+			],
+			'Test user.get: "selectRole" (invalid array parameter "abc")' => [
+				'request' => [
+					'output' => [],
+					'selectRole' => ['abc'],
+					'userids' => ['1']
+				],
+				'expected_result' => [],
+				'expected_error' => 'Invalid parameter "/output/1": value must be one of "roleid", "name", "type", "readonly".'
+			],
+
+			'Test user.get: "selectRole" with "roleid"' => [
+				'request' => [
+					'output' => [],
+					'selectRole' => ['roleid'],
+					'userids' => ['1']
+				],
+				'expected_result' => [[
+					'userid' => '1',
+					'role' => [
+						'roleid' => '3'
+					]
+				]],
+				'expected_error' => null
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getUserData
+	 */
+	public function testUsers_Get(array $request, array $expected_result, ?string $expected_error): void {
+		$result = $this->call('user.get', $request, $expected_error);
+
+		if ($expected_error === null) {
+			$this->assertSame($expected_result, $result['result']);
+		}
+	}
+
 	public static function user_create() {
 		return [
 			// Check user password.

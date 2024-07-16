@@ -4386,6 +4386,10 @@ msgstr "Tạo media type"
 msgid "Create new"
 msgstr "Tạo mới"
 
+#: jsLoader.php:363
+msgid "Create new report"
+msgstr ""
+
 #: app/views/administration.proxy.list.php:37
 msgid "Create proxy"
 msgstr "Tạo proxy"
@@ -6785,6 +6789,10 @@ msgstr ""
 msgid "Failed to update dashboard properties."
 msgstr ""
 
+#: app/views/js/popup.dashboard.share.edit.js.php:86
+msgid "Failed to update dashboard sharing."
+msgstr ""
+
 #: jsLoader.php:142
 msgid "Failed to update widget properties."
 msgstr ""
@@ -7901,6 +7909,10 @@ msgstr ""
 msgid "Host group elements"
 msgstr "Các phần tử nhóm host"
 
+#: jsLoader.php:287
+msgid "Host group is not selected."
+msgstr ""
+
 #: include/views/monitoring.sysmap.edit.php:165
 msgid "Host group label type"
 msgstr "Kiểu nhãn nhóm host"
@@ -7974,6 +7986,10 @@ msgstr "Host lưu trữ"
 #: hostinventoriesoverview.php:26 hostinventoriesoverview.php:146
 msgid "Host inventory overview"
 msgstr "Tổng quan về host lưu trữ"
+
+#: jsLoader.php:284
+msgid "Host is not selected."
+msgstr ""
 
 #: include/views/monitoring.sysmap.edit.php:180
 msgid "Host label type"
@@ -11150,6 +11166,10 @@ msgstr "Vị trí nhãn phần tử sơ đồ "
 #: include/views/monitoring.sysmap.edit.php:240
 msgid "Map element label type"
 msgstr "Loại nhãn phần tử bản đồ"
+
+#: jsLoader.php:285
+msgid "Map is not selected."
+msgstr ""
 
 #: sysmap.php:128
 msgid "Map is updated! Return to map list?"
@@ -17980,6 +18000,10 @@ msgstr "Trigger ở trạng thái \"unknown\""
 msgid "Trigger in template \"%1$s\" has dependency with trigger in template \"%2$s\"."
 msgstr "Trigger trong template \"%1$s\" phụ thuộc vào trigger trong template \"%2$s\"."
 
+#: jsLoader.php:286
+msgid "Trigger is not selected."
+msgstr ""
+
 #: include/views/monitoring.sysmap.edit.php:195
 msgid "Trigger label type"
 msgstr "Kiểu nhãn trigger"
@@ -19620,6 +19644,10 @@ msgstr ""
 msgid "View as"
 msgstr "Xem"
 
+#: jsLoader.php:397
+msgid "View related reports"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1234
 msgid "Virtual space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr "Kích thước không gian ảo tính bằng byte hoặc theo tỷ lệ phần trăm từ tổng số. Trả về integer cho byte; float cho tỷ lệ phần trăm"
@@ -20156,6 +20184,10 @@ msgstr "Bạn không có quyền truy cập trang này."
 #: include/func.inc.php:1724
 msgid "You must login to view this page."
 msgstr "Bạn phải đăng nhập để xem trang này."
+
+#: jsLoader.php:282
+msgid "You need to have at least one image uploaded to create map element. Images can be uploaded in Administration->General->Images section."
+msgstr ""
 
 #: include/classes/db/DB.php:135
 msgid "Your database is not working properly. Please wait a few minutes and try to repeat this action. If the problem still persists, please contact system administrator. The problem might be caused by long running transaction or row level lock accomplished by your database management system."
@@ -21872,6 +21904,10 @@ msgstr "Bên phải "
 
 #: app/controllers/CControllerPopupTriggerExpr.php:924
 msgid "right() - Returns the rightmost count characters"
+msgstr ""
+
+#: jsLoader.php:199
+msgid "root"
 msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:937

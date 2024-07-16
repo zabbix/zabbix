@@ -4459,6 +4459,10 @@ msgstr "Criar tipo de média"
 msgid "Create new"
 msgstr "Criar novo"
 
+#: jsLoader.php:363
+msgid "Create new report"
+msgstr ""
+
 #: app/views/administration.proxy.list.php:37
 msgid "Create proxy"
 msgstr "Criar proxy"
@@ -6863,6 +6867,10 @@ msgstr ""
 msgid "Failed to update dashboard properties."
 msgstr ""
 
+#: app/views/js/popup.dashboard.share.edit.js.php:86
+msgid "Failed to update dashboard sharing."
+msgstr ""
+
 #: jsLoader.php:142
 msgid "Failed to update widget properties."
 msgstr ""
@@ -7984,6 +7992,10 @@ msgstr ""
 msgid "Host group elements"
 msgstr "Elementos do grupo de hosts"
 
+#: jsLoader.php:287
+msgid "Host group is not selected."
+msgstr ""
+
 #: include/views/monitoring.sysmap.edit.php:165
 msgid "Host group label type"
 msgstr "Tipo de etiqueta do grupo de hosts"
@@ -8057,6 +8069,10 @@ msgstr "Inventário do host"
 #: hostinventoriesoverview.php:26 hostinventoriesoverview.php:146
 msgid "Host inventory overview"
 msgstr "Vista global do inventário de host"
+
+#: jsLoader.php:284
+msgid "Host is not selected."
+msgstr ""
 
 #: include/views/monitoring.sysmap.edit.php:180
 msgid "Host label type"
@@ -11246,6 +11262,10 @@ msgstr ""
 
 #: include/views/monitoring.sysmap.edit.php:240
 msgid "Map element label type"
+msgstr ""
+
+#: jsLoader.php:285
+msgid "Map is not selected."
 msgstr ""
 
 #: sysmap.php:128
@@ -18101,6 +18121,10 @@ msgstr "A trigger está no estado \"desconhecido\""
 msgid "Trigger in template \"%1$s\" has dependency with trigger in template \"%2$s\"."
 msgstr "O trigger no template \"%1$s\" tem um dependência com o trigger no template \"%2$s\"."
 
+#: jsLoader.php:286
+msgid "Trigger is not selected."
+msgstr ""
+
 #: include/views/monitoring.sysmap.edit.php:195
 msgid "Trigger label type"
 msgstr "Tipo de etiqueta do trigger"
@@ -19748,6 +19772,10 @@ msgstr ""
 msgid "View as"
 msgstr ""
 
+#: jsLoader.php:397
+msgid "View related reports"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1234
 msgid "Virtual space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr "Espaço virtual em bytes ou percentagem do total. Retorna inteiro para bytes; Ponto flutuante para percentagem"
@@ -20286,6 +20314,10 @@ msgstr "Não possui permissão para aceder a esta página."
 #: include/func.inc.php:1724
 msgid "You must login to view this page."
 msgstr "Terá que iniciar sessão para poder ver esta página."
+
+#: jsLoader.php:282
+msgid "You need to have at least one image uploaded to create map element. Images can be uploaded in Administration->General->Images section."
+msgstr ""
 
 #: include/classes/db/DB.php:135
 msgid "Your database is not working properly. Please wait a few minutes and try to repeat this action. If the problem still persists, please contact system administrator. The problem might be caused by long running transaction or row level lock accomplished by your database management system."
@@ -22003,6 +22035,10 @@ msgstr "direita"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:924
 msgid "right() - Returns the rightmost count characters"
+msgstr ""
+
+#: jsLoader.php:199
+msgid "root"
 msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:937

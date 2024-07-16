@@ -805,7 +805,7 @@ function makeMessageBox(type, messages, title, show_close_box, show_details) {
 		var $button = jQuery('<button>')
 				.addClass('overlay-close-btn')
 				.attr('type', 'button')
-				.attr('title', t('Close'))
+				.attr('title', t('S_CLOSE'))
 				.click(function() {
 					jQuery(this)
 						.closest('.' + msg_class)
