@@ -105,7 +105,7 @@ static void	hk_check_table_segmentation(const char *table_name, const char *segm
  *             compression_policy - [IN]                                      *
  *                                                                            *
  * Return value: >=0 - data compression age in seconds                        *
- *               <0  - hypertable has different compression policy            *
+ *               -1  - hypertable has different compression policy            *
  *                                                                            *
  ******************************************************************************/
 static int	hk_get_compression_age(const char *table_name, int compression_policy)
