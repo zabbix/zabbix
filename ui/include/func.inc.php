@@ -2732,3 +2732,22 @@ function getTileProviders(): array {
 		]
 	];
 }
+
+/**
+ * Check if a string is valid in a specified encoding.
+ *
+ * @param string $string   The string to check. Only string type values are allowed due to iconv().
+ * @param string $encoding The encoding to check against. Only string type values are allowed due to iconv().
+ *
+ * @return bool True if the string is valid in the specified encoding, false otherwise.
+ */
+function zbx_mb_check_encoding(string $string, string $encoding): bool {
+	if (function_exists('mb_check_encoding')) {
+		return mb_check_encoding($string, $encoding);
+	}
+
+	// Alternative implementation if mb_check_encoding does not exist.
+	$decoded_string = iconv($encoding, $encoding, $string);
+
+	return $decoded_string === $string;
+}

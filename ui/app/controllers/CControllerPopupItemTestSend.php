@@ -282,7 +282,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 		];
 
 		if ($this->use_prev_value) {
-			$prev_value = $this->getInput('prev_value', '');
+			$prev_value = $this->get_value_from_host ? $this->getInput('value', '') : $this->getInput('prev_value', '');
 			$prev_time = $this->getInput('prev_time', '');
 
 			if ($prev_value !== '' || $prev_time !== '') {
@@ -373,9 +373,10 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			$output['value'] = $result_item['result'];
 			$output['eol'] = $result_item['eol'] === 'CRLF' ? ZBX_EOL_CRLF : ZBX_EOL_LF;
 
-			// Move current value to previous value field.
-			if ($this->use_prev_value && $result_item['result'] !== '') {
-				$output['prev_value'] = $result_item['result'];
+			if ($this->use_prev_value) {
+				$output['prev_value'] = array_key_exists('history', $data['options'])
+					? $data['options']['history']['value']
+					: $result_item['result'];
 				$output['prev_time'] = $this->getPrevTime();
 			}
 

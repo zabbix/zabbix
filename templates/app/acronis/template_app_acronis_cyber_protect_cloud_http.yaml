@@ -32,7 +32,6 @@ zabbix_export:
           key: acronis.cpc.account_manager.get_token
           delay: '{$ACRONIS.CPC.AUTH.INTERVAL}'
           history: '0'
-          trends: '0'
           value_type: TEXT
           authtype: BASIC
           username: '{$ACRONIS.CPC.AUTH.CLIENT.ID}'
@@ -49,8 +48,8 @@ zabbix_export:
                   return JSON.stringify(list);
           timeout: 15s
           url: '{$ACRONIS.CPC.DATACENTER.URL}{$ACRONIS.CPC.PATH.ACCOUNT.MANAGEMENT}/idp/token'
-          posts: grant_type=client_credentials
           status_codes: ''
+          posts: grant_type=client_credentials
           http_proxy: '{$ACRONIS.CPC.HTTP.PROXY}'
           headers:
             - name: Content-Type
@@ -66,7 +65,6 @@ zabbix_export:
           name: 'Acronis CPC: MSP Discovery'
           type: DEPENDENT
           key: acronis.cpc.lld.msp_discovery
-          delay: '0'
           description: 'Discovers MSP and creates host prototype based on that.'
           host_prototypes:
             - uuid: bbdc747270f64876bc701dd87c27dbbe
@@ -139,7 +137,6 @@ zabbix_export:
           key: acronis.cpc.alerts.get
           delay: 5m
           history: '0'
-          trends: '0'
           value_type: TEXT
           description: 'Fetches all alerts.'
           preprocessing:
@@ -164,7 +161,6 @@ zabbix_export:
           name: 'Alerts with "critical" severity'
           type: DEPENDENT
           key: acronis.cpc.alerts.severity.crit
-          delay: '0'
           description: 'Gets count of alerts with "critical" severity.'
           preprocessing:
             - type: JSONPATH
@@ -184,7 +180,6 @@ zabbix_export:
           name: 'Alerts with "error" severity'
           type: DEPENDENT
           key: acronis.cpc.alerts.severity.err
-          delay: '0'
           description: 'Gets count of alerts with "error" severity.'
           preprocessing:
             - type: JSONPATH
@@ -204,7 +199,6 @@ zabbix_export:
           name: 'Alerts with "information" severity'
           type: DEPENDENT
           key: acronis.cpc.alerts.severity.info
-          delay: '0'
           description: 'Gets count of alerts with "information" severity.'
           preprocessing:
             - type: JSONPATH
@@ -224,7 +218,6 @@ zabbix_export:
           name: 'Alerts with "ok" severity'
           type: DEPENDENT
           key: acronis.cpc.alerts.severity.ok
-          delay: '0'
           description: 'Gets count of alerts with "ok" severity.'
           preprocessing:
             - type: JSONPATH
@@ -244,7 +237,6 @@ zabbix_export:
           name: 'Alerts with "warning" severity'
           type: DEPENDENT
           key: acronis.cpc.alerts.severity.warn
-          delay: '0'
           description: 'Gets count of alerts with "warning" severity.'
           preprocessing:
             - type: JSONPATH
@@ -266,7 +258,6 @@ zabbix_export:
           key: acronis.cpc.customers.get
           delay: 5m
           history: '0'
-          trends: '0'
           value_type: TEXT
           description: 'Fetches all customers.'
           preprocessing:
@@ -295,7 +286,6 @@ zabbix_export:
           type: HTTP_AGENT
           key: acronis.cpc.devices.get
           history: '0'
-          trends: '0'
           value_type: TEXT
           description: 'Fetches all devices.'
           preprocessing:
@@ -445,31 +435,24 @@ zabbix_export:
           name: 'Acronis CPC: Alerts discovery'
           type: DEPENDENT
           key: acronis.cpc.alerts.discovery
-          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#CATEGORY}'
                 value: '{$ACRONIS.CPC.ALERT.DISCOVERY.CATEGORY.MATCHES}'
-                formulaid: A
               - macro: '{#CATEGORY}'
                 value: '{$ACRONIS.CPC.ALERT.DISCOVERY.CATEGORY.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
               - macro: '{#RESOURCE_NAME}'
                 value: '{$ACRONIS.CPC.ALERT.DISCOVERY.RESOURCE.MATCHES}'
-                formulaid: C
               - macro: '{#RESOURCE_NAME}'
                 value: '{$ACRONIS.CPC.ALERT.DISCOVERY.RESOURCE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: D
               - macro: '{#SEVERITY}'
                 value: '{$ACRONIS.CPC.ALERT.DISCOVERY.SEVERITY.MATCHES}'
-                formulaid: E
               - macro: '{#SEVERITY}'
                 value: '{$ACRONIS.CPC.ALERT.DISCOVERY.SEVERITY.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: F
           lifetime: '0'
           description: 'Discovers alerts.'
           item_prototypes:
@@ -477,7 +460,6 @@ zabbix_export:
               name: 'Alert [{#TYPE}]:[{#ALERT_ID}]: Alert severity'
               type: DEPENDENT
               key: 'acronis.cpc.alert.severity[{#ALERT_ID}]'
-              delay: '0'
               description: 'Severity for the alert.'
               valuemap:
                 name: 'Alert severity'
@@ -575,27 +557,22 @@ zabbix_export:
           name: 'Acronis CPC: Customer discovery'
           type: DEPENDENT
           key: acronis.cpc.customer.discovery
-          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#KIND}'
                 value: '{$ACRONIS.CPC.CUSTOMER.DISCOVERY.KIND.MATCHES}'
-                formulaid: A
               - macro: '{#NAME}'
                 value: '{$ACRONIS.CPC.CUSTOMER.DISCOVERY.NAME.MATCHES}'
-                formulaid: B
               - macro: '{#NAME}'
                 value: '{$ACRONIS.CPC.CUSTOMER.DISCOVERY.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: C
           description: 'Discovers customers.'
           item_prototypes:
             - uuid: d61dc067880a4317886acd54d0df1da1
               name: 'Customer [{#NAME}]: Enabled status'
               type: DEPENDENT
               key: 'acronis.cpc.customer.status[{#NAME}]'
-              delay: '0'
               description: 'Enabled status for customer (true or false).'
               valuemap:
                 name: 'True false'
@@ -606,8 +583,6 @@ zabbix_export:
                   error_handler: CUSTOM_ERROR
                   error_handler_params: 'Could not find customer status'
                 - type: BOOL_TO_DECIMAL
-                  parameters:
-                    - ''
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
@@ -635,24 +610,20 @@ zabbix_export:
           name: 'Acronis CPC: Device discovery'
           type: DEPENDENT
           key: acronis.cpc.device.discovery
-          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#TENANT_NAME}'
                 value: '{$ACRONIS.CPC.DEVICE.DISCOVERY.TENANT.MATCHES}'
-                formulaid: A
               - macro: '{#TENANT_NAME}'
                 value: '{$ACRONIS.CPC.DEVICE.DISCOVERY.TENANT.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
           description: 'Discovers devices.'
           item_prototypes:
             - uuid: 63f8280408c34e029085af75f15c0db3
               name: 'Device [{#NAME}]:[{#ID}]: Agent enabled'
               type: DEPENDENT
               key: 'acronis.cpc.device.agent.enabled[{#NAME}]'
-              delay: '0'
               description: 'Agent status (enabled or disabled) for the device.'
               valuemap:
                 name: 'True false'
@@ -691,7 +662,6 @@ zabbix_export:
               name: 'Device [{#NAME}]:[{#ID}]: Agent online'
               type: DEPENDENT
               key: 'acronis.cpc.device.agent.online[{#NAME}]'
-              delay: '0'
               description: 'Agent reachability for the device.'
               valuemap:
                 name: 'True false'
@@ -719,8 +689,6 @@ zabbix_export:
               name: 'Device [{#NAME}]:[{#ID}]: Agent version'
               type: DEPENDENT
               key: 'acronis.cpc.device.agent.version[{#NAME}]'
-              delay: '0'
-              trends: '0'
               value_type: CHAR
               description: 'Agent version for the device.'
               preprocessing:
@@ -747,7 +715,6 @@ zabbix_export:
               name: 'Device [{#NAME}]:[{#ID}]: Next machine backup run'
               type: DEPENDENT
               key: 'acronis.cpc.device.backup.next[{#NAME}]'
-              delay: '0'
               units: unixtime
               description: 'Next scheduled machine backup run for device.'
               preprocessing:
@@ -787,7 +754,6 @@ zabbix_export:
               name: 'Device [{#NAME}]:[{#ID}]: Previous successful machine backup run'
               type: DEPENDENT
               key: 'acronis.cpc.device.backup.prev.ok[{#NAME}]'
-              delay: '0'
               units: unixtime
               description: 'Previous successful machine backup run for device.'
               preprocessing:
@@ -816,7 +782,6 @@ zabbix_export:
               name: 'Device [{#NAME}]:[{#ID}]: Previous machine backup run'
               type: DEPENDENT
               key: 'acronis.cpc.device.backup.prev[{#NAME}]'
-              delay: '0'
               units: unixtime
               description: 'Previous machine backup run for device.'
               preprocessing:
@@ -845,7 +810,6 @@ zabbix_export:
               name: 'Device [{#NAME}]:[{#ID}]: CyberFit score'
               type: DEPENDENT
               key: 'acronis.cpc.device.cyberfit[{#NAME}]'
-              delay: '0'
               value_type: FLOAT
               description: 'Acronis "CyberFit" score for the device. Value of "-1" is assigned if "CyberFit" could not be found for device.'
               valuemap:
@@ -907,7 +871,6 @@ zabbix_export:
               name: 'Device [{#NAME}]:[{#ID}]: Next patch management run'
               type: DEPENDENT
               key: 'acronis.cpc.device.patch.next[{#NAME}]'
-              delay: '0'
               units: unixtime
               description: 'Next scheduled patch management run for device.'
               preprocessing:
@@ -947,7 +910,6 @@ zabbix_export:
               name: 'Device [{#NAME}]:[{#ID}]: Previous successful patch management run'
               type: DEPENDENT
               key: 'acronis.cpc.device.patch.prev.ok[{#NAME}]'
-              delay: '0'
               units: unixtime
               description: 'Previous successful patch management run for device.'
               preprocessing:
@@ -976,7 +938,6 @@ zabbix_export:
               name: 'Device [{#NAME}]:[{#ID}]: Previous patch management run'
               type: DEPENDENT
               key: 'acronis.cpc.device.patch.prev[{#NAME}]'
-              delay: '0'
               units: unixtime
               description: 'Previous patch management run for device.'
               preprocessing:
@@ -1005,8 +966,6 @@ zabbix_export:
               name: 'Device [{#NAME}]:[{#ID}]: Protection plan name'
               type: DEPENDENT
               key: 'acronis.cpc.device.protection.name[{#NAME}]'
-              delay: '0'
-              trends: '0'
               value_type: CHAR
               description: 'Protection plan name for device.'
               preprocessing:
@@ -1033,7 +992,6 @@ zabbix_export:
               name: 'Device [{#NAME}]:[{#ID}]: Next antimalware protection scan'
               type: DEPENDENT
               key: 'acronis.cpc.device.protection.scan.next[{#NAME}]'
-              delay: '0'
               units: unixtime
               description: 'Next scheduled antimalware protection scan for device.'
               preprocessing:
@@ -1073,7 +1031,6 @@ zabbix_export:
               name: 'Device [{#NAME}]:[{#ID}]: Previous successful antimalware protection scan'
               type: DEPENDENT
               key: 'acronis.cpc.device.protection.scan.prev.ok[{#NAME}]'
-              delay: '0'
               units: unixtime
               description: 'Previous successful antimalware protection scan for device.'
               preprocessing:
@@ -1102,7 +1059,6 @@ zabbix_export:
               name: 'Device [{#NAME}]:[{#ID}]: Previous antimalware protection scan'
               type: DEPENDENT
               key: 'acronis.cpc.device.protection.scan.prev[{#NAME}]'
-              delay: '0'
               units: unixtime
               description: 'Previous antimalware protection scan for device.'
               preprocessing:
@@ -1131,8 +1087,6 @@ zabbix_export:
               name: 'Device [{#NAME}]:[{#ID}]: Protection status'
               type: DEPENDENT
               key: 'acronis.cpc.device.protection.status[{#NAME}]'
-              delay: '0'
-              trends: '0'
               value_type: CHAR
               description: 'Protection status for device.'
               preprocessing:
@@ -1184,7 +1138,6 @@ zabbix_export:
               type: HTTP_AGENT
               key: 'acronis.cpc.device.res.status.raw[{#NAME}]'
               history: '0'
-              trends: '0'
               value_type: TEXT
               description: 'Gets statuses for device resources.'
               preprocessing:
@@ -1216,7 +1169,6 @@ zabbix_export:
               name: 'Device [{#NAME}]:[{#ID}]: Next vulnerability assessment'
               type: DEPENDENT
               key: 'acronis.cpc.device.vuln.next[{#NAME}]'
-              delay: '0'
               units: unixtime
               description: 'Next scheduled vulnerability assessment for device.'
               preprocessing:
@@ -1256,7 +1208,6 @@ zabbix_export:
               name: 'Device [{#NAME}]:[{#ID}]: Previous successful vulnerability assessment'
               type: DEPENDENT
               key: 'acronis.cpc.device.vuln.prev.ok[{#NAME}]'
-              delay: '0'
               units: unixtime
               description: 'Previous successful vulnerability assessment for device.'
               preprocessing:
@@ -1285,7 +1236,6 @@ zabbix_export:
               name: 'Device [{#NAME}]:[{#ID}]: Previous vulnerability assessment'
               type: DEPENDENT
               key: 'acronis.cpc.device.vuln.prev[{#NAME}]'
-              delay: '0'
               units: unixtime
               description: 'Previous vulnerability assessment for device.'
               preprocessing:

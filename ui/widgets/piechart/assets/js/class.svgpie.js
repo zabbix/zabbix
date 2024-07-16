@@ -282,8 +282,8 @@ class CSVGPie {
 	 * @param {number} height
 	 */
 	setSize({width, height}) {
-		this.#width = width - (this.#padding.horizontal) * 2;
-		this.#height = height - (this.#padding.vertical) * 2;
+		this.#width = Math.max(0, width - this.#padding.horizontal * 2);
+		this.#height = Math.max(0, height - this.#padding.vertical * 2);
 
 		this.#svg
 			.attr('width', width)
@@ -646,12 +646,15 @@ class CSVGPie {
 				.attr('class', CSVGPie.ZBX_STYLE_ARC_NO_DATA_INNER)
 				.attr('r', this.#radius_inner);
 
+			let total_value_width = this.#radius_inner * 2;
+			total_value_width -= total_value_width / CSVGPie.TOTAL_VALUE_PADDING;
+
 			if (this.#config.total_value?.show) {
 				this.#total_value_container = this.#container
 					.append('svg:foreignObject')
 					.attr('class', CSVGPie.ZBX_STYLE_TOTAL_VALUE)
-					.attr('x', -this.#radius_inner)
-					.attr('width', `${this.#radius_inner * 2}px`)
+					.attr('x', -total_value_width / 2)
+					.attr('width', `${total_value_width}px`)
 					.style('font-weight', this.#config.total_value.is_bold ? 'bold' : '')
 					.style('color', this.#config.total_value.color !== '' ? this.#config.total_value.color : '')
 					.style('display', 'none');
@@ -679,37 +682,38 @@ class CSVGPie {
 
 			const width_ratio = available_width / text_width;
 
-			const default_height = default_size * width_ratio / this.#scale;
-			const max_height = available_width / this.#scale * CSVGPie.TEXT_BASELINE;
+			const default_height = default_size * width_ratio;
+			const max_height = available_width * CSVGPie.TEXT_BASELINE;
 
-			const normal_height = Math.min(default_height, max_height);
-			const min_height = CSVGPie.TOTAL_VALUE_HEIGHT_MIN / this.#scale;
+			const normal_height = Math.min(default_height, max_height) * .875;
+			const min_height = CSVGPie.TOTAL_VALUE_HEIGHT_MIN;
 
-			return Math.max(normal_height, min_height);
+			return Math.max(normal_height, min_height) / this.#scale;
 		}
 
 		if (this.#sectors_new.length > 0) {
 			this.#no_data_container.style('display', 'none');
 
 			if (this.#config.total_value?.show) {
-				let available_width = this.#radius_inner * 2;
-				available_width -= available_width / CSVGPie.TOTAL_VALUE_PADDING;
-
 				this.#total_value_container
 					.select('div')
 					.text(this.#total_value_text)
-					.attr('title', this.#total_value_text)
-					.style('width', `${available_width}px`);
+					.attr('title', this.#total_value_text);
 
 				if (this.#config.total_value.is_custom_size) {
 					this.#total_value_font_size = this.#config.total_value.size * 10;
 				}
 				else {
-					const font_weight = this.#config.total_value.is_bold ? 'bold' : '';
+					if (this.#scale > 0) {
+						const font_weight = this.#config.total_value.is_bold ? 'bold' : '';
 
-					this.#total_value_font_size = getAutoFontSize(
-						this.#total_value_text, CSVGPie.TOTAL_VALUE_HEIGHT_MIN, font_weight
-					);
+						this.#total_value_font_size = getAutoFontSize(
+							this.#total_value_text, CSVGPie.TOTAL_VALUE_HEIGHT_MIN, font_weight
+						);
+					}
+					else {
+						this.#total_value_font_size = 0;
+					}
 				}
 
 				this.#total_value_container
