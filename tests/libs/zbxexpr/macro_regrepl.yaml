@@ -208,7 +208,7 @@ in:
   params: '"",""'
 
 out:
-  value: ''
+  value: 'customername_1'
   return: SUCCEED
 
 ---
@@ -231,5 +231,13 @@ out:
   value: '\'
   return: SUCCEED
 
+---
+test case: empty regular expression
+in:
+  data: 'customername_1'
+  params: ',a'
 
+out:
+  value: 'customername_1'
+  return: SUCCEED
 ...

@@ -1038,10 +1038,16 @@ int	zbx_regexp_repl(const char *string, const char *pattern, const char *repl_te
 	zbx_vector_regrepl_t	matches;
 
 	zbx_free(*out);
+
+	if ('\0' == *pattern)
+	{
+		*out = repleaced;
+		return SUCCEED;
+	}
+
 	if (FAIL == regexp_prepare(pattern, ZBX_REGEXP_MULTILINE, &regexp, &error))
 	{
 		*out = repleaced;
-		zbx_free(repleaced);
 		zbx_free(error);
 		return FAIL;
 	}

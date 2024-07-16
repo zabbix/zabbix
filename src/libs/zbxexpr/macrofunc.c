@@ -481,12 +481,14 @@ static int	macrofunc_regrepl(char **params, size_t nparam, char **out)
 
 	for (i = 0; i < nparam; i += 2)
 	{
-		if (FAIL == zbx_regexp_repl(*out, params[i], params[i + 1], &value))
-			return FAIL;
+		int	ret;
 
+		ret = zbx_regexp_repl(*out, params[i], params[i + 1], &value);
 		zbx_free(*out);
 		*out = value;
 		value = NULL;
+		if (FAIL == ret)
+			return FAIL;
 	}
 
 	return SUCCEED;
