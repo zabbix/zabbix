@@ -241,7 +241,7 @@ $formgrid = (new CFormGrid())
 				->addValue(_('Raw data'), ZBX_POSTTYPE_RAW)
 				->addValue(_('JSON data'), ZBX_POSTTYPE_JSON)
 				->addValue(_('XML data'), ZBX_POSTTYPE_XML)
-				->setEnabled(!$readonly)
+				->setReadonly($readonly)
 				->setModern()
 		))->setId('js-item-post-type-field')
 	])
@@ -300,7 +300,7 @@ $formgrid = (new CFormGrid())
 		(new CLabel(_('Follow redirects'), 'follow_redirects'))->setId('js-item-follow-redirects-label'),
 		(new CFormField(
 			(new CCheckBox('follow_redirects', HTTPTEST_STEP_FOLLOW_REDIRECTS_ON))
-				->setEnabled(!$readonly)
+				->setReadonly($readonly)
 				->setChecked($item['follow_redirects'] == HTTPTEST_STEP_FOLLOW_REDIRECTS_ON)
 		))->setId('js-item-follow-redirects-field')
 	])
@@ -311,7 +311,7 @@ $formgrid = (new CFormGrid())
 				->addValue(_('Body'), HTTPTEST_STEP_RETRIEVE_MODE_CONTENT)
 				->addValue(_('Headers'), HTTPTEST_STEP_RETRIEVE_MODE_HEADERS)
 				->addValue(_('Body and headers'), HTTPTEST_STEP_RETRIEVE_MODE_BOTH)
-				->setEnabled(!($readonly || $item['request_method'] == HTTPCHECK_REQUEST_HEAD))
+				->setReadonly($readonly || $item['request_method'] == HTTPCHECK_REQUEST_HEAD)
 				->setModern()
 		))->setId('js-item-retrieve-mode-field')
 	])
@@ -319,7 +319,7 @@ $formgrid = (new CFormGrid())
 		(new CLabel(_('Convert to JSON'), 'output_format'))->setId('js-item-output-format-label'),
 		(new CFormField(
 			(new CCheckBox('output_format', HTTPCHECK_STORE_JSON))
-				->setEnabled(!$readonly)
+				->setReadonly($readonly)
 				->setChecked($item['output_format'] == HTTPCHECK_STORE_JSON)
 		))->setId('js-item-output-format-field')
 	])
@@ -363,7 +363,7 @@ $formgrid = (new CFormGrid())
 		(new CLabel(_('SSL verify peer'), 'verify_peer'))->setId('js-item-verify-peer-label'),
 		(new CFormField(
 			(new CCheckBox('verify_peer', ZBX_HTTP_VERIFY_PEER_ON))
-				->setEnabled(!$readonly)
+				->setReadonly($readonly)
 				->setChecked($item['verify_peer'] == ZBX_HTTP_VERIFY_PEER_ON)
 		))->setId('js-item-verify-peer-field')
 	])
@@ -371,7 +371,7 @@ $formgrid = (new CFormGrid())
 		(new CLabel(_('SSL verify host'), 'verify_host'))->setId('js-item-verify-host-label'),
 		(new CFormField(
 			(new CCheckBox('verify_host', ZBX_HTTP_VERIFY_HOST_ON))
-				->setEnabled(!$readonly)
+				->setReadonly($readonly)
 				->setChecked($item['verify_host'] == ZBX_HTTP_VERIFY_HOST_ON)
 		))->setId('js-item-verify-host-field')
 	])
@@ -410,7 +410,7 @@ $formgrid = (new CFormGrid())
 				'name' => 'master_itemid',
 				'object_name' => 'items',
 				'multiple' => false,
-				'disabled' => $readonly,
+				'readonly' => $readonly,
 				'data' => $item['master_item']
 					? [[
 							'id' => $item['master_item']['itemid'],
@@ -440,9 +440,10 @@ if ($data['host']['status'] == HOST_STATUS_MONITORED || $data['host']['status'] 
 		? $data['host']['interfaces'][$item['interfaceid']] : [];
 
 	if ($item['discovered']) {
+		$formgrid->addItem(new CVar('interfaceid', $item['interfaceid']));
+
 		$required = $interface && $interface['type'] != INTERFACE_TYPE_OPT;
-		$select_interface = (new CTextBox('interface', $interface ? getHostInterface($interface) : _('None'), true))
-			->setAttribute('disabled', 'disabled');
+		$select_interface = new CTextBox('interface', $interface ? getHostInterface($interface) : _('None'), true);
 		$label_for = $select_interface->getId();
 	}
 	else {
@@ -800,7 +801,7 @@ $formgrid
 			(new CMultiSelect([
 				'name' => 'valuemapid',
 				'object_name' => $item['context'] === 'host' ? 'valuemaps' : 'template_valuemaps',
-				'disabled' => $readonly,
+				'readonly' => $readonly,
 				'multiple' => false,
 				'data' => $item['valuemap']
 					? [[

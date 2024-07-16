@@ -30,8 +30,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.4.0
           key: 'dell.server.contact[sysContact]'
           delay: 1h
-          history: 7d
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -50,8 +48,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.1.0
           key: 'dell.server.descr[sysDescr]'
           delay: 1h
-          history: 7d
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -71,8 +67,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.4.1.674.10892.5.1.1.8.0
           key: 'dell.server.hw.firmware[racFirmwareVersion]'
           delay: 1h
-          history: 7d
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: IDRAC-MIB-SMIv2
@@ -100,8 +94,6 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.674.10892.5.1.3.12.0
           key: 'dell.server.hw.model[systemModelName]'
-          history: 7d
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: IDRAC-MIB-SMIv2
@@ -119,8 +111,6 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.674.10892.5.1.3.2.0
           key: 'dell.server.hw.serialnumber[systemServiceTag]'
-          history: 7d
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: IDRAC-MIB-SMIv2
@@ -149,7 +139,6 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.25.1.1.0
           key: 'dell.server.hw.uptime[hrSystemUptime]'
-          history: 7d
           trends: '0'
           units: uptime
           description: |
@@ -173,8 +162,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.6.0
           key: 'dell.server.location[sysLocation]'
           delay: 15m
-          history: 7d
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -193,8 +180,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.5.0
           key: 'dell.server.name[sysName]'
           delay: 15m
-          history: 7d
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -223,7 +208,6 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.3.0
           key: 'dell.server.net.uptime[sysUpTime]'
-          history: 7d
           trends: '0'
           units: uptime
           description: |
@@ -242,8 +226,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.2.0
           key: 'dell.server.objectid[sysObjectID]'
           delay: 15m
-          history: 7d
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -260,7 +242,6 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.674.10892.5.2.1.0
           key: 'dell.server.status[globalSystemStatus]'
-          history: 7d
           trends: '0'
           description: |
             MIB: IDRAC-MIB-SMIv2
@@ -313,8 +294,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.4.1.674.10892.5.1.3.6.0
           key: 'dell.server.sw.os[systemOSName]'
           delay: 1h
-          history: 7d
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: IDRAC-MIB-SMIv2
@@ -341,9 +320,6 @@ zabbix_export:
           name: 'SNMP traps (fallback)'
           type: SNMP_TRAP
           key: snmptrap.fallback
-          delay: '0'
-          history: 7d
-          trends: '0'
           value_type: LOG
           description: 'The item is used to collect all SNMP traps unmatched by other snmptrap items'
           logtimefmt: 'hh:mm:sszyyyy/MM/dd'
@@ -354,7 +330,6 @@ zabbix_export:
           name: 'SNMP agent availability'
           type: INTERNAL
           key: 'zabbix[host,snmp,available]'
-          history: 7d
           valuemap:
             name: zabbix.host.available
           preprocessing:
@@ -390,7 +365,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.15.1.4.{#SNMPINDEX}'
               key: 'dell.server.hw.diskarray.cache.battery.status[batteryState.{#SNMPINDEX}]'
-              history: 7d
               trends: '0'
               description: |
                 MIB: IDRAC-MIB-SMIv2
@@ -467,8 +441,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.1.1.2.{#SNMPINDEX}'
               key: 'dell.server.hw.diskarray.model[controllerName.{#SNMPINDEX}]'
-              history: 7d
-              trends: '0'
               value_type: CHAR
               description: |
                 MIB: IDRAC-MIB-SMIv2
@@ -487,7 +459,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.1.1.38.{#SNMPINDEX}'
               key: 'dell.server.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}]'
-              history: 7d
               trends: '0'
               description: |
                 MIB: IDRAC-MIB-SMIv2
@@ -560,7 +531,6 @@ zabbix_export:
             conditions:
               - macro: '{#TYPE}'
                 value: '3'
-                formulaid: A
           description: 'IDRAC-MIB-SMIv2::coolingDeviceTable'
           item_prototypes:
             - uuid: 9f2be3b0fc2f496dbdfcf5d6dbb4df7f
@@ -568,7 +538,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.700.12.1.6.{#SNMPINDEX}'
               key: 'dell.server.sensor.fan.speed[coolingDeviceReading.{#SNMPINDEX}]'
-              history: 7d
               units: rpm
               description: |
                 MIB: IDRAC-MIB-SMIv2
@@ -586,7 +555,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.700.12.1.5.{#SNMPINDEX}'
               key: 'dell.server.sensor.fan.status[coolingDeviceStatus.{#SNMPINDEX}]'
-              history: 7d
               trends: '0'
               description: |
                 MIB: IDRAC-MIB-SMIv2
@@ -639,7 +607,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.35.{#SNMPINDEX}'
               key: 'dell.server.hw.physicaldisk.media_type[physicalDiskMediaType.{#SNMPINDEX}]'
-              history: 7d
               trends: '0'
               description: |
                 MIB: IDRAC-MIB-SMIv2
@@ -663,8 +630,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.6.{#SNMPINDEX}'
               key: 'dell.server.hw.physicaldisk.model[physicalDiskProductID.{#SNMPINDEX}]'
-              history: 7d
-              trends: '0'
               value_type: CHAR
               description: |
                 MIB: IDRAC-MIB-SMIv2
@@ -683,8 +648,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.7.{#SNMPINDEX}'
               key: 'dell.server.hw.physicaldisk.serialnumber[physicalDiskSerialNo.{#SNMPINDEX}]'
-              history: 7d
-              trends: '0'
               value_type: CHAR
               description: |
                 MIB: IDRAC-MIB-SMIv2
@@ -714,7 +677,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.11.{#SNMPINDEX}'
               key: 'dell.server.hw.physicaldisk.size[physicalDiskCapacityInMB.{#SNMPINDEX}]'
-              history: 7d
               trends: '0'
               units: B
               description: |
@@ -737,7 +699,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.31.{#SNMPINDEX}'
               key: 'dell.server.hw.physicaldisk.smart_status[physicalDiskSmartAlertIndication.{#SNMPINDEX}]'
-              history: 7d
               trends: '0'
               description: |
                 MIB: IDRAC-MIB-SMIv2
@@ -771,7 +732,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.24.{#SNMPINDEX}'
               key: 'dell.server.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}]'
-              history: 7d
               trends: '0'
               description: |
                 MIB: IDRAC-MIB-SMIv2
@@ -833,7 +793,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.600.12.1.5.{#SNMPINDEX}'
               key: 'dell.server.sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}]'
-              history: 7d
               trends: '0'
               description: |
                 MIB: IDRAC-MIB-SMIv2
@@ -886,9 +845,8 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.700.20.1.5.{#SNMPINDEX}'
               key: 'dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}]'
-              history: 7d
-              trends: '0'
               value_type: FLOAT
+              trends: '0'
               description: |
                 MIB: IDRAC-MIB-SMIv2
                 This attribute defines the probe status of the temperature probe.
@@ -954,7 +912,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.700.20.1.6.{#SNMPINDEX}'
               key: 'dell.server.sensor.temp.value[temperatureProbeReading.{#SNMPINDEX}]'
-              history: 7d
               value_type: FLOAT
               units: °C
               description: |
@@ -987,7 +944,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.13.{#SNMPINDEX}'
               key: 'dell.server.hw.virtualdisk.layout[virtualDiskLayout.{#SNMPINDEX}]'
-              history: 7d
               description: |
                 MIB: IDRAC-MIB-SMIv2
                 The virtual disk's RAID type.
@@ -1019,7 +975,6 @@ zabbix_export:
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.11.{#SNMPINDEX}'
               key: 'dell.server.hw.virtualdisk.readpolicy[virtualDiskReadPolicy.{#SNMPINDEX}]'
               delay: 1h
-              history: 7d
               description: |
                 MIB: IDRAC-MIB-SMIv2
                 The read policy used by the controller for read operations on this virtual disk.
@@ -1039,7 +994,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.6.{#SNMPINDEX}'
               key: 'dell.server.hw.virtualdisk.size[virtualDiskSizeInMB.{#SNMPINDEX}]'
-              history: 7d
               trends: '0'
               units: B
               description: |
@@ -1063,7 +1017,6 @@ zabbix_export:
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.30.{#SNMPINDEX}'
               key: 'dell.server.hw.virtualdisk.state[virtualDiskOperationalState.{#SNMPINDEX}]'
               delay: 3m
-              history: 7d
               description: |
                 MIB: IDRAC-MIB-SMIv2
                 The state of the virtual disk when there are progressive operations ongoing.
@@ -1085,7 +1038,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.4.{#SNMPINDEX}'
               key: 'dell.server.hw.virtualdisk.status[virtualDiskState.{#SNMPINDEX}]'
-              history: 7d
               description: |
                 MIB: IDRAC-MIB-SMIv2
                 The current state of this virtual disk (which includes any member physical disks.)
@@ -1134,7 +1086,6 @@ zabbix_export:
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.10.{#SNMPINDEX}'
               key: 'dell.server.hw.virtualdisk.writepolicy[virtualDiskWritePolicy.{#SNMPINDEX}]'
               delay: 1h
-              history: 7d
               description: |
                 MIB: IDRAC-MIB-SMIv2
                 The write policy used by the controller for write operations on this virtual disk.

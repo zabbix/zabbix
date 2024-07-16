@@ -938,8 +938,10 @@ class testPageServicesServices extends CWebTest {
 			$form = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
 			$form->fill(['Sort order (0->999)' => $order]);
 			$form->submit();
+			$table->waitUntilReloaded();
 			$this->page->waitUntilReady();
 			$this->assertMessage(TEST_GOOD, 'Service updated');
+			CMessageElement::find()->one()->close();
 		}
 
 		$this->assertTableDataColumn(['3', '1', '2']);

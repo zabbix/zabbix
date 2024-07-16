@@ -933,6 +933,10 @@ msgstr ""
 msgid "Add a new widget"
 msgstr "새로운 위젯을 추가"
 
+#: widgets/navtree/Widget.php:34
+msgid "Add child element"
+msgstr ""
+
 #: widgets/navtree/Widget.php:39
 msgid "Add child elements"
 msgstr "하위 요소 추가"
@@ -966,6 +970,11 @@ msgstr ""
 #: app/views/trigger.massupdate.php:155
 msgid "Add host trigger"
 msgstr "호스트 트리거 추가"
+
+#: widgets/piechart/includes/CWidgetFieldDataSetView.php:260
+#: widgets/svggraph/includes/CWidgetFieldDataSetView.php:263
+msgid "Add item"
+msgstr ""
 
 #: app/partials/massupdate.macros.tab.php:96
 #: app/partials/massupdate.valuemaps.tab.php:38
@@ -1868,6 +1877,10 @@ msgstr ""
 #: app/views/administration.authentication.edit.php:131
 msgid "Avoid easy-to-guess passwords"
 msgstr "추측하기 쉬운 암호를 피하십시오"
+
+#: jsLoader.php:172
+msgid "Awaiting data"
+msgstr ""
 
 #: widgets/svggraph/views/widget.edit.php:51
 msgid "Axes"
@@ -5325,6 +5338,10 @@ msgstr "연락 방법 생성"
 msgid "Create new"
 msgstr "신규 생성"
 
+#: jsLoader.php:372
+msgid "Create new report"
+msgstr ""
+
 #: app/views/administration.proxy.list.php:239
 msgid "Create proxy"
 msgstr "프록시 생성"
@@ -7433,6 +7450,10 @@ msgstr "입력 파라미터가 공백입니다"
 msgid "Empty map ID."
 msgstr "맵ID가 공백입니다."
 
+#: widgets/itemhistory/Widget.php:32
+msgid "Empty value."
+msgstr ""
+
 #: app/views/action.list.php:167 app/views/administration.token.list.php:204
 #: app/views/administration.user.token.list.php:157
 #: app/views/configuration.discovery.list.php:121
@@ -9434,6 +9455,10 @@ msgstr[0] "호스트 그룹이 삭제됨"
 msgid "Host group elements"
 msgstr "호스트 그룹내의 호스트"
 
+#: jsLoader.php:292
+msgid "Host group is not selected."
+msgstr ""
+
 #: include/views/monitoring.sysmap.edit.php:168
 msgid "Host group label type"
 msgstr "호스트 그룹의 라벨타입"
@@ -9512,6 +9537,10 @@ msgstr "호스트 인벤토리"
 #: hostinventoriesoverview.php:26 hostinventoriesoverview.php:146
 msgid "Host inventory overview"
 msgstr "호스트 인벤토리의 개요"
+
+#: jsLoader.php:289
+msgid "Host is not selected."
+msgstr ""
 
 #: include/views/monitoring.sysmap.edit.php:183
 msgid "Host label type"
@@ -10047,6 +10076,10 @@ msgstr "이미지를 삭제하였습니다"
 #: include/views/monitoring.sysmap.edit.php:228
 msgid "Image label type"
 msgstr "이미지라벨 타입"
+
+#: widgets/itemhistory/Widget.php:33
+msgid "Image loading error."
+msgstr ""
 
 #: include/classes/helpers/CUploadFile.php:129
 #, c-format
@@ -12812,6 +12845,10 @@ msgstr "맵 요소의 레이블 위치"
 #: include/views/monitoring.sysmap.edit.php:243
 msgid "Map element label type"
 msgstr "맵 요소의 레이블 타입"
+
+#: jsLoader.php:290
+msgid "Map is not selected."
+msgstr ""
 
 #: sysmap.php:128
 msgid "Map is updated! Return to map list?"
@@ -19335,6 +19372,10 @@ msgstr ""
 msgid "String functions"
 msgstr "문자열 함수"
 
+#: widgets/piechart/includes/WidgetForm.php:137
+msgid "Stroke width"
+msgstr ""
+
 #: include/items.inc.php:1545 include/items.inc.php:1549
 #: include/items.inc.php:1553 include/items.inc.php:1557
 msgid "Structured data"
@@ -20700,6 +20741,10 @@ msgstr "트리거가 \"불명\" 상태"
 #, c-format
 msgid "Trigger in template \"%1$s\" has dependency with trigger in template \"%2$s\"."
 msgstr "템플릿\"%1$s\"의 트리거는 템플릿\"%2$s\"의 트리거 와 의존관계가 설정되어있습니다."
+
+#: jsLoader.php:291
+msgid "Trigger is not selected."
+msgstr ""
 
 #: include/views/monitoring.sysmap.edit.php:198
 msgid "Trigger label type"
@@ -22746,6 +22791,10 @@ msgstr ""
 msgid "View as"
 msgstr "표시형식"
 
+#: jsLoader.php:417
+msgid "View related reports"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1735
 msgid "Virtual space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr "가상 메모리 사이즈의 바이트 단위 혹은 전체에서 퍼센트값. 바이트 단위라면 integer를 리턴, 퍼센트라면 float를 리턴"
@@ -22951,6 +23000,10 @@ msgstr ""
 
 #: jsLoader.php:187
 msgid "Widget is too small for the specified number of columns and rows."
+msgstr ""
+
+#: jsLoader.php:205
+msgid "Widgets"
 msgstr ""
 
 #: graphs.php:39 include/views/configuration.graph.edit.php:100
@@ -23324,6 +23377,10 @@ msgstr "이 페이지를 표시하는 권한이 없습니다."
 #: include/classes/core/ZBase.php:763 include/func.inc.php:1709
 msgid "You must login to view this page."
 msgstr "이 페이지를 표시하기 위해서는 로그인이 필요합니다."
+
+#: jsLoader.php:287
+msgid "You need to have at least one image uploaded to create map element. Images can be uploaded in Administration->General->Images section."
+msgstr ""
 
 #: include/classes/db/DB.php:133
 msgid "Your database is not working properly. Please wait a few minutes and try to repeat this action. If the problem still persists, please contact system administrator. The problem might be caused by long running transaction or row level lock accomplished by your database management system."
@@ -25333,6 +25390,10 @@ msgstr "오른쪽"
 #: app/controllers/CControllerPopupTriggerExpr.php:953
 msgid "right() - Returns the rightmost count characters"
 msgstr "right() - 가장 오른쪽 카운트 문자를 반환합니다."
+
+#: widgets/navtree/Widget.php:41
+msgid "root"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:966
 msgid "round() - Rounds a value to decimal places"

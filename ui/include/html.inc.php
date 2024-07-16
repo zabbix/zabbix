@@ -293,10 +293,7 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 
 	if ($is_template) {
 		$template = new CSpan(
-			(new CLink($db_host['name'], (new CUrl('zabbix.php'))
-				->setArgument('action', 'template.edit')
-				->setArgument('templateid', $db_host['templateid'])
-			))
+			(new CLink($db_host['name']))
 				->setAttribute('data-templateid', $db_host['templateid'])
 				->onClick('view.editTemplate(event, this.dataset.templateid);')
 		);
@@ -1006,12 +1003,12 @@ function makeSuppressedProblemIcon(array $icon_data, bool $blink = false): CSimp
 		if (array_key_exists('maintenance_name', $suppression)) {
 			$maintenance_names[] = $suppression['maintenance_name'];
 		}
-		else {
+		elseif (array_key_exists('username', $suppression)) {
 			$username = $suppression['username'];
 		}
 	}
 
-	$maintenances = implode(',', $maintenance_names);
+	$maintenances = implode(', ', $maintenance_names);
 
 	return (new CButtonIcon(ZBX_ICON_EYE_OFF))
 		->addClass(ZBX_STYLE_COLOR_ICON)

@@ -40,13 +40,19 @@ window.ZABBIX = Object.create({
 	/**
 	 * Logs user out, also, handles side effects before that.
 	 */
-	logout: function(event) {
-		cancelEvent(event);
-
-		var ls = this.namespace('instances.localStorage');
+	logout: function(csrf_token) {
+		let ls = this.namespace('instances.localStorage');
 		ls && ls.destruct();
 
-		redirect('index.php?reconnect=1', 'post', 'sid', true);
+		redirect(`index.php?reconnect=1&_csrf_token=${csrf_token}`, 'post', '_csrf_token', true);
+	}
+});
+
+document.addEventListener('click', e => {
+	const element = e.target;
+
+	if (element.matches('input[type="radio"][readonly], input[type="checkbox"][readonly]')) {
+		e.preventDefault();
 	}
 });
 

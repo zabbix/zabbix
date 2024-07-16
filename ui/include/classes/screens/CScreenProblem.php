@@ -57,8 +57,6 @@ class CScreenProblem extends CScreenBase {
 	 * @param array       $options['tags']            (optional)
 	 * @param int         $options['limit']
 	 *
-	 * @static
-	 *
 	 * @return array
 	 */
 	private static function getDataEvents(array $options) {
@@ -87,8 +85,6 @@ class CScreenProblem extends CScreenBase {
 	 * @param int         $options['time_from']       (optional)
 	 * @param array       $options['tags']            (optional)
 	 * @param int         $options['limit']
-	 *
-	 * @static
 	 *
 	 * @return array
 	 */
@@ -139,8 +135,6 @@ class CScreenProblem extends CScreenBase {
 	 * @param array  $filter['cause_eventid']         (optional)
 	 * @param int    $limit
 	 * @param bool   $resolve_comments
-	 *
-	 * @static
 	 *
 	 * @return mixed
 	 */
@@ -370,8 +364,6 @@ class CScreenProblem extends CScreenBase {
 	 * @param array $problems[]['suppression_data']
 	 * @param int   $problems[]['suppression_data'][]['maintenanceid']
 	 * @param int   $problems[]['suppression_data'][]['userid']
-	 *
-	 * @static
 	 */
 	public static function addSuppressionNames(array &$problems) {
 		$maintenanceids = [];
@@ -407,13 +399,15 @@ class CScreenProblem extends CScreenBase {
 		foreach ($problems as &$problem) {
 			foreach ($problem['suppression_data'] as &$data) {
 				if ($data['maintenanceid'] != 0) {
-					$data['maintenance_name'] = $maintenances[$data['maintenanceid']]['name'];
+					$data['maintenance_name'] = array_key_exists($data['maintenanceid'], $maintenances)
+						? $maintenances[$data['maintenanceid']]['name']
+						: _('Inaccessible maintenance');
 				}
-				elseif ($data['userid'] != 0 && array_key_exists($data['userid'], $users)) {
-					$data['username'] = getUserFullname($users[$data['userid']]);
-				}
-				else {
-					$data['username'] = _('Inaccessible user');
+
+				if ($data['userid'] != 0) {
+					$data['username'] = array_key_exists($data['userid'], $users)
+						? getUserFullname($users[$data['userid']])
+						: _('Inaccessible user');
 				}
 			}
 			unset($data);
@@ -493,8 +487,6 @@ class CScreenProblem extends CScreenBase {
 	/**
 	 * @param array $eventids
 	 *
-	 * @static
-	 *
 	 * @return array
 	 */
 	private static function getExDataEvents(array $eventids) {
@@ -550,8 +542,6 @@ class CScreenProblem extends CScreenBase {
 	/**
 	 * @param array $eventids
 	 *
-	 * @static
-	 *
 	 * @return array
 	 */
 	private static function getExDataProblems(array $eventids) {
@@ -579,8 +569,6 @@ class CScreenProblem extends CScreenBase {
 	 * @param int   $filter['show']
 	 * @param int   $filter['show_opdata']
 	 * @param bool  $resolve_comments
-	 *
-	 * @static
 	 *
 	 * @return array
 	 */

@@ -154,8 +154,6 @@ class CRegexp extends CApiService {
 	/**
 	 * Check for unique global regular expression names.
 	 *
-	 * @static
-	 *
 	 * @param array      $regexs
 	 * @param array|null $db_regexs
 	 *
@@ -424,8 +422,6 @@ class CRegexp extends CApiService {
 
 	/**
 	 * Add the existing expressions to $db_regexs whether these are affected by the update.
-	 *
-	 * @static
 	 *
 	 * @param array $regexs
 	 * @param array $db_regexs

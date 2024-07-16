@@ -447,7 +447,40 @@ Overlay.prototype.unsetProperty = function(key) {
 			break;
 
 		case 'prevent_navigation':
-			window.removeEventListener('beforeunload', this.preventNavigation);
+			const dialogues = Object.values(overlays_stack.map).filter((overlay) => overlay.$dialogue !== undefined);
+			let prevent_navigation = false;
+
+			if (this.$dialogue !== undefined) {
+				if (dialogues.length === 0) {
+					if (this.$dialogue[0].dataset.preventNavigation === 'true' && !isVisible(this.$dialogue[0])) {
+						prevent_navigation = true;
+					}
+				}
+				else {
+					// Dialogue was closed.
+					if (dialogues[dialogues.length - 1].dialogueid === this.dialogueid
+							&& isVisible(this.$dialogue[0])) {
+						// Ignore last dialogue in stack, because it is same as "this" (which was closed).
+						dialogues.pop();
+
+						if (dialogues.some((dialogue) => dialogue.$dialogue[0].dataset.preventNavigation === 'true')) {
+							prevent_navigation = true;
+						}
+					}
+					// Dialogue was opened.
+					else {
+						if (dialogues.some((dialogue) => dialogue.$dialogue[0].dataset.preventNavigation === 'true')
+								|| this.$dialogue[0].dataset.preventNavigation === 'true') {
+							prevent_navigation = true;
+						}
+					}
+				}
+			}
+
+			if (!prevent_navigation) {
+				removeEventListener('beforeunload', this.preventNavigation);
+			}
+
 			break;
 	}
 };
@@ -516,6 +549,7 @@ Overlay.prototype.setProperties = function(obj) {
 				break;
 
 			case 'prevent_navigation':
+				this.$dialogue[0].dataset.preventNavigation = obj[key];
 				this.unsetProperty(key);
 				window.addEventListener('beforeunload', this.preventNavigation, {passive: false});
 				break;

@@ -49,7 +49,8 @@ Install Zabbix agent on Windows OS according to Zabbix documentation.
 |{$VFS.DEV.UTIL.MAX.WARN}|<p>The warning threshold of disk time utilization in percent.</p>|`95`|
 |{$VFS.DEV.READ.AWAIT.WARN}|<p>Disk read average response time (in s) before the trigger fires.</p>|`0.02`|
 |{$VFS.DEV.WRITE.AWAIT.WARN}|<p>Disk write average response time (in s) before the trigger fires.</p>|`0.02`|
-|{$SYSTEM.FUZZYTIME.MAX}|<p>The threshold for the difference of system time in seconds.</p>|`60`|
+|{$SYSTEM.FUZZYTIME.MAX}|<p>The upper threshold for difference of system time.</p>|`60s`|
+|{$SYSTEM.FUZZYTIME.MIN}|<p>The lower threshold for difference of system time. Used in recovery expression to avoid trigger flapping.</p>|`10s`|
 |{$IFCONTROL}|<p>Macro for the interface operational state for the "link down" trigger. Can be used with interface name as context.</p>|`1`|
 |{$NET.IF.IFNAME.MATCHES}|<p>Used in Network interface discovery. Can be overridden on the host or linked template level.</p>|`.*`|
 |{$NET.IF.IFNAME.NOT_MATCHES}|<p>Used in Network interface discovery. Can be overridden on the host or linked template level.</p>|`Macro too long. Please see the template.`|

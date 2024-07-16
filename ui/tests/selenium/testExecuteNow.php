@@ -249,12 +249,13 @@ class testExecuteNow extends CWebTest {
 	public function testExecuteNow_ContextMenu($data) {
 		// Login and select host group for testing.
 		$this->page->login()->open('zabbix.php?action=latest.view')->waitUntilReady();
+		$table = $this->query('xpath://table['.CXPathHelper::fromClass('list-table fixed').']')->asTable()->waitUntilVisible()->one();
 		$filter_form = $this->query('name:zbx_filter')->asForm()->one();
 		$filter_form->fill(['Host groups' => 'HG-for-executenow']);
 		$filter_form->submit();
-		$this->page->waitUntilReady();
+		$table->waitUntilReloaded();
 
-		$this->query('link', $data['item'])->one()->click();
+		$this->query('link', $data['item'])->waitUntilClickable()->one()->click();
 		$popup = CPopupMenuElement::find()->waitUntilVisible()->one();
 
 		// Disabled "Execute now" option in context menu.
@@ -391,7 +392,7 @@ class testExecuteNow extends CWebTest {
 		$this->selectItemsAndExecuteNow($data, $table);
 	}
 
-	public static function getIemPageData() {
+	public static function getItemPageData() {
 		return [
 			// Simple items.
 			[
@@ -439,13 +440,15 @@ class testExecuteNow extends CWebTest {
 	/**
 	 * Check "Execute now" button on Item page.
 	 *
-	 * @dataProvider getIemPageData
+	 * @dataProvider getItemPageData
 	 */
 	public function testExecuteNow_ItemPage($data) {
 		$hostid = CDataHelper::get('ExecuteNowAction.hostids.Host for execute now permissions');
 		$this->page->login()->open('zabbix.php?action=item.list&filter_set=1&filter_hostids%5B0%5D='.$hostid.'&context=host')->waitUntilReady();
 		$table = $this->query('xpath://form[@name="item_list"]//table')->asTable()->one()->waitUntilPresent();
 		$this->openItemAndExecuteNow($data, $table);
+
+		COverlayDialogElement::find()->one()->close();
 	}
 
 	public static function getDiscoveryRulesListData() {

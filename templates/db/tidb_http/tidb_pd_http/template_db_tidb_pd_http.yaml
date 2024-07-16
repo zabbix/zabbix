@@ -27,9 +27,7 @@ zabbix_export:
           name: 'Get cluster metrics'
           type: DEPENDENT
           key: pd.cluster_status.get_metrics
-          delay: '0'
           history: '0'
-          trends: '0'
           value_type: TEXT
           description: 'Get cluster metrics.'
           preprocessing:
@@ -47,7 +45,6 @@ zabbix_export:
           type: HTTP_AGENT
           key: pd.get_metrics
           history: '0'
-          trends: '0'
           value_type: TEXT
           description: 'Get TiDB PD instance metrics.'
           preprocessing:
@@ -66,7 +63,6 @@ zabbix_export:
           type: HTTP_AGENT
           key: pd.get_status
           history: '0'
-          trends: '0'
           value_type: TEXT
           description: 'Get TiDB PD instance status info.'
           preprocessing:
@@ -85,8 +81,6 @@ zabbix_export:
           name: 'gRPC Commands total, rate'
           type: DEPENDENT
           key: pd.grpc_command.rate
-          delay: '0'
-          history: 7d
           value_type: FLOAT
           description: 'The rate at which gRPC commands are completed.'
           preprocessing:
@@ -95,8 +89,6 @@ zabbix_export:
                 - '$[?(@.name == "grpc_server_handling_seconds_count")].value.sum()'
               error_handler: DISCARD_VALUE
             - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           master_item:
             key: pd.get_metrics
           tags:
@@ -106,9 +98,7 @@ zabbix_export:
           name: 'Get gRPC command metrics'
           type: DEPENDENT
           key: pd.grpc_commands.get_metrics
-          delay: '0'
           history: '0'
-          trends: '0'
           value_type: TEXT
           description: 'Get gRPC command metrics.'
           preprocessing:
@@ -125,9 +115,7 @@ zabbix_export:
           name: 'Get region metrics'
           type: DEPENDENT
           key: pd.regions.get_metrics
-          delay: '0'
           history: '0'
-          trends: '0'
           value_type: TEXT
           description: 'Get region metrics.'
           preprocessing:
@@ -144,9 +132,7 @@ zabbix_export:
           name: 'Get region label metrics'
           type: DEPENDENT
           key: pd.region_labels.get_metrics
-          delay: '0'
           history: '0'
-          trends: '0'
           value_type: TEXT
           description: 'Get region label metrics.'
           preprocessing:
@@ -163,9 +149,7 @@ zabbix_export:
           name: 'Get region status metrics'
           type: DEPENDENT
           key: pd.region_status.get_metrics
-          delay: '0'
           history: '0'
-          trends: '0'
           value_type: TEXT
           description: 'Get region status metrics.'
           preprocessing:
@@ -182,9 +166,7 @@ zabbix_export:
           name: 'Get scheduler metrics'
           type: DEPENDENT
           key: pd.scheduler.get_metrics
-          delay: '0'
           history: '0'
-          trends: '0'
           value_type: TEXT
           description: 'Get scheduler metrics.'
           preprocessing:
@@ -201,9 +183,6 @@ zabbix_export:
           name: Status
           type: DEPENDENT
           key: pd.status
-          delay: '0'
-          history: 7d
-          trends: '0'
           value_type: CHAR
           description: 'Status of PD instance.'
           valuemap:
@@ -234,8 +213,6 @@ zabbix_export:
           name: Uptime
           type: DEPENDENT
           key: pd.uptime
-          delay: '0'
-          history: 7d
           value_type: FLOAT
           units: uptime
           description: 'The runtime of each PD instance.'
@@ -266,9 +243,6 @@ zabbix_export:
           name: Version
           type: DEPENDENT
           key: pd.version
-          delay: '0'
-          history: 7d
-          trends: '0'
           value_type: CHAR
           description: 'Version of the PD instance.'
           preprocessing:
@@ -299,15 +273,12 @@ zabbix_export:
           name: 'Cluster metrics discovery'
           type: DEPENDENT
           key: pd.cluster.discovery
-          delay: '0'
           description: 'Discovery cluster specific metrics.'
           item_prototypes:
             - uuid: fe49e1de54214fb0ac882feb42fdee3b
               name: 'Number of regions'
               type: DEPENDENT
               key: 'pd.cluster_status.leader_count[{#SINGLETON}]'
-              delay: '0'
-              history: 7d
               description: 'The total count of cluster Regions.'
               preprocessing:
                 - type: JSONPATH
@@ -324,8 +295,6 @@ zabbix_export:
               name: 'Current peer count'
               type: DEPENDENT
               key: 'pd.cluster_status.region_count[{#SINGLETON}]'
-              delay: '0'
-              history: 7d
               description: 'The current count of all cluster peers.'
               preprocessing:
                 - type: JSONPATH
@@ -342,8 +311,6 @@ zabbix_export:
               name: 'Storage capacity'
               type: DEPENDENT
               key: 'pd.cluster_status.storage_capacity[{#SINGLETON}]'
-              delay: '0'
-              history: 7d
               value_type: FLOAT
               units: B
               description: 'The total storage capacity for this TiDB cluster.'
@@ -365,8 +332,6 @@ zabbix_export:
               name: 'Storage size'
               type: DEPENDENT
               key: 'pd.cluster_status.storage_size[{#SINGLETON}]'
-              delay: '0'
-              history: 7d
               value_type: FLOAT
               units: B
               description: 'The storage size that is currently used by the TiDB cluster.'
@@ -385,8 +350,6 @@ zabbix_export:
               name: 'Disconnect stores'
               type: DEPENDENT
               key: 'pd.cluster_status.store_disconnected[{#SINGLETON}]'
-              delay: '0'
-              history: 7d
               description: 'The count of disconnected stores.'
               preprocessing:
                 - type: JSONPATH
@@ -415,8 +378,6 @@ zabbix_export:
               name: 'Down stores'
               type: DEPENDENT
               key: 'pd.cluster_status.store_down[{#SINGLETON}]'
-              delay: '0'
-              history: 7d
               description: 'The count of down stores.'
               preprocessing:
                 - type: JSONPATH
@@ -445,8 +406,6 @@ zabbix_export:
               name: 'Lowspace stores'
               type: DEPENDENT
               key: 'pd.cluster_status.store_low_space[{#SINGLETON}]'
-              delay: '0'
-              history: 7d
               description: 'The count of low space stores.'
               preprocessing:
                 - type: JSONPATH
@@ -475,8 +434,6 @@ zabbix_export:
               name: 'Offline stores'
               type: DEPENDENT
               key: 'pd.cluster_status.store_offline[{#SINGLETON}]'
-              delay: '0'
-              history: 7d
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -495,8 +452,6 @@ zabbix_export:
               name: 'Tombstone stores'
               type: DEPENDENT
               key: 'pd.cluster_status.store_tombstone[{#SINGLETON}]'
-              delay: '0'
-              history: 7d
               description: 'The count of tombstone stores.'
               preprocessing:
                 - type: JSONPATH
@@ -516,8 +471,6 @@ zabbix_export:
               name: 'Unhealth stores'
               type: DEPENDENT
               key: 'pd.cluster_status.store_unhealth[{#SINGLETON}]'
-              delay: '0'
-              history: 7d
               description: 'The count of unhealthy stores.'
               preprocessing:
                 - type: JSONPATH
@@ -537,8 +490,6 @@ zabbix_export:
               name: 'Normal stores'
               type: DEPENDENT
               key: 'pd.cluster_status.store_up[{#SINGLETON}]'
-              delay: '0'
-              history: 7d
               description: 'The count of healthy storage instances.'
               preprocessing:
                 - type: JSONPATH
@@ -627,15 +578,12 @@ zabbix_export:
           name: 'gRPC commands discovery'
           type: DEPENDENT
           key: pd.grpc_command.discovery
-          delay: '0'
           description: 'Discovery grpc commands specific metrics.'
           item_prototypes:
             - uuid: 7b96abc0e68a405ea5693f4f445936fe
               name: 'gRPC Commands: {#GRPC_METHOD}, rate'
               type: DEPENDENT
               key: 'pd.grpc_command.rate[{#GRPC_METHOD}]'
-              delay: '0'
-              history: 7d
               value_type: FLOAT
               description: 'The rate per command type at which gRPC commands are completed.'
               preprocessing:
@@ -643,8 +591,6 @@ zabbix_export:
                   parameters:
                     - '$[?(@.labels.grpc_method == "{#GRPC_METHOD}")].value.first()'
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               master_item:
                 key: pd.grpc_commands.get_metrics
               tags:
@@ -677,15 +623,12 @@ zabbix_export:
           name: 'Region discovery'
           type: DEPENDENT
           key: pd.region.discovery
-          delay: '0'
           description: 'Discovery region specific metrics.'
           item_prototypes:
             - uuid: 024bf1d31bbd40a49d683d962887c6e0
               name: 'Region heartbeat: error, rate'
               type: DEPENDENT
               key: 'pd.region_heartbeat.error.rate[{#STORE_ADDRESS}]'
-              delay: '0'
-              history: 7d
               value_type: FLOAT
               description: 'The count of heartbeats with the error status per second.'
               preprocessing:
@@ -695,8 +638,6 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               master_item:
                 key: 'pd.region_heartbeat.get_metrics[{#STORE_ADDRESS}]'
               tags:
@@ -708,9 +649,7 @@ zabbix_export:
               name: 'Get metrics: {#STORE_ADDRESS}'
               type: DEPENDENT
               key: 'pd.region_heartbeat.get_metrics[{#STORE_ADDRESS}]'
-              delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
               description: 'Get region metrics for {#STORE_ADDRESS}.'
               preprocessing:
@@ -729,8 +668,6 @@ zabbix_export:
               name: 'Region heartbeat: active, rate'
               type: DEPENDENT
               key: 'pd.region_heartbeat.ok.rate[{#STORE_ADDRESS}]'
-              delay: '0'
-              history: 7d
               value_type: FLOAT
               description: 'The count of heartbeats with the ok status per second.'
               preprocessing:
@@ -740,8 +677,6 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               master_item:
                 key: 'pd.region_heartbeat.get_metrics[{#STORE_ADDRESS}]'
               tags:
@@ -753,8 +688,6 @@ zabbix_export:
               name: 'Region schedule push: total, rate'
               type: DEPENDENT
               key: 'pd.region_heartbeat.push.err.rate[{#STORE_ADDRESS}]'
-              delay: '0'
-              history: 7d
               value_type: FLOAT
               preprocessing:
                 - type: JSONPATH
@@ -763,8 +696,6 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               master_item:
                 key: 'pd.region_heartbeat.get_metrics[{#STORE_ADDRESS}]'
               tags:
@@ -776,8 +707,6 @@ zabbix_export:
               name: 'Region heartbeat: total, rate'
               type: DEPENDENT
               key: 'pd.region_heartbeat.rate[{#STORE_ADDRESS}]'
-              delay: '0'
-              history: 7d
               value_type: FLOAT
               description: 'The count of heartbeats reported to PD per instance per second.'
               preprocessing:
@@ -787,8 +716,6 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               master_item:
                 key: 'pd.region_heartbeat.get_metrics[{#STORE_ADDRESS}]'
               tags:
@@ -821,15 +748,12 @@ zabbix_export:
           name: 'Region labels discovery'
           type: DEPENDENT
           key: pd.region_labels.discovery
-          delay: '0'
           description: 'Discovery region labels specific metrics.'
           item_prototypes:
             - uuid: 117efc3f2fe64c51a18cd3be162185ea
               name: 'Regions label: {#TYPE}'
               type: DEPENDENT
               key: 'pd.region_labels[{#TYPE}]'
-              delay: '0'
-              history: 7d
               value_type: FLOAT
               description: 'The number of Regions in different label levels.'
               preprocessing:
@@ -862,15 +786,12 @@ zabbix_export:
           name: 'Region status discovery'
           type: DEPENDENT
           key: pd.region_status.discovery
-          delay: '0'
           description: 'Discovery region status specific metrics.'
           item_prototypes:
             - uuid: 45ef4940b0454492b70116d8958c9b11
               name: 'Regions status: {#TYPE}'
               type: DEPENDENT
               key: 'pd.region_status[{#TYPE}]'
-              delay: '0'
-              history: 7d
               value_type: FLOAT
               description: 'The health status of Regions indicated via the count of unusual Regions including pending peers, down peers, extra peers, offline peers, missing peers, learner peers and incorrect namespaces.'
               preprocessing:
@@ -926,39 +847,34 @@ zabbix_export:
                 conditions:
                   - macro: '{#TYPE}'
                     value: miss_peer_region_count
-                    formulaid: A
               operations:
                 - operationobject: TRIGGER_PROTOTYPE
                   operator: LIKE
                   value: 'Too many missed regions'
-                  status: ENABLED
                   discover: DISCOVER
+                  status: ENABLED
             - name: 'Unresponsive peers trigger'
               step: '2'
               filter:
                 conditions:
                   - macro: '{#TYPE}'
                     value: down_peer_region_count
-                    formulaid: A
               operations:
                 - operationobject: TRIGGER_PROTOTYPE
                   operator: LIKE
                   value: 'There are unresponsive peers'
-                  status: ENABLED
                   discover: DISCOVER
+                  status: ENABLED
         - uuid: b4b8007810ad4f7ba8da212cdde5b71b
           name: 'Running scheduler discovery'
           type: DEPENDENT
           key: pd.scheduler.discovery
-          delay: '0'
           description: 'Discovery scheduler specific metrics.'
           item_prototypes:
             - uuid: c6748a20540f49b293795bc72480dda7
               name: 'Scheduler status: {#KIND}'
               type: DEPENDENT
               key: 'pd.scheduler[{#KIND}]'
-              delay: '0'
-              history: 7d
               value_type: FLOAT
               description: 'The current running schedulers.'
               preprocessing:

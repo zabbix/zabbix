@@ -43,19 +43,23 @@ class CControllerTemplateDashboardEdit extends CController {
 		}
 
 		if ($this->hasInput('dashboardid')) {
-			$dashboards = API::TemplateDashboard()->get([
+			$db_dashboards = API::TemplateDashboard()->get([
 				'output' => ['dashboardid', 'name', 'templateid', 'display_period', 'auto_start'],
 				'selectPages' => ['dashboard_pageid', 'name', 'display_period', 'widgets'],
 				'dashboardids' => [$this->getInput('dashboardid')],
 				'editable' => true
 			]);
 
-			$this->dashboard = $dashboards[0];
+			if (!$db_dashboards) {
+				return false;
+			}
 
-			return (bool) $this->dashboard;
+			$this->dashboard = $db_dashboards[0];
+
+			return true;
 		}
 
-		return isWritableHostTemplates((array) $this->getInput('templateid'));
+		return isWritableHostTemplates([$this->getInput('templateid')]);
 	}
 
 	protected function doAction(): void {

@@ -640,6 +640,8 @@ class testDashboardProblemsWidget extends CWebTest {
 							' AND w.name ='.zbx_dbstr(CTestArrayHelper::get($data['fields'], 'Name', '')).')'
 			));
 		}
+
+		COverlayDialogElement::find()->one()->close();
 	}
 
 	public function testDashboardProblemsWidget_SimpleUpdate() {
@@ -668,7 +670,7 @@ class testDashboardProblemsWidget extends CWebTest {
 			[
 				[
 					'cancel_form' => false,
-					'create_widget' => false,
+					'create_widget' => true,
 					'save_dashboard' => false
 				]
 			],
@@ -708,10 +710,10 @@ class testDashboardProblemsWidget extends CWebTest {
 			? $dashboard->edit()->addWidget()->asForm()
 			: $dashboard->getWidget(self::$update_widget)->edit();
 
-		$dialog = COverlayDialogElement::find()->one();
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 
 		if ($create) {
-			$form->fill(['Type' => 'Problems']);
+			$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Problems')]);
 		}
 		else {
 			$values = $form->getFields()->asValues();
@@ -775,6 +777,8 @@ class testDashboardProblemsWidget extends CWebTest {
 		// Check that updating widget form values did not change in frontend.
 		if (!$create && !$save_dashboard) {
 			$this->assertEquals($values, $dashboard->getWidget(self::$update_widget)->edit()->getFields()->asValues());
+
+			COverlayDialogElement::find()->one()->close();
 		}
 
 		// Check that DB hash is not changed.

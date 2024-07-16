@@ -167,7 +167,7 @@ class CMacrosResolverGeneral {
 				if ($macro_parser->parse($text, $pos) != CParser::PARSE_FAIL) {
 					$macros[$pos] = $macro_parser->getMatch();
 					$pos += $macro_parser->getLength() - 1;
-					break;;
+					break;
 				}
 			}
 		}

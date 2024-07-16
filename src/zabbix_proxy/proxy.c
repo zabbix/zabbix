@@ -188,6 +188,7 @@ ZBX_GET_CONFIG_VAR2(char *, const char *, zbx_config_fping_location, NULL)
 ZBX_GET_CONFIG_VAR2(char *, const char *, zbx_config_fping6_location, NULL)
 
 static int	config_proxymode		= ZBX_PROXYMODE_ACTIVE;
+static sigset_t	orig_mask;
 
 int	config_forks[ZBX_PROCESS_TYPE_COUNT] = {
 	5, /* ZBX_PROCESS_TYPE_POLLER */
@@ -1393,18 +1394,19 @@ static void	proxy_db_init(void)
 	}
 
 	zbx_db_init_autoincrement_options();
+	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
 	if (ZBX_DB_UNKNOWN == (db_type = zbx_db_get_database_type()))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot use database \"%s\": database is not a Zabbix database",
 				zbx_config_dbhigh->config_dbname);
-		exit(EXIT_FAILURE);
+		goto out;
 	}
 	else if (ZBX_DB_PROXY != db_type)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot use database \"%s\": Zabbix proxy cannot work with a"
 				" Zabbix server database", zbx_config_dbhigh->config_dbname);
-		exit(EXIT_FAILURE);
+		goto out;
 	}
 
 	zbx_db_check_character_set();
@@ -1414,8 +1416,9 @@ static void	proxy_db_init(void)
 	{
 #ifdef HAVE_SQLITE3
 		if (NOTSUPPORTED == version_check)
-			exit(EXIT_FAILURE);
+			goto out;
 
+		zbx_db_close();
 		zabbix_log(LOG_LEVEL_WARNING, "removing database file: \"%s\"", zbx_config_dbhigh->config_dbname);
 		zbx_db_deinit();
 
@@ -1427,18 +1430,25 @@ static void	proxy_db_init(void)
 		}
 
 		proxy_db_init();
+
+		return;
 #else
 		ZBX_UNUSED(version_check);
-		exit(EXIT_FAILURE);
+		goto out;
 #endif
 	}
 
 #ifdef HAVE_ORACLE
-	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 	zbx_db_table_prepare("items", NULL);
 	zbx_db_table_prepare("item_preproc", NULL);
-	zbx_db_close();
 #endif
+	zbx_pb_init();
+	zbx_db_close();
+
+	return;
+out:
+	zbx_db_close();
+	exit(EXIT_FAILURE);
 }
 
 int	MAIN_ZABBIX_ENTRY(int flags)
@@ -1532,6 +1542,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				ZBX_PROXYMODE_PASSIVE == config_proxymode ? "passive" : "active",
 				config_hostname, ZABBIX_VERSION, ZABBIX_REVISION);
 	}
+
+	zbx_block_signals(&orig_mask);
 
 	if (FAIL == zbx_ipc_service_init_env(config_socket_path, &error))
 	{
@@ -1642,6 +1654,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	exit_args.rtc = &rtc;
 	zbx_set_on_exit_args(&exit_args);
 
+	zbx_unblock_signals(&orig_mask);
+
 	if (SUCCEED != zbx_init_database_cache(get_zbx_program_type, zbx_sync_proxy_history, config_history_cache_size,
 			config_history_index_cache_size, &config_trends_cache_size, &error))
 	{
@@ -1711,9 +1725,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	}
 
 	proxy_db_init();
-
-	zbx_pb_init();
-
 	if (0 != config_forks[ZBX_PROCESS_TYPE_DISCOVERYMANAGER])
 		zbx_discoverer_init();
 
@@ -1737,6 +1748,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	{
 		exit_args.listen_sock = &listen_sock;
 
+		zbx_block_signals(&orig_mask);
+
 		if (FAIL == zbx_tcp_listen(&listen_sock, config_listen_ip, (unsigned short)config_listen_port,
 				zbx_config_timeout, config_tcp_max_backlog_size))
 		{
@@ -1750,6 +1763,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			zbx_free(error);
 			exit(EXIT_FAILURE);
 		}
+
+		zbx_unblock_signals(&orig_mask);
 	}
 
 	/* not running zbx_tls_init_parent() since proxy is only run on Unix*/

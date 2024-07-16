@@ -257,6 +257,8 @@ var hintBox = {
 	 * Initialize hint box event handlers.
 	 *
 	 * Triggered events:
+	 * - onShowHint.hintBox 	- when show a hintbox.
+	 * - onHideHint.hintBox 	- when hide a hintbox.
 	 * - onDeleteHint.hintBox 	- when removing a hintbox.
 	 */
 	bindEvents: function () {
@@ -465,11 +467,21 @@ var hintBox = {
 			if (!isVisible(element)) {
 				hintBox.deleteHint(target);
 			}
-		});
 
-		target.resize_observer = new ResizeObserver(() => {
-			hintBox.onResize(e, target);
-		}).observe(box[0]);
+			setTimeout(() => {
+				if (target.scroll_observer !== undefined) {
+					const element_rect = element.getBoundingClientRect();
+
+					if ((element_rect.x !== target.scroll_observer.x || element_rect.y !== target.scroll_observer.y)
+							&& element.dataset.hintboxIgnorePositionChange !== '1') {
+						const do_focus_target = document.activeElement === document.body
+							|| element.hintBoxItem[0].contains(document.activeElement);
+
+						hintBox.deleteHint(target, do_focus_target);
+					}
+				}
+			});
+		});
 
 		target.observer.observe(document.body, {
 			attributes: true,
@@ -477,6 +489,9 @@ var hintBox = {
 			subtree: true,
 			childList: true
 		});
+
+		target.resize_observer = new ResizeObserver(() => hintBox.onResize(e, target));
+		target.resize_observer.observe(box[0]);
 
 		return box;
 	},
@@ -499,9 +514,39 @@ var hintBox = {
 					hintBox.positionElement(e, target, target.hintBoxItem);
 				});
 			}
+
+			const element = target instanceof jQuery ? target[0] : target;
+			const element_rect_initial = element.getBoundingClientRect();
+
+			target.scroll_observer = {
+				x: element_rect_initial.x,
+				y: element_rect_initial.y,
+				callback: (e) => hintBox.onScroll(target, e)
+			};
+
+			addEventListener('scroll', target.scroll_observer.callback, {capture: true});
 		}
 
 		addEventListener('resize', target.resizeHandler = e => hintBox.onResize(e, target));
+	},
+
+	onScroll: function(target, e) {
+		const element = target instanceof jQuery ? target[0] : target;
+		const element_rect = element.getBoundingClientRect();
+
+		if (e.target.classList.contains('wrapper')) {
+			target.scroll_observer.x = element_rect.x;
+			target.scroll_observer.y = element_rect.y;
+
+			return;
+		}
+
+		if (element_rect.x !== target.scroll_observer.x || element_rect.y !== target.scroll_observer.y) {
+			const do_focus_target = document.activeElement === document.body
+				|| element.hintBoxItem[0].contains(document.activeElement);
+
+			hintBox.deleteHint(target, do_focus_target);
+		}
 	},
 
 	showHint: function(e, target, hintText, className, isStatic, styles) {
@@ -517,6 +562,8 @@ var hintBox = {
 			Overlay.prototype.recoverFocus.call({'$dialogue': target.hintBoxItem});
 			Overlay.prototype.containFocus.call({'$dialogue': target.hintBoxItem});
 		}
+
+		target.dispatchEvent(new CustomEvent('onShowHint.hintBox'));
 	},
 
 	positionElement: function(e, target, $elem) {
@@ -597,12 +644,16 @@ var hintBox = {
 		}
 
 		hintBox.deleteHint(target);
+
+		target = target instanceof jQuery ? target[0] : target;
+
+		target.dispatchEvent(new CustomEvent('onHideHint.hintBox'));
 	},
 
-	deleteHint: function(target) {
+	deleteHint: function(target, do_focus_target = true) {
 		if (typeof target.hintboxid !== 'undefined') {
 			jQuery(target).removeAttr('data-expanded');
-			removeFromOverlaysStack(target.hintboxid);
+			removeFromOverlaysStack(target.hintboxid, do_focus_target);
 		}
 
 		if (target.hintBoxItem) {
@@ -611,7 +662,7 @@ var hintBox = {
 			delete target.hintBoxItem;
 
 			if (target.isStatic) {
-				if (jQuery(target).data('return-control') !== undefined) {
+				if (jQuery(target).data('return-control') !== undefined && do_focus_target) {
 					jQuery(target).data('return-control').focus();
 				}
 				delete target.isStatic;
@@ -622,6 +673,12 @@ var hintBox = {
 			target.observer.disconnect();
 
 			delete target.observer;
+		}
+
+		if (target.scroll_observer !== undefined) {
+			removeEventListener('scroll', target.scroll_observer.callback, {capture: true});
+
+			delete target.scroll_observer;
 		}
 
 		if (target.resize_observer !== undefined) {

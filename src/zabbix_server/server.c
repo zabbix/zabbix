@@ -220,6 +220,9 @@ static int	*threads_flags;
 
 static int	ha_status = ZBX_NODE_STATUS_UNKNOWN;
 static int	ha_failover_delay = ZBX_HA_DEFAULT_FAILOVER_DELAY;
+
+static sigset_t	orig_mask;
+
 ZBX_GET_CONFIG_VAR2(char *, const char *, zbx_config_pid_file, NULL)
 ZBX_GET_CONFIG_VAR(zbx_export_file_t *, problems_export, NULL)
 ZBX_GET_CONFIG_VAR(zbx_export_file_t *, history_export, NULL)
@@ -375,6 +378,7 @@ static char	*config_file				= NULL;
 static int	config_allow_root			= 0;
 static int	config_enable_global_scripts		= 1;
 static int	config_allow_software_update_check	= 1;
+static char	*config_sms_devices			= NULL;
 static zbx_config_log_t	log_file_cfg			= {NULL, NULL, ZBX_LOG_TYPE_UNDEFINED, 1};
 
 struct zbx_db_version_info_t	db_version_info;
@@ -628,6 +632,9 @@ static int	get_process_info_by_thread(int local_server_num, unsigned char *local
 static void	zbx_set_defaults(void)
 {
 	config_startup_time = (int)time(NULL);
+
+	if (NULL != CONFIG_HA_NODE_NAME && '\0' != *CONFIG_HA_NODE_NAME)
+		zbx_config_dbhigh->read_only_recoverable = 1;
 
 	if (NULL == zbx_config_dbhigh->config_dbhost)
 		zbx_config_dbhigh->config_dbhost = zbx_strdup(zbx_config_dbhigh->config_dbhost, "localhost");
@@ -1133,6 +1140,8 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 				ZBX_CONF_PARM_OPT,	0,			1000},
 		{"WebDriverURL",		&config_webdriver_url,			ZBX_CFG_TYPE_STRING,
 				ZBX_CONF_PARM_OPT,	0,			0},
+		{"SMSDevices",			&config_sms_devices,			ZBX_CFG_TYPE_STRING_LIST,
+				ZBX_CONF_PARM_OPT,	0,			1},
 		{0}
 	};
 
@@ -1439,8 +1448,6 @@ static void	zbx_check_db(void)
 			goto out;
 	}
 
-	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
-
 	if (SUCCEED == zbx_db_field_exists("config", "dbversion_status"))
 	{
 		zbx_json_initarray(&db_version_json, ZBX_JSON_STAT_BUF_LEN);
@@ -1473,8 +1480,6 @@ static void	zbx_check_db(void)
 		zbx_db_flush_version_requirements(db_version_json.buffer);
 		zbx_json_free(&db_version_json);
 	}
-
-	zbx_db_close();
 out:
 	if (SUCCEED != ret)
 	{
@@ -1508,12 +1513,8 @@ static void	zbx_db_save_server_status(void)
 
 	zbx_json_close(&json);
 
-	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
-
 	if (ZBX_DB_OK > zbx_db_execute("update config set server_status='%s'", json.buffer))
 		zabbix_log(LOG_LEVEL_WARNING, "Failed to save server status to database");
-
-	zbx_db_close();
 
 	zbx_json_free(&json);
 }
@@ -1585,7 +1586,8 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 							config_confsyncer_frequency, zbx_config_source_ip,
 							config_ssl_ca_location, config_ssl_cert_location,
 							config_ssl_key_location};
-	zbx_thread_alerter_args		alerter_args = {zbx_config_source_ip, config_ssl_ca_location};
+	zbx_thread_alerter_args		alerter_args = {zbx_config_source_ip, config_ssl_ca_location,
+							config_sms_devices};
 	zbx_thread_pinger_args		pinger_args = {zbx_config_timeout};
 	zbx_thread_pp_manager_args	preproc_man_args = {
 						.workers_num = config_forks[ZBX_PROCESS_TYPE_PREPROCESSOR],
@@ -1671,6 +1673,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	if (0 != config_forks[ZBX_PROCESS_TYPE_TRAPPER])
 	{
 		exit_args->listen_sock = listen_sock;
+		zbx_block_signals(&orig_mask);
 
 		if (FAIL == zbx_tcp_listen(listen_sock, zbx_config_listen_ip, (unsigned short)zbx_config_listen_port,
 				zbx_config_timeout, config_tcp_max_backlog_size))
@@ -1685,6 +1688,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 			zbx_free(error);
 			return FAIL;
 		}
+		zbx_unblock_signals(&orig_mask);
 	}
 
 	for (zbx_threads_num = 0, i = 0; i < ZBX_PROCESS_TYPE_COUNT; i++)
@@ -2117,6 +2121,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				ZABBIX_VERSION, ZABBIX_REVISION);
 	}
 
+	zbx_block_signals(&orig_mask);
+
 	if (FAIL == zbx_ipc_service_init_env(CONFIG_SOCKET_PATH, &error))
 	{
 		zbx_error("cannot initialize IPC services: %s", error);
@@ -2254,6 +2260,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
+	zbx_unblock_signals(&orig_mask);
+
 	if (SUCCEED != zbx_vault_db_credentials_get(&zbx_config_vault, &zbx_config_dbhigh->config_dbuser,
 			&zbx_config_dbhigh->config_dbpassword, zbx_config_source_ip, config_ssl_ca_location,
 			config_ssl_cert_location, config_ssl_key_location, &error))
@@ -2269,6 +2277,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
+	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
 	if (ZBX_DB_UNKNOWN == (db_type = zbx_db_get_database_type()))
 	{
@@ -2304,6 +2313,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	if (SUCCEED != zbx_db_check_instanceid())
 		exit(EXIT_FAILURE);
+	zbx_db_close();
 
 	if (FAIL == zbx_init_library_export(&zbx_config_export, &error))
 	{
@@ -2379,13 +2389,17 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		{
 			zabbix_log(LOG_LEVEL_INFORMATION, "\"%s\" node started in \"%s\" mode", CONFIG_HA_NODE_NAME,
 					zbx_ha_status_str(ha_status));
-
 		}
 	}
 
 	ha_status_old = ha_status;
 
-	if (ZBX_NODE_STATUS_STANDBY == ha_status)
+	if (ZBX_NODE_STATUS_ACTIVE == ha_status)
+	{
+		/* reset ha dispatcher heartbeat timings */
+		zbx_ha_dispatch_message(CONFIG_HA_NODE_NAME, NULL, ZBX_HA_RTC_STATE_RESET, NULL, NULL, NULL);
+	}
+	else if (ZBX_NODE_STATUS_STANDBY == ha_status)
 		standby_warning_time = time(NULL);
 
 	while (ZBX_IS_RUNNING())
@@ -2393,12 +2407,13 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		time_t			now;
 		zbx_ipc_client_t	*client;
 		zbx_ipc_message_t	*message;
+		int			rtc_state;
 
-		(void)zbx_ipc_service_recv(&rtc.service, &rtc_timeout, &client, &message);
+		rtc_state = zbx_ipc_service_recv(&rtc.service, &rtc_timeout, &client, &message);
 
 		if (NULL == message || ZBX_IPC_SERVICE_HA_RTC_FIRST <= message->code)
 		{
-			if (SUCCEED != zbx_ha_dispatch_message(CONFIG_HA_NODE_NAME, message, &ha_status,
+			if (SUCCEED != zbx_ha_dispatch_message(CONFIG_HA_NODE_NAME, message, rtc_state, &ha_status,
 					&ha_failover_delay, &error))
 			{
 				zabbix_log(LOG_LEVEL_CRIT, "HA manager error: %s", error);
@@ -2459,6 +2474,13 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 						server_teardown(&rtc, &listen_sock);
 						ha_status_old = ha_status;
 					}
+					else
+					{
+						/* reset ha dispatcher heartbeat timings */
+						zbx_ha_dispatch_message(CONFIG_HA_NODE_NAME, NULL,
+								ZBX_HA_RTC_STATE_RESET, NULL, NULL, NULL);
+					}
+
 					break;
 				case ZBX_NODE_STATUS_STANDBY:
 					server_teardown(&rtc, &listen_sock);

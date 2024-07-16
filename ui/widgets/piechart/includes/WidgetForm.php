@@ -57,12 +57,17 @@ class WidgetForm extends CWidgetForm {
 	public const LEGEND_LINES_MODE_FIXED = 0;
 	public const LEGEND_LINES_MODE_VARIABLE = 1;
 
+	public const MERGE_COLOR_DEFAULT = '768D99';
 	public const MERGE_PERCENT_MAX = 10;
 	public const MERGE_PERCENT_MIN = 1;
 
 	public const SPACE_DEFAULT = 1;
 	public const SPACE_MAX = 10;
 	public const SPACE_MIN = 0;
+
+	private const STROKE_DEFAULT = 0;
+	private const STROKE_MAX = 10;
+	private const STROKE_MIN = 0;
 
 	public const VALUE_DECIMALS_DEFAULT = 2;
 	public const VALUE_DECIMALS_MAX = 6;
@@ -129,6 +134,12 @@ class WidgetForm extends CWidgetForm {
 					->setDefault(self::WIDTH_DEFAULT)
 			)
 			->addField(
+				(new CWidgetFieldRangeControl('stroke', _('Stroke width'),
+					self::STROKE_MIN, self::STROKE_MAX
+				))
+					->setDefault(self::STROKE_DEFAULT)
+			)
+			->addField(
 				(new CWidgetFieldRangeControl('space', _('Space between sectors'),
 					self::SPACE_MIN, self::SPACE_MAX
 				))
@@ -172,7 +183,7 @@ class WidgetForm extends CWidgetForm {
 				(new CWidgetFieldCheckBox('units_show', null, _('Units')))
 			)
 			->addField(
-				(new CWidgetFieldTextBox('units'))
+				(new CWidgetFieldTextBox('units'))->setMaxLength(255)
 			)
 			->addField(
 				(new CWidgetFieldCheckBox('value_bold', _('Bold')))

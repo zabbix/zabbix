@@ -61,6 +61,7 @@ require_once dirname(__FILE__).'/dashboards/testDashboardsWidgetsPage.php';
 // Dashboard widgets.
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardClockWidget.php';
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardCopyWidgets.php';
+require_once dirname(__FILE__).'/dashboardWidgets/testDashboardDiscoveryStatusWidget.php';
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardDynamicItemWidgets.php';
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardFavoriteGraphsWidget.php';
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardFavoriteMapsWidget.php';
@@ -70,8 +71,11 @@ require_once dirname(__FILE__).'/dashboardWidgets/testDashboardGeomapWidgetScree
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardGraphPrototypeWidget.php';
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardGraphWidget.php';
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardGraphWidgetSelectedHosts.php';
+require_once dirname(__FILE__).'/dashboardWidgets/testDashboardHoneycombWidget.php';
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardHostAvailabilityWidget.php';
+require_once dirname(__FILE__).'/dashboardWidgets/testDashboardHostNavigatorWidget.php';
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardItemHistoryWidget.php';
+require_once dirname(__FILE__).'/dashboardWidgets/testDashboardItemNavigatorWidget.php';
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardItemValueWidget.php';
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardPieChartWidget.php';
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardProblemsBySeverityWidget.php';
@@ -158,6 +162,7 @@ require_once dirname(__FILE__).'/lld/testFormLowLevelDiscovery.php';
 require_once dirname(__FILE__).'/lld/testFormLowLevelDiscoveryOverrides.php';
 require_once dirname(__FILE__).'/lld/testFormTestLowLevelDiscovery.php';
 require_once dirname(__FILE__).'/lld/testInheritanceDiscoveryRule.php';
+require_once dirname(__FILE__).'/lld/testLowLevelDiscoveryDisabledObjects.php';
 require_once dirname(__FILE__).'/lld/testPageLowLevelDiscovery.php';
 
 // Macros.
@@ -212,6 +217,10 @@ require_once dirname(__FILE__).'/problems/testPageProblems.php';
 // Proxies.
 require_once dirname(__FILE__).'/proxies/testFormAdministrationProxies.php';
 require_once dirname(__FILE__).'/proxies/testPageAdministrationProxies.php';
+
+// Proxy Groups.
+require_once dirname(__FILE__).'/proxyGroups/testFormAdministrationProxyGroups.php';
+require_once dirname(__FILE__).'/proxyGroups/testPageAdministrationProxyGroups.php';
 
 // Queue.
 /*
@@ -385,6 +394,7 @@ class SeleniumTests {
 		// Dashboard widgets.
 		$suite->addTestSuite('testDashboardClockWidget');
 		$suite->addTestSuite('testDashboardCopyWidgets');
+		$suite->addTestSuite('testDashboardDiscoveryStatusWidget');
 		$suite->addTestSuite('testDashboardDynamicItemWidgets');
 		$suite->addTestSuite('testDashboardFavoriteGraphsWidget');
 		$suite->addTestSuite('testDashboardFavoriteMapsWidget');
@@ -394,8 +404,11 @@ class SeleniumTests {
 		$suite->addTestSuite('testDashboardGraphPrototypeWidget');
 		$suite->addTestSuite('testDashboardGraphWidget');
 		$suite->addTestSuite('testDashboardGraphWidgetSelectedHosts');
+		$suite->addTestSuite('testDashboardHoneycombWidget');
 		$suite->addTestSuite('testDashboardHostAvailabilityWidget');
+		$suite->addTestSuite('testDashboardHostNavigatorWidget');
 		$suite->addTestSuite('testDashboardItemHistoryWidget');
+		$suite->addTestSuite('testDashboardItemNavigatorWidget');
 		$suite->addTestSuite('testDashboardItemValueWidget');
 		$suite->addTestSuite('testDashboardPieChartWidget');
 		$suite->addTestSuite('testDashboardProblemsBySeverityWidget');
@@ -482,6 +495,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormLowLevelDiscoveryOverrides');
 		$suite->addTestSuite('testFormTestLowLevelDiscovery');
 		$suite->addTestSuite('testInheritanceDiscoveryRule');
+		$suite->addTestSuite('testLowLevelDiscoveryDisabledObjects');
 		$suite->addTestSuite('testPageLowLevelDiscovery');
 
 		// Macros.
@@ -536,6 +550,10 @@ class SeleniumTests {
 		// Proxies.
 		$suite->addTestSuite('testFormAdministrationProxies');
 		$suite->addTestSuite('testPageAdministrationProxies');
+
+		// Proxy groups.
+		$suite->addTestSuite('testFormAdministrationProxyGroups');
+		$suite->addTestSuite('testPageAdministrationProxyGroups');
 
 		// Queue.
 		/*

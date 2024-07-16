@@ -54,9 +54,11 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 				);
 			}
 			else {
-			$this->assertEquals($value, $form_field->getValue());
+				$this->assertEquals($value, $form_field->getValue());
 			}
 		}
+
+		$dialog->close();
 	}
 
 	/**
@@ -280,6 +282,8 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 			$result = trim(preg_replace('/\s\s+/', ' ', $get_text));
 			$this->assertEquals($result, $data['error']);
 		}
+
+		COverlayDialogElement::closeAll();
 	}
 
 	/*
@@ -358,6 +362,8 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 
 		// Check error message on posting the form.
 		$this->assertMessage(TEST_BAD, $data['error'], $data['error_details']);
+
+		$dialog->close();
 	}
 
 	public static function getCreateValidationData() {
@@ -1316,15 +1322,16 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 			switch ($action) {
 				case 'update':
 					$name .= ' (updated)';
-					$form->getField('Name')->fill('$name');
-					$dialog->getFooter()->query('button:Cancel')->one()->click();
+					$form->getField('Name')->fill($name);
+					$dialog->close(true);
 					break;
 
 				case 'clone':
 					$name .= ' (cloned)';
-					$form->getField('Name')->fill('$name');
+					$form->getField('Name')->fill($name);
 					$dialog->getFooter()->query('button:Clone')->one()->click();
-					$dialog->getFooter()->query('button:Cancel')->one()->click();
+					$dialog->query('xpath:.//h4[text()="New item"]')->waitUntilVisible()->one();
+					$dialog->close(true);
 					break;
 
 				case 'delete':
