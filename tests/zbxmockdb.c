@@ -19,7 +19,7 @@
 /* make sure that __wrap_*() prototypes match unwrapped counterparts */
 
 #define zbx_db_vselect			__wrap_zbx_db_vselect
-#define zbx_db_free_result		__wrap_zbx_db_free
+#define zbx_db_free_result		__wrap_zbx_db_free_result
 #define zbx_db_execute			__wrap_zbx_db_execute
 #define zbx_db_execute_multiple_query	__wrap_zbx_db_execute_multiple_query
 #define zbx_db_begin			__wrap_zbx_db_begin
@@ -60,8 +60,6 @@ struct zbx_db_result
 
 zbx_db_result_t	__wrap_zbx_db_select(const char *fmt, ...);
 zbx_db_result_t	__wrap_zbx_db_select_n(const char *query, int n);
-int	__wrap_zbx_db_execute(const char *fmt, ...);
-int	__wrap_zbx_db_commit(void);
 
 zbx_db_result_t	__wrap_zbx_dbconn_select(zbx_dbconn_t *db, const char *fmt, ...);
 
