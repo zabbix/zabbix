@@ -509,8 +509,6 @@ typedef struct
 /* events callbacks end */
 
 int	zbx_db_get_user_names(zbx_uint64_t userid, char **username, char **name, char **surname);
-int	zbx_db_flush_overflowed_sql(char *sql, size_t sql_offset);
-int	zbx_db_execute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_offset);
 char	*zbx_db_get_unique_hostname_by_sample(const char *host_name_sample, const char *field_name);
 
 typedef enum
