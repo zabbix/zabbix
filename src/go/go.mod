@@ -46,3 +46,5 @@ require (
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
 	gopkg.in/asn1-ber.v1 v1.0.0-20181015200546-f715ec2f112d // indirect
 )
+
+replace golang.zabbix.com/sdk => ../../../plugins/plugin-support
