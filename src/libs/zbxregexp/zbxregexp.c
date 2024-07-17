@@ -1036,6 +1036,7 @@ int	zbx_regexp_repl(const char *string, const char *pattern, const char *repl_te
 	char		*repleaced = zbx_strdup(NULL, string), *ptr = repleaced, *error = NULL;
 	zbx_regrepl_t	*prepl;
 	zbx_vector_regrepl_t	matches;
+	size_t	i;
 
 	zbx_free(*out);
 
@@ -1057,7 +1058,6 @@ int	zbx_regexp_repl(const char *string, const char *pattern, const char *repl_te
 	/* collect all matches */
 	for (;;)
 	{
-		size_t	i;
 		int	newshift;
 		prepl = zbx_malloc(NULL, sizeof(zbx_regrepl_t));
 		/* -1 is special pcre value for unused patterns */
@@ -1096,7 +1096,7 @@ int	zbx_regexp_repl(const char *string, const char *pattern, const char *repl_te
 	{
 		zbx_regmatch_t	*match = matches.values[mi]->match;
 		size_t	endof = (size_t)match[0].rm_eo - 1;
-		char	*repl, *empty = zbx_strdup(NULL, string);
+		char	*repl;
 
 		if (match[0].rm_eo == match[0].rm_so)
 			endof = (size_t)match[0].rm_eo;
@@ -1107,14 +1107,33 @@ int	zbx_regexp_repl(const char *string, const char *pattern, const char *repl_te
 		}
 		else
 		{
-			repl = regexp_sub_replace(empty, repl_template, match, ZBX_REGEXP_GROUPS_MAX, 0);
+			repl = regexp_sub_replace(string, repl_template, match, ZBX_REGEXP_GROUPS_MAX, 0);
 		}
 		if (NULL != repl)
 		{
-			if ('\0' == *repleaced)
+			if (match[0].rm_eo == match[0].rm_so)
 			{
+				char	*str = (char *)zbx_malloc(NULL, strlen(repleaced) + strlen(repl) + 1);
+
+				ptr = str;
+				for (i = 0; ; i++)
+				{
+					if (i == endof)
+					{
+						char	*prepl = repl;
+
+						while ('\0' != *prepl)
+							*ptr++ = *prepl++;
+					}
+					if ('\0' == repleaced[i])
+						break;
+
+					*ptr++ = repleaced[i];
+				}
+				*ptr = '\0';
 				zbx_free(repleaced);
-				repleaced = repl;
+				repleaced = str;
+				zbx_free(repl);
 			}
 			else
 			{
@@ -1122,7 +1141,6 @@ int	zbx_regexp_repl(const char *string, const char *pattern, const char *repl_te
 				zbx_free(repl);
 			}
 		}
-		zbx_free(empty);
 
 	}
 	zbx_vector_regrepl_clear_ext(&matches, (zbx_regrepl_free_func_t)zbx_ptr_free);

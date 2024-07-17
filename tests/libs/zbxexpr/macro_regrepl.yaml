@@ -259,4 +259,23 @@ out:
   value: '@'
   return: SUCCEED
 
+---
+test case: insertion test
+in:
+  data: '0tttttt1234aaaaa5'
+  params: '"(?=[0123456789])",A'
+
+out:
+  value: 'A0ttttttA1A2A3A4aaaaaA5'
+  return: SUCCEED
+---
+test case: replace end of string
+in:
+  data: '12345'
+  params: '$,@'
+
+out:
+  value: '12345@'
+  return: SUCCEED
+
 ...
