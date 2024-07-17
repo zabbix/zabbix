@@ -1095,11 +1095,7 @@ int	zbx_regexp_repl(const char *string, const char *pattern, const char *repl_te
 	for (mi = matches.values_num - 1; 0 <= mi; mi--)
 	{
 		zbx_regmatch_t	*match = matches.values[mi]->match;
-		size_t	endof = (size_t)match[0].rm_eo - 1;
 		char	*repl;
-
-		if (match[0].rm_eo == match[0].rm_so)
-			endof = (size_t)match[0].rm_eo;
 
 		if (NULL == repl_template || '\0' == *repl_template)
 		{
@@ -1111,35 +1107,28 @@ int	zbx_regexp_repl(const char *string, const char *pattern, const char *repl_te
 		}
 		if (NULL != repl)
 		{
-			if (match[0].rm_eo == match[0].rm_so)
-			{
-				char	*str = (char *)zbx_malloc(NULL, strlen(repleaced) + strlen(repl) + 1);
+			char	*str = (char *)zbx_malloc(NULL, strlen(repleaced) + strlen(repl) + 1);
 
-				ptr = str;
-				for (i = 0; ; i++)
+			ptr = str;
+			for (i = 0; ; i++)
+			{
+				if (i == match[0].rm_so)
 				{
-					if (i == endof)
-					{
-						char	*prepl = repl;
+					char	*prepl = repl;
 
-						while ('\0' != *prepl)
-							*ptr++ = *prepl++;
-					}
-					if ('\0' == repleaced[i])
-						break;
-
-					*ptr++ = repleaced[i];
+					while ('\0' != *prepl)
+						*ptr++ = *prepl++;
+					i = i + match[0].rm_eo - match[0].rm_so;
 				}
-				*ptr = '\0';
-				zbx_free(repleaced);
-				repleaced = str;
-				zbx_free(repl);
+				if ('\0' == repleaced[i])
+					break;
+
+				*ptr++ = repleaced[i];
 			}
-			else
-			{
-				zbx_replace_string(&repleaced, (size_t)match[0].rm_so, &endof, repl);
-				zbx_free(repl);
-			}
+			*ptr = '\0';
+			zbx_free(repleaced);
+			repleaced = str;
+			zbx_free(repl);
 		}
 
 	}
