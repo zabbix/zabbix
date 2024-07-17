@@ -1029,7 +1029,7 @@ int	zbx_mregexp_sub_precompiled(const char *string, const zbx_regexp_t *regexp, 
  * Comments: This function performs case sensitive match                         *
  *                                                                               *
  *********************************************************************************/
-int	zbx_regexp_repl(const char *string, const char *pattern, const char *repl_template, char **out)
+int	zbx_regexp_repl(const char *string, const char *pattern, const char *output_template, char **out)
 {
 	zbx_regexp_t		*regexp = NULL;
 	int			mi, shift = 0;
@@ -1039,7 +1039,7 @@ int	zbx_regexp_repl(const char *string, const char *pattern, const char *repl_te
 
 	zbx_free(*out);
 
-	if ('\0' == *pattern || '\0' == *repl_template)
+	if ('\0' == *pattern || '\0' == *output_template)
 	{
 		*out = out_str;
 		return SUCCEED;
@@ -1098,30 +1098,31 @@ int	zbx_regexp_repl(const char *string, const char *pattern, const char *repl_te
 	for (mi = matches.values_num - 1; 0 <= mi; mi--)
 	{
 		zbx_regmatch_t	*groups = matches.values[mi]->groups;
-		char		*repl;
+		char		*replace;
 
-		if (NULL == repl_template || '\0' == *repl_template)
+		if (NULL == output_template || '\0' == *output_template)
 		{
-			repl = zbx_strdup(NULL, "");
+			replace = zbx_strdup(NULL, "");
 		}
 		else
 		{
-			repl = regexp_sub_replace(string, repl_template, groups, ZBX_REGEXP_GROUPS_MAX, 0);
+			replace = regexp_sub_replace(string, output_template, groups, ZBX_REGEXP_GROUPS_MAX, 0);
 		}
 
-		if (NULL != repl)
+		if (NULL != replace)
 		{
-			char	*str = (char *)zbx_malloc(NULL, strlen(out_str) + strlen(repl) + 1);
+			char	*str = (char *)zbx_malloc(NULL, strlen(out_str) + strlen(replace) + 1);
 
 			ptr = str;
 			for (i = 0; ; i++)
 			{
 				if (i == (size_t)groups[0].rm_so)
 				{
-					char	*pinsertion = repl;
+					char	*replace_ptr = replace;
 
-					while ('\0' != *pinsertion)
-						*ptr++ = *pinsertion++;
+					while ('\0' != *replace_ptr)
+						*ptr++ = *replace_ptr++;
+
 					i = i + (size_t)(groups[0].rm_eo - groups[0].rm_so);
 				}
 				if ('\0' == out_str[i])
@@ -1132,7 +1133,7 @@ int	zbx_regexp_repl(const char *string, const char *pattern, const char *repl_te
 			*ptr = '\0';
 			zbx_free(out_str);
 			out_str = str;
-			zbx_free(repl);
+			zbx_free(replace);
 		}
 
 	}
