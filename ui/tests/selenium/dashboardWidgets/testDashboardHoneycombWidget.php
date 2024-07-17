@@ -49,6 +49,19 @@ class testDashboardHoneycombWidget extends testWidgets {
 	protected static $disposable_dashboard_id;
 
 	public static function prepareHoneycombWidgetData() {
+		CDataHelper::call('hostgroup.create', [
+			[
+				'name' => 'Maintenance group'
+			],
+			[
+				'name' => 'Host with tags'
+			],
+			[
+				'name' => 'Items with tags'
+			]
+		]);
+		$groupids = CDataHelper::getIds('name');
+
 		$response = CDataHelper::createHosts([
 			[
 				'host' => 'Host for honeycomb 1',
@@ -103,6 +116,70 @@ class testDashboardHoneycombWidget extends testWidgets {
 						'delay' => 0
 					]
 				]
+			],
+			[
+				'host' => 'Host for maintenance filter',
+				'groups' => [['groupid' => $groupids['Maintenance group']]],
+				'items' => [
+					[
+						'name' => 'Maintenance item',
+						'key_' => 'maintenance_1',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_UINT64,
+						'delay' => 0
+					]
+				]
+			],
+			[
+				'host' => 'Host with tags',
+				'groups' => [['groupid' => $groupids['Host with tags']]],
+				'tags' => [
+					[
+						'tag' => 'host_tag_1',
+						'value' => 'host_val_1'
+					]
+				],
+				'items' => [
+					[
+						'name' => 'Host tag item',
+						'key_' => 'host_tag_1',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_UINT64,
+						'delay' => 0
+					]
+				]
+			],
+			[
+				'host' => 'Host with items with tags',
+				'groups' => [['groupid' => $groupids['Items with tags']]],
+				'items' => [
+					[
+						'name' => 'Item tag 1',
+						'key_' => 'item_tag_1',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_UINT64,
+						'delay' => 0,
+						'tags' => [
+							[
+								'tag' => 'item_tag_1',
+								'value' => 'item_val_1'
+							]
+						]
+					],
+					[
+						'name' => 'Item tag 2',
+						'key_' => 'item_tag_2',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_UINT64,
+						'delay' => 0,
+						'tags' => [
+							[
+								'tag' => 'item_tag_2',
+								'value' => 'item_val_2'
+							]
+						]
+					]
+				]
 			]
 		]);
 		$itemids = $response['itemids'];
@@ -111,6 +188,16 @@ class testDashboardHoneycombWidget extends testWidgets {
 		foreach (['1' => 100, '2' => 200, '3' => 300, '4' => 400, '5' => 500] as $key => $value) {
 			CDataHelper::addItemData($itemids['Display:honey_display_'.$key], $value);
 		}
+
+		CDataHelper::call('maintenance.create', [
+			[
+				'name' => 'Honeycomb host maintenance',
+				'active_since' => time() - 1000,
+				'active_till' => time() + 10000,
+				'groups' => [['groupid' => $groupids['Maintenance group']]],
+				'timeperiods' => [[]]
+			]
+		]);
 
 		CDataHelper::call('dashboard.create', [
 			[
@@ -542,6 +629,46 @@ class testDashboardHoneycombWidget extends testWidgets {
 										'type' => 1,
 										'name' => 'reference',
 										'value' => 'TOQVG'
+									]
+								]
+							]
+						]
+					]
+				]
+			],
+			[
+				'name' => 'Dashboard for filtering honeycomb widget',
+				'auto_start' => 0,
+				'pages' => [
+					[
+						'widgets' => [
+							[
+								'type' => 'honeycomb',
+								'name' => 'UpdateHoneycomb',
+								'x' => 0,
+								'y' => 0,
+								'width' => 30,
+								'height' => 7,
+								'fields' => [
+									[
+										'type' => 0,
+										'name' => 'secondary_label_type',
+										'value' => 0
+									],
+									[
+										'type' => 1,
+										'name' => 'secondary_label',
+										'value' => '{ITEM.NAME}'
+									],
+									[
+										'type' => 1,
+										'name' => 'items.0',
+										'value' => 'test'
+									],
+									[
+										'type' => 1,
+										'name' => 'reference',
+										'value' => 'BUBUR'
 									]
 								]
 							]
@@ -1784,6 +1911,103 @@ class testDashboardHoneycombWidget extends testWidgets {
 			$element = CDashboardElement::find()->one()->getWidget('Honeycomb');
 			$this->assertScreenshot($element, 'honeycomb_'.$i);
 		}
+	}
+
+	public static function getFilteringData() {
+		return [
+			// #0 Display by Host group.
+			[
+				[
+					'fields' => [
+						'Host groups' => 'Items with tags',
+						'Item patterns' => ['Item tag 1', 'Item tag 2', 'Host tag item', 'Maintenance item']
+					],
+					'filtered_items' => ['Item tag 1', 'Item tag 2']
+				]
+			],
+			// #1 Display by Host.
+			[
+				[
+					'fields' => [
+						'Item patterns' => ''
+					],
+					'error_message' => [
+						'Invalid parameter "Item patterns": cannot be empty.'
+					]
+				]
+			],
+			// #2 Display by Host tag.
+			[
+				[
+					'fields' => [
+						'Item patterns' => ''
+					],
+					'error_message' => [
+						'Invalid parameter "Item patterns": cannot be empty.'
+					]
+				]
+			],
+			// #3 Display by Item.
+			[
+				[
+					'fields' => [
+						'Item patterns' => ''
+					],
+					'error_message' => [
+						'Invalid parameter "Item patterns": cannot be empty.'
+					]
+				]
+			],
+			// #4 Display by Items tag.
+			[
+				[
+					'fields' => [
+						'Item patterns' => ''
+					],
+					'error_message' => [
+						'Invalid parameter "Item patterns": cannot be empty.'
+					]
+				]
+			],
+			// #5 Show hosts in maintenance.
+			[
+				[
+					'fields' => [
+						'Item patterns' => ''
+					],
+					'error_message' => [
+						'Invalid parameter "Item patterns": cannot be empty.'
+					]
+				]
+			],
+			// #6 Don't show hosts in maintenance.
+			[
+				[
+					'fields' => [
+						'Item patterns' => ''
+					],
+					'error_message' => [
+						'Invalid parameter "Item patterns": cannot be empty.'
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getFilteringData
+	 */
+	public function testDashboardHoneycombWidget_CheckFiltering($data) {
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
+				self::$dashboardid['Dashboard for filtering honeycomb widget'])->waitUntilReady();
+		$this->checkWidgetForm($data, 'update', false);
+		$dashboard = CDashboardElement::find()->waitUntilReady()->one();
+		$dashboard->save();
+
+		// Check message that dashboard saved.
+		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
+		$this->page->waitUntilReady();
+		$widget = $dashboard->getWidget('UpdateHoneycomb');
 	}
 
 	/**
