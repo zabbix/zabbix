@@ -744,8 +744,7 @@ zabbix_export:
                   - macro: '{#TYPE}'
                     value: buckets
               operations:
-                - operationobject: ITEM_PROTOTYPE
-                  operator: LIKE
+                - operator: LIKE
                   value: bucket
                   discover: DISCOVER
             - name: 'total item'
@@ -755,8 +754,7 @@ zabbix_export:
                   - macro: '{#TYPE}'
                     value: totals
               operations:
-                - operationobject: ITEM_PROTOTYPE
-                  operator: NOT_LIKE
+                - operator: NOT_LIKE
                   value: bucket
                   discover: DISCOVER
         - uuid: 8dcd7c95a9364efdb2fe64c651360ad4
@@ -1126,8 +1124,7 @@ zabbix_export:
                   - macro: '{#TYPE}'
                     value: buckets
               operations:
-                - operationobject: ITEM_PROTOTYPE
-                  operator: LIKE
+                - operator: LIKE
                   value: bucket
                   discover: DISCOVER
             - name: 'total item'
@@ -1137,8 +1134,7 @@ zabbix_export:
                   - macro: '{#TYPE}'
                     value: totals
               operations:
-                - operationobject: ITEM_PROTOTYPE
-                  operator: NOT_LIKE
+                - operator: NOT_LIKE
                   value: bucket
                   discover: DISCOVER
         - uuid: d015cafd6e9f4707bb78125ff17cc679

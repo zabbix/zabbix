@@ -1859,8 +1859,7 @@ zabbix_export:
                   - macro: '{#FSTYPE}'
                     value: ^(btrfs|zfs)$
               operations:
-                - operationobject: ITEM_PROTOTYPE
-                  operator: LIKE
+                - operator: LIKE
                   value: Inodes
                   discover: NO_DISCOVER
       tags:
