@@ -3,6 +3,8 @@ Changes for 7.0.1rc2
 New features:
 
 Bug fixes:
+........S. [ZBX-24852] fixed compression policy change bug (askolmeisters)
+...G....S. [ZBX-24719] fixed Zabbix agent 2 crashing when executing global script (arimdjonoks)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.1rc1
