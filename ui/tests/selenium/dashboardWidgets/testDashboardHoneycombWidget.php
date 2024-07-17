@@ -183,21 +183,26 @@ class testDashboardHoneycombWidget extends testWidgets {
 			]
 		]);
 		$itemids = $response['itemids'];
-		$hostid = $response['hostids']['Display'];
+		$display_hostid = $response['hostids']['Display'];
+		$maintenance_hostid = $response['hostids']['Host for maintenance filter'];
 
 		foreach (['1' => 100, '2' => 200, '3' => 300, '4' => 400, '5' => 500] as $key => $value) {
 			CDataHelper::addItemData($itemids['Display:honey_display_'.$key], $value);
 		}
 
-		CDataHelper::call('maintenance.create', [
-			[
-				'name' => 'Honeycomb host maintenance',
-				'active_since' => time() - 1000,
-				'active_till' => time() + 10000,
-				'groups' => [['groupid' => $groupids['Maintenance group']]],
-				'timeperiods' => [[]]
-			]
-		]);
+		// Items ids that used in filtering scenario.
+		$filtered_items = [
+			$itemids['Host for maintenance filter:maintenance_1'],
+			$itemids['Host with tags:host_tag_1'],
+			$itemids['Host with items with tags:item_tag_1'],
+			$itemids['Host with items with tags:item_tag_2']
+		];
+
+		foreach ($filtered_items as $itemid) {
+			CDataHelper::addItemData($itemid, 100);
+		}
+
+		DBexecute('UPDATE hosts SET maintenance_status=1 WHERE hostid='.zbx_dbstr($maintenance_hostid));
 
 		CDataHelper::call('dashboard.create', [
 			[
@@ -308,7 +313,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 									[
 										'type' => '3',
 										'name' => 'hostids.0',
-										'value' => $hostid
+										'value' => $display_hostid
 									],
 									[
 										'type' => 1,
@@ -358,7 +363,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 									[
 										'type' => '3',
 										'name' => 'hostids.0',
-										'value' => $hostid
+										'value' => $display_hostid
 									],
 									[
 										'type' => 1,
@@ -413,7 +418,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 									[
 										'type' => '3',
 										'name' => 'hostids.0',
-										'value' => $hostid
+										'value' => $display_hostid
 									],
 									[
 										'type' => 1,
@@ -483,7 +488,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 									[
 										'type' => '3',
 										'name' => 'hostids.0',
-										'value' => $hostid
+										'value' => $display_hostid
 									],
 									[
 										'type' => 1,
@@ -598,7 +603,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 									[
 										'type' => '3',
 										'name' => 'hostids.0',
-										'value' => $hostid
+										'value' => $display_hostid
 									],
 									[
 										'type' => 1,
@@ -652,12 +657,12 @@ class testDashboardHoneycombWidget extends testWidgets {
 								'fields' => [
 									[
 										'type' => 0,
-										'name' => 'secondary_label_type',
-										'value' => 0
+										'name' => 'show.0',
+										'value' => 1
 									],
 									[
 										'type' => 1,
-										'name' => 'secondary_label',
+										'name' => 'primary_label',
 										'value' => '{ITEM.NAME}'
 									],
 									[
@@ -1915,86 +1920,209 @@ class testDashboardHoneycombWidget extends testWidgets {
 
 	public static function getFilteringData() {
 		return [
-			// #0 Display by Host group.
+			// #0 Filter by Host group.
 			[
 				[
 					'fields' => [
 						'Host groups' => 'Items with tags',
-						'Item patterns' => ['Item tag 1', 'Item tag 2', 'Host tag item', 'Maintenance item']
+						'Item patterns' => ['Item tag 1', 'Item tag 2', 'Host tag item']
 					],
 					'filtered_items' => ['Item tag 1', 'Item tag 2']
 				]
 			],
-			// #1 Display by Host.
+			// #1 Filter by Host.
 			[
 				[
 					'fields' => [
-						'Item patterns' => ''
+						'Host groups' => '',
+						'Hosts' => 'Host with tags',
+						'Item patterns' => ['Item tag 1', 'Item tag 2', 'Host tag item']
 					],
-					'error_message' => [
-						'Invalid parameter "Item patterns": cannot be empty.'
-					]
+					'filtered_items' => ['Host tag item']
 				]
 			],
-			// #2 Display by Host tag.
+			// #2 Filter by Item without host or host group.
 			[
 				[
 					'fields' => [
-						'Item patterns' => ''
+						'Host groups' => '',
+						'Hosts' => '',
+						'Item patterns' => ['Item tag 1', 'Host tag item']
 					],
-					'error_message' => [
-						'Invalid parameter "Item patterns": cannot be empty.'
-					]
+					'tags' => [
+						'host_tags' => [
+							['name' => '', 'operator' => 'Does not exist']
+						]
+					],
+					'filtered_items' => ['Item tag 1', 'Host tag item']
 				]
 			],
-			// #3 Display by Item.
+			// #3 Filter by Item with host.
 			[
 				[
 					'fields' => [
-						'Item patterns' => ''
+						'Host groups' => '',
+						'Hosts' => 'Host with tags',
+						'Item patterns' => ['Item tag 1', 'Host tag item']
 					],
-					'error_message' => [
-						'Invalid parameter "Item patterns": cannot be empty.'
-					]
+					'filtered_items' => ['Host tag item']
 				]
 			],
-			// #4 Display by Items tag.
+			// #4 Filter by Item with host group.
 			[
 				[
 					'fields' => [
-						'Item patterns' => ''
+						'Host groups' => 'Items with tags',
+						'Hosts' => '',
+						'Item patterns' => ['Item tag 2', 'Host tag item']
 					],
-					'error_message' => [
-						'Invalid parameter "Item patterns": cannot be empty.'
-					]
+					'filtered_items' => ['Item tag 2']
 				]
 			],
 			// #5 Show hosts in maintenance.
 			[
 				[
 					'fields' => [
-						'Item patterns' => ''
+						'Host groups' => '',
+						'Hosts' => '',
+						'Show hosts in maintenance' => true,
+						'Item patterns' => ['Item tag 1', 'Host tag item', 'Maintenance item']
 					],
-					'error_message' => [
-						'Invalid parameter "Item patterns": cannot be empty.'
-					]
+					'filtered_items' => ['Maintenance item', 'Item tag 1', 'Host tag item']
 				]
 			],
 			// #6 Don't show hosts in maintenance.
 			[
 				[
 					'fields' => [
-						'Item patterns' => ''
+						'Host groups' => '',
+						'Hosts' => '',
+						'Show hosts in maintenance' => false,
+						'Item patterns' => ['Item tag 1', 'Host tag item', 'Maintenance item']
 					],
-					'error_message' => [
-						'Invalid parameter "Item patterns": cannot be empty.'
-					]
+					'filtered_items' => ['Item tag 1', 'Host tag item']
+				]
+			],
+			// #7 Filter by Host exists tag.
+			[
+				[
+					'fields' => [
+						'Host groups' => '',
+						'Hosts' => '',
+						'Show hosts in maintenance' => false,
+						'Item patterns' => ['Item tag 1', 'Item tag 2', 'Host tag item']
+					],
+					'tags' => [
+						'host_tags' => [
+							['name' => 'host_tag_1', 'operator' => 'Exists']
+						]
+					],
+					'filtered_items' => ['Host tag item']
+				]
+			],
+			// #8 Filter by Host doesn't exist tag.
+			[
+				[
+					'fields' => [
+						'Host groups' => '',
+						'Hosts' => '',
+						'Show hosts in maintenance' => false,
+						'Item patterns' => ['Item tag 1', 'Item tag 2', 'Host tag item']
+					],
+					'tags' => [
+						'host_tags' => [
+							['name' => 'host_tag_1', 'operator' => 'Does not exist']
+						]
+					],
+					'filtered_items' => ['Item tag 1', 'Item tag 2']
+				]
+			],
+			// #9 Filter by Items exists tag.
+			[
+				[
+					'fields' => [
+						'Host groups' => '',
+						'Hosts' => '',
+						'Show hosts in maintenance' => false,
+						'Item patterns' => ['Item tag 1', 'Item tag 2', 'Host tag item']
+					],
+					'tags' => [
+						'item_tags' => [
+							['name' => 'item_tag_1', 'operator' => 'Exists']
+						],
+						'host_tags' => [
+							['name' => '', 'operator' => 'Does not exist']
+						]
+					],
+					'filtered_items' => ['Item tag 1']
+				]
+			],
+			// #10 Filter by Items doesn't exist tag.
+			[
+				[
+					'fields' => [
+						'Host groups' => '',
+						'Hosts' => '',
+						'Show hosts in maintenance' => false,
+						'Item patterns' => ['Item tag 1', 'Item tag 2', 'Host tag item']
+					],
+					'tags' => [
+						'item_tags' => [
+							['name' => 'item_tag_1', 'operator' => 'Does not exist']
+						],
+						'host_tags' => [
+							['name' => '', 'operator' => 'Does not exist']
+						]
+					],
+					'filtered_items' => ['Item tag 2', 'Host tag item']
+				]
+			],
+			// #11 Filter by Items and Host exists tag.
+			[
+				[
+					'fields' => [
+						'Host groups' => '',
+						'Hosts' => '',
+						'Show hosts in maintenance' => false,
+						'Item patterns' => ['Item tag 1', 'Item tag 2', 'Host tag item']
+					],
+					'tags' => [
+						'item_tags' => [
+							['name' => 'item_tag_1', 'operator' => 'Exists']
+						],
+						'host_tags' => [
+							['name' => 'host_tag_1', 'operator' => 'Exists']
+						]
+					],
+					'filtered_items' => ['No data']
+				]
+			],
+			// #12 Filter by Items and Host doesn't exist tag.
+			[
+				[
+					'fields' => [
+						'Host groups' => '',
+						'Hosts' => '',
+						'Show hosts in maintenance' => True,
+						'Item patterns' => ['Item tag 1', 'Item tag 2', 'Host tag item', 'Maintenance item']
+					],
+					'tags' => [
+						'item_tags' => [
+							['name' => 'item_tag_1', 'operator' => 'Does not exist']
+						],
+						'host_tags' => [
+							['name' => 'host_tag_1', 'operator' => 'Does not exist']
+						]
+					],
+					'filtered_items' => ['Maintenance item', 'Item tag 2']
 				]
 			]
 		];
 	}
 
 	/**
+	 * Filter honeycomb and check that correct item comb visible on widget.
+	 *
 	 * @dataProvider getFilteringData
 	 */
 	public function testDashboardHoneycombWidget_CheckFiltering($data) {
@@ -2008,6 +2136,11 @@ class testDashboardHoneycombWidget extends testWidgets {
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 		$this->page->waitUntilReady();
 		$widget = $dashboard->getWidget('UpdateHoneycomb');
+
+		// Check that correct combs displayed on honeycomb.
+		$content = $widget->getContent();
+		$filtered = $content->query('class', 'svg-honeycomb-content')->all()->asText();
+		$this->assertEquals($data['filtered_items'], $filtered);
 	}
 
 	/**
