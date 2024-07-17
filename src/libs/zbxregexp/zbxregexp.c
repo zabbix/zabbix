@@ -1112,13 +1112,13 @@ int	zbx_regexp_repl(const char *string, const char *pattern, const char *repl_te
 			ptr = str;
 			for (i = 0; ; i++)
 			{
-				if (i == match[0].rm_so)
+				if (i == (size_t)match[0].rm_so)
 				{
 					char	*prepl = repl;
 
 					while ('\0' != *prepl)
 						*ptr++ = *prepl++;
-					i = i + match[0].rm_eo - match[0].rm_so;
+					i = i + (size_t)(match[0].rm_eo - match[0].rm_so);
 				}
 				if ('\0' == repleaced[i])
 					break;
