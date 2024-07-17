@@ -539,19 +539,29 @@ zbx_proxy_suppress_t;
 /* string functions that could not be moved into libzbxstr.a because they */
 /* are used by libzbxcommon.a */
 
-/* used by log which will be part of common*/
+/* used by log which will be part of common */
 #if defined(__GNUC__) || defined(__clang__)
 #	define __zbx_attr_format_printf(idx1, idx2) __attribute__((__format__(__printf__, (idx1), (idx2))))
 #	if defined(HAVE_TESTS)
 #		define	__zbx_attr_weak		__attribute__((weak))
 #		define	__zbx_static
-#	else
-#		define	__zbx_attr_weak
-#		define	__zbx_static	static
 #	endif
 #else
 #	define __zbx_attr_format_printf(idx1, idx2)
-#	define	__zbx_attr_weak
+#endif
+
+/* function override support for mock tests */
+
+#if (defined(__GNUC__) || defined(__clang__)) && defined(HAVE_TESTS)
+#	define	__zbx_attr_weak		__attribute__((weak))
+#	define	__zbx_static
+#endif
+
+#if !defined(__zbx_attr_weak)
+#	define __zbx_attr_weak
+#endif
+
+#if !defined(__zbx_static)
 #	define	__zbx_static	static
 #endif
 
