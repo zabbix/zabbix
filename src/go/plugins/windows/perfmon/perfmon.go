@@ -271,7 +271,6 @@ func (p *Plugin) collectCounterData() error {
 }
 
 func (p *Plugin) setCounterData() error {
-
 	errCollect := win32.PdhCollectQueryData(p.query)
 	if errCollect != nil {
 		errCollect = fmt.Errorf("cannot collect value %s", errCollect)
