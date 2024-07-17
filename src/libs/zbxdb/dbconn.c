@@ -1973,7 +1973,7 @@ int	zbx_dbconn_table_exists(zbx_dbconn_t *db, const char *table_name)
 	table_name_esc = zbx_db_dyn_escape_string(table_name);
 
 #if defined(HAVE_MYSQL)
-	result = zbx_db_select("show tables like '%s'", table_name_esc);
+	result = zbx_dbconn_select(db, "show tables like '%s'", table_name_esc);
 #elif defined(HAVE_POSTGRESQL)
 	result = zbx_dbconn_select(db,
 			"select 1"
