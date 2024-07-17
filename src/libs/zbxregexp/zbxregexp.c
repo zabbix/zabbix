@@ -72,12 +72,12 @@ ZBX_PTR_VECTOR_IMPL(expression, zbx_expression_t *)
 
 typedef struct
 {
-	zbx_regmatch_t match[ZBX_REGEXP_GROUPS_MAX];
+	zbx_regmatch_t groups[ZBX_REGEXP_GROUPS_MAX];
 }
-zbx_regrepl_t;
+zbx_match_t;
 
-ZBX_PTR_VECTOR_DECL(regrepl, zbx_regrepl_t *)
-ZBX_PTR_VECTOR_IMPL(regrepl, zbx_regrepl_t *)
+ZBX_PTR_VECTOR_DECL(match, zbx_match_t *)
+ZBX_PTR_VECTOR_IMPL(match, zbx_match_t *)
 
 #if defined(HAVE_PCRE2_H)
 static char	*decode_pcre2_compile_error(int error_code, PCRE2_SIZE error_offset, int flags)
@@ -1034,8 +1034,7 @@ int	zbx_regexp_repl(const char *string, const char *pattern, const char *repl_te
 	zbx_regexp_t		*regexp = NULL;
 	int			mi, shift = 0;
 	char			*out_str = zbx_strdup(NULL, string), *ptr = out_str, *error = NULL;
-	zbx_regrepl_t		*prepl;
-	zbx_vector_regrepl_t	matches;
+	zbx_vector_match_t	matches;
 	size_t			i;
 
 	zbx_free(*out);
@@ -1053,41 +1052,42 @@ int	zbx_regexp_repl(const char *string, const char *pattern, const char *repl_te
 		return FAIL;
 	}
 
-	zbx_vector_regrepl_create(&matches);
+	zbx_vector_match_create(&matches);
 
 	/* collect all matches */
 	for (;;)
 	{
-		int	newshift;
+		int		newshift;
+		zbx_match_t	*match;
 
-		prepl = zbx_malloc(NULL, sizeof(zbx_regrepl_t));
+		match = zbx_malloc(NULL, sizeof(zbx_match_t));
 		/* -1 is special pcre value for unused patterns */
-		for (i = 0; i < ARRSIZE(prepl->match); i++)
-			prepl->match[i].rm_so = prepl->match[i].rm_eo = -1;
+		for (i = 0; i < ARRSIZE(match->groups); i++)
+			match->groups[i].rm_so = match->groups[i].rm_eo = -1;
 
-		if (ZBX_REGEXP_MATCH != regexp_exec(ptr, regexp, 0, ZBX_REGEXP_GROUPS_MAX, prepl->match, NULL))
+		if (ZBX_REGEXP_MATCH != regexp_exec(ptr, regexp, 0, ZBX_REGEXP_GROUPS_MAX, match->groups, NULL))
 		{
-			zbx_free(prepl);
+			zbx_free(match);
 			break;
 		}
 
-		ptr = ptr + (size_t)prepl->match[0].rm_eo;
-		newshift = prepl->match[0].rm_eo;
-		for (i = 0; i < ARRSIZE(prepl->match); i++)
+		ptr = ptr + (size_t)match->groups[0].rm_eo;
+		newshift = match->groups[0].rm_eo;
+		for (i = 0; i < ARRSIZE(match->groups); i++)
 		{
-			if (prepl->match[i].rm_eo != -1)
+			if (match->groups[i].rm_eo != -1)
 			{
-				prepl->match[i].rm_eo += shift;
-				prepl->match[i].rm_so += shift;
+				match->groups[i].rm_eo += shift;
+				match->groups[i].rm_so += shift;
 			}
 		}
 		shift += newshift;
-		zbx_vector_regrepl_append(&matches, prepl);
+		zbx_vector_match_append(&matches, match);
 
 		if ('\0' == *ptr)
 			break;
 
-		if (prepl->match[0].rm_eo == prepl->match[0].rm_so)
+		if (match->groups[0].rm_eo == match->groups[0].rm_so)
 		{
 			ptr++;
 			shift += 1;
@@ -1097,7 +1097,7 @@ int	zbx_regexp_repl(const char *string, const char *pattern, const char *repl_te
 	/* create pattern based string for each match and relplace matched string with this string */
 	for (mi = matches.values_num - 1; 0 <= mi; mi--)
 	{
-		zbx_regmatch_t	*match = matches.values[mi]->match;
+		zbx_regmatch_t	*groups = matches.values[mi]->groups;
 		char		*repl;
 
 		if (NULL == repl_template || '\0' == *repl_template)
@@ -1106,7 +1106,7 @@ int	zbx_regexp_repl(const char *string, const char *pattern, const char *repl_te
 		}
 		else
 		{
-			repl = regexp_sub_replace(string, repl_template, match, ZBX_REGEXP_GROUPS_MAX, 0);
+			repl = regexp_sub_replace(string, repl_template, groups, ZBX_REGEXP_GROUPS_MAX, 0);
 		}
 
 		if (NULL != repl)
@@ -1116,13 +1116,13 @@ int	zbx_regexp_repl(const char *string, const char *pattern, const char *repl_te
 			ptr = str;
 			for (i = 0; ; i++)
 			{
-				if (i == (size_t)match[0].rm_so)
+				if (i == (size_t)groups[0].rm_so)
 				{
 					char	*pinsertion = repl;
 
 					while ('\0' != *pinsertion)
 						*ptr++ = *pinsertion++;
-					i = i + (size_t)(match[0].rm_eo - match[0].rm_so);
+					i = i + (size_t)(groups[0].rm_eo - groups[0].rm_so);
 				}
 				if ('\0' == out_str[i])
 					break;
@@ -1137,8 +1137,8 @@ int	zbx_regexp_repl(const char *string, const char *pattern, const char *repl_te
 
 	}
 
-	zbx_vector_regrepl_clear_ext(&matches, (zbx_regrepl_free_func_t)zbx_ptr_free);
-	zbx_vector_regrepl_destroy(&matches);
+	zbx_vector_match_clear_ext(&matches, (zbx_match_free_func_t)zbx_ptr_free);
+	zbx_vector_match_destroy(&matches);
 	*out = out_str;
 
 	return SUCCEED;
