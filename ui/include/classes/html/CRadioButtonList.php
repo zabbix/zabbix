@@ -120,14 +120,6 @@ class CRadioButtonList extends CList {
 			$this->addClass($this->orientation === self::ORIENTATION_HORIZONTAL ? ZBX_STYLE_HOR_LIST : null);
 		}
 
-		if ($this->readonly) {
-			$this->addItem(
-				(new CVar($this->name, $this->value))
-					->setEnabled($this->enabled)
-					->removeId()
-			);
-		}
-
 		foreach ($this->values as $key => $value) {
 			if ($value['id'] === null) {
 				$value['id'] = zbx_formatDomId($this->name).'_'.$key;
@@ -135,8 +127,7 @@ class CRadioButtonList extends CList {
 
 			$radio = (new CInput('radio', $this->name, $value['value']))
 				->setAttribute('tabindex', '0')
-				// Read-only for radioboxes is simulated by disabling control and adding CVar with value.
-				->setEnabled($this->enabled && !$this->readonly && !$value['disabled'])
+				->setEnabled($this->enabled && !$value['disabled'])
 				->onChange($value['on_change'])
 				->setId($value['id']);
 
@@ -150,6 +141,10 @@ class CRadioButtonList extends CList {
 
 			if (!$this->autocomplete) {
 				$radio->setAttribute('autocomplete', 'off');
+			}
+
+			if ($this->readonly) {
+				$radio->setAttribute('readonly', 'readonly');
 			}
 
 			if ($this->modern) {

@@ -106,7 +106,7 @@
 
 		if (clone_btn !== null) {
 			clone_btn.addEventListener('click', () => {
-				if ($('#userid').data('multiSelect').options.disabled) {
+				if ($('#userid').data('multiSelect').options.readonly) {
 					$('#userid')
 						.multiSelect('clean')
 						.multiSelect('addData', [{

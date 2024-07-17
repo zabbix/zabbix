@@ -104,6 +104,12 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 				['type' => 'JMX agent', 'host' => 'Simple form test host']
 			],
 			[
+				['type' => 'Script', 'host' => 'Simple form test host']
+			],
+			[
+				['type' => 'Browser', 'host' => 'Simple form test host']
+			],
+			[
 				['type' => 'Zabbix agent', 'template' => 'Inheritance test template']
 			],
 			[
@@ -156,6 +162,12 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 			],
 			[
 				['type' => 'JMX agent', 'template' => 'Inheritance test template']
+			],
+			[
+				['type' => 'Script', 'template' => 'Inheritance test template']
+			],
+			[
+				['type' => 'Browser', 'template' => 'Inheritance test template']
 			]
 		];
 	}
@@ -403,6 +415,51 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 			$this->zbxTestAssertNotVisibleId('snmp_oid');
 		}
 
+		if (in_array($type, ['Script', 'Browser'])) {
+			// Check parameters table layout.
+			$parameters_table = $form_discovery->getField('Parameters')->asTable();
+			$this->assertSame(['Name', 'Value', 'Action'], $parameters_table->getHeadersText());
+
+			$this->assertEquals(['Remove', 'Add'], $parameters_table->query('tag:button')->all()
+					->filter(CElementFilter::CLICKABLE)->asText()
+			);
+
+			foreach(['parameters[0][name]' => 255, 'parameters[0][value]' => 2048] as $input_name => $maxlength) {
+				$input = $parameters_table->query('name', $input_name)->one();
+				$this->assertEquals($maxlength, $input->getAttribute('maxlength'));
+				$this->assertEquals('', $input->getValue());
+			}
+
+			// Check Script field.
+			$script_values = [
+				'Script' => '',
+				'Browser' => "var browser = new Browser(Browser.chromeOptions());\n\n".
+						"try {\n".
+						" browser.navigate(\"https://example.com\");\n".
+						" browser.collectPerfEntries();\n".
+						"}\n".
+						"finally {\n".
+						" return JSON.stringify(browser.getResult());\n".
+						"}"
+			];
+
+			$this->assertTrue($form_discovery->isRequired('Script'));
+			$script_field = $form_discovery->getField('Script');
+			$this->assertEquals('script', $script_field->query('xpath:.//input[@type="text"]')->one()
+					->getAttribute('placeholder')
+			);
+
+			$script_dialog = $script_field->edit();
+			$this->assertEquals('JavaScript', $script_dialog->getTitle());
+			$script_input = $script_dialog->query('xpath:.//textarea')->one();
+
+			foreach (['placeholder' => 'return value', 'maxlength' => 65535] as $attribute => $value) {
+				$this->assertEquals($value, $script_input->getAttribute($attribute));
+			}
+			$this->assertEquals($script_values[$type], $script_input->getText());
+			$script_dialog->close();
+		}
+
 		switch ($type) {
 			case 'Zabbix agent':
 			case 'Zabbix agent (active)':
@@ -414,6 +471,8 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 			case 'SSH agent':
 			case 'TELNET agent':
 			case 'JMX agent':
+			case 'Script':
+			case 'Browser':
 				$this->zbxTestTextPresent('Update interval');
 				$this->zbxTestAssertVisibleId('delay');
 				$this->zbxTestAssertAttribute("//input[@id='delay']", 'maxlength', 255);
@@ -1402,6 +1461,85 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 			// #64
 			[
 				[
+					'expected' => TEST_GOOD,
+					'type' => 'Script',
+					'name' => 'Script item',
+					'key' => 'script.lld',
+					'script' => 'zabbix',
+					'dbCheck' => true,
+					'formCheck' => true
+				]
+			],
+			// #65
+			[
+				[
+					'expected' => TEST_GOOD,
+					'type' => 'Browser',
+					'name' => 'Browser LLD',
+					'key' => 'browser.lld',
+					'dbCheck' => true,
+					'formCheck' => true
+				]
+			],
+			// #66
+			[
+				[
+					'expected' => TEST_BAD,
+					'type' => 'Script',
+					'name' => 'Empty script',
+					'key' => 'empty.script.lld',
+					'error_msg' => 'Page received incorrect data',
+					'errors' => [
+						'Incorrect value for field "Script": cannot be empty.'
+					]
+				]
+			],
+			// #67
+			[
+				[
+					'expected' => TEST_BAD,
+					'type' => 'Browser',
+					'name' => 'Browser item - empty script',
+					'key' => 'empty.script.browser.item',
+					'script' => '',
+					'error_msg' => 'Page received incorrect data',
+					'errors' => [
+						'Incorrect value for field "Script": cannot be empty.'
+					]
+				]
+			],
+			// #68
+			[
+				[
+					'expected' => TEST_BAD,
+					'type' => 'Script',
+					'name' => 'Empty parameter name - script item',
+					'key' => 'empty.parameter.script.lld',
+					'script' => 'script',
+					'params_value' => 'value',
+					'error_msg' => 'Cannot add discovery rule',
+					'errors' => [
+						'Invalid parameter "/1/parameters/1/name": cannot be empty.'
+					]
+				]
+			],
+			// #69
+			[
+				[
+					'expected' => TEST_BAD,
+					'type' => 'Browser',
+					'name' => 'Empty parameter name - browser item',
+					'key' => 'empty.param.name.browser.lld',
+					'params_value' => 'value',
+					'error_msg' => 'Cannot add discovery rule',
+					'errors' => [
+						'Invalid parameter "/1/parameters/1/name": cannot be empty.'
+					]
+				]
+			],
+			// #70
+			[
+				[
 					'expected' => TEST_BAD,
 					'type' => 'IPMI agent',
 					'name' => 'IPMI agent error',
@@ -1412,7 +1550,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					]
 				]
 			],
-			// #65
+			// #71
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1426,7 +1564,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					]
 				]
 			],
-			// #66
+			// #72
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1440,7 +1578,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					]
 				]
 			],
-			// #67
+			// #73
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1452,7 +1590,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'remove' => true
 				]
 			],
-			// #68 Default
+			// #74 Default
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1466,7 +1604,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					]
 				]
 			],
-			// #69 Default
+			// #75 Default
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1480,7 +1618,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					]
 				]
 			],
-			// #70 Default
+			// #76 Default
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1507,6 +1645,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
 		$this->zbxTestCheckHeader('Discovery rules');
+		$lld_form = $this->query('id:host-discovery-form')->asForm()->one();
 
 		if (isset($data['type'])) {
 			$this->zbxTestDropdownSelect('type', $data['type']);
@@ -1549,6 +1688,14 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 		if (isset($data['ipmi_sensor'])) {
 			$this->zbxTestInputType('ipmi_sensor', $data['ipmi_sensor']);
 			$ipmi_sensor = $this->zbxTestGetValue("//input[@id='ipmi_sensor']");
+		}
+
+		if (isset($data['script'])) {
+			$lld_form->getField('Script')->fill($data['script']);
+		}
+
+		if (isset($data['params_value'])) {
+			$lld_form->getField('name:parameters[0][value]')->fill($data['params_value']);
 		}
 
 		if (isset($data['params_es'])) {
@@ -1684,14 +1831,12 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 			}
 
 			// "Execute now" button availability
-			if (in_array($type, ['Zabbix agent', 'Simple check', 'SNMP agent', 'Zabbix internal', 'External check',
-					'Database monitor', 'IPMI agent', 'SSH agent', 'TELNET agent',
-					'JMX agent', 'Dependent item'])) {
-				$this->zbxTestClickButtonText('Execute now');
-				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Request sent successfully');
+			if (in_array($type, ['Zabbix agent (active)', 'SNMP trap', 'Zabbix trapper'])) {
+				$this->zbxTestAssertElementPresentXpath("//button[text()='Execute now'][@disabled]");
 			}
 			else {
-				$this->zbxTestAssertElementPresentXpath("//button[text()='Execute now'][@disabled]");
+				$this->zbxTestClickButtonText('Execute now');
+				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Request sent successfully');
 			}
 
 			if (isset($data['ipmi_sensor'])) {

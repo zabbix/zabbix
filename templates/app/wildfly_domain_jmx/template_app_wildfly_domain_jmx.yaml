@@ -52,7 +52,6 @@ zabbix_export:
           name: 'Launch type'
           type: JMX
           key: 'jmx["jboss.as:management-root=server","launchType"]'
-          trends: '0'
           value_type: CHAR
           username: '{$WILDFLY.USER}'
           password: '{$WILDFLY.PASSWORD}'
@@ -69,7 +68,6 @@ zabbix_export:
           name: Name
           type: JMX
           key: 'jmx["jboss.as:management-root=server","name"]'
-          trends: '0'
           value_type: CHAR
           username: '{$WILDFLY.USER}'
           password: '{$WILDFLY.PASSWORD}'
@@ -88,7 +86,6 @@ zabbix_export:
           name: 'Process type'
           type: JMX
           key: 'jmx["jboss.as:management-root=server","processType"]'
-          trends: '0'
           value_type: CHAR
           username: '{$WILDFLY.USER}'
           password: '{$WILDFLY.PASSWORD}'
@@ -105,7 +102,6 @@ zabbix_export:
           name: Version
           type: JMX
           key: 'jmx["jboss.as:management-root=server","productVersion"]'
-          trends: '0'
           value_type: CHAR
           username: '{$WILDFLY.USER}'
           password: '{$WILDFLY.PASSWORD}'
@@ -142,11 +138,9 @@ zabbix_export:
             conditions:
               - macro: '{#DEPLOYMENT}'
                 value: '{$WILDFLY.DEPLOYMENT.MATCHES}'
-                formulaid: A
               - macro: '{#DEPLOYMENT}'
                 value: '{$WILDFLY.DEPLOYMENT.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
           description: 'Discovery deployments metrics.'
           item_prototypes:
             - uuid: e6b1bebba5da4ce493ba7edf869c37b3
@@ -160,8 +154,6 @@ zabbix_export:
                 name: 'WildFly flag'
               preprocessing:
                 - type: BOOL_TO_DECIMAL
-                  parameters:
-                    - ''
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 3h
@@ -184,8 +176,6 @@ zabbix_export:
                 name: 'WildFly flag'
               preprocessing:
                 - type: BOOL_TO_DECIMAL
-                  parameters:
-                    - ''
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 3h
@@ -217,11 +207,9 @@ zabbix_export:
             conditions:
               - macro: '{#SERVER}'
                 value: '{$WILDFLY.SERVER.MATCHES}'
-                formulaid: A
               - macro: '{#SERVER}'
                 value: '{$WILDFLY.SERVER.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
           description: 'Discovery instances in domain.'
           item_prototypes:
             - uuid: d0938bbf20854315bd5cf17491b0ae1c
@@ -235,8 +223,6 @@ zabbix_export:
                 name: 'WildFly flag'
               preprocessing:
                 - type: BOOL_TO_DECIMAL
-                  parameters:
-                    - ''
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 3h
@@ -250,7 +236,6 @@ zabbix_export:
               name: 'WildFly domain: Server {#SERVER}: Server group'
               type: JMX
               key: 'jmx["{#JMXOBJ}",group]'
-              trends: '0'
               value_type: CHAR
               username: '{$WILDFLY.USER}'
               password: '{$WILDFLY.PASSWORD}'
@@ -280,7 +265,6 @@ zabbix_export:
               name: 'WildFly domain: Server {#SERVER}: Status'
               type: JMX
               key: 'jmx["{#JMXOBJ}",status]'
-              trends: '0'
               value_type: CHAR
               username: '{$WILDFLY.USER}'
               password: '{$WILDFLY.PASSWORD}'

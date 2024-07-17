@@ -21,9 +21,14 @@ require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 /**
  * @backup history_uint, profiles
  *
- * @onBefore prepareItemTagsData
+ * @dataSource GlobalMacros
+ *
+ * @onBefore prepareTestData
  */
 class testPageMonitoringLatestData extends CWebTest {
+
+	const FILTER_HOSTNAME = 'Host for items tags filtering';
+	const MAINTENANCE_HOSTNAME = 'Host in maintenance';
 
 	/**
 	 * Attach TableBehavior to the test.
@@ -42,73 +47,79 @@ class testPageMonitoringLatestData extends CWebTest {
 		return $this->query($this->getTableSelector())->asTable()->one();
 	}
 
-	const HOSTNAME = 'Host for items tags filtering';
-
-	// Host with items for filtering Latest data by item tags.
-	protected static $data = [
-		'hostgroupid' => null,
-		'hostid' => null,
-		'itemids' => [
-			'tag_item_1',
-			'tag_item_2',
-			'tag_item_3',
-			'tag_item_4'
-		]
-	];
-
-	public function prepareItemTagsData() {
+	public function prepareTestData() {
 		// Create hostgroup for host with items and tags.
 		$hostgroups = CDataHelper::call('hostgroup.create', [['name' => 'Group for Items With tags']]);
-		$this->assertArrayHasKey('groupids', $hostgroups);
-		self::$data['hostgroupid'] = $hostgroups['groupids'][0];
+		$hostgroup = $hostgroups['groupids'][0];
 
-		// Create host for items.
-		$hosts = CDataHelper::call('host.create', [
-			'host' => self::HOSTNAME,
-			'groups' => [['groupid' => self::$data['hostgroupid']]]
-		]);
-		$this->assertArrayHasKey('hostids', $hosts);
-
-		$hostids = CDataHelper::getIds('host');
-		self::$data['hostid'] = $hostids['Host for items tags filtering'];
-
-		// Create items on previously created host.
+		// Prepare items data.
+		$item_names = ['tag_item_1', 'tag_item_2', 'tag_item_3', 'tag_item_4'];
 		$items_tags_data = [];
-		foreach (self::$data['itemids'] as $i => $item) {
+		foreach ($item_names as $i => $item) {
 			$items_tags_data[] = [
-				'hostid' => self::$data['hostid'],
 				'name' => $item,
 				'key_' => 'trapper'.$i,
 				'type' => 2,
 				'value_type' => 0,
 				'tags' => [
-					[
-						'tag' => 'tag',
-						'value' => 'filtering_value'
-					],
-					[
-						'tag' => 'tag_number',
-						'value' => strval($i)
-					],
-					[
-						'tag' => 'component',
-						'value' => 'name:'.$item
-					]
+					['tag' => 'tag', 'value' => 'filtering_value'],
+					['tag' => 'tag_number', 'value' => strval($i)],
+					['tag' => 'component', 'value' => 'name:'.$item]
 				]
 			];
 		}
 
-		$items = CDataHelper::call('item.create', $items_tags_data);
+		// Create hosts with items and tags.
+		$result = CDataHelper::createHosts([
+			[
+				'host' => self::FILTER_HOSTNAME,
+				'groups' => ['groupid' => $hostgroup],
+				'items' => $items_tags_data
+			],
+			[
+				'host' => self::MAINTENANCE_HOSTNAME,
+				'groups' => ['groupid' => 4], // Zabbix servers.
+				'items' => [
+					[
+						'name' => 'Trapper',
+						'key_' => 'trap',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_UINT64
+					]
+				]
+			]
+		]);
 
-		self::$data['itemids']['tag_item_1'] = $items['itemids'][0];
-		self::$data['itemids']['tag_item_2'] = $items['itemids'][1];
-		self::$data['itemids']['tag_item_3'] = $items['itemids'][2];
-		self::$data['itemids']['tag_item_4'] = $items['itemids'][3];
+		$maintenace_hostid = $result['hostids'][self::MAINTENANCE_HOSTNAME];
+
+		$data_item_id = $result['itemids'][self::FILTER_HOSTNAME.':trapper0'];
 
 		// Add data to one item to see "With data"/"Without data" subfilter.
 		$time = time() - 100;
-		DBexecute("INSERT INTO history (itemid, clock, value, ns) VALUES (".zbx_dbstr(self::$data['itemids']['tag_item_1']).
-				", ".zbx_dbstr($time).", 1, 0)");
+		DBexecute('INSERT INTO history (itemid, clock, value, ns) VALUES ('.zbx_dbstr($data_item_id).', '.zbx_dbstr($time).', 1, 0)');
+
+		// Create maintenance for wrench icon checking in Latest data page.
+		$maintenances = CDataHelper::call('maintenance.create', [
+			[
+				'name' => 'Maintenance for latest data',
+				'maintenance_type' => MAINTENANCE_TYPE_NORMAL,
+				'description' => 'Maintenance for icon check in Latest data',
+				'active_since' => $time,
+				'active_till' => time() + 31536000,
+				'groups' => [['groupid' => 4]], // Zabbix servers.
+				'timeperiods' => [[]]
+			]
+		]);
+		$maintenanceid = $maintenances['maintenanceids'][0];
+
+		DBexecute('INSERT INTO maintenances_hosts (maintenance_hostid, maintenanceid, hostid) VALUES (1000000, '.
+				zbx_dbstr($maintenanceid).','.zbx_dbstr($maintenace_hostid).')'
+		);
+
+		DBexecute('UPDATE hosts SET maintenanceid='.zbx_dbstr($maintenanceid).
+				', maintenance_status=1, maintenance_type='.MAINTENANCE_TYPE_NORMAL.', maintenance_from='.zbx_dbstr(time()-1000).
+				' WHERE hostid='.zbx_dbstr($maintenace_hostid)
+		);
 	}
 
 	public function testPageMonitoringLatestData_CheckLayout() {
@@ -127,7 +138,7 @@ class testPageMonitoringLatestData extends CWebTest {
 				explode("\n", $this->query('class:no-data-message')->one()->getText())
 		);
 
-		$form->fill(['Hosts' => self::HOSTNAME]);
+		$form->fill(['Hosts' => self::FILTER_HOSTNAME]);
 		$form->submit();
 
 		$subfilter = $this->query('id:latest-data-subfilter')->waitUntilVisible()->asTable()->one();
@@ -558,7 +569,7 @@ class testPageMonitoringLatestData extends CWebTest {
 	 * @dataProvider getSubfilterData
 	 */
 	public function testPageMonitoringLatestData_Subfilter($data) {
-		$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE name='.zbx_dbstr(self::HOSTNAME));
+		$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE name='.zbx_dbstr(self::FILTER_HOSTNAME));
 
 		$link = (CTestArrayHelper::get($data['subfilter'], 'Data'))
 			? 'zabbix.php?action=latest.view&hostids%5B%5D='.$hostid
@@ -568,8 +579,8 @@ class testPageMonitoringLatestData extends CWebTest {
 
 		foreach ($data['subfilter'] as $header => $values) {
 			foreach ($values as $value) {
-				$this->query("xpath://h3[text()=".CXPathHelper::escapeQuotes($header)."]/..//a[text()=".
-						CXPathHelper::escapeQuotes($value)."]")->waitUntilClickable()->one()->click();
+				$this->query('xpath://h3[text()='.CXPathHelper::escapeQuotes($header).']/..//a[text()='.
+						CXPathHelper::escapeQuotes($value).']')->waitUntilClickable()->one()->click();
 				$this->page->waitUntilReady();
 			}
 		}
@@ -582,35 +593,60 @@ class testPageMonitoringLatestData extends CWebTest {
 		$this->query('button:Reset')->waitUntilClickable()->one()->click();
 	}
 
-	/**
-	 * Test for clicking on particular item tag in table and checking that items are filtered by this tag.
-	 */
 	public function testPageMonitoringLatestData_ClickTag() {
-		$tag = ['tag' => 'component: ', 'value' => 'storage'];
+		$this->checkClickTag();
+	}
 
+	public function testPageMonitoringLatestData_ClickTagKiosk() {
+		$this->checkClickTag(true);
+	}
+
+	/**
+	 * Test for clicking on particular item tag in table and checking that items are filtered by this tag using normal and kiosk mode.
+	 *
+	 * @param boolean $kiosk_mode	is kiosk mode applied on the page or not
+	 */
+	protected function checkClickTag($kiosk_mode = false) {
+		$tag = ['tag' => 'component: ', 'value' => 'storage'];
 		$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE name='.zbx_dbstr('ЗАББИКС Сервер'));
 		$this->page->login()->open('zabbix.php?action=latest.view&hostids%5B%5D='.$hostid)->waitUntilReady();
+
+		if ($kiosk_mode) {
+			$this->query('xpath://button[@title="Kiosk mode"]')->one()->click();
+			$this->page->waitUntilReady();
+			$this->assertTrue($this->query('xpath://button[@title="Normal view"]')->exists());
+		}
 
 		$this->getTable()->query('button', $tag['tag'].$tag['value'])->waitUntilClickable()->one()->click();
 		$this->page->waitUntilReady();
 
-		// Check that page remained the same.
-		$this->page->assertTitle('Latest data');
-		$this->page->assertHeader('Latest data');
-
 		// Check that tag value is selected in subfilter under correct header.
-		$this->assertTrue($this->query("xpath://td/h3[text()='Tag values']/..//label[text()=".
-				CXPathHelper::escapeQuotes($tag['tag'])."]/../..//span[@class=".
-				CXPathHelper::fromClass('subfilter-enabled')."]/a[text()=".
-				CXPathHelper::escapeQuotes($tag['value'])."]")->exists()
+		$this->assertTrue($this->query('xpath://td/h3[text()="Tag values"]/..//label[text()='.
+				CXPathHelper::escapeQuotes($tag['tag']).']/../..//span[@class='.
+				CXPathHelper::fromClass('subfilter-enabled').']/a[text()='.
+				CXPathHelper::escapeQuotes($tag['value']).']')->exists()
 		);
 
-		$this->assertTableData([
-				['Name' => 'Free swap space'],
-				['Name' => 'Free swap space in %'],
-				['Name' => 'Total swap space']
-			], $this->getTableSelector()
-		);
+		$data = [
+			['Name' => 'Free swap space'],
+			['Name' => 'Free swap space in %'],
+			['Name' => 'Total swap space']
+		];
+		$this->assertTableData($data, $this->getTableSelector());
+
+		if ($kiosk_mode) {
+			$this->query('xpath://button[@title="Normal view"]')->one()->click();
+			$this->page->waitUntilReady();
+			$this->assertTrue($this->query('xpath://button[@title="Kiosk mode"]')->exists());
+			$this->assertTableData($data, $this->getTableSelector());
+		}
+		else {
+			$this->query('button:Reset')->one()->click();
+			$this->page->waitUntilReady();
+			$this->assertEquals(['Filter is not set', 'Use the filter to display results'],
+					explode("\n", $this->query('class:no-data-message')->one()->getText())
+			);
+		}
 	}
 
 	/**
@@ -804,13 +840,13 @@ class testPageMonitoringLatestData extends CWebTest {
 	public function testPageMonitoringLatestData_checkMaintenanceIcon() {
 		$this->page->login()->open('zabbix.php?action=latest.view')->waitUntilReady();
 		$form = $this->query('name:zbx_filter')->asForm()->one();
-		$form->fill(['Hosts' => 'Available host in maintenance']);
+		$form->fill(['Hosts' => self::MAINTENANCE_HOSTNAME]);
 		$form->submit();
 
 		$this->query('xpath://button['.CXPathHelper::fromClass('zi-wrench-alt-small').']')->waitUntilClickable()->one()->click();
 		$hint = $this->query('xpath://div[@data-hintboxid]')->asOverlayDialog()->waitUntilPresent()->all()->last()->getText();
-		$hint_text = "Maintenance for Host availability widget [Maintenance with data collection]\n".
-				"Maintenance for checking Show hosts in maintenance option in Host availability widget";
+		$hint_text = "Maintenance for latest data [Maintenance with data collection]\n".
+				"Maintenance for icon check in Latest data";
 		$this->assertEquals($hint_text, $hint);
 	}
 
@@ -821,7 +857,7 @@ class testPageMonitoringLatestData extends CWebTest {
 		$itemid = CDBHelper::getValue('SELECT itemid FROM items WHERE name='.zbx_dbstr('4_item'));
 		$time = time();
 		$value = '15';
-		$true_time = date("Y-m-d H:i:s", $time);
+		$true_time = date('Y-m-d H:i:s', $time);
 
 		DBexecute('INSERT INTO history_uint (itemid, clock, value, ns) VALUES ('.zbx_dbstr($itemid).
 				', '.zbx_dbstr($time).', '.zbx_dbstr($value).', 0)'
