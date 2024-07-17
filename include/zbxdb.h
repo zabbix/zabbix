@@ -405,6 +405,7 @@ int	zbx_db_end(int ret);
 int	zbx_db_execute(const char *fmt, ...);
 int	zbx_db_execute_once(const char *fmt, ...);
 zbx_db_result_t	zbx_db_select(const char *fmt, ...);
+zbx_db_result_t	zbx_db_vselect(const char *fmt, va_list args);
 zbx_db_result_t	zbx_db_select_n(const char *query, int n);
 zbx_uint64_t	zbx_db_get_maxid_num(const char *tablename, int num);
 void	zbx_db_insert_prepare_dyn(zbx_db_insert_t *db_insert, const zbx_db_table_t *table, const zbx_db_field_t **fields,

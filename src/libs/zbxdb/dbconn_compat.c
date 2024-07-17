@@ -220,6 +220,24 @@ zbx_db_result_t	zbx_db_select(const char *fmt, ...)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: execute a select statement                                        *
+ *                                                                            *
+ * Comments: retry until DB is up                                             *
+ *                                                                            *
+ ******************************************************************************/
+zbx_db_result_t	zbx_db_vselect(const char *fmt, va_list args)
+{
+	if (NULL == dbconn)
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		return NULL;
+	}
+
+	return zbx_dbconn_vselect(dbconn, fmt, args);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: execute a select statement and get the first N entries            *
  *                                                                            *
  * Comments: retry until DB is up                                             *
