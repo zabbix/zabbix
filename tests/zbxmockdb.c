@@ -19,14 +19,12 @@
 /* make sure that __wrap_*() prototypes match unwrapped counterparts */
 
 #define zbx_db_vselect			__wrap_zbx_db_vselect
-#define zbx_db_free_result		__wrap_zbx_db_free_result
 #define zbx_db_execute			__wrap_zbx_db_execute
 #define zbx_db_execute_multiple_query	__wrap_zbx_db_execute_multiple_query
 #define zbx_db_begin			__wrap_zbx_db_begin
-#define zbx_db_commit			__wrap_xbc_db_commit
+#define zbx_db_commit			__wrap_zbx_db_commit
 #include "zbxdb.h"
 #undef zbx_db_vselect
-#undef zbx_db_free_result
 #undef zbx_db_execute
 #undef zbx_db_execute_multiple_query
 #undef zbx_db_begin
