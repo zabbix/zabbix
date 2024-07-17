@@ -95,11 +95,13 @@ DB_DEPS = \
 	$(top_srcdir)/src/libs/zbxdb/libzbxdb.a \
 	$(top_srcdir)/src/libs/zbxshmem/libzbxshmem.a \
 	$(top_srcdir)/src/libs/zbxdbschema/libzbxdbschema.a \
-	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
+	$(CFG_DEPS) \
 	$(JSON_DEPS) \
+	$(MUTEX_DEPS) \
+	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
 	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
 	$(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
-	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
+	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a 
 
 # WARNING - cyclyc dependency with DBHIGH
 TAGFILTER_DEPS = \

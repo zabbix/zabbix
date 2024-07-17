@@ -1033,7 +1033,7 @@ static int	dbconn_rollback(zbx_dbconn_t *db)
  * Return value: data, NULL (on error) or (zbx_db_result_t)ZBX_DB_DOWN        *
  *                                                                            *
  ******************************************************************************/
-static zbx_db_result_t	dbconn_vselect(zbx_dbconn_t *db, const char *fmt, va_list args)
+zbx_db_result_t	dbconn_vselect(zbx_dbconn_t *db, const char *fmt, va_list args)
 {
 	char		*sql = NULL;
 	zbx_db_result_t	result = NULL;
@@ -1504,7 +1504,7 @@ int	zbx_dbconn_execute(zbx_dbconn_t *db, const char *fmt, ...)
  * Comments: retry until DB is up                                             *
  *                                                                            *
  ******************************************************************************/
-zbx_db_result_t	zbx_dbconn_vselect(zbx_dbconn_t *db, const char *fmt, va_list args)
+zbx_db_result_t	__zbx_attr_weak zbx_dbconn_vselect(zbx_dbconn_t *db, const char *fmt, va_list args)
 {
 	zbx_db_result_t	rc;
 
@@ -1586,7 +1586,7 @@ zbx_db_result_t	zbx_dbconn_select_n(zbx_dbconn_t *db, const char *query, int n)
  * Purpose: fetch database row from result returned from select               *
  *                                                                            *
  ******************************************************************************/
-zbx_db_row_t	zbx_db_fetch(zbx_db_result_t result)
+zbx_db_row_t	__zbx_attr_weak zbx_db_fetch(zbx_db_result_t result)
 {
 	if (NULL == result)
 		return NULL;
@@ -1643,7 +1643,7 @@ zbx_db_row_t	zbx_db_fetch(zbx_db_result_t result)
  * Purpose: free result returned from database select                         *
  *                                                                            *
  ******************************************************************************/
-void	zbx_db_free_result(zbx_db_result_t result)
+void	__zbx_attr_weak zbx_db_free_result(zbx_db_result_t result)
 {
 #if defined(HAVE_MYSQL)
 	if (NULL == result)

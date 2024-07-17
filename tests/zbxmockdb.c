@@ -19,11 +19,9 @@
 /* make sure that __wrap_*() prototypes match unwrapped counterparts */
 
 #define zbx_db_vselect		__wrap_zbx_db_vselect
-#define zbx_db_fetch		__wrap_zbx_db_fetch
 #define zbx_db_free_result	__wrap_zbx_db_free
 #include "zbxdb.h"
 #undef zbx_db_vselect
-#undef zbx_db_fetch
 #undef zbx_db_free_result
 
 #define zbx_db_execute			__wrap_zbx_db_execute
@@ -201,7 +199,7 @@ zbx_db_result_t	__wrap_zbx_db_select_n(const char *query, int n)
 	return __wrap_zbx_db_select("%s limit %d", query, n);
 }
 
-zbx_db_row_t	__wrap_zbx_db_fetch(zbx_db_result_t result)
+zbx_db_row_t	zbx_db_fetch(zbx_db_result_t result)
 {
 	zbx_mock_error_t	error;
 	zbx_mock_handle_t	row, field;
@@ -259,7 +257,7 @@ zbx_db_row_t	__wrap_zbx_db_fetch(zbx_db_result_t result)
 }
 
 
-void	__wrap_zbx_db_free_result(zbx_db_result_t result)
+void	zbx_db_free_result(zbx_db_result_t result)
 {
 	if (NULL != result)
 	{
@@ -306,16 +304,9 @@ void	zbx_mockdb_destroy(void)
 	zbx_hashset_destroy(&mockdb.queries);
 }
 
-zbx_db_result_t	__wrap_zbx_dbconn_select(zbx_dbconn_t *db, const char *fmt, ...)
+zbx_db_result_t	zbx_dbconn_vselect(zbx_dbconn_t *db, const char *fmt, va_list args)
 {
-	va_list		args;
-	zbx_db_result_t	result;
-
 	ZBX_UNUSED(db);
 
-	va_start(args, fmt);
-	result = __wrap_zbx_db_vselect(fmt, args);
-	va_end(args);
-
-	return result;
+	return __wrap_zbx_db_vselect(fmt, args);
 }

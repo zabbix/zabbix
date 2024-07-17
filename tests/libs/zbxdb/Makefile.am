@@ -10,8 +10,8 @@ COMMON_SRC = \
 
 COMMON_FLAGS = -I@top_srcdir@/tests $(CMOCKA_CFLAGS) $(YAML_CFLAGS)
 
-DBHIGH_LIBS = \
-	$(DBHIGH_DEPS) \
+DB_LIBS = \
+	$(DB_DEPS) \
 	$(MOCK_DATA_DEPS) \
 	$(MOCK_TEST_DEPS)
 
@@ -21,7 +21,7 @@ zbx_dbconn_select_uint64_SOURCES = \
 	zbx_dbconn_select_uint64.c \
 	$(COMMON_SRC)
 
-zbx_dbconn_select_uint64_LDADD = $(DBHIGH_LIBS)
+zbx_dbconn_select_uint64_LDADD = $(DB_LIBS)
 
 
 zbx_dbconn_select_uint64_LDADD += @SERVER_LIBS@

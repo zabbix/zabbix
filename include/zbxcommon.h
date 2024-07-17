@@ -542,8 +542,17 @@ zbx_proxy_suppress_t;
 /* used by log which will be part of common*/
 #if defined(__GNUC__) || defined(__clang__)
 #	define __zbx_attr_format_printf(idx1, idx2) __attribute__((__format__(__printf__, (idx1), (idx2))))
+#	if defined(HAVE_TESTS)
+#		define	__zbx_attr_weak		__attribute__((weak))
+#		define	__zbx_static
+#	else
+#		define	__zbx_attr_weak
+#		define	__zbx_static	static
+#	endif
 #else
 #	define __zbx_attr_format_printf(idx1, idx2)
+#	define	__zbx_attr_weak
+#	define	__zbx_static	static
 #endif
 
 /* used by cuid and also by log */
