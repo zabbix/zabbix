@@ -1,6 +1,7 @@
 Changes for 7.2.0alpha1
 
 New features:
+..F.I..... [ZBXNEXT-8993] improved Availability report page filter and refactored legacy code (dpetra)
 A.F.I..PS. [ZBXNEXT-9176] removed support of Oracle DB (agriscenko, sboidenko)
 ........S. [ZBXNEXT-9285] added {EVENT.UPDATE.STATUS} support for Service update notifications (MVekslers)
 ..F....... [ZBXNEXT-9215] added option to specify widgets as data sources for items in Graph and Pie chart widgets (ashubin, averza)
@@ -132,6 +133,8 @@ Changes for 7.0.1rc2
 New features:
 
 Bug fixes:
+........S. [ZBX-24852] fixed compression policy change bug (askolmeisters)
+...G....S. [ZBX-24719] fixed Zabbix agent 2 crashing when executing global script (arimdjonoks)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.1rc1
