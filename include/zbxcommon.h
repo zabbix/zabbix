@@ -409,14 +409,20 @@ do														\
 }														\
 while (0)
 
-#define THIS_SHOULD_NEVER_HAPPEN_MSG(fmt, ...)									\
+#ifdef HAVE___VA_ARGS__
+#	define THIS_SHOULD_NEVER_HAPPEN_MSG(...)								\
 														\
-do														\
-{														\
-	THIS_SHOULD_NEVER_HAPPEN;										\
-	zbx_error(fmt, ##__VA_ARGS__);										\
-}														\
-while(0)
+	do													\
+	{													\
+		THIS_SHOULD_NEVER_HAPPEN;									\
+		zbx_error(__VA_ARGS__);									\
+	}													\
+	while(0)
+#else
+#	define THIS_SHOULD_NEVER_HAPPEN_MSG									\
+			THIS_SHOULD_NEVER_HAPPEN;								\
+			zbx_error
+#endif
 
 #define ARRSIZE(a)	(sizeof(a) / sizeof(*a))
 

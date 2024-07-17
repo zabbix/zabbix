@@ -98,6 +98,7 @@ DB_DEPS = \
 	$(CFG_DEPS) \
 	$(JSON_DEPS) \
 	$(MUTEX_DEPS) \
+	$(CRYPTO_DEPS) \
 	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
 	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
 	$(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
