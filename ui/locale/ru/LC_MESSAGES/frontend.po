@@ -1681,6 +1681,10 @@ msgstr "Должен быть указан хотя бы один день не�
 msgid "At least one host group or host must be selected."
 msgstr "Должна быть выбрана по крайней мере одна группа узлов сети или узел сети."
 
+#: include/classes/setup/CFrontendSetup.php:252
+msgid "At least one of MySQL or PostgreSQL should be supported."
+msgstr ""
+
 #: include/classes/setup/CFrontendSetup.php:241
 msgid "At least one of MySQL, PostgreSQL or Oracle should be supported."
 msgstr "Должна поддерживаться по крайней мере одна база данных из MySQL, PostgreSQL или Oracle."

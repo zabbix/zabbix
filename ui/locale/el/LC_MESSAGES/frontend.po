@@ -1660,6 +1660,10 @@ msgstr "Πρέπει να οριστεί τουλάχιστον μία ημέρ�
 msgid "At least one host group or host must be selected."
 msgstr "Πρέπει να επιλεγεί τουλάχιστον μία ομάδα διακομιστών ή διακομιστής."
 
+#: include/classes/setup/CFrontendSetup.php:252
+msgid "At least one of MySQL or PostgreSQL should be supported."
+msgstr ""
+
 #: include/classes/setup/CFrontendSetup.php:241
 msgid "At least one of MySQL, PostgreSQL or Oracle should be supported."
 msgstr "Θα πρέπει να υποστηρίζεται τουλάχιστον ένα από τα MySQL, PostgreSQL ή Oracle."

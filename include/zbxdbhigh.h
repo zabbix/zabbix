@@ -98,19 +98,10 @@
 #define ZBX_ITEM_SSL_KEY_FILE_LEN		255
 #define ZBX_ITEM_SSL_KEY_FILE_LEN_MAX		(ZBX_ITEM_SSL_KEY_FILE_LEN + 1)
 #define ZBX_ITEM_PREPROC_PARAMS_LEN		65535
-
-#if defined(HAVE_ORACLE)
-#	define ZBX_ITEM_PARAM_LEN		2048
-#	define ZBX_ITEM_DESCRIPTION_LEN		2048
-#	define ZBX_ITEM_POSTS_LEN		2048
-#	define ZBX_ITEM_HEADERS_LEN		2048
-#else
-#	define ZBX_ITEM_PARAM_LEN		65535
-#	define ZBX_ITEM_DESCRIPTION_LEN		65535
-#	define ZBX_ITEM_POSTS_LEN		65535
-#	define ZBX_ITEM_HEADERS_LEN		65535
-#endif
-
+#define ZBX_ITEM_PARAM_LEN			65535
+#define ZBX_ITEM_DESCRIPTION_LEN		65535
+#define ZBX_ITEM_POSTS_LEN			65535
+#define ZBX_ITEM_HEADERS_LEN			65535
 #define ZBX_ITEM_PARAMETER_NAME_LEN		255
 #define ZBX_ITEM_PARAMETER_VALUE_LEN		2048
 #define ZBX_ITEM_TAG_FIELD_LEN			255
@@ -133,38 +124,18 @@
 #define ZBX_GRAPH_ITEM_COLOR_LEN		6
 #define ZBX_GRAPH_ITEM_COLOR_LEN_MAX		(ZBX_GRAPH_ITEM_COLOR_LEN + 1)
 
-#define ZBX_DSERVICE_VALUE_LEN		255
+#define ZBX_DSERVICE_VALUE_LEN			255
 #define ZBX_MAX_DISCOVERED_VALUE_SIZE	(ZBX_DSERVICE_VALUE_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1)
 
 typedef zbx_uint64_t	(*zbx_dc_get_nextid_func_t)(const char *table_name, int num);
 
-#ifdef HAVE_ORACLE
-#	define ZBX_PLSQL_BEGIN	"begin\n"
-#	define ZBX_PLSQL_END	"end;"
-#	define	zbx_db_begin_multiple_update(sql, sql_alloc, sql_offset)			\
-			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ZBX_PLSQL_BEGIN)
-#	define	zbx_db_end_multiple_update(sql, sql_alloc, sql_offset)			\
-			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ZBX_PLSQL_END)
-#	define	ZBX_SQL_STRCMP		"%s%s%s"
-#	define	ZBX_SQL_STRVAL_EQ(str)				\
-			'\0' != *str ? "='"  : "",		\
-			'\0' != *str ? str   : " is null",	\
-			'\0' != *str ? "'"   : ""
-#	define	ZBX_SQL_STRVAL_NE(str)				\
-			'\0' != *str ? "<>'" : "",		\
-			'\0' != *str ? str   : " is not null",	\
-			'\0' != *str ? "'"   : ""
+#ifdef HAVE_MYSQL
+#	define	ZBX_SQL_STRCMP			"%s binary '%s'"
 #else
-#	define	zbx_db_begin_multiple_update(sql, sql_alloc, sql_offset)	do {} while (0)
-#	define	zbx_db_end_multiple_update(sql, sql_alloc, sql_offset)	do {} while (0)
-#	ifdef HAVE_MYSQL
-#		define	ZBX_SQL_STRCMP		"%s binary '%s'"
-#	else
-#		define	ZBX_SQL_STRCMP		"%s'%s'"
-#	endif
-#	define	ZBX_SQL_STRVAL_EQ(str)	"=", str
-#	define	ZBX_SQL_STRVAL_NE(str)	"<>", str
+#	define	ZBX_SQL_STRCMP			"%s'%s'"
 #endif
+#define	ZBX_SQL_STRVAL_EQ(str)			"=", str
+#define	ZBX_SQL_STRVAL_NE(str)			"<>", str
 
 #ifdef HAVE_MYSQL
 #	define ZBX_SQL_CONCAT()		"concat(%s,%s)"
@@ -192,6 +163,7 @@ typedef zbx_uint64_t	(*zbx_dc_get_nextid_func_t)(const char *table_name, int num
 #	define ZBX_SQL_SORT_ASC(field)	field " asc nulls first"
 #	define ZBX_SQL_SORT_DESC(field)	field " desc nulls last"
 #endif
+
 
 typedef struct
 {
@@ -494,11 +466,6 @@ int	zbx_db_validate_config_features(unsigned char program_type, const zbx_config
 void	zbx_db_validate_config(const zbx_config_dbhigh_t *config_dbhigh);
 #endif
 
-#ifdef HAVE_ORACLE
-void	zbx_db_statement_prepare(const char *sql);
-void	zbx_db_table_prepare(const char *tablename, struct zbx_json *json);
-int	zbx_db_check_oracle_colum_type(const char *table_name, const char *column_name, int expected_type);
-#endif
 int		zbx_db_execute(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
 int		zbx_db_execute_once(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
 zbx_db_result_t	zbx_db_select_once(const char *fmt, ...)__zbx_attr_format_printf(1, 2);
@@ -637,7 +604,7 @@ typedef struct
 /* events callbacks end */
 
 int	zbx_db_get_user_names(zbx_uint64_t userid, char **username, char **name, char **surname);
-
+int	zbx_db_flush_overflowed_sql(char *sql, size_t sql_offset);
 int	zbx_db_execute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_offset);
 char	*zbx_db_get_unique_hostname_by_sample(const char *host_name_sample, const char *field_name);
 

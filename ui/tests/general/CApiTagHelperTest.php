@@ -14,11 +14,17 @@
 **/
 
 
-use PHPUnit\Framework\TestCase;
+require_once __DIR__.'/../include/CTest.php';
+require_once __DIR__.'/../../include/classes/core/CRegistryFactory.php';
+require_once __DIR__.'/../../include/classes/api/API.php';
+require_once __DIR__.'/../../include/classes/api/CApiServiceFactory.php';
+require_once __DIR__.'/../../include/classes/api/helpers/CApiTagHelper.php';
+require_once __DIR__.'/../../include/classes/api/services/CItemGeneral.php';
+require_once __DIR__.'/../../include/classes/api/services/CItem.php';
 
-class CApiTagHelperTest extends TestCase {
+class CApiTagHelperTest extends CTest {
 
-	public static function provider() {
+	public static function provider(): array {
 		$sql_args = [2 => 'e', 'event_tag', 'eventid'];
 
 		return [
@@ -449,12 +455,7 @@ class CApiTagHelperTest extends TestCase {
 	/**
 	 * @dataProvider provider
 	 */
-	public function test(array $params, $expected) {
-		global $DB;
-
-		// zbx_dbstr() for ORACLE does not use DB specific functions
-		$DB['TYPE'] = ZBX_DB_ORACLE;
-
+	public function test(array $params, string $expected): void {
 		$this->assertSame($expected, call_user_func_array(['CApiTagHelper', 'addWhereCondition'], $params));
 	}
 }

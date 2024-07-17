@@ -2209,7 +2209,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 	public function testDashboardsTemplatedDashboardForm_WidgetDefaultLayout($data) {
 		$this->page->login()->open('zabbix.php?action=template.dashboard.list&templateid='.self::$update_templateid);
 		$this->query('button:Create dashboard')->one()->click();
-		COverlayDialogElement::find()->one()->waitUntilVisible()->close();
+		COverlayDialogElement::find()->one()->waitUntilReady()->close();
 
 		// Select the required type of widget.
 		$this->query('button:Add')->one()->waitUntilClickable()->click();
