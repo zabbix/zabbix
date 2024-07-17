@@ -447,6 +447,8 @@ class CUser extends CApiService {
 		}
 		unset($user);
 
+		self::checkOwnParameters($users, $db_users);
+
 		if ($aliases) {
 			$this->checkDuplicates($aliases);
 		}
@@ -454,7 +456,150 @@ class CUser extends CApiService {
 		$this->checkUserGroups($users, $db_users);
 		$db_mediatypes = $this->checkMediaTypes($users);
 		$this->validateMediaRecipients($users, $db_mediatypes);
-		$this->checkHimself($users);
+	}
+
+	/**
+	 * Check whether current user is allowed to change specific own parameters.
+	 *
+	 * @param array $users
+	 * @param array $db_users
+	 *
+	 * @throws APIException
+	 */
+	private static function checkOwnParameters(array $users, array $db_users): void {
+		$user = self::getOwnUser($users);
+
+		if ($user === null) {
+			return;
+		}
+
+		$db_user = $db_users[$user['userid']];
+
+		self::checkOwnAlias($user, $db_user);
+		self::checkOwnType($user, $db_user);
+		self::checkOwnUserGroups($user);
+		self::checkOwnMedia($user);
+	}
+
+	private static function getOwnUser(array $users): ?array {
+		if (self::$userData['type'] == USER_TYPE_SUPER_ADMIN) {
+			foreach ($users as $user) {
+				if (bccomp($user['userid'], self::$userData['userid']) == 0) {
+					return $user;
+				}
+			}
+
+			return null;
+		}
+
+		return reset($users);
+	}
+
+	private static function checkOwnAlias(array $user, array $db_user): void {
+		if (self::$userData['type'] == USER_TYPE_SUPER_ADMIN) {
+			return;
+		}
+
+		if (array_key_exists('alias', $user) && $user['alias'] !== $db_user['alias']) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Only Super admin users can update "%1$s" parameter.', 'alias')
+			);
+		}
+	}
+
+	private static function checkOwnType(array $user, array $db_user): void {
+		if (array_key_exists('type', $user) && $user['type'] !== $db_user['type']) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('User cannot change their user type.'));
+		}
+	}
+
+	private static function checkOwnUserGroups(array $user): void {
+		if (!array_key_exists('usrgrps', $user)) {
+			return;
+		}
+
+		$usrgrpids = array_column($user['usrgrps'], 'usrgrpid');
+
+		if (self::$userData['type'] == USER_TYPE_SUPER_ADMIN) {
+			$disabled_user_group = DBfetch(DBselect(
+				'SELECT NULL'.
+				' FROM usrgrp'.
+				' WHERE '.dbConditionId('usrgrpid', $usrgrpids).
+					' AND ('.
+						'gui_access='.GROUP_GUI_ACCESS_DISABLED.
+						' OR users_status='.GROUP_STATUS_DISABLED.
+					')',
+				1
+			));
+
+			if ($disabled_user_group) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_('User cannot add himself to a disabled group or a group with disabled GUI access.')
+				);
+			}
+		}
+		else {
+			$options = [
+				'output' => ['usrgrpid'],
+				'filter' => ['userid' => $user['userid']]
+			];
+			$db_usrgrpids = DBfetchColumn(DBselect(DB::makeSql('users_groups', $options)), 'usrgrpid');
+
+			if (array_diff($usrgrpids, $db_usrgrpids) || array_diff($db_usrgrpids, $usrgrpids)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Only Super admin users can update "%1$s" parameter.', 'usrgrps')
+				);
+			}
+		}
+	}
+
+	private static function checkOwnMedia(array $user): void {
+		if (self::$userData['type'] != USER_TYPE_ZABBIX_USER || !array_key_exists('user_medias', $user)) {
+			return;
+		}
+
+		$db_medias = DB::select('media', [
+			'output' => ['mediatypeid', 'sendto', 'active', 'severity', 'period'],
+			'filter' => ['userid' => $user['userid']]
+		]);
+
+		foreach ($user['user_medias'] as $media) {
+			$media['sendto'] = implode("\n", $media['sendto']);
+
+			$media += [
+				'active' => DB::getDefault('media', 'active'),
+				'severity' => DB::getDefault('media', 'severity'),
+				'period' => DB::getDefault('media', 'period')
+			];
+
+			$db_media_found = false;
+
+			foreach ($db_medias as $i => $db_media) {
+				$match = bccomp($media['mediatypeid'], $db_media['mediatypeid']) == 0
+					&& $media['sendto'] === $db_media['sendto']
+					&& $media['active'] == $db_media['active']
+					&& $media['severity'] == $db_media['severity']
+					&& $media['period'] === $db_media['period'];
+
+				if ($match) {
+					$db_media_found = true;
+					unset($db_medias[$i]);
+					break;
+				}
+			}
+
+			if (!$db_media_found) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Only Super admin or Admin users can update "%1$s" parameter.', 'user_medias')
+				);
+			}
+		}
+
+		if ($db_medias) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Only Super admin or Admin users can update "%1$s" parameter.', 'user_medias')
+			);
+		}
 	}
 
 	/**
@@ -702,42 +847,6 @@ class CUser extends CApiService {
 						}
 					}
 				}
-			}
-		}
-	}
-
-	/**
-	 * Additional check to exclude an opportunity to deactivate himself.
-	 *
-	 * @param array  $users
-	 * @param array  $users[]['usrgrps']  (optional)
-	 *
-	 * @throws APIException
-	 */
-	private function checkHimself(array $users) {
-		foreach ($users as $user) {
-			if (bccomp($user['userid'], self::$userData['userid']) == 0) {
-				if (array_key_exists('type', $user)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('User cannot change their user type.'));
-				}
-
-				if (array_key_exists('usrgrps', $user)) {
-					$db_usrgrps = DB::select('usrgrp', [
-						'output' => ['gui_access', 'users_status'],
-						'usrgrpids' => zbx_objectValues($user['usrgrps'], 'usrgrpid')
-					]);
-
-					foreach ($db_usrgrps as $db_usrgrp) {
-						if ($db_usrgrp['gui_access'] == GROUP_GUI_ACCESS_DISABLED
-								|| $db_usrgrp['users_status'] == GROUP_STATUS_DISABLED) {
-							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_('User cannot add himself to a disabled group or a group with disabled GUI access.')
-							);
-						}
-					}
-				}
-
-				break;
 			}
 		}
 	}
