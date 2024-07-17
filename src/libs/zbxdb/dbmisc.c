@@ -23,6 +23,7 @@
 #include "zbxnum.h"
 #include "zbxstr.h"
 #include "zbxtypes.h"
+#include "zbx_dbversion_constants.h"
 
 #define ZBX_MAX_SQL_SIZE	262144	/* 256KB */
 #ifndef ZBX_MAX_OVERFLOW_SQL_SIZE
