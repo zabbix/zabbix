@@ -20,28 +20,26 @@
 
 void	zbx_mock_test_entry(void **state)
 {
-	const size_t		macro_pos = 1, macro_pos_end = 6, func_pos = 8, func_param_pos = 15;
-	int			expected_ret, returned_ret;
-	char			*value = NULL, macro_expr[MAX_STRING_LEN];
-	zbx_token_func_macro_t	token;
+	int		expected_ret, returned_ret, pos = 0;
+	char		*value = NULL, macro_expr[MAX_STRING_LEN];
+	zbx_token_t	token;
 
 	ZBX_UNUSED(state);
 
 	zbx_snprintf(macro_expr, MAX_STRING_LEN, "{{TIME}.regrepl(%s)}", zbx_mock_get_parameter_string("in.params"));
 
-	token = (zbx_token_func_macro_t)
-		{
-			.macro		= { macro_pos, macro_pos_end },
-			.func		= { func_pos, strlen(macro_expr) - 2 },
-			.func_param	= { func_param_pos, strlen(macro_expr) - 2 }
-		};
+	if (SUCCEED != zbx_token_find(macro_expr, pos, &token, ZBX_TOKEN_SEARCH_BASIC))
+		fail_msg("cannot find token");
+
+	if (ZBX_TOKEN_FUNC_MACRO != token.type)
+		fail_msg("invalid token type");
 
 #define FMTTIME_INPUT_SIZE	1024
 
 	value = zbx_malloc(value, FMTTIME_INPUT_SIZE);
 
 	zbx_snprintf(value, FMTTIME_INPUT_SIZE, "%s", zbx_mock_get_parameter_string("in.data"));
-	returned_ret = zbx_calculate_macro_function(macro_expr, &token, &value);
+	returned_ret = zbx_calculate_macro_function(macro_expr, &token.data.func_macro, &value);
 	expected_ret = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
 	zbx_mock_assert_result_eq("return value", expected_ret, returned_ret);
 
