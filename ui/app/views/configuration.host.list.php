@@ -234,7 +234,7 @@ $table = (new CTableInfo())
 	->setPageNavigation($data['paging']);
 
 $current_time = time();
-$csrf_token_massupdate = CCsrfTokenHelper::get('host');
+$csrf_token = CCsrfTokenHelper::get('host');
 
 foreach ($data['hosts'] as $host) {
 	// Select an interface from the list with highest priority.
@@ -546,7 +546,7 @@ foreach ($data['hosts'] as $host) {
 
 $status_toggle_url =  (new CUrl('zabbix.php'))
 	->setArgument('action', 'popup.massupdate.host')
-	->setArgument(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token_massupdate)
+	->setArgument(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token)
 	->setArgument('visible[status]', 1)
 	->setArgument('update', 1)
 	->setArgument('backurl',
@@ -581,7 +581,7 @@ $form->addItem([
 				->addClass('js-no-chkbxrange')
 				->onClick(
 					"openMassupdatePopup('popup.massupdate.host', {".
-						CCsrfTokenHelper::CSRF_TOKEN_NAME.": '".$csrf_token_massupdate.
+						CCsrfTokenHelper::CSRF_TOKEN_NAME.": '".$csrf_token.
 					"'}, {
 						dialogue_class: 'modal-popup-static',
 						trigger_element: this
@@ -606,7 +606,7 @@ $html_page
 	view.init('.json_encode([
 		'applied_filter_groupids' => array_keys($data['filter']['groups']),
 		'form_name' => $form->getName(),
-		'token' => [CCsrfTokenHelper::CSRF_TOKEN_NAME => $csrf_token_massupdate]
+		'csrf_token' => $csrf_token
 	]).');
 '))
 	->setOnDocumentReady()

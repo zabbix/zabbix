@@ -27,10 +27,10 @@
 	const view = {
 		applied_filter_groupids: [],
 
-		init({applied_filter_groupids, form_name, token}) {
+		init({applied_filter_groupids, form_name, csrf_token}) {
 			this.applied_filter_groupids = applied_filter_groupids;
 			this.form = document.forms[form_name];
-			this.token = token;
+			this.csrf_token = csrf_token;
 
 			this.initFilter();
 
@@ -115,7 +115,10 @@
 			return fetch(curl.getUrl(), {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
-				body: JSON.stringify({...this.token, ...data})
+				body: JSON.stringify({
+					...data,
+					_csrf_token: this.csrf_token
+				})
 			})
 				.then((response) => response.json())
 				.then((response) => this.events.elementSuccess({detail: {action, ...response}}))
