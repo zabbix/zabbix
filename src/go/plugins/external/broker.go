@@ -137,6 +137,17 @@ func (b *pluginBroker) reader() {
 	}
 }
 
+func getTimeout(r *requestWithResponse, b *pluginBroker) time.Duration {
+	switch v := r.in.(type) {
+	case *comms.ExportRequest:
+		if v.Timeout != 0 {
+			return time.Second*time.Duration(v.Timeout) + +time.Millisecond*500
+		}
+	}
+
+	return b.timeout
+}
+
 func (b *pluginBroker) writer() {
 	for r := range b.tx {
 		go func(r any) {
@@ -155,7 +166,7 @@ func (b *pluginBroker) writer() {
 				b.requestsMutex.Unlock()
 
 				go func(id uint32) {
-					time.Sleep(b.timeout)
+					time.Sleep(getTimeout(r, b))
 
 					b.requestsMutex.Lock()
 					defer b.requestsMutex.Unlock()
