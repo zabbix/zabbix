@@ -13,9 +13,11 @@
 **/
 
 #include "dbconn.h"
+#include "zbxcommon.h"
 #include "zbxdb.h"
-#include "zbxdbhigh.h"
 #include "zbx_dbversion_constants.h"
+#include "zbxjson.h"
+#include "zbxtypes.h"
 
 /*********************************************************************************
  *                                                                               *

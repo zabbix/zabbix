@@ -12,9 +12,11 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#include "dbconn.h"
 #include "zbxcommon.h"
 #include "zbxdb.h"
+#include "zbxalgo.h"
+#include "zbxdbschema.h"
+#include "zbxtypes.h"
 
 static zbx_dbconn_t	*dbconn;
 static int		db_autoincrement;

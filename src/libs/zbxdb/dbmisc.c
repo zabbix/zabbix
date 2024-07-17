@@ -13,12 +13,16 @@
 **/
 
 #include "dbconn.h"
+#include "zbxcommon.h"
 #include "zbxdb.h"
-#include "zbxdbhigh.h"
 #include "zbxcfg.h"
 #include "zbxmutexs.h"
 #include "zbxshmem.h"
-#include "zbx_dbversion_constants.h"
+#include "zbxalgo.h"
+#include "zbxdbschema.h"
+#include "zbxnum.h"
+#include "zbxstr.h"
+#include "zbxtypes.h"
 
 #define ZBX_MAX_SQL_SIZE	262144	/* 256KB */
 #ifndef ZBX_MAX_OVERFLOW_SQL_SIZE
@@ -28,7 +32,7 @@
 #error ZBX_MAX_OVERFLOW_SQL_SIZE is out of range
 #endif
 
-ZBX_PTR_VECTOR_IMPL(const_db_field_ptr, const zbx_db_field_t *)
+ZBX_CONST_PTR_VECTOR_IMPL(const_db_field_ptr, const zbx_db_field_t *)
 ZBX_PTR_VECTOR_IMPL(db_value_ptr, zbx_db_value_t *)
 
 const char	*idcache_tables[] = {"events", "event_tag", "problem_tag", "dservices", "dhosts", "alerts",
@@ -106,7 +110,11 @@ static zbx_uint64_t	dbconn_get_cached_nextid(zbx_dbconn_t *db, size_t index, zbx
 		const zbx_db_table_t	*table;
 		zbx_uint64_t		min = 0, max = ZBX_DB_MAX_ID;
 
-		table = zbx_db_get_table(table_name);
+		if (NULL == (table = zbx_db_get_table(table_name)))
+		{
+			nextid = 0;
+			goto out;
+		}
 
 		result = zbx_dbconn_select(db, "select max(%s) from %s where %s between " ZBX_FS_UI64 " and "
 				ZBX_FS_UI64, table->recid, table_name, table->recid, min, max);

@@ -15,10 +15,12 @@
 #include "dbconn.h"
 #include "zbxcommon.h"
 #include "zbxdb.h"
-#include "zbxdbhigh.h"
 #include "zbx_dbversion_constants.h"
 #include "zbxthreads.h"
-#include "zbxmutexs.h"
+#include "zbxalgo.h"
+#include "zbxnum.h"
+#include "zbxstr.h"
+#include "zbxtime.h"
 
 #if defined(HAVE_POSTGRESQL)
 #	define ZBX_PG_READ_ONLY	"25006"
@@ -572,7 +574,7 @@ static int	dbconn_open(zbx_dbconn_t *db)
 	if (0 != db->config->dbport)
 	{
 		keywords[i] = "port";
-		values[i++] = cport = zbx_dsprintf(cport, "%d", db->config->dbport);
+		values[i++] = cport = zbx_dsprintf(cport, "%u", db->config->dbport);
 	}
 
 	keywords[i] = NULL;
@@ -1033,7 +1035,7 @@ static int	dbconn_rollback(zbx_dbconn_t *db)
  * Return value: data, NULL (on error) or (zbx_db_result_t)ZBX_DB_DOWN        *
  *                                                                            *
  ******************************************************************************/
-zbx_db_result_t	dbconn_vselect(zbx_dbconn_t *db, const char *fmt, va_list args)
+static zbx_db_result_t	dbconn_vselect(zbx_dbconn_t *db, const char *fmt, va_list args)
 {
 	char		*sql = NULL;
 	zbx_db_result_t	result = NULL;

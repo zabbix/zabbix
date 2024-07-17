@@ -62,12 +62,6 @@ static int	lld_function_compare_func(const void *d1, const void *d2)
 	return 0;
 }
 
-typedef struct zbx_lld_dependency_s zbx_lld_dependency_t;
-ZBX_VECTOR_STRUCT_DECL(lld_dependency_ptr, zbx_lld_dependency_t*)
-
-typedef struct zbx_lld_trigger_s zbx_lld_trigger_t;
-ZBX_VECTOR_STRUCT_DECL(lld_trigger_ptr, zbx_lld_trigger_t*)
-
 struct zbx_lld_trigger_s
 {
 	zbx_uint64_t		triggerid;
@@ -134,7 +128,6 @@ struct zbx_lld_trigger_s
 	unsigned char		type_orig;
 };
 
-ZBX_PTR_VECTOR_FUNC_DECL(lld_trigger_ptr, zbx_lld_trigger_t*)
 ZBX_PTR_VECTOR_IMPL(lld_trigger_ptr, zbx_lld_trigger_t*)
 
 static int	lld_trigger_compare_func(const void *d1, const void *d2)
@@ -158,7 +151,7 @@ struct zbx_lld_dependency_s
 	zbx_uint64_t		flags;
 };
 
-ZBX_PTR_VECTOR_FUNC_DECL(lld_dependency_ptr, zbx_lld_dependency_t*)
+ZBX_PTR_VECTOR_IMPL(lld_dependency_ptr, zbx_lld_dependency_t*)
 
 static int	lld_dependency_compare_func(const void *d1, const void *d2)
 {
@@ -214,8 +207,6 @@ static int	lld_trigger_prototype_compare_func(const void *d1, const void *d2)
 
 	return 0;
 }
-
-ZBX_PTR_VECTOR_IMPL(lld_dependency_ptr, zbx_lld_dependency_t*)
 
 typedef struct
 {

@@ -13,8 +13,13 @@
 **/
 
 #include "dbconn.h"
-#include "zbxdbhigh.h"
 #include "zbxcrypto.h"
+#include "zbxalgo.h"
+#include "zbxcommon.h"
+#include "zbxdb.h"
+#include "zbxdbschema.h"
+#include "zbxstr.h"
+#include "zbxtypes.h"
 
 /******************************************************************************
  *                                                                            *

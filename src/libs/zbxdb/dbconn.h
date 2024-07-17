@@ -15,9 +15,10 @@
 #ifndef ZABBIX_DBCONN_H
 #define ZABBIX_DBCONN_H
 
-#include "zbxsysinc.h"
+#include "zbxcommon.h"
 #include "zbxdb.h"
 #include "zbxdbschema.h"
+#include "zbxtypes.h"
 
 #if defined(HAVE_MYSQL)
 #	include "mysql.h"

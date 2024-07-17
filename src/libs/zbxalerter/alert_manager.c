@@ -1069,7 +1069,7 @@ static char	*am_create_db_alert_message(const zbx_db_config_t *db_config)
 
 		if (0 != db_config->dbport)
 		{
-			zbx_snprintf_alloc(&alert_message, &alert_message_alloc, &alert_message_offset, ":%d\"",
+			zbx_snprintf_alloc(&alert_message, &alert_message_alloc, &alert_message_offset, ":%u\"",
 					db_config->dbport);
 		}
 		else

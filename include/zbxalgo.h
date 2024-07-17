@@ -292,7 +292,7 @@ void			zbx_binary_heap_clear(zbx_binary_heap_t *heap);
 
 #define ZBX_VECTOR_STRUCT_DECL(__id, __type)									\
 														\
-typedef struct zbx_vector_ ## __id ## _s									\
+typedef struct													\
 {														\
 	__type			*values;									\
 	int			values_num;									\
@@ -303,7 +303,7 @@ typedef struct zbx_vector_ ## __id ## _s									\
 }														\
 zbx_vector_ ## __id ## _t;
 
-#define ZBX_VECTOR_FUNC_DECL(__id, __type)									\
+#define ZBX_VECTOR_FUNC_DECL(__id, __type, __const)								\
 														\
 void	zbx_vector_ ## __id ## _create(zbx_vector_ ## __id ## _t *vector);					\
 void	zbx_vector_ ## __id ## _create_ext(zbx_vector_ ## __id ## _t *vector,					\
@@ -323,13 +323,13 @@ void	zbx_vector_ ## __id ## _remove(zbx_vector_ ## __id ## _t *vector, int index
 void	zbx_vector_ ## __id ## _sort(zbx_vector_ ## __id ## _t *vector, zbx_compare_func_t compare_func);	\
 void	zbx_vector_ ## __id ## _uniq(zbx_vector_ ## __id ## _t *vector, zbx_compare_func_t compare_func);	\
 														\
-int	zbx_vector_ ## __id ## _nearestindex(const zbx_vector_ ## __id ## _t *vector, const __type value,	\
+int	zbx_vector_ ## __id ## _nearestindex(const zbx_vector_ ## __id ## _t *vector, __const __type value,	\
 									zbx_compare_func_t compare_func);	\
-int	zbx_vector_ ## __id ## _bsearch(const zbx_vector_ ## __id ## _t *vector, const __type value,		\
+int	zbx_vector_ ## __id ## _bsearch(const zbx_vector_ ## __id ## _t *vector, __const __type value,		\
 									zbx_compare_func_t compare_func);	\
-int	zbx_vector_ ## __id ## _lsearch(const zbx_vector_ ## __id ## _t *vector, const __type value, int *index,\
+int	zbx_vector_ ## __id ## _lsearch(const zbx_vector_ ## __id ## _t *vector, __const __type value, int *index,\
 									zbx_compare_func_t compare_func);	\
-int	zbx_vector_ ## __id ## _search(const zbx_vector_ ## __id ## _t *vector, const __type value,		\
+int	zbx_vector_ ## __id ## _search(const zbx_vector_ ## __id ## _t *vector, __const __type value,		\
 									zbx_compare_func_t compare_func);	\
 void	zbx_vector_ ## __id ## _setdiff(zbx_vector_ ## __id ## _t *left, const zbx_vector_ ## __id ## _t *right,\
 									zbx_compare_func_t compare_func);	\
@@ -338,18 +338,21 @@ void	zbx_vector_ ## __id ## _reserve(zbx_vector_ ## __id ## _t *vector, size_t s
 void	zbx_vector_ ## __id ## _clear(zbx_vector_ ## __id ## _t *vector);
 
 #define ZBX_VECTOR_DECL(__id, __type)	ZBX_VECTOR_STRUCT_DECL(__id, __type)					\
-					ZBX_VECTOR_FUNC_DECL(__id, __type)
+					ZBX_VECTOR_FUNC_DECL(__id, __type, const)
 
-#define ZBX_PTR_VECTOR_FUNC_DECL(__id, __type)									\
+#define ZBX_PTR_VECTOR_FUNC_DECL(__id, __type, __const)									\
 														\
-ZBX_VECTOR_FUNC_DECL(__id, __type)										\
+ZBX_VECTOR_FUNC_DECL(__id, __type, __const)										\
 														\
 typedef void (*zbx_ ## __id ## _free_func_t)(__type data);							\
 														\
 void	zbx_vector_ ## __id ## _clear_ext(zbx_vector_ ## __id ## _t *vector, zbx_ ## __id ## _free_func_t free_func);
 
 #define ZBX_PTR_VECTOR_DECL(__id, __type)	ZBX_VECTOR_STRUCT_DECL(__id, __type)				\
-						ZBX_PTR_VECTOR_FUNC_DECL(__id, __type)
+						ZBX_PTR_VECTOR_FUNC_DECL(__id, __type, const)
+
+#define ZBX_CONST_PTR_VECTOR_DECL(__id, __type)	ZBX_VECTOR_STRUCT_DECL(__id, __type)				\
+						ZBX_PTR_VECTOR_FUNC_DECL(__id, __type, )
 
 ZBX_VECTOR_DECL(uint64, zbx_uint64_t)
 ZBX_VECTOR_DECL(uint32, zbx_uint32_t)
@@ -364,7 +367,7 @@ ZBX_PTR_VECTOR_DECL(tags_ptr, zbx_tag_t*)
 
 #define	ZBX_VECTOR_ARRAY_GROWTH_FACTOR	3/2
 
-#define	ZBX_VECTOR_IMPL(__id, __type)										\
+#define	ZBX_VECTOR_FUNC_IMPL(__id, __type, __const)										\
 														\
 static void	__vector_ ## __id ## _ensure_free_space(zbx_vector_ ## __id ## _t *vector)			\
 {														\
@@ -504,7 +507,7 @@ void	zbx_vector_ ## __id ## _uniq(zbx_vector_ ## __id ## _t *vector, zbx_compare
 	}													\
 }														\
 														\
-int	zbx_vector_ ## __id ## _nearestindex(const zbx_vector_ ## __id ## _t *vector, const __type value,	\
+int	zbx_vector_ ## __id ## _nearestindex(const zbx_vector_ ## __id ## _t *vector, __const __type value,	\
 									zbx_compare_func_t compare_func)	\
 {														\
 	int	lo = 0, hi = vector->values_num, mid, c;							\
@@ -530,7 +533,7 @@ int	zbx_vector_ ## __id ## _nearestindex(const zbx_vector_ ## __id ## _t *vector
 	return hi;												\
 }														\
 														\
-int	zbx_vector_ ## __id ## _bsearch(const zbx_vector_ ## __id ## _t *vector, const __type value,		\
+int	zbx_vector_ ## __id ## _bsearch(const zbx_vector_ ## __id ## _t *vector, __const __type value,		\
 									zbx_compare_func_t compare_func)	\
 {														\
 	__type	*ptr;												\
@@ -544,7 +547,7 @@ int	zbx_vector_ ## __id ## _bsearch(const zbx_vector_ ## __id ## _t *vector, con
 		return FAIL;											\
 }														\
 														\
-int	zbx_vector_ ## __id ## _lsearch(const zbx_vector_ ## __id ## _t *vector, const __type value, int *index,\
+int	zbx_vector_ ## __id ## _lsearch(const zbx_vector_ ## __id ## _t *vector, __const __type value, int *index,\
 									zbx_compare_func_t compare_func)	\
 {														\
 	while (*index < vector->values_num)									\
@@ -567,7 +570,7 @@ int	zbx_vector_ ## __id ## _lsearch(const zbx_vector_ ## __id ## _t *vector, con
 	return FAIL;												\
 }														\
 														\
-int	zbx_vector_ ## __id ## _search(const zbx_vector_ ## __id ## _t *vector, const __type value,		\
+int	zbx_vector_ ## __id ## _search(const zbx_vector_ ## __id ## _t *vector, __const __type value,		\
 									zbx_compare_func_t compare_func)	\
 {														\
 	int	index;												\
@@ -632,9 +635,11 @@ void	zbx_vector_ ## __id ## _clear(zbx_vector_ ## __id ## _t *vector)					\
 	vector->values_num = 0;											\
 }
 
+#define	ZBX_VECTOR_IMPL(__id, __type)	ZBX_VECTOR_FUNC_IMPL(__id, __type, const)
+
 #define	ZBX_PTR_VECTOR_IMPL(__id, __type)									\
 														\
-ZBX_VECTOR_IMPL(__id, __type)											\
+ZBX_VECTOR_FUNC_IMPL(__id, __type, const)									\
 														\
 void	zbx_vector_ ## __id ## _clear_ext(zbx_vector_ ## __id ## _t *vector,					\
 		zbx_ ## __id ## _free_func_t free_func)								\
@@ -648,6 +653,18 @@ void	zbx_vector_ ## __id ## _clear_ext(zbx_vector_ ## __id ## _t *vector,					\
 														\
 		vector->values_num = 0;										\
 	}													\
+}
+
+#define	ZBX_CONST_PTR_VECTOR_IMPL(__id, __type)									\
+														\
+ZBX_VECTOR_FUNC_IMPL(__id, __type, )										\
+														\
+void	zbx_vector_ ## __id ## _clear_ext(zbx_vector_ ## __id ## _t *vector,					\
+		zbx_ ## __id ## _free_func_t free_func)								\
+{														\
+	ZBX_UNUSED(vector);											\
+	ZBX_UNUSED(free_func);											\
+	THIS_SHOULD_NEVER_HAPPEN_MSG("constant pointer vector contents must not be freed");			\
 }
 /* vector implementation end */
 
