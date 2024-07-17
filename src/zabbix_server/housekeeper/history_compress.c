@@ -157,7 +157,8 @@ static void	hk_set_table_compression_age(const char *table_name, int age, int co
 {
 	int	compress_after;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): table: %s age %d", __func__, table_name, age);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): table: %s age %d, compression_policy %d", __func__, table_name, age,
+			compression_policy);
 
 	if (age != (compress_after = hk_get_compression_age(table_name, compression_policy)) && -1 != compress_after)
 	{
@@ -247,7 +248,7 @@ static void	hk_history_disable_compression(void)
 	{
 		const zbx_history_table_compression_options_t	*table = &compression_tables[i];
 
-		if (0 <= hk_get_compression_age(table->name, table->compression_policy))
+		if (0 >= hk_get_compression_age(table->name, table->compression_policy))
 			continue;
 
 		zbx_db_free_result(zbx_db_select("select %s('%s')", COMPRESSION_POLICY_REMOVE, table->name));
