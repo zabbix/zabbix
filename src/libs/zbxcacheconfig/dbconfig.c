@@ -3795,7 +3795,72 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 			{
 				char	*error = NULL;
 
-				if (ITEM_TYPE_IPMI == item->type &&
+				if (ITEM_TYPE_ZABBIX == item->type &&
+						0 == get_config_forks_cb(ZBX_PROCESS_TYPE_AGENT_POLLER))
+				{
+						zbx_timespec_t	ts = {now, 0};
+
+						zbx_dc_add_history(item->itemid, item->value_type, 0, NULL, &ts,
+								ITEM_STATE_NOTSUPPORTED,
+								"StartAgentPollers is set to 0");
+				}
+				else if (ITEM_TYPE_JMX == item->type &&
+						0 == get_config_forks_cb(ZBX_PROCESS_TYPE_JAVAPOLLER))
+				{
+						zbx_timespec_t	ts = {now, 0};
+
+						zbx_dc_add_history(item->itemid, item->value_type, 0, NULL, &ts,
+								ITEM_STATE_NOTSUPPORTED,
+								"StartJavaPollers is set to 0");
+				}
+
+				else if (ITEM_TYPE_DB_MONITOR == item->type &&
+						0 == get_config_forks_cb(ZBX_PROCESS_TYPE_ODBCPOLLER))
+				{
+						zbx_timespec_t	ts = {now, 0};
+
+						zbx_dc_add_history(item->itemid, item->value_type, 0, NULL, &ts,
+								ITEM_STATE_NOTSUPPORTED,
+								"StartODBCPollers is set to 0");
+				}
+
+				else if (ITEM_TYPE_HTTPAGENT == item->type &&
+						0 == get_config_forks_cb(ZBX_PROCESS_TYPE_HTTPAGENT_POLLER))
+				{
+						zbx_timespec_t	ts = {now, 0};
+
+						zbx_dc_add_history(item->itemid, item->value_type, 0, NULL, &ts,
+								ITEM_STATE_NOTSUPPORTED,
+								"StartHTTPAgentPollers is set to 0");
+				}
+				else if (ITEM_TYPE_SNMP == item->type &&
+						0 == get_config_forks_cb(ZBX_PROCESS_TYPE_SNMP_POLLER))
+				{
+						zbx_timespec_t	ts = {now, 0};
+
+						zbx_dc_add_history(item->itemid, item->value_type, 0, NULL, &ts,
+								ITEM_STATE_NOTSUPPORTED,
+								"StartSNMPPollers is set to 0");
+}
+				else if (ITEM_TYPE_BROWSER == item->type &&
+						0 == get_config_forks_cb(ZBX_PROCESS_TYPE_BROWSERPOLLER))
+				{
+						zbx_timespec_t	ts = {now, 0};
+
+						zbx_dc_add_history(item->itemid, item->value_type, 0, NULL, &ts,
+								ITEM_STATE_NOTSUPPORTED,
+								"StartBrowserPollers is set to 0");
+				}
+				else if (ITEM_TYPE_SCRIPT == item->type &&
+						0 == get_config_forks_cb(ZBX_PROCESS_TYPE_POLLER))
+				{
+						zbx_timespec_t	ts = {now, 0};
+
+						zbx_dc_add_history(item->itemid, item->value_type, 0, NULL, &ts,
+								ITEM_STATE_NOTSUPPORTED,
+								"StartPollers is set to 0");
+				}
+				else if (ITEM_TYPE_IPMI == item->type &&
 						0 == get_config_forks_cb(ZBX_PROCESS_TYPE_IPMIPOLLER))
 				{
 						zbx_timespec_t	ts = {now, 0};
