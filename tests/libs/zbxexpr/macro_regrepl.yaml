@@ -202,7 +202,7 @@ out:
   return: SUCCEED
 
 ---
-test case: empty regular expression
+test case: empty regular expression ""
 in:
   data: 'customername_1'
   params: '"",""'
@@ -243,10 +243,20 @@ out:
 ---
 test case: empty regular expression and empty data
 in:
-  data: ' '
+  data: ''
   params: ',a'
 
 out:
-  value: ' '
+  value: ''
   return: SUCCEED
+---
+test case: replace empty data
+in:
+  data: ''
+  params: '.*,@'
+
+out:
+  value: '@'
+  return: SUCCEED
+
 ...
