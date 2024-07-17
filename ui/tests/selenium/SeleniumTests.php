@@ -61,6 +61,7 @@ require_once dirname(__FILE__).'/dashboards/testDashboardsWidgetsPage.php';
 // Dashboard widgets.
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardClockWidget.php';
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardCopyWidgets.php';
+require_once dirname(__FILE__).'/dashboardWidgets/testDashboardDiscoveryStatusWidget.php';
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardDynamicItemWidgets.php';
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardFavoriteGraphsWidget.php';
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardFavoriteMapsWidget.php';
@@ -393,6 +394,7 @@ class SeleniumTests {
 		// Dashboard widgets.
 		$suite->addTestSuite('testDashboardClockWidget');
 		$suite->addTestSuite('testDashboardCopyWidgets');
+		$suite->addTestSuite('testDashboardDiscoveryStatusWidget');
 		$suite->addTestSuite('testDashboardDynamicItemWidgets');
 		$suite->addTestSuite('testDashboardFavoriteGraphsWidget');
 		$suite->addTestSuite('testDashboardFavoriteMapsWidget');

@@ -830,10 +830,11 @@ class testFormUserRoles extends CWebTest {
 				foreach (['Read-write access to services', 'Read-only access to services'] as $field) {
 					$form->getField($field)->fill('Service list');
 				}
+
+				// Scroll up after filling the form to take the correct screenshot.
+				$this->page->scrollToTop();
 			}
 
-			// Scroll up after filling the form to take the correct screenshot.
-			$this->page->scrollToTop();
 			$this->assertScreenshotExcept($screenshot_area, ['query' => 'xpath://input[@id="name"]'], $role);
 		}
 
@@ -1363,6 +1364,8 @@ class testFormUserRoles extends CWebTest {
 
 				$this->page->open('zabbix.php?action=module.list')->waitUntilReady();
 				$this->query('button:Scan directory')->one()->click();
+				$this->page->waitUntilReady();
+				CMessageElement::find()->one()->close();
 				$table = $this->query('class:list-table')->asTable()->one();
 				$table->findRows('Name', $modules)->select();
 				$this->query('button:Enable')->one()->click();
@@ -1370,6 +1373,7 @@ class testFormUserRoles extends CWebTest {
 				$this->page->waitUntilReady();
 
 				$this->assertMessage(TEST_GOOD, 'Modules enabled');
+				CMessageElement::find()->one()->close();
 			}
 			else {
 				foreach ($modules as $module) {

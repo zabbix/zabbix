@@ -297,7 +297,8 @@ func (c *client) commandCleanup() {
 	}
 }
 
-func (c *client) addCommand(p *pluginAgent, id uint64, params []string, sink resultcache.Writer, now time.Time) {
+func (c *client) addCommand(p *pluginAgent, id uint64, params []string, sink resultcache.Writer, now time.Time,
+	timeout int) {
 	if _, ok := c.commands[id]; ok {
 		return
 	}
@@ -326,6 +327,7 @@ func (c *client) addCommand(p *pluginAgent, id uint64, params []string, sink res
 		id:       id,
 		params:   params,
 		output:   sink,
+		timeout:  timeout,
 	}
 
 	log.Debugf("[%d] created remote command task for plugin '%s' command '%s'", c.id, p.name(), params)
