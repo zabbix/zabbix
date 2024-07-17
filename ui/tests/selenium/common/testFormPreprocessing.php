@@ -2087,17 +2087,7 @@ abstract class testFormPreprocessing extends CWebTest {
 
 		$form->fill($data['fields']);
 		$form->selectTab('Preprocessing');
-
-		// Check that 'Type of information' field is not visible before first step is added.
-		$this->assertFalse($form->query('xpath:.//div[@id="item_preproc_list"]/label[text()="Type of information"]')
-				->one(false)->isVisible()
-		);
 		$this->addPreprocessingSteps($data['preprocessing']);
-
-		// Check that 'Type of information' field is visible after steps are added, but not for LLD.
-		$this->assertTrue($form->query('xpath:.//div[@id="item_preproc_list"]/label[text()="Type of information"]')
-				->one(false)->isVisible(!$lld)
-		);
 
 		return $form;
 	}
@@ -2959,25 +2949,29 @@ abstract class testFormPreprocessing extends CWebTest {
 						'parameters' => [
 							['placeholder' => 'search string', 'maxlength' => 255],
 							['placeholder' => 'replacement', 'maxlength' => 255]
-						]
+						],
+						'on_fail_enabled' => false
 					],
 					[
 						'type' => 'Trim',
 						'parameters' => [
 							['placeholder' => 'list of characters', 'maxlength' => 255]
-						]
+						],
+						'on_fail_enabled' => false
 					],
 					[
 						'type' => 'Right trim',
 						'parameters' => [
 							['placeholder' => 'list of characters', 'maxlength' => 255]
-						]
+						],
+						'on_fail_enabled' => false
 					],
 					[
 						'type' => 'Left trim',
 						'parameters' => [
 							['placeholder' => 'list of characters', 'maxlength' => 255]
-						]
+						],
+						'on_fail_enabled' => false
 					],
 					[
 						'type' => 'XML XPath',
@@ -3071,7 +3065,8 @@ abstract class testFormPreprocessing extends CWebTest {
 								'selector' => 'xpath:.//div[@class="multilineinput-control"]/input[@type="text"]',
 								'placeholder' => 'script'
 							]
-						]
+						],
+						'on_fail_enabled' => false
 					],
 					[
 						'type' => 'In range',
@@ -3112,23 +3107,15 @@ abstract class testFormPreprocessing extends CWebTest {
 						]
 					],
 					[
-						'type' => 'Check for not supported value',
-						'parameters' => [
-							[
-								'selector' => 'xpath:.//z-select[@name="preprocessing[0][params][0]"]',
-								'options' => ['any error', 'error matches', 'error does not match'],
-								'value' => 'any error'
-							]
-						]
-					],
-					[
-						'type' => 'Discard unchanged'
+						'type' => 'Discard unchanged',
+						'on_fail_enabled' => false
 					],
 					[
 						'type' => 'Discard unchanged with heartbeat',
 						'parameters' => [
 							['placeholder' => 'seconds', 'maxlength' => 255]
-						]
+						],
+						'on_fail_enabled' => false
 					],
 					[
 						'type' => 'Prometheus pattern',
@@ -3143,6 +3130,19 @@ abstract class testFormPreprocessing extends CWebTest {
 						'parameters' => [
 							['placeholder' => '<metric name>{<label name>="<label value>", ...} == <value>', 'maxlength' => 255]
 						]
+					],
+					// TODO: put this step after 'Check for error using regular expression' when ZBX-24874 is fixed.
+					[
+						'type' => 'Check for not supported value',
+						'parameters' => [
+							[
+								'selector' => 'xpath:.//z-select[@name="preprocessing[0][params][0]"]',
+								'options' => ['any error', 'error matches', 'error does not match'],
+								'value' => 'any error'
+							]
+						],
+						'on_fail_value' => true,
+						'on_fail_enabled' => false
 					]
 				]
 			]
@@ -3154,33 +3154,94 @@ abstract class testFormPreprocessing extends CWebTest {
 	 *
 	 * @param array $data     given preprocessing steps
 	 * @param array $steps    list of steps options
+	 * @param boolean $lld    true if LLD form is checked, false if item or item prototype
 	 */
-	protected function checkParameters($data, $steps) {
+	protected function checkLayout($data, $steps, $lld = false) {
 		$this->page->login()->open($this->link);
 		$this->query('button:'.$this->button)->waitUntilPresent()->one()->click();
 		$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
 		$form->fill(
 			[
-				'Name' => 'Item for preprocessing parameters check',
-				'Key' => 'preproc-params-check'
+				'Name' => 'Item for preprocessing layout check',
+				'Key' => 'preproc-layout-check'
 			]
 		);
-
 		$form->selectTab('Preprocessing');
-		$this->query('id:param_add')->one()->click();
-		$container = $this->query('xpath://li[contains(@class, "preprocessing-list-item")][1]')->waitUntilPresent()->one();
-		$step_type_field = $container->query('xpath:.//z-select[contains(@id, "_type")]')->asDropdown()->one();
+
+		// Check initial layout.
+		$preprocessing_container = $form->getFieldContainer('Preprocessing steps');
+		$list_step = $preprocessing_container->query('xpath://li['.CXPathHelper::fromClass('preprocessing-list-item').']');
+
+		// No any step presents at the beginning.
+		$this->assertFalse($list_step->exists());
+
+		// Check that 'Type of information' field is not visible before first step is added.
+		$this->assertFalse($form->query('xpath:.//div[@id="item_preproc_list"]/label[text()="Type of information"]')
+				->one(false)->isVisible()
+		);
+
+		$add_button = $this->query('id:param_add')->one();
+		$add_button->click();
+
+		// Check 1st step visibility and buttons.
+		$this->assertTrue($list_step->one()->isVisible());
+		$this->assertEquals(4, $preprocessing_container->query('button', ['Add', 'Test', 'Remove', 'Test all steps'])
+				->all()->filter(new CElementFilter(CElementFilter::CLICKABLE))->count()
+		);
+
+		// Check that 'Type of information' field is visible after step is added, but not for LLD.
+		$this->assertTrue($form->query('xpath:.//div[@id="item_preproc_list"]/label[text()="Type of information"]')
+				->one(false)->isVisible(!$lld)
+		);
+
+		if (!$lld) {
+			// Check hint.
+			$form->getLabel('Preprocessing steps')->query('xpath:./button[@data-hintbox]')->one()->waitUntilClickable()->click();
+			$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->all()->last()->waitUntilReady();
+			$this->assertEquals("Preprocessing is a transformation before saving the value to the database.".
+					" It is possible to define a sequence of preprocessing steps, and those are executed in the order they are set.".
+					"\n\nHowever, if \"Check for not supported value\" steps are configured, they are always placed and".
+					" executed first (with \"any error\" being the last of them).", $hint->getText()
+			);
+			$hint->query('xpath:.//button[@title="Close"]')->waitUntilClickable()->one()->click();
+
+			// Check 'Type of information' options.
+			$this->assertEquals(['Numeric (unsigned)', 'Numeric (float)', 'Character', 'Log', 'Text'],
+					$form->query('name:value_type_steps')->asDropdown()->one()->getOptions()->asText()
+			);
+		}
+
+		// Assert preprocessing table headers (table is actually list in HTML).
+		$this->assertEquals("Name\nParameters\nCustom on fail\nActions",
+				$this->query('xpath://li[contains(@class, "preprocessing-list-head")]')->one()->getText()
+		);
+
+		// Check that one alone list item is not draggable.
+		$disabled_sortable_element = $this->query('xpath://ul[@id="preprocessing" and contains(@class, "sortable-disabled")]');
+		$this->assertTrue($disabled_sortable_element->exists());
+
+		// Check steps' types in dropdown.
+		$step_type_field = $preprocessing_container->query('xpath:.//z-select[contains(@id, "_type")]')->asDropdown()->one();
 		$this->assertEquals($steps, $step_type_field->getOptions()->asText());
 
 		foreach ($data as $step) {
 			$step_type_field->fill($step['type']);
 
+			/*
+			 * Check Custom on fail checkbox. Note that error handler and parameters are checked by
+			 * separate scenario _CustomOnFail and function checkCustomOnFail().
+			 */
+			$on_fail_field = $preprocessing_container->query('xpath:.//input[@name="preprocessing[0][on_fail]"]')
+					->waitUntilPresent()->one();
+			$this->assertTrue($on_fail_field->isEnabled(CTestArrayHelper::get($step, 'on_fail_enabled', true)));
+			$this->assertTrue($on_fail_field->asCheckbox()->isChecked(CTestArrayHelper::get($step, 'on_fail_value', false)));
+
 			if (array_key_exists('parameters', $step)) {
 				foreach ($step['parameters'] as $i => $parameter) {
 					$parameter['selector'] = CTestArrayHelper::get($parameter, 'selector',
-						'xpath:.//input[@id="preprocessing_0_params_'.$i.'"]'
+							'xpath:.//input[@id="preprocessing_0_params_'.$i.'"]'
 					);
-					$field = $container->query($parameter['selector'])->waitUntilPresent()->one();
+					$field = $preprocessing_container->query($parameter['selector'])->waitUntilPresent()->one();
 
 					if (array_key_exists('placeholder', $parameter)) {
 						$this->assertEquals($parameter['placeholder'], $field->getAttribute('placeholder'));
@@ -3199,36 +3260,12 @@ abstract class testFormPreprocessing extends CWebTest {
 				}
 			}
 			else {
-				$this->assertFalse($container->query('xpath:.//input[contains(@id, "preprocessing_0_params")]')->exists());
+				$this->assertFalse($preprocessing_container->query('xpath:.//input[contains(@id, "preprocessing_0_params")]')->exists());
 			}
 		}
-	}
 
-	/**
-	 * Check initial layout of preprocessing steps tab.
-	 *
-	 * @param bollean $hint    true if hint icon presents and needs to be checked
-	 */
-	protected function checkPreprocessingLayout($hint = true) {
-		$this->page->login()->open($this->link);
-		$this->query('button:'.$this->button)->waitUntilPresent()->one()->click();
-		$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
-		$form->fill(
-			[
-				'Name' => 'Item for preprocessing layout check',
-				'Key' => 'preproc-layout-check'
-			]
-		);
-
-		$form->selectTab('Preprocessing');
-
-		// Check initial layout.
-		$list_step = $this->query('xpath://li[contains(@class, "preprocessing-list-item")]');
-		$this->assertFalse($list_step->exists());
-		$this->query('id:param_add')->one()->click();
-		$this->assertTrue($list_step->one()->isVisible());
-
-//		$table = $this->query('id:preprocessing')->asTable()->one();
-//		var_dump($table->getHeadersText());
+		// Add one more step and check sortable class.
+		$add_button->click();
+		$this->assertFalse($disabled_sortable_element->exists());
 	}
 }

@@ -155,7 +155,7 @@ class testFormPreprocessingItemPrototype extends testFormPreprocessing {
 	/**
 	 * @dataProvider getItemsParametersData
 	 */
-	public function testFormPreprocessingItemPrototype_CheckParametersPlaceholders($data) {
+	public function testFormPreprocessingItemPrototype_CheckStepsLayout($data) {
 		$steps = ['Regular expression', 'Replace', 'Trim', 'Right trim', 'Left trim', 'XML XPath', 'JSONPath', 'CSV to JSON',
 				'XML to JSON', 'SNMP walk value', 'SNMP walk to JSON', 'SNMP get value', 'Custom multiplier',
 				'Simple change', 'Change per second', 'Boolean to decimal', 'Octal to decimal', 'Hexadecimal to decimal',
@@ -164,6 +164,6 @@ class testFormPreprocessingItemPrototype extends testFormPreprocessing {
 				'Check for not supported value', 'Discard unchanged', 'Discard unchanged with heartbeat',
 				'Prometheus pattern', 'Prometheus to JSON'
 		];
-		$this->checkParameters($data, $steps);
+		$this->checkLayout($data, $steps);
 	}
 }

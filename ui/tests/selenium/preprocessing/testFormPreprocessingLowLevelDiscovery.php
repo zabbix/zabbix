@@ -361,7 +361,8 @@ class testFormPreprocessingLowLevelDiscovery extends testFormPreprocessing {
 						'parameters' => [
 							['placeholder' => 'search string', 'maxlength' => 255],
 							['placeholder' => 'replacement', 'maxlength' => 255]
-						]
+						],
+						'on_fail_enabled' => false
 					],
 					[
 						'type' => 'XML XPath',
@@ -434,7 +435,8 @@ class testFormPreprocessingLowLevelDiscovery extends testFormPreprocessing {
 								'selector' => 'xpath:.//div[@class="multilineinput-control"]/input[@type="text"]',
 								'placeholder' => 'script'
 							]
-						]
+						],
+						'on_fail_enabled' => false
 					],
 					[
 						'type' => 'Matches regular expression',
@@ -464,7 +466,8 @@ class testFormPreprocessingLowLevelDiscovery extends testFormPreprocessing {
 						'type' => 'Discard unchanged with heartbeat',
 						'parameters' => [
 							['placeholder' => 'seconds', 'maxlength' => 255]
-						]
+						],
+						'on_fail_enabled' => false
 					],
 					[
 						'type' => 'Prometheus to JSON',
@@ -483,15 +486,11 @@ class testFormPreprocessingLowLevelDiscovery extends testFormPreprocessing {
 	/**
 	 * @dataProvider getLLDParametersData
 	 */
-	public function testFormPreprocessingLowLevelDiscovery_CheckParametersPlaceholders($data) {
+	public function testFormPreprocessingLowLevelDiscovery_CheckStepsLayout($data) {
 		$steps = ['Regular expression', 'Replace', 'XML XPath', 'JSONPath', 'CSV to JSON', 'XML to JSON', 'SNMP walk value',
 			'SNMP walk to JSON', 'SNMP get value', 'JavaScript', 'Matches regular expression', 'Does not match regular expression',
 			'Check for error in JSON', 'Check for error in XML', 'Discard unchanged with heartbeat', 'Prometheus to JSON'
 		];
-		$this->checkParameters($data, $steps);
-	}
-
-	public function testFormPreprocessingLowLevelDiscovery_CheckLayout() {
-		$this->checkPreprocessingLayout(false);
+		$this->checkLayout($data, $steps, true);
 	}
 }
