@@ -44,6 +44,8 @@ const (
 	shutdownTimeout = 5
 	// inactive shutdown value
 	shutdownInactive = -1
+
+	maxItemTimeout = 600
 )
 
 type Request struct {
@@ -188,7 +190,6 @@ func (m *Manager) cleanupClient(c *client, now time.Time) {
 
 func parseItemTimeout(s string) (seconds int, e error) {
 	const invalidTimeoutError = "Unsupported timeout value."
-	const maxTimeout = 600
 
 	if s == "" {
 		e = errors.New(invalidTimeoutError)
@@ -220,7 +221,7 @@ func parseItemTimeout(s string) (seconds int, e error) {
 		seconds = intVal
 	}
 
-	if seconds > maxTimeout {
+	if seconds > maxItemTimeout {
 		e = errors.New(invalidTimeoutError)
 	}
 
