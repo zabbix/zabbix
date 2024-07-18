@@ -118,6 +118,136 @@ type Arguments struct {
 	help           bool
 }
 
+func processLoglevelIncreaseCommand(c *runtimecontrol.Client) (err error) {
+	if log.IncreaseLogLevel() {
+		message := fmt.Sprintf("Increased log level to %s", log.Level())
+		log.Infof(message)
+		err = c.Reply(message)
+
+		return
+	}
+	err = fmt.Errorf("Cannot increase log level above %s", log.Level())
+	log.Infof(err.Error())
+
+	return
+}
+
+func processLoglevelDecreaseCommand(c *runtimecontrol.Client) (err error) {
+	if log.DecreaseLogLevel() {
+		message := fmt.Sprintf("Decreased log level to %s", log.Level())
+		log.Infof(message)
+		err = c.Reply(message)
+
+		return
+	}
+	err = fmt.Errorf("Cannot decrease log level below %s", log.Level())
+	log.Infof(err.Error())
+
+	return
+}
+
+func processMetricsCommand(c *runtimecontrol.Client) (err error) {
+	data := manager.Query("metrics")
+	return c.Reply(data)
+}
+
+func processVersionCommand(c *runtimecontrol.Client) (err error) {
+	data := version.Long()
+	return c.Reply(data)
+}
+
+func processUserParamReloadCommand(c *runtimecontrol.Client) (err error) {
+	var userparams AgentUserParamOption
+
+	if err = conf.LoadUserParams(&userparams); err != nil {
+		err = fmt.Errorf("Cannot load user parameters: %s", err.Error())
+		log.Infof(err.Error())
+
+		return
+	}
+
+	agent.Options.UserParameter = userparams.UserParameter
+
+	if res := manager.QueryUserParams(); res != "ok" {
+		err = fmt.Errorf("Failed to reload user parameters: %s", res)
+		log.Infof(err.Error())
+
+		return
+	}
+
+	message := "User parameters reloaded"
+	log.Infof(message)
+	err = c.Reply(message)
+
+	return
+}
+
+func processRemoteCommand(c *runtimecontrol.Client) (err error) {
+	params := strings.Fields(c.Request())
+	switch len(params) {
+	case 0:
+		return errors.New("Empty command")
+	case 2: //nolint:gomnd
+		return errors.New("Too many commands")
+	default:
+	}
+
+	switch params[0] {
+	case "log_level_increase":
+		err = processLoglevelIncreaseCommand(c)
+	case "log_level_decrease":
+		err = processLoglevelDecreaseCommand(c)
+	case "metrics":
+		err = processMetricsCommand(c)
+	case "version":
+		err = processVersionCommand(c)
+	case "userparameter_reload":
+		err = processUserParamReloadCommand(c)
+	default:
+		return errors.New("Unknown command")
+	}
+
+	return
+}
+
+func run() error {
+	sigs := make(chan os.Signal, 1)
+	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+
+	control, err := runtimecontrol.New(agent.Options.ControlSocket, runtimeCommandSendingTimeout)
+	if err != nil {
+		return err
+	}
+
+	confirmService()
+	control.Start()
+
+	defer control.Stop()
+
+	for {
+		select {
+		case <-sigs:
+			sendServiceStop()
+
+			return nil
+		case client := <-control.Client():
+			err := processRemoteCommand(client)
+			if err != nil {
+				rerr := client.Reply(fmt.Sprintf("error: %s", err.Error()))
+				if rerr != nil {
+					log.Warningf("cannot reply to remote command: %s", rerr)
+				}
+			}
+
+			client.Close()
+		case serviceStop := <-closeChan:
+			if serviceStop {
+				return nil
+			}
+		}
+	}
+}
+
 func main() { //nolint:funlen,gocognit,gocyclo
 	version.Init(
 		applicationName,
@@ -207,14 +337,12 @@ func main() { //nolint:funlen,gocognit,gocyclo
 			return
 		}
 
-		if agent.Options.ControlSocket == "" {
+		if config.ControlSocket == "" {
 			fatalExit("", errs.New("Cannot send remote command: ControlSocket configuration parameter is not defined"))
 		}
 
 		reply, err := runtimecontrol.SendCommand(
-			agent.Options.ControlSocket,
-			args.runtimeCommand,
-			runtimeCommandSendingTimeout,
+			agent.Options.ControlSocket, args.runtimeCommand, runtimeCommandSendingTimeout,
 		)
 		if err != nil {
 			fatalExit("Cannot send remote command", err)
@@ -223,6 +351,22 @@ func main() { //nolint:funlen,gocognit,gocyclo
 		fmt.Fprintf(os.Stderr, "%s\n", reply)
 
 		return
+	}
+
+	agent.Options = *config
+
+	if err = agent.ValidateOptions(&agent.Options); err != nil {
+		if eerr := eventLogErr(err); eerr != nil {
+			err = fmt.Errorf("%s and %s", err, eerr)
+		}
+		fatalExit("cannot validate configuration", err)
+	}
+
+	if err = handleWindowsService(args.configPath); err != nil {
+		if eerr := eventLogErr(err); eerr != nil {
+			err = fmt.Errorf("%s and %s", err, eerr)
+		}
+		fatalExit("", err)
 	}
 
 	pluginSocket, err = initExternalPlugins(&agent.Options)
@@ -666,148 +810,11 @@ func fatalExit(message string, err error) {
 		message = fmt.Sprintf("%s: %s", message, err.Error())
 	}
 
-	fmt.Fprintf(
-		os.Stderr,
-		"zabbix_agent2 [%d]: ERROR: %s\n",
-		os.Getpid(),
-		message,
-	)
-
 	if agent.Options.LogType == "file" {
 		log.Critf("%s", message)
 	}
 
+	fmt.Fprintf(os.Stderr, "zabbix_agent2 [%d]: ERROR: %s\n", os.Getpid(), message)
+
 	os.Exit(1)
-}
-
-func processLoglevelIncreaseCommand(c *runtimecontrol.Client) (err error) {
-	if log.IncreaseLogLevel() {
-		message := fmt.Sprintf("Increased log level to %s", log.Level())
-		log.Infof(message)
-		err = c.Reply(message)
-
-		return
-	}
-	err = fmt.Errorf("Cannot increase log level above %s", log.Level())
-	log.Infof(err.Error())
-
-	return
-}
-
-func processLoglevelDecreaseCommand(c *runtimecontrol.Client) (err error) {
-	if log.DecreaseLogLevel() {
-		message := fmt.Sprintf("Decreased log level to %s", log.Level())
-		log.Infof(message)
-		err = c.Reply(message)
-
-		return
-	}
-	err = fmt.Errorf("Cannot decrease log level below %s", log.Level())
-	log.Infof(err.Error())
-
-	return
-}
-
-func processMetricsCommand(c *runtimecontrol.Client) (err error) {
-	data := manager.Query("metrics")
-
-	return c.Reply(data)
-}
-
-func processVersionCommand(c *runtimecontrol.Client) (err error) {
-	data := version.Long()
-
-	return c.Reply(data)
-}
-
-func processUserParamReloadCommand(c *runtimecontrol.Client) (err error) {
-	var userparams AgentUserParamOption
-
-	if err = conf.LoadUserParams(&userparams); err != nil {
-		err = fmt.Errorf("Cannot load user parameters: %s", err.Error())
-		log.Infof(err.Error())
-
-		return
-	}
-
-	agent.Options.UserParameter = userparams.UserParameter
-
-	if res := manager.QueryUserParams(); res != "ok" {
-		err = fmt.Errorf("Failed to reload user parameters: %s", res)
-		log.Infof(err.Error())
-
-		return
-	}
-
-	message := "User parameters reloaded"
-	log.Infof(message)
-	err = c.Reply(message)
-
-	return
-}
-
-func processRemoteCommand(c *runtimecontrol.Client) (err error) {
-	params := strings.Fields(c.Request())
-	switch len(params) {
-	case 0:
-		return errors.New("Empty command")
-	case 2: //nolint:gomnd
-		return errors.New("Too many commands")
-	default:
-	}
-
-	switch params[0] {
-	case "log_level_increase":
-		err = processLoglevelIncreaseCommand(c)
-	case "log_level_decrease":
-		err = processLoglevelDecreaseCommand(c)
-	case "metrics":
-		err = processMetricsCommand(c)
-	case "version":
-		err = processVersionCommand(c)
-	case "userparameter_reload":
-		err = processUserParamReloadCommand(c)
-	default:
-		return errors.New("Unknown command")
-	}
-
-	return
-}
-
-func run() error {
-	sigs := make(chan os.Signal, 1)
-	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
-
-	control, err := runtimecontrol.New(agent.Options.ControlSocket, runtimeCommandSendingTimeout)
-	if err != nil {
-		return err
-	}
-
-	confirmService()
-	control.Start()
-
-	defer control.Stop()
-
-	for {
-		select {
-		case <-sigs:
-			sendServiceStop()
-
-			return nil
-		case client := <-control.Client():
-			err := processRemoteCommand(client)
-			if err != nil {
-				rerr := client.Reply(fmt.Sprintf("error: %s", err.Error()))
-				if rerr != nil {
-					log.Warningf("cannot reply to remote command: %s", rerr)
-				}
-			}
-
-			client.Close()
-		case serviceStop := <-closeChan:
-			if serviceStop {
-				return nil
-			}
-		}
-	}
 }
