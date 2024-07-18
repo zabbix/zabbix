@@ -31,7 +31,6 @@
 #include "zbxalgo.h"
 #include "zbxcacheconfig.h"
 #include "zbxdb.h"
-#include "zbxdbhigh.h"
 #include "zbxipcservice.h"
 #include "zbxnum.h"
 #include "zbxjson.h"

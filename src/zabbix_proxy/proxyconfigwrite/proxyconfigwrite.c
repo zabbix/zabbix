@@ -15,7 +15,6 @@
 #include "proxyconfigwrite.h"
 
 #include "zbxdbwrap.h"
-#include "zbxdbhigh.h"
 #include "zbxcommshigh.h"
 #include "zbxrtc.h"
 #include "zbx_host_constants.h"

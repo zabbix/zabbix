@@ -18,7 +18,6 @@
 #include "../audit/audit_server.h"
 
 #include "zbx_ha_constants.h"
-#include "zbxdbhigh.h"
 #include "zbxipcservice.h"
 #include "zbxserialize.h"
 #include "zbxthreads.h"

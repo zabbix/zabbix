@@ -16,7 +16,6 @@
 #include "zbxexpression.h"
 
 #include "zbxexec.h"
-#include "zbxdbhigh.h"
 #include "zbxtasks.h"
 #include "zbxembed.h"
 #include "zbxnum.h"
