@@ -6,16 +6,10 @@ form.dashboard-widget-clock {
 		&.fields-group-time,
 		&.fields-group-tzone {
 			display: grid;
-			grid-template-columns: 60px 120px repeat(2, minmax(60px, max-content) auto);
+			grid-template-columns: 60px 120px 60px auto;
 			align-items: center;
 			column-gap: 10px;
 			row-gap: 5px;
-
-			.field-size {
-				input {
-					margin-right: 5px;
-				}
-			}
 		}
 
 		&.fields-group-time {
@@ -51,12 +45,12 @@ div.dashboard-widget-clock {
 
 		.clock-date,
 		.clock-time,
-		.clock-time-zone {
+		.clock-time-zone,
+		.clock-disabled {
 			max-width: 100%;
 			white-space: nowrap;
 			overflow: hidden;
 			text-overflow: ellipsis;
-			font-size: calc(var(--content-height) * var(--widget-clock-font) / #{$line-height});
 			line-height: $line-height;
 			flex-shrink: 0;
 		}
@@ -66,7 +60,6 @@ div.dashboard-widget-clock {
 		}
 
 		.clock-disabled {
-			font-size: calc(var(--content-height) * 0.6 / #{$line-height});
 			color: $font-alt-color;
 			font-weight: bold;
 		}

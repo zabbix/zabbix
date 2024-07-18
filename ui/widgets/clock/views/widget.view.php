@@ -59,8 +59,6 @@ else {
 				}
 
 				if ($styles !== null) {
-					$div->addStyle(sprintf('--widget-clock-font: %1$s;', number_format($styles['size'] / 100, 2)));
-
 					if ($styles['bold']) {
 						$div->addClass('bold');
 					}
@@ -90,6 +88,7 @@ else {
 	}
 
 	$view->setVar('clock_data', $data['clock_data']);
+	$view->setVar('styles', $data['styles']);
 }
 
 $view
