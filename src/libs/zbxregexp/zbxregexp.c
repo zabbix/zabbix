@@ -1032,7 +1032,7 @@ int	zbx_mregexp_sub_precompiled(const char *string, const zbx_regexp_t *regexp, 
 int	zbx_regexp_repl(const char *string, const char *pattern, const char *output_template, char **out)
 {
 	zbx_regexp_t		*regexp = NULL;
-	int			mi, shift = 0;
+	int			mi, shift = 0, ret = FAIL;
 	char			*out_str = zbx_strdup(NULL, string), *ptr = out_str, *error = NULL;
 	zbx_vector_match_t	matches;
 	size_t			i;
@@ -1104,9 +1104,18 @@ int	zbx_regexp_repl(const char *string, const char *pattern, const char *output_
 
 		if (NULL != replace)
 		{
-			char	*str = (char *)zbx_malloc(NULL, strlen(out_str) + strlen(replace) + 1);
+			size_t	length = strlen(out_str) + strlen(replace) + 1;
+			char	*str;
 
-			ptr = str;
+			if (MAX_EXECUTE_OUTPUT_LEN <= length)
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "Macro function output exceeded limit of %d Kb",
+						MAX_EXECUTE_OUTPUT_LEN / ZBX_KIBIBYTE);
+				zbx_free(replace);
+				goto out;
+			}
+			ptr = str = (char *)zbx_malloc(NULL, length);
+
 			for (i = 0; ; i++)
 			{
 				if (i == (size_t)groups[0].rm_so)
@@ -1130,11 +1139,13 @@ int	zbx_regexp_repl(const char *string, const char *pattern, const char *output_
 		}
 	}
 
+	ret = SUCCEED;
+out:
 	zbx_vector_match_clear_ext(&matches, (zbx_match_free_func_t)zbx_ptr_free);
 	zbx_vector_match_destroy(&matches);
 	*out = out_str;
 
-	return SUCCEED;
+	return ret;
 }
 
 /*********************************************************************************
