@@ -253,7 +253,7 @@ static int	dbconn_is_recoverable_error(zbx_dbconn_t *db, const PGresult *pg_resu
 	if (0 == zbx_strcmp_null(PQresultErrorField(pg_result, PG_DIAG_SQLSTATE), ZBX_PG_DEADLOCK))
 		return SUCCEED;
 
-	if (1 == db->ZBX_PG_READ_ONLY_RECOVERABLE &&
+	if (1 == db->config->read_only_recoverable &&
 			0 == zbx_strcmp_null(PQresultErrorField(pg_result, PG_DIAG_SQLSTATE), ZBX_PG_READ_ONLY))
 	{
 		return SUCCEED;
@@ -1245,18 +1245,14 @@ zbx_dbconn_t	*zbx_dbconn_create(void)
 	db = (zbx_dbconn_t *)zbx_malloc(NULL, sizeof(zbx_dbconn_t));
 	memset(db, 0, sizeof(zbx_dbconn_t));
 
+	db->config = db_config;
 	db->txn_error = ZBX_DB_OK;
 	db->txn_end_error = ZBX_DB_OK;
-
 	db->connect_options = ZBX_DB_CONNECT_NORMAL;
 
-#if defined(HAVE_POSTGRESQL)
-	db->ZBX_PG_READ_ONLY_RECOVERABLE = db_config->read_only_recoverable;
-#elif defined(HAVE_SQLITE3)
+#if defined(HAVE_SQLITE3)
 	db->sqlite_access = &db_sqlite_access;
 #endif
-	db->config = db_config;
-
 	return db;
 }
 

@@ -59,7 +59,6 @@ struct zbx_dbconn
 	int			txn_begin;		/* transaction begin statement is executed */
 #elif defined(HAVE_POSTGRESQL)
 	PGconn			*conn;
-	int			ZBX_PG_READ_ONLY_RECOVERABLE;
 #elif defined(HAVE_SQLITE3)
 	sqlite3			*conn;
 	zbx_mutex_t		*sqlite_access;
