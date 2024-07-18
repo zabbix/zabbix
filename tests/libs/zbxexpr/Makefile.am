@@ -14,7 +14,8 @@ BINARIES_tests = \
 	zbx_get_report_nextcheck \
 	macro_fmttime \
 	zbx_function_param_parse_ext \
-	zbx_substitute_macros
+	zbx_substitute_macros \
+	zbx_substitute_macros1
 
 noinst_PROGRAMS = $(BINARIES_tests)
 
@@ -224,3 +225,16 @@ zbx_substitute_macros_LDADD += @SERVER_LIBS@
 zbx_substitute_macros_LDFLAGS = @SERVER_LDFLAGS@
 
 zbx_substitute_macros_CFLAGS = $(EXPR_COMPILER_FLAGS)
+
+zbx_substitute_macros1_SOURCES = \
+	zbx_substitute_macros1.c \
+	$(COMMON_SRC_FILES)
+
+zbx_substitute_macros1_LDADD = \
+	$(EXPR_LIBS)
+
+zbx_substitute_macros1_LDADD += @SERVER_LIBS@
+
+zbx_substitute_macros1_LDFLAGS = @SERVER_LDFLAGS@
+
+zbx_substitute_macros1_CFLAGS = $(EXPR_COMPILER_FLAGS)
