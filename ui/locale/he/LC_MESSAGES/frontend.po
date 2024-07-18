@@ -4470,6 +4470,10 @@ msgstr "יצירת סוג מדיה"
 msgid "Create new"
 msgstr "יצירת חדש"
 
+#: jsLoader.php:363
+msgid "Create new report"
+msgstr ""
+
 #: app/views/administration.proxy.list.php:37
 msgid "Create proxy"
 msgstr "יצירת מתווך"
@@ -6873,6 +6877,10 @@ msgstr "עדכון מאפייני עמוד לוח המחוונים נכשל."
 msgid "Failed to update dashboard properties."
 msgstr "עדכון מאפייני לוח המחוונים נכשל."
 
+#: app/views/js/popup.dashboard.share.edit.js.php:86
+msgid "Failed to update dashboard sharing."
+msgstr ""
+
 #: jsLoader.php:142
 msgid "Failed to update widget properties."
 msgstr "עדכון מאפייני הווידג׳ט נכשל."
@@ -7994,6 +8002,10 @@ msgstr "קבוצת המארחים „%1$s” היא פנימית ואי אפשר
 msgid "Host group elements"
 msgstr "רכיבי קבוצת מארחים"
 
+#: jsLoader.php:287
+msgid "Host group is not selected."
+msgstr ""
+
 #: include/views/monitoring.sysmap.edit.php:165
 msgid "Host group label type"
 msgstr "סוג תווית קבוצת מארחים"
@@ -8067,6 +8079,10 @@ msgstr "מאגר מארח"
 #: hostinventoriesoverview.php:26 hostinventoriesoverview.php:146
 msgid "Host inventory overview"
 msgstr "סקירת מאגר מארח"
+
+#: jsLoader.php:284
+msgid "Host is not selected."
+msgstr ""
 
 #: include/views/monitoring.sysmap.edit.php:180
 msgid "Host label type"
@@ -11256,6 +11272,10 @@ msgstr "מיקום תווית רכיב במפה"
 #: include/views/monitoring.sysmap.edit.php:240
 msgid "Map element label type"
 msgstr "סוג תווית רכיב במפה"
+
+#: jsLoader.php:285
+msgid "Map is not selected."
+msgstr ""
 
 #: sysmap.php:128
 msgid "Map is updated! Return to map list?"
@@ -18110,6 +18130,10 @@ msgstr "ההקפצה במצב „לא ידוע”"
 msgid "Trigger in template \"%1$s\" has dependency with trigger in template \"%2$s\"."
 msgstr "להקפצה בתבנית „%1$s” יש תלות בהקפצה בתבנית „%2$s”."
 
+#: jsLoader.php:286
+msgid "Trigger is not selected."
+msgstr ""
+
 #: include/views/monitoring.sysmap.edit.php:195
 msgid "Trigger label type"
 msgstr "סוג תווית הקפצה"
@@ -19757,6 +19781,10 @@ msgstr "תצוגה"
 msgid "View as"
 msgstr "הצגה בתור"
 
+#: jsLoader.php:397
+msgid "View related reports"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1234
 msgid "Virtual space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr "גודל נפח וירטואלי באחוזים מהכלל. מחזירה מספר שלם לבתים, שבר עשרוני לאחוזים"
@@ -20295,6 +20323,10 @@ msgstr "אין לך הרשאה לגשת לעמוד זה."
 #: include/func.inc.php:1724
 msgid "You must login to view this page."
 msgstr "עליך להיכנס כדי לצפות בעמוד זה."
+
+#: jsLoader.php:282
+msgid "You need to have at least one image uploaded to create map element. Images can be uploaded in Administration->General->Images section."
+msgstr ""
 
 #: include/classes/db/DB.php:135
 msgid "Your database is not working properly. Please wait a few minutes and try to repeat this action. If the problem still persists, please contact system administrator. The problem might be caused by long running transaction or row level lock accomplished by your database management system."
@@ -22015,6 +22047,10 @@ msgstr "ימינה"
 #: app/controllers/CControllerPopupTriggerExpr.php:924
 msgid "right() - Returns the rightmost count characters"
 msgstr "right()‎ - מחזירה כמות כזאת של התווים הימניים ביותר"
+
+#: jsLoader.php:199
+msgid "root"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:937
 msgid "round() - Rounds a value to decimal places"

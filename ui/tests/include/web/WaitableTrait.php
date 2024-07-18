@@ -245,6 +245,13 @@ trait WaitableTrait {
 	/**
 	 * @inheritdoc
 	 */
+	public function getNotEnabledCondition() {
+		return $this->getReversedCondition($this->getEnabledCondition());
+	}
+
+	/**
+	 * @inheritdoc
+	 */
 	public function getNotReadyCondition() {
 		return $this->getReversedCondition($this->getReadyCondition());
 	}

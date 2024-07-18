@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-11-01T20:46:59Z'
+  date: '2024-07-02T13:47:48Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -17,7 +17,7 @@ zabbix_export:
           type: INTERNAL
           key: 'zabbix[preprocessing_queue]'
           history: 7d
-          description: 'Count of values enqueued in the preprocessing queue.'
+          description: 'The count of values enqueued in the preprocessing queue.'
           tags:
             - tag: component
               value: system
@@ -28,7 +28,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Average percentage of time availability manager processes have been busy in the last minute.'
+          description: 'The average percentage of the time during which the availability manager processes have been busy for the last minute.'
           tags:
             - tag: component
               value: internal-process
@@ -50,7 +50,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Average percentage of time configuration syncer processes have been busy in the last minute.'
+          description: 'The average percentage of the time during which the configuration syncer processes have been busy for the last minute.'
           tags:
             - tag: component
               value: internal-process
@@ -72,7 +72,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Average percentage of time data sender processes have been busy in the last minute.'
+          description: 'The average percentage of the time during which the data sender processes have been busy for the last minute.'
           tags:
             - tag: component
               value: internal-process
@@ -88,16 +88,16 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 1d00c5ef345f4827a921ff3e3617d316
-          name: 'Zabbix proxy: Utilization of discoverer data collector processes, in %'
+          name: 'Zabbix proxy: Utilization of discoverer internal processes, in %'
           type: INTERNAL
           key: 'zabbix[process,discoverer,avg,busy]'
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Average percentage of time discoverer processes have been busy in the last minute.'
+          description: 'The average percentage of the time during which the discoverer processes have been busy for the last minute.'
           tags:
             - tag: component
-              value: data-collector
+              value: internal-process
           triggers:
             - uuid: 080bd8d98f204d8580cbb1088f07d57b
               expression: 'avg(/Zabbix proxy health/zabbix[process,discoverer,avg,busy],10m)>{$ZABBIX.PROXY.UTIL.MAX:"discoverer"}'
@@ -116,7 +116,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Average percentage of time heartbeat sender processes have been busy in the last minute.'
+          description: 'The average percentage of the time during which the heartbeat sender processes have been busy for the last minute.'
           tags:
             - tag: component
               value: internal-process
@@ -132,16 +132,16 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: d34bb8623fff4fb99f87167534299654
-          name: 'Zabbix proxy: Utilization of history poller data collector processes, in %'
+          name: 'Zabbix proxy: Utilization of history poller internal processes, in %'
           type: INTERNAL
           key: 'zabbix[process,history poller,avg,busy]'
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Average percentage of time history poller processes have been busy in the last minute.'
+          description: 'The average percentage of the time during which the history poller processes have been busy for the last minute.'
           tags:
             - tag: component
-              value: data-collector
+              value: internal-process
           triggers:
             - uuid: 7ee08ecfeafc488583e8e4719b8a1be1
               expression: 'avg(/Zabbix proxy health/zabbix[process,history poller,avg,busy],10m)>{$ZABBIX.PROXY.UTIL.MAX:"history poller"}'
@@ -160,7 +160,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Average percentage of time history syncer processes have been busy in the last minute.'
+          description: 'The average percentage of the time during which the history syncer processes have been busy for the last minute.'
           tags:
             - tag: component
               value: internal-process
@@ -182,7 +182,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Average percentage of time housekeeper processes have been busy in the last minute.'
+          description: 'The average percentage of the time during which the housekeeper processes have been busy for the last minute.'
           tags:
             - tag: component
               value: internal-process
@@ -204,10 +204,10 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Average percentage of time http poller processes have been busy in the last minute.'
+          description: 'The average percentage of the time during which the http poller processes have been busy for the last minute.'
           tags:
             - tag: component
-              value: data-collector
+              value: gathering-process
           triggers:
             - uuid: e93e5a3dd27f4d378bbfe2c8e5b009e7
               expression: 'avg(/Zabbix proxy health/zabbix[process,http poller,avg,busy],10m)>{$ZABBIX.PROXY.UTIL.MAX:"http poller"}'
@@ -226,10 +226,10 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Average percentage of time icmp pinger processes have been busy in the last minute.'
+          description: 'The average percentage of the time during which the icmp pinger processes have been busy for the last minute.'
           tags:
             - tag: component
-              value: data-collector
+              value: gathering-process
           triggers:
             - uuid: d514f4a08bcd4fe2b696015a74ffafcf
               expression: 'avg(/Zabbix proxy health/zabbix[process,icmp pinger,avg,busy],10m)>{$ZABBIX.PROXY.UTIL.MAX:"icmp pinger"}'
@@ -248,7 +248,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Average percentage of time ipmi manager processes have been busy in the last minute.'
+          description: 'The average percentage of the time during which the ipmi manager processes have been busy for the last minute.'
           tags:
             - tag: component
               value: internal-process
@@ -270,10 +270,10 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Average percentage of time ipmi poller processes have been busy in the last minute.'
+          description: 'The average percentage of the time during which the ipmi poller processes have been busy for the last minute.'
           tags:
             - tag: component
-              value: data-collector
+              value: gathering-process
           triggers:
             - uuid: 99ce9f0ed6204860b7b943e9e3a5fbc0
               expression: 'avg(/Zabbix proxy health/zabbix[process,ipmi poller,avg,busy],10m)>{$ZABBIX.PROXY.UTIL.MAX:"ipmi poller"}'
@@ -292,10 +292,10 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Average percentage of time java poller processes have been busy in the last minute.'
+          description: 'The average percentage of the time during which the java poller processes have been busy for the last minute.'
           tags:
             - tag: component
-              value: data-collector
+              value: gathering-process
           triggers:
             - uuid: 5b8cc59c21b145739e346479124c48f5
               expression: 'avg(/Zabbix proxy health/zabbix[process,java poller,avg,busy],10m)>{$ZABBIX.PROXY.UTIL.MAX:"java poller"}'
@@ -314,10 +314,10 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Average percentage of time ODBC poller processes have been busy in the last minute.'
+          description: 'The average percentage of the time during which the ODBC poller processes have been busy for the last minute.'
           tags:
             - tag: component
-              value: data-collector
+              value: gathering-process
           triggers:
             - uuid: 3177430235ac4eeaa23b8c39987989cc
               expression: 'avg(/Zabbix proxy health/zabbix[process,odbc poller,avg,busy],10m)>{$ZABBIX.PROXY.UTIL.MAX:"ODBC poller"}'
@@ -336,10 +336,10 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Average percentage of time poller processes have been busy in the last minute.'
+          description: 'The average percentage of the time during which the poller processes have been busy for the last minute.'
           tags:
             - tag: component
-              value: data-collector
+              value: gathering-process
           triggers:
             - uuid: 3f93b378367e48f89abe304ccb624047
               expression: 'avg(/Zabbix proxy health/zabbix[process,poller,avg,busy],10m)>{$ZABBIX.PROXY.UTIL.MAX:"poller"}'
@@ -358,7 +358,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Average percentage of time preprocessing manager processes have been busy in the last minute.'
+          description: 'The average percentage of the time during which the preprocessing manager processes have been busy for the last minute.'
           tags:
             - tag: component
               value: internal-process
@@ -380,7 +380,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Average percentage of time preprocessing worker processes have been busy in the last minute.'
+          description: 'The average percentage of the time during which the preprocessing worker processes have been busy for the last minute.'
           tags:
             - tag: component
               value: internal-process
@@ -402,7 +402,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Average percentage of time self-monitoring processes have been busy in the last minute.'
+          description: 'The average percentage of the time during which the self-monitoring processes have been busy for the last minute.'
           tags:
             - tag: component
               value: internal-process
@@ -424,10 +424,10 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Average percentage of time snmp trapper processes have been busy in the last minute.'
+          description: 'The average percentage of the time during which the snmp trapper processes have been busy for the last minute.'
           tags:
             - tag: component
-              value: data-collector
+              value: gathering-process
           triggers:
             - uuid: bb0a46beffbc457faea9362d4325c676
               expression: 'avg(/Zabbix proxy health/zabbix[process,snmp trapper,avg,busy],10m)>{$ZABBIX.PROXY.UTIL.MAX:"snmp trapper"}'
@@ -446,7 +446,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Average percentage of time task manager processes have been busy in the last minute.'
+          description: 'The average percentage of the time during which the task manager processes have been busy for the last minute.'
           tags:
             - tag: component
               value: internal-process
@@ -468,10 +468,10 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Average percentage of time trapper processes have been busy in the last minute.'
+          description: 'The average percentage of the time during which the trapper processes have been busy for the last minute.'
           tags:
             - tag: component
-              value: data-collector
+              value: gathering-process
           triggers:
             - uuid: 95ad6d80dc9c4f46a4e255d13f1b01a3
               expression: 'avg(/Zabbix proxy health/zabbix[process,trapper,avg,busy],10m)>{$ZABBIX.PROXY.UTIL.MAX:"trapper"}'
@@ -490,10 +490,10 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Average percentage of time unreachable poller processes have been busy in the last minute.'
+          description: 'The average percentage of the time during which the unreachable poller processes have been busy for the last minute.'
           tags:
             - tag: component
-              value: data-collector
+              value: gathering-process
           triggers:
             - uuid: a28abd3f43f843af9646a1f8b1ca056a
               expression: 'avg(/Zabbix proxy health/zabbix[process,unreachable poller,avg,busy],10m)>{$ZABBIX.PROXY.UTIL.MAX:"unreachable poller"}'
@@ -506,16 +506,16 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: a5a7076a175c400f866a4d873d12e1e4
-          name: 'Zabbix proxy: Utilization of vmware data collector processes, in %'
+          name: 'Zabbix proxy: Utilization of vmware collector data collector processes, in %'
           type: INTERNAL
           key: 'zabbix[process,vmware collector,avg,busy]'
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Average percentage of time vmware collector processes have been busy in the last minute.'
+          description: 'The average percentage of the time during which the vmware collector processes have been busy for the last minute.'
           tags:
             - tag: component
-              value: data-collector
+              value: gathering-process
           triggers:
             - uuid: a1051b5ac8334125a40cb36a95605284
               expression: 'avg(/Zabbix proxy health/zabbix[process,vmware collector,avg,busy],10m)>{$ZABBIX.PROXY.UTIL.MAX:"vmware collector"}'
@@ -541,7 +541,7 @@ zabbix_export:
           type: INTERNAL
           key: 'zabbix[queue,10m]'
           history: 7d
-          description: 'Number of monitored items in the queue which are delayed at least by 10 minutes.'
+          description: 'The number of monitored items in the queue, which are delayed at least by 10 minutes.'
           tags:
             - tag: component
               value: system
@@ -550,7 +550,6 @@ zabbix_export:
               expression: 'min(/Zabbix proxy health/zabbix[queue,10m],10m)>100'
               name: 'Zabbix proxy: More than 100 items having missing data for more than 10 minutes'
               priority: WARNING
-              description: 'zabbix[stats,{$IP},{$PORT},queue,10m] item is collecting data about how many items are missing data for more than 10 minutes.'
               tags:
                 - tag: scope
                   value: performance
@@ -559,7 +558,7 @@ zabbix_export:
           type: INTERNAL
           key: 'zabbix[queue]'
           history: 7d
-          description: 'Number of monitored items in the queue which are delayed at least by 6 seconds.'
+          description: 'The number of monitored items in the queue, which are delayed at least by 6 seconds.'
           tags:
             - tag: component
               value: system
@@ -570,28 +569,33 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Availability statistics of Zabbix configuration cache. Percentage of used buffer.'
+          description: 'The availability statistics of Zabbix configuration cache. The percentage of used data buffer.'
           tags:
             - tag: component
               value: system
           triggers:
             - uuid: 98ae52367f69476dbeb9c50e5f28b429
-              expression: 'max(/Zabbix proxy health/zabbix[rcache,buffer,pused],10m)>{$ZABBIX.PROXY.UTIL.MAX}'
-              name: 'Zabbix proxy: More than {$ZABBIX.PROXY.UTIL.MAX}% used in the configuration cache'
+              expression: 'max(/Zabbix proxy health/zabbix[rcache,buffer,pused],10m)>{$ZABBIX.PROXY.UTIL.MAX:"configuration cache"}'
+              name: 'Zabbix proxy: More than {$ZABBIX.PROXY.UTIL.MAX:"configuration cache"}% used in the configuration cache'
               priority: AVERAGE
-              description: 'Consider increasing CacheSize in the zabbix_proxy.conf configuration file.'
+              description: 'Consider increasing `CacheSize` in the `zabbix_proxy.conf` configuration file.'
               tags:
                 - tag: scope
                   value: capacity
                 - tag: scope
                   value: performance
         - uuid: ef820395239d4a108980fe53017a89fc
-          name: 'Zabbix proxy: Required performance'
+          name: 'Zabbix proxy: Required VPS'
           type: INTERNAL
           key: 'zabbix[requiredperformance]'
           history: 7d
           value_type: FLOAT
-          description: 'Required performance of Zabbix proxy, in new values per second expected.'
+          units: '!vps'
+          description: 'The required performance of a proxy (the number of values that need to be collected per second).'
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 12h
           tags:
             - tag: component
               value: system
@@ -623,7 +627,7 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: CHAR
-          description: 'Version of Zabbix proxy.'
+          description: 'A version of Zabbix proxy.'
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -649,16 +653,16 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Availability statistics of Zabbix vmware cache. Percentage of used buffer.'
+          description: 'The availability statistics of Zabbix vmware cache. The percentage of used data buffer.'
           tags:
             - tag: component
               value: system
           triggers:
             - uuid: 69707cc61b7d408f8683dae435183d4f
-              expression: 'max(/Zabbix proxy health/zabbix[vmware,buffer,pused],10m)>{$ZABBIX.PROXY.UTIL.MAX}'
-              name: 'Zabbix proxy: More than {$ZABBIX.PROXY.UTIL.MAX}% used in the vmware cache'
+              expression: 'max(/Zabbix proxy health/zabbix[vmware,buffer,pused],10m)>{$ZABBIX.PROXY.UTIL.MAX:"vmware cache"}'
+              name: 'Zabbix proxy: More than {$ZABBIX.PROXY.UTIL.MAX:"vmware cache"}% used in the vmware cache'
               priority: AVERAGE
-              description: 'Consider increasing VMwareCacheSize in the zabbix_proxy.conf configuration file.'
+              description: 'Consider increasing `VMwareCacheSize` in the `zabbix_proxy.conf` configuration file.'
               tags:
                 - tag: scope
                   value: capacity
@@ -672,17 +676,17 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           description: |
-            Statistics and availability of Zabbix write cache. Percentage of used history buffer.
-            History cache is used to store item values. A high number indicates performance problems on the database side.
+            The statistics and availability of Zabbix write cache. The percentage of used history buffer.
+            The history cache is used to store item values. A high number indicates performance problems on the database side.
           tags:
             - tag: component
               value: system
           triggers:
             - uuid: dc5a87f6c62d47b08ddd4578aa5f293f
-              expression: 'max(/Zabbix proxy health/zabbix[wcache,history,pused],10m)>{$ZABBIX.PROXY.UTIL.MAX}'
-              name: 'Zabbix proxy: More than {$ZABBIX.PROXY.UTIL.MAX}% used in the history cache'
+              expression: 'max(/Zabbix proxy health/zabbix[wcache,history,pused],10m)>{$ZABBIX.PROXY.UTIL.MAX:"history cache"}'
+              name: 'Zabbix proxy: More than {$ZABBIX.PROXY.UTIL.MAX:"history cache"}% used in the history cache'
               priority: AVERAGE
-              description: 'Consider increasing HistoryCacheSize in the zabbix_proxy.conf configuration file.'
+              description: 'Consider increasing `HistoryCacheSize` in the `zabbix_proxy.conf` configuration file.'
               tags:
                 - tag: scope
                   value: capacity
@@ -696,17 +700,17 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           description: |
-            Statistics and availability of Zabbix write cache. Percentage of used history index buffer.
-            History index cache is used to index values stored in history cache.
+            The statistics and availability of Zabbix write cache. The percentage of used history index buffer.
+            The history index cache is used to index values stored in the history cache.
           tags:
             - tag: component
               value: system
           triggers:
             - uuid: 92b94edb126d48af9e5e959357e2107b
-              expression: 'max(/Zabbix proxy health/zabbix[wcache,index,pused],10m)>{$ZABBIX.PROXY.UTIL.MAX}'
-              name: 'Zabbix proxy: More than {$ZABBIX.PROXY.UTIL.MAX}% used in the history index cache'
+              expression: 'max(/Zabbix proxy health/zabbix[wcache,index,pused],10m)>{$ZABBIX.PROXY.UTIL.MAX:"index cache"}'
+              name: 'Zabbix proxy: More than {$ZABBIX.PROXY.UTIL.MAX:"index cache"}% used in the history index cache'
               priority: AVERAGE
-              description: 'Consider increasing HistoryIndexCacheSize in the zabbix_proxy.conf configuration file.'
+              description: 'Consider increasing `HistoryIndexCacheSize` in the `zabbix_proxy.conf` configuration file.'
               tags:
                 - tag: scope
                   value: capacity
@@ -718,14 +722,17 @@ zabbix_export:
           key: 'zabbix[wcache,values,float]'
           history: 7d
           value_type: FLOAT
+          units: '!vps'
           description: |
-            Statistics and availability of Zabbix write cache.
-            Number of processed float values.
+            The statistics and availability of Zabbix write cache.
+            The number of processed numeric (float) values.
           preprocessing:
             - type: CHANGE_PER_SECOND
               parameters:
                 - ''
           tags:
+            - tag: component
+              value: nvps
             - tag: component
               value: system
         - uuid: 47cdd6ef01734ec1ab15b0ab43d147ca
@@ -734,14 +741,17 @@ zabbix_export:
           key: 'zabbix[wcache,values,log]'
           history: 7d
           value_type: FLOAT
+          units: '!vps'
           description: |
-            Statistics and availability of Zabbix write cache.
-            Number of processed log values.
+            The statistics and availability of Zabbix write cache.
+            The number of processed log values.
           preprocessing:
             - type: CHANGE_PER_SECOND
               parameters:
                 - ''
           tags:
+            - tag: component
+              value: nvps
             - tag: component
               value: system
         - uuid: 46574db1d70545f6af89e8607d22f5bb
@@ -750,14 +760,17 @@ zabbix_export:
           key: 'zabbix[wcache,values,not supported]'
           history: 7d
           value_type: FLOAT
+          units: '!vps'
           description: |
-            Statistics and availability of Zabbix write cache.
-            Number of times item processing resulted in item becoming unsupported or keeping that state.
+            The statistics and availability of Zabbix write cache.
+            The number of times the item processing resulted in an item becoming unsupported or keeping that state.
           preprocessing:
             - type: CHANGE_PER_SECOND
               parameters:
                 - ''
           tags:
+            - tag: component
+              value: nvps
             - tag: component
               value: system
         - uuid: 5f0c3ed0998e499aaa1e4a30726928fc
@@ -766,14 +779,17 @@ zabbix_export:
           key: 'zabbix[wcache,values,str]'
           history: 7d
           value_type: FLOAT
+          units: '!vps'
           description: |
-            Statistics and availability of Zabbix write cache.
-            Number of processed character/string values.
+            The statistics and availability of Zabbix write cache.
+            The number of processed character values.
           preprocessing:
             - type: CHANGE_PER_SECOND
               parameters:
                 - ''
           tags:
+            - tag: component
+              value: nvps
             - tag: component
               value: system
         - uuid: 1c259b08b3ff445f9b2f24a02c07c5db
@@ -782,14 +798,17 @@ zabbix_export:
           key: 'zabbix[wcache,values,text]'
           history: 7d
           value_type: FLOAT
+          units: '!vps'
           description: |
-            Statistics and availability of Zabbix write cache.
-            Number of processed text values.
+            The statistics and availability of Zabbix write cache.
+            The number of processed text values.
           preprocessing:
             - type: CHANGE_PER_SECOND
               parameters:
                 - ''
           tags:
+            - tag: component
+              value: nvps
             - tag: component
               value: system
         - uuid: 8e4b9641b173415c8608ee4863bcd547
@@ -798,14 +817,17 @@ zabbix_export:
           key: 'zabbix[wcache,values,uint]'
           history: 7d
           value_type: FLOAT
+          units: '!vps'
           description: |
-            Statistics and availability of Zabbix write cache.
-            Number of processed numeric (unsigned) values.
+            The statistics and availability of Zabbix write cache.
+            The number of processed numeric (unsigned) values.
           preprocessing:
             - type: CHANGE_PER_SECOND
               parameters:
                 - ''
           tags:
+            - tag: component
+              value: nvps
             - tag: component
               value: system
         - uuid: 5229b786efc84f01bb31f2819c47d9f4
@@ -814,14 +836,17 @@ zabbix_export:
           key: 'zabbix[wcache,values]'
           history: 7d
           value_type: FLOAT
+          units: '!vps'
           description: |
-            Statistics and availability of Zabbix write cache.
-            Total number of values processed by Zabbix server or Zabbix proxy, except unsupported items.
+            The statistics and availability of Zabbix write cache.
+            The total number of values processed by Zabbix server or Zabbix proxy, except unsupported items.
           preprocessing:
             - type: CHANGE_PER_SECOND
               parameters:
                 - ''
           tags:
+            - tag: component
+              value: nvps
             - tag: component
               value: system
       tags:
@@ -834,220 +859,540 @@ zabbix_export:
       macros:
         - macro: '{$ZABBIX.PROXY.UTIL.MAX}'
           value: '75'
-          description: 'Maximum average percentage of time processes busy in the last minute (default is 75).'
+          description: 'Default maximum threshold for percentage utilization triggers (use macro context for specification).'
         - macro: '{$ZABBIX.PROXY.UTIL.MIN}'
           value: '65'
-          description: 'Minimum average percentage of time processes busy in the last minute (default is 65).'
+          description: 'Default minimum threshold for percentage utilization triggers (use macro context for specification).'
       dashboards:
-        - uuid: c12bdb602db645a292d0cbba39d58e9f
+        - uuid: 67b5b007727e478caeeae08ad2eb87f5
           name: 'Zabbix proxy health'
+          auto_start: 'NO'
           pages:
-            - widgets:
+            - name: Performance
+              widgets:
                 - type: GRAPH_CLASSIC
-                  width: '12'
+                  name: 'Cache usage, in %'
+                  width: '24'
+                  height: '6'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Zabbix proxy health'
+                        name: 'Zabbix proxy: Cache usage, in %'
+                - type: GRAPH_CLASSIC
+                  name: 'Proxy performance'
+                  'y': '6'
+                  width: '24'
                   height: '5'
                   fields:
                     - type: GRAPH
                       name: graphid
                       value:
                         host: 'Zabbix proxy health'
-                        name: 'Zabbix proxy: Zabbix proxy performance'
+                        name: 'Zabbix proxy: Server performance'
                 - type: GRAPH_CLASSIC
-                  'y': '5'
-                  width: '12'
+                  name: 'Values processed'
+                  'y': '11'
+                  width: '24'
+                  height: '6'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Zabbix proxy health'
+                        name: 'Zabbix proxy: Values processed'
+                - type: GRAPH_CLASSIC
+                  name: 'Internal queues'
+                  'y': '17'
+                  width: '24'
                   height: '5'
                   fields:
                     - type: GRAPH
                       name: graphid
                       value:
                         host: 'Zabbix proxy health'
-                        name: 'Zabbix proxy: Zabbix internal process busy %'
+                        name: 'Zabbix proxy: Internal queues'
                 - type: GRAPH_CLASSIC
-                  x: '12'
-                  width: '12'
+                  name: 'Values to send'
+                  'y': '22'
+                  width: '24'
                   height: '5'
                   fields:
                     - type: GRAPH
                       name: graphid
                       value:
                         host: 'Zabbix proxy health'
-                        name: 'Zabbix proxy: Zabbix data gathering process busy %'
+                        name: 'Zabbix proxy: Values to send'
+            - name: Processes
+              widgets:
                 - type: GRAPH_CLASSIC
-                  x: '12'
-                  'y': '5'
-                  width: '12'
+                  name: 'Utilization: Internal processes: Core'
+                  width: '24'
+                  height: '6'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Zabbix proxy health'
+                        name: 'Zabbix proxy: Utilization: Internal processes: Core'
+                - type: GRAPH_CLASSIC
+                  name: 'Utilization: Internal processes: Housekeeping'
+                  'y': '6'
+                  width: '24'
                   height: '5'
                   fields:
                     - type: GRAPH
                       name: graphid
                       value:
                         host: 'Zabbix proxy health'
-                        name: 'Zabbix proxy: Zabbix cache usage, % used'
+                        name: 'Zabbix proxy: Utilization: Internal processes: Housekeeping'
+                - type: GRAPH_CLASSIC
+                  name: 'Utilization: Gathering processes'
+                  'y': '11'
+                  width: '24'
+                  height: '7'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Zabbix proxy health'
+                        name: 'Zabbix proxy: Utilization: Gathering processes'
+                - type: GRAPH_CLASSIC
+                  name: 'Utilization: Gathering processes: Web'
+                  'y': '18'
+                  width: '24'
+                  height: '5'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Zabbix proxy health'
+                        name: 'Zabbix proxy: Utilization: Gathering processes: Web'
+                - type: GRAPH_CLASSIC
+                  name: 'Utilization: Gathering processes: Trappers'
+                  'y': '23'
+                  width: '24'
+                  height: '5'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Zabbix proxy health'
+                        name: 'Zabbix proxy: Utilization: Gathering processes: Trappers'
+                - type: GRAPH_CLASSIC
+                  name: 'Utilization: Availability processes'
+                  'y': '28'
+                  width: '24'
+                  height: '6'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Zabbix proxy health'
+                        name: 'Zabbix proxy: Utilization: Availability processes'
+                - type: GRAPH_CLASSIC
+                  name: 'Utilization: Calculation processes'
+                  'y': '34'
+                  width: '24'
+                  height: '6'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Zabbix proxy health'
+                        name: 'Zabbix proxy: Utilization: Calculation processes'
+                - type: GRAPH_CLASSIC
+                  name: 'Utilization: Discovery processes'
+                  'y': '40'
+                  width: '24'
+                  height: '5'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Zabbix proxy health'
+                        name: 'Zabbix proxy: Utilization: Discovery processes'
+                - type: GRAPH_CLASSIC
+                  name: 'Utilization: Data exchange with server'
+                  'y': '45'
+                  width: '24'
+                  height: '6'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Zabbix proxy health'
+                        name: 'Zabbix proxy: Utilization: Data exchange with server'
+            - name: Statuses
+              widgets:
+                - type: ITEM
+                  name: 'Zabbix proxy version'
+                  width: '8'
+                  height: '3'
+                  fields:
+                    - type: INTEGER
+                      name: adv_conf
+                      value: '1'
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Zabbix proxy health'
+                        key: 'zabbix[version]'
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '3'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                    - type: INTEGER
+                      name: time_h_pos
+                      value: '2'
+                    - type: INTEGER
+                      name: time_size
+                      value: '9'
+                    - type: INTEGER
+                      name: time_v_pos
+                      value: '2'
+                    - type: INTEGER
+                      name: value_size
+                      value: '25'
+                - type: ITEM
+                  name: Uptime
+                  x: '8'
+                  width: '8'
+                  height: '3'
+                  fields:
+                    - type: INTEGER
+                      name: adv_conf
+                      value: '1'
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Zabbix proxy health'
+                        key: 'zabbix[uptime]'
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '3'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                    - type: INTEGER
+                      name: time_h_pos
+                      value: '2'
+                    - type: INTEGER
+                      name: time_size
+                      value: '9'
+                    - type: INTEGER
+                      name: time_v_pos
+                      value: '2'
+                    - type: INTEGER
+                      name: value_size
+                      value: '25'
+      valuemaps:
+        - uuid: 10388a0c06864ac483377f4ad3a91854
+          name: 'Proxy buffer mode'
+          mappings:
+            - value: '0'
+              newvalue: Disk
+            - value: '1'
+              newvalue: Memory
   graphs:
-    - uuid: 40b649050cb8420888abcae129eafe27
-      name: 'Zabbix proxy: Zabbix cache usage, % used'
+    - uuid: ceb1bf478790407e86b9309202f870c7
+      name: 'Zabbix proxy: Cache usage, in %'
       ymin_type_1: FIXED
       ymax_type_1: FIXED
       graph_items:
-        - color: DD0000
+        - drawtype: GRADIENT_LINE
+          color: 33a02c
           item:
             host: 'Zabbix proxy health'
             key: 'zabbix[rcache,buffer,pused]'
         - sortorder: '1'
-          color: 00DDDD
+          drawtype: GRADIENT_LINE
+          color: e31a1c
           item:
             host: 'Zabbix proxy health'
             key: 'zabbix[wcache,index,pused]'
         - sortorder: '2'
-          color: 3333FF
+          drawtype: GRADIENT_LINE
+          color: ff7f00
           item:
             host: 'Zabbix proxy health'
             key: 'zabbix[wcache,history,pused]'
-        - sortorder: '3'
-          color: 00FF00
-          item:
-            host: 'Zabbix proxy health'
-            key: 'zabbix[vmware,buffer,pused]'
-    - uuid: 7635642bf94249e39d420a6eba1f6649
-      name: 'Zabbix proxy: Zabbix data gathering process busy %'
+    - uuid: 417ed43f3224404eb7809dcc3bc5ac48
+      name: 'Zabbix proxy: Internal queues'
       ymin_type_1: FIXED
-      ymax_type_1: FIXED
       graph_items:
-        - color: '990099'
-          item:
-            host: 'Zabbix proxy health'
-            key: 'zabbix[process,trapper,avg,busy]'
-        - sortorder: '1'
-          color: '990000'
-          item:
-            host: 'Zabbix proxy health'
-            key: 'zabbix[process,poller,avg,busy]'
-        - sortorder: '2'
-          color: 0000EE
-          item:
-            host: 'Zabbix proxy health'
-            key: 'zabbix[process,ipmi poller,avg,busy]'
-        - sortorder: '3'
-          color: FF33FF
-          item:
-            host: 'Zabbix proxy health'
-            key: 'zabbix[process,discoverer,avg,busy]'
-        - sortorder: '4'
-          color: '007700'
-          item:
-            host: 'Zabbix proxy health'
-            key: 'zabbix[process,icmp pinger,avg,busy]'
-        - sortorder: '5'
-          color: '003300'
-          item:
-            host: 'Zabbix proxy health'
-            key: 'zabbix[process,http poller,avg,busy]'
-        - sortorder: '6'
-          color: 33FFFF
-          item:
-            host: 'Zabbix proxy health'
-            key: 'zabbix[process,unreachable poller,avg,busy]'
-        - sortorder: '7'
-          color: DD0000
-          item:
-            host: 'Zabbix proxy health'
-            key: 'zabbix[process,java poller,avg,busy]'
-        - sortorder: '8'
-          color: '000099'
-          item:
-            host: 'Zabbix proxy health'
-            key: 'zabbix[process,snmp trapper,avg,busy]'
-        - sortorder: '9'
-          color: 00FF00
-          item:
-            host: 'Zabbix proxy health'
-            key: 'zabbix[process,vmware collector,avg,busy]'
-        - sortorder: '10'
-          color: 5A2B57
-          item:
-            host: 'Zabbix proxy health'
-            key: 'zabbix[process,history poller,avg,busy]'
-        - sortorder: '11'
-          color: 9FA8DA
-          item:
-            host: 'Zabbix proxy health'
-            key: 'zabbix[process,odbc poller,avg,busy]'
-    - uuid: 60a3dcc84e494c17b656395d78d9b9e9
-      name: 'Zabbix proxy: Zabbix internal process busy %'
-      ymin_type_1: FIXED
-      ymax_type_1: FIXED
-      graph_items:
-        - color: FFAA00
-          item:
-            host: 'Zabbix proxy health'
-            key: 'zabbix[process,housekeeper,avg,busy]'
-        - sortorder: '1'
-          color: '990099'
-          item:
-            host: 'Zabbix proxy health'
-            key: 'zabbix[process,configuration syncer,avg,busy]'
-        - sortorder: '2'
-          color: EE0000
-          item:
-            host: 'Zabbix proxy health'
-            key: 'zabbix[process,history syncer,avg,busy]'
-        - sortorder: '3'
-          color: FF66FF
-          item:
-            host: 'Zabbix proxy health'
-            key: 'zabbix[process,self-monitoring,avg,busy]'
-        - sortorder: '4'
-          color: 0000EE
-          item:
-            host: 'Zabbix proxy health'
-            key: 'zabbix[process,heartbeat sender,avg,busy]'
-        - sortorder: '5'
-          color: 00EE00
-          item:
-            host: 'Zabbix proxy health'
-            key: 'zabbix[process,data sender,avg,busy]'
-        - sortorder: '6'
-          color: '009999'
-          item:
-            host: 'Zabbix proxy health'
-            key: 'zabbix[process,task manager,avg,busy]'
-        - sortorder: '7'
-          color: BBBB00
-          item:
-            host: 'Zabbix proxy health'
-            key: 'zabbix[process,ipmi manager,avg,busy]'
-        - sortorder: '8'
-          color: '990000'
-          item:
-            host: 'Zabbix proxy health'
-            key: 'zabbix[process,preprocessing manager,avg,busy]'
-        - sortorder: '9'
-          color: '008800'
-          item:
-            host: 'Zabbix proxy health'
-            key: 'zabbix[process,preprocessing worker,avg,busy]'
-        - sortorder: '10'
-          color: 2B5429
-          item:
-            host: 'Zabbix proxy health'
-            key: 'zabbix[process,availability manager,avg,busy]'
-    - uuid: 787ad6ca2967415c8a1daa4a4400c12d
-      name: 'Zabbix proxy: Zabbix internal queues'
-      graph_items:
-        - color: '008800'
+        - drawtype: GRADIENT_LINE
+          color: ffff99
           item:
             host: 'Zabbix proxy health'
             key: 'zabbix[preprocessing_queue]'
-    - uuid: d03bdc914520474084d6809312cdf097
-      name: 'Zabbix proxy: Zabbix proxy performance'
+    - uuid: 93354ef7c32a4a5a89545ffd39807c11
+      name: 'Zabbix proxy: Server performance'
+      ymin_type_1: FIXED
       graph_items:
         - drawtype: GRADIENT_LINE
-          color: 00C800
+          color: 33a02c
           item:
             host: 'Zabbix proxy health'
             key: 'zabbix[wcache,values]'
         - sortorder: '1'
-          color: C80000
+          drawtype: GRADIENT_LINE
+          color: e31a1c
           item:
             host: 'Zabbix proxy health'
             key: 'zabbix[queue]'
+    - uuid: 00ad2718542248f886d5ccad8deddee2
+      name: 'Zabbix proxy: Utilization: Availability processes'
+      ymin_type_1: FIXED
+      ymax_type_1: FIXED
+      graph_items:
+        - drawtype: GRADIENT_LINE
+          color: 6a3d9a
+          item:
+            host: 'Zabbix proxy health'
+            key: 'zabbix[process,unreachable poller,avg,busy]'
+        - sortorder: '1'
+          drawtype: GRADIENT_LINE
+          color: b15928
+          item:
+            host: 'Zabbix proxy health'
+            key: 'zabbix[process,availability manager,avg,busy]'
+        - sortorder: '2'
+          drawtype: GRADIENT_LINE
+          color: 1f78b4
+          item:
+            host: 'Zabbix proxy health'
+            key: 'zabbix[process,icmp pinger,avg,busy]'
+        - sortorder: '3'
+          drawtype: GRADIENT_LINE
+          color: b2df8a
+          item:
+            host: 'Zabbix proxy health'
+            key: 'zabbix[process,heartbeat sender,avg,busy]'
+    - uuid: 1d1a48b41a6b49e59218040360ef42da
+      name: 'Zabbix proxy: Utilization: Calculation processes'
+      ymin_type_1: FIXED
+      ymax_type_1: FIXED
+      graph_items:
+        - drawtype: GRADIENT_LINE
+          color: 17becf
+          item:
+            host: 'Zabbix proxy health'
+            key: 'zabbix[process,history poller,avg,busy]'
+        - sortorder: '1'
+          drawtype: GRADIENT_LINE
+          color: bcbd22
+          item:
+            host: 'Zabbix proxy health'
+            key: 'zabbix[process,preprocessing worker,avg,busy]'
+        - sortorder: '2'
+          drawtype: GRADIENT_LINE
+          color: d62728
+          item:
+            host: 'Zabbix proxy health'
+            key: 'zabbix[process,preprocessing manager,avg,busy]'
+    - uuid: af44cec7712542ff9506265db7ba5da5
+      name: 'Zabbix proxy: Utilization: Data exchange with server'
+      ymin_type_1: FIXED
+      ymax_type_1: FIXED
+      graph_items:
+        - drawtype: GRADIENT_LINE
+          color: cab2d6
+          item:
+            host: 'Zabbix proxy health'
+            key: 'zabbix[process,trapper,avg,busy]'
+        - sortorder: '1'
+          drawtype: GRADIENT_LINE
+          color: fdbf6f
+          item:
+            host: 'Zabbix proxy health'
+            key: 'zabbix[process,data sender,avg,busy]'
+        - sortorder: '2'
+          drawtype: GRADIENT_LINE
+          color: b2df8a
+          item:
+            host: 'Zabbix proxy health'
+            key: 'zabbix[process,heartbeat sender,avg,busy]'
+    - uuid: adc8f3fcf9b644ee95a91b59396c3e2a
+      name: 'Zabbix proxy: Utilization: Discovery processes'
+      ymin_type_1: FIXED
+      ymax_type_1: FIXED
+      graph_items:
+        - drawtype: GRADIENT_LINE
+          color: 1f78b4
+          item:
+            host: 'Zabbix proxy health'
+            key: 'zabbix[process,discoverer,avg,busy]'
+    - uuid: e075b2ee0fb546cda02c1582753bb0ab
+      name: 'Zabbix proxy: Utilization: Gathering processes'
+      ymin_type_1: FIXED
+      ymax_type_1: FIXED
+      graph_items:
+        - drawtype: GRADIENT_LINE
+          color: 1f78b4
+          item:
+            host: 'Zabbix proxy health'
+            key: 'zabbix[process,poller,avg,busy]'
+        - sortorder: '1'
+          drawtype: GRADIENT_LINE
+          color: 6a3d9a
+          item:
+            host: 'Zabbix proxy health'
+            key: 'zabbix[process,ipmi poller,avg,busy]'
+        - sortorder: '2'
+          drawtype: GRADIENT_LINE
+          color: b15928
+          item:
+            host: 'Zabbix proxy health'
+            key: 'zabbix[process,ipmi manager,avg,busy]'
+        - sortorder: '3'
+          drawtype: GRADIENT_LINE
+          color: a6cee3
+          item:
+            host: 'Zabbix proxy health'
+            key: 'zabbix[process,java poller,avg,busy]'
+        - sortorder: '4'
+          drawtype: GRADIENT_LINE
+          color: fb9a99
+          item:
+            host: 'Zabbix proxy health'
+            key: 'zabbix[process,vmware collector,avg,busy]'
+        - sortorder: '5'
+          drawtype: GRADIENT_LINE
+          color: fdbf6f
+          item:
+            host: 'Zabbix proxy health'
+            key: 'zabbix[process,odbc poller,avg,busy]'
+    - uuid: 7bc9691b46364f44b58dcd9a8e641d7c
+      name: 'Zabbix proxy: Utilization: Gathering processes: Trappers'
+      ymin_type_1: FIXED
+      ymax_type_1: FIXED
+      graph_items:
+        - drawtype: GRADIENT_LINE
+          color: cab2d6
+          item:
+            host: 'Zabbix proxy health'
+            key: 'zabbix[process,trapper,avg,busy]'
+        - sortorder: '1'
+          drawtype: GRADIENT_LINE
+          color: ffff99
+          item:
+            host: 'Zabbix proxy health'
+            key: 'zabbix[process,snmp trapper,avg,busy]'
+    - uuid: 23b31c677bb045f0ad159ca593cd2c1c
+      name: 'Zabbix proxy: Utilization: Gathering processes: Web'
+      ymin_type_1: FIXED
+      ymax_type_1: FIXED
+      graph_items:
+        - drawtype: GRADIENT_LINE
+          color: 1f78b4
+          item:
+            host: 'Zabbix proxy health'
+            key: 'zabbix[process,http poller,avg,busy]'
+    - uuid: 96fad0c7cce44fe18700fc58246400dc
+      name: 'Zabbix proxy: Utilization: Internal processes: Core'
+      ymin_type_1: FIXED
+      ymax_type_1: FIXED
+      graph_items:
+        - drawtype: GRADIENT_LINE
+          color: 1f78b4
+          item:
+            host: 'Zabbix proxy health'
+            key: 'zabbix[process,configuration syncer,avg,busy]'
+        - sortorder: '1'
+          drawtype: GRADIENT_LINE
+          color: e31a1c
+          item:
+            host: 'Zabbix proxy health'
+            key: 'zabbix[process,history syncer,avg,busy]'
+        - sortorder: '2'
+          drawtype: GRADIENT_LINE
+          color: ff7f00
+          item:
+            host: 'Zabbix proxy health'
+            key: 'zabbix[process,self-monitoring,avg,busy]'
+        - sortorder: '3'
+          drawtype: GRADIENT_LINE
+          color: b15928
+          item:
+            host: 'Zabbix proxy health'
+            key: 'zabbix[process,task manager,avg,busy]'
+        - sortorder: '4'
+          drawtype: GRADIENT_LINE
+          color: fdbf6f
+          item:
+            host: 'Zabbix proxy health'
+            key: 'zabbix[process,data sender,avg,busy]'
+    - uuid: 1e9f097c1bec484ab44a27cc3bb952f8
+      name: 'Zabbix proxy: Utilization: Internal processes: Housekeeping'
+      ymin_type_1: FIXED
+      ymax_type_1: FIXED
+      graph_items:
+        - drawtype: GRADIENT_LINE
+          color: fdbf6f
+          item:
+            host: 'Zabbix proxy health'
+            key: 'zabbix[process,housekeeper,avg,busy]'
+    - uuid: d6fe8bd399f2460aab0da6c99daa1c36
+      name: 'Zabbix proxy: Values processed'
+      ymin_type_1: FIXED
+      graph_items:
+        - drawtype: GRADIENT_LINE
+          color: 1f78b4
+          item:
+            host: 'Zabbix proxy health'
+            key: 'zabbix[wcache,values,uint]'
+        - sortorder: '1'
+          drawtype: GRADIENT_LINE
+          color: 33a02c
+          item:
+            host: 'Zabbix proxy health'
+            key: 'zabbix[wcache,values,float]'
+        - sortorder: '2'
+          drawtype: GRADIENT_LINE
+          color: e31a1c
+          item:
+            host: 'Zabbix proxy health'
+            key: 'zabbix[wcache,values,not supported]'
+        - sortorder: '3'
+          drawtype: GRADIENT_LINE
+          color: ff7f00
+          item:
+            host: 'Zabbix proxy health'
+            key: 'zabbix[wcache,values,str]'
+        - sortorder: '4'
+          drawtype: GRADIENT_LINE
+          color: 6a3d9a
+          item:
+            host: 'Zabbix proxy health'
+            key: 'zabbix[wcache,values,log]'
+        - sortorder: '5'
+          drawtype: GRADIENT_LINE
+          color: b15928
+          item:
+            host: 'Zabbix proxy health'
+            key: 'zabbix[wcache,values,text]'
+    - uuid: 53fce31268414b3c82f6bc50142bb409
+      name: 'Zabbix proxy: Values to send'
+      ymin_type_1: FIXED
+      graph_items:
+        - drawtype: GRADIENT_LINE
+          color: b15928
+          item:
+            host: 'Zabbix proxy health'
+            key: 'zabbix[proxy_history]'

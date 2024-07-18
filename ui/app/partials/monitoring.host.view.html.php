@@ -87,7 +87,7 @@ foreach ($data['hosts'] as $hostid => $host) {
 	}
 
 	if ($total_problem_count == 0) {
-		$problems_link->addItem('Problems');
+		$problems_link->addItem(_('Problems'));
 	}
 	else {
 		$problems_link->addClass(ZBX_STYLE_PROBLEM_ICON_LINK);
