@@ -299,7 +299,7 @@ class CMacroFunction {
 	 * @return string
 	 */
 	private static function macrofuncUrlencode(string $value, array $parameters): string {
-		return self::removeDefaultParameter($parameters) === [] ? urlencode($value) : UNRESOLVED_MACRO_STRING;
+		return self::removeDefaultParameter($parameters) === [] ? rawurlencode($value) : UNRESOLVED_MACRO_STRING;
 	}
 
 	/**
