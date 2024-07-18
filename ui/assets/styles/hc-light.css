@@ -3592,7 +3592,6 @@ section {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  margin: auto;
   fill: #000000; }
 .svg-pie-chart .svg-pie-chart-total-value-no-data {
   text-anchor: middle;
