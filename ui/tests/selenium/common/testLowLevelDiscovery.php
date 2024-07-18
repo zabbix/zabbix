@@ -183,31 +183,8 @@ class testLowLevelDiscovery extends CWebTest {
 			// Check buttons default values and parameters in fields in every tab.
 			switch ($tab) {
 				case 'Preprocessing':
-					$preprocessing_container = $form->getFieldContainer('Preprocessing steps');
-					$preprocessing_container->query('button:Add')->waitUntilClickable()->one()->click();
-					$this->assertTrue($preprocessing_container->query('id:preprocessing')->one()->isVisible());
-					$this->assertEquals(4, $preprocessing_container->query('button', ['Add', 'Test', 'Remove', 'Test all steps'])
-							->all()->filter(new CElementFilter(CElementFilter::CLICKABLE))->count()
-					);
-
-					$preprocessing_fields = [
-						'id:preprocessing_0_type' => ['value' => 'Regular expression', 'options' => ['Regular expression',
-								'Replace', 'XML XPath', 'JSONPath', 'CSV to JSON', 'XML to JSON', 'SNMP walk value',
-								'SNMP walk to JSON', 'SNMP get value', 'JavaScript', 'Matches regular expression',
-								'Does not match regular expression', 'Check for error in JSON', 'Check for error in XML',
-								'Discard unchanged with heartbeat', 'Prometheus to JSON'
-							]
-						],
-						'id:preprocessing_0_params_0' => ['value' => '', 'placeholder' => 'pattern', 'maxlength' => 255],
-						'id:preprocessing_0_params_1' => ['value' => '', 'placeholder' => 'output', 'maxlength' => 255],
-						'id:preprocessing_0_on_fail' => ['value' => false]
-					];
-
-					$this->checkFieldsParameters($preprocessing_fields);
-
-					foreach (array_keys($preprocessing_fields) as $key) {
-						$this->assertTrue($form->getField($key)->isEnabled());
-					}
+					// Other Preprocessing checks are performed in testFormPreprocessingLowLevelDiscovery.
+					$this->assertTrue($form->getField('Preprocessing steps')->isVisible());
 					break;
 
 				case 'LLD macros':

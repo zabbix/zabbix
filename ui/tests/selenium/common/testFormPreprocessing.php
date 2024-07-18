@@ -3150,7 +3150,7 @@ abstract class testFormPreprocessing extends CWebTest {
 	}
 
 	/**
-	 * Check placeholders and default values in preprocessing parameters.
+	 * Check layput of preprocessing tab and fields.
 	 *
 	 * @param array $data     given preprocessing steps
 	 * @param array $steps    list of steps options
@@ -3183,7 +3183,7 @@ abstract class testFormPreprocessing extends CWebTest {
 		$add_button = $this->query('id:param_add')->one();
 		$add_button->click();
 
-		// Check 1st step visibility and buttons.
+		// Check 1st step's visibility and buttons.
 		$this->assertTrue($list_step->one()->isVisible());
 		$this->assertEquals(4, $preprocessing_container->query('button', ['Add', 'Test', 'Remove', 'Test all steps'])
 				->all()->filter(new CElementFilter(CElementFilter::CLICKABLE))->count()
@@ -3194,8 +3194,8 @@ abstract class testFormPreprocessing extends CWebTest {
 				->one(false)->isVisible(!$lld)
 		);
 
+		// Hint is present only for Items and Item prototypes.
 		if (!$lld) {
-			// Check hint.
 			$form->getLabel('Preprocessing steps')->query('xpath:./button[@data-hintbox]')->one()->waitUntilClickable()->click();
 			$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->all()->last()->waitUntilReady();
 			$this->assertEquals("Preprocessing is a transformation before saving the value to the database.".
