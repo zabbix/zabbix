@@ -778,6 +778,7 @@ int	zbx_token_find(const char *expression, int pos, zbx_token_t *token, zbx_toke
 			if (SUCCEED == (ret = token_parse_var_macro(expression, ptr, token)))
 				continue;
 		}
+
 		switch (ptr[1])
 		{
 			case '$':

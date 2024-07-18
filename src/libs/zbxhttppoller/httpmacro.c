@@ -53,14 +53,14 @@ static int 	httpmacro_cmp_func(const void *d1, const void *d2)
  *                   FAIL - not found                                         *
  *                                                                            *
  ******************************************************************************/
-static int	zbx_macro_variable_search(const zbx_vector_ptr_pair_t *pmacro,
-			const char *key, const zbx_strloc_t loc)
+static int	zbx_macro_variable_search(const zbx_vector_ptr_pair_t *pmacro, const char *key, const zbx_strloc_t loc)
 {
 	for (int i = 0; i < pmacro->values_num; i++)
 	{
 		if (SUCCEED == zbx_strloc_cmp(key, &loc, pmacro->values[i].first, strlen(pmacro->values[i].first)))
 			return i;
 	}
+
 	return FAIL;
 }
 
@@ -144,12 +144,14 @@ static int	httpmacro_append_pair(zbx_httptest_t *httptest, const char *pkey, siz
 
 		if (SUCCEED == (rc = zbx_jsonobj_open(data, &obj)))
 			rc = zbx_jsonobj_query(&obj, value_str + JSONPATH_PREFIX_SIZE, (char **)&pair.second);
+
 		if (SUCCEED != rc)
 		{
 			errmsg = zbx_strdup(NULL, zbx_json_strerror());
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot parse json: %s", __func__, errmsg);
 			zbx_free(pair.second);
 		}
+
 		zbx_jsonobj_clear(&obj);
 		zbx_free(value_str);
 	}
@@ -256,7 +258,7 @@ int	http_substitute_variables(const zbx_httptest_t *httptest, char **data)
 				continue;
 			substitute = zbx_strdup(NULL, httptest->macros.values[index].second);
 			if (SUCCEED != zbx_calculate_macro_function(*data, &token.data.var_func_macro,
-							&substitute))
+					&substitute))
 			{
 				zbx_replace_string(data, token.loc.l, &token.loc.r, ZBX_MACRO_UNKNOWN);
 				ret = FAIL;
@@ -275,10 +277,11 @@ int	http_substitute_variables(const zbx_httptest_t *httptest, char **data)
 				continue;
 
 			zbx_replace_string(data, token.loc.l, &token.loc.r,
-						(char *)httptest->macros.values[index].second);
+					(char *)httptest->macros.values[index].second);
 			pos = token.loc.r;
 		}
 	}
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() data:'%s'", __func__, *data);
 
 	return ret;

@@ -61,7 +61,7 @@ static int	macrofunc_regsub(char **params, size_t nparam, char **out)
 
 	if (2 != nparam)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s invalid parameters number", __func__);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() invalid parameters number", __func__);
 		return FAIL;
 	}
 
@@ -92,7 +92,7 @@ static int	zbx_tr_rule_create(const unsigned char *param, unsigned char *dst)
 {
 	unsigned char		c, range_from = 0;
 	const unsigned char	*ptr;
-	int		i, len = 0;
+	int			i, len = 0;
 
 	/* construct string to replace */
 	for (ptr = param; '\0' != *ptr; ptr++)
@@ -140,7 +140,6 @@ static int	zbx_tr_rule_create(const unsigned char *param, unsigned char *dst)
 				/* continue allow last range char to be escaped */
 				continue;
 			}
-
 		}
 		else
 		{
@@ -159,7 +158,7 @@ static int	zbx_tr_rule_create(const unsigned char *param, unsigned char *dst)
 			if (range_from > c)
 			{
 				zabbix_log(LOG_LEVEL_DEBUG,
-					"%s range-endpoints are in reverse collating sequence order: %s",
+					"%s() range-endpoints are in reverse collating sequence order: %s",
 					__func__, param);
 				return FAIL;
 			}
@@ -169,7 +168,7 @@ static int	zbx_tr_rule_create(const unsigned char *param, unsigned char *dst)
 				dst[len++] = range_from + i;
 				if (ZBX_RULE_BUFF_LEN <= len)
 				{
-					zabbix_log(LOG_LEVEL_DEBUG, "%s too big parameter rule: %s", __func__, param);
+					zabbix_log(LOG_LEVEL_DEBUG, "%s() too big parameter rule: %s", __func__, param);
 					return FAIL;
 				}
 			}
@@ -180,7 +179,7 @@ static int	zbx_tr_rule_create(const unsigned char *param, unsigned char *dst)
 			dst[len++] = c;
 			if (ZBX_RULE_BUFF_LEN <= len)
 			{
-				zabbix_log(LOG_LEVEL_DEBUG, "%s parameter rule overflow %s", __func__, param);
+				zabbix_log(LOG_LEVEL_DEBUG, "%s() parameter rule overflow %s", __func__, param);
 				return FAIL;
 			}
 		}
@@ -204,17 +203,18 @@ static int	zbx_tr_rule_create(const unsigned char *param, unsigned char *dst)
 static int	macrofunc_tr(char **params, size_t nparam, char **out)
 {
 	unsigned char	translate[UCHAR_MAX+1], *ptr, buff_from[ZBX_RULE_BUFF_LEN], buff_to[ZBX_RULE_BUFF_LEN];
-	int	buff_from_len, buff_to_len;
-	size_t	i;
+	int		buff_from_len, buff_to_len;
+	size_t		i;
 
 	if (2 != nparam)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s invalid parameters number", __func__);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() invalid parameters number", __func__);
 		return FAIL;
 	}
 
 	if (FAIL == (buff_from_len = zbx_tr_rule_create((unsigned char*)params[0], buff_from)))
 		return FAIL;
+
 	if (FAIL == (buff_to_len = zbx_tr_rule_create((unsigned char*)params[1], buff_to)))
 		return FAIL;
 
@@ -227,9 +227,9 @@ static int	macrofunc_tr(char **params, size_t nparam, char **out)
 	for (i = 0; i < (size_t)buff_from_len; i++)
 	{
 		if (i < (size_t)buff_to_len)
-			translate[(unsigned)buff_from[i]] = buff_to[i];
+			translate[buff_from[i]] = buff_to[i];
 		else
-			translate[(unsigned)buff_from[i]] = buff_to[buff_to_len - 1];
+			translate[buff_from[i]] = buff_to[buff_to_len - 1];
 	}
 
 	/* translate */
@@ -241,6 +241,7 @@ static int	macrofunc_tr(char **params, size_t nparam, char **out)
 	}
 
 	zbx_replace_invalid_utf8(*out);
+
 	return SUCCEED;
 }
 
@@ -262,7 +263,7 @@ static int	macrofunc_btoa(char **params, size_t nparam, char **out)
 	ZBX_UNUSED(params);
 	if (0 != nparam)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s invalid parameters number", __func__);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() invalid parameters number", __func__);
 		return FAIL;
 	}
 
@@ -287,9 +288,10 @@ static int	macrofunc_btoa(char **params, size_t nparam, char **out)
 static int	macrofunc_urlencode(char **params, size_t nparam, char **out)
 {
 	ZBX_UNUSED(params);
+
 	if (0 != nparam)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s invalid parameters number", __func__);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() invalid parameters number", __func__);
 		return FAIL;
 	}
 
@@ -312,9 +314,10 @@ static int	macrofunc_urlencode(char **params, size_t nparam, char **out)
 static int	macrofunc_urldecode(char **params, size_t nparam, char **out)
 {
 	ZBX_UNUSED(params);
+
 	if (0 != nparam)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s invalid parameters number", __func__);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() invalid parameters number", __func__);
 		return FAIL;
 	}
 
@@ -337,9 +340,10 @@ static int	macrofunc_urldecode(char **params, size_t nparam, char **out)
 static int	macrofunc_lowercase(char **params, size_t nparam, char **out)
 {
 	ZBX_UNUSED(params);
+
 	if (0 != nparam)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s invalid parameters number", __func__);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() invalid parameters number", __func__);
 		return FAIL;
 	}
 
@@ -362,9 +366,10 @@ static int	macrofunc_lowercase(char **params, size_t nparam, char **out)
 static int	macrofunc_uppercase(char **params, size_t nparam, char **out)
 {
 	ZBX_UNUSED(params);
+
 	if (0 != nparam)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s invalid parameters number", __func__);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() invalid parameters number", __func__);
 		return FAIL;
 	}
 
@@ -386,14 +391,14 @@ static int	macrofunc_uppercase(char **params, size_t nparam, char **out)
  ******************************************************************************/
 static int	macrofunc_htmlencode(char **params, size_t nparam, char **out)
 {
-	zbx_htmlentity_t *pentity;
-	char	ch;
+	zbx_htmlentity_t	*pentity;
+	char			ch;
 
 	ZBX_UNUSED(params);
 
 	if (0 != nparam)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s invalid parameters number", __func__);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() invalid parameters number", __func__);
 		return FAIL;
 	}
 
@@ -410,6 +415,7 @@ static int	macrofunc_htmlencode(char **params, size_t nparam, char **out)
 			}
 		}
 	}
+
 	return SUCCEED;
 }
 
@@ -432,7 +438,7 @@ static int	macrofunc_htmldecode(char **params, size_t nparam, char **out)
 
 	if (0 != nparam)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s invalid parameters number", __func__);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() invalid parameters number", __func__);
 		return FAIL;
 	}
 
@@ -474,7 +480,7 @@ static int	macrofunc_regrepl(char **params, size_t nparam, char **out)
 
 	if (0 == nparam || 0 != nparam % 2)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s invalid parameters number", __func__);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() invalid parameters number", __func__);
 		return FAIL;
 	}
 
@@ -486,6 +492,7 @@ static int	macrofunc_regrepl(char **params, size_t nparam, char **out)
 		zbx_free(*out);
 		*out = value;
 		value = NULL;
+
 		if (FAIL == ret)
 			return FAIL;
 	}
@@ -511,7 +518,7 @@ static int	macrofunc_iregsub(char **params, size_t nparam, char **out)
 
 	if (2 != nparam)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s invalid parameters number", __func__);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() invalid parameters number", __func__);
 		return FAIL;
 	}
 
@@ -547,7 +554,7 @@ static int	macrofunc_fmttime(char **params, size_t nparam, char **out)
 
 	if (0 == nparam || 2 < nparam)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s invalid parameters number", __func__);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() invalid parameters number", __func__);
 		return FAIL;
 	}
 
