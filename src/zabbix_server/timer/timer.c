@@ -90,8 +90,6 @@ static void	db_update_host_maintenances(const zbx_vector_host_maintenance_diff_p
 	char					*sql = NULL;
 	size_t					sql_alloc = 0, sql_offset = 0;
 
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	for (int i = 0; i < updates->values_num; i++)
 	{
 		char					delim = ' ';
@@ -143,10 +141,7 @@ static void	db_update_host_maintenances(const zbx_vector_host_maintenance_diff_p
 			log_host_maintenance_update(diff);
 	}
 
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (16 < sql_offset)
-		zbx_db_execute("%s", sql);
+	(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
 
 	zbx_free(sql);
 }
@@ -453,7 +448,6 @@ static void	db_update_event_suppress_data(int *suppressed_num, int process_num, 
 
 		zbx_db_insert_prepare(&db_insert, "event_suppress", "event_suppressid", "eventid", "maintenanceid",
 				"suppress_until", (char *)NULL);
-		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		for (int i = 0; i < event_queries.values_num; i++)
 		{
@@ -562,13 +556,8 @@ static void	db_update_event_suppress_data(int *suppressed_num, int process_num, 
 
 		zbx_vector_uint64_destroy(&eventids);
 
-		zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-		if (16 < sql_offset)
-		{
-			if (ZBX_DB_OK > zbx_db_execute("%s", sql))
-				goto cleanup;
-		}
+		if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
+			goto cleanup;
 
 		zbx_db_insert_autoincrement(&db_insert, "event_suppressid");
 		zbx_db_insert_execute(&db_insert);

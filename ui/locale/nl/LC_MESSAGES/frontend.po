@@ -1657,6 +1657,10 @@ msgstr "Er moet minimaal één dag van de week of dag van de maand worden opgege
 msgid "At least one host group or host must be selected."
 msgstr "Er moet ten minste één hostgroep of host worden geselecteerd."
 
+#: include/classes/setup/CFrontendSetup.php:252
+msgid "At least one of MySQL or PostgreSQL should be supported."
+msgstr ""
+
 #: include/classes/setup/CFrontendSetup.php:241
 msgid "At least one of MySQL, PostgreSQL or Oracle should be supported."
 msgstr "Ten minste één van MySQL, PostgreSQL of Oracle moet worden ondersteund."

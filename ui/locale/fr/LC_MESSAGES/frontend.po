@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-06-08 10:31+0000\n"
+"PO-Revision-Date: 2024-07-05 19:07+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -957,7 +957,7 @@ msgstr "Ajouter un nouveau widget"
 
 #: widgets/navtree/Widget.php:34
 msgid "Add child element"
-msgstr ""
+msgstr "Ajouter un élément enfant"
 
 #: widgets/navtree/Widget.php:39
 msgid "Add child elements"
@@ -996,7 +996,7 @@ msgstr "Ajouter un déclencheur à l'hôte"
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:260
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:263
 msgid "Add item"
-msgstr ""
+msgstr "Ajouter un élément"
 
 #: app/partials/massupdate.macros.tab.php:96
 #: app/partials/massupdate.valuemaps.tab.php:38
@@ -1655,6 +1655,10 @@ msgstr "Au moins un jour de la semaine ou un jour du mois doit être spécifié.
 #: include/classes/api/services/CMaintenance.php:577
 msgid "At least one host group or host must be selected."
 msgstr "Au moins un groupe hôte ou un hôte doit être sélectionné."
+
+#: include/classes/setup/CFrontendSetup.php:252
+msgid "At least one of MySQL or PostgreSQL should be supported."
+msgstr ""
 
 #: include/classes/setup/CFrontendSetup.php:241
 msgid "At least one of MySQL, PostgreSQL or Oracle should be supported."
@@ -5431,7 +5435,7 @@ msgstr "Créer un nouveau"
 
 #: jsLoader.php:372
 msgid "Create new report"
-msgstr ""
+msgstr "Créer un nouveau rapport"
 
 #: app/views/administration.proxy.list.php:239
 msgid "Create proxy"
@@ -9559,7 +9563,7 @@ msgstr "Éléments du groupe d'hôtes"
 
 #: jsLoader.php:292
 msgid "Host group is not selected."
-msgstr ""
+msgstr "Le groupe d'hôtes n'est pas sélectionné."
 
 #: include/views/monitoring.sysmap.edit.php:168
 msgid "Host group label type"
@@ -9642,7 +9646,7 @@ msgstr "Aperçu d'inventaire d'hôtes"
 
 #: jsLoader.php:289
 msgid "Host is not selected."
-msgstr ""
+msgstr "L'hôte n'est pas sélectionné."
 
 #: include/views/monitoring.sysmap.edit.php:183
 msgid "Host label type"
@@ -12964,7 +12968,7 @@ msgstr "Type d'étiquette de l'élément de carte"
 
 #: jsLoader.php:290
 msgid "Map is not selected."
-msgstr ""
+msgstr "La carte n'est pas sélectionnée."
 
 #: sysmap.php:128
 msgid "Map is updated! Return to map list?"
@@ -20886,7 +20890,7 @@ msgstr "Le déclencheur du modèle \"%1$s\" a une dépendance au déclencheur du
 
 #: jsLoader.php:291
 msgid "Trigger is not selected."
-msgstr ""
+msgstr "Le déclencheur n’est pas sélectionné."
 
 #: include/views/monitoring.sysmap.edit.php:198
 msgid "Trigger label type"
@@ -22942,7 +22946,7 @@ msgstr "Afficher comme"
 
 #: jsLoader.php:417
 msgid "View related reports"
-msgstr ""
+msgstr "Afficher les rapports associés"
 
 #: include/classes/data/CItemData.php:1735
 msgid "Virtual space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
@@ -23155,7 +23159,7 @@ msgstr "Le widget est trop petit pour le nombre de colonnes et de lignes spécif
 
 #: jsLoader.php:205
 msgid "Widgets"
-msgstr ""
+msgstr "Widgets"
 
 #: graphs.php:39 include/views/configuration.graph.edit.php:100
 #: include/views/configuration.graph.list.php:170
@@ -25543,7 +25547,7 @@ msgstr "right() - Retourne le nombre de caractères le plus à droite"
 
 #: widgets/navtree/Widget.php:41
 msgid "root"
-msgstr ""
+msgstr "racine"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:966
 msgid "round() - Rounds a value to decimal places"

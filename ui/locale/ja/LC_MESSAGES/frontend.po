@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-06-08 07:44+0000\n"
-"Last-Translator: suuei <zab@notr.app>\n"
+"PO-Revision-Date: 2024-07-01 08:41+0000\n"
+"Last-Translator: Kodai <kodai.terashima@zabbix.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -1630,6 +1630,10 @@ msgstr "少なくとも1つの曜日または日付を指定してください�
 #: include/classes/api/services/CMaintenance.php:577
 msgid "At least one host group or host must be selected."
 msgstr "少なくとも1つのホストグループまたはホストが選択されている必要があります。"
+
+#: include/classes/setup/CFrontendSetup.php:252
+msgid "At least one of MySQL or PostgreSQL should be supported."
+msgstr ""
 
 #: include/classes/setup/CFrontendSetup.php:241
 msgid "At least one of MySQL, PostgreSQL or Oracle should be supported."
@@ -12505,7 +12509,7 @@ msgstr "ログファイル監視。ログ値を返す。"
 
 #: app/views/administration.audit.settings.edit.php:49
 msgid "Log system actions"
-msgstr ""
+msgstr "Zabbixサーバーによる設定変更を記録"
 
 #: app/views/popup.massupdate.item.php:365
 #: include/views/configuration.item.edit.php:948
@@ -20455,7 +20459,7 @@ msgstr "上"
 #: include/classes/helpers/CMenuHelper.php:144
 #: include/classes/helpers/CRoleHelper.php:424
 msgid "Top 100 triggers"
-msgstr "上位の100トリガー"
+msgstr "障害発生数上位100トリガー"
 
 #: widgets/tophosts/includes/WidgetForm.php:145
 msgid "Top N"
@@ -21480,7 +21484,7 @@ msgstr "Up"
 #: app/partials/administration.system.info.php:59
 #: app/partials/administration.system.info.php:64
 msgid "Up to date"
-msgstr ""
+msgstr "最新バージョン"
 
 #: app/controllers/CControllerAuditLogList.php:205
 #: app/partials/massupdate.macros.tab.php:126

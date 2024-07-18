@@ -110,10 +110,6 @@ class CAlert extends CApiService {
 		}
 
 		if ($db_alerts) {
-			if (self::dbDistinct($sql_parts)) {
-				$db_alerts = $this->addNclobFieldValues($options, $db_alerts);
-			}
-
 			$db_alerts = $this->addRelatedObjects($options, $db_alerts);
 			$db_alerts = $this->unsetExtraFields($db_alerts, ['alertid', 'userid', 'mediatypeid'], $options['output']);
 
@@ -346,8 +342,6 @@ class CAlert extends CApiService {
 	}
 
 	protected function applyQueryOutputOptions($table_name, $table_alias, array $options, array $sql_parts): array {
-		self::unsetNclobFieldsFromOutput($options, $sql_parts);
-
 		$sql_parts = parent::applyQueryOutputOptions($table_name, $table_alias, $options, $sql_parts);
 
 		if (!$options['countOutput']) {

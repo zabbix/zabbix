@@ -1,6 +1,9 @@
 Changes for 7.2.0alpha1
 
 New features:
+..F.I..... [ZBXNEXT-8993] improved Availability report page filter and refactored legacy code (dpetra)
+A.F.I..PS. [ZBXNEXT-9176] removed support of Oracle DB (agriscenko, sboidenko)
+........S. [ZBXNEXT-9285] added {EVENT.UPDATE.STATUS} support for Service update notifications (MVekslers)
 ..F....... [ZBXNEXT-9215] added option to specify widgets as data sources for items in Graph and Pie chart widgets (ashubin, averza)
 .........T [ZBXNEXT-8657] updated Zabbix health templates with new items and visualization (atocko)
 ........S. [ZBXNEXT-9143] added index on auditlog recordsetid (arimdjonoks)
@@ -18,6 +21,7 @@ New features:
 .......PS. [ZBXNEXT-8990] extended VMware event log with username (asestakovs)
 
 Bug fixes:
+...G....S. [ZBX-24719] fixed Zabbix agent 2 crashing when executing global script (arimdjonoks)
 .......PS. [ZBX-24514] fixed standalone Zabbix server and Zabbix proxy not stopping when database is read-only (vso)
 ........S. [ZBX-24632] fixed perf entry collection on Firefox in browser monitoring, added filtering of unserializable properties (wiper)
 ..F....... [ZBX-23936] fixed state and styling of readonly fields (ddauksa)
@@ -122,6 +126,13 @@ A......... [ZBX-24299] fixed possibility to alter readonly error fields with Hos
 .......PS. [ZBX-24540] fixed crash when expanding host interface macros on main Zabbix agent interface (wiper)
 .......PS. [ZBX-17382] improved get[oid] and walk[oid] to display UTF-8 text instead of hex if MIB files are not installed (vso)
 ........S. [ZBX-23690] optimized maintenance calculations for large number of hosts x maintenances (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 7.0.1rc2
+
+Bug fixes:
+........S. [ZBX-24852] fixed compression policy change bug (askolmeisters)
+...G....S. [ZBX-24719] fixed Zabbix agent 2 crashing when executing global script (arimdjonoks)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.1rc1
@@ -998,6 +1009,18 @@ Bug fixes:
 ...G...... [ZBX-22147] updated default buffer size to 1000 in Zabbix agent 2 (esneiders)
 .......PS. [ZBX-22587] fixed JSON validation not detecting invalid unicode characters and out-of-bounds access with JSONPath on invalid unicode character (vso)
 A.F....... [ZBX-21976] added support of OneLogin and Azure SCIM, fixed some issues with provisioning (epulke)
+
+--------------------------------------------------------------------------------
+Changes for 6.4.18rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 6.4.17
+
+6.4.17rc1 was released as 6.4.17 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 6.4.17rc1
@@ -2881,6 +2904,18 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 ..F.I..... [ZBXNEXT-7397] removed support for MD5 user passwords (asestakovs, mkrisjanis)
 ........S. [ZBXNEXT-7488] removed zabbix[history*] and zabbix[trends*] internal items (akozlovs)
 ..F....... [ZBXNEXT-7138] added modal form for API tokens in User settings->API tokens and Administration->General->API tokens (epulke)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.33rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 6.0.32
+
+6.0.32rc1 was released as 6.0.32 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 6.0.32rc1
