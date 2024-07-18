@@ -377,46 +377,6 @@ int	zbx_tsdb_get_version(void)
 	return zbx_dbconn_tsdb_get_version(dbconn);
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: sets TimescaleDB (TSDB) compression availability                  *
- *                                                                            *
- * Parameters:  compression_availabile - [IN] compression availability        *
- *              0 (OFF): compression is not available                         *
- *              1 (ON): compression is available                              *
- *                                                                            *
- ******************************************************************************/
-void	zbx_tsdb_set_compression_availability(int compression_availabile)
-{
-	if (NULL == dbconn)
-	{
-		THIS_SHOULD_NEVER_HAPPEN;
-		return;
-	}
-
-	zbx_dbconn_tsdb_set_compression_availability(dbconn, compression_availabile);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: retrieves TimescaleDB (TSDB) compression availability             *
- *                                                                            *
- * Return value: compression availability as as integer                       *
- *               0 (OFF): compression is not available                        *
- *               1 (ON): compression is available                             *
- *                                                                            *
- ******************************************************************************/
-int	zbx_tsdb_get_compression_availability(void)
-{
-	if (NULL == dbconn)
-	{
-		THIS_SHOULD_NEVER_HAPPEN;
-		return 0;
-	}
-
-	return zbx_dbconn_tsdb_get_compression_availability(dbconn);
-}
-
 #endif
 
 /******************************************************************************

@@ -56,14 +56,9 @@ struct zbx_dbconn
 #if defined(HAVE_MYSQL)
 	MYSQL			*conn;
 	int			error_count;
-	zbx_uint32_t		ZBX_MYSQL_SVERSION;
-	int			ZBX_MARIADB_SFORK;
 	int			txn_begin;		/* transaction begin statement is executed */
 #elif defined(HAVE_POSTGRESQL)
 	PGconn			*conn;
-	int			ZBX_TSDB_VERSION;
-	zbx_uint32_t		ZBX_PG_SVERSION;
-	int 			ZBX_TIMESCALE_COMPRESSION_AVAILABLE;
 	int			ZBX_PG_READ_ONLY_RECOVERABLE;
 #elif defined(HAVE_SQLITE3)
 	sqlite3			*conn;
@@ -78,7 +73,7 @@ char	*db_dyn_escape_string(const char *src, size_t max_bytes, size_t max_chars, 
 char	*db_dyn_escape_field_len(const zbx_db_field_t *field, const char *src, zbx_escape_sequence_t flag);
 int	db_is_escape_sequence(char c);
 
-
+zbx_uint32_t	db_get_server_version(void);
 
 #endif
 

@@ -630,9 +630,10 @@ static int	dbconn_open(zbx_dbconn_t *db)
 
 	if (NULL != (row = zbx_db_fetch(result)))
 		ZBX_PG_ESCAPE_BACKSLASH = (0 == strcmp(row[0], "off"));
+
 	zbx_db_free_result(result);
 
-	if (90000 <= db->ZBX_PG_SVERSION)
+	if (90000 <= db_get_server_version())
 	{
 		/* change the output format for values of type bytea from hex (the default) to escape */
 		if (0 < (ret = dbconn_execute(db, "set bytea_output=escape")))
@@ -1249,13 +1250,7 @@ zbx_dbconn_t	*zbx_dbconn_create(void)
 
 	db->connect_options = ZBX_DB_CONNECT_NORMAL;
 
-#if defined(HAVE_MYSQL)
-	db->ZBX_MYSQL_SVERSION = ZBX_DBVERSION_UNDEFINED;
-	db->ZBX_MARIADB_SFORK = OFF;
-#elif defined(HAVE_POSTGRESQL)
-	db->ZBX_TSDB_VERSION = -1;
-	db->ZBX_PG_SVERSION = ZBX_DBVERSION_UNDEFINED;
-	db->ZBX_TIMESCALE_COMPRESSION_AVAILABLE = OFF;
+#if defined(HAVE_POSTGRESQL)
 	db->ZBX_PG_READ_ONLY_RECOVERABLE = db_config->read_only_recoverable;
 #elif defined(HAVE_SQLITE3)
 	db->sqlite_access = &db_sqlite_access;

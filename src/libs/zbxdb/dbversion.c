@@ -22,6 +22,31 @@
 #	include "zbxstr.h"
 #endif
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: For PostgreSQL, MySQL and MariaDB:                                *
+ *          stoires DBMS version as integer: MMmmuu                           *
+ *          M = major version part                                            *
+ *          m = minor version part                                            *
+ *          u = patch version part                                            *
+ *                                                                            *
+ * Example: if the original DB version was 1.2.34 then 10234 is set           *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_uint32_t	ZBX_DB_SVERSION = ZBX_DBVERSION_UNDEFINED;
+
+zbx_uint32_t	db_get_server_version(void)
+{
+	return ZBX_DB_SVERSION;
+}
+
+#if defined(HAVE_POSTGRESQL)
+static int 	ZBX_TIMESCALE_COMPRESSION_AVAILABLE = OFF;
+static int	ZBX_TSDB_VERSION = -1;
+#elif defined (HAVE_MYSQL)
+static int	ZBX_MARIADB_SFORK = OFF;
+#endif
+
 /*********************************************************************************
  *                                                                               *
  * Purpose: determine if a vendor database(MySQL, MariaDB, PostgreSQL,           *
@@ -139,43 +164,6 @@ void	zbx_db_version_json_create(struct zbx_json *json, struct zbx_db_version_inf
 	}
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: For PostgreSQL, MySQL and MariaDB:                                *
- *          returns DBMS version as integer: MMmmuu                           *
- *          M = major version part                                            *
- *          m = minor version part                                            *
- *          u = patch version part                                            *
- *                                                                            *
- * Example: if the original DB version was 1.2.34 then 10234 gets returned    *
- *                                                                            *
- * Purpose: For OracleDB:                                                     *
- *          returns DBMS version as integer: MRruRRivUU                       *
- *          MR = major release version part                                   *
- *          ru = release update version part                                  *
- *          RR = release update version revision part                         *
- *          iv = increment version part                                       *
- *          UU = unused, reserved for future use                              *
- *                                                                            *
- * Example: if the OracleDB version was 18.1.0.0.7 then 1801000007 gets       *
- *          returned                                                          *
- *                                                                            *
- * Return value: DBMS version or DBVERSION_UNDEFINED if unknown               *
- *                                                                            *
- ******************************************************************************/
-static zbx_uint32_t	dbconn_version_get(zbx_dbconn_t *db)
-{
-#if defined(HAVE_MYSQL)
-	return db->ZBX_MYSQL_SVERSION;
-#elif defined(HAVE_POSTGRESQL)
-	return db->ZBX_PG_SVERSION;
-#elif defined(HAVE_ORACLE)
-	return db->ZBX_ORACLE_SVERSION;
-#else
-	ZBX_UNUSED(db);
-	return ZBX_DBVERSION_UNDEFINED;
-#endif
-}
 
 /***************************************************************************************************************
  *                                                                                                             *
@@ -203,26 +191,26 @@ void	zbx_dbconn_extract_version_info(zbx_dbconn_t *db, struct zbx_db_version_inf
 	if (NULL != (info = mysql_get_server_info(db->conn)) && NULL != strstr(info, "MariaDB"))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "MariaDB fork detected");
-		db->ZBX_MARIADB_SFORK = ON;
+		ZBX_MARIADB_SFORK = ON;
 	}
 
-	if (ON == db->ZBX_MARIADB_SFORK && 6 == sscanf(info, "%d.%d.%d-%d.%d.%d-MariaDB", &client_major_version,
+	if (ON == ZBX_MARIADB_SFORK && 6 == sscanf(info, "%d.%d.%d-%d.%d.%d-MariaDB", &client_major_version,
 			&client_minor_version, &client_release_version, &server_major_version,
 			&server_minor_version, &server_release_version))
 	{
-		db->ZBX_MYSQL_SVERSION = (zbx_uint32_t)(server_major_version * 10000 + server_minor_version * 100 +
+		ZBX_DB_SVERSION = (zbx_uint32_t)(server_major_version * 10000 + server_minor_version * 100 +
 				server_release_version);
 		zabbix_log(LOG_LEVEL_DEBUG, "MariaDB subversion detected");
 	}
 	else
-		db->ZBX_MYSQL_SVERSION = (zbx_uint32_t)mysql_get_server_version(db->conn);
+		ZBX_DB_SVERSION = (zbx_uint32_t)mysql_get_server_version(db->conn);
 
-	version_info->current_version = db->ZBX_MYSQL_SVERSION;
+	version_info->current_version = ZBX_DB_SVERSION;
 	version_info->friendly_current_version = zbx_dsprintf(NULL, "%d.%.2d.%.2d",
-			RIGHT2(db->ZBX_MYSQL_SVERSION/10000), RIGHT2(db->ZBX_MYSQL_SVERSION/100),
-			RIGHT2(db->ZBX_MYSQL_SVERSION));
+			RIGHT2(ZBX_DB_SVERSION/10000), RIGHT2(ZBX_DB_SVERSION/100),
+			RIGHT2(ZBX_DB_SVERSION));
 
-	if (ON == db->ZBX_MARIADB_SFORK)
+	if (ZBX_MARIADB_SFORK)
 	{
 		version_info->database = "MariaDB";
 
@@ -254,13 +242,13 @@ void	zbx_dbconn_extract_version_info(zbx_dbconn_t *db, struct zbx_db_version_inf
 	zbx_uint32_t major;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-	db->ZBX_PG_SVERSION = (zbx_uint32_t)PQserverVersion(db->conn);
+	ZBX_DB_SVERSION = (zbx_uint32_t)PQserverVersion(db->conn);
 
-	major = db->ZBX_PG_SVERSION/10000;
+	major = ZBX_DB_SVERSION/10000;
 
 	version_info->database = "PostgreSQL";
 
-	version_info->current_version = db->ZBX_PG_SVERSION;
+	version_info->current_version = ZBX_DB_SVERSION;
 	version_info->min_version = ZBX_POSTGRESQL_MIN_VERSION;
 	version_info->max_version = ZBX_POSTGRESQL_MAX_VERSION;
 	version_info->min_supported_version = ZBX_POSTGRESQL_MIN_SUPPORTED_VERSION;
@@ -268,12 +256,12 @@ void	zbx_dbconn_extract_version_info(zbx_dbconn_t *db, struct zbx_db_version_inf
 	if (10 > major)
 	{
 		version_info->friendly_current_version = zbx_dsprintf(NULL, "%" PRIu32 ".%d.%d", major,
-				RIGHT2(db->ZBX_PG_SVERSION/100), RIGHT2(db->ZBX_PG_SVERSION));
+				RIGHT2(ZBX_DB_SVERSION/100), RIGHT2(ZBX_DB_SVERSION));
 	}
 	else
 	{
 		version_info->friendly_current_version = zbx_dsprintf(NULL, "%" PRIu32 ".%d", major,
-				RIGHT2(db->ZBX_PG_SVERSION));
+				RIGHT2(ZBX_DB_SVERSION));
 	}
 
 	version_info->friendly_min_version = ZBX_POSTGRESQL_MIN_VERSION_STR;
@@ -288,7 +276,7 @@ void	zbx_dbconn_extract_version_info(zbx_dbconn_t *db, struct zbx_db_version_inf
 	version_info->flag = DB_VERSION_SUPPORTED;
 	version_info->friendly_current_version = NULL;
 #endif
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() version:%lu", __func__, (unsigned long)dbconn_version_get(db));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() version:%lu", __func__, (unsigned long)ZBX_DB_SVERSION);
 }
 
 #ifdef HAVE_POSTGRESQL
@@ -383,12 +371,12 @@ int	zbx_dbconn_tsdb_get_version(zbx_dbconn_t *db)
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
 
-	if (-1 == db->ZBX_TSDB_VERSION)
+	if (-1 == ZBX_TSDB_VERSION)
 	{
 		/* catalog pg_extension not available */
-		if (90001 > db->ZBX_PG_SVERSION)
+		if (90001 > ZBX_DB_SVERSION)
 		{
-			ver = db->ZBX_TSDB_VERSION = 0;
+			ver = ZBX_TSDB_VERSION = 0;
 			goto out;
 		}
 
@@ -404,7 +392,7 @@ int	zbx_dbconn_tsdb_get_version(zbx_dbconn_t *db)
 		/* extension is not installed */
 		if (NULL == result)
 		{
-			ver = db->ZBX_TSDB_VERSION = 0;
+			ver = ZBX_TSDB_VERSION = 0;
 			goto out;
 		}
 
@@ -414,15 +402,15 @@ int	zbx_dbconn_tsdb_get_version(zbx_dbconn_t *db)
 			ver = major * 10000;
 			ver += minor * 100;
 			ver += patch;
-			db->ZBX_TSDB_VERSION = ver;
+			ZBX_TSDB_VERSION = ver;
 		}
 		else
-			ver = db->ZBX_TSDB_VERSION = 0;
+			ver = ZBX_TSDB_VERSION = 0;
 
 		zbx_db_free_result(result);
 	}
 	else
-		ver = db->ZBX_TSDB_VERSION;
+		ver = ZBX_TSDB_VERSION;
 out:
 	return ver;
 }
@@ -436,9 +424,9 @@ out:
  *              1 (ON): compression is available                              *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dbconn_tsdb_set_compression_availability(zbx_dbconn_t *db, int compression_availabile)
+void	zbx_tsdb_set_compression_availability(int compression_availabile)
 {
-	db->ZBX_TIMESCALE_COMPRESSION_AVAILABLE = compression_availabile;
+	ZBX_TIMESCALE_COMPRESSION_AVAILABLE = compression_availabile;
 }
 
 /******************************************************************************
@@ -450,9 +438,9 @@ void	zbx_dbconn_tsdb_set_compression_availability(zbx_dbconn_t *db, int compress
  *               1 (ON): compression is available                             *
  *                                                                            *
  ******************************************************************************/
-int	zbx_dbconn_tsdb_get_compression_availability(zbx_dbconn_t *db)
+int	zbx_tsdb_get_compression_availability(void)
 {
-	return db->ZBX_TIMESCALE_COMPRESSION_AVAILABLE;
+	return ZBX_TIMESCALE_COMPRESSION_AVAILABLE;
 }
 
 #endif
