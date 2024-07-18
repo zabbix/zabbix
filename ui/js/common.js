@@ -548,6 +548,11 @@ function closeDialogHandler(event) {
 				case 'color_picker':
 					jQuery.colorpicker('hide');
 					break;
+
+				// Close map/shape overlay.
+				case 'map-window':
+					jQuery('#map-window .btn-overlay-close').trigger('click');
+					break;
 			}
 		}
 	}
@@ -798,11 +803,11 @@ function redirect(uri, method, needle, invert_needle, allow_empty) {
 			if ((is_needle && !invert_needle) || (!is_needle && invert_needle)) {
 				if (Array.isArray(args[key])) {
 					for (var i = 0, l = args[key].length; i < l; i++) {
-						action += '&' + key + '[]=' + args[key][i];
+						action += '&' + key + '[]=' + encodeURIComponent(args[key][i]);
 					}
 				}
 				else {
-					action += '&' + key + '=' + args[key];
+					action += '&' + key + '=' + encodeURIComponent(args[key]);
 				}
 
 				continue;

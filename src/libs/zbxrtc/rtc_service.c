@@ -549,18 +549,20 @@ static void	rtc_process(zbx_rtc_t *rtc, zbx_ipc_client_t *client, zbx_uint32_t c
 	if (NULL == cb_proc_req || FAIL == cb_proc_req(rtc, code, data, &result_ex))
 		rtc_process_request(rtc, code, data, &result);
 
-	if (NULL != result_ex)
-		result = zbx_strdcat(result, result_ex);
-
-	if (NULL == result)
+	if (ZBX_RTC_NOTIFY != code)
 	{
-		/* generate default success message if no specific success or error messages were returned */
-		result = zbx_strdup(NULL, "Runtime control command was forwarded successfully\n");
-	}
+		if (NULL != result_ex)
+			result = zbx_strdcat(result, result_ex);
 
-	size = (zbx_uint32_t)strlen(result) + 1;
-	zbx_ipc_client_send(client, code, (unsigned char *)result, size);
-	zbx_free(result);
+		if (NULL == result)
+		{
+			/* generate default success message if no specific success or error messages were returned */
+			result = zbx_strdup(NULL, "Runtime control command was forwarded successfully\n");
+		}
+
+		size = (zbx_uint32_t)strlen(result) + 1;
+		zbx_ipc_client_send(client, code, (unsigned char *)result, size);
+	}
 
 	zbx_free(result_ex);
 	zbx_free(result);
@@ -647,7 +649,7 @@ int	zbx_rtc_wait_for_sync_finish(zbx_rtc_t *rtc, zbx_rtc_process_request_ex_func
 					if (ZBX_IPC_RTC_MAX >= message->code)
 					{
 						const char *rtc_error = "Cannot perform specified runtime control"
-								" command during initial configuration cache sync\n";
+								" command during startup\n";
 						zbx_ipc_client_send(client, message->code,
 								(const unsigned char *)rtc_error,
 								(zbx_uint32_t)strlen(rtc_error) + 1);

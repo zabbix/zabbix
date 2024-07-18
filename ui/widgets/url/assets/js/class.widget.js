@@ -15,6 +15,40 @@
 
 class CWidgetUrl extends CWidget {
 
+	onStart() {
+		this._events = {
+			...this._events,
+
+			mousedown: () => {
+				if (this._is_edit_mode) {
+					const iframe = this._contents.querySelector('iframe');
+
+					if (iframe !== null) {
+						iframe.style.pointerEvents = 'none';
+
+						addEventListener('mouseup', this._events.mouseup, {once: true});
+					}
+				}
+			},
+
+			mouseup: () => {
+				const iframe = this._contents.querySelector('iframe');
+
+				if (iframe !== null) {
+					iframe.style.pointerEvents = '';
+				}
+			}
+		}
+	}
+
+	onActivate() {
+		this._target.addEventListener('mousedown', this._events.mousedown);
+	}
+
+	onDeactivate() {
+		this._target.removeEventListener('mousedown', this._events.mousedown);
+	}
+
 	promiseReady() {
 		const readiness = [super.promiseReady()];
 

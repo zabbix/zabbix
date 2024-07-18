@@ -722,14 +722,18 @@ abstract class CItemGeneral extends CApiService {
 				if ($chunks[$last]['size'] < self::INHERIT_CHUNK_SIZE) {
 					$_hosts = array_slice($hosts, 0, self::INHERIT_CHUNK_SIZE - $chunks[$last]['size'], true);
 
-					$can_add_hosts = true;
+					$can_add_hosts = !array_intersect_key($chunks[$last]['hosts'],
+						array_diff_key($tpl_links[$item['hostid']], $_hosts)
+					);
 
-					foreach ($chunks[$last]['item_indexes'] as $_i) {
-						$new_hosts = array_diff_key($_hosts, $chunks[$last]['hosts']);
+					if ($can_add_hosts) {
+						foreach ($chunks[$last]['item_indexes'] as $_i) {
+							$new_hosts = array_diff_key($_hosts, $chunks[$last]['hosts']);
 
-						if (array_intersect_key($tpl_links[$items[$_i]['hostid']], $new_hosts)) {
-							$can_add_hosts = false;
-							break;
+							if (array_intersect_key($tpl_links[$items[$_i]['hostid']], $new_hosts)) {
+								$can_add_hosts = false;
+								break;
+							}
 						}
 					}
 

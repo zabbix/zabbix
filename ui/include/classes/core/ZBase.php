@@ -211,15 +211,17 @@ class ZBase {
 
 				$router->setAction($action_name);
 
-				$this->component_registry->get('menu.main')
-					->setSelectedByAction($action_name, $_REQUEST,
-						CViewHelper::loadSidebarMode() != ZBX_SIDEBAR_VIEW_MODE_COMPACT
-					);
+				if (CWebUser::isLoggedIn()) {
+					$this->component_registry->get('menu.main')
+						->setSelectedByAction($action_name, $_REQUEST,
+							CViewHelper::loadSidebarMode() != ZBX_SIDEBAR_VIEW_MODE_COMPACT
+						);
 
-				$this->component_registry->get('menu.user')
-					->setSelectedByAction($action_name, $_REQUEST,
-						CViewHelper::loadSidebarMode() != ZBX_SIDEBAR_VIEW_MODE_COMPACT
-					);
+					$this->component_registry->get('menu.user')
+						->setSelectedByAction($action_name, $_REQUEST,
+							CViewHelper::loadSidebarMode() != ZBX_SIDEBAR_VIEW_MODE_COMPACT
+						);
+				}
 
 				CProfiler::getInstance()->start();
 
@@ -872,8 +874,11 @@ class ZBase {
 	 */
 	private function initComponents(): void {
 		$this->component_registry->register('router', new CRouter());
-		$this->component_registry->register('menu.main', CMenuHelper::getMainMenu());
-		$this->component_registry->register('menu.user', CMenuHelper::getUserMenu());
+
+		if (CWebUser::isLoggedIn()) {
+			$this->component_registry->register('menu.main', CMenuHelper::getMainMenu());
+			$this->component_registry->register('menu.user', CMenuHelper::getUserMenu());
+		}
 	}
 
 	/**
