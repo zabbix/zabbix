@@ -7,8 +7,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 5.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-04-01 16:26+0300\n"
-"PO-Revision-Date: 2023-03-27 00:50+0000\n"
-"Last-Translator: 璞玉 <puyu@bbqi.cc>\n"
+"PO-Revision-Date: 2024-06-27 02:38+0000\n"
+"Last-Translator: NoYoWiFi <1284524409@qq.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
@@ -24,7 +24,7 @@ msgstr ""
 #: include/classes/db/PostgresqlDbBackend.php:96
 #, c-format
 msgid "\"%1$s\" instead \"%2$s\""
-msgstr "\"%1$s\" 替代 \"%2$s\""
+msgstr "\"%1$s\" 替换 \"%2$s\""
 
 #: include/classes/import/validators/C10XmlValidator.php:346
 #: include/classes/import/validators/C10XmlValidator.php:363
@@ -38,7 +38,7 @@ msgstr "\"%1$s\" 替代 \"%2$s\""
 #: include/classes/import/validators/C50XmlValidator.php:1891
 #, c-format
 msgid "\"%1$s\" is expected"
-msgstr "\"%1$s\" 预计"
+msgstr "预期\"%1$s\" "
 
 #: include/classes/api/services/CMaintenance.php:352
 #: include/classes/api/services/CMaintenance.php:359
@@ -60,19 +60,19 @@ msgstr "\"%1$s\" 的值必须小于或等于 \"%2$s\" 的值"
 #: include/classes/import/validators/C10XmlValidator.php:403
 #: include/classes/import/validators/C10XmlValidator.php:424
 msgid "\"host:key\" pair is expected"
-msgstr "“主机：key值” 关键的预计"
+msgstr "需要“主机:键值” 对形式"
 
 #: include/forms.inc.php:1297
 #: include/views/configuration.host.discovery.edit.php:704
 #: include/views/js/configuration.host.discovery.edit.js.php:91
 #: include/views/js/item.preprocessing.js.php:148
 msgid "$.path.to.node"
-msgstr "$.path.to.node"
+msgstr "$.节点.路径"
 
 #: include/classes/api/services/CDRule.php:549
 #, c-format
 msgid "%1$d characters exceeds maximum length of %2$d characters"
-msgstr "%1$d 个字符超出了 %2$d 个字符的最大长度"
+msgstr "%1$d 个字符超出最大长度 %2$d 个字符"
 
 #: include/func.inc.php:493
 #, c-format
@@ -84,24 +84,24 @@ msgstr[0] "%1$d 天"
 #, c-format
 msgctxt "screen reader"
 msgid "%1$d matches for %2$s found"
-msgstr "%1$d 匹配找到的 %2$s"
+msgstr "找到%1$d个可匹配%2$s"
 
 #: app/controllers/CControllerWidgetProblemsView.php:57
 #: include/classes/screens/CScreenHostTriggers.php:211
 #, c-format
 msgid "%1$d of %3$d%2$s problem is shown"
 msgid_plural "%1$d of %3$d%2$s problems are shown"
-msgstr[0] "%1$d of %3$d%2$s 问题显示"
+msgstr[0] "问题显示 %1$d / %3$d%2$s"
 
 #: app/controllers/CControllerPopupAcknowledgeEdit.php:115
 #, c-format
 msgid "%1$d problems selected."
-msgstr "%1$d 个问题被选择。"
+msgstr "选中%1$d 个问题。"
 
 #: chart4.php:94 chart5.php:89
 #, c-format
 msgid "%1$s (year %2$s)"
-msgstr "%1$s (年 %2$s)"
+msgstr "%1$s (%2$s 年)"
 
 #: include/classes/core/CModuleManager.php:228
 #, c-format
@@ -118,7 +118,7 @@ msgstr[0] "%1$s 监控项"
 #: include/classes/import/readers/CXmlImportReader.php:46
 #, c-format
 msgid "%1$s [Line: %2$s | Column: %3$s]"
-msgstr "%1$s [线: %2$s | 列: %3$s]"
+msgstr "%1$s [行: %2$s | 列: %3$s]"
 
 #: include/actions.inc.php:1920
 #, c-format
@@ -130,12 +130,12 @@ msgstr[0] "%1$s 动作"
 #: jsLoader.php:239
 #, c-format
 msgid "%1$s characters"
-msgstr "%1$s 个字符"
+msgstr "%1$s 字符"
 
 #: jsLoader.php:240
 #, c-format
 msgid "%1$s characters remaining"
-msgstr "剩余%1$s 个字符"
+msgstr "剩余%1$s 字符"
 
 #: app/views/popup.acknowledge.edit.php:59
 #: app/views/popup.acknowledge.edit.php:64
@@ -148,14 +148,14 @@ msgstr[0] "%1$s 事件"
 #, c-format
 msgid "%1$s host in maintenance"
 msgid_plural "%1$s hosts in maintenance"
-msgstr[0] "%1$s 主机在维护中"
+msgstr[0] "%1$s 主机维护中"
 
 #: app/controllers/CControllerWidgetPlainTextView.php:119
 #: include/views/monitoring.history.php:32
 #, c-format
 msgid "%1$s item"
 msgid_plural "%1$s items"
-msgstr[0] "%1$s 项目"
+msgstr[0] "%1$s 监控项"
 
 #: include/actions.inc.php:1756
 #, c-format
@@ -178,7 +178,7 @@ msgstr[0] "%1$s 分"
 #, c-format
 msgid "%1$s of %2$s element in problem state"
 msgid_plural "%1$s of %2$s elements in problem state"
-msgstr[0] "处于问题状态的 %2$s 元素的 %1$s"
+msgstr[0] "%2$s 中的 %1$s 处于问题状态"
 
 #: jsLoader.php:259
 #, c-format
@@ -197,7 +197,7 @@ msgstr[0] "问题发生在 %1$s"
 #, c-format
 msgid "%1$s problem in total"
 msgid_plural "%1$s problems in total"
-msgstr[0] "异常问题总计 %1$s"
+msgstr[0] "问题总计 %1$s"
 
 #: app/views/monitoring.widget.actionlog.view.php:45
 #: include/actions.inc.php:2198 include/classes/screens/CScreenActions.php:129
@@ -221,7 +221,7 @@ msgstr[0] "%1$s 秒"
 #, c-format
 msgid "%1$s unacknowledged problem"
 msgid_plural "%1$s unacknowledged problems"
-msgstr[0] "%1$s 未知的问题"
+msgstr[0] "%1$s 未确认问题"
 
 #: app/views/monitoring.widget.problems.view.php:272
 #, c-format
@@ -246,21 +246,19 @@ msgstr "%1$s, 只读"
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s, selected"
-msgstr "%1$s, 选择"
+msgstr "%1$s, 已选择"
 
 #: include/func.inc.php:1898
 #, c-format
 msgid "%4$s failed login attempt logged. Last failed attempt was from %1$s on %2$s at %3$s."
 msgid_plural "%4$s failed login attempts logged. Last failed attempt was from %1$s on %2$s at %3$s."
-msgstr[0] ""
-"发生了 %4$s 次失败的登陆尝试。最后一次失败的登陆尝试发生在 %2$s 日 %3$s 客户端IP地址是 %1$s 。\n"
-" 连续发生了 %4$s 次失败的登陆尝试。最后一次失败的登陆尝试发生在 %2$s 日 %3$s 客户端IP地址是 %1$s 。"
+msgstr[0] "发生了 %4$s 次失败的登陆尝试。最后一次失败的登陆尝试发生在 %2$s 日 %3$s 客户端IP地址是 %1$s。"
 
 #: include/classes/screens/CScreenDiscovery.php:213
 #, c-format
 msgid "%d device"
 msgid_plural "%d devices"
-msgstr[0] "%d个设备"
+msgstr[0] "%d 台设备"
 
 #: include/users.inc.php:158
 #, c-format
@@ -274,18 +272,18 @@ msgstr "(0 - 无穷大)"
 
 #: app/partials/popup.operations.php:65
 msgid "(0 - use action default)"
-msgstr "(0 - 使用默认)"
+msgstr "(0 - 使用默认动作)"
 
 #: include/views/configuration.hostgroups.list.php:34
 msgid "(Only super admins can create groups)"
-msgstr "(只有超级管理员能创建群组)"
+msgstr "(仅超级管理员能创建群组)"
 
 #: app/views/popup.itemtestedit.view.php:111
 #: include/views/configuration.host.edit.php:203
 #: include/views/configuration.host.massupdate.php:98
 #: include/views/configuration.host.prototype.edit.php:114
 msgid "(no proxy)"
-msgstr "(无agent代理程序)"
+msgstr "(无Proxy)"
 
 #: include/classes/setup/CSetupWizard.php:248
 msgid "0 - use default port"
@@ -317,7 +315,7 @@ msgstr "3D 视图"
 
 #: queue.php:115 queue.php:170
 msgid "5 minutes"
-msgstr "5分"
+msgstr "5分钟"
 
 #: queue.php:111 queue.php:166
 msgid "5 seconds"
@@ -344,7 +342,7 @@ msgstr "<手册>"
 #: include/views/js/item.preprocessing.js.php:195
 #: include/views/js/item.preprocessing.js.php:204
 msgid "<metric name>{<label name>=\"<label value>\", ...} == <value>"
-msgstr "<指标名称>{<标签名称>=\"<标签名称>\",...} == <值>"
+msgstr "<指标名称>{<标签名称>=\"<标签值>\", ...} == <值>"
 
 #: app/views/administration.script.edit.php:44
 msgid "<sub-menu/sub-menu/...>script"
@@ -496,7 +494,7 @@ msgstr "动作已添加"
 #: include/classes/core/ZBase.php:433
 #, c-format
 msgid "Action class %1$s must extend %2$s class."
-msgstr "动作类 %1$s 必须扩展 %2$s 类。"
+msgstr "动作分组 %1$s 必须扩展 %2$s 分组。"
 
 #: actionconf.php:202
 msgid "Action deleted"
@@ -505,12 +503,12 @@ msgstr "动作已删除"
 #: actionconf.php:381
 msgid "Action disabled"
 msgid_plural "Actions disabled"
-msgstr[0] "激活 禁用激活 禁用"
+msgstr[0] "动作已禁用"
 
 #: actionconf.php:380
 msgid "Action enabled"
 msgid_plural "Actions enabled"
-msgstr[0] "激活 启用激活 启用"
+msgstr[0] "动作已启用"
 
 #: auditacts.php:27 include/classes/screens/CScreenActions.php:168
 #: include/classes/widgets/CWidgetConfig.php:33 include/menu.inc.php:139
@@ -551,7 +549,7 @@ msgstr "主动式"
 #: include/views/configuration.maintenance.list.php:101
 msgctxt "maintenance status"
 msgid "Active"
-msgstr "启用中"
+msgstr "主动式"
 
 #: include/views/configuration.maintenance.edit.php:58
 #: include/views/configuration.maintenance.list.php:84 maintenance.php:44
@@ -715,11 +713,11 @@ msgstr "添加"
 
 #: app/views/js/administration.mediatype.edit.js.php:133
 msgid "Add (message type limit reached)"
-msgstr "添加（已达消息类型限制）"
+msgstr "添加 (已达消息类型限制)"
 
 #: jsLoader.php:128
 msgid "Add a new widget"
-msgstr "添加新构件"
+msgstr "添加新小组件"
 
 #: include/services.inc.php:75 include/services.inc.php:114
 msgid "Add child"
@@ -735,11 +733,11 @@ msgstr "添加主机"
 
 #: app/partials/massupdate.macros.tab.php:93
 msgid "Add missing"
-msgstr "添加缺失的"
+msgstr "添加缺失项"
 
 #: jsLoader.php:326
 msgid "Add multiple maps"
-msgstr "添加多个拓扑图"
+msgstr "添加拓扑图集"
 
 #: include/classes/widgets/CWidgetHelper.php:1211
 msgid "Add new data set"
@@ -747,7 +745,7 @@ msgstr "添加新数据集"
 
 #: include/views/configuration.host.edit.php:147
 msgid "Add new interface"
-msgstr "添加新的接口"
+msgstr "添加新接口"
 
 #: include/classes/widgets/CWidgetHelper.php:738
 msgid "Add new override"
@@ -777,7 +775,7 @@ msgstr "添加到主机群组"
 
 #: app/views/monitoring.dashboard.view.php:108 jsLoader.php:115
 msgid "Add widget"
-msgstr "添加构件"
+msgstr "添加小组件"
 
 #: jsLoader.php:251
 #, c-format
@@ -787,7 +785,7 @@ msgstr "%1$s，已添加"
 
 #: include/hosts.inc.php:63
 msgid "Admin"
-msgstr "管理者"
+msgstr "管理员"
 
 #: include/menu.inc.php:152
 msgid "Administration"
@@ -817,12 +815,12 @@ msgstr "存在时间小于 %1$s"
 #: include/views/configuration.httpconf.edit.php:112
 #: include/views/js/configuration.host.edit.js.php:178
 msgid "Agent"
-msgstr "客户端"
+msgstr "Agent"
 
 #: include/classes/items/CHelpItems.php:69
 #: include/classes/items/CHelpItems.php:399
 msgid "Agent availability check. Returns nothing - unavailable; 1 - available"
-msgstr "客户端可达性检查。返回 nothing - 不可达；1 - 可达"
+msgstr "Agent可达性检查。返回 空 - 不可达；1 - 可达"
 
 #: include/views/configuration.host.list.php:196
 msgid "Agent encryption"
@@ -831,11 +829,11 @@ msgstr "agent 加密"
 #: include/classes/items/CHelpItems.php:65
 #: include/classes/items/CHelpItems.php:395
 msgid "Agent host name. Returns string"
-msgstr "客户端主机名。返回字符串"
+msgstr "Agent主机名。返回字符串"
 
 #: include/views/inventory.host.view.php:62
 msgid "Agent interfaces"
-msgstr "agent代理程序的接口"
+msgstr "Agent 接口"
 
 #: include/classes/items/CHelpItems.php:73
 #: include/classes/items/CHelpItems.php:403
@@ -852,7 +850,7 @@ msgstr "聚合函数"
 
 #: include/classes/widgets/CWidgetHelper.php:1141
 msgid "Aggregation interval"
-msgstr "聚合时间区间"
+msgstr "聚合时间间隔"
 
 #: include/actions.inc.php:2132
 msgid "Alert message"
@@ -884,7 +882,7 @@ msgstr "所有"
 
 #: app/partials/monitoring.dashboard.breadcrumbs.php:29
 msgid "All dashboards"
-msgstr "添加仪表盘"
+msgstr "仪表盘"
 
 #: app/partials/administration.usergroup.grouprights.html.php:46
 #: app/views/administration.user.edit.php:341
@@ -902,7 +900,7 @@ msgstr "所有的链接应含 特定的名称和URL"
 
 #: include/html.inc.php:527
 msgid "All maps"
-msgstr "所有地图"
+msgstr "拓扑图"
 
 #: include/views/configuration.trigger.prototype.edit.php:490
 #: include/views/configuration.triggers.edit.php:516
@@ -1034,7 +1032,7 @@ msgstr[0] "分类已删除"
 
 #: include/classes/core/CJsonRpc.php:200
 msgid "Application error."
-msgstr "应用集 错误."
+msgstr "应用错误."
 
 #: app/controllers/CControllerPopupGeneric.php:188
 #: include/views/configuration.item.prototype.edit.php:709
@@ -1140,7 +1138,7 @@ msgstr "不变"
 
 #: include/views/monitoring.history.php:102
 msgid "As plain text"
-msgstr "纯文字"
+msgstr "纯文本"
 
 #: app/views/administration.authentication.edit.php:206
 #: app/views/administration.authentication.edit.php:240
@@ -1155,7 +1153,7 @@ msgstr "资产标签"
 #, c-format
 msgid "At %1$s:%2$s %3$s of every week"
 msgid_plural "At %1$s:%2$s %3$s of every %4$s weeks"
-msgstr[0] "每周的 %1$s:%2$s %3$s每 %4$s 周的 %1$s:%2$s %3$s"
+msgstr[0] "每周 %1$s:%2$s %3$s 每 %4$s 周 %1$s:%2$s %3$s"
 
 #: include/maintenances.inc.php:50
 #, c-format
@@ -1179,13 +1177,13 @@ msgstr "于(时:分)"
 
 #: app/controllers/CControllerPopupLldOperation.php:122
 msgid "At least one action is mandatory."
-msgstr "至少必须执行一项操作。"
+msgstr "至少需要执行一项操作。"
 
 #: include/classes/api/services/CMaintenance.php:279
 #: include/classes/api/services/CMaintenance.php:706
 #: include/views/configuration.maintenance.edit.php:206
 msgid "At least one host group or host must be selected."
-msgstr "至少选择一个主机群组或主机。"
+msgstr "至少选择一个主机组或主机。"
 
 #: include/classes/api/services/CMaintenance.php:373
 #: include/classes/api/services/CMaintenance.php:381
@@ -1196,15 +1194,15 @@ msgstr "必须创建至少一个维护期间."
 
 #: include/classes/setup/CFrontendSetup.php:259
 msgid "At least one of MySQL, PostgreSQL or Oracle should be supported."
-msgstr "应该至少支持MySQL，PostgreSQL或Oracle中的一种。"
+msgstr "应该至少支持MySQL，PostgreSQL或Oracle之一。"
 
 #: include/views/configuration.correlation.edit.php:154
 msgid "At least one operation must be selected."
-msgstr "必须至少选择一项操作。"
+msgstr "至少需要选择一项操作。"
 
 #: include/views/configuration.action.edit.php:529
 msgid "At least one operation must exist."
-msgstr "必须至少设置一个执行内容。"
+msgstr "必须至少设置一个操作。"
 
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:155
 msgid "At least one update operation or message is mandatory"
@@ -1290,17 +1288,17 @@ msgstr "身份验证已经变更"
 #: app/views/popup.discovery.check.php:103
 #: include/views/js/configuration.host.edit.js.php:125
 msgid "Authentication passphrase"
-msgstr "验证口令"
+msgstr "认证口令"
 
 #: app/views/popup.discovery.check.php:96
 #: include/views/js/configuration.host.edit.js.php:118
 msgid "Authentication protocol"
-msgstr "验证协议"
+msgstr "认证协议"
 
 #: app/controllers/CControllerAuthenticationUpdate.php:313
 #: app/controllers/CControllerAuthenticationUpdate.php:322
 msgid "Authentication settings updated"
-msgstr "验证设置已更新"
+msgstr "验证配置已更新"
 
 #: app/views/administration.module.edit.php:40
 #: app/views/administration.module.list.php:75
@@ -1333,16 +1331,16 @@ msgstr "自动注销"
 #: include/views/configuration.host.massupdate.php:222
 #: include/views/configuration.host.prototype.edit.php:322
 msgid "Automatic"
-msgstr "自动地"
+msgstr "自动"
 
 #: include/views/monitoring.sysmap.edit.php:137
 msgid "Automatic icon mapping"
-msgstr "自动的图标映射"
+msgstr "自动映射图标"
 
 #: include/views/js/monitoring.sysmaps.js.php:239
 #: include/views/js/monitoring.sysmaps.js.php:654
 msgid "Automatic icon selection"
-msgstr "自动的图标选择"
+msgstr "自动选择图标"
 
 #: app/controllers/CControllerAuditLogList.php:218
 #: app/controllers/CControllerAutoregEdit.php:67
@@ -1473,7 +1471,7 @@ msgstr "布尔值到十进制"
 
 #: include/views/js/monitoring.sysmaps.js.php:394
 msgid "Border"
-msgstr "边"
+msgstr "边框"
 
 #: include/views/js/monitoring.sysmaps.js.php:580
 msgid "Border colour"
@@ -1553,7 +1551,7 @@ msgstr "CPU 使用率。返回浮点数"
 
 #: app/views/popup.itemtestedit.view.php:163
 msgid "CRLF"
-msgstr "CRLF"
+msgstr "换行"
 
 #: include/items.inc.php:1796
 msgid "CSV to JSON"
@@ -1633,13 +1631,13 @@ msgstr "不能添加一个已发现的应用集 \"%1$s\" 到 web 场景。"
 #: include/classes/api/services/CGraph.php:734
 #, c-format
 msgid "Cannot add a non-numeric item \"%1$s\" to graph \"%2$s\"."
-msgstr "不能添加一个非数字监控项 \"%1$s\" 到图表 \"%2$s\"."
+msgstr "无法添加一个非数字监控项 \"%1$s\" 到图表 \"%2$s\"."
 
 #: include/classes/api/services/CGraphPrototype.php:671
 #: include/classes/api/services/CGraphPrototype.php:735
 #, c-format
 msgid "Cannot add a non-numeric item \"%1$s\" to graph prototype \"%2$s\"."
-msgstr "不可以添加一个非数值型的监控项目 \"%1$s\"到数据图模板\"%2$s\"."
+msgstr "无法添加一个非数值型的监控项目 \"%1$s\"到数据图模板\"%2$s\"."
 
 #: actionconf.php:181
 msgid "Cannot add action"
@@ -1710,7 +1708,7 @@ msgstr "无法添加监控项目\"%1$s\"从\"%2$s\"到分类 \"%3$s\" 从\"%4$s\
 
 #: disc_prototypes.php:642
 msgid "Cannot add item prototype"
-msgstr "不能添加监控项原型"
+msgstr "无法添加监控项原型"
 
 #: include/classes/api/services/CApplication.php:613
 msgid "Cannot add items."
@@ -1734,7 +1732,7 @@ msgstr "无法添加报警媒介类型"
 #, c-format
 msgid "Cannot add module: %1$s."
 msgid_plural "Cannot add modules: %1$s."
-msgstr[0] "不能添加模块：%1$s。"
+msgstr[0] "无法添加模块：%1$s。"
 
 #: include/classes/api/services/CGraph.php:40
 #, c-format
@@ -1744,7 +1742,7 @@ msgstr "无法添加超过一个 \"图形总计\" 类型的监控项于图形 \"
 #: include/classes/api/services/CGraphPrototype.php:40
 #, c-format
 msgid "Cannot add more than one item with type \"Graph sum\" on graph prototype \"%1$s\"."
-msgstr "不可以在数据图模板\"%1$s\"上添加超过一个\"Graph sum\"类型的监控项目."
+msgstr "无法在数据图模板\"%1$s\"上添加超过一个\"Graph sum\"类型的监控项目."
 
 #: sysmaps.php:211
 msgid "Cannot add network map"
@@ -1758,7 +1756,7 @@ msgstr "不能添加新的应用 \"%1$s\"."
 #: app/controllers/CControllerProxyCreate.php:56
 #: app/controllers/CControllerProxyCreate.php:112
 msgid "Cannot add proxy"
-msgstr "无法添加agent代理程序"
+msgstr "无法添加Proxy代理程序"
 
 #: app/controllers/CControllerRegExCreate.php:43
 #: app/controllers/CControllerRegExCreate.php:90
@@ -1806,7 +1804,7 @@ msgstr "无法添加用户"
 #: app/controllers/CControllerUsergroupCreate.php:51
 #: app/controllers/CControllerUsergroupCreate.php:100
 msgid "Cannot add user group"
-msgstr "不能添加用户组"
+msgstr "无法添加用户组"
 
 #: app/controllers/CControllerValuemapCreate.php:41
 #: app/controllers/CControllerValuemapCreate.php:77
@@ -1815,11 +1813,11 @@ msgstr "无法添加值映射"
 
 #: httpconf.php:199
 msgid "Cannot add web scenario"
-msgstr "不能添加web场景"
+msgstr "无法添加web场景"
 
 #: jsLoader.php:136
 msgid "Cannot add widget: not enough free space on the dashboard."
-msgstr "不能添加小构建：仪表板上没有足够的空余空间"
+msgstr "无法添加小组件：仪表盘上的可用空间不足。"
 
 #: jsLoader.php:126
 msgid "Cannot add widgets in kiosk mode"
@@ -1835,7 +1833,7 @@ msgstr "无法绑定到 LDAP 服务器。"
 
 #: httpconf.php:190 httpconf.php:503 items.php:879
 msgid "Cannot clear history"
-msgstr "无法清除历史"
+msgstr "无法清除历史数据"
 
 #: items.php:1293
 msgid "Cannot clear history: at least one of the selected items doesn't belong to any monitored host"
@@ -1870,7 +1868,7 @@ msgstr "无法连接到 LDAP 服务器。"
 
 #: include/classes/setup/CSetupWizard.php:321
 msgid "Cannot connect to the database."
-msgstr "不能连接到数据库。"
+msgstr "无法连接到数据库。"
 
 #: include/views/js/configuration.httpconf.edit.js.php:106
 msgid "Cannot convert POST data:"
@@ -1908,11 +1906,11 @@ msgstr "无法创建其他的数据库连接."
 #: include/classes/api/services/CTrigger.php:1004
 #: include/classes/api/services/CTriggerPrototype.php:826
 msgid "Cannot create circular dependencies."
-msgstr "不能创建环形的依赖关系。"
+msgstr "无法创建循环依赖关系。"
 
 #: include/classes/api/services/CTrigger.php:976
 msgid "Cannot create dependency on trigger itself."
-msgstr "不能创建触发器本身的依赖."
+msgstr "无法创建触发器本身的依赖."
 
 #: include/classes/api/services/CTriggerPrototype.php:765
 msgid "Cannot create dependency on trigger prototype itself."
@@ -1982,7 +1980,7 @@ msgstr "无法删除自动发现规则"
 
 #: graphs.php:291
 msgid "Cannot delete graph"
-msgstr "无法删除图形"
+msgstr "无法删除图表"
 
 #: graphs.php:283
 msgid "Cannot delete graph prototype"
@@ -1990,11 +1988,11 @@ msgstr "无法删除图表原型"
 
 #: graphs.php:324
 msgid "Cannot delete graph prototypes"
-msgstr "无法删除数据图模板"
+msgstr "无法删除图表模板"
 
 #: graphs.php:341
 msgid "Cannot delete graphs"
-msgstr "无法删除图形"
+msgstr "无法删除图表"
 
 #: hostgroups.php:134 hostgroups.php:156
 msgid "Cannot delete group"
@@ -2036,7 +2034,7 @@ msgstr "无法删除自动发现主机\"%1$s\"的接口。"
 
 #: include/classes/api/services/CHost.php:1250
 msgid "Cannot delete inventory."
-msgstr "无法删除资产纪录."
+msgstr "无法删除资产记录."
 
 #: items.php:477
 msgid "Cannot delete item"
@@ -2044,11 +2042,11 @@ msgstr "无法删除监控项"
 
 #: disc_prototypes.php:308
 msgid "Cannot delete item prototype"
-msgstr "无法删除监控项目模板"
+msgstr "无法删除监控项原型"
 
 #: disc_prototypes.php:685
 msgid "Cannot delete item prototypes"
-msgstr "无法删除监控项目模板"
+msgstr "无法删除监控项原型"
 
 #: items.php:1349
 msgid "Cannot delete items"
@@ -2061,7 +2059,7 @@ msgstr "无法删除维护"
 #: app/controllers/CControllerMediatypeDelete.php:69
 msgid "Cannot delete media type"
 msgid_plural "Cannot delete media types"
-msgstr[0] "无法删除示警媒介类型"
+msgstr[0] "无法删除告警媒介类型"
 
 #: app/controllers/CControllerModuleScan.php:118
 #, c-format
@@ -2076,7 +2074,7 @@ msgstr "无法删除网络拓扑图"
 #: app/controllers/CControllerProxyDelete.php:69
 msgid "Cannot delete proxy"
 msgid_plural "Cannot delete proxies"
-msgstr[0] "无法删除agent代理程序"
+msgstr[0] "无法删除proxy"
 
 #: app/controllers/CControllerRegExDelete.php:79
 msgid "Cannot delete regular expression"
@@ -2203,7 +2201,7 @@ msgstr[0] "无法禁用动作"
 #: correlation.php:318
 msgid "Cannot disable correlation"
 msgid_plural "Cannot disable correlations"
-msgstr[0] "无法停用关联项"
+msgstr[0] "无法禁用关联项"
 
 #: discoveryconf.php:184 host_discovery.php:706
 msgid "Cannot disable discovery rule"
@@ -2229,7 +2227,7 @@ msgstr[0] "无法禁用消息介质类型"
 #: app/controllers/CControllerModuleUpdate.php:146
 msgid "Cannot disable module"
 msgid_plural "Cannot disable modules"
-msgstr[0] ""
+msgstr[0] "无法禁用模块"
 
 #: app/controllers/CControllerModuleUpdate.php:165
 #, c-format
@@ -2253,7 +2251,7 @@ msgstr "无法显示监控项队列."
 
 #: chart7.php:91
 msgid "Cannot display more than one item with type \"Graph sum\"."
-msgstr "不可以显示超过一个 \"Graph sum\"类型的监控项目"
+msgstr "无法显示超过一个 \"Graph sum\"类型的监控项目"
 
 #: actionconf.php:388
 msgid "Cannot enable action"
@@ -2289,7 +2287,7 @@ msgstr[0] "无法启用消息介质类型"
 #: app/controllers/CControllerModuleUpdate.php:142
 msgid "Cannot enable module"
 msgid_plural "Cannot enable modules"
-msgstr[0] ""
+msgstr[0] "无法启用模块"
 
 #: app/controllers/CControllerModuleUpdate.php:160
 #, c-format
@@ -2322,7 +2320,7 @@ msgstr "无法扩展宏."
 #: include/classes/import/importers/CMapImporter.php:267
 #, c-format
 msgid "Cannot find background image \"%1$s\" used in map \"%2$s\"."
-msgstr "无法找到用在聚合图形 \"%2$s\" 中的群组 \"%1$s\"."
+msgstr "无法找到用在拓扑图 \"%2$s\" 中的背景图片 \"%1$s\"."
 
 #: include/classes/import/importers/CAbstractScreenImporter.php:80
 #, c-format
@@ -2385,12 +2383,12 @@ msgstr "在主机\"%3$s\"上，未能找到可用于监控项 \"%2$s\" 的 \"%1$
 #: include/classes/import/CConfigurationImport.php:1139
 #, c-format
 msgid "Cannot find interface \"%1$s\" used for item prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
-msgstr "在 \"%4$s\"上无法找到自动发现规则 \"%3$s\"上的\"%2$s\"监控项原型所对应的接口 \"%1$s\""
+msgstr "在 \"%4$s\"上无法针对自动发现规则 \"%3$s\"上的\"%2$s\"主机模板找到接口 \"%1$s\""
 
 #: include/classes/import/CConfigurationImport.php:1636
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph \"%3$s\"."
-msgstr "无法为数据图\"%3$s\"在\"%2$s\"上找到可以作为最大Y值的监控项目 \"%1$s\"."
+msgstr "无法为数据图\"%3$s\"在\"%2$s\"上找到可以作为Y轴最大值的监控项 \"%1$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1405
 #, c-format
@@ -2400,22 +2398,22 @@ msgstr "无法在\"%2$s\"上为\"%5$s\"上的自动发现规则\"%4$s\"上的数
 #: include/classes/import/CConfigurationImport.php:1620
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph \"%3$s\"."
-msgstr "无法为数据图 \"%3$s\"在\"%2$s\"上可以作为最小值的监控项目\"%1$s\""
+msgstr "无法为数据图 \"%3$s\"在\"%2$s\"上可以作为Y轴最小值的监控项\"%1$s\""
 
 #: include/classes/import/CConfigurationImport.php:1385
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
-msgstr "无法在\"%2$s\"上为\"%5$s\"上的自动发现规则\"%4$s\"上的数据图模板\"%3$s\"找到可以作为最小Y值的监控项目\"%1$s\""
+msgstr "无法在\"%2$s\"上为\"%5$s\"上的自动发现规则\"%4$s\"上的数据图模板\"%3$s\"找到可以作为Y轴最小值的监控项\"%1$s\""
 
 #: include/classes/import/CConfigurationImport.php:1654
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph \"%3$s\"."
-msgstr "无法在\"%2$s\"上找到被数据图\"%3$s\"引用的监控项目\"%1$s\"."
+msgstr "无法在\"%2$s\"上找到被图表\"%3$s\"引用的监控项\"%1$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1425
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
-msgstr "在 \"%5$s\"中无法找到被自动发现规则\"%4$s\"上的数据图模板 \"%3$s\"在\"%2$s\"上所引用的监控项目\"%1$s\"."
+msgstr "在 \"%5$s\"中无法找到被自动发现规则\"%4$s\"上的图表模板 \"%3$s\"在\"%2$s\"上所引用的监控项\"%1$s\"."
 
 #: include/classes/import/importers/CAbstractScreenImporter.php:99
 #, c-format
@@ -2440,7 +2438,7 @@ msgstr "无法在\"%4$s\"上为自动发现规则 \"%3$s\"上的主机模板\"%2
 #: include/classes/import/CConfigurationImport.php:1025
 #, c-format
 msgid "Cannot find template \"%1$s\" for override \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
-msgstr "在\"%4$s\"上找不到用于覆盖\"%2$s\"上的自动发现规则\"%3$s\"的模板\"%1$s\""
+msgstr "无法在\"%4$s\"上为自动发现规则 \"%3$s\"上的主机模板\"%2$s\"找模板\"%1$s\""
 
 #: include/classes/import/importers/CMapImporter.php:170
 #: include/classes/import/importers/CMapImporter.php:223
@@ -2451,12 +2449,12 @@ msgstr "无法找到触发器 \"%1$s\" 用于地图 \"%2$s\"."
 #: include/classes/import/CConfigurationImport.php:773
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item \"%2$s\" on \"%3$s\"."
-msgstr "无法在 \"%3$s\"上找到由监控项目\"%2$s\" 所引用的数据映射\"%1$s\"."
+msgstr "无法在 \"%3$s\"上找到由监控项\"%2$s\" 所引用的值映射\"%1$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1153
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
-msgstr "无法在\"%4$s\"上找到由自动发现规则 \"%3$s\"上的 \"%2$s\"监控项目模板所引用的数据映射 \"%1$s\"."
+msgstr "无法在\"%4$s\"上找到由自动发现规则 \"%3$s\"上的 \"%2$s\"监控项模板所引用的值映射 \"%1$s\"."
 
 #: srv_status.php:179
 msgid "Cannot format Tree. Check logic structure in service links."
@@ -2502,7 +2500,7 @@ msgstr "不能登出"
 
 #: include/classes/api/services/CHost.php:1094
 msgid "Cannot mass update host name."
-msgstr "不能大量更新主机名称."
+msgstr "无法大量更新主机名称。"
 
 #: include/classes/api/services/CTemplate.php:1131
 msgid "Cannot mass update template name."
@@ -2510,7 +2508,7 @@ msgstr "无法批量更新模板名称."
 
 #: include/classes/api/services/CHost.php:1080
 msgid "Cannot mass update visible host name."
-msgstr "不能大量更新可见主机名称"
+msgstr "无法大量更新可见主机名称。"
 
 #: include/classes/api/services/CTemplate.php:1096
 msgid "Cannot mass update visible template name."
@@ -2529,12 +2527,12 @@ msgstr "不能完成没有where条件的删除描述式在表 \"%1$s\" 上."
 #: include/classes/db/DB.php:565
 #, c-format
 msgid "Cannot perform update statement on table \"%1$s\" without values."
-msgstr "不能完成没有值的更新表达式料表 \"%1$s\" 上."
+msgstr "无法对空表 \"%1$s\" 执行update语句。"
 
 #: include/classes/db/DB.php:578
 #, c-format
 msgid "Cannot perform update statement on table \"%1$s\" without where condition."
-msgstr "不能完成没有条件的更新描述式在表 \"%1$s\" 上."
+msgstr "没有where条件，无法对表 \"%1$s\" 执行update语句。"
 
 #: include/classes/api/services/CApplication.php:549
 msgid "Cannot process applications from different hosts or templates."
@@ -2554,7 +2552,7 @@ msgstr "无法读取XML： %1$s 。"
 #: include/classes/server/CZabbixServer.php:480
 #, c-format
 msgid "Cannot read the response, check connection with the Zabbix server \"%1$s\"."
-msgstr "不能读取响应, 检查与Zabbix服务器 \"%1$s\" 的连接."
+msgstr "无法获取响应, 检查与Zabbix服务器 \"%1$s\" 的连接."
 
 #: include/classes/api/services/CUser.php:432
 msgid "Cannot rename guest user."
@@ -2593,7 +2591,7 @@ msgstr "在动作 \"%2$s\" 中无法设置 \"%1$s\" "
 #: include/classes/api/services/CGraphGeneral.php:498
 #, c-format
 msgid "Cannot set \"%1$s\" for graph \"%2$s\"."
-msgstr "在图形 \"%2$s\" 中无法设置 \"%1$s\""
+msgstr "在图表 \"%2$s\" 中无法设置 \"%1$s\""
 
 #: include/classes/api/services/CGraphGeneral.php:503
 #, c-format
@@ -2625,7 +2623,7 @@ msgstr "无法设置 \"模板序列号\" 为聚合图形 \"%1$s\"."
 #: include/classes/api/services/CHost.php:2093
 #: include/classes/api/services/CHost.php:2254
 msgid "Cannot set inventory fields for disabled inventory."
-msgstr "无法设置审计字段为已经禁止的审计."
+msgstr "无法设置资产字段为已经禁止的资产."
 
 #: include/classes/api/services/CScreenItem.php:539
 #: include/classes/api/services/CScreenItem.php:557
@@ -2676,32 +2674,32 @@ msgstr "无法取消链接触发器“%1$s”，它有来自模板的监控项�
 #: include/classes/api/services/CAction.php:3017
 #, c-format
 msgid "Cannot update \"%1$s\" for action \"%2$s\"."
-msgstr "不能对动作\"%2$s\"更新\"%1$s\"."
+msgstr "无法对动作\"%2$s\" 更新\"%1$s\"。"
 
 #: include/classes/api/services/CGraphGeneral.php:640
 #, c-format
 msgid "Cannot update \"%1$s\" for graph \"%2$s\"."
-msgstr "图形 \"%2$s\" 无法更新 \"%1$s\""
+msgstr "无法对图表 \"%2$s\" 更新 \"%1$s\"。"
 
 #: include/classes/api/services/CGraphGeneral.php:645
 #, c-format
 msgid "Cannot update \"%1$s\" for graph prototype \"%2$s\"."
-msgstr "图形模板 \"%2$s\" 无法更新 \"%1$s\" "
+msgstr "无法对图表原型 \"%2$s\" 更新 \"%1$s\" 。"
 
 #: include/classes/api/services/CItemGeneral.php:279
 #, c-format
 msgid "Cannot update \"%1$s\" for item \"%2$s\"."
-msgstr "无法更新 \"%1$s\" 为监控项 \"%2$s\"."
+msgstr "无法对监控项 \"%2$s\" 更新 \"%1$s\"。"
 
 #: include/classes/api/services/CTriggerGeneral.php:917
 #, c-format
 msgid "Cannot update \"%1$s\" for templated trigger \"%2$s\"."
-msgstr "触发器模板 \"%2$s\" 无法更新 \"%1$s\""
+msgstr "无法对模板触发器 \"%2$s\" 更新 \"%1$s\"。"
 
 #: include/classes/api/services/CTriggerGeneral.php:928
 #, c-format
 msgid "Cannot update \"%1$s\" for templated trigger prototype \"%2$s\"."
-msgstr "触发器原型 \"%2$s\" 无法更新到模板 \"%1$s\"。"
+msgstr "无法对模板触发器原型 \"%2$s\" 更新 \"%1$s\"。"
 
 #: include/classes/api/services/CHost.php:2231
 #, c-format
@@ -2711,14 +2709,14 @@ msgstr "无法更新 \"%2$s\"在发现的主机\"%1$s\"。"
 #: include/classes/api/services/CItemGeneral.php:209
 #, c-format
 msgid "Cannot update \"%2$s\" for a discovered item \"%1$s\"."
-msgstr "无法更新 \"%2$s\"在发现的监控项 \"%1$s\"。"
+msgstr "无法对发现的监控项 \"%1$s\" 更新 \"%2$s\"。"
 
 #: include/classes/api/services/CTriggerGeneral.php:923
 #: include/classes/api/services/CTrigger.php:705
 #: include/classes/api/services/CTrigger.php:834
 #, c-format
 msgid "Cannot update \"%2$s\" for a discovered trigger \"%1$s\"."
-msgstr "无法更新 \"%2$s\" 在发现的触发器\"%1$s\"。"
+msgstr "无法对已发现的触发器 \"%1$s\" 更新 \"%2$s\"。"
 
 #: include/classes/api/services/CImage.php:499
 #, c-format
@@ -2802,11 +2800,11 @@ msgstr[0] "无法更新事件"
 
 #: graphs.php:242 graphs.php:304
 msgid "Cannot update graph"
-msgstr "无法更新图形"
+msgstr "无法更新图表"
 
 #: graphs.php:224
 msgid "Cannot update graph prototype"
-msgstr "无法更新数据图模板"
+msgstr "无法更新图表原型"
 
 #: hostgroups.php:76
 msgid "Cannot update group"
@@ -2879,11 +2877,11 @@ msgstr "无法更新维护"
 #: app/controllers/CControllerMediatypeUpdate.php:77
 #: app/controllers/CControllerMediatypeUpdate.php:180
 msgid "Cannot update media type"
-msgstr "无法更新媒介型态"
+msgstr "无法更新媒介类型"
 
 #: app/controllers/CControllerModuleUpdate.php:139
 msgid "Cannot update module"
-msgstr ""
+msgstr "无法更新模块"
 
 #: app/controllers/CControllerModuleUpdate.php:157
 #, c-format
@@ -2897,13 +2895,13 @@ msgstr "无法更新网络拓扑图"
 #: app/controllers/CControllerProxyUpdate.php:58
 #: app/controllers/CControllerProxyUpdate.php:123
 msgid "Cannot update proxy"
-msgstr "无法更新agent代理程序"
+msgstr "无法更新proxy"
 
 #: include/classes/api/services/CProxy.php:705
 #: include/classes/api/services/CProxy.php:826
 #, c-format
 msgid "Cannot update proxy for discovered host \"%1$s\"."
-msgstr "对于被自动发现的主机 \"%1$s\"无法更新其代理节点"
+msgstr "对于被自动发现的主机 \"%1$s\"无法更新其Proxy节点"
 
 #: app/controllers/CControllerRegExUpdate.php:45
 #: app/controllers/CControllerRegExUpdate.php:101
@@ -2964,7 +2962,7 @@ msgstr "无法更新触发器 \"%1$s\": %2$s "
 #: trigger_prototypes.php:350 trigger_prototypes.php:509
 msgid "Cannot update trigger prototype"
 msgid_plural "Cannot update trigger prototypes"
-msgstr[0] "无法更新触发器模板"
+msgstr[0] "无法更新触发器原型"
 
 #: include/classes/api/services/CTriggerGeneral.php:1637
 #, c-format
@@ -3093,12 +3091,12 @@ msgstr "字符串未包含"
 
 #: include/hosts.inc.php:234
 msgid "Chassis"
-msgstr "机壳"
+msgstr "机箱"
 
 #: include/classes/items/CHelpItems.php:225
 #: include/classes/items/CHelpItems.php:575
 msgid "Chassis information. Returns string"
-msgstr "机架信息。返回字符串"
+msgstr "机箱信息。返回字符串"
 
 #: include/views/js/configuration.discovery.edit.js.php:375
 msgid "Check already exists."
@@ -3111,20 +3109,20 @@ msgstr "检查开始于\"%1$s\"的表达式部份."
 
 #: include/items.inc.php:1840
 msgid "Check for error in JSON"
-msgstr "JSON数据错误检查"
+msgstr "检查JSON中格式错误"
 
 #: include/items.inc.php:1844
 msgid "Check for error in XML"
-msgstr "XML数据错误检查"
+msgstr "检查XML中格式错误"
 
 #: include/items.inc.php:1848
 msgid "Check for error using regular expression"
-msgstr "使用正则表达式检查错误"
+msgstr "检查正则表达式的错误"
 
 #: include/classes/setup/CSetupWizard.php:46
 #: include/classes/setup/CSetupWizard.php:215
 msgid "Check of pre-requisites"
-msgstr "必要条件检测"
+msgstr "检查必要条件"
 
 #: include/classes/api/services/CItemGeneral.php:392
 #: include/classes/api/services/CItemGeneral.php:399
@@ -3186,13 +3184,13 @@ msgstr "检查 UDP 端口 是否处于侦听状态。返回 0 - 未侦听；1 - 
 #: include/classes/items/CHelpItems.php:483
 #: include/classes/items/CHelpItems.php:775
 msgid "Checks performance of TCP service. Returns 0 - service is down; seconds - the number of seconds spent while connecting to the service"
-msgstr "检查 TCP 服务的性能，当服务 down 时返回 0，否则返回连接服务花费的秒数"
+msgstr "检查 TCP 服务的性能。返回 0 - 服务已关闭；或连接到服务所用的秒数"
 
 #: include/classes/items/CHelpItems.php:145
 #: include/classes/items/CHelpItems.php:495
 #: include/classes/items/CHelpItems.php:783
 msgid "Checks performance of UDP service. Returns 0 - service is down; seconds - the number of seconds spent waiting for response from the service"
-msgstr "检查 UDP 服务的性能，当服务 down 时返回 0，否则返回连接到服务花费的秒数"
+msgstr "检查 UDP 服务的性能。返回 0 - 服务已关闭； 或等待服务响应的秒数"
 
 #: include/classes/api/services/CDRule.php:653
 msgid "Checks should be unique."
@@ -3200,25 +3198,25 @@ msgstr "检查必需是唯一的"
 
 #: include/locales.inc.php:50
 msgid "Chinese (zh_CN)"
-msgstr "中文 (zh_CN)"
+msgstr "简体中文 (zh_CN)"
 
 #: include/locales.inc.php:51
 msgid "Chinese (zh_TW)"
-msgstr "中文 (zh_TW)"
+msgstr "繁體中文 (zh_TW)"
 
 #: include/classes/import/importers/CTemplateImporter.php:201
 #, c-format
 msgid "Circular reference in templates: %1$s."
-msgstr "模板 %1$s 存在环形引用。"
+msgstr "模板 %1$s 存在循环引用。"
 
 #: include/classes/api/services/CHostBase.php:213
 msgid "Circular template linkage is not allowed."
-msgstr "不允许环形模板链接."
+msgstr "不允许循环模板链接。"
 
 #: include/classes/core/ZBase.php:427
 #, c-format
 msgid "Class %1$s not found for action %2$s."
-msgstr "找不到动作 %2$s 的类 %1$s。"
+msgstr "在动作%2$s未在分组%1$s中找到。"
 
 #: include/views/configuration.httpconf.list.php:192
 #: include/views/configuration.item.list.php:241
@@ -3234,7 +3232,7 @@ msgstr "清除历史和趋势"
 #: include/views/configuration.host.massupdate.php:155
 #: include/views/configuration.template.massupdate.php:119
 msgid "Clear when unlinking"
-msgstr "清除当无链接时"
+msgstr "取消链接时清除"
 
 #: jsLoader.php:130
 msgid "Click and drag to desired size."
@@ -3310,7 +3308,7 @@ msgstr "关闭问题"
 #: include/classes/widgets/CWidgetHelper.php:984 jsLoader.php:230
 #: jsLoader.php:235
 msgid "Collapse"
-msgstr "宕机"
+msgstr "折叠"
 
 #: app/partials/layout.htmlpage.aside.php:41
 #: app/partials/layout.htmlpage.aside.php:43
@@ -3370,7 +3368,7 @@ msgstr "命令"
 #: include/items.inc.php:1255
 msgctxt "SNMP Community"
 msgid "Community"
-msgstr "团队"
+msgstr "团体字"
 
 #: app/views/monitoring.problem.view.php:324
 msgid "Compact view"
@@ -3445,12 +3443,12 @@ msgstr "在关联项 \"%1$s\" 中 条件 \"%2$s\" 在表达式 \"%3$s\"没有被
 #: include/classes/api/services/CDiscoveryRule.php:1764
 #, c-format
 msgid "Condition \"%2$s\" used in formula \"%3$s\" for discovery rule \"%1$s\" is not defined."
-msgstr "对于自动发现规则\"%1$s\"应用于计算表达式 \"%3$s\"中的条件 \"%2$s\"未被定义"
+msgstr "自动发现规则\"%1$s\"应用于计算表达式 \"%3$s\"中的条件 \"%2$s\"未定义"
 
 #: include/classes/api/services/CDiscoveryRule.php:1558
 #, c-format
 msgid "Condition \"%2$s\" used in formula \"%3$s\" for override \"%1$s\" is not defined."
-msgstr "用于覆盖“%1$s”的公式“%3$s”中的条件“%2$s”未定义。"
+msgstr "覆盖“%1$s”的公式“%3$s”中的条件“%2$s”未定义。"
 
 #: app/partials/popup.operations.php:393
 #: include/views/configuration.action.edit.php:138
@@ -3472,7 +3470,7 @@ msgstr "配置"
 
 #: include/classes/items/CHelpItems.php:1163
 msgid "Configuration cache statistics. Cache - buffer (modes: pfree, total, used, free)."
-msgstr "配置缓存统计.缓存—缓冲(模式：空闲的百分数，总计，已使用，未使用"
+msgstr "配置缓存统计。缓存 - 缓冲区（模式：pfree、total、used、free）。"
 
 #: include/classes/setup/CSetupWizard.php:488
 #, c-format
@@ -3485,7 +3483,7 @@ msgstr "配置导入"
 
 #: app/controllers/CControllerGuiEdit.php:59
 msgid "Configuration of GUI"
-msgstr "图形接口的配置"
+msgstr "配置图形界面"
 
 #: app/controllers/CControllerAuditLogList.php:186
 msgid "Configuration of Zabbix"
@@ -3493,7 +3491,7 @@ msgstr "Zabbix的配置"
 
 #: actionconf.php:27
 msgid "Configuration of actions"
-msgstr "动作的配置"
+msgstr "配置动作"
 
 #: applications.php:26
 msgid "Configuration of applications"
@@ -3505,11 +3503,11 @@ msgstr "配置身份验证"
 
 #: discoveryconf.php:26 host_discovery.php:27
 msgid "Configuration of discovery rules"
-msgstr "配置发现规则"
+msgstr "配置自动发现规则"
 
 #: graphs.php:27
 msgid "Configuration of graph prototypes"
-msgstr "配置图形原型"
+msgstr "配置图表原型"
 
 #: graphs.php:27
 msgid "Configuration of graphs"
@@ -3517,7 +3515,7 @@ msgstr "配置图标"
 
 #: hostgroups.php:25
 msgid "Configuration of host groups"
-msgstr "配置主机群组"
+msgstr "配置主机组"
 
 #: host_prototypes.php:27
 msgid "Configuration of host prototypes"
@@ -3529,7 +3527,7 @@ msgstr "配置主机"
 
 #: app/controllers/CControllerHousekeepingEdit.php:92
 msgid "Configuration of housekeeping"
-msgstr "管家设置"
+msgstr "配置管家服务"
 
 #: app/controllers/CControllerIconMapEdit.php:106
 #: app/controllers/CControllerIconMapList.php:64
@@ -3560,16 +3558,16 @@ msgstr "配置维护时段"
 #: app/controllers/CControllerMediatypeEdit.php:240
 #: app/controllers/CControllerMediatypeList.php:141
 msgid "Configuration of media types"
-msgstr "配置媒体类型"
+msgstr "配置媒介类型"
 
 #: sysmap.php:26 sysmaps.php:27
 msgid "Configuration of network maps"
-msgstr "配置网络地图"
+msgstr "配置网络拓扑图"
 
 #: app/controllers/CControllerProxyEdit.php:156
 #: app/controllers/CControllerProxyList.php:175
 msgid "Configuration of proxies"
-msgstr "配置代理"
+msgstr "配置Proxy"
 
 #: app/controllers/CControllerRegExEdit.php:122
 #: app/controllers/CControllerRegExList.php:74
@@ -3649,7 +3647,7 @@ msgstr "配置已更新"
 #: include/classes/setup/CSetupWizard.php:50
 #: include/classes/setup/CSetupWizard.php:330
 msgid "Configure DB connection"
-msgstr "配置DB连接"
+msgstr "配置数据库连接"
 
 #: app/views/administration.script.edit.php:117
 msgid "Confirmation text"
@@ -3657,7 +3655,7 @@ msgstr "确认文字"
 
 #: include/classes/setup/CSetupWizard.php:486
 msgid "Congratulations! You have successfully installed Zabbix frontend."
-msgstr "恩！不错zabbix前端已经配置好了！千山万水第一步！加油，少年！"
+msgstr "恩！Zabbix前端已经配置好了！千山万水第一步！加油吧，少年！"
 
 #: app/views/administration.proxy.edit.php:47 include/hosts.inc.php:1439
 #: include/views/inventory.host.view.php:79
@@ -3674,12 +3672,12 @@ msgstr "已连接"
 
 #: app/views/administration.mediatype.edit.php:79
 msgid "Connection security"
-msgstr "安全链接"
+msgstr "安全连接"
 
 #: include/classes/server/CZabbixServer.php:434
 #, c-format
 msgid "Connection timeout of %1$s seconds exceeded when connecting to Zabbix server \"%2$s\"."
-msgstr "连接超时 %1$s 秒超出当连接Zabbix 服务器 \"%2$s\"."
+msgstr "连接到 Zabbix 服务器“%2$s”时超时,已超 %1$s 秒。"
 
 #: include/classes/server/CZabbixServer.php:545
 #, c-format
@@ -3701,11 +3699,11 @@ msgid ""
 "3. Zabbix server daemon not running;\n"
 "4. Firewall is blocking TCP connection.\n"
 msgstr ""
-"连接 Zabbix 服务器“%1$s”被拒绝。可能的原因：\n"
+"与 Zabbix 服务器“%1$s”的连接被拒绝。可能的原因：\n"
 "1. “zabbix.conf.php”中的服务器IP/DNS不正确；\n"
 "2. 安全环境（例如SELinux）阻塞连接；\n"
 "3. Zabbix server 守护进程没有运行；\n"
-"4. 防火墙阻止了TCP 连接。\n"
+"4. 开启了防火墙阻止 TCP 连接。\n"
 
 #: include/classes/server/CZabbixServer.php:541
 #, c-format
@@ -3714,17 +3712,17 @@ msgid ""
 "1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n"
 "2. Firewall is blocking TCP connection.\n"
 msgstr ""
-"连接Zabbix服务器 \"%1$s\" 超时. 可能的原因是:\n"
+"连接到Zabbix服务器 \"%1$s\" 超时. 可能的原因是:\n"
 "1.\"zabbix.conf.php\" 中的服务器IP/DNS配置不正确；\n"
-"2.防火墙阻止了TCP连接。\n"
+"2.开启了防火墙阻止了TCP的连接。\n"
 
 #: include/classes/setup/CSetupWizard.php:273
 msgid "Connection will not be encrypted because it uses a socket file (on Unix) or shared memory (Windows)."
-msgstr "连接不会被加密，因为它使用套接字文件（在 Unix 上）或共享内存（Windows）。"
+msgstr "连接不会被加密，因为使用了socket文件(在 Unix 上)或共享内存(Windows)。"
 
 #: include/views/configuration.host.massupdate.php:311
 msgid "Connections"
-msgstr "链接"
+msgstr "连接"
 
 #: include/views/configuration.host.edit.php:456
 #: include/views/configuration.host.massupdate.php:282
@@ -3734,7 +3732,7 @@ msgstr "从主机连接"
 
 #: app/views/administration.proxy.edit.php:98
 msgid "Connections from proxy"
-msgstr "从代理连接"
+msgstr "从Proxy连接"
 
 #: include/views/configuration.host.edit.php:448
 #: include/views/configuration.host.massupdate.php:275
@@ -3744,7 +3742,7 @@ msgstr "连接主机"
 
 #: app/views/administration.proxy.edit.php:91
 msgid "Connections to proxy"
-msgstr "连接代理"
+msgstr "连接Proxy"
 
 #: include/views/monitoring.screen.list.php:99
 #: include/views/monitoring.sysmap.list.php:75
@@ -3852,7 +3850,7 @@ msgstr "转换到 JSON"
 #: include/views/js/monitoring.sysmaps.js.php:286
 #: include/views/js/monitoring.sysmaps.js.php:415
 msgid "Coordinates"
-msgstr "座标"
+msgstr "坐标"
 
 #: include/views/configuration.copy.elements.php:77
 #: include/views/configuration.graph.list.php:223
@@ -3874,21 +3872,21 @@ msgstr "关联项 \"%1$s\" 已经存在"
 
 #: correlation.php:143
 msgid "Correlation added"
-msgstr "关联项添加"
+msgstr "关联项已添加"
 
 #: correlation.php:160
 msgid "Correlation deleted"
-msgstr "删除关联项"
+msgstr "关联项已删除"
 
 #: correlation.php:315
 msgid "Correlation disabled"
 msgid_plural "Correlations disabled"
-msgstr[0] "禁用关联项"
+msgstr[0] "关联项已停用"
 
 #: correlation.php:314
 msgid "Correlation enabled"
 msgid_plural "Correlations enabled"
-msgstr[0] "启用关联项"
+msgstr[0] "关联项已启用"
 
 #: include/classes/api/services/CCorrelation.php:532
 #, c-format
@@ -3936,11 +3934,11 @@ msgstr "监控日志文件行数统计。返回 整数"
 
 #: include/classes/items/CHelpItems.php:1139
 msgid "Count of values enqueued in the low-level discovery processing queue."
-msgstr "在LLD处理队列中排队的值的计数。"
+msgstr "在LLD处理队列中排队的值个数。"
 
 #: include/classes/items/CHelpItems.php:1143
 msgid "Count of values enqueued in the preprocessing queue."
-msgstr "在预处理队列中排队的值的计数。"
+msgstr "在预处理队列中排队的值个数。"
 
 #: include/views/configuration.action.list.php:54
 msgid "Create action"
@@ -3972,7 +3970,7 @@ msgstr "创建依赖项发现规则"
 
 #: jsLoader.php:268
 msgid "Create dependent item"
-msgstr "创建仪表盘依赖项"
+msgstr "创建依赖项"
 
 #: include/views/configuration.host.prototype.list.php:175
 #: include/views/configuration.item.prototype.list.php:192
@@ -4005,15 +4003,15 @@ msgstr "启用新的"
 
 #: include/views/configuration.graph.list.php:47
 msgid "Create graph"
-msgstr "创建图形"
+msgstr "创建图表"
 
 #: include/views/configuration.graph.list.php:46
 msgid "Create graph (select host first)"
-msgstr "创建图形(先选择主机)"
+msgstr "创建图表(先选择主机)"
 
 #: include/views/configuration.graph.list.php:31
 msgid "Create graph prototype"
-msgstr "创建图形原型"
+msgstr "创建图表原型"
 
 #: include/views/configuration.host.list.php:31
 msgid "Create host"
@@ -4022,7 +4020,7 @@ msgstr "创建主机"
 #: include/views/configuration.hostgroups.list.php:30
 #: include/views/configuration.hostgroups.list.php:34
 msgid "Create host group"
-msgstr "创建主机群组"
+msgstr "创建主机组"
 
 #: include/views/configuration.host.prototype.list.php:30
 msgid "Create host prototype"
@@ -4058,11 +4056,11 @@ msgstr "创建监控项原型"
 
 #: include/views/configuration.item.prototype.list.php:193
 msgid "Create items from selected prototypes as disabled?"
-msgstr "您想通过使所选原型中的禁用监控项来创建项目吗？"
+msgstr "从选定的原型中创建监控项时默认禁用？"
 
 #: include/views/configuration.item.prototype.list.php:190
 msgid "Create items from selected prototypes as enabled?"
-msgstr "您想通过使所选原型中的启用项目来创建项目吗？"
+msgstr "从选定的原型中创建监控项时默认启用？"
 
 #: include/views/configuration.maintenance.list.php:29
 msgid "Create maintenance period"
@@ -4074,7 +4072,7 @@ msgstr "创建拓扑图"
 
 #: app/views/administration.mediatype.list.php:34
 msgid "Create media type"
-msgstr "创建媒体类型"
+msgstr "创建媒介类型"
 
 #: include/views/conf.import.php:29 jsLoader.php:266
 msgid "Create new"
@@ -4082,7 +4080,7 @@ msgstr "创建新的"
 
 #: app/views/administration.proxy.list.php:34
 msgid "Create proxy"
-msgstr "创建代理"
+msgstr "创建Proxy"
 
 #: include/views/monitoring.screen.list.php:30
 msgid "Create screen"
@@ -4126,7 +4124,7 @@ msgstr "创建用户"
 
 #: app/views/administration.usergroup.list.php:34
 msgid "Create user group"
-msgstr "创建用户群组"
+msgstr "创建用户组"
 
 #: app/views/administration.valuemap.list.php:37
 msgid "Create value map"
@@ -4199,7 +4197,7 @@ msgstr "自定义倍数"
 #: app/views/js/popup.itemtestedit.view.js.php:375 include/forms.inc.php:1228
 #: include/forms.inc.php:1434 include/views/js/item.preprocessing.js.php:64
 msgid "Custom on fail"
-msgstr "自定义失败"
+msgstr "失败时自定义"
 
 #: screens.php:27
 msgid "Custom screens"
@@ -4263,7 +4261,7 @@ msgstr "暗色"
 #: app/controllers/CControllerAuditLogList.php:217
 #: app/controllers/CControllerDashboardView.php:141 include/menu.inc.php:31
 msgid "Dashboard"
-msgstr "仪表板"
+msgstr "仪表盘"
 
 #: include/classes/api/services/CDashboard.php:435
 #, c-format
@@ -4282,25 +4280,25 @@ msgstr "单元格X - %2$s Y - %3$s 控制台 \"%1$s\" 的小部件超出范围�
 
 #: app/controllers/CControllerDashboardUpdate.php:246
 msgid "Dashboard created"
-msgstr "仪表盘创建成功。"
+msgstr "仪表盘创建成功"
 
 #: app/controllers/CControllerDashboardDelete.php:59
 msgid "Dashboard deleted"
 msgid_plural "Dashboards deleted"
-msgstr[0] "仪表板已删除"
+msgstr[0] "仪表盘已删除"
 
 #: app/views/dashboard.properties.edit.php:64
 msgid "Dashboard properties"
-msgstr "仪表板属性"
+msgstr "仪表盘属性"
 
 #: app/views/dashboard.sharing.edit.php:97
 msgid "Dashboard sharing"
-msgstr "共享仪表盘"
+msgstr "仪表盘共享"
 
 #: app/controllers/CControllerDashboardShareUpdate.php:88
 #: app/controllers/CControllerDashboardUpdate.php:241
 msgid "Dashboard updated"
-msgstr "更新仪表盘"
+msgstr "仪表盘已更新"
 
 #: app/controllers/CControllerDashboardList.php:92
 #: app/views/monitoring.dashboard.list.php:35
@@ -4320,7 +4318,7 @@ msgstr "数据来自 %1$s. 产生于 %2$s 秒."
 
 #: include/views/js/configuration.httpconf.edit.js.php:99
 msgid "Data is not properly encoded."
-msgstr "数据不正确的编码。"
+msgstr "数据未能正确编码。"
 
 #: include/classes/screens/CScreenDataOverview.php:38
 #: include/classes/widgets/CWidgetConfig.php:35 include/screens.inc.php:29
@@ -4333,7 +4331,7 @@ msgstr "数据概览"
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:34
 #: include/classes/widgets/views/widget.svggraph.form.view.php:288
 msgid "Data set"
-msgstr "数据设置"
+msgstr "数据集"
 
 #: app/views/administration.housekeeping.edit.php:85
 #: app/views/administration.housekeeping.edit.php:99
@@ -4440,7 +4438,7 @@ msgstr "硬件安装日期"
 
 #: include/hosts.inc.php:324
 msgid "Date HW maintenance expires"
-msgstr "硬件维修过期日期"
+msgstr "硬件维保到期日"
 
 #: include/hosts.inc.php:314
 msgid "Date HW purchased"
@@ -4481,11 +4479,11 @@ msgstr "调试模式"
 
 #: include/func.inc.php:250
 msgid "Dec"
-msgstr "十二"
+msgstr "十二月"
 
 #: include/func.inc.php:130 include/func.inc.php:267 jsLoader.php:166
 msgid "December"
-msgstr "十二"
+msgstr "十二月"
 
 #: app/views/administration.iconmap.edit.php:108
 #: include/classes/widgets/forms/CWidgetForm.php:49 include/hosts.inc.php:31
@@ -4609,7 +4607,7 @@ msgstr "删除应用集?"
 
 #: include/views/configuration.action.edit.php:510
 msgid "Delete current action?"
-msgstr "删除目前的动作?"
+msgstr "删除当前的动作?"
 
 #: include/views/configuration.correlation.edit.php:171
 msgid "Delete current correlation?"
@@ -4617,12 +4615,12 @@ msgstr "删除当前的关联项？"
 
 #: jsLoader.php:271
 msgid "Delete dashboard?"
-msgstr "你确定要删除仪表盘？"
+msgstr "删除仪表盘？"
 
 #: include/views/configuration.discovery.edit.php:145
 #: include/views/configuration.host.discovery.edit.php:792
 msgid "Delete discovery rule?"
-msgstr "删除发现规则?"
+msgstr "删除自动发现规则?"
 
 #: include/views/configuration.trigger.prototype.edit.php:235
 #: include/views/configuration.trigger.prototype.edit.php:431
@@ -4633,11 +4631,11 @@ msgstr "删除表达式?"
 
 #: include/views/configuration.graph.edit.php:491
 msgid "Delete graph prototype?"
-msgstr "删除数据图模板？"
+msgstr "删除图表原型？"
 
 #: include/views/configuration.graph.edit.php:491
 msgid "Delete graph?"
-msgstr "删除图形?"
+msgstr "删除图表?"
 
 #: include/views/configuration.item.list.php:242
 msgid "Delete history of selected items?"
@@ -4653,7 +4651,7 @@ msgstr "删除图标映射?"
 
 #: include/views/configuration.item.prototype.edit.php:746
 msgid "Delete item prototype?"
-msgstr "删除监控项目模板?"
+msgstr "删除监控项原型?"
 
 #: include/views/configuration.item.edit.php:892
 msgid "Delete item?"
@@ -4669,15 +4667,15 @@ msgstr "删除维修期间?"
 
 #: app/views/administration.mediatype.edit.php:364
 msgid "Delete media type?"
-msgstr "删除媒体值？"
+msgstr "删除媒介类型？"
 
 #: include/views/conf.import.php:29
 msgid "Delete missing"
-msgstr "删除失败"
+msgstr "删除缺失"
 
 #: app/views/administration.proxy.edit.php:145
 msgid "Delete proxy?"
-msgstr "删除代理?"
+msgstr "删除Proxy?"
 
 #: app/views/administration.regex.edit.php:153
 msgid "Delete regular expression?"
@@ -4693,7 +4691,7 @@ msgstr "删除脚本?"
 
 #: include/views/configuration.action.list.php:151
 msgid "Delete selected actions?"
-msgstr "删除所选的动作?"
+msgstr "删除选定的动作?"
 
 #: include/views/configuration.application.list.php:149
 msgid "Delete selected applications?"
@@ -4701,24 +4699,24 @@ msgstr "删除所选的应用集?"
 
 #: include/views/configuration.correlation.list.php:132
 msgid "Delete selected correlations?"
-msgstr "删除选择的关联项？"
+msgstr "删除选定的关联项？"
 
 #: app/views/monitoring.dashboard.list.php:85
 msgid "Delete selected dashboards?"
-msgstr "删除所有的仪表盘？（危险）"
+msgstr "删除选定的仪表盘？"
 
 #: include/views/configuration.discovery.list.php:103
 #: include/views/configuration.host.discovery.list.php:309
 msgid "Delete selected discovery rules?"
-msgstr "删除所选的发现规则?"
+msgstr "删除选定的自动发现规则？"
 
 #: jsLoader.php:195
 msgid "Delete selected elements?"
-msgstr "删除所选的元素?"
+msgstr "删除选定的元素？"
 
 #: include/views/configuration.graph.list.php:226
 msgid "Delete selected graph prototypes?"
-msgstr "删除所选定的数据图模板?"
+msgstr "删除所选定的图表原型?"
 
 #: include/views/configuration.graph.list.php:227
 msgid "Delete selected graphs?"
@@ -4727,7 +4725,7 @@ msgstr "删除所选的图表?"
 #: app/views/administration.usergroup.edit.php:224
 #: include/views/configuration.hostgroups.edit.php:63
 msgid "Delete selected group?"
-msgstr "删除所选的群组?"
+msgstr "删除所选组？"
 
 #: app/views/administration.usergroup.list.php:228
 msgid "Delete selected groups?"
@@ -4739,11 +4737,11 @@ msgstr "删除所选的主机群组?"
 
 #: include/views/configuration.host.prototype.edit.php:383
 msgid "Delete selected host prototype?"
-msgstr "删除所选定的主机模板?"
+msgstr "删除所选定的主机原型?"
 
 #: include/views/configuration.host.prototype.list.php:179
 msgid "Delete selected host prototypes?"
-msgstr "删除所选定的主机模板?"
+msgstr "删除所选定的主机原型?"
 
 #: include/views/configuration.host.edit.php:506
 msgid "Delete selected host?"
@@ -4759,7 +4757,7 @@ msgstr "删除所选的图像?"
 
 #: include/views/configuration.item.prototype.list.php:197
 msgid "Delete selected item prototypes?"
-msgstr "删除所选定的监控项目模板?"
+msgstr "删除所选定的监控项原型?"
 
 #: include/views/configuration.item.list.php:262
 msgid "Delete selected items?"
@@ -4767,7 +4765,7 @@ msgstr "删除所选的监控项?"
 
 #: include/views/configuration.maintenance.list.php:121
 msgid "Delete selected maintenance periods?"
-msgstr "删除所选的维修期间?"
+msgstr "删除所选的维修期?"
 
 #: include/views/monitoring.sysmap.edit.php:420
 msgid "Delete selected map?"
@@ -4775,15 +4773,15 @@ msgstr "删除选择的拓扑图？"
 
 #: include/views/monitoring.sysmap.list.php:105
 msgid "Delete selected maps?"
-msgstr "删除所选的地图?"
+msgstr "删除选定的拓扑图？"
 
 #: app/views/administration.mediatype.list.php:173
 msgid "Delete selected media types?"
-msgstr "删除所选的报警媒体类型?"
+msgstr "删除所选的媒介类型?"
 
 #: app/views/administration.proxy.list.php:175
 msgid "Delete selected proxies?"
-msgstr "删除所选的代理?"
+msgstr "删除所选的proxy?"
 
 #: app/views/administration.regex.list.php:91
 msgid "Delete selected regular expressions?"
@@ -4958,11 +4956,11 @@ msgstr "描述"
 #: include/views/configuration.action.edit.php:419
 #: include/views/inventory.host.view.php:247
 msgid "Details"
-msgstr "细节"
+msgstr "详情"
 
 #: httpdetails.php:27 httpdetails.php:185
 msgid "Details of web scenario"
-msgstr "网络方案详细信息"
+msgstr "Web 场景详情"
 
 #: include/actions.inc.php:75
 msgid "Device"
@@ -5029,15 +5027,15 @@ msgstr "禁用主机"
 
 #: include/views/configuration.hostgroups.list.php:167
 msgid "Disable hosts in the selected host groups?"
-msgstr "停用所选的主机群组中的主机?"
+msgstr "禁用所选主机群组中的主机?"
 
 #: app/views/administration.proxy.list.php:173
 msgid "Disable hosts monitored by selected proxies?"
-msgstr "停用所选的agent代理程序所监测的主机?"
+msgstr "禁用所选的proxy所监测的主机?"
 
 #: include/views/configuration.action.list.php:150
 msgid "Disable selected actions?"
-msgstr "停用所选的动作?"
+msgstr "禁用所选的动作?"
 
 #: include/views/configuration.application.list.php:148
 msgid "Disable selected applications?"
@@ -5050,23 +5048,23 @@ msgstr "禁用选择的关联项？"
 #: include/views/configuration.discovery.list.php:102
 #: include/views/configuration.host.discovery.list.php:305
 msgid "Disable selected discovery rules?"
-msgstr "停用所选的自动发现规则?"
+msgstr "禁用所选的自动发现规则?"
 
 #: app/views/administration.usergroup.list.php:210
 msgid "Disable selected groups?"
-msgstr "停用所选的群组?"
+msgstr "禁用所选的用户群组?"
 
 #: include/views/configuration.host.list.php:469
 msgid "Disable selected hosts?"
-msgstr "停用所选的主机?"
+msgstr "禁用所选的主机?"
 
 #: include/views/configuration.item.list.php:257
 msgid "Disable selected items?"
-msgstr "停用所选的监控项?"
+msgstr "禁用所选的监控项?"
 
 #: app/views/administration.mediatype.list.php:163
 msgid "Disable selected media types?"
-msgstr "停用所选的报警媒介类型?"
+msgstr "禁用所选的报警媒介类型?"
 
 #: app/views/administration.module.list.php:123
 msgid "Disable selected modules?"
@@ -5074,7 +5072,7 @@ msgstr "禁用所选的模块?"
 
 #: include/views/configuration.triggers.list.php:339
 msgid "Disable selected triggers?"
-msgstr "停用所选的触发器?"
+msgstr "禁用所选的触发器?"
 
 #: include/views/configuration.httpconf.list.php:191
 msgid "Disable selected web scenarios?"
@@ -5111,7 +5109,7 @@ msgstr "禁用所选定的web场景？"
 #: include/views/configuration.host.prototype.edit.php:320
 #: include/views/js/monitoring.sysmaps.js.php:274
 msgid "Disabled"
-msgstr "停用的"
+msgstr "停用"
 
 #: app/views/administration.trigseverity.edit.php:76
 msgid "Disaster"
@@ -5146,7 +5144,7 @@ msgstr "发现"
 #: include/discovery.inc.php:138 include/forms.inc.php:540
 #: include/views/configuration.triggers.list.php:144
 msgid "Discovered"
-msgstr "已发现的"
+msgstr "已发现"
 
 #: include/views/configuration.graph.edit.php:75
 #: include/views/configuration.host.edit.php:61
@@ -5183,7 +5181,7 @@ msgstr "发现动作"
 
 #: include/views/configuration.discovery.edit.php:60
 msgid "Discovery by proxy"
-msgstr "由agent代理程序自动发现"
+msgstr "由Proxy代理程序自动发现"
 
 #: app/controllers/CControllerPopupDiscoveryCheck.php:109
 #: app/views/popup.condition.common.php:415 include/actions.inc.php:53
@@ -5200,11 +5198,11 @@ msgstr "自动发现清单"
 
 #: app/views/popup.condition.common.php:433 include/actions.inc.php:54
 msgid "Discovery object"
-msgstr "自动发现物件"
+msgstr "自动发现对象"
 
 #: include/classes/items/CHelpItems.php:787
 msgid "Discovery of VMware clusters, \"url\" - VMware service URL. Returns JSON"
-msgstr ""
+msgstr "VMware 发现的集群，“url”- VMware 服务 URL。返回 JSON"
 
 #: include/classes/items/CHelpItems.php:787
 msgid "Discovery of VMware clusters, <url> - VMware service URL. Returns JSON"
@@ -5212,7 +5210,7 @@ msgstr "发现 VMware 集群，<url> - VMware 服务 URL。返回 JSON"
 
 #: include/classes/items/CHelpItems.php:795
 msgid "Discovery of VMware datastores, \"url\" - VMware service URL. Returns JSON"
-msgstr ""
+msgstr "VMware 发现的数据存储，“url”- VMware 服务 URL。返回 JSON"
 
 #: include/classes/items/CHelpItems.php:795
 msgid "Discovery of VMware datastores, <url> - VMware service URL. Returns JSON"
@@ -5220,7 +5218,7 @@ msgstr "发现 VMware 数据存储，<url> - VMware 服务 URL。返回 JSON"
 
 #: include/classes/items/CHelpItems.php:839
 msgid "Discovery of VMware hypervisor datastores, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns JSON"
-msgstr ""
+msgstr "VMware 发现的虚拟机管理程序数据存储，“url”- VMware 服务 URL，“uuid”- VMware 虚拟机管理程序全局唯一标识符。返回 JSON"
 
 #: include/classes/items/CHelpItems.php:839
 msgid "Discovery of VMware hypervisor datastores, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
@@ -5228,7 +5226,7 @@ msgstr "发现 VMware hypervisor数据存储，<url> - VMware 服务 URL，<uuid
 
 #: include/classes/items/CHelpItems.php:859
 msgid "Discovery of VMware hypervisors, \"url\" - VMware service URL. Returns JSON"
-msgstr ""
+msgstr "VMware 发现的虚拟机管理程序，“url”- VMware 服务 URL。返回 JSON"
 
 #: include/classes/items/CHelpItems.php:859
 msgid "Discovery of VMware hypervisors, <url> - VMware service URL. Returns JSON"
@@ -5236,7 +5234,7 @@ msgstr "发现 VMware hypervisor，<url> - VMware 服务 URL。返回 JSON"
 
 #: include/classes/items/CHelpItems.php:1047
 msgid "Discovery of VMware virtual machine disk devices, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier. Returns JSON"
-msgstr ""
+msgstr "发现的VMware虚拟机磁盘设备，“url”-VMware服务URL，“uuid”-VMware虚拟机全局唯一标识符。返回 JSON"
 
 #: include/classes/items/CHelpItems.php:1047
 msgid "Discovery of VMware virtual machine disk devices, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
@@ -5244,7 +5242,7 @@ msgstr "发现 VMware 虚拟机磁盘设备，<url> - VMware 服务 URL，<uuid>
 
 #: include/classes/items/CHelpItems.php:1059
 msgid "Discovery of VMware virtual machine file systems, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier. Returns JSON"
-msgstr ""
+msgstr "VMware发现的虚拟机文件系统，“url”-VMware服务URL，“uuid”-VMware虚拟机全局唯一标识符。返回 JSON"
 
 #: include/classes/items/CHelpItems.php:1059
 msgid "Discovery of VMware virtual machine file systems, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
@@ -5252,7 +5250,7 @@ msgstr "发现 VMware 虚拟机文件系统，<url> - VMware 服务 URL，<uuid>
 
 #: include/classes/items/CHelpItems.php:971
 msgid "Discovery of VMware virtual machines, \"url\" - VMware service URL. Returns JSON"
-msgstr ""
+msgstr "VMware 发现的虚拟机，“url”-VMware 服务 URL。返回 JSON"
 
 #: include/classes/items/CHelpItems.php:971
 msgid "Discovery of VMware virtual machines, <url> - VMware service URL. Returns JSON"
@@ -5286,7 +5284,7 @@ msgstr "发现规则\"%1$s\"已存在"
 #: include/classes/api/services/CDiscoveryRule.php:2115
 #, c-format
 msgid "Discovery rule \"%1$s\" cannot be copied without its master item."
-msgstr "发现规则“%1$s”在没有主监控项的情况下无法复制。"
+msgstr "如果没有主监控项，则无法复制发现规则“%1$s”。"
 
 #: include/classes/api/services/CDRule.php:836
 #: include/classes/api/services/CDRule.php:853
@@ -5310,7 +5308,7 @@ msgstr[0] "发现规则已禁用"
 #: discoveryconf.php:180 host_discovery.php:702
 msgid "Discovery rule enabled"
 msgid_plural "Discovery rules enabled"
-msgstr[0] "发现规则已经启用"
+msgstr[0] "发现规则已启用"
 
 #: discoveryconf.php:125 host_discovery.php:676
 msgid "Discovery rule updated"
@@ -5356,7 +5354,7 @@ msgstr "显示OK触发器予"
 
 #: app/partials/monitoring.latest.view.html.php:332
 msgid "Display graph"
-msgstr "显示数据图"
+msgstr "显示图表"
 
 #: include/views/monitoring.sysmap.edit.php:149
 msgid "Display problems"
@@ -5364,7 +5362,7 @@ msgstr "显示问题"
 
 #: app/partials/monitoring.latest.view.html.php:331
 msgid "Display stacked graph"
-msgstr "显示堆叠数据图"
+msgstr "显示堆叠面积图"
 
 #: app/controllers/CControllerHintboxActionlist.php:94 app/views/search.php:154
 #: app/views/search.php:223 app/views/search.php:308
@@ -5372,12 +5370,12 @@ msgstr "显示堆叠数据图"
 #: include/classes/helpers/CPagerHelper.php:148 jsLoader.php:332 queue.php:309
 #, c-format
 msgid "Displaying %1$s of %2$s found"
-msgstr "显示 已自动发现的 %2$s中的%1$s"
+msgstr "显示 %1$s，共找到 %2$s "
 
 #: include/classes/helpers/CPagerHelper.php:151
 #, c-format
 msgid "Displaying %1$s to %2$s of %3$s found"
-msgstr "在 %3$s 中打印 %1$s 到 %2$s "
+msgstr "显示 %1$s 至 %2$s，共找到 %3$s"
 
 #: include/classes/widgets/views/widget.svggraph.form.view.php:289
 msgid "Displaying options"
@@ -5791,11 +5789,11 @@ msgstr "启用"
 
 #: app/views/administration.authentication.edit.php:41
 msgid "Enable HTTP authentication"
-msgstr "开启 HTTP 验证"
+msgstr "启用HTTP 验证"
 
 #: app/views/administration.authentication.edit.php:87
 msgid "Enable LDAP authentication"
-msgstr "开启 LDAP 验证"
+msgstr "启用LDAP 验证"
 
 #: app/views/administration.authentication.edit.php:146
 msgid "Enable SAML authentication"
@@ -5815,7 +5813,7 @@ msgstr "启用调试模式"
 
 #: app/views/administration.usergroup.list.php:216
 msgid "Enable debug mode in selected groups?"
-msgstr "于所选的群组中启用调试模式?"
+msgstr "启用所选用户群组的调试模式?"
 
 #: include/actions.inc.php:645 include/actions.inc.php:1057
 msgid "Enable host"
@@ -5832,7 +5830,7 @@ msgstr "启用主机"
 
 #: app/views/administration.proxy.list.php:170
 msgid "Enable hosts monitored by selected proxies?"
-msgstr "启用受所选的agent代理程序所监测的主机?"
+msgstr "启用受所选的proxy所监测的主机?"
 
 #: app/views/administration.housekeeping.edit.php:43
 #: app/views/administration.housekeeping.edit.php:81
@@ -5841,7 +5839,7 @@ msgstr "启用受所选的agent代理程序所监测的主机?"
 #: app/views/administration.housekeeping.edit.php:123
 #: app/views/administration.housekeeping.edit.php:141
 msgid "Enable internal housekeeping"
-msgstr "开启内部管家"
+msgstr "开启内部管家服务"
 
 #: include/views/configuration.action.list.php:149
 msgid "Enable selected actions?"
@@ -6021,15 +6019,15 @@ msgstr "事件已确认"
 #: app/controllers/CControllerAuditLogList.php:216 include/menu.inc.php:147
 #: include/views/configuration.correlation.list.php:27
 msgid "Event correlation"
-msgstr "关联项事件"
+msgstr "关联事件"
 
 #: correlation.php:26 include/views/configuration.correlation.edit.php:28
 msgid "Event correlation rules"
-msgstr "关联项事件规则"
+msgstr "关联事件规则"
 
 #: tr_events.php:29 tr_events.php:173 tr_events.php:199
 msgid "Event details"
-msgstr "事件细节"
+msgstr "事件详情"
 
 #: include/triggers.inc.php:1217
 msgid "Event generation"
@@ -6070,7 +6068,7 @@ msgstr "事件和报警"
 
 #: app/views/popup.maintenance.period.php:82
 msgid "Every day(s)"
-msgstr "每日"
+msgstr "每天"
 
 #: app/views/popup.maintenance.period.php:89
 msgid "Every week(s)"
@@ -6078,11 +6076,11 @@ msgstr "每周"
 
 #: app/partials/massupdate.macros.tab.php:101
 msgid "Except selected"
-msgstr "已选除外"
+msgstr "选择除外"
 
 #: app/views/popup.triggerwizard.php:54 app/views/popup.triggerwizard.php:106
 msgid "Exclude"
-msgstr "除外"
+msgstr "排除"
 
 #: include/classes/widgets/forms/CWidgetFormProblemHosts.php:42
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:42
@@ -6179,7 +6177,7 @@ msgstr "导出"
 
 #: app/views/monitoring.problem.view.php:364
 msgid "Export to CSV"
-msgstr "导出到CSV"
+msgstr "导出为CSV"
 
 #: app/views/administration.iconmap.edit.php:58
 #: app/views/administration.regex.edit.php:49
@@ -6210,7 +6208,7 @@ msgstr "表达式变量组成"
 #: include/classes/triggers/CTextTriggerConstructor.php:63
 #: include/regexp.inc.php:135 include/regexp.inc.php:142
 msgid "Expression cannot be empty"
-msgstr "表达式不能为空白"
+msgstr "表达式不能为空"
 
 #: include/views/configuration.trigger.prototype.edit.php:164
 #: include/views/configuration.trigger.prototype.edit.php:357
@@ -6273,7 +6271,7 @@ msgstr "无法解析URL。"
 
 #: app/controllers/CControllerDashboardUpdate.php:242
 msgid "Failed to update dashboard"
-msgstr "更新仪表盘失败"
+msgstr "更新仪板盘失败"
 
 #: include/classes/api/services/CTemplate.php:580
 msgid "Failed to update template."
@@ -6281,7 +6279,7 @@ msgstr "更新模板失败"
 
 #: include/items.inc.php:37
 msgid "Failure Audit"
-msgstr "失败审计"
+msgstr "审计失败"
 
 #: app/views/system.warning.php:26 app/views/system.warning.php:38
 msgid "Fatal error, please report to the Zabbix team"
@@ -6309,7 +6307,7 @@ msgstr "二月"
 
 #: hostinventoriesoverview.php:86 include/views/inventory.host.list.php:62
 msgid "Field"
-msgstr "栏位"
+msgstr "字段"
 
 #: include/classes/db/DB.php:331
 #, c-format
@@ -6407,7 +6405,7 @@ msgstr "文件大小（单位bytes）。返回整数"
 #: include/classes/items/CHelpItems.php:337
 #: include/classes/items/CHelpItems.php:687
 msgid "File time information. Returns integer (Unix timestamp)"
-msgstr "文件事件信息，返回的是时间戳 整数"
+msgstr "文件时间信息。返回整数（Unix 时间戳）"
 
 #: include/classes/widgets/CWidgetHelper.php:762
 #: include/classes/widgets/CWidgetHelper.php:817
@@ -6423,11 +6421,11 @@ msgstr "文件事件信息，返回的是时间戳 整数"
 #: include/classes/widgets/CWidgetHelper.php:827
 #: include/classes/widgets/CWidgetHelper.php:1081
 msgid "Fill"
-msgstr "填"
+msgstr "填充"
 
 #: include/graphs.inc.php:57
 msgid "Filled region"
-msgstr "填满的区域"
+msgstr "填满区域"
 
 #: app/partials/common.filter.trigger.php:179
 #: app/views/administration.mediatype.list.php:42
@@ -6465,7 +6463,7 @@ msgstr "填满的区域"
 #: include/views/monitoring.sysmap.list.php:44
 #: include/views/reports.toptriggers.php:80 report2.php:500
 msgid "Filter"
-msgstr "过滤器"
+msgstr "条件检索"
 
 #: app/views/popup.lldoverride.php:163
 #: include/views/configuration.host.discovery.edit.php:654
@@ -6504,11 +6502,11 @@ msgstr "首"
 #: app/controllers/CControllerPopupTriggerExpr.php:193
 #: app/controllers/CControllerPopupTriggerExpr.php:222
 msgid "Fit"
-msgstr "适合"
+msgstr "曲线拟合"
 
 #: include/views/js/monitoring.sysmaps.js.php:111
 msgid "Fit to map"
-msgstr "调整至符合拓扑图"
+msgstr "调整至拓扑图"
 
 #: include/views/configuration.graph.edit.php:172
 #: include/views/configuration.graph.edit.php:259
@@ -6646,16 +6644,16 @@ msgstr "图形化界面已经被禁用。"
 
 #: include/menu.inc.php:156
 msgid "General"
-msgstr "一般"
+msgstr "常规"
 
 #: chart4.php:172 chart5.php:203
 #, c-format
 msgid "Generated in %1$s sec"
-msgstr "在 %1$s 秒内生成"
+msgstr "产生于%1$s 秒"
 
 #: include/locales.inc.php:56
 msgid "Georgian (ka_GE)"
-msgstr "格鲁吉亚（ka_GE）"
+msgstr "格鲁吉亚语 (ka_GE)"
 
 #: include/locales.inc.php:57
 msgid "German (de_DE)"
@@ -6664,7 +6662,7 @@ msgstr "德语 (de_DE)"
 #: include/classes/items/CHelpItems.php:365
 #: include/classes/items/CHelpItems.php:715
 msgid "Get content of web page. Returns web page source as text"
-msgstr "获取网页。返回信息为网页源码或者TXT"
+msgstr "获取网页内容。以文本形式返回网页源"
 
 #: app/views/popup.itemtestedit.view.php:135
 msgid "Get value"
@@ -6777,7 +6775,7 @@ msgstr "图形\"%1$s\"已存在于\"%2$s\"中 (继承自其它的模板)."
 #: include/classes/api/services/CGraphPrototype.php:474
 #, c-format
 msgid "Graph \"%1$s\" already exists on \"%2$s\" (items are not identical)."
-msgstr "图形\"%1$s\"已存在于\"%2$s\"中 (项目不一致)."
+msgstr "图形\"%1$s\"已存在于\"%2$s\"中 (监控项不一致)."
 
 #: include/classes/api/services/CGraph.php:408
 #: include/classes/api/services/CGraphPrototype.php:416
@@ -6812,7 +6810,7 @@ msgstr "图形 \"%1$s\"不存在于模板\"%2$s\"中."
 #: include/classes/api/services/CGraph.php:36
 #, c-format
 msgid "Graph \"%1$s\" with templated items cannot contain items from other hosts."
-msgstr "含模板项目的图形\"%1$s\"不能包含其它主机的项目."
+msgstr "含模板监控项的图形\"%1$s\"不能包含其它主机的监控项."
 
 #: include/classes/widgets/CWidgetConfig.php:40
 msgid "Graph (classic)"
@@ -6849,17 +6847,17 @@ msgstr "图形原型"
 #: include/classes/api/services/CGraphPrototype.php:768
 #, c-format
 msgid "Graph prototype \"%1$s\" contains item prototypes from multiple discovery rules."
-msgstr "数据图模板 \"%1$s\" 包含来自多个自动发现规则上的监控项目模板"
+msgstr "数据图模板 \"%1$s\" 包含来自多个自动发现规则上的监控项模板"
 
 #: include/classes/api/services/CGraphPrototype.php:774
 #, c-format
 msgid "Graph prototype \"%1$s\" must have at least one item prototype."
-msgstr "数据图模板\"%1$s\"必须要有至少一个监控项目模板"
+msgstr "数据图模板\"%1$s\"必须要有至少一个监控项模板"
 
 #: include/classes/api/services/CGraphPrototype.php:36
 #, c-format
 msgid "Graph prototype \"%1$s\" with templated items cannot contain items from other hosts."
-msgstr "含模板项目的图形原型\"%1$s\"不能包含其它主机的项目."
+msgstr "含模板监控项的图形原型\"%1$s\"不能包含其它主机的监控项."
 
 #: graphs.php:229
 msgid "Graph prototype added"
@@ -7035,7 +7033,7 @@ msgstr "群组已更新"
 
 #: hostinventoriesoverview.php:173
 msgid "Grouping by"
-msgstr "群组化之于"
+msgstr "归类统计"
 
 #: app/views/administration.user.edit.php:80
 #: app/views/administration.user.list.php:102
@@ -7049,7 +7047,7 @@ msgstr "群组"
 
 #: include/menu.inc.php:226
 msgid "Guest user"
-msgstr "访客用户"
+msgstr "来宾用户"
 
 #: include/translateDefines.inc.php:35
 msgid "H:i"
@@ -7141,7 +7139,7 @@ msgstr "希伯来语（he_IL）"
 #: include/views/monitoring.sysmap.edit.php:104
 #: include/views/monitoring.sysmap.list.php:66 screenedit.php:68 sysmaps.php:42
 msgid "Height"
-msgstr "高"
+msgstr "高度(px)"
 
 #: include/menu.inc.php:212 include/menu.inc.php:215
 #: include/views/general.login.php:86
@@ -7251,7 +7249,7 @@ msgstr "事件历史"
 #: include/views/configuration.item.prototype.edit.php:610
 #: include/views/configuration.item.prototype.massupdate.php:314 items.php:65
 msgid "History storage period"
-msgstr "历史数据保留时长"
+msgstr "历史数据保留期"
 
 #: app/views/administration.module.edit.php:44
 msgid "Homepage"
@@ -8194,7 +8192,7 @@ msgstr "错误的动作条件端口\"%1$s\"."
 
 #: include/classes/api/services/CAction.php:3258
 msgid "Incorrect action condition proxy. Proxy does not exist or you have no access to it."
-msgstr "不正确的动作条件agent代理程序. agent代理程序不存在或您没有存取权."
+msgstr "不正确的动作条件Proxy代理程序. Proxy代理程序不存在或您没有存取权."
 
 #: include/classes/api/services/CAction.php:3246
 msgid "Incorrect action condition template. Template does not exist or you have no access to it."
@@ -8577,7 +8575,7 @@ msgstr "资产字段“%1$s”不正确。"
 
 #: include/classes/api/services/CAction.php:1962
 msgid "Incorrect inventory mode in action operation."
-msgstr "要执行的动作库存方式是不正确的。"
+msgstr "要执行的动作资产模式是不正确的。"
 
 #: include/classes/api/services/CScreenItem.php:688
 #, c-format
@@ -8591,7 +8589,7 @@ msgstr "错误的项目轴线值."
 #: include/classes/api/services/CTriggerGeneral.php:1551
 #, c-format
 msgid "Incorrect item key \"%1$s\" provided for trigger expression on \"%2$s\"."
-msgstr "提供错误的项目键值\"%1$s\"给\"%2$s\"上的触发器表达式."
+msgstr "提供错误的监控项键值\"%1$s\"给\"%2$s\"上的触发器表达式."
 
 #: include/classes/api/services/CScreenItem.php:705
 #, c-format
@@ -8601,12 +8599,12 @@ msgstr "图表元素应用了不正确的监控项目模板ID\"%1$s\" "
 #: app/controllers/CControllerPopupTestTriggerExpr.php:50
 #: include/triggers.inc.php:1375
 msgid "Incorrect item value type"
-msgstr "项目的数据类型不正确"
+msgstr "监控项的数据类型不正确"
 
 #: include/classes/validators/CFunctionValidator.php:300
 #, c-format
 msgid "Incorrect item value type \"%1$s\" provided for trigger function \"%2$s\"."
-msgstr "提供错误的项目值类型\"%1$s\"给触发器函数\"%2$s\"."
+msgstr "提供错误的监控项值类型\"%1$s\"给触发器函数\"%2$s\"."
 
 #: include/forms.inc.php:1514
 msgid "Incorrect list of items."
@@ -9262,7 +9260,7 @@ msgstr "已继承"
 
 #: include/views/configuration.host.edit.php:371
 msgid "Inherited and host macros"
-msgstr "继承以及主机 宏"
+msgstr "继承以及主机宏"
 
 #: include/views/configuration.host.prototype.edit.php:307
 msgid "Inherited and host prototype macros"
@@ -9348,7 +9346,7 @@ msgstr "认证"
 #: include/users.inc.php:84
 msgctxt "user type"
 msgid "Internal"
-msgstr "用户类型"
+msgstr "认证"
 
 #: include/classes/core/CJsonRpc.php:196
 msgid "Internal JSON-RPC error."
@@ -9777,12 +9775,12 @@ msgstr "主机\"%1$s\"的资产记录被禁用."
 
 #: app/views/administration.iconmap.edit.php:58
 msgid "Inventory field"
-msgstr "资产纪录栏位"
+msgstr "资产字段"
 
 #: app/partials/popup.operations.php:364
 #: include/views/configuration.host.massupdate.php:216
 msgid "Inventory mode"
-msgstr "资产纪录模式"
+msgstr "资产模式"
 
 #: app/views/administration.user.list.php:103
 msgid "Is online?"
@@ -9841,7 +9839,7 @@ msgstr "监控项\"%1$s\"已经存在于\"%2$s\"."
 #: include/items.inc.php:534
 #, c-format
 msgid "Item \"%1$s\" cannot be copied without its master item."
-msgstr "无法复制没有主监控项的监控项 \"%1$s\"。"
+msgstr "如果没有主项目，则无法复制监控项 \"%1$s\"。"
 
 #: include/classes/api/services/CItem.php:950
 #, c-format
@@ -9893,7 +9891,7 @@ msgstr[0] "监控项目被禁用"
 #: applications.php:227 items.php:1232
 msgid "Item enabled"
 msgid_plural "Items enabled"
-msgstr[0] "监控项目已启用"
+msgstr[0] "监控项已启用"
 
 #: include/actions.inc.php:1288
 msgid "Item in \"not supported\" state"
@@ -9901,7 +9899,7 @@ msgstr "监控项在“不支持”的状态"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:712
 msgid "Item not selected"
-msgstr "项目未被选择"
+msgstr "监控项未被选择"
 
 #: include/classes/api/services/CItemGeneral.php:1236
 #, c-format
@@ -9935,7 +9933,7 @@ msgstr "\"%2$s\"上的项目模板\"%1$s\"已经存在."
 
 #: disc_prototypes.php:642
 msgid "Item prototype added"
-msgstr "项目模板已经添加"
+msgstr "监控项模板已经添加"
 
 #: disc_prototypes.php:308
 msgid "Item prototype deleted"
@@ -9949,7 +9947,7 @@ msgstr[0] "项目模板已更新"
 #: include/classes/api/services/CDashboard.php:747
 #, c-format
 msgid "Item prototype with ID \"%1$s\" is not available."
-msgstr "ID为 \"%1$s\" 的项目原型不可用。"
+msgstr "ID为 \"%1$s\" 的监控项原型不可用。"
 
 #: app/controllers/CControllerPopupGeneric.php:317 include/html.inc.php:463
 #: include/views/configuration.host.discovery.list.php:260
@@ -9985,7 +9983,7 @@ msgstr "监控项使用错误的接口类型."
 
 #: chart.php:101 chart.php:104
 msgid "Item values"
-msgstr "项目值"
+msgstr "监控项值"
 
 #: include/items.inc.php:2071
 msgid "Item will not be refreshed. Please enter a correct update interval."
@@ -10002,7 +10000,7 @@ msgstr "监控项不会被刷新。更新间隔应该在 1s 到 1d 之间。还�
 #: include/classes/api/services/CDashboard.php:730
 #, c-format
 msgid "Item with ID \"%1$s\" is not available."
-msgstr "ID为 \"%1$s\" 的项目不可用。"
+msgstr "ID为 \"%1$s\" 的监控项不可用。"
 
 #: include/classes/api/services/CItemGeneral.php:613
 #, c-format
@@ -10120,7 +10118,7 @@ msgstr "JSON-RPC 错误生成失败。没有这样的错误 \"%1$s\"。"
 #: include/items.inc.php:1792
 #: include/views/configuration.host.discovery.edit.php:669
 msgid "JSONPath"
-msgstr "JSON 路径"
+msgstr "JSONPath"
 
 #: include/func.inc.php:239
 msgid "Jan"
@@ -10158,7 +10156,7 @@ msgstr "六月"
 #: include/views/configuration.host.discovery.edit.php:538
 #: include/views/configuration.host.discovery.list.php:133
 msgid "Keep lost resources period"
-msgstr "资源周期不足"
+msgstr "保留流失资源期限"
 
 #: include/httptest.inc.php:30
 #: include/views/configuration.host.discovery.edit.php:286
@@ -10264,48 +10262,48 @@ msgstr "语言"
 #: include/classes/api/services/CUser.php:551
 #, c-format
 msgid "Language \"%1$s\" is not supported."
-msgstr "不支持语言“%1$s”。"
+msgstr "语言 \"%1$s\" 不受支持。"
 
 #: include/classes/helpers/CPagerHelper.php:233
 msgctxt "page navigation"
 msgid "Last"
-msgstr "末"
+msgstr "末页"
 
 #: include/func.inc.php:2638
 #, c-format
 msgid "Last %1$d day"
 msgid_plural "Last %1$d days"
-msgstr[0] "最近 %1$d 天"
+msgstr[0] "过去 %1$d 天"
 
 #: include/func.inc.php:2632
 #, c-format
 msgid "Last %1$d hour"
 msgid_plural "Last %1$d hours"
-msgstr[0] "最近 %1$d 小时"
+msgstr[0] "过去 %1$d 小时"
 
 #: include/func.inc.php:2625
 #, c-format
 msgid "Last %1$d minute"
 msgid_plural "Last %1$d minutes"
-msgstr[0] "最近 %1$d 分钟"
+msgstr[0] "过去 %1$d 分钟"
 
 #: include/func.inc.php:2641
 #, c-format
 msgid "Last %1$d month"
 msgid_plural "Last %1$d months"
-msgstr[0] "最近 %1$d 个月"
+msgstr[0] "过去 %1$d 个月"
 
 #: include/func.inc.php:2618
 #, c-format
 msgid "Last %1$d second"
 msgid_plural "Last %1$d seconds"
-msgstr[0] "最近 %1$d 秒"
+msgstr[0] "过去 %1$d 秒"
 
 #: include/func.inc.php:2644
 #, c-format
 msgid "Last %1$d year"
 msgid_plural "Last %1$d years"
-msgstr[0] "最近 %1$d 年"
+msgstr[0] "过去 %1$d 年"
 
 #: srv_status.php:42
 msgid "Last 24 hours"
@@ -10516,7 +10514,7 @@ msgstr "链接的模板"
 
 #: include/views/configuration.template.list.php:159
 msgid "Linked to templates"
-msgstr "链接到模板"
+msgstr "关联到模板"
 
 #: include/views/js/monitoring.sysmaps.js.php:718
 #: include/views/js/monitoring.sysmaps.js.php:729
@@ -10535,17 +10533,17 @@ msgstr "块设备列表及其类型。返回 JSON"
 #: include/classes/items/CHelpItems.php:197
 #: include/classes/items/CHelpItems.php:547
 msgid "List of detected CPUs/CPU cores. Returns JSON"
-msgstr "检测到的 CPU/CPU 核心列表。返回 JSON"
+msgstr "检测到的 CPU/CPU 内核列表。返回 JSON"
 
 #: include/classes/items/CHelpItems.php:341
 #: include/classes/items/CHelpItems.php:691
 msgid "List of mounted filesystems and their types. Returns JSON"
-msgstr "已挂载文件系统及其类型的列表。返回 JSON"
+msgstr "已安装文件系统及其类型的列表。返回 JSON"
 
 #: include/classes/items/CHelpItems.php:345
 #: include/classes/items/CHelpItems.php:695
 msgid "List of mounted filesystems, their types, disk space and inode statistics. Returns JSON"
-msgstr "已挂载的文件系统、类型、磁盘空间列表和 inode 统计信息。返回 JSON"
+msgstr "挂载的文件系统、类型、磁盘空间列表和 inode 统计信息。返回 JSON"
 
 #: include/classes/items/CHelpItems.php:101
 #: include/classes/items/CHelpItems.php:451
@@ -10555,7 +10553,7 @@ msgstr "网络接口列表。返回 JSON"
 #: include/classes/items/CHelpItems.php:153
 #: include/classes/items/CHelpItems.php:503
 msgid "List of object instances of Windows performance counters, discovered using object names in English. Returns JSON"
-msgstr "Windows 性能计数器的对象实例列表，使用英文对象名称发现。返回 JSON"
+msgstr "Windows 性能计数器的对象实例列表，发现的英文对象名称。返回 JSON"
 
 #: include/classes/items/CHelpItems.php:149
 #: include/classes/items/CHelpItems.php:499
@@ -10615,7 +10613,7 @@ msgstr "本地"
 #: include/views/monitoring.history.php:292
 #: include/views/monitoring.screen.constructor.edit.php:720
 msgid "Local time"
-msgstr "当地时间"
+msgstr "本地时间"
 
 #: include/hosts.inc.php:214
 msgid "Location"
@@ -10822,16 +10820,16 @@ msgstr "维护已删除"
 
 #: app/controllers/CControllerPopupMaintenancePeriod.php:218
 msgid "Maintenance period"
-msgstr "维护周期"
+msgstr "维护时段"
 
 #: app/views/popup.maintenance.period.php:162
 msgid "Maintenance period length"
-msgstr "维护期间长度"
+msgstr "维护时段范围"
 
 #: include/views/configuration.maintenance.edit.php:28
 #: include/views/configuration.maintenance.list.php:27
 msgid "Maintenance periods"
-msgstr "维护期间"
+msgstr "维护时段"
 
 #: include/views/configuration.maintenance.edit.php:51
 msgid "Maintenance type"
@@ -11148,12 +11146,12 @@ msgstr "ID为 \"%1$s\" 的媒体类型不可用。"
 #: app/views/administration.mediatype.list.php:31 include/menu.inc.php:175
 #: include/views/conf.import.php:51
 msgid "Media types"
-msgstr "报警媒介类型"
+msgstr "媒介"
 
 #: include/classes/api/services/CMediatype.php:1140
 #, c-format
 msgid "Media types used by action \"%1$s\"."
-msgstr "动作“%1$s”使用的媒介类型。"
+msgstr "操作“%1$s”使用的媒介类型。"
 
 #: app/views/administration.usergroup.list.php:74
 #: include/views/configuration.hostgroups.list.php:66
@@ -11253,12 +11251,12 @@ msgstr "最小"
 #: include/classes/setup/CFrontendSetup.php:125
 #, c-format
 msgid "Minimum required PHP memory limit is %1$s (configuration option \"memory_limit\")."
-msgstr "PHP所需内存限制最低为%1$s (配置项\"memory_limit\")。"
+msgstr "所需求的最小PHP内存限制是%1$s (配置项\"memory_limit\")。"
 
 #: include/classes/setup/CFrontendSetup.php:163
 #, c-format
 msgid "Minimum required PHP upload filesize is %1$s (configuration option \"upload_max_filesize\")."
-msgstr "PHP上传文件大小最低限制为%1$s (配置项\"upload_max_filesize\")。"
+msgstr "所需求的最小PHP上传文件大小是%1$s (配置项\"upload_max_filesize\")。"
 
 #: include/classes/setup/CFrontendSetup.php:107
 #, c-format
@@ -11268,17 +11266,17 @@ msgstr "所需的最低 PHP 版本为 %1$s。"
 #: include/classes/setup/CFrontendSetup.php:194
 #, c-format
 msgid "Minimum required limit on execution time of PHP scripts is %1$s (configuration option \"max_execution_time\")."
-msgstr "PHP脚本执行时间最低要求限制为%1$s (配置项 \"max_execution_time\")。"
+msgstr "所要求的最小PHP脚本执行时间是%1$s (配置项 \"max_execution_time\")。"
 
 #: include/classes/setup/CFrontendSetup.php:217
 #, c-format
 msgid "Minimum required limit on input parse time for PHP scripts is %1$s (configuration option \"max_input_time\")."
-msgstr "PHP脚本输入解析时间最低要求限制为%1$s (配置项\"max_input_time\")。"
+msgstr "所要求的PHP脚本最小解析时间是%1$s (配置项\"max_input_time\")。"
 
 #: include/classes/setup/CFrontendSetup.php:144
 #, c-format
 msgid "Minimum required size of PHP post is %1$s (configuration option \"post_max_size\")."
-msgstr "PHP post大小最低限制为%1$s (配置项\"post_max_size\")。"
+msgstr "所要求的最小PHP post大小是%1$s (配置项\"post_max_size\")。"
 
 #: app/partials/common.filter.trigger.php:117
 #: app/views/monitoring.map.view.php:48
@@ -11374,7 +11372,7 @@ msgstr[0] "已删除模块: %1$s。"
 #: app/controllers/CControllerModuleUpdate.php:134
 msgid "Module disabled"
 msgid_plural "Modules disabled"
-msgstr[0] ""
+msgstr[0] "模块已禁用"
 
 #: app/controllers/CControllerModuleUpdate.php:150
 #, c-format
@@ -11385,7 +11383,7 @@ msgstr[0] "已禁用模块：%1$s。"
 #: app/controllers/CControllerModuleUpdate.php:131
 msgid "Module enabled"
 msgid_plural "Modules enabled"
-msgstr[0] ""
+msgstr[0] "模块已启用"
 
 #: app/controllers/CControllerModuleUpdate.php:145
 #, c-format
@@ -11395,7 +11393,7 @@ msgstr[0] "已启用模块：%1$s。"
 
 #: app/controllers/CControllerModuleUpdate.php:128
 msgid "Module updated"
-msgstr ""
+msgstr "模块已更新"
 
 #: app/controllers/CControllerModuleUpdate.php:142
 #, c-format
@@ -11434,7 +11432,7 @@ msgstr "要监控什么"
 #: include/views/configuration.host.massupdate.php:105
 #: include/views/configuration.host.prototype.edit.php:117
 msgid "Monitored by proxy"
-msgstr "由agent代理程序监测"
+msgstr "由Proxy代理程序监测"
 
 #: include/classes/screens/CScreenDiscovery.php:119
 msgid "Monitored host"
@@ -11663,7 +11661,7 @@ msgstr "名称"
 #: app/views/administration.user.list.php:99
 msgctxt "user first name"
 msgid "Name"
-msgstr "用户名第一部分"
+msgstr "名称"
 
 #: app/views/administration.authentication.edit.php:234
 msgid "Name ID"
@@ -11807,7 +11805,7 @@ msgstr "下一步"
 #: include/views/configuration.triggers.massupdate.php:68
 #: include/views/js/configuration.host.discovery.edit.overr.js.php:156
 msgid "No"
-msgstr "不"
+msgstr "否"
 
 #: include/classes/api/services/CCorrelation.php:636
 #: include/classes/api/services/CCorrelation.php:650
@@ -12067,7 +12065,7 @@ msgstr "主机“%1$s”没有提供接口。"
 
 #: include/classes/api/services/CAction.php:1957
 msgid "No inventory mode specified for action operation."
-msgstr "要执行的动作的库存模式没有被设定。"
+msgstr "要执行的动作的资产模式没有被设定。"
 
 #: include/classes/api/services/CScreenItem.php:523
 #: include/classes/api/services/CScreenItem.php:533
@@ -12285,7 +12283,7 @@ msgstr "没有系统访问权限。"
 #: include/classes/screens/CScreenLldGraph.php:51 include/func.inc.php:1507
 #: items.php:1461 items.php:1660 services.php:84
 msgid "No permissions to referred object or it does not exist!"
-msgstr "没有权限退回物件的或其不存在!"
+msgstr "没有权限引用对象或其不存在！"
 
 #: include/classes/api/services/CAction.php:1815
 #, c-format
@@ -12298,7 +12296,7 @@ msgstr "没有指定的私钥."
 
 #: include/views/configuration.discovery.edit.php:53
 msgid "No proxy"
-msgstr "没有agent代理程序"
+msgstr "没有Proxy代理程序"
 
 #: include/classes/api/services/CAction.php:1807
 #, c-format
@@ -12410,7 +12408,7 @@ msgstr "非确认"
 #: app/partials/trigoverview.table.left.php:62
 #: app/partials/trigoverview.table.top.php:61
 msgid "Not all results are displayed. Please provide more specific search criteria."
-msgstr "未展示所有结果，请提供更具体的搜索条件。"
+msgstr "并非所有结果都会显示。请提供更具体的搜索条件。"
 
 #: include/classes/api/services/CTrigger.php:1049
 #: include/classes/api/services/CTriggerPrototype.php:874
@@ -12507,7 +12505,7 @@ msgstr "Zabbix 数据库中的监控项数量"
 
 #: include/classes/items/CHelpItems.php:1155
 msgid "Number of items in proxy history that are not yet sent to the server"
-msgstr "系统代理程序历史数据中未发送给服务端的监控项数量"
+msgstr "系统Proxy代理程序历史数据中未发送给服务端的监控项数量"
 
 #: include/classes/items/CHelpItems.php:1159
 msgid "Number of items in the queue which are delayed by from to to seconds, inclusive."
@@ -12517,7 +12515,7 @@ msgstr "队列中延时秒数的项目的数量，包括."
 #: include/classes/items/CHelpItems.php:735
 #: include/classes/items/CHelpItems.php:1175
 msgid "Number of items in the queue which are delayed in Zabbix server or proxy by \"from\" till \"to\" seconds, inclusive."
-msgstr "队列中在 Zabbix 服务器或proxy中延迟 \"from\" 到 \"to\" 秒（含）的监控项数量。"
+msgstr "队列中在 Zabbix 服务器或proxy中延迟 \"from\" 到 \"to\" 秒的监控项数，包括在内。"
 
 #: include/classes/items/CHelpItems.php:1123
 msgid "Number of monitored hosts"
@@ -12538,7 +12536,7 @@ msgstr "问题的数量和扩大最关键的一个"
 
 #: include/classes/items/CHelpItems.php:875
 msgid "Number of processor cores on VMware hypervisor, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifiere"
-msgstr ""
+msgstr "VMware hypervisor的处理器内核数量,<url>-VMware服务URL,<uuid>-VMware 虚拟机管理程序全局唯一标识符"
 
 #: include/classes/items/CHelpItems.php:875
 msgid "Number of processor cores on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -12546,7 +12544,7 @@ msgstr "VMware hypervisor的处理器内核数量,<url>-VMware服务URL,<uuid>-V
 
 #: include/classes/items/CHelpItems.php:879
 msgid "Number of processor threads on VMware hypervisor, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "VMware 虚拟机管理程序上的处理器线程数，“url”- VMware 服务 URL，“uuid”- VMware 虚拟机管理程序全局唯一标识符"
 
 #: include/classes/items/CHelpItems.php:879
 msgid "Number of processor threads on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -12554,7 +12552,7 @@ msgstr "VMware hypervisor的处理器线程数量,<url>-VMware服务URL,<uuid>-V
 
 #: include/classes/items/CHelpItems.php:955
 msgid "Number of processors on VMware virtual machine, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "VMware 虚拟机上的处理器数量，“url”- VMware 服务 URL，“uuid”- VMware 虚拟机全局唯一标识符"
 
 #: include/classes/items/CHelpItems.php:955
 msgid "Number of processors on VMware virtual machine, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -12599,7 +12597,7 @@ msgstr "主机中不迟滞的监控项数量。"
 
 #: include/blocks.inc.php:659
 msgid "Number of users (online)"
-msgstr "用户数(线上)"
+msgstr "用户数(在线)"
 
 #: include/classes/items/CHelpItems.php:285
 #: include/classes/items/CHelpItems.php:635
@@ -12636,7 +12634,7 @@ msgstr "数据库中TRENDS_UINT表中值的条数."
 
 #: include/classes/items/CHelpItems.php:943
 msgid "Number of virtual machines on VMware hypervisor, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "VMware hypervisor 上的虚拟机数量，“url”- VMware 服务 URL，“uuid”- VMware hypervisor 全局唯一标识符"
 
 #: include/classes/items/CHelpItems.php:943
 msgid "Number of virtual machines on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -12718,7 +12716,7 @@ msgstr "操作系统"
 
 #: include/hosts.inc.php:124
 msgid "OS (Full details)"
-msgstr "操作系统(所有细节)"
+msgstr "操作系统(全称)"
 
 #: include/hosts.inc.php:129
 msgid "OS (Short)"
@@ -12846,7 +12844,7 @@ msgstr "只有管理员才可以设置聚合图形的所有者。"
 
 #: include/screens.inc.php:356 include/screens.inc.php:489
 msgid "Only administrators can set slide show owner."
-msgstr "只允许管理员设置幻灯片的所有者。"
+msgstr "注意，如果未使用单引号，%1$s 或 %2$s 将被视为主机名"
 
 #: include/blocks.inc.php:637
 msgid "Only items assigned to enabled hosts are counted"
@@ -12888,7 +12886,7 @@ msgstr "只有管理员才能删除拓扑图的值"
 
 #: include/classes/api/services/CDashboard.php:462
 msgid "Only super admins can set dashboard owner."
-msgstr "只有超级管理员才能设置仪表板所有者。"
+msgstr "只有超级管理员才能设置仪表盘所有者。"
 
 #: include/classes/api/services/CCorrelation.php:689
 msgid "Only super admins can update correlations."
@@ -12905,7 +12903,7 @@ msgstr "只可显示最近的20%%的指示器."
 
 #: include/blocks.inc.php:648
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
-msgstr "只计算指派给启用的主机的和相依于启用的项目的触发器"
+msgstr "只计算指派给启用的主机的和相依于启用的监控项的触发器"
 
 #: app/views/popup.mediatypetest.edit.php:52
 msgid "Open log"
@@ -12931,15 +12929,15 @@ msgstr "由于未认证的请求, 操作无法完成."
 
 #: jsLoader.php:111
 msgid "Operation details"
-msgstr "操作细节"
+msgstr "操作详情"
 
 #: include/classes/api/services/CAction.php:1930
 msgid "Operation has no group to operate."
-msgstr "操作并无群组来操作."
+msgstr "操作无对应的群组。"
 
 #: include/classes/api/services/CAction.php:1942
 msgid "Operation has no template to operate."
-msgstr "操作并无模板来操作."
+msgstr "操作无对应的模板。"
 
 #: app/partials/popup.operations.php:39
 msgid "Operation type"
@@ -12953,7 +12951,7 @@ msgstr "操作类型"
 #: include/views/configuration.triggers.edit.php:93
 #: include/views/configuration.triggers.list.php:200
 msgid "Operational data"
-msgstr "操作数据"
+msgstr "运营数据"
 
 #: app/views/popup.lldoverride.php:190
 #: include/views/configuration.action.edit.php:319
@@ -13515,7 +13513,7 @@ msgstr "粘贴"
 
 #: app/views/monitoring.dashboard.view.php:110 jsLoader.php:116
 msgid "Paste widget"
-msgstr "粘贴部件"
+msgstr "粘贴小组件"
 
 #: jsLoader.php:205
 msgid "Paste without external links"
@@ -13523,11 +13521,11 @@ msgstr "粘贴无外部链接"
 
 #: app/views/monitoring.charts.view.php:106
 msgid "Pattern"
-msgstr "模式"
+msgstr "图案"
 
 #: actionconf.php:81 include/views/configuration.action.edit.php:160
 msgid "Pause operations for suppressed problems"
-msgstr "暂停操作以制止问题"
+msgstr "针对被抑制的问题暂停操作"
 
 #: include/classes/debug/CProfiler.php:163
 #, c-format
@@ -13671,7 +13669,7 @@ msgstr "波兰(pl_PL)"
 
 #: include/views/configuration.item.edit.php:836
 msgid "Populates host inventory field"
-msgstr "填入主机资产纪录栏位"
+msgstr "填入主机资产字段"
 
 #: app/controllers/CControllerPopupItemTestGetValue.php:120
 #: app/controllers/CControllerPopupItemTestSend.php:160
@@ -13972,7 +13970,7 @@ msgstr "提供的 URL \"%1$s\" 无效。"
 #: app/views/administration.proxy.edit.php:28
 #: app/views/administration.proxy.list.php:31 include/menu.inc.php:164
 msgid "Proxies"
-msgstr "agent代理程序"
+msgstr "Proxy"
 
 #: app/controllers/CControllerAuditLogList.php:209
 #: app/views/administration.proxy.edit.php:87
@@ -13984,7 +13982,7 @@ msgstr "agent代理程序"
 #: include/views/configuration.host.list.php:153
 #: include/views/configuration.host.list.php:192 queue.php:165 queue.php:223
 msgid "Proxy"
-msgstr "agent代理程序"
+msgstr "Proxy"
 
 #: include/classes/api/services/CProxy.php:638
 #: include/classes/api/services/CProxy.php:767
@@ -13995,30 +13993,30 @@ msgstr "Proxy“%1$s”已存在。"
 #: include/classes/import/importers/CHostImporter.php:226
 #, c-format
 msgid "Proxy \"%1$s\" for host \"%2$s\" does not exist."
-msgstr "主机\"%2$s\"的agent代理程序\"%1$s\"不存在."
+msgstr "主机\"%2$s\"的Proxy代理程序\"%1$s\"不存在."
 
 #: include/classes/api/services/CProxy.php:482
 #, c-format
 msgid "Proxy \"%1$s\" is used by action \"%2$s\"."
-msgstr "代理  \"%1$s\" 已被动作 \"%2$s\" 使用。"
+msgstr "Proxy代理  \"%1$s\" 已被动作 \"%2$s\" 使用。"
 
 #: include/classes/api/services/CProxy.php:439
 #, c-format
 msgid "Proxy \"%1$s\" is used by discovery rule \"%2$s\"."
-msgstr "agent代理程序\"%1$s\"是用在自动发现规则\"%2$s\"上."
+msgstr "Proxy代理程序\"%1$s\"是用在自动发现规则\"%2$s\"上."
 
 #: app/controllers/CControllerProxyCreate.php:105
 msgid "Proxy added"
-msgstr "agent代理程序已添加"
+msgstr "Proxy代理程序已添加"
 
 #: app/views/administration.proxy.edit.php:79
 msgid "Proxy address"
-msgstr "代理地址"
+msgstr "Proxy代理地址"
 
 #: app/controllers/CControllerProxyDelete.php:66
 msgid "Proxy deleted"
 msgid_plural "Proxies deleted"
-msgstr[0] "agent代理程序已删除"
+msgstr[0] "proxy已删除"
 
 #: include/classes/api/services/CProxy.php:234
 msgid "Proxy interface creation failed."
@@ -14030,15 +14028,15 @@ msgstr "系统代理程序接口更新失败"
 
 #: app/views/administration.proxy.edit.php:68
 msgid "Proxy mode"
-msgstr "系统代理程序模式"
+msgstr "Proxy模式"
 
 #: app/views/administration.proxy.edit.php:62
 msgid "Proxy name"
-msgstr "agent代理程序名称"
+msgstr "Proxy名称"
 
 #: app/controllers/CControllerProxyUpdate.php:115
 msgid "Proxy updated"
-msgstr "agent代理程序已添加"
+msgstr "Proxy已添加"
 
 #: app/views/dashboard.sharing.edit.php:81
 #: include/views/monitoring.screen.edit.php:204
@@ -14082,7 +14080,7 @@ msgstr "队列详情"
 
 #: queue.php:64
 msgid "Queue overview"
-msgstr "队列概览"
+msgstr "队列概述"
 
 #: queue.php:65
 msgid "Queue overview by proxy"
@@ -14293,7 +14291,7 @@ msgstr "常规监控项"
 
 #: jsLoader.php:129
 msgid "Release to create a widget."
-msgstr "释放以创建小部件。"
+msgstr "释放以创建小组件。"
 
 #: include/views/general.login.php:76
 msgid "Remember me for 30 days"
@@ -14524,7 +14522,7 @@ msgstr "请求正文"
 #: include/views/configuration.item.prototype.edit.php:190
 #: include/views/configuration.item.prototype.massupdate.php:91
 msgid "Request body type"
-msgstr "请求 body 类型"
+msgstr "请求正文类型"
 
 #: host_discovery.php:403 host_discovery.php:736 items.php:868 items.php:1369
 msgid "Request sent successfully"
@@ -14620,7 +14618,7 @@ msgstr "通过关联规则解析。"
 #: include/classes/screens/CScreenHostTriggers.php:256
 #: include/classes/screens/CScreenProblem.php:995
 msgid "Resolved by inaccessible user."
-msgstr "由无法访问的用户解决。"
+msgstr "由已失效的用户解决。"
 
 #: app/views/monitoring.widget.problems.view.php:144
 #: include/classes/screens/CScreenHostTriggers.php:255
@@ -14641,7 +14639,7 @@ msgstr "资源 ID"
 
 #: app/views/popup.mediatypetest.edit.php:46
 msgid "Response"
-msgstr "响应"
+msgstr "反馈"
 
 #: include/classes/screens/CScreenHttpTestDetails.php:85
 msgid "Response code"
@@ -14688,14 +14686,14 @@ msgstr "结果类型"
 
 #: app/views/js/popup.itemtestedit.view.js.php:316
 msgid "Result with value map applied"
-msgstr "应用值映射的结果"
+msgstr "结果已使用值映射"
 
 #: app/views/popup.httpstep.php:158
 #: include/views/configuration.host.discovery.edit.php:257
 #: include/views/configuration.item.edit.php:296
 #: include/views/configuration.item.prototype.edit.php:277
 msgid "Retrieve mode"
-msgstr "恢复模式"
+msgstr "检索模式"
 
 #: include/classes/items/CHelpItems.php:313
 #: include/classes/items/CHelpItems.php:663
@@ -14708,7 +14706,7 @@ msgstr "重试"
 
 #: include/classes/items/CHelpItems.php:1235
 msgid "Return a JSON array with LLD macros describing the MBean objects or their attributes. Can be used for LLD."
-msgstr "返回一个 JSON 数组，其中包含描述 MBean 对象或其属性的 LLD 宏，可用于 LLD。"
+msgstr "返回一个 JSON 数组，其中包含描述 MBean 对象或其属性的 LLD 宏。可用于 LLD。"
 
 #: include/classes/items/CHelpItems.php:1239
 msgid "Return a JSON array with MBean objects or their attributes. Compared to jmx.discovery it does not define LLD macros. Can be used for LLD."
@@ -14728,13 +14726,13 @@ msgstr "返回ICMP ping的响应时间单位秒.例如：0.02"
 
 #: include/classes/items/CHelpItems.php:1115
 msgid "Returns a JSON array describing the host network interfaces configured in Zabbix. Can be used for LLD."
-msgstr "返回描述 Zabbix 中配置的主机网络接口的 JSON 数组。可用于 LLD。"
+msgstr "返回描述在 Zabbix 中配置的主机网络接口的 JSON 数组。可用于 LLD。"
 
 #: include/classes/items/CHelpItems.php:385
 #: include/classes/items/CHelpItems.php:731
 #: include/classes/items/CHelpItems.php:1171
 msgid "Returns a JSON object containing Zabbix server or proxy internal metrics."
-msgstr "返回包含 Zabbix Server或Proxy内部指标JSON对象。"
+msgstr "返回包含 Zabbix Server或Proxy的内部指标JSON对象。"
 
 #: include/classes/items/CHelpItems.php:1119
 msgid "Returns availability of a particular type of checks on the host. Value of this item corresponds to availability icons in the host list. Valid types are: agent, snmp, ipmi, jmx."
@@ -14774,7 +14772,7 @@ msgstr "右"
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:208
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:492
 msgid "Right Y"
-msgstr "Right Y"
+msgstr "右边Y轴"
 
 #: include/items.inc.php:1780
 msgid "Right trim"
@@ -14964,7 +14962,7 @@ msgstr "SNMPv1 客户端"
 
 #: include/views/js/configuration.host.edit.js.php:82
 msgid "SNMPv2"
-msgstr "SNMPv2"
+msgstr "SNMPv2c"
 
 #: include/discovery.inc.php:58
 msgid "SNMPv2 agent"
@@ -15380,7 +15378,7 @@ msgstr "选择构件"
 #: app/views/administration.script.edit.php:88
 #: include/views/monitoring.history.php:190
 msgid "Selected"
-msgstr "选择的"
+msgstr "已选"
 
 #: actionconf.php:400
 msgid "Selected actions deleted"
@@ -15497,7 +15495,7 @@ msgstr "服务器"
 
 #: app/views/administration.script.list.php:93 app/views/popup.generic.php:624
 msgid "Server (proxy)"
-msgstr "服务器（代理）"
+msgstr "服务器（Proxy）"
 
 #: include/classes/widgets/forms/CWidgetFormClock.php:33
 #: include/views/monitoring.screen.constructor.edit.php:721
@@ -15611,7 +15609,7 @@ msgstr "将错误设置为"
 
 #: include/actions.inc.php:1063
 msgid "Set host inventory mode"
-msgstr "设置主机清单模式"
+msgstr "设置主机资产模式"
 
 #: include/classes/html/CInputSecret.php:79 jsLoader.php:342
 msgid "Set new value"
@@ -15722,7 +15720,7 @@ msgstr "共享选项 \"%1$s\" 没有在聚合图形中指定值 \"%2$s\" 。"
 #: app/views/monitoring.problem.view.php:290
 #: include/classes/widgets/forms/CWidgetFormProblems.php:139
 msgid "Shortened"
-msgstr "缩短"
+msgstr "精简"
 
 #: app/partials/common.filter.trigger.php:43
 #: app/views/monitoring.problem.view.php:96
@@ -15739,7 +15737,7 @@ msgstr "查看"
 #: app/views/monitoring.latest.view.php:111
 #: app/views/monitoring.problem.view.php:333
 msgid "Show details"
-msgstr "查看细节"
+msgstr "查看详情"
 
 #: include/classes/widgets/CWidgetHelper.php:53
 msgid "Show header"
@@ -15749,7 +15747,7 @@ msgstr "显示标题"
 #: include/classes/widgets/forms/CWidgetFormHostAvail.php:62
 #: include/classes/widgets/forms/CWidgetFormWeb.php:59
 msgid "Show hosts in maintenance"
-msgstr "查看维修中主机"
+msgstr "显示维修中主机"
 
 #: app/views/monitoring.latest.view.php:105
 msgid "Show items without data"
@@ -15760,7 +15758,7 @@ msgstr "查看无资料项目"
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:266
 #: include/views/configuration.graph.edit.php:109
 msgid "Show legend"
-msgstr "查看图例"
+msgstr "显示图例"
 
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:48
 #: include/classes/widgets/forms/CWidgetFormPlainText.php:55
@@ -15776,7 +15774,7 @@ msgstr "查看线条"
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:139
 #: include/classes/widgets/forms/CWidgetFormProblems.php:159
 msgid "Show operational data"
-msgstr "显示操作数据"
+msgstr "显示运营数据"
 
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:299
 msgid "Show problems"
@@ -15784,7 +15782,7 @@ msgstr "显示问题"
 
 #: include/views/monitoring.history.php:173
 msgid "Show selected"
-msgstr "查看所选的"
+msgstr "显示已选"
 
 #: app/partials/layout.htmlpage.aside.php:50
 #: app/partials/layout.htmlpage.aside.php:52
@@ -15846,7 +15844,7 @@ msgstr "查看值"
 
 #: app/views/administration.gui.edit.php:48
 msgid "Show warning if Zabbix server is down"
-msgstr "当Zabbix服务器停机时显示警告"
+msgstr "当Zabbix服务器停机时显示告警"
 
 #: include/views/configuration.graph.edit.php:117
 msgid "Show working time"
@@ -16029,7 +16027,7 @@ msgstr "软件"
 
 #: include/hosts.inc.php:179
 msgid "Software (Full details)"
-msgstr "软件(全细节)"
+msgstr "软件(详情)"
 
 #: include/hosts.inc.php:184
 msgid "Software application A"
@@ -16058,7 +16056,7 @@ msgstr "软件架构信息。返回字符串"
 
 #: include/classes/api/managers/CHistoryManager.php:1125
 msgid "Some of the history for this item may be compressed, deletion is not available."
-msgstr "此监控项的某些历史记录可能会被压缩，将无法被删除。"
+msgstr "此监控项的某些历史记录可能会被压缩，无法删除。"
 
 #: include/classes/widgets/forms/CWidgetFormActionLog.php:30
 #: include/classes/widgets/forms/CWidgetFormProblems.php:199
@@ -16118,7 +16116,7 @@ msgstr "层积的"
 #: include/classes/widgets/CWidgetHelper.php:802
 #: include/classes/widgets/CWidgetHelper.php:1051
 msgid "Staircase"
-msgstr "楼梯"
+msgstr "阶梯"
 
 #: app/controllers/CControllerPopupGeneric.php:270
 msgid "Standard items"
@@ -16152,7 +16150,7 @@ msgstr "静态"
 
 #: include/classes/items/CHelpItems.php:1211
 msgid "Statistics and availability of Zabbix write cache. Cache - one of values (modes: all, float, uint, str, log, text, not supported), history (modes: pfree, free, total, used, pused), index (modes: pfree, free, total, used, pused), trend (modes: pfree, free, total, used, pused)."
-msgstr "Zabbix 写缓存的统计信息和可用性。缓存 - 值之一（模式：all、float、uint、str、log、text、不支持）、历史（模式：pfree、free、total、used、pused）、索引（模式：pfree、free、total、used , pused), 趋势 (模式: pfree, free, total, used, pused)。"
+msgstr "Zabbix 写缓存的统计和可用性。缓存 - 值之一（模式：all、float、uint、str、log、text、不支持）、历史（模式：pfree、free、total、used、pused）、索引（模式：pfree、free、total、used , pused), 趋势 (模式: pfree, free, total, used, pused)。"
 
 #: app/controllers/CControllerPopupGeneric.php:210
 #: app/controllers/CControllerPopupGeneric.php:224
@@ -16225,7 +16223,7 @@ msgstr "状态已禁用"
 
 #: include/classes/helpers/CMapHelper.php:284
 msgid "Status maintenance"
-msgstr "状态 维护"
+msgstr "维护状态"
 
 #: app/controllers/CControllerDiscoveryView.php:90
 #: app/views/monitoring.discovery.view.php:35
@@ -16335,7 +16333,7 @@ msgstr "主题"
 #: include/views/configuration.host.prototype.edit.php:370
 msgctxt "encryption certificate"
 msgid "Subject"
-msgstr "主体"
+msgstr "主题"
 
 #: jsLoader.php:293
 msgid "Submap"
@@ -16496,7 +16494,7 @@ msgstr "标签"
 #: app/views/monitoring.problem.view.php:300
 #: include/classes/widgets/forms/CWidgetFormProblems.php:151
 msgid "Tag display priority"
-msgstr "标签显示优先级"
+msgstr "标签显示顺序"
 
 #: app/views/administration.usergroup.edit.php:207
 msgid "Tag filter"
@@ -16757,7 +16755,7 @@ msgstr "测试媒介类型“%1$s”"
 #: app/controllers/CControllerPopupItemTestSend.php:148
 #, c-format
 msgid "Test of \"%1$s\" items is not supported."
-msgstr "不支持测试“%1$s”监控项。"
+msgstr "不支持测试“%1$s”项。"
 
 #: app/views/administration.regex.edit.php:119
 msgid "Test string"
@@ -16798,7 +16796,7 @@ msgstr "图表\"%3$s\"上的位于X坐标为%1$s坐标为%2$s的图表元素的Y
 #: include/classes/db/DbBackend.php:130
 #, c-format
 msgid "The Zabbix database version does not match current requirements. Your database version: %1$s. Required version: %2$s. Please contact your system administrator."
-msgstr "Zabbix 数据库版本不符合当前要求。您的数据库版本：%1$s，所需版本：%2$s。请联系您的系统管理员。"
+msgstr "Zabbix 数据库版本不符合当前要求。您的数据库版本：%1$s。所需版本：%2$s。请联系您的系统管理员。"
 
 #: include/html.inc.php:701
 #, c-format
@@ -16811,20 +16809,20 @@ msgstr "该应用程序不再被发现，并在下一次发现规则处理时删
 
 #: hosts.php:349
 msgid "The cloned host contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
-msgstr "克隆的主机包含用户定义的“秘密文本”类型的宏，这些宏的值和类型已重置。"
+msgstr "克隆的主机包含用户定义的“秘密文本”类型的宏。这些宏的值和类型已重置。"
 
 #: host_prototypes.php:153
 msgid "The cloned host prototype contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
-msgstr "克隆的主机原型包含用户定义的“秘密文本”类型的宏，这些宏的值和类型已重置。"
+msgstr "克隆的主机原型包含用户定义的“秘密文本”类型的宏。这些宏的值和类型已重置。"
 
 #: templates.php:201
 msgid "The cloned template contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
-msgstr "克隆的模板包含类型为“秘密文本”的用户定义宏，这些宏的值和类型已重置。"
+msgstr "克隆的模板包含类型为“秘密文本”的用户定义宏。这些宏的值和类型已重置。"
 
 #: include/html.inc.php:728
 #, c-format
 msgid "The graph is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
-msgstr "该图表不再被发现，并将在 %1$s 中删除（在 %2$s 的 %3$s）。"
+msgstr "该图表不再被发现，并将在 %1$s 中删除（在 %3$s 的 %2$s 上）。"
 
 #: include/html.inc.php:723
 msgid "The graph is not discovered anymore and will be deleted the next time discovery rule is processed."
@@ -16863,11 +16861,11 @@ msgstr[0] "图片被应用于拓扑图 %1$s上."
 #: include/html.inc.php:782
 #, c-format
 msgid "The item is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
-msgstr "已无法自动发现此项目了, 将删除于%1$s (在%2$s在%3$s)."
+msgstr "已无法自动发现此监控项了, 将于%1$s删除(在%2$s %3$s)."
 
 #: include/html.inc.php:777
 msgid "The item is not discovered anymore and will be deleted the next time discovery rule is processed."
-msgstr "被发现的监控项目丢失它将在下次自动发现规则执行时被删除."
+msgstr "被发现的监控项丢失它将在下次自动发现规则执行时被删除."
 
 #: include/classes/items/CHelpItems.php:173
 #: include/classes/items/CHelpItems.php:523
@@ -16890,7 +16888,7 @@ msgstr "请求的远程程序不存在/不可用"
 #: include/html.inc.php:755
 #, c-format
 msgid "The trigger is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
-msgstr "触发器不再被发现，并将在 %1$s 中删除（在 %2$s 的 %3$s ）。"
+msgstr "触发器不再被发现，并将在 %1$s 中删除（在 %2$s 的 %3$s 上）。"
 
 #: include/html.inc.php:750
 msgid "The trigger is not discovered anymore and will be deleted the next time discovery rule is processed."
@@ -16941,7 +16939,7 @@ msgstr "应启用此设置，因为历史表包含压缩块。"
 #: app/views/administration.housekeeping.edit.php:164
 #: include/blocks.inc.php:730
 msgid "This setting should be enabled, because trend tables contain compressed chunks."
-msgstr "应该启用此设置，因为趋势表包含压缩块。"
+msgstr "应启用此设置，因为趋势表包含压缩块。"
 
 #: include/func.inc.php:2592 srv_status.php:39
 msgid "This week"
@@ -17018,7 +17016,7 @@ msgstr "时间(降序)"
 
 #: include/classes/items/CHelpItems.php:1147
 msgid "Time a particular Zabbix process or a group of processes (identified by <type> and <mode>) spent in <state> in percentage."
-msgstr "乘以一个特定的 Zabbix 进程或一组进程（由 <type> 和 <mode> 标识）花费在 <state> 中的百分比。"
+msgstr "特定 Zabbix 进程或一组进程（由 <type> 和 <mode> 标识）在 <state> 中花费的时间百分比。"
 
 #: app/views/js/popup.mediatypetest.edit.js.php:104
 msgid "Time elapsed:"
@@ -17288,7 +17286,7 @@ msgstr "触发事件和警报数据存储期限 \"%1$s\" 。"
 #: include/classes/api/services/CHostBase.php:159
 #, c-format
 msgid "Trigger has items from template \"%1$s\" that is not linked to host."
-msgstr "触发器有项目来自于模板\"%1$s\"其并未链接到主机."
+msgstr "触发器有监控项来自于模板\"%1$s\"其并未链接到主机."
 
 #: include/actions.inc.php:1290
 msgid "Trigger in \"unknown\" state"
@@ -17340,7 +17338,7 @@ msgstr "触发器原型模板\"%1$s\"属于不同的联系，以模板。"
 #: include/classes/api/services/CTriggerGeneral.php:1631
 #, c-format
 msgid "Trigger prototype \"%1$s\" contains item prototypes from multiple discovery rules."
-msgstr "触发器模板\"%1$s\"中包含了来自多个自动发现规则的项目模板."
+msgstr "触发器模板\"%1$s\"中包含了来自多个自动发现规则的监控项模板."
 
 #: include/classes/import/CConfigurationImport.php:1498
 #, c-format
@@ -17350,7 +17348,7 @@ msgstr "触发器模板 \"%1$s\" 依赖于触发器 \"%2$s\" ,但它不存在。
 #: include/classes/api/services/CTriggerGeneral.php:1626
 #, c-format
 msgid "Trigger prototype \"%1$s\" must contain at least one item prototype."
-msgstr "触发器模板 \"%1$s\"必须至少包含一个项目模板."
+msgstr "触发器模板 \"%1$s\"必须至少包含一个监控项模板."
 
 #: trigger_prototypes.php:250
 msgid "Trigger prototype added"
@@ -17460,7 +17458,7 @@ msgstr "土耳其语 (tr_TR)"
 #: include/classes/api/services/CItem.php:1011
 #, c-format
 msgid "Two items (\"%1$s\" and \"%2$s\") cannot populate one host inventory field \"%3$s\", this would lead to a conflict."
-msgstr "两个项目 (\"%1$s\"和\"%2$s\")不能填入一个主机资产纪录栏位\"%3$s\", 这会造成冲突."
+msgstr "两个项目 (\"%1$s\"和\"%2$s\")不能填入一个主机资产字段位\"%3$s\", 这会造成冲突."
 
 #: jsLoader.php:194
 msgid "Two map elements should be selected"
@@ -18027,7 +18025,7 @@ msgstr "如果存在严重性则使用"
 
 #: app/views/administration.mediatype.list.php:76
 msgid "Used in actions"
-msgstr "用于动作中"
+msgstr "用于动作"
 
 #: app/views/administration.valuemap.list.php:63
 msgid "Used in items"
@@ -18051,7 +18049,7 @@ msgstr "用户 \"%1$s\" 不能没有用户组。"
 #: include/classes/api/services/CUser.php:1066
 #, c-format
 msgid "User \"%1$s\" is dashboard \"%2$s\" owner."
-msgstr "用户 \"%1$s\" 是仪表板 \"%2$s\" 所有者。"
+msgstr "用户 \"%1$s\" 是仪表盘 \"%2$s\" 所有者。"
 
 #: include/classes/api/services/CUser.php:1023
 #, c-format
@@ -18314,7 +18312,7 @@ msgstr "VMware缓存统计.可用的mode有:total, free, pfree, used and pused."
 
 #: include/classes/items/CHelpItems.php:791
 msgid "VMware cluster status, \"url\" - VMware service URL, \"name\" - VMware cluster name"
-msgstr ""
+msgstr "VMware 集群状态，“url”- VMware 服务 URL，“名称”- VMware 集群名称"
 
 #: include/classes/items/CHelpItems.php:791
 msgid "VMware cluster status, <url> - VMware service URL, <name> - VMware cluster name"
@@ -18331,7 +18329,7 @@ msgstr "VMware数据存储容量统计信息，以字节为单位，以百分比
 
 #: include/classes/items/CHelpItems.php:799
 msgid "VMware datastore hypervisors list, \"url\" - VMware service URL, \"datastore\" - datastore name"
-msgstr ""
+msgstr "VMware 数据存储管理程序列表，“url”- VMware 服务 URL，“数据存储”- 数据存储名称"
 
 #: include/classes/items/CHelpItems.php:799
 msgid "VMware datastore hypervisors list, <url> - VMware service URL, <datastore> - datastore name"
@@ -18339,7 +18337,7 @@ msgstr "VMware 数据存储管理程序列表，<url> - VMware 服务 URL，<dat
 
 #: include/classes/items/CHelpItems.php:803
 msgid "VMware datastore read statistics, \"url\" - VMware service URL, \"datastore\" - datastore name, \"mode\" - latency/maxlatency - average or maximum"
-msgstr ""
+msgstr "VMware 数据存储读取统计信息，<url> - VMware 服务 URL，<datastore> - 数据存储名称，<mode> - 延迟/最大延迟 - 平均值或最大值"
 
 #: include/classes/items/CHelpItems.php:803
 msgid "VMware datastore read statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum"
@@ -18347,7 +18345,7 @@ msgstr "VMware 数据存储读取统计信息，<url> - VMware 服务 URL，<dat
 
 #: include/classes/items/CHelpItems.php:811
 msgid "VMware datastore write statistics, \"url\" - VMware service URL, \"datastore\" - datastore name, \"mode\" - latency/maxlatency - average or maximum"
-msgstr ""
+msgstr "VMware 数据存储写入统计信息，<url> - VMware 服务 URL，<datastore> - 数据存储名称，<mode> - latency/maxlatency - 平均值或最大值"
 
 #: include/classes/items/CHelpItems.php:811
 msgid "VMware datastore write statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum"
@@ -18355,7 +18353,7 @@ msgstr "VMware 数据存储写入统计信息，<url> - VMware 服务 URL，<dat
 
 #: include/classes/items/CHelpItems.php:819
 msgid "VMware event log, \"url\" - VMware service URL, \"mode\" - all (default), skip - skip processing of older data"
-msgstr ""
+msgstr "VMware 事件日志，<url> - VMware 服务 URL，<mode> - all（默认），skip - 跳过旧数据的处理"
 
 #: include/classes/items/CHelpItems.php:819
 msgid "VMware event log, <url> - VMware service URL, <mode> - all (default), skip - skip processing of older data"
@@ -18363,7 +18361,7 @@ msgstr "VMware 事件日志，<url> - VMware 服务 URL，<mode> - all（默认�
 
 #: include/classes/items/CHelpItems.php:891
 msgid "VMware hypervisor BIOS uuid, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "VMware hypervisor BIOS uuid,<url> - VMware 服务 URL, <uuid> - VMware 虚拟机管理程序全局唯一标识符"
 
 #: include/classes/items/CHelpItems.php:891
 msgid "VMware hypervisor BIOS uuid, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -18371,7 +18369,7 @@ msgstr "VMware hypervisor BIOS uuid,<url> - VMware 服务 URL, <uuid> - VMware h
 
 #: include/classes/items/CHelpItems.php:923
 msgid "VMware hypervisor HW vendor state sensors, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns JSON"
-msgstr ""
+msgstr "VMware 虚拟机管理程序硬件供应商状态传感器，“url”- VMware 服务 URL，“uuid”- VMware 虚拟机管理程序全局唯一标识符。返回 JSON"
 
 #: include/classes/items/CHelpItems.php:923
 msgid "VMware hypervisor HW vendor state sensors, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
@@ -18379,7 +18377,7 @@ msgstr "VMware hypervisor硬件供应商状态传感器，<url> - VMware 服务 
 
 #: include/classes/items/CHelpItems.php:903
 msgid "VMware hypervisor ballooned memory size, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "VMware 虚拟机管理程序增加了内存大小，“url”-VMware 服务 URL，“uuid”-VMware 虚拟机管理程序全局唯一标识符"
 
 #: include/classes/items/CHelpItems.php:903
 msgid "VMware hypervisor ballooned memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -18387,7 +18385,7 @@ msgstr "VMware 虚拟机澎涨内存大小, <url> - VMware 服务 URL, <uuid> - 
 
 #: include/classes/items/CHelpItems.php:827
 msgid "VMware hypervisor cluster name, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "VMware 虚拟机管理程序集群名称，“url”- VMware 服务 URL，“uuid”- VMware 虚拟机管理程序全局唯一标识符"
 
 #: include/classes/items/CHelpItems.php:827
 msgid "VMware hypervisor cluster name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -18395,7 +18393,7 @@ msgstr "VMware hypervisor 集群名,<url> - VMware 服务 URL, <uuid> - VMware h
 
 #: include/classes/items/CHelpItems.php:835
 msgid "VMware hypervisor datacenter name, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns string"
-msgstr ""
+msgstr "VMware 虚拟机管理程序数据中心名称、“url”- VMware 服务 URL、“uuid”- VMware 虚拟机管理程序全局唯一标识符。返回字符串"
 
 #: include/classes/items/CHelpItems.php:835
 msgid "VMware hypervisor datacenter name, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns string"
@@ -18403,7 +18401,7 @@ msgstr "VMware hypervisor数据中心名称，<url> - VMware 服务 URL，<uuid>
 
 #: include/classes/items/CHelpItems.php:847
 msgid "VMware hypervisor datastore read statistics, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"datastore\" - datastore name, \"mode\" - latency"
-msgstr ""
+msgstr "VMware hypervisor 数据池读统计,<url> - VMware 服务 URL, <uuid> - VMware 虚拟机管理程序全局唯一标识符, <datastore> - 数据池名 ,<mode> - latency"
 
 #: include/classes/items/CHelpItems.php:847
 msgid "VMware hypervisor datastore read statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - datastore name, <mode> - latency"
@@ -18411,7 +18409,7 @@ msgstr "VMware hypervisor 数据池读统计,<url> - VMware 服务 URL, <uuid> -
 
 #: include/classes/items/CHelpItems.php:855
 msgid "VMware hypervisor datastore write statistics, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"datastore\" - datastore name, \"mode\" - latency"
-msgstr ""
+msgstr "VMware hypervisor 数据池写统计,<url> - VMware 服务 URL, <uuid> - VMware 虚拟机管理程序全局唯一标识符, <datastore> - 数据池名 ,<mode> - latency"
 
 #: include/classes/items/CHelpItems.php:855
 msgid "VMware hypervisor datastore write statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - datastore name, <mode> - latency"
@@ -18419,7 +18417,7 @@ msgstr "VMware hypervisor 数据池写统计,<url> - VMware 服务 URL, <uuid> -
 
 #: include/classes/items/CHelpItems.php:843
 msgid "VMware hypervisor datastores list, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "VMware 虚拟机管理程序数据存储列表，“url”- VMware 服务 URL，“uuid”- VMware 虚拟机管理程序全局唯一标识符"
 
 #: include/classes/items/CHelpItems.php:843
 msgid "VMware hypervisor datastores list, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -18427,7 +18425,7 @@ msgstr "VMware hypervisor数据存储列表，<url> - VMware 服务 URL，<uuid>
 
 #: include/classes/items/CHelpItems.php:927
 msgid "VMware hypervisor health state rollup sensor, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns 0 - gray; 1 - green; 2 - yellow; 3 - red"
-msgstr ""
+msgstr "VMware 虚拟机管理程序健康状态汇总传感器，“url”- VMware 服务 URL，“uuid”- VMware 虚拟机管理程序全局唯一标识符。返回 0 - 灰色； 1 - 绿色； 2-黄色； 3 - 红色"
 
 #: include/classes/items/CHelpItems.php:927
 msgid "VMware hypervisor health state rollup sensor, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns 0 - gray; 1 - green; 2 - yellow; 3 - red"
@@ -18435,7 +18433,7 @@ msgstr "VMware hypervisor运行状况汇总传感器，<url> - VMware 服务 URL
 
 #: include/classes/items/CHelpItems.php:899
 msgid "VMware hypervisor maintenance status, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "VMware 管理程序维护状态，<url> - VMware 服务 URL，<uuid> - VMware 虚拟机管理程序全局唯一标识符"
 
 #: include/classes/items/CHelpItems.php:899
 msgid "VMware hypervisor maintenance status, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -18443,7 +18441,7 @@ msgstr "VMware 管理程序维护状态，<url> - VMware 服务 URL，<uuid> - V
 
 #: include/classes/items/CHelpItems.php:887
 msgid "VMware hypervisor model, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "VMware 虚拟机管理程序模型，“url”- VMware 服务 URL，“uuid”- VMware 虚拟机管理程序全局唯一标识符"
 
 #: include/classes/items/CHelpItems.php:887
 msgid "VMware hypervisor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -18451,7 +18449,7 @@ msgstr "VMware hypervisor 型号; <url> - VMware 服务 URL, <uuid> - VMware hyp
 
 #: include/classes/items/CHelpItems.php:863
 msgid "VMware hypervisor name, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "VMware 虚拟机管理程序名称，“url”- VMware 服务 URL，“uuid”- VMware 虚拟机管理程序全局唯一标识符"
 
 #: include/classes/items/CHelpItems.php:863
 msgid "VMware hypervisor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -18459,7 +18457,7 @@ msgstr "VMware hypervisor 名称, <url> - VMware 服务 URL, <uuid> - VMware hyp
 
 #: include/classes/items/CHelpItems.php:911
 msgid "VMware hypervisor network input statistics, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"mode\" - bps"
-msgstr ""
+msgstr "VMware hypervisor 网络进流量统计, <url> - VMware 服务 URL, <uuid> - VMware 虚拟机管理程序全局唯一标识符, <mode> - bps"
 
 #: include/classes/items/CHelpItems.php:911
 msgid "VMware hypervisor network input statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
@@ -18467,7 +18465,7 @@ msgstr "VMware hypervisor 网络进流量统计, <url> - VMware 服务 URL, <uui
 
 #: include/classes/items/CHelpItems.php:915
 msgid "VMware hypervisor network output statistics, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"mode\" - bps"
-msgstr ""
+msgstr "VMware hypervisor 网络输出流量统计, <url> - VMware 服务 URL, <uuid> - VMware 虚拟机管理程序全局唯一标识符, <mode> - bps"
 
 #: include/classes/items/CHelpItems.php:915
 msgid "VMware hypervisor network output statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
@@ -18475,7 +18473,7 @@ msgstr "VMware hypervisor 网络输出流量统计, <url> - VMware 服务 URL, <
 
 #: include/classes/items/CHelpItems.php:919
 msgid "VMware hypervisor performance counter, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"path\" - performance counter path, \"instance\" - performance counter instance"
-msgstr ""
+msgstr "VMware 虚拟机管理程序性能计数器，“url”- VMware 服务 URL，“uuid”- VMware 虚拟机管理程序全局唯一标识符，“路径”- 性能计数器路径，“实例”- 性能计数器实例"
 
 #: include/classes/items/CHelpItems.php:919
 msgid "VMware hypervisor performance counter, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <path> - performance counter path, <instance> - performance counter instance"
@@ -18483,7 +18481,7 @@ msgstr "VMware hypervisor性能计数器,<url>-VMware服务URL,<uuid>-VMware hyp
 
 #: include/classes/items/CHelpItems.php:867
 msgid "VMware hypervisor processor frequency, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "VMware 虚拟机管理程序处理器频率，“url”- VMware 服务 URL，“uuid”- VMware 虚拟机管理程序全局唯一标识符"
 
 #: include/classes/items/CHelpItems.php:867
 msgid "VMware hypervisor processor frequency, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -18491,7 +18489,7 @@ msgstr "VMware hypervisor 处理器频率, <url> - VMware 服务 URL, <uuid> - V
 
 #: include/classes/items/CHelpItems.php:871
 msgid "VMware hypervisor processor model, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "VMware 虚拟机管理程序处理器型号，“url”- VMware 服务 URL，“uuid”- VMware 虚拟机管理程序全局唯一标识符"
 
 #: include/classes/items/CHelpItems.php:871
 msgid "VMware hypervisor processor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -18499,7 +18497,7 @@ msgstr "VMware hypervisor 处理器型号, <url> - VMware 服务 URL, <uuid> - V
 
 #: include/classes/items/CHelpItems.php:831
 msgid "VMware hypervisor processor usage in Hz, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "VMware 虚拟机管理程序处理器使用情况（以 Hz 为单位），“url”- VMware 服务 URL，“uuid”- VMware 虚拟机管理程序全局唯一标识符"
 
 #: include/classes/items/CHelpItems.php:831
 msgid "VMware hypervisor processor usage in Hz, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -18507,7 +18505,7 @@ msgstr "VMware hypervisor 处理器使用率单位Hz, <url> - VMware 服务 URL,
 
 #: include/classes/items/CHelpItems.php:931
 msgid "VMware hypervisor status, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "VMware 虚拟机管理程序状态，“url”- VMware 服务 URL，“uuid”- VMware 虚拟机管理程序全局唯一标识符"
 
 #: include/classes/items/CHelpItems.php:931
 msgid "VMware hypervisor status, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -18515,7 +18513,7 @@ msgstr "VMware hypervisor 状态, <url> - VMware 服务 URL, <uuid> - VMware hyp
 
 #: include/classes/items/CHelpItems.php:883
 msgid "VMware hypervisor total memory size, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "VMware 虚拟机管理程序总内存大小，“url”- VMware 服务 URL，“uuid”- VMware 虚拟机管理程序全局唯一标识符"
 
 #: include/classes/items/CHelpItems.php:883
 msgid "VMware hypervisor total memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -18523,7 +18521,7 @@ msgstr "VMware hypervisor 总内存大小, <url> - VMware 服务 URL, <uuid> - V
 
 #: include/classes/items/CHelpItems.php:935
 msgid "VMware hypervisor uptime, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "VMware 虚拟机管理程序正常运行时间，“url”- VMware 服务 URL，“uuid”- VMware 虚拟机管理程序全局唯一标识符"
 
 #: include/classes/items/CHelpItems.php:935
 msgid "VMware hypervisor uptime, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -18531,7 +18529,7 @@ msgstr "VMware hypervisor 在线时间, <url> - VMware 服务 URL, <uuid> - VMwa
 
 #: include/classes/items/CHelpItems.php:907
 msgid "VMware hypervisor used memory size, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "VMware 虚拟机管理程序使用的内存大小，“url”-VMware 服务 URL，“uuid”-VMware 虚拟机管理程序全局唯一标识符"
 
 #: include/classes/items/CHelpItems.php:907
 msgid "VMware hypervisor used memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -18539,7 +18537,7 @@ msgstr "VMware hypervisor 已使用内存大小, <url> - VMware 服务 URL, <uui
 
 #: include/classes/items/CHelpItems.php:895
 msgid "VMware hypervisor vendor name, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "VMware 虚拟机管理程序供应商名称，“url”- VMware 服务 URL，“uuid”- VMware 虚拟机管理程序全局唯一标识符"
 
 #: include/classes/items/CHelpItems.php:895
 msgid "VMware hypervisor vendor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -18547,7 +18545,7 @@ msgstr "VMware hypervisor 供应商名, <url> - VMware 服务 URL, <uuid> - VMwa
 
 #: include/classes/items/CHelpItems.php:939
 msgid "VMware hypervisor version, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "VMware 虚拟机管理程序版本，“url”- VMware 服务 URL，“uuid”- VMware 虚拟机管理程序全局唯一标识符"
 
 #: include/classes/items/CHelpItems.php:939
 msgid "VMware hypervisor version, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -18555,7 +18553,7 @@ msgstr "VMware hypervisor 版本, <url> - VMware 服务 URL, <uuid> - VMware hyp
 
 #: include/classes/items/CHelpItems.php:823
 msgid "VMware service full name, \"url\" - VMware service URL"
-msgstr ""
+msgstr "VMware 服务全名，“url”-VMware 服务 URL"
 
 #: include/classes/items/CHelpItems.php:823
 msgid "VMware service full name, <url> - VMware service URL"
@@ -18563,7 +18561,7 @@ msgstr "VMware 服务完整名, <url> - VMware 服务 URL"
 
 #: include/classes/items/CHelpItems.php:947
 msgid "VMware service version, \"url\" - VMware service URL"
-msgstr ""
+msgstr "VMware 服务版本，\"url\"-VMware 服务 URL"
 
 #: include/classes/items/CHelpItems.php:947
 msgid "VMware service version, <url> - VMware service URL"
@@ -18571,7 +18569,7 @@ msgstr "VMware 服务版本, <url> - VMware 服务 URL"
 
 #: include/classes/items/CHelpItems.php:983
 msgid "VMware virtual machine ballooned memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "VMware虚拟机内存大小膨胀，“url”-VMware服务URL，“uuid”-VMware虚拟机全局唯一标识符"
 
 #: include/classes/items/CHelpItems.php:983
 msgid "VMware virtual machine ballooned memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -18579,7 +18577,7 @@ msgstr "VMware 虚拟机澎涨内存大小, <url> - VMware 服务 URL, <uuid> - 
 
 #: include/classes/items/CHelpItems.php:1031
 msgid "VMware virtual machine committed storage space, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "VMware 虚拟机承诺的存储空间，“url”-VMware 服务 URL，“uuid”-VMware 虚拟机全局唯一标识符"
 
 #: include/classes/items/CHelpItems.php:1031
 msgid "VMware virtual machine committed storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -18587,7 +18585,7 @@ msgstr "VMware 虚拟机已经使用的存储空间, <url> - VMware 服务 URL, 
 
 #: include/classes/items/CHelpItems.php:987
 msgid "VMware virtual machine compressed memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "VMware虚拟机压缩内存大小，“url”-VMware服务URL，“uuid”-VMware虚拟机全局唯一标识符"
 
 #: include/classes/items/CHelpItems.php:987
 msgid "VMware virtual machine compressed memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -18595,7 +18593,7 @@ msgstr "VMware虚拟机压缩内存大小, <url> - VMware 服务 URL, <uuid> - V
 
 #: include/classes/items/CHelpItems.php:967
 msgid "VMware virtual machine datacenter name, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "VMware 虚拟机数据中心名称，<url> - VMware 服务 URL，<uuid> - VMware 虚拟机全局唯一标识符"
 
 #: include/classes/items/CHelpItems.php:967
 msgid "VMware virtual machine datacenter name, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns string"
@@ -18603,7 +18601,7 @@ msgstr "VMware 虚拟机数据中心名称，<url> - VMware 服务 URL，<uuid> 
 
 #: include/classes/items/CHelpItems.php:1051
 msgid "VMware virtual machine disk device read statistics, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - disk device instance, \"mode\" - bps/ops - bytes/operations per second"
-msgstr ""
+msgstr "VMware 虚拟机磁盘设备读统计, <url> - VMware 服务 URL, <uuid> - VMware 虚拟机全局唯一标识符, <instance> - 磁盘设备, <mode> - bps/ops - 字节/每秒操作次数"
 
 #: include/classes/items/CHelpItems.php:1051
 msgid "VMware virtual machine disk device read statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
@@ -18611,7 +18609,7 @@ msgstr "VMware 虚拟机磁盘设备读统计, <url> - VMware 服务 URL, <uuid>
 
 #: include/classes/items/CHelpItems.php:1055
 msgid "VMware virtual machine disk device write statistics, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - disk device instance, \"mode\" - bps/ops - bytes/operations per second"
-msgstr ""
+msgstr "VMware 虚拟机磁盘设备写统计, <url> - VMware 服务 URL, <uuid> - VMware 虚拟机全局唯一标识符, <instance> - 磁盘设备, <mode> - bps/ops - 字节/每秒操作次数"
 
 #: include/classes/items/CHelpItems.php:1055
 msgid "VMware virtual machine disk device write statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
@@ -18619,7 +18617,7 @@ msgstr "VMware 虚拟机磁盘设备写统计, <url> - VMware 服务 URL, <uuid>
 
 #: include/classes/items/CHelpItems.php:1063
 msgid "VMware virtual machine file system statistics, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"fsname\" - file system name, \"mode\" - total/free/used/pfree/pused"
-msgstr ""
+msgstr "VMware 虚拟机文件系统统计, <url> - VMware 服务 URL, <uuid> - VMware 虚拟机全局唯一标识符, <fsname> - 文件系统名, <mode> - total/free/used/pfree/pused"
 
 #: include/classes/items/CHelpItems.php:1063
 msgid "VMware virtual machine file system statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <fsname> - file system name, <mode> - total/free/used/pfree/pused"
@@ -18627,7 +18625,7 @@ msgstr "VMware 虚拟机文件系统统计, <url> - VMware 服务 URL, <uuid> - 
 
 #: include/classes/items/CHelpItems.php:1003
 msgid "VMware virtual machine guest memory usage, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "VMware 虚拟机访客内存使用情况，“url”- VMware 服务 URL，“uuid”- VMware 虚拟机全局唯一标识符"
 
 #: include/classes/items/CHelpItems.php:1003
 msgid "VMware virtual machine guest memory usage, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -18635,7 +18633,7 @@ msgstr "VMware 虚拟机内存使用率, <url> - VMware 服务 URL, <uuid> - VMw
 
 #: include/classes/items/CHelpItems.php:1007
 msgid "VMware virtual machine host memory usage, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "VMware虚拟机主机内存使用情况，“url”-VMware服务URL，“uuid”-VMware虚拟机全局唯一标识符"
 
 #: include/classes/items/CHelpItems.php:1007
 msgid "VMware virtual machine host memory usage, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -18643,7 +18641,7 @@ msgstr "VMware 虚拟机宿主机内存使用率, <url> - VMware 服务 URL, <uu
 
 #: include/classes/items/CHelpItems.php:975
 msgid "VMware virtual machine hypervisor name, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "VMware 虚拟机管理程序名称，“url”-VMware 服务 URL，“uuid”-VMware 虚拟机全局唯一标识符"
 
 #: include/classes/items/CHelpItems.php:975
 msgid "VMware virtual machine hypervisor name, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -18651,7 +18649,7 @@ msgstr "VMware 虚拟机hypervisor 名,<url> - VMware 服务 URL,<uuid> - VMware
 
 #: include/classes/items/CHelpItems.php:951
 msgid "VMware virtual machine name, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "VMware 虚拟机名称，“url”-VMware 服务 URL，“uuid”-VMware 虚拟机全局唯一标识符"
 
 #: include/classes/items/CHelpItems.php:951
 msgid "VMware virtual machine name, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -18659,7 +18657,7 @@ msgstr "VMware 虚拟机名, <url> - VMware 服务 URL, <uuid> - VMware 虚拟�
 
 #: include/classes/items/CHelpItems.php:1015
 msgid "VMware virtual machine network interface input statistics, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - network interface instance, \"mode\" - bps/pps - bytes/packets per second"
-msgstr ""
+msgstr "VMware 虚拟机网络接口进入流量统计, <url> - VMware 服务 URL, <uuid> - VMware 虚拟机全局唯一标识符, <instance> - 网络接口名称, <mode> - bps/pps - 字节/每秒操作次数"
 
 #: include/classes/items/CHelpItems.php:1015
 msgid "VMware virtual machine network interface input statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance, <mode> - bps/pps - bytes/packets per second"
@@ -18667,7 +18665,7 @@ msgstr "VMware 虚拟机网络接口进入流量统计, <url> - VMware 服务 UR
 
 #: include/classes/items/CHelpItems.php:1019
 msgid "VMware virtual machine network interface output statistics, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - network interface instance, \"mode\" - bps/pps - bytes/packets per second"
-msgstr ""
+msgstr "虚拟机网络接口流出流量统计, <url> - VMware 服务 URL, <uuid> - VMware 虚拟机全局唯一标识符, <instance> - 网络接口名称, <mode> - bps/pps - 字节/每秒操作次数"
 
 #: include/classes/items/CHelpItems.php:1019
 msgid "VMware virtual machine network interface output statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance, <mode> - bps/pps - bytes/packets per second"
@@ -18675,7 +18673,7 @@ msgstr "虚拟机网络接口流出流量统计, <url> - VMware 服务 URL, <uui
 
 #: include/classes/items/CHelpItems.php:1023
 msgid "VMware virtual machine performance counter, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"path\" - performance counter path, \"instance\" - performance counter instance"
-msgstr ""
+msgstr "VMware 虚拟机性能计数器，“url”- VMware 服务 URL，“uuid”- VMware 虚拟机全局唯一标识符，“path”- 性能计数器路径，“instance”- 性能计数器实例"
 
 #: include/classes/items/CHelpItems.php:1023
 msgid "VMware virtual machine performance counter, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <path> - performance counter path, <instance> - performance counter instance"
@@ -18683,7 +18681,7 @@ msgstr "VMware虚拟机性能计数器,<url>-VMware服务URL,<uuid>-VMware 虚�
 
 #: include/classes/items/CHelpItems.php:1027
 msgid "VMware virtual machine power state, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "VMware 虚拟机电源状态，“url”-VMware 服务 URL，“uuid”-VMware 虚拟机全局唯一标识符"
 
 #: include/classes/items/CHelpItems.php:1027
 msgid "VMware virtual machine power state, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -18691,7 +18689,7 @@ msgstr "VMware 虚拟机电源状态, <url> - VMware 服务 URL, <uuid> - VMware
 
 #: include/classes/items/CHelpItems.php:991
 msgid "VMware virtual machine private memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "VMware 虚拟机私有内存大小, <url> - VMware 服务 URL, <uuid> - VMware 虚拟机全局唯一标识符"
 
 #: include/classes/items/CHelpItems.php:991
 msgid "VMware virtual machine private memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -18699,7 +18697,7 @@ msgstr "VMware 虚拟机私有内存大小, <url> - VMware 服务 URL, <uuid> - 
 
 #: include/classes/items/CHelpItems.php:959
 msgid "VMware virtual machine processor ready time ms, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "VMware 虚拟机处理器就绪时间 ms，“url”-VMware 服务 URL，“uuid”-VMware 虚拟机全局唯一标识符"
 
 #: include/classes/items/CHelpItems.php:959
 msgid "VMware virtual machine processor ready time ms, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -18707,7 +18705,7 @@ msgstr "VMware虚拟机处理器准备时间ms，<url> - VMware服务URL，<uuid
 
 #: include/classes/items/CHelpItems.php:963
 msgid "VMware virtual machine processor usage in Hz, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "VMware 虚拟机处理器使用情况（以 Hz 为单位），“url”- VMware 服务 URL，“uuid”- VMware 虚拟机全局唯一标识符"
 
 #: include/classes/items/CHelpItems.php:963
 msgid "VMware virtual machine processor usage in Hz, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -18715,7 +18713,7 @@ msgstr "VMware 虚拟机处理器使用率，单位Hz, <url> - VMware 服务 URL
 
 #: include/classes/items/CHelpItems.php:995
 msgid "VMware virtual machine shared memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "VMware虚拟机共享内存大小，“url”-VMware服务URL，“uuid”-VMware虚拟机全局唯一标识符"
 
 #: include/classes/items/CHelpItems.php:995
 msgid "VMware virtual machine shared memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -18723,7 +18721,7 @@ msgstr "VMware 虚拟机共享内存大小, <url> - VMware 服务 URL, <uuid> - 
 
 #: include/classes/items/CHelpItems.php:999
 msgid "VMware virtual machine swapped memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "VMware虚拟机交换内存大小，“url”-VMware服务URL，“uuid”-VMware虚拟机全局唯一标识符"
 
 #: include/classes/items/CHelpItems.php:999
 msgid "VMware virtual machine swapped memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -18731,7 +18729,7 @@ msgstr "VMware 虚拟机交换分区大小, <url> - VMware 服务 URL, <uuid> - 
 
 #: include/classes/items/CHelpItems.php:979
 msgid "VMware virtual machine total memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "VMware虚拟机总内存大小，“url”-VMware服务URL，“uuid”-VMware虚拟机全局唯一标识符"
 
 #: include/classes/items/CHelpItems.php:979
 msgid "VMware virtual machine total memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -18739,7 +18737,7 @@ msgstr "VMware 虚拟机总内存大小, <url> - VMware 服务 URL, <uuid> - VMw
 
 #: include/classes/items/CHelpItems.php:1035
 msgid "VMware virtual machine uncommitted storage space, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "VMware虚拟机未提交存储空间，“url”-VMware服务URL，“uuid”-VMware虚拟机全局唯一标识符"
 
 #: include/classes/items/CHelpItems.php:1035
 msgid "VMware virtual machine uncommitted storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -18747,7 +18745,7 @@ msgstr "VMware 虚拟机的未提交存储空间(uncommitted storage space), <ur
 
 #: include/classes/items/CHelpItems.php:1039
 msgid "VMware virtual machine unshared storage space, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "VMware虚拟机非共享存储空间，“url”-VMware服务URL，“uuid”-VMware虚拟机全局唯一标识符"
 
 #: include/classes/items/CHelpItems.php:1039
 msgid "VMware virtual machine unshared storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -18755,7 +18753,7 @@ msgstr "VMware 虚拟机非共享存储空间, <url> - VMware 服务 URL, <uuid>
 
 #: include/classes/items/CHelpItems.php:1043
 msgid "VMware virtual machine uptime, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "VMware 虚拟机正常运行时间，“url”-VMware 服务 URL，“uuid”-VMware 虚拟机全局唯一标识符"
 
 #: include/classes/items/CHelpItems.php:1043
 msgid "VMware virtual machine uptime, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -18811,7 +18809,7 @@ msgstr "验证"
 #: include/views/monitoring.history.php:293
 #, c-format
 msgid "Value"
-msgstr "ֵ值"
+msgstr "值"
 
 #: include/classes/api/services/CMap.php:922
 #: include/classes/api/services/CMap.php:1393
@@ -19005,16 +19003,16 @@ msgstr "W"
 #: app/views/administration.trigseverity.edit.php:52 include/items.inc.php:33
 #: include/views/general.warning.php:26
 msgid "Warning"
-msgstr "警告"
+msgstr "告警"
 
 #: include/classes/setup/CSetupWizard.php:185
 msgctxt "setup"
 msgid "Warning"
-msgstr "设置"
+msgstr "告警"
 
 #: include/func.inc.php:1656 jsLoader.php:151
 msgid "Warning message"
-msgstr "警告信息"
+msgstr "告警信息"
 
 #: jsLoader.php:223
 msgid "We are sorry, the maximum possible number of elements to remember has been reached."
@@ -19126,7 +19124,7 @@ msgstr "当启用时"
 
 #: jsLoader.php:134
 msgid "Widget is too small for the specified number of columns and rows."
-msgstr "对于指定的列数和行数而言部件太小。"
+msgstr "对于指定的列数和行数而言小组件太小。"
 
 #: graphs.php:44 include/classes/widgets/CWidgetHelper.php:755
 #: include/classes/widgets/CWidgetHelper.php:788
@@ -19150,7 +19148,7 @@ msgstr "对于指定的列数和行数而言部件太小。"
 #: include/views/monitoring.sysmap.edit.php:99
 #: include/views/monitoring.sysmap.list.php:65 screenedit.php:67 sysmaps.php:41
 msgid "Width"
-msgstr "宽"
+msgstr "宽(px)"
 
 #: include/views/configuration.maintenance.edit.php:53
 #: include/views/configuration.maintenance.list.php:108
@@ -19575,7 +19573,7 @@ msgstr ""
 #: app/partials/popup.operations.php:234
 #: app/views/administration.script.edit.php:56 include/actions.inc.php:875
 msgid "Zabbix server (proxy)"
-msgstr "Zabbix server (代理)"
+msgstr "Zabbix server (Proxy)"
 
 #: include/classes/setup/CSetupWizard.php:54
 #: include/classes/setup/CSetupWizard.php:359
@@ -19614,7 +19612,7 @@ msgstr "缩小"
 #: include/func.inc.php:148
 #, c-format
 msgid "[Wrong value for day: \"%1$s\" ]"
-msgstr "[日期值错误：“%1$s”]"
+msgstr "[日期的错误值：“%1$s”]"
 
 #: include/func.inc.php:133
 #, c-format
@@ -20326,7 +20324,7 @@ msgstr "无效延迟"
 #: include/classes/graphdraw/CPieGraphDraw.php:169
 #: include/classes/helpers/CSvgGraphHelper.php:374
 msgid "invalid history storage period"
-msgstr "无效的历史数据期间"
+msgstr "无效的历史数据期"
 
 #: include/classes/validators/CApiInputValidator.php:1202
 msgid "invalid host group name"
@@ -20398,7 +20396,7 @@ msgstr "last() - 最后（最近）的 T 值"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:1517
 msgid "left"
-msgstr "左"
+msgstr "左侧"
 
 #: include/forms.inc.php:1286 include/views/js/item.preprocessing.js.php:134
 msgid "list of characters"
@@ -20551,7 +20549,7 @@ msgstr "n-d"
 
 #: include/translateDefines.inc.php:36
 msgid "n-d H:i"
-msgstr "n-d H:i"
+msgstr "m-d H:i"
 
 #: include/views/configuration.host.discovery.edit.php:125
 #: include/views/configuration.host.discovery.edit.php:221
@@ -20580,7 +20578,7 @@ msgstr "没有数据"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:397
 msgid "nodata() - No data received during period of time T (1 - true, 0 - false), Mode (strict - ignore proxy time delay in sending data)"
-msgstr "nodata() - 在时间段 T 内没有接收到数据（1 - 真，0 - 假），模式（strict - 忽略发送数据的代理时间延迟）"
+msgstr "nodata() - 在时间段 T 内没有接收到数据（1 - 真，0 - 假），模式（strict - 忽略发送数据的Proxy代理时间延迟）"
 
 #: include/classes/widgets/CWidgetHelper.php:1118 include/graphs.inc.php:74
 msgid "none"
@@ -20589,7 +20587,7 @@ msgstr "无"
 #: include/classes/api/services/CItemGeneral.php:2283
 #: include/classes/api/services/CItemGeneral.php:2305
 msgid "nonempty key and value pair expected"
-msgstr "期望非空键和值对"
+msgstr "需要非空键和值对"
 
 #: include/actions.inc.php:31
 msgid "not in"
@@ -20673,7 +20671,7 @@ msgstr "输出"
 #: include/views/js/item.preprocessing.js.php:155
 #: include/views/js/item.preprocessing.js.php:170
 msgid "pattern"
-msgstr "模式"
+msgstr "模式表达式"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:308
 msgid "percentile() - Percentile P of a period T"
@@ -20756,7 +20754,7 @@ msgstr "秒"
 
 #: include/classes/html/CActionButtonList.php:123
 msgid "selected"
-msgstr "选择"
+msgstr "已选"
 
 #: include/views/configuration.services.edit.php:255
 msgid "short description"
@@ -20937,14 +20935,14 @@ msgstr "在此输入搜索"
 
 #: include/classes/validators/CApiInputValidator.php:1808
 msgid "unacceptable URL"
-msgstr "不可接受的网址"
+msgstr "不可用的URL"
 
 #: include/classes/import/validators/C44XmlValidator.php:2222
 #: include/classes/import/validators/C50XmlValidator.php:2372
 #: include/classes/import/validators/CXmlValidatorGeneral.php:267
 #, c-format
 msgid "unexpected constant \"%1$s\""
-msgstr "非期望的常数值 \"%1$s\""
+msgstr "意外常量“%1$s”"
 
 #: include/classes/export/CConfigurationExportBuilder.php:105
 #: include/classes/import/converters/CConstantImportConverter.php:60
@@ -20952,11 +20950,11 @@ msgstr "非期望的常数值 \"%1$s\""
 #: include/classes/import/validators/C50XmlValidator.php:2330
 #, c-format
 msgid "unexpected constant value \"%1$s\""
-msgstr "非期望的常数值 \"%1$s\""
+msgstr "意外的常量值“%1$s”"
 
 #: include/classes/parsers/CItemKey.php:55
 msgid "unexpected end of key"
-msgstr "非期望的关键字结束"
+msgstr "键值意外结束"
 
 #: include/classes/parsers/CUserMacroParser.php:38
 msgid "unexpected end of macro"
@@ -21053,7 +21051,7 @@ msgstr "值"
 #: include/classes/api/services/CDiscoveryRule.php:1840
 #, c-format
 msgid "value \"%1$s\" already exists"
-msgstr "值 \"%1$s\" 已存在"
+msgstr "值“%1$s”已存在"
 
 #: include/classes/import/CConfigurationImport.php:871
 #: include/classes/import/CConfigurationImport.php:909
@@ -21113,20 +21111,20 @@ msgstr "值必须是 %1$s 之一"
 
 #: include/classes/api/services/CItemGeneral.php:1538
 msgid "value of first parameter is too long"
-msgstr "第一个参数的值太长了"
+msgstr "第一个参数的值太长"
 
 #: include/correlation.inc.php:215
 msgid "value of new event tag"
-msgstr "新时间标签的值"
+msgstr "新事件的标签值"
 
 #: include/classes/api/services/CItemGeneral.php:1544
 msgid "value of second parameter is too long"
-msgstr "第二个参数值太长了"
+msgstr "第二个参数的值太长"
 
 #: include/classes/api/services/CItemGeneral.php:1555
 #, c-format
 msgid "value of third parameter must be one of %1$s"
-msgstr "第三个参数的值必须是 %1$s 中的一个"
+msgstr "第三个参数的值必须是 %1$s 之一"
 
 #: include/actions.inc.php:571 include/actions.inc.php:589
 #: include/actions.inc.php:734 include/actions.inc.php:752

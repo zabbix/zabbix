@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 5.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-04-01 16:26+0300\n"
-"PO-Revision-Date: 2023-09-29 06:01+0000\n"
+"PO-Revision-Date: 2024-05-25 07:00+0000\n"
 "Last-Translator: Alexey <alexey.pustovalov@zabbix.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -2314,9 +2314,9 @@ msgstr[2] "Не удалось деактивировать способы оп�
 #: app/controllers/CControllerModuleUpdate.php:146
 msgid "Cannot disable module"
 msgid_plural "Cannot disable modules"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Не удалось деактивировать модуль"
+msgstr[1] "Не удалось деактивировать модули"
+msgstr[2] "Не удалось деактивировать модули"
 
 #: app/controllers/CControllerModuleUpdate.php:165
 #, c-format
@@ -2394,9 +2394,9 @@ msgstr[2] "Не удалось активировать способы опов�
 #: app/controllers/CControllerModuleUpdate.php:142
 msgid "Cannot enable module"
 msgid_plural "Cannot enable modules"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Не удалось активировать модуль"
+msgstr[1] "Не удалось активировать модули"
+msgstr[2] "Не удалось активировать модули"
 
 #: app/controllers/CControllerModuleUpdate.php:160
 #, c-format
@@ -3008,7 +3008,7 @@ msgstr "Не удалось обновить способ оповещений"
 
 #: app/controllers/CControllerModuleUpdate.php:139
 msgid "Cannot update module"
-msgstr ""
+msgstr "Не удалось обновить модуль"
 
 #: app/controllers/CControllerModuleUpdate.php:157
 #, c-format
@@ -11562,9 +11562,9 @@ msgstr[2] "Модулей удалено: %1$s."
 #: app/controllers/CControllerModuleUpdate.php:134
 msgid "Module disabled"
 msgid_plural "Modules disabled"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Модуль деактивирован"
+msgstr[1] "Модули деактивированы"
+msgstr[2] "Модули деактивированы"
 
 #: app/controllers/CControllerModuleUpdate.php:150
 #, c-format
@@ -11577,9 +11577,9 @@ msgstr[2] "Модулей деактивировано: %1$s."
 #: app/controllers/CControllerModuleUpdate.php:131
 msgid "Module enabled"
 msgid_plural "Modules enabled"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Модуль активирован"
+msgstr[1] "Модули активированы"
+msgstr[2] "Модули активированы"
 
 #: app/controllers/CControllerModuleUpdate.php:145
 #, c-format
@@ -11591,7 +11591,7 @@ msgstr[2] "Модулей активировано: %1$s."
 
 #: app/controllers/CControllerModuleUpdate.php:128
 msgid "Module updated"
-msgstr ""
+msgstr "Модуль обновлен"
 
 #: app/controllers/CControllerModuleUpdate.php:142
 #, c-format
