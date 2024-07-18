@@ -669,10 +669,13 @@ int	DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_INTERFACE *interface
 	int			simple_interval, disable_until, ret;
 	zbx_custom_interval_t	*custom_intervals;
 
+	zabbix_log(LOG_LEVEL_INFORMATION, "XSTRATA 00, DCitem_nextcheck_update");
+
 	if (0 == (flags & ZBX_ITEM_COLLECTED) && 0 != item->nextcheck &&
 			0 == (flags & ZBX_ITEM_KEY_CHANGED) && 0 == (flags & ZBX_ITEM_TYPE_CHANGED) &&
 			0 == (flags & ZBX_ITEM_DELAY_CHANGED))
 	{
+		zabbix_log(LOG_LEVEL_INFORMATION, "XSTRATA ret: suc");
 		return SUCCEED;	/* avoid unnecessary nextcheck updates when syncing items in cache */
 	}
 
@@ -3544,8 +3547,59 @@ static void	dc_item_value_type_update(int found, ZBX_DC_ITEM *item, zbx_item_val
 	}
 }
 
+static void	make_item_unsupported_if_zero_pollers(ZBX_DC_ITEM *item, unsigned char poller_type,
+		const char *start_poller_config_name)
+{
+	if (0 == get_config_forks_cb(poller_type))
+	{
+		time_t		now = time(NULL);
+		zbx_timespec_t  ts = {now, 0};
+		const char	*msg = zbx_dsprintf(NULL, "%s is set to 0", start_poller_config_name);
+
+		zbx_dc_add_history(item->itemid, item->value_type, 0, NULL, &ts, ITEM_STATE_NOTSUPPORTED, msg);
+	}
+}
+
+
+static void	process_zero_pollers_items(ZBX_DC_ITEM *item)
+{
+	zabbix_log(LOG_LEVEL_INFORMATION, "BADGER process_zero_pollers_items: %d", item->type);
+
+	switch (item->type)
+	{
+		case ITEM_TYPE_ZABBIX:
+			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_AGENT_POLLER, "StartAgentPollers");
+			break;
+		case ITEM_TYPE_JMX:
+			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_JAVAPOLLER, "StartJavaPollers");
+			break;
+		case ITEM_TYPE_DB_MONITOR:
+			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_ODBCPOLLER, "StartODBCPollers");
+			break;
+		case ITEM_TYPE_HTTPAGENT:
+			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_HTTPAGENT_POLLER,
+					"StartHTTPAgentPollers");
+			break;
+		case ITEM_TYPE_SNMP:
+			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_SNMP_POLLER, "StartSNMPPollers");
+			break;
+		case ITEM_TYPE_BROWSER:
+			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_BROWSERPOLLER,
+					"StartBrowserPollers");
+			break;
+		case ITEM_TYPE_SCRIPT:
+			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_POLLER, "StartPollers");
+			break;
+		case ITEM_TYPE_IPMI:
+			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_IPMIPOLLER, "StartIPMIPollers");
+			break;
+		default:
+			return;
+	}
+}
+
 static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, zbx_synced_new_config_t synced,
-		zbx_vector_uint64_t *deleted_itemids, zbx_vector_dc_item_ptr_t *new_items)
+		zbx_vector_uint64_t *deleted_itemids, zbx_vector_dc_item_ptr_t *new_items, unsigned char mode)
 {
 	char			**row;
 	zbx_uint64_t		rowid;
@@ -3795,81 +3849,14 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 			{
 				char	*error = NULL;
 
-				if (ITEM_TYPE_ZABBIX == item->type &&
-						0 == get_config_forks_cb(ZBX_PROCESS_TYPE_AGENT_POLLER))
+				if (ZBX_DBSYNC_INIT == mode || (0 != (flags & ZBX_ITEM_TYPE_CHANGED)) ||
+						(0 != (flags & ZBX_ITEM_NEW)))
 				{
-						zbx_timespec_t	ts = {now, 0};
-
-						zbx_dc_add_history(item->itemid, item->value_type, 0, NULL, &ts,
-								ITEM_STATE_NOTSUPPORTED,
-								"StartAgentPollers is set to 0");
-				}
-				else if (ITEM_TYPE_JMX == item->type &&
-						0 == get_config_forks_cb(ZBX_PROCESS_TYPE_JAVAPOLLER))
-				{
-						zbx_timespec_t	ts = {now, 0};
-
-						zbx_dc_add_history(item->itemid, item->value_type, 0, NULL, &ts,
-								ITEM_STATE_NOTSUPPORTED,
-								"StartJavaPollers is set to 0");
+					process_zero_pollers_items(item);
 				}
 
-				else if (ITEM_TYPE_DB_MONITOR == item->type &&
-						0 == get_config_forks_cb(ZBX_PROCESS_TYPE_ODBCPOLLER))
-				{
-						zbx_timespec_t	ts = {now, 0};
 
-						zbx_dc_add_history(item->itemid, item->value_type, 0, NULL, &ts,
-								ITEM_STATE_NOTSUPPORTED,
-								"StartODBCPollers is set to 0");
-				}
-
-				else if (ITEM_TYPE_HTTPAGENT == item->type &&
-						0 == get_config_forks_cb(ZBX_PROCESS_TYPE_HTTPAGENT_POLLER))
-				{
-						zbx_timespec_t	ts = {now, 0};
-
-						zbx_dc_add_history(item->itemid, item->value_type, 0, NULL, &ts,
-								ITEM_STATE_NOTSUPPORTED,
-								"StartHTTPAgentPollers is set to 0");
-				}
-				else if (ITEM_TYPE_SNMP == item->type &&
-						0 == get_config_forks_cb(ZBX_PROCESS_TYPE_SNMP_POLLER))
-				{
-						zbx_timespec_t	ts = {now, 0};
-
-						zbx_dc_add_history(item->itemid, item->value_type, 0, NULL, &ts,
-								ITEM_STATE_NOTSUPPORTED,
-								"StartSNMPPollers is set to 0");
-}
-				else if (ITEM_TYPE_BROWSER == item->type &&
-						0 == get_config_forks_cb(ZBX_PROCESS_TYPE_BROWSERPOLLER))
-				{
-						zbx_timespec_t	ts = {now, 0};
-
-						zbx_dc_add_history(item->itemid, item->value_type, 0, NULL, &ts,
-								ITEM_STATE_NOTSUPPORTED,
-								"StartBrowserPollers is set to 0");
-				}
-				else if (ITEM_TYPE_SCRIPT == item->type &&
-						0 == get_config_forks_cb(ZBX_PROCESS_TYPE_POLLER))
-				{
-						zbx_timespec_t	ts = {now, 0};
-
-						zbx_dc_add_history(item->itemid, item->value_type, 0, NULL, &ts,
-								ITEM_STATE_NOTSUPPORTED,
-								"StartPollers is set to 0");
-				}
-				else if (ITEM_TYPE_IPMI == item->type &&
-						0 == get_config_forks_cb(ZBX_PROCESS_TYPE_IPMIPOLLER))
-				{
-						zbx_timespec_t	ts = {now, 0};
-
-						zbx_dc_add_history(item->itemid, item->value_type, 0, NULL, &ts,
-								ITEM_STATE_NOTSUPPORTED,
-								"StartIPMIPollers is set to 0");
-				}
-				else if (FAIL == DCitem_nextcheck_update(item, interface, flags, now, &error))
+				if (FAIL == DCitem_nextcheck_update(item, interface, flags, now, &error))
 				{
 					zbx_timespec_t	ts = {now, 0};
 
@@ -3886,6 +3873,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 					}
 					zbx_free(error);
 				}
+
 			}
 		}
 		else
@@ -8185,7 +8173,7 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 	pisec2 = zbx_time() - sec;
 
 	sec = zbx_time();
-	DCsync_items(&items_sync, new_revision, flags, synced, deleted_itemids, pnew_items);
+	DCsync_items(&items_sync, new_revision, flags, synced, deleted_itemids, pnew_items, mode);
 	isec2 = zbx_time() - sec;
 
 	sec = zbx_time();
