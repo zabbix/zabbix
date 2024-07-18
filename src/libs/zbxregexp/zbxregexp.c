@@ -1100,7 +1100,8 @@ int	zbx_regexp_repl(const char *string, const char *pattern, const char *output_
 		zbx_regmatch_t	*groups = matches.values[mi]->groups;
 		char		*replace;
 
-		replace = regexp_sub_replace(string, output_template, groups, ZBX_REGEXP_GROUPS_MAX, 0);
+		replace = regexp_sub_replace(string, output_template, groups, ZBX_REGEXP_GROUPS_MAX,
+						MAX_EXECUTE_OUTPUT_LEN);
 
 		if (NULL != replace)
 		{
@@ -1136,6 +1137,10 @@ int	zbx_regexp_repl(const char *string, const char *pattern, const char *output_
 			zbx_free(out_str);
 			out_str = str;
 			zbx_free(replace);
+		}
+		else
+		{
+			goto out;
 		}
 	}
 
