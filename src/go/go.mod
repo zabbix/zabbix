@@ -27,7 +27,7 @@ require (
 	golang.org/x/net v0.17.0
 	golang.org/x/sys v0.13.0
 	golang.org/x/text v0.13.0
-	golang.zabbix.com/sdk v1.2.2-0.20240702114056-b5e52e006951
+	golang.zabbix.com/sdk v1.2.2-0.20240718080343-b713d1a76b37
 )
 
 require (
@@ -46,5 +46,3 @@ require (
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
 	gopkg.in/asn1-ber.v1 v1.0.0-20181015200546-f715ec2f112d // indirect
 )
-
-replace golang.zabbix.com/sdk => ../../../plugins/plugin-support
