@@ -3557,6 +3557,8 @@ static void	make_item_unsupported_if_zero_pollers(ZBX_DC_ITEM *item, unsigned ch
 		const char	*msg = zbx_dsprintf(NULL, "%s is set to 0", start_poller_config_name);
 
 		zbx_dc_add_history(item->itemid, item->value_type, 0, NULL, &ts, ITEM_STATE_NOTSUPPORTED, msg);
+
+		zbx_free(msg);
 	}
 }
 
@@ -3599,7 +3601,7 @@ static void	process_zero_pollers_items(ZBX_DC_ITEM *item)
 }
 
 static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, zbx_synced_new_config_t synced,
-		zbx_vector_uint64_t *deleted_itemids, zbx_vector_dc_item_ptr_t *new_items, unsigned char mode)
+		zbx_vector_uint64_t *deleted_itemids, zbx_vector_dc_item_ptr_t *new_items)
 {
 	char			**row;
 	zbx_uint64_t		rowid;
@@ -3849,12 +3851,8 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 			{
 				char	*error = NULL;
 
-				if (ZBX_DBSYNC_INIT == mode || (0 != (flags & ZBX_ITEM_TYPE_CHANGED)) ||
-						(0 != (flags & ZBX_ITEM_NEW)))
-				{
+				if ((0 != (flags & ZBX_ITEM_TYPE_CHANGED)) || (0 != (flags & ZBX_ITEM_NEW)))
 					process_zero_pollers_items(item);
-				}
-
 
 				if (FAIL == DCitem_nextcheck_update(item, interface, flags, now, &error))
 				{
@@ -8173,7 +8171,7 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 	pisec2 = zbx_time() - sec;
 
 	sec = zbx_time();
-	DCsync_items(&items_sync, new_revision, flags, synced, deleted_itemids, pnew_items, mode);
+	DCsync_items(&items_sync, new_revision, flags, synced, deleted_itemids, pnew_items);
 	isec2 = zbx_time() - sec;
 
 	sec = zbx_time();
