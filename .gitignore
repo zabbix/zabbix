@@ -56,10 +56,6 @@ database/mysql/data.sql
 database/mysql/schema.sql
 database/mysql/option-patches
 !database/mysql/option-patches/double.sql
-database/oracle/data.sql
-database/oracle/schema.sql
-database/oracle/option-patches
-!database/oracle/option-patches/double.sql
 database/postgresql/data.sql
 database/postgresql/schema.sql
 database/postgresql/option-patches
@@ -189,6 +185,7 @@ tests/libs/zbxexpr/zbx_user_macro_parse
 tests/libs/zbxexpr/zbx_validate_interval
 tests/libs/zbxexpr/macro_fmttime
 tests/libs/zbxexpr/zbx_substitute_macros
+tests/libs/zbxexpr/zbx_substitute_macros1
 tests/libs/zbxexpression/zbx_evaluate
 tests/libs/zbxexpression/zbx_evaluate_unknown
 tests/libs/zbxexpression/evaluate_function

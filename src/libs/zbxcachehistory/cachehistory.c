@@ -592,7 +592,6 @@ static void	dc_trends_fetch_and_update(ZBX_DC_TREND *trends, int trends_num, zbx
 	result = zbx_db_select("%s order by itemid,clock", sql);
 
 	sql_offset = 0;
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
@@ -633,10 +632,7 @@ static void	dc_trends_fetch_and_update(ZBX_DC_TREND *trends, int trends_num, zbx
 
 	zbx_db_free_result(result);
 
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
-		zbx_db_execute("%s", sql);
+	(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
 }
 
 /******************************************************************************
@@ -1772,8 +1768,6 @@ void	zbx_db_mass_update_items(const zbx_vector_item_diff_ptr_t *item_diff,
 
 	if (i != item_diff->values_num || 0 != inventory_values->values_num)
 	{
-		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 		if (i != item_diff->values_num)
 		{
 			zbx_db_save_item_changes(&sql, &sql_alloc, &sql_offset, item_diff,
@@ -1783,10 +1777,7 @@ void	zbx_db_mass_update_items(const zbx_vector_item_diff_ptr_t *item_diff,
 		if (0 != inventory_values->values_num)
 			DCadd_update_inventory_sql(&sql_offset, inventory_values);
 
-		zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-		if (sql_offset > 16)	/* In ORACLE always present begin..end; */
-			zbx_db_execute("%s", sql);
+		(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
 
 		zbx_dc_config_update_inventory_values(inventory_values);
 	}

@@ -365,7 +365,6 @@ static int	update_event_names(void)
 	memset(&trigger, 0, sizeof(zbx_db_trigger));
 
 	sql = (char *)zbx_malloc(NULL, sql_alloc);
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = zbx_db_select(
 			"select triggerid,description,expression,priority,comments,url,url_name,"
@@ -412,11 +411,9 @@ static int	update_event_names(void)
 
 	zbx_dc_close_user_macros(um_handle);
 
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (SUCCEED == ret && 16 < sql_offset) /* in ORACLE always present begin..end; */
+	if (SUCCEED == ret)
 	{
-		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
+		if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
 			ret = FAIL;
 	}
 

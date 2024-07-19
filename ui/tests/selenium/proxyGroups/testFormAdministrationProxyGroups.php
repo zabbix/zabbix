@@ -93,7 +93,7 @@ class testFormAdministrationProxyGroups extends CWebTest {
 		$dialog->close();
 
 		$this->query('link:Online proxy group')->waitUntilClickable()->one()->click();
-		$dialog->invalidate();
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$this->assertEquals('Proxy group', $dialog->getTitle());
 		$form->invalidate();
 

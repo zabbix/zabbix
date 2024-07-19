@@ -31,7 +31,7 @@
 #define	ZBX_TYPE_TEXT		4
 #define	ZBX_TYPE_UINT		5
 #define	ZBX_TYPE_ID		6
-#define	ZBX_TYPE_SHORTTEXT	7
+/* ZBX_TYPE_SHORTTEXT 7 */
 #define	ZBX_TYPE_LONGTEXT	8
 #define ZBX_TYPE_CUID		9
 #define	ZBX_TYPE_SERIAL		10

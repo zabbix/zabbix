@@ -1632,6 +1632,10 @@ msgstr "최소 하루의 요일 또는 날짜를 지정해야 합니다."
 msgid "At least one host group or host must be selected."
 msgstr "적어도 1개의 호스트 그룹 혹은 호스트가 선택되어 있을 필요가 있습니다."
 
+#: include/classes/setup/CFrontendSetup.php:252
+msgid "At least one of MySQL or PostgreSQL should be supported."
+msgstr ""
+
 #: include/classes/setup/CFrontendSetup.php:241
 msgid "At least one of MySQL, PostgreSQL or Oracle should be supported."
 msgstr "MySQL, PostgreSQL 또는 Oracle 중 하나 이상이 지원되어야 합니다."
