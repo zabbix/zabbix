@@ -3551,7 +3551,7 @@ static void	make_item_unsupported_if_zero_pollers(ZBX_DC_ITEM *item, unsigned ch
 	{
 		time_t		now = time(NULL);
 		zbx_timespec_t  ts = {now, 0};
-		const char	*msg = zbx_dsprintf(NULL, "%s are disabled in configuration", start_poller_config_name);
+		char	*msg = zbx_dsprintf(NULL, "%s are disabled in configuration", start_poller_config_name);
 
 		zbx_dc_add_history(item->itemid, item->value_type, 0, NULL, &ts, ITEM_STATE_NOTSUPPORTED, msg);
 
