@@ -669,13 +669,10 @@ int	DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_INTERFACE *interface
 	int			simple_interval, disable_until, ret;
 	zbx_custom_interval_t	*custom_intervals;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "XSTRATA 00, DCitem_nextcheck_update");
-
 	if (0 == (flags & ZBX_ITEM_COLLECTED) && 0 != item->nextcheck &&
 			0 == (flags & ZBX_ITEM_KEY_CHANGED) && 0 == (flags & ZBX_ITEM_TYPE_CHANGED) &&
 			0 == (flags & ZBX_ITEM_DELAY_CHANGED))
 	{
-		zabbix_log(LOG_LEVEL_INFORMATION, "XSTRATA ret: suc");
 		return SUCCEED;	/* avoid unnecessary nextcheck updates when syncing items in cache */
 	}
 
@@ -3554,7 +3551,7 @@ static void	make_item_unsupported_if_zero_pollers(ZBX_DC_ITEM *item, unsigned ch
 	{
 		time_t		now = time(NULL);
 		zbx_timespec_t  ts = {now, 0};
-		const char	*msg = zbx_dsprintf(NULL, "%s is set to 0", start_poller_config_name);
+		const char	*msg = zbx_dsprintf(NULL, "%s are disabled in configuration", start_poller_config_name);
 
 		zbx_dc_add_history(item->itemid, item->value_type, 0, NULL, &ts, ITEM_STATE_NOTSUPPORTED, msg);
 
@@ -3565,35 +3562,32 @@ static void	make_item_unsupported_if_zero_pollers(ZBX_DC_ITEM *item, unsigned ch
 
 static void	process_zero_pollers_items(ZBX_DC_ITEM *item)
 {
-	zabbix_log(LOG_LEVEL_INFORMATION, "BADGER process_zero_pollers_items: %d", item->type);
-
 	switch (item->type)
 	{
 		case ITEM_TYPE_ZABBIX:
-			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_AGENT_POLLER, "StartAgentPollers");
+			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_AGENT_POLLER, "AgentPollers");
 			break;
 		case ITEM_TYPE_JMX:
-			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_JAVAPOLLER, "StartJavaPollers");
+			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_JAVAPOLLER, "JavaPollers");
 			break;
 		case ITEM_TYPE_DB_MONITOR:
-			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_ODBCPOLLER, "StartODBCPollers");
+			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_ODBCPOLLER, "ODBCPollers");
 			break;
 		case ITEM_TYPE_HTTPAGENT:
 			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_HTTPAGENT_POLLER,
-					"StartHTTPAgentPollers");
+					"HTTPAgentPollers");
 			break;
 		case ITEM_TYPE_SNMP:
-			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_SNMP_POLLER, "StartSNMPPollers");
+			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_SNMP_POLLER, "SNMPPollers");
 			break;
 		case ITEM_TYPE_BROWSER:
-			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_BROWSERPOLLER,
-					"StartBrowserPollers");
+			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_BROWSERPOLLER, "BrowserPollers");
 			break;
 		case ITEM_TYPE_SCRIPT:
-			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_POLLER, "StartPollers");
+			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_POLLER, "Pollers");
 			break;
 		case ITEM_TYPE_IPMI:
-			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_IPMIPOLLER, "StartIPMIPollers");
+			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_IPMIPOLLER, "IPMIPollers");
 			break;
 		default:
 			return;
@@ -3871,7 +3865,6 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 					}
 					zbx_free(error);
 				}
-
 			}
 		}
 		else
