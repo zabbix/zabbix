@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-07-05 19:07+0000\n"
+"PO-Revision-Date: 2024-07-12 22:27+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -1658,7 +1658,7 @@ msgstr "Au moins un groupe hôte ou un hôte doit être sélectionné."
 
 #: include/classes/setup/CFrontendSetup.php:252
 msgid "At least one of MySQL or PostgreSQL should be supported."
-msgstr ""
+msgstr "Au moins MySQL ou PostgreSQL doit être supporté."
 
 #: include/classes/setup/CFrontendSetup.php:241
 msgid "At least one of MySQL, PostgreSQL or Oracle should be supported."
@@ -1879,6 +1879,11 @@ msgstr "Disponibilité"
 msgid "Availability report"
 msgstr "Rapport de disponibilité"
 
+#: app/controllers/CControllerAvailabilityReportTrigger.php:70
+#: app/views/reports.availabilityreport.trigger.php:23
+msgid "Availability report graph"
+msgstr ""
+
 #: include/classes/html/CHostAvailability.php:80
 #: widgets/hostavail/views/widget.view.php:32
 msgid "Available"
@@ -1908,7 +1913,7 @@ msgstr "Évitez les mots de passe faciles à deviner"
 
 #: jsLoader.php:172
 msgid "Awaiting data"
-msgstr ""
+msgstr "En attente de données"
 
 #: widgets/svggraph/views/widget.edit.php:51
 msgid "Axes"
@@ -23535,7 +23540,7 @@ msgstr "Vous devez vous identifier pour accéder à cette page."
 
 #: jsLoader.php:287
 msgid "You need to have at least one image uploaded to create map element. Images can be uploaded in Administration->General->Images section."
-msgstr ""
+msgstr "Vous devez avoir au moins une image téléchargée pour créer un élément de carte. Les images peuvent être téléchargées dans la section Administration->Général->Images."
 
 #: include/classes/db/DB.php:133
 msgid "Your database is not working properly. Please wait a few minutes and try to repeat this action. If the problem still persists, please contact system administrator. The problem might be caused by long running transaction or row level lock accomplished by your database management system."
