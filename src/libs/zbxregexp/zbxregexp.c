@@ -1105,35 +1105,23 @@ int	zbx_regexp_repl(const char *string, const char *pattern, const char *output_
 
 		if (NULL != replace)
 		{
-			size_t	length = strlen(out_str) + strlen(replace) + 1;
+			size_t	replen = strlen(replace), outlen = strlen(out_str), length = outlen + replen + 1,
+				eo = (size_t)groups[0].rm_eo;
 			char	*str;
 
 			if (MAX_EXECUTE_OUTPUT_LEN <= length)
 			{
-				zabbix_log(LOG_LEVEL_DEBUG, "Macro function output exceeded limit of %d Kb",
+				zabbix_log(LOG_LEVEL_DEBUG, "macro function output exceeded limit of %d Kb",
 						MAX_EXECUTE_OUTPUT_LEN / ZBX_KIBIBYTE);
 				zbx_free(replace);
 				goto out;
 			}
 			ptr = str = (char *)zbx_malloc(NULL, length);
+			if (0 != (size_t)groups[0].rm_so)
+				memcpy(ptr, out_str, (size_t)groups[0].rm_so);
+			memcpy(ptr + groups[0].rm_so, replace, replen);
+			memcpy(ptr + groups[0].rm_so + replen, out_str + eo, outlen - eo + 1);
 
-			for (i = 0; ; i++)
-			{
-				if (i == (size_t)groups[0].rm_so)
-				{
-					char	*replace_ptr = replace;
-
-					while ('\0' != *replace_ptr)
-						*ptr++ = *replace_ptr++;
-
-					i = i + (size_t)(groups[0].rm_eo - groups[0].rm_so);
-				}
-				if ('\0' == out_str[i])
-					break;
-
-				*ptr++ = out_str[i];
-			}
-			*ptr = '\0';
 			zbx_free(out_str);
 			out_str = str;
 			zbx_free(replace);
@@ -1143,7 +1131,6 @@ int	zbx_regexp_repl(const char *string, const char *pattern, const char *output_
 			goto out;
 		}
 	}
-
 	ret = SUCCEED;
 out:
 	zbx_vector_match_clear_ext(&matches, (zbx_match_free_func_t)zbx_ptr_free);
