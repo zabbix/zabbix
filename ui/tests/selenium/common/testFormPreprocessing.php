@@ -3150,7 +3150,7 @@ abstract class testFormPreprocessing extends CWebTest {
 	}
 
 	/**
-	 * Check layput of preprocessing tab and fields.
+	 * Check layout of preprocessing tab and fields.
 	 *
 	 * @param array $data     given preprocessing steps
 	 * @param array $steps    list of steps options
@@ -3170,7 +3170,7 @@ abstract class testFormPreprocessing extends CWebTest {
 
 		// Check initial layout.
 		$preprocessing_container = $form->getFieldContainer('Preprocessing steps');
-		$list_step = $preprocessing_container->query('xpath://li['.CXPathHelper::fromClass('preprocessing-list-item').']');
+		$list_step = $preprocessing_container->query('xpath:.//li['.CXPathHelper::fromClass('preprocessing-list-item').']');
 
 		// No any step presents at the beginning.
 		$this->assertFalse($list_step->exists());
@@ -3197,7 +3197,7 @@ abstract class testFormPreprocessing extends CWebTest {
 		// Hint is present only for Items and Item prototypes.
 		if (!$lld) {
 			$form->getLabel('Preprocessing steps')->query('xpath:./button[@data-hintbox]')->one()->waitUntilClickable()->click();
-			$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->all()->last()->waitUntilReady();
+			$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->one()->waitUntilReady();
 			$this->assertEquals("Preprocessing is a transformation before saving the value to the database.".
 					" It is possible to define a sequence of preprocessing steps, and those are executed in the order they are set.".
 					"\n\nHowever, if \"Check for not supported value\" steps are configured, they are always placed and".
@@ -3243,12 +3243,10 @@ abstract class testFormPreprocessing extends CWebTest {
 					);
 					$field = $preprocessing_container->query($parameter['selector'])->waitUntilPresent()->one();
 
-					if (array_key_exists('placeholder', $parameter)) {
-						$this->assertEquals($parameter['placeholder'], $field->getAttribute('placeholder'));
-					}
-
-					if (array_key_exists('maxlength', $parameter)) {
-						$this->assertEquals($parameter['maxlength'], $field->getAttribute('maxlength'));
+					foreach (['maxlength', 'placeholder'] as $attribute) {
+						if (array_key_exists($attribute, $parameter)) {
+							$this->assertEquals($parameter[$attribute], $field->getAttribute($attribute));
+						}
 					}
 
 					if (array_key_exists('options', $parameter)) {
