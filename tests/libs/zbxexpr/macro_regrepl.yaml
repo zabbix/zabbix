@@ -194,11 +194,11 @@ out:
 ---
 test case: replace with empty value
 in:
-  data: 'customername_1'
-  params: '"(.*)_([0-9]+)",""'
+  data: 't t t t'
+  params: 't,""'
 
 out:
-  value: 'customername_1'
+  value: '   '
   return: SUCCEED
 
 ---
