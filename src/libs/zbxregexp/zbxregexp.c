@@ -79,6 +79,11 @@ zbx_match_t;
 ZBX_PTR_VECTOR_DECL(match, zbx_match_t *)
 ZBX_PTR_VECTOR_IMPL(match, zbx_match_t *)
 
+static void	zbx_match_free(zbx_match_t *match)
+{
+	zbx_free(match);
+}
+
 #if defined(HAVE_PCRE2_H)
 static char	*decode_pcre2_compile_error(int error_code, PCRE2_SIZE error_offset, int flags)
 {
@@ -1133,7 +1138,7 @@ int	zbx_regexp_repl(const char *string, const char *pattern, const char *output_
 	}
 	ret = SUCCEED;
 out:
-	zbx_vector_match_clear_ext(&matches, (zbx_match_free_func_t)zbx_ptr_free);
+	zbx_vector_match_clear_ext(&matches, zbx_match_free);
 	zbx_vector_match_destroy(&matches);
 	*out = out_str;
 
