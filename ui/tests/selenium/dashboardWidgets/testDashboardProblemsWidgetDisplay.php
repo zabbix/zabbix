@@ -23,7 +23,7 @@ require_once dirname(__FILE__).'/../common/testWidgets.php';
  *
  * @onBefore prepareDashboardData, prepareProblemsData
  */
-class testDashboardProblemsWidgetDisplay extends testWidgets  {
+class testDashboardProblemsWidgetDisplay extends testWidgets {
 
 	protected static $dashboardid;
 	protected static $time;

@@ -242,11 +242,6 @@ class testWidgets extends CWebTest {
 				}
 
 				$column_overlay->getFooter()->query('button:Add')->waitUntilClickable()->one()->click();
-
-				if (array_key_exists('column_error', $data)) {
-					break;
-				}
-
 				$column_overlay->waitUntilNotVisible();
 				$form->waitUntilReloaded();
 			}
@@ -375,7 +370,7 @@ class testWidgets extends CWebTest {
 			' WHERE dashboard_pageid'.
 			' IN (SELECT dashboard_pageid'.
 				' FROM dashboard_page'.
-				' WHERE dashboardid='.static::$dashboardid.
+				' WHERE dashboardid='.zbx_dbstr(static::$dashboardid).
 			')'
 		);
 	}

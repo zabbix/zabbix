@@ -5541,7 +5541,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 								'Data' => 'Text',
 								'Text' => '{$1}' // This will be resolved in widget.
 							]
-						],
+						]
 					],
 					'result' => [
 						[
@@ -5652,7 +5652,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'headers' => ['Host', 'Maintenance Trapper', 'Item1'],
 					'check_maintenance' => [
 						'Host in maintenance' => "Maintenance for Top Hosts widget [Maintenance with data collection]\n".
-							"Maintenance for icon check in Top Hosts widget"
+								"Maintenance for icon check in Top Hosts widget"
 					]
 				]
 			]
