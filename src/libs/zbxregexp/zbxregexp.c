@@ -1112,7 +1112,6 @@ int	zbx_regexp_repl(const char *string, const char *pattern, const char *output_
 		{
 			size_t	replen = strlen(replace), outlen = strlen(out_str), length = outlen + replen + 1,
 				eo = (size_t)groups[0].rm_eo;
-			char	*str;
 
 			if (MAX_EXECUTE_OUTPUT_LEN <= length)
 			{
@@ -1121,14 +1120,14 @@ int	zbx_regexp_repl(const char *string, const char *pattern, const char *output_
 				zbx_free(replace);
 				goto out;
 			}
-			ptr = str = (char *)zbx_malloc(NULL, length);
+			ptr = (char *)zbx_malloc(NULL, length);
 			if (0 != (size_t)groups[0].rm_so)
 				memcpy(ptr, out_str, (size_t)groups[0].rm_so);
 			memcpy(ptr + groups[0].rm_so, replace, replen);
 			memcpy(ptr + groups[0].rm_so + replen, out_str + eo, outlen - eo + 1);
 
 			zbx_free(out_str);
-			out_str = str;
+			out_str = ptr;
 			zbx_free(replace);
 		}
 		else
