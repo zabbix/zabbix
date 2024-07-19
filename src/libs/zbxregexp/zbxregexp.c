@@ -1044,7 +1044,7 @@ int	zbx_regexp_repl(const char *string, const char *pattern, const char *output_
 
 	zbx_free(*out);
 
-	if ('\0' == *pattern || '\0' == *output_template)
+	if ('\0' == *pattern)
 	{
 		*out = out_str;
 		return SUCCEED;
@@ -1105,7 +1105,10 @@ int	zbx_regexp_repl(const char *string, const char *pattern, const char *output_
 		zbx_regmatch_t	*groups = matches.values[mi]->groups;
 		char		*replace;
 
-		replace = regexp_sub_replace(string, output_template, groups, ZBX_REGEXP_GROUPS_MAX,
+		if ('\0' == *output_template)
+			replace = zbx_strdup(NULL, output_template);
+		else
+			replace = regexp_sub_replace(string, output_template, groups, ZBX_REGEXP_GROUPS_MAX,
 						MAX_EXECUTE_OUTPUT_LEN);
 
 		if (NULL != replace)
@@ -1123,7 +1126,8 @@ int	zbx_regexp_repl(const char *string, const char *pattern, const char *output_
 			ptr = (char *)zbx_malloc(NULL, length);
 			if (0 != (size_t)groups[0].rm_so)
 				memcpy(ptr, out_str, (size_t)groups[0].rm_so);
-			memcpy(ptr + groups[0].rm_so, replace, replen);
+			if (0 != replen)
+				memcpy(ptr + groups[0].rm_so, replace, replen);
 			memcpy(ptr + groups[0].rm_so + replen, out_str + eo, outlen - eo + 1);
 
 			zbx_free(out_str);
