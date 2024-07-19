@@ -21,6 +21,7 @@ require_once dirname(__FILE__).'/../../include/CWebTest.php';
  */
 class testLowLevelDiscovery extends CWebTest {
 	const SQL = 'SELECT * FROM items WHERE flags=1 ORDER BY itemid';
+	const SIMPLE_UPDATE_CLONE_LLD = 'LLD for simple update or clone scenario';
 
 	protected static $templateid;
 	protected static $hostid;
@@ -641,7 +642,7 @@ class testLowLevelDiscovery extends CWebTest {
 			: static::$hostid.'&context=host';
 
 		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.$url);
-		$this->query('link:LLD for simple update scenario')->waitUntilClickable()->one()->click();
+		$this->query('link', self::SIMPLE_UPDATE_CLONE_LLD)->waitUntilClickable()->one()->click();
 		$this->query('button:Update')->waitUntilClickable()->one()->click();
 		$this->assertMessage(TEST_GOOD, 'Discovery rule updated');
 		$this->page->assertTitle('Configuration of discovery rules');
@@ -2533,6 +2534,207 @@ class testLowLevelDiscovery extends CWebTest {
 					}
 				}
 			}
+		}
+	}
+
+	/**
+	 * Data for checking that LLD fields are being cloned correctly.
+	 * Note that preprocessing cloning is fully checked in
+	 * testFormPreprocessingCloneHost and testFormPreprocessingCloneTemplate.
+	 */
+	public static function getCloneData() {
+		return [
+			// #0 Clone with the same fields.
+			[
+				[
+					'expected' => TEST_BAD
+
+				]
+			],
+			// #1 Clone with just change LLD key but the same other fields.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields'  => [
+						'Key' => 'simple_update_clone_key[cloned]'
+					],
+					'expected_fields' => [
+						'Name' => self::SIMPLE_UPDATE_CLONE_LLD,
+						'Type' => 'HTTP agent',
+						'Key' => 'simple_update_clone_key[cloned]',
+						'URL' => 'https://www.test.com/search',
+						'name:query_fields[0][name]' => 'test_name1',
+						'name:query_fields[0][value]' => 'value1',
+						'name:query_fields[1][name]' => '2',
+						'name:query_fields[1][value]' => 'value2',
+						'Request type' => 'HEAD',
+						'Request body type' => 'JSON data',
+						'Request body' => '{"zabbix_export": {"version": "6.0","date": "2024-03-20T20:05:14Z"}}',
+						'name:headers[0][name]' => 'name1',
+						'name:headers[0][value]' => 'value',
+						'Required status codes' => '400, 600',
+						'Follow redirects' => true,
+						'Retrieve mode' => 'Headers',
+						'HTTP proxy' => '161.1.1.5',
+						'HTTP authentication' => 'NTLM',
+						'id:http_username' => 'user',
+						'id:http_password' => 'pass',
+						'SSL verify peer' => true,
+						'SSL verify host' => true,
+						'SSL certificate file' => '/home/test/certdb/ca.crt',
+						'SSL key file' => '/home/test/certdb/postgresql-server.crt',
+						'SSL key password' => '/home/test/certdb/postgresql-server.key',
+						'Update interval' => '1h',
+						'id:custom_timeout' => 'Override',
+						'id:timeout' => '10s',
+						'id:lifetime_type' => 'After',
+						'id:lifetime' => '15d',
+						'id:enabled_lifetime_type' => 'Never',
+						'Enable trapping' => true,
+						'Allowed hosts' => '127.0.2.3',
+						'Description' => 'LLD for test',
+						'Enabled' => true,
+						// Preprocessing tab.
+						'id:preprocessing_0_type' => 'Replace',
+						'id:preprocessing_0_params_0' => 'a',
+						'id:preprocessing_0_params_1' => 'b',
+						// LLD macros tab.
+						'id:lld_macro_paths_0_lld_macro' => '{#MACRO}',
+						'id:lld_macro_paths_0_path' => '$.path',
+						// Filters tab.
+						'id:conditions_0_macro' => '{#MACRO}',
+						'name:conditions[0][operator]' => 'does not match',
+						'id:conditions_0_value' => 'expression'
+					],
+					'expected_overrides' => '1: Override Yes Remove'
+				]
+			],
+			// #2 Clone with type and other fields change.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields'  => [
+						'Name' => self::SIMPLE_UPDATE_CLONE_LLD.' cloned with field changes',
+						'Type' => 'IPMI agent',
+						'Key' => 'simple_update_clone_key[cloned_2]',
+						'IPMI sensor' => 'new cloned sensor  🙂🙃み け め 𒁥',
+						'Update interval' => '65s',
+						'id:delay_flex_0_type' => 'Scheduling',
+						'id:delay_flex_0_schedule' => 'wd3-4h3-5',
+						'id:lifetime_type' => 'Immediately',
+						'Description' => 'New cloned description',
+						'Enabled' => false
+					],
+					'Preprocessing' => [
+						[
+							'type' => 'Prometheus to JSON',
+							'parameter_1' => '{label_name!~"name"}'
+						]
+					],
+					'LLD macros' => [
+						['LLD macro' => '{#CLONED_MACRO}', 'JSONPath' => '$.cloned.path.a']
+					],
+					'Filters' => [
+						[
+							'Macro' => '{#CLONED_FILTER_MACRO}',
+							'Regular expression' => 'cloned_expression',
+							'operator' => 'matches'
+						]
+					],
+					'Overrides' => [
+						[
+
+						]
+					],
+				]
+			]
+		];
+	}
+
+	/**
+	 * Test for checking LLD cloning.
+	 *
+	 * @param  array $data       given data provider
+	 * @param string $context    is LLD updated on Host or on Template
+	 */
+	public function checkClone($data, $context = 'host') {
+		if ($data['expected'] === TEST_BAD) {
+			$old_hash = CDBHelper::getHash(self::SQL);
+		}
+
+		$url = ($context === 'template')
+			? static::$templateid.'&context=template'
+			: static::$hostid.'&context=host';
+
+		$host_name = ($context === 'template') ? 'Template with LLD' : 'Host for LLD form test';
+		$original_key = 'simple_update_clone_key';
+		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.$url);
+		$this->query('link', self::SIMPLE_UPDATE_CLONE_LLD)->waitUntilClickable()->one()->click();
+		$form = $this->query('id:host-discovery-form')->asForm()->waitUntilVisible()->one();
+		$form->query('button:Clone')->one()->waitUntilClickable()->click();
+		$form->invalidate();
+		$this->assertEquals(['Add', 'Test', 'Cancel'], $form->query('xpath:.//div[@class="form-actions"]/button')
+				->all()->filter(CElementFilter::CLICKABLE)->asText()
+		);
+		$form->fill(CTestArrayHelper::get($data, 'fields', []));
+
+		// Change Preprocessing.
+		if (array_key_exists('Preprocessing', $data)) {
+			$form->selectTab('Preprocessing');
+			$form->query('name:preprocessing[0][remove]')->waitUntilClickable()->one()->click();
+			$this->addPreprocessingSteps($data['Preprocessing']);
+		}
+
+		// Change LLD macros.
+		if (array_key_exists('LLD macros', $data)) {
+			$form->selectTab('LLD macros');
+			$this->fillComplexFields($data['LLD macros'], $form, 'LLD macros', 'textarea');
+		}
+
+		// Change Filters.
+		if (array_key_exists('Filters', $data)) {
+			$form->selectTab('Filters');
+			$this->fillComplexFields($data['Filters'], $form, 'Filters', 'input');
+		}
+
+		// Change Overrides.
+		if (array_key_exists('Overrides', $data)) {
+			$form->selectTab('Overrides11');
+
+		}
+
+		$form->submit();
+
+		if ($data['expected'] === TEST_GOOD) {
+			$this->assertMessage(TEST_GOOD, 'Discovery rule created');
+
+			// Check that LLD created on the right host.
+			$this->page->assertHeader('Discovery rules');
+			$this->assertTrue($this->query('xpath://ul[@class="breadcrumbs"]//a[text()='.
+					CXPathHelper::escapeQuotes($host_name).']')->one()->isClickable()
+			);
+
+			// Open created new LLD form.
+			$this->query('class:list-table')->asTable()->one()->findRow('Key', $data['fields']['Key'])
+					->getColumn('Name')->query('tag:a')->waitUntilClickable()->one()->click();
+			$form->checkValue($data['expected_fields']);
+
+			$form->selectTab('Overrides');
+			$this->assertEquals($data['expected_overrides'],
+					$form->getFieldContainer('Overrides')->asTable()->getRow(0)->getText()
+			);
+
+			// Check that original LLD remained in DB.
+			$this->assertEquals(1, CDBHelper::getCount(
+				'SELECT * FROM items'.
+				' WHERE key_='.zbx_dbstr($original_key).
+					' AND flags=1'
+			));
+		}
+		else {
+			$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
+			$this->assertMessage(TEST_BAD, 'Cannot add discovery rule', 'An LLD rule with key "'.$original_key.'"'.
+					' already exists on the '.$context.' "'.$host_name.'".');
 		}
 	}
 

@@ -53,14 +53,8 @@ class testFormLowLevelDiscoveryFromTemplate extends testLowLevelDiscovery {
 						'delay' => 30
 					],
 					[
-						'name' => 'LLD for clone scenario',
-						'key_' => 'vfs.fs.discovery3',
-						'type' => ITEM_TYPE_ZABBIX,
-						'delay' => 30
-					],
-					[
-						'name' => 'LLD for simple update scenario',
-						'key_' => 'update_key',
+						'name' => self::SIMPLE_UPDATE_CLONE_LLD,
+						'key_' => 'simple_update_clone_key',
 						'type' => ITEM_TYPE_HTTPAGENT,
 						'delay' => '1h;wd1-2h7-14',
 						'url' => 'https://www.test.com/search',
@@ -215,6 +209,13 @@ class testFormLowLevelDiscoveryFromTemplate extends testLowLevelDiscovery {
 	 */
 	public function testFormLowLevelDiscoveryFromTemplate_Cancel($data) {
 		$this->checkCancel($data, 'template');
+	}
+
+	/**
+	 * @dataProvider getCloneData
+	 */
+	public function testFormLowLevelDiscoveryFromTemplate_Clone($data) {
+		$this->checkClone($data, 'template');
 	}
 
 	public function testFormLowLevelDiscoveryFromTemplate_Delete() {
