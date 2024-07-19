@@ -67,14 +67,10 @@ class CTagBehavior extends CBehavior {
 	 */
 	public function setTags($tags) {
 		$table = $this->getTagTable();
+		$this->removeTags();
 
-		foreach ($tags as $i => $tag) {
-			if ($i === 0) {
-				$table->updateRow($i, $tag);
-			}
-			else {
-				$table->addRow($tag);
-			}
+		foreach ($tags as $tag) {
+			$table->addRow($tag);
 		}
 
 		return $this;
@@ -105,5 +101,9 @@ class CTagBehavior extends CBehavior {
 		}
 
 		$this->test->assertEquals($rows, $this->getTags(), 'Tags on a page does not match tags in data provider.');
+	}
+
+	public function removeTags() {
+		return $this->getTagTable()->clear();
 	}
 }
