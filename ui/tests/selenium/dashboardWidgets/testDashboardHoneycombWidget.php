@@ -71,8 +71,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 						'name' => 'Numeric for honeycomb 1',
 						'key_' => 'num_honey_1',
 						'type' => ITEM_TYPE_TRAPPER,
-						'value_type' => ITEM_VALUE_TYPE_UINT64,
-						'delay' => 0
+						'value_type' => ITEM_VALUE_TYPE_UINT64
 					]
 				]
 			],
@@ -84,36 +83,31 @@ class testDashboardHoneycombWidget extends testWidgets {
 						'name' => 'Display item 1',
 						'key_' => 'honey_display_1',
 						'type' => ITEM_TYPE_TRAPPER,
-						'value_type' => ITEM_VALUE_TYPE_UINT64,
-						'delay' => 0
+						'value_type' => ITEM_VALUE_TYPE_UINT64
 					],
 					[
 						'name' => 'Display item 2',
 						'key_' => 'honey_display_2',
 						'type' => ITEM_TYPE_TRAPPER,
-						'value_type' => ITEM_VALUE_TYPE_UINT64,
-						'delay' => 0
+						'value_type' => ITEM_VALUE_TYPE_UINT64
 					],
 					[
 						'name' => 'Display item 3',
 						'key_' => 'honey_display_3',
 						'type' => ITEM_TYPE_TRAPPER,
-						'value_type' => ITEM_VALUE_TYPE_UINT64,
-						'delay' => 0
+						'value_type' => ITEM_VALUE_TYPE_UINT64
 					],
 					[
 						'name' => 'Display item 4',
 						'key_' => 'honey_display_4',
 						'type' => ITEM_TYPE_TRAPPER,
-						'value_type' => ITEM_VALUE_TYPE_UINT64,
-						'delay' => 0
+						'value_type' => ITEM_VALUE_TYPE_UINT64
 					],
 					[
 						'name' => 'Display item 5',
 						'key_' => 'honey_display_5',
 						'type' => ITEM_TYPE_TRAPPER,
-						'value_type' => ITEM_VALUE_TYPE_UINT64,
-						'delay' => 0
+						'value_type' => ITEM_VALUE_TYPE_UINT64
 					]
 				]
 			],
@@ -125,8 +119,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 						'name' => 'Maintenance item',
 						'key_' => 'maintenance_1',
 						'type' => ITEM_TYPE_TRAPPER,
-						'value_type' => ITEM_VALUE_TYPE_UINT64,
-						'delay' => 0
+						'value_type' => ITEM_VALUE_TYPE_UINT64
 					]
 				]
 			],
@@ -144,8 +137,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 						'name' => 'Host tag item',
 						'key_' => 'host_tag_1',
 						'type' => ITEM_TYPE_TRAPPER,
-						'value_type' => ITEM_VALUE_TYPE_UINT64,
-						'delay' => 0
+						'value_type' => ITEM_VALUE_TYPE_UINT64
 					]
 				]
 			],
@@ -158,7 +150,6 @@ class testDashboardHoneycombWidget extends testWidgets {
 						'key_' => 'item_tag_1',
 						'type' => ITEM_TYPE_TRAPPER,
 						'value_type' => ITEM_VALUE_TYPE_UINT64,
-						'delay' => 0,
 						'tags' => [
 							[
 								'tag' => 'item_tag_1',
@@ -171,11 +162,46 @@ class testDashboardHoneycombWidget extends testWidgets {
 						'key_' => 'item_tag_2',
 						'type' => ITEM_TYPE_TRAPPER,
 						'value_type' => ITEM_VALUE_TYPE_UINT64,
-						'delay' => 0,
 						'tags' => [
 							[
 								'tag' => 'item_tag_2',
 								'value' => 'item_val_2'
+							]
+						]
+					],
+					[
+						'name' => 'Item tag 3',
+						'key_' => 'item_tag_3',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_UINT64,
+						'tags' => [
+							[
+								'tag' => 'item_tag_3',
+								'value' => 'item_val_3'
+							]
+						]
+					],
+					[
+						'name' => 'Item tag 4',
+						'key_' => 'item_tag_4',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_UINT64,
+						'tags' => [
+							[
+								'tag' => 'item_tag_1',
+								'value' => 'item_val_1'
+							]
+						]
+					],
+					[
+						'name' => 'Item tag 5',
+						'key_' => 'item_tag_5',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_UINT64,
+						'tags' => [
+							[
+								'tag' => 'item_tag_1',
+								'value' => 'item_val_5'
 							]
 						]
 					]
@@ -186,8 +212,8 @@ class testDashboardHoneycombWidget extends testWidgets {
 		$display_hostid = $response['hostids']['Display'];
 		$maintenance_hostid = $response['hostids']['Host for maintenance filter'];
 
-		foreach (['1' => 100, '2' => 200, '3' => 300, '4' => 400, '5' => 500] as $key => $value) {
-			CDataHelper::addItemData($itemids['Display:honey_display_'.$key], $value);
+		foreach ([100, 200, 300, 400, 500] as $i => $value) {
+			CDataHelper::addItemData($itemids['Display:honey_display_'.($i + 1)], $value);
 		}
 
 		// Items ids that used in filtering scenario.
@@ -195,14 +221,32 @@ class testDashboardHoneycombWidget extends testWidgets {
 			$itemids['Host for maintenance filter:maintenance_1'],
 			$itemids['Host with tags:host_tag_1'],
 			$itemids['Host with items with tags:item_tag_1'],
-			$itemids['Host with items with tags:item_tag_2']
+			$itemids['Host with items with tags:item_tag_2'],
+			$itemids['Host with items with tags:item_tag_3'],
+			$itemids['Host with items with tags:item_tag_4'],
+			$itemids['Host with items with tags:item_tag_5']
 		];
 
 		foreach ($filtered_items as $itemid) {
 			CDataHelper::addItemData($itemid, 100);
 		}
 
-		DBexecute('UPDATE hosts SET maintenance_status=1 WHERE hostid='.zbx_dbstr($maintenance_hostid));
+		// Create Maintenance and host in maintenance.
+		$maintenances = CDataHelper::call('maintenance.create', [
+			[
+				'name' => 'Honeycomb host maintenance',
+				'active_since' => time() - 1000,
+				'active_till' => time() + 31536000,
+				'groups' => [['groupid' => $groupids['Maintenance group']]],
+				'timeperiods' => [[]]
+			]
+		]);
+		$maintenanceid = $maintenances['maintenanceids'][0];
+
+		DBexecute('UPDATE hosts SET maintenanceid='.zbx_dbstr($maintenanceid).
+			', maintenance_status=1, maintenance_type='.MAINTENANCE_TYPE_NORMAL.', maintenance_from='.zbx_dbstr(time()-1000).
+			' WHERE hostid='.zbx_dbstr($maintenance_hostid)
+		);
 
 		CDataHelper::call('dashboard.create', [
 			[
@@ -1920,7 +1964,16 @@ class testDashboardHoneycombWidget extends testWidgets {
 
 	public static function getFilteringData() {
 		return [
-			// #0 Filter by Host group.
+			// #0 Filter by 3 items.
+			[
+				[
+					'fields' => [
+						'Item patterns' => ['Item tag 1', 'Item tag 2', 'Host tag item']
+					],
+					'filtered_items' => ['Item tag 1', 'Item tag 2', 'Host tag item']
+				]
+			],
+			// #1 Filter by Host group.
 			[
 				[
 					'fields' => [
@@ -1930,7 +1983,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 					'filtered_items' => ['Item tag 1', 'Item tag 2']
 				]
 			],
-			// #1 Filter by Host.
+			// #2 Filter by Host.
 			[
 				[
 					'fields' => [
@@ -1941,7 +1994,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 					'filtered_items' => ['Host tag item']
 				]
 			],
-			// #2 Filter by Item without host or host group.
+			// #3 Filter by Item without host or host group and with Host tag.
 			[
 				[
 					'fields' => [
@@ -1957,29 +2010,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 					'filtered_items' => ['Item tag 1', 'Host tag item']
 				]
 			],
-			// #3 Filter by Item with host.
-			[
-				[
-					'fields' => [
-						'Host groups' => '',
-						'Hosts' => 'Host with tags',
-						'Item patterns' => ['Item tag 1', 'Host tag item']
-					],
-					'filtered_items' => ['Host tag item']
-				]
-			],
-			// #4 Filter by Item with host group.
-			[
-				[
-					'fields' => [
-						'Host groups' => 'Items with tags',
-						'Hosts' => '',
-						'Item patterns' => ['Item tag 2', 'Host tag item']
-					],
-					'filtered_items' => ['Item tag 2']
-				]
-			],
-			// #5 Show hosts in maintenance.
+			// #4 Show hosts in maintenance.
 			[
 				[
 					'fields' => [
@@ -1991,7 +2022,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 					'filtered_items' => ['Maintenance item', 'Item tag 1', 'Host tag item']
 				]
 			],
-			// #6 Don't show hosts in maintenance.
+			// #5 Don't show hosts in maintenance.
 			[
 				[
 					'fields' => [
@@ -2003,7 +2034,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 					'filtered_items' => ['Item tag 1', 'Host tag item']
 				]
 			],
-			// #7 Filter by Host exists tag.
+			// #6 Filter by Host exists tag.
 			[
 				[
 					'fields' => [
@@ -2020,7 +2051,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 					'filtered_items' => ['Host tag item']
 				]
 			],
-			// #8 Filter by Host doesn't exist tag.
+			// #7 Filter by Host doesn't exist tag.
 			[
 				[
 					'fields' => [
@@ -2037,7 +2068,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 					'filtered_items' => ['Item tag 1', 'Item tag 2']
 				]
 			],
-			// #9 Filter by Items exists tag.
+			// #8 Filter by Items exists tag.
 			[
 				[
 					'fields' => [
@@ -2057,7 +2088,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 					'filtered_items' => ['Item tag 1']
 				]
 			],
-			// #10 Filter by Items doesn't exist tag.
+			// #9 Filter by Items doesn't exist tag.
 			[
 				[
 					'fields' => [
@@ -2077,7 +2108,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 					'filtered_items' => ['Item tag 2', 'Host tag item']
 				]
 			],
-			// #11 Filter by Items and Host exists tag.
+			// #10 Filter by Items and Host exists tag.
 			[
 				[
 					'fields' => [
@@ -2097,7 +2128,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 					'filtered_items' => ['No data']
 				]
 			],
-			// #12 Filter by Items and Host doesn't exist tag.
+			// #11 Filter by Items and Host doesn't exist tag.
 			[
 				[
 					'fields' => [
@@ -2116,6 +2147,120 @@ class testDashboardHoneycombWidget extends testWidgets {
 					],
 					'filtered_items' => ['Maintenance item', 'Item tag 2']
 				]
+			],
+			// #12 Item tag Or with operators Contain.
+			[
+				[
+					'fields' => [
+						'Host groups' => '',
+						'Hosts' => '',
+						'Show hosts in maintenance' => false,
+						'Item patterns' => ['Item tag 1', 'Item tag 2', 'Item tag 3', 'Item tag 4', 'Item tag 5'],
+						'Item tags' => 'Or'
+					],
+					'tags' => [
+						'item_tags' => [
+							['name' => 'item_tag_1', 'operator' => 'Contains', 'value' => 'item_val_1'],
+							['name' => 'item_tag_3', 'operator' => 'Contains', 'value' => 'item_val_3']
+						]
+					],
+					'filtered_items' => ['Item tag 1', 'Item tag 3', 'Item tag 4']
+				]
+			],
+			// #13 Item tag And/Or with operators Contain.
+			[
+				[
+					'fields' => [
+						'Host groups' => '',
+						'Hosts' => '',
+						'Show hosts in maintenance' => false,
+						'Item patterns' => ['Item tag 1', 'Item tag 2', 'Item tag 3', 'Item tag 4', 'Item tag 5'],
+						'Item tags' => 'And/Or'
+					],
+					'tags' => [
+						'item_tags' => [
+							['name' => 'item_tag_1', 'operator' => 'Contains', 'value' => 'item_val_1'],
+							['name' => 'item_tag_3', 'operator' => 'Contains', 'value' => 'item_val_3']
+						]
+					],
+					'filtered_items' => ['No data']
+				]
+			],
+			// #14 Item tag Or with operators Exists.
+			[
+				[
+					'fields' => [
+						'Host groups' => '',
+						'Hosts' => '',
+						'Show hosts in maintenance' => false,
+						'Item patterns' => ['Item tag 1', 'Item tag 2', 'Item tag 3', 'Item tag 4', 'Item tag 5'],
+						'Item tags' => 'Or'
+					],
+					'tags' => [
+						'item_tags' => [
+							['name' => 'item_tag_1', 'operator' => 'Exists'],
+							['name' => 'item_tag_3', 'operator' => 'Exists']
+						]
+					],
+					'filtered_items' => ['Item tag 1', 'Item tag 3', 'Item tag 4', 'Item tag 5']
+				]
+			],
+			// #15 Item tag And/Or with operators Exists.
+			[
+				[
+					'fields' => [
+						'Host groups' => '',
+						'Hosts' => '',
+						'Show hosts in maintenance' => false,
+						'Item patterns' => ['Item tag 1', 'Item tag 2', 'Item tag 3', 'Item tag 4', 'Item tag 5'],
+						'Item tags' => 'And/Or'
+					],
+					'tags' => [
+						'item_tags' => [
+							['name' => 'item_tag_1', 'operator' => 'Exists'],
+							['name' => 'item_tag_3', 'operator' => 'Exists']
+						]
+					],
+					'filtered_items' => ['No data']
+				]
+			],
+			// #16 Item tag Or with operators Does not exist and Contains.
+			[
+				[
+					'fields' => [
+						'Host groups' => '',
+						'Hosts' => '',
+						'Show hosts in maintenance' => false,
+						'Item patterns' => ['Item tag 1', 'Item tag 2', 'Item tag 3', 'Item tag 4', 'Item tag 5'],
+						'Item tags' => 'Or'
+					],
+					'tags' => [
+						'item_tags' => [
+							['name' => 'item_tag_2', 'operator' => 'Contains', 'value' => 'item_val_2'],
+							['name' => 'item_tag_3', 'operator' => 'Does not exist']
+						]
+					],
+					'filtered_items' => ['Item tag 1', 'Item tag 2', 'Item tag 4', 'Item tag 5']
+				]
+			],
+			// #17 Item tag And/Or with operators Does not exist and Contains.
+			[
+				[
+					'fields' => [
+						'Host groups' => '',
+						'Hosts' => '',
+						'Show hosts in maintenance' => false,
+						'Item patterns' => ['Item tag 1', 'Item tag 2', 'Item tag 3', 'Item tag 4', 'Item tag 5'],
+						'Item tags' => 'And/Or'
+					],
+					'tags' => [
+						'item_tags' => [
+							['name' => 'item_tag_2', 'operator' => 'Contains', 'value' => 'item_val_2'],
+							['name' => 'item_tag_3', 'operator' => 'Does not exist']
+						]
+					],
+					'filtered_items' => ['Item tag 2']
+				]
 			]
 		];
 	}
@@ -2133,13 +2278,12 @@ class testDashboardHoneycombWidget extends testWidgets {
 		$dashboard->save();
 
 		// Check message that dashboard saved.
-		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 		$this->page->waitUntilReady();
-		$widget = $dashboard->getWidget('UpdateHoneycomb');
+		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 
 		// Check that correct combs displayed on honeycomb.
-		$content = $widget->getContent();
-		$filtered = $content->query('class', 'svg-honeycomb-content')->all()->asText();
+		$filtered = $dashboard->getWidget('UpdateHoneycomb')->getContent()->query('class', 'svg-honeycomb-content')
+				->all()->asText();
 		$this->assertEquals($data['filtered_items'], $filtered);
 	}
 
