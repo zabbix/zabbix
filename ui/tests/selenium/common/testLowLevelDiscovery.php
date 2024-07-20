@@ -2548,7 +2548,6 @@ class testLowLevelDiscovery extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD
-
 				]
 			],
 			// #1 Clone with just change LLD key but the same other fields.
@@ -2606,18 +2605,26 @@ class testLowLevelDiscovery extends CWebTest {
 						'name:conditions[0][operator]' => 'does not match',
 						'id:conditions_0_value' => 'expression'
 					],
-					'expected_overrides' => '1: Override Yes Remove'
+					'Overrides' => [
+						'Name' => 'Override',
+						'If filter matches' => 'Stop processing',
+						'id:overrides_filters_0_macro' => '{#MACRO}',
+						'name:overrides_filters[0][operator]' => 'exists'
+					]
 				]
 			],
-			// #2 Clone with type and other fields change.
+			// #2 Clone with all fields change.
 			[
 				[
 					'expected' => TEST_GOOD,
 					'fields'  => [
 						'Name' => self::SIMPLE_UPDATE_CLONE_LLD.' cloned with field changes',
-						'Type' => 'IPMI agent',
+						'Type' => 'SSH agent',
 						'Key' => 'simple_update_clone_key[cloned_2]',
-						'IPMI sensor' => 'new cloned sensor  🙂🙃み け め 𒁥',
+						'Host interface' => '127.0.0.1:10050',
+						'User name' => 'cloned_username',
+						'Password' => 'cloned_password',
+						'Executed script' => 'test_script',
 						'Update interval' => '65s',
 						'id:delay_flex_0_type' => 'Scheduling',
 						'id:delay_flex_0_schedule' => 'wd3-4h3-5',
@@ -2626,10 +2633,7 @@ class testLowLevelDiscovery extends CWebTest {
 						'Enabled' => false
 					],
 					'Preprocessing' => [
-						[
-							'type' => 'Prometheus to JSON',
-							'parameter_1' => '{label_name!~"name"}'
-						]
+						['type' => 'Prometheus to JSON', 'parameter_1' => '{label_name!~"name"}']
 					],
 					'LLD macros' => [
 						['LLD macro' => '{#CLONED_MACRO}', 'JSONPath' => '$.cloned.path.a']
@@ -2641,11 +2645,38 @@ class testLowLevelDiscovery extends CWebTest {
 							'operator' => 'matches'
 						]
 					],
+					'change_overrides' => true,
 					'Overrides' => [
-						[
-
-						]
+						'Name' => 'New Cloned override',
+						'If filter matches' => 'Continue overrides',
+						'id:overrides_filters_0_macro' => '{#NEW_CLONED_MACRO}',
+						'name:overrides_filters[0][operator]' => 'does not exist'
 					],
+					'expected_fields' => [
+						'Name' => self::SIMPLE_UPDATE_CLONE_LLD.' cloned with field changes',
+						'Type' => 'SSH agent',
+						'Key' => 'simple_update_clone_key[cloned_2]',
+						'Host interface' => '127.0.0.1:10050',
+						'User name' => 'cloned_username',
+						'Password' => 'cloned_password',
+						'Executed script' => 'test_script',
+						'Update interval' => '65s',
+						'id:delay_flex_0_type' => 'Scheduling',
+						'id:delay_flex_0_schedule' => 'wd3-4h3-5',
+						'id:lifetime_type' => 'Immediately',
+						'Description' => 'New cloned description',
+						'Enabled' => false,
+						// Preprocessing tab.
+						'id:preprocessing_0_type' => 'Prometheus to JSON',
+						'id:preprocessing_0_params_0' => '{label_name!~"name"}',
+						// LLD macros tab.
+						'id:lld_macro_paths_0_lld_macro' => '{#CLONED_MACRO}',
+						'id:lld_macro_paths_0_path' => '$.cloned.path.a',
+						// Filters tab.
+						'id:conditions_0_macro' => '{#CLONED_FILTER_MACRO}',
+						'name:conditions[0][operator]' => 'matches',
+						'id:conditions_0_value' => 'cloned_expression'
+					]
 				]
 			]
 		];
@@ -2655,7 +2686,7 @@ class testLowLevelDiscovery extends CWebTest {
 	 * Test for checking LLD cloning.
 	 *
 	 * @param  array $data       given data provider
-	 * @param string $context    is LLD updated on Host or on Template
+	 * @param string $context    is LLD cloned on Host or on Template
 	 */
 	public function checkClone($data, $context = 'host') {
 		if ($data['expected'] === TEST_BAD) {
@@ -2676,7 +2707,15 @@ class testLowLevelDiscovery extends CWebTest {
 		$this->assertEquals(['Add', 'Test', 'Cancel'], $form->query('xpath:.//div[@class="form-actions"]/button')
 				->all()->filter(CElementFilter::CLICKABLE)->asText()
 		);
-		$form->fill(CTestArrayHelper::get($data, 'fields', []));
+
+		if (CTestArrayHelper::get($data, 'fields', [])) {
+			if ($context === 'template') {
+				unset($data['fields']['Host interface']);
+				unset($data['expected_fields']['Host interface']);
+			}
+
+			$form->fill($data['fields']);
+		}
 
 		// Change Preprocessing.
 		if (array_key_exists('Preprocessing', $data)) {
@@ -2698,9 +2737,13 @@ class testLowLevelDiscovery extends CWebTest {
 		}
 
 		// Change Overrides.
-		if (array_key_exists('Overrides', $data)) {
-			$form->selectTab('Overrides11');
-
+		if (array_key_exists('Overrides', $data) && CTestArrayHelper::get($data, 'change_overrides', false)) {
+			$form->selectTab('Overrides');
+			$form->query('link:Override')->waitUntilClickable()->one()->click();
+			$override_dialog_form = COverlayDialogElement::find()->all()->last()->asForm()->waitUntilReady();
+			$override_dialog_form->fill($data['Overrides']);
+			$override_dialog_form->submit();
+			$override_dialog_form->waitUntilNotVisible();
 		}
 
 		$form->submit();
@@ -2717,12 +2760,20 @@ class testLowLevelDiscovery extends CWebTest {
 			// Open created new LLD form.
 			$this->query('class:list-table')->asTable()->one()->findRow('Key', $data['fields']['Key'])
 					->getColumn('Name')->query('tag:a')->waitUntilClickable()->one()->click();
+			$form->invalidate();
 			$form->checkValue($data['expected_fields']);
 
-			$form->selectTab('Overrides');
-			$this->assertEquals($data['expected_overrides'],
-					$form->getFieldContainer('Overrides')->asTable()->getRow(0)->getText()
-			);
+			if (array_key_exists('Overrides', $data)) {
+				$form->selectTab('Overrides');
+				$override_name = CTestArrayHelper::get($data, 'change_overrides', false)
+					? $data['Overrides']['Name']
+					: 'Override';
+				$form->query('link', $override_name)->waitUntilClickable()->one()->click();
+				$override_dialog_form = COverlayDialogElement::find()->all()->last()->asForm()->waitUntilReady();
+				$override_dialog_form->checkValue($data['Overrides']);
+				$override_dialog_form->submit();
+				$override_dialog_form->waitUntilNotVisible();
+			}
 
 			// Check that original LLD remained in DB.
 			$this->assertEquals(1, CDBHelper::getCount(
@@ -2858,14 +2909,14 @@ class testLowLevelDiscovery extends CWebTest {
 				$form->query('link:Cancel override')->waitUntilClickable()->one()->click();
 			}
 
-			$overlay_dialog_form = COverlayDialogElement::find()->all()->last()->asForm()->waitUntilReady();
-			$overlay_dialog_form->fill($fields['overrides_fields']['filters']);
-			$overlay_dialog_form->getFieldContainer('Operations')->query('button:Add')->waitUntilClickable()->one()->click();
+			$override_dialog_form = COverlayDialogElement::find()->all()->last()->asForm()->waitUntilReady();
+			$override_dialog_form->fill($fields['overrides_fields']['filters']);
+			$override_dialog_form->getFieldContainer('Operations')->query('button:Add')->waitUntilClickable()->one()->click();
 			$operation_dialog_form = COverlayDialogElement::find()->all()->last()->asForm()->waitUntilReady();
 			$operation_dialog_form->fill($fields['overrides_fields']['operations']);
 			$operation_dialog_form->submit();
 			$operation_dialog_form->waitUntilNotVisible();
-			$overlay_dialog_form->submit();
+			$override_dialog_form->submit();
 			$operation_dialog_form->waitUntilNotVisible();
 		}
 
