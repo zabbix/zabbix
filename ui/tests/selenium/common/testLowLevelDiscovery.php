@@ -23,6 +23,8 @@ class testLowLevelDiscovery extends CWebTest {
 	const SQL = 'SELECT * FROM items WHERE flags=1 ORDER BY itemid';
 	const SIMPLE_UPDATE_CLONE_LLD = 'LLD for simple update or clone scenario';
 
+	protected static $context = 'host';
+	protected static $groupid;
 	protected static $templateid;
 	protected static $hostid;
 	protected static $update_lld;
@@ -41,11 +43,9 @@ class testLowLevelDiscovery extends CWebTest {
 
 	/**
 	 * Test for LLD Form initial layout check without changing the LLD type.
-	 *
-	 * @param string $context    is LLD created on Host or on Template
 	 */
-	protected function checkInitialLayout($context = 'host') {
-		$url = ($context === 'template')
+	protected function checkInitialLayout() {
+		$url = (static::$context === 'template')
 			? static::$templateid.'&context=template'
 			: static::$empty_hostid.'&context=host';
 
@@ -67,7 +67,7 @@ class testLowLevelDiscovery extends CWebTest {
 				'Delete lost resources', 'Disable lost resources'
 		];
 
-		if ($context === 'template') {
+		if (static::$context === 'template') {
 			$required_labels = array_values(array_diff($required_labels, ['Host interface']));
 		}
 
@@ -156,7 +156,7 @@ class testLowLevelDiscovery extends CWebTest {
 			'Overrides' => ['value' => []]
 		];
 
-		if ($context === 'template') {
+		if (static::$context === 'template') {
 			unset($fields['Host interface']);
 		}
 
@@ -173,7 +173,7 @@ class testLowLevelDiscovery extends CWebTest {
 			]
 		];
 
-		if ($context === 'template') {
+		if (static::$context === 'template') {
 			$visible_fields['Discovery rule'] = array_values(array_diff($visible_fields['Discovery rule'], ['Host interface']));
 		}
 
@@ -419,10 +419,9 @@ class testLowLevelDiscovery extends CWebTest {
 	 * Test for LLD Form's layout check depending on LLD type.
 	 *
 	 * @param array $data        data provider
-	 * @param string $context    is LLD created on Host or on Template
 	 */
-	protected function checkLayoutDependingOnType($data, $context = 'host') {
-		$url = ($context === 'template')
+	protected function checkLayoutDependingOnType($data) {
+		$url = (static::$context === 'template')
 			? static::$templateid.'&context=template'
 			: static::$empty_hostid.'&context=host';
 
@@ -434,7 +433,7 @@ class testLowLevelDiscovery extends CWebTest {
 		$permanent_fields = ['Name', 'Type', 'Key', 'Delete lost resources', 'Disable lost resources', 'Description', 'Enabled'];
 
 		// Host interface field doesn't exist for Template.
-		if ($context === 'template') {
+		if (static::$context === 'template') {
 			$data['fields'] = array_values(array_diff($data['fields'], ['Host interface']));
 		}
 
@@ -481,7 +480,7 @@ class testLowLevelDiscovery extends CWebTest {
 			case 'Zabbix agent';
 			case 'JMX agent':
 			case 'IPMI agent':
-				if ($context === 'host') {
+				if (static::$context === 'host') {
 					// Check red interface info message.
 					$this->assertTrue($form->query('xpath:.//span[@class="red" and text()="No interface found"]')
 							->one()->isVisible()
@@ -631,13 +630,11 @@ class testLowLevelDiscovery extends CWebTest {
 
 	/**
 	 * Test for checking LLD update form without any changes.
-	 *
-	 * @param string $context    is LLD updated on Host or on Template
 	 */
-	protected function checkSimpleUpdate($context = 'host') {
+	protected function checkSimpleUpdate() {
 		$old_hash = CDBHelper::getHash(self::SQL);
 
-		$url = ($context === 'template')
+		$url = (static::$context === 'template')
 			? static::$templateid.'&context=template'
 			: static::$hostid.'&context=host';
 
@@ -2341,9 +2338,8 @@ class testLowLevelDiscovery extends CWebTest {
 	 *
 	 * @param array   $data       data provider
 	 * @param boolean $update     true for update scenario, false for create
-	 * @param string  $context    is LLD updated on Host or on Template
 	 */
-	protected function checkForm($data, $update = false, $context = 'host') {
+	protected function checkForm($data, $update = false) {
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			$old_hash = CDBHelper::getHash(self::SQL);
 		}
@@ -2355,7 +2351,7 @@ class testLowLevelDiscovery extends CWebTest {
 			$data['fields']['Key'] = 'upd.'.$data['fields']['Key'];
 		}
 
-		$url = ($context === 'template')
+		$url = (static::$context === 'template')
 			? static::$templateid.'&context=template'
 			: static::$interfaces_hostid.'&context=host';
 
@@ -2364,7 +2360,7 @@ class testLowLevelDiscovery extends CWebTest {
 				->one()->click();
 		$form = $this->query('id:host-discovery-form')->asForm()->waitUntilVisible()->one();
 
-		if ($context === 'template') {
+		if (static::$context === 'template') {
 			unset($data['fields']['Host interface']);
 		}
 
@@ -2472,14 +2468,14 @@ class testLowLevelDiscovery extends CWebTest {
 			}
 
 			// Rewrite complex interface value for SNMP.
-			if ($context === 'host') {
+			if (static::$context === 'host') {
 				if (CTestArrayHelper::get($data, 'checked_interface', false)) {
 					$data['fields']['Host interface'] = $data['checked_interface'];
 				}
 			}
 
 			if ($data['fields']['Type'] === 'Dependent item') {
-				$data['fields']['Master item'] = ($context === 'template')
+				$data['fields']['Master item'] = (static::$context === 'template')
 					? 'Template with LLD: Master item'
 					: 'Host for LLD form test with all interfaces: Master item';
 			}
@@ -2686,18 +2682,17 @@ class testLowLevelDiscovery extends CWebTest {
 	 * Test for checking LLD cloning.
 	 *
 	 * @param  array $data       given data provider
-	 * @param string $context    is LLD cloned on Host or on Template
 	 */
-	public function checkClone($data, $context = 'host') {
+	public function checkClone($data) {
 		if ($data['expected'] === TEST_BAD) {
 			$old_hash = CDBHelper::getHash(self::SQL);
 		}
 
-		$url = ($context === 'template')
+		$url = (static::$context === 'template')
 			? static::$templateid.'&context=template'
 			: static::$hostid.'&context=host';
 
-		$host_name = ($context === 'template') ? 'Template with LLD' : 'Host for LLD form test';
+		$host_name = (static::$context === 'template') ? 'Template with LLD' : 'Host for LLD form test';
 		$original_key = 'simple_update_clone_key';
 		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.$url);
 		$this->query('link', self::SIMPLE_UPDATE_CLONE_LLD)->waitUntilClickable()->one()->click();
@@ -2709,7 +2704,7 @@ class testLowLevelDiscovery extends CWebTest {
 		);
 
 		if (CTestArrayHelper::get($data, 'fields', [])) {
-			if ($context === 'template') {
+			if (static::$context === 'template') {
 				unset($data['fields']['Host interface']);
 				unset($data['expected_fields']['Host interface']);
 			}
@@ -2785,7 +2780,7 @@ class testLowLevelDiscovery extends CWebTest {
 		else {
 			$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
 			$this->assertMessage(TEST_BAD, 'Cannot add discovery rule', 'An LLD rule with key "'.$original_key.'"'.
-					' already exists on the '.$context.' "'.$host_name.'".');
+					' already exists on the '.static::$context.' "'.$host_name.'".');
 		}
 	}
 
@@ -2802,10 +2797,9 @@ class testLowLevelDiscovery extends CWebTest {
 	 * Check cancelling LLD form.
 	 *
 	 * @param array  $data       given data provider
-	 * @param string $context    is LLD updated on Host or on Template
 	 */
-	protected function checkCancel($data, $context = 'host') {
-		$url = ($context === 'template')
+	protected function checkCancel($data) {
+		$url = (static::$context === 'template')
 			? static::$templateid.'&context=template'
 			: static::$hostid.'&context=host';
 
@@ -2928,11 +2922,9 @@ class testLowLevelDiscovery extends CWebTest {
 
 	/**
 	 * Check deleting LLD from Host or Template.
-	 *
-	 * @param string $context    is LLD deleted from Host or from Template
 	 */
-	protected function checkDelete($context = 'host') {
-		$url = ($context === 'template')
+	protected function checkDelete() {
+		$url = (static::$context === 'template')
 			? static::$templateid.'&context=template'
 			: static::$hostid.'&context=host';
 
@@ -3062,5 +3054,18 @@ class testLowLevelDiscovery extends CWebTest {
 				}
 			}
 		}
+	}
+
+	protected static function deleteData() {
+		$hostids = CDBHelper::getColumn('SELECT hostid FROM hosts_groups WHERE groupid='.zbx_dbstr(static::$groupid),
+				'hostid'
+		);
+
+		$delete_methods = (static::$context === 'host')
+			? ['host' => 'host.delete', 'group' => 'hostgroup.delete']
+			: ['host' => 'template.delete', 'group' => 'templategroup.delete'];
+
+		CDataHelper::call($delete_methods['host'], array_values($hostids));
+		CDataHelper::call($delete_methods['group'], [static::$groupid]);
 	}
 }

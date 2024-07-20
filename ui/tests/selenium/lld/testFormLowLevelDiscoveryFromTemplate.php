@@ -17,20 +17,23 @@
 require_once dirname(__FILE__).'/../common/testLowLevelDiscovery.php';
 
 /**
- * @backup hosts
- *
  * @onBefore prepareLLDTemplateData
+ *
+ * @onAfter deleteData
  */
 class testFormLowLevelDiscoveryFromTemplate extends testLowLevelDiscovery {
 
+	protected static $groupid;
 	protected static $templateid;
+	protected static $context = 'template';
 	protected static $update_lld = 'LLD for update scenario';
 
 	public function prepareLLDTemplateData() {
+		static::$groupid = CDataHelper::call('templategroup.create', [['name' => 'Template group for lld']])['groupids'][0];
 		$templates = CDataHelper::createTemplates([
 			[
 				'host' => 'Template with LLD',
-				'groups' => ['groupid' => 1], // Templates.
+				'groups' => ['groupid' => static::$groupid],
 				'items' => [
 					[
 						'name' => 'Master item',
