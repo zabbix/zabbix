@@ -33,7 +33,7 @@
 
 			this.initFilter();
 
-			document.addEventListener('click', (e) => {
+			document.forms['hosts'].addEventListener('click', e => {
 				if (e.target.classList.contains('js-edit-template')) {
 					this.editTemplate({templateid: e.target.dataset.templateid});
 				}
@@ -43,23 +43,17 @@
 				else if (e.target.classList.contains('js-edit-proxy-group')) {
 					this.editProxyGroup(e.target.dataset.proxy_groupid);
 				}
-			});
-
-			document.forms['hosts'].addEventListener('click', (e) => {
-				const target = e.target;
-				const hostids = Object.keys(chkbxRange.getSelectedIds());
-
-				if (target.classList.contains('js-enable-host')) {
-					this.enable(null, {hostids: [target.dataset.hostid]});
+				else if (e.target.classList.contains('js-enable-host')) {
+					this.enable(null, {hostids: [e.target.dataset.hostid]});
 				}
-				if (target.classList.contains('js-disable-host')) {
-					this.disable(null, {hostids: [target.dataset.hostid]});
+				else if (e.target.classList.contains('js-disable-host')) {
+					this.disable(null, {hostids: [e.target.dataset.hostid]});
 				}
-				if (target.classList.contains('js-massenable-host')) {
-					this.enable(target, {hostids: hostids});
+				else if (e.target.classList.contains('js-massenable-host')) {
+					this.enable(e.target, {hostids: Object.keys(chkbxRange.getSelectedIds())});
 				}
-				if (target.classList.contains('js-massdisable-host')) {
-					this.disable(target, {hostids: hostids});
+				else if (e.target.classList.contains('js-massdisable-host')) {
+					this.disable(e.target, {hostids: Object.keys(chkbxRange.getSelectedIds())});
 				}
 			});
 		},
