@@ -1129,8 +1129,6 @@ int	process_httptests(int now, const char *config_source_ip, const char *config_
 	if (SUCCEED != zbx_dc_httptest_next(now, &httptestid, nextcheck))
 		goto out;
 
-	um_handle = zbx_dc_open_user_macros();
-
 	/* create macro cache to use in HTTP tests */
 	zbx_vector_ptr_pair_create(&httptest.macros);
 
@@ -1247,8 +1245,6 @@ int	process_httptests(int now, const char *config_source_ip, const char *config_
 
 	/* destroy the macro cache used in HTTP tests */
 	zbx_vector_ptr_pair_destroy(&httptest.macros);
-
-	zbx_dc_close_user_macros(um_handle);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
