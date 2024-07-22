@@ -15,8 +15,12 @@ BINARIES_tests = \
 	macro_fmttime \
 	zbx_function_param_parse_ext \
 	zbx_substitute_macros \
-	zbx_substitute_macros1 \
-	zbx_substitute_macros_um
+	zbx_substitute_macros1
+	
+
+if SERVER
+BINARIES_tests += zbx_substitute_macros_um
+endif
 
 noinst_PROGRAMS = $(BINARIES_tests)
 
@@ -240,6 +244,8 @@ zbx_substitute_macros1_LDFLAGS = @SERVER_LDFLAGS@
 
 zbx_substitute_macros1_CFLAGS = $(EXPR_COMPILER_FLAGS)
 
+if SERVER
+
 WRAP_FUNCS = \
 	-Wl,--wrap=__zbx_shmem_malloc \
 	-Wl,--wrap=__zbx_shmem_realloc \
@@ -314,3 +320,5 @@ zbx_substitute_macros_um_LDFLAGS = @SERVER_LDFLAGS@ $(WRAP_FUNCS)
 zbx_substitute_macros_um_CFLAGS = \
 	-I@top_srcdir@/src/libs \
 	$(EXPR_COMPILER_FLAGS)
+
+endif
