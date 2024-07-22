@@ -27,9 +27,8 @@
 	const view = {
 		applied_filter_groupids: [],
 
-		init({applied_filter_groupids, form_name, csrf_token}) {
+		init({applied_filter_groupids, csrf_token}) {
 			this.applied_filter_groupids = applied_filter_groupids;
-			this.form = document.forms[form_name];
 			this.csrf_token = csrf_token;
 
 			this.initFilter();
@@ -46,7 +45,7 @@
 				}
 			});
 
-			this.form.addEventListener('click', (e) => {
+			document.forms['hosts'].addEventListener('click', (e) => {
 				const target = e.target;
 				const hostids = Object.keys(chkbxRange.getSelectedIds());
 

@@ -605,7 +605,6 @@ $html_page
 (new CScriptTag('
 	view.init('.json_encode([
 		'applied_filter_groupids' => array_keys($data['filter']['groups']),
-		'form_name' => $form->getName(),
 		'csrf_token' => $csrf_token
 	]).');
 '))
