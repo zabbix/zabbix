@@ -1292,6 +1292,7 @@ class testUserRolesPermissions extends CWebTest {
 		$this->assertEquals('TEST_SERVER_NAME: API tokens', $this->page->getTitle());
 		$this->changeRoleRule(['Manage API tokens' => false]);
 		$this->checkLinks(['zabbix.php?action=user.token.list']);
+		$this->page->logout();
 	}
 
 	/**
@@ -1733,7 +1734,7 @@ class testUserRolesPermissions extends CWebTest {
 			// Disabled "Execute now" option in context menu.
 			if (!array_key_exists('expected', $test_case)) {
 				foreach ($test_case['items'] as $item) {
-					$this->query('link', $item)->one()->click();
+					$this->query('link', $item)->waitUntilClickable()->one()->click();
 					$popup = CPopupMenuElement::find()->waitUntilVisible()->one();
 					$this->assertFalse($popup->getItem('Execute now')->isEnabled());
 					$this->page->pressKey(WebDriverKeys::ESCAPE);
@@ -1742,7 +1743,7 @@ class testUserRolesPermissions extends CWebTest {
 				continue;
 			}
 
-			$this->query('link', $test_case['items'])->one()->click();
+			$this->query('link', $test_case['items'])->waitUntilClickable()->one()->click();
 			$popup = CPopupMenuElement::find()->waitUntilVisible()->one();
 			$popup->fill('Execute now');
 

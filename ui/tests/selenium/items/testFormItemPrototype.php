@@ -276,6 +276,18 @@ class testFormItemPrototype extends CLegacyWebTest {
 			],
 			[
 				[
+					'host' => 'Simple form test host',
+					'type' => 'Script'
+				]
+			],
+			[
+				[
+					'host' => 'Simple form test host',
+					'type' => 'Browser'
+				]
+			],
+			[
+				[
 					'template' => 'Inheritance test template',
 					'type' => 'Zabbix agent'
 				]
@@ -481,6 +493,18 @@ class testFormItemPrototype extends CLegacyWebTest {
 				[
 					'template' => 'Inheritance test template',
 					'type' => 'Calculated'
+				]
+			],
+			[
+				[
+					'template' => 'Inheritance test template',
+					'type' => 'Script'
+				]
+			],
+			[
+				[
+					'template' => 'Inheritance test template',
+					'type' => 'Browser'
 				]
 			],
 			[
@@ -805,6 +829,51 @@ class testFormItemPrototype extends CLegacyWebTest {
 			$this->assertFalse($form->getField('SNMP OID')->isDisplayed());
 		}
 
+		if (in_array($type, ['Script', 'Browser'])) {
+			// Check parameters table layout.
+			$parameters_table = $form->getField('Parameters')->asTable();
+			$this->assertSame(['Name', 'Value', 'Action'], $parameters_table->getHeadersText());
+
+			$this->assertEquals(['Remove', 'Add'], $parameters_table->query('tag:button')->all()
+					->filter(CElementFilter::CLICKABLE)->asText()
+			);
+
+			foreach(['parameters[0][name]' => 255, 'parameters[0][value]' => 2048] as $input_name => $maxlength) {
+				$input = $parameters_table->query('name', $input_name)->one();
+				$this->assertEquals($maxlength, $input->getAttribute('maxlength'));
+				$this->assertEquals('', $input->getValue());
+			}
+
+			// Check Script field.
+			$script_values = [
+				'Script' => '',
+				'Browser' => "var browser = new Browser(Browser.chromeOptions());\n\n".
+						"try {\n".
+						" browser.navigate(\"https://example.com\");\n".
+						" browser.collectPerfEntries();\n".
+						"}\n".
+						"finally {\n".
+						" return JSON.stringify(browser.getResult());\n".
+						"}"
+			];
+
+			$this->assertTrue($form->isRequired('Script'));
+			$script_field = $form->getField('Script');
+			$this->assertEquals('script', $script_field->query('xpath:.//input[@type="text"]')->one()
+					->getAttribute('placeholder')
+			);
+
+			$script_dialog = $script_field->edit();
+			$this->assertEquals('JavaScript', $script_dialog->getTitle());
+			$script_input = $script_dialog->query('xpath:.//textarea')->one();
+
+			foreach (['placeholder' => 'return value', 'maxlength' => 65535] as $attribute => $value) {
+				$this->assertEquals($value, $script_input->getAttribute($attribute));
+			}
+			$this->assertEquals($script_values[$type], $script_input->getText());
+			$script_dialog->close();
+		}
+
 		switch ($type) {
 			case 'Zabbix agent':
 			case 'Zabbix agent (active)':
@@ -818,6 +887,8 @@ class testFormItemPrototype extends CLegacyWebTest {
 			case 'TELNET agent':
 			case 'JMX agent':
 			case 'Calculated':
+			case 'Script':
+			case 'Browser':
 				$this->assertTrue($form->getField('Update interval')->isDisplayed());
 				$this->assertEquals(255, $form->getField('Update interval')->getAttribute('maxlength'));
 				if (!isset($itemid)) {
@@ -1878,6 +1949,85 @@ class testFormItemPrototype extends CLegacyWebTest {
 			// #60
 			[
 				[
+					'expected' => TEST_GOOD,
+					'type' => 'Script',
+					'name' => 'Script item',
+					'key' => 'script.item[{#KEY}]',
+					'script' => 'zabbix',
+					'dbCheck' => true,
+					'formCheck' => true
+				]
+			],
+			// #61
+			[
+				[
+					'expected' => TEST_GOOD,
+					'type' => 'Browser',
+					'name' => 'Default browser item',
+					'key' => 'default.browser.item[{#KEY}]',
+					'dbCheck' => true,
+					'formCheck' => true
+				]
+			],
+			// #62
+			[
+				[
+					'expected' => TEST_BAD,
+					'type' => 'Script',
+					'name' => 'Empty script',
+					'key' => 'empty.script[{#KEY}]',
+					'error_msg' => 'Cannot add item prototype',
+					'errors' => [
+						'Invalid parameter "/1/params": cannot be empty.'
+					]
+				]
+			],
+			// #63
+			[
+				[
+					'expected' => TEST_BAD,
+					'type' => 'Browser',
+					'name' => 'Browser item - empty script',
+					'key' => 'empty.script.browser.item[{#KEY}]',
+					'script' => '',
+					'error_msg' => 'Cannot add item prototype',
+					'errors' => [
+						'Invalid parameter "/1/params": cannot be empty.'
+					]
+				]
+			],
+			// #64
+			[
+				[
+					'expected' => TEST_BAD,
+					'type' => 'Script',
+					'name' => 'Empty parameter name - script item',
+					'key' => 'empty.parameter.script.item[{#KEY}]',
+					'script' => 'script',
+					'params_value' => 'value',
+					'error_msg' => 'Cannot add item prototype',
+					'errors' => [
+						'Invalid parameter "/1/parameters/1/name": cannot be empty.'
+					]
+				]
+			],
+			// #65
+			[
+				[
+					'expected' => TEST_BAD,
+					'type' => 'Browser',
+					'name' => 'Empty parameter name - browser item',
+					'key' => 'empty.param.name.browser.item[{#KEY}]',
+					'params_value' => 'value',
+					'error_msg' => 'Cannot add item prototype',
+					'errors' => [
+						'Invalid parameter "/1/parameters/1/name": cannot be empty.'
+					]
+				]
+			],
+			// #66
+			[
+				[
 					'expected' => TEST_BAD,
 					'type' => 'IPMI agent',
 					'name' => 'IPMI agent error',
@@ -1888,7 +2038,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #61
+			// #67
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1901,7 +2051,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #62
+			// #68
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1914,7 +2064,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #63
+			// #69
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1926,7 +2076,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'remove' => true
 				]
 			],
-			// #64
+			// #70
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1939,7 +2089,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'remove' => true
 				]
 			],
-			// #65
+			// #71
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1952,7 +2102,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #66 Empty SQL query
+			// #72 Empty SQL query
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1964,7 +2114,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #67 Default
+			// #73 Default
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1977,7 +2127,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #68 Default
+			// #74 Default
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1991,7 +2141,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #69 Default
+			// #75 Default
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2005,7 +2155,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #70 Default
+			// #76 Default
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2074,6 +2224,14 @@ class testFormItemPrototype extends CLegacyWebTest {
 		if (isset($data['ipmi_sensor'])) {
 				$this->zbxTestInputType('ipmi_sensor', $data['ipmi_sensor']);
 				$ipmi_sensor = $this->zbxTestGetValue("//input[@id='ipmi_sensor']");
+		}
+
+		if (isset($data['script'])) {
+			$form->getField('Script')->fill($data['script']);
+		}
+
+		if (isset($data['params_value'])) {
+			$form->getField('name:parameters[0][value]')->fill($data['params_value']);
 		}
 
 		if (isset($data['allowed_hosts'])) {

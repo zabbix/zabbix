@@ -35,11 +35,9 @@ zabbix_export:
             conditions:
               - macro: '{#JMXNAME}'
                 value: '{$GRIDGAIN.LLD.FILTER.DATA.REGION.MATCHES}'
-                formulaid: A
               - macro: '{#JMXNAME}'
                 value: '{$GRIDGAIN.LLD.FILTER.DATA.REGION.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
           item_prototypes:
             - uuid: c09b0ea002db4c3d9104a7f51b9921cc
               name: 'Data region {#JMXNAME}: Allocation, rate'
@@ -445,8 +443,6 @@ zabbix_export:
               description: 'Total number of jobs cancelled by the node per second.'
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 - tag: component
@@ -463,8 +459,6 @@ zabbix_export:
               description: 'Total number of jobs handled by the node per second.'
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 - tag: component
@@ -481,8 +475,6 @@ zabbix_export:
               description: 'Total number of jobs this node rejects during collision resolution operations since node startup per second.'
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 - tag: component
@@ -685,7 +677,6 @@ zabbix_export:
               name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Version'
               type: JMX
               key: 'jmx["{#JMXOBJ}",FullVersion]'
-              trends: '0'
               value_type: CHAR
               username: '{$GRIDGAIN.USER}'
               password: '{$GRIDGAIN.PASSWORD}'
@@ -717,7 +708,6 @@ zabbix_export:
               name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Local node ID'
               type: JMX
               key: 'jmx["{#JMXOBJ}",LocalNodeId]'
-              trends: '0'
               value_type: CHAR
               username: '{$GRIDGAIN.USER}'
               password: '{$GRIDGAIN.PASSWORD}'
@@ -815,8 +805,6 @@ zabbix_export:
               description: 'The number of  messages received per second.'
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 - tag: component
@@ -833,8 +821,6 @@ zabbix_export:
               description: 'Gets maximum number of reconnect attempts used when establishing connection with remote nodes per second.'
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 - tag: component
@@ -850,8 +836,6 @@ zabbix_export:
               description: 'The number of  messages sent per second.'
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 - tag: component
@@ -899,7 +883,6 @@ zabbix_export:
               name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Coordinator'
               type: JMX
               key: 'jmx["{#JMXOBJ}",Coordinator]'
-              trends: '0'
               value_type: CHAR
               username: '{$GRIDGAIN.USER}'
               password: '{$GRIDGAIN.PASSWORD}'
@@ -985,8 +968,6 @@ zabbix_export:
               description: 'Number of times node tries to (re)establish connection to another node per second.'
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 - tag: component
@@ -1004,8 +985,6 @@ zabbix_export:
               description: 'The number of messages received per second.'
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 - tag: component
@@ -1023,8 +1002,6 @@ zabbix_export:
               description: 'The number of messages processed per second.'
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 - tag: component
@@ -1178,11 +1155,9 @@ zabbix_export:
             conditions:
               - macro: '{#JMXNAME}'
                 value: '{$GRIDGAIN.LLD.FILTER.CACHE.MATCHES}'
-                formulaid: A
               - macro: '{#JMXNAME}'
                 value: '{$GRIDGAIN.LLD.FILTER.CACHE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
           item_prototypes:
             - uuid: d46bf088d33946a69a5b625566558994
               name: 'Cache group [{#JMXNAME}]: Backups'
@@ -1199,7 +1174,6 @@ zabbix_export:
               name: 'Cache group [{#JMXNAME}]: Caches'
               type: JMX
               key: 'jmx["{#JMXOBJ}",Caches]'
-              trends: '0'
               value_type: CHAR
               username: '{$GRIDGAIN.USER}'
               password: '{$GRIDGAIN.PASSWORD}'
@@ -1380,11 +1354,9 @@ zabbix_export:
             conditions:
               - macro: '{#JMXNAME}'
                 value: '{$GRIDGAIN.LLD.FILTER.THREAD.POOL.MATCHES}'
-                formulaid: A
               - macro: '{#JMXNAME}'
                 value: '{$GRIDGAIN.LLD.FILTER.THREAD.POOL.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
           item_prototypes:
             - uuid: 7d6ab6a7180c44859b933784fb565212
               name: 'Thread pool [{#JMXNAME}]: Pool size, core'
@@ -1493,11 +1465,9 @@ zabbix_export:
             conditions:
               - macro: '{#JMXGROUP}'
                 value: '{$GRIDGAIN.LLD.FILTER.CACHE.MATCHES}'
-                formulaid: A
               - macro: '{#JMXGROUP}'
                 value: '{$GRIDGAIN.LLD.FILTER.CACHE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
           item_prototypes:
             - uuid: 6fb5dee0c7434b279eb21da7d54edacc
               name: 'Cache group [{#JMXGROUP}]: Cache gets, rate'
@@ -1510,8 +1480,6 @@ zabbix_export:
               description: 'The number of gets to the cache per second.'
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 - tag: component
@@ -1553,8 +1521,6 @@ zabbix_export:
               description: 'The number of puts to the cache per second.'
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 - tag: component
@@ -1570,8 +1536,6 @@ zabbix_export:
               description: 'The number of removals from the cache per second.'
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 - tag: component
@@ -1599,8 +1563,6 @@ zabbix_export:
               description: 'The number of transaction commits per second.'
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 - tag: component
@@ -1616,8 +1578,6 @@ zabbix_export:
               description: 'The number of transaction rollback per second.'
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 - tag: component
@@ -1632,8 +1592,6 @@ zabbix_export:
               description: 'The number of entries in heap memory.'
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 - tag: component
