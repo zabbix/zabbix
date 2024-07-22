@@ -684,46 +684,6 @@ class testDashboardHoneycombWidget extends testWidgets {
 						]
 					]
 				]
-			],
-			[
-				'name' => 'Dashboard for filtering honeycomb widget',
-				'auto_start' => 0,
-				'pages' => [
-					[
-						'widgets' => [
-							[
-								'type' => 'honeycomb',
-								'name' => 'UpdateHoneycomb',
-								'x' => 0,
-								'y' => 0,
-								'width' => 30,
-								'height' => 7,
-								'fields' => [
-									[
-										'type' => 0,
-										'name' => 'show.0',
-										'value' => 1
-									],
-									[
-										'type' => 1,
-										'name' => 'primary_label',
-										'value' => '{ITEM.NAME}'
-									],
-									[
-										'type' => 1,
-										'name' => 'items.0',
-										'value' => 'test'
-									],
-									[
-										'type' => 1,
-										'name' => 'reference',
-										'value' => 'BUBUR'
-									]
-								]
-							]
-						]
-					]
-				]
 			]
 		]);
 		self::$dashboardid = CDataHelper::getIds('name');
@@ -1962,6 +1922,59 @@ class testDashboardHoneycombWidget extends testWidgets {
 		}
 	}
 
+	/**
+	 * Creates the base widget used for the update scenario.
+	 */
+	public function prepareFilteringHoneycomb() {
+		$providedData = $this->getProvidedData();
+		$data = reset($providedData);
+
+		// Create a dashboard with the widget for updating.
+		$response = CDataHelper::call('dashboard.create', [
+			[
+				'name' => 'Dashboard for filtering '.md5(serialize($data)),
+				'auto_start' => 0,
+				'pages' => [
+					[
+						'widgets' => [
+							[
+								'type' => 'honeycomb',
+								'name' => 'UpdateHoneycomb',
+								'x' => 0,
+								'y' => 0,
+								'width' => 30,
+								'height' => 7,
+								'fields' => [
+									[
+										'type' => 0,
+										'name' => 'show.0',
+										'value' => 1
+									],
+									[
+										'type' => 1,
+										'name' => 'primary_label',
+										'value' => '{ITEM.NAME}'
+									],
+									[
+										'type' => 1,
+										'name' => 'items.0',
+										'value' => 'test'
+									],
+									[
+										'type' => 1,
+										'name' => 'reference',
+										'value' => 'BUBUR'
+									]
+								]
+							]
+						]
+					]
+				]
+			]
+		]);
+		self::$disposable_dashboard_id = $response['dashboardids'][0];
+	}
+
 	public static function getFilteringData() {
 		return [
 			// #0 Filter by 3 items.
@@ -1987,7 +2000,6 @@ class testDashboardHoneycombWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Host groups' => '',
 						'Hosts' => 'Host with tags',
 						'Item patterns' => ['Item tag 1', 'Item tag 2', 'Host tag item']
 					],
@@ -1998,8 +2010,6 @@ class testDashboardHoneycombWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Host groups' => '',
-						'Hosts' => '',
 						'Item patterns' => ['Item tag 1', 'Host tag item']
 					],
 					'tags' => [
@@ -2014,8 +2024,6 @@ class testDashboardHoneycombWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Host groups' => '',
-						'Hosts' => '',
 						'Show hosts in maintenance' => true,
 						'Item patterns' => ['Item tag 1', 'Host tag item', 'Maintenance item']
 					],
@@ -2026,8 +2034,6 @@ class testDashboardHoneycombWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Host groups' => '',
-						'Hosts' => '',
 						'Show hosts in maintenance' => false,
 						'Item patterns' => ['Item tag 1', 'Host tag item', 'Maintenance item']
 					],
@@ -2038,9 +2044,6 @@ class testDashboardHoneycombWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Host groups' => '',
-						'Hosts' => '',
-						'Show hosts in maintenance' => false,
 						'Item patterns' => ['Item tag 1', 'Item tag 2', 'Host tag item']
 					],
 					'tags' => [
@@ -2055,9 +2058,6 @@ class testDashboardHoneycombWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Host groups' => '',
-						'Hosts' => '',
-						'Show hosts in maintenance' => false,
 						'Item patterns' => ['Item tag 1', 'Item tag 2', 'Host tag item']
 					],
 					'tags' => [
@@ -2072,17 +2072,11 @@ class testDashboardHoneycombWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Host groups' => '',
-						'Hosts' => '',
-						'Show hosts in maintenance' => false,
 						'Item patterns' => ['Item tag 1', 'Item tag 2', 'Host tag item']
 					],
 					'tags' => [
 						'item_tags' => [
 							['name' => 'item_tag_1', 'operator' => 'Exists']
-						],
-						'host_tags' => [
-							['name' => '', 'operator' => 'Does not exist']
 						]
 					],
 					'filtered_items' => ['Item tag 1']
@@ -2092,17 +2086,11 @@ class testDashboardHoneycombWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Host groups' => '',
-						'Hosts' => '',
-						'Show hosts in maintenance' => false,
 						'Item patterns' => ['Item tag 1', 'Item tag 2', 'Host tag item']
 					],
 					'tags' => [
 						'item_tags' => [
 							['name' => 'item_tag_1', 'operator' => 'Does not exist']
-						],
-						'host_tags' => [
-							['name' => '', 'operator' => 'Does not exist']
 						]
 					],
 					'filtered_items' => ['Item tag 2', 'Host tag item']
@@ -2112,9 +2100,6 @@ class testDashboardHoneycombWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Host groups' => '',
-						'Hosts' => '',
-						'Show hosts in maintenance' => false,
 						'Item patterns' => ['Item tag 1', 'Item tag 2', 'Host tag item']
 					],
 					'tags' => [
@@ -2132,8 +2117,6 @@ class testDashboardHoneycombWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Host groups' => '',
-						'Hosts' => '',
 						'Show hosts in maintenance' => True,
 						'Item patterns' => ['Item tag 1', 'Item tag 2', 'Host tag item', 'Maintenance item']
 					],
@@ -2152,9 +2135,6 @@ class testDashboardHoneycombWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Host groups' => '',
-						'Hosts' => '',
-						'Show hosts in maintenance' => false,
 						'Item patterns' => ['Item tag 1', 'Item tag 2', 'Item tag 3', 'Item tag 4', 'Item tag 5'],
 						'Item tags' => 'Or'
 					],
@@ -2171,9 +2151,6 @@ class testDashboardHoneycombWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Host groups' => '',
-						'Hosts' => '',
-						'Show hosts in maintenance' => false,
 						'Item patterns' => ['Item tag 1', 'Item tag 2', 'Item tag 3', 'Item tag 4', 'Item tag 5'],
 						'Item tags' => 'And/Or'
 					],
@@ -2190,9 +2167,6 @@ class testDashboardHoneycombWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Host groups' => '',
-						'Hosts' => '',
-						'Show hosts in maintenance' => false,
 						'Item patterns' => ['Item tag 1', 'Item tag 2', 'Item tag 3', 'Item tag 4', 'Item tag 5'],
 						'Item tags' => 'Or'
 					],
@@ -2209,9 +2183,6 @@ class testDashboardHoneycombWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Host groups' => '',
-						'Hosts' => '',
-						'Show hosts in maintenance' => false,
 						'Item patterns' => ['Item tag 1', 'Item tag 2', 'Item tag 3', 'Item tag 4', 'Item tag 5'],
 						'Item tags' => 'And/Or'
 					],
@@ -2228,9 +2199,6 @@ class testDashboardHoneycombWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Host groups' => '',
-						'Hosts' => '',
-						'Show hosts in maintenance' => false,
 						'Item patterns' => ['Item tag 1', 'Item tag 2', 'Item tag 3', 'Item tag 4', 'Item tag 5'],
 						'Item tags' => 'Or'
 					],
@@ -2247,9 +2215,6 @@ class testDashboardHoneycombWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Host groups' => '',
-						'Hosts' => '',
-						'Show hosts in maintenance' => false,
 						'Item patterns' => ['Item tag 1', 'Item tag 2', 'Item tag 3', 'Item tag 4', 'Item tag 5'],
 						'Item tags' => 'And/Or'
 					],
@@ -2269,10 +2234,12 @@ class testDashboardHoneycombWidget extends testWidgets {
 	 * Filter honeycomb and check that correct item comb visible on widget.
 	 *
 	 * @dataProvider getFilteringData
+	 *
+	 * @onBefore prepareFilteringHoneycomb
 	 */
 	public function testDashboardHoneycombWidget_CheckFiltering($data) {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
-				self::$dashboardid['Dashboard for filtering honeycomb widget'])->waitUntilReady();
+				self::$disposable_dashboard_id)->waitUntilReady();
 		$this->checkWidgetForm($data, 'update', false);
 		$dashboard = CDashboardElement::find()->waitUntilReady()->one();
 		$dashboard->save();
