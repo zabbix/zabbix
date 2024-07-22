@@ -473,7 +473,6 @@ void	lld_flush_discoveries(zbx_hashset_t *discoveries, const char *id_field, con
 
 	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
 		zbx_db_execute("%s", sql);
-	
 
 	if (0 != upd_ts.values_num)
 	{
