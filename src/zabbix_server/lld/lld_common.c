@@ -476,6 +476,7 @@ void	lld_flush_discoveries(zbx_hashset_t *discoveries, const char *id_field, con
 
 	if (0 != upd_ts.values_num)
 	{
+		sql_offset = 0;
 		zbx_vector_uint64_sort(&upd_ts, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update %s set lastcheck=%d where",
 				discovery_table, now);
