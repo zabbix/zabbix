@@ -249,12 +249,13 @@ class testExecuteNow extends CWebTest {
 	public function testExecuteNow_ContextMenu($data) {
 		// Login and select host group for testing.
 		$this->page->login()->open('zabbix.php?action=latest.view')->waitUntilReady();
+		$table = $this->query('xpath://table['.CXPathHelper::fromClass('list-table fixed').']')->asTable()->waitUntilVisible()->one();
 		$filter_form = $this->query('name:zbx_filter')->asForm()->one();
 		$filter_form->fill(['Host groups' => 'HG-for-executenow']);
 		$filter_form->submit();
-		$this->page->waitUntilReady();
+		$table->waitUntilReloaded();
 
-		$this->query('link', $data['item'])->one()->click();
+		$this->query('link', $data['item'])->waitUntilClickable()->one()->click();
 		$popup = CPopupMenuElement::find()->waitUntilVisible()->one();
 
 		// Disabled "Execute now" option in context menu.

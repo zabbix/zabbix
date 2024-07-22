@@ -76,7 +76,11 @@ class Template {
 	 * @return {HTMLElement}
 	 */
 	evaluateToElement(data = {}) {
-		return new DOMParser().parseFromString(this.evaluate(data), 'text/html').body.firstElementChild;
+		const template = document.createElement('template');
+
+		template.innerHTML = this.evaluate(data);
+
+		return template.content.firstElementChild;
 	}
 
 	/**
