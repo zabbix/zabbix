@@ -672,8 +672,8 @@ static void	process_httptest(zbx_dc_host_t *host, zbx_httptest_t *httptest, int 
 	zbx_timespec_t		ts;
 	double			speed_download = 0;
 	int			speed_download_num = 0, lastfailedstep = 0;
-	zbx_dc_um_handle_t	*um_handle;
 #ifdef HAVE_LIBCURL
+	zbx_dc_um_handle_t	*um_handle;
 	zbx_db_row_t		row;
 	zbx_httpstat_t		stat;
 	char			errbuf[CURL_ERROR_SIZE];
