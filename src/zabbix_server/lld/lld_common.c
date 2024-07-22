@@ -14,6 +14,7 @@
 
 #include "lld.h"
 
+#include "zbxcommon.h"
 #include "zbxdbhigh.h"
 #include "audit/zbxaudit.h"
 #include "zbxdb.h"
@@ -327,17 +328,20 @@ void	lld_flush_discoveries(zbx_hashset_t *discoveries, const char *id_field, con
 		object_audit_entry_create_f cb_audit_create, object_audit_entry_update_status_f cb_audit_update_status)
 {
 	int				updates_num = 0;
-	zbx_vector_uint64_t		upd_ids, del_ids;
+	zbx_vector_uint64_t		upd_ids, del_ids, upd_ts;
 	zbx_vector_lld_discovery_ptr_t	object_updates, discovery_updates;
 	zbx_hashset_iter_t		iter;
 	zbx_lld_discovery_t		*discovery;
 	char				*sql = NULL;
 	size_t				sql_alloc = 0, sql_offset = 0;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
 	zbx_vector_lld_discovery_ptr_create(&object_updates);
 	zbx_vector_lld_discovery_ptr_create(&discovery_updates);
 	zbx_vector_uint64_create(&upd_ids);
 	zbx_vector_uint64_create(&del_ids);
+	zbx_vector_uint64_create(&upd_ts);
 
 	zbx_hashset_iter_reset(discoveries, &iter);
 	while (NULL != (discovery = (zbx_lld_discovery_t *)zbx_hashset_iter_next(&iter)))
@@ -380,7 +384,12 @@ void	lld_flush_discoveries(zbx_hashset_t *discoveries, const char *id_field, con
 			zbx_vector_lld_discovery_ptr_append(&object_updates, discovery);
 
 		if (0 != (discovery->flags & ZBX_LLD_DISCOVERY_UPDATE))
-			zbx_vector_lld_discovery_ptr_append(&discovery_updates, discovery);
+		{
+			if (ZBX_LLD_DISCOVERY_UPDATE_LASTCHECK == (discovery->flags & ZBX_LLD_DISCOVERY_UPDATE))
+				zbx_vector_uint64_append(&upd_ts, discovery->id);
+			else
+				zbx_vector_lld_discovery_ptr_append(&discovery_updates, discovery);
+		}
 	}
 
 	if (0 != del_ids.values_num)
@@ -389,8 +398,17 @@ void	lld_flush_discoveries(zbx_hashset_t *discoveries, const char *id_field, con
 		cb_delete_objects(&del_ids, ZBX_AUDIT_LLD_CONTEXT);
 	}
 
-	if (0 == object_updates.values_num && 0 == discovery_updates.values_num)
+	if (0 == object_updates.values_num && 0 == discovery_updates.values_num && 0 == upd_ts.values_num)
 		goto commit;
+
+	if (0 != upd_ts.values_num)
+	{
+		zbx_vector_uint64_sort(&upd_ts, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update %s set"
+				" lastcheck=%d where", discovery_table, now);
+		zbx_db_execute_multiple_query(sql, id_field, &upd_ts);
+		sql_offset = 0;
+	}
 
 	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
@@ -469,8 +487,11 @@ void	lld_flush_discoveries(zbx_hashset_t *discoveries, const char *id_field, con
 commit:
 	zbx_db_commit();
 out:
+	zbx_vector_uint64_destroy(&upd_ts);
 	zbx_vector_uint64_destroy(&del_ids);
 	zbx_vector_uint64_destroy(&upd_ids);
 	zbx_vector_lld_discovery_ptr_destroy(&discovery_updates);
 	zbx_vector_lld_discovery_ptr_destroy(&object_updates);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }

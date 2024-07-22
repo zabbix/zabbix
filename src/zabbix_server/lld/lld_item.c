@@ -4492,6 +4492,8 @@ static void	lld_process_lost_items(zbx_vector_lld_item_full_ptr_t *items, const 
 {
 	zbx_hashset_t	discoveries;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
 	zbx_hashset_create(&discoveries, (size_t)items->values_num, ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
@@ -4525,6 +4527,8 @@ static void	lld_process_lost_items(zbx_vector_lld_item_full_ptr_t *items, const 
 			zbx_db_delete_items, zbx_audit_item_create_entry, zbx_audit_item_update_json_update_status);
 
 	zbx_hashset_destroy(&discoveries);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
