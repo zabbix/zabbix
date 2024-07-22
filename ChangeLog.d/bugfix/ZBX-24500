@@ -1,1 +1,1 @@
-A......... [ZBX-24500] fixed issue creating multiple hosts or proxies with different values of PSK key for same PSK identity (gcalenko)
+A......... [ZBX-24500] fixed an issue that allowed defining multiple PSK keys for the same PSK identity used in hosts, proxies, and autoregistration (gcalenko)

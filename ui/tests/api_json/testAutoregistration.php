@@ -78,16 +78,16 @@ class testAutoregistration extends CAPITest {
 		CDataHelper::call('autoregistration.update', ['tls_accept' => HOST_ENCRYPTION_NONE]);
 	}
 
-	public static function resolveIds(array $rows) {
+	private static function resolveIds(array $rows) {
 		foreach ($rows as &$value) {
 			if (is_array($value)) {
 				$value = self::resolveIds($value);
 			}
 			else {
 				// Whitespaces in $key are not trimmed.
-				[$api, $key] = sscanf((string) $value, ':%[^: ]:%[^\0]');
+				[, $api, $key] = explode(':', (string) $value, 3) + ['', '', ''];
 
-				if ($api !== null && $key !== null && array_key_exists($key, self::$data[$api])) {
+				if ($api !== '' && $key !== '' && array_key_exists($key, self::$data[$api])) {
 					$value = self::$data[$api][$key];
 				}
 			}

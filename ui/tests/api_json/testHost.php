@@ -329,7 +329,7 @@ class testHost extends CAPITest {
 				],
 				'expected_error' => 'Incorrect value for field "/2/tls_psk": another value of tls_psk exists for same tls_psk_identity.'
 			],
-			'Field "tls_psk" cannot have different values for same "tls_psk_identity"' => [
+			'Field "tls_psk" cannot have different values for same "tls_psk_identity" with database check' => [
 				'host' => [
 					[
 						'host' => 'bca.example.com',

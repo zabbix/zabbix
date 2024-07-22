@@ -615,14 +615,14 @@ class CProxy extends CApiService {
 	}
 
 	/**
-	 * Check there are no multiple proxies having same value tls_psk_identity and different value of tls_psk.
+	 * Check there are no multiple proxies having same value of tls_psk_identity, but different value of tls_psk.
 	 *
 	 * @param array $proxies
 	 * @param array $db_proxies
 	 *
 	 * @throws CAPIException
 	 */
-	protected static function checkTlsPsk(array $proxies, array $db_proxies = null): void {
+	private static function checkTlsPsk(array $proxies, array $db_proxies = null): void {
 		$psk_pairs = [];
 		$tls_psk_fields = array_flip(['tls_psk_identity', 'tls_psk']);
 
