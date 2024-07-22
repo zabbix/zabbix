@@ -212,6 +212,70 @@ static void	httppairs_free(zbx_vector_ptr_pair_t *pairs)
 	zbx_vector_ptr_pair_destroy(pairs);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: resolves macros in HTTP test field                                *
+ *          (ZBX_MACRO_TYPE_HTTPTEST_FIELD) context                           *
+ *                                                                            *
+ * Parameters: p            - [IN] macro resolver data structure              *
+ *             args         - [IN] list of variadic parameters                *
+ *                                 Expected content:                          *
+ *                                  - zbx_dc_um_handle_t *um_handle: user     *
+ *                                      macro cache handle                    *
+ *                                  - const zbx_dc_host_t *dc_host: host      *
+ *                                      information                           *
+ *             replace_with - [OUT] pointer to value to replace macro with    *
+ *             data         - [IN/OUT] pointer to original input raw string   *
+ *                                  (for macro in macro resolving)            *
+ *             error        - [OUT] pointer to pre-allocated error message    *
+ *                                  buffer (can be NULL)                      *
+ *             maxerrlen    - [IN] size of error message buffer (can be 0 if  *
+ *                                 'error' is NULL)                           *
+ *                                                                            *
+ ******************************************************************************/
+static int	macro_httptest_field_resolv(zbx_macro_resolv_data_t *p, va_list args, char **replace_with, char **data,
+		char *error, size_t maxerrlen)
+{
+	int				ret = SUCCEED;
+	zbx_dc_interface_t		interface;
+
+	/* Passed arguments */
+	zbx_dc_um_handle_t		*um_handle = va_arg(args, zbx_dc_um_handle_t *);
+	const zbx_dc_host_t		*dc_host = va_arg(args, const zbx_dc_host_t *);
+
+	ZBX_UNUSED(data);
+	ZBX_UNUSED(error);
+	ZBX_UNUSED(maxerrlen);
+
+	if (ZBX_TOKEN_USER_MACRO == p->token.type || (ZBX_TOKEN_USER_FUNC_MACRO == p->token.type &&
+				0 == strncmp(p->macro, MVAR_USER_MACRO, ZBX_CONST_STRLEN(MVAR_USER_MACRO))))
+	{
+		zbx_dc_get_user_macro(um_handle, p->macro, &dc_host->hostid, 1, replace_with);
+		p->pos = p->token.loc.r;
+	}
+	else if (0 == strcmp(p->macro, MVAR_HOST_HOST) || 0 == strcmp(p->macro, MVAR_HOSTNAME))
+		*replace_with = zbx_strdup(*replace_with, dc_host->host);
+	else if (0 == strcmp(p->macro, MVAR_HOST_NAME))
+		*replace_with = zbx_strdup(*replace_with, dc_host->name);
+	else if (0 == strcmp(p->macro, MVAR_HOST_IP) || 0 == strcmp(p->macro, MVAR_IPADDRESS))
+	{
+		if (SUCCEED == (ret = zbx_dc_config_get_interface(&interface, dc_host->hostid, 0)))
+			*replace_with = zbx_strdup(*replace_with, interface.ip_orig);
+	}
+	else if	(0 == strcmp(p->macro, MVAR_HOST_DNS))
+	{
+		if (SUCCEED == (ret = zbx_dc_config_get_interface(&interface, dc_host->hostid, 0)))
+			*replace_with = zbx_strdup(*replace_with, interface.dns_orig);
+	}
+	else if (0 == strcmp(p->macro, MVAR_HOST_CONN))
+	{
+		if (SUCCEED == (ret = zbx_dc_config_get_interface(&interface, dc_host->hostid, 0)))
+			*replace_with = zbx_strdup(*replace_with, interface.addr);
+	}
+
+	return ret;
+}
+
 #ifdef HAVE_LIBCURL
 static void	process_step_data(zbx_uint64_t httpstepid, zbx_httpstat_t *stat, zbx_timespec_t *ts)
 {
@@ -296,70 +360,6 @@ static void	process_step_data(zbx_uint64_t httpstepid, zbx_httpstat_t *stat, zbx
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: resolves macros in HTTP test field                                *
- *          (ZBX_MACRO_TYPE_HTTPTEST_FIELD) context                           *
- *                                                                            *
- * Parameters: p            - [IN] macro resolver data structure              *
- *             args         - [IN] list of variadic parameters                *
- *                                 Expected content:                          *
- *                                  - zbx_dc_um_handle_t *um_handle: user     *
- *                                      macro cache handle                    *
- *                                  - const zbx_dc_host_t *dc_host: host      *
- *                                      information                           *
- *             replace_with - [OUT] pointer to value to replace macro with    *
- *             data         - [IN/OUT] pointer to original input raw string   *
- *                                  (for macro in macro resolving)            *
- *             error        - [OUT] pointer to pre-allocated error message    *
- *                                  buffer (can be NULL)                      *
- *             maxerrlen    - [IN] size of error message buffer (can be 0 if  *
- *                                 'error' is NULL)                           *
- *                                                                            *
- ******************************************************************************/
-static int	macro_httptest_field_resolv(zbx_macro_resolv_data_t *p, va_list args, char **replace_with, char **data,
-		char *error, size_t maxerrlen)
-{
-	int				ret = SUCCEED;
-	zbx_dc_interface_t		interface;
-
-	/* Passed arguments */
-	zbx_dc_um_handle_t		*um_handle = va_arg(args, zbx_dc_um_handle_t *);
-	const zbx_dc_host_t		*dc_host = va_arg(args, const zbx_dc_host_t *);
-
-	ZBX_UNUSED(data);
-	ZBX_UNUSED(error);
-	ZBX_UNUSED(maxerrlen);
-
-	if (ZBX_TOKEN_USER_MACRO == p->token.type || (ZBX_TOKEN_USER_FUNC_MACRO == p->token.type &&
-				0 == strncmp(p->macro, MVAR_USER_MACRO, ZBX_CONST_STRLEN(MVAR_USER_MACRO))))
-	{
-		zbx_dc_get_user_macro(um_handle, p->macro, &dc_host->hostid, 1, replace_with);
-		p->pos = p->token.loc.r;
-	}
-	else if (0 == strcmp(p->macro, MVAR_HOST_HOST) || 0 == strcmp(p->macro, MVAR_HOSTNAME))
-		*replace_with = zbx_strdup(*replace_with, dc_host->host);
-	else if (0 == strcmp(p->macro, MVAR_HOST_NAME))
-		*replace_with = zbx_strdup(*replace_with, dc_host->name);
-	else if (0 == strcmp(p->macro, MVAR_HOST_IP) || 0 == strcmp(p->macro, MVAR_IPADDRESS))
-	{
-		if (SUCCEED == (ret = zbx_dc_config_get_interface(&interface, dc_host->hostid, 0)))
-			*replace_with = zbx_strdup(*replace_with, interface.ip_orig);
-	}
-	else if	(0 == strcmp(p->macro, MVAR_HOST_DNS))
-	{
-		if (SUCCEED == (ret = zbx_dc_config_get_interface(&interface, dc_host->hostid, 0)))
-			*replace_with = zbx_strdup(*replace_with, interface.dns_orig);
-	}
-	else if (0 == strcmp(p->macro, MVAR_HOST_CONN))
-	{
-		if (SUCCEED == (ret = zbx_dc_config_get_interface(&interface, dc_host->hostid, 0)))
-			*replace_with = zbx_strdup(*replace_with, interface.addr);
-	}
-
-	return ret;
 }
 
 /******************************************************************************
