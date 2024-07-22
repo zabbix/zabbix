@@ -4182,7 +4182,7 @@ form.dashboard-widget-clock .fields-group.fields-group-tzone .form-field.field-t
 
 div.dashboard-widget-clock .clock-digital {
   box-sizing: border-box;
-  min-height: 100%;
+  height: 100%;
   padding: 10px;
   display: flex;
   flex-direction: column;

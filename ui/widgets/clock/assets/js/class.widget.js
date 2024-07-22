@@ -31,12 +31,21 @@ class CWidgetClock extends CWidget {
 
 	static DEFAULT_LOCALE = 'en-US';
 
-	static DEFAULT_FONT_SIZE_DATE = 20;
-	static DEFAULT_FONT_SIZE_TIME = 30;
-	static DEFAULT_FONT_SIZE_TIMEZONE = 20;
-	static DEFAULT_FONT_SIZE_NO_DATA = 60;
-	static FONT_SIZE_MIN = 12;
+	// Default font sizes (as part of widget height).
+	static DEFAULT_FONT_SIZE_DATE = 0.2;
+	static DEFAULT_FONT_SIZE_TIME = 0.3;
+	static DEFAULT_FONT_SIZE_TIMEZONE = 0.2;
+	static DEFAULT_FONT_SIZE_NO_DATA = 0.6;
+
+	// Minimum font sizes (in pixels) must be in same proportions as default font sizes (except for no data).
+	static MIN_FONT_SIZE_DATE = 12;
+	static MIN_FONT_SIZE_TIME = 18;
+	static MIN_FONT_SIZE_TIMEZONE = 12;
+	static MIN_FONT_SIZE_NO_DATA = 12;
+
 	static LINE_HEIGHT = 1.14;
+
+	static PADDING = 10;
 
 	onInitialize() {
 		this._time_offset = 0;
@@ -248,66 +257,98 @@ class CWidgetClock extends CWidget {
 	}
 
 	_adjustDigitalClockSize() {
-		const container_style = getComputedStyle(this._target.querySelector('.clock-digital'));
+		const container_rect = this._target.querySelector('.clock-digital').getBoundingClientRect();
 
-		const available_width = Math.floor(
-			parseFloat(container_style.width)
-			- parseFloat(container_style.paddingLeft) - parseFloat(container_style.paddingRight)
-			- parseFloat(container_style.borderLeftWidth) - parseFloat(container_style.borderRightWidth)
-		);
-
-		const available_height = Math.floor(
-			parseFloat(container_style.height)
-			- parseFloat(container_style.paddingTop) - parseFloat(container_style.paddingBottom)
-			- parseFloat(container_style.borderTopWidth) - parseFloat(container_style.borderBottomWidth)
-		);
-
-		const getAutoFontSize = (text, default_height, font_weight) => {
-			let font_size = available_height * default_height / 100;
-
-			const text_width = this._getMeasuredTextWidth(text, font_size, font_weight);
-
-			if (text_width > available_width) {
-				font_size *= available_width / text_width;
-			}
-
-			return Math.max(CWidgetClock.FONT_SIZE_MIN, font_size / CWidgetClock.LINE_HEIGHT);
-		}
+		const max_width = (container_rect.width - CWidgetClock.PADDING * 2) * .9;
+		const max_height = container_rect.height - CWidgetClock.PADDING * 2;
 
 		if (this._is_enabled) {
-			if (this._show.includes(CWidgetClock.SHOW_DATE)) {
-				const date_element = this._target.querySelector('.clock-date');
-				const font_weight = this._styles.date.bold ? 'bold' : '';
-				const font_size = getAutoFontSize(date_element.textContent, CWidgetClock.DEFAULT_FONT_SIZE_DATE,
-					font_weight);
+			const elements = [];
 
-				date_element.style.fontSize = `${font_size}px`;
+			if (this._show.includes(CWidgetClock.SHOW_DATE)) {
+				const element = this._target.querySelector('.clock-date');
+
+				if (element !== null) {
+					const font_size = Math.max(
+						CWidgetClock.MIN_FONT_SIZE_DATE,
+						max_height * CWidgetClock.DEFAULT_FONT_SIZE_DATE / CWidgetClock.LINE_HEIGHT
+					);
+					const font_weight = this._styles.date.bold ? 'bold' : '';
+					const width = this._getMeasuredTextWidth(element.textContent, font_size, font_weight);
+
+					element.style.fontSize = `${font_size}px`;
+
+					elements.push({element, width, font_size, min_font_size: CWidgetClock.MIN_FONT_SIZE_DATE});
+				}
 			}
 
 			if (this._show.includes(CWidgetClock.SHOW_TIME)) {
-				const time_element = this._target.querySelector('.clock-time');
-				const font_weight = this._styles.time.bold ? 'bold' : '';
-				const font_size = getAutoFontSize(time_element.textContent, CWidgetClock.DEFAULT_FONT_SIZE_TIME,
-					font_weight);
+				const element = this._target.querySelector('.clock-time');
 
-				time_element.style.fontSize = `${font_size}px`;
+				if (element !== null) {
+					const font_size = Math.max(
+						CWidgetClock.MIN_FONT_SIZE_TIME,
+						max_height * CWidgetClock.DEFAULT_FONT_SIZE_TIME / CWidgetClock.LINE_HEIGHT
+					);
+					const font_weight = this._styles.time.bold ? 'bold' : '';
+					const width = this._getMeasuredTextWidth(element.textContent, font_size, font_weight);
+
+					element.style.fontSize = `${font_size}px`;
+
+					elements.push({element, width, font_size, min_font_size: CWidgetClock.MIN_FONT_SIZE_TIME});
+				}
 			}
 
 			if (this._show.includes(CWidgetClock.SHOW_TIMEZONE)) {
-				const timezone_element = this._target.querySelector('.clock-time-zone');
-				const font_weight = this._styles.timezone.bold ? 'bold' : '';
-				const font_size = getAutoFontSize(timezone_element.textContent, CWidgetClock.DEFAULT_FONT_SIZE_TIMEZONE,
-					font_weight);
+				const element = this._target.querySelector('.clock-time-zone');
 
-				timezone_element.style.fontSize = `${font_size}px`;
+				if (element !== null) {
+					const font_size = Math.max(
+						CWidgetClock.MIN_FONT_SIZE_TIMEZONE,
+						max_height * CWidgetClock.DEFAULT_FONT_SIZE_TIMEZONE / CWidgetClock.LINE_HEIGHT
+					);
+					const font_weight = this._styles.timezone.bold ? 'bold' : '';
+					const width = this._getMeasuredTextWidth(element.textContent, font_size, font_weight);
+
+					element.style.fontSize = `${font_size}px`;
+
+					elements.push({element, width, font_size, min_font_size: CWidgetClock.MIN_FONT_SIZE_TIMEZONE});
+				}
+			}
+
+			if (elements.length > 0) {
+				const widest_element = elements.reduce((el1, el2) => el1.width > el2.width ? el1 : el2);
+
+				if (widest_element.width > max_width) {
+					const width_ratio = max_width / widest_element.width;
+
+					for (const element of elements) {
+						const font_size = Math.max(
+							element.min_font_size,
+							element.font_size * width_ratio
+						);
+
+						element.element.style.fontSize = `${font_size}px`;
+					}
+				}
 			}
 		}
 		else {
 			const no_data_element = this._target.querySelector('.clock-disabled');
-			const font_size = getAutoFontSize(no_data_element.textContent, CWidgetClock.DEFAULT_FONT_SIZE_NO_DATA,
-				'bold');
 
-			no_data_element.style.fontSize = `${font_size}px`;
+			if (no_data_element !== null) {
+				let font_size = max_height * CWidgetClock.DEFAULT_FONT_SIZE_NO_DATA / CWidgetClock.LINE_HEIGHT;
+
+				const width = this._getMeasuredTextWidth(no_data_element.textContent, font_size, 'bold');
+
+				if (width > max_width) {
+					font_size *= max_width / width;
+				}
+
+				font_size = Math.max(CWidgetClock.MIN_FONT_SIZE_NO_DATA, font_size);
+
+				no_data_element.style.fontSize = `${font_size}px`;
+			}
 		}
 	}
 
