@@ -161,7 +161,7 @@ void	zbx_mock_test_entry(void **state)
 		um_handle = zbx_dc_open_user_macros_masked();
 		break;
 	default:
-		THIS_SHOULD_NEVER_HAPPEN;
+		exit(1);
 		break;
 	}
 
