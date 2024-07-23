@@ -956,6 +956,10 @@ msgstr ""
 msgid "Add a new widget"
 msgstr ""
 
+#: widgets/navtree/Widget.php:34
+msgid "Add child element"
+msgstr ""
+
 #: widgets/navtree/Widget.php:39
 msgid "Add child elements"
 msgstr ""
@@ -988,6 +992,11 @@ msgstr ""
 #: app/partials/trigger.edit.dependencies.tab.php:91
 #: app/views/trigger.massupdate.php:155
 msgid "Add host trigger"
+msgstr ""
+
+#: widgets/piechart/includes/CWidgetFieldDataSetView.php:260
+#: widgets/svggraph/includes/CWidgetFieldDataSetView.php:263
+msgid "Add item"
 msgstr ""
 
 #: app/partials/massupdate.macros.tab.php:96
@@ -1893,6 +1902,10 @@ msgstr ""
 
 #: app/views/administration.authentication.edit.php:131
 msgid "Avoid easy-to-guess passwords"
+msgstr ""
+
+#: jsLoader.php:172
+msgid "Awaiting data"
 msgstr ""
 
 #: widgets/svggraph/views/widget.edit.php:51
@@ -5429,6 +5442,10 @@ msgstr "Създаване на метод на уведомление"
 
 #: app/views/popup.import.php:143 jsLoader.php:349
 msgid "Create new"
+msgstr ""
+
+#: jsLoader.php:372
+msgid "Create new report"
 msgstr ""
 
 #: app/views/administration.proxy.list.php:239
@@ -9560,6 +9577,10 @@ msgstr[1] ""
 msgid "Host group elements"
 msgstr "Елементи на хост група"
 
+#: jsLoader.php:292
+msgid "Host group is not selected."
+msgstr ""
+
 #: include/views/monitoring.sysmap.edit.php:168
 msgid "Host group label type"
 msgstr "Тип етикет на хост група"
@@ -9638,6 +9659,10 @@ msgstr "Инвентарни данни на хост"
 #: hostinventoriesoverview.php:26 hostinventoriesoverview.php:146
 msgid "Host inventory overview"
 msgstr "Преглед инвентарните данни на хост"
+
+#: jsLoader.php:289
+msgid "Host is not selected."
+msgstr ""
 
 #: include/views/monitoring.sysmap.edit.php:183
 msgid "Host label type"
@@ -12963,6 +12988,10 @@ msgstr ""
 
 #: include/views/monitoring.sysmap.edit.php:243
 msgid "Map element label type"
+msgstr ""
+
+#: jsLoader.php:290
+msgid "Map is not selected."
 msgstr ""
 
 #: sysmap.php:128
@@ -19513,6 +19542,10 @@ msgstr ""
 msgid "String functions"
 msgstr ""
 
+#: widgets/piechart/includes/WidgetForm.php:137
+msgid "Stroke width"
+msgstr ""
+
 #: include/items.inc.php:1545 include/items.inc.php:1549
 #: include/items.inc.php:1553 include/items.inc.php:1557
 msgid "Structured data"
@@ -20887,6 +20920,10 @@ msgstr ""
 #, c-format
 msgid "Trigger in template \"%1$s\" has dependency with trigger in template \"%2$s\"."
 msgstr "В тригер от шаблон \"%1$s\" има зависимост с тригер от шаблон \"%2$s\"."
+
+#: jsLoader.php:291
+msgid "Trigger is not selected."
+msgstr ""
 
 #: include/views/monitoring.sysmap.edit.php:198
 msgid "Trigger label type"
@@ -22942,6 +22979,10 @@ msgstr ""
 msgid "View as"
 msgstr ""
 
+#: jsLoader.php:417
+msgid "View related reports"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1735
 msgid "Virtual space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr ""
@@ -23151,6 +23192,10 @@ msgstr ""
 
 #: jsLoader.php:187
 msgid "Widget is too small for the specified number of columns and rows."
+msgstr ""
+
+#: jsLoader.php:205
+msgid "Widgets"
 msgstr ""
 
 #: graphs.php:39 include/views/configuration.graph.edit.php:100
@@ -23525,6 +23570,10 @@ msgstr ""
 #: include/classes/core/ZBase.php:763 include/func.inc.php:1709
 msgid "You must login to view this page."
 msgstr "Трябва да влезете в системата, за да видите тази страница."
+
+#: jsLoader.php:287
+msgid "You need to have at least one image uploaded to create map element. Images can be uploaded in Administration->General->Images section."
+msgstr ""
 
 #: include/classes/db/DB.php:133
 msgid "Your database is not working properly. Please wait a few minutes and try to repeat this action. If the problem still persists, please contact system administrator. The problem might be caused by long running transaction or row level lock accomplished by your database management system."
@@ -25529,6 +25578,10 @@ msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:953
 msgid "right() - Returns the rightmost count characters"
+msgstr ""
+
+#: widgets/navtree/Widget.php:41
+msgid "root"
 msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:966

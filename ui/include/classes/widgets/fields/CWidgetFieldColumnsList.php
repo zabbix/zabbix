@@ -73,12 +73,13 @@ class CWidgetFieldColumnsList extends CWidgetField {
 		$columns_values = $this->getValue();
 
 		foreach ($columns_values as $column_index => &$value) {
-			if ($value['data'] != self::DATA_ITEM_VALUE
-					|| $value['aggregate_function'] == AGGREGATE_NONE) {
+			if ($value['data'] != self::DATA_ITEM_VALUE || $value['aggregate_function'] == AGGREGATE_NONE) {
 				continue;
 			}
 
-			$time_period_field = (new CWidgetFieldTimePeriod($this->name.'.'.$column_index.'.time_period'))
+			$time_period_field = (new CWidgetFieldTimePeriod($this->name.'.'.$column_index.'.time_period',
+				'/'.($column_index + 1)
+			))
 				->setDefault([
 					CWidgetField::FOREIGN_REFERENCE_KEY => CWidgetField::createTypedReference(
 						CWidgetField::REFERENCE_DASHBOARD, CWidgetsData::DATA_TYPE_TIME_PERIOD
@@ -87,8 +88,7 @@ class CWidgetFieldColumnsList extends CWidgetField {
 				->setInType(CWidgetsData::DATA_TYPE_TIME_PERIOD)
 				->acceptDashboard()
 				->acceptWidget()
-				->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
-				->prefixLabel('/'.($column_index + 1));
+				->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK);
 
 			if (array_key_exists('time_period', $value)) {
 				$time_period_field->setValue($value['time_period']);

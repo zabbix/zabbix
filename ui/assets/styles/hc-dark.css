@@ -2962,6 +2962,10 @@ output {
         pointer-events: none;
         color: #b5b5b5;
         -webkit-text-fill-color: #b5b5b5; }
+  .multiselect [aria-readonly] .subfilter-enabled,
+  .multiselect [aria-readonly] .btn-icon {
+    cursor: default;
+    background-color: #383838; }
   .multiselect div[aria-live] {
     overflow: hidden;
     position: absolute;
@@ -3167,12 +3171,15 @@ output {
       z-index: 1; }
     .radio-list-control input[type="radio"]:focus + label {
       box-shadow: 0 0 0 2px #ffffff; }
-    .radio-list-control input[type="radio"]:checked[disabled] + label {
-      background-color: white !important;
-      transition: none; }
-    .radio-list-control input[type="radio"][disabled] + label {
+    .radio-list-control input[type="radio"][readonly] + label, .radio-list-control input[type="radio"][disabled] + label {
       transition: none;
-      cursor: default; }
+      cursor: default;
+      box-shadow: none; }
+    .radio-list-control input[type="radio"][readonly]:checked + label, .radio-list-control input[type="radio"][disabled]:checked + label {
+      background-color: white; }
+    .radio-list-control input[type="radio"][readonly]:checked + label {
+      color: #ffffff;
+      -webkit-text-fill-color: #ffffff; }
 
 .range-control {
   position: relative;
@@ -3493,9 +3500,26 @@ section {
     text-anchor: end; }
   .svg-gauge .svg-gauge-label-center {
     text-anchor: middle; }
-  .svg-gauge .svg-gauge-value,
-  .svg-gauge .svg-gauge-units {
-    text-anchor: middle; }
+  .svg-gauge .svg-gauge-value-and-units {
+    text-align: center;
+    white-space: nowrap;
+    color: #ffffff; }
+    .svg-gauge .svg-gauge-value-and-units > div {
+      margin: auto;
+      overflow: hidden;
+      text-overflow: ellipsis; }
+      .svg-gauge .svg-gauge-value-and-units > div .svg-gauge-value {
+        overflow: hidden;
+        text-overflow: ellipsis; }
+  .svg-gauge .svg-gauge-value-and-units-horizontal .svg-gauge-value,
+  .svg-gauge .svg-gauge-value-and-units-horizontal .svg-gauge-units {
+    display: inline; }
+  .svg-gauge .svg-gauge-value-and-units-horizontal .svg-gauge-space {
+    display: inline-block; }
+  .svg-gauge .svg-gauge-value-and-units-vertical .svg-gauge-value,
+  .svg-gauge .svg-gauge-value-and-units-vertical .svg-gauge-units {
+    overflow: hidden;
+    text-overflow: ellipsis; }
   .svg-gauge .svg-gauge-no-data {
     text-anchor: middle;
     fill: #cacaca; }
@@ -3571,7 +3595,6 @@ section {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  margin: auto;
   fill: #ffffff; }
 .svg-pie-chart .svg-pie-chart-total-value-no-data {
   text-anchor: middle;
@@ -4386,7 +4409,8 @@ div.dashboard-widget-item .dashboard-grid-widget-body .item-value {
 div.dashboard-widget-item .dashboard-grid-widget-body .item-value-content {
   display: flex;
   align-items: baseline;
-  overflow: hidden; }
+  overflow: hidden;
+  white-space: nowrap; }
 div.dashboard-widget-item .dashboard-grid-widget-body .item-description,
 div.dashboard-widget-item .dashboard-grid-widget-body .item-time,
 div.dashboard-widget-item .dashboard-grid-widget-body .type-text .value {
@@ -4829,6 +4853,15 @@ form.dashboard-widget-piechart {
     padding: 5px 5px 5px 10px; }
   form.dashboard-widget-piechart .single-item-table tbody:not(:empty) + tfoot td {
     padding-top: 0; }
+  form.dashboard-widget-piechart .single-item-table .reference-hint {
+    margin-right: 4px; }
+    form.dashboard-widget-piechart .single-item-table .reference-hint::before {
+      font-size: 16px;
+      color: #f8f8f8; }
+  form.dashboard-widget-piechart .single-item-table .unavailable-widget .reference-hint::before {
+    color: #7d7d7d; }
+  form.dashboard-widget-piechart .single-item-table .unavailable-widget a {
+    color: #7d7d7d; }
   form.dashboard-widget-piechart .no-items-message {
     display: none;
     line-height: 24px;
@@ -4963,6 +4996,15 @@ form.dashboard-widget-svggraph .single-item-table tfoot td {
   padding: 5px 5px 5px 10px; }
 form.dashboard-widget-svggraph .single-item-table tbody:not(:empty) + tfoot td {
   padding-top: 0; }
+form.dashboard-widget-svggraph .single-item-table .reference-hint {
+  margin-right: 4px; }
+  form.dashboard-widget-svggraph .single-item-table .reference-hint::before {
+    font-size: 16px;
+    color: #f8f8f8; }
+form.dashboard-widget-svggraph .single-item-table .unavailable-widget .reference-hint::before {
+  color: #7d7d7d; }
+form.dashboard-widget-svggraph .single-item-table .unavailable-widget a {
+  color: #7d7d7d; }
 form.dashboard-widget-svggraph .overrides-list {
   position: relative;
   margin: -5px 0 -5px 15px; }
@@ -5659,6 +5701,8 @@ select {
     transform: translate(-50%, -50%) rotate(-45deg); }
   .checkbox-radio[type="checkbox"]:checked[disabled] + label span::after {
     border-color: #666666 !important; }
+  .checkbox-radio[type="checkbox"]:checked[readonly] + label span::after {
+    border-color: #ffffff !important; }
   .checkbox-radio[type="radio"] + label span {
     border-radius: 50%; }
   .checkbox-radio[type="radio"]:checked + label span::after {
@@ -5673,6 +5717,8 @@ select {
     border-radius: 50%; }
   .checkbox-radio[type="radio"]:checked[disabled] + label span::after {
     background-color: #666666 !important; }
+  .checkbox-radio[type="radio"]:checked[readonly] + label span::after {
+    background-color: #ffffff !important; }
   .checkbox-radio:focus + label span {
     border-color: #bbbbbb; }
   .checkbox-radio:checked[disabled] + label span {
@@ -5826,20 +5872,20 @@ z-select .list, input[type="text"], input[type="password"], input[type="search"]
 .btn-dashboard-normal {
   box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); }
 
-.z-select[readonly] .focusable,
+.multiselect[aria-readonly], .z-select[readonly] .focusable,
 z-select[readonly] .focusable, input[readonly], textarea[readonly] {
   color: #ffffff;
   -webkit-text-fill-color: #ffffff;
   background-color: #000000;
   border-color: #5a5a5a; }
 
-.multiselect[aria-disabled], .radio-list-control input[type="radio"][disabled] + label, .z-select[disabled] .focusable,
+.multiselect[aria-disabled], .radio-list-control input[type="radio"][readonly] + label, .radio-list-control input[type="radio"][disabled] + label, .z-select[disabled] .focusable,
 z-select[disabled] .focusable, input[disabled], textarea[disabled], select option[disabled], select[disabled], select[readonly], .checkbox-radio[readonly] span, .checkbox-radio[readonly] + label span, .checkbox-radio[disabled] + label span {
   color: #7d7d7d;
   -webkit-text-fill-color: #7d7d7d;
   background-color: #000000;
   border-color: #5a5a5a; }
-  .multiselect[aria-disabled]::placeholder, .radio-list-control input[type="radio"][disabled] + label::placeholder, .z-select[disabled] .focusable::placeholder,
+  .multiselect[aria-disabled]::placeholder, .radio-list-control input[type="radio"][readonly] + label::placeholder, .radio-list-control input[type="radio"][disabled] + label::placeholder, .z-select[disabled] .focusable::placeholder,
   z-select[disabled] .focusable::placeholder, input[disabled]::placeholder, textarea[disabled]::placeholder, select option[disabled]::placeholder, select[disabled]::placeholder, select[readonly]::placeholder, .checkbox-radio[readonly] span::placeholder, .checkbox-radio[readonly] + label span::placeholder, .checkbox-radio[disabled] + label span::placeholder {
     color: #484848;
     -webkit-text-fill-color: #484848;
@@ -6060,7 +6106,6 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
     transform: rotate(45deg); }
 
 .overlay-dialogue {
-  display: table;
   position: absolute;
   z-index: 1000;
   padding: 17px 10px 10px;
@@ -7368,7 +7413,7 @@ svg {
   width: 85px; }
 #itemsTable .table-col-y-axis-side {
   width: 85px; }
-#itemsTable .table-col-colour {
+#itemsTable .table-col-color {
   width: 55px; }
 #itemsTable .table-col-action {
   width: 55px; }

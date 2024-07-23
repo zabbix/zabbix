@@ -27,7 +27,6 @@ zabbix_export:
           name: 'ICMP ping'
           type: SIMPLE
           key: icmpping
-          history: 7d
           valuemap:
             name: 'Service state'
           tags:
@@ -48,7 +47,6 @@ zabbix_export:
           name: 'ICMP loss'
           type: SIMPLE
           key: icmppingloss
-          history: 7d
           value_type: FLOAT
           units: '%'
           tags:
@@ -74,7 +72,6 @@ zabbix_export:
           name: 'ICMP response time'
           type: SIMPLE
           key: icmppingsec
-          history: 7d
           value_type: FLOAT
           units: s
           tags:
@@ -104,7 +101,6 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.232.6.2.6.1.0
           key: 'sensor.temp.status[cpqHeThermalCondition.0]'
-          history: 7d
           trends: '0'
           description: |
             MIB: CPQHLTH-MIB
@@ -127,9 +123,6 @@ zabbix_export:
           name: 'SNMP traps (fallback)'
           type: SNMP_TRAP
           key: snmptrap.fallback
-          delay: '0'
-          history: 7d
-          trends: '0'
           value_type: LOG
           description: 'The item is used to collect all SNMP traps unmatched by other snmptrap items'
           logtimefmt: 'hh:mm:sszyyyy/MM/dd'
@@ -142,8 +135,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.4.0
           key: 'system.contact[sysContact.0]'
           delay: 15m
-          history: 7d
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -162,8 +153,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.1.0
           key: 'system.descr[sysDescr.0]'
           delay: 15m
-          history: 7d
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -182,8 +171,6 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.232.2.2.4.2.0
           key: system.hw.model
-          history: 7d
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: CPQSINFO-MIB
@@ -201,8 +188,6 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.232.2.2.2.1.0
           key: system.hw.serialnumber
-          history: 7d
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: CPQSINFO-MIB
@@ -232,7 +217,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.25.1.1.0
           key: 'system.hw.uptime[hrSystemUptime.0]'
           delay: 30s
-          history: 7d
           trends: '0'
           units: uptime
           description: |
@@ -256,8 +240,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.6.0
           key: 'system.location[sysLocation.0]'
           delay: 15m
-          history: 7d
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -276,8 +258,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.5.0
           key: system.name
           delay: 15m
-          history: 7d
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -309,7 +289,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.3.0
           key: 'system.net.uptime[sysUpTime.0]'
           delay: 30s
-          history: 7d
           trends: '0'
           units: uptime
           description: |
@@ -328,8 +307,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.2.0
           key: 'system.objectid[sysObjectID.0]'
           delay: 15m
-          history: 7d
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -346,7 +323,6 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.232.6.1.3.0
           key: 'system.status[cpqHeMibCondition.0]'
-          history: 7d
           trends: '0'
           description: |
             MIB: CPQHLTH-MIB
@@ -390,7 +366,6 @@ zabbix_export:
           name: 'SNMP agent availability'
           type: INTERNAL
           key: 'zabbix[host,snmp,available]'
-          history: 7d
           description: |
             Availability of SNMP checks on the host. The value of this item corresponds to availability icons in the host list.
             Possible values:
@@ -431,7 +406,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.3.2.2.2.1.6.{#SNMPINDEX}'
               key: 'system.hw.diskarray.cache.battery.status[cpqDaAccelBattery.{#SNMPINDEX}]'
-              history: 7d
               trends: '0'
               description: |
                 MIB: CPQIDA-MIB
@@ -499,7 +473,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.3.2.2.2.1.2.{#SNMPINDEX}'
               key: 'system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}]'
-              history: 7d
               trends: '0'
               description: |
                 MIB: CPQIDA-MIB
@@ -607,7 +580,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.3.2.2.1.1.2.{#SNMPINDEX}'
               key: 'system.hw.diskarray.model[cpqDaCntlrModel.{#SNMPINDEX}]'
-              history: 7d
               trends: '0'
               description: |
                 MIB: CPQIDA-MIB
@@ -630,7 +602,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.3.2.2.1.1.6.{#SNMPINDEX}'
               key: 'system.hw.diskarray.status[cpqDaCntlrCondition.{#SNMPINDEX}]'
-              history: 7d
               trends: '0'
               description: |
                 MIB: CPQIDA-MIB
@@ -692,7 +663,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.6.2.6.7.1.9.{#SNMPINDEX}'
               key: 'sensor.fan.status[cpqHeFltTolFanCondition.{#SNMPINDEX}]'
-              history: 7d
               trends: '0'
               description: |
                 MIB: CPQHLTH-MIB
@@ -754,7 +724,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.3.2.5.1.1.69.{#SNMPINDEX}'
               key: 'system.hw.physicaldisk.media_type[cpqDaPhyDrvMediaType.{#SNMPINDEX}]'
-              history: 7d
               trends: '0'
               description: |
                 MIB: CPQIDA-MIB
@@ -778,8 +747,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.3.2.5.1.1.3.{#SNMPINDEX}'
               key: 'system.hw.physicaldisk.model[cpqDaPhyDrvModel.{#SNMPINDEX}]'
-              history: 7d
-              trends: '0'
               value_type: CHAR
               description: |
                 MIB: CPQIDA-MIB
@@ -801,8 +768,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.3.2.5.1.1.51.{#SNMPINDEX}'
               key: 'system.hw.physicaldisk.serialnumber[cpqDaPhyDrvSerialNum.{#SNMPINDEX}]'
-              history: 7d
-              trends: '0'
               value_type: CHAR
               description: |
                 MIB: CPQIDA-MIB
@@ -835,7 +800,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.3.2.5.1.1.45.{#SNMPINDEX}'
               key: 'system.hw.physicaldisk.size[cpqDaPhyDrvMediaType.{#SNMPINDEX}]'
-              history: 7d
               trends: '0'
               units: B
               description: |
@@ -864,7 +828,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.3.2.5.1.1.57.{#SNMPINDEX}'
               key: 'system.hw.physicaldisk.smart_status[cpqDaPhyDrvSmartStatus.{#SNMPINDEX}]'
-              history: 7d
               trends: '0'
               description: |
                 MIB: CPQIDA-MIB
@@ -903,7 +866,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.3.2.5.1.1.6.{#SNMPINDEX}'
               key: 'system.hw.physicaldisk.status[cpqDaPhyDrvStatus.{#SNMPINDEX}]'
-              history: 7d
               trends: '0'
               description: |
                 MIB: CPQIDA-MIB
@@ -967,7 +929,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.6.2.9.3.1.4.{#SNMPINDEX}'
               key: 'sensor.psu.status[cpqHeFltTolPowerSupplyCondition.{#SNMPINDEX}]'
-              history: 7d
               trends: '0'
               description: |
                 MIB: CPQHLTH-MIB
@@ -1025,7 +986,6 @@ zabbix_export:
             conditions:
               - macro: '{#SENSOR_LOCALE}'
                 value: (4|8|9|12|13)
-                formulaid: A
           description: 'Scanning table of Temperature Sensor Entries: CPQHLTH-MIB::cpqHeTemperatureTable'
           item_prototypes:
             - uuid: ac352f7b00d6478daf601d0f7cb508e4
@@ -1033,7 +993,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.6.2.6.8.1.6.{#SNMPINDEX}'
               key: 'sensor.temp.condition[cpqHeTemperatureCondition.{#SNMPINDEX}]'
-              history: 7d
               description: |
                 MIB: CPQHLTH-MIB
                 The Temperature sensor condition.
@@ -1088,7 +1047,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.6.2.6.8.1.3.{#SNMPINDEX}'
               key: 'sensor.temp.locale[cpqHeTemperatureLocale.{#SNMPINDEX}]'
-              history: 7d
               trends: '0'
               description: |
                 MIB: CPQHLTH-MIB
@@ -1107,7 +1065,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.6.2.6.8.1.4.{#SNMPINDEX}'
               key: 'sensor.temp.value[cpqHeTemperatureCelsius.{#SNMPINDEX}]'
-              history: 7d
               value_type: FLOAT
               units: °C
               description: |
@@ -1134,10 +1091,8 @@ zabbix_export:
             conditions:
               - macro: '{#SENSOR_LOCALE}'
                 value: '11'
-                formulaid: A
               - macro: '{#SNMPINDEX}'
                 value: 0\.1
-                formulaid: B
           description: 'Scanning table of Temperature Sensor Entries: CPQHLTH-MIB::cpqHeTemperatureTable with ambient(11) and 0.1 index filter'
           item_prototypes:
             - uuid: da102e6fc86b49c7bd57c2805ca08675
@@ -1145,7 +1100,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.6.2.6.8.1.6.{#SNMPINDEX}'
               key: 'sensor.temp.condition[cpqHeTemperatureCondition.Ambient.{#SNMPINDEX}]'
-              history: 7d
               description: |
                 MIB: CPQHLTH-MIB
                 The Temperature sensor condition.
@@ -1199,7 +1153,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.6.2.6.8.1.4.{#SNMPINDEX}'
               key: 'sensor.temp.value[cpqHeTemperatureCelsius.Ambient.{#SNMPINDEX}]'
-              history: 7d
               value_type: FLOAT
               units: °C
               description: |
@@ -1226,7 +1179,6 @@ zabbix_export:
             conditions:
               - macro: '{#SENSOR_LOCALE}'
                 value: '6'
-                formulaid: A
           description: 'Scanning table of Temperature Sensor Entries: CPQHLTH-MIB::cpqHeTemperatureTable with cpu(6) filter'
           item_prototypes:
             - uuid: 4cad241ca3bd4382879bebabc4f42201
@@ -1234,7 +1186,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.6.2.6.8.1.6.{#SNMPINDEX}'
               key: 'sensor.temp.condition[cpqHeTemperatureCondition.CPU.{#SNMPINDEX}]'
-              history: 7d
               description: |
                 MIB: CPQHLTH-MIB
                 The Temperature sensor condition.
@@ -1289,7 +1240,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.6.2.6.8.1.4.{#SNMPINDEX}'
               key: 'sensor.temp.value[cpqHeTemperatureCelsius.CPU.{#SNMPINDEX}]'
-              history: 7d
               value_type: FLOAT
               units: °C
               description: |
@@ -1316,7 +1266,6 @@ zabbix_export:
             conditions:
               - macro: '{#SENSOR_LOCALE}'
                 value: '5'
-                formulaid: A
           description: 'Scanning table of Temperature Sensor Entries: CPQHLTH-MIB::cpqHeTemperatureTable with ioBoard(5) filter'
           item_prototypes:
             - uuid: 51fbe5f6d6c1481e818eafa7cbe01295
@@ -1324,7 +1273,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.6.2.6.8.1.6.{#SNMPINDEX}'
               key: 'sensor.temp.condition[cpqHeTemperatureCondition."I/O.{#SNMPINDEX}"]'
-              history: 7d
               description: |
                 MIB: CPQHLTH-MIB
                 The Temperature sensor condition.
@@ -1379,7 +1327,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.6.2.6.8.1.4.{#SNMPINDEX}'
               key: 'sensor.temp.value[cpqHeTemperatureCelsius."I/O.{#SNMPINDEX}"]'
-              history: 7d
               value_type: FLOAT
               units: °C
               description: |
@@ -1406,7 +1353,6 @@ zabbix_export:
             conditions:
               - macro: '{#SENSOR_LOCALE}'
                 value: '7'
-                formulaid: A
           description: 'Scanning table of Temperature Sensor Entries: CPQHLTH-MIB::cpqHeTemperatureTable with memory(7) filter'
           item_prototypes:
             - uuid: 861d683a933b4eb5989b0f5484a9a93d
@@ -1414,7 +1360,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.6.2.6.8.1.6.{#SNMPINDEX}'
               key: 'sensor.temp.condition[cpqHeTemperatureCondition.Memory.{#SNMPINDEX}]'
-              history: 7d
               description: |
                 MIB: CPQHLTH-MIB
                 The Temperature sensor condition.
@@ -1469,7 +1414,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.6.2.6.8.1.4.{#SNMPINDEX}'
               key: 'sensor.temp.value[cpqHeTemperatureCelsius.Memory.{#SNMPINDEX}]'
-              history: 7d
               value_type: FLOAT
               units: °C
               description: |
@@ -1496,7 +1440,6 @@ zabbix_export:
             conditions:
               - macro: '{#SENSOR_LOCALE}'
                 value: '10'
-                formulaid: A
           description: 'Scanning table of Temperature Sensor Entries: CPQHLTH-MIB::cpqHeTemperatureTable with powerSupply(10) filter'
           item_prototypes:
             - uuid: 01eea51183834c6a8ed7daf75abe6c87
@@ -1504,7 +1447,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.6.2.6.8.1.6.{#SNMPINDEX}'
               key: 'sensor.temp.condition[cpqHeTemperatureCondition.PSU.{#SNMPINDEX}]'
-              history: 7d
               description: |
                 MIB: CPQHLTH-MIB
                 The Temperature sensor condition.
@@ -1559,7 +1501,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.6.2.6.8.1.4.{#SNMPINDEX}'
               key: 'sensor.temp.value[cpqHeTemperatureCelsius.PSU.{#SNMPINDEX}]'
-              history: 7d
               value_type: FLOAT
               units: °C
               description: |
@@ -1586,7 +1527,6 @@ zabbix_export:
             conditions:
               - macro: '{#SENSOR_LOCALE}'
                 value: '3'
-                formulaid: A
           description: 'Scanning table of Temperature Sensor Entries: CPQHLTH-MIB::cpqHeTemperatureTable with system(3) filter'
           item_prototypes:
             - uuid: 6adae921be5545c995cf24b2b900818c
@@ -1594,7 +1534,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.6.2.6.8.1.6.{#SNMPINDEX}'
               key: 'sensor.temp.condition[cpqHeTemperatureCondition.System.{#SNMPINDEX}]'
-              history: 7d
               description: |
                 MIB: CPQHLTH-MIB
                 The Temperature sensor condition.
@@ -1648,7 +1587,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.6.2.6.8.1.4.{#SNMPINDEX}'
               key: 'sensor.temp.value[cpqHeTemperatureCelsius.System.{#SNMPINDEX}]'
-              history: 7d
               value_type: FLOAT
               units: °C
               description: |
@@ -1678,7 +1616,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.3.2.3.1.1.3.{#SNMPINDEX}'
               key: 'system.hw.virtualdisk.layout[cpqDaLogDrvFaultTol.{#SNMPINDEX}]'
-              history: 7d
               description: |
                 Logical Drive Fault Tolerance.
                 This shows the fault tolerance mode of the logical drive.
@@ -1698,7 +1635,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.3.2.3.1.1.9.{#SNMPINDEX}'
               key: 'system.hw.virtualdisk.size[cpqDaLogDrvSize.{#SNMPINDEX}]'
-              history: 7d
               trends: '0'
               units: B
               description: |
@@ -1725,7 +1661,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.3.2.3.1.1.4.{#SNMPINDEX}'
               key: 'system.hw.virtualdisk.status[cpqDaLogDrvStatus.{#SNMPINDEX}]'
-              history: 7d
               description: 'Logical Drive Status.'
               valuemap:
                 name: 'CPQIDA-MIB::cpqDaLogDrvStatus'

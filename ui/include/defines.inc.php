@@ -13,8 +13,8 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-define('ZABBIX_VERSION',		'7.0.1rc1');
-define('ZABBIX_API_VERSION',	'7.0.1');
+define('ZABBIX_VERSION',		'7.0.2rc1');
+define('ZABBIX_API_VERSION',	'7.0.2');
 define('ZABBIX_EXPORT_VERSION',	'7.0');
 
 define('ZABBIX_DB_VERSION',		7000000);
@@ -1525,6 +1525,8 @@ define('XML_STRING',		0x01);
 define('XML_ARRAY',			0x02);
 define('XML_INDEXED_ARRAY',	0x04);
 define('XML_REQUIRED',		0x08);
+define('XML_MULTIPLE',		0x10);
+define('XML_IGNORE_TAG',	0x20);
 
 // API validation
 // multiple types

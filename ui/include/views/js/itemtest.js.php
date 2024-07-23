@@ -251,20 +251,14 @@
 		}
 
 		// Common properties.
-		properties = jQuery.extend(properties, {
+		return jQuery.extend(properties, {
 			delay: form_data['delay'] || '',
 			value_type: form_data['value_type'] || <?= CControllerPopupItemTest::ZBX_DEFAULT_VALUE_TYPE ?>,
 			item_type: form_data['type'],
 			itemid: <?= array_key_exists('itemid', $data) ? (int) $data['itemid'] : 0 ?>,
 			valuemapid: form_data['valuemapid'],
-			interfaceid: form_data['interfaceid'] || form_data['selectedInterfaceId']
+			interfaceid: form_data['interfaceid'] || 0
 		});
-
-		if (properties.interfaceid == undefined) {
-			properties.interfaceid = 0;
-		}
-
-		return properties;
 	}
 
 	/**

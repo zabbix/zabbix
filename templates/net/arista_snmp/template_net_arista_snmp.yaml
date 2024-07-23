@@ -30,7 +30,6 @@ zabbix_export:
           name: 'ICMP ping'
           type: SIMPLE
           key: icmpping
-          history: 7d
           valuemap:
             name: 'Service state'
           tags:
@@ -51,7 +50,6 @@ zabbix_export:
           name: 'ICMP loss'
           type: SIMPLE
           key: icmppingloss
-          history: 7d
           value_type: FLOAT
           units: '%'
           tags:
@@ -77,7 +75,6 @@ zabbix_export:
           name: 'ICMP response time'
           type: SIMPLE
           key: icmppingsec
-          history: 7d
           value_type: FLOAT
           units: s
           tags:
@@ -109,7 +106,6 @@ zabbix_export:
           key: sensors.get
           delay: 1h
           history: '0'
-          trends: '0'
           value_type: TEXT
           description: 'Gets sensors with type, description, and thresholds.'
           preprocessing:
@@ -136,9 +132,6 @@ zabbix_export:
           name: 'SNMP traps (fallback)'
           type: SNMP_TRAP
           key: snmptrap.fallback
-          delay: '0'
-          history: 7d
-          trends: '0'
           value_type: LOG
           description: 'The item is used to collect all SNMP traps unmatched by other snmptrap items'
           logtimefmt: 'hh:mm:sszyyyy/MM/dd'
@@ -151,8 +144,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.4.0
           key: 'system.contact[sysContact.0]'
           delay: 15m
-          history: 7d
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -170,7 +161,6 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#CPU.UTIL},1.3.6.1.2.1.25.3.3.1.2]'
           key: system.cpu.util
-          history: 7d
           value_type: FLOAT
           units: '%'
           description: |
@@ -201,8 +191,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.1.0
           key: 'system.descr[sysDescr.0]'
           delay: 15m
-          history: 7d
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -222,7 +210,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.25.1.1.0
           key: 'system.hw.uptime[hrSystemUptime.0]'
           delay: 30s
-          history: 7d
           trends: '0'
           units: uptime
           description: |
@@ -246,8 +233,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.6.0
           key: 'system.location[sysLocation.0]'
           delay: 15m
-          history: 7d
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -266,8 +251,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.5.0
           key: system.name
           delay: 15m
-          history: 7d
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -299,7 +282,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.3.0
           key: 'system.net.uptime[sysUpTime.0]'
           delay: 30s
-          history: 7d
           trends: '0'
           units: uptime
           description: |
@@ -318,8 +300,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.2.0
           key: 'system.objectid[sysObjectID.0]'
           delay: 15m
-          history: 7d
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -335,7 +315,6 @@ zabbix_export:
           name: 'SNMP agent availability'
           type: INTERNAL
           key: 'zabbix[host,snmp,available]'
-          history: 7d
           description: |
             Availability of SNMP checks on the host. The value of this item corresponds to availability icons in the host list.
             Possible values:
@@ -373,7 +352,6 @@ zabbix_export:
             conditions:
               - macro: '{#ENT_CLASS}'
                 value: '3'
-                formulaid: A
           item_prototypes:
             - uuid: 161777c6b77c4c91a11e90dda46d4ec5
               name: '{#ENT_NAME}: Hardware model name'
@@ -381,8 +359,6 @@ zabbix_export:
               snmp_oid: '1.3.6.1.2.1.47.1.1.1.1.13.{#SNMPINDEX}'
               key: 'system.hw.model[entPhysicalModelName.{#SNMPINDEX}]'
               delay: 1h
-              history: 7d
-              trends: '0'
               value_type: CHAR
               description: 'MIB: ENTITY-MIB'
               preprocessing:
@@ -398,8 +374,6 @@ zabbix_export:
               snmp_oid: '1.3.6.1.2.1.47.1.1.1.1.11.{#SNMPINDEX}'
               key: 'system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}]'
               delay: 1h
-              history: 7d
-              trends: '0'
               value_type: CHAR
               description: 'MIB: ENTITY-MIB'
               preprocessing:
@@ -424,13 +398,11 @@ zabbix_export:
           name: 'Fan discovery'
           type: DEPENDENT
           key: fan.discovery
-          delay: '0'
           filter:
             evaltype: OR
             conditions:
               - macro: '{#SENSOR_TYPE}'
                 value: '10'
-                formulaid: A
           description: 'ENTITY-SENSORS-MIB::EntitySensorDataType discovery with rpm filter'
           item_prototypes:
             - uuid: 7d86974a2de14ce3a254172b6bf0761f
@@ -438,7 +410,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.2.1.99.1.1.1.4.{#SNMPINDEX}'
               key: 'sensor.fan.speed[entPhySensorValue.{#SNMPINDEX}]'
-              history: 7d
               units: rpm
               description: |
                 MIB: ENTITY-SENSORS-MIB
@@ -511,7 +482,6 @@ zabbix_export:
               snmp_oid: '1.3.6.1.2.1.99.1.1.1.5.{#SNMPINDEX}'
               key: 'sensor.fan.status[entPhySensorOperStatus.{#SNMPINDEX}]'
               delay: 3m
-              history: 7d
               trends: '0'
               description: |
                 MIB: ENTITY-SENSORS-MIB
@@ -542,7 +512,6 @@ zabbix_export:
                 conditions:
                   - macro: '{#THRESHOLD_LO_WARN}'
                     value: ^$
-                    formulaid: A
               operations:
                 - operationobject: TRIGGER_PROTOTYPE
                   operator: REGEXP
@@ -554,7 +523,6 @@ zabbix_export:
                 conditions:
                   - macro: '{#THRESHOLD_LO_CRIT}'
                     value: ^$
-                    formulaid: A
               operations:
                 - operationobject: TRIGGER_PROTOTYPE
                   operator: REGEXP
@@ -566,7 +534,6 @@ zabbix_export:
                 conditions:
                   - macro: '{#THRESHOLD_HI_WARN}'
                     value: ^$
-                    formulaid: A
               operations:
                 - operationobject: TRIGGER_PROTOTYPE
                   operator: REGEXP
@@ -578,7 +545,6 @@ zabbix_export:
                 conditions:
                   - macro: '{#THRESHOLD_HI_CRIT}'
                     value: ^$
-                    formulaid: A
               operations:
                 - operationobject: TRIGGER_PROTOTYPE
                   operator: REGEXP
@@ -595,46 +561,34 @@ zabbix_export:
             conditions:
               - macro: '{#IFADMINSTATUS}'
                 value: '{$NET.IF.IFADMINSTATUS.MATCHES}'
-                formulaid: A
               - macro: '{#IFADMINSTATUS}'
                 value: '{$NET.IF.IFADMINSTATUS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
               - macro: '{#IFALIAS}'
                 value: '{$NET.IF.IFALIAS.MATCHES}'
-                formulaid: C
               - macro: '{#IFALIAS}'
                 value: '{$NET.IF.IFALIAS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: D
               - macro: '{#IFDESCR}'
                 value: '{$NET.IF.IFDESCR.MATCHES}'
-                formulaid: E
               - macro: '{#IFDESCR}'
                 value: '{$NET.IF.IFDESCR.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: F
               - macro: '{#IFNAME}'
                 value: '{$NET.IF.IFNAME.MATCHES}'
-                formulaid: G
               - macro: '{#IFNAME}'
                 value: '{$NET.IF.IFNAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: H
               - macro: '{#IFOPERSTATUS}'
                 value: '{$NET.IF.IFOPERSTATUS.MATCHES}'
-                formulaid: I
               - macro: '{#IFOPERSTATUS}'
                 value: '{$NET.IF.IFOPERSTATUS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: J
               - macro: '{#IFTYPE}'
                 value: '{$NET.IF.IFTYPE.MATCHES}'
-                formulaid: K
               - macro: '{#IFTYPE}'
                 value: '{$NET.IF.IFTYPE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: L
           description: 'Discovering interfaces from IF-MIB.'
           item_prototypes:
             - uuid: 5be3410cbb6e4c439198aa8f532c7d4f
@@ -643,7 +597,6 @@ zabbix_export:
               snmp_oid: '1.3.6.1.2.1.2.2.1.13.{#SNMPINDEX}'
               key: 'net.if.in.discards[ifInDiscards.{#SNMPINDEX}]'
               delay: 3m
-              history: 7d
               description: |
                 MIB: IF-MIB
                 The number of inbound packets which were chosen to be discarded
@@ -653,8 +606,6 @@ zabbix_export:
                 and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               tags:
                 - tag: component
                   value: network
@@ -668,14 +619,11 @@ zabbix_export:
               snmp_oid: '1.3.6.1.2.1.2.2.1.14.{#SNMPINDEX}'
               key: 'net.if.in.errors[ifInErrors.{#SNMPINDEX}]'
               delay: 3m
-              history: 7d
               description: |
                 MIB: IF-MIB
                 For packet-oriented interfaces, the number of inbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.  For character-oriented or fixed-length interfaces, the number of inbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               tags:
                 - tag: component
                   value: network
@@ -689,15 +637,12 @@ zabbix_export:
               snmp_oid: '1.3.6.1.2.1.31.1.1.1.6.{#SNMPINDEX}'
               key: 'net.if.in[ifHCInOctets.{#SNMPINDEX}]'
               delay: 3m
-              history: 7d
               units: bps
               description: |
                 MIB: IF-MIB
                 The total number of octets received on the interface, including framing characters. This object is a 64-bit version of ifInOctets. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
                 - type: MULTIPLIER
                   parameters:
                     - '8'
@@ -714,7 +659,6 @@ zabbix_export:
               snmp_oid: '1.3.6.1.2.1.2.2.1.19.{#SNMPINDEX}'
               key: 'net.if.out.discards[ifOutDiscards.{#SNMPINDEX}]'
               delay: 3m
-              history: 7d
               description: |
                 MIB: IF-MIB
                 The number of outbound packets which were chosen to be discarded
@@ -724,8 +668,6 @@ zabbix_export:
                 and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               tags:
                 - tag: component
                   value: network
@@ -739,14 +681,11 @@ zabbix_export:
               snmp_oid: '1.3.6.1.2.1.2.2.1.20.{#SNMPINDEX}'
               key: 'net.if.out.errors[ifOutErrors.{#SNMPINDEX}]'
               delay: 3m
-              history: 7d
               description: |
                 MIB: IF-MIB
                 For packet-oriented interfaces, the number of outbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.  For character-oriented or fixed-length interfaces, the number of outbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               tags:
                 - tag: component
                   value: network
@@ -760,15 +699,12 @@ zabbix_export:
               snmp_oid: '1.3.6.1.2.1.31.1.1.1.10.{#SNMPINDEX}'
               key: 'net.if.out[ifHCOutOctets.{#SNMPINDEX}]'
               delay: 3m
-              history: 7d
               units: bps
               description: |
                 MIB: IF-MIB
                 The total number of octets transmitted out of the interface, including framing characters. This object is a 64-bit version of ifOutOctets.Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
                 - type: MULTIPLIER
                   parameters:
                     - '8'
@@ -785,7 +721,6 @@ zabbix_export:
               snmp_oid: '1.3.6.1.2.1.31.1.1.1.15.{#SNMPINDEX}'
               key: 'net.if.speed[ifHighSpeed.{#SNMPINDEX}]'
               delay: 5m
-              history: 7d
               trends: '0'
               units: bps
               description: |
@@ -810,7 +745,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.2.1.2.2.1.8.{#SNMPINDEX}'
               key: 'net.if.status[ifOperStatus.{#SNMPINDEX}]'
-              history: 7d
               trends: '0'
               description: |
                 MIB: IF-MIB
@@ -855,7 +789,6 @@ zabbix_export:
               snmp_oid: '1.3.6.1.2.1.2.2.1.3.{#SNMPINDEX}'
               key: 'net.if.type[ifType.{#SNMPINDEX}]'
               delay: 1h
-              history: 7d
               trends: '0'
               description: |
                 MIB: IF-MIB
@@ -1000,10 +933,8 @@ zabbix_export:
             conditions:
               - macro: '{#IFOPERSTATUS}'
                 value: '1'
-                formulaid: A
               - macro: '{#SNMPVALUE}'
                 value: (2|3)
-                formulaid: B
           description: 'Discovering interfaces from IF-MIB and EtherLike-MIB. Interfaces with up(1) Operational Status are discovered.'
           item_prototypes:
             - uuid: 065e407dcf1248d2827d0b199b271921
@@ -1011,7 +942,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.2.1.10.7.2.1.19.{#SNMPINDEX}'
               key: 'net.if.duplex[dot3StatsDuplexStatus.{#SNMPINDEX}]'
-              history: 7d
               description: |
                 MIB: EtherLike-MIB
                 The current mode of operation of the MAC
@@ -1084,7 +1014,6 @@ zabbix_export:
             conditions:
               - macro: '{#ENT_CLASS}'
                 value: '6'
-                formulaid: A
           item_prototypes:
             - uuid: 3ec518948c0d4472b55adc761ef7855d
               name: '{#ENT_NAME}: Power supply status'
@@ -1092,7 +1021,6 @@ zabbix_export:
               snmp_oid: '1.3.6.1.2.1.131.1.1.1.3.{#SNMPINDEX}'
               key: 'sensor.psu.status[entStateOper.{#SNMPINDEX}]'
               delay: 3m
-              history: 7d
               trends: '0'
               description: 'MIB: ENTITY-STATE-MIB'
               valuemap:
@@ -1116,16 +1044,13 @@ zabbix_export:
           name: 'Temperature discovery'
           type: DEPENDENT
           key: temp.discovery
-          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#SENSOR_PRECISION}'
                 value: '1'
-                formulaid: A
               - macro: '{#SENSOR_TYPE}'
                 value: '8'
-                formulaid: B
           description: 'ENTITY-SENSORS-MIB::EntitySensorDataType discovery with temperature filter'
           item_prototypes:
             - uuid: 2851148fc01c4ba5afb5ab6a3deba5ff
@@ -1134,7 +1059,6 @@ zabbix_export:
               snmp_oid: '1.3.6.1.2.1.99.1.1.1.5.{#SNMPINDEX}'
               key: 'sensor.temp.status[entPhySensorOperStatus.{#SNMPINDEX}]'
               delay: 3m
-              history: 7d
               trends: '0'
               description: |
                 MIB: ENTITY-SENSORS-MIB
@@ -1150,7 +1074,6 @@ zabbix_export:
               snmp_oid: '1.3.6.1.2.1.99.1.1.1.4.{#SNMPINDEX}'
               key: 'sensor.temp.value[entPhySensorValue.{#SNMPINDEX}]'
               delay: 3m
-              history: 7d
               value_type: FLOAT
               units: °C
               description: |
@@ -1221,7 +1144,6 @@ zabbix_export:
                 conditions:
                   - macro: '{#THRESHOLD_LO_WARN}'
                     value: ^$
-                    formulaid: A
               operations:
                 - operationobject: TRIGGER_PROTOTYPE
                   operator: REGEXP
@@ -1233,7 +1155,6 @@ zabbix_export:
                 conditions:
                   - macro: '{#THRESHOLD_LO_CRIT}'
                     value: ^$
-                    formulaid: A
               operations:
                 - operationobject: TRIGGER_PROTOTYPE
                   operator: REGEXP
@@ -1245,7 +1166,6 @@ zabbix_export:
                 conditions:
                   - macro: '{#THRESHOLD_HI_WARN}'
                     value: ^$
-                    formulaid: A
               operations:
                 - operationobject: TRIGGER_PROTOTYPE
                   operator: REGEXP
@@ -1257,7 +1177,6 @@ zabbix_export:
                 conditions:
                   - macro: '{#THRESHOLD_HI_CRIT}'
                     value: ^$
-                    formulaid: A
               operations:
                 - operationobject: TRIGGER_PROTOTYPE
                   operator: REGEXP
@@ -1274,25 +1193,20 @@ zabbix_export:
             conditions:
               - macro: '{#FSNAME}'
                 value: '{$VFS.FS.FSNAME.MATCHES}'
-                formulaid: A
               - macro: '{#FSNAME}'
                 value: '{$VFS.FS.FSNAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
               - macro: '{#FSTYPE}'
                 value: '{$VFS.FS.FSTYPE.MATCHES}'
-                formulaid: C
               - macro: '{#FSTYPE}'
                 value: '{$VFS.FS.FSTYPE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: D
           description: 'HOST-RESOURCES-MIB::hrStorage discovery with storage filter.'
           item_prototypes:
             - uuid: 676989796c6847ecb76732acce13126a
               name: '{#FSNAME}: Space utilization'
               type: CALCULATED
               key: 'vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}]'
-              history: 7d
               value_type: FLOAT
               units: '%'
               params: '(last(//vfs.fs.used[hrStorageUsed.{#SNMPINDEX}])/last(//vfs.fs.total[hrStorageSize.{#SNMPINDEX}]))*100'
@@ -1307,7 +1221,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.2.1.25.2.3.1.5.{#SNMPINDEX}'
               key: 'vfs.fs.total[hrStorageSize.{#SNMPINDEX}]'
-              history: 7d
               units: B
               description: |
                 MIB: HOST-RESOURCES-MIB
@@ -1328,7 +1241,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.2.1.25.2.3.1.6.{#SNMPINDEX}'
               key: 'vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]'
-              history: 7d
               units: B
               description: |
                 MIB: HOST-RESOURCES-MIB
@@ -1419,18 +1331,14 @@ zabbix_export:
             conditions:
               - macro: '{#MEMNAME}'
                 value: '{$MEMORY.NAME.MATCHES}'
-                formulaid: A
               - macro: '{#MEMNAME}'
                 value: '{$MEMORY.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
               - macro: '{#MEMTYPE}'
                 value: '{$MEMORY.TYPE.MATCHES}'
-                formulaid: C
               - macro: '{#MEMTYPE}'
                 value: '{$MEMORY.TYPE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: D
           description: 'HOST-RESOURCES-MIB::hrStorage discovery with memory filter'
           item_prototypes:
             - uuid: 321107495a2d4f4cb2b9aea7bd62a238
@@ -1438,7 +1346,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.2.1.25.2.3.1.5.{#SNMPINDEX}'
               key: 'vm.memory.total[hrStorageSize.{#SNMPINDEX}]'
-              history: 7d
               units: B
               description: |
                 MIB: HOST-RESOURCES-MIB
@@ -1457,7 +1364,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.2.1.25.2.3.1.6.{#SNMPINDEX}'
               key: 'vm.memory.used[hrStorageUsed.{#SNMPINDEX}]'
-              history: 7d
               units: B
               description: |
                 MIB: HOST-RESOURCES-MIB
@@ -1473,7 +1379,6 @@ zabbix_export:
               name: '{#MEMNAME}: Memory utilization'
               type: CALCULATED
               key: 'vm.memory.util[memoryUsedPercentage.{#SNMPINDEX}]'
-              history: 7d
               value_type: FLOAT
               units: '%'
               params: 'last(//vm.memory.used[hrStorageUsed.{#SNMPINDEX}])/last(//vm.memory.total[hrStorageSize.{#SNMPINDEX}])*100'
@@ -1508,13 +1413,11 @@ zabbix_export:
           name: 'Voltage discovery'
           type: DEPENDENT
           key: voltage.discovery
-          delay: '0'
           filter:
             evaltype: OR
             conditions:
               - macro: '{#SENSOR_TYPE}'
                 value: 3|4
-                formulaid: A
           description: 'ENTITY-SENSORS-MIB::EntitySensorDataType discovery with volts filter'
           item_prototypes:
             - uuid: 7f66af7d12864f2cbaa8a106979ec427
@@ -1522,7 +1425,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.2.1.99.1.1.1.4.{#SNMPINDEX}'
               key: 'sensor.voltage.value[entPhySensorValue.{#SNMPINDEX}]'
-              history: 7d
               value_type: FLOAT
               units: V
               description: |
@@ -1589,7 +1491,6 @@ zabbix_export:
                 conditions:
                   - macro: '{#THRESHOLD_LO_WARN}'
                     value: ^$
-                    formulaid: A
               operations:
                 - operationobject: TRIGGER_PROTOTYPE
                   operator: REGEXP
@@ -1601,7 +1502,6 @@ zabbix_export:
                 conditions:
                   - macro: '{#THRESHOLD_LO_CRIT}'
                     value: ^$
-                    formulaid: A
               operations:
                 - operationobject: TRIGGER_PROTOTYPE
                   operator: REGEXP
@@ -1613,7 +1513,6 @@ zabbix_export:
                 conditions:
                   - macro: '{#THRESHOLD_HI_WARN}'
                     value: ^$
-                    formulaid: A
               operations:
                 - operationobject: TRIGGER_PROTOTYPE
                   operator: REGEXP
@@ -1625,7 +1524,6 @@ zabbix_export:
                 conditions:
                   - macro: '{#THRESHOLD_HI_CRIT}'
                     value: ^$
-                    formulaid: A
               operations:
                 - operationobject: TRIGGER_PROTOTYPE
                   operator: REGEXP

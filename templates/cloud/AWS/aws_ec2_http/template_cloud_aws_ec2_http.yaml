@@ -24,9 +24,6 @@ zabbix_export:
           name: 'Get alarms check'
           type: DEPENDENT
           key: aws.ec2.alarms.check
-          delay: '0'
-          history: 7d
-          trends: '0'
           value_type: CHAR
           description: 'Check result of the alarm data has been got correctly.'
           preprocessing:
@@ -54,8 +51,6 @@ zabbix_export:
           name: 'Credit CPU: Balance'
           type: DEPENDENT
           key: aws.ec2.cpu.credit_balance
-          delay: '0'
-          history: 7d
           value_type: FLOAT
           description: |
             The number of earned CPU credits that an instance has accrued since it was launched or started. For T2 Standard, the CPUCreditBalance also includes the number of launch credits that have been accrued.
@@ -89,8 +84,6 @@ zabbix_export:
           name: 'Credit CPU: Usage'
           type: DEPENDENT
           key: aws.ec2.cpu.credit_usage
-          delay: '0'
-          history: 7d
           value_type: FLOAT
           description: |
             The number of CPU credits spent by the instance for CPU utilization.
@@ -111,8 +104,6 @@ zabbix_export:
           name: 'Credit CPU: Surplus balance'
           type: DEPENDENT
           key: aws.ec2.cpu.surplus_credit_balance
-          delay: '0'
-          history: 7d
           value_type: FLOAT
           description: |
             The number of surplus credits that have been spent by an unlimited instance when its CPUCreditBalance value is zero.
@@ -133,8 +124,6 @@ zabbix_export:
           name: 'Credit CPU: Surplus charged'
           type: DEPENDENT
           key: aws.ec2.cpu.surplus_credit_charged
-          delay: '0'
-          history: 7d
           value_type: FLOAT
           description: |
             The number of spent surplus credits that are not paid down by earned CPU credits, and which thus incur an additional charge.
@@ -170,8 +159,6 @@ zabbix_export:
           name: 'CPU: Utilization'
           type: DEPENDENT
           key: aws.ec2.cpu_utilization
-          delay: '0'
-          history: 7d
           value_type: FLOAT
           units: '%'
           description: |
@@ -204,8 +191,6 @@ zabbix_export:
           name: 'Disk: Read bytes, rate'
           type: DEPENDENT
           key: aws.ec2.disk.read_bytes.rate
-          delay: '0'
-          history: 7d
           value_type: FLOAT
           units: Bps
           description: |
@@ -230,8 +215,6 @@ zabbix_export:
           name: 'Disk: Read, rate'
           type: DEPENDENT
           key: aws.ec2.disk.read_ops.rate
-          delay: '0'
-          history: 7d
           value_type: FLOAT
           units: Ops
           description: |
@@ -254,8 +237,6 @@ zabbix_export:
           name: 'Disk: Write bytes, rate'
           type: DEPENDENT
           key: aws.ec2.disk_write_bytes.rate
-          delay: '0'
-          history: 7d
           value_type: FLOAT
           units: Bps
           description: |
@@ -280,8 +261,6 @@ zabbix_export:
           name: 'Disk: Write ops, rate'
           type: DEPENDENT
           key: aws.ec2.disk_write_ops.rate
-          delay: '0'
-          history: 7d
           value_type: FLOAT
           units: Ops
           description: |
@@ -304,8 +283,6 @@ zabbix_export:
           name: 'EBS: Byte balance'
           type: DEPENDENT
           key: aws.ec2.ebs.byte_balance
-          delay: '0'
-          history: 7d
           value_type: FLOAT
           units: '%'
           description: 'Percentage of throughput credits remaining in the burst bucket for Nitro-based instances.'
@@ -333,8 +310,6 @@ zabbix_export:
           name: 'EBS: IO balance'
           type: DEPENDENT
           key: aws.ec2.ebs.io_balance
-          delay: '0'
-          history: 7d
           value_type: FLOAT
           units: '%'
           description: 'Percentage of I/O credits remaining in the burst bucket for Nitro-based instances.'
@@ -362,8 +337,6 @@ zabbix_export:
           name: 'EBS: Read bytes, rate'
           type: DEPENDENT
           key: aws.ec2.ebs.read_bytes.rate
-          delay: '0'
-          history: 7d
           value_type: FLOAT
           units: Bps
           description: 'Bytes read from all EBS volumes attached to the instance for Nitro-based instances.'
@@ -384,8 +357,6 @@ zabbix_export:
           name: 'EBS: Read, rate'
           type: DEPENDENT
           key: aws.ec2.ebs.read_ops.rate
-          delay: '0'
-          history: 7d
           value_type: FLOAT
           units: Ops
           description: 'Completed read operations from all Amazon EBS volumes attached to the instance for Nitro-based instances.'
@@ -406,8 +377,6 @@ zabbix_export:
           name: 'EBS: Write bytes, rate'
           type: DEPENDENT
           key: aws.ec2.ebs.write_bytes.rate
-          delay: '0'
-          history: 7d
           value_type: FLOAT
           units: Bps
           description: 'Bytes written to all EBS volumes attached to the instance for Nitro-based instances.'
@@ -428,8 +397,6 @@ zabbix_export:
           name: 'EBS: Write, rate'
           type: DEPENDENT
           key: aws.ec2.ebs.write_ops.rate
-          delay: '0'
-          history: 7d
           value_type: FLOAT
           description: 'Completed write operations to all EBS volumes attached to the instance in a specified period of time.'
           preprocessing:
@@ -451,7 +418,6 @@ zabbix_export:
           key: aws.ec2.get_alarms
           delay: 0s;m/1
           history: '0'
-          trends: '0'
           value_type: TEXT
           params: |
             var AWS = {
@@ -732,7 +698,6 @@ zabbix_export:
           key: aws.ec2.get_metrics
           delay: 0s;m/5
           history: '0'
-          trends: '0'
           value_type: TEXT
           params: |
             var AWS = {
@@ -1041,7 +1006,6 @@ zabbix_export:
           key: aws.ec2.get_volumes
           delay: 5m
           history: '0'
-          trends: '0'
           value_type: TEXT
           params: |
             var AWS = {
@@ -1269,8 +1233,6 @@ zabbix_export:
           name: 'Metadata: No token'
           type: DEPENDENT
           key: aws.ec2.metadata.no_token
-          delay: '0'
-          history: 7d
           value_type: FLOAT
           description: |
             The number of times the instance metadata service was successfully accessed using a method that does not use a token.
@@ -1290,9 +1252,6 @@ zabbix_export:
           name: 'Get metrics check'
           type: DEPENDENT
           key: aws.ec2.metrics.check
-          delay: '0'
-          history: 7d
-          trends: '0'
           value_type: CHAR
           description: 'Check result of the instance metric data has been got correctly.'
           preprocessing:
@@ -1320,8 +1279,6 @@ zabbix_export:
           name: 'Network: Bytes in, rate'
           type: DEPENDENT
           key: aws.ec2.network_in.rate
-          delay: '0'
-          history: 7d
           value_type: FLOAT
           units: Bps
           description: |
@@ -1344,8 +1301,6 @@ zabbix_export:
           name: 'Network: Bytes out, rate'
           type: DEPENDENT
           key: aws.ec2.network_out.rate
-          delay: '0'
-          history: 7d
           value_type: FLOAT
           units: Bps
           description: |
@@ -1367,8 +1322,6 @@ zabbix_export:
           name: 'Network: Packets in, rate'
           type: DEPENDENT
           key: aws.ec2.packets_in.rate
-          delay: '0'
-          history: 7d
           value_type: FLOAT
           description: |
             The number of packets received on all network interfaces by the instance.
@@ -1391,8 +1344,6 @@ zabbix_export:
           name: 'Network: Packets out, rate'
           type: DEPENDENT
           key: aws.ec2.packets_out.rate
-          delay: '0'
-          history: 7d
           value_type: FLOAT
           description: |
             The number of packets sent out on all network interfaces by the instance.
@@ -1415,8 +1366,6 @@ zabbix_export:
           name: 'Status: Check failed'
           type: DEPENDENT
           key: aws.ec2.status_check_failed
-          delay: '0'
-          history: 7d
           description: |
             Reports whether the instance has passed both the instance status check and the system status check in the last minute.
             This metric can be either 0 (passed) or 1 (failed).
@@ -1436,8 +1385,6 @@ zabbix_export:
           name: 'Status: Check failed, instance'
           type: DEPENDENT
           key: aws.ec2.status_check_failed_instance
-          delay: '0'
-          history: 7d
           description: |
             Reports whether the instance has passed the instance status check in the last minute.
             This metric can be either 0 (passed) or 1 (failed).
@@ -1474,8 +1421,6 @@ zabbix_export:
           name: 'Status: Check failed, system'
           type: DEPENDENT
           key: aws.ec2.status_check_failed_system
-          delay: '0'
-          history: 7d
           description: |
             Reports whether the instance has passed the system status check in the last minute.
             This metric can be either 0 (passed) or 1 (failed).
@@ -1511,9 +1456,6 @@ zabbix_export:
           name: 'Get volumes info check'
           type: DEPENDENT
           key: aws.ec2.volumes.check
-          delay: '0'
-          history: 7d
-          trends: '0'
           value_type: CHAR
           description: 'Check result of the volume information has been got correctly.'
           preprocessing:
@@ -1542,33 +1484,26 @@ zabbix_export:
           name: 'Instance Alarms discovery'
           type: DEPENDENT
           key: aws.ec2.alarms.discovery
-          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#ALARM_NAME}'
                 value: '{$AWS.EC2.LLD.FILTER.ALARM_NAME.MATCHES}'
-                formulaid: A
               - macro: '{#ALARM_NAME}'
                 value: '{$AWS.EC2.LLD.FILTER.ALARM_NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
               - macro: '{#ALARM_SERVICE_NAMESPACE}'
                 value: '{$AWS.EC2.LLD.FILTER.ALARM_SERVICE_NAMESPACE.MATCHES}'
-                formulaid: C
               - macro: '{#ALARM_SERVICE_NAMESPACE}'
                 value: '{$AWS.EC2.LLD.FILTER.ALARM_SERVICE_NAMESPACE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: D
           description: 'Discovery instance and attached EBS volumes alarms.'
           item_prototypes:
             - uuid: 6294e05dc170431bb3af2caf1ccf6d40
               name: '[{#ALARM_NAME}]: Get metrics'
               type: DEPENDENT
               key: 'aws.ec2.alarm.get_metrics["{#ALARM_NAME}"]'
-              delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
               description: 'Get alarm metrics about the state and its reason.'
               preprocessing:
@@ -1585,8 +1520,6 @@ zabbix_export:
               name: '[{#ALARM_NAME}]: State'
               type: DEPENDENT
               key: 'aws.ec2.alarm.state["{#ALARM_NAME}"]'
-              delay: '0'
-              history: 7d
               description: |
                 The state value for the alarm. Possible values: 0 (OK), 1 (INSUFFICIENT_DATA), 2 (ALARM).
                 Alarm description:
@@ -1622,9 +1555,6 @@ zabbix_export:
               name: '[{#ALARM_NAME}]: State reason'
               type: DEPENDENT
               key: 'aws.ec2.alarm.state_reason["{#ALARM_NAME}"]'
-              delay: '0'
-              history: 7d
-              trends: '0'
               value_type: TEXT
               description: |
                 An explanation for the alarm state, in text format.
@@ -1682,25 +1612,20 @@ zabbix_export:
           name: 'Instance Volumes discovery'
           type: DEPENDENT
           key: aws.ec2.volumes.discovery
-          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#VOLUME_TYPE}'
                 value: '{$AWS.EC2.LLD.FILTER.VOLUME_TYPE.MATCHES}'
-                formulaid: A
               - macro: '{#VOLUME_TYPE}'
                 value: '{$AWS.EC2.LLD.FILTER.VOLUME_TYPE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
           description: 'Discovery attached EBS volumes.'
           item_prototypes:
             - uuid: cc0ece769d954bb590fb1a1a3d20e559
               name: '[{#VOLUME_ID}]: Attachment state'
               type: DEPENDENT
               key: 'aws.ec2.ebs.attachment_status["{#VOLUME_ID}"]'
-              delay: '0'
-              history: 7d
               description: 'The attachment state of the volume. Possible values: 0 (attaching), 1 (attached), 2 (detaching).'
               valuemap:
                 name: 'Volume attachment state'
@@ -1731,9 +1656,6 @@ zabbix_export:
               name: '[{#VOLUME_ID}]: Attachment time'
               type: DEPENDENT
               key: 'aws.ec2.ebs.attachment_time["{#VOLUME_ID}"]'
-              delay: '0'
-              history: 7d
-              trends: '0'
               value_type: CHAR
               description: 'The time stamp when the attachment initiated.'
               valuemap:
@@ -1759,9 +1681,6 @@ zabbix_export:
               name: '[{#VOLUME_ID}]: Create time'
               type: DEPENDENT
               key: 'aws.ec2.ebs.create_time["{#VOLUME_ID}"]'
-              delay: '0'
-              history: 7d
-              trends: '0'
               value_type: CHAR
               description: 'The time stamp when volume creation was initiated.'
               preprocessing:
@@ -1785,9 +1704,6 @@ zabbix_export:
               name: '[{#VOLUME_ID}]: Device'
               type: DEPENDENT
               key: 'aws.ec2.ebs.device["{#VOLUME_ID}"]'
-              delay: '0'
-              history: 7d
-              trends: '0'
               value_type: CHAR
               description: 'The device name specified in the block device mapping (for example, /dev/sda1).'
               preprocessing:
@@ -1811,9 +1727,7 @@ zabbix_export:
               name: '[{#VOLUME_ID}]: Get volume data'
               type: DEPENDENT
               key: 'aws.ec2.ebs.get_volume["{#VOLUME_ID}"]'
-              delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
               description: 'Get data of the "{#VOLUME_ID}" volume.'
               preprocessing:
@@ -1834,8 +1748,6 @@ zabbix_export:
               name: '[{#VOLUME_ID}]: Status'
               type: DEPENDENT
               key: 'aws.ec2.ebs.status["{#VOLUME_ID}"]'
-              delay: '0'
-              history: 7d
               description: |
                 The state of the volume.
                 Possible values: 0 (creating), 1 (available), 2 (in-use), 3 (deleting), 4 (deleted), 5 (error).
@@ -1876,8 +1788,6 @@ zabbix_export:
               name: '[{#VOLUME_ID}]: Burst balance'
               type: DEPENDENT
               key: 'aws.ec2.ebs.volume.burst_balance["{#VOLUME_ID}"]'
-              delay: '0'
-              history: 7d
               value_type: FLOAT
               units: '%'
               description: |
@@ -1912,8 +1822,6 @@ zabbix_export:
               name: '[{#VOLUME_ID}]: Consumed Read/Write, ops'
               type: DEPENDENT
               key: 'aws.ec2.ebs.volume.consumed_read_write_ops["{#VOLUME_ID}"]'
-              delay: '0'
-              history: 7d
               value_type: FLOAT
               description: |
                 Used with Provisioned IOPS SSD volumes only.
@@ -1938,8 +1846,6 @@ zabbix_export:
               name: '[{#VOLUME_ID}]: Idle time'
               type: DEPENDENT
               key: 'aws.ec2.ebs.volume.idle_time["{#VOLUME_ID}"]'
-              delay: '0'
-              history: 7d
               value_type: FLOAT
               units: s
               description: |
@@ -1963,8 +1869,6 @@ zabbix_export:
               name: '[{#VOLUME_ID}]: Queue length'
               type: DEPENDENT
               key: 'aws.ec2.ebs.volume.queue_length["{#VOLUME_ID}"]'
-              delay: '0'
-              history: 7d
               value_type: FLOAT
               description: 'The number of read and write operation requests waiting to be completed in a specified period of time.'
               preprocessing:
@@ -1985,8 +1889,6 @@ zabbix_export:
               name: '[{#VOLUME_ID}]: Read, bytes'
               type: DEPENDENT
               key: 'aws.ec2.ebs.volume.read_bytes["{#VOLUME_ID}"]'
-              delay: '0'
-              history: 7d
               value_type: FLOAT
               units: Bps
               description: |
@@ -2011,8 +1913,6 @@ zabbix_export:
               name: '[{#VOLUME_ID}]: Read, ops'
               type: DEPENDENT
               key: 'aws.ec2.ebs.volume.read_ops["{#VOLUME_ID}"]'
-              delay: '0'
-              history: 7d
               value_type: FLOAT
               units: Ops
               description: 'The total number of read operations in a specified period of time. Note: read operations are counted on completion.'
@@ -2034,8 +1934,6 @@ zabbix_export:
               name: '[{#VOLUME_ID}]: Throughput, pct'
               type: DEPENDENT
               key: 'aws.ec2.ebs.volume.throughput_percentage["{#VOLUME_ID}"]'
-              delay: '0'
-              history: 7d
               value_type: FLOAT
               units: '%'
               description: |
@@ -2062,8 +1960,6 @@ zabbix_export:
               name: '[{#VOLUME_ID}]: Read time, total'
               type: DEPENDENT
               key: 'aws.ec2.ebs.volume.total_read_time["{#VOLUME_ID}"]'
-              delay: '0'
-              history: 7d
               value_type: FLOAT
               units: s
               description: |
@@ -2090,8 +1986,6 @@ zabbix_export:
               name: '[{#VOLUME_ID}]: Write time, total'
               type: DEPENDENT
               key: 'aws.ec2.ebs.volume.total_write_time["{#VOLUME_ID}"]'
-              delay: '0'
-              history: 7d
               value_type: FLOAT
               units: s
               description: |
@@ -2118,8 +2012,6 @@ zabbix_export:
               name: '[{#VOLUME_ID}]: Write, bytes'
               type: DEPENDENT
               key: 'aws.ec2.ebs.volume.write_bytes["{#VOLUME_ID}"]'
-              delay: '0'
-              history: 7d
               value_type: FLOAT
               units: Bps
               description: |
@@ -2144,8 +2036,6 @@ zabbix_export:
               name: '[{#VOLUME_ID}]: Write, ops'
               type: DEPENDENT
               key: 'aws.ec2.ebs.volume.write_ops["{#VOLUME_ID}"]'
-              delay: '0'
-              history: 7d
               value_type: FLOAT
               units: Ops
               description: 'The total number of write operations in a specified period of time. Note: write operations are counted on completion.'
@@ -2169,7 +2059,6 @@ zabbix_export:
               key: 'aws.ec2.get_ebs_metrics["{#VOLUME_ID}"]'
               delay: 0s;m/5
               history: '0'
-              trends: '0'
               value_type: TEXT
               params: |
                 var AWS = {
