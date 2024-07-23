@@ -3726,7 +3726,8 @@ static void	lld_process_lost_triggers(zbx_vector_lld_trigger_ptr_t *triggers, co
 
 		if (0 != (trigger->flags & ZBX_FLAG_LLD_TRIGGER_DISCOVERED))
 		{
-			lld_process_discovered_object(discovery, trigger->discovery_status, trigger->ts_delete);
+			lld_process_discovered_object(discovery, trigger->discovery_status, trigger->ts_delete,
+					trigger->lastcheck, now);
 			lld_enable_discovered_object(discovery, object_status, trigger->disable_source,
 					trigger->ts_disable);
 			continue;

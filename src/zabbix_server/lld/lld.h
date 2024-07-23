@@ -426,7 +426,8 @@ zbx_lld_discovery_t;
 ZBX_VECTOR_DECL(lld_discovery_ptr, zbx_lld_discovery_t *)
 
 zbx_lld_discovery_t	*lld_add_discovery(zbx_hashset_t *discoveries, zbx_uint64_t id, const char *name);
-void	lld_process_discovered_object(zbx_lld_discovery_t *discovery, unsigned char discovery_status, int ts_delete);
+void	lld_process_discovered_object(zbx_lld_discovery_t *discovery, unsigned char discovery_status, int ts_delete,
+		int lastcheck, int now);
 void	lld_enable_discovered_object(zbx_lld_discovery_t *discovery, unsigned char object_status,
 		unsigned char disable_source, int ts_disable);
 void	lld_process_lost_object(zbx_lld_discovery_t *discovery, unsigned char object_status, int lastcheck, int now,

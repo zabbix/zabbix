@@ -105,9 +105,11 @@ zbx_lld_discovery_t	*lld_add_discovery(zbx_hashset_t *discoveries, zbx_uint64_t 
  *             ts_delete        - [IN] current object removal time            *
  *                                                                            *
  ******************************************************************************/
-void	lld_process_discovered_object(zbx_lld_discovery_t *discovery, unsigned char discovery_status, int ts_delete)
+void	lld_process_discovered_object(zbx_lld_discovery_t *discovery, unsigned char discovery_status, int ts_delete,
+		int lastcheck, int now)
 {
-	discovery->flags |= ZBX_LLD_DISCOVERY_UPDATE_LASTCHECK;
+	if (lastcheck != now)
+		discovery->flags |= ZBX_LLD_DISCOVERY_UPDATE_LASTCHECK;
 
 	if (ZBX_LLD_DISCOVERY_STATUS_NORMAL != discovery_status)
 	{

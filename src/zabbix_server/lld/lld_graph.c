@@ -1481,7 +1481,8 @@ static void	lld_process_lost_graphs(zbx_vector_lld_graph_ptr_t *graphs, const zb
 
 		if (0 != (graph->flags & ZBX_FLAG_LLD_GRAPH_DISCOVERED))
 		{
-			lld_process_discovered_object(discovery, graph->discovery_status, graph->ts_delete);
+			lld_process_discovered_object(discovery, graph->discovery_status, graph->ts_delete,
+					graph->lastcheck, now);
 			continue;
 		}
 
