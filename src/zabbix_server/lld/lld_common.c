@@ -348,7 +348,7 @@ void	lld_flush_discoveries(zbx_hashset_t *discoveries, const char *id_field, con
 	zbx_hashset_iter_reset(discoveries, &iter);
 	while (NULL != (discovery = (zbx_lld_discovery_t *)zbx_hashset_iter_next(&iter)))
 	{
-		if (0 == discovery->flags || ZBX_LLD_DISCOVERY_DELETE_OBJECT == discovery->flags)
+		if (0 == discovery->flags)
 			continue;
 
 		if (0 != (discovery->flags & (ZBX_LLD_DISCOVERY_UPDATE_OBJECT_STATUS)))

@@ -684,8 +684,8 @@ out:
  ******************************************************************************/
 static void	lld_graph_make(const zbx_vector_lld_gitem_ptr_t *gitems_proto, zbx_vector_lld_graph_ptr_t *graphs,
 		zbx_vector_lld_item_ptr_t *items, const char *name_proto, zbx_uint64_t ymin_itemid_proto,
-		zbx_uint64_t ymax_itemid_proto, unsigned char discover_proto, const zbx_lld_row_t *lld_row,
-		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths)
+		zbx_uint64_t ymax_itemid_proto, unsigned char discover_proto, int lastcheck,
+		const zbx_lld_row_t *lld_row, const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths)
 {
 	zbx_lld_graph_t			*graph = NULL;
 	const struct zbx_json_parse	*jp_row = &lld_row->jp_row;
@@ -744,7 +744,7 @@ static void	lld_graph_make(const zbx_vector_lld_gitem_ptr_t *gitems_proto, zbx_v
 		graph = (zbx_lld_graph_t *)zbx_malloc(NULL, sizeof(zbx_lld_graph_t));
 
 		graph->graphid = 0;
-		graph->lastcheck = 0;
+		graph->lastcheck = lastcheck;
 		graph->discovery_status = ZBX_LLD_DISCOVERY_STATUS_NORMAL;
 		graph->ts_delete = 0;
 
@@ -782,15 +782,15 @@ out:
 
 static void	lld_graphs_make(const zbx_vector_lld_gitem_ptr_t *gitems_proto, zbx_vector_lld_graph_ptr_t *graphs,
 		zbx_vector_lld_item_ptr_t *items, const char *name_proto, zbx_uint64_t ymin_itemid_proto,
-		zbx_uint64_t ymax_itemid_proto, unsigned char discover_proto, const zbx_vector_lld_row_ptr_t *lld_rows,
-		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths)
+		zbx_uint64_t ymax_itemid_proto, unsigned char discover_proto, int lastcheck,
+		const zbx_vector_lld_row_ptr_t *lld_rows, const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths)
 {
 	for (int i = 0; i < lld_rows->values_num; i++)
 	{
 		zbx_lld_row_t	*lld_row = lld_rows->values[i];
 
 		lld_graph_make(gitems_proto, graphs, items, name_proto, ymin_itemid_proto, ymax_itemid_proto,
-				discover_proto, lld_row, lld_macro_paths);
+				discover_proto, lastcheck, lld_row, lld_macro_paths);
 	}
 
 	zbx_vector_lld_graph_ptr_sort(graphs, lld_graph_compare_func);
@@ -1085,7 +1085,7 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 				"ymax_itemid", "flags", (char *)NULL);
 
 		zbx_db_insert_prepare(&db_insert_gdiscovery, "graph_discovery", "graphid", "parent_graphid",
-				(char *)NULL);
+				"lastcheck", (char *)NULL);
 	}
 
 	if (0 != new_gitems)
@@ -1125,7 +1125,7 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 					(int)ymin_type, (int)ymax_type, graph->ymin_itemid, graph->ymax_itemid,
 					ZBX_FLAG_DISCOVERY_CREATED, 0);
 
-			zbx_db_insert_add_values(&db_insert_gdiscovery, graphid, parent_graphid);
+			zbx_db_insert_add_values(&db_insert_gdiscovery, graphid, parent_graphid, graph->lastcheck);
 
 			graph->graphid = graphid++;
 		}
@@ -1573,7 +1573,7 @@ int	lld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_ve
 		/* making graphs */
 
 		lld_graphs_make(&gitems_proto, &graphs, &items, name_proto, ymin_itemid_proto, ymax_itemid_proto,
-				discover_proto, lld_rows, lld_macro_paths);
+				discover_proto, lastcheck, lld_rows, lld_macro_paths);
 		lld_graphs_validate(hostid, &graphs, error);
 		ret = lld_graphs_save(hostid, parent_graphid, &graphs, width, height, yaxismin, yaxismax,
 				show_work_period, show_triggers, graphtype, show_legend, show_3d, percent_left,
