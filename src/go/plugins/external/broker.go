@@ -21,8 +21,6 @@ package external
 
 import (
 	"encoding/json"
-	"errors"
-	"fmt"
 	"net"
 	"sync"
 	"sync/atomic"
@@ -33,8 +31,13 @@ import (
 	"golang.zabbix.com/sdk/plugin/comms"
 )
 
-// ErrBrokerClosed is returned when a request is made on a closed broker.
-var ErrBrokerClosed = errs.New("broker closed")
+var (
+	// ErrBrokerClosed is returned when a request is made on a closed broker.
+	ErrBrokerClosed = errs.New("broker closed")
+	// ErrBrokerTimeout is returned when a request sent by broker does not
+	// receive a response within timeout.
+	ErrBrokerTimeout = errs.New("broker timeout")
+)
 
 // pluginBroker handles communication with a single plugin.
 type pluginBroker struct {
@@ -167,7 +170,11 @@ func (b *pluginBroker) writer() {
 						return
 					}
 
-					req.err <- errors.New("timeout reached while waiting for response from plugin")
+					req.err <- errs.Wrapf(
+						ErrBrokerTimeout,
+						"timeout %s reached while waiting for response from plugin",
+						b.timeout.String(),
+					)
 					close(req.out)
 					close(req.err)
 					delete(b.requests, id)
@@ -197,7 +204,7 @@ func (b *pluginBroker) writer() {
 				}
 
 			default:
-				panic(fmt.Errorf("unsupported request type %T", r))
+				panic(errs.Errorf("unsupported request type %T", r))
 			}
 		}(r)
 	}
@@ -289,7 +296,7 @@ func DoWithResponseAs[T any](broker *pluginBroker, data any) (*T, error) {
 
 	err = json.Unmarshal(dataBytes, &resp)
 	if err != nil {
-		return nil, err
+		return nil, errs.Wrap(err, "failed to unmarsal response")
 	}
 
 	return &resp, nil
