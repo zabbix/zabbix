@@ -21,7 +21,23 @@
             "function": "uppercase",
             "parameters": []
         },
-        "result": "çşğü"
+        "result": "ÇŞĞÜ"
+    },
+    {
+        "value": "pārbaude",
+        "macrofunc": {
+            "function": "uppercase",
+            "parameters": []
+        },
+        "result": "PĀRBAUDE"
+    },
+    {
+        "value": "тест",
+        "macrofunc": {
+            "function": "uppercase",
+            "parameters": []
+        },
+        "result": "ТЕСТ"
     },
     {
         "value": "",

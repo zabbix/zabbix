@@ -352,7 +352,9 @@ class CMacroFunction {
 	 * @return string
 	 */
 	private static function macrofuncLowercase(string $value, array $parameters): string {
-		return self::removeDefaultParameter($parameters) === [] ? strtolower($value) : UNRESOLVED_MACRO_STRING;
+		return self::removeDefaultParameter($parameters) === []
+			? mb_strtolower($value, 'UTF-8')
+			: UNRESOLVED_MACRO_STRING;
 	}
 
 	/**
@@ -363,7 +365,9 @@ class CMacroFunction {
 	 * @return string
 	 */
 	private static function macrofuncUppercase(string $value, array $parameters): string {
-		return self::removeDefaultParameter($parameters) === [] ? strtoupper($value) : UNRESOLVED_MACRO_STRING;
+		return self::removeDefaultParameter($parameters) === []
+			? mb_strtoupper($value, 'UTF-8')
+			: UNRESOLVED_MACRO_STRING;
 	}
 
 	/**

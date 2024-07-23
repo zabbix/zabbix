@@ -21,7 +21,23 @@
             "function": "lowercase",
             "parameters": []
         },
-        "result": "ÁÇĞİÖÜ"
+        "result": "áçği̇öü"
+    },
+    {
+        "value": "PĀRBAUDE",
+        "macrofunc": {
+            "function": "lowercase",
+            "parameters": []
+        },
+        "result": "pārbaude"
+    },
+    {
+        "value": "ТЕСТ",
+        "macrofunc": {
+            "function": "lowercase",
+            "parameters": []
+        },
+        "result": "тест"
     },
     {
         "value": "",
