@@ -52,6 +52,7 @@ zabbix_export:
             
             	setParams: function (params) {
             		AWS.params['proxy'] = params.proxy;
+            		AWS.params['basegroup'] = params.basegroup;
             		switch (AWS.getField(params, 'auth_type')) {
             			case 'role_base':
             				AWS.params['auth_type'] = 'role_base';
@@ -265,7 +266,9 @@ zabbix_export:
             						{
             							instanceId: AWS.getField(instance, 'instanceId'),
             							instanceName: AWS.tagToNameInstances(instance),
-            							instanceRegion: region_name
+            							instanceRegion: region_name,
+            							instanceIp: AWS.getField(instance, 'privateIpAddress'),
+            							instanceGroup: AWS.params.basegroup+'/'+region_name+'/ec2'
             						}
             					)
             				});
@@ -291,22 +294,28 @@ zabbix_export:
             conditions:
               - macro: '{#AWS.EC2.INSTANCE.NAME}'
                 value: '{$AWS.EC2.LLD.FILTER.NAME.MATCHES}'
+                formulaid: A
               - macro: '{#AWS.EC2.INSTANCE.NAME}'
                 value: '{$AWS.EC2.LLD.FILTER.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: B
               - macro: '{#AWS.EC2.INSTANCE.REGION}'
                 value: '{$AWS.EC2.LLD.FILTER.REGION.MATCHES}'
+                formulaid: C
               - macro: '{#AWS.EC2.INSTANCE.REGION}'
                 value: '{$AWS.EC2.LLD.FILTER.REGION.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: D
           description: 'Get EC2 instances.'
           host_prototypes:
             - uuid: c4c830c727294b07926c39b00cf19046
               host: '{#AWS.EC2.INSTANCE.ID}'
-              name: '{#AWS.EC2.INSTANCE.NAME}'
+              name: '{#AWS.EC2.INSTANCE.NAME} - {#AWS.EC2.INSTANCE.ID}'
               group_links:
                 - group:
                     name: 'Virtual machines'
+              group_prototypes:
+                - name: '{#AWS.EC2.INSTANCE.GROUP}'
               templates:
                 - name: 'AWS EC2 by HTTP'
               macros:
@@ -319,19 +328,24 @@ zabbix_export:
               tags:
                 - tag: name
                   value: '{#AWS.EC2.INSTANCE.NAME}'
+                - tag: provider
+                  value: AWS
                 - tag: region
                   value: '{#AWS.EC2.INSTANCE.REGION}'
                 - tag: service
                   value: ec2
               custom_interfaces: 'YES'
               interfaces:
-                - ip: '{#AWS.EC2.INSTANCE.ID}'
+                - ip: '{#AWS.EC2.INSTANCE.IP}'
+                  dns: '{#AWS.EC2.INSTANCE.NAME}'
           timeout: '{$AWS.DATA.TIMEOUT}'
           parameters:
             - name: AccessKeyId
               value: '{$AWS.ACCESS.KEY.ID}'
             - name: auth_type
               value: '{$AWS.AUTH_TYPE}'
+            - name: basegroup
+              value: '{$AWS.BASE.GROUP}'
             - name: proxy
               value: '{$AWS.PROXY}'
             - name: region_match
@@ -341,8 +355,12 @@ zabbix_export:
             - name: SecretAccessKey
               value: '{$AWS.SECRET.ACCESS.KEY}'
           lld_macro_paths:
+            - lld_macro: '{#AWS.EC2.INSTANCE.GROUP}'
+              path: $.instanceGroup
             - lld_macro: '{#AWS.EC2.INSTANCE.ID}'
               path: $.instanceId
+            - lld_macro: '{#AWS.EC2.INSTANCE.IP}'
+              path: $.instanceIp
             - lld_macro: '{#AWS.EC2.INSTANCE.NAME}'
               path: $.instanceName
             - lld_macro: '{#AWS.EC2.INSTANCE.REGION}'
@@ -613,19 +631,25 @@ zabbix_export:
             conditions:
               - macro: '{#AWS.ECS.CLUSTER.NAME}'
                 value: '{$AWS.ECS.LLD.FILTER.NAME.MATCHES}'
+                formulaid: A
               - macro: '{#AWS.ECS.CLUSTER.NAME}'
                 value: '{$AWS.ECS.LLD.FILTER.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: B
               - macro: '{#AWS.ECS.CLUSTER.REGION}'
                 value: '{$AWS.ECS.LLD.FILTER.REGION.MATCHES}'
+                formulaid: C
               - macro: '{#AWS.ECS.CLUSTER.REGION}'
                 value: '{$AWS.ECS.LLD.FILTER.REGION.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: D
               - macro: '{#AWS.ECS.CLUSTER.STATUS}'
                 value: '{$AWS.ECS.LLD.FILTER.STATUS.MATCHES}'
+                formulaid: E
               - macro: '{#AWS.ECS.CLUSTER.STATUS}'
                 value: '{$AWS.ECS.LLD.FILTER.STATUS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: F
           description: 'Get ECS clusters.'
           host_prototypes:
             - uuid: 71072e5a149e45b293946866f8220c07
@@ -678,6 +702,7 @@ zabbix_export:
                 conditions:
                   - macro: '{#AWS.ECS.CLUSTER.INFRASTRUCTURE}'
                     value: ^serverless$
+                    formulaid: A
               operations:
                 - operationobject: HOST_PROTOTYPE
                   operator: REGEXP
@@ -689,6 +714,7 @@ zabbix_export:
                 conditions:
                   - macro: '{#AWS.ECS.CLUSTER.INFRASTRUCTURE}'
                     value: ^use_ecs2$
+                    formulaid: A
               operations:
                 - operationobject: HOST_PROTOTYPE
                   operator: REGEXP
@@ -720,6 +746,7 @@ zabbix_export:
             
             	setParams: function (params) {
             		AWS.params['proxy'] = params.proxy;
+            		AWS.params['basegroup'] = params.basegroup;
             		switch (AWS.getField(params, 'auth_type')) {
             			case 'role_base':
             				AWS.params['auth_type'] = 'role_base';
@@ -905,7 +932,8 @@ zabbix_export:
             						type: AWS.getField(elb, 'Type'),
             						state: AWS.getField(elb, 'State.Code'),
             						dns_name: AWS.getField(elb, 'DNSName'),
-            						region: region_name
+            						region: region_name,
+            						group: AWS.params.basegroup+'/'+region_name+'/elb'
             					}
             				)
             			});
@@ -930,19 +958,25 @@ zabbix_export:
             conditions:
               - macro: '{#AWS.ELB.NAME}'
                 value: '{$AWS.ELB.LLD.FILTER.NAME.MATCHES}'
+                formulaid: A
               - macro: '{#AWS.ELB.NAME}'
                 value: '{$AWS.ELB.LLD.FILTER.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: B
               - macro: '{#AWS.ELB.REGION}'
                 value: '{$AWS.ELB.LLD.FILTER.REGION.MATCHES}'
+                formulaid: C
               - macro: '{#AWS.ELB.REGION}'
                 value: '{$AWS.ELB.LLD.FILTER.REGION.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: D
               - macro: '{#AWS.ELB.STATE}'
                 value: '{$AWS.ELB.LLD.FILTER.STATE.MATCHES}'
+                formulaid: E
               - macro: '{#AWS.ELB.STATE}'
                 value: '{$AWS.ELB.LLD.FILTER.STATE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: F
           description: 'Get ELB load balancers.'
           host_prototypes:
             - uuid: 2c31bc79209e41978f76315406339769
@@ -951,6 +985,8 @@ zabbix_export:
               group_links:
                 - group:
                     name: Applications
+              group_prototypes:
+                - name: '{#AWS.ELB.GROUP}'
               macros:
                 - macro: '{$AWS.ELB.ARN}'
                   value: '{#AWS.ELB.ARN}'
@@ -978,6 +1014,8 @@ zabbix_export:
               value: '{$AWS.ACCESS.KEY.ID}'
             - name: auth_type
               value: '{$AWS.AUTH_TYPE}'
+            - name: basegroup
+              value: '{$AWS.BASE.GROUP}'
             - name: proxy
               value: '{$AWS.PROXY}'
             - name: region_match
@@ -991,6 +1029,8 @@ zabbix_export:
               path: $.arn
             - lld_macro: '{#AWS.ELB.DNS.NAME}'
               path: $.dns_name
+            - lld_macro: '{#AWS.ELB.GROUP}'
+              path: $.group
             - lld_macro: '{#AWS.ELB.NAME}'
               path: $.name
             - lld_macro: '{#AWS.ELB.REGION}'
@@ -1006,6 +1046,7 @@ zabbix_export:
                 conditions:
                   - macro: '{#AWS.ELB.TYPE}'
                     value: ^application$
+                    formulaid: A
               operations:
                 - operationobject: HOST_PROTOTYPE
                   operator: REGEXP
@@ -1017,6 +1058,7 @@ zabbix_export:
                 conditions:
                   - macro: '{#AWS.ELB.TYPE}'
                     value: ^network$
+                    formulaid: A
               operations:
                 - operationobject: HOST_PROTOTYPE
                   operator: REGEXP
@@ -1048,6 +1090,7 @@ zabbix_export:
             
             	setParams: function (params) {
             		AWS.params['proxy'] = params.proxy;
+            		AWS.params['basegroup'] = params.basegroup;
             		switch (AWS.getField(params, 'auth_type')) {
             			case 'role_base':
             				AWS.params['auth_type'] = 'role_base';
@@ -1227,7 +1270,8 @@ zabbix_export:
             				lld_array.push(
             					{
             						DBInstanceIdentifier: AWS.getField(db, 'DBInstanceIdentifier'),
-            						instanceRegion: region_name
+            						instanceRegion: region_name,
+            						group: AWS.params.basegroup+'/'+region_name+'/rds'
             					}
             				)
             			});
@@ -1252,14 +1296,18 @@ zabbix_export:
             conditions:
               - macro: '{#AWS.RDS.INSTANCE.ID}'
                 value: '{$AWS.RDS.LLD.FILTER.NAME.MATCHES}'
+                formulaid: A
               - macro: '{#AWS.RDS.INSTANCE.ID}'
                 value: '{$AWS.RDS.LLD.FILTER.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: B
               - macro: '{#AWS.RDS.REGION}'
                 value: '{$AWS.RDS.LLD.FILTER.REGION.MATCHES}'
+                formulaid: C
               - macro: '{#AWS.RDS.REGION}'
                 value: '{$AWS.RDS.LLD.FILTER.REGION.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: D
           description: 'Get RDS instances.'
           host_prototypes:
             - uuid: 799663c52a644f78aa3b3c14d4cc7235
@@ -1268,6 +1316,8 @@ zabbix_export:
               group_links:
                 - group:
                     name: Databases
+              group_prototypes:
+                - name: '{#AWS.RDS.GROUP}'
               templates:
                 - name: 'AWS RDS instance by HTTP'
               macros:
@@ -1293,6 +1343,8 @@ zabbix_export:
               value: '{$AWS.ACCESS.KEY.ID}'
             - name: auth_type
               value: '{$AWS.AUTH_TYPE}'
+            - name: basegroup
+              value: '{$AWS.BASE.GROUP}'
             - name: proxy
               value: '{$AWS.PROXY}'
             - name: region_match
@@ -1302,6 +1354,8 @@ zabbix_export:
             - name: SecretAccessKey
               value: '{$AWS.SECRET.ACCESS.KEY}'
           lld_macro_paths:
+            - lld_macro: '{#AWS.RDS.GROUP}'
+              path: $.group
             - lld_macro: '{#AWS.RDS.INSTANCE.ID}'
               path: $.DBInstanceIdentifier
             - lld_macro: '{#AWS.RDS.REGION}'
@@ -1316,12 +1370,21 @@ zabbix_export:
             	params: {},
             	metadata: 'http://169.254.169.254/latest/meta-data/iam/security-credentials',
             
+            	isObjectEmpty: function (obj) {
+            		for (var prop in obj) {
+            			if (obj.hasOwnProperty(prop)) {
+            				return false;
+            			}
+            		}
+            		return true;
+            	},
+            
             	getField: function (data, path) {
             		var steps = path.split('.');
             		for (var i = 0; i < steps.length; i++) {
             			var step = steps[i];
-            			if (typeof data !== 'object' || typeof data[step] === 'undefined') {
-            				throw 'Required field was not found: ' + path;
+            			if (typeof data !== 'object' || AWS.isObjectEmpty(data) || typeof data[step] === 'undefined') {
+            				return null;
             			}
             
             			data = data[step];
@@ -1332,6 +1395,7 @@ zabbix_export:
             
             	setParams: function (params) {
             		AWS.params['proxy'] = params.proxy;
+            		AWS.params['basegroup'] = params.basegroup;
             		switch (AWS.getField(params, 'auth_type')) {
             			case 'role_base':
             				AWS.params['auth_type'] = 'role_base';
@@ -1470,8 +1534,21 @@ zabbix_export:
             		return JSON.parse(response);
             	},
             
+            	getBucketRegion: function (name) {
+            		var request = new HttpRequest(),
+            			url = 'https://' + name + '.s3.amazonaws.com';
+            
+            		Zabbix.log(4, '[ AWS S3 ] Sending request: ' + url);
+            
+            		response = request.get(url);
+            		var headers = request.getHeaders();
+                    
+            		return headers['x-amz-bucket-region'];
+            	},
+            
             	listBuckets: function () {
-            		var payload = {
+            		var lld_array = [],
+            		payload = {
             			'Action': 'ListBuckets',
             			'Version': '2006-03-01'
             		};
@@ -1482,7 +1559,21 @@ zabbix_export:
             			return [];
             		}
             
-            		return Array.isArray(result) ? result : [result];
+            		if (!Array.isArray(result))
+            			result = [result];
+            
+            		result.forEach(function (res_item) {
+            			bucketName = AWS.getField(res_item, 'Name');
+            			region_name = AWS.getBucketRegion(bucketName)
+            
+            			lld_array.push({
+            				Name: bucketName,
+            				Region: region_name,
+            				Group: AWS.params.basegroup+'/'+region_name+'/s3'
+            			})
+            		});
+            
+            		return lld_array;
             
             	}
             
@@ -1503,9 +1594,11 @@ zabbix_export:
             conditions:
               - macro: '{#AWS.S3.NAME}'
                 value: '{$AWS.S3.LLD.FILTER.NAME.MATCHES}'
+                formulaid: A
               - macro: '{#AWS.S3.NAME}'
                 value: '{$AWS.S3.LLD.FILTER.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: B
           description: 'Get S3 bucket instances.'
           host_prototypes:
             - uuid: e45bd9810ea14718b17b875aad3fc544
@@ -1515,7 +1608,7 @@ zabbix_export:
                 - group:
                     name: Applications
               group_prototypes:
-                - name: '{#AWS.S3.REGION}'
+                - name: '{#AWS.S3.GROUP}'
               templates:
                 - name: 'AWS S3 bucket by HTTP'
               macros:
@@ -1528,6 +1621,10 @@ zabbix_export:
               tags:
                 - tag: name
                   value: '{#AWS.S3.NAME}'
+                - tag: provider
+                  value: AWS
+                - tag: region
+                  value: '{#AWS.S3.REGION}'
                 - tag: service
                   value: s3
               custom_interfaces: 'YES'
@@ -1539,13 +1636,19 @@ zabbix_export:
               value: '{$AWS.ACCESS.KEY.ID}'
             - name: auth_type
               value: '{$AWS.AUTH_TYPE}'
+            - name: basegroup
+              value: '{$AWS.BASE.GROUP}'
             - name: proxy
               value: '{$AWS.PROXY}'
             - name: SecretAccessKey
               value: '{$AWS.SECRET.ACCESS.KEY}'
           lld_macro_paths:
+            - lld_macro: '{#AWS.S3.GROUP}'
+              path: $.Group
             - lld_macro: '{#AWS.S3.NAME}'
               path: $.Name
+            - lld_macro: '{#AWS.S3.REGION}'
+              path: $.Region
       tags:
         - tag: class
           value: software
@@ -1557,6 +1660,9 @@ zabbix_export:
         - macro: '{$AWS.AUTH_TYPE}'
           value: access_key
           description: 'Authorization method. Possible values: role_base, access_key.'
+        - macro: '{$AWS.BASE.GROUP}'
+          value: Cloud/AWS
+          description: 'The base group to add resources to. Region and Type is appended to this.'
         - macro: '{$AWS.DATA.TIMEOUT}'
           value: 60s
           description: 'A response timeout for an API.'
