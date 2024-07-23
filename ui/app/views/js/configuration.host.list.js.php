@@ -44,16 +44,28 @@
 					this.editProxyGroup(e.target.dataset.proxy_groupid);
 				}
 				else if (e.target.classList.contains('js-enable-host')) {
-					this.enable(null, {hostids: [e.target.dataset.hostid]});
+					this.enable(e.target, {hostids: [e.target.dataset.hostid]});
 				}
 				else if (e.target.classList.contains('js-disable-host')) {
-					this.disable(null, {hostids: [e.target.dataset.hostid]});
+					this.disable(e.target, {hostids: [e.target.dataset.hostid]});
 				}
 				else if (e.target.classList.contains('js-massenable-host')) {
-					this.enable(e.target, {hostids: Object.keys(chkbxRange.getSelectedIds())});
+					const message = Object.keys(chkbxRange.getSelectedIds()).length > 1
+						? <?= json_encode(_('Enable selected hosts?')) ?>
+						: <?= json_encode(_('Enable selected host?')) ?>;
+
+					if (window.confirm(message)) {
+						this.enable(e.target, {hostids: Object.keys(chkbxRange.getSelectedIds())});
+					}
 				}
 				else if (e.target.classList.contains('js-massdisable-host')) {
-					this.disable(e.target, {hostids: Object.keys(chkbxRange.getSelectedIds())});
+					const message = Object.keys(chkbxRange.getSelectedIds()).length > 1
+						? <?= json_encode(_('Disable selected hosts?')) ?>
+						: <?= json_encode(_('Disable selected host?')) ?>;
+
+					if (window.confirm(message)) {
+						this.disable(e.target, {hostids: Object.keys(chkbxRange.getSelectedIds())});
+					}
 				}
 			});
 		},
@@ -61,41 +73,19 @@
 		enable(target, parameters) {
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'host.enable');
-
-			if (target !== null) {
-				this.confirmAction(curl, parameters, target);
-			}
-			else {
-				this.postAction(curl, parameters);
-			}
+			target.classList.add('is-loading');
+			this.postAction(curl, parameters)
+				.finally(() => {
+					target.classList.remove('is-loading');
+					target.blur();
+				});
 		},
 
 		disable(target, parameters) {
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'host.disable');
-
-			if (target !== null) {
-				this.confirmAction(curl, parameters, target);
-			}
-			else {
-				this.postAction(curl, parameters);
-			}
-		},
-
-		confirmAction(curl, data, target) {
-			const confirm_messages = {
-				'host.enable': <?= json_encode([_('Enable selected host?'), _('Enable selected hosts?')]) ?>,
-				'host.disable': <?= json_encode([_('Disable selected host?'), _('Disable selected hosts?')]) ?>
-			};
-			const confirm = confirm_messages[curl.getArgument('action')];
-			const message = confirm ? confirm[data.hostids.length > 1 ? 1 : 0] : null;
-
-			if (message !== null && !window.confirm(message)) {
-				return;
-			}
-
 			target.classList.add('is-loading');
-			this.postAction(curl, data)
+			this.postAction(curl, parameters)
 				.finally(() => {
 					target.classList.remove('is-loading');
 					target.blur();

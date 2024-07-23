@@ -472,6 +472,8 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 					throw new Exception();
 				}
 
+				$hosts_count = count($hosts);
+
 				// Value mapping.
 				if (array_key_exists('valuemaps', $visible)) {
 					$this->updateValueMaps($hostids);
