@@ -260,7 +260,7 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 			return $reference === self::REFERENCE_DASHBOARD ? self::DATA_SOURCE_DASHBOARD : self::DATA_SOURCE_WIDGET;
 		}
 		elseif (array_key_exists('data_source', $value)) {
-			return $value['data_source'];
+			return (int) $value['data_source'];
 		}
 		else {
 			return self::DATA_SOURCE_DEFAULT;
