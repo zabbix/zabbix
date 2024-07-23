@@ -1433,7 +1433,7 @@ out:
 static void 	lld_trigger_make(const zbx_lld_trigger_prototype_t *trigger_prototype,
 		zbx_vector_lld_trigger_ptr_t *triggers, const zbx_vector_lld_item_ptr_t *items,
 		zbx_hashset_t *items_triggers, const zbx_lld_row_t *lld_row,
-		const zbx_vector_lld_macro_path_ptr_t *lld_macros, char **error)
+		const zbx_vector_lld_macro_path_ptr_t *lld_macros, int lastcheck, char **error)
 {
 	zbx_lld_trigger_t		*trigger;
 	char				*buffer = NULL, *expression = NULL, *recovery_expression = NULL, err[64];
@@ -1576,7 +1576,7 @@ static void 	lld_trigger_make(const zbx_lld_trigger_prototype_t *trigger_prototy
 		trigger = (zbx_lld_trigger_t *)zbx_malloc(NULL, sizeof(zbx_lld_trigger_t));
 
 		trigger->triggerid = 0;
-		trigger->lastcheck = 0;
+		trigger->lastcheck = lastcheck;
 		trigger->discovery_status = ZBX_LLD_DISCOVERY_STATUS_NORMAL;
 		trigger->ts_delete = 0;
 		trigger->ts_disable = 0;
@@ -1719,7 +1719,7 @@ static int	items_triggers_compare_func(const void *d1, const void *d2)
 static void	lld_triggers_make(const zbx_vector_lld_trigger_prototype_ptr_t *trigger_prototypes,
 		zbx_vector_lld_trigger_ptr_t *triggers, const zbx_vector_lld_item_ptr_t *items,
 		const zbx_vector_lld_row_ptr_t *lld_rows, const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths,
-		char **error)
+		int lastcheck, char **error)
 {
 	const zbx_lld_trigger_prototype_t	*trigger_prototype;
 	zbx_hashset_t				items_triggers;
@@ -1754,7 +1754,7 @@ static void	lld_triggers_make(const zbx_vector_lld_trigger_prototype_ptr_t *trig
 			zbx_lld_row_t	*lld_row = lld_rows->values[j];
 
 			lld_trigger_make(trigger_prototype, triggers, items, &items_triggers, lld_row, lld_macro_paths,
-					error);
+					lastcheck, error);
 		}
 	}
 
@@ -2620,7 +2620,7 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_lld_trigger_p
 				"manual_close", "opdata", "event_name", (char *)NULL);
 
 		zbx_db_insert_prepare(&db_insert_tdiscovery, "trigger_discovery", "triggerid", "parent_triggerid",
-				(char *)NULL);
+				"lastcheck", (char *)NULL);
 	}
 
 	if (0 != new_tags)
@@ -2739,7 +2739,8 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_lld_trigger_p
 			zbx_audit_trigger_update_json_add_rexpr(ZBX_AUDIT_LLD_CONTEXT, triggerid,
 					(int)ZBX_FLAG_DISCOVERY_CREATED, trigger->recovery_expression);
 
-			zbx_db_insert_add_values(&db_insert_tdiscovery, triggerid, trigger->parent_triggerid);
+			zbx_db_insert_add_values(&db_insert_tdiscovery, triggerid, trigger->parent_triggerid,
+					trigger->lastcheck);
 
 			trigger->triggerid = triggerid++;
 		}
@@ -3809,7 +3810,7 @@ int	lld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_
 
 	/* making triggers */
 
-	lld_triggers_make(&trigger_prototypes, &triggers, &items, lld_rows, lld_macro_paths, error);
+	lld_triggers_make(&trigger_prototypes, &triggers, &items, lld_rows, lld_macro_paths, lastcheck, error);
 	lld_triggers_validate(hostid, &triggers, error);
 	lld_trigger_dependencies_make(&trigger_prototypes, &triggers, lld_rows, error);
 	lld_trigger_dependencies_validate(&triggers, error);
