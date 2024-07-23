@@ -510,40 +510,20 @@ function getSeverityTableCell($severity, array $data, array $stat, $is_total = f
 	switch ($ext_ack) {
 		case EXTACK_OPTION_ALL:
 			return CSeverityHelper::makeSeverityCell($severity, [
-				(new CSpan(
-					(new CSpan(
-						new CSpan($allTriggersNum)
-					))->addClass(ZBX_STYLE_TOTALS_LIST_COUNT_PART)
-				))->addClass(ZBX_STYLE_TOTALS_LIST_COUNT),
+				(new CSpan($allTriggersNum))->addClass(ZBX_STYLE_TOTALS_LIST_COUNT),
 				(new CSpan($severity_name))->addClass(ZBX_STYLE_TOTALS_LIST_NAME)->setTitle($severity_name)
 			], false, $is_total);
 
 		case EXTACK_OPTION_UNACK:
 			return CSeverityHelper::makeSeverityCell($severity, [
-				(new CSpan(
-					(new CSpan(
-						new CSpan($unackTriggersNum)
-					))->addClass(ZBX_STYLE_TOTALS_LIST_COUNT_PART)
-				))->addClass(ZBX_STYLE_TOTALS_LIST_COUNT),
+				(new CSpan($unackTriggersNum))->addClass(ZBX_STYLE_TOTALS_LIST_COUNT),
 				(new CSpan($severity_name))->addClass(ZBX_STYLE_TOTALS_LIST_NAME)->setTitle($severity_name)
 			], false, $is_total);
 
 		case EXTACK_OPTION_BOTH:
-			$layout = array_key_exists('layout', $data['filter']) ? $data['filter']['layout'] : STYLE_HORIZONTAL;
-			$of = $layout == STYLE_HORIZONTAL ? ' '._('of').' ' : _('of');
-
 			return CSeverityHelper::makeSeverityCell($severity, [
-				(new CSpan([
-					(new CSpan(
-						new CSpan($unackTriggersNum)
-					))->addClass(ZBX_STYLE_TOTALS_LIST_COUNT_PART),
-					(new CSpan(
-						new CSpan($of)
-					))->addClass(ZBX_STYLE_TOTALS_LIST_COUNT_PART),
-					(new CSpan(
-						new CSpan($allTriggersNum)
-					))->addClass(ZBX_STYLE_TOTALS_LIST_COUNT_PART)
-				]))->addClass(ZBX_STYLE_TOTALS_LIST_COUNT),
+				(new CSpan([$unackTriggersNum, ' '._('of').' ', $allTriggersNum]))
+					->addClass(ZBX_STYLE_TOTALS_LIST_COUNT),
 				(new CSpan($severity_name))->addClass(ZBX_STYLE_TOTALS_LIST_NAME)->setTitle($severity_name)
 			], false, $is_total);
 

@@ -3410,23 +3410,13 @@ svg {
 		flex: 1;
 		align-items: center;
 		display: flex;
-		column-gap: 5px;
 		line-height: 20px;
-		overflow: hidden;
 		padding: 0 10px;
 		position: relative;
 	}
 
 	.count {
 		font-size: 16px;
-
-		.count-part {
-			@extend %overflow-ellipsis;
-		}
-	}
-
-	.name {
-		@extend %overflow-ellipsis;
 	}
 
 	&.totals-list-horizontal {
@@ -3437,39 +3427,23 @@ svg {
 			text-align: center;
 		}
 
-		.count {
-			@extend %overflow-ellipsis;
-			width: 100%;
-		}
-
+		.count,
 		.name {
+			@extend %overflow-ellipsis;
 			width: 100%;
 		}
 	}
 
 	&.totals-list-vertical {
 		flex-direction: column;
+		min-width: min-content;
 
 		> div {
+			column-gap: 5px;
 			min-height: 20px;
 			padding-top: 2px;
 			padding-bottom: 2px;
-		}
-
-		.count {
-			flex-shrink: 0;
-
-			.count-part {
-				display: block;
-
-				.ellipsis::after {
-					content: '…';
-				}
-			}
-		}
-
-		.name {
-			flex-grow: 1;
+			white-space: nowrap;
 		}
 	}
 }
