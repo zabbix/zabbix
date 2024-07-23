@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-07-05 18:30+0000\n"
+"PO-Revision-Date: 2024-07-14 16:33+0000\n"
 "Last-Translator: Vicente Salvador <vicentesalvadorcubedo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
@@ -1658,7 +1658,7 @@ msgstr "Debe ser seleccionado al menos un equipo o grupo de equipos."
 
 #: include/classes/setup/CFrontendSetup.php:252
 msgid "At least one of MySQL or PostgreSQL should be supported."
-msgstr ""
+msgstr "Al menos una BD MySQL o PostgreSQL debe estar soportada."
 
 #: include/classes/setup/CFrontendSetup.php:241
 msgid "At least one of MySQL, PostgreSQL or Oracle should be supported."
@@ -1878,6 +1878,11 @@ msgstr "Disponibilidad"
 #: include/classes/helpers/CRoleHelper.php:423 report2.php:25 report2.php:156
 msgid "Availability report"
 msgstr "Informe de disponibilidad"
+
+#: app/controllers/CControllerAvailabilityReportTrigger.php:70
+#: app/views/reports.availabilityreport.trigger.php:23
+msgid "Availability report graph"
+msgstr ""
 
 #: include/classes/html/CHostAvailability.php:80
 #: widgets/hostavail/views/widget.view.php:32
