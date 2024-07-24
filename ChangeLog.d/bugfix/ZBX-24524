@@ -1,0 +1,1 @@
+.......PS. [ZBX-24524] fixed "new values per second" stat to include dependent items in calculation (asestakovs)
