@@ -149,8 +149,8 @@ class testDiscoveryRules extends CIntegrationTest {
 			try {
 				$response = $this->call('drule.get', [
 					'filter' => [
-						'name' => self::DRULE_NAME_ERR,
-					],
+						'name' => self::DRULE_NAME_ERR
+					]
 				]);
 
 				$this->assertArrayHasKey('result', $response, 'Failed to get discovery rule error');
@@ -197,7 +197,7 @@ class testDiscoveryRules extends CIntegrationTest {
 					'key_' => $oid,
 					'ports' => '161',
 					'snmp_community' => 'public',
-					'uniq' => 0,
+					'uniq' => 0
 				]
 			]
 		];
@@ -237,7 +237,7 @@ class testDiscoveryRules extends CIntegrationTest {
 					'snmpv3_securityname' => self::SNMPSIM_USERNAME,
 					'uniq' => 0,
 					'host_source' => 2, /* IP */
-					'name_source' => 2, /* IP */
+					'name_source' => 2  /* IP */
 				]
 			]
 		];
@@ -278,7 +278,7 @@ class testDiscoveryRules extends CIntegrationTest {
 			],
 			'operations' => [
 				[
-					'operationtype' => OPERATION_TYPE_HOST_ADD,
+					'operationtype' => OPERATION_TYPE_HOST_ADD
 				]
 			]
 		]);
