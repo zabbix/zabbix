@@ -20,6 +20,7 @@
 #ifndef ZABBIX_GLOBAL_H
 #define ZABBIX_GLOBAL_H
 
+char	*es_get_buffer_dyn(duk_context *ctx, int index, duk_size_t *len);
 void	es_init_global_functions(zbx_es_t *es);
 
 #endif
