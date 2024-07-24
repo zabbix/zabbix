@@ -33,8 +33,9 @@
 
 typedef struct
 {
-	void	*heapptr;	/* js object heap ptr */
-	void	*data;
+	void			*heapptr;	/* js object heap ptr */
+	void			*data;
+	zbx_es_obj_type_t	type;
 }
 zbx_es_obj_data_t;
 
@@ -879,13 +880,14 @@ int	es_is_chained_constructor_call(duk_context *ctx)
  *           This function must be used only from object constructor          *
  *                                                                            *
  ******************************************************************************/
-void	es_obj_attach_data(zbx_es_env_t *env, void *data)
+void	es_obj_attach_data(zbx_es_env_t *env, void *data, zbx_es_obj_type_t type)
 {
 	zbx_es_obj_data_t	obj_local;
 
 	obj_local.heapptr = duk_require_heapptr(env->ctx, -1);
 
 	obj_local.data = data;
+	obj_local.type = type;
 	zbx_hashset_insert(&env->objmap, &obj_local, sizeof(obj_local));
 }
 
@@ -894,13 +896,12 @@ void	es_obj_attach_data(zbx_es_env_t *env, void *data)
  * Purpose: get data pointer attached to current object                       *
  *                                                                            *
  * Parameters: env  - [IN]                                                    *
- *             ref  - [IN] pointer reference, returned by es_put_ptr()        *
- *             type - [IN] pointer type                                       *
+ *             type - [IN] object type                                        *
  *                                                                            *
  * Comments: This function must be used only from object methods.             *
  *                                                                            *
  ******************************************************************************/
-void	*es_obj_get_data(zbx_es_env_t *env)
+void	*es_obj_get_data(zbx_es_env_t *env, zbx_es_obj_type_t type)
 {
 	zbx_es_obj_data_t	obj_local, *obj;
 
@@ -908,7 +909,7 @@ void	*es_obj_get_data(zbx_es_env_t *env)
 	obj_local.heapptr = duk_require_heapptr(env->ctx, -1);
 	duk_pop(env->ctx);
 
-	if (NULL != (obj = zbx_hashset_search(&env->objmap, &obj_local)))
+	if (NULL != (obj = zbx_hashset_search(&env->objmap, &obj_local)) && obj->type == type)
 		return obj->data;
 
 	return NULL;
@@ -918,8 +919,8 @@ void	*es_obj_get_data(zbx_es_env_t *env)
  *                                                                            *
  * Purpose: detach data pointer from current object                           *
  *                                                                            *
- * Parameters: env - [IN]                                                     *
- *             ref - [IN] pointer reference, returned by es_put_ptr()         *
+ * Parameters: env  - [IN]                                                    *
+ *             type - [IN] object type                                        *
  *                                                                            *
  * Return value: detached data pointer                                        *
  *                                                                            *
@@ -929,14 +930,14 @@ void	*es_obj_get_data(zbx_es_env_t *env)
  *           This function must be used only from object destructor.          *
  *                                                                            *
  ******************************************************************************/
-void	*es_obj_detach_data(zbx_es_env_t *env)
+void	*es_obj_detach_data(zbx_es_env_t *env, zbx_es_obj_type_t type)
 {
 	zbx_es_obj_data_t	obj_local, *obj;
 	void			*data;
 
 	obj_local.heapptr = duk_require_heapptr(env->ctx, -1);
 
-	if (NULL == (obj = zbx_hashset_search(&env->objmap, &obj_local)))
+	if (NULL == (obj = zbx_hashset_search(&env->objmap, &obj_local)) || obj->type != type)
 		return NULL;
 
 	data = obj->data;

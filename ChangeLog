@@ -1,6 +1,16 @@
-Changes for 7.0.1rc2
+Changes for 7.0.2rc1
 
 New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 7.0.1
+
+7.0.1rc2 was released as 7.0.1 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 7.0.1rc2
 
 Bug fixes:
 ........S. [ZBX-24852] fixed compression policy change bug (askolmeisters)
