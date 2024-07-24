@@ -550,11 +550,8 @@ class CDBHelper {
 	 * @param int   $value TRIGGER_VALUE_FALSE
 	 * @param array $event_fields
 	 */
-	public static function setTriggerProblem($triggers_names, $value = TRIGGER_VALUE_TRUE, $event_fields = [], $eventid_return = false) {
-		if ($eventid_return) {
-			$eventids = [];
-		}
-
+	public static function setTriggerProblem($triggers_names, $value = TRIGGER_VALUE_TRUE, $event_fields = []) {
+		$eventids = [];
 		foreach ($triggers_names as $trigger_name) {
 			$trigger = DB::find('triggers', ['description' => $trigger_name]);
 
@@ -642,15 +639,11 @@ class CDBHelper {
 						}
 					}
 
-					if ($eventid_return) {
-						$eventids[] = $fields['eventid'];
-					}
+					$eventids[] = $fields['eventid'];
 				}
 			}
 		}
 
-		if ($eventid_return) {
-			return $eventids;
-		}
+		return $eventids;
 	}
 }

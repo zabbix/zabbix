@@ -25,6 +25,8 @@ require_once dirname(__FILE__).'/../include/CWebTest.php';
  * @backup profiles
  *
  * @onBefore prepareAlarmData
+ *
+ * @onAfterEach closeAndAcknowledgeEvents
  */
 class testFormAlarmNotification extends CWebTest {
 
@@ -192,13 +194,12 @@ class testFormAlarmNotification extends CWebTest {
 	/**
 	 * Check Alarm notification overlay dialog layout.
 	 *
-	 * @onAfter closeAndAcknowledgeEvents
 	 */
 	public function testFormAlarmNotification_Layout() {
 		// Trigger problem.
 		$time = time();
 		$event_time = date('Y-m-d H:i:s', $time);
-		self::$eventids = CDBHelper::setTriggerProblem(['Not_classified_trigger_4'], TRIGGER_VALUE_TRUE, ['clock' => $time], true);
+		self::$eventids = CDBHelper::setTriggerProblem(['Not_classified_trigger_4'], TRIGGER_VALUE_TRUE, ['clock' => $time]);
 
 		$this->page->login()->open('zabbix.php?action=problem.view')->waitUntilReady();
 
@@ -295,7 +296,6 @@ class testFormAlarmNotification extends CWebTest {
 
 	/**
 	 * Check that colors displayed in alarm notification overlay are the same as in configuration.
-	 * @onAfter closeAndAcknowledgeEvents
 	 */
 	public function testFormAlarmNotification_CheckColorChange() {
 		$severity_names = [
@@ -312,7 +312,7 @@ class testFormAlarmNotification extends CWebTest {
 				self::$hostid)->waitUntilReady();
 
 		// Trigger problem.
-		self::$eventids = CDBHelper::setTriggerProblem(self::ALL_TRIGGERS, TRIGGER_VALUE_TRUE, [], true);
+		self::$eventids = CDBHelper::setTriggerProblem(self::ALL_TRIGGERS);
 
 		// Open Trigger displaying options page for color check and change.
 		$this->page->open('zabbix.php?action=trigdisplay.edit')->waitUntilReady();
@@ -436,8 +436,6 @@ class testFormAlarmNotification extends CWebTest {
 	 *
 	 * @dataProvider getDisplayedAlarmsData
 	 * @ignoreBrowserErrors
-	 *
-	 * @onAfter closeAndAcknowledgeEvents
 	 */
 	public function testFormAlarmNotification_DisplayedAlarms($data) {
 		$this->page->login()->open('zabbix.php?action=problem.view&filter_reset=1')->waitUntilReady();
@@ -445,7 +443,7 @@ class testFormAlarmNotification extends CWebTest {
 				self::$hostid)->waitUntilReady();
 
 		// Trigger problem.
-		self::$eventids = CDBHelper::setTriggerProblem($data['trigger_name'], TRIGGER_VALUE_TRUE, [], true);
+		self::$eventids = CDBHelper::setTriggerProblem($data['trigger_name']);
 
 		// Filter problems by Hosts and refresh page for alarm overlay to appear.
 		$table = $this->query('class:list-table')->asTable()->one();
@@ -587,7 +585,6 @@ class testFormAlarmNotification extends CWebTest {
 	 *
 	 * @dataProvider getNotDisplayedAlarmsData
 	 *
-	 * @onAfter closeAndAcknowledgeEvents
 	 */
 	public function testFormAlarmNotification_NotDisplayedAlarms($data) {
 		// Set checked trigger severity in messaging settings.
@@ -603,7 +600,7 @@ class testFormAlarmNotification extends CWebTest {
 				self::$hostid)->waitUntilReady();
 
 		// Trigger problem.
-		self::$eventids = CDBHelper::setTriggerProblem(self::ALL_TRIGGERS, TRIGGER_VALUE_TRUE, [], true);
+		self::$eventids = CDBHelper::setTriggerProblem(self::ALL_TRIGGERS);
 
 		// Filter problems by Hosts and refresh page for alarm overlay to appear.
 		$table = $this->query('class:list-table')->asTable()->one();
