@@ -24,7 +24,7 @@ $csrf_token = CCsrfTokenHelper::get('mediatype');
 
 // Create form.
 $form = (new CForm())
-	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token))->removeId())
+	->addItem((new CVar(CSRF_TOKEN_NAME, $csrf_token))->removeId())
 	->setId('media-type-form')
 	->addVar('mediatypeid', $data['mediatypeid'])
 	->disablePasswordAutofill()

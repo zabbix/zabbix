@@ -628,7 +628,7 @@ function getMenuPopupDashboard(options, trigger_element) {
 		const url_delete = new Curl('zabbix.php');
 		url_delete.setArgument('action', 'dashboard.delete');
 		url_delete.setArgument('dashboardids', [options.dashboardid]);
-		url_delete.setArgument('_csrf_token', options.csrf_token);
+		url_delete.setArgument(CSRF_TOKEN_NAME, options.csrf_token);
 
 		sections.push({
 			label: t('Actions'),
@@ -663,7 +663,7 @@ function getMenuPopupDashboard(options, trigger_element) {
 							return false;
 						}
 
-						redirect(url_delete.getUrl(), 'post', '_csrf_token', true);
+						redirect(url_delete.getUrl(), 'post', CSRF_TOKEN_NAME, true);
 					},
 					disabled: !options.editable
 				}
@@ -882,7 +882,7 @@ function getMenuPopupTrigger(options, trigger_element) {
 						body: urlEncodeData({
 							eventids: [options.eventid],
 							change_rank: ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE,
-							_csrf_token: options.csrf_tokens['acknowledge']
+							[CSRF_TOKEN_NAME]: options.csrf_tokens['acknowledge']
 						})
 					})
 						.then((response) => response.json())
@@ -930,7 +930,7 @@ function getMenuPopupTrigger(options, trigger_element) {
 							eventids: options.eventids,
 							cause_eventid: options.eventid,
 							change_rank: ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM,
-							_csrf_token: options.csrf_tokens['acknowledge']
+							[CSRF_TOKEN_NAME]: options.csrf_tokens['acknowledge']
 						})
 					})
 						.then((response) => response.json())

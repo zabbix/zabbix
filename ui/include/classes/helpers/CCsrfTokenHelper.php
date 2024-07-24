@@ -19,8 +19,6 @@
  */
 class CCsrfTokenHelper {
 
-	public const CSRF_TOKEN_NAME = '_csrf_token';
-
 	/**
 	 * Generates CSRF token that is used in forms.
 	 *
