@@ -21,6 +21,8 @@ A.F.I..PS. [ZBXNEXT-9176] removed support of Oracle DB (agriscenko, sboidenko)
 .......PS. [ZBXNEXT-8990] extended VMware event log with username (asestakovs)
 
 Bug fixes:
+........S. [ZBX-24821] made 'execute_on' value being recorded in audit only for shell scripts (arimdjonoks)
+........S. [ZBX-24852] fixed compression policy change bug (askolmeisters)
 ...G....S. [ZBX-24719] fixed Zabbix agent 2 crashing when executing global script (arimdjonoks)
 .......PS. [ZBX-24514] fixed standalone Zabbix server and Zabbix proxy not stopping when database is read-only (vso)
 ........S. [ZBX-24632] fixed perf entry collection on Firefox in browser monitoring, added filtering of unserializable properties (wiper)
@@ -128,9 +130,19 @@ A......... [ZBX-24299] fixed possibility to alter readonly error fields with Hos
 ........S. [ZBX-23690] optimized maintenance calculations for large number of hosts x maintenances (wiper)
 
 --------------------------------------------------------------------------------
-Changes for 7.0.1rc2
+Changes for 7.0.2rc1
 
 New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 7.0.1
+
+7.0.1rc2 was released as 7.0.1 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 7.0.1rc2
 
 Bug fixes:
 ........S. [ZBX-24852] fixed compression policy change bug (askolmeisters)

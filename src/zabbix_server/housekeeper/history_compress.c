@@ -104,7 +104,8 @@ static void	hk_check_table_segmentation(const char *table_name, const char *segm
  * Parameters: table_name         - [IN] hypertable name                      *
  *             compression_policy - [IN]                                      *
  *                                                                            *
- * Return value: data compression age in seconds                              *
+ * Return value: >=0 - data compression age in seconds                        *
+ *               -1  - hypertable has different compression policy            *
  *                                                                            *
  ******************************************************************************/
 static int	hk_get_compression_age(const char *table_name, int compression_policy)
@@ -122,9 +123,22 @@ static int	hk_get_compression_age(const char *table_name, int compression_policy
 			" hypertable_schema='%s' and hypertable_name='%s'", field, zbx_db_get_schema_esc(), table_name);
 
 	if (NULL != (row = zbx_db_fetch(result)))
-		age = atoi(row[0]);
+	{
+		/* extraction from JSON may return empty field when JSON exists but field doesn't */
+		if (NULL == row[0])
+		{
+			zabbix_log(LOG_LEVEL_ERR, "Unexpected TimescaleDB configuration: the %s table does not have %s "
+					"compression policy", table_name, field);
+			age = -1;
+		}
+		else
+		{
+			age = atoi(row[0]);
+		}
+	}
 
 	zbx_db_free_result(result);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() age: %d", __func__, age);
 
 	return age;
@@ -143,9 +157,10 @@ static void	hk_set_table_compression_age(const char *table_name, int age, int co
 {
 	int	compress_after;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): table: %s age %d", __func__, table_name, age);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): table: %s age %d, compression_policy %d", __func__, table_name, age,
+			compression_policy);
 
-	if (age != (compress_after = hk_get_compression_age(table_name, compression_policy)))
+	if (age != (compress_after = hk_get_compression_age(table_name, compression_policy)) && -1 != compress_after)
 	{
 		zbx_db_result_t	res = NULL;
 
@@ -233,7 +248,7 @@ static void	hk_history_disable_compression(void)
 	{
 		const zbx_history_table_compression_options_t	*table = &compression_tables[i];
 
-		if (0 == hk_get_compression_age(table->name, table->compression_policy))
+		if (0 >= hk_get_compression_age(table->name, table->compression_policy))
 			continue;
 
 		zbx_db_free_result(zbx_db_select("select %s('%s')", COMPRESSION_POLICY_REMOVE, table->name));

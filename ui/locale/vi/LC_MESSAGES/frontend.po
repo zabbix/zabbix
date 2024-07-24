@@ -1854,6 +1854,11 @@ msgstr "Tính sẵn sàng"
 msgid "Availability report"
 msgstr "Thông báo tính sẵn sàng"
 
+#: app/controllers/CControllerAvailabilityReportTrigger.php:70
+#: app/views/reports.availabilityreport.trigger.php:23
+msgid "Availability report graph"
+msgstr ""
+
 #: include/classes/html/CHostAvailability.php:80
 #: widgets/hostavail/views/widget.view.php:32
 msgid "Available"
