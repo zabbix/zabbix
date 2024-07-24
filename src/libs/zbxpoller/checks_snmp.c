@@ -236,8 +236,6 @@ typedef struct
 }
 zbx_snmp_engineid_record_t;
 
-#undef ZBX_SNMP_MAX_ENGINEID_LEN
-
 static zbx_hash_t	snmp_engineid_cache_hash(const void *data)
 {
 	const zbx_snmp_engineid_record_t	*hv = (const zbx_snmp_engineid_record_t *)data;
@@ -295,6 +293,12 @@ static int	zbx_snmp_cache_handle_engineid(netsnmp_session *session, zbx_dc_item_
 
 	if (0 == engineid_cache_initialized)
 		return SUCCEED;
+
+	if (ZBX_SNMP_MAX_ENGINEID_LEN < session->securityEngineIDLen)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "SNMP engineID of non-conformant length (" ZBX_FS_UI64 ") was detected");
+		return SUCCEED;
+	}
 
 	local_record.engineid_len = session->securityEngineIDLen;
 	memcpy(&local_record.engineid, session->securityEngineID, session->securityEngineIDLen);
@@ -386,6 +390,8 @@ static int	zbx_snmp_cache_handle_engineid(netsnmp_session *session, zbx_dc_item_
 out:
 	return ret;
 }
+
+#undef ZBX_SNMP_MAX_ENGINEID_LEN
 
 void	zbx_housekeep_snmp_engineid_cache(void)
 {
