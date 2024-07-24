@@ -14,7 +14,7 @@ Zabbix version: 6.0 and higher.
 ## Tested versions
 
 This template has been tested on:
-- AWS ELB Application Load Balancer with Target Groups by HTTP
+- AWS Lambda by HTTP
 
 ## Configuration
 
@@ -22,11 +22,11 @@ This template has been tested on:
 
 ## Setup
 
-The template gets AWS ELB Application Load Balancer metrics and uses the script item to make HTTP requests to the CloudWatch API.
+The template gets AWS Lambda metrics and uses the script item to make HTTP requests to the CloudWatch API.
 
-Before using the template, you need to create an IAM policy with the necessary permissions for the Zabbix role in your AWS account. For more information, visit the [ELB policies page](https://docs.aws.amazon.com/elasticloadbalancing/latest/userguide/elb-api-permissions.html) on the AWS website.
+Before using the template, you need to create an IAM policy with the necessary permissions for the Zabbix role in your AWS account. For more information, visit the [Lambda permissions page](https://docs.aws.amazon.com/lambda/latest/dg/lambda-permissions.html) on the AWS website.
 
-Add the following required permissions to your Zabbix IAM policy in order to collect AWS ELB Application Load Balancer metrics.
+Add the following required permissions to your Zabbix IAM policy in order to collect AWS Lambda metrics.
 ```json
 {
     "Version":"2012-10-17",
