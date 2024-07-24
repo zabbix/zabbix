@@ -159,7 +159,7 @@ static duk_ret_t	es_md5(duk_context *ctx)
 	ptr = md5sum = (char *)zbx_malloc(NULL, MD5_DIGEST_SIZE * 2 + 1);
 
 	zbx_md5_init(&state);
-	zbx_md5_append(&state, (const md5_byte_t *)str, strlen(str));
+	zbx_md5_append(&state, (const md5_byte_t *)str, (int)len);
 	zbx_md5_finish(&state, hash);
 
 	for (i = 0; i < MD5_DIGEST_SIZE; i++)
@@ -199,7 +199,7 @@ static duk_ret_t	es_sha256(duk_context *ctx)
 	if (NULL == (str = es_get_buffer_dyn(ctx, 0, &len)))
 		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot obtain parameter");
 
-	zbx_sha256_hash(str, hash_res);
+	zbx_sha256_hash_len(str, len, hash_res);
 
 	for (i = 0 ; i < ZBX_SHA256_DIGEST_SIZE; i++)
 	{

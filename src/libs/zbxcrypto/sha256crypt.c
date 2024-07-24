@@ -308,3 +308,12 @@ void	zbx_sha256_hash(const char *in, char *out)
 	sha256_finish_ctx (&ctx, out);
 }
 
+void	zbx_sha256_hash_len(const char *in, size_t len, char *out)
+{
+	struct sha256_ctx ctx;
+
+	sha256_init_ctx(&ctx);
+	sha256_process_bytes (in, len, &ctx);
+	sha256_finish_ctx(&ctx, out);
+}
+

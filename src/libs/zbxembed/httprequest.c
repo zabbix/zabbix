@@ -301,6 +301,7 @@ static duk_ret_t	es_httprequest_query(duk_context *ctx, const char *http_request
 	int			err_index = -1;
 	zbx_es_env_t		*env;
 	zbx_uint64_t		timeout_ms, elapsed_ms;
+	duk_size_t		contents_len = 0;
 
 	if (NULL == (env = zbx_es_get_env(ctx)))
 		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot access internal environment");
@@ -322,10 +323,9 @@ static duk_ret_t	es_httprequest_query(duk_context *ctx, const char *http_request
 
 	if (0 == duk_is_null_or_undefined(ctx, 1))
 	{
-		if (SUCCEED != zbx_cesu8_to_utf8(duk_to_string(ctx, 1), &contents))
+		if (NULL == (contents = es_get_buffer_dyn(ctx, 1, &contents_len)))
 		{
-			err_index = duk_push_error_object(ctx, DUK_RET_TYPE_ERROR,
-					"cannot convert request contents to utf8");
+			err_index = duk_push_error_object(ctx, DUK_RET_TYPE_ERROR, "cannot obtain second parameter");
 			goto out;
 		}
 	}
@@ -362,6 +362,7 @@ static duk_ret_t	es_httprequest_query(duk_context *ctx, const char *http_request
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_CUSTOMREQUEST, http_request, err);
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_TIMEOUT_MS, timeout_ms - elapsed_ms, err);
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_POSTFIELDS, ZBX_NULL2EMPTY_STR(contents), err);
+	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_POSTFIELDSIZE, (long)contents_len, err);
 	ZBX_CURL_SETOPT(ctx, request->handle, ZBX_CURLOPT_ACCEPT_ENCODING, "", err);
 #if LIBCURL_VERSION_NUM >= 0x071304
 	/* CURLOPT_PROTOCOLS is supported starting with version 7.19.4 (0x071304) */

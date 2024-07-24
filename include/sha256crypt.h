@@ -20,8 +20,11 @@
 #ifndef ZABBIX_SHA256CRYPT_H
 #define ZABBIX_SHA256CRYPT_H
 
+#include "common.h"
+
 #define ZBX_SHA256_DIGEST_SIZE	32
 
 void	zbx_sha256_hash(const char *in, char *out);
+void	zbx_sha256_hash_len(const char *in, size_t len, char *out);
 
 #endif /* ZABBIX_SHA256CRYPT_H */
