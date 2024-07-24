@@ -46,7 +46,7 @@ static zbx_webdriver_t *es_webdriver(duk_context *ctx)
 		return NULL;
 	}
 
-	if (NULL == (wd = (zbx_webdriver_t *)es_obj_get_data(env)))
+	if (NULL == (wd = (zbx_webdriver_t *)es_obj_get_data(env, ES_OBJ_BROWSER)))
 		(void)duk_push_error_object(ctx, DUK_RET_EVAL_ERROR, "cannot find native data attached to object");
 
 	return wd;
@@ -67,7 +67,7 @@ static duk_ret_t	es_browser_dtor(duk_context *ctx)
 
 	zabbix_log(LOG_LEVEL_TRACE, "Browser::~Browser()");
 
-	if (NULL != (wd = (zbx_webdriver_t *)es_obj_detach_data(env)))
+	if (NULL != (wd = (zbx_webdriver_t *)es_obj_detach_data(env, ES_OBJ_BROWSER)))
 	{
 		webdriver_release(wd);
 		env->browser_objects--;
@@ -128,7 +128,7 @@ static duk_ret_t	es_browser_ctor(duk_context *ctx)
 	}
 
 	duk_push_this(ctx);
-	es_obj_attach_data(env, wd);
+	es_obj_attach_data(env, wd, ES_OBJ_BROWSER);
 	wd->browser = duk_get_heapptr(ctx, -1);
 
 	if (SUCCEED != webdriver_open_session(wd, capabilities, &error))
@@ -147,7 +147,7 @@ out:
 	{
 		if (NULL != wd)
 		{
-			(void)es_obj_detach_data(env);
+			(void)es_obj_detach_data(env, ES_OBJ_BROWSER);
 			webdriver_release(wd);
 		}
 
