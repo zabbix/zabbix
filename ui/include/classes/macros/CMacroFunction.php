@@ -146,6 +146,7 @@ class CMacroFunction {
 					return UNRESOLVED_MACRO_STRING;
 				}
 
+				$pattern = preg_quote($pattern, '/');
 				$value = preg_replace('/' . $pattern . '/i', $replacement, $value, -1);
 
 				if ($value === null || preg_last_error() !== PREG_NO_ERROR) {
