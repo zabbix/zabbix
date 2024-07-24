@@ -171,10 +171,10 @@ $graphTable = (new CTableInfo())
 	->setPageNavigation($data['paging']);
 
 $csrf_token = CCsrfTokenHelper::get('graphs.php');
+$hosts = null;
 
 foreach ($data['graphs'] as $graph) {
 	$graphid = $graph['graphid'];
-	$hosts = null;
 
 	if (!$this->data['hostid']) {
 		$hosts = [];
