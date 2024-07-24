@@ -2824,8 +2824,7 @@ static int	eval_execute_function_jsonpath(const zbx_eval_context_t *ctx, const z
 	{
 		default_value = &output->values[output->values_num - token->opt + 2];
 
-		if (ZBX_VARIANT_NONE != default_value->type &&
-				SUCCEED != zbx_variant_convert(default_value, ZBX_VARIANT_STR))
+		if (SUCCEED != zbx_variant_convert(default_value, ZBX_VARIANT_STR))
 		{
 			*error = zbx_strdup(*error, "invalid third parameter");
 			return ret;
