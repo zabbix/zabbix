@@ -151,9 +151,10 @@ static duk_ret_t	es_md5(duk_context *ctx)
 	md5_byte_t	hash[MD5_DIGEST_SIZE];
 	int		i;
 	char		*str = NULL, *md5sum, *ptr;
+	duk_size_t	len;
 
-	if (SUCCEED != zbx_cesu8_to_utf8(duk_require_string(ctx, 0), &str))
-		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot convert value to utf8");
+	if (NULL == (str = es_get_buffer_dyn(ctx, 0, &len)))
+		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot obtain parameter");
 
 	ptr = md5sum = (char *)zbx_malloc(NULL, MD5_DIGEST_SIZE * 2 + 1);
 
@@ -190,11 +191,13 @@ static duk_ret_t	es_md5(duk_context *ctx)
  ******************************************************************************/
 static duk_ret_t	es_sha256(duk_context *ctx)
 {
-	char	*str = NULL, hash_res[ZBX_SHA256_DIGEST_SIZE], hash_res_stringhexes[ZBX_SHA256_DIGEST_SIZE * 2 + 1];
-	int	i;
+	char		*str = NULL, hash_res[ZBX_SHA256_DIGEST_SIZE],
+			hash_res_stringhexes[ZBX_SHA256_DIGEST_SIZE * 2 + 1];
+	int		i;
+	duk_size_t	len;
 
-	if (SUCCEED != zbx_cesu8_to_utf8(duk_require_string(ctx, 0), &str))
-		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot convert value to utf8");
+	if (NULL == (str = es_get_buffer_dyn(ctx, 0, &len)))
+		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot obtain parameter");
 
 	zbx_sha256_hash(str, hash_res);
 
