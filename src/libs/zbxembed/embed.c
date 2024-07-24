@@ -619,7 +619,7 @@ int	zbx_es_execute(zbx_es_t *es, const char *script, const char *code, int size,
 		}
 		else
 		{
-			if (SUCCEED != (ret = zbx_cesu8_to_utf8(duk_safe_to_string(es->env->ctx, -1), output)))
+			if (SUCCEED != (ret = es_duktape_string_decode(duk_safe_to_string(es->env->ctx, -1), output)))
 				*error = zbx_strdup(*error, "could not convert return value to utf8");
 			else
 				zabbix_log(LOG_LEVEL_DEBUG, "%s() output:'%s'", __func__, *output);

@@ -25,6 +25,7 @@
 #include "httprequest.h"
 #include "embed.h"
 #include "duktape.h"
+#include "global.h"
 
 #ifdef HAVE_LIBCURL
 
