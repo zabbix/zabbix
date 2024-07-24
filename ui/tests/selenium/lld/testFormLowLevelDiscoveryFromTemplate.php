@@ -179,49 +179,49 @@ class testFormLowLevelDiscoveryFromTemplate extends testLowLevelDiscovery {
 	}
 
 	public function testFormLowLevelDiscoveryFromTemplate_InitialLayout() {
-		$this->checkInitialLayout('template');
+		$this->checkInitialLayout();
 	}
 
 	/**
 	 * @dataProvider getTypeDependingData
 	 */
 	public function testFormLowLevelDiscoveryFromTemplate_TypeDependingLayout($data) {
-		$this->checkLayoutDependingOnType($data, 'template');
+		$this->checkLayoutDependingOnType($data);
 	}
 
 	public function testFormLowLevelDiscoveryFromTemplate_SimpleUpdate() {
-		$this->checkSimpleUpdate('template');
+		$this->checkSimpleUpdate();
 	}
 
 	/**
 	 * @dataProvider getLLDData
 	 */
 	public function testFormLowLevelDiscoveryFromTemplate_Create($data) {
-		$this->checkForm($data, false, 'template');
+		$this->checkForm($data, false);
 	}
 
 	/**
 	 * @dataProvider getLLDData
 	 */
 	public function testFormLowLevelDiscoveryFromTemplate_Update($data) {
-		$this->checkForm($data, true, 'template');
+		$this->checkForm($data, true);
 	}
 
 	/**
 	 * @dataProvider getCancelData
 	 */
 	public function testFormLowLevelDiscoveryFromTemplate_Cancel($data) {
-		$this->checkCancel($data, 'template');
+		$this->checkCancel($data);
 	}
 
 	/**
 	 * @dataProvider getCloneData
 	 */
 	public function testFormLowLevelDiscoveryFromTemplate_Clone($data) {
-		$this->checkClone($data, 'template');
+		$this->checkClone($data);
 	}
 
 	public function testFormLowLevelDiscoveryFromTemplate_Delete() {
-		$this->checkDelete('template');
+		$this->checkDelete();
 	}
 }

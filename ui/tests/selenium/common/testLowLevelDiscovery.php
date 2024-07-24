@@ -2550,7 +2550,7 @@ class testLowLevelDiscovery extends CWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
-					'fields'  => [
+					'fields' => [
 						'Key' => 'simple_update_clone_key[cloned]'
 					],
 					'expected_fields' => [
@@ -2613,7 +2613,7 @@ class testLowLevelDiscovery extends CWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
-					'fields'  => [
+					'fields' => [
 						'Name' => self::SIMPLE_UPDATE_CLONE_LLD.' cloned with field changes',
 						'Type' => 'SSH agent',
 						'Key' => 'simple_update_clone_key[cloned_2]',
@@ -2697,13 +2697,13 @@ class testLowLevelDiscovery extends CWebTest {
 		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.$url);
 		$this->query('link', self::SIMPLE_UPDATE_CLONE_LLD)->waitUntilClickable()->one()->click();
 		$form = $this->query('id:host-discovery-form')->asForm()->waitUntilVisible()->one();
-		$form->query('button:Clone')->one()->waitUntilClickable()->click();
+		$form->query('button:Clone')->waitUntilClickable()->one()->click();
 		$form->invalidate();
 		$this->assertEquals(['Add', 'Test', 'Cancel'], $form->query('xpath:.//div[@class="form-actions"]/button')
 				->all()->filter(CElementFilter::CLICKABLE)->asText()
 		);
 
-		if (CTestArrayHelper::get($data, 'fields', [])) {
+		if (CTestArrayHelper::get($data, 'fields')) {
 			if (static::$context === 'template') {
 				unset($data['fields']['Host interface']);
 				unset($data['expected_fields']['Host interface']);
@@ -2732,7 +2732,7 @@ class testLowLevelDiscovery extends CWebTest {
 		}
 
 		// Change Overrides.
-		if (array_key_exists('Overrides', $data) && CTestArrayHelper::get($data, 'change_overrides', false)) {
+		if (array_key_exists('Overrides', $data) && CTestArrayHelper::get($data, 'change_overrides')) {
 			$form->selectTab('Overrides');
 			$form->query('link:Override')->waitUntilClickable()->one()->click();
 			$override_dialog_form = COverlayDialogElement::find()->all()->last()->asForm()->waitUntilReady();
@@ -2780,7 +2780,8 @@ class testLowLevelDiscovery extends CWebTest {
 		else {
 			$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
 			$this->assertMessage(TEST_BAD, 'Cannot add discovery rule', 'An LLD rule with key "'.$original_key.'"'.
-					' already exists on the '.static::$context.' "'.$host_name.'".');
+					' already exists on the '.static::$context.' "'.$host_name.'".'
+			);
 		}
 	}
 
