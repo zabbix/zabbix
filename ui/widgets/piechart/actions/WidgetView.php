@@ -651,6 +651,10 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$non_total_sectors = [];
 		$has_total_item = false;
 
+		$sectors = array_filter($sectors, static function ($sector) {
+			return $sector['value'] !== null;
+		});
+
 		// Move total sector to the end.
 		foreach ($sectors as $key => $sector) {
 			if ($sector['is_total']) {
@@ -725,7 +729,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		return [
 			'svg_sectors' => $svg_sectors,
-			'svg_total_value' => $total_value['formatted_value']
+			'svg_total_value' => $total_value
 		];
 	}
 }

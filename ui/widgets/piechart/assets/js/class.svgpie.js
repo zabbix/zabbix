@@ -319,10 +319,10 @@ class CSVGPie {
 		}
 
 		if (this.#config.total_value && total_value.value !== null) {
-			this.#total_value_text = total_value.value;
+			this.#total_value_text = total_value.formatted_value.value;
 
-			if (this.#config.total_value.units_show && total_value.units !== '') {
-				this.#total_value_text += ` ${total_value.units}`;
+			if (this.#config.total_value.units_show && total_value.formatted_value.units !== '') {
+				this.#total_value_text += ` ${total_value.formatted_value.units}`;
 			}
 		}
 
