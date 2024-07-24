@@ -191,12 +191,14 @@ class testFormAlarmNotification extends CWebTest {
 
 	/**
 	 * Check Alarm notification overlay dialog layout.
+	 *
+	 * @onAfter closeAndAcknowledgeEvents
 	 */
 	public function testFormAlarmNotification_Layout() {
 		// Trigger problem.
 		$time = time();
 		$event_time = date('Y-m-d H:i:s', $time);
-		CDBHelper::setTriggerProblem(['Not_classified_trigger_4'], TRIGGER_VALUE_TRUE, ['clock' => $time]);
+		self::$eventids = CDBHelper::setTriggerProblem(['Not_classified_trigger_4'], TRIGGER_VALUE_TRUE, ['clock' => $time], true);
 
 		$this->page->login()->open('zabbix.php?action=problem.view')->waitUntilReady();
 
@@ -293,6 +295,7 @@ class testFormAlarmNotification extends CWebTest {
 
 	/**
 	 * Check that colors displayed in alarm notification overlay are the same as in configuration.
+	 * @onAfter closeAndAcknowledgeEvents
 	 */
 	public function testFormAlarmNotification_CheckColorChange() {
 		$severity_names = [
@@ -304,16 +307,12 @@ class testFormAlarmNotification extends CWebTest {
 			'Not classified' => 'FF0080'
 		];
 
-		$this->page->login()->open('zabbix.php?action=problem.view&unacknowledged=1&sort=name&sortorder=ASC&hostids%5B%5D='.
+		$this->page->login()->open('zabbix.php?action=problem.view&filter_reset=1')->waitUntilReady();
+		$this->page->open('zabbix.php?action=problem.view&unacknowledged=1&sort=name&sortorder=ASC&hostids%5B%5D='.
 				self::$hostid)->waitUntilReady();
 
-		// In case some scenarios failed and problems didn't closed at the end.
-		if ($this->getEmptyTableCondition()) {
-			$this->closeProblems();
-		}
-
 		// Trigger problem.
-		CDBHelper::setTriggerProblem(self::ALL_TRIGGERS);
+		self::$eventids = CDBHelper::setTriggerProblem(self::ALL_TRIGGERS, TRIGGER_VALUE_TRUE, [], true);
 
 		// Open Trigger displaying options page for color check and change.
 		$this->page->open('zabbix.php?action=trigdisplay.edit')->waitUntilReady();
@@ -353,13 +352,10 @@ class testFormAlarmNotification extends CWebTest {
 		$alarm_colors_changed = $this->getAlarmColors();
 		$this->assertEquals($changed_colors, $alarm_colors_changed);
 
-		// Navigate to problem page for problems closing.
-		$this->page->open('zabbix.php?action=problem.view&unacknowledged=1&sort=name&sortorder=ASC&hostids%5B%5D='.
-				self::$hostid)->waitUntilReady();
-
-		if ($this->getEmptyTableCondition()) {
-			$this->closeProblems();
-		}
+		// Check close button and close the problems.
+		$alarm_dialog = $this->getAlarmOverlay();
+		$alarm_dialog->query('xpath:.//button[@title="Close"]')->one()->click();
+		$alarm_dialog->ensureNotPresent();
 	}
 
 	public static function getDisplayedAlarmsData() {
@@ -441,20 +437,15 @@ class testFormAlarmNotification extends CWebTest {
 	 * @dataProvider getDisplayedAlarmsData
 	 * @ignoreBrowserErrors
 	 *
-	 * @onAfterEach closeAndAcknowledgeEvents
+	 * @onAfter closeAndAcknowledgeEvents
 	 */
 	public function testFormAlarmNotification_DisplayedAlarms($data) {
 		$this->page->login()->open('zabbix.php?action=problem.view&filter_reset=1')->waitUntilReady();
 		$this->page->open('zabbix.php?action=problem.view&unacknowledged=1&sort=name&sortorder=ASC&hostids%5B%5D='.
 				self::$hostid)->waitUntilReady();
 
-		// In case some scenarios failed and problems didn't closed at the end.
-		if ($this->getEmptyTableCondition()) {
-			$this->closeProblems();
-		}
-
 		// Trigger problem.
-		CDBHelper::setTriggerProblem($data['trigger_name']);
+		self::$eventids = CDBHelper::setTriggerProblem($data['trigger_name'], TRIGGER_VALUE_TRUE, [], true);
 
 		// Filter problems by Hosts and refresh page for alarm overlay to appear.
 		$table = $this->query('class:list-table')->asTable()->one();
@@ -475,7 +466,6 @@ class testFormAlarmNotification extends CWebTest {
 		// Check close button and close the problems.
 		$alarm_dialog->query('xpath:.//button[@title="Close"]')->one()->click();
 		$alarm_dialog->ensureNotPresent();
-		$this->closeProblems();
 	}
 
 	public static function getNotDisplayedAlarmsData(){
@@ -596,6 +586,8 @@ class testFormAlarmNotification extends CWebTest {
 	 * @onBefore resetTriggerSeverities
 	 *
 	 * @dataProvider getNotDisplayedAlarmsData
+	 *
+	 * @onAfter closeAndAcknowledgeEvents
 	 */
 	public function testFormAlarmNotification_NotDisplayedAlarms($data) {
 		// Set checked trigger severity in messaging settings.
@@ -610,13 +602,8 @@ class testFormAlarmNotification extends CWebTest {
 		$this->page->open('zabbix.php?action=problem.view&unacknowledged=1&sort=name&sortorder=ASC&hostids%5B%5D='.
 				self::$hostid)->waitUntilReady();
 
-		// In case some scenarios failed and problems didn't closed at the end.
-		if ($this->getEmptyTableCondition()) {
-			$this->closeProblems();
-		}
-
 		// Trigger problem.
-		CDBHelper::setTriggerProblem(self::ALL_TRIGGERS);
+		self::$eventids = CDBHelper::setTriggerProblem(self::ALL_TRIGGERS, TRIGGER_VALUE_TRUE, [], true);
 
 		// Filter problems by Hosts and refresh page for alarm overlay to appear.
 		$table = $this->query('class:list-table')->asTable()->one();
@@ -642,8 +629,6 @@ class testFormAlarmNotification extends CWebTest {
 			$alarm_dialog->query('xpath:.//button[@title="Close"]')->one()->click();
 			$alarm_dialog->ensureNotPresent();
 		}
-
-		$this->closeProblems();
 	}
 
 	/**
@@ -659,20 +644,6 @@ class testFormAlarmNotification extends CWebTest {
 				zbx_dbstr('a:6:{i:0;s:1:"1";i:1;s:1:"1";i:2;s:1:"1";i:3;s:1:"1";i:4;s:1:"1";i:5;s:1:"1";}').', '.
 				zbx_dbstr('triggers.severities').', 3)'
 		);
-	}
-
-	/**
-	 * Manually close problem from Problems page.
-	 */
-	protected function closeProblems() {
-		$this->selectTableRows();
-		$this->query('button:Mass update')->one()->click();
-
-		// Find appeared Alarm notification overlay dialog.
-		$problem_form = COverlayDialogElement::find()->waitUntilReady()->one()->asForm();
-		$problem_form->fill(['Close problem' => true, 'Acknowledge' => true])->submit();
-
-		COverlayDialogElement::ensureNotPresent();
 	}
 
 	/**
@@ -701,10 +672,9 @@ class testFormAlarmNotification extends CWebTest {
 				->waitUntilVisible()->one();
 	}
 
-	protected function getEmptyTableCondition() {
-		return $this->query('class:list-table')->asTable()->one()->getRows()->asText() !== ['No data found.'];
-	}
-
+	/**
+	 * Acknowledge and close triggered problem.
+	 */
 	protected function closeAndAcknowledgeEvents() {
 		CDataHelper::call('event.acknowledge', [
 			'eventids' => self::$eventids,
