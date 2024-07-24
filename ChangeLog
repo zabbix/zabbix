@@ -1,8 +1,14 @@
 Changes for 6.0.33rc1
 
 New features:
+.........T [ZBXNEXT-9217] added AWS Lambda by HTTP template (egordymov)
+.......PS. [ZBXNEXT-9293] updated max supported MySQL version to 9.0 (mprihodko)
 
 Bug fixes:
+.......PS. [ZBX-24524] fixed "new values per second" stat to include dependent items in calculation (asestakovs)
+........S. [ZBX-24821] made 'execute_on' value being recorded in audit only for shell scripts (arimdjonoks)
+..F....... [ZBX-23312] fixed discovery edit form being saved incorrectly after dcheck update (dfofanovs)
+.........T [ZBX-24773] fixed duplicate item preprocessing in Kubernetes Kubelet by HTTP template (egordymov)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.32
