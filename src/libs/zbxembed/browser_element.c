@@ -47,6 +47,13 @@ static zbx_wd_element_t *wd_element(duk_context *ctx)
 	return el;
 }
 
+void	wd_element_free(zbx_wd_element_t *el)
+{
+	webdriver_release(el->wd);
+	zbx_free(el->id);
+	zbx_free(el);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: element destructor                                                *
@@ -63,11 +70,7 @@ static duk_ret_t	wd_element_dtor(duk_context *ctx)
 		return duk_error(ctx, DUK_RET_EVAL_ERROR, "cannot access internal environment");
 
 	if (NULL != (el = (zbx_wd_element_t *)es_obj_detach_data(env, ES_OBJ_ELEMENT)))
-	{
-		webdriver_release(el->wd);
-		zbx_free(el->id);
-		zbx_free(el);
-	}
+		wd_element_free(el);
 
 	return 0;
 }

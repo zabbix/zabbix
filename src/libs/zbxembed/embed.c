@@ -391,10 +391,10 @@ static void	es_objmap_destroy(zbx_hashset_t *objmap)
 				webdriver_release((zbx_webdriver_t *)obj->data);
 				break;
 			case ES_OBJ_ELEMENT:
-				webdriver_release(((zbx_wd_element_t *)obj->data)->wd);
+				wd_element_free((zbx_wd_element_t *)obj->data);
 				break;
 			case ES_OBJ_ALERT:
-				webdriver_release(((zbx_wd_alert_t *)obj->data)->wd);
+				wd_alert_free((zbx_wd_alert_t *)obj->data);
 				break;
 		}
 	}

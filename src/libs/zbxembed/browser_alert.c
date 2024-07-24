@@ -46,6 +46,12 @@ static zbx_wd_alert_t *wd_alert(duk_context *ctx)
 	return alert;
 }
 
+void	wd_alert_free(zbx_wd_alert_t *alert)
+{
+	webdriver_release(alert->wd);
+	zbx_free(alert);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: alert destructor                                                  *
@@ -62,10 +68,7 @@ static duk_ret_t	wd_alert_dtor(duk_context *ctx)
 		return duk_error(ctx, DUK_RET_EVAL_ERROR, "cannot access internal environment");
 
 	if (NULL != (alert = (zbx_wd_alert_t *)es_obj_detach_data(env, ES_OBJ_ALERT)))
-	{
-		webdriver_release(alert->wd);
-		zbx_free(alert);
-	}
+		wd_alert_free(alert);
 
 	return 0;
 }
