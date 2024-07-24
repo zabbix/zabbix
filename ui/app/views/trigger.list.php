@@ -319,7 +319,10 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 			if (!empty($hosts)) {
 				$hosts[] = ', ';
 			}
-			$hosts[] = $host['name'];
+
+			$hosts[] = (new CLink($host['name']))
+				->setAttribute('data-hostid', $host['hostid'])
+				->addClass('js-edit-'.$data['context']);
 		}
 	}
 

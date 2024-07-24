@@ -1083,6 +1083,26 @@ function getMenuPopupItem(options) {
 			});
 		}
 
+		if (options.context === 'host') {
+			const action = new URLSearchParams(options.backurl.split('?')[1]).get('action');
+
+			config_urls.push({
+				label: t('Host'),
+				clickCallback: (e) => {
+					action === 'latest.view' ? view.editHost(options.hostid) : view.editHost(e, options.hostid);
+				}
+			});
+		}
+		else {
+			config_urls.push({
+				label: t('Template'),
+				clickCallback: (e) => {
+					view.editTemplate(e, options.hostid);
+				}
+			});
+		}
+
+
 		if (!config_triggers.disabled) {
 			const trigger_items = [];
 

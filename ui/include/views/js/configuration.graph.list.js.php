@@ -53,6 +53,15 @@
 						location.href = location.href;
 					});
 				});
+
+				document.addEventListener('click', (e) => {
+					if (e.target.classList.contains('js-edit-host')) {
+						this.editHost(e, e.target.dataset.hostid);
+					}
+					else if (e.target.classList.contains('js-edit-template')) {
+						this.editTemplate(e, e.target.dataset.hostid);
+					}
+				});
 			}
 		},
 

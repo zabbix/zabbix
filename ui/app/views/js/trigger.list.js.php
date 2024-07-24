@@ -100,6 +100,12 @@
 				else if (e.target.id === 'js-massupdate-trigger') {
 					this.#massupdate(e.target);
 				}
+				else if (e.target.classList.contains('js-edit-host')) {
+					this.editHost(e, e.target.dataset.hostid);
+				}
+				else if (e.target.classList.contains('js-edit-template')) {
+					this.editTemplate(e, e.target.dataset.hostid);
+				}
 			})
 		}
 

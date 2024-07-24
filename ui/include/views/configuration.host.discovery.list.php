@@ -311,9 +311,13 @@ foreach ($data['discoveries'] as $discovery) {
 		$checkbox->setAttribute('data-actions', 'execute');
 	}
 
+	$host_link = (new CLink($discovery['hosts'][0]['name']))
+		->setAttribute('data-hostid', $discovery['hosts'][0]['hostid'])
+		->addClass('js-edit-'.$data['context']);
+
 	$discoveryTable->addRow([
 		$checkbox,
-		$discovery['hosts'][0]['name'],
+		$host_link,
 		$description,
 		[
 			new CLink(_('Item prototypes'),

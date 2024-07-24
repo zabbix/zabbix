@@ -174,19 +174,16 @@ $csrf_token = CCsrfTokenHelper::get('graphs.php');
 
 foreach ($data['graphs'] as $graph) {
 	$graphid = $graph['graphid'];
+	$hosts = null;
 
-	$hostList = null;
+	if (!$this->data['hostid']) {
+		$hosts = [];
 
-	if (empty($this->data['hostid'])) {
-		$hostList = [];
 		foreach ($graph['hosts'] as $host) {
-			$hostList[$host['name']] = $host['name'];
+			$hosts[] = (new CLink($host['name']))
+				->setAttribute('data-hostid', $host['hostid'])
+				->addClass('js-edit-'.$data['context']);
 		}
-
-		foreach ($graph['templates'] as $template) {
-			$hostList[$template['name']] = $template['name'];
-		}
-		$hostList = implode(', ', $hostList);
 	}
 
 	$flag = ($data['parent_discoveryid'] === null) ? ZBX_FLAG_DISCOVERY_NORMAL : ZBX_FLAG_DISCOVERY_PROTOTYPE;
@@ -246,7 +243,7 @@ foreach ($data['graphs'] as $graph) {
 
 	$graphTable->addRow([
 		new CCheckBox('group_graphid['.$graphid.']', $graphid),
-		$hostList,
+		$hosts,
 		$name,
 		$graph['width'],
 		$graph['height'],
