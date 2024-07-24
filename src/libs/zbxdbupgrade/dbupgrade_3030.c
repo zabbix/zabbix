@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "dbupgrade.h"
@@ -22,6 +17,10 @@
 #include "zbxdbhigh.h"
 #include "zbxnum.h"
 #include "zbxhttp.h"
+#include "zbxalgo.h"
+#include "zbxdb.h"
+#include "zbxdbschema.h"
+#include "zbxstr.h"
 
 /*
  * 3.4 development database patches
@@ -380,7 +379,6 @@ static int	DBpatch_3030030(void)
 		}
 
 		sql_offset = 0;
-		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		while (NULL != (row = zbx_db_fetch(result)))
 		{
@@ -399,13 +397,8 @@ static int	DBpatch_3030030(void)
 			upd_num++;
 		}
 
-		zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-		if (16 < sql_offset)
-		{
-			if (ZBX_DB_OK > zbx_db_execute("%s", sql))
-				ret = FAIL;
-		}
+		if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
+			ret = FAIL;
 out:
 		zbx_db_free_result(result);
 	}
@@ -470,7 +463,7 @@ static int	DBpatch_3030037(void)
 					{"password", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 					{"publickey", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 					{"privatekey", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-					{"command", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
+					{"command", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0},
 					{"alertid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
 					{"parent_taskid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"hostid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
@@ -497,7 +490,7 @@ static int	DBpatch_3030039(void)
 					{"taskid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 					{"parent_taskid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-					{"info", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
+					{"info", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0},
 					{0}
 				},
 				NULL
@@ -542,7 +535,7 @@ static int	DBpatch_3030043(void)
 					{"y", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 					{"width", "200", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 					{"height", "200", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-					{"text", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
+					{"text", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0},
 					{"font", "9", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 					{"font_size", "11", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 					{"font_color", "000000", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
@@ -706,7 +699,7 @@ static int	DBpatch_3030054(void)
 					{"httptestid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 					{"name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-					{"value", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
+					{"value", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0},
 					{0}
 				},
 				NULL
@@ -736,7 +729,7 @@ static int	DBpatch_3030057(void)
 					{"httpstepid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 					{"name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-					{"value", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
+					{"value", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0},
 					{0}
 				},
 				NULL
@@ -1075,8 +1068,6 @@ static int	DBpatch_table_convert(const char *table, const char *recid, const DBp
 
 	sql_offset = 0;
 
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update %s set ", table);
@@ -1095,13 +1086,8 @@ static int	DBpatch_table_convert(const char *table, const char *recid, const DBp
 			goto out;
 	}
 
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
-	{
-		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
-			goto out;
-	}
+	if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
+		goto out;
 
 	ret = SUCCEED;
 out:
@@ -1260,8 +1246,6 @@ static int	DBpatch_3030093(void)
 
 	result = zbx_db_select("select itemid,delay,delay_flex from items");
 
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		delay = atoi(row[1]);
@@ -1295,13 +1279,8 @@ static int	DBpatch_3030093(void)
 			goto out;
 	}
 
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
-	{
-		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
-			goto out;
-	}
+	if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
+		goto out;
 
 	ret = SUCCEED;
 out:
@@ -1382,8 +1361,6 @@ static int	DBpatch_3030102(void)
 
 	result = zbx_db_select("select itemid,lifetime from items");
 
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update items set lifetime='");
@@ -1403,13 +1380,8 @@ static int	DBpatch_3030102(void)
 			goto out;
 	}
 
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
-	{
-		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
-			goto out;
-	}
+	if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
+		goto out;
 
 	ret = SUCCEED;
 out:
@@ -1723,8 +1695,6 @@ static int	DBpatch_trailing_semicolon_remove(const char *table, const char *reci
 
 	result = zbx_db_select("select %s,%s from %s%s", recid, field, table, condition);
 
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		if (NULL == (semicolon = strrchr(row[1], ';')) || '\0' != *(semicolon + 1))
@@ -1737,13 +1707,8 @@ static int	DBpatch_trailing_semicolon_remove(const char *table, const char *reci
 			goto out;
 	}
 
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
-	{
-		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
-			goto out;
-	}
+	if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
+		goto out;
 
 	ret = SUCCEED;
 out:
@@ -2128,7 +2093,7 @@ static int	DBpatch_3030179(void)
 
 static int	DBpatch_3030180(void)
 {
-	const zbx_db_field_t	field = {"ack_longdata", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"ack_longdata", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("actions", &field);
 }

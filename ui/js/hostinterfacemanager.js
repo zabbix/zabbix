@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -476,51 +471,14 @@ class HostInterfaceManager {
 		}
 	}
 
-	/**
-	 * Converts form field to readonly.
-	 *
-	 * @param {Element} el  Native JavaScript element for form field.
-	 */
-	setReadonly(el) {
-		const tag_name = el.tagName;
-
-		if (tag_name === 'INPUT') {
-			const type = el.getAttribute('type');
-
-			switch (type) {
-				case 'text':
-					el.readOnly = true;
-					break;
-
-				case 'radio':
-				case 'checkbox':
-					const {checked, name, value} = el;
-					el.disabled = true;
-
-					if (checked) {
-						const input = document.createElement('input');
-						input.type = 'hidden';
-						input.name = name;
-						input.value = value;
-
-						el.insertAdjacentElement('beforebegin', input);
-					}
-					break;
-			}
-		}
-		else if (tag_name === 'Z-SELECT') {
-			el.readOnly = true;
-		}
-	}
-
 	makeReadonly() {
 		[...document.querySelectorAll('.' + HostInterfaceManager.ZBX_STYLE_HOST_INTERFACE_ROW)].forEach((row) => {
-			[...row.querySelectorAll('input, z-select')].map((el) => {
-				this.setReadonly(el);
+			[...row.querySelectorAll('input, z-select')].map((element) => {
+				element.readOnly = true;
 			});
 
 			[...row.querySelectorAll('.' + HostInterfaceManager.ZBX_STYLE_HOST_INTERFACE_BTN_REMOVE)]
-				.map((el) => el.remove());
+				.map((element) => element.remove());
 		});
 
 		return true;

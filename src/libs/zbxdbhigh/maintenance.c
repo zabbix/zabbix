@@ -1,25 +1,23 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "zbxdbhigh.h"
 
 #include "zbxnum.h"
+#include "zbxalgo.h"
+#include "zbxdb.h"
+#include "zbxstr.h"
 
 /******************************************************************************
  *                                                                            *
@@ -57,10 +55,6 @@ int	zbx_db_lock_maintenanceids(zbx_vector_uint64_t *maintenanceids)
 			maintenanceids->values_num);
 #if defined(HAVE_MYSQL)
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by maintenanceid lock in share mode");
-#elif defined(HAVE_ORACLE)
-	/* Row level shared locks are not supported in Oracle. Table lock in share mode leads to deadlock on */
-	/* event_suppress insertion due to locking that occurs in order to satisfy foreign key constraint.   */
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by maintenanceid" ZBX_FOR_UPDATE);
 #else
 	/* For PostgreSQL table level locks are used because row level shared locks have reader preference which */
 	/* could lead to theoretical situation when server blocks out frontend from maintenances updates.        */

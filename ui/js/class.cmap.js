@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -799,14 +794,7 @@ ZABBIX.apps.map = (function($) {
 					}
 				});
 
-				jQuery(document).on('keydown', (event) => {
-					if (event.which == KEY_ESCAPE) {
-						that.clearSelection();
-						that.toggleForm();
-					}
-				});
-
-				$('.btn-overlay-close, #elementClose').click(function() {
+				$('#map-window .btn-overlay-close, #elementClose').click(function() {
 					that.clearSelection();
 					that.toggleForm();
 				});
@@ -2834,6 +2822,10 @@ ZABBIX.apps.map = (function($) {
 				// Element must first be visible so that outerWidth() and outerHeight() are correct.
 				this.formContainer.positionOverlayDialogue();
 				this.active = true;
+
+				addToOverlaysStack('map-window', document.activeElement, 'map-window');
+
+				document.getElementById('elementType').focus();
 			},
 
 			/**
@@ -2842,6 +2834,8 @@ ZABBIX.apps.map = (function($) {
 			hide: function() {
 				this.domNode.toggle(false);
 				this.active = false;
+
+				removeFromOverlaysStack('map-window');
 			},
 
 			/**
@@ -3194,13 +3188,13 @@ ZABBIX.apps.map = (function($) {
 				// validate element id
 				if ($.isEmptyObject(data.elements) && data.elementtype !== '4') {
 					switch (data.elementtype) {
-						case '0': alert('Host is not selected.');
+						case '0': alert(t('Host is not selected.'));
 							return false;
-						case '1': alert('Map is not selected.');
+						case '1': alert(t('Map is not selected.'));
 							return false;
-						case '2': alert('Trigger is not selected.');
+						case '2': alert(t('Trigger is not selected.'));
 							return false;
-						case '3': alert('Host group is not selected.');
+						case '3': alert(t('Host group is not selected.'));
 							return false;
 					}
 				}
@@ -3347,6 +3341,10 @@ ZABBIX.apps.map = (function($) {
 				// Element must first be visible so that outerWidth() and outerHeight() are correct.
 				this.formContainer.positionOverlayDialogue();
 				this.updateList();
+
+				addToOverlaysStack('map-window', document.activeElement, 'map-window');
+
+				document.getElementById('chkboxLabel').focus();
 			},
 
 			/**
@@ -3360,6 +3358,8 @@ ZABBIX.apps.map = (function($) {
 				});
 				$('textarea', this.domNode).val('');
 				this.actionProcessor.process();
+
+				removeFromOverlaysStack('map-window');
 			},
 
 			/**
@@ -3479,6 +3479,10 @@ ZABBIX.apps.map = (function($) {
 				// Element must first be visible so that outerWidth() and outerHeight() are correct.
 				this.formContainer.positionOverlayDialogue();
 				this.active = true;
+
+				addToOverlaysStack('map-window', document.activeElement, 'map-window');
+
+				document.querySelector('#shapeForm [name="type"]:checked').focus();
 			},
 
 			/**
@@ -3487,6 +3491,8 @@ ZABBIX.apps.map = (function($) {
 			hide: function() {
 				this.domNode.toggle(false);
 				this.active = false;
+
+				removeFromOverlaysStack('map-window');
 			},
 
 			/**
@@ -3609,6 +3615,10 @@ ZABBIX.apps.map = (function($) {
 				// Element must first be visible so that outerWidth() and outerHeight() are correct.
 				this.formContainer.positionOverlayDialogue();
 				this.active = true;
+
+				addToOverlaysStack('map-window', document.activeElement, 'map-window');
+
+				document.getElementById(figures ? 'chkboxType' : 'chkboxBorderType').focus();
 			},
 
 			/**
@@ -3621,6 +3631,8 @@ ZABBIX.apps.map = (function($) {
 				$('textarea, input[type=text]', this.domNode).val('');
 				$('.color-picker input', this.domNode).change();
 				this.actionProcessor.process();
+
+				removeFromOverlaysStack('map-window');
 			},
 
 			/**

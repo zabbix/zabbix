@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "zbxcommon.h"
@@ -554,18 +549,20 @@ static void	rtc_process(zbx_rtc_t *rtc, zbx_ipc_client_t *client, zbx_uint32_t c
 	if (NULL == cb_proc_req || FAIL == cb_proc_req(rtc, code, data, &result_ex))
 		rtc_process_request(rtc, code, data, &result);
 
-	if (NULL != result_ex)
-		result = zbx_strdcat(result, result_ex);
-
-	if (NULL == result)
+	if (ZBX_RTC_NOTIFY != code)
 	{
-		/* generate default success message if no specific success or error messages were returned */
-		result = zbx_strdup(NULL, "Runtime control command was forwarded successfully\n");
-	}
+		if (NULL != result_ex)
+			result = zbx_strdcat(result, result_ex);
 
-	size = (zbx_uint32_t)strlen(result) + 1;
-	zbx_ipc_client_send(client, code, (unsigned char *)result, size);
-	zbx_free(result);
+		if (NULL == result)
+		{
+			/* generate default success message if no specific success or error messages were returned */
+			result = zbx_strdup(NULL, "Runtime control command was forwarded successfully\n");
+		}
+
+		size = (zbx_uint32_t)strlen(result) + 1;
+		zbx_ipc_client_send(client, code, (unsigned char *)result, size);
+	}
 
 	zbx_free(result_ex);
 	zbx_free(result);
@@ -652,7 +649,7 @@ int	zbx_rtc_wait_for_sync_finish(zbx_rtc_t *rtc, zbx_rtc_process_request_ex_func
 					if (ZBX_IPC_RTC_MAX >= message->code)
 					{
 						const char *rtc_error = "Cannot perform specified runtime control"
-								" command during initial configuration cache sync\n";
+								" command during startup\n";
 						zbx_ipc_client_send(client, message->code,
 								(const unsigned char *)rtc_error,
 								(zbx_uint32_t)strlen(rtc_error) + 1);

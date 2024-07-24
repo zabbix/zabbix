@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -45,6 +40,11 @@ class CCheckBoxList extends CList {
 	 * @var bool $enabled
 	 */
 	protected $enabled = true;
+
+	/**
+	 * @var bool $readonly
+	 */
+	protected $readonly = false;
 
 	/**
 	 * @var bool $layout_fixed
@@ -140,6 +140,17 @@ class CCheckBoxList extends CList {
 	}
 
 	/**
+	 * Set checkboxes readonly state.
+	 *
+	 * @param bool $readonly  State of checkboxes.
+	 */
+	public function setReadonly(bool $readonly) {
+		$this->readonly = $readonly;
+
+		return $this;
+	}
+
+	/**
 	 * Make columns the same size.
 	 *
 	 * @param bool $layout_fixed
@@ -203,7 +214,8 @@ class CCheckBoxList extends CList {
 			$checkbox = (new CCheckBox($name, $value['value']))
 				->setLabel($value['label'])
 				->setChecked($value['checked'])
-				->setEnabled($this->enabled);
+				->setEnabled($this->enabled)
+				->setReadonly($this->readonly);
 
 			if (array_key_exists('id', $value) || $this->uniqid !== '') {
 				$checkbox->setId(array_key_exists('id', $value)

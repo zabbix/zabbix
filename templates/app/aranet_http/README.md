@@ -7,7 +7,7 @@
 
 ## Requirements
 
-Zabbix version: 7.0 and higher.
+Zabbix version: 7.2 and higher.
 
 ## Tested versions
 
@@ -16,7 +16,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.0/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.2/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -48,8 +48,8 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Aranet: Sensors discovery|<p>Discovery for Aranet Cloud sensors</p>|Dependent item|aranet.sensor.discovery<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `15m`</p></li></ul>|
-|Aranet: Get data||Script|aranet.get_data|
+|Sensors discovery|<p>Discovery for Aranet Cloud sensors</p>|Dependent item|aranet.sensor.discovery<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `15m`</p></li></ul>|
+|Get data||Script|aranet.get_data|
 
 ### LLD rule Temperature discovery
 

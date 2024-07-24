@@ -1,21 +1,16 @@
 <?php declare(strict_types = 0);
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -97,6 +92,9 @@ class CSettingsHelper {
 	public const TIMEOUT_SSH_AGENT = 'timeout_ssh_agent';
 	public const TIMEOUT_TELNET_AGENT = 'timeout_telnet_agent';
 	public const TIMEOUT_SCRIPT = 'timeout_script';
+	public const TIMEOUT_BROWSER = 'timeout_browser';
+	public const SOFTWARE_UPDATE_CHECKID = 'software_update_checkid';
+	public const SOFTWARE_UPDATE_CHECK_DATA = 'software_update_check_data';
 
 	private static $params = [];
 	private static $params_public = [];
@@ -130,7 +128,7 @@ class CSettingsHelper {
 					'geomaps_tile_url', 'geomaps_max_zoom', 'geomaps_attribution', 'vault_provider',
 					'timeout_zabbix_agent', 'timeout_simple_check', 'timeout_snmp_agent', 'timeout_external_check',
 					'timeout_db_monitor', 'timeout_http_agent', 'timeout_ssh_agent', 'timeout_telnet_agent',
-					'timeout_script'
+					'timeout_script', 'timeout_browser'
 				]
 			]);
 
@@ -169,7 +167,9 @@ class CSettingsHelper {
 			self::$params_private = CSettings::getPrivate();
 		}
 
-		$supported_params = array_intersect_key(self::$params_private, array_flip([self::SESSION_KEY]));
+		$supported_params = array_intersect_key(self::$params_private,
+			array_flip([self::SESSION_KEY, self::SOFTWARE_UPDATE_CHECKID])
+		);
 
 		return $supported_params[$field];
 	}
@@ -190,7 +190,19 @@ class CSettingsHelper {
 		return self::$params_private[self::SERVER_STATUS];
 	}
 
+	public static function getSoftwareUpdateCheckData(): array {
+		if (!self::$params_private) {
+			self::$params_private = CSettings::getPrivate();
+		}
+
+		return self::$params_private[self::SOFTWARE_UPDATE_CHECK_DATA];
+	}
+
 	public static function isGlobalScriptsEnabled(): bool {
 		return self::getServerStatus()['configuration']['enable_global_scripts'];
+	}
+
+	public static function isSoftwareUpdateCheckEnabled(): bool {
+		return !CWebUser::isGuest() && self::getServerStatus()['configuration']['allow_software_update_check'];
 	}
 }

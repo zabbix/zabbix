@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -1340,8 +1335,8 @@ class testFormConnectors extends CWebTest {
 			'mailto://zabbix.com', 'tel://zabbix.com', 'ssh://zabbix.com'
 		];
 
-		$this->page->login()->open('zabbix.php?action=connector.list');
-		$this->query('link', self::DEFAULT_CONNECTOR)->one()->click();
+		$this->page->login()->open('zabbix.php?action=connector.list')->waitUntilReady();
+		$this->query('link', self::DEFAULT_CONNECTOR)->waitUntilClickable()->one()->click();
 
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$form = $dialog->asForm();
@@ -1368,7 +1363,7 @@ class testFormConnectors extends CWebTest {
 		$config_form->submit();
 		$this->assertMessage(TEST_GOOD, 'Configuration updated');
 
-		$this->page->open('zabbix.php?action=connector.list');
+		$this->page->open('zabbix.php?action=connector.list')->waitUntilReady();
 		$this->assertUriScheme($form, array_merge($default_valid_schemes, $invalid_schemes));
 	}
 
@@ -1380,7 +1375,7 @@ class testFormConnectors extends CWebTest {
 	 * @param string $expected		expected result after connector form submit, TEST_GOOD or TEST_BAD
 	 */
 	private function assertUriScheme($form, $data, $expected = TEST_GOOD) {
-		$this->query('link', self::DEFAULT_CONNECTOR)->one()->click();
+		$this->query('link', self::DEFAULT_CONNECTOR)->waitUntilClickable()->one()->click();
 
 		foreach ($data as $scheme) {
 			$form->fill(['URL' => $scheme]);

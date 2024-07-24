@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "postinit.h"
@@ -370,7 +365,6 @@ static int	update_event_names(void)
 	memset(&trigger, 0, sizeof(zbx_db_trigger));
 
 	sql = (char *)zbx_malloc(NULL, sql_alloc);
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = zbx_db_select(
 			"select triggerid,description,expression,priority,comments,url,url_name,"
@@ -417,11 +411,9 @@ static int	update_event_names(void)
 
 	zbx_dc_close_user_macros(um_handle);
 
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (SUCCEED == ret && 16 < sql_offset) /* in ORACLE always present begin..end; */
+	if (SUCCEED == ret)
 	{
-		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
+		if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
 			ret = FAIL;
 	}
 

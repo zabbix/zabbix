@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -29,8 +24,7 @@ function organizeInterfaces(interface_ids_by_types, item_interface_types, item_t
 	const  INTERFACE_TYPE_ANY = -1,
 		INTERFACE_TYPE_OPT = -2,
 		$interface_select = $('#interface-select'),
-		interface_select_node = $interface_select.get(0),
-		selected_interfaceid = +$('#selectedInterfaceId').val();
+		interface_select_node = $interface_select.get(0);
 
 	if (!interface_select_node) {
 		return;
@@ -89,10 +83,6 @@ function organizeInterfaces(interface_ids_by_types, item_interface_types, item_t
 		));
 		$interface_select.show();
 		$('#interface_not_defined').hide();
-	}
-
-	if (selected_interfaceid) {
-		interface_select_node.value = selected_interfaceid;
 	}
 
 	const allowed_opt_interface = (interface_type == INTERFACE_TYPE_OPT);

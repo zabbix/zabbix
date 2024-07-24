@@ -1,21 +1,16 @@
 <?php declare(strict_types = 0);
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -53,16 +48,17 @@ class CWidgetFieldDataSet extends CWidgetField {
 			->setDefault(self::DEFAULT_VALUE)
 			->setValidationRules(['type' => API_OBJECTS, 'fields' => [
 				'dataset_type'			=> ['type' => API_INT32, 'in' => implode(',', [self::DATASET_TYPE_SINGLE_ITEM, self::DATASET_TYPE_PATTERN_ITEM])],
-				'hosts'					=> ['type' => API_STRINGS_UTF8, 'flags' => null],
-				'items'					=> ['type' => API_STRINGS_UTF8, 'flags' => null],
-				'itemids'				=> ['type' => API_IDS, 'flags' => null],
+				'hosts'					=> ['type' => API_STRINGS_UTF8],
+				'items'					=> ['type' => API_STRINGS_UTF8],
+				'itemids'				=> ['type' => API_IDS],
+				'references'			=> ['type' => API_STRINGS_UTF8],
 				'color'					=> ['type' => API_COLOR, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 				'type'					=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [SVG_GRAPH_TYPE_LINE, SVG_GRAPH_TYPE_POINTS, SVG_GRAPH_TYPE_STAIRCASE, SVG_GRAPH_TYPE_BAR])],
 				'stacked'				=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [SVG_GRAPH_STACKED_OFF, SVG_GRAPH_STACKED_ON])],
-				'width'					=> ['type' => API_INT32, 'in' => implode(',', range(0, 10))],
-				'pointsize'				=> ['type' => API_INT32, 'in' => implode(',', range(1, 10))],
-				'transparency'			=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', range(0, 10))],
-				'fill'					=> ['type' => API_INT32, 'in' => implode(',', range(0, 10))],
+				'width'					=> ['type' => API_INT32, 'in' => '0:10'],
+				'pointsize'				=> ['type' => API_INT32, 'in' => '1:10'],
+				'transparency'			=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '0:10'],
+				'fill'					=> ['type' => API_INT32, 'in' => '0:10'],
 				'missingdatafunc'		=> ['type' => API_INT32, 'in' => implode(',', [SVG_GRAPH_MISSING_DATA_NONE, SVG_GRAPH_MISSING_DATA_CONNECTED, SVG_GRAPH_MISSING_DATA_TREAT_AS_ZERO, SVG_GRAPH_MISSING_DATA_LAST_KNOWN])],
 				'axisy'					=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [GRAPH_YAXIS_SIDE_LEFT, GRAPH_YAXIS_SIDE_RIGHT])],
 				'timeshift'				=> ['type' => API_TIME_UNIT, 'flags' => API_REQUIRED, 'in' => implode(':', [ZBX_MIN_TIMESHIFT, ZBX_MAX_TIMESHIFT])],
@@ -146,7 +142,7 @@ class CWidgetFieldDataSet extends CWidgetField {
 
 		$validation_rules = $this->getValidationRules($strict);
 		$value = $this->getValue();
-		$label = $this->label ?? $this->name;
+		$label = $this->getErrorLabel();
 
 		if (!count($value)) {
 			if (!CApiInputValidator::validate($validation_rules, $value, $label, $error)) {
@@ -157,27 +153,43 @@ class CWidgetFieldDataSet extends CWidgetField {
 			$validation_rules['type'] = API_OBJECT;
 		}
 
-		foreach ($value as $index => $data) {
+		foreach ($value as $index => &$data) {
 			$validation_rules_by_type = $validation_rules;
 
 			if ($data['dataset_type'] == self::DATASET_TYPE_SINGLE_ITEM) {
 				$validation_rules_by_type['fields']['itemids']['flags'] |= API_REQUIRED;
+				$validation_rules_by_type['fields']['references']['flags'] |= API_REQUIRED;
 				$validation_rules_by_type['fields']['color']['type'] = API_COLORS;
 
 				unset($data['hosts'], $data['items']);
 			}
 			else {
-				$validation_rules_by_type['fields']['hosts']['flags'] |= API_REQUIRED;
+				if (!$this->isTemplateDashboard()) {
+					$validation_rules_by_type['fields']['hosts']['flags'] |= API_REQUIRED;
+				}
+
 				$validation_rules_by_type['fields']['items']['flags'] |= API_REQUIRED;
 
-				unset($data['itemids']);
+				unset($data['itemids'], $data['references']);
 			}
 
 			if (!CApiInputValidator::validate($validation_rules_by_type, $data, $label.'/'.($index + 1), $error)) {
 				$errors[] = $error;
 				break;
 			}
+
+			if ($data['dataset_type'] == self::DATASET_TYPE_SINGLE_ITEM) {
+				foreach ($data['itemids'] as $i => &$item_spec) {
+					if ($item_spec == 0) {
+						$item_spec = [CWidgetField::FOREIGN_REFERENCE_KEY => $data['references'][$i]];
+					}
+				}
+				unset($item_spec);
+
+				unset($data['references']);
+			}
 		}
+		unset($data);
 
 		if (!$errors) {
 			$this->setValue($value);
@@ -225,12 +237,22 @@ class CWidgetFieldDataSet extends CWidgetField {
 				];
 			}
 
-			foreach ($value['itemids'] as $item_index => $itemid) {
-				$widget_fields[] = [
-					'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
-					'name' => $this->name.'.'.$index.'.itemids.'.$item_index,
-					'value' => $itemid
-				];
+			foreach ($value['itemids'] as $item_index => $item_spec) {
+				if (is_array($item_spec)) {
+					$widget_fields[] = [
+						'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+						'name' => $this->name.'.'.$index.'.itemids.'.$item_index.'.'.
+							CWidgetField::FOREIGN_REFERENCE_KEY,
+						'value' => $item_spec[CWidgetField::FOREIGN_REFERENCE_KEY]
+					];
+				}
+				else {
+					$widget_fields[] = [
+						'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
+						'name' => $this->name.'.'.$index.'.itemids.'.$item_index,
+						'value' => $item_spec
+					];
+				}
 			}
 
 			// Field "color" stored as array for dataset type DATASET_TYPE_SINGLE_ITEM (0)
@@ -276,6 +298,7 @@ class CWidgetFieldDataSet extends CWidgetField {
 
 			self::setValidationRuleFlag($validation_rules['fields']['items'], API_NOT_EMPTY);
 			self::setValidationRuleFlag($validation_rules['fields']['itemids'], API_NOT_EMPTY);
+			self::setValidationRuleFlag($validation_rules['fields']['references'], API_NOT_EMPTY);
 		}
 
 		return $validation_rules;

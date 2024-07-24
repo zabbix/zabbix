@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -24,40 +19,24 @@ require_once dirname(__FILE__).'/../common/testFormMacros.php';
 /**
  * @onBefore prepareDiscoveredHostMacrosData
  *
+ * @dataSource GlobalMacros
+ *
  * @backup hosts, config
  */
 class testFormMacrosDiscoveredHost extends testFormMacros {
 
-	/**
-	 * Parent hostid for macros test.
-	 *
-	 * @var integer
-	 */
-	protected static $hostid;
-
-	/**
-	 * Parent hostid for macros inheritance test.
-	 *
-	 * @var integer
-	 */
 	protected static $inherit_hostid;
-
-	/**
-	 * Names and ids for discovered hosts.
-	 *
-	 * @var array
-	 */
 	protected static $hosts = [];
 
-	public $vault_object = 'host';
-	public $hashi_error_field = '/1/macros/3/value';
-	public $cyber_error_field = '/1/macros/4/value';
-	public $update_vault_macro = '{$VAULT_HOST_MACRO3_CHANGED}';
-	public $vault_macro_index = 2;
+	protected $vault_object = 'host';
+	protected $hashi_error_field = '/1/macros/4/value';
+	protected $cyber_error_field = '/1/macros/4/value';
+	protected $update_vault_macro = '{$VAULT_HOST_MACRO3_CHANGED}';
+	protected $vault_macro_index = 2;
 
-	public $revert_macro_1 = '{$SECRET_HOST_MACRO_REVERT}';
-	public $revert_macro_2 = '{$SECRET_HOST_MACRO_2_TEXT_REVERT}';
-	public $revert_macro_object = 'host';
+	protected $revert_macro_1 = '{$SECRET_HOST_MACRO_REVERT}';
+	protected $revert_macro_2 = '{$SECRET_HOST_MACRO_2_TEXT_REVERT}';
+	protected $revert_macro_object = 'host';
 
 	/**
 	 * Create new hosts for discovery rules and prototypes with macros.
@@ -172,6 +151,11 @@ class testFormMacrosDiscoveredHost extends testFormMacros {
 					]
 				]
 			],
+			// '3 Discovered host macros_create'.
+			[
+				'hostid' => self::$hosts[3]['hostid'],
+				'macros' => []
+			],
 			// '4 Discovered host macros_revert'.
 			[
 				'hostid' => self::$hosts[4]['hostid'],
@@ -226,6 +210,16 @@ class testFormMacrosDiscoveredHost extends testFormMacros {
 					]
 				]
 			],
+			// '6 Discovered host vault_validation'.
+			[
+				'hostid' => self::$hosts[6]['hostid'],
+				'macros' => []
+			],
+			// '7 Discovered host vault_create'.
+			[
+				'hostid' => self::$hosts[7]['hostid'],
+				'macros' => []
+			],
 			// '8 Discovered host macros_inheritance'.
 			[
 				'hostid' => self::$hosts[8]['hostid'],
@@ -274,12 +268,12 @@ class testFormMacrosDiscoveredHost extends testFormMacros {
 		$hosts = CDataHelper::call('host.create', [
 			[
 				'host' => 'Parent host for discovered hosts macros',
-				'groups' => [['groupid' => 4]],
+				'groups' => [['groupid' => self::ZABBIX_SERVERS_GROUPID]],
 				'interfaces' => ['type'=> 1, 'main' => 1, 'useip' => 1, 'ip' => '127.0.0.1', 'dns' => '', 'port' => 10050]
 			],
 			[
 				'host' => 'Parent host for macros inheritance',
-				'groups' => [['groupid' => 4]],
+				'groups' => [['groupid' => self::ZABBIX_SERVERS_GROUPID]],
 				'interfaces' => ['type'=> 1, 'main' => 1, 'useip' => 1, 'ip' => '127.0.0.1', 'dns' => '', 'port' => 10050],
 				'macros' => [
 					[
@@ -304,15 +298,15 @@ class testFormMacrosDiscoveredHost extends testFormMacros {
 			]
 		]);
 
-		self::$hostid = $hosts['hostids'][0];
+		$hostid = $hosts['hostids'][0];
 		self::$inherit_hostid = $hosts['hostids'][1];
 
-		$interfaceid = CDBHelper::getValue('SELECT interfaceid FROM interface WHERE hostid='.zbx_dbstr(self::$hostid));
+		$interfaceid = CDBHelper::getValue('SELECT interfaceid FROM interface WHERE hostid='.zbx_dbstr($hostid));
 		$inherit_interfaceid = CDBHelper::getValue('SELECT interfaceid FROM interface WHERE hostid='.zbx_dbstr(self::$inherit_hostid));
 
 		// Create discovery rules.
 		$llds = [
-			'Test discovered hosts' => ['hostid' => self::$hostid, 'interface' => $interfaceid],
+			'Test discovered hosts' => ['hostid' => $hostid, 'interface' => $interfaceid],
 			'Test discovered macros inheritance' => ['hostid' => self::$inherit_hostid, 'interface' => $inherit_interfaceid]
 		];
 
@@ -339,7 +333,7 @@ class testFormMacrosDiscoveredHost extends testFormMacros {
 			$prototypes_data[] = [
 				'host' => self::$hosts[$k]['prototype_name'],
 				'ruleid' => $lldid,
-				'groupLinks' => [['groupid' => 4]],
+				'groupLinks' => [['groupid' => self::ZABBIX_SERVERS_GROUPID]],
 				'macros' => $host_macros[$k]['macros']
 			];
 		}
@@ -349,7 +343,7 @@ class testFormMacrosDiscoveredHost extends testFormMacros {
 			$prototypes_data[] = [
 				'host' => self::$hosts[$l]['prototype_name'],
 				'ruleid' => $lldid,
-				'groupLinks' => [['groupid' => 4]]
+				'groupLinks' => [['groupid' => self::ZABBIX_SERVERS_GROUPID]]
 			];
 		}
 
@@ -357,7 +351,7 @@ class testFormMacrosDiscoveredHost extends testFormMacros {
 		$prototypes_data[] = [
 			'host' => self::$hosts[8]['prototype_name'],
 			'ruleid' => $inherit_lldid,
-			'groupLinks' => [['groupid' => 4]],
+			'groupLinks' => [['groupid' => self::ZABBIX_SERVERS_GROUPID]],
 			'macros' => [
 				[
 					'macro' => '{$PROTO_MACRO}',
@@ -442,7 +436,7 @@ class testFormMacrosDiscoveredHost extends testFormMacros {
 	 * @dataProvider getUpdateMacrosCommonData
 	 */
 	public function testFormMacrosDiscoveredHost_Update($data) {
-		$this->checkMacros($data, 'host', self::$hosts[0]['name'], true, false, null, true);
+		$this->checkMacros($data, 'host', self::$hosts[0]['name'], true);
 	}
 
 	/**
@@ -456,7 +450,9 @@ class testFormMacrosDiscoveredHost extends testFormMacros {
 	 * @dataProvider getRemoveInheritedMacrosData
 	 */
 	public function testFormMacrosDiscoveredHost_RemoveInheritedMacro($data) {
-		$this->checkRemoveInheritedMacros($data, 'host', self::$hosts[1]['hostid'], false, null, self::$hosts[1]['name']);
+		$this->checkRemoveInheritedMacros($data, 'host', self::$hosts[1]['hostid'], false, null,
+				self::$hosts[1]['name']
+		);
 	}
 
 	/**
@@ -552,7 +548,7 @@ class testFormMacrosDiscoveredHost extends testFormMacros {
 	/**
 	 * Check Vault macros validation.
 	 */
-	public function testFormMacrosDiscoveredHost_checkVaultValidation() {
+	public function testFormMacrosDiscoveredHost_CheckVaultValidation() {
 		$this->checkVaultValidation('zabbix.php?action=host.view', 'hosts', self::$hosts[5]['name'], true);
 	}
 
@@ -561,7 +557,7 @@ class testFormMacrosDiscoveredHost extends testFormMacros {
 	 */
 	public function testFormMacrosDiscoveredHost_CreateVaultMacros($data) {
 		$host = ($data['vault'] === 'Hashicorp') ? self::$hosts[7]['name'] : self::$hosts[6]['name'];
-		$this->createVaultMacros($data, 'zabbix.php?action=host.view', 'hosts', $host, true);
+		$this->createVaultMacros($data, 'zabbix.php?action=host.view', 'hosts', $host);
 	}
 
 	public function getUpdateVaultMacrosDiscoveredData() {

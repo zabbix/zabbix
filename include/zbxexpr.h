@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #ifndef ZABBIX_EXPR_H
@@ -254,5 +249,35 @@ int	zbx_get_report_nextcheck(int now, unsigned char cycle, unsigned char weekday
 #define ZBX_CONDITION_OPERATOR_NOT_EXIST		13
 
 int	zbx_strloc_cmp(const char *src, const zbx_strloc_t *loc, const char *text, size_t text_len);
+
+typedef struct
+{
+	zbx_token_search_t	token_search;
+
+	zbx_token_t	token;			/* current token type */
+	zbx_token_t	inner_token;		/* inner token type */
+
+	const char	*macro;			/* normalized macro (without function id, index, etc.) */
+	int		pos;			/* macro position in input data string */
+
+	int	raw_value;			/* flag that resolver should resolve to raw value */
+	int	indexed;
+	int	index;
+	int	resolved;			/* flag that macro is fully resolved (special case) */
+}
+zbx_macro_resolv_data_t;
+
+typedef int (*zbx_macro_resolv_func_t)(zbx_macro_resolv_data_t *p, va_list args, char **replace_to,
+		char **data, char *error, size_t maxerrlen);
+
+int		zbx_is_indexed_macro(const char *str, const zbx_token_t *token);
+const char	*zbx_macro_in_list(const char *str, zbx_strloc_t strloc, const char **macros, int *N_functionid);
+char		*zbx_get_macro_from_func(const char *str, zbx_token_func_macro_t *fm, int *N_functionid);
+const char	**zbx_get_indexable_macros(void);
+
+int	zbx_substitute_macros(char **data, char *error, size_t maxerrlen, zbx_macro_resolv_func_t resolver, ...);
+
+/* macro function calculation */
+int	zbx_calculate_macro_function(const char *expression, const zbx_token_func_macro_t *func_macro, char **out);
 
 #endif /* ZABBIX_EXPR_H */

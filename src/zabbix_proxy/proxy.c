@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "zbxdbwrap.h"
@@ -77,6 +72,7 @@
 #include "zbxpreproc.h"
 #include "zbxstr.h"
 #include "zbxtime.h"
+#include "zbxbincommon.h"
 
 #ifdef HAVE_OPENIPMI
 #include "zbxipmi.h"
@@ -192,6 +188,7 @@ ZBX_GET_CONFIG_VAR2(char *, const char *, zbx_config_fping_location, NULL)
 ZBX_GET_CONFIG_VAR2(char *, const char *, zbx_config_fping6_location, NULL)
 
 static int	config_proxymode		= ZBX_PROXYMODE_ACTIVE;
+static sigset_t	orig_mask;
 
 int	config_forks[ZBX_PROCESS_TYPE_COUNT] = {
 	5, /* ZBX_PROCESS_TYPE_POLLER */
@@ -311,9 +308,12 @@ static char	*config_ssl_ca_location = NULL;
 static char	*config_ssl_cert_location = NULL;
 static char	*config_ssl_key_location = NULL;
 
+/* browser item */
+static char	*config_webdriver_url = NULL;
+
 static zbx_config_tls_t		*zbx_config_tls = NULL;
 static zbx_config_dbhigh_t	*zbx_config_dbhigh = NULL;
-static zbx_config_vault_t	zbx_config_vault = {NULL, NULL, NULL, NULL, NULL, NULL};
+static zbx_config_vault_t	zbx_config_vault = {NULL, NULL, NULL, NULL, NULL, NULL, NULL};
 
 static char	*config_socket_path	= NULL;
 static int	config_history_storage_pipelines	= 0;
@@ -966,6 +966,8 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 				ZBX_CONF_PARM_OPT,	0,			0},
 		{"VaultURL",			&zbx_config_vault.url,			ZBX_CFG_TYPE_STRING,
 				ZBX_CONF_PARM_OPT,	0,			0},
+		{"VaultPrefix",			&zbx_config_vault.prefix,		ZBX_CFG_TYPE_STRING,
+				ZBX_CONF_PARM_OPT,	0,			0},
 		{"VaultDBPath",			&zbx_config_vault.db_path,		ZBX_CFG_TYPE_STRING,
 				ZBX_CONF_PARM_OPT,	0,			0},
 		{"DBSocket",			&(zbx_config_dbhigh->config_dbsocket),	ZBX_CFG_TYPE_STRING,
@@ -1089,6 +1091,8 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 				ZBX_CONF_PARM_OPT,	1,			1000},
 		{"StartBrowserPollers",		&config_forks[ZBX_PROCESS_TYPE_BROWSERPOLLER],	ZBX_CFG_TYPE_INT,
 				ZBX_CONF_PARM_OPT,	0,			1000},
+		{"WebDriverURL",		&config_webdriver_url,			ZBX_CFG_TYPE_STRING,
+				ZBX_CONF_PARM_OPT,	0,			0},
 		{0}
 	};
 
@@ -1231,7 +1235,7 @@ int	main(int argc, char **argv)
 	zbx_config_dbhigh = zbx_config_dbhigh_new();
 
 	/* initialize libraries before using */
-	zbx_init_library_common(zbx_log_impl, get_zbx_progname);
+	zbx_init_library_common(zbx_log_impl, get_zbx_progname, zbx_backtrace);
 	zbx_init_library_nix(get_zbx_progname, get_process_info_by_thread);
 	zbx_init_library_dbupgrade(get_zbx_program_type, get_zbx_config_timeout);
 	zbx_init_library_dbwrap(NULL, zbx_preprocess_item_value, zbx_preprocessor_flush);
@@ -1266,7 +1270,7 @@ int	main(int argc, char **argv)
 				t.task = ZBX_TASK_TEST_CONFIG;
 				break;
 			case 'h':
-				zbx_print_help(NULL, help_message, usage_message, zbx_progname);
+				zbx_print_help(zbx_progname, help_message, usage_message, NULL);
 				exit(EXIT_SUCCESS);
 				break;
 			case 'V':
@@ -1282,7 +1286,7 @@ int	main(int argc, char **argv)
 				t.flags |= ZBX_TASK_FLAG_FOREGROUND;
 				break;
 			default:
-				zbx_print_usage(usage_message, zbx_progname);
+				zbx_print_usage(zbx_progname, usage_message);
 				exit(EXIT_FAILURE);
 				break;
 		}
@@ -1364,17 +1368,14 @@ int	main(int argc, char **argv)
 			log_file_cfg.log_type, log_file_cfg.log_file_name, NULL, get_zbx_threads, get_zbx_threads_num);
 }
 
-static void	zbx_check_db(void)
+static int	zbx_check_db(void)
 {
 	struct zbx_db_version_info_t	db_version_info;
+	int				ret;
 
-	if (FAIL == zbx_db_check_version_info(&db_version_info, config_allow_unsupported_db_versions, zbx_program_type))
-	{
-		zbx_free(db_version_info.friendly_current_version);
-		exit(EXIT_FAILURE);
-	}
-
+	ret = zbx_db_check_version_info(&db_version_info, config_allow_unsupported_db_versions, zbx_program_type);
 	zbx_free(db_version_info.friendly_current_version);
+	return ret;
 }
 
 static void	proxy_db_init(void)
@@ -1390,29 +1391,32 @@ static void	proxy_db_init(void)
 	}
 
 	zbx_db_init_autoincrement_options();
+	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
 	if (ZBX_DB_UNKNOWN == (db_type = zbx_db_get_database_type()))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot use database \"%s\": database is not a Zabbix database",
 				zbx_config_dbhigh->config_dbname);
-		exit(EXIT_FAILURE);
+		goto out;
 	}
 	else if (ZBX_DB_PROXY != db_type)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot use database \"%s\": Zabbix proxy cannot work with a"
 				" Zabbix server database", zbx_config_dbhigh->config_dbname);
-		exit(EXIT_FAILURE);
+		goto out;
 	}
 
 	zbx_db_check_character_set();
-	zbx_check_db();
+	if (SUCCEED != zbx_check_db())
+		goto out;
 
 	if (SUCCEED != (version_check = zbx_db_check_version_and_upgrade(ZBX_HA_MODE_STANDALONE)))
 	{
 #ifdef HAVE_SQLITE3
 		if (NOTSUPPORTED == version_check)
-			exit(EXIT_FAILURE);
+			goto out;
 
+		zbx_db_close();
 		zabbix_log(LOG_LEVEL_WARNING, "removing database file: \"%s\"", zbx_config_dbhigh->config_dbname);
 		zbx_db_deinit();
 
@@ -1422,20 +1426,22 @@ static void	proxy_db_init(void)
 					zbx_config_dbhigh->config_dbname, zbx_strerror(errno));
 			exit(EXIT_FAILURE);
 		}
-
+		zbx_db_close();
 		proxy_db_init();
+
+		return;
 #else
 		ZBX_UNUSED(version_check);
-		exit(EXIT_FAILURE);
+		goto out;
 #endif
 	}
-
-#ifdef HAVE_ORACLE
-	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
-	zbx_db_table_prepare("items", NULL);
-	zbx_db_table_prepare("item_preproc", NULL);
+	zbx_pb_init();
 	zbx_db_close();
-#endif
+
+	return;
+out:
+	zbx_db_close();
+	exit(EXIT_FAILURE);
 }
 
 int	MAIN_ZABBIX_ENTRY(int flags)
@@ -1461,7 +1467,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 								get_config_forks, config_java_gateway,
 								config_java_gateway_port, config_externalscripts,
 								zbx_get_value_internal_ext_proxy,
-								config_ssh_key_location};
+								config_ssh_key_location, config_webdriver_url};
 	zbx_thread_proxyconfig_args		proxyconfig_args = {zbx_config_tls, &zbx_config_vault,
 								get_zbx_program_type, zbx_config_timeout,
 								&config_server_addrs, config_hostname,
@@ -1478,7 +1484,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 								get_config_forks, config_java_gateway,
 								config_java_gateway_port, config_externalscripts,
 								zbx_config_enable_remote_commands,
-								config_ssh_key_location};
+								config_ssh_key_location, config_webdriver_url};
 	zbx_thread_httppoller_args		httppoller_args = {zbx_config_source_ip, config_ssl_ca_location,
 								config_ssl_cert_location, config_ssl_key_location};
 	zbx_thread_discoverer_args		discoverer_args = {zbx_config_tls, get_zbx_program_type,
@@ -1499,7 +1505,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 								config_externalscripts,
 								zbx_config_enable_remote_commands,
 								zbx_get_value_internal_ext_proxy,
-								config_ssh_key_location, trapper_process_request_proxy,
+								config_ssh_key_location, config_webdriver_url,
+								trapper_process_request_proxy,
 								zbx_autoreg_update_host_proxy};
 	zbx_thread_proxy_housekeeper_args	housekeeper_args = {zbx_config_timeout, config_housekeeping_frequency,
 								config_proxy_local_buffer, config_proxy_offline_buffer};
@@ -1528,6 +1535,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				ZBX_PROXYMODE_PASSIVE == config_proxymode ? "passive" : "active",
 				config_hostname, ZABBIX_VERSION, ZABBIX_REVISION);
 	}
+
+	zbx_block_signals(&orig_mask);
 
 	if (FAIL == zbx_ipc_service_init_env(config_socket_path, &error))
 	{
@@ -1608,11 +1617,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "using configuration file: %s", config_file);
 
-#ifdef HAVE_ORACLE
-	zabbix_log(LOG_LEVEL_INFORMATION, "Support for Oracle DB is deprecated since Zabbix 7.0 and will be removed in "
-			"future versions");
-#endif
-
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	if (SUCCEED != zbx_coredump_disable())
 	{
@@ -1637,6 +1641,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	exit_args.rtc = &rtc;
 	zbx_set_on_exit_args(&exit_args);
+
+	zbx_unblock_signals(&orig_mask);
 
 	if (SUCCEED != zbx_init_database_cache(get_zbx_program_type, zbx_sync_proxy_history, config_history_cache_size,
 			config_history_index_cache_size, &config_trends_cache_size, &error))
@@ -1705,10 +1711,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
-
 	proxy_db_init();
-
-	zbx_pb_init();
 
 	if (0 != config_forks[ZBX_PROCESS_TYPE_DISCOVERYMANAGER])
 		zbx_discoverer_init();
@@ -1733,6 +1736,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	{
 		exit_args.listen_sock = &listen_sock;
 
+		zbx_block_signals(&orig_mask);
+
 		if (FAIL == zbx_tcp_listen(&listen_sock, config_listen_ip, (unsigned short)config_listen_port,
 				zbx_config_timeout, config_tcp_max_backlog_size))
 		{
@@ -1746,6 +1751,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			zbx_free(error);
 			exit(EXIT_FAILURE);
 		}
+
+		zbx_unblock_signals(&orig_mask);
 	}
 
 	/* not running zbx_tls_init_parent() since proxy is only run on Unix*/

@@ -1,32 +1,27 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
 /**
- * A class for creating conditions.
+ * A class to perform operations with conditions.
  */
 class CConditionHelper {
 
 	/**
-	 * Generate a numeric formula from conditions $conditions with respect to evaluation type $evalType.
-	 * Each condition must have a condition type, that will be used for grouping.
+	 * Get formula with condition IDs of the given conditions using the given evaluation method and field to group
+	 * conditions by.
 	 *
 	 * Supported $evalType values:
 	 * - CONDITION_EVAL_TYPE_AND_OR
@@ -34,25 +29,26 @@ class CConditionHelper {
 	 * - CONDITION_EVAL_TYPE_OR
 	 *
 	 * Example:
-	 * echo CFormulaHelper::getFormula(array(
-	 * 	1 => 'condition1',
-	 *	2 => 'condition1',
-	 *	5 => 'condition2'
+	 * echo CConditionHelper::getFormula(array(
+	 *     1 => ['type' => '1'],
+	 *     2 => ['type' => '1'],
+	 *     5 => ['type' => '2']
 	 * ), CONDITION_EVAL_TYPE_AND_OR);
 	 *
 	 * // ({1} or {2}) and {5}
 	 *
 	 * Keep in sync with JS getConditionFormula().
 	 *
-	 * @param array $conditions		conditions with IDs as keys and condition type with values
-	 * @param int	$evalType
+	 * @param array  $conditions
+	 * @param string $group_field_name
+	 * @param int    $evalType
 	 *
 	 * @return string
 	 */
-	public static function getFormula(array $conditions, $evalType) {
+	public static function getEvalFormula(array $conditions, string $group_field_name, int $evalType): string {
 		$groupedConditions = [];
-		foreach ($conditions as $id => $condition) {
-			$groupedConditions[$condition][] = '{'.$id.'}';
+		foreach ($conditions as $conditionid => $condition) {
+			$groupedConditions[$condition[$group_field_name]][] = '{'.$conditionid.'}';
 		}
 
 		// operators
@@ -92,88 +88,122 @@ class CConditionHelper {
 	}
 
 	/**
-	 * Extract the numeric IDs used in the given formula and generate a set of letter aliases for them.
-	 * Aliases will be generated in the order they appear in the formula.
+	 * Replace the user-defined formula IDs in the given formula and conditions with system-generated ones.
 	 *
 	 * Example:
-	 * CFormulaHelper::getFormulaIds('1 or (2 and 3) or 2');
+	 * $formula = '(X or Y) and Z';
+	 * $conditions = [
+	 *     1 => ['formulaid' => 'X', 'type' => 1],
+	 *     2 => ['formulaid' => 'Y', 'type' => 1],
+	 *     5 => ['formulaid' => 'Z', 'type' => 2]
+	 * ];
+	 * CConditionHelper::resetFormulaIds($formula, $conditions);
 	 *
-	 * // array(1 => 'A', 2 => 'B', 3 => 'C')
+	 * // $formula = '(A or B) and C';
+	 * // $conditions = [
+	 * //     1 => ['formulaid' => 'A', 'type' => 1],
+	 * //     2 => ['formulaid' => 'B', 'type' => 1],
+	 * //     5 => ['formulaid' => 'C', 'type' => 2]
+	 * // ];
 	 *
-	 * @param string $formula	a formula with numeric IDs
-	 *
-	 * @return array
+	 * @param string $formula
+	 * @param array  $conditions
 	 */
-	public static function getFormulaIds($formula) {
-		$matches = [];
+	public static function resetFormulaIds(string &$formula, array &$conditions): void {
+		self::replaceFormulaIds($formula, $conditions);
+		self::addFormulaIds($conditions, $formula);
+		self::replaceConditionIds($formula, $conditions);
+	}
+
+	/**
+	 * Add a formula ID to each of the given conditions according to the condition ID contained in the given formula.
+	 *
+	 * Example:
+	 * $formula = '({1} or {2}) and {5}';
+	 * $conditions = [
+	 *     1 => ['type' => 1],
+	 *     2 => ['type' => 1],
+	 *     5 => ['type' => 2]
+	 * ];
+	 * CConditionHelper::addFormulaIds($conditions, $formula);
+	 *
+	 * // $conditions = [
+	 * //     1 => ['formulaid' => 'A', 'type' => 1],
+	 * //     2 => ['formulaid' => 'B', 'type' => 1],
+	 * //     5 => ['formulaid' => 'C', 'type' => 2]
+	 * // ];
+	 *
+	 * @param array  $conditions
+	 * @param string $formula
+	 */
+	public static function addFormulaIds(array &$conditions, string $formula): void {
 		preg_match_all('/\d+/', $formula, $matches);
 
-		$ids = array_keys(array_flip($matches[0]));
+		$conditionids = array_keys(array_flip($matches[0]));
 
 		$i = 0;
-		$formulaIds = [];
-		foreach ($ids as $id) {
-			$formulaIds[$id] = num2letter($i);
+		foreach ($conditionids as $conditionid) {
+			$conditions[$conditionid]['formulaid'] = num2letter($i);
 
 			$i++;
 		}
-
-		return $formulaIds;
 	}
 
 	/**
-	 * Replace numeric IDs with formula IDs using the pairs given in $ids.
+	 * Replace condition IDs in the given formula with the appropriate formula IDs of the given conditions.
 	 *
-	 * @param string 	$formula
-	 * @param array 	$ids		array of numeric ID - formula ID pairs
+	 * Example:
+	 * $formula = '({1} or {2}) and {5}';
+	 * $conditions = [
+	 *     1 => ['formulaid' => 'A', 'type' => 1],
+	 *     2 => ['formulaid' => 'B', 'type' => 1],
+	 *     5 => ['formulaid' => 'C', 'type' => 2]
+	 * ];
+	 * CConditionHelper::replaceConditionIds($formula, $conditions);
 	 *
-	 * @return string
+	 * // $formula = '(A or B) and C';
+	 *
+	 * @param string $formula
+	 * @param array  $conditions
 	 */
-	public static function replaceNumericIds($formula, array $ids) {
-		foreach ($ids as $id => $formulaId) {
-			$formula = str_replace('{'.$id.'}', $formulaId, $formula);
+	public static function replaceConditionIds(string &$formula, array $conditions): void {
+		foreach ($conditions as $conditionid => $condition) {
+			$formula = str_replace('{'.$conditionid.'}', $condition['formulaid'], $formula);
 		}
-
-		return $formula;
 	}
 
 	/**
-	 * Replace formula IDs with numeric IDs using the pairs given in $ids.
+	 * Replace formula IDs of the given formula with the appropriate condition IDs of the given conditions.
 	 *
-	 * Notes:
-	 *     - $formula must be valid before the function call
-	 *     - $ids must contain all constants used in the $formula
+	 * Example:
+	 * $formula = '(A or B) and C';
+	 * $conditions = [
+	 *     1 => ['formulaid' => 'A', 'type' => 1],
+	 *     2 => ['formulaid' => 'B', 'type' => 1],
+	 *     5 => ['formulaid' => 'C', 'type' => 2]
+	 * ];
+	 * CConditionHelper::replaceFormulaIds($formula, $conditions);
 	 *
-	 * @param string 	$formula
-	 * @param array 	$ids		array of formula ID - numeric ID pairs
+	 * // $formula = '({1} or {2}) and {5}';
 	 *
-	 * @return string
+	 * @param string $formula
+	 * @param array  $conditions
 	 */
-	public static function replaceLetterIds($formula, array $ids) {
+	public static function replaceFormulaIds(string &$formula, array $conditions): void {
 		$parser = new CConditionFormula();
 		$parser->parse($formula);
 
+		$conditionids = [];
+
+		foreach ($conditions as $conditionid => $condition) {
+			$conditionids[$condition['formulaid']] = $conditionid;
+		}
+
 		foreach (array_reverse($parser->constants) as $constant) {
-			$formula = substr_replace($formula, '{'.$ids[$constant['value']].'}', $constant['pos'],
+			$formula = substr_replace($formula, '{'.$conditionids[$constant['value']].'}', $constant['pos'],
 				strlen($constant['value'])
 			);
 		}
-
-		return $formula;
-	}
-
-	/**
-	 * Sort conditions by formula id as if they were numbers.
-	 *
-	 * @param array		$conditions		conditions
-	 * @return array
-	 */
-	public static function sortConditionsByFormulaId($conditions) {
-		uasort($conditions, function ($condition1, $condition2) {
-			return CConditionHelper::compareFormulaIds($condition1['formulaid'], $condition2['formulaid']);
-		});
-
-		return $conditions;
 	}
 
 	/**
@@ -232,30 +262,112 @@ class CConditionHelper {
 		return $nextFormulaId;
 	}
 
-
 	/**
 	 * Sorts the conditions based on the given formula.
 	 *
-	 * @param array $filter  Array containing the formula and conditions.
-	 *
-	 * $filter = [
-	 *     'conditions' =>  (array)   Array of conditions.
-	 *     'formula' =>     (string)  Action condition formula.
-	 * ]
-	 *
-	 * @return array
+	 * @param array  $conditions
+	 * @param array  $conditions[<conditionid>]
+	 * @param string $formula
 	 */
-	public static function sortConditionsByFormula(array $filter): array {
-		$formula = $filter['formula'];
+	public static function sortConditionsByFormula(array &$conditions, string $formula): void {
+		preg_match_all('/\d+/', $formula, $matches);
+		$order = [];
+		foreach ($matches[0] as $key => $conditionid) {
+			$order += [$conditionid => $key];
+		}
 
-		usort($filter['conditions'], static function (array $a, array $b) use ($formula) {
-			$pattern = '/([A-Z]+)/';
-			preg_match_all($pattern, $formula, $matches);
-			$upper_letters = $matches[0];
-
-			return array_search($a['formulaid'], $upper_letters) <=> array_search($b['formulaid'], $upper_letters);
+		uksort($conditions, static function (string $a, string $b) use ($order) {
+			return bccomp($order[$a], $order[$b]);
 		});
+	}
 
-		return $filter['conditions'];
+	/**
+	 * Sorts the action conditions based on the calculation types And/Or, And, Or.
+	 *
+	 * @param array $conditions
+	 * @param int   $eventsource
+	 */
+	public static function sortActionConditions(array &$conditions, int $eventsource): void {
+		$ct_order = array_flip(get_conditions_by_eventsource($eventsource));
+
+		uasort($conditions, static function (array $row1, array $row2) use ($ct_order) {
+			if ($cmp = $ct_order[$row1['conditiontype']] <=> $ct_order[$row2['conditiontype']]) {
+				return $cmp;
+			}
+
+			foreach (['operator', 'value2', 'value'] as $field_name) {
+				if ($cmp = strnatcasecmp($row1[$field_name], $row2[$field_name])) {
+					return $cmp;
+				}
+			}
+
+			return 0;
+		});
+	}
+
+	/**
+	 * Sorts the LLD rule filter conditions based on the calculation types And/Or, And, Or.
+	 *
+	 * @param array $conditions
+	 */
+	public static function sortLldRuleConditions(array &$conditions): void {
+		uasort($conditions, static function (array $row1, array $row2) {
+			// To correctly sort macros, only the internal part of the macro needs to be sorted.
+			// See order_macros() for details.
+			if ($cmp = strnatcmp(substr($row1['macro'], 2, -1), substr($row2['macro'], 2, -1))) {
+				return $cmp;
+			}
+
+			foreach (['operator', 'value'] as $field_name) {
+				if ($cmp = strnatcasecmp($row1[$field_name], $row2[$field_name])) {
+					return $cmp;
+				}
+			}
+
+			return 0;
+		});
+	}
+
+	/**
+	 * Sorts the correlation conditions based on the calculation types And/Or, And, Or.
+	 *
+	 * @param array $conditions
+	 */
+	public static function sortCorrelationConditions(array &$conditions): void {
+		$type_order = array_flip(array_keys(CCorrelationHelper::getConditionTypes()));
+
+		uasort($conditions, static function (array $row1, array $row2) use ($type_order) {
+			if ($cmp = $type_order[$row1['type']] <=> $type_order[$row2['type']]) {
+				return $cmp;
+			}
+
+			switch ($row1['type']) {
+				case ZBX_CORR_CONDITION_OLD_EVENT_TAG:
+				case ZBX_CORR_CONDITION_NEW_EVENT_TAG:
+					$field_names = ['tag'];
+					break;
+
+				case ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP:
+					$field_names = ['operator', 'groupid'];
+					break;
+
+				case ZBX_CORR_CONDITION_EVENT_TAG_PAIR:
+					$field_names = ['oldtag', 'newtag'];
+					break;
+
+				case ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE:
+				case ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE:
+					$field_names = ['tag', 'operator', 'value'];
+					break;
+			}
+
+			foreach ($field_names as $field_name) {
+				if ($cmp = strnatcasecmp($row1[$field_name], $row2[$field_name])) {
+					return $cmp;
+				}
+			}
+
+			return 0;
+		});
 	}
 }

@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -141,8 +136,32 @@ class CConfigurationExportBuilder {
 			$store = [];
 
 			if ($type == XML_ARRAY) {
-				foreach ($rules as $tag => $rule) {
-					$value = self::buildArrayRow($rule, $row, $tag, $main_tag);
+				foreach ($rules as $tag => $tag_rules) {
+					while ($tag_rules['type'] & XML_MULTIPLE) {
+						$matched_multiple_rule = null;
+
+						foreach ($tag_rules['rules'] as $multiple_rule) {
+							if (self::multipleRuleMatched($multiple_rule, $row)) {
+								$multiple_rule['type'] = ($tag_rules['type'] & XML_REQUIRED) | $multiple_rule['type'];
+								$matched_multiple_rule =
+									$multiple_rule + array_intersect_key($tag_rules, array_flip(['default']));
+								break;
+							}
+						}
+
+						if ($matched_multiple_rule === null) {
+							// For use by developers. Do not translate.
+							throw new Exception('Incorrect XML_MULTIPLE validation rules.');
+						}
+
+						$tag_rules = $matched_multiple_rule;
+					}
+
+					if ($tag_rules['type'] & XML_IGNORE_TAG) {
+						continue;
+					}
+
+					$value = self::buildArrayRow($tag_rules, $row, $tag, $main_tag);
 
 					if ($value !== null) {
 						$store[$tag] = $value;
@@ -162,6 +181,22 @@ class CConfigurationExportBuilder {
 		}
 
 		return $result;
+	}
+
+	private static function multipleRuleMatched(array $multiple_rule, array $data): bool {
+		if (array_key_exists('else', $multiple_rule)) {
+			return true;
+		}
+		elseif (is_array($multiple_rule['if'])) {
+			$field_name = $multiple_rule['if']['tag'];
+
+			return array_key_exists($data[$field_name], $multiple_rule['if']['in']);
+		}
+		elseif ($multiple_rule['if'] instanceof Closure) {
+			return call_user_func($multiple_rule['if'], $data);
+		}
+
+		return false;
 	}
 
 	/**
@@ -452,7 +487,7 @@ class CConfigurationExportBuilder {
 				'smtp_authentication' => $media_type['smtp_authentication'],
 				'username' => $media_type['username'],
 				'password' => $media_type['passwd'],
-				'content_type' => $media_type['content_type'],
+				'message_format' => $media_type['message_format'],
 				'script_name' => $media_type['exec_path'],
 				'parameters' => self::formatMediaTypeParameters($media_type),
 				'gsm_modem' => $media_type['gsm_modem'],
@@ -481,8 +516,6 @@ class CConfigurationExportBuilder {
 	/**
 	 * Format media type parameters.
 	 *
-	 * @static
-	 *
 	 * @param array $media_type
 	 *
 	 * @return array|string
@@ -505,8 +538,6 @@ class CConfigurationExportBuilder {
 
 	/**
 	 * Format media type message templates.
-	 *
-	 * @static
 	 *
 	 * @param array $message_templates
 	 *
@@ -638,7 +669,7 @@ class CConfigurationExportBuilder {
 				'password' => $discoveryRule['password'],
 				'publickey' => $discoveryRule['publickey'],
 				'privatekey' => $discoveryRule['privatekey'],
-				'filter' => self::formatLldFilter($discoveryRule['filter']),
+				'filter' => $discoveryRule['filter'],
 				'lifetime_type' => $discoveryRule['lifetime_type'],
 				'lifetime' => $discoveryRule['lifetime'],
 				'enabled_lifetime_type' => $discoveryRule['enabled_lifetime_type'],
@@ -691,19 +722,6 @@ class CConfigurationExportBuilder {
 	}
 
 	/**
-	 * Format the LLD filter.
-	 *
-	 * @param array $filter
-	 *
-	 * @return array
-	 */
-	private static function formatLldFilter(array $filter): array {
-		$filter['conditions'] = sortLldRuleFilterConditions($filter['conditions'], $filter['evaltype']);
-
-		return $filter;
-	}
-
-	/**
 	 * Format the LLD macro paths.
 	 *
 	 * @param array $lld_macro_paths
@@ -728,8 +746,6 @@ class CConfigurationExportBuilder {
 		CArrayHelper::sort($overrides, ['step']);
 
 		foreach ($overrides as &$override) {
-			$override['filter'] = self::formatLldFilter($override['filter']);
-
 			unset($override['filter']['eval_formula']);
 
 			if (!$override['filter']['conditions']) {
@@ -758,8 +774,6 @@ class CConfigurationExportBuilder {
 	 * Format preprocessing steps.
 	 *
 	 * @param array $preprocessing_steps
-	 *
-	 * @static
 	 *
 	 * @return array
 	 */

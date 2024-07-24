@@ -1,37 +1,33 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "pg_manager.h"
-#include "zbxcommon.h"
+
 #include "pg_cache.h"
 #include "pg_service.h"
+
+#include "zbxtimekeeper.h"
 #include "zbx_host_constants.h"
 #include "zbxalgo.h"
 #include "zbxcacheconfig.h"
 #include "zbxdb.h"
 #include "zbxdbhigh.h"
 #include "zbxnix.h"
-#include "zbxnum.h"
 #include "zbxself.h"
 #include "zbxstr.h"
 #include "zbxtime.h"
-#include "zbxtypes.h"
+
 /******************************************************************************
  *                                                                            *
  * Purpose: initialize proxy group manager                                    *
@@ -457,17 +453,12 @@ static void	pgm_rebalance_and_flush_updates(zbx_pg_cache_t *cache)
 
 			zbx_db_begin();
 
-			zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 			pgm_db_flush_group_updates(&sql, &sql_alloc, &sql_offset, &group_updates);
 			pgm_db_flush_proxy_updates(&sql, &sql_alloc, &sql_offset, &proxy_updates);
 			pgm_db_flush_host_proxy_updates(&sql, &sql_alloc, &sql_offset, &hosts_mod);
 			pgm_db_flush_host_proxy_deletes(&sql, &sql_alloc, &sql_offset, &hosts_del);
 
-			zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-			if (16 < sql_offset)
-				zbx_db_execute("%s", sql);
+			(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
 
 			pgm_db_flush_host_proxy_inserts(&hosts_new);
 

@@ -1,21 +1,16 @@
 <?php declare(strict_types = 0);
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -31,11 +26,11 @@
 			document.getElementById('js-create').addEventListener('click', () => this.#edit());
 
 			document.getElementById('js-massenable').addEventListener('click', (e) =>
-				this.#enable(e.target, Object.keys(chkbxRange.getSelectedIds()), true)
+				this.#enable(e.target, Object.keys(chkbxRange.getSelectedIds()))
 			);
 
 			document.getElementById('js-massdisable').addEventListener('click', (e) =>
-				this.#disable(e.target, Object.keys(chkbxRange.getSelectedIds()), true)
+				this.#disable(e.target, Object.keys(chkbxRange.getSelectedIds()))
 			);
 
 			document.getElementById('js-massdelete').addEventListener('click', (e) =>
@@ -92,23 +87,19 @@
 		}
 
 		/**
-		 * Shows confirmation window if multiple media type elements are selected for enabling and sends a POST request
-		 * to enable action.
+		 * Shows confirmation window when single or multiple media type elements are selected for enabling
+		 * and sends a POST request to enable action.
 		 *
 		 * @param {element} target        The target element that will be passed to post.
 		 * @param {array}   mediatypeids  Media type IDs to enable.
-		 * @param {bool}    massenable    True if footer button is pressed for mass enable action which brings up
-		 *                                confirmation menu. False if only one element with single link is clicked.
 		 */
-		#enable(target, mediatypeids, massenable = false) {
-			if (massenable) {
-				const confirmation = mediatypeids.length > 1
-					? <?= json_encode(_('Enable selected media types?')) ?>
-					: <?= json_encode(_('Enable selected media type?')) ?>;
+		#enable(target, mediatypeids) {
+			const confirmation = mediatypeids.length > 1
+				? <?= json_encode(_('Enable selected media types?')) ?>
+				: <?= json_encode(_('Enable selected media type?')) ?>;
 
-				if (!window.confirm(confirmation)) {
-					return;
-				}
+			if (!window.confirm(confirmation)) {
+				return;
 			}
 
 			const curl = new Curl('zabbix.php');
@@ -119,23 +110,19 @@
 		}
 
 		/**
-		 * Shows confirmation window if multiple media type elements are selected for enabling and sends a POST request
-		 * to disable action.
+		 * Shows confirmation window when single or multiple media type elements are selected for disabling
+		 * and sends a POST request to disable action.
 		 *
 		 * @param {element} target        The target element that will be passed to post.
 		 * @param {array}   mediatypeids  Media type IDs to disable.
-		 * @param {bool}    massdisable   True if footer button is pressed for mass enable action which brings up
-		 *                                confirmation menu. False if only one element with single link is clicked.
 		 */
-		#disable(target, mediatypeids, massdisable = false) {
-			if (massdisable) {
-				const confirmation = mediatypeids.length > 1
-					? <?= json_encode(_('Disable selected media types?')) ?>
-					: <?= json_encode(_('Disable selected media type?')) ?>;
+		#disable(target, mediatypeids) {
+			const confirmation = mediatypeids.length > 1
+				? <?= json_encode(_('Disable selected media types?')) ?>
+				: <?= json_encode(_('Disable selected media type?')) ?>;
 
-				if (!window.confirm(confirmation)) {
-					return;
-				}
+			if (!window.confirm(confirmation)) {
+				return;
 			}
 
 			const curl = new Curl('zabbix.php');

@@ -7,7 +7,7 @@ This template is designed for the effortless deployment of Check Point Next Gene
 
 ## Requirements
 
-Zabbix version: 7.0 and higher.
+Zabbix version: 7.2 and higher.
 
 ## Tested versions
 
@@ -16,7 +16,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.0/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.2/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -73,62 +73,62 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Check Point: Appliance product name|<p>MIB: CHECKPOINT-MIB</p><p>Appliance product name.</p>|SNMP agent|system.hw.model<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|Check Point: Appliance serial number|<p>MIB: CHECKPOINT-MIB</p><p>Appliance serial number.</p>|SNMP agent|system.hw.serialnumber<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|Check Point: Appliance manufacturer|<p>MIB: CHECKPOINT-MIB</p><p>Appliance manufacturer.</p>|SNMP agent|system.hw.manufacturer<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|Check Point: Remote Access users|<p>MIB: CHECKPOINT-MIB</p><p>Number of remote access users.</p>|SNMP agent|remote.users.number<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.length()`</p></li></ul>|
-|Check Point: System contact details|<p>MIB: SNMPv2-MIB</p><p>Name and contact information of the contact person for the node. If not provided, the value is a zero-length string.</p>|SNMP agent|system.contact<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
-|Check Point: System description|<p>MIB: SNMPv2-MIB</p><p>Full name and version identification of the system's hardware type, software operating system, and networking software.</p>|SNMP agent|system.descr<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
-|Check Point: System location|<p>MIB: SNMPv2-MIB</p><p>Physical location of the node (e.g., `equipment room`, `3rd floor`). If not provided, the value is a zero-length string.</p>|SNMP agent|system.location<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
-|Check Point: System name|<p>MIB: SNMPv2-MIB</p><p>An administratively-assigned name for the node (the node's fully-qualified domain name). If not provided, the value is a zero-length string.</p>|SNMP agent|system.name<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
-|Check Point: System object ID|<p>MIB: SNMPv2-MIB</p><p>The vendor's authoritative identification of the entity as part of the vendor's SMI enterprises subtree with the prefix 1.3.6.1.4.1 (e.g., a vendor with the identifier 1.3.6.1.4.1.4242 might assign a system object with the OID 1.3.6.1.4.1.4242.1.1).</p>|SNMP agent|system.objectid<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
-|Check Point: System uptime|<p>MIB: HOST-RESOURCES-V2-MIB</p><p>Time since the network management portion of the system was last re-initialized.</p>|SNMP agent|system.uptime<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `0.01`</p></li></ul>|
-|Check Point: Number of CPUs|<p>MIB: CHECKPOINT-MIB</p><p>Number of processors.</p>|SNMP agent|system.cpu.num<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Check Point: CPU utilization|<p>MIB: CHECKPOINT-MIB</p><p>CPU utilization per core in %.</p>|SNMP agent|system.cpu.util|
-|Check Point: Load average (1m avg)|<p>MIB: UCD-SNMP-MIB</p><p>Average number of processes being executed or waiting over the last minute.</p>|SNMP agent|system.cpu.load.avg1|
-|Check Point: Load average (5m avg)|<p>MIB: UCD-SNMP-MIB</p><p>Average number of processes being executed or waiting over the last 5 minutes.</p>|SNMP agent|system.cpu.load.avg5|
-|Check Point: Load average (15m avg)|<p>MIB: UCD-SNMP-MIB</p><p>Average number of processes being executed or waiting over the last 15 minutes.</p>|SNMP agent|system.cpu.load.avg15|
-|Check Point: CPU user time|<p>MIB: CHECKPOINT-MIB</p><p>Average time the CPU has spent running user processes that are not niced.</p>|SNMP agent|system.cpu.user|
-|Check Point: CPU system time|<p>MIB: CHECKPOINT-MIB</p><p>Average time the CPU has spent running the kernel and its processes.</p>|SNMP agent|system.cpu.system|
-|Check Point: CPU idle time|<p>MIB: CHECKPOINT-MIB</p><p>Average time the CPU has spent doing nothing.</p>|SNMP agent|system.cpu.idle|
-|Check Point: Context switches per second|<p>MIB: UCD-SNMP-MIB</p><p>Number of context switches per second.</p>|SNMP agent|system.cpu.switches<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
-|Check Point: CPU interrupts per second|<p>MIB: CHECKPOINT-MIB</p><p>Number of interrupts processed per second.</p>|SNMP agent|system.cpu.intr|
-|Check Point: Total memory|<p>MIB: CHECKPOINT-MIB</p><p>Total real memory in bytes. Memory used by applications.</p>|SNMP agent|vm.memory.total|
-|Check Point: Active memory|<p>MIB: CHECKPOINT-MIB</p><p>Active real memory (memory used by applications that is not cached to the disk) in bytes.</p>|SNMP agent|vm.memory.active|
-|Check Point: Free memory|<p>MIB: CHECKPOINT-MIB</p><p>Free memory available for applications in bytes.</p>|SNMP agent|vm.memory.free|
-|Check Point: Used memory|<p>Used real memory calculated by total real memory and free real memory in bytes.</p>|Calculated|vm.memory.used|
-|Check Point: Memory utilization|<p>Memory utilization in %.</p>|Calculated|vm.memory.util|
-|Check Point: Encrypted packets per second|<p>MIB: CHECKPOINT-MIB</p><p>Number of encrypted packets per second.</p>|SNMP agent|vpn.packets.encrypted<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
-|Check Point: Decrypted packets per second|<p>MIB: CHECKPOINT-MIB</p><p>Number of decrypted packets per second.</p>|SNMP agent|vpn.packets.decrypted<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
-|Check Point: ICMP ping|<p>Host accessibility by ICMP.</p><p>0 - ICMP ping fails.</p><p>1 - ICMP ping successful.</p>|Simple check|icmpping|
-|Check Point: ICMP loss|<p>Percentage of lost packets.</p>|Simple check|icmppingloss|
-|Check Point: ICMP response time|<p>ICMP ping response time (in seconds).</p>|Simple check|icmppingsec|
-|Check Point: SNMP agent availability|<p>Availability of SNMP checks on the host. The value of this item corresponds to the availability icons in the host list.</p><p></p><p>Possible values:</p><p>0 - not available</p><p>1 - available</p><p>2 - unknown</p>|Zabbix internal|zabbix[host,snmp,available]|
-|Check Point: SNMP traps (fallback)|<p>Used to collect all SNMP traps unmatched by other `snmptrap` items.</p>|SNMP trap|snmptrap.fallback|
-|Check Point: SNMP walk network interfaces|<p>Used for discovering interfaces from IF-MIB.</p>|SNMP agent|net.if.walk|
-|Check Point: SNMP walk CPU|<p>Used for discovering CPU from CHECKPOINT-MIB.</p>|SNMP agent|system.cpu.walk|
-|Check Point: SNMP walk VPN tunnels|<p>Used for discovering VPN tunnels from CHECKPOINT-MIB.</p>|SNMP agent|vpn.tunnel.walk|
-|Check Point: SNMP walk disks|<p>Used for discovering storage disks from CHECKPOINT-MIB.</p>|SNMP agent|vfs.fs.walk|
-|Check Point: SNMP walk temperature sensors|<p>Used for discovering temperature sensors from CHECKPOINT-MIB.</p>|SNMP agent|sensor.temp.walk|
-|Check Point: SNMP walk fan sensors|<p>Used for discovering fan sensors from CHECKPOINT-MIB.</p>|SNMP agent|sensor.fan.walk|
-|Check Point: SNMP walk voltage sensors|<p>Used for discovering voltage sensors from CHECKPOINT-MIB.</p>|SNMP agent|sensor.volt.walk|
-|Check Point: SNMP walk PSU sensors|<p>Used for discovering power supply sensors from CHECKPOINT-MIB.</p>|SNMP agent|sensor.psu.walk|
-|Check Point: SNMP walk svn features|<p>Used for discovering software blades and features from CHECKPOINT-MIB.</p>|SNMP agent|svn.feature.walk|
+|Appliance product name|<p>MIB: CHECKPOINT-MIB</p><p>Appliance product name.</p>|SNMP agent|system.hw.model<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Appliance serial number|<p>MIB: CHECKPOINT-MIB</p><p>Appliance serial number.</p>|SNMP agent|system.hw.serialnumber<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Appliance manufacturer|<p>MIB: CHECKPOINT-MIB</p><p>Appliance manufacturer.</p>|SNMP agent|system.hw.manufacturer<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Remote Access users|<p>MIB: CHECKPOINT-MIB</p><p>Number of remote access users.</p>|SNMP agent|remote.users.number<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.length()`</p></li></ul>|
+|System contact details|<p>MIB: SNMPv2-MIB</p><p>Name and contact information of the contact person for the node. If not provided, the value is a zero-length string.</p>|SNMP agent|system.contact<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|System description|<p>MIB: SNMPv2-MIB</p><p>Full name and version identification of the system's hardware type, software operating system, and networking software.</p>|SNMP agent|system.descr<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|System location|<p>MIB: SNMPv2-MIB</p><p>Physical location of the node (e.g., `equipment room`, `3rd floor`). If not provided, the value is a zero-length string.</p>|SNMP agent|system.location<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|System name|<p>MIB: SNMPv2-MIB</p><p>An administratively-assigned name for the node (the node's fully-qualified domain name). If not provided, the value is a zero-length string.</p>|SNMP agent|system.name<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|System object ID|<p>MIB: SNMPv2-MIB</p><p>The vendor's authoritative identification of the entity as part of the vendor's SMI enterprises subtree with the prefix 1.3.6.1.4.1 (e.g., a vendor with the identifier 1.3.6.1.4.1.4242 might assign a system object with the OID 1.3.6.1.4.1.4242.1.1).</p>|SNMP agent|system.objectid<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|System uptime|<p>MIB: HOST-RESOURCES-V2-MIB</p><p>Time since the network management portion of the system was last re-initialized.</p>|SNMP agent|system.uptime<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `0.01`</p></li></ul>|
+|Number of CPUs|<p>MIB: CHECKPOINT-MIB</p><p>Number of processors.</p>|SNMP agent|system.cpu.num<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|CPU utilization|<p>MIB: CHECKPOINT-MIB</p><p>CPU utilization per core in %.</p>|SNMP agent|system.cpu.util|
+|Load average (1m avg)|<p>MIB: UCD-SNMP-MIB</p><p>Average number of processes being executed or waiting over the last minute.</p>|SNMP agent|system.cpu.load.avg1|
+|Load average (5m avg)|<p>MIB: UCD-SNMP-MIB</p><p>Average number of processes being executed or waiting over the last 5 minutes.</p>|SNMP agent|system.cpu.load.avg5|
+|Load average (15m avg)|<p>MIB: UCD-SNMP-MIB</p><p>Average number of processes being executed or waiting over the last 15 minutes.</p>|SNMP agent|system.cpu.load.avg15|
+|CPU user time|<p>MIB: CHECKPOINT-MIB</p><p>Average time the CPU has spent running user processes that are not niced.</p>|SNMP agent|system.cpu.user|
+|CPU system time|<p>MIB: CHECKPOINT-MIB</p><p>Average time the CPU has spent running the kernel and its processes.</p>|SNMP agent|system.cpu.system|
+|CPU idle time|<p>MIB: CHECKPOINT-MIB</p><p>Average time the CPU has spent doing nothing.</p>|SNMP agent|system.cpu.idle|
+|Context switches per second|<p>MIB: UCD-SNMP-MIB</p><p>Number of context switches per second.</p>|SNMP agent|system.cpu.switches<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
+|CPU interrupts per second|<p>MIB: CHECKPOINT-MIB</p><p>Number of interrupts processed per second.</p>|SNMP agent|system.cpu.intr|
+|Total memory|<p>MIB: CHECKPOINT-MIB</p><p>Total real memory in bytes. Memory used by applications.</p>|SNMP agent|vm.memory.total|
+|Active memory|<p>MIB: CHECKPOINT-MIB</p><p>Active real memory (memory used by applications that is not cached to the disk) in bytes.</p>|SNMP agent|vm.memory.active|
+|Free memory|<p>MIB: CHECKPOINT-MIB</p><p>Free memory available for applications in bytes.</p>|SNMP agent|vm.memory.free|
+|Used memory|<p>Used real memory calculated by total real memory and free real memory in bytes.</p>|Calculated|vm.memory.used|
+|Memory utilization|<p>Memory utilization in %.</p>|Calculated|vm.memory.util|
+|Encrypted packets per second|<p>MIB: CHECKPOINT-MIB</p><p>Number of encrypted packets per second.</p>|SNMP agent|vpn.packets.encrypted<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
+|Decrypted packets per second|<p>MIB: CHECKPOINT-MIB</p><p>Number of decrypted packets per second.</p>|SNMP agent|vpn.packets.decrypted<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
+|ICMP ping|<p>Host accessibility by ICMP.</p><p>0 - ICMP ping fails.</p><p>1 - ICMP ping successful.</p>|Simple check|icmpping|
+|ICMP loss|<p>Percentage of lost packets.</p>|Simple check|icmppingloss|
+|ICMP response time|<p>ICMP ping response time (in seconds).</p>|Simple check|icmppingsec|
+|SNMP agent availability|<p>Availability of SNMP checks on the host. The value of this item corresponds to the availability icons in the host list.</p><p></p><p>Possible values:</p><p>0 - not available</p><p>1 - available</p><p>2 - unknown</p>|Zabbix internal|zabbix[host,snmp,available]|
+|SNMP traps (fallback)|<p>Used to collect all SNMP traps unmatched by other `snmptrap` items.</p>|SNMP trap|snmptrap.fallback|
+|SNMP walk network interfaces|<p>Used for discovering interfaces from IF-MIB.</p>|SNMP agent|net.if.walk|
+|SNMP walk CPU|<p>Used for discovering CPU from CHECKPOINT-MIB.</p>|SNMP agent|system.cpu.walk|
+|SNMP walk VPN tunnels|<p>Used for discovering VPN tunnels from CHECKPOINT-MIB.</p>|SNMP agent|vpn.tunnel.walk|
+|SNMP walk disks|<p>Used for discovering storage disks from CHECKPOINT-MIB.</p>|SNMP agent|vfs.fs.walk|
+|SNMP walk temperature sensors|<p>Used for discovering temperature sensors from CHECKPOINT-MIB.</p>|SNMP agent|sensor.temp.walk|
+|SNMP walk fan sensors|<p>Used for discovering fan sensors from CHECKPOINT-MIB.</p>|SNMP agent|sensor.fan.walk|
+|SNMP walk voltage sensors|<p>Used for discovering voltage sensors from CHECKPOINT-MIB.</p>|SNMP agent|sensor.volt.walk|
+|SNMP walk PSU sensors|<p>Used for discovering power supply sensors from CHECKPOINT-MIB.</p>|SNMP agent|sensor.psu.walk|
+|SNMP walk svn features|<p>Used for discovering software blades and features from CHECKPOINT-MIB.</p>|SNMP agent|svn.feature.walk|
 
 ### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Check Point: Device has been replaced|<p>The device serial number has changed. Acknowledge to close the problem manually.</p>|`last(/Check Point Next Generation Firewall by SNMP/system.hw.serialnumber,#1)<>last(/Check Point Next Generation Firewall by SNMP/system.hw.serialnumber,#2) and length(last(/Check Point Next Generation Firewall by SNMP/system.hw.serialnumber))>0`|Info|**Manual close**: Yes|
-|Check Point: System name has changed|<p>The name of the system has changed. Acknowledge to close the problem manually.</p>|`last(/Check Point Next Generation Firewall by SNMP/system.name,#1)<>last(/Check Point Next Generation Firewall by SNMP/system.name,#2) and length(last(/Check Point Next Generation Firewall by SNMP/system.name))>0`|Info|**Manual close**: Yes|
-|Check Point: Device has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/Check Point Next Generation Firewall by SNMP/system.uptime)<10m`|Info|**Manual close**: Yes|
-|Check Point: High CPU utilization|<p>CPU utilization is too high. The system might be slow to respond.</p>|`min(/Check Point Next Generation Firewall by SNMP/system.cpu.util,5m)>{$CPU.UTIL.CRIT}`|Warning||
-|Check Point: Load average is too high|<p>The load average per CPU is too high. The system may be slow to respond.</p>|`min(/Check Point Next Generation Firewall by SNMP/system.cpu.load.avg1,5m)/last(/Check Point Next Generation Firewall by SNMP/system.cpu.num)>{$LOAD_AVG_PER_CPU.MAX.WARN} and last(/Check Point Next Generation Firewall by SNMP/system.cpu.load.avg5)>0 and last(/Check Point Next Generation Firewall by SNMP/system.cpu.load.avg15)>0`|Average||
-|Check Point: High memory utilization|<p>The system is running out of free memory.</p>|`min(/Check Point Next Generation Firewall by SNMP/vm.memory.util,5m)>{$MEMORY.UTIL.MAX}`|Average||
-|Check Point: Unavailable by ICMP ping|<p>Last three attempts returned timeout. Please check device connectivity.</p>|`max(/Check Point Next Generation Firewall by SNMP/icmpping,#3)=0`|High||
-|Check Point: High ICMP ping loss|<p>ICMP packet loss detected.</p>|`min(/Check Point Next Generation Firewall by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Check Point Next Generation Firewall by SNMP/icmppingloss,5m)<100`|Warning|**Depends on**:<br><ul><li>Check Point: Unavailable by ICMP ping</li></ul>|
-|Check Point: High ICMP ping response time|<p>Average ICMP response time is too high.</p>|`avg(/Check Point Next Generation Firewall by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}`|Warning|**Depends on**:<br><ul><li>Check Point: Unavailable by ICMP ping</li><li>Check Point: High ICMP ping loss</li></ul>|
-|Check Point: No SNMP data collection|<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p>|`max(/Check Point Next Generation Firewall by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0`|Warning|**Depends on**:<br><ul><li>Check Point: Unavailable by ICMP ping</li></ul>|
+|Device has been replaced|<p>The device serial number has changed. Acknowledge to close the problem manually.</p>|`last(/Check Point Next Generation Firewall by SNMP/system.hw.serialnumber,#1)<>last(/Check Point Next Generation Firewall by SNMP/system.hw.serialnumber,#2) and length(last(/Check Point Next Generation Firewall by SNMP/system.hw.serialnumber))>0`|Info|**Manual close**: Yes|
+|System name has changed|<p>The name of the system has changed. Acknowledge to close the problem manually.</p>|`last(/Check Point Next Generation Firewall by SNMP/system.name,#1)<>last(/Check Point Next Generation Firewall by SNMP/system.name,#2) and length(last(/Check Point Next Generation Firewall by SNMP/system.name))>0`|Info|**Manual close**: Yes|
+|Device has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/Check Point Next Generation Firewall by SNMP/system.uptime)<10m`|Info|**Manual close**: Yes|
+|High CPU utilization|<p>CPU utilization is too high. The system might be slow to respond.</p>|`min(/Check Point Next Generation Firewall by SNMP/system.cpu.util,5m)>{$CPU.UTIL.CRIT}`|Warning||
+|Load average is too high|<p>The load average per CPU is too high. The system may be slow to respond.</p>|`min(/Check Point Next Generation Firewall by SNMP/system.cpu.load.avg1,5m)/last(/Check Point Next Generation Firewall by SNMP/system.cpu.num)>{$LOAD_AVG_PER_CPU.MAX.WARN} and last(/Check Point Next Generation Firewall by SNMP/system.cpu.load.avg5)>0 and last(/Check Point Next Generation Firewall by SNMP/system.cpu.load.avg15)>0`|Average||
+|High memory utilization|<p>The system is running out of free memory.</p>|`min(/Check Point Next Generation Firewall by SNMP/vm.memory.util,5m)>{$MEMORY.UTIL.MAX}`|Average||
+|Unavailable by ICMP ping|<p>Last three attempts returned timeout. Please check device connectivity.</p>|`max(/Check Point Next Generation Firewall by SNMP/icmpping,#3)=0`|High||
+|High ICMP ping loss|<p>ICMP packet loss detected.</p>|`min(/Check Point Next Generation Firewall by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Check Point Next Generation Firewall by SNMP/icmppingloss,5m)<100`|Warning|**Depends on**:<br><ul><li>Unavailable by ICMP ping</li></ul>|
+|High ICMP ping response time|<p>Average ICMP response time is too high.</p>|`avg(/Check Point Next Generation Firewall by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}`|Warning|**Depends on**:<br><ul><li>Unavailable by ICMP ping</li><li>High ICMP ping loss</li></ul>|
+|No SNMP data collection|<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p>|`max(/Check Point Next Generation Firewall by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0`|Warning|**Depends on**:<br><ul><li>Unavailable by ICMP ping</li></ul>|
 
 ### LLD rule Firewall discovery
 
@@ -246,7 +246,7 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Interface {#IFNAME}({#IFALIAS}): Link down|<p>This trigger expression works as follows:<br>1. It can be triggered if the interface link status is down.<br>2. `{$NET.IF.CONTROL:"{#IFNAME}"}=1` - a user can redefine the context macro to "0", marking this interface as not important. No new trigger will be fired if this interface link is down.<br>3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the interface link status was up to "1" sometime before.<br><br>WARNING: If closed manually, it will not fire again on the next poll because of `diff`.</p>|`{$NET.IF.CONTROL:"{#IFNAME}"}=1 and last(/Check Point Next Generation Firewall by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=1 and (last(/Check Point Next Generation Firewall by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Check Point Next Generation Firewall by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))`|Average|**Manual close**: Yes|
+|Interface {#IFNAME}({#IFALIAS}): Link down|<p>This trigger expression works as follows:<br>1. It can be triggered if the interface link status is down.<br>2. `{$NET.IF.CONTROL:"{#IFNAME}"}=1` - a user can redefine the context macro to "0", marking this interface as not important. No new trigger will be fired if this interface link is down.<br>3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the interface link status was up to "1" sometime before.<br><br>WARNING: If closed manually, it will not fire again on the next poll because of `diff`.</p>|`{$NET.IF.CONTROL:"{#IFNAME}"}=1 and last(/Check Point Next Generation Firewall by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Check Point Next Generation Firewall by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Check Point Next Generation Firewall by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))`|Average|**Manual close**: Yes|
 |Interface {#IFNAME}({#IFALIAS}): High bandwidth usage|<p>The utilization of the network interface is close to its estimated maximum bandwidth.</p>|`(avg(/Check Point Next Generation Firewall by SNMP/net.if.in[ifInOctets.{#SNMPINDEX}],15m)>({$NET.IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Check Point Next Generation Firewall by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}]) or avg(/Check Point Next Generation Firewall by SNMP/net.if.out[ifOutOctets.{#SNMPINDEX}],15m)>({$NET.IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Check Point Next Generation Firewall by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])) and last(/Check Point Next Generation Firewall by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])>0`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Interface {#IFNAME}({#IFALIAS}): Link down</li></ul>|
 |Interface {#IFNAME}({#IFALIAS}): High error rate|<p>It recovers when it is below 80% of the `{$NET.IF.ERRORS.WARN:"{#IFNAME}"}` threshold.</p>|`min(/Check Point Next Generation Firewall by SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)>{$NET.IF.ERRORS.WARN:"{#IFNAME}"} or min(/Check Point Next Generation Firewall by SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)>{$NET.IF.ERRORS.WARN:"{#IFNAME}"}`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Interface {#IFNAME}({#IFALIAS}): Link down</li></ul>|
 |Interface {#IFNAME}({#IFALIAS}): Ethernet has changed to lower speed than it was before|<p>This Ethernet connection has transitioned down from its known maximum speed. This might be a sign of autonegotiation issues. Acknowledge to close the problem manually.</p>|`change(/Check Point Next Generation Firewall by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])<0 and last(/Check Point Next Generation Firewall by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])>0 and ( last(/Check Point Next Generation Firewall by SNMP/net.if.type[ifType.{#SNMPINDEX}])=6 or last(/Check Point Next Generation Firewall by SNMP/net.if.type[ifType.{#SNMPINDEX}])=7 or last(/Check Point Next Generation Firewall by SNMP/net.if.type[ifType.{#SNMPINDEX}])=11 or last(/Check Point Next Generation Firewall by SNMP/net.if.type[ifType.{#SNMPINDEX}])=62 or last(/Check Point Next Generation Firewall by SNMP/net.if.type[ifType.{#SNMPINDEX}])=69 or last(/Check Point Next Generation Firewall by SNMP/net.if.type[ifType.{#SNMPINDEX}])=117 ) and (last(/Check Point Next Generation Firewall by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2)`|Info|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Interface {#IFNAME}({#IFALIAS}): Link down</li></ul>|

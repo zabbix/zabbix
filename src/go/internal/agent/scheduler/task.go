@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 package scheduler
@@ -560,11 +555,41 @@ type commandTask struct {
 	id     uint64
 	params []string
 	output resultcache.Writer
+	timeout int
+}
+
+func (t *commandTask) ClientID() (clientid uint64) {
+        return agent.MaxBuiltinClientID;
+}
+
+func (t *commandTask) Output() (output plugin.ResultWriter) {
+        return nil
+}
+
+func (t *commandTask) ItemID() (itemid uint64) {
+        return 0
+}
+
+func (t *commandTask) Meta() (meta *plugin.Meta) {
+        return nil
+}
+
+func (t *commandTask) GlobalRegexp() plugin.RegexpMatcher {
+        return nil
+}
+
+func (t *commandTask) Timeout() int {
+        return t.timeout
+}
+
+func (t *commandTask) Delay() string {
+        return ""
 }
 
 func (t *commandTask) isRecurring() bool {
 	return false
 }
+
 func (t *commandTask) perform(s Scheduler) {
 	// execute remote command
 	go func() {
@@ -572,7 +597,7 @@ func (t *commandTask) perform(s Scheduler) {
 
 		var cr *resultcache.CommandResult
 
-		if ret, err := e.Export("system.run", t.params, nil); err == nil {
+		if ret, err := e.Export("system.run", t.params, t); err == nil {
 			if ret != nil {
 				cr = &resultcache.CommandResult{
 					ID:     t.id,

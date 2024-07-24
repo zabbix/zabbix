@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "operations.h"
@@ -896,11 +891,12 @@ static void	discovered_host_tags_save(zbx_uint64_t hostid, zbx_vector_db_tag_ptr
 			}
 		}
 
-		res = zbx_db_insert_execute(&db_insert_tag);
-
-		zbx_db_insert_clean(&db_insert_tag);
-
-		if (SUCCEED == res)
+		if (SUCCEED != (res = zbx_db_insert_execute(&db_insert_tag)))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "failed to add tags to discovered host, hostid = " ZBX_FS_UI64,
+					hostid);
+		}
+		else
 		{
 			hosttagid = first_hosttagid;
 
@@ -916,11 +912,8 @@ static void	discovered_host_tags_save(zbx_uint64_t hostid, zbx_vector_db_tag_ptr
 				}
 			}
 		}
-		else
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "failed to add tags to discovered host, hostid = " ZBX_FS_UI64,
-					hostid);
-		}
+
+		zbx_db_insert_clean(&db_insert_tag);
 	}
 
 	if (SUCCEED == res && 0 != del_tagids.values_num)
@@ -932,7 +925,12 @@ static void	discovered_host_tags_save(zbx_uint64_t hostid, zbx_vector_db_tag_ptr
 		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hosttagid", del_tagids.values,
 				del_tagids.values_num);
 
-		if (ZBX_DB_OK == zbx_db_execute("%s", sql))
+		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "failed to delete tags from a discovered host, hostid = "
+					ZBX_FS_UI64, hostid);
+		}
+		else
 		{
 			for (int i = 0; i < host_tags->values_num; i++)
 			{
@@ -944,11 +942,6 @@ static void	discovered_host_tags_save(zbx_uint64_t hostid, zbx_vector_db_tag_ptr
 							hostid, tag->tagid);
 				}
 			}
-		}
-		else
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "failed to delete tags from a discovered host, hostid = "
-					ZBX_FS_UI64, hostid);
 		}
 
 		zbx_free(sql);

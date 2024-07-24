@@ -1,21 +1,16 @@
 <?php declare(strict_types = 0);
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -206,7 +201,7 @@ $host_tab
 			(new CMultiSelect([
 				'name' => 'groups[]',
 				'object_name' => 'hostGroup',
-				'disabled' => $host_is_discovered,
+				'readonly' => $host_is_discovered,
 				'add_new' => (CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN),
 				'data' => $data['groups_ms'],
 				'popup' => [
@@ -365,7 +360,9 @@ $ipmi_tab = (new CFormGrid())
 	->addItem([
 		new CLabel(_('Username'), 'ipmi_username'),
 		new CFormField(
-			(new CTextBox('ipmi_username', $data['host']['ipmi_username'], $host_is_discovered))
+			(new CTextBox('ipmi_username', $data['host']['ipmi_username'], $host_is_discovered,
+				DB::getFieldLength('hosts', 'ipmi_username')
+			))
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				->disableAutocomplete()
 		)
@@ -373,7 +370,9 @@ $ipmi_tab = (new CFormGrid())
 	->addItem([
 		new CLabel(_('Password'), 'ipmi_password'),
 		new CFormField(
-			(new CTextBox('ipmi_password', $data['host']['ipmi_password'], $host_is_discovered))
+			(new CTextBox('ipmi_password', $data['host']['ipmi_password'], $host_is_discovered,
+				DB::getFieldLength('hosts', 'ipmi_password')
+			))
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				->disableAutocomplete()
 		)
@@ -411,8 +410,8 @@ $inventory_tab = (new CFormGrid())
 				->addValue(_('Disabled'), HOST_INVENTORY_DISABLED)
 				->addValue(_('Manual'), HOST_INVENTORY_MANUAL)
 				->addValue(_('Automatic'), HOST_INVENTORY_AUTOMATIC)
-				->setEnabled(!$host_is_discovered)
-				->setModern(true),
+				->setReadonly($host_is_discovered)
+				->setModern(),
 			$host_is_discovered ? new CInput('hidden', 'inventory_mode', $data['host']['inventory_mode']) : null
 		])
 	]);
@@ -483,7 +482,7 @@ $encryption_tab = (new CFormGrid())
 				->addValue(_('PSK'), HOST_ENCRYPTION_PSK)
 				->addValue(_('Certificate'), HOST_ENCRYPTION_CERTIFICATE)
 				->setModern(true)
-				->setEnabled(!$host_is_discovered)
+				->setReadonly($host_is_discovered)
 		)
 	])
 	->addItem([
@@ -493,15 +492,15 @@ $encryption_tab = (new CFormGrid())
 				(new CCheckBox('tls_in_none'))
 					->setChecked(($tls_accept & HOST_ENCRYPTION_NONE))
 					->setLabel(_('No encryption'))
-					->setEnabled(!$host_is_discovered),
+					->setReadonly($host_is_discovered),
 				(new CCheckBox('tls_in_psk'))
 					->setChecked(($tls_accept & HOST_ENCRYPTION_PSK))
 					->setLabel(_('PSK'))
-					->setEnabled(!$host_is_discovered),
+					->setReadonly($host_is_discovered),
 				(new CCheckBox('tls_in_cert'))
 					->setChecked(($tls_accept & HOST_ENCRYPTION_CERTIFICATE))
 					->setLabel(_('Certificate'))
-					->setEnabled(!$host_is_discovered)
+					->setReadonly($host_is_discovered)
 			]))
 				->addClass(ZBX_STYLE_LIST_CHECK_RADIO),
 			new CInput('hidden', 'tls_accept', $tls_accept)

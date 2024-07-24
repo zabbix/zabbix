@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -31,6 +26,10 @@ use Facebook\WebDriver\WebDriverKeys;
  * @onBefore prepareData
  */
 class testDocumentationLinks extends CWebTest {
+
+	// LLD and host prototype for case 'Host LLD host prototype edit form'.
+	protected static $lldid;
+	protected static $host_prototypeid;
 
 	public function prepareData() {
 		self::$version = substr(ZABBIX_VERSION, 0, 3);
@@ -91,6 +90,33 @@ class testDocumentationLinks extends CWebTest {
 				'timeperiods' => [[]]
 			]
 		]);
+
+		// Create host prototype.
+		$response = CDataHelper::createHosts([
+			[
+				'host' => 'Host with host prototype for documentations links',
+				'groups' => [['groupid' => 4]], // Zabbix server
+				'discoveryrules' => [
+					[
+						'name' => 'Drule for documentation links check',
+						'key_' => 'drule',
+						'type' => ITEM_TYPE_TRAPPER,
+						'delay' => 0
+					]
+				]
+			]
+		]);
+		self::$lldid = $response['discoveryruleids']['Host with host prototype for documentations links:drule'];
+
+		CDataHelper::call('hostprototype.create', [
+			[
+				'host' => 'Host prototype for documentation links test {#H}',
+				'ruleid' => self::$lldid,
+				'groupLinks' => [['groupid'=> 4]] // Zabbix servers.
+			]
+		]);
+		$prototype_hostids = CDataHelper::getIds('host');
+		self::$host_prototypeid = $prototype_hostids['Host prototype for documentation links test {#H}'];
 	}
 
 	/**
@@ -480,7 +506,7 @@ class testDocumentationLinks extends CWebTest {
 			// #40 Availability report view.
 			[
 				[
-					'url' => 'report2.php',
+					'url' => 'zabbix.php?action=availabilityreport.list',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/reports/availability'
 				]
 			],
@@ -1391,7 +1417,7 @@ class testDocumentationLinks extends CWebTest {
 			// #129 Host LLD host prototype edit form.
 			[
 				[
-					'url' => 'host_prototypes.php?form=update&parent_discoveryid=90001&hostid=99200&context=host',
+					'url' => 'host_prototype',
 					'doc_link' => '/en/manual/vm_monitoring#host-prototypes'
 				]
 			],
@@ -2356,8 +2382,8 @@ class testDocumentationLinks extends CWebTest {
 							'element' => 'id:dashboard-add-widget'
 						]
 					],
-					'widget_type' => 'Plain text',
-					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/plain_text'
+					'widget_type' => 'Item history',
+					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/item_history'
 				]
 			],
 			// #222 Start creating Problem hosts widget.
@@ -2651,6 +2677,24 @@ class testDocumentationLinks extends CWebTest {
 					'widget_type' => 'Host navigator',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/host_navigator'
 				]
+			],
+			// #240 Start creating Item navigator widget.
+			[
+				[
+					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Edit dashboard'
+						],
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'id:dashboard-add-widget'
+						]
+					],
+					'widget_type' => 'Item navigator',
+					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/item_navigator'
+				]
 			]
 		];
 	}
@@ -2659,6 +2703,11 @@ class testDocumentationLinks extends CWebTest {
 	 * @dataProvider getGeneralDocumentationLinkData
 	 */
 	public function testDocumentationLinks_checkGeneralLinks($data) {
+		if ($data['url'] === 'host_prototype') {
+			$data['url'] = 'host_prototypes.php?form=update&parent_discoveryid='.self::$lldid.
+					'&hostid='.self::$host_prototypeid.'&context=host';
+		}
+
 		$this->page->login()->open($data['url'])->waitUntilReady();
 
 		// Execute the corresponding callback function to open the form with doc link.

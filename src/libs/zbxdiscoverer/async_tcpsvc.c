@@ -1,28 +1,25 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "async_tcpsvc.h"
-#include "zbxcommon.h"
+
+#include "../../libs/zbxpoller/async_poller.h"
+
+#include "zbxtimekeeper.h"
 #include "zbxcomms.h"
 #include "zbxself.h"
 #include "zbxsysinfo.h"
-#include "../../libs/zbxpoller/async_poller.h"
 #include "zbx_discoverer_constants.h"
 
 static const char	*get_tcpsvc_step_string(zbx_zabbix_tcpsvc_step_t step)
@@ -150,8 +147,9 @@ static int	tcpsvc_task_process(short event, void *data, int *fd, const char *add
 
 			return ZBX_ASYNC_TASK_WRITE;
 		case ZABBIX_TCPSVC_STEP_CONNECT_WAIT:
-			if (0 == getsockopt(tcpsvc_context->s.socket, SOL_SOCKET, SO_ERROR, &errnum, &optlen) &&
-					0 != errnum)
+			/* sometimes error is not reported, so also validate that socket is writable */
+			if ((0 == getsockopt(tcpsvc_context->s.socket, SOL_SOCKET, SO_ERROR, &errnum, &optlen) &&
+					0 != errnum) || SUCCEED != zbx_socket_pollout(&tcpsvc_context->s, 0, NULL))
 			{
 				SET_RESULT_FAIL("connect");
 				break;

@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "dbupgrade_macros.h"
@@ -22,6 +17,7 @@
 
 #include "zbxdbhigh.h"
 #include "zbxnum.h"
+#include "zbxstr.h"
 
 /* Function argument descriptors.                                                */
 /* Used in varargs list to describe following parameter mapping to old position. */
@@ -127,8 +123,6 @@ int	db_rename_macro(zbx_db_result_t result, const char *table, const char *pkey,
 
 	sql = zbx_malloc(NULL, sql_alloc);
 
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		old_offset = sql_offset;
@@ -169,9 +163,7 @@ int	db_rename_macro(zbx_db_result_t result, const char *table, const char *pkey,
 		}
 	}
 
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (16 < sql_offset && ZBX_DB_OK > zbx_db_execute("%s", sql))
+	if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
 		ret = FAIL;
 out:
 	zbx_free(value);

@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -254,7 +249,7 @@ class CConfigurationImport {
 					? ['uuid' => $item['uuid']]
 					: [];
 
-				if ($item['valuemap']) {
+				if (array_key_exists('valuemap', $item) && $item['valuemap']) {
 					$valuemaps_refs[$host][$item['valuemap']['name']] = [];
 				}
 			}
@@ -271,7 +266,7 @@ class CConfigurationImport {
 						? ['uuid' => $item_prototype['uuid']]
 						: [];
 
-					if (!empty($item_prototype['valuemap'])) {
+					if (array_key_exists('valuemap', $item_prototype) && $item_prototype['valuemap']) {
 						$valuemaps_refs[$host][$item_prototype['valuemap']['name']] = [];
 					}
 				}
@@ -823,15 +818,6 @@ class CConfigurationImport {
 
 				$levels[$level] = true;
 
-				$delay_types = [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE,
-					ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
-					ITEM_TYPE_CALCULATED, ITEM_TYPE_JMX, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT
-				];
-
-				if (!in_array($item['type'], $delay_types)) {
-					unset($item['delay']);
-				}
-
 				if (array_key_exists('interface_ref', $item) && $item['interface_ref']) {
 					$interfaceid = $this->referencer->findInterfaceidByRef($hostid, $item['interface_ref']);
 
@@ -844,6 +830,8 @@ class CConfigurationImport {
 					$item['interfaceid'] = $interfaceid;
 				}
 				unset($item['interface_ref']);
+
+				$item['valuemapid'] = 0;
 
 				if (array_key_exists('valuemap', $item) && $item['valuemap']) {
 					$valuemapid = $this->referencer->findValuemapidByName($hostid, $item['valuemap']['name']);
@@ -880,9 +868,11 @@ class CConfigurationImport {
 				}
 
 				foreach ($item['preprocessing'] as &$preprocessing_step) {
-					$preprocessing_step['params'] = implode("\n", $preprocessing_step['parameters']);
+					if (array_key_exists('parameters', $preprocessing_step)) {
+						$preprocessing_step['params'] = implode("\n", $preprocessing_step['parameters']);
 
-					unset($preprocessing_step['parameters']);
+						unset($preprocessing_step['parameters']);
+					}
 				}
 				unset($preprocessing_step);
 
@@ -1103,15 +1093,6 @@ class CConfigurationImport {
 					$discovery_rule['graph_prototypes'], $discovery_rule['host_prototypes']
 				);
 
-				$delay_types = [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE,
-					ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
-					ITEM_TYPE_JMX, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT
-				];
-
-				if (!in_array($discovery_rule['type'], $delay_types)) {
-					unset($discovery_rule['delay']);
-				}
-
 				if (array_key_exists('interface_ref', $discovery_rule) && $discovery_rule['interface_ref']) {
 					$interfaceid = $this->referencer->findInterfaceidByRef($hostid, $discovery_rule['interface_ref']);
 
@@ -1169,34 +1150,13 @@ class CConfigurationImport {
 				}
 
 				foreach ($discovery_rule['preprocessing'] as &$preprocessing_step) {
-					$preprocessing_step['params'] = implode("\n", $preprocessing_step['parameters']);
+					if (array_key_exists('parameters', $preprocessing_step)) {
+						$preprocessing_step['params'] = implode("\n", $preprocessing_step['parameters']);
 
-					unset($preprocessing_step['parameters']);
+						unset($preprocessing_step['parameters']);
+					}
 				}
 				unset($preprocessing_step);
-
-				if (array_key_exists('filter', $discovery_rule)) {
-					foreach ($discovery_rule['filter']['conditions'] as &$condition) {
-						if ($discovery_rule['filter']['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
-							unset($condition['formulaid']);
-						}
-					}
-					unset($condition);
-				}
-
-				foreach ($discovery_rule['overrides'] as &$override) {
-					if (!array_key_exists('filter', $override)) {
-						continue;
-					}
-
-					foreach ($override['filter']['conditions'] as &$condition) {
-						if ($override['filter']['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
-							unset($condition['formulaid']);
-						}
-					}
-					unset($condition);
-				}
-				unset($override);
 
 				if ($itemid !== null) {
 					$discovery_rule['itemid'] = $itemid;
@@ -1273,7 +1233,8 @@ class CConfigurationImport {
 
 					$delay_types = [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE,
 						ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
-						ITEM_TYPE_CALCULATED, ITEM_TYPE_JMX, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT
+						ITEM_TYPE_CALCULATED, ITEM_TYPE_JMX, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT,
+						ITEM_TYPE_BROWSER
 					];
 
 					if (!in_array($item_prototype['type'], $delay_types)) {
@@ -1300,7 +1261,9 @@ class CConfigurationImport {
 					}
 					unset($item_prototype['interface_ref']);
 
-					if ($item_prototype['valuemap']) {
+					$item_prototype['valuemapid'] = 0;
+
+					if (array_key_exists('valuemap', $item_prototype) && $item_prototype['valuemap']) {
 						$valuemapid = $this->referencer->findValuemapidByName($hostid,
 							$item_prototype['valuemap']['name']
 						);
@@ -1354,9 +1317,11 @@ class CConfigurationImport {
 					}
 
 					foreach ($item_prototype['preprocessing'] as &$preprocessing_step) {
-						$preprocessing_step['params'] = implode("\n", $preprocessing_step['parameters']);
+						if (array_key_exists('parameters', $preprocessing_step)) {
+							$preprocessing_step['params'] = implode("\n", $preprocessing_step['parameters']);
 
-						unset($preprocessing_step['parameters']);
+							unset($preprocessing_step['parameters']);
+						}
 					}
 					unset($preprocessing_step);
 
@@ -2497,9 +2462,9 @@ class CConfigurationImport {
 		// Unlike triggers that belong to multiple hosts, trigger prototypes do not, so we just delete them.
 		if ($trigger_prototypes_to_delete) {
 			API::TriggerPrototype()->delete(array_keys($trigger_prototypes_to_delete));
-
-			$this->referencer->refreshTriggers();
 		}
+
+		$this->referencer->refreshTriggers();
 
 		$db_graph_prototypes = API::GraphPrototype()->get([
 			'output' => [],
@@ -2514,9 +2479,9 @@ class CConfigurationImport {
 		// Unlike graphs that belong to multiple hosts, graph prototypes do not, so we just delete them.
 		if ($graph_prototypes_to_delete) {
 			API::GraphPrototype()->delete(array_keys($graph_prototypes_to_delete));
-
-			$this->referencer->refreshGraphs();
 		}
+
+		$this->referencer->refreshGraphs();
 
 		$db_item_prototypes = API::ItemPrototype()->get([
 			'output' => [],
@@ -2530,9 +2495,9 @@ class CConfigurationImport {
 
 		if ($item_prototypes_to_delete) {
 			API::ItemPrototype()->delete(array_keys($item_prototypes_to_delete));
-
-			$this->referencer->refreshItems();
 		}
+
+		$this->referencer->refreshItems();
 	}
 
 	/**
@@ -2940,7 +2905,7 @@ class CConfigurationImport {
 			foreach ($items as $item) {
 				$resolved_masters_cache[$host_name][$item['key_']] = [
 					'type' => $item['type'],
-					$master_item_key => $item[$master_item_key]
+					$master_item_key => $item['type'] == ITEM_TYPE_DEPENDENT ? $item[$master_item_key] : []
 				];
 
 				if ($item['type'] == ITEM_TYPE_DEPENDENT && array_key_exists('key', $item[$master_item_key])) {

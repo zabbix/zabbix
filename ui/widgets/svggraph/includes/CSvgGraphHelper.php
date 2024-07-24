@@ -1,21 +1,16 @@
 <?php declare(strict_types = 0);
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -117,8 +112,10 @@ class CSvgGraphHelper {
 					'w' => $graph->getCanvasWidth(),
 					'h' => $graph->getCanvasHeight()
 				],
-				'spp' => ($options['time_period']['time_to'] - $options['time_period']['time_from'])
-					/ $graph->getCanvasWidth()
+				'spp' => $graph->getCanvasWidth() === 0
+					? 0
+					: ($options['time_period']['time_to'] - $options['time_period']['time_from'])
+						/ $graph->getCanvasWidth()
 			],
 			'errors' => $errors
 		];
@@ -253,19 +250,40 @@ class CSvgGraphHelper {
 				$tmp_items = API::Item()->get([
 					'output' => ['key_'],
 					'itemids' => $data_set['itemids'],
-					'webitems' => true
+					'webitems' => true,
+					'preservekeys' => true
 				]);
 
 				if ($tmp_items) {
+					$keys_index = [];
+
+					foreach ($data_set['itemids'] as $item_index => $itemid) {
+						if (array_key_exists($itemid, $tmp_items)) {
+							$keys_index[$tmp_items[$itemid]['key_']] = $item_index;
+						}
+					}
+
 					$items = API::Item()->get([
-						'output' => ['itemid'],
+						'output' => ['itemid', 'key_'],
 						'hostids' => [$override_hostid],
 						'webitems' => true,
 						'filter' => [
-							'key_' => array_column($tmp_items, 'key_')
+							'key_' => array_keys($keys_index)
 						]
 					]);
-					$data_set['itemids'] = $items ? array_column($items, 'itemid') : null;
+
+					if ($items) {
+						$data_set['itemids'] = [];
+
+						foreach ($items as $item) {
+							$data_set['itemids'][$keys_index[$item['key_']]] = $item['itemid'];
+						}
+
+						ksort($data_set['itemids']);
+					}
+					else {
+						$data_set['itemids'] = null;
+					}
 				}
 			}
 
@@ -285,21 +303,9 @@ class CSvgGraphHelper {
 				'limit' => $max_metrics
 			]);
 
-			$items = [];
-
-			foreach ($data_set['itemids'] as $itemid) {
-				if (array_key_exists($itemid, $db_items)) {
-					$items[] = $resolve_macros
-						? CArrayHelper::renameKeys($db_items[$itemid], ['name_resolved' => 'name'])
-						: $db_items[$itemid];
-				}
-			}
-
-			if (!$items) {
+			if (!$db_items) {
 				continue;
 			}
-
-			unset($data_set['itemids']);
 
 			// The bigger transparency level, the less visible the metric is.
 			$data_set['transparency'] = 10 - (int) $data_set['transparency'];
@@ -308,12 +314,26 @@ class CSvgGraphHelper {
 				? (int) timeUnitToSeconds($data_set['timeshift'])
 				: 0;
 
-			$colors = $data_set['color'];
+			$itemids = $data_set['itemids'];
+			$itemids_index = array_flip($itemids);
 
-			foreach ($items as $item) {
-				$data_set['color'] = '#'.array_shift($colors);
-				$metrics[] = $item + ['data_set' => $index, 'options' => $data_set];
-				$max_metrics--;
+			unset($data_set['itemids']);
+
+			foreach ($itemids as $itemid) {
+				if (array_key_exists($itemid, $db_items)) {
+					$item = $resolve_macros
+						? CArrayHelper::renameKeys($db_items[$itemid], ['name_resolved' => 'name'])
+						: $db_items[$itemid];
+
+					$metrics[] = $item + [
+						'data_set' => $index,
+						'options' => [
+							'color' => '#'.$data_set['color'][$itemids_index[$itemid]]
+						] + $data_set
+					];
+
+					$max_metrics--;
+				}
 			}
 		}
 	}

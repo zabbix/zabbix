@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -48,6 +43,7 @@ class testItemTest extends CWebTest {
 	 */
 	public function getCommonTestButtonStateData() {
 		return [
+				['Type' => 'Zabbix agent'],
 				['Type' => 'Zabbix agent (active)'],
 				['Type' => 'Simple check'],
 				['Type' => 'SNMP agent','SNMP OID' => '[IF-MIB::]ifInOctets.1'],
@@ -59,8 +55,10 @@ class testItemTest extends CWebTest {
 				['Type' => 'IPMI agent', 'IPMI sensor' => 'Sensor'],
 				['Type' => 'SSH agent', 'Key' => 'ssh.run[Description,127.0.0.1,50,[{#KEY}]]', 'User name' => 'Name', 'Executed script' => 'Script'],
 				['Type' => 'TELNET agent', 'Key' => 'telnet[{#KEY}]'],
-				['Type' => 'JMX agent', 'Key' => 'jmx[{#KEY}]','JMX endpoint' => 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi', 'User name' => ''],
-				['Type' => 'Dependent item', 'Key'=>'dependent[{#KEY}]', 'Master item' => 'Master item']
+				['Type' => 'JMX agent', 'Key' => 'jmx[{#KEY}]', 'JMX endpoint' => 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi', 'User name' => ''],
+				['Type' => 'Dependent item', 'Key' => 'dependent[{#KEY}]', 'Master item' => 'Master item'],
+				['Type' => 'Script', 'Script' => 'return 1;'],
+				['Type' => 'Browser']
 		];
 	}
 
@@ -116,8 +114,6 @@ class testItemTest extends CWebTest {
 			'Type' => 'Zabbix agent',
 			'Key' => 'key[{#KEY}]'
 		]);
-		// Check Test item button.
-		$this->checkTestButtonInPreprocessing($item_type);
 		$this->saveFormAndCheckMessage($item_type.$success_text);
 		$itemid = CDBHelper::getValue('SELECT itemid FROM items WHERE name='.zbx_dbstr($item_name));
 
@@ -144,28 +140,13 @@ class testItemTest extends CWebTest {
 
 				$this->checkTestButtonInPreprocessing($item_type, $enabled, $i);
 
-				// Check "Execute now" button only in host case item saved form and then change type.
+				// Change item type.
 				if ($i === 0) {
-					if ($check_now) {
-						if ($item_type !== 'Discovery rule') {
-							if ($type === 'Dependent item') {
-								$enabled = true;
-							}
-							$execute_button = $dialog->getFooter()->query('button:Execute now')->waitUntilVisible()->one();
-						}
-						else {
-							$execute_button = $this->query('button:Execute now')->waitUntilVisible()->one();
-						}
-
-						$this->assertTrue($execute_button->isEnabled($enabled));
-					}
-
 					$item_form->fill($update);
-					// TODO: workaround for ZBXNEXT-5365
-					if ($item_type === 'Item prototype'
-						&& array_key_exists('Master item', $update)) {
-							sleep(2);
-							$item_form->getFieldContainer('Master item')->asMultiselect()->select($update['Master item']);
+					// TODO: workaround for DEV-3855
+					if ($item_type === 'Item prototype' && array_key_exists('Master item', $update)) {
+						sleep(2);
+						$item_form->getFieldContainer('Master item')->asMultiselect()->select($update['Master item']);
 					}
 
 					$type = $update['Type'];
@@ -173,6 +154,32 @@ class testItemTest extends CWebTest {
 			}
 
 			$this->saveFormAndCheckMessage($item_type.' updated', $item_type == 'Discovery rule' ? true : false);
+
+			/**
+			 * By design, when changing item type, the "Execute now" doesn't change its state, as these changes have not
+			 * been written to the DB yet. To check the "Execute now" button state the item needs to be saved and
+			 * its form should be opened again.
+			 */
+			if ($check_now) {
+				if ($type === 'Dependent item') {
+					$enabled = true;
+				}
+
+				$this->query('link', $item_name)->waitUntilClickable()->one()->click();
+
+				if ($item_type === 'Discovery rule') {
+					$button = $this->query('button:Execute now')->waitUntilVisible()->one();
+				}
+				else {
+					$button = COverlayDialogElement::find()->one()->waitUntilReady()->query('button:Execute now')->one();
+				}
+
+				$this->assertTrue($button->isEnabled($enabled));
+
+				if ($item_type !== 'Discovery rule') {
+					COverlayDialogElement::find()->one()->close();
+				}
+			}
 		}
 	}
 
@@ -401,6 +408,25 @@ class testItemTest extends CWebTest {
 							'macro' => '{HOST.PORT}',
 							'value' => '12345'
 						]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Type' => 'Script',
+						'Key' => 'test.script',
+						'Script' => 'return 1;'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Type' => 'Browser',
+						'Key' => 'test.browser'
 					]
 				]
 			],
@@ -939,6 +965,8 @@ class testItemTest extends CWebTest {
 					case 'Database monitor':
 					case 'HTTP agent':
 					case 'JMX agent':
+					case 'Script':
+					case 'Browser':
 						$fields_state = [
 							'address' => false,
 							'port' => false,
@@ -1002,7 +1030,7 @@ class testItemTest extends CWebTest {
 
 				if ($is_host || array_key_exists('interface', $data) || in_array($data['fields']['Type'],
 						['Zabbix internal', 'External check', 'Database monitor', 'HTTP agent', 'JMX agent',
-						'Calculated'])) {
+						'Calculated', 'Script', 'Browser'])) {
 					$details = 'Connection to Zabbix server "localhost:10051" refused. Possible reasons:';
 				}
 				else {
@@ -1102,7 +1130,7 @@ class testItemTest extends CWebTest {
 					unset($macro);
 				}
 
-				if ($macros['expected']){
+				if ($macros['expected']) {
 					foreach ($test_form->query('class:textarea-flexible-container')->asTable()->one()->getRows() as $row) {
 						$columns = $row->getColumns()->asArray();
 						/*
@@ -1140,9 +1168,11 @@ class testItemTest extends CWebTest {
 				}
 
 				$this->assertMessage(TEST_BAD, null, $data['error']);
-				$overlay->getFooter()->query('button:Cancel')->one()->click();
 				break;
 		}
+
+		$overlay->close();
+		$dialog->close();
 	}
 
 	/**

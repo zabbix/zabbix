@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "lld_worker.h"
@@ -23,6 +18,7 @@
 
 #include "../events/events.h"
 
+#include "zbxtimekeeper.h"
 #include "zbxnix.h"
 #include "zbxlog.h"
 #include "zbxipcservice.h"
@@ -30,7 +26,6 @@
 #include "zbxtime.h"
 #include "zbx_item_constants.h"
 #include "zbxstr.h"
-#include "zbxalgo.h"
 #include "zbxcacheconfig.h"
 #include "zbxdbhigh.h"
 
@@ -152,12 +147,9 @@ static void	lld_process_task(const zbx_ipc_message_t *message)
 		diff.itemid = itemid;
 		zbx_vector_item_diff_ptr_append(&diffs, &diff);
 
-		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 		zbx_db_save_item_changes(&sql, &sql_alloc, &sql_offset, &diffs, ZBX_FLAGS_ITEM_DIFF_UPDATE_DB);
-		zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-		if (16 < sql_offset)
-			zbx_db_execute("%s", sql);
+		(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
 
 		zbx_dc_config_items_apply_changes(&diffs);
 

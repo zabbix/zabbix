@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -73,7 +68,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			'key'					=> 'string',
 			'interface'				=> 'array',
 			'ipmi_sensor'			=> 'string',
-			'item_type'				=> 'in '.implode(',', [ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_HTTPTEST, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_CALCULATED, ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT]),
+			'item_type'				=> 'in '.implode(',', [ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_HTTPTEST, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_CALCULATED, ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER]),
 			'jmx_endpoint'			=> 'string',
 			'macros'				=> 'array',
 			'output_format'			=> 'in '.implode(',', [HTTPCHECK_STORE_RAW, HTTPCHECK_STORE_JSON]),
@@ -81,6 +76,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			'params_es'				=> 'string',
 			'params_f'				=> 'string',
 			'script'				=> 'string',
+			'browser_script'		=> 'string',
 			'password'				=> 'string',
 			'post_type'				=> 'in '.implode(',', [ZBX_POSTTYPE_RAW, ZBX_POSTTYPE_JSON, ZBX_POSTTYPE_XML]),
 			'posts'					=> 'string',
@@ -286,7 +282,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 		];
 
 		if ($this->use_prev_value) {
-			$prev_value = $this->getInput('prev_value', '');
+			$prev_value = $this->get_value_from_host ? $this->getInput('value', '') : $this->getInput('prev_value', '');
 			$prev_time = $this->getInput('prev_time', '');
 
 			if ($prev_value !== '' || $prev_time !== '') {
@@ -377,9 +373,10 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			$output['value'] = $result_item['result'];
 			$output['eol'] = $result_item['eol'] === 'CRLF' ? ZBX_EOL_CRLF : ZBX_EOL_LF;
 
-			// Move current value to previous value field.
-			if ($this->use_prev_value && $result_item['result'] !== '') {
-				$output['prev_value'] = $result_item['result'];
+			if ($this->use_prev_value) {
+				$output['prev_value'] = array_key_exists('history', $data['options'])
+					? $data['options']['history']['value']
+					: $result_item['result'];
 				$output['prev_time'] = $this->getPrevTime();
 			}
 
@@ -454,17 +451,15 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 		}
 
 		if ($this->show_final_result) {
-			$final_result = $steps_data ? $result_preproc : $result_item;
-
-			if (array_key_exists('result', $final_result)) {
+			if (array_key_exists('result', $result_preproc)) {
 				$output['final'] = [
 					'action' => _s('Result converted to %1$s', itemValueTypeString($data['item']['value_type'])),
-					'result' => $final_result['result']
+					'result' => $result_preproc['result']
 				];
 
-				if (array_key_exists('truncated', $final_result) && $final_result['truncated']) {
+				if (array_key_exists('truncated', $result_preproc) && $result_preproc['truncated']) {
 					$output['final']['warning'] = _s('Result is truncated due to its size (%1$s).',
-						convertUnits(['value' => $final_result['original_size'], 'units' => 'B'])
+						convertUnits(['value' => $result_preproc['original_size'], 'units' => 'B'])
 					);
 				}
 
@@ -478,16 +473,16 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 
 				if ($valuemap) {
 					$output['mapped_value'] = CValueMapHelper::applyValueMap($data['item']['value_type'],
-						$final_result['result'], $valuemap
+						$result_preproc['result'], $valuemap
 					);
 				}
 			}
-			elseif (array_key_exists('error', $final_result)) {
+			elseif (array_key_exists('error', $result_preproc)) {
 				$output['final'] = [
 					'action' => $test_outcome['action'] == ZBX_PREPROC_FAIL_SET_ERROR
 						? _('Set error to')
 						: '',
-					'error' => $final_result['error']
+					'error' => $result_preproc['error']
 				];
 			}
 

@@ -2,22 +2,17 @@
 // +build linux
 
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 package proc
@@ -192,6 +187,7 @@ type procStatus struct {
 	CtxSwitches   int64   `json:"ctx_switches"`
 	Threads       int64   `json:"threads"`
 	PageFaults    int64   `json:"page_faults"`
+	Pss           int64   `json:"pss"`
 }
 
 type procSummary struct {
@@ -214,6 +210,7 @@ type procSummary struct {
 	CtxSwitches   int64   `json:"ctx_switches"`
 	Threads       int64   `json:"threads"`
 	PageFaults    int64   `json:"page_faults"`
+	Pss           int64   `json:"pss"`
 }
 
 type thread struct {
@@ -900,7 +897,7 @@ func (p *PluginExport) exportProcGet(params []string) (interface{}, error) {
 				proc.Name, 1, proc.Vsize, proc.Pmem, proc.Rss, proc.Data,
 				proc.Exe, proc.Lck, proc.Lib, proc.Pin, proc.Pte, proc.Size, proc.Stk,
 				proc.Swap, proc.CpuTimeUser, proc.CpuTimeSystem, proc.CtxSwitches, proc.Threads,
-				proc.PageFaults,
+				proc.PageFaults, proc.Pss,
 			}
 
 			if len(array) > i+1 {
@@ -926,6 +923,7 @@ func (p *PluginExport) exportProcGet(params []string) (interface{}, error) {
 					addNonNegativeFloat(&procSum.CpuTimeSystem, procCmp.CpuTimeSystem)
 					addNonNegative(&procSum.CtxSwitches, procCmp.CtxSwitches)
 					addNonNegative(&procSum.PageFaults, procCmp.PageFaults)
+					addNonNegative(&procSum.Pss, procCmp.Pss)
 				}
 			}
 			processed = append(processed, proc.Name)

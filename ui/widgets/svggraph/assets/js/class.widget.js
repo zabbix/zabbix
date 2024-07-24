@@ -1,24 +1,21 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
 class CWidgetSvgGraph extends CWidget {
+
+	static DATASET_TYPE_SINGLE_ITEM = 0;
 
 	onInitialize() {
 		this._has_contents = false;
@@ -44,7 +41,7 @@ class CWidgetSvgGraph extends CWidget {
 	}
 
 	onFeedback({type, value}) {
-		if (type === '_timeperiod') {
+		if (type === CWidgetsData.DATA_TYPE_TIME_PERIOD) {
 			this._startUpdating();
 
 			this.feedback({time_period: value});
@@ -52,28 +49,60 @@ class CWidgetSvgGraph extends CWidget {
 			return true;
 		}
 
-		return super.onFeedback({type, value});
+		return false;
 	}
 
 	promiseUpdate() {
 		const time_period = this.getFieldsData().time_period;
 
-		if (!this.hasBroadcast('_timeperiod') || this.isFieldsReferredDataUpdated('time_period')) {
-			this.broadcast({_timeperiod: time_period});
+		if (!this.hasBroadcast(CWidgetsData.DATA_TYPE_TIME_PERIOD) || this.isFieldsReferredDataUpdated('time_period')) {
+			this.broadcast({
+				[CWidgetsData.DATA_TYPE_TIME_PERIOD]: time_period
+			});
 		}
 
 		return super.promiseUpdate();
 	}
 
 	getUpdateRequestData() {
-		return {
-			...super.getUpdateRequestData(),
-			has_custom_time_period: this.getFieldsReferredData().has('time_period') ? undefined : 1
-		};
+		const request_data = super.getUpdateRequestData();
+
+		for (const [dataset_key, dataset] of request_data.fields.ds.entries()) {
+			if (dataset.dataset_type != CWidgetSvgGraph.DATASET_TYPE_SINGLE_ITEM) {
+				continue;
+			}
+
+			const dataset_new = {
+				...dataset,
+				itemids: [],
+				color: []
+			};
+
+			for (const [item_index, itemid] of dataset.itemids.entries()) {
+				if (Array.isArray(itemid)) {
+					if (itemid.length === 1) {
+						dataset_new.itemids.push(itemid[0]);
+						dataset_new.color.push(dataset.color[item_index]);
+					}
+				}
+				else {
+					dataset_new.itemids.push(itemid);
+					dataset_new.color.push(dataset.color[item_index]);
+				}
+			}
+
+			request_data.fields.ds[dataset_key] = dataset_new;
+		}
+
+		if (!this.getFieldsReferredData().has('time_period')) {
+			request_data.has_custom_time_period = 1;
+		}
+
+		return request_data;
 	}
 
 	processUpdateResponse(response) {
-		this._destroyGraph();
+		this.clearContents();
 
 		super.processUpdateResponse(response);
 
@@ -90,6 +119,14 @@ class CWidgetSvgGraph extends CWidget {
 			});
 		}
 		else {
+			this._has_contents = false;
+		}
+	}
+
+	onClearContents() {
+		if (this._has_contents) {
+			this._deactivateGraph();
+
 			this._has_contents = false;
 		}
 	}
@@ -111,13 +148,6 @@ class CWidgetSvgGraph extends CWidget {
 	_deactivateGraph() {
 		if (this._has_contents) {
 			jQuery(this._svg).svggraph('deactivate');
-		}
-	}
-
-	_destroyGraph() {
-		if (this._has_contents) {
-			this._deactivateGraph();
-			this._body.innerHTML = '';
 		}
 	}
 

@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "reporter.h"
@@ -22,14 +17,12 @@
 
 #include "../db_lengths_constants.h"
 
+#include "zbxtimekeeper.h"
 #include "zbxthreads.h"
 #include "zbxalerter.h"
 #include "zbxcrypto.h"
-#include "zbxexpression.h"
 #include "zbxself.h"
 #include "zbxnix.h"
-#include "zbxcrypto.h"
-#include "report_protocol.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
 #include "zbxlog.h"
@@ -41,6 +34,7 @@
 #include "zbxipcservice.h"
 #include "zbxjson.h"
 #include "zbxstr.h"
+#include "zbx_expression_constants.h"
 
 #define ZBX_REPORT_STATUS_ENABLED	0
 #define ZBX_REPORT_STATUS_DISABLED	1
@@ -451,7 +445,6 @@ static void	rm_db_flush_reports(zbx_rm_t *manager)
 	zbx_vector_uint64_uniq(&manager->flush_queue, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	zbx_db_begin();
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	for (int i = 0; i < manager->flush_queue.values_num; i++)
 	{
@@ -502,10 +495,7 @@ static void	rm_db_flush_reports(zbx_rm_t *manager)
 		report->flags = 0;
 	}
 
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
-		zbx_db_execute("%s", sql);
+	(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
 
 	zbx_db_commit();
 
@@ -1480,7 +1470,7 @@ static int	rm_writer_process_job(zbx_rm_writer_t *writer, zbx_rm_job_t *job, cha
 				"select mediatypeid,type,smtp_server,smtp_helo,smtp_email,exec_path,gsm_modem,username,"
 					"passwd,smtp_port,smtp_security,smtp_verify_peer,smtp_verify_host,"
 					"smtp_authentication,maxsessions,maxattempts,attempt_interval,"
-					"content_type,script,timeout"
+					"message_format,script,timeout"
 				" from media_type"
 				" where");
 
@@ -1511,7 +1501,7 @@ static int	rm_writer_process_job(zbx_rm_writer_t *writer, zbx_rm_job_t *job, cha
 			mt.maxsessions = atoi(row[14]);
 			mt.maxattempts = atoi(row[15]);
 			mt.attempt_interval = zbx_strdup(NULL, row[16]);
-			ZBX_STR2UCHAR(mt.content_type, row[17]);
+			ZBX_STR2UCHAR(mt.message_format, row[17]);
 			mt.script = zbx_strdup(NULL, row[18]);
 			mt.timeout = zbx_strdup(NULL, row[19]);
 
@@ -1579,7 +1569,7 @@ static int	rm_jobs_add_user(zbx_rm_t *manager, zbx_rm_report_t *report, zbx_uint
 		char **error)
 {
 	int		i;
-	zbx_rm_job_t	*job;
+	zbx_rm_job_t	*job = NULL;
 
 	if (FAIL != zbx_vector_uint64_search(&report->users_excl, userid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
 		return SUCCEED;
@@ -1681,6 +1671,42 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: resolves macros in report (ZBX_MACRO_TYPE_REPORT) context         *
+ *                                                                            *
+ * Parameters: p            - [IN] macro resolver data structure              *
+ *             args         - [IN] list of variadic parameters                *
+ *                                 Expected content:                          *
+ *                                  - const char *tz: name of timezone        *
+ *                                      (can be NULL)                         *
+ *             replace_with - [OUT] pointer to value to replace macro with    *
+ *             data         - [IN/OUT] pointer to original input raw string   *
+ *                                  (for macro in macro resolving)            *
+ *             error        - [OUT] pointer to pre-allocated error message    *
+ *                                  buffer (can be NULL)                      *
+ *             maxerrlen    - [IN] size of error message buffer (can be 0 if  *
+ *                                 'error' is NULL)                           *
+ *                                                                            *
+ ******************************************************************************/
+static int	macro_report_resolv(zbx_macro_resolv_data_t *p, va_list args, char **replace_with, char **data,
+		char *error, size_t maxerrlen)
+{
+	/* Passed arguments */
+	const char	*tz = va_arg(args, const char *);
+
+	ZBX_UNUSED(data);
+	ZBX_UNUSED(error);
+	ZBX_UNUSED(maxerrlen);
+
+	if (0 == strcmp(p->macro, MVAR_TIME))
+	{
+		*replace_with = zbx_strdup(*replace_with, zbx_time2str(time(NULL), tz));
+	}
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: creates jobs to process report                                    *
  *                                                                            *
  * Parameters: manager - [IN]                                                 *
@@ -1699,14 +1725,11 @@ static int	rm_report_create_jobs(zbx_rm_t *manager, zbx_rm_report_t *report, int
 	zbx_uint64_t		access_userid;
 	zbx_rm_batch_t		*batch, batch_local;
 	zbx_vector_ptr_pair_t	params;
-	zbx_dc_um_handle_t	*um_handle;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() reportid:" ZBX_FS_UI64 , __func__, report->reportid);
 
 	zbx_vector_ptr_create(&jobs);
 	zbx_vector_ptr_pair_create(&params);
-
-	um_handle = zbx_dc_open_user_macros();
 
 	for (int i = 0; i < report->params.values_num; i++)
 	{
@@ -1717,14 +1740,11 @@ static int	rm_report_create_jobs(zbx_rm_t *manager, zbx_rm_report_t *report, int
 
 		if (0 == strcmp(pair.first, ZBX_REPORT_PARAM_BODY) || 0 == strcmp(pair.first, ZBX_REPORT_PARAM_SUBJECT))
 		{
-			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-					NULL, (char **)&pair.second, ZBX_MACRO_TYPE_REPORT, NULL, 0);
+			zbx_substitute_macros((char **)&pair.second, NULL, 0, macro_report_resolv, NULL);
 		}
 
 		zbx_vector_ptr_pair_append(&params, pair);
 	}
-
-	zbx_dc_close_user_macros(um_handle);
 
 	zbx_db_begin();
 
@@ -2045,8 +2065,7 @@ static int	rm_test_report(zbx_rm_t *manager, zbx_ipc_client_t *client, zbx_ipc_m
 		if (0 == strcmp(params.values[i].first, ZBX_REPORT_PARAM_BODY) ||
 				0 == strcmp(params.values[i].first, ZBX_REPORT_PARAM_SUBJECT))
 		{
-			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-					NULL, (char **)&params.values[i].second, ZBX_MACRO_TYPE_REPORT, NULL, 0);
+			zbx_substitute_macros((char **)&params.values[i].second, NULL, 0, macro_report_resolv, NULL);
 		}
 	}
 

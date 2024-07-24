@@ -1,21 +1,16 @@
 <?php declare(strict_types = 0);
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -192,7 +187,7 @@ $formgrid = (new CFormGrid())
 			->setAsteriskMark()
 			->setId('js-item-script-label'),
 		(new CFormField(
-			(new CMultilineInput('script', $item['params'], [
+			(new CMultilineInput('script', $item['script'], [
 				'title' => _('JavaScript'),
 				'placeholder' => _('script'),
 				'placeholder_textarea' => 'return value',
@@ -204,6 +199,24 @@ $formgrid = (new CFormGrid())
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAriaRequired()
 		))->setId('js-item-script-field')
+	])
+	->addItem([
+		(new CLabel(_('Script'), 'browser_script'))
+			->setAsteriskMark()
+			->setId('js-item-browser-script-label'),
+		(new CFormField(
+			(new CMultilineInput('browser_script', $item['browser_script'], [
+				'title' => _('JavaScript'),
+				'placeholder' => _('script'),
+				'placeholder_textarea' => 'return value',
+				'grow' => 'auto',
+				'rows' => 0,
+				'maxlength' => DB::getFieldLength('items', 'params'),
+				'readonly' => $readonly
+			]))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setAriaRequired()
+		))->setId('js-item-browser-script-field')
 	])
 	->addItem([
 		(new CLabel(_('Request type'), 'label-request-method'))->setId('js-item-request-method-label'),
@@ -228,7 +241,7 @@ $formgrid = (new CFormGrid())
 				->addValue(_('Raw data'), ZBX_POSTTYPE_RAW)
 				->addValue(_('JSON data'), ZBX_POSTTYPE_JSON)
 				->addValue(_('XML data'), ZBX_POSTTYPE_XML)
-				->setEnabled(!$readonly)
+				->setReadonly($readonly)
 				->setModern()
 		))->setId('js-item-post-type-field')
 	])
@@ -287,7 +300,7 @@ $formgrid = (new CFormGrid())
 		(new CLabel(_('Follow redirects'), 'follow_redirects'))->setId('js-item-follow-redirects-label'),
 		(new CFormField(
 			(new CCheckBox('follow_redirects', HTTPTEST_STEP_FOLLOW_REDIRECTS_ON))
-				->setEnabled(!$readonly)
+				->setReadonly($readonly)
 				->setChecked($item['follow_redirects'] == HTTPTEST_STEP_FOLLOW_REDIRECTS_ON)
 		))->setId('js-item-follow-redirects-field')
 	])
@@ -298,7 +311,7 @@ $formgrid = (new CFormGrid())
 				->addValue(_('Body'), HTTPTEST_STEP_RETRIEVE_MODE_CONTENT)
 				->addValue(_('Headers'), HTTPTEST_STEP_RETRIEVE_MODE_HEADERS)
 				->addValue(_('Body and headers'), HTTPTEST_STEP_RETRIEVE_MODE_BOTH)
-				->setEnabled(!($readonly || $item['request_method'] == HTTPCHECK_REQUEST_HEAD))
+				->setReadonly($readonly || $item['request_method'] == HTTPCHECK_REQUEST_HEAD)
 				->setModern()
 		))->setId('js-item-retrieve-mode-field')
 	])
@@ -306,7 +319,7 @@ $formgrid = (new CFormGrid())
 		(new CLabel(_('Convert to JSON'), 'output_format'))->setId('js-item-output-format-label'),
 		(new CFormField(
 			(new CCheckBox('output_format', HTTPCHECK_STORE_JSON))
-				->setEnabled(!$readonly)
+				->setReadonly($readonly)
 				->setChecked($item['output_format'] == HTTPCHECK_STORE_JSON)
 		))->setId('js-item-output-format-field')
 	])
@@ -350,7 +363,7 @@ $formgrid = (new CFormGrid())
 		(new CLabel(_('SSL verify peer'), 'verify_peer'))->setId('js-item-verify-peer-label'),
 		(new CFormField(
 			(new CCheckBox('verify_peer', ZBX_HTTP_VERIFY_PEER_ON))
-				->setEnabled(!$readonly)
+				->setReadonly($readonly)
 				->setChecked($item['verify_peer'] == ZBX_HTTP_VERIFY_PEER_ON)
 		))->setId('js-item-verify-peer-field')
 	])
@@ -358,7 +371,7 @@ $formgrid = (new CFormGrid())
 		(new CLabel(_('SSL verify host'), 'verify_host'))->setId('js-item-verify-host-label'),
 		(new CFormField(
 			(new CCheckBox('verify_host', ZBX_HTTP_VERIFY_HOST_ON))
-				->setEnabled(!$readonly)
+				->setReadonly($readonly)
 				->setChecked($item['verify_host'] == ZBX_HTTP_VERIFY_HOST_ON)
 		))->setId('js-item-verify-host-field')
 	])
@@ -397,7 +410,7 @@ $formgrid = (new CFormGrid())
 				'name' => 'master_itemid',
 				'object_name' => 'items',
 				'multiple' => false,
-				'disabled' => $readonly,
+				'readonly' => $readonly,
 				'data' => $item['master_item']
 					? [[
 							'id' => $item['master_item']['itemid'],
@@ -427,9 +440,10 @@ if ($data['host']['status'] == HOST_STATUS_MONITORED || $data['host']['status'] 
 		? $data['host']['interfaces'][$item['interfaceid']] : [];
 
 	if ($item['discovered']) {
+		$formgrid->addItem(new CVar('interfaceid', $item['interfaceid']));
+
 		$required = $interface && $interface['type'] != INTERFACE_TYPE_OPT;
-		$select_interface = (new CTextBox('interface', $interface ? getHostInterface($interface) : _('None'), true))
-			->setAttribute('disabled', 'disabled');
+		$select_interface = new CTextBox('interface', $interface ? getHostInterface($interface) : _('None'), true);
 		$label_for = $select_interface->getId();
 	}
 	else {
@@ -575,7 +589,7 @@ $formgrid
 			->setAsteriskMark()
 			->setId('js-item-executed-script-label'),
 		(new CFormField(
-			(new CTextArea('params_es', $item['params']))
+			(new CTextArea('params_es', $item['params_es']))
 				->addClass(ZBX_STYLE_MONOSPACE_FONT)
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAriaRequired()
@@ -588,7 +602,7 @@ $formgrid
 			->setAsteriskMark()
 			->setId('js-item-sql-query-label'),
 		(new CFormField(
-			(new CTextArea('params_ap', $item['params']))
+			(new CTextArea('params_ap', $item['params_ap']))
 				->addClass(ZBX_STYLE_MONOSPACE_FONT)
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAriaRequired()
@@ -601,7 +615,7 @@ $formgrid
 			->setAsteriskMark()
 			->setId('js-item-formula-label'),
 		(new CFormField(
-			(new CTextArea('params_f', $item['params']))
+			(new CTextArea('params_f', $item['params_f']))
 				->addClass(ZBX_STYLE_MONOSPACE_FONT)
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAriaRequired()
@@ -667,7 +681,7 @@ $formgrid
 /**
  * Append timeout field to form list for item types:
  * ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR,
- * ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_SNMP, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SCRIPT
+ * ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_SNMP, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER
  */
 $edit_source_timeouts_link = null;
 $custom_timeout_enabled = $item['custom_timeout'] == ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED;
@@ -787,7 +801,7 @@ $formgrid
 			(new CMultiSelect([
 				'name' => 'valuemapid',
 				'object_name' => $item['context'] === 'host' ? 'valuemaps' : 'template_valuemaps',
-				'disabled' => $readonly,
+				'readonly' => $readonly,
 				'multiple' => false,
 				'data' => $item['valuemap']
 					? [[

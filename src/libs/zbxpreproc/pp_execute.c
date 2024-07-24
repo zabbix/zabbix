@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "pp_execute.h"
@@ -36,6 +31,8 @@
 #		error Zabbix requires libxml2 library built with thread support.
 #	endif
 #endif
+
+#define PP_VALUE_LOG_LIMIT	4096
 
 /******************************************************************************
  *                                                                            *
@@ -1055,8 +1052,8 @@ int	pp_execute_step(zbx_pp_context_t *ctx, zbx_pp_cache_t *cache, zbx_dc_um_shar
 	int	ret;
 	char	*params = NULL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() step:%d params:'%s' value:'%s' cache:%p", __func__,
-			step->type, step->params, zbx_variant_value_desc(value), (void *)cache);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() step:%d params:'%s' value:'%.*s' cache:%p", __func__,
+			step->type, step->params, PP_VALUE_LOG_LIMIT, zbx_variant_value_desc(value), (void *)cache);
 
 	params = zbx_strdup(NULL, step->params);
 
@@ -1163,8 +1160,8 @@ int	pp_execute_step(zbx_pp_context_t *ctx, zbx_pp_cache_t *cache, zbx_dc_um_shar
 out:
 	zbx_free(params);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() ret:%s value:%s", __func__, zbx_result_string(ret),
-			zbx_variant_value_desc(value));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() ret:%s value:%.*s", __func__, zbx_result_string(ret),
+			PP_VALUE_LOG_LIMIT, zbx_variant_value_desc(value));
 
 	return ret;
 }
@@ -1195,7 +1192,7 @@ void	pp_execute(zbx_pp_context_t *ctx, zbx_pp_item_preproc_t *preproc, zbx_pp_ca
 	int			quote_error, results_num, action;
 	zbx_variant_t		value_raw;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): value:%s type:%s", __func__,
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): value:%.*s type:%s", __func__, PP_VALUE_LOG_LIMIT,
 			zbx_variant_value_desc(NULL == cache ? value_in : &cache->value),
 			zbx_variant_type_desc(NULL == cache ? value_in : &cache->value));
 
@@ -1306,9 +1303,8 @@ void	pp_execute(zbx_pp_context_t *ctx, zbx_pp_item_preproc_t *preproc, zbx_pp_ca
 	else
 		pp_free_results(results, results_num);
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): value:'%s' type:%s", __func__,
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): value:'%.*s' type:%s", __func__, PP_VALUE_LOG_LIMIT,
 			zbx_variant_value_desc(value_out), zbx_variant_type_desc(value_out));
-
 }
 
 void	pp_context_init(zbx_pp_context_t *ctx)

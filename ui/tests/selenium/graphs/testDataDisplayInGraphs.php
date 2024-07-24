@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -31,7 +26,6 @@ class testDataDisplayInGraphs extends CWebTest {
 	protected static $hostid;
 	protected static $itemids;
 	protected static $dashboardid;
-	protected static $db_type;
 
 	const TIMESTAMPS = [
 		'history' => [
@@ -676,7 +670,7 @@ class testDataDisplayInGraphs extends CWebTest {
 								'name' => '',
 								'x' => 0,
 								'y' => 0,
-								'width' => 12,
+								'width' => 36,
 								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
@@ -690,9 +684,9 @@ class testDataDisplayInGraphs extends CWebTest {
 							[
 								'type' => 'graph',
 								'name' => '',
-								'x' => 12,
+								'x' => 36,
 								'y' => 0,
-								'width' => 12,
+								'width' => 36,
 								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
@@ -708,7 +702,7 @@ class testDataDisplayInGraphs extends CWebTest {
 								'name' => '',
 								'x' => 0,
 								'y' => 4,
-								'width' => 12,
+								'width' => 36,
 								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
@@ -722,9 +716,9 @@ class testDataDisplayInGraphs extends CWebTest {
 							[
 								'type' => 'graph',
 								'name' => '',
-								'x' => 12,
+								'x' => 36,
 								'y' => 4,
-								'width' => 12,
+								'width' => 36,
 								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
@@ -740,7 +734,7 @@ class testDataDisplayInGraphs extends CWebTest {
 								'name' => '',
 								'x' => 0,
 								'y' => 8,
-								'width' => 12,
+								'width' => 36,
 								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
@@ -754,9 +748,9 @@ class testDataDisplayInGraphs extends CWebTest {
 							[
 								'type' => 'graph',
 								'name' => '',
-								'x' => 12,
+								'x' => 36,
 								'y' => 8,
-								'width' => 12,
+								'width' => 36,
 								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
@@ -772,7 +766,7 @@ class testDataDisplayInGraphs extends CWebTest {
 								'name' => '',
 								'x' => 0,
 								'y' => 12,
-								'width' => 12,
+								'width' => 36,
 								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
@@ -786,9 +780,9 @@ class testDataDisplayInGraphs extends CWebTest {
 							[
 								'type' => 'graph',
 								'name' => '',
-								'x' => 12,
+								'x' => 36,
 								'y' => 12,
-								'width' => 12,
+								'width' => 36,
 								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
@@ -804,7 +798,7 @@ class testDataDisplayInGraphs extends CWebTest {
 								'name' => '',
 								'x' => 0,
 								'y' => 16,
-								'width' => 12,
+								'width' => 36,
 								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
@@ -818,9 +812,9 @@ class testDataDisplayInGraphs extends CWebTest {
 							[
 								'type' => 'graph',
 								'name' => '',
-								'x' => 12,
+								'x' => 36,
 								'y' => 16,
-								'width' => 12,
+								'width' => 36,
 								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
@@ -841,7 +835,7 @@ class testDataDisplayInGraphs extends CWebTest {
 								'name' => '',
 								'x' => 0,
 								'y' => 0,
-								'width' => 6,
+								'width' => 18,
 								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
@@ -855,9 +849,9 @@ class testDataDisplayInGraphs extends CWebTest {
 							[
 								'type' => 'graph',
 								'name' => '',
-								'x' => 6,
+								'x' => 18,
 								'y' => 0,
-								'width' => 6,
+								'width' => 18,
 								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
@@ -871,9 +865,9 @@ class testDataDisplayInGraphs extends CWebTest {
 							[
 								'type' => 'graph',
 								'name' => '',
-								'x' => 12,
+								'x' => 36,
 								'y' => 0,
-								'width' => 6,
+								'width' => 18,
 								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
@@ -887,9 +881,9 @@ class testDataDisplayInGraphs extends CWebTest {
 							[
 								'type' => 'graph',
 								'name' => '',
-								'x' => 18,
+								'x' => 54,
 								'y' => 0,
-								'width' => 6,
+								'width' => 18,
 								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
@@ -910,7 +904,7 @@ class testDataDisplayInGraphs extends CWebTest {
 								'name' => '',
 								'x' => 0,
 								'y' => 0,
-								'width' => 12,
+								'width' => 36,
 								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
@@ -929,9 +923,9 @@ class testDataDisplayInGraphs extends CWebTest {
 							[
 								'type' => 'graph',
 								'name' => '',
-								'x' => 12,
+								'x' => 36,
 								'y' => 0,
-								'width' => 12,
+								'width' => 36,
 								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
@@ -957,7 +951,7 @@ class testDataDisplayInGraphs extends CWebTest {
 								'name' => 'SVG Graph history draw = Line',
 								'x' => 0,
 								'y' => 0,
-								'width' => 12,
+								'width' => 36,
 								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
@@ -1011,9 +1005,9 @@ class testDataDisplayInGraphs extends CWebTest {
 							[
 								'type' => 'svggraph',
 								'name' => 'SVG Graph history draw = Points',
-								'x' => 12,
+								'x' => 36,
 								'y' => 0,
-								'width' => 12,
+								'width' => 36,
 								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
@@ -1079,7 +1073,7 @@ class testDataDisplayInGraphs extends CWebTest {
 								'name' => 'SVG Graph history draw = Staircase',
 								'x' => 0,
 								'y' => 4,
-								'width' => 12,
+								'width' => 36,
 								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
@@ -1143,9 +1137,9 @@ class testDataDisplayInGraphs extends CWebTest {
 							[
 								'type' => 'svggraph',
 								'name' => 'SVG Graph history draw = Bar',
-								'x' => 12,
+								'x' => 36,
 								'y' => 4,
-								'width' => 12,
+								'width' => 36,
 								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
@@ -1211,7 +1205,7 @@ class testDataDisplayInGraphs extends CWebTest {
 								'name' => 'SVG Graph trends draw = Line',
 								'x' => 0,
 								'y' => 8,
-								'width' => 12,
+								'width' => 36,
 								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
@@ -1270,9 +1264,9 @@ class testDataDisplayInGraphs extends CWebTest {
 							[
 								'type' => 'svggraph',
 								'name' => 'SVG Graph trends draw = Points',
-								'x' => 12,
+								'x' => 36,
 								'y' => 8,
-								'width' => 12,
+								'width' => 36,
 								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
@@ -1343,7 +1337,7 @@ class testDataDisplayInGraphs extends CWebTest {
 								'name' => 'SVG Graph trends draw = Staircase',
 								'x' => 0,
 								'y' => 12,
-								'width' => 12,
+								'width' => 36,
 								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
@@ -1412,9 +1406,9 @@ class testDataDisplayInGraphs extends CWebTest {
 							[
 								'type' => 'svggraph',
 								'name' => 'SVG Graph trends draw = Bar',
-								'x' => 12,
+								'x' => 36,
 								'y' => 12,
-								'width' => 12,
+								'width' => 36,
 								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
@@ -1490,7 +1484,7 @@ class testDataDisplayInGraphs extends CWebTest {
 								'name' => 'history, missing data = connected',
 								'x' => 0,
 								'y' => 0,
-								'width' => 12,
+								'width' => 36,
 								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
@@ -1554,9 +1548,9 @@ class testDataDisplayInGraphs extends CWebTest {
 							[
 								'type' => 'svggraph',
 								'name' => 'history, missing data = treat as 0',
-								'x' => 12,
+								'x' => 36,
 								'y' => 0,
-								'width' => 12,
+								'width' => 36,
 								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
@@ -1622,7 +1616,7 @@ class testDataDisplayInGraphs extends CWebTest {
 								'name' => 'trends, missing data = connected',
 								'x' => 0,
 								'y' => 4,
-								'width' => 12,
+								'width' => 36,
 								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
@@ -1691,9 +1685,9 @@ class testDataDisplayInGraphs extends CWebTest {
 							[
 								'type' => 'svggraph',
 								'name' => 'trends, missing data = treat as 0',
-								'x' => 12,
+								'x' => 36,
 								'y' => 4,
-								'width' => 12,
+								'width' => 36,
 								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
@@ -1764,7 +1758,7 @@ class testDataDisplayInGraphs extends CWebTest {
 								'name' => 'Axes options + time shift history',
 								'x' => 0,
 								'y' => 8,
-								'width' => 12,
+								'width' => 36,
 								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
@@ -1858,9 +1852,9 @@ class testDataDisplayInGraphs extends CWebTest {
 							[
 								'type' => 'svggraph',
 								'name' => 'history, axes options + time shift',
-								'x' => 12,
+								'x' => 36,
 								'y' => 8,
-								'width' => 12,
+								'width' => 36,
 								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
@@ -1961,7 +1955,7 @@ class testDataDisplayInGraphs extends CWebTest {
 								'name' => 'history, no legend',
 								'x' => 0,
 								'y' => 12,
-								'width' => 12,
+								'width' => 36,
 								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
@@ -2025,9 +2019,9 @@ class testDataDisplayInGraphs extends CWebTest {
 							[
 								'type' => 'svggraph',
 								'name' => 'trends, Agg func = min + max',
-								'x' => 12,
+								'x' => 36,
 								'y' => 12,
-								'width' => 12,
+								'width' => 36,
 								'height' => 4,
 								'view_mode' => 0,
 								'fields' => [
@@ -2110,9 +2104,6 @@ class testDataDisplayInGraphs extends CWebTest {
 		]);
 
 		self::$dashboardid = $dashboard_responce['dashboardids'][0];
-
-		global $DB;
-		self::$db_type = $DB['TYPE'];
 	}
 
 	public function getMonitoringGraphData() {
@@ -2195,6 +2186,7 @@ class testDataDisplayInGraphs extends CWebTest {
 			}
 
 			$filter_form->submit();
+			$this->page->waitUntilReady();
 
 			// Switch to kiosk mode if screenshot needs to be checked in Kiosk mode.
 			if (CTestArrayHelper::get($data, 'kiosk_mode')) {
@@ -2208,7 +2200,7 @@ class testDataDisplayInGraphs extends CWebTest {
 				$graph->waitUntilClassesNotPresent('is-loading');
 			}
 
-			$this->assertScreenshot($charts_table, $screenshot_string.$show.self::$db_type);
+			$this->assertScreenshot($charts_table, $screenshot_string.$show);
 
 			// Switch back to normal view to avoid impacting following scenarios.
 			if (CTestArrayHelper::get($data, 'kiosk_mode')) {
@@ -2251,7 +2243,7 @@ class testDataDisplayInGraphs extends CWebTest {
 
 		// Wait for the image source to change and check graph screenshot.
 		$image->waitUntilAttributesNotPresent(['src' => $old_source]);
-		$screenshot_id = 'latest_data_'.$data['type'].self::$db_type;
+		$screenshot_id = 'latest_data_'.$data['type'];
 		$this->assertScreenshot($this->query('class:center')->one(), $screenshot_id);
 
 		$this->checkKioskMode('class:center', $screenshot_id);
@@ -2321,7 +2313,7 @@ class testDataDisplayInGraphs extends CWebTest {
 			$dashboard->waitUntilReady();
 		}
 
-		$screenshot_id = 'dashboard_'.$data['page'].'_page_'.CTestArrayHelper::get($data, 'type', 'svg').self::$db_type;
+		$screenshot_id = 'dashboard_'.$data['page'].'_page_'.CTestArrayHelper::get($data, 'type', 'svg');
 		$this->assertScreenshot($dashboard, $screenshot_id);
 
 		$this->checkKioskMode('class:dashboard-grid', $screenshot_id);

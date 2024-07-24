@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 require_once 'vendor/autoload.php';
@@ -334,16 +329,7 @@ class CWebTest extends CTest {
 				$color = array_key_exists('color', $region) ? $region['color'] : null;
 
 				if (array_key_exists('element', $region)) {
-					if ($region['element'] instanceof CElement) {
-						$region = $region['element']->getRect();
-						$region['x'] -= $offset['x'];
-						$region['y'] -= $offset['y'];
-
-						if ($color !== null) {
-							$region['color'] = $color;
-						}
-					}
-					else {
+					if (!$region['element'] instanceof CElement) {
 						$this->fail('Except element is not an instance of CElement.');
 					}
 				}
@@ -357,7 +343,7 @@ class CWebTest extends CTest {
 					}
 
 					foreach ($query->all() as $item) {
-						$append[] = array_merge($item->getRect(), ($color !== null) ? ['color' => $color] : []);
+						$append[] = array_merge(['element' => $item], ($color !== null) ? ['color' => $color] : []);
 					}
 
 					unset($regions[$i]);
@@ -368,9 +354,7 @@ class CWebTest extends CTest {
 				}
 			}
 			elseif ($region instanceof CElement) {
-				$region = $region->getRect();
-				$region['x'] -= $offset['x'];
-				$region['y'] -= $offset['y'];
+				$region = ['element' => $region];
 			}
 			else {
 				$this->fail('Screenshot except configuration is invalid.');
@@ -379,6 +363,10 @@ class CWebTest extends CTest {
 		unset($region);
 
 		foreach ($append as &$region) {
+			if (array_key_exists('element', $region)) {
+				continue;
+			}
+
 			$region['x'] -= $offset['x'];
 			$region['y'] -= $offset['y'];
 		}
@@ -412,7 +400,7 @@ class CWebTest extends CTest {
 		}
 
 		$script = 'var tag = document.createElement("style");tag.setAttribute("id", "selenium-injected-style");'.
-				'tag.textContent = "* {text-rendering: geometricPrecision; image-rendering: pixelated}";'.
+				'tag.textContent = "* {text-rendering: geometricPrecision; image-rendering: pixelated} .selenium-hide {opacity: 0 !important}";'.
 				'(document.head||document.documentElement).appendChild(tag);';
 
 		try {
@@ -436,10 +424,22 @@ class CWebTest extends CTest {
 
 		try {
 			$name = md5($function.$id).'.png';
-			$this->page->updateViewport();
-			$screenshot = CImageHelper::getImageWithoutRegions($this->page->takeScreenshot($element),
-					$this->getNormalizedRegions($element, $regions)
-			);
+
+			$coordinates = [];
+			foreach ($this->getNormalizedRegions($element, $regions) as $region) {
+				if (array_key_exists('element', $region)) {
+					try {
+						$this->page->getDriver()->executeScript('arguments[0].classList.add(\'selenium-hide\');', [$region['element']]);
+					} catch (Exception $exception) {
+						// Code is not missing here.
+					}
+				}
+				else {
+					$coordinates[] = $region;
+				}
+			}
+
+			$screenshot = CImageHelper::getImageWithoutRegions($this->page->takeScreenshot($element), $coordinates);
 
 			if (($reference = @file_get_contents(PHPUNIT_REFERENCE_DIR.$class.'/'.$name)) === false) {
 				if (file_put_contents(PHPUNIT_SCREENSHOT_DIR.'ref_'.$name, $screenshot) !== false) {

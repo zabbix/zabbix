@@ -1,31 +1,27 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "escalator.h"
 
 #include "../server_constants.h"
 #include "../db_lengths_constants.h"
+#include "../actions/actions.h"
 
+#include "zbxtimekeeper.h"
 #include "zbxexpression.h"
 #include "zbxnix.h"
 #include "zbxself.h"
-#include "../actions/actions.h"
 #include "zbxscripts.h"
 #include "zbxevent.h"
 #include "zbxservice.h"
@@ -1164,7 +1160,8 @@ static void	execute_commands(const zbx_db_event *event, const zbx_db_event *r_ev
 		const zbx_service_alarm_t *service_alarm, const zbx_db_service *service, zbx_uint64_t actionid,
 		zbx_uint64_t operationid, int esc_step, int macro_type, const char *default_timezone,
 		int config_timeout, int config_trapper_timeout, const char *config_source_ip,
-		const char *config_ssh_key_location, zbx_get_config_forks_f get_config_forks, int config_enable_global_scripts, unsigned char program_type)
+		const char *config_ssh_key_location, zbx_get_config_forks_f get_config_forks,
+		int config_enable_global_scripts, unsigned char program_type)
 {
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
@@ -3327,8 +3324,6 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_db_escalat
 
 		zbx_vector_escalation_diff_ptr_sort(&diffs, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
-		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 		for (int i = 0; i < diffs.values_num; i++)
 		{
 			char	separator = ' ';
@@ -3376,10 +3371,7 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_db_escalat
 			zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 		}
 
-		zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-		if (16 < sql_offset)	/* in ORACLE always present begin..end; */
-			zbx_db_execute("%s", sql);
+		(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
 
 		zbx_free(sql);
 	}

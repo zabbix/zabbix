@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -29,6 +24,8 @@ class CWidgetPieChart extends CWidget {
 	static ZBX_STYLE_PIE_CHART_LEGEND_SHOW_VALUE = 'svg-pie-chart-legend-show-value';
 	static ZBX_STYLE_PIE_CHART_LEGEND_VALUE = 'svg-pie-chart-legend-value';
 	static ZBX_STYLE_PIE_CHART_LEGEND_NO_DATA = 'svg-pie-chart-legend-no-data';
+
+	static DATASET_TYPE_SINGLE_ITEM = 0;
 
 	// Legend single line height is 18px. Value should be synchronized with $svg-legend-line-height in scss.
 	static LEGEND_LINE_HEIGHT = 18;
@@ -57,11 +54,48 @@ class CWidgetPieChart extends CWidget {
 	}
 
 	getUpdateRequestData() {
-		return {
-			...super.getUpdateRequestData(),
-			has_custom_time_period: this.getFieldsReferredData().has('time_period') ? undefined : 1,
-			with_config: this.#pie_chart === null ? 1 : undefined
-		};
+		const request_data = super.getUpdateRequestData();
+
+		for (const [dataset_key, dataset] of request_data.fields.ds.entries()) {
+			if (dataset.dataset_type != CWidgetPieChart.DATASET_TYPE_SINGLE_ITEM) {
+				continue;
+			}
+
+			const dataset_new = {
+				...dataset,
+				itemids: [],
+				type: [],
+				color: []
+			};
+
+			for (const [item_index, itemid] of dataset.itemids.entries()) {
+				if (Array.isArray(itemid)) {
+					if (itemid.length === 1) {
+						dataset_new.itemids.push(itemid[0]);
+						dataset_new.type.push(dataset.type[item_index]);
+						dataset_new.color.push(dataset.color[item_index]);
+					}
+				}
+				else {
+					dataset_new.itemids.push(itemid);
+					dataset_new.type.push(dataset.type[item_index]);
+					dataset_new.color.push(dataset.color[item_index]);
+				}
+			}
+
+			request_data.fields.ds[dataset_key] = dataset_new;
+		}
+
+
+		if (!this.getFieldsReferredData().has('time_period')) {
+			request_data.has_custom_time_period = 1;
+		}
+
+		if (this.#pie_chart === null) {
+			request_data.with_config = 1;
+		}
+
+		return request_data;
 	}
 
 	setContents(response) {
@@ -102,6 +136,13 @@ class CWidgetPieChart extends CWidget {
 			all_sectorids: response.all_sectorids,
 			total_value: response.total_value
 		});
+	}
+
+	onClearContents() {
+		if (this.#pie_chart !== null) {
+			this.#pie_chart.destroy();
+			this.#pie_chart = null;
+		}
 	}
 
 	#showLegend(legend, total_item) {

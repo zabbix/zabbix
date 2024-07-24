@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -62,6 +57,10 @@ class CMultiSelect extends CTag {
 			$this->setAttribute('aria-disabled', 'true');
 		}
 
+		if (array_key_exists('readonly', $options) && $options['readonly']) {
+			$this->setAttribute('aria-readonly', 'true');
+		}
+
 		$this->params = [
 			'name' => $options['name'],
 			'labels' => [
@@ -97,7 +96,8 @@ class CMultiSelect extends CTag {
 			$this->params['data'] = zbx_cleanHashes($options['data']);
 		}
 
-		foreach (['defaultValue', 'disabled', 'selectedLimit', 'addNew', 'styles', 'placeholder', 'hidden'] as $option) {
+		foreach (['defaultValue', 'disabled', 'selectedLimit', 'addNew', 'styles', 'placeholder', 'hidden', 'readonly']
+				as $option) {
 			if (array_key_exists($option, $options)) {
 				$this->params[$option] = $options[$option];
 			}
@@ -162,7 +162,8 @@ class CMultiSelect extends CTag {
 	 */
 	protected function mapOptions(array $options) {
 		$valid_fields = ['name', 'object_name', 'multiselect_id', 'multiple', 'disabled', 'default_value', 'data',
-			'add_new', 'add_post_js', 'styles', 'popup', 'custom_select', 'placeholder', 'autosuggest', 'hidden'
+			'add_new', 'add_post_js', 'styles', 'popup', 'custom_select', 'placeholder', 'autosuggest', 'hidden',
+			'readonly'
 		];
 
 		foreach ($options as $field => $value) {
@@ -183,7 +184,8 @@ class CMultiSelect extends CTag {
 			'add_new' => 'addNew',
 			'add_post_js' => 'add_post_js',
 			'styles' => 'styles',
-			'placeholder' => 'placeholder'
+			'placeholder' => 'placeholder',
+			'readonly' => 'readonly'
 		];
 
 		foreach ($mappings as $new_field => $old_field) {

@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -82,7 +77,8 @@ class testFormAdministrationProxies extends CWebTest {
 				'timeout_http_agent' => '300s',
 				'timeout_ssh_agent' => '300s',
 				'timeout_telnet_agent' => '300s',
-				'timeout_script' => '300s'
+				'timeout_script' => '300s',
+				'timeout_browser' => '300s'
 			],
 			[
 				'name' => self::CHANGE_PASSIVE_PROXY,
@@ -103,7 +99,8 @@ class testFormAdministrationProxies extends CWebTest {
 				'timeout_http_agent' => '300s',
 				'timeout_ssh_agent' => '300s',
 				'timeout_telnet_agent' => '300s',
-				'timeout_script' => '300s'
+				'timeout_script' => '300s',
+				'timeout_browser' => '300s'
 			]
 		]);
 	}
@@ -509,6 +506,8 @@ class testFormAdministrationProxies extends CWebTest {
 				// Check fields lengths.
 				$field_maxlengths = [
 					'Proxy name' => 128,
+					'id:local_address' => 255,
+					'id:local_port' => 64,
 					'Proxy address' => 255,
 					'Description' => 65535,
 					'PSK identity' => 128,
@@ -519,9 +518,18 @@ class testFormAdministrationProxies extends CWebTest {
 
 				foreach ($field_maxlengths as $name => $maxlength) {
 					$field = $form->getField($name);
-					$this->assertEquals('', $field->getValue());
+					$this->assertEquals(($name === 'id:local_port' ? '10051' : ''), $field->getValue());
 					$this->assertEquals($maxlength, $field->getAttribute('maxlength'));
 				}
+
+				// Check that "Address for active agents" field and that it's is displayed only when a proxy group is selected.
+				$address_field = $form->getField('Address for active agents');
+				$this->assertFalse($address_field->isDisplayed());
+				$form->fill(['Proxy group' => 'Online proxy group']);
+				$this->assertTrue($address_field->isDisplayed());
+
+				$this->assertEquals(['Address', 'Port'], $address_field->asTable()->getHeadersText());
+				$this->assertEquals(['Proxy name', 'Address for active agents'], $form->getRequiredLabels());
 
 				// Check timeouts.
 				$form->selectTab('Timeouts');
@@ -539,7 +547,7 @@ class testFormAdministrationProxies extends CWebTest {
 
 				// Available timeouts list.
 				$timeouts = ['Zabbix agent', 'Simple check', 'SNMP agent', 'External check', 'Database monitor',
-						'HTTP agent', 'SSH agent', 'TELNET agent', 'Script'
+						'HTTP agent', 'SSH agent', 'TELNET agent', 'Script', 'Browser'
 				];
 
 				// Every timeout has mandatory status.
@@ -550,8 +558,9 @@ class testFormAdministrationProxies extends CWebTest {
 					$form->fill(['Timeouts for item types' => $timeout]);
 
 					foreach ($timeouts as $timeout) {
+						$default = ($timeout === 'Browser') ? '60s' : '3s';
 						$field = $form->getField($timeout);
-						$this->assertEquals('3s', $field->getValue());
+						$this->assertEquals($default, $field->getValue());
 						$this->assertEquals(255, $field->getAttribute('maxlength'));
 						$this->assertEquals($enabled, $field->isClickable());
 					}
@@ -561,7 +570,7 @@ class testFormAdministrationProxies extends CWebTest {
 				$this->assertEquals(['Proxy', 'Encryption', 'Timeouts'], $form->getTabs());
 				$form->checkValue(['Proxy mode' => 'Active']);
 			}
-			else{
+			else {
 				$form->getField('Proxy mode')->asSegmentedRadio()->select('Passive');
 
 				// Check that 'Proxy address' is disappeared.
@@ -761,6 +770,154 @@ class testFormAdministrationProxies extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'proxy_fields' => [
+						'Proxy name' => 'Empty local address',
+						'Proxy group' => 'Online proxy group'
+					],
+					'error' => 'Incorrect value for field "Address for active agents: Address": cannot be empty.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'Invalid symbols in local address',
+						'Proxy group' => 'Online proxy group',
+						'id:local_address' => '!@#$%^&*()_+'
+					],
+					'error' => 'Invalid parameter "/1/local_address": an IP or DNS is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'Space in local address - IP',
+						'Proxy group' => 'Online proxy group',
+						'id:local_address' => '127.0 .0.1'
+					],
+					'error' => 'Invalid parameter "/1/local_address": an IP or DNS is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'Space in local address - DNS',
+						'Proxy group' => 'Online proxy group',
+						'id:local_address' => 'zab bix'
+					],
+					'error' => 'Invalid parameter "/1/local_address": an IP or DNS is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'User macro in local address',
+						'Proxy group' => 'Online proxy group',
+						'id:local_address' => '{$MACRO}'
+					],
+					'error' => 'Invalid parameter "/1/local_address": an IP or DNS is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'Built-in macro in local address',
+						'Proxy group' => 'Online proxy group',
+						'id:local_address' => '{TIME}'
+					],
+					'error' => 'Invalid parameter "/1/local_address": an IP or DNS is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'LLD macro in local address',
+						'Proxy group' => 'Online proxy group',
+						'id:local_address' => '{#MACRO}'
+					],
+					'error' => 'Invalid parameter "/1/local_address": an IP or DNS is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'Empty local address port',
+						'Proxy group' => 'Online proxy group',
+						'id:local_address' => '127.0.0.1',
+						'id:local_port' => ''
+					],
+					'error' => 'Incorrect value for field "Address for active agents: Port": cannot be empty.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'Non-numeric value in local address port',
+						'Proxy group' => 'Online proxy group',
+						'id:local_address' => '127.0.0.1',
+						'id:local_port' => '3k'
+					],
+					'error' => 'Invalid parameter "/1/local_port": an integer is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'Too high number in local address port',
+						'Proxy group' => 'Online proxy group',
+						'id:local_address' => '127.0.0.1',
+						'id:local_port' => '65536'
+					],
+					'error' => 'Invalid parameter "/1/local_port": value must be one of 0-65535.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'Negative number in local address port',
+						'Proxy group' => 'Online proxy group',
+						'id:local_address' => '127.0.0.1',
+						'id:local_port' => '-1'
+					],
+					'error' => 'Invalid parameter "/1/local_port": value must be one of 0-65535.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'Built in macro in local address port',
+						'Proxy group' => 'Online proxy group',
+						'id:local_address' => '127.0.0.1',
+						'id:local_port' => '{TIME}'
+					],
+					'error' => 'Invalid parameter "/1/local_port": an integer is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'LLD macro in local address port',
+						'Proxy group' => 'Online proxy group',
+						'id:local_address' => '127.0.0.1',
+						'id:local_port' => '{#PORT}'
+					],
+					'error' => 'Invalid parameter "/1/local_port": an integer is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
 						'Proxy name' => 'Empty IP address',
 						'Proxy mode' => 'Passive',
 						'id:address' => ''
@@ -878,7 +1035,7 @@ class testFormAdministrationProxies extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'proxy_fields' => [
-						'Proxy name' => 'All timeouts fields empty',
+						'Proxy name' => 'All timeout fields empty',
 						'Proxy mode' => 'Active'
 					],
 					'timeout_fields' => [
@@ -890,7 +1047,8 @@ class testFormAdministrationProxies extends CWebTest {
 						'HTTP agent' => '',
 						'SSH agent' => '',
 						'TELNET agent' => '',
-						'Script' => ''
+						'Script' => '',
+						'Browser' => ''
 					],
 					'error' => [
 						'Incorrect value for field "timeout_zabbix_agent": cannot be empty.',
@@ -901,7 +1059,8 @@ class testFormAdministrationProxies extends CWebTest {
 						'Incorrect value for field "timeout_http_agent": cannot be empty.',
 						'Incorrect value for field "timeout_ssh_agent": cannot be empty.',
 						'Incorrect value for field "timeout_telnet_agent": cannot be empty.',
-						'Incorrect value for field "timeout_script": cannot be empty.'
+						'Incorrect value for field "timeout_script": cannot be empty.',
+						'Incorrect value for field "timeout_browser": cannot be empty.'
 					]
 				]
 			],
@@ -1449,6 +1608,66 @@ class testFormAdministrationProxies extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'proxy_fields' => [
+						'Proxy name' => 'Browser timeout - 0',
+						'Proxy mode' => 'Active'
+					],
+					'timeout_fields' => [
+						'Browser' => '0'
+					],
+					'error' => [
+						'Invalid parameter "/1/timeout_browser": value must be one of 1-600.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'Browser timeout - 601',
+						'Proxy mode' => 'Active'
+					],
+					'timeout_fields' => [
+						'Browser' => '601'
+					],
+					'error' => [
+						'Invalid parameter "/1/timeout_browser": value must be one of 1-600.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'Browser timeout - too large',
+						'Proxy mode' => 'Active'
+					],
+					'timeout_fields' => [
+						'Browser' => '1234567890123456'
+					],
+					'error' => [
+						'Invalid parameter "/1/timeout_browser": a number is too large.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
+						'Proxy name' => 'Browser timeout - test',
+						'Proxy mode' => 'Active'
+					],
+					'timeout_fields' => [
+						'Browser' => 'test'
+					],
+					'error' => [
+						'Invalid parameter "/1/timeout_browser": a time unit is expected.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
 						'Proxy name' => 'Timeouts field - global macros',
 						'Proxy mode' => 'Active'
 					],
@@ -1524,7 +1743,7 @@ class testFormAdministrationProxies extends CWebTest {
 			[
 				[
 					'proxy_fields' => [
-						'Proxy name' => 'All timeouts fields - 300',
+						'Proxy name' => 'All timeout fields - 300',
 						'Proxy mode' => 'Active'
 					],
 					'timeout_fields' => [
@@ -1536,14 +1755,15 @@ class testFormAdministrationProxies extends CWebTest {
 						'HTTP agent' => '300',
 						'SSH agent' => '300',
 						'TELNET agent' => '300',
-						'Script' => '300'
+						'Script' => '300',
+						'Browser' => '300'
 					]
 				]
 			],
 			[
 				[
 					'proxy_fields' => [
-						'Proxy name' => 'All timeouts fields - macros',
+						'Proxy name' => 'All timeout fields - macros',
 						'Proxy mode' => 'Active'
 					],
 					'timeout_fields' => [
@@ -1555,7 +1775,8 @@ class testFormAdministrationProxies extends CWebTest {
 						'HTTP agent' => '{$MACROS}',
 						'SSH agent' => '{$MACROS}',
 						'TELNET agent' => '{$MACROS}',
-						'Script' => '{$MACROS}'
+						'Script' => '{$MACROS}',
+						'Browser' => '{$MACROS}'
 					]
 				]
 			],
@@ -1563,7 +1784,10 @@ class testFormAdministrationProxies extends CWebTest {
 				[
 					'proxy_fields' => [
 						'Proxy name' => 'All fields Passive proxy No encryption',
-						'Proxy mode' => 'Passive'
+						'Proxy mode' => 'Passive',
+						'Proxy group' => 'Offline group',
+						'id:local_address' => 'zabbix.com',
+						'id:local_port' => '65535'
 					],
 					'encryption_fields' => [
 						'Connections to proxy' => 'No encryption'
@@ -1575,6 +1799,9 @@ class testFormAdministrationProxies extends CWebTest {
 					'proxy_fields' => [
 						'Proxy name' => '-All fields Active proxy 123',
 						'Proxy mode' => 'Active',
+						'Proxy group' => 'Offline group',
+						'id:local_address' => '192.168.0.1',
+						'id:local_port' => '{$PORT}',
 						'Proxy address' => '120.9.9.9',
 						'Description' => "~`!@#$%^&*()_+-=”№;:?Х[]{}|\\|//"
 					],
@@ -1636,6 +1863,9 @@ class testFormAdministrationProxies extends CWebTest {
 				[
 					'proxy_fields' => [
 						'Proxy name' => '      Selenium test proxy with spaces    ',
+						'Proxy group' => 'Offline group',
+						'id:local_address' => '   127.0.0.1   ',
+						'id:local_port' => '   11111   ',
 						'Description' => '       Test description with trailing spaces        ',
 						'Proxy mode' => 'Active'
 					],
@@ -1827,7 +2057,7 @@ class testFormAdministrationProxies extends CWebTest {
 			// Remove leading and trailing spaces from data for assertion.
 			if (CTestArrayHelper::get($data, 'trim', false)) {
 				$trimmed_fields = [
-					'proxy_fields' => ['Proxy name', 'Description'],
+					'proxy_fields' => ['Proxy name', 'Description', 'id:local_address', 'id:local_port'],
 					'encryption_fields' => ['Issuer', 'Subject']
 				];
 
@@ -2082,6 +2312,9 @@ class testFormAdministrationProxies extends CWebTest {
 			'proxy_fields' => [
 				'Proxy name' => 'Proxy for cancel',
 				'Proxy mode' => 'Passive',
+				'Proxy group' => 'Group without proxies',
+				'id:local_address' => '127.0.0.1',
+				'id:local_port' => 33333,
 				'id:address' => '192.8.8.8',
 				'id:port' => 222,
 				'Description' => 'Description for cancel'

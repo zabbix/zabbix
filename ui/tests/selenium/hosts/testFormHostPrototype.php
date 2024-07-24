@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
@@ -60,10 +55,10 @@ class testFormHostPrototype extends CLegacyWebTest {
 		$this->zbxTestAssertElementValue('name', $visible_name);
 		$this->zbxTestAssertElementPresentXpath('//div[contains(@class,"interface-cell-ip")]/input[@readonly]');
 		$this->zbxTestAssertElementPresentXpath('//div[contains(@class,"interface-cell-dns")]/input[@readonly]');
-		$this->zbxTestAssertElementPresentXpath('//label[@for="interfaces_50024_useip_1" and text()="IP"]/../input[@disabled]');
-		$this->zbxTestAssertElementPresentXpath('//label[@for="interfaces_50024_useip_0" and text()="DNS"]/../input[@disabled]');
+		$this->zbxTestAssertElementPresentXpath('//label[@for="interfaces_50024_useip_1" and text()="IP"]/../input[@readonly]');
+		$this->zbxTestAssertElementPresentXpath('//label[@for="interfaces_50024_useip_0" and text()="DNS"]/../input[@readonly]');
 		$this->zbxTestAssertElementPresentXpath('//div[contains(@class,"interface-cell-port")]/input[@type="text"][@readonly]');
-		$this->zbxTestAssertElementPresentXpath('//div[contains(@class,"interface-cell-default")]/input[@disabled]');
+		$this->zbxTestAssertElementPresentXpath('//div[contains(@class,"interface-cell-default")]/input[@readonly]');
 
 		foreach (['SNMP', 'JMX', 'IPMI'] as $interface) {
 			$this->zbxTestAssertElementNotPresentXpath('//div[contains(@class,"interface-cell-type") and contains(text(),"'.$interface.'")]');
@@ -149,7 +144,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 		// Check layout at Encryption tab.
 		$this->zbxTestTabSwitch('Encryption');
 		foreach (['tls_connect_0', 'tls_connect_1', 'tls_connect_2', 'tls_in_none', 'tls_in_cert', 'tls_in_psk'] as $id) {
-			$this->zbxTestAssertElementPresentXpath('//input[@id="'.$id.'"][@disabled]');
+			$this->zbxTestAssertElementPresentXpath('//input[@id="'.$id.'"][@readonly]');
 		}
 	}
 
@@ -770,7 +765,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 		];
 
 		foreach ($labels as $label) {
-			$this->zbxTestAssertElementPresentXpath('//label[text()="'.$label['value'].'"]/../input[@type="'.$label['type'].'"][@disabled]');
+			$this->zbxTestAssertElementPresentXpath('//label[text()="'.$label['value'].'"]/../input[@type="'.$label['type'].'"][@readonly]');
 		}
 
 		// Go to host and change Encryption settings.
@@ -805,7 +800,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 		$this->zbxTestWaitForPageToLoad();
 
 		// Check correct radio is selected.
-		$this->zbxTestAssertElementPresentXpath('//label[text()="'.$data['connection_to_host'].'"]/../input[@type="radio"][@checked][@disabled]');
+		$this->zbxTestAssertElementPresentXpath('//label[text()="'.$data['connection_to_host'].'"]/../input[@type="radio"][@checked][@readonly]');
 
 		// Check checkboxes.
 		foreach ($data['connection_from_host'] as $label => $state) {

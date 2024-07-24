@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -103,6 +98,13 @@ class CSVGHoneycomb {
 	 * @type {number}
 	 */
 	#cells_max_count;
+
+	/**
+	 * Limit for maximum number of cells to display in the widget.
+	 *
+	 * @type {number}
+	 */
+	#cells_max_count_limit = 1000;
 
 	/**
 	 * Width of cell (inner radius).
@@ -222,12 +224,16 @@ class CSVGHoneycomb {
 	 * @param {number} height
 	 */
 	setSize({width, height}) {
-		this.#width = width - this.#padding.horizontal * 2;
-		this.#height = height - this.#padding.vertical * 2;
-
 		this.#svg
 			.attr('width', width)
 			.attr('height', height);
+
+		this.#width = Math.max(0, width - this.#padding.horizontal * 2);
+		this.#height = Math.max(0, height - this.#padding.vertical * 2);
+
+		if (this.#width === 0 || this.#height === 0) {
+			return;
+		}
 
 		this.#adjustSize();
 
@@ -243,6 +249,10 @@ class CSVGHoneycomb {
 	 */
 	setValue({cells}) {
 		this.#cells_data = cells;
+
+		if (this.#width === 0 || this.#height === 0) {
+			return;
+		}
 
 		this.#adjustSize();
 		this.#updateCells();
@@ -311,14 +321,10 @@ class CSVGHoneycomb {
 			};
 		};
 
-		const cell_min_width = CSVGHoneycomb.CELL_WIDTH_MIN;
-		const cell_min_height = CSVGHoneycomb.CELL_WIDTH_MIN / Math.sqrt(3) * 2;
-
-		const max_rows = Math.floor((this.#height - cell_min_height) / (cell_min_height * .75)) + 1;
-		const max_columns = Math.floor((this.#width - (max_rows > 1 ? cell_min_width / 2 : 0)) / cell_min_width);
+		const {max_rows, max_columns} = CSVGHoneycomb.getContainerMaxParams({width: this.#width, height: this.#height});
 
 		this.#cells_max_count = this.#cells_data !== null
-			? Math.min(this.#cells_data.length, max_rows * max_columns)
+			? Math.min(this.#cells_max_count_limit, this.#cells_data.length, max_rows * max_columns)
 			: 0;
 
 		const rows = Math.max(1, Math.min(max_rows, this.#cells_max_count,
@@ -893,7 +899,7 @@ class CSVGHoneycomb {
 
 			if (value < curr[threshold_type]) {
 				if (prev === null) {
-					return apply_interpolation ? `#${curr.color}` : bg_color;
+					return bg_color;
 				}
 
 				if (apply_interpolation) {
@@ -1001,5 +1007,23 @@ class CSVGHoneycomb {
 	 */
 	static #getUniqueId() {
 		return `CSVGHoneycomb-${this.ID_COUNTER++}`;
+	}
+
+	/**
+	 * Get honeycomb container max row and max column count.
+	 *
+	 * @param {number} width
+	 * @param {number} height
+	 *
+	 * @returns {{max_rows: number, max_columns: number}}
+	 */
+	static getContainerMaxParams({width, height}) {
+		const cell_min_width = CSVGHoneycomb.CELL_WIDTH_MIN;
+		const cell_min_height = CSVGHoneycomb.CELL_WIDTH_MIN / Math.sqrt(3) * 2;
+
+		const max_rows = Math.max(0, Math.floor((height - cell_min_height) / (cell_min_height * .75)) + 1);
+		const max_columns = Math.max(0, Math.floor((width - (max_rows > 1 ? cell_min_width / 2 : 0)) / cell_min_width));
+
+		return {max_rows, max_columns};
 	}
 }

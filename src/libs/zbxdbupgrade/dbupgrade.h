@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #ifndef ZABBIX_DBUPGRADE_H
@@ -76,11 +71,6 @@ int	DBdrop_foreign_key(const char *table_name, int id);
 #if defined(HAVE_POSTGRESQL)
 int	DBcheck_field_type(const char *table_name, const zbx_db_field_t *field);
 #endif
-
-#	ifdef HAVE_ORACLE
-int	DBcreate_serial_sequence(const char *table_name);
-int	DBcreate_serial_trigger(const char *table_name, const char *field_name);
-#	endif
 
 int	DBcreate_changelog_insert_trigger(const char *table_name, const char *field_name);
 int	DBcreate_changelog_update_trigger(const char *table_name, const char *field_name);

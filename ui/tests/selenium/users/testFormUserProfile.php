@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -156,10 +151,12 @@ class testFormUserProfile extends CLegacyWebTest {
 		$sqlHashUsers = "select * from users where username<>'".PHPUNIT_LOGIN_NAME."' order by userid";
 		$oldHashUsers = CDBHelper::getHash($sqlHashUsers);
 
-		$this->zbxTestLogin('zabbix.php?action=userprofile.edit');
+		$this->page->login();
+		$this->page->open('zabbix.php?action=userprofile.edit')->waitUntilReady();
 
 		$this->zbxTestDropdownSelect('theme', 'Blue');
 		$this->zbxTestClickWait('update');
+		$this->page->waitUntilReady();
 		$this->zbxTestCheckHeader('Global view');
 
 		$row = DBfetch(DBselect("select theme from users where username='".PHPUNIT_LOGIN_NAME."'"));

@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "audit.h"
@@ -24,6 +19,10 @@
 #include "zbxjson.h"
 #include "zbxcacheconfig.h"
 #include "zbxnum.h"
+#include "zbxdb.h"
+#include "zbxdbhigh.h"
+#include "zbxdbschema.h"
+#include "zbxstr.h"
 #include "zbx_scripts_constants.h"
 
 #define AUDIT_USERID		__UINT64_C(0)
@@ -184,8 +183,8 @@ int	zbx_auditlog_global_script(unsigned char script_type, unsigned char script_e
 		const char *output, const char *error)
 {
 	int		ret = SUCCEED;
-	char		auditid_cuid[CUID_LEN], execute_on_s[MAX_ID_LEN + 1], hostid_s[MAX_ID_LEN + 1],
-			eventid_s[MAX_ID_LEN + 1], proxyid_s[MAX_ID_LEN + 1];
+	char		auditid_cuid[CUID_LEN], hostid_s[MAX_ID_LEN + 1], eventid_s[MAX_ID_LEN + 1],
+			proxyid_s[MAX_ID_LEN + 1];
 	struct zbx_json	details_json;
 	zbx_config_t	cfg;
 	zbx_db_insert_t	db_insert;
@@ -201,9 +200,14 @@ int	zbx_auditlog_global_script(unsigned char script_type, unsigned char script_e
 
 	zbx_json_init(&details_json, ZBX_JSON_STAT_BUF_LEN);
 
-	zbx_snprintf(execute_on_s, sizeof(execute_on_s), "%hhu", script_execute_on);
+	if (ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT == script_type)
+	{
+		char	execute_on_s[MAX_ID_LEN + 1];
 
-	append_str_json(&details_json, AUDIT_DETAILS_ACTION_ADD, "script.execute_on", execute_on_s);
+		zbx_snprintf(execute_on_s, sizeof(execute_on_s), "%hhu", script_execute_on);
+
+		append_str_json(&details_json, AUDIT_DETAILS_ACTION_ADD, "script.execute_on", execute_on_s);
+	}
 
 	if (0 != eventid)
 	{

@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -111,12 +106,18 @@ class CWidgetNavTree extends CWidget {
 	}
 
 	onFeedback({type, value}) {
+		if (type !== CWidgetsData.DATA_TYPE_MAP_ID) {
+			return;
+		}
+
+		const sysmapid = value[0];
+
 		const item_selected = this.#navtree[this.#navtree_item_selected];
 
 		let new_item_id = 0;
 
 		for (const [id, item] of Object.entries(this.#navtree)) {
-			if (item.sysmapid == value && item.parent == this.#navtree_item_selected) {
+			if (item.sysmapid == sysmapid && item.parent == this.#navtree_item_selected) {
 				new_item_id = id;
 				break;
 			}
@@ -124,7 +125,7 @@ class CWidgetNavTree extends CWidget {
 
 		if (new_item_id == 0) {
 			for (const [id, item] of Object.entries(this.#navtree)) {
-				if (item.sysmapid == value && item_selected.parent == id) {
+				if (item.sysmapid == sysmapid && item_selected.parent == id) {
 					new_item_id = id;
 					break;
 				}
@@ -141,12 +142,7 @@ class CWidgetNavTree extends CWidget {
 	}
 
 	processUpdateResponse(response) {
-		if (this.#has_content) {
-			this.#deactivateContentEvents();
-			this.#removeTree();
-
-			this.#has_content = false;
-		}
+		this.clearContents();
 
 		super.processUpdateResponse(response);
 
@@ -167,6 +163,15 @@ class CWidgetNavTree extends CWidget {
 
 			this.#makeTree();
 			this.#activateContentEvents();
+		}
+	}
+
+	onClearContents() {
+		if (this.#has_content) {
+			this.#deactivateContentEvents();
+			this.#removeTree();
+
+			this.#has_content = false;
 		}
 	}
 
@@ -490,9 +495,9 @@ class CWidgetNavTree extends CWidget {
 			}
 
 			this.broadcast({
-				_mapid: this.#markTreeItemSelected(this.#navtree_item_selected)
-					? this.#navtree[this.#navtree_item_selected].sysmapid
-					: null
+				[CWidgetsData.DATA_TYPE_MAP_ID]: this.#markTreeItemSelected(this.#navtree_item_selected)
+					? [this.#navtree[this.#navtree_item_selected].sysmapid]
+					: CWidgetsData.getDefault(CWidgetsData.DATA_TYPE_MAP_ID)
 			});
 		}
 	}
@@ -704,18 +709,25 @@ class CWidgetNavTree extends CWidget {
 			},
 			dataType: 'json',
 			success: (response) => {
+				let content = response.body;
+
+				if (response.error !== undefined) {
+					content = makeMessageBox('bad', response.error.messages, response.error.title, false)[0];
+				}
+
 				if (response.debug !== undefined) {
-					response.body += response.debug;
+					content += response.debug;
 				}
 
 				overlayDialogue({
 					'title': t('Edit tree element'),
 					'class': 'modal-popup',
-					'content': response.body,
+					'content': content,
 					'buttons': [
 						{
 							'title': item_edit ? t('Apply') : t('Add'),
 							'class': 'dialogue-widget-save',
+							'enabled': response.error === undefined,
 							'action': (overlay) => {
 								const form = document.getElementById('widget-dialogue-form');
 								const form_inputs = form.elements;
@@ -790,30 +802,56 @@ class CWidgetNavTree extends CWidget {
 											}
 
 											const add_child_level = (sysmapid, itemid, depth) => {
-												if (response.hierarchy[sysmapid] !== undefined
-													&& depth <= this.#max_depth) {
-													const root = this._target
-														.querySelector(`.tree-item[data-id="${itemid}"]>ul.tree-list`);
+												const root = this._target
+													.querySelector(`.tree-item[data-id="${itemid}"]>ul.tree-list`);
 
+												if (root === null) {
+													return;
+												}
+
+												const tree_item = root.closest('.tree-item');
+
+												if (tree_item.classList.contains('is-parent')) {
+													tree_item.classList.remove('closed');
+													tree_item.classList.add('opened');
+												}
+
+												if (response.hierarchy[sysmapid] !== undefined && itemid !== undefined
+														&& depth <= this.#max_depth) {
 													$.each(response.hierarchy[sysmapid], (i, submapid) => {
 														if (response.submaps[submapid] === undefined) {
 															return;
 														}
 
-														const submap_item = response.submaps[submapid];
-														const submap_itemid = this.#getNextId();
+														const same_consecutive_submap = response.hierarchy[sysmapid]
+															.filter((id, index) => id === submapid && index < i).length;
 
-														root.append(this.#makeTreeItem({
-															id: submap_itemid,
-															name: submap_item['name'],
-															sysmapid: submap_item['sysmapid'],
-															parent: itemid
-														}));
+														const added_submap = root.querySelectorAll(
+															`:scope>.tree-item[data-sysmapid="${submapid}"]`
+														)[same_consecutive_submap];
+
+														let submap_itemid;
+
+														if (added_submap !== undefined) {
+															submap_itemid = added_submap.dataset.id;
+														}
+														else {
+															submap_itemid = this.#getNextId();
+
+															const submap_item = response.submaps[submapid];
+
+															root.append(this.#makeTreeItem({
+																id: submap_itemid,
+																name: submap_item['name'],
+																sysmapid: submap_item['sysmapid'],
+																parent: itemid
+															}));
+														}
+
 														add_child_level(submapid, submap_itemid, depth + 1);
 													});
 
-													root.closest('.tree-item').classList.remove('closed');
-													root.closest('.tree-item').classList.add('opened', 'is-parent');
+													tree_item.classList.add('is-parent');
 												}
 											};
 
@@ -992,7 +1030,9 @@ class CWidgetNavTree extends CWidget {
 						[this.getWidgetId()]
 					);
 
-					this.broadcast({_mapid: this.#navtree[this.#navtree_item_selected].sysmapid});
+					this.broadcast({
+						[CWidgetsData.DATA_TYPE_MAP_ID]: [this.#navtree[this.#navtree_item_selected].sysmapid]
+					});
 				}
 
 				e.preventDefault();

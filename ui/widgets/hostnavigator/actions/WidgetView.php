@@ -1,21 +1,16 @@
 <?php declare(strict_types = 0);
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -34,8 +29,6 @@ use Widgets\HostNavigator\Includes\{
 };
 
 class WidgetView extends CControllerDashboardWidgetView {
-
-	private const SHOW_IN_MAINTENANCE_ON = 1;
 
 	protected function init(): void {
 		parent::init();
@@ -79,7 +72,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			return $no_data;
 		}
 
-		$is_show_in_maintenance_on = $this->fields_values['maintenance'] == self::SHOW_IN_MAINTENANCE_ON;
+		$is_show_in_maintenance_on = $this->fields_values['maintenance'] == 1;
 
 		$output = $is_show_in_maintenance_on
 			? ['hostid', 'name', 'status', 'maintenanceid', 'maintenance_status']
@@ -205,7 +198,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		$maintenanceids = [];
 
-		if ($group_by_severity || $is_show_in_maintenance_on || $tags_to_keep) {
+		if ($group_by_severity || $is_show_in_maintenance_on || $tags_to_keep || $group_by_host_groups) {
 			foreach ($hosts as &$host) {
 				if ($tags_to_keep) {
 					$host['tags'] = array_values(array_filter($host['tags'], function($tag) use ($tags_to_keep) {
@@ -233,6 +226,15 @@ class WidgetView extends CControllerDashboardWidgetView {
 						unset($host['maintenanceid']);
 					}
 					unset($host['maintenance_status'], $host['status']);
+				}
+
+				if ($group_by_host_groups && $override_hostid === '' && !$this->isTemplateDashboard()
+						&& $groupids !== null) {
+					$host['hostgroups'] = array_values(
+						array_filter($host['hostgroups'], function($group) use ($groupids) {
+							return in_array($group['groupid'], $groupids);
+						})
+					);
 				}
 			}
 			unset($host);
@@ -278,22 +280,25 @@ class WidgetView extends CControllerDashboardWidgetView {
 			}
 		}
 
-		$severity_names = [];
+		$severities = [];
 
 		if ($this->fields_values['problems'] != WidgetForm::PROBLEMS_NONE
 				|| in_array(CWidgetFieldHostGrouping::GROUP_BY_SEVERITY,
 					array_column($this->fields_values['group_by'], 'attribute')
 				)) {
-			foreach (CSeverityHelper::getSeverities() as $severity) {
-				$severity_names[$severity['value']] = $severity['label'];
+			$severities = CSeverityHelper::getSeverities();
+
+			foreach ($severities as &$severity) {
+				$severity['status_style'] = CSeverityHelper::getStatusStyle($severity['value']);
 			}
+			unset($severity);
 		}
 
 		return [
 			'group_by' => $this->fields_values['group_by'],
 			'open_groups' => $open_groups,
 			'show_problems' => $this->fields_values['problems'] != WidgetForm::PROBLEMS_NONE,
-			'severity_names' => $severity_names
+			'severities' => $severities
 		];
 	}
 }

@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "lld.h"
@@ -3449,7 +3444,7 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototy
 		if (0 != item->itemid && 0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE))
 		{
 			upd_items++;
-			if(0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_KEY))
+			if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_KEY))
 				zbx_vector_uint64_append(&upd_keys, item->itemid);
 		}
 	}
@@ -3579,8 +3574,6 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototy
 
 		sql_offset = 0;
 
-		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 		for (int i = 0; i < items->values_num; i++)
 		{
 			item = items->values[i];
@@ -3606,9 +3599,7 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototy
 			lld_item_discovery_prepare_update(item_prototype, item, &sql, &sql_alloc, &sql_offset);
 		}
 
-		zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-		if (sql_offset > 16)
-			zbx_db_execute("%s", sql);
+		(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
 	}
 out:
 	zbx_free(sql);
@@ -3686,11 +3677,6 @@ static int	lld_items_preproc_save(zbx_uint64_t hostid, zbx_vector_lld_item_full_
 		}
 
 		*host_locked = 1;
-	}
-
-	if (0 != update_preproc_num)
-	{
-		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 	}
 
 	if (0 != new_preproc_num)
@@ -3802,12 +3788,7 @@ static int	lld_items_preproc_save(zbx_uint64_t hostid, zbx_vector_lld_item_full_
 	}
 
 	if (0 != update_preproc_num)
-	{
-		zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-		if (16 < sql_offset)	/* in ORACLE always present begin..end; */
-			zbx_db_execute("%s", sql);
-	}
+		(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
 
 	if (0 != new_preproc_num)
 	{
@@ -3906,11 +3887,6 @@ static int	lld_items_param_save(zbx_uint64_t hostid, zbx_vector_lld_item_full_pt
 		*host_locked = 1;
 	}
 
-	if (0 != update_param_num)
-	{
-		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-	}
-
 	if (0 != new_param_num)
 	{
 		new_paramid = zbx_db_get_maxid_num("item_parameter", new_param_num);
@@ -3985,12 +3961,7 @@ static int	lld_items_param_save(zbx_uint64_t hostid, zbx_vector_lld_item_full_pt
 	}
 
 	if (0 != update_param_num)
-	{
-		zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-		if (16 < sql_offset)	/* in ORACLE always present begin..end; */
-			zbx_db_execute("%s", sql);
-	}
+		(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
 
 	if (0 != new_param_num)
 	{
@@ -4089,11 +4060,6 @@ static int	lld_items_tags_save(zbx_uint64_t hostid, zbx_vector_lld_item_full_ptr
 		*host_locked = 1;
 	}
 
-	if (0 != update_tag_num)
-	{
-		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-	}
-
 	if (0 != new_tag_num)
 	{
 		new_tagid = zbx_db_get_maxid_num("item_tag", new_tag_num);
@@ -4167,12 +4133,7 @@ static int	lld_items_tags_save(zbx_uint64_t hostid, zbx_vector_lld_item_full_ptr
 	}
 
 	if (0 != update_tag_num)
-	{
-		zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-		if (16 < sql_offset)	/* in ORACLE always present begin..end; */
-			zbx_db_execute("%s", sql);
-	}
+		(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
 
 	if (0 != new_tag_num)
 	{

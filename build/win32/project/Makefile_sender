@@ -28,6 +28,7 @@ ADD_RFLAGS = /d "ZABBIX_SENDER"
 
 # the main object file must be already added in master Makefile
 OBJS = \
+	..\..\..\src\libs\zbxbincommon\bincommon.o \
 	..\..\..\src\libs\zbxnum\num.o \
 	..\..\..\src\libs\zbxparam\param.o \
 	..\..\..\src\libs\zbxcrypto\endian.o \

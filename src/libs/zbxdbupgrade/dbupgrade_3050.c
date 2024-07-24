@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "dbupgrade.h"
@@ -592,7 +587,7 @@ static int	DBpatch_3050048(void)
 
 static int	DBpatch_3050049(void)
 {
-	const zbx_db_field_t	field = {"posts", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"posts", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("items", &field);
 }
@@ -627,7 +622,7 @@ static int	DBpatch_3050053(void)
 
 static int	DBpatch_3050054(void)
 {
-	const zbx_db_field_t	field = {"headers", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"headers", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("items", &field);
 }
@@ -1160,8 +1155,6 @@ static int	DBpatch_3050118(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	result = zbx_db_select(
 			"select e.eventid,t.priority"
 			" from events e"
@@ -1180,9 +1173,8 @@ static int	DBpatch_3050118(void)
 		if (SUCCEED != (ret = zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
 			goto out;
 	}
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	if (16 < sql_offset && ZBX_DB_OK > zbx_db_execute("%s", sql))
+	if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
 		ret = FAIL;
 out:
 	zbx_db_free_result(result);
@@ -1202,8 +1194,6 @@ static int	DBpatch_3050119(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	result = zbx_db_select(
 			"select p.eventid,t.priority"
 			" from problem p"
@@ -1222,9 +1212,7 @@ static int	DBpatch_3050119(void)
 			goto out;
 	}
 
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (16 < sql_offset && ZBX_DB_OK > zbx_db_execute("%s", sql))
+	if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
 		ret = FAIL;
 out:
 	zbx_db_free_result(result);
@@ -1248,8 +1236,6 @@ static int	DBpatch_3050120(void)
 
 	sql = zbx_malloc(NULL, sql_alloc);
 	zbx_hashset_create(&eventids, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = zbx_db_select("select acknowledgeid,eventid,action from acknowledges order by clock");
 	while (NULL != (row = zbx_db_fetch(result)))
@@ -1276,9 +1262,7 @@ static int	DBpatch_3050120(void)
 			goto out;
 	}
 
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (16 < sql_offset && ZBX_DB_OK > zbx_db_execute("%s", sql))
+	if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
 		ret = FAIL;
 out:
 	zbx_hashset_destroy(&eventids);
@@ -1325,8 +1309,6 @@ static int	DBpatch_3050122(void)
 	int		ret = FAIL;
 	char		*sql = NULL;
 	size_t		sql_alloc = 0, sql_offset = 0;
-
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = zbx_db_select("select functionid,parameter from functions where name='logsource'");
 
@@ -1400,13 +1382,8 @@ static int	DBpatch_3050122(void)
 			goto out;
 	}
 
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (16 < sql_offset)
-	{
-		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
-			goto out;
-	}
+	if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
+		goto out;
 
 	ret = SUCCEED;
 out:

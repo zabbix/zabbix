@@ -1,24 +1,18 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "trigger_linking.h"
-#include "zbxdbwrap.h"
 #include "trigger_dep_linking.h"
 
 #include "zbxeval.h"
@@ -26,6 +20,9 @@
 #include "audit/zbxaudit_trigger.h"
 #include "zbxnum.h"
 #include "zbx_trigger_constants.h"
+#include "zbxdb.h"
+#include "zbxdbhigh.h"
+#include "zbxstr.h"
 
 typedef struct
 {
@@ -458,7 +455,6 @@ static int	DBcopy_template_trigger_tags(const zbx_vector_uint64_t *new_triggerid
 	if (0 != update_num)
 	{
 		sql_offset = 0;
-		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 	}
 
 	if (0 != insert_num)
@@ -548,10 +544,7 @@ static int	DBcopy_template_trigger_tags(const zbx_vector_uint64_t *new_triggerid
 
 	if (0 != update_num)
 	{
-		zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-		if (16 < sql_offset)	/* in ORACLE always present begin..end; */
-			zbx_db_execute("%s", sql);
+		(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
 	}
 
 	if (0 != insert_num)
@@ -1007,7 +1000,6 @@ static int	execute_triggers_updates(zbx_hashset_t *zbx_host_triggers_main_data, 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_hashset_iter_reset(zbx_host_triggers_main_data, &iter1);
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	while (NULL != (found = (zbx_target_host_trigger_entry_t *)zbx_hashset_iter_next(&iter1)))
 	{
@@ -1185,13 +1177,9 @@ static int	execute_triggers_updates(zbx_hashset_t *zbx_host_triggers_main_data, 
 		}
 	}
 
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
+	if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
+		res = FAIL;
 
-	if (16 < sql_offset)
-	{
-		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
-			res = FAIL;
-	}
 clean:
 	zbx_free(sql);
 
@@ -1298,9 +1286,6 @@ static int	execute_triggers_inserts(zbx_vector_trigger_copies_insert_t *trigger_
 	zbx_trigger_functions_entry_t	*found, temp_t;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	zbx_db_begin_multiple_update(&sql_update_triggers_expr, &sql_update_triggers_expr_alloc,
-			&sql_update_triggers_expr_offset);
 
 	zbx_db_insert_prepare(&db_insert, "triggers", "triggerid", "description", "priority", "status", "comments",
 			"url", "url_name", "type", "value", "state", "templateid", "flags", "recovery_mode",
@@ -1457,12 +1442,9 @@ func_out:
 		res = zbx_db_insert_execute(&db_insert_funcs);
 	zbx_db_insert_clean(&db_insert_funcs);
 
-	zbx_db_end_multiple_update(&sql_update_triggers_expr, &sql_update_triggers_expr_alloc,
-			&sql_update_triggers_expr_offset);
-
-	if (SUCCEED == res && 16 < sql_update_triggers_expr_offset)	/* In ORACLE always present begin..end; */
+	if (SUCCEED == res)
 	{
-		if (ZBX_DB_OK > zbx_db_execute("%s", sql_update_triggers_expr))
+		if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql_update_triggers_expr, sql_update_triggers_expr_offset))
 			res = FAIL;
 	}
 

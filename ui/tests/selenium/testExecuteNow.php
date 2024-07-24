@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 require_once dirname(__FILE__).'/../include/CWebTest.php';
@@ -254,12 +249,13 @@ class testExecuteNow extends CWebTest {
 	public function testExecuteNow_ContextMenu($data) {
 		// Login and select host group for testing.
 		$this->page->login()->open('zabbix.php?action=latest.view')->waitUntilReady();
+		$table = $this->query('xpath://table['.CXPathHelper::fromClass('list-table fixed').']')->asTable()->waitUntilVisible()->one();
 		$filter_form = $this->query('name:zbx_filter')->asForm()->one();
 		$filter_form->fill(['Host groups' => 'HG-for-executenow']);
 		$filter_form->submit();
-		$this->page->waitUntilReady();
+		$table->waitUntilReloaded();
 
-		$this->query('link', $data['item'])->one()->click();
+		$this->query('link', $data['item'])->waitUntilClickable()->one()->click();
 		$popup = CPopupMenuElement::find()->waitUntilVisible()->one();
 
 		// Disabled "Execute now" option in context menu.
@@ -396,7 +392,7 @@ class testExecuteNow extends CWebTest {
 		$this->selectItemsAndExecuteNow($data, $table);
 	}
 
-	public static function getIemPageData() {
+	public static function getItemPageData() {
 		return [
 			// Simple items.
 			[
@@ -444,13 +440,15 @@ class testExecuteNow extends CWebTest {
 	/**
 	 * Check "Execute now" button on Item page.
 	 *
-	 * @dataProvider getIemPageData
+	 * @dataProvider getItemPageData
 	 */
 	public function testExecuteNow_ItemPage($data) {
 		$hostid = CDataHelper::get('ExecuteNowAction.hostids.Host for execute now permissions');
 		$this->page->login()->open('zabbix.php?action=item.list&filter_set=1&filter_hostids%5B0%5D='.$hostid.'&context=host')->waitUntilReady();
 		$table = $this->query('xpath://form[@name="item_list"]//table')->asTable()->one()->waitUntilPresent();
 		$this->openItemAndExecuteNow($data, $table);
+
+		COverlayDialogElement::find()->one()->close();
 	}
 
 	public static function getDiscoveryRulesListData() {

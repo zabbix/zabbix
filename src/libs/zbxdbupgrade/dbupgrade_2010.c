@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "dbupgrade.h"
@@ -22,6 +17,9 @@
 #include "zbxnum.h"
 #include "zbxparam.h"
 #include "zbxdbhigh.h"
+#include "zbxdb.h"
+#include "zbxdbschema.h"
+#include "zbxstr.h"
 #include "zbx_host_constants.h"
 #include "zbx_trigger_constants.h"
 #include "zbx_item_constants.h"
@@ -716,14 +714,14 @@ static int	DBpatch_2010073(void)
 
 static int	DBpatch_2010074(void)
 {
-	const zbx_db_field_t	field = {"variables", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"variables", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 
 	return DBrename_field("httptest", "macros", &field);
 }
 
 static int	DBpatch_2010075(void)
 {
-	const zbx_db_field_t	field = {"variables", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"variables", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("httpstep", &field);
 }
@@ -1756,42 +1754,22 @@ static int	DBpatch_2010195(void)
 
 static int	DBpatch_2010196(void)
 {
-#ifdef HAVE_ORACLE
-	const zbx_db_field_t	field = {"message_tmp", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
-
-	return DBadd_field("alerts", &field);
-#else
 	return SUCCEED;
-#endif
 }
 
 static int	DBpatch_2010197(void)
 {
-#ifdef HAVE_ORACLE
-	return ZBX_DB_OK > zbx_db_execute("update alerts set message_tmp=message") ? FAIL : SUCCEED;
-#else
 	return SUCCEED;
-#endif
 }
 
 static int	DBpatch_2010198(void)
 {
-#ifdef HAVE_ORACLE
-	return DBdrop_field("alerts", "message");
-#else
 	return SUCCEED;
-#endif
 }
 
 static int	DBpatch_2010199(void)
 {
-#ifdef HAVE_ORACLE
-	const zbx_db_field_t	field = {"message", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
-
-	return DBrename_field("alerts", "message_tmp", &field);
-#else
 	return SUCCEED;
-#endif
 }
 
 #endif

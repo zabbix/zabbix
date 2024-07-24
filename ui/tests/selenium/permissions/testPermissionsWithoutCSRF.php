@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -212,7 +207,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			// #16 Discovery rule update.
 			[
 				[
-					'db' => 'SELECT * FROM drules',
+					'db' => 'SELECT * FROM host_discovery',
 					'link' => 'host_discovery.php?form=update&itemid=99107&context=host',
 					'incorrect_request' => true
 				]
@@ -220,7 +215,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			// #17 Discovery rule create.
 			[
 				[
-					'db' => 'SELECT * FROM drules',
+					'db' => 'SELECT * FROM host_discovery',
 					'link' => 'host_discovery.php?form=create&hostid=99202&context=host',
 					'incorrect_request' => true
 				]
@@ -292,7 +287,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			// #26 Discovery create.
 			[
 				[
-					'db' => 'SELECT * FROM host_discovery',
+					'db' => 'SELECT * FROM drules',
 					'link' => 'zabbix.php?action=discovery.list',
 					'overlay' => 'create'
 				]
@@ -300,7 +295,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			// #27 Discovery update.
 			[
 				[
-					'db' => 'SELECT * FROM host_discovery',
+					'db' => 'SELECT * FROM drules',
 					'link' => 'zabbix.php?action=discovery.list',
 					'overlay' => 'update'
 				]

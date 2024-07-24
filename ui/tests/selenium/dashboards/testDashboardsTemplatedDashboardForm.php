@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -34,14 +29,13 @@ use Facebook\WebDriver\Exception\UnexpectedAlertOpenException;
  */
 class testDashboardsTemplatedDashboardForm extends CWebTest {
 
-	const UPDATE_TEMPLATEID = 50000;	// ID of the "Template ZBX6663 First" template used for template dashboards tests.
-	const HOST_FOR_TEMPLATE = 99015;	// ID of the "Empty host" host to which a template with dashboards will be linked.
-	const TEMPLATE_ITEM = 'Item ZBX6663 Second';
-	const TEMPLATE_ITEM_ID = 400400;	// ID of item "Item ZBX6663 Second" that is used to create widgets.
-	const TEMPLATE = 'Template ZBX6663 First';
 	const WIDGET_SQL = 'SELECT * FROM widget w INNER JOIN dashboard_page dp ON dp.dashboard_pageid=w.dashboard_pageid'.
 			' INNER JOIN dashboard d ON d.dashboardid=dp.dashboardid ORDER BY w.widgetid';
-
+	const TEMPLATE = 'Template for dashboard testing';
+	const TEMPLATE_ITEM = 'Templates widget item';
+	protected static $update_templateid; // ID of the "Template for dashboard testing" for template dashboards tests.
+	protected static $hostid_for_template; // ID of the "Empty host for template" to which a template with dashboards will be linked.
+	protected static $template_itemid; // ID of item "Templates widget item" that is used to create widgets.
 	protected static $dashboardid_with_widgets;
 	protected static $empty_dashboardid;
 	protected static $dashboardid_for_update;
@@ -59,12 +53,79 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 	}
 
 	/**
-	 * Function creates template dashboards and defines the corresponding dashboard IDs.
+	 * Function creates host, template, template dashboards and defines the corresponding dashboard IDs.
 	 */
 	public static function prepareTemplateDashboardsData() {
+		$hosts = CDataHelper::call('host.create', [
+			'host' => 'Empty host for template',
+			'groups' => [['groupid' => 4]] //Zabbix servers.
+		]);
+		self::$hostid_for_template = $hosts['hostids'][0];
+
+		$templates = CDataHelper::createTemplates([
+			[
+				'host' => self::TEMPLATE,
+				'groups' => ['groupid' => 1], // Templates.
+				'items' => [
+					[
+						'name' => self::TEMPLATE_ITEM,
+						'key_' => 'templ_key[1]',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_UINT64
+					]
+				],
+				'discoveryrules' => [
+					[
+						'name' => 'LLD rule for graph prototype widget',
+						'key_' => 'drule',
+						'type' => ITEM_TYPE_TRAPPER,
+						'delay' => 0
+					]
+				]
+			]
+		]);
+		self::$update_templateid = $templates['templateids']['Template for dashboard testing'];
+		self::$template_itemid = $templates['itemids']['Template for dashboard testing:templ_key[1]'];
+		$discoveryruleid =  $templates['discoveryruleids']['Template for dashboard testing:drule'];
+
+		CDataHelper::call('graph.create', [
+			[
+				'name' => 'Templated graph',
+				'gitems' => [['itemid' => self::$template_itemid, 'color' => '00AA00']]
+			]
+		]);
+
+		CDataHelper::call('trigger.create', [
+			[
+				'description' => 'Templated trigger',
+				'expression' => 'last(/'.self::TEMPLATE.'/templ_key[1])=0'
+			]
+		]);
+
+		$item_protototypes = CDataHelper::call('itemprototype.create', [
+			[
+				'hostid' => self::$update_templateid,
+				'ruleid' => $discoveryruleid,
+				'name' => 'Template item prototype {#KEY}',
+				'key_' => 'trap[{#KEY}]',
+				'type' => ITEM_TYPE_TRAPPER,
+				'value_type' => ITEM_VALUE_TYPE_UINT64,
+				'delay' => 0
+			]
+		]);
+		$item_prototypeid = $item_protototypes['itemids'][0];
+
+		$graph_protototypes = CDataHelper::call('graphprototype.create', [
+			[
+				'name' => 'Template graph prototype {#KEY}',
+				'gitems' => [['itemid' => $item_prototypeid, 'color' => '3333FF']]
+			]
+		]);
+		$graph_prototypeid = $graph_protototypes['graphids'][0];
+
 		$response = CDataHelper::call('templatedashboard.create', [
 			[
-				'templateid' => self::UPDATE_TEMPLATEID,
+				'templateid' => self::$update_templateid,
 				'name' => 'Dashboard with all widgets',
 				'pages' => [
 					[
@@ -73,47 +134,47 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'actionlog',
 								'name' => 'Action log widget',
-								'width' => 4,
+								'width' => 12,
 								'height' => 4
 							],
 							[
 								'type' => 'clock',
 								'name' => 'Clock widget',
-								'x' => 4,
+								'x' => 12,
 								'y' => 0,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4
 							],
 							[
 								'type' => 'discovery',
 								'name' => 'Discovery status widget',
-								'x' => 8,
+								'x' => 24,
 								'y' => 0,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4
 							],
 							[
 								'type' => 'favgraphs',
 								'name' => 'Favorite graphs widget',
-								'x' => 12,
+								'x' => 36,
 								'y' => 0,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4
 							],
 							[
 								'type' => 'favmaps',
 								'name' => 'Favorite maps widget',
-								'x' => 16,
+								'x' => 48,
 								'y' => 0,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4
 							],
 							[
 								'type' => 'gauge',
 								'name' => 'Gauge widget',
-								'x' => 20,
+								'x' => 60,
 								'y' => 0,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4,
 								'fields' => [
 									[
@@ -129,7 +190,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 									[
 										'type' => 4,
 										'name' => 'itemid',
-										'value' => self::TEMPLATE_ITEM_ID
+										'value' => self::$template_itemid
 									]
 								]
 							],
@@ -138,15 +199,15 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 								'name' => 'Geomap widget',
 								'x' => 0,
 								'y' => 4,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4
 							],
 							[
 								'type' => 'graph',
 								'name' => 'Graph (classic) widget',
-								'x' => 4,
+								'x' => 12,
 								'y' => 4,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4,
 								'fields' => [
 									[
@@ -157,31 +218,31 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 									[
 										'type' => 4,
 										'name' => 'itemid',
-										'value' => self::TEMPLATE_ITEM_ID
+										'value' => self::$template_itemid
 									]
 								]
 							],
 							[
 								'type' => 'graphprototype',
 								'name' => 'Graph prototype widget',
-								'x' => 8,
+								'x' => 24,
 								'y' => 4,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4,
 								'fields' => [
 									[
 										'type' => 7,
 										'name' => 'graphid',
-										'value' => 700016
+										'value' => $graph_prototypeid
 									]
 								]
 							],
 							[
 								'type' => 'svggraph',
 								'name' => 'Graph widget',
-								'x' => 12,
+								'x' => 36,
 								'y' => 4,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4,
 								'fields' => [
 									[
@@ -204,23 +265,23 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'hostavail',
 								'name' => 'Host availability widget',
-								'x' => 16,
+								'x' => 48,
 								'y' => 4,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4
 							],
 							[
 								'type' => 'item',
 								'name' => 'Item value widget',
-								'x' => 20,
+								'x' => 60,
 								'y' => 4,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4,
 								'fields' => [
 									[
 										'type' => 4,
 										'name' => 'itemid',
-										'value' => self::TEMPLATE_ITEM_ID
+										'value' => self::$template_itemid
 									],
 									[
 										'type' => 0,
@@ -244,7 +305,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 								'name' => 'Map widget',
 								'x' => 0,
 								'y' => 8,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4,
 								'fields' => [
 									[
@@ -257,9 +318,9 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'navtree',
 								'name' => 'Map navigation tree widget',
-								'x' => 4,
+								'x' => 12,
 								'y' => 8,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4,
 								'fields' => [
 									[
@@ -272,9 +333,9 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'piechart',
 								'name' => 'Pie chart widget',
-								'x' => 8,
+								'x' => 24,
 								'y' => 8,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4,
 								'fields' => [
 									['name' => 'ds.0.hosts.0', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'Test Host'],
@@ -283,34 +344,39 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 								]
 							],
 							[
-								'type' => 'plaintext',
-								'name' => 'Plain text widget',
-								'x' => 12,
+								'type' => 'itemhistory',
+								'name' => 'Item history widget',
+								'x' => 36,
 								'y' => 8,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4,
 								'fields' => [
 									[
-										'type' => 4,
-										'name' => 'itemids',
-										'value' => self::TEMPLATE_ITEM_ID
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'columns.0.name',
+										'value' => 'Column_1'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
+										'name' => 'columns.0.itemid',
+										'value' => self::$template_itemid
 									]
 								]
 							],
 							[
 								'type' => 'problemhosts',
 								'name' => 'Problem hosts widget',
-								'x' => 16,
+								'x' => 48,
 								'y' => 8,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4
 							],
 							[
 								'type' => 'problems',
 								'name' => 'Problems widget',
-								'x' => 20,
+								'x' => 60,
 								'y' => 8,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4
 							],
 							[
@@ -318,15 +384,15 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 								'name' => 'Problems by severity widget',
 								'x' => 0,
 								'y' => 12,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4
 							],
 							[
 								'type' => 'slareport',
 								'name' => 'SLA report widget',
-								'x' => 4,
+								'x' => 12,
 								'y' => 12,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4,
 								'fields' => [
 									[
@@ -344,17 +410,17 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'systeminfo',
 								'name' => 'System info details widget',
-								'x' => 8,
+								'x' => 24,
 								'y' => 12,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4
 							],
 							[
 								'type' => 'systeminfo',
 								'name' => 'System info HA nodes widget',
-								'x' => 12,
+								'x' => 36,
 								'y' => 12,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4,
 								'fields' => [
 									[
@@ -367,9 +433,9 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'tophosts',
 								'name' => 'Top hosts widget',
-								'x' => 16,
+								'x' => 48,
 								'y' => 12,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4,
 								'fields' => [
 									[
@@ -417,9 +483,9 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'toptriggers',
 								'name' => 'Top triggers widget',
-								'x' => 20,
+								'x' => 60,
 								'y' => 12,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4
 							],
 							[
@@ -427,15 +493,15 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 								'name' => 'Trigger overview widget',
 								'x' => 0,
 								'y' => 16,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4
 							],
 							[
 								'type' => 'url',
 								'name' => 'URL widget',
-								'x' => 4,
+								'x' => 12,
 								'y' => 16,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4,
 								'fields' => [
 									[
@@ -448,25 +514,40 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							[
 								'type' => 'web',
 								'name' => 'Web monitoring widget',
-								'x' => 8,
+								'x' => 24,
 								'y' => 16,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4
 							],
 							[
 								'type' => 'dataover',
 								'name' => 'Data overview widget',
-								'x' => 12,
+								'x' => 36,
 								'y' => 16,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4
+							],
+							[
+								'type' => 'honeycomb',
+								'name' => 'Honeycomb widget',
+								'x' => 48,
+								'y' => 16,
+								'width' => 12,
+								'height' => 4,
+								'fields' => [
+									[
+										'type' => 1,
+										'name' => 'items.0',
+										'value' => 'Test dashboard honeycomb'
+									]
+								]
 							]
 						]
 					]
 				]
 			],
 			[
-				'templateid' => self::UPDATE_TEMPLATEID,
+				'templateid' => self::$update_templateid,
 				'name' => 'Dashboard for widget creation',
 				'pages' => [
 					[
@@ -477,8 +558,8 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 								'name' => 'Empty navtree widget',
 								'x' => 0,
 								'y' => 0,
-								'width' => 4,
-								'height' => 2,
+								'width' => 24,
+								'height' => 8,
 								'view_mode' => 0,
 								'fields' => [
 									[
@@ -496,7 +577,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 				]
 			],
 			[
-				'templateid' => self::UPDATE_TEMPLATEID,
+				'templateid' => self::$update_templateid,
 				'name' => 'Dashboard for widget update',
 				'pages' => [
 					[
@@ -506,15 +587,15 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 								'name' => 'Widget for update',
 								'x' => 0,
 								'y' => 0,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4
 							],
 							[
 								'type' => 'clock',
 								'name' => 'Widget 4 duplicate check',
-								'x' => 4,
+								'x' => 12,
 								'y' => 0,
-								'width' => 4,
+								'width' => 12,
 								'height' => 4
 							],
 							[
@@ -522,7 +603,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 								'name' => 'Empty navtree widget',
 								'x' => 0,
 								'y' => 4,
-								'width' => 4,
+								'width' => 12,
 								'height' => 2,
 								'view_mode' => 0,
 								'fields' => [
@@ -549,17 +630,17 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 	 */
 	public static function prepareHostLinkageToTemplateData() {
 		CDataHelper::call('host.update', [
-			'hostid' => self::HOST_FOR_TEMPLATE,
+			'hostid' => self::$hostid_for_template,
 			'templates' => [
 				[
-					'templateid' => self::UPDATE_TEMPLATEID
+					'templateid' => self::$update_templateid
 				]
 			]
 		]);
 	}
 
 	public function testDashboardsTemplatedDashboardForm_Layout() {
-		$this->page->login()->open('zabbix.php?action=template.dashboard.list&templateid='.self::UPDATE_TEMPLATEID);
+		$this->page->login()->open('zabbix.php?action=template.dashboard.list&templateid='.self::$update_templateid);
 		$this->query('button:Create dashboard')->one()->click();
 		$this->checkDialogue('Dashboard properties');
 		// TODO: added updateViewport due to unstable test on Jenkins, scroll appears for 0.5 seconds
@@ -1001,7 +1082,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 								[
 									'field_locator' => 'xpath:.//label[text()="Units"]/../following-sibling::div[1]/input',
 									'attributes' => [
-										'maxlength' => 2048
+										'maxlength' => 255
 									]
 								],
 								[
@@ -1031,7 +1112,6 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 									],
 									'value' => 'After value'
 								],
-
 								[
 									'field' => 'Colour',
 									'field_locator' => 'id:lbl_units_color',
@@ -1645,22 +1725,24 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					]
 				]
 			],
-			// #13 Plain text widget.
+			// #13 Item history widget.
 			[
 				[
-					'type' => CFormElement::RELOADABLE_FILL('Plain text'),
+					'type' => CFormElement::RELOADABLE_FILL('Item history'),
 					'refresh_interval' => 'Default (1 minute)',
 					'fields' => [
 						[
-							'field' => 'Items',
-							'type' => 'multiselect',
-							'mandatory' => true
+							'field' => 'Layout',
+							'type' => 'radio_button',
+							'possible_values' => ['Horizontal', 'Vertical'],
+							'value' => 'Horizontal'
 						],
 						[
-							'field' => 'Items location',
-							'type' => 'radio_button',
-							'possible_values' => ['Left', 'Top'],
-							'value' => 'Left'
+							'field' => 'Columns',
+							'type' => 'table',
+							'headers' => ['', 'Name', 'Data', 'Action'],
+							'buttons' => ['Add'],
+							'mandatory' => true
 						],
 						[
 							'field' => 'Show lines',
@@ -1669,12 +1751,29 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 								'maxlength' => 3
 							],
 							'mandatory' => true
+						]
+					],
+					'hidden' => [
+						[
+							'field' => 'New values',
+							'type' => 'radio_button',
+							'possible_values' => ['Top', 'Bottom'],
+							'value' => 'Top'
 						],
 						[
-							'field' => 'Show text as HTML',
+							'field' => 'Show timestamp',
 							'type' => 'checkbox',
 							'value' => false
+						],
+						[
+							'field' => 'Show column header',
+							'type' => 'radio_button',
+							'possible_values' => ['Off', 'Horizontal', 'Vertical'],
+							'value' => 'Vertical'
 						]
+					],
+					'fill_for_hidden' => [
+						'Advanced configuration' => true
 					]
 				]
 			],
@@ -2108,9 +2207,9 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 	 * @dataProvider getWidgetDefaultLayoutData
 	 */
 	public function testDashboardsTemplatedDashboardForm_WidgetDefaultLayout($data) {
-		$this->page->login()->open('zabbix.php?action=template.dashboard.list&templateid='.self::UPDATE_TEMPLATEID);
+		$this->page->login()->open('zabbix.php?action=template.dashboard.list&templateid='.self::$update_templateid);
 		$this->query('button:Create dashboard')->one()->click();
-		COverlayDialogElement::find()->one()->waitUntilVisible()->close();
+		COverlayDialogElement::find()->one()->waitUntilReady()->close();
 
 		// Select the required type of widget.
 		$this->query('button:Add')->one()->waitUntilClickable()->click();
@@ -2478,7 +2577,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 	 * @dataProvider getDashboardPropertiesData
 	 */
 	public function testDashboardsTemplatedDashboardForm_DashboardPropertiesCreate($data) {
-		$this->page->login()->open('zabbix.php?action=template.dashboard.list&templateid='.self::UPDATE_TEMPLATEID);
+		$this->page->login()->open('zabbix.php?action=template.dashboard.list&templateid='.self::$update_templateid);
 		$this->query('button:Create dashboard')->one()->click();
 		$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 
@@ -3169,11 +3268,11 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 						'Type' => CFormElement::RELOADABLE_FILL('Graph (classic)'),
 						'Name' => 'Graph widget with graph and legend',
 						'Source' => 'Graph',
-						'Graph' => 'Graph ZBX6663 Second',
+						'Graph' => 'Templated graph',
 						'Show legend' => true
 					],
 					'swap_expected' => [
-						'Graph' => self::TEMPLATE.': '.'Graph ZBX6663 Second'
+						'Graph' => self::TEMPLATE.': '.'Templated graph'
 					]
 				]
 			],
@@ -3215,16 +3314,16 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 						'Type' => CFormElement::RELOADABLE_FILL('Graph prototype'),
 						'Name' => 'Graph prototype widget with empty graph',
 						'Source' => 'Graph prototype',
-						'Graph prototype' => 'GraphPrototype ZBX6663 Second',
+						'Graph prototype' => 'Template graph prototype {#KEY}',
 						'Columns' => '',
 						'Rows' => ''
 					],
 					'swap_expected' => [
-						'Graph prototype' => self::TEMPLATE.': '.'GraphPrototype ZBX6663 Second'
+						'Graph prototype' => self::TEMPLATE.': '.'Template graph prototype {#KEY}'
 					],
 					'error_message' => [
-						'Invalid parameter "Columns": value must be one of 1-24.',
-						'Invalid parameter "Rows": value must be one of 1-16.'
+						'Invalid parameter "Columns": value must be one of 1-72.',
+						'Invalid parameter "Rows": value must be one of 1-64.'
 					]
 				]
 			],
@@ -3249,16 +3348,16 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 						'Type' => CFormElement::RELOADABLE_FILL('Graph prototype'),
 						'Name' => 'Graph prototype widget with too much Columns',
 						'Source' => 'Graph prototype',
-						'Graph prototype' => 'GraphPrototype ZBX6663 Second',
-						'Columns' => 55,
-						'Rows' => 55
+						'Graph prototype' => 'Template graph prototype {#KEY}',
+						'Columns' => 73,
+						'Rows' => 65
 					],
 					'swap_expected' => [
-						'Graph prototype' => self::TEMPLATE.': '.'GraphPrototype ZBX6663 Second'
+						'Graph prototype' => self::TEMPLATE.': '.'Template graph prototype {#KEY}'
 					],
 					'error_message' => [
-						'Invalid parameter "Columns": value must be one of 1-24.',
-						'Invalid parameter "Rows": value must be one of 1-16.'
+						'Invalid parameter "Columns": value must be one of 1-72.',
+						'Invalid parameter "Rows": value must be one of 1-64.'
 					]
 				]
 			],
@@ -3270,16 +3369,16 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 						'Type' => CFormElement::RELOADABLE_FILL('Graph prototype'),
 						'Name' => 'Graph prototype widget with too much Columns',
 						'Source' => 'Graph prototype',
-						'Graph prototype' => 'GraphPrototype ZBX6663 Second',
+						'Graph prototype' => 'Template graph prototype {#KEY}',
 						'Columns' => '-5',
 						'Rows' => '-5'
 					],
 					'swap_expected' => [
-						'Graph prototype' => self::TEMPLATE.': '.'GraphPrototype ZBX6663 Second'
+						'Graph prototype' => self::TEMPLATE.': '.'Template graph prototype {#KEY}'
 					],
 					'error_message' => [
-						'Invalid parameter "Columns": value must be one of 1-24.',
-						'Invalid parameter "Rows": value must be one of 1-16.'
+						'Invalid parameter "Columns": value must be one of 1-72.',
+						'Invalid parameter "Rows": value must be one of 1-64.'
 					]
 				]
 			],
@@ -3290,13 +3389,13 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 						'Type' => CFormElement::RELOADABLE_FILL('Graph prototype'),
 						'Name' => 'Graph prototype widget legend',
 						'Source' => 'Graph prototype',
-						'Graph prototype' => 'GraphPrototype ZBX6663 Second',
+						'Graph prototype' => 'Template graph prototype {#KEY}',
 						'Show legend' => true,
 						'Columns' => 2,
 						'Rows' => 2
 					],
 					'swap_expected' => [
-						'Graph prototype' => self::TEMPLATE.': '.'GraphPrototype ZBX6663 Second'
+						'Graph prototype' => self::TEMPLATE.': '.'Template graph prototype {#KEY}'
 					]
 				]
 			],
@@ -3307,13 +3406,13 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 						'Type' => CFormElement::RELOADABLE_FILL('Graph prototype'),
 						'Name' => 'Simple Graph prototype without legend',
 						'Source' => 'Simple graph prototype',
-						'Item prototype' => 'ItemProto ZBX6663 Second',
+						'Item prototype' => 'Template item prototype {#KEY}',
 						'Show legend' => false,
 						'Columns' => 1,
 						'Rows' => 1
 					],
 					'swap_expected' => [
-						'Item prototype' => self::TEMPLATE.': '.'ItemProto ZBX6663 Second'
+						'Item prototype' => self::TEMPLATE.': '.'Template item prototype {#KEY}'
 					]
 				]
 			],
@@ -3592,83 +3691,96 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					]
 				]
 			],
-			// #56 Plain text widget with empty Items parameter.
+			// #56 Item history widget with empty Items parameter.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Type' => CFormElement::RELOADABLE_FILL('Plain text'),
-						'Name' => 'Plain text widget with empty Items',
-						'Items' => '',
+						'Type' => CFormElement::RELOADABLE_FILL('Item history'),
+						'Name' => 'Item history widget with empty Items',
 						'Show lines' => ''
 					],
 					'error_message' => [
-						'Invalid parameter "Items": cannot be empty.',
+						'Invalid parameter "Columns": cannot be empty.',
 						'Invalid parameter "Show lines": value must be one of 1-100.'
 					]
 				]
 			],
-			// #57 Plain text widget with too high value of Show lines parameter.
+			// #57 Item history widget with too high value of Show lines parameter.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Type' => CFormElement::RELOADABLE_FILL('Plain text'),
-						'Name' => 'Plain text widget with too much lines',
-						'Items' => self::TEMPLATE_ITEM,
+						'Type' => CFormElement::RELOADABLE_FILL('Item history'),
+						'Name' => 'Item history widget with too much lines',
 						'Show lines' => 999
 					],
-					'swap_expected' => [
-						'Items' => self::TEMPLATE.': '.self::TEMPLATE_ITEM
+					'Column' => [
+						'Name' => 'Column1',
+						'Item' => [
+							'values' => self::TEMPLATE_ITEM,
+							'context' => ['values' => self::TEMPLATE]
+						]
 					],
 					'error_message' => 'Invalid parameter "Show lines": value must be one of 1-100.'
 				]
 			],
-			// #58 Plain text widget with negative Show lines parameter.
+			// #58 Item history widget with negative Show lines parameter.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Type' => CFormElement::RELOADABLE_FILL('Plain text'),
-						'Name' => 'Plain text widget with negative Show lines',
-						'Items' => self::TEMPLATE_ITEM,
-						'Show lines' => -9
+						'Type' => CFormElement::RELOADABLE_FILL('Item history'),
+						'Name' => 'Item history widget with too much lines',
+						'Show lines' => -99
 					],
-					'swap_expected' => [
-						'Items' => self::TEMPLATE.': '.self::TEMPLATE_ITEM
+					'Column' => [
+						'Name' => 'Column1',
+						'Item' => [
+							'values' => self::TEMPLATE_ITEM,
+							'context' => ['values' => self::TEMPLATE]
+						]
 					],
 					'error_message' => 'Invalid parameter "Show lines": value must be one of 1-100.'
 				]
 			],
-			// #59 Plain text widget with Items location = top and text shown as HTML.
+			// #59 Item history widget with Values location = Bottom, Show timestamp =true and Column header = Off.
 			[
 				[
 					'fields' => [
-						'Type' => CFormElement::RELOADABLE_FILL('Plain text'),
-						'Name' => 'Plain text widget top location HTML',
-						'Items' => self::TEMPLATE_ITEM,
+						'Type' => CFormElement::RELOADABLE_FILL('Item history'),
+						'Name' => 'Item history widget top location HTML',
 						'Show lines' => 9,
-						'Items location' => 'Top',
-						'Show text as HTML' => true
+						'Advanced configuration' => true,
+						'New values' => 'Bottom',
+						'Show timestamp' => true,
+						'Show column header' => 'Off'
 					],
-					'swap_expected' => [
-						'Items' => self::TEMPLATE.': '.self::TEMPLATE_ITEM
+					'Column' => [
+						'Name' => 'Column1',
+						'Item' => [
+							'values' => self::TEMPLATE_ITEM,
+							'context' => ['values' => self::TEMPLATE]
+						]
 					]
 				]
 			],
-			// #60 Plain text widget with Items location = left and text shown as plain text.
+			// #60 Item history widget with Vertical layout and Horizontal header.
 			[
 				[
 					'fields' => [
-						'Type' => CFormElement::RELOADABLE_FILL('Plain text'),
-						'Name' => 'Plain text widget left location no HTML',
-						'Items' => self::TEMPLATE_ITEM,
-						'Show lines' => 9,
-						'Items location' => 'Left',
-						'Show text as HTML' => false
+						'Type' => CFormElement::RELOADABLE_FILL('Item history'),
+						'Name' => 'Item history widget left location no HTML',
+						'Layout' => 'Vertical',
+						'Show lines' => 100,
+						'Advanced configuration' => true,
+						'Show column header' => 'Horizontal'
 					],
-					'swap_expected' => [
-						'Items' => self::TEMPLATE.': '.self::TEMPLATE_ITEM
+					'Column' => [
+						'Item' => [
+							'values' => self::TEMPLATE_ITEM,
+							'context' => ['values' => self::TEMPLATE]
+						]
 					]
 				]
 			],
@@ -3812,6 +3924,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 						'Type' => CFormElement::RELOADABLE_FILL('SLA report'),
 						'Name' => 'SLA report widget with missing SLA'
 					],
+					'page' => '2nd page',
 					'error_message' => 'Invalid parameter "SLA": cannot be empty.'
 				]
 			],
@@ -3828,6 +3941,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'swap_expected' => [
 						'Show periods' => 0
 					],
+					'page' => '2nd page',
 					'error_message' => 'Invalid parameter "Show periods": value must be one of 1-100.'
 				]
 			],
@@ -3841,6 +3955,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 						'SLA' => 'SLA Daily',
 						'Show periods' => '101'
 					],
+					'page' => '2nd page',
 					'error_message' => 'Invalid parameter "Show periods": value must be one of 1-100.'
 				]
 			],
@@ -3857,6 +3972,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'swap_expected' => [
 						'Show periods' => 0
 					],
+					'page' => '2nd page',
 					'error_message' => 'Invalid parameter "Show periods": value must be one of 1-100.'
 				]
 			],
@@ -3870,6 +3986,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 						'SLA' => 'SLA Daily',
 						'Show periods' => '-5'
 					],
+					'page' => '2nd page',
 					'error_message' => 'Invalid parameter "Show periods": value must be one of 1-100.'
 				]
 			],
@@ -3884,6 +4001,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 						'From' => 'yesterday',
 						'To' => 'today + 1 day'
 					],
+					'page' => '2nd page',
 					'error_message' => [
 						'Invalid parameter "From": a date is expected.',
 						'Invalid parameter "To": a date is expected.'
@@ -3901,6 +4019,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 						'From' => '2022/01/01',
 						'To' => '2022/02/01'
 					],
+					'page' => '2nd page',
 					'error_message' => [
 						'Invalid parameter "From": a date is expected.',
 						'Invalid parameter "To": a date is expected.'
@@ -3918,6 +4037,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 						'From' => '1968-01-01',
 						'To' => '1969-10-10'
 					],
+					'page' => '2nd page',
 					'error_message' => [
 						'Invalid parameter "From": a date is expected.',
 						'Invalid parameter "To": a date is expected.'
@@ -3935,6 +4055,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 						'From' => '2040-01-01',
 						'To' => '2050-10-10'
 					],
+					'page' => '2nd page',
 					'error_message' => [
 						'Invalid parameter "From": a date is expected.',
 						'Invalid parameter "To": a date is expected.'
@@ -4252,7 +4373,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 		CDashboardElement::find()->one()->getWidget(self::$previous_widget_name)->edit();
 
 		// Update widget configuration and save filled in data for further validation.
-		$filled_data = $this->fillWidgetConfigurationFrom($data);
+		$filled_data = $this->fillWidgetConfigurationFrom($data, true);
 
 		// For some fields default values or context should be added to the reference array before comparison.
 		if (array_key_exists('swap_expected', $data)) {
@@ -4271,10 +4392,32 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 	 *
 	 * @return array
 	 */
-	protected function fillWidgetConfigurationFrom($data) {
+	protected function fillWidgetConfigurationFrom($data, $update = false) {
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 		$form = $dialog->asForm();
 		$form->fill($data['fields']);
+
+		if (array_key_exists('Column', $data)) {
+			if ($update) {
+				$button_remove = $form->query('button:Remove');
+				$remove_count = $button_remove->count();
+
+				for ($i = 0; $i < $remove_count; $i++) {
+					$button_remove->waitUntilClickable()->one()->click();
+					$form->waitUntilReloaded();
+				}
+			}
+
+			$form->getFieldContainer('Columns')->query('button:Add')->one()->waitUntilClickable()->click();
+			$column_overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+			$column_overlay->asForm()->fill($data['Column']);
+			$column_overlay->getFooter()->query('button:Add')->waitUntilClickable()->one()->click();
+			$column_overlay->waitUntilNotVisible();
+			$form->waitUntilReloaded();
+
+			// Open Advanced config again because after column filling it becomes collapsed.
+			$form->fill(['Advanced configuration' => true]);
+		}
 
 		// Some field changes, like changing the type of map widget, result in dialog reload, so need to wait until it's done.
 		if (CTestArrayHelper::get($data, 'form_reload')) {
@@ -4322,7 +4465,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 	 * @onBefore prepareHostLinkageToTemplateData
 	 */
 	public function testDashboardsTemplatedDashboardForm_ViewDashboardOnHost() {
-		$this->page->login()->open('zabbix.php?action=host.dashboard.view&hostid='.self::HOST_FOR_TEMPLATE);
+		$this->page->login()->open('zabbix.php?action=host.dashboard.view&hostid='.self::$hostid_for_template);
 		$this->query('xpath://span[text()="Dashboard with all widgets"]')->one()->waitUntilVisible()->click();
 		$this->page->waitUntilReady();
 
@@ -4394,10 +4537,10 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 		}
 		else {
 			$all_types = ['Action log', 'Clock', 'Discovery status', 'Favorite graphs', 'Favorite maps', 'Gauge', 'Geomap',
-				'Graph', 'Graph (classic)', 'Graph prototype', 'Honeycomb', 'Host availability', 'Host navigator',
-				'Item value', 'Map', 'Map navigation tree', 'Pie chart', 'Plain text', 'Problem hosts', 'Problems',
-				'Problems by severity', 'SLA report', 'System information', 'Top hosts', 'Top triggers', 'Trigger overview',
-				'URL', 'Web monitoring', 'Data overview'
+				'Graph', 'Graph (classic)', 'Graph prototype', 'Honeycomb', 'Host availability', 'Host navigator', 'Item history',
+				'Item navigator', 'Item value', 'Map', 'Map navigation tree', 'Pie chart', 'Problem hosts',
+				'Problems', 'Problems by severity', 'SLA report', 'System information', 'Top hosts', 'Top triggers',
+				'Trigger overview', 'URL', 'Web monitoring', 'Data overview'
 			];
 			$this->assertEquals($all_types, $form->getField('Type')->getOptions()->asText());
 		}
@@ -4517,12 +4660,23 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 
 			if (array_key_exists('Advanced configuration', $reference_data)) {
 				$reopened_form->fill(['Advanced configuration' => true]);
+				$this->assertTrue($reopened_form->query('xpath:.//button[@title="Collapse"]')->one()->isVisible());
 			}
 
 			$this->assertEquals($created_values, $reopened_form->getFields()->filter(new CElementFilter(CElementFilter::VISIBLE))
 					->asValues()
 			);
 			$reopened_form->checkValue($reference_data);
+
+			// Check saved column and item name.
+			if (array_key_exists('Column', $data)) {
+				$row = $reopened_form->query('id:list_columns')->asTable()->one()->getRow(0);
+				$this->assertEquals(CTestArrayHelper::get($data['Column'], 'Name',
+						$data['Column']['Item']['context']['values'].': '.$data['Column']['Item']['values']),
+						$row->getColumn('Name')->getText()
+				);
+				$this->assertEquals(self::TEMPLATE_ITEM, $row->getColumn('Data')->getText());
+			}
 
 			$this->closeDialogue();
 		}

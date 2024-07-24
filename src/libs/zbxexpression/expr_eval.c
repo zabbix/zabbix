@@ -1,21 +1,16 @@
 /*
- ** Zabbix
- ** Copyright (C) 2001-2024 Zabbix SIA
- **
- ** This program is free software; you can redistribute it and/or modify
- ** it under the terms of the GNU General Public License as published by
- ** the Free Software Foundation; either version 2 of the License, or
- ** (at your option) any later version.
- **
- ** This program is distributed in the hope that it will be useful,
- ** but WITHOUT ANY WARRANTY; without even the implied warranty of
- ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- ** GNU General Public License for more details.
- **
- ** You should have received a copy of the GNU General Public License
- ** along with this program; if not, write to the Free Software
- ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- **/
+** Copyright (C) 2001-2024 Zabbix SIA
+**
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
+**
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
+**
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
+**/
 
 #include "zbxexpression.h"
 #include "datafunc.h"
@@ -30,6 +25,14 @@
 #include "zbx_host_constants.h"
 #include "zbx_item_constants.h"
 #include "zbxtime.h"
+#include "zbxvariant.h"
+#include "zbxstr.h"
+#include "zbxhistory.h"
+#include "zbxexpr.h"
+#include "zbxdbhigh.h"
+#include "zbxdb.h"
+#include "zbxcacheconfig.h"
+#include "zbxalgo.h"
 
 #define ZBX_ITEM_QUERY_UNSET		0x0000
 
@@ -881,6 +884,27 @@ static void	expression_cache_dcitems(zbx_expression_eval_t *eval)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: check if function is to be evaluated for NOTSUPPORTED items.      *
+ *                                                                            *
+ * Parameters: fn - [IN] function name                                        *
+ *                                                                            *
+ * Return value: SUCCEED - do evaluate the function for NOTSUPPORTED items    *
+ *               FAIL - don't evaluate the function for NOTSUPPORTED items    *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_evaluatable_for_notsupported(const char *fn)
+{
+	/* function nodata() are exceptions,                   */
+	/* and should be evaluated for NOTSUPPORTED items, too */
+
+	if (0 == strcmp(fn, "nodata"))
+		return SUCCEED;
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: evaluate historical function for one item query.                  *
  *                                                                            *
  * Parameters: eval     - [IN] evaluation data                                *
@@ -963,7 +987,7 @@ static int	expression_eval_one(zbx_expression_eval_t *eval, zbx_expression_query
 
 	if (0 == args_num)
 	{
-		ret = evaluate_function(value, &evaluate_item, func_name, "", ts, error);
+		ret = zbx_evaluate_function(value, &evaluate_item, func_name, "", ts, error);
 		goto out;
 	}
 
@@ -995,7 +1019,7 @@ static int	expression_eval_one(zbx_expression_eval_t *eval, zbx_expression_query
 		}
 	}
 
-	ret = evaluate_function(value, &evaluate_item, func_name, ZBX_NULL2EMPTY_STR(params), ts, error);
+	ret = zbx_evaluate_function(value, &evaluate_item, func_name, ZBX_NULL2EMPTY_STR(params), ts, error);
 out:
 	zbx_free(params);
 

@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -38,8 +33,7 @@ class makeSqlTest extends CTest {
 					'sortfield' => ['host', 'name'],
 					'sortorder' => [ZBX_SORT_DOWN, ZBX_SORT_UP]
 				],
-				'SELECT h.hostid,h.host,h.name FROM hosts h WHERE h.hostid IN (9998,9999,10000,10001,10002,10003) AND h.maintenanceid=1 ORDER BY h.host DESC,h.name',
-				'SELECT h.hostid,h.host,h.name FROM hosts h WHERE h.hostid BETWEEN 9998 AND 10003 AND h.maintenanceid=1 ORDER BY h.host DESC,h.name'
+				'SELECT h.hostid,h.host,h.name FROM hosts h WHERE h.hostid IN (9998,9999,10000,10001,10002,10003) AND h.maintenanceid=1 ORDER BY h.host DESC,h.name'
 			],
 			[
 				'hosts', null,
@@ -52,7 +46,6 @@ class makeSqlTest extends CTest {
 					'sortfield' => ['host', 'name'],
 					'sortorder' => [ZBX_SORT_DOWN, ZBX_SORT_UP]
 				],
-				'SELECT hostid,host,name FROM hosts WHERE hostid IN (10001,10002,10003) AND maintenanceid=1 ORDER BY host DESC,name',
 				'SELECT hostid,host,name FROM hosts WHERE hostid IN (10001,10002,10003) AND maintenanceid=1 ORDER BY host DESC,name'
 			],
 			[
@@ -61,7 +54,6 @@ class makeSqlTest extends CTest {
 					'countOutput' => true,
 					'hostids' => [10001]
 				],
-				'SELECT COUNT(h.*) AS rowscount FROM hosts h WHERE h.hostid=10001',
 				'SELECT COUNT(h.*) AS rowscount FROM hosts h WHERE h.hostid=10001'
 			],
 			[
@@ -70,7 +62,6 @@ class makeSqlTest extends CTest {
 					'countOutput' => true,
 					'hostids' => [10001, 10002, 10003]
 				],
-				'SELECT COUNT(*) AS rowscount FROM hosts WHERE hostid IN (10001,10002,10003)',
 				'SELECT COUNT(*) AS rowscount FROM hosts WHERE hostid IN (10001,10002,10003)'
 			],
 			[
@@ -82,7 +73,6 @@ class makeSqlTest extends CTest {
 						'roleid' => [3, 4]
 					]
 				],
-				'SELECT userid FROM users WHERE userid=2 AND roleid IN (3,4)',
 				'SELECT userid FROM users WHERE userid=2 AND roleid IN (3,4)'
 			]
 		];
@@ -94,14 +84,11 @@ class makeSqlTest extends CTest {
 	 * @param string $table_name
 	 * @param string $table_alias
 	 * @param array  $options
-	 * @param string $expected_non_oracle
-	 * @param string $expected_oracle
+	 * @param string $expected
 	 */
-	public function test($table_name, $table_alias, $options, $expected_non_oracle, $expected_oracle) {
-		global $DB;
-
+	public function test($table_name, $table_alias, $options, $expected) {
 		$sql = DB::makeSql($table_name, $options, $table_alias);
 
-		$this->assertEquals($DB['TYPE'] == ZBX_DB_ORACLE ? $expected_oracle : $expected_non_oracle, $sql);
+		$this->assertEquals($expected, $sql);
 	}
 }

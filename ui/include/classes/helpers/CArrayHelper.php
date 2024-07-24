@@ -1,21 +1,16 @@
 <?php
 /*
- ** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -51,7 +46,6 @@ class CArrayHelper {
 	 * Get from array only values with given keys.
 	 * If requested key is not in given array exception is thrown.
 	 *
-	 * @static
 	 * @throws InvalidArgumentException
 	 *
 	 * @param array $array
@@ -75,8 +69,6 @@ class CArrayHelper {
 	 * Get values with the $keys from $array.
 	 * If the requested key is not in the given array it is skipped.
 	 *
-	 * @static
-	 *
 	 * @param array $array
 	 * @param array $keys
 	 *
@@ -95,8 +87,6 @@ class CArrayHelper {
 
 	/**
 	 * Select sub-array of array items with keys in given numeric range.
-	 *
-	 * @static
 	 *
 	 * @param array $array    Array with numeric keys to test for given range.
 	 * @param int   $start    Range start value.
@@ -157,8 +147,6 @@ class CArrayHelper {
 	/**
 	 * Sort array by multiple fields.
 	 *
-	 * @static
-	 *
 	 * @param array $array  array to sort passed by reference
 	 * @param array $fields fields to sort, can be either string with field name or array with 'field' and 'order' keys
 	 */
@@ -176,7 +164,6 @@ class CArrayHelper {
 	 * Method to be used as callback for uasort function in sort method.
 	 *
 	 * @TODO: with PHP 5.3+ this should be changed to closure
-	 * @static
 	 *
 	 * @param $a
 	 * @param $b

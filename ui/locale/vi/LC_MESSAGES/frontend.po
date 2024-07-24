@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2023-09-22 06:40+0000\n"
-"Last-Translator: diana.dauksa <diana.dauksa@zabbix.com>\n"
+"PO-Revision-Date: 2024-06-28 08:42+0000\n"
+"Last-Translator: dungta28888.ansv <dungta28888.ansv@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: vi\n"
 "MIME-Version: 1.0\n"
@@ -19,14 +19,14 @@ msgstr ""
 #: app/controllers/CControllerSlaReportList.php:182
 #, c-format
 msgid "\"%1$s\" date must be less than \"%2$s\" date."
-msgstr ""
+msgstr "Ngày \"%1$s\" phải trước ngày \"%2$s\"."
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:142
 #: include/classes/db/PostgresqlDbBackend.php:96
 #, c-format
 msgid "\"%1$s\" instead \"%2$s\""
-msgstr ""
+msgstr "\"%1$s\" thay vì \"%2$s\""
 
 #: include/classes/import/validators/C10XmlValidator.php:322
 #: include/classes/import/validators/C10XmlValidator.php:340
@@ -44,13 +44,13 @@ msgstr ""
 #: include/classes/import/validators/C62XmlValidator.php:2054
 #, c-format
 msgid "\"%1$s\" is expected"
-msgstr "\"%1$s\" được dự đoán trước"
+msgstr "\"%1$s\" được mong đợi"
 
 #: include/classes/api/services/CReport.php:220
 #: include/classes/api/services/CReport.php:615
 #, c-format
 msgid "\"%1$s\" must be an empty string or greater than \"%2$s\"."
-msgstr ""
+msgstr "\"%1$s\" phải là một chuỗi rỗng hoặc dài hơn \"%2$s\"."
 
 #: include/classes/import/validators/C10XmlValidator.php:359
 #: include/classes/import/validators/C10XmlValidator.php:382
@@ -85,7 +85,12 @@ msgstr "%1$d khớp với %2$s được tìm thấy"
 #: widgets/hostnavigator/Widget.php:39
 #, c-format
 msgid "%1$d of %1$d+ hosts are shown"
-msgstr ""
+msgstr "%1$d trong tổng số %1$d+ máy chủ được hiển thị."
+
+#: widgets/itemnavigator/Widget.php:39
+#, c-format
+msgid "%1$d of %1$d+ items are shown"
+msgstr "%1$d trong tổng số %1$d+ mục được hiển thị."
 
 #: widgets/problems/actions/WidgetView.php:78
 #, c-format
@@ -96,7 +101,7 @@ msgstr[0] "Vấn đề %1$d của %3$d%2$s được hiển thị"
 #: app/controllers/CControllerPopupAcknowledgeEdit.php:132
 #, c-format
 msgid "%1$d problems selected."
-msgstr ""
+msgstr "%1$d vấn đề đã lựa chọn."
 
 #: chart4.php:95
 #, c-format
@@ -106,7 +111,7 @@ msgstr "%1$s (năm %2$s)"
 #: include/classes/core/CModuleManager.php:159
 #, c-format
 msgid "%1$s - thrown by module located at %2$s."
-msgstr ""
+msgstr "%1$s - phát bởi mô đun nằm ở %2$s."
 
 #: include/classes/import/readers/CXmlImportReader.php:52
 #: include/classes/validators/CApiInputValidator.php:4025
@@ -124,12 +129,12 @@ msgstr[0] "%1$s hoạt động "
 #: jsLoader.php:321
 #, c-format
 msgid "%1$s characters"
-msgstr ""
+msgstr "%1$s ký tự"
 
 #: jsLoader.php:322
 #, c-format
 msgid "%1$s characters remaining"
-msgstr ""
+msgstr "%1$s ký tự còn lại"
 
 #: app/views/popup.acknowledge.edit.php:60
 #: app/views/popup.acknowledge.edit.php:65
@@ -141,7 +146,7 @@ msgstr[0] "%1$s Sự kiện "
 #: app/views/popup.usergroupmapping.edit.php:87
 #, c-format
 msgid "%1$s group pattern"
-msgstr ""
+msgstr "%1$s nhóm mẫu"
 
 #: include/maps.inc.php:416
 #, c-format
@@ -188,12 +193,12 @@ msgstr[0] "Trạng thái phần tử %1$s của %2$s gặp vấn đề"
 #: app/views/administration.miscconfig.edit.php:127
 #, c-format
 msgid "%1$s or %2$s - allows the page to be displayed only in a frame on the same origin as the page itself"
-msgstr ""
+msgstr "%1$s hoặc %2$s - cho phép hiển thị trang trong một khung ở tại cùng vị trí như trang gốc"
 
 #: app/views/administration.miscconfig.edit.php:130
 #, c-format
 msgid "%1$s or %2$s - prevents the page from being displayed in a frame, regardless of the site attempting to do so"
-msgstr ""
+msgstr "%1$s hoặc %2$s - đã ngăn cản việc hiển thị đầy đủ trang web trong frame, mặc dù máy chủ web đã cố gắng thực thi."
 
 #: jsLoader.php:341
 #, c-format
@@ -259,22 +264,22 @@ msgstr "%1$s, chọn"
 #: app/controllers/CControllerMediatypeEnable.php:86
 #, c-format
 msgid "%1$s. %2$s: %3$s. %4$s."
-msgstr ""
+msgstr "%1$s. %2$s: %3$s. %4$s."
 
 #: include/classes/core/CModuleManager.php:153
 #, c-format
 msgid "%1$s.php class must extend %2$s for module located at %3$s."
-msgstr ""
+msgstr "Class %1$s.php phải mở rộng module %2$s nằm tại vị trí %3$s."
 
 #: app/controllers/CControllerMediatypeEnable.php:105
 #, c-format
 msgid "%1$s: %2$s"
-msgstr ""
+msgstr "%1$s: %2$s"
 
 #: include/classes/graph/CSvgGraph.php:1418
 #, c-format
 msgid "%1$sth percentile: %2$s"
-msgstr ""
+msgstr "Phân vị %1$sth: %2$s"
 
 #: include/func.inc.php:2050
 #, c-format
@@ -311,20 +316,20 @@ msgstr "(chỉ có nhóm super admins mới có thể tạo nhóm)"
 #: app/partials/hostmacros.inherited.list.html.php:204
 #: app/partials/hostmacros.list.html.php:105
 msgid "(created by host discovery)"
-msgstr ""
+msgstr "(được tạo bởi việc khám phá máy chủ tự động)"
 
 #: include/views/configuration.item.edit.php:648
 #: include/views/configuration.item.prototype.edit.php:619
 msgid "(legacy) to retrieve a single value synchronously, optionally combined with other values"
-msgstr ""
+msgstr "(Cũ) để nhận đồng bộ một giá trị đơn, tùy chọn kết hợp với những giá trị khác"
 
 #: include/views/configuration.host.discovery.edit.php:553
 msgid "(legacy) to retrieve a subtree in JSON"
-msgstr ""
+msgstr "(Cũ) để nhận cây con trong JSON"
 
 #: app/partials/configuration.host.edit.html.php:133
 msgid "(linked by host discovery)"
-msgstr ""
+msgstr "(liên kết bởi việc khám phá host)"
 
 #: app/partials/configuration.host.edit.html.php:261
 #: app/views/popup.itemtestedit.view.php:254
@@ -354,16 +359,16 @@ msgstr "10 giây"
 #: tests/selenium/modules/clock32/includes/WidgetForm.php:116
 #: widgets/clock/includes/WidgetForm.php:116
 msgid "12-hour"
-msgstr ""
+msgstr "12-giờ"
 
 #: tests/selenium/modules/clock32/includes/WidgetForm.php:115
 #: widgets/clock/includes/WidgetForm.php:115
 msgid "24-hour"
-msgstr ""
+msgstr "24-giờ"
 
 #: app/views/popup.sla.edit.php:101 include/classes/helpers/CSlaHelper.php:254
 msgid "24x7"
-msgstr ""
+msgstr "24x7"
 
 #: app/views/administration.queue.overview.php:49
 #: app/views/administration.queue.overview.proxy.php:49
@@ -392,11 +397,11 @@ msgstr "500 giá trị gần nhất"
 #: app/views/js/popup.itemtestedit.view.js.php:37
 #: app/views/js/popup.itemtestedit.view.js.php:44
 msgid "<empty string>"
-msgstr ""
+msgstr "<chuỗi rỗng>"
 
 #: include/forms.inc.php:1402 include/views/js/item.preprocessing.js.php:364
 msgid "<label name>"
-msgstr ""
+msgstr "<tên label>"
 
 #: include/views/monitoring.sysmap.edit.php:131
 msgid "<manual>"
@@ -406,16 +411,16 @@ msgstr "<bằng tay>"
 #: include/views/js/item.preprocessing.js.php:362
 #: include/views/js/item.preprocessing.js.php:371
 msgid "<metric name>{<label name>=\"<label value>\", ...} == <value>"
-msgstr ""
+msgstr "<tên metric>{<tên label>=\"<giá trị label>\", ...} == <giá trị>"
 
 #: app/views/administration.script.edit.php:94
 msgid "<sub-menu/sub-menu/...>"
-msgstr ""
+msgstr "<menu con/menu con/...>"
 
 #: widgets/geomap/Widget.php:48
 msgctxt "abbreviation of severity level"
 msgid "A"
-msgstr ""
+msgstr "A"
 
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:199
 msgid "ADD OVERRIDE"
@@ -423,34 +428,34 @@ msgstr "Thêm đè lên"
 
 #: tests/selenium/modules/clock32/Widget.php:46
 msgid "ALARM CLOCK"
-msgstr ""
+msgstr "ALARM CLOCK"
 
 #: app/views/administration.user.list.php:137
 msgid "API access"
-msgstr ""
+msgstr "API access"
 
 #: app/views/mfa.edit.php:102
 msgid "API hostname"
-msgstr ""
+msgstr "API hostname"
 
 #: app/controllers/CControllerPopupGeneric.php:422
 #: app/views/administration.userrole.edit.php:310
 msgid "API methods"
-msgstr ""
+msgstr "API methods"
 
 #: app/controllers/CControllerAuditLogList.php:222
 msgid "API token"
-msgstr ""
+msgstr "API token"
 
 #: include/classes/api/services/CToken.php:287
 #, c-format
 msgid "API token \"%1$s\" already exists for userid \"%2$s\"."
-msgstr ""
+msgstr "API token \"%1$s\" đã tồn tại cho userid \"%2$s\"."
 
 #: app/controllers/CControllerTokenCreate.php:116
 #: app/controllers/CControllerTokenCreate.php:129
 msgid "API token added"
-msgstr ""
+msgstr "API token đã được thêm"
 
 #: app/controllers/CControllerTokenDelete.php:64
 msgid "API token deleted"
@@ -469,12 +474,12 @@ msgstr[0] ""
 
 #: include/classes/api/services/CUser.php:1807
 msgid "API token expired."
-msgstr ""
+msgstr "API token đã hết hạn."
 
 #: app/controllers/CControllerTokenUpdate.php:107
 #: app/controllers/CControllerTokenUpdate.php:135
 msgid "API token updated"
-msgstr ""
+msgstr "API token đã được cập nhật"
 
 #: app/controllers/CControllerPopupTokenEdit.php:116
 #: app/controllers/CControllerPopupTokenView.php:75
@@ -486,16 +491,16 @@ msgstr ""
 #: include/classes/helpers/CMenuHelper.php:467
 #: include/classes/helpers/CRoleHelper.php:495 include/html.inc.php:848
 msgid "API tokens"
-msgstr ""
+msgstr "API tokens"
 
 #: widgets/gauge/includes/WidgetForm.php:265
 #: widgets/item/includes/WidgetForm.php:209
 msgid "Above value"
-msgstr ""
+msgstr "Giá trị bên trên"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:370
 msgid "Abscissa"
-msgstr ""
+msgstr "Hoành độ"
 
 #: include/classes/core/ZBase.php:757 include/func.inc.php:1683
 msgid "Access denied"
@@ -508,27 +513,27 @@ msgstr "Truy cập bị từ chối!"
 #: app/views/administration.user.edit.php:673
 #: app/views/administration.userrole.edit.php:296
 msgid "Access to API"
-msgstr ""
+msgstr "Truy cập vào API"
 
 #: app/views/administration.user.edit.php:525
 #: app/views/administration.userrole.edit.php:88
 msgid "Access to UI elements"
-msgstr ""
+msgstr "Truy cập đến phần tử UI"
 
 #: app/views/administration.user.edit.php:702
 #: app/views/administration.userrole.edit.php:345
 msgid "Access to actions"
-msgstr ""
+msgstr "Truy cập đến actions"
 
 #: app/views/administration.user.edit.php:643
 #: app/views/administration.userrole.edit.php:244
 msgid "Access to modules"
-msgstr ""
+msgstr "Truy cập đến modules"
 
 #: app/views/administration.user.edit.php:547
 #: app/views/administration.userrole.edit.php:156
 msgid "Access to services"
-msgstr ""
+msgstr "Truy cập đến services"
 
 #: include/actions.inc.php:165 include/classes/screens/CScreenProblem.php:1181
 msgid "Ack"
@@ -540,7 +545,7 @@ msgstr "Ghi nhận"
 
 #: include/classes/helpers/CRoleHelper.php:545
 msgid "Acknowledge problems"
-msgstr ""
+msgstr "Các vấn đề đã được ghi nhận"
 
 #: app/partials/monitoring.problem.filter.php:147
 #: app/views/popup.condition.edit.php:784 include/actions.inc.php:1533
@@ -560,7 +565,7 @@ msgstr " Sự kiện được ghi nhận giải quyết"
 #: app/partials/monitoring.problem.filter.php:142
 #: widgets/problems/views/widget.edit.php:105
 msgid "Acknowledgement status"
-msgstr ""
+msgstr "Trạng thái ghi nhận"
 
 #: app/controllers/CControllerAuditLogList.php:221
 #: app/partials/action.operations.php:32 app/partials/action.operations.php:35
@@ -631,12 +636,12 @@ msgstr ""
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:240
 #: widgets/tophosts/views/column.edit.php:249
 msgid "Action"
-msgstr "Hành động"
+msgstr "Action"
 
 #: widgets/actionlog/views/widget.view.php:38
 msgctxt "compact table header"
 msgid "Action"
-msgstr ""
+msgstr "Action"
 
 #: include/classes/api/services/CAction.php:2824
 #, c-format
@@ -646,7 +651,7 @@ msgstr "Hành động \"%1$s\" đã tồn tại."
 #: include/classes/api/services/CRole.php:754
 #, c-format
 msgid "Action \"%2$s\" is not available for user role \"%1$s\"."
-msgstr ""
+msgstr "Hành động \"%2$s\" không có sẵn cho vai trò \"%1$s\"."
 
 #: app/controllers/CControllerActionCreate.php:264
 msgid "Action added"
@@ -655,13 +660,12 @@ msgstr "Action được thêm vào"
 #: include/classes/core/ZBase.php:603
 #, c-format
 msgid "Action class %1$s must extend %2$s class."
-msgstr ""
+msgstr "Action class %1$s phải mở rộng class %2$s."
 
 #: app/controllers/CControllerActionDelete.php:79
-#, fuzzy
 msgid "Action deleted"
 msgid_plural "Actions deleted"
-msgstr[0] "Hành động đã được xóa"
+msgstr[0] ""
 
 #: app/controllers/CControllerActionDisable.php:84
 msgid "Action disabled"
@@ -684,7 +688,7 @@ msgstr "Bản ghi hoạt động"
 #: app/views/administration.script.list.php:67
 #: app/views/administration.script.list.php:107
 msgid "Action operation"
-msgstr ""
+msgstr "Action operation"
 
 #: app/controllers/CControllerActionUpdate.php:267
 msgid "Action updated"
@@ -693,7 +697,7 @@ msgstr "Hành động đã cập nhật"
 #: include/classes/api/services/CDashboardGeneral.php:672
 #, c-format
 msgid "Action with ID \"%1$s\" is not available."
-msgstr ""
+msgstr "Hành động ID \"%1$s\" không có sẵn."
 
 #: app/controllers/CControllerPopupGeneric.php:496
 #: app/controllers/CControllerPopupGeneric.php:504
@@ -719,7 +723,7 @@ msgstr "Hành động"
 #: widgets/problems/includes/WidgetProblems.php:107
 msgctxt "compact table header"
 msgid "Actions"
-msgstr ""
+msgstr "Actions"
 
 #: app/partials/administration.ha.nodes.php:50
 #: app/views/administration.proxy.list.php:54
@@ -735,7 +739,7 @@ msgstr "Kích hoạt"
 
 #: include/hosts.inc.php:497
 msgid "Active checks"
-msgstr ""
+msgstr "Kiểm tra chủ động"
 
 #: app/views/maintenance.edit.php:144 app/views/maintenance.list.php:96
 msgid "Active since"
@@ -918,35 +922,39 @@ msgstr "Add"
 #: app/views/js/administration.mediatype.edit.js.php:129
 #: app/views/js/mediatype.edit.js.php:389
 msgid "Add (message type limit reached)"
-msgstr ""
+msgstr "Thêm (kiểu tin nhắn đã đạt giới hạn)"
 
 #: widgets/tophosts/views/widget.edit.php:63
 msgid "Add a column"
-msgstr ""
+msgstr "Thêm một cột"
 
 #: jsLoader.php:156
 msgid "Add a new widget"
 msgstr "Thêm một ô điều khiển mới"
 
+#: widgets/navtree/Widget.php:34
+msgid "Add child element"
+msgstr ""
+
 #: widgets/navtree/Widget.php:39
 msgid "Add child elements"
-msgstr ""
+msgstr "Thêm phần tử con"
 
 #: app/partials/service.list.edit.php:117
 msgid "Add child service"
-msgstr ""
+msgstr "Thêm dịch vụ con"
 
 #: app/views/js/popup.service.edit.js.php:375
 msgid "Add child services"
-msgstr ""
+msgstr "Thêm các dịch vụ con"
 
 #: app/partials/configuration.valuemap.php:57
 msgid "Add from host"
-msgstr ""
+msgstr "Thêm từ máy chủ"
 
 #: app/partials/configuration.valuemap.php:54
 msgid "Add from template"
-msgstr ""
+msgstr "Thêm từ mẫu"
 
 #: include/actions.inc.php:629 include/actions.inc.php:860
 msgid "Add host"
@@ -954,18 +962,23 @@ msgstr "Thêm host"
 
 #: include/actions.inc.php:653 include/actions.inc.php:871
 msgid "Add host tags"
-msgstr ""
+msgstr "Thêm thẻ máy chủ"
 
 #: app/partials/trigger.edit.dependencies.tab.php:65
 #: app/partials/trigger.edit.dependencies.tab.php:91
 #: app/views/trigger.massupdate.php:155
 msgid "Add host trigger"
+msgstr "Thêm host trigger"
+
+#: widgets/piechart/includes/CWidgetFieldDataSetView.php:260
+#: widgets/svggraph/includes/CWidgetFieldDataSetView.php:263
+msgid "Add item"
 msgstr ""
 
 #: app/partials/massupdate.macros.tab.php:96
 #: app/partials/massupdate.valuemaps.tab.php:38
 msgid "Add missing"
-msgstr ""
+msgstr "Thêm các mục thiếu"
 
 #: widgets/navtree/Widget.php:40
 msgid "Add multiple maps"
@@ -979,7 +992,7 @@ msgstr "Đặt lại dữ liệu mới"
 #: app/partials/configuration.host.edit.html.php:242
 #: include/views/configuration.host.prototype.edit.php:286
 msgid "Add new interface"
-msgstr ""
+msgstr "Thêm giao diện mới"
 
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:53
 msgid "Add new override"
@@ -988,15 +1001,15 @@ msgstr "Ghi đè"
 #: app/views/js/configuration.dashboard.edit.js.php:239
 #: app/views/js/monitoring.dashboard.view.js.php:366
 msgid "Add page"
-msgstr ""
+msgstr "Thêm trang"
 
 #: app/views/js/popup.service.edit.js.php:405
 msgid "Add parent services"
-msgstr ""
+msgstr "Thêm các dịch vụ cấp trên"
 
 #: include/classes/helpers/CRoleHelper.php:543
 msgid "Add problem comments"
-msgstr ""
+msgstr "Thêm mô tả vấn đề"
 
 #: app/partials/trigger.edit.dependencies.tab.php:77
 #: app/partials/trigger.edit.dependencies.tab.php:87
@@ -1007,11 +1020,11 @@ msgstr "Thêm kiểu"
 
 #: app/controllers/CControllerPopupScheduledReportEdit.php:129
 msgid "Add scheduled report"
-msgstr ""
+msgstr "Thêm báo cáo định kỳ"
 
 #: app/views/js/administration.userrole.edit.js.php:232
 msgid "Add services"
-msgstr ""
+msgstr "Thêm dịch vụ"
 
 #: widgets/navtree/views/navtreeitem.edit.php:80
 msgid "Add submaps"
@@ -1019,7 +1032,7 @@ msgstr "Thêm nội dung sơ đồ"
 
 #: app/controllers/CControllerFavoriteDelete.php:74 include/html.inc.php:177
 msgid "Add to favorites"
-msgstr ""
+msgstr "Thêm vào mục ưa thích."
 
 #: include/actions.inc.php:864
 msgid "Add to host group"
@@ -1031,11 +1044,11 @@ msgstr "Thêm vào nhóm host"
 
 #: app/partials/scheduledreport.subscription.php:42
 msgid "Add user"
-msgstr ""
+msgstr "Thêm người dùng"
 
 #: app/partials/scheduledreport.subscription.php:45
 msgid "Add user group"
-msgstr ""
+msgstr "Thêm nhóm"
 
 #: app/controllers/CControllerDashboardWidgetEdit.php:68
 #: app/views/js/configuration.dashboard.edit.js.php:235
@@ -1047,7 +1060,7 @@ msgstr "Thêm ô điều khiển"
 #: app/controllers/CControllerAuditLogList.php:379
 #: app/controllers/CControllerPopupImportCompare.php:167
 msgid "Added"
-msgstr ""
+msgstr "Đã thêm"
 
 #: jsLoader.php:333
 #, c-format
@@ -1057,18 +1070,18 @@ msgstr "Đã thêm, %1$s"
 
 #: app/views/popup.service.statusrule.edit.php:94
 msgid "Additional rule"
-msgstr ""
+msgstr "Luật bổ sung"
 
 #: app/views/popup.service.edit.php:185
 msgid "Additional rules"
-msgstr ""
+msgstr "Các luật bổ sung"
 
 #: app/controllers/CControllerProxyCreate.php:82
 #: app/controllers/CControllerProxyUpdate.php:76
 #: app/partials/administration.ha.nodes.php:28
 #: app/views/popup.proxy.edit.php:40
 msgid "Address"
-msgstr ""
+msgstr "Địa chỉ"
 
 #: app/controllers/CControllerProxyCreate.php:72
 #: app/controllers/CControllerProxyCreate.php:80
@@ -1076,7 +1089,7 @@ msgstr ""
 #: app/controllers/CControllerProxyUpdate.php:75
 #: app/views/popup.proxy.edit.php:90
 msgid "Address for active agents"
-msgstr ""
+msgstr "Địa chỉ cho active agents"
 
 #: include/hosts.inc.php:63 include/users.inc.php:53
 msgid "Admin"
@@ -1093,7 +1106,7 @@ msgstr "Quản trị"
 #: widgets/clock/views/widget.edit.php:53
 #: widgets/gauge/views/widget.edit.php:54 widgets/item/views/widget.edit.php:48
 msgid "Advanced configuration"
-msgstr ""
+msgstr "Cấu hình nâng cao"
 
 #: include/views/monitoring.sysmap.edit.php:162
 msgid "Advanced labels"
@@ -1101,23 +1114,23 @@ msgstr "Nhãn nâng cao"
 
 #: app/views/popup.import.php:148
 msgid "Advanced options"
-msgstr ""
+msgstr "Lựa chọn nâng cao"
 
 #: include/views/configuration.host.discovery.edit.php:721
 #: include/views/configuration.host.discovery.edit.php:737
 #: include/views/configuration.host.discovery.list.php:157
 #: include/views/configuration.host.discovery.list.php:172
 msgid "After"
-msgstr ""
+msgstr "After"
 
 #: app/views/js/mfa.edit.js.php:168
 msgid "After this change, users who have already enrolled in this MFA method will have to complete the enrollment process again because TOTP secrets will be reset."
-msgstr ""
+msgstr "Sau khi thực hiện thay đổi này, những người dùng đã sử dụng phương thức MFA này sẽ phải thực hiện lại quá trình xin cấp quyền sử dụng, do mã bí mật TOTP sẽ được cài đặt lại."
 
 #: widgets/gauge/includes/WidgetForm.php:266
 #: widgets/item/includes/WidgetForm.php:210
 msgid "After value"
-msgstr ""
+msgstr "After value"
 
 #: include/events.inc.php:339
 msgid "Age"
@@ -1135,11 +1148,11 @@ msgstr "Agent"
 
 #: widgets/hostavail/views/widget.view.php:82
 msgid "Agent (active)"
-msgstr ""
+msgstr "Agent (chủ động)"
 
 #: widgets/hostavail/views/widget.view.php:83
 msgid "Agent (passive)"
-msgstr ""
+msgstr "Agent (thụ động)"
 
 #: include/classes/data/CItemData.php:911
 msgid "Agent availability check. Returns nothing - unavailable; 1 - available"
@@ -1151,7 +1164,7 @@ msgstr "Mã hóa agent"
 
 #: include/classes/data/CItemData.php:895
 msgid "Agent host metadata. Returns string"
-msgstr ""
+msgstr "Siêu dữ liệu host của agent. Trả về kiểu chuỗi."
 
 #: include/classes/data/CItemData.php:903
 msgid "Agent host name. Returns string"
@@ -1163,34 +1176,34 @@ msgstr "Agent interfaces"
 
 #: include/classes/data/CItemData.php:919
 msgid "Agent variant check. Returns 1 - for Zabbix agent; 2 - for Zabbix agent 2"
-msgstr ""
+msgstr "Kiểm tra biến thể agent. Giá trị 1 - là Zabbix agent; 2 - là Zabbix agent 2"
 
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:417
 msgid "Aggregate"
-msgstr ""
+msgstr "Tổng hợp"
 
 #: app/views/popup.triggerexpr.php:126
 msgid "Aggregate functions"
-msgstr ""
+msgstr "Các hàm tổng hợp"
 
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:283
 msgid "Aggregates each item in the data set."
-msgstr ""
+msgstr "Tổng hợp các mục trong tập dữ liệu."
 
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:305
 msgid "Aggregates the whole data set."
-msgstr ""
+msgstr "Tổng hợp toàn bộ tập dữ liệu."
 
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:282
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:384
 #: widgets/tophosts/views/column.edit.php:142
 msgid "Aggregation function"
-msgstr ""
+msgstr "Hàm tổng hợp"
 
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:406
 #: widgets/tophosts/views/column.edit.php:165
 msgid "Aggregation interval"
-msgstr ""
+msgstr "Chu kỳ tổng hợp"
 
 #: include/actions.inc.php:2048
 msgid "Alert message"
@@ -1199,11 +1212,11 @@ msgstr "Tin nhắn cảnh báo"
 #: include/classes/helpers/CMenuHelper.php:292
 #: include/classes/helpers/CRoleHelper.php:348
 msgid "Alerts"
-msgstr ""
+msgstr "Cảnh báo"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1145
 msgid "Algorithm"
-msgstr ""
+msgstr "Thuật toán"
 
 #: include/hosts.inc.php:114
 msgid "Alias"
@@ -1255,7 +1268,7 @@ msgstr "Tất cả bảng điều khiển"
 
 #: app/views/monitoring.charts.view.php:82
 msgid "All graphs"
-msgstr ""
+msgstr "Tất cả đồ thị"
 
 #: app/views/administration.user.edit.php:483
 #: app/views/administration.user.edit.php:484
@@ -1286,7 +1299,7 @@ msgstr "Tất cả vấn đề nếu khớp với thẻ giá trị"
 
 #: app/controllers/CControllerServiceListGeneral.php:150
 msgid "All services"
-msgstr ""
+msgstr "Tất cả dịch vụ"
 
 #: app/partials/usergroup.tagfilters.php:43
 #: app/views/usergroup.tagfilter.edit.php:74
@@ -1299,7 +1312,7 @@ msgstr "Tất cả mẫu"
 
 #: app/views/administration.userrole.edit.php:314
 msgid "Allow list"
-msgstr ""
+msgstr "Danh sách được phép"
 
 #: app/partials/trigger.edit.trigger.tab.php:259
 #: app/views/trigger.massupdate.php:58 include/triggers.inc.php:615
@@ -1309,7 +1322,7 @@ msgstr "Cho phép đóng bằng tay"
 #: app/views/discovery.check.edit.php:160
 #: app/views/popup.discovery.check.php:128
 msgid "Allow redirect"
-msgstr ""
+msgstr "Cho phép chuyển hướng"
 
 #: app/views/popup.massupdate.item.php:403
 #: include/views/configuration.host.discovery.edit.php:763
@@ -1320,59 +1333,59 @@ msgstr "Những host được phép"
 
 #: app/views/administration.user.edit.php:693
 msgid "Allowed methods"
-msgstr ""
+msgstr "Các phương thức được phép"
 
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:326
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:450
 msgid "Also used as legend label for aggregated data sets."
-msgstr ""
+msgstr "Được sử dụng làm nhãn chú thích cho tập dữ liệu được tổng hợp."
 
 #: include/classes/setup/CSetupWizard.php:1034
 msgid "Alternatively, you can install it manually:"
-msgstr "Xen kẽ, bạn có thể cài đặt chúng bằng tay:"
+msgstr "Thay vào đó, bạn có thể cài đặt chúng bằng tay:"
 
 #: include/classes/data/CItemData.php:2317
 msgid "Amount of guest physical memory that is swapped out to the swap space, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "Dung lượng bộ nhớ máy khách được đẩy ra phân vùng swap, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
 
 #: include/classes/data/CItemData.php:2352
 msgid "Amount of host physical memory consumed for backing up guest physical memory pages, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "Dung lượng bộ nhớ máy chủ vật lý được sử dụng để sao lưu các trang bộ nhớ của máy ảo, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
 
 #: include/classes/api/services/CItemGeneral.php:1781
 #, c-format
 msgid "An LLD rule with key \"%1$s\" already exists on the host \"%2$s\"."
-msgstr ""
+msgstr "Một LLD rule với mã \"%1$s\" đã tồn tại trên máy chủ \"%2$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:1780
 #, c-format
 msgid "An LLD rule with key \"%1$s\" already exists on the template \"%2$s\"."
-msgstr ""
+msgstr "Một LLD rule với mã \"%1$s\" đã tồn tại trong mẫu \"%2$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:1775
 #, c-format
 msgid "An item prototype with key \"%1$s\" already exists on the host \"%2$s\"."
-msgstr ""
+msgstr "Một mục nguyên mẫu với mã \"%1$s\" đã tồn tại trên máy chủ \"%2$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:1774
 #, c-format
 msgid "An item prototype with key \"%1$s\" already exists on the template \"%2$s\"."
-msgstr ""
+msgstr "Một mục nguyên mẫu với mã \"%1$s\" đã tồn tại trong mẫu \"%2$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:1769
 #, c-format
 msgid "An item with key \"%1$s\" already exists on the host \"%2$s\"."
-msgstr ""
+msgstr "Một mục với mã \"%1$s\" đã tồn tại trên máy chủ \"%2$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:1768
 #, c-format
 msgid "An item with key \"%1$s\" already exists on the template \"%2$s\"."
-msgstr ""
+msgstr "Một mục với mã \"%1$s\" đã tồn tại trong mẫu \"%2$s\"."
 
 #: tests/selenium/modules/clock32/includes/WidgetForm.php:74
 #: widgets/clock/includes/WidgetForm.php:74
 msgid "Analog"
-msgstr ""
+msgstr "Analog"
 
 #: app/partials/trigger.edit.trigger.tab.php:111
 #: app/partials/trigger.edit.trigger.tab.php:191
@@ -1407,15 +1420,15 @@ msgstr "Và/Hoặc"
 
 #: widgets/gauge/includes/WidgetForm.php:170
 msgid "Angle"
-msgstr ""
+msgstr "Góc"
 
 #: app/views/popup.sla.edit.php:79 include/classes/helpers/CSlaHelper.php:43
 msgid "Annually"
-msgstr ""
+msgstr "Hằng năm"
 
 #: jsLoader.php:201
 msgid "Another widget is used as data source."
-msgstr ""
+msgstr "Một widget khác được sử dụng làm nguồn dữ liệu."
 
 #: app/partials/monitoring.host.filter.php:134 app/views/action.list.php:95
 #: app/views/administration.proxy.list.php:53
@@ -1440,12 +1453,20 @@ msgstr "Bất cứ gì"
 #: app/views/js/trigger.edit.js.php:886
 #: app/views/js/trigger.massupdate.js.php:67
 msgid "Any changes made in the current form will be lost."
-msgstr ""
+msgstr "Những thay đổi đã được thực hiện trên biểu mẫu hiện tại sẽ mất đi."
 
 #: app/views/js/administration.regex.edit.js.php:164
 #: include/classes/helpers/CRegexHelper.php:27
 msgid "Any character string included"
 msgstr "Chuỗi ký tự bất kỳ bao gồm"
+
+#: app/views/js/popup.import.js.php:109
+msgid "Any existing host entities not present in the import file will be deleted. Click OK to proceed."
+msgstr "Bất kỳ thực thể máy chủ nào không xuất hiện trong tập tin được nhập sẽ bị xóa. Bấm OK để tiếp tục."
+
+#: app/views/js/popup.import.js.php:106
+msgid "Any existing template entities not present in the import file will be deleted. Click OK to proceed."
+msgstr "Bất kỳ thực thể mẫu nào không xuất hiện trong tập tin được nhập sẽ bị xóa. Bấm OK để tiếp tục."
 
 #: include/classes/core/CJsonRpc.php:225
 msgid "Application error."
@@ -1472,7 +1493,7 @@ msgstr "Áp dụng quyền truy cập và bộ lọc thẻ đến phân nhóm"
 
 #: app/partials/configuration.templategroup.edit.html.php:47
 msgid "Apply permissions to all subgroups"
-msgstr ""
+msgstr "Áp dụng quyền cho tất cả các nhóm con"
 
 #: app/views/maintenance.list.php:72 app/views/maintenance.list.php:109
 msgctxt "maintenance status"
@@ -1481,7 +1502,7 @@ msgstr "Đang tiếp cận"
 
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:429
 msgid "Approximation"
-msgstr ""
+msgstr "Xấp xỉ"
 
 #: include/func.inc.php:239
 msgid "Apr"
@@ -1493,23 +1514,23 @@ msgstr "Tháng tư"
 
 #: widgets/gauge/includes/WidgetForm.php:246
 msgid "Arc background"
-msgstr ""
+msgstr "Nền vòng cung"
 
 #: widgets/gauge/includes/WidgetForm.php:305
 msgid "Arc size"
-msgstr ""
+msgstr "Cỡ cung"
 
 #: app/views/popup.tabfilter.edit.php:76
 msgid "Are you sure you want to delete this filter?"
-msgstr ""
+msgstr "Bạn chắc chắn muốn xóa bộ lọc này chứ?"
 
 #: app/views/js/administration.macros.edit.js.php:87
 msgid "Are you sure you want to delete?"
-msgstr ""
+msgstr "Bạn chắc chắn muốn xóa chứ?"
 
 #: include/classes/html/CButtonQMessage.php:52
 msgid "Are you sure you want to perform this action?"
-msgstr ""
+msgstr "Bạn chắc chắn muốn thực hiện hành động này chứ?"
 
 #: include/views/js/monitoring.sysmaps.js.php:125
 msgid "Area size"
@@ -1535,7 +1556,7 @@ msgstr "dạng text"
 #: app/views/administration.authentication.edit.php:366
 #: app/views/administration.authentication.edit.php:403
 msgid "Assertions"
-msgstr ""
+msgstr "Khẳng định"
 
 #: include/hosts.inc.php:149
 msgid "Asset tag"
@@ -1543,7 +1564,7 @@ msgstr "Asset tag"
 
 #: app/partials/configuration.host.edit.html.php:331
 msgid "Assigned proxy"
-msgstr ""
+msgstr "Proxy được gán"
 
 #: include/classes/helpers/CMaintenanceHelper.php:86
 #, c-format
@@ -1573,34 +1594,34 @@ msgstr "Tại (giờ: phút)"
 
 #: include/classes/api/services/CAuthentication.php:153
 msgid "At least one LDAP server must exist."
-msgstr ""
+msgstr "Cần có ít nhất 1 máy chủ LDAP."
 
 #: include/classes/api/services/CAuthentication.php:234
 msgid "At least one MFA method must exist."
-msgstr ""
+msgstr "Cần có ít nhất 1 phương thức MFA."
 
 #: app/views/administration.userrole.edit.php:137
 msgid "At least one UI element must be checked."
-msgstr ""
+msgstr "Cần có ít nhất 1 phần tử UI được chọn."
 
 #: include/classes/api/services/CRole.php:480
 #, c-format
 msgid "At least one UI element must be enabled for user role \"%1$s\"."
-msgstr ""
+msgstr "Cần có ít nhất 1 phần tử UI được bật cho vai trò \"%1$s\"."
 
 #: app/controllers/CControllerPopupLldOperation.php:121
 msgid "At least one action is mandatory."
-msgstr ""
+msgstr "Cần ít nhất một hành động."
 
 #: include/classes/api/services/CUser.php:547
 #: include/classes/api/services/CUser.php:1316
 #, c-format
 msgid "At least one active user must exist with role \"%1$s\"."
-msgstr ""
+msgstr "Cần ít nhất 1 user hoạt động với vai trò \"%1$s\"."
 
 #: include/classes/api/services/CMaintenance.php:686
 msgid "At least one day of the week or day of the month must be specified."
-msgstr ""
+msgstr "Cần xác định ít nhất một ngày trong tuần hoặc một ngày trong tháng."
 
 #: app/controllers/CControllerMaintenanceCreate.php:62
 #: app/controllers/CControllerMaintenanceUpdate.php:63
@@ -1610,13 +1631,17 @@ msgstr ""
 msgid "At least one host group or host must be selected."
 msgstr "Ít nhất một nhóm máy chủ hoặc máy chủ phải đượ chọn."
 
+#: include/classes/setup/CFrontendSetup.php:252
+msgid "At least one of MySQL or PostgreSQL should be supported."
+msgstr ""
+
 #: include/classes/setup/CFrontendSetup.php:241
 msgid "At least one of MySQL, PostgreSQL or Oracle should be supported."
-msgstr ""
+msgstr "Ít nhất một trong số MySQL, PostgreSQL hoặc Oracle phải được hỗ trợ."
 
 #: app/views/correlation.edit.php:264
 msgid "At least one operation must be selected."
-msgstr ""
+msgstr "Ít nhất một thao tác phải được chọn."
 
 #: app/views/popup.action.edit.php:179 app/views/popup.action.edit.php:252
 msgid "At least one operation must exist."
@@ -1625,15 +1650,15 @@ msgstr "Ít nhất một thao tác phải tồn tại."
 #: include/classes/api/services/CHostGroup.php:1655
 #, c-format
 msgid "At least one parameter \"%1$s\" or \"%2$s\" must be enabled."
-msgstr ""
+msgstr "Ít nhất một tham số \"%1$s\" hoặc \"%2$s\" phải được bật."
 
 #: widgets/gauge/views/widget.edit.php:50
 msgid "At least one parameter must be enabled."
-msgstr ""
+msgstr "Ít nhất 1 tham số phải được bật."
 
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:283
 msgid "At least one update operation or message is mandatory"
-msgstr ""
+msgstr "Ít nhất một hoạt động cập nhật hoặc tin nhắn là bắt buộc"
 
 #: app/views/popup.acknowledge.edit.php:147
 msgid "At least one update operation or message must exist."
@@ -1645,7 +1670,7 @@ msgstr "Ít nhất một người dùng hoặc một nhóm người dùng phải
 
 #: include/classes/api/services/CReport.php:363
 msgid "At least one user or user group must be specified."
-msgstr ""
+msgstr "Ít nhất 1 người dùng hoặc nhóm phải được xác định."
 
 #: app/views/administration.mediatype.edit.php:354
 #: app/views/mediatype.edit.php:464
@@ -1663,11 +1688,11 @@ msgstr "Thử nghiệm"
 #: app/views/popup.ldap.edit.php:267
 #: app/views/popup.mediatypemapping.edit.php:59
 msgid "Attribute"
-msgstr ""
+msgstr "Attribute"
 
 #: app/views/administration.geomaps.edit.php:86
 msgid "Attribution text"
-msgstr ""
+msgstr "Attribution text"
 
 #: app/controllers/CControllerAuditLogList.php:190
 #: app/views/administration.audit.settings.edit.php:29
@@ -1683,7 +1708,7 @@ msgstr "Kiểm tra log"
 
 #: app/views/administration.housekeeping.edit.php:242
 msgid "Audit settings"
-msgstr ""
+msgstr "Cài đặt kiểm toán"
 
 #: include/func.inc.php:243
 msgid "Aug"
@@ -1695,11 +1720,11 @@ msgstr "Tháng 8"
 
 #: app/views/popup.token.view.php:45
 msgid "Auth token"
-msgstr ""
+msgstr "Mã xác thực"
 
 #: app/views/administration.authentication.edit.php:372
 msgid "AuthN requests"
-msgstr ""
+msgstr "AuthN yêu cầu"
 
 #: app/controllers/CControllerAuditLogList.php:223
 #: app/views/administration.authentication.edit.php:562
@@ -1751,16 +1776,16 @@ msgstr "Cài đặt xác thưc đã được cập nhật"
 
 #: app/views/module.edit.php:44 app/views/module.list.php:87
 msgid "Author"
-msgstr ""
+msgstr "Tác giả"
 
 #: app/views/administration.miscconfig.edit.php:87
 msgid "Authorization"
-msgstr ""
+msgstr "Cấp phép"
 
 #: widgets/piechart/includes/WidgetForm.php:154
 #: widgets/tophosts/views/column.edit.php:204
 msgid "Auto"
-msgstr ""
+msgstr "Tự động"
 
 #: widgets/piechart/includes/WidgetForm.php:114
 #: widgets/svggraph/includes/WidgetForm.php:245
@@ -1808,16 +1833,16 @@ msgstr "Tự động lựa chọn biểu tượng"
 #: include/classes/helpers/CMediatypeHelper.php:300
 #: include/classes/helpers/CMenuHelper.php:342 include/html.inc.php:908
 msgid "Autoregistration"
-msgstr ""
+msgstr "Tự động đăng ký"
 
 #: app/views/action.list.php:44 include/classes/helpers/CMenuHelper.php:258
 #: include/classes/helpers/CRoleHelper.php:473
 msgid "Autoregistration actions"
-msgstr ""
+msgstr "Hành động tự động đăng ký"
 
 #: app/views/administration.housekeeping.edit.php:87
 msgid "Autoregistration data storage period"
-msgstr ""
+msgstr "Thời gian lưu trữ dữ liệu tự động đăng ký"
 
 #: app/partials/monitoring.host.view.html.php:37
 #: app/views/configuration.host.list.php:212
@@ -1829,6 +1854,11 @@ msgstr "Tính sẵn sàng"
 msgid "Availability report"
 msgstr "Thông báo tính sẵn sàng"
 
+#: app/controllers/CControllerAvailabilityReportTrigger.php:70
+#: app/views/reports.availabilityreport.trigger.php:23
+msgid "Availability report graph"
+msgstr ""
+
 #: include/classes/html/CHostAvailability.php:80
 #: widgets/hostavail/views/widget.view.php:32
 msgid "Available"
@@ -1837,7 +1867,7 @@ msgstr "Sẵn sàng"
 #: widgets/hostavail/views/widget.view.php:33
 msgctxt "compact table header"
 msgid "Available"
-msgstr ""
+msgstr "Sẵn sàng"
 
 #: app/views/administration.trigdisplay.edit.php:128
 #: widgets/geomap/Widget.php:42
@@ -1846,14 +1876,18 @@ msgstr "Trung bình"
 
 #: include/classes/data/CItemData.php:2478
 msgid "Average number of outstanding read requests to the virtual disk during the collection interval , \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - disk device instance"
-msgstr ""
+msgstr "Số lượng trung bình các yêu cầu đọc đột biến gửi đến đĩa cứng ảo trong thời gian thu thập dữ liệu , \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - disk device instance"
 
 #: include/classes/data/CItemData.php:2513
 msgid "Average number of outstanding write requests to the virtual disk during the collection interval, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - disk device instance"
-msgstr ""
+msgstr "Số lượng trung bình các yêu cầu ghi đột biến gửi đến đĩa cứng ảo trong thời gian thu thập dữ liệu, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - disk device instance"
 
 #: app/views/administration.authentication.edit.php:131
 msgid "Avoid easy-to-guess passwords"
+msgstr "Tránh mật khẩu dễ đoán"
+
+#: jsLoader.php:172
+msgid "Awaiting data"
 msgstr ""
 
 #: widgets/svggraph/views/widget.edit.php:51
@@ -1877,7 +1911,7 @@ msgstr "Hình nền"
 #: widgets/clock/includes/WidgetForm.php:88
 #: widgets/item/includes/WidgetForm.php:258
 msgid "Background color"
-msgstr ""
+msgstr "Màu nền"
 
 #: include/views/monitoring.sysmap.edit.php:125
 msgid "Background image"
@@ -1888,7 +1922,7 @@ msgstr "Ảnh nền"
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:218
 #: widgets/tophosts/views/column.edit.php:183
 msgid "Bar"
-msgstr ""
+msgstr "Thanh"
 
 #: app/views/popup.ldap.edit.php:67
 msgid "Base DN"
@@ -1897,7 +1931,7 @@ msgstr "Tên Domain Name"
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:201
 #: widgets/tophosts/views/column.edit.php:213
 msgid "Base color"
-msgstr ""
+msgstr "Màu cơ sở"
 
 #: app/views/connector.edit.php:128 include/httptest.inc.php:28
 msgid "Basic"
@@ -1905,33 +1939,33 @@ msgstr "Cơ bản"
 
 #: app/views/connector.edit.php:132
 msgid "Bearer"
-msgstr ""
+msgstr "Bearer"
 
 #: app/views/connector.edit.php:152
 msgid "Bearer token"
-msgstr ""
+msgstr "Bearer token"
 
 #: widgets/gauge/includes/WidgetForm.php:264
 #: widgets/item/includes/WidgetForm.php:208
 msgid "Before value"
-msgstr ""
+msgstr "Giá trị trước đó"
 
 #: widgets/gauge/includes/WidgetForm.php:267
 #: widgets/item/includes/WidgetForm.php:211
 msgid "Below value"
-msgstr ""
+msgstr "Giá trị bên dưới"
 
 #: app/partials/configuration.filter.items.php:147
 #: app/views/popup.massupdate.item.php:152 include/items.inc.php:133
 #: include/views/configuration.item.edit.php:127
 #: include/views/configuration.item.prototype.edit.php:112
 msgid "Binary"
-msgstr ""
+msgstr "Nhị phân"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1455
 #, c-format
 msgid "Binary item \"%1$s\" cannot be used in trigger"
-msgstr ""
+msgstr "Mục nhị phân \"%1$s\" không thể được sử dụng trong trigger"
 
 #: app/views/popup.ldap.edit.php:85
 msgid "Bind DN"
@@ -2016,7 +2050,7 @@ msgstr "Độ rộng viền"
 
 #: app/controllers/CControllerUserUpdateGeneral.php:105
 msgid "Both passwords must be equal."
-msgstr ""
+msgstr "Cả hai mật khẩu phải bằng nhau."
 
 #: include/views/js/monitoring.sysmaps.js.php:42
 #: include/views/js/monitoring.sysmaps.js.php:156
@@ -2031,7 +2065,7 @@ msgstr "Dưới"
 
 #: widgets/tophosts/includes/WidgetForm.php:146
 msgid "Bottom N"
-msgstr ""
+msgstr "Dưới N"
 
 #: jsLoader.php:266
 msgid "Bring forward"
@@ -2040,6 +2074,11 @@ msgstr "Đưa ra phía trước"
 #: jsLoader.php:265
 msgid "Bring to front"
 msgstr "Đặt phía trước"
+
+#: app/views/administration.timeouts.edit.php:130
+#: app/views/popup.proxy.edit.php:342 include/items.inc.php:99
+msgid "Browser"
+msgstr "Trình duyệt"
 
 #: include/locales.inc.php:35
 msgid "Bulgarian (bg_BG)"
@@ -2080,52 +2119,52 @@ msgstr "CPU load. Trả về kiều float"
 
 #: include/classes/data/CItemData.php:2282
 msgid "CPU time spent waiting for swap-in, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - CPU instance"
-msgstr ""
+msgstr "Thời gian CPU được dùng để đợi swap-in, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - CPU instance"
 
 #: include/classes/data/CItemData.php:1939
 msgid "CPU usage as a percentage during the interval depends on power management or HT, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "Lượng phần trăm sử dụng CPU trong chu kỳ đo phụ thuộc vào cấu hình quản lý năng lượng hoặc HT, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
 
 #: include/classes/data/CItemData.php:1925
 msgid "CPU usage as a percentage during the interval, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "Phần trăm CPU sử dụng trong chu kỳ đo, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
 
 #: include/classes/data/CItemData.php:2289
 msgid "CPU usage as a percentage during the interval, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "Phần trăm CPU sử dụng trong chu kỳ đo, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
 
 #: include/classes/data/CItemData.php:2205
 msgid "CPU usage in hertz during the interval on VMware Resource Pool, \"url\" - VMware service URL, \"rpid\" - VMware resource pool id"
-msgstr ""
+msgstr "Mức sử dụng CPU tính theo Hz trong chu kỳ đo của VMware Resource Pool, \"url\" - VMware service URL, \"rpid\" - VMware resource pool id"
 
 #: include/classes/data/CItemData.php:1399
 msgid "CPU utilization percentage. Returns float"
-msgstr ""
+msgstr "Phần trăm sử dụng CPU. Trả về float"
 
 #: app/views/popup.itemtestedit.view.php:321
 msgid "CRLF"
-msgstr ""
+msgstr "CRLF"
 
 #: tests/selenium/modules/module_number_7/Module.php:17
 msgid "CSRF test"
-msgstr ""
+msgstr "Kiểm tra CSRF"
 
 #: tests/selenium/modules/module_number_7/views/csrf.form.view.php:25
 msgid "CSRF token test"
-msgstr ""
+msgstr "Kiểm tra khóa CSRF"
 
 #: tests/selenium/modules/module_number_7/actions/CsrfFormUpdate.php:35
 msgid "CSRF token validation succeeded."
-msgstr ""
+msgstr "Xác thực khóa CSRF thành công."
 
 #: include/items.inc.php:1554
 msgid "CSV to JSON"
-msgstr ""
+msgstr "CSV qua JSON"
 
 #: include/classes/validators/CApiInputValidator.php:3175
 #: include/classes/validators/CNewValidator.php:352
 msgid "CUID is expected"
-msgstr ""
+msgstr "CUID được mong đợi"
 
 #: include/items.inc.php:100 include/views/configuration.graph.edit.php:180
 #: include/views/configuration.graph.edit.php:275
@@ -2183,7 +2222,7 @@ msgstr "Hủy bỏ"
 #: app/controllers/CControllerTokenCreate.php:65
 #: app/controllers/CControllerTokenCreate.php:135
 msgid "Cannot add API token"
-msgstr ""
+msgstr "Không thể thêm khóa API"
 
 #: include/classes/api/services/CGraphGeneral.php:620
 #: include/classes/api/services/CGraphGeneral.php:642
@@ -2205,7 +2244,7 @@ msgstr "Không thể thêm hành động"
 #: jsLoader.php:133
 #, c-format
 msgid "Cannot add dashboard page: maximum number of %1$d dashboard pages has been added."
-msgstr ""
+msgstr "Không thể thêm trang vào bảng điều khiển: số lượng tối đa %1$d trang đã được thêm vào."
 
 #: host_discovery.php:540
 msgid "Cannot add discovery rule"
@@ -2227,11 +2266,11 @@ msgstr "Không thể thêm host"
 #: app/controllers/CControllerHostGroupCreate.php:40
 #: app/controllers/CControllerHostGroupCreate.php:70
 msgid "Cannot add host group"
-msgstr ""
+msgstr "Không thể thêm nhóm máy chủ"
 
 #: host_prototypes.php:263
 msgid "Cannot add host prototype"
-msgstr "Không thể thêm kiểu host"
+msgstr "Không thể thêm nguyên mẫu host"
 
 #: app/controllers/CControllerImageCreate.php:41
 #: app/controllers/CControllerImageCreate.php:101
@@ -2275,7 +2314,7 @@ msgstr "Không thể thêm nhiều hơn một item với kiểu \"Graph sum
 
 #: widgets/piechart/includes/CWidgetFieldDataSet.php:168
 msgid "Cannot add more than one item with type \"Total\" to the chart."
-msgstr ""
+msgstr "Không thể thêm nhiều hơn 1 mục có kiểu là \"Total\" vào đồ thị."
 
 #: sysmaps.php:219
 msgid "Cannot add network map"
@@ -2289,7 +2328,7 @@ msgstr "Không thể thêm proxy"
 #: app/controllers/CControllerProxyGroupCreate.php:42
 #: app/controllers/CControllerProxyGroupCreate.php:74
 msgid "Cannot add proxy group"
-msgstr ""
+msgstr "Không thể thêm proxy group"
 
 #: app/controllers/CControllerRegExCreate.php:41
 #: app/controllers/CControllerRegExCreate.php:72
@@ -2298,7 +2337,7 @@ msgstr "Không thể thêm biểu thức chính quy"
 
 #: app/controllers/CControllerScheduledReportCreate.php:152
 msgid "Cannot add scheduled report"
-msgstr ""
+msgstr "Không thể thêm báo cáo định kỳ"
 
 #: app/controllers/CControllerScriptCreate.php:64
 #: app/controllers/CControllerScriptCreate.php:162
@@ -2317,7 +2356,7 @@ msgstr "Không thể thêm template"
 #: app/controllers/CControllerTemplateGroupCreate.php:40
 #: app/controllers/CControllerTemplateGroupCreate.php:70
 msgid "Cannot add template group"
-msgstr ""
+msgstr "Không thể thêm nhóm mẫu"
 
 #: app/controllers/CControllerTriggerCreate.php:57
 #: app/controllers/CControllerTriggerCreate.php:131
@@ -2337,7 +2376,7 @@ msgstr "Không thể thêm người dùng"
 #: app/controllers/CControllerUsergroupCreate.php:50
 #: app/controllers/CControllerUsergroupCreate.php:150
 msgid "Cannot add user group"
-msgstr ""
+msgstr "Không thể thêm nhóm người dùng"
 
 #: httpconf.php:199
 msgid "Cannot add web scenario"
@@ -2345,26 +2384,26 @@ msgstr "Không thể thêm web scenario"
 
 #: jsLoader.php:135
 msgid "Cannot add widget: no widgets available."
-msgstr ""
+msgstr "Không thể thêm widget: không còn widgets nào có sẵn."
 
 #: jsLoader.php:134
 msgid "Cannot add widget: not enough free space on the dashboard."
-msgstr ""
+msgstr "Không thể thêm widget: không đủ không gian trống trên bảng điều khiển."
 
 #: include/classes/api/services/CItem.php:1542
 #, c-format
 msgid "Cannot assign the inventory field \"%1$s\" to the item with key \"%2$s\" of host \"%3$s\", because it is already populated by the item with key \"%4$s\"."
-msgstr ""
+msgstr "Không thể gán trường inventory \"%1$s\" vào mục có khóa \"%2$s\" của máy chủ \"%3$s\", bởi vì nó đã được tạo ra trước đó bởi mục có khóa \"%4$s\"."
 
 #: include/classes/api/services/CItem.php:1541
 #, c-format
 msgid "Cannot assign the inventory field \"%1$s\" to the item with key \"%2$s\" of template \"%3$s\", because it is already populated by the item with key \"%4$s\"."
-msgstr ""
+msgstr "Không thể gán trường inventory \"%1$s\" vào mục có khóa \"%2$s\" của mẫu \"%3$s\", bởi vì nó đã được tạo ra trước đó bởi mục có khóa \"%4$s\"."
 
 #: jsLoader.php:336
 msgctxt "screen reader"
 msgid "Cannot be removed"
-msgstr ""
+msgstr "Không thể loại bỏ"
 
 #: include/classes/validators/CLdapAuthValidator.php:73
 msgid "Cannot bind anonymously to LDAP server."
@@ -2380,15 +2419,15 @@ msgstr "Không thể liên kết với máy chủ LDAP."
 #: app/controllers/CControllerTriggerExpressionConstructor.php:149
 #, c-format
 msgid "Cannot build expression tree: %1$s."
-msgstr ""
+msgstr "Không thể xây dựng cây biểu thức: %1$s."
 
 #: include/classes/api/services/CRole.php:785
 msgid "Cannot change the user type of own role."
-msgstr ""
+msgstr "Không thể thay đổi loại người dùng ra khỏi vai trò của chính nó."
 
 #: httpconf.php:190 httpconf.php:406 items.php:687 items.php:723
 msgid "Cannot clear history and trends"
-msgstr ""
+msgstr "Không thể xóa lịch sử và xu hướng"
 
 #: include/classes/api/services/CDiscoveryRule.php:3834
 msgid "Cannot clone graph prototypes."
@@ -2413,7 +2452,7 @@ msgstr "Không thể kết nối đến cơ sở dữ liệu."
 
 #: app/views/js/webscenario.step.edit.js.php:200
 msgid "Cannot convert POST data:"
-msgstr ""
+msgstr "Không thể chuyển đổi dữ liệu POST:"
 
 #: app/controllers/CControllerCopyCreate.php:183
 msgid "Cannot copy graph"
@@ -2423,27 +2462,27 @@ msgstr[0] "Không thể sao chép đồ thị"
 #: include/classes/helpers/CGraphHelper.php:74
 #, c-format
 msgid "Cannot copy graph \"%1$s\", because it has items from the multiple hosts."
-msgstr ""
+msgstr "Không thể sao chép đồ thị \"%1$s\", bởi vì nó có những mục từ nhiều máy chủ."
 
 #: include/classes/helpers/CGraphGeneralHelper.php:91
 #, c-format
 msgid "Cannot copy graph \"%1$s\", because the item with key \"%2$s\" does not exist on the host \"%3$s\"."
-msgstr ""
+msgstr "Không thể sao chép đồ thị \"%1$s\", bởi vì khóa mục \"%2$s\" không tồn tại trên máy chủ \"%3$s\"."
 
 #: include/classes/helpers/CGraphGeneralHelper.php:92
 #, c-format
 msgid "Cannot copy graph \"%1$s\", because the item with key \"%2$s\" does not exist on the template \"%3$s\"."
-msgstr ""
+msgstr "Không thể sao chép đồ thị \"%1$s\", bởi vì mục khóa \"%2$s\" không tồn tại trong mẫu \"%3$s\"."
 
 #: include/classes/helpers/CGraphGeneralHelper.php:96
 #, c-format
 msgid "Cannot copy graph prototype \"%1$s\", because the item with key \"%2$s\" does not exist on the host \"%3$s\"."
-msgstr ""
+msgstr "Không thể sao chép nguyên mẫu đồ thị \"%1$s\", bởi vì mục khóa \"%2$s\" không tồn tại trên máy chủ \"%3$s\"."
 
 #: include/classes/helpers/CGraphGeneralHelper.php:97
 #, c-format
 msgid "Cannot copy graph prototype \"%1$s\", because the item with key \"%2$s\" does not exist on the template \"%3$s\"."
-msgstr ""
+msgstr "Không thể sao chép nguyên mẫu đồ thị \"%1$s\", bởi vì mục khóa \"%2$s\" không tồn tại trong mẫu \"%3$s\"."
 
 #: app/controllers/CControllerCopyCreate.php:161
 msgid "Cannot copy item"
@@ -2453,12 +2492,12 @@ msgstr[0] "Không thể sao chép item"
 #: include/classes/api/services/CDiscoveryRule.php:3643
 #, c-format
 msgid "Cannot copy item prototype with key \"%1$s\" without its master item with key \"%2$s\"."
-msgstr ""
+msgstr "Không thể sao chép mục nguyên mẫu có khóa \"%1$s\" mà thiếu mục cha của nó có khóa là \"%2$s\"."
 
 #: include/classes/helpers/CItemGeneralHelper.php:278
 #, c-format
 msgid "Cannot copy item with key \"%1$s\" without its master item with key \"%2$s\"."
-msgstr ""
+msgstr "Không thể sao chép mục có khóa \"%1$s\" mà thiếu mục cha của nó có khóa là \"%2$s\"."
 
 #: app/controllers/CControllerCopyCreate.php:172
 msgid "Cannot copy trigger"
@@ -2468,27 +2507,27 @@ msgstr[0] "Không thể sao chép trigger"
 #: include/classes/helpers/CTriggerGeneralHelper.php:196
 #, c-format
 msgid "Cannot copy trigger \"%1$s\" without the trigger \"%2$s\", on which it depends, to the host \"%3$s\"."
-msgstr ""
+msgstr "Không thể sao chép trigger \"%1$s\" mà thiếu đi trigger phụ thuộc \"%2$s\", vào máy chủ \"%3$s\"."
 
 #: include/classes/helpers/CTriggerGeneralHelper.php:197
 #, c-format
 msgid "Cannot copy trigger \"%1$s\" without the trigger \"%2$s\", on which it depends, to the template \"%3$s\"."
-msgstr ""
+msgstr "Không thể sao chép trigger \"%1$s\" mà thiếu đi trigger phụ thuộc \"%2$s\", vào mẫu \"%3$s\"."
 
 #: include/classes/helpers/CTriggerHelper.php:76
 #, c-format
 msgid "Cannot copy trigger \"%1$s\", because it has multiple hosts in the expression."
-msgstr ""
+msgstr "Không thể sao chép trigger \"%1$s\", bởi vì biểu thức của nó bao gồm nhiều máy chủ."
 
 #: include/classes/helpers/CTriggerHelper.php:75
 #, c-format
 msgid "Cannot copy trigger \"%1$s\", because it has multiple templates in the expression."
-msgstr ""
+msgstr "Không thể sao chép trigger \"%1$s\", bởi vì biểu thức của nó bao gồm nhiều mẫu."
 
 #: app/controllers/CControllerSlaCreate.php:69
 #: app/controllers/CControllerSlaCreate.php:127
 msgid "Cannot create SLA"
-msgstr ""
+msgstr "Không thể tạo SLA"
 
 #: include/classes/api/services/CHostPrototype.php:1291
 #, c-format
@@ -2502,7 +2541,7 @@ msgstr "Không thể tạo sự kết nối cơ sở dữ liệu khác."
 #: app/controllers/CControllerConnectorCreate.php:82
 #: app/controllers/CControllerConnectorCreate.php:155
 msgid "Cannot create connector"
-msgstr ""
+msgstr "Không thể tạo connector"
 
 #: app/controllers/CControllerDiscoveryCreate.php:47
 #: app/controllers/CControllerDiscoveryCreate.php:95
@@ -2512,7 +2551,7 @@ msgstr "Không thể tạo quy tắc phát hiện"
 #: app/controllers/CControllerCorrelationCreate.php:48
 #: app/controllers/CControllerCorrelationCreate.php:115
 msgid "Cannot create event correlation"
-msgstr ""
+msgstr "Không thể tạo mối tương quan sự kiện"
 
 #: app/controllers/CControllerIconMapCreate.php:56
 msgid "Cannot create icon map"
@@ -2521,27 +2560,27 @@ msgstr "Không thể tạo biểu tượng sơ đồ."
 #: app/controllers/CControllerMaintenanceCreate.php:72
 #: app/controllers/CControllerMaintenanceCreate.php:150
 msgid "Cannot create maintenance period"
-msgstr ""
+msgstr "Không thể tạo chu kỳ bảo trì"
 
 #: app/controllers/CControllerProxyConfigRefresh.php:79
 msgid "Cannot create request"
-msgstr ""
+msgstr "Không thể tạo yêu cầu"
 
 #: app/controllers/CControllerPopupScheduledReportCreate.php:136
 #: app/controllers/CControllerScheduledReportCreate.php:59
 msgid "Cannot create scheduled report"
-msgstr ""
+msgstr "Không thể tạo báo cáo định kỳ"
 
 #: app/controllers/CControllerServiceCreate.php:77
 #: app/controllers/CControllerServiceCreate.php:159
 msgid "Cannot create service"
-msgstr ""
+msgstr "Không thể tạo dịch vụ"
 
 #: include/classes/api/services/CService.php:2403
 #: include/classes/api/services/CService.php:2427
 #, c-format
 msgid "Cannot create service \"%1$s\": %2$s."
-msgstr ""
+msgstr "Không thể tạo dịch vụ \"%1$s\": %2$s."
 
 #: include/classes/setup/CSetupWizard.php:1030
 msgid "Cannot create the configuration file."
@@ -2550,11 +2589,11 @@ msgstr "Không thể tạo tập tin cấu hình."
 #: app/controllers/CControllerUserroleCreate.php:114
 #: app/controllers/CControllerUserroleCreate.php:161
 msgid "Cannot create user role"
-msgstr ""
+msgstr "Không thể tạo vai trò người dùng"
 
 #: app/controllers/CControllerWebScenarioStepCheck.php:56
 msgid "Cannot create web scenario step"
-msgstr ""
+msgstr "Không thể tạo bước kịch bản web"
 
 #: app/controllers/CControllerTokenDelete.php:72
 msgid "Cannot delete API token"
@@ -2564,7 +2603,7 @@ msgstr[0] ""
 #: include/classes/api/services/CMfa.php:459
 #, c-format
 msgid "Cannot delete MFA method \"%1$s\", because it is used by user group \"%2$s\"."
-msgstr ""
+msgstr "Không thể xóa phương thức MFA \"%1$s\", vì nó đang được sử dụng bởi nhóm người dùng \"%2$s\"."
 
 #: app/controllers/CControllerSlaDelete.php:72
 msgid "Cannot delete SLA"
@@ -2577,7 +2616,6 @@ msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
 msgstr "Không thể xóa người dùng zabbix nội bộ \"%1$s\", thử vô hiệu hóa người dùng nào đó."
 
 #: app/controllers/CControllerActionDelete.php:87
-#, fuzzy
 msgid "Cannot delete action"
 msgid_plural "Cannot delete actions"
 msgstr[0] "Không thể xóa hành động"
@@ -2585,7 +2623,7 @@ msgstr[0] "Không thể xóa hành động"
 #: include/classes/api/services/CRole.php:368
 #, c-format
 msgid "Cannot delete assigned user role \"%1$s\"."
-msgstr ""
+msgstr "Không thể xóa vai trò \"%1$s\"."
 
 #: app/controllers/CControllerConnectorDelete.php:68
 msgid "Cannot delete connector"
@@ -2600,16 +2638,15 @@ msgstr[0] "Không thể xóa bảng điểu khiển"
 
 #: include/classes/api/services/CMfa.php:446
 msgid "Cannot delete default MFA method."
-msgstr ""
+msgstr "Không thể xóa phương thức MFA mặc định."
 
 #: include/classes/api/services/CUserDirectory.php:944
 #: include/classes/api/services/CUserDirectory.php:949
 msgid "Cannot delete default user directory."
-msgstr ""
+msgstr "Không thể xóa thư mục người dùng mặc định."
 
 #: app/controllers/CControllerDiscoveryDelete.php:68 host_discovery.php:390
 #: host_discovery.php:597
-#, fuzzy
 msgid "Cannot delete discovery rule"
 msgid_plural "Cannot delete discovery rules"
 msgstr[0] "Không thể xóa quy tắc phát hiện"
@@ -2620,19 +2657,16 @@ msgid_plural "Cannot delete event correlations"
 msgstr[0] ""
 
 #: graphs.php:281 graphs.php:338
-#, fuzzy
 msgid "Cannot delete graph"
 msgid_plural "Cannot delete graphs"
 msgstr[0] "Không thể xóa biểu đồ"
 
 #: graphs.php:273 graphs.php:317
-#, fuzzy
 msgid "Cannot delete graph prototype"
 msgid_plural "Cannot delete graph prototypes"
-msgstr[0] "Không thể xóa kiểu biểu đồ."
+msgstr[0] ""
 
 #: app/controllers/CControllerHostMassDelete.php:76
-#, fuzzy
 msgid "Cannot delete host"
 msgid_plural "Cannot delete hosts"
 msgstr[0] "Không thể xóa host"
@@ -2657,7 +2691,7 @@ msgstr[0] ""
 #: app/controllers/CControllerHostGroupDelete.php:39
 #: app/controllers/CControllerTemplateGroupDelete.php:39
 msgid "Cannot delete host groups"
-msgstr ""
+msgstr "Không thể xóa host groups"
 
 #: host_prototypes.php:319
 msgid "Cannot delete host prototype"
@@ -2679,23 +2713,21 @@ msgstr "Không thể xóa hình ảnh"
 #: include/classes/api/services/CHostInterface.php:631
 #, c-format
 msgid "Cannot delete interface for discovered host \"%1$s\"."
-msgstr ""
+msgstr "Không thể xóa interface của host được phát hiện \"%1$s\"."
 
 #: include/classes/api/services/CHost.php:1190
 msgid "Cannot delete inventory."
 msgstr "Không thể xóa danh sách lưu trữ."
 
 #: items.php:524 items.php:736
-#, fuzzy
 msgid "Cannot delete item"
 msgid_plural "Cannot delete items"
 msgstr[0] "Không thể xóa item"
 
 #: disc_prototypes.php:302 disc_prototypes.php:500
-#, fuzzy
 msgid "Cannot delete item prototype"
 msgid_plural "Cannot delete item prototypes"
-msgstr[0] "Không thể xóa loại item"
+msgstr[0] ""
 
 #: app/controllers/CControllerMaintenanceDelete.php:71
 msgid "Cannot delete maintenance period"
@@ -2714,14 +2746,13 @@ msgid_plural "Cannot delete modules: %1$s."
 msgstr[0] ""
 
 #: sysmaps.php:266
-#, fuzzy
 msgid "Cannot delete network map"
 msgid_plural "Cannot delete network maps"
 msgstr[0] "Không thể xóa sơ đồ mạng"
 
 #: app/controllers/CControllerProxyDelete.php:39
 msgid "Cannot delete proxies"
-msgstr ""
+msgstr "Không thể xóa các proxy"
 
 #: app/controllers/CControllerProxyDelete.php:79
 msgid "Cannot delete proxy"
@@ -2735,12 +2766,12 @@ msgstr[0] ""
 
 #: app/controllers/CControllerProxyGroupDelete.php:39
 msgid "Cannot delete proxy groups"
-msgstr ""
+msgstr "Không thể xóa các proxy group"
 
 #: include/classes/api/services/CRole.php:362
 #, c-format
 msgid "Cannot delete readonly user role \"%1$s\"."
-msgstr ""
+msgstr "Không thể xóa user role chỉ đọc \"%1$s\"."
 
 #: app/controllers/CControllerRegExDelete.php:55
 msgid "Cannot delete regular expression"
@@ -2763,7 +2794,6 @@ msgid "Cannot delete scripts. Script \"%1$s\" is used in action operation \"%2$s
 msgstr "Không thể xóa các tập lệnh. Tập lệnh \"%1$s\" được sử dụng trong hành động thao tác \"%2$s\"."
 
 #: app/controllers/CControllerServiceDelete.php:72
-#, fuzzy
 msgid "Cannot delete service"
 msgid_plural "Cannot delete services"
 msgstr[0] "Không thể xóa dịch vụ"
@@ -2772,10 +2802,9 @@ msgstr[0] "Không thể xóa dịch vụ"
 #: include/classes/api/services/CService.php:470
 #, c-format
 msgid "Cannot delete service \"%1$s\": %2$s."
-msgstr ""
+msgstr "Không thể xóa service \"%1$s\": %2$s."
 
 #: app/controllers/CControllerTemplateDelete.php:143
-#, fuzzy
 msgid "Cannot delete template"
 msgid_plural "Cannot delete templates"
 msgstr[0] "Không thể xóa template"
@@ -2809,16 +2838,14 @@ msgid "Cannot delete templated web scenario \"%1$s\"."
 msgstr "Không thể xóa web scenario mẫu \"%1$s\"."
 
 #: app/controllers/CControllerTriggerDelete.php:70
-#, fuzzy
 msgid "Cannot delete trigger"
 msgid_plural "Cannot delete triggers"
 msgstr[0] "Không thể xóa trigger"
 
 #: app/controllers/CControllerTriggerPrototypeDelete.php:72
-#, fuzzy
 msgid "Cannot delete trigger prototype"
 msgid_plural "Cannot delete trigger prototypes"
-msgstr[0] "Không thể xóa kiểu trigger"
+msgstr[0] ""
 
 #: app/controllers/CControllerUserDelete.php:59
 msgid "Cannot delete user"
@@ -2828,12 +2855,17 @@ msgstr[0] "Không thể xóa người dùng"
 #: include/classes/api/services/CUserDirectory.php:964
 #, c-format
 msgid "Cannot delete user directory \"%1$s\"."
-msgstr ""
+msgstr "Không thể xóa user directory \"%1$s\"."
 
 #: app/controllers/CControllerUsergroupDelete.php:59
 msgid "Cannot delete user group"
 msgid_plural "Cannot delete user groups"
 msgstr[0] ""
+
+#: include/classes/api/services/CUserGroup.php:1397
+#, c-format
+msgid "Cannot delete user group \"%1$s\", because it is used by provisioned user \"%2$s\"."
+msgstr "Không thể xóa user group \"%1$s\", vì nó đang được sử dụng bởi user hiện hành \"%2$s\"."
 
 #: app/controllers/CControllerUserroleDelete.php:59
 msgid "Cannot delete user role"
@@ -2841,7 +2873,6 @@ msgid_plural "Cannot delete user roles"
 msgstr[0] ""
 
 #: httpconf.php:178 httpconf.php:418
-#, fuzzy
 msgid "Cannot delete web scenario"
 msgid_plural "Cannot delete web scenarios"
 msgstr[0] "Không thể xóa web scenario"
@@ -2992,124 +3023,124 @@ msgstr[0] "Không thể kích hoạt web scenarioKhông thể kích hoạt c
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:198
 msgid "Cannot evaluate expression"
-msgstr ""
+msgstr "Không thể đánh giá biểu thức"
 
 #: include/classes/api/services/CScript.php:1042
 msgid "Cannot execute URL type script."
-msgstr ""
+msgstr "Không thể thực thi URL type script"
 
 #: app/controllers/CControllerItemMassCheckNow.php:243
 #: app/controllers/CControllerItemMassCheckNow.php:251
 msgid "Cannot execute operation"
-msgstr ""
+msgstr "Không thể thực thi operation"
 
 #: app/controllers/CControllerPopupScriptExec.php:122
 msgid "Cannot execute script."
-msgstr ""
+msgstr "Không thể thực thi script"
 
 #: jsLoader.php:277
 msgid "Cannot expand macros."
-msgstr "Không thể mở rộng bộ lệnh."
+msgstr "Không thể mở rộng macros."
 
 #: include/classes/import/importers/CTemplateDashboardImporter.php:217
 #, c-format
 msgid "Cannot find SLA \"%1$s\" used in dashboard \"%2$s\"."
-msgstr ""
+msgstr "Không thể tìm thấy SLA \"%1$s\" trong dashboard \"%2$s\"."
 
 #: include/classes/import/importers/CTemplateDashboardImporter.php:241
 #, c-format
 msgid "Cannot find action \"%1$s\" used in dashboard \"%2$s\"."
-msgstr ""
+msgstr "Không thể tìm thấy action \"%1$s\" trong dashboard \"%2$s\"."
 
 #: include/classes/import/importers/CMapImporter.php:270
 #, c-format
 msgid "Cannot find background image \"%1$s\" used in map \"%2$s\"."
-msgstr "Không thể tìm thấy hình nền \"%1$s\" được sử dụng trong sơ đồ \"%2$s\"."
+msgstr "Không thể tìm thấy hình nền \"%1$s\" được sử dụng trong map \"%2$s\"."
 
 #: include/classes/import/importers/CTemplateDashboardImporter.php:181
 #, c-format
 msgid "Cannot find graph \"%1$s\" used in dashboard \"%2$s\"."
-msgstr ""
+msgstr "Không thể tìm thấy graph \"%1$s\" trong dashboard \"%2$s\"."
 
 #: include/classes/import/importers/CMapImporter.php:152
 #, c-format
 msgid "Cannot find group \"%1$s\" used in map \"%2$s\"."
-msgstr "Không thể tìm thấy nhóm \"%1$s\" được sử dụng trong sơ đồ \"%2$s\"."
+msgstr "Không thể tìm thấy group \"%1$s\" trong map \"%2$s\"."
 
 #: include/classes/import/importers/CTemplateDashboardImporter.php:151
 #, c-format
 msgid "Cannot find host \"%1$s\" used in dashboard \"%2$s\"."
-msgstr ""
+msgstr "Không thể tìm thấy host \"%1$s\" trong dashboard \"%2$s\"."
 
 #: include/classes/import/importers/CMapImporter.php:164
 #, c-format
 msgid "Cannot find host \"%1$s\" used in map \"%2$s\"."
-msgstr "Không thể tìm thấy host \"%1$s\" được sử dụng trong sơ đồ \"%2$s\"."
+msgstr "Không thể tìm thấy host \"%1$s\" được sử dụng trong map \"%2$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1435
 #, c-format
 msgid "Cannot find host group \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
-msgstr "Không thể tìm thấy nhóm host \"%1$s\" cho kiểu host \"%2$s\" của quy tắc phát hiện \"%3$s\" trên \"%4$s\"."
+msgstr "Không thể tìm thấy host group \"%1$s\" cho host prototype \"%2$s\" của discovery rule \"%3$s\" trên \"%4$s\"."
 
 #: include/classes/api/services/CDiscoveryRule.php:3350
 #, c-format
 msgid "Cannot find host interface on \"%1$s\" for item key \"%2$s\"."
-msgstr "Không thể tìm thất host interface trên \"%1$s\" cho item key \"%2$s\"."
+msgstr "Không thể tìm thấy host interface trên \"%1$s\" cho item key \"%2$s\"."
 
 #: include/classes/api/services/CDiscoveryRule.php:3685
 #, c-format
 msgid "Cannot find host interface on \"%1$s\" for item prototype with key \"%2$s\"."
-msgstr ""
+msgstr "Không thể tìm thấy host interface trên \"%1$s\" cho item prototype với key \"%2$s\"."
 
 #: include/classes/helpers/CItemGeneralHelper.php:203
 #, c-format
 msgid "Cannot find host interface on \"%1$s\" for item with key \"%2$s\"."
-msgstr ""
+msgstr "Không thể tìm thấy host interface trên \"%1$s\" cho item với key \"%2$s\"."
 
 #: include/classes/import/importers/CMapImporter.php:207
 #, c-format
 msgid "Cannot find icon \"%1$s\" used in map \"%2$s\"."
-msgstr "Không thể tìm thấy biểu tượng \"%1$s\" được sử dụng trong sơ đồ \"%2$s\"."
+msgstr "Không thể tìm thấy icon \"%1$s\" được sử dụng trong map \"%2$s\"."
 
 #: include/classes/import/importers/CMapImporter.php:258
 #, c-format
 msgid "Cannot find icon map \"%1$s\" used in map \"%2$s\"."
-msgstr "Không thể tìm thấp biểu tượng sơ đồ \"%1$s\" được sử dụng trong sơ đồ \"%2$s\"."
+msgstr "Không thể tìm thấy icon map \"%1$s\" được sử dụng trong map \"%2$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1131
 #, c-format
 msgid "Cannot find interface \"%1$s\" used for discovery rule \"%2$s\" on \"%3$s\"."
-msgstr ""
+msgstr "Không thể tìm thấy interface \"%1$s\" được dùng cho discovery rule \"%2$s\" trên \"%3$s\"."
 
 #: include/classes/import/CConfigurationImport.php:833
 #, c-format
 msgid "Cannot find interface \"%1$s\" used for item \"%2$s\" on \"%3$s\"."
-msgstr ""
+msgstr "Không tìm thấy interface \"%1$s\" được dùng cho item \"%2$s\" trên \"%3$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1323
 #, c-format
 msgid "Cannot find interface \"%1$s\" used for item prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
-msgstr ""
+msgstr "Không thấy interface \"%1$s\" được dùng cho item prototype \"%2$s\" của discovery rule \"%3$s\" trên \"%4$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1852
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph \"%3$s\"."
-msgstr "Không thể tìm thấy item \"%1$s\" trên \"%2$s\" được sử dụng như giá trị cực đại trên trục Y cho biểu đồ \"%3$s\"."
+msgstr "Không thể tìm thấy item \"%1$s\" trên \"%2$s\" được sử dụng như giá trị cực đại trên trục Y cho graph \"%3$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1618
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
-msgstr "Không thể tìm thấy item \"%1$s\" trên \"%2$s\" được sử dụng như giá trị cực đại trên trục Y cho kiểu biểu đồ \"%3$s\" của quy tắc phát hiện \"%4$s\" trên \"%5$s\"."
+msgstr "Không thể tìm thấy item \"%1$s\" trên \"%2$s\" được sử dụng như giá trị cực đại trên trục Y cho graph prototype \"%3$s\" của discovery rule \"%4$s\" trên \"%5$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1834
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph \"%3$s\"."
-msgstr "không thể tìm thấy item \"%1$s\"  trên \"%2$s\" được sử dụng như giá trị nhỏ nhất trên trục Y của biểu đồ \"%3$s\"."
+msgstr "Không thể tìm thấy item \"%1$s\"  trên \"%2$s\" được sử dụng như giá trị nhỏ nhất trên trục Y của graph \"%3$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1597
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
-msgstr "Không thể tìm thấy item \"%1$s\" trên \"%2$s\" được sử dụng như giá trị nhỏ nhất trên trục Y cho kiểu biểu đồ \"%3$s\" của quy tắc phát hiện \"%4$s\" trên \"%5$s\"."
+msgstr "Không thể tìm thấy item \"%1$s\" trên \"%2$s\" được sử dụng như giá trị nhỏ nhất trên trục Y cho graph prototype \"%3$s\" của discovery rule \"%4$s\" trên \"%5$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1872
 #, c-format
@@ -3124,27 +3155,27 @@ msgstr "Không thể tìm kiếm item \"%1$s\" trên \"%2$s\" được sử dụ
 #: include/classes/import/importers/CTemplateDashboardImporter.php:166
 #, c-format
 msgid "Cannot find item \"%1$s\" used in dashboard \"%2$s\"."
-msgstr ""
+msgstr "Không thể tìm thấy item \"%1$s\" được sử dụng trong dashboard \"%2$s\"."
 
 #: include/classes/import/importers/CTemplateDashboardImporter.php:193
 #, c-format
 msgid "Cannot find map \"%1$s\" used in dashboard \"%2$s\"."
-msgstr ""
+msgstr "Không thể tìm thấy map \"%1$s\" được sử dụng trong dashboard \"%2$s\"."
 
 #: include/classes/import/importers/CMapImporter.php:140
 #, c-format
 msgid "Cannot find map \"%1$s\" used in map \"%2$s\"."
-msgstr "Không thể tìm thấy \"%1$s\" được sử dụng trong sơ đồ  \"%2$s\"."
+msgstr "Không thể tìm thấy map \"%1$s\" được sử dụng trong map \"%2$s\"."
 
 #: include/classes/import/importers/CTemplateDashboardImporter.php:253
 #, c-format
 msgid "Cannot find media type \"%1$s\" used in dashboard \"%2$s\"."
-msgstr ""
+msgstr "Không thể tìm thấy media type \"%1$s\" được sử dụng trong dashboard \"%2$s\"."
 
 #: include/classes/import/importers/CTemplateDashboardImporter.php:205
 #, c-format
 msgid "Cannot find service \"%1$s\" used in dashboard \"%2$s\"."
-msgstr ""
+msgstr "Không thể tìm thấy service \"%1$s\" được sử dụng trong dashboard \"%2$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1458
 #, c-format
@@ -3154,22 +3185,22 @@ msgstr "Không thể tìm thấy template \"%1$s\" cho kiểu host \"%2$s\" 
 #: include/classes/import/CConfigurationImport.php:1182
 #, c-format
 msgid "Cannot find template \"%1$s\" for override \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
-msgstr ""
+msgstr "Không thể tìm thấy template \"%1$s\" để ghi đè \"%2$s\" của discovery rule \"%3$s\" trên \"%4$s\"."
 
 #: include/classes/import/importers/CMapImporter.php:179
 #: include/classes/import/importers/CMapImporter.php:229
 #, c-format
 msgid "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
-msgstr "Không thể tìm thấy trigger \"%1$s\" được sử dụng trong sơ đồ \"%2$s\"."
+msgstr "Không thể tìm thấy trigger \"%1$s\" được sử dụng trong map \"%2$s\"."
 
 #: include/classes/import/importers/CTemplateDashboardImporter.php:229
 #, c-format
 msgid "Cannot find user \"%1$s\" used in dashboard \"%2$s\"."
-msgstr ""
+msgstr "Không thể tìm thấy user \"%1$s\" được sử dụng trong dashboard \"%2$s\"."
 
 #: include/classes/api/services/CUser.php:1543
 msgid "Cannot find user directory for LDAP."
-msgstr ""
+msgstr "Không thể tìm thấy user directory trong LDAP."
 
 #: include/classes/import/CConfigurationImport.php:847
 #, c-format
@@ -3187,13 +3218,13 @@ msgstr "Không thể tìm thấy giá trị sơ đồ \"%1$s\"  được s
 #: include/classes/api/services/CRole.php:676
 #, c-format
 msgid "Cannot have non-default \"%2$s\" rule while having \"%3$s\" set to %4$d for user role \"%1$s\"."
-msgstr ""
+msgstr "Không thể có luật không mặc định \"%2$s\" trong khi \"%3$s\" được đặt thành %4$d cho user role \"%1$s\"."
 
 #: include/classes/api/services/CRole.php:562
 #: include/classes/api/services/CRole.php:638
 #, c-format
 msgid "Cannot have non-empty tag value while having empty tag in rule \"%2$s\" for user role \"%1$s\"."
-msgstr ""
+msgstr "Không thể có giá trị tag không rỗng trong khi có tag rỗng trong rule \"%2$s\" cho user role \"%1$s\"."
 
 #: include/classes/import/importers/CTemplateImporter.php:259
 #: include/classes/import/importers/CTemplateImporter.php:419
@@ -3205,197 +3236,197 @@ msgstr[0] "Không thể nhập template \"%1$s\", template được liên kết
 #: include/classes/api/services/CItemGeneral.php:689
 #, c-format
 msgid "Cannot inherit LDD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
-msgstr ""
+msgstr "Không thể kế thừa LDD rules với key \"%1$s\" của cả \"%2$s\" và \"%3$s\" mẫu, bởi vì key phải là duy nhất trên host \"%4$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:690
 #, c-format
 msgid "Cannot inherit LDD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
-msgstr ""
+msgstr "Không thể kế thừa LDD rules với key \"%1$s\" của cả hai templates \"%2$s\" và \"%3$s\", bởi vì key phải là duy nhất trên template \"%4$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:819
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a discovered item with the same key already exists."
-msgstr ""
+msgstr "Không thể kế thừa LLD rule với key \"%1$s\" của template \"%2$s\" cho host \"%3$s\", bởi vì một item khác trùng key đã tồn tại trước."
 
 #: include/classes/api/services/CItemGeneral.php:1230
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a host interface of type \"%4$s\" is required."
-msgstr ""
+msgstr "Không thể kế thừa LLD rule với key \"%1$s\" của template \"%2$s\" cho host \"%3$s\", bởi vì một host interface có kiểu là \"%4$s\" là bắt buộc phải có."
 
 #: include/classes/api/services/CItemGeneral.php:874
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule with the same key is already inherited from template \"%4$s\"."
-msgstr ""
+msgstr "Không thể kế thừa LLD rule với key \"%1$s\" của template \"%2$s\" cho host \"%3$s\", bởi vì một LLD rule với cùng key đã được kế thừa từ template \"%4$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:813
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item prototype with the same key already exists."
-msgstr ""
+msgstr "Không thể kế thừa LLD rule với key \"%1$s\" của template \"%2$s\" cho host \"%3$s\", bởi vì một item prototype với cùng key đã tồn tại trước đó."
 
 #: include/classes/api/services/CItemGeneral.php:807
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item with the same key already exists."
-msgstr ""
+msgstr "Không thể kế thừa LLD rule với key \"%1$s\" của template \"%2$s\" cho host \"%3$s\", bởi vì một item với cùng key đã tồn tại trước đó."
 
 #: include/classes/api/services/CItemGeneral.php:820
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because a discovered item with the same key already exists."
-msgstr ""
+msgstr "Không thể kế thừa LLD rule với key \"%1$s\" của template \"%2$s\" cho template \"%3$s\", bởi vì một item với cùng key đã tồn tại trước đó."
 
 #: include/classes/api/services/CItemGeneral.php:875
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule with the same key is already inherited from template \"%4$s\"."
-msgstr ""
+msgstr "Không thể kế thừa LLD rule với key \"%1$s\" của template \"%2$s\" cho template \"%3$s\", bởi vì một LLD rule với cùng key đã được kế thừa từ template \"%4$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:814
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item prototype with the same key already exists."
-msgstr ""
+msgstr "Không thể kế thừa LLD rule với key \"%1$s\" của template \"%2$s\" cho template \"%3$s\", bởi vì một item prototype với cùng giá trị key đã tồn tại trước đó."
 
 #: include/classes/api/services/CItemGeneral.php:808
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item with the same key already exists."
-msgstr ""
+msgstr "Không thể kế thừa LLD rule với key \"%1$s\" của template \"%2$s\" cho template \"%3$s\", bởi vì một item với cùng giá trị key đã tồn tại trước đó."
 
 #: include/classes/api/services/CItemPrototype.php:1220
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" and LLD rule \"%3$s\" to host \"%4$s\", because an item prototype with the same key already belongs to LLD rule \"%5$s\"."
-msgstr ""
+msgstr "Không thể kế thừa item prototype với key \"%1$s\" của template \"%2$s\" và LLD rule \"%3$s\" cho host \"%4$s\", bởi vì một item prototype với cùng giá trị key trước đó đã thuộc về LLD rule \"%5$s\"."
 
 #: include/classes/api/services/CItemPrototype.php:1221
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" and LLD rule \"%3$s\" to template \"%4$s\", because an item prototype with the same key already belongs to LLD rule \"%5$s\"."
-msgstr ""
+msgstr "Không thể kế thừa item prototype với key \"%1$s\" của template \"%2$s\" và LLD rule \"%3$s\" cho template \"%4$s\", bởi vì một item prototype với cùng giá trị key trước đó đã thuộc về LLD rule \"%5$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:841
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a discovered item with the same key already exists."
-msgstr ""
+msgstr "Không thể kế thừa item prototype với key \"%1$s\" của template \"%2$s\" cho host \"%3$s\", bởi vì một item với cùng giá trị key đã tồn tại trước đó."
 
 #: include/classes/api/services/CItemGeneral.php:1234
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a host interface of type \"%4$s\" is required."
-msgstr ""
+msgstr "Không thể kế thừa item prototype với key \"%1$s\" của template \"%2$s\" cho host \"%3$s\", bởi vì một host interface có kiểu \"%4$s\" là bắt buộc."
 
 #: include/classes/api/services/CItemGeneral.php:835
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule with the same key already exists."
-msgstr ""
+msgstr "Không thể kế thừa item prototype với key \"%1$s\" của template \"%2$s\" cho host \"%3$s\", bởi vì một LLD rule với cùng giá trị key đã tồn tại trước đó."
 
 #: include/classes/api/services/CItemGeneral.php:880
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item prototype with the same key is already inherited from template \"%4$s\"."
-msgstr ""
+msgstr "Không thể kế thừa item prototype với key \"%1$s\" của template \"%2$s\" cho host \"%3$s\", bởi vì một item prototype với giá trị key đã được kế thừa trước đó từ template \"%4$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:829
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item with the same key already exists."
-msgstr ""
+msgstr "Không thể kế thừa item prototype với key \"%1$s\" của template \"%2$s\" cho host \"%3$s\", bởi vì một item vời cùng giá trị key đã tồn tại trước đó."
 
 #: include/classes/api/services/CItemGeneral.php:842
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because a discovered item with the same key already exists."
-msgstr ""
+msgstr "Không thể kế thừa item prototype với key \"%1$s\" của template \"%2$s\" cho template \"%3$s\", bởi vì một item được phát hiện với cùng giá trị key đã tồn tại trước đó."
 
 #: include/classes/api/services/CItemGeneral.php:836
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule with the same key already exists."
-msgstr ""
+msgstr "Không thể kế thừa item prototype với key \"%1$s\" của template \"%2$s\" cho template \"%3$s\", bởi vì một LLD rule với cùng giá trị key đã tồn tại trước đó."
 
 #: include/classes/api/services/CItemGeneral.php:881
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item prototype with the same key is already inherited from template \"%4$s\"."
-msgstr ""
+msgstr "Không thể kế thừa item prototype với key \"%1$s\" của template \"%2$s\" cho template \"%3$s\", bởi vì một item prototype với cùng giá trị key đã được kế thừa trước đó từ template \"%4$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:830
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item with the same key already exists."
-msgstr ""
+msgstr "Không thể kế thừa item prototype với key \"%1$s\" của template \"%2$s\" cho template \"%3$s\", bởi vì một item với cùng giá trị key đã tồn tại trước đó."
 
 #: include/classes/api/services/CItemGeneral.php:683
 #, c-format
 msgid "Cannot inherit item prototypes with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
-msgstr ""
+msgstr "Không thể kế thừa item prototypes với key \"%1$s\" của các templates \"%2$s\" và \"%3$s\", bởi vì key phải là duy nhất trên host \"%4$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:684
 #, c-format
 msgid "Cannot inherit item prototypes with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
-msgstr ""
+msgstr "Không thể kế thừa item prototypes với giá trị key \"%1$s\" thuộc cả hai templates \"%2$s\" và \"%3$s\", bởi vì giá trị key phải là duy nhất trên template \"%4$s\"."
 
 #: include/classes/api/services/CItem.php:1465
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" and item with key \"%3$s\" of template \"%4$s\" to host \"%5$s\", because they would populate the same inventory field \"%6$s\"."
-msgstr ""
+msgstr "Không thể kế thừa item với giá trị key \"%1$s\" của template \"%2$s\" và item với giá trị key \"%3$s\" của template \"%4$s\" cho host \"%5$s\", bởi vì chúng sẽ sinh ra cùng một inventory field \"%6$s\"."
 
 #: include/classes/api/services/CItem.php:1464
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" and item with key \"%3$s\" of template \"%4$s\" to template \"%5$s\", because they would populate the same inventory field \"%6$s\"."
-msgstr ""
+msgstr "Không thể kế thừa item với key \"%1$s\" của template \"%2$s\" và item với key \"%3$s\" của template \"%4$s\" cho template \"%5$s\", bởi vì chúng sẽ sinh ra cùng một inventory field \"%6$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:797
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a discovered item with the same key already exists."
-msgstr ""
+msgstr "Không thể kế thừa item với key \"%1$s\" của template \"%2$s\" cho host \"%3$s\", bởi vì một item được phát hiện có cùng giá trị key đã tồn tại trước đó."
 
 #: include/classes/api/services/CItemGeneral.php:1226
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a host interface of type \"%4$s\" is required."
-msgstr ""
+msgstr "Không thể kế thừa item với key \"%1$s\" của template \"%2$s\" cho host \"%3$s\", bởi vì một host interface có kiểu \"%4$s\" là bắt buộc."
 
 #: include/classes/api/services/CItemGeneral.php:785
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule with the same key already exists."
-msgstr ""
+msgstr "Không thể kế thừa item với key \"%1$s\" của template \"%2$s\" cho host \"%3$s\", bởi vì một LLD rule có cùng giá trị key đã tồn tại trước đó."
 
 #: include/classes/api/services/CItemGeneral.php:791
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item prototype with the same key already exists."
-msgstr ""
+msgstr "Không thể kế thừa item với key \"%1$s\" của template \"%2$s\" cho host \"%3$s\", bởi vì một item prototype có cùng giá trị key đã tồn tại trước đó."
 
 #: include/classes/api/services/CItemGeneral.php:868
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item with the same key is already inherited from template \"%4$s\"."
-msgstr ""
+msgstr "Không thể kế thừa item với key \"%1$s\" của template \"%2$s\" cho host \"%3$s\", bởi vì một item có cùng giá trị key đã được kế thừa trước đó từ template \"%4$s\"."
 
 #: include/classes/api/services/CItem.php:1519
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because its inventory field \"%4$s\" is already populated by the item with key \"%5$s\"."
-msgstr ""
+msgstr "Không thể kế thừa item với key \"%1$s\" của template \"%2$s\" cho host \"%3$s\", bởi vì inventory field \"%4$s\" của nó đã được sinh ra bởi item với key \"%5$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:798
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because a discovered item with the same key already exists."
-msgstr ""
+msgstr "Không thể kế thừa item với key \"%1$s\" của template \"%2$s\" cho template \"%3$s\", bởi vì một item được phát hiện với cùng giá trị key đã tồn tại trước đó."
 
 #: include/classes/api/services/CItemGeneral.php:786
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule with the same key already exists."
-msgstr ""
+msgstr "Không thể kế thừa item với key \"%1$s\" của template \"%2$s\" cho template \"%3$s\", bởi vì một LLD rule với cùng một giá trị key đã tồn tại trước đó."
 
 #: include/classes/api/services/CItemGeneral.php:792
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item prototype with the same key already exists."
-msgstr ""
+msgstr "Không thể kế thừa item với key \"%1$s\" của template \"%2$s\" cho template \"%3$s\", bởi vì một item prototype với cùng giá trị key này đã tồn tại trước đó."
 
 #: include/classes/api/services/CItemGeneral.php:869
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item with the same key is already inherited from template \"%4$s\"."
-msgstr ""
+msgstr "Không thể kế thừa item với key \"%1$s\" của template \"%2$s\" cho template \"%3$s\", bởi vì một item với cùng giá trị key này đã được kế thừa trước đó từ template \"%4$s\"."
 
 #: include/classes/api/services/CItem.php:1518
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because its inventory field \"%4$s\" is already populated by the item with key \"%5$s\"."
-msgstr ""
+msgstr "Không thể kế thừa item với key \"%1$s\" của template \"%2$s\" cho template \"%3$s\", bởi vì inventory field \"%4$s\" của nó đã được sinh ra bởi item với key \"%5$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:677
 #, c-format
 msgid "Cannot inherit items with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
-msgstr ""
+msgstr "Không thể kế thừa các item có cùng giá trị key \"%1$s\" từ cả hai template \"%2$s\" và \"%3$s\", bởi vì giá trị item key phải là duy nhất trên host \"%4$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:678
 #, c-format
 msgid "Cannot inherit items with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
-msgstr ""
+msgstr "Không thể kế thừa nhiều item với cùng giá trị key \"%1$s\" từ cả hai template \"%2$s\" và \"%3$s\", bởi vì giá trị item key phải là duy nhất trên template \"%4$s\"."
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1263
 #: app/controllers/CControllerPopupTriggerExpr.php:1644
@@ -3409,108 +3440,108 @@ msgstr "Không thể liên kết template"
 #: include/classes/api/services/CHostBase.php:806
 #, c-format
 msgid "Cannot link template \"%1$s\" to host \"%2$s\", because it would be linked twice through template \"%3$s\"."
-msgstr ""
+msgstr "Không thể liên kết template \"%1$s\" với host \"%2$s\", bởi vì nó đã được liên kết 2 lần thông qua template \"%3$s\"."
 
 #: include/classes/api/services/CHostBase.php:872
 #, c-format
 msgid "Cannot link template \"%1$s\" to host \"%2$s\", because its parent template \"%3$s\" would be linked twice."
-msgstr ""
+msgstr "Không thể liên kết template \"%1$s\" với host \"%2$s\", bởi vì template cha \"%3$s\" của nó sẽ bị liên kết hai lần."
 
 #: include/classes/api/services/CHostBase.php:803
 #, c-format
 msgid "Cannot link template \"%1$s\" to host prototype \"%2$s\", because it would be linked twice through template \"%3$s\"."
-msgstr ""
+msgstr "Không thể liên kết template \"%1$s\" cho host prototype \"%2$s\", bởi vì nó sẽ được liên kết hai lần thông qua template \"%3$s\"."
 
 #: include/classes/api/services/CHostBase.php:869
 #, c-format
 msgid "Cannot link template \"%1$s\" to host prototype \"%2$s\", because its parent template \"%3$s\" would be linked twice."
-msgstr ""
+msgstr "Không thể liên kết template \"%1$s\" cho host prototype \"%2$s\", bởi vì template cha của nó \"%3$s\" sẽ được liên kết hai lần."
 
 #: include/classes/api/services/CHostBase.php:1125
 #: include/classes/api/services/CHostBase.php:1195
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\" due to dependency of trigger \"%3$s\"."
-msgstr ""
+msgstr "Không thể liên kết template \"%1$s\" cho template \"%2$s\" bởi vì nó phụ thuộc vào trigger \"%3$s\"."
 
 #: include/classes/api/services/CHostBase.php:1238
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\" due to expression of trigger \"%3$s\"."
-msgstr ""
+msgstr "Không thể liên kết template \"%1$s\" cho template \"%2$s\" do biểu thức trigger \"%3$s\"."
 
 #: include/classes/api/services/CHostBase.php:503
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\", because a circular linkage (%3$s) would occur."
-msgstr ""
+msgstr "Không thể liên kết template \"%1$s\" cho template \"%2$s\", bởi vì liên kết vòng (%3$s) sẽ xảy ra."
 
 #: include/classes/api/services/CHostBase.php:976
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\", because it would be linked to host \"%3$s\" twice."
-msgstr ""
+msgstr "Không thể liên kết template \"%1$s\" cho template \"%2$s\", bởi vì nó sẽ bị liên kết hai lần trên host \"%3$s\"."
 
 #: include/classes/api/services/CHostBase.php:973
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\", because it would be linked to host prototype \"%3$s\" twice."
-msgstr ""
+msgstr "Không thể liên kết template \"%1$s\" cho template \"%2$s\", bởi vì nó sẽ bị liên kết hai lần trên host prototype \"%3$s\"."
 
 #: include/classes/api/services/CHostBase.php:970
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\", because it would be linked to template \"%3$s\" twice."
-msgstr ""
+msgstr "Không thể liên kết template \"%1$s\" với template \"%2$s\", bởi vì nó sẽ được liên kết hai lần tới template \"%3$s\"."
 
 #: include/classes/api/services/CHostBase.php:800
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\", because it would be linked twice through template \"%3$s\"."
-msgstr ""
+msgstr "Không thể liên kết template \"%1$s\" với template \"%2$s\", bởi vì nó sẽ được liên kết hai lần thông qua template \"%3$s\"."
 
 #: include/classes/api/services/CHostBase.php:1003
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\", because its parent template \"%3$s\" would be linked to host \"%4$s\" twice."
-msgstr ""
+msgstr "Không thể liên kết template \"%1$s\" với template \"%2$s\", bởi vì template cha của nó \"%3$s\" sẽ được liên kết hai lần trên host \"%4$s\"."
 
 #: include/classes/api/services/CHostBase.php:1000
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\", because its parent template \"%3$s\" would be linked to host prototype \"%4$s\" twice."
-msgstr ""
+msgstr "Không thể liên kết template \"%1$s\" với template \"%2$s\", bởi vì template cha của nó \"%3$s\" sẽ được liên kết hai lần trên host prototype \"%4$s\"."
 
 #: include/classes/api/services/CHostBase.php:997
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\", because its parent template \"%3$s\" would be linked to template \"%4$s\" twice."
-msgstr ""
+msgstr "Không thể liên kết template \"%1$s\" với template \"%2$s\", bởi vì template cha của nó \"%3$s\" sẽ được liên kết hai lần tới template \"%4$s\"."
 
 #: include/classes/api/services/CHostBase.php:866
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\", because its parent template \"%3$s\" would be linked twice."
-msgstr ""
+msgstr "Không thể liên kết template \"%1$s\" với template \"%2$s\", bởi vì template cha của nó \"%3$s\" sẽ được liên kết hai lần."
 
 #: include/classes/api/services/CHostBase.php:1151
 #, c-format
 msgid "Cannot link template \"%1$s\" without template \"%2$s\" to host \"%3$s\" due to dependency of trigger \"%4$s\"."
-msgstr ""
+msgstr "Không thể liên kết template \"%1$s\" mà không có template \"%2$s\" trên host \"%3$s\" bởi vì nó phụ thuộc vào trigger \"%4$s\"."
 
 #: include/classes/api/services/CHostBase.php:1264
 #, c-format
 msgid "Cannot link template \"%1$s\" without template \"%2$s\" to host \"%3$s\" due to expression of trigger \"%4$s\"."
-msgstr ""
+msgstr "Không thể liên kết template \"%1$s\" mà không có template \"%2$s\" trên host \"%3$s\" bởi vì biểu thức trigger \"%4$s\"."
 
 #: include/classes/api/services/CHostBase.php:1148
 #, c-format
 msgid "Cannot link template \"%1$s\" without template \"%2$s\" to host prototype \"%3$s\" due to dependency of trigger \"%4$s\"."
-msgstr ""
+msgstr "Không thể liên kết template \"%1$s\" mà không có template \"%2$s\" trên host prototype \"%3$s\" bởi vì nó phụ thuộc trigger \"%4$s\"."
 
 #: include/classes/api/services/CHostBase.php:1261
 #, c-format
 msgid "Cannot link template \"%1$s\" without template \"%2$s\" to host prototype \"%3$s\" due to expression of trigger \"%4$s\"."
-msgstr ""
+msgstr "Không thể liên kết template \"%1$s\" mà không có template \"%2$s\" trên host prototype \"%3$s\" bởi vì biểu thức trigger \"%4$s\"."
 
 #: include/classes/api/services/CHostBase.php:1145
 #, c-format
 msgid "Cannot link template \"%1$s\" without template \"%2$s\" to template \"%3$s\" due to dependency of trigger \"%4$s\"."
-msgstr ""
+msgstr "Không thể liên kết template \"%1$s\" mà không có template \"%2$s\" trên template \"%3$s\" bởi vì nó phụ thuộc trigger \"%4$s\"."
 
 #: include/classes/api/services/CHostBase.php:1258
 #, c-format
 msgid "Cannot link template \"%1$s\" without template \"%2$s\" to template \"%3$s\" due to expression of trigger \"%4$s\"."
-msgstr ""
+msgstr "Không thể liên kết template \"%1$s\" mà không có template \"%2$s\" trên template \"%3$s\" bởi vì biểu thức trigger \"%4$s\"."
 
 #: app/controllers/CControllerModuleEdit.php:95
 #: include/classes/core/ZBase.php:903
@@ -3521,38 +3552,38 @@ msgstr[0] ""
 
 #: include/classes/api/services/CUser.php:1431
 msgid "Cannot log out."
-msgstr ""
+msgstr "Không thể đăng xuất."
 
 #: include/classes/api/services/CHost.php:1034
 msgid "Cannot mass update host name."
-msgstr "Không thể cập nhật cùng một lúc tên host."
+msgstr "Không thể cập nhật hàng loạt tên host."
 
 #: include/classes/api/services/CHost.php:1020
 msgid "Cannot mass update visible host name."
-msgstr "Không thể cập nhật cùng một lúc visible host name."
+msgstr "Không thể cập nhật hàng loạt tên hiển thị của host."
 
 #: jsLoader.php:435
 msgid "Cannot open URL"
-msgstr ""
+msgstr "Không thể mở URL"
 
 #: include/classes/api/services/CHostBase.php:1561
 #, c-format
 msgid "Cannot pass duplicate template IDs for the linkage: %1$s."
-msgstr ""
+msgstr "Không thể truyền template IDs trùng lặp cho đường dẫn: %1$s."
 
 #: jsLoader.php:136
 msgid "Cannot paste inaccessible widget."
-msgstr ""
+msgstr "Không thể dán widget không truy cập được."
 
 #: include/classes/db/DB.php:856
 #, c-format
 msgid "Cannot perform delete statement on table \"%1$s\" without where condition."
-msgstr "Không thể xóa trạng thái trong bảng \"%1$s\" với điều kiện tại đó."
+msgstr "Không thể thực hiện lệnh xóa trong bảng \"%1$s\" mà thiếu điều kiện where."
 
 #: include/classes/db/DB.php:676
 #, c-format
 msgid "Cannot perform update statement on table \"%1$s\" without values."
-msgstr "Không thể cập nhật trạng thái trong bảng \"%1$s\" với nhiều giá trị."
+msgstr "Không thể thực hiện lệnh cập nhật trên bảng \"%1$s\" mà không có giá trị."
 
 #: include/classes/db/DB.php:689
 #, c-format
@@ -3579,7 +3610,7 @@ msgstr "Không thể đọc XML: %1$s."
 #: include/classes/import/readers/CYamlImportReader.php:55
 #, c-format
 msgid "Cannot read YAML: %1$s."
-msgstr ""
+msgstr "Không thể đọc YAML: %1$s."
 
 #: include/classes/server/CZabbixServer.php:567
 #, c-format
@@ -3589,7 +3620,7 @@ msgstr "Không thể đọc các câu trả lời, kiểm tra kết nối 
 #: app/controllers/CControllerPopupMassupdateHost.php:363
 #, c-format
 msgid "Cannot remove the tag with name \"%1$s\" and value \"%2$s\", defined in a host prototype, from host \"%3$s\"."
-msgstr ""
+msgstr "Không thể xóa bỏ tag được định nghĩa trong một host prototype với tên \"%1$s\" và giá trị \"%2$s\", từ host \"%3$s\"."
 
 #: include/classes/api/services/CUser.php:510
 msgid "Cannot rename guest user."
@@ -3640,62 +3671,62 @@ msgstr "Không thể đặt \"%1$s\" cho kiểu đồ thị \"%2$s\"."
 
 #: widgets/piechart/includes/CWidgetFieldDataSet.php:175
 msgid "Cannot set \"Data set aggregation\" when item with type \"Total\" is added to the chart."
-msgstr ""
+msgstr "Không thể cài đặt \"Data set aggregation\" khi đã có sẵn một item với kiểu là \"Total\" được thêm vào biểu đồ."
 
 #: include/classes/api/services/CItemGeneral.php:2478
 #, c-format
 msgid "Cannot set dependency for LLD rule with key \"%1$s\" on the master item with key \"%2$s\" on the host \"%3$s\": %4$s."
-msgstr ""
+msgstr "Không thể cài đặt dependency cho LLD rule có key là \"%1$s\" trên master item có key là \"%2$s\" trên host \"%3$s\": %4$s."
 
 #: include/classes/api/services/CItemGeneral.php:2477
 #, c-format
 msgid "Cannot set dependency for LLD rule with key \"%1$s\" on the master item with key \"%2$s\" on the template \"%3$s\": %4$s."
-msgstr ""
+msgstr "Không thể cài đặt dependency cho LLD rule có key là \"%1$s\" trên master item có key là \"%2$s\" trên template \"%3$s\": %4$s."
 
 #: include/classes/api/services/CItemGeneral.php:2472
 #, c-format
 msgid "Cannot set dependency for item prototype with key \"%1$s\" on the master item prototype with key \"%2$s\" on the host \"%3$s\": %4$s."
-msgstr ""
+msgstr "Không thể cài đặt dependency cho item prototype có key là \"%1$s\" trên master item prototype có key là \"%2$s\" trên host \"%3$s\": %4$s."
 
 #: include/classes/api/services/CItemGeneral.php:2471
 #, c-format
 msgid "Cannot set dependency for item prototype with key \"%1$s\" on the master item prototype with key \"%2$s\" on the template \"%3$s\": %4$s."
-msgstr ""
+msgstr "Không thể cài đặt dependency cho item prototype có key là \"%1$s\" trên master item prototype có key là \"%2$s\" trên template \"%3$s\": %4$s."
 
 #: include/classes/api/services/CItemGeneral.php:2467
 #, c-format
 msgid "Cannot set dependency for item prototype with key \"%1$s\" on the master item with key \"%2$s\" on the host \"%3$s\": %4$s."
-msgstr ""
+msgstr "Không thể cài đặt dependency cho item prototype có key là \"%1$s\" trên master item có key là \"%2$s\" trên host \"%3$s\": %4$s."
 
 #: include/classes/api/services/CItemGeneral.php:2466
 #, c-format
 msgid "Cannot set dependency for item prototype with key \"%1$s\" on the master item with key \"%2$s\" on the template \"%3$s\": %4$s."
-msgstr ""
+msgstr "Không thể cài đặt dependency cho item prototype có key là \"%1$s\" trên master item có key là \"%2$s\" trên template \"%3$s\": %4$s."
 
 #: include/classes/api/services/CItemGeneral.php:2461
 #, c-format
 msgid "Cannot set dependency for item with key \"%1$s\" on the master item with key \"%2$s\" on the host \"%3$s\": %4$s."
-msgstr ""
+msgstr "Không thể cài đặt dependency cho item có key là \"%1$s\" trên master item có key là \"%2$s\" trên host \"%3$s\": %4$s."
 
 #: include/classes/api/services/CItemGeneral.php:2460
 #, c-format
 msgid "Cannot set dependency for item with key \"%1$s\" on the master item with key \"%2$s\" on the template \"%3$s\": %4$s."
-msgstr ""
+msgstr "Không thể cài đặt dependency cho item có key là \"%1$s\" trên master item có key là \"%2$s\" trên template \"%3$s\": %4$s."
 
 #: include/classes/api/services/CHost.php:1085
 #: include/classes/api/services/CHost.php:2161
 #: include/classes/api/services/CHost.php:2367
 msgid "Cannot set inventory fields for disabled inventory."
-msgstr "Không thể đặt lại các trường inventory khi vô hiệu hóa inventory."
+msgstr "Không thể cài đặt inventory fields cho inventory đã bị vô hiệu hóa."
 
 #: include/classes/api/services/CService.php:1433
 #, c-format
 msgid "Cannot specify \"propagation_rule\" parameter without specifying \"propagation_value\" parameter for service \"%1$s\"."
-msgstr ""
+msgstr "Không thể cài đặt tham số \"propagation_rule\" mà không cài đặt giá trị \"propagation_value\" cho service \"%1$s\"."
 
 #: jsLoader.php:285
 msgid "Cannot support notification audio for this device."
-msgstr ""
+msgstr "Không thể hỗ trợ âm thanh thông báo cho thiết bị này."
 
 #: include/classes/api/services/CHostInterface.php:305
 msgid "Cannot switch host for interface."
@@ -3704,7 +3735,7 @@ msgstr "Không thể chuyển đổi host cho interface."
 #: app/controllers/CControllerMediatypeTestEdit.php:75
 #: app/controllers/CControllerMediatypeTestSend.php:84
 msgid "Cannot test disabled media type."
-msgstr ""
+msgstr "Không thể kiểm tra media type đã bị vô hiệu hóa."
 
 #: app/controllers/CControllerUserUnblock.php:68
 msgid "Cannot unblock user"
@@ -3718,52 +3749,52 @@ msgstr "Không thể ngắt kết nối tempate"
 #: include/classes/api/services/CHostBase.php:332
 #, c-format
 msgid "Cannot unlink template \"%1$s\" from host \"%2$s\" due to dependency of trigger \"%3$s\"."
-msgstr ""
+msgstr "Không thể ngắt liên kết template \"%1$s\" ra khỏi host \"%2$s\" bởi vì nó phụ thuộc vào trigger \"%3$s\"."
 
 #: include/classes/api/services/CHostBase.php:416
 #, c-format
 msgid "Cannot unlink template \"%1$s\" from template \"%2$s\" due to dependency of trigger \"%3$s\" on host \"%4$s\"."
-msgstr ""
+msgstr "Không thể ngắt liên kết template \"%1$s\" ra khỏi template \"%2$s\" bởi vì nó phụ thuộc vào trigger \"%3$s\" trên host \"%4$s\"."
 
 #: include/classes/api/services/CHostBase.php:415
 #, c-format
 msgid "Cannot unlink template \"%1$s\" from template \"%2$s\" due to dependency of trigger \"%3$s\" on template \"%4$s\"."
-msgstr ""
+msgstr "Không thể ngắt liên kết template \"%1$s\" ra khỏi template \"%2$s\" bởi vì nó phụ thuộc vào trigger \"%3$s\" trên template \"%4$s\"."
 
 #: include/classes/api/services/CHostBase.php:331
 #, c-format
 msgid "Cannot unlink template \"%1$s\" from template \"%2$s\" due to dependency of trigger \"%3$s\"."
-msgstr ""
+msgstr "Không thể ngắt liên kết template \"%1$s\" ra khỏi template \"%2$s\" bởi vì nó phụ thuộc vào trigger \"%3$s\"."
 
 #: include/classes/api/services/CHostBase.php:256
 #, c-format
 msgid "Cannot unlink template \"%1$s\" without template \"%2$s\" from host \"%3$s\" due to expression of trigger \"%4$s\"."
-msgstr ""
+msgstr "Không thể ngắt liên kết template \"%1$s\" ra khỏi template \"%2$s\" trên host \"%3$s\" do biểu thức của trigger \"%4$s\"."
 
 #: include/classes/api/services/CHostBase.php:255
 #, c-format
 msgid "Cannot unlink template \"%1$s\" without template \"%2$s\" from template \"%3$s\" due to expression of trigger \"%4$s\"."
-msgstr ""
+msgstr "Không thể ngắt liên kết template \"%1$s\" nếu thiếu template \"%2$s\" ra khỏi template \"%3$s\" do biểu thức trigger \"%4$s\"."
 
 #: include/classes/api/services/CHostGeneral.php:885
 #, c-format
 msgid "Cannot unlink trigger \"%1$s\", it has items from template that is left linked to host."
-msgstr ""
+msgstr "Không thể ngắt liên kết trigger \"%1$s\", nó có các items trong template vẫn được liên kết với host."
 
 #: include/classes/api/services/CAction.php:2772
 #, c-format
 msgid "Cannot update \"%1$s\" for action \"%2$s\"."
-msgstr "Không thể cập nhật \"%1$s\" cho hành động \"%2$s\"."
+msgstr "Không thể cập nhật \"%1$s\" cho action \"%2$s\"."
 
 #: include/classes/api/services/CGraphGeneral.php:967
 #, c-format
 msgid "Cannot update \"%1$s\" for graph \"%2$s\"."
-msgstr "Không thể cập nhật \"%1$s\" cho đồ thị \"%2$s\"."
+msgstr "Không thể cập nhật \"%1$s\" cho graph \"%2$s\"."
 
 #: include/classes/api/services/CGraphGeneral.php:971
 #, c-format
 msgid "Cannot update \"%1$s\" for graph prototype \"%2$s\"."
-msgstr "Không thể cập nhật \"%1$s\" cho kiểu đồ thị \"%2$s\"."
+msgstr "Không thể cập nhật \"%1$s\" cho graph prototype \"%2$s\"."
 
 #: include/classes/api/services/CTriggerGeneral.php:1136
 #, c-format
@@ -3773,56 +3804,56 @@ msgstr "Không thể cập nhật \"%1$s\" cho trigger mẫu \"%2$s\"."
 #: include/classes/api/services/CTriggerGeneral.php:1147
 #, c-format
 msgid "Cannot update \"%1$s\" for templated trigger prototype \"%2$s\"."
-msgstr "Không thể cập nhật \"%1$s\" cho kiểu trigger mẫu \"%2$s\"."
+msgstr "Không thể cập nhật \"%1$s\" cho templated trigger prototype \"%2$s\"."
 
 #: include/classes/api/services/CHost.php:2344
 #, c-format
 msgid "Cannot update \"%2$s\" for a discovered host \"%1$s\"."
-msgstr "Không thể cập nhật \"%2$s\" cho máy chủ khám phá \"%1$s\"."
+msgstr "Không thể cập nhật \"%2$s\" cho host được khám phá \"%1$s\"."
 
 #: include/classes/api/services/CTriggerGeneral.php:1142
 #, c-format
 msgid "Cannot update \"%2$s\" for a discovered trigger \"%1$s\"."
-msgstr "Không thể cập nhật \"%2$s\" cho một trigger khám phá \"%1$s\"."
+msgstr "Không thể cập nhật \"%2$s\" cho một trigger được khám phá \"%1$s\"."
 
 #: app/controllers/CControllerTokenUpdate.php:66
 #: app/controllers/CControllerTokenUpdate.php:142
 msgid "Cannot update API token"
-msgstr ""
+msgstr "Không thể cập nhật API token"
 
 #: app/controllers/CControllerSlaUpdate.php:70
 #: app/controllers/CControllerSlaUpdate.php:138
 msgid "Cannot update SLA"
-msgstr ""
+msgstr "Không thể cập nhật SLA"
 
 #: include/classes/api/services/CGraphGeneral.php:68
 msgid "Cannot update a discovered graph."
-msgstr "Không thể cập nhật một biểu đồ được phát hiện."
+msgstr "Không thể cập nhật một graph được phát hiện."
 
 #: include/classes/api/services/CHostGroup.php:818
 #, c-format
 msgid "Cannot update a discovered host group \"%1$s\"."
-msgstr ""
+msgstr "Không thể cập nhật host group được phát hiện \"%1$s\"."
 
 #: include/classes/api/services/CGraphGeneral.php:84
 #, c-format
 msgid "Cannot update a templated graph \"%1$s\"."
-msgstr ""
+msgstr "Không thể cập nhật templated graph \"%1$s\"."
 
 #: include/classes/api/services/CHttpTest.php:574
 #, c-format
 msgid "Cannot update a templated web scenario \"%1$s\": %2$s."
-msgstr "Không thể cập nhật một mẫu web scenario \"%1$s\": %2$s."
+msgstr "Không thể cập nhật templated web scenario \"%1$s\": %2$s."
 
 #: app/controllers/CControllerActionUpdate.php:58
 #: app/controllers/CControllerActionUpdate.php:275
 msgid "Cannot update action"
-msgstr "Không thể cập nhật hành động"
+msgstr "Không thể cập nhật action"
 
 #: app/controllers/CControllerAuthenticationUpdate.php:91
 #: app/controllers/CControllerAuthenticationUpdate.php:306
 msgid "Cannot update authentication"
-msgstr "Không thể cập nhật xác thực"
+msgstr "Không thể cập nhật authentication"
 
 #: app/controllers/CControllerAuditSettingsUpdate.php:45
 #: app/controllers/CControllerAuditSettingsUpdate.php:82
@@ -3846,7 +3877,7 @@ msgstr "Không thể cập nhật cấu hình"
 #: app/controllers/CControllerConnectorUpdate.php:83
 #: app/controllers/CControllerConnectorUpdate.php:157
 msgid "Cannot update connector"
-msgstr ""
+msgstr "Không thể cập nhật connector"
 
 #: app/controllers/CControllerDiscoveryUpdate.php:48
 #: app/controllers/CControllerDiscoveryUpdate.php:96 host_discovery.php:548
@@ -3862,24 +3893,24 @@ msgstr[0] "Không thể cập nhật sự kiện"
 #: app/controllers/CControllerCorrelationUpdate.php:49
 #: app/controllers/CControllerCorrelationUpdate.php:117
 msgid "Cannot update event correlation"
-msgstr ""
+msgstr "Không thể cập nhật luật tương quan sự kiện"
 
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:134
 msgid "Cannot update events"
-msgstr ""
+msgstr "Không thể cập nhật các sự kiện"
 
 #: graphs.php:241
 msgid "Cannot update graph"
-msgstr "Không thể cập nhật đồ thị"
+msgstr "Không thể cập nhật graph"
 
 #: graphs.php:223 graphs.php:294
 msgid "Cannot update graph prototype"
-msgstr "Không thể cập nhật kiểu đồ thị"
+msgstr "Không thể cập nhật graph prototype"
 
 #: include/classes/api/services/CHostGroup.php:1266
 #, c-format
 msgid "Cannot update groups for discovered host \"%1$s\"."
-msgstr "Không thể cập nhật các nhóm cho host được phát hiện \"%1$s\"."
+msgstr "Không thể cập nhật các host groups được phát hiện \"%1$s\"."
 
 #: app/controllers/CControllerHostUpdate.php:36
 #: app/controllers/CControllerHostUpdate.php:160
@@ -3891,12 +3922,12 @@ msgstr[0] "Không thể cập nhật host"
 
 #: include/classes/api/services/CHost.php:982
 msgid "Cannot update host encryption settings. Connection settings for both directions should be specified."
-msgstr "Không thể cập nhật cài đặt mật mã máy chủ. Cài đặt kết nối cho cả hướng được chỉ rõ."
+msgstr "Không thể cập nhật cài đặt mã hóa host. Cài đặt kết nối cho cả hai hướng phải được chỉ rõ."
 
 #: app/controllers/CControllerHostGroupUpdate.php:43
 #: app/controllers/CControllerHostGroupUpdate.php:105
 msgid "Cannot update host group"
-msgstr ""
+msgstr "Không thể cập nhật host group"
 
 #: host_prototypes.php:266 host_prototypes.php:280 host_prototypes.php:301
 msgid "Cannot update host prototype"
@@ -3905,7 +3936,7 @@ msgstr[0] "Không thể cập nhật kiểu host"
 
 #: app/controllers/CControllerIconMapUpdate.php:73
 msgid "Cannot update icon map"
-msgstr "Không thể cập nhật biểu tượng sơ đồ"
+msgstr "Không thể cập nhật icon map"
 
 #: app/controllers/CControllerImageUpdate.php:43
 #: app/controllers/CControllerImageUpdate.php:109
@@ -3937,19 +3968,19 @@ msgstr "Không thể cập nhật các macro"
 #: app/controllers/CControllerMaintenanceUpdate.php:73
 #: app/controllers/CControllerMaintenanceUpdate.php:152
 msgid "Cannot update maintenance period"
-msgstr ""
+msgstr "Không thể cập nhật chu kì bảo trì"
 
 #: app/controllers/CControllerMediatypeUpdate.php:78
 msgid "Cannot update media type"
-msgstr "Không thể cập nhật kiểu media"
+msgstr "Không thể cập nhật media type"
 
 #: app/controllers/CControllerModuleUpdate.php:102
 msgid "Cannot update module"
-msgstr ""
+msgstr "Không thể cập nhật module"
 
 #: sysmaps.php:189
 msgid "Cannot update network map"
-msgstr "Không thể cập nhật sơ đồ mạng"
+msgstr "Không thể cập nhật network map"
 
 #: app/controllers/CControllerProxyUpdate.php:137
 #: app/controllers/CControllerProxyUpdate.php:205
@@ -3964,12 +3995,12 @@ msgstr "Không thể cập nhật proxy cho host được phát hiện \"%
 #: app/controllers/CControllerProxyGroupUpdate.php:43
 #: app/controllers/CControllerProxyGroupUpdate.php:82
 msgid "Cannot update proxy group"
-msgstr ""
+msgstr "Không thể cập nhật proxy group"
 
 #: include/classes/api/services/CRole.php:768
 #, c-format
 msgid "Cannot update readonly user role \"%1$s\"."
-msgstr ""
+msgstr "Không thể cập nhật user role chỉ đọc \"%1$s\"."
 
 #: app/controllers/CControllerRegExUpdate.php:44
 #: app/controllers/CControllerRegExUpdate.php:89
@@ -3979,7 +4010,7 @@ msgstr "Không thể cập nhật biểu thức chính quy"
 #: app/controllers/CControllerScheduledReportUpdate.php:63
 #: app/controllers/CControllerScheduledReportUpdate.php:156
 msgid "Cannot update scheduled report"
-msgstr ""
+msgstr "Không thể cập nhật báo cáo định kì"
 
 #: app/controllers/CControllerScriptUpdate.php:65
 #: app/controllers/CControllerScriptUpdate.php:166
@@ -3991,7 +4022,7 @@ msgstr "Không thể cập nhật script"
 #: include/classes/api/services/CScript.php:443
 #, c-format
 msgid "Cannot update script scope. Script \"%1$s\" is used in action \"%2$s\"."
-msgstr ""
+msgstr "Không thể cập nhật phạm vi của script. Script \"%1$s\" đã được sử dụng trong action \"%2$s\"."
 
 #: app/controllers/CControllerServiceUpdate.php:78
 #: app/controllers/CControllerServiceUpdate.php:172
@@ -4004,22 +4035,21 @@ msgstr ""
 #: include/classes/api/services/CService.php:2460
 #, c-format
 msgid "Cannot update service \"%1$s\": %2$s."
-msgstr ""
+msgstr "Không thể cập nhật service \"%1$s\": %2$s."
 
 #: app/controllers/CControllerPopupMassupdateService.php:161
 msgid "Cannot update services"
-msgstr ""
+msgstr "Không thể cập nhật các services"
 
 #: include/classes/api/services/CHttpTest.php:598
 #: include/classes/api/services/CHttpTest.php:892
 #, c-format
 msgid "Cannot update step for a templated web scenario \"%1$s\": %2$s."
-msgstr "Không thể cập nhật bước cho một mẫu web scenario \"%1$s\": %2$s."
+msgstr "Không thể cập nhật bước cho templated web scenario \"%1$s\": %2$s."
 
 #: app/controllers/CControllerTemplateMassupdate.php:353
 #: app/controllers/CControllerTemplateUpdate.php:49
 #: app/controllers/CControllerTemplateUpdate.php:196
-#, fuzzy
 msgid "Cannot update template"
 msgid_plural "Cannot update templates"
 msgstr[0] "Không thể cập nhật template"
@@ -4027,12 +4057,11 @@ msgstr[0] "Không thể cập nhật template"
 #: app/controllers/CControllerTemplateGroupUpdate.php:41
 #: app/controllers/CControllerTemplateGroupUpdate.php:94
 msgid "Cannot update template group"
-msgstr ""
+msgstr "Không thể cập nhật template group"
 
 #: app/controllers/CControllerTriggerMassupdate.php:212
 #: app/controllers/CControllerTriggerUpdate.php:58
 #: app/controllers/CControllerTriggerUpdate.php:155
-#, fuzzy
 msgid "Cannot update trigger"
 msgid_plural "Cannot update triggers"
 msgstr[0] "Không thể cập nhật trigger"
@@ -4054,7 +4083,7 @@ msgstr[0] "Không thể cập nhật kiểu trigger"
 #: include/classes/api/services/CTriggerGeneral.php:2140
 #, c-format
 msgid "Cannot update trigger prototype \"%1$s\": %2$s."
-msgstr "Không thể cập nhật kiểu trigger \"%1$s\": %2$s."
+msgstr "Không thể cập nhật trigger prototype \"%1$s\": %2$s."
 
 #: app/controllers/CControllerUserProfileUpdate.php:69
 #: app/controllers/CControllerUserProfileUpdate.php:127
@@ -4073,7 +4102,7 @@ msgstr[0] ""
 #: app/controllers/CControllerUserroleUpdate.php:117
 #: app/controllers/CControllerUserroleUpdate.php:187
 msgid "Cannot update user role"
-msgstr ""
+msgstr "Không thể cập nhật user role"
 
 #: httpconf.php:195
 msgid "Cannot update web scenario"
@@ -4081,7 +4110,7 @@ msgstr "Không thể cập nhận web scenario"
 
 #: app/controllers/CControllerWebScenarioStepCheck.php:57
 msgid "Cannot update web scenario step"
-msgstr ""
+msgstr "Không thể cập nhật web scenario step"
 
 #: app/views/administration.regex.edit.php:55
 msgid "Case sensitive"
@@ -4091,7 +4120,7 @@ msgstr "Phân biệt chữ hoa/thường"
 #: app/views/administration.authentication.edit.php:247
 #: app/views/administration.authentication.edit.php:412
 msgid "Case-sensitive login"
-msgstr ""
+msgstr "Đăng nhập phân biệt chữ hoa-thường"
 
 #: include/locales.inc.php:36
 msgid "Catalan (ca_ES)"
@@ -4099,11 +4128,11 @@ msgstr "Catalan (ca_ES)"
 
 #: include/classes/data/CItemData.php:1344
 msgid "Catches all SNMP traps that match regex. If regexp is unspecified, catches any trap."
-msgstr "Chọn tất cả các trap SNMP phù hợp với regex. Nếu regrexp không được chỉ định, chọn bất kỳ trap nào."
+msgstr "Bắt toàn bộ các trap SNMP khớp với regex. Nếu biểu thức regrexp không được xác định, bắt bất kỳ trap nào."
 
 #: include/classes/data/CItemData.php:1337
 msgid "Catches all SNMP traps that were not caught by any of snmptrap[] items."
-msgstr "Chọn tất cả các trap SNMP không bị chọn bởi bất kỳ item snmptrap [] nào."
+msgstr "Bắt tất cả các trap SNMP không bị bắt bởi bất kỳ phần tử mảng snmptrap[] nào."
 
 #: include/actions.inc.php:1991 include/classes/screens/CScreenProblem.php:1178
 #: include/events.inc.php:182
@@ -4152,7 +4181,7 @@ msgstr ""
 
 #: app/views/mfa.edit.php:128
 msgid "Change client secret"
-msgstr ""
+msgstr "Thay đổi khóa bí mật của client"
 
 #: widgets/item/includes/WidgetForm.php:131
 #: widgets/item/includes/WidgetForm.php:249
@@ -4160,7 +4189,7 @@ msgstr ""
 #: widgets/item/includes/WidgetForm.php:255
 #: widgets/item/views/widget.edit.php:200
 msgid "Change indicator"
-msgstr ""
+msgstr "Chỉ dấu báo hiệu thay đổi"
 
 #: app/views/administration.mediatype.edit.php:157
 #: app/views/administration.user.edit.php:209 app/views/mediatype.edit.php:214
@@ -4174,12 +4203,12 @@ msgstr "Thay đổi trên giây"
 
 #: include/classes/helpers/CRoleHelper.php:561
 msgid "Change problem ranking"
-msgstr ""
+msgstr "Thay đổi xếp hạng vấn đề"
 
 #: app/views/popup.acknowledge.edit.php:72
 #: include/classes/helpers/CRoleHelper.php:544
 msgid "Change severity"
-msgstr "Thay đổi mức độ bảo mật"
+msgstr "Thay đổi mức độ nghiêm trọng"
 
 #: include/classes/html/CMacroValue.php:168
 msgid "Change type"
@@ -4206,7 +4235,7 @@ msgstr "Chuỗi ký tự không bao gồm"
 #: app/controllers/CControllerPopupTriggerExpr.php:982
 #: app/controllers/CControllerPopupTriggerExpr.php:1170
 msgid "Chars"
-msgstr ""
+msgstr "Ký tự"
 
 #: include/hosts.inc.php:234
 msgid "Chassis"
@@ -4235,11 +4264,11 @@ msgstr ""
 
 #: include/items.inc.php:1622
 msgid "Check for error using regular expression"
-msgstr ""
+msgstr "Kiểm tra lỗi bằng việc sử dụng biểu thức chính quy"
 
 #: include/items.inc.php:1626
 msgid "Check for not supported value"
-msgstr ""
+msgstr "Kiểm tra giá trị không được hỗ trợ"
 
 #: include/classes/setup/CSetupWizard.php:56
 #: include/classes/setup/CSetupWizard.php:510
@@ -4261,15 +4290,15 @@ msgstr "Kiểm tra"
 
 #: include/classes/data/CItemData.php:1093
 msgid "Checks if DNS service is up. Returns 0 - DNS is down (server did not respond or DNS resolution failed); 1 - DNS is up"
-msgstr "Kiểm tra nếu máy chủ DNS bật. Trả về 0 - DNS tắt (Máy chủ không trả lời hoặc độ phân giải DNS lỗi);"
+msgstr "Kiểm tra liệu dịch vụ DNS đang bật hay không. Trả về 0 - DNS đang tắt (Máy chủ không trả lời hoặc phân giải DNS lỗi); 1 - DNS đang bật."
 
 #: include/classes/data/CItemData.php:1623
 msgid "Checks if file exists. Returns 0 - not found; 1 - file of the specified type exists"
-msgstr ""
+msgstr "Kiểm tra liệu tập tin tồn tại hay không. Trả về 0 - không tìm thấy; 1 - tồn tại tập tin có kiểu được xác định"
 
 #: include/classes/data/CItemData.php:969
 msgid "Checks if host is accessible by ICMP ping. 0 - ICMP ping fails. 1 - ICMP ping successful."
-msgstr ""
+msgstr "Kiểm tra liệu host có truy cập được bằng ICMP ping hay không. 0 - ICMP ping thất bại. 1 - ICMP ping thành công."
 
 #: include/classes/data/CItemData.php:1157
 msgid "Checks if it is possible to make TCP connection to specified port. Returns 0 - cannot connect; 1 - can connect"
@@ -4285,11 +4314,11 @@ msgstr "Kiểm tra nếu dịch vụ đang chạy và đáp ứng yêu cầu đ�
 
 #: include/classes/data/CItemData.php:1149
 msgid "Checks if this TCP port is in LISTEN state. Returns 0 - it is not in LISTEN state; 1 - it is in LISTEN state"
-msgstr "Kiểm tra nếu cổng TCP này là trong trạng thái LISTEN. Trả về 0 - nó không ở trạng thái LISTEN; 1 - nó không ở trạng thái LISTEN"
+msgstr "Kiểm tra xem cổng TCP ở trong trạng thái LISTEN hay không. Trả về 0 - nó không ở trạng thái LISTEN; 1 - nó ở trạng thái LISTEN"
 
 #: include/classes/data/CItemData.php:1191
 msgid "Checks if this UDP port is in LISTEN state. Returns 0 - it is not in LISTEN state; 1 - it is in LISTEN state"
-msgstr "Kiểm tra nếu cổng UDP này là trong trạng thái LISTEN. Trả về 0 - nó không ở trạng thái LISTEN; 1 - nó ở trạng thái LISTEN"
+msgstr "Kiểm tra xem cổng UDP này ở trong trạng thái LISTEN hay không. Trả về 0 - nó không ở trạng thái LISTEN; 1 - nó ở trạng thái LISTEN"
 
 #: include/classes/data/CItemData.php:1165
 msgid "Checks performance of TCP service. Returns 0 - service is down; seconds - the number of seconds spent while connecting to the service"
@@ -4305,24 +4334,24 @@ msgstr "Kiểm tra phải là duy nhất."
 
 #: app/views/popup.service.edit.php:287 app/views/popup.service.edit.php:300
 msgid "Child services"
-msgstr ""
+msgstr "Các dịch vụ con"
 
 #: include/locales.inc.php:37
 msgid "Chinese (zh_CN)"
-msgstr "Chinese (zh_CN)"
+msgstr "Tiếng Trung quốc Đại lục (zh_CN)"
 
 #: include/locales.inc.php:38
 msgid "Chinese (zh_TW)"
-msgstr "Chinese (zh_TW)"
+msgstr "Tiếng Trung quốc Đài Loan (zh_TW)"
 
 #: include/classes/import/importers/CTemplateImporter.php:294
 #, c-format
 msgid "Circular reference in templates: %1$s."
-msgstr "Thông tư tham khảo cho các template: %1$s."
+msgstr "Tham chiếu vòng trong template: %1$s."
 
 #: include/classes/api/services/CHostBase.php:1767
 msgid "Circular template linkage is not allowed."
-msgstr "Liên kết thông tư template không được cho phép."
+msgstr "Không được phép liên kết vòng giữa các template."
 
 #: include/classes/core/ZBase.php:590 include/classes/core/ZBase.php:596
 #, c-format
@@ -4339,19 +4368,19 @@ msgstr "Xóa lịch sử và phương hướng."
 
 #: include/views/configuration.item.list.php:315
 msgid "Clear history and trends of selected item?"
-msgstr ""
+msgstr "Xóa lịch sử và xu hướng của item được chọn?"
 
 #: include/views/configuration.item.list.php:316
 msgid "Clear history and trends of selected items?"
-msgstr ""
+msgstr "Xóa lịch sử và xu hướng của các items được chọn?"
 
 #: include/views/configuration.httpconf.list.php:238
 msgid "Clear history and trends of selected web scenario?"
-msgstr ""
+msgstr "Xóa lịch sử và xu hướng của web scenario được chọn?"
 
 #: include/views/configuration.httpconf.list.php:239
 msgid "Clear history and trends of selected web scenarios?"
-msgstr ""
+msgstr "Xóa lịch sử và xu hướng của các web scenarios được chọn?"
 
 #: app/views/popup.massupdate.host.php:66 app/views/template.massupdate.php:70
 msgid "Clear when unlinking"
@@ -4363,7 +4392,7 @@ msgstr "Nhấp và kéo đến kích thước mong muốn."
 
 #: jsLoader.php:323
 msgid "Click to view or edit"
-msgstr ""
+msgstr "Kích để xem hoặc sửa"
 
 #: app/views/mfa.edit.php:111
 msgid "Client ID"
@@ -4380,7 +4409,7 @@ msgstr "Đồng hồ"
 #: tests/selenium/modules/clock32/includes/WidgetForm.php:73
 #: widgets/clock/includes/WidgetForm.php:73
 msgid "Clock type"
-msgstr ""
+msgstr "Loại đồng hồ"
 
 #: app/partials/scheduledreport.formgrid.html.php:225
 #: app/views/administration.iconmap.edit.php:140
@@ -4414,11 +4443,11 @@ msgstr "Tạo bản sao"
 #: app/views/configuration.host.edit.php:61
 #: app/views/js/popup.host.edit.js.php:44 host_prototypes.php:203
 msgid "Cloned host parameter values have been modified."
-msgstr ""
+msgstr "Các giá trị host parameter được sao chép đã bị thay đổi."
 
 #: app/views/js/template.edit.js.php:40
 msgid "Cloned template parameter values have been modified."
-msgstr ""
+msgstr "Các giá trị template parameter được sao chép đã bị thay đổi."
 
 #: app/views/popup.import.compare.php:47 app/views/popup.token.view.php:84
 #: include/func.inc.php:1814 include/views/js/monitoring.sysmaps.js.php:86
@@ -4455,7 +4484,7 @@ msgstr "Đóng vấn đề"
 
 #: include/classes/helpers/CRoleHelper.php:547
 msgid "Close problems"
-msgstr ""
+msgstr "Đóng các vấn đề"
 
 #: app/views/mfa.edit.php:90
 msgid "Code length"
@@ -4494,24 +4523,24 @@ msgstr ""
 #: widgets/item/includes/WidgetForm.php:246
 #: widgets/piechart/includes/WidgetForm.php:181
 msgid "Color"
-msgstr ""
+msgstr "Màu sắc"
 
 #: include/classes/validators/CColorValidator.php:32 jsLoader.php:279
 #, c-format
 msgid "Color \"%1$s\" is not correct: expecting hexadecimal color code (6 symbols)."
-msgstr ""
+msgstr "Màu \"%1$s\" không đúng: mã màu hexadecimal được mong đợi (6 symbols)."
 
 #: include/views/js/monitoring.sysmaps.js.php:807
 msgid "Color (OK)"
-msgstr ""
+msgstr "Màu sắc (OK)"
 
 #: widgets/honeycomb/includes/WidgetForm.php:213
 msgid "Color interpolation"
-msgstr ""
+msgstr "Nội suy màu sắc"
 
 #: widgets/gauge/views/widget.edit.php:92
 msgid "Colors"
-msgstr ""
+msgstr "Các màu"
 
 #: widgets/graphprototype/includes/WidgetForm.php:82
 #: widgets/tophosts/includes/WidgetForm.php:140
@@ -4524,7 +4553,7 @@ msgstr "Kết quả tổng hợp"
 
 #: include/classes/html/widgets/fields/CWidgetFieldLatLngView.php:35
 msgid "Comma separated center coordinates and zoom level to display when the widget is initially loaded."
-msgstr ""
+msgstr "Danh sách dưới dạng phân cách bằng dấu phẩy của tọa độ trung tâm và mức phóng đại để hiển thị khi widget được nạp ban đầu."
 
 #: app/views/administration.script.edit.php:199
 #: app/views/reports.actionlog.list.csv.php:45
@@ -5291,6 +5320,10 @@ msgstr "Tạo media type"
 msgid "Create new"
 msgstr "Tạo mới"
 
+#: jsLoader.php:372
+msgid "Create new report"
+msgstr ""
+
 #: app/views/administration.proxy.list.php:239
 msgid "Create proxy"
 msgstr "Tạo proxy"
@@ -5546,6 +5579,10 @@ msgstr ""
 #: include/classes/helpers/CSlaHelper.php:39 report4.php:90
 msgid "Daily"
 msgstr "Hàng ngày"
+
+#: include/locales.inc.php:40
+msgid "Danish (da_DK)"
+msgstr ""
 
 #: include/classes/core/ZBase.php:381
 msgid "Dark"
@@ -7040,6 +7077,10 @@ msgstr "Các trigger hiển thị OK khi"
 msgid "Display graph"
 msgstr "Hiển thị đồ thị"
 
+#: widgets/itemhistory/views/column.edit.php:241
+msgid "Display local time"
+msgstr ""
+
 #: widgets/svggraph/includes/WidgetForm.php:364
 msgid "Display min/avg/max"
 msgstr ""
@@ -7389,6 +7430,10 @@ msgstr "Không có tham số đầu vào."
 #: include/classes/api/services/CMap.php:1042
 msgid "Empty map ID."
 msgstr "ID sơ đồ trống."
+
+#: widgets/itemhistory/Widget.php:32
+msgid "Empty value."
+msgstr ""
 
 #: app/views/action.list.php:167 app/views/administration.token.list.php:204
 #: app/views/administration.user.token.list.php:157
@@ -8357,6 +8402,11 @@ msgstr "Lọc"
 msgid "Filter deleted"
 msgstr ""
 
+#: app/partials/monitoring.latest.view.html.php:36
+#: app/views/popup.generic.php:180
+msgid "Filter is not set"
+msgstr ""
+
 #: app/controllers/CControllerPopupTabFilterEdit.php:115
 msgid "Filter properties"
 msgstr ""
@@ -9125,6 +9175,10 @@ msgstr "Độ tương phản sáng"
 msgid "Highlight whole row"
 msgstr "Làm nổi bật toàn bộ hàng"
 
+#: widgets/itemhistory/views/column.edit.php:132
+msgid "Highlights"
+msgstr ""
+
 #: app/controllers/CControllerAuditLogList.php:232
 #: app/controllers/CControllerPopupLldOperation.php:218
 #: app/partials/configuration.filter.items.php:158
@@ -9382,6 +9436,10 @@ msgstr[0] ""
 msgid "Host group elements"
 msgstr "Các phần tử nhóm host"
 
+#: jsLoader.php:292
+msgid "Host group is not selected."
+msgstr ""
+
 #: include/views/monitoring.sysmap.edit.php:168
 msgid "Host group label type"
 msgstr "Kiểu nhãn nhóm host"
@@ -9461,6 +9519,10 @@ msgstr "Host lưu trữ"
 msgid "Host inventory overview"
 msgstr "Tổng quan về host lưu trữ"
 
+#: jsLoader.php:289
+msgid "Host is not selected."
+msgstr ""
+
 #: include/views/monitoring.sysmap.edit.php:183
 msgid "Host label type"
 msgstr "Kiểu nhãn host"
@@ -9501,6 +9563,10 @@ msgstr ""
 #: include/hosts.inc.php:284
 msgid "Host networks"
 msgstr "Các mạng host"
+
+#: widgets/hostnavigator/includes/WidgetForm.php:65
+msgid "Host patterns"
+msgstr ""
 
 #: app/views/usergroup.edit.php:270
 msgid "Host permissions"
@@ -9580,6 +9646,14 @@ msgstr ""
 #: include/hosts.inc.php:289
 msgid "Host subnet mask"
 msgstr "Host subnet mask"
+
+#: widgets/itemnavigator/Widget.php:43
+msgid "Host tag"
+msgstr ""
+
+#: widgets/itemnavigator/includes/CWidgetFieldItemGroupingView.php:80
+msgid "Host tag value"
+msgstr ""
 
 #: widgets/tophosts/includes/WidgetForm.php:125
 msgid "Host tags"
@@ -9983,6 +10057,10 @@ msgstr "Hình ảnh đã bị xóa"
 #: include/views/monitoring.sysmap.edit.php:228
 msgid "Image label type"
 msgstr "Loại nhãn hình ảnh"
+
+#: widgets/itemhistory/Widget.php:33
+msgid "Image loading error."
+msgstr ""
 
 #: include/classes/helpers/CUploadFile.php:129
 #, c-format
@@ -11648,9 +11726,17 @@ msgid "Item enabled"
 msgid_plural "Items enabled"
 msgstr[0] "Item đã được kích hoạtCác item đã được kích hoạt"
 
+#: widgets/itemhistory/Widget.php:26
+msgid "Item history"
+msgstr ""
+
 #: include/actions.inc.php:1074
 msgid "Item in \"not supported\" state"
 msgstr "Item trong trạng thái \"không được hỗ trợ\""
+
+#: widgets/itemnavigator/includes/WidgetForm.php:107
+msgid "Item limit"
+msgstr ""
 
 #: widgets/piechart/views/widget.edit.js.php:209
 #: widgets/svggraph/views/widget.edit.js.php:287
@@ -11661,6 +11747,10 @@ msgstr ""
 msgid "Item name"
 msgstr ""
 
+#: widgets/itemnavigator/Widget.php:29
+msgid "Item navigator"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:1622
 msgid "Item not selected"
 msgstr "Item không được lựa chọn"
@@ -11668,6 +11758,13 @@ msgstr "Item không được lựa chọn"
 #: widgets/piechart/views/widget.edit.js.php:203
 #: widgets/svggraph/views/widget.edit.js.php:281
 msgid "Item pattern"
+msgstr ""
+
+#: widgets/honeycomb/includes/WidgetForm.php:90
+#: widgets/itemnavigator/includes/WidgetForm.php:78
+#: widgets/piechart/views/widget.edit.js.php:208
+#: widgets/svggraph/views/widget.edit.js.php:279
+msgid "Item patterns"
 msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:241
@@ -11711,6 +11808,14 @@ msgstr "Kiểu item với ID \"%1$s\" không sẵn sàng."
 #: include/views/configuration.item.prototype.list.php:29
 msgid "Item prototypes"
 msgstr "Các kiểu item"
+
+#: widgets/itemnavigator/Widget.php:44
+msgid "Item tag"
+msgstr ""
+
+#: widgets/itemnavigator/includes/CWidgetFieldItemGroupingView.php:81
+msgid "Item tag value"
+msgstr ""
 
 #: app/partials/configuration.tags.tab.php:165
 #: widgets/dataover/includes/WidgetForm.php:51
@@ -12129,6 +12234,10 @@ msgstr "Đồ thị tuần cuối cùng"
 #: include/views/inventory.host.view.php:151 jsLoader.php:375
 msgid "Latest data"
 msgstr "Dữ liệu gần đây nhất"
+
+#: app/partials/administration.system.info.php:101
+msgid "Latest release"
+msgstr ""
 
 #: jsLoader.php:376
 msgid "Latest values"
@@ -12718,6 +12827,10 @@ msgstr "Vị trí nhãn phần tử sơ đồ "
 msgid "Map element label type"
 msgstr "Loại nhãn phần tử bản đồ"
 
+#: jsLoader.php:290
+msgid "Map is not selected."
+msgstr ""
+
 #: sysmap.php:128
 msgid "Map is updated! Return to map list?"
 msgstr ""
@@ -13067,6 +13180,10 @@ msgstr "Các loại phương tiện"
 
 #: app/views/popup.media.php:75
 msgid "Media types disabled by Administration."
+msgstr ""
+
+#: app/views/popup.media.php:78
+msgid "Media types disabled in Alerts."
 msgstr ""
 
 #: include/classes/api/services/CMediatype.php:873
@@ -13945,8 +14062,17 @@ msgstr ""
 msgid "New triggers"
 msgstr "Trigger mới"
 
+#: app/partials/administration.system.info.php:58
+#: app/partials/administration.system.info.php:63
+msgid "New update available"
+msgstr ""
+
 #: app/views/popup.usergroupmapping.edit.php:112
 msgid "New user group mapping"
+msgstr ""
+
+#: widgets/itemhistory/includes/WidgetForm.php:96
+msgid "New values"
 msgstr ""
 
 #: app/views/monitoring.host.dashboard.view.php:146
@@ -14025,6 +14151,12 @@ msgstr ""
 #: app/views/maintenance.edit.php:138 app/views/maintenance.list.php:122
 msgid "No data collection"
 msgstr "Không thu thập dữ liệu"
+
+#: app/views/search.php:48 app/views/search.php:209 app/views/search.php:289
+#: app/views/search.php:394 include/classes/html/CTableInfo.php:72
+#: widgets/hostnavigator/Widget.php:40
+msgid "No data found"
+msgstr ""
 
 #: include/classes/html/CTableInfo.php:35
 msgid "No data found."
@@ -15855,6 +15987,14 @@ msgstr ""
 msgid "Please select two elements"
 msgstr "Xin vui lòng lựa chọn 2 phần tử"
 
+#: jsLoader.php:194
+msgid "Please update configuration"
+msgstr ""
+
+#: app/partials/administration.system.info.php:47
+msgid "Please upgrade to latest major release."
+msgstr ""
+
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:312
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:179
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:244
@@ -16676,6 +16816,10 @@ msgstr ""
 msgid "Referred widget became unavailable. Please update configuration."
 msgstr ""
 
+#: jsLoader.php:195
+msgid "Referred widget is unavailable"
+msgstr ""
+
 #: app/views/administration.user.edit.php:309
 msgid "Refresh"
 msgstr "làm mới"
@@ -16747,6 +16891,10 @@ msgstr "Các biểu thức chính quy"
 
 #: app/controllers/CControllerPopupScheduledReportList.php:54
 msgid "Related reports"
+msgstr ""
+
+#: app/partials/administration.system.info.php:72
+msgid "Release notes"
 msgstr ""
 
 #: jsLoader.php:158
@@ -18505,6 +18653,10 @@ msgstr ""
 msgid "Show arc"
 msgstr ""
 
+#: widgets/itemhistory/includes/WidgetForm.php:105
+msgid "Show column header"
+msgstr ""
+
 #: widgets/hostavail/includes/WidgetForm.php:62
 #: widgets/tophosts/includes/WidgetForm.php:136
 #: widgets/web/includes/WidgetForm.php:66
@@ -18575,6 +18727,10 @@ msgstr "Hiển thị lựa chọn"
 msgid "Show sidebar"
 msgstr ""
 
+#: widgets/systeminfo/includes/WidgetForm.php:42
+msgid "Show software update check details"
+msgstr ""
+
 #: app/partials/monitoring.host.filter.php:147
 #: app/partials/monitoring.problem.filter.php:135
 #: app/views/administration.user.edit.php:814
@@ -18606,11 +18762,19 @@ msgstr ""
 msgid "Show text as HTML"
 msgstr "Hiển thị văn bản như HTML"
 
+#: widgets/itemhistory/views/column.edit.php:251
+msgid "Show thumbnail"
+msgstr ""
+
 #: app/partials/monitoring.problem.filter.php:297
 #: widgets/problemsbysv/includes/WidgetForm.php:122
 #: widgets/problems/includes/WidgetForm.php:149
 msgid "Show timeline"
 msgstr "Hiển thị dòng thời gian"
+
+#: widgets/itemhistory/includes/WidgetForm.php:102
+msgid "Show timestamp"
+msgstr ""
 
 #: widgets/piechart/includes/WidgetForm.php:150
 msgid "Show total value"
@@ -18646,6 +18810,10 @@ msgstr "Đã hiển thị"
 
 #: app/views/mfa.edit.php:67
 msgid "Shown as the account name to all MFA users in authenticator apps."
+msgstr ""
+
+#: app/views/mfa.edit.php:67
+msgid "Shown as the label to all MFA users in authenticator apps."
 msgstr ""
 
 #: include/classes/html/CHtmlPage.php:148
@@ -18706,6 +18874,14 @@ msgstr ""
 #: app/partials/trigger.edit.trigger.tab.php:239
 msgid "Single"
 msgstr "Đơn"
+
+#: widgets/itemhistory/views/column.edit.php:150
+msgid "Single line"
+msgstr ""
+
+#: widgets/itemhistory/views/column.edit.php:140
+msgid "Single line - result will be displayed in a single line and truncated to specified length."
+msgstr ""
 
 #: include/hosts.inc.php:364
 msgid "Site ZIP / postal"
@@ -18813,6 +18989,10 @@ msgstr "Phần mềm ứng dụng E"
 #: include/classes/data/CItemData.php:1471
 msgid "Software architecture information. Returns string"
 msgstr "Thông tin kiến trúc phần mềm. Trả về kiểu string"
+
+#: app/partials/administration.system.info.php:96
+msgid "Software update last checked"
+msgstr ""
 
 #: include/classes/api/managers/CHistoryManager.php:1343
 msgid "Some of the history for this item may be compressed, deletion is not available."
@@ -19171,6 +19351,10 @@ msgstr ""
 
 #: app/views/popup.triggerexpr.php:133
 msgid "String functions"
+msgstr ""
+
+#: widgets/piechart/includes/WidgetForm.php:137
+msgid "Stroke width"
 msgstr ""
 
 #: include/items.inc.php:1545 include/items.inc.php:1549
@@ -20021,6 +20205,10 @@ msgstr ""
 msgid "This setting should be enabled, because trend tables contain compressed chunks."
 msgstr ""
 
+#: widgets/itemhistory/views/column.edit.php:242
+msgid "This setting will display local time instead of the timestamp. \"Show timestamp\" must also be checked in the advanced configuration."
+msgstr ""
+
 #: include/views/configuration.item.edit.php:129
 #: include/views/configuration.item.prototype.edit.php:114
 msgid "This type of information may not match the key."
@@ -20535,6 +20723,10 @@ msgstr "Trigger ở trạng thái \"unknown\""
 msgid "Trigger in template \"%1$s\" has dependency with trigger in template \"%2$s\"."
 msgstr "Trigger trong template \"%1$s\" phụ thuộc vào trigger trong template \"%2$s\"."
 
+#: jsLoader.php:291
+msgid "Trigger is not selected."
+msgstr ""
+
 #: include/views/monitoring.sysmap.edit.php:198
 msgid "Trigger label type"
 msgstr "Kiểu nhãn trigger"
@@ -20998,6 +21190,10 @@ msgstr "Chỉ không được báo nhận"
 msgid "Unavailable"
 msgstr ""
 
+#: jsLoader.php:206 jsLoader.php:211
+msgid "Unavailable widget"
+msgstr ""
+
 #: app/views/administration.user.list.php:309
 msgid "Unblock"
 msgstr "Bỏ chặn"
@@ -21297,6 +21493,11 @@ msgctxt "discovery status"
 msgid "Up"
 msgstr "Up"
 
+#: app/partials/administration.system.info.php:59
+#: app/partials/administration.system.info.php:64
+msgid "Up to date"
+msgstr ""
+
 #: app/controllers/CControllerAuditLogList.php:205
 #: app/partials/massupdate.macros.tab.php:126
 #: app/partials/massupdate.valuemaps.tab.php:94
@@ -21478,6 +21679,15 @@ msgstr "Sử dụng nếu mức độ quan trọng"
 
 #: app/views/administration.miscconfig.edit.php:127
 msgid "Use iframe sandboxing"
+msgstr ""
+
+#: widgets/itemhistory/views/column.edit.php:232
+msgid "Use monospace font"
+msgstr ""
+
+#: app/partials/monitoring.latest.view.html.php:36
+#: app/views/popup.generic.php:180
+msgid "Use the filter to display results"
 msgstr ""
 
 #: app/views/administration.script.list.php:93 app/views/mediatype.list.php:98
@@ -21705,6 +21915,10 @@ msgstr ""
 #: widgets/gauge/views/widget.edit.php:116
 #: widgets/item/views/widget.edit.php:90
 msgid "User macros"
+msgstr ""
+
+#: app/views/popup.mediatypemapping.edit.php:73
+msgid "User media"
 msgstr ""
 
 #: app/partials/layout.htmlpage.aside.php:94
@@ -22466,6 +22680,13 @@ msgstr ""
 msgid "Vault connection failed."
 msgstr ""
 
+#: include/classes/setup/CSetupWizard.php:609
+#: include/classes/setup/CSetupWizard.php:640
+#: include/classes/setup/CSetupWizard.php:843
+#: include/classes/setup/CSetupWizard.php:863
+msgid "Vault prefix"
+msgstr ""
+
 #: app/views/administration.miscconfig.edit.php:100
 msgid "Vault provider"
 msgstr ""
@@ -22550,6 +22771,10 @@ msgstr ""
 #: include/views/monitoring.history.php:86
 msgid "View as"
 msgstr "Xem"
+
+#: jsLoader.php:417
+msgid "View related reports"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1735
 msgid "Virtual space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
@@ -22756,6 +22981,10 @@ msgstr ""
 
 #: jsLoader.php:187
 msgid "Widget is too small for the specified number of columns and rows."
+msgstr ""
+
+#: jsLoader.php:205
+msgid "Widgets"
 msgstr ""
 
 #: graphs.php:39 include/views/configuration.graph.edit.php:100
@@ -23130,6 +23359,10 @@ msgstr "Bạn không có quyền truy cập trang này."
 msgid "You must login to view this page."
 msgstr "Bạn phải đăng nhập để xem trang này."
 
+#: jsLoader.php:287
+msgid "You need to have at least one image uploaded to create map element. Images can be uploaded in Administration->General->Images section."
+msgstr ""
+
 #: include/classes/db/DB.php:133
 msgid "Your database is not working properly. Please wait a few minutes and try to repeat this action. If the problem still persists, please contact system administrator. The problem might be caused by long running transaction or row level lock accomplished by your database management system."
 msgstr "Cơ sở dữ liệu của bạn không hoạt động đúng. Vui lòng đợi vài phút và cố gắng lặp lại hành động này. Nếu sự cố vẫn còn, vui lòng liên hệ với quản trị viên hệ thống. Vấn đề có thể do giao dịch chạy dài hoặc khóa cấp hàng được thực hiện bởi hệ thống quản lý cơ sở dữ liệu của bạn."
@@ -23460,6 +23693,10 @@ msgstr "một mảng hoặc một chuỗi ký tự được mong đợi"
 
 #: include/classes/validators/CApiInputValidator.php:2969
 msgid "an array or object is expected"
+msgstr ""
+
+#: include/classes/api/services/CUser.php:990
+msgid "an email address is expected"
 msgstr ""
 
 #: include/classes/import/validators/C10XmlValidator.php:363
@@ -23859,6 +24096,15 @@ msgstr ""
 msgid "cannot update readonly parameter \"%1$s\" of inherited object"
 msgstr ""
 
+#: include/classes/api/services/CUserGroup.php:501
+#: include/classes/api/services/CUser.php:451
+#: include/classes/api/services/CUser.php:614
+#: include/classes/api/services/CUser.php:794
+#: include/classes/api/services/CUser.php:1066
+#, c-format
+msgid "cannot update readonly parameter \"%1$s\" of provisioned user"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:491
 msgid "cbrt() - Cube root"
 msgstr ""
@@ -24226,6 +24472,13 @@ msgstr ""
 msgid "host pattern"
 msgstr "Mẫu máy chủ"
 
+#: widgets/piechart/includes/CWidgetFieldDataSetView.php:155
+#: widgets/svggraph/includes/CWidgetFieldDataSetView.php:159
+#: widgets/svggraph/includes/CWidgetFieldOverrideView.php:284
+#: widgets/svggraph/views/widget.edit.php:292
+msgid "host patterns"
+msgstr ""
+
 #: include/classes/api/services/CHostPrototype.php:1249
 msgid "host prototype with the same UUID already exists"
 msgstr ""
@@ -24463,6 +24716,15 @@ msgstr ""
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:329
 msgid "item pattern"
 msgstr "item mẫu"
+
+#: widgets/piechart/includes/CWidgetFieldDataSetView.php:134
+#: widgets/piechart/includes/CWidgetFieldDataSetView.php:172
+#: widgets/svggraph/includes/CWidgetFieldDataSetView.php:138
+#: widgets/svggraph/includes/CWidgetFieldDataSetView.php:176
+#: widgets/svggraph/includes/CWidgetFieldOverrideView.php:261
+#: widgets/svggraph/includes/CWidgetFieldOverrideView.php:303
+msgid "item patterns"
+msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:545
 msgid "item prototype with the same UUID already exists"
@@ -24981,6 +25243,11 @@ msgstr "đầu ra"
 msgid "pattern"
 msgstr "Mẫu"
 
+#: include/classes/html/widgets/fields/CWidgetFieldHostPatternSelectView.php:32
+#: include/classes/html/widgets/fields/CWidgetFieldPatternSelectView.php:36
+msgid "patterns"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:878
 msgid "percentile() - Percentile P of a period T"
 msgstr "Percile () - Phần trăm P của giai đoạn T"
@@ -25044,6 +25311,11 @@ msgstr ""
 msgid "referred object does not exist"
 msgstr ""
 
+#: include/classes/widgets/fields/CWidgetFieldMultiSelect.php:81
+#: include/classes/widgets/fields/CWidgetFieldTimePeriod.php:99
+msgid "referred widget is unavailable"
+msgstr ""
+
 #: app/controllers/CControllerQueueDetails.php:104
 #: app/controllers/CControllerQueueOverview.php:82
 #: app/controllers/CControllerQueueOverviewProxy.php:73
@@ -25094,6 +25366,10 @@ msgstr "Bên phải "
 
 #: app/controllers/CControllerPopupTriggerExpr.php:953
 msgid "right() - Returns the rightmost count characters"
+msgstr ""
+
+#: widgets/navtree/Widget.php:41
+msgid "root"
 msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:966

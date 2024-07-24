@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -166,17 +161,23 @@ abstract class CXmlValidatorGeneral {
 			}
 
 			// validation of the values type
-			foreach ($rules['rules'] as $tag => $rule) {
-				if (array_key_exists('import', $rule) && !$this->preview) {
-					$data[$tag] = call_user_func($rule['import'], $data);
+			foreach ($rules['rules'] as $tag => $tag_rules) {
+				$tag_rules = $this->getResultRule($tag_rules, $data, $rules['rules']);
+
+				if ($tag_rules['type'] & XML_IGNORE_TAG) {
+					continue;
+				}
+
+				if (array_key_exists('import', $tag_rules) && !$this->preview) {
+					$data[$tag] = call_user_func($tag_rules['import'], $data);
 				}
 
 				if (array_key_exists($tag, $data)) {
 					$subpath = ($path === '/' ? $path : $path.'/').$tag;
-					$this->doValidateRecursive($rule, $data[$tag], $data, $subpath);
+					$this->doValidateRecursive($tag_rules, $data[$tag], $data, $subpath);
 				}
-				elseif (($rule['type'] & XML_REQUIRED) || (array_key_exists('ex_required', $rule)
-						&& call_user_func($rule['ex_required'], $data))) {
+				elseif (($tag_rules['type'] & XML_REQUIRED) || (array_key_exists('ex_required', $tag_rules)
+						&& call_user_func($tag_rules['ex_required'], $data))) {
 					throw new Exception(_s('Invalid tag "%1$s": %2$s.', $path,
 						_s('the tag "%1$s" is missing', $tag)
 					));
@@ -295,5 +296,58 @@ abstract class CXmlValidatorGeneral {
 		if (array_key_exists('in', $rules) && !in_array($value, array_values($rules['in']))) {
 			throw new Exception(_s('Invalid tag "%1$s": %2$s.', $path, _s('unexpected constant "%1$s"', $value)));
 		}
+	}
+
+	private function getResultRule(array $tag_rules, array &$data, array $parent_rules): array {
+		while ($tag_rules['type'] & XML_MULTIPLE) {
+			$matched_multiple_rule = null;
+
+			foreach ($tag_rules['rules'] as $multiple_rule) {
+				if ($this->multipleRuleMatched($multiple_rule, $data, $parent_rules)) {
+					$multiple_rule['type'] = ($tag_rules['type'] & XML_REQUIRED) | $multiple_rule['type'];
+					$matched_multiple_rule =
+						$multiple_rule + array_intersect_key($tag_rules, array_flip(['default']));
+					break;
+				}
+			}
+
+			if ($matched_multiple_rule === null) {
+				// For use by developers. Do not translate.
+				throw new Exception('Incorrect XML_MULTIPLE validation rules.');
+			}
+
+			$tag_rules = $matched_multiple_rule;
+		}
+
+		return $tag_rules;
+	}
+
+	private function multipleRuleMatched(array $multiple_rule, array &$data, array $rules): bool {
+		if (array_key_exists('else', $multiple_rule)) {
+			return true;
+		}
+		elseif (is_array($multiple_rule['if'])) {
+			$field_name = $multiple_rule['if']['tag'];
+
+			if (array_key_exists($field_name, $data)) {
+				return in_array($data[$field_name], $multiple_rule['if']['in']);
+			}
+			else {
+				$tag_rules = $this->getResultRule($rules[$field_name], $data, $rules);
+
+				if (!$this->isPreview()) {
+					$data[$field_name] = array_key_exists('in', $tag_rules)
+						? $tag_rules['in'][$tag_rules['default']]
+						: $tag_rules['default'];
+				}
+
+				return array_key_exists($tag_rules['default'], $multiple_rule['if']['in']);
+			}
+		}
+		elseif ($multiple_rule['if'] instanceof Closure) {
+			return call_user_func($multiple_rule['if'], $data);
+		}
+
+		return false;
 	}
 }

@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -178,6 +173,12 @@ class testFormItem extends CLegacyWebTest {
 				['type' => 'Calculated', 'host' => 'Simple form test host']
 			],
 			[
+				['type' => 'Script', 'host' => 'Simple form test host']
+			],
+			[
+				['type' => 'Browser', 'host' => 'Simple form test host']
+			],
+			[
 				['type' => 'Zabbix agent', 'template' => 'Inheritance test template']
 			],
 			[
@@ -319,6 +320,12 @@ class testFormItem extends CLegacyWebTest {
 				['type' => 'Calculated', 'template' => 'Inheritance test template']
 			],
 			[
+				['type' => 'Script', 'template' => 'Inheritance test template']
+			],
+			[
+				['type' => 'Browser', 'template' => 'Inheritance test template']
+			],
+			[
 				[
 					'host' => 'Template inheritance test host',
 					'hostTemplate' => 'Inheritance test template',
@@ -399,23 +406,24 @@ class testFormItem extends CLegacyWebTest {
 		if (!isset($templateid)) {
 			$options = $type_field->getOptions()->asText();
 			$this->assertEquals($options, [
-					'Zabbix agent',
-					'Zabbix agent (active)',
-					'Simple check',
-					'SNMP agent',
-					'SNMP trap',
-					'Zabbix internal',
-					'Zabbix trapper',
-					'External check',
-					'Database monitor',
-					'HTTP agent',
-					'IPMI agent',
-					'SSH agent',
-					'TELNET agent',
-					'JMX agent',
-					'Calculated',
-					'Dependent item',
-					'Script'
+				'Zabbix agent',
+				'Zabbix agent (active)',
+				'Simple check',
+				'SNMP agent',
+				'SNMP trap',
+				'Zabbix internal',
+				'Zabbix trapper',
+				'External check',
+				'Database monitor',
+				'HTTP agent',
+				'IPMI agent',
+				'SSH agent',
+				'TELNET agent',
+				'JMX agent',
+				'Calculated',
+				'Dependent item',
+				'Script',
+				'Browser'
 			]);
 			if (isset($data['type'])) {
 				$type_field->select($data['type']);
@@ -611,6 +619,51 @@ class testFormItem extends CLegacyWebTest {
 			$this->assertFalse($form->getField('SNMP OID')->isDisplayed());
 		}
 
+		if (in_array($type, ['Script', 'Browser'])) {
+			// Check parameters table layout.
+			$parameters_table = $form->getField('Parameters')->asTable();
+			$this->assertSame(['Name', 'Value', 'Action'], $parameters_table->getHeadersText());
+
+			$this->assertEquals(['Remove', 'Add'], $parameters_table->query('tag:button')->all()
+					->filter(CElementFilter::CLICKABLE)->asText()
+			);
+
+			foreach(['parameters[0][name]' => 255, 'parameters[0][value]' => 2048] as $input_name => $maxlength) {
+				$input = $parameters_table->query('name', $input_name)->one();
+				$this->assertEquals($maxlength, $input->getAttribute('maxlength'));
+				$this->assertEquals('', $input->getValue());
+			}
+
+			// Check Script field.
+			$script_values = [
+				'Script' => '',
+				'Browser' => "var browser = new Browser(Browser.chromeOptions());\n\n".
+						"try {\n".
+						" browser.navigate(\"https://example.com\");\n".
+						" browser.collectPerfEntries();\n".
+						"}\n".
+						"finally {\n".
+						" return JSON.stringify(browser.getResult());\n".
+						"}"
+			];
+
+			$this->assertTrue($form->isRequired('Script'));
+			$script_field = $form->getField('Script');
+			$this->assertEquals('script', $script_field->query('xpath:.//input[@type="text"]')->one()
+					->getAttribute('placeholder')
+			);
+
+			$script_dialog = $script_field->edit();
+			$this->assertEquals('JavaScript', $script_dialog->getTitle());
+			$script_input = $script_dialog->query('xpath:.//textarea')->one();
+
+			foreach (['placeholder' => 'return value', 'maxlength' => 65535] as $attribute => $value) {
+				$this->assertEquals($value, $script_input->getAttribute($attribute));
+			}
+			$this->assertEquals($script_values[$type], $script_input->getText());
+			$script_dialog->close();
+		}
+
 		switch ($type) {
 			case 'Zabbix agent':
 			case 'Zabbix agent (active)':
@@ -624,6 +677,8 @@ class testFormItem extends CLegacyWebTest {
 			case 'TELNET agent':
 			case 'JMX agent':
 			case 'Calculated':
+			case 'Script':
+			case 'Browser':
 				$this->assertTrue($form->getField('Update interval')->isDisplayed());
 				$this->assertEquals(255, $form->getField('Update interval')->getAttribute('maxlength'));
 				if (!isset($itemid)) {
@@ -926,6 +981,8 @@ class testFormItem extends CLegacyWebTest {
 				}
 			}
 		}
+
+		$dialog->close();
 	}
 
 	// Returns update data
@@ -1699,6 +1756,79 @@ class testFormItem extends CLegacyWebTest {
 			],
 			[
 				[
+					'expected' => TEST_GOOD,
+					'type' => 'Script',
+					'name' => 'Script item',
+					'key' => 'script.item',
+					'script' => 'zabbix',
+					'dbCheck' => true,
+					'formCheck' => true
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'type' => 'Browser',
+					'name' => 'Default browser item',
+					'key' => 'default.browser.item',
+					'dbCheck' => true,
+					'formCheck' => true
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'type' => 'Script',
+					'name' => 'Empty script',
+					'key' => 'empty.script',
+					'error_msg' => 'Cannot add item',
+					'errors' => [
+						'Invalid parameter "/1/params": cannot be empty.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'type' => 'Browser',
+					'name' => 'Browser item - empty script',
+					'key' => 'empty.script.browser.item',
+					'script' => '',
+					'error_msg' => 'Cannot add item',
+					'errors' => [
+						'Invalid parameter "/1/params": cannot be empty.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'type' => 'Script',
+					'name' => 'Empty parameter name - script item',
+					'key' => 'empty.parameter.script.item',
+					'script' => 'script',
+					'params_value' => 'value',
+					'error_msg' => 'Cannot add item',
+					'errors' => [
+						'Invalid parameter "/1/parameters/1/name": cannot be empty.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'type' => 'Browser',
+					'name' => 'Empty parameter name - browser item',
+					'key' => 'empty.param.name.browser.item',
+					'params_value' => 'value',
+					'error_msg' => 'Cannot add item',
+					'errors' => [
+						'Invalid parameter "/1/parameters/1/name": cannot be empty.'
+					]
+				]
+			],
+			[
+				[
 					'expected' => TEST_BAD,
 					'type' => 'IPMI agent',
 					'name' => 'IPMI agent error',
@@ -1886,6 +2016,14 @@ class testFormItem extends CLegacyWebTest {
 			$ipmi_sensor = $this->zbxTestGetValue("//input[@id='ipmi_sensor']");
 		}
 
+		if (isset($data['script'])) {
+			$form->getField('Script')->fill($data['script']);
+		}
+
+		if (isset($data['params_value'])) {
+			$form->getField('name:parameters[0][value]')->fill($data['params_value']);
+		}
+
 		if (isset($data['allowed_hosts'])) {
 			$this->zbxTestInputType('trapper_hosts', $data['allowed_hosts']);
 		}
@@ -1987,9 +2125,12 @@ class testFormItem extends CLegacyWebTest {
 					$this->zbxTestCheckTitle('Configuration of items');
 					$this->assertMessage(TEST_BAD, $data['error_msg'], $data['errors']);
 					$this->zbxTestTextPresent(['Host', 'Name', 'Key']);
+
 					if (isset($data['formula'])) {
 						$this->zbxTestAssertElementValue('formula', $data['formulaValue']);
 					}
+
+					$dialog->close();
 					break;
 				}
 			}
@@ -2060,20 +2201,20 @@ class testFormItem extends CLegacyWebTest {
 			$this->zbxTestAssertElementPresentXpath("//z-select[@id='value_type']//li[text()='$value_type']");
 
 			// "Execute now" button availability
-			if (in_array($type, ['Zabbix agent', 'Simple check', 'SNMP agent', 'Zabbix internal', 'External check',
-					'Database monitor', 'IPMI agent', 'SSH agent', 'TELNET agent', 'JMX agent', 'Calculated',
-					'Dependent item'])) {
-				$dialog_check->getFooter()->query('button:Execute now')->one()->click();
-				$this->assertMessage(TEST_GOOD, 'Request sent successfully');
+			if (in_array($type, ['Zabbix agent (active)', 'SNMP trap', 'Zabbix trapper'])) {
+				$this->assertFalse($dialog_check->getFooter()->query('button:Execute now')->one()->isClickable());
 			}
 			else {
-				$this->assertFalse($dialog_check->getFooter()->query('button:Execute now')->one()->isClickable());
+				$dialog_check->getFooter()->query('button:Execute now')->one()->click();
+				$this->assertMessage(TEST_GOOD, 'Request sent successfully');
 			}
 
 			if (isset($data['ipmi_sensor'])) {
 				$ipmiValue = $this->zbxTestGetValue("//input[@id='ipmi_sensor']");
 				$this->assertEquals($ipmi_sensor, $ipmiValue);
 			}
+
+			$dialog_check->close();
 		}
 	}
 
@@ -2104,11 +2245,13 @@ class testFormItem extends CLegacyWebTest {
 		$this->zbxTestOpen(self::HOST_LIST_PAGE);
 		$this->filterEntriesAndOpenItems();
 		$this->zbxTestClickLinkTextWait($this->item);
-		$form = COverlayDialogElement::find()->one()->waitUntilReady()->asForm();
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		$form = $dialog->asForm();
 		$form->getLabel('History')->query("xpath:span[@class='js-hint']/button")->one()->click();
-		$this->zbxTestAssertElementText("//div[@class='overlay-dialogue']", 'Overridden by global housekeeping settings (99d)');
+		$this->zbxTestAssertElementText("//div[@class='overlay-dialogue wordbreak']", 'Overridden by global housekeeping settings (99d)');
 		$form->getLabel('Trends')->query("xpath:span[@class='js-hint']/button")->one()->click();
-		$this->zbxTestAssertElementText("//div[@class='overlay-dialogue'][2]", 'Overridden by global housekeeping settings (455d)');
+		$this->zbxTestAssertElementText("//div[@class='overlay-dialogue wordbreak'][2]", 'Overridden by global housekeeping settings (455d)');
+		$dialog->close();
 
 		$this->zbxTestOpen('zabbix.php?action=housekeeping.edit');
 

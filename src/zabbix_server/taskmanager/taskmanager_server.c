@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "taskmanager_server.h"
@@ -24,6 +19,7 @@
 #include "../actions/actions.h"
 #include "../audit/audit_server.h"
 
+#include "zbxtimekeeper.h"
 #include "zbxnix.h"
 #include "zbxself.h"
 #include "zbxlog.h"
@@ -738,7 +734,6 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 		zbx_dc_reschedule_items(&itemids, time(NULL), proxyids);
 
 		sql_offset = 0;
-		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		for (int i = 0; i < tasks.values_num; i++)
 		{
@@ -772,10 +767,7 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 			zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 		}
 
-		zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-		if (16 < sql_offset)	/* in ORACLE always present begin..end; */
-			zbx_db_execute("%s", sql);
+		(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
 
 		zbx_vector_uint64_destroy(&itemids);
 		zbx_free(proxyids);

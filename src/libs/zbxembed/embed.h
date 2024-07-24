@@ -1,27 +1,26 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #ifndef ZABBIX_EMBED_H
 #define ZABBIX_EMBED_H
 
-#include "duktape.h"
+#include "zbxembed.h"
+
 #include "zbxtime.h"
+#include "zbxalgo.h"
+
+#include "duktape.h"
 
 #define ZBX_ES_LOG_MEMORY_LIMIT	(ZBX_MEBIBYTE * 8)
 #define ZBX_ES_LOG_MSG_LIMIT	8000
@@ -57,10 +56,33 @@ struct zbx_es_env
 	int		logged_msgs;
 
 	const char	*config_source_ip;
+
+	char		*browser_endpoint;
+
+	int		browser_objects;
+	int		constructor_chain;
+
+	zbx_hashset_t	objmap;
 };
 
 zbx_es_env_t	*zbx_es_get_env(duk_context *ctx);
 
 int	es_duktape_string_decode(const char *duk_str, char **out_str);
+
+duk_ret_t	es_super(duk_context *ctx, const char *base, int args);
+int	es_is_chained_constructor_call(duk_context *ctx);
+
+typedef enum
+{
+	ES_OBJ_HTTPREQUEST,
+	ES_OBJ_BROWSER,
+	ES_OBJ_ELEMENT,
+	ES_OBJ_ALERT
+}
+zbx_es_obj_type_t;
+
+void	es_obj_attach_data(zbx_es_env_t *env, void *data, zbx_es_obj_type_t type);
+void	*es_obj_get_data(zbx_es_env_t *env, zbx_es_obj_type_t type);
+void	*es_obj_detach_data(zbx_es_env_t *env, zbx_es_obj_type_t type);
 
 #endif /* ZABBIX_EMBED_H */

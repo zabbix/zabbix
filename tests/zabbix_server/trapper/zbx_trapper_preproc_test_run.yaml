@@ -1526,4 +1526,41 @@ out:
   return: SUCCEED
   expected_len: 524285
   expected_truncated: true
+---
+test case: 'Check no cutoff -1'
+in:
+  value_gen_length: 524287
+  value_append: ""
+out:
+  return: SUCCEED
+  expected_len: 524287
+  expected_truncated: false
+---
+test case: 'Check no cutoff backslash'
+in:
+  value_gen_length: 524286
+  value_append: "\\\\"
+out:
+  return: SUCCEED
+  expected_len: 524288
+  expected_truncated: false
+---
+test case: 'Check cutoff backslash middle'
+in:
+  value_gen_length: 524287
+  value_append: "\\\\"
+out:
+  return: SUCCEED
+  expected_len: 524287
+  expected_truncated: true
+---
+test case: 'Check cutoff backslash complete'
+in:
+  value_gen_length: 524288
+  value_append: "\\\\"
+out:
+  return: SUCCEED
+  expected_len: 524288
+  expected_truncated: true
 ...
+

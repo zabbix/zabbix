@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -27,8 +22,10 @@ class CWidgetGraphPrototype extends CWidgetIterator {
 	promiseUpdate() {
 		const time_period = this.getFieldsData().time_period;
 
-		if (!this.hasBroadcast('_timeperiod') || this.isFieldsReferredDataUpdated('time_period')) {
-			this.broadcast({_timeperiod: time_period});
+		if (!this.hasBroadcast(CWidgetsData.DATA_TYPE_TIME_PERIOD) || this.isFieldsReferredDataUpdated('time_period')) {
+			this.broadcast({
+				[CWidgetsData.DATA_TYPE_TIME_PERIOD]: time_period
+			});
 		}
 
 		return super.promiseUpdate();
@@ -42,13 +39,13 @@ class CWidgetGraphPrototype extends CWidgetIterator {
 	}
 
 	onFeedback({type, value}) {
-		if (type === '_timeperiod') {
+		if (type === CWidgetsData.DATA_TYPE_TIME_PERIOD) {
 			this.feedback({time_period: value});
 
 			return true;
 		}
 
-		return super.onFeedback({type, value});
+		return false;
 	}
 
 	_updateWidget(widget) {

@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -26,10 +21,6 @@ class DB {
 	const DBEXECUTE_ERROR = 1;
 	const RESERVEIDS_ERROR = 2;
 	const SCHEMA_ERROR = 3;
-	const INPUT_ERROR = 4;
-
-	const TABLE_TYPE_CONFIG = 1;
-	const TABLE_TYPE_HISTORY = 2;
 
 	const FIELD_TYPE_INT = 'int';
 	const FIELD_TYPE_CHAR = 'char';
@@ -38,7 +29,6 @@ class DB {
 	const FIELD_TYPE_UINT = 'uint';
 	const FIELD_TYPE_BLOB = 'blob';
 	const FIELD_TYPE_TEXT = 'text';
-	const FIELD_TYPE_NCLOB = 'nclob';
 	const FIELD_TYPE_CUID = 'cuid';
 
 	private static $schema = null;
@@ -61,11 +51,9 @@ class DB {
 				case ZBX_DB_MYSQL:
 					self::$dbBackend = new MysqlDbBackend();
 					break;
+
 				case ZBX_DB_POSTGRESQL:
 					self::$dbBackend = new PostgresqlDbBackend();
-					break;
-				case ZBX_DB_ORACLE:
-					self::$dbBackend = new OracleDbBackend();
 					break;
 			}
 		}
@@ -201,28 +189,7 @@ class DB {
 	 */
 	public static function getSchema(?string $table = null): array {
 		if (self::$schema === null) {
-			$schema = include __DIR__.'/../../'.self::SCHEMA_FILE;
-
-			global $DB;
-
-			if ($DB['TYPE'] === ZBX_DB_ORACLE) {
-				$config = DBfetch(DBselect('SELECT dbversion_status FROM config'));
-				$dbversion_status = $config ? (array) json_decode($config['dbversion_status'], true) : [];
-
-				foreach ($dbversion_status as $dbversion) {
-					if (array_key_exists('schema_diff', $dbversion)
-							&& array_key_exists('tables', $dbversion['schema_diff'])) {
-						foreach ($dbversion['schema_diff']['tables'] as $table_name => $table_params) {
-							foreach ($table_params['fields'] as $field_name => $field) {
-								$schema[$table_name]['fields'][$field_name]['type'] = $field['type'];
-								$schema[$table_name]['fields'][$field_name]['length'] = $field['length'];
-							}
-						}
-					}
-				}
-			}
-
-			self::$schema = $schema;
+			self::$schema = include __DIR__.'/../../'.self::SCHEMA_FILE;
 		}
 
 		if ($table === null) {
@@ -272,17 +239,7 @@ class DB {
 	 * @return int
 	 */
 	public static function getFieldLength($table_name, $field_name) {
-		global $DB;
-
 		$schema = self::getSchema($table_name);
-
-		if ($schema['fields'][$field_name]['type'] == self::FIELD_TYPE_TEXT) {
-			return ($DB['TYPE'] == ZBX_DB_ORACLE) ? 2048 : 65535;
-		}
-
-		if ($schema['fields'][$field_name]['type'] == self::FIELD_TYPE_NCLOB) {
-			return 65535;
-		}
 
 		return $schema['fields'][$field_name]['length'];
 	}
@@ -425,26 +382,7 @@ class DB {
 						break;
 
 					case self::FIELD_TYPE_TEXT:
-						if ($DB['TYPE'] == ZBX_DB_ORACLE) {
-							$length = mb_strlen($values[$field]);
-
-							if ($length > 2048) {
-								self::exception(self::SCHEMA_ERROR, _s('Value "%1$s" is too long for field "%2$s" - %3$d characters. Allowed length is %4$d characters.',
-									$values[$field], $field, $length, 2048));
-							}
-						}
 						$values[$field] = zbx_dbstr($values[$field]);
-						break;
-
-					case self::FIELD_TYPE_NCLOB:
-						// Using strlen because 4000 bytes is largest possible string literal in oracle query.
-						if ($DB['TYPE'] == ZBX_DB_ORACLE && strlen($values[$field]) > ORACLE_MAX_STRING_SIZE) {
-							$chunks = zbx_dbstr(self::chunkMultibyteStr($values[$field], ORACLE_MAX_STRING_SIZE));
-							$values[$field] = 'TO_NCLOB('.implode(') || TO_NCLOB(', $chunks).')';
-						}
-						else {
-							$values[$field] = zbx_dbstr($values[$field]);
-						}
 						break;
 
 					case self::FIELD_TYPE_BLOB:
@@ -456,34 +394,10 @@ class DB {
 							case ZBX_DB_POSTGRESQL:
 								$values[$field] = "'".pg_escape_bytea($DB['DB'], $values[$field])."'";
 								break;
-
-							case ZBX_DB_ORACLE:
-								// Do nothing; Check CImage.php to see how to update BLOB data with ORACLE DB.
-								break;
 						}
 				}
 			}
 		}
-	}
-
-	/**
-	 * @param string $str
-	 * @param int $chunk_size
-	 *
-	 * @return array
-	 */
-	public static function chunkMultibyteStr(string $str, int $chunk_size): array {
-		$chunks = [];
-		$offset = 0;
-		$size = strlen($str);
-
-		while ($offset < $size) {
-			$chunk = mb_strcut($str, $offset, $chunk_size);
-			$chunks[] = $chunk;
-			$offset = strlen($chunk) + $offset;
-		}
-
-		return $chunks;
 	}
 
 	/**
@@ -557,21 +471,12 @@ class DB {
 
 		$mandatory_fields = [];
 
-		switch ($DB['TYPE']) {
-			case ZBX_DB_MYSQL:
-				foreach ($table_schema['fields'] as $name => $field) {
-					if ($field['type'] == self::FIELD_TYPE_TEXT || $field['type'] == self::FIELD_TYPE_NCLOB) {
-						$mandatory_fields += [$name => $field['default']];
-					}
+		if ($DB['TYPE'] === ZBX_DB_MYSQL) {
+			foreach ($table_schema['fields'] as $name => $field) {
+				if ($field['type'] === self::FIELD_TYPE_TEXT) {
+					$mandatory_fields += [$name => $field['default']];
 				}
-				break;
-
-			case ZBX_DB_ORACLE:
-				foreach ($table_schema['fields'] as $name => $field) {
-					if ($field['type'] == self::FIELD_TYPE_BLOB) {
-						$mandatory_fields += [$name => 'EMPTY_BLOB()'];
-					}
-				}
+			}
 		}
 
 		return $mandatory_fields;
@@ -1180,16 +1085,7 @@ class DB {
 			foreach ((array) $patterns as $pattern) {
 				// escaping parameter that is about to be used in LIKE statement
 				$pattern = mb_strtoupper(strtr($pattern, ['!' => '!!', '%' => '!%', '_' => '!_']));
-				$pattern = $start.$pattern.'%';
-
-				if ($DB['TYPE'] == ZBX_DB_ORACLE && $field_schema['type'] === DB::FIELD_TYPE_NCLOB
-						&& strlen($pattern) > ORACLE_MAX_STRING_SIZE) {
-					$chunks = zbx_dbstr(DB::chunkMultibyteStr($pattern, ORACLE_MAX_STRING_SIZE));
-					$pattern = 'TO_NCLOB('.implode(') || TO_NCLOB(', $chunks).')';
-				}
-				else {
-					$pattern = zbx_dbstr($pattern);
-				}
+				$pattern = zbx_dbstr($start.$pattern.'%');
 
 				$search[] = self::uppercaseField($field_name, $table_name, $table_alias).' LIKE '.$pattern." ESCAPE '!'";
 			}
@@ -1229,7 +1125,7 @@ class DB {
 
 			$field_schema = $table_schema['fields'][$field_name];
 
-			if ($field_schema['type'] == self::FIELD_TYPE_TEXT || $field_schema['type'] == self::FIELD_TYPE_NCLOB) {
+			if ($field_schema['type'] == self::FIELD_TYPE_TEXT) {
 				self::exception(self::SCHEMA_ERROR,
 					vsprintf('%s: field "%s.%s" has an unsupported type.', [__FUNCTION__, $table_name, $field_name])
 				);

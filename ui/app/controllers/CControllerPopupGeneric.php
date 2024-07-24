@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -165,7 +160,7 @@ class CControllerPopupGeneric extends CController {
 			],
 			'templates' => [
 				'title' => _('Templates'),
-				'min_user_type' => USER_TYPE_ZABBIX_ADMIN,
+				'min_user_type' => USER_TYPE_ZABBIX_USER,
 				'allowed_src_fields' => 'hostid,host',
 				'form' => [
 					'name' => 'templateform',
@@ -921,7 +916,7 @@ class CControllerPopupGeneric extends CController {
 				'object_name' => $src_name,
 				'data' => array_values($hosts),
 				'selectedLimit' => 1,
-				'disabled' => $this->hasInput('only_hostid'),
+				'readonly' => $this->hasInput('only_hostid'),
 				'popup' => [
 					'parameters' => [
 						'srctbl' => $src_name,
@@ -1439,6 +1434,7 @@ class CControllerPopupGeneric extends CController {
 				$options += [
 					'output' => ['triggerid', 'expression', 'description', 'status', 'priority', 'state'],
 					'selectHosts' => ['name'],
+					'selectItems' => ['status'],
 					'selectDependencies' => ['triggerid', 'expression', 'description'],
 					'expandDescription' => true
 				];
@@ -1452,6 +1448,23 @@ class CControllerPopupGeneric extends CController {
 
 				if (!$this->template_preselect_required || $this->templateids) {
 					$records = API::Trigger()->get($options);
+
+					if ($this->hasInput('with_monitored_triggers')) {
+						foreach ($records as $id => $record) {
+							foreach ($record['items'] as $item) {
+								if ($item['status'] != ITEM_STATUS_ACTIVE) {
+									unset($records[$id]);
+
+									break;
+								}
+							}
+
+							if ($record['status'] != TRIGGER_STATUS_ENABLED) {
+								unset($records[$id]);
+							}
+						}
+
+					}
 				}
 				else {
 					$records = [];

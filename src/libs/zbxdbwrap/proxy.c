@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "zbxdbwrap.h"
@@ -45,6 +40,7 @@
 #include "zbxipcservice.h"
 #include "zbxjson.h"
 #include "zbxstr.h"
+#include "zbxautoreg.h"
 
 /* the space reserved in json buffer to hold at least one record plus service data */
 #define ZBX_DATA_JSON_RESERVED		(ZBX_HISTORY_TEXT_VALUE_LEN * 4 + ZBX_KIBIBYTE * 4)
@@ -1375,7 +1371,7 @@ static int	sender_item_validator(zbx_history_recv_item_t *item, zbx_socket_t *so
 		return FAIL;
 	}
 
-	switch(item->type)
+	switch (item->type)
 	{
 		case ITEM_TYPE_HTTPAGENT:
 			if (0 == item->allow_traps)
@@ -1946,7 +1942,6 @@ fail:
 	zbx_vector_dservice_ptr_clear_ext(&services_old, zbx_dservice_ptr_free);
 	zbx_vector_dservice_ptr_destroy(&services_old);
 	zbx_vector_uint64_destroy(&dserviceids);
-
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
@@ -2711,7 +2706,6 @@ static void	zbx_db_flush_proxy_lastaccess(void)
 		sql = (char *)zbx_malloc(NULL, sql_alloc);
 
 		zbx_db_begin();
-		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		for (i = 0; i < lastaccess.values_num; i++)
 		{
@@ -2725,11 +2719,7 @@ static void	zbx_db_flush_proxy_lastaccess(void)
 			zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 		}
 
-		zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-		if (16 < sql_offset)	/* in ORACLE always present begin..end; */
-			zbx_db_execute("%s", sql);
-
+		(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
 		zbx_db_commit();
 
 		zbx_free(sql);

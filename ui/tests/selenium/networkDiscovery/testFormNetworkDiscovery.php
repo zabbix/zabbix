@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -1172,6 +1167,8 @@ class testFormNetworkDiscovery extends CWebTest {
 					$this->assertEquals($old_hash, $this->getHash());
 
 					// After checking error in overlay no need to test further form.
+					$check_dialog->close();
+					$dialog->close();
 					return;
 				}
 
@@ -1632,7 +1629,7 @@ class testFormNetworkDiscovery extends CWebTest {
 					'expected_fields' => [
 						'Name' => 'New cloned name with changes',
 						'id:discovery_by' => 'Proxy',
-						'xpath:.//div[@id="proxyid"]/..' => 'Proxy for Network discovery cloning',
+						'xpath:.//div[@id="proxyid"]/..' => 'Proxy for cloning Network discovery',
 						'IP range' => '192.168.2.3-255',
 						'Update interval' => '25h',
 						'id:concurrency_max_type' => 'Unlimited',

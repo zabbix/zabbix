@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -199,9 +194,13 @@ class CAction extends CApiService {
 				'SELECT NULL'.
 				' FROM operations o'.
 				' JOIN opmessage_usr omu ON o.operationid=omu.operationid'.
-				' JOIN users_groups ug ON omu.userid=ug.userid'.
-					' AND '.dbConditionId('ug.usrgrpid', $usrgrpids, true).
 				' WHERE a.actionid=o.actionid'.
+					' AND NOT EXISTS ('.
+						'SELECT NULL'.
+						' FROM users_groups ug'.
+						' WHERE omu.userid=ug.userid'.
+							' AND '.dbConditionId('ug.usrgrpid', $usrgrpids).
+					')'.
 			')';
 
 			// Check permissions of scripts used in operations.
@@ -394,35 +393,12 @@ class CAction extends CApiService {
 
 		if ($result) {
 			$result = $this->addRelatedObjects($options, $result);
-
-			foreach ($result as &$action) {
-				// unset the fields that are returned in the filter
-				unset($action['formula'], $action['evaltype']);
-
-				if ($options['selectFilter'] !== null) {
-					$filter = $this->unsetExtraFields(
-						[$action['filter']],
-						['conditions', 'formula', 'evaltype'],
-						$options['selectFilter']
-					);
-					$filter = reset($filter);
-
-					if (isset($filter['conditions'])) {
-						foreach ($filter['conditions'] as &$condition) {
-							unset($condition['actionid'], $condition['conditionid']);
-						}
-						unset($condition);
-					}
-
-					$action['filter'] = $filter;
-				}
-			}
-			unset($action);
+			$result = $this->unsetExtraFields($result, ['formula', 'evaltype']);
+			$result = $this->unsetExtraFields($result, ['eventsource'], $options['output']);
 		}
 
-		// removing keys (hash -> array)
 		if (!$options['preservekeys']) {
-			$result = zbx_cleanHashes($result);
+			$result = array_values($result);
 		}
 
 		return $result;
@@ -597,11 +573,14 @@ class CAction extends CApiService {
 				continue;
 			}
 
-			$action['filter']['formula'] = ($action['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION)
-				? CConditionHelper::replaceLetterIds($action['filter']['formula'],
-					array_column($action['filter']['conditions'], 'conditionid', 'formulaid')
-				)
-				: '';
+			if ($action['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+				CConditionHelper::replaceFormulaIds($action['filter']['formula'],
+					array_column($action['filter']['conditions'], null, 'conditionid')
+				);
+			}
+			else {
+				$action['filter']['formula'] = '';
+			}
 
 			$db_formula = $is_update ? $db_actions[$action['actionid']]['filter']['formula'] : '';
 
@@ -1504,77 +1483,71 @@ class CAction extends CApiService {
 
 		// adding formulas
 		if ($options['selectFilter'] !== null) {
-			$formulaRequested = $this->outputIsRequested('formula', $options['selectFilter']);
-			$evalFormulaRequested = $this->outputIsRequested('eval_formula', $options['selectFilter']);
-			$conditionsRequested = $this->outputIsRequested('conditions', $options['selectFilter']);
+			$has_evaltype = $this->outputIsRequested('evaltype', $options['selectFilter']);
+			$has_formula = $this->outputIsRequested('formula', $options['selectFilter']);
+			$has_eval_formula = $this->outputIsRequested('eval_formula', $options['selectFilter']);
+			$has_conditions = $this->outputIsRequested('conditions', $options['selectFilter']);
 
-			$filters = [];
-			foreach ($result as $action) {
-				$filters[$action['actionid']] = [
-					'evaltype' => $action['evaltype'],
-					'formula' => isset($action['formula']) ? $action['formula'] : ''
-				];
-			}
-
-			if ($formulaRequested || $evalFormulaRequested || $conditionsRequested) {
-				$conditions = API::getApiService()->select('conditions', [
-						'output' => ['actionid', 'conditionid', 'conditiontype', 'operator', 'value', 'value2'],
-						'filter' => ['actionid' => $actionIds],
-					'preservekeys' => true
-				]);
-
-				$relationMap = $this->createRelationMap($conditions, 'actionid', 'conditionid');
-				$filters = $relationMap->mapMany($filters, $conditions, 'conditions');
-
-				foreach ($filters as &$filter) {
-					// in case of a custom expression - use the given formula
-					if ($filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-						$formula = $filter['formula'];
-					}
-					// in other cases - generate the formula automatically
-					else {
-						$conditions = $filter['conditions'];
-
-						// sort conditions
-						$sortFields = [
-							['field' => 'conditiontype', 'order' => ZBX_SORT_DOWN],
-							['field' => 'operator', 'order' => ZBX_SORT_DOWN],
-							['field' => 'value2', 'order' => ZBX_SORT_DOWN],
-							['field' => 'value', 'order' => ZBX_SORT_DOWN]
-						];
-						CArrayHelper::sort($conditions, $sortFields);
-
-						$conditionsForFormula = [];
-						foreach ($conditions as $condition) {
-							$conditionsForFormula[$condition['conditionid']] = $condition['conditiontype'];
-						}
-						$formula = CConditionHelper::getFormula($conditionsForFormula, $filter['evaltype']);
-					}
-
-					// generate formulaids from the effective formula
-					$formulaIds = CConditionHelper::getFormulaIds($formula);
-					foreach ($filter['conditions'] as &$condition) {
-						$condition['formulaid'] = $formulaIds[$condition['conditionid']];
-					}
-					unset($condition);
-
-					// generated a letter based formula only for actions with custom expressions
-					if ($formulaRequested && $filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-						$filter['formula'] = CConditionHelper::replaceNumericIds($formula, $formulaIds);
-					}
-
-					if ($evalFormulaRequested) {
-						$filter['eval_formula'] = CConditionHelper::replaceNumericIds($formula, $formulaIds);
-					}
-				}
-				unset($filter);
-			}
-
-			// add filters to the result
 			foreach ($result as &$action) {
-				$action['filter'] = $filters[$action['actionid']];
+				$action['filter'] = [];
+
+				if ($has_evaltype) {
+					$action['filter']['evaltype'] = $action['evaltype'];
+				}
 			}
 			unset($action);
+
+			if ($has_formula || $has_eval_formula || $has_conditions) {
+				$db_conditions = DBselect(
+					'SELECT c.actionid,c.conditionid,c.conditiontype,c.operator,c.value,c.value2'.
+					' FROM conditions c'.
+					' WHERE '.dbConditionInt('c.actionid', $actionIds)
+				);
+
+				$action_conditions = [];
+
+				while ($db_condition = DBfetch($db_conditions)) {
+					$action_conditions[$db_condition['actionid']][$db_condition['conditionid']] =
+						array_diff_key($db_condition, array_flip(['conditionid', 'actionid']));
+				}
+
+				foreach ($result as &$action) {
+					$eval_formula = '';
+					$conditions = array_key_exists($action['actionid'], $action_conditions)
+						? $action_conditions[$action['actionid']]
+						: [];
+
+					if ($action['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+						CConditionHelper::sortConditionsByFormula($conditions, $action['formula']);
+
+						$eval_formula = $action['formula'];
+					}
+					else {
+						CConditionHelper::sortActionConditions($conditions, (int) $action['eventsource']);
+
+						$eval_formula =
+							CConditionHelper::getEvalFormula($conditions, 'conditiontype', (int) $action['evaltype']);
+					}
+
+					CConditionHelper::addFormulaIds($conditions, $eval_formula);
+					CConditionHelper::replaceConditionIds($eval_formula, $conditions);
+
+					if ($has_formula) {
+						$action['filter']['formula'] = $action['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION
+							? $eval_formula
+							: '';
+					}
+
+					if ($has_eval_formula) {
+						$action['filter']['eval_formula'] = $eval_formula;
+					}
+
+					if ($has_conditions) {
+						$action['filter']['conditions'] = array_values($conditions);
+					}
+				}
+				unset($action);
+			}
 		}
 
 		// Adding operations.
@@ -2199,6 +2172,7 @@ class CAction extends CApiService {
 				|| $this->outputIsRequested('eval_formula', $options['selectFilter'])
 				|| $this->outputIsRequested('conditions', $options['selectFilter'])) {
 
+				$sqlParts = $this->addQuerySelect('a.eventsource', $sqlParts);
 				$sqlParts = $this->addQuerySelect('a.formula', $sqlParts);
 				$sqlParts = $this->addQuerySelect('a.evaltype', $sqlParts);
 			}
@@ -2213,9 +2187,9 @@ class CAction extends CApiService {
 	/**
 	 * Returns validation rules for the filter object.
 	 *
-	 * @param int $eventsource  Action event source. Possible values:
-	 *                          EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION,
-	 *                          EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE
+	 * @param int  $eventsource  Action event source. Possible values:
+	 *                           EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION,
+	 *                           EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE
 	 *
 	 * @return array
 	 */
@@ -2235,10 +2209,10 @@ class CAction extends CApiService {
 					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_HOST], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(ZBX_CONDITION_TYPE_HOST))],
 					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_TRIGGER], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(ZBX_CONDITION_TYPE_TRIGGER))],
 					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_TEMPLATE], 'type' => API_INT32,'in' => implode(',', get_operators_by_conditiontype(ZBX_CONDITION_TYPE_TEMPLATE))],
-					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_EVENT_NAME], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(ZBX_CONDITION_TYPE_EVENT_NAME))],
+					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_EVENT_NAME], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', get_operators_by_conditiontype(ZBX_CONDITION_TYPE_EVENT_NAME))],
 					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_TRIGGER_SEVERITY], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(ZBX_CONDITION_TYPE_TRIGGER_SEVERITY))],
-					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_TIME_PERIOD], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(ZBX_CONDITION_TYPE_TIME_PERIOD))],
-					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_SUPPRESSED], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(ZBX_CONDITION_TYPE_SUPPRESSED))],
+					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_TIME_PERIOD], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', get_operators_by_conditiontype(ZBX_CONDITION_TYPE_TIME_PERIOD))],
+					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_SUPPRESSED], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', get_operators_by_conditiontype(ZBX_CONDITION_TYPE_SUPPRESSED))],
 					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_EVENT_TAG], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(ZBX_CONDITION_TYPE_EVENT_TAG))],
 					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_EVENT_TAG_VALUE], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(ZBX_CONDITION_TYPE_EVENT_TAG_VALUE))]
 				];
@@ -2260,7 +2234,7 @@ class CAction extends CApiService {
 					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_DSERVICE_TYPE], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(ZBX_CONDITION_TYPE_DSERVICE_TYPE))],
 					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_DSERVICE_PORT], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(ZBX_CONDITION_TYPE_DSERVICE_PORT))],
 					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_DSTATUS], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(ZBX_CONDITION_TYPE_DSTATUS))],
-					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_DUPTIME], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(ZBX_CONDITION_TYPE_DUPTIME))],
+					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_DUPTIME], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', get_operators_by_conditiontype(ZBX_CONDITION_TYPE_DUPTIME))],
 					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_DVALUE], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(ZBX_CONDITION_TYPE_DVALUE))],
 					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_DRULE], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(ZBX_CONDITION_TYPE_DRULE))],
 					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_DCHECK], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(ZBX_CONDITION_TYPE_DCHECK))],
@@ -2276,8 +2250,8 @@ class CAction extends CApiService {
 				];
 				$operator_rules = [
 					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_PROXY], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(ZBX_CONDITION_TYPE_PROXY))],
-					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_HOST_NAME], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(ZBX_CONDITION_TYPE_HOST_NAME))],
-					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_HOST_METADATA], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(ZBX_CONDITION_TYPE_HOST_METADATA))]
+					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_HOST_NAME], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', get_operators_by_conditiontype(ZBX_CONDITION_TYPE_HOST_NAME))],
+					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_HOST_METADATA], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', get_operators_by_conditiontype(ZBX_CONDITION_TYPE_HOST_METADATA))]
 				];
 				break;
 
@@ -2306,7 +2280,7 @@ class CAction extends CApiService {
 				];
 				$operator_rules = [
 					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_SERVICE], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(ZBX_CONDITION_TYPE_SERVICE))],
-					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_SERVICE_NAME], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(ZBX_CONDITION_TYPE_SERVICE_NAME))],
+					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_SERVICE_NAME], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', get_operators_by_conditiontype(ZBX_CONDITION_TYPE_SERVICE_NAME))],
 					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_EVENT_TAG], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(ZBX_CONDITION_TYPE_EVENT_TAG))],
 					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_EVENT_TAG_VALUE], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(ZBX_CONDITION_TYPE_EVENT_TAG_VALUE))]
 				];
@@ -2315,7 +2289,7 @@ class CAction extends CApiService {
 
 		$condition_fields = [
 			'conditiontype' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', self::VALID_CONDITION_TYPES[$eventsource])],
-			'operator' =>		['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => $operator_rules],
+			'operator' =>		['type' => API_MULTIPLE, 'rules' => $operator_rules],
 			'value' =>			['type' => API_MULTIPLE, 'rules' => $value_rules],
 			'value2' =>			['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_EVENT_TAG_VALUE], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('conditions', 'value2')],
@@ -2341,11 +2315,11 @@ class CAction extends CApiService {
 	/**
 	 * Returns validation rules for objects of normal, recovery and update operations.
 	 *
-	 * @param int $recovery     Action operation mode. Possible values:
-	 *                          ACTION_OPERATION, ACTION_RECOVERY_OPERATION, ACTION_UPDATE_OPERATION
-	 * @param int $eventsource  Action event source. Possible values:
-	 *                          EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION,
-	 *                          EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE
+	 * @param int  $recovery     Action operation mode. Possible values:
+	 *                           ACTION_OPERATION, ACTION_RECOVERY_OPERATION, ACTION_UPDATE_OPERATION
+	 * @param int  $eventsource  Action event source. Possible values:
+	 *                           EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION,
+	 *                           EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE
 	 *
 	 * @return array
 	 */
@@ -2757,7 +2731,8 @@ class CAction extends CApiService {
 						}
 					}
 					elseif ($condition['conditiontype'] == ZBX_CONDITION_TYPE_DVALUE) {
-						if ($condition['operator'] == CONDITION_OPERATOR_EQUAL
+						if (!array_key_exists('operator', $condition)
+								|| $condition['operator'] == CONDITION_OPERATOR_EQUAL
 								|| $condition['operator'] == CONDITION_OPERATOR_NOT_EQUAL) {
 							continue;
 						}
@@ -3469,14 +3444,9 @@ class CAction extends CApiService {
 
 			foreach ($db_actions as &$db_action) {
 				if ($db_action['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-					$formula = $db_action['filter']['formula'];
-
-					$formulaids = CConditionHelper::getFormulaIds($formula);
-
-					foreach ($db_action['filter']['conditions'] as &$db_condition) {
-						$db_condition['formulaid'] = $formulaids[$db_condition['conditionid']];
-					}
-					unset($db_condition);
+					CConditionHelper::addFormulaIds($db_action['filter']['conditions'],
+						$db_action['filter']['formula']
+					);
 				}
 			}
 			unset($db_action);

@@ -1,26 +1,25 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "zbxdbhigh.h"
 #include "dbupgrade.h"
 #include "zbxdbschema.h"
-#include "zbxeval.h"
+#include "zbxdb.h"
+#include "zbxexpr.h"
+#include "zbxnum.h"
+#include "zbxstr.h"
+#include "zbxjson.h"
 
 /*
  * 6.4 development database patches
@@ -164,7 +163,7 @@ static int	DBpatch_6030006(void)
 
 static int	DBpatch_6030007(void)
 {
-	const zbx_db_field_t	field = {"server_status", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"server_status", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
@@ -488,8 +487,6 @@ static int	DBpatch_6030062(void)
 
 	sql = zbx_malloc(NULL, sql_alloc);
 
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	result = zbx_db_select("select moduleid,relative_path from module");
 
 	while (NULL != (row = zbx_db_fetch(result)))
@@ -514,11 +511,9 @@ static int	DBpatch_6030062(void)
 	}
 	zbx_db_free_result(result);
 
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (SUCCEED == ret && 16 < sql_offset)
+	if (SUCCEED == ret)
 	{
-		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
+		if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
 			ret = FAIL;
 	}
 
@@ -1514,7 +1509,7 @@ static int	DBpatch_6030164(void)
 					{"ssl_cert_file", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 					{"ssl_key_file", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 					{"ssl_key_password", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-					{"description", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
+					{"description", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0},
 					{"status", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 					{"tags_evaltype", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 					{0}

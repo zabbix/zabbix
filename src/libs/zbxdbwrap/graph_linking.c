@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "graph_linking.h"
@@ -1154,8 +1149,6 @@ static int	execute_graphs_updates(zbx_hashset_t *host_graphs_main_data, zbx_hash
 	zbx_graph_copy_t	*found;
 
 	zbx_hashset_iter_reset(host_graphs_main_data, &iter1);
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-	zbx_db_begin_multiple_update(&sql2, &sql_alloc2, &sql_offset2);
 
 	while (SUCCEED == res && NULL != (found = (zbx_graph_copy_t *)zbx_hashset_iter_next(&iter1)))
 	{
@@ -1349,10 +1342,7 @@ static int	execute_graphs_updates(zbx_hashset_t *host_graphs_main_data, zbx_hash
 					found->flags, host_graphs_items, audit_context_mode);
 		}
 	}
-
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (SUCCEED == res && 16 < sql_offset && ZBX_DB_OK > zbx_db_execute("%s", sql))
+	if (SUCCEED == res && ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "failed to execute graphs updates");
 		res = FAIL;
@@ -1360,15 +1350,10 @@ static int	execute_graphs_updates(zbx_hashset_t *host_graphs_main_data, zbx_hash
 
 	zbx_free(sql);
 
-	if (SUCCEED == res)
+	if (SUCCEED == res && ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql2, sql_offset2))
 	{
-		zbx_db_end_multiple_update(&sql2, &sql_alloc2, &sql_offset2);
-
-		if (16 < sql_offset2 && (ZBX_DB_OK > zbx_db_execute("%s", sql2)))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "failed to execute graphs items updates");
-			res = FAIL;
-		}
+		zabbix_log(LOG_LEVEL_WARNING, "failed to execute graphs items updates");
+		res = FAIL;
 	}
 
 	zbx_free(sql2);

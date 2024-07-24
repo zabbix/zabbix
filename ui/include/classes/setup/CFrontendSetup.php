@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -254,7 +249,7 @@ class CFrontendSetup {
 			'current' => empty($current) ? _('off') : new CSpan($current),
 			'required' => null,
 			'result' => $current ? self::CHECK_OK : self::CHECK_FATAL,
-			'error' => _('At least one of MySQL, PostgreSQL or Oracle should be supported.')
+			'error' => _('At least one of MySQL or PostgreSQL should be supported.')
 		];
 	}
 
@@ -275,12 +270,6 @@ class CFrontendSetup {
 				'pg_free_result', 'pg_last_error', 'pg_parameter_status', 'pg_query', 'pg_unescape_bytea',
 				'pg_field_type'])) {
 			$allowed_db[ZBX_DB_POSTGRESQL] = 'PostgreSQL';
-		}
-
-		if (zbx_is_callable(['oci_bind_by_name', 'oci_close', 'oci_commit', 'oci_connect', 'oci_error', 'oci_execute',
-				'oci_fetch_assoc', 'oci_field_type', 'oci_free_statement', 'oci_new_descriptor', 'oci_parse',
-				'oci_rollback'])) {
-			$allowed_db[ZBX_DB_ORACLE] = 'Oracle';
 		}
 
 		return $allowed_db;

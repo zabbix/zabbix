@@ -1,25 +1,20 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "dbconfigworker.h"
 
-#include "zbx_host_constants.h"
+#include "zbxtimekeeper.h"
 #include "zbxlog.h"
 #include "zbxself.h"
 #include "zbxipcservice.h"
@@ -29,6 +24,8 @@
 #include "zbxcacheconfig.h"
 #include "zbxalgo.h"
 #include "zbxdbhigh.h"
+#include "zbxdb.h"
+#include "zbxstr.h"
 
 static void	dbsync_item_rtname(zbx_vector_uint64_t *hostids, int *processed_num, int *updated_num,
 		int *macro_used)
@@ -58,7 +55,6 @@ static void	dbsync_item_rtname(zbx_vector_uint64_t *hostids, int *processed_num,
 	um_handle = zbx_dc_open_user_macros();
 
 	zbx_db_begin();
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	for (zbx_uint64_t *batch = hostids->values; batch < hostids->values + hostids->values_num;
 			batch += ZBX_DBCONFIG_BATCH_SIZE)
@@ -115,10 +111,7 @@ static void	dbsync_item_rtname(zbx_vector_uint64_t *hostids, int *processed_num,
 		zbx_db_free_result(result);
 	}
 
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
-		zbx_db_execute("%s", sql);
+	(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
 
 	zbx_free(sql_select);
 	zbx_free(sql);

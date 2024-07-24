@@ -1,24 +1,20 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "timer.h"
 
+#include "zbxtimekeeper.h"
 #include "zbxalgo.h"
 #include "zbxdb.h"
 #include "zbxdbhigh.h"
@@ -94,8 +90,6 @@ static void	db_update_host_maintenances(const zbx_vector_host_maintenance_diff_p
 	char					*sql = NULL;
 	size_t					sql_alloc = 0, sql_offset = 0;
 
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	for (int i = 0; i < updates->values_num; i++)
 	{
 		char					delim = ' ';
@@ -147,10 +141,7 @@ static void	db_update_host_maintenances(const zbx_vector_host_maintenance_diff_p
 			log_host_maintenance_update(diff);
 	}
 
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (16 < sql_offset)
-		zbx_db_execute("%s", sql);
+	(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
 
 	zbx_free(sql);
 }
@@ -254,6 +245,7 @@ static void	event_queries_fetch(zbx_db_result_t result, zbx_vector_event_suppres
 			query->eventid = eventid;
 			ZBX_STR2UINT64(query->triggerid, row[1]);
 			ZBX_DBROW2UINT64(query->r_eventid, row[2]);
+			zbx_vector_uint64_create(&query->hostids);
 			zbx_vector_uint64_create(&query->functionids);
 			zbx_vector_tags_ptr_create(&query->tags);
 			zbx_vector_uint64_pair_create(&query->maintenances);
@@ -456,7 +448,6 @@ static void	db_update_event_suppress_data(int *suppressed_num, int process_num, 
 
 		zbx_db_insert_prepare(&db_insert, "event_suppress", "event_suppressid", "eventid", "maintenanceid",
 				"suppress_until", (char *)NULL);
-		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		for (int i = 0; i < event_queries.values_num; i++)
 		{
@@ -565,13 +556,8 @@ static void	db_update_event_suppress_data(int *suppressed_num, int process_num, 
 
 		zbx_vector_uint64_destroy(&eventids);
 
-		zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-		if (16 < sql_offset)
-		{
-			if (ZBX_DB_OK > zbx_db_execute("%s", sql))
-				goto cleanup;
-		}
+		if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
+			goto cleanup;
 
 		zbx_db_insert_autoincrement(&db_insert, "event_suppressid");
 		zbx_db_insert_execute(&db_insert);

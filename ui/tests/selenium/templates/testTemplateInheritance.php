@@ -1,21 +1,16 @@
 <?php
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -145,29 +140,27 @@ class testTemplateInheritance extends CLegacyWebTest {
 				break;
 		}
 
-		switch ($result) {
-			case TEST_GOOD:
-				// check that the inherited item matches the original
-				$this->zbxTestOpen(self::HOST_LIST_PAGE);
-				$this->filterEntriesAndOpenObjects($this->hostName, 'Items', 'Items');
-				$this->zbxTestCheckHeader('Items');
-				$this->zbxTestAssertElementText("//a[text()='".$itemName."']/parent::td", "$template: $itemName");
-				$this->zbxTestClickLinkTextWait($itemName);
-				$this->zbxTestAssertElementValue('name', $itemName);
-				$this->zbxTestAssertElementValue('key', $keyName);
-				$this->zbxTestDropdownAssertSelected('type', 'Simple check');
-				$this->zbxTestDropdownAssertSelected('value_type', 'Numeric (unsigned)');
-				$this->zbxTestAssertElementValue('units', 'units');
-				$this->zbxTestAssertElementValue('delay', '33s');
-				$this->zbxTestAssertElementValue('history', '54d');
-				$this->zbxTestAssertElementValue('trends', '55d');
-				$this->zbxTestAssertElementText('//*[@name="description"]', 'description');
-				$this->zbxTestTextPresent('Parent items');
-				$this->zbxTestTextPresent($template);
-				break;
-			case TEST_BAD:
-				break;
+		if ($result === TEST_GOOD) {
+			// check that the inherited item matches the original
+			$this->zbxTestOpen(self::HOST_LIST_PAGE);
+			$this->filterEntriesAndOpenObjects($this->hostName, 'Items', 'Items');
+			$this->zbxTestCheckHeader('Items');
+			$this->zbxTestAssertElementText("//a[text()='".$itemName."']/parent::td", "$template: $itemName");
+			$this->zbxTestClickLinkTextWait($itemName);
+			$this->zbxTestAssertElementValue('name', $itemName);
+			$this->zbxTestAssertElementValue('key', $keyName);
+			$this->zbxTestDropdownAssertSelected('type', 'Simple check');
+			$this->zbxTestDropdownAssertSelected('value_type', 'Numeric (unsigned)');
+			$this->zbxTestAssertElementValue('units', 'units');
+			$this->zbxTestAssertElementValue('delay', '33s');
+			$this->zbxTestAssertElementValue('history', '54d');
+			$this->zbxTestAssertElementValue('trends', '55d');
+			$this->zbxTestAssertElementText('//*[@name="description"]', 'description');
+			$this->zbxTestTextPresent('Parent items');
+			$this->zbxTestTextPresent($template);
 		}
+
+		COverlayDialogElement::find()->one()->close();
 	}
 
 	public function testTemplateInheritance_unlinkHost(){
@@ -223,7 +216,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestAssertElementValue('name', 'Test LLD trigger1');
 		$this->zbxTestAssertElementValue('expression', 'last(/Template inheritance test host/key-item-inheritance-test,#1)=0');
 		$this->assertTrue($this->zbxTestCheckboxSelected('recovery_mode_0'));
-		$this->zbxTestAssertElementPresentXpath("//input[@id='recovery_mode_0'][@disabled]");
+		$this->zbxTestAssertElementPresentXpath("//input[@id='recovery_mode_0'][@readonly]");
 		$this->zbxTestAssertElementText('//*[@name="description"]', 'comments');
 		$this->zbxTestAssertElementValue('url', 'zabbix.php');
 		$this->assertTrue($this->zbxTestCheckboxSelected('priority_2'));
@@ -391,6 +384,8 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestAssertElementText('//*[@name="description"]', 'description');
 		$this->zbxTestTextPresent('Parent items');
 		$this->zbxTestTextPresent($this->templateName);
+
+		$overlay->close();
 	}
 
 	/**
@@ -441,7 +436,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->assertEquals($getName, 'Test LLD trigger');
 		$this->zbxTestAssertElementValue('expression', 'last(/Template inheritance test host/item-discovery-prototype[{#KEY}],#1)=0');
 		$this->assertTrue($this->zbxTestCheckboxSelected('recovery_mode_0'));
-		$this->zbxTestAssertElementPresentXpath("//input[@id='recovery_mode_0'][@disabled]");
+		$this->zbxTestAssertElementPresentXpath("//input[@id='recovery_mode_0'][@readonly]");
 		$this->zbxTestAssertElementText('//*[@name="description"]', 'comments');
 		$this->zbxTestAssertElementValue('url', 'zabbix.php');
 		$this->assertTrue($this->zbxTestCheckboxSelected('priority_2'));

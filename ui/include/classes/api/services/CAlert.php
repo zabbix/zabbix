@@ -1,21 +1,16 @@
 <?php declare(strict_types = 0);
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -115,10 +110,6 @@ class CAlert extends CApiService {
 		}
 
 		if ($db_alerts) {
-			if (self::dbDistinct($sql_parts)) {
-				$db_alerts = $this->addNclobFieldValues($options, $db_alerts);
-			}
-
 			$db_alerts = $this->addRelatedObjects($options, $db_alerts);
 			$db_alerts = $this->unsetExtraFields($db_alerts, ['alertid', 'userid', 'mediatypeid'], $options['output']);
 
@@ -351,8 +342,6 @@ class CAlert extends CApiService {
 	}
 
 	protected function applyQueryOutputOptions($table_name, $table_alias, array $options, array $sql_parts): array {
-		self::unsetNclobFieldsFromOutput($options, $sql_parts);
-
 		$sql_parts = parent::applyQueryOutputOptions($table_name, $table_alias, $options, $sql_parts);
 
 		if (!$options['countOutput']) {

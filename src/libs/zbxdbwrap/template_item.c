@@ -1,20 +1,15 @@
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 #include "zbxdbhigh.h"
@@ -1036,7 +1031,6 @@ static void	save_template_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items, in
 	if (0 != upd_items)
 	{
 		sql = (char *)zbx_malloc(sql, sql_alloc);
-		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 	}
 
 	for (i = 0; i < items->values_num; i++)
@@ -1064,13 +1058,12 @@ static void	save_template_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items, in
 
 	if (0 != upd_items)
 	{
-		zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-		if (16 < sql_offset)
-			zbx_db_execute("%s", sql);
+		(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
 
 		zbx_free(sql);
 	}
+
+	zbx_vector_ptr_sort(items, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 }
 
 /******************************************************************************
@@ -1145,8 +1138,6 @@ static void	save_template_lld_rules(zbx_vector_ptr_t *items, zbx_vector_ptr_t *r
 			}
 		}
 	}
-
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	/* update lld rule conditions for existing items */
 	for (i = 0; i < rules->values_num; i++)
@@ -1241,10 +1232,7 @@ static void	save_template_lld_rules(zbx_vector_ptr_t *items, zbx_vector_ptr_t *r
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 	}
 
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (16 < sql_offset)
-		zbx_db_execute("%s", sql);
+	(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
 
 	if (0 != new_conditions)
 	{
@@ -1570,9 +1558,6 @@ static void	copy_template_items_preproc(const zbx_vector_ptr_t *items, int audit
 		}
 	}
 
-	if (0 != update_preproc_num)
-		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	if (0 != new_preproc_num)
 	{
 		new_preprocid = zbx_db_get_maxid_num("item_preproc", new_preproc_num);
@@ -1672,12 +1657,7 @@ static void	copy_template_items_preproc(const zbx_vector_ptr_t *items, int audit
 	}
 
 	if (0 != update_preproc_num)
-	{
-		zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-		if (16 < sql_offset)	/* in ORACLE always present begin..end; */
-			zbx_db_execute("%s", sql);
-	}
+		(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
 
 	if (0 != new_preproc_num)
 	{
@@ -1754,9 +1734,6 @@ static void	copy_template_item_tags(const zbx_vector_ptr_t *items, int audit_con
 		}
 	}
 
-	if (0 != update_tag_num)
-		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	if (0 != new_tag_num)
 	{
 		new_tagid = zbx_db_get_maxid_num("item_tag", new_tag_num);
@@ -1825,12 +1802,7 @@ static void	copy_template_item_tags(const zbx_vector_ptr_t *items, int audit_con
 	}
 
 	if (0 != update_tag_num)
-	{
-		zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-		if (16 < sql_offset)	/* in ORACLE always present begin..end; */
-			zbx_db_execute("%s", sql);
-	}
+		(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
 
 	if (0 != new_tag_num)
 	{
@@ -1910,9 +1882,6 @@ static void	copy_template_item_script_params(const zbx_vector_ptr_t *items, int 
 		}
 	}
 
-	if (0 != update_param_num)
-		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	if (0 != new_param_num)
 	{
 		zbx_db_insert_prepare(&db_insert, "item_parameter", "item_parameterid", "itemid", "name", "value",
@@ -1985,12 +1954,7 @@ static void	copy_template_item_script_params(const zbx_vector_ptr_t *items, int 
 	}
 
 	if (0 != update_param_num)
-	{
-		zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-		if (16 < sql_offset)	/* in ORACLE always present begin..end; */
-			zbx_db_execute("%s", sql);
-	}
+		(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
 
 	if (0 != new_param_num)
 	{
@@ -2079,9 +2043,6 @@ static void	copy_template_lld_macro_paths(const zbx_vector_ptr_t *items, int aud
 		sql_offset = 0;
 	}
 
-	if (0 != update_lld_macro_num)
-		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	if (0 != new_lld_macro_num)
 	{
 		zbx_db_insert_prepare(&db_insert, "lld_macro_path", "lld_macro_pathid", "itemid", "lld_macro", "path",
@@ -2158,12 +2119,7 @@ static void	copy_template_lld_macro_paths(const zbx_vector_ptr_t *items, int aud
 	}
 
 	if (0 != update_lld_macro_num)
-	{
-		zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-		if (16 < sql_offset)	/* in ORACLE always present begin..end; */
-			zbx_db_execute("%s", sql);
-	}
+		(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
 
 	if (0 != new_lld_macro_num)
 	{

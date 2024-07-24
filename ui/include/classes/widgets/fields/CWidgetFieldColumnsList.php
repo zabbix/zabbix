@@ -1,21 +1,16 @@
 <?php declare(strict_types = 0);
 /*
-** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
 **
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-** GNU General Public License for more details.
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
 **/
 
 
@@ -78,12 +73,13 @@ class CWidgetFieldColumnsList extends CWidgetField {
 		$columns_values = $this->getValue();
 
 		foreach ($columns_values as $column_index => &$value) {
-			if ($value['data'] != self::DATA_ITEM_VALUE
-					|| $value['aggregate_function'] == AGGREGATE_NONE) {
+			if ($value['data'] != self::DATA_ITEM_VALUE || $value['aggregate_function'] == AGGREGATE_NONE) {
 				continue;
 			}
 
-			$time_period_field = (new CWidgetFieldTimePeriod($this->name.'.'.$column_index.'.time_period'))
+			$time_period_field = (new CWidgetFieldTimePeriod($this->name.'.'.$column_index.'.time_period',
+				'/'.($column_index + 1)
+			))
 				->setDefault([
 					CWidgetField::FOREIGN_REFERENCE_KEY => CWidgetField::createTypedReference(
 						CWidgetField::REFERENCE_DASHBOARD, CWidgetsData::DATA_TYPE_TIME_PERIOD
@@ -92,8 +88,7 @@ class CWidgetFieldColumnsList extends CWidgetField {
 				->setInType(CWidgetsData::DATA_TYPE_TIME_PERIOD)
 				->acceptDashboard()
 				->acceptWidget()
-				->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
-				->prefixLabel('/'.($column_index + 1));
+				->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK);
 
 			if (array_key_exists('time_period', $value)) {
 				$time_period_field->setValue($value['time_period']);
