@@ -42,7 +42,7 @@ class testGeneric extends CLegacyWebTest {
 
 			// reports
 			['zabbix.php?action=report.status',					'System information'],
-			['report2.php',										'Availability report'],
+			['zabbix.php?action=availabilityreport.list',		'Availability report'],
 			['zabbix.php?action=toptriggers.list',				'Top 100 triggers'],
 			['zabbix.php?action=toptriggers.list&filter_severities[0]=0&filter_set=1',	'Top 100 triggers'],
 			['zabbix.php?action=toptriggers.list&filter_severities[1]=1&filter_set=1',	'Top 100 triggers'],

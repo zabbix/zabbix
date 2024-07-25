@@ -853,13 +853,15 @@ static void	preprocessing_flush_value(zbx_pp_manager_t *manager, zbx_uint64_t it
  *                                                                            *
  * Purpose: handle new preprocessing request                                  *
  *                                                                            *
- * Parameters: manager - [IN] preprocessing manager                           *
- *             message - [IN] packed preprocessing request                    *
+ * Parameters: manager    - [IN] preprocessing manager                        *
+ *             message    - [IN] packed preprocessing request                 *
+ *             direct_num - [OUT] number of directly flushed values           *
  *                                                                            *
  *  Return value: The number of requests queued for preprocessing             *
  *                                                                            *
  ******************************************************************************/
-static zbx_uint64_t	preprocessor_add_request(zbx_pp_manager_t *manager, zbx_ipc_message_t *message)
+static zbx_uint64_t	preprocessor_add_request(zbx_pp_manager_t *manager, zbx_ipc_message_t *message,
+		zbx_uint64_t *direct_num)
 {
 	zbx_uint32_t			offset = 0;
 	zbx_preproc_item_value_t	value;
@@ -885,6 +887,7 @@ static zbx_uint64_t	preprocessor_add_request(zbx_pp_manager_t *manager, zbx_ipc_
 
 		if (NULL == (task = zbx_pp_manager_create_task(manager, value.itemid, &var, ts, &var_opt)))
 		{
+			(*direct_num)++;
 			/* allow empty values */
 			preprocessing_flush_value(manager, value.itemid, value.item_value_type, value.item_flags,
 					&var, ts, &var_opt);
@@ -1236,7 +1239,8 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 
 	while (ZBX_IS_RUNNING())
 	{
-		double	time_now = zbx_time();
+		double		time_now = zbx_time();
+		zbx_uint64_t	direct_num = 0;
 
 		if (STAT_INTERVAL < time_now - time_stat)
 		{
@@ -1269,7 +1273,7 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 			switch (message->code)
 			{
 				case ZBX_IPC_PREPROCESSOR_REQUEST:
-					queued_num += preprocessor_add_request(manager, message);
+					queued_num += preprocessor_add_request(manager, message, &direct_num);
 					break;
 				case ZBX_IPC_PREPROCESSOR_QUEUE:
 					preprocessor_reply_queue_size(manager, client);
@@ -1309,12 +1313,10 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 		{
 			processed_num += (unsigned int)tasks.values_num;
 			preprocessor_flush_tasks(manager, &tasks);
-			zbx_rtc_notify_generic(&manager->rtc, ZBX_PROCESS_TYPE_HISTSYNCER, 1,
-					ZBX_RTC_HISTORY_SYNC_NOTIFY, NULL, 0);
 			zbx_pp_tasks_clear(&tasks);
 		}
 
-		if (0 != finished_num)
+		if (0 != finished_num || 0 != direct_num)
 		{
 			timeout.sec = 0;
 			timeout.ns = 0;
@@ -1325,10 +1327,14 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 			timeout.ns = PP_MANAGER_DELAY_NS;
 		}
 
-		/* flush local history cache when there is nothing more to process or one second after last flush */
-		if (0 == pending_num + processing_num + finished_num || 1 < sec - time_flush)
+		if (0 == pending_num + processing_num + finished_num + direct_num || 1 < sec - time_flush)
 		{
-			zbx_dc_flush_history();
+			if (0 != zbx_dc_flush_history())
+			{
+				zbx_rtc_notify_generic(&manager->rtc, ZBX_PROCESS_TYPE_HISTSYNCER, 1,
+						ZBX_RTC_HISTORY_SYNC_NOTIFY, NULL, 0);
+			}
+
 			time_flush = sec;
 		}
 

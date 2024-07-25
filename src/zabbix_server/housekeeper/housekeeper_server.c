@@ -205,23 +205,6 @@ static zbx_hk_history_rule_t	hk_history_rules[] = {
 	{0}
 };
 
-static int	hk_history_rules_partition_is_table_name_excluded(const char *table_name)
-{
-	static const char	*hk_history_rules_partition_exclude_list_table_names[] = {
-		"history_bin", /* not hypertable yet*/
-		NULL
-	};
-
-	for (const char **table_name_ptr = hk_history_rules_partition_exclude_list_table_names; NULL != *table_name_ptr;
-			table_name_ptr++)
-	{
-		if (0 == strcmp(*table_name_ptr, table_name))
-			return SUCCEED;
-	}
-
-	return FAIL;
-}
-
 /******************************************************************************
  *                                                                            *
  * Purpose: compare two delete queue items by their itemid                    *
@@ -679,9 +662,6 @@ static int	housekeeping_history_and_trends(int now)
 		if (ZBX_HK_MODE_DISABLED == *rule->poption_mode)
 			goto skip;
 
-		if (SUCCEED == hk_history_rules_partition_is_table_name_excluded(rule->table))
-			goto process_delete_queue_for_housekeeping_rule;
-
 		/* If partitioning enabled for history and/or trends then drop partitions with expired history.  */
 		/* ZBX_HK_MODE_PARTITION is set during configuration sync based on the following: */
 		/* 1. "Override item history (or trend) period" must be on 2. DB must be PostgreSQL */
@@ -727,7 +707,8 @@ static int	housekeeping_history_and_trends(int now)
 			}
 		}
 #endif
-process_delete_queue_for_housekeeping_rule:
+		/* process delete queue for the housekeeping rule */
+
 		zbx_vector_hk_delete_queue_ptr_sort(&rule->delete_queue, hk_item_update_cache_compare);
 
 		for (int i = 0; i < rule->delete_queue.values_num; i++)
@@ -770,8 +751,7 @@ static int	housekeeping_process_rule(int now, int config_max_hk_delete, zbx_hk_r
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() table:'%s' field_name:'%s' filter:'%s' min_clock:%d now:%d",
 			__func__, rule->table, rule->field_name, rule->filter, rule->min_clock, now);
 
-	if (ZBX_HK_MODE_PARTITION == *rule->poption_mode &&
-			FAIL == hk_history_rules_partition_is_table_name_excluded(rule->table))
+	if (ZBX_HK_MODE_PARTITION == *rule->poption_mode)
 	{
 		hk_drop_partition(rule->table, *rule->phistory, now);
 		goto ret;
@@ -920,15 +900,7 @@ static int	DBdelete_from_table(const char *tablename, const char *filter, int li
 	}
 	else
 	{
-#if defined(HAVE_ORACLE)
-		return zbx_db_execute(
-				"delete from %s"
-				" where %s"
-					" and rownum<=%d",
-				tablename,
-				filter,
-				limit);
-#elif defined(HAVE_MYSQL)
+#if defined(HAVE_MYSQL)
 		return zbx_db_execute(
 				"delete from %s"
 				" where %s limit %d",
@@ -1309,7 +1281,7 @@ static int	housekeeping_problems(int now, int config_max_hk_delete)
 	int			deleted = 0;
 	zbx_vector_uint64_t	ids_uint64;
 	size_t			sql_alloc = 0, sql_offset;
-	char			buffer[MAX_STRING_LEN], *sql = NULL;;
+	char			buffer[MAX_STRING_LEN], *sql = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() now:%d", __func__, now);
 

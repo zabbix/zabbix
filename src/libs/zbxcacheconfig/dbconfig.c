@@ -55,7 +55,6 @@
 #include "zbxdb.h"
 #include "zbxmutexs.h"
 #include "zbxautoreg.h"
-#include "zbxexpression.h"
 #include "zbxpgservice.h"
 #include "zbxinterface.h"
 #include "zbxhistory.h"
@@ -7845,15 +7844,6 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 
 	zbx_dbsync_init_changelog(&proxy_sync, changelog_sync_mode);
 
-
-#ifdef HAVE_ORACLE
-	/* With Oracle fetch statements can fail before all data has been fetched. */
-	/* In such cache next sync will need to do full scan rather than just      */
-	/* applying changelog diff. To detect this problem configuration is synced */
-	/* in transaction and error is checked at the end.                         */
-	zbx_db_begin();
-#endif
-
 	sec = zbx_time();
 	if (FAIL == zbx_dbsync_compare_config(&config_sync))
 		goto out;
@@ -8066,6 +8056,12 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 
 	/* sync item data to support item lookups when resolving macros during configuration sync */
 
+	/* fetch prototype items before items to avoid item fetch consuming prototype changelog records */
+	sec = zbx_time();
+	if (FAIL == zbx_dbsync_compare_prototype_items(&prototype_items_sync))
+		goto out;
+	pisec = zbx_time() - sec;
+
 	sec = zbx_time();
 	if (FAIL == zbx_dbsync_compare_interfaces(&if_sync))
 		goto out;
@@ -8080,11 +8076,6 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 	if (FAIL == zbx_dbsync_compare_template_items(&template_items_sync))
 		goto out;
 	tisec = zbx_time() - sec;
-
-	sec = zbx_time();
-	if (FAIL == zbx_dbsync_compare_prototype_items(&prototype_items_sync))
-		goto out;
-	pisec = zbx_time() - sec;
 
 	sec = zbx_time();
 	if (FAIL == zbx_dbsync_compare_item_discovery(&item_discovery_sync))
@@ -8116,16 +8107,16 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 	/* relies on hosts, proxies and interfaces, must be after DCsync_{hosts,interfaces}() */
 
 	sec = zbx_time();
+	DCsync_prototype_items(&prototype_items_sync);
+	pisec2 = zbx_time() - sec;
+
+	sec = zbx_time();
 	DCsync_items(&items_sync, new_revision, flags, synced, deleted_itemids, pnew_items);
 	isec2 = zbx_time() - sec;
 
 	sec = zbx_time();
 	DCsync_template_items(&template_items_sync);
 	tisec2 = zbx_time() - sec;
-
-	sec = zbx_time();
-	DCsync_prototype_items(&prototype_items_sync);
-	pisec2 = zbx_time() - sec;
 
 	sec = zbx_time();
 	DCsync_item_discovery(&item_discovery_sync);
@@ -8644,12 +8635,6 @@ out:
 
 	FINISH_SYNC;
 
-#ifdef HAVE_ORACLE
-	if (ZBX_DB_OK == dberr)
-		dberr = zbx_db_commit();
-	else
-		zbx_db_rollback();
-#endif
 	switch (dberr)
 	{
 		case ZBX_DB_OK:
@@ -13131,6 +13116,52 @@ static void	dc_status_update_apply_diff(zbx_dc_status_diff_t *diff)
 	config->status->last_update = time(NULL);
 }
 
+static int	get_active_item_count_rec(const ZBX_DC_ITEM *dc_item)
+{
+	int	count = 1;
+
+	if (NULL != dc_item->master_item)
+	{
+		for (int i = 0; i < dc_item->master_item->dep_itemids.values_num; i++)
+		{
+			ZBX_DC_ITEM	*dep_item;
+
+			if (NULL != (dep_item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items,
+					&dc_item->master_item->dep_itemids.values[i].first)) &&
+					ITEM_STATUS_ACTIVE == dep_item->status)
+			{
+				count += get_active_item_count_rec(dep_item);
+			}
+		}
+	}
+
+	return count;
+}
+
+static void	update_required_performance(const ZBX_DC_ITEM *dc_item, zbx_dc_status_diff_proxy_t *proxy_diff,
+		zbx_dc_status_diff_t *diff)
+{
+	int	delay;
+	char	*delay_s;
+
+	delay_s = dc_expand_user_and_func_macros_dyn(dc_item->delay, &dc_item->hostid, 1, ZBX_MACRO_ENV_NONSECURE);
+
+	if (SUCCEED == zbx_interval_preproc(delay_s, &delay, NULL, NULL) && 0 != delay)
+	{
+		int	item_count;
+
+		if (0 < (item_count = get_active_item_count_rec(dc_item)))
+		{
+			diff->required_performance += 1.0 / delay * item_count;
+
+			if (NULL != proxy_diff)
+				proxy_diff->required_performance += 1.0 / delay * item_count;
+		}
+	}
+
+	zbx_free(delay_s);
+}
+
 static void	get_host_statistics(ZBX_DC_HOST *dc_host, zbx_dc_status_diff_host_t *host_diff,
 		zbx_dc_status_diff_proxy_t *proxy_diff, zbx_dc_status_diff_t *diff)
 {
@@ -13150,25 +13181,8 @@ static void	get_host_statistics(ZBX_DC_HOST *dc_host, zbx_dc_status_diff_host_t 
 			case ITEM_STATUS_ACTIVE:
 				if (HOST_STATUS_MONITORED == dc_host->status)
 				{
-					if (SUCCEED == diff->reset)
-					{
-						int	delay;
-						char	*delay_s;
-
-						delay_s = dc_expand_user_and_func_macros_dyn(dc_item->delay,
-								&dc_item->hostid, 1, ZBX_MACRO_ENV_NONSECURE);
-
-						if (SUCCEED == zbx_interval_preproc(delay_s, &delay, NULL, NULL) &&
-								0 != delay)
-						{
-							diff->required_performance += 1.0 / delay;
-
-							if (NULL != proxy_diff)
-								proxy_diff->required_performance += 1.0 / delay;
-						}
-
-						zbx_free(delay_s);
-					}
+					if (SUCCEED == diff->reset && ITEM_TYPE_DEPENDENT != dc_item->type)
+						update_required_performance(dc_item, proxy_diff, diff);
 
 					switch (dc_item->state)
 					{

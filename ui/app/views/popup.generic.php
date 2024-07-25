@@ -65,7 +65,7 @@ if (array_key_exists('hosts', $data['filter'])) {
 	$multiselect_options['popup']['parameters']['dstfrm'] = $header_form->getId();
 
 	$host_ms = (new CMultiSelect($multiselect_options))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH);
-	if ($multiselect_options['disabled']) {
+	if ($multiselect_options['readonly']) {
 		$host_ms->setTitle(_('You cannot switch hosts for current selection.'));
 	}
 	$controls[] = (new CFormList())->addRow(new CLabel(_('Host'), 'popup_host_ms'), $host_ms);
@@ -324,37 +324,14 @@ switch ($data['popup_type']) {
 				$description = new CLabel($trigger['description']);
 			}
 
-			if ($data['multiselect']) {
-				$description
-					->setAttribute('data-reference', $options['reference'])
-					->setAttribute('data-triggerid', $trigger['triggerid'])
-					->setAttribute('data-parentid', $options['parentid'])
-					->onClick('
-						addValue(this.dataset.reference, this.dataset.triggerid, this.dataset.parentid ?? null);
-						popup_generic.closePopup(event);
-					');
-			}
-			else {
-				$values = [];
-
-				if ($options['dstfld1'] !== '' && $options['srcfld1'] !== '') {
-					$values[$options['dstfld1']] = $trigger[$options['srcfld1']];
-				}
-				if ($options['dstfld2'] !== '' && $options['srcfld2'] !== '') {
-					$values[$options['dstfld2']] = $trigger[$options['srcfld2']];
-				}
-				if ($options['dstfld3'] !== '' && $options['srcfld3'] !== '') {
-					$values[$options['dstfld3']] = $trigger[$options['srcfld3']];
-				}
-
-				$description
-					->setAttribute('data-dstfrm', $options['dstfrm'])
-					->setAttribute('data-values', json_encode($values))
-					->onClick('
-						addValues(this.dataset.dstfrm, JSON.parse(this.dataset.values));
-						popup_generic.closePopup(event);
-					');
-			}
+			$description
+				->setAttribute('data-reference', $options['reference'])
+				->setAttribute('data-triggerid', $trigger['triggerid'])
+				->setAttribute('data-parentid', $options['parentid'])
+				->onClick('
+					addValue(this.dataset.reference, this.dataset.triggerid, this.dataset.parentid ?? null);
+					popup_generic.closePopup(event);
+				');
 
 			if ($trigger['dependencies']) {
 				$description = [$description, BR(), bold(_('Depends on')), BR()];
@@ -378,21 +355,19 @@ switch ($data['popup_type']) {
 					->addClass(triggerIndicatorStyle($trigger['status'], $trigger['state']))
 			]);
 
-			if ($data['multiselect']) {
-				$trigger = [
-					'id' => $trigger['triggerid'],
-					'name' => $trigger['description'],
-					'triggerid' => $trigger['triggerid'],
-					'description' => $trigger['description'],
-					'expression' => $trigger['expression'],
-					'priority' => $trigger['priority'],
-					'status' => $trigger['status'],
-					'host' => $trigger['hostname']
-				];
+			$trigger = [
+				'id' => $trigger['triggerid'],
+				'name' => $trigger['description'],
+				'triggerid' => $trigger['triggerid'],
+				'description' => $trigger['description'],
+				'expression' => $trigger['expression'],
+				'priority' => $trigger['priority'],
+				'status' => $trigger['status'],
+				'host' => $trigger['hostname']
+			];
 
-				if ($data['popup_type'] === 'trigger_prototypes') {
-					$trigger['prototype'] = '1';
-				}
+			if ($data['popup_type'] === 'trigger_prototypes') {
+				$trigger['prototype'] = '1';
 			}
 		}
 		unset($trigger);
@@ -900,6 +875,7 @@ $types = [
 	'proxy_groups',
 	'roles',
 	'templates',
+	'template_triggers',
 	'users',
 	'usrgrp',
 	'sla',

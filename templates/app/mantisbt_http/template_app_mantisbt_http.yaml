@@ -27,7 +27,6 @@ zabbix_export:
           key: mantisbt.get.projects
           delay: 1h
           history: '0'
-          trends: '0'
           value_type: TEXT
           description: 'Get projects from Mantis BT.'
           timeout: 30s
@@ -44,28 +43,22 @@ zabbix_export:
           name: 'Projects discovery'
           type: DEPENDENT
           key: mantisbt.projects.discovery
-          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#ENABLED}'
                 value: 'true'
-                formulaid: A
               - macro: '{#NAME}'
                 value: '{$MANTIS.LLD.FILTER.PROJECTS.MATCHES}'
-                formulaid: B
               - macro: '{#NAME}'
                 value: '{$MANTIS.LLD.FILTER.PROJECTS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: C
           description: 'Discovery rule for a Mantis BT projects.'
           item_prototypes:
             - uuid: baffdd6d9e51403084fc4a98bb4b9ff7
               name: 'Project [{#NAME}]: High priority issues'
               type: DEPENDENT
               key: 'mantis.project.priority.high_issues[{#NAME}]'
-              delay: '0'
-              history: 7d
               description: 'Count of "high" priority issues.'
               preprocessing:
                 - type: JSONPATH
@@ -82,8 +75,6 @@ zabbix_export:
               name: 'Project [{#NAME}]: Immediate priority issues'
               type: DEPENDENT
               key: 'mantis.project.priority.immediate_issues[{#NAME}]'
-              delay: '0'
-              history: 7d
               description: 'Count of "immediate" priority issues.'
               preprocessing:
                 - type: JSONPATH
@@ -100,8 +91,6 @@ zabbix_export:
               name: 'Project [{#NAME}]: Low priority issues'
               type: DEPENDENT
               key: 'mantis.project.priority.low_issues[{#NAME}]'
-              delay: '0'
-              history: 7d
               description: 'Count of "low" priority issues.'
               preprocessing:
                 - type: JSONPATH
@@ -118,8 +107,6 @@ zabbix_export:
               name: 'Project [{#NAME}]: None priority issues'
               type: DEPENDENT
               key: 'mantis.project.priority.none_issues[{#NAME}]'
-              delay: '0'
-              history: 7d
               description: 'Count of "none" priority issues.'
               preprocessing:
                 - type: JSONPATH
@@ -136,8 +123,6 @@ zabbix_export:
               name: 'Project [{#NAME}]: Normal priority issues'
               type: DEPENDENT
               key: 'mantis.project.priority.normal_issues[{#NAME}]'
-              delay: '0'
-              history: 7d
               description: 'Count of "normal" priority issues.'
               preprocessing:
                 - type: JSONPATH
@@ -154,8 +139,6 @@ zabbix_export:
               name: 'Project [{#NAME}]: Urgent priority issues'
               type: DEPENDENT
               key: 'mantis.project.priority.urgent_issues[{#NAME}]'
-              delay: '0'
-              history: 7d
               description: 'Count of "urgent" priority issues.'
               preprocessing:
                 - type: JSONPATH
@@ -172,8 +155,6 @@ zabbix_export:
               name: 'Project [{#NAME}]: Duplicate issues'
               type: DEPENDENT
               key: 'mantis.project.resolution.duplicate_issues[{#NAME}]'
-              delay: '0'
-              history: 7d
               description: 'Count of "duplicate" resolution issues.'
               preprocessing:
                 - type: JSONPATH
@@ -190,8 +171,6 @@ zabbix_export:
               name: 'Project [{#NAME}]: Fixed issues'
               type: DEPENDENT
               key: 'mantis.project.resolution.fixed_issues[{#NAME}]'
-              delay: '0'
-              history: 7d
               description: 'Count of "fixed" resolution issues.'
               preprocessing:
                 - type: JSONPATH
@@ -208,8 +187,6 @@ zabbix_export:
               name: 'Project [{#NAME}]: Not fixable issues'
               type: DEPENDENT
               key: 'mantis.project.resolution.not_fixable_issues[{#NAME}]'
-              delay: '0'
-              history: 7d
               description: 'Count of "not fixable" resolution issues.'
               preprocessing:
                 - type: JSONPATH
@@ -226,8 +203,6 @@ zabbix_export:
               name: 'Project [{#NAME}]: No change required issues'
               type: DEPENDENT
               key: 'mantis.project.resolution.no_change_required_issues[{#NAME}]'
-              delay: '0'
-              history: 7d
               description: 'Count of "no change required" resolution issues.'
               preprocessing:
                 - type: JSONPATH
@@ -244,8 +219,6 @@ zabbix_export:
               name: 'Project [{#NAME}]: Open issues'
               type: DEPENDENT
               key: 'mantis.project.resolution.open_issues[{#NAME}]'
-              delay: '0'
-              history: 7d
               description: 'Count of "open" resolution issues.'
               preprocessing:
                 - type: JSONPATH
@@ -262,8 +235,6 @@ zabbix_export:
               name: 'Project [{#NAME}]: Reopened issues'
               type: DEPENDENT
               key: 'mantis.project.resolution.reopened_issues[{#NAME}]'
-              delay: '0'
-              history: 7d
               description: 'Count of "reopened" resolution issues.'
               preprocessing:
                 - type: JSONPATH
@@ -280,8 +251,6 @@ zabbix_export:
               name: 'Project [{#NAME}]: Suspended issues'
               type: DEPENDENT
               key: 'mantis.project.resolution.suspended_issues[{#NAME}]'
-              delay: '0'
-              history: 7d
               description: 'Count of "suspended" resolution issues.'
               preprocessing:
                 - type: JSONPATH
@@ -298,8 +267,6 @@ zabbix_export:
               name: 'Project [{#NAME}]: Unable to reproduce issues'
               type: DEPENDENT
               key: 'mantis.project.resolution.unable_to_reproduce_issues[{#NAME}]'
-              delay: '0'
-              history: 7d
               description: 'Count of "unable to reproduce" resolution issues.'
               preprocessing:
                 - type: JSONPATH
@@ -316,8 +283,6 @@ zabbix_export:
               name: 'Project [{#NAME}]: Will not fix issues'
               type: DEPENDENT
               key: 'mantis.project.resolution.wont_fix_issues[{#NAME}]'
-              delay: '0'
-              history: 7d
               description: 'Count of "wont fix" resolution issues.'
               preprocessing:
                 - type: JSONPATH
@@ -334,8 +299,6 @@ zabbix_export:
               name: 'Project [{#NAME}]: Block severity issues'
               type: DEPENDENT
               key: 'mantis.project.severity.block_issues[{#NAME}]'
-              delay: '0'
-              history: 7d
               description: 'Count of "block" severity issues.'
               preprocessing:
                 - type: JSONPATH
@@ -352,8 +315,6 @@ zabbix_export:
               name: 'Project [{#NAME}]: Crash severity issues'
               type: DEPENDENT
               key: 'mantis.project.severity.crash_issues[{#NAME}]'
-              delay: '0'
-              history: 7d
               description: 'Count of "crash" severity issues.'
               preprocessing:
                 - type: JSONPATH
@@ -370,8 +331,6 @@ zabbix_export:
               name: 'Project [{#NAME}]: Feature severity issues'
               type: DEPENDENT
               key: 'mantis.project.severity.feature_issues[{#NAME}]'
-              delay: '0'
-              history: 7d
               description: 'Count of "feature" severity issues.'
               preprocessing:
                 - type: JSONPATH
@@ -388,8 +347,6 @@ zabbix_export:
               name: 'Project [{#NAME}]: Major severity issues'
               type: DEPENDENT
               key: 'mantis.project.severity.major_issues[{#NAME}]'
-              delay: '0'
-              history: 7d
               description: 'Count of "major" severity issues.'
               preprocessing:
                 - type: JSONPATH
@@ -406,8 +363,6 @@ zabbix_export:
               name: 'Project [{#NAME}]: Minor severity issues'
               type: DEPENDENT
               key: 'mantis.project.severity.minor_issues[{#NAME}]'
-              delay: '0'
-              history: 7d
               description: 'Count of "minor" severity issues.'
               preprocessing:
                 - type: JSONPATH
@@ -424,8 +379,6 @@ zabbix_export:
               name: 'Project [{#NAME}]: Text severity issues'
               type: DEPENDENT
               key: 'mantis.project.severity.text_issues[{#NAME}]'
-              delay: '0'
-              history: 7d
               description: 'Count of "text" severity issues.'
               preprocessing:
                 - type: JSONPATH
@@ -442,8 +395,6 @@ zabbix_export:
               name: 'Project [{#NAME}]: Trivial severity issues'
               type: DEPENDENT
               key: 'mantis.project.severity.trivial_issues[{#NAME}]'
-              delay: '0'
-              history: 7d
               description: 'Count of "trivial" severity issues.'
               preprocessing:
                 - type: JSONPATH
@@ -460,8 +411,6 @@ zabbix_export:
               name: 'Project [{#NAME}]: Tweak severity issues'
               type: DEPENDENT
               key: 'mantis.project.severity.tweak_issues[{#NAME}]'
-              delay: '0'
-              history: 7d
               description: 'Count of "tweak" severity issues.'
               preprocessing:
                 - type: JSONPATH
@@ -478,8 +427,6 @@ zabbix_export:
               name: 'Project [{#NAME}]: Acknowledged issues'
               type: DEPENDENT
               key: 'mantis.project.status.acknowledged_issues[{#NAME}]'
-              delay: '0'
-              history: 7d
               description: 'Count of issues with ''acknowledged'' status.'
               preprocessing:
                 - type: JSONPATH
@@ -496,8 +443,6 @@ zabbix_export:
               name: 'Project [{#NAME}]: Assigned issues'
               type: DEPENDENT
               key: 'mantis.project.status.assigned_issues[{#NAME}]'
-              delay: '0'
-              history: 7d
               description: 'Count of issues with ''assigned'' status.'
               preprocessing:
                 - type: JSONPATH
@@ -514,8 +459,6 @@ zabbix_export:
               name: 'Project [{#NAME}]: Closed issues'
               type: DEPENDENT
               key: 'mantis.project.status.closed_issues[{#NAME}]'
-              delay: '0'
-              history: 7d
               description: 'Count of issues with ''closed'' status.'
               preprocessing:
                 - type: JSONPATH
@@ -532,8 +475,6 @@ zabbix_export:
               name: 'Project [{#NAME}]: Confirmed issues'
               type: DEPENDENT
               key: 'mantis.project.status.confirmed_issues[{#NAME}]'
-              delay: '0'
-              history: 7d
               description: 'Count of issues with ''confirmed'' status.'
               preprocessing:
                 - type: JSONPATH
@@ -550,8 +491,6 @@ zabbix_export:
               name: 'Project [{#NAME}]: Feedback issues'
               type: DEPENDENT
               key: 'mantis.project.status.feedback_issues[{#NAME}]'
-              delay: '0'
-              history: 7d
               description: 'Count of issues with ''feedback'' status.'
               preprocessing:
                 - type: JSONPATH
@@ -568,8 +507,6 @@ zabbix_export:
               name: 'Project [{#NAME}]: New issues'
               type: DEPENDENT
               key: 'mantis.project.status.new_issues[{#NAME}]'
-              delay: '0'
-              history: 7d
               description: 'Count of issues with ''new'' status.'
               preprocessing:
                 - type: JSONPATH
@@ -586,8 +523,6 @@ zabbix_export:
               name: 'Project [{#NAME}]: Resolved issues'
               type: DEPENDENT
               key: 'mantis.project.status.resolved_issues[{#NAME}]'
-              delay: '0'
-              history: 7d
               description: 'Count of issues with ''resolved'' status.'
               preprocessing:
                 - type: JSONPATH
@@ -604,8 +539,6 @@ zabbix_export:
               name: 'Project [{#NAME}]: Total issues'
               type: DEPENDENT
               key: 'mantis.project.total_issues[{#NAME}]'
-              delay: '0'
-              history: 7d
               description: 'Count of issues in project.'
               preprocessing:
                 - type: JSONPATH
@@ -624,7 +557,6 @@ zabbix_export:
               key: 'mantisbt.get.issues[{#NAME}]'
               delay: 20m
               history: '0'
-              trends: '0'
               value_type: TEXT
               description: 'Getting project issues.'
               timeout: 30s

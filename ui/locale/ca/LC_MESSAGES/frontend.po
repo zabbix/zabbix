@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-05-28 08:39+0000\n"
+"PO-Revision-Date: 2024-07-14 07:23+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -954,6 +954,10 @@ msgstr "Afegeix una columna"
 msgid "Add a new widget"
 msgstr "Afegeix un giny nou"
 
+#: widgets/navtree/Widget.php:34
+msgid "Add child element"
+msgstr "Afegir un element fill"
+
 #: widgets/navtree/Widget.php:39
 msgid "Add child elements"
 msgstr "Afegeix elements fill"
@@ -987,6 +991,11 @@ msgstr "Afegeix etiquetes d'equip"
 #: app/views/trigger.massupdate.php:155
 msgid "Add host trigger"
 msgstr "Afegir trigger d'equip"
+
+#: widgets/piechart/includes/CWidgetFieldDataSetView.php:260
+#: widgets/svggraph/includes/CWidgetFieldDataSetView.php:263
+msgid "Add item"
+msgstr "Afegir un element"
 
 #: app/partials/massupdate.macros.tab.php:96
 #: app/partials/massupdate.valuemaps.tab.php:38
@@ -1646,6 +1655,10 @@ msgstr "Cal triar, com a mínim, un dia de la setmana o un dia del mes."
 msgid "At least one host group or host must be selected."
 msgstr "S'ha de triar, com a mínim, almenys un grup d'equips o un equip."
 
+#: include/classes/setup/CFrontendSetup.php:252
+msgid "At least one of MySQL or PostgreSQL should be supported."
+msgstr "Com a mínim hauria d'admetre MySQL o PostgreSQL."
+
 #: include/classes/setup/CFrontendSetup.php:241
 msgid "At least one of MySQL, PostgreSQL or Oracle should be supported."
 msgstr "Com a mínim MySQL, PostgreSQL o Oracle haurien d'ésser suportats."
@@ -1865,6 +1878,11 @@ msgstr "Disponibilitat"
 msgid "Availability report"
 msgstr "Informe de disponibilitat"
 
+#: app/controllers/CControllerAvailabilityReportTrigger.php:70
+#: app/views/reports.availabilityreport.trigger.php:23
+msgid "Availability report graph"
+msgstr ""
+
 #: include/classes/html/CHostAvailability.php:80
 #: widgets/hostavail/views/widget.view.php:32
 msgid "Available"
@@ -1891,6 +1909,10 @@ msgstr "El nombre mitjà de sol·licituds d'escriptura pendents al disc virtual 
 #: app/views/administration.authentication.edit.php:131
 msgid "Avoid easy-to-guess passwords"
 msgstr "Eviteu paraules de pas fàcils d'endevinar"
+
+#: jsLoader.php:172
+msgid "Awaiting data"
+msgstr "Esperant dades"
 
 #: widgets/svggraph/views/widget.edit.php:51
 msgid "Axes"
@@ -5414,6 +5436,10 @@ msgstr "Crea un tipus de suport"
 #: app/views/popup.import.php:143 jsLoader.php:349
 msgid "Create new"
 msgstr "Crea'n un de nou"
+
+#: jsLoader.php:372
+msgid "Create new report"
+msgstr "Crea un informe nou"
 
 #: app/views/administration.proxy.list.php:239
 msgid "Create proxy"
@@ -9539,6 +9565,10 @@ msgstr[1] "S'han esborrat els grups d'equips"
 msgid "Host group elements"
 msgstr "Elements del grup d'equips"
 
+#: jsLoader.php:292
+msgid "Host group is not selected."
+msgstr "El grup d'equips no s'ha pas seleccionat."
+
 #: include/views/monitoring.sysmap.edit.php:168
 msgid "Host group label type"
 msgstr "Tipus d'etiqueta del grup d'equips"
@@ -9617,6 +9647,10 @@ msgstr "Inventari d'equips"
 #: hostinventoriesoverview.php:26 hostinventoriesoverview.php:146
 msgid "Host inventory overview"
 msgstr "Visió general de l'inventari d'equips"
+
+#: jsLoader.php:289
+msgid "Host is not selected."
+msgstr "L'equip no s'ha pas seleccionat."
 
 #: include/views/monitoring.sysmap.edit.php:183
 msgid "Host label type"
@@ -12935,6 +12969,10 @@ msgstr "Ubicació de l'etiqueta de l'element del mapa"
 #: include/views/monitoring.sysmap.edit.php:243
 msgid "Map element label type"
 msgstr "Tipus d'etiqueta d'element del mapa"
+
+#: jsLoader.php:290
+msgid "Map is not selected."
+msgstr "El mapa no s'ha pas triat."
 
 #: sysmap.php:128
 msgid "Map is updated! Return to map list?"
@@ -19480,7 +19518,7 @@ msgstr "Funcions d'string"
 
 #: widgets/piechart/includes/WidgetForm.php:137
 msgid "Stroke width"
-msgstr ""
+msgstr "Amplada del traç"
 
 #: include/items.inc.php:1545 include/items.inc.php:1549
 #: include/items.inc.php:1553 include/items.inc.php:1557
@@ -20853,6 +20891,10 @@ msgstr "Trigger en estat \"desconegut\"."
 #, c-format
 msgid "Trigger in template \"%1$s\" has dependency with trigger in template \"%2$s\"."
 msgstr "El trigger de la plantilla \"%1$s\" té una dependència amb el trigger de la plantilla \"%2$s\"."
+
+#: jsLoader.php:291
+msgid "Trigger is not selected."
+msgstr "No s'ha triat pas el trigger."
 
 #: include/views/monitoring.sysmap.edit.php:198
 msgid "Trigger label type"
@@ -22906,6 +22948,10 @@ msgstr "Veure"
 msgid "View as"
 msgstr "Veure com a"
 
+#: jsLoader.php:417
+msgid "View related reports"
+msgstr "Veure informes relacionats"
+
 #: include/classes/data/CItemData.php:1735
 msgid "Virtual space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr "Mida de l'espai virtual en octets o en percentatge respecte al total. Retorna els octets en enters, i els percentatges en flotants"
@@ -23114,6 +23160,10 @@ msgstr "El giny és obsolet."
 #: jsLoader.php:187
 msgid "Widget is too small for the specified number of columns and rows."
 msgstr "El giny és massa petit per al nombre especificat de columnes i files."
+
+#: jsLoader.php:205
+msgid "Widgets"
+msgstr "Ginys"
 
 #: graphs.php:39 include/views/configuration.graph.edit.php:100
 #: include/views/configuration.graph.list.php:170
@@ -23486,6 +23536,10 @@ msgstr "No teniu pas permís per accedir a aquesta pàgina."
 #: include/classes/core/ZBase.php:763 include/func.inc.php:1709
 msgid "You must login to view this page."
 msgstr "Heu d'iniciar sessió per veure aquesta pàgina."
+
+#: jsLoader.php:287
+msgid "You need to have at least one image uploaded to create map element. Images can be uploaded in Administration->General->Images section."
+msgstr "Heu de tindre almenys una imatge penjada per crear un element del mapa. Les imatges es poden penjar a la secció Administració->General->Imatges."
 
 #: include/classes/db/DB.php:133
 msgid "Your database is not working properly. Please wait a few minutes and try to repeat this action. If the problem still persists, please contact system administrator. The problem might be caused by long running transaction or row level lock accomplished by your database management system."
@@ -25494,6 +25548,10 @@ msgstr "dreta"
 #: app/controllers/CControllerPopupTriggerExpr.php:953
 msgid "right() - Returns the rightmost count characters"
 msgstr "right() - Retorna els caràcters de recompte més a la dreta"
+
+#: widgets/navtree/Widget.php:41
+msgid "root"
+msgstr "arrel"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:966
 msgid "round() - Rounds a value to decimal places"
