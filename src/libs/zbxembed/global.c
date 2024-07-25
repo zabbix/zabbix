@@ -27,30 +27,6 @@
 
 /******************************************************************************
  *                                                                            *
- * Purpose: check if the object at index is instance of the specified object  *
- *                                                                            *
- * Parameters: ctx         - [IN] pointer to duk_context                      *
- *             index       - [IN] index of object to check                    *
- *             object_name - [IN] target object name                          *
- *                                                                            *
- * Return value: SUCCEED - object at index is instance of object_name         *
- *                                                                            *
- ******************************************************************************/
-static int	es_instanceof(duk_context *ctx, int index, const char *object_name)
-{
-	int	ret;
-
-	if (0 == duk_get_global_string(ctx, object_name))
-		return FAIL;
-
-	ret = duk_instanceof(ctx, index, -1);
-	duk_pop(ctx);
-
-	return (0 == ret ? FAIL : SUCCEED);
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: export duktape data at the index into buffer                      *
  *                                                                            *
  * Return value: allocated buffer with exported data or NULL on error         *
@@ -71,32 +47,27 @@ char	*es_get_buffer_dyn(duk_context *ctx, int index, duk_size_t *len)
 
 	type = duk_get_type(ctx, index);
 
-	if (DUK_TYPE_OBJECT == type)
-	{
-		if (SUCCEED == es_instanceof(ctx, index, "ArrayBuffer"))
-			type = DUK_TYPE_BUFFER;
-		else
-			type = DUK_TYPE_STRING;
-	}
-
 	switch (type)
 	{
-		case DUK_TYPE_BUFFER:
-			if (NULL == (ptr = duk_get_buffer_data(ctx, index, len)))
-				break;
-			buf = zbx_malloc(NULL, *len);
-			memcpy(buf, ptr, *len);
-			break;
-		case DUK_TYPE_OBJECT:
 		case DUK_TYPE_UNDEFINED:
 		case DUK_TYPE_NONE:
 		case DUK_TYPE_NULL:
-			break;
-		default:
-			if (SUCCEED == es_duktape_string_decode(duk_safe_to_string(ctx, index), &buf))
-				*len = strlen(buf);
-			break;
+			return NULL;
 	}
+
+	if (NULL != (ptr = duk_get_buffer_data(ctx, index, len)))
+	{
+		buf = zbx_malloc(NULL, *len);
+		memcpy(buf, ptr, *len);
+
+		return buf;
+	}
+
+	if (type == DUK_TYPE_BUFFER)
+		return NULL;
+
+	if (SUCCEED == es_duktape_string_decode(duk_safe_to_string(ctx, index), &buf))
+		*len = strlen(buf);
 
 	return buf;
 }
