@@ -20,6 +20,7 @@
 package external
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"net"
@@ -186,14 +187,19 @@ func (p *Plugin) startPlugin(initial bool) (<-chan error, error) {
 
 	p.cmd = exec.Command(p.Path, p.socket, strconv.FormatBool(initial)) //nolint:gosec
 
+	b := &bytes.Buffer{}
+	p.cmd.Stderr = b
+	p.cmd.Stdout = b
+
 	err := p.cmd.Start()
 	if err != nil {
 		return nil, errs.Wrapf(err, "failed to start plugin process %q", p.Path)
 	}
 
 	go func() {
-		p.logr.Debugf("plugin process exited")
 		p.cmdWait <- p.cmd.Wait()
+		p.logr.Debugf("plugin process %s exited", p.name)
+		p.logr.Tracef("plugin process %s stderr/out: %s", p.name, b.String())
 	}()
 
 	conn, err := getConnection(p.listener, p.timeout)
