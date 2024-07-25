@@ -24,7 +24,12 @@ class CApiPskHelper {
 	/**
 	 * Check tls_psk_identity have same tls_psk value across all hosts, proxies and autoregistration.
 	 *
-	 * @param array $psk_pairs
+	 * @param array  $psk_pairs
+	 * @param string $psk_pair[]['tls_psk']
+	 * @param string $psk_pair[]['tls_psk_identity']
+	 * @param string $psk_pair[]['hostid']            (optional) required on host update
+	 * @param string $psk_pair[]['proxyid']           (optional) required on proxy update
+	 * @param string $psk_pair[]['autoreg_tlsid']     (optional) required on autoregistration update
 	 *
 	 * @throws APIException
 	 */

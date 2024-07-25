@@ -909,21 +909,25 @@ class CHost extends CHostGeneral {
 
 		sort($hostids);
 
+		$tls_fields = ['tls_connect', 'tls_accept', 'tls_issuer', 'tls_subject', 'tls_psk_identity', 'tls_psk'];
+		$tls_values = array_intersect_key($data, array_flip($tls_fields));
 		$db_hosts = $this->get([
 			'output' => ['hostid', 'proxy_hostid', 'host', 'status', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username',
-				'ipmi_password', 'name', 'description', 'tls_connect', 'tls_accept', 'tls_issuer', 'tls_subject',
-				'tls_psk_identity', 'tls_psk', 'inventory_mode'
+				'ipmi_password', 'name', 'description', 'inventory_mode'
 			],
 			'hostids' => $hostids,
 			'editable' => true,
 			'preservekeys' => true
 		]);
 
-		foreach ($hosts as $host) {
+		foreach ($hosts as &$host) {
 			if (!array_key_exists($host['hostid'], $db_hosts)) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 			}
+
+			$host += $tls_values;
 		}
+		unset($host);
 
 		// Check inventory mode value.
 		if (array_key_exists('inventory_mode', $data)) {
@@ -937,9 +941,7 @@ class CHost extends CHostGeneral {
 		}
 
 		// Check connection fields only for massupdate action.
-		if (array_key_exists('tls_connect', $data) || array_key_exists('tls_accept', $data)
-				|| array_key_exists('tls_psk_identity', $data) || array_key_exists('tls_psk', $data)
-				|| array_key_exists('tls_issuer', $data) || array_key_exists('tls_subject', $data)) {
+		if ($tls_values) {
 			if (!array_key_exists('tls_connect', $data) || !array_key_exists('tls_accept', $data)) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _(
 					'Cannot update host encryption settings. Connection settings for both directions should be specified.'
@@ -951,6 +953,17 @@ class CHost extends CHostGeneral {
 				$data['tls_psk_identity'] = '';
 				$data['tls_psk'] = '';
 			}
+			else {
+				$db_hosts_tls_data = DB::select('hosts', [
+					'output' => $tls_fields,
+					'hostids' => array_keys($db_hosts),
+					'preservekeys' => true
+				]);
+
+				foreach ($db_hosts_tls_data as $hostid => $db_host_tls_data) {
+					$db_hosts[$hostid] += $db_host_tls_data;
+				}
+			}
 
 			// Clean certificate fields.
 			if ($data['tls_connect'] != HOST_ENCRYPTION_CERTIFICATE
@@ -958,9 +971,9 @@ class CHost extends CHostGeneral {
 				$data['tls_issuer'] = '';
 				$data['tls_subject'] = '';
 			}
-		}
 
-		$this->validateEncryption([$data]);
+			$this->validateEncryption($hosts, $db_hosts);
+		}
 
 		if (array_key_exists('groups', $data) && !$data['groups'] && $db_hosts) {
 			$host = reset($db_hosts);
@@ -1835,13 +1848,15 @@ class CHost extends CHostGeneral {
 					));
 				}
 
-				$psk_pairs[$i] = [
-					'tls_psk_identity' => $tls_psk_identity,
-					'tls_psk' => $tls_psk
-				];
+				if (array_key_exists('tls_psk_identity', $host) || array_key_exists('tls_psk', $host)) {
+					$psk_pairs[$i] = [
+						'tls_psk_identity' => $tls_psk_identity,
+						'tls_psk' => $tls_psk
+					];
 
-				if ($db_hosts !== null) {
-					$psk_pairs[$i]['hostid'] = $host['hostid'];
+					if ($db_hosts !== null) {
+						$psk_pairs[$i]['hostid'] = $host['hostid'];
+					}
 				}
 			}
 			else {

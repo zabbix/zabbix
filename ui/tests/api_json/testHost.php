@@ -40,46 +40,15 @@ class testHost extends CAPITest {
 		$result = CDataHelper::call('hostgroup.create', $hostgroups);
 		self::$data['hostgroup'] = array_combine(array_column($hostgroups, 'name'), $result['groupids']);
 
-		$hosts = [];
-		// dataProviderInvalidHostCreate: Field "tls_psk" cannot have different values for same "tls_psk_identity"
-		$hosts[] = [
-			'host' => 'test.example.com',
-			'groups' => [['groupid' => ':hostgroup:API tests hosts group']],
-			'tls_accept' => HOST_ENCRYPTION_PSK,
-			'tls_psk_identity' => 'public',
-			'tls_psk' => '79cbf232a3ad3bfe38dee29861f8ba6b'
-		];
-		// dataProviderInvalidHostUpdate, dataProviderValidHostUpdate
-		$hosts[] = [
-			'host' => 'psk1.example.com',
-			'groups' => [['groupid' => ':hostgroup:API tests hosts group']],
-			'tls_accept' => HOST_ENCRYPTION_PSK,
-			'tls_psk_identity' => 'example.com',
-			'tls_psk' => '79cbf232a3ad3bfe38dee29861f8ba6b'
-		];
-		$hosts[] = [
-			'host' => 'psk2.example.com',
-			'groups' => [['groupid' => ':hostgroup:API tests hosts group']],
-			'tls_accept' => HOST_ENCRYPTION_PSK,
-			'tls_psk_identity' => 'example.com',
-			'tls_psk' => '79cbf232a3ad3bfe38dee29861f8ba6b'
-		];
-		$hosts[] = [
-			'host' => 'psk3.example.com',
-			'groups' => [['groupid' => ':hostgroup:API tests hosts group']],
-			'tls_connect' => HOST_ENCRYPTION_PSK,
-			'tls_psk_identity' => 'psk3.example.com',
-			'tls_psk' => 'de4f735c561e5444b0932f7ebd636b85'
-		];
-
-		$result = CDataHelper::call('host.create', self::resolveIds($hosts));
-		self::$data['host'] = array_combine(array_column($hosts, 'host'), $result['hostids']);
-
 		CDataHelper::call('autoregistration.update', [
 			'tls_accept' => HOST_ENCRYPTION_PSK,
 			'tls_psk_identity' => 'autoregistration',
 			'tls_psk' => 'ec30a947e6776ae9efb77f46aefcba04'
 		]);
+
+		self::prepareTestDataHostPskFieldsCreate();
+		self::prepareTestDataHostPskFieldsUpdate();
+		self::prepareTestDataHostPskFieldsMassUpdate();
 	}
 
 	public static function cleanTestData(): void {
@@ -184,6 +153,20 @@ class testHost extends CAPITest {
 				'expected_error' => 'Incorrect arguments passed to function.'
 			]
 		];
+	}
+
+	public static function prepareTestDataHostPskFieldsCreate() {
+		$hosts = [
+			[
+				'host' => 'test.example.com',
+				'groups' => [['groupid' => ':hostgroup:API tests hosts group']],
+				'tls_accept' => HOST_ENCRYPTION_PSK,
+				'tls_psk_identity' => 'public',
+				'tls_psk' => '79cbf232a3ad3bfe38dee29861f8ba6b'
+			]
+		];
+		$result = CDataHelper::call('host.create', self::resolveIds($hosts));
+		self::$data['host'] += array_combine(array_column($hosts, 'host'), $result['hostids']);
 	}
 
 	public static function dataProviderInvalidHostCreate() {
@@ -545,6 +528,35 @@ class testHost extends CAPITest {
 		}
 	}
 
+	public static function prepareTestDataHostPskFieldsUpdate() {
+		$hosts = [
+			[
+				'host' => 'psk1.example.com',
+				'groups' => [['groupid' => ':hostgroup:API tests hosts group']],
+				'tls_accept' => HOST_ENCRYPTION_PSK,
+				'tls_psk_identity' => 'example.com',
+				'tls_psk' => '79cbf232a3ad3bfe38dee29861f8ba6b'
+			],
+			[
+				'host' => 'psk2.example.com',
+				'groups' => [['groupid' => ':hostgroup:API tests hosts group']],
+				'tls_accept' => HOST_ENCRYPTION_PSK,
+				'tls_psk_identity' => 'example.com',
+				'tls_psk' => '79cbf232a3ad3bfe38dee29861f8ba6b'
+			],
+			[
+				'host' => 'psk3.example.com',
+				'groups' => [['groupid' => ':hostgroup:API tests hosts group']],
+				'tls_connect' => HOST_ENCRYPTION_PSK,
+				'tls_psk_identity' => 'psk3.example.com',
+				'tls_psk' => 'de4f735c561e5444b0932f7ebd636b85'
+			]
+		];
+
+		$result = CDataHelper::call('host.create', self::resolveIds($hosts));
+		self::$data['host'] += array_combine(array_column($hosts, 'host'), $result['hostids']);
+	}
+
 	public static function dataProviderInvalidHostUpdate() {
 		return [
 			'Field "tls_psk_identity" cannot be empty when "tls_connect" is HOST_ENCRYPTION_PSK' => [
@@ -582,9 +594,19 @@ class testHost extends CAPITest {
 
 	public static function dataProviderValidHostUpdate() {
 		return [
-			'Can change "tls_psk_identity" and "tls_psk"' => [
+			'Can update "tls_psk_identity" and "tls_psk"' => [
 				'host' => [
-					['hostid' => ':host:psk1.example.com', 'tls_psk_identity' => 'psk3.example.com', 'tls_psk' => 'de4f735c561e5444b0932f7ebd636b85']
+					['hostid' => ':host:psk1.example.com', 'tls_psk_identity' => 'psk4.example.com', 'tls_psk' => 'de4f735c561e5444b0932f7ebd636b85']
+				]
+			],
+			'Can update "tls_psk"' => [
+				'host' => [
+					['hostid' => ':host:psk1.example.com', 'tls_psk' => '11111111111111111111111111111111']
+				]
+			],
+			'Can update "tls_psk_identity"' => [
+				'host' => [
+					['hostid' => ':host:psk1.example.com', 'tls_psk_identity' => 'psk5.example.com']
 				]
 			]
 		];
@@ -596,5 +618,136 @@ class testHost extends CAPITest {
 	 */
 	public function testHost_Update($hosts, $expected_error = null) {
 		$this->call('host.update', self::resolveIds($hosts), $expected_error);
+	}
+
+	public static function prepareTestDataHostPskFieldsMassUpdate() {
+		$hosts = [
+			[
+				'host' => 'host.massupdate.psk1',
+				'groups' => [['groupid' => ':hostgroup:API tests hosts group']],
+				'tls_accept' => HOST_ENCRYPTION_PSK,
+				'tls_psk_identity' => 'host.massupdate.psk1',
+				'tls_psk' => '85fbc6f14e967d7e75b12da395ca9b46'
+			],
+			[
+				'host' => 'host.massupdate.psk2',
+				'groups' => [['groupid' => ':hostgroup:API tests hosts group']],
+				'tls_connect' => HOST_ENCRYPTION_PSK,
+				'tls_psk_identity' => 'host.massupdate.psk2',
+				'tls_psk' => 'dc773e30385b5248b67c29988812d876'
+			],
+			[
+				'host' => 'host.massupdate.psk3',
+				'groups' => [['groupid' => ':hostgroup:API tests hosts group']],
+				'tls_accept' => HOST_ENCRYPTION_PSK,
+				'tls_psk_identity' => 'host.massupdate.psk3',
+				'tls_psk' => '6e801121c08cee058677d3b99e888740'
+			],
+			[
+				'host' => 'host.massupdate.psk4',
+				'groups' => [['groupid' => ':hostgroup:API tests hosts group']],
+				'tls_accept' => HOST_ENCRYPTION_PSK,
+				'tls_psk_identity' => 'host.massupdate.psk3',
+				'tls_psk' => '6e801121c08cee058677d3b99e888740'
+			],
+			[
+				'host' => 'host.massupdate.psk5',
+				'groups' => [['groupid' => ':hostgroup:API tests hosts group']],
+				'tls_accept' => HOST_ENCRYPTION_PSK,
+				'tls_psk_identity' => 'host.massupdate.psk5',
+				'tls_psk' => '3ea2412335c350dcb8a0e76d1152f372'
+			]
+		];
+
+		$result = CDataHelper::call('host.create', self::resolveIds($hosts));
+		self::$data['host'] += array_combine(array_column($hosts, 'host'), $result['hostids']);
+	}
+
+	public static function dataProviderInvalidHostPskFieldsMassUpdate() {
+		return [
+			'Field "tls_accept" is required when "tls_connect" is set' => [
+				[
+					'tls_connect' => HOST_ENCRYPTION_PSK,
+					'hosts' => [
+						['hostid' => ':host:host.massupdate.psk1'],
+						['hostid' => ':host:host.massupdate.psk2']
+					]
+				],
+				'Cannot update host encryption settings. Connection settings for both directions should be specified.'
+			],
+			'Field "tls_connect" is required when "tls_accept" is set' => [
+				[
+					'tls_accept' => HOST_ENCRYPTION_PSK,
+					'hosts' => [
+						['hostid' => ':host:host.massupdate.psk1']
+					]
+				],
+				'Cannot update host encryption settings. Connection settings for both directions should be specified.'
+			],
+			'Field "tls_psk" cannot have different values for same "tls_psk_identity" on change "tls_psk_identity"' => [
+				[
+					'tls_psk_identity' => 'host.massupdate.psk1',
+					'tls_accept' => HOST_ENCRYPTION_PSK,
+					'tls_connect' => HOST_ENCRYPTION_PSK,
+					'hosts' => [
+						['hostid' => ':host:host.massupdate.psk1'],
+						['hostid' => ':host:host.massupdate.psk2']
+					]
+				],
+				'Incorrect value for field "/2/tls_psk": another value of tls_psk exists for same tls_psk_identity.'
+			],
+			'Field "tls_psk" cannot have different values for same "tls_psk_identity" on change "tls_psk"' => [
+				[
+					'tls_psk' => '11111111111111111111111111111111',
+					'tls_accept' => HOST_ENCRYPTION_PSK,
+					'tls_connect' => HOST_ENCRYPTION_PSK,
+					'hosts' => [
+						['hostid' => ':host:host.massupdate.psk3']
+					]
+				],
+				'Incorrect value for field "/1/tls_psk": another value of tls_psk exists for same tls_psk_identity.'
+			]
+		];
+	}
+
+	public static function dataProviderValidHostPskFieldsMassUpdate() {
+		return [
+			'Can update "tls_psk_identity" and "tls_psk"' => [
+				[
+					'tls_psk_identity' => 'host.massupdate',
+					'tls_psk' => 'a296c2411feb2b730bea9742307fba01',
+					'tls_accept' => HOST_ENCRYPTION_PSK,
+					'tls_connect' => HOST_ENCRYPTION_PSK,
+					'hosts' => [
+						['hostid' => ':host:host.massupdate.psk1'],
+						['hostid' => ':host:host.massupdate.psk2']
+					]
+				]
+			],
+			'Can update "tls_psk"' => [
+				[
+					'tls_psk' => 'dc773e30385b5248b67c29988812d876',
+					'tls_accept' => HOST_ENCRYPTION_PSK,
+					'tls_connect' => HOST_ENCRYPTION_PSK,
+					'hosts' => [
+						['hostid' => ':host:host.massupdate.psk5']
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider dataProviderInvalidHostPskFieldsMassUpdate
+	 * @dataProvider dataProviderValidHostPskFieldsMassUpdate
+	 */
+	public function testHostPskFields_MassUpdate($data, $expected_error = null) {
+		$data = self::resolveIds($data);
+
+		if (array_key_exists('hosts', $data)) {
+			$data['hosts'] = self::resolveIds($data['hosts']);
+		}
+
+		$this->call('host.massupdate', $data, $expected_error);
 	}
 }
