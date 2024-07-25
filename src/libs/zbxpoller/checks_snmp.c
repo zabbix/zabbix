@@ -298,8 +298,8 @@ static int	zbx_snmp_cache_handle_engineid(netsnmp_session *session, zbx_dc_item_
 	{
 		ret = FAIL;
 		item_context->ret = NOTSUPPORTED;
-		SET_MSG_RESULT(&item_context->result, zbx_dsprintf(NULL, "SNMP engineId length is non-conformant "
-				"(" ZBX_FS_UI64 ")", session->securityEngineIDLen));
+		SET_MSG_RESULT(&item_context->result, zbx_dsprintf(NULL, "Invalid SNMP engineId length "
+				"\"" ZBX_FS_UI64 "\"", session->securityEngineIDLen));
 
 		goto out;
 	}
