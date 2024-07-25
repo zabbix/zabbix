@@ -73,10 +73,10 @@ char	*es_get_buffer_dyn(duk_context *ctx, int index, duk_size_t *len)
 
 	if (DUK_TYPE_OBJECT == type)
 	{
-		if (SUCCEED == es_instanceof(ctx, index, "String"))
-			type = DUK_TYPE_STRING;
-		else if (SUCCEED == es_instanceof(ctx, index, "ArrayBuffer"))
+		if (SUCCEED == es_instanceof(ctx, index, "ArrayBuffer"))
 			type = DUK_TYPE_BUFFER;
+		else
+			type = DUK_TYPE_STRING;
 	}
 
 	switch (type)
