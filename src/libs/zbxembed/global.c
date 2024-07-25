@@ -21,6 +21,30 @@
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: check if the object at index is instance of the specified object  *
+ *                                                                            *
+ * Parameters: ctx         - [IN] pointer to duk_context                      *
+ *             index       - [IN] index of object to check                    *
+ *             object_name - [IN] target object name                          *
+ *                                                                            *
+ * Return value: SUCCEED - object at index is instance of object_name         *
+ *                                                                            *
+ ******************************************************************************/
+static int	es_instanceof(duk_context *ctx, int index, const char *object_name)
+{
+	int	ret;
+
+	if (0 == duk_get_global_string(ctx, object_name))
+		return FAIL;
+
+	ret = duk_instanceof(ctx, index, -1);
+	duk_pop(ctx);
+
+	return (0 == ret ? FAIL : SUCCEED);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: export duktape data at the index into buffer                      *
  *                                                                            *
  * Return value: allocated buffer with exported data or NULL on error         *
@@ -41,20 +65,29 @@ char	*es_get_buffer_dyn(duk_context *ctx, int index, duk_size_t *len)
 
 	type = duk_get_type(ctx, index);
 
+	if (DUK_TYPE_OBJECT == type)
+	{
+		if (SUCCEED == es_instanceof(ctx, index, "ArrayBuffer"))
+			type = DUK_TYPE_BUFFER;
+		else
+			type = DUK_TYPE_STRING;
+	}
+
 	switch (type)
 	{
 		case DUK_TYPE_BUFFER:
-		case DUK_TYPE_OBJECT:
-			ptr = duk_require_buffer_data(ctx, index, len);
+			if (NULL == (ptr = duk_get_buffer_data(ctx, index, len)))
+				break;
 			buf = zbx_malloc(NULL, *len);
 			memcpy(buf, ptr, *len);
 			break;
+		case DUK_TYPE_OBJECT:
 		case DUK_TYPE_UNDEFINED:
 		case DUK_TYPE_NONE:
 		case DUK_TYPE_NULL:
 			break;
 		default:
-			if (SUCCEED == es_duktape_string_decode(duk_to_string(ctx, index), &buf))
+			if (SUCCEED == es_duktape_string_decode(duk_safe_to_string(ctx, index), &buf))
 				*len = strlen(buf);
 			break;
 	}
@@ -102,8 +135,8 @@ static duk_ret_t	es_btoa(duk_context *ctx)
  ******************************************************************************/
 static duk_ret_t	es_atob(duk_context *ctx)
 {
-	char	*buffer = NULL, *str = NULL;
-	size_t	out_size, buffer_size;
+	char	*buffer = NULL, *str = NULL, *ptr;
+	int	out_size, buffer_size;
 
 	if (SUCCEED != es_duktape_string_decode(duk_require_string(ctx, 0), &str))
 		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot convert value to utf8");
@@ -111,7 +144,9 @@ static duk_ret_t	es_atob(duk_context *ctx)
 	buffer_size = strlen(str) * 3 / 4 + 1;
 	buffer = zbx_malloc(buffer, buffer_size);
 	zbx_base64_decode(str, buffer, buffer_size, &out_size);
-	duk_push_lstring(ctx, buffer, (duk_size_t)out_size);
+	ptr = duk_push_fixed_buffer(ctx, out_size);
+	memcpy(ptr, buffer, out_size);
+
 	zbx_free(str);
 	zbx_free(buffer);
 
@@ -154,10 +189,9 @@ static void	es_bin_to_hex(const unsigned char *bin, size_t len, char *out)
  ******************************************************************************/
 static duk_ret_t	es_md5(duk_context *ctx)
 {
-	char		*str;
+	char		*str, *md5sum;
 	md5_state_t	state;
 	md5_byte_t	hash[ZBX_MD5_DIGEST_SIZE];
-	char		*md5sum;
 	duk_size_t	len;
 
 	if (NULL == (str = es_get_buffer_dyn(ctx, 0, &len)))
