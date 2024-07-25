@@ -640,6 +640,12 @@ static int	DBpatch_6000044(void)
 #undef TOKEN_LEN
 #undef LAST_FOREACH
 }
+
+static int	DBpatch_6000045(void)
+{
+	return DBcreate_index("auditlog", "auditlog_4", "recordsetid", 0);
+}
+
 #endif
 
 DBPATCH_START(6000)
@@ -691,5 +697,6 @@ DBPATCH_ADD(6000041, 0, 0)
 DBPATCH_ADD(6000042, 0, 0)
 DBPATCH_ADD(6000043, 0, 0)
 DBPATCH_ADD(6000044, 0, 0)
+DBPATCH_ADD(6000045, 0, 0)
 
 DBPATCH_END()
