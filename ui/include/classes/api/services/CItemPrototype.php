@@ -740,13 +740,12 @@ class CItemPrototype extends CItemGeneral {
 		return $sqlParts;
 	}
 
-	public function addRelatedObjects(array $options, array $result) {
-		$result = parent::addRelatedObjects($options, $result);
-
-		$itemids = array_keys($result);
-
-		// adding triggers
-		if (!is_null($options['selectTriggers'])) {
+	/**
+	 * @param array $options    Array of query options.
+	 * @param array $result     Query results.
+	 */
+	private function addRelatedTriggers(array $options, array &$result): void {
+		if ($options['selectTriggers'] !== null) {
 			if ($options['selectTriggers'] != API_OUTPUT_COUNT) {
 				$triggers = [];
 				$relationMap = $this->createRelationMap($result, 'itemid', 'triggerid', 'functions');
@@ -770,7 +769,7 @@ class CItemPrototype extends CItemGeneral {
 				$triggers = API::TriggerPrototype()->get([
 					'countOutput' => true,
 					'groupCount' => true,
-					'itemids' => $itemids
+					'itemids' => array_keys($result)
 				]);
 				$triggers = zbx_toHash($triggers, 'itemid');
 
@@ -781,45 +780,13 @@ class CItemPrototype extends CItemGeneral {
 				}
 			}
 		}
+	}
 
-		// adding graphs
-		if (!is_null($options['selectGraphs'])) {
-			if ($options['selectGraphs'] != API_OUTPUT_COUNT) {
-				$graphs = [];
-				$relationMap = $this->createRelationMap($result, 'itemid', 'graphid', 'graphs_items');
-				$related_ids = $relationMap->getRelatedIds();
-
-				if ($related_ids) {
-					$graphs = API::GraphPrototype()->get([
-						'output' => $options['selectGraphs'],
-						'graphids' => $related_ids,
-						'preservekeys' => true
-					]);
-
-					if (!is_null($options['limitSelects'])) {
-						order_result($graphs, 'name');
-					}
-				}
-
-				$result = $relationMap->mapMany($result, $graphs, 'graphs', $options['limitSelects']);
-			}
-			else {
-				$graphs = API::GraphPrototype()->get([
-					'countOutput' => true,
-					'groupCount' => true,
-					'itemids' => $itemids
-				]);
-				$graphs = zbx_toHash($graphs, 'itemid');
-
-				foreach ($result as $itemid => $item) {
-					$result[$itemid]['graphs'] = array_key_exists($itemid, $graphs)
-						? $graphs[$itemid]['rowscount']
-						: '0';
-				}
-			}
-		}
-
-		// adding discoveryrule
+	/**
+	 * @param array $options    Array of query options.
+	 * @param array $result     Query results.
+	 */
+	private function addRelatedDiscoveryRule(array $options, array &$result): void {
 		if ($options['selectDiscoveryRule'] !== null && $options['selectDiscoveryRule'] != API_OUTPUT_COUNT) {
 			$relationMap = $this->createRelationMap($result, 'itemid', 'parent_itemid', 'item_discovery');
 			$discoveryRules = API::DiscoveryRule()->get([
@@ -830,29 +797,21 @@ class CItemPrototype extends CItemGeneral {
 			]);
 			$result = $relationMap->mapOne($result, $discoveryRules, 'discoveryRule');
 		}
+	}
 
-		// Adding item tags.
-		if ($options['selectTags'] !== null) {
-			$options['selectTags'] = ($options['selectTags'] !== API_OUTPUT_EXTEND)
-				? (array) $options['selectTags']
-				: ['tag', 'value'];
+	public function addRelatedObjects(array $options, array $result): array {
+		$result_chunks = array_chunk($result, CItemGeneral::CHUNK_SIZE, true);
+		$result = [];
 
-			$options['selectTags'] = array_intersect(['tag', 'value'], $options['selectTags']);
-			$requested_output = array_flip($options['selectTags']);
+		foreach ($result_chunks as $result_chunk) {
+			$result_chunk = parent::addRelatedObjects($options, $result_chunk);
 
-			$db_tags = DBselect(
-				'SELECT '.implode(',', array_merge($options['selectTags'], ['itemid'])).
-				' FROM item_tag'.
-				' WHERE '.dbConditionInt('itemid', $itemids)
-			);
+			$this->addRelatedTriggers($options, $result_chunk);
+			$this->addRelatedGraphs($options, $result_chunk);
+			$this->addRelatedDiscoveryRule($options, $result_chunk);
+			$this->addRelatedItemTags($options, $result_chunk);
 
-			array_walk($result, function (&$item) {
-				$item['tags'] = [];
-			});
-
-			while ($db_tag = DBfetch($db_tags)) {
-				$result[$db_tag['itemid']]['tags'][] = array_intersect_key($db_tag, $requested_output);
-			}
+			$result += $result_chunk;
 		}
 
 		return $result;
