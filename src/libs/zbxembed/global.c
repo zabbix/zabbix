@@ -82,7 +82,8 @@ char	*es_get_buffer_dyn(duk_context *ctx, int index, duk_size_t *len)
 	switch (type)
 	{
 		case DUK_TYPE_BUFFER:
-			ptr = duk_require_buffer_data(ctx, index, len);
+			if (NULL == (ptr = duk_get_buffer_data(ctx, index, len)))
+				break;
 			buf = zbx_malloc(NULL, *len);
 			memcpy(buf, ptr, *len);
 			break;
@@ -92,7 +93,7 @@ char	*es_get_buffer_dyn(duk_context *ctx, int index, duk_size_t *len)
 		case DUK_TYPE_NULL:
 			break;
 		default:
-			if (SUCCEED == es_duktape_string_decode(duk_to_string(ctx, index), &buf))
+			if (SUCCEED == es_duktape_string_decode(duk_safe_to_string(ctx, index), &buf))
 				*len = strlen(buf);
 			break;
 	}
