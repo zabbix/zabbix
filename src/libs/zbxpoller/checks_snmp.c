@@ -296,8 +296,12 @@ static int	zbx_snmp_cache_handle_engineid(netsnmp_session *session, zbx_dc_item_
 
 	if (ZBX_SNMP_MAX_ENGINEID_LEN < session->securityEngineIDLen)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "SNMP engineID of non-conformant length (" ZBX_FS_UI64 ") was detected");
-		return SUCCEED;
+		ret = FAIL;
+		item_context->ret = NOTSUPPORTED;
+		SET_MSG_RESULT(&item_context->result, zbx_dsprintf(NULL, "SNMP engineId length is non-conformant "
+				"(" ZBX_FS_UI64 ")", session->securityEngineIDLen));
+
+		goto out;
 	}
 
 	local_record.engineid_len = session->securityEngineIDLen;
@@ -383,6 +387,9 @@ static int	zbx_snmp_cache_handle_engineid(netsnmp_session *session, zbx_dc_item_
 			zbx_free(hosts);
 
 			ret = FAIL;
+			item_context->ret = NOTSUPPORTED;
+			SET_MSG_RESULT(&item_context->result, zbx_dsprintf(NULL, "SNMP engineId is not unique"));
+
 			goto out;
 #undef	ZBX_SNMP_ENGINEID_WARNING_PERIOD
 		}
@@ -3019,12 +3026,7 @@ static int	snmp_task_process(short event, void *data, int *fd, const char *addr,
 			}
 
 			if (FAIL == zbx_snmp_cache_handle_engineid(session, &snmp_context->item))
-			{
-				snmp_context->item.ret = NOTSUPPORTED;
-				SET_MSG_RESULT(&snmp_context->item.result, zbx_dsprintf(NULL,
-						"SNMP engineId is not unique"));
 				goto stop;
-			}
 
 			if (SNMPERR_SUCCESS != create_user_from_session(session))
 			{
