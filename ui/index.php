@@ -26,7 +26,7 @@ $fields = [
 	'name' =>		[T_ZBX_STR, O_NO,	null,	null,	'isset({enter}) && {enter} != "'.ZBX_GUEST_USER.'"', _('Username')],
 	'password' =>	[T_ZBX_STR, O_OPT, P_NO_TRIM,	null,	'isset({enter}) && {enter} != "'.ZBX_GUEST_USER.'"'],
 	'sessionid' =>	[T_ZBX_STR, O_OPT, null,	null,	null],
-	'reconnect' =>	[T_ZBX_INT, O_OPT, P_SYS,	null,	null],
+	'reconnect' =>	[T_ZBX_INT, O_OPT, P_SYS|P_ACT,	null,	null],
 	'enter' =>		[T_ZBX_STR, O_OPT, P_SYS,	null,	null],
 	'autologin' =>	[T_ZBX_INT, O_OPT, null,	null,	null],
 	'request' =>	[T_ZBX_STR, O_OPT, null,	null,	null],

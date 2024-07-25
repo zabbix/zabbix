@@ -13,6 +13,7 @@
 **/
 
 #include "dbupgrade.h"
+#include "zbxdbhigh.h"
 
 /*
  * 7.0 maintenance database patches
@@ -25,6 +26,31 @@ static int	DBpatch_7000000(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_7000001(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute(
+			"update profiles"
+				" set value_str='operating_mode'"
+				" where idx='web.proxies.php.sort'"
+				" and value_str like 'status'"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7000002(void)
+{
+	if (FAIL == zbx_db_index_exists("auditlog", "auditlog_4"))
+		return DBcreate_index("auditlog", "auditlog_4", "recordsetid", 0);
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(7000)
@@ -32,5 +58,7 @@ DBPATCH_START(7000)
 /* version, duplicates flag, mandatory flag */
 
 DBPATCH_ADD(7000000, 0, 1)
+DBPATCH_ADD(7000001, 0, 0)
+DBPATCH_ADD(7000002, 0, 0)
 
 DBPATCH_END()

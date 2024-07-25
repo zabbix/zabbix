@@ -931,6 +931,10 @@ msgstr "სვეტის დამატება"
 msgid "Add a new widget"
 msgstr "ახალი ვიჯეტის დამატება"
 
+#: widgets/navtree/Widget.php:34
+msgid "Add child element"
+msgstr ""
+
 #: widgets/navtree/Widget.php:39
 msgid "Add child elements"
 msgstr "შვილი ელემენტების დამატება"
@@ -964,6 +968,11 @@ msgstr "ჰოსტის ჭეების დამატება"
 #: app/views/trigger.massupdate.php:155
 msgid "Add host trigger"
 msgstr "ჰოსტის ტრიგერის დამატება"
+
+#: widgets/piechart/includes/CWidgetFieldDataSetView.php:260
+#: widgets/svggraph/includes/CWidgetFieldDataSetView.php:263
+msgid "Add item"
+msgstr ""
 
 #: app/partials/massupdate.macros.tab.php:96
 #: app/partials/massupdate.valuemaps.tab.php:38
@@ -1866,6 +1875,10 @@ msgstr ""
 #: app/views/administration.authentication.edit.php:131
 msgid "Avoid easy-to-guess passwords"
 msgstr "ადვილად მისახვედრი პაროლების თავიდან აცილება"
+
+#: jsLoader.php:172
+msgid "Awaiting data"
+msgstr ""
 
 #: widgets/svggraph/views/widget.edit.php:51
 msgid "Axes"
@@ -5294,6 +5307,10 @@ msgstr "მედიის ტიპის შექმნა"
 #: app/views/popup.import.php:143 jsLoader.php:349
 msgid "Create new"
 msgstr "ახლის შექმნა"
+
+#: jsLoader.php:372
+msgid "Create new report"
+msgstr ""
 
 #: app/views/administration.proxy.list.php:239
 msgid "Create proxy"
@@ -9403,6 +9420,10 @@ msgstr[0] "ჰოსტების ჯგუფი წაიშალა"
 msgid "Host group elements"
 msgstr "ჰოსტის ჯგუფის ელემენტები"
 
+#: jsLoader.php:292
+msgid "Host group is not selected."
+msgstr ""
+
 #: include/views/monitoring.sysmap.edit.php:168
 msgid "Host group label type"
 msgstr "ჰოსტების ჯგუფის ჭდის ტიპი"
@@ -9481,6 +9502,10 @@ msgstr "ჰოსტის ინვენტარი"
 #: hostinventoriesoverview.php:26 hostinventoriesoverview.php:146
 msgid "Host inventory overview"
 msgstr "ჰოსტის ინვენტარის მიმოხილვა"
+
+#: jsLoader.php:289
+msgid "Host is not selected."
+msgstr ""
 
 #: include/views/monitoring.sysmap.edit.php:183
 msgid "Host label type"
@@ -12781,6 +12806,10 @@ msgstr "რუკის ელემენტი ჭდის მდებარ
 msgid "Map element label type"
 msgstr "რუკის ელემენტის ჭდის ტიპი"
 
+#: jsLoader.php:290
+msgid "Map is not selected."
+msgstr ""
+
 #: sysmap.php:128
 msgid "Map is updated! Return to map list?"
 msgstr "რუკა განახლებულია! დავბრუნდე რუკების სიაზე?"
@@ -15020,6 +15049,19 @@ msgstr ""
 
 #: app/views/administration.proxygroup.list.php:80
 msgid "Online proxies"
+msgstr ""
+
+#: include/classes/api/services/CUser.php:874
+#: include/classes/api/services/CUser.php:882
+#: include/classes/api/services/CUser.php:889
+#, c-format
+msgid "Only Super admin or Admin users can update \"%1$s\" parameter."
+msgstr ""
+
+#: include/classes/api/services/CUser.php:812
+#: include/classes/api/services/CUser.php:853
+#, c-format
+msgid "Only Super admin users can update \"%1$s\" parameter."
 msgstr ""
 
 #: include/classes/api/services/CDRule.php:509
@@ -19301,6 +19343,10 @@ msgstr "სტრიქონი"
 msgid "String functions"
 msgstr ""
 
+#: widgets/piechart/includes/WidgetForm.php:137
+msgid "Stroke width"
+msgstr ""
+
 #: include/items.inc.php:1545 include/items.inc.php:1549
 #: include/items.inc.php:1553 include/items.inc.php:1557
 msgid "Structured data"
@@ -20662,6 +20708,10 @@ msgstr ""
 #: include/classes/api/services/CHostBase.php:1615
 #, c-format
 msgid "Trigger in template \"%1$s\" has dependency with trigger in template \"%2$s\"."
+msgstr ""
+
+#: jsLoader.php:291
+msgid "Trigger is not selected."
 msgstr ""
 
 #: include/views/monitoring.sysmap.edit.php:198
@@ -22707,6 +22757,10 @@ msgstr "ხედი"
 msgid "View as"
 msgstr "ნახვა, როგორც"
 
+#: jsLoader.php:417
+msgid "View related reports"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1735
 msgid "Virtual space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr ""
@@ -22911,6 +22965,10 @@ msgstr "ვიჯეტი მოძველებულია."
 
 #: jsLoader.php:187
 msgid "Widget is too small for the specified number of columns and rows."
+msgstr ""
+
+#: jsLoader.php:205
+msgid "Widgets"
 msgstr ""
 
 #: graphs.php:39 include/views/configuration.graph.edit.php:100
@@ -23283,6 +23341,10 @@ msgstr ""
 
 #: include/classes/core/ZBase.php:763 include/func.inc.php:1709
 msgid "You must login to view this page."
+msgstr ""
+
+#: jsLoader.php:287
+msgid "You need to have at least one image uploaded to create map element. Images can be uploaded in Administration->General->Images section."
 msgstr ""
 
 #: include/classes/db/DB.php:133
@@ -25288,6 +25350,10 @@ msgstr "მარჯვენა"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:953
 msgid "right() - Returns the rightmost count characters"
+msgstr ""
+
+#: widgets/navtree/Widget.php:41
+msgid "root"
 msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:966

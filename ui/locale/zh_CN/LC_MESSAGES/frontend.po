@@ -935,6 +935,10 @@ msgstr "添加列"
 msgid "Add a new widget"
 msgstr "添加新小组件"
 
+#: widgets/navtree/Widget.php:34
+msgid "Add child element"
+msgstr ""
+
 #: widgets/navtree/Widget.php:39
 msgid "Add child elements"
 msgstr "添加子节点"
@@ -968,6 +972,11 @@ msgstr "添加主机标签"
 #: app/views/trigger.massupdate.php:155
 msgid "Add host trigger"
 msgstr "添加主机触发器"
+
+#: widgets/piechart/includes/CWidgetFieldDataSetView.php:260
+#: widgets/svggraph/includes/CWidgetFieldDataSetView.php:263
+msgid "Add item"
+msgstr ""
 
 #: app/partials/massupdate.macros.tab.php:96
 #: app/partials/massupdate.valuemaps.tab.php:38
@@ -1870,6 +1879,10 @@ msgstr "收集间隔期间对虚拟磁盘的平均未完成写入请求数，\"u
 #: app/views/administration.authentication.edit.php:131
 msgid "Avoid easy-to-guess passwords"
 msgstr "避免弱密码"
+
+#: jsLoader.php:172
+msgid "Awaiting data"
+msgstr ""
 
 #: widgets/svggraph/views/widget.edit.php:51
 msgid "Axes"
@@ -5309,6 +5322,10 @@ msgstr "创建媒介类型"
 #: app/views/popup.import.php:143 jsLoader.php:349
 msgid "Create new"
 msgstr "创建新的"
+
+#: jsLoader.php:372
+msgid "Create new report"
+msgstr ""
 
 #: app/views/administration.proxy.list.php:239
 msgid "Create proxy"
@@ -9418,6 +9435,10 @@ msgstr[0] "主机组已删除"
 msgid "Host group elements"
 msgstr "主机群组组件"
 
+#: jsLoader.php:292
+msgid "Host group is not selected."
+msgstr ""
+
 #: include/views/monitoring.sysmap.edit.php:168
 msgid "Host group label type"
 msgstr "主机群组标签类型"
@@ -9496,6 +9517,10 @@ msgstr "主机资产记录"
 #: hostinventoriesoverview.php:26 hostinventoriesoverview.php:146
 msgid "Host inventory overview"
 msgstr "主机资产记录概览"
+
+#: jsLoader.php:289
+msgid "Host is not selected."
+msgstr ""
 
 #: include/views/monitoring.sysmap.edit.php:183
 msgid "Host label type"
@@ -12796,6 +12821,10 @@ msgstr "拓扑元素标签位置"
 msgid "Map element label type"
 msgstr "拓扑元素标签类型"
 
+#: jsLoader.php:290
+msgid "Map is not selected."
+msgstr ""
+
 #: sysmap.php:128
 msgid "Map is updated! Return to map list?"
 msgstr "拓扑图已更新！返回拓扑图列表？"
@@ -15035,6 +15064,19 @@ msgstr ""
 
 #: app/views/administration.proxygroup.list.php:80
 msgid "Online proxies"
+msgstr ""
+
+#: include/classes/api/services/CUser.php:874
+#: include/classes/api/services/CUser.php:882
+#: include/classes/api/services/CUser.php:889
+#, c-format
+msgid "Only Super admin or Admin users can update \"%1$s\" parameter."
+msgstr ""
+
+#: include/classes/api/services/CUser.php:812
+#: include/classes/api/services/CUser.php:853
+#, c-format
+msgid "Only Super admin users can update \"%1$s\" parameter."
 msgstr ""
 
 #: include/classes/api/services/CDRule.php:509
@@ -19316,6 +19358,10 @@ msgstr "字符串"
 msgid "String functions"
 msgstr "字符串函数"
 
+#: widgets/piechart/includes/WidgetForm.php:137
+msgid "Stroke width"
+msgstr ""
+
 #: include/items.inc.php:1545 include/items.inc.php:1549
 #: include/items.inc.php:1553 include/items.inc.php:1557
 msgid "Structured data"
@@ -20678,6 +20724,10 @@ msgstr "触发器在\"未知\"状态"
 #, c-format
 msgid "Trigger in template \"%1$s\" has dependency with trigger in template \"%2$s\"."
 msgstr "模板\"%1$s\"中的触发器依赖模板\"%2$s\"中的触发器"
+
+#: jsLoader.php:291
+msgid "Trigger is not selected."
+msgstr ""
 
 #: include/views/monitoring.sysmap.edit.php:198
 msgid "Trigger label type"
@@ -22722,6 +22772,10 @@ msgstr "视图"
 msgid "View as"
 msgstr "以视图"
 
+#: jsLoader.php:417
+msgid "View related reports"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1735
 msgid "Virtual space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr "虚拟空间大小（以字节计）或百分比（总计）。 返回整型字节; 浮点百分比"
@@ -22927,6 +22981,10 @@ msgstr "小组件已弃用。"
 #: jsLoader.php:187
 msgid "Widget is too small for the specified number of columns and rows."
 msgstr "对于指定的列数和行数而言小组件太小。"
+
+#: jsLoader.php:205
+msgid "Widgets"
+msgstr ""
 
 #: graphs.php:39 include/views/configuration.graph.edit.php:100
 #: include/views/configuration.graph.list.php:170
@@ -23299,6 +23357,10 @@ msgstr "你没有权限来访问这个页面."
 #: include/classes/core/ZBase.php:763 include/func.inc.php:1709
 msgid "You must login to view this page."
 msgstr "您必需登录才能浏览此页面."
+
+#: jsLoader.php:287
+msgid "You need to have at least one image uploaded to create map element. Images can be uploaded in Administration->General->Images section."
+msgstr ""
 
 #: include/classes/db/DB.php:133
 msgid "Your database is not working properly. Please wait a few minutes and try to repeat this action. If the problem still persists, please contact system administrator. The problem might be caused by long running transaction or row level lock accomplished by your database management system."
@@ -25307,6 +25369,10 @@ msgstr "正确"
 #: app/controllers/CControllerPopupTriggerExpr.php:953
 msgid "right() - Returns the rightmost count characters"
 msgstr "right() - 返回最右边指定个数字符"
+
+#: widgets/navtree/Widget.php:41
+msgid "root"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:966
 msgid "round() - Rounds a value to decimal places"

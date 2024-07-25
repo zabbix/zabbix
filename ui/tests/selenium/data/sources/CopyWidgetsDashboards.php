@@ -81,7 +81,7 @@ class CopyWidgetsDashboards {
 		]);
 		$item_prototypeid = $item_protototypes['itemids'][0];
 
-		$item_protototypes = CDataHelper::call('graphprototype.create', [
+		$graph_protototypes = CDataHelper::call('graphprototype.create', [
 			[
 				'name' => 'Template graph prototype {#KEY}',
 				'width' => 600,
@@ -89,7 +89,7 @@ class CopyWidgetsDashboards {
 				'gitems' => [['itemid' => $item_prototypeid, 'color' => '3333FF']]
 			]
 		]);
-		$graph_prototypeid = $item_protototypes['graphids'][0];
+		$graph_prototypeid = $graph_protototypes['graphids'][0];
 
 		CDataHelper::call('dashboard.create', [
 			[
@@ -2190,6 +2190,137 @@ class CopyWidgetsDashboards {
 										'value' => 'AZIBO'
 									]
 								]
+							],
+							[
+								'type' => 'honeycomb',
+								'name' => 'Honeycomb for copying',
+								'x' => 9,
+								'y' => 17,
+								'width' => 8,
+								'height' => 5,
+								'view_mode' => 0,
+								'fields' => [
+									[
+										'type' => 2,
+										'name' => 'groupids.0',
+										'value' => 4
+									],
+									[
+										'type' => 3,
+										'name' => 'hostids.0',
+										'value' => 10084
+									],
+									[
+										'type' => 1,
+										'name' => 'host_tags.0.tag',
+										'value' => 'tag1'
+									],
+									[
+										'type' => 0,
+										'name' => 'host_tags.0.operator',
+										'value' => 0
+									],
+									[
+										'type' => 1,
+										'name' => 'host_tags.0.value',
+										'value' => 'val1'
+									],
+									[
+										'type' => 1,
+										'name' => 'items.0',
+										'value' => 'Linux: Available memory'
+									],
+									[
+										'type' => 1,
+										'name' => 'item_tags.0.tag',
+										'value' => 'tag2'
+									],
+									[
+										'type' => 0,
+										'name' => 'item_tags.0.operator',
+										'value' => 0
+									],
+									[
+										'type' => 1,
+										'name' => 'item_tags.0.value',
+										'value' => 'val2'
+									],
+									[
+										'type' => 0,
+										'name' => 'maintenance',
+										'value' => 1
+									],
+									[
+										'type' => 1,
+										'name' => 'primary_label',
+										'value' => 'TEXT'
+									],
+									[
+										'type' => 0,
+										'name' => 'primary_label_size_type',
+										'value' => 1
+									],
+									[
+										'type' => 0,
+										'name' => 'primary_label_size',
+										'value' => 22
+									],
+									[
+										'type' => 0,
+										'name' => 'primary_label_bold',
+										'value' => 1
+									],
+									[
+										'type' => 1,
+										'name' => 'primary_label_color',
+										'value' => 'E1BEE7'
+									],
+									[
+										'type' => 0,
+										'name' => 'secondary_label_decimal_places',
+										'value' => 3
+									],
+									[
+										'type' => 1,
+										'name' => 'secondary_label_color',
+										'value' => '00BCD4'
+									],
+									[
+										'type' => 1,
+										'name' => 'secondary_label_units',
+										'value' => 'after'
+									],
+									[
+										'type' => 1,
+										'name' => 'bg_color',
+										'value' => '9575CD'
+									],
+									[
+										'type' => 1,
+										'name' => 'thresholds.0.color',
+										'value' => 'FF465C'
+									],
+									[
+										'type' => 1,
+										'name' => 'thresholds.0.threshold',
+										'value' => '100'
+									],
+									[
+										'type' => 1,
+										'name' => 'thresholds.1.color',
+										'value' => 'FFD54F'
+									],
+									[
+										'type' => 1,
+										'name' => 'thresholds.1.threshold',
+										'value' => '200'
+									],
+									[
+										'type' => 1,
+										'name' => 'reference',
+										'value' => 'ENJSC'
+									]
+								]
 							]
 						]
 					],
@@ -2249,6 +2380,14 @@ class CopyWidgetsDashboards {
 								'type' => 'clock',
 								'name' => 'Clock widget',
 								'width' => 19,
+								'height' => 4
+							],
+							[
+								'type' => 'discovery',
+								'name' => 'Discovery status widget',
+								'x' => 5,
+								'y' => 10,
+								'width' => 12,
 								'height' => 4
 							],
 							[
@@ -2818,6 +2957,112 @@ class CopyWidgetsDashboards {
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'reference',
 										'value' => 'AZIBO'
+									]
+								]
+							],
+							[
+								'type' => 'honeycomb',
+								'name' => 'Honeycomb widget',
+								'x' => 17,
+								'y' => 10,
+								'width' => 5,
+								'height' => 5,
+								'view_mode' => 0,
+								'fields' => [
+									[
+										'type' => 1,
+										'name' => 'items.0',
+										'value' => 'item_pattern'
+									],
+									[
+										'type' => 1,
+										'name' => 'item_tags.0.tag',
+										'value' => 'tag1'
+									],
+									[
+										'type' => 0,
+										'name' => 'item_tags.0.operator',
+										'value' => 0
+									],
+									[
+										'type' => 1,
+										'name' => 'item_tags.0.value',
+										'value' => 'val1'
+									],
+									[
+										'type' => 0,
+										'name' => 'maintenance',
+										'value' => 1
+									],
+									[
+										'type' => 1,
+										'name' => 'primary_label',
+										'value' => 'TEXT'
+									],
+									[
+										'type' => 0,
+										'name' => 'primary_label_size_type',
+										'value' => 1
+									],
+									[
+										'type' => 0,
+										'name' => 'primary_label_size',
+										'value' => 22
+									],
+									[
+										'type' => 0,
+										'name' => 'primary_label_bold',
+										'value' => 1
+									],
+									[
+										'type' => 1,
+										'name' => 'primary_label_color',
+										'value' => 'E1BEE7'
+									],
+									[
+										'type' => 0,
+										'name' => 'secondary_label_decimal_places',
+										'value' => 3
+									],
+									[
+										'type' => 1,
+										'name' => 'secondary_label_color',
+										'value' => '00BCD4'
+									],
+									[
+										'type' => 1,
+										'name' => 'secondary_label_units',
+										'value' => 'test_unit'
+									],
+									[
+										'type' => 1,
+										'name' => 'bg_color',
+										'value' => '9575CD'
+									],
+									[
+										'type' => 1,
+										'name' => 'thresholds.0.color',
+										'value' => 'FF465C'
+									],
+									[
+										'type' => 1,
+										'name' => 'thresholds.0.threshold',
+										'value' => '100'
+									],
+									[
+										'type' => 1,
+										'name' => 'thresholds.1.color',
+										'value' => 'FFD54F'
+									],
+									[
+										'type' => 1,
+										'name' => 'thresholds.1.threshold',
+										'value' => '200'
+									],
+									[
+										'type' => 1,
+										'name' => 'reference',
+										'value' => 'FAXKO'
 									]
 								]
 							]

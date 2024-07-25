@@ -23,8 +23,6 @@ zabbix_export:
           name: 'Accepted connections per second'
           type: DEPENDENT
           key: php-fpm.conn_accepted.rate
-          delay: '0'
-          history: 7d
           value_type: FLOAT
           description: 'The number of accepted requests per second.'
           preprocessing:
@@ -32,8 +30,6 @@ zabbix_export:
               parameters:
                 - '$.[''accepted conn'']'
             - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           master_item:
             key: 'web.page.get["{$PHP_FPM.HOST}","{$PHP_FPM.STATUS.PAGE}?json","{$PHP_FPM.PORT}"]'
           tags:
@@ -43,8 +39,6 @@ zabbix_export:
           name: 'Listen queue'
           type: DEPENDENT
           key: php-fpm.listen_queue
-          delay: '0'
-          history: 7d
           description: 'The current number of connections that have been initiated but not yet accepted.'
           preprocessing:
             - type: JSONPATH
@@ -59,8 +53,6 @@ zabbix_export:
           name: 'Listen queue, len'
           type: DEPENDENT
           key: php-fpm.listen_queue_len
-          delay: '0'
-          history: 7d
           description: 'The size of the socket queue of pending connections.'
           preprocessing:
             - type: JSONPATH
@@ -75,8 +67,6 @@ zabbix_export:
           name: 'Listen queue, max'
           type: DEPENDENT
           key: php-fpm.listen_queue_max
-          delay: '0'
-          history: 7d
           description: 'The maximum number of requests in the queue of pending connections since this FPM pool was started.'
           preprocessing:
             - type: JSONPATH
@@ -91,7 +81,6 @@ zabbix_export:
           name: 'Queue usage'
           type: CALCULATED
           key: php-fpm.listen_queue_usage
-          history: 7d
           value_type: FLOAT
           units: '%'
           params: 'last(//php-fpm.listen_queue)/(last(//php-fpm.listen_queue_len)+(last(//php-fpm.listen_queue_len)=0))*100'
@@ -115,16 +104,12 @@ zabbix_export:
           name: 'Max children reached'
           type: DEPENDENT
           key: php-fpm.max_children
-          delay: '0'
-          history: 7d
           description: 'The number of times that `pm.max_children` has been reached since the PHP-FPM pool was started.'
           preprocessing:
             - type: JSONPATH
               parameters:
                 - '$.[''max children reached'']'
             - type: SIMPLE_CHANGE
-              parameters:
-                - ''
           master_item:
             key: 'web.page.get["{$PHP_FPM.HOST}","{$PHP_FPM.STATUS.PAGE}?json","{$PHP_FPM.PORT}"]'
           tags:
@@ -134,9 +119,6 @@ zabbix_export:
           name: 'Pool name'
           type: DEPENDENT
           key: php-fpm.name
-          delay: '0'
-          history: 7d
-          trends: '0'
           value_type: CHAR
           description: 'The name of the current pool.'
           preprocessing:
@@ -155,8 +137,6 @@ zabbix_export:
           name: Ping
           type: DEPENDENT
           key: php-fpm.ping
-          delay: '0'
-          history: 7d
           valuemap:
             name: 'Service state'
           preprocessing:
@@ -175,8 +155,6 @@ zabbix_export:
           name: 'Processes, active'
           type: DEPENDENT
           key: php-fpm.processes_active
-          delay: '0'
-          history: 7d
           description: 'The total number of active processes.'
           preprocessing:
             - type: JSONPATH
@@ -191,8 +169,6 @@ zabbix_export:
           name: 'Processes, idle'
           type: DEPENDENT
           key: php-fpm.processes_idle
-          delay: '0'
-          history: 7d
           description: 'The total number of idle processes.'
           preprocessing:
             - type: JSONPATH
@@ -207,8 +183,6 @@ zabbix_export:
           name: 'Processes, max active'
           type: DEPENDENT
           key: php-fpm.processes_max_active
-          delay: '0'
-          history: 7d
           description: 'The highest value of "active processes" since the PHP-FPM server was started.'
           preprocessing:
             - type: JSONPATH
@@ -223,8 +197,6 @@ zabbix_export:
           name: 'Processes, total'
           type: DEPENDENT
           key: php-fpm.processes_total
-          delay: '0'
-          history: 7d
           description: 'The total number of server processes currently running.'
           preprocessing:
             - type: JSONPATH
@@ -239,9 +211,6 @@ zabbix_export:
           name: 'Process manager'
           type: DEPENDENT
           key: php-fpm.process_manager
-          delay: '0'
-          history: 7d
-          trends: '0'
           value_type: CHAR
           description: 'The method used by the process manager to control the number of child processes for this pool.'
           preprocessing:
@@ -271,16 +240,12 @@ zabbix_export:
           name: 'Slow requests'
           type: DEPENDENT
           key: php-fpm.slow_requests
-          delay: '0'
-          history: 7d
           description: 'The number of requests that has exceeded your `request_slowlog_timeout` value.'
           preprocessing:
             - type: JSONPATH
               parameters:
                 - '$.[''slow requests'']'
             - type: SIMPLE_CHANGE
-              parameters:
-                - ''
           master_item:
             key: 'web.page.get["{$PHP_FPM.HOST}","{$PHP_FPM.STATUS.PAGE}?json","{$PHP_FPM.PORT}"]'
           tags:
@@ -301,8 +266,6 @@ zabbix_export:
           name: 'Start time'
           type: DEPENDENT
           key: php-fpm.start_time
-          delay: '0'
-          history: 7d
           units: unixtime
           description: 'The time when this pool was started.'
           preprocessing:
@@ -318,8 +281,6 @@ zabbix_export:
           name: Uptime
           type: DEPENDENT
           key: php-fpm.uptime
-          delay: '0'
-          history: 7d
           units: s
           description: 'It indicates how long has this pool been running.'
           preprocessing:
@@ -346,9 +307,6 @@ zabbix_export:
           name: Version
           type: DEPENDENT
           key: php-fpm.version
-          delay: '0'
-          history: 7d
-          trends: '0'
           value_type: CHAR
           description: 'The current version of the PHP. You can get it from the HTTP-Header "X-Powered-By"; it may not work if you have changed the default HTTP-headers.'
           preprocessing:
@@ -380,7 +338,6 @@ zabbix_export:
           name: 'Get processes summary'
           key: 'proc.get[{$PHP_FPM.PROCESS.NAME.PARAMETER},,,summary]'
           history: '0'
-          trends: '0'
           value_type: TEXT
           description: 'The aggregated data of summary metrics for all processes.'
           tags:
@@ -390,7 +347,6 @@ zabbix_export:
           name: php-fpm_ping
           key: 'web.page.get["{$PHP_FPM.HOST}","{$PHP_FPM.PING.PAGE}","{$PHP_FPM.PORT}"]'
           history: '0'
-          trends: '0'
           value_type: TEXT
           tags:
             - tag: component
@@ -399,7 +355,6 @@ zabbix_export:
           name: 'Get status page'
           key: 'web.page.get["{$PHP_FPM.HOST}","{$PHP_FPM.STATUS.PAGE}?json","{$PHP_FPM.PORT}"]'
           history: '0'
-          trends: '0'
           value_type: TEXT
           preprocessing:
             - type: REGEX
@@ -414,22 +369,18 @@ zabbix_export:
           name: 'PHP-FPM process discovery'
           type: DEPENDENT
           key: php-fpm.proc.discovery
-          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#PHP_FPM.NAME}'
                 value: '{$PHP_FPM.PROCESS_NAME}'
-                formulaid: A
           description: 'The discovery of the PHP-FPM summary processes.'
           item_prototypes:
             - uuid: 985005cdf7b44332a59a5f7da7528d88
               name: 'Get process data'
               type: DEPENDENT
               key: 'php-fpm.proc.get[{#PHP_FPM.NAME}]'
-              delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
               description: 'The summary metrics aggregated by a process `{#PHP_FPM.NAME}`.'
               preprocessing:
@@ -447,8 +398,6 @@ zabbix_export:
               name: 'Number of running processes'
               type: DEPENDENT
               key: 'php-fpm.proc.num[{#PHP_FPM.NAME}]'
-              delay: '0'
-              history: 7d
               description: 'The number of running processes `{#PHP_FPM.NAME}`.'
               preprocessing:
                 - type: JSONPATH
@@ -476,8 +425,6 @@ zabbix_export:
               name: 'Memory usage, %'
               type: DEPENDENT
               key: 'php-fpm.proc.pmem[{#PHP_FPM.NAME}]'
-              delay: '0'
-              history: 7d
               value_type: FLOAT
               units: '%'
               description: 'The percentage of real memory used by a process `{#PHP_FPM.NAME}`.'
@@ -495,8 +442,6 @@ zabbix_export:
               name: 'Memory usage (rss)'
               type: DEPENDENT
               key: 'php-fpm.proc.rss[{#PHP_FPM.NAME}]'
-              delay: '0'
-              history: 7d
               units: B
               description: 'The summary of resident set size memory used by a process `{#PHP_FPM.NAME}` expressed in bytes.'
               preprocessing:
@@ -513,8 +458,6 @@ zabbix_export:
               name: 'Memory usage (vsize)'
               type: DEPENDENT
               key: 'php-fpm.proc.vmem[{#PHP_FPM.NAME}]'
-              delay: '0'
-              history: 7d
               units: B
               description: 'The summary of virtual memory used by a process `{#PHP_FPM.NAME}` expressed in bytes.'
               preprocessing:
@@ -530,7 +473,6 @@ zabbix_export:
             - uuid: a709eaae52ad4128a129c618db6525d2
               name: 'CPU utilization'
               key: 'proc.cpu.util[{#PHP_FPM.NAME}]'
-              history: 7d
               value_type: FLOAT
               units: '%'
               description: 'The percentage of the CPU utilization by a process `{#PHP_FPM.NAME}`.'

@@ -668,7 +668,13 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 	if (0 != (macro_type & (ZBX_MACRO_TYPE_MESSAGE_NORMAL | ZBX_MACRO_TYPE_MESSAGE_RECOVERY |
 			ZBX_MACRO_TYPE_MESSAGE_UPDATE | ZBX_MACRO_TYPE_EVENT_NAME)))
 	{
-		token_search |= ZBX_TOKEN_SEARCH_EXPRESSION_MACRO;
+
+		const zbx_db_event	*c_event;
+
+		c_event = ((NULL != r_event) ? r_event : event);
+
+		if (NULL != c_event && EVENT_SOURCE_TRIGGERS == c_event->source)
+			token_search |= ZBX_TOKEN_SEARCH_EXPRESSION_MACRO;
 	}
 
 	if (SUCCEED != zbx_token_find(*data, pos, &token, token_search))
@@ -2042,6 +2048,13 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 						replace_to = zbx_strdup(replace_to, zbx_time2str(service_alarm->clock,
 								tz));
 					}
+				}
+				else if (0 == strcmp(m, MVAR_EVENT_UPDATE_STATUS))
+				{
+					if (0 != (macro_type & ZBX_MACRO_TYPE_MESSAGE_UPDATE) && NULL != service_alarm)
+						replace_to = zbx_strdup(replace_to, "1");
+					else
+						replace_to = zbx_strdup(replace_to, "0");
 				}
 				else if (0 == strcmp(m, MVAR_EVENT_STATUS) || 0 == strcmp(m, MVAR_EVENT_VALUE))
 				{

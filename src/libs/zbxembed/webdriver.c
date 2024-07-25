@@ -222,6 +222,7 @@ static int	webdriver_session_query(zbx_webdriver_t *wd, const char *method, cons
 
 	webdriver_discard_error(wd);
 
+	zbx_rtrim(wd->endpoint, "/");
 	zbx_snprintf_alloc(&url, &url_alloc, &url_offset, "%s/session", wd->endpoint);
 
 	if (NULL != wd->session)
@@ -1010,14 +1011,15 @@ out:
  ******************************************************************************/
 int	webdriver_get_perf_data(zbx_webdriver_t *wd, struct zbx_json_parse *jp, char **error)
 {
-	const char	*script = "var a=window.performance.getEntries();var out=[];"
-						"for (o of a) {"
-							"var obj = {};"
-							"for (p in o) {"
-								"if (!(o[p] instanceof Object)) {obj[p] = o[p];}"
-							"}"
-							"out.push(obj);"
-						"}; return out;";
+	const char	*script =
+		"var a=window.performance.getEntries();var out=[];"
+		"for (o of a) {"
+			"var obj = {};"
+			"for (p in o) {"
+				"if (!(o[p] instanceof Object) && typeof o[p] !== 'function') {obj[p] = o[p];}"
+			"}"
+			"out.push(obj);"
+		"}; return out;";
 
 	return webdriver_execute_script(wd, script, jp, error);
 }
@@ -1080,9 +1082,7 @@ int	webdriver_collect_perf_data(zbx_webdriver_t *wd, const char *bookmark, char 
 	if (SUCCEED != webdriver_get_perf_data(wd, &jp, error))
 		goto out;
 
-	wd_perf_collect(&wd->perf, bookmark, &jp);
-
-	ret = SUCCEED;
+	ret = wd_perf_collect(&wd->perf, bookmark, &jp, error);
 out:
 	return ret;
 }

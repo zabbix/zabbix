@@ -36,7 +36,6 @@ zabbix_export:
           name: 'ICMP ping'
           type: SIMPLE
           key: icmpping
-          history: 7d
           valuemap:
             name: 'Service state'
           tags:
@@ -57,7 +56,6 @@ zabbix_export:
           name: 'ICMP loss'
           type: SIMPLE
           key: icmppingloss
-          history: 7d
           value_type: FLOAT
           units: '%'
           tags:
@@ -83,7 +81,6 @@ zabbix_export:
           name: 'ICMP response time'
           type: SIMPLE
           key: icmppingsec
-          history: 7d
           value_type: FLOAT
           units: s
           tags:
@@ -112,9 +109,6 @@ zabbix_export:
           name: 'SNMP traps (fallback)'
           type: SNMP_TRAP
           key: snmptrap.fallback
-          delay: '0'
-          history: 7d
-          trends: '0'
           value_type: LOG
           description: 'The item is used to collect all SNMP traps unmatched by other snmptrap items'
           logtimefmt: 'hh:mm:sszyyyy/MM/dd'
@@ -127,8 +121,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.4.0
           key: 'system.contact[sysContact.0]'
           delay: 15m
-          history: 7d
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -146,7 +138,6 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.171.12.1.1.6.2.0
           key: 'system.cpu.util[agentCPUutilizationIn1min.0]'
-          history: 7d
           value_type: FLOAT
           units: '%'
           description: |
@@ -172,8 +163,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.1.0
           key: 'system.descr[sysDescr.0]'
           delay: 15m
-          history: 7d
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -193,8 +182,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.47.1.1.1.1.9.1
           key: system.hw.firmware
           delay: 1h
-          history: 7d
-          trends: '0'
           value_type: CHAR
           description: 'MIB: ENTITY-MIB'
           preprocessing:
@@ -221,8 +208,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.1.0
           key: system.hw.model
           delay: 1h
-          history: 7d
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -243,8 +228,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.4.1.171.12.1.1.12.0
           key: system.hw.serialnumber
           delay: 1h
-          history: 7d
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: DLINK-AGENT-MIB
@@ -274,7 +257,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.25.1.1.0
           key: 'system.hw.uptime[hrSystemUptime.0]'
           delay: 30s
-          history: 7d
           trends: '0'
           units: uptime
           description: |
@@ -298,8 +280,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.47.1.1.1.1.8.1
           key: system.hw.version
           delay: 1h
-          history: 7d
-          trends: '0'
           value_type: CHAR
           description: 'MIB: ENTITY-MIB'
           preprocessing:
@@ -315,8 +295,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.6.0
           key: 'system.location[sysLocation.0]'
           delay: 15m
-          history: 7d
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -335,8 +313,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.5.0
           key: system.name
           delay: 15m
-          history: 7d
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -368,7 +344,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.3.0
           key: 'system.net.uptime[sysUpTime.0]'
           delay: 30s
-          history: 7d
           trends: '0'
           units: uptime
           description: |
@@ -387,8 +362,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.2.0
           key: 'system.objectid[sysObjectID.0]'
           delay: 15m
-          history: 7d
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -404,7 +377,6 @@ zabbix_export:
           name: 'SNMP agent availability'
           type: INTERNAL
           key: 'zabbix[host,snmp,available]'
-          history: 7d
           description: |
             Availability of SNMP checks on the host. The value of this item corresponds to availability icons in the host list.
             Possible values:
@@ -442,7 +414,6 @@ zabbix_export:
             conditions:
               - macro: '{#STATUS}'
                 value: '[^0]'
-                formulaid: A
           description: 'swFanID of EQUIPMENT-MIB::swFanTable'
           item_prototypes:
             - uuid: 9fec4303859d411db13a470374862232
@@ -451,7 +422,6 @@ zabbix_export:
               snmp_oid: '1.3.6.1.4.1.171.12.11.1.7.1.3.{#SNMPINDEX}'
               key: 'sensor.fan.status[swFanStatus.{#SNMPINDEX}]'
               delay: 3m
-              history: 7d
               trends: '0'
               description: |
                 MIB: EQUIPMENT-MIB
@@ -489,7 +459,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.171.12.1.1.9.1.4.{#SNMPINDEX}'
               key: 'vm.memory.util[agentDRAMutilization.{#SNMPINDEX}]'
-              history: 7d
               value_type: FLOAT
               units: '%'
               description: |
@@ -532,46 +501,34 @@ zabbix_export:
             conditions:
               - macro: '{#IFADMINSTATUS}'
                 value: '{$NET.IF.IFADMINSTATUS.MATCHES}'
-                formulaid: A
               - macro: '{#IFADMINSTATUS}'
                 value: '{$NET.IF.IFADMINSTATUS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
               - macro: '{#IFALIAS}'
                 value: '{$NET.IF.IFALIAS.MATCHES}'
-                formulaid: C
               - macro: '{#IFALIAS}'
                 value: '{$NET.IF.IFALIAS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: D
               - macro: '{#IFDESCR}'
                 value: '{$NET.IF.IFDESCR.MATCHES}'
-                formulaid: E
               - macro: '{#IFDESCR}'
                 value: '{$NET.IF.IFDESCR.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: F
               - macro: '{#IFNAME}'
                 value: '{$NET.IF.IFNAME.MATCHES}'
-                formulaid: G
               - macro: '{#IFNAME}'
                 value: '{$NET.IF.IFNAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: H
               - macro: '{#IFOPERSTATUS}'
                 value: '{$NET.IF.IFOPERSTATUS.MATCHES}'
-                formulaid: I
               - macro: '{#IFOPERSTATUS}'
                 value: '{$NET.IF.IFOPERSTATUS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: J
               - macro: '{#IFTYPE}'
                 value: '{$NET.IF.IFTYPE.MATCHES}'
-                formulaid: K
               - macro: '{#IFTYPE}'
                 value: '{$NET.IF.IFTYPE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: L
           description: 'Discovering interfaces from IF-MIB.'
           item_prototypes:
             - uuid: c0ce842d655a4bbba3759c557d8fba27
@@ -580,7 +537,6 @@ zabbix_export:
               snmp_oid: '1.3.6.1.2.1.2.2.1.13.{#SNMPINDEX}'
               key: 'net.if.in.discards[ifInDiscards.{#SNMPINDEX}]'
               delay: 3m
-              history: 7d
               description: |
                 MIB: IF-MIB
                 The number of inbound packets which were chosen to be discarded
@@ -590,8 +546,6 @@ zabbix_export:
                 and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               tags:
                 - tag: component
                   value: network
@@ -605,14 +559,11 @@ zabbix_export:
               snmp_oid: '1.3.6.1.2.1.2.2.1.14.{#SNMPINDEX}'
               key: 'net.if.in.errors[ifInErrors.{#SNMPINDEX}]'
               delay: 3m
-              history: 7d
               description: |
                 MIB: IF-MIB
                 For packet-oriented interfaces, the number of inbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.  For character-oriented or fixed-length interfaces, the number of inbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               tags:
                 - tag: component
                   value: network
@@ -626,15 +577,12 @@ zabbix_export:
               snmp_oid: '1.3.6.1.2.1.31.1.1.1.6.{#SNMPINDEX}'
               key: 'net.if.in[ifHCInOctets.{#SNMPINDEX}]'
               delay: 3m
-              history: 7d
               units: bps
               description: |
                 MIB: IF-MIB
                 The total number of octets received on the interface, including framing characters. This object is a 64-bit version of ifInOctets. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
                 - type: MULTIPLIER
                   parameters:
                     - '8'
@@ -651,7 +599,6 @@ zabbix_export:
               snmp_oid: '1.3.6.1.2.1.2.2.1.19.{#SNMPINDEX}'
               key: 'net.if.out.discards[ifOutDiscards.{#SNMPINDEX}]'
               delay: 3m
-              history: 7d
               description: |
                 MIB: IF-MIB
                 The number of outbound packets which were chosen to be discarded
@@ -661,8 +608,6 @@ zabbix_export:
                 and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               tags:
                 - tag: component
                   value: network
@@ -676,14 +621,11 @@ zabbix_export:
               snmp_oid: '1.3.6.1.2.1.2.2.1.20.{#SNMPINDEX}'
               key: 'net.if.out.errors[ifOutErrors.{#SNMPINDEX}]'
               delay: 3m
-              history: 7d
               description: |
                 MIB: IF-MIB
                 For packet-oriented interfaces, the number of outbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.  For character-oriented or fixed-length interfaces, the number of outbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               tags:
                 - tag: component
                   value: network
@@ -697,15 +639,12 @@ zabbix_export:
               snmp_oid: '1.3.6.1.2.1.31.1.1.1.10.{#SNMPINDEX}'
               key: 'net.if.out[ifHCOutOctets.{#SNMPINDEX}]'
               delay: 3m
-              history: 7d
               units: bps
               description: |
                 MIB: IF-MIB
                 The total number of octets transmitted out of the interface, including framing characters. This object is a 64-bit version of ifOutOctets.Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
                 - type: MULTIPLIER
                   parameters:
                     - '8'
@@ -722,7 +661,6 @@ zabbix_export:
               snmp_oid: '1.3.6.1.2.1.31.1.1.1.15.{#SNMPINDEX}'
               key: 'net.if.speed[ifHighSpeed.{#SNMPINDEX}]'
               delay: 5m
-              history: 7d
               trends: '0'
               units: bps
               description: |
@@ -747,7 +685,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.2.1.2.2.1.8.{#SNMPINDEX}'
               key: 'net.if.status[ifOperStatus.{#SNMPINDEX}]'
-              history: 7d
               trends: '0'
               description: |
                 MIB: IF-MIB
@@ -792,7 +729,6 @@ zabbix_export:
               snmp_oid: '1.3.6.1.2.1.2.2.1.3.{#SNMPINDEX}'
               key: 'net.if.type[ifType.{#SNMPINDEX}]'
               delay: 1h
-              history: 7d
               trends: '0'
               description: |
                 MIB: IF-MIB
@@ -937,10 +873,8 @@ zabbix_export:
             conditions:
               - macro: '{#IFOPERSTATUS}'
                 value: '1'
-                formulaid: A
               - macro: '{#SNMPVALUE}'
                 value: (2|3)
-                formulaid: B
           description: 'Discovering interfaces from IF-MIB and EtherLike-MIB. Interfaces with up(1) Operational Status are discovered.'
           item_prototypes:
             - uuid: 986a658678e2465997ad152317f6cf34
@@ -948,7 +882,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.2.1.10.7.2.1.19.{#SNMPINDEX}'
               key: 'net.if.duplex[dot3StatsDuplexStatus.{#SNMPINDEX}]'
-              history: 7d
               description: |
                 MIB: EtherLike-MIB
                 The current mode of operation of the MAC
@@ -1021,7 +954,6 @@ zabbix_export:
             conditions:
               - macro: '{#STATUS}'
                 value: '[^0]'
-                formulaid: A
           description: 'swPowerID of EQUIPMENT-MIB::swPowerTable'
           item_prototypes:
             - uuid: 7e87cca325f94ac091723f4dcef5ef26
@@ -1030,7 +962,6 @@ zabbix_export:
               snmp_oid: '1.3.6.1.4.1.171.12.11.1.6.1.3.{#SNMPINDEX}'
               key: 'sensor.psu.status[swPowerStatus.{#SNMPINDEX}]'
               delay: 3m
-              history: 7d
               trends: '0'
               description: |
                 MIB: EQUIPMENT-MIB
@@ -1071,7 +1002,6 @@ zabbix_export:
               snmp_oid: '1.3.6.1.4.1.171.12.11.1.8.1.2.{#SNMPINDEX}'
               key: 'sensor.temp.value[swTemperatureCurrent.{#SNMPINDEX}]'
               delay: 3m
-              history: 7d
               value_type: FLOAT
               units: °C
               description: |

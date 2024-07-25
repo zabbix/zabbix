@@ -73,7 +73,7 @@ class testPageGraphPrototypes extends testPagePrototypes {
 			]
 		]);
 		$this->assertArrayHasKey('itemids', $item_prototype );
-		$prototype_itemid = CDataHelper::getIds('name')['1 Item prototype for graphs'];;
+		$prototype_itemid = CDataHelper::getIds('name')['1 Item prototype for graphs'];
 
 		CDataHelper::call('graphprototype.create', [
 			[

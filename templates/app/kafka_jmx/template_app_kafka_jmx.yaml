@@ -25,7 +25,6 @@ zabbix_export:
           name: 'Leader election per second'
           type: JMX
           key: 'jmx["kafka.controller:type=ControllerStats,name=LeaderElectionRateAndTimeMs","Count"]'
-          history: 7d
           value_type: FLOAT
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
@@ -38,15 +37,12 @@ zabbix_export:
           name: 'Unclean leader election per second'
           type: JMX
           key: 'jmx["kafka.controller:type=ControllerStats,name=UncleanLeaderElectionsPerSec","Count"]'
-          history: 7d
           value_type: FLOAT
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'Number of “unclean” elections per second.'
           preprocessing:
             - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             - tag: component
@@ -64,7 +60,6 @@ zabbix_export:
           name: 'Controller state on broker'
           type: JMX
           key: 'jmx["kafka.controller:type=KafkaController,name=ActiveControllerCount","Value"]'
-          history: 7d
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'One indicates that the broker is the controller for the cluster.'
@@ -82,7 +77,6 @@ zabbix_export:
           name: 'Offline partitions count'
           type: JMX
           key: 'jmx["kafka.controller:type=KafkaController,name=OfflinePartitionsCount","Value"]'
-          history: 7d
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'Number of partitions that don''t have an active leader.'
@@ -103,7 +97,6 @@ zabbix_export:
           name: 'Ineligible pending replica deletes'
           type: JMX
           key: 'jmx["kafka.controller:type=KafkaController,name=ReplicasIneligibleToDeleteCount","Value"]'
-          history: 7d
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'The number of ineligible pending replica deletes.'
@@ -115,7 +108,6 @@ zabbix_export:
           name: 'Pending replica deletes'
           type: JMX
           key: 'jmx["kafka.controller:type=KafkaController,name=ReplicasToDeleteCount","Value"]'
-          history: 7d
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'The number of pending replica deletes.'
@@ -127,7 +119,6 @@ zabbix_export:
           name: 'Ineligible pending topic deletes'
           type: JMX
           key: 'jmx["kafka.controller:type=KafkaController,name=TopicsIneligibleToDeleteCount","Value"]'
-          history: 7d
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'The number of ineligible pending topic deletes.'
@@ -139,7 +130,6 @@ zabbix_export:
           name: 'Pending topic deletes'
           type: JMX
           key: 'jmx["kafka.controller:type=KafkaController,name=TopicsToDeleteCount","Value"]'
-          history: 7d
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'The number of pending topic deletes.'
@@ -151,7 +141,6 @@ zabbix_export:
           name: 'Offline log directory count'
           type: JMX
           key: 'jmx["kafka.log:type=LogManager,name=OfflineLogDirectoryCount","Value"]'
-          history: 7d
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'The number of offline log directories (for example, after a hardware failure).'
@@ -172,7 +161,6 @@ zabbix_export:
           name: 'Fetch-Consumer response send time, p95'
           type: JMX
           key: 'jmx["kafka.network:type=RequestMetrics,name=ResponseSendTimeMs,request=FetchConsumer","95thPercentile"]'
-          history: 7d
           value_type: FLOAT
           units: ms
           username: '{$KAFKA.USER}'
@@ -186,7 +174,6 @@ zabbix_export:
           name: 'Fetch-Consumer response send time, p99'
           type: JMX
           key: 'jmx["kafka.network:type=RequestMetrics,name=ResponseSendTimeMs,request=FetchConsumer","99thPercentile"]'
-          history: 7d
           value_type: FLOAT
           units: ms
           username: '{$KAFKA.USER}'
@@ -200,7 +187,6 @@ zabbix_export:
           name: 'Fetch-Consumer response send time, mean'
           type: JMX
           key: 'jmx["kafka.network:type=RequestMetrics,name=ResponseSendTimeMs,request=FetchConsumer","Mean"]'
-          history: 7d
           value_type: FLOAT
           units: ms
           username: '{$KAFKA.USER}'
@@ -214,7 +200,6 @@ zabbix_export:
           name: 'Fetch-Follower response send time, p95'
           type: JMX
           key: 'jmx["kafka.network:type=RequestMetrics,name=ResponseSendTimeMs,request=FetchFollower","95thPercentile"]'
-          history: 7d
           value_type: FLOAT
           units: ms
           username: '{$KAFKA.USER}'
@@ -228,7 +213,6 @@ zabbix_export:
           name: 'Fetch-Follower response send time, p99'
           type: JMX
           key: 'jmx["kafka.network:type=RequestMetrics,name=ResponseSendTimeMs,request=FetchFollower","99thPercentile"]'
-          history: 7d
           value_type: FLOAT
           units: ms
           username: '{$KAFKA.USER}'
@@ -242,7 +226,6 @@ zabbix_export:
           name: 'Fetch-Follower response send time, mean'
           type: JMX
           key: 'jmx["kafka.network:type=RequestMetrics,name=ResponseSendTimeMs,request=FetchFollower","Mean"]'
-          history: 7d
           value_type: FLOAT
           units: ms
           username: '{$KAFKA.USER}'
@@ -256,7 +239,6 @@ zabbix_export:
           name: 'Produce response send time, p95'
           type: JMX
           key: 'jmx["kafka.network:type=RequestMetrics,name=ResponseSendTimeMs,request=Produce","95thPercentile"]'
-          history: 7d
           value_type: FLOAT
           units: ms
           username: '{$KAFKA.USER}'
@@ -270,7 +252,6 @@ zabbix_export:
           name: 'Produce response send time, p99'
           type: JMX
           key: 'jmx["kafka.network:type=RequestMetrics,name=ResponseSendTimeMs,request=Produce","99thPercentile"]'
-          history: 7d
           value_type: FLOAT
           units: ms
           username: '{$KAFKA.USER}'
@@ -284,7 +265,6 @@ zabbix_export:
           name: 'Produce response send time, mean'
           type: JMX
           key: 'jmx["kafka.network:type=RequestMetrics,name=ResponseSendTimeMs,request=Produce","Mean"]'
-          history: 7d
           value_type: FLOAT
           units: ms
           username: '{$KAFKA.USER}'
@@ -298,7 +278,6 @@ zabbix_export:
           name: 'Temporary memory size in bytes (Fetch), max'
           type: JMX
           key: 'jmx["kafka.network:type=RequestMetrics,name=TemporaryMemoryBytes,request=Fetch","Max"]'
-          history: 7d
           units: B
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
@@ -313,7 +292,6 @@ zabbix_export:
           name: 'Temporary memory size in bytes (Fetch), min'
           type: JMX
           key: 'jmx["kafka.network:type=RequestMetrics,name=TemporaryMemoryBytes,request=Fetch","Mean"]'
-          history: 7d
           units: B
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
@@ -328,7 +306,6 @@ zabbix_export:
           name: 'Temporary memory size in bytes (Produce), max'
           type: JMX
           key: 'jmx["kafka.network:type=RequestMetrics,name=TemporaryMemoryBytes,request=Produce","Max"]'
-          history: 7d
           units: B
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
@@ -343,7 +320,6 @@ zabbix_export:
           name: 'Temporary memory size in bytes (Produce), avg'
           type: JMX
           key: 'jmx["kafka.network:type=RequestMetrics,name=TemporaryMemoryBytes,request=Produce","Mean"]'
-          history: 7d
           units: B
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
@@ -358,7 +334,6 @@ zabbix_export:
           name: 'Temporary memory size in bytes (Produce), min'
           type: JMX
           key: 'jmx["kafka.network:type=RequestMetrics,name=TemporaryMemoryBytes,request=Produce","Min"]'
-          history: 7d
           units: B
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
@@ -373,7 +348,6 @@ zabbix_export:
           name: 'Fetch-Consumer request total time, p95'
           type: JMX
           key: 'jmx["kafka.network:type=RequestMetrics,name=TotalTimeMs,request=FetchConsumer","95thPercentile"]'
-          history: 7d
           value_type: FLOAT
           units: ms
           username: '{$KAFKA.USER}'
@@ -387,7 +361,6 @@ zabbix_export:
           name: 'Fetch-Consumer request total time, p99'
           type: JMX
           key: 'jmx["kafka.network:type=RequestMetrics,name=TotalTimeMs,request=FetchConsumer","99thPercentile"]'
-          history: 7d
           value_type: FLOAT
           units: ms
           username: '{$KAFKA.USER}'
@@ -401,7 +374,6 @@ zabbix_export:
           name: 'Fetch-Consumer request total time, mean'
           type: JMX
           key: 'jmx["kafka.network:type=RequestMetrics,name=TotalTimeMs,request=FetchConsumer","Mean"]'
-          history: 7d
           value_type: FLOAT
           units: ms
           username: '{$KAFKA.USER}'
@@ -415,7 +387,6 @@ zabbix_export:
           name: 'Fetch-Follower request total time, p95'
           type: JMX
           key: 'jmx["kafka.network:type=RequestMetrics,name=TotalTimeMs,request=FetchFollower","95thPercentile"]'
-          history: 7d
           value_type: FLOAT
           units: ms
           username: '{$KAFKA.USER}'
@@ -429,7 +400,6 @@ zabbix_export:
           name: 'Fetch-Follower request total time, p99'
           type: JMX
           key: 'jmx["kafka.network:type=RequestMetrics,name=TotalTimeMs,request=FetchFollower","99thPercentile"]'
-          history: 7d
           value_type: FLOAT
           units: ms
           username: '{$KAFKA.USER}'
@@ -443,7 +413,6 @@ zabbix_export:
           name: 'Fetch-Follower request total time, mean'
           type: JMX
           key: 'jmx["kafka.network:type=RequestMetrics,name=TotalTimeMs,request=FetchFollower","Mean"]'
-          history: 7d
           value_type: FLOAT
           units: ms
           username: '{$KAFKA.USER}'
@@ -457,7 +426,6 @@ zabbix_export:
           name: 'Produce request total time, p95'
           type: JMX
           key: 'jmx["kafka.network:type=RequestMetrics,name=TotalTimeMs,request=Produce","95thPercentile"]'
-          history: 7d
           value_type: FLOAT
           units: ms
           username: '{$KAFKA.USER}'
@@ -471,7 +439,6 @@ zabbix_export:
           name: 'Produce request total time, p99'
           type: JMX
           key: 'jmx["kafka.network:type=RequestMetrics,name=TotalTimeMs,request=Produce","99thPercentile"]'
-          history: 7d
           value_type: FLOAT
           units: ms
           username: '{$KAFKA.USER}'
@@ -485,7 +452,6 @@ zabbix_export:
           name: 'Produce request total time, mean'
           type: JMX
           key: 'jmx["kafka.network:type=RequestMetrics,name=TotalTimeMs,request=Produce","Mean"]'
-          history: 7d
           value_type: FLOAT
           units: ms
           username: '{$KAFKA.USER}'
@@ -499,7 +465,6 @@ zabbix_export:
           name: 'UpdateMetadata request total time, p95'
           type: JMX
           key: 'jmx["kafka.network:type=RequestMetrics,name=TotalTimeMs,request=UpdateMetadata","95thPercentile"]'
-          history: 7d
           value_type: FLOAT
           units: ms
           username: '{$KAFKA.USER}'
@@ -513,7 +478,6 @@ zabbix_export:
           name: 'UpdateMetadata request total time, p99'
           type: JMX
           key: 'jmx["kafka.network:type=RequestMetrics,name=TotalTimeMs,request=UpdateMetadata","99thPercentile"]'
-          history: 7d
           value_type: FLOAT
           units: ms
           username: '{$KAFKA.USER}'
@@ -527,7 +491,6 @@ zabbix_export:
           name: 'Fetch-Consumer request total time, mean'
           type: JMX
           key: 'jmx["kafka.network:type=RequestMetrics,name=TotalTimeMs,request=UpdateMetadata","Mean"]'
-          history: 7d
           value_type: FLOAT
           units: ms
           username: '{$KAFKA.USER}'
@@ -541,7 +504,6 @@ zabbix_export:
           name: 'Network processor average idle percent'
           type: JMX
           key: 'jmx["kafka.network:type=SocketServer,name=NetworkProcessorAvgIdlePercent","Value"]'
-          history: 7d
           value_type: FLOAT
           units: '%'
           username: '{$KAFKA.USER}'
@@ -578,7 +540,6 @@ zabbix_export:
           name: Uptime
           type: JMX
           key: 'jmx["kafka.server:type=app-info","start-time-ms"]'
-          history: 7d
           units: s
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
@@ -606,8 +567,6 @@ zabbix_export:
           name: Version
           type: JMX
           key: 'jmx["kafka.server:type=app-info","version"]'
-          history: 7d
-          trends: '0'
           value_type: CHAR
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
@@ -635,7 +594,6 @@ zabbix_export:
           name: 'Bytes in per second'
           type: JMX
           key: 'jmx["kafka.server:type=BrokerTopicMetrics,name=BytesInPerSec","Count"]'
-          history: 7d
           value_type: FLOAT
           units: Bps
           username: '{$KAFKA.USER}'
@@ -643,8 +601,6 @@ zabbix_export:
           description: 'The rate at which data sent from producers is consumed by the broker.'
           preprocessing:
             - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             - tag: component
@@ -653,7 +609,6 @@ zabbix_export:
           name: 'Bytes out per second'
           type: JMX
           key: 'jmx["kafka.server:type=BrokerTopicMetrics,name=BytesOutPerSec","Count"]'
-          history: 7d
           value_type: FLOAT
           units: Bps
           username: '{$KAFKA.USER}'
@@ -661,8 +616,6 @@ zabbix_export:
           description: 'The rate at which data is fetched and read from the broker by consumers.'
           preprocessing:
             - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             - tag: component
@@ -671,15 +624,12 @@ zabbix_export:
           name: 'Bytes rejected per second'
           type: JMX
           key: 'jmx["kafka.server:type=BrokerTopicMetrics,name=BytesRejectedPerSec","Count"]'
-          history: 7d
           value_type: FLOAT
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'The rate at which bytes rejected per second by the broker.'
           preprocessing:
             - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             - tag: component
@@ -688,15 +638,12 @@ zabbix_export:
           name: 'Client fetch request failed per second'
           type: JMX
           key: 'jmx["kafka.server:type=BrokerTopicMetrics,name=FailedFetchRequestsPerSec","Count"]'
-          history: 7d
           value_type: FLOAT
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'Number of client fetch request failures per second.'
           preprocessing:
             - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             - tag: component
@@ -705,15 +652,12 @@ zabbix_export:
           name: 'Produce requests failed per second'
           type: JMX
           key: 'jmx["kafka.server:type=BrokerTopicMetrics,name=FailedProduceRequestsPerSec","Count"]'
-          history: 7d
           value_type: FLOAT
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'Number of failed produce requests per second.'
           preprocessing:
             - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             - tag: component
@@ -722,15 +666,12 @@ zabbix_export:
           name: 'Messages in per second'
           type: JMX
           key: 'jmx["kafka.server:type=BrokerTopicMetrics,name=MessagesInPerSec","Count"]'
-          history: 7d
           value_type: FLOAT
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'The rate at which individual messages are consumed by the broker.'
           preprocessing:
             - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             - tag: component
@@ -739,7 +680,6 @@ zabbix_export:
           name: 'Requests in producer purgatory'
           type: JMX
           key: 'jmx["kafka.server:type=DelayedOperationPurgatory,name=PurgatorySize,delayedOperation=Fetch","Value"]'
-          history: 7d
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'Number of requests waiting in producer purgatory.'
@@ -751,7 +691,6 @@ zabbix_export:
           name: 'Requests in fetch purgatory'
           type: JMX
           key: 'jmx["kafka.server:type=DelayedOperationPurgatory,name=PurgatorySize,delayedOperation=Produce","Value"]'
-          history: 7d
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'Number of requests waiting in fetch purgatory.'
@@ -763,7 +702,6 @@ zabbix_export:
           name: 'Request handler average idle percent'
           type: JMX
           key: 'jmx["kafka.server:type=KafkaRequestHandlerPool,name=RequestHandlerAvgIdlePercent","OneMinuteRate"]'
-          history: 7d
           value_type: FLOAT
           units: '%'
           username: '{$KAFKA.USER}'
@@ -791,7 +729,6 @@ zabbix_export:
           name: 'Replication maximum lag'
           type: JMX
           key: 'jmx["kafka.server:type=ReplicaFetcherManager,name=MaxLag,clientId=Replica","Value"]'
-          history: 7d
           value_type: FLOAT
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
@@ -804,15 +741,12 @@ zabbix_export:
           name: 'ISR expands per second'
           type: JMX
           key: 'jmx["kafka.server:type=ReplicaManager,name=IsrExpandsPerSec","Count"]'
-          history: 7d
           value_type: FLOAT
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'The rate at which the number of ISRs in the broker increases.'
           preprocessing:
             - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             - tag: component
@@ -821,15 +755,12 @@ zabbix_export:
           name: 'ISR shrink per second'
           type: JMX
           key: 'jmx["kafka.server:type=ReplicaManager,name=IsrShrinksPerSec","Count"]'
-          history: 7d
           value_type: FLOAT
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'Rate of replicas leaving the ISR pool.'
           preprocessing:
             - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             - tag: component
@@ -838,7 +769,6 @@ zabbix_export:
           name: 'Leader count'
           type: JMX
           key: 'jmx["kafka.server:type=ReplicaManager,name=LeaderCount","Value"]'
-          history: 7d
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'The number of replicas for which this broker is the leader.'
@@ -850,7 +780,6 @@ zabbix_export:
           name: 'Partition count'
           type: JMX
           key: 'jmx["kafka.server:type=ReplicaManager,name=PartitionCount","Value"]'
-          history: 7d
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'The number of partitions in the broker.'
@@ -862,7 +791,6 @@ zabbix_export:
           name: 'Number of reassigning partitions'
           type: JMX
           key: 'jmx["kafka.server:type=ReplicaManager,name=ReassigningPartitions","Value"]'
-          history: 7d
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'The number of reassigning leader partitions on a broker.'
@@ -874,7 +802,6 @@ zabbix_export:
           name: 'Under minimum ISR partition count'
           type: JMX
           key: 'jmx["kafka.server:type=ReplicaManager,name=UnderMinIsrPartitionCount","Value"]'
-          history: 7d
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'The number of partitions under the minimum In-Sync Replica (ISR) count.'
@@ -895,7 +822,6 @@ zabbix_export:
           name: 'Under replicated partitions'
           type: JMX
           key: 'jmx["kafka.server:type=ReplicaManager,name=UnderReplicatedPartitions","Value"]'
-          history: 7d
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'The number of partitions that have not been fully replicated in the follower replicas (the number of non-reassigning replicas - the number of ISR > 0).'
@@ -916,7 +842,6 @@ zabbix_export:
           name: 'Request queue size'
           type: JMX
           key: 'jmx["kafka.server:type=Request","queue-size"]'
-          history: 7d
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'The size of the delay queue.'
@@ -928,8 +853,6 @@ zabbix_export:
           name: 'ZooKeeper connection status'
           type: JMX
           key: 'jmx["kafka.server:type=SessionExpireListener,name=SessionState","Value"]'
-          history: 7d
-          trends: '0'
           value_type: CHAR
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
@@ -956,7 +879,6 @@ zabbix_export:
           name: 'ZooKeeper disconnect rate'
           type: JMX
           key: 'jmx["kafka.server:type=SessionExpireListener,name=ZooKeeperDisconnectsPerSec","Count"]'
-          history: 7d
           value_type: FLOAT
           units: rps
           username: '{$KAFKA.USER}'
@@ -964,8 +886,6 @@ zabbix_export:
           description: 'ZooKeeper client disconnect per second.'
           preprocessing:
             - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             - tag: component
@@ -974,7 +894,6 @@ zabbix_export:
           name: 'ZooKeeper session expiration rate'
           type: JMX
           key: 'jmx["kafka.server:type=SessionExpireListener,name=ZooKeeperExpiresPerSec","Count"]'
-          history: 7d
           value_type: FLOAT
           units: rps
           username: '{$KAFKA.USER}'
@@ -982,8 +901,6 @@ zabbix_export:
           description: 'ZooKeeper client session expiration per second.'
           preprocessing:
             - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             - tag: component
@@ -992,7 +909,6 @@ zabbix_export:
           name: 'ZooKeeper readonly rate'
           type: JMX
           key: 'jmx["kafka.server:type=SessionExpireListener,name=ZooKeeperReadOnlyConnectsPerSec","Count"]'
-          history: 7d
           value_type: FLOAT
           units: rps
           username: '{$KAFKA.USER}'
@@ -1000,8 +916,6 @@ zabbix_export:
           description: 'ZooKeeper client readonly per second.'
           preprocessing:
             - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             - tag: component
@@ -1010,7 +924,6 @@ zabbix_export:
           name: 'ZooKeeper sync rate'
           type: JMX
           key: 'jmx["kafka.server:type=SessionExpireListener,name=ZooKeeperSyncConnectsPerSec","Count"]'
-          history: 7d
           value_type: FLOAT
           units: rps
           username: '{$KAFKA.USER}'
@@ -1018,8 +931,6 @@ zabbix_export:
           description: 'ZooKeeper client sync per second.'
           preprocessing:
             - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             - tag: component
@@ -1028,7 +939,6 @@ zabbix_export:
           name: 'ZooKeeper client request latency'
           type: JMX
           key: 'jmx["kafka.server:type=ZooKeeperClientMetrics,name=ZooKeeperRequestLatencyMs","Count"]'
-          history: 7d
           units: ms
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
@@ -1050,17 +960,14 @@ zabbix_export:
             conditions:
               - macro: '{#JMXTOPIC}'
                 value: '{$KAFKA.TOPIC.MATCHES}'
-                formulaid: A
               - macro: '{#JMXTOPIC}'
                 value: '{$KAFKA.TOPIC.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
           item_prototypes:
             - uuid: 42ad85334b524973afa2fd8f2a135e77
               name: 'Kafka {#JMXTOPIC}: Bytes out per second'
               type: JMX
               key: 'jmx["kafka.server:type=BrokerTopicMetrics,name=BytesOutPerSec,topic={#JMXTOPIC}","Count"]'
-              history: 7d
               value_type: FLOAT
               units: Bps
               username: '{$KAFKA.USER}'
@@ -1068,8 +975,6 @@ zabbix_export:
               description: 'The rate at which data is fetched and read from the broker by consumers (by topic).'
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 - tag: component
@@ -1091,25 +996,20 @@ zabbix_export:
             conditions:
               - macro: '{#JMXTOPIC}'
                 value: '{$KAFKA.TOPIC.MATCHES}'
-                formulaid: A
               - macro: '{#JMXTOPIC}'
                 value: '{$KAFKA.TOPIC.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
           item_prototypes:
             - uuid: abaf2616581a46158a13a71ffcf67634
               name: 'Kafka {#JMXTOPIC}: Bytes rejected per second'
               type: JMX
               key: 'jmx["kafka.server:type=BrokerTopicMetrics,name=BytesRejectedPerSec,topic={#JMXTOPIC}","Count"]'
-              history: 7d
               value_type: FLOAT
               username: '{$KAFKA.USER}'
               password: '{$KAFKA.PASSWORD}'
               description: 'Rejected bytes rate by topic.'
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 - tag: component
@@ -1131,17 +1031,14 @@ zabbix_export:
             conditions:
               - macro: '{#JMXTOPIC}'
                 value: '{$KAFKA.TOPIC.MATCHES}'
-                formulaid: A
               - macro: '{#JMXTOPIC}'
                 value: '{$KAFKA.TOPIC.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
           item_prototypes:
             - uuid: 61bb29999ea1465c8125b518507d9e5d
               name: 'Kafka {#JMXTOPIC}: Bytes in per second'
               type: JMX
               key: 'jmx["kafka.server:type=BrokerTopicMetrics,name=BytesInPerSec,topic={#JMXTOPIC}","Count"]'
-              history: 7d
               value_type: FLOAT
               units: Bps
               username: '{$KAFKA.USER}'
@@ -1149,8 +1046,6 @@ zabbix_export:
               description: 'The rate at which data sent from producers is consumed by topic.'
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 - tag: component
@@ -1163,15 +1058,12 @@ zabbix_export:
               name: 'Kafka {#JMXTOPIC}: Messages in per second'
               type: JMX
               key: 'jmx["kafka.server:type=BrokerTopicMetrics,name=MessagesInPerSec,topic={#JMXTOPIC}","Count"]'
-              history: 7d
               value_type: FLOAT
               username: '{$KAFKA.USER}'
               password: '{$KAFKA.PASSWORD}'
               description: 'The rate at which individual messages are consumed by topic.'
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 - tag: component

@@ -225,6 +225,12 @@ static zbx_export_file_t	*export_init(const char *process_type, const char *proc
 	if ('/' == export_dir[strlen(export_dir) - 1])
 		export_dir[strlen(export_dir) - 1] = '\0';
 
+	if (NULL != file)
+	{
+		zbx_free(file->name);
+		zbx_free(file);
+	}
+
 	file = (zbx_export_file_t *)zbx_malloc(NULL, sizeof(zbx_export_file_t));
 	file->name = zbx_dsprintf(NULL, "%s/%s-%s-%d.ndjson", export_dir, process_type, process_name, process_num);
 
