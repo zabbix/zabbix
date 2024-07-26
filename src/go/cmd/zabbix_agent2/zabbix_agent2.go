@@ -210,7 +210,7 @@ func processRemoteCommand(c *runtimecontrol.Client) (err error) {
 	return
 }
 
-func run() error {
+func waitStop() error {
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 
@@ -248,24 +248,35 @@ func run() error {
 	}
 }
 
-func main() { //nolint:funlen,gocognit,gocyclo
-	version.Init(
-		applicationName,
-		tls.CopyrightMessage(),
-		copyrightMessageMQTT(),
-		copyrightMessageModbus(),
-	)
+func main() {
+	err := run()
+	if err != nil {
+		fatalCloseOSItems()
+
+		fmt.Fprintf(os.Stderr, "zabbix_agent2 [%d]: ERROR: %s\n", os.Getpid(), err.Error())
+		os.Exit(1)
+	}
+
+	os.Exit(0)
+}
+
+func run() error {
+	version.Init(applicationName, tls.CopyrightMessage(), copyrightMessageMQTT(), copyrightMessageModbus())
+
+	err := log.Open(log.Console, log.Warning, "", 0)
+	if err != nil {
+		return errs.Wrap(err, "failed to open loging to console")
+	}
 
 	flagsUsage, args, err := parseArgs()
 	if err != nil {
-		// parseArgs prints usage message on parse error,
-		// safe to allways exit 1.
-		os.Exit(1)
+		return errs.Wrap(err, "failed to parse args")
 	}
 
 	if args.help {
 		fmt.Print(helpMessage(flagsUsage))
-		os.Exit(0)
+
+		return nil
 	}
 
 	setServiceRun(args.foreground)
@@ -276,34 +287,34 @@ func main() { //nolint:funlen,gocognit,gocyclo
 			comms.ProtocolVersion,
 		)})
 
-		return
+		return nil
 	}
 
 	err = openEventLog()
 	if err != nil {
-		fatalExit("", err)
+		return errs.Wrap(err, "failed to open event log")
 	}
 
 	err = validateExclusiveFlags(args)
 	if err != nil {
-		fatalExit("", errors.Join(err, eventLogErr(err)))
+		return eventLogErr(errs.Wrap(err, "failed to validate exclusive flags"))
 	}
 
 	if args.testConfig {
-		fmt.Printf("Validating configuration file \"%s\"\n", args.configPath)
+		fmt.Fprintf(os.Stdout, "Validating configuration file %q\n", args.configPath)
 	}
 
 	err = conf.Load(args.configPath, &agent.Options)
 	if err != nil {
 		if args.configPath != "" || args.testConfig {
-			fatalExit("", errors.Join(err, eventLogErr(err)))
+			return eventLogErr(errs.Wrap(err, "failed to load configuration"))
 		}
 
 		// create default configuration for testing options
 		// pass empty string to config arg to trigger this
 		err = conf.Unmarshal([]byte{}, &agent.Options)
 		if err != nil {
-			fatalExit("", errors.Join(err, eventLogErr(err)))
+			return errs.Wrap(err, "failed to create default configuration")
 		}
 
 		log.Infof("Using default configuration")
@@ -311,14 +322,12 @@ func main() { //nolint:funlen,gocognit,gocyclo
 
 	err = agent.ValidateOptions(&agent.Options)
 	if err != nil {
-		fatalExit(
-			"cannot validate configuration", errors.Join(err, eventLogErr(err)),
-		)
+		return eventLogErr(errs.Wrap(err, "cannot validate configuration"))
 	}
 
 	err = handleWindowsService(args.configPath)
 	if err != nil {
-		fatalExit("", errors.Join(err, eventLogErr(err)))
+		return eventLogErr(errs.Wrap(err, "failed to handle windows service"))
 	}
 
 	err = log.Open(log.Console, log.Warning, "", 0)
@@ -326,52 +335,44 @@ func main() { //nolint:funlen,gocognit,gocyclo
 		fatalExit("cannot initialize logger", err)
 	}
 
+	if err = agent.ValidateOptions(&agent.Options); err != nil {
+		return eventLogErr(errs.Wrap(err, "cannot validate configuration"))
+	}
+
+	if err = handleWindowsService(args.configPath); err != nil {
+		return eventLogErr(errs.Wrap(err, "failed to handle windows service"))
+	}
+
 	if args.runtimeCommand != "" {
 		if args.runtimeCommand == "help" {
 			fmt.Fprintf(
 				os.Stdout,
-				runtimeControlHelpMessageFormat,
+				usageMessageFormatRuntimeControlFormat,
 				runtimeCommandSendingTimeout.String(),
 			)
 
-			return
+			return nil
 		}
 
-		if config.ControlSocket == "" {
-			fatalExit("", errs.New("Cannot send remote command: ControlSocket configuration parameter is not defined"))
+		if agent.Options.ControlSocket == "" {
+			return errs.New("cannot send remote command: configuration parameter ControlSocket is not defined")
 		}
 
 		reply, err := runtimecontrol.SendCommand(
 			agent.Options.ControlSocket, args.runtimeCommand, runtimeCommandSendingTimeout,
 		)
 		if err != nil {
-			fatalExit("Cannot send remote command", err)
+			return errs.Wrap(err, "cannot send remote command")
 		}
 
 		fmt.Fprintf(os.Stderr, "%s\n", reply)
 
-		return
-	}
-
-	agent.Options = *config
-
-	if err = agent.ValidateOptions(&agent.Options); err != nil {
-		if eerr := eventLogErr(err); eerr != nil {
-			err = fmt.Errorf("%s and %s", err, eerr)
-		}
-		fatalExit("cannot validate configuration", err)
-	}
-
-	if err = handleWindowsService(args.configPath); err != nil {
-		if eerr := eventLogErr(err); eerr != nil {
-			err = fmt.Errorf("%s and %s", err, eerr)
-		}
-		fatalExit("", err)
+		return nil
 	}
 
 	pluginSocket, err = initExternalPlugins(&agent.Options)
 	if err != nil {
-		fatalExit("cannot register plugins", err)
+		return errs.Wrap(err, "cannot register plugins")
 	}
 
 	defer cleanUpExternal()
@@ -379,7 +380,7 @@ func main() { //nolint:funlen,gocognit,gocyclo
 	if args.test != "" || args.print || args.testConfig {
 		m, err := prepareMetricPrintManager(args.verbose)
 		if err != nil {
-			fatalExit("failed to prepare metric print", err)
+			return errs.Wrap(err, "failed to prepare metric print manager")
 		}
 
 		if args.test != "" {
@@ -396,13 +397,26 @@ func main() { //nolint:funlen,gocognit,gocyclo
 			fmt.Print("Validation successful\n")
 		}
 
-		return
+		return nil
 	}
 
 	if args.verbose {
-		fatalExit("", errors.New("verbose parameter can be specified only with test or print parameters"))
+		return errors.New("verbose parameter can be specified only with test or print parameters")
 	}
 
+	err = runAgent(args.foreground, args.configPath)
+	if err != nil {
+		if agent.Options.LogType == "file" {
+			log.Critf("%s", err.Error())
+		}
+
+		return errs.Wrap(err, "failed to run agent")
+	}
+
+	return nil
+}
+
+func runAgent(isForeground bool, configPath string) error {
 	var logType int
 
 	switch agent.Options.LogType {
@@ -414,14 +428,14 @@ func main() { //nolint:funlen,gocognit,gocyclo
 		logType = log.File
 	}
 
-	err = log.Open(
+	err := log.Open(
 		logType,
 		agent.Options.DebugLevel,
 		agent.Options.LogFile,
 		agent.Options.LogFileSize,
 	)
 	if err != nil {
-		fatalExit("cannot initialize logger", err)
+		return errs.Wrap(err, "cannot initialize logger")
 	}
 
 	zbxlib.SetLogLevel(agent.Options.DebugLevel)
@@ -431,32 +445,32 @@ func main() { //nolint:funlen,gocognit,gocyclo
 
 	addresses, err := serverconnector.ParseServerActive()
 	if err != nil {
-		fatalExit("cannot parse the \"ServerActive\" parameter", err)
+		return errs.Wrap(err, "cannot parse the \"ServerActive\" parameter")
 	}
 
 	tlsConfig, err := agent.GetTLSConfig(&agent.Options)
 	if err != nil {
-		fatalExit("cannot use encryption configuration", err)
+		return errs.Wrap(err, "failed to get encryption configuration")
 	}
 
 	if tlsConfig != nil {
 		err = tls.Init(tlsConfig)
 		if err != nil {
-			fatalExit("cannot configure encryption", err)
+			return errs.Wrap(err, "failed to initialize encryption")
 		}
 	}
 
 	pidFile, err = pidfile.New(agent.Options.PidFile)
 	if err != nil {
-		fatalExit("cannot initialize PID file", err)
+		return errs.Wrap(err, "cannot initialize PID file")
 	}
 
 	defer pidFile.Delete()
 
-	log.Infof("using configuration file: %s", args.configPath)
+	log.Infof("using configuration file: %s", configPath)
 
 	if err = keyaccess.LoadRules(agent.Options.AllowKey, agent.Options.DenyKey); err != nil {
-		fatalExit("Failed to load key access rules", err)
+		return errs.Wrap(err, "Failed to load key access rules")
 	}
 
 	_, err = agent.InitUserParameterPlugin(
@@ -465,12 +479,12 @@ func main() { //nolint:funlen,gocognit,gocyclo
 		agent.Options.UserParameterDir,
 	)
 	if err != nil {
-		fatalExit("cannot initialize user parameters", err)
+		return errs.Wrap(err, "cannot initialize user parameters")
 	}
 
 	manager, err = scheduler.NewManager(&agent.Options)
 	if err != nil {
-		fatalExit("cannot create scheduling manager", err)
+		return errs.Wrap(err, "cannot create scheduling manager")
 	}
 
 	// replacement of deprecated StartAgents
@@ -479,7 +493,7 @@ func main() { //nolint:funlen,gocognit,gocyclo
 
 		listenIPs, err = serverlistener.ParseListenIP(&agent.Options)
 		if err != nil {
-			fatalExit("cannot parse \"ListenIP\" parameter", err)
+			return errs.Wrap(err, "cannot parse \"ListenIP\" parameter")
 		}
 
 		for i := 0; i < len(listenIPs); i++ {
@@ -495,10 +509,10 @@ func main() { //nolint:funlen,gocognit,gocyclo
 
 	err = loadOSDependentItems()
 	if err != nil {
-		fatalExit("cannot load os dependent items", err)
+		return errs.Wrap(err, "cannot load os dependent items")
 	}
 
-	if args.foreground {
+	if isForeground {
 		if agent.Options.LogType != "console" {
 			fmt.Println(greeting)
 		}
@@ -508,12 +522,12 @@ func main() { //nolint:funlen,gocognit,gocyclo
 
 	err = configUpdateItemParameters(manager, &agent.Options)
 	if err != nil {
-		fatalExit("cannot process configuration", err)
+		return errs.Wrap(err, "cannot process configuration")
 	}
 
 	hostnames, err := agent.ValidateHostnames(agent.Options.Hostname)
 	if err != nil {
-		fatalExit("cannot parse the \"Hostname\" parameter", err)
+		return errs.Wrap(err, "cannot parse the \"Hostname\" parameter")
 	}
 
 	agent.FirstHostname = hostnames[0]
@@ -523,17 +537,17 @@ func main() { //nolint:funlen,gocognit,gocyclo
 	)
 	log.Infof(hostmessage)
 
-	if args.foreground {
+	if isForeground {
 		if agent.Options.LogType != "console" {
-			fmt.Println(hostmessage)
+			fmt.Fprintln(os.Stdout, hostmessage)
 		}
 
-		fmt.Println("Press Ctrl+C to exit.")
+		fmt.Fprintln(os.Stdout, "Press Ctrl+C to exit.")
 	}
 
 	err = resultcache.Prepare(&agent.Options, addresses, hostnames)
 	if err != nil {
-		fatalExit("cannot prepare result cache", err)
+		return errs.Wrap(err, "cannot prepare result cache")
 	}
 
 	serverConnectors = make(
@@ -548,7 +562,7 @@ func main() { //nolint:funlen,gocognit,gocyclo
 				manager, addresses[i], hostnames[j], &agent.Options,
 			)
 			if err != nil {
-				fatalExit("cannot create server connector", err)
+				return errs.Wrap(err, "cannot create server connector")
 			}
 
 			serverConnectors[idx].Start()
@@ -562,18 +576,18 @@ func main() { //nolint:funlen,gocognit,gocyclo
 	for _, listener := range listeners {
 		err = listener.Start()
 		if err != nil {
-			fatalExit("cannot start server listener", err)
+			return errs.Wrap(err, "cannot start server listener")
 		}
 	}
 
 	if agent.Options.StatusPort != 0 {
-		err = statuslistener.Start(manager, args.configPath)
+		err = statuslistener.Start(manager, configPath)
 		if err != nil {
-			fatalExit("cannot start HTTP listener", err)
+			return errs.Wrap(err, "cannot start HTTP listener")
 		}
 	}
 
-	err = run()
+	err = waitStop()
 	if err != nil {
 		log.Errf("cannot start agent: %s", err.Error())
 	}
@@ -605,11 +619,13 @@ func main() { //nolint:funlen,gocognit,gocyclo
 	farewell := fmt.Sprintf("Zabbix Agent 2 stopped. (%s)", version.Long())
 	log.Infof(farewell)
 
-	if args.foreground && agent.Options.LogType != "console" {
+	if isForeground && agent.Options.LogType != "console" {
 		fmt.Println(farewell)
 	}
 
 	waitServiceClose()
+
+	return nil
 }
 
 func parseArgs() (string, *Arguments, error) {
@@ -715,9 +731,9 @@ func parseArgs() (string, *Arguments, error) {
 
 	err := fs.Parse(os.Args[1:])
 	if err != nil {
-		fmt.Printf("failed to parse flags: %s\n%s", err.Error(), usageMessage())
+		fmt.Fprint(os.Stdout, usageMessage())
 
-		return "", nil, zbxerr.ErrorOSExitZero
+		return "", nil, errs.Wrap(err, "failed to parse command line arguments")
 	}
 
 	return f.Usage(), args, nil
