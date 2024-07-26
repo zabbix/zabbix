@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-07-24T12:02:28Z'
+  date: '2024-07-26T10:44:28Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -1819,11 +1819,12 @@ zabbix_export:
             			'Version': '2006-03-01'
             		};
             
-            		var result = AWS.getField(AWS.request('GET', AWS.params.request_region, 's3', 's3.' + AWS.params.request_region + '.amazonaws.com', AWS.prepareParams(payload), '', ''), 'ListAllMyBucketsResult.Buckets.Bucket');
+            		var result = AWS.getField(AWS.request('GET', AWS.params.request_region, 's3', 's3.' + AWS.params.request_region + '.amazonaws.com', AWS.prepareParams(payload), '', ''), 'ListAllMyBucketsResult.Buckets');
             
             		if (result === null) {
             			return [];
             		}
+            		result = AWS.getField(result, 'Bucket');
             
             		return Array.isArray(result) ? result : [result];
             
