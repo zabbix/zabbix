@@ -260,6 +260,7 @@ func main() {
 	os.Exit(0)
 }
 
+//nolint:gocognit,gocyclo,cyclop,maintidx
 func run() error {
 	version.Init(applicationName, tls.CopyrightMessage(), copyrightMessageMQTT(), copyrightMessageModbus())
 
@@ -401,7 +402,7 @@ func run() error {
 	}
 
 	if args.verbose {
-		return errors.New("verbose parameter can be specified only with test or print parameters")
+		return errs.New("verbose parameter can be specified only with test or print parameters")
 	}
 
 	err = runAgent(args.foreground, args.configPath)
@@ -416,6 +417,7 @@ func run() error {
 	return nil
 }
 
+//nolint:gocognit,gocyclo,cyclop,maintidx
 func runAgent(isForeground bool, configPath string) error {
 	var logType int
 
