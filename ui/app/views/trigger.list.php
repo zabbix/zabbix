@@ -314,6 +314,7 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 
 	// hosts
 	$hosts = null;
+
 	if ($data['single_selected_hostid'] == 0) {
 		foreach ($trigger['hosts'] as $hostid => $host) {
 			if (!empty($hosts)) {
@@ -321,6 +322,8 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 			}
 			$hosts[] = $host['name'];
 		}
+
+		$hosts = (new CCol($hosts))->addClass(ZBX_STYLE_WORDBREAK);
 	}
 
 	if ($trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
