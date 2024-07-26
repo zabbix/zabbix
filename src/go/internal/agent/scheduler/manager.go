@@ -399,7 +399,7 @@ func (m *Manager) processCommandRequest(update *commandRequest) {
 		}
 
 		if p, ok := m.plugins["system.run"]; ok {
-			c.addCommand(p, rc.Id, params, update.sink, update.now)
+			c.addCommand(p, rc.Id, params, update.sink, update.now, rc.Timeout)
 
 			if !p.queued() {
 				heap.Push(&m.pluginQueue, p)

@@ -2049,6 +2049,13 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 								tz));
 					}
 				}
+				else if (0 == strcmp(m, MVAR_EVENT_UPDATE_STATUS))
+				{
+					if (0 != (macro_type & ZBX_MACRO_TYPE_MESSAGE_UPDATE) && NULL != service_alarm)
+						replace_to = zbx_strdup(replace_to, "1");
+					else
+						replace_to = zbx_strdup(replace_to, "0");
+				}
 				else if (0 == strcmp(m, MVAR_EVENT_STATUS) || 0 == strcmp(m, MVAR_EVENT_VALUE))
 				{
 					get_current_event_value(m, c_event, &replace_to);
