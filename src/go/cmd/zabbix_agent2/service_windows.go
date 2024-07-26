@@ -616,11 +616,7 @@ func sendServiceStop() {
 
 func runService() {
 	if err := svc.Run(serviceName, &winService{}); err != nil {
-		fatalExit(
-			"use foreground option to run Zabbix agent as console application",
-			err,
-		)
-		return
+		panic(errs.Wrap(err, "use foreground option to run Zabbix agent as console application"))
 	}
 }
 
