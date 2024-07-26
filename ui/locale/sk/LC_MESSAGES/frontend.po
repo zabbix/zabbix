@@ -13027,6 +13027,18 @@ msgstr "Len super administrátori môžu upravovať typy médií."
 msgid "Only Super Admins can update user groups."
 msgstr "Skupiny používateľov môžu aktualizovať iba superadministrátori."
 
+#: include/classes/api/services/CUser.php:593
+#: include/classes/api/services/CUser.php:600
+#, c-format
+msgid "Only Super admin or Admin users can update \"%1$s\" parameter."
+msgstr ""
+
+#: include/classes/api/services/CUser.php:505
+#: include/classes/api/services/CUser.php:550
+#, c-format
+msgid "Only Super admin users can update \"%1$s\" parameter."
+msgstr ""
+
 #: include/classes/api/services/CDRule.php:481
 msgid "Only Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 checks can be made unique."
 msgstr "Len kontroly typu Zabbix agent, SNMPv1, SNMPv2 alebo SNMPv3 môžu byť unikátne."
