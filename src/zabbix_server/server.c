@@ -1943,6 +1943,8 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 		}
 	}
 
+	zbx_set_child_pids(zbx_threads, zbx_threads_num);
+
 	/* startup/postinit tasks can take a long time, update status */
 	if (SUCCEED != (ret = zbx_ha_get_status(CONFIG_HA_NODE_NAME, ha_stat, ha_failover, &error)))
 	{
@@ -2102,7 +2104,8 @@ static void	server_restart_ha(zbx_rtc_t *rtc)
 int	MAIN_ZABBIX_ENTRY(int flags)
 {
 	char		*error = NULL, *smtp_auth_feature_status = NULL;
-	int		i, db_type, ret, ha_status_old;
+	int		i, db_type, ha_status_old;
+	pid_t		pid;
 
 	zbx_socket_t		listen_sock = {0};
 	time_t			standby_warning_time;
@@ -2497,13 +2500,16 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			}
 		}
 
-		if (0 < (ret = waitpid((pid_t)-1, &i, WNOHANG)))
+		if (0 < (pid = waitpid((pid_t)-1, &i, WNOHANG)))
 		{
-			zbx_set_exiting_with_fail();
-			break;
+			if (SUCCEED == zbx_is_child_pid(pid, zbx_threads, zbx_threads_num))
+			{
+				zbx_set_exiting_with_fail();
+				break;
+			}
 		}
 
-		if (-1 == ret && EINTR != errno)
+		if (-1 == pid && EINTR != errno)
 		{
 			zabbix_log(LOG_LEVEL_ERR, "failed to wait on child processes: %s", zbx_strerror(errno));
 			zbx_set_exiting_with_fail();

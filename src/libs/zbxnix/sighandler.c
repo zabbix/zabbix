@@ -27,6 +27,9 @@
 
 static int	sig_parent_pid = -1;
 
+static pid_t	*child_pids = NULL;
+static size_t	child_pid_count = 0;
+
 void	set_sig_parent_pid(int in)
 {
 	sig_parent_pid = in;
@@ -231,7 +234,21 @@ static void	terminate_signal_handler(int sig, siginfo_t *siginfo, void *context)
  ******************************************************************************/
 static void	child_signal_handler(int sig, siginfo_t *siginfo, void *context)
 {
+	int	found = 0;
+
 	SIG_CHECK_PARAMS(sig, siginfo, context);
+
+	for (int i = 0; i < child_pid_count; i++)
+	{
+		if (siginfo->si_pid == child_pids[i])
+		{
+			found = 1;
+			break;
+		}
+	}
+
+	if (0 == found)
+		return;
 
 	if (!SIG_PARENT_PROCESS)
 		exit_with_failure();
@@ -385,4 +402,10 @@ void	zbx_unblock_signals(const sigset_t *orig_mask)
 void	zbx_set_on_exit_args(void *args)
 {
 	zbx_on_exit_args = args;
+}
+
+void	zbx_set_child_pids(pid_t *pids, size_t pid_num)
+{
+	child_pids = pids;
+	child_pid_count = pid_num;
 }

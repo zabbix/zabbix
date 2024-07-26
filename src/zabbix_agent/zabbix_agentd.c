@@ -28,6 +28,10 @@
 #include "zbxmutexs.h"
 #include "zbxbincommon.h"
 
+#ifndef _WINDOWS
+#	include "zbxnix.h"
+#endif
+
 static char	*config_pid_file = NULL;
 
 static char	*zbx_config_hosts_allowed = NULL;
@@ -1248,6 +1252,27 @@ static void	signal_redirect_cb(int flags, zbx_signal_handler_f sigusr_handler)
 }
 #endif
 
+#ifndef _WINDOWS
+static int	wait_for_children(ZBX_THREAD_HANDLE *pids, size_t pids_num)
+{
+	int	ws;
+	pid_t	pid;
+
+	pid = wait(&ws);
+
+	if (FAIL == zbx_is_child_pid(pid, pids, pids_num))
+		return SUCCEED;
+
+	if (-1 == pid)
+		return SUCCEED;
+
+	if (EINTR != errno)
+		zbx_set_exiting_with_fail();
+
+	return FAIL;
+}
+#endif
+
 int	MAIN_ZABBIX_ENTRY(int flags)
 {
 	zbx_socket_t		listen_sock = {0};
@@ -1462,17 +1487,10 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		THIS_SHOULD_NEVER_HAPPEN;
 	}
 #else
+	zbx_set_child_pids(zbx_threads, zbx_threads_num);
 	zbx_unset_exit_on_terminate();
 
-	while (ZBX_IS_RUNNING() && -1 == wait(&i))	/* wait for any child to exit */
-	{
-		if (EINTR != errno)
-		{
-			zabbix_log(LOG_LEVEL_ERR, "failed to wait on child processes: %s", zbx_strerror(errno));
-			zbx_set_exiting_with_fail();
-			break;
-		}
-	}
+	while (ZBX_IS_RUNNING() && SUCCEED == wait_for_children(zbx_threads, zbx_threads_num)) { }
 
 	zbx_log_exit_signal();
 
