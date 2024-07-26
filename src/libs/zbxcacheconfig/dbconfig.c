@@ -15955,7 +15955,9 @@ static void	dc_proxy_group_discovery_add_group_cfg(struct zbx_json *json, const 
 	if ('{' == *ptr)
 		um_cache_resolve_const(config->um_cache, NULL, 0, pg->min_online, ZBX_MACRO_ENV_NONSECURE, &ptr);
 
-	if (1 > (min_online = atoi(ptr)))
+	min_online = atoi(ptr);
+
+	if (ZBX_PG_PROXY_MIN_ONLINE_MIN > min_online || ZBX_PG_PROXY_MIN_ONLINE_MAX < min_online)
 		min_online = INVALID_VALUE;
 
 	zbx_json_addint64(json, "min_online", min_online);

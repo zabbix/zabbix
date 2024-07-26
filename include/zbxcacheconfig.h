@@ -1470,6 +1470,8 @@ struct zbx_pg_group
 	zbx_uint64_t			proxy_groupid;
 	char				*name;
 	char				*failover_delay;
+#define ZBX_PG_PROXY_MIN_ONLINE_MIN	1
+#define ZBX_PG_PROXY_MIN_ONLINE_MAX	1000
 	char				*min_online;
 	zbx_uint64_t			revision;
 	zbx_uint64_t			hostmap_revision;
