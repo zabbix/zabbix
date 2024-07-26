@@ -1121,7 +1121,7 @@ class CMacrosResolverGeneral {
 			foreach ($keys as $key => $tokens) {
 				foreach ($tokens as $token => $data) {
 					if ($data['macro'] === 'ITEM.VALUE' || $data['macro'] === 'ITEM.LASTVALUE') {
-						$macro_values[$key][$token] = $macro_value = array_key_exists('macrofunc', $data)
+						$macro_values[$key][$token] = array_key_exists('macrofunc', $data)
 							? self::calcMacrofunc($history[$itemid][0]['value'], $data['macrofunc'])
 							: formatHistoryValue($history[$itemid][0]['value'], $db_items[$itemid]);
 						continue;
