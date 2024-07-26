@@ -1,1 +1,1 @@
-..F....... [ZBX-24683] fixed PHP runtime errors in Monitoring->Problems page (Sasha)
+A......... [ZBX-24683] fixed validation rules in event.get() and problem.get() methods (Sasha)
