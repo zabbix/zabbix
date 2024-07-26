@@ -100,7 +100,7 @@ foreach ($data['items'] as $item) {
 					'backurl' => $list_url
 				])
 			),
-		$name,
+		(new CCol($name))->addClass(ZBX_STYLE_WORDBREAK),
 		(new CDiv($item['key_']))->addClass(ZBX_STYLE_WORDWRAP),
 		$item['delay'],
 		$item['history'],
