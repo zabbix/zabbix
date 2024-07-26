@@ -15932,13 +15932,36 @@ static void	dc_proxy_discovery_add_row(struct zbx_json *json, const ZBX_DC_PROXY
  ******************************************************************************/
 static void	dc_proxy_group_discovery_add_group_cfg(struct zbx_json *json, const zbx_dc_proxy_group_t *pg)
 {
+#define INVALID_VALUE	-1
+	const char	*ptr;
+	int		failover_delay, min_online;
+
 	zbx_json_addobject(json, NULL);
 
 	zbx_json_addstring(json, "name", pg->name, ZBX_JSON_TYPE_STRING);
-	zbx_json_addstring(json, "failover_delay", pg->failover_delay, ZBX_JSON_TYPE_STRING);
-	zbx_json_addstring(json, "min_online", pg->min_online, ZBX_JSON_TYPE_STRING);
+
+	ptr = pg->failover_delay;
+
+	if ('{' == *ptr)
+		um_cache_resolve_const(config->um_cache, NULL, 0, pg->failover_delay, ZBX_MACRO_ENV_NONSECURE, &ptr);
+
+	if (FAIL == zbx_is_time_suffix(ptr, &failover_delay, ZBX_LENGTH_UNLIMITED))
+		failover_delay = INVALID_VALUE;
+
+	zbx_json_addint64(json, "failover_delay", failover_delay);
+
+	ptr = pg->min_online;
+
+	if ('{' == *ptr)
+		um_cache_resolve_const(config->um_cache, NULL, 0, pg->min_online, ZBX_MACRO_ENV_NONSECURE, &ptr);
+
+	if (1 > (min_online = atoi(ptr)))
+		min_online = INVALID_VALUE;
+
+	zbx_json_addint64(json, "min_online", min_online);
 
 	zbx_json_close(json);
+#undef INVALID_VALUE
 }
 
 /******************************************************************************

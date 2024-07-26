@@ -335,6 +335,7 @@ static void	pg_get_all_pgroup_rtdata(zbx_pg_service_t *pgs, zbx_ipc_client_t *cl
 
 	(void)zbx_serialize_value(data, num_pgroups);
 
+	data_len = (zbx_uint32_t)(HEADER_LEN + (size_t)num_pgroups * PROXY_GROUP_LEN);
 	zbx_ipc_client_send(client, ZBX_IPC_PGM_ALL_PGROUP_RTDATA, data, data_len);
 
 	zbx_free(data);
