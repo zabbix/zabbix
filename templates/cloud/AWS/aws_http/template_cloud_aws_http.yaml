@@ -1792,11 +1792,12 @@ zabbix_export:
             			'Version': '2006-03-01'
             		};
             
-            		var result = AWS.getField(AWS.request('GET', AWS.params.request_region, 's3', 's3.' + AWS.params.request_region + '.amazonaws.com', AWS.prepareParams(payload), '', ''), 'ListAllMyBucketsResult.Buckets.Bucket');
+            		var result = AWS.getField(AWS.request('GET', AWS.params.request_region, 's3', 's3.' + AWS.params.request_region + '.amazonaws.com', AWS.prepareParams(payload), '', ''), 'ListAllMyBucketsResult.Buckets');
             
             		if (result === null) {
             			return [];
             		}
+            		result = AWS.getField(result, 'Bucket');
             
             		return Array.isArray(result) ? result : [result];
             
