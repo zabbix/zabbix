@@ -28,7 +28,7 @@ class CDropdownElement extends CElement {
 	 * @return CElementCollection
 	 */
 	public function getOptions() {
-		return $this->query('xpath:.//li[not(@optgroup)]')->all();
+		return $this->query('xpath:.//li[not(@optgroup) and not(contains(@style,"display: none"))]')->all();
 	}
 
 	/**

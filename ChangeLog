@@ -1,3 +1,37 @@
+Changes for 7.0.2rc2
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 7.0.2rc1
+
+New features:
+....I...S. [ZBXNEXT-9230] converted history_bin table to hypertable for TimescaleDB (asestakovs)
+.........T [ZBXNEXT-9217] added AWS Lambda by HTTP template (egordymov)
+.......PS. [ZBXNEXT-9293] updated max supported MySQL version to 9.0 (mprihodko)
+........S. [ZBXNEXT-9285] added {EVENT.UPDATE.STATUS} support for Service update notifications (MVekslers)
+
+Bug fixes:
+.......PS. [ZBX-24889] fixed crash when VMware eventlog data is still not collected (MVekslers)
+...G...... [ZBX-24460] removed sending length of data in reserved field when compression is not used in Zabbix agent 2 (dgoloscapov)
+.......PS. [ZBX-24524] fixed "New values per second" statistic to include dependent items in calculation (asestakovs)
+........S. [ZBX-24743] fixed wrong DB error handling on host tag deletion by network discovery action operation (mprihodko)
+..F....... [ZBX-24695] fixed hintbox sizing (apoga)
+.........T [ZBX-24773] fixed duplicate item preprocessing in Kubernetes Kubelet by HTTP template (egordymov)
+..F....... [ZBX-24651] fixed errors in minimum size widgets (apoga)
+..F....... [ZBX-24613] fixed disappearing "Back" button on refresh in submaps of Map widget (apoga)
+..F....... [ZBX-24163] fixed submap addition in Map navigation tree widget to not append same submaps repeatedly (apoga)
+A......... [ZBX-24772] fixed inability to access actions targeting users having at least one common user group with the current user of Admin role (vmaksimovs)
+........S. [ZBX-24821] made 'execute_on' value being recorded in audit only for shell scripts (arimdjonoks)
+
+--------------------------------------------------------------------------------
+Changes for 7.0.1
+
+7.0.1rc2 was released as 7.0.1 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 7.0.1rc2
 
 Bug fixes:
@@ -2779,8 +2813,14 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 Changes for 6.0.33rc1
 
 New features:
+.........T [ZBXNEXT-9217] added AWS Lambda by HTTP template (egordymov)
+.......PS. [ZBXNEXT-9293] updated max supported MySQL version to 9.0 (mprihodko)
 
 Bug fixes:
+.......PS. [ZBX-24524] fixed "new values per second" stat to include dependent items in calculation (asestakovs)
+........S. [ZBX-24821] made 'execute_on' value being recorded in audit only for shell scripts (arimdjonoks)
+..F....... [ZBX-23312] fixed discovery edit form being saved incorrectly after dcheck update (dfofanovs)
+.........T [ZBX-24773] fixed duplicate item preprocessing in Kubernetes Kubelet by HTTP template (egordymov)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.32
