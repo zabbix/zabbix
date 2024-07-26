@@ -24,6 +24,10 @@ A.F.I..PS. [ZBXNEXT-9176] removed support of Oracle DB (agriscenko, sboidenko)
 .......PS. [ZBXNEXT-8990] extended VMware event log with username (asestakovs)
 
 Bug fixes:
+.......PS. [ZBX-24658] fixed host proxy mapping update on proxies with forced full configuration sync (wiper)
+A......... [ZBX-24683] fixed validation rules in event.get() and problem.get() methods (Sasha)
+.........T [ZBX-24859] fixed JavaScript in S3 buckets discovery rule (egordymov)
+.........T [ZBX-24617] fixed hardcoded region in AWS by HTTP template (egordymov)
 .......PS. [ZBX-24889] fixed crash when VMware eventlog data is still not collected (MVekslers)
 ...G...... [ZBX-24460] removed sending length of data in reserved field when compression is not used in Zabbix agent 2 (dgoloscapov)
 .......PS. [ZBX-24524] fixed "New values per second" statistic to include dependent items in calculation (asestakovs)
@@ -148,6 +152,9 @@ Changes for 7.0.2rc2
 New features:
 
 Bug fixes:
+.......PS. [ZBX-24658] fixed host proxy mapping update on proxies with forced full configuration sync (wiper)
+A......... [ZBX-24683] fixed validation rules in event.get() and problem.get() methods (Sasha)
+........S. [ZBX-24915] fixed housekeeper delete parameter (askolmeisters)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.2rc1
@@ -1063,6 +1070,7 @@ A.F....... [ZBX-21976] added support of OneLogin and Azure SCIM, fixed some issu
 Changes for 6.4.18rc1
 
 New features:
+.......PS. [ZBXNEXT-9293] updated max supported MySQL version to 9.0 (mprihodko)
 
 Bug fixes:
 
@@ -2962,6 +2970,8 @@ New features:
 .......PS. [ZBXNEXT-9293] updated max supported MySQL version to 9.0 (mprihodko)
 
 Bug fixes:
+.........T [ZBX-24859] fixed JavaScript in S3 buckets discovery rule (egordymov)
+.........T [ZBX-24617] fixed hardcoded region in AWS by HTTP template (egordymov)
 .......PS. [ZBX-24524] fixed "new values per second" stat to include dependent items in calculation (asestakovs)
 ........S. [ZBX-24821] made 'execute_on' value being recorded in audit only for shell scripts (arimdjonoks)
 ..F....... [ZBX-23312] fixed discovery edit form being saved incorrectly after dcheck update (dfofanovs)
