@@ -586,9 +586,7 @@ class testPageMonitoringLatestData extends CWebTest {
 		// Check that subfilter remains selected after main field is cleared.
 		if (CTestArrayHelper::get($data, 'check_after_clear', false)) {
 			$table = $this->getTable();
-			$filter_form = $this->query('name:zbx_filter')->asForm()->one()->waitUntilVisible();
-			$filter_form->fill(['Name' => '']);
-			$filter_form->submit();
+			CFilterElement::find()->one()->getForm()->fill(['Name' => ''])->submit();
 			$table->waitUntilReloaded();
 
 			foreach ($data['subfilter']['Tag values'] as $subfilter) {
@@ -596,6 +594,8 @@ class testPageMonitoringLatestData extends CWebTest {
 						->one()->isAttributePresent(['class' => 'subfilter subfilter-enabled'])
 				);
 			}
+
+			$this->assertTableData($data['result'], $this->getTableSelector());
 		}
 
 		$this->query('button:Reset')->waitUntilClickable()->one()->click();
