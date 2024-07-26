@@ -193,10 +193,19 @@
 				else {
 					if ($obj.length) {
 						$obj.remove();
-						jQuery('#' + key + '_' + param[0]).prop('checked', true);
 					}
 				}
 			});
+		}
+
+		const form = document.getElementById('discoveryForm');
+
+		for (const name of ['uniqueness_criteria', 'host_source', 'name_source']) {
+			const elements = form.querySelectorAll(`input[name="${name}"]`);
+
+			if ([...elements].filter(element => element.checked).length == 0) {
+				elements[0].checked = true;
+			}
 		}
 	}
 
