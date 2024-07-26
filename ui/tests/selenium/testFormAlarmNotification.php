@@ -42,7 +42,6 @@ class testFormAlarmNotification extends CWebTest {
 	}
 
 	protected static $eventids;
-
 	protected static $hostid;
 	const DEFAULT_COLORPICKER = 'xpath:./following::div[@class="color-picker"]';
 
@@ -70,55 +69,61 @@ class testFormAlarmNotification extends CWebTest {
 						'name' => 'Not classified',
 						'key_' => 'not_classified',
 						'type' => ITEM_TYPE_TRAPPER,
-						'value_type' => ITEM_VALUE_TYPE_UINT64,
-						'delay' => 0
+						'value_type' => ITEM_VALUE_TYPE_UINT64
 					],
 					[
 						'name' => 'Information',
 						'key_' => 'information',
 						'type' => ITEM_TYPE_TRAPPER,
-						'value_type' => ITEM_VALUE_TYPE_UINT64,
-						'delay' => 0
+						'value_type' => ITEM_VALUE_TYPE_UINT64
 					],
 					[
 						'name' => 'Warning',
 						'key_' => 'warning',
 						'type' => ITEM_TYPE_TRAPPER,
-						'value_type' => ITEM_VALUE_TYPE_UINT64,
-						'delay' => 0
+						'value_type' => ITEM_VALUE_TYPE_UINT64
 					],
 					[
 						'name' => 'Average',
 						'key_' => 'average',
 						'type' => ITEM_TYPE_TRAPPER,
-						'value_type' => ITEM_VALUE_TYPE_UINT64,
-						'delay' => 0
+						'value_type' => ITEM_VALUE_TYPE_UINT64
 					],
 					[
 						'name' => 'High',
 						'key_' => 'high',
 						'type' => ITEM_TYPE_TRAPPER,
-						'value_type' => ITEM_VALUE_TYPE_UINT64,
-						'delay' => 0
+						'value_type' => ITEM_VALUE_TYPE_UINT64
 					],
 					[
 						'name' => 'Disaster',
 						'key_' => 'disaster',
 						'type' => ITEM_TYPE_TRAPPER,
-						'value_type' => ITEM_VALUE_TYPE_UINT64,
-						'delay' => 0
+						'value_type' => ITEM_VALUE_TYPE_UINT64
 					],
 					[
 						'name' => 'Multiple errors',
 						'key_' => 'multiple_errors',
 						'type' => ITEM_TYPE_TRAPPER,
-						'value_type' => ITEM_VALUE_TYPE_UINT64,
-						'delay' => 0
+						'value_type' => ITEM_VALUE_TYPE_UINT64
+					]
+				]
+			],
+			[
+				'host' => 'Host for maintenance alarm',
+				'groups' => [['groupid' => 4]], // Zabbix server
+				'items' => [
+					[
+						'name' => 'Suppressed item',
+						'key_' => 'suppressed_item',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_UINT64
 					]
 				]
 			]
 		]);
 		self::$hostid = $response['hostids'][self::HOST_NAME];
+		$maintenance_hostid = $response['hostids']['Host for maintenance alarm'];
 
 		CDataHelper::call('trigger.create', [
 			[
@@ -181,6 +186,13 @@ class testFormAlarmNotification extends CWebTest {
 				'priority' => TRIGGER_SEVERITY_NOT_CLASSIFIED,
 				'manual_close' => 1,
 				'type' => 1
+			],
+			[
+				'description' => 'Suppressed_error',
+				'expression' => 'last(/Host for maintenance alarm/suppressed_item)=0',
+				'priority' => TRIGGER_SEVERITY_DISASTER,
+				'manual_close' => 1,
+				'type' => 1
 			]
 		]);
 
@@ -189,11 +201,27 @@ class testFormAlarmNotification extends CWebTest {
 				' VALUES (555,1,'.zbx_dbstr('web.messages').',1,'.zbx_dbstr('enabled').',3)');
 		DBexecute('INSERT INTO profiles (profileid, userid, idx, value_str, source, type)'.
 				' VALUES (556,1,'.zbx_dbstr('web.messages').',180,'.zbx_dbstr('timeout').',3)');
+
+		// Create Maintenance and host in maintenance.
+		$maintenance = CDataHelper::call('maintenance.create', [
+			[
+				'name' => 'Alarm notification maintenance',
+				'active_since' => time() - 1000,
+				'active_till' => time() + 31536000,
+				'hosts' => [['hostid' => $maintenance_hostid]],
+				'timeperiods' => [[]]
+			]
+		]);
+		$maintenanceid = $maintenance['maintenanceids'][0];
+
+		DBexecute('UPDATE hosts SET maintenanceid='.zbx_dbstr($maintenanceid).
+			', maintenance_status=1, maintenance_type='.MAINTENANCE_TYPE_NORMAL.', maintenance_from='.zbx_dbstr(time()-1000).
+			' WHERE hostid='.zbx_dbstr($maintenance_hostid)
+		);
 	}
 
 	/**
 	 * Check Alarm notification overlay dialog layout.
-	 *
 	 */
 	public function testFormAlarmNotification_Layout() {
 		// Trigger problem.
@@ -471,7 +499,7 @@ class testFormAlarmNotification extends CWebTest {
 			// #0 Not classified turned off.
 			[
 				[
-					'severity_status' => ['Not classified' => false],
+					'profile_setting' => ['Not classified' => false],
 					'trigger_name' => [
 						'Average_trigger',
 						'Disaster_trigger',
@@ -484,7 +512,7 @@ class testFormAlarmNotification extends CWebTest {
 			// #1 Information turned off.
 			[
 				[
-					'severity_status' => ['Information' => false],
+					'profile_setting' => ['Information' => false],
 					'trigger_name' => [
 						'Average_trigger',
 						'Disaster_trigger',
@@ -497,7 +525,7 @@ class testFormAlarmNotification extends CWebTest {
 			// #2 Warning turned off.
 			[
 				[
-					'severity_status' => ['Warning' => false],
+					'profile_setting' => ['Warning' => false],
 					'trigger_name' => [
 						'Average_trigger',
 						'Disaster_trigger',
@@ -510,7 +538,7 @@ class testFormAlarmNotification extends CWebTest {
 			// #3 Average turned off.
 			[
 				[
-					'severity_status' => ['Average' => false],
+					'profile_setting' => ['Average' => false],
 					'trigger_name' => [
 						'Disaster_trigger',
 						'High_trigger',
@@ -523,7 +551,7 @@ class testFormAlarmNotification extends CWebTest {
 			// #4 High turned off.
 			[
 				[
-					'severity_status' => ['High' => false],
+					'profile_setting' => ['High' => false],
 					'trigger_name' => [
 						'Average_trigger',
 						'Disaster_trigger',
@@ -536,7 +564,7 @@ class testFormAlarmNotification extends CWebTest {
 			// #5 Disaster turned off.
 			[
 				[
-					'severity_status' => ['Disaster' => false],
+					'profile_setting' => ['Disaster' => false],
 					'trigger_name' => [
 						'Average_trigger',
 						'High_trigger',
@@ -549,7 +577,7 @@ class testFormAlarmNotification extends CWebTest {
 			// #6 Not classified and High severities turned off.
 			[
 				[
-					'severity_status' => [
+					'profile_setting' => [
 						'Not classified' => false,
 						'High' => false
 					],
@@ -561,10 +589,18 @@ class testFormAlarmNotification extends CWebTest {
 					]
 				]
 			],
-			// #7 All turned off.
+			// #7 Display suppressed problems.
 			[
 				[
-					'severity_status' => [
+					'profile_setting' => ['Show suppressed problems' => true],
+					'trigger_problem' => ['Suppressed_error'],
+					'trigger_name' => ['Suppressed_error']
+				]
+			],
+			// #8 All turned off.
+			[
+				[
+					'profile_setting' => [
 						'Not classified' => false,
 						'Information' => false,
 						'Warning' => false,
@@ -572,6 +608,13 @@ class testFormAlarmNotification extends CWebTest {
 						'High' => false,
 						'Disaster' => false
 					],
+					'trigger_name' => ''
+				]
+			],
+			// #9 Message notification turned off.
+			[
+				[
+					'profile_setting' => ['Frontend messaging' => false],
 					'trigger_name' => ''
 				]
 			]
@@ -584,32 +627,33 @@ class testFormAlarmNotification extends CWebTest {
 	 * @onBefore resetTriggerSeverities
 	 *
 	 * @dataProvider getNotDisplayedAlarmsData
-	 *
 	 */
 	public function testFormAlarmNotification_NotDisplayedAlarms($data) {
 		// Set checked trigger severity in messaging settings.
 		$this->page->login()->open('zabbix.php?action=userprofile.edit')->waitUntilReady();
 		$form = $this->query('id:user-form')->asForm()->one();
 		$form->selectTab('Messaging');
-		$form->fill($data['severity_status']);
+		$form->fill($data['profile_setting']);
 		$form->submit();
 		$this->page->waitUntilReady();
 
 		$this->page->open('zabbix.php?action=problem.view&filter_reset=1')->waitUntilReady();
-		$this->page->open('zabbix.php?action=problem.view&unacknowledged=1&sort=name&sortorder=ASC&hostids%5B%5D='.
-				self::$hostid)->waitUntilReady();
+		$this->page->open('zabbix.php?action=problem.view&unacknowledged=1&show_suppressed=1&sort=name&sortorder=ASC')->waitUntilReady();
 
 		// Trigger problem.
-		self::$eventids = CDBHelper::setTriggerProblem(self::ALL_TRIGGERS);
+		self::$eventids = (array_key_exists('trigger_problem', $data))
+				? CDBHelper::setTriggerProblem($data['trigger_problem'])
+				: CDBHelper::setTriggerProblem(self::ALL_TRIGGERS);
 
 		// Filter problems by Hosts and refresh page for alarm overlay to appear.
 		$table = $this->query('class:list-table')->asTable()->one();
-		$this->query('name:zbx_filter')->asForm()->one()->fill(['Hosts' => self::HOST_NAME])->submit();
+		$this->query('name:zbx_filter')->asForm()->one()->fill(['Hosts' => [self::HOST_NAME, 'Host for maintenance alarm']])->submit();
 		$table->waitUntilReloaded();
 		$this->page->refresh()->waitUntilReady();
 
 		// Check that problems displayed in table.
-		$this->assertTableDataColumn(self::ALL_TRIGGERS, 'Problem');
+		$triggered_problems = (array_key_exists('trigger_problem', $data)) ? $data['trigger_problem'] : self::ALL_TRIGGERS;
+		$this->assertTableDataColumn($triggered_problems, 'Problem');
 
 		if ($data['trigger_name'] === '') {
 			$this->assertFalse($this->query('xpath://div[@class="overlay-dialogue notif ui-draggable"]')->one()->isDisplayed());
