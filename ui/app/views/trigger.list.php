@@ -347,8 +347,8 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 		CSeverityHelper::makeSeverityCell((int) $trigger['priority']),
 		$data['show_value_column'] ? $trigger_value : null,
 		$hosts,
-		$description,
-		$trigger['opdata'],
+		(new CCol($description))->addClass(ZBX_STYLE_WORDBREAK),
+		(new CCol($trigger['opdata']))->addClass(ZBX_STYLE_WORDBREAK),
 		(new CDiv($expression))->addClass(ZBX_STYLE_WORDBREAK),
 		(new CDiv([
 			$status,
