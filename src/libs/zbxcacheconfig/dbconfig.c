@@ -15503,7 +15503,7 @@ int	zbx_dc_register_config_session(zbx_uint64_t hostid, const char *token, zbx_u
 		/* one session cannot be updated at the same time by different processes,            */
 		/* so updating its properties without reallocating memory can be done with read lock */
 		session->last_id = session_config_revision;
-		session_local.lastaccess = now;
+		session->lastaccess = now;
 	}
 	*dc_revision = config->revision;
 	UNLOCK_CACHE;
