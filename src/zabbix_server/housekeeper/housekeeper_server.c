@@ -1487,19 +1487,19 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 		int	d_history_and_trends = housekeeping_history_and_trends(now);
 
 		zbx_setproctitle("%s [removing old problems]", get_process_type_string(process_type));
-		int	d_problems = housekeeping_problems(now, housekeeper_args_in->config_housekeeping_frequency);
+		int	d_problems = housekeeping_problems(now, housekeeper_args_in->config_max_housekeeper_delete);
 
 		zbx_setproctitle("%s [removing old events]", get_process_type_string(process_type));
-		int	d_events = housekeeping_events(now, housekeeper_args_in->config_housekeeping_frequency);
+		int	d_events = housekeeping_events(now, housekeeper_args_in->config_max_housekeeper_delete);
 
 		zbx_setproctitle("%s [removing old sessions]", get_process_type_string(process_type));
-		int	d_sessions = housekeeping_sessions(now, housekeeper_args_in->config_housekeeping_frequency);
+		int	d_sessions = housekeeping_sessions(now, housekeeper_args_in->config_max_housekeeper_delete);
 
 		zbx_setproctitle("%s [removing old service alarms]", get_process_type_string(process_type));
-		int	d_services = housekeeping_services(now, housekeeper_args_in->config_housekeeping_frequency);
+		int	d_services = housekeeping_services(now, housekeeper_args_in->config_max_housekeeper_delete);
 
 		zbx_setproctitle("%s [removing old audit log items]", get_process_type_string(process_type));
-		int	d_audit = housekeeping_audit(now, housekeeper_args_in->config_housekeeping_frequency);
+		int	d_audit = housekeeping_audit(now, housekeeper_args_in->config_max_housekeeper_delete);
 
 		zbx_setproctitle("%s [removing old autoreg_hosts]", get_process_type_string(process_type));
 		int	d_autoreg_host = housekeeping_autoreg_host(housekeeper_args_in->config_max_housekeeper_delete);
@@ -1508,7 +1508,7 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 		int	records = housekeeping_proxy_dhistory(now);
 
 		zbx_setproctitle("%s [removing deleted items data]", get_process_type_string(process_type));
-		int	d_cleanup = housekeeping_cleanup(housekeeper_args_in->config_housekeeping_frequency);
+		int	d_cleanup = housekeeping_cleanup(housekeeper_args_in->config_max_housekeeper_delete);
 		sec = zbx_time() - sec;
 
 		zabbix_log(LOG_LEVEL_WARNING, "%s [deleted %d hist/trends, %d items/triggers, %d events, %d problems,"
