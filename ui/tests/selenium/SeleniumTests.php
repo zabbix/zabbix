@@ -161,7 +161,8 @@ require_once dirname(__FILE__).'/latestData/testPageItemHistory.php';
 require_once dirname(__FILE__).'/latestData/testPageMonitoringLatestData.php';
 
 // LLD.
-require_once dirname(__FILE__).'/lld/testFormLowLevelDiscovery.php';
+require_once dirname(__FILE__).'/lld/testFormLowLevelDiscoveryFromHost.php';
+require_once dirname(__FILE__).'/lld/testFormLowLevelDiscoveryFromTemplate.php';
 require_once dirname(__FILE__).'/lld/testFormLowLevelDiscoveryOverrides.php';
 require_once dirname(__FILE__).'/lld/testFormTestLowLevelDiscovery.php';
 require_once dirname(__FILE__).'/lld/testInheritanceDiscoveryRule.php';
@@ -498,7 +499,8 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageMonitoringLatestData');
 
 		// LLD.
-		$suite->addTestSuite('testFormLowLevelDiscovery');
+		$suite->addTestSuite('testFormLowLevelDiscoveryFromHost');
+		$suite->addTestSuite('testFormLowLevelDiscoveryFromTemplate');
 		$suite->addTestSuite('testFormLowLevelDiscoveryOverrides');
 		$suite->addTestSuite('testFormTestLowLevelDiscovery');
 		$suite->addTestSuite('testInheritanceDiscoveryRule');

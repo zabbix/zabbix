@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-05-28 09:23+0000\n"
+"PO-Revision-Date: 2024-07-08 07:33+0000\n"
 "Last-Translator: Tomáš Skočdopole <tomas.skocdopole@initmax.cz>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: cs\n"
@@ -980,7 +980,7 @@ msgstr "Přidat nový widget"
 
 #: widgets/navtree/Widget.php:34
 msgid "Add child element"
-msgstr ""
+msgstr "Přidat podřízený prvek"
 
 #: widgets/navtree/Widget.php:39
 msgid "Add child elements"
@@ -1019,7 +1019,7 @@ msgstr "Přidat spouštěč hostitele"
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:260
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:263
 msgid "Add item"
-msgstr ""
+msgstr "Přidat item"
 
 #: app/partials/massupdate.macros.tab.php:96
 #: app/partials/massupdate.valuemaps.tab.php:38
@@ -1681,6 +1681,10 @@ msgstr "Musí být uveden alespoň jeden den v týdnu nebo den v měsíci."
 msgid "At least one host group or host must be selected."
 msgstr "Minimálně jedna skupina hostů musí být vybrána."
 
+#: include/classes/setup/CFrontendSetup.php:252
+msgid "At least one of MySQL or PostgreSQL should be supported."
+msgstr ""
+
 #: include/classes/setup/CFrontendSetup.php:241
 msgid "At least one of MySQL, PostgreSQL or Oracle should be supported."
 msgstr "Měl by být podporován alespoň jeden z MySQL, PostgreSQL nebo Oracle."
@@ -1900,6 +1904,11 @@ msgstr "Dostupnost"
 msgid "Availability report"
 msgstr "Protokol dostupnosti"
 
+#: app/controllers/CControllerAvailabilityReportTrigger.php:70
+#: app/views/reports.availabilityreport.trigger.php:23
+msgid "Availability report graph"
+msgstr ""
+
 #: include/classes/html/CHostAvailability.php:80
 #: widgets/hostavail/views/widget.view.php:32
 msgid "Available"
@@ -1929,7 +1938,7 @@ msgstr "Vyhnout se snadno uhodnutelným heslům"
 
 #: jsLoader.php:172
 msgid "Awaiting data"
-msgstr ""
+msgstr "Čekání na data"
 
 #: widgets/svggraph/views/widget.edit.php:51
 msgid "Axes"
@@ -5540,7 +5549,7 @@ msgstr "Vytvořit nové"
 
 #: jsLoader.php:372
 msgid "Create new report"
-msgstr ""
+msgstr "Vytvořit nový report"
 
 #: app/views/administration.proxy.list.php:239
 msgid "Create proxy"
@@ -9684,7 +9693,7 @@ msgstr "Prvky skupiny hostů"
 
 #: jsLoader.php:292
 msgid "Host group is not selected."
-msgstr ""
+msgstr "Skupina hostů není vybrána."
 
 #: include/views/monitoring.sysmap.edit.php:168
 msgid "Host group label type"
@@ -9767,7 +9776,7 @@ msgstr "Přehled inventáře hosta"
 
 #: jsLoader.php:289
 msgid "Host is not selected."
-msgstr ""
+msgstr "Host není vybrán."
 
 #: include/views/monitoring.sysmap.edit.php:183
 msgid "Host label type"
@@ -13108,7 +13117,7 @@ msgstr "Typ štítku na mapě"
 
 #: jsLoader.php:290
 msgid "Map is not selected."
-msgstr ""
+msgstr "Mapa není vybrána."
 
 #: sysmap.php:128
 msgid "Map is updated! Return to map list?"
@@ -15371,6 +15380,19 @@ msgstr "Online"
 msgid "Online proxies"
 msgstr "Online proxy"
 
+#: include/classes/api/services/CUser.php:874
+#: include/classes/api/services/CUser.php:882
+#: include/classes/api/services/CUser.php:889
+#, c-format
+msgid "Only Super admin or Admin users can update \"%1$s\" parameter."
+msgstr ""
+
+#: include/classes/api/services/CUser.php:812
+#: include/classes/api/services/CUser.php:853
+#, c-format
+msgid "Only Super admin users can update \"%1$s\" parameter."
+msgstr ""
+
 #: include/classes/api/services/CDRule.php:509
 msgid "Only Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 checks can be made unique."
 msgstr "Jen kontroly typu Zabbix agent, SNMPv1, SNMPv2 nebo SNMPv3 mohou být unikátní."
@@ -17209,7 +17231,7 @@ msgstr "Uvolněním vytvoříte widget."
 
 #: include/views/general.login.php:76
 msgid "Remember me for 30 days"
-msgstr "Zapamatovat moje přihlášení na 30 dní"
+msgstr "Zapamatovat moje přihlášení na 30 dnů"
 
 #: include/actions.inc.php:859 include/actions.inc.php:1765
 #: include/actions.inc.php:2047
@@ -19676,7 +19698,7 @@ msgstr "Řetězcové funkce"
 
 #: widgets/piechart/includes/WidgetForm.php:137
 msgid "Stroke width"
-msgstr ""
+msgstr "Šířka tahu"
 
 #: include/items.inc.php:1545 include/items.inc.php:1549
 #: include/items.inc.php:1553 include/items.inc.php:1557
@@ -21061,7 +21083,7 @@ msgstr "Spouštěč v šabloně \"%1$s\" má závislost na spouštěči v šablo
 
 #: jsLoader.php:291
 msgid "Trigger is not selected."
-msgstr ""
+msgstr "Trigger není vybrán."
 
 #: include/views/monitoring.sysmap.edit.php:198
 msgid "Trigger label type"
@@ -23126,7 +23148,7 @@ msgstr "Pohled jako"
 
 #: jsLoader.php:417
 msgid "View related reports"
-msgstr ""
+msgstr "Zobrazit související reporty"
 
 #: include/classes/data/CItemData.php:1735
 msgid "Virtual space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
@@ -23342,7 +23364,7 @@ msgstr "Widget je pro zadaný počet sloupců a řádků příliš malý."
 
 #: jsLoader.php:205
 msgid "Widgets"
-msgstr ""
+msgstr "Widgety"
 
 #: graphs.php:39 include/views/configuration.graph.edit.php:100
 #: include/views/configuration.graph.list.php:170
@@ -23718,7 +23740,7 @@ msgstr "Pro zobrazení této stránky musíte být přihlášen(a)."
 
 #: jsLoader.php:287
 msgid "You need to have at least one image uploaded to create map element. Images can be uploaded in Administration->General->Images section."
-msgstr ""
+msgstr "Chcete-li vytvořit prvek mapy, musíte mít nahrán alespoň jeden obrázek. Obrázky lze nahrát v sekci Administrace->Obecné->Obrázky."
 
 #: include/classes/db/DB.php:133
 msgid "Your database is not working properly. Please wait a few minutes and try to repeat this action. If the problem still persists, please contact system administrator. The problem might be caused by long running transaction or row level lock accomplished by your database management system."
@@ -25730,7 +25752,7 @@ msgstr "right() - Vrátí počet znaků zprava"
 
 #: widgets/navtree/Widget.php:41
 msgid "root"
-msgstr ""
+msgstr "kořen"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:966
 msgid "round() - Rounds a value to decimal places"

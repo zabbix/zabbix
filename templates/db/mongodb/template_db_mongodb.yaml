@@ -2111,22 +2111,18 @@ zabbix_export:
                   - macro: '{#NODE_STATE}'
                     value: '1'
               operations:
-                - operationobject: ITEM_PROTOTYPE
-                  operator: LIKE
+                - operator: LIKE
                   value: 'Number of replicas'
                   discover: DISCOVER
                   status: ENABLED
-                - operationobject: ITEM_PROTOTYPE
-                  operator: LIKE
+                - operator: LIKE
                   value: 'Number of unhealthy replicas'
                   discover: DISCOVER
                   status: ENABLED
-                - operationobject: ITEM_PROTOTYPE
-                  operator: LIKE
+                - operator: LIKE
                   value: 'Replication lag'
                   discover: NO_DISCOVER
-                - operationobject: ITEM_PROTOTYPE
-                  operator: LIKE
+                - operator: LIKE
                   value: 'Unhealthy replicas'
                   discover: DISCOVER
                   status: ENABLED
@@ -2137,8 +2133,7 @@ zabbix_export:
                   - macro: '{#NODE_STATE}'
                     value: '7'
               operations:
-                - operationobject: ITEM_PROTOTYPE
-                  operator: LIKE
+                - operator: LIKE
                   value: 'Replication lag'
                   discover: NO_DISCOVER
         - uuid: 9b37bb1d3e244a95ac5702bcf3ab19a9

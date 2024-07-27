@@ -328,8 +328,6 @@ void	lld_process_lost_objects(const char *table, const char *table_obj, const ch
 		zbx_db_free_result(result);
 	}
 
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	/* update object table */
 
 	if (0 != dis_ids.values_num)
@@ -464,10 +462,7 @@ void	lld_process_lost_objects(const char *table, const char *table_obj, const ch
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 	}
 
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
-		zbx_db_execute("%s", sql);
+	(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
 
 	zbx_free(sql);
 

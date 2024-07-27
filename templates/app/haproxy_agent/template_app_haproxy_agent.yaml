@@ -734,8 +734,7 @@ zabbix_export:
                   - macro: '{#MODE}'
                     value: tcp
               operations:
-                - operationobject: ITEM_PROTOTYPE
-                  operator: LIKE
+                - operator: LIKE
                   value: 'Number of responses with codes'
                   discover: NO_DISCOVER
                   status: ENABLED
@@ -1156,8 +1155,7 @@ zabbix_export:
                   - macro: '{#MODE}'
                     value: tcp
               operations:
-                - operationobject: ITEM_PROTOTYPE
-                  operator: LIKE
+                - operator: LIKE
                   value: 'Number of responses with codes'
                   discover: NO_DISCOVER
                   status: ENABLED
@@ -1834,8 +1832,7 @@ zabbix_export:
                   - macro: '{#MODE}'
                     value: tcp
               operations:
-                - operationobject: ITEM_PROTOTYPE
-                  operator: LIKE
+                - operator: LIKE
                   value: 'Number of responses with codes'
                   discover: NO_DISCOVER
                   status: ENABLED

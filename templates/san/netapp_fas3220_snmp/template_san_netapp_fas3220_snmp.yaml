@@ -806,8 +806,7 @@ zabbix_export:
                   - macro: '{#FSTYPE}'
                     value: 3|4
               operations:
-                - operationobject: ITEM_PROTOTYPE
-                  operator: LIKE
+                - operator: LIKE
                   value: Saved
                   discover: NO_DISCOVER
         - uuid: e06a66c956164722a289cb8832341451

@@ -220,7 +220,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 			]],
 			// #16.
 			[[
-				'url' => 'report2.php',
+				'url' => 'zabbix.php?action=availabilityreport.list',
 				'title' =>	'Availability report',
 				'header' =>	'Availability report',
 				'users' => [

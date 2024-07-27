@@ -247,6 +247,7 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 		& > li {
 			margin-right: 5px;
 			line-height: 24px;
+			white-space: nowrap;
 
 			> ul {
 				display: flex;
@@ -262,6 +263,12 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 						content: "/";
 					}
 				}
+			}
+		}
+
+		.wide {
+			li > span {
+				max-width: 500px;
 			}
 		}
 

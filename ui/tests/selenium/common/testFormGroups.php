@@ -188,7 +188,7 @@ class testFormGroups extends CWebTest {
 
 			// Open group create form.
 			$this->query('button', 'Create '.$this->object.' group')->one()->click();
-			$this->assertEquals('New '.$this->object.' group', $dialog->getTitle());
+			$this->assertEquals('New '.$this->object.' group', $dialog->waitUntilReady()->getTitle());
 		}
 
 		$form->invalidate();
