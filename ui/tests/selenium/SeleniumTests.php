@@ -328,7 +328,6 @@ require_once dirname(__FILE__).'/webScenarios/testInheritanceWeb.php';
 require_once dirname(__FILE__).'/webScenarios/testPageMonitoringWebDetails.php';
 
 require_once dirname(__FILE__).'/testDocumentationLinks.php';
-require_once dirname(__FILE__).'/testEmptyPages.php';
 require_once dirname(__FILE__).'/testExecuteNow.php';
 require_once dirname(__FILE__).'/testExpandExpressionMacros.php';
 require_once dirname(__FILE__).'/testFormLogin.php';
@@ -340,6 +339,7 @@ require_once dirname(__FILE__).'/testPageBrowserWarning.php';
 require_once dirname(__FILE__).'/testPageInventory.php';
 require_once dirname(__FILE__).'/testPageSearch.php';
 require_once dirname(__FILE__).'/testPageStatusOfZabbix.php';
+require_once dirname(__FILE__).'/testPagesWithoutData.php';
 require_once dirname(__FILE__).'/testSidebarMenu.php';
 require_once dirname(__FILE__).'/testTimezone.php';
 require_once dirname(__FILE__).'/testUrlParameters.php';
@@ -666,7 +666,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageMonitoringWebDetails');
 
 		$suite->addTestSuite('testDocumentationLinks');
-		$suite->addTestSuite('testEmptyPages');
 		$suite->addTestSuite('testExecuteNow');
 		$suite->addTestSuite('testExpandExpressionMacros');
 		$suite->addTestSuite('testFormLogin');
@@ -678,6 +677,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageInventory');
 		$suite->addTestSuite('testPageSearch');
 		$suite->addTestSuite('testPageStatusOfZabbix');
+		$suite->addTestSuite('testPagesWithoutData');
 		$suite->addTestSuite('testSidebarMenu');
 		$suite->addTestSuite('testTimezone');
 		$suite->addTestSuite('testUrlParameters');

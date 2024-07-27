@@ -23,7 +23,7 @@ require_once dirname(__FILE__).'/../include/CWebTest.php';
  *
  * @backup profiles
  */
-class testEmptyPages extends CWebTest {
+class testPagesWithoutData extends CWebTest {
 
 	const EMPTY_HOST = 'Empty host for multiselects test';
 	const EMPTY_LLD_HOST = 'Host with empty LLD';
@@ -251,7 +251,7 @@ class testEmptyPages extends CWebTest {
 	 *
 	 * @dataProvider getEmptyPagesData
 	 */
-	public function testEmptyPages_Pages($data) {
+	public function testPagesWithoutData_CheckEmptyPages($data) {
 		$context_host = str_contains($data['url'], 'context=host');
 
 		if (in_array(CTestArrayHelper::get($data, 'page'), ['Hosts', 'Templates', 'SLA', 'SLA report',
