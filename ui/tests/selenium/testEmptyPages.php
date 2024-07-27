@@ -275,12 +275,12 @@ class testEmptyPages extends CWebTest {
 
 		if (CTestArrayHelper::get($data, 'page') === 'SLA report') {
 			$this->assertEquals('Select SLA to display SLA report.',
-				$this->query('xpath://div[@class="no-data-message"]')->one()->getText()
+					$this->query('xpath://div[@class="no-data-message"]')->one()->getText()
 			);
 		}
 		else {
 			$this->assertEquals(['No data found'],
-				$this->getTable('xpath://table[@class="list-table no-data"]')->getRows()->asText()
+					$this->getTable('xpath://table[@class="list-table no-data"]')->getRows()->asText()
 			);
 			$this->assertTableStats();
 		}

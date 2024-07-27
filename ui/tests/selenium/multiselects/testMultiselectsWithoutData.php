@@ -73,7 +73,7 @@ class testMultiselectsWithoutData extends testMultiselectDialogs {
 		self::$empty_hostid = $hosts['hostids'][self::EMPTY_HOST];
 
 		$template_groups = CDataHelper::call('templategroup.create', [
-			['name' => 'Template group for empty template']
+				['name' => 'Template group for empty template']
 		]);
 
 		$template_groupid = $template_groups['groupids'][0];
@@ -485,7 +485,7 @@ class testMultiselectsWithoutData extends testMultiselectDialogs {
 			[
 				[
 					'object' => 'Availability report',
-					'url' => 'report2.php?filter_rst=1',
+					'url' => 'zabbix.php?action=availabilityreport.list&filter_rst=1',
 					'checked_multiselects' => [self::HOSTS_MULTISELECT]
 				]
 			],
@@ -520,8 +520,8 @@ class testMultiselectsWithoutData extends testMultiselectDialogs {
 		// Main objects are hosts and templates, but sub-objects are items, triggers, graphs, etc.
 		if (array_key_exists('sub_object', $data)) {
 			$this->query('class:list-table')->asTable()->waitUntilPresent()->one()
-				->findRow('Name', ($data['object'] === 'Hosts') ? self::EMPTY_HOST : self::EMPTY_TEMPLATE)
-				->getColumn($data['sub_object'])->query('tag:a')->waitUntilClickable()->one()->click();
+					->findRow('Name', ($data['object'] === 'Hosts') ? self::EMPTY_HOST : self::EMPTY_TEMPLATE)
+					->getColumn($data['sub_object'])->query('tag:a')->waitUntilClickable()->one()->click();
 			$this->page->waitUntilReady();
 		}
 
@@ -771,6 +771,7 @@ class testMultiselectsWithoutData extends testMultiselectDialogs {
 			case 'host prototype':
 				$form = $this->query($data['form'])->asForm(['normalized' => true])->one();
 				$this->checkMultiselectDialogs($form, [self::TEMPLATES_MULTISELECT]);
+				break;
 		}
 
 		if (in_array($data['object'], ['item prototype', 'trigger prototype', 'graph prototype'])) {
