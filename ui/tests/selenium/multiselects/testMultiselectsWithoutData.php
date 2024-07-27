@@ -790,9 +790,9 @@ class testMultiselectsWithoutData extends testMultiselectDialogs {
 	/**
 	 * Function for testing opened overlay's title and contents.
 	 *
-	 * @param COverlayDialogElement $overlay tested overlay
-	 * @param string $title title of tested overlay
-	 * @param string $filter hostname selected in overlay filter
+	 * @param COverlayDialogElement $overlay    tested overlay
+	 * @param string                $title      title of tested overlay
+	 * @param string                $filter     hostname selected in overlay filter
 	 */
 	protected function checkEmptyOverlay($overlay, $title, $filter = null) {
 		$this->checkErrorsAndTitle($overlay, $title);
