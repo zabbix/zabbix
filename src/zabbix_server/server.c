@@ -1709,6 +1709,8 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 
 	thread_args.info.program_type = zbx_program_type;
 
+	zbx_set_child_pids(zbx_threads, zbx_threads_num);
+
 	for (i = 0; i < zbx_threads_num; i++)
 	{
 		if (FAIL == get_process_info_by_thread(i + 1, &thread_args.info.process_type,
@@ -1943,8 +1945,6 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 		}
 	}
 
-	zbx_set_child_pids(zbx_threads, zbx_threads_num);
-
 	/* startup/postinit tasks can take a long time, update status */
 	if (SUCCEED != (ret = zbx_ha_get_status(CONFIG_HA_NODE_NAME, ha_stat, ha_failover, &error)))
 	{
@@ -2011,6 +2011,7 @@ static void	server_teardown(zbx_rtc_t *rtc, zbx_socket_t *listen_sock)
 		zbx_thread_wait(zbx_threads[i]);
 	}
 
+	zbx_set_child_pids(NULL, 0);
 	zbx_free(zbx_threads);
 	zbx_free(threads_flags);
 
