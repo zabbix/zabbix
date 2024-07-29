@@ -169,23 +169,15 @@ class WidgetView extends CControllerDashboardWidgetView {
 	 * are assigned to this axis.
 	 */
 	private function toggleYAxes(): void {
-		$ds_left_y_axis_count = 0;
-		$ds_right_y_axis_count = 0;
+		$ds_y_axes = array_column($this->fields_values['ds'], 'axisy', 'axisy');
 
-		foreach ($this->fields_values['ds'] as $data_set) {
-			if ($data_set['axisy'] == GRAPH_YAXIS_SIDE_LEFT) {
-				$ds_left_y_axis_count++;
-			}
-			else {
-				$ds_right_y_axis_count++;
-			}
-		}
-
-		if ($this->fields_values['lefty'] == SVG_GRAPH_AXIS_ON && $ds_left_y_axis_count == 0) {
+		if ($this->fields_values['lefty'] == SVG_GRAPH_AXIS_ON
+				&& !array_key_exists(GRAPH_YAXIS_SIDE_LEFT, $ds_y_axes)) {
 			$this->fields_values['lefty'] = SVG_GRAPH_AXIS_OFF;
 		}
 
-		if ($this->fields_values['righty'] == SVG_GRAPH_AXIS_ON && $ds_right_y_axis_count == 0) {
+		if ($this->fields_values['righty'] == SVG_GRAPH_AXIS_ON
+				&& !array_key_exists(GRAPH_YAXIS_SIDE_RIGHT, $ds_y_axes)) {
 			$this->fields_values['righty'] = SVG_GRAPH_AXIS_OFF;
 		}
 	}
