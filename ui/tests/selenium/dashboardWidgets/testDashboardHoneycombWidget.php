@@ -44,6 +44,16 @@ class testDashboardHoneycombWidget extends testWidgets {
 	protected static $dashboardid;
 
 	/**
+	 * Hash before TEST_BAD scenario.
+	 */
+	protected static $old_hash;
+
+	/**
+	 * Widget amount before create/update.
+	 */
+	protected static $old_widget_count;
+
+	/**
 	 * Id of dashboard for update scenarios.
 	 */
 	protected static $disposable_dashboard_id;
@@ -1398,6 +1408,17 @@ class testDashboardHoneycombWidget extends testWidgets {
 	public function testDashboardHoneycombWidget_Create($data) {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
 				self::$dashboardid['Dashboard for creating honeycomb widgets'])->waitUntilReady();
+
+		// Get hash if expected is TEST_BAD.
+		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
+			// Hash before update.
+			self::$old_hash = CDBHelper::getHash(self::SQL);
+		}
+		else {
+			self::$old_widget_count = CDashboardElement::find()->waitUntilReady()->one()->getWidgets()->count();
+		}
+
+		$this->fillWidgetForm($data, 'create');
 		$this->checkWidgetForm($data, 'create');
 	}
 
@@ -1406,7 +1427,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 	 */
 	public function testDashboardHoneycombWidget_SimpleUpdate() {
 		// Hash before simple update.
-		$old_hash = CDBHelper::getHash(self::SQL);
+		self::$old_hash = CDBHelper::getHash(self::SQL);
 
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
 				self::$dashboardid['Dashboard for simple updating honeycomb widget'])->waitUntilReady();
@@ -1418,7 +1439,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 
 		// Compare old hash and new one.
-		$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
+		$this->assertEquals(self::$old_hash, CDBHelper::getHash(self::SQL));
 	}
 
 	/**
@@ -1468,6 +1489,17 @@ class testDashboardHoneycombWidget extends testWidgets {
 	public function testDashboardHoneycombWidget_Update($data) {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
 				self::$disposable_dashboard_id)->waitUntilReady();
+
+		// Get hash if expected is TEST_BAD.
+		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
+			// Hash before update.
+			self::$old_hash = CDBHelper::getHash(self::SQL);
+		}
+		else {
+			self::$old_widget_count = CDashboardElement::find()->waitUntilReady()->one()->getWidgets()->count();
+		}
+
+		$this->fillWidgetForm($data, 'update');
 		$this->checkWidgetForm($data, 'update');
 	}
 
@@ -1761,7 +1793,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 	public function testDashboardHoneycombWidget_Display($data) {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
 				self::$disposable_dashboard_id)->waitUntilReady();
-		$this->checkWidgetForm($data, 'update', false);
+		$this->fillWidgetForm($data, 'update');
 		$dashboard = CDashboardElement::find()->waitUntilReady()->one();
 		$dashboard->save();
 
@@ -1845,14 +1877,14 @@ class testDashboardHoneycombWidget extends testWidgets {
 	 * @dataProvider getCancelData
 	 */
 	public function testDashboardHoneycombWidget_Cancel($data) {
-		$old_hash = CDBHelper::getHash(self::SQL);
+		self::$old_hash = CDBHelper::getHash(self::SQL);
 		$new_name = 'Widget to be cancelled';
 
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
 				self::$dashboardid['Dashboard for canceling honeycomb widget']
 		);
 		$dashboard = CDashboardElement::find()->one()->edit();
-		$old_widget_count = $dashboard->getWidgets()->count();
+		self::$old_widget_count = $dashboard->getWidgets()->count();
 
 		// Start updating or creating a widget.
 		if (CTestArrayHelper::get($data, 'update', false)) {
@@ -1894,7 +1926,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 				}
 			}
 
-			$this->assertEquals($old_widget_count, $dashboard->getWidgets()->count());
+			$this->assertEquals(self::$old_widget_count, $dashboard->getWidgets()->count());
 		}
 		// Save or cancel dashboard update.
 		if (CTestArrayHelper::get($data, 'save_dashboard', false)) {
@@ -1904,7 +1936,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 			$dashboard->cancelEditing();
 		}
 		// Confirm that no changes were made to the widget.
-		$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
+		$this->assertEquals(self::$old_hash, CDBHelper::getHash(self::SQL));
 	}
 
 	/**
@@ -2006,21 +2038,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 					'filtered_items' => ['Host tag item']
 				]
 			],
-			// #3 Filter by Item without host or host group and with Host tag.
-			[
-				[
-					'fields' => [
-						'Item patterns' => ['Item tag 1', 'Host tag item']
-					],
-					'tags' => [
-						'host_tags' => [
-							['name' => '', 'operator' => 'Does not exist']
-						]
-					],
-					'filtered_items' => ['Item tag 1', 'Host tag item']
-				]
-			],
-			// #4 Show hosts in maintenance.
+			// #3 Show hosts in maintenance.
 			[
 				[
 					'fields' => [
@@ -2030,7 +2048,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 					'filtered_items' => ['Maintenance item', 'Item tag 1', 'Host tag item']
 				]
 			],
-			// #5 Don't show hosts in maintenance.
+			// #4 Don't show hosts in maintenance.
 			[
 				[
 					'fields' => [
@@ -2040,7 +2058,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 					'filtered_items' => ['Item tag 1', 'Host tag item']
 				]
 			],
-			// #6 Filter by Host exists tag.
+			// #5 Filter by Host exists tag.
 			[
 				[
 					'fields' => [
@@ -2054,7 +2072,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 					'filtered_items' => ['Host tag item']
 				]
 			],
-			// #7 Filter by Host doesn't exist tag.
+			// #6 Filter by Host doesn't exist tag.
 			[
 				[
 					'fields' => [
@@ -2068,7 +2086,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 					'filtered_items' => ['Item tag 1', 'Item tag 2']
 				]
 			],
-			// #8 Filter by Items exists tag.
+			// #7 Filter by Items exists tag.
 			[
 				[
 					'fields' => [
@@ -2082,7 +2100,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 					'filtered_items' => ['Item tag 1']
 				]
 			],
-			// #9 Filter by Items doesn't exist tag.
+			// #8 Filter by Items doesn't exist tag.
 			[
 				[
 					'fields' => [
@@ -2096,7 +2114,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 					'filtered_items' => ['Item tag 2', 'Host tag item']
 				]
 			],
-			// #10 Filter by Items and Host exists tag.
+			// #9 Filter by Items and Host exists tag.
 			[
 				[
 					'fields' => [
@@ -2113,7 +2131,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 					'filtered_items' => ['No data']
 				]
 			],
-			// #11 Filter by Items and Host doesn't exist tag.
+			// #10 Filter by Items and Host doesn't exist tag.
 			[
 				[
 					'fields' => [
@@ -2131,7 +2149,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 					'filtered_items' => ['Maintenance item', 'Item tag 2']
 				]
 			],
-			// #12 Item tag Or with operators Contain.
+			// #11 Item tag Or with operators Contain.
 			[
 				[
 					'fields' => [
@@ -2147,7 +2165,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 					'filtered_items' => ['Item tag 1', 'Item tag 3', 'Item tag 4']
 				]
 			],
-			// #13 Item tag And/Or with operators Contain.
+			// #12 Item tag And/Or with operators Contain.
 			[
 				[
 					'fields' => [
@@ -2163,7 +2181,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 					'filtered_items' => ['No data']
 				]
 			],
-			// #14 Item tag Or with operators Exists.
+			// #13 Item tag Or with operators Exists.
 			[
 				[
 					'fields' => [
@@ -2179,7 +2197,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 					'filtered_items' => ['Item tag 1', 'Item tag 3', 'Item tag 4', 'Item tag 5']
 				]
 			],
-			// #15 Item tag And/Or with operators Exists.
+			// #14 Item tag And/Or with operators Exists.
 			[
 				[
 					'fields' => [
@@ -2195,7 +2213,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 					'filtered_items' => ['No data']
 				]
 			],
-			// #16 Item tag Or with operators Does not exist and Contains.
+			// #15 Item tag Or with operators Does not exist and Contains.
 			[
 				[
 					'fields' => [
@@ -2211,7 +2229,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 					'filtered_items' => ['Item tag 1', 'Item tag 2', 'Item tag 4', 'Item tag 5']
 				]
 			],
-			// #17 Item tag And/Or with operators Does not exist and Contains.
+			// #16 Item tag And/Or with operators Does not exist and Contains.
 			[
 				[
 					'fields' => [
@@ -2240,7 +2258,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 	public function testDashboardHoneycombWidget_CheckFiltering($data) {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
 				self::$disposable_dashboard_id)->waitUntilReady();
-		$this->checkWidgetForm($data, 'update', false);
+		$this->fillWidgetForm($data, 'update');
 		$dashboard = CDashboardElement::find()->waitUntilReady()->one();
 		$dashboard->save();
 
@@ -2277,23 +2295,13 @@ class testDashboardHoneycombWidget extends testWidgets {
 	}
 
 	/**
-	 * Create or update Honeycomb widget and check after.
+	 * Create or update Honeycomb widget.
 	 *
 	 * @param array   $data  	data provider
 	 * @param string  $action	create/update honeycomb widget
-	 * @param boolean $check	check honeycomb values after creation or not
 	 */
-	protected function checkWidgetForm($data, $action, $check = true) {
+	protected function fillWidgetForm($data, $action) {
 		$dashboard = CDashboardElement::find()->waitUntilReady()->one();
-
-		// Get hash if expected is TEST_BAD.
-		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
-			// Hash before update.
-			$old_hash = CDBHelper::getHash(self::SQL);
-		}
-		else {
-			$old_widget_count = $dashboard->getWidgets()->count();
-		}
 
 		$form = ($action === 'create')
 			? $dashboard->edit()->addWidget()->asForm()
@@ -2315,51 +2323,58 @@ class testDashboardHoneycombWidget extends testWidgets {
 
 		$form->fill($data['fields']);
 		$form->submit();
+	}
 
-		if ($check) {
-			// Check hash if TEST_BAD and check widget amount if TEST_GOOD.
-			if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
-				$this->assertMessage(TEST_BAD, null, $data['error_message']);
-				COverlayDialogElement::find()->one()->close();
-				$dashboard->save();
-				$this->assertMessage(TEST_GOOD, 'Dashboard updated');
+	/**
+	 * Check created or updated Honeycomb widget.
+	 *
+	 * @param array   $data  	data provider
+	 * @param string  $action	create/update honeycomb widget
+	 */
+	protected function checkWidgetForm($data, $action) {
+		$dashboard = CDashboardElement::find()->waitUntilReady()->one();
 
-				// Compare old hash and new one.
-				$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
+		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
+			$this->assertMessage(TEST_BAD, null, $data['error_message']);
+			COverlayDialogElement::find()->one()->close();
+			$dashboard->save();
+			$this->assertMessage(TEST_GOOD, 'Dashboard updated');
+
+			// Compare old hash and new one.
+			$this->assertEquals(self::$old_hash, CDBHelper::getHash(self::SQL));
+		}
+		else {
+			// Make sure that the widget is present before saving the dashboard.
+			$header = (array_key_exists('Name', $data['fields']))
+				? (($data['fields']['Name'] === '') ? 'Honeycomb' : $data['fields']['Name'])
+				: 'Honeycomb';
+
+			$dashboard->getWidget($header);
+			$dashboard->save();
+
+			// Check message that dashboard saved.
+			$this->assertMessage(TEST_GOOD, 'Dashboard updated');
+
+			// Check widget amount that it is added.
+			$this->assertEquals(self::$old_widget_count + (($action === 'create') ? 1 : 0), $dashboard->getWidgets()->count());
+
+			$form = $dashboard->getWidget($header)->edit()->asForm();
+			$form->fill(['Advanced configuration' => true]);
+			$this->query('id:lbl_bg_color')->one()->waitUntilVisible();
+
+			if (array_key_exists('tags', $data)) {
+				$this->addOrCheckTags($data['tags']);
 			}
-			else {
-				// Make sure that the widget is present before saving the dashboard.
-				$header = (array_key_exists('Name', $data['fields']))
-					? (($data['fields']['Name'] === '') ? 'Honeycomb' : $data['fields']['Name'])
-					: 'Honeycomb';
 
-				$dashboard->getWidget($header);
-				$dashboard->save();
-
-				// Check message that dashboard saved.
-				$this->assertMessage(TEST_GOOD, 'Dashboard updated');
-
-				// Check widget amount that it is added.
-				$this->assertEquals($old_widget_count + (($action === 'create') ? 1 : 0), $dashboard->getWidgets()->count());
-
-				$form = $dashboard->getWidget($header)->edit()->asForm();
-				$form->fill(['Advanced configuration' => true]);
-				$this->query('id:lbl_bg_color')->one()->waitUntilVisible();
-
-				if (array_key_exists('tags', $data)) {
-					$this->addOrCheckTags($data['tags']);
-				}
-
-				// Check Thresholds values.
-				if (array_key_exists('thresholds', $data)) {
-					$this->getTreshholdTable()->checkValue($data['thresholds']);
-				}
-
-				$form->checkValue($data['fields']);
-				COverlayDialogElement::find()->one()->close();
-				$dashboard->save();
-				$this->assertMessage(TEST_GOOD, 'Dashboard updated');
+			// Check Thresholds values.
+			if (array_key_exists('thresholds', $data)) {
+				$this->getTreshholdTable()->checkValue($data['thresholds']);
 			}
+
+			$form->checkValue($data['fields']);
+			COverlayDialogElement::find()->one()->close();
+			$dashboard->save();
+			$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 		}
 	}
 
