@@ -234,20 +234,9 @@ static void	terminate_signal_handler(int sig, siginfo_t *siginfo, void *context)
  ******************************************************************************/
 static void	child_signal_handler(int sig, siginfo_t *siginfo, void *context)
 {
-	int	found = 0;
-
 	SIG_CHECK_PARAMS(sig, siginfo, context);
 
-	for (int i = 0; i < child_pid_count; i++)
-	{
-		if (siginfo->si_pid == child_pids[i])
-		{
-			found = 1;
-			break;
-		}
-	}
-
-	if (0 == found)
+	if (FAIL == zbx_is_child_pid(siginfo->si_pid, child_pids, child_pid_count))
 		return;
 
 	if (!SIG_PARENT_PROCESS)
