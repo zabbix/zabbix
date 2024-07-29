@@ -41,6 +41,7 @@ class testFormAlarmNotification extends CWebTest {
 		];
 	}
 
+	protected static $maintenanceid;
 	protected static $eventids;
 	protected static $hostid;
 	const DEFAULT_COLORPICKER = 'xpath:./following::div[@class="color-picker"]';
@@ -212,9 +213,9 @@ class testFormAlarmNotification extends CWebTest {
 				'timeperiods' => [[]]
 			]
 		]);
-		$maintenanceid = $maintenance['maintenanceids'][0];
+		self::$maintenanceid = $maintenance['maintenanceids'][0];
 
-		DBexecute('UPDATE hosts SET maintenanceid='.zbx_dbstr($maintenanceid).
+		DBexecute('UPDATE hosts SET maintenanceid='.zbx_dbstr(self::$maintenanceid).
 			', maintenance_status=1, maintenance_type='.MAINTENANCE_TYPE_NORMAL.', maintenance_from='.zbx_dbstr(time()-1000).
 			' WHERE hostid='.zbx_dbstr($maintenance_hostid)
 		);
@@ -494,7 +495,7 @@ class testFormAlarmNotification extends CWebTest {
 		$alarm_dialog->ensureNotPresent();
 	}
 
-	public static function getNotDisplayedAlarmsData(){
+	public static function getNotificationSettingsData() {
 		return [
 			// #0 Not classified turned off.
 			[
@@ -593,11 +594,19 @@ class testFormAlarmNotification extends CWebTest {
 			[
 				[
 					'profile_setting' => ['Show suppressed problems' => true],
-					'trigger_problem' => ['Suppressed_error'],
+					'suppressed_problem' => ['Suppressed_error'],
 					'trigger_name' => ['Suppressed_error']
 				]
 			],
-			// #8 All turned off.
+			// #8 Don't display suppressed problems.
+			[
+				[
+					'profile_setting' => ['Show suppressed problems' => false],
+					'suppressed_problem' => ['Suppressed_error'],
+					'trigger_name' => ''
+				]
+			],
+			// #9 All turned off.
 			[
 				[
 					'profile_setting' => [
@@ -611,7 +620,7 @@ class testFormAlarmNotification extends CWebTest {
 					'trigger_name' => ''
 				]
 			],
-			// #9 Message notification turned off.
+			// #10 Message notification turned off.
 			[
 				[
 					'profile_setting' => ['Frontend messaging' => false],
@@ -622,13 +631,13 @@ class testFormAlarmNotification extends CWebTest {
 	}
 
 	/**
-	 * Check that turning off alarms for severity, they are not displayed in alarm notification overlay.
+	 * Check notification display after changing user Frontend notification settings.
 	 *
 	 * @onBefore resetTriggerSeverities
 	 *
-	 * @dataProvider getNotDisplayedAlarmsData
+	 * @dataProvider getNotificationSettingsData
 	 */
-	public function testFormAlarmNotification_NotDisplayedAlarms($data) {
+	public function testFormAlarmNotification_NotificationSettings($data) {
 		// Set checked trigger severity in messaging settings.
 		$this->page->login()->open('zabbix.php?action=userprofile.edit')->waitUntilReady();
 		$form = $this->query('id:user-form')->asForm()->one();
@@ -641,9 +650,16 @@ class testFormAlarmNotification extends CWebTest {
 		$this->page->open('zabbix.php?action=problem.view&unacknowledged=1&show_suppressed=1&sort=name&sortorder=ASC')->waitUntilReady();
 
 		// Trigger problem.
-		self::$eventids = (array_key_exists('trigger_problem', $data))
-				? CDBHelper::setTriggerProblem($data['trigger_problem'])
-				: CDBHelper::setTriggerProblem(self::ALL_TRIGGERS);
+		if (array_key_exists('suppressed_problem', $data)) {
+			self::$eventids = CDBHelper::setTriggerProblem($data['suppressed_problem']);
+			$time = time()+10000;
+			DBexecute('INSERT INTO event_suppress (event_suppressid, eventid, maintenanceid, suppress_until) VALUES '.
+					'('.zbx_dbstr(self::$eventids[0]).', '.zbx_dbstr(self::$eventids[0]).', '.
+					zbx_dbstr(self::$maintenanceid).', '.zbx_dbstr($time).')');
+		}
+		else {
+			self::$eventids = CDBHelper::setTriggerProblem(self::ALL_TRIGGERS);
+		}
 
 		// Filter problems by Hosts and refresh page for alarm overlay to appear.
 		$table = $this->query('class:list-table')->asTable()->one();
@@ -652,7 +668,7 @@ class testFormAlarmNotification extends CWebTest {
 		$this->page->refresh()->waitUntilReady();
 
 		// Check that problems displayed in table.
-		$triggered_problems = (array_key_exists('trigger_problem', $data)) ? $data['trigger_problem'] : self::ALL_TRIGGERS;
+		$triggered_problems = (array_key_exists('suppressed_problem', $data)) ? $data['suppressed_problem'] : self::ALL_TRIGGERS;
 		$this->assertTableDataColumn($triggered_problems, 'Problem');
 
 		if ($data['trigger_name'] === '') {

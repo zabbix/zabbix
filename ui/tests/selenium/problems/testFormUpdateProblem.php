@@ -128,7 +128,7 @@ class testFormUpdateProblem extends CWebTest {
 		// Create problems and events.
 		$time = time();
 		foreach (CDataHelper::getIds('description') as $name => $id) {
-			CDBHelper::setTriggerProblem($name, TRIGGER_VALUE_TRUE, $time);
+			CDBHelper::setTriggerProblem([$name], TRIGGER_VALUE_TRUE, $time);
 		}
 
 		$eventids = [];

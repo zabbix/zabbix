@@ -229,7 +229,7 @@ class testGeomapWidgetScreenshots extends CWebTest {
 
 		// Create events and problems.
 		foreach (['Trigger Riga', 'Trigger Tallin', 'Trigger Vilnius', 'Trigger Oslo', 'Trigger Bergen'] as $name) {
-			CDBHelper::setTriggerProblem($name, TRIGGER_VALUE_TRUE);
+			CDBHelper::setTriggerProblem([$name], TRIGGER_VALUE_TRUE);
 		}
 	}
 

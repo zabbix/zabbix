@@ -112,7 +112,7 @@ class testFormFilterProblems extends testFormFilter {
 		];
 
 		foreach ($trigger_data as $params) {
-			CDBHelper::setTriggerProblem($params['name'], TRIGGER_VALUE_TRUE, ['clock' => $params['time']]);
+			CDBHelper::setTriggerProblem([$params['name']], TRIGGER_VALUE_TRUE, ['clock' => $params['time']]);
 		}
 	}
 
