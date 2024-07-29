@@ -13131,6 +13131,52 @@ static void	dc_status_update_apply_diff(zbx_dc_status_diff_t *diff)
 	config->status->last_update = time(NULL);
 }
 
+static int	get_active_item_count_rec(const ZBX_DC_ITEM *dc_item)
+{
+	int	count = 1;
+
+	if (NULL != dc_item->master_item)
+	{
+		for (int i = 0; i < dc_item->master_item->dep_itemids.values_num; i++)
+		{
+			ZBX_DC_ITEM	*dep_item;
+
+			if (NULL != (dep_item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items,
+					&dc_item->master_item->dep_itemids.values[i].first)) &&
+					ITEM_STATUS_ACTIVE == dep_item->status)
+			{
+				count += get_active_item_count_rec(dep_item);
+			}
+		}
+	}
+
+	return count;
+}
+
+static void	update_required_performance(const ZBX_DC_ITEM *dc_item, zbx_dc_status_diff_proxy_t *proxy_diff,
+		zbx_dc_status_diff_t *diff)
+{
+	int	delay;
+	char	*delay_s;
+
+	delay_s = dc_expand_user_and_func_macros_dyn(dc_item->delay, &dc_item->hostid, 1, ZBX_MACRO_ENV_NONSECURE);
+
+	if (SUCCEED == zbx_interval_preproc(delay_s, &delay, NULL, NULL) && 0 != delay)
+	{
+		int	item_count;
+
+		if (0 < (item_count = get_active_item_count_rec(dc_item)))
+		{
+			diff->required_performance += 1.0 / delay * item_count;
+
+			if (NULL != proxy_diff)
+				proxy_diff->required_performance += 1.0 / delay * item_count;
+		}
+	}
+
+	zbx_free(delay_s);
+}
+
 static void	get_host_statistics(ZBX_DC_HOST *dc_host, zbx_dc_status_diff_host_t *host_diff,
 		zbx_dc_status_diff_proxy_t *proxy_diff, zbx_dc_status_diff_t *diff)
 {
@@ -13150,25 +13196,8 @@ static void	get_host_statistics(ZBX_DC_HOST *dc_host, zbx_dc_status_diff_host_t 
 			case ITEM_STATUS_ACTIVE:
 				if (HOST_STATUS_MONITORED == dc_host->status)
 				{
-					if (SUCCEED == diff->reset)
-					{
-						int	delay;
-						char	*delay_s;
-
-						delay_s = dc_expand_user_and_func_macros_dyn(dc_item->delay,
-								&dc_item->hostid, 1, ZBX_MACRO_ENV_NONSECURE);
-
-						if (SUCCEED == zbx_interval_preproc(delay_s, &delay, NULL, NULL) &&
-								0 != delay)
-						{
-							diff->required_performance += 1.0 / delay;
-
-							if (NULL != proxy_diff)
-								proxy_diff->required_performance += 1.0 / delay;
-						}
-
-						zbx_free(delay_s);
-					}
+					if (SUCCEED == diff->reset && ITEM_TYPE_DEPENDENT != dc_item->type)
+						update_required_performance(dc_item, proxy_diff, diff);
 
 					switch (dc_item->state)
 					{
@@ -15474,7 +15503,7 @@ int	zbx_dc_register_config_session(zbx_uint64_t hostid, const char *token, zbx_u
 		/* one session cannot be updated at the same time by different processes,            */
 		/* so updating its properties without reallocating memory can be done with read lock */
 		session->last_id = session_config_revision;
-		session_local.lastaccess = now;
+		session->lastaccess = now;
 	}
 	*dc_revision = config->revision;
 	UNLOCK_CACHE;

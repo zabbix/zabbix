@@ -1264,6 +1264,7 @@ class testDashboardGaugeWidget extends testWidgets {
 		// Wait until widget with header appears on the Dashboard.
 		$dashboard->save();
 		$widget = $dashboard->waitUntilReady()->getWidget($header)->waitUntilReady();
+		$this->page->scrollDown();
 		$this->page->removeFocus();
 
 		// Wait until the gauge is animated.
