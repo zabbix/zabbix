@@ -28,10 +28,6 @@
 #include "zbxmutexs.h"
 #include "zbxbincommon.h"
 
-#ifndef _WINDOWS
-#	include "zbxnix.h"
-#endif
-
 static char	*config_pid_file = NULL;
 
 static char	*zbx_config_hosts_allowed = NULL;
