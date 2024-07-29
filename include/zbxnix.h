@@ -61,9 +61,6 @@ void	zbx_set_sigusr_handler(void (*handler)(int flags));
 void	zbx_signal_process_by_type(int proc_type, int proc_num, int flags, char **out);
 void	zbx_signal_process_by_pid(int pid, int flags, char **out);
 
-#ifndef _WINDOWS
-int	zbx_is_child_pid(pid_t pid, pid_t *child_pids, size_t child_pids_num);
-#endif
 /* daemon end */
 
 /* IPC start */
