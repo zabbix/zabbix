@@ -1260,14 +1260,20 @@ static int	wait_for_children(ZBX_THREAD_HANDLE *pids, size_t pids_num)
 
 	pid = wait(&ws);
 
+	if (-1 == pid)
+	{
+		if (EINTR != errno)
+		{
+			zabbix_log(LOG_LEVEL_ERR, "failed to wait on child processes: %s", zbx_strerror(errno));
+			zbx_set_exiting_with_fail();
+			return FAIL;
+		}
+
+		return SUCCEED;
+	}
+
 	if (FAIL == zbx_is_child_pid(pid, pids, pids_num))
 		return SUCCEED;
-
-	if (-1 == pid)
-		return SUCCEED;
-
-	if (EINTR != errno)
-		zbx_set_exiting_with_fail();
 
 	return FAIL;
 }
