@@ -175,23 +175,13 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 	 * are assigned to this axis.
 	 */
 	private static function toggleYAxes(array $fields): array {
-		$ds_left_y_axis_count = 0;
-		$ds_right_y_axis_count = 0;
+		$ds_y_axes = array_column($fields['ds'], 'axisy', 'axisy');
 
-		foreach ($fields['ds'] as $data_set) {
-			if ($data_set['axisy'] == GRAPH_YAXIS_SIDE_LEFT) {
-				$ds_left_y_axis_count++;
-			}
-			else {
-				$ds_right_y_axis_count++;
-			}
-		}
-
-		if ($fields['lefty'] == SVG_GRAPH_AXIS_SHOW && $ds_left_y_axis_count == 0) {
+		if ($fields['lefty'] == SVG_GRAPH_AXIS_SHOW && !array_key_exists(GRAPH_YAXIS_SIDE_LEFT, $ds_y_axes)) {
 			$fields['lefty'] = 0;
 		}
 
-		if ($fields['righty'] == SVG_GRAPH_AXIS_SHOW && $ds_right_y_axis_count == 0) {
+		if ($fields['righty'] == SVG_GRAPH_AXIS_SHOW && !array_key_exists(GRAPH_YAXIS_SIDE_RIGHT, $ds_y_axes)) {
 			$fields['righty'] = 0;
 		}
 
