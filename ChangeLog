@@ -1,7 +1,7 @@
 Changes for 7.0.2rc2
 
 Bug fixes:
-.......PS. [ZBX-24658] fixed host proxy mapping update on proxies with forced full configuration sync (wiper)
+.......PS. [ZBX-24658] fixed host-proxy mapping update on proxies with forced full configuration sync (wiper)
 A......... [ZBX-24683] fixed validation rules in event.get() and problem.get() methods (Sasha)
 ........S. [ZBX-24915] fixed housekeeper delete parameter (askolmeisters)
 
