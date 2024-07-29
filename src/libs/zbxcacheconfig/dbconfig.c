@@ -3550,8 +3550,8 @@ static void	make_item_unsupported_if_zero_pollers(ZBX_DC_ITEM *item, unsigned ch
 	if (0 == get_config_forks_cb(poller_type))
 	{
 		time_t		now = time(NULL);
-		zbx_timespec_t  ts = {now, 0};
-		char	*msg = zbx_dsprintf(NULL, "%s are disabled in configuration", start_poller_config_name);
+		zbx_timespec_t	ts = {now, 0};
+		char		*msg = zbx_dsprintf(NULL, "%s are disabled in configuration", start_poller_config_name);
 
 		zbx_dc_add_history(item->itemid, item->value_type, 0, NULL, &ts, ITEM_STATE_NOTSUPPORTED, msg);
 
@@ -3559,35 +3559,34 @@ static void	make_item_unsupported_if_zero_pollers(ZBX_DC_ITEM *item, unsigned ch
 	}
 }
 
-
 static void	process_zero_pollers_items(ZBX_DC_ITEM *item)
 {
 	switch (item->type)
 	{
 		case ITEM_TYPE_ZABBIX:
-			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_AGENT_POLLER, "AgentPollers");
+			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_AGENT_POLLER, "Agent Pollers");
 			break;
 		case ITEM_TYPE_JMX:
-			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_JAVAPOLLER, "JavaPollers");
+			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_JAVAPOLLER, "Java Pollers");
 			break;
 		case ITEM_TYPE_DB_MONITOR:
-			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_ODBCPOLLER, "ODBCPollers");
+			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_ODBCPOLLER, "ODBC Pollers");
 			break;
 		case ITEM_TYPE_HTTPAGENT:
 			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_HTTPAGENT_POLLER,
-					"HTTPAgentPollers");
+					"HTTPAgent Pollers");
 			break;
 		case ITEM_TYPE_SNMP:
-			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_SNMP_POLLER, "SNMPPollers");
+			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_SNMP_POLLER, "SNMP Pollers");
 			break;
 		case ITEM_TYPE_BROWSER:
-			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_BROWSERPOLLER, "BrowserPollers");
+			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_BROWSERPOLLER, "Browser Pollers");
 			break;
 		case ITEM_TYPE_SCRIPT:
 			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_POLLER, "Pollers");
 			break;
 		case ITEM_TYPE_IPMI:
-			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_IPMIPOLLER, "IPMIPollers");
+			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_IPMIPOLLER, "IPMI Pollers");
 			break;
 		default:
 			return;
