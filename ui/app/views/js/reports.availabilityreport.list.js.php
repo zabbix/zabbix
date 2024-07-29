@@ -1,3 +1,4 @@
+<?php declare(strict_types = 0);
 /*
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
@@ -12,23 +13,30 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-package main
 
-import (
-	"fmt"
+/**
+ * @var CView $this
+ */
 
-	"golang.zabbix.com/sdk/plugin/container"
-)
+?>
 
-func main() {
-	h, err := container.NewHandler(impl.Name())
-	if err != nil {
-		panic(fmt.Sprintf("failed to create plugin handler %s", err.Error()))
+<script>
+	const view = new class {
+
+		init({timeline}) {
+			document.getElementById('mode').addEventListener('change', (e) => {
+				e.target.closest('form').submit()
+			});
+
+			timeControl.addObject('availabilityreport', timeline, {
+				id: 'timeline_1',
+				domid: 'availabilityreport',
+				loadSBox: 0,
+				loadImage: 0,
+				dynamic: 0
+			});
+
+			timeControl.processObjects();
+		}
 	}
-	impl.Logger = &h
-
-	err = h.Execute()
-	if err != nil {
-		panic(fmt.Sprintf("failed to execute plugin handler %s", err.Error()))
-	}
-}
+</script>

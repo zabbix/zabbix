@@ -664,6 +664,14 @@ class CPage {
 	}
 
 	/**
+	 * Scroll down to the bottom of the page.
+	 */
+	public function scrollDown() {
+		$this->getDriver()->executeScript('document.getElementsByClassName(\'wrapper\')[0].scrollTo(0,'.
+				' document.body.scrollHeight)');
+	}
+
+	/**
 	 * Navigates back to the previous page.
 	 */
 	public function navigateBack() {

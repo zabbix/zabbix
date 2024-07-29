@@ -805,7 +805,6 @@ static int	proxyconfig_convert_value(const zbx_db_table_t *table, const zbx_db_f
 			break;
 		case ZBX_TYPE_CHAR:
 		case ZBX_TYPE_TEXT:
-		case ZBX_TYPE_SHORTTEXT:
 		case ZBX_TYPE_LONGTEXT:
 			if (NULL != value)
 				value_local.str = zbx_strdup(NULL, ZBX_NULL2EMPTY_STR(buf));
@@ -855,8 +854,6 @@ static int	proxyconfig_update_rows(zbx_table_data_t *td, char **error)
 
 	buf = (char *)zbx_malloc(NULL, buf_alloc);
 
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	for (i = 0; i < td->updates.values_num; i++)
 	{
 		char		delim = ' ';
@@ -898,7 +895,6 @@ static int	proxyconfig_update_rows(zbx_table_data_t *td, char **error)
 					break;
 				case ZBX_TYPE_CHAR:
 				case ZBX_TYPE_TEXT:
-				case ZBX_TYPE_SHORTTEXT:
 				case ZBX_TYPE_LONGTEXT:
 					value_esc = zbx_db_dyn_escape_string_len(buf, field->length);
 					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "'%s'", value_esc);
@@ -918,9 +914,7 @@ static int	proxyconfig_update_rows(zbx_table_data_t *td, char **error)
 			goto out;
 	}
 
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (16 < sql_offset && ZBX_DB_OK > zbx_db_execute("%s", sql))
+	if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
 		goto out;
 
 	ret = SUCCEED;
@@ -1041,7 +1035,6 @@ clean:
 				{
 					case ZBX_TYPE_CHAR:
 					case ZBX_TYPE_TEXT:
-					case ZBX_TYPE_SHORTTEXT:
 					case ZBX_TYPE_LONGTEXT:
 						zbx_free(values.values[j]->str);
 				}
