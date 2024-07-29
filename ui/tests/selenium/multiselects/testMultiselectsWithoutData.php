@@ -146,42 +146,38 @@ class testMultiselectsWithoutData extends testMultiselectDialogs {
 		return [
 			// #0 Trigger actions.
 			[
-				[
-					'source' => EVENT_SOURCE_TRIGGERS,
-					'tabs' => [
-						'Action' => [
-							'Conditions' => [
-								'Trigger' => [
-									'Triggers' => ['title' => 'Triggers', 'empty' => true, 'filter' => ['Host' => '']]
-								],
-								'Host' => self::HOSTS_MULTISELECT,
-								'Template' => self::TEMPLATES_MULTISELECT
-							]
-						],
+				'source' => EVENT_SOURCE_TRIGGERS,
+				'tabs' => [
+					'Action' => [
+						'Conditions' => [
+							'Trigger' => [
+								'Triggers' => ['title' => 'Triggers', 'empty' => true, 'filter' => ['Host' => '']]
+							],
+							'Host' => self::HOSTS_MULTISELECT,
+							'Template' => self::TEMPLATES_MULTISELECT
+						]
+					],
+					'Operations' => [
 						'Operations' => [
-							'Operations' => [
-								self::SCRIPT => self::HOSTS_MULTISELECT
-							],
-							'Recovery operations' => [
-								self::SCRIPT => self::HOSTS_MULTISELECT
-							],
-							'Update operations' => [
-								self::SCRIPT => self::HOSTS_MULTISELECT
-							]
+							self::SCRIPT => self::HOSTS_MULTISELECT
+						],
+						'Recovery operations' => [
+							self::SCRIPT => self::HOSTS_MULTISELECT
+						],
+						'Update operations' => [
+							self::SCRIPT => self::HOSTS_MULTISELECT
 						]
 					]
 				]
 			],
 			// #1 Service actions.
 			[
-				[
-					'source' => EVENT_SOURCE_SERVICE,
-					'tabs' => [
-						'Action' => [
-							'Conditions' => [
-								'Service' => [
-									'Services' => ['title' => 'Services', 'empty' => true, 'filter' => ['Name' => '']]
-								]
+				'source' => EVENT_SOURCE_SERVICE,
+				'tabs' => [
+					'Action' => [
+						'Conditions' => [
+							'Service' => [
+								'Services' => ['title' => 'Services', 'empty' => true, 'filter' => ['Name' => '']]
 							]
 						]
 					]
@@ -189,58 +185,52 @@ class testMultiselectsWithoutData extends testMultiselectDialogs {
 			],
 			// #2 Discovery actions.
 			[
-				[
-					'source' => EVENT_SOURCE_DISCOVERY,
-					'tabs' => [
-						'Action' => [
-							'Conditions' => [
-								'Proxy' => [
-									'Proxy' => ['title' => 'Proxies', 'empty' => true, 'filter' => null]
-								]
+				'source' => EVENT_SOURCE_DISCOVERY,
+				'tabs' => [
+					'Action' => [
+						'Conditions' => [
+							'Proxy' => [
+								'Proxy' => ['title' => 'Proxies', 'empty' => true, 'filter' => null]
 							]
-						],
+						]
+					],
+					'Operations' => [
 						'Operations' => [
-							'Operations' => [
-								'Link template' => self::TEMPLATES_MULTISELECT,
-								'Unlink template' => self::TEMPLATES_MULTISELECT,
-								self::SCRIPT => self::HOSTS_MULTISELECT
-							]
+							'Link template' => self::TEMPLATES_MULTISELECT,
+							'Unlink template' => self::TEMPLATES_MULTISELECT,
+							self::SCRIPT => self::HOSTS_MULTISELECT
 						]
 					]
 				]
 			],
 			// #3 Autoregistration actions.
 			[
-				[
-					'source' => EVENT_SOURCE_AUTOREGISTRATION,
-					'tabs' => [
-						'Action' => [
-							'Conditions' => [
-								'Proxy' => [
-									'Proxy' => ['title' => 'Proxies', 'empty' => true, 'filter' => null]
-								]
+				'source' => EVENT_SOURCE_AUTOREGISTRATION,
+				'tabs' => [
+					'Action' => [
+						'Conditions' => [
+							'Proxy' => [
+								'Proxy' => ['title' => 'Proxies', 'empty' => true, 'filter' => null]
 							]
-						],
+						]
+					],
+					'Operations' => [
 						'Operations' => [
-							'Operations' => [
-								'Link template' => self::TEMPLATES_MULTISELECT,
-								'Unlink template' => self::TEMPLATES_MULTISELECT,
-								self::SCRIPT => self::HOSTS_MULTISELECT
-							]
+							'Link template' => self::TEMPLATES_MULTISELECT,
+							'Unlink template' => self::TEMPLATES_MULTISELECT,
+							self::SCRIPT => self::HOSTS_MULTISELECT
 						]
 					]
 				]
 			],
 			// #4 Internal actions.
 			[
-				[
-					'source' => EVENT_SOURCE_INTERNAL,
-					'tabs' => [
-						'Action' => [
-							'Conditions' => [
-								'Host' => self::HOSTS_MULTISELECT,
-								'Template' => self::TEMPLATES_MULTISELECT
-							]
+				'source' => EVENT_SOURCE_INTERNAL,
+				'tabs' => [
+					'Action' => [
+						'Conditions' => [
+							'Host' => self::HOSTS_MULTISELECT,
+							'Template' => self::TEMPLATES_MULTISELECT
 						]
 					]
 				]
@@ -253,12 +243,12 @@ class testMultiselectsWithoutData extends testMultiselectDialogs {
 	 *
 	 * @dataProvider getActionOverlaysData
 	 */
-	public function testMultiselectsWithoutData_ActionOverlays($data) {
-		$this->page->login()->open('zabbix.php?action=action.list&filter_rst=1&eventsource='.$data['source']);
+	public function testMultiselectsWithoutData_ActionOverlays($source, $tabs) {
+		$this->page->login()->open('zabbix.php?action=action.list&filter_rst=1&eventsource='.$source);
 		$this->query('button:Create action')->one()->waitUntilClickable()->click();
 		$action_form = COverlayDialogElement::find()->all()->last()->waitUntilReady()->asForm();
 
-		foreach ($data['tabs'] as $tab => $fields) {
+		foreach ($tabs as $tab => $fields) {
 			$action_form->selectTab($tab);
 
 			foreach ($fields as $field => $options) {
