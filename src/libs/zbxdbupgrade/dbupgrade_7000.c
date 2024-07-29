@@ -51,7 +51,7 @@ static int	DBpatch_7000002(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_7010003(void)
+static int	DBpatch_7000003(void)
 {
 	return DBdrop_index("userdirectory_usrgrp", "userdirectory_usrgrp_3");
 }
