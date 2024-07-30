@@ -474,7 +474,7 @@ class testMultiselectsWithoutData extends testMultiselectDialogs {
 			[
 				[
 					'object' => 'Availability report',
-					'url' => 'zabbix.php?action=availabilityreport.list&filter_rst=1',
+					'url' => 'report2.php?filter_rst=1',
 					'checked_multiselects' => [self::HOSTS_MULTISELECT]
 				]
 			],
