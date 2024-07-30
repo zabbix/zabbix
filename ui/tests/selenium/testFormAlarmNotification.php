@@ -329,7 +329,7 @@ class testFormAlarmNotification extends CWebTest {
 	public function testFormAlarmNotification_CheckColorChange() {
 		// Trigger problem.
 		self::$eventids = CDBHelper::setTriggerProblem(self::ALL_TRIGGERS);
-		sleep(1);
+		sleep(2);
 
 		$severity_names = [
 			'Disaster' => '00FF00',
