@@ -31,17 +31,8 @@ class CWidgetClock extends CWidget {
 
 	static DEFAULT_LOCALE = 'en-US';
 
-	// Default font sizes (as part of widget height).
-	static DEFAULT_FONT_SIZE_DATE = 0.2;
-	static DEFAULT_FONT_SIZE_TIME = 0.3;
-	static DEFAULT_FONT_SIZE_TIMEZONE = 0.2;
-	static DEFAULT_FONT_SIZE_NO_DATA = 0.6;
-
-	// Minimum font sizes (in pixels) must be in same proportions as default font sizes (except for no data).
-	static MIN_FONT_SIZE_DATE = 12;
-	static MIN_FONT_SIZE_TIME = 18;
-	static MIN_FONT_SIZE_TIMEZONE = 12;
-	static MIN_FONT_SIZE_NO_DATA = 12;
+	static MIN_FONT_SIZE = 12;
+	static MIN_FONT_SIZE_BIG = 24;
 
 	static LINE_HEIGHT = 1.14;
 
@@ -265,20 +256,55 @@ class CWidgetClock extends CWidget {
 		if (this._is_enabled) {
 			const elements = [];
 
+			let ratio_date = 1;
+			let ratio_time = 1;
+			let ratio_timezone = 1;
+
+			let min_font_size_date = CWidgetClock.MIN_FONT_SIZE;
+			let min_font_size_time = CWidgetClock.MIN_FONT_SIZE;
+			let min_font_size_timezone = CWidgetClock.MIN_FONT_SIZE;
+
+			if (this._show.length === 2) {
+				const ratio_small = 0.17;
+				const ratio_big = 0.83;
+
+				if (this._show.includes(CWidgetClock.SHOW_DATE) && this._show.includes(CWidgetClock.SHOW_TIME)) {
+					ratio_date = ratio_small;
+					ratio_time = ratio_big;
+					min_font_size_time = CWidgetClock.MIN_FONT_SIZE_BIG;
+				}
+				else if (this._show.includes(CWidgetClock.SHOW_DATE) && this._show.includes(CWidgetClock.SHOW_TIMEZONE)) {
+					ratio_date = ratio_big;
+					ratio_timezone = ratio_small;
+					min_font_size_date = CWidgetClock.MIN_FONT_SIZE_BIG;
+				}
+				else if (this._show.includes(CWidgetClock.SHOW_TIME) && this._show.includes(CWidgetClock.SHOW_TIMEZONE)) {
+					ratio_time = ratio_big;
+					ratio_timezone = ratio_small;
+					min_font_size_time = CWidgetClock.MIN_FONT_SIZE_BIG;
+				}
+			}
+			else if (this._show.length === 3) {
+				ratio_date = 0.2;
+				ratio_time = 0.6;
+				ratio_timezone = 0.2;
+				min_font_size_time = CWidgetClock.MIN_FONT_SIZE_BIG;
+			}
+
 			if (this._show.includes(CWidgetClock.SHOW_DATE)) {
 				const element = this._target.querySelector('.clock-date');
 
 				if (element !== null) {
 					const font_size = Math.max(
-						CWidgetClock.MIN_FONT_SIZE_DATE,
-						max_height * CWidgetClock.DEFAULT_FONT_SIZE_DATE / CWidgetClock.LINE_HEIGHT
+						min_font_size_date,
+						max_height * ratio_date / CWidgetClock.LINE_HEIGHT
 					);
 					const font_weight = this._styles.date.bold ? 'bold' : '';
 					const width = this._getMeasuredTextWidth(element.textContent, font_size, font_weight);
 
 					element.style.fontSize = `${font_size}px`;
 
-					elements.push({element, width, font_size, min_font_size: CWidgetClock.MIN_FONT_SIZE_DATE});
+					elements.push({element, width, font_size, min_font_size: min_font_size_date});
 				}
 			}
 
@@ -287,15 +313,15 @@ class CWidgetClock extends CWidget {
 
 				if (element !== null) {
 					const font_size = Math.max(
-						CWidgetClock.MIN_FONT_SIZE_TIME,
-						max_height * CWidgetClock.DEFAULT_FONT_SIZE_TIME / CWidgetClock.LINE_HEIGHT
+						min_font_size_time,
+						max_height * ratio_time / CWidgetClock.LINE_HEIGHT
 					);
 					const font_weight = this._styles.time.bold ? 'bold' : '';
 					const width = this._getMeasuredTextWidth(element.textContent, font_size, font_weight);
 
 					element.style.fontSize = `${font_size}px`;
 
-					elements.push({element, width, font_size, min_font_size: CWidgetClock.MIN_FONT_SIZE_TIME});
+					elements.push({element, width, font_size, min_font_size: min_font_size_time});
 				}
 			}
 
@@ -304,15 +330,15 @@ class CWidgetClock extends CWidget {
 
 				if (element !== null) {
 					const font_size = Math.max(
-						CWidgetClock.MIN_FONT_SIZE_TIMEZONE,
-						max_height * CWidgetClock.DEFAULT_FONT_SIZE_TIMEZONE / CWidgetClock.LINE_HEIGHT
+						min_font_size_timezone,
+						max_height * ratio_timezone / CWidgetClock.LINE_HEIGHT
 					);
 					const font_weight = this._styles.timezone.bold ? 'bold' : '';
 					const width = this._getMeasuredTextWidth(element.textContent, font_size, font_weight);
 
 					element.style.fontSize = `${font_size}px`;
 
-					elements.push({element, width, font_size, min_font_size: CWidgetClock.MIN_FONT_SIZE_TIMEZONE});
+					elements.push({element, width, font_size, min_font_size: min_font_size_timezone});
 				}
 			}
 
@@ -337,7 +363,9 @@ class CWidgetClock extends CWidget {
 			const no_data_element = this._target.querySelector('.clock-disabled');
 
 			if (no_data_element !== null) {
-				let font_size = max_height * CWidgetClock.DEFAULT_FONT_SIZE_NO_DATA / CWidgetClock.LINE_HEIGHT;
+				const ratio = 0.6;
+
+				let font_size = max_height * ratio / CWidgetClock.LINE_HEIGHT;
 
 				const width = this._getMeasuredTextWidth(no_data_element.textContent, font_size, 'bold');
 
@@ -345,7 +373,7 @@ class CWidgetClock extends CWidget {
 					font_size *= max_width / width;
 				}
 
-				font_size = Math.max(CWidgetClock.MIN_FONT_SIZE_NO_DATA, font_size);
+				font_size = Math.max(CWidgetClock.MIN_FONT_SIZE, font_size);
 
 				no_data_element.style.fontSize = `${font_size}px`;
 			}
