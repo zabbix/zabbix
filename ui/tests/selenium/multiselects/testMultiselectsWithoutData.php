@@ -14,7 +14,6 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../common/testMultiselectDialogs.php';
 
 /**
@@ -33,10 +32,10 @@ class testMultiselectsWithoutData extends testMultiselectDialogs {
 	const SCRIPT = 'Script for Actions';
 	const TEMPLATES_MULTISELECT = ['Templates' => ['title' => 'Templates', 'empty' => true, 'filter' => ['Template group' => '']]];
 	const HOSTS_MULTISELECT = ['Hosts' => ['title' => 'Hosts', 'empty' => true, 'filter' => ['Host group' => '']]];
-	public static $empty_hostid;
-	public static $empty_templateid;
-	public static $host_lldid;
-	public static $template_lldid;
+	protected static $empty_hostid;
+	protected static $empty_templateid;
+	protected static $host_lldid;
+	protected static $template_lldid;
 
 	/**
 	 * Attach TableBehavior to the test.

@@ -17,7 +17,7 @@
 require_once dirname(__FILE__).'/../include/CWebTest.php';
 
 /**
- * Test for checking empty pages, overlays and tables.
+ * Test for checking empty pages and tables.
  *
  * @onBefore prepareEmptyData
  *
@@ -29,10 +29,10 @@ class testPagesWithoutData extends CWebTest {
 	const EMPTY_LLD_HOST = 'Host with empty LLD';
 	const EMPTY_TEMPLATE = 'Empty template for multiselects test';
 	const EMPTY_LLD_TEMPLATE = 'Template with empty LLD';
-	public static $empty_hostid;
-	public static $empty_templateid;
-	public static $host_lldid;
-	public static $template_lldid;
+	protected static $empty_hostid;
+	protected static $empty_templateid;
+	protected static $host_lldid;
+	protected static $template_lldid;
 
 	/**
 	 * Attach TableBehavior to the test.
@@ -218,14 +218,14 @@ class testPagesWithoutData extends CWebTest {
 			[
 				[
 					'page' => 'SLA',
-					'url' => 'zabbix.php?action=sla.list',
+					'url' => 'zabbix.php?action=sla.list'
 				]
 			],
 			// #19 Empty SLA report page.
 			[
 				[
 					'page' => 'SLA report',
-					'url' => 'zabbix.php?action=slareport.list',
+					'url' => 'zabbix.php?action=slareport.list'
 				]
 			],
 			// #20 Empty Top 100 triggers page.
