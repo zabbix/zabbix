@@ -340,12 +340,8 @@ class testFormAlarmNotification extends CWebTest {
 			'Not classified' => 'FF0080'
 		];
 
-		$this->page->login()->open('zabbix.php?action=problem.view&filter_reset=1')->waitUntilReady();
-		$this->page->open('zabbix.php?action=problem.view&unacknowledged=1&sort=name&sortorder=ASC&hostids%5B%5D='.
-				self::$hostid)->waitUntilReady();
-
 		// Open Trigger displaying options page for color check and change.
-		$this->page->open('zabbix.php?action=trigdisplay.edit')->waitUntilReady();
+		$this->page->login()->open('zabbix.php?action=trigdisplay.edit')->waitUntilReady();
 		$form = $this->query('id:trigdisplay-form')->asForm()->one();
 
 		// Find actual colors for all severity levels.
