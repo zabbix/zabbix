@@ -17,22 +17,24 @@
 require_once dirname(__FILE__).'/../common/testLowLevelDiscovery.php';
 
 /**
- * @backup hosts
- *
  * @onBefore prepareLLDData
+ *
+ * @onAfter deleteData
  */
 class testFormLowLevelDiscoveryFromHost extends testLowLevelDiscovery {
 
+	protected static $groupid;
 	protected static $hostid;
 	protected static $empty_hostid;
 	protected static $interfaces_hostid;
 	protected static $update_lld = 'LLD for update scenario';
 
 	public function prepareLLDData() {
+		static::$groupid = CDataHelper::call('hostgroup.create', [['name' => 'Host group for lld']])['groupids'][0];
 		$result = CDataHelper::createHosts([
 			[
 				'host' => 'Host for LLD form test with all interfaces',
-				'groups' => ['groupid' => 4], // Zabbix servers.
+				'groups' => ['groupid' => static::$groupid],
 				'items' => [
 					[
 						'name' => 'Master item',
@@ -103,11 +105,11 @@ class testFormLowLevelDiscoveryFromHost extends testLowLevelDiscovery {
 			],
 			[
 				'host' => 'Empty host without interfaces',
-				'groups' => ['groupid' => 4] // Zabbix servers.
+				'groups' => ['groupid' => static::$groupid]
 			],
 			[
 				'host' => 'Host for LLD form test',
-				'groups' => ['groupid' => 4], // Zabbix servers.
+				'groups' => ['groupid' => static::$groupid],
 				'interfaces' => [
 					[
 						'type' => INTERFACE_TYPE_AGENT,
@@ -126,14 +128,8 @@ class testFormLowLevelDiscoveryFromHost extends testLowLevelDiscovery {
 						'delay' => 30
 					],
 					[
-						'name' => 'LLD for clone scenario',
-						'key_' => 'vfs.fs.discovery3',
-						'type' => ITEM_TYPE_ZABBIX,
-						'delay' => 30
-					],
-					[
-						'name' => 'LLD for simple update scenario',
-						'key_' => 'update_key',
+						'name' => self::SIMPLE_UPDATE_CLONE_LLD,
+						'key_' => 'simple_update_clone_key',
 						'type' => ITEM_TYPE_HTTPAGENT,
 						'delay' => '1h;wd1-2h7-14',
 						'url' => 'https://www.test.com/search',
@@ -290,6 +286,13 @@ class testFormLowLevelDiscoveryFromHost extends testLowLevelDiscovery {
 	 */
 	public function testFormLowLevelDiscoveryFromHost_Cancel($data) {
 		$this->checkCancel($data);
+	}
+
+	/**
+	 * @dataProvider getCloneData
+	 */
+	public function testFormLowLevelDiscoveryFromHost_Clone($data) {
+		$this->checkClone($data);
 	}
 
 	public function testFormLowLevelDiscoveryFromHost_Delete() {
