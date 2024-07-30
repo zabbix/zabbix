@@ -1249,7 +1249,7 @@ static void	signal_redirect_cb(int flags, zbx_signal_handler_f sigusr_handler)
 #endif
 
 #ifndef _WINDOWS
-static int	wait_for_children(ZBX_THREAD_HANDLE *pids, size_t pids_num)
+static int	wait_for_children(const ZBX_THREAD_HANDLE *pids, size_t pids_num)
 {
 	int	ws;
 	pid_t	pid;

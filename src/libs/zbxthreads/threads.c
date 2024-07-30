@@ -85,16 +85,14 @@ void	zbx_child_fork(pid_t *pid)
 		signal(SIGCHLD, SIG_DFL);
 }
 
-int	zbx_is_child_pid(pid_t pid, pid_t *child_pids, size_t child_pids_num)
+int	zbx_is_child_pid(pid_t pid, const pid_t *child_pids, size_t child_pids_num)
 {
 	size_t	i;
 
 	for (i = 0; i < child_pids_num; i++)
 	{
 		if (pid == child_pids[i])
-		{
 			return SUCCEED;
-		}
 	}
 
 	return FAIL;

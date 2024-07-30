@@ -60,7 +60,6 @@ void	zbx_set_sigusr_handler(void (*handler)(int flags));
 
 void	zbx_signal_process_by_type(int proc_type, int proc_num, int flags, char **out);
 void	zbx_signal_process_by_pid(int pid, int flags, char **out);
-
 /* daemon end */
 
 /* IPC start */
@@ -125,7 +124,7 @@ void	zbx_unset_exit_on_terminate(void);
 
 void	zbx_log_exit_signal(void);
 void	zbx_set_on_exit_args(void *args);
-void    zbx_set_child_pids(pid_t *pids, size_t pid_num);
+void	zbx_set_child_pids(const pid_t *pids, size_t pid_num);
 /* sighandler end */
 
 int	zbx_parse_rtc_options(const char *opt, int *message);

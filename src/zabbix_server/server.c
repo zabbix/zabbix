@@ -2104,9 +2104,9 @@ static void	server_restart_ha(zbx_rtc_t *rtc)
 
 int	MAIN_ZABBIX_ENTRY(int flags)
 {
-	char		*error = NULL, *smtp_auth_feature_status = NULL;
-	int		i, db_type, ha_status_old;
-	pid_t		pid;
+	char	*error = NULL, *smtp_auth_feature_status = NULL;
+	int	i, db_type, ha_status_old;
+	pid_t	pid;
 
 	zbx_socket_t		listen_sock = {0};
 	time_t			standby_warning_time;

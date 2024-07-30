@@ -27,8 +27,8 @@
 
 static int	sig_parent_pid = -1;
 
-static pid_t	*child_pids = NULL;
-static size_t	child_pid_count = 0;
+static const pid_t	*child_pids = NULL;
+static size_t		child_pid_count = 0;
 
 void	set_sig_parent_pid(int in)
 {
@@ -393,7 +393,7 @@ void	zbx_set_on_exit_args(void *args)
 	zbx_on_exit_args = args;
 }
 
-void	zbx_set_child_pids(pid_t *pids, size_t pid_num)
+void	zbx_set_child_pids(const pid_t *pids, size_t pid_num)
 {
 	child_pids = pids;
 	child_pid_count = pid_num;
