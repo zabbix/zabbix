@@ -262,6 +262,10 @@ class CWebTest extends CTest {
 			self::closePage();
 		}
 
+		if (self::$shared_page) {
+			self::$shared_page->open('setup.php');
+		}
+
 		parent::onAfterTestCase();
 	}
 
