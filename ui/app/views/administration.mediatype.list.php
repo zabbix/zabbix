@@ -123,6 +123,10 @@ foreach ($data['mediatypes'] as $mediaType) {
 			$actionLinks[] = ', ';
 		}
 		array_pop($actionLinks);
+
+		if ($mediaType['action_count_total'] > count($mediaType['listOfActions'])) {
+			$actionLinks[] = [', ', HELLIP()];
+		}
 	}
 	else {
 		$actionLinks = '';
