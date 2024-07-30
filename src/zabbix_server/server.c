@@ -2508,6 +2508,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				zbx_set_exiting_with_fail();
 				break;
 			}
+			else
+				zabbix_log(LOG_LEVEL_TRACE, "indirect child process exitted");
 		}
 
 		if (-1 == pid && EINTR != errno)
