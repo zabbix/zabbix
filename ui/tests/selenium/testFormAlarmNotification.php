@@ -329,6 +329,7 @@ class testFormAlarmNotification extends CWebTest {
 	public function testFormAlarmNotification_CheckColorChange() {
 		// Trigger problem.
 		self::$eventids = CDBHelper::setTriggerProblem(self::ALL_TRIGGERS);
+		sleep(1);
 
 		$severity_names = [
 			'Disaster' => '00FF00',
@@ -469,6 +470,7 @@ class testFormAlarmNotification extends CWebTest {
 	public function testFormAlarmNotification_DisplayedAlarms($data) {
 		// Trigger problem.
 		self::$eventids = CDBHelper::setTriggerProblem($data['trigger_name']);
+		sleep(1);
 
 		$this->page->login()->open('zabbix.php?action=problem.view&filter_reset=1')->waitUntilReady();
 		$this->page->open('zabbix.php?action=problem.view&unacknowledged=1&sort=name&sortorder=ASC&hostids%5B%5D='.
