@@ -93,6 +93,10 @@ class CControllerMediatypeList extends CController {
 			foreach ($data['mediatypes'] as &$media_type) {
 				$media_type['typeid'] = $media_type['type'];
 				$media_type['type'] = CMediatypeHelper::getMediaTypes($media_type['type']);
+				$media_type['action_count_total'] = count($media_type['actions']);
+				$media_type['actions'] = array_slice($media_type['actions'], 0,
+					CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE)
+				);
 			}
 			unset($media_type);
 

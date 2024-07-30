@@ -127,24 +127,23 @@ foreach ($data['mediatypes'] as $media_type) {
 	}
 
 	// action list
-	$action_links = [];
+	$actions = [];
 
-	if (count($media_type['actions']) > 0) {
+	if ($media_type['actions']) {
 		foreach ($media_type['actions'] as $action) {
-			$action_links[] = (new CLink($action['name']))
+			$actions[] = (new CLink($action['name']))
 				->addClass('js-action-edit')
 				->setAttribute('data-actionid', $action['actionid'])
 				->setAttribute('data-eventsource', $action['eventsource']);
-
-			$action_links[] = ', ';
+			$actions[] = ', ';
 		}
-		array_pop($action_links);
-	}
-	else {
-		$action_links = '';
-	}
 
-	$action_column = (new CCol($action_links))->addStyle('white-space: normal;');
+		array_pop($actions);
+
+		if ($media_type['action_count_total'] > count($media_type['actions'])) {
+			$actions[] = [', ', HELLIP()];
+		}
+	}
 
 	$status = (MEDIA_TYPE_STATUS_ACTIVE == $media_type['status'])
 		? (new CLink(_('Enabled')))
@@ -175,7 +174,7 @@ foreach ($data['mediatypes'] as $media_type) {
 		(new CCol($name))->addClass(ZBX_STYLE_NOWRAP),
 		CMediatypeHelper::getMediaTypes($media_type['typeid']),
 		$status,
-		$action_column,
+		$actions,
 		$details,
 		$test_link
 	]);
@@ -186,7 +185,6 @@ $media_type_form->addItem([
 	$media_type_table,
 	new CActionButtonList('action', 'mediatypeids', [
 		'mediatype.enable' => [
-
 			'content' => (new CSimpleButton(_('Enable')))
 				->addClass(ZBX_STYLE_BTN_ALT)
 				->setId('js-massenable')
