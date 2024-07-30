@@ -1775,6 +1775,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	else
 		rtc_process_request_func = rtc_process_request_ex_proxy;
 
+	zbx_set_child_pids(zbx_threads, zbx_threads_num);
+
 	for (i = 0; i < zbx_threads_num; i++)
 	{
 		if (FAIL == get_process_info_by_thread(i + 1, &thread_args.info.process_type,
@@ -1906,7 +1908,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		}
 	}
 
-	zbx_set_child_pids(zbx_threads, zbx_threads_num);
 	zbx_unset_exit_on_terminate();
 
 	while (ZBX_IS_RUNNING())
