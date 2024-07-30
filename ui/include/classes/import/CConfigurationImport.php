@@ -1792,18 +1792,21 @@ class CConfigurationImport {
 		$triggers_to_process_dependencies = [];
 
 		foreach ($this->getFormattedTriggers() as $trigger) {
-			$triggerid = null;
-			$hostids = $this->extractProcessedHostids($trigger);
+			$hostids = $this->extractHostids($trigger);
 
 			if (!$hostids) {
 				continue;
 			}
 
-			foreach ($hostids as $hostid) {
-				$is_template_trigger = $this->importedObjectContainer->isTemplateProcessed($hostid);
+			$triggerid = null;
+			$is_template_trigger = false;
 
-				if ($is_template_trigger) {
-					break;
+			foreach ($hostids as $hostid) {
+				if ($this->importedObjectContainer->isTemplateProcessed($hostid)) {
+					$is_template_trigger = true;
+				}
+				elseif (!$this->importedObjectContainer->isHostProcessed($hostid)) {
+					continue 2;
 				}
 			}
 
@@ -1856,7 +1859,7 @@ class CConfigurationImport {
 		$this->processTriggerDependencies($triggers_to_process_dependencies);
 	}
 
-	private function extractProcessedHostids(array $trigger): array {
+	private function extractHostids(array $trigger): array {
 		$expression_parser = new CExpressionParser(['usermacros' => true]);
 
 		if ($expression_parser->parse($trigger['expression']) != CParser::PARSE_SUCCESS) {
@@ -1877,8 +1880,7 @@ class CConfigurationImport {
 		foreach (array_unique($hosts) as $host) {
 			$hostid = $this->referencer->findTemplateidOrHostidByHost($host);
 
-			if ($hostid === null || (!$this->importedObjectContainer->isHostProcessed($hostid)
-					&& !$this->importedObjectContainer->isTemplateProcessed($hostid))) {
+			if ($hostid === null) {
 				return [];
 			}
 
