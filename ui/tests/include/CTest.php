@@ -268,7 +268,7 @@ class CTest extends TestCase {
 	 * @before
 	 */
 	public function onBeforeTestCase() {
-		var_dump(time().' - time before test');
+		var_dump(microtime().' - time before test');
 		global $DB;
 		static $suite = null;
 		$class_name = get_class($this);
@@ -387,7 +387,7 @@ class CTest extends TestCase {
 	 * @after
 	 */
 	public function onAfterTestCase() {
-		var_dump(time().' - time after test case');
+		var_dump(microtime().' - time after test case');
 		$errors = @file_get_contents(PHPUNIT_ERROR_LOG);
 
 		if ($this->case_backup_config) {
