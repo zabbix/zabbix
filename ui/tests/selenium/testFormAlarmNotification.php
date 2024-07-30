@@ -327,7 +327,8 @@ class testFormAlarmNotification extends CWebTest {
 	 * Check that colors displayed in alarm notification overlay are the same as in configuration.
 	 */
 	public function testFormAlarmNotification_CheckColorChange() {
-
+		// Trigger problem.
+		self::$eventids = CDBHelper::setTriggerProblem(self::ALL_TRIGGERS);
 
 		$severity_names = [
 			'Disaster' => '00FF00',
@@ -348,14 +349,6 @@ class testFormAlarmNotification extends CWebTest {
 			$field = $form->getField($severity_name);
 			$default_colors[] = $field->query(self::DEFAULT_COLORPICKER.'/button')->one()->getCSSValue('background-color');
 		}
-
-		// Trigger problem.
-		self::$eventids = CDBHelper::setTriggerProblem(self::ALL_TRIGGERS);
-		sleep(1);
-
-		// Refresh page for alarm overlay to appear.
-		$this->page->refresh()->waitUntilReady();
-		$form->invalidate();
 
 		// Compare colors in alarm and in form.
 		$alarm_colors = $this->getAlarmColors();
@@ -459,16 +452,12 @@ class testFormAlarmNotification extends CWebTest {
 
 	/**
 	 * Check that alarms displayed in alarm notification overlay.
-	 * Ignore browser errors annotation is required due to - sometimes errors appears when triggering problems
-	 * and events directly from database after refreshing browser.
 	 *
 	 * @dataProvider getDisplayedAlarmsData
-	 * @ignoreBrowserErrors
 	 */
 	public function testFormAlarmNotification_DisplayedAlarms($data) {
 		// Trigger problem.
 		self::$eventids = CDBHelper::setTriggerProblem($data['trigger_name']);
-		sleep(1);
 
 		$this->page->login()->open('zabbix.php?action=problem.view&filter_reset=1')->waitUntilReady();
 		$this->page->open('zabbix.php?action=problem.view&unacknowledged=1&sort=name&sortorder=ASC&hostids%5B%5D='.
@@ -478,7 +467,6 @@ class testFormAlarmNotification extends CWebTest {
 		$table = $this->query('class:list-table')->asTable()->one();
 		$this->query('name:zbx_filter')->asForm()->one()->fill(['Hosts' => self::HOST_NAME])->submit();
 		$table->waitUntilReloaded();
-		$this->page->refresh()->waitUntilReady();
 
 		// Check that problems displayed in table.
 		$this->assertTableDataColumn($data['trigger_name'], 'Problem');
