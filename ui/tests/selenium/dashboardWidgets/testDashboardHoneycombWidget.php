@@ -254,8 +254,8 @@ class testDashboardHoneycombWidget extends testWidgets {
 		$maintenanceid = $maintenances['maintenanceids'][0];
 
 		DBexecute('UPDATE hosts SET maintenanceid='.zbx_dbstr($maintenanceid).
-			', maintenance_status=1, maintenance_type='.MAINTENANCE_TYPE_NORMAL.', maintenance_from='.zbx_dbstr(time()-1000).
-			' WHERE hostid='.zbx_dbstr($maintenance_hostid)
+				', maintenance_status=1, maintenance_type='.MAINTENANCE_TYPE_NORMAL.', maintenance_from='.zbx_dbstr(time()-1000).
+				' WHERE hostid='.zbx_dbstr($maintenance_hostid)
 		);
 
 		CDataHelper::call('dashboard.create', [
@@ -1418,8 +1418,9 @@ class testDashboardHoneycombWidget extends testWidgets {
 			self::$old_widget_count = CDashboardElement::find()->waitUntilReady()->one()->getWidgets()->count();
 		}
 
-		$this->fillWidgetForm($data, 'create');
-		$this->checkWidgetForm($data, 'create');
+		$dashboard = CDashboardElement::find()->waitUntilReady()->one();
+		$this->fillWidgetForm($data, 'create', $dashboard);
+		$this->checkWidgetForm($data, 'create', $dashboard);
 	}
 
 	/**
@@ -1499,8 +1500,9 @@ class testDashboardHoneycombWidget extends testWidgets {
 			self::$old_widget_count = CDashboardElement::find()->waitUntilReady()->one()->getWidgets()->count();
 		}
 
-		$this->fillWidgetForm($data, 'update');
-		$this->checkWidgetForm($data, 'update');
+		$dashboard = CDashboardElement::find()->waitUntilReady()->one();
+		$this->fillWidgetForm($data, 'update', $dashboard);
+		$this->checkWidgetForm($data, 'update', $dashboard);
 	}
 
 	/**
@@ -1522,9 +1524,9 @@ class testDashboardHoneycombWidget extends testWidgets {
 		// Check that widget is not present on dashboard and in DB.
 		$this->assertFalse($dashboard->getWidget($widget_name, false)->isValid());
 		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM widget_field wf'.
-			' LEFT JOIN widget w'.
-			' ON w.widgetid=wf.widgetid'.
-			' WHERE w.name='.zbx_dbstr($widget_name)
+				' LEFT JOIN widget w'.
+				' ON w.widgetid=wf.widgetid'.
+				' WHERE w.name='.zbx_dbstr($widget_name)
 		));
 	}
 
@@ -1793,8 +1795,8 @@ class testDashboardHoneycombWidget extends testWidgets {
 	public function testDashboardHoneycombWidget_Display($data) {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
 				self::$disposable_dashboard_id)->waitUntilReady();
-		$this->fillWidgetForm($data, 'update');
 		$dashboard = CDashboardElement::find()->waitUntilReady()->one();
+		$this->fillWidgetForm($data, 'update', $dashboard);
 		$dashboard->save();
 
 		// Check message that dashboard saved.
@@ -2258,8 +2260,8 @@ class testDashboardHoneycombWidget extends testWidgets {
 	public function testDashboardHoneycombWidget_CheckFiltering($data) {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
 				self::$disposable_dashboard_id)->waitUntilReady();
-		$this->fillWidgetForm($data, 'update');
 		$dashboard = CDashboardElement::find()->waitUntilReady()->one();
+		$this->fillWidgetForm($data, 'update', $dashboard);
 		$dashboard->save();
 
 		// Check message that dashboard saved.
@@ -2297,12 +2299,11 @@ class testDashboardHoneycombWidget extends testWidgets {
 	/**
 	 * Create or update Honeycomb widget.
 	 *
-	 * @param array   $data  	data provider
-	 * @param string  $action	create/update honeycomb widget
+	 * @param array             $data         data provider
+	 * @param string            $action       create/update honeycomb widget
+	 * @param CDashboardElement $dashboard    given dashboard
 	 */
-	protected function fillWidgetForm($data, $action) {
-		$dashboard = CDashboardElement::find()->waitUntilReady()->one();
-
+	protected function fillWidgetForm($data, $action, $dashboard) {
 		$form = ($action === 'create')
 			? $dashboard->edit()->addWidget()->asForm()
 			: $dashboard->getWidget('UpdateHoneycomb')->edit();
@@ -2328,12 +2329,11 @@ class testDashboardHoneycombWidget extends testWidgets {
 	/**
 	 * Check created or updated Honeycomb widget.
 	 *
-	 * @param array   $data  	data provider
-	 * @param string  $action	create/update honeycomb widget
+	 * @param array             $data         data provider
+	 * @param string            $action       create/update honeycomb widget
+	 * @param CDashboardElement $dashboard    given dashboard
 	 */
-	protected function checkWidgetForm($data, $action) {
-		$dashboard = CDashboardElement::find()->waitUntilReady()->one();
-
+	protected function checkWidgetForm($data, $action, $dashboard) {
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			$this->assertMessage(TEST_BAD, null, $data['error_message']);
 			COverlayDialogElement::find()->one()->close();
@@ -2381,7 +2381,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 	/**
 	 * Add or Check tags in Honeycomb widget.
 	 *
-	 * @param array  $tags      given tags
+	 * @param array   $tags     given tags
 	 * @param boolean $check    check tags' values after creation or not
 	 */
 	protected function addOrCheckTags($tags, $check = true) {
