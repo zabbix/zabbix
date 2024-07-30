@@ -653,6 +653,8 @@ class testFormAlarmNotification extends CWebTest {
 		if (array_key_exists('suppressed_problem', $data)) {
 			self::$eventids = CDBHelper::setTriggerProblem($data['suppressed_problem']);
 			$time = time()+10000;
+
+			// To check that suppressed notification can be visible after profile settings change.
 			DBexecute('INSERT INTO event_suppress (event_suppressid, eventid, maintenanceid, suppress_until) VALUES '.
 					'('.zbx_dbstr(self::$eventids[0]).', '.zbx_dbstr(self::$eventids[0]).', '.
 					zbx_dbstr(self::$maintenanceid).', '.zbx_dbstr($time).')');
