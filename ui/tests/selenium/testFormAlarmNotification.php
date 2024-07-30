@@ -327,6 +327,9 @@ class testFormAlarmNotification extends CWebTest {
 	 * Check that colors displayed in alarm notification overlay are the same as in configuration.
 	 */
 	public function testFormAlarmNotification_CheckColorChange() {
+		// Trigger problem.
+		self::$eventids = CDBHelper::setTriggerProblem(self::ALL_TRIGGERS);
+
 		$severity_names = [
 			'Disaster' => '00FF00',
 			'High' => '00FF00',
@@ -339,9 +342,6 @@ class testFormAlarmNotification extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=problem.view&filter_reset=1')->waitUntilReady();
 		$this->page->open('zabbix.php?action=problem.view&unacknowledged=1&sort=name&sortorder=ASC&hostids%5B%5D='.
 				self::$hostid)->waitUntilReady();
-
-		// Trigger problem.
-		self::$eventids = CDBHelper::setTriggerProblem(self::ALL_TRIGGERS);
 
 		// Open Trigger displaying options page for color check and change.
 		$this->page->open('zabbix.php?action=trigdisplay.edit')->waitUntilReady();
@@ -467,12 +467,12 @@ class testFormAlarmNotification extends CWebTest {
 	 * @ignoreBrowserErrors
 	 */
 	public function testFormAlarmNotification_DisplayedAlarms($data) {
+		// Trigger problem.
+		self::$eventids = CDBHelper::setTriggerProblem($data['trigger_name']);
+
 		$this->page->login()->open('zabbix.php?action=problem.view&filter_reset=1')->waitUntilReady();
 		$this->page->open('zabbix.php?action=problem.view&unacknowledged=1&sort=name&sortorder=ASC&hostids%5B%5D='.
 				self::$hostid)->waitUntilReady();
-
-		// Trigger problem.
-		self::$eventids = CDBHelper::setTriggerProblem($data['trigger_name']);
 
 		// Filter problems by Hosts and refresh page for alarm overlay to appear.
 		$table = $this->query('class:list-table')->asTable()->one();
