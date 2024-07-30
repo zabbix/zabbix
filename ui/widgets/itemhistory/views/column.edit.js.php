@@ -89,7 +89,7 @@ window.item_history_column_edit = new class {
 					});
 
 				if (name_field.value === '' || name_field.value === current_item_name) {
-					current_item_name = ms_item_data[0].name;
+					current_item_name = ms_item_data[0].prefix + ms_item_data[0].name;
 
 					if (templateid !== '') {
 						current_item_name = current_item_name.substring(
