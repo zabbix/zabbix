@@ -327,9 +327,7 @@ class testFormAlarmNotification extends CWebTest {
 	 * Check that colors displayed in alarm notification overlay are the same as in configuration.
 	 */
 	public function testFormAlarmNotification_CheckColorChange() {
-		// Trigger problem.
-		self::$eventids = CDBHelper::setTriggerProblem(self::ALL_TRIGGERS);
-		sleep(2);
+
 
 		$severity_names = [
 			'Disaster' => '00FF00',
@@ -350,6 +348,10 @@ class testFormAlarmNotification extends CWebTest {
 			$field = $form->getField($severity_name);
 			$default_colors[] = $field->query(self::DEFAULT_COLORPICKER.'/button')->one()->getCSSValue('background-color');
 		}
+
+		// Trigger problem.
+		self::$eventids = CDBHelper::setTriggerProblem(self::ALL_TRIGGERS);
+		sleep(1);
 
 		// Refresh page for alarm overlay to appear.
 		$this->page->refresh()->waitUntilReady();
