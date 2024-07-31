@@ -183,11 +183,13 @@ window.tophosts_column_edit_form = new class {
 	 * Fetch type of item by item name.
 	 *
 	 * @param {string|null} name
+	 * @param {number|null} groupid  Host group id from widget main configuration form fields.
+	 * @param {number|null} hostid   Host id from widget main configuration form fields.
 	 *
 	 * @return {Promise<any>}  Resolved promise will contain item type of first found item of such name,
 	 *                         or null in case of error or if no item is currently selected.
 	 */
-	#promiseGetItemType(name) {
+	#promiseGetItemType(name, groupid = null, hostid = null) {
 		if (name === null) {
 			return Promise.resolve(null);
 		}
@@ -197,6 +199,8 @@ window.tophosts_column_edit_form = new class {
 		curl.setArgument('method', 'item_value_type_by_name.get');
 		curl.setArgument('type', <?= PAGE_TYPE_TEXT_RETURN_JSON ?>);
 		curl.setArgument('name', name);
+		curl.setArgument('groupid', groupid);
+		curl.setArgument('hostid', hostid);
 
 		return fetch(curl.getUrl())
 			.then((response) => response.json())
