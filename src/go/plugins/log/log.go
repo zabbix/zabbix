@@ -32,8 +32,7 @@ import (
 var impl Plugin
 
 type Options struct {
-	plugin.SystemOptions `conf:"optional"`
-	MaxLinesPerSecond    int `conf:"range=1:1000,default=20"`
+	MaxLinesPerSecond int `conf:"range=1:1000,default=20"`
 }
 
 // Plugin -
@@ -64,7 +63,7 @@ func init() {
 }
 
 func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
-	if err := conf.Unmarshal(options, &p.options); err != nil {
+	if err := conf.Unmarshal(options, &p.options, true); err != nil {
 		p.Warningf("cannot unmarshal configuration options: %s", err)
 	}
 
@@ -73,7 +72,13 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 
 func (p *Plugin) Validate(options interface{}) error {
 	var o Options
-	return conf.Unmarshal(options, &o)
+
+	err := conf.Unmarshal(options, &o, true)
+	if err != nil {
+		return errs.Errorf("plugin config validation failed, %s", err.Error())
+	}
+
+	return nil
 }
 
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {

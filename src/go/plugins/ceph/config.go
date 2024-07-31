@@ -16,6 +16,7 @@ package ceph
 
 import (
 	"golang.zabbix.com/sdk/conf"
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/plugin"
 )
 
@@ -54,7 +55,7 @@ type PluginOptions struct {
 // Configure implements the Configurator interface.
 // Initializes configuration structures.
 func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
-	if err := conf.Unmarshal(options, &p.options); err != nil {
+	if err := conf.Unmarshal(options, &p.options, true); err != nil {
 		p.Errf("cannot unmarshal configuration options: %s", err)
 	}
 
@@ -68,5 +69,10 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 func (p *Plugin) Validate(options interface{}) error {
 	var opts PluginOptions
 
-	return conf.Unmarshal(options, &opts)
+	err := conf.Unmarshal(options, &opts, true)
+	if err != nil {
+		return errs.Errorf("plugin config validation failed, %s", err.Error())
+	}
+
+	return nil
 }

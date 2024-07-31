@@ -22,6 +22,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/google/go-cmp/cmp"
 	"golang.zabbix.com/agent2/internal/agent"
 	"golang.zabbix.com/agent2/internal/agent/alias"
 	"golang.zabbix.com/agent2/internal/agent/resultcache"
@@ -1829,9 +1830,9 @@ func TestConfigurator(t *testing.T) {
 	_ = log.Open(log.Console, log.Debug, "", 0)
 
 	var opt1, opt2, opt3 configuratorOption
-	_ = conf.Unmarshal([]byte("Delay=5"), &opt1)
-	_ = conf.Unmarshal([]byte("Delay=30"), &opt2)
-	_ = conf.Unmarshal([]byte("Delay=60"), &opt3)
+	_ = conf.Unmarshal([]byte("Delay=5"), &opt1, true)
+	_ = conf.Unmarshal([]byte("Delay=30"), &opt2, true)
+	_ = conf.Unmarshal([]byte("Delay=60"), &opt3, true)
 
 	agent.Options.Plugins = map[string]interface{}{
 		"Debug1": opt1.Params,
@@ -1905,172 +1906,88 @@ func TestConfigurator(t *testing.T) {
 }
 
 func Test_getPluginOptions(t *testing.T) {
+	t.Parallel()
+
+	activeChecksOn := 1
+	activeChecksOff := 0
+
 	type args struct {
-		optsRaw any
+		pluginSystemOptions agent.SystemOptions
+		pluginName          string
 	}
 	tests := []struct {
-		name                  string
-		args                  args
-		wantCapacity          int
-		wantForceActiveChecks int
+		name  string
+		args  args
+		want  int
+		want1 int
 	}{
 		{
-			"default",
+			"+valid",
 			args{
-				&conf.Node{
-					Name:  "Test",
-					Nodes: []any{},
+				agent.SystemOptions{
+					Capacity: 50,
 				},
-			},
-			1000,
-			0,
-		},
-		{
-			"system_cap_active_checks_and_unexpected_param",
-			args{
-				&conf.Node{
-					Name: "Test",
-					Nodes: []any{
-						&conf.Node{
-							Name: "Capacity",
-							Nodes: []any{
-								&conf.Value{Value: []byte("10")},
-							},
-						},
-						&conf.Node{
-							Name: "System",
-							Nodes: []any{
-								&conf.Node{
-									Name: "Capacity",
-									Nodes: []any{
-										&conf.Value{Value: []byte("50")},
-									},
-								},
-								&conf.Node{
-									Name: "ForceActiveChecksOnStart",
-									Nodes: []any{
-										&conf.Value{Value: []byte("1")},
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-			50,
-			1,
-		},
-		{
-			"unexpected_param",
-			args{
-				&conf.Node{
-					Name: "Test",
-					Nodes: []any{
-						&conf.Node{
-							Name: "Capacity",
-							Nodes: []any{
-								&conf.Value{Value: []byte("10")},
-							},
-						},
-					},
-				},
-			},
-			1000,
-			0,
-		},
-		{
-			"system_cap",
-			args{
-				&conf.Node{
-					Name: "Test",
-					Nodes: []any{
-						&conf.Node{
-							Name: "System",
-							Nodes: []any{
-								&conf.Node{
-									Name: "Capacity",
-									Nodes: []any{
-										&conf.Value{Value: []byte("50")},
-									},
-								},
-							},
-						},
-					},
-				},
+				"Test",
 			},
 			50,
 			0,
 		},
 		{
-			"active_checks",
+			"+activeChecksSetOn",
 			args{
-				&conf.Node{
-					Name: "Test",
-					Nodes: []any{
-						&conf.Node{
-							Name: "System",
-							Nodes: []any{
-								&conf.Node{
-									Name: "ForceActiveChecksOnStart",
-									Nodes: []any{
-										&conf.Value{Value: []byte("1")},
-									},
-								},
-							},
-						},
-					},
+				agent.SystemOptions{
+					ForceActiveChecksOnStart: &activeChecksOn,
 				},
+				"Test",
 			},
 			1000,
 			1,
 		},
 		{
-			"no_active_checks",
+			"activeChecksSetOff",
 			args{
-				&conf.Node{
-					Name: "Test",
-					Nodes: []any{
-						&conf.Node{
-							Name: "System",
-							Nodes: []any{
-								&conf.Node{
-									Name: "ForceActiveChecksOnStart",
-									Nodes: []any{
-										&conf.Value{Value: []byte("0")},
-									},
-								},
-							},
-						},
-					},
+				agent.SystemOptions{
+					ForceActiveChecksOnStart: &activeChecksOff,
 				},
+				"Test",
 			},
 			1000,
 			0,
 		},
 		{
-			"nil",
-			args{nil},
+			"+SystemCapacityAndActiveCheckSet",
+			args{
+				agent.SystemOptions{
+					Capacity:                 50,
+					ForceActiveChecksOnStart: &activeChecksOn,
+				},
+				"Test",
+			},
+			50,
+			1,
+		},
+		{
+			"+emptySystemOptions",
+			args{
+				agent.SystemOptions{},
+				"Test",
+			},
 			1000,
 			0,
 		},
 	}
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
-			gotCapacity, gotForceActiveChecks := getPluginOptions(tt.args.optsRaw, "test")
-			if gotCapacity != tt.wantCapacity {
-				t.Errorf(
-					"getPluginOptions() got Plugins.<PluginName>.System.Capacity = %v, want %v",
-					gotCapacity,
-					tt.wantCapacity,
-				)
+			t.Parallel()
+
+			got, got1 := getPluginOptions(tt.args.pluginSystemOptions, tt.args.pluginName)
+			if diff := cmp.Diff(tt.want, got); diff != "" {
+				t.Fatalf("getPluginOptions() got = %s", diff)
 			}
 
-			if gotForceActiveChecks != tt.wantForceActiveChecks {
-				t.Errorf(
-					"getPluginOptions() got ForceActiveChecksOnStart = %v, want %v",
-					gotForceActiveChecks,
-					tt.wantForceActiveChecks,
-				)
+			if diff := cmp.Diff(tt.want1, got1); diff != "" {
+				t.Fatalf("getPluginOptions() got1 = %s", diff)
 			}
 		})
 	}
