@@ -21,7 +21,7 @@
 
 // create form
 $form = (new CForm())
-	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('copy')))->removeId());
+	->addItem((new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('copy')))->removeId());
 
 // Enable form submitting on Enter.
 $form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));

@@ -110,9 +110,7 @@ window.mediatype_edit_popup = new class {
 		const curl = new Curl('zabbix.php');
 
 		curl.setArgument('action', 'mediatype.delete');
-		curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
-			<?= json_encode(CCsrfTokenHelper::get('mediatype'), JSON_THROW_ON_ERROR) ?>
-		);
+		curl.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('mediatype')) ?>);
 
 		this.#post(curl.getUrl(), {mediatypeids: [this.mediatypeid]}, (response) => {
 			overlayDialogueDestroy(this.overlay.dialogueid);

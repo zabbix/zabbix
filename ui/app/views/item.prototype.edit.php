@@ -40,7 +40,7 @@ $type_with_key_select = [
 $form = (new CForm('post'))
 	->setName('itemForm')
 	->setId('item-form')
-	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('item')))->removeId())
+	->addItem((new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('item')))->removeId())
 	->addItem(getMessages())
 	->addVar('context', $item['context'])
 	->addVar('hostid', $data['host']['hostid'])
