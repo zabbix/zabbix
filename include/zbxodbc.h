@@ -33,7 +33,6 @@ int	zbx_odbc_query_result_to_json(zbx_odbc_query_result_t *query_result, char **
 
 void	zbx_odbc_query_result_free(zbx_odbc_query_result_t *query_result);
 void	zbx_odbc_data_source_free(zbx_odbc_data_source_t *data_source);
-void	zbx_odbc_connection_pwd_append(char **connection_str, const char *value);
 
 #endif	/* HAVE_UNIXODBC */
 

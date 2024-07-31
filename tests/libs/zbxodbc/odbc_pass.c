@@ -15,10 +15,9 @@
 #include "zbxmocktest.h"
 #include "zbxmockutil.h"
 #include "zbxmockassert.h"
+#include "../../../src/libs/zbxodbc/odbc.c"
 
 #define CONNECTION_SIZE	1024
-
-void zbx_odbc_connection_pwd_append(char **connection_str, const char *value);
 
 void	zbx_mock_test_entry(void **state)
 {

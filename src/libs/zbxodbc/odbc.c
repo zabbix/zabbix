@@ -228,7 +228,7 @@ static void	zbx_odbc_connection_string_append(char **connection_str, const char 
  *             value          - [IN] attribute value                          *
  *                                                                            *
  ******************************************************************************/
-void	zbx_odbc_connection_pwd_append(char **connection_str, const char *value)
+static void	zbx_odbc_connection_pwd_append(char **connection_str, const char *value)
 {
 	size_t	len;
 	char	last = '\0', *pwd = NULL;
