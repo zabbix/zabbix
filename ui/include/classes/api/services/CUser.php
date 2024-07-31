@@ -1491,9 +1491,22 @@ class CUser extends CApiService {
 		);
 
 		if (array_key_exists('error', $user_data)) {
-			self::addAuditLogByUser(array_key_exists('db_user', $user_data) ? $user_data['db_user']['userid'] : null,
-				CWebUser::getIp(), $user['username'], CAudit::ACTION_LOGIN_FAILED, CAudit::RESOURCE_USER
-			);
+			// If DB is not utf8mb4, attempt to record login attempt may override "Incorrect username..." message.
+			try {
+				self::addAuditLogByUser(
+					array_key_exists('db_user', $user_data) ? $user_data['db_user']['userid'] : null,
+					CWebUser::getIp(), $user['username'], CAudit::ACTION_LOGIN_FAILED, CAudit::RESOURCE_USER
+				);
+			} catch (Exception $foo) {
+				if (mb_strlen($user['username']) != strlen($user['username'])) {
+					DBend(false);
+
+					self::addAuditLogByUser(
+						array_key_exists('db_user', $user_data) ? $user_data['db_user']['userid'] : null,
+						CWebUser::getIp(), '[multibyte string]', CAudit::ACTION_LOGIN_FAILED, CAudit::RESOURCE_USER
+					);
+				}
+			}
 
 			self::exception(ZBX_API_ERROR_PARAMETERS, $user_data['error']);
 		}

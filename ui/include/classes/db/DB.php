@@ -74,9 +74,7 @@ class DB {
 	}
 
 	private static function exception($code, $error) {
-		if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
-			throw new DBException($error, $code);
-		}
+		throw new DBException($error, $code);
 	}
 
 	/**

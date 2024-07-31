@@ -1856,7 +1856,7 @@ function makeMessageBox(string $class, array $messages, string $title = null, bo
 function filter_messages(): array {
 	if (!CSettingsHelper::getPublic(CSettingsHelper::SHOW_TECHNICAL_ERRORS)
 			&& CWebUser::getType() != USER_TYPE_SUPER_ADMIN && !CWebUser::getDebugMode()) {
-		$messages = CMessageHelper::getMessages();
+		$messages = array_unique(CMessageHelper::getMessages(), SORT_REGULAR);
 		CMessageHelper::clear(false);
 
 		$generic_exists = false;

@@ -46,6 +46,13 @@ class CApiClientResponse {
 	public $errorMessage;
 
 	/**
+	 * Whether error was caused by user (false) or some system failure (true).
+	 *
+	 * @var	bool
+	 */
+	public $is_technical_error = false;
+
+	/**
 	 * Debug information.
 	 *
 	 * @var	array

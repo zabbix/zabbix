@@ -77,7 +77,8 @@ class CFrontendApiWrapper extends CApiWrapper {
 			if ($response->debug) {
 				$trace .= ' ['.$this->profiler->formatCallStack($response->debug).']';
 			}
-			error($trace);
+
+			error($trace, $response->is_technical_error);
 
 			return false;
 		}
