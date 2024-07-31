@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-07-06 15:01+0000\n"
+"PO-Revision-Date: 2024-07-21 08:34+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -1657,7 +1657,7 @@ msgstr "S'ha de triar, com a mínim, almenys un grup d'equips o un equip."
 
 #: include/classes/setup/CFrontendSetup.php:252
 msgid "At least one of MySQL or PostgreSQL should be supported."
-msgstr ""
+msgstr "Com a mínim hauria d'admetre MySQL o PostgreSQL."
 
 #: include/classes/setup/CFrontendSetup.php:241
 msgid "At least one of MySQL, PostgreSQL or Oracle should be supported."
@@ -1877,6 +1877,11 @@ msgstr "Disponibilitat"
 #: include/classes/helpers/CRoleHelper.php:423 report2.php:25 report2.php:156
 msgid "Availability report"
 msgstr "Informe de disponibilitat"
+
+#: app/controllers/CControllerAvailabilityReportTrigger.php:70
+#: app/views/reports.availabilityreport.trigger.php:23
+msgid "Availability report graph"
+msgstr "Gràfic de l'informe de disponibilitat"
 
 #: include/classes/html/CHostAvailability.php:80
 #: widgets/hostavail/views/widget.view.php:32
@@ -15219,6 +15224,19 @@ msgstr "En línia"
 #: app/views/administration.proxygroup.list.php:80
 msgid "Online proxies"
 msgstr "Proxys en línia"
+
+#: include/classes/api/services/CUser.php:874
+#: include/classes/api/services/CUser.php:882
+#: include/classes/api/services/CUser.php:889
+#, c-format
+msgid "Only Super admin or Admin users can update \"%1$s\" parameter."
+msgstr ""
+
+#: include/classes/api/services/CUser.php:812
+#: include/classes/api/services/CUser.php:853
+#, c-format
+msgid "Only Super admin users can update \"%1$s\" parameter."
+msgstr ""
 
 #: include/classes/api/services/CDRule.php:509
 msgid "Only Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 checks can be made unique."

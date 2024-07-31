@@ -152,9 +152,7 @@ window.proxy_edit_popup = new class {
 	refreshConfig() {
 		const curl = new Curl('zabbix.php');
 		curl.setArgument('action', 'proxy.config.refresh');
-		curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
-			<?= json_encode(CCsrfTokenHelper::get('proxy')) ?>
-		);
+		curl.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('proxy')) ?>);
 
 		this._post(curl.getUrl(), {proxyids: [this.proxyid]}, (response) => {
 			for (const element of this.form.parentNode.children) {
@@ -182,9 +180,7 @@ window.proxy_edit_popup = new class {
 	delete() {
 		const curl = new Curl('zabbix.php');
 		curl.setArgument('action', 'proxy.delete');
-		curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
-			<?= json_encode(CCsrfTokenHelper::get('proxy')) ?>
-		);
+		curl.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('proxy')) ?>);
 
 		this._post(curl.getUrl(), {proxyids: [this.proxyid]}, (response) => {
 			overlayDialogueDestroy(this.overlay.dialogueid);

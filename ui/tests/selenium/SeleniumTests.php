@@ -13,6 +13,9 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+// These tests should be run first.
+require_once dirname(__FILE__).'/multiselects/testMultiselectsWithoutData.php';
+require_once dirname(__FILE__).'/testPagesWithoutData.php';
 
 // Actions.
 require_once dirname(__FILE__).'/actions/testFormAction.php';
@@ -158,7 +161,8 @@ require_once dirname(__FILE__).'/latestData/testPageItemHistory.php';
 require_once dirname(__FILE__).'/latestData/testPageMonitoringLatestData.php';
 
 // LLD.
-require_once dirname(__FILE__).'/lld/testFormLowLevelDiscovery.php';
+require_once dirname(__FILE__).'/lld/testFormLowLevelDiscoveryFromHost.php';
+require_once dirname(__FILE__).'/lld/testFormLowLevelDiscoveryFromTemplate.php';
 require_once dirname(__FILE__).'/lld/testFormLowLevelDiscoveryOverrides.php';
 require_once dirname(__FILE__).'/lld/testFormTestLowLevelDiscovery.php';
 require_once dirname(__FILE__).'/lld/testInheritanceDiscoveryRule.php';
@@ -347,6 +351,10 @@ class SeleniumTests {
 	public static function suite() {
 		$suite = new TestSuite('selenium');
 
+		// These tests should be run first.
+		$suite->addTestSuite('testMultiselectsWithoutData');
+		$suite->addTestSuite('testPagesWithoutData');
+
 		// Actions.
 		$suite->addTestSuite('testFormAction');
 		$suite->addTestSuite('testPageActions');
@@ -491,7 +499,8 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageMonitoringLatestData');
 
 		// LLD.
-		$suite->addTestSuite('testFormLowLevelDiscovery');
+		$suite->addTestSuite('testFormLowLevelDiscoveryFromHost');
+		$suite->addTestSuite('testFormLowLevelDiscoveryFromTemplate');
 		$suite->addTestSuite('testFormLowLevelDiscoveryOverrides');
 		$suite->addTestSuite('testFormTestLowLevelDiscovery');
 		$suite->addTestSuite('testInheritanceDiscoveryRule');

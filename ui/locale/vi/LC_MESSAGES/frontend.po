@@ -1854,6 +1854,11 @@ msgstr "Tính sẵn sàng"
 msgid "Availability report"
 msgstr "Thông báo tính sẵn sàng"
 
+#: app/controllers/CControllerAvailabilityReportTrigger.php:70
+#: app/views/reports.availabilityreport.trigger.php:23
+msgid "Availability report graph"
+msgstr ""
+
 #: include/classes/html/CHostAvailability.php:80
 #: widgets/hostavail/views/widget.view.php:32
 msgid "Available"
@@ -15066,6 +15071,19 @@ msgstr ""
 
 #: app/views/administration.proxygroup.list.php:80
 msgid "Online proxies"
+msgstr ""
+
+#: include/classes/api/services/CUser.php:874
+#: include/classes/api/services/CUser.php:882
+#: include/classes/api/services/CUser.php:889
+#, c-format
+msgid "Only Super admin or Admin users can update \"%1$s\" parameter."
+msgstr ""
+
+#: include/classes/api/services/CUser.php:812
+#: include/classes/api/services/CUser.php:853
+#, c-format
+msgid "Only Super admin users can update \"%1$s\" parameter."
 msgstr ""
 
 #: include/classes/api/services/CDRule.php:509

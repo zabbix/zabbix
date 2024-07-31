@@ -19,7 +19,10 @@
  */
 class CCsrfTokenHelper {
 
-	public const CSRF_TOKEN_NAME = '_csrf_token';
+	/**
+	 * @deprecated  For backward compatibility of modules. Use CSRF_TOKEN_NAME instead.
+	 */
+	public const CSRF_TOKEN_NAME = CSRF_TOKEN_NAME;
 
 	/**
 	 * Generates CSRF token that is used in forms.

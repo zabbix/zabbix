@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-06-01 14:20+0000\n"
-"Last-Translator: Alexey <alexey.pustovalov@zabbix.com>\n"
+"PO-Revision-Date: 2024-07-26 16:25+0000\n"
+"Last-Translator: Daniil Mitrofanov <daniil.mitrofanov@softswiss.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -980,7 +980,7 @@ msgstr "Добавить новый виджет"
 
 #: widgets/navtree/Widget.php:34
 msgid "Add child element"
-msgstr ""
+msgstr "Добавить дочерний элемент"
 
 #: widgets/navtree/Widget.php:39
 msgid "Add child elements"
@@ -1019,7 +1019,7 @@ msgstr "Добавить триггер узла сети"
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:260
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:263
 msgid "Add item"
-msgstr ""
+msgstr "Добавить элемент"
 
 #: app/partials/massupdate.macros.tab.php:96
 #: app/partials/massupdate.valuemaps.tab.php:38
@@ -1683,7 +1683,7 @@ msgstr "Должна быть выбрана по крайней мере одн
 
 #: include/classes/setup/CFrontendSetup.php:252
 msgid "At least one of MySQL or PostgreSQL should be supported."
-msgstr ""
+msgstr "Должна поддерживаться по крайней мере одна база данных: MySQL или PostgreSQL."
 
 #: include/classes/setup/CFrontendSetup.php:241
 msgid "At least one of MySQL, PostgreSQL or Oracle should be supported."
@@ -1904,6 +1904,11 @@ msgstr "Доступность"
 msgid "Availability report"
 msgstr "Отчет о доступности"
 
+#: app/controllers/CControllerAvailabilityReportTrigger.php:70
+#: app/views/reports.availabilityreport.trigger.php:23
+msgid "Availability report graph"
+msgstr "График отчета о доступности"
+
 #: include/classes/html/CHostAvailability.php:80
 #: widgets/hostavail/views/widget.view.php:32
 msgid "Available"
@@ -1933,7 +1938,7 @@ msgstr "Избегать легко угадываемых паролей"
 
 #: jsLoader.php:172
 msgid "Awaiting data"
-msgstr ""
+msgstr "Ожидание данных"
 
 #: widgets/svggraph/views/widget.edit.php:51
 msgid "Axes"
@@ -2160,7 +2165,7 @@ msgstr "Информация о CPU. Возвращает строку или ч
 
 #: include/classes/data/CItemData.php:1375
 msgid "CPU load. Returns float"
-msgstr "Загрузка ЦПУ. Возвращает дробное значение"
+msgstr "Загрузка ЦПУ. Возвращает число с плавающей точкой"
 
 #: include/classes/data/CItemData.php:2282
 msgid "CPU time spent waiting for swap-in, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - CPU instance"
@@ -2192,15 +2197,15 @@ msgstr "CRLF"
 
 #: tests/selenium/modules/module_number_7/Module.php:17
 msgid "CSRF test"
-msgstr ""
+msgstr "CSRF-тест"
 
 #: tests/selenium/modules/module_number_7/views/csrf.form.view.php:25
 msgid "CSRF token test"
-msgstr ""
+msgstr "Тест токена CSRF"
 
 #: tests/selenium/modules/module_number_7/actions/CsrfFormUpdate.php:35
 msgid "CSRF token validation succeeded."
-msgstr ""
+msgstr "Проверка токена CSRF прошла успешно."
 
 #: include/items.inc.php:1554
 msgid "CSV to JSON"
@@ -5544,7 +5549,7 @@ msgstr "Создать новое"
 
 #: jsLoader.php:372
 msgid "Create new report"
-msgstr ""
+msgstr "Создать новый отчет"
 
 #: app/views/administration.proxy.list.php:239
 msgid "Create proxy"
@@ -9688,7 +9693,7 @@ msgstr "Элементы группы узлов сети"
 
 #: jsLoader.php:292
 msgid "Host group is not selected."
-msgstr ""
+msgstr "Группа узлов сети не выбрана."
 
 #: include/views/monitoring.sysmap.edit.php:168
 msgid "Host group label type"
@@ -9771,7 +9776,7 @@ msgstr "Обзор инвентарных данных узла сети"
 
 #: jsLoader.php:289
 msgid "Host is not selected."
-msgstr ""
+msgstr "Узел сети не выбран."
 
 #: include/views/monitoring.sysmap.edit.php:183
 msgid "Host label type"
@@ -13112,7 +13117,7 @@ msgstr "Тип подписи к элементам карты"
 
 #: jsLoader.php:290
 msgid "Map is not selected."
-msgstr ""
+msgstr "Карта сети не выбрана."
 
 #: sysmap.php:128
 msgid "Map is updated! Return to map list?"
@@ -13497,7 +13502,7 @@ msgstr "Метрики памяти пула ресурсов VMware, \"url\" - 
 
 #: include/classes/data/CItemData.php:1727
 msgid "Memory size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
-msgstr "Размер памяти в байтах или в процентах от общей. Возвращает целое число в байтах; целое с плавающей точкой для процетнов"
+msgstr "Размер памяти в байтах или в процентах от общей. Возвращает целое число в байтах; целое с плавающей точкой для процентов"
 
 #: include/classes/data/CItemData.php:1273
 msgid "Memory used by process in bytes. Returns integer"
@@ -14367,7 +14372,7 @@ msgstr "Новые триггера"
 #: app/partials/administration.system.info.php:58
 #: app/partials/administration.system.info.php:63
 msgid "New update available"
-msgstr "Доступно новое обновление"
+msgstr "Доступно обновление"
 
 #: app/views/popup.usergroupmapping.edit.php:112
 msgid "New user group mapping"
@@ -15198,7 +15203,7 @@ msgstr "Количество виртуальных машин на VMware ги�
 
 #: include/classes/data/CItemData.php:1711
 msgid "Number or percentage of inodes. Returns integer for number; float for percentage"
-msgstr "Количество inode в процентах. Возвращает целое число для количества; дробное - для процентов"
+msgstr "Количество inode в процентах. Возвращает целое число для количества; число с плавающей точкой - для процентов"
 
 #: include/items.inc.php:1585 include/items.inc.php:1589
 #: include/items.inc.php:1593
@@ -15374,6 +15379,19 @@ msgstr "Онлайн"
 #: app/views/administration.proxygroup.list.php:80
 msgid "Online proxies"
 msgstr "Онлайн прокси"
+
+#: include/classes/api/services/CUser.php:874
+#: include/classes/api/services/CUser.php:882
+#: include/classes/api/services/CUser.php:889
+#, c-format
+msgid "Only Super admin or Admin users can update \"%1$s\" parameter."
+msgstr ""
+
+#: include/classes/api/services/CUser.php:812
+#: include/classes/api/services/CUser.php:853
+#, c-format
+msgid "Only Super admin users can update \"%1$s\" parameter."
+msgstr ""
 
 #: include/classes/api/services/CDRule.php:509
 msgid "Only Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 checks can be made unique."
@@ -16161,7 +16179,7 @@ msgstr "Процент использованной физической пам�
 
 #: include/classes/data/CItemData.php:2898
 msgid "Percentage of online proxies. Returns float."
-msgstr "Процентное отношение онлайн прокси. Возвращает дробное значение."
+msgstr "Процентное отношение онлайн прокси. Возвращает число с плавающей точкой."
 
 #: include/classes/data/CItemData.php:2268
 msgid "Percentage of time that the virtual machine was ready, but could not get scheduled to run on the physical CPU, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - CPU instance"
@@ -16654,7 +16672,7 @@ msgstr "Проблемы по важности"
 
 #: include/classes/data/CItemData.php:1257
 msgid "Process CPU utilization percentage. Returns float"
-msgstr "Утилизация CPU процессом в процентах. Возвращает дробное число"
+msgstr "Утилизация CPU процессом в процентах. Возвращает число с плавающей точкой"
 
 #: app/views/administration.mediatype.edit.php:250
 #: app/views/mediatype.edit.php:312
@@ -19680,7 +19698,7 @@ msgstr "Строковые функции"
 
 #: widgets/piechart/includes/WidgetForm.php:137
 msgid "Stroke width"
-msgstr ""
+msgstr "Ширина обводки"
 
 #: include/items.inc.php:1545 include/items.inc.php:1549
 #: include/items.inc.php:1553 include/items.inc.php:1557
@@ -19715,7 +19733,7 @@ msgstr "Подкарта"
 
 #: tests/selenium/modules/module_number_7/views/csrf.form.view.php:20
 msgid "Submit"
-msgstr ""
+msgstr "Подтвердить"
 
 #: app/controllers/CControllerPopupScheduledReportSubscriptionEdit.php:167
 msgid "Subscription"
@@ -19799,7 +19817,7 @@ msgstr "Статистика swap out (из памяти на устройств
 
 #: include/classes/data/CItemData.php:1527
 msgid "Swap space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
-msgstr "Размер файла подкачки в байтах или в процентах от всего размера. Возвращает целое число для байт; дробное для процентов"
+msgstr "Размер файла подкачки в байтах или в процентах от всего размера. Возвращает целое число для байт; число с плавающей точкой для процентов"
 
 #: include/locales.inc.php:63
 msgid "Swedish (sv_SE)"
@@ -19856,7 +19874,7 @@ msgstr "Локализация системы"
 
 #: include/classes/data/CItemData.php:1463
 msgid "System statistics. Returns integer or float"
-msgstr "Статистика системы. Возвращает целое число или дробное"
+msgstr "Статистика системы. Возвращает целое число или число с плавающей точкой"
 
 #: widgets/systeminfo/includes/WidgetForm.php:37
 msgid "System stats"
@@ -21065,7 +21083,7 @@ msgstr "У триггера из шаблона \"%1$s\" есть зависим
 
 #: jsLoader.php:291
 msgid "Trigger is not selected."
-msgstr ""
+msgstr "Триггер не выбран."
 
 #: include/views/monitoring.sysmap.edit.php:198
 msgid "Trigger label type"
@@ -22960,11 +22978,11 @@ msgstr "Значение темы MQTT. Формат возвращаемых д
 
 #: include/classes/data/CItemData.php:1233
 msgid "Value of any Windows performance counter in English. Returns integer, float, string or text (depending on the request)"
-msgstr "Значение любого счетчика производительности Windows на Английском языке. Возвращает целое число, дробное число, строку или текст (в зависимости от запроса)"
+msgstr "Значение любого счетчика производительности Windows на Английском языке. Возвращает целое число, число с плавающей точкой, строку или текст (в зависимости от запроса)"
 
 #: include/classes/data/CItemData.php:1225
 msgid "Value of any Windows performance counter. Returns integer, float, string or text (depending on the request)"
-msgstr "Значение любого счетчика производительности Windows. Возвращает целое число, дробное число, строку или текст (в зависимости от запроса)"
+msgstr "Значение любого счетчика производительности Windows. Возвращает целое число, число с плавающей точкой число, строку или текст (в зависимости от запроса)"
 
 #: app/views/js/correlation.edit.js.php:268
 #: include/classes/helpers/CCorrelationHelper.php:153
@@ -23130,7 +23148,7 @@ msgstr "Просмотр как"
 
 #: jsLoader.php:417
 msgid "View related reports"
-msgstr ""
+msgstr "Просмотр связанных отчетов"
 
 #: include/classes/data/CItemData.php:1735
 msgid "Virtual space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
@@ -23346,7 +23364,7 @@ msgstr "Виджет слишком маленький для заданного
 
 #: jsLoader.php:205
 msgid "Widgets"
-msgstr ""
+msgstr "Виджеты"
 
 #: graphs.php:39 include/views/configuration.graph.edit.php:100
 #: include/views/configuration.graph.list.php:170
@@ -23722,7 +23740,7 @@ msgstr "Для просмотра этой страницы вы должны в
 
 #: jsLoader.php:287
 msgid "You need to have at least one image uploaded to create map element. Images can be uploaded in Administration->General->Images section."
-msgstr ""
+msgstr "Вам необходимо загрузить хотя бы одно изображение для создания элемента карты сети. Изображения можно загрузить в разделе Администрирование->Основные->Изображения."
 
 #: include/classes/db/DB.php:133
 msgid "Your database is not working properly. Please wait a few minutes and try to repeat this action. If the problem still persists, please contact system administrator. The problem might be caused by long running transaction or row level lock accomplished by your database management system."
@@ -24696,7 +24714,7 @@ msgstr "текст ошибки"
 
 #: include/forms.inc.php:1454 include/views/js/item.preprocessing.js.php:241
 msgid "error-matching"
-msgstr ""
+msgstr "сопоставление ошибок"
 
 #: app/views/popup.lldoverride.php:104
 #: include/views/configuration.host.discovery.edit.php:820
@@ -25734,7 +25752,7 @@ msgstr "right() - Возвращает количество самых прав�
 
 #: widgets/navtree/Widget.php:41
 msgid "root"
-msgstr ""
+msgstr "корневой элемент"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:966
 msgid "round() - Rounds a value to decimal places"
