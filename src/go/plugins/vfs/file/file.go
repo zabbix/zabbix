@@ -20,7 +20,6 @@
 package file
 
 import (
-	"golang.zabbix.com/sdk/conf"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/plugin"
 	"golang.zabbix.com/sdk/std"
@@ -32,15 +31,13 @@ var (
 )
 
 type Options struct {
-	plugin.SystemOptions `conf:"optional,name=System"`
-	Timeout              int `conf:"optional,range=1:30"`
-	Capacity             int `conf:"optional,range=1:100"`
+	Timeout  int `conf:"optional,range=1:30"`
+	Capacity int `conf:"optional,range=1:100"`
 }
 
 // Plugin -
 type Plugin struct {
 	plugin.Base
-	options Options
 }
 
 func init() {

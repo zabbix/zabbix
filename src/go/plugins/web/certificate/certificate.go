@@ -30,7 +30,6 @@ import (
 	"strings"
 	"time"
 
-	"golang.zabbix.com/sdk/conf"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/plugin"
 	"golang.zabbix.com/sdk/uri"
@@ -77,13 +76,11 @@ type ValidationResult struct {
 }
 
 type Options struct {
-	plugin.SystemOptions `conf:"optional,name=System"`
-	Timeout              int `conf:"optional,range=1:30"`
+	Timeout int `conf:"optional,range=1:30"`
 }
 
 type Plugin struct {
 	plugin.Base
-	options Options
 }
 
 func init() {

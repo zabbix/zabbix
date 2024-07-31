@@ -27,6 +27,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/google/go-cmp/cmp"
 	"golang.zabbix.com/agent2/internal/agent"
 	"golang.zabbix.com/agent2/internal/agent/alias"
 	"golang.zabbix.com/agent2/pkg/itemutil"
@@ -1770,9 +1771,9 @@ func TestConfigurator(t *testing.T) {
 	_ = log.Open(log.Console, log.Debug, "", 0)
 
 	var opt1, opt2, opt3 configuratorOption
-	_ = conf.Unmarshal([]byte("Delay=5"), &opt1)
-	_ = conf.Unmarshal([]byte("Delay=30"), &opt2)
-	_ = conf.Unmarshal([]byte("Delay=60"), &opt3)
+	_ = conf.Unmarshal([]byte("Delay=5"), &opt1, true)
+	_ = conf.Unmarshal([]byte("Delay=30"), &opt2, true)
+	_ = conf.Unmarshal([]byte("Delay=60"), &opt3, true)
 
 	agent.Options.Plugins = map[string]interface{}{
 		"Debug1": opt1.Params,
@@ -1843,102 +1844,89 @@ func TestConfigurator(t *testing.T) {
 	manager.checkPluginTimeline(t, plugins, calls, 5)
 }
 
-func Test_getCapacity(t *testing.T) {
+func Test_getPluginOptions(t *testing.T) {
+	t.Parallel()
+
+	activeChecksOn := 1
+	activeChecksOff := 0
+
 	type args struct {
-		optsRaw interface{}
+		pluginSystemOptions agent.SystemOptions
+		pluginName          string
 	}
 	tests := []struct {
-		name string
-		args args
-		want int
+		name  string
+		args  args
+		want  int
+		want1 int
 	}{
 		{
-			"default",
+			"+valid",
 			args{
-				&conf.Node{
-					Name:  "Test",
-					Nodes: []interface{}{},
+				agent.SystemOptions{
+					Capacity: 50,
 				},
-			},
-			100,
-		},
-		{
-			"both_cap",
-			args{
-				&conf.Node{
-					Name: "Test",
-					Nodes: []interface{}{
-						&conf.Node{
-							Name: "Capacity",
-							Nodes: []interface{}{
-								&conf.Value{Value: []byte("10")},
-							},
-						},
-						&conf.Node{
-							Name: "System",
-							Nodes: []interface{}{
-								&conf.Node{
-									Name: "Capacity",
-									Nodes: []interface{}{
-										&conf.Value{Value: []byte("50")},
-									},
-								},
-							},
-						},
-					},
-				},
+				"Test",
 			},
 			50,
+			0,
 		},
 		{
-			"depriceted_cap",
+			"+activeChecksSetOn",
 			args{
-				&conf.Node{
-					Name: "Test",
-					Nodes: []interface{}{
-						&conf.Node{
-							Name: "Capacity",
-							Nodes: []interface{}{
-								&conf.Value{Value: []byte("10")},
-							},
-						},
-					},
+				agent.SystemOptions{
+					ForceActiveChecksOnStart: &activeChecksOn,
 				},
+				"Test",
 			},
-			10,
+			1000,
+			1,
 		},
 		{
-			"system_cap",
+			"activeChecksSetOff",
 			args{
-				&conf.Node{
-					Name: "Test",
-					Nodes: []interface{}{
-						&conf.Node{
-							Name: "System",
-							Nodes: []interface{}{
-								&conf.Node{
-									Name: "Capacity",
-									Nodes: []interface{}{
-										&conf.Value{Value: []byte("50")},
-									},
-								},
-							},
-						},
-					},
+				agent.SystemOptions{
+					ForceActiveChecksOnStart: &activeChecksOff,
 				},
+				"Test",
+			},
+			1000,
+			0,
+		},
+		{
+			"+SystemCapacityAndActiveCheckSet",
+			args{
+				agent.SystemOptions{
+					Capacity:                 50,
+					ForceActiveChecksOnStart: &activeChecksOn,
+				},
+				"Test",
 			},
 			50,
+			1,
 		},
 		{
-			"nil",
-			args{nil},
-			100,
+			"+emptySystemOptions",
+			args{
+				agent.SystemOptions{},
+				"Test",
+			},
+			1000,
+			0,
 		},
 	}
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
-			if got, _ := getPluginOptions(tt.args.optsRaw, "test"); got != tt.want {
-				t.Errorf("getCapacity() = %v, want %v", got, tt.want)
+			t.Parallel()
+
+			got, got1 := getPluginOptions(tt.args.pluginSystemOptions, tt.args.pluginName)
+			if diff := cmp.Diff(tt.want, got); diff != "" {
+				t.Fatalf("getPluginOptions() got = %s", diff)
+			}
+
+			if diff := cmp.Diff(tt.want1, got1); diff != "" {
+				t.Fatalf("getPluginOptions() got1 = %s", diff)
 			}
 		})
 	}

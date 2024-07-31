@@ -61,7 +61,6 @@ type AgentOptions struct {
 	TLSKeyFile               string   `conf:"optional"`
 	TLSServerCertIssuer      string   `conf:"optional"`
 	TLSServerCertSubject     string   `conf:"optional"`
-	ExternalPlugins          []string `conf:"optional,name=PluginPath"`
 	ExternalPluginTimeout    int      `conf:"optional,name=PluginTimeout,range=1:30"`
 	ExternalPluginsSocket    string   `conf:"optional,name=PluginSocket,default=\\\\.\\pipe\\agent.plugin.sock"`
 	ForceActiveChecksOnStart int      `conf:"optional,range=0:1,default=0"`
@@ -69,5 +68,12 @@ type AgentOptions struct {
 	AllowKey interface{} `conf:"optional"`
 	DenyKey  interface{} `conf:"optional"`
 
-	Plugins map[string]interface{} `conf:"optional"`
+	Plugins              map[string]interface{}   `conf:"optional"`
+	PluginsSystemOptions map[string]SystemOptions `conf:"-"`
+}
+
+type SystemOptions struct {
+	Path                     string `conf:"optional"`
+	ForceActiveChecksOnStart *int   `conf:"optional"`
+	Capacity                 int    `conf:"optional"`
 }

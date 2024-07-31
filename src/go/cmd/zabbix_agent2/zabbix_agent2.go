@@ -333,7 +333,7 @@ func main() {
 		}
 		// create default configuration for testing options
 		if !argConfig {
-			_ = conf.Unmarshal([]byte{}, &agent.Options)
+			_ = conf.UnmarshalStrict([]byte{}, &agent.Options)
 		}
 	}
 
@@ -367,6 +367,11 @@ func main() {
 
 		log.Infof(reply)
 		os.Exit(0)
+	}
+
+	err = agent.Options.LoadSystemOptions()
+	if err != nil {
+		fatalExit("cannot initialize plugin system option", err)
 	}
 
 	pluginSocket, err = initExternalPlugins(&agent.Options)
