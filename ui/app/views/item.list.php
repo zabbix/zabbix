@@ -132,7 +132,7 @@ foreach ($data['items'] as $item) {
 						_('Recovery'), ': ', $trigger['recovery_expression']
 					]
 					: $trigger['expression']
-			))->addClass(ZBX_STYLE_WORDWRAP),
+			))->addClass(ZBX_STYLE_WORDBREAK),
 			(new CSpan(triggerIndicator($trigger['status'], $trigger['state'])))
 				->addClass(triggerIndicatorStyle($trigger['status'], $trigger['state']))
 		]);
