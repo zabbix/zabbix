@@ -23,11 +23,9 @@ use CController,
 	CWidgetsData;
 
 use Zabbix\Widgets\CWidgetField;
+use Zabbix\Widgets\Fields\CWidgetFieldTimePeriod;
 
-use Zabbix\Widgets\Fields\{
-	CWidgetFieldColumnsList,
-	CWidgetFieldTimePeriod
-};
+use Widgets\TopHosts\Includes\CWidgetFieldColumnsList;
 
 class ColumnEdit extends CController {
 
@@ -40,17 +38,20 @@ class ColumnEdit extends CController {
 		$fields = [
 			'name' =>				'string',
 			'data' =>				'int32',
+			'text' =>				'string',
 			'item' =>				'string',
-			'aggregate_function' =>	'int32',
-			'time_period' =>		'array',
+			'base_color' =>			'string',
+			'display_item_as' =>	'int32',
 			'display' =>			'int32',
-			'history' =>			'int32',
 			'min' =>				'string',
 			'max' =>				'string',
-			'decimal_places' =>		'string',
-			'base_color' =>			'string',
 			'thresholds' =>			'array',
-			'text' =>				'string',
+			'decimal_places' =>		'string',
+			'highlights' =>			'array',
+			'show_thumbnail' =>		'int32',
+			'aggregate_function' =>	'int32',
+			'time_period' =>		'array',
+			'history' =>			'int32',
 			'edit' =>				'in 1',
 			'update' =>				'in 1',
 			'templateid' =>			'string'
@@ -104,7 +105,7 @@ class ColumnEdit extends CController {
 		if (!$this->hasInput('update')) {
 			$data = [
 				'action' => $this->getAction(),
-				'thresholds_colors' => CWidgetFieldColumnsList::THRESHOLDS_DEFAULT_COLOR_PALETTE,
+				'colors' => CWidgetFieldColumnsList::DEFAULT_COLOR_PALETTE,
 				'templateid' => $this->hasInput('templateid') ? $this->getInput('templateid') : null,
 				'errors' => hasErrorMessages() ? getMessages() : null,
 				'user' => [
@@ -175,21 +176,24 @@ class ColumnEdit extends CController {
 			$column_defaults = [
 				'name' => '',
 				'data' => CWidgetFieldColumnsList::DATA_ITEM_VALUE,
+				'text' => '',
 				'item' => '',
+				'base_color' => '',
+				'display_item_as' => CWidgetFieldColumnsList::DISPLAY_VALUE_AS_NUMERIC,
+				'display' => CWidgetFieldColumnsList::DISPLAY_AS_IS,
+				'min' => '',
+				'max' => '',
+				'thresholds' => [],
+				'decimal_places' => CWidgetFieldColumnsList::DEFAULT_DECIMAL_PLACES,
+				'highlights' => [],
+				'show_thumbnail' => 0,
 				'aggregate_function' => AGGREGATE_NONE,
 				'time_period' => [
 					CWidgetField::FOREIGN_REFERENCE_KEY => CWidgetField::createTypedReference(
 						CWidgetField::REFERENCE_DASHBOARD, CWidgetsData::DATA_TYPE_TIME_PERIOD
 					)
 				],
-				'display' => CWidgetFieldColumnsList::DISPLAY_AS_IS,
-				'history' => CWidgetFieldColumnsList::HISTORY_DATA_AUTO,
-				'min' => '',
-				'max' => '',
-				'decimal_places' => CWidgetFieldColumnsList::DEFAULT_DECIMAL_PLACES,
-				'base_color' => '',
-				'text' => '',
-				'thresholds' => []
+				'history' => CWidgetFieldColumnsList::HISTORY_DATA_AUTO
 			];
 		}
 

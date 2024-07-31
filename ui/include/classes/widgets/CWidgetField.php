@@ -282,6 +282,7 @@ abstract class CWidgetField {
 			$this->setValue($value);
 		}
 		else {
+			$this->setValue($this->getDefault());
 			$errors[] = $error;
 		}
 

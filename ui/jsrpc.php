@@ -881,6 +881,28 @@ switch ($data['method']) {
 		}
 		break;
 
+	case 'item_value_type_by_name.get':
+		$result = '';
+		$groupids = $data['groupids'] ?: null;
+		$hostids = $data['hostids'] ?: null;
+
+		if (array_key_exists('name', $data)) {
+			$items = API::Item()->get([
+				'output' => ['value_type'],
+				'groupids' => $groupids,
+				'hostids' => $hostids,
+				'webitems' => true,
+				'search' => [
+					'name_resolved' => $data['name']
+				]
+			]);
+
+			if ($items) {
+				$result = $items[0]['value_type'];
+			}
+		}
+		break;
+
 	case 'get_scripts_by_hosts':
 		$result = [];
 
