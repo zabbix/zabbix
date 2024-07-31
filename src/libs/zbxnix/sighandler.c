@@ -13,6 +13,7 @@
 **/
 
 #include "zbxnix.h"
+#include "zbxthreads.h"
 
 #include "fatal.h"
 #include "sigcommon.h"
