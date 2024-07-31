@@ -2178,7 +2178,10 @@ class testDataDisplayInGraphs extends CWebTest {
 			: 'monitoring_hosts_'.$data['type'].'_';
 
 		// Check screenshots of graphs for each option in 'Show' field.
-		foreach (['All graphs' => 6, 'Host graphs' => 4, 'Simple graphs' => 2] as $show => $count) {
+		$show_data = $data['type'] === 'trends'
+			? ['All graphs' => 8, 'Host graphs' => 6, 'Simple graphs' => 2]
+			: ['All graphs' => 6, 'Host graphs' => 4, 'Simple graphs' => 2];
+		foreach ($show_data as $show => $count) {
 			// Pie widget displays data in non-fixed time period, so only host graph screenshot will not differ each time.
 			if ($data['type'] === 'pie' && $show !== 'Host graphs') {
 				continue;
