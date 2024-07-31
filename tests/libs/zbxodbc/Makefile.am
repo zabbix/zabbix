@@ -1,5 +1,7 @@
 include ../Makefile.include
 
+if HAVE_UNIXODBC
+
 BINARIES_tests = \
 	odbc_pass
 
@@ -11,8 +13,9 @@ COMMON_SRC_FILES = \
 PARAM_LIBS = \
 	$(MOCK_DATA_DEPS) \
 	$(MOCK_TEST_DEPS) \
-	$(JSON_DEPS) \
-	$(top_srcdir)/src/libs/zbxodbc/libzbxodbc.a
+	$(top_srcdir)/src/libs/zbxodbc/libzbxodbc.a \
+	$(JSON_DEPS)
+
 
 
 PARAM_COMPILER_FLAGS = \
@@ -31,3 +34,5 @@ odbc_pass_LDADD += @SERVER_LIBS@
 odbc_pass_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
 
 odbc_pass_CFLAGS = $(PARAM_COMPILER_FLAGS)
+
+endif

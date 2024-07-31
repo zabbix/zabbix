@@ -29,11 +29,7 @@ void	zbx_mock_test_entry(void **state)
 	zbx_snprintf(value, MAX_STRING_LEN, "%s", zbx_mock_get_parameter_string("in.pwd"));
 	connection = zbx_malloc(value, CONNECTION_SIZE);
 	zbx_snprintf(connection, MAX_STRING_LEN, "%s", zbx_mock_get_parameter_string("in.connection"));
-#ifdef HAVE_UNIXODBC
 	zbx_odbc_connection_pwd_append(&connection, value);
-#else
-	skip();
-#endif
 	zbx_mock_assert_str_eq("odbc_pass result", zbx_mock_get_parameter_string("out.value"), connection);
 	zbx_free(connection);
 }
