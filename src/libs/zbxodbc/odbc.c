@@ -204,7 +204,7 @@ static void	zbx_log_odbc_connection_info(const char *function, SQLHDBC hdbc)
  *             value          - [IN] attribute value                          *
  *                                                                            *
  ******************************************************************************/
-static void zbx_odbc_connection_string_append(char **connection_str, const char *attribute, const char *value)
+static void	zbx_odbc_connection_string_append(char **connection_str, const char *attribute, const char *value)
 {
 	size_t	len;
 	char	last = '\0';
@@ -228,7 +228,7 @@ static void zbx_odbc_connection_string_append(char **connection_str, const char 
  *             value          - [IN] attribute value                          *
  *                                                                            *
  ******************************************************************************/
-void zbx_odbc_connection_pwd_append(char **connection_str, const char *value)
+void	zbx_odbc_connection_pwd_append(char **connection_str, const char *value)
 {
 	size_t	len;
 	char	last = '\0', *pwd = NULL;
@@ -262,18 +262,18 @@ void zbx_odbc_connection_pwd_append(char **connection_str, const char *value)
 
 			}
 		}
+
 		if (0 != need_replacement)
 		{
 			*dst++ = '}';
 			*dst++ = '\0';
 		}
 		else
-		{
 			zbx_free(pwd);
-		}
 	}
+
 	if (0 < (len = strlen(*connection_str)))
-	last = (*connection_str)[len-1];
+		last = (*connection_str)[len-1];
 
 	*connection_str = zbx_dsprintf(*connection_str, "%s%sPWD=%s", *connection_str, ';' == last ? "" : ";",
 					(NULL != pwd) ? pwd : value);
