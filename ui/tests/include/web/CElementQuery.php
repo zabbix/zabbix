@@ -554,6 +554,17 @@ class CElementQuery implements IWaitable {
 	}
 
 	/**
+	 * @inheritdoc
+	 */
+	public function getCountCondition($count) {
+		$target = $this;
+
+		return function () use ($target, $count) {
+			return $target->count() === $count;
+		};
+	}
+
+	/**
 	 * Check that the corresponding element exists.
 	 *
 	 * @return boolean
