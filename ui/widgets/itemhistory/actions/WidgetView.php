@@ -56,8 +56,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 		];
 
 		if (!$this->fields_values['override_hostid'] && $this->isTemplateDashboard()) {
-			$data['error'] = _('No data.');
-
 			$this->setResponse(new CControllerResponseData($data));
 
 			return;
@@ -124,8 +122,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 		}
 
 		if (!$columns) {
-			$data['error'] = _('No data.');
-
 			$this->setResponse(new CControllerResponseData($data));
 
 			return;

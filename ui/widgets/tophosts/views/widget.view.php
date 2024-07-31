@@ -23,7 +23,7 @@
 
 use Widgets\TopHosts\Widget;
 
-use Zabbix\Widgets\Fields\CWidgetFieldColumnsList;
+use Widgets\TopHosts\Includes\CWidgetFieldColumnsList;
 
 $table = new CTableInfo();
 
@@ -34,17 +34,7 @@ else {
 	$header = [];
 
 	foreach ($data['configuration'] as $column_config) {
-		if ($column_config['data'] == CWidgetFieldColumnsList::DATA_ITEM_VALUE) {
-			if ($column_config['display'] == CWidgetFieldColumnsList::DISPLAY_AS_IS) {
-				$header[] = (new CColHeader($column_config['name']))->addClass(ZBX_STYLE_CENTER);
-			}
-			else {
-				$header[] = (new CColHeader($column_config['name']))->setColSpan(2);
-			}
-		}
-		else {
-			$header[] = $column_config['name'];
-		}
+		$header[] = $column_config['name'];
 	}
 
 	$table->setHeader($header);
@@ -56,13 +46,7 @@ else {
 			$column_config = $data['configuration'][$i];
 
 			if ($column === null) {
-				if ($column_config['data'] == CWidgetFieldColumnsList::DATA_ITEM_VALUE
-						&& $column_config['display'] != CWidgetFieldColumnsList::DISPLAY_AS_IS) {
-					$row[] = (new CCol(''))->setColSpan(2);
-				}
-				else {
-					$row[] = '';
-				}
+				$row[] = '';
 
 				continue;
 			}
@@ -133,7 +117,6 @@ else {
 							->addStyle($color !== '' ? 'background-color: #' . $color : null)
 							->addItem(
 								(new CDiv($formatted_value))
-									->addClass(ZBX_STYLE_CENTER)
 									->addClass(ZBX_STYLE_CURSOR_POINTER)
 									->setHint(
 										(new CDiv($column['value']))->addClass(ZBX_STYLE_HINTBOX_WRAP)
@@ -188,9 +171,20 @@ else {
 			}
 		}
 
-		$table->addRow(
-			(new CRow($row))->setAttribute('data-hostid', $context['hostid'])
-		);
+		$is_empty_row = true;
+
+		foreach ($row as $column) {
+			if ($column !== '') {
+				$is_empty_row = false;
+				break;
+			}
+		}
+
+		if (!$is_empty_row) {
+			$table->addRow(
+				(new CRow($row))->setAttribute('data-hostid', $context['hostid'])
+			);
+		}
 	}
 }
 

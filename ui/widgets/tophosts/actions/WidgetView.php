@@ -28,32 +28,32 @@ use API,
 	Manager;
 
 use Widgets\TopHosts\Widget;
-use Zabbix\Widgets\Fields\CWidgetFieldColumnsList;
+use Widgets\TopHosts\Includes\CWidgetFieldColumnsList;
 
 class WidgetView extends CControllerDashboardWidgetView {
 
 	protected function doAction(): void {
 		$data = [
 			'name' => $this->getInput('name', $this->widget->getDefaultName()),
+			'error' => null,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
 		];
 
-		// Editing template dashboard?
-		if ($this->isTemplateDashboard() && !$this->fields_values['override_hostid']) {
-			$data['error'] = _('No data.');
+		if (!$this->fields_values['override_hostid'] && $this->isTemplateDashboard()) {
+			$data['configuration'] = $this->fields_values['columns'];
+			$data['rows'] = [];
 		}
 		else {
 			$data += $this->getData();
-			$data['error'] = null;
 		}
 
 		$this->setResponse(new CControllerResponseData($data));
 	}
 
 	private function getData(): array {
-		$configuration = $this->fields_values['columns'];
+		$columns = $this->fields_values['columns'];
 
 		$groupids = !$this->isTemplateDashboard() && $this->fields_values['groupids']
 			? getSubGroups($this->fields_values['groupids'])
@@ -101,7 +101,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$item_names = [];
 		$items = [];
 
-		foreach ($configuration as $column_index => $column) {
+		foreach ($columns as $column_index => $column) {
 			switch ($column['data']) {
 				case CWidgetFieldColumnsList::DATA_TEXT:
 					$has_text_column = true;
@@ -117,7 +117,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$hosts_with_items = [];
 
 			foreach ($item_names as $column_index => $item_name) {
-				$numeric_only = self::isNumericOnlyColumn($configuration[$column_index]);
+				$numeric_only = self::isNumericOnlyColumn($columns[$column_index]);
 				$items[$column_index] = self::getItems($item_name, $numeric_only, $groupids, $hostids);
 
 				foreach ($items[$column_index] as $item) {
@@ -131,13 +131,13 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		if (!$hostids) {
 			return [
-				'configuration' => $configuration,
+				'configuration' => $columns,
 				'rows' => []
 			];
 		}
 
 		$master_column_index = $this->fields_values['column'];
-		$master_column = $configuration[$master_column_index];
+		$master_column = $columns[$master_column_index];
 		$master_entities = $hosts;
 		$master_entity_values = [];
 
@@ -241,7 +241,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$item_values = [];
 		$text_columns = [];
 
-		foreach ($configuration as $column_index => &$column) {
+		foreach ($columns as $column_index => &$column) {
 			if ($column['data'] == CWidgetFieldColumnsList::DATA_TEXT) {
 				$text_columns[$column_index] = $column['text'];
 				continue;
@@ -350,7 +350,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		foreach ($master_hostids as $hostid) {
 			$row = [];
 
-			foreach ($configuration as $column_index => $column) {
+			foreach ($columns as $column_index => $column) {
 				switch ($column['data']) {
 					case CWidgetFieldColumnsList::DATA_HOST_NAME:
 						$data = [
@@ -392,7 +392,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		}
 
 		return [
-			'configuration' => $configuration,
+			'configuration' => $columns,
 			'rows' => $rows
 		];
 	}
