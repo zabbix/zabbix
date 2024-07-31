@@ -1492,7 +1492,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_set_child_pids(zbx_threads, zbx_threads_num);
 	zbx_unset_exit_on_terminate();
 
-	while (ZBX_IS_RUNNING() && SUCCEED == wait_for_children(zbx_threads, zbx_threads_num));
+	while (ZBX_IS_RUNNING() && SUCCEED == wait_for_children(zbx_threads, zbx_threads_num))
+		;
 
 	zbx_log_exit_signal();
 
