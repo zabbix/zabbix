@@ -1029,7 +1029,7 @@ class CWidgetBase {
 			const curl = new Curl('zabbix.php');
 
 			curl.setArgument('action', 'dashboard.widget.rfrate');
-			curl.setArgument('_csrf_token', this._csrf_token);
+			curl.setArgument(CSRF_TOKEN_NAME, this._csrf_token);
 
 			fetch(curl.getUrl(), {
 				method: 'POST',
