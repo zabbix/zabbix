@@ -177,5 +177,70 @@ out:
 
 	return ret;
 }
+/******************************************************************************
+ *                                                                            *
+ * Purpose: gets all proxy group real-time data from proxy group manager      *
+ *                                                                            *
+ * Parameter: pgroups_rtdata - [OUT] proxy groups real-time data              *
+ *            error          - [OUT]                                          *
+ *                                                                            *
+ * Comments: used only by server                                              *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_pg_get_all_rtdata(zbx_hashset_t *pgroups_rtdata, char **error)
+{
+	zbx_ipc_socket_t	sock, *psock;
+	int			ret = FAIL, pgroups_num;
+	zbx_ipc_message_t	message = {0};
+	const unsigned char	*ptr = NULL;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
+	if (0 == pgservice_sock.fd)
+	{
+		if (FAIL == zbx_ipc_socket_open(&sock, ZBX_IPC_SERVICE_PGSERVICE, ZBX_PG_SERVICE_TIMEOUT, error))
+			goto out;
+
+		psock = &sock;
+	}
+	else
+		psock = &pgservice_sock;
+
+	if (FAIL == zbx_ipc_socket_write(psock, ZBX_IPC_PGM_GET_ALL_PGROUP_RTDATA, NULL, 0))
+	{
+		*error = zbx_strdup(NULL, "Cannot send request to proxy group manager service");
+		goto clean;
+	}
+
+	if (FAIL == zbx_ipc_socket_read(psock, &message))
+	{
+		*error = zbx_strdup(NULL, "Cannot read proxy group manager service response");
+		goto clean;
+	}
+
+	ptr = message.data;
+	ptr += zbx_deserialize_value(ptr, &pgroups_num);
+
+	for (int i = 0; i < pgroups_num; i++)
+	{
+		zbx_pg_rtdata_t	pg_rtdata;
+
+		ptr += zbx_deserialize_value(ptr, &pg_rtdata.proxy_groupid);
+		ptr += zbx_deserialize_value(ptr, &pg_rtdata.status);
+		ptr += zbx_deserialize_value(ptr, &pg_rtdata.proxy_online_num);
+		ptr += zbx_deserialize_value(ptr, &pg_rtdata.proxy_num);
+
+		(void)zbx_hashset_insert(pgroups_rtdata, &pg_rtdata, sizeof(pg_rtdata));
+	}
+
+	ret = SUCCEED;
+clean:
+	zbx_ipc_message_clean(&message);
+
+	if (psock == &sock)
+		zbx_ipc_socket_close(psock);
+out:
+	zabbix_log(LOG_LEVEL_TRACE, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
