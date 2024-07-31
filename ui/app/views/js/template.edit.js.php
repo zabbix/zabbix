@@ -237,9 +237,7 @@ window.template_edit_popup = new class {
 		const curl = new Curl('zabbix.php');
 
 		curl.setArgument('action', 'template.delete');
-		curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
-			<?= json_encode(CCsrfTokenHelper::get('template'), JSON_THROW_ON_ERROR) ?>
-		);
+		curl.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('template')) ?>);
 
 		let data = {templateids: [this.templateid]}
 		if (clear) {

@@ -62,7 +62,7 @@ if ($data['readonly'] == true) {
 // Create form.
 $user_form = (new CForm())
 	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
-	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token))->removeId())
+	->addItem((new CVar(CSRF_TOKEN_NAME, $csrf_token))->removeId())
 	->setId('user-form')
 	->setName('user_form')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
@@ -838,7 +838,7 @@ if ($data['action'] === 'user.edit') {
 				(new CRedirectButton(_('Delete'), (new CUrl('zabbix.php'))
 					->setArgument('action', 'user.delete')
 					->setArgument('userids', [$data['userid']])
-					->setArgument(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token),
+					->setArgument(CSRF_TOKEN_NAME, $csrf_token),
 					_('Delete selected user?')
 				))
 					->setEnabled(bccomp(CWebUser::$data['userid'], $data['userid']) != 0)

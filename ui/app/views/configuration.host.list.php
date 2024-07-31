@@ -41,7 +41,7 @@ $html_page = (new CHtmlPage())
 					->onClick(
 						'return PopUp("popup.import", {
 							rules_preset: "host", '.
-							CCsrfTokenHelper::CSRF_TOKEN_NAME.': "'. CCsrfTokenHelper::get('import').
+							CSRF_TOKEN_NAME.': "'.CCsrfTokenHelper::get('import').
 						'"}, {
 							dialogueid: "popup_import",
 							dialogue_class: "modal-popup-generic"
@@ -561,7 +561,7 @@ foreach ($data['hosts'] as $host) {
 
 $status_toggle_url =  (new CUrl('zabbix.php'))
 	->setArgument('action', 'popup.massupdate.host')
-	->setArgument(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token_massupdate)
+	->setArgument(CSRF_TOKEN_NAME, $csrf_token_massupdate)
 	->setArgument('visible[status]', 1)
 	->setArgument('update', 1)
 	->setArgument('backurl',
@@ -602,7 +602,7 @@ $form->addItem([
 				->addClass('js-no-chkbxrange')
 				->onClick(
 					"openMassupdatePopup('popup.massupdate.host', {".
-						CCsrfTokenHelper::CSRF_TOKEN_NAME.": '".$csrf_token_massupdate.
+						CSRF_TOKEN_NAME.": '".$csrf_token_massupdate.
 					"'}, {
 						dialogue_class: 'modal-popup-static',
 						trigger_element: this

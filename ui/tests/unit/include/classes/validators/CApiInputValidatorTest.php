@@ -1777,9 +1777,21 @@ class CApiInputValidatorTest extends TestCase {
 				'Invalid parameter "/1/id": value must be 0.'
 			],
 			[
+				['type' => API_ID],
+				null,
+				'/1/id',
+				'Invalid parameter "/1/id": a number is expected.'
+			],
+			[
+				['type' => API_ID, 'flags' => API_ALLOW_NULL],
+				null,
+				'/1/id',
+				null
+			],
+			[
 				['type' => API_BOOLEAN],
 				true,
-				'/1/createMissing',
+				'/1/id',
 				true
 			],
 			[

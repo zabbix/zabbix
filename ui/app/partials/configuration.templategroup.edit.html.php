@@ -20,7 +20,7 @@
  */
 
 $form = (new CForm())
-	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('templategroup')))->removeId())
+	->addItem((new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('templategroup')))->removeId())
 	->setId('templategroupForm')
 	->setName('templategroupForm')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
