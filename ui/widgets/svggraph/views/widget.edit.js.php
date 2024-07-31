@@ -311,7 +311,7 @@ window.widget_svggraph_form = new class {
 				of: e.target,
 				my: 'left top',
 				at: 'left bottom',
-				within: '.wrapper'
+				within: 'body'
 			}
 		});
 	}
