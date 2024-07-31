@@ -43,7 +43,7 @@ class CControllerSoftwareVersionCheckGet extends CController {
 			else {
 				$data['version'] = CSettingsHelper::getServerStatus()['version'];
 				$data['check_hash'] = CSettingsHelper::getPrivate(CSettingsHelper::SOFTWARE_UPDATE_CHECKID);
-				$data['_csrf_token'] = CCsrfTokenHelper::get('softwareversioncheck');
+				$data['csrf_token'] = CCsrfTokenHelper::get('softwareversioncheck');
 			}
 		}
 

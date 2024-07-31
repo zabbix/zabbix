@@ -37,6 +37,8 @@ define('ZBX_BCRYPT_COST',		10);
 
 define('ZBX_SESSION_NAME', 'zbx_session'); // Session cookie name for Zabbix front-end.
 
+define('CSRF_TOKEN_NAME', '_csrf_token');
+
 define('ZBX_KIBIBYTE',	'1024');
 define('ZBX_MEBIBYTE',	'1048576');
 define('ZBX_GIBIBYTE',	'1073741824');
@@ -2059,6 +2061,7 @@ define('ZBX_STYLE_LAYOUT_KIOSKMODE', 'layout-kioskmode');
 define('ZBX_STYLE_CONTAINER', 'container');
 define('ZBX_STYLE_LAYOUT_WRAPPER', 'wrapper');
 define('ZBX_STYLE_LEFT', 'left');
+define('ZBX_STYLE_LINE_CLAMP', 'line-clamp');
 define('ZBX_STYLE_LINK', 'link');
 define('ZBX_STYLE_LINK_ACTION', 'link-action');
 define('ZBX_STYLE_LINK_ALT', 'link-alt');

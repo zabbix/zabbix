@@ -123,9 +123,7 @@
 		}
 
 		_post(target, connectorids, url) {
-			url.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
-				<?= json_encode(CCsrfTokenHelper::get('connector')) ?>
-			);
+			url.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('connector')) ?>);
 
 			target.classList.add('is-loading');
 
