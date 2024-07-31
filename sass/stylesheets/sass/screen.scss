@@ -547,6 +547,13 @@ form {
 	word-break: break-word;
 }
 
+.line-clamp {
+	display: -webkit-box;
+	overflow: hidden;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: var(--line-clamp);
+}
+
 // Filters.
 .filter-btn-container {
 	position: relative;
