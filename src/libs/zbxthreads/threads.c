@@ -13,6 +13,7 @@
 **/
 
 #include "zbxthreads.h"
+#include <unistd.h>
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
 #include "zbxwin32.h"
@@ -88,6 +89,9 @@ void	zbx_child_fork(pid_t *pid)
 int	zbx_is_child_pid(pid_t pid, const pid_t *child_pids, size_t child_pids_num)
 {
 	size_t	i;
+
+	if (NULL == child_pids)
+		return FAIL;
 
 	for (i = 0; i < child_pids_num; i++)
 	{
