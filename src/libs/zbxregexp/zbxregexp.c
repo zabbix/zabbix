@@ -1144,6 +1144,7 @@ out:
 	zbx_vector_match_clear_ext(&matches, zbx_match_free);
 	zbx_vector_match_destroy(&matches);
 	*out = out_str;
+	zbx_replace_invalid_utf8(*out);
 
 	return ret;
 }
