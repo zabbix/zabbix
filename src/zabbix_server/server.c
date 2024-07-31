@@ -2509,7 +2509,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				break;
 			}
 			else
-				zabbix_log(LOG_LEVEL_TRACE, "indirect child process exitted");
+				zabbix_log(LOG_LEVEL_TRACE, "indirect child process exited");
 		}
 
 		if (-1 == pid && EINTR != errno)
