@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/../common/testWidgets.php';
 class testDashboardTopHostsWidget extends testWidgets {
 
 	/**
-	 * Attach MessageBehavior and TagBehavior to the test.
+	 * Attach Behaviors to the test.
 	 */
 	public function getBehaviors() {
 		return [
@@ -35,7 +35,8 @@ class testDashboardTopHostsWidget extends testWidgets {
 				'class' => CTagBehavior::class,
 				'tag_selector' => 'id:tags_table_tags'
 			],
-			CTableBehavior::class
+			CTableBehavior::class,
+			CWidgetBehavior::class
 		];
 	}
 
@@ -5437,9 +5438,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'Tags' => [
 						'tags' => [
 							[
-								'action' => USER_ACTION_UPDATE,
-								'index' => 0,
-								'tag' => 'host',
+								'name' => 'host',
 								'operator' => 'Equals',
 								'value' => 'B'
 							]
@@ -5474,22 +5473,18 @@ class testDashboardTopHostsWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Name' => 'Hosts filtered by tag, macros in columns',
-						'Order by' => 'Host name'
+						'Name' => 'Hosts filtered by tag, macros in columns'
 					],
 					'Tags' => [
 						'evaluation' => 'Or',
 						'tags' => [
 							[
-								'action' => USER_ACTION_UPDATE,
-								'index' => 0,
-								'tag' => 'host',
+								'name' => 'host',
 								'operator' => 'Equals',
 								'value' => 'B'
 							],
 							[
-								'action' => USER_ACTION_ADD,
-								'tag' => 'tag',
+								'name' => 'tag',
 								'operator' => 'Exists'
 							]
 						]
@@ -5543,6 +5538,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 							]
 						]
 					],
+					'Order by' => 'Host name',
 					'result' => [
 						[
 							'Host name' => 'HostB',
@@ -5667,6 +5663,75 @@ class testDashboardTopHostsWidget extends testWidgets {
 	 * @onAfter deleteWidgets
 	 */
 	public function testDashboardTopHostsWidget_CheckWidgetTable($data) {
-		$this->checkWidgetDisplay($data, 'Top hosts', $data['headers']);
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.static::$dashboardid);
+		$dashboard = CDashboardElement::find()->one();
+		$form = $this->openWidgetAndFill($dashboard, 'Top hosts', $data['fields']);
+
+		if (array_key_exists('Tags', $data)) {
+			$form->getField('id:evaltype')->fill(CTestArrayHelper::get($data['Tags'], 'evaluation', 'And/Or'));
+			$this->setTags($data['Tags']['tags']);
+		}
+
+		// Fill Columns field.
+		if (array_key_exists('Columns', $data)) {
+			foreach ($data['Columns'] as $column) {
+				$form->getFieldContainer('Columns')->query('button:Add')->one()->waitUntilClickable()->click();
+				$column_overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+				$column_overlay_form = $column_overlay->asForm();
+				$column_overlay_form->fill($column['fields']);
+
+				foreach (['Highlights', 'Thresholds'] as $table_field) {
+					if (array_key_exists($table_field, $column)) {
+						foreach ($column[$table_field] as $highlight) {
+							$column_overlay_form->getFieldContainer($table_field)->query('button:Add')->one()
+									->waitUntilClickable()->click();
+							$column_overlay_form->fill($highlight);
+						}
+					}
+				}
+
+				$column_overlay->getFooter()->query('button:Add')->waitUntilClickable()->one()->click();
+				$column_overlay->waitUntilNotVisible();
+				$form->waitUntilReloaded();
+			}
+		}
+
+		// 'Order by' can only be filled after columns are added.
+		if (array_key_exists('Order by', $data)) {
+			$form->fill(['Order by' => $data['Order by']]);
+		}
+
+		$form->submit();
+
+		// Check saved dashboard.
+		$form->waitUntilNotVisible();
+		$dashboard->save();
+		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
+
+		// Assert widget's table.
+		$dashboard->getWidget($data['fields']['Name'])->waitUntilReady();
+		$table = $this->query('class:list-table')->asTable()->one();
+
+		if (empty($data['result'])) {
+			$this->assertTableData();
+		}
+		else {
+			$this->assertTableHasData($data['result']);
+		}
+
+		// Assert table headers depending on widget settings.
+		$this->assertEquals($data['headers'], $table->getHeadersText());
+
+		// Check maintenance icon and hint text.
+		if (CTestArrayHelper::get($data, 'check_maintenance')) {
+			foreach ($data['check_maintenance'] as $host => $hint_text) {
+				$this->query('xpath://td/a[text()='.CXPathHelper::escapeQuotes($host).
+						']/..//button[contains(@class,"wrench")]')->waitUntilClickable()->one()->click();
+				$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->waitUntilPresent();
+				$this->assertEquals($hint_text, $hint->one()->getText());
+				$hint->one()->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click();
+				$hint->waitUntilNotPresent();
+			}
+		}
 	}
 }

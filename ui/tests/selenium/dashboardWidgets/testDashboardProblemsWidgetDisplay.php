@@ -34,6 +34,26 @@ class testDashboardProblemsWidgetDisplay extends testWidgets {
 	protected static $eventid_for_widget_text;
 	protected static $eventid_for_widget_unsigned;
 
+	/**
+	 * Attach Widget Behavior to the test.
+	 */
+	/**
+	 * Attach MessageBehavior and TableBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [
+			CMessageBehavior::class,
+			CTableBehavior::class,
+			CWidgetBehavior::class,
+			[
+				'class' => CTagBehavior::class,
+				'tag_selector' => 'id:tags_table_tags'
+			]
+		];
+	}
+
 	public function prepareDashboardData() {
 		$response = CDataHelper::call('dashboard.create', [
 			'name' => 'Dashboard for Problem widget check',
@@ -427,9 +447,7 @@ class testDashboardProblemsWidgetDisplay extends testWidgets {
 					'Tags' => [
 						'tags' => [
 							[
-								'action' => USER_ACTION_UPDATE,
-								'index' => 0,
-								'tag' => 'Delta',
+								'name' => 'Delta',
 								'operator' => 'Exists'
 							]
 						]
@@ -461,9 +479,7 @@ class testDashboardProblemsWidgetDisplay extends testWidgets {
 					'Tags' => [
 						'tags' => [
 							[
-								'action' => USER_ACTION_UPDATE,
-								'index' => 0,
-								'tag' => 'Eta',
+								'name' => 'Eta',
 								'operator' => 'Equals',
 								'value' => 'e'
 							]
@@ -503,14 +519,12 @@ class testDashboardProblemsWidgetDisplay extends testWidgets {
 						'evaluation' => 'Or',
 						'tags' => [
 							[
-								'action' => USER_ACTION_UPDATE,
-								'index' => 0,
-								'tag' => 'Theta',
+								'name' => 'Theta',
 								'operator' => 'Contains',
 								'value' => 't'
 							],
 							[
-								'tag' => 'Tag4',
+								'name' => 'Tag4',
 								'operator' => 'Exists'
 							]
 						]
@@ -549,14 +563,12 @@ class testDashboardProblemsWidgetDisplay extends testWidgets {
 						'evaluation' => 'And/Or',
 						'tags' => [
 							[
-								'action' => USER_ACTION_UPDATE,
-								'index' => 0,
-								'tag' => 'Theta',
+								'name' => 'Theta',
 								'operator' => 'Equals',
 								'value' => 't'
 							],
 							[
-								'tag' => 'Kappa',
+								'name' => 'Kappa',
 								'operator' => 'Does not exist'
 							]
 						]
@@ -755,9 +767,115 @@ class testDashboardProblemsWidgetDisplay extends testWidgets {
 	 * @onAfter deleteWidgets
 	 */
 	public function testDashboardProblemsWidgetDisplay_CheckTable($data) {
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.static::$dashboardid);
+		$dashboard = CDashboardElement::find()->one();
+		$form = $this->openWidgetAndFill($dashboard, 'Problems', $data['fields']);
+
+		if (array_key_exists('Tags', $data)) {
+			$form->getField('id:evaltype')->fill(CTestArrayHelper::get($data['Tags'], 'evaluation', 'And/Or'));
+			$this->setTags($data['Tags']['tags']);
+		}
+
+		$form->submit();
+
+		// Check saved dashboard.
+		$form->waitUntilNotVisible();
+		$dashboard->save();
+		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
+
+		// Assert widget's table.
+		$dashboard->getWidget($data['fields']['Name'])->waitUntilReady();
+		$table = $this->query('class:list-table')->asTable()->one();
+
+		// Change time for actual value, because it cannot be used in data provider.
+		foreach ($data['result'] as &$row) {
+			if (CTestArrayHelper::get($row, 'Time')) {
+				$row['Time'] = date('H:i:s', static::$time);
+			}
+			unset($row);
+		}
+
+		// Check clicks on Acknowledge and Actions icons and hints' contents.
+		if (CTestArrayHelper::get($data, 'actions')) {
+			foreach ($data['actions'] as $problem => $action) {
+				$action_cell = $table->findRow('Problem • Severity', $problem)->getColumn('Actions');
+
+				foreach ($action as $class => $hint_rows) {
+					$icon = $action_cell->query('xpath:.//*['.CXPathHelper::fromClass($class).']')->one();
+					$this->assertTrue($icon->isVisible());
+
+					if ($class !== 'color-positive') {
+						// Click on icon and open hint.
+						$icon->click();
+						$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->asOverlayDialog()
+								->waitUntilReady()->one();
+						$hint_table = $hint->query('class:list-table')->asTable()->waitUntilVisible()->one();
+
+						// Check rows in hint's table.
+						foreach ($hint_table->getRows() as $i => $row) {
+							$hint_rows[$i]['Time'] = ($hint_rows[$i]['Time'] === 'acknowledged')
+								? date('Y-m-d H:i:s', static::$acktime)
+								: date('Y-m-d H:i:s', static::$time);
+							$row->assertValues($hint_rows[$i]);
+						}
+
+						$hint->close();
+					}
+				}
+			}
+		}
+
+		// When there are shown less lines than filtered, table appears unusual and doesn't fit for framework functions.
+		if (CTestArrayHelper::get($data['fields'], 'Show lines')) {
+			$this->assertEquals(count($data['result']) + 1, $table->getRows()->count());
+
+			// Assert table rows.
+			$result = [];
+			for ($i = 0; $i < count($data['result']); $i++) {
+				$result[] = $table->getRow($i)->getColumn('Problem • Severity')->getText();
+			}
+
+			$this->assertEquals($data['result'], $result);
+
+			// Assert table stats.
+			$this->assertEquals($data['stats'], $table->getRow(count($data['result']))->getText());
+		}
+		elseif (empty($data['result'])) {
+			$this->assertTableData();
+		}
+		else {
+			$this->assertTableHasData($data['result']);
+		}
+
+		// Assert table headers depending on widget settings.
 		$headers = (CTestArrayHelper::get($data, 'headers', ['Time', '', '', 'Recovery time', 'Status', 'Info',
 				'Host', 'Problem • Severity', 'Duration', 'Update', 'Actions']
 		));
-		$this->checkWidgetDisplay($data, 'Problems', $headers);
+		$this->assertEquals($headers, $table->getHeadersText());
+
+		if (CTestArrayHelper::get($data['fields'], 'Show timeline')) {
+			$this->assertTrue($table->query('class:timeline-td')->exists());
+		}
+
+		if (CTestArrayHelper::get($data, 'check_tag_ellipsis')) {
+			foreach ($data['check_tag_ellipsis'] as $problem => $ellipsis_text) {
+				$table->findRow('Problem • Severity', $problem)->getColumn('Tags')->query('class:zi-more')
+						->waitUntilClickable()->one()->click();
+				$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->asOverlayDialog()
+						->waitUntilVisible()->one();
+				$this->assertEquals($ellipsis_text, $hint->getText());
+				$hint->close();
+			}
+		}
+
+		// Check eye icon for suppressed problem.
+		if (CTestArrayHelper::get($data, 'check_suppressed_icon')) {
+			$table->findRow('Problem • Severity', $data['check_suppressed_icon']['problem'])->getColumn('Info')
+					->query('class:zi-eye-off')->waitUntilClickable()->one()->click();
+			$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->asOverlayDialog()
+					->waitUntilVisible()->one();
+			$this->assertEquals($data['check_suppressed_icon']['text'], $hint->getText());
+			$hint->close();
+		}
 	}
 }
