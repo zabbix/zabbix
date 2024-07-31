@@ -218,7 +218,12 @@ window.tophosts_column_edit_form = new class {
 			});
 	}
 
-	#updateForm(item_type_change = false) {
+	/**
+	 * Updates widget column configuration form field visibility, enable/disable state and available options.
+	 *
+	 * @param {boolean} item_change  Whether form update was triggered by changing the selected item.
+	 */
+	#updateForm(item_change = false) {
 		const data_type = document.querySelector('[name=data]').value;
 		const data_item_value = data_type == <?= CWidgetFieldColumnsList::DATA_ITEM_VALUE ?>;
 		const data_text = data_type == <?= CWidgetFieldColumnsList::DATA_TEXT ?>;
@@ -231,7 +236,7 @@ window.tophosts_column_edit_form = new class {
 		const display_as_text = <?= CWidgetFieldColumnsList::DISPLAY_VALUE_AS_TEXT ?>;
 		const display_as_binary = <?= CWidgetFieldColumnsList::DISPLAY_VALUE_AS_BINARY ?>;
 
-		if (item_type_change) {
+		if (item_change) {
 			document.querySelectorAll('[name=display_item_as]').forEach(element => {
 				element.checked = (element.value == display_as_text && is_item_type_text)
 					|| (element.value == display_as_binary && is_item_type_binary)
