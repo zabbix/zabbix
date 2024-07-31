@@ -5273,19 +5273,11 @@ class testDashboardTopHostsWidget extends testWidgets {
 	protected function createTopHostsWidget($data, $name, $widget_name = null) {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.$name);
 		$dashboard = CDashboardElement::find()->one();
-		$form = $dashboard->edit()->addWidget()->asForm();
-		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Top hosts')]);
-
-		if ($widget_name) {
-			$form->fill(['Name' => $widget_name]);
-		}
+		$fields = array_key_exists('main_fields', $data) ? $data['main_fields'] : ['Name' => $widget_name];
+		$form = $this->openWidgetAndFill($dashboard, 'Top hosts', $fields);
 
 		// Add new column(s) and save widget.
 		$this->fillColumnForm($data, 'create');
-
-		if (array_key_exists('main_fields', $data)) {
-			$form->fill($data['main_fields']);
-		}
 
 		$form->submit();
 		COverlayDialogElement::ensureNotPresent();
