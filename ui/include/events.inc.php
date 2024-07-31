@@ -178,7 +178,7 @@ function make_event_details(array $event, array $allowed) {
 	$table = (new CTableInfo())
 		->addRow([
 			_('Event'),
-			(new CCol($event['name']))->addClass(ZBX_STYLE_WORDWRAP)
+			(new CCol($event['name']))->addClass(ZBX_STYLE_WORDBREAK)
 		])
 		->addRow([
 			_('Operational data'),
