@@ -564,6 +564,8 @@ class CDBHelper {
 					'preservekeys' => true
 				]);
 
+				$time = time();
+
 				$fields = [
 					'source' => EVENT_SOURCE_TRIGGERS,
 					'object' => EVENT_OBJECT_TRIGGER,
@@ -571,7 +573,7 @@ class CDBHelper {
 					'value' => $value,
 					'name' => $trigger['description'],
 					'severity' => $trigger['priority'],
-					'clock' => CTestArrayHelper::get($event_fields, 'clock', time()),
+					'clock' => CTestArrayHelper::get($event_fields, 'clock', $time),
 					'ns' => CTestArrayHelper::get($event_fields, 'ns', 0),
 					'acknowledged' => CTestArrayHelper::get($event_fields, 'acknowledged', EVENT_NOT_ACKNOWLEDGED)
 				];
@@ -586,7 +588,7 @@ class CDBHelper {
 						DB::update('triggers', [
 							'values' => [
 								'value' => TRIGGER_VALUE_TRUE,
-								'lastchange' => CTestArrayHelper::get($event_fields, 'clock', time())
+								'lastchange' => CTestArrayHelper::get($event_fields, 'clock', $time)
 							],
 							'where' => ['triggerid' => $trigger['triggerid']]
 						]);
@@ -602,7 +604,7 @@ class CDBHelper {
 							DB::update('triggers', [
 								'values' => [
 									'value' => TRIGGER_VALUE_FALSE,
-									'lastchange' => CTestArrayHelper::get($event_fields, 'clock', time())
+									'lastchange' => CTestArrayHelper::get($event_fields, 'clock', $time)
 								],
 								'where' => ['triggerid' => $trigger['triggerid']]
 							]);

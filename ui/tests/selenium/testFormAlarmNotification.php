@@ -463,11 +463,6 @@ class testFormAlarmNotification extends CWebTest {
 		$this->page->open('zabbix.php?action=problem.view&unacknowledged=1&sort=name&sortorder=ASC&hostids%5B%5D='.
 				self::$hostid)->waitUntilReady();
 
-		// Filter problems by Hosts and refresh page for alarm overlay to appear.
-		$table = $this->query('class:list-table')->asTable()->one();
-		$this->query('name:zbx_filter')->asForm()->one()->fill(['Hosts' => self::HOST_NAME])->submit();
-		$table->waitUntilReloaded();
-
 		// Check that problems displayed in table.
 		$this->assertTableDataColumn($data['trigger_name'], 'Problem');
 
