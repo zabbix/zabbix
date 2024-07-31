@@ -118,9 +118,7 @@
 		}
 
 		_post(target, druleids, url) {
-			url.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
-				<?= json_encode(CCsrfTokenHelper::get('discovery')) ?>
-			);
+			url.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('discovery')) ?>);
 
 			target.classList.add('is-loading');
 

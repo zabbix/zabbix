@@ -188,7 +188,7 @@ $confirm_messages = [
 
 	(new CScriptTag('
 		view.init('.json_encode([
-			'token' => [CCsrfTokenHelper::CSRF_TOKEN_NAME => CCsrfTokenHelper::get('item')],
+			'token' => [CSRF_TOKEN_NAME => CCsrfTokenHelper::get('item')],
 			'confirm_messages' => $confirm_messages,
 			'context' => $data['context'],
 			'form_name' => $form->getName()
