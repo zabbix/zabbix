@@ -1,1 +1,1 @@
-..F....... [ZBX-24835] fixed case-conversion and preg functions work incorrectly with the Turkish locale (agriscenko)
+..F....... [ZBX-24835] fixed case-conversion and preg functions working incorrectly with the Turkish locale (agriscenko)
