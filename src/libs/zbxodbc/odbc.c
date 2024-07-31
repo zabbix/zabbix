@@ -239,8 +239,9 @@ void	zbx_odbc_connection_pwd_append(char **connection_str, const char *value)
 	len = strlen(value);
 	if ('{' != *value || '}' != value[len-1])
 	{
-		int	need_replacement = 0;
-		char	*src = (char *)value, *dst;
+		int		need_replacement = 0;
+		const char	*src = value;
+		char		*dst;
 
 		dst = pwd = (char *)zbx_malloc(NULL, (len + 1) * 2);
 		*dst++ = '{';
