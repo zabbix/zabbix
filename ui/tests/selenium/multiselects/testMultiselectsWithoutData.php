@@ -19,7 +19,7 @@ require_once dirname(__FILE__).'/../common/testMultiselectDialogs.php';
 /**
  * Test for checking empty multiselects' overlays.
  *
- * @onBefore prepareEmptyData
+ * @onBefore clearData, prepareEmptyData
  *
  * @backup profiles
  */
@@ -44,6 +44,26 @@ class testMultiselectsWithoutData extends testMultiselectDialogs {
 	 */
 	public function getBehaviors() {
 		return [CTableBehavior::class];
+	}
+
+	public function clearData() {
+		// Delete Services.
+		$serviceids = CDBHelper::getColumn('SELECT serviceid FROM services', 'serviceid');
+		CDataHelper::call('service.delete', array_values($serviceids));
+
+		// Delete Proxies and Proxy groups, connected Hosts and Discovery rules.
+		$discoveryruleids = CDBHelper::getColumn('SELECT * FROM drules', 'druleid');
+		CDataHelper::call('drule.delete', array_values($discoveryruleids));
+
+		$monitored_hostid = CDBHelper::getColumn('SELECT * FROM hosts WHERE monitored_by=1', 'hostid');
+		CDataHelper::call('host.delete', array_values($monitored_hostid));
+
+		$proxyids = CDBHelper::getColumn('SELECT * FROM proxy', 'proxyid');
+		CDataHelper::call('proxy.delete', array_values($proxyids));
+
+		// Delete SLA.
+		$slaids = CDBHelper::getColumn('SELECT * FROM sla', 'slaid');
+		CDataHelper::call('sla.delete', array_values($slaids));
 	}
 
 	public function prepareEmptyData() {
