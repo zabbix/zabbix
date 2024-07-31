@@ -327,7 +327,7 @@ $confirm_messages = [
 		'field_switches' => CItemData::filterSwitchingConfiguration(),
 		'form_name' => $form->getName(),
 		'hostids' => $data['filter_data']['filter_hostids'],
-		'token' => [CCsrfTokenHelper::CSRF_TOKEN_NAME => CCsrfTokenHelper::get('item')]
+		'token' => [CSRF_TOKEN_NAME => CCsrfTokenHelper::get('item')]
 	]).');
 '))
 	->setOnDocumentReady()

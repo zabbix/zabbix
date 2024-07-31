@@ -37,6 +37,8 @@ define('ZBX_BCRYPT_COST',		10);
 
 define('ZBX_SESSION_NAME', 'zbx_session'); // Session cookie name for Zabbix front-end.
 
+define('CSRF_TOKEN_NAME', '_csrf_token');
+
 define('ZBX_KIBIBYTE',	'1024');
 define('ZBX_MEBIBYTE',	'1048576');
 define('ZBX_GIBIBYTE',	'1073741824');

@@ -1,7 +1,7 @@
 <?php
 
 $form = (new CForm())
-	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get($data['action'])))->removeId())
+	->addItem((new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get($data['action'])))->removeId())
 	->addVar('action', $data['action'])
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID);
 
