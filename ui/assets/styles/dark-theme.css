@@ -2457,7 +2457,7 @@ button {
   .list-table .btn-icon:not(.no-indent):not(:first-child),
   .list-table .icon:not(.no-indent):not(:first-child),
   .list-table .link-action:not(.no-indent):not(:first-child) {
-    margin-left: 5px; }
+    margin-left: 2px; }
 .list-table .icon {
   border-radius: 2px; }
 .list-table .btn-small,
