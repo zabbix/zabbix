@@ -25,6 +25,8 @@ import (
 	"unicode/utf8"
 
 	"golang.zabbix.com/agent2/pkg/tls"
+	"golang.zabbix.com/sdk/conf"
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/plugin"
 )
@@ -78,8 +80,25 @@ var (
 	errInvalidTLSPSKFile = errors.New("invalid TLSPSKFile configuration parameter")
 )
 
-func invalidTLSPSKFileError(e error) error {
-	return fmt.Errorf("%w: %w", errInvalidTLSPSKFile, e)
+type pluginOptions struct {
+	System SystemOptions `conf:"optional"`
+}
+
+// LoadSystemOptions removes system configuration from plugin options and added to system options.
+func (a *AgentOptions) LoadSystemOptions() error {
+	a.PluginsSystemOptions = make(map[string]SystemOptions)
+
+	for name, p := range a.Plugins {
+		var o pluginOptions
+		if err := conf.Unmarshal(p, &o, true); err != nil {
+			return errs.Errorf("failed to unmarshal options for plugin %s, %s", name, err.Error())
+		}
+
+		a.Plugins[name] = removeSystem(p)
+		a.PluginsSystemOptions[name] = o.System
+	}
+
+	return nil
 }
 
 // CutAfterN returns the whole string s, if it is not longer then n runes (not bytes). Otherwise it returns the
@@ -354,6 +373,10 @@ func ValidateOptions(options *AgentOptions) error {
 	return nil
 }
 
+func invalidTLSPSKFileError(e error) error {
+	return fmt.Errorf("%w: %w", errInvalidTLSPSKFile, e)
+}
+
 func requireNoCipherCert(options *AgentOptions) error {
 	if options.TLSCipherCert != "" {
 		return errCipherCertAndAll
@@ -376,4 +399,26 @@ func requireNoCipherAll(options *AgentOptions) error {
 	}
 
 	return nil
+}
+
+func removeSystem(privateOptions any) any {
+	if root, ok := privateOptions.(*conf.Node); ok {
+		for i, v := range root.Nodes {
+			if node, ok := v.(*conf.Node); ok {
+				if node.Name == "System" {
+					root.Nodes = remove(root.Nodes, i)
+
+					return root
+				}
+			}
+		}
+	}
+
+	return privateOptions
+}
+
+func remove(s []any, i int) []any {
+	s[i] = s[len(s)-1]
+
+	return s[:len(s)-1]
 }

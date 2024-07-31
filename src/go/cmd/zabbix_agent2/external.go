@@ -35,18 +35,17 @@ type pluginOptions struct {
 func initExternalPlugins(options *agent.AgentOptions) (string, error) {
 	paths := make(map[string]string)
 
-	for name, p := range options.Plugins {
-		var o pluginOptions
-		if err := conf.Unmarshal(p, &o, false); err != nil {
-			// not an external plugin, just ignore the error
+	for name, s := range options.PluginsSystemOptions {
+		// if path is not set it's an internal plugin
+		if s.Path == nil {
 			continue
 		}
 
-		if !filepath.IsAbs(o.System.Path) {
-			return "", errs.Errorf("path %q not absolute", o.System.Path)
+		if !filepath.IsAbs(*s.Path) {
+			return "", errs.Errorf("path %q not absolute", *s.Path)
 		}
 
-		paths[name] = o.System.Path
+		paths[name] = *s.Path
 	}
 
 	if len(paths) == 0 {
@@ -69,12 +68,6 @@ func initExternalPlugins(options *agent.AgentOptions) (string, error) {
 	for name, path := range paths {
 		log.Debugf("initializing external plugin %q", name)
 
-		// configuratorTask from internal/agent/scheduler/task.go depends
-		// on loadable plugin configs not containing Path field, hence
-		// it needs to removed.
-		config := removePathField(options.Plugins[name])
-		options.Plugins[name] = config
-
 		accessor := external.NewPlugin(
 			name,
 			path,
@@ -83,7 +76,7 @@ func initExternalPlugins(options *agent.AgentOptions) (string, error) {
 			listener,
 		)
 
-		err := accessor.RegisterMetrics(config)
+		err := accessor.RegisterMetrics(options.Plugins[name])
 		if err != nil {
 			return "", errs.Wrapf(err, "failed to register metrics of plugin %q", name)
 		}

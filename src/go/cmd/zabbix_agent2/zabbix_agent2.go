@@ -205,7 +205,7 @@ func run() error {
 
 		// create default configuration for testing options
 		// pass empty string to config arg to trigger this
-		err = conf.Unmarshal([]byte{}, &agent.Options)
+		err = conf.Unmarshal([]byte{}, &agent.Options, true)
 		if err != nil {
 			return errs.Wrap(err, "failed to create default configuration")
 		}
@@ -253,6 +253,11 @@ func run() error {
 		fmt.Fprintf(os.Stderr, "%s\n", reply)
 
 		return nil
+	}
+
+	err = agent.Options.LoadSystemOptions()
+	if err != nil {
+		fatalExit("cannot initialize plugin system option", err)
 	}
 
 	pluginSocket, err = initExternalPlugins(&agent.Options)
