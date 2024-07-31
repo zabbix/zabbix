@@ -1120,46 +1120,11 @@ class CMacrosResolverGeneral {
 
 			foreach ($keys as $key => $tokens) {
 				foreach ($tokens as $token => $data) {
-					switch ($data['macro']) {
-						case 'ITEM.VALUE':
-						case 'ITEM.LASTVALUE':
-							if (array_key_exists('function', $data)) {
-								if ($data['function'] !== 'regsub' && $data['function'] !== 'iregsub') {
-									continue 2;
-								}
-
-								if (count($data['parameters']) != 2) {
-									continue 2;
-								}
-
-								$ci = ($data['function'] === 'iregsub') ? 'i' : '';
-
-								set_error_handler(function ($errno, $errstr) {});
-								$rc = preg_match('/'.$data['parameters'][0].'/'.$ci, $history[$itemid][0]['value'],
-									$matches
-								);
-								restore_error_handler();
-
-								if ($rc === false) {
-									continue 2;
-								}
-
-								$macro_value = $data['parameters'][1];
-								$matched_macros = self::getMacroPositions($macro_value, ['replacements' => true]);
-
-								foreach (array_reverse($matched_macros, true) as $pos => $macro) {
-									$macro_value = substr_replace($macro_value,
-										array_key_exists($macro[1], $matches) ? $matches[$macro[1]] : '',
-										$pos, strlen($macro)
-									);
-								}
-							}
-							else {
-								$macro_value = formatHistoryValue($history[$itemid][0]['value'], $db_items[$itemid]);
-							}
-
-							$macro_values[$key][$token] = $macro_value;
-							break;
+					if ($data['macro'] === 'ITEM.VALUE' || $data['macro'] === 'ITEM.LASTVALUE') {
+						$macro_values[$key][$token] = array_key_exists('macrofunc', $data)
+							? self::calcMacrofunc($history[$itemid][0]['value'], $data['macrofunc'])
+							: formatHistoryValue($history[$itemid][0]['value'], $db_items[$itemid]);
+						continue;
 					}
 
 					if ($db_items[$itemid]['value_type'] != ITEM_VALUE_TYPE_LOG) {
