@@ -21,20 +21,6 @@ class testWidgets extends CWebTest {
 	const TABLE_SELECTOR = 'xpath://form[@name="itemform"]//table';
 
 	protected static $dashboardid;
-	protected static $acktime;
-	protected static $time;
-
-	/**
-	 * Attach MessageBehavior and TableBehavior to the test.
-	 *
-	 * @return array
-	 */
-	public function getBehaviors() {
-		return [
-			CMessageBehavior::class,
-			CTableBehavior::class
-		];
-	}
 
 	/**
 	 * Gets widget and widget_field tables to compare hash values, excludes widget_fieldid because it can change.

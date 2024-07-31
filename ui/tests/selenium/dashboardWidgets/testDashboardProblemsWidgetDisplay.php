@@ -35,10 +35,7 @@ class testDashboardProblemsWidgetDisplay extends testWidgets {
 	protected static $eventid_for_widget_unsigned;
 
 	/**
-	 * Attach Widget Behavior to the test.
-	 */
-	/**
-	 * Attach MessageBehavior and TableBehavior to the test.
+	 * Attach Behaviors to the test.
 	 *
 	 * @return array
 	 */
@@ -189,9 +186,9 @@ class testDashboardProblemsWidgetDisplay extends testWidgets {
 		}
 
 		// Create events and problems.
-		static::$time = time();
+		self::$time = time();
 		foreach (CDataHelper::getIds('description') as $name => $id) {
-			CDBHelper::setTriggerProblem($name, TRIGGER_VALUE_TRUE, ['clock' => static::$time]);
+			CDBHelper::setTriggerProblem($name, TRIGGER_VALUE_TRUE, ['clock' => self::$time]);
 		}
 
 		// Manual close is true for the problem: Trigger for widget 1 char.
@@ -241,7 +238,7 @@ class testDashboardProblemsWidgetDisplay extends testWidgets {
 			'eventids' => self::$eventid_for_widget_unsigned,
 			'selectAcknowledges' => ['clock']
 		]);
-		static::$acktime = CTestArrayHelper::get($event, '0.acknowledges.0.clock');
+		self::$acktime = CTestArrayHelper::get($event, '0.acknowledges.0.clock');
 	}
 
 	public static function getCheckWidgetTableData() {
@@ -767,7 +764,7 @@ class testDashboardProblemsWidgetDisplay extends testWidgets {
 	 * @onAfter deleteWidgets
 	 */
 	public function testDashboardProblemsWidgetDisplay_CheckTable($data) {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.static::$dashboardid);
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
 		$dashboard = CDashboardElement::find()->one();
 		$form = $this->openWidgetAndFill($dashboard, 'Problems', $data['fields']);
 
@@ -790,7 +787,7 @@ class testDashboardProblemsWidgetDisplay extends testWidgets {
 		// Change time for actual value, because it cannot be used in data provider.
 		foreach ($data['result'] as &$row) {
 			if (CTestArrayHelper::get($row, 'Time')) {
-				$row['Time'] = date('H:i:s', static::$time);
+				$row['Time'] = date('H:i:s', self::$time);
 			}
 			unset($row);
 		}
@@ -814,8 +811,8 @@ class testDashboardProblemsWidgetDisplay extends testWidgets {
 						// Check rows in hint's table.
 						foreach ($hint_table->getRows() as $i => $row) {
 							$hint_rows[$i]['Time'] = ($hint_rows[$i]['Time'] === 'acknowledged')
-								? date('Y-m-d H:i:s', static::$acktime)
-								: date('Y-m-d H:i:s', static::$time);
+								? date('Y-m-d H:i:s', self::$acktime)
+								: date('Y-m-d H:i:s', self::$time);
 							$row->assertValues($hint_rows[$i]);
 						}
 
