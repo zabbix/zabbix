@@ -695,7 +695,8 @@ int	zbx_calculate_macro_function(const char *expression, const zbx_token_func_ma
 	size_t			nparam = 0, param_alloc = 8, buf_alloc = 0, buf_offset = 0, len, sep_pos;
 	int			(*macrofunc)(char **params, size_t nparam, char **out), ret;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+	if (NULL == *out)
+		return FAIL;
 
 	ptr = expression + func_macro->func.l;
 	len = func_macro->func_param.l - func_macro->func.l;
