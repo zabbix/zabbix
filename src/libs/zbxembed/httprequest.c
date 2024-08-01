@@ -25,6 +25,7 @@
 #include "httprequest.h"
 #include "embed.h"
 #include "duktape.h"
+#include "global.h"
 
 #ifdef HAVE_LIBCURL
 
@@ -72,7 +73,7 @@ static size_t	curl_write_cb(void *ptr, size_t size, size_t nmemb, void *userdata
 	size_t			r_size = size * nmemb;
 	zbx_es_httprequest_t	*request = (zbx_es_httprequest_t *)userdata;
 
-	zbx_strncpy_alloc(&request->data, &request->data_alloc, &request->data_offset, (const char *)ptr, r_size);
+	zbx_str_memcpy_alloc(&request->data, &request->data_alloc, &request->data_offset, (const char *)ptr, r_size);
 
 	return r_size;
 }
@@ -231,7 +232,7 @@ static duk_ret_t	es_httprequest_add_header(duk_context *ctx)
 	if (NULL == (request = es_httprequest(ctx)))
 		return duk_error(ctx, DUK_RET_EVAL_ERROR, "internal scripting error: null object");
 
-	if (SUCCEED != zbx_cesu8_to_utf8(duk_to_string(ctx, 0), &utf8))
+	if (SUCCEED != es_duktape_string_decode(duk_safe_to_string(ctx, 0), &utf8))
 	{
 		err_index = duk_push_error_object(ctx, DUK_RET_TYPE_ERROR, "cannot convert header to utf8");
 		goto out;
@@ -301,6 +302,7 @@ static duk_ret_t	es_httprequest_query(duk_context *ctx, const char *http_request
 	int			err_index = -1;
 	zbx_es_env_t		*env;
 	zbx_uint64_t		timeout_ms, elapsed_ms;
+	duk_size_t		contents_len = 0;
 
 	if (NULL == (env = zbx_es_get_env(ctx)))
 		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot access internal environment");
@@ -314,7 +316,7 @@ static duk_ret_t	es_httprequest_query(duk_context *ctx, const char *http_request
 		goto out;
 	}
 
-	if (SUCCEED != zbx_cesu8_to_utf8(duk_to_string(ctx, 0), &url))
+	if (SUCCEED != es_duktape_string_decode(duk_safe_to_string(ctx, 0), &url))
 	{
 		err_index = duk_push_error_object(ctx, DUK_RET_TYPE_ERROR, "cannot convert URL to utf8");
 		goto out;
@@ -322,10 +324,9 @@ static duk_ret_t	es_httprequest_query(duk_context *ctx, const char *http_request
 
 	if (0 == duk_is_null_or_undefined(ctx, 1))
 	{
-		if (SUCCEED != zbx_cesu8_to_utf8(duk_to_string(ctx, 1), &contents))
+		if (NULL == (contents = es_get_buffer_dyn(ctx, 1, &contents_len)))
 		{
-			err_index = duk_push_error_object(ctx, DUK_RET_TYPE_ERROR,
-					"cannot convert request contents to utf8");
+			err_index = duk_push_error_object(ctx, DUK_RET_TYPE_ERROR, "cannot obtain second parameter");
 			goto out;
 		}
 	}
@@ -349,7 +350,7 @@ static duk_ret_t	es_httprequest_query(duk_context *ctx, const char *http_request
 			request->headers_sz = 0;
 		}
 
-		if (NULL != contents)
+		if (NULL != contents && DUK_TYPE_STRING == duk_get_type(ctx, 1))
 		{
 			if (SUCCEED == zbx_json_open(contents, &jp))
 				request->headers = curl_slist_append(NULL, "Content-Type: application/json");
@@ -362,6 +363,7 @@ static duk_ret_t	es_httprequest_query(duk_context *ctx, const char *http_request
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_CUSTOMREQUEST, http_request, err);
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_TIMEOUT_MS, timeout_ms - elapsed_ms, err);
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_POSTFIELDS, ZBX_NULL2EMPTY_STR(contents), err);
+	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_POSTFIELDSIZE, (long)contents_len, err);
 	ZBX_CURL_SETOPT(ctx, request->handle, ZBX_CURLOPT_ACCEPT_ENCODING, "", err);
 #if LIBCURL_VERSION_NUM >= 0x071304
 	/* CURLOPT_PROTOCOLS is supported starting with version 7.19.4 (0x071304) */
@@ -453,7 +455,7 @@ static duk_ret_t	es_httprequest_set_proxy(duk_context *ctx)
 	if (NULL == (request = es_httprequest(ctx)))
 		return duk_error(ctx, DUK_RET_EVAL_ERROR, "internal scripting error: null object");
 
-	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_PROXY, duk_to_string(ctx, 0), err);
+	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_PROXY, duk_safe_to_string(ctx, 0), err);
 out:
 	if (-1 != err_index)
 		return duk_throw(ctx);
@@ -567,7 +569,7 @@ static duk_ret_t	es_httprequest_set_httpauth(duk_context *ctx)
 
 	if (0 == duk_is_null_or_undefined(ctx, 1))
 	{
-		if (SUCCEED != zbx_cesu8_to_utf8(duk_to_string(ctx, 1), &username))
+		if (SUCCEED != es_duktape_string_decode(duk_safe_to_string(ctx, 1), &username))
 		{
 			err_index = duk_push_error_object(ctx, DUK_RET_TYPE_ERROR, "cannot convert username to utf8");
 			goto out;
@@ -576,7 +578,7 @@ static duk_ret_t	es_httprequest_set_httpauth(duk_context *ctx)
 
 	if (0 == duk_is_null_or_undefined(ctx, 2))
 	{
-		if (SUCCEED != zbx_cesu8_to_utf8(duk_to_string(ctx, 2), &password))
+		if (SUCCEED != es_duktape_string_decode(duk_safe_to_string(ctx, 2), &password))
 		{
 			err_index = duk_push_error_object(ctx, DUK_RET_TYPE_ERROR, "cannot convert username to utf8");
 			goto out;

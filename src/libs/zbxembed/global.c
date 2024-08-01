@@ -27,6 +27,53 @@
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: export duktape data at the index into buffer                      *
+ *                                                                            *
+ * Return value: allocated buffer with exported data or NULL on error         *
+ *                                                                            *
+ * Comments: Throws an error:                                                 *
+ *               - if the top value at ctx value stack is non buffer object   *
+ *               - if the value stack is empty                                *
+ *           The returned buffer must be freed by the caller.                 *
+ *                                                                            *
+ ******************************************************************************/
+char	*es_get_buffer_dyn(duk_context *ctx, int index, duk_size_t *len)
+{
+	duk_int_t	type;
+	const char	*ptr;
+	char		*buf = NULL;
+
+	*len = 0;
+
+	type = duk_get_type(ctx, index);
+
+	switch (type)
+	{
+		case DUK_TYPE_UNDEFINED:
+		case DUK_TYPE_NONE:
+		case DUK_TYPE_NULL:
+			return NULL;
+	}
+
+	if (NULL != (ptr = duk_get_buffer_data(ctx, index, len)))
+	{
+		buf = zbx_malloc(NULL, *len);
+		memcpy(buf, ptr, *len);
+
+		return buf;
+	}
+
+	if (type == DUK_TYPE_BUFFER)
+		return NULL;
+
+	if (SUCCEED == es_duktape_string_decode(duk_safe_to_string(ctx, index), &buf))
+		*len = strlen(buf);
+
+	return buf;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: es_btoa                                                          *
  *                                                                            *
  * Purpose: encodes parameter to base64 string                                *
@@ -40,15 +87,17 @@
  ******************************************************************************/
 static duk_ret_t	es_btoa(duk_context *ctx)
 {
-	char	*str = NULL, *b64str = NULL;
+	char		*str, *b64str = NULL;
+	duk_size_t	len;
 
-	if (SUCCEED != zbx_cesu8_to_utf8(duk_require_string(ctx, 0), &str))
-		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot convert value to utf8");
+	if (NULL == (str = es_get_buffer_dyn(ctx, 0, &len)))
+		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot obtain parameter");
 
-	str_base64_encode_dyn(str, &b64str, (int)strlen(str));
+	str_base64_encode_dyn(str, &b64str, (int)len);
 	duk_push_string(ctx, b64str);
 	zbx_free(str);
 	zbx_free(b64str);
+
 	return 1;
 }
 
@@ -67,18 +116,22 @@ static duk_ret_t	es_btoa(duk_context *ctx)
  ******************************************************************************/
 static duk_ret_t	es_atob(duk_context *ctx)
 {
-	char	*buffer = NULL, *str = NULL;
+	char	*buffer = NULL, *str = NULL, *ptr;
 	int	out_size, buffer_size;
 
-	if (SUCCEED != zbx_cesu8_to_utf8(duk_require_string(ctx, 0), &str))
+	if (SUCCEED != es_duktape_string_decode(duk_require_string(ctx, 0), &str))
 		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot convert value to utf8");
 
 	buffer_size = (int)strlen(str) * 3 / 4 + 1;
 	buffer = zbx_malloc(buffer, (size_t)buffer_size);
 	str_base64_decode(str, buffer, buffer_size, &out_size);
-	duk_push_lstring(ctx, buffer, (duk_size_t)out_size);
+
+	ptr = duk_push_fixed_buffer(ctx, out_size);
+	memcpy(ptr, buffer, out_size);
+
 	zbx_free(str);
 	zbx_free(buffer);
+
 	return 1;
 }
 
@@ -102,14 +155,15 @@ static duk_ret_t	es_md5(duk_context *ctx)
 	md5_byte_t	hash[MD5_DIGEST_SIZE];
 	int		i;
 	char		*str = NULL, *md5sum, *ptr;
+	duk_size_t	len;
 
-	if (SUCCEED != zbx_cesu8_to_utf8(duk_require_string(ctx, 0), &str))
-		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot convert value to utf8");
+	if (NULL == (str = es_get_buffer_dyn(ctx, 0, &len)))
+		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot obtain parameter");
 
 	ptr = md5sum = (char *)zbx_malloc(NULL, MD5_DIGEST_SIZE * 2 + 1);
 
 	zbx_md5_init(&state);
-	zbx_md5_append(&state, (const md5_byte_t *)str, strlen(str));
+	zbx_md5_append(&state, (const md5_byte_t *)str, (int)len);
 	zbx_md5_finish(&state, hash);
 
 	for (i = 0; i < MD5_DIGEST_SIZE; i++)
@@ -141,13 +195,15 @@ static duk_ret_t	es_md5(duk_context *ctx)
  ******************************************************************************/
 static duk_ret_t	es_sha256(duk_context *ctx)
 {
-	char	*str = NULL, hash_res[ZBX_SHA256_DIGEST_SIZE], hash_res_stringhexes[ZBX_SHA256_DIGEST_SIZE * 2 + 1];
-	int	i;
+	char		*str = NULL, hash_res[ZBX_SHA256_DIGEST_SIZE],
+			hash_res_stringhexes[ZBX_SHA256_DIGEST_SIZE * 2 + 1];
+	int		i;
+	duk_size_t	len;
 
-	if (SUCCEED != zbx_cesu8_to_utf8(duk_require_string(ctx, 0), &str))
-		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot convert value to utf8");
+	if (NULL == (str = es_get_buffer_dyn(ctx, 0, &len)))
+		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot obtain parameter");
 
-	zbx_sha256_hash(str, hash_res);
+	zbx_sha256_hash_len(str, len, hash_res);
 
 	for (i = 0 ; i < ZBX_SHA256_DIGEST_SIZE; i++)
 	{
