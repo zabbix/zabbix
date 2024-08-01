@@ -5269,6 +5269,8 @@ class testDashboardTopHostsWidget extends testWidgets {
 	 * @param array     $data			data provider values
 	 * @param string    $name		    name of the dashboard where to create Top Hosts widget
 	 * @param string	$widget_name	name of the widget to be created
+	 *
+	 * @return CDashboardElement
 	 */
 	protected function createTopHostsWidget($data, $name, $widget_name = null) {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.$name);
@@ -5276,8 +5278,19 @@ class testDashboardTopHostsWidget extends testWidgets {
 		$fields = array_key_exists('main_fields', $data) ? $data['main_fields'] : ['Name' => $widget_name];
 		$form = $this->openWidgetAndFill($dashboard, 'Top hosts', $fields);
 
+		// Fill Tags.
+		if (array_key_exists('Tags', $data)) {
+			$form->getField('id:evaltype')->fill(CTestArrayHelper::get($data['Tags'], 'evaluation', 'And/Or'));
+			$this->setTags($data['Tags']['tags']);
+		}
+
 		// Add new column(s) and save widget.
 		$this->fillColumnForm($data, 'create');
+
+		// 'Order by' can only be filled after columns are added.
+		if (array_key_exists('Order by', $data)) {
+			$form->fill(['Order by' => $data['Order by']]);
+		}
 
 		$form->submit();
 		COverlayDialogElement::ensureNotPresent();
@@ -5289,6 +5302,8 @@ class testDashboardTopHostsWidget extends testWidgets {
 		$dashboard->save();
 		$dashboard->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
+
+		return $dashboard;
 	}
 
 	/**
@@ -5344,24 +5359,20 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// #0 Filtered by hosts, in column: item which came from two different templates.
 			[
 				[
-					'fields' => [
+					'main_fields' => [
 						'Name' => 'Item on different hosts from one template',
 						'Hosts' => ['HostA', 'HostB', 'HostC']
 					],
-					'Columns' => [
+					'column_fields' => [
 						[
-							'fields' => [
-								'Name' => 'Host',
-								'Data' => 'Host name'
-							]
+							'Name' => 'Host',
+							'Data' => 'Host name'
 						],
 						[
-							'fields' => [
-								'Name' => 'Column1',
-								'Item name' => [
-									'values' => 'Item1',
-									'context' => ['values' => 'HostA']
-								]
+							'Name' => 'Column1',
+							'Item name' => [
+								'values' => 'Item1',
+								'context' => ['values' => 'HostA']
 							]
 						]
 					],
@@ -5376,19 +5387,17 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// #1 Filtered by host group, Host limit is set less than filtered result.
 			[
 				[
-					'fields' => [
+					'main_fields' => [
 						'Name' => 'Show lines < then possible result',
 						'Host groups' => ['Top Hosts test host group'],
 						'Host limit' => 2
 					],
-					'Columns' => [
+					'column_fields' => [
 						[
-							'fields' => [
-								'Name' => 'Item',
-								'Item name' => [
-									'values' => 'Item1',
-									'context' => ['values' => 'HostA']
-								]
+							'Name' => 'Item',
+							'Item name' => [
+								'values' => 'Item1',
+								'context' => ['values' => 'HostA']
 							]
 						]
 					],
@@ -5403,10 +5412,10 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// TODO: This case is failing until ZBX-24828 is fixed.
 //			[
 //				[
-//					'fields' => [
+//					'main_fields' => [
 //						'Name' => 'No data'
 //					],
-//					'Columns' => [
+//					'column_fields' => [
 //						[
 //							'fields' => [
 //								'Name' => 'Item2',
@@ -5424,7 +5433,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// #3 Filtered by tags, columns: text and item, order newest in bottom.
 			[
 				[
-					'fields' => [
+					'main_fields' => [
 						'Name' => 'Hosts filtered by tag'
 					],
 					'Tags' => [
@@ -5436,21 +5445,17 @@ class testDashboardTopHostsWidget extends testWidgets {
 							]
 						]
 					],
-					'Columns' => [
+					'column_fields' => [
 						[
-							'fields' => [
-								'Name' => 'Text column',
-								'Data' => 'Text',
-								'Text' => '🙂🙃み け め 𒁥 test_text:'
-							]
+							'Name' => 'Text column',
+							'Data' => 'Text',
+							'Text' => '🙂🙃み け め 𒁥 test_text:'
 						],
 						[
-							'fields' => [
-								'Name' => '🙂🙃み け め 𒁥',
-								'Item name' => [
-									'values' => 'Item1',
-									'context' => ['values' => 'HostA']
-								]
+							'Name' => '🙂🙃み け め 𒁥',
+							'Item name' => [
+								'values' => 'Item1',
+								'context' => ['values' => 'HostA']
 							]
 						]
 					],
@@ -5464,7 +5469,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// #4 Filtered by tags with OR operator, different macros used in columns.
 			[
 				[
-					'fields' => [
+					'main_fields' => [
 						'Name' => 'Hosts filtered by tag, macros in columns'
 					],
 					'Tags' => [
@@ -5481,53 +5486,41 @@ class testDashboardTopHostsWidget extends testWidgets {
 							]
 						]
 					],
-					'Columns' => [
+					'column_fields' => [
 						[
-							'fields' => [
-								'Name' => 'Host name',
-								'Data' => 'Host name'
+							'Name' => 'Host name',
+							'Data' => 'Host name'
+						],
+						[
+							'Name' => 'Text: Macro in host',
+							'Data' => 'Text',
+							'Text' => '{HOST.HOST}' // This will be resolved in widget.
+						],
+						[
+							'Name' => '{#LLD_MACRO}',
+							'Item name' => [
+								'values' => 'Item1',
+								'context' => ['values' => 'HostB']
 							]
 						],
 						[
-							'fields' => [
-								'Name' => 'Text: Macro in host',
-								'Data' => 'Text',
-								'Text' => '{HOST.HOST}' // This will be resolved in widget.
+							'Name' => '{HOST.HOST}',
+							'Item name' => [
+								'values' => 'Item1',
+								'context' => ['values' => 'HostB']
 							]
 						],
 						[
-							'fields' => [
-								'Name' => '{#LLD_MACRO}',
-								'Item name' => [
-									'values' => 'Item1',
-									'context' => ['values' => 'HostB']
-								]
+							'Name' => '{$USERMACRO}',
+							'Item name' => [
+								'values' => 'Item2',
+								'context' => ['values' => 'HostA']
 							]
 						],
 						[
-							'fields' => [
-								'Name' => '{HOST.HOST}',
-								'Item name' => [
-									'values' => 'Item1',
-									'context' => ['values' => 'HostB']
-								]
-							]
-						],
-						[
-							'fields' => [
-								'Name' => '{$USERMACRO}',
-								'Item name' => [
-									'values' => 'Item2',
-									'context' => ['values' => 'HostA']
-								]
-							]
-						],
-						[
-							'fields' => [
-								'Name' => '{$1} Resolved',
-								'Data' => 'Text',
-								'Text' => '{$1}' // This will be resolved in widget.
-							]
+							'Name' => '{$1} Resolved',
+							'Data' => 'Text',
+							'Text' => '{$1}' // This will be resolved in widget.
 						]
 					],
 					'Order by' => 'Host name',
@@ -5557,35 +5550,29 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// #5 Filtered by Host group, not including Host in maintenance.
 			[
 				[
-					'fields' => [
+					'main_fields' => [
 						'Name' => 'Hosts group without maintenance',
 						'Host groups' => 'Top Hosts test host group'
 					],
-					'Columns' => [
+					'column_fields' => [
 						[
-							'fields' => [
-								'Name' => 'Host',
-								'Data' => 'Host name'
+							'Name' => 'Host',
+							'Data' => 'Host name'
+						],
+						[
+							'Name' => 'Maintenance Trapper',
+							'Item name' => [
+								'values' => 'Maintenance trapper',
+								'context' => ['values' => 'Host in maintenance']
 							]
 						],
 						[
-							'fields' => [
-								'Name' => 'Maintenance Trapper',
-								'Item name' => [
-									'values' => 'Maintenance trapper',
-									'context' => ['values' => 'Host in maintenance']
-								]
-							]
-						],
-						[
-							'fields' => [
-								'Name' => 'Item1',
-								'Item name' => [
-									'values' => 'Item1',
-									'context' => ['values' => 'HostA']
-								],
-								'Decimal places' => 5
-							]
+							'Name' => 'Item1',
+							'Item name' => [
+								'values' => 'Item1',
+								'context' => ['values' => 'HostA']
+							],
+							'Decimal places' => 5
 						]
 					],
 					'result' => [
@@ -5599,35 +5586,29 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// #6 Filtered by Host group, including Host in maintenance.
 			[
 				[
-					'fields' => [
+					'main_fields' => [
 						'Name' => 'Hosts group with maintenance',
 						'Host groups' => 'Top Hosts test host group',
 						'Show hosts in maintenance' => true
 					],
-					'Columns' => [
+					'column_fields' => [
 						[
-							'fields' => [
-								'Name' => 'Host',
-								'Data' => 'Host name'
-							]
+							'Name' => 'Host',
+							'Data' => 'Host name'
 						],
 						[
-							'fields' => [
-								'Name' => 'Maintenance Trapper',
-								'Item name' => [
-									'values' => 'Maintenance trapper',
-									'context' => ['values' => 'Host in maintenance']
-								],
-								'Decimal places' => 4
-							]
+							'Name' => 'Maintenance Trapper',
+							'Item name' => [
+								'values' => 'Maintenance trapper',
+								'context' => ['values' => 'Host in maintenance']
+							],
+							'Decimal places' => 4
 						],
 						[
-							'fields' => [
-								'Name' => 'Item1',
-								'Item name' => [
-									'values' => 'Item1',
-									'context' => ['values' => 'HostA']
-								]
+							'Name' => 'Item1',
+							'Item name' => [
+								'values' => 'Item1',
+								'context' => ['values' => 'HostA']
 							]
 						]
 					],
@@ -5655,53 +5636,10 @@ class testDashboardTopHostsWidget extends testWidgets {
 	 * @onAfter deleteWidgets
 	 */
 	public function testDashboardTopHostsWidget_CheckWidgetTable($data) {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.static::$dashboardid);
-		$dashboard = CDashboardElement::find()->one();
-		$form = $this->openWidgetAndFill($dashboard, 'Top hosts', $data['fields']);
-
-		if (array_key_exists('Tags', $data)) {
-			$form->getField('id:evaltype')->fill(CTestArrayHelper::get($data['Tags'], 'evaluation', 'And/Or'));
-			$this->setTags($data['Tags']['tags']);
-		}
-
-		// Fill Columns field.
-		if (array_key_exists('Columns', $data)) {
-			foreach ($data['Columns'] as $column) {
-				$form->getFieldContainer('Columns')->query('button:Add')->one()->waitUntilClickable()->click();
-				$column_overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();
-				$column_overlay_form = $column_overlay->asForm();
-				$column_overlay_form->fill($column['fields']);
-
-				foreach (['Highlights', 'Thresholds'] as $table_field) {
-					if (array_key_exists($table_field, $column)) {
-						foreach ($column[$table_field] as $highlight) {
-							$column_overlay_form->getFieldContainer($table_field)->query('button:Add')->one()
-									->waitUntilClickable()->click();
-							$column_overlay_form->fill($highlight);
-						}
-					}
-				}
-
-				$column_overlay->getFooter()->query('button:Add')->waitUntilClickable()->one()->click();
-				$column_overlay->waitUntilNotVisible();
-				$form->waitUntilReloaded();
-			}
-		}
-
-		// 'Order by' can only be filled after columns are added.
-		if (array_key_exists('Order by', $data)) {
-			$form->fill(['Order by' => $data['Order by']]);
-		}
-
-		$form->submit();
-
-		// Check saved dashboard.
-		$form->waitUntilNotVisible();
-		$dashboard->save();
-		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
+		$dashboard = $this->createTopHostsWidget($data, static::$dashboardid);
 
 		// Assert widget's table.
-		$dashboard->getWidget($data['fields']['Name'])->waitUntilReady();
+		$dashboard->getWidget($data['main_fields']['Name'])->waitUntilReady();
 		$table = $this->query('class:list-table')->asTable()->one();
 
 		if (empty($data['result'])) {
