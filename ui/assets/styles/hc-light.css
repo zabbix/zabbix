@@ -2399,7 +2399,7 @@ button {
   .list-table .btn-icon:not(.no-indent):not(:first-child),
   .list-table .icon:not(.no-indent):not(:first-child),
   .list-table .link-action:not(.no-indent):not(:first-child) {
-    margin-left: 2px; }
+    margin-left: 5px; }
 .list-table .icon {
   border-radius: 2px; }
 .list-table .btn-small,
@@ -2445,9 +2445,10 @@ button {
     .list-table thead th.column-tags-3 {
       width: 452px; } }
 .list-table .tag {
+  margin-right: 0;
   cursor: pointer; }
-  .list-table .tag:not(:last-child) {
-    margin-right: 3px; }
+  .list-table .tag:not(:first-child) {
+    margin-left: 3px; }
 .list-table.compact-view .tag {
   max-width: 40px; }
   @media screen and (min-width: 1200px) {
