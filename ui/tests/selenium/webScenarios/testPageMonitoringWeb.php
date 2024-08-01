@@ -618,6 +618,7 @@ class testPageMonitoringWeb extends CWebTest {
 		$form = $this->query('id:http_step')->asForm()->one();
 		$form->fill(['Name' => 'Step number 3', 'id:url' => 'test.com']);
 		$form->submit();
+		COverlayDialogElement::ensureNotPresent();
 		$this->query('button:Update')->one()->click();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Web scenario updated');

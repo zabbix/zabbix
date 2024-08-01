@@ -66,4 +66,6 @@ void	es_obj_attach_data(zbx_es_env_t *env, void *data);
 void	*es_obj_get_data(zbx_es_env_t *env);
 void	*es_obj_detach_data(zbx_es_env_t *env);
 
+int	es_duktape_string_decode(const char *duk_str, char **out_str);
+
 #endif /* ZABBIX_EMBED_H */
