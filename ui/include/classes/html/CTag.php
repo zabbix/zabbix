@@ -21,7 +21,7 @@ class CTag extends CObject {
 	 *
 	 * @var array
 	 */
-	public $attributes = [];
+	private $attributes = [];
 
 	/**
 	 * The name of the tag.

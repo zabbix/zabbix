@@ -198,8 +198,7 @@ else {
 			}
 
 			if ($column instanceof CCol) {
-				$attributes = $column->attributes ?? [];
-				if (!isset($attributes['no-data'])) {
+				if (!$column->getAttribute('no-data')) {
 					$is_empty_row = false;
 					break;
 				}
