@@ -267,7 +267,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 		$row = $this->query('class:list-table')->asTable()->one()->findRow('Name', self::$media_name);
 
 		$statuses = ['Disabled', 'Enabled'];
-		foreach($statuses as $old_status) {
+		foreach ($statuses as $old_status) {
 			$new_status = array_values(array_diff($statuses, [$old_status]))[0];
 			// Change media type status.
 			$row->query('link', $old_status)->one()->click();
@@ -283,6 +283,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 
 			// Check result on fronted.
 			$this->assertMessage(TEST_GOOD, 'Media type '.lcfirst($new_status));
+			CMessageElement::find()->one()->close();
 
 			if ($new_status === 'Enabled') {
 				$enabled = true;

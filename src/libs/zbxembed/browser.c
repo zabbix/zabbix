@@ -46,7 +46,7 @@ static zbx_webdriver_t *es_webdriver(duk_context *ctx)
 		return NULL;
 	}
 
-	if (NULL == (wd = (zbx_webdriver_t *)es_obj_get_data(env)))
+	if (NULL == (wd = (zbx_webdriver_t *)es_obj_get_data(env, ES_OBJ_BROWSER)))
 		(void)duk_push_error_object(ctx, DUK_RET_EVAL_ERROR, "cannot find native data attached to object");
 
 	return wd;
@@ -67,7 +67,7 @@ static duk_ret_t	es_browser_dtor(duk_context *ctx)
 
 	zabbix_log(LOG_LEVEL_TRACE, "Browser::~Browser()");
 
-	if (NULL != (wd = (zbx_webdriver_t *)es_obj_detach_data(env)))
+	if (NULL != (wd = (zbx_webdriver_t *)es_obj_detach_data(env, ES_OBJ_BROWSER)))
 	{
 		webdriver_release(wd);
 		env->browser_objects--;
@@ -98,7 +98,7 @@ static duk_ret_t	es_browser_ctor(duk_context *ctx)
 	duk_dup(ctx, 0);
 	duk_pcall_prop(ctx, -3, 1);
 
-	if (SUCCEED != es_duktape_string_decode(duk_to_string(ctx, -1), &capabilities))
+	if (SUCCEED != es_duktape_string_decode(duk_safe_to_string(ctx, -1), &capabilities))
 	{
 		err_index = duk_push_error_object(ctx, DUK_RET_TYPE_ERROR,
 				"cannot convert browser capabilities to utf8");
@@ -128,7 +128,7 @@ static duk_ret_t	es_browser_ctor(duk_context *ctx)
 	}
 
 	duk_push_this(ctx);
-	es_obj_attach_data(env, wd);
+	es_obj_attach_data(env, wd, ES_OBJ_BROWSER);
 	wd->browser = duk_get_heapptr(ctx, -1);
 
 	if (SUCCEED != webdriver_open_session(wd, capabilities, &error))
@@ -147,7 +147,7 @@ out:
 	{
 		if (NULL != wd)
 		{
-			(void)es_obj_detach_data(env);
+			(void)es_obj_detach_data(env, ES_OBJ_BROWSER);
 			webdriver_release(wd);
 		}
 
@@ -177,7 +177,7 @@ static duk_ret_t	es_browser_navigate(duk_context *ctx)
 	if (NULL == (wd = es_webdriver(ctx)))
 		return duk_throw(ctx);
 
-	if (SUCCEED != es_duktape_string_decode(duk_to_string(ctx, 0), &url))
+	if (SUCCEED != es_duktape_string_decode(duk_safe_to_string(ctx, 0), &url))
 	{
 		(void)browser_push_error(ctx, wd, "cannot get url: %s", error);
 
@@ -246,13 +246,13 @@ static duk_ret_t	es_browser_find_element(duk_context *ctx)
 	if (NULL == (wd = es_webdriver(ctx)))
 		return duk_throw(ctx);
 
-	if (SUCCEED != es_duktape_string_decode(duk_to_string(ctx, 0), &strategy))
+	if (SUCCEED != es_duktape_string_decode(duk_safe_to_string(ctx, 0), &strategy))
 	{
 		err_index = browser_push_error(ctx, wd, "cannot convert strategy parameter to utf8");
 		goto out;
 	}
 
-	if (SUCCEED != es_duktape_string_decode(duk_to_string(ctx, 1), &selector))
+	if (SUCCEED != es_duktape_string_decode(duk_safe_to_string(ctx, 1), &selector))
 	{
 		err_index = browser_push_error(ctx, wd, "cannot convert selector parameter to utf8");
 		goto out;
@@ -305,13 +305,13 @@ static duk_ret_t	es_browser_find_elements(duk_context *ctx)
 	if (NULL == (wd = es_webdriver(ctx)))
 		return duk_throw(ctx);
 
-	if (SUCCEED != es_duktape_string_decode(duk_to_string(ctx, 0), &strategy))
+	if (SUCCEED != es_duktape_string_decode(duk_safe_to_string(ctx, 0), &strategy))
 	{
 		err_index = browser_push_error(ctx, wd, "cannot convert strategy parameter to utf8");
 		goto out;
 	}
 
-	if (SUCCEED != es_duktape_string_decode(duk_to_string(ctx, 1), &selector))
+	if (SUCCEED != es_duktape_string_decode(duk_safe_to_string(ctx, 1), &selector))
 	{
 		err_index = browser_push_error(ctx, wd, "cannot convert selector parameter to utf8");
 		goto out;
@@ -686,7 +686,7 @@ static duk_ret_t	es_browser_add_cookie(duk_context *ctx)
 	duk_dup(ctx, 0);
 	duk_pcall_prop(ctx, -3, 1);
 
-	if (SUCCEED != es_duktape_string_decode(duk_to_string(ctx, -1), &cookie_json))
+	if (SUCCEED != es_duktape_string_decode(duk_safe_to_string(ctx, -1), &cookie_json))
 	{
 		(void)browser_push_error(ctx, wd, "cannot convert cookie object to JSON format");
 
@@ -826,7 +826,7 @@ static duk_ret_t	es_browser_set_error(duk_context *ctx)
 	if (NULL == (wd = es_webdriver(ctx)))
 		return duk_throw(ctx);
 
-	if (SUCCEED != es_duktape_string_decode(duk_to_string(ctx, 0), &message))
+	if (SUCCEED != es_duktape_string_decode(duk_safe_to_string(ctx, 0), &message))
 	{
 		(void)browser_push_error(ctx, wd, "cannot convert message parameter to utf8");
 
@@ -924,7 +924,7 @@ static duk_ret_t	es_browser_collect_perf_entries(duk_context *ctx)
 
 	if (!duk_is_null(ctx, 0) && !duk_is_undefined(ctx, 0))
 	{
-		if (SUCCEED != es_duktape_string_decode(duk_to_string(ctx, 0), &bookmark))
+		if (SUCCEED != es_duktape_string_decode(duk_safe_to_string(ctx, 0), &bookmark))
 		{
 			err_index = browser_push_error(ctx, wd, "cannot convert bookmark parameter to utf8");
 
@@ -1004,7 +1004,7 @@ static duk_ret_t	es_browser_get_raw_perf_entries_by_type(duk_context *ctx)
 		return duk_throw(ctx);
 	}
 
-	if (SUCCEED != es_duktape_string_decode(duk_to_string(ctx, 0), &entry_type))
+	if (SUCCEED != es_duktape_string_decode(duk_safe_to_string(ctx, 0), &entry_type))
 	{
 		(void)browser_push_error(ctx, wd, "cannot convert entry type parameter to utf8");
 		return duk_throw(ctx);
@@ -1051,7 +1051,7 @@ static duk_ret_t	es_browser_execute_script(duk_context *ctx)
 
 	wd = es_webdriver(ctx);
 
-	if (SUCCEED != es_duktape_string_decode(duk_to_string(ctx, 0), &script))
+	if (SUCCEED != es_duktape_string_decode(duk_safe_to_string(ctx, 0), &script))
 	{
 		(void)browser_push_error(ctx, wd, "cannot convert script parameter to utf8");
 

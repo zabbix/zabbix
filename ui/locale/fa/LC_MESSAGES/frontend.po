@@ -931,6 +931,10 @@ msgstr "افزودن ستون"
 msgid "Add a new widget"
 msgstr "افزودن ویجت جدید"
 
+#: widgets/navtree/Widget.php:34
+msgid "Add child element"
+msgstr ""
+
 #: widgets/navtree/Widget.php:39
 msgid "Add child elements"
 msgstr ""
@@ -963,6 +967,11 @@ msgstr "افزودن تگ های هاست"
 #: app/partials/trigger.edit.dependencies.tab.php:91
 #: app/views/trigger.massupdate.php:155
 msgid "Add host trigger"
+msgstr ""
+
+#: widgets/piechart/includes/CWidgetFieldDataSetView.php:260
+#: widgets/svggraph/includes/CWidgetFieldDataSetView.php:263
+msgid "Add item"
 msgstr ""
 
 #: app/partials/massupdate.macros.tab.php:96
@@ -1621,6 +1630,10 @@ msgstr ""
 msgid "At least one host group or host must be selected."
 msgstr ""
 
+#: include/classes/setup/CFrontendSetup.php:252
+msgid "At least one of MySQL or PostgreSQL should be supported."
+msgstr ""
+
 #: include/classes/setup/CFrontendSetup.php:241
 msgid "At least one of MySQL, PostgreSQL or Oracle should be supported."
 msgstr ""
@@ -1840,6 +1853,11 @@ msgstr "دسترسی"
 msgid "Availability report"
 msgstr "گزارش دسترسی"
 
+#: app/controllers/CControllerAvailabilityReportTrigger.php:70
+#: app/views/reports.availabilityreport.trigger.php:23
+msgid "Availability report graph"
+msgstr ""
+
 #: include/classes/html/CHostAvailability.php:80
 #: widgets/hostavail/views/widget.view.php:32
 msgid "Available"
@@ -1865,6 +1883,10 @@ msgstr ""
 
 #: app/views/administration.authentication.edit.php:131
 msgid "Avoid easy-to-guess passwords"
+msgstr ""
+
+#: jsLoader.php:172
+msgid "Awaiting data"
 msgstr ""
 
 #: widgets/svggraph/views/widget.edit.php:51
@@ -5297,6 +5319,10 @@ msgstr "ایجاد نوع رسانه"
 
 #: app/views/popup.import.php:143 jsLoader.php:349
 msgid "Create new"
+msgstr ""
+
+#: jsLoader.php:372
+msgid "Create new report"
 msgstr ""
 
 #: app/views/administration.proxy.list.php:239
@@ -9409,6 +9435,10 @@ msgstr[0] ""
 msgid "Host group elements"
 msgstr "عناصر گروه هاست"
 
+#: jsLoader.php:292
+msgid "Host group is not selected."
+msgstr ""
+
 #: include/views/monitoring.sysmap.edit.php:168
 msgid "Host group label type"
 msgstr "نوع برچسب گروه هاست"
@@ -9487,6 +9517,10 @@ msgstr "فهرست هاست"
 #: hostinventoriesoverview.php:26 hostinventoriesoverview.php:146
 msgid "Host inventory overview"
 msgstr "نمای کلی فهرست هاست"
+
+#: jsLoader.php:289
+msgid "Host is not selected."
+msgstr ""
 
 #: include/views/monitoring.sysmap.edit.php:183
 msgid "Host label type"
@@ -12787,6 +12821,10 @@ msgstr ""
 msgid "Map element label type"
 msgstr ""
 
+#: jsLoader.php:290
+msgid "Map is not selected."
+msgstr ""
+
 #: sysmap.php:128
 msgid "Map is updated! Return to map list?"
 msgstr ""
@@ -15026,6 +15064,19 @@ msgstr ""
 
 #: app/views/administration.proxygroup.list.php:80
 msgid "Online proxies"
+msgstr ""
+
+#: include/classes/api/services/CUser.php:874
+#: include/classes/api/services/CUser.php:882
+#: include/classes/api/services/CUser.php:889
+#, c-format
+msgid "Only Super admin or Admin users can update \"%1$s\" parameter."
+msgstr ""
+
+#: include/classes/api/services/CUser.php:812
+#: include/classes/api/services/CUser.php:853
+#, c-format
+msgid "Only Super admin users can update \"%1$s\" parameter."
 msgstr ""
 
 #: include/classes/api/services/CDRule.php:509
@@ -20674,6 +20725,10 @@ msgstr ""
 msgid "Trigger in template \"%1$s\" has dependency with trigger in template \"%2$s\"."
 msgstr ""
 
+#: jsLoader.php:291
+msgid "Trigger is not selected."
+msgstr ""
+
 #: include/views/monitoring.sysmap.edit.php:198
 msgid "Trigger label type"
 msgstr "نوع برچسب هشدار"
@@ -22717,6 +22772,10 @@ msgstr ""
 msgid "View as"
 msgstr ""
 
+#: jsLoader.php:417
+msgid "View related reports"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1735
 msgid "Virtual space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr ""
@@ -22921,6 +22980,10 @@ msgstr ""
 
 #: jsLoader.php:187
 msgid "Widget is too small for the specified number of columns and rows."
+msgstr ""
+
+#: jsLoader.php:205
+msgid "Widgets"
 msgstr ""
 
 #: graphs.php:39 include/views/configuration.graph.edit.php:100
@@ -23294,6 +23357,10 @@ msgstr ""
 #: include/classes/core/ZBase.php:763 include/func.inc.php:1709
 msgid "You must login to view this page."
 msgstr "شما باید وارد شوید تا این صفحه را ببینید"
+
+#: jsLoader.php:287
+msgid "You need to have at least one image uploaded to create map element. Images can be uploaded in Administration->General->Images section."
+msgstr ""
 
 #: include/classes/db/DB.php:133
 msgid "Your database is not working properly. Please wait a few minutes and try to repeat this action. If the problem still persists, please contact system administrator. The problem might be caused by long running transaction or row level lock accomplished by your database management system."
@@ -25298,6 +25365,10 @@ msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:953
 msgid "right() - Returns the rightmost count characters"
+msgstr ""
+
+#: widgets/navtree/Widget.php:41
+msgid "root"
 msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:966

@@ -1,1 +1,0 @@
-A......... [ZBX-24622] fixed inability to inherit a template with multiple items to multiple hosts when the total amount of inherited items exceeds, but is not a multiple of batch size (vmaksimovs)

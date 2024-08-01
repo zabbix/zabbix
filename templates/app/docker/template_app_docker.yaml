@@ -23,8 +23,6 @@ zabbix_export:
           name: Architecture
           type: DEPENDENT
           key: docker.architecture
-          delay: '0'
-          trends: '0'
           value_type: CHAR
           preprocessing:
             - type: JSONPATH
@@ -42,8 +40,6 @@ zabbix_export:
           name: 'Cgroup driver'
           type: DEPENDENT
           key: docker.cgroup_driver
-          delay: '0'
-          trends: '0'
           value_type: CHAR
           preprocessing:
             - type: JSONPATH
@@ -61,7 +57,6 @@ zabbix_export:
           name: 'Get containers'
           key: docker.containers
           history: '0'
-          trends: '0'
           value_type: TEXT
           tags:
             - tag: component
@@ -70,7 +65,6 @@ zabbix_export:
           name: 'Containers paused'
           type: DEPENDENT
           key: docker.containers.paused
-          delay: '0'
           description: 'Total number of containers paused on this host.'
           preprocessing:
             - type: JSONPATH
@@ -85,7 +79,6 @@ zabbix_export:
           name: 'Containers running'
           type: DEPENDENT
           key: docker.containers.running
-          delay: '0'
           description: 'Total number of containers running on this host.'
           preprocessing:
             - type: JSONPATH
@@ -100,7 +93,6 @@ zabbix_export:
           name: 'Containers stopped'
           type: DEPENDENT
           key: docker.containers.stopped
-          delay: '0'
           description: 'Total number of containers stopped on this host.'
           preprocessing:
             - type: JSONPATH
@@ -115,7 +107,6 @@ zabbix_export:
           name: 'Containers total'
           type: DEPENDENT
           key: docker.containers.total
-          delay: '0'
           description: 'Total number of containers on this host.'
           preprocessing:
             - type: JSONPATH
@@ -130,7 +121,6 @@ zabbix_export:
           name: 'Containers size'
           type: DEPENDENT
           key: docker.containers_size
-          delay: '0'
           units: B
           preprocessing:
             - type: JSONPATH
@@ -147,7 +137,6 @@ zabbix_export:
           name: 'CPU CFS Period enabled'
           type: DEPENDENT
           key: docker.cpu_cfs_period.enabled
-          delay: '0'
           description: 'https://docs.docker.com/config/containers/resource_constraints/#configure-the-default-cfs-scheduler'
           valuemap:
             name: 'Docker flag'
@@ -156,8 +145,6 @@ zabbix_export:
               parameters:
                 - $.CpuCfsPeriod
             - type: BOOL_TO_DECIMAL
-              parameters:
-                - ''
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
@@ -170,7 +157,6 @@ zabbix_export:
           name: 'CPU CFS Quota enabled'
           type: DEPENDENT
           key: docker.cpu_cfs_quota.enabled
-          delay: '0'
           description: 'https://docs.docker.com/config/containers/resource_constraints/#configure-the-default-cfs-scheduler'
           valuemap:
             name: 'Docker flag'
@@ -179,8 +165,6 @@ zabbix_export:
               parameters:
                 - $.CpuCfsQuota
             - type: BOOL_TO_DECIMAL
-              parameters:
-                - ''
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
@@ -193,7 +177,6 @@ zabbix_export:
           name: 'CPU Set enabled'
           type: DEPENDENT
           key: docker.cpu_set.enabled
-          delay: '0'
           description: 'https://docs.docker.com/config/containers/resource_constraints/#configure-the-default-cfs-scheduler'
           valuemap:
             name: 'Docker flag'
@@ -202,8 +185,6 @@ zabbix_export:
               parameters:
                 - $.CPUSet
             - type: BOOL_TO_DECIMAL
-              parameters:
-                - ''
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
@@ -216,7 +197,6 @@ zabbix_export:
           name: 'CPU Shares enabled'
           type: DEPENDENT
           key: docker.cpu_shares.enabled
-          delay: '0'
           description: 'https://docs.docker.com/config/containers/resource_constraints/#configure-the-default-cfs-scheduler'
           valuemap:
             name: 'Docker flag'
@@ -225,8 +205,6 @@ zabbix_export:
               parameters:
                 - $.CPUShares
             - type: BOOL_TO_DECIMAL
-              parameters:
-                - ''
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
@@ -239,7 +217,6 @@ zabbix_export:
           name: 'Get data_usage'
           key: docker.data_usage
           history: '0'
-          trends: '0'
           value_type: TEXT
           tags:
             - tag: component
@@ -248,7 +225,6 @@ zabbix_export:
           name: 'Debug enabled'
           type: DEPENDENT
           key: docker.debug.enabled
-          delay: '0'
           valuemap:
             name: 'Docker flag'
           preprocessing:
@@ -256,8 +232,6 @@ zabbix_export:
               parameters:
                 - $.Debug
             - type: BOOL_TO_DECIMAL
-              parameters:
-                - ''
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
@@ -270,8 +244,6 @@ zabbix_export:
           name: 'Default runtime'
           type: DEPENDENT
           key: docker.default_runtime
-          delay: '0'
-          trends: '0'
           value_type: CHAR
           preprocessing:
             - type: JSONPATH
@@ -289,8 +261,6 @@ zabbix_export:
           name: 'Storage driver'
           type: DEPENDENT
           key: docker.driver
-          delay: '0'
-          trends: '0'
           value_type: CHAR
           description: |
             Docker storage driver.
@@ -311,7 +281,6 @@ zabbix_export:
           name: Goroutines
           type: DEPENDENT
           key: docker.goroutines
-          delay: '0'
           description: 'Number of goroutines.'
           preprocessing:
             - type: JSONPATH
@@ -326,7 +295,6 @@ zabbix_export:
           name: 'Get images'
           key: docker.images
           history: '0'
-          trends: '0'
           value_type: TEXT
           tags:
             - tag: component
@@ -335,7 +303,6 @@ zabbix_export:
           name: 'Images available'
           type: DEPENDENT
           key: docker.images.top_level
-          delay: '0'
           description: 'Number of top-level images.'
           preprocessing:
             - type: JSONPATH
@@ -350,7 +317,6 @@ zabbix_export:
           name: 'Images total'
           type: DEPENDENT
           key: docker.images.total
-          delay: '0'
           description: 'Number of images with intermediate image layers.'
           preprocessing:
             - type: JSONPATH
@@ -365,7 +331,6 @@ zabbix_export:
           name: 'Images size'
           type: DEPENDENT
           key: docker.images_size
-          delay: '0'
           units: B
           preprocessing:
             - type: JSONPATH
@@ -382,7 +347,6 @@ zabbix_export:
           name: 'Get info'
           key: docker.info
           history: '0'
-          trends: '0'
           value_type: TEXT
           tags:
             - tag: component
@@ -391,7 +355,6 @@ zabbix_export:
           name: 'IPv4 Forwarding enabled'
           type: DEPENDENT
           key: docker.ipv4_forwarding.enabled
-          delay: '0'
           valuemap:
             name: 'Docker flag'
           preprocessing:
@@ -399,8 +362,6 @@ zabbix_export:
               parameters:
                 - $.IPv4Forwarding
             - type: BOOL_TO_DECIMAL
-              parameters:
-                - ''
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
@@ -413,7 +374,6 @@ zabbix_export:
           name: 'Kernel memory enabled'
           type: DEPENDENT
           key: docker.kernel_mem.enabled
-          delay: '0'
           valuemap:
             name: 'Docker flag'
           preprocessing:
@@ -421,8 +381,6 @@ zabbix_export:
               parameters:
                 - $.KernelMemory
             - type: BOOL_TO_DECIMAL
-              parameters:
-                - ''
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
@@ -435,7 +393,6 @@ zabbix_export:
           name: 'Kernel memory TCP enabled'
           type: DEPENDENT
           key: docker.kernel_mem_tcp.enabled
-          delay: '0'
           valuemap:
             name: 'Docker flag'
           preprocessing:
@@ -443,8 +400,6 @@ zabbix_export:
               parameters:
                 - $.KernelMemoryTCP
             - type: BOOL_TO_DECIMAL
-              parameters:
-                - ''
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
@@ -457,8 +412,6 @@ zabbix_export:
           name: 'Kernel version'
           type: DEPENDENT
           key: docker.kernel_version
-          delay: '0'
-          trends: '0'
           value_type: CHAR
           preprocessing:
             - type: JSONPATH
@@ -476,7 +429,6 @@ zabbix_export:
           name: 'Layers size'
           type: DEPENDENT
           key: docker.layers_size
-          delay: '0'
           units: B
           preprocessing:
             - type: JSONPATH
@@ -491,7 +443,6 @@ zabbix_export:
           name: 'Live restore enabled'
           type: DEPENDENT
           key: docker.live_restore.enabled
-          delay: '0'
           valuemap:
             name: 'Docker flag'
           preprocessing:
@@ -499,8 +450,6 @@ zabbix_export:
               parameters:
                 - $.LiveRestoreEnabled
             - type: BOOL_TO_DECIMAL
-              parameters:
-                - ''
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
@@ -513,8 +462,6 @@ zabbix_export:
           name: 'Logging driver'
           type: DEPENDENT
           key: docker.logging_driver
-          delay: '0'
-          trends: '0'
           value_type: CHAR
           preprocessing:
             - type: JSONPATH
@@ -532,7 +479,6 @@ zabbix_export:
           name: 'Memory total'
           type: DEPENDENT
           key: docker.mem.total
-          delay: '0'
           units: B
           preprocessing:
             - type: JSONPATH
@@ -547,7 +493,6 @@ zabbix_export:
           name: 'Memory limit enabled'
           type: DEPENDENT
           key: docker.mem_limit.enabled
-          delay: '0'
           valuemap:
             name: 'Docker flag'
           preprocessing:
@@ -555,8 +500,6 @@ zabbix_export:
               parameters:
                 - $.MemoryLimit
             - type: BOOL_TO_DECIMAL
-              parameters:
-                - ''
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
@@ -569,9 +512,7 @@ zabbix_export:
           name: Name
           type: DEPENDENT
           key: docker.name
-          delay: '0'
           history: 1h
-          trends: '0'
           value_type: CHAR
           preprocessing:
             - type: JSONPATH
@@ -600,7 +541,6 @@ zabbix_export:
           name: NCPU
           type: DEPENDENT
           key: docker.ncpu
-          delay: '0'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -614,7 +554,6 @@ zabbix_export:
           name: 'NEvents listener'
           type: DEPENDENT
           key: docker.nevents_listener
-          delay: '0'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -628,7 +567,6 @@ zabbix_export:
           name: Nfd
           type: DEPENDENT
           key: docker.nfd
-          delay: '0'
           description: 'Number of used File Descriptors.'
           preprocessing:
             - type: JSONPATH
@@ -643,7 +581,6 @@ zabbix_export:
           name: 'OomKill disabled'
           type: DEPENDENT
           key: docker.oomkill.disabled
-          delay: '0'
           valuemap:
             name: 'Docker flag'
           preprocessing:
@@ -651,8 +588,6 @@ zabbix_export:
               parameters:
                 - $.OomKillDisable
             - type: BOOL_TO_DECIMAL
-              parameters:
-                - ''
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
@@ -665,8 +600,6 @@ zabbix_export:
           name: 'Operating system'
           type: DEPENDENT
           key: docker.operating_system
-          delay: '0'
-          trends: '0'
           value_type: CHAR
           preprocessing:
             - type: JSONPATH
@@ -684,8 +617,6 @@ zabbix_export:
           name: 'OS type'
           type: DEPENDENT
           key: docker.os_type
-          delay: '0'
-          trends: '0'
           value_type: CHAR
           preprocessing:
             - type: JSONPATH
@@ -703,14 +634,11 @@ zabbix_export:
           name: 'Pids limit enabled'
           type: DEPENDENT
           key: docker.pids_limit.enabled
-          delay: '0'
           preprocessing:
             - type: JSONPATH
               parameters:
                 - $.PidsLimit
             - type: BOOL_TO_DECIMAL
-              parameters:
-                - ''
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
@@ -746,8 +674,6 @@ zabbix_export:
           name: 'Docker root dir'
           type: DEPENDENT
           key: docker.root_dir
-          delay: '0'
-          trends: '0'
           value_type: CHAR
           preprocessing:
             - type: JSONPATH
@@ -765,8 +691,6 @@ zabbix_export:
           name: 'Server version'
           type: DEPENDENT
           key: docker.server_version
-          delay: '0'
-          trends: '0'
           value_type: CHAR
           preprocessing:
             - type: JSONPATH
@@ -795,7 +719,6 @@ zabbix_export:
           name: 'Swap limit enabled'
           type: DEPENDENT
           key: docker.swap_limit.enabled
-          delay: '0'
           valuemap:
             name: 'Docker flag'
           preprocessing:
@@ -803,8 +726,6 @@ zabbix_export:
               parameters:
                 - $.SwapLimit
             - type: BOOL_TO_DECIMAL
-              parameters:
-                - ''
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
@@ -819,7 +740,6 @@ zabbix_export:
           name: 'Volumes size'
           type: DEPENDENT
           key: docker.volumes_size
-          delay: '0'
           units: B
           preprocessing:
             - type: JSONPATH
@@ -840,11 +760,9 @@ zabbix_export:
             conditions:
               - macro: '{#NAME}'
                 value: '{$DOCKER.LLD.FILTER.CONTAINER.MATCHES}'
-                formulaid: A
               - macro: '{#NAME}'
                 value: '{$DOCKER.LLD.FILTER.CONTAINER.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
           description: |
             Discovery of containers metrics.
             
@@ -856,7 +774,6 @@ zabbix_export:
               name: 'Container {#NAME}: Created'
               type: DEPENDENT
               key: 'docker.container_info.created["{#NAME}"]'
-              delay: '0'
               units: unixtime
               valuemap:
                 name: 'Docker date format'
@@ -880,7 +797,6 @@ zabbix_export:
               name: 'Container {#NAME}: Finished at'
               type: DEPENDENT
               key: 'docker.container_info.finished["{#NAME}"]'
-              delay: '0'
               value_type: FLOAT
               units: unixtime
               description: 'Time at which the container last terminated.'
@@ -906,8 +822,6 @@ zabbix_export:
               name: 'Container {#NAME}: Image'
               type: DEPENDENT
               key: 'docker.container_info.image["{#NAME}"]'
-              delay: '0'
-              trends: '0'
               value_type: CHAR
               preprocessing:
                 - type: JSONPATH
@@ -927,7 +841,6 @@ zabbix_export:
               name: 'Container {#NAME}: Restart count'
               type: DEPENDENT
               key: 'docker.container_info.restart_count["{#NAME}"]'
-              delay: '0'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -943,7 +856,6 @@ zabbix_export:
               name: 'Container {#NAME}: Started at'
               type: DEPENDENT
               key: 'docker.container_info.started["{#NAME}"]'
-              delay: '0'
               value_type: FLOAT
               units: unixtime
               valuemap:
@@ -968,7 +880,6 @@ zabbix_export:
               name: 'Container {#NAME}: Dead'
               type: DEPENDENT
               key: 'docker.container_info.state.dead["{#NAME}"]'
-              delay: '0'
               valuemap:
                 name: 'Docker flag'
               preprocessing:
@@ -976,8 +887,6 @@ zabbix_export:
                   parameters:
                     - $.State.Dead
                 - type: BOOL_TO_DECIMAL
-                  parameters:
-                    - ''
               master_item:
                 key: 'docker.container_info["{#NAME}",full]'
               tags:
@@ -989,8 +898,6 @@ zabbix_export:
               name: 'Container {#NAME}: Error'
               type: DEPENDENT
               key: 'docker.container_info.state.error["{#NAME}"]'
-              delay: '0'
-              trends: '0'
               value_type: CHAR
               preprocessing:
                 - type: JSONPATH
@@ -1021,7 +928,6 @@ zabbix_export:
               name: 'Container {#NAME}: Exit code'
               type: DEPENDENT
               key: 'docker.container_info.state.exitcode["{#NAME}"]'
-              delay: '0'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1040,7 +946,6 @@ zabbix_export:
               name: 'Container {#NAME}: Health failing streak'
               type: DEPENDENT
               key: 'docker.container_info.state.health.failing["{#NAME}"]'
-              delay: '0'
               value_type: FLOAT
               preprocessing:
                 - type: JSONPATH
@@ -1061,7 +966,6 @@ zabbix_export:
               name: 'Container {#NAME}: Health status'
               type: DEPENDENT
               key: 'docker.container_info.state.health["{#NAME}"]'
-              delay: '0'
               value_type: FLOAT
               description: 'Container''s `HEALTHCHECK`.'
               valuemap:
@@ -1102,7 +1006,6 @@ zabbix_export:
               name: 'Container {#NAME}: OOMKilled'
               type: DEPENDENT
               key: 'docker.container_info.state.oomkilled["{#NAME}"]'
-              delay: '0'
               valuemap:
                 name: 'Docker flag'
               preprocessing:
@@ -1110,8 +1013,6 @@ zabbix_export:
                   parameters:
                     - $.State.OOMKilled
                 - type: BOOL_TO_DECIMAL
-                  parameters:
-                    - ''
               master_item:
                 key: 'docker.container_info["{#NAME}",full]'
               tags:
@@ -1123,7 +1024,6 @@ zabbix_export:
               name: 'Container {#NAME}: Paused'
               type: DEPENDENT
               key: 'docker.container_info.state.paused["{#NAME}"]'
-              delay: '0'
               valuemap:
                 name: 'Docker flag'
               preprocessing:
@@ -1131,8 +1031,6 @@ zabbix_export:
                   parameters:
                     - $.State.Paused
                 - type: BOOL_TO_DECIMAL
-                  parameters:
-                    - ''
               master_item:
                 key: 'docker.container_info["{#NAME}",full]'
               tags:
@@ -1144,7 +1042,6 @@ zabbix_export:
               name: 'Container {#NAME}: Pid'
               type: DEPENDENT
               key: 'docker.container_info.state.pid["{#NAME}"]'
-              delay: '0'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1163,7 +1060,6 @@ zabbix_export:
               name: 'Container {#NAME}: Restarting'
               type: DEPENDENT
               key: 'docker.container_info.state.restarting["{#NAME}"]'
-              delay: '0'
               valuemap:
                 name: 'Docker flag'
               preprocessing:
@@ -1171,8 +1067,6 @@ zabbix_export:
                   parameters:
                     - $.State.Restarting
                 - type: BOOL_TO_DECIMAL
-                  parameters:
-                    - ''
               master_item:
                 key: 'docker.container_info["{#NAME}",full]'
               tags:
@@ -1184,7 +1078,6 @@ zabbix_export:
               name: 'Container {#NAME}: Running'
               type: DEPENDENT
               key: 'docker.container_info.state.running["{#NAME}"]'
-              delay: '0'
               valuemap:
                 name: 'Docker flag'
               preprocessing:
@@ -1192,8 +1085,6 @@ zabbix_export:
                   parameters:
                     - $.State.Running
                 - type: BOOL_TO_DECIMAL
-                  parameters:
-                    - ''
               master_item:
                 key: 'docker.container_info["{#NAME}",full]'
               tags:
@@ -1205,8 +1096,6 @@ zabbix_export:
               name: 'Container {#NAME}: Status'
               type: DEPENDENT
               key: 'docker.container_info.state.status["{#NAME}"]'
-              delay: '0'
-              trends: '0'
               value_type: CHAR
               preprocessing:
                 - type: JSONPATH
@@ -1226,7 +1115,6 @@ zabbix_export:
               name: 'Container {#NAME}: Get info'
               key: 'docker.container_info["{#NAME}",full]'
               history: '0'
-              trends: '0'
               value_type: CHAR
               description: 'Return low-level information about a container.'
               tags:
@@ -1238,7 +1126,6 @@ zabbix_export:
               name: 'Container {#NAME}: CPU percent usage'
               type: DEPENDENT
               key: 'docker.container_stats.cpu_pct_usage["{#NAME}"]'
-              delay: '0'
               value_type: FLOAT
               units: '%'
               preprocessing:
@@ -1256,7 +1143,6 @@ zabbix_export:
               name: 'Container {#NAME}: CPU kernelmode usage per second'
               type: DEPENDENT
               key: 'docker.container_stats.cpu_usage.kernel.rate["{#NAME}"]'
-              delay: '0'
               value_type: FLOAT
               units: s
               preprocessing:
@@ -1264,8 +1150,6 @@ zabbix_export:
                   parameters:
                     - $.cpu_stats.cpu_usage.usage_in_kernelmode
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
                 - type: MULTIPLIER
                   parameters:
                     - '1.0E-9'
@@ -1280,7 +1164,6 @@ zabbix_export:
               name: 'Container {#NAME}: Throttled periods'
               type: DEPENDENT
               key: 'docker.container_stats.cpu_usage.throttled_periods["{#NAME}"]'
-              delay: '0'
               description: 'Number of periods when the container hits its throttling limit.'
               preprocessing:
                 - type: JSONPATH
@@ -1297,7 +1180,6 @@ zabbix_export:
               name: 'Container {#NAME}: Throttled time'
               type: DEPENDENT
               key: 'docker.container_stats.cpu_usage.throttled_time["{#NAME}"]'
-              delay: '0'
               value_type: FLOAT
               units: s
               description: 'Aggregate time the container was throttled for in nanoseconds.'
@@ -1319,7 +1201,6 @@ zabbix_export:
               name: 'Container {#NAME}: Throttling periods'
               type: DEPENDENT
               key: 'docker.container_stats.cpu_usage.throttling_periods["{#NAME}"]'
-              delay: '0'
               description: 'Number of periods with throttling active.'
               preprocessing:
                 - type: JSONPATH
@@ -1336,7 +1217,6 @@ zabbix_export:
               name: 'Container {#NAME}: CPU total usage per second'
               type: DEPENDENT
               key: 'docker.container_stats.cpu_usage.total.rate["{#NAME}"]'
-              delay: '0'
               value_type: FLOAT
               units: s
               preprocessing:
@@ -1344,8 +1224,6 @@ zabbix_export:
                   parameters:
                     - $.cpu_stats.cpu_usage.total_usage
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
                 - type: MULTIPLIER
                   parameters:
                     - '1.0E-9'
@@ -1360,7 +1238,6 @@ zabbix_export:
               name: 'Container {#NAME}: CPU usermode usage per second'
               type: DEPENDENT
               key: 'docker.container_stats.cpu_usage.user.rate["{#NAME}"]'
-              delay: '0'
               value_type: FLOAT
               units: s
               preprocessing:
@@ -1368,8 +1245,6 @@ zabbix_export:
                   parameters:
                     - $.cpu_stats.cpu_usage.usage_in_usermode
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
                 - type: MULTIPLIER
                   parameters:
                     - '1.0E-9'
@@ -1384,7 +1259,6 @@ zabbix_export:
               name: 'Container {#NAME}: Memory commit bytes'
               type: DEPENDENT
               key: 'docker.container_stats.memory.commit_bytes["{#NAME}"]'
-              delay: '0'
               units: B
               preprocessing:
                 - type: JSONPATH
@@ -1401,7 +1275,6 @@ zabbix_export:
               name: 'Container {#NAME}: Memory commit peak bytes'
               type: DEPENDENT
               key: 'docker.container_stats.memory.commit_peak_bytes["{#NAME}"]'
-              delay: '0'
               units: B
               preprocessing:
                 - type: JSONPATH
@@ -1418,7 +1291,6 @@ zabbix_export:
               name: 'Container {#NAME}: Memory maximum usage'
               type: DEPENDENT
               key: 'docker.container_stats.memory.max_usage["{#NAME}"]'
-              delay: '0'
               units: B
               preprocessing:
                 - type: JSONPATH
@@ -1435,7 +1307,6 @@ zabbix_export:
               name: 'Container {#NAME}: Memory private working set'
               type: DEPENDENT
               key: 'docker.container_stats.memory.private_working_set["{#NAME}"]'
-              delay: '0'
               units: B
               preprocessing:
                 - type: JSONPATH
@@ -1452,7 +1323,6 @@ zabbix_export:
               name: 'Container {#NAME}: Memory usage'
               type: DEPENDENT
               key: 'docker.container_stats.memory.usage["{#NAME}"]'
-              delay: '0'
               units: B
               preprocessing:
                 - type: JSONPATH
@@ -1469,7 +1339,6 @@ zabbix_export:
               name: 'Container {#NAME}: Online CPUs'
               type: DEPENDENT
               key: 'docker.container_stats.online_cpus["{#NAME}"]'
-              delay: '0'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1485,7 +1354,6 @@ zabbix_export:
               name: 'Container {#NAME}: Current PIDs count'
               type: DEPENDENT
               key: 'docker.container_stats.pids_stats.current["{#NAME}"]'
-              delay: '0'
               description: 'Current number of PIDs the container has created.'
               preprocessing:
                 - type: JSONPATH
@@ -1502,7 +1370,6 @@ zabbix_export:
               name: 'Container {#NAME}: Get stats'
               key: 'docker.container_stats["{#NAME}"]'
               history: '0'
-              trends: '0'
               value_type: CHAR
               description: 'Get container stats based on resource usage.'
               tags:
@@ -1514,7 +1381,6 @@ zabbix_export:
               name: 'Container {#NAME}: Networks bytes received per second'
               type: DEPENDENT
               key: 'docker.networks.rx_bytes["{#NAME}"]'
-              delay: '0'
               value_type: FLOAT
               units: B
               preprocessing:
@@ -1524,8 +1390,6 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               master_item:
                 key: 'docker.container_stats["{#NAME}"]'
               tags:
@@ -1537,7 +1401,6 @@ zabbix_export:
               name: 'Container {#NAME}: Networks incoming packets dropped per second'
               type: DEPENDENT
               key: 'docker.networks.rx_dropped["{#NAME}"]'
-              delay: '0'
               value_type: FLOAT
               preprocessing:
                 - type: JSONPATH
@@ -1546,8 +1409,6 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               master_item:
                 key: 'docker.container_stats["{#NAME}"]'
               tags:
@@ -1559,7 +1420,6 @@ zabbix_export:
               name: 'Container {#NAME}: Networks errors received per second'
               type: DEPENDENT
               key: 'docker.networks.rx_errors["{#NAME}"]'
-              delay: '0'
               value_type: FLOAT
               preprocessing:
                 - type: JSONPATH
@@ -1568,8 +1428,6 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               master_item:
                 key: 'docker.container_stats["{#NAME}"]'
               tags:
@@ -1581,7 +1439,6 @@ zabbix_export:
               name: 'Container {#NAME}: Networks packets received per second'
               type: DEPENDENT
               key: 'docker.networks.rx_packets["{#NAME}"]'
-              delay: '0'
               value_type: FLOAT
               preprocessing:
                 - type: JSONPATH
@@ -1590,8 +1447,6 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               master_item:
                 key: 'docker.container_stats["{#NAME}"]'
               tags:
@@ -1603,7 +1458,6 @@ zabbix_export:
               name: 'Container {#NAME}: Networks bytes sent per second'
               type: DEPENDENT
               key: 'docker.networks.tx_bytes["{#NAME}"]'
-              delay: '0'
               value_type: FLOAT
               units: B
               preprocessing:
@@ -1613,8 +1467,6 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               master_item:
                 key: 'docker.container_stats["{#NAME}"]'
               tags:
@@ -1626,7 +1478,6 @@ zabbix_export:
               name: 'Container {#NAME}: Networks outgoing packets dropped per second'
               type: DEPENDENT
               key: 'docker.networks.tx_dropped["{#NAME}"]'
-              delay: '0'
               value_type: FLOAT
               preprocessing:
                 - type: JSONPATH
@@ -1635,8 +1486,6 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               master_item:
                 key: 'docker.container_stats["{#NAME}"]'
               tags:
@@ -1648,7 +1497,6 @@ zabbix_export:
               name: 'Container {#NAME}: Networks errors sent per second'
               type: DEPENDENT
               key: 'docker.networks.tx_errors["{#NAME}"]'
-              delay: '0'
               value_type: FLOAT
               preprocessing:
                 - type: JSONPATH
@@ -1657,8 +1505,6 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               master_item:
                 key: 'docker.container_stats["{#NAME}"]'
               tags:
@@ -1670,7 +1516,6 @@ zabbix_export:
               name: 'Container {#NAME}: Networks packets sent per second'
               type: DEPENDENT
               key: 'docker.networks.tx_packets["{#NAME}"]'
-              delay: '0'
               value_type: FLOAT
               preprocessing:
                 - type: JSONPATH
@@ -1679,8 +1524,6 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               master_item:
                 key: 'docker.container_stats["{#NAME}"]'
               tags:
@@ -1795,18 +1638,15 @@ zabbix_export:
             conditions:
               - macro: '{#NAME}'
                 value: '{$DOCKER.LLD.FILTER.IMAGE.MATCHES}'
-                formulaid: A
               - macro: '{#NAME}'
                 value: '{$DOCKER.LLD.FILTER.IMAGE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
           description: 'Discovery of images metrics.'
           item_prototypes:
             - uuid: 63b19204b1d0459b9969234a719dab93
               name: 'Image {#NAME}: Created'
               type: DEPENDENT
               key: 'docker.image.created["{#ID}"]'
-              delay: '0'
               units: unixtime
               preprocessing:
                 - type: JSONPATH
@@ -1826,7 +1666,6 @@ zabbix_export:
               name: 'Image {#NAME}: Size'
               type: DEPENDENT
               key: 'docker.image.size["{#ID}"]'
-              delay: '0'
               units: B
               preprocessing:
                 - type: JSONPATH

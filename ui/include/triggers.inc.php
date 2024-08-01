@@ -567,7 +567,7 @@ function make_trigger_details($trigger, $eventid) {
 		->addRow([
 			new CCol(_('Trigger')),
 			new CCol((new CLinkAction(CMacrosResolverHelper::resolveTriggerName($trigger)))
-				->addClass(ZBX_STYLE_WORDWRAP)
+				->addClass(ZBX_STYLE_WORDBREAK)
 				->setMenuPopup(CMenuPopupHelper::getTrigger([
 					'triggerid' => $trigger['triggerid'],
 					'backurl' => (new CUrl('tr_events.php'))
@@ -596,11 +596,11 @@ function make_trigger_details($trigger, $eventid) {
 	$table
 		->addRow([
 			new CCol(_('Problem expression')),
-			new CCol((new CDiv($trigger['expression']))->addClass(ZBX_STYLE_WORDWRAP))
+			new CCol((new CDiv($trigger['expression']))->addClass(ZBX_STYLE_WORDBREAK))
 		])
 		->addRow([
 			new CCol(_('Recovery expression')),
-			new CCol((new CDiv($trigger['recovery_expression']))->addClass(ZBX_STYLE_WORDWRAP))
+			new CCol((new CDiv($trigger['recovery_expression']))->addClass(ZBX_STYLE_WORDBREAK))
 		])
 		->addRow([_('Event generation'), _('Normal').((TRIGGER_MULT_EVENT_ENABLED == $trigger['type'])
 			? ' + '._('Multiple PROBLEM events')
@@ -1906,20 +1906,6 @@ function makeTriggerTemplatesHtml($triggerid, array $parent_templates, $flag, bo
 	}
 
 	return $list;
-}
-
-/**
- * Check if user has read permissions for triggers.
- *
- * @param $triggerids
- *
- * @return bool
- */
-function isReadableTriggers(array $triggerids) {
-	return count($triggerids) == API::Trigger()->get([
-		'triggerids' => $triggerids,
-		'countOutput' => true
-	]);
 }
 
 /**

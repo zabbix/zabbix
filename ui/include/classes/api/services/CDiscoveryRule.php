@@ -305,10 +305,6 @@ class CDiscoveryRule extends CItemGeneral {
 		}
 
 		if ($result) {
-			if (self::dbDistinct($sqlParts)) {
-				$result = $this->addNclobFieldValues($options, $result);
-			}
-
 			self::prepareItemsForApi($result, false);
 
 			$result = $this->addRelatedObjects($options, $result);

@@ -284,6 +284,71 @@ static void	pg_get_proxy_group_stats(zbx_pg_service_t *pgs, zbx_ipc_client_t *cl
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: gets all proxy group real-time data                               *
+ *                                                                            *
+ * Parameter: pgs     - [IN] proxy group service                              *
+ *            client  - [IN] IPC client                                       *
+ *                                                                            *
+ * Comments: skips standalone proxies                                         *
+ *                                                                            *
+ ******************************************************************************/
+static void	pg_get_all_pgroup_rtdata(zbx_pg_service_t *pgs, zbx_ipc_client_t *client)
+{
+#define PROXY_GROUP_LEN	(sizeof(zbx_uint64_t) + 3 * sizeof(int))
+	int			num_pgroups = 0;
+	zbx_uint32_t		data_len;
+	unsigned char		*ptr, *data;
+	zbx_hashset_iter_t	iter;
+	zbx_pg_group_t		*pg;
+#define HEADER_LEN	sizeof(num_pgroups)
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	pg_cache_lock(pgs->cache);
+
+	data_len = (zbx_uint32_t)(HEADER_LEN + (size_t)pgs->cache->groups.num_data * PROXY_GROUP_LEN);
+	ptr = data = (unsigned char *)zbx_malloc(NULL, data_len);
+
+	ptr += HEADER_LEN;
+
+	zbx_hashset_iter_reset(&pgs->cache->groups, &iter);
+	while (NULL != (pg = (zbx_pg_group_t *)zbx_hashset_iter_next(&iter)))
+	{
+		/* skip standalone proxies */
+		if (ZBX_PG_GROUP_STATE_DISABLED == pg->state)
+			continue;
+
+		int	proxies_online_num = 0;
+
+		for (int i = 0; i < pg->proxies.values_num; i++)
+		{
+			if (ZBX_PG_PROXY_STATE_ONLINE == pg->proxies.values[i]->state)
+				proxies_online_num++;
+		}
+
+		ptr += zbx_serialize_value(ptr, pg->proxy_groupid);
+		ptr += zbx_serialize_value(ptr, pg->state);
+		ptr += zbx_serialize_value(ptr, proxies_online_num);
+		ptr += zbx_serialize_value(ptr, pg->proxies.values_num);
+
+		num_pgroups++;
+	}
+
+	(void)zbx_serialize_value(data, num_pgroups);
+
+	data_len = (zbx_uint32_t)(HEADER_LEN + (size_t)num_pgroups * PROXY_GROUP_LEN);
+	zbx_ipc_client_send(client, ZBX_IPC_PGM_ALL_PGROUP_RTDATA, data, data_len);
+
+	zbx_free(data);
+
+	pg_cache_unlock(pgs->cache);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+#undef HEADER_LEN
+#undef PROXY_GROUP_LEN
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: proxy group service thread entry                                  *
  *                                                                            *
  ******************************************************************************/
@@ -315,6 +380,9 @@ static void	*pg_service_entry(void *data)
 					break;
 				case ZBX_IPC_PGM_PROXY_RTDATA:
 					pg_update_proxy_rtdata(pgs, message);
+					break;
+				case ZBX_IPC_PGM_GET_ALL_PGROUP_RTDATA:
+					pg_get_all_pgroup_rtdata(pgs, client);
 					break;
 				case ZBX_IPC_PGM_STOP:
 					goto out;

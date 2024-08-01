@@ -327,19 +327,24 @@ static zbx_dc_um_handle_t	*dc_um_handle = NULL;
  *               FAIL otherwise                                               *
  *                                                                            *
  * Comments: list of the items, always processed by server                    *
- *           ,------------------+--------------------------------------,      *
- *           | type             | key                                  |      *
- *           +------------------+--------------------------------------+      *
- *           | Zabbix internal  | zabbix[host,,items]                  |      *
- *           | Zabbix internal  | zabbix[host,,items_unsupported]      |      *
- *           | Zabbix internal  | zabbix[host,discovery,interfaces]    |      *
- *           | Zabbix internal  | zabbix[host,,maintenance]            |      *
- *           | Zabbix internal  | zabbix[proxy,discovery]              |      *
- *           | Zabbix internal  | zabbix[proxy,<proxyname>,lastaccess] |      *
- *           | Zabbix internal  | zabbix[proxy,<proxyname>,delay]      |      *
- *           | Zabbix aggregate | *                                    |      *
- *           | Calculated       | *                                    |      *
- *           '------------------+--------------------------------------'      *
+ * ,------------------+-----------------------------------------------------, *
+ * | type             | key                                                 | *
+ * +------------------+-----------------------------------------------------+ *
+ * | Zabbix internal  | zabbix[host,,items]                                 | *
+ * | Zabbix internal  | zabbix[host,,items_unsupported]                     | *
+ * | Zabbix internal  | zabbix[host,discovery,interfaces]                   | *
+ * | Zabbix internal  | zabbix[host,,maintenance]                           | *
+ * | Zabbix internal  | zabbix[proxy,discovery]                             | *
+ * | Zabbix internal  | zabbix[proxy,<proxyname>,lastaccess]                | *
+ * | Zabbix internal  | zabbix[proxy,<proxyname>,delay]                     | *
+ * | Zabbix internal  | zabbix[proxy group,discovery]                       | *
+ * | Zabbix internal  | zabbix[proxy group,<groupname>,state]               | *
+ * | Zabbix internal  | zabbix[proxy group,<groupname>,available]           | *
+ * | Zabbix internal  | zabbix[proxy group,<groupname>,pavailable]          | *
+ * | Zabbix internal  | zabbix[proxy group,<groupname>,proxies]             | *
+ * | Zabbix aggregate | *                                                   | *
+ * | Calculated       | *                                                   | *
+ * '------------------+-----------------------------------------------------' *
  *                                                                            *
  ******************************************************************************/
 int	zbx_is_item_processed_by_server(unsigned char type, const char *key)
@@ -377,8 +382,11 @@ int	zbx_is_item_processed_by_server(unsigned char type, const char *key)
 
 				if (2 == request.nparam)
 				{
-					if (0 == strcmp(arg1, "proxy") && 0 == strcmp(arg2, "discovery"))
+					if ((0 == strcmp(arg1, "proxy") && 0 == strcmp(arg2, "discovery")) ||
+							0 == strcmp(arg1, "proxy group"))
+					{
 						ret = SUCCEED;
+					}
 
 					goto clean;
 				}
@@ -7844,15 +7852,6 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 
 	zbx_dbsync_init_changelog(&proxy_sync, changelog_sync_mode);
 
-
-#ifdef HAVE_ORACLE
-	/* With Oracle fetch statements can fail before all data has been fetched. */
-	/* In such cache next sync will need to do full scan rather than just      */
-	/* applying changelog diff. To detect this problem configuration is synced */
-	/* in transaction and error is checked at the end.                         */
-	zbx_db_begin();
-#endif
-
 	sec = zbx_time();
 	if (FAIL == zbx_dbsync_compare_config(&config_sync))
 		goto out;
@@ -8644,12 +8643,6 @@ out:
 
 	FINISH_SYNC;
 
-#ifdef HAVE_ORACLE
-	if (ZBX_DB_OK == dberr)
-		dberr = zbx_db_commit();
-	else
-		zbx_db_rollback();
-#endif
 	switch (dberr)
 	{
 		case ZBX_DB_OK:
@@ -13131,6 +13124,52 @@ static void	dc_status_update_apply_diff(zbx_dc_status_diff_t *diff)
 	config->status->last_update = time(NULL);
 }
 
+static int	get_active_item_count_rec(const ZBX_DC_ITEM *dc_item)
+{
+	int	count = 1;
+
+	if (NULL != dc_item->master_item)
+	{
+		for (int i = 0; i < dc_item->master_item->dep_itemids.values_num; i++)
+		{
+			ZBX_DC_ITEM	*dep_item;
+
+			if (NULL != (dep_item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items,
+					&dc_item->master_item->dep_itemids.values[i].first)) &&
+					ITEM_STATUS_ACTIVE == dep_item->status)
+			{
+				count += get_active_item_count_rec(dep_item);
+			}
+		}
+	}
+
+	return count;
+}
+
+static void	update_required_performance(const ZBX_DC_ITEM *dc_item, zbx_dc_status_diff_proxy_t *proxy_diff,
+		zbx_dc_status_diff_t *diff)
+{
+	int	delay;
+	char	*delay_s;
+
+	delay_s = dc_expand_user_and_func_macros_dyn(dc_item->delay, &dc_item->hostid, 1, ZBX_MACRO_ENV_NONSECURE);
+
+	if (SUCCEED == zbx_interval_preproc(delay_s, &delay, NULL, NULL) && 0 != delay)
+	{
+		int	item_count;
+
+		if (0 < (item_count = get_active_item_count_rec(dc_item)))
+		{
+			diff->required_performance += 1.0 / delay * item_count;
+
+			if (NULL != proxy_diff)
+				proxy_diff->required_performance += 1.0 / delay * item_count;
+		}
+	}
+
+	zbx_free(delay_s);
+}
+
 static void	get_host_statistics(ZBX_DC_HOST *dc_host, zbx_dc_status_diff_host_t *host_diff,
 		zbx_dc_status_diff_proxy_t *proxy_diff, zbx_dc_status_diff_t *diff)
 {
@@ -13150,25 +13189,8 @@ static void	get_host_statistics(ZBX_DC_HOST *dc_host, zbx_dc_status_diff_host_t 
 			case ITEM_STATUS_ACTIVE:
 				if (HOST_STATUS_MONITORED == dc_host->status)
 				{
-					if (SUCCEED == diff->reset)
-					{
-						int	delay;
-						char	*delay_s;
-
-						delay_s = dc_expand_user_and_func_macros_dyn(dc_item->delay,
-								&dc_item->hostid, 1, ZBX_MACRO_ENV_NONSECURE);
-
-						if (SUCCEED == zbx_interval_preproc(delay_s, &delay, NULL, NULL) &&
-								0 != delay)
-						{
-							diff->required_performance += 1.0 / delay;
-
-							if (NULL != proxy_diff)
-								proxy_diff->required_performance += 1.0 / delay;
-						}
-
-						zbx_free(delay_s);
-					}
+					if (SUCCEED == diff->reset && ITEM_TYPE_DEPENDENT != dc_item->type)
+						update_required_performance(dc_item, proxy_diff, diff);
 
 					switch (dc_item->state)
 					{
@@ -15474,7 +15496,7 @@ int	zbx_dc_register_config_session(zbx_uint64_t hostid, const char *token, zbx_u
 		/* one session cannot be updated at the same time by different processes,            */
 		/* so updating its properties without reallocating memory can be done with read lock */
 		session->last_id = session_config_revision;
-		session_local.lastaccess = now;
+		session->lastaccess = now;
 	}
 	*dc_revision = config->revision;
 	UNLOCK_CACHE;
@@ -15919,6 +15941,77 @@ static void	dc_proxy_discovery_add_row(struct zbx_json *json, const ZBX_DC_PROXY
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: add proxy group configuration data row                            *
+ *                                                                            *
+ ******************************************************************************/
+static void	dc_proxy_group_discovery_add_group_cfg(struct zbx_json *json, const zbx_dc_proxy_group_t *pg)
+{
+#define INVALID_VALUE	-1
+	const char	*ptr;
+	int		failover_delay, min_online;
+
+	zbx_json_addobject(json, NULL);
+
+	zbx_json_addstring(json, "name", pg->name, ZBX_JSON_TYPE_STRING);
+
+	ptr = pg->failover_delay;
+
+	if ('{' == *ptr)
+		um_cache_resolve_const(config->um_cache, NULL, 0, pg->failover_delay, ZBX_MACRO_ENV_NONSECURE, &ptr);
+
+	if (FAIL == zbx_is_time_suffix(ptr, &failover_delay, ZBX_LENGTH_UNLIMITED))
+		failover_delay = INVALID_VALUE;
+
+	zbx_json_addint64(json, "failover_delay", failover_delay);
+
+	ptr = pg->min_online;
+
+	if ('{' == *ptr)
+		um_cache_resolve_const(config->um_cache, NULL, 0, pg->min_online, ZBX_MACRO_ENV_NONSECURE, &ptr);
+
+	min_online = atoi(ptr);
+
+	if (ZBX_PG_PROXY_MIN_ONLINE_MIN > min_online || ZBX_PG_PROXY_MIN_ONLINE_MAX < min_online)
+		min_online = INVALID_VALUE;
+
+	zbx_json_addint64(json, "min_online", min_online);
+
+	zbx_json_close(json);
+#undef INVALID_VALUE
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: add proxy group real-time statistics row                          *
+ *                                                                            *
+ ******************************************************************************/
+static void	dc_proxy_group_discovery_add_group_rtdata(const zbx_dc_proxy_group_t *pg, zbx_hashset_t *pgroups_rtdata,
+		struct zbx_json *json)
+{
+	zbx_pg_rtdata_t		*rtdata;
+
+	zbx_json_addobject(json, pg->name);
+
+	if (NULL == (rtdata = (zbx_pg_rtdata_t *)zbx_hashset_search(pgroups_rtdata, &pg->proxy_groupid)))
+		goto out;
+
+	zbx_json_addint64(json, "state", rtdata->status);
+	zbx_json_addint64(json, "available", rtdata->proxy_online_num);
+
+	double	perc;
+
+	if (0 != rtdata->proxy_num)
+		perc = (double)rtdata->proxy_online_num / rtdata->proxy_num * 100;
+	else
+		perc = 0;
+
+	zbx_json_adddouble(json, "pavailable", perc);
+out:
+	zbx_json_close(json);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: get data of all proxies from configuration cache and pack into    *
  *          JSON for LLD                                                      *
  *                                                                            *
@@ -15950,6 +16043,86 @@ void	zbx_proxy_discovery_get(char **data)
 
 	UNLOCK_CACHE;
 
+	zbx_json_close(&json);
+	*data = zbx_strdup(NULL, json.buffer);
+
+	zbx_json_free(&json);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get configuration and realtime data of all proxy groups and pack  *
+ *          into JSON                                                         *
+ *                                                                            *
+ * Parameter: data - [OUT] JSON with proxy group data                         *
+ *                                                                            *
+ * Comments: Allocates memory.                                                *
+ *           Configuration data is taken from configuration cache.            *
+ *           Real-time data is taken from proxy group manager via IPC.        *
+ *                                                                            *
+ * Output JSON example:                                                       *
+ * {                                                                          *
+ *     "data": [                                                              *
+ *        { "name": "Riga", "failover_delay": 60, "min_online": 1 },          *
+ *        { "name": "Tokyo", "failover_delay": 60, "min_online": 2 },         *
+ *        { "name": "Porto Alegre", "failover_delay": 60, "min_online": 3 }   *
+ *     ],                                                                     *
+ *     "rtdata": {                                                            *
+ *         "Riga": { "state": 3, "available": 10, "pavailable": 20 },         *
+ *         "Tokyo": { "state": 3, "available": 10, "pavailable": 20 },        *
+ *         "Porto Alegre": { "state": 1, "available": 0, "pavailable": 0 }    *
+ *     }                                                                      *
+ * }                                                                          *
+ *                                                                            *
+ * If an error happened while retrieving rtdata for some of the proxy groups: *
+ * {                                                                          *
+ * // ...                                                                     *
+ *     "rtdata": {                                                            *
+ * // ...                                                                     *
+ *         "Tokyo": {},                                                       *
+ * // ...                                                                     *
+ *     }                                                                      *
+ * }                                                                          *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_proxy_group_discovery_get(char **data)
+{
+	char			*error = NULL;
+	struct zbx_json		json;
+	zbx_hashset_iter_t	iter;
+	zbx_dc_proxy_group_t	*dc_proxy_group;
+	zbx_hashset_t		pgroups_rtdata;
+
+	zbx_hashset_create(&pgroups_rtdata, 0, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
+
+	zbx_json_addarray(&json, "data");
+
+	RDLOCK_CACHE;
+
+	zbx_hashset_iter_reset(&config->proxy_groups, &iter);
+	while (NULL != (dc_proxy_group = (zbx_dc_proxy_group_t *)zbx_hashset_iter_next(&iter)))
+		dc_proxy_group_discovery_add_group_cfg(&json, dc_proxy_group);
+
+	zbx_json_close(&json);
+
+	zbx_json_addobject(&json, "rtdata");
+
+	if (FAIL == zbx_pg_get_all_rtdata(&pgroups_rtdata, &error))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Cannot obtain real-time data for proxy groups: %s", error);
+		zbx_free(error);
+	}
+
+	zbx_hashset_iter_reset(&config->proxy_groups, &iter);
+	while (NULL != (dc_proxy_group = (zbx_dc_proxy_group_t *)zbx_hashset_iter_next(&iter)))
+		dc_proxy_group_discovery_add_group_rtdata(dc_proxy_group, &pgroups_rtdata, &json);
+
+	UNLOCK_CACHE;
+
+	zbx_hashset_destroy(&pgroups_rtdata);
+
+	zbx_json_close(&json);
 	zbx_json_close(&json);
 	*data = zbx_strdup(NULL, json.buffer);
 
