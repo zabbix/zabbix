@@ -93,9 +93,7 @@
 		}
 
 		#post(target, proxy_groupids, curl) {
-			curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
-				<?= json_encode(CCsrfTokenHelper::get('proxygroup'), JSON_THROW_ON_ERROR) ?>
-			);
+			curl.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('proxygroup')) ?>);
 
 			target.classList.add('is-loading');
 

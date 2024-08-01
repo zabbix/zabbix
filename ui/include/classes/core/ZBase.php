@@ -673,7 +673,7 @@ class ZBase {
 			CMessageHelper::addError('Controller: '.$router->getAction());
 			ksort($_REQUEST);
 			foreach ($_REQUEST as $key => $value) {
-				if ($key !== CCsrfTokenHelper::CSRF_TOKEN_NAME) {
+				if ($key !== CSRF_TOKEN_NAME) {
 					CMessageHelper::addError(is_scalar($value) ? $key.': '.$value : $key.': '.gettype($value));
 				}
 			}
@@ -741,7 +741,7 @@ class ZBase {
 
 	private static function denyPageAccess(CRouter $router): void {
 		$request_url = (new CUrl(array_key_exists('request', $_REQUEST) ? $_REQUEST['request'] : ''))
-			->removeArgument(CCsrfTokenHelper::CSRF_TOKEN_NAME)
+			->removeArgument(CSRF_TOKEN_NAME)
 			->toString();
 
 		if (CAuthenticationHelper::getPublic(CAuthenticationHelper::HTTP_LOGIN_FORM) == ZBX_AUTH_FORM_HTTP

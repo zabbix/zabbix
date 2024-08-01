@@ -20,7 +20,7 @@
  */
 
 $form = (new CForm('post'))
-	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('proxy')))->removeId())
+	->addItem((new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('proxy')))->removeId())
 	->setId('proxy-form')
 	->setName('proxy_form')
 	->addStyle('display: none;')

@@ -47,9 +47,9 @@ class testMultiselectsErrorsHostsTemplates extends testMultiselectDialogs {
 				[
 					'object' => 'Hosts',
 					'checked_multiselects' => [
-						['Host groups' => 'Host groups'],
-						['Templates' => 'Templates', 'Template group' => 'Template groups'],
-						['Proxies' => 'Proxies']
+						['Host groups' => ['title' => 'Host groups']],
+						['Templates' => ['title' => 'Templates'], 'Template group' => ['title' =>'Template groups']],
+						['Proxies' => ['title' => 'Proxies']]
 					],
 					// Fill this filter to enable 'Proxy' multiselect.
 					'filter' => ['Monitored by' => 'Proxy'],
@@ -64,7 +64,7 @@ class testMultiselectsErrorsHostsTemplates extends testMultiselectDialogs {
 					'object' => 'Hosts',
 					'sub_object' => 'Items' ,
 					'checked_multiselects' => [
-						['Value mapping' => 'Value mapping']
+						['Value mapping' => ['title' => 'Value mapping']]
 					],
 					'filled_multiselects' => [
 						['Value mapping' => 'Template value mapping']
@@ -104,8 +104,8 @@ class testMultiselectsErrorsHostsTemplates extends testMultiselectDialogs {
 				[
 					'object' => 'Templates',
 					'checked_multiselects' => [
-						['Template groups' => 'Template groups'],
-						['Linked templates' => 'Templates', 'Template group' => 'Template groups']
+						['Template groups' => ['title' => 'Template groups']],
+						['Linked templates' => ['title' => 'Templates'], 'Template group' => ['title' => 'Template groups']]
 					]
 				]
 			],
@@ -115,7 +115,7 @@ class testMultiselectsErrorsHostsTemplates extends testMultiselectDialogs {
 					'object' => 'Templates',
 					'sub_object' => 'Items' ,
 					'checked_multiselects' => [
-						['Value mapping' => 'Value mapping']
+						['Value mapping' => ['title' => 'Value mapping']]
 					],
 					'filled_multiselects' => [
 						['Value mapping' => 'Zabbix agent ping status']
@@ -167,8 +167,14 @@ class testMultiselectsErrorsHostsTemplates extends testMultiselectDialogs {
 
 			// Add common multiselect fields to data provider.
 			$common_multiselects = ($data['object'] === 'Hosts')
-				? [['Host groups' => 'Host groups'], ['Hosts' => 'Hosts', 'Host group' => 'Host groups']]
-				: [['Template groups' => 'Template groups'], ['Templates' => 'Templates', 'Template group' => 'Template groups']];
+				? [
+					['Host groups' => ['title' => 'Host groups']],
+					['Hosts' => ['title' => 'Hosts'], 'Host group' => ['title' => 'Host groups']]
+				]
+				: [
+					['Template groups' => ['title' => 'Template groups']],
+					['Templates' => ['title' => 'Templates'], 'Template group' => ['title' => 'Template groups']]
+				];
 
 			$data['checked_multiselects'] = array_merge($common_multiselects,
 					CTestArrayHelper::get($data, 'checked_multiselects', [])
