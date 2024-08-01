@@ -219,6 +219,26 @@ class CWidgetClock extends CWidget {
 			return;
 		}
 
+		const timezone_text = this._getTimeZoneText();
+
+		if (this._tzone_format === CWidgetClock.TIMEZONE_SHORT) {
+			clock_time_zone.textContent = timezone_text;
+		}
+		else {
+			const part1 = document.createElement('span');
+			clock_time_zone.appendChild(part1);
+
+			const part2 = document.createElement('span');
+			clock_time_zone.appendChild(part2);
+
+			const separator = ' ';
+
+			part1.textContent = timezone_text.substring(0, timezone_text.indexOf(separator));
+			part2.textContent = timezone_text.substring(timezone_text.indexOf(separator) + 1);
+		}
+	}
+
+	_getTimeZoneText() {
 		let timezone_text = this._time_zone;
 
 		if (this._time_zone === CWidgetClock.TIMEZONE_LOCAL) {
@@ -244,7 +264,7 @@ class CWidgetClock extends CWidget {
 			timezone_text = time_zone.replace(/_/g, ' ');
 		}
 
-		clock_time_zone.textContent = timezone_text;
+		return timezone_text;
 	}
 
 	_adjustDigitalClockSize() {
@@ -295,16 +315,18 @@ class CWidgetClock extends CWidget {
 				const element = this._target.querySelector('.clock-date');
 
 				if (element !== null) {
-					const font_size = Math.max(
-						min_font_size_date,
-						max_height * ratio_date / CWidgetClock.LINE_HEIGHT
-					);
-					const font_weight = this._styles.date.bold ? 'bold' : '';
-					const width = this._getMeasuredTextWidth(element.textContent, font_size, font_weight);
+					const font_size = Math.max(min_font_size_date, max_height * ratio_date / CWidgetClock.LINE_HEIGHT);
 
 					element.style.fontSize = `${font_size}px`;
 
-					elements.push({element, width, font_size, min_font_size: min_font_size_date});
+					elements.push({
+						type: CWidgetClock.SHOW_DATE,
+						element,
+						text: element.textContent,
+						font_size,
+						font_weight: this._styles.date.bold ? 'bold' : '',
+						min_font_size: min_font_size_date
+					});
 				}
 			}
 
@@ -312,16 +334,18 @@ class CWidgetClock extends CWidget {
 				const element = this._target.querySelector('.clock-time');
 
 				if (element !== null) {
-					const font_size = Math.max(
-						min_font_size_time,
-						max_height * ratio_time / CWidgetClock.LINE_HEIGHT
-					);
-					const font_weight = this._styles.time.bold ? 'bold' : '';
-					const width = this._getMeasuredTextWidth(element.textContent, font_size, font_weight);
+					const font_size = Math.max(min_font_size_time, max_height * ratio_time / CWidgetClock.LINE_HEIGHT);
 
 					element.style.fontSize = `${font_size}px`;
 
-					elements.push({element, width, font_size, min_font_size: min_font_size_time});
+					elements.push({
+						type: CWidgetClock.SHOW_TIME,
+						element,
+						text: element.textContent,
+						font_size,
+						font_weight: this._styles.time.bold ? 'bold' : '',
+						min_font_size: min_font_size_time
+					});
 				}
 			}
 
@@ -333,29 +357,69 @@ class CWidgetClock extends CWidget {
 						min_font_size_timezone,
 						max_height * ratio_timezone / CWidgetClock.LINE_HEIGHT
 					);
-					const font_weight = this._styles.timezone.bold ? 'bold' : '';
-					const width = this._getMeasuredTextWidth(element.textContent, font_size, font_weight);
 
 					element.style.fontSize = `${font_size}px`;
 
-					elements.push({element, width, font_size, min_font_size: min_font_size_timezone});
+					elements.push({
+						type: CWidgetClock.SHOW_TIMEZONE,
+						element,
+						text: this._getTimeZoneText(),
+						font_size,
+						font_weight: this._styles.timezone.bold ? 'bold' : '',
+						min_font_size: min_font_size_timezone
+					});
 				}
 			}
 
 			if (elements.length > 0) {
-				const widest_element = elements.reduce((el1, el2) => el1.width > el2.width ? el1 : el2);
+				const largest_width = elements
+					.map(e => this._getMeasuredTextWidth(e.text, e.font_size, e.font_weight))
+					.reduce((w1, w2) => w1 > w2 ? w1 : w2);
 
-				if (widest_element.width > max_width) {
-					const width_ratio = max_width / widest_element.width;
+				if (largest_width > max_width) {
+					const width_ratio = max_width / largest_width;
 
 					for (const element of elements) {
-						const font_size = Math.max(
-							element.min_font_size,
-							element.font_size * width_ratio
-						);
+						const font_size = Math.max(element.min_font_size, element.font_size * width_ratio);
 
 						element.element.style.fontSize = `${font_size}px`;
+
+						element.font_size = font_size;
 					}
+				}
+			}
+
+			if (this._show.includes(CWidgetClock.SHOW_TIMEZONE) && this._tzone_format === CWidgetClock.TIMEZONE_FULL) {
+				const timezone_element = elements.find(e => e.type === CWidgetClock.SHOW_TIMEZONE);
+				const timezone_line_height = timezone_element.font_size * CWidgetClock.LINE_HEIGHT;
+				const elements_height = elements
+					.reduce((sum, element) => sum + element.font_size * CWidgetClock.LINE_HEIGHT, 0);
+				const has_enough_free_height = max_height - elements_height >= timezone_line_height;
+
+				timezone_element.element.classList.toggle('separated', has_enough_free_height);
+
+				const parts = timezone_element.element.querySelectorAll('span');
+
+				timezone_element.text = has_enough_free_height
+					? Array.from(parts)
+						.reduce((p1, p2) => {
+							const getWidth = text => this._getMeasuredTextWidth(text, timezone_element.font_size,
+								timezone_element.font_weight);
+
+							return getWidth(p1.textContent) > getWidth(p2.textContent) ? p1 : p2;
+						}).textContent
+					: Array.from(parts, p => p.textContent).join(' ');
+
+				const elements_largest_width = elements
+					.map(e => this._getMeasuredTextWidth(e.text, e.font_size, e.font_weight))
+					.reduce((w1, w2) => w1 > w2 ? w1 : w2);
+				const all_elements_height = has_enough_free_height
+					? elements_height + timezone_line_height
+					: elements_height;
+				const ratio = Math.min(max_width / elements_largest_width, max_height / all_elements_height);
+
+				for (const element of elements) {
+					element.element.style.fontSize = `${Math.max(element.min_font_size, element.font_size * ratio)}px`;
 				}
 			}
 		}

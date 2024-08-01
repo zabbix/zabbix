@@ -52,7 +52,23 @@ div.dashboard-widget-clock {
 			overflow: hidden;
 			text-overflow: ellipsis;
 			line-height: $line-height;
-			flex-shrink: 0;
+		}
+
+		.clock-time-zone {
+			span:first-of-type {
+				margin-right: 0.2em;
+			}
+
+			&.separated {
+				text-align: center;
+
+				span {
+					display: block;
+					overflow: hidden;
+					text-overflow: ellipsis;
+					margin-right: 0;
+				}
+			}
 		}
 
 		.bold {

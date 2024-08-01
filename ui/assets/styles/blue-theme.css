@@ -4188,8 +4188,16 @@ div.dashboard-widget-clock .clock-digital {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    line-height: 1.14;
-    flex-shrink: 0; }
+    line-height: 1.14; }
+  div.dashboard-widget-clock .clock-digital .clock-time-zone span:first-of-type {
+    margin-right: 0.2em; }
+  div.dashboard-widget-clock .clock-digital .clock-time-zone.separated {
+    text-align: center; }
+    div.dashboard-widget-clock .clock-digital .clock-time-zone.separated span {
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-right: 0; }
   div.dashboard-widget-clock .clock-digital .bold {
     font-weight: bold; }
   div.dashboard-widget-clock .clock-digital .clock-disabled {
