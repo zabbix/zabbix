@@ -47,6 +47,34 @@ static int	DBpatch_7010001(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_7010002(void)
+{
+	int		i;
+	const char	*values[] = {
+			"web.avail_report.filter.active", "web.availabilityreport.filter.active",
+			"web.avail_report.filter.from", "web.availabilityreport.filter.from",
+			"web.avail_report.filter.to", "web.availabilityreport.filter.to",
+			"web.avail_report.mode", "web.availabilityreport.filter.mode",
+			"web.avail_report.0.groupids", "web.availabilityreport.filter.0.host_groups",
+			"web.avail_report.0.hostids", "web.availabilityreport.filter.0.hosts",
+			"web.avail_report.1.groupid", "web.availabilityreport.filter.1.template_groups",
+			"web.avail_report.1.hostid", "web.availabilityreport.filter.1.templates",
+			"web.avail_report.1.tpl_triggerid", "web.availabilityreport.filter.1.triggers",
+			"web.avail_report.1.hostgroupid", "web.availabilityreport.filter.1.host_groups"
+		};
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	for (i = 0; i < (int)ARRSIZE(values); i += 2)
+	{
+		if (ZBX_DB_OK > zbx_db_execute("update profiles set idx='%s' where idx='%s'", values[i + 1], values[i]))
+			return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(7010)

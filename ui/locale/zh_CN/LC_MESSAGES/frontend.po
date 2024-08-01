@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-06-17 08:28+0000\n"
+"PO-Revision-Date: 2024-07-15 08:55+0000\n"
 "Last-Translator: NoYoWiFi <1284524409@qq.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_CN\n"
@@ -935,6 +935,10 @@ msgstr "添加列"
 msgid "Add a new widget"
 msgstr "添加新小组件"
 
+#: widgets/navtree/Widget.php:34
+msgid "Add child element"
+msgstr "添加子节点元素"
+
 #: widgets/navtree/Widget.php:39
 msgid "Add child elements"
 msgstr "添加子节点"
@@ -968,6 +972,11 @@ msgstr "添加主机标签"
 #: app/views/trigger.massupdate.php:155
 msgid "Add host trigger"
 msgstr "添加主机触发器"
+
+#: widgets/piechart/includes/CWidgetFieldDataSetView.php:260
+#: widgets/svggraph/includes/CWidgetFieldDataSetView.php:263
+msgid "Add item"
+msgstr "添加监控项"
 
 #: app/partials/massupdate.macros.tab.php:96
 #: app/partials/massupdate.valuemaps.tab.php:38
@@ -1625,6 +1634,10 @@ msgstr "至少须指定一周或一个月中的某一天。"
 msgid "At least one host group or host must be selected."
 msgstr "至少选择一个主机组或主机。"
 
+#: include/classes/setup/CFrontendSetup.php:252
+msgid "At least one of MySQL or PostgreSQL should be supported."
+msgstr "至少应该支持MySQL或PostgreSQL中的一种。"
+
 #: include/classes/setup/CFrontendSetup.php:241
 msgid "At least one of MySQL, PostgreSQL or Oracle should be supported."
 msgstr "应该至少支持MySQL，PostgreSQL或Oracle之一。"
@@ -1844,6 +1857,11 @@ msgstr "可用性"
 msgid "Availability report"
 msgstr "可用性报表"
 
+#: app/controllers/CControllerAvailabilityReportTrigger.php:70
+#: app/views/reports.availabilityreport.trigger.php:23
+msgid "Availability report graph"
+msgstr ""
+
 #: include/classes/html/CHostAvailability.php:80
 #: widgets/hostavail/views/widget.view.php:32
 msgid "Available"
@@ -1870,6 +1888,10 @@ msgstr "收集间隔期间对虚拟磁盘的平均未完成写入请求数，\"u
 #: app/views/administration.authentication.edit.php:131
 msgid "Avoid easy-to-guess passwords"
 msgstr "避免弱密码"
+
+#: jsLoader.php:172
+msgid "Awaiting data"
+msgstr "等待数据"
 
 #: widgets/svggraph/views/widget.edit.php:51
 msgid "Axes"
@@ -2846,7 +2868,7 @@ msgstr[0] "无法删除用户组"
 #: include/classes/api/services/CUserGroup.php:1397
 #, c-format
 msgid "Cannot delete user group \"%1$s\", because it is used by provisioned user \"%2$s\"."
-msgstr "无法删除用户组 \"%1$s\", 因为它由预配用户 \"%2$s\"使用。"
+msgstr "无法删除用户组 \"%1$s\", 因为它正被预配置的用户 \"%2$s\"使用。"
 
 #: app/controllers/CControllerUserroleDelete.php:59
 msgid "Cannot delete user role"
@@ -3297,7 +3319,7 @@ msgstr "无法将模板“%2$s”的键为“%1$s”的监控项原型继承到�
 #: include/classes/api/services/CItemGeneral.php:880
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item prototype with the same key is already inherited from template \"%4$s\"."
-msgstr "无法继承模板“%2$s”的键为“%1$s”的项目原型来承载“%3$s”，因为具有相同键的项目原型已从模板“%4$s”继承。"
+msgstr "无法继承模板“%2$s”的键为“%1$s”的监控项原型来承载“%3$s”，因为具有相同键的监控项原型已从模板“%4$s”继承。"
 
 #: include/classes/api/services/CItemGeneral.php:829
 #, c-format
@@ -3317,7 +3339,7 @@ msgstr "无法将模板“%2$s”的键为“%1$s”的监控项原型继承到�
 #: include/classes/api/services/CItemGeneral.php:881
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item prototype with the same key is already inherited from template \"%4$s\"."
-msgstr "无法将模板“%2$s”的键为“%1$s”的项目原型继承到模板“%3$s”，因为具有相同键的项目原型已从模板“%4$s”继承。"
+msgstr "无法将模板“%2$s”的键为“%1$s”的监控项原型继承到模板“%3$s”，因为具有相同键的监控项原型已从模板“%4$s”继承。"
 
 #: include/classes/api/services/CItemGeneral.php:830
 #, c-format
@@ -3574,7 +3596,7 @@ msgstr "没有where条件，无法对表 \"%1$s\" 执行update语句。"
 #: app/controllers/CControllerUserProvision.php:69
 msgid "Cannot provision user"
 msgid_plural "Cannot provision users"
-msgstr[0] "无法配置用户"
+msgstr[0] "无法预配置用户"
 
 #: include/classes/import/readers/CJsonImportReader.php:35
 #, c-format
@@ -3760,7 +3782,7 @@ msgstr "由于触发器“%4$s”的表达式，无法取消没有模板“%2$s�
 #: include/classes/api/services/CHostGeneral.php:885
 #, c-format
 msgid "Cannot unlink trigger \"%1$s\", it has items from template that is left linked to host."
-msgstr "无法取消链接触发器“%1$s”，它有来自模板的项目仍链接到主机。"
+msgstr "无法取消链接触发器“%1$s”，它有来自模板的监控项仍链接到主机。"
 
 #: include/classes/api/services/CAction.php:2772
 #, c-format
@@ -4351,7 +4373,7 @@ msgstr "清除所选监控项的历史和趋势？"
 
 #: include/views/configuration.item.list.php:316
 msgid "Clear history and trends of selected items?"
-msgstr "清除所选项目的历史和趋势？"
+msgstr "清除所选监控项的历史和趋势？"
 
 #: include/views/configuration.httpconf.list.php:238
 msgid "Clear history and trends of selected web scenario?"
@@ -4792,7 +4814,7 @@ msgstr "配置数据库连接"
 #: app/views/administration.authentication.edit.php:422
 #: app/views/popup.ldap.edit.php:119
 msgid "Configure JIT provisioning"
-msgstr "配置准时(JIT)服务开通"
+msgstr "配置即时供应"
 
 #: app/views/js/administration.authentication.edit.js.php:143
 msgid "Confirm changes"
@@ -5288,11 +5310,11 @@ msgstr "从所选原型中启用并创建监控项？"
 
 #: include/views/configuration.item.prototype.list.php:213
 msgid "Create items from selected prototypes as disabled?"
-msgstr "您想通过使所选原型中的禁用监控项来创建项目吗？"
+msgstr "从选定的原型中创建监控项时默认禁用？"
 
 #: include/views/configuration.item.prototype.list.php:207
 msgid "Create items from selected prototypes as enabled?"
-msgstr "您想通过使所选原型中的启用项目来创建项目吗？"
+msgstr "从选定的原型中创建监控项时默认启用？"
 
 #: app/views/maintenance.list.php:152
 msgid "Create maintenance period"
@@ -5310,13 +5332,17 @@ msgstr "创建媒介类型"
 msgid "Create new"
 msgstr "创建新的"
 
+#: jsLoader.php:372
+msgid "Create new report"
+msgstr "创建新报表"
+
 #: app/views/administration.proxy.list.php:239
 msgid "Create proxy"
 msgstr "创建Proxy"
 
 #: app/views/administration.proxygroup.list.php:168
 msgid "Create proxy group"
-msgstr "创建Proxy"
+msgstr "创建Proxy组"
 
 #: app/views/reports.scheduledreport.list.php:37
 msgid "Create report"
@@ -6111,7 +6137,7 @@ msgstr "删除图标映射?"
 
 #: include/views/configuration.item.prototype.edit.php:980
 msgid "Delete item prototype?"
-msgstr "删除监控项目模板?"
+msgstr "删除监控项原型?"
 
 #: include/views/configuration.item.edit.php:1135
 msgid "Delete item?"
@@ -6502,20 +6528,20 @@ msgstr "将被弃用的参数“%1$s”不能与“%2$s”一起使用。"
 
 #: app/views/administration.authentication.edit.php:53
 msgid "Deprovisioned users group"
-msgstr "取消配置的用户组"
+msgstr "取消预配置的用户组"
 
 #: include/classes/api/services/CUserGroup.php:1002
 msgid "Deprovisioned users group cannot be deleted."
-msgstr "无法删除已取消配置的用户组。"
+msgstr "取消预配置的用户组不能被删除。"
 
 #: include/classes/api/services/CAuthentication.php:203
 msgid "Deprovisioned users group cannot be empty."
-msgstr "取消配置的用户组不能为空。"
+msgstr "取消预配置的用户组不能为空。"
 
 #: include/classes/api/services/CAuthentication.php:193
 #: include/classes/api/services/CUserGroup.php:321
 msgid "Deprovisioned users group cannot be enabled."
-msgstr "无法启用已取消配置的用户组。"
+msgstr "取消预配置的用户组不能被启用。"
 
 #: app/controllers/CControllerAuditLogList.php:306
 #: app/partials/configuration.host.edit.html.php:247
@@ -7445,7 +7471,7 @@ msgstr "所有用户使用HTTP认证方式"
 #: app/views/administration.authentication.edit.php:209
 #: app/views/administration.authentication.edit.php:281
 msgid "Enable JIT provisioning"
-msgstr "启用准时(JIT)服务开通"
+msgstr "启用即时供应"
 
 #: app/views/administration.authentication.edit.php:200
 msgid "Enable LDAP authentication"
@@ -7457,7 +7483,7 @@ msgstr "启用SAML身份验证"
 
 #: app/views/administration.authentication.edit.php:546
 msgid "Enable SCIM provisioning"
-msgstr "启用 SCIM 配置"
+msgstr "启用 SCIM 供应"
 
 #: app/views/administration.audit.settings.edit.php:44
 msgid "Enable audit logging"
@@ -8056,7 +8082,7 @@ msgstr "过期时间小于"
 
 #: app/views/popup.generic.php:623 include/graphs.inc.php:27
 msgid "Exploded"
-msgstr "爆发的"
+msgstr "爆炸饼图"
 
 #: include/classes/html/CButtonExport.php:32
 msgid "Export"
@@ -8575,7 +8601,7 @@ msgstr "图形化界面已经被禁用。"
 
 #: widgets/gauge/Widget.php:46
 msgid "Gauge"
-msgstr "表盘"
+msgstr "仪表盘"
 
 #: include/classes/helpers/CMenuHelper.php:338
 #: include/classes/helpers/CRoleHelper.php:507
@@ -8740,7 +8766,7 @@ msgstr "图形\"%1$s\"已存在于\"%2$s\"中 (继承自其它的模板)."
 #: include/classes/api/services/CGraphGeneral.php:1322
 #, c-format
 msgid "Graph \"%1$s\" already exists on \"%2$s\" (items are not identical)."
-msgstr "图形\"%1$s\"已存在于\"%2$s\"中 (项目不一致)."
+msgstr "图形\"%1$s\"已存在于\"%2$s\"中 (监控项不一致)."
 
 #: include/classes/api/services/CGraphGeneral.php:1270
 #, c-format
@@ -8766,7 +8792,7 @@ msgstr "模板“%2$s”上已存在图表“%1$s”。"
 #: include/classes/api/services/CGraph.php:38
 #, c-format
 msgid "Graph \"%1$s\" with templated items cannot contain items from other hosts."
-msgstr "含模板项目的图形\"%1$s\"不能包含其它主机的项目."
+msgstr "含模板监控项的图形\"%1$s\"不能包含其它主机的监控项."
 
 #: widgets/graph/Widget.php:29
 msgid "Graph (classic)"
@@ -8811,17 +8837,17 @@ msgstr "图表原型“%1$s”已存在于模板“%3$s”的键为“%2$s”的
 #: include/classes/api/services/CGraphGeneral.php:702
 #, c-format
 msgid "Graph prototype \"%1$s\" contains item prototypes from multiple discovery rules."
-msgstr "数据图模板 \"%1$s\" 包含来自多个自动发现规则上的监控项目模板"
+msgstr "数据图模板 \"%1$s\" 包含来自多个自动发现规则上的监控项模板"
 
 #: include/classes/api/services/CGraphGeneral.php:708
 #, c-format
 msgid "Graph prototype \"%1$s\" must have at least one item prototype."
-msgstr "数据图模板\"%1$s\"必须要有至少一个监控项目模板"
+msgstr "数据图模板\"%1$s\"必须要有至少一个监控项模板"
 
 #: include/classes/api/services/CGraphPrototype.php:38
 #, c-format
 msgid "Graph prototype \"%1$s\" with templated items cannot contain items from other hosts."
-msgstr "含模板项目的图形原型\"%1$s\"不能包含其它主机的项目."
+msgstr "含模板监控项的图形原型\"%1$s\"不能包含其它主机的监控项."
 
 #: graphs.php:228
 msgid "Graph prototype added"
@@ -9418,6 +9444,10 @@ msgstr[0] "主机组已删除"
 msgid "Host group elements"
 msgstr "主机群组组件"
 
+#: jsLoader.php:292
+msgid "Host group is not selected."
+msgstr "主机组未被选择。"
+
 #: include/views/monitoring.sysmap.edit.php:168
 msgid "Host group label type"
 msgstr "主机群组标签类型"
@@ -9496,6 +9526,10 @@ msgstr "主机资产记录"
 #: hostinventoriesoverview.php:26 hostinventoriesoverview.php:146
 msgid "Host inventory overview"
 msgstr "主机资产记录概览"
+
+#: jsLoader.php:289
+msgid "Host is not selected."
+msgstr "主机未被选择。"
 
 #: include/views/monitoring.sysmap.edit.php:183
 msgid "Host label type"
@@ -10502,17 +10536,17 @@ msgstr "资产字段“%1$s”不正确。"
 
 #: app/controllers/CControllerActionOperationCheck.php:188
 msgid "Incorrect inventory mode in action operation."
-msgstr "要执行的动作库存方式是不正确的。"
+msgstr "要执行的动作资产模式是不正确的。"
 
 #: include/classes/api/services/CTriggerGeneral.php:2050
 #, c-format
 msgid "Incorrect item key \"%1$s\" provided for trigger expression on \"%2$s\"."
-msgstr "提供错误的项目键值\"%1$s\"给\"%2$s\"上的触发器表达式."
+msgstr "提供错误的监控项键值\"%1$s\"给\"%2$s\"上的触发器表达式."
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:50
 #: include/triggers.inc.php:769
 msgid "Incorrect item value type"
-msgstr "项目的数据类型不正确"
+msgstr "监控项的数据类型不正确"
 
 #: include/classes/api/services/CTriggerGeneral.php:2057
 #, c-format
@@ -11182,11 +11216,11 @@ msgstr "无效的JSON. 当解析JSON文字时, 在服务器端发生了一个错
 
 #: app/controllers/CControllerAuthenticationUpdate.php:165
 msgid "Invalid LDAP JIT provisioning media type mapping configuration."
-msgstr "无效的 LDAP 准时(JIT)服务开通媒介类型映射配置。"
+msgstr "LDAP 即时供应媒体类型映射配置无效。"
 
 #: app/controllers/CControllerAuthenticationUpdate.php:158
 msgid "Invalid LDAP JIT provisioning user group mapping configuration."
-msgstr "无效的 LDAP准时(JIT)服务开通用户组映射配置。"
+msgstr "LDAP 即时供应用户组映射配置无效。"
 
 #: app/controllers/CControllerPopupLdapCheck.php:75
 #: app/controllers/CControllerPopupLdapEdit.php:68
@@ -11202,11 +11236,11 @@ msgstr "MFA 配置无效"
 
 #: app/controllers/CControllerAuthenticationUpdate.php:208
 msgid "Invalid SAML JIT provisioning media type mapping configuration."
-msgstr "SAML准时(JIT)服务开通媒介类型映射配置无效。"
+msgstr "SAML 即时供应媒体类型映射配置无效。"
 
 #: app/controllers/CControllerAuthenticationUpdate.php:202
 msgid "Invalid SAML JIT provisioning user group mapping configuration."
-msgstr "SAML准时(JIT)服务开通用户组映射配置无效。"
+msgstr "SAML 即时供应用户组映射配置无效。"
 
 #: jsLoader.php:438
 #, c-format
@@ -11671,7 +11705,7 @@ msgstr "监控项已添加"
 
 #: app/views/popup.itemtestedit.view.php:433
 msgid "Item contains user-defined macros with secret values. Values of these macros should be entered manually."
-msgstr "项目包含具有秘密值的用户定义的宏。这些宏的值应手动输入。"
+msgstr "监控项包含具有秘密值的用户定义的宏。这些宏的值应手动输入。"
 
 #: app/controllers/CControllerCopyCreate.php:160
 msgid "Item copied"
@@ -11699,7 +11733,7 @@ msgstr[0] "监控项已启用"
 
 #: widgets/itemhistory/Widget.php:26
 msgid "Item history"
-msgstr "项目历史"
+msgstr "监控项历史"
 
 #: include/actions.inc.php:1074
 msgid "Item in \"not supported\" state"
@@ -11707,36 +11741,36 @@ msgstr "监控项在“不支持”的状态"
 
 #: widgets/itemnavigator/includes/WidgetForm.php:107
 msgid "Item limit"
-msgstr "项目限制"
+msgstr "监控项限制"
 
 #: widgets/piechart/views/widget.edit.js.php:209
 #: widgets/svggraph/views/widget.edit.js.php:287
 msgid "Item list"
-msgstr "项目列表"
+msgstr "监控项列表"
 
 #: widgets/tophosts/views/column.edit.php:123
 msgid "Item name"
-msgstr "项目名称"
+msgstr "监控项名称"
 
 #: widgets/itemnavigator/Widget.php:29
 msgid "Item navigator"
-msgstr "项目导航"
+msgstr "监控项导航"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1622
 msgid "Item not selected"
-msgstr "项目未被选择"
+msgstr "监控项未被选择"
 
 #: widgets/piechart/views/widget.edit.js.php:203
 #: widgets/svggraph/views/widget.edit.js.php:281
 msgid "Item pattern"
-msgstr "项目图案"
+msgstr "监控项图案"
 
 #: widgets/honeycomb/includes/WidgetForm.php:90
 #: widgets/itemnavigator/includes/WidgetForm.php:78
 #: widgets/piechart/views/widget.edit.js.php:208
 #: widgets/svggraph/views/widget.edit.js.php:279
 msgid "Item patterns"
-msgstr "项目模式"
+msgstr "监控项模式"
 
 #: app/controllers/CControllerAuditLogList.php:241
 #: app/views/popup.lldoperation.php:49 app/views/popup.massupdate.item.php:512
@@ -11750,7 +11784,7 @@ msgstr "监控项原型"
 
 #: disc_prototypes.php:454
 msgid "Item prototype added"
-msgstr "项目模板已经添加"
+msgstr "监控项模板已经添加"
 
 #: disc_prototypes.php:302 disc_prototypes.php:499
 msgid "Item prototype deleted"
@@ -11767,7 +11801,7 @@ msgstr[0] "项目模板已更新"
 #: include/classes/api/services/CDashboardGeneral.php:488
 #, c-format
 msgid "Item prototype with ID \"%1$s\" is not available."
-msgstr "ID为 \"%1$s\" 的项目原型不可用。"
+msgstr "ID为 \"%1$s\" 的监控项原型不可用。"
 
 #: app/controllers/CControllerPopupGeneric.php:363
 #: app/controllers/CControllerPopupImportCompare.php:180
@@ -11781,11 +11815,11 @@ msgstr "监控项原型"
 
 #: widgets/itemnavigator/Widget.php:44
 msgid "Item tag"
-msgstr "项目标签"
+msgstr "监控项标签"
 
 #: widgets/itemnavigator/includes/CWidgetFieldItemGroupingView.php:81
 msgid "Item tag value"
-msgstr "项目标签值"
+msgstr "监控项标签值"
 
 #: app/partials/configuration.tags.tab.php:165
 #: widgets/dataover/includes/WidgetForm.php:51
@@ -11830,7 +11864,7 @@ msgstr "监控项不会被刷新。更新间隔应该在 1s 到 1d 之间。还�
 #: include/classes/api/services/CDashboardGeneral.php:460
 #, c-format
 msgid "Item with ID \"%1$s\" is not available."
-msgstr "ID为 \"%1$s\" 的项目不可用。"
+msgstr "ID为 \"%1$s\" 的监控项不可用。"
 
 #: app/controllers/CControllerPopupGeneric.php:295
 #: app/controllers/CControllerPopupGeneric.php:311
@@ -12354,15 +12388,15 @@ msgstr "位于给定键的 Windows 注册表值或键的列表。返回 JSON。"
 
 #: include/classes/data/CItemData.php:2743
 msgid "List of Zabbix proxies with name, mode, encryption, compression, version, last seen, host count, item count, required values per second (vps) and compatibility (current/outdated/unsupported). Returns JSON."
-msgstr "Zabbix proxy列表，包括名称、模式、加密、压缩、版本、上次看到、主机数、项目数、每秒所需值 (vps) 和兼容性（当前/过期/不支持）。返回 JSON。"
+msgstr "Zabbix proxy列表，包括名称、模式、加密、压缩、版本、上次看到、主机数、监控项数、每秒所需值 (vps) 和兼容性（当前/过期/不支持）。返回 JSON。"
 
 #: include/classes/data/CItemData.php:2877
 msgid "List of Zabbix proxies with name, mode, encryption, compression, version, last seen, host count, item count, required values per second (vps), compatibility (current/outdated/unsupported), timeouts, proxy group name if proxy belongs to group, state (unknown/offline/online). Returns JSON."
-msgstr "Zabbix proxies列表，包括名称、模式、加密、压缩、版本、最后出现时间、主机数、项目数、每秒所需值（vps）、兼容性（当前/过时/不支持）、超时、如果代理属于某个组则显示代理组名称、状态（未知/离线/在线）。返回JSON。"
+msgstr "Zabbix proxies列表，包括名称、模式、加密、压缩、版本、最后出现时间、主机数、监控项数、每秒所需值（vps）、兼容性（当前/过时/不支持）、超时、如果代理属于某个组则显示代理组名称、状态（未知/离线/在线）。返回JSON。"
 
 #: include/classes/data/CItemData.php:2905
 msgid "List of Zabbix proxies with name, mode, encryption, compression, version, last seen, host count, item count, required values per second (vps), compatibility (current/outdated/unsupported), timeouts, proxy group name, state (unknown/offline/online). Returns JSON."
-msgstr "Zabbix proxies列表，包括名称、模式、加密、压缩、版本、最后出现时间、主机数、项目数、每秒所需值（vps）、兼容性（当前/过时/不支持）、超时、代理组名称、状态（未知/离线/在线）。返回JSON。"
+msgstr "Zabbix proxies列表，包括名称、模式、加密、压缩、版本、最后出现时间、主机数、监控项数、每秒所需值（vps）、兼容性（当前/过时/不支持）、超时、代理组名称、状态（未知/离线/在线）。返回JSON。"
 
 #: include/classes/data/CItemData.php:1559
 msgid "List of block devices and their type. Returns JSON"
@@ -12795,6 +12829,10 @@ msgstr "拓扑元素标签位置"
 #: include/views/monitoring.sysmap.edit.php:243
 msgid "Map element label type"
 msgstr "拓扑元素标签类型"
+
+#: jsLoader.php:290
+msgid "Map is not selected."
+msgstr "拓扑图未被选择。"
 
 #: sysmap.php:128
 msgid "Map is updated! Return to map list?"
@@ -14652,7 +14690,7 @@ msgstr "不允许为用户“guest”设置主题。"
 #: include/classes/api/services/CUser.php:469
 #, c-format
 msgid "Not allowed to update field \"%1$s\" for provisioned user."
-msgstr "不允许为配置的用户更新字段“%1$s”。"
+msgstr "不允许更新预配置用户的字段\"%1$s\"。"
 
 #: include/classes/api/clients/CLocalApiClient.php:174
 #: include/classes/api/services/CUser.php:1769
@@ -14776,7 +14814,7 @@ msgstr "队列中延迟到秒（包含）的监控项数。"
 #: include/classes/data/CItemData.php:2615
 #: include/classes/data/CItemData.php:2778
 msgid "Number of items in the queue which are delayed in Zabbix server or proxy by \"from\" till \"to\" seconds, inclusive."
-msgstr "队列中在 Zabbix 服务器或proxy中延迟 \"from\" 到 \"to\" 秒的项目数，包括在内。"
+msgstr "队列中在 Zabbix 服务器或proxy中延迟 \"from\" 到 \"to\" 秒的监控项数，包括在内。"
 
 #: include/classes/data/CItemData.php:2687
 msgid "Number of monitored hosts"
@@ -15037,6 +15075,19 @@ msgstr "在线"
 msgid "Online proxies"
 msgstr "在线proxies"
 
+#: include/classes/api/services/CUser.php:874
+#: include/classes/api/services/CUser.php:882
+#: include/classes/api/services/CUser.php:889
+#, c-format
+msgid "Only Super admin or Admin users can update \"%1$s\" parameter."
+msgstr ""
+
+#: include/classes/api/services/CUser.php:812
+#: include/classes/api/services/CUser.php:853
+#, c-format
+msgid "Only Super admin users can update \"%1$s\" parameter."
+msgstr ""
+
 #: include/classes/api/services/CDRule.php:509
 msgid "Only Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 checks can be made unique."
 msgstr "仅Zabbix agent, SNMPv1,SNMPv2 和 SNMPv3检查是独立的."
@@ -15048,7 +15099,7 @@ msgstr "只有管理员才可以设置拓扑图的所有人。"
 
 #: app/views/administration.authentication.edit.php:54
 msgid "Only disabled group can be set for deprovisioned users."
-msgstr "只能为已取消配置的用户设置禁用组。"
+msgstr "只有禁用的组才能设置为取消预配置的用户。"
 
 #: app/partials/administration.system.info.php:66
 msgid "Only items assigned to enabled hosts are counted"
@@ -15086,7 +15137,7 @@ msgstr "只允许超级管理员可以设置报告所有者。"
 
 #: app/partials/administration.system.info.php:78
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
-msgstr "只计算指派给启用的主机的和相依于启用的项目的触发器"
+msgstr "只计算指派给启用的主机的和相依于启用的监控项的触发器"
 
 #: jsLoader.php:439
 msgid "Open URL"
@@ -15896,7 +15947,7 @@ msgstr "波斯语 (fa_IR)"
 #: app/views/popup.generic.php:620 include/graphs.inc.php:26
 #: widgets/piechart/includes/WidgetForm.php:121
 msgid "Pie"
-msgstr "Pie"
+msgstr "饼图"
 
 #: widgets/piechart/Widget.php:31
 msgid "Pie chart"
@@ -16377,27 +16428,27 @@ msgstr "提供的秘密查询字符串“%1$s”无效。"
 
 #: app/views/administration.user.list.php:302
 msgid "Provision now"
-msgstr "现在开通"
+msgstr "立即预配置"
 
 #: app/views/administration.user.list.php:304
 msgid "Provision selected LDAP user?"
-msgstr "配置选定的 LDAP 用户？"
+msgstr "是否预配置选定的LDAP用户？"
 
 #: app/views/administration.user.list.php:305
 msgid "Provision selected LDAP users?"
-msgstr "开通选定的 LDAP 用户？"
+msgstr "是否预配置选定的LDAP用户？"
 
 #: app/views/administration.user.list.php:140
 msgid "Provisioned"
-msgstr "已开通"
+msgstr "预配置的"
 
 #: app/views/administration.authentication.edit.php:256
 msgid "Provisioning period"
-msgstr "开通期限"
+msgstr "供应周期"
 
 #: app/controllers/CControllerUserProvision.php:65
 msgid "Provisioning successful."
-msgstr "开通成功。"
+msgstr "供应成功。"
 
 #: app/controllers/CControllerPopupGeneric.php:215
 #: app/views/administration.proxy.list.php:233
@@ -19013,7 +19064,7 @@ msgstr "速度"
 #: include/views/monitoring.history.php:255
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:291
 msgid "Stacked"
-msgstr "层积的"
+msgstr "堆叠图"
 
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:285
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:175
@@ -20065,11 +20116,11 @@ msgstr[0] "图片被应用于拓扑图 %1$s上."
 #: include/html.inc.php:778
 #, c-format
 msgid "The item is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
-msgstr "已无法自动发现此项目了, 将删除于%1$s (在%2$s在%3$s)."
+msgstr "已无法自动发现此监控项了, 将于%1$s删除(在%2$s %3$s)."
 
 #: include/html.inc.php:773
 msgid "The item is not discovered anymore and will be deleted the next time discovery rule is processed."
-msgstr "被发现的监控项目丢失它将在下次自动发现规则执行时被删除."
+msgstr "被发现的监控项丢失它将在下次自动发现规则执行时被删除."
 
 #: include/classes/html/widgets/fields/CWidgetFieldLatLngView.php:43
 #, c-format
@@ -20177,7 +20228,7 @@ msgstr "此类信息可能与密钥不匹配。"
 
 #: app/views/administration.user.edit.php:61
 msgid "This user is IdP provisioned. Manual changes for provisioned fields are not allowed."
-msgstr "此用户已配置 IdP。不允许手动更改已提供的字段。"
+msgstr "此用户由身份提供者预配置的。不允许手动更改预配置的字段。"
 
 #: include/func.inc.php:2572
 msgid "This week"
@@ -20672,7 +20723,7 @@ msgstr[0] "触发器已启用"
 #: include/classes/api/services/CHostBase.php:1670
 #, c-format
 msgid "Trigger has items from template \"%1$s\" that is not linked to host."
-msgstr "触发器有项目来自于模板\"%1$s\"其并未链接到主机."
+msgstr "触发器有监控项来自于模板\"%1$s\"其并未链接到主机."
 
 #: include/actions.inc.php:1076
 msgid "Trigger in \"unknown\" state"
@@ -20682,6 +20733,10 @@ msgstr "触发器在\"未知\"状态"
 #, c-format
 msgid "Trigger in template \"%1$s\" has dependency with trigger in template \"%2$s\"."
 msgstr "模板\"%1$s\"中的触发器依赖模板\"%2$s\"中的触发器"
+
+#: jsLoader.php:291
+msgid "Trigger is not selected."
+msgstr "触发器未被选择。"
 
 #: include/views/monitoring.sysmap.edit.php:198
 msgid "Trigger label type"
@@ -20776,7 +20831,7 @@ msgstr "触发器原型“%1$s”不能依赖触发器原型“%2$s”，因为�
 #: include/classes/api/services/CTriggerGeneral.php:2134
 #, c-format
 msgid "Trigger prototype \"%1$s\" contains item prototypes from multiple discovery rules."
-msgstr "触发器模板\"%1$s\"中包含了来自多个自动发现规则的项目模板."
+msgstr "触发器模板\"%1$s\"中包含了来自多个自动发现规则的监控项模板."
 
 #: include/classes/import/CConfigurationImport.php:1728
 #, c-format
@@ -20786,7 +20841,7 @@ msgstr "触发器模板 \"%1$s\" 依赖于触发器 \"%2$s\" ,但它不存在。
 #: include/classes/api/services/CTriggerGeneral.php:2129
 #, c-format
 msgid "Trigger prototype \"%1$s\" must contain at least one item prototype."
-msgstr "触发器模板 \"%1$s\"必须至少包含一个项目模板."
+msgstr "触发器模板 \"%1$s\"必须至少包含一个监控项模板."
 
 #: app/controllers/CControllerTriggerPrototypeCreate.php:126
 msgid "Trigger prototype added"
@@ -21704,7 +21759,7 @@ msgstr "用户 \"%1$s\" 必须拥有密码，因为内部身份验证正在生�
 #: app/controllers/CControllerUserProvision.php:61
 #, c-format
 msgid "User \"%1$s\" provisioned."
-msgstr "用户“%1$s”已开通。"
+msgstr "用户\"%1$s\"已预配置。"
 
 #: app/controllers/CControllerUserUnblock.php:61
 #, c-format
@@ -22726,6 +22781,10 @@ msgstr "视图"
 msgid "View as"
 msgstr "以视图"
 
+#: jsLoader.php:417
+msgid "View related reports"
+msgstr "查看相关报表"
+
 #: include/classes/data/CItemData.php:1735
 msgid "Virtual space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr "虚拟空间大小（以字节计）或百分比（总计）。 返回整型字节; 浮点百分比"
@@ -22932,6 +22991,10 @@ msgstr "小组件已弃用。"
 msgid "Widget is too small for the specified number of columns and rows."
 msgstr "对于指定的列数和行数而言小组件太小。"
 
+#: jsLoader.php:205
+msgid "Widgets"
+msgstr "部件"
+
 #: graphs.php:39 include/views/configuration.graph.edit.php:100
 #: include/views/configuration.graph.list.php:170
 #: include/views/js/monitoring.sysmaps.js.php:126
@@ -22989,7 +23052,7 @@ msgstr "通过此设置，将仅显示数值类型数据。"
 
 #: widgets/tophosts/views/column.edit.php:135
 msgid "With this setting only numeric items will be displayed in this column."
-msgstr "使用此设置，此列中将仅显示数字项目。"
+msgstr "使用此设置，此列中将仅显示数字监控项。"
 
 #: widgets/item/views/widget.edit.php:70
 #: widgets/tophosts/views/column.edit.php:225
@@ -23303,6 +23366,10 @@ msgstr "你没有权限来访问这个页面."
 #: include/classes/core/ZBase.php:763 include/func.inc.php:1709
 msgid "You must login to view this page."
 msgstr "您必需登录才能浏览此页面."
+
+#: jsLoader.php:287
+msgid "You need to have at least one image uploaded to create map element. Images can be uploaded in Administration->General->Images section."
+msgstr "您需要至少上传一张图片才能创建地图元素。图片可以在\"管理\"->\"常规\"->\"图片\"部分上传。"
 
 #: include/classes/db/DB.php:133
 msgid "Your database is not working properly. Please wait a few minutes and try to repeat this action. If the problem still persists, please contact system administrator. The problem might be caused by long running transaction or row level lock accomplished by your database management system."
@@ -24047,7 +24114,7 @@ msgstr "无法更新继承对象的只读参数“%1$s”"
 #: include/classes/api/services/CUser.php:1066
 #, c-format
 msgid "cannot update readonly parameter \"%1$s\" of provisioned user"
-msgstr "无法更新预配用户的只读参数 \"%1$s\""
+msgstr "无法更新预配置用户的只读参数\"%1$s\""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:491
 msgid "cbrt() - Cube root"
@@ -24668,7 +24735,7 @@ msgstr "监控项模式"
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:261
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:303
 msgid "item patterns"
-msgstr "项目模式"
+msgstr "监控项模式"
 
 #: include/classes/api/services/CItemGeneral.php:545
 msgid "item prototype with the same UUID already exists"
@@ -25311,6 +25378,10 @@ msgstr "正确"
 #: app/controllers/CControllerPopupTriggerExpr.php:953
 msgid "right() - Returns the rightmost count characters"
 msgstr "right() - 返回最右边指定个数字符"
+
+#: widgets/navtree/Widget.php:41
+msgid "root"
+msgstr "root"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:966
 msgid "round() - Rounds a value to decimal places"

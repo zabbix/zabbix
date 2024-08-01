@@ -336,7 +336,7 @@ static int	DBpatch_2030031(void)
 
 static int	DBpatch_2030032(void)
 {
-	const zbx_db_field_t	field = {"description", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"description", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("hosts", &field);
 }
@@ -1172,13 +1172,8 @@ static int	DBpatch_2030095(void)
 
 			zbx_chrcpy_alloc(&params, &params_alloc, &params_offset, *p);
 		}
-#if defined(HAVE_ORACLE)
-		if (0 == params_offset || (2048 < params_offset && 2048 /* ZBX_ITEM_PARAM_LEN */ <
-				zbx_strlen_utf8(params)))
-#else
 		if (0 == params_offset ||
 				(65535 < params_offset && 65535 /* ZBX_ITEM_PARAM_LEN */ < zbx_strlen_utf8(params)))
-#endif
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot convert calculated item expression \"%s\": resulting"
 					" expression is %s", row[1], 0 == params_offset ? "empty" : "too long");
@@ -1237,7 +1232,7 @@ static int	DBpatch_2030100(void)
 
 static int	DBpatch_2030101(void)
 {
-	const zbx_db_field_t	field = {"headers", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"headers", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("httptest", &field);
 }
@@ -1265,7 +1260,7 @@ static int	DBpatch_2030104(void)
 
 static int	DBpatch_2030105(void)
 {
-	const zbx_db_field_t	field = {"headers", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"headers", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("httpstep", &field);
 }

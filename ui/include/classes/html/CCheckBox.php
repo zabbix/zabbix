@@ -69,7 +69,6 @@ class CCheckBox extends CInput {
 
 		$this->setChecked(false);
 		$this->addClass(ZBX_STYLE_CHECKBOX_RADIO);
-		$this->setAttribute('tabindex', '0');
 	}
 
 	/**

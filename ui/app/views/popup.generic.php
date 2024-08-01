@@ -65,7 +65,7 @@ if (array_key_exists('hosts', $data['filter'])) {
 	$multiselect_options['popup']['parameters']['dstfrm'] = $header_form->getId();
 
 	$host_ms = (new CMultiSelect($multiselect_options))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH);
-	if ($multiselect_options['disabled']) {
+	if ($multiselect_options['readonly']) {
 		$host_ms->setTitle(_('You cannot switch hosts for current selection.'));
 	}
 	$controls[] = (new CFormList())->addRow(new CLabel(_('Host'), 'popup_host_ms'), $host_ms);
@@ -324,37 +324,14 @@ switch ($data['popup_type']) {
 				$description = new CLabel($trigger['description']);
 			}
 
-			if ($data['multiselect']) {
-				$description
-					->setAttribute('data-reference', $options['reference'])
-					->setAttribute('data-triggerid', $trigger['triggerid'])
-					->setAttribute('data-parentid', $options['parentid'])
-					->onClick('
-						addValue(this.dataset.reference, this.dataset.triggerid, this.dataset.parentid ?? null);
-						popup_generic.closePopup(event);
-					');
-			}
-			else {
-				$values = [];
-
-				if ($options['dstfld1'] !== '' && $options['srcfld1'] !== '') {
-					$values[$options['dstfld1']] = $trigger[$options['srcfld1']];
-				}
-				if ($options['dstfld2'] !== '' && $options['srcfld2'] !== '') {
-					$values[$options['dstfld2']] = $trigger[$options['srcfld2']];
-				}
-				if ($options['dstfld3'] !== '' && $options['srcfld3'] !== '') {
-					$values[$options['dstfld3']] = $trigger[$options['srcfld3']];
-				}
-
-				$description
-					->setAttribute('data-dstfrm', $options['dstfrm'])
-					->setAttribute('data-values', json_encode($values))
-					->onClick('
-						addValues(this.dataset.dstfrm, JSON.parse(this.dataset.values));
-						popup_generic.closePopup(event);
-					');
-			}
+			$description
+				->setAttribute('data-reference', $options['reference'])
+				->setAttribute('data-triggerid', $trigger['triggerid'])
+				->setAttribute('data-parentid', $options['parentid'])
+				->onClick('
+					addValue(this.dataset.reference, this.dataset.triggerid, this.dataset.parentid ?? null);
+					popup_generic.closePopup(event);
+				');
 
 			if ($trigger['dependencies']) {
 				$description = [$description, BR(), bold(_('Depends on')), BR()];
@@ -378,21 +355,19 @@ switch ($data['popup_type']) {
 					->addClass(triggerIndicatorStyle($trigger['status'], $trigger['state']))
 			]);
 
-			if ($data['multiselect']) {
-				$trigger = [
-					'id' => $trigger['triggerid'],
-					'name' => $trigger['description'],
-					'triggerid' => $trigger['triggerid'],
-					'description' => $trigger['description'],
-					'expression' => $trigger['expression'],
-					'priority' => $trigger['priority'],
-					'status' => $trigger['status'],
-					'host' => $trigger['hostname']
-				];
+			$trigger = [
+				'id' => $trigger['triggerid'],
+				'name' => $trigger['description'],
+				'triggerid' => $trigger['triggerid'],
+				'description' => $trigger['description'],
+				'expression' => $trigger['expression'],
+				'priority' => $trigger['priority'],
+				'status' => $trigger['status'],
+				'host' => $trigger['hostname']
+			];
 
-				if ($data['popup_type'] === 'trigger_prototypes') {
-					$trigger['prototype'] = '1';
-				}
+			if ($data['popup_type'] === 'trigger_prototypes') {
+				$trigger['prototype'] = '1';
 			}
 		}
 		unset($trigger);
@@ -488,7 +463,6 @@ switch ($data['popup_type']) {
 	case 'items':
 	case 'template_items':
 	case 'item_prototypes':
-
 		if ($options['srcfld2'] !== '' && $options['dstfld2'] !== '') {
 			// TODO: this condition must be removed after all item and item_prototype fields changing to multiselect
 			foreach ($data['table_records'] as &$item) {
@@ -536,8 +510,16 @@ switch ($data['popup_type']) {
 
 				$table->addRow([
 					$data['multiselect'] ? new CCheckBox('item['.$checkbox_key.']', $item['itemid']) : null,
-					$description,
-					(new CDiv($item['key_']))->addClass(ZBX_STYLE_WORDWRAP),
+					(new CDiv($description))
+						->addClass(ZBX_STYLE_WORDBREAK)
+						->addClass(ZBX_STYLE_LINE_CLAMP)
+						->addStyle('--line-clamp: 4;')
+						->setTitle($item['name']),
+					(new CDiv($item['key_']))
+						->addClass(ZBX_STYLE_WORDWRAP)
+						->addClass(ZBX_STYLE_LINE_CLAMP)
+						->addStyle('--line-clamp: 4;')
+						->setTitle($item['key_']),
 					item_type2str($item['type']),
 					itemValueTypeString($item['value_type']),
 					($data['popup_type'] === 'items')
@@ -570,16 +552,25 @@ switch ($data['popup_type']) {
 					$data['multiselect']
 						? new CCheckBox('item['.$item['itemid'].']', $item_pattern)
 						: null,
-					(new CLink($item['name']))
-						->setAttribute('data-reference', $options['reference'])
-						->setAttribute('data-pattern', $item_pattern)
-						->setAttribute('data-parentid', $options['parentid'])
-						->onClick('
-							addValue(this.dataset.reference, this.dataset.pattern, this.dataset.parentid ?? null);
-							popup_generic.closePopup(event);
-						')
-						->addClass(ZBX_STYLE_WORDBREAK),
-					(new CDiv($item['key_']))->addClass(ZBX_STYLE_WORDWRAP),
+					(new CDiv(
+						(new CLink($item['name']))
+							->setAttribute('data-reference', $options['reference'])
+							->setAttribute('data-pattern', $item_pattern)
+							->setAttribute('data-parentid', $options['parentid'])
+							->onClick('
+								addValue(this.dataset.reference, this.dataset.pattern, this.dataset.parentid ?? null);
+								popup_generic.closePopup(event);
+							')
+					))
+						->addClass(ZBX_STYLE_WORDBREAK)
+						->addClass(ZBX_STYLE_LINE_CLAMP)
+						->addStyle('--line-clamp: 4;')
+						->setTitle($item['name']),
+					(new CDiv($item['key_']))
+						->addClass(ZBX_STYLE_WORDWRAP)
+						->addClass(ZBX_STYLE_LINE_CLAMP)
+						->addStyle('--line-clamp: 4;')
+						->setTitle($item['key_']),
 					item_type2str($item['type']),
 					itemValueTypeString($item['value_type']),
 					($data['popup_type'] === 'items')
@@ -900,6 +891,7 @@ $types = [
 	'proxy_groups',
 	'roles',
 	'templates',
+	'template_triggers',
 	'users',
 	'usrgrp',
 	'sla',

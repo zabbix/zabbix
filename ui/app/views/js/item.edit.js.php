@@ -20,7 +20,6 @@
 
 ?>
 (() => {
-const CSRF_TOKEN_NAME = <?= json_encode(CCsrfTokenHelper::CSRF_TOKEN_NAME) ?>;
 const INTERFACE_TYPE_OPT = <?= INTERFACE_TYPE_OPT ?>;
 const ITEM_DELAY_FLEXIBLE = <?= ITEM_DELAY_FLEXIBLE ?>;
 const ITEM_STORAGE_OFF = <?= ITEM_STORAGE_OFF ?>;
@@ -674,13 +673,15 @@ window.item_edit_form = new class {
 	}
 
 	#updateRetrieveModeVisibility() {
-		const disable = this.field.request_method.value == HTTPCHECK_REQUEST_HEAD;
+		const is_readonly = this.field.request_method.value == HTTPCHECK_REQUEST_HEAD;
 
-		if (disable) {
-			this.field.retrieve_mode.item(0).checked = true;
-		}
+		this.field.retrieve_mode.forEach(radio => {
+			if (is_readonly && radio.value == <?= HTTPTEST_STEP_RETRIEVE_MODE_HEADERS ?>) {
+				radio.checked = true;
+			}
 
-		this.field.retrieve_mode.forEach(radio => radio.disabled = disable);
+			radio.readOnly = is_readonly || this.form_readonly;
+		});
 	}
 
 	#updateValueTypeHintVisibility(preprocessing_active) {
@@ -695,7 +696,7 @@ window.item_edit_form = new class {
 
 	#updateHistoryModeVisibility() {
 		const mode_field = [].filter.call(this.field.history_mode, e => e.matches(':checked')).pop();
-		const disabled = mode_field.value == ITEM_STORAGE_OFF;
+		const disabled = mode_field.value == ITEM_STORAGE_OFF && !mode_field.readOnly;
 
 		this.field.history.toggleAttribute('disabled', disabled);
 		this.field.history.classList.toggle(ZBX_STYLE_DISPLAY_NONE, disabled);
@@ -704,7 +705,7 @@ window.item_edit_form = new class {
 
 	#updateTrendsModeVisibility() {
 		const mode_field = [].filter.call(this.field.trends_mode, e => e.matches(':checked')).pop();
-		const disabled = mode_field.value == ITEM_STORAGE_OFF;
+		const disabled = mode_field.value == ITEM_STORAGE_OFF && !mode_field.readOnly;
 
 		this.field.trends.toggleAttribute('disabled', disabled);
 		this.field.trends.classList.toggle(ZBX_STYLE_DISPLAY_NONE, disabled);
@@ -747,7 +748,7 @@ window.item_edit_form = new class {
 	#intervalTypeChangeHandler(e) {
 		const target = e.target;
 
-		if (!target.matches('[name$="[type]"]')) {
+		if (!target.matches('[name$="[type]"]') || target.hasAttribute('readonly')) {
 			return;
 		}
 

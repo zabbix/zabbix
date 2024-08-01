@@ -1371,7 +1371,7 @@ static int	sender_item_validator(zbx_history_recv_item_t *item, zbx_socket_t *so
 		return FAIL;
 	}
 
-	switch(item->type)
+	switch (item->type)
 	{
 		case ITEM_TYPE_HTTPAGENT:
 			if (0 == item->allow_traps)
@@ -1942,7 +1942,6 @@ fail:
 	zbx_vector_dservice_ptr_clear_ext(&services_old, zbx_dservice_ptr_free);
 	zbx_vector_dservice_ptr_destroy(&services_old);
 	zbx_vector_uint64_destroy(&dserviceids);
-
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
@@ -2707,7 +2706,6 @@ static void	zbx_db_flush_proxy_lastaccess(void)
 		sql = (char *)zbx_malloc(NULL, sql_alloc);
 
 		zbx_db_begin();
-		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		for (i = 0; i < lastaccess.values_num; i++)
 		{
@@ -2721,11 +2719,7 @@ static void	zbx_db_flush_proxy_lastaccess(void)
 			zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 		}
 
-		zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-		if (16 < sql_offset)	/* in ORACLE always present begin..end; */
-			zbx_db_execute("%s", sql);
-
+		(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
 		zbx_db_commit();
 
 		zbx_free(sql);

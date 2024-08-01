@@ -53,21 +53,6 @@ class zbx_dbcast_2bigintTest extends TestCase {
 	/**
 	 * @dataProvider provider
 	 */
-	public function test_oracle($field) {
-		global $DB;
-
-		$oldDB = $DB;
-
-		$DB['TYPE'] = ZBX_DB_ORACLE;
-
-		$this->assertEquals('CAST('.$field.' AS NUMBER(20))', zbx_dbcast_2bigint($field));
-
-		$DB = $oldDB;
-	}
-
-	/**
-	 * @dataProvider provider
-	 */
 	public function test_postgresql($field) {
 		global $DB;
 

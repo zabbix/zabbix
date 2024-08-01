@@ -147,7 +147,6 @@ static int	am_db_get_alerts(zbx_vector_am_db_alert_ptr_t *alerts)
 	zbx_db_begin();
 	result = zbx_db_select("%s", sql);
 	sql_offset = 0;
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
@@ -782,7 +781,6 @@ static int	am_db_flush_results(zbx_hashset_t *mediatypes, const unsigned char *d
 			sql_offset = 0;
 
 			zbx_db_begin();
-			zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 			zbx_db_insert_prepare(&db_event, "event_tag", "eventtagid", "eventid", "tag", "value",
 					(char *)NULL);
 			zbx_db_insert_prepare(&db_problem, "problem_tag", "problemtagid", "eventid", "tag", "value",
@@ -827,10 +825,7 @@ static int	am_db_flush_results(zbx_hashset_t *mediatypes, const unsigned char *d
 
 			am_db_validate_tags_for_update(&update_events_tags, &db_event, &db_problem);
 
-			zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-			if (16 < sql_offset)
-				zbx_db_execute("%s", sql);
-
+			(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
 			zbx_db_insert_autoincrement(&db_event, "eventtagid");
 			zbx_db_insert_execute(&db_event);
 			zbx_db_insert_clean(&db_event);

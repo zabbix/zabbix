@@ -108,6 +108,7 @@ typedef struct
 	unsigned char		db_trigger_queue_lock;
 
 	zbx_hc_proxyqueue_t	proxyqueue;
+	int			processing_num;
 }
 ZBX_DC_CACHE;
 
@@ -591,7 +592,6 @@ static void	dc_trends_fetch_and_update(ZBX_DC_TREND *trends, int trends_num, zbx
 	result = zbx_db_select("%s order by itemid,clock", sql);
 
 	sql_offset = 0;
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
@@ -632,10 +632,7 @@ static void	dc_trends_fetch_and_update(ZBX_DC_TREND *trends, int trends_num, zbx
 
 	zbx_db_free_result(result);
 
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
-		zbx_db_execute("%s", sql);
+	(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
 }
 
 /******************************************************************************
@@ -1771,8 +1768,6 @@ void	zbx_db_mass_update_items(const zbx_vector_item_diff_ptr_t *item_diff,
 
 	if (i != item_diff->values_num || 0 != inventory_values->values_num)
 	{
-		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 		if (i != item_diff->values_num)
 		{
 			zbx_db_save_item_changes(&sql, &sql_alloc, &sql_offset, item_diff,
@@ -1782,10 +1777,7 @@ void	zbx_db_mass_update_items(const zbx_vector_item_diff_ptr_t *item_diff,
 		if (0 != inventory_values->values_num)
 			DCadd_update_inventory_sql(&sql_offset, inventory_values);
 
-		zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-		if (sql_offset > 16)	/* In ORACLE always present begin..end; */
-			zbx_db_execute("%s", sql);
+		(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
 
 		zbx_dc_config_update_inventory_values(inventory_values);
 	}
@@ -2441,23 +2433,33 @@ void	zbx_dc_add_history_variant(zbx_uint64_t itemid, unsigned char value_type, u
 	}
 }
 
-void	zbx_dc_flush_history(void)
+size_t	zbx_dc_flush_history(void)
 {
+	int	processing_num;
+
 	if (0 == item_values_num)
-		return;
+		return 0;
 
 	LOCK_CACHE;
 
 	hc_add_item_values(item_values, item_values_num);
 
 	cache->history_num += item_values_num;
+	processing_num = cache->processing_num;
 
 	UNLOCK_CACHE;
 
 	zbx_vps_monitor_add_collected((zbx_uint64_t)item_values_num);
 
+	size_t	count = item_values_num;
+
 	item_values_num = 0;
 	string_values_offset = 0;
+
+	if (0 != processing_num)
+		return 0;
+
+	return count;
 }
 
 /******************************************************************************
@@ -2951,6 +2953,9 @@ void	zbx_hc_pop_items(zbx_vector_hc_item_ptr_t *history_items)
 
 		zbx_binary_heap_remove_min(&cache->history_queue);
 	}
+
+	if (0 != history_items->values_num)
+		cache->processing_num++;
 }
 
 /******************************************************************************
@@ -3020,6 +3025,8 @@ void	zbx_hc_push_items(zbx_vector_hc_item_ptr_t *history_items)
 				break;
 		}
 	}
+
+	cache->processing_num--;
 }
 
 /******************************************************************************
@@ -3168,6 +3175,7 @@ int	zbx_init_database_cache(zbx_get_program_type_f get_program_type, zbx_history
 			goto out;
 	}
 
+	cache->processing_num = 0;
 	cache->history_num_total = 0;
 	cache->history_progress_ts = 0;
 

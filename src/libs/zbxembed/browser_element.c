@@ -49,7 +49,7 @@ static zbx_wd_element_t *wd_element(duk_context *ctx)
 		return NULL;
 	}
 
-	if (NULL == (el = (zbx_wd_element_t *)es_obj_get_data(env)))
+	if (NULL == (el = (zbx_wd_element_t *)es_obj_get_data(env, ES_OBJ_ELEMENT)))
 		(void)duk_push_error_object(ctx, DUK_RET_EVAL_ERROR, "cannot find native data attached to object");
 
 	return el;
@@ -70,7 +70,7 @@ static duk_ret_t	wd_element_dtor(duk_context *ctx)
 	if (NULL == (env = zbx_es_get_env(ctx)))
 		return duk_error(ctx, DUK_RET_EVAL_ERROR, "cannot access internal environment");
 
-	if (NULL != (el = (zbx_wd_element_t *)es_obj_detach_data(env)))
+	if (NULL != (el = (zbx_wd_element_t *)es_obj_detach_data(env, ES_OBJ_ELEMENT)))
 	{
 		webdriver_release(el->wd);
 		zbx_free(el->id);
@@ -100,7 +100,7 @@ static duk_ret_t	wd_element_ctor(duk_context *ctx, zbx_webdriver_t *wd, const ch
 	el->id = zbx_strdup(NULL, elementid);
 
 	duk_push_object(ctx);
-	es_obj_attach_data(env, el);
+	es_obj_attach_data(env, el, ES_OBJ_ELEMENT);
 
 	duk_push_c_function(ctx, wd_element_dtor, 1);
 	duk_set_finalizer(ctx, -2);
