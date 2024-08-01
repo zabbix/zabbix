@@ -165,7 +165,7 @@ $from_list = (new CFormList())
 	);
 
 $form = (new CForm())
-	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('miscconfig')))->removeId())
+	->addItem((new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('miscconfig')))->removeId())
 	->setId('miscconfig-form')
 	->setName('otherForm')
 	->setAction((new CUrl('zabbix.php'))

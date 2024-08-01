@@ -710,10 +710,10 @@ class testDashboardProblemsWidget extends CWebTest {
 			? $dashboard->edit()->addWidget()->asForm()
 			: $dashboard->getWidget(self::$update_widget)->edit();
 
-		$dialog = COverlayDialogElement::find()->one();
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 
 		if ($create) {
-			$form->fill(['Type' => 'Problems']);
+			$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Problems')]);
 		}
 		else {
 			$values = $form->getFields()->asValues();

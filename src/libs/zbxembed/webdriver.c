@@ -1011,14 +1011,15 @@ out:
  ******************************************************************************/
 int	webdriver_get_perf_data(zbx_webdriver_t *wd, struct zbx_json_parse *jp, char **error)
 {
-	const char	*script = "var a=window.performance.getEntries();var out=[];"
-						"for (o of a) {"
-							"var obj = {};"
-							"for (p in o) {"
-								"if (!(o[p] instanceof Object)) {obj[p] = o[p];}"
-							"}"
-							"out.push(obj);"
-						"}; return out;";
+	const char	*script =
+		"var a=window.performance.getEntries();var out=[];"
+		"for (o of a) {"
+			"var obj = {};"
+			"for (p in o) {"
+				"if (!(o[p] instanceof Object) && typeof o[p] !== 'function') {obj[p] = o[p];}"
+			"}"
+			"out.push(obj);"
+		"}; return out;";
 
 	return webdriver_execute_script(wd, script, jp, error);
 }

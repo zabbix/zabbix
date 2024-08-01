@@ -491,6 +491,8 @@ class testFormUserPermissions extends CWebTest {
 
 		$this->page->open('zabbix.php?action=module.list')->waitUntilReady();
 		$this->query('button:Scan directory')->one()->click();
+		$this->page->waitUntilReady();
+		CMessageElement::find()->one()->close();
 		$table = $this->query('class:list-table')->asTable()->one();
 		$table->findRows('Name', ['4th Module'])->select();
 		$this->query('button:Enable')->one()->click();

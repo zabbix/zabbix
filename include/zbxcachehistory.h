@@ -136,7 +136,7 @@ void	zbx_dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsi
 		AGENT_RESULT *result, const zbx_timespec_t *ts, unsigned char state, const char *error);
 void	zbx_dc_add_history_variant(zbx_uint64_t itemid, unsigned char value_type, unsigned char item_flags,
 		zbx_variant_t *value, zbx_timespec_t ts, const zbx_pp_value_opt_t *value_opt);
-void	zbx_dc_flush_history(void);
+size_t	zbx_dc_flush_history(void);
 void	zbx_hc_pop_items(zbx_vector_hc_item_ptr_t *history_items);
 void	zbx_hc_get_item_values(zbx_dc_history_t *history, zbx_vector_hc_item_ptr_t *history_items);
 void	zbx_hc_push_items(zbx_vector_hc_item_ptr_t *history_items);

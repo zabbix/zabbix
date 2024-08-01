@@ -45,7 +45,6 @@ zabbix_export:
           name: 'Aborted clients per second'
           type: DEPENDENT
           key: mysql.aborted_clients.rate
-          delay: '0'
           value_type: FLOAT
           description: 'Number of connections that were aborted because the client died without closing the connection properly.'
           preprocessing:
@@ -53,8 +52,6 @@ zabbix_export:
               parameters:
                 - '/resultset/row[field/text()=''Aborted_clients'']/field[@name=''Value'']/text()'
             - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           master_item:
             key: 'mysql.get_status_variables["{$MYSQL.HOST}","{$MYSQL.PORT}"]'
           tags:
@@ -64,7 +61,6 @@ zabbix_export:
           name: 'Aborted connections per second'
           type: DEPENDENT
           key: mysql.aborted_connects.rate
-          delay: '0'
           value_type: FLOAT
           description: 'Number of failed attempts to connect to the MySQL server.'
           preprocessing:
@@ -72,8 +68,6 @@ zabbix_export:
               parameters:
                 - '/resultset/row[field/text()=''Aborted_connects'']/field[@name=''Value'']/text()'
             - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           master_item:
             key: 'mysql.get_status_variables["{$MYSQL.HOST}","{$MYSQL.PORT}"]'
           tags:
@@ -96,7 +90,6 @@ zabbix_export:
           name: 'Binlog cache disk use'
           type: DEPENDENT
           key: mysql.binlog_cache_disk_use
-          delay: '0'
           value_type: FLOAT
           description: 'Number of transactions that used a temporary disk cache because they could not fit in the regular binary log cache, being larger than `binlog_cache_size`.'
           preprocessing:
@@ -156,7 +149,6 @@ zabbix_export:
           name: 'Bytes received'
           type: DEPENDENT
           key: mysql.bytes_received.rate
-          delay: '0'
           value_type: FLOAT
           units: Bps
           description: 'Number of bytes received from all clients.'
@@ -165,8 +157,6 @@ zabbix_export:
               parameters:
                 - '/resultset/row[field/text()=''Bytes_received'']/field[@name=''Value'']/text()'
             - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           master_item:
             key: 'mysql.get_status_variables["{$MYSQL.HOST}","{$MYSQL.PORT}"]'
           tags:
@@ -176,7 +166,6 @@ zabbix_export:
           name: 'Bytes sent'
           type: DEPENDENT
           key: mysql.bytes_sent.rate
-          delay: '0'
           value_type: FLOAT
           units: Bps
           description: 'Number of bytes sent to all clients.'
@@ -185,8 +174,6 @@ zabbix_export:
               parameters:
                 - '/resultset/row[field/text()=''Bytes_sent'']/field[@name=''Value'']/text()'
             - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           master_item:
             key: 'mysql.get_status_variables["{$MYSQL.HOST}","{$MYSQL.PORT}"]'
           tags:
@@ -196,7 +183,6 @@ zabbix_export:
           name: 'Command Delete per second'
           type: DEPENDENT
           key: mysql.com_delete.rate
-          delay: '0'
           value_type: FLOAT
           description: 'The `Com_delete` counter variable indicates the number of times the `DELETE` statement has been executed.'
           preprocessing:
@@ -204,8 +190,6 @@ zabbix_export:
               parameters:
                 - '/resultset/row[field/text()=''Com_delete'']/field[@name=''Value'']/text()'
             - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           master_item:
             key: 'mysql.get_status_variables["{$MYSQL.HOST}","{$MYSQL.PORT}"]'
           tags:
@@ -215,7 +199,6 @@ zabbix_export:
           name: 'Command Insert per second'
           type: DEPENDENT
           key: mysql.com_insert.rate
-          delay: '0'
           value_type: FLOAT
           description: 'The `Com_insert` counter variable indicates the number of times the `INSERT` statement has been executed.'
           preprocessing:
@@ -223,8 +206,6 @@ zabbix_export:
               parameters:
                 - '/resultset/row[field/text()=''Com_insert'']/field[@name=''Value'']/text()'
             - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           master_item:
             key: 'mysql.get_status_variables["{$MYSQL.HOST}","{$MYSQL.PORT}"]'
           tags:
@@ -234,7 +215,6 @@ zabbix_export:
           name: 'Command Select per second'
           type: DEPENDENT
           key: mysql.com_select.rate
-          delay: '0'
           value_type: FLOAT
           description: 'The `Com_select` counter variable indicates the number of times the `SELECT` statement has been executed.'
           preprocessing:
@@ -242,8 +222,6 @@ zabbix_export:
               parameters:
                 - '/resultset/row[field/text()=''Com_select'']/field[@name=''Value'']/text()'
             - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           master_item:
             key: 'mysql.get_status_variables["{$MYSQL.HOST}","{$MYSQL.PORT}"]'
           tags:
@@ -253,7 +231,6 @@ zabbix_export:
           name: 'Command Update per second'
           type: DEPENDENT
           key: mysql.com_update.rate
-          delay: '0'
           value_type: FLOAT
           description: 'The `Com_update` counter variable indicates the number of times the `UPDATE` statement has been executed.'
           preprocessing:
@@ -261,8 +238,6 @@ zabbix_export:
               parameters:
                 - '/resultset/row[field/text()=''Com_update'']/field[@name=''Value'']/text()'
             - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           master_item:
             key: 'mysql.get_status_variables["{$MYSQL.HOST}","{$MYSQL.PORT}"]'
           tags:
@@ -272,7 +247,6 @@ zabbix_export:
           name: 'Connections per second'
           type: DEPENDENT
           key: mysql.connections.rate
-          delay: '0'
           value_type: FLOAT
           description: 'Number of connection attempts (successful or not) to the MySQL server.'
           preprocessing:
@@ -280,8 +254,6 @@ zabbix_export:
               parameters:
                 - '/resultset/row[field/text()=''Connections'']/field[@name=''Value'']/text()'
             - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           master_item:
             key: 'mysql.get_status_variables["{$MYSQL.HOST}","{$MYSQL.PORT}"]'
           tags:
@@ -291,7 +263,6 @@ zabbix_export:
           name: 'Connection errors accept per second'
           type: DEPENDENT
           key: mysql.connection_errors_accept.rate
-          delay: '0'
           value_type: FLOAT
           description: 'Number of errors that occurred during calls to `accept()` on the listening port.'
           preprocessing:
@@ -299,8 +270,6 @@ zabbix_export:
               parameters:
                 - '/resultset/row[field/text()=''Connection_errors_accept'']/field[@name=''Value'']/text()'
             - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           master_item:
             key: 'mysql.get_status_variables["{$MYSQL.HOST}","{$MYSQL.PORT}"]'
           tags:
@@ -310,7 +279,6 @@ zabbix_export:
           name: 'Connection errors internal per second'
           type: DEPENDENT
           key: mysql.connection_errors_internal.rate
-          delay: '0'
           value_type: FLOAT
           description: 'Number of refused connections due to internal server errors, for example, out of memory errors, or failed thread starts.'
           preprocessing:
@@ -318,8 +286,6 @@ zabbix_export:
               parameters:
                 - '/resultset/row[field/text()=''Connection_errors_internal'']/field[@name=''Value'']/text()'
             - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           master_item:
             key: 'mysql.get_status_variables["{$MYSQL.HOST}","{$MYSQL.PORT}"]'
           tags:
@@ -329,7 +295,6 @@ zabbix_export:
           name: 'Connection errors max connections per second'
           type: DEPENDENT
           key: mysql.connection_errors_max_connections.rate
-          delay: '0'
           value_type: FLOAT
           description: 'Number of refused connections due to the `max_connections` limit being reached.'
           preprocessing:
@@ -337,8 +302,6 @@ zabbix_export:
               parameters:
                 - '/resultset/row[field/text()=''Connection_errors_max_connections'']/field[@name=''Value'']/text()'
             - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           master_item:
             key: 'mysql.get_status_variables["{$MYSQL.HOST}","{$MYSQL.PORT}"]'
           tags:
@@ -358,7 +321,6 @@ zabbix_export:
           name: 'Connection errors peer address per second'
           type: DEPENDENT
           key: mysql.connection_errors_peer_address.rate
-          delay: '0'
           value_type: FLOAT
           description: 'Number of errors while searching for the connecting client''s IP address.'
           preprocessing:
@@ -366,8 +328,6 @@ zabbix_export:
               parameters:
                 - '/resultset/row[field/text()=''Connection_errors_peer_address'']/field[@name=''Value'']/text()'
             - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           master_item:
             key: 'mysql.get_status_variables["{$MYSQL.HOST}","{$MYSQL.PORT}"]'
           tags:
@@ -377,7 +337,6 @@ zabbix_export:
           name: 'Connection errors select per second'
           type: DEPENDENT
           key: mysql.connection_errors_select.rate
-          delay: '0'
           value_type: FLOAT
           description: 'Number of errors during calls to `select()` or `poll()` on the listening port. The client would not necessarily have been rejected in these cases.'
           preprocessing:
@@ -385,8 +344,6 @@ zabbix_export:
               parameters:
                 - '/resultset/row[field/text()=''Connection_errors_select'']/field[@name=''Value'']/text()'
             - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           master_item:
             key: 'mysql.get_status_variables["{$MYSQL.HOST}","{$MYSQL.PORT}"]'
           tags:
@@ -396,7 +353,6 @@ zabbix_export:
           name: 'Connection errors tcpwrap per second'
           type: DEPENDENT
           key: mysql.connection_errors_tcpwrap.rate
-          delay: '0'
           value_type: FLOAT
           description: 'Number of connections the libwrap library has refused.'
           preprocessing:
@@ -404,8 +360,6 @@ zabbix_export:
               parameters:
                 - '/resultset/row[field/text()=''Connection_errors_tcpwrap'']/field[@name=''Value'']/text()'
             - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           master_item:
             key: 'mysql.get_status_variables["{$MYSQL.HOST}","{$MYSQL.PORT}"]'
           tags:
@@ -415,7 +369,6 @@ zabbix_export:
           name: 'Created tmp tables on disk per second'
           type: DEPENDENT
           key: mysql.created_tmp_disk_tables.rate
-          delay: '0'
           value_type: FLOAT
           description: 'Number of internal on-disk temporary tables created by the server while executing statements.'
           preprocessing:
@@ -423,8 +376,6 @@ zabbix_export:
               parameters:
                 - '/resultset/row[field/text()=''Created_tmp_disk_tables'']/field[@name=''Value'']/text()'
             - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           master_item:
             key: 'mysql.get_status_variables["{$MYSQL.HOST}","{$MYSQL.PORT}"]'
           tags:
@@ -446,7 +397,6 @@ zabbix_export:
           name: 'Created tmp files on disk per second'
           type: DEPENDENT
           key: mysql.created_tmp_files.rate
-          delay: '0'
           value_type: FLOAT
           description: 'How many temporary files `mysqld` has created.'
           preprocessing:
@@ -454,8 +404,6 @@ zabbix_export:
               parameters:
                 - '/resultset/row[field/text()=''Created_tmp_files'']/field[@name=''Value'']/text()'
             - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           master_item:
             key: 'mysql.get_status_variables["{$MYSQL.HOST}","{$MYSQL.PORT}"]'
           tags:
@@ -475,7 +423,6 @@ zabbix_export:
           name: 'Created tmp tables on memory per second'
           type: DEPENDENT
           key: mysql.created_tmp_tables.rate
-          delay: '0'
           value_type: FLOAT
           description: 'Number of internal temporary tables created by the server while executing statements.'
           preprocessing:
@@ -483,8 +430,6 @@ zabbix_export:
               parameters:
                 - '/resultset/row[field/text()=''Created_tmp_tables'']/field[@name=''Value'']/text()'
             - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           master_item:
             key: 'mysql.get_status_variables["{$MYSQL.HOST}","{$MYSQL.PORT}"]'
           tags:
@@ -506,7 +451,6 @@ zabbix_export:
           name: 'Get status variables'
           key: 'mysql.get_status_variables["{$MYSQL.HOST}","{$MYSQL.PORT}"]'
           history: '0'
-          trends: '0'
           value_type: TEXT
           description: 'Gets server global status information.'
           tags:
@@ -516,7 +460,6 @@ zabbix_export:
           name: 'InnoDB buffer pool pages free'
           type: DEPENDENT
           key: mysql.innodb_buffer_pool_pages_free
-          delay: '0'
           description: 'The total size of the InnoDB buffer pool, in pages.'
           preprocessing:
             - type: XMLPATH
@@ -533,7 +476,6 @@ zabbix_export:
           name: 'InnoDB buffer pool pages total'
           type: DEPENDENT
           key: mysql.innodb_buffer_pool_pages_total
-          delay: '0'
           description: 'The total size of the InnoDB buffer pool, in pages.'
           preprocessing:
             - type: XMLPATH
@@ -553,7 +495,6 @@ zabbix_export:
           name: 'InnoDB buffer pool reads'
           type: DEPENDENT
           key: mysql.innodb_buffer_pool_reads
-          delay: '0'
           description: 'Number of logical reads that InnoDB could not satisfy from the buffer pool and had to read directly from the disk.'
           preprocessing:
             - type: XMLPATH
@@ -570,7 +511,6 @@ zabbix_export:
           name: 'InnoDB buffer pool reads per second'
           type: DEPENDENT
           key: mysql.innodb_buffer_pool_reads.rate
-          delay: '0'
           value_type: FLOAT
           description: 'Number of logical reads per second that InnoDB could not satisfy from the buffer pool and had to read directly from the disk.'
           preprocessing:
@@ -578,8 +518,6 @@ zabbix_export:
               parameters:
                 - '/resultset/row[field/text()=''Innodb_buffer_pool_reads'']/field[@name=''Value'']/text()'
             - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           master_item:
             key: 'mysql.get_status_variables["{$MYSQL.HOST}","{$MYSQL.PORT}"]'
           tags:
@@ -591,7 +529,6 @@ zabbix_export:
           name: 'InnoDB buffer pool read requests'
           type: DEPENDENT
           key: mysql.innodb_buffer_pool_read_requests
-          delay: '0'
           description: 'Number of logical read requests.'
           preprocessing:
             - type: XMLPATH
@@ -608,7 +545,6 @@ zabbix_export:
           name: 'InnoDB buffer pool read requests per second'
           type: DEPENDENT
           key: mysql.innodb_buffer_pool_read_requests.rate
-          delay: '0'
           value_type: FLOAT
           description: 'Number of logical read requests per second.'
           preprocessing:
@@ -616,8 +552,6 @@ zabbix_export:
               parameters:
                 - '/resultset/row[field/text()=''Innodb_buffer_pool_read_requests'']/field[@name=''Value'']/text()'
             - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           master_item:
             key: 'mysql.get_status_variables["{$MYSQL.HOST}","{$MYSQL.PORT}"]'
           tags:
@@ -629,7 +563,6 @@ zabbix_export:
           name: 'Innodb buffer pool wait free'
           type: DEPENDENT
           key: mysql.innodb_buffer_pool_wait_free
-          delay: '0'
           value_type: FLOAT
           description: 'Number of times InnoDB waited for a free page before reading or creating a page. Normally, writes to the InnoDB buffer pool happen in the background. When no clean pages are available, dirty pages are flushed first in order to free some up. This counts the numbers of wait for this operation to finish. If this value is not small, look at the increasing `innodb_buffer_pool_size`.'
           preprocessing:
@@ -664,7 +597,6 @@ zabbix_export:
           name: 'Innodb number open files'
           type: DEPENDENT
           key: mysql.innodb_num_open_files
-          delay: '0'
           value_type: FLOAT
           description: 'Number of open files held by InnoDB. InnoDB only.'
           preprocessing:
@@ -685,7 +617,6 @@ zabbix_export:
           name: 'Innodb log written'
           type: DEPENDENT
           key: mysql.innodb_os_log_written
-          delay: '0'
           value_type: FLOAT
           units: B
           description: 'Number of bytes written to the InnoDB log.'
@@ -702,7 +633,6 @@ zabbix_export:
           name: 'InnoDB row lock time'
           type: DEPENDENT
           key: mysql.innodb_row_lock_time
-          delay: '0'
           value_type: FLOAT
           units: s
           description: 'The total time spent in acquiring row locks for InnoDB tables, in milliseconds.'
@@ -727,7 +657,6 @@ zabbix_export:
           name: 'InnoDB row lock time max'
           type: DEPENDENT
           key: mysql.innodb_row_lock_time_max
-          delay: '0'
           value_type: FLOAT
           units: s
           description: 'The maximum time to acquire a row lock for InnoDB tables, in milliseconds.'
@@ -752,7 +681,6 @@ zabbix_export:
           name: 'InnoDB row lock waits'
           type: DEPENDENT
           key: mysql.innodb_row_lock_waits
-          delay: '0'
           description: 'Number of times operations on InnoDB tables had to wait for a row lock.'
           preprocessing:
             - type: XMLPATH
@@ -769,7 +697,6 @@ zabbix_export:
           name: 'Max used connections'
           type: DEPENDENT
           key: mysql.max_used_connections
-          delay: '0'
           description: 'The maximum number of connections that have been in use simultaneously since the server start.'
           preprocessing:
             - type: XMLPATH
@@ -787,7 +714,6 @@ zabbix_export:
           name: 'Open tables'
           type: DEPENDENT
           key: mysql.open_tables
-          delay: '0'
           value_type: FLOAT
           description: 'Number of tables that are open.'
           preprocessing:
@@ -806,7 +732,6 @@ zabbix_export:
           name: 'Open table definitions'
           type: DEPENDENT
           key: mysql.open_table_definitions
-          delay: '0'
           value_type: FLOAT
           description: 'Number of cached table definitions.'
           preprocessing:
@@ -852,7 +777,6 @@ zabbix_export:
           name: 'Queries per second'
           type: DEPENDENT
           key: mysql.queries.rate
-          delay: '0'
           value_type: FLOAT
           description: 'Number of statements executed by the server. This variable includes statements executed within stored programs, unlike the `Questions` variable.'
           preprocessing:
@@ -860,8 +784,6 @@ zabbix_export:
               parameters:
                 - '/resultset/row[field/text()=''Queries'']/field[@name=''Value'']/text()'
             - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           master_item:
             key: 'mysql.get_status_variables["{$MYSQL.HOST}","{$MYSQL.PORT}"]'
           tags:
@@ -871,7 +793,6 @@ zabbix_export:
           name: 'Questions per second'
           type: DEPENDENT
           key: mysql.questions.rate
-          delay: '0'
           value_type: FLOAT
           description: 'Number of statements executed by the server. This includes only statements sent to the server by clients and not statements executed within stored programs, unlike the `Queries` variable.'
           preprocessing:
@@ -879,8 +800,6 @@ zabbix_export:
               parameters:
                 - '/resultset/row[field/text()=''Questions'']/field[@name=''Value'']/text()'
             - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           master_item:
             key: 'mysql.get_status_variables["{$MYSQL.HOST}","{$MYSQL.PORT}"]'
           tags:
@@ -890,7 +809,6 @@ zabbix_export:
           name: 'Slow queries per second'
           type: DEPENDENT
           key: mysql.slow_queries.rate
-          delay: '0'
           value_type: FLOAT
           description: 'Number of queries that have taken more than `long_query_time` seconds.'
           preprocessing:
@@ -898,8 +816,6 @@ zabbix_export:
               parameters:
                 - '/resultset/row[field/text()=''Slow_queries'']/field[@name=''Value'']/text()'
             - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           master_item:
             key: 'mysql.get_status_variables["{$MYSQL.HOST}","{$MYSQL.PORT}"]'
           tags:
@@ -919,7 +835,6 @@ zabbix_export:
           name: 'Threads cached'
           type: DEPENDENT
           key: mysql.threads_cached
-          delay: '0'
           description: 'Number of threads in the thread cache.'
           preprocessing:
             - type: XMLPATH
@@ -934,7 +849,6 @@ zabbix_export:
           name: 'Threads connected'
           type: DEPENDENT
           key: mysql.threads_connected
-          delay: '0'
           description: 'Number of currently open connections.'
           preprocessing:
             - type: XMLPATH
@@ -949,7 +863,6 @@ zabbix_export:
           name: 'Threads created per second'
           type: DEPENDENT
           key: mysql.threads_created.rate
-          delay: '0'
           value_type: FLOAT
           description: 'Number of threads created to handle connections. If the value of `Threads_created` is large, you may want to increase the `thread_cache_size` value. The cache miss rate can be calculated as `Threads_created`/`Connections`.'
           preprocessing:
@@ -957,8 +870,6 @@ zabbix_export:
               parameters:
                 - '/resultset/row[field/text()=''Threads_created'']/field[@name=''Value'']/text()'
             - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           master_item:
             key: 'mysql.get_status_variables["{$MYSQL.HOST}","{$MYSQL.PORT}"]'
           tags:
@@ -968,7 +879,6 @@ zabbix_export:
           name: 'Threads running'
           type: DEPENDENT
           key: mysql.threads_running
-          delay: '0'
           description: 'Number of threads that are not sleeping.'
           preprocessing:
             - type: XMLPATH
@@ -983,7 +893,6 @@ zabbix_export:
           name: Uptime
           type: DEPENDENT
           key: mysql.uptime
-          delay: '0'
           units: uptime
           description: 'Number of seconds that the server has been up.'
           preprocessing:
@@ -1021,7 +930,6 @@ zabbix_export:
           name: Version
           key: 'mysql.version["{$MYSQL.HOST}","{$MYSQL.PORT}"]'
           delay: 15m
-          trends: '0'
           value_type: CHAR
           description: 'MySQL server version.'
           preprocessing:
@@ -1056,11 +964,9 @@ zabbix_export:
             conditions:
               - macro: '{#DBNAME}'
                 value: '{$MYSQL.DBNAME.MATCHES}'
-                formulaid: A
               - macro: '{#DBNAME}'
                 value: '{$MYSQL.DBNAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
           description: 'Scanning databases in DBMS.'
           item_prototypes:
             - uuid: dda45077011d4f8fa5c25b1f351179ca
@@ -1092,14 +998,12 @@ zabbix_export:
           name: 'MariaDB discovery'
           type: DEPENDENT
           key: mysql.extra_metric.discovery
-          delay: '0'
           description: 'Used for additional metrics if MariaDB is used.'
           item_prototypes:
             - uuid: 7743cdbaf71c491189ac1a927409e998
               name: 'Binlog commits'
               type: DEPENDENT
               key: 'mysql.binlog_commits[{#SINGLETON}]'
-              delay: '0'
               value_type: FLOAT
               description: 'Total number of transactions committed to the binary log.'
               preprocessing:
@@ -1115,7 +1019,6 @@ zabbix_export:
               name: 'Binlog group commits'
               type: DEPENDENT
               key: 'mysql.binlog_group_commits[{#SINGLETON}]'
-              delay: '0'
               value_type: FLOAT
               description: 'Total number of group commits done to the binary log.'
               preprocessing:
@@ -1131,7 +1034,6 @@ zabbix_export:
               name: 'Master GTID wait count'
               type: DEPENDENT
               key: 'mysql.master_gtid_wait_count[{#SINGLETON}]'
-              delay: '0'
               value_type: FLOAT
               description: 'The number of times `MASTER_GTID_WAIT` called.'
               preprocessing:
@@ -1150,7 +1052,6 @@ zabbix_export:
               name: 'Master GTID wait timeouts'
               type: DEPENDENT
               key: 'mysql.master_gtid_wait_timeouts[{#SINGLETON}]'
-              delay: '0'
               value_type: FLOAT
               description: 'Number of timeouts occurring in `MASTER_GTID_WAIT`.'
               preprocessing:
@@ -1169,7 +1070,6 @@ zabbix_export:
               name: 'Master GTID wait time'
               type: DEPENDENT
               key: 'mysql.master_gtid_wait_time[{#SINGLETON}]'
-              delay: '0'
               value_type: FLOAT
               description: 'Total number of time spent in `MASTER_GTID_WAIT`.'
               preprocessing:
@@ -1200,7 +1100,6 @@ zabbix_export:
               name: 'Replication Seconds Behind Master {#MASTER_HOST}'
               type: DEPENDENT
               key: 'mysql.seconds_behind_master["{#MASTER_HOST}"]'
-              delay: '0'
               units: s
               description: |
                 The number of seconds that the slave SQL thread is behind processing the master binary log.
@@ -1237,8 +1136,6 @@ zabbix_export:
               name: 'Replication Slave IO Running {#MASTER_HOST}'
               type: DEPENDENT
               key: 'mysql.slave_io_running["{#MASTER_HOST}"]'
-              delay: '0'
-              trends: '0'
               value_type: CHAR
               description: |
                 Whether the I/O thread for reading the master's binary log is running.
@@ -1280,8 +1177,6 @@ zabbix_export:
               name: 'Replication Slave SQL Running {#MASTER_HOST}'
               type: DEPENDENT
               key: 'mysql.slave_sql_running["{#MASTER_HOST}"]'
-              delay: '0'
-              trends: '0'
               value_type: CHAR
               description: |
                 Whether the SQL thread for executing events in the relay log is running.
@@ -1314,8 +1209,6 @@ zabbix_export:
               name: 'Replication Slave SQL Running State {#MASTER_HOST}'
               type: DEPENDENT
               key: 'mysql.slave_sql_running_state["{#MASTER_HOST}"]'
-              delay: '0'
-              trends: '0'
               value_type: TEXT
               description: 'This shows the state of the SQL driver threads.'
               preprocessing:
@@ -1334,7 +1227,6 @@ zabbix_export:
               name: 'Replication Slave status {#MASTER_HOST}'
               key: 'mysql.slave_status["{$MYSQL.HOST}","{$MYSQL.PORT}","{#MASTER_HOST}"]'
               history: '0'
-              trends: '0'
               value_type: TEXT
               description: 'The item gets status information on the essential parameters of the slave threads.'
               tags:

@@ -603,8 +603,8 @@ var hintBox = {
 			};
 
 		if ($host[0].clientWidth > hint_width) {
-			css.width = $elem.width();
-			css.height = $elem.height();
+			css.width = Math.ceil($elem.width());
+			css.height = Math.ceil($elem.height());
 		}
 
 		if (event_x + event_offset + hint_width <= host_x_max) {
@@ -644,6 +644,9 @@ var hintBox = {
 		}
 
 		hintBox.deleteHint(target);
+
+		target = target instanceof jQuery ? target[0] : target;
+
 		target.dispatchEvent(new CustomEvent('onHideHint.hintBox'));
 	},
 

@@ -54,6 +54,7 @@ typedef struct
 	char	*config_db_tls_cipher;
 	char	*config_db_tls_cipher_13;
 	int	config_dbport;
+	int	read_only_recoverable;
 }
 zbx_config_dbhigh_t;
 

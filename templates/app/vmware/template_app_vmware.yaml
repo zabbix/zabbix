@@ -26,7 +26,6 @@ zabbix_export:
           name: 'Event log'
           type: SIMPLE
           key: 'vmware.eventlog[{$VMWARE.URL},skip]'
-          trends: '0'
           value_type: LOG
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
@@ -39,7 +38,6 @@ zabbix_export:
           type: SIMPLE
           key: 'vmware.fullname[{$VMWARE.URL}]'
           delay: 1h
-          trends: '0'
           value_type: CHAR
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
@@ -56,7 +54,6 @@ zabbix_export:
           type: SIMPLE
           key: 'vmware.version[{$VMWARE.URL}]'
           delay: 1h
-          trends: '0'
           value_type: CHAR
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
@@ -308,7 +305,6 @@ zabbix_export:
           type: SIMPLE
           key: 'vmware.vm.cluster.name[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
           delay: 1h
-          trends: '0'
           value_type: CHAR
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
@@ -409,7 +405,6 @@ zabbix_export:
           type: SIMPLE
           key: 'vmware.vm.datacenter.name[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
           delay: 1h
-          trends: '0'
           value_type: CHAR
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
@@ -459,7 +454,6 @@ zabbix_export:
           type: SIMPLE
           key: 'vmware.vm.hv.name[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
           delay: 1h
-          trends: '0'
           value_type: CHAR
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
@@ -965,7 +959,6 @@ zabbix_export:
           type: SIMPLE
           key: 'vmware.hv.cluster.name[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
           delay: 1h
-          trends: '0'
           value_type: CHAR
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
@@ -1017,7 +1010,6 @@ zabbix_export:
           type: SIMPLE
           key: 'vmware.hv.datacenter.name[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
           delay: 1h
-          trends: '0'
           value_type: CHAR
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
@@ -1034,7 +1026,6 @@ zabbix_export:
           type: SIMPLE
           key: 'vmware.hv.fullname[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
           delay: 1h
-          trends: '0'
           value_type: CHAR
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
@@ -1063,7 +1054,6 @@ zabbix_export:
           type: SIMPLE
           key: 'vmware.hv.hw.cpu.model[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
           delay: 1h
-          trends: '0'
           value_type: CHAR
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
@@ -1114,7 +1104,6 @@ zabbix_export:
           type: SIMPLE
           key: 'vmware.hv.hw.model[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
           delay: 1h
-          trends: '0'
           value_type: CHAR
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
@@ -1127,7 +1116,6 @@ zabbix_export:
           type: SIMPLE
           key: 'vmware.hv.hw.uuid[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
           delay: 1h
-          trends: '0'
           value_type: CHAR
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
@@ -1140,7 +1128,6 @@ zabbix_export:
           type: SIMPLE
           key: 'vmware.hv.hw.vendor[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
           delay: 1h
-          trends: '0'
           value_type: CHAR
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
@@ -1223,7 +1210,6 @@ zabbix_export:
           type: SIMPLE
           key: 'vmware.hv.sensors.get[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
           history: '0'
-          trends: '0'
           value_type: TEXT
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
@@ -1294,7 +1280,6 @@ zabbix_export:
           type: SIMPLE
           key: 'vmware.hv.version[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
           delay: 1h
-          trends: '0'
           value_type: CHAR
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
@@ -1424,15 +1409,12 @@ zabbix_export:
           name: 'Healthcheck discovery'
           type: DEPENDENT
           key: vmware.hv.healthcheck.discovery
-          delay: '0'
           description: 'VMware Rollup Health State sensor discovery.'
           item_prototypes:
             - uuid: fabb7524dd454daa942266e5565ce40e
               name: 'Health state rollup'
               type: DEPENDENT
               key: 'vmware.hv.sensor.health.state[{#SINGLETON}]'
-              delay: '0'
-              trends: '0'
               value_type: CHAR
               description: 'The host health state rollup sensor value: gray - unknown, green - ok, red - it has a problem, yellow - it might have a problem.'
               preprocessing:
@@ -1493,28 +1475,23 @@ zabbix_export:
           name: 'Sensor discovery'
           type: DEPENDENT
           key: vmware.hv.sensors.discovery
-          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#NAME}'
                 value: '{$VMWARE.HV.SENSOR.DISCOVERY.NAME.MATCHES}'
-                formulaid: A
               - macro: '{#NAME}'
                 value: 'VMware Rollup Health State'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
               - macro: '{#NAME}'
                 value: '{$VMWARE.HV.SENSOR.DISCOVERY.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: C
           description: 'VMware hardware sensor discovery. The data is retrieved from numeric sensor probes and provides information about the health of the physical system.'
           item_prototypes:
             - uuid: d9a7725ccb0647069b331c5e3e51aeaf
               name: 'Sensor [{#NAME}] health state'
               type: DEPENDENT
               key: 'vmware.hv.sensor.state["{#NAME}"]'
-              delay: '0'
               description: |
                 VMware hardware sensor health state. One of the following:
                 - Unknown
