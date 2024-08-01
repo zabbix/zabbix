@@ -25,7 +25,7 @@ use Widgets\TopHosts\Widget;
 
 use Widgets\TopHosts\Includes\CWidgetFieldColumnsList;
 
-$table = new CTableInfo();
+$table = (new CTableInfo())->addClass($data['show_thumbnail'] ? 'show-thumbnail' : null);
 
 if ($data['error'] !== null) {
 	$table->setNoDataMessage($data['error']);
@@ -34,7 +34,17 @@ else {
 	$header = [];
 
 	foreach ($data['configuration'] as $column_config) {
-		$header[] = $column_config['name'];
+		if ($column_config['data'] == CWidgetFieldColumnsList::DATA_ITEM_VALUE
+				&& $column_config['display_item_as'] == CWidgetFieldColumnsList::DISPLAY_VALUE_AS_NUMERIC
+				&& $column_config['display'] != CWidgetFieldColumnsList::DISPLAY_AS_IS) {
+			$header[] = (new CColHeader(
+				(new CSpan($column_config['name']))
+					->setTitle($column_config['name'])
+			))->setColSpan(2);
+		}
+		else {
+			$header[] = new CColHeader($column_config['name']);
+		}
 	}
 
 	$table->setHeader($header);
@@ -46,7 +56,16 @@ else {
 			$column_config = $data['configuration'][$i];
 
 			if ($column === null) {
-				$row[] = '';
+				if ($column_config['data'] == CWidgetFieldColumnsList::DATA_ITEM_VALUE
+						&& $column_config['display_item_as'] == CWidgetFieldColumnsList::DISPLAY_VALUE_AS_NUMERIC
+						&& $column_config['display'] != CWidgetFieldColumnsList::DISPLAY_AS_IS) {
+					$row[] = (new CCol(''))
+						->setColSpan(2)
+						->setAttribute('no-data', true);
+				}
+				else {
+					$row[] = '';
+				}
 
 				continue;
 			}
@@ -174,7 +193,18 @@ else {
 		$is_empty_row = true;
 
 		foreach ($row as $column) {
-			if ($column !== '') {
+			if ($column === '') {
+				continue;
+			}
+
+			if ($column instanceof CCol) {
+				$attributes = $column->attributes ?? [];
+				if (!isset($attributes['no-data'])) {
+					$is_empty_row = false;
+					break;
+				}
+			}
+			else {
 				$is_empty_row = false;
 				break;
 			}
