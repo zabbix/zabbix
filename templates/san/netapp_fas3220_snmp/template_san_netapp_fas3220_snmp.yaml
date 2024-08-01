@@ -43,7 +43,6 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.789.1.6.4.10.0
           key: 'fas3220.disk[diskFailedMessage]'
-          trends: '0'
           value_type: TEXT
           description: 'If diskFailedCount is non-zero, this is a string describing the failed disk or disks. Each failed disk is described.'
           preprocessing:
@@ -58,7 +57,6 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.789.1.1.6.0
           key: 'fas3220.inventory[productFirmwareVersion]'
-          trends: '0'
           value_type: CHAR
           description: 'Version string for the firmware running on this platform.'
           preprocessing:
@@ -73,7 +71,6 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.789.1.1.2.0
           key: 'fas3220.inventory[productVersion]'
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: NETAPP-MIB
@@ -162,8 +159,6 @@ zabbix_export:
           name: 'SNMP traps (fallback)'
           type: SNMP_TRAP
           key: snmptrap.fallback
-          delay: '0'
-          trends: '0'
           value_type: LOG
           description: 'The item is used to collect all SNMP traps unmatched by other snmptrap items'
           logtimefmt: 'hh:mm:sszyyyy/MM/dd'
@@ -176,7 +171,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.4.0
           key: 'system.contact[sysContact.0]'
           delay: 15m
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -195,7 +189,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.1.0
           key: 'system.descr[sysDescr.0]'
           delay: 15m
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -238,7 +231,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.6.0
           key: 'system.location[sysLocation.0]'
           delay: 15m
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -257,7 +249,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.5.0
           key: system.name
           delay: 15m
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -307,7 +298,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.2.0
           key: 'system.objectid[sysObjectID.0]'
           delay: 15m
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -378,7 +368,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.789.1.25.2.1.20.{#SNMPINDEX}'
               key: 'fas3220.cluster[nodeEnvFailedFanMessage, "{#NODE.NAME}"]'
-              trends: '0'
               value_type: TEXT
               description: 'Text message describing current condition of chassis fans. This is useful only if envFailedFanCount is not zero.'
               preprocessing:
@@ -410,7 +399,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.789.1.25.2.1.22.{#SNMPINDEX}'
               key: 'fas3220.cluster[nodeEnvFailedPowerSupplyMessage, "{#NODE.NAME}"]'
-              trends: '0'
               value_type: TEXT
               description: 'Text message describing the state of any power supplies that are currently degraded. This is useful only if envFailedPowerSupplyCount is not zero.'
               preprocessing:
@@ -481,7 +469,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.789.1.25.2.1.3.{#SNMPINDEX}'
               key: 'fas3220.cluster[nodeLocation, "{#NODE.NAME}"]'
-              trends: '0'
               value_type: CHAR
               description: 'Node Location. Same as sysLocation for a specific node.'
               preprocessing:
@@ -498,7 +485,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.789.1.25.2.1.4.{#SNMPINDEX}'
               key: 'fas3220.cluster[nodeModel, "{#NODE.NAME}"]'
-              trends: '0'
               value_type: CHAR
               description: 'Node Model. Same as productModel for a specific node.'
               preprocessing:
@@ -553,7 +539,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.789.1.25.2.1.5.{#SNMPINDEX}'
               key: 'fas3220.cluster[nodeSerialNumber, "{#NODE.NAME}"]'
-              trends: '0'
               value_type: CHAR
               description: 'Node Serial Number. Same as productSerialNum for a specific node.'
               preprocessing:
@@ -667,18 +652,14 @@ zabbix_export:
             conditions:
               - macro: '{#FSNAME}'
                 value: '{$FAS3220.FS.NAME.MATCHES}'
-                formulaid: A
               - macro: '{#FSNAME}'
                 value: '{$FAS3220.FS.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
               - macro: '{#FSTYPE}'
                 value: '{$FAS3220.FS.TYPE.MATCHES}'
-                formulaid: C
               - macro: '{#FSTYPE}'
                 value: '{$FAS3220.FS.TYPE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: D
           description: 'Filesystems discovery with filter.'
           item_prototypes:
             - uuid: 4f77d54089e34da8bf5b50033e3e2ca3
@@ -824,10 +805,8 @@ zabbix_export:
                 conditions:
                   - macro: '{#FSTYPE}'
                     value: 3|4
-                    formulaid: A
               operations:
-                - operationobject: ITEM_PROTOTYPE
-                  operator: LIKE
+                - operator: LIKE
                   value: Saved
                   discover: NO_DISCOVER
         - uuid: e06a66c956164722a289cb8832341451
@@ -955,25 +934,19 @@ zabbix_export:
             conditions:
               - macro: '{#IFNAME}'
                 value: '{$FAS3220.NET.PORT.NAME.MATCHES}'
-                formulaid: A
               - macro: '{#IFNAME}'
                 value: '{$FAS3220.NET.PORT.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
               - macro: '{#ROLE}'
                 value: '{$FAS3220.NET.PORT.ROLE.MATCHES}'
-                formulaid: C
               - macro: '{#TYPE}'
                 value: '{$FAS3220.NET.PORT.TYPE.MATCHES}'
-                formulaid: D
               - macro: '{#TYPE}'
                 value: '{$FAS3220.NET.PORT.ROLE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: E
               - macro: '{#TYPE}'
                 value: '{$FAS3220.NET.PORT.TYPE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: F
           description: 'Network interfaces discovery with filter.'
           item_prototypes:
             - uuid: abbab9f31f7a4e07a2e5f3fcb2150677
@@ -987,8 +960,6 @@ zabbix_export:
                 The number of inbound packets that were chosen to be discarded even though no errors had been detected to prevent their being deliverable to a higher-layer protocol. One possible reason for discarding such a packet could be to free up buffer space.
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               tags:
                 - tag: component
                   value: network
@@ -1007,8 +978,6 @@ zabbix_export:
                 The number of inbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               tags:
                 - tag: component
                   value: network
@@ -1028,8 +997,6 @@ zabbix_export:
                   parameters:
                     - '8'
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               tags:
                 - tag: component
                   value: network
@@ -1048,8 +1015,6 @@ zabbix_export:
                 The number of outbound packets that were chosen to be discarded even though no errors had been detected to prevent their being transmitted. One possible reason for discarding such a packet could be to free up buffer space.
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               tags:
                 - tag: component
                   value: network
@@ -1068,8 +1033,6 @@ zabbix_export:
                 The number of outbound packets that could not be transmitted because of errors.
               preprocessing:
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               tags:
                 - tag: component
                   value: network
@@ -1089,8 +1052,6 @@ zabbix_export:
                   parameters:
                     - '8'
                 - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
               tags:
                 - tag: component
                   value: network
@@ -1103,7 +1064,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.789.1.22.2.1.32.{#SNMPINDEX}'
               key: 'fas3220.net.port[netportDegradedReason, "{#NODE}", "{#IFNAME}"]'
-              trends: '0'
               value_type: TEXT
               description: 'The list of reasons why the port is marked as degraded.'
               preprocessing:

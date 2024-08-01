@@ -566,11 +566,9 @@ zabbix_export:
             conditions:
               - macro: '{#APPPOOL}'
                 value: '{$IIS.APPPOOL.MATCHES}'
-                formulaid: A
               - macro: '{#APPPOOL}'
                 value: '{$IIS.APPPOOL.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
           item_prototypes:
             - uuid: 82c0636b84d84863a2051d6b708d841b
               name: 'AppPool {#APPPOOL} state'

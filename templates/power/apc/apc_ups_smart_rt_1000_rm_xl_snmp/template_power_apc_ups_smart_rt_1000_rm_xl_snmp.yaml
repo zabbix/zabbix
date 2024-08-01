@@ -79,7 +79,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.2.1.3.0
           key: 'battery.last_replace_date[upsBasicBatteryLastReplaceDate]'
           delay: 1h
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: PowerNet-MIB
@@ -514,8 +513,6 @@ zabbix_export:
           name: 'SNMP traps (fallback)'
           type: SNMP_TRAP
           key: snmptrap.fallback
-          delay: '0'
-          trends: '0'
           value_type: LOG
           description: 'The item is used to collect all SNMP traps unmatched by other snmptrap items'
           logtimefmt: 'hh:mm:sszyyyy/MM/dd'
@@ -528,7 +525,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.4.0
           key: 'system.contact[sysContact.0]'
           delay: 15m
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -549,7 +545,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.1.0
           key: 'system.descr[sysDescr.0]'
           delay: 15m
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -592,7 +587,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.6.0
           key: 'system.location[sysLocation.0]'
           delay: 15m
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -611,7 +605,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.1.1.1.0
           key: 'system.model[upsBasicIdentModel]'
           delay: 15m
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: PowerNet-MIB
@@ -629,7 +622,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.5.0
           key: 'system.name[sysName.0]'
           delay: 15m
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -679,7 +671,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.2.0
           key: 'system.objectid[sysObjectID.0]'
           delay: 15m
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: SNMPv2-MIB
@@ -697,7 +688,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.4.1.318.1.1.1.1.2.3.0
           key: 'system.sn[upsAdvIdentSerialNumber]'
           delay: 15m
-          trends: '0'
           value_type: CHAR
           description: |
             MIB: PowerNet-MIB
@@ -782,7 +772,6 @@ zabbix_export:
               - macro: '{#CARTRIDGE_STATUS}'
                 value: ^$
                 operator: NOT_MATCHES_REGEX
-                formulaid: A
           item_prototypes:
             - uuid: 9715d1700f5f49ffaf3ff35c666f50cf
               name: '{#BATTERY_PACK}.{#CARTRIDGE_INDEX}: Battery estimated replace date'
@@ -790,7 +779,6 @@ zabbix_export:
               snmp_oid: '1.3.6.1.4.1.318.1.1.1.2.3.10.2.1.8.{#SNMPINDEX}'
               key: 'battery.estimated_replace_date[upsHighPrecBatteryPackCartridgeReplaceDate.{#BATTERY_PACK}.{#CARTRIDGE_INDEX}]'
               delay: 1h
-              trends: '0'
               value_type: CHAR
               description: |
                 MIB: PowerNet-MIB
@@ -809,7 +797,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.318.1.1.1.2.3.10.2.1.7.{#SNMPINDEX}'
               key: 'battery.pack.cartridge_health[upsHighPrecBatteryPackCartridgeHealth.{#BATTERY_PACK}.{#CARTRIDGE_INDEX}]'
-              trends: '0'
               value_type: CHAR
               description: |
                 MIB: PowerNet-MIB
@@ -853,7 +840,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.318.1.1.1.2.3.10.2.1.10.{#SNMPINDEX}'
               key: 'battery.pack.status[upsHighPrecBatteryPackCartridgeStatus.{#BATTERY_PACK}.{#CARTRIDGE_INDEX}]'
-              trends: '0'
               value_type: CHAR
               description: |
                 MIB: PowerNet-MIB
@@ -933,7 +919,6 @@ zabbix_export:
               snmp_oid: '1.3.6.1.4.1.318.1.1.1.2.3.10.2.1.4.{#SNMPINDEX}'
               key: 'system.sn[upsHighPrecBatteryPackSerialNumber.{#BATTERY_PACK}.{#CARTRIDGE_INDEX}]'
               delay: 15m
-              trends: '0'
               value_type: CHAR
               description: |
                 MIB: PowerNet-MIB
@@ -1052,10 +1037,8 @@ zabbix_export:
                 conditions:
                   - macro: '{#EXTERNAL_SENSOR1_NAME}'
                     value: Temp
-                    formulaid: A
               operations:
-                - operationobject: ITEM_PROTOTYPE
-                  operator: LIKE
+                - operator: LIKE
                   value: Humidity
                   discover: NO_DISCOVER
         - uuid: d4b34302c7d74f83a409947f2eed37b0
@@ -1162,10 +1145,8 @@ zabbix_export:
                 conditions:
                   - macro: '{#EXTERNAL_SENSOR2_NAME}'
                     value: Temp
-                    formulaid: A
               operations:
-                - operationobject: ITEM_PROTOTYPE
-                  operator: LIKE
+                - operator: LIKE
                   value: Humidity
                   discover: NO_DISCOVER
         - uuid: 525a204918834dbfa788a3681c2d0527

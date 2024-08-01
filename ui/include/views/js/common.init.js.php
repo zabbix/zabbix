@@ -49,7 +49,7 @@
 				idx: idx,
 				[value_fields[profile_type]]: value,
 				idx2: idx2,
-				_csrf_token: <?= json_encode(CCsrfTokenHelper::get('profile')) ?>
+				[CSRF_TOKEN_NAME]: <?= json_encode(CCsrfTokenHelper::get('profile')) ?>
 			}
 		});
 	}
@@ -62,7 +62,7 @@
 			data: {
 				object: object,
 				objectid: objectid,
-				_csrf_token: <?= json_encode(CCsrfTokenHelper::get('favorite')) ?>
+				[CSRF_TOKEN_NAME]: <?= json_encode(CCsrfTokenHelper::get('favorite')) ?>
 			}
 		});
 	}
@@ -75,7 +75,7 @@
 			data: {
 				object: object,
 				objectid: objectid,
-				_csrf_token: <?= json_encode(CCsrfTokenHelper::get('favorite')) ?>
+				[CSRF_TOKEN_NAME]: <?= json_encode(CCsrfTokenHelper::get('favorite')) ?>
 			}
 		});
 	}

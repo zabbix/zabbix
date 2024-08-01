@@ -1,1 +1,0 @@
-..F....... [ZBX-23403] fixed frontend not showing pre-requisites page if PHP mbstring extension is not installed (Ivo)

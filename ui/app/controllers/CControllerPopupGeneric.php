@@ -307,8 +307,8 @@ class CControllerPopupGeneric extends CController {
 					'id' => 'items'
 				],
 				'table_columns' => [
-					_('Name'),
-					_('Key'),
+					(new CColHeader(_('Name')))->addStyle('width: 30%;'),
+					(new CColHeader(_('Key')))->addStyle('width: 30%;'),
 					_('Type'),
 					_('Type of information'),
 					_('Status')
@@ -323,8 +323,8 @@ class CControllerPopupGeneric extends CController {
 					'id' => 'items'
 				],
 				'table_columns' => [
-					_('Name'),
-					_('Key'),
+					(new CColHeader(_('Name')))->addStyle('width: 30%;'),
+					(new CColHeader(_('Key')))->addStyle('width: 30%;'),
 					_('Type'),
 					_('Type of information'),
 					_('Status')
@@ -375,8 +375,8 @@ class CControllerPopupGeneric extends CController {
 					'id' => 'items'
 				],
 				'table_columns' => [
-					_('Name'),
-					_('Key'),
+					(new CColHeader(_('Name')))->addStyle('width: 30%;'),
+					(new CColHeader(_('Key')))->addStyle('width: 30%;'),
 					_('Type'),
 					_('Type of information')
 				]
@@ -916,7 +916,7 @@ class CControllerPopupGeneric extends CController {
 				'object_name' => $src_name,
 				'data' => array_values($hosts),
 				'selectedLimit' => 1,
-				'disabled' => $this->hasInput('only_hostid'),
+				'readonly' => $this->hasInput('only_hostid'),
 				'popup' => [
 					'parameters' => [
 						'srctbl' => $src_name,
