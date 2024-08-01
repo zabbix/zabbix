@@ -30,7 +30,7 @@ class testTriggerPrototypes extends CAPITest {
 		return [
 			'Basic filter by ID' => [
 				'params' => [
-					'output' => ['triggerids'],
+					'output' => ['triggerid'],
 					'triggerids' => $triggerids
 				],
 				'expect' => [
@@ -40,7 +40,7 @@ class testTriggerPrototypes extends CAPITest {
 			],
 			'Host parameter matched' => [
 				'params' => [
-					'output' => ['triggerids'],
+					'output' => ['triggerid'],
 					'triggerids' => $triggerids,
 					'host' => $host
 				],
@@ -51,7 +51,7 @@ class testTriggerPrototypes extends CAPITest {
 			],
 			'Host parameter not matched' => [
 				'params' => [
-					'output' => ['triggerids'],
+					'output' => ['triggerid'],
 					'triggerids' => $triggerids,
 					'host' => 'Not '.$host
 				],
@@ -60,9 +60,20 @@ class testTriggerPrototypes extends CAPITest {
 					'triggerids' => []
 				]
 			],
+			'Host parameter as array not matched' => [
+				'params' => [
+					'output' => ['triggerid'],
+					'triggerids' => $triggerids,
+					'host' => [$host]
+				],
+				'expect' => [
+					'error' => null,
+					'triggerids' => []
+				]
+			],
 			'Filter host parameter matched' => [
 				'params' => [
-					'output' => ['triggerids'],
+					'output' => ['triggerid'],
 					'triggerids' => $triggerids,
 					'filter' => [
 						'host' => $host
@@ -73,9 +84,22 @@ class testTriggerPrototypes extends CAPITest {
 					'triggerids' => $triggerids
 				]
 			],
+			'One of filter host parameters matched' => [
+				'params' => [
+					'output' => ['triggerid'],
+					'triggerids' => $triggerids,
+					'filter' => [
+						'host' => ['Not '.$host, $host]
+					]
+				],
+				'expect' => [
+					'error' => null,
+					'triggerids' => $triggerids
+				]
+			],
 			'Filter host parameter not matched' => [
 				'params' => [
-					'output' => ['triggerids'],
+					'output' => ['triggerid'],
 					'triggerids' => $triggerids,
 					'filter' => [
 						'host' => 'Not '.$host

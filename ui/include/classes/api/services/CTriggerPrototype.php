@@ -344,15 +344,13 @@ class CTriggerPrototype extends CTriggerGeneral {
 
 		// host
 		if ($options['host'] !== null) {
-			zbx_value2array($options['host']);
-
 			$sqlParts['from']['functions'] = 'functions f';
 			$sqlParts['from']['items'] = 'items i';
 			$sqlParts['from']['hosts'] = 'hosts h';
 			$sqlParts['where']['ft'] = 'f.triggerid=t.triggerid';
 			$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
 			$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
-			$sqlParts['where']['host'] = dbConditionString('h.host', $options['host']);
+			$sqlParts['where']['host'] = ' h.host='.zbx_dbstr($options['host']);
 		}
 
 		// min_severity
