@@ -332,8 +332,15 @@ func main() {
 			fatalExit("", err)
 		}
 		// create default configuration for testing options
+<<<<<<< HEAD
 		if !argConfig {
 			_ = conf.UnmarshalStrict([]byte{}, &agent.Options)
+=======
+		// pass empty string to config arg to trigger this
+		err = conf.UnmarshalStrict([]byte{}, &agent.Options)
+		if err != nil {
+			fatalExit("", errors.Join(err, eventLogErr(err)))
+>>>>>>> 10d0dbb1dac (...G...... [DEV-3542] fixed plugins to properly have default capacity and capacity hierarchy)
 		}
 	}
 
@@ -369,18 +376,19 @@ func main() {
 		os.Exit(0)
 	}
 
-	err = agent.Options.LoadSystemOptions()
+	systemOpt, err := agent.Options.LoadSystemOptions()
 	if err != nil {
 		fatalExit("cannot initialize plugin system option", err)
 	}
 
-	pluginSocket, err = initExternalPlugins(&agent.Options)
+	pluginSocket, err = initExternalPlugins(&agent.Options, systemOpt)
 	if err != nil {
 		fatalExit("cannot register plugins", err)
 	}
 
 	defer cleanUpExternal()
 
+<<<<<<< HEAD
 	if argTest || argPrint {
 		var level int
 		if argVerbose {
@@ -390,6 +398,12 @@ func main() {
 		}
 		if err = log.Open(log.Console, level, "", 0); err != nil {
 			fatalExit("cannot initialize logger", err)
+=======
+	if args.test != "" || args.print || args.testConfig {
+		m, err := prepareMetricPrintManager(args.verbose, systemOpt)
+		if err != nil {
+			fatalExit("failed to prepare metric print", err)
+>>>>>>> 10d0dbb1dac (...G...... [DEV-3542] fixed plugins to properly have default capacity and capacity hierarchy)
 		}
 
 		if err = keyaccess.LoadRules(agent.Options.AllowKey, agent.Options.DenyKey); err != nil {
@@ -508,7 +522,12 @@ func main() {
 		fatalExit("cannot initialize user parameters", err)
 	}
 
+<<<<<<< HEAD
 	if manager, err = scheduler.NewManager(&agent.Options); err != nil {
+=======
+	manager, err = scheduler.NewManager(&agent.Options, systemOpt)
+	if err != nil {
+>>>>>>> 10d0dbb1dac (...G...... [DEV-3542] fixed plugins to properly have default capacity and capacity hierarchy)
 		fatalExit("cannot create scheduling manager", err)
 	}
 
@@ -744,6 +763,64 @@ func helpMessage(flagsUsage string) string {
 	)
 }
 
+<<<<<<< HEAD
+=======
+func prepareMetricPrintManager(verbose bool, pluginSysOpt agent.PluginSystemOptions) (*scheduler.Manager, error) {
+	level := log.None
+
+	if verbose {
+		level = log.Trace
+	}
+
+	err := log.Open(log.Console, level, "", 0)
+	if err != nil {
+		return nil, zbxerr.New("failed to initialize logger").Wrap(err)
+	}
+
+	err = keyaccess.LoadRules(agent.Options.AllowKey, agent.Options.DenyKey)
+	if err != nil {
+		return nil, zbxerr.New("failed to load key access rules").Wrap(err)
+	}
+
+	_, err = agent.InitUserParameterPlugin(
+		agent.Options.UserParameter,
+		agent.Options.UnsafeUserParameters,
+		agent.Options.UserParameterDir,
+	)
+	if err != nil {
+		return nil, zbxerr.New("failed to initialize user parameters").Wrap(err)
+	}
+
+	m, err := scheduler.NewManager(&agent.Options, pluginSysOpt)
+	if err != nil {
+		return nil, zbxerr.New("failed to create scheduling manager").Wrap(err)
+	}
+
+	m.Start()
+
+	err = configUpdateItemParameters(m, &agent.Options)
+	if err != nil {
+		return nil, zbxerr.New("failed to process configuration").Wrap(err)
+	}
+
+	hostnames, err := agent.ValidateHostnames(agent.Options.Hostname)
+	if err != nil {
+		return nil, zbxerr.New(`failed to parse "Hostname" parameter`).Wrap(err)
+	}
+
+	agent.FirstHostname = hostnames[0]
+
+	err = configUpdateItemParameters(m, &agent.Options)
+	if err != nil {
+		return nil, zbxerr.New("failed to uptade item parameters").Wrap(err)
+	}
+
+	agent.SetPerformTask(scheduler.Scheduler(m).PerformTask)
+
+	return m, nil
+}
+
+>>>>>>> 10d0dbb1dac (...G...... [DEV-3542] fixed plugins to properly have default capacity and capacity hierarchy)
 func fatalExit(message string, err error) {
 	fatalCloseOSItems()
 
