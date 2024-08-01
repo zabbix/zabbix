@@ -72,9 +72,7 @@ window.proxy_group_edit_popup = new class {
 		const curl = new Curl('zabbix.php');
 
 		curl.setArgument('action', 'proxygroup.delete');
-		curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
-			<?= json_encode(CCsrfTokenHelper::get('proxygroup'), JSON_THROW_ON_ERROR) ?>
-		);
+		curl.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('proxygroup')) ?>);
 
 		this.#post(curl.getUrl(), {proxy_groupids: [this.#proxy_groupid]}, (response) => {
 			overlayDialogueDestroy(this.#overlay.dialogueid);

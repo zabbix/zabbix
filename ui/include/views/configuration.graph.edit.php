@@ -41,7 +41,7 @@ $url = (new CUrl('graphs.php'))
 
 // Create form.
 $graphForm = (new CForm('post', $url))
-	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('graphs.php')))->removeId())
+	->addItem((new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('graphs.php')))->removeId())
 	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->setName('graphForm')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
@@ -114,7 +114,7 @@ $graphFormList
 	->addRow(_('Show legend'),
 		(new CCheckBox('show_legend'))
 			->setChecked($data['show_legend'] == 1)
-			->setEnabled(!$readonly)
+			->setReadonly($readonly)
 	);
 
 // Append graph types to form list.
@@ -122,12 +122,12 @@ if ($data['graphtype'] == GRAPH_TYPE_NORMAL || $data['graphtype'] == GRAPH_TYPE_
 	$graphFormList->addRow(_('Show working time'),
 		(new CCheckBox('show_work_period'))
 			->setChecked($data['show_work_period'] == 1)
-			->setEnabled(!$readonly)
+			->setReadonly($readonly)
 	);
 	$graphFormList->addRow(_('Show triggers'),
 		(new CCheckbox('show_triggers'))
 			->setchecked($data['show_triggers'] == 1)
-			->setEnabled(!$readonly)
+			->setReadonly($readonly)
 	);
 
 	if ($data['graphtype'] == GRAPH_TYPE_NORMAL) {
@@ -137,7 +137,7 @@ if ($data['graphtype'] == GRAPH_TYPE_NORMAL || $data['graphtype'] == GRAPH_TYPE_
 		$percentLeftCheckbox = (new CCheckBox('visible[percent_left]'))
 			->setChecked(true)
 			->onClick('showHideVisible("percent_left");')
-			->setEnabled(!$readonly);
+			->setReadonly($readonly);
 
 		if(array_key_exists('visible', $data) && array_key_exists('percent_left', $data['visible'])) {
 			$percentLeftCheckbox->setChecked(true);
@@ -155,7 +155,7 @@ if ($data['graphtype'] == GRAPH_TYPE_NORMAL || $data['graphtype'] == GRAPH_TYPE_
 		$percentRightCheckbox = (new CCheckBox('visible[percent_right]'))
 			->setChecked(true)
 			->onClick('showHideVisible("percent_right");')
-			->setEnabled(!$readonly);
+			->setReadonly($readonly);
 
 		if(array_key_exists('visible', $data) && array_key_exists('percent_right', $data['visible'])) {
 			$percentRightCheckbox->setChecked(true);
@@ -177,7 +177,7 @@ if ($data['graphtype'] == GRAPH_TYPE_NORMAL || $data['graphtype'] == GRAPH_TYPE_
 			GRAPH_YAXIS_TYPE_FIXED => _('Fixed'),
 			GRAPH_YAXIS_TYPE_ITEM_VALUE => _('Item')
 		]))
-		->setDisabled($readonly)
+		->setReadonly($readonly)
 		->setFocusableElementId('ymin_type_label');
 
 	if ($data['ymin_type'] == GRAPH_YAXIS_TYPE_FIXED) {
@@ -214,7 +214,7 @@ if ($data['graphtype'] == GRAPH_TYPE_NORMAL || $data['graphtype'] == GRAPH_TYPE_
 			'object_name' => 'items',
 			'data' => $ymin_axis_ms_data,
 			'multiple' => false,
-			'disabled' => $readonly,
+			'readonly' => $readonly,
 			'styles' => [
 				'display' => 'inline-flex'
 			],
@@ -272,7 +272,7 @@ if ($data['graphtype'] == GRAPH_TYPE_NORMAL || $data['graphtype'] == GRAPH_TYPE_
 			GRAPH_YAXIS_TYPE_FIXED => _('Fixed'),
 			GRAPH_YAXIS_TYPE_ITEM_VALUE => _('Item')
 		]))
-		->setDisabled($readonly)
+		->setReadonly($readonly)
 		->setFocusableElementId('ymax_type_label');
 
 	if ($data['ymax_type'] == GRAPH_YAXIS_TYPE_FIXED) {
@@ -308,7 +308,7 @@ if ($data['graphtype'] == GRAPH_TYPE_NORMAL || $data['graphtype'] == GRAPH_TYPE_
 			'object_name' => 'items',
 			'data' => $ymax_axis_ms_data,
 			'multiple' => false,
-			'disabled' => $readonly,
+			'readonly' => $readonly,
 			'styles' => [
 				'display' => 'inline-flex'
 			],
@@ -361,7 +361,7 @@ else {
 	$graphFormList->addRow(_('3D view'),
 		(new CCheckBox('show_3d'))
 			->setChecked($data['show_3d'] == 1)
-			->setEnabled(!$readonly)
+			->setReadonly($readonly)
 	);
 }
 
@@ -392,7 +392,7 @@ $items_table = (new CTable())
 			))
 				->addClass('table-col-y-axis-side')
 			: null,
-		(new CTableColumn(_('Color')))->addClass('table-col-colour'),
+		(new CTableColumn(_('Color')))->addClass('table-col-color'),
 		$readonly ? null : (new CTableColumn(_('Action')))->addClass('table-col-action')
 	]);
 
@@ -497,7 +497,7 @@ if ($data['graphid'] != 0) {
 	$updateButton = new CSubmit('update', _('Update'));
 	$deleteButton = new CButtonDelete(
 		($data['parent_discoveryid'] === null) ? _('Delete graph?') : _('Delete graph prototype?'),
-		url_params(['graphid', 'parent_discoveryid', 'hostid', 'context']).'&'.CCsrfTokenHelper::CSRF_TOKEN_NAME.'='.
+		url_params(['graphid', 'parent_discoveryid', 'hostid', 'context']).'&'.CSRF_TOKEN_NAME.'='.
 		CCsrfTokenHelper::get('graphs.php'), 'context'
 	);
 

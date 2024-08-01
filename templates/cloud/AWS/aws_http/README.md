@@ -44,7 +44,8 @@ Add the following required permissions to your Zabbix IAM policy in order to col
                 "s3:GetBucketLocation",
                 "elasticloadbalancing:DescribeLoadBalancers",
                 "elasticloadbalancing:DescribeTargetGroups",
-                "ec2:DescribeSecurityGroups"
+                "ec2:DescribeSecurityGroups",
+                "lambda:ListFunctions"
             ],
             "Effect": "Allow",
             "Resource": "*"
@@ -83,7 +84,8 @@ If you are using role-based authorization, add the appropriate permissions:
                 "ec2:ReplaceIamInstanceProfileAssociation",
                 "elasticloadbalancing:DescribeLoadBalancers",
                 "elasticloadbalancing:DescribeTargetGroups",
-                "ec2:DescribeSecurityGroups"
+                "ec2:DescribeSecurityGroups",
+                "lambda:ListFunctions"
             ],
             "Resource": "*"
         }
@@ -123,6 +125,8 @@ Additional information about the metrics and used API methods:
 |{$AWS.ACCESS.KEY.ID}|<p>Access key ID.</p>||
 |{$AWS.SECRET.ACCESS.KEY}|<p>Secret access key.</p>||
 |{$AWS.AUTH_TYPE}|<p>Authorization method. Possible values: role_base, access_key.</p>|`access_key`|
+|{$AWS.REQUEST.REGION}|<p>Region used in GET request `ListBuckets`.</p>|`us-east-1`|
+|{$AWS.DESCRIBE.REGION}|<p>Region used in POST request `DescribeRegions`.</p>|`us-east-1`|
 |{$AWS.EC2.LLD.FILTER.NAME.MATCHES}|<p>Filter of discoverable EC2 instances by namespace.</p>|`.*`|
 |{$AWS.EC2.LLD.FILTER.NAME.NOT_MATCHES}|<p>Filter to exclude discovered EC2 instances by namespace.</p>|`CHANGE_IF_NEEDED`|
 |{$AWS.EC2.LLD.FILTER.REGION.MATCHES}|<p>Filter of discoverable EC2 instances by region.</p>|`.*`|
@@ -139,12 +143,18 @@ Additional information about the metrics and used API methods:
 |{$AWS.RDS.LLD.FILTER.REGION.NOT_MATCHES}|<p>Filter to exclude discovered RDS instances by region.</p>|`CHANGE_IF_NEEDED`|
 |{$AWS.ECS.LLD.FILTER.REGION.MATCHES}|<p>Filter of discoverable ECS clusters by region.</p>|`.*`|
 |{$AWS.ECS.LLD.FILTER.REGION.NOT_MATCHES}|<p>Filter to exclude discovered ECS clusters by region.</p>|`CHANGE_IF_NEEDED`|
-|{$AWS.ELB.LLD.FILTER.NAME.MATCHES}|<p>Filter of discoverable ELB load balancer by name.</p>|`.*`|
-|{$AWS.ELB.LLD.FILTER.NAME.NOT_MATCHES}|<p>Filter to exclude discovered ELB load balancer by name.</p>|`CHANGE_IF_NEEDED`|
-|{$AWS.ELB.LLD.FILTER.REGION.MATCHES}|<p>Filter of discoverable ELB load balancer by region.</p>|`.*`|
-|{$AWS.ELB.LLD.FILTER.REGION.NOT_MATCHES}|<p>Filter to exclude discovered ELB load balancer by region.</p>|`CHANGE_IF_NEEDED`|
-|{$AWS.ELB.LLD.FILTER.STATE.MATCHES}|<p>Filter of discoverable ELB load balancer by status.</p>|`active`|
+|{$AWS.ELB.LLD.FILTER.NAME.MATCHES}|<p>Filter of discoverable ELB load balancers by name.</p>|`.*`|
+|{$AWS.ELB.LLD.FILTER.NAME.NOT_MATCHES}|<p>Filter to exclude discovered ELB load balancers by name.</p>|`CHANGE_IF_NEEDED`|
+|{$AWS.ELB.LLD.FILTER.REGION.MATCHES}|<p>Filter of discoverable ELB load balancers by region.</p>|`.*`|
+|{$AWS.ELB.LLD.FILTER.REGION.NOT_MATCHES}|<p>Filter to exclude discovered ELB load balancers by region.</p>|`CHANGE_IF_NEEDED`|
+|{$AWS.ELB.LLD.FILTER.STATE.MATCHES}|<p>Filter of discoverable ELB load balancers by status.</p>|`active`|
 |{$AWS.ELB.LLD.FILTER.STATE.NOT_MATCHES}|<p>Filter to exclude discovered ELB load balancer by status.</p>|`CHANGE_IF_NEEDED`|
+|{$AWS.LAMBDA.LLD.FILTER.REGION.MATCHES}|<p>Filter of discoverable Lambda functions by region.</p>|`.*`|
+|{$AWS.LAMBDA.LLD.FILTER.REGION.NOT_MATCHES}|<p>Filter to exclude discovered Lambda functions by region.</p>|`CHANGE_IF_NEEDED`|
+|{$AWS.LAMBDA.LLD.FILTER.RUNTIME.MATCHES}|<p>Filter of discoverable Lambda functions by Runtime.</p>|`.*`|
+|{$AWS.LAMBDA.LLD.FILTER.RUNTIME.NOT_MATCHES}|<p>Filter to exclude discovered Lambda functions by Runtime.</p>|`CHANGE_IF_NEEDED`|
+|{$AWS.LAMBDA.LLD.FILTER.NAME.MATCHES}|<p>Filter of discoverable Lambda functions by name.</p>|`.*`|
+|{$AWS.LAMBDA.LLD.FILTER.NAME.NOT_MATCHES}|<p>Filter to exclude discovered Lambda functions by name.</p>|`CHANGE_IF_NEEDED`|
 
 ### LLD rule S3 buckets discovery
 
@@ -175,6 +185,12 @@ Additional information about the metrics and used API methods:
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |ELB load balancers discovery|<p>Get ELB load balancers.</p>|Script|aws.elb.discovery|
+
+### LLD rule Lambda discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Lambda discovery|<p>Get Lambda functions.</p>|Script|aws.lambda.discovery|
 
 ## Feedback
 

@@ -1,0 +1,13 @@
+diff --git a/ui/js/multiselect.js b/ui/js/multiselect.js
+index f20e4304173..ee6e85f5f61 100644
+--- a/ui/js/multiselect.js
++++ b/ui/js/multiselect.js
+@@ -714,7 +714,7 @@
+ 									});
+ 
+ 								delete ms.values.searchTimeout;
+-							}, 500);
++							}, 10);
+ 						}
+ 					}
+ 					else {

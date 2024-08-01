@@ -36,7 +36,7 @@ $url = (new CUrl('httpconf.php'))
 
 $form = (new CForm('post', $url))
 	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
-	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('httpconf.php')))->removeId())
+	->addItem((new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('httpconf.php')))->removeId())
 	->setId('webscenario-form')
 	->setName('webscenario_form')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
@@ -393,7 +393,7 @@ if ($data['httptestid'] != 0) {
 	}
 
 	$buttons[] = (new CButtonDelete(_('Delete web scenario?'), url_params(['form', 'httptestid', 'hostid', 'context']).
-		'&'.CCsrfTokenHelper::CSRF_TOKEN_NAME.'='.CCsrfTokenHelper::get('httpconf.php'),
+		'&'.CSRF_TOKEN_NAME.'='.CCsrfTokenHelper::get('httpconf.php'),
 		'context'
 	))->setEnabled(!$data['templated']);
 	$buttons[] = new CButtonCancel(url_param('context'));

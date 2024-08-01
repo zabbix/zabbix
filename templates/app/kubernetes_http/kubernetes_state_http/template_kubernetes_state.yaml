@@ -2707,12 +2707,10 @@ zabbix_export:
                   - macro: '{#SINGLETON}'
                     operator: EXISTS
               operations:
-                - operationobject: ITEM_PROTOTYPE
-                  operator: REGEXP
+                - operator: REGEXP
                   value: 'status phase.*sum'
                   discover: DISCOVER
-                - operationobject: ITEM_PROTOTYPE
-                  operator: NOT_REGEXP
+                - operator: NOT_REGEXP
                   value: 'status phase.*sum'
                   discover: NO_DISCOVER
                 - operationobject: TRIGGER_PROTOTYPE
@@ -2904,12 +2902,10 @@ zabbix_export:
                   - macro: '{#IS_SUM}'
                     operator: EXISTS
               operations:
-                - operationobject: ITEM_PROTOTYPE
-                  operator: REGEXP
+                - operator: REGEXP
                   value: 'status phase.*sum'
                   discover: DISCOVER
-                - operationobject: ITEM_PROTOTYPE
-                  operator: NOT_REGEXP
+                - operator: NOT_REGEXP
                   value: 'status phase.*sum'
                   discover: NO_DISCOVER
                 - operationobject: TRIGGER_PROTOTYPE

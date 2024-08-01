@@ -1279,8 +1279,7 @@ zabbix_export:
                   - macro: '{#DRIVE_TYPE}'
                     value: SSD
               operations:
-                - operationobject: ITEM_PROTOTYPE
-                  operator: REGEXP
+                - operator: REGEXP
                   value: 'Predicted media life left'
                   discover: DISCOVER
         - uuid: 98061dca5146498ea5f663b229cb7ba9

@@ -180,6 +180,27 @@ form.dashboard-widget-piechart {
 		tbody:not(:empty) + tfoot td {
 			padding-top: 0;
 		}
+
+		.reference-hint {
+			margin-right: 4px;
+
+			&::before {
+				font-size: $icon-medium-size;
+				color: $link-color;
+			}
+		}
+
+		.unavailable-widget {
+			.reference-hint {
+				&::before {
+					color: $form-disabled-font-color;
+				}
+			}
+
+			a {
+				color: $form-disabled-font-color;
+			}
+		}
 	}
 
 	.no-items-message {
