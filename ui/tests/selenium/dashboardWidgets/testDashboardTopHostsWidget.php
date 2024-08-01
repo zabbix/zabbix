@@ -5267,13 +5267,13 @@ class testDashboardTopHostsWidget extends testWidgets {
 	 * Function used to create Top Hosts widget with special columns.
 	 *
 	 * @param array     $data			data provider values
-	 * @param string    $name		    name of the dashboard where to create Top Hosts widget
+	 * @param string    $dashboardid    id of the dashboard where to create Top Hosts widget
 	 * @param string	$widget_name	name of the widget to be created
 	 *
 	 * @return CDashboardElement
 	 */
-	protected function createTopHostsWidget($data, $name, $widget_name = null) {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.$name);
+	protected function createTopHostsWidget($data, $dashboardid, $widget_name = null) {
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.$dashboardid);
 		$dashboard = CDashboardElement::find()->one();
 		$fields = array_key_exists('main_fields', $data) ? $data['main_fields'] : ['Name' => $widget_name];
 		$form = $this->openWidgetAndFill($dashboard, 'Top hosts', $fields);
