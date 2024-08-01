@@ -215,7 +215,7 @@ class CWidgetFieldColumnsList extends CWidgetField {
 			'base_color'			=> ['type' => API_COLOR, 'default' => ''],
 			'display_item_as'		=> ['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'data', 'in' => self::DATA_ITEM_VALUE],
-											'type' => API_INT32, 'default' => self::DISPLAY_AS_IS, 'in' => implode(',', [self::DISPLAY_VALUE_AS_NUMERIC, self::DISPLAY_VALUE_AS_TEXT, self::DISPLAY_VALUE_AS_BINARY])],
+											'type' => API_INT32, 'default' => self::DISPLAY_VALUE_AS_NUMERIC, 'in' => implode(',', [self::DISPLAY_VALUE_AS_NUMERIC, self::DISPLAY_VALUE_AS_TEXT, self::DISPLAY_VALUE_AS_BINARY])],
 										['else' => true,
 											'type' => API_INT32]
 			]],

@@ -293,7 +293,7 @@ window.tophosts_column_edit_form = new class {
 
 		const inputs = {
 			'text': data_text,
-			'display_item_value_as': data_item_value,
+			'display_item_as': data_item_value,
 			'display': display_item_as == display_as_numeric,
 			'min': show_min_max,
 			'max': show_min_max,
