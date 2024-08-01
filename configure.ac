@@ -882,15 +882,22 @@ dnl *                 Checks for library functions                  *
 dnl *                                                               *
 dnl *****************************************************************
 
-AC_CHECK_FUNCS(hstrerror)
-AC_CHECK_FUNCS(getenv)
-AC_CHECK_FUNCS(putenv)
-AC_CHECK_FUNCS(setenv)
-AC_CHECK_FUNCS(tzset)
-AC_CHECK_FUNCS(unsetenv)
-AC_CHECK_FUNCS(sigqueue)
-AC_CHECK_FUNCS(round)
-AC_CHECK_FUNCS(malloc_trim)
+AC_FUNC_FORK
+AC_FUNC_GETMNTENT
+AC_FUNC_LSTAT_FOLLOWS_SLASHED_SYMLINK
+AC_FUNC_MALLOC
+AC_FUNC_MKTIME
+AC_FUNC_MMAP
+AC_FUNC_REALLOC
+AC_FUNC_STRTOD
+
+AC_CHECK_FUNCS([alarm atexit clock_gettime dup2 fesetround floor getcwd       \
+                getenv gethostname getmntent getmntinfo getpagesize           \
+                gettimeofday hstrerror inet_ntoa localtime_r malloc_trim      \
+                memchr memmove memset mkdir modf munmap pow pstat_getdynamic  \
+                realpath round select setenv setenv sigqueue socket sqrt      \
+                strcasecmp strchr strcspn strdup strerror strpbrk strrchr     \
+                strstr strtol strtoul sysinfo tzset tzset uname unsetenv])
 
 dnl *****************************************************************
 dnl *                                                               *
