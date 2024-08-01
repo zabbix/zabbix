@@ -24,7 +24,6 @@ zabbix_export:
           type: HTTP_AGENT
           key: hadoop.datanodes.get
           history: '0'
-          trends: '0'
           value_type: TEXT
           preprocessing:
             - type: JAVASCRIPT
@@ -63,7 +62,6 @@ zabbix_export:
           name: 'NameNode: Total blocks'
           type: DEPENDENT
           key: hadoop.namenode.blocks_total
-          delay: '0'
           description: 'Count of blocks tracked by NameNode.'
           preprocessing:
             - type: JSONPATH
@@ -78,7 +76,6 @@ zabbix_export:
           name: 'NameNode: Blocks allocable'
           type: DEPENDENT
           key: hadoop.namenode.block_capacity
-          delay: '0'
           description: 'Maximum number of blocks allocable.'
           preprocessing:
             - type: JSONPATH
@@ -93,7 +90,6 @@ zabbix_export:
           name: 'NameNode: Capacity remaining'
           type: DEPENDENT
           key: hadoop.namenode.capacity_remaining
-          delay: '0'
           units: B
           description: 'Available capacity.'
           preprocessing:
@@ -109,7 +105,6 @@ zabbix_export:
           name: 'NameNode: Corrupt blocks'
           type: DEPENDENT
           key: hadoop.namenode.corrupt_blocks
-          delay: '0'
           description: 'Number of corrupt blocks.'
           preprocessing:
             - type: JSONPATH
@@ -124,7 +119,6 @@ zabbix_export:
           name: 'NameNode: Total files'
           type: DEPENDENT
           key: hadoop.namenode.files_total
-          delay: '0'
           description: 'Total count of files tracked by the NameNode.'
           preprocessing:
             - type: JSONPATH
@@ -140,7 +134,6 @@ zabbix_export:
           type: HTTP_AGENT
           key: hadoop.namenode.get
           history: '0'
-          trends: '0'
           value_type: TEXT
           url: '{$HADOOP.NAMENODE.HOST}:{$HADOOP.NAMENODE.PORT}/jmx'
           tags:
@@ -150,9 +143,7 @@ zabbix_export:
           name: 'NameNode: Get info'
           type: DEPENDENT
           key: hadoop.namenode.info
-          delay: '0'
           history: '0'
-          trends: '0'
           value_type: TEXT
           preprocessing:
             - type: JSONPATH
@@ -169,7 +160,6 @@ zabbix_export:
           name: 'NameNode: Missing blocks'
           type: DEPENDENT
           key: hadoop.namenode.missing_blocks
-          delay: '0'
           description: 'Number of missing blocks.'
           preprocessing:
             - type: JSONPATH
@@ -193,7 +183,6 @@ zabbix_export:
           name: 'NameNode: Dead DataNodes'
           type: DEPENDENT
           key: hadoop.namenode.num_dead_data_nodes
-          delay: '0'
           description: 'Count of dead DataNodes.'
           preprocessing:
             - type: JSONPATH
@@ -220,7 +209,6 @@ zabbix_export:
           name: 'NameNode: Alive DataNodes'
           type: DEPENDENT
           key: hadoop.namenode.num_live_data_nodes
-          delay: '0'
           description: 'Count of alive DataNodes.'
           preprocessing:
             - type: JSONPATH
@@ -238,7 +226,6 @@ zabbix_export:
           name: 'NameNode: Stale DataNodes'
           type: DEPENDENT
           key: hadoop.namenode.num_stale_data_nodes
-          delay: '0'
           description: 'DataNodes that do not send a heartbeat within 30 seconds are marked as "stale".'
           preprocessing:
             - type: JSONPATH
@@ -256,7 +243,6 @@ zabbix_export:
           name: 'NameNode: Block Pool Renaming'
           type: DEPENDENT
           key: hadoop.namenode.percent_block_pool_used
-          delay: '0'
           value_type: FLOAT
           preprocessing:
             - type: JSONPATH
@@ -271,7 +257,6 @@ zabbix_export:
           name: 'NameNode: Percent capacity remaining'
           type: DEPENDENT
           key: hadoop.namenode.percent_remaining
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'Available capacity in percent.'
@@ -301,7 +286,6 @@ zabbix_export:
           name: 'NameNode: RPC queue & processing time'
           type: DEPENDENT
           key: hadoop.namenode.rpc_processing_time_avg
-          delay: '0'
           value_type: FLOAT
           units: s
           description: 'Average time spent on processing RPC requests.'
@@ -318,7 +302,6 @@ zabbix_export:
           name: 'NameNode: Total load'
           type: DEPENDENT
           key: hadoop.namenode.total_load
-          delay: '0'
           description: 'The current number of concurrent file accesses (read/write) across all DataNodes.'
           preprocessing:
             - type: JSONPATH
@@ -333,7 +316,6 @@ zabbix_export:
           name: 'NameNode: Transactions since last checkpoint'
           type: DEPENDENT
           key: hadoop.namenode.transactions_since_last_checkpoint
-          delay: '0'
           description: 'Total number of transactions since last checkpoint.'
           preprocessing:
             - type: JSONPATH
@@ -348,7 +330,6 @@ zabbix_export:
           name: 'NameNode: Under-replicated blocks'
           type: DEPENDENT
           key: hadoop.namenode.under_replicated_blocks
-          delay: '0'
           description: 'The number of blocks with insufficient replication.'
           preprocessing:
             - type: JSONPATH
@@ -363,7 +344,6 @@ zabbix_export:
           name: 'NameNode: Uptime'
           type: DEPENDENT
           key: hadoop.namenode.uptime
-          delay: '0'
           value_type: FLOAT
           units: s
           preprocessing:
@@ -406,7 +386,6 @@ zabbix_export:
           name: 'NameNode: Failed volumes'
           type: DEPENDENT
           key: hadoop.namenode.volume_failures_total
-          delay: '0'
           description: 'Number of failed volumes.'
           preprocessing:
             - type: JSONPATH
@@ -431,7 +410,6 @@ zabbix_export:
           type: HTTP_AGENT
           key: hadoop.nodemanagers.get
           history: '0'
-          trends: '0'
           value_type: TEXT
           preprocessing:
             - type: JAVASCRIPT
@@ -446,7 +424,6 @@ zabbix_export:
           type: HTTP_AGENT
           key: hadoop.resourcemanager.get
           history: '0'
-          trends: '0'
           value_type: TEXT
           url: '{$HADOOP.RESOURCEMANAGER.HOST}:{$HADOOP.RESOURCEMANAGER.PORT}/jmx'
           tags:
@@ -456,9 +433,7 @@ zabbix_export:
           name: 'ResourceManager: Get info'
           type: DEPENDENT
           key: hadoop.resourcemanager.info
-          delay: '0'
           history: '0'
-          trends: '0'
           value_type: TEXT
           preprocessing:
             - type: JSONPATH
@@ -475,7 +450,6 @@ zabbix_export:
           name: 'ResourceManager: Active NMs'
           type: DEPENDENT
           key: hadoop.resourcemanager.num_active_nm
-          delay: '0'
           description: 'Number of Active NodeManagers.'
           preprocessing:
             - type: JSONPATH
@@ -502,7 +476,6 @@ zabbix_export:
           name: 'ResourceManager: Decommissioned NMs'
           type: DEPENDENT
           key: hadoop.resourcemanager.num_decommissioned_nm
-          delay: '0'
           description: 'Number of Decommissioned NodeManagers.'
           preprocessing:
             - type: JSONPATH
@@ -517,7 +490,6 @@ zabbix_export:
           name: 'ResourceManager: Decommissioning NMs'
           type: DEPENDENT
           key: hadoop.resourcemanager.num_decommissioning_nm
-          delay: '0'
           description: 'Number of Decommissioning NodeManagers.'
           preprocessing:
             - type: JSONPATH
@@ -535,7 +507,6 @@ zabbix_export:
           name: 'ResourceManager: Lost NMs'
           type: DEPENDENT
           key: hadoop.resourcemanager.num_lost_nm
-          delay: '0'
           description: 'Number of Lost NodeManagers.'
           preprocessing:
             - type: JSONPATH
@@ -553,7 +524,6 @@ zabbix_export:
           name: 'ResourceManager: Rebooted NMs'
           type: DEPENDENT
           key: hadoop.resourcemanager.num_rebooted_nm
-          delay: '0'
           description: 'Number of Rebooted NodeManagers.'
           preprocessing:
             - type: JSONPATH
@@ -568,7 +538,6 @@ zabbix_export:
           name: 'ResourceManager: Shutdown NMs'
           type: DEPENDENT
           key: hadoop.resourcemanager.num_shutdown_nm
-          delay: '0'
           description: 'Number of Shutdown NodeManagers.'
           preprocessing:
             - type: JSONPATH
@@ -583,7 +552,6 @@ zabbix_export:
           name: 'ResourceManager: Unhealthy NMs'
           type: DEPENDENT
           key: hadoop.resourcemanager.num_unhealthy_nm
-          delay: '0'
           description: 'Number of Unhealthy NodeManagers.'
           preprocessing:
             - type: JSONPATH
@@ -607,7 +575,6 @@ zabbix_export:
           name: 'ResourceManager: RPC queue & processing time'
           type: DEPENDENT
           key: hadoop.resourcemanager.rpc_processing_time_avg
-          delay: '0'
           value_type: FLOAT
           units: s
           description: 'Average time spent on processing RPC requests.'
@@ -624,7 +591,6 @@ zabbix_export:
           name: 'ResourceManager: Uptime'
           type: DEPENDENT
           key: hadoop.resourcemanager.uptime
-          delay: '0'
           value_type: FLOAT
           units: s
           preprocessing:
@@ -770,8 +736,6 @@ zabbix_export:
               name: '{#HOSTNAME}: Admin state'
               type: DEPENDENT
               key: 'hadoop.datanode.admin_state[{#HOSTNAME}]'
-              delay: '0'
-              trends: '0'
               value_type: CHAR
               description: 'Administrative state.'
               preprocessing:
@@ -790,7 +754,6 @@ zabbix_export:
               name: '{#HOSTNAME}: Used'
               type: DEPENDENT
               key: 'hadoop.datanode.dfs_used[{#HOSTNAME}]'
-              delay: '0'
               units: B
               description: 'Used disk space.'
               preprocessing:
@@ -807,7 +770,6 @@ zabbix_export:
               type: HTTP_AGENT
               key: 'hadoop.datanode.get[{#HOSTNAME}]'
               history: '0'
-              trends: '0'
               value_type: TEXT
               url: '{#INFOADDR}/jmx'
               tags:
@@ -817,7 +779,6 @@ zabbix_export:
               name: '{#HOSTNAME}: JVM Garbage collection time'
               type: DEPENDENT
               key: 'hadoop.datanode.jvm.gc_time[{#HOSTNAME}]'
-              delay: '0'
               units: '!ms'
               description: 'The JVM garbage collection time in milliseconds.'
               preprocessing:
@@ -833,7 +794,6 @@ zabbix_export:
               name: '{#HOSTNAME}: JVM Heap usage'
               type: DEPENDENT
               key: 'hadoop.datanode.jvm.mem_heap_used[{#HOSTNAME}]'
-              delay: '0'
               value_type: FLOAT
               units: '!MB'
               description: 'The JVM heap usage in MBytes.'
@@ -850,7 +810,6 @@ zabbix_export:
               name: '{#HOSTNAME}: JVM Threads'
               type: DEPENDENT
               key: 'hadoop.datanode.jvm.threads[{#HOSTNAME}]'
-              delay: '0'
               description: 'The number of JVM threads.'
               preprocessing:
                 - type: JSONPATH
@@ -865,7 +824,6 @@ zabbix_export:
               name: '{#HOSTNAME}: Number of failed volumes'
               type: DEPENDENT
               key: 'hadoop.datanode.numfailedvolumes[{#HOSTNAME}]'
-              delay: '0'
               description: 'Number of failed storage volumes.'
               preprocessing:
                 - type: JSONPATH
@@ -880,8 +838,6 @@ zabbix_export:
               name: '{#HOSTNAME}: Oper state'
               type: DEPENDENT
               key: 'hadoop.datanode.oper_state[{#HOSTNAME}]'
-              delay: '0'
-              trends: '0'
               value_type: CHAR
               description: 'Operational state.'
               preprocessing:
@@ -909,9 +865,7 @@ zabbix_export:
               name: 'Hadoop DataNode {#HOSTNAME}: Get raw info'
               type: DEPENDENT
               key: 'hadoop.datanode.raw_info[{#HOSTNAME}]'
-              delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
               preprocessing:
                 - type: JSONPATH
@@ -927,7 +881,6 @@ zabbix_export:
               name: '{#HOSTNAME}: Remaining'
               type: DEPENDENT
               key: 'hadoop.datanode.remaining[{#HOSTNAME}]'
-              delay: '0'
               units: B
               description: 'Remaining disk space.'
               preprocessing:
@@ -943,7 +896,6 @@ zabbix_export:
               name: '{#HOSTNAME}: Uptime'
               type: DEPENDENT
               key: 'hadoop.datanode.uptime[{#HOSTNAME}]'
-              delay: '0'
               value_type: FLOAT
               units: s
               preprocessing:
@@ -986,8 +938,6 @@ zabbix_export:
               name: '{#HOSTNAME}: Version'
               type: DEPENDENT
               key: 'hadoop.datanode.version[{#HOSTNAME}]'
-              delay: '0'
-              trends: '0'
               value_type: CHAR
               description: 'DataNode software version.'
               preprocessing:
@@ -1056,7 +1006,6 @@ zabbix_export:
               name: '{#HOSTNAME}: Available memory'
               type: DEPENDENT
               key: 'hadoop.nodemanager.availablememory[{#HOSTNAME}]'
-              delay: '0'
               units: '!MB'
               preprocessing:
                 - type: JSONPATH
@@ -1071,7 +1020,6 @@ zabbix_export:
               name: '{#HOSTNAME}: Container launch avg duration'
               type: DEPENDENT
               key: 'hadoop.nodemanager.container_launch_duration_avg[{#HOSTNAME}]'
-              delay: '0'
               value_type: FLOAT
               preprocessing:
                 - type: JSONPATH
@@ -1087,7 +1035,6 @@ zabbix_export:
               type: HTTP_AGENT
               key: 'hadoop.nodemanager.get[{#HOSTNAME}]'
               history: '0'
-              trends: '0'
               value_type: TEXT
               url: '{#NODEHTTPADDRESS}/jmx'
               tags:
@@ -1097,7 +1044,6 @@ zabbix_export:
               name: '{#HOSTNAME}: JVM Garbage collection time'
               type: DEPENDENT
               key: 'hadoop.nodemanager.jvm.gc_time[{#HOSTNAME}]'
-              delay: '0'
               units: '!ms'
               description: 'The JVM garbage collection time in milliseconds.'
               preprocessing:
@@ -1113,7 +1059,6 @@ zabbix_export:
               name: '{#HOSTNAME}: JVM Heap usage'
               type: DEPENDENT
               key: 'hadoop.nodemanager.jvm.mem_heap_used[{#HOSTNAME}]'
-              delay: '0'
               value_type: FLOAT
               units: '!MB'
               description: 'The JVM heap usage in MBytes.'
@@ -1130,7 +1075,6 @@ zabbix_export:
               name: '{#HOSTNAME}: JVM Threads'
               type: DEPENDENT
               key: 'hadoop.nodemanager.jvm.threads[{#HOSTNAME}]'
-              delay: '0'
               description: 'The number of JVM threads.'
               preprocessing:
                 - type: JSONPATH
@@ -1145,8 +1089,6 @@ zabbix_export:
               name: '{#HOSTNAME}: Number of containers'
               type: DEPENDENT
               key: 'hadoop.nodemanager.numcontainers[{#HOSTNAME}]'
-              delay: '0'
-              trends: '0'
               value_type: CHAR
               preprocessing:
                 - type: JSONPATH
@@ -1161,9 +1103,7 @@ zabbix_export:
               name: 'Hadoop NodeManager {#HOSTNAME}: Get raw info'
               type: DEPENDENT
               key: 'hadoop.nodemanager.raw_info[{#HOSTNAME}]'
-              delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
               preprocessing:
                 - type: JSONPATH
@@ -1179,7 +1119,6 @@ zabbix_export:
               name: '{#HOSTNAME}: RPC queue & processing time'
               type: DEPENDENT
               key: 'hadoop.nodemanager.rpc_processing_time_avg[{#HOSTNAME}]'
-              delay: '0'
               value_type: FLOAT
               description: 'Average time spent on processing RPC requests.'
               preprocessing:
@@ -1195,8 +1134,6 @@ zabbix_export:
               name: '{#HOSTNAME}: State'
               type: DEPENDENT
               key: 'hadoop.nodemanager.state[{#HOSTNAME}]'
-              delay: '0'
-              trends: '0'
               value_type: CHAR
               description: 'State of the node - valid values are: NEW, RUNNING, UNHEALTHY, DECOMMISSIONING, DECOMMISSIONED, LOST, REBOOTED, SHUTDOWN.'
               preprocessing:
@@ -1224,7 +1161,6 @@ zabbix_export:
               name: '{#HOSTNAME}: Uptime'
               type: DEPENDENT
               key: 'hadoop.nodemanager.uptime[{#HOSTNAME}]'
-              delay: '0'
               value_type: FLOAT
               units: s
               preprocessing:
@@ -1267,7 +1203,6 @@ zabbix_export:
               name: '{#HOSTNAME}: Used memory'
               type: DEPENDENT
               key: 'hadoop.nodemanager.usedmemory[{#HOSTNAME}]'
-              delay: '0'
               units: '!MB'
               preprocessing:
                 - type: JSONPATH
@@ -1282,8 +1217,6 @@ zabbix_export:
               name: '{#HOSTNAME}: Version'
               type: DEPENDENT
               key: 'hadoop.nodemanager.version[{#HOSTNAME}]'
-              delay: '0'
-              trends: '0'
               value_type: CHAR
               preprocessing:
                 - type: JSONPATH

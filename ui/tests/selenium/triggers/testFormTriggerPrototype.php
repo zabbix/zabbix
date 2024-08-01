@@ -258,12 +258,12 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 		$this->zbxTestAssertElementPresentXpath("//a[@id='tab_triggersTab' and text()='Trigger prototype']");
 
 		if (isset($data['constructor'])) {
-			$this->zbxTestClickButtonText('Expression constructor');
+			$dialog->query('button:Expression constructor')->waitUntilClickable()->one()->click();
 			// Wait for expression constructor to open, textarea is disabled and its id has changed to 'expr_temp'.
 			$dialog->query('id:expr_temp')->waitUntilVisible();
 
 			if ($data['constructor'] === 'open_close') {
-				$this->zbxTestClickButtonText('Close expression constructor');
+				$dialog->query('button:Close expression constructor')->waitUntilClickable()->one()->click();
 				// Wait until expression constructor closes, textarea is enabled and its id has changed to 'expression'.
 				$dialog->query('id:expression')->waitUntilVisible();
 			}
@@ -428,7 +428,7 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 					->filter(CElementFilter::NOT_CLICKABLE)->count()
 			);
 			$this->assertTrue($this->zbxTestCheckboxSelected('recovery_mode_0'));
-			$this->zbxTestAssertElementPresentXpath("//input[@id='recovery_mode_0'][@disabled]");
+			$this->zbxTestAssertElementPresentXpath("//input[@id='recovery_mode_0'][@readonly]");
 		}
 		else {
 			$this->assertEquals(2, $dialog_footer->query('button', ['Add', 'Cancel'])->all()

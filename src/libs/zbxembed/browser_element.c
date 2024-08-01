@@ -118,7 +118,7 @@ static duk_ret_t	wd_element_send_keys(duk_context *ctx)
 	const char		*keys_cesu;
 
 	if (!duk_is_null(ctx, 0) && !duk_is_undefined(ctx, 0))
-		keys_cesu = duk_to_string(ctx, 0);
+		keys_cesu = duk_safe_to_string(ctx, 0);
 
 	if (NULL == (el = wd_element(ctx)))
 		return duk_throw(ctx);
@@ -218,7 +218,7 @@ static duk_ret_t	wd_element_get_attribute(duk_context *ctx)
 	const char		*name_cesu;
 
 	if (!duk_is_null(ctx, 0) && !duk_is_undefined(ctx, 0))
-		name_cesu = duk_to_string(ctx, 0);
+		name_cesu = duk_safe_to_string(ctx, 0);
 
 	if (NULL == (el = wd_element(ctx)))
 		return duk_throw(ctx);
@@ -271,7 +271,7 @@ static duk_ret_t	wd_element_get_property(duk_context *ctx)
 	const char		*name_cesu;
 
 	if (!duk_is_null(ctx, 0) && !duk_is_undefined(ctx, 0))
-		name_cesu = duk_to_string(ctx, 0);
+		name_cesu = duk_safe_to_string(ctx, 0);
 
 	if (NULL == (el = wd_element(ctx)))
 		return duk_throw(ctx);

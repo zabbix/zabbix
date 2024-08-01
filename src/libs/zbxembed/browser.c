@@ -98,7 +98,7 @@ static duk_ret_t	es_browser_ctor(duk_context *ctx)
 	duk_dup(ctx, 0);
 	duk_pcall_prop(ctx, -3, 1);
 
-	if (SUCCEED != es_duktape_string_decode(duk_to_string(ctx, -1), &capabilities))
+	if (SUCCEED != es_duktape_string_decode(duk_safe_to_string(ctx, -1), &capabilities))
 	{
 		err_index = duk_push_error_object(ctx, DUK_RET_TYPE_ERROR,
 				"cannot convert browser capabilities to utf8");
@@ -175,7 +175,7 @@ static duk_ret_t	es_browser_navigate(duk_context *ctx)
 	int		ret;
 	const char	*url_cesu;
 
-	url_cesu = duk_to_string(ctx, 0);
+	url_cesu = duk_safe_to_string(ctx, 0);
 
 	if (NULL == (wd = es_webdriver(ctx)))
 		return duk_throw(ctx);
@@ -247,8 +247,8 @@ static duk_ret_t	es_browser_find_element(duk_context *ctx)
 	int		err_index = -1;
 	const char	*strategy_cesu, *selector_cesu;
 
-	strategy_cesu = duk_to_string(ctx, 0);
-	selector_cesu = duk_to_string(ctx, 1);
+	strategy_cesu = duk_safe_to_string(ctx, 0);
+	selector_cesu = duk_safe_to_string(ctx, 1);
 
 	if (NULL == (wd = es_webdriver(ctx)))
 		return duk_throw(ctx);
@@ -308,8 +308,8 @@ static duk_ret_t	es_browser_find_elements(duk_context *ctx)
 	zbx_vector_str_t	elements;
 	const char		*strategy_cesu, *selector_cesu;
 
-	strategy_cesu = duk_to_string(ctx, 0);
-	selector_cesu = duk_to_string(ctx, 1);
+	strategy_cesu = duk_safe_to_string(ctx, 0);
+	selector_cesu = duk_safe_to_string(ctx, 1);
 
 	zbx_vector_str_create(&elements);
 
@@ -695,7 +695,7 @@ static duk_ret_t	es_browser_add_cookie(duk_context *ctx)
 	duk_dup(ctx, 0);
 	duk_pcall_prop(ctx, -3, 1);
 
-	cookie_cesu = duk_to_string(ctx, -1);
+	cookie_cesu = duk_safe_to_string(ctx, -1);
 
 	if (NULL == (wd = es_webdriver(ctx)))
 		return duk_throw(ctx);
@@ -838,7 +838,7 @@ static duk_ret_t	es_browser_set_error(duk_context *ctx)
 	char		*message = NULL;
 	const char	*message_cesu;
 
-	message_cesu = duk_to_string(ctx, 0);
+	message_cesu = duk_safe_to_string(ctx, 0);
 
 	if (NULL == (wd = es_webdriver(ctx)))
 		return duk_throw(ctx);
@@ -938,7 +938,7 @@ static duk_ret_t	es_browser_collect_perf_entries(duk_context *ctx)
 	const char	*bookmark_str = NULL;
 
 	if (!duk_is_null(ctx, 0) && !duk_is_undefined(ctx, 0))
-		bookmark_str = duk_to_string(ctx, 0);
+		bookmark_str = duk_safe_to_string(ctx, 0);
 
 	if (NULL == (wd = es_webdriver(ctx)))
 		return duk_throw(ctx);
@@ -1023,7 +1023,7 @@ static duk_ret_t	es_browser_get_raw_perf_entries_by_type(duk_context *ctx)
 		return duk_throw(ctx);
 	}
 
-	type_cesu = duk_to_string(ctx, 0);
+	type_cesu = duk_safe_to_string(ctx, 0);
 
 	if (NULL == (wd = es_webdriver(ctx)))
 		return duk_throw(ctx);
@@ -1074,7 +1074,7 @@ static duk_ret_t	es_browser_execute_script(duk_context *ctx)
 	struct zbx_json_parse	jp;
 	const char		*script_cesu;
 
-	script_cesu = duk_to_string(ctx, 0);
+	script_cesu = duk_safe_to_string(ctx, 0);
 
 	if (NULL == (wd = es_webdriver(ctx)))
 		return duk_throw(ctx);

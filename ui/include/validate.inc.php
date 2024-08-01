@@ -213,8 +213,9 @@ function check_type(&$field, $flags, &$var, $type, $caption = null) {
 			$error = true;
 			$message = _s('Field "%1$s" is not string.', $caption);
 		}
-		elseif (mb_check_encoding($var, 'UTF-8') !== true) {
+		elseif (zbx_mb_check_encoding($var, 'UTF-8') !== true) {
 			error(_s('Field "%1$s" is not correct: %2$s.', $caption, _('invalid byte sequence in UTF-8')));
+
 			return ZBX_VALID_ERROR;
 		}
 	}
@@ -322,7 +323,7 @@ function check_field(&$fields, &$field, $checks) {
 		elseif ($flags & P_ACT) {
 			$action = APP::Component()->router->getAction();
 
-			$csrf_token_form = getRequest(CCsrfTokenHelper::CSRF_TOKEN_NAME, '');
+			$csrf_token_form = getRequest(CSRF_TOKEN_NAME, '');
 
 			if (!isRequestMethod('post') || !is_string($csrf_token_form) || $csrf_token_form === ''
 					|| !CCsrfTokenHelper::check($csrf_token_form, $action)) {
