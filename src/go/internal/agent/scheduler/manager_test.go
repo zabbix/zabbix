@@ -258,7 +258,7 @@ func (m *mockManager) iterate(t *testing.T, iters int) {
 }
 
 func (m *mockManager) mockInit(t *testing.T) {
-	mgr, err := NewManager(&agent.Options)
+	mgr, err := NewManager(&agent.Options, make(agent.PluginSystemOptions))
 	if err != nil {
 		panic(errs.Wrap(err, "failed to create manager"))
 	}
@@ -680,9 +680,7 @@ func checkExporterTasks(t *testing.T, m *Manager, clientID uint64, items []*clie
 	}
 }
 
-func TestTaskCreate(t *testing.T) {
-	_ = log.Open(log.Console, log.Debug, "", 0)
-
+func newManager() (*Manager, error) {
 	plugin.ClearRegistry()
 	plugins := make([]mockExporterPlugin, 3)
 	for i := range plugins {
@@ -691,7 +689,17 @@ func TestTaskCreate(t *testing.T) {
 		plugin.RegisterMetrics(p, name, name, "Debug.")
 	}
 
-	manager, _ := NewManager(&agent.Options)
+	return NewManager(&agent.Options, make(agent.PluginSystemOptions))
+}
+
+//nolint:paralleltest
+func TestTaskCreate(t *testing.T) {
+	_ = log.Open(log.Console, log.Debug, "", 0)
+
+	manager, err := newManager()
+	if err != nil {
+		panic(err)
+	}
 
 	items := []*clientItem{
 		{itemid: 1, delay: "151", key: "debug1"},
@@ -738,15 +746,10 @@ func TestTaskCreate(t *testing.T) {
 func TestTaskUpdate(t *testing.T) {
 	_ = log.Open(log.Console, log.Debug, "", 0)
 
-	plugin.ClearRegistry()
-	plugins := make([]mockExporterPlugin, 3)
-	for i := range plugins {
-		p := &plugins[i]
-		name := fmt.Sprintf("debug%d", i+1)
-		plugin.RegisterMetrics(p, name, name, "Debug.")
+	manager, err := newManager()
+	if err != nil {
+		panic(err)
 	}
-
-	manager, _ := NewManager(&agent.Options)
 
 	items := []*clientItem{
 		{itemid: 1, delay: "151", key: "debug1"},
@@ -811,15 +814,10 @@ func TestTaskUpdate(t *testing.T) {
 func TestTaskUpdateInvalidInterval(t *testing.T) {
 	_ = log.Open(log.Console, log.Debug, "", 0)
 
-	plugin.ClearRegistry()
-	plugins := make([]mockExporterPlugin, 3)
-	for i := range plugins {
-		p := &plugins[i]
-		name := fmt.Sprintf("debug%d", i+1)
-		plugin.RegisterMetrics(p, name, name, "Debug.")
+	manager, err := newManager()
+	if err != nil {
+		panic(err)
 	}
-
-	manager, _ := NewManager(&agent.Options)
 
 	items := []*clientItem{
 		{itemid: 1, delay: "151", key: "debug1"},
@@ -870,15 +868,10 @@ func TestTaskUpdateInvalidInterval(t *testing.T) {
 func TestTaskDelete(t *testing.T) {
 	_ = log.Open(log.Console, log.Debug, "", 0)
 
-	plugin.ClearRegistry()
-	plugins := make([]mockExporterPlugin, 3)
-	for i := range plugins {
-		p := &plugins[i]
-		name := fmt.Sprintf("debug%d", i+1)
-		plugin.RegisterMetrics(p, name, name, "Debug.")
+	manager, err := newManager()
+	if err != nil {
+		panic(err)
 	}
-
-	manager, _ := NewManager(&agent.Options)
 
 	items := []*clientItem{
 		{itemid: 1, delay: "151", key: "debug1"},
@@ -1830,9 +1823,9 @@ func TestConfigurator(t *testing.T) {
 	_ = log.Open(log.Console, log.Debug, "", 0)
 
 	var opt1, opt2, opt3 configuratorOption
-	_ = conf.Unmarshal([]byte("Delay=5"), &opt1, true)
-	_ = conf.Unmarshal([]byte("Delay=30"), &opt2, true)
-	_ = conf.Unmarshal([]byte("Delay=60"), &opt3, true)
+	_ = conf.UnmarshalStrict([]byte("Delay=5"), &opt1)
+	_ = conf.UnmarshalStrict([]byte("Delay=30"), &opt2)
+	_ = conf.UnmarshalStrict([]byte("Delay=60"), &opt3)
 
 	agent.Options.Plugins = map[string]interface{}{
 		"Debug1": opt1.Params,
@@ -1905,75 +1898,161 @@ func TestConfigurator(t *testing.T) {
 	manager.checkPluginTimeline(t, plugins, calls, 5)
 }
 
-func Test_getPluginOptions(t *testing.T) {
+func Test_getPluginCapacity(t *testing.T) {
 	t.Parallel()
 
-	activeChecksOn := 1
-	activeChecksOff := 0
-
 	type args struct {
-		pluginSystemOptions agent.SystemOptions
-		pluginName          string
+		pluginSystemOptions  int
+		defaultCapacity      int
+		hardCodedMaxCapacity int
+		defaultMaxCapacity   int
+		pluginName           string
 	}
 	tests := []struct {
-		name  string
-		args  args
-		want  int
-		want1 int
+		name string
+		args args
+		want int
 	}{
 		{
 			"+valid",
 			args{
-				agent.SystemOptions{
-					Capacity: 50,
-				},
+				50,
+				1000,
+				100,
+				1000,
 				"Test",
 			},
 			50,
-			0,
 		},
 		{
-			"+activeChecksSetOn",
+			"+overPluginMaxCapacity",
 			args{
-				agent.SystemOptions{
-					ForceActiveChecksOnStart: &activeChecksOn,
-				},
+				150,
+				1000,
+				100,
+				1000,
+				"Test",
+			},
+			100,
+		},
+		{
+			"+overDefaultMaxCapacity",
+			args{
+				1500,
+				1000,
+				0,
+				1000,
 				"Test",
 			},
 			1000,
+		},
+		{
+			"+pluginMaxCapacityOverDefault",
+			args{
+				1500,
+				1000,
+				2000,
+				1000,
+				"Test",
+			},
+			1500,
+		},
+		{
+			"+overPluginMaxCapacityOverDefault",
+			args{
+				2500,
+				1000,
+				2000,
+				1000,
+				"Test",
+			},
+			2000,
+		},
+		{
+			"+systemCapacityNotSet",
+			args{
+				0,
+				1000,
+				2000,
+				1000,
+				"Test",
+			},
+			1000,
+		},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			got := getPluginCapacity(
+				tt.args.pluginSystemOptions,
+				tt.args.defaultCapacity,
+				tt.args.hardCodedMaxCapacity,
+				tt.args.defaultMaxCapacity,
+				tt.args.pluginName,
+			)
+			if diff := cmp.Diff(tt.want, got); diff != "" {
+				t.Fatalf("getPluginCapacity() = %s", diff)
+			}
+		})
+	}
+}
+
+func Test_getPluginForceActiveChecks(t *testing.T) {
+	t.Parallel()
+
+	activeChecksOn := 1
+	activeChecksOff := 0
+	activeChecksInvalid := -1
+
+	type args struct {
+		pluginActiveCheck *int
+		globalActiveCheck int
+		pluginName        string
+	}
+
+	tests := []struct {
+		name string
+		args args
+		want int
+	}{
+		{
+			"+valid",
+			args{
+				&activeChecksOn,
+				0,
+				"Test",
+			},
 			1,
 		},
 		{
 			"activeChecksSetOff",
 			args{
-				agent.SystemOptions{
-					ForceActiveChecksOnStart: &activeChecksOff,
-				},
+				&activeChecksOff,
+				1,
 				"Test",
 			},
-			1000,
 			0,
 		},
 		{
-			"+SystemCapacityAndActiveCheckSet",
+			"+globalActiveCheck",
 			args{
-				agent.SystemOptions{
-					Capacity:                 50,
-					ForceActiveChecksOnStart: &activeChecksOn,
-				},
+				nil,
+				1,
 				"Test",
 			},
-			50,
 			1,
 		},
 		{
-			"+emptySystemOptions",
+			"+invalidPluginCheck",
 			args{
-				agent.SystemOptions{},
+				&activeChecksInvalid,
+				1,
 				"Test",
 			},
-			1000,
-			0,
+			1,
 		},
 	}
 	for _, tt := range tests {
@@ -1981,13 +2060,9 @@ func Test_getPluginOptions(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			got, got1 := getPluginOptions(tt.args.pluginSystemOptions, tt.args.pluginName)
+			got := getPluginForceActiveChecks(tt.args.pluginActiveCheck, tt.args.globalActiveCheck, tt.args.pluginName)
 			if diff := cmp.Diff(tt.want, got); diff != "" {
-				t.Fatalf("getPluginOptions() got = %s", diff)
-			}
-
-			if diff := cmp.Diff(tt.want1, got1); diff != "" {
-				t.Fatalf("getPluginOptions() got1 = %s", diff)
+				t.Fatalf("getPluginForceActiveChecks() = %s", diff)
 			}
 		})
 	}

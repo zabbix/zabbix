@@ -80,25 +80,35 @@ var (
 	errInvalidTLSPSKFile = errors.New("invalid TLSPSKFile configuration parameter")
 )
 
+// PluginSystemOptions collection of system options for all plugins, map key are plugin names.
+type PluginSystemOptions map[string]SystemOptions
+
+// SystemOptions holds reserved plugin options.
+type SystemOptions struct {
+	Path                     *string `conf:"optional"`
+	ForceActiveChecksOnStart *int    `conf:"optional"`
+	Capacity                 int     `conf:"optional"`
+}
+
 type pluginOptions struct {
 	System SystemOptions `conf:"optional"`
 }
 
 // LoadSystemOptions removes system configuration from plugin options and added to system options.
-func (a *AgentOptions) LoadSystemOptions() error {
-	a.PluginsSystemOptions = make(map[string]SystemOptions)
+func (a *AgentOptions) LoadSystemOptions() (PluginSystemOptions, error) {
+	out := make(PluginSystemOptions)
 
 	for name, p := range a.Plugins {
 		var o pluginOptions
-		if err := conf.Unmarshal(p, &o, true); err != nil {
-			return errs.Errorf("failed to unmarshal options for plugin %s, %s", name, err.Error())
+		if err := conf.UnmarshalStrict(p, &o); err != nil {
+			return nil, errs.Errorf("failed to unmarshal options for plugin %s, %s", name, err.Error())
 		}
 
 		a.Plugins[name] = removeSystem(p)
-		a.PluginsSystemOptions[name] = o.System
+		out[name] = o.System
 	}
 
-	return nil
+	return out, nil
 }
 
 // CutAfterN returns the whole string s, if it is not longer then n runes (not bytes). Otherwise it returns the

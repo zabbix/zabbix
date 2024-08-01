@@ -31,7 +31,7 @@ type Options struct {
 // Configure implements the Configurator interface.
 // Initializes configuration structures.
 func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
-	if err := conf.Unmarshal(options, &p.options, true); err != nil {
+	if err := conf.UnmarshalStrict(options, &p.options); err != nil {
 		p.Errf("cannot unmarshal configuration options: %s", err)
 	}
 
@@ -48,7 +48,7 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 func (p *Plugin) Validate(options interface{}) error {
 	var opts Options
 
-	err := conf.Unmarshal(options, &opts, true)
+	err := conf.UnmarshalStrict(options, &opts)
 	if err != nil {
 		return err
 	}

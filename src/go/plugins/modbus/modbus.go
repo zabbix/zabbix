@@ -198,7 +198,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 // Configure implements the Configurator interface.
 // Initializes configuration structures.
 func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
-	if err := conf.Unmarshal(options, &p.options, true); err != nil {
+	if err := conf.UnmarshalStrict(options, &p.options); err != nil {
 		p.Errf("cannot unmarshal configuration options: %s", err)
 	}
 }
@@ -211,7 +211,7 @@ func (p *Plugin) Validate(options interface{}) error {
 		err  error
 	)
 
-	err = conf.Unmarshal(options, &opts, true)
+	err = conf.UnmarshalStrict(options, &opts)
 	if err != nil {
 		return err
 	}
