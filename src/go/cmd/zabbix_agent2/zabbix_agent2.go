@@ -205,7 +205,7 @@ func run() error {
 
 		// create default configuration for testing options
 		// pass empty string to config arg to trigger this
-		err = conf.Unmarshal([]byte{}, &agent.Options, true)
+		err = conf.UnmarshalStrict([]byte{}, &agent.Options)
 		if err != nil {
 			return errs.Wrap(err, "failed to create default configuration")
 		}
@@ -255,12 +255,12 @@ func run() error {
 		return nil
 	}
 
-	err = agent.Options.LoadSystemOptions()
+	systemOpt, err := agent.Options.LoadSystemOptions()
 	if err != nil {
 		fatalExit("cannot initialize plugin system option", err)
 	}
 
-	pluginSocket, err = initExternalPlugins(&agent.Options)
+	pluginSocket, err = initExternalPlugins(&agent.Options, systemOpt)
 	if err != nil {
 		return errs.Wrap(err, "cannot register plugins")
 	}
@@ -268,7 +268,7 @@ func run() error {
 	defer cleanUpExternal()
 
 	if args.test != "" || args.print || args.testConfig {
-		m, err := prepareMetricPrintManager(args.verbose)
+		m, err := prepareMetricPrintManager(args.verbose, systemOpt)
 		if err != nil {
 			return errs.Wrap(err, "failed to prepare metric print manager")
 		}
@@ -373,7 +373,7 @@ func runAgent(isForeground bool, configPath string) error {
 		return errs.Wrap(err, "cannot initialize user parameters")
 	}
 
-	manager, err = scheduler.NewManager(&agent.Options)
+	manager, err = scheduler.NewManager(&agent.Options, systemOpt)
 	if err != nil {
 		return errs.Wrap(err, "cannot create scheduling manager")
 	}
@@ -652,7 +652,7 @@ func helpMessage(flagsUsage string) string {
 	)
 }
 
-func prepareMetricPrintManager(verbose bool) (*scheduler.Manager, error) {
+func prepareMetricPrintManager(verbose bool, pluginSysOpt agent.PluginSystemOptions) (*scheduler.Manager, error) {
 	level := log.None
 
 	if verbose {
@@ -683,7 +683,7 @@ func prepareMetricPrintManager(verbose bool) (*scheduler.Manager, error) {
 		return nil, zbxerr.New("cannot load os dependent items").Wrap(err)
 	}
 
-	m, err := scheduler.NewManager(&agent.Options)
+	m, err := scheduler.NewManager(&agent.Options, pluginSysOpt)
 	if err != nil {
 		return nil, zbxerr.New("failed to create scheduling manager").Wrap(err)
 	}

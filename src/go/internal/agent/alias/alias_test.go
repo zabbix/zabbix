@@ -67,7 +67,7 @@ func TestGetAlias(t *testing.T) {
 
 	_ = log.Open(log.Console, log.Debug, "", 0)
 	var options agent.AgentOptions
-	_ = conf.Unmarshal([]byte{}, &options, true)
+	_ = conf.UnmarshalStrict([]byte{}, &options)
 	options.Alias = aliases
 
 	if manager, err := NewManager(&options); err == nil {

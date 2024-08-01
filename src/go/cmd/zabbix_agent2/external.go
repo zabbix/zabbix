@@ -32,10 +32,10 @@ type pluginOptions struct {
 	}
 }
 
-func initExternalPlugins(options *agent.AgentOptions) (string, error) {
+func initExternalPlugins(options *agent.AgentOptions, sysOptions agent.PluginSystemOptions) (string, error) {
 	paths := make(map[string]string)
 
-	for name, s := range options.PluginsSystemOptions {
+	for name, s := range sysOptions {
 		// if path is not set it's an internal plugin
 		if s.Path == nil {
 			continue

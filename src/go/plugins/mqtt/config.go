@@ -39,7 +39,7 @@ type Session struct {
 }
 
 func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
-	if err := conf.Unmarshal(options, &p.options, true); err != nil {
+	if err := conf.UnmarshalStrict(options, &p.options); err != nil {
 		p.Warningf("cannot unmarshal configuration options: %s", err)
 	}
 
@@ -51,7 +51,7 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 func (p *Plugin) Validate(options interface{}) error {
 	var o Options
 
-	err := conf.Unmarshal(options, &o, true)
+	err := conf.UnmarshalStrict(options, &o)
 	if err != nil {
 		return errs.Errorf("plugin config validation failed, %s", err.Error())
 	}

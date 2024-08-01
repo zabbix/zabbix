@@ -59,7 +59,7 @@ func (p *Plugin) Period() int {
 
 func (p *Plugin) Configure(global *plugin.GlobalOptions, private interface{}) {
 	p.options.Interval = 10
-	if err := conf.Unmarshal(private, &p.options, true); err != nil {
+	if err := conf.UnmarshalStrict(private, &p.options); err != nil {
 		p.Warningf("cannot unmarshal configuration options: %s", err)
 	}
 	p.Debugf("configure: interval=%d", p.options.Interval)

@@ -71,13 +71,5 @@ type AgentOptions struct {
 	AllowKey interface{} `conf:"optional"`
 	DenyKey  interface{} `conf:"optional"`
 
-	Plugins              map[string]any           `conf:"optional"`
-	PluginsSystemOptions map[string]SystemOptions `conf:"-"`
-}
-
-// SystemOptions holds reserved plugin options.
-type SystemOptions struct {
-	Path                     *string `conf:"optional"`
-	ForceActiveChecksOnStart *int    `conf:"optional"`
-	Capacity                 int     `conf:"optional"`
+	Plugins map[string]any `conf:"optional"`
 }
