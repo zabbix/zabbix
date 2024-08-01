@@ -73,7 +73,7 @@ class CWidgetHostNavigator extends CWidget {
 			return;
 		}
 
-		this.#csrf_token = response._csrf_token;
+		this.#csrf_token = response[CSRF_TOKEN_NAME];
 
 		if (this.#host_navigator === null) {
 			this.clearContents();
@@ -133,7 +133,7 @@ class CWidgetHostNavigator extends CWidget {
 		fetch(curl.getUrl(), {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
-			body: JSON.stringify({is_open, group_identifier, widgetid, _csrf_token: this.#csrf_token})
+			body: JSON.stringify({is_open, group_identifier, widgetid, [CSRF_TOKEN_NAME]: this.#csrf_token})
 		})
 			.then((response) => response.json())
 			.then((response) => {

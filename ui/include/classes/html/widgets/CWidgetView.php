@@ -32,8 +32,8 @@ class CWidgetView extends CObject {
 		return $this;
 	}
 
-	public function addCsrfToken() {
-		$this->setVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('widget'));
+	public function addCsrfToken(): self {
+		$this->setVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('widget'));
 
 		return $this;
 	}
