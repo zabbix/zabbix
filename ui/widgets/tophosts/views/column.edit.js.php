@@ -249,7 +249,6 @@ window.tophosts_column_edit_form = new class {
 		const display_numeric_as_is = document.querySelector('[name=display]:checked')
 			.value == <?= CWidgetFieldColumnsList::DISPLAY_AS_IS ?>;
 		const show_min_max = data_item_value && display_item_as == display_as_numeric && !display_numeric_as_is;
-		const aggregate_function = parseInt(document.getElementById('aggregate_function').value);
 
 		// Update aggregate function options based on item value display type.
 		const aggregation_function_select = document.querySelector('z-select[name=aggregate_function]');
@@ -310,12 +309,11 @@ window.tophosts_column_edit_form = new class {
 			}
 		}
 
+		const aggregate_function = parseInt(document.getElementById('aggregate_function').value);
+
 		// Toggle time period selector visibility and enable/disable state.
 		this.#form.fields.time_period.disabled = !data_item_value || aggregate_function == <?= AGGREGATE_NONE ?>;
-
-		document.querySelectorAll('.js-time_period-data-source').forEach(element => {
-			element.style.display = data_item_value && aggregate_function != <?= AGGREGATE_NONE ?> ? '' : 'none';
-		});
+		this.#form.fields.time_period.hidden = !data_item_value || aggregate_function == <?= AGGREGATE_NONE ?>;
 	}
 
 	submit() {

@@ -273,8 +273,7 @@ $time_period_field_view = (new CWidgetFieldTimePeriodView($data['time_period_fie
 	->setDateFormat(ZBX_FULL_DATE_TIME)
 	->setFromPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
 	->setToPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
-	->setFormName('tophosts_column')
-	->addClass('js-time-period');
+	->setFormName('tophosts_column');
 
 // Advanced configuration.
 $advanced_configuration_fieldset = (new CFormFieldsetCollapsible(_('Advanced configuration')))
