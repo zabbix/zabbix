@@ -411,7 +411,6 @@ run:
 			if c.options.HeartbeatFrequency > 0 {
 				if now.Sub(lastHeartbeat) > time.Second*time.Duration(c.options.HeartbeatFrequency) {
 					c.sendHeartbeatMsg()
-					fmt.Println("HB")
 					lastHeartbeat = time.Now()
 				}
 			}
