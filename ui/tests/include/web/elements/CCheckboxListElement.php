@@ -141,9 +141,9 @@ class CCheckboxListElement extends CElement {
 	 * @inheritdoc
 	 */
 	public function isEnabled($enabled = true) {
-		$xpath = 'xpath:.//input[@type="checkbox"][not(@disabled)]';
+		$all = $this->getCheckboxes();
 
-		return (($this->getCheckboxes()->count() === $this->query($xpath)->count()) === $enabled);
+		return (($all->count() === $all->filter(CElementFilter::ENABLED)->count()) === $enabled);
 	}
 
 	/**
