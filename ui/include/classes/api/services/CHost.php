@@ -910,7 +910,6 @@ class CHost extends CHostGeneral {
 		sort($hostids);
 
 		$tls_fields = ['tls_connect', 'tls_accept', 'tls_issuer', 'tls_subject', 'tls_psk_identity', 'tls_psk'];
-		$tls_values = array_intersect_key($data, array_flip($tls_fields));
 		$db_hosts = $this->get([
 			'output' => ['hostid', 'proxy_hostid', 'host', 'status', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username',
 				'ipmi_password', 'name', 'description', 'inventory_mode'
@@ -919,6 +918,47 @@ class CHost extends CHostGeneral {
 			'editable' => true,
 			'preservekeys' => true
 		]);
+
+		if (array_intersect_key($data, array_flip($tls_fields))) {
+			if (!array_key_exists('tls_connect', $data) || !array_key_exists('tls_accept', $data)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _(
+					'Cannot update host encryption settings. Connection settings for both directions should be specified.'
+				));
+			}
+
+			// Clean PSK fields.
+			if ($data['tls_connect'] != HOST_ENCRYPTION_PSK && !($data['tls_accept'] & HOST_ENCRYPTION_PSK)) {
+				$data += [
+					'tls_psk_identity' => DB::getDefault('hosts', 'tls_psk_identity'),
+					'tls_psk' => DB::getDefault('hosts', 'tls_psk')
+				];
+			}
+			else {
+				$db_hosts_tls_data = DB::select('hosts', [
+					'output' => $tls_fields,
+					'hostids' => array_keys($db_hosts),
+					'preservekeys' => true
+				]);
+
+				foreach ($hosts as &$host) {
+					if (array_key_exists($host['hostid'], $db_hosts_tls_data)) {
+						$db_hosts[$host['hostid']] += $db_hosts_tls_data[$host['hostid']];
+					}
+				}
+				unset($host);
+			}
+
+			// Clean certificate fields.
+			if ($data['tls_connect'] != HOST_ENCRYPTION_CERTIFICATE
+					&& !($data['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE)) {
+				$data += [
+					'tls_issuer' => DB::getDefault('hosts', 'tls_issuer'),
+					'tls_subject' => DB::getDefault('hosts', 'tls_subject')
+				];
+			}
+		}
+
+		$tls_values = array_intersect_key($data, array_flip($tls_fields));
 
 		foreach ($hosts as &$host) {
 			if (!array_key_exists($host['hostid'], $db_hosts)) {
@@ -942,36 +982,6 @@ class CHost extends CHostGeneral {
 
 		// Check connection fields only for massupdate action.
 		if ($tls_values) {
-			if (!array_key_exists('tls_connect', $data) || !array_key_exists('tls_accept', $data)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _(
-					'Cannot update host encryption settings. Connection settings for both directions should be specified.'
-				));
-			}
-
-			// Clean PSK fields.
-			if ($data['tls_connect'] != HOST_ENCRYPTION_PSK && !($data['tls_accept'] & HOST_ENCRYPTION_PSK)) {
-				$data['tls_psk_identity'] = '';
-				$data['tls_psk'] = '';
-			}
-			else {
-				$db_hosts_tls_data = DB::select('hosts', [
-					'output' => $tls_fields,
-					'hostids' => array_keys($db_hosts),
-					'preservekeys' => true
-				]);
-
-				foreach ($db_hosts_tls_data as $hostid => $db_host_tls_data) {
-					$db_hosts[$hostid] += $db_host_tls_data;
-				}
-			}
-
-			// Clean certificate fields.
-			if ($data['tls_connect'] != HOST_ENCRYPTION_CERTIFICATE
-					&& !($data['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE)) {
-				$data['tls_issuer'] = '';
-				$data['tls_subject'] = '';
-			}
-
 			$this->validateEncryption($hosts, $db_hosts);
 		}
 

@@ -550,6 +550,11 @@ class testHost extends CAPITest {
 				'tls_connect' => HOST_ENCRYPTION_PSK,
 				'tls_psk_identity' => 'psk3.example.com',
 				'tls_psk' => 'de4f735c561e5444b0932f7ebd636b85'
+			],
+			[
+				'host' => 'psk4.example.com',
+				'groups' => [['groupid' => ':hostgroup:API tests hosts group']],
+				'tls_connect' => HOST_ENCRYPTION_NONE
 			]
 		];
 
@@ -588,6 +593,54 @@ class testHost extends CAPITest {
 					['hostid' => ':host:psk1.example.com', 'tls_psk_identity' => 'autoregistration']
 				],
 				'expected_error' => 'Incorrect value for field "/1/tls_psk": another value of tls_psk exists for same tls_psk_identity.'
+			],
+			'Field "tls_psk" only default value is allowed when host "tls_connect" != HOST_ENCRYPTION_PSK' => [
+				'host' => [
+					['hostid' => ':host:psk3.example.com', 'tls_psk' => 'de4f735c561e5444b0932f7ebd636b85', 'tls_connect' => HOST_ENCRYPTION_NONE]
+				],
+				'expected_error' => 'Incorrect value for field "tls_psk": should be empty.'
+			],
+			'Field "tls_psk" only default value is allowed when host "tls_accept" != HOST_ENCRYPTION_PSK' => [
+				'host' => [
+					['hostid' => ':host:psk4.example.com', 'tls_psk' => 'de4f735c561e5444b0932f7ebd636b85', 'tls_accept' => HOST_ENCRYPTION_NONE]
+				],
+				'expected_error' => 'Incorrect value for field "tls_psk": should be empty.'
+			],
+			'Field "tls_psk_identity" only default value is allowed when host "tls_connect" != HOST_ENCRYPTION_PSK' => [
+				'host' => [
+					['hostid' => ':host:psk3.example.com', 'tls_psk_identity' => 'psk3.example.com', 'tls_connect' => HOST_ENCRYPTION_NONE]
+				],
+				'expected_error' => 'Incorrect value for field "tls_psk_identity": should be empty.'
+			],
+			'Field "tls_psk_identity" only default value is allowed when host "tls_accept" != HOST_ENCRYPTION_PSK' => [
+				'host' => [
+					['hostid' => ':host:psk4.example.com', 'tls_psk_identity' => 'psk4.example.com', 'tls_accept' => HOST_ENCRYPTION_NONE]
+				],
+				'expected_error' => 'Incorrect value for field "tls_psk_identity": should be empty.'
+			],
+			'Field "tls_issuer" only default value is allowed when host "tls_connect" != HOST_ENCRYPTION_CERTIFICATE' => [
+				'host' => [
+					['hostid' => ':host:psk3.example.com', 'tls_issuer' => 'psk4.example.com', 'tls_connect' => HOST_ENCRYPTION_NONE]
+				],
+				'expected_error' => 'Incorrect value for field "tls_issuer": should be empty.'
+			],
+			'Field "tls_issuer" only default value is allowed when host "tls_accept" != HOST_ENCRYPTION_CERTIFICATE' => [
+				'host' => [
+					['hostid' => ':host:psk4.example.com', 'tls_issuer' => 'psk4.example.com', 'tls_accept' => HOST_ENCRYPTION_NONE]
+				],
+				'expected_error' => 'Incorrect value for field "tls_issuer": should be empty.'
+			],
+			'Field "tls_subject" only default value is allowed when host "tls_connect" != HOST_ENCRYPTION_CERTIFICATE' => [
+				'host' => [
+					['hostid' => ':host:psk3.example.com', 'tls_subject' => 'psk4.example.com', 'tls_connect' => HOST_ENCRYPTION_NONE]
+				],
+				'expected_error' => 'Incorrect value for field "tls_subject": should be empty.'
+			],
+			'Field "tls_subject" only default value is allowed when host "tls_accept" != HOST_ENCRYPTION_CERTIFICATE' => [
+				'host' => [
+					['hostid' => ':host:psk4.example.com', 'tls_subject' => 'psk4.example.com', 'tls_accept' => HOST_ENCRYPTION_NONE]
+				],
+				'expected_error' => 'Incorrect value for field "tls_subject": should be empty.'
 			]
 		];
 	}
@@ -706,6 +759,50 @@ class testHost extends CAPITest {
 					]
 				],
 				'Incorrect value for field "/1/tls_psk": another value of tls_psk exists for same tls_psk_identity.'
+			],
+			'Field "tls_psk" only default value is allowed when host "tls_accept" and "tls_connect" != HOST_ENCRYPTION_PSK' => [
+				[
+					'tls_psk' => '12111111111111111111111111111121',
+					'tls_accept' => HOST_ENCRYPTION_NONE,
+					'tls_connect' => HOST_ENCRYPTION_CERTIFICATE,
+					'hosts' => [
+						['hostid' => ':host:host.massupdate.psk5']
+					]
+				],
+				'expected_error' => 'Incorrect value for field "tls_psk": should be empty.'
+			],
+			'Field "tls_psk_identity" only default value is allowed when host "tls_accept" and "tls_connect" != HOST_ENCRYPTION_PSK' => [
+				[
+					'tls_psk_identity' => 'host.massupdate.psk5',
+					'tls_accept' => HOST_ENCRYPTION_NONE,
+					'tls_connect' => HOST_ENCRYPTION_CERTIFICATE,
+					'hosts' => [
+						['hostid' => ':host:host.massupdate.psk5']
+					]
+				],
+				'expected_error' => 'Incorrect value for field "tls_psk_identity": should be empty.'
+			],
+			'Field "tls_issuer" only default value is allowed when host "tls_accept" and "tls_connect" != HOST_ENCRYPTION_CERTIFICATE' => [
+				[
+					'tls_issuer' => 'host.massupdate.psk5',
+					'tls_accept' => HOST_ENCRYPTION_NONE,
+					'tls_connect' => HOST_ENCRYPTION_NONE,
+					'hosts' => [
+						['hostid' => ':host:host.massupdate.psk5']
+					]
+				],
+				'expected_error' => 'Incorrect value for field "tls_issuer": should be empty.'
+			],
+			'Field "tls_subject" only default value is allowed when host "tls_accept" and "tls_connect" != HOST_ENCRYPTION_CERTIFICATE' => [
+				[
+					'tls_subject' => 'host.massupdate.psk5',
+					'tls_accept' => HOST_ENCRYPTION_NONE,
+					'tls_connect' => HOST_ENCRYPTION_NONE,
+					'hosts' => [
+						['hostid' => ':host:host.massupdate.psk5']
+					]
+				],
+				'expected_error' => 'Incorrect value for field "tls_subject": should be empty.'
 			]
 		];
 	}
