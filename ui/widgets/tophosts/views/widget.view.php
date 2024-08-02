@@ -139,7 +139,7 @@ else {
 						$row[] = (new CCol(
 							(new CButton(null, _('Show')))
 								->addClass(ZBX_STYLE_BTN_LINK)
-								->addClass($column['show_thumbnail'] ? 'btn-thumbnail' : ZBX_STYLE_BTN_LINK)
+								->addClass($column_config['show_thumbnail'] ? 'btn-thumbnail' : ZBX_STYLE_BTN_LINK)
 								->addClass('js-show-binary')
 								->setAttribute('data-alt', $column_config['name'])
 						))
