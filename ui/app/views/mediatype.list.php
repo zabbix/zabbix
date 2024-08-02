@@ -132,10 +132,12 @@ foreach ($data['mediatypes'] as $media_type) {
 
 	if ($media_type['actions']) {
 		foreach ($media_type['actions'] as $action) {
-			$actions[] = (new CLink($action['name']))
-				->addClass('js-action-edit')
-				->setAttribute('data-actionid', $action['actionid'])
-				->setAttribute('data-eventsource', $action['eventsource']);
+			$actions[] = $action['is_editable']
+				? (new CLink($action['name']))
+					->addClass('js-action-edit')
+					->setAttribute('data-actionid', $action['actionid'])
+					->setAttribute('data-eventsource', $action['eventsource'])
+				: $action['name'];
 			$actions[] = ', ';
 		}
 
