@@ -15,6 +15,7 @@
 package external
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"net"
@@ -24,6 +25,7 @@ import (
 	"sync"
 	"time"
 
+	"golang.zabbix.com/sdk/conf"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/plugin"
@@ -54,6 +56,7 @@ type Plugin struct {
 	cmdWait       chan error    // cmd.Wait() result
 	pluginStopped chan struct{} // triggered by plugin.Stop() request
 	broker        *pluginBroker
+	logr          log.Logger
 }
 
 // NewPlugin created a new external plugin accessor instance.
@@ -76,6 +79,7 @@ func NewPlugin(
 		timeout:       timeout,
 		cmdWait:       make(chan error),
 		pluginStopped: make(chan struct{}),
+		logr:          base.Logger, // set as a neat separate field.
 	}
 }
 
@@ -118,7 +122,15 @@ func (p *Plugin) RegisterMetrics(config any) error {
 func (p *Plugin) register() error {
 	p.Debugf("sending register request to plugin %q", p.name)
 
-	resp, err := p.broker.register()
+	resp, err := DoWithResponseAs[comms.RegisterResponse](
+		p.broker,
+		&comms.RegisterRequest{
+			Common: comms.Common{
+				Type: comms.RegisterRequestType,
+			},
+			ProtocolVersion: comms.ProtocolVersion,
+		},
+	)
 	if err != nil {
 		return errs.Wrap(err, "failed to send register request to plugin")
 	}
@@ -170,14 +182,19 @@ func (p *Plugin) startPlugin(initial bool) (<-chan error, error) {
 
 	p.cmd = exec.Command(p.Path, p.socket, strconv.FormatBool(initial)) //nolint:gosec
 
+	b := &bytes.Buffer{}
+	p.cmd.Stderr = b
+	p.cmd.Stdout = b
+
 	err := p.cmd.Start()
 	if err != nil {
 		return nil, errs.Wrapf(err, "failed to start plugin process %q", p.Path)
 	}
 
 	go func() {
-		p.Base.Debugf("plugin process exited")
 		p.cmdWait <- p.cmd.Wait()
+		p.logr.Debugf("plugin process %s exited", p.name)
+		p.logr.Tracef("plugin process %s stderr/out: %s", p.name, b.String())
 	}()
 
 	conn, err := getConnection(p.listener, p.timeout)
@@ -192,14 +209,14 @@ func (p *Plugin) startPlugin(initial bool) (<-chan error, error) {
 		)
 	}
 
-	p.broker = newBroker(p.name, conn, p.timeout, p.socket)
+	p.broker = newBroker(conn, p.timeout, p.logr)
 
 	pluginExit := make(chan error)
 
 	go func() {
 		defer func() {
 			p.Debugf("stoping communications broker")
-			p.broker.stop()
+			p.broker.close()
 		}()
 
 		select {
@@ -256,8 +273,19 @@ func (p *Plugin) killPlugin() error {
 // `start` request is only sent if the plugin also implements the Runner
 // interface.
 func (p *Plugin) Start() {
-	if comms.ImplementsRunner(p.interfaces) {
-		p.broker.start()
+	if !comms.ImplementsRunner(p.interfaces) {
+		return
+	}
+
+	err := p.broker.Do(
+		&comms.StartRequest{
+			Common: comms.Common{
+				Type: comms.StartRequestType,
+			},
+		},
+	)
+	if err != nil {
+		p.logr.Errf("failed to send start request to plugin %s, %s", err.Error())
 	}
 }
 
@@ -265,11 +293,11 @@ func (p *Plugin) Start() {
 func (p *Plugin) Stop() {
 	p.Debugf("sending terminate request")
 
+	// trigger normal exit handling for the plugin process.
 	p.pluginStopped <- struct{}{}
 
-	err := comms.Write(
-		p.broker.conn,
-		comms.TerminateRequest{
+	err := p.broker.Do(
+		&comms.TerminateRequest{
 			Common: comms.Common{
 				Id:   comms.NonRequiredID,
 				Type: comms.TerminateRequestType,
@@ -303,10 +331,21 @@ func (p *Plugin) Configure(
 		}
 	}()
 
-	p.broker.pluginName = p.Name()
+	if !comms.ImplementsConfigurator(p.interfaces) {
+		return
+	}
 
-	if comms.ImplementsConfigurator(p.interfaces) {
-		p.broker.configure(globalOptions, privateOptions)
+	err = p.broker.Do(
+		&comms.ConfigureRequest{
+			Common: comms.Common{
+				Type: comms.ConfigureRequestType,
+			},
+			GlobalOptions:  globalOptions,
+			PrivateOptions: privateOptions,
+		},
+	)
+	if err != nil {
+		p.logr.Errf("failed to send configure request: %s", err.Error())
 	}
 }
 
@@ -314,7 +353,20 @@ func (p *Plugin) Configure(
 func (p *Plugin) Validate(privateOptions any) error {
 	p.Debugf("sending validate request")
 
-	resp, err := p.broker.validate(privateOptions)
+	opts, ok := privateOptions.(*conf.Node)
+	if !ok {
+		return errs.Errorf("unsupported plugin options type %T", privateOptions)
+	}
+
+	resp, err := DoWithResponseAs[comms.ValidateResponse](
+		p.broker,
+		&comms.ValidateRequest{
+			Common: comms.Common{
+				Type: comms.ValidateRequestType,
+			},
+			PrivateOptions: opts,
+		},
+	)
 	if err != nil {
 		return errs.Wrap(err, "failed to send validate request to plugin")
 	}
@@ -328,7 +380,17 @@ func (p *Plugin) Validate(privateOptions any) error {
 
 // Export sends an `export` request to the plugin.
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (any, error) {
-	resp, err := p.broker.export(key, params, ctx.Timeout())
+	resp, err := DoWithResponseAs[comms.ExportResponse](
+		p.broker,
+		&comms.ExportRequest{
+			Common: comms.Common{
+				Type: comms.ExportRequestType,
+			},
+			Key:     key,
+			Params:  params,
+			Timeout: ctx.Timeout(),
+		},
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -340,9 +402,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	return nil, errs.New(resp.Error)
 }
 
-func getConnection(
-	listener net.Listener, timeout time.Duration,
-) (net.Conn, error) {
+func getConnection(listener net.Listener, timeout time.Duration) (net.Conn, error) {
 	var (
 		connC = make(chan net.Conn)
 		errC  = make(chan error)
