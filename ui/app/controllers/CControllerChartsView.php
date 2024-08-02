@@ -48,14 +48,14 @@ class CControllerChartsView extends CControllerCharts {
 
 		if ($ret && $this->hasInput('subfilter_tagnames')) {
 			$tagnames = $this->getInput('subfilter_tagnames', []);
-			$ret = (!$tagnames || count($tagnames) === count(array_filter($tagnames, 'is_string')));
+			$ret = !$tagnames || count($tagnames) == count(array_filter($tagnames, 'is_string'));
 		}
 
 		if ($ret && $this->hasInput('subfilter_tags')) {
 			$tags = $this->getInput('subfilter_tags', []);
 			foreach ($tags as $tag => $values) {
 				if (!is_scalar($tag) || !is_array($values)
-						|| count($values) !== count(array_filter($values, 'is_string'))) {
+						|| count($values) != count(array_filter($values, 'is_string'))) {
 					$ret = false;
 					break;
 				}
