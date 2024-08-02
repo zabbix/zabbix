@@ -131,6 +131,8 @@ foreach ($data['mediatypes'] as $media_type) {
 	$actions = [];
 
 	if ($media_type['actions']) {
+		$action_count_total = (new CSpan($media_type['action_count_total']))->addClass(ZBX_STYLE_ENTITY_COUNT);
+
 		foreach ($media_type['actions'] as $action) {
 			$actions[] = $action['is_editable']
 				? (new CLink($action['name']))
@@ -148,8 +150,6 @@ foreach ($data['mediatypes'] as $media_type) {
 		if ($media_type['action_count_total'] > count($media_type['actions'])) {
 			$actions[] = [', ', HELLIP()];
 		}
-
-		$action_count_total = (new CSpan($media_type['action_count_total']))->addClass(ZBX_STYLE_ENTITY_COUNT);
 	}
 
 	$status = (MEDIA_TYPE_STATUS_ACTIVE == $media_type['status'])
