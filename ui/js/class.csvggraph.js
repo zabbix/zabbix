@@ -94,6 +94,12 @@
 			graph.off('mouseup', makeHintboxStatic);
 			graph.removeData('hintbox');
 			hbox.remove();
+
+			if (graph.observer !== undefined) {
+				graph.observer.disconnect();
+
+				delete graph.observer;
+			}
 		}
 	}
 
@@ -116,10 +122,8 @@
 		if (content) {
 			// Should be put inside hintBoxItem to use functionality of hintBox.
 			graph.hintBoxItem = hintBox.createBox(e, graph, content, '', true, 'top: 0; left: 0',
-				graph.closest('.dashboard-grid-widget-container')
+				graph.closest('.dashboard-grid-widget-container'), false
 			);
-
-			fixHintBox(graph);
 
 			if (graph.data('simpleTriggersHintbox')) {
 				data.isTriggerHintBoxFrozen = true;
@@ -669,10 +673,8 @@
 		if (html !== null) {
 			if (hbox === null) {
 				hbox = hintBox.createBox(e, graph, html, '', false, false,
-					graph.closest('.dashboard-grid-widget-container')
+					graph.closest('.dashboard-grid-widget-container'), false
 				);
-
-				fixHintBox(graph);
 
 				graph
 					.off('mouseup', makeHintboxStatic)
@@ -860,10 +862,8 @@
 		if (html !== null) {
 			if (hbox === null) {
 				hbox = hintBox.createBox(e, graph, html, '', false, false,
-					graph.closest('.dashboard-grid-widget-container')
+					graph.closest('.dashboard-grid-widget-container'), false
 				);
-
-				fixHintBox(graph);
 
 				graph
 					.off('mouseup', makeHintboxStatic)
