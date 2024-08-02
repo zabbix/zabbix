@@ -18,12 +18,16 @@
 #include "zbxcommon.h"
 #include "fatal.h"
 #include "zbxcomms.h"
+#include "zbxthreads.h"
 
 #define ZBX_EXIT_NONE		0
 #define ZBX_EXIT_SUCCESS	1
 #define ZBX_EXIT_FAILURE	2
 
 static int	sig_parent_pid = -1;
+
+static const pid_t	*child_pids = NULL;
+static size_t		child_pid_count = 0;
 
 void	set_sig_parent_pid(int in)
 {
@@ -231,6 +235,9 @@ static void	child_signal_handler(int sig, siginfo_t *siginfo, void *context)
 {
 	SIG_CHECK_PARAMS(sig, siginfo, context);
 
+	if (FAIL == zbx_is_child_pid(siginfo->si_pid, child_pids, child_pid_count))
+		return;
+
 	if (!SIG_PARENT_PROCESS)
 		exit_with_failure();
 
@@ -383,4 +390,10 @@ void	zbx_unblock_signals(const sigset_t *orig_mask)
 void	zbx_set_on_exit_args(void *args)
 {
 	zbx_on_exit_args = args;
+}
+
+void	zbx_set_child_pids(const pid_t *pids, size_t pid_num)
+{
+	child_pids = pids;
+	child_pid_count = pid_num;
 }
