@@ -27,6 +27,7 @@ import (
 	"strconv"
 	"time"
 
+	"golang.zabbix.com/sdk/conf"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/plugin"

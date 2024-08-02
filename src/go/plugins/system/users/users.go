@@ -35,8 +35,7 @@ type Plugin struct {
 }
 
 type Options struct {
-	plugin.SystemOptions `conf:"optional,name=System"`
-	Timeout              int `conf:"optional,range=1:30"`
+	Timeout int `conf:"optional,range=1:30"`
 }
 
 func init() {

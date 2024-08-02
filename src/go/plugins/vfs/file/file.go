@@ -20,6 +20,7 @@
 package file
 
 import (
+	"golang.zabbix.com/sdk/conf"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/plugin"
 	"golang.zabbix.com/sdk/std"
@@ -38,6 +39,7 @@ type Options struct {
 // Plugin -
 type Plugin struct {
 	plugin.Base
+	options Options
 }
 
 func init() {

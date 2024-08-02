@@ -31,8 +31,7 @@ import (
 var impl Plugin
 
 type Options struct {
-	plugin.SystemOptions `conf:"optional,name=System"`
-	Interval             int
+	Interval int
 }
 
 // Plugin -

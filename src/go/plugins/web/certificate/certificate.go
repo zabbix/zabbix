@@ -30,6 +30,7 @@ import (
 	"strings"
 	"time"
 
+	"golang.zabbix.com/sdk/conf"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/plugin"
 	"golang.zabbix.com/sdk/uri"
@@ -81,6 +82,7 @@ type Options struct {
 
 type Plugin struct {
 	plugin.Base
+	options Options
 }
 
 func init() {

@@ -30,6 +30,7 @@ import (
 	"golang.zabbix.com/agent2/internal/agent"
 	"golang.zabbix.com/agent2/pkg/web"
 	"golang.zabbix.com/agent2/pkg/zbxregexp"
+	"golang.zabbix.com/sdk/conf"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/plugin"
 )
@@ -42,6 +43,7 @@ type Options struct {
 
 type Plugin struct {
 	plugin.Base
+	options Options
 }
 
 func init() {

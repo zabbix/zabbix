@@ -402,7 +402,7 @@ func main() {
 		}
 
 		var m *scheduler.Manager
-		if m, err = scheduler.NewManager(&agent.Options); err != nil {
+		if m, err = scheduler.NewManager(&agent.Options, systemOpt); err != nil {
 			fatalExit("cannot create scheduling manager", err)
 		}
 
@@ -508,7 +508,7 @@ func main() {
 		fatalExit("cannot initialize user parameters", err)
 	}
 
-	if manager, err = scheduler.NewManager(&agent.Options); err != nil {
+	if manager, err = scheduler.NewManager(&agent.Options, systemOpt); err != nil {
 		fatalExit("cannot create scheduling manager", err)
 	}
 

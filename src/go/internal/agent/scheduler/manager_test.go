@@ -1918,6 +1918,17 @@ func Test_getPluginCapacity(t *testing.T) {
 			},
 			1000,
 		},
+		{
+			"+defaultCapacity",
+			args{
+				0,
+				500,
+				0,
+				1000,
+				"Test",
+			},
+			500,
+		},
 	}
 
 	for _, tt := range tests {
