@@ -2991,7 +2991,7 @@ static void	jsonobj_index_el_clear(void *v)
  * Purpose: add matched object to the index                                   *
  *                                                                            *
  * Parameters: index   - [IN] the parent object index                         *
- *             name    - [IN] the name of objec to add to index               *
+ *             name    - [IN] the name of object to add to index               *
  *             obj     - [IN] the object to add to index                      *
  *             value   - [IN] the object matched by index path                *
  *                                                                            *
