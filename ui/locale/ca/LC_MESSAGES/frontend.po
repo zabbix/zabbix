@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 5.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-04-01 16:26+0300\n"
-"PO-Revision-Date: 2023-11-04 08:07+0000\n"
+"PO-Revision-Date: 2024-07-27 07:34+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -12928,13 +12928,13 @@ msgstr "Només els Super Admins poden actualitzar grups d'usuaris."
 #: include/classes/api/services/CUser.php:600
 #, c-format
 msgid "Only Super admin or Admin users can update \"%1$s\" parameter."
-msgstr ""
+msgstr "Només els usuaris Super admin o Admins poden actualitzar el paràmetre \"%1$s\"."
 
 #: include/classes/api/services/CUser.php:505
 #: include/classes/api/services/CUser.php:550
 #, c-format
 msgid "Only Super admin users can update \"%1$s\" parameter."
-msgstr ""
+msgstr "Només els usuaris Super admin poden actualitzar el paràmetre \"%1$s\"."
 
 #: include/classes/api/services/CDRule.php:481
 msgid "Only Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 checks can be made unique."

@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 5.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-04-01 16:26+0300\n"
-"PO-Revision-Date: 2024-06-27 02:38+0000\n"
+"PO-Revision-Date: 2024-07-29 23:19+0000\n"
 "Last-Translator: NoYoWiFi <1284524409@qq.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_CN\n"
@@ -12832,13 +12832,13 @@ msgstr "只有超级用户才能更新用户组。"
 #: include/classes/api/services/CUser.php:600
 #, c-format
 msgid "Only Super admin or Admin users can update \"%1$s\" parameter."
-msgstr ""
+msgstr "只有超级管理员或管理员用户才能更新 \"%1$s\" 参数。"
 
 #: include/classes/api/services/CUser.php:505
 #: include/classes/api/services/CUser.php:550
 #, c-format
 msgid "Only Super admin users can update \"%1$s\" parameter."
-msgstr ""
+msgstr "只有超级管理员用户才能更新 \"%1$s\" 参数。"
 
 #: include/classes/api/services/CDRule.php:481
 msgid "Only Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 checks can be made unique."
