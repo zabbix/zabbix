@@ -49,6 +49,7 @@ This template has been tested on:
     GRANT SELECT ON v_$log TO c##zabbix_mon;
     GRANT SELECT ON v_$archive_dest TO c##zabbix_mon;
     GRANT SELECT ON v_$asm_diskgroup TO c##zabbix_mon;
+    GRANT SELECT ON v_$asm_diskgroup_stat TO c##zabbix_mon;
     GRANT SELECT ON DBA_USERS TO c##zabbix_mon;
     ```
     This is needed because the template uses `CDB_*` views to monitor tablespaces from the CDB and different PDBs - the monitoring user therefore needs access to the container data objects on all PDBs.
@@ -75,6 +76,7 @@ This template has been tested on:
     GRANT SELECT ON v_$log TO zabbix_mon;
     GRANT SELECT ON v_$archive_dest TO zabbix_mon;
     GRANT SELECT ON v_$asm_diskgroup TO zabbix_mon;
+    GRANT SELECT ON v_$asm_diskgroup_stat TO zabbix_mon;
     GRANT SELECT ON DBA_USERS TO zabbix_mon;
     ```
     **Important! Ensure that the ODBC connection to Oracle includes the session parameter `NLS_NUMERIC_CHARACTERS= '.,'`. It is important for displaying the float numbers in Zabbix correctly.**
