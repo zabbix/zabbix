@@ -52,6 +52,11 @@ else {
 					case Widget::SHOW_TIMEZONE:
 						$div->addClass('clock-time-zone');
 						$styles = $data['styles']['timezone'];
+
+						if ($clock_data['tzone_format'] == Widget::TIMEZONE_FULL) {
+							$div->addItem([new CSpan(), new CSpan()]);
+						}
+
 						break;
 
 					default:

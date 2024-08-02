@@ -225,16 +225,11 @@ class CWidgetClock extends CWidget {
 			clock_time_zone.textContent = timezone_text;
 		}
 		else {
-			const part1 = document.createElement('span');
-			clock_time_zone.appendChild(part1);
-
-			const part2 = document.createElement('span');
-			clock_time_zone.appendChild(part2);
-
+			const parts = clock_time_zone.querySelectorAll('span');
 			const separator = ' ';
 
-			part1.textContent = timezone_text.substring(0, timezone_text.indexOf(separator));
-			part2.textContent = timezone_text.substring(timezone_text.indexOf(separator) + 1);
+			parts[0].textContent = timezone_text.substring(0, timezone_text.indexOf(separator));
+			parts[1].textContent = timezone_text.substring(timezone_text.indexOf(separator) + 1);
 		}
 	}
 
