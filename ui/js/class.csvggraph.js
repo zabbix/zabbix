@@ -909,19 +909,6 @@
 		return triggers;
 	}
 
-	// Adjust hintBox class - remove or add necessary things.
-	function fixHintBox(target) {
-		if (target.observer !== undefined) {
-			target.observer.disconnect();
-			delete target.observer;
-		}
-
-		if (target.resize_observer !== undefined) {
-			target.resize_observer.disconnect();
-			delete target.resize_observer;
-		}
-	}
-
 	jQuery.fn.svggraph = function(method) {
 		if (methods[method]) {
 			return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
