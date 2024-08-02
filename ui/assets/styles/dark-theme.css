@@ -5241,7 +5241,8 @@ pre, pre a, pre td, pre span {
     .host-dashboard-header-navigation > ul > li,
     .header-navigation > ul > li {
       margin-right: 5px;
-      line-height: 24px; }
+      line-height: 24px;
+      white-space: nowrap; }
       .host-dashboard-header-navigation > ul > li > ul,
       .header-navigation > ul > li > ul {
         display: flex; }
@@ -5254,6 +5255,9 @@ pre, pre a, pre td, pre span {
           .host-dashboard-header-navigation > ul > li > ul.breadcrumbs > li:not(:last-child)::after,
           .header-navigation > ul > li > ul.breadcrumbs > li:not(:last-child)::after {
             content: "/"; }
+    .host-dashboard-header-navigation > ul .wide li > span,
+    .header-navigation > ul .wide li > span {
+      max-width: 500px; }
     .host-dashboard-header-navigation > ul li > span,
     .header-navigation > ul li > span {
       display: inline-block;
@@ -5443,6 +5447,12 @@ form.is-loading {
 .wordbreak {
   white-space: pre-wrap;
   word-break: break-word; }
+
+.line-clamp {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: var(--line-clamp); }
 
 .filter-btn-container {
   position: relative;
@@ -6366,7 +6376,7 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
   min-height: 24px;
   overflow: hidden;
   resize: none;
-  word-break: break-all;
+  word-break: break-word;
   height: 24px;
   line-height: 14px;
   white-space: break-spaces; }

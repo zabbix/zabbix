@@ -280,13 +280,13 @@ class testFormTrigger extends CLegacyWebTest {
 		if (isset($data['constructor'])) {
 			switch ($data['constructor']) {
 				case 'open':
-					$this->zbxTestClickButtonText('Expression constructor');
+					$form->query('button:Expression constructor')->waitUntilClickable()->one()->click();
 					$form->query('id:expression')->waitUntilNotVisible();
 					break;
 				case 'open_close':
-					$this->zbxTestClickButtonText('Expression constructor');
+					$form->query('button:Expression constructor')->waitUntilClickable()->one()->click();
 					$form->query('id:expression')->waitUntilNotVisible();
-					$this->zbxTestClickButtonText('Close expression constructor');
+					$form->query('button:Close expression constructor')->waitUntilClickable()->one()->click();
 					$form->query('id:expression')->waitUntilVisible();
 					break;
 			}

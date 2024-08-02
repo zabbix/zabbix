@@ -102,7 +102,7 @@ static zbx_es_httprequest_t *es_httprequest(duk_context *ctx)
 		return NULL;
 	}
 
-	if (NULL == (request = (zbx_es_httprequest_t *)es_obj_get_data(env)))
+	if (NULL == (request = (zbx_es_httprequest_t *)es_obj_get_data(env, ES_OBJ_HTTPREQUEST)))
 		(void)duk_push_error_object(ctx, DUK_RET_EVAL_ERROR, "cannot find native data attached to object");
 
 	return request;
@@ -121,7 +121,7 @@ static duk_ret_t	es_httprequest_dtor(duk_context *ctx)
 	if (NULL == (env = zbx_es_get_env(ctx)))
 		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot access internal environment");
 
-	if (NULL != (request = (zbx_es_httprequest_t *)es_obj_detach_data(env)))
+	if (NULL != (request = (zbx_es_httprequest_t *)es_obj_detach_data(env, ES_OBJ_HTTPREQUEST)))
 	{
 		env->http_req_objects--;
 
@@ -163,7 +163,7 @@ static duk_ret_t	es_httprequest_ctor(duk_context *ctx)
 
 	request = (zbx_es_httprequest_t *)zbx_malloc(NULL, sizeof(zbx_es_httprequest_t));
 	memset(request, 0, sizeof(zbx_es_httprequest_t));
-	es_obj_attach_data(env, request);
+	es_obj_attach_data(env, request, ES_OBJ_HTTPREQUEST);
 
 	if (NULL == (request->handle = curl_easy_init()))
 	{
@@ -187,7 +187,7 @@ static duk_ret_t	es_httprequest_ctor(duk_context *ctx)
 out:
 	if (-1 != err_index)
 	{
-		(void)es_obj_detach_data(env);
+		(void)es_obj_detach_data(env, ES_OBJ_HTTPREQUEST);
 
 		if (NULL != request->handle)
 			curl_easy_cleanup(request->handle);
@@ -219,7 +219,7 @@ static duk_ret_t	es_httprequest_add_header(duk_context *ctx)
 	if (NULL == (request = es_httprequest(ctx)))
 		return duk_throw(ctx);
 
-	if (SUCCEED != es_duktape_string_decode(duk_to_string(ctx, 0), &utf8))
+	if (SUCCEED != es_duktape_string_decode(duk_safe_to_string(ctx, 0), &utf8))
 	{
 		err_index = duk_push_error_object(ctx, DUK_RET_TYPE_ERROR, "cannot convert header to utf8");
 		goto out;
@@ -299,7 +299,7 @@ static duk_ret_t	es_httprequest_query(duk_context *ctx, const char *http_request
 		goto out;
 	}
 
-	if (SUCCEED != es_duktape_string_decode(duk_to_string(ctx, 0), &url))
+	if (SUCCEED != es_duktape_string_decode(duk_safe_to_string(ctx, 0), &url))
 	{
 		err_index = duk_push_error_object(ctx, DUK_RET_TYPE_ERROR, "cannot convert URL to utf8");
 		goto out;
@@ -486,7 +486,7 @@ static duk_ret_t	es_httprequest_customrequest(duk_context *ctx)
 	if (0 != duk_is_null_or_undefined(ctx, 0))
 		return duk_error(ctx, DUK_RET_EVAL_ERROR, "HTTP method cannot be undefined or null");
 
-	method = duk_to_string(ctx, 0);
+	method = duk_safe_to_string(ctx, 0);
 	duk_remove(ctx, 0);
 
 	return es_httprequest_query(ctx, method);
@@ -506,7 +506,7 @@ static duk_ret_t	es_httprequest_set_proxy(duk_context *ctx)
 	if (NULL == (request = es_httprequest(ctx)))
 		return duk_throw(ctx);
 
-	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_PROXY, duk_to_string(ctx, 0), err);
+	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_PROXY, duk_safe_to_string(ctx, 0), err);
 out:
 	if (-1 != err_index)
 		return duk_throw(ctx);
@@ -752,7 +752,7 @@ static duk_ret_t	es_httprequest_set_httpauth(duk_context *ctx)
 
 	if (0 == duk_is_null_or_undefined(ctx, 1))
 	{
-		if (SUCCEED != es_duktape_string_decode(duk_to_string(ctx, 1), &username))
+		if (SUCCEED != es_duktape_string_decode(duk_safe_to_string(ctx, 1), &username))
 		{
 			err_index = duk_push_error_object(ctx, DUK_RET_TYPE_ERROR, "cannot convert username to utf8");
 			goto out;
@@ -761,7 +761,7 @@ static duk_ret_t	es_httprequest_set_httpauth(duk_context *ctx)
 
 	if (0 == duk_is_null_or_undefined(ctx, 2))
 	{
-		if (SUCCEED != es_duktape_string_decode(duk_to_string(ctx, 2), &password))
+		if (SUCCEED != es_duktape_string_decode(duk_safe_to_string(ctx, 2), &password))
 		{
 			err_index = duk_push_error_object(ctx, DUK_RET_TYPE_ERROR, "cannot convert username to utf8");
 			goto out;

@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-06-25 22:17+0000\n"
-"Last-Translator: Felix Solcher <felix.solcher@proton.me>\n"
+"PO-Revision-Date: 2024-07-05 14:22+0000\n"
+"Last-Translator: Dirk Franz <dirk.franz@dbi-services.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
@@ -208,7 +208,7 @@ msgstr ""
 #: app/views/administration.miscconfig.edit.php:130
 #, c-format
 msgid "%1$s or %2$s - prevents the page from being displayed in a frame, regardless of the site attempting to do so"
-msgstr ""
+msgstr "%1$s oder %2$s - verhindert, dass die Seite in einem Frame angezeigt wird, unabhängig davon, welche Site dies versucht."
 
 #: jsLoader.php:341
 #, c-format
@@ -289,7 +289,7 @@ msgstr "php-Klasse %1$s muss das Modul %2$s unter %3$s erweitern."
 #: app/controllers/CControllerMediatypeEnable.php:105
 #, c-format
 msgid "%1$s: %2$s"
-msgstr ""
+msgstr "%1$s: %2$s"
 
 #: include/classes/graph/CSvgGraph.php:1418
 #, c-format
@@ -338,11 +338,11 @@ msgstr "(erstellt durch Hosterkennung)"
 #: include/views/configuration.item.edit.php:648
 #: include/views/configuration.item.prototype.edit.php:619
 msgid "(legacy) to retrieve a single value synchronously, optionally combined with other values"
-msgstr ""
+msgstr "(Legacy) um einen einzelnen Wert synchron abzurufen, optional kombiniert mit anderen Werten"
 
 #: include/views/configuration.host.discovery.edit.php:553
 msgid "(legacy) to retrieve a subtree in JSON"
-msgstr ""
+msgstr "(Legacy) um einen Teilbaum in JSON abzurufen"
 
 #: app/partials/configuration.host.edit.html.php:133
 msgid "(linked by host discovery)"
@@ -453,7 +453,7 @@ msgstr "API Zugriff"
 
 #: app/views/mfa.edit.php:102
 msgid "API hostname"
-msgstr ""
+msgstr "API-Hostname"
 
 #: app/controllers/CControllerPopupGeneric.php:422
 #: app/views/administration.userrole.edit.php:310
@@ -1112,7 +1112,7 @@ msgstr "Adresse"
 #: app/controllers/CControllerProxyUpdate.php:75
 #: app/views/popup.proxy.edit.php:90
 msgid "Address for active agents"
-msgstr ""
+msgstr "Adresse für aktive Agenten"
 
 #: include/hosts.inc.php:63 include/users.inc.php:53
 msgid "Admin"
@@ -1144,7 +1144,7 @@ msgstr "Erweiterte Optionen"
 #: include/views/configuration.host.discovery.list.php:157
 #: include/views/configuration.host.discovery.list.php:172
 msgid "After"
-msgstr ""
+msgstr "Nach"
 
 #: app/views/js/mfa.edit.js.php:168
 msgid "After this change, users who have already enrolled in this MFA method will have to complete the enrollment process again because TOTP secrets will be reset."
@@ -1211,11 +1211,11 @@ msgstr "Zusammenfassende Funktionen"
 
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:283
 msgid "Aggregates each item in the data set."
-msgstr ""
+msgstr "Aggregiert jedes Element im Datensatz."
 
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:305
 msgid "Aggregates the whole data set."
-msgstr ""
+msgstr "Aggregiert den gesamten Datensatz."
 
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:282
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:384
@@ -1443,7 +1443,7 @@ msgstr "Und/Oder"
 
 #: widgets/gauge/includes/WidgetForm.php:170
 msgid "Angle"
-msgstr ""
+msgstr "Winkel"
 
 #: app/views/popup.sla.edit.php:79 include/classes/helpers/CSlaHelper.php:43
 msgid "Annually"
@@ -1476,7 +1476,7 @@ msgstr "Jeden"
 #: app/views/js/trigger.edit.js.php:886
 #: app/views/js/trigger.massupdate.js.php:67
 msgid "Any changes made in the current form will be lost."
-msgstr ""
+msgstr "Alle im aktuellen Formular vorgenommenen Änderungen gehen verloren."
 
 #: app/views/js/administration.regex.edit.js.php:164
 #: include/classes/helpers/CRegexHelper.php:27
@@ -1485,11 +1485,11 @@ msgstr "Beliebige Zeichenfolge enthalten"
 
 #: app/views/js/popup.import.js.php:109
 msgid "Any existing host entities not present in the import file will be deleted. Click OK to proceed."
-msgstr ""
+msgstr "Alle vorhandenen Host-Entitäten, die nicht in der Importdatei vorhanden sind, werden gelöscht. Klicken Sie auf „OK“, um fortzufahren."
 
 #: app/views/js/popup.import.js.php:106
 msgid "Any existing template entities not present in the import file will be deleted. Click OK to proceed."
-msgstr ""
+msgstr "Alle vorhandenen Vorlagenentitäten, die in der Importdatei nicht vorhanden sind, werden gelöscht. Klicken Sie auf „OK“, um fortzufahren."
 
 # Achtung: Hier ist NICHT die Zabbix "item application" gemeint.
 #: include/classes/core/CJsonRpc.php:225
@@ -1538,7 +1538,7 @@ msgstr "April"
 
 #: widgets/gauge/includes/WidgetForm.php:246
 msgid "Arc background"
-msgstr ""
+msgstr "Arc Hintergrund"
 
 #: widgets/gauge/includes/WidgetForm.php:305
 msgid "Arc size"
@@ -1589,21 +1589,21 @@ msgstr "Inventarnummer"
 
 #: app/partials/configuration.host.edit.html.php:331
 msgid "Assigned proxy"
-msgstr ""
+msgstr "Zugewiesener Proxy"
 
 #: include/classes/helpers/CMaintenanceHelper.php:86
 #, c-format
 msgid "At %1$s %2$s of every %3$s week"
 msgid_plural "At %1$s %2$s of every %3$s weeks"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Um %1$s:%2$s jede %3$s Woche"
+msgstr[1] "Um %1$s:%2$s jede %3$s Woche"
 
 #: include/classes/helpers/CMaintenanceHelper.php:71
 #, c-format
 msgid "At %1$s every %2$s day"
 msgid_plural "At %1$s every %2$s days"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Um %1$s jeden %2$s Tag"
+msgstr[1] "Um %1$s jeden %2$s Tag"
 
 #: include/classes/helpers/CMaintenanceHelper.php:114
 #, c-format
@@ -1625,7 +1625,7 @@ msgstr "Es muss mindestens ein LDAP-Server vorhanden sein."
 
 #: include/classes/api/services/CAuthentication.php:234
 msgid "At least one MFA method must exist."
-msgstr ""
+msgstr "Mindestens eine MFA Methode muss existieren."
 
 #: app/views/administration.userrole.edit.php:137
 msgid "At least one UI element must be checked."
@@ -1658,6 +1658,10 @@ msgstr "Mindestens ein Wochentag oder Tag des Monats muss angegeben werden."
 msgid "At least one host group or host must be selected."
 msgstr "Mindestens eine Host-Gruppe oder ein Host muss ausgewählt sein."
 
+#: include/classes/setup/CFrontendSetup.php:252
+msgid "At least one of MySQL or PostgreSQL should be supported."
+msgstr ""
+
 #: include/classes/setup/CFrontendSetup.php:241
 msgid "At least one of MySQL, PostgreSQL or Oracle should be supported."
 msgstr "Mindestens eine der Datenbanken MySQL, PostgreSQL oder Oracle sollte unterstützt sein."
@@ -1677,7 +1681,7 @@ msgstr "Mindestens ein Parameter „%1$s“ oder „%2$s“ muss aktiviert sein.
 
 #: widgets/gauge/views/widget.edit.php:50
 msgid "At least one parameter must be enabled."
-msgstr ""
+msgstr "Mindestens ein Parameter muss ausgewählt sein."
 
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:283
 msgid "At least one update operation or message is mandatory"
@@ -1876,6 +1880,11 @@ msgstr "Verfügbarkeit"
 #: include/classes/helpers/CRoleHelper.php:423 report2.php:25 report2.php:156
 msgid "Availability report"
 msgstr "Verfügbarkeitsanalyse"
+
+#: app/controllers/CControllerAvailabilityReportTrigger.php:70
+#: app/views/reports.availabilityreport.trigger.php:23
+msgid "Availability report graph"
+msgstr ""
 
 #: include/classes/html/CHostAvailability.php:80
 #: widgets/hostavail/views/widget.view.php:32
@@ -2097,7 +2106,7 @@ msgstr "In den Vordergrund"
 #: app/views/administration.timeouts.edit.php:130
 #: app/views/popup.proxy.edit.php:342 include/items.inc.php:99
 msgid "Browser"
-msgstr ""
+msgstr "Browser"
 
 #: include/locales.inc.php:35
 msgid "Bulgarian (bg_BG)"
@@ -2110,7 +2119,7 @@ msgstr "Nach Host"
 #: app/partials/monitoring.problem.filter.php:154
 #: widgets/problems/includes/WidgetForm.php:137
 msgid "By me"
-msgstr ""
+msgstr "Von mir"
 
 #: report2.php:192
 msgid "By trigger template"
@@ -2166,15 +2175,15 @@ msgstr "CRLF"
 
 #: tests/selenium/modules/module_number_7/Module.php:17
 msgid "CSRF test"
-msgstr ""
+msgstr "CSRF-Test"
 
 #: tests/selenium/modules/module_number_7/views/csrf.form.view.php:25
 msgid "CSRF token test"
-msgstr ""
+msgstr "CSRF-Token-Test"
 
 #: tests/selenium/modules/module_number_7/actions/CsrfFormUpdate.php:35
 msgid "CSRF token validation succeeded."
-msgstr ""
+msgstr "Die Validierung des CSRF-Tokens erfolgreich."
 
 #: include/items.inc.php:1554
 msgid "CSV to JSON"
@@ -2334,7 +2343,7 @@ msgstr "Diagrammprototyp \"%1$s\" darf nicht mehr als einen Datenpunkt vom Typ \
 
 #: widgets/piechart/includes/CWidgetFieldDataSet.php:168
 msgid "Cannot add more than one item with type \"Total\" to the chart."
-msgstr ""
+msgstr "Dem Diagramm kann nicht mehr als ein Element vom Typ „Total“ hinzugefügt werden."
 
 #: sysmaps.php:219
 msgid "Cannot add network map"
@@ -2348,7 +2357,7 @@ msgstr "Kann Proxy nicht hinzufügen"
 #: app/controllers/CControllerProxyGroupCreate.php:42
 #: app/controllers/CControllerProxyGroupCreate.php:74
 msgid "Cannot add proxy group"
-msgstr ""
+msgstr "Proxy Gruppe kann nicht hinzugefügt werden"
 
 #: app/controllers/CControllerRegExCreate.php:41
 #: app/controllers/CControllerRegExCreate.php:72
@@ -2447,7 +2456,7 @@ msgstr "Der Benutzertyp der eigenen Rolle kann nicht geändert werden."
 
 #: httpconf.php:190 httpconf.php:406 items.php:687 items.php:723
 msgid "Cannot clear history and trends"
-msgstr ""
+msgstr "Historie und Trends können nicht gelöscht werden"
 
 #: include/classes/api/services/CDiscoveryRule.php:3834
 msgid "Cannot clone graph prototypes."
@@ -15255,6 +15264,19 @@ msgstr ""
 
 #: app/views/administration.proxygroup.list.php:80
 msgid "Online proxies"
+msgstr ""
+
+#: include/classes/api/services/CUser.php:874
+#: include/classes/api/services/CUser.php:882
+#: include/classes/api/services/CUser.php:889
+#, c-format
+msgid "Only Super admin or Admin users can update \"%1$s\" parameter."
+msgstr ""
+
+#: include/classes/api/services/CUser.php:812
+#: include/classes/api/services/CUser.php:853
+#, c-format
+msgid "Only Super admin users can update \"%1$s\" parameter."
 msgstr ""
 
 #: include/classes/api/services/CDRule.php:509

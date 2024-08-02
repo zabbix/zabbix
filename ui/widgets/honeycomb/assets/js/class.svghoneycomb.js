@@ -224,12 +224,16 @@ class CSVGHoneycomb {
 	 * @param {number} height
 	 */
 	setSize({width, height}) {
-		this.#width = width - this.#padding.horizontal * 2;
-		this.#height = height - this.#padding.vertical * 2;
-
 		this.#svg
 			.attr('width', width)
 			.attr('height', height);
+
+		this.#width = Math.max(0, width - this.#padding.horizontal * 2);
+		this.#height = Math.max(0, height - this.#padding.vertical * 2);
+
+		if (this.#width === 0 || this.#height === 0) {
+			return;
+		}
 
 		this.#adjustSize();
 
@@ -245,6 +249,10 @@ class CSVGHoneycomb {
 	 */
 	setValue({cells}) {
 		this.#cells_data = cells;
+
+		if (this.#width === 0 || this.#height === 0) {
+			return;
+		}
 
 		this.#adjustSize();
 		this.#updateCells();
@@ -1013,8 +1021,8 @@ class CSVGHoneycomb {
 		const cell_min_width = CSVGHoneycomb.CELL_WIDTH_MIN;
 		const cell_min_height = CSVGHoneycomb.CELL_WIDTH_MIN / Math.sqrt(3) * 2;
 
-		const max_rows = Math.floor((height - cell_min_height) / (cell_min_height * .75)) + 1;
-		const max_columns = Math.floor((width - (max_rows > 1 ? cell_min_width / 2 : 0)) / cell_min_width);
+		const max_rows = Math.max(0, Math.floor((height - cell_min_height) / (cell_min_height * .75)) + 1);
+		const max_columns = Math.max(0, Math.floor((width - (max_rows > 1 ? cell_min_width / 2 : 0)) / cell_min_width));
 
 		return {max_rows, max_columns};
 	}

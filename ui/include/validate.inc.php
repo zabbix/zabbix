@@ -323,7 +323,7 @@ function check_field(&$fields, &$field, $checks) {
 		elseif ($flags & P_ACT) {
 			$action = APP::Component()->router->getAction();
 
-			$csrf_token_form = getRequest(CCsrfTokenHelper::CSRF_TOKEN_NAME, '');
+			$csrf_token_form = getRequest(CSRF_TOKEN_NAME, '');
 
 			if (!isRequestMethod('post') || !is_string($csrf_token_form) || $csrf_token_form === ''
 					|| !CCsrfTokenHelper::check($csrf_token_form, $action)) {

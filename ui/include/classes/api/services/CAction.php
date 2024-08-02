@@ -194,9 +194,13 @@ class CAction extends CApiService {
 				'SELECT NULL'.
 				' FROM operations o'.
 				' JOIN opmessage_usr omu ON o.operationid=omu.operationid'.
-				' JOIN users_groups ug ON omu.userid=ug.userid'.
-					' AND '.dbConditionId('ug.usrgrpid', $usrgrpids, true).
 				' WHERE a.actionid=o.actionid'.
+					' AND NOT EXISTS ('.
+						'SELECT NULL'.
+						' FROM users_groups ug'.
+						' WHERE omu.userid=ug.userid'.
+							' AND '.dbConditionId('ug.usrgrpid', $usrgrpids).
+					')'.
 			')';
 
 			// Check permissions of scripts used in operations.

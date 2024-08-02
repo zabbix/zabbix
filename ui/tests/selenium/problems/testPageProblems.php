@@ -212,6 +212,16 @@ class testPageProblems extends CWebTest {
 			}
 		}
 
+		// Check empty overlays.
+		foreach (['Hosts', 'Triggers'] as $field) {
+			$overlay = $filter_form->getField($field)->edit();
+			$this->assertEquals($field, $overlay->getTitle());
+			$this->assertEquals("Filter is not set\nUse the filter to display results",
+					$overlay->query('class:no-data-message')->one()->getText()
+			);
+			$overlay->close();
+		}
+
 		$segmented_radios = [
 			'Show' => ['Recent problems', 'Problems', 'History'],
 			'Acknowledgement status' => ['All', 'Unacknowledged', 'Acknowledged'],

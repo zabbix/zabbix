@@ -4475,4 +4475,22 @@ in:
       throw 0;
 out:
   return: FAIL
+---
+test case: Memory leak with finalizer
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: "a"
+  step:
+    type: ZBX_PREPROC_SCRIPT
+    params: |
+      var req = new HttpRequest();
+
+      req[atob('gkZpbmFsaXplcg==')] = null;
+
+      return 0;
+out:
+  value: "0"
+  return: SUCCEED
 ...

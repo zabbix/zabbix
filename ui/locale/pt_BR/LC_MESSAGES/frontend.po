@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-07-05 00:52+0000\n"
-"Last-Translator: Helder Santana <helder.santana@systemsbr.com.br>\n"
+"PO-Revision-Date: 2024-07-24 12:28+0000\n"
+"Last-Translator: Francys Nivea <francysnivea@hotmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
@@ -957,7 +957,7 @@ msgstr "Adicionar um novo widget"
 
 #: widgets/navtree/Widget.php:34
 msgid "Add child element"
-msgstr ""
+msgstr "Adicionar elemento filho"
 
 #: widgets/navtree/Widget.php:39
 msgid "Add child elements"
@@ -996,7 +996,7 @@ msgstr "Adicionar gatilho de host"
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:260
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:263
 msgid "Add item"
-msgstr ""
+msgstr "Adicionar item"
 
 #: app/partials/massupdate.macros.tab.php:96
 #: app/partials/massupdate.valuemaps.tab.php:38
@@ -1657,6 +1657,10 @@ msgstr "Pelo menos um dia da semana ou do mês deve ser especificado."
 msgid "At least one host group or host must be selected."
 msgstr "Ao menos um grupo de host ou host deve ser selecionado."
 
+#: include/classes/setup/CFrontendSetup.php:252
+msgid "At least one of MySQL or PostgreSQL should be supported."
+msgstr "Deve existir suporte a, pelo menos, MySQL ou PostgreSQL."
+
 #: include/classes/setup/CFrontendSetup.php:241
 msgid "At least one of MySQL, PostgreSQL or Oracle should be supported."
 msgstr "Deve haver suporte para pelo menos um dos seguintes sistemas: MySQL, PostgreSQL ou Oracle."
@@ -1876,6 +1880,11 @@ msgstr "Disponibilidade"
 msgid "Availability report"
 msgstr "Relatório de disponibilidade"
 
+#: app/controllers/CControllerAvailabilityReportTrigger.php:70
+#: app/views/reports.availabilityreport.trigger.php:23
+msgid "Availability report graph"
+msgstr "Graficos do relatório de disponibilidade"
+
 #: include/classes/html/CHostAvailability.php:80
 #: widgets/hostavail/views/widget.view.php:32
 msgid "Available"
@@ -1905,7 +1914,7 @@ msgstr "Evite senhas fáceis de adivinhar"
 
 #: jsLoader.php:172
 msgid "Awaiting data"
-msgstr ""
+msgstr "Aguardando dados"
 
 #: widgets/svggraph/views/widget.edit.php:51
 msgid "Axes"
@@ -5432,7 +5441,7 @@ msgstr "Criar novo"
 
 #: jsLoader.php:372
 msgid "Create new report"
-msgstr ""
+msgstr "Criar novo relatório"
 
 #: app/views/administration.proxy.list.php:239
 msgid "Create proxy"
@@ -6438,11 +6447,11 @@ msgstr "Excluir proxies selecionados?"
 #: app/views/js/administration.proxygroup.list.js.php:88
 #: app/views/popup.proxygroup.edit.php:147
 msgid "Delete selected proxy group?"
-msgstr ""
+msgstr "Excluir grupo de proxy selecionado?"
 
 #: app/views/js/administration.proxygroup.list.js.php:87
 msgid "Delete selected proxy groups?"
-msgstr ""
+msgstr "Excluir grupos de proxy selecionados?"
 
 #: app/views/js/administration.proxy.list.js.php:144
 #: app/views/popup.proxy.edit.php:367
@@ -7363,7 +7372,7 @@ msgstr "Duo Universal Prompt"
 
 #: include/classes/api/services/CUser.php:3493
 msgid "Duo state does not match saved state."
-msgstr "O estado Duo não corresponde ao estado salvo."
+msgstr "O estado duo não corresponde ao estado salvo."
 
 #: include/classes/api/services/CMap.php:614
 #: include/classes/api/services/CMap.php:1076
@@ -8011,7 +8020,7 @@ msgstr "Nome do Evento"
 
 #: app/views/popup.condition.edit.php:672
 msgid "Event name matches Trigger name (with macros expanded) unless a custom Event name is specified in Trigger settings."
-msgstr ""
+msgstr "O nome do evento corresponde ao nome do gatilho (com macros expandidas) a menos que um nome de evento personalizado seja especificado nas configurações do gatilho."
 
 #: include/classes/helpers/CCorrelationHelper.php:55
 msgid "Event tag pair"
@@ -9362,7 +9371,7 @@ msgstr "Home"
 
 #: widgets/honeycomb/Widget.php:29
 msgid "Honeycomb"
-msgstr ""
+msgstr "Honeycomb"
 
 #: widgets/hostavail/includes/WidgetForm.php:56
 #: widgets/problemsbysv/includes/WidgetForm.php:88
@@ -9562,7 +9571,7 @@ msgstr "Elementos do grupo de hosts"
 
 #: jsLoader.php:292
 msgid "Host group is not selected."
-msgstr ""
+msgstr "O grupo de hosts não está selecionado."
 
 #: include/views/monitoring.sysmap.edit.php:168
 msgid "Host group label type"
@@ -9645,7 +9654,7 @@ msgstr "Visão geral do inventário de host"
 
 #: jsLoader.php:289
 msgid "Host is not selected."
-msgstr ""
+msgstr "O host não está selecionado."
 
 #: include/views/monitoring.sysmap.edit.php:183
 msgid "Host label type"
@@ -12527,11 +12536,11 @@ msgstr "Lista de proxies do Zabbix com nome, modo, criptografia, compactação, 
 
 #: include/classes/data/CItemData.php:2877
 msgid "List of Zabbix proxies with name, mode, encryption, compression, version, last seen, host count, item count, required values per second (vps), compatibility (current/outdated/unsupported), timeouts, proxy group name if proxy belongs to group, state (unknown/offline/online). Returns JSON."
-msgstr ""
+msgstr "Lista de proxies Zabbix com nome, modo, criptografia, compressão, versão, último visto, contagem de hosts, contagem de itens, valores necessários por segundo (vps), compatibilidade (atual/desatualizado/não suportado), tempos limite, nome do grupo de proxy se o proxy pertencer a grupo, estado (desconhecido/offline/online). Retorna JSON."
 
 #: include/classes/data/CItemData.php:2905
 msgid "List of Zabbix proxies with name, mode, encryption, compression, version, last seen, host count, item count, required values per second (vps), compatibility (current/outdated/unsupported), timeouts, proxy group name, state (unknown/offline/online). Returns JSON."
-msgstr ""
+msgstr "Lista de proxies Zabbix com nome, modo, criptografia, compactação, versão, último visto, contagem de hosts, contagem de itens, valores necessários por segundo (vps), compatibilidade (atual/desatualizado/sem suporte), tempos limite, nome do grupo de proxy, estado (desconhecido/desligado/ligado). Retorna JSON."
 
 #: include/classes/data/CItemData.php:1559
 msgid "List of block devices and their type. Returns JSON"
@@ -12968,7 +12977,7 @@ msgstr "Tipo de rótulo no elemento do mapa"
 
 #: jsLoader.php:290
 msgid "Map is not selected."
-msgstr ""
+msgstr "O mapa não está selecionado."
 
 #: sysmap.php:128
 msgid "Map is updated! Return to map list?"
@@ -13474,7 +13483,7 @@ msgstr "Tamanho mínimo da senha"
 
 #: app/views/administration.proxygroup.list.php:81
 msgid "Minimum proxies"
-msgstr ""
+msgstr "Proxies mínimos"
 
 #: app/partials/administration.system.info.php:142
 #, c-format
@@ -13575,12 +13584,12 @@ msgstr "Está faltando a chave \"%1$s\" para o host \"%2$s\"."
 
 #: widgets/hostavail/views/widget.view.php:38
 msgid "Mixed"
-msgstr ""
+msgstr "Misturado"
 
 #: widgets/hostavail/views/widget.view.php:39
 msgctxt "compact table header"
 msgid "Mixed"
-msgstr ""
+msgstr "Misturado"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:273
 #: app/views/administration.proxy.list.php:50
@@ -15221,6 +15230,19 @@ msgstr "Online"
 msgid "Online proxies"
 msgstr "Proxies online"
 
+#: include/classes/api/services/CUser.php:874
+#: include/classes/api/services/CUser.php:882
+#: include/classes/api/services/CUser.php:889
+#, c-format
+msgid "Only Super admin or Admin users can update \"%1$s\" parameter."
+msgstr ""
+
+#: include/classes/api/services/CUser.php:812
+#: include/classes/api/services/CUser.php:853
+#, c-format
+msgid "Only Super admin users can update \"%1$s\" parameter."
+msgstr ""
+
 #: include/classes/api/services/CDRule.php:509
 msgid "Only Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 checks can be made unique."
 msgstr "Apenas através de verificações com o agente Zabbix, SNMPv1, SNMPv2 e SNMPv3 pode ser feita a verificação de unicidade."
@@ -15545,7 +15567,7 @@ msgstr "Substituir o período de retenção das estatísticas (médias)"
 
 #: app/views/popup.tabfilter.edit.php:40
 msgid "Override time period selector"
-msgstr ""
+msgstr "Ignorar seletor de período de tempo"
 
 #: app/controllers/CControllerPopupLldOverride.php:90
 #, c-format
@@ -16130,7 +16152,7 @@ msgstr "Ative a diretiva \"allow_url_fopen\"."
 
 #: include/views/mfa.login.php:62
 msgid "Please scan and get your verification code displayed in your authenticator app."
-msgstr ""
+msgstr "Digitalize e obtenha o código de verificação exibido em seu aplicativo de autenticação."
 
 #: jsLoader.php:261
 msgid "Please select two elements"
@@ -16686,7 +16708,7 @@ msgstr "Grupos de proxy"
 
 #: app/partials/configuration.host.edit.html.php:334
 msgid "Proxy is not assigned yet."
-msgstr ""
+msgstr "Proxy ainda não foi atribuído."
 
 #: app/views/popup.proxy.edit.php:59
 msgid "Proxy mode"
@@ -17891,7 +17913,7 @@ msgstr "Comunidade SNMP"
 
 #: include/items.inc.php:1570
 msgid "SNMP get value"
-msgstr ""
+msgstr "Obter valor SNMP"
 
 #: include/views/inventory.host.view.php:65
 msgid "SNMP interfaces"
@@ -18969,11 +18991,11 @@ msgstr "Mostrar"
 
 #: app/views/mfa.edit.php:67
 msgid "Shown as the account name to all MFA users in authenticator apps."
-msgstr ""
+msgstr "Exibido como o nome da conta para todos os usuários de MFA em aplicativos autenticadores."
 
 #: app/views/mfa.edit.php:67
 msgid "Shown as the label to all MFA users in authenticator apps."
-msgstr ""
+msgstr "Exibido como rótulo para todos os usuários de MFA em aplicativos autenticadores."
 
 #: include/classes/html/CHtmlPage.php:148
 msgid "Sidebar control"
@@ -19040,7 +19062,7 @@ msgstr "Linha única"
 
 #: widgets/itemhistory/views/column.edit.php:140
 msgid "Single line - result will be displayed in a single line and truncated to specified length."
-msgstr ""
+msgstr "Linha única - o resultado será exibido em uma única linha e truncado no comprimento especificado."
 
 #: include/hosts.inc.php:364
 msgid "Site ZIP / postal"
@@ -19151,7 +19173,7 @@ msgstr "Informação sobre a arquitetura de software. Retorna: texto"
 
 #: app/partials/administration.system.info.php:96
 msgid "Software update last checked"
-msgstr ""
+msgstr "Atualização de software verificada pela última vez"
 
 #: include/classes/api/managers/CHistoryManager.php:1343
 msgid "Some of the history for this item may be compressed, deletion is not available."
@@ -19288,7 +19310,7 @@ msgstr "Status"
 
 #: include/classes/data/CItemData.php:2912
 msgid "State of proxy group. Returns integer: 0 - unknown; 1 - offline; 2 - recovering; 3 - online; 4 - degrading."
-msgstr ""
+msgstr "Estado do grupo proxy. Retorna inteiro: 0 - desconhecido; 1 - offline; 2 - recuperando; 3 - online; 4 - degradando."
 
 #: include/classes/data/CItemData.php:2855
 msgid "State of proxy memory buffer."
@@ -20313,7 +20335,7 @@ msgstr "O trigger não é mais descoberto e será excluído na próxima vez em q
 
 #: include/views/configuration.host.discovery.edit.php:712
 msgid "The value should be greater than LLD rule update interval."
-msgstr ""
+msgstr "O valor deve ser maior que o intervalo de atualização da regra LLD."
 
 #: include/classes/api/services/CUser.php:3482
 msgid "The verification code was incorrect, please try again."
@@ -20369,7 +20391,7 @@ msgstr "Essa configuração deve ser ativada, pois as tabelas de tendências con
 
 #: widgets/itemhistory/views/column.edit.php:242
 msgid "This setting will display local time instead of the timestamp. \"Show timestamp\" must also be checked in the advanced configuration."
-msgstr ""
+msgstr "Esta configuração exibirá a hora local ao invés do carimbo de data/hora. \"Exibir carimbo de data/hora\" também deve estar selecionado na configuração avançada."
 
 #: include/views/configuration.item.edit.php:129
 #: include/views/configuration.item.prototype.edit.php:114
@@ -20890,7 +20912,7 @@ msgstr "Existe trigger no template \"%1$s\" que possui dependência com trigger 
 
 #: jsLoader.php:291
 msgid "Trigger is not selected."
-msgstr ""
+msgstr "O gatilho não está selecionado."
 
 #: include/views/monitoring.sysmap.edit.php:198
 msgid "Trigger label type"
@@ -21002,11 +21024,10 @@ msgid "Trigger prototype added"
 msgstr "Protótipo de trigger adicionado"
 
 #: app/controllers/CControllerTriggerPrototypeDelete.php:62
-#, fuzzy
 msgid "Trigger prototype deleted"
 msgid_plural "Trigger prototypes deleted"
-msgstr[0] "Protótipo de trigger excluído"
-msgstr[1] "Protótipo de trigger excluído"
+msgstr[0] "Protótipo de gatilho excluído"
+msgstr[1] "Protótipos de gatilhos excluídos"
 
 #: app/controllers/CControllerTriggerMassupdate.php:219
 #: app/controllers/CControllerTriggerPrototypeDisable.php:76
@@ -21046,11 +21067,10 @@ msgstr "Tags de gatilho"
 
 #: app/controllers/CControllerTriggerMassupdate.php:220
 #: app/controllers/CControllerTriggerUpdate.php:147
-#, fuzzy
 msgid "Trigger updated"
 msgid_plural "Triggers updated"
-msgstr[0] "Trigger atualizada"
-msgstr[1] "Trigger atualizada"
+msgstr[0] "Gatilho atualizado"
+msgstr[1] "Gatilhos atualizados"
 
 #: app/controllers/CControllerPopupGeneric.php:227
 #: app/controllers/CControllerPopupGeneric.php:241
@@ -21321,7 +21341,7 @@ msgstr "Não é possível recuperar a versão do TimescaleDB."
 #: include/views/mfa.login.php:65
 #, c-format
 msgid "Unable to scan? You can use %1$s secret key to manually configure your authenticator app:"
-msgstr ""
+msgstr "Não é possível digitalizar? Você pode usar o segredo %1$s para configurar manualmente em seu aplicativo autenticador:"
 
 #: include/classes/db/DbBackend.php:147
 msgid "Unable to select configuration."
@@ -21824,7 +21844,7 @@ msgstr "Use %{ref} no filtro de grupo para fazer referência ao valor desse atri
 
 #: app/views/administration.miscconfig.edit.php:123
 msgid "Use X-Frame-Options HTTP header"
-msgstr ""
+msgstr "Utilize o cabeçalho HTTP X-Frame-Options"
 
 #: app/partials/configuration.host.interface.row.php:222
 msgid "Use combined requests"
@@ -22349,7 +22369,7 @@ msgstr "Estatísticas de gravação do armazenamento de dados da VMware, \"url\"
 
 #: include/classes/data/CItemData.php:1890
 msgid "VMware event log, \"url\" - VMware service URL, \"mode\"- all (default) or skip - skip processing of older data, \"severity\" - filtering is disabled by default or \"error,warning,info,user\" in any combination"
-msgstr ""
+msgstr "Log de eventos VMware, \"url\" - URL do serviço VMware, \"modo\" - todos (default) ou pular - pular o processamento de dados mais antigos, \"severidade\" - a filtragem está desabilitada por padrão ou \"erro, aviso, informações, usuário\" em qualquer combinação"
 
 #: include/classes/data/CItemData.php:1890
 msgid "VMware event log, \"url\" - VMware service URL, \"mode\"- all (default), skip - skip processing of older data"
@@ -22859,7 +22879,7 @@ msgstr "Falha na conexão com o Vault."
 #: include/classes/setup/CSetupWizard.php:843
 #: include/classes/setup/CSetupWizard.php:863
 msgid "Vault prefix"
-msgstr ""
+msgstr "Prefixo do cofre"
 
 #: app/views/administration.miscconfig.edit.php:100
 msgid "Vault provider"
@@ -22948,7 +22968,7 @@ msgstr "Ver como"
 
 #: jsLoader.php:417
 msgid "View related reports"
-msgstr ""
+msgstr "Visualizar relatórios relacionados"
 
 #: include/classes/data/CItemData.php:1735
 msgid "Virtual space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
@@ -23061,11 +23081,10 @@ msgid "Web scenario added"
 msgstr "Cenário web adicionado"
 
 #: httpconf.php:178 httpconf.php:417
-#, fuzzy
 msgid "Web scenario deleted"
 msgid_plural "Web scenarios deleted"
 msgstr[0] "Cenário web excluído"
-msgstr[1] "Cenário web excluído"
+msgstr[1] "Cenários web excluídos"
 
 #: httpconf.php:386
 msgid "Web scenario disabled"
@@ -23162,7 +23181,7 @@ msgstr "O widget é muito pequeno para o número especificado de colunas e linha
 
 #: jsLoader.php:205
 msgid "Widgets"
-msgstr ""
+msgstr "Widgets"
 
 #: graphs.php:39 include/views/configuration.graph.edit.php:100
 #: include/views/configuration.graph.list.php:170
@@ -23291,7 +23310,7 @@ msgstr "Cabeçalho HTTP X-Frame-Options"
 
 #: app/views/administration.miscconfig.edit.php:125
 msgid "X-Frame-Options HTTP header supported values:"
-msgstr ""
+msgstr "Valores suportados pelo cabeçalho HTTP X-Frame-Options:"
 
 #: include/views/js/monitoring.sysmaps.js.php:439
 msgid "X1"
@@ -23491,7 +23510,7 @@ msgstr "Você está autenticado como \"%1$s\"."
 
 #: app/views/mfa.edit.php:46
 msgid "You are not able to choose some of the MFA methods, because PHP CURL extension is not installed on the web server."
-msgstr ""
+msgstr "Não é possível escolher alguns dos métodos MFA, porque a extensão PHP CURL não está instalada no servidor web."
 
 #: app/views/administration.gui.edit.php:69
 #: app/views/administration.user.edit.php:272
@@ -23538,7 +23557,7 @@ msgstr "Você deve logar para ver esta página."
 
 #: jsLoader.php:287
 msgid "You need to have at least one image uploaded to create map element. Images can be uploaded in Administration->General->Images section."
-msgstr ""
+msgstr "Você precisa ter pelo menos uma imagem carregada para criar o elemento do mapa. As imagens podem ser carregadas na seção Administração->Geral->Imagens."
 
 #: include/classes/db/DB.php:133
 msgid "Your database is not working properly. Please wait a few minutes and try to repeat this action. If the problem still persists, please contact system administrator. The problem might be caused by long running transaction or row level lock accomplished by your database management system."
@@ -23758,7 +23777,7 @@ msgstr "um caractere especial"
 #: app/views/administration.miscconfig.edit.php:133
 #, c-format
 msgid "a string of space-separated hostnames; adding %1$s to the list allows the page to be displayed in a frame on the same origin as the page itself"
-msgstr ""
+msgstr "uma lista de nomes de hosts separados por espaço; adicionar %1$s à lista permite que a página seja exibida em um quadro de mesma origem na mesma página"
 
 #: include/classes/validators/CApiInputValidator.php:2989
 msgid "a string, number or null value is expected"
@@ -24283,7 +24302,7 @@ msgstr "não é possível atualizar o parâmetro readonly \"%1$s\" do objeto her
 #: include/classes/api/services/CUser.php:1066
 #, c-format
 msgid "cannot update readonly parameter \"%1$s\" of provisioned user"
-msgstr ""
+msgstr "não é possível atualizar o parâmetro somente leitura \"%1$s\" do usuário provisionado"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:491
 msgid "cbrt() - Cube root"
@@ -24586,7 +24605,7 @@ msgstr "configurações globais de limpeza de dados"
 
 #: include/classes/api/services/CScript.php:726
 msgid "global script execution on Zabbix server is disabled by server configuration"
-msgstr ""
+msgstr "a execução de script global no servidor Zabbix está desabilitada pela configuração do servidor"
 
 #: include/html.inc.php:795 include/html.inc.php:800 include/html.inc.php:805
 msgid "graph"
@@ -24657,7 +24676,7 @@ msgstr "padrão de host"
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:284
 #: widgets/svggraph/views/widget.edit.php:292
 msgid "host patterns"
-msgstr ""
+msgstr "padrões de host"
 
 #: include/classes/api/services/CHostPrototype.php:1249
 msgid "host prototype with the same UUID already exists"
@@ -24698,7 +24717,7 @@ msgstr "incluindo subgrupos"
 #: include/classes/parsers/CIPRangeParser.php:148
 #, c-format
 msgid "incorrect address starting from \"%1$s\""
-msgstr ""
+msgstr "endereço incorreto iniciando em \"%1$s\""
 
 #: include/classes/parsers/C10TriggerExpression.php:525
 msgid "incorrect calculated item formula"
@@ -25426,7 +25445,7 @@ msgstr "padrão"
 #: include/classes/html/widgets/fields/CWidgetFieldHostPatternSelectView.php:32
 #: include/classes/html/widgets/fields/CWidgetFieldPatternSelectView.php:36
 msgid "patterns"
-msgstr ""
+msgstr "padrões"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:878
 msgid "percentile() - Percentile P of a period T"
@@ -25550,7 +25569,7 @@ msgstr "right() - Retorna a contagem de caracteres mais à direita"
 
 #: widgets/navtree/Widget.php:41
 msgid "root"
-msgstr ""
+msgstr "root"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:966
 msgid "round() - Rounds a value to decimal places"
