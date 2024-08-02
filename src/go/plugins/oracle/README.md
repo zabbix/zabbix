@@ -45,6 +45,7 @@ GRANT SELECT ON v_$sgastat TO c##zabbix_mon;
 GRANT SELECT ON v_$log TO c##zabbix_mon;
 GRANT SELECT ON v_$archive_dest TO c##zabbix_mon;
 GRANT SELECT ON v_$asm_diskgroup TO c##zabbix_mon;
+GRANT SELECT ON v_$asm_diskgroup_stat TO c##zabbix_mon;
 GRANT SELECT ON DBA_USERS TO c##zabbix_mon;
 ```
 This is needed because the template uses ```CDB_*``` views to monitor tablespaces from CDB and different PDBs, and, therefore, the monitoring user needs access to the container data objects on all PDBs.
@@ -60,6 +61,7 @@ GRANT SELECT ON DBA_USERS TO zabbix_mon;
 GRANT SELECT ON V_$ACTIVE_SESSION_HISTORY TO zabbix_mon;
 GRANT SELECT ON V_$ARCHIVE_DEST TO zabbix_mon;
 GRANT SELECT ON V_$ASM_DISKGROUP TO zabbix_mon;
+GRANT SELECT ON V_$ASM_DISKGROUP_STAT TO zabbix_mon;
 GRANT SELECT ON V_$DATABASE TO zabbix_mon;
 GRANT SELECT ON V_$DATAFILE TO zabbix_mon;
 GRANT SELECT ON V_$INSTANCE TO zabbix_mon;

@@ -154,10 +154,6 @@ function removeListener(element, eventname, expression, bubbling) {
 }
 
 function cancelEvent(e) {
-	if (!e) {
-		e = window.event;
-	}
-
 	e.stopPropagation();
 	e.preventDefault();
 
@@ -547,6 +543,11 @@ function closeDialogHandler(event) {
 				// Close overlay color picker.
 				case 'color_picker':
 					jQuery.colorpicker('hide');
+					break;
+
+				// Close map/shape overlay.
+				case 'map-window':
+					jQuery('#map-window .btn-overlay-close').trigger('click');
 					break;
 			}
 		}
@@ -1031,7 +1032,7 @@ Function.prototype.bindAsEventListener = function (context) {
 	var method = this, args = Array.prototype.slice.call(arguments, 1);
 
 	return function(event) {
-		return method.apply(context, [event || window.event].concat(args));
+		return method.apply(context, [event].concat(args));
 	};
 };
 

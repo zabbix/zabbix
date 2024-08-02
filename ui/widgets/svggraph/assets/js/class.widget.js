@@ -15,6 +15,8 @@
 
 class CWidgetSvgGraph extends CWidget {
 
+	static DATASET_TYPE_SINGLE_ITEM = 0;
+
 	onInitialize() {
 		this._has_contents = false;
 		this._svg_options = {};
@@ -63,10 +65,40 @@ class CWidgetSvgGraph extends CWidget {
 	}
 
 	getUpdateRequestData() {
-		return {
-			...super.getUpdateRequestData(),
-			has_custom_time_period: this.getFieldsReferredData().has('time_period') ? undefined : 1
-		};
+		const request_data = super.getUpdateRequestData();
+
+		for (const [dataset_key, dataset] of request_data.fields.ds.entries()) {
+			if (dataset.dataset_type != CWidgetSvgGraph.DATASET_TYPE_SINGLE_ITEM) {
+				continue;
+			}
+
+			const dataset_new = {
+				...dataset,
+				itemids: [],
+				color: []
+			};
+
+			for (const [item_index, itemid] of dataset.itemids.entries()) {
+				if (Array.isArray(itemid)) {
+					if (itemid.length === 1) {
+						dataset_new.itemids.push(itemid[0]);
+						dataset_new.color.push(dataset.color[item_index]);
+					}
+				}
+				else {
+					dataset_new.itemids.push(itemid);
+					dataset_new.color.push(dataset.color[item_index]);
+				}
+			}
+
+			request_data.fields.ds[dataset_key] = dataset_new;
+		}
+
+		if (!this.getFieldsReferredData().has('time_period')) {
+			request_data.has_custom_time_period = 1;
+		}
+
+		return request_data;
 	}
 
 	processUpdateResponse(response) {

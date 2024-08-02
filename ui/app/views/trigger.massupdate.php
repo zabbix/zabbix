@@ -21,7 +21,7 @@
 
 // Create form.
 $form = (new CForm())
-	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('trigger')))->removeId())
+	->addItem((new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('trigger')))->removeId())
 	->setId('massupdate-form')
 	->addVar('action', $data['prototype'] ? 'trigger.prototype.massupdate' : 'trigger.massupdate')
 	->addVar('ids', $data['ids'])

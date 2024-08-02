@@ -21,6 +21,7 @@
 #if defined(_WINDOWS) || defined(__MINGW32__)
 #	include "zbxsysinfo.h"
 #	include "zbxwin32.h"
+#	include "../sysinfo.h"
 #	pragma comment(lib, "user32.lib")
 #endif
 

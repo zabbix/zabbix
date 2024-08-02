@@ -34,13 +34,11 @@
 			document.addEventListener('click', (e) => {
 				if (e.target.classList.contains('js-massupdate')) {
 					openMassupdatePopup('template.massupdate', {
-							<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?> :
-								<?= json_encode(CCsrfTokenHelper::get('template')) ?>
-						}, {
-							dialogue_class: 'modal-popup-static',
-							trigger_element: e.target
-						}
-					);
+						[CSRF_TOKEN_NAME]: <?= json_encode(CCsrfTokenHelper::get('template')) ?>
+					}, {
+						dialogue_class: 'modal-popup-static',
+						trigger_element: e.target
+					});
 				}
 				else if (e.target.classList.contains('js-massdelete')) {
 					this.#delete(e.target, Object.keys(chkbxRange.getSelectedIds()), false);
@@ -60,7 +58,7 @@
 			document.getElementById('js-import').addEventListener('click', () => {
 				PopUp("popup.import", {
 					rules_preset: "template",
-					<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>: "<?=CCsrfTokenHelper::get('import') ?>"
+					[CSRF_TOKEN_NAME]: <?= json_encode(CCsrfTokenHelper::get('import')) ?>
 				}, {
 					dialogueid: "popup_import",
 					dialogue_class: "modal-popup-generic"
@@ -136,9 +134,7 @@
 				curl.setArgument('action', 'template.delete');
 			}
 
-			curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
-				<?= json_encode(CCsrfTokenHelper::get('template')) ?>
-			);
+			curl.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('template')) ?>);
 
 			if (!window.confirm(confirmation)) {
 				return;

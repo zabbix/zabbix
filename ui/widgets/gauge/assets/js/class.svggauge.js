@@ -236,8 +236,8 @@ class CSVGGauge {
 		this.#svg.setAttribute('width', `${width}`);
 		this.#svg.setAttribute('height', `${height}`);
 
-		this.#width = width - this.#padding.horizontal * 2;
-		this.#height = height - this.#padding.vertical * 2;
+		this.#width = Math.max(0, width - this.#padding.horizontal * 2);
+		this.#height = Math.max(0, height - this.#padding.vertical * 2);
 
 		this.#g_clip_rect.setAttribute('width', `${this.#width}`);
 		this.#g_clip_rect.setAttribute('height', `${this.#height}`);

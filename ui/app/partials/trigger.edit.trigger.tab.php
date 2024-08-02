@@ -62,7 +62,7 @@ $trigger_form_grid
 
 if ($discovered_trigger) {
 	$trigger_form_grid->addItem([(new CVar('priority', (int) $data['priority']))->removeId()]);
-	$severity = new CSeverity('priority_names', (int) $data['priority'], false);
+	$severity = (new CSeverity('priority_names', (int) $data['priority']))->setReadonly($readonly);
 }
 else {
 	$severity = new CSeverity('priority', (int) $data['priority']);
@@ -156,7 +156,7 @@ $trigger_form_grid->addItem([new CLabel(_('OK event generation'), 'recovery_mode
 		->addValue(_('Recovery expression'), ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION)
 		->addValue(_('None'), ZBX_RECOVERY_MODE_NONE)
 		->setModern()
-		->setEnabled(!$readonly)
+		->setReadonly($readonly)
 	)
 ]);
 
@@ -234,7 +234,7 @@ $trigger_form_grid
 			->addValue(_('Single'), TRIGGER_MULT_EVENT_DISABLED)
 			->addValue(_('Multiple'), TRIGGER_MULT_EVENT_ENABLED)
 			->setModern()
-			->setEnabled(!$readonly)
+			->setReadonly($readonly)
 		)
 	])
 	->addItem([new CLabel(_('OK event closes'), 'correlation_mode'),
@@ -242,7 +242,7 @@ $trigger_form_grid
 			->addValue(_('All problems'), ZBX_TRIGGER_CORRELATION_NONE)
 			->addValue(_('All problems if tag values match'), ZBX_TRIGGER_CORRELATION_TAG)
 			->setModern()
-			->setEnabled(!$readonly)
+			->setReadonly($readonly)
 		))->setId('ok-event-closes')
 	])
 	->addItem([(new CLabel(_('Tag for matching'), 'correlation_tag'))->setAsteriskMark(),
@@ -255,7 +255,7 @@ $trigger_form_grid
 		new CFormField(
 			(new CCheckBox('manual_close', ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED))
 				->setChecked($data['manual_close'] == ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED)
-				->setEnabled(!$readonly)
+				->setReadonly($readonly)
 		)
 	])
 	->addItem([

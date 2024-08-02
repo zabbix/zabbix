@@ -1571,8 +1571,7 @@ zabbix_export:
                   - macro: '{#TYPE}'
                     value: '8'
               operations:
-                - operationobject: ITEM_PROTOTYPE
-                  operator: REGEXP
+                - operator: REGEXP
                   value: 'SSD life left'
                   discover: DISCOVER
         - uuid: dd952ff876134376baef061dc260884c
