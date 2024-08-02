@@ -693,11 +693,11 @@ int	zbx_calculate_macro_function(const char *expression, const zbx_token_func_ma
 	char			**params, *buf = NULL;
 	const char		*ptr;
 	size_t			nparam = 0, param_alloc = 8, buf_alloc = 0, buf_offset = 0, len, sep_pos;
-	int			(*macrofunc)(char **params, size_t nparam, char **out), ret;
+	int			(*macrofunc)(char **params, size_t nparam, char **out), ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 	if (NULL == *out)
-		return FAIL;
+		goto out;
 
 	ptr = expression + func_macro->func.l;
 	len = func_macro->func_param.l - func_macro->func.l;
@@ -729,7 +729,7 @@ int	zbx_calculate_macro_function(const char *expression, const zbx_token_func_ma
 	else if (ZBX_CONST_STRLEN("regrepl") == len && 0 == strncmp(ptr, "regrepl", len))
 		macrofunc = macrofunc_regrepl;
 	else
-		return FAIL;
+		goto out;
 
 	zbx_strncpy_alloc(&buf, &buf_alloc, &buf_offset, expression + func_macro->func_param.l + 1,
 			func_macro->func_param.r - func_macro->func_param.l - 1);
@@ -757,7 +757,7 @@ int	zbx_calculate_macro_function(const char *expression, const zbx_token_func_ma
 
 	zbx_free(params);
 	zbx_free(buf);
-
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(), ret: %s", __func__, zbx_result_string(ret));
 
 	return ret;
