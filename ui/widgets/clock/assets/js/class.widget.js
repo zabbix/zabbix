@@ -293,12 +293,14 @@ class CWidgetClock extends CWidget {
 					ratio_time = ratio_big;
 					min_font_size_time = CWidgetClock.MIN_FONT_SIZE_BIG;
 				}
-				else if (this._show.includes(CWidgetClock.SHOW_DATE) && this._show.includes(CWidgetClock.SHOW_TIMEZONE)) {
+				else if (this._show.includes(CWidgetClock.SHOW_DATE)
+						&& this._show.includes(CWidgetClock.SHOW_TIMEZONE)) {
 					ratio_date = ratio_big;
 					ratio_timezone = ratio_small;
 					min_font_size_date = CWidgetClock.MIN_FONT_SIZE_BIG;
 				}
-				else if (this._show.includes(CWidgetClock.SHOW_TIME) && this._show.includes(CWidgetClock.SHOW_TIMEZONE)) {
+				else if (this._show.includes(CWidgetClock.SHOW_TIME)
+						&& this._show.includes(CWidgetClock.SHOW_TIMEZONE)) {
 					ratio_time = ratio_big;
 					ratio_timezone = ratio_small;
 					min_font_size_time = CWidgetClock.MIN_FONT_SIZE_BIG;
