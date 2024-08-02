@@ -25,6 +25,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"slices"
 	"strings"
 	"unicode"
 
@@ -59,7 +60,7 @@ func (a *AgentOptions) LoadSystemOptions() (PluginSystemOptions, error) {
 
 	for name, p := range a.Plugins {
 		var o pluginOptions
-		if err := conf.UnmarshalStrict(p, &o); err != nil {
+		if err := conf.Unmarshal(p, &o); err != nil {
 			return nil, errs.Errorf("failed to unmarshal options for plugin %s, %s", name, err.Error())
 		}
 
@@ -290,7 +291,7 @@ func removeSystem(privateOptions any) any {
 		for i, v := range root.Nodes {
 			if node, ok := v.(*conf.Node); ok {
 				if node.Name == "System" {
-					root.Nodes = remove(root.Nodes, i)
+					root.Nodes = slices.Delete(root.Nodes, i, i+1)
 
 					return root
 				}
@@ -299,10 +300,4 @@ func removeSystem(privateOptions any) any {
 	}
 
 	return privateOptions
-}
-
-func remove(s []any, i int) []any {
-	s[i] = s[len(s)-1]
-
-	return s[:len(s)-1]
 }
