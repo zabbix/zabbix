@@ -20,7 +20,6 @@
 
 ?>
 (() => {
-const CSRF_TOKEN_NAME = <?= json_encode(CCsrfTokenHelper::CSRF_TOKEN_NAME) ?>;
 const INTERFACE_TYPE_OPT = <?= INTERFACE_TYPE_OPT ?>;
 const ITEM_DELAY_FLEXIBLE = <?= ITEM_DELAY_FLEXIBLE ?>;
 const ITEM_STORAGE_OFF = <?= ITEM_STORAGE_OFF ?>;

@@ -33,7 +33,7 @@ $html_page = (new CHtmlPage())
 					->onClick(
 						'return PopUp("popup.import", {
 							rules_preset: "mediatype", '.
-							CCsrfTokenHelper::CSRF_TOKEN_NAME.': "'. CCsrfTokenHelper::get('import').
+							CSRF_TOKEN_NAME.': "'.CCsrfTokenHelper::get('import').
 						'"},{
 							dialogueid: "popup_import",
 							dialogue_class: "modal-popup-generic"

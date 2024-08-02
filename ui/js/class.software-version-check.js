@@ -52,7 +52,7 @@ class CSoftwareVersionCheck {
 					this.#data.versions = [];
 					this.#data.version = response.version;
 					this.#data.check_hash = response.check_hash;
-					this.#data._csrf_token = response._csrf_token;
+					this.#data.csrf_token = response.csrf_token;
 
 					this.#getCurrentData();
 				}
@@ -96,7 +96,7 @@ class CSoftwareVersionCheck {
 			headers: {'Content-Type': 'application/json'},
 			body: JSON.stringify({
 				versions: this.#data.versions,
-				_csrf_token: this.#data._csrf_token
+				[CSRF_TOKEN_NAME]: this.#data.csrf_token
 			})
 		})
 			.then(response => response.json())
