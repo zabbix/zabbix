@@ -1534,7 +1534,7 @@ class testDashboardPieChartWidget extends testWidgets {
 				foreach ($data_set['items'] as $item) {
 					// Get the correct checkbox in table by knowing only link text;
 					$checkbox_xpath = 'xpath:.//a[text()='.CXPathHelper::escapeQuotes($item['name']).
-							']/../preceding-sibling::td/input[@type="checkbox"]';
+							']/../../preceding-sibling::td/input[@type="checkbox"]';
 					$table->query($checkbox_xpath)->waitUntilPresent()->asCheckbox()->one()->check();
 				}
 
