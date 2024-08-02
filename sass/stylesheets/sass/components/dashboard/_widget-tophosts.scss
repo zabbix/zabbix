@@ -17,10 +17,14 @@ form.dashboard-widget-tophosts {
 
 div.dashboard-widget-tophosts {
 	$bar-gauge-height: 20px;
+	$thumbnail-height: 56px;
 
 	.list-table {
-		th.center {
-			text-align: center;
+		&.show-thumbnail {
+			tbody td {
+				height: $thumbnail-height;
+				vertical-align: middle;
+			}
 		}
 
 		tr[data-hostid] {

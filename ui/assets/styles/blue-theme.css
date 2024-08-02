@@ -5111,8 +5111,9 @@ form.dashboard-widget-tophosts #list_columns .text {
 form.dashboard-widget-tophosts #column {
   max-width: 250px; }
 
-div.dashboard-widget-tophosts .list-table th.center {
-  text-align: center; }
+div.dashboard-widget-tophosts .list-table.show-thumbnail tbody td {
+  height: 56px;
+  vertical-align: middle; }
 div.dashboard-widget-tophosts .list-table tr[data-hostid] {
   cursor: pointer; }
 div.dashboard-widget-tophosts td {
