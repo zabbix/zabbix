@@ -90,7 +90,7 @@ $media_type_table = (new CTableInfo())
 		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $url),
 		make_sorting_header(_('Type'), 'type', $data['sort'], $data['sortorder'], $url),
 		_('Status'),
-		_('Used in actions'),
+		(new CColHeader(_('Used in actions')))->setColSpan(2),
 		_('Details'),
 		_('Action')
 	])
@@ -127,6 +127,7 @@ foreach ($data['mediatypes'] as $media_type) {
 	}
 
 	// action list
+	$action_count_total = '';
 	$actions = [];
 
 	if ($media_type['actions']) {
@@ -143,6 +144,8 @@ foreach ($data['mediatypes'] as $media_type) {
 		if ($media_type['action_count_total'] > count($media_type['actions'])) {
 			$actions[] = [', ', HELLIP()];
 		}
+
+		$action_count_total = (new CSpan($media_type['action_count_total']))->addClass(ZBX_STYLE_ENTITY_COUNT);
 	}
 
 	$status = (MEDIA_TYPE_STATUS_ACTIVE == $media_type['status'])
@@ -174,6 +177,7 @@ foreach ($data['mediatypes'] as $media_type) {
 		(new CCol($name))->addClass(ZBX_STYLE_NOWRAP),
 		CMediatypeHelper::getMediaTypes($media_type['typeid']),
 		$status,
+		(new CCol($action_count_total))->addClass(ZBX_STYLE_CELL_WIDTH),
 		$actions,
 		$details,
 		$test_link
