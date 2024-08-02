@@ -137,7 +137,9 @@ foreach ($data['mediatypes'] as $media_type) {
 					->addClass('js-action-edit')
 					->setAttribute('data-actionid', $action['actionid'])
 					->setAttribute('data-eventsource', $action['eventsource'])
-				: $action['name'];
+					->addClass(ZBX_STYLE_LINK_ALT)
+					->addClass(ZBX_STYLE_GREY)
+				: (new CSpan($action['name']))->addClass(ZBX_STYLE_GREY);
 			$actions[] = ', ';
 		}
 
