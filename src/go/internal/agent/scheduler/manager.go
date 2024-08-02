@@ -965,10 +965,9 @@ func getPluginForceActiveChecks(
 	pluginActiveCheck *int,
 	globalActiveCheck int,
 	pluginName string,
-
-) int {
+) bool {
 	if pluginActiveCheck == nil {
-		return globalActiveCheck
+		return activeCheckToBool(globalActiveCheck)
 	}
 
 	if *pluginActiveCheck > 1 || *pluginActiveCheck < 0 {
@@ -978,10 +977,14 @@ func getPluginForceActiveChecks(
 			*pluginActiveCheck,
 		)
 
-		return globalActiveCheck
+		return activeCheckToBool(globalActiveCheck)
 	}
 
-	return *pluginActiveCheck
+	return activeCheckToBool(*pluginActiveCheck)
+}
+
+func activeCheckToBool(in int) bool {
+	return in == 1
 }
 
 func getPluginInterfaceNames(p plugin.Accessor) string {

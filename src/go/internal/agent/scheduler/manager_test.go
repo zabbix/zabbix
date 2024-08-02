@@ -2016,7 +2016,7 @@ func Test_getPluginForceActiveChecks(t *testing.T) {
 	tests := []struct {
 		name string
 		args args
-		want int
+		want bool
 	}{
 		{
 			"+valid",
@@ -2025,7 +2025,7 @@ func Test_getPluginForceActiveChecks(t *testing.T) {
 				0,
 				"Test",
 			},
-			1,
+			true,
 		},
 		{
 			"activeChecksSetOff",
@@ -2034,7 +2034,7 @@ func Test_getPluginForceActiveChecks(t *testing.T) {
 				1,
 				"Test",
 			},
-			0,
+			false,
 		},
 		{
 			"+globalActiveCheck",
@@ -2043,7 +2043,7 @@ func Test_getPluginForceActiveChecks(t *testing.T) {
 				1,
 				"Test",
 			},
-			1,
+			true,
 		},
 		{
 			"+invalidPluginCheck",
@@ -2052,7 +2052,7 @@ func Test_getPluginForceActiveChecks(t *testing.T) {
 				1,
 				"Test",
 			},
-			1,
+			true,
 		},
 	}
 	for _, tt := range tests {
