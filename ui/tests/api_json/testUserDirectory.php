@@ -1075,7 +1075,11 @@ class testUserDirectory extends CAPITest {
 			'usergroup.delete' => array_values(self::$data['usrgrpid']),
 			'userdirectory.delete' => array_values(self::$data['userdirectoryid'])
 		]);
-		CDataHelper::call('authentication.update', ['ldap_userdirectoryid' => 0]);
+		CDataHelper::call('authentication.update', [
+			'ldap_userdirectoryid' => 0,
+			'ldap_auth_enabled' => ZBX_AUTH_LDAP_DISABLED,
+			'saml_auth_enabled' => ZBX_AUTH_SAML_DISABLED
+		]);
 
 		foreach ($api_ids as $api => $ids) {
 			CDataHelper::call($api, $ids);
