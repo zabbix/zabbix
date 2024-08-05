@@ -60,6 +60,7 @@ window.widget_tophosts_form = new class {
 
 	#processColumnsAction(e) {
 		const target = e.target;
+		const form_fields = getFormFields(this.#form);
 
 		let column_popup;
 
@@ -69,7 +70,11 @@ window.widget_tophosts_form = new class {
 
 				column_popup = PopUp(
 					'widget.tophosts.column.edit',
-					{templateid: this.#templateid},
+					{
+						templateid: this.#templateid,
+						groupids: form_fields.groupids,
+						hostids: form_fields.hostids
+					},
 					{
 						dialogueid: 'tophosts-column-edit-overlay',
 						dialogue_class: 'modal-popup-generic'
@@ -81,8 +86,6 @@ window.widget_tophosts_form = new class {
 				break;
 
 			case 'edit':
-				const form_fields = getFormFields(this.#form);
-
 				this.#column_index = target.closest('tr').querySelector('[name="sortorder[columns][]"]').value;
 
 				column_popup = PopUp(
@@ -90,7 +93,9 @@ window.widget_tophosts_form = new class {
 					{
 						...form_fields.columns[this.#column_index],
 						edit: 1,
-						templateid: this.#templateid
+						templateid: this.#templateid,
+						groupids: form_fields.groupids,
+						hostids: form_fields.hostids
 					}, {
 						dialogueid: 'tophosts-column-edit-overlay',
 						dialogue_class: 'modal-popup-generic'

@@ -50,7 +50,7 @@ window.tophosts_column_edit_form = new class {
 	 */
 	#item_value_type;
 
-	init({form_id, thresholds, highlights, colors}) {
+	init({form_id, thresholds, highlights, colors, groupids, hostids}) {
 		this.#overlay = overlays_stack.getById('tophosts-column-edit-overlay');
 		this.#dialogue = this.#overlay.$dialogue[0];
 		this.#form = document.getElementById(form_id);
@@ -68,7 +68,7 @@ window.tophosts_column_edit_form = new class {
 			if (ms_item_data.length > 0) {
 				this.#overlay.setLoading();
 
-				this.#promiseGetItemType(ms_item_data[0].name)
+				this.#promiseGetItemType(ms_item_data[0].name, groupids, hostids)
 					.then((type) => {
 						if (this.#form.isConnected) {
 							this.#item_value_type = type;
@@ -183,13 +183,13 @@ window.tophosts_column_edit_form = new class {
 	 * Fetch type of item by item name.
 	 *
 	 * @param {string|null} name
-	 * @param {number|null} groupid  Host group id from widget main configuration form fields.
-	 * @param {number|null} hostid   Host id from widget main configuration form fields.
+	 * @param {array|null} groupids  Host group ids from widget main configuration form fields.
+	 * @param {array|null} hostids   Host ids from widget main configuration form fields.
 	 *
 	 * @return {Promise<any>}  Resolved promise will contain item type of first found item of such name,
 	 *                         or null in case of error or if no item is currently selected.
 	 */
-	#promiseGetItemType(name, groupid = null, hostid = null) {
+	#promiseGetItemType(name, groupids = null, hostids = null) {
 		if (name === null) {
 			return Promise.resolve(null);
 		}
@@ -199,8 +199,8 @@ window.tophosts_column_edit_form = new class {
 		curl.setArgument('method', 'item_value_type_by_name.get');
 		curl.setArgument('type', <?= PAGE_TYPE_TEXT_RETURN_JSON ?>);
 		curl.setArgument('name', name);
-		curl.setArgument('groupid', groupid);
-		curl.setArgument('hostid', hostid);
+		curl.setArgument('groupids', groupids);
+		curl.setArgument('hostids', hostids);
 
 		return fetch(curl.getUrl())
 			.then((response) => response.json())

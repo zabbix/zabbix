@@ -52,6 +52,8 @@ class ColumnEdit extends CController {
 			'aggregate_function' =>	'int32',
 			'time_period' =>		'array',
 			'history' =>			'int32',
+			'groupids' =>           'array',
+			'hostids' =>            'array',
 			'edit' =>				'in 1',
 			'update' =>				'in 1',
 			'templateid' =>			'string'

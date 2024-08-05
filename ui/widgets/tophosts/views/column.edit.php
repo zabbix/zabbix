@@ -335,7 +335,9 @@ $form
 				'form_id' => $form->getId(),
 				'thresholds' => $data['thresholds'],
 				'highlights' => $data['highlights'],
-				'colors' => $data['colors']
+				'colors' => $data['colors'],
+				'groupids' => $data['groupids'],
+				'hostids' => $data['hostids']
 			], JSON_THROW_ON_ERROR).');
 		'))->setOnDocumentReady()
 	);
