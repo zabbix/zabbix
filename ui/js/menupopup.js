@@ -1089,7 +1089,7 @@ function getMenuPopupItem(options) {
 			config_urls.push({
 				label: t('Host'),
 				clickCallback: (e) => {
-					action === 'latest.view' ? view.editHost(options.hostid) : view.editHost(e, options.hostid);
+					action === 'item.list' ? view.editHost(e, options.hostid) : view.editHost(options.hostid);
 				}
 			});
 		}
