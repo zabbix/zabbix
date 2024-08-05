@@ -258,6 +258,21 @@ AC_CHECK_HEADERS(libperfstat.h, [], [], [
 #endif
 ])
 
+AC_TYPE_INT16_T
+AC_TYPE_INT32_T
+AC_TYPE_INT64_T
+AC_TYPE_INT8_T
+AC_TYPE_MODE_T
+AC_TYPE_OFF_T
+AC_TYPE_PID_T
+AC_TYPE_SIZE_T
+AC_TYPE_SSIZE_T
+AC_TYPE_UID_T
+AC_TYPE_UINT16_T
+AC_TYPE_UINT32_T
+AC_TYPE_UINT64_T
+AC_TYPE_UINT8_T
+
 dnl Kluge for building wihout pkg-config
 m4_ifdef([PKG_PROG_PKG_CONFIG], [], [ AC_DEFUN([PKG_PROG_PKG_CONFIG], []) ])
 
@@ -313,8 +328,6 @@ esac
 if test "x$largefile" = "xyes"; then
 	AC_SYS_LARGEFILE
 fi
-
-AC_TYPE_PID_T
 
 AC_MSG_CHECKING(for socklen_t)
 AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
