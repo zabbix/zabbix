@@ -17,7 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package cpu
+package stats
 
 /*
 #include <unistd.h>
@@ -40,6 +40,8 @@ const (
 	procStatLocation = "/proc/stat"
 )
 
+var impl Plugin
+
 // Plugin -
 type Plugin struct {
 	plugin.Base
@@ -56,6 +58,10 @@ func init() {
 	if err != nil {
 		panic(errs.Wrap(err, "failed to register metrics"))
 	}
+}
+
+func (p *Plugin) Period() int {
+	return 1
 }
 
 func (p *Plugin) getCpuLoad(params []string) (result interface{}, err error) {
@@ -122,8 +128,8 @@ func (p *Plugin) Collect() (err error) {
 		slot.counters[counterUser] -= slot.counters[counterGcpu]
 		slot.counters[counterNice] -= slot.counters[counterGnice]
 
-		if cpu.tail = cpu.tail.inc(); cpu.tail == cpu.head {
-			cpu.head = cpu.head.inc()
+		if cpu.tail = cpu.tail.inc(maxHistory); cpu.tail == cpu.head {
+			cpu.head = cpu.head.inc(maxHistory)
 		}
 	}
 	return nil

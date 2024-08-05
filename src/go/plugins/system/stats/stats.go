@@ -17,7 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package cpu
+package stats
 
 import (
 	"encoding/json"
@@ -27,9 +27,7 @@ import (
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
-const pluginName = "Cpu"
-
-var impl Plugin
+const pluginName = "Stats"
 
 const (
 	maxHistory = 60*15 + 2
@@ -45,23 +43,42 @@ var cpuStatuses [3]string = [3]string{"", "offline", "online"}
 type cpuCounter int
 type historyIndex int
 
-func (h historyIndex) inc() historyIndex {
+func (h historyIndex) inc(interval int) historyIndex {
 	h++
-	if h == maxHistory {
+	if int(h) == interval {
 		h = 0
 	}
+
 	return h
 }
 
-func (h historyIndex) dec() historyIndex {
+func (h historyIndex) dec(interval int) historyIndex {
 	h--
-	if h < 0 {
-		h = maxHistory - 1
+	if int(h) < 0 {
+		h = historyIndex(interval - 1)
+	}
+
+	return h
+}
+
+func (h historyIndex) sub(value historyIndex, interval int) historyIndex {
+	h -= value
+	for h < 0 {
+		h += historyIndex(interval)
 	}
 	return h
 }
 
-func (h historyIndex) sub(value historyIndex) historyIndex {
+func (h historyIndex) sub2(value, interval int) historyIndex {
+	h -= historyIndex(value)
+	for int(h) < 0 {
+		h += historyIndex(interval)
+	}
+
+	return h
+}
+
+func (h historyIndex) sub3(value historyIndex) historyIndex {
 	h -= value
 	for h < 0 {
 		h += maxHistory
@@ -79,10 +96,6 @@ type cpuUnit struct {
 type cpuDiscovery struct {
 	Number int    `json:"{#CPU.NUMBER}"`
 	Status string `json:"{#CPU.STATUS}"`
-}
-
-func (p *Plugin) Period() int {
-	return 1
 }
 
 func (p *Plugin) getCpuDiscovery(params []string) (result interface{}, err error) {
