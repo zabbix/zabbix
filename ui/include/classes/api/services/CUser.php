@@ -478,7 +478,6 @@ class CUser extends CApiService {
 		self::checkOwnAlias($user, $db_user);
 		self::checkOwnType($user, $db_user);
 		self::checkOwnUserGroups($user);
-		self::checkOwnMedia($user);
 	}
 
 	private static function getOwnUser(array $users): ?array {
@@ -550,55 +549,6 @@ class CUser extends CApiService {
 					_s('Only Super admin users can update "%1$s" parameter.', 'usrgrps')
 				);
 			}
-		}
-	}
-
-	private static function checkOwnMedia(array $user): void {
-		if (self::$userData['type'] != USER_TYPE_ZABBIX_USER || !array_key_exists('user_medias', $user)) {
-			return;
-		}
-
-		$db_medias = DB::select('media', [
-			'output' => ['mediatypeid', 'sendto', 'active', 'severity', 'period'],
-			'filter' => ['userid' => $user['userid']]
-		]);
-
-		foreach ($user['user_medias'] as $media) {
-			$media['sendto'] = implode("\n", $media['sendto']);
-
-			$media += [
-				'active' => DB::getDefault('media', 'active'),
-				'severity' => DB::getDefault('media', 'severity'),
-				'period' => DB::getDefault('media', 'period')
-			];
-
-			$db_media_found = false;
-
-			foreach ($db_medias as $i => $db_media) {
-				$match = bccomp($media['mediatypeid'], $db_media['mediatypeid']) == 0
-					&& $media['sendto'] === $db_media['sendto']
-					&& $media['active'] == $db_media['active']
-					&& $media['severity'] == $db_media['severity']
-					&& $media['period'] === $db_media['period'];
-
-				if ($match) {
-					$db_media_found = true;
-					unset($db_medias[$i]);
-					break;
-				}
-			}
-
-			if (!$db_media_found) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Only Super admin or Admin users can update "%1$s" parameter.', 'user_medias')
-				);
-			}
-		}
-
-		if ($db_medias) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Only Super admin or Admin users can update "%1$s" parameter.', 'user_medias')
-			);
 		}
 	}
 
