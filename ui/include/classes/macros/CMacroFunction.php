@@ -191,14 +191,18 @@ class CMacroFunction {
 		}
 
 		// Add missing characters if length of searchlist and replacementlist is not identical.
-		if (strlen($searchlist) > strlen($replacementlist)) {
-			$replacementlist = str_pad($replacementlist, strlen($searchlist), substr($replacementlist, -1));
+		$searchlist_length = mb_strlen($searchlist);
+		$replacementlist_length = mb_strlen($replacementlist);
+
+		if ($searchlist_length > $replacementlist_length) {
+			$last_char = mb_substr($replacementlist, -1, 1);
+			$replacementlist .= str_repeat($last_char, $searchlist_length - $replacementlist_length);
 		}
-		elseif (strlen($replacementlist) > strlen($searchlist)) {
-			$replacementlist = substr($replacementlist, 0, strlen($searchlist));
+		elseif ($replacementlist_length > $searchlist_length) {
+			$replacementlist = mb_substr($replacementlist, 0, $searchlist_length);
 		}
 
-		return strtr($value, $searchlist, $replacementlist);
+		return strtr($value, array_combine(mb_str_split($searchlist), mb_str_split($replacementlist)));
 	}
 
 	/**
