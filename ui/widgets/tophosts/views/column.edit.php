@@ -337,7 +337,7 @@ $form
 				'highlights' => $data['highlights'],
 				'colors' => $data['colors'],
 				'groupids' => array_key_exists('groupids', $data) ? $data['groupids'] : [],
-				'hostids' => array_key_exists('hostids', $data) ? $data['hostids'] : [],
+				'hostids' => array_key_exists('hostids', $data) ? $data['hostids'] : []
 			], JSON_THROW_ON_ERROR).');
 		'))->setOnDocumentReady()
 	);
