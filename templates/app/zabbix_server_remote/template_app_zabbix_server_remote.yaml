@@ -2719,7 +2719,7 @@ zabbix_export:
                       value: '1'
                     - type: STRING
                       name: reference
-                      value: AAACE
+                      value: AAACF
                     - type: INTEGER
                       name: show_problems
                       value: '1'
@@ -3369,7 +3369,7 @@ zabbix_export:
                       value: '1'
                     - type: STRING
                       name: reference
-                      value: AAABG
+                      value: AAABI
                     - type: INTEGER
                       name: show_problems
                       value: '1'
