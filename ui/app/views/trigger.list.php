@@ -293,7 +293,7 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 	if ($data['show_info_column']) {
 		$info_icons = [];
 		if ($trigger['status'] == TRIGGER_STATUS_ENABLED && $trigger['error']) {
-			$info_icons[] = makeErrorIcon((new CDiv($trigger['error']))->addClass(ZBX_STYLE_WORDWRAP));
+			$info_icons[] = makeErrorIcon((new CDiv($trigger['error']))->addClass(ZBX_STYLE_WORDBREAK));
 		}
 
 		if (array_key_exists('status', $trigger['triggerDiscovery'])
@@ -314,6 +314,7 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 
 	// hosts
 	$hosts = null;
+
 	if ($data['single_selected_hostid'] == 0) {
 		foreach ($trigger['hosts'] as $hostid => $host) {
 			if (!empty($hosts)) {
@@ -324,6 +325,8 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 				->setAttribute('data-hostid', $host['hostid'])
 				->addClass('js-edit-'.$data['context']);
 		}
+
+		$hosts = (new CCol($hosts))->addClass(ZBX_STYLE_WORDBREAK);
 	}
 
 	if ($trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
@@ -350,9 +353,9 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 		CSeverityHelper::makeSeverityCell((int) $trigger['priority']),
 		$data['show_value_column'] ? $trigger_value : null,
 		$hosts,
-		$description,
-		$trigger['opdata'],
-		(new CDiv($expression))->addClass(ZBX_STYLE_WORDWRAP),
+		(new CCol($description))->addClass(ZBX_STYLE_WORDBREAK),
+		(new CCol($trigger['opdata']))->addClass(ZBX_STYLE_WORDBREAK),
+		(new CDiv($expression))->addClass(ZBX_STYLE_WORDBREAK),
 		(new CDiv([
 			$status,
 			$disabled_by_lld ? makeDescriptionIcon(_('Disabled automatically by an LLD rule.')) : null
@@ -409,7 +412,7 @@ $html_page
 		'checkbox_hash' => $data['checkbox_hash'],
 		'checkbox_object' => 'g_triggerid',
 		'context' => $data['context'],
-		'token' => [CCsrfTokenHelper::CSRF_TOKEN_NAME => CCsrfTokenHelper::get('trigger')]
+		'token' => [CSRF_TOKEN_NAME => CCsrfTokenHelper::get('trigger')]
 	]).');
 '))
 	->setOnDocumentReady()

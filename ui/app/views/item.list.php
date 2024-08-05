@@ -132,7 +132,7 @@ foreach ($data['items'] as $item) {
 						_('Recovery'), ': ', $trigger['recovery_expression']
 					]
 					: $trigger['expression']
-			))->addClass(ZBX_STYLE_WORDWRAP),
+			))->addClass(ZBX_STYLE_WORDBREAK),
 			(new CSpan(triggerIndicator($trigger['status'], $trigger['state'])))
 				->addClass(triggerIndicatorStyle($trigger['status'], $trigger['state']))
 		]);
@@ -333,7 +333,7 @@ $confirm_messages = [
 		'field_switches' => CItemData::filterSwitchingConfiguration(),
 		'form_name' => $form->getName(),
 		'hostids' => $data['filter_data']['filter_hostids'],
-		'token' => [CCsrfTokenHelper::CSRF_TOKEN_NAME => CCsrfTokenHelper::get('item')]
+		'token' => [CSRF_TOKEN_NAME => CCsrfTokenHelper::get('item')]
 	]).');
 '))
 	->setOnDocumentReady()

@@ -731,7 +731,7 @@ class CSvgGraph extends CSvg {
 
 		$offset_top = 10;
 		$offset_bottom = self::SVG_GRAPH_X_AXIS_HEIGHT;
-		$this->canvas_height = $this->height - $offset_top - $offset_bottom;
+		$this->canvas_height = max(0, $this->height - $offset_top - $offset_bottom);
 		$this->canvas_y = $offset_top;
 
 		// Determine units for left side.
@@ -790,8 +790,9 @@ class CSvgGraph extends CSvg {
 
 		// Calculate vertical scale parameters for right side.
 
-		if ($this->left_y_min_calculated && $this->left_y_max_calculated) {
-			$rows_min = $rows_max = $result['rows'];
+		if ($this->show_left_y_axis && $this->left_y_min_calculated && $this->left_y_max_calculated) {
+			$rows_min = $result['rows'];
+			$rows_max = $result['rows'];
 		}
 
 		$this->right_y_min_calculated = $this->right_y_min === null;
@@ -842,7 +843,7 @@ class CSvgGraph extends CSvg {
 			}
 		}
 
-		$this->canvas_width = $this->width - $this->offset_left - $this->offset_right;
+		$this->canvas_width = max(0, $this->width - $this->offset_left - $this->offset_right);
 		$this->canvas_x = $this->offset_left;
 
 		// Calculate vertical zero position.

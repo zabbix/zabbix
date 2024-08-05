@@ -202,9 +202,9 @@
 		}
 
 		#massupdate(target) {
-			openMassupdatePopup('trigger.massupdate', { <?= json_encode(CCsrfTokenHelper::CSRF_TOKEN_NAME) ?>:
-					<?= json_encode(CCsrfTokenHelper::get('trigger')) ?>
-				}, {
+			openMassupdatePopup('trigger.massupdate', {
+				[CSRF_TOKEN_NAME]: <?= json_encode(CCsrfTokenHelper::get('trigger')) ?>
+			}, {
 				dialogue_class: 'modal-popup-static',
 				trigger_element: target
 			});
