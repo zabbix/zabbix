@@ -148,7 +148,7 @@ class testItemTest extends CWebTest {
 			 * its form should be opened again.
 			 */
 			if ($check_now) {
-				$this->query('link', $item_name)->waitUntilClickable()->one()->click();
+				$this->page->open($saved_link.$itemid);
 				$this->assertTrue($this->query('id:check_now')->waitUntilVisible()->one()->isEnabled($enabled));
 			}
 		}
