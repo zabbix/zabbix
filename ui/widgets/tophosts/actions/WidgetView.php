@@ -193,7 +193,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				$master_entities_min = end($master_entity_values);
 				$master_entities_max = reset($master_entity_values);
 			}
-			else {
+			elseif ($master_column['display_item_as'] != CWidgetFieldColumnsList::DISPLAY_VALUE_AS_BINARY) {
 				natcasesort($master_entity_values);
 			}
 		}
