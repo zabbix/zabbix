@@ -4135,7 +4135,6 @@ static void	DCsync_triggers(zbx_dbsync_t *sync, zbx_uint64_t revision)
 				&found, uniq);
 
 		/* store new information in trigger structure */
-		
 		trigger->flags = flags;
 
 		dc_strpool_replace(found, &trigger->description, row[1]);
