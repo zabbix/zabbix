@@ -12681,6 +12681,10 @@ msgstr "Seznam Zabbix proxy serverů s názvem, režimem, šifrováním, kompres
 msgid "List of Zabbix proxies with name, mode, encryption, compression, version, last seen, host count, item count, required values per second (vps), compatibility (current/outdated/unsupported), timeouts, proxy group name, state (unknown/offline/online). Returns JSON."
 msgstr "Seznam Zabbix proxy serverů s názvem, režimem, šifrováním, kompresí, verzí, naposledy viděným, počtem hostů, počtem itemů, požadovanými hodnotami za sekundu (vps), kompatibilitou (aktuální/zastaralé/nepodporované), časovými limity, názvem skupiny proxy, stavem (neznámý/offline/online). Vrátí JSON."
 
+#: include/classes/data/CItemData.php:2935
+msgid "List of Zabbix proxy groups configuration data and real-time data. Configuration data includes proxy group name, failover delay, and minimum number of online proxies required for the group to be online. Real-time data includes number of online proxies, percentage of online proxies, and state of proxy group (unknown, offline, recovering, online, degrading). This item does not return groupless proxies. Returns JSON."
+msgstr ""
+
 #: include/classes/data/CItemData.php:1559
 msgid "List of block devices and their type. Returns JSON"
 msgstr "Seznam blokových zařízení a jejich typ. Vrátí JSON"

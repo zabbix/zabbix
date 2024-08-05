@@ -126,6 +126,7 @@ class testLowLevelDiscovery extends CWebTest {
 			'id:delay_flex_0_delay' => ['placeholder' => '50s', 'maxlength' => 255],
 			'id:delay_flex_0_period' => ['placeholder' => '1-7,00:00-24:00', 'maxlength' => 255],
 			'id:timeout' => ['value' => '3s', 'maxlength' => 255],
+			'id:inherited_timeout' => ['value' => '3s', 'maxlength' => 255],
 			'id:custom_timeout' => ['labels' => ['Global', 'Override'], 'value' => 'Global'],
 			'Delete lost resources' => ['value' => '7d', 'maxlength' => 255],
 			'Disable lost resources' => ['value' => '1h', 'maxlength' => 255],
@@ -522,11 +523,19 @@ class testLowLevelDiscovery extends CWebTest {
 
 				// Timeout fields' dependency.
 				$timeout_array = [
-					'Global' => ['enabled' => false, 'visible' => true],
-					'Override' => ['enabled' => true, 'visible' => true]
+					'Global' => [
+						'id:inherited_timeout' => ['enabled' => false, 'visible' => true],
+						'id:timeout' => ['enabled' => false, 'visible' => false]
+					],
+					'Override' => [
+						'id:inherited_timeout' => ['enabled' => false, 'visible' => false],
+						'id:timeout' => ['enabled' => true, 'visible' => true]
+					]
 				];
-				foreach ($timeout_array as $timeout => $status) {
-					$this->checkFieldsDependency($form, ['id:custom_timeout' => $timeout], ['id:timeout' => $status]);
+				foreach ($timeout_array as $timeout => $statuses) {
+					foreach ($statuses as $id => $status) {
+						$this->checkFieldsDependency($form, ['id:custom_timeout' => $timeout], [$id => $status]);
+					}
 				}
 
 				// Check Timeouts link.
