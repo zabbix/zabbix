@@ -525,19 +525,6 @@ abstract class testFormPreprocessing extends CWebTest {
 	 */
 	public static function getCommonPreprocessingValidationData() {
 		return [
-			[
-				[
-					'expected' => TEST_GOOD,
-					'fields' => [
-						'Name' => 'Check for not supported value - two checks',
-						'Key' => 'check-for-not-supported-value-two-checks[{#KEY}]'
-					],
-					'preprocessing' => [
-						['type' => 'Check for not supported value'],
-						['type' => 'Check for not supported value', 'parameter_1' => 'error matches', 'parameter_2' => '^test.*$']
-					]
-				]
-			],
 			// Text - Regular expression.
 			[
 				[
@@ -1429,8 +1416,8 @@ abstract class testFormPreprocessing extends CWebTest {
 						'Key' => 'check-for-not-supported-value-two-checks[{#KEY}]'
 					],
 					'preprocessing' => [
-						['type' => 'Check for not supported value'],
-						['type' => 'Check for not supported value', 'parameter_1' => 'error matches', 'parameter_2' => '^test.*$']
+						['type' => 'Check for not supported value', 'parameter_1' => 'error matches', 'parameter_2' => '^test.*$'],
+						['type' => 'Check for not supported value', 'parameter_1' => 'any error']
 					]
 				]
 			],
