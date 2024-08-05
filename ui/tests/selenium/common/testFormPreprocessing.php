@@ -184,7 +184,7 @@ abstract class testFormPreprocessing extends CWebTest {
 	 * BAD scenario data for items and item prototypes ONLY (not LLD).
 	 *
 	 * Comments are formatted like this:
-	 * {Preprocessing step category} - {Preprocessing step}.
+	 * {Preprocessing step category} - {Preprocessing step name}.
 	 * The category is show in UI.
 	 */
 	public function getItemPreprocessingValidationData() {
@@ -520,7 +520,7 @@ abstract class testFormPreprocessing extends CWebTest {
 	 * BAD scenario data, common for all - items, item prototypes and LLD.
 	 *
 	 * Comments are formatted like this:
-	 * {Preprocessing step category} - {Preprocessing step}.
+	 * {Preprocessing step category} - {Preprocessing step name}.
 	 * The category is show in UI.
 	 */
 	public static function getCommonPreprocessingValidationData() {
@@ -845,7 +845,7 @@ abstract class testFormPreprocessing extends CWebTest {
 	 * GOOD scenario data for items and item prototypes ONLY (not LLD).
 	 *
 	 * Comments are formatted like this:
-	 * {Preprocessing step category} - {Preprocessing step}.
+	 * {Preprocessing step category} - {Preprocessing step name}.
 	 * The category is show in UI.
 	 */
 	public static function getItemPreprocessingCreateData() {
