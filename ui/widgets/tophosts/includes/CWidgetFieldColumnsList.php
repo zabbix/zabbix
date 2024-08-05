@@ -133,7 +133,7 @@ class CWidgetFieldColumnsList extends CWidgetField {
 			'decimal_places' => ZBX_WIDGET_FIELD_TYPE_INT32,
 			'show_thumbnail' => ZBX_WIDGET_FIELD_TYPE_INT32,
 			'aggregate_function' => ZBX_WIDGET_FIELD_TYPE_INT32,
-			'history' => ZBX_WIDGET_FIELD_TYPE_INT32,
+			'history' => ZBX_WIDGET_FIELD_TYPE_INT32
 		];
 
 		$column_defaults = [
