@@ -525,7 +525,7 @@ class testLowLevelDiscovery extends CWebTest {
 				$timeout_array = [
 					'Global' => [
 						'id:inherited_timeout' => ['enabled' => false, 'visible' => true],
-						'id:timeout' => ['enabled' => false, 'visible' => false],
+						'id:timeout' => ['enabled' => false, 'visible' => false]
 					],
 					'Override' => [
 						'id:inherited_timeout' => ['enabled' => false, 'visible' => false],
