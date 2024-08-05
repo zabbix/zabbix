@@ -133,7 +133,7 @@ static void	es_free(void *udata, void *ptr)
  * Purpose: decodes 3-byte utf-8 sequence                                     *
  *                                                                            *
  * Parameters: ptr - [IN] pointer to the 3 byte sequence                      *
- *             out - [OUT] the decoded value                                  *
+ *             out - [OUT] decoded value                                      *
  *                                                                            *
  * Return value: SUCCEED                                                      *
  *               FAIL                                                         *

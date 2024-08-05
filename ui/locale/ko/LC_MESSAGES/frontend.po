@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-07-26 10:06+0000\n"
+"PO-Revision-Date: 2024-08-01 08:44+0000\n"
 "Last-Translator: Tony Kim <qaguya@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: ko\n"
@@ -428,7 +428,7 @@ msgstr "오버라이드 추가"
 
 #: tests/selenium/modules/clock32/Widget.php:46
 msgid "ALARM CLOCK"
-msgstr ""
+msgstr "알람 시계"
 
 #: app/views/administration.user.list.php:137
 msgid "API access"
@@ -1122,7 +1122,7 @@ msgstr "고급 옵션"
 #: include/views/configuration.host.discovery.list.php:157
 #: include/views/configuration.host.discovery.list.php:172
 msgid "After"
-msgstr ""
+msgstr "이후"
 
 #: app/views/js/mfa.edit.js.php:168
 msgid "After this change, users who have already enrolled in this MFA method will have to complete the enrollment process again because TOTP secrets will be reset."
@@ -1557,7 +1557,7 @@ msgstr "일반 텍스트로 보기"
 #: app/views/administration.authentication.edit.php:366
 #: app/views/administration.authentication.edit.php:403
 msgid "Assertions"
-msgstr ""
+msgstr "어설션"
 
 #: include/hosts.inc.php:149
 msgid "Asset tag"
@@ -12402,6 +12402,10 @@ msgstr "이름, 모드, 암호화, 압축, 버전, 마지막으로 확인된 호
 #: include/classes/data/CItemData.php:2905
 msgid "List of Zabbix proxies with name, mode, encryption, compression, version, last seen, host count, item count, required values per second (vps), compatibility (current/outdated/unsupported), timeouts, proxy group name, state (unknown/offline/online). Returns JSON."
 msgstr "이름, 모드, 암호화, 압축, 버전, 마지막 조회 시간, 호스트 수, 항목 수, 초당 필요한 값(vps), 호환성(현재/기존/지원되지 않음), 타임아웃, 프록시 그룹 이름, 상태(알 수 없음/오프라인/온라인)를 포함한 Zabbix 프록시 목록을 반환합니다. JSON을 반환합니다."
+
+#: include/classes/data/CItemData.php:2935
+msgid "List of Zabbix proxy groups configuration data and real-time data. Configuration data includes proxy group name, failover delay, and minimum number of online proxies required for the group to be online. Real-time data includes number of online proxies, percentage of online proxies, and state of proxy group (unknown, offline, recovering, online, degrading). This item does not return groupless proxies. Returns JSON."
+msgstr ""
 
 #: include/classes/data/CItemData.php:1559
 msgid "List of block devices and their type. Returns JSON"

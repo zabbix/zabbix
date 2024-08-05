@@ -416,7 +416,6 @@ class CUserGroup extends CApiService {
 		}
 		$this->checkUsers($usrgrps, $db_usrgrps);
 		$this->checkHimself($usrgrps, __FUNCTION__, $db_usrgrps);
-		$this->checkUsersWithoutGroups($usrgrps);
 		$this->checkTemplateGroups($usrgrps);
 		$this->checkHostGroups($usrgrps);
 		$this->checkTagFilters($usrgrps);
@@ -675,82 +674,6 @@ class CUserGroup extends CApiService {
 						);
 					}
 				}
-			}
-		}
-	}
-
-	/**
-	 * Check to exclude an opportunity to leave user without user groups.
-	 *
-	 * @param array  $usrgrps
-	 * @param array  $usrgrps[]['usrgrpid']
-	 * @param array  $usrgrps[]['users']              (optional)
-	 * @param string $usrgrps[]['users'][]['userid']
-	 *
-	 * @throws APIException
-	 */
-	private function checkUsersWithoutGroups(array $usrgrps) {
-		$users_groups = [];
-
-		foreach ($usrgrps as $usrgrp) {
-			if (array_key_exists('users', $usrgrp)) {
-				$users_groups[$usrgrp['usrgrpid']] = [];
-
-				foreach ($usrgrp['users'] as $user) {
-					$users_groups[$usrgrp['usrgrpid']][$user['userid']] = true;
-				}
-			}
-		}
-
-		if (!$users_groups) {
-			return;
-		}
-
-		$db_users_groups = DB::select('users_groups', [
-			'output' => ['usrgrpid', 'userid'],
-			'filter' => ['usrgrpid' => array_keys($users_groups)]
-		]);
-
-		$ins_userids = [];
-		$del_userids = [];
-
-		foreach ($db_users_groups as $db_user_group) {
-			if (array_key_exists($db_user_group['userid'], $users_groups[$db_user_group['usrgrpid']])) {
-				unset($users_groups[$db_user_group['usrgrpid']][$db_user_group['userid']]);
-			}
-			else {
-				if (!array_key_exists($db_user_group['userid'], $del_userids)) {
-					$del_userids[$db_user_group['userid']] = 0;
-				}
-				$del_userids[$db_user_group['userid']]++;
-			}
-		}
-
-		foreach ($users_groups as $usrgrpid => $userids) {
-			foreach (array_keys($userids) as $userid) {
-				$ins_userids[$userid] = true;
-			}
-		}
-
-		$del_userids = array_diff_key($del_userids, $ins_userids);
-
-		if (!$del_userids) {
-			return;
-		}
-
-		$db_users = DBselect(
-			'SELECT u.userid,u.username,count(ug.usrgrpid) as usrgrp_num'.
-			' FROM users u,users_groups ug'.
-			' WHERE u.userid=ug.userid'.
-				' AND '.dbConditionInt('u.userid', array_keys($del_userids)).
-			' GROUP BY u.userid,u.username'
-		);
-
-		while ($db_user = DBfetch($db_users)) {
-			if ($db_user['usrgrp_num'] == $del_userids[$db_user['userid']]) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('User "%1$s" cannot be without user group.', $db_user['username'])
-				);
 			}
 		}
 	}
@@ -1372,7 +1295,6 @@ class CUserGroup extends CApiService {
 		}
 
 		self::checkProvisionedUsersExist($db_usrgrps);
-		$this->checkUsersWithoutGroups($usrgrps);
 	}
 
 	private static function checkProvisionedUsersExist(array $db_user_groups): void {
