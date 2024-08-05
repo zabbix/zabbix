@@ -21,7 +21,7 @@
             "function": "uppercase",
             "parameters": []
         },
-        "result": "ÇŞĞÜ"
+        "result": "çşğü"
     },
     {
         "value": "pārbaude",
@@ -29,7 +29,7 @@
             "function": "uppercase",
             "parameters": []
         },
-        "result": "PĀRBAUDE"
+        "result": "PāRBAUDE"
     },
     {
         "value": "тест",
@@ -37,7 +37,7 @@
             "function": "uppercase",
             "parameters": []
         },
-        "result": "ТЕСТ"
+        "result": "тест"
     },
     {
         "value": "",
