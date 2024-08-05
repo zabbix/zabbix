@@ -886,6 +886,10 @@ class testUserDirectory extends CAPITest {
 			'Test delete id not exists' => [
 				'userdirectoryids' => [1234],
 				'expected_error' => 'No permissions to referred object or it does not exist!'
+			],
+			'Test delete SAML fail when saml_auth_enabled is enabled' => [
+				'userdirectoryids' => ['API SAML'],
+				'expected_error' => 'Cannot delete default user directory.'
 			]
 		];
 	}
@@ -921,19 +925,29 @@ class testUserDirectory extends CAPITest {
 		$this->call('usergroup.delete', [self::$data['usrgrpid']['Auth test #1']]);
 		self::$data['usrgrpid'] = array_diff(self::$data['usrgrpid'], [self::$data['usrgrpid']['Auth test #1']]);
 
-		$ids = self::$data['userdirectoryid'];
-		unset($ids['API LDAP #2']);
+		$samlids = array_intersect_key(self::$data['userdirectoryid'], array_flip(['API SAML']));
+		$ldapids = array_diff_key(self::$data['userdirectoryid'], $samlids);
+		$ldap_defaultid = $ldapids['API LDAP #2'];
 
-		// Delete all usergroups except default usergroup.
-		$this->call('userdirectory.delete', array_values($ids));
-		self::$data['userdirectoryid'] = array_diff(self::$data['userdirectoryid'], $ids);
+		// Delete LDAP userdirectories except default.
+		$this->call('userdirectory.delete', array_values(array_diff($ldapids, [$ldap_defaultid])));
 
 		$error = 'Cannot delete default user directory.';
-		$this->call('userdirectory.delete', self::$data['userdirectoryid'], $error);
+		$this->call('userdirectory.delete', [$ldap_defaultid], $error);
 
-		// Disable ldap to be able to delete default userdirectory.
+		// Disable LDAP authentication to be able to delete default LDAP userdirectory.
 		$this->call('authentication.update', ['ldap_auth_enabled' => ZBX_AUTH_LDAP_DISABLED]);
-		$this->call('userdirectory.delete', array_values(self::$data['userdirectoryid']));
+		$this->call('userdirectory.delete', [$ldap_defaultid]);
+
+		$error = 'Cannot delete default user directory.';
+		$this->call('userdirectory.delete', array_values($samlids), $error);
+
+		// Disable SAML authentication to be able to delete default SAML userdirectory.
+		$this->call('authentication.update', ['saml_auth_enabled' => ZBX_AUTH_SAML_DISABLED]);
+		$this->call('userdirectory.delete', array_values($samlids));
+
+		// Unset deleted userdirectory ids.
+		self::$data['userdirectoryid'] = array_diff(self::$data['userdirectoryid'], $ldapids, $samlids);
 	}
 
 	/**
@@ -1048,7 +1062,8 @@ class testUserDirectory extends CAPITest {
 
 		CDataHelper::call('authentication.update', [
 			'ldap_userdirectoryid' => self::$data['userdirectoryid']['API LDAP #2'],
-			'ldap_auth_enabled' => ZBX_AUTH_LDAP_ENABLED
+			'ldap_auth_enabled' => ZBX_AUTH_LDAP_ENABLED,
+			'saml_auth_enabled' => ZBX_AUTH_SAML_ENABLED
 		]);
 	}
 

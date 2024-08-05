@@ -192,9 +192,7 @@ window.script_edit_popup = new class {
 		const curl = new Curl('zabbix.php');
 
 		curl.setArgument('action', 'script.delete');
-		curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
-			<?= json_encode(CCsrfTokenHelper::get('script'), JSON_THROW_ON_ERROR) ?>
-		);
+		curl.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('script')) ?>);
 
 		this.#post(curl.getUrl(), {scriptids: [this.scriptid]}, (response) => {
 			overlayDialogueDestroy(this.overlay.dialogueid);

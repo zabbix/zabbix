@@ -31,7 +31,7 @@ class CLink extends CTag {
 
 	/**
 	 * Adds CSRF token into the URL.
-	 * POST method will be used for '_csrf_token' argument.
+	 * POST method will be used for CSRF_TOKEN_NAME argument.
 	 *
 	 * @param string $csrf_token  already generated CSRF token string.
 	 *
@@ -79,13 +79,13 @@ class CLink extends CTag {
 		if ($this->csrf_token != '') {
 			if (array_key_exists(ZBX_SESSION_NAME, $_COOKIE)) {
 				$url .= (strpos($url, '&') !== false || strpos($url, '?') !== false) ? '&' : '?';
-				$url .= CCsrfTokenHelper::CSRF_TOKEN_NAME.'='.$this->csrf_token;
+				$url .= CSRF_TOKEN_NAME.'='.$this->csrf_token;
 			}
 			$confirm_script = ($this->confirm_message !== '')
 				? 'Confirm('.json_encode($this->confirm_message).') && '
 				: '';
 			$this->onClick("javascript: return ".$confirm_script."redirect('".$url."', 'post', '".
-				CCsrfTokenHelper::CSRF_TOKEN_NAME."', true)"
+				CSRF_TOKEN_NAME."', true)"
 			);
 			$this->setAttribute('href', 'javascript:void(0)');
 		}

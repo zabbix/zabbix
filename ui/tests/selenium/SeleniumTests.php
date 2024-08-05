@@ -13,6 +13,9 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+// These tests should be run first.
+require_once dirname(__FILE__).'/multiselects/testMultiselectsWithoutData.php';
+require_once dirname(__FILE__).'/testPagesWithoutData.php';
 
 // Actions.
 require_once dirname(__FILE__).'/actions/testFormAction.php';
@@ -347,6 +350,10 @@ use PHPUnit\Framework\TestSuite;
 class SeleniumTests {
 	public static function suite() {
 		$suite = new TestSuite('selenium');
+
+		// These tests should be run first.
+		$suite->addTestSuite('testMultiselectsWithoutData');
+		$suite->addTestSuite('testPagesWithoutData');
 
 		// Actions.
 		$suite->addTestSuite('testFormAction');

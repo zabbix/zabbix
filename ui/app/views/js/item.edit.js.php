@@ -20,7 +20,6 @@
 
 ?>
 (() => {
-const CSRF_TOKEN_NAME = <?= json_encode(CCsrfTokenHelper::CSRF_TOKEN_NAME) ?>;
 const INTERFACE_TYPE_OPT = <?= INTERFACE_TYPE_OPT ?>;
 const ITEM_DELAY_FLEXIBLE = <?= ITEM_DELAY_FLEXIBLE ?>;
 const ITEM_STORAGE_OFF = <?= ITEM_STORAGE_OFF ?>;
@@ -204,14 +203,6 @@ window.item_edit_form = new class {
 
 			switch (target.getAttribute('name')) {
 				case 'custom_timeout':
-					if (this.field.timeout.value === '') {
-						this.field.timeout.value = this.field.inherited_timeout.value;
-					}
-
-					this.updateFieldsVisibility();
-
-					break;
-
 				case 'history_mode':
 				case 'trends_mode':
 					this.updateFieldsVisibility();
@@ -772,7 +763,7 @@ window.item_edit_form = new class {
 
 		const custom_timeout_value = [...this.field.custom_timeout].filter(element => element.checked)[0].value;
 
-		if (this.field.timeout.value === '' && custom_timeout_value != ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED) {
+		if (custom_timeout_value != ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED) {
 			this.field.timeout.value = this.field.inherited_timeout.value;
 		}
 

@@ -554,6 +554,13 @@ form {
 	word-break: break-word;
 }
 
+.line-clamp {
+	display: -webkit-box;
+	overflow: hidden;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: var(--line-clamp);
+}
+
 // Filters.
 .filter-btn-container {
 	position: relative;
@@ -2135,7 +2142,7 @@ select {
 	min-height: 24px;
 	overflow: hidden;
 	resize: none;
-	word-break: break-all;
+	word-break: break-word;
 	height: 24px;
 	line-height: 14px;
 	white-space: break-spaces;

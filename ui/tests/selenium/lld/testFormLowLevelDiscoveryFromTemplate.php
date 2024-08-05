@@ -17,20 +17,23 @@
 require_once dirname(__FILE__).'/../common/testLowLevelDiscovery.php';
 
 /**
- * @backup hosts
- *
  * @onBefore prepareLLDTemplateData
+ *
+ * @onAfter deleteData
  */
 class testFormLowLevelDiscoveryFromTemplate extends testLowLevelDiscovery {
 
+	protected static $groupid;
 	protected static $templateid;
+	protected static $context = 'template';
 	protected static $update_lld = 'LLD for update scenario';
 
 	public function prepareLLDTemplateData() {
+		static::$groupid = CDataHelper::call('templategroup.create', [['name' => 'Template group for lld']])['groupids'][0];
 		$templates = CDataHelper::createTemplates([
 			[
 				'host' => 'Template with LLD',
-				'groups' => ['groupid' => 1], // Templates.
+				'groups' => ['groupid' => static::$groupid],
 				'items' => [
 					[
 						'name' => 'Master item',
@@ -53,14 +56,8 @@ class testFormLowLevelDiscoveryFromTemplate extends testLowLevelDiscovery {
 						'delay' => 30
 					],
 					[
-						'name' => 'LLD for clone scenario',
-						'key_' => 'vfs.fs.discovery3',
-						'type' => ITEM_TYPE_ZABBIX,
-						'delay' => 30
-					],
-					[
-						'name' => 'LLD for simple update scenario',
-						'key_' => 'update_key',
+						'name' => self::SIMPLE_UPDATE_CLONE_LLD,
+						'key_' => 'simple_update_clone_key',
 						'type' => ITEM_TYPE_HTTPAGENT,
 						'delay' => '1h;wd1-2h7-14',
 						'url' => 'https://www.test.com/search',
@@ -182,42 +179,49 @@ class testFormLowLevelDiscoveryFromTemplate extends testLowLevelDiscovery {
 	}
 
 	public function testFormLowLevelDiscoveryFromTemplate_InitialLayout() {
-		$this->checkInitialLayout('template');
+		$this->checkInitialLayout();
 	}
 
 	/**
 	 * @dataProvider getTypeDependingData
 	 */
 	public function testFormLowLevelDiscoveryFromTemplate_TypeDependingLayout($data) {
-		$this->checkLayoutDependingOnType($data, 'template');
+		$this->checkLayoutDependingOnType($data);
 	}
 
 	public function testFormLowLevelDiscoveryFromTemplate_SimpleUpdate() {
-		$this->checkSimpleUpdate('template');
+		$this->checkSimpleUpdate();
 	}
 
 	/**
 	 * @dataProvider getLLDData
 	 */
 	public function testFormLowLevelDiscoveryFromTemplate_Create($data) {
-		$this->checkForm($data, false, 'template');
+		$this->checkForm($data, false);
 	}
 
 	/**
 	 * @dataProvider getLLDData
 	 */
 	public function testFormLowLevelDiscoveryFromTemplate_Update($data) {
-		$this->checkForm($data, true, 'template');
+		$this->checkForm($data, true);
 	}
 
 	/**
 	 * @dataProvider getCancelData
 	 */
 	public function testFormLowLevelDiscoveryFromTemplate_Cancel($data) {
-		$this->checkCancel($data, 'template');
+		$this->checkCancel($data);
+	}
+
+	/**
+	 * @dataProvider getCloneData
+	 */
+	public function testFormLowLevelDiscoveryFromTemplate_Clone($data) {
+		$this->checkClone($data);
 	}
 
 	public function testFormLowLevelDiscoveryFromTemplate_Delete() {
-		$this->checkDelete('template');
+		$this->checkDelete();
 	}
 }

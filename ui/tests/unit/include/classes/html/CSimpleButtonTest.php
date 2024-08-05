@@ -20,16 +20,16 @@ class CSimpleButtonTest extends CTagTest {
 		return [
 			[
 				[],
-				'<button type="button" tabindex="0"></button>'
+				'<button type="button"></button>'
 			],
 			[
 				['caption'],
-				'<button type="button" tabindex="0">caption</button>'
+				'<button type="button">caption</button>'
 			],
 			// value encoding
 			[
 				['</button>'],
-				'<button type="button" tabindex="0">&lt;/button&gt;</button>'
+				'<button type="button">&lt;/button&gt;</button>'
 			]
 		];
 	}
@@ -38,7 +38,7 @@ class CSimpleButtonTest extends CTagTest {
 		$button = $this->createTag();
 		$button->setEnabled(false);
 		$this->assertEquals(
-			'<button type="button" tabindex="0" disabled="disabled"></button>',
+			'<button type="button" disabled="disabled"></button>',
 			(string) $button
 		);
 	}
