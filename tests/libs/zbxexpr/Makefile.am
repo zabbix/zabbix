@@ -27,6 +27,8 @@ COMMON_SRC_FILES = \
 
 EXPR_LIBS = \
 	$(EXPR_DEPS) \
+	$(top_srcdir)/src/libs/zbxhttp/libzbxhttp.a \
+	$(top_srcdir)/src/libs/zbxcrypto/libzbxcrypto.a \
 	$(MOCK_DATA_DEPS) \
 	$(MOCK_TEST_DEPS)
 
