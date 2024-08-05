@@ -134,7 +134,7 @@ else {
 						);
 					}
 					elseif ($column_config['display_item_as'] != CWidgetFieldColumnsList::DISPLAY_VALUE_AS_BINARY) {
-						$max_length = 255;
+						$max_length = 20;
 						$formatted_value = substr($column['value'], 0, $max_length)
 							.(strlen($column['value']) > $max_length ? '...' : '');
 					}

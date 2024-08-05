@@ -43,6 +43,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		if (!$this->fields_values['override_hostid'] && $this->isTemplateDashboard()) {
 			$data['configuration'] = $this->fields_values['columns'];
+			$data['show_thumbnail'] = false;
 			$data['rows'] = [];
 		}
 		else {
