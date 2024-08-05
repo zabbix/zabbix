@@ -1712,7 +1712,10 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	zbx_set_exit_on_terminate();
 
 	thread_args.info.program_type = zbx_program_type;
-
+#ifdef	HAVE_MALLOC_TRIM
+	/* avoid memory not being released back to the system */
+	malloc_trim(ZBX_MALLOC_TRIM);
+#endif
 	for (i = 0; i < zbx_threads_num; i++)
 	{
 		if (FAIL == get_process_info_by_thread(i + 1, &thread_args.info.process_type,

@@ -4115,9 +4115,19 @@ static void	DCsync_triggers(zbx_dbsync_t *sync, zbx_uint64_t revision)
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
 	{
+		unsigned char	flags;
+
 		/* removed rows will be always added at the end */
 		if (ZBX_DBSYNC_ROW_REMOVE == tag)
 			break;
+
+		if (NULL == row[19])
+			continue;
+
+		ZBX_STR2UCHAR(flags, row[19]);
+
+		if (ZBX_FLAG_DISCOVERY_PROTOTYPE == flags)
+			continue;
 
 		ZBX_STR2UINT64(triggerid, row[0]);
 
@@ -4125,11 +4135,8 @@ static void	DCsync_triggers(zbx_dbsync_t *sync, zbx_uint64_t revision)
 				&found, uniq);
 
 		/* store new information in trigger structure */
-
-		ZBX_STR2UCHAR(trigger->flags, row[19]);
-
-		if (ZBX_FLAG_DISCOVERY_PROTOTYPE == trigger->flags)
-			continue;
+		
+		trigger->flags = flags;
 
 		dc_strpool_replace(found, &trigger->description, row[1]);
 		dc_strpool_replace(found, &trigger->expression, row[2]);
@@ -7735,6 +7742,12 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 			item_tag_sec2, um_cache_sec, queues_sec, changelog_sec, drules_sec, drules_sec2, httptest_sec,
 			httptest_sec2, connector_sec, connector_sec2, proxy_sec, proxy_sec2, proxy_group_sec,
 			proxy_group_sec2, hp_sec, hp_sec2;
+	zbx_int64_t	used, cused, autoreg_used, autoreg_host_used, proxy_group_used, um_cache_used, host_tag_used,
+			proxy_used, hused, hiused, hgroups_used, maintenance_used, connector_used, hp_used, ifused,
+			piused, iused, tiused, idused, itempp_used, itemscrp_used, fused, tused,
+			dused, expr_used, action_used, action_op_used, action_condition_used, trigger_tag_used,
+			item_tag_used, correlation_used, corr_condition_used, corr_operation_used, drules_used,
+			httptest_used;
 
 	zbx_dbsync_t	config_sync, hosts_sync, hi_sync, htmpl_sync, gmacro_sync, hmacro_sync, if_sync, items_sync,
 			template_items_sync, prototype_items_sync, item_discovery_sync, triggers_sync, tdep_sync,
@@ -7884,21 +7897,29 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 	/* sync global configuration settings */
 	START_SYNC;
 	sec = zbx_time();
+	used = config_mem->used_size;
 	DCsync_config(&config_sync, new_revision, &flags);
 	csec2 = zbx_time() - sec;
+	cused = config_mem->used_size - used;
 
 	/* must be done in the same cache locking with config sync */
 	sec = zbx_time();
+	used = config_mem->used_size;
 	DCsync_autoreg_config(&autoreg_config_sync, new_revision);
 	autoreg_csec2 = zbx_time() - sec;
+	autoreg_used = config_mem->used_size - used;
 
 	sec = zbx_time();
+	used = config_mem->used_size;
 	DCsync_autoreg_host(&autoreg_host_sync);
 	autoreg_host_csec2 = zbx_time() - sec;
+	autoreg_host_used = config_mem->used_size - used;
 
 	sec = zbx_time();
+	used = config_mem->used_size;
 	dc_sync_proxy_group(&proxy_group_sync, new_revision);
 	proxy_group_sec2 = zbx_time() - sec;
+	proxy_group_used = config_mem->used_size - used;
 
 	FINISH_SYNC;
 
@@ -7926,13 +7947,17 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 
 	START_SYNC;
 	sec = zbx_time();
+	used = config_mem->used_size;
 	config->um_cache = um_cache_sync(config->um_cache, new_revision, &gmacro_sync, &hmacro_sync, &htmpl_sync,
 			config_vault, get_program_type_cb());
 	um_cache_sec = zbx_time() - sec;
+	um_cache_used = config_mem->used_size - used;
 
 	sec = zbx_time();
+	used = config_mem->used_size;
 	DCsync_host_tags(&host_tag_sync);
 	host_tag_sec2 = zbx_time() - sec;
+	host_tag_used = config_mem->used_size - used;
 
 	FINISH_SYNC;
 
@@ -8014,25 +8039,34 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 
 	START_SYNC;
 
+	used = config_mem->used_size;
 	sec = zbx_time();
 	DCsync_proxies(&proxy_sync, new_revision, config_vault, proxyconfig_frequency, &psk_owners);
 	proxy_sec2 = zbx_time() - sec;
+	proxy_used = config_mem->used_size - used;
 
+	used = config_mem->used_size;
 	sec = zbx_time();
 	zbx_vector_uint64_create(&active_avail_diff);
 	DCsync_hosts(&hosts_sync, new_revision, &active_avail_diff, &activated_hosts, &psk_owners, pg_host_reloc_ref);
 	zbx_dbsync_clear_user_macros();
 	hsec2 = zbx_time() - sec;
+	hused = config_mem->used_size - used;
 
+	used = config_mem->used_size;
 	sec = zbx_time();
 	DCsync_host_inventory(&hi_sync, new_revision);
 	hisec2 = zbx_time() - sec;
+	hiused = config_mem->used_size - used;
 
+	used = config_mem->used_size;
 	sec = zbx_time();
 	DCsync_hostgroups(&hgroups_sync);
 	DCsync_hostgroup_hosts(&hgroup_host_sync);
 	hgroups_sec2 = zbx_time() - sec;
+	hgroups_used = config_mem->used_size - used;
 
+	used = config_mem->used_size;
 	sec = zbx_time();
 	DCsync_maintenances(&maintenance_sync);
 	DCsync_maintenance_tags(&maintenance_tag_sync);
@@ -8040,6 +8074,7 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 	DCsync_maintenance_hosts(&maintenance_host_sync);
 	DCsync_maintenance_periods(&maintenance_period_sync);
 	maintenance_sec2 = zbx_time() - sec;
+	maintenance_used = config_mem->used_size - used;
 
 	if (0 != hgroups_sync.add_num + hgroups_sync.update_num + hgroups_sync.remove_num)
 		update_flags |= ZBX_DBSYNC_UPDATE_HOST_GROUPS;
@@ -8055,14 +8090,18 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 	if (0 != (update_flags & (ZBX_DBSYNC_UPDATE_HOST_GROUPS | ZBX_DBSYNC_UPDATE_MAINTENANCE_GROUPS)))
 		dc_maintenance_precache_nested_groups();
 
+	used = config_mem->used_size;
 	sec = zbx_time();
 	DCsync_connectors(&connector_sync, new_revision);
 	DCsync_connector_tags(&connector_tag_sync);
 	connector_sec2 = zbx_time() - sec;
+	connector_used = config_mem->used_size - used;
 
+	used = config_mem->used_size;
 	sec = zbx_time();
 	dc_sync_host_proxy(&hp_sync, new_revision);
 	hp_sec2 = zbx_time() - sec;
+	hp_used = config_mem->used_size - used;
 
 	FINISH_SYNC;
 
@@ -8117,41 +8156,57 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 	START_SYNC;
 
 	/* resolves macros for interface_snmpaddrs, must be after DCsync_hmacros() */
+	used = config_mem->used_size;
 	sec = zbx_time();
 	DCsync_interfaces(&if_sync, new_revision);
 	ifsec2 = zbx_time() - sec;
+	ifused = config_mem->used_size - used;
 
 	/* relies on hosts, proxies and interfaces, must be after DCsync_{hosts,interfaces}() */
 
+	used = config_mem->used_size;
 	sec = zbx_time();
 	DCsync_prototype_items(&prototype_items_sync);
 	pisec2 = zbx_time() - sec;
+	piused = config_mem->used_size - used;
 
+	used = config_mem->used_size;
 	sec = zbx_time();
 	DCsync_items(&items_sync, new_revision, flags, synced, deleted_itemids, pnew_items);
 	isec2 = zbx_time() - sec;
+	iused = config_mem->used_size - used;
 
+	used = config_mem->used_size;
 	sec = zbx_time();
 	DCsync_template_items(&template_items_sync);
 	tisec2 = zbx_time() - sec;
+	tiused = config_mem->used_size - used;
 
+	used = config_mem->used_size;
 	sec = zbx_time();
 	DCsync_item_discovery(&item_discovery_sync);
 	idsec2 = zbx_time() - sec;
+	idused = config_mem->used_size - used;
 
 	/* relies on items, must be after DCsync_items() */
+	used = config_mem->used_size;
 	sec = zbx_time();
 	DCsync_item_preproc(&itempp_sync, new_revision);
 	itempp_sec2 = zbx_time() - sec;
+	itempp_used = config_mem->used_size - used;
 
 	/* relies on items, must be after DCsync_items() */
+	used = config_mem->used_size;
 	sec = zbx_time();
 	DCsync_items_param(&itemscrp_sync, new_revision);
 	itemscrp_sec2 = zbx_time() - sec;
+	itemscrp_used = config_mem->used_size - used;
 
+	used = config_mem->used_size;
 	sec = zbx_time();
 	DCsync_functions(&func_sync, new_revision);
 	fsec2 = zbx_time() - sec;
+	fused = config_mem->used_size - used;
 
 	FINISH_SYNC;
 
@@ -8223,63 +8278,89 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 	START_SYNC;
 
 	sec = zbx_time();
+	used = config_mem->used_size;
 	DCsync_triggers(&triggers_sync, new_revision);
 	tsec2 = zbx_time() - sec;
+	tused = config_mem->used_size - used;
 
+	used = config_mem->used_size;
 	sec = zbx_time();
 	DCsync_trigdeps(&tdep_sync);
 	dsec2 = zbx_time() - sec;
+	dused = config_mem->used_size - used;
 
+	used = config_mem->used_size;
 	sec = zbx_time();
 	DCsync_expressions(&expr_sync, new_revision);
 	expr_sec2 = zbx_time() - sec;
+	expr_used = config_mem->used_size - used;
 
+	used = config_mem->used_size;
 	sec = zbx_time();
 	DCsync_actions(&action_sync);
 	action_sec2 = zbx_time() - sec;
+	action_used = config_mem->used_size - used;
 
+	used = config_mem->used_size;
 	sec = zbx_time();
 	DCsync_action_ops(&action_op_sync);
 	action_op_sec2 = zbx_time() - sec;
+	action_op_used = config_mem->used_size - used;
 
+	used = config_mem->used_size;
 	sec = zbx_time();
 	DCsync_action_conditions(&action_condition_sync);
 	action_condition_sec2 = zbx_time() - sec;
+	action_condition_used = config_mem->used_size - used;
 
+	used = config_mem->used_size;
 	sec = zbx_time();
 	/* relies on triggers, must be after DCsync_triggers() */
 	DCsync_trigger_tags(&trigger_tag_sync);
 	trigger_tag_sec2 = zbx_time() - sec;
+	trigger_tag_used = config_mem->used_size - used;
 
+	used = config_mem->used_size;
 	sec = zbx_time();
 	DCsync_item_tags(&item_tag_sync);
 	item_tag_sec2 = zbx_time() - sec;
+	item_tag_used = config_mem->used_size - used;
 
+	used = config_mem->used_size;
 	sec = zbx_time();
 	DCsync_correlations(&correlation_sync);
 	correlation_sec2 = zbx_time() - sec;
+	correlation_used = config_mem->used_size - used;
 
+	used = config_mem->used_size;
 	sec = zbx_time();
 	/* relies on correlation rules, must be after DCsync_correlations() */
 	DCsync_corr_conditions(&corr_condition_sync);
 	corr_condition_sec2 = zbx_time() - sec;
+	corr_condition_used = config_mem->used_size - used;
 
+	used = config_mem->used_size;
 	sec = zbx_time();
 	/* relies on correlation rules, must be after DCsync_correlations() */
 	DCsync_corr_operations(&corr_operation_sync);
 	corr_operation_sec2 = zbx_time() - sec;
+	corr_operation_used = config_mem->used_size - used;
 
+	used = config_mem->used_size;
 	sec = zbx_time();
 	dc_sync_drules(&drules_sync, new_revision);
 	dc_sync_dchecks(&dchecks_sync, new_revision);
 	drules_sec2 = zbx_time() - sec;
+	drules_used = config_mem->used_size - used;
 
+	used = config_mem->used_size;
 	sec = zbx_time();
 	dc_sync_httptests(&httptest_sync, new_revision);
 	dc_sync_httptest_fields(&httptest_field_sync, new_revision);
 	dc_sync_httpsteps(&httpstep_sync, new_revision);
 	dc_sync_httpstep_fields(&httpstep_field_sync, new_revision);
 	httptest_sec2 = zbx_time() - sec;
+	httptest_used = config_mem->used_size - used;
 
 	sec = zbx_time();
 
@@ -8342,33 +8423,40 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 				itempp_sec2 + maintenance_sec2 + item_tag_sec2 + update_sec + um_cache_sec +
 				drules_sec2 + httptest_sec2 + connector_sec2 + proxy_sec2 + proxy_group_sec2 + hp_sec2;
 
+		zbx_int64_t	total_used = used + cused + autoreg_used + autoreg_host_used + proxy_group_used + um_cache_used + host_tag_used +
+			proxy_used + hused + hiused + hgroups_used + maintenance_used + connector_used + hp_used + ifused +
+			piused + iused + tiused + idused + itempp_used + itemscrp_used + fused + tused +
+			dused + expr_used + action_used + action_op_used + action_condition_used + trigger_tag_used +
+			item_tag_used + correlation_used + corr_condition_used + corr_operation_used + drules_used +
+			httptest_used;
+
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() changelog  : sql:" ZBX_FS_DBL " sec (%d records)",
 				__func__, changelog_sec, changelog_num);
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() config     : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
-				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
-				__func__, csec, csec2, config_sync.add_num, config_sync.update_num,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() config     : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec "
+				ZBX_FS_I64 " bytes (" ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
+				__func__, csec, csec2, cused, config_sync.add_num, config_sync.update_num,
 				config_sync.remove_num);
 
 		total += autoreg_csec + autoreg_host_csec;
 		total2 += autoreg_csec2 + autoreg_host_csec2;
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() autoreg    : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
-				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
-				__func__, autoreg_csec, autoreg_csec2, autoreg_config_sync.add_num,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() autoreg    : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec "
+				ZBX_FS_I64 " bytes (" ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
+				__func__, autoreg_csec, autoreg_csec2, autoreg_used, autoreg_config_sync.add_num,
 				autoreg_config_sync.update_num, autoreg_config_sync.remove_num);
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() autoreg host    : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
-				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
-				__func__, autoreg_host_csec, autoreg_host_csec2, autoreg_host_sync.add_num,
-				autoreg_host_sync.update_num, autoreg_host_sync.remove_num);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() autoreg host    : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec "
+				ZBX_FS_I64 " bytes (" ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
+				__func__, autoreg_host_csec, autoreg_host_csec2, autoreg_host_used,
+				autoreg_host_sync.add_num, autoreg_host_sync.update_num, autoreg_host_sync.remove_num);
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() hosts      : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
-				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
-				__func__, hsec, hsec2, hosts_sync.add_num, hosts_sync.update_num,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() hosts      : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec "
+				ZBX_FS_I64 " bytes (" ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
+				__func__, hsec, hsec2, hused, hosts_sync.add_num, hosts_sync.update_num,
 				hosts_sync.remove_num);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() host_invent: sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
-				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
-				__func__, hisec, hisec2, hi_sync.add_num, hi_sync.update_num,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() host_invent: sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec "
+				ZBX_FS_I64 " bytes (" ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
+				__func__, hisec, hisec2, hiused, hi_sync.add_num, hi_sync.update_num,
 				hi_sync.remove_num);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() templates  : sql:" ZBX_FS_DBL " sec ("
 				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
@@ -8382,105 +8470,107 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
 				__func__, hmsec, hmacro_sync.add_num, hmacro_sync.update_num,
 				hmacro_sync.remove_num);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() interfaces : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
-				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
-				__func__, ifsec, ifsec2, if_sync.add_num, if_sync.update_num,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() interfaces : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec "
+				ZBX_FS_I64 " bytes (" ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
+				__func__, ifsec, ifsec2, ifused, if_sync.add_num, if_sync.update_num,
 				if_sync.remove_num);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() items      : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
-				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
-				__func__, isec, isec2, items_sync.add_num, items_sync.update_num,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() items      : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec "
+				ZBX_FS_I64 " bytes (" ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
+				__func__, isec, isec2, iused, items_sync.add_num, items_sync.update_num,
 				items_sync.remove_num);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() template_items      : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
-				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
-				__func__, tisec, tisec2, template_items_sync.add_num,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() template_items      : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec "
+				ZBX_FS_I64 " bytes (" ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
+				__func__, tisec, tisec2, tiused, template_items_sync.add_num,
 				template_items_sync.update_num, template_items_sync.remove_num);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() prototype_items      : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
-				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
-				__func__, pisec, pisec2, prototype_items_sync.add_num,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() prototype_items      : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec "
+				ZBX_FS_I64 " bytes (" ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
+				__func__, pisec, pisec2, piused, prototype_items_sync.add_num,
 				prototype_items_sync.update_num, prototype_items_sync.remove_num);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() item_discovery      : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
-				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
-				__func__, idsec, idsec2, item_discovery_sync.add_num, item_discovery_sync.update_num,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() item_discovery      : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec "
+				ZBX_FS_I64 " bytes (" ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
+				__func__, idsec, idsec2, idused, item_discovery_sync.add_num, item_discovery_sync.update_num,
 				item_discovery_sync.remove_num);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() triggers   : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
-				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
-				__func__, tsec, tsec2, triggers_sync.add_num, triggers_sync.update_num,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() triggers   : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec "
+				ZBX_FS_I64 " bytes (" ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
+				__func__, tsec, tsec2, tused, triggers_sync.add_num, triggers_sync.update_num,
 				triggers_sync.remove_num);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() trigdeps   : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
-				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
-				__func__, dsec, dsec2, tdep_sync.add_num, tdep_sync.update_num,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() trigdeps   : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec "
+				ZBX_FS_I64 " bytes (" ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
+				__func__, dsec, dsec2, dused, tdep_sync.add_num, tdep_sync.update_num,
 				tdep_sync.remove_num);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() trig. tags : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
-				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
-				__func__, trigger_tag_sec, trigger_tag_sec2, trigger_tag_sync.add_num,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() trig. tags : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec "
+				ZBX_FS_I64 " bytes (" ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
+				__func__, trigger_tag_sec, trigger_tag_sec2, trigger_tag_used, trigger_tag_sync.add_num,
 				trigger_tag_sync.update_num, trigger_tag_sync.remove_num);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() host tags : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
-				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
-				__func__, host_tag_sec, host_tag_sec2, host_tag_sync.add_num,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() host tags : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec "
+				ZBX_FS_I64 " bytes (" ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
+				__func__, host_tag_sec, host_tag_sec2, host_tag_used, host_tag_sync.add_num,
 				host_tag_sync.update_num, host_tag_sync.remove_num);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() item tags : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
-				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
-				__func__, item_tag_sec, item_tag_sec2, item_tag_sync.add_num,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() item tags : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec "
+				ZBX_FS_I64 " bytes (" ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
+				__func__, item_tag_sec, item_tag_sec2, item_tag_used, item_tag_sync.add_num,
 				item_tag_sync.update_num, item_tag_sync.remove_num);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() functions  : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
-				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
-				__func__, fsec, fsec2, func_sync.add_num, func_sync.update_num,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() functions  : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec "
+				ZBX_FS_I64 " bytes (" ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
+				__func__, fsec, fsec2, fused, func_sync.add_num, func_sync.update_num,
 				func_sync.remove_num);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() expressions: sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
-				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
-				__func__, expr_sec, expr_sec2, expr_sync.add_num, expr_sync.update_num,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() expressions: : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec "
+				ZBX_FS_I64 " bytes (" ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
+				__func__, expr_sec, expr_sec2, expr_used, expr_sync.add_num, expr_sync.update_num,
 				expr_sync.remove_num);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() actions    : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
-				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
-				__func__, action_sec, action_sec2, action_sync.add_num, action_sync.update_num,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() actions    : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec "
+				ZBX_FS_I64 " bytes (" ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
+				__func__, action_sec, action_sec2, action_used, action_sync.add_num, action_sync.update_num,
 				action_sync.remove_num);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() operations : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
-				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
-				__func__, action_op_sec, action_op_sec2, action_op_sync.add_num,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() operations : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec "
+				ZBX_FS_I64 " bytes (" ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
+				__func__, action_op_sec, action_op_sec2, action_op_used, action_op_sync.add_num,
 				action_op_sync.update_num, action_op_sync.remove_num);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() conditions : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
-				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
-				__func__, action_condition_sec, action_condition_sec2,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() conditions : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec "
+				ZBX_FS_I64 " bytes (" ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
+				__func__, action_condition_sec, action_condition_sec2, action_condition_used,
 				action_condition_sync.add_num, action_condition_sync.update_num,
 				action_condition_sync.remove_num);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() corr       : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
-				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
-				__func__, correlation_sec, correlation_sec2, correlation_sync.add_num,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() corr       : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec "
+				ZBX_FS_I64 " bytes (" ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
+				__func__, correlation_sec, correlation_sec2, correlation_used, correlation_sync.add_num,
 				correlation_sync.update_num, correlation_sync.remove_num);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() corr_cond  : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
-				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
-				__func__, corr_condition_sec, corr_condition_sec2, corr_condition_sync.add_num,
-				corr_condition_sync.update_num, corr_condition_sync.remove_num);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() corr_op    : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
-				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
-				__func__, corr_operation_sec, corr_operation_sec2, corr_operation_sync.add_num,
-				corr_operation_sync.update_num, corr_operation_sync.remove_num);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() hgroups    : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
-				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
-				__func__, hgroups_sec, hgroups_sec2, hgroups_sync.add_num,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() corr_cond  : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec "
+				ZBX_FS_I64 " bytes (" ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
+				__func__, corr_condition_sec, corr_condition_sec2, corr_condition_used,
+				corr_condition_sync.add_num, corr_condition_sync.update_num,
+				corr_condition_sync.remove_num);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() corr_op    : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec "
+				ZBX_FS_I64 " bytes (" ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
+				__func__, corr_operation_sec, corr_operation_sec2, corr_operation_used,
+				corr_operation_sync.add_num, corr_operation_sync.update_num,
+				corr_operation_sync.remove_num);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() hgroups    : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec "
+				ZBX_FS_I64 " bytes (" ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
+				__func__, hgroups_sec, hgroups_sec2, hgroups_used, hgroups_sync.add_num,
 				hgroups_sync.update_num, hgroups_sync.remove_num);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() item pproc : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
-				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
-				__func__, itempp_sec, itempp_sec2, itempp_sync.add_num, itempp_sync.update_num,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() item pproc : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec "
+				ZBX_FS_I64 " bytes (" ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
+				__func__, itempp_sec, itempp_sec2, itempp_used, itempp_sync.add_num, itempp_sync.update_num,
 				itempp_sync.remove_num);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() item script param: sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
-				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
-				__func__, itemscrp_sec, itemscrp_sec2, itemscrp_sync.add_num,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() item script param: : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec "
+				ZBX_FS_I64 " bytes (" ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
+				__func__, itemscrp_sec, itemscrp_sec2, itemscrp_sync.add_num, itemscrp_used,
 				itemscrp_sync.update_num, itemscrp_sync.remove_num);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() maintenance: sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
-				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
-				__func__, maintenance_sec, maintenance_sec2, maintenance_sync.add_num,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() maintenance: sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec "
+				ZBX_FS_I64 " bytes (" ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
+				__func__, maintenance_sec, maintenance_sec2, maintenance_used, maintenance_sync.add_num,
 				maintenance_sync.update_num, maintenance_sync.remove_num);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() drules     : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
-				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
-				__func__, drules_sec, drules_sec2, drules_sync.add_num, drules_sync.update_num,
-				drules_sync.remove_num);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() drules     : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec "
+				ZBX_FS_I64 " bytes (" ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
+				__func__, drules_sec, drules_sec2, drules_used, drules_sync.add_num,
+				drules_sync.update_num, drules_sync.remove_num);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() dchecks    : (" ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
 				__func__, dchecks_sync.add_num, dchecks_sync.update_num, dchecks_sync.remove_num);
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() httptests  : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
-				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
-				__func__, httptest_sec, httptest_sec2, httptest_sync.add_num, httptest_sync.update_num,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() httptests  : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec "
+				ZBX_FS_I64 " bytes (" ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
+				__func__, httptest_sec, httptest_sec2, httptest_used, httptest_sync.add_num, httptest_sync.update_num,
 				httptest_sync.remove_num);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() httptestfld : (" ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
 				__func__, httptest_field_sync.add_num, httptest_field_sync.update_num,
@@ -8490,33 +8580,36 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() httpstepfld : (" ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
 				__func__, httpstep_field_sync.add_num, httpstep_field_sync.update_num,
 				httpstep_field_sync.remove_num);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() connector: sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
-				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
-				__func__, connector_sec, connector_sec2, connector_sync.add_num,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() connector: sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec "
+				ZBX_FS_I64 " bytes (" ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
+				__func__, connector_sec, connector_sec2, connector_used, connector_sync.add_num,
 				connector_sync.update_num, connector_sync.remove_num);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() connector_tag: sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
 				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
 				__func__, connector_sec, connector_sec2, connector_tag_sync.add_num,
 				connector_tag_sync.update_num, connector_tag_sync.remove_num);
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() proxy: sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
-				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
-				__func__, proxy_sec, proxy_sec2, proxy_sync.add_num,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() proxy: sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec "
+				ZBX_FS_I64 " bytes (" ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
+				__func__, proxy_sec, proxy_sec2, proxy_used, proxy_sync.add_num,
 				proxy_sync.update_num, proxy_sync.remove_num);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() proxy_group: sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
-				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
-				__func__, proxy_group_sec, proxy_group_sec2, proxy_group_sync.add_num,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() proxy_group: sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec "
+				ZBX_FS_I64 " bytes (" ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
+				__func__, proxy_group_sec, proxy_group_sec2, proxy_group_used, proxy_group_sync.add_num,
 				proxy_group_sync.update_num, proxy_group_sync.remove_num);
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() host_proxy: sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
-				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
-				__func__, hp_sec, hp_sec2, hp_sync.add_num, hp_sync.update_num, hp_sync.remove_num);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() host_proxy: sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec "
+				ZBX_FS_I64 " bytes (" ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
+				__func__, hp_sec, hp_sec2, hp_used, hp_sync.add_num, hp_sync.update_num,
+				hp_sync.remove_num);
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() macro cache: " ZBX_FS_DBL " sec.", __func__, um_cache_sec);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() macro cache: " ZBX_FS_DBL " sec " ZBX_FS_I64 " bytes.", __func__,
+				um_cache_sec, um_cache_used);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() reindex    : " ZBX_FS_DBL " sec.", __func__, update_sec);
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() total sql  : " ZBX_FS_DBL " sec.", __func__, total);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() total sync : " ZBX_FS_DBL " sec.", __func__, total2);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() total memory : " ZBX_FS_I64 " bytes.", __func__, total_used);
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() proxies    : %d (%d slots)", __func__,
 				config->proxies.num_data, config->proxies.num_slots);
