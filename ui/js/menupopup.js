@@ -1102,7 +1102,6 @@ function getMenuPopupItem(options) {
 			});
 		}
 
-
 		if (!config_triggers.disabled) {
 			const trigger_items = [];
 
