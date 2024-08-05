@@ -57,10 +57,13 @@ else {
 		foreach ($columns as $i => $column) {
 			$column_config = $data['configuration'][$i];
 
+			$is_double_column_span = ($column_config['data'] == CWidgetFieldColumnsList::DATA_ITEM_VALUE)
+				&& (($column_config['display_item_as'] == CWidgetFieldColumnsList::DISPLAY_VALUE_AS_NUMERIC
+						&& $column_config['display'] != CWidgetFieldColumnsList::DISPLAY_AS_IS)
+					|| ($column_config['display_item_as'] == CWidgetFieldColumnsList::DISPLAY_VALUE_AS_BINARY));
+
 			if ($column === null) {
-				if ($column_config['data'] == CWidgetFieldColumnsList::DATA_ITEM_VALUE
-						&& $column_config['display_item_as'] == CWidgetFieldColumnsList::DISPLAY_VALUE_AS_NUMERIC
-						&& $column_config['display'] != CWidgetFieldColumnsList::DISPLAY_AS_IS) {
+				if ($is_double_column_span) {
 					$row[] = (new CCol(''))->setColSpan(2);
 				}
 				else {
