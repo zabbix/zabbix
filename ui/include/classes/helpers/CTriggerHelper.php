@@ -183,7 +183,7 @@ class CTriggerHelper extends CTriggerGeneralHelper {
 
 									if (array_key_exists($master_trigger['triggerid'], $src_master_dep_triggers)
 											&& array_key_exists($src_dep_triggerid, $src_master_dep_triggers[$master_trigger['triggerid']])) {
-										continue 3;
+										continue 2;
 									}
 								}
 
