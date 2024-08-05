@@ -119,11 +119,10 @@ AC_COMPILE_IFELSE([
 )
 CFLAGS="$saved_CFLAGS"
 
+AC_MSG_CHECKING(whether compiler supports -Werror=cpp)
 checked_werror_cpp_CFLAGS=
 AS_IF([test $cc_accepts_werror = yes],
     [
-        AC_MSG_CHECKING(whether compiler supports -Werror=cpp)
-
         saved_CFLAGS="$CFLAGS"
         CFLAGS="$CFLAGS -Werror=cpp"
         AC_COMPILE_IFELSE([
@@ -153,7 +152,7 @@ AS_IF([test $cc_accepts_werror = yes],
     ],
     dnl Default
     [
-        dnl Do nothing
+        AC_MSG_RESULT(skipping)
     ]
 )
 
