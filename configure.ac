@@ -34,8 +34,10 @@ dnl *                     Checks for programs                       *
 dnl *                                                               *
 dnl *****************************************************************
 
-AC_PROG_CC([cc c99 gcc clang])
 AC_PROG_EGREP
+AC_PROG_AWK
+AC_PROG_CC([cc c99 gcc clang])
+AC_PROG_CXX
 
 dnl **
 dnl * Program capability tests
