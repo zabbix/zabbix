@@ -315,7 +315,6 @@ if test "x$largefile" = "xyes"; then
 	AC_SYS_LARGEFILE
 fi
 
-AC_C_CONST
 AC_TYPE_PID_T
 
 AC_MSG_CHECKING(for socklen_t)
