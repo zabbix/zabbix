@@ -275,6 +275,8 @@ AC_TYPE_UINT8_T
 
 AC_CHECK_TYPES([ptrdiff_t])
 
+AC_STRUCT_ST_BLOCKS
+
 dnl Kluge for building wihout pkg-config
 m4_ifdef([PKG_PROG_PKG_CONFIG], [], [ AC_DEFUN([PKG_PROG_PKG_CONFIG], []) ])
 
