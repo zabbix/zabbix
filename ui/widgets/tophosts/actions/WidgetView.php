@@ -494,13 +494,15 @@ class WidgetView extends CControllerDashboardWidgetView {
 								'limit' => 1
 							]);
 
-							$result[$db_values[0]['itemid']] =
-								$column['display_item_as'] == CWidgetFieldColumnsList::DISPLAY_VALUE_AS_BINARY
-									? [
-									'clock' => $db_values[0]['clock'],
-									'ns' => $db_values[0]['ns']
-									]
-									: $db_values[0]['value'];
+							if ($db_values) {
+								$result[$db_values[0]['itemid']] =
+									$column['display_item_as'] == CWidgetFieldColumnsList::DISPLAY_VALUE_AS_BINARY
+										? [
+											'clock' => $db_values[0]['clock'],
+											'ns' => $db_values[0]['ns']
+										]
+										: $db_values[0]['value'];
+							}
 						}
 						else {
 							$db_values = API::History()->get([
@@ -511,7 +513,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 								'time_till' => $column['time_period']['to_ts']
 							]);
 
-							$result[$db_values[0]['itemid']] = count($db_values);
+							if ($db_values) {
+								$result[$db_values[0]['itemid']] = count($db_values);
+							}
 						}
 					}
 				}
@@ -544,13 +548,15 @@ class WidgetView extends CControllerDashboardWidgetView {
 							'limit' => 1
 						]);
 
-						$result[$db_values[0]['itemid']] =
-							$column['display_item_as'] == CWidgetFieldColumnsList::DISPLAY_VALUE_AS_BINARY
-								? [
-									'clock' => $db_values[0]['clock'],
-									'ns' => $db_values[0]['ns']
-								]
-								: $db_values[0]['value'];
+						if ($db_values) {
+							$result[$db_values[0]['itemid']] =
+								$column['display_item_as'] == CWidgetFieldColumnsList::DISPLAY_VALUE_AS_BINARY
+									? [
+										'clock' => $db_values[0]['clock'],
+										'ns' => $db_values[0]['ns']
+									]
+									: $db_values[0]['value'];
+						}
 					}
 				}
 				else {
