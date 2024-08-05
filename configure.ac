@@ -280,6 +280,8 @@ AC_CHECK_TYPES([ptrdiff_t])
 
 AC_STRUCT_ST_BLOCKS
 
+AC_CHECK_MEMBERS([struct stat.st_rdev])
+
 dnl Kluge for building wihout pkg-config
 m4_ifdef([PKG_PROG_PKG_CONFIG], [], [ AC_DEFUN([PKG_PROG_PKG_CONFIG], []) ])
 
