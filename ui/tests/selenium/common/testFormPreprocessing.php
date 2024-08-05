@@ -181,11 +181,11 @@ abstract class testFormPreprocessing extends CWebTest {
 	];
 
 	/*
-	 * Preprocessing validation data for Item and Item prototype.
+	 * BAD scenario data for items and item prototypes ONLY (not LLD).
 	 *
-	 * For easier navigation the comments are formated like this:
-	 * {Preprocessing step type} - {Preprocessting step name}.
-	 * Both, the type and the name are shown inside the Preprocessing step dropdown.
+	 * Comments are formatted like this:
+	 * {Preprocessing step category} - {Preprocessing step}.
+	 * The category is show in UI.
 	 */
 	public function getItemPreprocessingValidationData() {
 		return array_merge($this->getCommonPreprocessingValidationData(), [
@@ -517,11 +517,11 @@ abstract class testFormPreprocessing extends CWebTest {
 	}
 
 	/*
-	 * Preprocessing validation data for item, item prototype and LLD.
+	 * BAD scenario data, common for all - items, item prototypes and LLD.
 	 *
-	 * For easier navigation the comments are formated like this:
-	 * {Preprocessing step type} - {Preprocessting step name}.
-	 * Both, the type and the name are shown inside the Preprocessing step dropdown.
+	 * Comments are formatted like this:
+	 * {Preprocessing step category} - {Preprocessing step}.
+	 * The category is show in UI.
 	 */
 	public static function getCommonPreprocessingValidationData() {
 		return [
@@ -842,11 +842,11 @@ abstract class testFormPreprocessing extends CWebTest {
 	}
 
 	/*
-	 * Preprocessing data for item and item prototype successful creation.
+	 * GOOD scenario data for items and item prototypes ONLY (not LLD).
 	 *
-	 * For easier navigation the comments are formated like this:
-	 * {Preprocessing step type} - {Preprocessting step name}.
-	 * Both, the type and the name are shown inside the Preprocessing step dropdown.
+	 * Comments are formatted like this:
+	 * {Preprocessing step category} - {Preprocessing step}.
+	 * The category is show in UI.
 	 */
 	public static function getItemPreprocessingCreateData() {
 		return [
