@@ -35,15 +35,133 @@ dnl *                                                               *
 dnl *****************************************************************
 
 AC_PROG_CC([cc c99 gcc clang])
-AM_PROG_CC_C_O
+AC_PROG_EGREP
+
+dnl **
+dnl * Program capability tests
+dnl *
+
+AC_MSG_CHECKING(whether compiler continues when given unrecognized flags)
+cc_rejects_unknown_flags=
+dnl Be mindful of the flag you're passing.
+dnl Depending on the compiler's argument parsing, this may be interpretted
+dnl as another flag. Be very explicit.
+saved_CFLAGS="$CFLAGS"
+CFLAGS="--ThisFlagShouldCauseACompilerInvocationFailure"
+AC_COMPILE_IFELSE([
+    dnl The program should be legal C99 to avoid unrelated failures.
+
+    dnl As the test harness wraps the body in a main() with a
+    dnl successful return, we don't need to provide any code
+    dnl for the compiler to succeed at the test.
+    AC_LANG_PROGRAM([[
+    /* empty preamble */
+    ]], [[
+    /* empty body */
+    ]])], [
+        cc_rejects_unknown_flags="no"
+        AC_MSG_RESULT(yes)
+    ], [
+        cc_rejects_unknown_flags="yes"
+        AC_MSG_RESULT(no)
+    ]
+)
+CFLAGS="$saved_CFLAGS"
+
+dnl The -Werror flag is _not_ supported by compilers such as
+dnl xlc (IBM's C/C++ compiler suite on AIX), where the flag
+dnl `-qhalt` enables the same behavior.
+AC_MSG_CHECKING(whether compiler supports -Werror)
+cc_accepts_werror=
+dnl XXX: The flag to be tested gets _appended_ in case the
+dnl user has provided CFLAGS containing -Wno-error, which would
+dnl negate the effect of -Werror.
+saved_CFLAGS="$CFLAGS"
+CFLAGS="$CFLAGS -Werror"
+AC_COMPILE_IFELSE([
+    dnl The program should be legal C99 to avoid unrelated failures.
+
+    dnl As the test harness wraps the body in a main() with a
+    dnl successful return, we don't really need to provide
+    dnl any code to get the compiler to succeed at the test.
+    dnl The expectation is when the compiler will not recognize
+    dnl the flag and consequently fail the compilation
+    dnl (as opposed to issuing a warning and continuing).
+    dnl If this is not the case, the variable
+    dnl $compiler_rejects_unknown_flags can be tested for this
+    dnl behavior, as set by a previous test.
+    AC_LANG_PROGRAM([[
+    /* empty preamble */
+    ]], [[
+    /* empty body */
+    ]])], [
+        AS_IF([test $cc_rejects_unknown_flags = yes],
+            [
+                cc_accepts_werror="yes"
+                AC_MSG_RESULT(yes)
+            ],
+            [
+                dnl The compilation failed, but as the compiler
+                dnl does not reject unrecognized flags, we can't
+                dnl differentiate between success and the compiler
+                dnl just ignoring it.
+
+                dnl XXX We probably can, by resorting to pretty
+                dnl gnarly output processing; keep it simple for now.
+                cc_accepts_werror="unknown"
+                AC_MSG_RESULT(unknown)
+            ]
+        )
+    ], [
+        cc_accepts_werror="no"
+        AC_MSG_RESULT(no)
+    ]
+)
+CFLAGS="$saved_CFLAGS"
+
+checked_werror_cpp_CFLAGS=
+AS_IF([test $cc_accepts_werror = yes],
+    [
+        AC_MSG_CHECKING(whether compiler supports -Werror=cpp)
+
+        saved_CFLAGS="$CFLAGS"
+        CFLAGS="$CFLAGS -Werror=cpp"
+        AC_COMPILE_IFELSE([
+            dnl XXX: We're forcing a compiler failure here,
+            dnl thus the result setting is inverted, because
+            dnl we're providing a test case that should _fail_
+            dnl compilation. Thus, if it succeeds, the compiler
+            dnl does not support dnl the flag.
+            dnl
+            dnl We've already established whether the compiler
+            dnl continues with invocation errors, and whether it
+            dnl whether it accepts -Werror at all.
+            AC_LANG_PROGRAM([[
+            #warning This preprocessor warning is intentional
+            ]], [[
+            /* empty body */
+            ]])], [
+                dnl Set this explicitly here, regardless of the initial value
+                checked_werror_cpp_CFLAGS=""
+                AC_MSG_RESULT(no)
+            ], [
+                checked_werror_cpp_CFLAGS="-Werror=cpp"
+                AC_MSG_RESULT(yes)
+            ]
+        )
+        CFLAGS="$saved_CFLAGS"
+    ],
+    dnl Default
+    [
+        dnl Do nothing
+    ]
+)
 
 dnl *****************************************************************
 dnl *                                                               *
 dnl *                   Checks for header files                     *
 dnl *                                                               *
 dnl *****************************************************************
-
-AC_PROG_EGREP
 
 AC_CHECK_HEADERS(stdio.h stdlib.h string.h unistd.h netdb.h signal.h malloc.h \
   syslog.h time.h errno.h sys/types.h sys/stat.h netinet/in.h \
@@ -98,17 +216,6 @@ AC_CHECK_HEADERS(net/if.h net/if_mib.h, [], [], [
 #  include <net/if.h>
 #endif
 ])
-
-AC_MSG_CHECKING(whether compiler supports -Werror=cpp)
-checked_werror_cpp_CFLAGS=""
-saved_CFLAGS="$CFLAGS"
-CFLAGS="$CFLAGS -Werror=cpp"
-AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[]], [[
-  void f() {};
-]])],[checked_werror_cpp_CFLAGS="-Werror=cpp"
-  AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no)
-])
-CFLAGS="$saved_CFLAGS"
 
 saved_CFLAGS="$CFLAGS"
 CFLAGS="$checked_werror_cpp_CFLAGS $CFLAGS"
