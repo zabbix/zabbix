@@ -118,42 +118,67 @@ else {
 					break;
 
 				case CWidgetFieldColumnsList::DATA_ITEM_VALUE:
-					if ($column_config['display_item_as'] != CWidgetFieldColumnsList::DISPLAY_VALUE_AS_BINARY) {
-						if (in_array($column['item']['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])) {
-							$formatted_value = formatAggregatedHistoryValue($column['value'], $column['item'],
-								$column_config['aggregate_function'], false, true, [
-									'decimals' => $column_config['decimal_places'],
-									'decimals_exact' => true,
-									'small_scientific' => false,
-									'zero_as_zero' => false
-								]
-							);
-						}
-						elseif ($column['item']['value_type'] != ITEM_VALUE_TYPE_BINARY) {
-							$formatted_value = formatAggregatedHistoryValue($column['value'], $column['item'],
-								$column_config['aggregate_function']
-							);
-						}
+					if (in_array($column['item']['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])) {
+						$formatted_value = formatAggregatedHistoryValue($column['value'], $column['item'],
+							$column_config['aggregate_function'], false, true, [
+								'decimals' => $column_config['decimal_places'],
+								'decimals_exact' => true,
+								'small_scientific' => false,
+								'zero_as_zero' => false
+							]
+						);
 					}
-					else {
-						$row[] = (new CCol(
-							(new CButton(null, _('Show')))
-								->addClass(ZBX_STYLE_BTN_LINK)
-								->addClass($column_config['show_thumbnail'] ? 'btn-thumbnail' : ZBX_STYLE_BTN_LINK)
-								->addClass('js-show-binary')
-								->setAttribute('data-alt', $column_config['name'])
-						))
-							->setAttribute('bgcolor', $color !== '' ? '#'.$color : null)
-							->setAttribute('data-itemid', $column['item']['itemid'])
-							->setColSpan(2);
+					elseif ($column['item']['value_type'] != ITEM_VALUE_TYPE_BINARY) {
+						$formatted_value = formatAggregatedHistoryValue($column['value'], $column['item'],
+							$column_config['aggregate_function']
+						);
+					}
+					elseif ($column_config['display_item_as'] != CWidgetFieldColumnsList::DISPLAY_VALUE_AS_BINARY) {
+						$max_length = 255;
+						$formatted_value = substr($column['value'], 0, $max_length)
+							.(strlen($column['value']) > $max_length ? '...' : '');
+					}
 
-						break;
+					if ($column_config['display_item_as'] == CWidgetFieldColumnsList::DISPLAY_VALUE_AS_BINARY) {
+						if ($column['item']['value_type'] == ITEM_VALUE_TYPE_BINARY
+								&& $column_config['aggregate_function'] != AGGREGATE_COUNT) {
+							$row[] = (new CCol(
+								(new CButton(null, _('Show')))
+									->addClass($column_config['show_thumbnail'] ? 'btn-thumbnail' : ZBX_STYLE_BTN_LINK)
+									->addClass('js-show-binary')
+									->setAttribute('data-alt', $column_config['name'])
+							))
+								->setAttribute('bgcolor', $color !== '' ? '#'.$color : null)
+								->setAttribute('data-itemid', $column['item']['itemid'])
+								->setAttribute('data-clock', $column['value']['clock'].'.'.$column['value']['ns'])
+								->setColSpan(2);
+
+							break;
+						}
+						else {
+							$row[] = (new CCol(
+								(new CButton(null, _('Show')))
+									->addClass(ZBX_STYLE_BTN_LINK)
+									->setAttribute('data-alt', $column_config['name'])
+							))
+								->setAttribute('bgcolor', $color !== '' ? '#'.$color : null)
+								->setHint(
+									(new CDiv(base64_encode($column['value'])))->addClass(ZBX_STYLE_HINTBOX_WRAP)
+								)
+								->setColSpan(2);
+
+							break;
+						}
 					}
 
 					if ($column_config['display_item_as'] == CWidgetFieldColumnsList::DISPLAY_VALUE_AS_TEXT) {
 						if (array_key_exists('highlights', $column_config)) {
+							$value_to_check = $column['item']['value_type'] == ITEM_VALUE_TYPE_BINARY
+								? $column['value']
+								: $formatted_value;
+
 							foreach ($column_config['highlights'] as $highlight) {
-								if (@preg_match('('.$highlight['pattern'].')', $formatted_value)) {
+								if (@preg_match('('.$highlight['pattern'].')', $value_to_check)) {
 									$color = $highlight['color'];
 									break;
 								}

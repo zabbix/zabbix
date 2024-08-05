@@ -98,6 +98,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		);
 
 		$has_text_column = false;
+		$show_thumbnail = false;
 		$item_names = [];
 		$items = [];
 
@@ -109,6 +110,11 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 				case CWidgetFieldColumnsList::DATA_ITEM_VALUE:
 					$item_names[$column_index] = $column['item'];
+
+					if ($column['display_item_as'] == CWidgetFieldColumnsList::DISPLAY_VALUE_AS_BINARY
+							&& $column['show_thumbnail'] == 1) {
+						$show_thumbnail = true;
+					}
 					break;
 			}
 		}
@@ -132,6 +138,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		if (!$hostids) {
 			return [
 				'configuration' => $columns,
+				'show_thumbnail' => $show_thumbnail,
 				'rows' => []
 			];
 		}
@@ -393,6 +400,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		return [
 			'configuration' => $columns,
+			'show_thumbnail' => $show_thumbnail,
 			'rows' => $rows
 		];
 	}
@@ -457,35 +465,112 @@ class WidgetView extends CControllerDashboardWidgetView {
 			? $column['time_period']['from_ts']
 			: time() - $history_period_s;
 
-		$items = self::addDataSource($items, $time_from, $column);
+		$items_by_value_type = self::addDataSource($items, $time_from, $column);
 
 		$result = [];
 
 		if ($column['aggregate_function'] != AGGREGATE_NONE) {
-			$values = Manager::History()->getAggregatedValues($items, $column['aggregate_function'], $time_from,
-				$column['time_period']['to_ts']
-			);
+			foreach ($items_by_value_type as $value_type => $items) {
+				if ($value_type == ITEM_VALUE_TYPE_BINARY) {
+					$itemids = array_keys($items);
+					$output = $column['display_item_as'] == CWidgetFieldColumnsList::DISPLAY_VALUE_AS_BINARY
+						? ['itemid', 'clock', 'ns']
+						: ['itemid', 'value'];
 
-			$result += array_column($values, 'value', 'itemid');
+					foreach ($itemids as $itemid) {
+						if ($column['aggregate_function'] == AGGREGATE_LAST
+								|| $column['aggregate_function'] == AGGREGATE_FIRST) {
+							$db_values = API::History()->get([
+								'output' => $output,
+								'history' => ITEM_VALUE_TYPE_BINARY,
+								'itemids' => [$itemid],
+								'time_from' => $column['time_period']['from_ts'],
+								'time_till' => $column['time_period']['to_ts'],
+								'sortfield' => ['clock', 'ns'],
+								'sortorder' => $column['aggregate_function'] == AGGREGATE_LAST
+									? ZBX_SORT_DOWN
+									: ZBX_SORT_UP,
+								'limit' => 1
+							]);
+
+							$result[$db_values[0]['itemid']] =
+								$column['display_item_as'] == CWidgetFieldColumnsList::DISPLAY_VALUE_AS_BINARY
+									? [
+									'clock' => $db_values[0]['clock'],
+									'ns' => $db_values[0]['ns']
+									]
+									: $db_values[0]['value'];
+						}
+						else {
+							$db_values = API::History()->get([
+								'output' => ['itemid'],
+								'history' => ITEM_VALUE_TYPE_BINARY,
+								'itemids' => [$itemid],
+								'time_from' => $column['time_period']['from_ts'],
+								'time_till' => $column['time_period']['to_ts']
+							]);
+
+							$result[$db_values[0]['itemid']] = count($db_values);
+						}
+					}
+				}
+				else {
+					$values = Manager::History()->getAggregatedValues($items, $column['aggregate_function'], $time_from,
+						$column['time_period']['to_ts']
+					);
+
+					$result += array_column($values, 'value', 'itemid');
+				}
+			}
 		}
 		else {
 			$items_by_source = ['history' => [], 'trends' => []];
 
-			foreach (self::addDataSource($items, $time_from, $column) as $itemid => $item) {
-				$items_by_source[$item['source']][$itemid] = $item;
-			}
+			foreach ($items_by_value_type as $value_type => $items) {
+				if ($value_type == ITEM_VALUE_TYPE_BINARY) {
+					$itemids = array_keys($items);
+					$output = $column['display_item_as'] == CWidgetFieldColumnsList::DISPLAY_VALUE_AS_BINARY
+						? ['itemid', 'clock', 'ns']
+						: ['itemid', 'value'];
 
-			if ($items_by_source['history']) {
-				$values = Manager::History()->getLastValues($items_by_source['history'], 1, $history_period_s);
-				$result += array_column(array_column($values, 0), 'value', 'itemid');
-			}
+					foreach ($itemids as $itemid) {
+						$db_values = API::History()->get([
+							'output' => $output,
+							'history' => ITEM_VALUE_TYPE_BINARY,
+							'itemids' => [$itemid],
+							'sortfield' => ['clock', 'ns'],
+							'sortorder' => ZBX_SORT_DOWN,
+							'limit' => 1
+						]);
 
-			if ($items_by_source['trends']) {
-				$values = Manager::History()->getAggregatedValues($items_by_source['trends'], AGGREGATE_LAST,
-					$time_from
-				);
+						$result[$db_values[0]['itemid']] =
+							$column['display_item_as'] == CWidgetFieldColumnsList::DISPLAY_VALUE_AS_BINARY
+								? [
+									'clock' => $db_values[0]['clock'],
+									'ns' => $db_values[0]['ns']
+								]
+								: $db_values[0]['value'];
+					}
+				}
+				else {
+					foreach ($items as $itemid => $item) {
+						$items_by_source[$item['source']][$itemid] = $item;
+					}
 
-				$result += array_column($values, 'value', 'itemid');
+					if ($items_by_source['history']) {
+						$values = Manager::History()->getLastValues($items_by_source['history'], 1, $history_period_s);
+
+						$result += array_column(array_column($values, 0), 'value', 'itemid');
+					}
+
+					if ($items_by_source['trends']) {
+						$values = Manager::History()->getAggregatedValues($items_by_source['trends'], AGGREGATE_LAST,
+							$time_from
+						);
+
+						$result += array_column($values, 'value', 'itemid');
+					}
+				}
 			}
 		}
 
@@ -493,6 +578,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 	}
 
 	private static function addDataSource(array $items, int $time, array $column): array {
+		$items_by_history_type = [];
+
 		if ($column['history'] == CWidgetFieldColumnsList::HISTORY_DATA_AUTO) {
 			$items = CItemHelper::addDataSource($items, $time);
 		}
@@ -509,9 +596,11 @@ class WidgetView extends CControllerDashboardWidgetView {
 			if (!in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])) {
 				$item['source'] = 'history';
 			}
+
+			$items_by_history_type[$item['value_type']][$item['itemid']] = $item;
 		}
 		unset($item);
 
-		return $items;
+		return $items_by_history_type;
 	}
 }
