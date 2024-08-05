@@ -56,7 +56,7 @@ $filter = (new CFilter())
 	]);
 
 $form = (new CForm())
-	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('proxygroup')))->removeId())
+	->addItem((new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('proxygroup')))->removeId())
 	->setId('proxy-group-list')
 	->setName('proxy_group_list');
 

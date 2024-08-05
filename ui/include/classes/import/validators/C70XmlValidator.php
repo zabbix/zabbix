@@ -559,7 +559,8 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 		CXmlConstantValue::NONE => CXmlConstantName::NONE,
 		CXmlConstantValue::BASIC => CXmlConstantName::BASIC,
 		CXmlConstantValue::NTLM => CXmlConstantName::NTLM,
-		CXmlConstantValue::KERBEROS => CXmlConstantName::KERBEROS
+		CXmlConstantValue::KERBEROS => CXmlConstantName::KERBEROS,
+		CXmlConstantValue::DIGEST => CXmlConstantName::DIGEST
 	];
 
 	private $ENABLED_LIFETIME_TYPES = [

@@ -20,7 +20,7 @@
  */
 
 $form = (new CForm())
-	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('tagfilter')))->removeId())
+	->addItem((new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('tagfilter')))->removeId())
 	->setId('tag-filter-add-form')
 	->setName('tag-filter-add-form');
 

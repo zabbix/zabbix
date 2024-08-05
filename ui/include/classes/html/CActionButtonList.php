@@ -120,7 +120,7 @@ class CActionButtonList extends CObject {
 				}
 
 				if (array_key_exists('csrf_token', $button_data)) {
-					$on_click_action .= 'create_var(form,"'.CCsrfTokenHelper::CSRF_TOKEN_NAME.'", "'.
+					$on_click_action .= 'create_var(form,"'.CSRF_TOKEN_NAME.'", "'.
 						$button_data['csrf_token'].'", false);';
 				}
 
