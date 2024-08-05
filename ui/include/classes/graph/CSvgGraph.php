@@ -790,8 +790,9 @@ class CSvgGraph extends CSvg {
 
 		// Calculate vertical scale parameters for right side.
 
-		if ($this->left_y_min_calculated && $this->left_y_max_calculated) {
-			$rows_min = $rows_max = $result['rows'];
+		if ($this->show_left_y_axis && $this->left_y_min_calculated && $this->left_y_max_calculated) {
+			$rows_min = $result['rows'];
+			$rows_max = $result['rows'];
 		}
 
 		$this->right_y_min_calculated = $this->right_y_min === null;

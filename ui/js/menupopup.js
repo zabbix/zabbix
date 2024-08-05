@@ -1761,11 +1761,11 @@ jQuery(function($) {
 
 			$opener.attr('aria-expanded', 'true');
 
-			var $menu_popup = $('<ul>', {
-					'role': 'menu',
-					'class': 'menu-popup menu-popup-top',
-					'tabindex': 0
-				});
+			let $menu_popup = $('<ul>', {
+				'role': 'menu',
+				'class': 'menu-popup menu-popup-top',
+				'tabindex': 0
+			});
 
 			// Add custom class, if specified.
 			if ('class' in options) {
@@ -1781,10 +1781,11 @@ jQuery(function($) {
 			$menu_popup.data('menu_popup', options);
 
 			if (options.background_layer) {
-				$('.wrapper').append($('<div>', {class: 'menu-popup-overlay'}));
+				$('.wrapper').append($('<div>', {class: 'menu-popup-overlay'}).append($menu_popup));
 			}
-
-			$('.wrapper').append($menu_popup);
+			else {
+				$('.wrapper').append($menu_popup);
+			}
 
 			// Position the menu (before hiding).
 			$menu_popup.position(options.position);
@@ -1832,10 +1833,11 @@ jQuery(function($) {
 				}
 
 				if (options.background_layer) {
-					menu_popup.prev().remove();
+					$('.menu-popup-overlay').remove();
 				}
-
-				menu_popup.remove();
+				else {
+					menu_popup.remove();
+				}
 
 				// Call menu close callback function.
 				typeof options.closeCallback === 'function' && options.closeCallback.apply();

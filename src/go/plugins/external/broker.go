@@ -16,369 +16,321 @@ package external
 
 import (
 	"encoding/json"
-	"errors"
-	"fmt"
 	"net"
+	"sync"
+	"sync/atomic"
 	"time"
 
-	"golang.zabbix.com/sdk/conf"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
-	"golang.zabbix.com/sdk/plugin"
 	"golang.zabbix.com/sdk/plugin/comms"
 )
 
-const queSize = 100
+var (
+	// ErrBrokerClosed is returned when a request is made on a closed broker.
+	ErrBrokerClosed = errs.New("broker closed")
+	// ErrBrokerTimeout is returned when a request sent by broker does not
+	// receive a response within timeout.
+	ErrBrokerTimeout = errs.New("broker timeout")
+)
 
+// pluginBroker handles communication with a single plugin.
 type pluginBroker struct {
-	pluginName string
-	socket     string
-	timeout    time.Duration
-	conn       net.Conn
-	requests   map[uint32]chan any
-	errx       chan error
-	log        chan any
-	// channel to handle agent->plugin requests
-	tx chan *request
-	// channel to handle plugin->agent requests/responses
-	rx chan *request
+	timeout   time.Duration
+	conn      net.Conn
+	requestID atomic.Uint32
+
+	// map of requestID to requests awaiting response from plugin
+	requests      map[uint32]*requestWithResponse
+	requestsMutex sync.Mutex
+
+	// channel to handle agent to plugin requests
+	// can have only *request and *requestWithResponse types
+	tx chan any
+
+	logr log.Logger
 }
 
-type RequestWrapper struct {
-	comms.Common
-	comms.LogRequest
-}
-
+// describes a one directional (agent to plugin) request. err chan is closed
+// when request is sent out.
 type request struct {
-	id   uint32
-	data any
-	out  chan any
+	id  uint32
+	in  any
+	err chan error
 }
 
-func newBroker(pluginName string, conn net.Conn, timeout time.Duration, socket string) *pluginBroker {
+// requestWithResponse describes a request that expects a response from the plugin.
+// out, err chan are closed when response or error is received.
+type requestWithResponse struct {
+	id  uint32
+	in  any
+	out chan []byte
+	err chan error
+}
+
+func newBroker(
+	conn net.Conn, timeout time.Duration, logr log.Logger,
+) *pluginBroker {
 	pb := &pluginBroker{
-		pluginName: pluginName,
-		socket:     socket,
-		timeout:    timeout,
-		conn:       conn,
-		requests:   make(map[uint32]chan any),
-		errx:       make(chan error, queSize),
-		log:        make(chan any),
-		tx:         make(chan *request, queSize),
-		rx:         make(chan *request, queSize),
+		timeout:  timeout,
+		conn:     conn,
+		requests: make(map[uint32]*requestWithResponse),
+		tx:       make(chan any),
+		logr:     logr,
 	}
 
-	go pb.handleLogs()
-	go pb.handleConnection()
-	go pb.runBackground()
+	go pb.reader()
+	go pb.writer()
 
 	return pb
 }
 
-func (b *pluginBroker) handleConnection() {
+func (b *pluginBroker) reader() {
 	for {
-		t, data, err := comms.Read(b.conn)
+		meta, data, err := comms.Read(b.conn)
 		if err != nil {
 			if isErrConnectionClosed(err) {
-				log.Tracef("closed connection to loaded %s plugin", b.pluginName)
+				b.logr.Tracef("closed connection to plugin")
 
 				return
 			}
 
-			log.Errf(
-				"failed to read response for plugin %s, %s",
-				b.pluginName,
-				err.Error(),
-			)
+			b.logr.Errf("failed to read response: %s", err.Error())
 
 			continue
 		}
 
-		var id uint32
-		var resp interface{}
+		go func(meta comms.Common, data []byte) {
+			if meta.Id == 0 {
+				// incoming plugin log requests from plugin.
+				resp := &comms.LogRequest{}
 
-		switch t {
-		case comms.RegisterResponseType:
-			var reg comms.RegisterResponse
-			err := json.Unmarshal(data, &reg)
-			if err != nil {
-				panic(
-					fmt.Errorf(
-						"failed to read register response for plugin %s, %s",
-						b.pluginName,
+				err := json.Unmarshal(data, resp)
+				if err != nil {
+					b.logr.Errf(
+						"failed to read log message from plugins: %s",
 						err.Error(),
-					),
-				)
-			}
-
-			id = reg.Id
-			resp = reg
-
-		case comms.LogRequestType:
-			var log comms.LogRequest
-			err := json.Unmarshal(data, &log)
-			if err != nil {
-				panic(
-					fmt.Errorf(
-						"failed to read log request response for plugin %s, %s",
-						b.pluginName,
-						err.Error(),
-					),
-				)
-			}
-
-			// plugin notifications don't have responses, so use 0 id
-			resp = log
-
-		case comms.ValidateResponseType:
-			var valid comms.ValidateResponse
-			err := json.Unmarshal(data, &valid)
-			if err != nil {
-				panic(
-					fmt.Errorf(
-						"failed to read validate response for plugin %s, %s",
-						b.pluginName,
-						err.Error(),
-					),
-				)
-			}
-
-			id = valid.Id
-			resp = valid
-		case comms.ExportResponseType:
-			var export comms.ExportResponse
-			err := json.Unmarshal(data, &export)
-			if err != nil {
-				panic(
-					fmt.Errorf(
-						"failed to read export response for plugin %s, %s",
-						b.pluginName,
-						err.Error(),
-					),
-				)
-			}
-
-			id = export.Id
-			resp = export
-		}
-
-		b.rx <- &request{id: id, data: resp}
-	}
-}
-
-func (b *pluginBroker) timeoutRequest(id uint32) {
-	<-time.After(b.timeout)
-	b.tx <- &request{id: id}
-}
-
-func (b *pluginBroker) runBackground() {
-	var lastid uint32
-
-	for {
-		select {
-		case r := <-b.rx:
-			if r.id == 0 {
-				// incoming plugin request, current only LogRequest
-				b.log <- r.data
-			} else {
-				// response, forward data to the corresponding channel
-				if o, ok := b.requests[r.id]; ok {
-					o <- r.data
-					close(o)
-					delete(b.requests, r.id)
-				}
-			}
-
-		case r := <-b.tx:
-			if r.data == nil {
-				if r.id == 0 {
-					// stop request has null contents
-					b.conn.Close()
+					)
 
 					return
 				}
 
-				// timeout has id + nil data
-				if o, ok := b.requests[r.id]; ok {
-					o <- errors.New("timeout occurred")
-					close(o)
+				b.handleLog(resp)
+
+				return
+			}
+
+			// response, forward data to the corresponding channel
+			b.requestsMutex.Lock()
+			defer b.requestsMutex.Unlock()
+
+			req, ok := b.requests[meta.Id]
+			if !ok {
+				return
+			}
+
+			req.out <- data
+			close(req.out)
+			close(req.err)
+			delete(b.requests, meta.Id)
+		}(meta, data)
+	}
+}
+
+func (b *pluginBroker) writer() {
+	for r := range b.tx {
+		go func(r any) {
+			switch r := r.(type) {
+			case *request:
+				defer close(r.err)
+
+				err := comms.Write(b.conn, r.in)
+				if err != nil {
+					r.err <- errs.Wrap(err, "failed to write request body")
+				}
+
+			case *requestWithResponse:
+				b.requestsMutex.Lock()
+				b.requests[r.id] = r
+				b.requestsMutex.Unlock()
+
+				go func(id uint32) {
+					time.Sleep(b.timeout)
+
+					b.requestsMutex.Lock()
+					defer b.requestsMutex.Unlock()
+
+					req, ok := b.requests[id]
+					if !ok {
+						return
+					}
+
+					req.err <- errs.Wrapf(
+						ErrBrokerTimeout,
+						"timeout %s reached while waiting for response from plugin",
+						b.timeout.String(),
+					)
+					close(req.out)
+					close(req.err)
+					delete(b.requests, id)
+				}(r.id)
+
+				err := comms.Write(b.conn, r.in)
+				if err != nil {
+					b.requestsMutex.Lock()
+					defer b.requestsMutex.Unlock()
+
+					// check if request is still awaiting response (or timeout)
+					req, ok := b.requests[r.id]
+					if !ok {
+						b.logr.Errf(
+							"stopped waiting for response from plugin, "+
+								"before write error could be handled: %s",
+							err.Error(),
+						)
+
+						return
+					}
+
+					req.err <- errs.Wrap(err, "failed to write request body")
+					close(req.out)
+					close(req.err)
 					delete(b.requests, r.id)
 				}
-			} else {
-				lastid++
-				switch v := r.data.(type) {
-				case *comms.ExportRequest:
-					go b.timeoutRequest(lastid)
-					v.Id = lastid
-				case *comms.RegisterRequest:
-					go b.timeoutRequest(lastid)
-					v.Id = lastid
-				case *comms.ValidateRequest:
-					go b.timeoutRequest(lastid)
-					v.Id = lastid
-				case *comms.TerminateRequest:
-					v.Id = lastid
-				case *comms.ConfigureRequest:
-					v.Id = lastid
-				case *comms.StartRequest:
-					v.Id = lastid
-				}
 
-				b.requests[lastid] = r.out
-				err := comms.Write(b.conn, r.data)
-				if err != nil {
-					panic(
-						fmt.Errorf(
-							"failed to write request for plugin %s, %s",
-							b.pluginName,
-							err.Error(),
-						),
-					)
-				}
+			default:
+				panic(errs.Errorf("unsupported request type %T", r))
 			}
-		}
+		}(r)
 	}
 }
 
-func (b *pluginBroker) handleLogs() {
-	for u := range b.log {
-		switch v := u.(type) {
-		case comms.LogRequest:
-			b.handleLog(v)
-		default:
-			log.Errf(`Failed to log message from plugins, unknown request type "%T"`, u)
-		}
+// close closes the broker and all associated resources.
+func (b *pluginBroker) close() {
+	// not 100% sure if there won't be any requests after close (might panic).
+	close(b.tx) // close writer
+
+	err := b.conn.Close() // close reader
+	if err != nil {
+		b.logr.Errf("failed to close connection to plugin: %s", err.Error())
+	}
+
+	b.requestsMutex.Lock()
+	defer b.requestsMutex.Unlock()
+
+	for id, req := range b.requests {
+		req.err <- ErrBrokerClosed
+		close(req.out)
+		close(req.err)
+		delete(b.requests, id)
 	}
 }
 
-func (b *pluginBroker) handleLog(l comms.LogRequest) {
-	msg := l.Message
-	if b.pluginName != "" {
-		msg = fmt.Sprintf("[%s] %s", b.pluginName, msg)
+// DoWithResponse sends a request to the plugin and blocks until a response is received.
+// Data must be a pointer.
+func (b *pluginBroker) DoWithResponse(data any) ([]byte, error) {
+	id := b.requestID.Add(1)
+
+	data, err := setID(data, id)
+	if err != nil {
+		return nil, errs.Wrap(err, "failed to set request id")
 	}
 
+	r := &requestWithResponse{
+		id:  id,
+		in:  data,
+		out: make(chan []byte),
+		err: make(chan error),
+	}
+
+	b.tx <- r
+
+	select {
+	case data := <-r.out:
+		return data, nil
+	case err := <-r.err:
+		return nil, err
+	}
+}
+
+// Do sends a request to the plugin and blocks until the request data has been written.
+// Data must be a pointer.
+func (b *pluginBroker) Do(data any) error {
+	id := b.requestID.Add(1)
+
+	data, err := setID(data, id)
+	if err != nil {
+		return errs.Wrap(err, "failed to set request id")
+	}
+
+	r := &request{
+		id:  id,
+		in:  data,
+		err: make(chan error),
+	}
+
+	b.tx <- r
+
+	err = <-r.err
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// DoWithResponseAs same as pluginBroker.DoWithResponse but unmarshals the
+// response into T.
+func DoWithResponseAs[T any](broker *pluginBroker, data any) (*T, error) {
+	dataBytes, err := broker.DoWithResponse(data)
+	if err != nil {
+		return nil, err
+	}
+
+	var resp T
+
+	err = json.Unmarshal(dataBytes, &resp)
+	if err != nil {
+		return nil, errs.Wrap(err, "failed to unmarsal response")
+	}
+
+	return &resp, nil
+}
+
+func (b *pluginBroker) handleLog(l *comms.LogRequest) {
 	switch l.Severity {
 	case log.Info:
-		log.Infof(msg)
+		b.logr.Infof(l.Message)
 	case log.Crit:
-		log.Critf(msg)
+		b.logr.Critf(l.Message)
 	case log.Err:
-		log.Errf(msg)
+		b.logr.Errf(l.Message)
 	case log.Warning:
-		log.Warningf(msg)
+		b.logr.Warningf(l.Message)
 	case log.Debug:
-		log.Debugf(msg)
+		b.logr.Debugf(l.Message)
 	case log.Trace:
-		log.Tracef(msg)
+		b.logr.Tracef(l.Message)
 	}
 }
 
-func (b *pluginBroker) start() {
-	r := request{
-		data: &comms.StartRequest{
-			Common: comms.Common{
-				Type: comms.StartRequestType,
-			},
-		},
+func setID(data any, id uint32) (any, error) {
+	switch v := data.(type) {
+	case *comms.ExportRequest:
+		v.Id = id
+	case *comms.RegisterRequest:
+		v.Id = id
+	case *comms.ValidateRequest:
+		v.Id = id
+	case *comms.TerminateRequest:
+		v.Id = id
+	case *comms.ConfigureRequest:
+		v.Id = id
+	case *comms.StartRequest:
+		v.Id = id
+	default:
+		return nil, errs.Errorf("unsupported request type %T", data)
 	}
 
-	b.tx <- &r
-}
-
-func (b *pluginBroker) stop() {
-	b.tx <- &request{data: nil}
-}
-
-func (b *pluginBroker) export(key string, params []string, timeout int) (*comms.ExportResponse, error) {
-	data := comms.ExportRequest{
-		Common: comms.Common{
-			Type: comms.ExportRequestType,
-		},
-		Key:     key,
-		Params:  params,
-		Timeout: timeout,
-	}
-
-	r := request{
-		data: &data,
-		out:  make(chan interface{}),
-	}
-
-	b.tx <- &r
-	u := <-r.out
-
-	switch v := u.(type) {
-	case comms.ExportResponse:
-		return &v, nil
-	case error:
-		return nil, v
-	}
-
-	return nil, errs.New("unknown response")
-}
-
-func (b *pluginBroker) register() (*comms.RegisterResponse, error) {
-	r := request{
-		data: &comms.RegisterRequest{
-			Common: comms.Common{
-				Type: comms.RegisterRequestType,
-			},
-			ProtocolVersion: comms.ProtocolVersion,
-		},
-		out: make(chan interface{}),
-	}
-
-	b.tx <- &r
-	u := <-r.out
-
-	switch v := u.(type) {
-	case comms.RegisterResponse:
-		return &v, nil
-	case error:
-		return nil, v
-	}
-
-	return nil, errors.New("unknown response")
-}
-
-func (b *pluginBroker) configure(globalOptions *plugin.GlobalOptions, privateOptions interface{}) {
-	r := request{
-		data: &comms.ConfigureRequest{
-			Common: comms.Common{
-				Type: comms.ConfigureRequestType,
-			},
-			GlobalOptions:  globalOptions,
-			PrivateOptions: privateOptions,
-		},
-	}
-
-	b.tx <- &r
-}
-
-func (b *pluginBroker) validate(privateOptions interface{}) (*comms.ValidateResponse, error) {
-	opts, ok := privateOptions.(*conf.Node)
-	if !ok {
-		return nil, fmt.Errorf("unsupported plugin options type %T", privateOptions)
-	}
-	r := request{
-		data: &comms.ValidateRequest{
-			Common: comms.Common{
-				Type: comms.ValidateRequestType,
-			},
-			PrivateOptions: opts,
-		},
-		out: make(chan interface{}),
-	}
-
-	b.tx <- &r
-	u := <-r.out
-
-	switch v := u.(type) {
-	case comms.ValidateResponse:
-		return &v, nil
-	case error:
-		return nil, v
-	}
-
-	return nil, errors.New("unknown response")
+	return data, nil
 }
