@@ -5,6 +5,10 @@ New features:
 ..F....PS. [ZBXNEXT-9218] added proxy group discovery internal item (mprihodko)
 
 Bug fixes:
+........S. [ZBX-24879] fixed ODBC login with special characters in the password field (sboidenko)
+..F....... [ZBX-24947] fixed PHP runtime errors while processing frontend notifications (Sasha)
+.........T [ZBX-24927] fixed duplicate references in dashboard widgets (akotsegubov)
+..F....... [ZBX-23867] fixed inherited timeout not being passed to LLD testing form (agriscenko)
 ...G...PS. [ZBX-24779] fixed signal propagation issues when using Zabbix as a PID1 in a container (dgoloscapov)
 A......... [ZBX-24543] removed restriction to remove a user group or removing a user from a user group when the user belongs to only one user group (gcalenko)
 A......... [ZBX-24251] fixed login error when SAML authentication is enabled without a SAML userdirectory (gcalenko)
@@ -2849,6 +2853,7 @@ New features:
 .......PS. [ZBXNEXT-9293] updated max supported MySQL version to 9.0 (mprihodko)
 
 Bug fixes:
+..F....... [ZBX-24947] fixed PHP runtime errors while processing frontend notifications (Sasha)
 ...G...... [ZBX-24824] improved loadable plugin connection broker (rzvejs)
 A......... [ZBX-24583] fixed inability to export/import web scenario with digest authentication (jfreibergs)
 ..F....... [ZBX-23905] fixed double scroll in script dialogs (apoga)
