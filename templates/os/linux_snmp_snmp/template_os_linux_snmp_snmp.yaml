@@ -1774,7 +1774,7 @@ zabbix_export:
                   dskUsedHigh
                   dskUsedLow
                 Together they compose 64-bit number.
-                Reserved space is not counted in.
+                Reserverd space is not counted in.
               preprocessing:
                 - type: JAVASCRIPT
                   parameters:
