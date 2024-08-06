@@ -1,7 +1,5 @@
 Changes for 5.0.43rc1
 
-New features:
-
 Bug fixes:
 .........T [ZBX-23788] added SNMP OID ifAlias in Network interfaces discovery (egordymov)
 .....J.... [ZBX-24298] allowed any JNDI service providers back in JMX monitoring (dimir)
