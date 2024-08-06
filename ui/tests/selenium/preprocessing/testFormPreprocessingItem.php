@@ -92,7 +92,6 @@ class testFormPreprocessingItem extends testFormPreprocessing {
 		$this->checkCreate($data);
 	}
 
-
 	/**
 	 * @dataProvider getItemPreprocessingTrailingSpacesData
 	 */
