@@ -153,7 +153,7 @@ else {
 							))
 								->setAttribute('bgcolor', $color !== '' ? '#'.$color : null)
 								->setHint(
-									(new CDiv(base64_encode($column['value'])))->addClass(ZBX_STYLE_HINTBOX_WRAP)
+									(new CDiv($column['value']))->addClass(ZBX_STYLE_HINTBOX_WRAP)
 								)
 								->setColSpan(2);
 
