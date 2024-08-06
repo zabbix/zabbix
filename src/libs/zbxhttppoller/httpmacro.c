@@ -19,8 +19,6 @@
 #include "zbxvariant.h"
 #include "zbxxml.h"
 
-#define ZBX_MACRO_UNKNOWN	"*UNKNOWN*"
-
 /******************************************************************************
  *                                                                            *
  * Purpose: compares two macros by name                                       *
@@ -242,6 +240,7 @@ out:
  ******************************************************************************/
 int	http_substitute_variables(const zbx_httptest_t *httptest, char **data)
 {
+#define ZBX_MACRO_UNKNOWN	"*UNKNOWN*"
 	int		index, ret = SUCCEED;
 	size_t		pos = 0;
 	zbx_token_t	token;
@@ -285,6 +284,7 @@ int	http_substitute_variables(const zbx_httptest_t *httptest, char **data)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() data:'%s'", __func__, *data);
 
 	return ret;
+#undef ZBX_MACRO_UNKNOWN
 }
 
 /******************************************************************************
