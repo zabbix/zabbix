@@ -184,5 +184,53 @@
             "parameters": ["(.*)_([0-9]+)", "\\\\"]
         },
         "result": "\\"
+    },
+    {
+        "value": "oldParam=value",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["OLDPARAM", "newParam"]
+        },
+        "result": "oldParam=value"
+    },
+    {
+        "value": "oldparam=value",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["oldparam","newParam\/"]
+        },
+        "result": "newParam/=value"
+    },
+    {
+        "value": "test_value",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["com\/", "newParam"]
+        },
+        "result": "*UNKNOWN*"
+    },
+    {
+        "value": "test_value",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["","test"]
+        },
+        "result": "test_value"
+    },
+    {
+        "value": "testing_value",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["[aebcd]", "test"]
+        },
+        "result": "tteststing_vtestlutest"
+    },
+    {
+        "value": "regrepl testing",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["\\w+$", "test"]
+        },
+        "result": "regrepl test"
     }
 ]

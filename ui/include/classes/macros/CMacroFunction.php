@@ -142,16 +142,19 @@ class CMacroFunction {
 				$pattern = $parameters[$i];
 				$replacement = $parameters[$i + 1];
 
-				if (!is_string($replacement)) {
+				if ($pattern === '' || !is_string($replacement)) {
+					continue;
+				}
+
+				if ($pattern[0] !== '/' && substr($pattern, -1) !== '/') {
+					$pattern = '/' . $pattern . '/';
+				}
+
+				if (@preg_match($pattern, '') === false) {
 					return UNRESOLVED_MACRO_STRING;
 				}
 
-				$pattern = preg_quote($pattern, '/');
-				$value = preg_replace('/' . $pattern . '/i', $replacement, $value, -1);
-
-				if ($value === null || preg_last_error() !== PREG_NO_ERROR) {
-					return UNRESOLVED_MACRO_STRING;
-				}
+				$value = preg_replace($pattern, $replacement, $value);
 			}
 		}
 		catch (Exception $e) {
