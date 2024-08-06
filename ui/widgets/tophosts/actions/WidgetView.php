@@ -193,7 +193,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 				$master_entities_min = end($master_entity_values);
 				$master_entities_max = reset($master_entity_values);
 			}
-			elseif ($master_column['display_item_as'] != CWidgetFieldColumnsList::DISPLAY_VALUE_AS_BINARY) {
+			elseif ($master_column['data'] != CWidgetFieldColumnsList::DATA_ITEM_VALUE
+					|| $master_column['display_item_as'] != CWidgetFieldColumnsList::DISPLAY_VALUE_AS_BINARY) {
 				natcasesort($master_entity_values);
 			}
 		}
@@ -204,7 +205,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 				$master_entities_min = reset($master_entity_values);
 				$master_entities_max = end($master_entity_values);
 			}
-			else {
+			elseif ($master_column['data'] != CWidgetFieldColumnsList::DATA_ITEM_VALUE
+					|| $master_column['display_item_as'] != CWidgetFieldColumnsList::DISPLAY_VALUE_AS_BINARY) {
 				natcasesort($master_entity_values);
 				$master_entity_values = array_reverse($master_entity_values, true);
 			}

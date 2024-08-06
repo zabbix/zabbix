@@ -34,10 +34,7 @@ else {
 	$header = [];
 
 	foreach ($data['configuration'] as $column_config) {
-		if ($column_config['data'] == CWidgetFieldColumnsList::DATA_ITEM_VALUE
-				&& (($column_config['display_item_as'] == CWidgetFieldColumnsList::DISPLAY_VALUE_AS_NUMERIC
-					&& $column_config['display'] != CWidgetFieldColumnsList::DISPLAY_AS_IS)
-						|| $column_config['display_item_as'] == CWidgetFieldColumnsList::DISPLAY_VALUE_AS_BINARY)) {
+		if (shouldUseDoubleColumnHeader($column_config)) {
 			$header[] = (new CColHeader(
 				(new CSpan($column_config['name']))
 					->setTitle($column_config['name'])
@@ -57,24 +54,13 @@ else {
 		foreach ($columns as $i => $column) {
 			$column_config = $data['configuration'][$i];
 
-			$is_double_column_span = ($column_config['data'] == CWidgetFieldColumnsList::DATA_ITEM_VALUE)
-				&& (($column_config['display_item_as'] == CWidgetFieldColumnsList::DISPLAY_VALUE_AS_NUMERIC
-						&& $column_config['display'] != CWidgetFieldColumnsList::DISPLAY_AS_IS)
-					|| ($column_config['display_item_as'] == CWidgetFieldColumnsList::DISPLAY_VALUE_AS_BINARY));
-
 			if ($column === null) {
-				if ($is_double_column_span) {
-					$row[] = (new CCol(''))->setColSpan(2);
-				}
-				else {
-					$row[] = '';
-				}
+				$row[] = shouldUseDoubleColumnHeader($column_config) ? (new CCol(''))->setColSpan(2) : '';
 
 				continue;
 			}
 
 			$is_empty_row = false;
-
 			$color = $column_config['base_color'];
 
 			if ($column_config['data'] == CWidgetFieldColumnsList::DATA_ITEM_VALUE
@@ -99,6 +85,7 @@ else {
 				}
 			}
 
+			// Create each column's cell display according to configuration and value type.
 			switch ($column_config['data']) {
 				case CWidgetFieldColumnsList::DATA_HOST_NAME:
 					$row[] = (new CCol(
@@ -266,3 +253,10 @@ else {
 (new CWidgetView($data))
 	->addItem($table)
 	->show();
+
+function shouldUseDoubleColumnHeader(array $column_config): bool {
+	return $column_config['data'] == CWidgetFieldColumnsList::DATA_ITEM_VALUE
+			&& (($column_config['display_item_as'] == CWidgetFieldColumnsList::DISPLAY_VALUE_AS_NUMERIC
+				&& $column_config['display'] != CWidgetFieldColumnsList::DISPLAY_AS_IS)
+					|| $column_config['display_item_as'] == CWidgetFieldColumnsList::DISPLAY_VALUE_AS_BINARY);
+}

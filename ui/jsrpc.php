@@ -883,8 +883,8 @@ switch ($data['method']) {
 
 	case 'item_value_type_by_name.get':
 		$result = '';
-		$groupids = $data['groupids'] ?: null;
-		$hostids = $data['hostids'] ?: null;
+		$groupids = array_key_exists('groupids', $data) ? $data['groupids'] : null;
+		$hostids = array_key_exists('hostids', $data) ? $data['hostids'] : null;
 
 		if (array_key_exists('name', $data)) {
 			$items = API::Item()->get([
