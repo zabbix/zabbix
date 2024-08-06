@@ -103,7 +103,7 @@ class testFormPreprocessingLowLevelDiscovery extends testFormPreprocessing {
 	];
 
 	/*
-	 * Preprocessing data for LLD successful creation.
+	 * GOOD create scenario data for LLD ONLY.
 	 */
 	public function getLLDPreprocessingCreateData() {
 		return array_merge($this->getCommonPreprocessingCreateData(), [
