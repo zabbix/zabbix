@@ -22,7 +22,6 @@
 #include "zbxtime.h"
 #include "zbxstr.h"
 #include "zbxnum.h"
-#include "zbxhttp.h"
 #include "zbxcrypto.h"
 
 #define ZBX_RULE_BUFF_LEN 512
@@ -276,7 +275,7 @@ static int	macrofunc_btoa(char **params, size_t nparam, char **out)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: zbx_http_url_encode wrapper.                                      *
+ * Purpose: zbx_url_encode wrapper.                                           *
  *                                                                            *
  * Parameters: params - [IN] function parameters                              *
  *             nparam - [IN] function parameter count                         *
@@ -295,14 +294,14 @@ static int	macrofunc_urlencode(char **params, size_t nparam, char **out)
 		return FAIL;
 	}
 
-	zbx_http_url_encode(*out, out);
+	zbx_url_encode(*out, out);
 
 	return SUCCEED;
 }
 
 /******************************************************************************
  *                                                                            *
- * Purpose: zbx_http_url_decode wrapper.                                      *
+ * Purpose: zbx_url_decode wrapper.                                           *
  *                                                                            *
  * Parameters: params - [IN] function parameters                              *
  *             nparam - [IN] function parameter count                         *
@@ -321,7 +320,7 @@ static int	macrofunc_urldecode(char **params, size_t nparam, char **out)
 		return FAIL;
 	}
 
-	zbx_http_url_decode(*out, out);
+	zbx_url_decode(*out, out);
 
 	return SUCCEED;
 }

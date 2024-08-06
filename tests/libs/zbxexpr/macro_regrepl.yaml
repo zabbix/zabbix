@@ -17,7 +17,7 @@ out:
   value: 'short short123 -short'
   return: SUCCEED
 ---
-test case: one parametr
+test case: one parameter
 in:
   data: 'ABCabc123'
   params: '"1"'
@@ -35,7 +35,7 @@ out:
   value: '--- ABC'
   return: SUCCEED
 ---
-test case: three parametrs
+test case: three parameters
 in:
   data: 'ABCabc123'
   params: '"1","2","3"'
@@ -53,7 +53,7 @@ out:
   value: '--- !!!'
   return: SUCCEED
 ---
-test case: five parametrs
+test case: five parameters
 in:
   data: 'ABCabc123'
   params: '"1","2","3","4","5"'
@@ -71,7 +71,7 @@ out:
   value: '+++ !!! +++'
   return: SUCCEED
 ---
-test case: seven parametrs
+test case: seven parameters
 in:
   data: 'ABCabc123'
   params: '"1","2","3","4","5","6","7"'
@@ -90,7 +90,7 @@ out:
   return: SUCCEED
 
 ---
-test case: nine parametrs
+test case: nine parameters
 in:
   data: 'ABCabc123'
   params: '"1","2","3","4","5","6","7","8","9"'

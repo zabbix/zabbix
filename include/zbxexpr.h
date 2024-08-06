@@ -286,4 +286,7 @@ int	zbx_substitute_macros(char **data, char *error, size_t maxerrlen, zbx_macro_
 /* macro function calculation */
 int	zbx_calculate_macro_function(const char *expression, const zbx_token_func_macro_t *func_macro, char **out);
 
+void	zbx_url_encode(const char *source, char **result);
+int	zbx_url_decode(const char *source, char **result);
+
 #endif /* ZABBIX_EXPR_H */
