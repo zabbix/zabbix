@@ -28,6 +28,7 @@
 #include "zbxdbhigh.h"
 #include "zbxstr.h"
 #include "zbxtime.h"
+#include "zbxexpr.h"
 
 #ifdef HAVE_LIBCURL
 
