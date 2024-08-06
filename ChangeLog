@@ -26,6 +26,10 @@ A.F.I..PS. [ZBXNEXT-9176] removed support of Oracle DB (agriscenko, sboidenko)
 .......PS. [ZBXNEXT-8990] extended VMware event log with username (asestakovs)
 
 Bug fixes:
+........S. [ZBX-24879] fixed ODBC login with special characters in the password field (sboidenko)
+..F....... [ZBX-24947] fixed PHP runtime errors while processing frontend notifications (Sasha)
+.........T [ZBX-24927] fixed duplicate references in dashboard widgets (akotsegubov)
+..F....... [ZBX-23867] fixed inherited timeout not being passed to LLD testing form (agriscenko)
 ...G...PS. [ZBX-24779] fixed signal propagation issues when using Zabbix as a PID1 in a container (dgoloscapov)
 A......... [ZBX-24543] removed restriction to remove a user group or removing a user from a user group when the user belongs to only one user group (gcalenko)
 A......... [ZBX-24251] fixed login error when SAML authentication is enabled without a SAML userdirectory (gcalenko)
@@ -169,6 +173,10 @@ New features:
 ..F....PS. [ZBXNEXT-9218] added proxy group discovery internal item (mprihodko)
 
 Bug fixes:
+........S. [ZBX-24879] fixed ODBC login with special characters in the password field (sboidenko)
+..F....... [ZBX-24947] fixed PHP runtime errors while processing frontend notifications (Sasha)
+.........T [ZBX-24927] fixed duplicate references in dashboard widgets (akotsegubov)
+..F....... [ZBX-23867] fixed inherited timeout not being passed to LLD testing form (agriscenko)
 ...G...PS. [ZBX-24779] fixed signal propagation issues when using Zabbix as a PID1 in a container (dgoloscapov)
 A......... [ZBX-24543] removed restriction to remove a user group or removing a user from a user group when the user belongs to only one user group (gcalenko)
 A......... [ZBX-24251] fixed login error when SAML authentication is enabled without a SAML userdirectory (gcalenko)
@@ -3013,6 +3021,7 @@ New features:
 .......PS. [ZBXNEXT-9293] updated max supported MySQL version to 9.0 (mprihodko)
 
 Bug fixes:
+..F....... [ZBX-24947] fixed PHP runtime errors while processing frontend notifications (Sasha)
 ...G...... [ZBX-24824] improved loadable plugin connection broker (rzvejs)
 A......... [ZBX-24583] fixed inability to export/import web scenario with digest authentication (jfreibergs)
 ..F....... [ZBX-23905] fixed double scroll in script dialogs (apoga)
@@ -3020,7 +3029,7 @@ A......... [ZBX-24583] fixed inability to export/import web scenario with digest
 ..F....... [ZBX-24909] fixed resolving of macro functions in the "Item value" widget (Sasha)
 .........T [ZBX-24859] fixed JavaScript in S3 buckets discovery rule (egordymov)
 .........T [ZBX-24617] fixed hardcoded region in AWS by HTTP template (egordymov)
-.......PS. [ZBX-24524] fixed "new values per second" stat to include dependent items in calculation (asestakovs)
+.......PS. [ZBX-24524] fixed "New values per second" statistic to include dependent items in calculation (asestakovs)
 ........S. [ZBX-24821] made 'execute_on' value being recorded in audit only for shell scripts (arimdjonoks)
 ..F....... [ZBX-23312] fixed discovery edit form being saved incorrectly after dcheck update (dfofanovs)
 .........T [ZBX-24773] fixed duplicate item preprocessing in Kubernetes Kubelet by HTTP template (egordymov)
@@ -6175,8 +6184,6 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 
 --------------------------------------------------------------------------------
 Changes for 5.0.43rc1
-
-New features:
 
 Bug fixes:
 .........T [ZBX-23788] added SNMP OID ifAlias in Network interfaces discovery (egordymov)

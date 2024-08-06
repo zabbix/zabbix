@@ -208,7 +208,6 @@ class CControllerNotificationsGet extends CController {
 				'output' => [],
 				'selectHosts' => ['hostid', 'name'],
 				'triggerids' => array_keys($problems_by_triggerid),
-				'lastChangeSince' => $this->time_from,
 				'preservekeys' => true
 			]);
 

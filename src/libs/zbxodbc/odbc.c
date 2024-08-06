@@ -204,7 +204,7 @@ static void	zbx_log_odbc_connection_info(const char *function, SQLHDBC hdbc)
  *             value          - [IN] attribute value                          *
  *                                                                            *
  ******************************************************************************/
-static void zbx_odbc_connection_string_append(char **connection_str, const char *attribute, const char *value)
+static void	zbx_odbc_connection_string_append(char **connection_str, const char *attribute, const char *value)
 {
 	size_t	len;
 	char	last = '\0';
@@ -217,6 +217,67 @@ static void zbx_odbc_connection_string_append(char **connection_str, const char 
 
 	*connection_str = zbx_dsprintf(*connection_str, "%s%s%s=%s", *connection_str, ';' == last ? "" : ";",
 			attribute, value);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: Appends a password to the ODBC connection string.                 *
+ *          Connection string is reallocated to fit new value.                *
+ *                                                                            *
+ * Parameters: connection_str - [IN/OUT] connection string                    *
+ *             value          - [IN] attribute value                          *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_odbc_connection_pwd_append(char **connection_str, const char *value)
+{
+	size_t	len;
+	char	last = '\0', *pwd = NULL;
+
+	if (NULL == value)
+		return;
+
+	len = strlen(value);
+	if ('{' != *value || '}' != value[len-1])
+	{
+		int		need_replacement = 0;
+		const char	*src = value;
+		char		*dst;
+
+		dst = pwd = (char *)zbx_malloc(NULL, (len + 1) * 2);
+		*dst++ = '{';
+		while ('\0' != *src)
+		{
+			switch (*src)
+			{
+				case '}':
+					*dst++ = *src;
+					*dst++ = *src++;
+					break;
+				case ';':
+				case '=':
+				case ' ':
+					need_replacement = 1;
+					ZBX_FALLTHROUGH;
+				default:
+					*dst++ = *src++;
+			}
+		}
+
+		if (0 != need_replacement)
+		{
+			*dst++ = '}';
+			*dst++ = '\0';
+		}
+		else
+			zbx_free(pwd);
+	}
+
+	if (0 < (len = strlen(*connection_str)))
+		last = (*connection_str)[len-1];
+
+	*connection_str = zbx_dsprintf(*connection_str, "%s%sPWD=%s", *connection_str, ';' == last ? "" : ";",
+			(NULL != pwd) ? pwd : value);
+	zbx_free(pwd);
 }
 
 /******************************************************************************
@@ -255,7 +316,7 @@ zbx_odbc_data_source_t	*zbx_odbc_connect(const char *dsn, const char *connection
 		{
 			rc = SQLAllocHandle(SQL_HANDLE_DBC, data_source->henv, &data_source->hdbc);
 
-			if(SUCCEED == zbx_odbc_diag(SQL_HANDLE_ENV, data_source->henv, rc, &diag))
+			if (SUCCEED == zbx_odbc_diag(SQL_HANDLE_ENV, data_source->henv, rc, &diag))
 			{
 				rc = SQLSetConnectAttr(data_source->hdbc, (SQLINTEGER)SQL_LOGIN_TIMEOUT,
 						(SQLPOINTER)(intptr_t)timeout, (SQLINTEGER)0);
@@ -280,7 +341,7 @@ zbx_odbc_data_source_t	*zbx_odbc_connect(const char *dsn, const char *connection
 						{
 							connection_str = zbx_strdup(NULL, connection);
 							zbx_odbc_connection_string_append(&connection_str, "UID", user);
-							zbx_odbc_connection_string_append(&connection_str, "PWD", pass);
+							zbx_odbc_connection_pwd_append(&connection_str, pass);
 							connection = connection_str;
 						}
 
