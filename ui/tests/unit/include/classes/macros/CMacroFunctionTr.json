@@ -334,5 +334,61 @@
             "parameters": ["*", "\\-"]
         },
         "result": "-A-"
+    },
+    {
+        "value": "ABCabc123",
+        "macrofunc": {
+            "function": "tr",
+            "parameters": ["\\", "\\\\-"]
+        },
+        "result": "ABCabc123"
+    },
+    {
+        "value": "ыABCabc123ыы",
+        "macrofunc": {
+            "function": "tr",
+            "parameters": ["ы", "в"]
+        },
+        "result": "вABCabc123вв"
+    },
+    {
+        "value": "value_12345",
+        "macrofunc": {
+            "function": "tr",
+            "parameters": ["5", "П"]
+        },
+        "result": "value_1234?"
+    },
+    {
+        "value": "abcde_12345",
+        "macrofunc": {
+            "function": "tr",
+            "parameters": ["a-c", "Я"]
+        },
+        "result": "Я?de_12345"
+    },
+    {
+        "value": "abcde_12345",
+        "macrofunc": {
+            "function": "tr",
+            "parameters": ["a-c", "ЯA-Я"]
+        },
+        "result": "ЯAde_12345"
+    },
+    {
+        "value": "value_ППП_aaa_123",
+        "macrofunc": {
+            "function": "tr",
+            "parameters": ["123", "П"]
+        },
+        "result": "value_ППП_aaa_П?"
+    },
+    {
+        "value": "value_ППП_aaa_123321",
+        "macrofunc": {
+            "function": "tr",
+            "parameters": ["123", "П"]
+        },
+        "result": "value_ППП_aaa_П????"
     }
 ]

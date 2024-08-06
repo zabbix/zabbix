@@ -190,19 +190,61 @@ class CMacroFunction {
 			return UNRESOLVED_MACRO_STRING;
 		}
 
-		// Add missing characters if length of searchlist and replacementlist is not identical.
-		$searchlist_length = mb_strlen($searchlist);
-		$replacementlist_length = mb_strlen($replacementlist);
-
-		if ($searchlist_length > $replacementlist_length) {
-			$last_char = mb_substr($replacementlist, -1, 1);
-			$replacementlist .= str_repeat($last_char, $searchlist_length - $replacementlist_length);
-		}
-		elseif ($replacementlist_length > $searchlist_length) {
-			$replacementlist = mb_substr($replacementlist, 0, $searchlist_length);
+		// Handle multibyte characters.
+		if (!mb_check_encoding($searchlist, 'ASCII') || !mb_check_encoding($replacementlist, 'ASCII')) {
+			return self::handleMultibyteCharacters($value, $searchlist, $replacementlist);
 		}
 
-		return strtr($value, array_combine(mb_str_split($searchlist), mb_str_split($replacementlist)));
+		if (strlen($searchlist) > strlen($replacementlist)) {
+			$replacementlist = str_pad($replacementlist, strlen($searchlist), substr($replacementlist, -1));
+		}
+		elseif (strlen($replacementlist) > strlen($searchlist)) {
+			$replacementlist = substr($replacementlist, 0, strlen($searchlist));
+		}
+
+		return strtr($value, $searchlist, $replacementlist);
+	}
+
+	/**
+	 * Handles the character transliteration when multibyte characters are used in search-list or replacement-list
+	 *
+	 * @param string $value            [IN] Macro value.
+	 * @param string $searchlist       [IN] Search parameter.
+	 * @param string $replacementlist  [IN] Replacement parameter.
+	 *
+	 * @return string
+	 */
+	private static function handleMultibyteCharacters(string $value, string $searchlist,
+			string $replacementlist): string {
+		$searchlist_bytes = array_values(unpack('C*', $searchlist));
+		$replacementlist_bytes = array_values(unpack('C*', $replacementlist));
+
+		// Add missing characters or truncate replacementlist based on byte length.
+		if (count($searchlist_bytes) > count($replacementlist_bytes)) {
+			$replacementlist_bytes = array_pad($replacementlist_bytes, count($searchlist_bytes),
+				end($replacementlist_bytes)
+			);
+		}
+		elseif (count($replacementlist_bytes) > count($searchlist_bytes)) {
+			$replacementlist_bytes = array_slice($replacementlist_bytes, 0, count($searchlist_bytes));
+		}
+
+		// Build the translation map for byte-level replacement.
+		$translation_map = array_combine($searchlist_bytes, $replacementlist_bytes);
+		if ($translation_map === false) {
+			$translation_map = [];
+		}
+
+		// Translate the string based on byte values.
+		$value_bytes = array_values(unpack('C*', $value));
+		$translated_bytes = array_map(function ($byte) use ($translation_map) {
+			return $translation_map[$byte] ?? $byte;
+		}, $value_bytes);
+
+		// Convert bytes back to string.
+		$converted_string = implode(array_map('chr', $translated_bytes));
+
+		return mb_convert_encoding($converted_string, 'UTF-8', 'UTF-8');
 	}
 
 	/**
@@ -225,8 +267,9 @@ class CMacroFunction {
 
 				if ($i < $length) {
 					$expanded .= match ($characters[$i]) {
-						'a' => "\a",
-						'b' => "\b",
+						// Alert and backspace use hex codes as PHP doesn't support these escape sequences directly.
+						'a' => "\x07",
+						'b' => "\x08",
 						'f' => "\f",
 						'n' => "\n",
 						'r' => "\r",
@@ -240,7 +283,7 @@ class CMacroFunction {
 			}
 
 			// Handle ranges.
-			if (array_key_exists($i, $characters) && $parameter[$i] === '-') {
+			if (array_key_exists($i, $characters) && $parameter[$i] === '-' && $i + 1 !== $length) {
 				// If the first element is '-', and it is part of a range, do not interpret it as a separate character.
 				if ($i === 0 && $parameter[$i] === '-' && $parameter[$i + 1] === '-') {
 					$i++;
