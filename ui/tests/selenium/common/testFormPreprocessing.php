@@ -1412,10 +1412,89 @@ abstract class testFormPreprocessing extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Name' => 'Check for not supported value - two checks',
-						'Key' => 'check-for-not-supported-value-two-checks[{#KEY}]'
+						'Name' => 'Check for not supported value - error matches + any error',
+						'Key' => 'check-for-not-supported-value-1[{#KEY}]'
 					],
 					'preprocessing' => [
+						['type' => 'Check for not supported value', 'parameter_1' => 'error matches', 'parameter_2' => '^test.*$'],
+						['type' => 'Check for not supported value', 'parameter_1' => 'any error']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Check for not supported value - error matches + error matches',
+						'Key' => 'check-for-not-supported-value-2[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Check for not supported value', 'parameter_1' => 'error matches', 'parameter_2' => '^test.*$'],
+						['type' => 'Check for not supported value', 'parameter_1' => 'error matches', 'parameter_2' => 'different']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Check for not supported value - error matches + error matches (equal parameters)',
+						'Key' => 'check-for-not-supported-value-3[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Check for not supported value', 'parameter_1' => 'error matches', 'parameter_2' => 'equal'],
+						['type' => 'Check for not supported value', 'parameter_1' => 'error matches', 'parameter_2' => 'equal']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Check for not supported value - error does not match + any error',
+						'Key' => 'check-for-not-supported-value-4[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Check for not supported value', 'parameter_1' => 'error does not match', 'parameter_2' => '^test.*$'],
+						['type' => 'Check for not supported value', 'parameter_1' => 'any error']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Check for not supported value - error does not match + error does not match',
+						'Key' => 'check-for-not-supported-value-5[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Check for not supported value', 'parameter_1' => 'error does not match', 'parameter_2' => '^test.*$'],
+						['type' => 'Check for not supported value', 'parameter_1' => 'error does not match', 'parameter_2' => 'different']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Check for not supported value - error does not match + error does not match (equal parameters)',
+						'Key' => 'check-for-not-supported-value-6[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Check for not supported value', 'parameter_1' => 'error does not match', 'parameter_2' => 'equal'],
+						['type' => 'Check for not supported value', 'parameter_1' => 'error does not match', 'parameter_2' => 'equal']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Check for not supported value - all types',
+						'Key' => 'check-for-not-supported-value-all-types[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Check for not supported value', 'parameter_1' => 'error does not match', 'parameter_2' => 'aa'],
 						['type' => 'Check for not supported value', 'parameter_1' => 'error matches', 'parameter_2' => '^test.*$'],
 						['type' => 'Check for not supported value', 'parameter_1' => 'any error']
 					]
@@ -2912,28 +2991,6 @@ abstract class testFormPreprocessing extends CWebTest {
 		if (!$lld) {
 			COverlayDialogElement::find()->one()->close();
 		}
-	}
-
-	/**
-	 * Check that adding two 'Check for not supported value'
-	 * preprocessing steps is impossible.
-	 */
-	public function checkRepeatedNotSupported() {
-		// TODO: rewrite this check accordingly to DEV-2667 (1).
-		/*$this->page->login()->open($this->link);
-		$this->query('button:'.$this->button)->waitUntilPresent()->one()->click();
-
-		$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
-		$form->fill(['Key' => 'test.key']);
-		$form->selectTab('Preprocessing');
-
-		$this->addPreprocessingSteps([['type' => 'Check for not supported value']]);
-		$this->query('id:param_add')->one()->click();
-
-		$this->assertTrue($this->query('xpath://z-select[@id="preprocessing_0_type"]'.
-				'//li[text()="Check for not supported value"]')->one()->isEnabled());
-		$this->assertFalse($this->query('xpath://z-select[@id="preprocessing_1_type"]'.
-				'//li[text()="Check for not supported value"]')->one()->isEnabled());*/
 	}
 
 	/*

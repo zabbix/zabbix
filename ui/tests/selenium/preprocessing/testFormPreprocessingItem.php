@@ -92,13 +92,6 @@ class testFormPreprocessingItem extends testFormPreprocessing {
 		$this->checkCreate($data);
 	}
 
-	/**
-	 * Check that adding two 'Check for not supported value'
-	 * preprocessing steps is impossible.
-	 */
-	public function testFormItemPreprocessing_RepeatedNotSupported() {
-		$this->checkRepeatedNotSupported();
-	}
 
 	/**
 	 * @dataProvider getItemPreprocessingTrailingSpacesData
