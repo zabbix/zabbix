@@ -1,3 +1,29 @@
+Changes for 6.0.33rc1
+
+New features:
+...G.....T [ZBXNEXT-9000] changed query table for ASM disk group metrics in Oracle Database plugin and Oracle by ODBC template (knaglis)
+.........T [ZBXNEXT-9217] added AWS Lambda by HTTP template (egordymov)
+.......PS. [ZBXNEXT-9293] updated max supported MySQL version to 9.0 (mprihodko)
+
+Bug fixes:
+...G...... [ZBX-24824] improved loadable plugin connection broker (rzvejs)
+A......... [ZBX-24583] fixed inability to export/import web scenario with digest authentication (jfreibergs)
+..F....... [ZBX-23905] fixed double scroll in script dialogs (apoga)
+..F....... [ZBX-18767] fixed word breaks in flexible text input fields and trigger expressions (ddauksa)
+..F....... [ZBX-24909] fixed resolving of macro functions in the "Item value" widget (Sasha)
+.........T [ZBX-24859] fixed JavaScript in S3 buckets discovery rule (egordymov)
+.........T [ZBX-24617] fixed hardcoded region in AWS by HTTP template (egordymov)
+.......PS. [ZBX-24524] fixed "new values per second" stat to include dependent items in calculation (asestakovs)
+........S. [ZBX-24821] made 'execute_on' value being recorded in audit only for shell scripts (arimdjonoks)
+..F....... [ZBX-23312] fixed discovery edit form being saved incorrectly after dcheck update (dfofanovs)
+.........T [ZBX-24773] fixed duplicate item preprocessing in Kubernetes Kubelet by HTTP template (egordymov)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.32
+
+6.0.32rc1 was released as 6.0.32 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 6.0.32rc1
 
 New features:
