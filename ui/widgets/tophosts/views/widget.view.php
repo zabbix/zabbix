@@ -146,6 +146,10 @@ else {
 							break;
 						}
 						else {
+							$value = $column_config['aggregate_function'] == AGGREGATE_COUNT
+								? $column['value']
+								: base64_encode($column['value']);
+
 							$row[] = (new CCol(
 								(new CButton(null, _('Show')))
 									->addClass(ZBX_STYLE_BTN_LINK)
@@ -153,7 +157,7 @@ else {
 							))
 								->setAttribute('bgcolor', $color !== '' ? '#'.$color : null)
 								->setHint(
-									(new CDiv($column['value']))->addClass(ZBX_STYLE_HINTBOX_WRAP)
+									(new CDiv($value))->addClass(ZBX_STYLE_HINTBOX_WRAP)
 								)
 								->setColSpan(2);
 
