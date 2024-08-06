@@ -6,6 +6,7 @@ New features:
 .......PS. [ZBXNEXT-9293] updated max supported MySQL version to 9.0 (mprihodko)
 
 Bug fixes:
+..F....... [ZBX-24947] fixed PHP runtime errors while processing frontend notifications (Sasha)
 ...G...... [ZBX-24824] improved loadable plugin connection broker (rzvejs)
 A......... [ZBX-24583] fixed inability to export/import web scenario with digest authentication (jfreibergs)
 ..F....... [ZBX-23905] fixed double scroll in script dialogs (apoga)
