@@ -804,7 +804,10 @@ static duk_ret_t	es_httprequest_set_httpauth(duk_context *ctx)
 	}
 
 	if (NULL == (request = es_httprequest(ctx)))
-		return duk_throw(ctx);
+	{
+		err_index = 0;
+		goto out;
+	}
 
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_HTTPAUTH, mask, err);
 
