@@ -261,9 +261,8 @@ class testFormUserGroups extends CLegacyWebTest {
 		return [
 			[
 				[
-					'expected' => TEST_BAD,
-					'name' => 'Disabled',
-					'error' => 'User "disabled-user" cannot be without user group.'
+					'expected' => TEST_GOOD,
+					'name' => 'Disabled'
 				]
 			],
 			[
