@@ -180,8 +180,18 @@ abstract class testFormPreprocessing extends CWebTest {
 		]
 	];
 
+	/**
+	 * Sets rows per page to 200 so that all items are always shown on screen.
+	 */
+	protected function setRowsPerPage() {
+		DB::update('users', [
+			'values' => ['rows_per_page' => 200],
+			'where' => ['userid' => 1] // Admin (super admin role)
+		]);
+	}
+
 	/*
-	 * GOOD scenario data common for all - items and item prototypes ONLY (not LLD).
+	 * GOOD scenario data common for all - items, item prototypes and LLD.
 	 *
 	 * Comments are formatted like this:
 	 * {Preprocessing step category} - {Preprocessing step name}.
@@ -3575,8 +3585,8 @@ abstract class testFormPreprocessing extends CWebTest {
 			'Key' => 'cloned-preprocessing'.time().'[{#KEY}]'
 		];
 
-		// Open original item on host and get its' preprocessing steps.
-		$this->page->login()->open($link);
+		// Open original item on host and get its preprocessing steps.
+		$this->page->login()->open($link)->waitUntilReady();
 
 		if ($item === 'Discovery rule') {
 			$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
@@ -3586,7 +3596,7 @@ abstract class testFormPreprocessing extends CWebTest {
 				? CDBHelper::getValue('SELECT name FROM items WHERE itemid='.($templated ? self::INHERITED_ITEMID : self::CLONE_ITEMID))
 				: CDBHelper::getValue('SELECT name FROM items WHERE itemid='.($templated ? self::INHERITED_ITEM_PROTOTYPE : self::CLONE_ITEM_PROTOTYPEID));
 
-			$this->query('link', $item_name)->one()->click();
+			$this->query('link', $item_name)->one()->waitUntilClickable()->click();
 			$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 			$form = $dialog->asForm();
 		}

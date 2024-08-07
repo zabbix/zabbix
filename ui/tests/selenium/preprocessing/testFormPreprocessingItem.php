@@ -18,7 +18,8 @@ require_once dirname(__FILE__).'/../common/testFormPreprocessing.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 
 /**
- * @backup items
+ * @backup items,users
+ * @onBefore setRowsPerPage
  */
 class testFormPreprocessingItem extends testFormPreprocessing {
 
@@ -130,7 +131,7 @@ class testFormPreprocessingItem extends testFormPreprocessing {
 		$original_steps = $this->listPreprocessingSteps();
 		$dialog->close();
 		// Open copied item form, get steps text and compare to original.
-		$this->page->open('zabbix.php?action=item.list&filter_set=1&context=host&filter_hostids[0]='.self::HOSTID.'&filter_name='.$item_name);
+		$this->page->open('zabbix.php?action=item.list&filter_set=1&context=host&filter_hostids[0]='.self::HOSTID);
 		$this->query('link', $item_name)->one()->click();
 		$form->invalidate();
 		$this->assertEquals($item_name, $form->getField('Name')->getValue());
