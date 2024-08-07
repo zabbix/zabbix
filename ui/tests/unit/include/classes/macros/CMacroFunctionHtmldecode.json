@@ -46,5 +46,13 @@
             "parameters": []
         },
         "result": ""
+    },
+    {
+        "value": "12345",
+        "macrofunc": {
+            "function": "htmldecode",
+            "parameters": [" "]
+        },
+        "result": "*UNKNOWN*"
     }
 ]

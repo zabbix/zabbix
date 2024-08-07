@@ -34,7 +34,7 @@
     {
         "value": "%20",
         "macrofunc": {
-            "function": "urlencode",
+            "function": "urldecode",
             "parameters": ["123"]
         },
         "result": "*UNKNOWN*"
@@ -42,8 +42,16 @@
     {
         "value": "%20%20%20",
         "macrofunc": {
-            "function": "urlencode",
+            "function": "urldecode",
             "parameters": ["123", "456", "789"]
+        },
+        "result": "*UNKNOWN*"
+    },
+    {
+        "value": "12345",
+        "macrofunc": {
+            "function": "urldecode",
+            "parameters": [" "]
         },
         "result": "*UNKNOWN*"
     }

@@ -62,5 +62,13 @@
             "parameters": []
         },
         "result": "12345"
+    },
+    {
+        "value": "12345",
+        "macrofunc": {
+            "function": "lowercase",
+            "parameters": [" "]
+        },
+        "result": "*UNKNOWN*"
     }
 ]

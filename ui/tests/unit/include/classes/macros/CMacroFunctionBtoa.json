@@ -86,5 +86,13 @@
             "parameters": []
         },
         "result": "MTIzNDU2Nzg5MCFAIyQlXiYqKClfKy09e31bXToiOyc8Pj8sLi98XGB+"
+    },
+    {
+        "value": "12345",
+        "macrofunc": {
+            "function": "btoa",
+            "parameters": [" "]
+        },
+        "result": "*UNKNOWN*"
     }
 ]

@@ -2751,7 +2751,7 @@ class C10TriggerExpressionTest extends TestCase {
 							'function' => 'diff()',
 							'functionName' => 'diff',
 							'functionParam' => '',
-							'functionParamList' => ['']
+							'functionParamList' => []
 						]
 					]
 				],

@@ -92,6 +92,12 @@ class C10FunctionParser extends CParser {
 			return false;
 		}
 
+		if ($pos < strlen($source) - 1  && $source[$pos + 1] === ')') {
+			$pos+=2;
+
+			return true;
+		}
+
 		$_parameters = [];
 		$state = self::STATE_NEW;
 		$num = 0;
