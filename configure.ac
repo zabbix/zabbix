@@ -132,11 +132,11 @@ AS_IF([test $cc_accepts_werror = yes],
             dnl thus the result setting is inverted, because
             dnl we're providing a test case that should _fail_
             dnl compilation. Thus, if it succeeds, the compiler
-            dnl does not support dnl the flag.
+            dnl does not support the flag.
             dnl
             dnl We've already established whether the compiler
-            dnl continues with invocation errors, and whether it
-            dnl whether it accepts -Werror at all.
+            dnl continues with invocation errors, and whether
+            dnl it accepts -Werror at all.
             AC_LANG_PROGRAM([[
             #warning This preprocessor warning is intentional
             ]], [[
