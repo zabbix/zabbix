@@ -59,7 +59,7 @@ class testMultiselectsWithoutData extends testMultiselectDialogs {
 			CDataHelper::call('drule.delete', array_values($discoveryruleids));
 		}
 
-		$monitored_hostids = CDBHelper::getColumn('SELECT * FROM hosts WHERE monitored_by=1', 'hostid');
+		$monitored_hostids = CDBHelper::getColumn('SELECT * FROM hosts WHERE monitored_by=1 OR monitored_by=2', 'hostid');
 		if ($monitored_hostids !== []) {
 			CDataHelper::call('host.delete', array_values($monitored_hostids));
 		}
@@ -72,6 +72,11 @@ class testMultiselectsWithoutData extends testMultiselectDialogs {
 		$proxyids = CDBHelper::getColumn('SELECT * FROM proxy', 'proxyid');
 		if ($proxyids !== []) {
 			CDataHelper::call('proxy.delete', array_values($proxyids));
+		}
+
+		$proxy_groupids = CDBHelper::getColumn('SELECT * FROM proxy_group', 'proxy_groupid');
+		if ($proxyids !== []) {
+			CDataHelper::call('proxygroup.delete', array_values($proxy_groupids));
 		}
 
 		// Delete SLA.
