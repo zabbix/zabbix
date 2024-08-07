@@ -113,8 +113,6 @@ class CControllerScriptList extends CController {
 			(new CUrl('zabbix.php'))->setArgument('action', $this->getAction())
 		);
 
-
-
 		/*
 		 * Find script host group name and user group name. Set to NULL if all host/user groups used. Find associated
 		 * actions in any of operations. Collect scriptids for action scope scripts.
