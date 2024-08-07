@@ -1061,7 +1061,7 @@ static char	*zbx_snmp_get_octet_string(const struct variable_list *var, unsigned
 
 	if (ZBX_ASN_OCTET_STR_UTF_8 == snmp_asn_octet_str && NULL == hint)
 	{
-		/* avoid convertion to Hex-STRING for valid UTF-8 strings without hints */
+		/* avoid conversion to Hex-STRING for valid UTF-8 strings without hints */
 		if (NULL != (strval_dyn = zbx_sprint_asn_octet_str_dyn(var)))
 		{
 			type = ZBX_SNMP_STR_ASCII;
