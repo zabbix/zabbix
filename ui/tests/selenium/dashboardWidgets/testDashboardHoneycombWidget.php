@@ -44,11 +44,34 @@ class testDashboardHoneycombWidget extends testWidgets {
 	protected static $dashboardid;
 
 	/**
+	 * Hash before TEST_BAD scenario.
+	 */
+	protected static $old_hash;
+
+	/**
+	 * Widget amount before create/update.
+	 */
+	protected static $old_widget_count;
+
+	/**
 	 * Id of dashboard for update scenarios.
 	 */
 	protected static $disposable_dashboard_id;
 
 	public static function prepareHoneycombWidgetData() {
+		CDataHelper::call('hostgroup.create', [
+			[
+				'name' => 'Maintenance group'
+			],
+			[
+				'name' => 'Host with tags'
+			],
+			[
+				'name' => 'Items with tags'
+			]
+		]);
+		$groupids = CDataHelper::getIds('name');
+
 		$response = CDataHelper::createHosts([
 			[
 				'host' => 'Host for honeycomb 1',
@@ -58,8 +81,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 						'name' => 'Numeric for honeycomb 1',
 						'key_' => 'num_honey_1',
 						'type' => ITEM_TYPE_TRAPPER,
-						'value_type' => ITEM_VALUE_TYPE_UINT64,
-						'delay' => 0
+						'value_type' => ITEM_VALUE_TYPE_UINT64
 					]
 				]
 			],
@@ -71,46 +93,170 @@ class testDashboardHoneycombWidget extends testWidgets {
 						'name' => 'Display item 1',
 						'key_' => 'honey_display_1',
 						'type' => ITEM_TYPE_TRAPPER,
-						'value_type' => ITEM_VALUE_TYPE_UINT64,
-						'delay' => 0
+						'value_type' => ITEM_VALUE_TYPE_UINT64
 					],
 					[
 						'name' => 'Display item 2',
 						'key_' => 'honey_display_2',
 						'type' => ITEM_TYPE_TRAPPER,
-						'value_type' => ITEM_VALUE_TYPE_UINT64,
-						'delay' => 0
+						'value_type' => ITEM_VALUE_TYPE_UINT64
 					],
 					[
 						'name' => 'Display item 3',
 						'key_' => 'honey_display_3',
 						'type' => ITEM_TYPE_TRAPPER,
-						'value_type' => ITEM_VALUE_TYPE_UINT64,
-						'delay' => 0
+						'value_type' => ITEM_VALUE_TYPE_UINT64
 					],
 					[
 						'name' => 'Display item 4',
 						'key_' => 'honey_display_4',
 						'type' => ITEM_TYPE_TRAPPER,
-						'value_type' => ITEM_VALUE_TYPE_UINT64,
-						'delay' => 0
+						'value_type' => ITEM_VALUE_TYPE_UINT64
 					],
 					[
 						'name' => 'Display item 5',
 						'key_' => 'honey_display_5',
 						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_UINT64
+					]
+				]
+			],
+			[
+				'host' => 'Host for maintenance filter',
+				'groups' => [['groupid' => $groupids['Maintenance group']]],
+				'items' => [
+					[
+						'name' => 'Maintenance item',
+						'key_' => 'maintenance_1',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_UINT64
+					]
+				]
+			],
+			[
+				'host' => 'Host with tags',
+				'groups' => [['groupid' => $groupids['Host with tags']]],
+				'tags' => [
+					[
+						'tag' => 'host_tag_1',
+						'value' => 'host_val_1'
+					]
+				],
+				'items' => [
+					[
+						'name' => 'Host tag item',
+						'key_' => 'host_tag_1',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_UINT64
+					]
+				]
+			],
+			[
+				'host' => 'Host with items with tags',
+				'groups' => [['groupid' => $groupids['Items with tags']]],
+				'items' => [
+					[
+						'name' => 'Item tag 1',
+						'key_' => 'item_tag_1',
+						'type' => ITEM_TYPE_TRAPPER,
 						'value_type' => ITEM_VALUE_TYPE_UINT64,
-						'delay' => 0
+						'tags' => [
+							[
+								'tag' => 'item_tag_1',
+								'value' => 'item_val_1'
+							]
+						]
+					],
+					[
+						'name' => 'Item tag 2',
+						'key_' => 'item_tag_2',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_UINT64,
+						'tags' => [
+							[
+								'tag' => 'item_tag_2',
+								'value' => 'item_val_2'
+							]
+						]
+					],
+					[
+						'name' => 'Item tag 3',
+						'key_' => 'item_tag_3',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_UINT64,
+						'tags' => [
+							[
+								'tag' => 'item_tag_3',
+								'value' => 'item_val_3'
+							]
+						]
+					],
+					[
+						'name' => 'Item tag 4',
+						'key_' => 'item_tag_4',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_UINT64,
+						'tags' => [
+							[
+								'tag' => 'item_tag_1',
+								'value' => 'item_val_1'
+							]
+						]
+					],
+					[
+						'name' => 'Item tag 5',
+						'key_' => 'item_tag_5',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_UINT64,
+						'tags' => [
+							[
+								'tag' => 'item_tag_1',
+								'value' => 'item_val_5'
+							]
+						]
 					]
 				]
 			]
 		]);
 		$itemids = $response['itemids'];
-		$hostid = $response['hostids']['Display'];
+		$display_hostid = $response['hostids']['Display'];
+		$maintenance_hostid = $response['hostids']['Host for maintenance filter'];
 
-		foreach (['1' => 100, '2' => 200, '3' => 300, '4' => 400, '5' => 500] as $key => $value) {
-			CDataHelper::addItemData($itemids['Display:honey_display_'.$key], $value);
+		foreach ([100, 200, 300, 400, 500] as $i => $value) {
+			CDataHelper::addItemData($itemids['Display:honey_display_'.($i + 1)], $value);
 		}
+
+		// Items ids that used in filtering scenario.
+		$filtered_items = [
+			$itemids['Host for maintenance filter:maintenance_1'],
+			$itemids['Host with tags:host_tag_1'],
+			$itemids['Host with items with tags:item_tag_1'],
+			$itemids['Host with items with tags:item_tag_2'],
+			$itemids['Host with items with tags:item_tag_3'],
+			$itemids['Host with items with tags:item_tag_4'],
+			$itemids['Host with items with tags:item_tag_5']
+		];
+
+		foreach ($filtered_items as $itemid) {
+			CDataHelper::addItemData($itemid, 100);
+		}
+
+		// Create Maintenance and host in maintenance.
+		$maintenances = CDataHelper::call('maintenance.create', [
+			[
+				'name' => 'Honeycomb host maintenance',
+				'active_since' => time() - 1000,
+				'active_till' => time() + 31536000,
+				'groups' => [['groupid' => $groupids['Maintenance group']]],
+				'timeperiods' => [[]]
+			]
+		]);
+		$maintenanceid = $maintenances['maintenanceids'][0];
+
+		DBexecute('UPDATE hosts SET maintenanceid='.zbx_dbstr($maintenanceid).
+				', maintenance_status=1, maintenance_type='.MAINTENANCE_TYPE_NORMAL.', maintenance_from='.zbx_dbstr(time()-1000).
+				' WHERE hostid='.zbx_dbstr($maintenance_hostid)
+		);
 
 		CDataHelper::call('dashboard.create', [
 			[
@@ -221,7 +367,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 									[
 										'type' => '3',
 										'name' => 'hostids.0',
-										'value' => $hostid
+										'value' => $display_hostid
 									],
 									[
 										'type' => 1,
@@ -271,7 +417,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 									[
 										'type' => '3',
 										'name' => 'hostids.0',
-										'value' => $hostid
+										'value' => $display_hostid
 									],
 									[
 										'type' => 1,
@@ -326,7 +472,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 									[
 										'type' => '3',
 										'name' => 'hostids.0',
-										'value' => $hostid
+										'value' => $display_hostid
 									],
 									[
 										'type' => 1,
@@ -396,7 +542,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 									[
 										'type' => '3',
 										'name' => 'hostids.0',
-										'value' => $hostid
+										'value' => $display_hostid
 									],
 									[
 										'type' => 1,
@@ -511,7 +657,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 									[
 										'type' => '3',
 										'name' => 'hostids.0',
-										'value' => $hostid
+										'value' => $display_hostid
 									],
 									[
 										'type' => 1,
@@ -1262,7 +1408,19 @@ class testDashboardHoneycombWidget extends testWidgets {
 	public function testDashboardHoneycombWidget_Create($data) {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
 				self::$dashboardid['Dashboard for creating honeycomb widgets'])->waitUntilReady();
-		$this->checkWidgetForm($data, 'create');
+
+		// Get hash if expected is TEST_BAD.
+		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
+			// Hash before update.
+			self::$old_hash = CDBHelper::getHash(self::SQL);
+		}
+		else {
+			self::$old_widget_count = CDashboardElement::find()->waitUntilReady()->one()->getWidgets()->count();
+		}
+
+		$dashboard = CDashboardElement::find()->waitUntilReady()->one();
+		$this->fillWidgetForm($data, 'create', $dashboard);
+		$this->checkWidgetForm($data, 'create', $dashboard);
 	}
 
 	/**
@@ -1270,7 +1428,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 	 */
 	public function testDashboardHoneycombWidget_SimpleUpdate() {
 		// Hash before simple update.
-		$old_hash = CDBHelper::getHash(self::SQL);
+		self::$old_hash = CDBHelper::getHash(self::SQL);
 
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
 				self::$dashboardid['Dashboard for simple updating honeycomb widget'])->waitUntilReady();
@@ -1282,7 +1440,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 
 		// Compare old hash and new one.
-		$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
+		$this->assertEquals(self::$old_hash, CDBHelper::getHash(self::SQL));
 	}
 
 	/**
@@ -1332,7 +1490,19 @@ class testDashboardHoneycombWidget extends testWidgets {
 	public function testDashboardHoneycombWidget_Update($data) {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
 				self::$disposable_dashboard_id)->waitUntilReady();
-		$this->checkWidgetForm($data, 'update');
+
+		// Get hash if expected is TEST_BAD.
+		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
+			// Hash before update.
+			self::$old_hash = CDBHelper::getHash(self::SQL);
+		}
+		else {
+			self::$old_widget_count = CDashboardElement::find()->waitUntilReady()->one()->getWidgets()->count();
+		}
+
+		$dashboard = CDashboardElement::find()->waitUntilReady()->one();
+		$this->fillWidgetForm($data, 'update', $dashboard);
+		$this->checkWidgetForm($data, 'update', $dashboard);
 	}
 
 	/**
@@ -1354,9 +1524,9 @@ class testDashboardHoneycombWidget extends testWidgets {
 		// Check that widget is not present on dashboard and in DB.
 		$this->assertFalse($dashboard->getWidget($widget_name, false)->isValid());
 		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM widget_field wf'.
-			' LEFT JOIN widget w'.
-			' ON w.widgetid=wf.widgetid'.
-			' WHERE w.name='.zbx_dbstr($widget_name)
+				' LEFT JOIN widget w'.
+				' ON w.widgetid=wf.widgetid'.
+				' WHERE w.name='.zbx_dbstr($widget_name)
 		));
 	}
 
@@ -1625,8 +1795,8 @@ class testDashboardHoneycombWidget extends testWidgets {
 	public function testDashboardHoneycombWidget_Display($data) {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
 				self::$disposable_dashboard_id)->waitUntilReady();
-		$this->checkWidgetForm($data, 'update', false);
 		$dashboard = CDashboardElement::find()->waitUntilReady()->one();
+		$this->fillWidgetForm($data, 'update', $dashboard);
 		$dashboard->save();
 
 		// Check message that dashboard saved.
@@ -1709,14 +1879,14 @@ class testDashboardHoneycombWidget extends testWidgets {
 	 * @dataProvider getCancelData
 	 */
 	public function testDashboardHoneycombWidget_Cancel($data) {
-		$old_hash = CDBHelper::getHash(self::SQL);
+		self::$old_hash = CDBHelper::getHash(self::SQL);
 		$new_name = 'Widget to be cancelled';
 
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
 				self::$dashboardid['Dashboard for canceling honeycomb widget']
 		);
 		$dashboard = CDashboardElement::find()->one()->edit();
-		$old_widget_count = $dashboard->getWidgets()->count();
+		self::$old_widget_count = $dashboard->getWidgets()->count();
 
 		// Start updating or creating a widget.
 		if (CTestArrayHelper::get($data, 'update', false)) {
@@ -1758,7 +1928,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 				}
 			}
 
-			$this->assertEquals($old_widget_count, $dashboard->getWidgets()->count());
+			$this->assertEquals(self::$old_widget_count, $dashboard->getWidgets()->count());
 		}
 		// Save or cancel dashboard update.
 		if (CTestArrayHelper::get($data, 'save_dashboard', false)) {
@@ -1768,7 +1938,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 			$dashboard->cancelEditing();
 		}
 		// Confirm that no changes were made to the widget.
-		$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
+		$this->assertEquals(self::$old_hash, CDBHelper::getHash(self::SQL));
 	}
 
 	/**
@@ -1784,6 +1954,324 @@ class testDashboardHoneycombWidget extends testWidgets {
 			$element = CDashboardElement::find()->one()->getWidget('Honeycomb');
 			$this->assertScreenshot($element, 'honeycomb_'.$i);
 		}
+	}
+
+	/**
+	 * Creates the base widget used for the update scenario.
+	 */
+	public function prepareFilteringHoneycomb() {
+		$providedData = $this->getProvidedData();
+		$data = reset($providedData);
+
+		// Create a dashboard with the widget for updating.
+		$response = CDataHelper::call('dashboard.create', [
+			[
+				'name' => 'Dashboard for filtering '.md5(serialize($data)),
+				'auto_start' => 0,
+				'pages' => [
+					[
+						'widgets' => [
+							[
+								'type' => 'honeycomb',
+								'name' => 'UpdateHoneycomb',
+								'x' => 0,
+								'y' => 0,
+								'width' => 30,
+								'height' => 7,
+								'fields' => [
+									[
+										'type' => 0,
+										'name' => 'show.0',
+										'value' => 1
+									],
+									[
+										'type' => 1,
+										'name' => 'primary_label',
+										'value' => '{ITEM.NAME}'
+									],
+									[
+										'type' => 1,
+										'name' => 'items.0',
+										'value' => 'test'
+									],
+									[
+										'type' => 1,
+										'name' => 'reference',
+										'value' => 'BUBUR'
+									]
+								]
+							]
+						]
+					]
+				]
+			]
+		]);
+		self::$disposable_dashboard_id = $response['dashboardids'][0];
+	}
+
+	public static function getFilteringData() {
+		return [
+			// #0 Filter by 3 items.
+			[
+				[
+					'fields' => [
+						'Item patterns' => ['Item tag 1', 'Item tag 2', 'Host tag item']
+					],
+					'filtered_items' => ['Item tag 1', 'Item tag 2', 'Host tag item']
+				]
+			],
+			// #1 Filter by Host group.
+			[
+				[
+					'fields' => [
+						'Host groups' => 'Items with tags',
+						'Item patterns' => ['Item tag 1', 'Item tag 2', 'Host tag item']
+					],
+					'filtered_items' => ['Item tag 1', 'Item tag 2']
+				]
+			],
+			// #2 Filter by Host.
+			[
+				[
+					'fields' => [
+						'Hosts' => 'Host with tags',
+						'Item patterns' => ['Item tag 1', 'Item tag 2', 'Host tag item']
+					],
+					'filtered_items' => ['Host tag item']
+				]
+			],
+			// #3 Show hosts in maintenance.
+			[
+				[
+					'fields' => [
+						'Show hosts in maintenance' => true,
+						'Item patterns' => ['Item tag 1', 'Host tag item', 'Maintenance item']
+					],
+					'filtered_items' => ['Maintenance item', 'Item tag 1', 'Host tag item']
+				]
+			],
+			// #4 Don't show hosts in maintenance.
+			[
+				[
+					'fields' => [
+						'Show hosts in maintenance' => false,
+						'Item patterns' => ['Item tag 1', 'Host tag item', 'Maintenance item']
+					],
+					'filtered_items' => ['Item tag 1', 'Host tag item']
+				]
+			],
+			// #5 Filter by Host exists tag.
+			[
+				[
+					'fields' => [
+						'Item patterns' => ['Item tag 1', 'Item tag 2', 'Host tag item']
+					],
+					'tags' => [
+						'host_tags' => [
+							['name' => 'host_tag_1', 'operator' => 'Exists']
+						]
+					],
+					'filtered_items' => ['Host tag item']
+				]
+			],
+			// #6 Filter by Host doesn't exist tag.
+			[
+				[
+					'fields' => [
+						'Item patterns' => ['Item tag 1', 'Item tag 2', 'Host tag item']
+					],
+					'tags' => [
+						'host_tags' => [
+							['name' => 'host_tag_1', 'operator' => 'Does not exist']
+						]
+					],
+					'filtered_items' => ['Item tag 1', 'Item tag 2']
+				]
+			],
+			// #7 Filter by Items exists tag.
+			[
+				[
+					'fields' => [
+						'Item patterns' => ['Item tag 1', 'Item tag 2', 'Host tag item']
+					],
+					'tags' => [
+						'item_tags' => [
+							['name' => 'item_tag_1', 'operator' => 'Exists']
+						]
+					],
+					'filtered_items' => ['Item tag 1']
+				]
+			],
+			// #8 Filter by Items doesn't exist tag.
+			[
+				[
+					'fields' => [
+						'Item patterns' => ['Item tag 1', 'Item tag 2', 'Host tag item']
+					],
+					'tags' => [
+						'item_tags' => [
+							['name' => 'item_tag_1', 'operator' => 'Does not exist']
+						]
+					],
+					'filtered_items' => ['Item tag 2', 'Host tag item']
+				]
+			],
+			// #9 Filter by Items and Host exists tag.
+			[
+				[
+					'fields' => [
+						'Item patterns' => ['Item tag 1', 'Item tag 2', 'Host tag item']
+					],
+					'tags' => [
+						'item_tags' => [
+							['name' => 'item_tag_1', 'operator' => 'Exists']
+						],
+						'host_tags' => [
+							['name' => 'host_tag_1', 'operator' => 'Exists']
+						]
+					],
+					'filtered_items' => ['No data']
+				]
+			],
+			// #10 Filter by Items and Host doesn't exist tag.
+			[
+				[
+					'fields' => [
+						'Show hosts in maintenance' => True,
+						'Item patterns' => ['Item tag 1', 'Item tag 2', 'Host tag item', 'Maintenance item']
+					],
+					'tags' => [
+						'item_tags' => [
+							['name' => 'item_tag_1', 'operator' => 'Does not exist']
+						],
+						'host_tags' => [
+							['name' => 'host_tag_1', 'operator' => 'Does not exist']
+						]
+					],
+					'filtered_items' => ['Maintenance item', 'Item tag 2']
+				]
+			],
+			// #11 Item tag Or with operators Contain.
+			[
+				[
+					'fields' => [
+						'Item patterns' => ['Item tag 1', 'Item tag 2', 'Item tag 3', 'Item tag 4', 'Item tag 5'],
+						'Item tags' => 'Or'
+					],
+					'tags' => [
+						'item_tags' => [
+							['name' => 'item_tag_1', 'operator' => 'Contains', 'value' => 'item_val_1'],
+							['name' => 'item_tag_3', 'operator' => 'Contains', 'value' => 'item_val_3']
+						]
+					],
+					'filtered_items' => ['Item tag 1', 'Item tag 3', 'Item tag 4']
+				]
+			],
+			// #12 Item tag And/Or with operators Contain.
+			[
+				[
+					'fields' => [
+						'Item patterns' => ['Item tag 1', 'Item tag 2', 'Item tag 3', 'Item tag 4', 'Item tag 5'],
+						'Item tags' => 'And/Or'
+					],
+					'tags' => [
+						'item_tags' => [
+							['name' => 'item_tag_1', 'operator' => 'Contains', 'value' => 'item_val_1'],
+							['name' => 'item_tag_3', 'operator' => 'Contains', 'value' => 'item_val_3']
+						]
+					],
+					'filtered_items' => ['No data']
+				]
+			],
+			// #13 Item tag Or with operators Exists.
+			[
+				[
+					'fields' => [
+						'Item patterns' => ['Item tag 1', 'Item tag 2', 'Item tag 3', 'Item tag 4', 'Item tag 5'],
+						'Item tags' => 'Or'
+					],
+					'tags' => [
+						'item_tags' => [
+							['name' => 'item_tag_1', 'operator' => 'Exists'],
+							['name' => 'item_tag_3', 'operator' => 'Exists']
+						]
+					],
+					'filtered_items' => ['Item tag 1', 'Item tag 3', 'Item tag 4', 'Item tag 5']
+				]
+			],
+			// #14 Item tag And/Or with operators Exists.
+			[
+				[
+					'fields' => [
+						'Item patterns' => ['Item tag 1', 'Item tag 2', 'Item tag 3', 'Item tag 4', 'Item tag 5'],
+						'Item tags' => 'And/Or'
+					],
+					'tags' => [
+						'item_tags' => [
+							['name' => 'item_tag_1', 'operator' => 'Exists'],
+							['name' => 'item_tag_3', 'operator' => 'Exists']
+						]
+					],
+					'filtered_items' => ['No data']
+				]
+			],
+			// #15 Item tag Or with operators Does not exist and Contains.
+			[
+				[
+					'fields' => [
+						'Item patterns' => ['Item tag 1', 'Item tag 2', 'Item tag 3', 'Item tag 4', 'Item tag 5'],
+						'Item tags' => 'Or'
+					],
+					'tags' => [
+						'item_tags' => [
+							['name' => 'item_tag_2', 'operator' => 'Contains', 'value' => 'item_val_2'],
+							['name' => 'item_tag_3', 'operator' => 'Does not exist']
+						]
+					],
+					'filtered_items' => ['Item tag 1', 'Item tag 2', 'Item tag 4', 'Item tag 5']
+				]
+			],
+			// #16 Item tag And/Or with operators Does not exist and Contains.
+			[
+				[
+					'fields' => [
+						'Item patterns' => ['Item tag 1', 'Item tag 2', 'Item tag 3', 'Item tag 4', 'Item tag 5'],
+						'Item tags' => 'And/Or'
+					],
+					'tags' => [
+						'item_tags' => [
+							['name' => 'item_tag_2', 'operator' => 'Contains', 'value' => 'item_val_2'],
+							['name' => 'item_tag_3', 'operator' => 'Does not exist']
+						]
+					],
+					'filtered_items' => ['Item tag 2']
+				]
+			]
+		];
+	}
+
+	/**
+	 * Filter honeycomb and check that correct item comb visible on widget.
+	 *
+	 * @dataProvider getFilteringData
+	 *
+	 * @onBefore prepareFilteringHoneycomb
+	 */
+	public function testDashboardHoneycombWidget_CheckFiltering($data) {
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
+				self::$disposable_dashboard_id)->waitUntilReady();
+		$dashboard = CDashboardElement::find()->waitUntilReady()->one();
+		$this->fillWidgetForm($data, 'update', $dashboard);
+		$dashboard->save();
+
+		// Check message that dashboard saved.
+		$this->page->waitUntilReady();
+		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
+
+		// Check that correct combs displayed on honeycomb.
+		$filtered = $dashboard->getWidget('UpdateHoneycomb')->getContent()->query('class', 'svg-honeycomb-content')
+				->all()->asText();
+		$this->assertEquals($data['filtered_items'], $filtered);
 	}
 
 	/**
@@ -1809,24 +2297,13 @@ class testDashboardHoneycombWidget extends testWidgets {
 	}
 
 	/**
-	 * Create or update Honeycomb widget and check after.
+	 * Create or update Honeycomb widget.
 	 *
-	 * @param array   $data  	data provider
-	 * @param string  $action	create/update honeycomb widget
-	 * @param boolean $check	check honeycomb values after creation or not
+	 * @param array             $data         data provider
+	 * @param string            $action       create/update honeycomb widget
+	 * @param CDashboardElement $dashboard    given dashboard
 	 */
-	protected function checkWidgetForm($data, $action, $check = true) {
-		$dashboard = CDashboardElement::find()->waitUntilReady()->one();
-
-		// Get hash if expected is TEST_BAD.
-		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
-			// Hash before update.
-			$old_hash = CDBHelper::getHash(self::SQL);
-		}
-		else {
-			$old_widget_count = $dashboard->getWidgets()->count();
-		}
-
+	protected function fillWidgetForm($data, $action, $dashboard) {
 		$form = ($action === 'create')
 			? $dashboard->edit()->addWidget()->asForm()
 			: $dashboard->getWidget('UpdateHoneycomb')->edit();
@@ -1847,58 +2324,64 @@ class testDashboardHoneycombWidget extends testWidgets {
 
 		$form->fill($data['fields']);
 		$form->submit();
+	}
 
-		if ($check) {
-			// Check hash if TEST_BAD and check widget amount if TEST_GOOD.
-			if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
-				$this->assertMessage(TEST_BAD, null, $data['error_message']);
-				COverlayDialogElement::find()->one()->close();
-				$dashboard->save();
-				$this->assertMessage(TEST_GOOD, 'Dashboard updated');
+	/**
+	 * Check created or updated Honeycomb widget.
+	 *
+	 * @param array             $data         data provider
+	 * @param string            $action       create/update honeycomb widget
+	 * @param CDashboardElement $dashboard    given dashboard
+	 */
+	protected function checkWidgetForm($data, $action, $dashboard) {
+		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
+			$this->assertMessage(TEST_BAD, null, $data['error_message']);
+			COverlayDialogElement::find()->one()->close();
+			$dashboard->save();
+			$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 
-				// Compare old hash and new one.
-				$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
+			// Compare old hash and new one.
+			$this->assertEquals(self::$old_hash, CDBHelper::getHash(self::SQL));
+		}
+		else {
+			// Make sure that the widget is present before saving the dashboard.
+			$header = (array_key_exists('Name', $data['fields']))
+				? (($data['fields']['Name'] === '') ? 'Honeycomb' : $data['fields']['Name'])
+				: 'Honeycomb';
+
+			$dashboard->getWidget($header);
+			$dashboard->save();
+
+			// Check message that dashboard saved.
+			$this->assertMessage(TEST_GOOD, 'Dashboard updated');
+
+			// Check widget amount that it is added.
+			$this->assertEquals(self::$old_widget_count + (($action === 'create') ? 1 : 0), $dashboard->getWidgets()->count());
+
+			$form = $dashboard->getWidget($header)->edit()->asForm();
+			$form->fill(['Advanced configuration' => true]);
+			$this->query('id:lbl_bg_color')->one()->waitUntilVisible();
+
+			if (array_key_exists('tags', $data)) {
+				$this->addOrCheckTags($data['tags']);
 			}
-			else {
-				// Make sure that the widget is present before saving the dashboard.
-				$header = (array_key_exists('Name', $data['fields']))
-					? (($data['fields']['Name'] === '') ? 'Honeycomb' : $data['fields']['Name'])
-					: 'Honeycomb';
 
-				$dashboard->getWidget($header);
-				$dashboard->save();
-
-				// Check message that dashboard saved.
-				$this->assertMessage(TEST_GOOD, 'Dashboard updated');
-
-				// Check widget amount that it is added.
-				$this->assertEquals($old_widget_count + (($action === 'create') ? 1 : 0), $dashboard->getWidgets()->count());
-
-				$form = $dashboard->getWidget($header)->edit()->asForm();
-				$form->fill(['Advanced configuration' => true]);
-				$this->query('id:lbl_bg_color')->one()->waitUntilVisible();
-
-				if (array_key_exists('tags', $data)) {
-					$this->addOrCheckTags($data['tags']);
-				}
-
-				// Check Thresholds values.
-				if (array_key_exists('thresholds', $data)) {
-					$this->getTreshholdTable()->checkValue($data['thresholds']);
-				}
-
-				$form->checkValue($data['fields']);
-				COverlayDialogElement::find()->one()->close();
-				$dashboard->save();
-				$this->assertMessage(TEST_GOOD, 'Dashboard updated');
+			// Check Thresholds values.
+			if (array_key_exists('thresholds', $data)) {
+				$this->getTreshholdTable()->checkValue($data['thresholds']);
 			}
+
+			$form->checkValue($data['fields']);
+			COverlayDialogElement::find()->one()->close();
+			$dashboard->save();
+			$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 		}
 	}
 
 	/**
 	 * Add or Check tags in Honeycomb widget.
 	 *
-	 * @param array  $tags      given tags
+	 * @param array   $tags     given tags
 	 * @param boolean $check    check tags' values after creation or not
 	 */
 	protected function addOrCheckTags($tags, $check = true) {
