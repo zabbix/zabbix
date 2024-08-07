@@ -29,9 +29,9 @@ static zbx_history_table_t	areg = {
 		{"host",		ZBX_PROTO_TAG_HOST,		ZBX_JSON_TYPE_STRING,	NULL},
 		{"listen_ip",		ZBX_PROTO_TAG_IP,		ZBX_JSON_TYPE_STRING,	""},
 		{"listen_dns",		ZBX_PROTO_TAG_DNS,		ZBX_JSON_TYPE_STRING,	""},
-		{"listen_port",		ZBX_PROTO_TAG_PORT,		ZBX_JSON_TYPE_STRING,	"0"},
+		{"listen_port",		ZBX_PROTO_TAG_PORT,		ZBX_JSON_TYPE_INT,	"0"},
 		{"host_metadata",	ZBX_PROTO_TAG_HOST_METADATA,	ZBX_JSON_TYPE_STRING,	""},
-		{"flags",		ZBX_PROTO_TAG_FLAGS,		ZBX_JSON_TYPE_STRING,	"0"},
+		{"flags",		ZBX_PROTO_TAG_FLAGS,		ZBX_JSON_TYPE_INT,	"0"},
 		{"tls_accepted",	ZBX_PROTO_TAG_TLS_ACCEPTED,	ZBX_JSON_TYPE_INT,	"0"},
 		{0}
 		}
@@ -234,15 +234,44 @@ static int	pb_autoreg_get_mem(zbx_pb_t *pb, struct zbx_json *j, zbx_uint64_t *la
 
 			(void)zbx_list_iterator_peek(&li, (void **)&row);
 
+			/* row fields in the same order as defined in areg table */
+			void	*rows_num[] = { &row->clock,
+					&row->host,
+					&row->listen_ip,
+					&row->listen_dns,
+					&row->listen_port,
+					&row->host_metadata,
+					&row->flags,
+					&row->tls_accepted };
+
 			zbx_json_addobject(j, NULL);
-			zbx_json_addint64(j, ZBX_PROTO_TAG_CLOCK, row->clock);
-			zbx_json_addstring(j, ZBX_PROTO_TAG_HOST, row->host, ZBX_JSON_TYPE_STRING);
-			zbx_json_addstring(j, ZBX_PROTO_TAG_IP, row->listen_ip, ZBX_JSON_TYPE_STRING);
-			zbx_json_addstring(j, ZBX_PROTO_TAG_DNS, row->listen_dns, ZBX_JSON_TYPE_STRING);
-			zbx_json_addint64(j, ZBX_PROTO_TAG_PORT, row->listen_port);
-			zbx_json_addstring(j, ZBX_PROTO_TAG_HOST_METADATA, row->host_metadata, ZBX_JSON_TYPE_STRING);
-			zbx_json_addint64(j, ZBX_PROTO_TAG_FLAGS, row->flags);
-			zbx_json_addint64(j, ZBX_PROTO_TAG_TLS_ACCEPTED, row->tls_accepted);
+
+			for (int i = 0; i < (int)ARRSIZE(rows_num); i++)
+			{
+				zbx_history_field_t	*fld = &areg.fields[i];
+
+				if (NULL != fld->default_value)
+				{
+					int	def_val;
+
+					if (ZBX_JSON_TYPE_STRING == fld->jt)
+					{
+						if (0 == strcmp(fld->default_value, *(char**)(rows_num[i])))
+							continue;
+					}
+					else if (SUCCEED == zbx_is_int(fld->default_value, &def_val) &&
+							def_val == *(int*)(rows_num[i]))
+					{
+						continue;
+					}
+				}
+
+				if (ZBX_JSON_TYPE_INT == fld->jt)
+					zbx_json_addint64(j, fld->tag, *(int*)(rows_num[i]));
+				else
+					zbx_json_addstring(j, fld->tag, *(char**)(rows_num[i]), ZBX_JSON_TYPE_STRING);
+			}
+
 			zbx_json_close(j);
 
 			records_num++;
