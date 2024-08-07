@@ -6107,7 +6107,6 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
 
 .overlay-dialogue {
   position: absolute;
-  min-width: fit-content;
   z-index: 1000;
   padding: 17px 10px 10px;
   background-color: #000000;
