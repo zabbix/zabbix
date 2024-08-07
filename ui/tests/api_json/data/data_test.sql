@@ -4,26 +4,26 @@
 UPDATE hosts SET status=0 WHERE host='Zabbix server';
 
 -- host groups
-INSERT INTO hosts (hostid, host, name, status, description) VALUES (50009, 'API Host', 'API Host', 0, '');
-INSERT INTO hosts (hostid, host, name, status, description) VALUES (50010, 'API Template', 'API Template', 3, '');
-INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (50022,50009,1,1,1,'127.0.0.1','','10050');
-INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (50029,50009,1,2,1,'127.0.0.1','','161');
-INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (50030,50009,1,4,1,'127.0.0.1','','12345');
-INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (50031,50009,1,3,1,'127.0.0.1','','623');
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (5000999, 'API Host', 'API Host', 0, '');
+INSERT INTO hosts (hostid, host, name, status, description) VALUES (5001099, 'API Template', 'API Template', 3, '');
+INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (50022,5000999,1,1,1,'127.0.0.1','','10050');
+INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (50029,5000999,1,2,1,'127.0.0.1','','161');
+INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (50030,5000999,1,4,1,'127.0.0.1','','12345');
+INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (50031,5000999,1,3,1,'127.0.0.1','','623');
 INSERT INTO interface_snmp (interfaceid, version, bulk, community, securityname, securitylevel, authpassphrase, privpassphrase, authprotocol, privprotocol, contextname) VALUES (50029, 2, 1, '{$SNMP_COMMUNITY}', '', 0, '', '', 0, 0, '');
 INSERT INTO hstgrp (groupid,name,internal) VALUES (50012,'API group for hosts',0);
 INSERT INTO hstgrp (groupid,name,internal) VALUES (50013,'API group for templates',0);
-INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50009, 50009, 50012);
-INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50011, 50010, 50013);
-INSERT INTO hosts_templates (hosttemplateid, hostid, templateid) VALUES (50003, 50009, 50010);
-INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (400660, 50009, 50022, 0, 2,'API discovery rule','vfs.fs.discovery',30,90,0,'','',1,'','');
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (5000999, 5000999, 50012);
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50011, 5001099, 50013);
+INSERT INTO hosts_templates (hosttemplateid, hostid, templateid) VALUES (50003, 5000999, 5001099);
+INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (400660, 5000999, 50022, 0, 2,'API discovery rule','vfs.fs.discovery',30,90,0,'','',1,'','');
 INSERT INTO hstgrp (groupid,name,internal) VALUES (50005,'API host group for update',0);
-INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50010, 50009, 50005);
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (5001099, 5000999, 50005);
 INSERT INTO hstgrp (groupid,name,internal) VALUES (50006,'API host group for update internal',1);
 INSERT INTO hstgrp (groupid,name,internal) VALUES (50007,'API host group delete internal',1);
 INSERT INTO hstgrp (groupid,name,internal) VALUES (50008,'API host group delete',0);
-INSERT INTO hstgrp (groupid,name,internal) VALUES (50009,'API host group delete2',0);
-INSERT INTO hstgrp (groupid,name,internal) VALUES (50010,'API host group delete3',0);
+INSERT INTO hstgrp (groupid,name,internal) VALUES (5000999,'API host group delete2',0);
+INSERT INTO hstgrp (groupid,name,internal) VALUES (5001099,'API host group delete3',0);
 INSERT INTO hstgrp (groupid,name,internal) VALUES (50011,'API host group delete4',0);
 -- discovered host groups
 INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (50011, 'API host prototype {#FSNAME}', 'API host prototype {#FSNAME}', 0, 2, '');
@@ -97,13 +97,13 @@ INSERT INTO opmessage_usr (opmessage_usrid, operationid, userid) VALUES (4, 32, 
 INSERT INTO sysmaps (sysmapid, name, width, height, backgroundid, label_type, label_location, highlight, expandproblem, markelements, show_unack, userid, private) VALUES (6, 'API map', 800, 600, NULL, 0, 0, 1, 1, 1, 2, 14, 0);
 
 -- valuemap
-INSERT INTO valuemap (valuemapid,hostid,name) VALUES (1399,50009,'API value map for update');
-INSERT INTO valuemap (valuemapid,hostid,name) VALUES (1400,50009,'API value map for update with mappings');
-INSERT INTO valuemap (valuemapid,hostid,name) VALUES (1401,50009,'API value map delete');
-INSERT INTO valuemap (valuemapid,hostid,name) VALUES (1402,50009,'API value map delete2');
-INSERT INTO valuemap (valuemapid,hostid,name) VALUES (1403,50009,'API value map delete3');
-INSERT INTO valuemap (valuemapid,hostid,name) VALUES (1404,50009,'API value map delete4');
-INSERT INTO valuemap (valuemapid,hostid,name) VALUES (1405,50009,'API value duplicate');
+INSERT INTO valuemap (valuemapid,hostid,name) VALUES (1399,5000999,'API value map for update');
+INSERT INTO valuemap (valuemapid,hostid,name) VALUES (1400,5000999,'API value map for update with mappings');
+INSERT INTO valuemap (valuemapid,hostid,name) VALUES (1401,5000999,'API value map delete');
+INSERT INTO valuemap (valuemapid,hostid,name) VALUES (1402,5000999,'API value map delete2');
+INSERT INTO valuemap (valuemapid,hostid,name) VALUES (1403,5000999,'API value map delete3');
+INSERT INTO valuemap (valuemapid,hostid,name) VALUES (1404,5000999,'API value map delete4');
+INSERT INTO valuemap (valuemapid,hostid,name) VALUES (1405,5000999,'API value duplicate');
 INSERT INTO valuemap_mapping (valuemap_mappingid,valuemapid,value,newvalue) VALUES (99040,1399,'1','Unknown');
 INSERT INTO valuemap_mapping (valuemap_mappingid,valuemapid,value,newvalue) VALUES (99050,1400,'One','Online');
 INSERT INTO valuemap_mapping (valuemap_mappingid,valuemapid,value,newvalue) VALUES (99060,1400,'Two','Offline');
@@ -259,49 +259,49 @@ INSERT INTO icon_mapping (iconmappingid, iconmapid, iconid, inventory_link, expr
 INSERT INTO sysmaps (sysmapid, name, width, height, backgroundid, label_type, label_location, highlight, expandproblem, markelements, show_unack, iconmapid, userid, private) VALUES (7, 'Map with iconmap', 800, 600, NULL, 0, 0, 1, 1, 1, 2, 7, 1, 0);
 
 -- web scenarios
-INSERT INTO httptest (httptestid, name, delay, agent, hostid) VALUES (15000, 'Api web scenario', 60, 'Zabbix', 50009);
+INSERT INTO httptest (httptestid, name, delay, agent, hostid) VALUES (15000, 'Api web scenario', 60, 'Zabbix', 5000999);
 INSERT INTO httpstep (httpstepid, httptestid, name, no, url, posts) VALUES (15000, 15000, 'Api step', 1, 'http://api.com', '');
-INSERT INTO httptest (httptestid, name, delay, agent, hostid) VALUES (15001, 'Api web scenario for update one', 60, 'Zabbix', 50009);
+INSERT INTO httptest (httptestid, name, delay, agent, hostid) VALUES (15001, 'Api web scenario for update one', 60, 'Zabbix', 5000999);
 INSERT INTO httpstep (httpstepid, httptestid, name, no, url, posts) VALUES (15001, 15001, 'Api step for update one', 1, 'http://api1.com', '');
-INSERT INTO httptest (httptestid, name, delay, agent, hostid) VALUES (15002, 'Api web scenario for update two', 60, 'Zabbix', 50009);
+INSERT INTO httptest (httptestid, name, delay, agent, hostid) VALUES (15002, 'Api web scenario for update two', 60, 'Zabbix', 5000999);
 INSERT INTO httpstep (httpstepid, httptestid, name, no, url, posts) VALUES (15002, 15002, 'Api step for update two', 1, 'http://api2.com', '');
-INSERT INTO httptest (httptestid, name, delay, agent, hostid) VALUES (15003, 'Api web scenario for delete0', 60, 'Zabbix', 50009);
+INSERT INTO httptest (httptestid, name, delay, agent, hostid) VALUES (15003, 'Api web scenario for delete0', 60, 'Zabbix', 5000999);
 INSERT INTO httpstep (httpstepid, httptestid, name, no, url, posts) VALUES (15003, 15003, 'Api step for delete0', 1, 'http://api.com', '');
-INSERT INTO httptest (httptestid, name, delay, agent, hostid) VALUES (15004, 'Api web scenario for delete1', 60, 'Zabbix', 50009);
+INSERT INTO httptest (httptestid, name, delay, agent, hostid) VALUES (15004, 'Api web scenario for delete1', 60, 'Zabbix', 5000999);
 INSERT INTO httpstep (httpstepid, httptestid, name, no, url, posts) VALUES (15004, 15004, 'Api step for delete1', 1, 'http://api.com', '');
-INSERT INTO httptest (httptestid, name, delay, agent, hostid) VALUES (15005, 'Api web scenario for delete2', 60, 'Zabbix', 50009);
+INSERT INTO httptest (httptestid, name, delay, agent, hostid) VALUES (15005, 'Api web scenario for delete2', 60, 'Zabbix', 5000999);
 INSERT INTO httpstep (httpstepid, httptestid, name, no, url, posts) VALUES (15005, 15005, 'Api step for delete2', 1, 'http://api.com', '');
-INSERT INTO httptest (httptestid, name, delay, agent, hostid) VALUES (15006, 'Api templated web scenario', 60, 'Zabbix', 50010);
+INSERT INTO httptest (httptestid, name, delay, agent, hostid) VALUES (15006, 'Api templated web scenario', 60, 'Zabbix', 5001099);
 INSERT INTO httpstep (httpstepid, httptestid, name, no, url, posts) VALUES (15006, 15006, 'Api templated step', 1, 'http://api.com', '');
-INSERT INTO httptest (httptestid, name, delay, agent, hostid, templateid) VALUES (15007, 'Api templated web scenario', 60, 'Zabbix', 50009, 15006);
+INSERT INTO httptest (httptestid, name, delay, agent, hostid, templateid) VALUES (15007, 'Api templated web scenario', 60, 'Zabbix', 5000999, 15006);
 INSERT INTO httpstep (httpstepid, httptestid, name, no, url, posts) VALUES (15007, 15007, 'Api templated step', 1, 'http://api.com', '');
 INSERT INTO httptest (httptestid, name, delay, agent, hostid) VALUES (15008, 'Api web scenario with read permissions', 60, 'Zabbix', 50012);
 INSERT INTO httpstep (httpstepid, httptestid, name, no, url, posts) VALUES (15008, 15008, 'Api step with read permissions', 1, 'http://api.com', '');
 INSERT INTO httptest (httptestid, name, delay, agent, hostid) VALUES (15009, 'Api web with deny permissions', 60, 'Zabbix', 50014);
 INSERT INTO httpstep (httpstepid, httptestid, name, no, url, posts) VALUES (15009, 15009, 'Api step with deny permissions', 1, 'http://api.com', '');
-INSERT INTO httptest (httptestid, name, delay, agent, hostid) VALUES (15010, 'Api web scenario for delete as zabbix-admin', 60, 'Zabbix', 50009);
+INSERT INTO httptest (httptestid, name, delay, agent, hostid) VALUES (15010, 'Api web scenario for delete as zabbix-admin', 60, 'Zabbix', 5000999);
 INSERT INTO httpstep (httpstepid, httptestid, name, no, url, posts) VALUES (15010, 15010, 'Api step for delete as zabbix-admin', 1, 'http://api.com', '');
-INSERT INTO httptest (httptestid, name, delay, agent, hostid) VALUES (15011, 'Api web scenario for delete as zabbix-user', 60, 'Zabbix', 50009);
+INSERT INTO httptest (httptestid, name, delay, agent, hostid) VALUES (15011, 'Api web scenario for delete as zabbix-user', 60, 'Zabbix', 5000999);
 INSERT INTO httpstep (httpstepid, httptestid, name, no, url, posts) VALUES (15011, 15011, 'Api step for delete as zabbix-user', 1, 'http://api.com', '');
-INSERT INTO httptest (httptestid, name, delay, agent, hostid) VALUES (15012, 'Api web scenario for update having 1 step', 60, 'Zabbix', 50009);
+INSERT INTO httptest (httptestid, name, delay, agent, hostid) VALUES (15012, 'Api web scenario for update having 1 step', 60, 'Zabbix', 5000999);
 INSERT INTO httpstep (httpstepid, httptestid, name, no, url, posts) VALUES (15012, 15012, 'Api step for update having 1 step', 1, 'http://api.com', '');
-INSERT INTO httptest (httptestid, name, delay, agent, hostid) VALUES (15013, 'Api web scenario for update having 2 steps', 60, 'Zabbix', 50009);
+INSERT INTO httptest (httptestid, name, delay, agent, hostid) VALUES (15013, 'Api web scenario for update having 2 steps', 60, 'Zabbix', 5000999);
 INSERT INTO httpstep (httpstepid, httptestid, name, no, url, posts) VALUES (15013, 15013, 'Api step 1', 1, 'http://api.com', '');
 INSERT INTO httpstep (httpstepid, httptestid, name, no, url, posts) VALUES (15014, 15013, 'Api step 2', 2, 'http://api.com', '');
 
 -- web scenario for webitem update testing
-INSERT INTO httptest (httptestid, name, delay, agent, hostid) VALUES (15015, 'Webtest key_name', 60, 'Zabbix', 50009);
+INSERT INTO httptest (httptestid, name, delay, agent, hostid) VALUES (15015, 'Webtest key_name', 60, 'Zabbix', 5000999);
 INSERT INTO httpstep (httpstepid, httptestid, name, no, url, posts) VALUES (15015, 15015, 'Webstep name 1', 1, 'http://api.com', '');
 INSERT INTO httpstep (httpstepid, httptestid, name, no, url, posts) VALUES (15016, 15015, 'Webstep name 2', 2, 'http://api.com', '');
-INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (150151, 50009, 1, 9, 0,'Download speed for scenario "$1".','web.test.in[Webtest key_name,,bps]','2m','30d',0,'','',0,'','');
-INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (150152, 50009, 1, 9, 3,'Failed step of scenario "$1".','web.test.fail[Webtest key_name]','2m','30d',0,'','',0,'','');
-INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (150153, 50009, 1, 9, 1,'Last error message of scenario "$1".','web.test.error[Webtest key_name]','2m','30d',0,'','',0,'','');
-INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (150154, 50009, 1, 9, 0,'Download speed for step "$2" of scenario "$1".','web.test.in[Webtest key_name,Webstep name 1,bps]','1m','30d',0,'','',0,'','');
-INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (150155, 50009, 1, 9, 0,'Response time for step "$2" of scenario "$1".','web.test.time[Webtest key_name,Webstep name 1,resp]','1m','30d',0,'','',0,'','');
-INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (150156, 50009, 1, 9, 3,'Response code for step "$2" of scenario "$1".','web.test.rspcode[Webtest key_name,Webstep name 1]','1m','30d',0,'','',0,'','');
-INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (150157, 50009, 1, 9, 0,'Download speed for step "$2" of scenario "$1".','web.test.in[Webtest key_name,Webstep name 2,bps]','1m','30d',0,'','',0,'','');
-INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (150158, 50009, 1, 9, 0,'Response time for step "$2" of scenario "$1".','web.test.time[Webtest key_name,Webstep name 2,resp]','1m','30d',0,'','',0,'','');
-INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (150159, 50009, 1, 9, 3,'Response code for step "$2" of scenario "$1".','web.test.rspcode[Webtest key_name,Webstep name 2]','1m','30d',0,'','',0,'','');
+INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (150151, 5000999, 1, 9, 0,'Download speed for scenario "$1".','web.test.in[Webtest key_name,,bps]','2m','30d',0,'','',0,'','');
+INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (150152, 5000999, 1, 9, 3,'Failed step of scenario "$1".','web.test.fail[Webtest key_name]','2m','30d',0,'','',0,'','');
+INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (150153, 5000999, 1, 9, 1,'Last error message of scenario "$1".','web.test.error[Webtest key_name]','2m','30d',0,'','',0,'','');
+INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (150154, 5000999, 1, 9, 0,'Download speed for step "$2" of scenario "$1".','web.test.in[Webtest key_name,Webstep name 1,bps]','1m','30d',0,'','',0,'','');
+INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (150155, 5000999, 1, 9, 0,'Response time for step "$2" of scenario "$1".','web.test.time[Webtest key_name,Webstep name 1,resp]','1m','30d',0,'','',0,'','');
+INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (150156, 5000999, 1, 9, 3,'Response code for step "$2" of scenario "$1".','web.test.rspcode[Webtest key_name,Webstep name 1]','1m','30d',0,'','',0,'','');
+INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (150157, 5000999, 1, 9, 0,'Download speed for step "$2" of scenario "$1".','web.test.in[Webtest key_name,Webstep name 2,bps]','1m','30d',0,'','',0,'','');
+INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (150158, 5000999, 1, 9, 0,'Response time for step "$2" of scenario "$1".','web.test.time[Webtest key_name,Webstep name 2,resp]','1m','30d',0,'','',0,'','');
+INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,status,params,description,flags,posts,headers) VALUES (150159, 5000999, 1, 9, 3,'Response code for step "$2" of scenario "$1".','web.test.rspcode[Webtest key_name,Webstep name 2]','1m','30d',0,'','',0,'','');
 INSERT INTO httptestitem (httptestitemid, httptestid, itemid, type) VALUES (150151, 15015, 150151, 2);
 INSERT INTO httptestitem (httptestitemid, httptestid, itemid, type) VALUES (150152, 15015, 150152, 3);
 INSERT INTO httptestitem (httptestitemid, httptestid, itemid, type) VALUES (150153, 15015, 150153, 4);
@@ -857,14 +857,14 @@ INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (9
 INSERT INTO trigger_discovery (triggerid, parent_triggerid) VALUES (30004, 30003);
 
 -- LLD rules
-INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,trends,status,params,description,flags,posts,headers) VALUES (110006,50009,50022,0,4,'API LLD rule 1','apilldrule1','30s','90d',0,0,'','',1,'','');
-INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,trends,status,params,description,flags,posts,headers) VALUES (110007,50009,50022,0,4,'API LLD rule 2','apilldrule2','30s','90d',0,0,'','',1,'','');
-INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,trends,status,params,description,flags,posts,headers) VALUES (110008,50009,50022,0,4,'API LLD rule 3','apilldrule3','30s','90d',0,0,'','',1,'','');
-INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,trends,status,params,description,flags,posts,headers) VALUES (110009,50009,50022,0,4,'API LLD rule 4','apilldrule4','30s','90d',0,0,'','',1,'','');
-INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,trends,status,params,description,flags,posts,headers) VALUES (110010,50010,null,0,4,'API Template LLD rule','apitemplatelldrule','30s','90d',0,0,'','',1,'','');
-INSERT INTO items (itemid,hostid,interfaceid,templateid,type,value_type,name,key_,delay,history,trends,status,params,description,flags,posts,headers) VALUES (110011,50009,50022,110010,0,4,'API Template LLD rule','apitemplatelldrule','30s','90d',0,0,'','',1,'','');
-INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,trends,status,params,description,flags,posts,headers) VALUES (110012,50009,50022,0,4,'API LLD rule get LLD macro paths','apilldrulegetlldmacropaths','30s','90d',0,0,'','',1,'','');
-INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,trends,status,params,description,flags,posts,headers) VALUES (110013,50009,50022,0,4,'API LLD rule get preprocessing','apilldrulegetpreprocessing','30s','90d',0,0,'','',1,'','');
+INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,trends,status,params,description,flags,posts,headers) VALUES (110006,5000999,50022,0,4,'API LLD rule 1','apilldrule1','30s','90d',0,0,'','',1,'','');
+INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,trends,status,params,description,flags,posts,headers) VALUES (110007,5000999,50022,0,4,'API LLD rule 2','apilldrule2','30s','90d',0,0,'','',1,'','');
+INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,trends,status,params,description,flags,posts,headers) VALUES (110008,5000999,50022,0,4,'API LLD rule 3','apilldrule3','30s','90d',0,0,'','',1,'','');
+INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,trends,status,params,description,flags,posts,headers) VALUES (110009,5000999,50022,0,4,'API LLD rule 4','apilldrule4','30s','90d',0,0,'','',1,'','');
+INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,trends,status,params,description,flags,posts,headers) VALUES (110010,5001099,null,0,4,'API Template LLD rule','apitemplatelldrule','30s','90d',0,0,'','',1,'','');
+INSERT INTO items (itemid,hostid,interfaceid,templateid,type,value_type,name,key_,delay,history,trends,status,params,description,flags,posts,headers) VALUES (110011,5000999,50022,110010,0,4,'API Template LLD rule','apitemplatelldrule','30s','90d',0,0,'','',1,'','');
+INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,trends,status,params,description,flags,posts,headers) VALUES (110012,5000999,50022,0,4,'API LLD rule get LLD macro paths','apilldrulegetlldmacropaths','30s','90d',0,0,'','',1,'','');
+INSERT INTO items (itemid,hostid,interfaceid,type,value_type,name,key_,delay,history,trends,status,params,description,flags,posts,headers) VALUES (110013,5000999,50022,0,4,'API LLD rule get preprocessing','apilldrulegetpreprocessing','30s','90d',0,0,'','',1,'','');
 
 -- LLD macro paths
 INSERT INTO lld_macro_path (lld_macro_pathid,itemid,lld_macro,path) VALUES (991,110006,'{#A}','$.list[:1].type');
@@ -1041,7 +1041,7 @@ INSERT INTO history_text (itemid, clock, value, ns) VALUES
 -- INSERT INTO auditlog_details (auditdetailid, auditid, table_name, field_name, oldvalue, newvalue) VALUES (9005, 9005, 'groups', 'name', 'HG1', 'HG1 updated');
 
 -- LLD with overrides to delete
-INSERT INTO items (itemid,type,snmp_oid,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,formula,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,evaltype,jmx_endpoint,master_itemid,timeout,url,query_fields,posts,status_codes,follow_redirects,post_type,http_proxy,headers,retrieve_mode,request_method,output_format,ssl_cert_file,ssl_key_file,ssl_key_password,verify_peer,verify_host,allow_traps,discover) VALUES (133763,2,'',50009,'Overrides (delete)','overrides.delete','0','90d','0',0,4,'','','','',NULL,NULL,'','',0,'','','','',1,NULL,'',0,'30d',0,'',NULL,'3s','','','','200',1,0,'','',0,0,0,'','','',0,0,0,0);
+INSERT INTO items (itemid,type,snmp_oid,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,formula,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,evaltype,jmx_endpoint,master_itemid,timeout,url,query_fields,posts,status_codes,follow_redirects,post_type,http_proxy,headers,retrieve_mode,request_method,output_format,ssl_cert_file,ssl_key_file,ssl_key_password,verify_peer,verify_host,allow_traps,discover) VALUES (133763,2,'',5000999,'Overrides (delete)','overrides.delete','0','90d','0',0,4,'','','','',NULL,NULL,'','',0,'','','','',1,NULL,'',0,'30d',0,'',NULL,'3s','','','','200',1,0,'','',0,0,0,'','','',0,0,0,0);
 INSERT INTO lld_override (lld_overrideid,itemid,name,step,evaltype,formula,stop) VALUES (10001,133763,'override',1,3,'{10001} or {10002} or {10003}',1);
 INSERT INTO lld_override (lld_overrideid,itemid,name,step,evaltype,formula,stop) VALUES (10002,133763,'override 2',2,0,'',1);
 INSERT INTO lld_override_condition (lld_override_conditionid,lld_overrideid,operator,macro,value) VALUES (10001,10001,8,'{#MACRO1}','d{3}$');
@@ -1071,12 +1071,12 @@ INSERT INTO lld_override_optag (lld_override_optagid,lld_override_operationid,ta
 INSERT INTO lld_override_optag (lld_override_optagid,lld_override_operationid,tag,value) VALUES (10004,10005,'tag2','value2');
 INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (10001,10005,10264);
 INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (10002,10005,10265);
-INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (10003,10005,50010);
+INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (10003,10005,5001099);
 INSERT INTO lld_override_optrends (lld_override_operationid,trends) VALUES (10002,'36d');
 INSERT INTO lld_override_optrends (lld_override_operationid,trends) VALUES (10006,'5d');
 
 -- LLD with overrides to copy
-INSERT INTO items (itemid,type,snmp_oid,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,formula,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,evaltype,jmx_endpoint,master_itemid,timeout,url,query_fields,posts,status_codes,follow_redirects,post_type,http_proxy,headers,retrieve_mode,request_method,output_format,ssl_cert_file,ssl_key_file,ssl_key_password,verify_peer,verify_host,allow_traps,discover) VALUES (133764,2,'',50009,'Overrides (copy)','overrides.copy','0','90d','0',0,4,'','','','',NULL,NULL,'','',0,'','','','',1,NULL,'',0,'30d',0,'',NULL,'3s','','','','200',1,0,'','',0,0,0,'','','',0,0,0,0);
+INSERT INTO items (itemid,type,snmp_oid,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,formula,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,evaltype,jmx_endpoint,master_itemid,timeout,url,query_fields,posts,status_codes,follow_redirects,post_type,http_proxy,headers,retrieve_mode,request_method,output_format,ssl_cert_file,ssl_key_file,ssl_key_password,verify_peer,verify_host,allow_traps,discover) VALUES (133764,2,'',5000999,'Overrides (copy)','overrides.copy','0','90d','0',0,4,'','','','',NULL,NULL,'','',0,'','','','',1,NULL,'',0,'30d',0,'',NULL,'3s','','','','200',1,0,'','',0,0,0,'','','',0,0,0,0);
 INSERT INTO lld_override (lld_overrideid,itemid,name,step,evaltype,formula,stop) VALUES (10003,133764,'override',1,3,'{10004} or {10005} or {10006}',1);
 INSERT INTO lld_override (lld_overrideid,itemid,name,step,evaltype,formula,stop) VALUES (10004,133764,'override 2',2,0,'',1);
 INSERT INTO lld_override_condition (lld_override_conditionid,lld_overrideid,operator,macro,value) VALUES (10004,10003,8,'{#MACRO1}','d{3}$');
@@ -1106,12 +1106,12 @@ INSERT INTO lld_override_optag (lld_override_optagid,lld_override_operationid,ta
 INSERT INTO lld_override_optag (lld_override_optagid,lld_override_operationid,tag,value) VALUES (10008,10011,'tag2','value2');
 INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (10004,10011,10264);
 INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (10005,10011,10265);
-INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (10006,10011,50010);
+INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (10006,10011,5001099);
 INSERT INTO lld_override_optrends (lld_override_operationid,trends) VALUES (10008,'36d');
 INSERT INTO lld_override_optrends (lld_override_operationid,trends) VALUES (10012,'5d');
 
 -- LLD with overrides to update
-INSERT INTO items (itemid,type,snmp_oid,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,formula,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,evaltype,jmx_endpoint,master_itemid,timeout,url,query_fields,posts,status_codes,follow_redirects,post_type,http_proxy,headers,retrieve_mode,request_method,output_format,ssl_cert_file,ssl_key_file,ssl_key_password,verify_peer,verify_host,allow_traps,discover) VALUES (133765,2,'',50009,'Overrides (update)','overrides.update','0','90d','0',0,4,'','','','',NULL,NULL,'','',0,'','','','',1,NULL,'',0,'30d',0,'',NULL,'3s','','','','200',1,0,'','',0,0,0,'','','',0,0,0,0);
+INSERT INTO items (itemid,type,snmp_oid,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,formula,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,evaltype,jmx_endpoint,master_itemid,timeout,url,query_fields,posts,status_codes,follow_redirects,post_type,http_proxy,headers,retrieve_mode,request_method,output_format,ssl_cert_file,ssl_key_file,ssl_key_password,verify_peer,verify_host,allow_traps,discover) VALUES (133765,2,'',5000999,'Overrides (update)','overrides.update','0','90d','0',0,4,'','','','',NULL,NULL,'','',0,'','','','',1,NULL,'',0,'30d',0,'',NULL,'3s','','','','200',1,0,'','',0,0,0,'','','',0,0,0,0);
 INSERT INTO lld_override (lld_overrideid,itemid,name,step,evaltype,formula,stop) VALUES (10005,133765,'override',1,3,'{10007} or {10008} or {10009}',1);
 INSERT INTO lld_override (lld_overrideid,itemid,name,step,evaltype,formula,stop) VALUES (10006,133765,'override 2',2,0,'',1);
 INSERT INTO lld_override_condition (lld_override_conditionid,lld_overrideid,operator,macro,value) VALUES (10007,10005,8,'{#MACRO1}','d{3}$');
@@ -1141,7 +1141,7 @@ INSERT INTO lld_override_optag (lld_override_optagid,lld_override_operationid,ta
 INSERT INTO lld_override_optag (lld_override_optagid,lld_override_operationid,tag,value) VALUES (10012,10017,'tag2','value2');
 INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (10007,10017,10264);
 INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (10008,10017,10265);
-INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (10009,10017,50010);
+INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (10009,10017,5001099);
 INSERT INTO lld_override_optrends (lld_override_operationid,trends) VALUES (10014,'36d');
 INSERT INTO lld_override_optrends (lld_override_operationid,trends) VALUES (10018,'5d');
 
@@ -1149,7 +1149,7 @@ INSERT INTO lld_override_optrends (lld_override_operationid,trends) VALUES (1001
 INSERT INTO hosts (hostid,proxy_hostid,host,status,lastaccess,ipmi_authtype,ipmi_privilege,ipmi_username,ipmi_password,maintenanceid,maintenance_status,maintenance_type,maintenance_from,name,flags,templateid,description,tls_connect,tls_accept,tls_issuer,tls_subject,tls_psk_identity,tls_psk,proxy_address,auto_compress,discover) VALUES (131001,NULL,'Overrides template constraint',3,0,-1,2,'','',NULL,0,0,0,'Overrides template constaint',0,NULL,'',1,1,'','','','','',1,0);
 INSERT INTO hstgrp (groupid,name,internal,flags) VALUES (139001,'Overrides',0,0);
 INSERT INTO hosts_groups (hostgroupid,hostid,groupid) VALUES (139201,131001,139001);
-INSERT INTO items (itemid,type,snmp_oid,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,formula,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,evaltype,jmx_endpoint,master_itemid,timeout,url,query_fields,posts,status_codes,follow_redirects,post_type,http_proxy,headers,retrieve_mode,request_method,output_format,ssl_cert_file,ssl_key_file,ssl_key_password,verify_peer,verify_host,allow_traps,discover) VALUES (133766,0,'',50009,'Overrides (template constraint)','overrides.template.constraint','1m','90d','0',0,4,'','','','',NULL,NULL,'','',0,'','','','',1,50022,'',0,'30d',0,'',NULL,'3s','','','','200',1,0,'','',0,0,0,'','','',0,0,0,0);
+INSERT INTO items (itemid,type,snmp_oid,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,formula,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,evaltype,jmx_endpoint,master_itemid,timeout,url,query_fields,posts,status_codes,follow_redirects,post_type,http_proxy,headers,retrieve_mode,request_method,output_format,ssl_cert_file,ssl_key_file,ssl_key_password,verify_peer,verify_host,allow_traps,discover) VALUES (133766,0,'',5000999,'Overrides (template constraint)','overrides.template.constraint','1m','90d','0',0,4,'','','','',NULL,NULL,'','',0,'','','','',1,50022,'',0,'30d',0,'',NULL,'3s','','','','200',1,0,'','',0,0,0,'','','',0,0,0,0);
 INSERT INTO lld_override (lld_overrideid,itemid,name,step,evaltype,formula,stop) VALUES (10007,133766,'Only template operation',1,0,'',0);
 INSERT INTO lld_override (lld_overrideid,itemid,name,step,evaltype,formula,stop) VALUES (10008,133766,'Not only template operation',2,0,'',0);
 INSERT INTO lld_override_operation (lld_override_operationid,lld_overrideid,operationobject,operator,value) VALUES (10019,10007,3,0,'');
@@ -1562,21 +1562,21 @@ INSERT INTO hosts_templates (hosttemplateid, hostid, templateid) VALUES (50004, 
 INSERT INTO hosts_templates (hosttemplateid, hostid, templateid) VALUES (50005, 99014, 99025);
 INSERT INTO hosts_templates (hosttemplateid, hostid, templateid) VALUES (50006, 99015, 99026);
 INSERT INTO hosts_templates (hosttemplateid, hostid, templateid) VALUES (50007, 99024, 99027);
-INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (1000, 99013, 'OS', 'Windows');
-INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (1001, 99014, 'Browser', 'Firefox');
-INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (1002, 99015, 'OS', 'Linux');
-INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (1003, 99016, 'Browser', 'Chrome');
-INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (1004, 99018, 'Other', '');
-INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (1005, 99019, 'OS', 'Android');
-INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (1006, 99020, 'Browser', 'IE');
-INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (1007, 99021, 'OS', '');
-INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (1008, 99022, 'OS', 'Mac');
-INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (1009, 99023, 'Browser', '');
-INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (1010, 99024, 'OS', 'Win7');
-INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (1011, 99025, 'Browser', 'FF');
-INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (1012, 99026, 'OS', 'Ubuntu Bionic Beaver');
-INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (1013, 99025, 'Webbrowser', 'Mozilla');
-INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (1014, 99027, 'office', 'Riga');
+INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (100990, 99013, 'OS', 'Windows');
+INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (100991, 99014, 'Browser', 'Firefox');
+INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (100992, 99015, 'OS', 'Linux');
+INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (100993, 99016, 'Browser', 'Chrome');
+INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (100994, 99018, 'Other', '');
+INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (100995, 99019, 'OS', 'Android');
+INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (100996, 99020, 'Browser', 'IE');
+INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (100997, 99021, 'OS', '');
+INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (100998, 99022, 'OS', 'Mac');
+INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (100999, 99023, 'Browser', '');
+INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (109910, 99024, 'OS', 'Win7');
+INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (109911, 99025, 'Browser', 'FF');
+INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (109912, 99026, 'OS', 'Ubuntu Bionic Beaver');
+INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (109913, 99025, 'Webbrowser', 'Mozilla');
+INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (109914, 99027, 'office', 'Riga');
 INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, status, params, description, posts, headers) VALUES (58736, 99013, NULL, 2, 3, 'Item', 'item', 0, 90, 0, '', '', '', '');
 INSERT INTO triggers (triggerid, description, expression, comments, value) VALUES (50172, 'trigger1', '{50232}=1', '', '1');
 INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50232, 50172, 58736, 'last', '$');
