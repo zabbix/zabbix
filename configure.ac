@@ -225,7 +225,7 @@ AC_CHECK_HEADERS(net/if.h net/if_mib.h, [], [], [
 ])
 
 saved_CFLAGS="$CFLAGS"
-CFLAGS="$checked_werror_cpp_CFLAGS $CFLAGS"
+CFLAGS="$CFLAGS $checked_werror_cpp_CFLAGS"
 AC_CHECK_HEADERS(sys/mount.h sys/proc.h sys/sysctl.h sys/user.h, [], [], [
 #ifdef HAVE_SYS_TYPES_H
 #  include <sys/types.h>
