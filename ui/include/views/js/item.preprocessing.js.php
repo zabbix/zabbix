@@ -425,7 +425,9 @@
 						break;
 
 					default:
-						$on_fail.prop('disabled', false);
+						$on_fail
+							.prop('disabled', false)
+							.prop('readonly', false);
 						$row.find('[name*="[test]"]').prop('disabled', false);
 						break;
 				}
