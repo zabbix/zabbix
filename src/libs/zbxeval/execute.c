@@ -2339,7 +2339,7 @@ static int	eval_execute_function_histogram_quantile(const zbx_eval_context_t *ct
 				}
 				else
 				{
-					*error = zbx_dsprintf(*error, "invalid string values of backet"
+					*error = zbx_dsprintf(*error, "invalid string values of bucket"
 							" for function at \"%s\"", err_fn);
 					return FAIL;
 				}
@@ -2806,7 +2806,7 @@ static int	eval_execute_function_jsonpath(const zbx_eval_context_t *ctx, const z
 	ret = FAIL;
 	json_value = &output->values[output->values_num - token->opt];
 
-	if (ZBX_VARIANT_NONE != json_value->type && SUCCEED != zbx_variant_convert(json_value, ZBX_VARIANT_STR))
+	if (SUCCEED != zbx_variant_convert(json_value, ZBX_VARIANT_STR))
 	{
 		*error = zbx_strdup(*error, "invalid first parameter");
 		return ret;
@@ -2814,7 +2814,7 @@ static int	eval_execute_function_jsonpath(const zbx_eval_context_t *ctx, const z
 
 	path = &output->values[output->values_num - token->opt + 1];
 
-	if (ZBX_VARIANT_NONE != path->type && SUCCEED != zbx_variant_convert(path, ZBX_VARIANT_STR))
+	if (SUCCEED != zbx_variant_convert(path, ZBX_VARIANT_STR))
 	{
 		*error = zbx_strdup(*error, "invalid second parameter");
 		return ret;
@@ -2824,8 +2824,7 @@ static int	eval_execute_function_jsonpath(const zbx_eval_context_t *ctx, const z
 	{
 		default_value = &output->values[output->values_num - token->opt + 2];
 
-		if (ZBX_VARIANT_NONE != default_value->type &&
-				SUCCEED != zbx_variant_convert(default_value, ZBX_VARIANT_STR))
+		if (SUCCEED != zbx_variant_convert(default_value, ZBX_VARIANT_STR))
 		{
 			*error = zbx_strdup(*error, "invalid third parameter");
 			return ret;

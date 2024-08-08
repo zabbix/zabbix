@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-06-29 14:28+0000\n"
+"PO-Revision-Date: 2024-07-29 02:29+0000\n"
 "Last-Translator: Helder Santana <helder.santana@systemsbr.com.br>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
@@ -957,7 +957,7 @@ msgstr "Adicionar um novo widget"
 
 #: widgets/navtree/Widget.php:34
 msgid "Add child element"
-msgstr ""
+msgstr "Adicionar elemento filho"
 
 #: widgets/navtree/Widget.php:39
 msgid "Add child elements"
@@ -996,7 +996,7 @@ msgstr "Adicionar gatilho de host"
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:260
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:263
 msgid "Add item"
-msgstr ""
+msgstr "Adicionar item"
 
 #: app/partials/massupdate.macros.tab.php:96
 #: app/partials/massupdate.valuemaps.tab.php:38
@@ -1659,7 +1659,7 @@ msgstr "Ao menos um grupo de host ou host deve ser selecionado."
 
 #: include/classes/setup/CFrontendSetup.php:252
 msgid "At least one of MySQL or PostgreSQL should be supported."
-msgstr ""
+msgstr "Deve existir suporte a, pelo menos, MySQL ou PostgreSQL."
 
 #: include/classes/setup/CFrontendSetup.php:241
 msgid "At least one of MySQL, PostgreSQL or Oracle should be supported."
@@ -1880,6 +1880,11 @@ msgstr "Disponibilidade"
 msgid "Availability report"
 msgstr "Relatório de disponibilidade"
 
+#: app/controllers/CControllerAvailabilityReportTrigger.php:70
+#: app/views/reports.availabilityreport.trigger.php:23
+msgid "Availability report graph"
+msgstr "Graficos do relatório de disponibilidade"
+
 #: include/classes/html/CHostAvailability.php:80
 #: widgets/hostavail/views/widget.view.php:32
 msgid "Available"
@@ -1909,7 +1914,7 @@ msgstr "Evite senhas fáceis de adivinhar"
 
 #: jsLoader.php:172
 msgid "Awaiting data"
-msgstr ""
+msgstr "Aguardando dados"
 
 #: widgets/svggraph/views/widget.edit.php:51
 msgid "Axes"
@@ -5436,7 +5441,7 @@ msgstr "Criar novo"
 
 #: jsLoader.php:372
 msgid "Create new report"
-msgstr ""
+msgstr "Criar novo relatório"
 
 #: app/views/administration.proxy.list.php:239
 msgid "Create proxy"
@@ -9566,7 +9571,7 @@ msgstr "Elementos do grupo de hosts"
 
 #: jsLoader.php:292
 msgid "Host group is not selected."
-msgstr ""
+msgstr "O grupo de hosts não está selecionado."
 
 #: include/views/monitoring.sysmap.edit.php:168
 msgid "Host group label type"
@@ -9649,7 +9654,7 @@ msgstr "Visão geral do inventário de host"
 
 #: jsLoader.php:289
 msgid "Host is not selected."
-msgstr ""
+msgstr "O host não está selecionado."
 
 #: include/views/monitoring.sysmap.edit.php:183
 msgid "Host label type"
@@ -12537,6 +12542,10 @@ msgstr "Lista de proxies Zabbix com nome, modo, criptografia, compressão, vers�
 msgid "List of Zabbix proxies with name, mode, encryption, compression, version, last seen, host count, item count, required values per second (vps), compatibility (current/outdated/unsupported), timeouts, proxy group name, state (unknown/offline/online). Returns JSON."
 msgstr "Lista de proxies Zabbix com nome, modo, criptografia, compactação, versão, último visto, contagem de hosts, contagem de itens, valores necessários por segundo (vps), compatibilidade (atual/desatualizado/sem suporte), tempos limite, nome do grupo de proxy, estado (desconhecido/desligado/ligado). Retorna JSON."
 
+#: include/classes/data/CItemData.php:2935
+msgid "List of Zabbix proxy groups configuration data and real-time data. Configuration data includes proxy group name, failover delay, and minimum number of online proxies required for the group to be online. Real-time data includes number of online proxies, percentage of online proxies, and state of proxy group (unknown, offline, recovering, online, degrading). This item does not return groupless proxies. Returns JSON."
+msgstr ""
+
 #: include/classes/data/CItemData.php:1559
 msgid "List of block devices and their type. Returns JSON"
 msgstr "Lista de dispositivos de bloco e seu tipo. Retorna JSON"
@@ -12972,7 +12981,7 @@ msgstr "Tipo de rótulo no elemento do mapa"
 
 #: jsLoader.php:290
 msgid "Map is not selected."
-msgstr ""
+msgstr "O mapa não está selecionado."
 
 #: sysmap.php:128
 msgid "Map is updated! Return to map list?"
@@ -15224,6 +15233,19 @@ msgstr "Online"
 #: app/views/administration.proxygroup.list.php:80
 msgid "Online proxies"
 msgstr "Proxies online"
+
+#: include/classes/api/services/CUser.php:874
+#: include/classes/api/services/CUser.php:882
+#: include/classes/api/services/CUser.php:889
+#, c-format
+msgid "Only Super admin or Admin users can update \"%1$s\" parameter."
+msgstr "Somente usuários Super administradores ou Administradores podem atualizar o parâmetro \"%1$s\"."
+
+#: include/classes/api/services/CUser.php:812
+#: include/classes/api/services/CUser.php:853
+#, c-format
+msgid "Only Super admin users can update \"%1$s\" parameter."
+msgstr "Somente usuários Super administradores podem atualizar o parâmetro \"%1$s\"."
 
 #: include/classes/api/services/CDRule.php:509
 msgid "Only Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 checks can be made unique."
@@ -20894,7 +20916,7 @@ msgstr "Existe trigger no template \"%1$s\" que possui dependência com trigger 
 
 #: jsLoader.php:291
 msgid "Trigger is not selected."
-msgstr ""
+msgstr "O gatilho não está selecionado."
 
 #: include/views/monitoring.sysmap.edit.php:198
 msgid "Trigger label type"
@@ -22950,7 +22972,7 @@ msgstr "Ver como"
 
 #: jsLoader.php:417
 msgid "View related reports"
-msgstr ""
+msgstr "Visualizar relatórios relacionados"
 
 #: include/classes/data/CItemData.php:1735
 msgid "Virtual space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
@@ -23163,7 +23185,7 @@ msgstr "O widget é muito pequeno para o número especificado de colunas e linha
 
 #: jsLoader.php:205
 msgid "Widgets"
-msgstr ""
+msgstr "Widgets"
 
 #: graphs.php:39 include/views/configuration.graph.edit.php:100
 #: include/views/configuration.graph.list.php:170
@@ -23539,7 +23561,7 @@ msgstr "Você deve logar para ver esta página."
 
 #: jsLoader.php:287
 msgid "You need to have at least one image uploaded to create map element. Images can be uploaded in Administration->General->Images section."
-msgstr ""
+msgstr "Você precisa ter pelo menos uma imagem carregada para criar o elemento do mapa. As imagens podem ser carregadas na seção Administração->Geral->Imagens."
 
 #: include/classes/db/DB.php:133
 msgid "Your database is not working properly. Please wait a few minutes and try to repeat this action. If the problem still persists, please contact system administrator. The problem might be caused by long running transaction or row level lock accomplished by your database management system."
@@ -25551,7 +25573,7 @@ msgstr "right() - Retorna a contagem de caracteres mais à direita"
 
 #: widgets/navtree/Widget.php:41
 msgid "root"
-msgstr ""
+msgstr "root"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:966
 msgid "round() - Rounds a value to decimal places"

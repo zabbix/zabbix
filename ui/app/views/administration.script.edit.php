@@ -19,10 +19,8 @@
  * @var array $data
  */
 
-$csrf_token = CCsrfTokenHelper::get('script');
-
 $form = (new CForm())
-	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token))->removeId())
+	->addItem((new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('script')))->removeId())
 	->setId('script-form')
 	->setName('scripts')
 	->addVar('scriptid', $data['scriptid'])

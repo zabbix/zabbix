@@ -89,7 +89,7 @@ else {
 							)
 							->removeId()
 						: null,
-					(new CDiv($e['list']))->addClass(ZBX_STYLE_WORDWRAP),
+					(new CDiv($e['list']))->addClass(ZBX_STYLE_WORDBREAK),
 					!$data['readonly']
 						? (new CCol((new CButtonLink(_('Remove')))
 							->addClass(($data['expression_type'] === TRIGGER_EXPRESSION)
