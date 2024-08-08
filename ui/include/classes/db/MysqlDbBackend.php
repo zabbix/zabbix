@@ -24,16 +24,6 @@ class MysqlDbBackend extends DbBackend {
 	 * @return bool
 	 */
 	protected function checkDbVersionTable() {
-		$table_exists = DBfetch(DBselect("SHOW TABLES LIKE 'dbversion'"));
-
-		if (!$table_exists) {
-			$this->setError(_s('Unable to determine current Zabbix database version: %1$s.',
-				_s('the table "%1$s" was not found', 'dbversion')
-			));
-
-			return false;
-		}
-
 		return true;
 	}
 
@@ -172,13 +162,6 @@ class MysqlDbBackend extends DbBackend {
 	 * @return bool
 	 */
 	public function init() {
-		$db_encoding = DBselect('SHOW VARIABLES LIKE "character_set_database"');
-		$charset = $db_encoding ? DBfetch($db_encoding) : false;
-		if ($charset && strtoupper($charset['Value']) === 'UTF8MB4') {
-			DBexecute('SET NAMES utf8mb4');
-			return;
-		}
-
 		DBexecute('SET NAMES utf8');
 	}
 }
