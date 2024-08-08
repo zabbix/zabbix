@@ -919,6 +919,10 @@ class CHost extends CHostGeneral {
 			'preservekeys' => true
 		]);
 
+		if (count($hosts) != count($db_hosts)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+
 		if (array_intersect_key($data, array_flip($tls_fields))) {
 			if (!array_key_exists('tls_connect', $data) || !array_key_exists('tls_accept', $data)) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _(
@@ -933,20 +937,6 @@ class CHost extends CHostGeneral {
 					'tls_psk' => DB::getDefault('hosts', 'tls_psk')
 				];
 			}
-			else {
-				$db_hosts_tls_data = DB::select('hosts', [
-					'output' => $tls_fields,
-					'hostids' => array_keys($db_hosts),
-					'preservekeys' => true
-				]);
-
-				foreach ($hosts as &$host) {
-					if (array_key_exists($host['hostid'], $db_hosts_tls_data)) {
-						$db_hosts[$host['hostid']] += $db_hosts_tls_data[$host['hostid']];
-					}
-				}
-				unset($host);
-			}
 
 			// Clean certificate fields.
 			if ($data['tls_connect'] != HOST_ENCRYPTION_CERTIFICATE
@@ -956,18 +946,20 @@ class CHost extends CHostGeneral {
 					'tls_subject' => DB::getDefault('hosts', 'tls_subject')
 				];
 			}
-		}
 
-		$tls_values = array_intersect_key($data, array_flip($tls_fields));
+			$tls_values = array_intersect_key($data, array_flip($tls_fields));
+			$db_hosts_tls_data = DB::select('hosts', [
+				'output' => $tls_fields,
+				'hostids' => array_keys($db_hosts),
+				'preservekeys' => true
+			]);
 
-		foreach ($hosts as &$host) {
-			if (!array_key_exists($host['hostid'], $db_hosts)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
+			foreach ($hosts as &$host) {
+				$host += $tls_values;
+				$db_hosts[$host['hostid']] += $db_hosts_tls_data[$host['hostid']];
 			}
-
-			$host += $tls_values;
+			unset($host);
 		}
-		unset($host);
 
 		// Check inventory mode value.
 		if (array_key_exists('inventory_mode', $data)) {
