@@ -1382,10 +1382,12 @@ static void	execute_commands(const zbx_db_event *event, const zbx_db_event *r_ev
 				zbx_strscpy(host.ipmi_username, row[20]);
 				zbx_strscpy(host.ipmi_password, row[21]);
 #endif
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 				zbx_strscpy(host.tls_issuer, row[18 + ZBX_IPMI_FIELDS_NUM]);
 				zbx_strscpy(host.tls_subject, row[19 + ZBX_IPMI_FIELDS_NUM]);
 				zbx_strscpy(host.tls_psk_identity, row[20 + ZBX_IPMI_FIELDS_NUM]);
 				zbx_strscpy(host.tls_psk, row[21 + ZBX_IPMI_FIELDS_NUM]);
+#endif
 				host.monitored_by = (unsigned char)atoi(row[22 + ZBX_IPMI_FIELDS_NUM]);
 			}
 		}

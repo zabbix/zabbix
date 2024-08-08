@@ -128,10 +128,12 @@ int	zbx_event_db_get_host(const zbx_db_event *event, zbx_dc_host_t *host, char *
 		zbx_strscpy(host->ipmi_username, row[6]);
 		zbx_strscpy(host->ipmi_password, row[7]);
 #endif
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 		zbx_strscpy(host->tls_issuer, row[4 + ZBX_IPMI_FIELDS_NUM]);
 		zbx_strscpy(host->tls_subject, row[5 + ZBX_IPMI_FIELDS_NUM]);
 		zbx_strscpy(host->tls_psk_identity, row[6 + ZBX_IPMI_FIELDS_NUM]);
 		zbx_strscpy(host->tls_psk, row[7 + ZBX_IPMI_FIELDS_NUM]);
+#endif
 		host->monitored_by = (unsigned char)atoi(row[8 + ZBX_IPMI_FIELDS_NUM]);
 	}
 	zbx_db_free_result(result);
