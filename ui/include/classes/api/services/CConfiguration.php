@@ -33,7 +33,7 @@ class CConfiguration extends CApiService {
 	private function exportCompare(array $params) {
 		$this->validateExport($params, true);
 
-		return $this->exportForce($params, true);
+		return $this->exportForce($params);
 	}
 
 	/**
@@ -98,17 +98,16 @@ class CConfiguration extends CApiService {
 
 	/**
 	 * @param array $params
-	 * @param bool  $is_compare
 	 *
 	 * @return string
 	 */
-	private function exportForce(array $params, bool $is_compare = false) {
+	private function exportForce(array $params) {
 		$params['unlink_parent_templates'] = array_key_exists('unlink_parent_templates', $params)
 			? $params['unlink_parent_templates']
 			: [];
 
 		$export = new CConfigurationExport($params['options'], $params['unlink_parent_templates']);
-		$export->setBuilder((new CConfigurationExportBuilder())->setPreview($is_compare));
+		$export->setBuilder(new CConfigurationExportBuilder());
 		$writer = CExportWriterFactory::getWriter($params['format']);
 		$writer->formatOutput($params['prettyprint']);
 		$export->setWriter($writer);

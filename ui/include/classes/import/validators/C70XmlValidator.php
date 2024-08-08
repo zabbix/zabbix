@@ -989,7 +989,7 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 											'macro' =>			['type' => XML_STRING | XML_REQUIRED],
 											'value' =>			['type' => XML_STRING, 'default' => ''],
 											'operator' =>		['type' => XML_STRING, 'default' => CXmlConstantValue::CONDITION_MATCHES_REGEX, 'in' => $this->FILTER_CONDITION_OPERATOR],
-											'formulaid' =>		['type' => XML_IGNORE_TAG]
+											'formulaid' =>		['type' => XML_IGNORE_TAG, 'export_always' => true]
 										]]
 									]]
 								]]
@@ -1601,7 +1601,7 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 													'macro' =>			['type' => XML_STRING | XML_REQUIRED],
 													'value' =>			['type' => XML_STRING, 'default' => ''],
 													'operator' =>		['type' => XML_STRING, 'default' => CXmlConstantValue::CONDITION_MATCHES_REGEX, 'in' => $this->FILTER_CONDITION_OPERATOR],
-													'formulaid' =>		['type' => XML_IGNORE_TAG]
+													'formulaid' =>		['type' => XML_IGNORE_TAG, 'export_always' => true]
 												]]
 											]]
 										]]
@@ -2206,7 +2206,7 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 											'macro' =>			['type' => XML_STRING | XML_REQUIRED],
 											'value' =>			['type' => XML_STRING, 'default' => ''],
 											'operator' =>		['type' => XML_STRING, 'default' => CXmlConstantValue::CONDITION_MATCHES_REGEX, 'in' => $this->FILTER_CONDITION_OPERATOR],
-											'formulaid' =>		['type' => XML_IGNORE_TAG]
+											'formulaid' =>		['type' => XML_IGNORE_TAG, 'export_always' => true]
 										]]
 									]]
 								]]
@@ -2815,7 +2815,7 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 													'macro' =>			['type' => XML_STRING | XML_REQUIRED],
 													'value' =>			['type' => XML_STRING, 'default' => ''],
 													'operator' =>		['type' => XML_STRING, 'default' => CXmlConstantValue::CONDITION_MATCHES_REGEX, 'in' => $this->FILTER_CONDITION_OPERATOR],
-													'formulaid' =>		['type' => XML_IGNORE_TAG]
+													'formulaid' =>		['type' => XML_IGNORE_TAG, 'export_always' => true]
 												]]
 											]]
 										]]
