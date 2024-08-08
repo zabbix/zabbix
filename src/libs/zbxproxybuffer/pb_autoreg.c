@@ -235,7 +235,7 @@ static int	pb_autoreg_get_mem(zbx_pb_t *pb, struct zbx_json *j, zbx_uint64_t *la
 			(void)zbx_list_iterator_peek(&li, (void **)&row);
 
 			/* row fields in the same order as defined in areg table */
-			void	*table_areg_row[] = {
+			void	*areg_fields[] = {
 					&row->clock,
 					&row->host,
 					&row->listen_ip,
@@ -246,42 +246,7 @@ static int	pb_autoreg_get_mem(zbx_pb_t *pb, struct zbx_json *j, zbx_uint64_t *la
 					&row->tls_accepted
 					};
 
-			zbx_json_addobject(j, NULL);
-
-			for (int column = 0; column < (int)ARRSIZE(table_areg_row); column++)
-			{
-				zbx_history_field_t	*fld = &areg.fields[column];
-
-				if (NULL != fld->default_value)
-				{
-					int	def_val;
-
-					if (ZBX_JSON_TYPE_STRING == fld->jt)
-					{
-						if (0 == strcmp(fld->default_value, *(char**)(table_areg_row[column])))
-							continue;
-					}
-					else if (SUCCEED == zbx_is_int(fld->default_value, &def_val) &&
-							def_val == *(int*)(table_areg_row[column]))
-					{
-						continue;
-					}
-				}
-
-				if (ZBX_JSON_TYPE_INT == fld->jt)
-				{
-					zbx_json_addint64(j, fld->tag, *(int*)(table_areg_row[column]));
-				}
-				else if (ZBX_JSON_TYPE_STRING == fld->jt)
-				{
-					zbx_json_addstring(j, fld->tag, *(char**)(table_areg_row[column]),
-							ZBX_JSON_TYPE_STRING);
-				}
-				else
-					THIS_SHOULD_NEVER_HAPPEN;
-			}
-
-			zbx_json_close(j);
+			pb_add_json_field(j, &areg, areg_fields, (int)ARRSIZE(areg_fields));
 
 			records_num++;
 			*lastid = row->id;
