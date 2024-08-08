@@ -1343,7 +1343,7 @@ static void	execute_commands(const zbx_db_event *event, const zbx_db_event *r_ev
 		else
 		{
 			/* get host details */
-	
+
 			if (0 == host.hostid)
 			{
 				/* target is "Current host" */
