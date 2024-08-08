@@ -157,7 +157,7 @@ class CMediatypeHelper {
 					'html' => '<b>Problem started</b> at {EVENT.TIME} on {EVENT.DATE}<br>'.
 						'<b>Problem name:</b> {{EVENT.NAME}.htmlencode()}<br><b>Host:</b> {{HOST.NAME}.htmlencode()}<br>'.
 						'<b>Severity:</b> {{EVENT.SEVERITY}.htmlencode()}<br><b>Operational data:</b> {{EVENT.OPDATA}.htmlencode()}<br>'.
-						'<b>Original problem ID:</b> {EVENT.ID}<br>{TRIGGER.URL}',
+						'<b>Original problem ID:</b> {EVENT.ID}<br>{{TRIGGER.URL}.htmlencode()}',
 					'sms' => "{EVENT.SEVERITY}: {EVENT.NAME}\nHost: {HOST.NAME}\n{EVENT.DATE} {EVENT.TIME}",
 					'text' => "Problem started at {EVENT.TIME} on {EVENT.DATE}\n".
 						"Problem name: {EVENT.NAME}\nHost: {HOST.NAME}\nSeverity: {EVENT.SEVERITY}\n".
@@ -172,7 +172,7 @@ class CMediatypeHelper {
 					'subject' => 'Resolved in {EVENT.DURATION}: {EVENT.NAME}',
 					'html' => '<b>Problem has been resolved</b> at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}<br>'.
 						'<b>Problem name:</b> {{EVENT.NAME}.htmlencode()}<br><b>Problem duration:</b> {EVENT.DURATION}<br><b>Host:</b> {{HOST.NAME}.htmlencode()}<br>'.
-						'<b>Severity:</b> {{EVENT.SEVERITY}.htmlencode()}<br><b>Original problem ID:</b> {EVENT.ID}<br>{TRIGGER.URL}',
+						'<b>Severity:</b> {{EVENT.SEVERITY}.htmlencode()}<br><b>Original problem ID:</b> {EVENT.ID}<br>{{TRIGGER.URL}.htmlencode()}',
 					'sms' => "Resolved in {EVENT.DURATION}: {EVENT.NAME}\nHost: {HOST.NAME}\n{EVENT.DATE} {EVENT.TIME}",
 					'text' => "Problem has been resolved at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}\n".
 						"Problem name: {EVENT.NAME}\nProblem duration: {EVENT.DURATION}\nHost: {HOST.NAME}\nSeverity: {EVENT.SEVERITY}\n".
