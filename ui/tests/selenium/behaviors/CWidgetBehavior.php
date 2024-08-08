@@ -24,9 +24,10 @@ class CWidgetBehavior extends CBehavior {
 	/**
 	 * Create new or edit widget and fill fields.
 	 *
-	 * @param string $type    widget type
-	 * @param array  $data    given fields and values
-	 * @param string $name    widget name
+	 * @param CDashboardElement    $dashboard    dashboard element
+	 * @param string               $type         widget type
+	 * @param array  			   $data         given fields and values
+	 * @param string 			   $name         widget name
 	 *
 	 * @return CFormElement
 	 */
