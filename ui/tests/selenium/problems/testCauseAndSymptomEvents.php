@@ -151,6 +151,26 @@ class testCauseAndSymptomEvents extends CWebTest {
 				'description' => 'Battery problem trap [Cause]',
 				'expression' => 'last(/Host for Cause and Symptom update/kWh)<10',
 				'priority' => TRIGGER_SEVERITY_DISASTER
+			],
+			[
+				'description' => 'Battery problem trap2 [Cause]',
+				'expression' => 'last(/Host for Cause and Symptom update/kWh)<5',
+				'priority' => TRIGGER_SEVERITY_DISASTER
+			],
+			[
+				'description' => 'Battery problem linked [Cause]',
+				'expression' => 'last(/Host for Cause and Symptom update/kWh)<2',
+				'priority' => TRIGGER_SEVERITY_DISASTER
+			],
+			[
+				'description' => 'Battery problem linked [Symptom]',
+				'expression' => 'last(/Host for Cause and Symptom update/kWh)<3',
+				'priority' => TRIGGER_SEVERITY_DISASTER
+			],
+			[
+				'description' => 'Battery problem linked [Symptom2]',
+				'expression' => 'last(/Host for Cause and Symptom update/kWh)<4',
+				'priority' => TRIGGER_SEVERITY_DISASTER
 			]
 		]);
 		self::$triggerids = CDataHelper::getIds('description');
@@ -160,12 +180,20 @@ class testCauseAndSymptomEvents extends CWebTest {
 			CDBHelper::setTriggerProblem($name, TRIGGER_VALUE_TRUE);
 		}
 
-		// Set cause and symptoms for predefined problems.
-		$causeid = CDBHelper::getValue('SELECT eventid FROM problem WHERE name='.zbx_dbstr('Problem trap>150 [Cause]'));
-		$symptomid = CDBHelper::getValue('SELECT eventid FROM problem WHERE name='.zbx_dbstr('Problem trap>10 [Symptom]'));
-		DBexecute('UPDATE problem SET cause_eventid='.$causeid.' WHERE name='.zbx_dbstr('Problem trap>10 [Symptom]'));
-		DBexecute('INSERT INTO event_symptom (eventid, cause_eventid) VALUES ('.$symptomid.','.$causeid.')');
-		DBexecute('UPDATE event_symptom SET cause_eventid='.$causeid.' WHERE eventid='.$symptomid);
+		// Set cause and symptom(s) for predefined problems.
+		$problems = [
+			'Problem trap>150 [Cause]' => ['Problem trap>10 [Symptom]'],
+			'Battery problem linked [Cause]' => ['Battery problem linked [Symptom]', 'Battery problem linked [Symptom2]']
+		];
+		foreach ($problems as $cause => $symptoms) {
+			foreach ($symptoms as $symptom) {
+				$causeid = CDBHelper::getValue('SELECT eventid FROM problem WHERE name='.zbx_dbstr($cause));
+				$symptomid = CDBHelper::getValue('SELECT eventid FROM problem WHERE name='.zbx_dbstr($symptom));
+				DBexecute('UPDATE problem SET cause_eventid='.$causeid.' WHERE name='.zbx_dbstr($symptom));
+				DBexecute('INSERT INTO event_symptom (eventid, cause_eventid) VALUES ('.$symptomid.','.$causeid.')');
+				DBexecute('UPDATE event_symptom SET cause_eventid='.$causeid.' WHERE eventid='.$symptomid);
+			}
+		}
 	}
 
 	/**
@@ -185,19 +213,20 @@ class testCauseAndSymptomEvents extends CWebTest {
 		$this->assertTableData($result);
 
 		// Check collapsed symptom count.
-		$this->assertTrue($table->getRow(0)->query('class:entity-count')->one()->isVisible());
-		$this->assertEquals(1, $table->getRow(0)->query('class:entity-count')->one()->getText());
+		$cause = $table->findRow('Problem', 'Problem trap>150 [Cause]');
+		$cause->query('class:entity-count')->one()->isVisible();
+		$this->assertEquals(1, $cause->query('class:entity-count')->one()->getText());
 
 		// Check 'Event details' rank value for 'Cause' event.
-		$table->getRow(0)->query('xpath:.//a[contains(@href, "tr_events.php?triggerid='.
-				self::$triggerids['Problem trap>150 [Cause]'].'&eventid")]')->one()->click();
+		$cause->query('xpath:.//a[contains(@href, "tr_events.php?triggerid='.self::$triggerids['Problem trap>150 [Cause]'].
+				'&eventid")]')->one()->click();
 		$this->page->waitUntilReady();
 		$event_table = $this->query('xpath://section[@id="hat_eventdetails"]')->asTable()->waitUntilPresent()->one();
 		$this->assertEquals('Cause', $event_table->getRow(7)->getColumn(1)->getText());
 
 		$this->page->navigateBack();
 		$this->checkState(true);
-		$table->getRow(0)->query(self::EXPAND_XPATH)->one()->click();
+		$cause->query(self::EXPAND_XPATH)->one()->click();
 		$this->checkState();
 
 		// Check 'Event details' rank value for 'Symptom' event and possibility to navigate to 'Cause' event.
@@ -214,28 +243,30 @@ class testCauseAndSymptomEvents extends CWebTest {
 				self::$hostsids['hostids']['Host for Cause and Symptom check']
 		);
 		$this->checkState(true);
-		$table->getRow(0)->query(self::EXPAND_XPATH)->one()->click();
+		$cause->query(self::EXPAND_XPATH)->one()->click();
 		$this->checkState();
-		$table->getRow(0)->query(self::COLLAPSE_XPATH)->one()->click();
+		$cause->query(self::COLLAPSE_XPATH)->one()->click();
 		$this->checkState(true);
 	}
 
 	/**
 	 * @param boolean $collapsed	are symptom events in collapsed state or not
+	 * @param string $name			cause event name
 	 */
-	protected function checkState($collapsed = false) {
+	protected function checkState($collapsed = false, $name = 'Problem trap>150 [Cause]') {
 		$table = $this->query('class:list-table')->asTable()->waitUntilPresent()->one();
+		$cause = $table->findRow('Problem', $name);
 
 		if ($collapsed) {
 			// Check collapsed state.
-			$this->assertTrue($table->getRow(0)->query(self::EXPAND_XPATH)->one()->isVisible());
-			$this->assertFalse($table->getRow(0)->query(self::COLLAPSE_XPATH)->exists());
+			$this->assertTrue($cause->query(self::EXPAND_XPATH)->one()->isVisible());
+			$this->assertFalse($cause->query(self::COLLAPSE_XPATH)->exists());
 		}
 		else {
 			// Check expanded state.
-			$this->assertTrue($table->getRow(0)->query(self::COLLAPSE_XPATH)->one()->isVisible());
-			$this->assertFalse($table->getRow(0)->query(self::EXPAND_XPATH)->exists());
-			$this->assertTrue($table->getRow(1)->query(self::SYMPTOM_XPATH)->one()->isVisible());
+			$this->assertTrue($cause->query(self::COLLAPSE_XPATH)->one()->isVisible());
+			$this->assertFalse($cause->query(self::EXPAND_XPATH)->exists());
+			$this->assertTrue($table->findRow('Problem', 'Problem trap>10 [Symptom]')->query(self::SYMPTOM_XPATH)->one()->isVisible());
 		}
 	}
 
@@ -387,6 +418,109 @@ class testCauseAndSymptomEvents extends CWebTest {
 				$this->assertTrue($context_menu->getItem($problem_options)->isEnabled());
 			}
 		}
+	}
+
+	public function getConvertData() {
+		return [
+			// #0 Disabled checkbox with two selected cause events (mass update action).
+			[
+				[
+					'problems' => ['Battery problem trap [Cause]', 'Battery problem trap2 [Cause]'],
+					'state' => false // 'Convert to cause' checkbox state.
+				]
+			],
+			// #1 Disabled checkbox when only couse event is updating.
+			[
+				[
+					'problems' => ['Battery problem trap2 [Cause]'],
+					'state' => false
+				]
+			],
+			// #2 Enabled checkbox when mass update is performed for selected events that contain symptoms.
+			[
+				[
+					'select_all' => true,
+					'problems' => ['Battery problem trap [Cause]', 'Battery problem trap2 [Cause]',
+						'Battery problem linked [Cause]', 'Battery problem linked [Symptom]',
+						'Battery problem linked [Symptom2]'],
+					'state' => true
+				]
+			],
+			// #3 Enabled checkbox when mass update is performed when symptom events are expanded.
+			[
+				[
+					'select_all' => true,
+					'expand' => true,
+					'problems' => ['Battery problem trap [Cause]', 'Battery problem trap2 [Cause]',
+						'Battery problem linked [Cause]', 'Battery problem linked [Symptom]',
+						'Battery problem linked [Symptom2]'],
+					'state' => true
+				]
+			],
+			// #4 Disabled checkbox when couse event that contains symptom(s) is updating.
+			[
+				[
+					'problems' => ['Battery problem linked [Cause]'],
+					'state' => false
+				]
+			],
+			// #5 Enabled checkbox when symptom event is updating.
+			[
+				[
+					'expand' => true,
+					'problems' => ['Battery problem linked [Symptom]'],
+					'state' => true
+				]
+			],
+			// #6 Enabled checkbox when symptom events are selected and update form is opened via mass update action.
+			[
+				[
+					'expand' => true,
+					'problems' => ['Battery problem linked [Symptom]', 'Battery problem linked [Symptom2]'],
+					'state' => true
+				]
+			]
+		];
+	}
+
+	/**
+	 * The particular test scenario checks 'Convert to cause' checkbox state in Update Problem form.
+	 *
+	 * @dataProvider getConvertData
+	 */
+	public function testCauseAndSymptomEvents_UpdateProblem($data) {
+		$this->page->login()->open('zabbix.php?action=problem.view&hostids[]='.
+				self::$hostsids['hostids']['Host for Cause and Symptom update']
+		);
+		$form = CFilterElement::find()->one()->getForm();
+		$table = $this->query('class:list-table')->asTable()->waitUntilPresent()->one();
+		$count = count($data['problems']);
+		$table->findRows('Problem', $data['problems']);
+
+		if (array_key_exists('expand', $data)) {
+			$table->findRow('Problem', 'Battery problem linked [Cause]')->query(self::EXPAND_XPATH)->one()->click();
+		}
+
+		if ($count > 1) {
+			if (array_key_exists('select_all', $data)) {
+				$this->query('id:all_eventids')->asCheckbox()->one()->click();
+			}
+			else {
+				$table->findRows('Problem', $data['problems'])->select();
+			}
+			$this->query('button:Mass update')->waitUntilClickable()->one()->click();
+		}
+		else {
+			$table->findRow('Problem', $data['problems'][0])->query('link:Update')->waitUntilClickable()->one()->click();
+		}
+
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+		$form = $dialog->query('id:acknowledge_form')->asForm()->one();
+
+		// Check 'Problem' field value and 'Convert to cause' checkbox state.
+		$problem = $count > 1 ? $count.' problems selected.' : $data['problems'][0];
+		$this->assertEquals($problem, ($form->getField('Problem')->getText()));
+		$this->assertTrue($form->getField('id:change_rank')->isEnabled($data['state']));
 	}
 
 	public static function getCauseSymptomsData() {
