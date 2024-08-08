@@ -1388,7 +1388,7 @@ static void	execute_commands(const zbx_db_event *event, const zbx_db_event *r_ev
 				zbx_strscpy(host.tls_psk_identity, row[20 + ZBX_IPMI_FIELDS_NUM]);
 				zbx_strscpy(host.tls_psk, row[21 + ZBX_IPMI_FIELDS_NUM]);
 #endif
-				host.monitored_by = (unsigned char)atoi(row[22 + ZBX_IPMI_FIELDS_NUM]);
+				ZBX_STR2UCHAR(host.monitored_by, row[22 + ZBX_IPMI_FIELDS_NUM]);
 			}
 		}
 
