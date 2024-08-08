@@ -28,7 +28,7 @@ static zbx_history_table_t	dht = {
 		{"druleid",		ZBX_PROTO_TAG_DRULE,		ZBX_JSON_TYPE_INT,	NULL},
 		{"dcheckid",		ZBX_PROTO_TAG_DCHECK,		ZBX_JSON_TYPE_INT,	NULL},
 		{"ip",			ZBX_PROTO_TAG_IP,		ZBX_JSON_TYPE_STRING,	NULL},
-		{"dns",			ZBX_PROTO_TAG_DNS,		ZBX_JSON_TYPE_STRING,	NULL},
+		{"dns",			ZBX_PROTO_TAG_DNS,		ZBX_JSON_TYPE_STRING,	""},
 		{"port",		ZBX_PROTO_TAG_PORT,		ZBX_JSON_TYPE_INT,	"0"},
 		{"value",		ZBX_PROTO_TAG_VALUE,		ZBX_JSON_TYPE_STRING,	""},
 		{"status",		ZBX_PROTO_TAG_STATUS,		ZBX_JSON_TYPE_INT,	"0"},
@@ -346,18 +346,53 @@ static int	pb_discovery_get_mem(zbx_pb_t *pb, struct zbx_json *j, zbx_uint64_t *
 
 			(void)zbx_list_iterator_peek(&li, (void **)&row);
 
-			zbx_json_addobject(j, NULL);
-			zbx_json_addint64(j, ZBX_PROTO_TAG_CLOCK, row->clock);
-			zbx_json_adduint64(j, ZBX_PROTO_TAG_DRULE, row->druleid);
-			zbx_json_adduint64(j, ZBX_PROTO_TAG_DCHECK, row->dcheckid);
-			zbx_json_addstring(j, ZBX_PROTO_TAG_IP, row->ip, ZBX_JSON_TYPE_STRING);
-			zbx_json_addstring(j, ZBX_PROTO_TAG_DNS, row->dns, ZBX_JSON_TYPE_STRING);
-			zbx_json_addint64(j, ZBX_PROTO_TAG_PORT, row->port);
-			zbx_json_addstring(j, ZBX_PROTO_TAG_VALUE, row->value, ZBX_JSON_TYPE_STRING);
-			zbx_json_addint64(j, ZBX_PROTO_TAG_STATUS, row->status);
+			/* row fields in the same order as defined in dht table */
+			void	*table_dht_row[] = {
+					&row->clock,
+					&row->druleid,
+					&row->dcheckid,
+					&row->ip,
+					&row->dns,
+					&row->port,
+					&row->value,
+					&row->status,
+					&row->error
+					};
 
-			if ('\0' != *row->error)
-				zbx_json_addstring(j, ZBX_PROTO_TAG_ERROR, row->error, ZBX_JSON_TYPE_STRING);
+			zbx_json_addobject(j, NULL);
+
+			for (int column = 0; column < (int)ARRSIZE(table_dht_row); column++)
+			{
+				zbx_history_field_t	*fld = &dht.fields[column];
+
+				if (NULL != fld->default_value)
+				{
+					int	def_val;
+
+					if (ZBX_JSON_TYPE_STRING == fld->jt)
+					{
+						if (0 == strcmp(fld->default_value, *(char**)(table_dht_row[column])))
+							continue;
+					}
+					else if (SUCCEED == zbx_is_int(fld->default_value, &def_val) &&
+							def_val == *(int*)(table_dht_row[column]))
+					{
+						continue;
+					}
+				}
+
+				if (ZBX_JSON_TYPE_INT == fld->jt)
+				{
+					zbx_json_addint64(j, fld->tag, *(int*)(table_dht_row[column]));
+				}
+				else if (ZBX_JSON_TYPE_STRING == fld->jt)
+				{
+					zbx_json_addstring(j, fld->tag, *(char**)(table_dht_row[column]),
+							ZBX_JSON_TYPE_STRING);
+				}
+				else
+					THIS_SHOULD_NEVER_HAPPEN;
+			}
 
 			zbx_json_close(j);
 
