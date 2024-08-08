@@ -167,23 +167,72 @@ dnl *****************************************************************
 AC_HEADER_MAJOR
 AC_HEADER_RESOLV
 
-AC_CHECK_HEADERS(stdio.h stdlib.h string.h unistd.h netdb.h signal.h malloc.h \
-  syslog.h time.h errno.h sys/types.h sys/stat.h netinet/in.h \
-  math.h sys/socket.h dirent.h ctype.h \
-  fcntl.h sys/param.h arpa/inet.h \
-  sys/vfs.h sys/pstat.h sys/sysinfo.h sys/statvfs.h sys/statfs.h \
-  sys/loadavg.h sys/vmmeter.h strings.h vm/vm_param.h \
-  sys/time.h kstat.h sys/syscall.h sys/sysmacros.h \
-  stdint.h mach/host_info.h mach/mach_host.h pwd.h \
-  sys/var.h arpa/nameser.h assert.h sys/dkstat.h sys/disk.h sys/sched.h \
-  zone.h nlist.h kvm.h linux/version.h procinfo.h sys/dk.h \
-  sys/resource.h pthread.h windows.h process.h conio.h sys/wait.h \
-  stdarg.h winsock2.h pdh.h psapi.h sys/sem.h sys/ipc.h sys/shm.h Winldap.h \
-  Winber.h lber.h ws2tcpip.h inttypes.h sys/file.h grp.h \
-  execinfo.h sys/systemcfg.h sys/mnttab.h mntent.h sys/times.h \
-  dlfcn.h sys/utsname.h sys/un.h sys/protosw.h stddef.h limits.h float.h poll.h \
-  sys/ioctl.h sys/timeb.h termios.h utmpx.h
-)
+dnl ISO C Standard Library
+dnl
+AC_CHECK_HEADERS([assert.h ctype.h dirent.h dlfcn.h errno.h float.h          \
+                  inttypes.h limits.h math.h signal.h stdarg.h stddef.h      \
+                  stdint.h stdio.h stdlib.h string.h time.h                  \
+])
+
+dnl POSIX C Standard Library
+dnl
+AC_CHECK_HEADERS([sys/ipc.h sys/resource.h sys/sem.h sys/shm.h sys/socket.h  \
+                  sys/stat.h sys/statfs.h sys/statvfs.h sys/time.h           \
+                  sys/times.h sys/types.h sys/un.h sys/utsname.h sys/wait.h  \
+                  arpa/inet.h fcntl.h grp.h netdb.h netinet/in.h poll.h      \
+                  pthread.h pwd.h strings.h syslog.h termios.h unistd.h      \
+                  utmpx.h                                                    \
+])
+
+dnl X/Open and SUS
+AC_CHECK_HEADERS([sys/timeb.h])
+
+dnl Non-standardized and obsolete non-platform headers
+dnl XXX: sys/syscall.h is not standardized; obsoleted by unistd.h in POSIX;
+dnl      required on AIX to work around a defect in netinet/in6_var.h
+dnl      process.h is a non-standard header shipped by various compilers;
+dnl      effectively obsoleted by unistd.h in POSIX.
+AC_CHECK_HEADERS([sys/syscall.h malloc.h process.h])
+
+dnl GNU C extensions
+dnl
+AC_CHECK_HEADERS([execinfo.h mntent.h sys/sysinfo.h])
+
+dnl AIX
+AC_CHECK_HEADERS([sys/protosw.h sys/systemcfg.h sys/var.h procinfo.h])
+
+dnl BSDs
+dnl XXX: sys/param.h is needed by duktape; shipped everywhere _except_ Linux.
+dnl      sys/vfs.h is a Solaris thing that's spread to BSDs and Linux as part
+dnl      of the ZFS compat layer.
+AC_CHECK_HEADERS([sys/disk.h sys/dkstat.h sys/ioctl.h sys/param.h            \
+                  sys/sched.h sys/vfs.h sys/vmmeter.h arpa/nameser.h kvm.h   \
+])
+
+dnl HP-UX
+AC_CHECK_HEADERS([sys/pstat.h])
+
+dnl Linux
+AC_CHECK_HEADERS([linux/version.h])
+
+dnl MacOS
+AC_CHECK_HEADERS([mach/host_info.h mach/mach_host.h vm/vm_param.h nlist.h])
+dnl maybe MacOS
+AC_CHECK_HEADERS([kstat.h])
+
+dnl Solaris
+dnl
+dnl XXX: sys/loadavg.h declares getloadavg(), which glibc, musl c and
+dnl      BSD libc's have merged into stdlib.h.
+AC_CHECK_HEADERS([sys/dk.h sys/loadavg.h sys/mnttab.h sys/sysmacros.h zone.h])
+
+dnl Windows
+AC_CHECK_HEADERS([Winber.h Winldap.h conio.h pdh.h psapi.h windows.h         \
+                  winsock2.h ws2tcpip.h                                      \
+])
+
+dnl 3rd-Party Libraries
+AC_CHECK_HEADERS([lber.h])
 
 AC_CHECK_HEADERS(resolv.h, [], [], [
 #ifdef HAVE_SYS_TYPES_H
