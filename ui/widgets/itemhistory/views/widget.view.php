@@ -30,6 +30,7 @@ use Widgets\ItemHistory\Includes\{
 
 $table = (new CTableInfo())->addClass($data['show_thumbnail'] ? 'show-thumbnail' : null);
 $is_layout_vertical = $data['layout'] == WidgetForm::LAYOUT_VERTICAL;
+$column_count = count($data['columns']);
 
 if ($data['error'] !== null) {
 	$table->setNoDataMessage($data['error']);
@@ -120,7 +121,7 @@ else {
 			foreach ($column_indexes as $index) {
 				if (array_key_exists($index, $row)) {
 					$table_row = array_merge($table_row,
-						makeValueCell($data['columns'][$index], $row[$index], 'has-broadcast-data')
+						makeValueCell($data['columns'][$index], $row[$index], $column_count > 1, 'has-broadcast-data')
 					);
 				}
 				else {
@@ -177,7 +178,8 @@ function getRowClock(array $columns, array $row): string | int {
 	return reset($row)['clock'];
 }
 
-function makeValueCell(array $column, array $item_value, string $cell_class = null): array {
+function makeValueCell(array $column, array $item_value, bool $text_wordbreak = false,
+		string $cell_class = null): array {
 	$color = $column['base_color'];
 
 	switch ($column['item_value_type']) {
@@ -253,19 +255,37 @@ function makeValueCell(array $column, array $item_value, string $cell_class = nu
 				}
 			}
 
-			$value = $column['display'] == CWidgetFieldColumnsList::DISPLAY_SINGLE_LINE
-				? substr($item_value['value'], 0, $column['max_length'])
-				: $item_value['value'];
+			$cell = new CCol();
+
+			switch ($column['display']) {
+				case CWidgetFieldColumnsList::DISPLAY_AS_IS:
+					$cell
+						->addItem(
+							new CDiv(zbx_nl2br($item_value['value']))
+						)
+						->addClass($text_wordbreak ? ZBX_STYLE_WORDBREAK : ZBX_STYLE_NOWRAP);
+
+					break;
+
+				case CWidgetFieldColumnsList::DISPLAY_SINGLE_LINE:
+					$cell
+						->addItem(
+							new CDiv(substr($item_value['value'], 0, $column['max_length']))
+						)
+						->addClass(ZBX_STYLE_NOWRAP);
+
+					break;
+
+				case CWidgetFieldColumnsList::DISPLAY_HTML:
+					$cell->addItem(
+						new CJsScript($item_value['value'])
+					);
+
+					break;
+			}
 
 			return [
-				(new CCol($column['display'] != CWidgetFieldColumnsList::DISPLAY_HTML
-					? new CDiv($value)
-					: new CJsScript($value)
-				))
-					->addClass($column['display'] == CWidgetFieldColumnsList::DISPLAY_SINGLE_LINE
-						? ZBX_STYLE_NOWRAP
-						: null
-					)
+				$cell
 					->addClass($column['monospace_font'] ? ZBX_STYLE_MONOSPACE_FONT : null)
 					->addClass($cell_class)
 					->setAttribute('data-itemid', $item_value['itemid'])
