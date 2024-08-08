@@ -19,7 +19,7 @@ require_once dirname(__FILE__).'/../common/testWidgets.php';
 /**
  * @dataSource AllItemValueTypes, ItemValueWidget, GlobalMacros, TopHostsWidget
  *
- * @backup config, hstgrp, dashboard, maintenances
+ * @backup dashboard
  *
  * @onBefore prepareData
  */
