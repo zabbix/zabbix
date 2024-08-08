@@ -1193,9 +1193,7 @@ static void	execute_commands(const zbx_db_event *event, const zbx_db_event *r_ev
 				/* selected IPMI fields changes */
 				",h.ipmi_authtype,h.ipmi_privilege,h.ipmi_username,h.ipmi_password"
 #endif
-#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-				",h.tls_issuer,h.tls_subject,h.tls_psk_identity,h.tls_psk"
-#endif
+				",h.tls_issuer,h.tls_subject,h.tls_psk_identity,h.tls_psk,h.monitored_by"
 				);
 
 		zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset,
@@ -1223,9 +1221,7 @@ static void	execute_commands(const zbx_db_event *event, const zbx_db_event *r_ev
 #ifdef HAVE_OPENIPMI
 			",h.ipmi_authtype,h.ipmi_privilege,h.ipmi_username,h.ipmi_password"
 #endif
-#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-			",h.tls_issuer,h.tls_subject,h.tls_psk_identity,h.tls_psk"
-#endif
+			",h.tls_issuer,h.tls_subject,h.tls_psk_identity,h.tls_psk,h.monitored_by"
 			);
 	zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset,
 			" from opcommand o,opcommand_hst oh,hosts h,scripts s"
@@ -1244,10 +1240,8 @@ static void	execute_commands(const zbx_db_event *event, const zbx_db_event *r_ev
 	zbx_strcpy_alloc(&buffer, &buffer_alloc, &buffer_offset,
 				",0,2,null,null");
 #endif
-#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_strcpy_alloc(&buffer, &buffer_alloc, &buffer_offset,
-				",null,null,null,null");
-#endif
+				",null,null,null,null,0");
 	if (EVENT_SOURCE_SERVICE == event->source)
 	{
 		zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset,
@@ -1349,7 +1343,7 @@ static void	execute_commands(const zbx_db_event *event, const zbx_db_event *r_ev
 		else
 		{
 			/* get host details */
-
+	
 			if (0 == host.hostid)
 			{
 				/* target is "Current host" */
@@ -1388,12 +1382,11 @@ static void	execute_commands(const zbx_db_event *event, const zbx_db_event *r_ev
 				zbx_strscpy(host.ipmi_username, row[20]);
 				zbx_strscpy(host.ipmi_password, row[21]);
 #endif
-#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 				zbx_strscpy(host.tls_issuer, row[18 + ZBX_IPMI_FIELDS_NUM]);
 				zbx_strscpy(host.tls_subject, row[19 + ZBX_IPMI_FIELDS_NUM]);
 				zbx_strscpy(host.tls_psk_identity, row[20 + ZBX_IPMI_FIELDS_NUM]);
 				zbx_strscpy(host.tls_psk, row[21 + ZBX_IPMI_FIELDS_NUM]);
-#endif
+				host.monitored_by = (unsigned char)atoi(row[22 + ZBX_IPMI_FIELDS_NUM]);
 			}
 		}
 
