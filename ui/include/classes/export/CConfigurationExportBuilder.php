@@ -96,7 +96,7 @@ class CConfigurationExportBuilder {
 
 		$value = $has_data ? $row[$tag] : $default_value;
 
-		if (!$is_required && $default_value == $value) {
+		if (!$is_required && $default_value == $value && !array_key_exists('export_always', $rule)) {
 			return null;
 		}
 
