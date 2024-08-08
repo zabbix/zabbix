@@ -155,8 +155,8 @@ class CMediatypeHelper {
 				'template' => [
 					'subject' => 'Problem: {EVENT.NAME}',
 					'html' => '<b>Problem started</b> at {EVENT.TIME} on {EVENT.DATE}<br>'.
-						'<b>Problem name:</b> {EVENT.NAME}<br><b>Host:</b> {HOST.NAME}<br>'.
-						'<b>Severity:</b> {EVENT.SEVERITY}<br><b>Operational data:</b> {EVENT.OPDATA}<br>'.
+						'<b>Problem name:</b> {{EVENT.NAME}.htmlencode()}<br><b>Host:</b> {{HOST.NAME}.htmlencode()}<br>'.
+						'<b>Severity:</b> {{EVENT.SEVERITY}.htmlencode()}<br><b>Operational data:</b> {{EVENT.OPDATA}.htmlencode()}<br>'.
 						'<b>Original problem ID:</b> {EVENT.ID}<br>{TRIGGER.URL}',
 					'sms' => "{EVENT.SEVERITY}: {EVENT.NAME}\nHost: {HOST.NAME}\n{EVENT.DATE} {EVENT.TIME}",
 					'text' => "Problem started at {EVENT.TIME} on {EVENT.DATE}\n".
@@ -171,8 +171,8 @@ class CMediatypeHelper {
 				'template' => [
 					'subject' => 'Resolved in {EVENT.DURATION}: {EVENT.NAME}',
 					'html' => '<b>Problem has been resolved</b> at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}<br>'.
-						'<b>Problem name:</b> {EVENT.NAME}<br><b>Problem duration:</b> {EVENT.DURATION}<br><b>Host:</b> {HOST.NAME}<br>'.
-						'<b>Severity:</b> {EVENT.SEVERITY}<br><b>Original problem ID:</b> {EVENT.ID}<br>{TRIGGER.URL}',
+						'<b>Problem name:</b> {{EVENT.NAME}.htmlencode()}<br><b>Problem duration:</b> {EVENT.DURATION}<br><b>Host:</b> {{HOST.NAME}.htmlencode()}<br>'.
+						'<b>Severity:</b> {{EVENT.SEVERITY}.htmlencode()}<br><b>Original problem ID:</b> {EVENT.ID}<br>{TRIGGER.URL}',
 					'sms' => "Resolved in {EVENT.DURATION}: {EVENT.NAME}\nHost: {HOST.NAME}\n{EVENT.DATE} {EVENT.TIME}",
 					'text' => "Problem has been resolved at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}\n".
 						"Problem name: {EVENT.NAME}\nProblem duration: {EVENT.DURATION}\nHost: {HOST.NAME}\nSeverity: {EVENT.SEVERITY}\n".
@@ -186,8 +186,8 @@ class CMediatypeHelper {
 				'template' => [
 					'subject' => 'Updated problem in {EVENT.AGE}: {EVENT.NAME}',
 					'html' =>
-						'<b>{USER.FULLNAME} {EVENT.UPDATE.ACTION} problem</b> at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.<br>'.
-						'{EVENT.UPDATE.MESSAGE}<br><br><b>Current problem status:</b> {EVENT.STATUS}<br>'.
+						'<b>{{USER.FULLNAME}.htmlencode()} {EVENT.UPDATE.ACTION} problem</b> at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.<br>'.
+						'{{EVENT.UPDATE.MESSAGE}.htmlencode()}<br><br><b>Current problem status:</b> {EVENT.STATUS}<br>'.
 						'<b>Age:</b> {EVENT.AGE}<br><b>Acknowledged:</b> {EVENT.ACK.STATUS}.',
 					'sms' => '{USER.FULLNAME} {EVENT.UPDATE.ACTION} problem in {EVENT.AGE} at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}',
 					'text' =>
