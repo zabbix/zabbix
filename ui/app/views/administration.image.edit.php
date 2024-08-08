@@ -31,7 +31,7 @@ $form = (new CForm('post', (new CUrl('zabbix.php'))
 	->setArgument('action', ($data['imageid'] == 0) ? 'image.create' : 'image.update')
 	->getUrl(), 'multipart/form-data')
 )
-	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token))->removeId())
+	->addItem((new CVar(CSRF_TOKEN_NAME, $csrf_token))->removeId())
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('imagetype', $data['imagetype']);
 
@@ -79,7 +79,7 @@ if ($data['imageid'] != 0) {
 					->setArgument('action', 'image.delete')
 					->setArgument('imageid', $data['imageid'])
 					->setArgument('imagetype', $data['imagetype'])
-					->setArgument(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token),
+					->setArgument(CSRF_TOKEN_NAME, $csrf_token),
 				_('Delete selected image?')
 			))->setId('delete'),
 			(new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))

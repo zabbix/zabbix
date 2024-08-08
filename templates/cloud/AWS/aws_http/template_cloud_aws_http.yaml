@@ -95,7 +95,7 @@ zabbix_export:
             					AWS.params[field] = params[field];
             				});
             		}
-            		['region_match', 'region_not_match'].forEach(function (field) {
+            		['describe_region', 'region_match', 'region_not_match'].forEach(function (field) {
             			if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
             				throw 'Required param is not set: "' + field + '".';
             			}
@@ -215,9 +215,8 @@ zabbix_export:
             			'Version': '2016-11-15'
             		};
             
-            		result = AWS.request('POST', 'us-east-1', 'ec2', 'ec2.amazonaws.com', AWS.prepareParams(payload), '', '');
+            		regions = AWS.getField(AWS.request('POST', AWS.params.describe_region, 'ec2', 'ec2.' + AWS.params.describe_region + '.amazonaws.com', AWS.prepareParams(payload), '', ''), 'DescribeRegionsResponse.regionInfo.item');
             
-            		regions = AWS.getField(result, 'DescribeRegionsResponse.regionInfo.item')
             		if (!Array.isArray(regions))
             			regions = [regions]
             		return regions
@@ -332,6 +331,8 @@ zabbix_export:
               value: '{$AWS.ACCESS.KEY.ID}'
             - name: auth_type
               value: '{$AWS.AUTH_TYPE}'
+            - name: describe_region
+              value: '{$AWS.DESCRIBE.REGION}'
             - name: proxy
               value: '{$AWS.PROXY}'
             - name: region_match
@@ -402,7 +403,7 @@ zabbix_export:
             					AWS.params[field] = params[field];
             				});
             		}
-            		['region_match', 'region_not_match'].forEach(function (field) {
+            		['describe_region', 'region_match', 'region_not_match'].forEach(function (field) {
             			if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
             				throw 'Required param is not set: "' + field + '".';
             			}
@@ -514,9 +515,8 @@ zabbix_export:
             			'Version': '2016-11-15'
             		};
             
-            		result = AWS.request('POST', 'us-east-1', 'ec2', 'ec2.amazonaws.com', AWS.prepareParams(payload), '', '');
+            		regions = AWS.getField(AWS.request('POST', AWS.params.describe_region, 'ec2', 'ec2.' + AWS.params.describe_region + '.amazonaws.com', AWS.prepareParams(payload), '', ''), 'DescribeRegionsResponse.regionInfo.item');
             
-            		regions = AWS.getField(result, 'DescribeRegionsResponse.regionInfo.item')
             		if (!Array.isArray(regions))
             			regions = [regions]
             		return regions
@@ -654,6 +654,8 @@ zabbix_export:
               value: '{$AWS.ACCESS.KEY.ID}'
             - name: auth_type
               value: '{$AWS.AUTH_TYPE}'
+            - name: describe_region
+              value: '{$AWS.DESCRIBE.REGION}'
             - name: proxy
               value: '{$AWS.PROXY}'
             - name: region_match
@@ -763,7 +765,7 @@ zabbix_export:
             					AWS.params[field] = params[field];
             				});
             		}
-            		['region_match', 'region_not_match'].forEach(function (field) {
+            		['describe_region', 'region_match', 'region_not_match'].forEach(function (field) {
             			if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
             				throw 'Required param is not set: "' + field + '".';
             			}
@@ -873,7 +875,7 @@ zabbix_export:
             			'Version': '2016-11-15'
             		};
             
-            		regions = AWS.getField(AWS.request('regions', 'POST', 'us-east-1', 'ec2', 'ec2.amazonaws.com', AWS.prepareParams(payload), '', ''), 'DescribeRegionsResponse.regionInfo.item');
+            		regions = AWS.getField(AWS.request('regions', 'POST', AWS.params.describe_region, 'ec2', 'ec2.' + AWS.params.describe_region + '.amazonaws.com', AWS.prepareParams(payload), '', ''), 'DescribeRegionsResponse.regionInfo.item');
             
             		if (!Array.isArray(regions))
             			regions = [regions]
@@ -978,6 +980,8 @@ zabbix_export:
               value: '{$AWS.ACCESS.KEY.ID}'
             - name: auth_type
               value: '{$AWS.AUTH_TYPE}'
+            - name: describe_region
+              value: '{$AWS.DESCRIBE.REGION}'
             - name: proxy
               value: '{$AWS.PROXY}'
             - name: region_match
@@ -1091,7 +1095,7 @@ zabbix_export:
             					AWS.params[field] = params[field];
             				});
             		}
-            		['region_match', 'region_not_match'].forEach(function (field) {
+            		['describe_region', 'region_match', 'region_not_match'].forEach(function (field) {
             			if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
             				throw 'Required param is not set: "' + field + '".';
             			}
@@ -1201,7 +1205,7 @@ zabbix_export:
             			'Version': '2016-11-15'
             		};
             
-            		regions = AWS.getField(AWS.request('regions', 'POST', 'us-east-1', 'ec2', 'ec2.amazonaws.com', AWS.prepareParams(payload), '', ''), 'DescribeRegionsResponse.regionInfo.item');
+            		regions = AWS.getField(AWS.request('regions', 'POST', AWS.params.describe_region, 'ec2', 'ec2.' + AWS.params.describe_region + '.amazonaws.com', AWS.prepareParams(payload), '', ''), 'DescribeRegionsResponse.regionInfo.item');
             
             		if (!Array.isArray(regions))
             			regions = [regions]
@@ -1306,6 +1310,8 @@ zabbix_export:
               value: '{$AWS.ACCESS.KEY.ID}'
             - name: auth_type
               value: '{$AWS.AUTH_TYPE}'
+            - name: describe_region
+              value: '{$AWS.DESCRIBE.REGION}'
             - name: proxy
               value: '{$AWS.PROXY}'
             - name: region_match
@@ -1394,7 +1400,7 @@ zabbix_export:
             					AWS.params[field] = params[field];
             				});
             		}
-            		['region_match', 'region_not_match'].forEach(function (field) {
+            		['describe_region', 'region_match', 'region_not_match'].forEach(function (field) {
             			if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
             				throw 'Required param is not set: "' + field + '".';
             			}
@@ -1498,9 +1504,8 @@ zabbix_export:
             			'Version': '2016-11-15'
             		};
             
-            		result = AWS.request('POST', 'us-east-1', 'ec2', 'ec2.amazonaws.com', AWS.prepareParams(payload), '', '');
+            		regions = AWS.getField(AWS.request('POST', AWS.params.describe_region, 'ec2', 'ec2.' + AWS.params.describe_region + '.amazonaws.com', AWS.prepareParams(payload), '', ''), 'DescribeRegionsResponse.regionInfo.item');
             
-            		regions = AWS.getField(result, 'DescribeRegionsResponse.regionInfo.item')
             		if (!Array.isArray(regions))
             			regions = [regions]
             		return regions
@@ -1596,6 +1601,8 @@ zabbix_export:
               value: '{$AWS.ACCESS.KEY.ID}'
             - name: auth_type
               value: '{$AWS.AUTH_TYPE}'
+            - name: describe_region
+              value: '{$AWS.DESCRIBE.REGION}'
             - name: proxy
               value: '{$AWS.PROXY}'
             - name: region_match
@@ -1678,6 +1685,12 @@ zabbix_export:
             					AWS.params[field] = params[field];
             				});
             		}
+            		['request_region'].forEach(function (field) {
+            			if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            				throw 'Required param is not set: "' + field + '".';
+            			}
+            			AWS.params[field] = params[field];
+            		});
             	},
             
             	sign: function (key, message) {
@@ -1779,11 +1792,12 @@ zabbix_export:
             			'Version': '2006-03-01'
             		};
             
-            		var result = AWS.getField(AWS.request('GET', 'us-east-1', 's3', 's3.us-east-1.amazonaws.com', AWS.prepareParams(payload), '', ''), 'ListAllMyBucketsResult.Buckets.Bucket');
+            		var result = AWS.getField(AWS.request('GET', AWS.params.request_region, 's3', 's3.' + AWS.params.request_region + '.amazonaws.com', AWS.prepareParams(payload), '', ''), 'ListAllMyBucketsResult.Buckets');
             
             		if (result === null) {
             			return [];
             		}
+            		result = AWS.getField(result, 'Bucket');
             
             		return Array.isArray(result) ? result : [result];
             
@@ -1844,6 +1858,8 @@ zabbix_export:
               value: '{$AWS.AUTH_TYPE}'
             - name: proxy
               value: '{$AWS.PROXY}'
+            - name: request_region
+              value: '{$AWS.REQUEST.REGION}'
             - name: SecretAccessKey
               value: '{$AWS.SECRET.ACCESS.KEY}'
           lld_macro_paths:
@@ -1863,6 +1879,9 @@ zabbix_export:
         - macro: '{$AWS.DATA.TIMEOUT}'
           value: 60s
           description: 'A response timeout for an API.'
+        - macro: '{$AWS.DESCRIBE.REGION}'
+          value: us-east-1
+          description: 'Region used in POST request `DescribeRegions`.'
         - macro: '{$AWS.EC2.LLD.FILTER.NAME.MATCHES}'
           value: '.*'
           description: 'Filter of discoverable EC2 instances by namespace.'
@@ -1943,6 +1962,9 @@ zabbix_export:
         - macro: '{$AWS.RDS.LLD.FILTER.REGION.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'Filter to exclude discovered RDS instances by region.'
+        - macro: '{$AWS.REQUEST.REGION}'
+          value: us-east-1
+          description: 'Region used in GET request `ListBuckets`.'
         - macro: '{$AWS.S3.LLD.FILTER.NAME.MATCHES}'
           value: '.*'
           description: 'Filter of discoverable S3 buckets by namespace.'

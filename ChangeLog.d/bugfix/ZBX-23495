@@ -1,0 +1,1 @@
+...G...... [ZBX-23495] fixed Zabbix agent 2 still sending active check heartbeats when they are disabled (dgoloscapov)

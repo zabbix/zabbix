@@ -122,7 +122,7 @@
 		if (content) {
 			// Should be put inside hintBoxItem to use functionality of hintBox.
 			graph.hintBoxItem = hintBox.createBox(e, graph, content, '', true, 'top: 0; left: 0',
-				graph.closest('.dashboard-grid-widget-container')
+				graph.closest('.dashboard-grid-widget-container'), false
 			);
 
 			if (graph.data('simpleTriggersHintbox')) {
@@ -673,8 +673,9 @@
 		if (html !== null) {
 			if (hbox === null) {
 				hbox = hintBox.createBox(e, graph, html, '', false, false,
-					graph.closest('.dashboard-grid-widget-container')
+					graph.closest('.dashboard-grid-widget-container'), false
 				);
+
 				graph
 					.off('mouseup', makeHintboxStatic)
 					.on('mouseup', {graph: graph}, makeHintboxStatic);
@@ -861,8 +862,9 @@
 		if (html !== null) {
 			if (hbox === null) {
 				hbox = hintBox.createBox(e, graph, html, '', false, false,
-					graph.closest('.dashboard-grid-widget-container')
+					graph.closest('.dashboard-grid-widget-container'), false
 				);
+
 				graph
 					.off('mouseup', makeHintboxStatic)
 					.on('mouseup', {graph: graph}, makeHintboxStatic);

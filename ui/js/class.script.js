@@ -359,7 +359,7 @@ class Script {
 			eventid: eventid ?? undefined,
 			hostid: hostid ?? undefined,
 			manualinput: manualinput ?? undefined,
-			_csrf_token: csrf_token
+			[CSRF_TOKEN_NAME]: csrf_token
 		}, {
 			dialogue_class: 'modal-popup-medium', trigger_element
 		});

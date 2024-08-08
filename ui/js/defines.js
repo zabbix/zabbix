@@ -12,6 +12,9 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+
+const CSRF_TOKEN_NAME = '_csrf_token';
+
 const ZBX_STYLE_DISPLAY_NONE = 'display-none';
 
 const ZBX_STYLE_NO_DATA = 'no-data';
