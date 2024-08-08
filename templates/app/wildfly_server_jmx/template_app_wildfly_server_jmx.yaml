@@ -62,6 +62,7 @@ zabbix_export:
           type: JMX
           key: 'jmx["jboss.as:management-root=server","launchType"]'
           value_type: CHAR
+          trends: '0'
           username: '{$WILDFLY.USER}'
           password: '{$WILDFLY.PASSWORD}'
           description: 'The manner in which the server process was launched. Either "DOMAIN" for a domain mode server launched by a Host Controller, "STANDALONE" for a standalone server launched from the command line, or "EMBEDDED" for a standalone server launched as an embedded part of an application running in the same virtual machine.'
@@ -78,6 +79,7 @@ zabbix_export:
           type: JMX
           key: 'jmx["jboss.as:management-root=server","name"]'
           value_type: CHAR
+          trends: '0'
           username: '{$WILDFLY.USER}'
           password: '{$WILDFLY.PASSWORD}'
           description: |
@@ -96,6 +98,7 @@ zabbix_export:
           type: JMX
           key: 'jmx["jboss.as:management-root=server","processType"]'
           value_type: CHAR
+          trends: '0'
           username: '{$WILDFLY.USER}'
           password: '{$WILDFLY.PASSWORD}'
           description: 'The type of process represented by this root resource.'
@@ -112,6 +115,7 @@ zabbix_export:
           type: JMX
           key: 'jmx["jboss.as:management-root=server","productVersion"]'
           value_type: CHAR
+          trends: '0'
           username: '{$WILDFLY.USER}'
           password: '{$WILDFLY.PASSWORD}'
           description: 'The version of the WildFly Core based product release.'
@@ -139,6 +143,7 @@ zabbix_export:
           type: JMX
           key: 'jmx["jboss.as:management-root=server","runtimeConfigurationState"]'
           value_type: CHAR
+          trends: '0'
           username: '{$WILDFLY.USER}'
           password: '{$WILDFLY.PASSWORD}'
           description: 'The current persistent configuration state, one of starting, ok, reload-required, restart-required, stopping or stopped.'
@@ -163,6 +168,7 @@ zabbix_export:
           type: JMX
           key: 'jmx["jboss.as:management-root=server","serverState"]'
           value_type: CHAR
+          trends: '0'
           username: '{$WILDFLY.USER}'
           password: '{$WILDFLY.PASSWORD}'
           description: 'The current state of the server controller; either STARTING, RUNNING, RESTART_REQUIRED, RELOAD_REQUIRED or STOPPING.'
@@ -195,6 +201,8 @@ zabbix_export:
           description: 'The number of aborted (i.e. rolledback) transactions per second.'
           preprocessing:
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
           tags:
             - tag: component
@@ -209,6 +217,8 @@ zabbix_export:
           description: 'The number of transactions that have been rolled back by application request. This includes those that timeout, since the timeout behavior is considered an attribute of the application configuration.'
           preprocessing:
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
           tags:
             - tag: component
@@ -223,6 +233,8 @@ zabbix_export:
           description: 'The number of committed transactions.'
           preprocessing:
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
           tags:
             - tag: component
@@ -237,6 +249,8 @@ zabbix_export:
           description: 'The number of transactions which have terminated with heuristic outcomes.'
           preprocessing:
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
           tags:
             - tag: component
@@ -263,6 +277,8 @@ zabbix_export:
           description: 'The total number of nested (sub) transactions created.'
           preprocessing:
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
           tags:
             - tag: component
@@ -277,6 +293,8 @@ zabbix_export:
           description: 'The number of transactions that rolled back due to resource (participant) failure.'
           preprocessing:
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
           tags:
             - tag: component
@@ -291,6 +309,8 @@ zabbix_export:
           description: 'The number of transactions that have been rolled back due to internal system errors.'
           preprocessing:
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
           tags:
             - tag: component
@@ -305,6 +325,8 @@ zabbix_export:
           description: 'The number of transactions that have rolled back due to timeout.'
           preprocessing:
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
           tags:
             - tag: component
@@ -319,6 +341,8 @@ zabbix_export:
           description: 'The total number of transactions (top-level and nested) created per second.'
           preprocessing:
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
           tags:
             - tag: component
@@ -336,9 +360,11 @@ zabbix_export:
             conditions:
               - macro: '{#DEPLOYMENT}'
                 value: '{$WILDFLY.DEPLOYMENT.MATCHES}'
+                formulaid: A
               - macro: '{#DEPLOYMENT}'
                 value: '{$WILDFLY.DEPLOYMENT.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: B
           description: 'Discovery deployments metrics.'
           item_prototypes:
             - uuid: 52d99e3f76b4464fbf47271243682d05
@@ -373,6 +399,8 @@ zabbix_export:
                 name: 'WildFly flag'
               preprocessing:
                 - type: BOOL_TO_DECIMAL
+                  parameters:
+                    - ''
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 3h
@@ -393,6 +421,8 @@ zabbix_export:
                 name: 'WildFly flag'
               preprocessing:
                 - type: BOOL_TO_DECIMAL
+                  parameters:
+                    - ''
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 3h
@@ -413,6 +443,8 @@ zabbix_export:
                 name: 'WildFly flag'
               preprocessing:
                 - type: BOOL_TO_DECIMAL
+                  parameters:
+                    - ''
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 3h
@@ -427,6 +459,7 @@ zabbix_export:
               type: JMX
               key: 'jmx["{#JMXOBJ}",status]'
               value_type: CHAR
+              trends: '0'
               username: '{$WILDFLY.USER}'
               password: '{$WILDFLY.PASSWORD}'
               description: |
@@ -478,6 +511,8 @@ zabbix_export:
               description: 'The number of times that the statement cache was accessed  per second.'
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
               tags:
                 - tag: component
@@ -496,6 +531,8 @@ zabbix_export:
               description: 'The number of statements added to the statement cache per second.'
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
               tags:
                 - tag: component
@@ -529,6 +566,8 @@ zabbix_export:
               description: 'The number of statements discarded from the cache per second.'
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
               tags:
                 - tag: component
@@ -547,6 +586,8 @@ zabbix_export:
               description: 'The number of times that statements from the cache were used per second.'
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
               tags:
                 - tag: component
@@ -565,6 +606,8 @@ zabbix_export:
               description: 'The number of times that a statement request could not be satisfied with a statement from the cache per second.'
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
               tags:
                 - tag: component
@@ -584,6 +627,8 @@ zabbix_export:
                 name: 'WildFly flag'
               preprocessing:
                 - type: BOOL_TO_DECIMAL
+                  parameters:
+                    - ''
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 3h
@@ -776,6 +821,8 @@ zabbix_export:
               description: 'The number of failures trying to obtain a physical connection per second.'
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
               tags:
                 - tag: component
@@ -794,6 +841,8 @@ zabbix_export:
               description: 'The created per second'
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
               tags:
                 - tag: component
@@ -812,6 +861,8 @@ zabbix_export:
               description: 'The destroyed count.'
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
               tags:
                 - tag: component
@@ -880,6 +931,8 @@ zabbix_export:
                 name: 'WildFly flag'
               preprocessing:
                 - type: BOOL_TO_DECIMAL
+                  parameters:
+                    - ''
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 3h
@@ -908,6 +961,8 @@ zabbix_export:
               description: 'The timed out connections per second.'
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
               tags:
                 - tag: component
@@ -976,6 +1031,8 @@ zabbix_export:
               description: 'The number of XAResource commit invocations per second.'
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
               tags:
                 - tag: component
@@ -1011,6 +1068,8 @@ zabbix_export:
               description: 'The number of XAResource end invocations per second.'
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
               tags:
                 - tag: component
@@ -1046,6 +1105,8 @@ zabbix_export:
               description: 'The number of XAResource forget invocations per second.'
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
               tags:
                 - tag: component
@@ -1080,6 +1141,8 @@ zabbix_export:
               description: 'The number of XAResource prepare invocations per second.'
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
               tags:
                 - tag: component
@@ -1115,6 +1178,8 @@ zabbix_export:
               description: 'The number of XAResource recover invocations per second.'
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
               tags:
                 - tag: component
@@ -1150,6 +1215,8 @@ zabbix_export:
               description: 'The number of XAResource rollback invocations per second.'
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
               tags:
                 - tag: component
@@ -1185,6 +1252,8 @@ zabbix_export:
               description: 'The number of XAResource start invocations per second.'
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
               tags:
                 - tag: component
@@ -1260,6 +1329,8 @@ zabbix_export:
               description: 'The number of bytes that have been received by this listener per second.'
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
               tags:
                 - tag: component
@@ -1281,6 +1352,8 @@ zabbix_export:
               description: 'The number of bytes that have been sent out on this listener per second.'
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
               tags:
                 - tag: component
@@ -1301,6 +1374,8 @@ zabbix_export:
               description: 'The number of 500 responses that have been sent by this listener per second.'
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
               tags:
                 - tag: component
@@ -1328,6 +1403,8 @@ zabbix_export:
               description: 'The number of requests this listener has served per second.'
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
               tags:
                 - tag: component

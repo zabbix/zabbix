@@ -35,9 +35,11 @@ zabbix_export:
             conditions:
               - macro: '{#JMXNAME}'
                 value: '{$IGNITE.LLD.FILTER.DATA.REGION.MATCHES}'
+                formulaid: A
               - macro: '{#JMXNAME}'
                 value: '{$IGNITE.LLD.FILTER.DATA.REGION.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: B
           item_prototypes:
             - uuid: 56780f0bc58e499bb452e5879961ac9d
               name: 'Data region {#JMXNAME}: Allocation, rate'
@@ -491,6 +493,8 @@ zabbix_export:
               description: 'Total number of jobs cancelled by the node per second.'
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 - tag: component
@@ -507,6 +511,8 @@ zabbix_export:
               description: 'Total number of jobs handled by the node per second.'
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 - tag: component
@@ -523,6 +529,8 @@ zabbix_export:
               description: 'Total number of jobs this node rejects during collision resolution operations since node startup per second.'
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 - tag: component
@@ -742,6 +750,7 @@ zabbix_export:
               type: JMX
               key: 'jmx["{#JMXOBJ}",FullVersion]'
               value_type: CHAR
+              trends: '0'
               username: '{$IGNITE.USER}'
               password: '{$IGNITE.PASSWORD}'
               description: 'Version of Ignite instance.'
@@ -775,6 +784,7 @@ zabbix_export:
               type: JMX
               key: 'jmx["{#JMXOBJ}",LocalNodeId]'
               value_type: CHAR
+              trends: '0'
               username: '{$IGNITE.USER}'
               password: '{$IGNITE.PASSWORD}'
               description: 'Unique identifier for this node within grid.'
@@ -875,6 +885,8 @@ zabbix_export:
               description: 'The number of  messages received per second.'
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 - tag: component
@@ -892,6 +904,8 @@ zabbix_export:
               description: 'The number of  messages sent per second.'
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 - tag: component
@@ -940,6 +954,7 @@ zabbix_export:
               type: JMX
               key: 'jmx["{#JMXOBJ}",Coordinator]'
               value_type: CHAR
+              trends: '0'
               username: '{$IGNITE.USER}'
               password: '{$IGNITE.PASSWORD}'
               description: 'Current coordinator UUID.'
@@ -1026,6 +1041,8 @@ zabbix_export:
               description: 'Number of times node tries to (re)establish connection to another node per second.'
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 - tag: component
@@ -1043,6 +1060,8 @@ zabbix_export:
               description: 'The number of messages received per second.'
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 - tag: component
@@ -1060,6 +1079,8 @@ zabbix_export:
               description: 'The number of messages processed per second.'
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 - tag: component
@@ -1223,9 +1244,11 @@ zabbix_export:
             conditions:
               - macro: '{#JMXNAME}'
                 value: '{$IGNITE.LLD.FILTER.CACHE.MATCHES}'
+                formulaid: A
               - macro: '{#JMXNAME}'
                 value: '{$IGNITE.LLD.FILTER.CACHE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: B
           item_prototypes:
             - uuid: 0014580397654a279b3c8906e457ee74
               name: 'Cache group [{#JMXNAME}]: Backups'
@@ -1247,6 +1270,7 @@ zabbix_export:
               type: JMX
               key: 'jmx["{#JMXOBJ}",Caches]'
               value_type: CHAR
+              trends: '0'
               username: '{$IGNITE.USER}'
               password: '{$IGNITE.PASSWORD}'
               description: 'List of caches.'
@@ -1458,9 +1482,11 @@ zabbix_export:
             conditions:
               - macro: '{#JMXNAME}'
                 value: '{$IGNITE.LLD.FILTER.THREAD.POOL.MATCHES}'
+                formulaid: A
               - macro: '{#JMXNAME}'
                 value: '{$IGNITE.LLD.FILTER.THREAD.POOL.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: B
           item_prototypes:
             - uuid: 1646bb35234742bb894a5abfd1fbf021
               name: 'Thread pool [{#JMXNAME}]: Pool size, core'
@@ -1585,9 +1611,11 @@ zabbix_export:
             conditions:
               - macro: '{#JMXGROUP}'
                 value: '{$IGNITE.LLD.FILTER.CACHE.MATCHES}'
+                formulaid: A
               - macro: '{#JMXGROUP}'
                 value: '{$IGNITE.LLD.FILTER.CACHE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: B
           item_prototypes:
             - uuid: 372f156464634c2b98c2ce3bfe9ac2f4
               name: 'Cache group [{#JMXGROUP}]: Cache gets, rate'
@@ -1600,6 +1628,8 @@ zabbix_export:
               description: 'The number of gets to the cache per second.'
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 - tag: component
@@ -1653,6 +1683,8 @@ zabbix_export:
               description: 'The number of puts to the cache per second.'
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 - tag: component
@@ -1672,6 +1704,8 @@ zabbix_export:
               description: 'The number of removals from the cache per second.'
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 - tag: component
@@ -1707,6 +1741,8 @@ zabbix_export:
               description: 'The number of transaction commits per second.'
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 - tag: component
@@ -1726,6 +1762,8 @@ zabbix_export:
               description: 'The number of transaction rollback per second.'
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 - tag: component
@@ -1744,6 +1782,8 @@ zabbix_export:
               description: 'The number of entries in heap memory.'
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 - tag: component

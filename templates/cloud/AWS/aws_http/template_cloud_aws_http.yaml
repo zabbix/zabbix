@@ -290,14 +290,18 @@ zabbix_export:
             conditions:
               - macro: '{#AWS.EC2.INSTANCE.NAME}'
                 value: '{$AWS.EC2.LLD.FILTER.NAME.MATCHES}'
+                formulaid: A
               - macro: '{#AWS.EC2.INSTANCE.NAME}'
                 value: '{$AWS.EC2.LLD.FILTER.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: B
               - macro: '{#AWS.EC2.INSTANCE.REGION}'
                 value: '{$AWS.EC2.LLD.FILTER.REGION.MATCHES}'
+                formulaid: C
               - macro: '{#AWS.EC2.INSTANCE.REGION}'
                 value: '{$AWS.EC2.LLD.FILTER.REGION.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: D
           description: 'Get EC2 instances.'
           host_prototypes:
             - uuid: c4c830c727294b07926c39b00cf19046
@@ -613,19 +617,25 @@ zabbix_export:
             conditions:
               - macro: '{#AWS.ECS.CLUSTER.NAME}'
                 value: '{$AWS.ECS.LLD.FILTER.NAME.MATCHES}'
+                formulaid: A
               - macro: '{#AWS.ECS.CLUSTER.NAME}'
                 value: '{$AWS.ECS.LLD.FILTER.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: B
               - macro: '{#AWS.ECS.CLUSTER.REGION}'
                 value: '{$AWS.ECS.LLD.FILTER.REGION.MATCHES}'
+                formulaid: C
               - macro: '{#AWS.ECS.CLUSTER.REGION}'
                 value: '{$AWS.ECS.LLD.FILTER.REGION.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: D
               - macro: '{#AWS.ECS.CLUSTER.STATUS}'
                 value: '{$AWS.ECS.LLD.FILTER.STATUS.MATCHES}'
+                formulaid: E
               - macro: '{#AWS.ECS.CLUSTER.STATUS}'
                 value: '{$AWS.ECS.LLD.FILTER.STATUS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: F
           description: 'Get ECS clusters.'
           host_prototypes:
             - uuid: 71072e5a149e45b293946866f8220c07
@@ -680,6 +690,7 @@ zabbix_export:
                 conditions:
                   - macro: '{#AWS.ECS.CLUSTER.INFRASTRUCTURE}'
                     value: ^serverless$
+                    formulaid: A
               operations:
                 - operationobject: HOST_PROTOTYPE
                   operator: REGEXP
@@ -691,6 +702,7 @@ zabbix_export:
                 conditions:
                   - macro: '{#AWS.ECS.CLUSTER.INFRASTRUCTURE}'
                     value: ^use_ecs2$
+                    formulaid: A
               operations:
                 - operationobject: HOST_PROTOTYPE
                   operator: REGEXP
@@ -932,19 +944,25 @@ zabbix_export:
             conditions:
               - macro: '{#AWS.ELB.NAME}'
                 value: '{$AWS.ELB.LLD.FILTER.NAME.MATCHES}'
+                formulaid: A
               - macro: '{#AWS.ELB.NAME}'
                 value: '{$AWS.ELB.LLD.FILTER.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: B
               - macro: '{#AWS.ELB.REGION}'
                 value: '{$AWS.ELB.LLD.FILTER.REGION.MATCHES}'
+                formulaid: C
               - macro: '{#AWS.ELB.REGION}'
                 value: '{$AWS.ELB.LLD.FILTER.REGION.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: D
               - macro: '{#AWS.ELB.STATE}'
                 value: '{$AWS.ELB.LLD.FILTER.STATE.MATCHES}'
+                formulaid: E
               - macro: '{#AWS.ELB.STATE}'
                 value: '{$AWS.ELB.LLD.FILTER.STATE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: F
           description: 'Get ELB load balancers.'
           host_prototypes:
             - uuid: 2c31bc79209e41978f76315406339769
@@ -1010,6 +1028,7 @@ zabbix_export:
                 conditions:
                   - macro: '{#AWS.ELB.TYPE}'
                     value: ^application$
+                    formulaid: A
               operations:
                 - operationobject: HOST_PROTOTYPE
                   operator: REGEXP
@@ -1021,6 +1040,7 @@ zabbix_export:
                 conditions:
                   - macro: '{#AWS.ELB.TYPE}'
                     value: ^network$
+                    formulaid: A
               operations:
                 - operationobject: HOST_PROTOTYPE
                   operator: REGEXP
@@ -1262,19 +1282,25 @@ zabbix_export:
             conditions:
               - macro: '{#AWS.LAMBDA.NAME}'
                 value: '{$AWS.LAMBDA.LLD.FILTER.NAME.MATCHES}'
+                formulaid: A
               - macro: '{#AWS.LAMBDA.NAME}'
                 value: '{$AWS.LAMBDA.LLD.FILTER.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: B
               - macro: '{#AWS.LAMBDA.REGION}'
                 value: '{$AWS.LAMBDA.LLD.FILTER.REGION.MATCHES}'
+                formulaid: C
               - macro: '{#AWS.LAMBDA.REGION}'
                 value: '{$AWS.LAMBDA.LLD.FILTER.REGION.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: D
               - macro: '{#AWS.LAMBDA.RUNTIME}'
                 value: '{$AWS.LAMBDA.LLD.FILTER.RUNTIME.MATCHES}'
+                formulaid: E
               - macro: '{#AWS.LAMBDA.RUNTIME}'
                 value: '{$AWS.LAMBDA.LLD.FILTER.RUNTIME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: F
           description: 'Get Lambda functions.'
           host_prototypes:
             - uuid: 7b468bda682c402b96fd55210aa85155
@@ -1560,14 +1586,18 @@ zabbix_export:
             conditions:
               - macro: '{#AWS.RDS.INSTANCE.ID}'
                 value: '{$AWS.RDS.LLD.FILTER.NAME.MATCHES}'
+                formulaid: A
               - macro: '{#AWS.RDS.INSTANCE.ID}'
                 value: '{$AWS.RDS.LLD.FILTER.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: B
               - macro: '{#AWS.RDS.REGION}'
                 value: '{$AWS.RDS.LLD.FILTER.REGION.MATCHES}'
+                formulaid: C
               - macro: '{#AWS.RDS.REGION}'
                 value: '{$AWS.RDS.LLD.FILTER.REGION.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: D
           description: 'Get RDS instances.'
           host_prototypes:
             - uuid: 799663c52a644f78aa3b3c14d4cc7235
@@ -1820,9 +1850,11 @@ zabbix_export:
             conditions:
               - macro: '{#AWS.S3.NAME}'
                 value: '{$AWS.S3.LLD.FILTER.NAME.MATCHES}'
+                formulaid: A
               - macro: '{#AWS.S3.NAME}'
                 value: '{$AWS.S3.LLD.FILTER.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: B
           description: 'Get S3 bucket instances.'
           host_prototypes:
             - uuid: e45bd9810ea14718b17b875aad3fc544
