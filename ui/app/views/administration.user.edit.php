@@ -333,7 +333,11 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 		->setHeader([_('Type'), _('Send to'), _('When active'), _('Use if severity'), _('Status'), _('Action')]);
 
 	foreach ($data['medias'] as $index => $media) {
-		if ($data['mediatypes'][$media['mediatypeid']]['status'] == MEDIA_TYPE_STATUS_ACTIVE) {
+		if (!array_key_exists($media['mediatypeid'], $data['mediatypes'])) {
+			$media_name = (new CSpan(_('Unknown')))->addClass(ZBX_STYLE_DISABLED);
+			$status = (new CSpan(_('Disabled')))->addClass(ZBX_STYLE_RED);
+		}
+		elseif ($data['mediatypes'][$media['mediatypeid']]['status'] == MEDIA_TYPE_STATUS_ACTIVE) {
 			$media_name = $media['name'];
 
 			if ($media['active'] == MEDIA_STATUS_ACTIVE) {
@@ -359,12 +363,22 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 			'dstfrm' => $user_form->getName(),
 			'media' => $index,
 			'mediatypeid' => $media['mediatypeid'],
-			($media['mediatype'] == MEDIA_TYPE_EMAIL) ? 'sendto_emails' : 'sendto' => $media['sendto'],
 			'period' => $media['period'],
 			'severity' => $media['severity'],
 			'active' => $media['active'],
 			'userdirectory_mediaid' => $media['userdirectory_mediaid']
 		];
+
+		if ($media['mediatype'] === MEDIA_TYPE_EMAIL) {
+			$parameters['sendto_emails'] = $media['sendto'];
+		}
+		else {
+			if (is_array($media['sendto'])) {
+				$media['sendto'] = implode(', ', $media['sendto']);
+			}
+			$parameters['sendto'] = $media['sendto'];
+		}
+
 		$media_severity = [];
 
 		if (array_key_exists('mediaid', $media)) {
@@ -384,7 +398,7 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 				);
 		}
 
-		if ($media['mediatype'] == MEDIA_TYPE_EMAIL) {
+		if (is_array($media['sendto'])) {
 			$media['sendto'] = implode(', ', $media['sendto']);
 		}
 

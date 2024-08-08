@@ -108,7 +108,6 @@ var chkbxRange = {
 	 * @param e
 	 */
 	handleClick: function(e) {
-		e = e || window.event;
 		var checkbox = e.target;
 
 		PageRefresh.restart();

@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-07-23 15:10+0000\n"
-"Last-Translator: Jonatan <jonaricci@gmail.com>\n"
+"PO-Revision-Date: 2024-08-01 07:33+0000\n"
+"Last-Translator: Vicente Salvador <vicentesalvadorcubedo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
@@ -1882,7 +1882,7 @@ msgstr "Informe de disponibilidad"
 #: app/controllers/CControllerAvailabilityReportTrigger.php:70
 #: app/views/reports.availabilityreport.trigger.php:23
 msgid "Availability report graph"
-msgstr ""
+msgstr "Informe gráfico de disponibilidad"
 
 #: include/classes/html/CHostAvailability.php:80
 #: widgets/hostavail/views/widget.view.php:32
@@ -12538,6 +12538,10 @@ msgstr "Lista de servidores proxy de Zabbix con nombre, modo, cifrado, compresi�
 msgid "List of Zabbix proxies with name, mode, encryption, compression, version, last seen, host count, item count, required values per second (vps), compatibility (current/outdated/unsupported), timeouts, proxy group name, state (unknown/offline/online). Returns JSON."
 msgstr "Lista de servidores proxy de Zabbix con nombre, modo, cifrado, compresión, versión, visto por última vez, recuento de equipos, recuento de métricas, valores requeridos por segundo (vps), compatibilidad (actual/obsoleto/no compatible), tiempos de espera, nombre del grupo de proxy, estado (desconocido) /fuera de linea en linea). Devuelve JSON."
 
+#: include/classes/data/CItemData.php:2935
+msgid "List of Zabbix proxy groups configuration data and real-time data. Configuration data includes proxy group name, failover delay, and minimum number of online proxies required for the group to be online. Real-time data includes number of online proxies, percentage of online proxies, and state of proxy group (unknown, offline, recovering, online, degrading). This item does not return groupless proxies. Returns JSON."
+msgstr ""
+
 #: include/classes/data/CItemData.php:1559
 msgid "List of block devices and their type. Returns JSON"
 msgstr "Lista de dispositivos de bloques y su tipo. Devuelve JSON"
@@ -15231,13 +15235,13 @@ msgstr "Proxies en línea"
 #: include/classes/api/services/CUser.php:889
 #, c-format
 msgid "Only Super admin or Admin users can update \"%1$s\" parameter."
-msgstr ""
+msgstr "Solo los usuarios superadministradores o usuarios administradores pueden actualizar el parámetro \"%1$s\"."
 
 #: include/classes/api/services/CUser.php:812
 #: include/classes/api/services/CUser.php:853
 #, c-format
 msgid "Only Super admin users can update \"%1$s\" parameter."
-msgstr ""
+msgstr "Solo los usuarios superadministradores pueden actualizar el parámetro \"%1$s\"."
 
 #: include/classes/api/services/CDRule.php:509
 msgid "Only Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 checks can be made unique."
