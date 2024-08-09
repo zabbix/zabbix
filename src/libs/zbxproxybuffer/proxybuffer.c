@@ -867,8 +867,8 @@ void	zbx_pb_get_mem_stats(zbx_shmem_stats_t *stats)
 	pb_unlock();
 }
 
-void	pb_add_json_field(struct zbx_json *j, zbx_history_table_t *history_table, const char *fld_name,
-		void *value, int type)
+void	pb_add_json_field(struct zbx_json *j, zbx_history_table_t *history_table, const char *fld_name, void *value,
+		int type)
 {
 	union
 	{
@@ -883,8 +883,8 @@ void	pb_add_json_field(struct zbx_json *j, zbx_history_table_t *history_table, c
 		fld++;
 
 	if (NULL == fld->field ) {
-		zabbix_log(LOG_LEVEL_WARNING, "%s() error of table:%s unknown field name:%s", __func__, history_table->table,
-				fld_name);
+		zabbix_log(LOG_LEVEL_WARNING, "%s() error of table:%s unknown field name:%s", __func__,
+				history_table->table, fld_name);
 		THIS_SHOULD_NEVER_HAPPEN;
 		return;
 	}
