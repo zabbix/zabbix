@@ -27,6 +27,7 @@ zabbix_export:
           name: 'ACL: resolves, rate'
           type: DEPENDENT
           key: consul.acl.resolves.rate
+          delay: '0'
           value_type: FLOAT
           description: 'The number of ACL resolves per second.'
           preprocessing:
@@ -37,6 +38,8 @@ zabbix_export:
                 - ''
               error_handler: DISCARD_VALUE
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           master_item:
             key: consul.get_metrics
           tags:
@@ -46,6 +49,7 @@ zabbix_export:
           name: 'Catalog: deregister, rate'
           type: DEPENDENT
           key: consul.catalog.deregister.rate
+          delay: '0'
           value_type: FLOAT
           description: 'The number of catalog deregister operation per second.'
           preprocessing:
@@ -56,6 +60,8 @@ zabbix_export:
                 - ''
               error_handler: DISCARD_VALUE
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           master_item:
             key: consul.get_metrics
           tags:
@@ -65,6 +71,7 @@ zabbix_export:
           name: 'Catalog: register, rate'
           type: DEPENDENT
           key: consul.catalog.register.rate
+          delay: '0'
           value_type: FLOAT
           description: 'The number of catalog register operation per second.'
           preprocessing:
@@ -75,6 +82,8 @@ zabbix_export:
                 - ''
               error_handler: DISCARD_VALUE
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           master_item:
             key: consul.get_metrics
           tags:
@@ -84,6 +93,7 @@ zabbix_export:
           name: 'Number of checks'
           type: DEPENDENT
           key: consul.checks_number
+          delay: '0'
           description: 'Number of checks on current node.'
           preprocessing:
             - type: JSONPATH
@@ -101,6 +111,7 @@ zabbix_export:
           name: 'Number of check monitors'
           type: DEPENDENT
           key: consul.check_monitors_number
+          delay: '0'
           description: 'Number of check monitors on current node.'
           preprocessing:
             - type: JSONPATH
@@ -118,6 +129,7 @@ zabbix_export:
           name: 'Client RPC, per second'
           type: DEPENDENT
           key: consul.client_rpc
+          delay: '0'
           value_type: FLOAT
           units: Rps
           description: |
@@ -132,6 +144,8 @@ zabbix_export:
                 - ''
               error_handler: DISCARD_VALUE
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           master_item:
             key: consul.get_metrics
           tags:
@@ -141,6 +155,7 @@ zabbix_export:
           name: 'Client RPC failed ,per second'
           type: DEPENDENT
           key: consul.client_rpc_failed
+          delay: '0'
           value_type: FLOAT
           units: Rps
           description: 'Number of times per second whenever a Consul agent in client mode makes an RPC request to a Consul server and fails.'
@@ -152,6 +167,8 @@ zabbix_export:
                 - ''
               error_handler: DISCARD_VALUE
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           master_item:
             key: consul.get_metrics
           tags:
@@ -161,6 +178,7 @@ zabbix_export:
           name: 'Process CPU seconds, total'
           type: DEPENDENT
           key: consul.cpu_seconds_total.rate
+          delay: '0'
           value_type: FLOAT
           units: s
           description: 'Total user and system CPU time spent in seconds.'
@@ -172,6 +190,8 @@ zabbix_export:
                 - ''
               error_handler: DISCARD_VALUE
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           master_item:
             key: consul.get_metrics
           tags:
@@ -181,6 +201,7 @@ zabbix_export:
           name: 'GC pause, p50'
           type: DEPENDENT
           key: consul.gc_pause.p50
+          delay: '0'
           value_type: FLOAT
           units: s
           description: 'The 50 percentile (median) for the number of nanoseconds consumed by stop-the-world garbage collection (GC) pauses since Consul started, in milliseconds.'
@@ -206,6 +227,7 @@ zabbix_export:
           name: 'GC pause, p90'
           type: DEPENDENT
           key: consul.gc_pause.p90
+          delay: '0'
           value_type: FLOAT
           units: s
           description: 'The 90 percentile for the number of nanoseconds consumed by stop-the-world garbage collection (GC) pauses since Consul started, in milliseconds.'
@@ -233,6 +255,7 @@ zabbix_export:
           key: consul.get_local_services
           history: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             var Consul = {
             	setParams: function (params) {
@@ -342,7 +365,9 @@ zabbix_export:
           name: 'Get local services check'
           type: DEPENDENT
           key: consul.get_local_services.check
+          delay: '0'
           value_type: CHAR
+          trends: '0'
           description: 'Data collection check.'
           preprocessing:
             - type: JSONPATH
@@ -372,6 +397,7 @@ zabbix_export:
           key: consul.get_metrics
           history: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Get raw metrics from Consul instance /metrics endpoint.'
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
@@ -393,6 +419,7 @@ zabbix_export:
           key: consul.get_node_info
           history: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Get configuration and member information of the local agent.'
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
@@ -410,6 +437,7 @@ zabbix_export:
           name: 'Goroutine count'
           type: DEPENDENT
           key: consul.goroutines
+          delay: '0'
           description: 'The number of Goroutines on Consul instance.'
           preprocessing:
             - type: PROMETHEUS_PATTERN
@@ -426,6 +454,7 @@ zabbix_export:
           name: 'KV store: apply, p50'
           type: DEPENDENT
           key: consul.kvs.apply.p50
+          delay: '0'
           value_type: FLOAT
           units: ms
           description: 'The 50 percentile (median) for the time it takes to complete an update to the KV store.'
@@ -448,6 +477,7 @@ zabbix_export:
           name: 'KV store: apply, p90'
           type: DEPENDENT
           key: consul.kvs.apply.p90
+          delay: '0'
           value_type: FLOAT
           units: ms
           description: 'The 90 percentile for the time it takes to complete an update to the KV store.'
@@ -470,6 +500,7 @@ zabbix_export:
           name: 'KV store: apply, rate'
           type: DEPENDENT
           key: consul.kvs.apply.rate
+          delay: '0'
           value_type: FLOAT
           description: 'The number of updates to the KV store per second.'
           preprocessing:
@@ -480,6 +511,8 @@ zabbix_export:
                 - ''
               error_handler: DISCARD_VALUE
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           master_item:
             key: consul.get_metrics
           tags:
@@ -489,6 +522,7 @@ zabbix_export:
           name: 'Memberlist: degraded'
           type: DEPENDENT
           key: consul.memberlist.degraded
+          delay: '0'
           description: |
             This metric counts the number of times the Consul agent has performed failure detection on another agent at a slower probe rate.
             The agent uses its own health metric as an indicator to perform this action.
@@ -509,6 +543,7 @@ zabbix_export:
           name: 'Memberlist: gossip, p90'
           type: DEPENDENT
           key: consul.memberlist.dispatch_log.p90
+          delay: '0'
           value_type: FLOAT
           description: 'The 90 percentile for the number of gossips (messages) broadcasted to a set of randomly selected nodes.'
           preprocessing:
@@ -530,6 +565,7 @@ zabbix_export:
           name: 'Memberlist: gossip, p50'
           type: DEPENDENT
           key: consul.memberlist.gossip.p50
+          delay: '0'
           value_type: FLOAT
           units: ms
           description: 'The 50 for the number of gossips (messages) broadcasted to a set of randomly selected nodes.'
@@ -552,6 +588,7 @@ zabbix_export:
           name: 'Memberlist: health score'
           type: DEPENDENT
           key: consul.memberlist.health_score
+          delay: '0'
           description: |
             This metric describes a node's perception of its own health based on how well it is meeting the soft real-time requirements of the protocol.
             This metric ranges from 0 to 8, where 0 indicates "totally healthy".
@@ -599,6 +636,7 @@ zabbix_export:
           name: 'Memberlist: msg alive'
           type: DEPENDENT
           key: consul.memberlist.msg.alive
+          delay: '0'
           description: 'This metric counts the number of alive Consul agents, that the agent has mapped out so far, based on the message information given by the network layer.'
           preprocessing:
             - type: PROMETHEUS_PATTERN
@@ -616,6 +654,7 @@ zabbix_export:
           name: 'Memberlist: msg dead'
           type: DEPENDENT
           key: consul.memberlist.msg.dead
+          delay: '0'
           description: 'This metric counts the number of times a Consul agent has marked another agent to be a dead node.'
           preprocessing:
             - type: PROMETHEUS_PATTERN
@@ -633,6 +672,7 @@ zabbix_export:
           name: 'Memberlist: msg suspect'
           type: DEPENDENT
           key: consul.memberlist.msg.suspect
+          delay: '0'
           description: 'The number of times a Consul agent suspects another as failed while probing during gossip protocol.'
           preprocessing:
             - type: PROMETHEUS_PATTERN
@@ -650,6 +690,7 @@ zabbix_export:
           name: 'Memberlist: probe node, p50'
           type: DEPENDENT
           key: consul.memberlist.probe_node.p50
+          delay: '0'
           value_type: FLOAT
           units: ms
           description: 'The 50 percentile (median) for the time taken to perform a single round of failure detection on a select Consul agent.'
@@ -672,6 +713,7 @@ zabbix_export:
           name: 'Memberlist: probe node, p90'
           type: DEPENDENT
           key: consul.memberlist.probe_node.p90
+          delay: '0'
           value_type: FLOAT
           units: ms
           description: 'The 90 percentile for the time taken to perform a single round of failure detection on a select Consul agent.'
@@ -694,6 +736,7 @@ zabbix_export:
           name: 'Memberlist: push pull node, p50'
           type: DEPENDENT
           key: consul.memberlist.push_pull_node.p50
+          delay: '0'
           value_type: FLOAT
           description: 'The 50 percentile (median) for the number of Consul agents that have exchanged state with this agent.'
           preprocessing:
@@ -715,6 +758,7 @@ zabbix_export:
           name: 'Memberlist: push pull node, p90'
           type: DEPENDENT
           key: consul.memberlist.push_pull_node.p90
+          delay: '0'
           value_type: FLOAT
           units: ms
           description: 'The 90 percentile for the number of Consul agents that have exchanged state with this agent.'
@@ -737,6 +781,7 @@ zabbix_export:
           name: 'TCP connections, accepted per second'
           type: DEPENDENT
           key: consul.memberlist.tcp_accept
+          delay: '0'
           value_type: FLOAT
           units: Rps
           description: 'This metric counts the number of times a Consul agent has accepted an incoming TCP stream connection per second.'
@@ -748,6 +793,8 @@ zabbix_export:
                 - ''
               error_handler: DISCARD_VALUE
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           master_item:
             key: consul.get_metrics
           tags:
@@ -757,6 +804,7 @@ zabbix_export:
           name: 'TCP connections, per second'
           type: DEPENDENT
           key: consul.memberlist.tcp_connect
+          delay: '0'
           value_type: FLOAT
           units: Rps
           description: 'This metric counts the number of times a Consul agent has initiated a push/pull sync with an other agent per second.'
@@ -768,6 +816,8 @@ zabbix_export:
                 - ''
               error_handler: DISCARD_VALUE
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           master_item:
             key: consul.get_metrics
           tags:
@@ -777,6 +827,7 @@ zabbix_export:
           name: 'TCP send bytes, per second'
           type: DEPENDENT
           key: consul.memberlist.tcp_sent
+          delay: '0'
           value_type: FLOAT
           units: Bps
           description: 'This metric measures the total number of bytes sent by a Consul agent through the TCP protocol per second.'
@@ -788,6 +839,8 @@ zabbix_export:
                 - ''
               error_handler: DISCARD_VALUE
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           master_item:
             key: consul.get_metrics
           tags:
@@ -797,6 +850,7 @@ zabbix_export:
           name: 'UDP received bytes, per second'
           type: DEPENDENT
           key: consul.memberlist.udp_received
+          delay: '0'
           value_type: FLOAT
           units: Bps
           description: 'This metric measures the total number of bytes received by a Consul agent through the UDP protocol per second.'
@@ -808,6 +862,8 @@ zabbix_export:
                 - ''
               error_handler: DISCARD_VALUE
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           master_item:
             key: consul.get_metrics
           tags:
@@ -817,6 +873,7 @@ zabbix_export:
           name: 'UDP sent bytes, per second'
           type: DEPENDENT
           key: consul.memberlist.udp_sent
+          delay: '0'
           value_type: FLOAT
           units: Bps
           description: 'This metric measures the total number of bytes sent by a Consul agent through the UDP protocol per second.'
@@ -828,6 +885,8 @@ zabbix_export:
                 - ''
               error_handler: DISCARD_VALUE
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           master_item:
             key: consul.get_metrics
           tags:
@@ -837,6 +896,7 @@ zabbix_export:
           name: 'Open file descriptors, max'
           type: DEPENDENT
           key: consul.process_max_fds
+          delay: '0'
           value_type: FLOAT
           description: 'Maximum number of open file descriptors.'
           preprocessing:
@@ -854,6 +914,7 @@ zabbix_export:
           name: 'Open file descriptors'
           type: DEPENDENT
           key: consul.process_open_fds
+          delay: '0'
           value_type: FLOAT
           description: 'Number of open file descriptors.'
           preprocessing:
@@ -871,6 +932,7 @@ zabbix_export:
           name: 'RSS memory usage'
           type: DEPENDENT
           key: consul.resident_memory_bytes
+          delay: '0'
           value_type: FLOAT
           units: B
           description: 'Resident memory size in bytes.'
@@ -889,6 +951,7 @@ zabbix_export:
           name: Role
           type: DEPENDENT
           key: consul.role
+          delay: '0'
           description: 'Role of current Consul agent.'
           valuemap:
             name: 'Consul Node role'
@@ -897,6 +960,8 @@ zabbix_export:
               parameters:
                 - $.Config.Server
             - type: BOOL_TO_DECIMAL
+              parameters:
+                - ''
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 3h
@@ -909,6 +974,7 @@ zabbix_export:
           name: 'Serf member: failed, rate'
           type: DEPENDENT
           key: consul.serf.member.failed.rate
+          delay: '0'
           value_type: FLOAT
           description: |
             Increments when an agent is marked dead.
@@ -922,6 +988,8 @@ zabbix_export:
                 - ''
               error_handler: DISCARD_VALUE
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           master_item:
             key: consul.get_metrics
           tags:
@@ -931,6 +999,7 @@ zabbix_export:
           name: 'Serf member: flap, rate'
           type: DEPENDENT
           key: consul.serf.member.flap.rate
+          delay: '0'
           value_type: FLOAT
           description: |
             Increments when an agent is marked dead and then recovers within a short time period.
@@ -944,6 +1013,8 @@ zabbix_export:
                 - ''
               error_handler: DISCARD_VALUE
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           master_item:
             key: consul.get_metrics
           tags:
@@ -953,6 +1024,7 @@ zabbix_export:
           name: 'Serf member: join, rate'
           type: DEPENDENT
           key: consul.serf.member.join.rate
+          delay: '0'
           value_type: FLOAT
           description: |
             Increments when an agent joins the cluster. If an agent flapped or failed this counter also increments when it re-joins.
@@ -965,6 +1037,8 @@ zabbix_export:
                 - ''
               error_handler: DISCARD_VALUE
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           master_item:
             key: consul.get_metrics
           tags:
@@ -974,6 +1048,7 @@ zabbix_export:
           name: 'Serf member: left, rate'
           type: DEPENDENT
           key: consul.serf.member.left.rate
+          delay: '0'
           value_type: FLOAT
           description: 'Increments when an agent leaves the cluster. Shown as events per second.'
           preprocessing:
@@ -984,6 +1059,8 @@ zabbix_export:
                 - ''
               error_handler: DISCARD_VALUE
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           master_item:
             key: consul.get_metrics
           tags:
@@ -993,6 +1070,7 @@ zabbix_export:
           name: 'Serf member: update, rate'
           type: DEPENDENT
           key: consul.serf.member.update.rate
+          delay: '0'
           value_type: FLOAT
           description: 'Increments when a Consul agent updates. Shown as events per second.'
           preprocessing:
@@ -1003,6 +1081,8 @@ zabbix_export:
                 - ''
               error_handler: DISCARD_VALUE
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           master_item:
             key: consul.get_metrics
           tags:
@@ -1012,6 +1092,7 @@ zabbix_export:
           name: 'Number of services'
           type: DEPENDENT
           key: consul.services_number
+          delay: '0'
           description: 'Number of services on current node.'
           preprocessing:
             - type: JSONPATH
@@ -1029,6 +1110,7 @@ zabbix_export:
           name: 'Snapshot: append line, p50'
           type: DEPENDENT
           key: consul.snapshot.append_line.p50
+          delay: '0'
           value_type: FLOAT
           units: ms
           description: 'The 50 percentile (median) for the time taken by the Consul agent to append an entry into the existing log.'
@@ -1051,6 +1133,7 @@ zabbix_export:
           name: 'Snapshot: append line, p90'
           type: DEPENDENT
           key: consul.snapshot.append_line.p90
+          delay: '0'
           value_type: FLOAT
           units: ms
           description: 'The 90 percentile for the time taken by the Consul agent to append an entry into the existing log.'
@@ -1073,6 +1156,7 @@ zabbix_export:
           name: 'Snapshot: append line, rate'
           type: DEPENDENT
           key: consul.snapshot.append_line.rate
+          delay: '0'
           value_type: FLOAT
           description: 'The number of snapshot appendLine operations per second.'
           preprocessing:
@@ -1083,6 +1167,8 @@ zabbix_export:
                 - ''
               error_handler: DISCARD_VALUE
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           master_item:
             key: consul.get_metrics
           tags:
@@ -1092,6 +1178,7 @@ zabbix_export:
           name: 'Snapshot: compact, p50'
           type: DEPENDENT
           key: consul.snapshot.compact.p50
+          delay: '0'
           value_type: FLOAT
           units: ms
           description: |
@@ -1116,6 +1203,7 @@ zabbix_export:
           name: 'Snapshot: compact, p90'
           type: DEPENDENT
           key: consul.snapshot.compact.p90
+          delay: '0'
           value_type: FLOAT
           units: ms
           description: |
@@ -1140,6 +1228,7 @@ zabbix_export:
           name: 'Snapshot: compact, rate'
           type: DEPENDENT
           key: consul.snapshot.compact.rate
+          delay: '0'
           value_type: FLOAT
           description: 'The number of snapshot compact operations per second.'
           preprocessing:
@@ -1150,6 +1239,8 @@ zabbix_export:
                 - ''
               error_handler: DISCARD_VALUE
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           master_item:
             key: consul.get_metrics
           tags:
@@ -1159,7 +1250,9 @@ zabbix_export:
           name: Version
           type: DEPENDENT
           key: consul.version
+          delay: '0'
           value_type: CHAR
+          trends: '0'
           description: 'Version of Consul agent.'
           preprocessing:
             - type: JSONPATH
@@ -1188,6 +1281,7 @@ zabbix_export:
           name: 'Virtual memory size'
           type: DEPENDENT
           key: consul.virtual_memory_bytes
+          delay: '0'
           value_type: FLOAT
           units: B
           description: 'Virtual memory size in bytes.'
@@ -1207,12 +1301,14 @@ zabbix_export:
           name: 'HTTP API methods discovery'
           type: DEPENDENT
           key: consul.http_api_discovery
+          delay: '0'
           description: 'Discovery HTTP API methods specific metrics.'
           item_prototypes:
             - uuid: 4bdb2007bada4840aa453630e701059c
               name: 'HTTP request: ["{#HTTP_METHOD}"], p50'
               type: DEPENDENT
               key: 'consul.http.api.p50["{#HTTP_METHOD}"]'
+              delay: '0'
               value_type: FLOAT
               units: ms
               description: 'The 50 percentile (median) of how long it takes to service the given HTTP request for the given verb.'
@@ -1234,6 +1330,7 @@ zabbix_export:
               name: 'HTTP request: ["{#HTTP_METHOD}"], p90'
               type: DEPENDENT
               key: 'consul.http.api.p90["{#HTTP_METHOD}"]'
+              delay: '0'
               value_type: FLOAT
               units: ms
               description: 'The 90 percentile of how long it takes to service the given HTTP request for the given verb.'
@@ -1255,6 +1352,7 @@ zabbix_export:
               name: 'HTTP request: ["{#HTTP_METHOD}"], rate'
               type: DEPENDENT
               key: 'consul.http.api.rate["{#HTTP_METHOD}"]'
+              delay: '0'
               value_type: FLOAT
               units: Rps
               description: 'The number of HTTP request for the given verb per second.'
@@ -1266,6 +1364,8 @@ zabbix_export:
                     - sum
                   error_handler: DISCARD_VALUE
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               master_item:
                 key: consul.get_metrics
               tags:
@@ -1302,24 +1402,30 @@ zabbix_export:
           name: 'Local node services discovery'
           type: DEPENDENT
           key: consul.node_services_lld
+          delay: '0'
           filter:
             conditions:
               - macro: '{#SERVICE_NAME}'
                 value: '{$CONSUL.LLD.FILTER.LOCAL_SERVICE_NAME.MATCHES}'
+                formulaid: A
               - macro: '{#SERVICE_NAME}'
                 value: '{$CONSUL.LLD.FILTER.LOCAL_SERVICE_NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: B
               - macro: '{#SERVICE_NAMESPACE}'
                 value: '{$CONSUL.LLD.FILTER.SERVICE_NAMESPACE.MATCHES}'
+                formulaid: C
               - macro: '{#SERVICE_NAMESPACE}'
                 value: '{$CONSUL.LLD.FILTER.SERVICE_NAMESPACE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: D
           description: 'Discover metrics for services that are registered with the local agent.'
           item_prototypes:
             - uuid: 44b0f82769d244d6a20b9ce0b5cc5cb6
               name: '["{#SERVICE_NAME}"]: Aggregated status'
               type: DEPENDENT
               key: 'consul.service.aggregated_state["{#SERVICE_ID}"]'
+              delay: '0'
               discover: NO_DISCOVER
               description: 'Aggregated values of all health checks for the service instance.'
               valuemap:
@@ -1368,7 +1474,9 @@ zabbix_export:
               name: '["{#SERVICE_NAME}"]: Check ["{#SERVICE_CHECK_NAME}"]: Output'
               type: DEPENDENT
               key: 'consul.service.check.output["{#SERVICE_ID}/{#SERVICE_CHECK_ID}"]'
+              delay: '0'
               value_type: CHAR
+              trends: '0'
               discover: NO_DISCOVER
               description: 'Current output of health check for the service.'
               valuemap:
@@ -1395,6 +1503,7 @@ zabbix_export:
               name: '["{#SERVICE_NAME}"]: Check ["{#SERVICE_CHECK_NAME}"]: Status'
               type: DEPENDENT
               key: 'consul.service.check.state["{#SERVICE_ID}/{#SERVICE_CHECK_ID}"]'
+              delay: '0'
               discover: NO_DISCOVER
               description: 'Current state of health check for the service.'
               valuemap:
@@ -1470,11 +1579,14 @@ zabbix_export:
                 conditions:
                   - macro: '{#TYPE}'
                     value: aggregated_status
+                    formulaid: A
               operations:
-                - operator: LIKE
+                - operationobject: ITEM_PROTOTYPE
+                  operator: LIKE
                   value: 'Aggregated status'
                   discover: DISCOVER
-                - operator: LIKE
+                - operationobject: ITEM_PROTOTYPE
+                  operator: LIKE
                   value: State
                   discover: DISCOVER
             - name: checks
@@ -1483,20 +1595,24 @@ zabbix_export:
                 conditions:
                   - macro: '{#TYPE}'
                     value: service_check
+                    formulaid: A
               operations:
-                - operator: LIKE
+                - operationobject: ITEM_PROTOTYPE
+                  operator: LIKE
                   value: Check
                   discover: DISCOVER
         - uuid: 6ff39fd6911945b2baa9b762d5a86df2
           name: 'Raft leader metrics discovery'
           type: DEPENDENT
           key: consul.raft.leader.discovery
+          delay: '0'
           description: 'Discover raft metrics for leader nodes.'
           item_prototypes:
             - uuid: 440e2a259cd64b918ebfb607961da2c8
               name: 'Autopilot healthy'
               type: DEPENDENT
               key: 'consul.autopilot.healthy[{#SINGLETON}]'
+              delay: '0'
               value_type: FLOAT
               description: 'Tracks the overall health of the local server cluster. 1 if all servers are healthy, 0 if one or more are unhealthy.'
               valuemap:
@@ -1517,6 +1633,7 @@ zabbix_export:
               name: 'Raft state: commit time, p50'
               type: DEPENDENT
               key: 'consul.raft.commit_time.p50[{#SINGLETON}]'
+              delay: '0'
               value_type: FLOAT
               units: ms
               description: 'The 50 percentile (median) time it takes to commit a new entry to the raft log on the leader, in milliseconds.'
@@ -1539,6 +1656,7 @@ zabbix_export:
               name: 'Raft state: commit time, p90'
               type: DEPENDENT
               key: 'consul.raft.commit_time.p90[{#SINGLETON}]'
+              delay: '0'
               value_type: FLOAT
               units: ms
               description: 'The 90 percentile time it takes to commit a new entry to the raft log on the leader, in milliseconds.'
@@ -1561,6 +1679,7 @@ zabbix_export:
               name: 'Raft state: commit, rate'
               type: DEPENDENT
               key: 'consul.raft.commit_time.rate[{#SINGLETON}]'
+              delay: '0'
               value_type: FLOAT
               units: Rps
               description: 'The number of commits a new entry to the Raft log on the leader per second.'
@@ -1572,6 +1691,8 @@ zabbix_export:
                     - ''
                   error_handler: DISCARD_VALUE
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               master_item:
                 key: consul.get_metrics
               tags:
@@ -1581,6 +1702,7 @@ zabbix_export:
               name: 'Raft state: dispatch log, p50'
               type: DEPENDENT
               key: 'consul.raft.dispatch_log.p50[{#SINGLETON}]'
+              delay: '0'
               value_type: FLOAT
               units: ms
               description: 'The 50 percentile (median) time it takes for the leader to write log entries to disk, in milliseconds.'
@@ -1603,6 +1725,7 @@ zabbix_export:
               name: 'Raft state: dispatch log, p90'
               type: DEPENDENT
               key: 'consul.raft.dispatch_log.p90[{#SINGLETON}]'
+              delay: '0'
               value_type: FLOAT
               units: ms
               description: 'The 90 percentile time it takes for the leader to write log entries to disk, in milliseconds.'
@@ -1625,6 +1748,7 @@ zabbix_export:
               name: 'Raft state: dispatch log, rate'
               type: DEPENDENT
               key: 'consul.raft.dispatch_log.rate[{#SINGLETON}]'
+              delay: '0'
               value_type: FLOAT
               description: 'The number of times a Raft leader writes a log to disk per second.'
               preprocessing:
@@ -1635,6 +1759,8 @@ zabbix_export:
                     - ''
                   error_handler: DISCARD_VALUE
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               master_item:
                 key: consul.get_metrics
               tags:
@@ -1644,6 +1770,7 @@ zabbix_export:
               name: 'Raft state: leader last contact, p50'
               type: DEPENDENT
               key: 'consul.raft.leader_last_contact.p50[{#SINGLETON}]'
+              delay: '0'
               value_type: FLOAT
               units: ms
               description: 'The 50 percentile (median) of how long it takes a leader node to communicate with followers during a leader lease check, in milliseconds.'
@@ -1666,6 +1793,7 @@ zabbix_export:
               name: 'Raft state: leader last contact, p90'
               type: DEPENDENT
               key: 'consul.raft.leader_last_contact.p90[{#SINGLETON}]'
+              delay: '0'
               value_type: FLOAT
               units: ms
               description: 'The 90 percentile of how long it takes a leader node to communicate with followers during a leader lease check, in milliseconds.'
@@ -1699,12 +1827,14 @@ zabbix_export:
           name: 'Raft server metrics discovery'
           type: DEPENDENT
           key: consul.raft.server.discovery
+          delay: '0'
           description: 'Discover raft metrics for server nodes.'
           item_prototypes:
             - uuid: 428f1d7924634383aabcd5b37f561a41
               name: 'Raft: apply, rate'
               type: DEPENDENT
               key: 'consul.raft.apply.rate[{#SINGLETON}]'
+              delay: '0'
               value_type: FLOAT
               units: Rps
               description: |
@@ -1718,6 +1848,8 @@ zabbix_export:
                     - ''
                   error_handler: DISCARD_VALUE
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               master_item:
                 key: consul.get_metrics
               tags:
@@ -1727,7 +1859,9 @@ zabbix_export:
               name: 'Raft state'
               type: DEPENDENT
               key: 'consul.raft.state[{#SINGLETON}]'
+              delay: '0'
               value_type: CHAR
+              trends: '0'
               description: 'Current state of Consul agent.'
               preprocessing:
                 - type: JSONPATH
@@ -1745,6 +1879,7 @@ zabbix_export:
               name: 'Raft state: candidate'
               type: DEPENDENT
               key: 'consul.raft.state_candidate[{#SINGLETON}]'
+              delay: '0'
               description: 'The number of initiated leader elections.'
               preprocessing:
                 - type: PROMETHEUS_PATTERN
@@ -1762,6 +1897,7 @@ zabbix_export:
               name: 'Raft state: leader'
               type: DEPENDENT
               key: 'consul.raft.state_leader[{#SINGLETON}]'
+              delay: '0'
               description: 'Increments when a server becomes a leader.'
               preprocessing:
                 - type: PROMETHEUS_PATTERN

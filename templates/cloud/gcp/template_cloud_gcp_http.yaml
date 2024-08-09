@@ -30,7 +30,9 @@ zabbix_export:
           name: 'Authorization errors check'
           type: DEPENDENT
           key: gcp.auth.err.check
+          delay: '0'
           value_type: TEXT
+          trends: '0'
           description: 'A list of errors from API requests.'
           preprocessing:
             - type: JSONPATH
@@ -61,6 +63,7 @@ zabbix_export:
           delay: '{$GCP.AUTH.FREQUENCY}'
           history: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             var auth_url = 'https://oauth2.googleapis.com/token',
             	issued = Math.floor(new Date().getTime() / 1000),
@@ -195,8 +198,10 @@ zabbix_export:
           name: 'Instances get'
           type: DEPENDENT
           key: gcp.cloudsql.instances.get
+          delay: '0'
           history: '0'
           value_type: TEXT
+          trends: '0'
           description: 'GCP Cloud SQL: Instances get.'
           preprocessing:
             - type: JAVASCRIPT
@@ -330,6 +335,7 @@ zabbix_export:
           name: 'MSSQL instances count'
           type: DEPENDENT
           key: gcp.cloudsql.instances.mssql_count
+          delay: '0'
           description: 'GCP Cloud SQL MSSQL instances count.'
           preprocessing:
             - type: JSONPATH
@@ -345,6 +351,7 @@ zabbix_export:
           name: 'MySQL instances count'
           type: DEPENDENT
           key: gcp.cloudsql.instances.mysql_count
+          delay: '0'
           description: 'GCP Cloud SQL MySQL instances count.'
           preprocessing:
             - type: JSONPATH
@@ -360,6 +367,7 @@ zabbix_export:
           name: 'PostgreSQL instances count'
           type: DEPENDENT
           key: gcp.cloudsql.instances.pgsql_count
+          delay: '0'
           description: 'GCP Cloud SQL PostgreSQL instances count.'
           preprocessing:
             - type: JSONPATH
@@ -375,6 +383,7 @@ zabbix_export:
           name: 'Cloud SQL instances total'
           type: DEPENDENT
           key: gcp.cloudsql.instances.total
+          delay: '0'
           description: 'GCP Cloud SQL instances total count.'
           preprocessing:
             - type: JSONPATH
@@ -389,6 +398,7 @@ zabbix_export:
           name: 'Container-optimized GCE instances count'
           type: DEPENDENT
           key: gcp.gce.instances.cos_count
+          delay: '0'
           description: 'GCP Compute Engine: count of instances with Container-Optimized OS used.'
           preprocessing:
             - type: JSONPATH
@@ -404,8 +414,10 @@ zabbix_export:
           name: 'Instances get'
           type: DEPENDENT
           key: gcp.gce.instances.get
+          delay: '0'
           history: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Get GCP Compute Engine instances.'
           preprocessing:
             - type: JAVASCRIPT
@@ -528,6 +540,7 @@ zabbix_export:
           name: 'Regular GCE instances count'
           type: DEPENDENT
           key: gcp.gce.instances.regular_count
+          delay: '0'
           description: 'GCP Compute Engine: Regular instances count.'
           preprocessing:
             - type: JSONPATH
@@ -543,6 +556,7 @@ zabbix_export:
           name: 'GCE instances total'
           type: DEPENDENT
           key: gcp.gce.instances.total
+          delay: '0'
           description: 'GCP Compute Engine instances total count.'
           preprocessing:
             - type: JSONPATH
@@ -558,8 +572,10 @@ zabbix_export:
           name: 'Project quotas get'
           type: DEPENDENT
           key: gcp.gce.quotas.get
+          delay: '0'
           history: '0'
           value_type: TEXT
+          trends: '0'
           description: 'GCP Compute Engine resource quotas available for the particular project.'
           preprocessing:
             - type: JAVASCRIPT
@@ -652,26 +668,34 @@ zabbix_export:
           name: 'GCP Cloud SQL: MSSQL instances discovery'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.inst.discovery
+          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#CLOUD_SQL.INSTANCE.DB.TYPE}'
                 value: 'SQLSERVER.*'
+                formulaid: A
               - macro: '{#CLOUD_SQL.INSTANCE.NAME}'
                 value: '{$GCP.MSSQL.INST.NAME.MATCHES}'
+                formulaid: B
               - macro: '{#CLOUD_SQL.INSTANCE.NAME}'
                 value: '{$GCP.MSSQL.INST.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: C
               - macro: '{#CLOUD_SQL.INSTANCE.TYPE}'
                 value: '{$GCP.MSSQL.INST.TYPE.MATCHES}'
+                formulaid: D
               - macro: '{#CLOUD_SQL.INSTANCE.TYPE}'
                 value: '{$GCP.MSSQL.INST.TYPE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: E
               - macro: '{#CLOUD_SQL.INSTANCE.ZONE}'
                 value: '{$GCP.MSSQL.ZONE.MATCHES}'
+                formulaid: F
               - macro: '{#CLOUD_SQL.INSTANCE.ZONE}'
                 value: '{$GCP.MSSQL.ZONE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: G
           description: 'GCP Cloud SQL: MSSQL instances discovery.'
           host_prototypes:
             - uuid: edc6ab9314ed410b8a3cf6bfedff51ab
@@ -761,8 +785,10 @@ zabbix_export:
                 conditions:
                   - macro: '{#CLOUD_SQL.INSTANCE.TYPE}'
                     value: READ_REPLICA_INSTANCE
+                    formulaid: A
                   - macro: '{#CLOUD_SQL.MASTER}'
                     operator: EXISTS
+                    formulaid: B
               operations:
                 - operationobject: HOST_PROTOTYPE
                   operator: REGEXP
@@ -775,26 +801,34 @@ zabbix_export:
           name: 'GCP Cloud SQL: MySQL instances discovery'
           type: DEPENDENT
           key: gcp.cloudsql.mysql.inst.discovery
+          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#CLOUD_SQL.INSTANCE.DB.TYPE}'
                 value: 'MYSQL.*'
+                formulaid: A
               - macro: '{#CLOUD_SQL.INSTANCE.NAME}'
                 value: '{$GCP.MYSQL.INST.NAME.MATCHES}'
+                formulaid: B
               - macro: '{#CLOUD_SQL.INSTANCE.NAME}'
                 value: '{$GCP.MYSQL.INST.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: C
               - macro: '{#CLOUD_SQL.INSTANCE.TYPE}'
                 value: '{$GCP.MYSQL.INST.TYPE.MATCHES}'
+                formulaid: D
               - macro: '{#CLOUD_SQL.INSTANCE.TYPE}'
                 value: '{$GCP.MYSQL.INST.TYPE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: E
               - macro: '{#CLOUD_SQL.INSTANCE.ZONE}'
                 value: '{$GCP.MYSQL.ZONE.MATCHES}'
+                formulaid: F
               - macro: '{#CLOUD_SQL.INSTANCE.ZONE}'
                 value: '{$GCP.MYSQL.ZONE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: G
           description: 'GCP Cloud SQL: MySQL instances discovery.'
           host_prototypes:
             - uuid: 8b2556b881b14b86a98f90a447ae9734
@@ -877,8 +911,10 @@ zabbix_export:
                 conditions:
                   - macro: '{#CLOUD_SQL.INSTANCE.TYPE}'
                     value: READ_REPLICA_INSTANCE
+                    formulaid: A
                   - macro: '{#CLOUD_SQL.MASTER}'
                     operator: EXISTS
+                    formulaid: B
               operations:
                 - operationobject: HOST_PROTOTYPE
                   operator: REGEXP
@@ -891,26 +927,34 @@ zabbix_export:
           name: 'GCP Cloud SQL: PostgreSQL instances discovery'
           type: DEPENDENT
           key: gcp.cloudsql.pgsql.inst.discovery
+          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#CLOUD_SQL.INSTANCE.DB.TYPE}'
                 value: 'POSTGRES.*'
+                formulaid: A
               - macro: '{#CLOUD_SQL.INSTANCE.NAME}'
                 value: '{$GCP.PGSQL.INST.NAME.MATCHES}'
+                formulaid: B
               - macro: '{#CLOUD_SQL.INSTANCE.NAME}'
                 value: '{$GCP.PGSQL.INST.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: C
               - macro: '{#CLOUD_SQL.INSTANCE.TYPE}'
                 value: '{$GCP.PGSQL.INST.TYPE.MATCHES}'
+                formulaid: D
               - macro: '{#CLOUD_SQL.INSTANCE.TYPE}'
                 value: '{$GCP.PGSQL.TYPE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: E
               - macro: '{#CLOUD_SQL.INSTANCE.ZONE}'
                 value: '{$GCP.PGSQL.ZONE.MATCHES}'
+                formulaid: F
               - macro: '{#CLOUD_SQL.INSTANCE.ZONE}'
                 value: '{$GCP.PGSQL.ZONE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: G
           description: 'GCP Cloud SQL: PostgreSQL instances discovery.'
           host_prototypes:
             - uuid: 0fbbc550fda448d39aad6d0710f28b6a
@@ -993,8 +1037,10 @@ zabbix_export:
                 conditions:
                   - macro: '{#CLOUD_SQL.INSTANCE.TYPE}'
                     value: READ_REPLICA_INSTANCE
+                    formulaid: A
                   - macro: '{#CLOUD_SQL.MASTER}'
                     operator: EXISTS
+                    formulaid: B
               operations:
                 - operationobject: HOST_PROTOTYPE
                   operator: REGEXP
@@ -1007,19 +1053,24 @@ zabbix_export:
           name: 'GCP Compute Engine: Instances discovery'
           type: DEPENDENT
           key: gcp.gce.inst.discovery
+          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#GCE.INSTANCE.NAME}'
                 value: '{$GCP.GCE.INST.NAME.MATCHES}'
+                formulaid: A
               - macro: '{#GCE.INSTANCE.NAME}'
                 value: '{$GCP.GCE.INST.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: B
               - macro: '{#GCE.INSTANCE.ZONE}'
                 value: '{$GCP.GCE.ZONE.MATCHES}'
+                formulaid: C
               - macro: '{#GCE.INSTANCE.ZONE}'
                 value: '{$GCP.GCE.ZONE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: D
           description: 'GCP Compute Engine: Instances discovery.'
           host_prototypes:
             - uuid: cb22d82a12814afb8ba833c649d575c4
@@ -1097,20 +1148,24 @@ zabbix_export:
           name: 'GCP Compute Engine: Project quotas discovery'
           type: DEPENDENT
           key: gcp.gce.quotas.discovery
+          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#GCE.QUOTA.NAME}'
                 value: '{$GCP.GCE.QUOTA.MATCHES}'
+                formulaid: A
               - macro: '{#GCE.QUOTA.NAME}'
                 value: '{$GCP.GCE.QUOTA.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: B
           description: 'GCP Compute Engine: Quotas discovery.'
           item_prototypes:
             - uuid: 1e9a772b9a89497ba695079fc480bd0a
               name: 'Quota [{#GCE.QUOTA.NAME}]: Limit'
               type: DEPENDENT
               key: 'gcp.gce.quota.limit[{#GCE.QUOTA.NAME}]'
+              delay: '0'
               description: 'GCP Compute Engine: The current limit value for [{#GCE.QUOTA.NAME}] quota.'
               preprocessing:
                 - type: JSONPATH
@@ -1138,6 +1193,7 @@ zabbix_export:
               name: 'Quota [{#GCE.QUOTA.NAME}]: Percentage used'
               type: DEPENDENT
               key: 'gcp.gce.quota.pused[{#GCE.QUOTA.NAME}]'
+              delay: '0'
               value_type: FLOAT
               units: '%'
               description: 'GCP Compute Engine: Percentage usage for [{#GCE.QUOTA.NAME}] quota.'
@@ -1185,8 +1241,10 @@ zabbix_export:
               name: 'Quota [{#GCE.QUOTA.NAME}]: Raw data'
               type: DEPENDENT
               key: 'gcp.gce.quota.single.raw[{#GCE.QUOTA.NAME}]'
+              delay: '0'
               history: '0'
               value_type: TEXT
+              trends: '0'
               description: 'GCP Compute Engine: Get metrics for [{#GCE.QUOTA.NAME}] quota.'
               preprocessing:
                 - type: JSONPATH
@@ -1203,6 +1261,7 @@ zabbix_export:
               name: 'Quota [{#GCE.QUOTA.NAME}]: Usage'
               type: DEPENDENT
               key: 'gcp.gce.quota.usage[{#GCE.QUOTA.NAME}]'
+              delay: '0'
               description: 'GCP Compute Engine: The current usage value for [{#GCE.QUOTA.NAME}] quota.'
               preprocessing:
                 - type: JSONPATH
@@ -1565,6 +1624,7 @@ zabbix_export:
           name: 'Audits size'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.audits_size
+          delay: '0'
           units: B
           description: |
             Tracks the size in bytes of stored SQLServer audit files on an instance.
@@ -1584,6 +1644,7 @@ zabbix_export:
           name: 'Audits successfully uploaded'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.audits_upload_count
+          delay: '0'
           description: |
             Tracks the size in bytes of stored SQLServer audit files on an instance.
             Empty value if there are no audits enabled.
@@ -1602,6 +1663,7 @@ zabbix_export:
           name: 'Connection resets'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.conn.connection_reset_count
+          delay: '0'
           description: 'Total number of login operations started from the connection pool since the last restart of SQL Server service.'
           preprocessing:
             - type: JSONPATH
@@ -1618,6 +1680,7 @@ zabbix_export:
           name: 'Login attempts'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.conn.login_attempt_count
+          delay: '0'
           description: |
             Total number of login attempts since the last restart of SQL Server service.
             This does not include pooled connections.
@@ -1637,6 +1700,7 @@ zabbix_export:
           name: Logouts
           type: DEPENDENT
           key: gcp.cloudsql.mssql.conn.logout_count
+          delay: '0'
           description: 'Total number of logout operations since the last restart of SQL Server service.'
           preprocessing:
             - type: JSONPATH
@@ -1653,6 +1717,7 @@ zabbix_export:
           name: 'Processes blocked'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.conn.processes_blocked
+          delay: '0'
           description: 'Current number of blocked processes.'
           preprocessing:
             - type: JSONPATH
@@ -1669,6 +1734,7 @@ zabbix_export:
           name: 'Reserved CPU cores'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.cpu.reserved_cores
+          delay: '0'
           value_type: FLOAT
           description: 'Number of cores reserved for the database.'
           preprocessing:
@@ -1684,6 +1750,7 @@ zabbix_export:
           name: 'CPU usage time'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.cpu.usage_time
+          delay: '0'
           value_type: FLOAT
           units: s
           description: 'Cumulative CPU usage time in seconds.'
@@ -1700,6 +1767,7 @@ zabbix_export:
           name: 'CPU utilization'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.cpu.utilization
+          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'Current CPU utilization represented as a percentage of the reserved CPU that is currently in use.'
@@ -1732,6 +1800,7 @@ zabbix_export:
           delay: '{$GCP.TIME.WINDOW}'
           history: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             var base_path = 'cloudsql.googleapis.com/database/sqlserver/transactions/',
             	arr = [],
@@ -1904,6 +1973,7 @@ zabbix_export:
           name: 'Disk bytes used'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.disk.bytes_used
+          delay: '0'
           units: B
           description: 'Data utilization in bytes.'
           preprocessing:
@@ -1919,6 +1989,7 @@ zabbix_export:
           name: 'Disk size'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.disk.quota
+          delay: '0'
           units: B
           description: 'Maximum data disk size in bytes.'
           preprocessing:
@@ -1934,6 +2005,7 @@ zabbix_export:
           name: 'Disk read I/O'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.disk.read_ops_count
+          delay: '0'
           description: 'Delta count of data disk read I/O operations.'
           preprocessing:
             - type: JSONPATH
@@ -1948,6 +2020,7 @@ zabbix_export:
           name: 'Disk utilization'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.disk.utilization
+          delay: '0'
           value_type: FLOAT
           units: '%'
           description: |
@@ -1992,6 +2065,7 @@ zabbix_export:
           name: 'Disk write I/O'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.disk.write_ops_count
+          delay: '0'
           description: 'Delta count of data disk write I/O operations.'
           preprocessing:
             - type: JSONPATH
@@ -2110,6 +2184,7 @@ zabbix_export:
           name: 'Buffer cache hit ratio'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.memory.buffer_cache_hit_ratio
+          delay: '0'
           value_type: FLOAT
           units: '%'
           description: |
@@ -2129,6 +2204,7 @@ zabbix_export:
           name: 'Checkpoint pages'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.memory.checkpoint_page_count
+          delay: '0'
           description: 'Total number of pages flushed to disk by a checkpoint or other operation that requires all dirty pages to be flushed.'
           preprocessing:
             - type: JSONPATH
@@ -2143,6 +2219,7 @@ zabbix_export:
           name: 'Free list stalls'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.memory.free_list_stall_count
+          delay: '0'
           description: 'Total number of requests that had to wait for a free page.'
           preprocessing:
             - type: JSONPATH
@@ -2157,6 +2234,7 @@ zabbix_export:
           name: 'Lazy writes'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.memory.lazy_write_count
+          delay: '0'
           description: |
             Total number of buffers written by the buffer manager's lazy writer.
             The lazy writer is a system process that flushes out batches of dirty, aged buffers
@@ -2176,6 +2254,7 @@ zabbix_export:
           name: 'Memory grants pending'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.memory.memory_grants_pending
+          delay: '0'
           description: 'Current number of processes waiting for a workspace memory grant.'
           preprocessing:
             - type: JSONPATH
@@ -2190,6 +2269,7 @@ zabbix_export:
           name: 'Page life expectancy'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.memory.page_life_expectancy
+          delay: '0'
           units: s
           description: 'Current number of seconds a page will stay in the buffer pool without references.'
           preprocessing:
@@ -2205,6 +2285,7 @@ zabbix_export:
           name: 'Read page operations'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.memory.page_ops.read
+          delay: '0'
           description: |
             Total number of physical database page reads.
             This metric counts physical page reads across all databases.
@@ -2222,6 +2303,7 @@ zabbix_export:
           name: 'Write age operations'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.memory.page_ops.write
+          delay: '0'
           description: |
             Total number of physical database page writes.
             This metric counts physical page writes across all databases.
@@ -2239,6 +2321,7 @@ zabbix_export:
           name: 'Memory size'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.memory.quota
+          delay: '0'
           units: B
           description: 'Maximum RAM size in bytes.'
           preprocessing:
@@ -2254,6 +2337,7 @@ zabbix_export:
           name: 'Memory used by DB engine'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.memory.total_usage
+          delay: '0'
           units: B
           description: |
             Total RAM usage in bytes. 
@@ -2272,6 +2356,7 @@ zabbix_export:
           name: 'Memory usage'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.memory.usage
+          delay: '0'
           units: B
           description: |
             The RAM usage in bytes. 
@@ -2290,6 +2375,7 @@ zabbix_export:
           name: 'Memory utilization'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.memory.utilization
+          delay: '0'
           value_type: FLOAT
           units: '%'
           description: |
@@ -2322,6 +2408,7 @@ zabbix_export:
           delay: '{$GCP.TIME.WINDOW}'
           history: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             var base_path = 'cloudsql.googleapis.com/database/',
             	mssql_path = 'cloudsql.googleapis.com/database/sqlserver/',
@@ -2538,6 +2625,7 @@ zabbix_export:
           name: Connections
           type: DEPENDENT
           key: gcp.cloudsql.mssql.network.connections
+          delay: '0'
           description: 'Number of connections to the databases on the Cloud SQL instance.'
           preprocessing:
             - type: JSONPATH
@@ -2554,6 +2642,7 @@ zabbix_export:
           name: 'Network: Received bytes'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.network.received_bytes_count
+          delay: '0'
           units: B
           description: 'Delta count of bytes received through the network.'
           preprocessing:
@@ -2571,6 +2660,7 @@ zabbix_export:
           name: 'Network: Sent bytes'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.network.sent_bytes_count
+          delay: '0'
           units: B
           description: 'Delta count of bytes sent through the network.'
           preprocessing:
@@ -2591,6 +2681,7 @@ zabbix_export:
           delay: '{$GCP.TIME.WINDOW}'
           history: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             var base_path = 'cloudsql.googleapis.com/database/sqlserver/transactions/',
             	arr = [],
@@ -2709,6 +2800,7 @@ zabbix_export:
           delay: '{$GCP.TIME.WINDOW}'
           history: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             var base_path = 'cloudsql.googleapis.com/database/sqlserver/schedulers/',
             	arr = [],
@@ -2820,6 +2912,7 @@ zabbix_export:
           name: 'Batch requests'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.trans.batch_request_count
+          delay: '0'
           description: 'Total number of Transact-SQL command batches received.'
           preprocessing:
             - type: JSONPATH
@@ -2834,6 +2927,7 @@ zabbix_export:
           name: 'Forwarded records'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.trans.forwarded_record_count
+          delay: '0'
           description: 'Total number of records fetched through forwarded record pointers.'
           preprocessing:
             - type: JSONPATH
@@ -2848,6 +2942,7 @@ zabbix_export:
           name: 'Full scans'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.trans.full_scan_count
+          delay: '0'
           description: |
             Total number of unrestricted full scans.
             These can be either base-table or full-index scans.
@@ -2865,6 +2960,7 @@ zabbix_export:
           name: 'Page splits'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.trans.page_split_count
+          delay: '0'
           description: 'Total number of page splits that occur as the result of overflowing index pages.'
           preprocessing:
             - type: JSONPATH
@@ -2879,6 +2975,7 @@ zabbix_export:
           name: 'Probe scans'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.trans.probe_scan_count
+          delay: '0'
           description: 'Total number of probe scans that are used to find at least one single qualified row in an index or base table directly.'
           preprocessing:
             - type: JSONPATH
@@ -2893,6 +2990,7 @@ zabbix_export:
           name: 'SQL compilations'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.trans.sql_compilation_count
+          delay: '0'
           description: 'Total number of SQL compilations.'
           preprocessing:
             - type: JSONPATH
@@ -2907,6 +3005,7 @@ zabbix_export:
           name: 'SQL recompilations'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.trans.sql_recompilation_count
+          delay: '0'
           description: 'Total number of SQL recompilations.'
           preprocessing:
             - type: JSONPATH
@@ -2922,20 +3021,24 @@ zabbix_export:
           name: 'Databases discovery'
           type: DEPENDENT
           key: gcp.cloudsql.db.discovery
+          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#DB.NAME}'
                 value: '{$CLOUD_SQL.MSSQL.DB.NAME.MATCHES}'
+                formulaid: A
               - macro: '{#DB.NAME}'
                 value: '{$CLOUD_SQL.MSSQL.DB.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: B
           description: 'Databases discovery.'
           item_prototypes:
             - uuid: 8f6deafa9efd416797ea58d1fce41c29
               name: 'Database [{#DB.NAME}]: Log bytes flushed'
               type: DEPENDENT
               key: 'gcp.cloudsql.mssql.db.log_bytes_flushed_count[{#DB.NAME}]'
+              delay: '0'
               units: B
               description: 'Total number of log bytes flushed for the [{#DB.NAME}] database.'
               preprocessing:
@@ -2953,8 +3056,10 @@ zabbix_export:
               name: 'Database [{#DB.NAME}]: Raw data'
               type: DEPENDENT
               key: 'gcp.cloudsql.mssql.db.raw[{#DB.NAME}]'
+              delay: '0'
               history: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Data in raw format for the [{#DB.NAME}] database.'
               preprocessing:
                 - type: JSONPATH
@@ -2971,6 +3076,7 @@ zabbix_export:
               name: 'Database [{#DB.NAME}]: Transactions started'
               type: DEPENDENT
               key: 'gcp.cloudsql.mssql.db.transaction_count[{#DB.NAME}]'
+              delay: '0'
               description: 'Total number of transactions started for the [{#DB.NAME}] database.'
               preprocessing:
                 - type: JSONPATH
@@ -2996,20 +3102,24 @@ zabbix_export:
           name: 'Resources discovery'
           type: DEPENDENT
           key: gcp.cloudsql.resources.discovery
+          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#RESOURCE.NAME}'
                 value: '{$CLOUD_SQL.MSSQL.RES.NAME.MATCHES}'
+                formulaid: A
               - macro: '{#RESOURCE.NAME}'
                 value: '{$CLOUD_SQL.MSSQL.RES.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: B
           description: 'Resources discovery.'
           item_prototypes:
             - uuid: 55bb12000dca46e096045da83a46edea
               name: 'Resource [{#RESOURCE.NAME}]: Deadlocks'
               type: DEPENDENT
               key: 'gcp.cloudsql.mssql.resource.deadlock_count[{#RESOURCE.NAME}]'
+              delay: '0'
               description: 'Total number of lock requests that resulted in a deadlock for the [{#RESOURCE.NAME}] resource.'
               preprocessing:
                 - type: JSONPATH
@@ -3026,6 +3136,7 @@ zabbix_export:
               name: 'Resource [{#RESOURCE.NAME}]: Lock waits'
               type: DEPENDENT
               key: 'gcp.cloudsql.mssql.resource.lock_wait_count[{#RESOURCE.NAME}]'
+              delay: '0'
               description: 'Total number of lock requests that required the caller to wait for the [{#RESOURCE.NAME}] resource.'
               preprocessing:
                 - type: JSONPATH
@@ -3042,6 +3153,7 @@ zabbix_export:
               name: 'Resource [{#RESOURCE.NAME}]: Lock wait time'
               type: DEPENDENT
               key: 'gcp.cloudsql.mssql.resource.lock_wait_time[{#RESOURCE.NAME}]'
+              delay: '0'
               units: s
               description: 'Total time lock requests were waiting for locks for the [{#RESOURCE.NAME}] resource.'
               preprocessing:
@@ -3059,8 +3171,10 @@ zabbix_export:
               name: 'Resource [{#RESOURCE.NAME}]: Raw data'
               type: DEPENDENT
               key: 'gcp.cloudsql.mssql.resource.raw[{#RESOURCE.NAME}]'
+              delay: '0'
               history: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Data in raw format for the [{#RESOURCE.NAME}] resource.'
               preprocessing:
                 - type: JSONPATH
@@ -3086,20 +3200,24 @@ zabbix_export:
           name: 'Schedulers discovery'
           type: DEPENDENT
           key: gcp.cloudsql.schedulers.discovery
+          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#SCHEDULER.ID}'
                 value: '{$CLOUD_SQL.MSSQL.SCHEDULER.ID.MATCHES}'
+                formulaid: A
               - macro: '{#SCHEDULER.ID}'
                 value: '{$CLOUD_SQL.MSSQL.SCHEDULER.ID.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: B
           description: 'Schedulers discovery.'
           item_prototypes:
             - uuid: 67bde61c128e4dfe9e47d8a3a6e3ceec
               name: 'Scheduler [{#SCHEDULER.ID}]: Active workers'
               type: DEPENDENT
               key: 'gcp.cloudsql.mssql.scheduler.active_workers[{#SCHEDULER.ID}]'
+              delay: '0'
               description: |
                 Current number of active workers associated with the scheduler that goes by its ID [{#SCHEDULER.ID}].
                 An active worker is never preemptive, must have an associated task, and is either running, runnable, or suspended.
@@ -3119,6 +3237,7 @@ zabbix_export:
               name: 'Scheduler [{#SCHEDULER.ID}]: Current tasks'
               type: DEPENDENT
               key: 'gcp.cloudsql.mssql.scheduler.current_tasks[{#SCHEDULER.ID}]'
+              delay: '0'
               description: |
                 Current number of present tasks associated with the scheduler that goes by its ID [{#SCHEDULER.ID}].
                 This count includes tasks that are waiting for a worker to execute them and tasks that are currently waiting or running (in SUSPENDED or RUNNABLE state).
@@ -3138,6 +3257,7 @@ zabbix_export:
               name: 'Scheduler [{#SCHEDULER.ID}]: Current workers'
               type: DEPENDENT
               key: 'gcp.cloudsql.mssql.scheduler.current_workers[{#SCHEDULER.ID}]'
+              delay: '0'
               description: |
                 Current number of workers associated with the scheduler that goes by its ID [{#SCHEDULER.ID}].
                 It includes workers that are not assigned any task.
@@ -3157,6 +3277,7 @@ zabbix_export:
               name: 'Scheduler [{#SCHEDULER.ID}]: Pending I/O operations'
               type: DEPENDENT
               key: 'gcp.cloudsql.mssql.scheduler.pending_disk_io[{#SCHEDULER.ID}]'
+              delay: '0'
               description: |
                 Current number of pending I/Os waiting to be completed that are associated with the scheduler that goes by its ID [{#SCHEDULER.ID}].
                 Each scheduler has a list of pending I/Os that are checked to determine whether they have been completed every time there is a context switch.
@@ -3179,8 +3300,10 @@ zabbix_export:
               name: 'Scheduler [{#SCHEDULER.ID}]: Raw data'
               type: DEPENDENT
               key: 'gcp.cloudsql.mssql.scheduler.raw[{#SCHEDULER.ID}]'
+              delay: '0'
               history: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Data in raw format associated with the scheduler that goes by its ID [{#SCHEDULER.ID}].'
               preprocessing:
                 - type: JSONPATH
@@ -3197,6 +3320,7 @@ zabbix_export:
               name: 'Scheduler [{#SCHEDULER.ID}]: Runnable tasks'
               type: DEPENDENT
               key: 'gcp.cloudsql.mssql.scheduler.runnable_tasks[{#SCHEDULER.ID}]'
+              delay: '0'
               description: 'Current number of workers that are associated with the scheduler that goes by its ID [{#SCHEDULER.ID}] and have assigned tasks waiting to be scheduled on the runnable queue.'
               preprocessing:
                 - type: JSONPATH
@@ -3213,6 +3337,7 @@ zabbix_export:
               name: 'Scheduler [{#SCHEDULER.ID}]: Work queue'
               type: DEPENDENT
               key: 'gcp.cloudsql.mssql.scheduler.work_queue[{#SCHEDULER.ID}]'
+              delay: '0'
               description: |
                 Current number of tasks in the pending queue associated with the scheduler that goes by its ID [{#SCHEDULER.ID}].
                 These tasks are waiting for a worker to pick them up.
@@ -3524,6 +3649,7 @@ zabbix_export:
           name: 'Bytes sent to replica'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.repl.bytes_sent_to_replica_count
+          delay: '0'
           units: B
           description: |
             Total number of bytes sent to the remote availability replica.
@@ -3543,6 +3669,7 @@ zabbix_export:
           name: 'Log apply pending queue'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.repl.log_apply_pending_queue
+          delay: '0'
           description: 'Current number of log blocks that are waiting to be applied to replica.'
           preprocessing:
             - type: JSONPATH
@@ -3557,6 +3684,7 @@ zabbix_export:
           name: 'Log bytes received'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.repl.log_bytes_received_count
+          delay: '0'
           units: B
           description: 'Total size of log records received by the replica.'
           preprocessing:
@@ -3575,6 +3703,7 @@ zabbix_export:
           delay: '{$GCP.TIME.WINDOW}'
           history: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             var base_path = 'cloudsql.googleapis.com/database/sqlserver/replication/',
             	obj = {},
@@ -3693,6 +3822,7 @@ zabbix_export:
           name: 'Recovery queue'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.repl.recovery_queue
+          delay: '0'
           units: B
           description: 'Current size of log records in bytes in the replica''s log files that have not been redone.'
           preprocessing:
@@ -3711,6 +3841,7 @@ zabbix_export:
           name: 'Redone bytes'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.repl.redone_bytes_count
+          delay: '0'
           units: B
           description: 'Total size in bytes of redone log records.'
           preprocessing:
@@ -3726,6 +3857,7 @@ zabbix_export:
           name: 'Resent messages'
           type: DEPENDENT
           key: gcp.cloudsql.mssql.repl.resent_message_count
+          delay: '0'
           description: |
             Total count of Always On messages to resend.
             This includes messages that were attempted to be sent but failed and require resending.
@@ -3821,6 +3953,7 @@ zabbix_export:
           name: 'Reserved CPU cores'
           type: DEPENDENT
           key: gcp.cloudsql.mysql.cpu.reserved_cores
+          delay: '0'
           value_type: FLOAT
           description: 'Number of cores reserved for the database.'
           preprocessing:
@@ -3836,6 +3969,7 @@ zabbix_export:
           name: 'CPU usage time'
           type: DEPENDENT
           key: gcp.cloudsql.mysql.cpu.usage_time
+          delay: '0'
           value_type: FLOAT
           units: s
           description: 'Cumulative CPU usage time in seconds.'
@@ -3852,6 +3986,7 @@ zabbix_export:
           name: 'CPU utilization'
           type: DEPENDENT
           key: gcp.cloudsql.mysql.cpu.utilization
+          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'Current CPU utilization represented as a percentage of the reserved CPU that is currently in use.'
@@ -3939,6 +4074,7 @@ zabbix_export:
           name: 'Disk bytes used'
           type: DEPENDENT
           key: gcp.cloudsql.mysql.disk.bytes_used
+          delay: '0'
           units: B
           description: 'Data utilization in bytes.'
           preprocessing:
@@ -3954,6 +4090,7 @@ zabbix_export:
           name: 'Disk size'
           type: DEPENDENT
           key: gcp.cloudsql.mysql.disk.quota
+          delay: '0'
           units: B
           description: 'Maximum data disk size in bytes.'
           preprocessing:
@@ -3969,6 +4106,7 @@ zabbix_export:
           name: 'Disk read I/O'
           type: DEPENDENT
           key: gcp.cloudsql.mysql.disk.read_ops_count
+          delay: '0'
           description: 'Delta count of data disk read I/O operations.'
           preprocessing:
             - type: JSONPATH
@@ -3983,6 +4121,7 @@ zabbix_export:
           name: 'Disk utilization'
           type: DEPENDENT
           key: gcp.cloudsql.mysql.disk.utilization
+          delay: '0'
           value_type: FLOAT
           units: '%'
           description: |
@@ -4027,6 +4166,7 @@ zabbix_export:
           name: 'Disk write I/O'
           type: DEPENDENT
           key: gcp.cloudsql.mysql.disk.write_ops_count
+          delay: '0'
           description: 'Delta count of data disk write I/O operations.'
           preprocessing:
             - type: JSONPATH
@@ -4041,6 +4181,7 @@ zabbix_export:
           name: 'InnoDB dirty pages'
           type: DEPENDENT
           key: gcp.cloudsql.mysql.innodb_buffer_pool_pages_dirty
+          delay: '0'
           description: 'Number of unflushed pages in the InnoDB buffer pool.'
           preprocessing:
             - type: JSONPATH
@@ -4057,6 +4198,7 @@ zabbix_export:
           name: 'InnoDB free pages'
           type: DEPENDENT
           key: gcp.cloudsql.mysql.innodb_buffer_pool_pages_free
+          delay: '0'
           description: 'Number of unused pages in the InnoDB buffer pool.'
           preprocessing:
             - type: JSONPATH
@@ -4073,6 +4215,7 @@ zabbix_export:
           name: 'InnoDB total pages'
           type: DEPENDENT
           key: gcp.cloudsql.mysql.innodb_buffer_pool_pages_total
+          delay: '0'
           description: 'Total number of pages in the InnoDB buffer pool.'
           preprocessing:
             - type: JSONPATH
@@ -4089,6 +4232,7 @@ zabbix_export:
           name: 'InnoDB fsync calls'
           type: DEPENDENT
           key: gcp.cloudsql.mysql.innodb_data_fsyncs
+          delay: '0'
           description: 'Delta count of InnoDB fsync() calls.'
           preprocessing:
             - type: JSONPATH
@@ -4105,6 +4249,7 @@ zabbix_export:
           name: 'InnoDB log fsync calls'
           type: DEPENDENT
           key: gcp.cloudsql.mysql.innodb_os_log_fsyncs
+          delay: '0'
           description: 'Delta count of InnoDB fsync() calls to the log file.'
           preprocessing:
             - type: JSONPATH
@@ -4121,6 +4266,7 @@ zabbix_export:
           name: 'InnoDB pages read'
           type: DEPENDENT
           key: gcp.cloudsql.mysql.innodb_pages_read
+          delay: '0'
           description: 'Delta count of InnoDB pages read.'
           preprocessing:
             - type: JSONPATH
@@ -4137,6 +4283,7 @@ zabbix_export:
           name: 'InnoDB pages written'
           type: DEPENDENT
           key: gcp.cloudsql.mysql.innodb_pages_written
+          delay: '0'
           description: 'Delta count of InnoDB pages written.'
           preprocessing:
             - type: JSONPATH
@@ -4257,6 +4404,7 @@ zabbix_export:
           name: 'Memory size'
           type: DEPENDENT
           key: gcp.cloudsql.mysql.memory.quota
+          delay: '0'
           units: B
           description: 'Maximum RAM size in bytes.'
           preprocessing:
@@ -4272,6 +4420,7 @@ zabbix_export:
           name: 'Memory used by DB engine'
           type: DEPENDENT
           key: gcp.cloudsql.mysql.memory.total_usage
+          delay: '0'
           units: B
           description: |
             Total RAM usage in bytes. 
@@ -4290,6 +4439,7 @@ zabbix_export:
           name: 'Memory usage'
           type: DEPENDENT
           key: gcp.cloudsql.mysql.memory.usage
+          delay: '0'
           units: B
           description: |
             The RAM usage in bytes. 
@@ -4308,6 +4458,7 @@ zabbix_export:
           name: 'Memory utilization'
           type: DEPENDENT
           key: gcp.cloudsql.mysql.memory.utilization
+          delay: '0'
           value_type: FLOAT
           units: '%'
           description: |
@@ -4340,6 +4491,7 @@ zabbix_export:
           delay: '{$GCP.TIME.WINDOW}'
           history: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             var base_path = 'cloudsql.googleapis.com/database/',
             	mysql_path = 'cloudsql.googleapis.com/database/mysql/',
@@ -4500,6 +4652,7 @@ zabbix_export:
           name: Connections
           type: DEPENDENT
           key: gcp.cloudsql.mysql.network.connections
+          delay: '0'
           description: 'Number of connections to the databases on the Cloud SQL instance.'
           preprocessing:
             - type: JSONPATH
@@ -4516,6 +4669,7 @@ zabbix_export:
           name: 'Network: Received bytes'
           type: DEPENDENT
           key: gcp.cloudsql.mysql.network.received_bytes_count
+          delay: '0'
           units: B
           description: 'Delta count of bytes received through the network.'
           preprocessing:
@@ -4533,6 +4687,7 @@ zabbix_export:
           name: 'Network: Sent bytes'
           type: DEPENDENT
           key: gcp.cloudsql.mysql.network.sent_bytes_count
+          delay: '0'
           units: B
           description: 'Delta count of bytes sent through the network.'
           preprocessing:
@@ -4550,6 +4705,7 @@ zabbix_export:
           name: 'Open tables'
           type: DEPENDENT
           key: gcp.cloudsql.mysql.open_tables
+          delay: '0'
           description: 'The number of tables that are currently open.'
           preprocessing:
             - type: JSONPATH
@@ -4564,6 +4720,7 @@ zabbix_export:
           name: 'Open table definitions'
           type: DEPENDENT
           key: gcp.cloudsql.mysql.open_table_definitions
+          delay: '0'
           description: 'The number of table definitions that are currently cached.'
           preprocessing:
             - type: JSONPATH
@@ -4578,6 +4735,7 @@ zabbix_export:
           name: 'Network: Bytes received by MySQL'
           type: DEPENDENT
           key: gcp.cloudsql.mysql_received_bytes_count
+          delay: '0'
           units: B
           description: 'Delta count of bytes received by MySQL process.'
           preprocessing:
@@ -4595,6 +4753,7 @@ zabbix_export:
           name: 'Network: Bytes sent by MySQL'
           type: DEPENDENT
           key: gcp.cloudsql.mysql_sent_bytes_count
+          delay: '0'
           units: B
           description: 'Delta count of bytes sent by MySQL process.'
           preprocessing:
@@ -4612,6 +4771,7 @@ zabbix_export:
           name: Queries
           type: DEPENDENT
           key: gcp.cloudsql.queries
+          delay: '0'
           description: 'Delta of statements executed by the server.'
           preprocessing:
             - type: JSONPATH
@@ -4626,6 +4786,7 @@ zabbix_export:
           name: Questions
           type: DEPENDENT
           key: gcp.cloudsql.questions
+          delay: '0'
           description: 'Delta of statements executed by the server sent by the client.'
           preprocessing:
             - type: JSONPATH
@@ -4875,6 +5036,7 @@ zabbix_export:
           name: 'Last I/O thread error number'
           type: DEPENDENT
           key: gcp.cloudsql.mysql.repl.last_io_errno
+          delay: '0'
           description: 'The error number of the most recent error that caused the I/O thread to stop.'
           preprocessing:
             - type: JSONPATH
@@ -4889,6 +5051,7 @@ zabbix_export:
           name: 'Last SQL thread error number'
           type: DEPENDENT
           key: gcp.cloudsql.mysql.repl.last_sql_errno
+          delay: '0'
           description: 'The error number of the most recent error that caused the SQL thread to stop.'
           preprocessing:
             - type: JSONPATH
@@ -4906,6 +5069,7 @@ zabbix_export:
           delay: '{$GCP.TIME.WINDOW}'
           history: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             var base_path = 'cloudsql.googleapis.com/database/replication/',
             	mysql_path = 'cloudsql.googleapis.com/database/mysql/replication/',
@@ -5041,6 +5205,7 @@ zabbix_export:
           name: 'Network lag'
           type: DEPENDENT
           key: gcp.cloudsql.mysql.repl.network_lag
+          delay: '0'
           units: s
           description: 'Indicates time taken from primary binary log to IO thread on replica.'
           preprocessing:
@@ -5056,6 +5221,7 @@ zabbix_export:
           name: 'Replication lag'
           type: DEPENDENT
           key: gcp.cloudsql.mysql.repl.replica_lag
+          delay: '0'
           units: s
           description: 'Number of seconds the read replica is behind its primary (approximation).'
           preprocessing:
@@ -5071,6 +5237,7 @@ zabbix_export:
           name: 'Slave I/O thread running'
           type: DEPENDENT
           key: gcp.cloudsql.mysql.repl.slave_io_running
+          delay: '0'
           description: |
             Indicates whether the I/O thread for reading the primary's binary log is running.
             Possible values are Yes, No and Connecting.
@@ -5099,6 +5266,7 @@ zabbix_export:
           name: 'Slave SQL thread running'
           type: DEPENDENT
           key: gcp.cloudsql.mysql.repl.slave_sql_running
+          delay: '0'
           description: 'Indicates whether the SQL thread for executing events in the relay log is running.'
           valuemap:
             name: 'Thread state'
@@ -5107,6 +5275,8 @@ zabbix_export:
               parameters:
                 - $.slave_sql_running
             - type: BOOL_TO_DECIMAL
+              parameters:
+                - ''
           master_item:
             key: gcp.cloudsql.mysql.repl.metrics.get
           tags:
@@ -5116,6 +5286,7 @@ zabbix_export:
           name: 'Replication state'
           type: DEPENDENT
           key: gcp.cloudsql.mysql.repl.state
+          delay: '0'
           description: |
             The current serving state of replication.
             This metric is only available for the MySQL/PostgreSQL instances.
@@ -5305,6 +5476,7 @@ zabbix_export:
           name: 'Reserved CPU cores'
           type: DEPENDENT
           key: gcp.cloudsql.pgsql.cpu.reserved_cores
+          delay: '0'
           value_type: FLOAT
           description: 'Number of cores reserved for the database.'
           preprocessing:
@@ -5320,6 +5492,7 @@ zabbix_export:
           name: 'CPU usage time'
           type: DEPENDENT
           key: gcp.cloudsql.pgsql.cpu.usage_time
+          delay: '0'
           value_type: FLOAT
           units: s
           description: 'Cumulative CPU usage time in seconds.'
@@ -5336,6 +5509,7 @@ zabbix_export:
           name: 'CPU utilization'
           type: DEPENDENT
           key: gcp.cloudsql.pgsql.cpu.utilization
+          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'Current CPU utilization represented as a percentage of the reserved CPU that is currently in use.'
@@ -5423,6 +5597,7 @@ zabbix_export:
           name: 'Disk bytes used'
           type: DEPENDENT
           key: gcp.cloudsql.pgsql.disk.bytes_used
+          delay: '0'
           units: B
           description: 'Data utilization in bytes.'
           preprocessing:
@@ -5438,6 +5613,7 @@ zabbix_export:
           name: 'Disk size'
           type: DEPENDENT
           key: gcp.cloudsql.pgsql.disk.quota
+          delay: '0'
           units: B
           description: 'Maximum data disk size in bytes.'
           preprocessing:
@@ -5453,6 +5629,7 @@ zabbix_export:
           name: 'Disk read I/O'
           type: DEPENDENT
           key: gcp.cloudsql.pgsql.disk.read_ops_count
+          delay: '0'
           description: 'Delta count of data disk read I/O operations.'
           preprocessing:
             - type: JSONPATH
@@ -5467,6 +5644,7 @@ zabbix_export:
           name: 'Disk utilization'
           type: DEPENDENT
           key: gcp.cloudsql.pgsql.disk.utilization
+          delay: '0'
           value_type: FLOAT
           units: '%'
           description: |
@@ -5511,6 +5689,7 @@ zabbix_export:
           name: 'Disk write I/O'
           type: DEPENDENT
           key: gcp.cloudsql.pgsql.disk.write_ops_count
+          delay: '0'
           description: 'Delta count of data disk write I/O operations.'
           preprocessing:
             - type: JSONPATH
@@ -5629,6 +5808,7 @@ zabbix_export:
           name: 'Memory size'
           type: DEPENDENT
           key: gcp.cloudsql.pgsql.memory.quota
+          delay: '0'
           units: B
           description: 'Maximum RAM size in bytes.'
           preprocessing:
@@ -5644,6 +5824,7 @@ zabbix_export:
           name: 'Memory used by DB engine'
           type: DEPENDENT
           key: gcp.cloudsql.pgsql.memory.total_usage
+          delay: '0'
           units: B
           description: |
             Total RAM usage in bytes. 
@@ -5662,6 +5843,7 @@ zabbix_export:
           name: 'Memory usage'
           type: DEPENDENT
           key: gcp.cloudsql.pgsql.memory.usage
+          delay: '0'
           units: B
           description: |
             The RAM usage in bytes. 
@@ -5680,6 +5862,7 @@ zabbix_export:
           name: 'Memory utilization'
           type: DEPENDENT
           key: gcp.cloudsql.pgsql.memory.utilization
+          delay: '0'
           value_type: FLOAT
           units: '%'
           description: |
@@ -5712,6 +5895,7 @@ zabbix_export:
           delay: '{$GCP.TIME.WINDOW}'
           history: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             var base_path = 'cloudsql.googleapis.com/database/',
             	pgsql_path = 'cloudsql.googleapis.com/database/postgresql/',
@@ -5882,6 +6066,7 @@ zabbix_export:
           name: 'Network: Received bytes'
           type: DEPENDENT
           key: gcp.cloudsql.pgsql.network.received_bytes_count
+          delay: '0'
           units: B
           description: 'Delta count of bytes received through the network.'
           preprocessing:
@@ -5899,6 +6084,7 @@ zabbix_export:
           name: 'Network: Sent bytes'
           type: DEPENDENT
           key: gcp.cloudsql.pgsql.network.sent_bytes_count
+          delay: '0'
           units: B
           description: 'Delta count of bytes sent through the network.'
           preprocessing:
@@ -5916,6 +6102,7 @@ zabbix_export:
           name: Connections
           type: DEPENDENT
           key: gcp.cloudsql.pgsql.num_backends
+          delay: '0'
           description: |
             The number of the connections to the Cloud SQL PostgreSQL instance.
             Includes connections to the system databases, which aren't visible by default.
@@ -5935,6 +6122,7 @@ zabbix_export:
           name: 'Oldest prepared transaction age'
           type: DEPENDENT
           key: gcp.cloudsql.pgsql.oldest_transaction.prepared
+          delay: '0'
           description: |
             Age of the oldest prepared transaction yet to be vacuumed in the Cloud SQL PostgreSQL instance, measured in number of transactions that have happened since the oldest transaction.
             Empty value when there is no such transaction type.
@@ -5953,6 +6141,7 @@ zabbix_export:
           name: 'Oldest replica transaction age'
           type: DEPENDENT
           key: gcp.cloudsql.pgsql.oldest_transaction.replica
+          delay: '0'
           description: |
             Age of the oldest replica transaction yet to be vacuumed in the Cloud SQL PostgreSQL instance, measured in number of transactions that have happened since the oldest transaction.
             Empty value when there is no such transaction type.
@@ -5971,6 +6160,7 @@ zabbix_export:
           name: 'Oldest replication slot transaction age'
           type: DEPENDENT
           key: gcp.cloudsql.pgsql.oldest_transaction.replication_slot
+          delay: '0'
           description: |
             Age of the oldest replication slot transaction yet to be vacuumed in the Cloud SQL PostgreSQL instance, measured in number of transactions that have happened since the oldest transaction.
             Empty value when there is no such transaction type.
@@ -5989,6 +6179,7 @@ zabbix_export:
           name: 'Oldest running transaction age'
           type: DEPENDENT
           key: gcp.cloudsql.pgsql.oldest_transaction.running
+          delay: '0'
           description: |
             Age of the oldest running transaction yet to be vacuumed in the Cloud SQL PostgreSQL instance, measured in number of transactions that have happened since the oldest transaction.
             Empty value when there is no such transaction type.
@@ -6007,6 +6198,7 @@ zabbix_export:
           name: 'Data written to temporary'
           type: DEPENDENT
           key: gcp.cloudsql.pgsql.temp_bytes_written_count
+          delay: '0'
           units: B
           description: 'Total data size (in bytes) written to temporary files by the queries.'
           preprocessing:
@@ -6022,6 +6214,7 @@ zabbix_export:
           name: 'Temporary files used for writing data'
           type: DEPENDENT
           key: gcp.cloudsql.pgsql.temp_files_written_count
+          delay: '0'
           description: 'Total number of temporary files used for writing data while performing algorithms such as join and sort.'
           preprocessing:
             - type: JSONPATH
@@ -6036,6 +6229,7 @@ zabbix_export:
           name: 'Assigned transactions'
           type: DEPENDENT
           key: gcp.cloudsql.pgsql.transaction_id_count_assigned
+          delay: '0'
           description: 'Delta count of assigned transaction IDs.'
           preprocessing:
             - type: JSONPATH
@@ -6050,6 +6244,7 @@ zabbix_export:
           name: 'Frozen transactions'
           type: DEPENDENT
           key: gcp.cloudsql.pgsql.transaction_id_count_frozen
+          delay: '0'
           description: 'Delta count of frozen transaction IDs.'
           preprocessing:
             - type: JSONPATH
@@ -6064,6 +6259,7 @@ zabbix_export:
           name: 'Transaction ID utilization'
           type: DEPENDENT
           key: gcp.cloudsql.pgsql.transaction_id_utilization
+          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'Current utilization represented as a percentage of transaction IDs consumed by the Cloud SQL PostgreSQL instance.'
@@ -6090,15 +6286,18 @@ zabbix_export:
             conditions:
               - macro: '{#PGSQL.DB.NAME}'
                 value: '{$GCP.CLOUD_SQL.DB.NAME.MATCHES}'
+                formulaid: A
               - macro: '{#PGSQL.DB.NAME}'
                 value: '{$GCP.CLOUD_SQL.DB.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: B
           description: 'Databases discovery for the particular PostgreSQL instance.'
           item_prototypes:
             - uuid: 997bdb03ba0b437ca2705f28dcc651ed
               name: 'Database [{#PGSQL.DB.NAME}]: Buffer cache blocks read.'
               type: DEPENDENT
               key: 'gcp.cloudsql.pgsql.blocks_read_count_buffer_cache[{#PGSQL.DB.NAME}]'
+              delay: '0'
               description: 'Number of buffer cache blocks read by the [{#PGSQL.DB.NAME}] database.'
               preprocessing:
                 - type: JSONPATH
@@ -6115,6 +6314,7 @@ zabbix_export:
               name: 'Database [{#PGSQL.DB.NAME}]: Disk blocks read.'
               type: DEPENDENT
               key: 'gcp.cloudsql.pgsql.blocks_read_count_disk[{#PGSQL.DB.NAME}]'
+              delay: '0'
               description: 'Number of disk blocks read by the [{#PGSQL.DB.NAME}] database.'
               preprocessing:
                 - type: JSONPATH
@@ -6134,6 +6334,7 @@ zabbix_export:
               delay: '{$GCP.TIME.WINDOW}'
               history: '0'
               value_type: TEXT
+              trends: '0'
               params: |
                 var base_path = 'cloudsql.googleapis.com/database/postgresql/',
                 	obj = {};
@@ -6266,6 +6467,7 @@ zabbix_export:
               name: 'Database [{#PGSQL.DB.NAME}]: Deadlocks count'
               type: DEPENDENT
               key: 'gcp.cloudsql.pgsql.deadlock_count[{#PGSQL.DB.NAME}]'
+              delay: '0'
               description: 'Number of deadlocks detected in the [{#PGSQL.DB.NAME}] database.'
               preprocessing:
                 - type: JSONPATH
@@ -6282,6 +6484,7 @@ zabbix_export:
               name: 'Database [{#PGSQL.DB.NAME}]: Committed transactions'
               type: DEPENDENT
               key: 'gcp.cloudsql.pgsql.transaction_count_commit[{#PGSQL.DB.NAME}]'
+              delay: '0'
               description: 'Delta count of number of committed transactions to the [{#PGSQL.DB.NAME}] database.'
               preprocessing:
                 - type: JSONPATH
@@ -6298,6 +6501,7 @@ zabbix_export:
               name: 'Database [{#PGSQL.DB.NAME}]: Rolled-back transactions'
               type: DEPENDENT
               key: 'gcp.cloudsql.pgsql.transaction_count_rollback[{#PGSQL.DB.NAME}]'
+              delay: '0'
               description: 'Delta count of number of rolled-back transactions in the [{#PGSQL.DB.NAME}] database.'
               preprocessing:
                 - type: JSONPATH
@@ -6314,6 +6518,7 @@ zabbix_export:
               name: 'Database [{#PGSQL.DB.NAME}]: Tuples fetched'
               type: DEPENDENT
               key: 'gcp.cloudsql.pgsql.tuples_fetched_count[{#PGSQL.DB.NAME}]'
+              delay: '0'
               description: 'Total number of rows fetched as a result of queries to the [{#PGSQL.DB.NAME}] database.'
               preprocessing:
                 - type: JSONPATH
@@ -6330,6 +6535,7 @@ zabbix_export:
               name: 'Database [{#PGSQL.DB.NAME}]: Deleted rows processed'
               type: DEPENDENT
               key: 'gcp.cloudsql.pgsql.tuples_processed_count_delete[{#PGSQL.DB.NAME}]'
+              delay: '0'
               description: 'Number of tuples(rows) processed for delete operations for the database with the name [{#PGSQL.DB.NAME}].'
               preprocessing:
                 - type: JSONPATH
@@ -6346,6 +6552,7 @@ zabbix_export:
               name: 'Database [{#PGSQL.DB.NAME}]: Inserted rows processed.'
               type: DEPENDENT
               key: 'gcp.cloudsql.pgsql.tuples_processed_count_insert[{#PGSQL.DB.NAME}]'
+              delay: '0'
               description: 'Number of tuples(rows) processed for insert operations for the database with the name [{#PGSQL.DB.NAME}].'
               preprocessing:
                 - type: JSONPATH
@@ -6362,6 +6569,7 @@ zabbix_export:
               name: 'Database [{#PGSQL.DB.NAME}]: Updated rows processed'
               type: DEPENDENT
               key: 'gcp.cloudsql.pgsql.tuples_processed_count_update[{#PGSQL.DB.NAME}]'
+              delay: '0'
               description: 'Number of tuples(rows) processed for update operations for the database with the name [{#PGSQL.DB.NAME}].'
               preprocessing:
                 - type: JSONPATH
@@ -6378,6 +6586,7 @@ zabbix_export:
               name: 'Database [{#PGSQL.DB.NAME}]: Tuples returned'
               type: DEPENDENT
               key: 'gcp.cloudsql.pgsql.tuples_returned_count[{#PGSQL.DB.NAME}]'
+              delay: '0'
               description: 'Total number of rows scanned while processing the queries of the [{#PGSQL.DB.NAME}] database.'
               preprocessing:
                 - type: JSONPATH
@@ -6394,6 +6603,7 @@ zabbix_export:
               name: 'Database [{#PGSQL.DB.NAME}]: Dead tuples'
               type: DEPENDENT
               key: 'gcp.cloudsql.pgsql.tuple_size_dead[{#PGSQL.DB.NAME}]'
+              delay: '0'
               description: 'Number of live tuples(rows) in the [{#PGSQL.DB.NAME}] database.'
               preprocessing:
                 - type: JSONPATH
@@ -6410,6 +6620,7 @@ zabbix_export:
               name: 'Database [{#PGSQL.DB.NAME}]: Live tuples'
               type: DEPENDENT
               key: 'gcp.cloudsql.pgsql.tuple_size_live[{#PGSQL.DB.NAME}]'
+              delay: '0'
               description: 'Number of live tuples(rows) in the [{#PGSQL.DB.NAME}] database.'
               preprocessing:
                 - type: JSONPATH
@@ -6748,6 +6959,7 @@ zabbix_export:
           name: 'Flush location lag'
           type: DEPENDENT
           key: gcp.cloudsql.pgsql.repl.flush_location
+          delay: '0'
           units: B
           description: 'Flush location replication lag in bytes.'
           preprocessing:
@@ -6763,6 +6975,7 @@ zabbix_export:
           name: 'Number of log archival failures'
           type: DEPENDENT
           key: gcp.cloudsql.pgsql.repl.log_archive_failure_count
+          delay: '0'
           description: 'Number of failed attempts for archiving replication log files.'
           preprocessing:
             - type: JSONPATH
@@ -6777,6 +6990,7 @@ zabbix_export:
           name: 'Number of log archival successes'
           type: DEPENDENT
           key: gcp.cloudsql.pgsql.repl.log_archive_success_count
+          delay: '0'
           description: 'Number of failed attempts for archiving replication log files.'
           preprocessing:
             - type: JSONPATH
@@ -6794,6 +7008,7 @@ zabbix_export:
           delay: '{$GCP.TIME.WINDOW}'
           history: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             var base_path = 'cloudsql.googleapis.com/database/replication/',
             	pgsql_path = 'cloudsql.googleapis.com/database/postgresql/replication/',
@@ -6927,6 +7142,7 @@ zabbix_export:
           name: 'Network lag'
           type: DEPENDENT
           key: gcp.cloudsql.pgsql.repl.network_lag
+          delay: '0'
           units: s
           description: 'Indicates time taken from primary binary log to IO thread on replica.'
           preprocessing:
@@ -6942,6 +7158,7 @@ zabbix_export:
           name: 'Replay location lag'
           type: DEPENDENT
           key: gcp.cloudsql.pgsql.repl.replay_location
+          delay: '0'
           units: B
           description: 'Replay location replication lag in bytes.'
           preprocessing:
@@ -6957,6 +7174,7 @@ zabbix_export:
           name: 'Replication lag'
           type: DEPENDENT
           key: gcp.cloudsql.pgsql.repl.replica_lag
+          delay: '0'
           units: s
           description: 'Number of seconds the read replica is behind its primary (approximation).'
           preprocessing:
@@ -6972,6 +7190,7 @@ zabbix_export:
           name: 'Sent location lag'
           type: DEPENDENT
           key: gcp.cloudsql.pgsql.repl.sent_location
+          delay: '0'
           units: B
           description: 'Sent location replication lag in bytes.'
           preprocessing:
@@ -6987,6 +7206,7 @@ zabbix_export:
           name: 'Replication state'
           type: DEPENDENT
           key: gcp.cloudsql.pgsql.repl.state
+          delay: '0'
           description: |
             The current serving state of replication.
             This metric is only available for the MySQL/PostgreSQL instances.
@@ -7019,6 +7239,7 @@ zabbix_export:
           name: 'Write location lag'
           type: DEPENDENT
           key: gcp.cloudsql.pgsql.repl.write_location
+          delay: '0'
           units: B
           description: 'Write location replication lag in bytes.'
           preprocessing:
@@ -7125,6 +7346,7 @@ zabbix_export:
           name: 'Guest visible vCPUs'
           type: DEPENDENT
           key: gcp.gce.cpu.guest_visible_vcpus
+          delay: '0'
           value_type: FLOAT
           description: |
             Number of vCPUs visible inside the guest.
@@ -7146,6 +7368,7 @@ zabbix_export:
           name: 'Reserved vCPUs'
           type: DEPENDENT
           key: gcp.gce.cpu.reserved_cores
+          delay: '0'
           value_type: FLOAT
           description: 'Number of vCPUs reserved on the host of the instance.'
           preprocessing:
@@ -7161,6 +7384,7 @@ zabbix_export:
           name: 'Scheduler wait time'
           type: DEPENDENT
           key: gcp.gce.cpu.scheduler_wait_time
+          delay: '0'
           value_type: FLOAT
           units: s
           description: |
@@ -7183,6 +7407,7 @@ zabbix_export:
           name: 'CPU usage time'
           type: DEPENDENT
           key: gcp.gce.cpu.usage_time
+          delay: '0'
           value_type: FLOAT
           units: s
           description: |
@@ -7203,6 +7428,7 @@ zabbix_export:
           name: 'CPU utilization'
           type: DEPENDENT
           key: gcp.gce.cpu.utilization
+          delay: '0'
           value_type: FLOAT
           units: '%'
           description: |
@@ -7239,6 +7465,7 @@ zabbix_export:
           delay: '{$GCP.TIME.WINDOW}'
           history: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             var base_path = 'compute.googleapis.com/instance/disk/',
             	base_paths = ['read_ops_count', 'read_bytes_count', 'write_bytes_count', 'write_ops_count'];
@@ -7352,6 +7579,7 @@ zabbix_export:
           name: 'Firewall: Dropped bytes'
           type: DEPENDENT
           key: gcp.gce.firewall.dropped_bytes_count
+          delay: '0'
           units: B
           description: 'Count of incoming bytes dropped by the firewall.'
           preprocessing:
@@ -7369,6 +7597,7 @@ zabbix_export:
           name: 'Firewall: Dropped packets'
           type: DEPENDENT
           key: gcp.gce.firewall.dropped_packets_count
+          delay: '0'
           description: 'Count of incoming packets dropped by the firewall.'
           preprocessing:
             - type: JSONPATH
@@ -7472,6 +7701,7 @@ zabbix_export:
           name: 'Instance uptime'
           type: DEPENDENT
           key: gcp.gce.instance.uptime
+          delay: '0'
           value_type: FLOAT
           units: s
           description: 'Elapsed time since the VM was started, in seconds.'
@@ -7488,6 +7718,7 @@ zabbix_export:
           name: 'Integrity: Early boot validation status'
           type: DEPENDENT
           key: gcp.gce.integrity.early_boot_validation_status
+          delay: '0'
           description: |
             The validation status of early boot integrity policy.
             Empty value if integrity monitoring isn't enabled.
@@ -7517,6 +7748,7 @@ zabbix_export:
           name: 'Integrity: Late boot validation status'
           type: DEPENDENT
           key: gcp.gce.integrity.late_boot_validation_status
+          delay: '0'
           description: |
             The validation status of late boot integrity policy.
             Empty value if integrity monitoring isn't enabled.
@@ -7546,6 +7778,7 @@ zabbix_export:
           name: 'Memory usage percentage'
           type: DEPENDENT
           key: gcp.gce.memory.ram_pused
+          delay: '0'
           value_type: FLOAT
           units: '%'
           description: |
@@ -7576,6 +7809,7 @@ zabbix_export:
           name: 'Memory size'
           type: DEPENDENT
           key: gcp.gce.memory.ram_size
+          delay: '0'
           units: B
           description: |
             Total VM memory size.
@@ -7595,6 +7829,7 @@ zabbix_export:
           name: 'Memory used'
           type: DEPENDENT
           key: gcp.gce.memory.ram_used
+          delay: '0'
           units: B
           description: |
             Memory currently used in the VM.
@@ -7614,6 +7849,7 @@ zabbix_export:
           name: 'VM swap in'
           type: DEPENDENT
           key: gcp.gce.memory.swap_in_bytes_count
+          delay: '0'
           units: B
           description: |
             The amount of memory read into the guest from its own swap space.
@@ -7633,6 +7869,7 @@ zabbix_export:
           name: 'VM swap out'
           type: DEPENDENT
           key: gcp.gce.memory.swap_out_bytes_count
+          delay: '0'
           units: B
           description: |
             The amount of memory written from the guest to its own swap space.
@@ -7655,6 +7892,7 @@ zabbix_export:
           delay: '{$GCP.TIME.WINDOW}'
           history: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             var base_path = 'compute.googleapis.com/',
             	value_types = ['int64Value', 'doubleValue', 'stringValue', 'boolValue'],
@@ -7885,6 +8123,7 @@ zabbix_export:
           name: 'Network: Received bytes'
           type: DEPENDENT
           key: gcp.gce.network.lb.received_bytes_count.false
+          delay: '0'
           units: B
           description: 'Count of bytes received from the network without load-balancing.'
           preprocessing:
@@ -7902,6 +8141,7 @@ zabbix_export:
           name: 'Network: Received bytes: Load-balanced'
           type: DEPENDENT
           key: gcp.gce.network.lb.received_bytes_count.true
+          delay: '0'
           units: B
           description: |
             Whether traffic was received by an L3 loadbalanced IP address assigned to the VM.
@@ -7924,6 +8164,7 @@ zabbix_export:
           name: 'Network: Received packets'
           type: DEPENDENT
           key: gcp.gce.network.lb.received_packets_count.false
+          delay: '0'
           description: 'Count of packets received from the network without load-balancing.'
           preprocessing:
             - type: JSONPATH
@@ -7940,6 +8181,7 @@ zabbix_export:
           name: 'Network: Received packets: Load-balanced'
           type: DEPENDENT
           key: gcp.gce.network.lb.received_packets_count.true
+          delay: '0'
           description: |
             Whether traffic was received by an L3 loadbalanced IP address assigned to the VM.
             Traffic that is externally routed to the VM's standard internal or external IP address, such as L7 loadbalanced traffic, is not considered to be loadbalanced in this metric.
@@ -7961,6 +8203,7 @@ zabbix_export:
           name: 'Network: Sent bytes'
           type: DEPENDENT
           key: gcp.gce.network.lb.sent_bytes_count.false
+          delay: '0'
           units: B
           description: 'Count of bytes sent over the network without load-balancing.'
           preprocessing:
@@ -7978,6 +8221,7 @@ zabbix_export:
           name: 'Network: Sent bytes: Load-balanced'
           type: DEPENDENT
           key: gcp.gce.network.lb.sent_bytes_count.true
+          delay: '0'
           units: B
           description: |
             Whether traffic was received by an L3 loadbalanced IP address assigned to the VM.
@@ -8000,6 +8244,7 @@ zabbix_export:
           name: 'Network: Sent packets'
           type: DEPENDENT
           key: gcp.gce.network.lb.sent_packets_count.false
+          delay: '0'
           description: 'Count of packets sent over the network without load-balancing.'
           preprocessing:
             - type: JSONPATH
@@ -8016,6 +8261,7 @@ zabbix_export:
           name: 'Network: Sent packets: Load-balanced'
           type: DEPENDENT
           key: gcp.gce.network.lb.sent_packets_count.true
+          delay: '0'
           description: |
             Whether traffic was received by an L3 loadbalanced IP address assigned to the VM.
             Traffic that is externally routed to the VM's standard internal or external IP address, such as L7 loadbalanced traffic, is not considered to be loadbalanced in this metric.
@@ -8037,6 +8283,7 @@ zabbix_export:
           name: 'Network: Mirrored bytes'
           type: DEPENDENT
           key: gcp.gce.network.mirrored_bytes_count
+          delay: '0'
           units: B
           description: 'The count of mirrored bytes.'
           preprocessing:
@@ -8054,6 +8301,7 @@ zabbix_export:
           name: 'Network: Mirrored packets'
           type: DEPENDENT
           key: gcp.gce.network.mirrored_packets_count
+          delay: '0'
           description: 'The count of mirrored packets.'
           preprocessing:
             - type: JSONPATH
@@ -8070,6 +8318,7 @@ zabbix_export:
           name: 'Network: Mirrored packets dropped: Invalid'
           type: DEPENDENT
           key: gcp.gce.network.mirr_dropped_packets.invalid
+          delay: '0'
           description: |
             The count of mirrored packets dropped.
             Reason - invalid.
@@ -8089,6 +8338,7 @@ zabbix_export:
           name: 'Network: Mirrored packets dropped: Out of quota'
           type: DEPENDENT
           key: gcp.gce.network.mirr_dropped_packets.out_of_quota
+          delay: '0'
           description: |
             The count of mirrored packets dropped.
             Reason - out of quota.
@@ -8108,6 +8358,7 @@ zabbix_export:
           name: 'Network: Mirrored packets dropped: Unknown'
           type: DEPENDENT
           key: gcp.gce.network.mirr_dropped_packets.unknown
+          delay: '0'
           description: |
             The count of mirrored packets dropped.
             Reason - unknown.
@@ -8128,30 +8379,38 @@ zabbix_export:
           name: 'GCP Compute Engine: Physical disks discovery'
           type: DEPENDENT
           key: gcp.gce.phys.disks.discovery
+          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#GCE.DISK.DEV_TYPE}'
                 value: '{$GCE.DISK.DEV_TYPE.MATCHES}'
+                formulaid: A
               - macro: '{#GCE.DISK.DEV_TYPE}'
                 value: '{$GCE.DISK.DEV_TYPE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: B
               - macro: '{#GCE.DISK.NAME}'
                 value: '{$GCE.DISK.NAME.MATCHES}'
+                formulaid: C
               - macro: '{#GCE.DISK.NAME}'
                 value: '{$GCE.DISK.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: D
               - macro: '{#GCE.DISK.STOR_TYPE}'
                 value: '{$GCE.DISK.STOR_TYPE.MATCHES}'
+                formulaid: E
               - macro: '{#GCE.DISK.STOR_TYPE}'
                 value: '{$GCE.DISK.STOR_TYPE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: F
           description: 'GCP Compute Engine: Physical disks discovery.'
           item_prototypes:
             - uuid: dda10a0535c04fdb92092efeff020b2c
               name: 'Disk [{#GCE.DISK.NAME}]: Read bytes'
               type: DEPENDENT
               key: 'gcp.gce.disk.read_bytes_count[{#GCE.DISK.NAME}]'
+              delay: '0'
               units: B
               description: 'Count of bytes read from [{#GCE.DISK.NAME}] disk.'
               preprocessing:
@@ -8173,6 +8432,7 @@ zabbix_export:
               name: 'Disk [{#GCE.DISK.NAME}]: Read operations'
               type: DEPENDENT
               key: 'gcp.gce.disk.read_ops_count[{#GCE.DISK.NAME}]'
+              delay: '0'
               description: 'Count of read IO operations from [{#GCE.DISK.NAME}] disk.'
               preprocessing:
                 - type: JSONPATH
@@ -8193,6 +8453,7 @@ zabbix_export:
               name: 'Disk [{#GCE.DISK.NAME}]: Write bytes'
               type: DEPENDENT
               key: 'gcp.gce.disk.write_bytes_count[{#GCE.DISK.NAME}]'
+              delay: '0'
               units: B
               description: 'Count of bytes written to {#GCE.DISK.NAME}] disk.'
               preprocessing:
@@ -8214,6 +8475,7 @@ zabbix_export:
               name: 'Disk [{#GCE.DISK.NAME}]: Write operations'
               type: DEPENDENT
               key: 'gcp.gce.disk.write_ops_count[{#GCE.DISK.NAME}]'
+              delay: '0'
               description: 'Count of write IO operations to [{#GCE.DISK.NAME}] disk.'
               preprocessing:
                 - type: JSONPATH
@@ -8234,8 +8496,10 @@ zabbix_export:
               name: 'Disk [{#GCE.DISK.NAME}]: Raw data'
               type: DEPENDENT
               key: 'gcp.gce.quota.single.raw[{#GCE.DISK.NAME}]'
+              delay: '0'
               history: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Data in raw format for the disk with the name [{#GCE.DISK.NAME}].'
               preprocessing:
                 - type: JSONPATH
