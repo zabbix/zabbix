@@ -711,8 +711,8 @@ class testFormAlarmNotification extends CWebTest {
 	}
 
 	protected function getAlarmOverlay() {
-		return $this->query('xpath://div['.CXPathHelper::fromClass('overlay-dialogue notif').']')->asOverlayDialog()
-				->waitUntilVisible(10)->one();
+		return $this->query('xpath://div['.CXPathHelper::fromClass('overlay-dialogue notif').']')->waitUntilVisible(10)
+				->asOverlayDialog()->one();
 	}
 
 	/**
