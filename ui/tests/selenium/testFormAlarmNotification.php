@@ -460,8 +460,14 @@ class testFormAlarmNotification extends CWebTest {
 		self::$eventids = CDBHelper::setTriggerProblem($data['trigger_name']);
 
 		$this->page->login()->open('zabbix.php?action=problem.view&filter_reset=1')->waitUntilReady();
-		$this->page->open('zabbix.php?action=problem.view&unacknowledged=1&sort=name&sortorder=ASC&hostids%5B%5D='.
-				self::$hostid)->waitUntilReady();
+//		$this->page->open('zabbix.php?action=problem.view&unacknowledged=1&sort=name&sortorder=ASC&hostids%5B%5D='.
+//				self::$hostid)->waitUntilReady();
+
+		// All this code lines added to check how this scenario performs on jenkins.
+		$this->page->open('zabbix.php?action=problem.view&unacknowledged=1&show_suppressed=1&sort=name&sortorder=ASC')->waitUntilReady();
+		$this->query('name:zbx_filter')->asForm()->one()->fill(['Hosts' => [self::HOST_NAME, 'Host for maintenance alarm']])->submit();
+		$this->query('class:list-table')->asTable()->one()->waitUntilReloaded();
+		$this->page->refresh()->waitUntilReady();
 
 		// Check that problems displayed in table.
 		$this->assertTableDataColumn($data['trigger_name'], 'Problem');
