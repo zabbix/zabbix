@@ -732,12 +732,8 @@ static int	proxyconfig_prepare_rows(zbx_table_data_t *td, char **error)
 
 	if (-1 != rename_index)
 	{
-		char	cuid[CUID_LEN];
-
-		zbx_new_cuid(cuid);
-
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%c%s=" ZBX_SQL_CONCAT(),
-				delim, td->rename_field, "#", cuid);
+				delim, td->rename_field, "'#'", td->table->recid);
 		delim = ',';
 	}
 

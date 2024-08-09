@@ -167,9 +167,9 @@ typedef zbx_uint64_t	(*zbx_dc_get_nextid_func_t)(const char *table_name, int num
 #endif
 
 #ifdef HAVE_MYSQL
-#	define ZBX_SQL_CONCAT()		"concat('%s','%s')"
+#	define ZBX_SQL_CONCAT()		"concat(%s,%s)"
 #else
-#	define ZBX_SQL_CONCAT()		"'%s'||'%s'"
+#	define ZBX_SQL_CONCAT()		"%s||%s"
 #endif
 
 #define ZBX_SQL_NULLCMP(f1, f2)	"((" f1 " is null and " f2 " is null) or " f1 "=" f2 ")"
