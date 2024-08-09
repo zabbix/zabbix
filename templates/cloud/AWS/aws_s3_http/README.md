@@ -40,15 +40,52 @@ Add the following required permissions to your Zabbix IAM policy in order to col
         {
           "Action":[
               "cloudwatch:DescribeAlarms",
-              "cloudwatch:GetMetricData"
+              "cloudwatch:GetMetricData",
+              "s3:GetMetricsConfiguration"
           ],
           "Effect":"Allow",
           "Resource":"*"
         }
     ]
   }
-  ```
-
+```
+For using assume role authorization, add the appropriate permissions to the role you are using:
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": "sts:AssumeRole",
+            "Resource": "arn:aws:iam::{Account}:user/{UserName}"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "cloudwatch:DescribeAlarms",
+                "cloudwatch:GetMetricData",
+                "s3:GetMetricsConfiguration"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+```
+Next step add principal in trust relationships to the role you are using:
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "arn:aws:iam::{Account}:user/{UserName}"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+```
 If you are using role-based authorization, set the appropriate permissions:
 ```json
 {
@@ -64,7 +101,8 @@ If you are using role-based authorization, set the appropriate permissions:
             "Effect": "Allow",
             "Action": [
                 "cloudwatch:DescribeAlarms",
-                "cloudwatch:GetMetricData"
+                "cloudwatch:GetMetricData",
+                "s3:GetMetricsConfiguration",
                 "ec2:AssociateIamInstanceProfile",
                 "ec2:ReplaceIamInstanceProfileAssociation"
             ],
@@ -73,14 +111,36 @@ If you are using role-based authorization, set the appropriate permissions:
     ]
 }
 ```
+Next step add principal in trust relationships to the role you are using:
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": {
+                "Service": [
+                    "ec2.amazonaws.com"
+                ]
+            },
+            "Action": [
+                "sts:AssumeRole"
+            ]
+        }
+    ]
+}
+```
+**Note**, If you using role-based authorization is only possible when you use a Zabbix server or proxy inside AWS.
 
 To gather Request metrics, [enable Requests metrics](https://docs.aws.amazon.com/AmazonS3/latest/userguide/cloudwatch-monitoring.html) on your Amazon S3 buckets from the AWS console.
 
 You can also define a filter for the Request metrics using a shared prefix, object tag, or access point.
 
-Set the macros "{$AWS.AUTH_TYPE}", "{$AWS.S3.BUCKET.NAME}"
+Set the macros "{$AWS.AUTH_TYPE}", "{$AWS.S3.BUCKET.NAME}".
 
-If you are using access key-based authorization, set the following macros "{$AWS.ACCESS.KEY.ID}", "{$AWS.SECRET.ACCESS.KEY}"
+If you are using access key-based authorization, set the following macros "{$AWS.ACCESS.KEY.ID}", "{$AWS.SECRET.ACCESS.KEY}".
+
+If you are using access assume role authorization, set the following macros "{$AWS.ACCESS.KEY.ID}", "{$AWS.SECRET.ACCESS.KEY}", "{$AWS.STS.REGION}", "{$AWS.ASSUME.ROLE.ARN}".
 
 For more information about manage access keys, see [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys)
 
@@ -96,7 +156,10 @@ Additional information about metrics and used API methods:
 |{$AWS.PROXY}|<p>Sets HTTP proxy value. If this macro is empty then no proxy is used.</p>||
 |{$AWS.ACCESS.KEY.ID}|<p>Access key ID.</p>||
 |{$AWS.SECRET.ACCESS.KEY}|<p>Secret access key.</p>||
-|{$AWS.AUTH_TYPE}|<p>Authorization method. Possible values: role_base, access_key.</p>|`access_key`|
+|{$AWS.AUTH_TYPE}|<p>Authorization method. Possible values: access_key, assume_role, role_base.</p>|`access_key`|
+|{$AWS.REQUEST.REGION}|<p>Region used in GET request `ListBuckets`.</p>|`us-east-1`|
+|{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
+|{$AWS.ASSUME.ROLE.ARN}|<p>Arn assume role, add when used `assume_role` authorization method</p>||
 |{$AWS.S3.BUCKET.NAME}|<p>S3 bucket name.</p>||
 |{$AWS.S3.LLD.FILTER.ALARM_NAME.MATCHES}|<p>Filter of discoverable alarms by name.</p>|`.*`|
 |{$AWS.S3.LLD.FILTER.ALARM_NAME.NOT_MATCHES}|<p>Filter to exclude discovered alarms by name.</p>|`CHANGE_IF_NEEDED`|
@@ -139,7 +202,7 @@ Additional information about metrics and used API methods:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|AWS S3 Alarms: [{#ALARM_NAME}] has 'Alarm' state|<p>Alarm "{#ALARM_NAME}" has 'Alarm' state. <br>Reason: {ITEM.LASTVALUE2}</p>|`last(/AWS S3 bucket by HTTP/aws.s3.alarm.state["{#ALARM_NAME}"])=2 and length(last(/AWS S3 bucket by HTTP/aws.s3.alarm.state_reason["{#ALARM_NAME}"]))>0`|Average||
+|AWS S3 Alarms: [{#ALARM_NAME}] has 'Alarm' state|<p>Alarm "{#ALARM_NAME}" has 'Alarm' state.<br>Reason: {ITEM.LASTVALUE2}</p>|`last(/AWS S3 bucket by HTTP/aws.s3.alarm.state["{#ALARM_NAME}"])=2 and length(last(/AWS S3 bucket by HTTP/aws.s3.alarm.state_reason["{#ALARM_NAME}"]))>0`|Average||
 |AWS S3 Alarms: [{#ALARM_NAME}] has 'Insufficient data' state||`last(/AWS S3 bucket by HTTP/aws.s3.alarm.state["{#ALARM_NAME}"])=1`|Info||
 
 ### LLD rule Request Metrics discovery
