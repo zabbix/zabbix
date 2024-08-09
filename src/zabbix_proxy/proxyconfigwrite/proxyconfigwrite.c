@@ -732,8 +732,12 @@ static int	proxyconfig_prepare_rows(zbx_table_data_t *td, char **error)
 
 	if (-1 != rename_index)
 	{
+		char	cuid[CUID_LEN];
+
+		zbx_new_cuid(cuid);
+
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%c%s=" ZBX_SQL_CONCAT(),
-				delim, td->rename_field, "'#'", td->rename_field);
+				delim, td->rename_field, "#", cuid);
 		delim = ',';
 	}
 
@@ -1519,7 +1523,7 @@ static void	proxyconfig_prepare_hostmacros(zbx_table_data_t *hostmacro, zbx_tabl
 
 	zbx_vector_uint64_destroy(&hostids);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
