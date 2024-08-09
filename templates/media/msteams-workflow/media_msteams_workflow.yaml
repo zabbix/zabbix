@@ -494,6 +494,15 @@ zabbix_export:
         	Logger.log(Logger.WARN, 'notification failed: ' + error);
         	throw 'Sending failed: ' + error;
         };
+      description: |
+        To set up a webhook, please follow these steps:
+        
+        - Create a workflow in MS Teams. You can use the "Post a message in a channel when a webhook request is received" template for it.
+        - Copy the endpoint URL and place it in the teams_endpoint parameter.
+        - Set up the global macro {$ZABBIX.URL}, which will contain the URL to the Zabbix frontend.
+        - Create a Zabbix user and add the MS Teams Workflow media to it.
+        
+        For more detailed instructions, please visit https://git.zabbix.com/projects/ZBX/repos/zabbix/browse/templates/media/.
       message_templates:
         - event_source: TRIGGERS
           operation_mode: PROBLEM

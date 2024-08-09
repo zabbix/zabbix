@@ -3,8 +3,9 @@
 
 ## Overview
 
-This guide describes how to integrate Zabbix 7.0 with MS Teams Workflow using the Zabbix webhook feature. This guide will provide instructions on setting up a media type, a user and an action in Zabbix. 
-This integration is supported only for **Teams** as part of Office 365. Note, that **Teams** free plan does not support [MS Teams Workflow](https://support.microsoft.com/en-gb/office/browse-and-add-workflows-in-microsoft-teams-4998095c-8b72-4b0e-984c-f2ad39e6ba9a) feature.
+This guide describes how to integrate Zabbix 7.0 with MS Teams Workflow using the Zabbix webhook feature, providing instructions on setting up a media type, a user, and an action in Zabbix.
+
+This integration is supported only on **Teams** as part of Office 365. Note that the **Teams** free plan does not support the [MS Teams Workflow](https://support.microsoft.com/en-gb/office/browse-and-add-workflows-in-microsoft-teams-4998095c-8b72-4b0e-984c-f2ad39e6ba9a) feature.
 
 ## Requirements
 
@@ -13,7 +14,7 @@ Zabbix version: 7.0 and higher.
 ## Parameters
 ### User parameters
 
-User parameters mean to be changed due webhook setup and according the user preferences and environment.
+User parameters are intended to be changed according to the webhook setup as well as the user's preferences and environment.
 
 |Name|Value|Description|
 |----|-----|-----------|
@@ -22,7 +23,7 @@ User parameters mean to be changed due webhook setup and according the user pref
 
 ### System parameters
 
-System parameter are reserved for predefined macros that not mean to be changed.
+System parameters are reserved for predefined macros that are not meant to be changed.
 
 |Name|Value|Description|
 |----|-----|-----------|
@@ -36,27 +37,27 @@ System parameter are reserved for predefined macros that not mean to be changed.
 |alert_message|\{ALERT\.MESSAGE\}|'Default message' value from action configuration.|
 |alert_subject|\{ALERT\.SUBJECT\}|'Default subject' value from action configuration.|
 |event_id|\{EVENT\.ID\}|Numeric ID of the event that triggered an action.|
-|trigger_id|\{TRIGGER\.ID\}|Numeric trigger ID which triggered this action.|
+|trigger_id|\{TRIGGER\.ID\}|Numeric ID of the trigger of this action.|
 
-> Please be aware that each webhook supports an HTTP proxy. To use this feature, add a new mediatype parameter with the name `http_proxy` and set its value to the proxy URL.
+> Please be aware that each webhook supports an HTTP proxy. To use this feature, add a new media type parameter with the name `http_proxy` and set its value to the proxy URL.
 
 ## Service setup
 
-To set up a Teams Workflow webhook, follow these steps:
+To set up a MS Teams Workflow webhook, follow these steps:
 
 1. Open Teams:
     * On the left vertical hotbar, find the three dots for additional apps.
     * [![](images/th.1.png?raw=true)](images/1.png)
 
 2. Find the Workflows app:
-    * In the appeared window, find and click on the Workflows app.
+    * In the opened window, find and click on the Workflows app.
 
 3. Create a new flow:
-    * In the top right corner, click `+ New flow`.
+    * In the top-right corner, click `+ New flow`.
     * [![](images/th.2.png?raw=true)](images/2.png)
 
 4. Search for a template:
-    * In the search bar, enter the keyword "channel" and select the "Post a channel when a webhook request is received" template from the search results.
+    * In the search bar, enter the keyword "channel" and from the search results, select the template "Post a channel when a webhook request is received".
     * [![](images/th.3.png?raw=true)](images/3.png)
 
 5. Name your flow:
@@ -66,7 +67,7 @@ To set up a Teams Workflow webhook, follow these steps:
     * [![](images/th.4.png?raw=true)](images/4.png)
 
 6. Configure the flow:
-    * Select the appropriate "Microsoft Teams Team" and "Microsoft Teams channel" where Zabbix events will be posted.
+    * Select the appropriate Microsoft Teams team and Microsoft Teams channel where Zabbix events will be posted.
     * Click `Create Flow`.
 
 7. Save the Workflow endpoint URL:
@@ -74,7 +75,7 @@ To set up a Teams Workflow webhook, follow these steps:
     * Copy the workflow endpoint URL and save it! It will be used in the Zabbix webhook later.
 
 8. Verify the new Workflow:
-    * You can now close this window and press the Home button in the top left corner of the Workflow menu.
+    * You can now close this window and press the home button in the top-left corner of the workflow menu.
     * On this page, the new workflow called "Zabbix webhook" should appear.
     * [![](images/th.5.png?raw=true)](images/5.png)
 
@@ -82,13 +83,13 @@ To set up a Teams Workflow webhook, follow these steps:
     * Click on the "Zabbix webhook". A window with detailed info about this flow will appear.
     * [![](images/th.6.png?raw=true)](images/6.png)
 
-Note: If you want to remove the footer message "USERNAME used a Workflow to send this card. Get template", you need to click `+ Create from blank` instead of using the template in step 4 and recreate the event structure as in the template.
+Note: If you want to remove the footer message "USERNAME used a Workflow to send this card. Get template", you need to make a copy of the created from the template workflow. To do this, after step 9 click on `Save as` button and save a new copy. Do not forget to copy endpoint URL from the new copied workflow instead of using the one from step 7.
 
 ## Zabbix configuration
 
-1. **Set up global macro**:
-    - In the Zabbix web interface, go to `Administration` → `Macros` section in the dropdown menu in the top left corner.
-    - Set up the global macro `{$ZABBIX.URL}` which will contain the URL to the Zabbix frontend. The URL should be either an IP address, a fully qualified domain name, or localhost.
+1. **Set up the global macro**:
+    - In the Zabbix web interface, go to the `Administration` → `Macros` section in the menu on the left-hand side.
+    - Set up the global macro `{$ZABBIX.URL}` which will contain the URL to the Zabbix frontend. The URL should be either an IP address, a fully qualified domain name, or a localhost.
     - Specifying a protocol is mandatory, whereas the port is optional. Good examples: 
       - `http://zabbix.com`
       - `https://zabbix.lan/`
@@ -101,29 +102,28 @@ Note: If you want to remove the footer message "USERNAME used a Workflow to send
 
     [![](images/th.7.png?raw=true)](images/7.png)
 
-2. **Import media type**:
+2. **Import the media type**:
     - In the `Alerts` → `Media types` section, import the [media_msteams_workflow.yaml](media_msteams_workflow.yaml) file.
 
-3. **Configure MS Teams Workflow media type**:
-    - Open the newly added **MS Teams Workflow** media type and replace the placeholder `<PLACE WEBHOOK URL HERE>` with the **incoming webhook URL** created during the workflow setup in MS Teams on step 7.
+3. **Configure the MS Teams Workflow media type**:
+    - Open the newly added **MS Teams Workflow** media type and replace the placeholder `<PLACE WEBHOOK URL HERE>` with the **incoming webhook URL** created during step 7 of the MS Teams workflow setup.
 
 4. **Create a Zabbix user and add media**:
-    - In the `Users` → `Users` section, click the `Create user` button in the top right corner. In the `User` tab, fill in all required fields (marked with red asterisks). 
-    - In the `Media` tab, add a new media and select **MS Teams Workflow** type from the drop-down list. Although the `Send to` field is not used in MS Teams Workflow media, it cannot be empty. To comply with the frontend requirements, you can put any symbol there.
-    - Make sure this user has access to all hosts for which you would like problem notifications to be sent to MS Teams.
+    - In the `Users` → `Users` section, click the `Create user` button in the top-right corner. In the `User` tab, fill in all the required fields (marked with red asterisks).
+    - In the `Media` tab, add a new media type and select **MS Teams Workflow** from the drop-down list. Although the `Send to` field is not used in MS Teams Workflow media, it cannot be empty. To comply with frontend requirements, fill in the field with any symbol.
+    - Make sure the user has access to all the hosts for which you would like problem notifications to be sent to MS Teams. You can do so by selecting the appropriate user role in the `Permissions` tab.
 
-5. **Start receiving alerts**:
-    - Great! You can now start receiving alerts!
+5. **You can now start receiving alerts!**
 
-**Note**: MS Teams Workflow webhook supports Markdown syntax in the Alert message and subject. If you want to use it, go to `Alerts` → `Media types`, find the "MS Teams Workflow" media type, click on it, and in the `Message templates` tab, choose the desired message template and edit it using Markdown syntax.
+**Note**: The MS Teams Workflow webhook supports [Markdown format for Adaptive Cards](https://learn.microsoft.com/en-us/microsoftteams/platform/task-modules-and-cards/cards/cards-format?tabs=adaptive-md%2Cdesktop%2Cconnector-html) syntax in the alert message and subject. If you want to make use of it, go to `Alerts` → `Media types`, find the "MS Teams Workflow" media type, click on it, and in the `Message templates` tab, choose the desired message template and edit it using Markdown syntax.
 
 [![](images/th.8.png?raw=true)](images/8.png)
 
-For more information, see the [Zabbix Documentation](https://www.zabbix.com/documentation/7.0/manual/config/notifications) and the [MS Teams Workflow Documentation](https://support.microsoft.com/en-gb/office/browse-and-add-workflows-in-microsoft-teams-4998095c-8b72-4b0e-984c-f2ad39e6ba9a).
+For more information, see [Zabbix Documentation](https://www.zabbix.com/documentation/7.0/manual/config/notifications) and [MS Teams Workflow Documentation](https://support.microsoft.com/en-gb/office/browse-and-add-workflows-in-microsoft-teams-4998095c-8b72-4b0e-984c-f2ad39e6ba9a).
 
 ## Feedback
 
-Please report any issues with the media type at [`https://support.zabbix.com`](https://support.zabbix.com)
+Please report any issues with the media type at [`https://support.zabbix.com`](https://support.zabbix.com).
 
-You can also provide feedback, discuss the media type, or ask for help at [`ZABBIX forums`](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback)
+You can also provide feedback, discuss the media type, or ask for help at [`ZABBIX forums`](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
 
