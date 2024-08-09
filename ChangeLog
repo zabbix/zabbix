@@ -26,6 +26,16 @@ A.F.I..PS. [ZBXNEXT-9176] removed support of Oracle DB (agriscenko, sboidenko)
 .......PS. [ZBXNEXT-8990] extended VMware event log with username (asestakovs)
 
 Bug fixes:
+..F....... [ZBX-24940] fixed issue with dependent trigger copying (vmaksimovs, vmurzins)
+....I..... [ZBX-24576] fixed built-in dashboard "Local network" map element highlight overlapping the widget header (Ivo)
+....I..... [ZBX-24547] removed duplicate matching name "Problems by severity" in built-in "Global view" dashboard (Ivo)
+..F....... [ZBX-23844] fixed long names of icons and background images overlapping each other (agriscenko)
+..F....... [ZBX-24835] fixed case-conversion and preg functions working incorrectly with the Turkish locale (agriscenko)
+........S. [ZBX-23510] removed redundant userdirectory_usrgrp_3 index (arimdjonoks)
+.......PS. [ZBX-24926] fixed bad argument error when using latest libcurl (vso)
+...G...... [ZBX-23495] fixed Zabbix agent 2 still sending active check heartbeats when they are disabled (dgoloscapov)
+..F....... [ZBX-24708] fixed hint visualization issues in Graph widget (apoga)
+..F....... [ZBX-24769] fixed radio buttons in SVG graph data set becoming unresponsive after deleting another data set (agriscenko)
 ........S. [ZBX-24879] fixed ODBC login with special characters in the password field (sboidenko)
 ..F....... [ZBX-24947] fixed PHP runtime errors while processing frontend notifications (Sasha)
 .........T [ZBX-24927] fixed duplicate references in dashboard widgets (akotsegubov)
@@ -173,6 +183,17 @@ New features:
 ..F....PS. [ZBXNEXT-9218] added proxy group discovery internal item (mprihodko)
 
 Bug fixes:
+A........T [ZBX-24930] fixed inability to import latest official templates to 7.0.0 version (abiba, vmaksimovs)
+..F....... [ZBX-24940] fixed issue with dependent trigger copying (vmaksimovs, vmurzins)
+....I..... [ZBX-24576] fixed built-in dashboard "Local network" map element highlight overlapping the widget header (Ivo)
+....I..... [ZBX-24547] removed duplicate matching name "Problems by severity" in built-in "Global view" dashboard (Ivo)
+..F....... [ZBX-23844] fixed long names of icons and background images overlapping each other (agriscenko)
+..F....... [ZBX-24835] fixed case-conversion and preg functions working incorrectly with the Turkish locale (agriscenko)
+........S. [ZBX-23510] removed redundant userdirectory_usrgrp_3 index (arimdjonoks)
+.......PS. [ZBX-24926] fixed bad argument error when using latest libcurl (vso)
+...G...... [ZBX-23495] fixed Zabbix agent 2 still sending active check heartbeats when they are disabled (dgoloscapov)
+..F....... [ZBX-24708] fixed hint visualization issues in Graph widget (apoga)
+..F....... [ZBX-24769] fixed radio buttons in SVG graph data set becoming unresponsive after deleting another data set (agriscenko)
 ........S. [ZBX-24879] fixed ODBC login with special characters in the password field (sboidenko)
 ..F....... [ZBX-24947] fixed PHP runtime errors while processing frontend notifications (Sasha)
 .........T [ZBX-24927] fixed duplicate references in dashboard widgets (akotsegubov)
@@ -1122,6 +1143,8 @@ New features:
 .......PS. [ZBXNEXT-9293] updated max supported MySQL version to 9.0 (mprihodko)
 
 Bug fixes:
+A........T [ZBX-24930] fixed inability to import latest official templates to minor versions up to 6.4.16 (abiba, vmaksimovs)
+..F....... [ZBX-24835] fixed case-conversion and preg functions working incorrectly with the Turkish locale (agriscenko)
 ..F....... [ZBX-24909] fixed resolving of macro functions in the "Item value" widget (Sasha)
 
 --------------------------------------------------------------------------------
