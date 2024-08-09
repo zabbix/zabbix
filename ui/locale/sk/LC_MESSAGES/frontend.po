@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 5.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-04-01 16:26+0300\n"
-"PO-Revision-Date: 2024-01-09 20:29+0000\n"
+"PO-Revision-Date: 2024-08-08 07:45+0000\n"
 "Last-Translator: Tomáš Heřmánek <tomas.hermanek@initmax.cz>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
@@ -2315,9 +2315,9 @@ msgstr[2] "Nie je možné zakázať typ média"
 #: app/controllers/CControllerModuleUpdate.php:146
 msgid "Cannot disable module"
 msgid_plural "Cannot disable modules"
-msgstr[0] "Modul sa nedá vypnúť"
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Nie je možné zakázať modul"
+msgstr[1] "Nie je možné zakázať moduly"
+msgstr[2] "Nie je možné zakázať moduly"
 
 #: app/controllers/CControllerModuleUpdate.php:165
 #, c-format
@@ -2395,9 +2395,9 @@ msgstr[2] "Nie je možné povoliť typ média"
 #: app/controllers/CControllerModuleUpdate.php:142
 msgid "Cannot enable module"
 msgid_plural "Cannot enable modules"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Modul nie je možné aktivovať"
+msgstr[1] "Moduly nie je možné aktivovať"
+msgstr[2] "Moduly nie je možné aktivovať"
 
 #: app/controllers/CControllerModuleUpdate.php:160
 #, c-format
@@ -2866,7 +2866,7 @@ msgstr "Nie je možné aktualizovať zistenú skupinu hostov."
 #: include/classes/api/services/CGraphGeneral.php:69
 #, c-format
 msgid "Cannot update a templated graph \"%1$s\"."
-msgstr ""
+msgstr "Nie je možné aktualizovať šablónový graf \"%1$s\"."
 
 #: include/classes/api/services/CHttpTest.php:455
 #, c-format
@@ -3009,7 +3009,7 @@ msgstr "Nie je možné aktualizovať typ média"
 
 #: app/controllers/CControllerModuleUpdate.php:139
 msgid "Cannot update module"
-msgstr ""
+msgstr "Modul nie je možné aktualizovať"
 
 #: app/controllers/CControllerModuleUpdate.php:157
 #, c-format
@@ -5342,7 +5342,7 @@ msgstr "Objekt zisťovania"
 
 #: include/classes/items/CHelpItems.php:787
 msgid "Discovery of VMware clusters, \"url\" - VMware service URL. Returns JSON"
-msgstr ""
+msgstr "Prehľadávanie klastrov VMware, \"url\" – URL služby VMware. Vráti JSON"
 
 #: include/classes/items/CHelpItems.php:787
 msgid "Discovery of VMware clusters, <url> - VMware service URL. Returns JSON"
@@ -5350,7 +5350,7 @@ msgstr "Discovery clustrov VMware, <url> – URL služby VMware. Vráti JSON"
 
 #: include/classes/items/CHelpItems.php:795
 msgid "Discovery of VMware datastores, \"url\" - VMware service URL. Returns JSON"
-msgstr ""
+msgstr "Prehľadávanie dátových úložísk VMware, \"url\" – URL služby VMware. Vráti JSON"
 
 #: include/classes/items/CHelpItems.php:795
 msgid "Discovery of VMware datastores, <url> - VMware service URL. Returns JSON"
@@ -5358,7 +5358,7 @@ msgstr "Zistenie datastorov VMware, <url> – URL služby VMware. Vráti JSON"
 
 #: include/classes/items/CHelpItems.php:839
 msgid "Discovery of VMware hypervisor datastores, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns JSON"
-msgstr ""
+msgstr "Prehľadávanie dátových úložísk hypervízora VMware, \"url\" – URL služby VMware, \"uuid\" – globálny jedinečný identifikátor hypervízora VMware. Vráti JSON"
 
 #: include/classes/items/CHelpItems.php:839
 msgid "Discovery of VMware hypervisor datastores, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
@@ -5366,7 +5366,7 @@ msgstr "Discovery datastorov hypervízora VMware, <url> - URL služby VMware, <u
 
 #: include/classes/items/CHelpItems.php:859
 msgid "Discovery of VMware hypervisors, \"url\" - VMware service URL. Returns JSON"
-msgstr ""
+msgstr "Prehľadávanie hypervízorov VMware, \"url\" – URL služby VMware. Vráti JSON"
 
 #: include/classes/items/CHelpItems.php:859
 msgid "Discovery of VMware hypervisors, <url> - VMware service URL. Returns JSON"
@@ -5374,7 +5374,7 @@ msgstr "Discovery hypervízorov VMware, <url> – URL služby VMware. Vráti JSO
 
 #: include/classes/items/CHelpItems.php:1047
 msgid "Discovery of VMware virtual machine disk devices, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier. Returns JSON"
-msgstr ""
+msgstr "Prehľadávanie diskových zariadení virtuálneho stroja VMware, \"url\" – URL služby VMware, \"uuid\" – globálny jedinečný identifikátor virtuálneho stroja VMware. Vráti JSON"
 
 #: include/classes/items/CHelpItems.php:1047
 msgid "Discovery of VMware virtual machine disk devices, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
@@ -5382,7 +5382,7 @@ msgstr "Discovery diskových zariadení virtuálneho stroja VMware, <url> - URL 
 
 #: include/classes/items/CHelpItems.php:1059
 msgid "Discovery of VMware virtual machine file systems, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier. Returns JSON"
-msgstr ""
+msgstr "Prehľadávanie súborových systémov virtuálneho stroja VMware, \"url\" – URL služby VMware, \"uuid\" – globálny jedinečný identifikátor virtuálneho stroja VMware. Vráti JSON"
 
 #: include/classes/items/CHelpItems.php:1059
 msgid "Discovery of VMware virtual machine file systems, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
@@ -5390,7 +5390,7 @@ msgstr "Discovery súborových systémov virtuálneho stroja VMware, <url> - URL
 
 #: include/classes/items/CHelpItems.php:971
 msgid "Discovery of VMware virtual machines, \"url\" - VMware service URL. Returns JSON"
-msgstr ""
+msgstr "Prehľadávanie virtuálnych strojov VMware, \"url\" – URL služby VMware. Vráti JSON"
 
 #: include/classes/items/CHelpItems.php:971
 msgid "Discovery of VMware virtual machines, <url> - VMware service URL. Returns JSON"
@@ -6503,7 +6503,7 @@ msgstr "Pole \"%1$s\" nie je správne: %2$s"
 #: include/validate.inc.php:185 include/validate.inc.php:190
 #, c-format
 msgid "Field \"%1$s\" is not correct: %2$s."
-msgstr ""
+msgstr "Pole \"%1$s\" nie je správne: %2$s."
 
 #: include/validate.inc.php:167
 #, c-format
@@ -11563,9 +11563,9 @@ msgstr[2] "Moduly boli odstránené: %1$s."
 #: app/controllers/CControllerModuleUpdate.php:134
 msgid "Module disabled"
 msgid_plural "Modules disabled"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Modul vypnutý"
+msgstr[1] "Moduly vypnuté"
+msgstr[2] "Moduly vypnuté"
 
 #: app/controllers/CControllerModuleUpdate.php:150
 #, c-format
@@ -11578,9 +11578,9 @@ msgstr[2] "Moduly sú zakázané: %1$s."
 #: app/controllers/CControllerModuleUpdate.php:131
 msgid "Module enabled"
 msgid_plural "Modules enabled"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Modul povolený"
+msgstr[1] "Moduly povolené"
+msgstr[2] "Moduly povolené"
 
 #: app/controllers/CControllerModuleUpdate.php:145
 #, c-format
@@ -11592,7 +11592,7 @@ msgstr[2] "Moduly sú povolené: %1$s."
 
 #: app/controllers/CControllerModuleUpdate.php:128
 msgid "Module updated"
-msgstr ""
+msgstr "Modul aktualizovaný"
 
 #: app/controllers/CControllerModuleUpdate.php:142
 #, c-format
@@ -12735,7 +12735,7 @@ msgstr "Počet problémov a rozšírenie najkritickejšieho"
 
 #: include/classes/items/CHelpItems.php:875
 msgid "Number of processor cores on VMware hypervisor, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifiere"
-msgstr ""
+msgstr "Počet procesorových jadier na hypervízore VMware, \"url\" – URL služby VMware, \"uuid\" – globálny jedinečný identifikátor hypervízora VMware"
 
 #: include/classes/items/CHelpItems.php:875
 msgid "Number of processor cores on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -12743,7 +12743,7 @@ msgstr "Počet procesorových jadier na VMware, <url> - URL VMware služby, <uui
 
 #: include/classes/items/CHelpItems.php:879
 msgid "Number of processor threads on VMware hypervisor, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "Počet vlákien procesora na hypervízore VMware, \"url\" – adresa URL služby VMware, \"uuid\" – globálny jedinečný identifikátor hypervízora VMware"
 
 #: include/classes/items/CHelpItems.php:879
 msgid "Number of processor threads on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -12751,7 +12751,7 @@ msgstr "Počet procesorových threadov na VMware, <url> - URL VMware služby, <u
 
 #: include/classes/items/CHelpItems.php:955
 msgid "Number of processors on VMware virtual machine, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "Počet procesorov na virtuálnom stroji VMware, \"url\" – URL služby VMware, \"uuid\" – globálny jedinečný identifikátor virtuálneho stroja VMware"
 
 #: include/classes/items/CHelpItems.php:955
 msgid "Number of processors on VMware virtual machine, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -12833,7 +12833,7 @@ msgstr "Počet hodnôt uložených v tabuľke TRENDS_UINT."
 
 #: include/classes/items/CHelpItems.php:943
 msgid "Number of virtual machines on VMware hypervisor, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "Počet virtuálnych počítačov na hypervízore VMware, \"url\" – URL služby VMware, \"uuid\" – globálny jedinečný identifikátor hypervízora VMware"
 
 #: include/classes/items/CHelpItems.php:943
 msgid "Number of virtual machines on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -13031,13 +13031,13 @@ msgstr "Skupiny používateľov môžu aktualizovať iba superadministrátori."
 #: include/classes/api/services/CUser.php:600
 #, c-format
 msgid "Only Super admin or Admin users can update \"%1$s\" parameter."
-msgstr ""
+msgstr "Parameter \"%1$s\" môžu aktualizovať iba používatelia superadministrátori alebo správcovia."
 
 #: include/classes/api/services/CUser.php:505
 #: include/classes/api/services/CUser.php:550
 #, c-format
 msgid "Only Super admin users can update \"%1$s\" parameter."
-msgstr ""
+msgstr "Parameter \"%1$s\" môžu aktualizovať iba používatelia superadministrátori."
 
 #: include/classes/api/services/CDRule.php:481
 msgid "Only Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 checks can be made unique."
@@ -18553,7 +18553,7 @@ msgstr "VMware štatistiky cache. Platné módy sú: total, free, pfree, used a 
 
 #: include/classes/items/CHelpItems.php:791
 msgid "VMware cluster status, \"url\" - VMware service URL, \"name\" - VMware cluster name"
-msgstr ""
+msgstr "Stav klastra VMware, \"url\" – adresa URL služby VMware, \"názov\" – názov klastra VMware"
 
 #: include/classes/items/CHelpItems.php:791
 msgid "VMware cluster status, <url> - VMware service URL, <name> - VMware cluster name"
@@ -18570,7 +18570,7 @@ msgstr "Štatistika kapacity dátového úložiska VMware v bajtoch alebo v perc
 
 #: include/classes/items/CHelpItems.php:799
 msgid "VMware datastore hypervisors list, \"url\" - VMware service URL, \"datastore\" - datastore name"
-msgstr ""
+msgstr "Zoznam úložísk datastore pre hypervízor VMware, \"url\" – adresa URL služby VMware, \"úložisko\" – názov úložiska"
 
 #: include/classes/items/CHelpItems.php:799
 msgid "VMware datastore hypervisors list, <url> - VMware service URL, <datastore> - datastore name"
@@ -18578,7 +18578,7 @@ msgstr "Zoznam hypervízorov datastoru VMware, <url> – adresa URL služby VMwa
 
 #: include/classes/items/CHelpItems.php:803
 msgid "VMware datastore read statistics, \"url\" - VMware service URL, \"datastore\" - datastore name, \"mode\" - latency/maxlatency - average or maximum"
-msgstr ""
+msgstr "Štatistiky metriky čítania dátového úložiska VMware, \"url\" – adresa URL služby VMware, \"úložisko údajov\" – názov dátového úložiska, \"režim\" – latencia/maxlatencia – priemerné alebo maximálne"
 
 #: include/classes/items/CHelpItems.php:803
 msgid "VMware datastore read statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum"
@@ -18586,7 +18586,7 @@ msgstr "Štatistika čítania dátastoru VMware, <url> - URL služby VMware, <da
 
 #: include/classes/items/CHelpItems.php:811
 msgid "VMware datastore write statistics, \"url\" - VMware service URL, \"datastore\" - datastore name, \"mode\" - latency/maxlatency - average or maximum"
-msgstr ""
+msgstr "Štatistika metriky zápisu dátového úložiska VMware, \"url\" - URL služby VMware, \"datastore\" - názov dátového úložiska, \"režim\" - latencia/maxlatencia - priemer alebo maximum"
 
 #: include/classes/items/CHelpItems.php:811
 msgid "VMware datastore write statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum"
@@ -18594,7 +18594,7 @@ msgstr "Štatistika zápisu do datastoru VMware, <url> - URL služby VMware, <da
 
 #: include/classes/items/CHelpItems.php:819
 msgid "VMware event log, \"url\" - VMware service URL, \"mode\" - all (default), skip - skip processing of older data"
-msgstr ""
+msgstr "Protokol udalostí VMware, \"url\" – URL služby VMware, \"režim\" – všetko (predvolené), skip – preskočenie spracovania starších údajov"
 
 #: include/classes/items/CHelpItems.php:819
 msgid "VMware event log, <url> - VMware service URL, <mode> - all (default), skip - skip processing of older data"
@@ -18602,7 +18602,7 @@ msgstr "Protokol udalostí VMware, <url> - URL služby VMware, <režim> - všetk
 
 #: include/classes/items/CHelpItems.php:891
 msgid "VMware hypervisor BIOS uuid, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "UUID BIOS hypervízora VMware, \"url\" – URL služby VMware, \"uuid\" – globálny jedinečný identifikátor hypervízora VMware"
 
 #: include/classes/items/CHelpItems.php:891
 msgid "VMware hypervisor BIOS uuid, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -18610,7 +18610,7 @@ msgstr "VMware BIOS uuid, <url> - URL VMware služby, <uuid> - VMware host meno"
 
 #: include/classes/items/CHelpItems.php:923
 msgid "VMware hypervisor HW vendor state sensors, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns JSON"
-msgstr ""
+msgstr "Senzory stavu hardvéru hypervízora VMware, \"url\" – URL služby VMware, \"uuid\" – globálny jedinečný identifikátor hypervízora VMware. Vráti JSON"
 
 #: include/classes/items/CHelpItems.php:923
 msgid "VMware hypervisor HW vendor state sensors, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
@@ -18618,7 +18618,7 @@ msgstr "Senzory stavu HW hypervízora VMware, <url> - URL služby VMware, <uuid>
 
 #: include/classes/items/CHelpItems.php:903
 msgid "VMware hypervisor ballooned memory size, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "Veľkosť pamäte (ballooned) hypervízora VMware, \"url\" – adresa URL služby VMware, \"uuid\" – globálny jedinečný identifikátor hypervízora VMware"
 
 #: include/classes/items/CHelpItems.php:903
 msgid "VMware hypervisor ballooned memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -18626,7 +18626,7 @@ msgstr "VMware veľkosť balloned pamäti, <url> - URL VMware služby, <uuid> - 
 
 #: include/classes/items/CHelpItems.php:827
 msgid "VMware hypervisor cluster name, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "Názov klastra hypervízora VMware, \"url\" – adresa URL služby VMware, \"uuid\" – globálny jedinečný identifikátor hypervízora VMware"
 
 #: include/classes/items/CHelpItems.php:827
 msgid "VMware hypervisor cluster name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -18634,7 +18634,7 @@ msgstr "VMware kluster meno, <url> - URL VMware služby, <uuid> - VMware host me
 
 #: include/classes/items/CHelpItems.php:835
 msgid "VMware hypervisor datacenter name, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns string"
-msgstr ""
+msgstr "Názov dátového centra hypervízora VMware, \"url\" – adresa URL služby VMware, \"uuid\" – globálny jedinečný identifikátor hypervízora VMware. Vráti reťazec"
 
 #: include/classes/items/CHelpItems.php:835
 msgid "VMware hypervisor datacenter name, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns string"
@@ -18642,7 +18642,7 @@ msgstr "Názov dátového centra hypervízora VMware, <url> – adresa URL služ
 
 #: include/classes/items/CHelpItems.php:847
 msgid "VMware hypervisor datastore read statistics, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"datastore\" - datastore name, \"mode\" - latency"
-msgstr ""
+msgstr "Štatistiky operácií čítania dátového úložiska hypervízora VMware, \"url\" – URL služby VMware, \"uuid\" – globálny jedinečný identifikátor hypervízora VMware, \"úložisko\" – názov dátového úložiska, \"režim\" – latencia"
 
 #: include/classes/items/CHelpItems.php:847
 msgid "VMware hypervisor datastore read statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - datastore name, <mode> - latency"
@@ -18650,7 +18650,7 @@ msgstr "VMware štatistika čítania datastore, <url> - URL VMware služby, <uui
 
 #: include/classes/items/CHelpItems.php:855
 msgid "VMware hypervisor datastore write statistics, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"datastore\" - datastore name, \"mode\" - latency"
-msgstr ""
+msgstr "Štatistika operácií zápisu dátového úložiska hypervízora VMware, \"url\" – adresa URL služby VMware, \"uuid\" – globálny jedinečný identifikátor hypervízora VMware, \"úložisko\" – názov úložiska údajov, \"režim\" – latencia"
 
 #: include/classes/items/CHelpItems.php:855
 msgid "VMware hypervisor datastore write statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - datastore name, <mode> - latency"
@@ -18658,7 +18658,7 @@ msgstr "VMware štatistika zápisov datastore, <url> - URL VMware služby, <uuid
 
 #: include/classes/items/CHelpItems.php:843
 msgid "VMware hypervisor datastores list, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "Zoznam dátových úložísk hypervízora VMware, \"url\" – URL služby VMware, \"uuid\" – globálny jedinečný identifikátor hypervízora VMware"
 
 #: include/classes/items/CHelpItems.php:843
 msgid "VMware hypervisor datastores list, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -18666,7 +18666,7 @@ msgstr "Zoznam datastorov hypervízora VMware, <url> – URL služby VMware, <uu
 
 #: include/classes/items/CHelpItems.php:927
 msgid "VMware hypervisor health state rollup sensor, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns 0 - gray; 1 - green; 2 - yellow; 3 - red"
-msgstr ""
+msgstr "Senzor celkového stavu hypervízora VMware, \"url\" – URL služby VMware, \"uuid\" – globálny jedinečný identifikátor hypervízora VMware. Vráti 0 - šedá; 1 - zelená; 2 - žltá; 3 - červená"
 
 #: include/classes/items/CHelpItems.php:927
 msgid "VMware hypervisor health state rollup sensor, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns 0 - gray; 1 - green; 2 - yellow; 3 - red"
@@ -18674,7 +18674,7 @@ msgstr "Senzor zdravotného stavu hypervízora VMware, <url> – URL služby VMw
 
 #: include/classes/items/CHelpItems.php:899
 msgid "VMware hypervisor maintenance status, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "Stav údržby hypervízora VMware, \"url\" – adresa URL služby VMware, \"uuid\" – globálny jedinečný identifikátor hypervízora VMware"
 
 #: include/classes/items/CHelpItems.php:899
 msgid "VMware hypervisor maintenance status, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -18682,7 +18682,7 @@ msgstr "Stav údržby hypervízora VMware, <url> – adresa URL služby VMware, 
 
 #: include/classes/items/CHelpItems.php:887
 msgid "VMware hypervisor model, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "Model hypervízora VMware, \"url\" – adresa URL služby VMware, \"uuid\" – globálny jedinečný identifikátor hypervízora VMware"
 
 #: include/classes/items/CHelpItems.php:887
 msgid "VMware hypervisor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -18690,7 +18690,7 @@ msgstr "VMware model, <url> - URL VMware služby, <uuid> - VMware host meno"
 
 #: include/classes/items/CHelpItems.php:863
 msgid "VMware hypervisor name, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "Názov hypervízora VMware, \"url\" – adresa URL služby VMware, \"uuid\" – globálny jedinečný identifikátor hypervízora VMware"
 
 #: include/classes/items/CHelpItems.php:863
 msgid "VMware hypervisor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -18698,7 +18698,7 @@ msgstr "VMware meno, <url> - URL VMware služby, <uuid> - VMware host meno"
 
 #: include/classes/items/CHelpItems.php:911
 msgid "VMware hypervisor network input statistics, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"mode\" - bps"
-msgstr ""
+msgstr "Štatistika sieťového vstupu hypervízora VMware, \"url\" – adresa URL služby VMware, \"uuid\" – globálny jedinečný identifikátor hypervízora VMware, \"režim\" – bps"
 
 #: include/classes/items/CHelpItems.php:911
 msgid "VMware hypervisor network input statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
@@ -18706,7 +18706,7 @@ msgstr "VMware vstupné sieťové štatistiky, <url> - URL VMware služby, <uuid
 
 #: include/classes/items/CHelpItems.php:915
 msgid "VMware hypervisor network output statistics, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"mode\" - bps"
-msgstr ""
+msgstr "Štatistika sieťového výstupu hypervízora VMware, \"url\" – adresa URL služby VMware, \"uuid\" – globálny jedinečný identifikátor hypervízora VMware, \"režim\" – bps"
 
 #: include/classes/items/CHelpItems.php:915
 msgid "VMware hypervisor network output statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
@@ -18714,7 +18714,7 @@ msgstr "VMware výstupné sieťové štatistiky, <url> - URL VMware služby, <uu
 
 #: include/classes/items/CHelpItems.php:919
 msgid "VMware hypervisor performance counter, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"path\" - performance counter path, \"instance\" - performance counter instance"
-msgstr ""
+msgstr "Počítadlo výkonu hypervízora VMware, \"url\" - URL služby VMware, \"uuid\" - globálny jedinečný identifikátor hypervízora VMware, \"cesta\" - cesta počítadla výkonu, \"inštancia\" - inštancia počítadla výkonu"
 
 #: include/classes/items/CHelpItems.php:919
 msgid "VMware hypervisor performance counter, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <path> - performance counter path, <instance> - performance counter instance"
@@ -18722,7 +18722,7 @@ msgstr "VMware performance counter, <url> - VMware servisná URL, <uuid> - VMwar
 
 #: include/classes/items/CHelpItems.php:867
 msgid "VMware hypervisor processor frequency, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "Frekvencia procesora hypervízora VMware, \"url\" – adresa URL služby VMware, \"uuid\" – globálny jedinečný identifikátor hypervízora VMware"
 
 #: include/classes/items/CHelpItems.php:867
 msgid "VMware hypervisor processor frequency, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -18730,7 +18730,7 @@ msgstr "VMware frekvencia procesora, <url> - URL VMware služby, <uuid> - VMware
 
 #: include/classes/items/CHelpItems.php:871
 msgid "VMware hypervisor processor model, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "Model procesora hypervízora VMware, \"url\" – URL služby VMware, \"uuid\" – globálny jedinečný identifikátor hypervízora VMware"
 
 #: include/classes/items/CHelpItems.php:871
 msgid "VMware hypervisor processor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -18738,7 +18738,7 @@ msgstr "VMware model procesora, <url> - URL VMware služby, <uuid> - VMware host
 
 #: include/classes/items/CHelpItems.php:831
 msgid "VMware hypervisor processor usage in Hz, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "Využitie procesora hypervízora VMware v Hz, \"url\" – adresa URL služby VMware, \"uuid\" – globálny jedinečný identifikátor hypervízora VMware"
 
 #: include/classes/items/CHelpItems.php:831
 msgid "VMware hypervisor processor usage in Hz, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -18746,7 +18746,7 @@ msgstr "VMware využitie procesora v Hz, <url> - URL VMware služby, <uuid> - VM
 
 #: include/classes/items/CHelpItems.php:931
 msgid "VMware hypervisor status, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "Stav hypervízora VMware, \"url\" – adresa URL služby VMware, \"uuid\" – globálny jedinečný identifikátor hypervízora VMware"
 
 #: include/classes/items/CHelpItems.php:931
 msgid "VMware hypervisor status, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -18754,7 +18754,7 @@ msgstr "VMware status, <url> - URL VMware služby, <uuid> - VMware host meno"
 
 #: include/classes/items/CHelpItems.php:883
 msgid "VMware hypervisor total memory size, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "Celková veľkosť pamäte hypervízora VMware, \"url\" – adresa URL služby VMware, \"uuid\" – globálny jedinečný identifikátor hypervízora VMware"
 
 #: include/classes/items/CHelpItems.php:883
 msgid "VMware hypervisor total memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -18762,7 +18762,7 @@ msgstr "VMware celková veľkosť pamäte, <url> - URL VMware služby, <uuid> - 
 
 #: include/classes/items/CHelpItems.php:935
 msgid "VMware hypervisor uptime, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "Doba prevádzky hypervízora VMware, \"url\" – adresa URL služby VMware, \"uuid\" – globálny jedinečný identifikátor hypervízora VMware"
 
 #: include/classes/items/CHelpItems.php:935
 msgid "VMware hypervisor uptime, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -18770,7 +18770,7 @@ msgstr "VMware prevádzkový čas, <url> - URL VMware služby, <uuid> - VMware h
 
 #: include/classes/items/CHelpItems.php:907
 msgid "VMware hypervisor used memory size, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "Veľkosť použitej pamäte hypervízora VMware, \"url\" – adresa URL služby VMware, \"uuid\" – globálny jedinečný identifikátor hypervízora VMware"
 
 #: include/classes/items/CHelpItems.php:907
 msgid "VMware hypervisor used memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -18778,7 +18778,7 @@ msgstr "VMware veľkosť použitej pamäte, <url> - URL VMware služby, <uuid> -
 
 #: include/classes/items/CHelpItems.php:895
 msgid "VMware hypervisor vendor name, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "Názov výrobcu hypervízora VMware, \"url\" – adresa URL služby VMware, \"uuid\" – globálny jedinečný identifikátor hypervízora VMware"
 
 #: include/classes/items/CHelpItems.php:895
 msgid "VMware hypervisor vendor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -18786,7 +18786,7 @@ msgstr "VMware meno predajcu, <url> - URL VMware služby, <uuid> - VMware host m
 
 #: include/classes/items/CHelpItems.php:939
 msgid "VMware hypervisor version, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "Verzia hypervízora VMware, \"url\" – adresa URL služby VMware, \"uuid\" – globálny jedinečný identifikátor hypervízora VMware"
 
 #: include/classes/items/CHelpItems.php:939
 msgid "VMware hypervisor version, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -18794,7 +18794,7 @@ msgstr "VMware verzia, <url> - URL VMware služby, <uuid> - VMware host meno"
 
 #: include/classes/items/CHelpItems.php:823
 msgid "VMware service full name, \"url\" - VMware service URL"
-msgstr ""
+msgstr "Celý názov služby VMware, \"url\" – URL služby VMware"
 
 #: include/classes/items/CHelpItems.php:823
 msgid "VMware service full name, <url> - VMware service URL"
@@ -18802,7 +18802,7 @@ msgstr "VMware plné meno služby, <url> - URL VMware služby"
 
 #: include/classes/items/CHelpItems.php:947
 msgid "VMware service version, \"url\" - VMware service URL"
-msgstr ""
+msgstr "Verzia služby VMware, \"url\" – URL služby VMware"
 
 #: include/classes/items/CHelpItems.php:947
 msgid "VMware service version, <url> - VMware service URL"
@@ -18810,7 +18810,7 @@ msgstr "VMware verzia, <url> - URL VMware služby"
 
 #: include/classes/items/CHelpItems.php:983
 msgid "VMware virtual machine ballooned memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "Veľkosť pamäte (ballooned) virtuálneho počítača VMware, \"url\" – adresa URL služby VMware, \"uuid\" – globálny jedinečný identifikátor virtuálneho počítača VMware"
 
 #: include/classes/items/CHelpItems.php:983
 msgid "VMware virtual machine ballooned memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -18818,7 +18818,7 @@ msgstr "VMware veľkosť balloned pamäti virtuálneho stroja, <url> - URL VMwar
 
 #: include/classes/items/CHelpItems.php:1031
 msgid "VMware virtual machine committed storage space, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "Úložný priestor vyžiadaný virtuálnym strojom VMware, \"url\" – adresa URL služby VMware, \"uuid\" – globálny jedinečný identifikátor virtuálneho stroja VMware"
 
 #: include/classes/items/CHelpItems.php:1031
 msgid "VMware virtual machine committed storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -18826,7 +18826,7 @@ msgstr "VMware použitý úložný priestor virtuálnym strojom, <url> - URL VMw
 
 #: include/classes/items/CHelpItems.php:987
 msgid "VMware virtual machine compressed memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "Veľkosť komprimovanej pamäte virtuálneho stroja VMware, \"url\" – adresa URL služby VMware, \"uuid\" – globálny jedinečný identifikátor virtuálneho stroja VMware"
 
 #: include/classes/items/CHelpItems.php:987
 msgid "VMware virtual machine compressed memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -18834,7 +18834,7 @@ msgstr "VMware veľkosť komprimovanej pamäte virtuálneho stroja, <url> - URL 
 
 #: include/classes/items/CHelpItems.php:967
 msgid "VMware virtual machine datacenter name, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "Názov dátového centra virtuálneho stroja VMware, \"url\" – adresa URL služby VMware, \"uuid\" – globálny jedinečný identifikátor virtuálneho stroja VMware"
 
 #: include/classes/items/CHelpItems.php:967
 msgid "VMware virtual machine datacenter name, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns string"
@@ -18842,7 +18842,7 @@ msgstr "Názov dátového centra virtuálneho počítača VMware, <url> - URL sl
 
 #: include/classes/items/CHelpItems.php:1051
 msgid "VMware virtual machine disk device read statistics, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - disk device instance, \"mode\" - bps/ops - bytes/operations per second"
-msgstr ""
+msgstr "Štatistika čítania disku virtuálneho stroja VMware, \"url\" – URL služby VMware, \"uuid\" – globálny jedinečný identifikátor virtuálneho stroja VMware, \"instance\" – inštancia diskového zariadenia, \"režim\" – bps/ops – bajty/operácie za sekundu"
 
 #: include/classes/items/CHelpItems.php:1051
 msgid "VMware virtual machine disk device read statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
@@ -18850,7 +18850,7 @@ msgstr "VMware štatistika čítania diskov virtuálneho stroja, <url> - URL VMw
 
 #: include/classes/items/CHelpItems.php:1055
 msgid "VMware virtual machine disk device write statistics, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - disk device instance, \"mode\" - bps/ops - bytes/operations per second"
-msgstr ""
+msgstr "Štatistika zápisu diskového zariadenia virtuálneho stroja VMware, \"url\" – URL služby VMware, \"uuid\" – globálny jedinečný identifikátor virtuálneho stroja VMware, \"instance\" – inštancia diskového zariadenia, \"režim\" – bps/ops – bajty/operácie za sekundu"
 
 #: include/classes/items/CHelpItems.php:1055
 msgid "VMware virtual machine disk device write statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
@@ -18858,7 +18858,7 @@ msgstr "VMware štatistika zápisov diskov virtuálneho stroja, <url> - URL VMwa
 
 #: include/classes/items/CHelpItems.php:1063
 msgid "VMware virtual machine file system statistics, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"fsname\" - file system name, \"mode\" - total/free/used/pfree/pused"
-msgstr ""
+msgstr "Štatistika súborového systému virtuálneho stroja VMware, \"url\" – URL služby VMware, \"uuid\" – globálny jedinečný identifikátor virtuálneho stroja VMware, \"fsname\" – názov systému súborov, \"režim\"- celkom/voľne/použité/pfree/pused"
 
 #: include/classes/items/CHelpItems.php:1063
 msgid "VMware virtual machine file system statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <fsname> - file system name, <mode> - total/free/used/pfree/pused"
@@ -18866,7 +18866,7 @@ msgstr "VMware štatistika súborového systému virtuálneho stroja, <url> - UR
 
 #: include/classes/items/CHelpItems.php:1003
 msgid "VMware virtual machine guest memory usage, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "Využitie pamäte hosťa virtuálneho počítača VMware, \"url\" – adresa URL služby VMware, \"uuid\" – globálny jedinečný identifikátor virtuálneho počítača VMware"
 
 #: include/classes/items/CHelpItems.php:1003
 msgid "VMware virtual machine guest memory usage, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -18874,7 +18874,7 @@ msgstr "VMware využitie hostiteľskej pamäti virtuálneho stroja, <url> - URL 
 
 #: include/classes/items/CHelpItems.php:1007
 msgid "VMware virtual machine host memory usage, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "Využitie pamäte hostiteľa virtuálneho počítača VMware, \"url\" – adresa URL služby VMware, \"uuid\" – globálny jedinečný identifikátor virtuálneho počítača VMware"
 
 #: include/classes/items/CHelpItems.php:1007
 msgid "VMware virtual machine host memory usage, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -18882,7 +18882,7 @@ msgstr "VMware využitie hostovej pamäti virtuálneho stroja, <url> - URL VMwar
 
 #: include/classes/items/CHelpItems.php:975
 msgid "VMware virtual machine hypervisor name, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "Názov hypervízora virtuálneho stroja VMware, \"url\" – adresa URL služby VMware, \"uuid\" – globálny jedinečný identifikátor virtuálneho stroja VMware"
 
 #: include/classes/items/CHelpItems.php:975
 msgid "VMware virtual machine hypervisor name, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -18890,7 +18890,7 @@ msgstr "VMware meno hypervízora virtuálneho stroja, <url> - URL VMware služby
 
 #: include/classes/items/CHelpItems.php:951
 msgid "VMware virtual machine name, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "Názov virtuálneho počítača VMware, \"url\" – adresa URL služby VMware, \"uuid\" – globálny jedinečný identifikátor virtuálneho počítača VMware"
 
 #: include/classes/items/CHelpItems.php:951
 msgid "VMware virtual machine name, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -18898,7 +18898,7 @@ msgstr "VMware meno virtuálneho stroja, <url> - URL VMware služby, <uuid> - VM
 
 #: include/classes/items/CHelpItems.php:1015
 msgid "VMware virtual machine network interface input statistics, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - network interface instance, \"mode\" - bps/pps - bytes/packets per second"
-msgstr ""
+msgstr "Štatistika vstupu sieťového rozhrania virtuálneho stroja VMware, \"url\" – URL služby VMware, \"uuid\" – globálny jedinečný identifikátor virtuálneho stroja VMware, \"inštancia\" – inštancia sieťového rozhrania, \"režim\" – bps/pps – bajty/pakety za sekundu"
 
 #: include/classes/items/CHelpItems.php:1015
 msgid "VMware virtual machine network interface input statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance, <mode> - bps/pps - bytes/packets per second"
@@ -18906,7 +18906,7 @@ msgstr "VMware štatistika vstupov sieťového rozhrania virtuálneho stroja, <u
 
 #: include/classes/items/CHelpItems.php:1019
 msgid "VMware virtual machine network interface output statistics, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - network interface instance, \"mode\" - bps/pps - bytes/packets per second"
-msgstr ""
+msgstr "Štatistika výstupu sieťového rozhrania virtuálneho stroja VMware, \"url\" – URL služby VMware, \"uuid\" – globálny jedinečný identifikátor virtuálneho stroja VMware, \"instance\" – inštancia sieťového rozhrania, \"režim\" – bps/pps – bajty/pakety za sekundu"
 
 #: include/classes/items/CHelpItems.php:1019
 msgid "VMware virtual machine network interface output statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance, <mode> - bps/pps - bytes/packets per second"
@@ -18914,7 +18914,7 @@ msgstr "VMware štatistika výstupov sieťového rozhrania virtuálneho stroja, 
 
 #: include/classes/items/CHelpItems.php:1023
 msgid "VMware virtual machine performance counter, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"path\" - performance counter path, \"instance\" - performance counter instance"
-msgstr ""
+msgstr "Počítadlo metriky výkonu virtuálneho stroja VMware, \"url\" – URL služby VMware, \"uuid\" – globálny jedinečný identifikátor virtuálneho stroja VMware, \"cesta\" – cesta počítadla výkonu, \"instance\" – inštancia počítadla výkonu"
 
 #: include/classes/items/CHelpItems.php:1023
 msgid "VMware virtual machine performance counter, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <path> - performance counter path, <instance> - performance counter instance"
@@ -18922,7 +18922,7 @@ msgstr "VMware VM performance counter, <url> - VMware service URL, <uuid> - VMwa
 
 #: include/classes/items/CHelpItems.php:1027
 msgid "VMware virtual machine power state, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "Stav zapnutia virtuálneho počítača VMware, \"url\" – adresa URL služby VMware, \"uuid\" – globálny jedinečný identifikátor virtuálneho počítača VMware"
 
 #: include/classes/items/CHelpItems.php:1027
 msgid "VMware virtual machine power state, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -18930,7 +18930,7 @@ msgstr "VMware stav napájania virtuálneho stroja, <url> - URL VMware služby, 
 
 #: include/classes/items/CHelpItems.php:991
 msgid "VMware virtual machine private memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "Veľkosť privátnej pamäte virtuálneho počítača VMware, \"url\" – adresa URL služby VMware, \"uuid\" – globálny jedinečný identifikátor virtuálneho počítača VMware"
 
 #: include/classes/items/CHelpItems.php:991
 msgid "VMware virtual machine private memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -18938,7 +18938,7 @@ msgstr "VMware veľkosť privátnej pamäte virtuálneho stroja, <url> - URL VMw
 
 #: include/classes/items/CHelpItems.php:959
 msgid "VMware virtual machine processor ready time ms, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "Čas pripravenosti procesora virtuálneho stroja VMware ms, \"url\" – URL služby VMware, \"uuid\" – globálny jedinečný identifikátor virtuálneho stroja VMware"
 
 #: include/classes/items/CHelpItems.php:959
 msgid "VMware virtual machine processor ready time ms, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -18946,7 +18946,7 @@ msgstr "Čas pripravenosti procesora virtuálneho počítača VMware ms, <url> -
 
 #: include/classes/items/CHelpItems.php:963
 msgid "VMware virtual machine processor usage in Hz, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "Využitie procesora virtuálneho stroja VMware v Hz, \"url\" – URL služby VMware, \"uuid\" – globálny jedinečný identifikátor virtuálneho stroja VMware"
 
 #: include/classes/items/CHelpItems.php:963
 msgid "VMware virtual machine processor usage in Hz, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -18954,7 +18954,7 @@ msgstr "VMware využitie procesora virtuálneho stroja v Hz, <url> - URL VMware 
 
 #: include/classes/items/CHelpItems.php:995
 msgid "VMware virtual machine shared memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "Veľkosť zdieľanej pamäte virtuálneho stroja VMware, \"url\" – adresa URL služby VMware, \"uuid\" – globálny jedinečný identifikátor virtuálneho stroja VMware"
 
 #: include/classes/items/CHelpItems.php:995
 msgid "VMware virtual machine shared memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -18962,7 +18962,7 @@ msgstr "VMware veľkosť zdielanej pamäte virtuálneho stroja, <url> - URL VMwa
 
 #: include/classes/items/CHelpItems.php:999
 msgid "VMware virtual machine swapped memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "Veľkosť swap pamäte virtuálneho stroja VMware, \"url\" – adresa URL služby VMware, \"uuid\" – globálny jedinečný identifikátor virtuálneho stroja VMware"
 
 #: include/classes/items/CHelpItems.php:999
 msgid "VMware virtual machine swapped memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -18970,7 +18970,7 @@ msgstr "VMware veľkosť swapovanej pamäte virtuálneho stroja, <url> - URL VMw
 
 #: include/classes/items/CHelpItems.php:979
 msgid "VMware virtual machine total memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "Celková veľkosť pamäte virtuálneho stroja VMware, \"url\" – URL služby VMware, \"uuid\" – globálny jedinečný identifikátor virtuálneho stroja VMware"
 
 #: include/classes/items/CHelpItems.php:979
 msgid "VMware virtual machine total memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -18978,7 +18978,7 @@ msgstr "VMware celková veľkosť pamäte virtuálneho stroja, <url> - URL VMwar
 
 #: include/classes/items/CHelpItems.php:1035
 msgid "VMware virtual machine uncommitted storage space, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "Nevyžiadaný (uncommitted) úložný priestor virtuálneho stroja VMware, \"url\" – adresa URL služby VMware, \"uuid\" – globálny jedinečný identifikátor virtuálneho stroja VMware"
 
 #: include/classes/items/CHelpItems.php:1035
 msgid "VMware virtual machine uncommitted storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -18986,7 +18986,7 @@ msgstr "VMware nevyužitý priestor virtuálneho stroja, <url> - URL VMware slu�
 
 #: include/classes/items/CHelpItems.php:1039
 msgid "VMware virtual machine unshared storage space, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "Nezdieľaný úložný priestor virtuálneho počítača VMware, \"url\" – adresa URL služby VMware, \"uuid\" – globálny jedinečný identifikátor virtuálneho počítača VMware"
 
 #: include/classes/items/CHelpItems.php:1039
 msgid "VMware virtual machine unshared storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -18994,7 +18994,7 @@ msgstr "VMware nezdieľaný priestor virtuálneho stroja, <url> - URL VMware slu
 
 #: include/classes/items/CHelpItems.php:1043
 msgid "VMware virtual machine uptime, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "Doba prevádzky virtuálneho stroja VMware, \"url\" – URL služby VMware, \"uuid\" – globálny jedinečný identifikátor virtuálneho stroja VMware"
 
 #: include/classes/items/CHelpItems.php:1043
 msgid "VMware virtual machine uptime, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -20561,7 +20561,7 @@ msgstr "neplatná sekvencia bajtov v UTF-8"
 
 #: include/validate.inc.php:190
 msgid "invalid data type"
-msgstr ""
+msgstr "neplatný typ údajov"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:115 include/items.inc.php:2035
 msgid "invalid delay"
