@@ -3243,7 +3243,8 @@ int	zbx_async_check_snmp(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_async_ta
 		goto out;
 	}
 
-	if (SUCCEED != zbx_parse_item_key(item->snmp_oid, &request))
+	if (SUCCEED != zbx_parse_item_key(item->snmp_oid, &request) &&
+			ZABBIX_ASYNC_RESOLVE_REVERSE_DNS_NO == resolve_reverse_dns)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid SNMP OID: cannot parse parameter."));
 		ret = CONFIG_ERROR;
