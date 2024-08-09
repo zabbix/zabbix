@@ -25,7 +25,7 @@ zabbix_export:
         
         For public repositories no additional permission scopes are required. For the private repositories the "repo" scope must be set (full control of private repositories) for the monitoring to work.
         
-        Additional information abouth OAuth scopes is available in the official documentation:
+        Additional information about OAuth scopes is available in the official documentation:
         https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/scopes-for-oauth-apps#available-scopes
         
         Note, that authenticated users must have admin access to the repository and the "repo" scope must be set to get the information about self-hosted runners:
@@ -508,30 +508,10 @@ zabbix_export:
           tags:
             - tag: component
               value: releases
-        - uuid: c0e4cf3a4f654f5b82d29db43aeaa6eb
-          name: 'Repository is a fork'
-          type: DEPENDENT
-          key: github.repo.repository.fork
-          description: 'Indicates, whether the repository is a fork.'
-          valuemap:
-            name: Boolean
-          preprocessing:
-            - type: JSONPATH
-              parameters:
-                - $.data..fork.first()
-            - type: BOOL_TO_DECIMAL
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 6h
-          master_item:
-            key: github.repo.repository.get
-          tags:
-            - tag: component
-              value: repository
         - uuid: 72a596dd573e4237a1fde665477bdfb5
           name: 'Repository forks'
           type: DEPENDENT
-          key: github.repo.repository.forks
+          key: github.repo.repository.forks.count
           description: 'The number of the repository forks.'
           preprocessing:
             - type: JSONPATH
@@ -726,6 +706,26 @@ zabbix_export:
               tags:
                 - tag: scope
                   value: availability
+        - uuid: c0e4cf3a4f654f5b82d29db43aeaa6eb
+          name: 'Repository is a fork'
+          type: DEPENDENT
+          key: github.repo.repository.is_fork
+          description: 'Indicates, whether the repository is a fork.'
+          valuemap:
+            name: Boolean
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.data..fork.first()
+            - type: BOOL_TO_DECIMAL
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          master_item:
+            key: github.repo.repository.get
+          tags:
+            - tag: component
+              value: repository
         - uuid: ece3996cba7e4561a6629df40299579f
           name: 'Repository size'
           type: DEPENDENT
@@ -1634,7 +1634,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'github.repo.runners.online[{#RUNNER_NAME}]'
               trends: '0'
-              description: 'Indicates whether the runner is is connected to GitHub and is ready to execute jobs.'
+              description: 'Indicates whether the runner is connected to GitHub and is ready to execute jobs.'
               valuemap:
                 name: Boolean
               preprocessing:
@@ -1665,7 +1665,7 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 3759039884e6486fb92f2a5abf7b1133
                   expression: 'last(/GitHub repository by HTTP/github.repo.runners.online[{#RUNNER_NAME}],#2)=1 and last(/GitHub repository by HTTP/github.repo.runners.online[{#RUNNER_NAME}])=0'
-                  name: 'GitHub: Runner [{#RUNNER_NAME}]: The runner has became offline'
+                  name: 'GitHub: Runner [{#RUNNER_NAME}]: The runner has become offline'
                   priority: WARNING
                   description: 'The runner was online previously but now it is not connected to GitHub. This could be because the machine is offline, the self-hosted runner application is not running on the machine, or the self-hosted runner application cannot communicate with GitHub.'
                   tags:
@@ -2562,7 +2562,7 @@ zabbix_export:
                       name: itemid.0
                       value:
                         host: 'GitHub repository by HTTP'
-                        key: github.repo.repository.forks
+                        key: github.repo.repository.forks.count
                     - type: INTEGER
                       name: show.0
                       value: '1'

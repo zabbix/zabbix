@@ -36,7 +36,7 @@ For example, you could create a new classic personal access token by following t
 
 For public repositories no additional permission scopes are required. For the private repositories the `repo` scope must be set (full control of private repositories) for the monitoring to work.
 
-Additional information abouth OAuth scopes is available in the [`official documentation`](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/scopes-for-oauth-apps#available-scopes).
+Additional information about OAuth scopes is available in the [`official documentation`](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/scopes-for-oauth-apps#available-scopes).
 
 **Note**, that authenticated users must have admin access to the repository and the `repo` scope must be set to get the information about [`self-hosted runners`](https://docs.github.com/en/rest/actions/self-hosted-runners?apiVersion=2022-11-28#list-self-hosted-runners-for-a-repository).
 
@@ -118,11 +118,11 @@ The fine-grained token needs to have the following permissions set to provide ac
 |Requests limit utilization, in %|<p>The calculated usage of API requests limit in %.</p><p></p><p>Information about request limits in GitHub REST API documentation:</p><p>https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api?apiVersion=2022-11-28</p>|Dependent item|github.repo.requests.util<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 |Get repository|<p>Get the general repository information. If the repository is not a fork, the community profile metrics are also retrieved.</p><p></p><p>Information about endpoint:</p><p>https://docs.github.com/en/rest/repos/repos?apiVersion=2022-11-28#get-a-repository</p><p></p><p>Information about community profile metrics:</p><p>https://docs.github.com/en/rest/metrics/community?apiVersion=2022-11-28#get-community-profile-metrics</p>|Script|github.repo.repository.get|
 |Get repository data check|<p>The data collection check.</p>|Dependent item|github.repo.repository.get.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to: ``</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
-|Repository is a fork|<p>Indicates, whether the repository is a fork.</p>|Dependent item|github.repo.repository.fork<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data..fork.first()`</p></li><li>Boolean to decimal</li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Repository is a fork|<p>Indicates, whether the repository is a fork.</p>|Dependent item|github.repo.repository.is_fork<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data..fork.first()`</p></li><li>Boolean to decimal</li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 |Repository size|<p>The size of the repository.</p>|Dependent item|github.repo.repository.size<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data..size.first()`</p></li><li><p>Custom multiplier: `1024`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |Repository stargazers|<p>The number of GitHub users who starred the repository.</p>|Dependent item|github.repo.repository.stargazers<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data..stargazers_count.first()`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |Repository watchers|<p>The number of GitHub users who are subscribed to the repository.</p>|Dependent item|github.repo.repository.watchers<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data..subscribers_count.first()`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
-|Repository forks|<p>The number of the repository forks.</p>|Dependent item|github.repo.repository.forks<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data..forks_count.first()`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Repository forks|<p>The number of the repository forks.</p>|Dependent item|github.repo.repository.forks.count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data..forks_count.first()`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 
 ### Triggers
 
@@ -182,13 +182,13 @@ The fine-grained token needs to have the following permissions set to provide ac
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |Runner [{#RUNNER_NAME}]: Busy|<p>Indicates whether the runner is currently executing a job.</p>|Dependent item|github.repo.runners.busy[{#RUNNER_NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.id == "{#RUNNER_ID}")].busy.first()`</p></li><li>Boolean to decimal</li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Runner [{#RUNNER_NAME}]: Online|<p>Indicates whether the runner is is connected to GitHub and is ready to execute jobs.</p>|Dependent item|github.repo.runners.online[{#RUNNER_NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.id == "{#RUNNER_ID}")].status.first()`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Runner [{#RUNNER_NAME}]: Online|<p>Indicates whether the runner is connected to GitHub and is ready to execute jobs.</p>|Dependent item|github.repo.runners.online[{#RUNNER_NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.id == "{#RUNNER_ID}")].status.first()`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Trigger prototypes for Self-hosted runners discovery
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|GitHub: Runner [{#RUNNER_NAME}]: The runner has became offline|<p>The runner was online previously but now it is not connected to GitHub. This could be because the machine is offline, the self-hosted runner application is not running on the machine, or the self-hosted runner application cannot communicate with GitHub.</p>|`last(/GitHub repository by HTTP/github.repo.runners.online[{#RUNNER_NAME}],#2)=1 and last(/GitHub repository by HTTP/github.repo.runners.online[{#RUNNER_NAME}])=0`|Warning||
+|GitHub: Runner [{#RUNNER_NAME}]: The runner has become offline|<p>The runner was online previously but now it is not connected to GitHub. This could be because the machine is offline, the self-hosted runner application is not running on the machine, or the self-hosted runner application cannot communicate with GitHub.</p>|`last(/GitHub repository by HTTP/github.repo.runners.online[{#RUNNER_NAME}],#2)=1 and last(/GitHub repository by HTTP/github.repo.runners.online[{#RUNNER_NAME}])=0`|Warning||
 
 ### LLD rule Community profile metrics discovery
 
