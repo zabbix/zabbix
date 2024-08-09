@@ -467,7 +467,6 @@ class testFormAlarmNotification extends CWebTest {
 		$this->assertTableDataColumn($data['trigger_name'], 'Problem');
 
 		// Find appeared Alarm notification overlay dialog and check triggered problems by trigger name.
-		$this->page->refresh()->waitUntilReady();
 		$alarm_dialog = $this->getAlarmOverlay();
 		$triggered_alarms = $alarm_dialog->query('xpath:.//ul[@class="notif-body"]/li//a[contains(@href, "triggerids")]')
 				->all()->asText();
