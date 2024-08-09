@@ -324,6 +324,9 @@ static void	pb_discovery_add_rows_db(zbx_list_t *rows, zbx_list_item_t *next, zb
  ******************************************************************************/
 static int	pb_discovery_get_mem(zbx_pb_t *pb, struct zbx_json *j, zbx_uint64_t *lastid, int *more)
 {
+#define	pb_add_json_field_helper(fld_name, type)						\
+	pb_add_json_field(j, &dht, ZBX_STR(fld_name), &row->fld_name, type)
+
 	int			records_num = 0;
 	zbx_list_iterator_t	li;
 	zbx_pb_discovery_t	*row;
@@ -346,20 +349,17 @@ static int	pb_discovery_get_mem(zbx_pb_t *pb, struct zbx_json *j, zbx_uint64_t *
 
 			(void)zbx_list_iterator_peek(&li, (void **)&row);
 
-			/* row fields in the same order as defined in dht table */
-			void	*dht_fields[] = {
-					&row->clock,
-					&row->druleid,
-					&row->dcheckid,
-					&row->ip,
-					&row->dns,
-					&row->port,
-					&row->value,
-					&row->status,
-					&row->error
-					};
-
-			pb_add_json_field(j, &dht, dht_fields, (int)ARRSIZE(dht_fields));
+			zbx_json_addobject(j, NULL);
+			pb_add_json_field_helper(clock, ZBX_TYPE_INT);
+			pb_add_json_field_helper(druleid, ZBX_TYPE_UINT);
+			pb_add_json_field_helper(dcheckid, ZBX_TYPE_UINT);
+			pb_add_json_field_helper(ip, ZBX_TYPE_CHAR);
+			pb_add_json_field_helper(dns, ZBX_TYPE_CHAR);
+			pb_add_json_field_helper(port, ZBX_TYPE_INT);
+			pb_add_json_field_helper(value, ZBX_TYPE_CHAR);
+			pb_add_json_field_helper(status, ZBX_TYPE_INT);
+			pb_add_json_field_helper(error, ZBX_TYPE_CHAR);
+			zbx_json_close(j);
 
 			records_num++;
 			*lastid = row->id;
@@ -369,6 +369,8 @@ static int	pb_discovery_get_mem(zbx_pb_t *pb, struct zbx_json *j, zbx_uint64_t *
 	}
 
 	return records_num;
+
+#	undef	pb_add_json_field_helper
 }
 
 /******************************************************************************
