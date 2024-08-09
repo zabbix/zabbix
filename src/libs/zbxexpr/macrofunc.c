@@ -689,10 +689,11 @@ static int	macrofunc_fmtnum(char **params, size_t nparam, char **out)
  ******************************************************************************/
 int	zbx_calculate_macro_function(const char *expression, const zbx_token_func_macro_t *func_macro, char **out)
 {
-	char			**params, *buf = NULL;
+	char			**params;
 	const char		*ptr;
-	size_t			nparam = 0, param_alloc = 8, buf_alloc = 0, buf_offset = 0, len, sep_pos;
+	size_t			nparam = 0, param_alloc = 8, len, sep_pos = 0;
 	int			(*macrofunc)(char **params, size_t nparam, char **out), ret = FAIL;
+	zbx_strloc_t		loc = func_macro->func_param;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 	if (NULL == *out)
@@ -730,11 +731,9 @@ int	zbx_calculate_macro_function(const char *expression, const zbx_token_func_ma
 	else
 		goto out;
 
-	zbx_strncpy_alloc(&buf, &buf_alloc, &buf_offset, expression + func_macro->func_param.l + 1,
-			func_macro->func_param.r - func_macro->func_param.l - 1);
 	params = (char **)zbx_malloc(NULL, sizeof(char *) * param_alloc);
 
-	for (ptr = buf; ptr < buf + buf_offset; ptr += sep_pos + 1)
+	for (ptr = expression + loc.l + 1; ptr <= expression + loc.r; ptr += sep_pos + 1)
 	{
 		size_t	param_pos, param_len;
 		int	quoted;
@@ -746,6 +745,10 @@ int	zbx_calculate_macro_function(const char *expression, const zbx_token_func_ma
 		}
 
 		zbx_function_param_parse(ptr, &param_pos, &param_len, &sep_pos);
+
+		if (')' == ptr[sep_pos] && 0 == nparam && 0 == param_len)
+			break;
+
 		params[nparam++] = zbx_function_param_unquote_dyn_compat(ptr + param_pos, param_len, &quoted);
 	}
 
@@ -755,7 +758,6 @@ int	zbx_calculate_macro_function(const char *expression, const zbx_token_func_ma
 		zbx_free(params[nparam]);
 
 	zbx_free(params);
-	zbx_free(buf);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(), ret: %s", __func__, zbx_result_string(ret));
 
