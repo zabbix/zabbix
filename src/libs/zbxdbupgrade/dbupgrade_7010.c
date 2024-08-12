@@ -75,6 +75,14 @@ static int	DBpatch_7010002(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_7010003(void)
+{
+	if (SUCCEED == zbx_db_index_exists("userdirectory_usrgrp", "userdirectory_usrgrp_3"))
+		return DBdrop_index("userdirectory_usrgrp", "userdirectory_usrgrp_3");
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(7010)
@@ -84,5 +92,6 @@ DBPATCH_START(7010)
 DBPATCH_ADD(7010000, 0, 1)
 DBPATCH_ADD(7010001, 0, 1)
 DBPATCH_ADD(7010002, 0, 1)
+DBPATCH_ADD(7010003, 0, 1)
 
 DBPATCH_END()

@@ -46,10 +46,8 @@ int	zbx_event_db_get_host(const zbx_db_event *event, zbx_dc_host_t *host, char *
 			/* do not forget to update ZBX_IPMI_FIELDS_NUM if number of selected IPMI fields changes */
 			",h.ipmi_authtype,h.ipmi_privilege,h.ipmi_username,h.ipmi_password");
 #endif
-#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset,
-			",h.tls_issuer,h.tls_subject,h.tls_psk_identity,h.tls_psk");
-#endif
+			",h.tls_issuer,h.tls_subject,h.tls_psk_identity,h.tls_psk,h.monitored_by");
 	switch (event->source)
 	{
 		case EVENT_SOURCE_TRIGGERS:
@@ -136,6 +134,7 @@ int	zbx_event_db_get_host(const zbx_db_event *event, zbx_dc_host_t *host, char *
 		zbx_strscpy(host->tls_psk_identity, row[6 + ZBX_IPMI_FIELDS_NUM]);
 		zbx_strscpy(host->tls_psk, row[7 + ZBX_IPMI_FIELDS_NUM]);
 #endif
+		ZBX_STR2UCHAR(host->monitored_by, row[8 + ZBX_IPMI_FIELDS_NUM]);
 	}
 	zbx_db_free_result(result);
 
