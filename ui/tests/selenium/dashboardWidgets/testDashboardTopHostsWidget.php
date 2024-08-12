@@ -2323,7 +2323,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 
 			// Check error message in column form.
 			if (array_key_exists('column_error', $data)) {
-				// Count of days mentioned in error depends ot presence of leap year february in selected period.
+				// Count of days mentioned in error depends on presence of leap year february in selected period.
 				if (CTestArrayHelper::get($data, 'days_count')) {
 					$data['column_error'] = str_replace('{days}', CDateTimeHelper::countDays('now', 'P2Y'), $data['column_error']);
 				}
