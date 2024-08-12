@@ -3893,14 +3893,13 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 				&rowid)))
 		{
 			zbx_hashset_remove_direct(&config->template_items, template_item);
-			continue;
 		}
-
-		if (NULL != deleted_itemids)
-			zbx_vector_uint64_append(deleted_itemids, rowid);
 
 		if (NULL == (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &rowid)))
 			continue;
+
+		if (NULL != deleted_itemids)
+			zbx_vector_uint64_append(deleted_itemids, rowid);
 
 		if (NULL != (host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &item->hostid)))
 		{
