@@ -923,6 +923,17 @@ class CHost extends CHostGeneral {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
+		// Check inventory mode value.
+		if (array_key_exists('inventory_mode', $data)) {
+			$valid_inventory_modes = [HOST_INVENTORY_DISABLED, HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC];
+			$inventory_mode = new CLimitedSetValidator([
+				'values' => $valid_inventory_modes,
+				'messageInvalid' => _s('Incorrect value for field "%1$s": %2$s.', 'inventory_mode',
+					_s('value must be one of %1$s', implode(', ', $valid_inventory_modes)))
+			]);
+			$this->checkValidator($data['inventory_mode'], $inventory_mode);
+		}
+
 		if (array_intersect_key($data, array_flip($tls_fields))) {
 			if (!array_key_exists('tls_connect', $data) || !array_key_exists('tls_accept', $data)) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _(
@@ -959,21 +970,7 @@ class CHost extends CHostGeneral {
 				$db_hosts[$host['hostid']] += $db_hosts_tls_data[$host['hostid']];
 			}
 			unset($host);
-		}
 
-		// Check inventory mode value.
-		if (array_key_exists('inventory_mode', $data)) {
-			$valid_inventory_modes = [HOST_INVENTORY_DISABLED, HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC];
-			$inventory_mode = new CLimitedSetValidator([
-				'values' => $valid_inventory_modes,
-				'messageInvalid' => _s('Incorrect value for field "%1$s": %2$s.', 'inventory_mode',
-					_s('value must be one of %1$s', implode(', ', $valid_inventory_modes)))
-			]);
-			$this->checkValidator($data['inventory_mode'], $inventory_mode);
-		}
-
-		// Check connection fields only for massupdate action.
-		if ($tls_values) {
 			$this->validateEncryption($hosts, $db_hosts);
 		}
 
