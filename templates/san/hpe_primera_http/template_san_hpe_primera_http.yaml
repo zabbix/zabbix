@@ -34,6 +34,7 @@ zabbix_export:
           name: 'Disks total'
           type: DEPENDENT
           key: hpe.primera.disks.total
+          delay: '0'
           description: 'Number of physical disks.'
           preprocessing:
             - type: JSONPATH
@@ -53,8 +54,10 @@ zabbix_export:
           name: 'Get CPGs data'
           type: DEPENDENT
           key: hpe.primera.get.cpgs
+          delay: '0'
           history: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Common provisioning groups data.'
           preprocessing:
             - type: JSONPATH
@@ -72,6 +75,7 @@ zabbix_export:
           key: hpe.primera.get.data
           history: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             var Primera = {
             	params: {},
@@ -242,8 +246,10 @@ zabbix_export:
           name: 'Get disks data'
           type: DEPENDENT
           key: hpe.primera.get.disks
+          delay: '0'
           history: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Disks data.'
           preprocessing:
             - type: JSONPATH
@@ -259,7 +265,9 @@ zabbix_export:
           name: 'Get errors'
           type: DEPENDENT
           key: hpe.primera.get.errors
+          delay: '0'
           value_type: TEXT
+          trends: '0'
           description: 'A list of errors from WSAPI requests.'
           preprocessing:
             - type: JSONPATH
@@ -290,8 +298,10 @@ zabbix_export:
           name: 'Get hosts data'
           type: DEPENDENT
           key: hpe.primera.get.hosts
+          delay: '0'
           history: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Hosts data.'
           preprocessing:
             - type: JSONPATH
@@ -307,8 +317,10 @@ zabbix_export:
           name: 'Get ports data'
           type: DEPENDENT
           key: hpe.primera.get.ports
+          delay: '0'
           history: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Ports data.'
           preprocessing:
             - type: JSONPATH
@@ -324,8 +336,10 @@ zabbix_export:
           name: 'Get system data'
           type: DEPENDENT
           key: hpe.primera.get.system
+          delay: '0'
           history: '0'
           value_type: TEXT
+          trends: '0'
           description: 'System data.'
           preprocessing:
             - type: JSONPATH
@@ -341,8 +355,10 @@ zabbix_export:
           name: 'Get tasks data'
           type: DEPENDENT
           key: hpe.primera.get.tasks
+          delay: '0'
           history: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Tasks data.'
           preprocessing:
             - type: JSONPATH
@@ -358,8 +374,10 @@ zabbix_export:
           name: 'Get volumes data'
           type: DEPENDENT
           key: hpe.primera.get.volumes
+          delay: '0'
           history: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Volumes data.'
           preprocessing:
             - type: JSONPATH
@@ -375,6 +393,7 @@ zabbix_export:
           name: 'Capacity allocated'
           type: DEPENDENT
           key: hpe.primera.system.capacity.allocated
+          delay: '0'
           units: B
           description: 'Allocated capacity in the system.'
           preprocessing:
@@ -398,6 +417,7 @@ zabbix_export:
           name: 'Capacity failed'
           type: DEPENDENT
           key: hpe.primera.system.capacity.failed
+          delay: '0'
           units: B
           description: 'Failed capacity in the system.'
           preprocessing:
@@ -421,6 +441,7 @@ zabbix_export:
           name: 'Capacity free'
           type: DEPENDENT
           key: hpe.primera.system.capacity.free
+          delay: '0'
           units: B
           description: 'Free capacity in the system.'
           preprocessing:
@@ -444,6 +465,7 @@ zabbix_export:
           name: 'Capacity total'
           type: DEPENDENT
           key: hpe.primera.system.capacity.total
+          delay: '0'
           units: B
           description: 'Total capacity in the system.'
           preprocessing:
@@ -467,6 +489,7 @@ zabbix_export:
           name: 'Chunklet size'
           type: DEPENDENT
           key: hpe.primera.system.chunklet.size
+          delay: '0'
           units: B
           description: 'Chunklet size.'
           preprocessing:
@@ -490,7 +513,9 @@ zabbix_export:
           name: 'System contact'
           type: DEPENDENT
           key: hpe.primera.system.contact
+          delay: '0'
           value_type: CHAR
+          trends: '0'
           description: 'Contact of the system.'
           inventory_link: CONTACT
           preprocessing:
@@ -510,7 +535,9 @@ zabbix_export:
           name: 'System location'
           type: DEPENDENT
           key: hpe.primera.system.location
+          delay: '0'
           value_type: CHAR
+          trends: '0'
           description: 'Location of the system.'
           inventory_link: LOCATION
           preprocessing:
@@ -530,7 +557,9 @@ zabbix_export:
           name: Model
           type: DEPENDENT
           key: hpe.primera.system.model
+          delay: '0'
           value_type: CHAR
+          trends: '0'
           description: 'System model.'
           inventory_link: MODEL
           preprocessing:
@@ -549,7 +578,9 @@ zabbix_export:
           name: 'System name'
           type: DEPENDENT
           key: hpe.primera.system.name
+          delay: '0'
           value_type: CHAR
+          trends: '0'
           description: 'System name.'
           inventory_link: NAME
           preprocessing:
@@ -568,6 +599,7 @@ zabbix_export:
           name: 'Nodes online'
           type: DEPENDENT
           key: hpe.primera.system.nodes.online
+          delay: '0'
           description: 'Number of online nodes in the system.'
           preprocessing:
             - type: JSONPATH
@@ -585,6 +617,7 @@ zabbix_export:
           name: 'Nodes total'
           type: DEPENDENT
           key: hpe.primera.system.nodes.total
+          delay: '0'
           description: 'Total number of nodes in the system.'
           preprocessing:
             - type: JSONPATH
@@ -602,7 +635,9 @@ zabbix_export:
           name: 'Serial number'
           type: DEPENDENT
           key: hpe.primera.system.serial_number
+          delay: '0'
           value_type: CHAR
+          trends: '0'
           description: 'System serial number.'
           inventory_link: SERIALNO_A
           preprocessing:
@@ -621,7 +656,9 @@ zabbix_export:
           name: 'Software version number'
           type: DEPENDENT
           key: hpe.primera.system.sw_version
+          delay: '0'
           value_type: CHAR
+          trends: '0'
           description: 'Storage system software version number.'
           preprocessing:
             - type: JSONPATH
@@ -665,20 +702,24 @@ zabbix_export:
           name: 'Common provisioning groups discovery'
           type: DEPENDENT
           key: hpe.primera.cpg.discovery
+          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#NAME}'
                 value: '{$HPE.PRIMERA.CPG.NAME.MATCHES}'
+                formulaid: A
               - macro: '{#NAME}'
                 value: '{$HPE.PRIMERA.CPG.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: B
           description: 'List of CPGs resources.'
           item_prototypes:
             - uuid: 6d070a747a01498b94c56da721a63192
               name: 'CPG [{#NAME}]: Number of FPVVs'
               type: DEPENDENT
               key: 'hpe.primera.cpg.fpvv["{#ID}",count]'
+              delay: '0'
               description: 'Number of FPVVs (Fully Provisioned Virtual Volumes) allocated in the CPG.'
               preprocessing:
                 - type: JSONPATH
@@ -700,6 +741,7 @@ zabbix_export:
               name: 'CPG [{#NAME}]: Raw space: Free'
               type: DEPENDENT
               key: 'hpe.primera.cpg.space.raw["{#ID}",free]'
+              delay: '0'
               units: B
               description: 'Raw free space.'
               preprocessing:
@@ -725,6 +767,7 @@ zabbix_export:
               name: 'CPG [{#NAME}]: Raw space: Shared'
               type: DEPENDENT
               key: 'hpe.primera.cpg.space.raw["{#ID}",shared]'
+              delay: '0'
               units: B
               description: 'Raw shared space.'
               preprocessing:
@@ -748,6 +791,7 @@ zabbix_export:
               name: 'CPG [{#NAME}]: Raw space: Total'
               type: DEPENDENT
               key: 'hpe.primera.cpg.space.raw["{#ID}",total]'
+              delay: '0'
               units: B
               description: 'Raw total space.'
               preprocessing:
@@ -773,6 +817,7 @@ zabbix_export:
               name: 'CPG [{#NAME}]: Logical disk space: Snapshot administration: Total (raw)'
               type: DEPENDENT
               key: 'hpe.primera.cpg.space.sa["{#ID}",raw_total]'
+              delay: '0'
               units: B
               description: 'Total physical (raw) logical disk space in snapshot administration.'
               preprocessing:
@@ -798,6 +843,7 @@ zabbix_export:
               name: 'CPG [{#NAME}]: Logical disk space: Snapshot administration: Used (raw)'
               type: DEPENDENT
               key: 'hpe.primera.cpg.space.sa["{#ID}",raw_used]'
+              delay: '0'
               units: B
               description: 'Amount of physical (raw) logical disk used in snapshot administration.'
               preprocessing:
@@ -823,6 +869,7 @@ zabbix_export:
               name: 'CPG [{#NAME}]: Logical disk space: Snapshot administration: Total'
               type: DEPENDENT
               key: 'hpe.primera.cpg.space.sa["{#ID}",total]'
+              delay: '0'
               units: B
               description: 'Total logical disk space in snapshot administration.'
               preprocessing:
@@ -848,6 +895,7 @@ zabbix_export:
               name: 'CPG [{#NAME}]: Logical disk space: Snapshot administration: Used'
               type: DEPENDENT
               key: 'hpe.primera.cpg.space.sa["{#ID}",used]'
+              delay: '0'
               units: B
               description: 'Amount of logical disk used in snapshot administration.'
               preprocessing:
@@ -873,6 +921,7 @@ zabbix_export:
               name: 'CPG [{#NAME}]: Logical disk space: Snapshot data: Total (raw)'
               type: DEPENDENT
               key: 'hpe.primera.cpg.space.sd["{#ID}",raw_total]'
+              delay: '0'
               units: B
               description: 'Total physical (raw) logical disk space in snapshot data space.'
               preprocessing:
@@ -898,6 +947,7 @@ zabbix_export:
               name: 'CPG [{#NAME}]: Logical disk space: Snapshot data: Used (raw)'
               type: DEPENDENT
               key: 'hpe.primera.cpg.space.sd["{#ID}",raw_used]'
+              delay: '0'
               units: B
               description: 'Amount of physical (raw) logical disk used in snapshot data space.'
               preprocessing:
@@ -923,6 +973,7 @@ zabbix_export:
               name: 'CPG [{#NAME}]: Logical disk space: Snapshot data: Total'
               type: DEPENDENT
               key: 'hpe.primera.cpg.space.sd["{#ID}",total]'
+              delay: '0'
               units: B
               description: 'Total logical disk space in snapshot data space.'
               preprocessing:
@@ -948,6 +999,7 @@ zabbix_export:
               name: 'CPG [{#NAME}]: Logical disk space: Snapshot data: Used'
               type: DEPENDENT
               key: 'hpe.primera.cpg.space.sd["{#ID}",used]'
+              delay: '0'
               units: B
               description: 'Amount of logical disk used in snapshot data space.'
               preprocessing:
@@ -973,6 +1025,7 @@ zabbix_export:
               name: 'CPG [{#NAME}]: Logical disk space: User space: Total (raw)'
               type: DEPENDENT
               key: 'hpe.primera.cpg.space.usr["{#ID}",raw_total]'
+              delay: '0'
               units: B
               description: 'Total physical (raw) logical disk space in user data space.'
               preprocessing:
@@ -998,6 +1051,7 @@ zabbix_export:
               name: 'CPG [{#NAME}]: Logical disk space: User space: Used (raw)'
               type: DEPENDENT
               key: 'hpe.primera.cpg.space.usr["{#ID}",raw_used]'
+              delay: '0'
               units: B
               description: 'Amount of physical (raw) logical disk used in user data space.'
               preprocessing:
@@ -1023,6 +1077,7 @@ zabbix_export:
               name: 'CPG [{#NAME}]: Logical disk space: User space: Total'
               type: DEPENDENT
               key: 'hpe.primera.cpg.space.usr["{#ID}",total]'
+              delay: '0'
               units: B
               description: 'Total logical disk space in user data space.'
               preprocessing:
@@ -1048,6 +1103,7 @@ zabbix_export:
               name: 'CPG [{#NAME}]: Logical disk space: User space: Used'
               type: DEPENDENT
               key: 'hpe.primera.cpg.space.usr["{#ID}",used]'
+              delay: '0'
               units: B
               description: 'Amount of logical disk used in user data space.'
               preprocessing:
@@ -1073,6 +1129,7 @@ zabbix_export:
               name: 'CPG [{#NAME}]: CPG space: Free'
               type: DEPENDENT
               key: 'hpe.primera.cpg.space["{#ID}",free]'
+              delay: '0'
               units: B
               description: 'Free CPG space.'
               preprocessing:
@@ -1098,6 +1155,7 @@ zabbix_export:
               name: 'CPG [{#NAME}]: CPG space: Shared'
               type: DEPENDENT
               key: 'hpe.primera.cpg.space["{#ID}",shared]'
+              delay: '0'
               units: B
               description: 'Shared CPG space.'
               preprocessing:
@@ -1123,6 +1181,7 @@ zabbix_export:
               name: 'CPG [{#NAME}]: CPG space: Total'
               type: DEPENDENT
               key: 'hpe.primera.cpg.space["{#ID}",total]'
+              delay: '0'
               units: B
               description: 'Total CPG space.'
               preprocessing:
@@ -1148,7 +1207,9 @@ zabbix_export:
               name: 'CPG [{#NAME}]: Degraded state'
               type: DEPENDENT
               key: 'hpe.primera.cpg.state["{#ID}",degraded]'
+              delay: '0'
               value_type: CHAR
+              trends: '0'
               description: |
                 Detailed state of the CPG:
                 
@@ -1202,7 +1263,9 @@ zabbix_export:
               name: 'CPG [{#NAME}]: Failed state'
               type: DEPENDENT
               key: 'hpe.primera.cpg.state["{#ID}",failed]'
+              delay: '0'
               value_type: CHAR
+              trends: '0'
               description: |
                 Detailed state of the CPG:
                 
@@ -1259,6 +1322,7 @@ zabbix_export:
               name: 'CPG [{#NAME}]: State'
               type: DEPENDENT
               key: 'hpe.primera.cpg.state["{#ID}"]'
+              delay: '0'
               description: |
                 Overall state of the CPG:
                 
@@ -1308,6 +1372,7 @@ zabbix_export:
               name: 'CPG [{#NAME}]: Number of TDVVs'
               type: DEPENDENT
               key: 'hpe.primera.cpg.tdvv["{#ID}",count]'
+              delay: '0'
               description: 'Number of TDVVs (Thinly Deduplicated Virtual Volume) created in the CPG.'
               preprocessing:
                 - type: JSONPATH
@@ -1329,6 +1394,7 @@ zabbix_export:
               name: 'CPG [{#NAME}]: Number of TPVVs'
               type: DEPENDENT
               key: 'hpe.primera.cpg.tpvv["{#ID}",count]'
+              delay: '0'
               description: 'Number of TPVVs (Thinly Provisioned Virtual Volumes) allocated in the CPG.'
               preprocessing:
                 - type: JSONPATH
@@ -1350,8 +1416,10 @@ zabbix_export:
               name: 'CPG [{#NAME}]: Get CPG data'
               type: DEPENDENT
               key: 'hpe.primera.cpg["{#ID}",data]'
+              delay: '0'
               history: '0'
               value_type: TEXT
+              trends: '0'
               description: 'CPG {#NAME} data'
               preprocessing:
                 - type: JSONPATH
@@ -1502,14 +1570,17 @@ zabbix_export:
           name: 'Disks discovery'
           type: DEPENDENT
           key: hpe.primera.disks.discovery
+          delay: '0'
           description: 'List of physical disk resources.'
           item_prototypes:
             - uuid: 811d27264b5e41e3a9e9f397888cda47
               name: 'Disk [{#POSITION}]: Get disk data'
               type: DEPENDENT
               key: 'hpe.primera.disk["{#ID}",data]'
+              delay: '0'
               history: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Disk [{#POSITION}] data'
               preprocessing:
                 - type: JSONPATH
@@ -1528,6 +1599,7 @@ zabbix_export:
               name: 'Disk [{#POSITION}]: Free size'
               type: DEPENDENT
               key: 'hpe.primera.disk["{#ID}",free_size]'
+              delay: '0'
               units: B
               description: 'Physical disk free size.'
               preprocessing:
@@ -1553,7 +1625,9 @@ zabbix_export:
               name: 'Disk [{#POSITION}]: Firmware version'
               type: DEPENDENT
               key: 'hpe.primera.disk["{#ID}",fw_version]'
+              delay: '0'
               value_type: CHAR
+              trends: '0'
               description: 'Physical disk firmware version.'
               preprocessing:
                 - type: JSONPATH
@@ -1575,6 +1649,7 @@ zabbix_export:
               name: 'Disk [{#POSITION}]: Path A0 degraded'
               type: DEPENDENT
               key: 'hpe.primera.disk["{#ID}",loop_a0_degraded]'
+              delay: '0'
               description: 'Indicates if this is a degraded path for the disk.'
               valuemap:
                 name: Boolean
@@ -1587,6 +1662,8 @@ zabbix_export:
                   parameters:
                     - 10m
                 - type: BOOL_TO_DECIMAL
+                  parameters:
+                    - ''
               master_item:
                 key: 'hpe.primera.disk["{#ID}",data]'
               tags:
@@ -1609,6 +1686,7 @@ zabbix_export:
               name: 'Disk [{#POSITION}]: Path A1 degraded'
               type: DEPENDENT
               key: 'hpe.primera.disk["{#ID}",loop_a1_degraded]'
+              delay: '0'
               description: 'Indicates if this is a degraded path for the disk.'
               valuemap:
                 name: Boolean
@@ -1621,6 +1699,8 @@ zabbix_export:
                   parameters:
                     - 10m
                 - type: BOOL_TO_DECIMAL
+                  parameters:
+                    - ''
               master_item:
                 key: 'hpe.primera.disk["{#ID}",data]'
               tags:
@@ -1643,6 +1723,7 @@ zabbix_export:
               name: 'Disk [{#POSITION}]: Path B0 degraded'
               type: DEPENDENT
               key: 'hpe.primera.disk["{#ID}",loop_b0_degraded]'
+              delay: '0'
               description: 'Indicates if this is a degraded path for the disk.'
               valuemap:
                 name: Boolean
@@ -1655,6 +1736,8 @@ zabbix_export:
                   parameters:
                     - 10m
                 - type: BOOL_TO_DECIMAL
+                  parameters:
+                    - ''
               master_item:
                 key: 'hpe.primera.disk["{#ID}",data]'
               tags:
@@ -1677,6 +1760,7 @@ zabbix_export:
               name: 'Disk [{#POSITION}]: Path B1 degraded'
               type: DEPENDENT
               key: 'hpe.primera.disk["{#ID}",loop_b1_degraded]'
+              delay: '0'
               description: 'Indicates if this is a degraded path for the disk.'
               valuemap:
                 name: Boolean
@@ -1689,6 +1773,8 @@ zabbix_export:
                   parameters:
                     - 10m
                 - type: BOOL_TO_DECIMAL
+                  parameters:
+                    - ''
               master_item:
                 key: 'hpe.primera.disk["{#ID}",data]'
               tags:
@@ -1711,7 +1797,9 @@ zabbix_export:
               name: 'Disk [{#POSITION}]: Manufacturer'
               type: DEPENDENT
               key: 'hpe.primera.disk["{#ID}",manufacturer]'
+              delay: '0'
               value_type: CHAR
+              trends: '0'
               description: 'Physical disk manufacturer.'
               preprocessing:
                 - type: JSONPATH
@@ -1733,7 +1821,9 @@ zabbix_export:
               name: 'Disk [{#POSITION}]: Model'
               type: DEPENDENT
               key: 'hpe.primera.disk["{#ID}",model]'
+              delay: '0'
               value_type: CHAR
+              trends: '0'
               description: 'Manufacturer''s device ID for disk.'
               preprocessing:
                 - type: JSONPATH
@@ -1755,6 +1845,7 @@ zabbix_export:
               name: 'Disk [{#POSITION}]: RPM'
               type: DEPENDENT
               key: 'hpe.primera.disk["{#ID}",rpm]'
+              delay: '0'
               units: '!rpm'
               description: 'RPM of the physical disk.'
               preprocessing:
@@ -1778,7 +1869,9 @@ zabbix_export:
               name: 'Disk [{#POSITION}]: Serial number'
               type: DEPENDENT
               key: 'hpe.primera.disk["{#ID}",serial_number]'
+              delay: '0'
               value_type: CHAR
+              trends: '0'
               description: 'Disk drive serial number.'
               preprocessing:
                 - type: JSONPATH
@@ -1800,6 +1893,7 @@ zabbix_export:
               name: 'Disk [{#POSITION}]: State'
               type: DEPENDENT
               key: 'hpe.primera.disk["{#ID}",state]'
+              delay: '0'
               description: |
                 State of the physical disk:
                 
@@ -1863,6 +1957,7 @@ zabbix_export:
               name: 'Disk [{#POSITION}]: Total size'
               type: DEPENDENT
               key: 'hpe.primera.disk["{#ID}",total_size]'
+              delay: '0'
               units: B
               description: 'Physical disk total size.'
               preprocessing:
@@ -1902,18 +1997,22 @@ zabbix_export:
           name: 'Hosts discovery'
           type: DEPENDENT
           key: hpe.primera.hosts.discovery
+          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#NAME}'
                 operator: EXISTS
+                formulaid: A
           description: 'List of host properties.'
           item_prototypes:
             - uuid: 142a03a36dbf477ebbcb99994efe4246
               name: 'Host [{#NAME}]: Comment'
               type: DEPENDENT
               key: 'hpe.primera.host["{#ID}",comment]'
+              delay: '0'
               value_type: CHAR
+              trends: '0'
               description: 'Additional information for the host.'
               preprocessing:
                 - type: JSONPATH
@@ -1934,7 +2033,9 @@ zabbix_export:
               name: 'Host [{#NAME}]: Contact'
               type: DEPENDENT
               key: 'hpe.primera.host["{#ID}",contact]'
+              delay: '0'
               value_type: CHAR
+              trends: '0'
               description: 'The host''s owner and contact.'
               preprocessing:
                 - type: JSONPATH
@@ -1955,8 +2056,10 @@ zabbix_export:
               name: 'Host [{#NAME}]: Get host data'
               type: DEPENDENT
               key: 'hpe.primera.host["{#ID}",data]'
+              delay: '0'
               history: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Host [{#NAME}] data'
               preprocessing:
                 - type: JSONPATH
@@ -1975,7 +2078,9 @@ zabbix_export:
               name: 'Host [{#NAME}]: IP address'
               type: DEPENDENT
               key: 'hpe.primera.host["{#ID}",ipaddress]'
+              delay: '0'
               value_type: CHAR
+              trends: '0'
               description: 'The host''s IP address.'
               preprocessing:
                 - type: JSONPATH
@@ -1996,7 +2101,9 @@ zabbix_export:
               name: 'Host [{#NAME}]: Location'
               type: DEPENDENT
               key: 'hpe.primera.host["{#ID}",location]'
+              delay: '0'
               value_type: CHAR
+              trends: '0'
               description: 'The host''s location.'
               preprocessing:
                 - type: JSONPATH
@@ -2017,7 +2124,9 @@ zabbix_export:
               name: 'Host [{#NAME}]: Model'
               type: DEPENDENT
               key: 'hpe.primera.host["{#ID}",model]'
+              delay: '0'
               value_type: CHAR
+              trends: '0'
               description: 'The host''s model.'
               preprocessing:
                 - type: JSONPATH
@@ -2038,7 +2147,9 @@ zabbix_export:
               name: 'Host [{#NAME}]: OS'
               type: DEPENDENT
               key: 'hpe.primera.host["{#ID}",os]'
+              delay: '0'
               value_type: CHAR
+              trends: '0'
               description: 'The operating system running on the host.'
               preprocessing:
                 - type: JSONPATH
@@ -2073,20 +2184,24 @@ zabbix_export:
           name: 'Ports discovery'
           type: DEPENDENT
           key: hpe.primera.ports.discovery
+          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#TYPE}'
                 value: '3'
                 operator: NOT_MATCHES_REGEX
+                formulaid: A
           description: 'List of ports.'
           item_prototypes:
             - uuid: 3b3d82c9c161429294a69774ec0daf5d
               name: 'Port [{#NODE}:{#SLOT}:{#CARD.PORT}]: Get port data'
               type: DEPENDENT
               key: 'hpe.primera.port["{#NODE}:{#SLOT}:{#CARD.PORT}",data]'
+              delay: '0'
               history: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Port [{#NODE}:{#SLOT}:{#CARD.PORT}] data'
               preprocessing:
                 - type: JSONPATH
@@ -2105,6 +2220,7 @@ zabbix_export:
               name: 'Port [{#NODE}:{#SLOT}:{#CARD.PORT}]: Failover state'
               type: DEPENDENT
               key: 'hpe.primera.port["{#NODE}:{#SLOT}:{#CARD.PORT}",failover_state]'
+              delay: '0'
               description: |
                 The state of the failover operation, shown for the two ports indicated in the N:S:P and Partner columns. The value can be one of the following:
                 
@@ -2147,6 +2263,7 @@ zabbix_export:
               name: 'Port [{#NODE}:{#SLOT}:{#CARD.PORT}]: Hardware type'
               type: DEPENDENT
               key: 'hpe.primera.port["{#NODE}:{#SLOT}:{#CARD.PORT}",hw_type]'
+              delay: '0'
               description: |
                 Hardware type:
                 
@@ -2178,6 +2295,7 @@ zabbix_export:
               name: 'Port [{#NODE}:{#SLOT}:{#CARD.PORT}]: Link state'
               type: DEPENDENT
               key: 'hpe.primera.port["{#NODE}:{#SLOT}:{#CARD.PORT}",link_state]'
+              delay: '0'
               description: |
                 Port link state:
                 
@@ -2241,6 +2359,7 @@ zabbix_export:
               name: 'Port [{#NODE}:{#SLOT}:{#CARD.PORT}]: Type'
               type: DEPENDENT
               key: 'hpe.primera.port["{#NODE}:{#SLOT}:{#CARD.PORT}",type]'
+              delay: '0'
               description: |
                 Port connection type:
                 
@@ -2292,19 +2411,24 @@ zabbix_export:
           name: 'Tasks discovery'
           type: DEPENDENT
           key: hpe.primera.tasks.discovery
+          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#NAME}'
                 value: '{$HPE.PRIMERA.LLD.FILTER.TASK.NAME.MATCHES}'
+                formulaid: A
               - macro: '{#NAME}'
                 value: '{$HPE.PRIMERA.LLD.FILTER.TASK.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: B
               - macro: '{#TYPE}'
                 value: '{$HPE.PRIMERA.LLD.FILTER.TASK.TYPE.MATCHES}'
+                formulaid: C
               - macro: '{#TYPE}'
                 value: '{$HPE.PRIMERA.LLD.FILTER.TASK.TYPE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: D
           lifetime: 1d
           description: 'List of tasks started within last 24 hours.'
           item_prototypes:
@@ -2312,8 +2436,10 @@ zabbix_export:
               name: 'Task [{#NAME}]: Get task data'
               type: DEPENDENT
               key: 'hpe.primera.task["{#ID}",data]'
+              delay: '0'
               history: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Task [{#NAME}] data'
               preprocessing:
                 - type: JSONPATH
@@ -2332,6 +2458,7 @@ zabbix_export:
               name: 'Task [{#NAME}]: Finish time'
               type: DEPENDENT
               key: 'hpe.primera.task["{#ID}",finish_time]'
+              delay: '0'
               units: unixtime
               description: 'Task finish time.'
               preprocessing:
@@ -2362,6 +2489,7 @@ zabbix_export:
               name: 'Task [{#NAME}]: Start time'
               type: DEPENDENT
               key: 'hpe.primera.task["{#ID}",start_time]'
+              delay: '0'
               units: unixtime
               description: 'Task start time.'
               preprocessing:
@@ -2388,6 +2516,7 @@ zabbix_export:
               name: 'Task [{#NAME}]: Status'
               type: DEPENDENT
               key: 'hpe.primera.task["{#ID}",status]'
+              delay: '0'
               description: |
                 Task status:
                 
@@ -2432,6 +2561,7 @@ zabbix_export:
               name: 'Task [{#NAME}]: Type'
               type: DEPENDENT
               key: 'hpe.primera.task["{#ID}",type]'
+              delay: '0'
               description: |
                 Task type:
                 
@@ -2511,20 +2641,24 @@ zabbix_export:
           name: 'Volumes discovery'
           type: DEPENDENT
           key: hpe.primera.volumes.discovery
+          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#NAME}'
                 value: '{$HPE.PRIMERA.VOLUME.NAME.MATCHES}'
+                formulaid: A
               - macro: '{#NAME}'
                 value: '{$HPE.PRIMERA.VOLUME.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: B
           description: 'List of storage volume resources.'
           item_prototypes:
             - uuid: 40db4c8f6d85414e843c97770225f93d
               name: 'Volume [{#NAME}]: Compaction ratio'
               type: DEPENDENT
               key: 'hpe.primera.volume.capacity.efficiency["{#ID}",compaction]'
+              delay: '0'
               value_type: FLOAT
               description: 'The compaction ratio indicates the overall amount of storage space saved with thin technology.'
               preprocessing:
@@ -2548,6 +2682,7 @@ zabbix_export:
               name: 'Volume [{#NAME}]: Storage space saved using compression'
               type: DEPENDENT
               key: 'hpe.primera.volume.capacity.efficiency["{#ID}",compression]'
+              delay: '0'
               value_type: FLOAT
               description: 'Indicates the amount of storage space saved using compression.'
               preprocessing:
@@ -2571,6 +2706,7 @@ zabbix_export:
               name: 'Volume [{#NAME}]: Storage space saved using deduplication'
               type: DEPENDENT
               key: 'hpe.primera.volume.capacity.efficiency["{#ID}",deduplication]'
+              delay: '0'
               value_type: FLOAT
               description: 'Indicates the amount of storage space saved using deduplication.'
               preprocessing:
@@ -2594,6 +2730,7 @@ zabbix_export:
               name: 'Volume [{#NAME}]: Overprovisioning ratio'
               type: DEPENDENT
               key: 'hpe.primera.volume.capacity.efficiency["{#ID}",overprovisioning]'
+              delay: '0'
               value_type: FLOAT
               description: 'Overprovisioning capacity efficiency ratio.'
               preprocessing:
@@ -2617,6 +2754,7 @@ zabbix_export:
               name: 'Volume [{#NAME}]: Storage space saved using deduplication and compression'
               type: DEPENDENT
               key: 'hpe.primera.volume.capacity.efficiency["{#ID}",reduction]'
+              delay: '0'
               value_type: FLOAT
               description: 'Indicates the amount of storage space saved using deduplication and compression together.'
               preprocessing:
@@ -2640,6 +2778,7 @@ zabbix_export:
               name: 'Volume [{#NAME}]: Administrative space: Free'
               type: DEPENDENT
               key: 'hpe.primera.volume.space.admin["{#ID}",free]'
+              delay: '0'
               units: B
               description: 'Free administrative space.'
               preprocessing:
@@ -2665,6 +2804,7 @@ zabbix_export:
               name: 'Volume [{#NAME}]: Administrative space: Raw reserved'
               type: DEPENDENT
               key: 'hpe.primera.volume.space.admin["{#ID}",raw_reserved]'
+              delay: '0'
               units: B
               description: 'Raw reserved administrative space.'
               preprocessing:
@@ -2690,6 +2830,7 @@ zabbix_export:
               name: 'Volume [{#NAME}]: Administrative space: Reserved'
               type: DEPENDENT
               key: 'hpe.primera.volume.space.admin["{#ID}",reserved]'
+              delay: '0'
               units: B
               description: 'Reserved administrative space.'
               preprocessing:
@@ -2715,6 +2856,7 @@ zabbix_export:
               name: 'Volume [{#NAME}]: Administrative space: Used'
               type: DEPENDENT
               key: 'hpe.primera.volume.space.admin["{#ID}",used]'
+              delay: '0'
               units: B
               description: 'Used administrative space.'
               preprocessing:
@@ -2740,6 +2882,7 @@ zabbix_export:
               name: 'Volume [{#NAME}]: Snapshot space: Free'
               type: DEPENDENT
               key: 'hpe.primera.volume.space.snapshot["{#ID}",free]'
+              delay: '0'
               units: B
               description: 'Free snapshot space.'
               preprocessing:
@@ -2765,6 +2908,7 @@ zabbix_export:
               name: 'Volume [{#NAME}]: Snapshot space: Raw reserved'
               type: DEPENDENT
               key: 'hpe.primera.volume.space.snapshot["{#ID}",raw_reserved]'
+              delay: '0'
               units: B
               description: 'Raw reserved snapshot space.'
               preprocessing:
@@ -2790,6 +2934,7 @@ zabbix_export:
               name: 'Volume [{#NAME}]: Snapshot space: Reserved'
               type: DEPENDENT
               key: 'hpe.primera.volume.space.snapshot["{#ID}",reserved]'
+              delay: '0'
               units: B
               description: 'Reserved snapshot space.'
               preprocessing:
@@ -2815,6 +2960,7 @@ zabbix_export:
               name: 'Volume [{#NAME}]: Snapshot space: Used'
               type: DEPENDENT
               key: 'hpe.primera.volume.space.snapshot["{#ID}",used]'
+              delay: '0'
               units: B
               description: 'Used snapshot space.'
               preprocessing:
@@ -2840,6 +2986,7 @@ zabbix_export:
               name: 'Volume [{#NAME}]: Total reserved space'
               type: DEPENDENT
               key: 'hpe.primera.volume.space.total["{#ID}",reserved]'
+              delay: '0'
               units: B
               description: 'Total reserved space.'
               preprocessing:
@@ -2866,6 +3013,7 @@ zabbix_export:
               name: 'Volume [{#NAME}]: Total space'
               type: DEPENDENT
               key: 'hpe.primera.volume.space.total["{#ID}",size]'
+              delay: '0'
               units: B
               description: 'Virtual size of volume.'
               preprocessing:
@@ -2892,6 +3040,7 @@ zabbix_export:
               name: 'Volume [{#NAME}]: Total used space'
               type: DEPENDENT
               key: 'hpe.primera.volume.space.total["{#ID}",used]'
+              delay: '0'
               units: B
               description: 'Total used space. Sum of used user space and used snapshot space.'
               preprocessing:
@@ -2915,6 +3064,7 @@ zabbix_export:
               name: 'Volume [{#NAME}]: User space: Free'
               type: DEPENDENT
               key: 'hpe.primera.volume.space.user["{#ID}",free]'
+              delay: '0'
               units: B
               description: 'Free user space.'
               preprocessing:
@@ -2940,6 +3090,7 @@ zabbix_export:
               name: 'Volume [{#NAME}]: User space: Raw reserved'
               type: DEPENDENT
               key: 'hpe.primera.volume.space.user["{#ID}",raw_reserved]'
+              delay: '0'
               units: B
               description: 'Raw reserved user space.'
               preprocessing:
@@ -2965,6 +3116,7 @@ zabbix_export:
               name: 'Volume [{#NAME}]: User space: Reserved'
               type: DEPENDENT
               key: 'hpe.primera.volume.space.user["{#ID}",reserved]'
+              delay: '0'
               units: B
               description: 'Reserved user space.'
               preprocessing:
@@ -2990,6 +3142,7 @@ zabbix_export:
               name: 'Volume [{#NAME}]: User space: Used'
               type: DEPENDENT
               key: 'hpe.primera.volume.space.user["{#ID}",used]'
+              delay: '0'
               units: B
               description: 'Used user space.'
               preprocessing:
@@ -3015,6 +3168,7 @@ zabbix_export:
               name: 'Volume [{#NAME}]: Compression state'
               type: DEPENDENT
               key: 'hpe.primera.volume.state["{#ID}",compression]'
+              delay: '0'
               description: |
                 Volume compression state:
                 
@@ -3044,6 +3198,7 @@ zabbix_export:
               name: 'Volume [{#NAME}]: Deduplication state'
               type: DEPENDENT
               key: 'hpe.primera.volume.state["{#ID}",deduplication]'
+              delay: '0'
               description: |
                 Volume deduplication state:
                 
@@ -3073,7 +3228,9 @@ zabbix_export:
               name: 'Volume [{#NAME}]: Degraded state'
               type: DEPENDENT
               key: 'hpe.primera.volume.state["{#ID}",degraded]'
+              delay: '0'
               value_type: CHAR
+              trends: '0'
               description: |
                 Volume detailed state:
                 
@@ -3127,7 +3284,9 @@ zabbix_export:
               name: 'Volume [{#NAME}]: Failed state'
               type: DEPENDENT
               key: 'hpe.primera.volume.state["{#ID}",failed]'
+              delay: '0'
               value_type: CHAR
+              trends: '0'
               description: |
                 Volume detailed state:
                 
@@ -3184,6 +3343,7 @@ zabbix_export:
               name: 'Volume [{#NAME}]: State'
               type: DEPENDENT
               key: 'hpe.primera.volume.state["{#ID}"]'
+              delay: '0'
               description: |
                 State of the volume:
                 
@@ -3233,7 +3393,9 @@ zabbix_export:
               name: 'Volume [{#NAME}]: Remote copy status'
               type: DEPENDENT
               key: 'hpe.primera.volume.status["{#ID}",rcopy]'
+              delay: '0'
               value_type: CHAR
+              trends: '0'
               description: |
                 Remote copy status of the volume:
                 
@@ -3263,8 +3425,10 @@ zabbix_export:
               name: 'Volume [{#NAME}]: Get volume data'
               type: DEPENDENT
               key: 'hpe.primera.volume["{#ID}",data]'
+              delay: '0'
               history: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Volume [{#NAME}] data'
               preprocessing:
                 - type: JSONPATH

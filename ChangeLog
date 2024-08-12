@@ -1,8 +1,39 @@
 Changes for 7.0.3rc1
 
 New features:
+...G.....T [ZBXNEXT-9000] changed query table for ASM disk group metrics in Oracle Database plugin and Oracle by ODBC template (knaglis)
+..F....PS. [ZBXNEXT-9218] added proxy group discovery internal item (mprihodko)
 
 Bug fixes:
+A........T [ZBX-24930] fixed inability to import latest official templates to 7.0.0 version (abiba, vmaksimovs)
+..F....... [ZBX-24940] fixed issue with dependent trigger copying (vmaksimovs, vmurzins)
+....I..... [ZBX-24576] fixed built-in dashboard "Local network" map element highlight overlapping the widget header (Ivo)
+....I..... [ZBX-24547] removed duplicate matching name "Problems by severity" in built-in "Global view" dashboard (Ivo)
+..F....... [ZBX-23844] fixed long names of icons and background images overlapping each other (agriscenko)
+..F....... [ZBX-24835] fixed case-conversion and preg functions working incorrectly with the Turkish locale (agriscenko)
+........S. [ZBX-23510] removed redundant userdirectory_usrgrp_3 index (arimdjonoks)
+.......PS. [ZBX-24926] fixed bad argument error when using latest libcurl (vso)
+...G...... [ZBX-23495] fixed Zabbix agent 2 still sending active check heartbeats when they are disabled (dgoloscapov)
+..F....... [ZBX-24708] fixed hint visualization issues in Graph widget (apoga)
+..F....... [ZBX-24769] fixed radio buttons in SVG graph data set becoming unresponsive after deleting another data set (agriscenko)
+........S. [ZBX-24879] fixed ODBC login with special characters in the password field (sboidenko)
+..F....... [ZBX-24947] fixed PHP runtime errors while processing frontend notifications (Sasha)
+.........T [ZBX-24927] fixed duplicate references in dashboard widgets (akotsegubov)
+..F....... [ZBX-23867] fixed inherited timeout not being passed to LLD testing form (agriscenko)
+...G...PS. [ZBX-24779] fixed signal propagation issues when using Zabbix as a PID1 in a container (dgoloscapov)
+A......... [ZBX-24543] removed restriction to remove a user group or removing a user from a user group when the user belongs to only one user group (gcalenko)
+A......... [ZBX-24251] fixed login error when SAML authentication is enabled without a SAML userdirectory (gcalenko)
+...G...... [ZBX-24824] improved loadable plugin connection broker (rzvejs)
+A......... [ZBX-24583] fixed inability to export/import web scenario with digest authentication (jfreibergs)
+..F....... [ZBX-23954] fixed Pie chart widget displaying "No data" if data is 0 (wczerneha)
+..F....... [ZBX-23927] fixed the incorrect layering of dropdown menu in Graph and Pie chart widgets (wczerneha)
+..F....... [ZBX-23877] fixed different displaying in left/right axis for SVG Graph widget (wczerneha)
+..F....... [ZBX-21815] fixed issue with undefined offset for media type when it was deleted before saving the user (wczerneha)
+.........T [ZBX-24617] fixed hardcoded region in AWS by HTTP template (egordymov)
+..F....... [ZBX-23905] fixed double scroll in script dialogs (apoga)
+..F....... [ZBX-23714] fixed items popup layout (apoga)
+.........T [ZBX-24859] fixed JavaScript in S3 buckets discovery rule (egordymov)
+..F....... [ZBX-18767] fixed word breaks in flexible text input fields and trigger expressions (ddauksa)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.2
@@ -934,6 +965,9 @@ New features:
 .......PS. [ZBXNEXT-9293] updated max supported MySQL version to 9.0 (mprihodko)
 
 Bug fixes:
+A........T [ZBX-24930] fixed inability to import latest official templates to minor versions up to 6.4.16 (abiba, vmaksimovs)
+..F....... [ZBX-24835] fixed case-conversion and preg functions working incorrectly with the Turkish locale (agriscenko)
+..F....... [ZBX-24909] fixed resolving of macro functions in the "Item value" widget (Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 6.4.17
@@ -2827,13 +2861,20 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 Changes for 6.0.33rc1
 
 New features:
+...G.....T [ZBXNEXT-9000] changed query table for ASM disk group metrics in Oracle Database plugin and Oracle by ODBC template (knaglis)
 .........T [ZBXNEXT-9217] added AWS Lambda by HTTP template (egordymov)
 .......PS. [ZBXNEXT-9293] updated max supported MySQL version to 9.0 (mprihodko)
 
 Bug fixes:
+..F....... [ZBX-24947] fixed PHP runtime errors while processing frontend notifications (Sasha)
+...G...... [ZBX-24824] improved loadable plugin connection broker (rzvejs)
+A......... [ZBX-24583] fixed inability to export/import web scenario with digest authentication (jfreibergs)
+..F....... [ZBX-23905] fixed double scroll in script dialogs (apoga)
+..F....... [ZBX-18767] fixed word breaks in flexible text input fields and trigger expressions (ddauksa)
+..F....... [ZBX-24909] fixed resolving of macro functions in the "Item value" widget (Sasha)
 .........T [ZBX-24859] fixed JavaScript in S3 buckets discovery rule (egordymov)
 .........T [ZBX-24617] fixed hardcoded region in AWS by HTTP template (egordymov)
-.......PS. [ZBX-24524] fixed "new values per second" stat to include dependent items in calculation (asestakovs)
+.......PS. [ZBX-24524] fixed "New values per second" statistic to include dependent items in calculation (asestakovs)
 ........S. [ZBX-24821] made 'execute_on' value being recorded in audit only for shell scripts (arimdjonoks)
 ..F....... [ZBX-23312] fixed discovery edit form being saved incorrectly after dcheck update (dfofanovs)
 .........T [ZBX-24773] fixed duplicate item preprocessing in Kubernetes Kubelet by HTTP template (egordymov)
@@ -5988,8 +6029,6 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 
 --------------------------------------------------------------------------------
 Changes for 5.0.43rc1
-
-New features:
 
 Bug fixes:
 .........T [ZBX-23788] added SNMP OID ifAlias in Network interfaces discovery (egordymov)

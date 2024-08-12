@@ -73,7 +73,6 @@ INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (55002, 50020, 52
 
 -- user group
 INSERT INTO usrgrp (usrgrpid, name) VALUES (14, 'API user group for update with user and rights');
-INSERT INTO usrgrp (usrgrpid, name) VALUES (15, 'API user group with one user');
 INSERT INTO usrgrp (usrgrpid, name) VALUES (16, 'API user group delete');
 INSERT INTO usrgrp (usrgrpid, name) VALUES (17, 'API user group delete1');
 INSERT INTO usrgrp (usrgrpid, name) VALUES (18, 'API user group delete2');
@@ -84,12 +83,10 @@ INSERT INTO usrgrp (usrgrpid, name) VALUES (22, 'API user group in configuration
 INSERT INTO usrgrp (usrgrpid, name) VALUES (23, 'API user group for update');
 INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (4, 'zabbix-admin', '$2a$10$PmEcvov/w84R3sShOV4rX.xJd81bwgaK4o0SfoiSxop2ol7PPGsOi', 0, 0, 'en_US', '30s', 2, 'default', 0, 0, 50);
 INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (5, 'zabbix-user', '$2a$10$w8oiYEgP3Fy4XuPIE5VCiO2j5snJEopKfTCYa3DC7bNL83ldKlPRS', 0, 0, 'en_US', '30s', 1, 'default', 0, 0, 50);
-INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (6, 'user-in-one-group', '$2a$10$mTYvfZskz3369zQaYLogHuSUMQ11YSEOZtua2NFSL3/.T6kQ/bNaG', 0, 0, 'en_US', '30s', 2, 'default', 0, 0, 50);
 INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (7, 'user-in-two-groups', '$2a$10$GiBCQXAPeTCPR9rEQ/YodOmE7mqvXjYwbEkZLGP7iWU/fzKcB9yF6', 0, 0, 'en_US', '30s', 2, 'default', 0, 0, 50);
 INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (8, 'api-user', '$2a$10$NyZQvuelvUVqpCDYb7cOy.pEewNe9U0MK0ZIdjJeupYbgHU6G7Iea', 0, 0, 'en_US', '30s', 2, 'default', 0, 0, 50);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (7, 8, 4);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (8, 14, 4);
-INSERT INTO users_groups (id, usrgrpid, userid) VALUES (9, 15, 6);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (10, 16, 7);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (11, 17, 7);
 INSERT INTO rights (rightid, groupid, permission, id) VALUES (2, 14, 3, 50012);
