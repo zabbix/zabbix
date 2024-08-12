@@ -201,6 +201,7 @@ static int		engineid_cache_initialized = 0;
 
 #define ZBX_SNMP_GET	0
 #define ZBX_SNMP_WALK	1
+#define ZBX_SNMP_OID	2
 
 #define	SNMP_MT_EXECLOCK					\
 	if (0 != snmp_rwlock_init_done)				\
@@ -3228,9 +3229,15 @@ int	zbx_async_check_snmp(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_async_ta
 		snmp_context->snmp_oid_type = ZBX_SNMP_WALK;
 		pdu_type = ZBX_IF_SNMP_VERSION_1 == item->snmp_version ? SNMP_MSG_GETNEXT : SNMP_MSG_GETBULK;
 	}
-	else
+	else if (0 == strncmp(item->snmp_oid, "get[", ZBX_CONST_STRLEN("get[")))
 	{
 		snmp_context->snmp_oid_type = ZBX_SNMP_GET;
+		pdu_type = SNMP_MSG_GET;
+	}
+	else if (ZABBIX_ASYNC_RESOLVE_REVERSE_DNS_YES == resolve_reverse_dns)
+	{
+		/* OIDs without key are supported in case of network discovery */
+		snmp_context->snmp_oid_type = ZBX_SNMP_OID;
 		pdu_type = SNMP_MSG_GET;
 	}
 
@@ -3243,8 +3250,7 @@ int	zbx_async_check_snmp(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_async_ta
 		goto out;
 	}
 
-	if (SUCCEED != zbx_parse_item_key(item->snmp_oid, &request) &&
-			ZABBIX_ASYNC_RESOLVE_REVERSE_DNS_NO == resolve_reverse_dns)
+	if (ZBX_SNMP_OID != snmp_context->snmp_oid_type && SUCCEED != zbx_parse_item_key(item->snmp_oid, &request))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid SNMP OID: cannot parse parameter."));
 		ret = CONFIG_ERROR;
