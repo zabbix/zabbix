@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-08-09T08:54:05Z'
+  date: '2024-08-12T08:52:07Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -2075,10 +2075,10 @@ zabbix_export:
         - macro: '{$AWS.ACCESS.KEY.ID}'
           description: 'Access key ID.'
         - macro: '{$AWS.ASSUME.ROLE.ARN}'
-          description: 'Arn assume role, add when used `assume_role` authorization method'
+          description: 'ARN assume role; add when using the `assume_role` authorization method.'
         - macro: '{$AWS.AUTH_TYPE}'
           value: access_key
-          description: 'Authorization method. Possible values: access_key, assume_role, role_base.'
+          description: 'Authorization method. Possible values: `access_key`, `assume_role`, `role_base`.'
         - macro: '{$AWS.DATA.TIMEOUT}'
           value: 60s
           description: 'A response timeout for an API.'

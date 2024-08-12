@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-08-08T12:29:40Z'
+  date: '2024-08-12T08:51:42Z'
   groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -2369,10 +2369,10 @@ zabbix_export:
         - macro: '{$AWS.ACCESS.KEY.ID}'
           description: 'Access key ID.'
         - macro: '{$AWS.ASSUME.ROLE.ARN}'
-          description: 'Arn assume role, add when used `assume_role` authorization method'
+          description: 'ARN assume role; add when using the `assume_role` authorization method.'
         - macro: '{$AWS.AUTH_TYPE}'
           value: access_key
-          description: 'Authorization method. Possible values: access_key, assume_role, role_base.'
+          description: 'Authorization method. Possible values: `access_key`, `assume_role`, `role_base`.'
         - macro: '{$AWS.DATA.TIMEOUT}'
           value: 60s
           description: 'API response timeout.'
@@ -4640,9 +4640,11 @@ zabbix_export:
       macros:
         - macro: '{$AWS.ACCESS.KEY.ID}'
           description: 'Access key ID.'
+        - macro: '{$AWS.ASSUME.ROLE.ARN}'
+          description: 'ARN assume role; add when using the `assume_role` authorization method.'
         - macro: '{$AWS.AUTH_TYPE}'
           value: access_key
-          description: 'Authorization method. Possible values: `role_base`, `access_key`.'
+          description: 'Authorization method. Possible values: `access_key`, `assume_role`, `role_base`.'
         - macro: '{$AWS.DATA.TIMEOUT}'
           value: 60s
           description: 'API response timeout.'
@@ -4676,6 +4678,9 @@ zabbix_export:
           description: 'AWS Network Load Balancer region code.'
         - macro: '{$AWS.SECRET.ACCESS.KEY}'
           description: 'Secret access key.'
+        - macro: '{$AWS.STS.REGION}'
+          value: us-east-1
+          description: 'Region used in assume role request.'
       dashboards:
         - uuid: 3b69323b2b8940b0a1fd0ae2ae2dc156
           name: 'Overview AWS ELB Network Load Balancer'

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-08-08T12:30:42Z'
+  date: '2024-08-12T08:52:13Z'
   groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -780,10 +780,10 @@ zabbix_export:
         - macro: '{$AWS.ACCESS.KEY.ID}'
           description: 'Access key ID.'
         - macro: '{$AWS.ASSUME.ROLE.ARN}'
-          description: 'Arn assume role, add when used `assume_role` authorization method'
+          description: 'ARN assume role; add when using the `assume_role` authorization method.'
         - macro: '{$AWS.AUTH_TYPE}'
           value: access_key
-          description: 'Authorization method. Possible values: access_key, assume_role, role_base.'
+          description: 'Authorization method. Possible values: `access_key`, `assume_role`, `role_base`.'
         - macro: '{$AWS.BILLING.LLD.FILTER.SERVICE.MATCHES}'
           value: '.*'
           description: 'Filter of discoverable discovered billing service by name.'

@@ -71,7 +71,7 @@ For using assume role authorization, add the appropriate permissions to the role
     ]
 }
 ```
-Next step add principal in trust relationships to the role you are using:
+Next, add a principal to the trust relationships of the role you are using:
 ```json
 {
   "Version": "2012-10-17",
@@ -111,7 +111,7 @@ If you are using role-based authorization, set the appropriate permissions:
     ]
 }
 ```
-Next step add principal in trust relationships to the role you are using:
+Next, add a principal to the trust relationships of the role you are using:
 ```json
 {
     "Version": "2012-10-17",
@@ -130,13 +130,13 @@ Next step add principal in trust relationships to the role you are using:
     ]
 }
 ```
-**Note**, If you using role-based authorization is only possible when you use a Zabbix server or proxy inside AWS.
+**Note**, Using role-based authorization is only possible when you use a Zabbix server or proxy inside AWS.
 
-Set the following macros "{$AWS.AUTH_TYPE}", "{$AWS.REGION}", "{$AWS.ECS.CLUSTER.NAME}".
+Set the following macros `{$AWS.AUTH_TYPE}`, `{$AWS.REGION}`, `{$AWS.ECS.CLUSTER.NAME`.
 
-If you are using access key-based authorization, set the following macros "{$AWS.ACCESS.KEY.ID}", "{$AWS.SECRET.ACCESS.KEY}".
+If you are using access key-based authorization, set the following macros: `{$AWS.ACCESS.KEY.ID}`, `{$AWS.SECRET.ACCESS.KEY}`.
 
-If you are using access assume role authorization, set the following macros "{$AWS.ACCESS.KEY.ID}", "{$AWS.SECRET.ACCESS.KEY}", "{$AWS.STS.REGION}", "{$AWS.ASSUME.ROLE.ARN}".
+If you are using access assume role authorization, set the following macros: `{$AWS.ACCESS.KEY.ID}`, `{$AWS.SECRET.ACCESS.KEY}`, `{$AWS.STS.REGION}`, `{$AWS.ASSUME.ROLE.ARN}`.
 
 For more information about managing access keys, see [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys)
 
@@ -153,9 +153,9 @@ Additional information about the metrics and used API methods:
 |{$AWS.ACCESS.KEY.ID}|<p>Access key ID.</p>||
 |{$AWS.SECRET.ACCESS.KEY}|<p>Secret access key.</p>||
 |{$AWS.REGION}|<p>Amazon ECS Region code.</p>|`us-west-1`|
-|{$AWS.AUTH_TYPE}|<p>Authorization method. Possible values: access_key, assume_role, role_base.</p>|`access_key`|
+|{$AWS.AUTH_TYPE}|<p>Authorization method. Possible values: `access_key`, `assume_role`, `role_base`.</p>|`access_key`|
 |{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
-|{$AWS.ASSUME.ROLE.ARN}|<p>Arn assume role, add when used `assume_role` authorization method</p>||
+|{$AWS.ASSUME.ROLE.ARN}|<p>ARN assume role; add when using the `assume_role` authorization method.</p>||
 |{$AWS.ECS.CLUSTER.NAME}|<p>ECS cluster name.</p>||
 |{$AWS.ECS.LLD.FILTER.ALARM_NAME.MATCHES}|<p>Filter of discoverable alarms by name.</p>|`.*`|
 |{$AWS.ECS.LLD.FILTER.ALARM_NAME.NOT_MATCHES}|<p>Filter to exclude discovered alarms by name.</p>|`CHANGE_IF_NEEDED`|
