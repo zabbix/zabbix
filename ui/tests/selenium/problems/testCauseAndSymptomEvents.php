@@ -24,13 +24,14 @@ require_once dirname(__FILE__).'/../../include/CWebTest.php';
 class testCauseAndSymptomEvents extends CWebTest {
 
 	/**
-	 * Attach TableBehavior to the test.
+	 * Attach TableBehavior and MessageBehavior to the test.
 	 *
 	 * @return array
 	 */
 	public function getBehaviors() {
 		return [
-			CTableBehavior::class
+			CTableBehavior::class,
+			CMessageBehavior::class
 		];
 	}
 
@@ -523,9 +524,9 @@ class testCauseAndSymptomEvents extends CWebTest {
 		$this->assertTrue($form->getField('id:change_rank')->isEnabled($data['state']));
 	}
 
-	public static function getCauseSymptomsData() {
+	public static function getСauseAndSymptomsData() {
 		return [
-			// #0 Show symptoms false.
+			// #0 Filtering results when "Show symptoms" => false.
 			[
 				[
 					'fields' => [
@@ -533,13 +534,15 @@ class testCauseAndSymptomEvents extends CWebTest {
 						'Show symptoms' => false,
 						'Show timeline' => false
 					],
+					'headers' => ['', '', '', 'Time', 'Severity', 'Recovery time', 'Status', 'Info',
+						'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags'],
 					'result' => [
 						['Problem' => 'Problem trap>150 [Cause]'],
 						['Problem' => 'Problem trap>10 [Symptom]']
 					]
 				]
 			],
-			// #1 Show symptoms true.
+			// #1 Filtering results when "Show symptoms" => true.
 			[
 				[
 					'fields' => [
@@ -547,48 +550,179 @@ class testCauseAndSymptomEvents extends CWebTest {
 						'Show symptoms' => true,
 						'Show timeline' => false
 					],
+					'headers' => ['', '', '', 'Time', 'Severity', 'Recovery time', 'Status', 'Info',
+						'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags'],
 					'result' => [
 						['Problem' => 'Problem trap>150 [Cause]'],
 						['Problem' => 'Problem trap>10 [Symptom]'],
 						['Problem' => 'Problem trap>10 [Symptom]']
 					]
 				]
+			],
+			// #2 Cause event is shown when symptom trigger is disabled but 'Show symptoms' => false.
+			[
+				[
+					'fields' => [
+						'Hosts' => 'Host for Cause and Symptom check',
+						'Show symptoms' => false
+					],
+					'triggers' => [
+						'Problem trap>10 [Symptom]' => 'Disable',
+						'Problem trap>150 [Cause]' => 'Enable'
+					],
+					'headers' => ['', 'Time', '', '', 'Severity', 'Recovery time', 'Status', 'Info',
+						'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags'],
+					'result' => 'Problem trap>150 [Cause]'
+				]
+			],
+			// #3 Cause event is shown when symptom trigger is disabled but 'Show symptoms' => true.
+			[
+				[
+					'fields' => [
+						'Hosts' => 'Host for Cause and Symptom check',
+						'Show symptoms' => true
+					],
+					'triggers' => [
+						'Problem trap>10 [Symptom]' => 'Disable',
+						'Problem trap>150 [Cause]' => 'Enable'
+					],
+					'headers' => ['', 'Time', '', '', 'Severity', 'Recovery time', 'Status', 'Info',
+						'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags'],
+					'result' => 'Problem trap>150 [Cause]'
+				]
+			],
+			// #4 Symptom event is shown when cause trigger is disabled but 'Show symptoms' => true.
+			[
+				[
+					'fields' => [
+						'Hosts' => 'Host for Cause and Symptom check',
+						'Show symptoms' => true
+					],
+					'triggers' => [
+						'Problem trap>10 [Symptom]' => 'Enable',
+						'Problem trap>150 [Cause]' => 'Disable'
+					],
+					'headers' => ['', '', 'Time', '', '', 'Severity', 'Recovery time', 'Status', 'Info',
+						'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags'],
+					'result' => 'Problem trap>10 [Symptom]'
+				]
+			],
+			// #5 No data is shown when cause trigger is disabled but 'Show symptoms' => false.
+			[
+				[
+					'fields' => [
+						'Hosts' => 'Host for Cause and Symptom check',
+						'Show symptoms' => false
+					],
+					'triggers' => [
+						'Problem trap>10 [Symptom]' => 'Enable',
+						'Problem trap>150 [Cause]' => 'Disable'
+					],
+					'headers' => ['', 'Time', '', '', 'Severity', 'Recovery time', 'Status', 'Info',
+						'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags']
+				]
+			],
+			// #6 No data is shown when cause and symptom triggers are disabled but "Show symptoms" => true.
+			[
+				[
+					'fields' => [
+						'Hosts' => 'Host for Cause and Symptom check',
+						'Show symptoms' => true
+					],
+					'headers' => ['', 'Time', '', '', 'Severity', 'Recovery time', 'Status', 'Info',
+						'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags']
+				]
+			],
+			// #7 No data is shown when cause and symptom triggers are disabled but "Show symptoms" => false.
+			[
+				[
+					'fields' => [
+						'Hosts' => 'Host for Cause and Symptom check',
+						'Show symptoms' => false
+					],
+					'headers' => ['', 'Time', '', '', 'Severity', 'Recovery time', 'Status', 'Info',
+						'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags']
+				]
 			]
 		];
 	}
 
 	/**
-	 * @dataProvider getCauseSymptomsData
+	 * Test scenario checks "Problems" page filtering results using disabled/enabled triggers and/or "Show symptoms" flag.
+	 *
+	 * @dataProvider getСauseAndSymptomsData
 	 */
-	public function testCauseAndSymptomEvents_Filter($data) {
-		$this->page->login()->open('zabbix.php?action=problem.view&filter_reset=1&sort=clock&sortorder=ASC');
+	public function testCauseAndSymptomEvents_FilterResults($data) {
+		if (array_key_exists('triggers', $data)) {
+			$this->page->login()->open('zabbix.php?action=trigger.list&filter_set=1&filter_hostids[0]='
+					.self::$hostsids['hostids']['Host for Cause and Symptom check'].'&context=host');
+
+			// Change trigger(s) state.
+			if (array_key_exists('result', $data)) {
+				foreach ($data['triggers'] as $trigger => $status) {
+					$this->query('class:list-table')->asTable()->waitUntilPresent()->one()->findRows('Name', $trigger)->select();
+					$this->query('button:'.$status)->waitUntilClickable()->one()->click();
+					$this->page->acceptAlert();
+					$this->page->waitUntilReady();
+					$this->assertMessage(TEST_GOOD, 'Trigger '.strtolower($status .'d'));
+					CMessageElement::find()->one()->close();
+				}
+			}
+			else {
+				$this->query('id:all_triggers')->asCheckbox()->one()->click();
+				$this->query('button:Disable')->waitUntilClickable()->one()->click();
+				$this->page->acceptAlert();
+				$this->page->waitUntilReady();
+				$this->assertMessage(TEST_GOOD, 'Triggers disabled');
+			}
+
+			$this->page->open('zabbix.php?action=problem.view&filter_reset=1&sort=clock&sortorder=ASC');
+		}
+		else {
+			$this->page->login()->open('zabbix.php?action=problem.view&filter_reset=1&sort=clock&sortorder=ASC');
+
+			// Check headers when Cause and Symptoms problems present in table and 'Show timeline' = true (default state).
+			$this->assertEquals(['', '', '', 'Time', '', '', 'Severity', 'Recovery time', 'Status', 'Info',
+					'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags'], $this->query('class:list-table')
+					->asTable()->waitUntilPresent()->one()->getHeadersText()
+			);
+		}
+
 		$form = CFilterElement::find()->one()->getForm();
-		$table = $this->query('class:list-table')->asTable()->waitUntilPresent()->one();
-
-		// Check headers when Cause and Symptoms problems present in table and 'Show timeline' = true.
-		$this->assertEquals(['', '', '', 'Time', '', '', 'Severity', 'Recovery time', 'Status', 'Info',
-				'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags'], $table->getHeadersText()
-		);
-
 		$form->fill($data['fields']);
 		$form->submit();
+		$table = $this->query('class:list-table')->asTable()->waitUntilPresent()->one();
 		$table->waitUntilReloaded();
-		$this->assertTableData($data['result']);
+		$this->assertEquals($data['headers'], $table->getHeadersText());
 
-		// Check headers when Cause and Symptoms problems present in table and 'Show timeline' = false.
-		$this->assertEquals(['', '', '', 'Time', 'Severity', 'Recovery time', 'Status', 'Info',
-				'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags'], $table->getHeadersText()
-		);
+		// Check 'cause and symptom' icons when trigger(s) state is changed.
+		if (array_key_exists('triggers', $data) && array_key_exists('result', $data)) {
+			$this->assertFalse($table->findRow('Problem', $data['result'])->query(self::COLLAPSE_XPATH)->exists());
 
-		// For Cause problem arrow icon is not present at all.
-		$this->assertFalse($table->getRow(0)->query(self::SYMPTOM_XPATH)->exists());
+			if (CTestArrayHelper::get($data, 'result') === 'Problem trap>10 [Symptom]') {
+				$this->assertTrue($table->findRow('Problem', $data['result'])->query(self::SYMPTOM_XPATH)->one()->isVisible());
+			}
+		}
+		else {
+			// Check 'cause and symptom' icons and filtering results when trigger(s) state is unchanged.
+			if (array_key_exists('result', $data)) {
+				$this->assertTableData($data['result']);
 
-		// For both cases Symptom arrow icon is not visible for the collapsed problem.
-		$this->assertFalse($table->getRow(1)->query(self::SYMPTOM_XPATH)->one()->isVisible());
+				// For Cause problem arrow icon is not present at all.
+				$this->assertFalse($table->findRow('Problem', 'Problem trap>150 [Cause]')->query(self::SYMPTOM_XPATH)->exists());
 
-		// When Symptom is present in the table it is marked with Symptom arrow icon.
-		if ($data['fields']['Show symptoms']) {
-			$this->assertTrue($table->getRow(2)->query(self::SYMPTOM_XPATH)->one()->isVisible());
+				// For both cases Symptom arrow icon is not visible for the collapsed problem.
+				$this->assertFalse($table->getRow(1)->query(self::SYMPTOM_XPATH)->one()->isVisible());
+
+				// When Symptom is present in the table it is marked with Symptom arrow icon.
+				if ($data['fields']['Show symptoms']) {
+					$this->assertTrue($table->getRow(2)->query(self::SYMPTOM_XPATH)->one()->isVisible());
+				}
+			}
+			else {
+				// 'No data found' results when cause and symptom triggers are disabled.
+				$this->assertTableData();
+			}
 		}
 	}
 }
