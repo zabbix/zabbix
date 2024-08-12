@@ -691,7 +691,7 @@ void	op_host_del(const DB_EVENT *event)
 	zbx_vector_uint64_t	hostids;
 	zbx_vector_str_t	hostnames;
 	zbx_uint64_t		hostid;
-	char			*hostname = NULL, *hostname_esc;
+	char			*hostname = NULL, *hostname_esc = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
