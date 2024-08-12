@@ -907,7 +907,6 @@ void	pb_add_json_field(struct zbx_json *j, zbx_history_table_t *history_table, c
 			zbx_json_addint64(j, fld->tag, *(int*)value);
 			break;
 		case ZBX_TYPE_UINT:
-
 			if (NULL != fld->default_value && (SUCCEED == zbx_is_uint64(fld->default_value, &def.val_u64) &&
 					def.val_u64 == *(zbx_uint64_t*)value))
 			{
