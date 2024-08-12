@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-08-12T08:50:51Z'
+  date: '2024-08-13T07:59:46Z'
   groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -683,7 +683,7 @@ zabbix_export:
             			data.MetricsConfiguration.forEach(function (item) {
             				item.region = region;
             			});
-            		} else { data = ['To view request metrics, create a filter'] }
+            		} else { data.MetricsConfiguration = ['To view request metrics, create a filter'] }
             		return data.MetricsConfiguration;
             
             	},

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-08-12T08:51:17Z'
+  date: '2024-08-12T14:26:37Z'
   groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -461,7 +461,7 @@ zabbix_export:
             					'RoleSessionName': AWS.params.role_arn.match(role_arn_regex)[1] + 'Session',
             				};
             
-            				credentials = AWS.getField(AWS.request('GET', AWS.params.sts_region, 'sts', 'sts.' + AWS.params.sts_region + '.amazonaws.com', AWS.prepareParams(payload), '', ''), 'AssumeRoleResponse.AssumeRoleResult.Credentials');
+            				credentials = AWS.getField(AWS.request('GET', AWS.params.sts_region, 'sts', AWS.prepareParams(payload)), 'AssumeRoleResponse.AssumeRoleResult.Credentials');
             				['AccessKeyId', 'SecretAccessKey', 'SessionToken'].forEach(function (field) {
             					if (typeof credentials !== 'object' || typeof credentials[field] === 'undefined' || credentials[field] === '') {
             						throw 'Required credentials is not set: "' + field + '".';
@@ -530,15 +530,15 @@ zabbix_export:
             		return result.join('&');
             	},
             
-            	request: function (method, region, service, host, params, data, uri) {
+            	request: function (method, region, service, params, data) {
             		if (typeof data === 'undefined' || data === null) {
             			data = '';
             		}
             
             		var amzdate = (new Date()).toISOString().replace(/\.\d+Z/, 'Z').replace(/[-:]/g, ''),
             			date = amzdate.replace(/T\d+Z/, ''),
-            
-            			canonical_uri = '/' + uri,
+            			canonical_uri = '/',
+            			host = service + '.' + region + '.amazonaws.com',
             			canonical_headers = 'content-encoding:amz-1.0\n' + 'host:' + host + '\n' + 'x-amz-date:' + amzdate + '\n',
             			signed_headers = 'content-encoding;host;x-amz-date',
             			canonical_request = method + '\n' + canonical_uri + '\n' + params + '\n' + canonical_headers + '\n' + signed_headers + '\n' + sha256(data),
@@ -591,11 +591,11 @@ zabbix_export:
             		var payload = {
             			'Action': 'ListServices',
             			'Version': '2014-11-13',
-            			'status': AWS.params.cluster_name
+            			'cluster': AWS.params.cluster_name
             		},
             			services = [];
             
-            		ECSClusters_Services = AWS.getField(AWS.request('GET', AWS.params.region, 'ecs', 'ecs.' + AWS.params.region + '.amazonaws.com', AWS.prepareParams(payload), '', ''), 'ListServicesResponse.ListServicesResult.serviceArns');
+            		ECSClusters_Services = AWS.getField(AWS.request('GET', AWS.params.region, 'ecs', AWS.prepareParams(payload)), 'ListServicesResponse.ListServicesResult.serviceArns');
             
             		for (k in ECSClusters_Services) {
             			id = ECSClusters_Services[k];
