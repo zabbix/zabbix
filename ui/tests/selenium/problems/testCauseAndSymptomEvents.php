@@ -43,7 +43,7 @@ class testCauseAndSymptomEvents extends CWebTest {
 	const SYMPTOM_XPATH = 'xpath:.//span[(@title="Symptom")]';
 
 	public function prepareData() {
-		// Create hostgroups for hosts.
+		// Create host groups for hosts.
 		CDataHelper::call('hostgroup.create', [
 			['name' => 'Group for Cause and Symptom check'],
 			['name' => 'Group for Cause and Symptom update']
@@ -126,7 +126,7 @@ class testCauseAndSymptomEvents extends CWebTest {
 			]
 		]);
 
-		// Create trigger based on item.
+		// Create triggers.
 		CDataHelper::call('trigger.create', [
 			[
 				'description' => 'Problem trap>10 [Symptom]',
@@ -394,10 +394,9 @@ class testCauseAndSymptomEvents extends CWebTest {
 	 */
 	public function testCauseAndSymptomEvents_ContextMenu($data) {
 		$this->page->login()->open('zabbix.php?action=problem.view&groupids[]='.self::$groupids['Group for Cause and Symptom check']);
-		$table = $this->query('class:list-table')->asTable()->waitUntilPresent()->one();
 
 		if (array_key_exists('linked_events', $data)) {
-			$table->query(self::EXPAND_XPATH)->one()->click();
+			$this->query('class:list-table')->asTable()->waitUntilPresent()->one()->query(self::EXPAND_XPATH)->one()->click();
 		}
 
 		if (array_key_exists('selected_events', $data)) {
@@ -509,6 +508,7 @@ class testCauseAndSymptomEvents extends CWebTest {
 			else {
 				$table->findRows('Problem', $data['problems'])->select();
 			}
+
 			$this->query('button:Mass update')->waitUntilClickable()->one()->click();
 		}
 		else {
@@ -654,8 +654,8 @@ class testCauseAndSymptomEvents extends CWebTest {
 	 */
 	public function testCauseAndSymptomEvents_FilterResults($data) {
 		if (array_key_exists('triggers', $data)) {
-			$this->page->login()->open('zabbix.php?action=trigger.list&filter_set=1&filter_hostids[0]='
-					.self::$hostsids['hostids']['Host for Cause and Symptom check'].'&context=host');
+			$this->page->login()->open('zabbix.php?action=trigger.list&filter_set=1&filter_hostids[0]='.
+					self::$hostsids['hostids']['Host for Cause and Symptom check'].'&context=host');
 
 			// Change trigger(s) state.
 			if (array_key_exists('result', $data)) {
@@ -720,7 +720,7 @@ class testCauseAndSymptomEvents extends CWebTest {
 				}
 			}
 			else {
-				// 'No data found' results when cause and symptom triggers are disabled.
+				// 'No data found' result when cause and symptom triggers are disabled.
 				$this->assertTableData();
 			}
 		}
