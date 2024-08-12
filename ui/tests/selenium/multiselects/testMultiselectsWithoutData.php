@@ -46,43 +46,56 @@ class testMultiselectsWithoutData extends testMultiselectDialogs {
 		return [CTableBehavior::class];
 	}
 
+	/**
+	 * Function for finding and deleting data created before with previous tests.
+	 */
 	public function clearData() {
-		// Delete Services.
-		$serviceids = CDBHelper::getColumn('SELECT serviceid FROM services', 'serviceid');
-		if ($serviceids !== []) {
-			CDataHelper::call('service.delete', array_values($serviceids));
-		}
+		$delete_data = [
+			// Delete Services.
+			[
+				'api' => 'service.delete',
+				'sql' => 'SELECT * FROM services',
+				'column' => 'serviceid'
+			],
+			// Delete Proxies and Proxy groups, connected Hosts, Actions and Discovery rules.
+			[
+				'api' => 'drule.delete',
+				'sql' => 'SELECT * FROM drules',
+				'column' => 'druleid'
+			],
+			[
+				'api' => 'host.delete',
+				'sql' => 'SELECT * FROM hosts WHERE monitored_by=1 OR monitored_by=2',
+				'column' => 'hostid'
+			],
+			[
+				'api' => 'action.delete',
+				'sql' => 'SELECT * FROM actions',
+				'column' => 'actionid'
+			],
+			[
+				'api' => 'proxy.delete',
+				'sql' => 'SELECT * FROM proxy',
+				'column' => 'proxyid'
+			],
+			[
+				'api' => 'proxygroup.delete',
+				'sql' => 'SELECT * FROM proxy_group',
+				'column' => 'proxy_groupid'
+			],
+			// Delete SLA.
+			[
+				'api' => 'sla.delete',
+				'sql' => 'SELECT * FROM sla',
+				'column' => 'slaid'
+			]
+		];
 
-		// Delete Proxies and Proxy groups, connected Hosts, Actions and Discovery rules.
-		$discoveryruleids = CDBHelper::getColumn('SELECT * FROM drules', 'druleid');
-		if ($discoveryruleids !== []) {
-			CDataHelper::call('drule.delete', array_values($discoveryruleids));
-		}
-
-		$monitored_hostids = CDBHelper::getColumn('SELECT * FROM hosts WHERE monitored_by=1 OR monitored_by=2', 'hostid');
-		if ($monitored_hostids !== []) {
-			CDataHelper::call('host.delete', array_values($monitored_hostids));
-		}
-
-		$actionids = CDBHelper::getColumn('SELECT * FROM actions', 'actionid');
-		if ($actionids !== []) {
-			CDataHelper::call('action.delete', array_values($actionids));
-		}
-
-		$proxyids = CDBHelper::getColumn('SELECT * FROM proxy', 'proxyid');
-		if ($proxyids !== []) {
-			CDataHelper::call('proxy.delete', array_values($proxyids));
-		}
-
-		$proxy_groupids = CDBHelper::getColumn('SELECT * FROM proxy_group', 'proxy_groupid');
-		if ($proxyids !== []) {
-			CDataHelper::call('proxygroup.delete', array_values($proxy_groupids));
-		}
-
-		// Delete SLA.
-		$slaids = CDBHelper::getColumn('SELECT * FROM sla', 'slaid');
-		if ($slaids !== []) {
-			CDataHelper::call('sla.delete', array_values($slaids));
+		foreach ($delete_data as $data) {
+			$ids = CDBHelper::getColumn($data['sql'], $data['column']);
+			if ($ids !== []) {
+				CDataHelper::call($data['api'], array_values($ids));
+			}
 		}
 	}
 

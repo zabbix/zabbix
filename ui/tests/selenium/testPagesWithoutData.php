@@ -43,6 +43,9 @@ class testPagesWithoutData extends CWebTest {
 		return [CTableBehavior::class];
 	}
 
+	/**
+	 * Function for finding and deleting data created before with previous tests.
+	 */
 	public function clearData() {
 		// Delete SLA.
 		$slaids = CDBHelper::getColumn('SELECT * FROM sla', 'slaid');
