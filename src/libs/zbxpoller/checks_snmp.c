@@ -3240,6 +3240,12 @@ int	zbx_async_check_snmp(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_async_ta
 		snmp_context->snmp_oid_type = ZBX_SNMP_OID;
 		pdu_type = SNMP_MSG_GET;
 	}
+	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid SNMP OID: unsupported parameter."));
+		ret = CONFIG_ERROR;
+		goto out;
+	}
 
 	snmp_context->probe = ZBX_IF_SNMP_VERSION_3 == item->snmp_version ? 1 : 0;
 
