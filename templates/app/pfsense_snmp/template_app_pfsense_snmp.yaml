@@ -125,6 +125,8 @@ zabbix_export:
             True if the packet was logged with the specified packet filter reason code. The known codes are: match, bad-offset, fragment, short, normalize, and memory.
           preprocessing:
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           tags:
             - tag: component
               value: network
@@ -140,6 +142,8 @@ zabbix_export:
             True if the packet was logged with the specified packet filter reason code. The known codes are: match, bad-offset, fragment, short, normalize, and memory.
           preprocessing:
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           tags:
             - tag: component
               value: network
@@ -155,6 +159,8 @@ zabbix_export:
             True if the packet was logged with the specified packet filter reason code. The known codes are: match, bad-offset, fragment, short, normalize, and memory.
           preprocessing:
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           tags:
             - tag: component
               value: network
@@ -170,6 +176,8 @@ zabbix_export:
             True if the packet was logged with the specified packet filter reason code. The known codes are: match, bad-offset, fragment, short, normalize, and memory.
           preprocessing:
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           tags:
             - tag: component
               value: network
@@ -185,6 +193,8 @@ zabbix_export:
             True if the packet was logged with the specified packet filter reason code. The known codes are: match, bad-offset, fragment, short, normalize, and memory.
           preprocessing:
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           tags:
             - tag: component
               value: network
@@ -200,6 +210,8 @@ zabbix_export:
             True if the packet was logged with the specified packet filter reason code. The known codes are: match, bad-offset, fragment, short, normalize, and memory.
           preprocessing:
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           tags:
             - tag: component
               value: network
@@ -366,34 +378,46 @@ zabbix_export:
             conditions:
               - macro: '{#IFADMINSTATUS}'
                 value: '{$NET.IF.IFADMINSTATUS.MATCHES}'
+                formulaid: A
               - macro: '{#IFADMINSTATUS}'
                 value: '{$NET.IF.IFADMINSTATUS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: B
               - macro: '{#IFALIAS}'
                 value: '{$NET.IF.IFALIAS.MATCHES}'
+                formulaid: C
               - macro: '{#IFALIAS}'
                 value: '{$NET.IF.IFALIAS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: D
               - macro: '{#IFDESCR}'
                 value: '{$NET.IF.IFDESCR.MATCHES}'
+                formulaid: E
               - macro: '{#IFDESCR}'
                 value: '{$NET.IF.IFDESCR.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: F
               - macro: '{#IFNAME}'
                 value: '@Network interfaces for discovery'
+                formulaid: G
               - macro: '{#IFNAME}'
                 value: '{$NET.IF.IFNAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: H
               - macro: '{#IFOPERSTATUS}'
                 value: '{$NET.IF.IFOPERSTATUS.MATCHES}'
+                formulaid: I
               - macro: '{#IFOPERSTATUS}'
                 value: '{$NET.IF.IFOPERSTATUS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: J
               - macro: '{#IFTYPE}'
                 value: '{$NET.IF.IFTYPE.MATCHES}'
+                formulaid: K
               - macro: '{#IFTYPE}'
                 value: '{$NET.IF.IFTYPE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: L
           description: 'Discovering interfaces from IF-MIB.'
           item_prototypes:
             - uuid: b20cd75f9b8543c894862003121893c1
@@ -407,6 +431,8 @@ zabbix_export:
                 IPv4 bits per second blocked coming in on this interface.
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
                 - type: MULTIPLIER
                   parameters:
                     - '8'
@@ -430,6 +456,8 @@ zabbix_export:
                 The number of IPv4 packets blocked coming in on this interface.
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               tags:
                 - tag: component
                   value: firewall
@@ -450,6 +478,8 @@ zabbix_export:
                 IPv6 bits per second blocked coming in on this interface.
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
                 - type: MULTIPLIER
                   parameters:
                     - '8'
@@ -473,6 +503,8 @@ zabbix_export:
                 The number of IPv6 packets blocked coming in on this interface.
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               tags:
                 - tag: component
                   value: firewall
@@ -496,6 +528,8 @@ zabbix_export:
                 and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               tags:
                 - tag: component
                   value: network
@@ -513,6 +547,8 @@ zabbix_export:
                 For packet-oriented interfaces, the number of inbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.  For character-oriented or fixed-length interfaces, the number of inbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               tags:
                 - tag: component
                   value: network
@@ -547,6 +583,8 @@ zabbix_export:
                 IPv4 bits per second passed coming in on this interface.
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
                 - type: MULTIPLIER
                   parameters:
                     - '8'
@@ -570,6 +608,8 @@ zabbix_export:
                 The number of IPv4 packets passed coming in on this interface.
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               tags:
                 - tag: component
                   value: firewall
@@ -590,6 +630,8 @@ zabbix_export:
                 IPv6 bits per second passed coming in on this interface.
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
                 - type: MULTIPLIER
                   parameters:
                     - '8'
@@ -613,6 +655,8 @@ zabbix_export:
                 The number of IPv6 packets passed coming in on this interface.
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               tags:
                 - tag: component
                   value: firewall
@@ -633,6 +677,8 @@ zabbix_export:
                 The total number of octets received on the interface, including framing characters. This object is a 64-bit version of ifInOctets. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
                 - type: MULTIPLIER
                   parameters:
                     - '8'
@@ -654,6 +700,8 @@ zabbix_export:
                 IPv4 bits per second blocked going out on this interface.
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
                 - type: MULTIPLIER
                   parameters:
                     - '8'
@@ -677,6 +725,8 @@ zabbix_export:
                 The number of IPv4 packets blocked going out on this interface.
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               tags:
                 - tag: component
                   value: firewall
@@ -697,6 +747,8 @@ zabbix_export:
                 IPv6 bits per second blocked going out on this interface.
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
                 - type: MULTIPLIER
                   parameters:
                     - '8'
@@ -720,6 +772,8 @@ zabbix_export:
                 The number of IPv6 packets blocked going out on this interface.
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               tags:
                 - tag: component
                   value: firewall
@@ -743,6 +797,8 @@ zabbix_export:
                 and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               tags:
                 - tag: component
                   value: network
@@ -760,6 +816,8 @@ zabbix_export:
                 For packet-oriented interfaces, the number of outbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.  For character-oriented or fixed-length interfaces, the number of outbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               tags:
                 - tag: component
                   value: network
@@ -794,6 +852,8 @@ zabbix_export:
                 IPv4 bits per second passed going out on this interface.
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
                 - type: MULTIPLIER
                   parameters:
                     - '8'
@@ -817,6 +877,8 @@ zabbix_export:
                 The number of IPv4 packets passed going out on this interface.
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               tags:
                 - tag: component
                   value: firewall
@@ -837,6 +899,8 @@ zabbix_export:
                 IPv6 bits per second passed going out on this interface.
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
                 - type: MULTIPLIER
                   parameters:
                     - '8'
@@ -860,6 +924,8 @@ zabbix_export:
                 The number of IPv6 packets passed going out on this interface.
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               tags:
                 - tag: component
                   value: firewall
@@ -880,6 +946,8 @@ zabbix_export:
                 The total number of octets transmitted out of the interface, including framing characters. This object is a 64-bit version of ifOutOctets.Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
                 - type: MULTIPLIER
                   parameters:
                     - '8'
