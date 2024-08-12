@@ -107,6 +107,7 @@ zabbix_export:
           delay: 1h
           history: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Gets sensors with type, description, and thresholds.'
           preprocessing:
             - type: JAVASCRIPT
@@ -132,7 +133,9 @@ zabbix_export:
           name: 'SNMP traps (fallback)'
           type: SNMP_TRAP
           key: snmptrap.fallback
+          delay: '0'
           value_type: LOG
+          trends: '0'
           description: 'The item is used to collect all SNMP traps unmatched by other snmptrap items'
           logtimefmt: 'hh:mm:sszyyyy/MM/dd'
           tags:
@@ -145,6 +148,7 @@ zabbix_export:
           key: 'system.contact[sysContact.0]'
           delay: 15m
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: SNMPv2-MIB
             The textual identification of the contact person for this managed node, together with information on how to contact this person.  If no contact information is known, the value is the zero-length string.
@@ -192,6 +196,7 @@ zabbix_export:
           key: 'system.descr[sysDescr.0]'
           delay: 15m
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: SNMPv2-MIB
             A textual description of the entity. This value should
@@ -234,6 +239,7 @@ zabbix_export:
           key: 'system.location[sysLocation.0]'
           delay: 15m
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: SNMPv2-MIB
             Physical location of the node (e.g., `equipment room`, `3rd floor`). If not provided, the value is a zero-length string.
@@ -252,6 +258,7 @@ zabbix_export:
           key: system.name
           delay: 15m
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: SNMPv2-MIB
             An administratively-assigned name for this managed node.By convention, this is the node's fully-qualified domain name.  If the name is unknown, the value is the zero-length string.
@@ -301,6 +308,7 @@ zabbix_export:
           key: 'system.objectid[sysObjectID.0]'
           delay: 15m
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: SNMPv2-MIB
             The vendor's authoritative identification of the network management subsystem contained in the entity.  This value is allocated within the SMI enterprises subtree (1.3.6.1.4.1) and provides an easy and unambiguous means for determining`what kind of box' is being managed.  For example, if vendor`Flintstones, Inc.' was assigned the subtree1.3.6.1.4.1.4242, it could assign the identifier 1.3.6.1.4.1.4242.1.1 to its `Fred Router'.
@@ -352,6 +360,7 @@ zabbix_export:
             conditions:
               - macro: '{#ENT_CLASS}'
                 value: '3'
+                formulaid: A
           item_prototypes:
             - uuid: 161777c6b77c4c91a11e90dda46d4ec5
               name: '{#ENT_NAME}: Hardware model name'
@@ -360,6 +369,7 @@ zabbix_export:
               key: 'system.hw.model[entPhysicalModelName.{#SNMPINDEX}]'
               delay: 1h
               value_type: CHAR
+              trends: '0'
               description: 'MIB: ENTITY-MIB'
               preprocessing:
                 - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -375,6 +385,7 @@ zabbix_export:
               key: 'system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}]'
               delay: 1h
               value_type: CHAR
+              trends: '0'
               description: 'MIB: ENTITY-MIB'
               preprocessing:
                 - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -398,11 +409,13 @@ zabbix_export:
           name: 'Fan discovery'
           type: DEPENDENT
           key: fan.discovery
+          delay: '0'
           filter:
             evaltype: OR
             conditions:
               - macro: '{#SENSOR_TYPE}'
                 value: '10'
+                formulaid: A
           description: 'ENTITY-SENSORS-MIB::EntitySensorDataType discovery with rpm filter'
           item_prototypes:
             - uuid: 7d86974a2de14ce3a254172b6bf0761f
@@ -512,6 +525,7 @@ zabbix_export:
                 conditions:
                   - macro: '{#THRESHOLD_LO_WARN}'
                     value: ^$
+                    formulaid: A
               operations:
                 - operationobject: TRIGGER_PROTOTYPE
                   operator: REGEXP
@@ -523,6 +537,7 @@ zabbix_export:
                 conditions:
                   - macro: '{#THRESHOLD_LO_CRIT}'
                     value: ^$
+                    formulaid: A
               operations:
                 - operationobject: TRIGGER_PROTOTYPE
                   operator: REGEXP
@@ -534,6 +549,7 @@ zabbix_export:
                 conditions:
                   - macro: '{#THRESHOLD_HI_WARN}'
                     value: ^$
+                    formulaid: A
               operations:
                 - operationobject: TRIGGER_PROTOTYPE
                   operator: REGEXP
@@ -545,6 +561,7 @@ zabbix_export:
                 conditions:
                   - macro: '{#THRESHOLD_HI_CRIT}'
                     value: ^$
+                    formulaid: A
               operations:
                 - operationobject: TRIGGER_PROTOTYPE
                   operator: REGEXP
@@ -561,34 +578,46 @@ zabbix_export:
             conditions:
               - macro: '{#IFADMINSTATUS}'
                 value: '{$NET.IF.IFADMINSTATUS.MATCHES}'
+                formulaid: A
               - macro: '{#IFADMINSTATUS}'
                 value: '{$NET.IF.IFADMINSTATUS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: B
               - macro: '{#IFALIAS}'
                 value: '{$NET.IF.IFALIAS.MATCHES}'
+                formulaid: C
               - macro: '{#IFALIAS}'
                 value: '{$NET.IF.IFALIAS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: D
               - macro: '{#IFDESCR}'
                 value: '{$NET.IF.IFDESCR.MATCHES}'
+                formulaid: E
               - macro: '{#IFDESCR}'
                 value: '{$NET.IF.IFDESCR.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: F
               - macro: '{#IFNAME}'
                 value: '{$NET.IF.IFNAME.MATCHES}'
+                formulaid: G
               - macro: '{#IFNAME}'
                 value: '{$NET.IF.IFNAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: H
               - macro: '{#IFOPERSTATUS}'
                 value: '{$NET.IF.IFOPERSTATUS.MATCHES}'
+                formulaid: I
               - macro: '{#IFOPERSTATUS}'
                 value: '{$NET.IF.IFOPERSTATUS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: J
               - macro: '{#IFTYPE}'
                 value: '{$NET.IF.IFTYPE.MATCHES}'
+                formulaid: K
               - macro: '{#IFTYPE}'
                 value: '{$NET.IF.IFTYPE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: L
           description: 'Discovering interfaces from IF-MIB.'
           item_prototypes:
             - uuid: 5be3410cbb6e4c439198aa8f532c7d4f
@@ -606,6 +635,8 @@ zabbix_export:
                 and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               tags:
                 - tag: component
                   value: network
@@ -624,6 +655,8 @@ zabbix_export:
                 For packet-oriented interfaces, the number of inbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.  For character-oriented or fixed-length interfaces, the number of inbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               tags:
                 - tag: component
                   value: network
@@ -643,6 +676,8 @@ zabbix_export:
                 The total number of octets received on the interface, including framing characters. This object is a 64-bit version of ifInOctets. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
                 - type: MULTIPLIER
                   parameters:
                     - '8'
@@ -668,6 +703,8 @@ zabbix_export:
                 and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               tags:
                 - tag: component
                   value: network
@@ -686,6 +723,8 @@ zabbix_export:
                 For packet-oriented interfaces, the number of outbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.  For character-oriented or fixed-length interfaces, the number of outbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               tags:
                 - tag: component
                   value: network
@@ -705,6 +744,8 @@ zabbix_export:
                 The total number of octets transmitted out of the interface, including framing characters. This object is a 64-bit version of ifOutOctets.Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
                 - type: MULTIPLIER
                   parameters:
                     - '8'
@@ -933,8 +974,10 @@ zabbix_export:
             conditions:
               - macro: '{#IFOPERSTATUS}'
                 value: '1'
+                formulaid: A
               - macro: '{#SNMPVALUE}'
                 value: (2|3)
+                formulaid: B
           description: 'Discovering interfaces from IF-MIB and EtherLike-MIB. Interfaces with up(1) Operational Status are discovered.'
           item_prototypes:
             - uuid: 065e407dcf1248d2827d0b199b271921
@@ -1014,6 +1057,7 @@ zabbix_export:
             conditions:
               - macro: '{#ENT_CLASS}'
                 value: '6'
+                formulaid: A
           item_prototypes:
             - uuid: 3ec518948c0d4472b55adc761ef7855d
               name: '{#ENT_NAME}: Power supply status'
@@ -1044,13 +1088,16 @@ zabbix_export:
           name: 'Temperature discovery'
           type: DEPENDENT
           key: temp.discovery
+          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#SENSOR_PRECISION}'
                 value: '1'
+                formulaid: A
               - macro: '{#SENSOR_TYPE}'
                 value: '8'
+                formulaid: B
           description: 'ENTITY-SENSORS-MIB::EntitySensorDataType discovery with temperature filter'
           item_prototypes:
             - uuid: 2851148fc01c4ba5afb5ab6a3deba5ff
@@ -1144,6 +1191,7 @@ zabbix_export:
                 conditions:
                   - macro: '{#THRESHOLD_LO_WARN}'
                     value: ^$
+                    formulaid: A
               operations:
                 - operationobject: TRIGGER_PROTOTYPE
                   operator: REGEXP
@@ -1155,6 +1203,7 @@ zabbix_export:
                 conditions:
                   - macro: '{#THRESHOLD_LO_CRIT}'
                     value: ^$
+                    formulaid: A
               operations:
                 - operationobject: TRIGGER_PROTOTYPE
                   operator: REGEXP
@@ -1166,6 +1215,7 @@ zabbix_export:
                 conditions:
                   - macro: '{#THRESHOLD_HI_WARN}'
                     value: ^$
+                    formulaid: A
               operations:
                 - operationobject: TRIGGER_PROTOTYPE
                   operator: REGEXP
@@ -1177,6 +1227,7 @@ zabbix_export:
                 conditions:
                   - macro: '{#THRESHOLD_HI_CRIT}'
                     value: ^$
+                    formulaid: A
               operations:
                 - operationobject: TRIGGER_PROTOTYPE
                   operator: REGEXP
@@ -1193,14 +1244,18 @@ zabbix_export:
             conditions:
               - macro: '{#FSNAME}'
                 value: '{$VFS.FS.FSNAME.MATCHES}'
+                formulaid: A
               - macro: '{#FSNAME}'
                 value: '{$VFS.FS.FSNAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: B
               - macro: '{#FSTYPE}'
                 value: '{$VFS.FS.FSTYPE.MATCHES}'
+                formulaid: C
               - macro: '{#FSTYPE}'
                 value: '{$VFS.FS.FSTYPE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: D
           description: 'HOST-RESOURCES-MIB::hrStorage discovery with storage filter.'
           item_prototypes:
             - uuid: 676989796c6847ecb76732acce13126a
@@ -1331,14 +1386,18 @@ zabbix_export:
             conditions:
               - macro: '{#MEMNAME}'
                 value: '{$MEMORY.NAME.MATCHES}'
+                formulaid: A
               - macro: '{#MEMNAME}'
                 value: '{$MEMORY.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: B
               - macro: '{#MEMTYPE}'
                 value: '{$MEMORY.TYPE.MATCHES}'
+                formulaid: C
               - macro: '{#MEMTYPE}'
                 value: '{$MEMORY.TYPE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: D
           description: 'HOST-RESOURCES-MIB::hrStorage discovery with memory filter'
           item_prototypes:
             - uuid: 321107495a2d4f4cb2b9aea7bd62a238
@@ -1413,11 +1472,13 @@ zabbix_export:
           name: 'Voltage discovery'
           type: DEPENDENT
           key: voltage.discovery
+          delay: '0'
           filter:
             evaltype: OR
             conditions:
               - macro: '{#SENSOR_TYPE}'
                 value: 3|4
+                formulaid: A
           description: 'ENTITY-SENSORS-MIB::EntitySensorDataType discovery with volts filter'
           item_prototypes:
             - uuid: 7f66af7d12864f2cbaa8a106979ec427
@@ -1491,6 +1552,7 @@ zabbix_export:
                 conditions:
                   - macro: '{#THRESHOLD_LO_WARN}'
                     value: ^$
+                    formulaid: A
               operations:
                 - operationobject: TRIGGER_PROTOTYPE
                   operator: REGEXP
@@ -1502,6 +1564,7 @@ zabbix_export:
                 conditions:
                   - macro: '{#THRESHOLD_LO_CRIT}'
                     value: ^$
+                    formulaid: A
               operations:
                 - operationobject: TRIGGER_PROTOTYPE
                   operator: REGEXP
@@ -1513,6 +1576,7 @@ zabbix_export:
                 conditions:
                   - macro: '{#THRESHOLD_HI_WARN}'
                     value: ^$
+                    formulaid: A
               operations:
                 - operationobject: TRIGGER_PROTOTYPE
                   operator: REGEXP
@@ -1524,6 +1588,7 @@ zabbix_export:
                 conditions:
                   - macro: '{#THRESHOLD_HI_CRIT}'
                     value: ^$
+                    formulaid: A
               operations:
                 - operationobject: TRIGGER_PROTOTYPE
                   operator: REGEXP
