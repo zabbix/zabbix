@@ -255,7 +255,7 @@ $table
 	->addRow(_('Description'),
 		(new CTextArea('description', $data['description']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('maxlength', DB::getFieldLength('maintenances', 'description'))
+			->setMaxlength(DB::getFieldLength('maintenances', 'description'))
 			->setReadonly(!$data['allowed_edit'])
 	);
 
