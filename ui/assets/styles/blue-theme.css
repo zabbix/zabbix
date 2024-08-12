@@ -4800,7 +4800,7 @@ div.dashboard-widget-navtree .treeview {
     border-top-color: #0275b8; }
 
 form.dashboard-widget-piechart {
-  width: 1350px; }
+  width: 1330px; }
   form.dashboard-widget-piechart .pie-chart-widget-config-tabs {
     grid-column: 1 / -1; }
   form.dashboard-widget-piechart .pie-chart-widget-config-tabs > .tabs-nav {
