@@ -5,6 +5,7 @@ New features:
 ..F....PS. [ZBXNEXT-9218] added proxy group discovery internal item (mprihodko)
 
 Bug fixes:
+........S. [ZBX-24800] fixed global scripts being executed on Zabbix server instead of Zabbix proxy when used in actions (vso)
 A........T [ZBX-24930] fixed inability to import latest official templates to 7.0.0 version (abiba, vmaksimovs)
 ..F....... [ZBX-24940] fixed issue with dependent trigger copying (vmaksimovs, vmurzins)
 ....I..... [ZBX-24576] fixed built-in dashboard "Local network" map element highlight overlapping the widget header (Ivo)
