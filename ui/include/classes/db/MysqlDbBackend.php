@@ -24,7 +24,7 @@ class MysqlDbBackend extends DbBackend {
 	 * @return bool
 	 */
 	protected function checkDbVersionTable() {
-		$table_exists = DBfetch(DBselect("SHOW TABLES LIKE 'dbversion'"));
+		$table_exists = DBfetch(DBselect("select null from dbversion"));
 
 		if (!$table_exists) {
 			$this->setError(_s('Unable to determine current Zabbix database version: %1$s.',
@@ -165,7 +165,23 @@ class MysqlDbBackend extends DbBackend {
 
 		return $resource;
 	}
+	private function setCharset($charset) {
+		global $DB;
 
+		if (!array_key_exists('DB', $DB) || $DB['DB'] === null) {
+			return false;
+		}
+
+		try
+		{
+			$result = mysqli_set_charset($DB['DB'], $charset);
+		}
+		catch (mysqli_sql_exception $e) {
+			return false;
+		}
+
+		return true;
+	}
 	/**
 	 * Initialize connection.
 	 *
@@ -177,13 +193,8 @@ class MysqlDbBackend extends DbBackend {
 			DBexecute("SET innodb_snapshot_isolation='OFF'");
 		}
 
-		$db_encoding = DBselect("SHOW VARIABLES LIKE 'character_set_database'");
-		$charset = $db_encoding ? DBfetch($db_encoding) : false;
-		if ($charset && strtoupper($charset['Value']) === 'UTF8MB4') {
-			DBexecute('SET NAMES utf8mb4');
-			return;
+		if (!$this->setCharset("utf8mb4") && !$this->setCharset("utf8") && !$this->setCharset("utf8mb3")) {
+			trigger_error('Cannot set charset', E_USER_WARNING);
 		}
-
-		DBexecute('SET NAMES utf8');
 	}
 }
