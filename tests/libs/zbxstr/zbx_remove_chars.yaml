@@ -1,0 +1,28 @@
+test case: "abc c" 
+in:
+  string: "abc"
+  list: "c"
+out:
+  return: "ab"
+---
+test case: "abc b"
+in:
+  string: "abc"
+  list: "b"
+out:
+  return: "ac"
+---
+test case: "abc a"
+in:
+  string: "abc"
+  list: "a"
+out:
+  return: "bc"
+---
+test case: "$123$ $"
+in:
+  string: "$123$"
+  list: "$"
+out:
+  return: "123"
+

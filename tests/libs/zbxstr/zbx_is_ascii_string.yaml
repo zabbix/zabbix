@@ -1,0 +1,56 @@
+test case: "succeed 0123456789"
+in:
+  string: "0123456789"
+out:
+  return: SUCCEED
+---
+test case: "fail ы"
+in:
+  string: "ы"
+out:
+  return: FAIL
+---
+test case: "succeed qwert"
+in:
+  string: "qwert"
+out:
+  return: SUCCEED
+---
+test case: "succeed ()_+-="
+in:
+  string: "()_+-="
+out:
+  return: SUCCEED
+---
+test case: "succeed ABCD"
+in:
+  string: "ABCD"
+out:
+  return: SUCCEED
+---
+test case: "succeed ;;2::"
+in:
+  string: ";;2::"
+out:
+  return: SUCCEED
+---
+test case: "fail abcыsss"
+in:
+  string: "abcыsss"
+out:
+  return: FAIL
+---
+test case: "fail 诶"
+in:
+  string: "诶"
+out:
+  return: FAIL
+---
+test case: "succeed empty string"
+in:
+  string: ""
+out:
+  return: SUCCEED
+
+
+

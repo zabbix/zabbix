@@ -7,7 +7,9 @@ BINARIES_tests = \
 	zbx_truncate_value \
 	zbx_dyn_escape_string \
 	zbx_ltrim_utf8 \
-	zbx_rtrim_utf8
+	zbx_rtrim_utf8 \
+	zbx_is_ascii_string\
+	zbx_remove_chars 
 
 noinst_PROGRAMS = $(BINARIES_tests)
 
@@ -123,5 +125,36 @@ zbx_rtrim_utf8_LDADD += @SERVER_LIBS@
 zbx_rtrim_utf8_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
 
 zbx_rtrim_utf8_CFLAGS = $(STR_COMPILER_FLAGS)
+
+# zbx_is_ascii_string
+
+zbx_is_ascii_string_SOURCES = \
+	zbx_is_ascii_string.c \
+	$(COMMON_SRC_FILES)
+
+zbx_is_ascii_string_LDADD = \
+	$(STR_LIBS)
+
+zbx_is_ascii_string_LDADD += @SERVER_LIBS@
+
+zbx_is_ascii_string_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
+
+zbx_is_ascii_string_CFLAGS = $(STR_COMPILER_FLAGS)
+
+# zbx_remove_chars
+
+zbx_remove_chars_SOURCES = \
+	zbx_remove_chars.c \
+	$(COMMON_SRC_FILES)
+
+zbx_remove_chars_LDADD = \
+	$(STR_LIBS)
+
+zbx_remove_chars_LDADD += @SERVER_LIBS@
+
+zbx_remove_chars_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
+
+zbx_remove_chars_CFLAGS = $(STR_COMPILER_FLAGS)
+
 
 #endif
