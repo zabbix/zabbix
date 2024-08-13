@@ -28,6 +28,7 @@ zabbix_export:
           delay: 0s;h/6
           history: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             var AWS = {
             	params: {},
@@ -251,6 +252,7 @@ zabbix_export:
           delay: 0s;h9
           history: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             var AWS = {
             	params: {},
@@ -506,20 +508,24 @@ zabbix_export:
           name: 'AWS monthly costs by services discovery'
           type: DEPENDENT
           key: aws.cost.service.monthly.discovery
+          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#AWS.BILLING.SERVICE.NAME}'
                 value: '{$AWS.BILLING.LLD.FILTER.SERVICE.MATCHES}'
+                formulaid: A
               - macro: '{#AWS.BILLING.SERVICE.NAME}'
                 value: '{$AWS.BILLING.LLD.FILTER.SERVICE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: B
           description: 'Discovery of monthly costs by services.'
           item_prototypes:
             - uuid: d01ee8df0e204f1a857b8188df47402a
               name: '[{#AWS.BILLING.SERVICE.NAME}]: Month [{#AWS.BILLING.MONTH}] Blended cost'
               type: DEPENDENT
               key: 'aws.monthly.service.cost["{#AWS.BILLING.SERVICE.NAME}", "{#AWS.BILLING.MONTH}"]'
+              delay: '0'
               value_type: FLOAT
               units: '{#AWS.BILLING.UNIT}'
               description: 'The monthly cost by service {#AWS.BILLING.SERVICE.NAME}.'
@@ -567,20 +573,24 @@ zabbix_export:
           name: 'AWS daily costs by services discovery'
           type: DEPENDENT
           key: aws.daily.services.costs.discovery
+          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#AWS.BILLING.SERVICE.NAME}'
                 value: '{$AWS.BILLING.LLD.FILTER.SERVICE.MATCHES}'
+                formulaid: A
               - macro: '{#AWS.BILLING.SERVICE.NAME}'
                 value: '{$AWS.BILLING.LLD.FILTER.SERVICE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: B
           description: 'Discovery of daily blended costs by services.'
           item_prototypes:
             - uuid: b6e121c3a1eb49858e942beab12660e2
               name: 'Service [{#AWS.BILLING.SERVICE.NAME}]: Blended daily cost'
               type: DEPENDENT
               key: 'aws.daily.service.cost["{#AWS.BILLING.SERVICE.NAME}"]'
+              delay: '0'
               value_type: FLOAT
               units: '{#AWS.BILLING.UNIT}'
               description: 'The daily blended cost of the {#AWS.BILLING.SERVICE.NAME} service for the previous day.'
@@ -620,12 +630,14 @@ zabbix_export:
           name: 'AWS monthly costs discovery'
           type: DEPENDENT
           key: aws.monthly.cost.discovery
+          delay: '0'
           description: 'Discovery of monthly costs.'
           item_prototypes:
             - uuid: aaf85a53d1804c858fc20189f0483bad
               name: '[{#AWS.BILLING.MONTH}]: Blended cost per month'
               type: DEPENDENT
               key: 'aws.monthly.cost["{#AWS.BILLING.MONTH}"]'
+              delay: '0'
               value_type: FLOAT
               units: '{#AWS.BILLING.UNIT}'
               description: 'The blended cost by month {#AWS.BILLING.MONTH}.'

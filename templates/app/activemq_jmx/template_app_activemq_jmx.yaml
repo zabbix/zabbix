@@ -46,6 +46,7 @@ zabbix_export:
               type: JMX
               key: 'jmx[{#JMXOBJ},BrokerVersion]'
               value_type: TEXT
+              trends: '0'
               username: '{$ACTIVEMQ.USER}'
               password: '{$ACTIVEMQ.PASSWORD}'
               description: 'The version of the broker.'
@@ -242,6 +243,8 @@ zabbix_export:
               description: 'Rate of messages that have been delivered by the broker and acknowledged by consumers.'
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 - tag: component
@@ -256,6 +259,8 @@ zabbix_export:
               description: 'Rate of messages that have been sent to the broker.'
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 - tag: component
@@ -450,6 +455,8 @@ zabbix_export:
               description: 'Rate of messages that has been acknowledged (and removed) from the destination.'
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 - tag: component
@@ -464,6 +471,8 @@ zabbix_export:
               description: 'Rate of messages that have been sent to the destination.'
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 - tag: component
