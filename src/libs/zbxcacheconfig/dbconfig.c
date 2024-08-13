@@ -7685,7 +7685,7 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 			proxy_group_sec2, hp_sec, hp_sec2;
 
 	zbx_dbsync_t	config_sync, hosts_sync, hi_sync, htmpl_sync, gmacro_sync, hmacro_sync, if_sync, items_sync,
-			prototype_items_sync, item_discovery_sync, triggers_sync, tdep_sync,
+			item_discovery_sync, triggers_sync, tdep_sync,
 			func_sync, expr_sync, action_sync, action_op_sync, action_condition_sync, trigger_tag_sync,
 			item_tag_sync, host_tag_sync, correlation_sync, corr_condition_sync, corr_operation_sync,
 			hgroups_sync, itempp_sync, itemscrp_sync, maintenance_sync, maintenance_period_sync,
@@ -7755,7 +7755,6 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 	zbx_dbsync_init(&hmacro_sync, mode);
 	zbx_dbsync_init(&if_sync, mode);
 	zbx_dbsync_init_changelog(&items_sync, changelog_sync_mode);
-	zbx_dbsync_init_changelog(&prototype_items_sync, changelog_sync_mode);
 	zbx_dbsync_init(&item_discovery_sync, mode);
 	zbx_dbsync_init_changelog(&triggers_sync, changelog_sync_mode);
 	zbx_dbsync_init(&tdep_sync, mode);
@@ -8645,7 +8644,6 @@ clean:
 	zbx_dbsync_clear(&host_tag_sync);
 	zbx_dbsync_clear(&if_sync);
 	zbx_dbsync_clear(&items_sync);
-	zbx_dbsync_clear(&prototype_items_sync);
 	zbx_dbsync_clear(&item_discovery_sync);
 	zbx_dbsync_clear(&triggers_sync);
 	zbx_dbsync_clear(&tdep_sync);
