@@ -3682,7 +3682,7 @@ void	get_values_snmp(zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes,
 			goto out;
 		}
 
-		if (NULL == (dnsbase = evdns_base_new(snmp_result.base, EVDNS_BASE_INITIALIZE_NAMESERVERS)))
+		if (NULL == (dnsbase = evdns_base_new(snmp_result.base, 1)))
 		{
 			int	ret;
 

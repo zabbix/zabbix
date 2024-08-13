@@ -36,7 +36,7 @@ static int	discovery_async_poller_dns_init(discovery_poller_config_t *poller_con
 {
 	char	*timeout;
 
-	if (NULL == (poller_config->dnsbase = evdns_base_new(poller_config->base, EVDNS_BASE_INITIALIZE_NAMESERVERS)))
+	if (NULL == (poller_config->dnsbase = evdns_base_new(poller_config->base, 1)))
 	{
 		int	ret;
 

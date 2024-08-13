@@ -27,13 +27,18 @@ AC_LINK_IFELSE([AC_LANG_PROGRAM([[
 
 AC_DEFUN([LIBEVENT_ACCEPT_VERSION],
 [
-	minimal_libevent_version=0x02010800
-	found_libevent_version=`cat $1 | $EGREP \#define.*'EVENT__NUMERIC_VERSION ' | $AWK '{print @S|@3;}'`
-	# compare versions lexicographically
-	libevent_version_check=`expr $found_libevent_version \>\= $minimal_libevent_version`
+	if test -f $1; then
+		minimal_libevent_version=0x02000a00
+		found_libevent_version=`cat $1 | $EGREP \#define.*'_NUMERIC_VERSION ' | $AWK '{print @S|@3;}'`
 
-	if test "$libevent_version_check" = "1"; then
-		accept_libevent_version="yes"
+		# compare versions lexicographically
+		libevent_version_check=`expr $found_libevent_version \>\= $minimal_libevent_version`
+
+		if test "$libevent_version_check" = "1"; then
+			accept_libevent_version="yes"
+		else
+			accept_libevent_version="no"
+		fi;
 	else
 		accept_libevent_version="no"
 	fi;
