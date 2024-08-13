@@ -23,6 +23,12 @@
 
 use Widgets\Clock\Widget;
 
+const CLOCK_CLASSES = [
+	Widget::SHOW_DATE => 'clock-date',
+	Widget::SHOW_TIME => 'clock-time',
+	Widget::SHOW_TIMEZONE => 'clock-time-zone',
+];
+
 $view = new CWidgetView($data);
 
 if ($data['clock_data']['critical_error'] !== null) {
@@ -38,38 +44,21 @@ else {
 			foreach ($clock_data['show'] as $show) {
 				$div = new CDiv();
 
-				switch ($show) {
-					case Widget::SHOW_DATE:
-						$div->addClass('clock-date');
-						$styles = $data['styles']['date'];
-						break;
+				if (array_key_exists($show, CLOCK_CLASSES)) {
+					$div->addClass(CLOCK_CLASSES[$show]);
 
-					case Widget::SHOW_TIME:
-						$div->addClass('clock-time');
-						$styles = $data['styles']['time'];
-						break;
-
-					case Widget::SHOW_TIMEZONE:
-						$div->addClass('clock-time-zone');
-						$styles = $data['styles']['timezone'];
-
-						if ($clock_data['tzone_format'] == Widget::TIMEZONE_FULL) {
-							$div->addItem([new CSpan(), new CSpan()]);
-						}
-
-						break;
-
-					default:
-						$styles = null;
-				}
-
-				if ($styles !== null) {
-					if ($styles['bold']) {
-						$div->addClass('bold');
+					if ($show == Widget::SHOW_TIMEZONE && $clock_data['tzone_format'] == Widget::TIMEZONE_FULL) {
+						$div->addItem([new CSpan(), new CSpan()]);
 					}
 
-					if ($styles['color'] !== '') {
-						$div->addStyle(sprintf('color: #%1$s;', $styles['color']));
+					if (array_key_exists($show, $data['styles']) && $data['styles'][$show]) {
+						if ($data['styles'][$show]['bold']) {
+							$div->addClass('bold');
+						}
+
+						if ($data['styles'][$show]['color'] !== '') {
+							$div->addStyle(sprintf('color: #%1$s;', $data['styles'][$show]['color']));
+						}
 					}
 				}
 
@@ -94,6 +83,7 @@ else {
 
 	$view->setVar('clock_data', $data['clock_data']);
 	$view->setVar('styles', $data['styles']);
+	$view->setVar('classes', CLOCK_CLASSES);
 }
 
 $view

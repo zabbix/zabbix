@@ -31,6 +31,8 @@ class CWidgetClock extends CWidget {
 
 	static DEFAULT_LOCALE = 'en-US';
 
+	static DEFAULT_RATIO = 1;
+
 	static MIN_FONT_SIZE = 12;
 	static MIN_FONT_SIZE_BIG = 24;
 
@@ -51,6 +53,7 @@ class CWidgetClock extends CWidget {
 		this._is_enabled = true;
 		this._canvas_context = document.createElement('canvas').getContext('2d');
 		this._styles = {};
+		this._classes = {};
 	}
 
 	onActivate() {
@@ -101,6 +104,7 @@ class CWidgetClock extends CWidget {
 				this._tzone_format = response.clock_data.tzone_format;
 				this._show = response.clock_data.show;
 				this._styles = response.styles;
+				this._classes = response.classes;
 			}
 
 			this._startClock();
@@ -167,7 +171,7 @@ class CWidgetClock extends CWidget {
 		let m = now.getMinutes();
 		let s = now.getSeconds();
 
-		if (clock_svg !== null && !clock_svg.classList.contains('disabled')) {
+		if (!clock_svg.classList.contains('disabled')) {
 			this._clockHandRotate(clock_svg.querySelector('.clock-hand-h'), 30 * (h + m / 60 + s / 3600));
 			this._clockHandRotate(clock_svg.querySelector('.clock-hand-m'), 6 * (m + s / 60));
 			this._clockHandRotate(clock_svg.querySelector('.clock-hand-s'), 6 * s);
@@ -270,102 +274,64 @@ class CWidgetClock extends CWidget {
 
 		if (this._is_enabled) {
 			const elements = [];
+			let element_data = {};
 
-			let ratio_date = 1;
-			let ratio_time = 1;
-			let ratio_timezone = 1;
+			for (const type of this._show) {
+				const element = this._target.querySelector('.' + this._classes[type]);
 
-			let min_font_size_date = CWidgetClock.MIN_FONT_SIZE;
-			let min_font_size_time = CWidgetClock.MIN_FONT_SIZE;
-			let min_font_size_timezone = CWidgetClock.MIN_FONT_SIZE;
+				if (element !== null) {
+					element_data[type] = {
+						type,
+						element,
+						ratio: CWidgetClock.DEFAULT_RATIO,
+						min_font_size: CWidgetClock.MIN_FONT_SIZE,
+						font_weight: this._styles[type].bold ? 'bold' : ''
+					}
+				}
+			}
 
-			if (this._show.length === 2) {
+			if (Object.entries(element_data).length === 2) {
 				const ratio_small = 0.17;
 				const ratio_big = 0.83;
 
-				if (this._show.includes(CWidgetClock.SHOW_DATE) && this._show.includes(CWidgetClock.SHOW_TIME)) {
-					ratio_date = ratio_small;
-					ratio_time = ratio_big;
-					min_font_size_time = CWidgetClock.MIN_FONT_SIZE_BIG;
+				if (CWidgetClock.SHOW_TIMEZONE in element_data) {
+					element_data[CWidgetClock.SHOW_TIMEZONE].ratio = ratio_small;
+
+					if (CWidgetClock.SHOW_DATE in element_data) {
+						element_data[CWidgetClock.SHOW_DATE].ratio = ratio_big;
+						element_data[CWidgetClock.SHOW_DATE].min_font_size = CWidgetClock.MIN_FONT_SIZE_BIG;
+					}
 				}
-				else if (this._show.includes(CWidgetClock.SHOW_DATE)
-						&& this._show.includes(CWidgetClock.SHOW_TIMEZONE)) {
-					ratio_date = ratio_big;
-					ratio_timezone = ratio_small;
-					min_font_size_date = CWidgetClock.MIN_FONT_SIZE_BIG;
-				}
-				else if (this._show.includes(CWidgetClock.SHOW_TIME)
-						&& this._show.includes(CWidgetClock.SHOW_TIMEZONE)) {
-					ratio_time = ratio_big;
-					ratio_timezone = ratio_small;
-					min_font_size_time = CWidgetClock.MIN_FONT_SIZE_BIG;
-				}
-			}
-			else if (this._show.length === 3) {
-				ratio_date = 0.2;
-				ratio_time = 0.6;
-				ratio_timezone = 0.2;
-				min_font_size_time = CWidgetClock.MIN_FONT_SIZE_BIG;
-			}
 
-			if (this._show.includes(CWidgetClock.SHOW_DATE)) {
-				const element = this._target.querySelector('.clock-date');
+				if (CWidgetClock.SHOW_TIME in element_data) {
+					element_data[CWidgetClock.SHOW_TIME].ratio = ratio_big;
+					element_data[CWidgetClock.SHOW_TIME].min_font_size = CWidgetClock.MIN_FONT_SIZE_BIG;
 
-				if (element !== null) {
-					const font_size = Math.max(min_font_size_date, max_height * ratio_date / CWidgetClock.LINE_HEIGHT);
-
-					element.style.fontSize = `${font_size}px`;
-
-					elements.push({
-						type: CWidgetClock.SHOW_DATE,
-						element,
-						text: element.textContent,
-						font_size,
-						font_weight: this._styles.date.bold ? 'bold' : '',
-						min_font_size: min_font_size_date
-					});
+					if (CWidgetClock.SHOW_DATE in element_data) {
+						element_data[CWidgetClock.SHOW_DATE].ratio = ratio_small;
+					}
 				}
 			}
+			else if (Object.entries(element_data).length === 3) {
+				element_data[CWidgetClock.SHOW_DATE].ratio = 0.2;
+				element_data[CWidgetClock.SHOW_TIME].ratio = 0.6;
+				element_data[CWidgetClock.SHOW_TIMEZONE].ratio = 0.2;
 
-			if (this._show.includes(CWidgetClock.SHOW_TIME)) {
-				const element = this._target.querySelector('.clock-time');
-
-				if (element !== null) {
-					const font_size = Math.max(min_font_size_time, max_height * ratio_time / CWidgetClock.LINE_HEIGHT);
-
-					element.style.fontSize = `${font_size}px`;
-
-					elements.push({
-						type: CWidgetClock.SHOW_TIME,
-						element,
-						text: element.textContent,
-						font_size,
-						font_weight: this._styles.time.bold ? 'bold' : '',
-						min_font_size: min_font_size_time
-					});
-				}
+				element_data[CWidgetClock.SHOW_TIME].min_font_size = CWidgetClock.MIN_FONT_SIZE_BIG;
 			}
 
-			if (this._show.includes(CWidgetClock.SHOW_TIMEZONE)) {
-				const element = this._target.querySelector('.clock-time-zone');
+			for (const type in element_data) {
+				const data = element_data[type];
+				const font_size = Math.max(data.min_font_size, max_height * data.ratio / CWidgetClock.LINE_HEIGHT);
+				const text = type === CWidgetClock.SHOW_TIMEZONE ? this._getTimeZoneText() : data.element.textContent;
 
-				if (element !== null) {
-					const font_size = Math.max(
-						min_font_size_timezone,
-						max_height * ratio_timezone / CWidgetClock.LINE_HEIGHT
-					);
+				data.element.style.fontSize = `${font_size}px`;
 
-					element.style.fontSize = `${font_size}px`;
-
-					elements.push({
-						type: CWidgetClock.SHOW_TIMEZONE,
-						element,
-						text: this._getTimeZoneText(),
-						font_size,
-						font_weight: this._styles.timezone.bold ? 'bold' : '',
-						min_font_size: min_font_size_timezone
-					});
-				}
+				elements.push({
+					...data,
+					text,
+					font_size
+				});
 			}
 
 			if (elements.length > 0) {
@@ -380,13 +346,12 @@ class CWidgetClock extends CWidget {
 						const font_size = Math.max(element.min_font_size, element.font_size * width_ratio);
 
 						element.element.style.fontSize = `${font_size}px`;
-
 						element.font_size = font_size;
 					}
 				}
 			}
 
-			if (this._show.includes(CWidgetClock.SHOW_TIMEZONE) && this._tzone_format === CWidgetClock.TIMEZONE_FULL) {
+			if (CWidgetClock.SHOW_TIMEZONE in element_data && this._tzone_format === CWidgetClock.TIMEZONE_FULL) {
 				const timezone_element = elements.find(e => e.type === CWidgetClock.SHOW_TIMEZONE);
 				const timezone_line_height = timezone_element.font_size * CWidgetClock.LINE_HEIGHT;
 				const elements_height = elements
@@ -401,7 +366,8 @@ class CWidgetClock extends CWidget {
 					? Array.from(parts)
 						.reduce((p1, p2) => {
 							const getWidth = text => this._getMeasuredTextWidth(text, timezone_element.font_size,
-								timezone_element.font_weight);
+								timezone_element.font_weight
+							);
 
 							return getWidth(p1.textContent) > getWidth(p2.textContent) ? p1 : p2;
 						}).textContent
