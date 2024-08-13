@@ -137,11 +137,10 @@ func (b *pluginBroker) reader() {
 	}
 }
 
-func getTimeout(r *requestWithResponse, b *pluginBroker) time.Duration {
-	switch v := r.in.(type) {
-	case *comms.ExportRequest:
+func getRequestTimeout(r *requestWithResponse, b *pluginBroker) time.Duration {
+	if v, ok := r.in.(*comms.ExportRequest); ok {
 		if v.Timeout != 0 {
-			return time.Second*time.Duration(v.Timeout) + +time.Millisecond*500
+			return time.Second*time.Duration(v.Timeout) + time.Millisecond*500
 		}
 	}
 
@@ -166,7 +165,8 @@ func (b *pluginBroker) writer() {
 				b.requestsMutex.Unlock()
 
 				go func(id uint32) {
-					time.Sleep(getTimeout(r, b))
+					t := getRequestTimeout(r, b)
+					time.Sleep(t)
 
 					b.requestsMutex.Lock()
 					defer b.requestsMutex.Unlock()
@@ -179,7 +179,7 @@ func (b *pluginBroker) writer() {
 					req.err <- errs.Wrapf(
 						ErrBrokerTimeout,
 						"timeout %s reached while waiting for response from plugin",
-						b.timeout.String(),
+						t.String(),
 					)
 					close(req.out)
 					close(req.err)
