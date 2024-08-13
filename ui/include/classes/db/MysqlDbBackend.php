@@ -24,7 +24,18 @@ class MysqlDbBackend extends DbBackend {
 	 * @return bool
 	 */
 	protected function checkDbVersionTable() {
-		$table_exists = DBfetch(DBselect("select null from dbversion"));
+		global $DB;
+
+		if (!array_key_exists('DB', $DB) || $DB['DB'] === null) {
+			return false;
+		}
+
+		try
+		{
+			$table_exists = mysqli_query($DB['DB'], "select null from dbversion");
+		}
+		catch (mysqli_sql_exception $e) {
+		}
 
 		if (!$table_exists) {
 			$this->setError(_s('Unable to determine current Zabbix database version: %1$s.',
