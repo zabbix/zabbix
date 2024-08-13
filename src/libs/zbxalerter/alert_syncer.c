@@ -1012,7 +1012,7 @@ static void	alert_syncer_register(zbx_ipc_async_socket_t *socket)
 
 ZBX_THREAD_ENTRY(zbx_alert_syncer_thread, args)
 {
-#define ZBX_POLL_INTERVAL		5
+#define ZBX_POLL_INTERVAL		1
 	zbx_thread_alert_syncer_args	*alert_syncer_args_in = (zbx_thread_alert_syncer_args *)
 							(((zbx_thread_args_t *)args)->args);
 	int				sleeptime, freq_watchdog, sleeptime_after_notify = 0;
