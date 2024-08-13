@@ -378,10 +378,8 @@ class CProfiler {
 		$callStackString = '';
 
 		if ($functions) {
-			$callStackString = array_key_exists('file', $firstCall)
-				? pathinfo($firstCall['file'], PATHINFO_BASENAME).':'.$firstCall['line'].' → '
-				: '';
-			$callStackString .= implode(' → ', $functions);
+			$callStackString .= pathinfo($firstCall['file'], PATHINFO_BASENAME).':'.$firstCall['line'].' → '.
+				implode(' → ', $functions);
 		}
 
 		if ($callWithFile) {

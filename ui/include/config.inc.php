@@ -27,7 +27,7 @@ try {
 catch (DBException $e) {
 	echo (new CView('general.warning', [
 		'header' => 'Database error',
-		'messages' => [$CWebUser::getType() == USER_TYPE_SUPER_ADMIN
+		'messages' => [CWebUser::getType() == USER_TYPE_SUPER_ADMIN
 			? $e->getMessage()
 			: _('System error occurred. Please contact Zabbix administrator.')
 		],
