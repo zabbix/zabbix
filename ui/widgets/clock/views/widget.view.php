@@ -51,14 +51,12 @@ else {
 						$div->addItem([new CSpan(), new CSpan()]);
 					}
 
-					if (array_key_exists($show, $data['styles']) && $data['styles'][$show]) {
-						if ($data['styles'][$show]['bold']) {
-							$div->addClass('bold');
-						}
+					if ($data['styles'][$show]['bold']) {
+						$div->addClass('bold');
+					}
 
-						if ($data['styles'][$show]['color'] !== '') {
-							$div->addStyle(sprintf('color: #%1$s;', $data['styles'][$show]['color']));
-						}
+					if ($data['styles'][$show]['color'] !== '') {
+						$div->addStyle(sprintf('color: #%1$s;', $data['styles'][$show]['color']));
 					}
 				}
 
