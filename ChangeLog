@@ -3,6 +3,11 @@ Changes for 5.0.43rc1
 Bug fixes:
 .........T [ZBX-23788] added SNMP OID ifAlias in Network interfaces discovery (egordymov)
 .....J.... [ZBX-24298] allowed any JNDI service providers back in JMX monitoring (dimir)
+..F.....S. [ZBX-25015] fixed information exposure in System information widget for users without proper permissions (vmurzins)
+....I..... [ZBX-25011] fixed access for non-admin user to options of installed MSI (MVekslers)
+........S. [ZBX-25012] implemented phone number validation check to avoid AT commands injection (sboidenko)
+........S. [ZBX-25013] fixed exploit to read files using SMS (sboidenko)
+A......... [ZBX-25017] fixed sensitive data exposure from audit log (gcalenko)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.42
