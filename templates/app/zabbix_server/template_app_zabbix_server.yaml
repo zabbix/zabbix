@@ -1881,10 +1881,11 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: bbbaf1aaa1a64e57bad2ec53cc0e96f6
                   expression: 'max(/Zabbix server health/zabbix.proxy.group.avail.proxies.percent[{#PROXY.GROUP.NAME}],3m)<{$PROXY.GROUP.AVAIL.PERCENT.MIN}'
-                  name: 'Proxy group [{#PROXY.GROUP.NAME}]: Availability below {$PROXY.GROUP.AVAIL.PERCENT.MIN}%'
+                  name: 'Proxy group [{#PROXY.GROUP.NAME}]: Availability too low'
+                  event_name: 'Proxy group [{#PROXY.GROUP.NAME}]: Availability below {$PROXY.GROUP.AVAIL.PERCENT.MIN}%'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: WARNING
-                  description: 'The availability of proxies in a proxy group is below "{$PROXY.GROUP.AVAIL.PERCENT.MIN}" for at least 3 minutes.'
+                  description: 'The availability of proxies in a proxy group is below {$PROXY.GROUP.AVAIL.PERCENT.MIN}% for at least 3 minutes.'
                   tags:
                     - tag: scope
                       value: availability
@@ -2085,6 +2086,9 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - $.data
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
       tags:
         - tag: class
           value: software
