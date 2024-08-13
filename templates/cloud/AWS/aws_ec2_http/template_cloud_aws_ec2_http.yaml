@@ -2450,8 +2450,12 @@ zabbix_export:
                   value: '{$AWS.PROXY}'
                 - name: region
                   value: '{$AWS.REGION}'
+                - name: role_arn
+                  value: '{$AWS.ASSUME.ROLE.ARN}'
                 - name: SecretAccessKey
                   value: '{$AWS.SECRET.ACCESS.KEY}'
+                - name: sts_region
+                  value: '{$AWS.STS.REGION}'
                 - name: volume_id
                   value: '{#VOLUME_ID}'
               tags:
