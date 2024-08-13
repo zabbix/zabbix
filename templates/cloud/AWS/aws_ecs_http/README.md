@@ -39,18 +39,53 @@ Add the following required permissions to your Zabbix IAM policy in order to col
     "Statement":[
         {
           "Action":[
-                "cloudwatch:DescribeAlarms",
-                "cloudwatch:GetMetricData",
-                "ecs:ListServices",
-                "esc:ListTasks"
+              "cloudwatch:DescribeAlarms",
+              "cloudwatch:GetMetricData",
+              "ecs:ListServices"
           ],
           "Effect":"Allow",
           "Resource":"*"
         }
     ]
   }
-  ```
-
+```
+For using assume role authorization, add the appropriate permissions to the role you are using:
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": "sts:AssumeRole",
+            "Resource": "arn:aws:iam::{Account}:user/{UserName}"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "cloudwatch:DescribeAlarms",
+                "cloudwatch:GetMetricData",
+                "ecs:ListServices"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+```
+Next, add a principal to the trust relationships of the role you are using:
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "arn:aws:iam::{Account}:user/{UserName}"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+```
 If you are using role-based authorization, set the appropriate permissions:
 ```json
 {
@@ -68,7 +103,6 @@ If you are using role-based authorization, set the appropriate permissions:
                 "cloudwatch:DescribeAlarms",
                 "cloudwatch:GetMetricData",
                 "ecs:ListServices",
-                "esc:ListTasks",
                 "ec2:AssociateIamInstanceProfile",
                 "ec2:ReplaceIamInstanceProfileAssociation"
             ],
@@ -77,10 +111,32 @@ If you are using role-based authorization, set the appropriate permissions:
     ]
 }
 ```
+Next, add a principal to the trust relationships of the role you are using:
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": {
+                "Service": [
+                    "ec2.amazonaws.com"
+                ]
+            },
+            "Action": [
+                "sts:AssumeRole"
+            ]
+        }
+    ]
+}
+```
+**Note**, Using role-based authorization is only possible when you use a Zabbix server or proxy inside AWS.
 
-Set the following macros "{$AWS.AUTH_TYPE}", "{$AWS.REGION}", "{$AWS.ECS.CLUSTER.NAME}"
+Set the following macros `{$AWS.AUTH_TYPE}`, `{$AWS.REGION}`, `{$AWS.ECS.CLUSTER.NAME`.
 
-If you are using access key-based authorization, set the following macros "{$AWS.ACCESS.KEY.ID}", "{$AWS.SECRET.ACCESS.KEY}"
+If you are using access key-based authorization, set the following macros: `{$AWS.ACCESS.KEY.ID}`, `{$AWS.SECRET.ACCESS.KEY}`.
+
+If you are using access assume role authorization, set the following macros: `{$AWS.ACCESS.KEY.ID}`, `{$AWS.SECRET.ACCESS.KEY}`, `{$AWS.STS.REGION}`, `{$AWS.ASSUME.ROLE.ARN}`.
 
 For more information about managing access keys, see [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys)
 
@@ -97,7 +153,9 @@ Additional information about the metrics and used API methods:
 |{$AWS.ACCESS.KEY.ID}|<p>Access key ID.</p>||
 |{$AWS.SECRET.ACCESS.KEY}|<p>Secret access key.</p>||
 |{$AWS.REGION}|<p>Amazon ECS Region code.</p>|`us-west-1`|
-|{$AWS.AUTH_TYPE}|<p>Authorization method. Possible values: role_base, access_key.</p>|`access_key`|
+|{$AWS.AUTH_TYPE}|<p>Authorization method. Possible values: `access_key`, `assume_role`, `role_base`.</p>|`access_key`|
+|{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
+|{$AWS.ASSUME.ROLE.ARN}|<p>ARN assume role; add when using the `assume_role` authorization method.</p>||
 |{$AWS.ECS.CLUSTER.NAME}|<p>ECS cluster name.</p>||
 |{$AWS.ECS.LLD.FILTER.ALARM_NAME.MATCHES}|<p>Filter of discoverable alarms by name.</p>|`.*`|
 |{$AWS.ECS.LLD.FILTER.ALARM_NAME.NOT_MATCHES}|<p>Filter to exclude discovered alarms by name.</p>|`CHANGE_IF_NEEDED`|
@@ -155,14 +213,14 @@ Additional information about the metrics and used API methods:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|[{#ALARM_NAME}] has 'Alarm' state|<p>Alarm "{#ALARM_NAME}" has 'Alarm' state. <br>Reason: {ITEM.LASTVALUE2}</p>|`last(/AWS ECS Cluster by HTTP/aws.ecs.alarm.state["{#ALARM_NAME}"])=2 and length(last(/AWS ECS Cluster by HTTP/aws.ecs.alarm.state_reason["{#ALARM_NAME}"]))>0`|Average||
+|[{#ALARM_NAME}] has 'Alarm' state|<p>Alarm "{#ALARM_NAME}" has 'Alarm' state.<br>Reason: {ITEM.LASTVALUE2}</p>|`last(/AWS ECS Cluster by HTTP/aws.ecs.alarm.state["{#ALARM_NAME}"])=2 and length(last(/AWS ECS Cluster by HTTP/aws.ecs.alarm.state_reason["{#ALARM_NAME}"]))>0`|Average||
 |[{#ALARM_NAME}] has 'Insufficient data' state||`last(/AWS ECS Cluster by HTTP/aws.ecs.alarm.state["{#ALARM_NAME}"])=1`|Info||
 
 ### LLD rule Cluster Services discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Cluster Services discovery|<p>Discovery {$AWS.ECS.CLUSTER.NAME} services.</p>|Dependent item|aws.ecs.services.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.services`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Cluster Services discovery|<p>Discovery {$AWS.ECS.CLUSTER.NAME} services.</p>|Dependent item|aws.ecs.services.discovery<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 
 ### Item prototypes for Cluster Services discovery
 
