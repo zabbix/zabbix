@@ -1004,7 +1004,7 @@ zabbix_export:
                       name: graphid.0
                       value:
                         host: 'AWS Lambda by HTTP'
-                        name: Invocations
+                        name: 'AWS Lambda: Invocations'
                     - type: STRING
                       name: reference
                       value: ECCBA
@@ -1017,7 +1017,7 @@ zabbix_export:
                       name: graphid.0
                       value:
                         host: 'AWS Lambda by HTTP'
-                        name: Errors
+                        name: 'AWS Lambda: Errors'
                     - type: STRING
                       name: reference
                       value: DBBFF
@@ -1030,7 +1030,7 @@ zabbix_export:
                       name: graphid.0
                       value:
                         host: 'AWS Lambda by HTTP'
-                        name: Duration
+                        name: 'AWS Lambda: Duration'
                     - type: STRING
                       name: reference
                       value: FBDDF
@@ -1043,7 +1043,7 @@ zabbix_export:
                       name: graphid.0
                       value:
                         host: 'AWS Lambda by HTTP'
-                        name: Throttles
+                        name: 'AWS Lambda: Throttles'
                     - type: STRING
                       name: reference
                       value: BDAAA
@@ -1057,7 +1057,7 @@ zabbix_export:
                       name: graphid.0
                       value:
                         host: 'AWS Lambda by HTTP'
-                        name: 'Asynchronous events'
+                        name: 'AWS Lambda: Asynchronous events'
                     - type: STRING
                       name: reference
                       value: CAADA
@@ -1070,7 +1070,7 @@ zabbix_export:
                       name: graphid.0
                       value:
                         host: 'AWS Lambda by HTTP'
-                        name: 'Async event age'
+                        name: 'AWS Lambda: Async event age'
                     - type: STRING
                       name: reference
                       value: EAFEB
@@ -1083,7 +1083,7 @@ zabbix_export:
                       name: graphid.0
                       value:
                         host: 'AWS Lambda by HTTP'
-                        name: 'Async dropped events'
+                        name: 'AWS Lambda: Async dropped events'
                     - type: STRING
                       name: reference
                       value: ECADD
@@ -1097,7 +1097,7 @@ zabbix_export:
                       name: graphid.0
                       value:
                         host: 'AWS Lambda by HTTP'
-                        name: 'Concurrent executions'
+                        name: 'AWS Lambda: Concurrent executions'
                     - type: STRING
                       name: reference
                       value: CAECA
@@ -1110,7 +1110,7 @@ zabbix_export:
                       name: graphid.0
                       value:
                         host: 'AWS Lambda by HTTP'
-                        name: 'Unreserved concurrent executions'
+                        name: 'AWS Lambda: Unreserved concurrent executions'
                     - type: STRING
                       name: reference
                       value: CFEBE
@@ -1128,7 +1128,7 @@ zabbix_export:
               newvalue: Unknown
   graphs:
     - uuid: af2dcb92a19a47c2a6f8d1ea78794553
-      name: 'Async dropped events'
+      name: 'AWS Lambda: Async dropped events'
       graph_items:
         - drawtype: BOLD_LINE
           color: 199C0D
@@ -1136,7 +1136,7 @@ zabbix_export:
             host: 'AWS Lambda by HTTP'
             key: aws.lambda.async_events_dropped.sum
     - uuid: c6d59fa52671477db6865874acedec1b
-      name: 'Async event age'
+      name: 'AWS Lambda: Async event age'
       graph_items:
         - drawtype: BOLD_LINE
           color: 199C0D
@@ -1144,7 +1144,7 @@ zabbix_export:
             host: 'AWS Lambda by HTTP'
             key: aws.lambda.async_event_age.avg
     - uuid: 2b98a8ff2c584419b962ed0cb3fe8809
-      name: 'Asynchronous events'
+      name: 'AWS Lambda: Asynchronous events'
       graph_items:
         - drawtype: BOLD_LINE
           color: 199C0D
@@ -1152,7 +1152,7 @@ zabbix_export:
             host: 'AWS Lambda by HTTP'
             key: aws.lambda.async_events_received.sum
     - uuid: 8eb1c4bbb3974048a76e4c84bdfa25a5
-      name: 'Concurrent executions'
+      name: 'AWS Lambda: Concurrent executions'
       graph_items:
         - drawtype: BOLD_LINE
           color: 199C0D
@@ -1160,7 +1160,7 @@ zabbix_export:
             host: 'AWS Lambda by HTTP'
             key: aws.lambda.concurrent_executions.max
     - uuid: 7e1dad2ad49d4c0487e4e724594331fa
-      name: Duration
+      name: 'AWS Lambda: Duration'
       graph_items:
         - drawtype: BOLD_LINE
           color: 199C0D
@@ -1168,7 +1168,7 @@ zabbix_export:
             host: 'AWS Lambda by HTTP'
             key: aws.lambda.duration.avg
     - uuid: 07288fd5c2ff4806a6749e114d0cf93d
-      name: Errors
+      name: 'AWS Lambda: Errors'
       graph_items:
         - drawtype: BOLD_LINE
           color: 199C0D
@@ -1176,7 +1176,7 @@ zabbix_export:
             host: 'AWS Lambda by HTTP'
             key: aws.lambda.errors.sum
     - uuid: cc854ebac57143629b49f1fae3598d8b
-      name: Invocations
+      name: 'AWS Lambda: Invocations'
       graph_items:
         - drawtype: BOLD_LINE
           color: 199C0D
@@ -1184,7 +1184,7 @@ zabbix_export:
             host: 'AWS Lambda by HTTP'
             key: aws.lambda.invocations.sum
     - uuid: c16f61d853474a0f9a251327873ef62e
-      name: Throttles
+      name: 'AWS Lambda: Throttles'
       graph_items:
         - drawtype: BOLD_LINE
           color: 199C0D
@@ -1198,7 +1198,7 @@ zabbix_export:
             host: 'AWS Lambda by HTTP'
             key: aws.lambda.throttles.sum
     - uuid: d01c132670fb4347b591ddb96900fa99
-      name: 'Unreserved concurrent executions'
+      name: 'AWS Lambda: Unreserved concurrent executions'
       graph_items:
         - drawtype: BOLD_LINE
           color: 199C0D

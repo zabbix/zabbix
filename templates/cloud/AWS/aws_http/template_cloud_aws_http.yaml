@@ -2033,8 +2033,6 @@ zabbix_export:
               group_links:
                 - group:
                     name: Applications
-              group_prototypes:
-                - name: '{#AWS.S3.REGION}'
               templates:
                 - name: 'AWS S3 bucket by HTTP'
               macros:
