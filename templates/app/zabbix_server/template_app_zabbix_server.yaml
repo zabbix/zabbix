@@ -1915,7 +1915,7 @@ zabbix_export:
               units: s
               description: 'Failover period in the Zabbix proxy group.'
               valuemap:
-                name: 'Proxy group failover'
+                name: 'Proxy group invalid value'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1944,7 +1944,10 @@ zabbix_export:
               name: 'Proxy group [{#PROXY.GROUP.NAME}]: Minimum number of proxies'
               type: DEPENDENT
               key: 'zabbix.proxy.group.online.min[{#PROXY.GROUP.NAME}]'
+              value_type: FLOAT
               description: 'Minimum number of proxies online in the Zabbix proxy group.'
+              valuemap:
+                name: 'Proxy group invalid value'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1959,6 +1962,16 @@ zabbix_export:
                   value: proxy-group
                 - tag: proxy-group-name
                   value: '{#PROXY.GROUP.NAME}'
+              trigger_prototypes:
+                - uuid: ba1aa13dc8204c76be4fa85a6411de4d
+                  expression: 'last(/Zabbix server health/zabbix.proxy.group.online.min[{#PROXY.GROUP.NAME}],#1)=-1'
+                  name: 'Proxy group [{#PROXY.GROUP.NAME}]: Minimum number of proxies invalid value'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'Proxy group minimum number of proxies has an invalid value.'
+                  tags:
+                    - tag: scope
+                      value: notice
             - uuid: b493eccc24ea4343ae3caf0651d46b6c
               name: 'Proxy group [{#PROXY.GROUP.NAME}]: Settings'
               type: DEPENDENT
@@ -3201,7 +3214,7 @@ zabbix_export:
             - value: '-1'
               newvalue: Never
         - uuid: 8c23fc3b231b439a8eec4d0d60859c90
-          name: 'Proxy group failover'
+          name: 'Proxy group invalid value'
           mappings:
             - value: '-1'
               newvalue: 'Invalid value'

@@ -225,6 +225,7 @@ Link this template to the local Zabbix server host.
 |Proxy group [{#PROXY.GROUP.NAME}]: Status changed|<p>The state of the Zabbix proxy group has changed. Acknowledge to close the problem manually.</p>|`last(/Zabbix server health/zabbix.proxy.group.state[{#PROXY.GROUP.NAME}],#1)<>last(/Zabbix server health/zabbix.proxy.group.state[{#PROXY.GROUP.NAME}],#2) and length(last(/Zabbix server health/zabbix.proxy.group.state[{#PROXY.GROUP.NAME}]))>0`|Info|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Proxy group [{#PROXY.GROUP.NAME}]: Status "degrading"</li></ul>|
 |Proxy group [{#PROXY.GROUP.NAME}]: Availability below {$PROXY.GROUP.AVAIL.PERCENT.MIN}%|<p>The availability of proxies in a proxy group is below "{$PROXY.GROUP.AVAIL.PERCENT.MIN}" for at least 3 minutes.</p>|`max(/Zabbix server health/zabbix.proxy.group.avail.proxies.percent[{#PROXY.GROUP.NAME}],3m)<{$PROXY.GROUP.AVAIL.PERCENT.MIN}`|Warning||
 |Proxy group [{#PROXY.GROUP.NAME}]: Failover invalid value|<p>Proxy group failover has an invalid value.</p>|`last(/Zabbix server health/zabbix.proxy.group.failover[{#PROXY.GROUP.NAME}],#1)=-1`|Warning||
+|Proxy group [{#PROXY.GROUP.NAME}]: Minimum number of proxies invalid value|<p>Proxy group minimum number of proxies has an invalid value.</p>|`last(/Zabbix server health/zabbix.proxy.group.online.min[{#PROXY.GROUP.NAME}],#1)=-1`|Warning||
 
 ### LLD rule High availability cluster node discovery
 
