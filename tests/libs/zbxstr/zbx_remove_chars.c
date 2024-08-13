@@ -27,11 +27,11 @@ void	zbx_mock_test_entry(void **state)
 
 	src = zbx_mock_get_parameter_string("in.string");
 
-    list =  zbx_mock_get_parameter_string("in.list");
+	list =  zbx_mock_get_parameter_string("in.list");
 
 	exp_result = zbx_mock_get_parameter_string("out.return");
 
 	zbx_remove_chars(src, list);
 
-    zbx_mock_assert_str_eq("return value",  exp_result, src);
+	zbx_mock_assert_str_eq("return value",  exp_result, src);
 }
