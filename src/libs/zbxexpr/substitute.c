@@ -161,7 +161,7 @@ static int	substitute_macros_args(zbx_token_search_t search, char **data, char *
 
 			va_copy(pargs, args); /* copy current argument position */
 
-			ret = resolver(&p, args, &replace_to, data, error, maxerrlen);
+			ret = resolver(&p, pargs, &replace_to, data, error, maxerrlen);
 
 			va_end(pargs);
 

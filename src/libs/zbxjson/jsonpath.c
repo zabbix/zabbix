@@ -2870,7 +2870,7 @@ static void	jsonpath_ctx_clear(zbx_jsonpath_context_t *ctx)
  *                                                                            *
  * Purpose: perform jsonpath query on the specified json object               *
  *                                                                            *
- * Parameters: obj    - [IN] json object                                  *
+ * Parameters: obj    - [IN] json object                                      *
  *             index  - [IN] jsonpath index (optional)                        *
  *             path   - [IN] jsonpath                                         *
  *             output - [OUT] output value                                    *
@@ -2991,7 +2991,7 @@ static void	jsonobj_index_el_clear(void *v)
  * Purpose: add matched object to the index                                   *
  *                                                                            *
  * Parameters: index   - [IN] the parent object index                         *
- *             name    - [IN] the name of objec to add to index               *
+ *             name    - [IN] the name of object to add to index              *
  *             obj     - [IN] the object to add to index                      *
  *             value   - [IN] the object matched by index path                *
  *                                                                            *

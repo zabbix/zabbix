@@ -409,7 +409,7 @@ var hintBox = {
 		});
 	},
 
-	createBox: function(e, target, hintText, className, isStatic, styles, appendTo) {
+	createBox: function(e, target, hintText, className, isStatic, styles, appendTo, reposition_on_resize = true) {
 		var hintboxid = hintBox.getUniqueId(),
 			box = jQuery('<div>', {'data-hintboxid': hintboxid}).addClass('overlay-dialogue wordbreak'),
 			appendTo = appendTo || '.wrapper';
@@ -490,8 +490,10 @@ var hintBox = {
 			childList: true
 		});
 
-		target.resize_observer = new ResizeObserver(() => hintBox.onResize(e, target));
-		target.resize_observer.observe(box[0]);
+		if (reposition_on_resize) {
+			target.resize_observer = new ResizeObserver(() => hintBox.onResize(e, target));
+			target.resize_observer.observe(box[0]);
+		}
 
 		return box;
 	},
@@ -603,8 +605,8 @@ var hintBox = {
 			};
 
 		if ($host[0].clientWidth > hint_width) {
-			css.width = $elem.width();
-			css.height = $elem.height();
+			css.width = Math.ceil($elem.width());
+			css.height = Math.ceil($elem.height());
 		}
 
 		if (event_x + event_offset + hint_width <= host_x_max) {

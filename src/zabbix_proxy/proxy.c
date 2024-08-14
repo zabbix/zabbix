@@ -1448,7 +1448,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 {
 	zbx_socket_t				listen_sock = {0};
 	char					*error = NULL;
-	int					i, ret;
+	int					i;
+	pid_t					pid;
 	zbx_rtc_t				rtc;
 	zbx_timespec_t				rtc_timeout = {1, 0};
 	zbx_on_exit_args_t			exit_args = {.rtc = NULL, .listen_sock = NULL};
@@ -1774,6 +1775,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	else
 		rtc_process_request_func = rtc_process_request_ex_proxy;
 
+	zbx_set_child_pids(zbx_threads, zbx_threads_num);
+
 	for (i = 0; i < zbx_threads_num; i++)
 	{
 		if (FAIL == get_process_info_by_thread(i + 1, &thread_args.info.process_type,
@@ -1923,13 +1926,16 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		if (NULL != client)
 			zbx_ipc_client_release(client);
 
-		if (0 < (ret = waitpid((pid_t)-1, &i, WNOHANG)))
+		if (0 < (pid = waitpid((pid_t)-1, &i, WNOHANG)))
 		{
-			zbx_set_exiting_with_fail();
-			break;
+			if (SUCCEED == zbx_is_child_pid(pid, zbx_threads, zbx_threads_num))
+			{
+				zbx_set_exiting_with_fail();
+				break;
+			}
 		}
 
-		if (-1 == ret && EINTR != errno)
+		if (-1 == pid && EINTR != errno)
 		{
 			zabbix_log(LOG_LEVEL_ERR, "failed to wait on child processes: %s", zbx_strerror(errno));
 			zbx_set_exiting_with_fail();

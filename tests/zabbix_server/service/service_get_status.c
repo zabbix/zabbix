@@ -43,6 +43,6 @@ void	zbx_mock_test_entry(void **state)
 	if (SUCCEED == rc_exp)
 	{
 		status_exp = zbx_mock_get_parameter_string("out.status");
-		zbx_mock_assert_int_eq("propogated service status", atoi(status_exp), status_ret);
+		zbx_mock_assert_int_eq("propagated service status", atoi(status_exp), status_ret);
 	}
 }

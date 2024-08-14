@@ -38,9 +38,7 @@ window.mediatype_test_edit_popup = new class {
 		const curl = new Curl('zabbix.php');
 
 		curl.setArgument('action', 'mediatype.test.send');
-		curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
-			<?= json_encode(CCsrfTokenHelper::get('mediatype'), JSON_THROW_ON_ERROR) ?>
-		);
+		curl.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('mediatype')) ?>);
 
 		this.form.querySelector('#mediatypetest_log')?.classList.add('<?= ZBX_STYLE_DISABLED ?>');
 

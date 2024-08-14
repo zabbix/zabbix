@@ -72,7 +72,7 @@ void	zbx_pp_history_reserve(zbx_pp_history_t *history, int history_num)
  * Parameters: history - [IN] preprocessing history                           *
  *             index   - [IN] preprocessing step index                        *
  *             value   - [IN/OUT] value to add, its resources are copied      *
- *                         over to history and the value itself is reseted    *
+ *                         over to history and the value itself is reset      *
  *             ts      - [IN] value timestamp                                 *
  *                                                                            *
  ******************************************************************************/
