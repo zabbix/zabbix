@@ -805,7 +805,7 @@ int	check_vcenter_eventlog(AGENT_REQUEST *request, const DC_ITEM *item, AGENT_RE
 	}
 	else if (item->itemid != service->eventlog.owner_itemid)
 	{
-		/* To protect against data fragmentation among multiple vmware event items. */
+		/* to protect against data fragmentation among multiple vmware event items */
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Duplicate VMware eventlog item is not supported"));
 		goto unlock;
 	}
