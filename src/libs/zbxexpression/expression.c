@@ -2804,10 +2804,15 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 					zbx_snprintf(error, maxerrlen, "Invalid macro '%.*s' value",
 							(int)(token.loc.r - token.loc.l + 1), *data + token.loc.l);
 				}
-				res = FAIL;
+
+				if (0 != (macro_type & (ZBX_MACRO_TYPE_SCRIPT | ZBX_MACRO_TYPE_SCRIPT_NORMAL |
+						ZBX_MACRO_TYPE_SCRIPT_RECOVERY)))
+				{
+					res = FAIL;
+				}
 			}
-			else
-				replace_to = zbx_strdup(replace_to, STR_UNKNOWN_VARIABLE);
+
+			replace_to = zbx_strdup(replace_to, STR_UNKNOWN_VARIABLE);
 		}
 
 		if (ZBX_TOKEN_USER_MACRO == token.type || (ZBX_TOKEN_MACRO == token.type && 0 == indexed_macro))
