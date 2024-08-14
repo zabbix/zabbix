@@ -273,13 +273,13 @@ class CWidgetClock extends CWidget {
 		const max_height = container_rect.height - CWidgetClock.PADDING * 2;
 
 		if (this._is_enabled) {
-			const elements = {};
+			const clock_parts = {};
 
 			for (const type of this._show) {
 				const element = this._target.querySelector(`.${this._classes[type]}`);
 
 				if (element !== null) {
-					elements[type] = {
+					clock_parts[type] = {
 						element,
 						ratio: CWidgetClock.DEFAULT_RATIO,
 						min_font_size: CWidgetClock.MIN_FONT_SIZE,
@@ -289,60 +289,60 @@ class CWidgetClock extends CWidget {
 				}
 			}
 
-			if (Object.values(elements).length === 2) {
+			if (Object.values(clock_parts).length === 2) {
 				const ratio_small = 0.17;
 				const ratio_big = 0.83;
 
-				if (CWidgetClock.SHOW_TIMEZONE in elements) {
-					elements[CWidgetClock.SHOW_TIMEZONE].ratio = ratio_small;
+				if (CWidgetClock.SHOW_TIMEZONE in clock_parts) {
+					clock_parts[CWidgetClock.SHOW_TIMEZONE].ratio = ratio_small;
 
-					if (CWidgetClock.SHOW_DATE in elements) {
-						elements[CWidgetClock.SHOW_DATE].ratio = ratio_big;
-						elements[CWidgetClock.SHOW_DATE].min_font_size = CWidgetClock.MIN_FONT_SIZE_BIG;
+					if (CWidgetClock.SHOW_DATE in clock_parts) {
+						clock_parts[CWidgetClock.SHOW_DATE].ratio = ratio_big;
+						clock_parts[CWidgetClock.SHOW_DATE].min_font_size = CWidgetClock.MIN_FONT_SIZE_BIG;
 					}
 				}
 
-				if (CWidgetClock.SHOW_TIME in elements) {
-					elements[CWidgetClock.SHOW_TIME].ratio = ratio_big;
-					elements[CWidgetClock.SHOW_TIME].min_font_size = CWidgetClock.MIN_FONT_SIZE_BIG;
+				if (CWidgetClock.SHOW_TIME in clock_parts) {
+					clock_parts[CWidgetClock.SHOW_TIME].ratio = ratio_big;
+					clock_parts[CWidgetClock.SHOW_TIME].min_font_size = CWidgetClock.MIN_FONT_SIZE_BIG;
 
-					if (CWidgetClock.SHOW_DATE in elements) {
-						elements[CWidgetClock.SHOW_DATE].ratio = ratio_small;
+					if (CWidgetClock.SHOW_DATE in clock_parts) {
+						clock_parts[CWidgetClock.SHOW_DATE].ratio = ratio_small;
 					}
 				}
 			}
-			else if (Object.values(elements).length === 3) {
-				elements[CWidgetClock.SHOW_DATE].ratio = 0.2;
-				elements[CWidgetClock.SHOW_TIME].ratio = 0.6;
-				elements[CWidgetClock.SHOW_TIMEZONE].ratio = 0.2;
+			else if (Object.values(clock_parts).length === 3) {
+				clock_parts[CWidgetClock.SHOW_DATE].ratio = 0.2;
+				clock_parts[CWidgetClock.SHOW_TIME].ratio = 0.6;
+				clock_parts[CWidgetClock.SHOW_TIMEZONE].ratio = 0.2;
 
-				elements[CWidgetClock.SHOW_TIME].min_font_size = CWidgetClock.MIN_FONT_SIZE_BIG;
+				clock_parts[CWidgetClock.SHOW_TIME].min_font_size = CWidgetClock.MIN_FONT_SIZE_BIG;
 			}
 
-			for (const element of Object.values(elements)) {
-				element.font_size = Math.max(element.min_font_size,
-					max_height * element.ratio / CWidgetClock.LINE_HEIGHT
+			for (const clock_part of Object.values(clock_parts)) {
+				clock_part.font_size = Math.max(clock_part.min_font_size,
+					max_height * clock_part.ratio / CWidgetClock.LINE_HEIGHT
 				);
 			}
 
-			if (Object.values(elements).length > 0) {
-				const largest_width = Object.values(elements)
+			if (Object.values(clock_parts).length > 0) {
+				const largest_width = Object.values(clock_parts)
 					.map(e => this._getMeasuredTextWidth(e.text, e.font_size, e.font_weight))
 					.reduce((w1, w2) => w1 > w2 ? w1 : w2);
 
 				if (largest_width > max_width) {
 					const width_ratio = max_width / largest_width;
 
-					for (const element of Object.values(elements)) {
-						element.font_size = Math.max(element.min_font_size, element.font_size * width_ratio);
+					for (const clock_part of Object.values(clock_parts)) {
+						clock_part.font_size = Math.max(clock_part.min_font_size, clock_part.font_size * width_ratio);
 					}
 				}
 			}
 
-			if (CWidgetClock.SHOW_TIMEZONE in elements && this._tzone_format === CWidgetClock.TIMEZONE_FULL) {
-				const timezone_element = elements[CWidgetClock.SHOW_TIMEZONE];
+			if (CWidgetClock.SHOW_TIMEZONE in clock_parts && this._tzone_format === CWidgetClock.TIMEZONE_FULL) {
+				const timezone_element = clock_parts[CWidgetClock.SHOW_TIMEZONE];
 				const timezone_line_height = timezone_element.font_size * CWidgetClock.LINE_HEIGHT;
-				const elements_height = Object.values(elements)
+				const elements_height = Object.values(clock_parts)
 					.reduce((sum, element) => sum + element.font_size * CWidgetClock.LINE_HEIGHT, 0);
 				const has_enough_free_height = max_height - elements_height >= timezone_line_height;
 
@@ -361,7 +361,7 @@ class CWidgetClock extends CWidget {
 						}).textContent
 					: Array.from(parts, p => p.textContent).join(' ');
 
-				const elements_largest_width = Object.values(elements)
+				const elements_largest_width = Object.values(clock_parts)
 					.map(e => this._getMeasuredTextWidth(e.text, e.font_size, e.font_weight))
 					.reduce((w1, w2) => w1 > w2 ? w1 : w2);
 				const all_elements_height = has_enough_free_height
@@ -369,13 +369,13 @@ class CWidgetClock extends CWidget {
 					: elements_height;
 				const ratio = Math.min(max_width / elements_largest_width, max_height / all_elements_height);
 
-				for (const element of Object.values(elements)) {
-					element.font_size = Math.max(element.min_font_size, element.font_size * ratio);
+				for (const clock_part of Object.values(clock_parts)) {
+					clock_part.font_size = Math.max(clock_part.min_font_size, clock_part.font_size * ratio);
 				}
 			}
 
-			for (const element of Object.values(elements)) {
-				element.element.style.fontSize = `${element.font_size}px`;
+			for (const clock_part of Object.values(clock_parts)) {
+				clock_part.element.style.fontSize = `${clock_part.font_size}px`;
 			}
 		}
 		else {
