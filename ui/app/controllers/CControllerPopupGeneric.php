@@ -160,7 +160,7 @@ class CControllerPopupGeneric extends CController {
 			],
 			'templates' => [
 				'title' => _('Templates'),
-				'min_user_type' => USER_TYPE_ZABBIX_ADMIN,
+				'min_user_type' => USER_TYPE_ZABBIX_USER,
 				'allowed_src_fields' => 'hostid,host',
 				'form' => [
 					'name' => 'templateform',
@@ -307,8 +307,8 @@ class CControllerPopupGeneric extends CController {
 					'id' => 'items'
 				],
 				'table_columns' => [
-					_('Name'),
-					_('Key'),
+					(new CColHeader(_('Name')))->addStyle('width: 30%;'),
+					(new CColHeader(_('Key')))->addStyle('width: 30%;'),
 					_('Type'),
 					_('Type of information'),
 					_('Status')
@@ -323,8 +323,8 @@ class CControllerPopupGeneric extends CController {
 					'id' => 'items'
 				],
 				'table_columns' => [
-					_('Name'),
-					_('Key'),
+					(new CColHeader(_('Name')))->addStyle('width: 30%;'),
+					(new CColHeader(_('Key')))->addStyle('width: 30%;'),
 					_('Type'),
 					_('Type of information'),
 					_('Status')
@@ -375,8 +375,8 @@ class CControllerPopupGeneric extends CController {
 					'id' => 'items'
 				],
 				'table_columns' => [
-					_('Name'),
-					_('Key'),
+					(new CColHeader(_('Name')))->addStyle('width: 30%;'),
+					(new CColHeader(_('Key')))->addStyle('width: 30%;'),
 					_('Type'),
 					_('Type of information')
 				]
@@ -916,7 +916,7 @@ class CControllerPopupGeneric extends CController {
 				'object_name' => $src_name,
 				'data' => array_values($hosts),
 				'selectedLimit' => 1,
-				'disabled' => $this->hasInput('only_hostid'),
+				'readonly' => $this->hasInput('only_hostid'),
 				'popup' => [
 					'parameters' => [
 						'srctbl' => $src_name,
@@ -1434,6 +1434,7 @@ class CControllerPopupGeneric extends CController {
 				$options += [
 					'output' => ['triggerid', 'expression', 'description', 'status', 'priority', 'state'],
 					'selectHosts' => ['name'],
+					'selectItems' => ['status'],
 					'selectDependencies' => ['triggerid', 'expression', 'description'],
 					'expandDescription' => true
 				];
@@ -1447,6 +1448,23 @@ class CControllerPopupGeneric extends CController {
 
 				if (!$this->template_preselect_required || $this->templateids) {
 					$records = API::Trigger()->get($options);
+
+					if ($this->hasInput('with_monitored_triggers')) {
+						foreach ($records as $id => $record) {
+							foreach ($record['items'] as $item) {
+								if ($item['status'] != ITEM_STATUS_ACTIVE) {
+									unset($records[$id]);
+
+									break;
+								}
+							}
+
+							if ($record['status'] != TRIGGER_STATUS_ENABLED) {
+								unset($records[$id]);
+							}
+						}
+
+					}
 				}
 				else {
 					$records = [];

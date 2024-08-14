@@ -178,7 +178,7 @@ class testDashboardGaugeWidget extends testWidgets {
 
 			// Units.
 			'id:units_show' => ['value' => true, 'enabled' => true, 'visible' => false],
-			'id:units' => ['value' => '', 'maxlength' => 2048, 'enabled' => true, 'visible' => false],
+			'id:units' => ['value' => '', 'maxlength' => 255, 'enabled' => true, 'visible' => false],
 			'id:units_size' => ['value' => 25, 'maxlength' => 3, 'enabled' => true, 'visible' => false],
 			'id:units_pos' => ['value' => 'After value', 'enabled' => true, 'visible' => false],
 			'id:units_bold' => ['value' => false, 'enabled' => true, 'visible' => false],
@@ -1263,8 +1263,9 @@ class testDashboardGaugeWidget extends testWidgets {
 
 		// Wait until widget with header appears on the Dashboard.
 		$dashboard->save();
-		$widget = $dashboard->waitUntilReady()->getWidget($header)->waitUntilReady();
-		$this->page->removeFocus();
+		$widget = $dashboard->waitUntilReady()->getWidget($header);
+		// Without scroll down on Jenkins error - requested image region is invalid.
+		$this->page->scrollDown();
 
 		// Wait until the gauge is animated.
 		$this->query('xpath://div['.CXPathHelper::fromClass('is-ready').']')->waitUntilVisible();

@@ -20,7 +20,7 @@
  */
 
 $form = (new CForm('post'))
-	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('service')))->removeId())
+	->addItem((new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('service')))->removeId())
 	->setId('service-form')
 	->setName('service_form')
 	->addItem(getMessages());
@@ -223,8 +223,9 @@ $tags_tab = (new CFormGrid())
 					renderTagTable($data['form']['tags'])
 						->addClass('tags-table')
 						->setHeader((new CRowHeader([_('Name'), _('Value'), _('Action')]))->addClass(ZBX_STYLE_GREY)),
-					(new CTemplateTag('tag-row-tmpl'))
-						->addItem(renderTagTableRow('#{rowNum}', '', '', ZBX_TAG_MANUAL, ['add_post_js' => false]))
+					(new CTemplateTag('tag-row-tmpl'))->addItem(
+						renderTagTableRow('#{rowNum}', ['tag' => '', 'value' => ''], ['add_post_js' => false])
+					)
 				])
 		)
 	]);

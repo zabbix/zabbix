@@ -84,9 +84,8 @@ class CControllerTemplateDashboardUpdate extends CController {
 
 			return true;
 		}
-		else {
-			return isWritableHostTemplates([$this->getInput('templateid')]);
-		}
+
+		return isWritableHostTemplates([$this->getInput('templateid')]);
 	}
 
 	protected function doAction() {

@@ -35,7 +35,7 @@ $csrf_token = CCsrfTokenHelper::get('regex');
 
 $form = (new CForm())
 	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
-	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token))->removeId())
+	->addItem((new CVar(CSRF_TOKEN_NAME, $csrf_token))->removeId())
 	->setId('regex')
 	->setAction($action->getUrl())
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID);
@@ -151,7 +151,7 @@ if ($data['regexid'] != 0) {
 					(new CUrl('zabbix.php'))
 						->setArgument('action', 'regex.delete')
 						->setArgument('regexids', (array) $data['regexid'])
-						->setArgument(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token),
+						->setArgument(CSRF_TOKEN_NAME, $csrf_token),
 				_('Delete regular expression?')
 			))->setId('delete'),
 			(new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))

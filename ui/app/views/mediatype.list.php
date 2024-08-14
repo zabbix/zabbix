@@ -33,7 +33,7 @@ $html_page = (new CHtmlPage())
 					->onClick(
 						'return PopUp("popup.import", {
 							rules_preset: "mediatype", '.
-							CCsrfTokenHelper::CSRF_TOKEN_NAME.': "'. CCsrfTokenHelper::get('import').
+							CSRF_TOKEN_NAME.': "'.CCsrfTokenHelper::get('import').
 						'"},{
 							dialogueid: "popup_import",
 							dialogue_class: "modal-popup-generic"
@@ -148,10 +148,12 @@ foreach ($data['mediatypes'] as $media_type) {
 
 	$status = (MEDIA_TYPE_STATUS_ACTIVE == $media_type['status'])
 		? (new CLink(_('Enabled')))
+			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass(ZBX_STYLE_GREEN)
 			->addClass('js-disable')
 			->setAttribute('data-mediatypeid', (int) $media_type['mediatypeid'])
 		: (new CLink(_('Disabled')))
+			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass(ZBX_STYLE_RED)
 			->addClass('js-enable')
 			->setAttribute('data-mediatypeid', (int) $media_type['mediatypeid']);

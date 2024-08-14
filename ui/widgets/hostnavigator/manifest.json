@@ -7,7 +7,7 @@
 	"version": "1.0",
 	"author": "Zabbix",
 	"description": "Displays host hierarchy with ability to control other widgets based on selected host.",
-	"url": "https://www.zabbix.com/documentation/7.2/en/manual/web_interface/frontend_sections/dashboards/widgets/host_navigator",
+	"url": "web_interface/frontend_sections/dashboards/widgets/host_navigator",
 	"widget": {
 		"size": {
 			"width": 12,

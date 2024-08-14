@@ -211,15 +211,17 @@ class ZBase {
 
 				$router->setAction($action_name);
 
-				$this->component_registry->get('menu.main')
-					->setSelectedByAction($action_name, $_REQUEST,
-						CViewHelper::loadSidebarMode() != ZBX_SIDEBAR_VIEW_MODE_COMPACT
-					);
+				if (CWebUser::isLoggedIn()) {
+					$this->component_registry->get('menu.main')
+						->setSelectedByAction($action_name, $_REQUEST,
+							CViewHelper::loadSidebarMode() != ZBX_SIDEBAR_VIEW_MODE_COMPACT
+						);
 
-				$this->component_registry->get('menu.user')
-					->setSelectedByAction($action_name, $_REQUEST,
-						CViewHelper::loadSidebarMode() != ZBX_SIDEBAR_VIEW_MODE_COMPACT
-					);
+					$this->component_registry->get('menu.user')
+						->setSelectedByAction($action_name, $_REQUEST,
+							CViewHelper::loadSidebarMode() != ZBX_SIDEBAR_VIEW_MODE_COMPACT
+						);
+				}
 
 				CProfiler::getInstance()->start();
 
@@ -671,7 +673,7 @@ class ZBase {
 			CMessageHelper::addError('Controller: '.$router->getAction());
 			ksort($_REQUEST);
 			foreach ($_REQUEST as $key => $value) {
-				if ($key !== CCsrfTokenHelper::CSRF_TOKEN_NAME) {
+				if ($key !== CSRF_TOKEN_NAME) {
 					CMessageHelper::addError(is_scalar($value) ? $key.': '.$value : $key.': '.gettype($value));
 				}
 			}
@@ -739,7 +741,7 @@ class ZBase {
 
 	private static function denyPageAccess(CRouter $router): void {
 		$request_url = (new CUrl(array_key_exists('request', $_REQUEST) ? $_REQUEST['request'] : ''))
-			->removeArgument(CCsrfTokenHelper::CSRF_TOKEN_NAME)
+			->removeArgument(CSRF_TOKEN_NAME)
 			->toString();
 
 		if (CAuthenticationHelper::getPublic(CAuthenticationHelper::HTTP_LOGIN_FORM) == ZBX_AUTH_FORM_HTTP
@@ -872,8 +874,11 @@ class ZBase {
 	 */
 	private function initComponents(): void {
 		$this->component_registry->register('router', new CRouter());
-		$this->component_registry->register('menu.main', CMenuHelper::getMainMenu());
-		$this->component_registry->register('menu.user', CMenuHelper::getUserMenu());
+
+		if (CWebUser::isLoggedIn()) {
+			$this->component_registry->register('menu.main', CMenuHelper::getMainMenu());
+			$this->component_registry->register('menu.user', CMenuHelper::getUserMenu());
+		}
 	}
 
 	/**

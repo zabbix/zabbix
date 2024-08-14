@@ -669,4 +669,12 @@ class CPage {
 	public function scrollToTop() {
 		$this->getDriver()->executeScript('document.getElementsByClassName(\'wrapper\')[0].scrollTo(0, 0)');
 	}
+
+	/**
+	 * Scroll down to the bottom of the page.
+	 */
+	public function scrollDown() {
+		$this->getDriver()->executeScript('document.getElementsByClassName(\'wrapper\')[0].scrollTo(0,'.
+				' document.body.scrollHeight)');
+	}
 }

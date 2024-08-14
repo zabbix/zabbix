@@ -613,8 +613,6 @@ static int	DBpatch_3010024(void)
 		char	*sql = NULL;
 		size_t	sql_alloc = 0, sql_offset = 0;
 
-		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 		if (0 != actionids_disable.values_num)
 		{
 			/* status: 1 - ZBX_ACTION_STATUS_DISABLED */
@@ -640,8 +638,6 @@ static int	DBpatch_3010024(void)
 					actionids_convert.values_num);
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 		}
-
-		zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
 			ret = FAIL;
@@ -1033,8 +1029,6 @@ static int	DBpatch_3010026(void)
 	zbx_vector_uint64_create(&conditionids);
 	zbx_vector_uint64_create(&actionids);
 	zbx_vector_str_create(&filter);
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	result = zbx_db_select("select actionid,eventsource,evaltype,formula,name from actions");
 
 	while (NULL != (row = zbx_db_fetch(result)))
@@ -1072,13 +1066,8 @@ static int	DBpatch_3010026(void)
 			goto out;
 	}
 
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
-	{
-		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
-			goto out;
-	}
+	if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
+		goto out;
 
 	if (0 != conditionids.values_num)
 	{
@@ -1288,7 +1277,7 @@ static int	DBpatch_3010049(void)
 				{
 					{"correlationid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-					{"description", "", NULL, NULL, 255, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
+					{"description", "", NULL, NULL, 255, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0},
 					{"evaltype", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 					{"status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 					{"formula", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
@@ -1590,8 +1579,6 @@ static int	DBpatch_3010079(void)
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
 
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	result = zbx_db_select("select p.eventid,e.clock,e.ns"
 			" from problem p,events e"
 			" where p.eventid=e.eventid"
@@ -1607,13 +1594,8 @@ static int	DBpatch_3010079(void)
 			goto out;
 	}
 
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (16 < sql_offset)
-	{
-		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
-			goto out;
-	}
+	if (ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
+		goto out;
 
 	ret = SUCCEED;
 out:

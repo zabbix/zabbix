@@ -15,26 +15,31 @@
 
 class CSVGGauge {
 
-	static ZBX_STYLE_CLASS =					'svg-gauge';
-	static ZBX_STYLE_DESCRIPTION =				'svg-gauge-description';
-	static ZBX_STYLE_ARCS =						'svg-gauge-arcs';
-	static ZBX_STYLE_THRESHOLDS_ARC_SECTOR =	'svg-gauge-thresholds-arc-sector';
-	static ZBX_STYLE_VALUE_ARC_SECTOR =			'svg-gauge-value-arc-sector';
-	static ZBX_STYLE_EMPTY_ARC_SECTOR =			'svg-gauge-empty-arc-sector';
-	static ZBX_STYLE_NEEDLE =					'svg-gauge-needle';
-	static ZBX_STYLE_NEEDLE_LIGHT =				'svg-gauge-needle-light';
-	static ZBX_STYLE_NEEDLE_DARK =				'svg-gauge-needle-dark';
-	static ZBX_STYLE_LABEL =					'svg-gauge-label';
-	static ZBX_STYLE_LABEL_LEFT =				'svg-gauge-label-left';
-	static ZBX_STYLE_LABEL_RIGHT =				'svg-gauge-label-right';
-	static ZBX_STYLE_LABEL_CENTER =				'svg-gauge-label-center';
-	static ZBX_STYLE_VALUE_AND_UNITS =			'svg-gauge-value-and-units';
-	static ZBX_STYLE_VALUE =					'svg-gauge-value';
-	static ZBX_STYLE_UNITS =					'svg-gauge-units';
-	static ZBX_STYLE_NO_DATA =					'svg-gauge-no-data';
+	static ZBX_STYLE_CLASS =						'svg-gauge';
+	static ZBX_STYLE_DESCRIPTION =					'svg-gauge-description';
+	static ZBX_STYLE_ARCS =							'svg-gauge-arcs';
+	static ZBX_STYLE_THRESHOLDS_ARC_SECTOR =		'svg-gauge-thresholds-arc-sector';
+	static ZBX_STYLE_VALUE_ARC_SECTOR =				'svg-gauge-value-arc-sector';
+	static ZBX_STYLE_EMPTY_ARC_SECTOR =				'svg-gauge-empty-arc-sector';
+	static ZBX_STYLE_NEEDLE =						'svg-gauge-needle';
+	static ZBX_STYLE_NEEDLE_LIGHT =					'svg-gauge-needle-light';
+	static ZBX_STYLE_NEEDLE_DARK =					'svg-gauge-needle-dark';
+	static ZBX_STYLE_LABEL =						'svg-gauge-label';
+	static ZBX_STYLE_LABEL_LEFT =					'svg-gauge-label-left';
+	static ZBX_STYLE_LABEL_RIGHT =					'svg-gauge-label-right';
+	static ZBX_STYLE_LABEL_CENTER =					'svg-gauge-label-center';
+	static ZBX_STYLE_VALUE_AND_UNITS =				'svg-gauge-value-and-units';
+	static ZBX_STYLE_VALUE_AND_UNITS_HORIZONTAL =	'svg-gauge-value-and-units-horizontal';
+	static ZBX_STYLE_VALUE_AND_UNITS_VERTICAL =		'svg-gauge-value-and-units-vertical';
+	static ZBX_STYLE_VALUE =						'svg-gauge-value';
+	static ZBX_STYLE_UNITS =						'svg-gauge-units';
+	static ZBX_STYLE_SPACE =						'svg-gauge-space';
+	static ZBX_STYLE_NO_DATA =						'svg-gauge-no-data';
 
 	static SVG_NS = 'http://www.w3.org/2000/svg';
 	static XHTML_NS = 'http://www.w3.org/1999/xhtml';
+
+	static SCALE = 1000;
 
 	static LINE_HEIGHT = 1.14;
 	static TEXT_BASELINE = 0.8;
@@ -105,7 +110,7 @@ class CSVGGauge {
 	 *
 	 * @type {SVGGElement}
 	 */
-	#g_scalable;
+	#container;
 
 	/**
 	 * Created SVG child elements and related data.
@@ -185,9 +190,9 @@ class CSVGGauge {
 		this.#g.setAttribute('transform', `translate(${this.#padding.horizontal} ${this.#padding.vertical})`);
 		this.#g.setAttribute('clip-path', `url(#${g_clip_path.id})`);
 
-		this.#g_scalable = document.createElementNS(CSVGGauge.SVG_NS, 'g');
+		this.#container = document.createElementNS(CSVGGauge.SVG_NS, 'g');
 
-		this.#g.appendChild(this.#g_scalable);
+		this.#g.appendChild(this.#container);
 
 		if (this.#config.description.show) {
 			this.#createDescription();
@@ -231,8 +236,8 @@ class CSVGGauge {
 		this.#svg.setAttribute('width', `${width}`);
 		this.#svg.setAttribute('height', `${height}`);
 
-		this.#width = width - this.#padding.horizontal * 2;
-		this.#height = height - this.#padding.vertical * 2;
+		this.#width = Math.max(0, width - this.#padding.horizontal * 2);
+		this.#height = Math.max(0, height - this.#padding.vertical * 2);
 
 		this.#g_clip_rect.setAttribute('width', `${this.#width}`);
 		this.#g_clip_rect.setAttribute('height', `${this.#height}`);
@@ -241,8 +246,8 @@ class CSVGGauge {
 			this.#drawDescription();
 		}
 
-		// Fix imprecise calculation of "this.#g_scalable" dimensions.
-		this.#g_scalable.setAttribute('transform', `translate(0 0) scale(1000)`);
+		// Fix imprecise calculation of "this.#container" dimensions.
+		this.#container.setAttribute('transform', `translate(0 0) scale(${CSVGGauge.SCALE})`);
 
 		this.#adjustScalableGroup();
 	}
@@ -255,12 +260,8 @@ class CSVGGauge {
 	 * @param {string|null} units_text  Text representation of the units of the value.
 	 */
 	setValue({value, value_text, units_text}) {
-		if (this.#config.value.show) {
-			this.#elements.value_and_units.value.container.textContent = value !== null ? value_text : '';
-
-			if (this.#config.units.show) {
-				this.#elements.value_and_units.units.container.textContent = value !== null ? units_text : '';
-			}
+		if (this.#config.value.show && value !== null) {
+			this.#drawValueAndUnits({value, value_text, units_text});
 		}
 
 		this.#elements.no_data.container.textContent = value === null ? t('No data') : '';
@@ -398,7 +399,7 @@ class CSVGGauge {
 	#createArcs() {
 		const container = document.createElementNS(CSVGGauge.SVG_NS, 'g');
 
-		this.#g_scalable.appendChild(container);
+		this.#container.appendChild(container);
 
 		container.classList.add(CSVGGauge.ZBX_STYLE_ARCS);
 
@@ -496,7 +497,7 @@ class CSVGGauge {
 
 		const container = document.createElementNS(CSVGGauge.SVG_NS, 'path');
 
-		this.#g_scalable.appendChild(container);
+		this.#container.appendChild(container);
 
 		container.classList.add(CSVGGauge.ZBX_STYLE_NEEDLE);
 
@@ -546,7 +547,7 @@ class CSVGGauge {
 
 			const container = document.createElementNS(CSVGGauge.SVG_NS, 'text');
 
-			this.#g_scalable.appendChild(container);
+			this.#container.appendChild(container);
 
 			container.classList.add(CSVGGauge.ZBX_STYLE_LABEL);
 
@@ -583,119 +584,98 @@ class CSVGGauge {
 	}
 
 	/**
-	 * Create and position containers for value and units.
+	 * Create containers for value and units.
 	 */
 	#createValueAndUnits() {
-		const container = document.createElementNS(CSVGGauge.SVG_NS, 'text');
-
-		this.#g_scalable.appendChild(container);
-
+		const container = document.createElementNS(CSVGGauge.SVG_NS, 'foreignObject');
 		container.classList.add(CSVGGauge.ZBX_STYLE_VALUE_AND_UNITS);
+		this.#container.appendChild(container);
 
-		const arcs_height = ((this.#config.thresholds.arc.show || this.#config.value_arc.show)
-				&& this.#config.angle === 270)
-			? 1 + Math.sqrt(2) / 2
-			: 1;
+		const contents = document.createElementNS(CSVGGauge.XHTML_NS, 'div');
+		container.appendChild(contents);
 
-		const is_aligned_to_bottom = (this.#config.thresholds.arc.show || this.#config.value_arc.show)
-			&& (this.#config.angle === 270 || !this.#config.needle.show);
+		container.setAttribute('width', `${2 * CSVGGauge.SCALE}`);
+		container.setAttribute('x', `${-1 * CSVGGauge.SCALE}`);
 
-		const value_font_size = this.#config.value.size / 100;
-		const value_container = document.createElementNS(CSVGGauge.SVG_NS, 'tspan');
+		// Fix imprecise calculation of font size.
+		container.setAttribute('transform', `scale(${1 / CSVGGauge.SCALE})`);
 
+		const padding = 20;
+
+		let contents_width = this.#config.angle === 180 ? 2 * CSVGGauge.SCALE : Math.sqrt(2) * CSVGGauge.SCALE;
+		contents_width -= contents_width / padding;
+		contents.style.width = `${contents_width}px`;
+
+		const font_sizes = this.#getFontSizes();
+
+		const value_container = document.createElementNS(CSVGGauge.XHTML_NS, 'div');
 		value_container.classList.add(CSVGGauge.ZBX_STYLE_VALUE);
-		value_container.style.fontSize = `${value_font_size}px`;
+		value_container.style.fontSize = `${font_sizes.value.font_size}px`;
+		value_container.style.lineHeight = `${font_sizes.value.line_height}px`;
 
 		if (this.#config.value.is_bold) {
 			value_container.style.fontWeight = 'bold';
 		}
 
 		if (this.#config.value.color) {
-			value_container.style.fill = `#${this.#config.value.color}`;
+			value_container.style.color = `#${this.#config.value.color}`;
 		}
 
-		this.#elements.value_and_units = {container, value: {container: value_container}};
+		this.#elements.value_and_units = {container, contents, value: {container: value_container}};
 
 		if (this.#config.units.show) {
-			const units_font_size = this.#config.units.size / 100;
-			const units_container = document.createElementNS(CSVGGauge.SVG_NS, 'tspan');
-
+			const units_container = document.createElementNS(CSVGGauge.XHTML_NS, 'div');
 			units_container.classList.add(CSVGGauge.ZBX_STYLE_UNITS);
-			units_container.style.fontSize = `${units_font_size}px`;
+			units_container.style.fontSize = `${font_sizes.units.font_size}px`;
+			units_container.style.lineHeight = `${font_sizes.units.line_height}px`;
 
 			if (this.#config.units.is_bold) {
 				units_container.style.fontWeight = 'bold';
 			}
 
 			if (this.#config.units.color) {
-				units_container.style.fill = `#${this.#config.units.color}`;
+				units_container.style.color = `#${this.#config.units.color}`;
 			}
 
 			switch (this.#config.units.position) {
 				case CSVGGauge.UNITS_POSITION_BEFORE:
 				case CSVGGauge.UNITS_POSITION_AFTER:
-					const space_font_size = Math.min(value_font_size, units_font_size);
-					const space_container = document.createElementNS(CSVGGauge.SVG_NS, 'tspan');
+					container.classList.add(CSVGGauge.ZBX_STYLE_VALUE_AND_UNITS_HORIZONTAL);
 
-					space_container.style.fontSize = `${space_font_size}px`;
-					space_container.textContent = ' ';
+					const space_container = document.createElementNS(CSVGGauge.XHTML_NS, 'div');
+					space_container.classList.add(CSVGGauge.ZBX_STYLE_SPACE);
+
+					const min_font_size = Math.min(font_sizes.value.font_size, font_sizes.units.font_size);
+
+					space_container.style.width = `${min_font_size / 3}px`;
 
 					if (this.#config.units.position === CSVGGauge.UNITS_POSITION_BEFORE) {
-						container.appendChild(units_container);
-						container.appendChild(space_container);
-						container.appendChild(value_container);
+						contents.appendChild(units_container);
+						contents.appendChild(space_container);
+						contents.appendChild(value_container);
 					}
 					else {
-						container.appendChild(value_container);
-						container.appendChild(space_container);
-						container.appendChild(units_container);
+						contents.appendChild(value_container);
+						contents.appendChild(space_container);
+						contents.appendChild(units_container);
 					}
 
-					if (is_aligned_to_bottom) {
-						container.setAttribute('y', `${arcs_height}`);
-					}
-					else {
-						const max_font_size = Math.max(value_font_size, units_font_size);
+					contents.style.fontSize = `${min_font_size}px`; // For ellipsis to appear.
 
-						container.setAttribute('y', `${arcs_height + CSVGGauge.NEEDLE_RADIUS / 100 * 2
-							+ max_font_size * (CSVGGauge.CAPITAL_HEIGHT + CSVGGauge.NEEDLE_GAP / 100)
-						}`);
-					}
+					this.#elements.value_and_units.space = {container: space_container};
 
 					break;
 
 				default:
-					const parts = this.#config.units.position === CSVGGauge.UNITS_POSITION_BELOW
-						? [value_container, units_container]
-						: [units_container, value_container];
+					container.classList.add(CSVGGauge.ZBX_STYLE_VALUE_AND_UNITS_VERTICAL);
 
-					const parts_font_size = this.#config.units.position === CSVGGauge.UNITS_POSITION_BELOW
-						? [value_font_size, units_font_size]
-						: [units_font_size, value_font_size];
-
-					container.appendChild(parts[0]);
-					container.appendChild(parts[1]);
-
-					parts[1].setAttribute('x', '0');
-
-					if (is_aligned_to_bottom) {
-						parts[0].setAttribute('y', `${arcs_height
-							- parts_font_size[1] * CSVGGauge.CAPITAL_HEIGHT
-							- parts_font_size[1] * (1 - CSVGGauge.TEXT_BASELINE)
-							- parts_font_size[0] * (1 - CSVGGauge.TEXT_BASELINE)
-						}`);
-						parts[1].setAttribute('y', `${arcs_height}`);
+					if (this.#config.units.position === CSVGGauge.UNITS_POSITION_BELOW) {
+						contents.appendChild(value_container);
+						contents.appendChild(units_container);
 					}
 					else {
-						const y_top = arcs_height + CSVGGauge.NEEDLE_RADIUS / 100 * 2
-							+ parts_font_size[0] * (CSVGGauge.CAPITAL_HEIGHT + CSVGGauge.NEEDLE_GAP / 100);
-
-						parts[0].setAttribute('y', `${y_top}`);
-						parts[1].setAttribute('y', `${y_top
-							+ parts_font_size[1] * CSVGGauge.CAPITAL_HEIGHT
-							+ parts_font_size[1] * (1 - CSVGGauge.TEXT_BASELINE)
-							+ parts_font_size[0] * (1 - CSVGGauge.TEXT_BASELINE)
-						}`);
+						contents.appendChild(units_container);
+						contents.appendChild(value_container);
 					}
 
 					break;
@@ -704,17 +684,144 @@ class CSVGGauge {
 			this.#elements.value_and_units.units = {container: units_container};
 		}
 		else {
-			container.appendChild(value_container);
+			contents.appendChild(value_container);
+		}
+	}
 
-			if (is_aligned_to_bottom) {
-				container.setAttribute('y', `${arcs_height}`);
+	/**
+	 * Draw and position containers for value and units.
+	 *
+	 * @param {number|null} value       Numeric value of the gauge.
+	 * @param {string|null} value_text  Text representation of the value.
+	 * @param {string|null} units_text  Text representation of the units of the value.
+	 */
+	#drawValueAndUnits({value, value_text, units_text}) {
+		const correction_font = 10;
+
+		const font_sizes = this.#getFontSizes();
+
+		const max_font_size = Math.max(font_sizes.value.font_size, font_sizes.units.font_size);
+		const max_line_height = Math.max(font_sizes.value.line_height, font_sizes.units.line_height);
+
+		let arcs_height = (this.#config.thresholds.arc.show || this.#config.value_arc.show)
+				&& this.#config.angle === 270
+			? 1 + Math.sqrt(2) / 2
+			: 1;
+
+		arcs_height *= CSVGGauge.SCALE;
+
+		const is_aligned_to_bottom = (this.#config.thresholds.arc.show || this.#config.value_arc.show)
+			&& (this.#config.angle === 270 || !this.#config.needle.show);
+
+		this.#elements.value_and_units.value.container.textContent = value !== null ? value_text : '';
+
+		this.#elements.value_and_units.container.setAttribute('height', `${max_line_height}`);
+		this.#elements.value_and_units.container.setAttribute('y', is_aligned_to_bottom
+			? `${arcs_height - max_font_size}`
+			: `${arcs_height + CSVGGauge.NEEDLE_RADIUS * correction_font * 2}`
+		);
+
+		if (this.#config.units.show && units_text !== null) {
+			this.#elements.value_and_units.units.container.textContent = value !== null ? units_text : '';
+
+			if (this.#elements.value_and_units.space !== undefined) {
+				this.#elements.value_and_units.space.container.style.display = '';
 			}
-			else {
-				container.setAttribute('y', `${arcs_height + CSVGGauge.NEEDLE_RADIUS / 100 * 2
-					+ value_font_size * (CSVGGauge.CAPITAL_HEIGHT + CSVGGauge.NEEDLE_GAP / 100)
-				}`);
+
+			if (this.#config.units.position === CSVGGauge.UNITS_POSITION_ABOVE
+					|| this.#config.units.position === CSVGGauge.UNITS_POSITION_BELOW) {
+				this.#elements.value_and_units.container.setAttribute('height',
+					`${font_sizes.value.line_height + font_sizes.units.line_height}`
+				);
+
+				const parts_font_size = this.#config.units.position === CSVGGauge.UNITS_POSITION_BELOW
+					? [font_sizes.value.font_size, font_sizes.units.font_size]
+					: [font_sizes.units.font_size, font_sizes.value.font_size];
+
+				this.#elements.value_and_units.container.setAttribute('y', is_aligned_to_bottom
+					? arcs_height - parts_font_size[0] / CSVGGauge.TEXT_BASELINE - parts_font_size[1]
+					: arcs_height + CSVGGauge.NEEDLE_RADIUS * correction_font * 2
+				);
 			}
 		}
+		else if (this.#elements.value_and_units.space !== undefined) {
+			this.#elements.value_and_units.space.container.style.display = 'none';
+		}
+
+		let tooltip = '';
+
+		if (value_text !== null) {
+			if (this.#config.units.show && units_text !== null) {
+				const parts = this.#config.units.position === CSVGGauge.UNITS_POSITION_BELOW
+						|| this.#config.units.position === CSVGGauge.UNITS_POSITION_AFTER
+					? [value_text, units_text]
+					: [units_text, value_text];
+
+				if (this.#config.units.position === CSVGGauge.UNITS_POSITION_ABOVE
+						|| this.#config.units.position === CSVGGauge.UNITS_POSITION_BELOW) {
+					tooltip = `${parts[0]}\r\n${parts[1]}`;
+				}
+				else {
+					tooltip = `${parts[0]} ${parts[1]}`;
+				}
+			}
+			else {
+				tooltip = value_text;
+			}
+		}
+
+		this.#elements.value_and_units.contents.setAttribute('title', tooltip);
+	}
+
+	/**
+	 * Get font sizes and line heights of value and units.
+	 *
+	 * @returns {Object}
+	 */
+	#getFontSizes() {
+		const correction_font = 10;
+		const baseline_offset = 22;
+
+		const value_font_size = this.#config.value.size * correction_font;
+		let value_line_height = value_font_size / CSVGGauge.TEXT_BASELINE;
+
+		let units_font_size = 0;
+		let units_line_height = 0;
+
+		if (this.#config.units.show) {
+			units_font_size = this.#config.units.size * correction_font;
+			units_line_height = units_font_size / CSVGGauge.TEXT_BASELINE;
+
+			if (this.#config.units.position === CSVGGauge.UNITS_POSITION_BEFORE
+					|| this.#config.units.position === CSVGGauge.UNITS_POSITION_AFTER) {
+				if (value_line_height > units_line_height) {
+					value_line_height += value_line_height / baseline_offset;
+				}
+				else {
+					units_line_height += units_line_height / baseline_offset;
+				}
+			}
+			else if (this.#config.units.position === CSVGGauge.UNITS_POSITION_ABOVE) {
+				value_line_height += value_line_height / baseline_offset;
+			}
+			else if (this.#config.units.position === CSVGGauge.UNITS_POSITION_BELOW) {
+				units_line_height += units_line_height / baseline_offset;
+			}
+		}
+		else {
+			value_line_height += value_line_height / baseline_offset;
+		}
+
+		return {
+			value: {
+				font_size: value_font_size,
+				line_height: value_line_height
+			},
+			units: {
+				font_size: units_font_size,
+				line_height: units_line_height
+			}
+		};
 	}
 
 	/**
@@ -723,7 +830,7 @@ class CSVGGauge {
 	#createNoData() {
 		const container = document.createElementNS(CSVGGauge.SVG_NS, 'text');
 
-		this.#g_scalable.appendChild(container);
+		this.#container.appendChild(container);
 
 		container.classList.add(CSVGGauge.ZBX_STYLE_NO_DATA);
 
@@ -735,8 +842,8 @@ class CSVGGauge {
 			container.style.fontWeight = 'bold';
 		}
 
-		const arcs_height = ((this.#config.thresholds.arc.show || this.#config.value_arc.show)
-				&& this.#config.angle === 270)
+		const arcs_height = (this.#config.thresholds.arc.show || this.#config.value_arc.show)
+				&& this.#config.angle === 270
 			? 1 + Math.sqrt(2) / 2
 			: 1;
 
@@ -783,7 +890,7 @@ class CSVGGauge {
 			? '&block;'
 			: '';
 
-		const scalable_bbox = this.#g_scalable.getBBox();
+		const scalable_bbox = this.#container.getBBox();
 
 		if (this.#config.value.show) {
 			this.#elements.value_and_units.value.container.textContent = value_text;
@@ -802,8 +909,8 @@ class CSVGGauge {
 	 * Adjust X, Y position and scale of scalable group.
 	 */
 	#adjustScalableGroup() {
-		const arcs_height = ((this.#config.thresholds.arc.show || this.#config.value_arc.show)
-				&& this.#config.angle === 270)
+		const arcs_height = (this.#config.thresholds.arc.show || this.#config.value_arc.show)
+				&& this.#config.angle === 270
 			? 1 + Math.sqrt(2) / 2
 			: 1;
 
@@ -826,7 +933,7 @@ class CSVGGauge {
 				? description_height + description_gap
 				: 0);
 
-		this.#g_scalable.setAttribute('transform', `translate(${position_x} ${position_y}) scale(${scale})`);
+		this.#container.setAttribute('transform', `translate(${position_x} ${position_y}) scale(${scale})`);
 	}
 
 	/**

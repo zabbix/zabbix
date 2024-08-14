@@ -132,8 +132,8 @@ class CMenuHelper {
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_REPORTS_AVAILABILITY_REPORT)
 				? (new CMenuItem(_('Availability report')))
-					->setUrl(new CUrl('report2.php'), 'report2.php')
-					->setAliases(['chart4.php'])
+					->setAction('availabilityreport.list')
+					->setAliases(['availabilityreport.trigger'])
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_REPORTS_TOP_TRIGGERS)
 				? (new CMenuItem(_('Top 100 triggers')))->setAction('toptriggers.list')
@@ -483,7 +483,8 @@ class CMenuHelper {
 				->setIcon(ZBX_ICON_SIGN_OUT)
 				->setUrl(new CUrl('#signout'))
 				->setTitle(_('Sign out'))
-				->onClick('ZABBIX.logout(event)')
+				->onClick('event.preventDefault(); ZABBIX.logout(this.dataset.csrf_token)')
+				->setAttribute('data-csrf_token', CCsrfTokenHelper::get('index.php'))
 		);
 
 		return $menu;

@@ -1143,20 +1143,6 @@ function isReadableHosts(array $hostids) {
 }
 
 /**
- * Check if user has read permissions for templates.
- *
- * @param array $templateids
- *
- * @return bool
- */
-function isReadableTemplates(array $templateids) {
-	return count($templateids) == API::Template()->get([
-		'countOutput' => true,
-		'templateids' => $templateids
-	]);
-}
-
-/**
  * Check if user has write permissions for hosts or templates.
  *
  * @param array $hostids

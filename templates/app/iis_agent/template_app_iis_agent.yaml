@@ -23,7 +23,6 @@ zabbix_export:
           name: '{$IIS.PORT} port ping'
           type: SIMPLE
           key: 'net.tcp.service[{$IIS.SERVICE},,{$IIS.PORT}]'
-          history: 7d
           valuemap:
             name: 'Service state'
           preprocessing:
@@ -50,7 +49,6 @@ zabbix_export:
         - uuid: 50d8f5a08bbc494b8525f26eedbee781
           name: 'Anonymous users per second'
           key: 'perf_counter_en["\Web Service(_Total)\Anonymous Users/sec", 60]'
-          history: 7d
           value_type: FLOAT
           description: 'The number of requests from users over an anonymous connection per second. Average per minute.'
           tags:
@@ -59,7 +57,6 @@ zabbix_export:
         - uuid: ac80660edbb74c1fb4739368806900d5
           name: 'Bytes Received per second'
           key: 'perf_counter_en["\Web Service(_Total)\Bytes Received/sec", 60]'
-          history: 7d
           value_type: FLOAT
           units: Bps
           description: 'The average rate per minute at which data bytes are received by the service at the Application Layer. Does not include protocol headers or control bytes.'
@@ -69,7 +66,6 @@ zabbix_export:
         - uuid: 5a0648316a164446bbf605930469d4c4
           name: 'Bytes Sent per second'
           key: 'perf_counter_en["\Web Service(_Total)\Bytes Sent/sec", 60]'
-          history: 7d
           value_type: FLOAT
           units: Bps
           description: 'The average rate per minute at which data bytes are sent by the service.'
@@ -79,7 +75,6 @@ zabbix_export:
         - uuid: f086d17b51254e16bd43b57b39dc000e
           name: 'Bytes Total per second'
           key: 'perf_counter_en["\Web Service(_Total)\Bytes Total/Sec", 60]'
-          history: 7d
           value_type: FLOAT
           units: Bps
           description: 'The average rate per minute of total bytes/sec transferred by the Web service (sum of bytes sent/sec and bytes received/sec).'
@@ -89,7 +84,6 @@ zabbix_export:
         - uuid: b94dc0df81234c7d97197fe30875d5e9
           name: 'Method CGI requests per second'
           key: 'perf_counter_en["\Web Service(_Total)\CGI Requests/Sec", 60]'
-          history: 7d
           value_type: FLOAT
           description: 'The rate of CGI requests that are simultaneously being processed by the Web service. Average per minute.'
           preprocessing:
@@ -102,7 +96,6 @@ zabbix_export:
         - uuid: 1e8244ebb5524c72af1d506df7bb2982
           name: 'Connection attempts per second'
           key: 'perf_counter_en["\Web Service(_Total)\Connection Attempts/Sec", 60]'
-          history: 7d
           value_type: FLOAT
           description: 'The average rate per minute that connections using the Web service are being attempted. The count is the average for all Web sites combined.'
           preprocessing:
@@ -115,7 +108,6 @@ zabbix_export:
         - uuid: 2b4cb17b486643eda9a560b43af70d74
           name: 'Method COPY requests per second'
           key: 'perf_counter_en["\Web Service(_Total)\Copy Requests/Sec", 60]'
-          history: 7d
           value_type: FLOAT
           description: 'The rate of HTTP requests made using the COPY method. Copy requests are used for copying files and directories. Average per minute.'
           preprocessing:
@@ -128,7 +120,6 @@ zabbix_export:
         - uuid: 1baed2823f1a4d2ca618cac5ab8bbcbb
           name: 'Current connections'
           key: 'perf_counter_en["\Web Service(_Total)\Current Connections"]'
-          history: 7d
           value_type: FLOAT
           description: 'The number of active connections.'
           tags:
@@ -137,7 +128,6 @@ zabbix_export:
         - uuid: 350a6c7fac354570bbba04aa2fd6c98a
           name: 'Method DELETE requests per second'
           key: 'perf_counter_en["\Web Service(_Total)\Delete Requests/Sec", 60]'
-          history: 7d
           value_type: FLOAT
           description: 'The rate of HTTP requests using the DELETE method made. Average per minute.'
           preprocessing:
@@ -150,7 +140,6 @@ zabbix_export:
         - uuid: 6ae641f632ae4422a6f71898078dc2ee
           name: 'Method GET requests per second'
           key: 'perf_counter_en["\Web Service(_Total)\Get Requests/Sec", 60]'
-          history: 7d
           value_type: FLOAT
           description: 'The rate of HTTP requests made using the GET method. GET requests are generally used for basic file retrievals or image maps, though they can be used with forms. Average per minute.'
           preprocessing:
@@ -163,7 +152,6 @@ zabbix_export:
         - uuid: 5e37ff2d4d1b4bf6bad855a3d09ec6c7
           name: 'Method HEAD requests per second'
           key: 'perf_counter_en["\Web Service(_Total)\Head Requests/Sec", 60]'
-          history: 7d
           value_type: FLOAT
           description: 'The rate of HTTP requests using the HEAD method made. HEAD requests generally indicate a client is querying the state of a document they already have to see if it needs to be refreshed. Average per minute.'
           preprocessing:
@@ -176,7 +164,6 @@ zabbix_export:
         - uuid: 18217a40ddbc421fb2db1b19d1fb7d59
           name: 'Method ISAPI requests per second'
           key: 'perf_counter_en["\Web Service(_Total)\ISAPI Extension Requests/Sec", 60]'
-          history: 7d
           value_type: FLOAT
           description: 'The rate of ISAPI Extension requests that are simultaneously being processed by the Web service. Average per minute.'
           preprocessing:
@@ -189,7 +176,6 @@ zabbix_export:
         - uuid: b7634ae2a9d5454bbac631b55e896277
           name: 'Locked errors per second'
           key: 'perf_counter_en["\Web Service(_Total)\Locked Errors/Sec", 60]'
-          history: 7d
           value_type: FLOAT
           description: 'The rate of errors due to requests that couldn''t be satisfied by the server because the requested document was locked. These are generally reported as an HTTP 423 error code to the client. Average per minute.'
           preprocessing:
@@ -202,7 +188,6 @@ zabbix_export:
         - uuid: 069548a7c9e840bb8975f9b02b582c51
           name: 'Method LOCK requests per second'
           key: 'perf_counter_en["\Web Service(_Total)\Lock Requests/Sec", 60]'
-          history: 7d
           value_type: FLOAT
           description: 'The rate of HTTP requests made using the LOCK method. Lock requests are used to lock a file for one user so that only that user can modify the file. Average per minute.'
           preprocessing:
@@ -215,7 +200,6 @@ zabbix_export:
         - uuid: 02c1fe0d15d94744959e4b53b21309fe
           name: 'Method MKCOL requests per second'
           key: 'perf_counter_en["\Web Service(_Total)\Mkcol Requests/Sec", 60]'
-          history: 7d
           value_type: FLOAT
           description: 'The rate of HTTP requests using the MKCOL method made. Mkcol requests are used to create directories on the server. Average per minute.'
           preprocessing:
@@ -228,7 +212,6 @@ zabbix_export:
         - uuid: 6395e8edb1394396bd7602f621cf4b00
           name: 'Method MOVE requests per second'
           key: 'perf_counter_en["\Web Service(_Total)\Move Requests/Sec", 60]'
-          history: 7d
           value_type: FLOAT
           description: 'The rate of HTTP requests using the MOVE method made. Move requests are used for moving files and directories. Average per minute.'
           preprocessing:
@@ -241,7 +224,6 @@ zabbix_export:
         - uuid: d67523ef47464f8c9735d0a0359b5c77
           name: 'NonAnonymous users per second'
           key: 'perf_counter_en["\Web Service(_Total)\NonAnonymous Users/sec", 60]'
-          history: 7d
           value_type: FLOAT
           description: 'The number of requests from users over a non-anonymous connection per second. Average per minute.'
           tags:
@@ -250,7 +232,6 @@ zabbix_export:
         - uuid: 11d9995d25114e4fad666a1b75734c01
           name: 'Not Found errors per second'
           key: 'perf_counter_en["\Web Service(_Total)\Not Found Errors/Sec", 60]'
-          history: 7d
           value_type: FLOAT
           description: 'The rate of errors due to requests that couldn''t be satisfied by the server because the requested document could not be found. These are generally reported to the client with HTTP error code 404. Average per minute.'
           preprocessing:
@@ -263,7 +244,6 @@ zabbix_export:
         - uuid: 22ececa2db2d488587b1194883723ea6
           name: 'Method OPTIONS requests per second'
           key: 'perf_counter_en["\Web Service(_Total)\Options Requests/Sec", 60]'
-          history: 7d
           value_type: FLOAT
           description: 'The rate of HTTP requests using the OPTIONS method made. Average per minute.'
           preprocessing:
@@ -276,7 +256,6 @@ zabbix_export:
         - uuid: 1653ca4c0c6743f39d9b1e764022da7c
           name: 'Method Total Other requests per second'
           key: 'perf_counter_en["\Web Service(_Total)\Other Request Methods/Sec", 60]'
-          history: 7d
           value_type: FLOAT
           description: 'Total Other Request Methods is the number of HTTP requests that are not OPTIONS, GET, HEAD, POST, PUT, DELETE, TRACE, MOVE, COPY, MKCOL, PROPFIND, PROPPATCH, SEARCH, LOCK or UNLOCK methods (since service startup). Average per minute.'
           preprocessing:
@@ -289,7 +268,6 @@ zabbix_export:
         - uuid: 5f1210173665453e84f8f330a8c15eea
           name: 'Method POST requests per second'
           key: 'perf_counter_en["\Web Service(_Total)\Post Requests/Sec", 60]'
-          history: 7d
           value_type: FLOAT
           description: 'Rate of HTTP requests using POST method. Generally used for forms or gateway requests. Average per minute.'
           preprocessing:
@@ -302,7 +280,6 @@ zabbix_export:
         - uuid: f197e93e03d04025bc855d4d77c35010
           name: 'Method PROPFIND requests per second'
           key: 'perf_counter_en["\Web Service(_Total)\Propfind Requests/Sec", 60]'
-          history: 7d
           value_type: FLOAT
           description: 'The rate of HTTP requests using the PROPFIND method made. Propfind requests retrieve property values on files and directories. Average per minute.'
           preprocessing:
@@ -315,7 +292,6 @@ zabbix_export:
         - uuid: 55c71bab45b04a2ca2afb526bf7c3e7f
           name: 'Method PROPPATCH requests per second'
           key: 'perf_counter_en["\Web Service(_Total)\Proppatch Requests/Sec", 60]'
-          history: 7d
           value_type: FLOAT
           description: 'The rate of HTTP requests using the PROPPATCH method made. Proppatch requests set property values on files and directories. Average per minute.'
           preprocessing:
@@ -328,7 +304,6 @@ zabbix_export:
         - uuid: d1d19cf6c920465184aa2b2a8b4439c9
           name: 'Method PUT requests per second'
           key: 'perf_counter_en["\Web Service(_Total)\Put Requests/Sec", 60]'
-          history: 7d
           value_type: FLOAT
           description: 'The rate of HTTP requests using the PUT method made. Average per minute.'
           preprocessing:
@@ -341,7 +316,6 @@ zabbix_export:
         - uuid: 20ae8a67912045dc9b69c83d68e5e8ea
           name: 'Method MS-SEARCH requests per second'
           key: 'perf_counter_en["\Web Service(_Total)\Search Requests/Sec", 60]'
-          history: 7d
           value_type: FLOAT
           description: 'The rate of HTTP requests using the MS-SEARCH method made. Search requests are used to query the server to find resources that match a set of conditions provided by the client. Average per minute.'
           preprocessing:
@@ -354,7 +328,6 @@ zabbix_export:
         - uuid: 4aa9419482eb484a8fc1773bee8b2993
           name: Uptime
           key: 'perf_counter_en["\Web Service(_Total)\Service Uptime"]'
-          history: 7d
           value_type: FLOAT
           units: s
           description: 'The service uptime expressed in seconds.'
@@ -375,7 +348,6 @@ zabbix_export:
         - uuid: 805f7dca2ac74f5bbfb81c5e7bfa6e09
           name: 'Total connection attempts'
           key: 'perf_counter_en["\Web Service(_Total)\Total Connection Attempts (all instances)"]'
-          history: 7d
           value_type: FLOAT
           description: 'The total number of connections to the Web or FTP service that have been attempted since service startup. The count is the total for all Web sites or FTP sites combined.'
           preprocessing:
@@ -388,7 +360,6 @@ zabbix_export:
         - uuid: 90eb19d7d37f439da2c78c44d85784ef
           name: 'Method Total requests per second'
           key: 'perf_counter_en["\Web Service(_Total)\Total Method Requests/Sec", 60]'
-          history: 7d
           value_type: FLOAT
           description: 'The rate of all HTTP requests received. Average per minute.'
           preprocessing:
@@ -401,7 +372,6 @@ zabbix_export:
         - uuid: c2ddd72243ba4a499a7a1e9ba6e4046c
           name: 'Method TRACE requests per second'
           key: 'perf_counter_en["\Web Service(_Total)\Trace Requests/Sec", 60]'
-          history: 7d
           value_type: FLOAT
           description: 'The rate of HTTP requests using the TRACE method made. Average per minute.'
           preprocessing:
@@ -414,7 +384,6 @@ zabbix_export:
         - uuid: 05a19416695b436daf701d9750b015a8
           name: 'Method TRACE requests per second'
           key: 'perf_counter_en["\Web Service(_Total)\Unlock Requests/Sec", 60]'
-          history: 7d
           value_type: FLOAT
           description: 'The rate of HTTP requests using the UNLOCK method made. Unlock requests are used to remove locks from files. Average per minute.'
           preprocessing:
@@ -427,7 +396,6 @@ zabbix_export:
         - uuid: 1e4b39ec2cca49fb9fb5a306c2724568
           name: 'Files cache hits percentage'
           key: 'perf_counter_en["\Web Service Cache\File Cache Hits %"]'
-          history: 7d
           value_type: FLOAT
           description: 'The ratio of user-mode file cache hits to total cache requests (since service startup). Note: This value might be low if the Kernel URI cache hits percentage is high.'
           preprocessing:
@@ -440,7 +408,6 @@ zabbix_export:
         - uuid: d9c46d370afc496ba0a0ad0c141b4490
           name: 'File cache misses'
           key: 'perf_counter_en["\Web Service Cache\File Cache Misses"]'
-          history: 7d
           value_type: FLOAT
           description: 'The total number of unsuccessful lookups in the user-mode file cache since service startup.'
           preprocessing:
@@ -453,7 +420,6 @@ zabbix_export:
         - uuid: 566f0bea097e4b0bb7042e4f0302ff26
           name: 'URIs cache hits percentage'
           key: 'perf_counter_en["\Web Service Cache\URI Cache Hits %"]'
-          history: 7d
           value_type: FLOAT
           description: 'The ratio of user-mode URI Cache Hits to total cache requests (since service startup)'
           preprocessing:
@@ -466,7 +432,6 @@ zabbix_export:
         - uuid: ab1884be28b54ea7bb187bbe843bb6a7
           name: 'URI cache misses'
           key: 'perf_counter_en["\Web Service Cache\URI Cache Misses"]'
-          history: 7d
           value_type: FLOAT
           description: 'The total number of unsuccessful lookups in the user-mode URI cache since service startup.'
           preprocessing:
@@ -479,7 +444,6 @@ zabbix_export:
         - uuid: 7d76ec3d35f6446c842595c4831fabf4
           name: 'World Wide Web Publishing Service (W3SVC) state'
           key: 'service.info[W3SVC]'
-          history: 7d
           description: 'The World Wide Web Publishing Service (W3SVC) provides web connectivity and administration of websites through the IIS snap-in. If the World Wide Web Publishing Service stops, the operating system cannot serve any form of web request. This service was dependent on "Windows Process Activation Service".'
           valuemap:
             name: 'Windows service state'
@@ -507,7 +471,6 @@ zabbix_export:
         - uuid: 38858eb3cc2f4580a0a3c56c11fdeba5
           name: 'Windows Process Activation Service (WAS) state'
           key: 'service.info[WAS]'
-          history: 7d
           description: 'Windows Process Activation Service (WAS) is a tool for managing worker processes that contain applications that host Windows Communication Foundation (WCF) services. Worker processes handle requests that are sent to a Web Server for specific application pools. Each application pool sets boundaries for the applications it contains.'
           valuemap:
             name: 'Windows service state'
@@ -539,16 +502,13 @@ zabbix_export:
             conditions:
               - macro: '{#APPPOOL}'
                 value: '{$IIS.APPPOOL.MATCHES}'
-                formulaid: A
               - macro: '{#APPPOOL}'
                 value: '{$IIS.APPPOOL.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
           item_prototypes:
             - uuid: 270068fe6e6844ae9bbf993509eda7e0
               name: 'AppPool {#APPPOOL} state'
               key: 'perf_counter_en["\APP_POOL_WAS({#APPPOOL})\Current Application Pool State"]'
-              history: 7d
               description: 'The state of the application pool.'
               valuemap:
                 name: 'Application pool state'
@@ -575,7 +535,6 @@ zabbix_export:
             - uuid: f039a53351d54132ab9ad046282389d8
               name: '{#APPPOOL} Uptime'
               key: 'perf_counter_en["\APP_POOL_WAS({#APPPOOL})\Current Application Pool Uptime"]'
-              history: 7d
               value_type: FLOAT
               units: s
               description: 'The web application uptime period since the last restart.'
@@ -598,7 +557,6 @@ zabbix_export:
             - uuid: 4700b5729ca440869de976ae347598cf
               name: 'AppPool {#APPPOOL} recycles'
               key: 'perf_counter_en["\APP_POOL_WAS({#APPPOOL})\Total Application Pool Recycles"]'
-              history: 7d
               description: 'The number of times the application pool has been recycled since Windows Process Activation Service (WAS) started.'
               preprocessing:
                 - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -621,7 +579,6 @@ zabbix_export:
               name: 'AppPool {#APPPOOL} current queue size'
               key: 'perf_counter_en["\HTTP Service Request Queues({#APPPOOL})\CurrentQueueSize"]'
               delay: 30s
-              history: 7d
               description: 'The number of requests in the queue.'
               preprocessing:
                 - type: DISCARD_UNCHANGED_HEARTBEAT

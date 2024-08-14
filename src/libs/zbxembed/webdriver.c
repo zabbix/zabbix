@@ -347,7 +347,7 @@ zbx_webdriver_t	*webdriver_create(const char *endpoint, const char *sourceip, ch
 			SUCCEED != CURL_SETOPT(wd->handle, CURLOPT_SSL_VERIFYHOST, 0L, error) ||
 			SUCCEED != CURL_SETOPT(wd->handle, CURLOPT_HEADERFUNCTION, curl_header_cb, error) ||
 			SUCCEED != CURL_SETOPT(wd->handle, CURLOPT_HEADERDATA, wd, error) ||
-			SUCCEED != CURL_SETOPT(wd->handle, CURLOPT_INTERFACE, sourceip, error))
+			(NULL != sourceip && SUCCEED != CURL_SETOPT(wd->handle, CURLOPT_INTERFACE, sourceip, error)))
 	{
 		goto out;
 	}
@@ -1010,14 +1010,15 @@ out:
  ******************************************************************************/
 int	webdriver_get_perf_data(zbx_webdriver_t *wd, struct zbx_json_parse *jp, char **error)
 {
-	const char	*script = "var a=window.performance.getEntries();var out=[];"
-						"for (o of a) {"
-							"var obj = {};"
-							"for (p in o) {"
-								"if (!(o[p] instanceof Object)) {obj[p] = o[p];}"
-							"}"
-							"out.push(obj);"
-						"}; return out;";
+	const char	*script =
+		"var a=window.performance.getEntries();var out=[];"
+		"for (o of a) {"
+			"var obj = {};"
+			"for (p in o) {"
+				"if (!(o[p] instanceof Object) && typeof o[p] !== 'function') {obj[p] = o[p];}"
+			"}"
+			"out.push(obj);"
+		"}; return out;";
 
 	return webdriver_execute_script(wd, script, jp, error);
 }

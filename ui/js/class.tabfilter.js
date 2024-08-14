@@ -257,7 +257,7 @@ class CTabFilter extends CBaseComponent {
 		}
 
 		body.idx = this._idx_namespace + '.' + property;
-		body._csrf_token = this._csrf_token;
+		body[CSRF_TOKEN_NAME] = this._csrf_token;
 
 		if (property !== 'properties') {
 			this._fetch[property] = new AbortController();

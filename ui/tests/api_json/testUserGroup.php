@@ -15,9 +15,11 @@
 
 
 require_once dirname(__FILE__).'/../include/CAPITest.php';
+require_once __DIR__.'/../include/helpers/CTestDataHelper.php';
 
 /**
  * @onBefore  prepareTestData
+ * @onAfter   cleanTestData
  *
  * @backup usrgrp, userdirectory, mfa
  */
@@ -54,6 +56,47 @@ class testUserGroup extends CAPITest {
 
 		$this->assertArrayHasKey('mfaids', $mfa);
 		self::$data['mfaid'] = array_combine(['MFA TOTP method'], $mfa['mfaids']);
+
+		// usergroup.update
+		CTestDataHelper::createObjects([
+			'user_groups' => [
+				['name' => 'user group 1']
+			],
+			'roles' => [
+				['name' => 'api admin role', 'type' => USER_TYPE_ZABBIX_ADMIN]
+			],
+			'users' => [
+				[
+					'username' => 'single_group_user',
+					'roleid' => ':role:api admin role',
+					'passwd' => 'zabbix123456',
+					'usrgrps' => [
+						['usrgrpid' => ':user_group:user group 1']
+					]
+				]
+			]
+		]);
+
+		// usergroup.delete
+		CTestDataHelper::createObjects([
+			'user_groups' => [
+				['name' => 'user group 2']
+			],
+			'users' => [
+				[
+					'username' => 'usergroup_delete_single_group_user',
+					'roleid' => ':role:api admin role',
+					'passwd' => 'zabbix123456',
+					'usrgrps' => [
+						['usrgrpid' => ':user_group:user group 2']
+					]
+				]
+			]
+		]);
+	}
+
+	public static function cleanTestData(): void {
+		CTestDataHelper::cleanUp();
 	}
 
 	public static function usergroup_create() {
@@ -261,13 +304,13 @@ class testUserGroup extends CAPITest {
 				]],
 				'expected_error' => 'User cannot add himself to a disabled group or a group with disabled GUI access.'
 			],
-			[
+			'Can remove user with one group from group users' => [
 				'group' => [[
-					'usrgrpid' => '15',
+					'usrgrpid' => ':user_group:user group 1',
 					'name' => 'User without user group',
 					'users' => ['userid' => 1]
 				]],
-				'expected_error' => 'User "user-in-one-group" cannot be without user group.'
+				'expected_error' => null
 			],
 			// Check two user group for update.
 			[
@@ -353,6 +396,7 @@ class testUserGroup extends CAPITest {
 	* @dataProvider usergroup_update
 	*/
 	public function testUserGroup_Update($groups, $expected_error) {
+		CTestDataHelper::convertUserGroupReferences($groups);
 		$result = $this->call('usergroup.update', $groups, $expected_error);
 
 		if ($expected_error === null) {
@@ -694,15 +738,6 @@ class testUserGroup extends CAPITest {
 				'usergroup' => ['16', '16'],
 				'expected_error' => 'Invalid parameter "/2": value (16) already exists.'
 			],
-			// Check users without groups
-			[
-				'usergroup' => ['15'],
-				'expected_error' => 'User "user-in-one-group" cannot be without user group.'
-			],
-			[
-				'usergroup' => ['16','17'],
-				'expected_error' => 'User "user-in-two-groups" cannot be without user group.'
-			],
 			// Check user group used in actions
 			[
 				'usergroup' => ['20'],
@@ -720,11 +755,11 @@ class testUserGroup extends CAPITest {
 			],
 			// Check successfully delete of user group.
 			[
-				'usergroup' => ['17'],
+				'usergroup' => ['18', '19'],
 				'expected_error' => null
 			],
-			[
-				'usergroup' => ['18', '19'],
+			'Can delete group havig user with single group' => [
+				'usergroup' => [':user_group:user group 2'],
 				'expected_error' => null
 			]
 		];
@@ -733,8 +768,9 @@ class testUserGroup extends CAPITest {
 	/**
 	* @dataProvider usergroup_delete
 	*/
-	public function testUserGroup_Delete($group, $expected_error) {
-		$result = $this->call('usergroup.delete', $group, $expected_error);
+	public function testUserGroup_Delete($groupids, $expected_error) {
+		$groupids = CTestDataHelper::getConvertedValueReferences($groupids);
+		$result = $this->call('usergroup.delete', $groupids, $expected_error);
 
 		if ($expected_error === null) {
 			foreach ($result['result']['usrgrpids'] as $usrgrpid) {

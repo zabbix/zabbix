@@ -100,7 +100,7 @@ foreach ($data['items'] as $item) {
 					'backurl' => $list_url
 				])
 			),
-		$name,
+		(new CCol($name))->addClass(ZBX_STYLE_WORDBREAK),
 		(new CDiv($item['key_']))->addClass(ZBX_STYLE_WORDWRAP),
 		$item['delay'],
 		$item['history'],
@@ -188,7 +188,7 @@ $confirm_messages = [
 
 	(new CScriptTag('
 		view.init('.json_encode([
-			'token' => [CCsrfTokenHelper::CSRF_TOKEN_NAME => CCsrfTokenHelper::get('item')],
+			'token' => [CSRF_TOKEN_NAME => CCsrfTokenHelper::get('item')],
 			'confirm_messages' => $confirm_messages,
 			'context' => $data['context'],
 			'form_name' => $form->getName()

@@ -95,6 +95,13 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 			]
 		]);
 
+		CDataHelper::call('trigger.create', [
+			[
+				'description' => 'Templated trigger',
+				'expression' => 'last(/'.self::TEMPLATE.'/templ_key[1])=0'
+			]
+		]);
+
 		$item_protototypes = CDataHelper::call('itemprototype.create', [
 			[
 				'hostid' => self::$update_templateid,
@@ -519,6 +526,21 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 								'y' => 16,
 								'width' => 12,
 								'height' => 4
+							],
+							[
+								'type' => 'honeycomb',
+								'name' => 'Honeycomb widget',
+								'x' => 48,
+								'y' => 16,
+								'width' => 12,
+								'height' => 4,
+								'fields' => [
+									[
+										'type' => 1,
+										'name' => 'items.0',
+										'value' => 'Test dashboard honeycomb'
+									]
+								]
 							]
 						]
 					]
@@ -1060,7 +1082,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 								[
 									'field_locator' => 'xpath:.//label[text()="Units"]/../following-sibling::div[1]/input',
 									'attributes' => [
-										'maxlength' => 2048
+										'maxlength' => 255
 									]
 								],
 								[
@@ -2187,7 +2209,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 	public function testDashboardsTemplatedDashboardForm_WidgetDefaultLayout($data) {
 		$this->page->login()->open('zabbix.php?action=template.dashboard.list&templateid='.self::$update_templateid);
 		$this->query('button:Create dashboard')->one()->click();
-		COverlayDialogElement::find()->one()->waitUntilVisible()->close();
+		COverlayDialogElement::find()->one()->waitUntilReady()->close();
 
 		// Select the required type of widget.
 		$this->query('button:Add')->one()->waitUntilClickable()->click();
