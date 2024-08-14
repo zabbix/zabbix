@@ -732,7 +732,7 @@ $item_tab
 		new CLabel(_('Description'), 'description'),
 		new CFormField((new CTextArea('description', $data['description']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setMaxLength(DB::getFieldLength('host', 'description'))
+			->setMaxLength(DB::getFieldLength('hosts', 'description'))
 		)
 	])
 	->addItem([
