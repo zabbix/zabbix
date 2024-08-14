@@ -24,7 +24,6 @@ require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
  * @onBefore prepareMapsData
  *
  */
-
 class testPageMaps extends CWebTest {
 
 	/**
@@ -227,6 +226,12 @@ class testPageMaps extends CWebTest {
 		// Check that delete and export buttons became clickable.
 		$this->assertTrue($this->query('button', ['Delete', 'Export'])->one()->isClickable());
 
+		// Check export options.
+		$this->assertEquals(['YAML', 'XML', 'JSON'], $this->query('id:export')->one()->asPopupButton()->getMenu()
+				->getItems()->asText()
+		);
+		CPopupMenuElement::find()->one()->close();
+
 		// Reset filter and check that maps are unselected.
 		$form->query('button:Reset')->one()->click();
 		$this->page->waitUntilReady();
@@ -299,7 +304,70 @@ class testPageMaps extends CWebTest {
 					]
 				]
 			],
-			// #2 View results with non-existing request.
+			// #2 View results with partial name match.
+			[
+				[
+					'filter' => [
+						'Name' => 'Zabbix'
+					],
+					'expected' => [
+						self::SYSMAP_FIRST_Z
+					]
+				]
+			],
+			// #3 View results with partial name match with space.
+			[
+				[
+					'filter' => [
+						'Name' => 'Map with'
+					],
+					'expected' => [
+						self::SYSMAP_HIGH_HEIGHT,
+						self::SYSMAP_HIGH_WIDTH,
+						'Map with icon mapping',
+						self::SYSMAP_LOW_HEIGHT,
+						self::SYSMAP_LOW_WIDTH,
+						'Public map with image'
+					]
+				]
+			],
+			// #4 View results with partial match, trailing and leading spaces.
+			[
+				[
+					'filter' => [
+						'Name' => ' with lowest '
+					],
+					'expected' => [
+						self::SYSMAP_LOW_HEIGHT,
+						self::SYSMAP_LOW_WIDTH
+					]
+				]
+			],
+			// #5 View results with upper case.
+			[
+				[
+					'filter' => [
+						'Name' => 'SORTING'
+					],
+					'expected' => [
+						self::SYSMAP_FIRST_A,
+						self::SYSMAP_FIRST_Z
+					]
+				]
+			],
+			// #6 View results with lower case.
+			[
+				[
+					'filter' => [
+						'Name' => 'sorting'
+					],
+					'expected' => [
+						self::SYSMAP_FIRST_A,
+						self::SYSMAP_FIRST_Z
+					]
+				]
+			],
+			// #7 View results with non-existing request.
 			[
 				[
 					'filter' => [
@@ -307,7 +375,7 @@ class testPageMaps extends CWebTest {
 					]
 				]
 			],
-			// #3 View results if request contains special symbols.
+			// #8 View results if request contains special symbols.
 			[
 				[
 					'filter' => [
@@ -318,7 +386,7 @@ class testPageMaps extends CWebTest {
 					]
 				]
 			],
-			// #4 View results if request has trailing spaces.
+			// #9 View results if request has trailing spaces.
 			[
 				[
 					'filter' => [
@@ -329,7 +397,7 @@ class testPageMaps extends CWebTest {
 					]
 				]
 			],
-			// #5 View results if request has leading spaces.
+			// #10 View results if request has leading spaces.
 			[
 				[
 					'filter' => [
@@ -340,7 +408,7 @@ class testPageMaps extends CWebTest {
 					]
 				]
 			],
-			// #6 View results with request that has spaces separating the words.
+			// #11 View results with request that has spaces separating the words.
 			[
 				[
 					'filter' => [
@@ -424,8 +492,8 @@ class testPageMaps extends CWebTest {
 
 		$all = CDBHelper::getCount(self::SYSMAPS_SQL);
 		$db_check = ($count_names > 0)
-				? CDBHelper::getCount('SELECT NULL FROM sysmaps WHERE name IN ('.CDBHelper::escape($data['name']).')')
-				: $all;
+			? CDBHelper::getCount('SELECT NULL FROM sysmaps WHERE name IN ('.CDBHelper::escape($data['name']).')')
+			: $all;
 		$this->assertEquals(0, $db_check);
 
 		$this->assertTableStats($all);

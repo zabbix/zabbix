@@ -182,7 +182,7 @@ class testFormMap extends CLegacyWebTest {
 		$sqlLinks = 'SELECT * FROM sysmaps_links WHERE sysmapid='.zbx_dbstr($sysmapid).' ORDER BY linkid';
 		$oldHashLinks = CDBHelper::getHash($sqlLinks);
 		$sqlLinkTriggers = 'SELECT slt.* FROM sysmaps_link_triggers slt, sysmaps_links sl WHERE slt.linkid = sl.linkid'.
-			' AND sl.sysmapid='.zbx_dbstr($sysmapid).' ORDER BY slt.linktriggerid';
+				' AND sl.sysmapid='.zbx_dbstr($sysmapid).' ORDER BY slt.linktriggerid';
 		$oldHashLinkTriggers = CDBHelper::getHash($sqlLinkTriggers);
 
 		$this->page->login()->open('sysmaps.php')->waitUntilReady();
@@ -224,6 +224,12 @@ class testFormMap extends CLegacyWebTest {
 		}
 	}
 
+	/**
+	 * Check title and header on the pages related to sysmap.
+	 *
+	 * @param string	$header		expected header of the page
+	 * @param string	$title		expected title of the page
+	 */
 	protected function assertTitleAndHeader($header = 'Maps', $title = 'Configuration of network maps') {
 		$this->page->assertTitle($title);
 		$this->page->assertHeader($header);

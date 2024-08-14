@@ -354,15 +354,13 @@ class testFormSysmap extends CLegacyWebTest {
 		$this->page->waitUntilReady();
 
 		// Check the title and header of Create map page.
-		$this->page->assertTitle('Configuration of network maps');
-		$this->page->assertHeader('Network maps');
+		$this->assertTitleAndHeader('Network maps');
 
 		$this->query('button:Cancel')->one()->click();
 		$this->page->waitUntilReady();
 
 		// Check that user is returned to maps page.
-		$this->page->assertTitle('Configuration of network maps');
-		$this->page->assertHeader('Maps');
+		$this->assertTitleAndHeader();
 
 		$this->assertEquals($old_hash, CDBHelper::getHash('SELECT * FROM sysmaps ORDER BY sysmapid'));
 	}
@@ -433,7 +431,6 @@ class testFormSysmap extends CLegacyWebTest {
 		$this->assertEquals(1, CDBHelper::getCount("SELECT sysmapid FROM sysmaps WHERE name='".$mapName."'"));
 		$this->zbxTestTextPresent($mapName);
 		return $mapName;
-
 	}
 
 	/**
@@ -449,8 +446,14 @@ class testFormSysmap extends CLegacyWebTest {
 		$this->assertEquals(0, CDBHelper::getCount("SELECT sysmapid FROM sysmaps WHERE name='".$mapName."'"));
 	}
 
-	protected function assertTitleAndHeader($header = 'Maps') {
-		$this->page->assertTitle('Configuration of network maps');
+	/**
+	 * Check title and header on the pages related to sysmap.
+	 *
+	 * @param string	$header		expected header of the page
+	 * @param string	$title		expected title of the page
+	 */
+	protected function assertTitleAndHeader($header = 'Maps', $title = 'Configuration of network maps') {
+		$this->page->assertTitle($title);
 		$this->page->assertHeader($header);
 	}
 }
