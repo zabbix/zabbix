@@ -347,7 +347,7 @@ zbx_webdriver_t	*webdriver_create(const char *endpoint, const char *sourceip, ch
 			SUCCEED != CURL_SETOPT(wd->handle, CURLOPT_SSL_VERIFYHOST, 0L, error) ||
 			SUCCEED != CURL_SETOPT(wd->handle, CURLOPT_HEADERFUNCTION, curl_header_cb, error) ||
 			SUCCEED != CURL_SETOPT(wd->handle, CURLOPT_HEADERDATA, wd, error) ||
-			SUCCEED != CURL_SETOPT(wd->handle, CURLOPT_INTERFACE, sourceip, error))
+			(NULL != sourceip && SUCCEED != CURL_SETOPT(wd->handle, CURLOPT_INTERFACE, sourceip, error)))
 	{
 		goto out;
 	}
