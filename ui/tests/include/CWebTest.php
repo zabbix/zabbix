@@ -22,16 +22,18 @@ require_once 'vendor/autoload.php';
 
 require_once __DIR__.'/CTest.php';
 require_once __DIR__.'/web/CPage.php';
+require_once __DIR__.'/helpers/CDataHelper.php';
 require_once __DIR__.'/helpers/CXPathHelper.php';
 require_once __DIR__.'/helpers/CImageHelper.php';
 require_once __DIR__.'/../../include/classes/helpers/CMessageHelper.php';
 require_once __DIR__.'/../../include/classes/routing/CUrl.php';
 
-require_once __DIR__.'/../selenium/behaviors/CMessageBehavior.php';
 require_once __DIR__.'/../selenium/behaviors/CMacrosBehavior.php';
+require_once __DIR__.'/../selenium/behaviors/CMessageBehavior.php';
 require_once __DIR__.'/../selenium/behaviors/CPreprocessingBehavior.php';
 require_once __DIR__.'/../selenium/behaviors/CTableBehavior.php';
 require_once __DIR__.'/../selenium/behaviors/CTagBehavior.php';
+require_once __DIR__.'/../selenium/behaviors/CWidgetBehavior.php';
 
 define('TEST_GOOD', 0);
 define('TEST_BAD', 1);
@@ -334,16 +336,7 @@ class CWebTest extends CTest {
 				$color = array_key_exists('color', $region) ? $region['color'] : null;
 
 				if (array_key_exists('element', $region)) {
-					if ($region['element'] instanceof CElement) {
-						$region = $region['element']->getRect();
-						$region['x'] -= $offset['x'];
-						$region['y'] -= $offset['y'];
-
-						if ($color !== null) {
-							$region['color'] = $color;
-						}
-					}
-					else {
+					if (!$region['element'] instanceof CElement) {
 						$this->fail('Except element is not an instance of CElement.');
 					}
 				}
@@ -357,7 +350,7 @@ class CWebTest extends CTest {
 					}
 
 					foreach ($query->all() as $item) {
-						$append[] = array_merge($item->getRect(), ($color !== null) ? ['color' => $color] : []);
+						$append[] = array_merge(['element' => $item], ($color !== null) ? ['color' => $color] : []);
 					}
 
 					unset($regions[$i]);
@@ -368,9 +361,7 @@ class CWebTest extends CTest {
 				}
 			}
 			elseif ($region instanceof CElement) {
-				$region = $region->getRect();
-				$region['x'] -= $offset['x'];
-				$region['y'] -= $offset['y'];
+				$region = ['element' => $region];
 			}
 			else {
 				$this->fail('Screenshot except configuration is invalid.');
@@ -379,6 +370,10 @@ class CWebTest extends CTest {
 		unset($region);
 
 		foreach ($append as &$region) {
+			if (array_key_exists('element', $region)) {
+				continue;
+			}
+
 			$region['x'] -= $offset['x'];
 			$region['y'] -= $offset['y'];
 		}
@@ -412,7 +407,7 @@ class CWebTest extends CTest {
 		}
 
 		$script = 'var tag = document.createElement("style");tag.setAttribute("id", "selenium-injected-style");'.
-				'tag.textContent = "* {text-rendering: geometricPrecision; image-rendering: pixelated}";'.
+				'tag.textContent = "* {text-rendering: geometricPrecision; image-rendering: pixelated} .selenium-hide {opacity: 0 !important}";'.
 				'(document.head||document.documentElement).appendChild(tag);';
 
 		try {
@@ -436,10 +431,22 @@ class CWebTest extends CTest {
 
 		try {
 			$name = md5($function.$id).'.png';
-			$this->page->updateViewport();
-			$screenshot = CImageHelper::getImageWithoutRegions($this->page->takeScreenshot($element),
-					$this->getNormalizedRegions($element, $regions)
-			);
+
+			$coordinates = [];
+			foreach ($this->getNormalizedRegions($element, $regions) as $region) {
+				if (array_key_exists('element', $region)) {
+					try {
+						$this->page->getDriver()->executeScript('arguments[0].classList.add(\'selenium-hide\');', [$region['element']]);
+					} catch (Exception $exception) {
+						// Code is not missing here.
+					}
+				}
+				else {
+					$coordinates[] = $region;
+				}
+			}
+
+			$screenshot = CImageHelper::getImageWithoutRegions($this->page->takeScreenshot($element), $coordinates);
 
 			if (($reference = @file_get_contents(PHPUNIT_REFERENCE_DIR.$class.'/'.$name)) === false) {
 				if (file_put_contents(PHPUNIT_SCREENSHOT_DIR.'ref_'.$name, $screenshot) !== false) {

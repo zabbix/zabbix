@@ -68,6 +68,7 @@
 						CALC_FNC_AVG => _('avg'),
 						CALC_FNC_MAX => _('max')
 					]))
+					->setReadonly($readonly)
 			?>
 		</td>
 
@@ -76,6 +77,7 @@
 			<?= (new CSelect('items[#{number}][drawtype]'))
 					->setValue('#{drawtype}')
 					->addOptions(CSelect::createOptionsFromArray($graph_item_drawtypes))
+					->setReadonly($readonly)
 			?>
 		</td>
 
@@ -87,6 +89,7 @@
 						GRAPH_YAXIS_SIDE_LEFT => _('Left'),
 						GRAPH_YAXIS_SIDE_RIGHT => _('Right')
 					]))
+					->setReadonly($readonly)
 			?>
 		</td>
 
@@ -147,6 +150,7 @@
 						CALC_FNC_AVG => _('avg'),
 						CALC_FNC_MAX => _('max')
 					]))
+					->setReadonly($readonly)
 			?>
 		</td>
 
@@ -158,6 +162,7 @@
 						GRAPH_YAXIS_SIDE_LEFT => _('Left'),
 						GRAPH_YAXIS_SIDE_RIGHT => _('Right')
 					]))
+					->setReadonly($readonly)
 			?>
 		</td>
 
@@ -217,6 +222,7 @@
 						GRAPH_ITEM_SIMPLE =>_('Simple'),
 						GRAPH_ITEM_SUM =>_('Graph sum')
 					]))
+					->setReadonly($readonly)
 			?>
 		</td>
 
@@ -230,6 +236,7 @@
 						CALC_FNC_MAX => _('max'),
 						CALC_FNC_LST => _('last')
 					]))
+					->setReadonly($readonly)
 			?>
 		</td>
 
@@ -289,6 +296,7 @@
 						GRAPH_ITEM_SIMPLE => _('Simple'),
 						GRAPH_ITEM_SUM => _('Graph sum')
 					]))
+					->setReadonly($readonly)
 			?>
 		</td>
 
@@ -302,6 +310,7 @@
 						CALC_FNC_MAX => _('max'),
 						CALC_FNC_LST => _('last')
 					]))
+					->setReadonly($readonly)
 			?>
 		</td>
 
@@ -423,14 +432,15 @@
 			});
 
 			if (this.graphs.readonly) {
-				$('#itemsTable').sortable({disabled: true}).find('input').prop('readonly', true);
-				$('z-select', '#itemsTable').prop('disabled', true);
-
 				const size = $('#itemsTable tr.sortable').length;
 
 				for (let i = 0; i < size; i++) {
-					$('#items_' + i + '_color').removeAttr('onchange');
-					$('#lbl_items_' + i + '_color').removeAttr('onclick');
+					$('#items_' + i + '_color')
+						.removeAttr('onchange')
+						.prop('readonly', true);
+					$('#lbl_items_' + i + '_color')
+						.removeAttr('onclick')
+						.prop('readonly', true);
 				}
 			}
 

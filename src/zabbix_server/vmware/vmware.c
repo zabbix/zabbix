@@ -1903,6 +1903,31 @@ static void	vmware_counter_free(zbx_vmware_counter_t *counter)
 	zbx_free(counter);
 }
 
+static void	vmware_validate_url_suffix(const char *url, char **error)
+{
+#define VMWARE_URL_SUFFIX_SDK	"/sdk"
+	size_t	len = strlen(url);
+
+	if (ZBX_CONST_STRLEN(VMWARE_URL_SUFFIX_SDK) > len ||
+			0 != strcmp(url + (len - ZBX_CONST_STRLEN(VMWARE_URL_SUFFIX_SDK)), VMWARE_URL_SUFFIX_SDK))
+	{
+		*error = zbx_strdup(*error, "Invalid URL: missing '" VMWARE_URL_SUFFIX_SDK "'.");
+	}
+#undef VMWARE_URL_SUFFIX_SDK
+}
+
+#define VMWARE_VALIDATE_EMPTY(field, field_str)						\
+do											\
+{											\
+	if ('\0' == *field)								\
+	{										\
+		if (NULL == *error)							\
+			*error = zbx_dsprintf(*error, "Empty %s", field_str);		\
+		else									\
+			*error = zbx_dsprintf(*error, "%s, %s", *error, field_str);	\
+	}										\
+} while(0)
+
 /******************************************************************************
  *                                                                            *
  * Purpose: authenticates vmware service                                      *
@@ -1939,6 +1964,16 @@ static int	vmware_service_authenticate(zbx_vmware_service_t *service, CURL *easy
 	int		ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() '%s'@'%s'", __func__, service->username, service->url);
+
+	VMWARE_VALIDATE_EMPTY(service->url, "URL");
+	VMWARE_VALIDATE_EMPTY(service->username, "username");
+	VMWARE_VALIDATE_EMPTY(service->password, "password");
+
+	if (NULL != *error)
+	{
+		*error = zbx_strdcat(*error, ".");
+		goto out;
+	}
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_COOKIEFILE, "")) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_FOLLOWLOCATION, 1L)) ||
@@ -1993,7 +2028,10 @@ static int	vmware_service_authenticate(zbx_vmware_service_t *service, CURL *easy
 				username_esc, password_esc);
 
 		if (SUCCEED != zbx_soap_post(__func__, easyhandle, xml, &doc, NULL, error) && NULL == doc)
+		{
+			vmware_validate_url_suffix(service->url, error);
 			goto out;
+		}
 
 		if (NULL == *error)
 		{
@@ -2023,7 +2061,10 @@ static int	vmware_service_authenticate(zbx_vmware_service_t *service, CURL *easy
 			username_esc, password_esc);
 
 	if (SUCCEED != zbx_soap_post(__func__, easyhandle, xml, NULL, NULL, error))
+	{
+		vmware_validate_url_suffix(service->url, error);
 		goto out;
+	}
 
 	ret = SUCCEED;
 out:
@@ -2036,6 +2077,8 @@ out:
 
 	return ret;
 }
+
+#undef VMWARE_VALIDATE_EMPTY
 
 /******************************************************************************
  *                                                                            *

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-01-22T15:14:35Z'
+  date: '2024-06-04T23:06:56Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -106,6 +106,9 @@ zabbix_export:
                 - '$.body[?(@.Name)].length()'
           master_item:
             key: nomad.client.nodes.get
+          tags:
+            - tag: component
+              value: environment
         - uuid: e848e135a5574931accf114fcafb89d7
           name: 'HashiCorp Nomad: Region'
           type: DEPENDENT
@@ -293,6 +296,9 @@ zabbix_export:
                 - '$[?(@.Name)].length()'
           master_item:
             key: nomad.server.nodes.get
+          tags:
+            - tag: component
+              value: environment
       discovery_rules:
         - uuid: 0ba167e5638344ab842224df5b8909e1
           name: 'Clients discovery'
@@ -1509,6 +1515,9 @@ zabbix_export:
                 - $.body..Version.first()
           master_item:
             key: nomad.client.node.info.get
+          tags:
+            - tag: component
+              value: system
           triggers:
             - uuid: afac97bced6f49bc994ae633b662722c
               expression: 'change(/HashiCorp Nomad Client by HTTP/nomad.client.version)<>0'
@@ -2903,6 +2912,9 @@ zabbix_export:
               error_handler: DISCARD_VALUE
           master_item:
             key: nomad.server.stats.get
+          tags:
+            - tag: component
+              value: system
         - uuid: 6ad163ebdefa4f5aa1e3712b7ddac7a7
           name: 'HashiCorp Nomad Server: FSM allocation client update time'
           type: DEPENDENT
@@ -5735,6 +5747,9 @@ zabbix_export:
                 - $.body.config.Version.Version
           master_item:
             key: nomad.server.stats.get
+          tags:
+            - tag: component
+              value: system
           triggers:
             - uuid: 3c7dfd5ec21144b6b58c603d60142200
               expression: 'change(/HashiCorp Nomad Server by HTTP/nomad.server.version)<>0'

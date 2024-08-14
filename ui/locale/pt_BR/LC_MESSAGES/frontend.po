@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-04-02 17:26+0300\n"
-"PO-Revision-Date: 2024-04-20 17:58+0000\n"
-"Last-Translator: Marco <marcodefreitas@gmail.com>\n"
+"PO-Revision-Date: 2024-06-20 01:50+0000\n"
+"Last-Translator: Helder Santana <helder.santana@systemsbr.com.br>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
@@ -202,12 +202,12 @@ msgstr[1] "%1$s de %2$s elementos em estado de incidente"
 #: app/views/administration.miscconfig.edit.php:119
 #, c-format
 msgid "%1$s or %2$s - allows the page to be displayed only in a frame on the same origin as the page itself"
-msgstr ""
+msgstr "%1$s ou %2$s - permite que a página seja exibida apenas em um frame com a mesma origem da página"
 
 #: app/views/administration.miscconfig.edit.php:122
 #, c-format
 msgid "%1$s or %2$s - prevents the page from being displayed in a frame, regardless of the site attempting to do so"
-msgstr ""
+msgstr "%1$s ou %2$s - previne que a página seja exibida em um frame, independente do site que tente fazê-lo"
 
 #: jsLoader.php:353
 #, c-format
@@ -2477,8 +2477,8 @@ msgstr[1] "Não é possível desativar os itens"
 #: app/controllers/CControllerMediatypeDisable.php:75
 msgid "Cannot disable media type"
 msgid_plural "Cannot disable media types"
-msgstr[0] "Não é possível desabilitar o tipo de midia"
-msgstr[1] "Não é possível desabilitar os tipos de midia"
+msgstr[0] "Não é possível desabilitar o tipo de mídia"
+msgstr[1] "Não é possível desabilitar os tipos de mídia"
 
 #: app/controllers/CControllerModuleUpdate.php:148
 msgid "Cannot disable module"
@@ -4471,6 +4471,10 @@ msgstr "Criar tipo de mídia"
 #: app/views/popup.import.php:97 jsLoader.php:361
 msgid "Create new"
 msgstr "Criar novo"
+
+#: jsLoader.php:363
+msgid "Create new report"
+msgstr ""
 
 #: app/views/administration.proxy.list.php:37
 msgid "Create proxy"
@@ -6567,7 +6571,7 @@ msgstr "Nome do Evento"
 
 #: app/views/popup.condition.common.php:642
 msgid "Event name matches Trigger name (with macros expanded) unless a custom Event name is specified in Trigger settings."
-msgstr ""
+msgstr "O nome do evento corresponde ao nome do Trigger (com macros expandidas) a menos que um nome de evento personalizado seja especificado nas configurações do Trigger."
 
 #: include/classes/helpers/CCorrelationHelper.php:55
 msgid "Event tag pair"
@@ -6876,6 +6880,10 @@ msgstr "Falha ao atualizar as propriedades da página do painel."
 #: jsLoader.php:141
 msgid "Failed to update dashboard properties."
 msgstr "Falha ao atualizar as propriedades do painel."
+
+#: app/views/js/popup.dashboard.share.edit.js.php:86
+msgid "Failed to update dashboard sharing."
+msgstr ""
 
 #: jsLoader.php:142
 msgid "Failed to update widget properties."
@@ -7998,6 +8006,10 @@ msgstr "O grupo de hosts \"%1$s\" é interno e não pode ser excluído."
 msgid "Host group elements"
 msgstr "Elementos do grupo de hosts"
 
+#: jsLoader.php:287
+msgid "Host group is not selected."
+msgstr ""
+
 #: include/views/monitoring.sysmap.edit.php:165
 msgid "Host group label type"
 msgstr "Tipo de rótulo do grupo de hosts"
@@ -8071,6 +8083,10 @@ msgstr "Inventário do host"
 #: hostinventoriesoverview.php:26 hostinventoriesoverview.php:146
 msgid "Host inventory overview"
 msgstr "Visão geral do inventário de host"
+
+#: jsLoader.php:284
+msgid "Host is not selected."
+msgstr ""
 
 #: include/views/monitoring.sysmap.edit.php:180
 msgid "Host label type"
@@ -10687,7 +10703,7 @@ msgstr "Última checagem"
 
 #: jsLoader.php:382
 msgid "Last hour graph"
-msgstr "Gráfico última hora"
+msgstr "Gráfico da última hora"
 
 #: jsLoader.php:383
 msgid "Last month graph"
@@ -10964,7 +10980,7 @@ msgstr "Local"
 #: include/classes/widgets/forms/CWidgetFormClock.php:32
 #: include/views/monitoring.history.php:292
 msgid "Local time"
-msgstr "Hora local"
+msgstr "Horário local"
 
 #: include/hosts.inc.php:214
 msgid "Location"
@@ -11264,6 +11280,10 @@ msgstr "Localização do rótulo do elemento no mapa"
 msgid "Map element label type"
 msgstr "Tipo de rótulo no elemento do mapa"
 
+#: jsLoader.php:285
+msgid "Map is not selected."
+msgstr ""
+
 #: sysmap.php:128
 msgid "Map is updated! Return to map list?"
 msgstr "O mapa foi atualizado! Voltar à lista de mapas?"
@@ -11510,7 +11530,7 @@ msgstr "Registro de teste de tipo de mídia"
 
 #: app/controllers/CControllerPopupMediatypeTestSend.php:142
 msgid "Media type test successful."
-msgstr "Teste de tipo de mídia bem-sucedido."
+msgstr "Teste de tipo de mídia bem sucedido."
 
 #: app/controllers/CControllerMediatypeUpdate.php:173
 msgid "Media type updated"
@@ -12873,7 +12893,7 @@ msgstr "Não suportado"
 #: app/views/administration.miscconfig.edit.php:130
 #, c-format
 msgid "Note that %1$s or %2$s will be regarded as hostnames if used without single quotes."
-msgstr ""
+msgstr "Observe que %1$s ou %2$s serão considerados como hostnames, se utilizados sem aspas simples."
 
 #: include/hosts.inc.php:229
 msgid "Notes"
@@ -13203,6 +13223,18 @@ msgstr "Um"
 #: app/views/popup.maintenance.period.php:75 include/maintenances.inc.php:25
 msgid "One time only"
 msgstr "Apenas uma vez"
+
+#: include/classes/api/services/CUser.php:800
+#: include/classes/api/services/CUser.php:807
+#, c-format
+msgid "Only Super admin or Admin users can update \"%1$s\" parameter."
+msgstr ""
+
+#: include/classes/api/services/CUser.php:725
+#: include/classes/api/services/CUser.php:766
+#, c-format
+msgid "Only Super admin users can update \"%1$s\" parameter."
+msgstr ""
 
 #: include/classes/api/services/CDRule.php:488
 msgid "Only Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 checks can be made unique."
@@ -14692,7 +14724,7 @@ msgstr "Operações de recuperação"
 #: include/classes/screens/CScreenProblem.php:878
 #: include/classes/screens/CScreenProblem.php:1151 include/events.inc.php:286
 msgid "Recovery time"
-msgstr "Hora da recuperação"
+msgstr "Horário da recuperação"
 
 #: include/views/js/monitoring.sysmaps.js.php:349
 #: include/views/js/monitoring.sysmaps.js.php:503
@@ -16069,7 +16101,7 @@ msgstr "Servidor (proxy)"
 
 #: include/classes/widgets/forms/CWidgetFormClock.php:33
 msgid "Server time"
-msgstr "Hora do servidor"
+msgstr "Horário do servidor"
 
 #: app/controllers/CControllerAuditLogList.php:224
 #: app/views/js/slareport.list.js.php:39
@@ -16717,17 +16749,17 @@ msgstr "Iniciar a apresentação de slides automaticamente"
 #: app/views/popup.sla.edit.php:185
 #: app/views/popup.sla.excludeddowntime.edit.php:49
 msgid "Start time"
-msgstr "Hora de início"
+msgstr "Horário de início"
 
 #: include/classes/api/services/CSla.php:566
 #, c-format
 msgid "Start time must be less than end time for SLA \"%1$s\"."
-msgstr "A hora de início deve ser menor que a hora de término do SLA \"%1$s\"."
+msgstr "O horário de início deve ser menor que o de término do SLA \"%1$s\"."
 
 #: include/classes/api/services/CSla.php:593
 #, c-format
 msgid "Start time must be less than end time for excluded downtime \"%2$s\" of SLA \"%1$s\"."
-msgstr "A hora de início deve ser menor que a hora de término para o tempo de inatividade excluído \"%2$s\" do SLA \"%1$s\"."
+msgstr "O horário de início deve ser menor que o de término para o tempo de inatividade excluído \"%2$s\" do SLA \"%1$s\"."
 
 #: include/classes/validators/CLdapAuthValidator.php:81
 msgid "Starting TLS failed."
@@ -16735,7 +16767,7 @@ msgstr "Falha ao inicializar o TLS."
 
 #: include/classes/data/CItemData.php:1618
 msgid "Startup time of Zabbix server, Unix timestamp."
-msgstr "Horário de início do servidor Zabbix, padrão de hora do UNIX."
+msgstr "Horário de início do servidor Zabbix, tiemstamp UNIX."
 
 #: app/partials/configuration.filter.items.php:174 include/forms.inc.php:543
 #: include/views/configuration.host.discovery.list.php:154
@@ -17762,11 +17794,11 @@ msgstr "Até"
 #: include/events.inc.php:192 include/events.inc.php:285
 #: include/views/administration.auditacts.list.php:65
 msgid "Time"
-msgstr "Hora"
+msgstr "Tempo"
 
 #: include/classes/data/CItemData.php:1686
 msgid "Time a particular Zabbix process or a group of processes (identified by <type> and <mode>) spent in <state> in percentage."
-msgstr "Hora de um processo ou grupo de processos Zabbix em particular (identificado pelo <type> e <mode>) utilizado no estado <state> em percentual."
+msgstr "Horário de um processo ou grupo de processos Zabbix em particular (identificado pelo <type> e <mode>) utilizado no estado <state> em percentual."
 
 #: app/views/js/popup.mediatypetest.edit.js.php:103
 #: app/views/js/popup.scriptexec.js.php:44
@@ -17779,7 +17811,7 @@ msgstr "Período padrão do filtro de tempo"
 
 #: include/classes/data/CItemData.php:1690
 msgid "Time of proxy last access. Name - proxy name. Valid params are: lastaccess - Unix timestamp, delay - seconds."
-msgstr "Hora do último acesso ao proxy. Nome - nome do proxy. Os parâmetros válidos são: lastaccess - carimbo de data/hora Unix, delay - segundos."
+msgstr "Horário do último acesso ao proxy. Nome - nome do proxy. Os parâmetros válidos são: lastaccess - carimbo de data/hora Unix, delay - segundos."
 
 #: include/actions.inc.php:51
 #: include/classes/widgets/views/widget.svggraph.form.view.php:309
@@ -17825,7 +17857,7 @@ msgstr "Tempo limite"
 #: include/classes/screens/CScreenHistory.php:443
 #: include/views/monitoring.history.php:291
 msgid "Timestamp"
-msgstr "Hora"
+msgstr "Carimbo de data e hora"
 
 #: app/views/sla.list.php:91
 msgid "Timezone"
@@ -18118,6 +18150,10 @@ msgstr "A trigger está no estado \"desconhecido\""
 #, c-format
 msgid "Trigger in template \"%1$s\" has dependency with trigger in template \"%2$s\"."
 msgstr "Existe trigger no template \"%1$s\" que possui dependência com trigger no template \"%2$s\"."
+
+#: jsLoader.php:286
+msgid "Trigger is not selected."
+msgstr ""
 
 #: include/views/monitoring.sysmap.edit.php:195
 msgid "Trigger label type"
@@ -19766,6 +19802,10 @@ msgstr "Visualizar"
 msgid "View as"
 msgstr "Ver como"
 
+#: jsLoader.php:397
+msgid "View related reports"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1234
 msgid "Virtual space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr "Espaço virtual em bytes ou percentual do total. Retorna inteiro para bytes; Ponto flutuante para percentual"
@@ -20305,6 +20345,10 @@ msgstr "Você não possui permissão para acessar esta página."
 msgid "You must login to view this page."
 msgstr "Você deve logar para ver esta página."
 
+#: jsLoader.php:282
+msgid "You need to have at least one image uploaded to create map element. Images can be uploaded in Administration->General->Images section."
+msgstr ""
+
 #: include/classes/db/DB.php:135
 msgid "Your database is not working properly. Please wait a few minutes and try to repeat this action. If the problem still persists, please contact system administrator. The problem might be caused by long running transaction or row level lock accomplished by your database management system."
 msgstr "Seu banco de dados não está funcionando corretamente. Aguarde alguns minutos e tente novamente esta ação. Se o problema persistir, por favor contacte um administrador do sistema. O problema pode ser causado por uma transação demorada em execução ou por bloqueio em nível de linha realizado por seu sistema gerenciador de banco de dados."
@@ -20495,7 +20539,7 @@ msgstr "um caractere especial"
 #: app/views/administration.miscconfig.edit.php:125
 #, c-format
 msgid "a string of space-separated hostnames; adding %1$s to the list allows the page to be displayed in a frame on the same origin as the page itself"
-msgstr ""
+msgstr "lista de hostnames separados por espaço; adicionar %1$s à lista permite que a página seja exibida em um frame desta mesma página"
 
 #: include/classes/validators/CApiInputValidator.php:2650
 msgid "a string, number or null value is expected"
@@ -22026,6 +22070,10 @@ msgstr "direita"
 msgid "right() - Returns the rightmost count characters"
 msgstr "right() - Retorna a contagem de caracteres mais à direita"
 
+#: jsLoader.php:199
+msgid "root"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:937
 msgid "round() - Rounds a value to decimal places"
 msgstr "round() - Arredonda um valor para casas decimais"
@@ -22112,7 +22160,7 @@ msgstr "deve estar vazio"
 
 #: app/controllers/CControllerPopupItemTestSend.php:197
 msgid "should be less than current time"
-msgstr "deve ser menor que a hora atual"
+msgstr "deve ser menor que o horário atual"
 
 #: include/views/monitoring.sysmap.edit.php:134
 msgid "show icon mappings"
@@ -22274,7 +22322,7 @@ msgstr "mudança de horário"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1033
 msgid "time() - Current time"
-msgstr "time() - Hora atual"
+msgstr "time() - Horário atual"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1039
 msgid "timeleft() - Time to reach threshold estimated based on period T"
@@ -22430,7 +22478,7 @@ msgstr "função não suportada do Prometheus"
 
 #: app/controllers/CControllerPopupItemTestSend.php:192
 msgid "unsupported time suffix"
-msgstr "sufixo de hora não suportado"
+msgstr "sufixo de tempo não suportado"
 
 #: include/classes/import/validators/CXmlValidator.php:64
 msgid "unsupported version number"

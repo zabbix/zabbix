@@ -425,7 +425,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 					],
 					'expected' => [
 						'Linux by Zabbix agent: Block devices discovery',
-						'Zabbix server health: Zabbix server: Zabbix stats cluster: High availability cluster node discovery',
+						'Zabbix server health: Zabbix server: Cluster stats: High availability cluster node discovery',
 						'LLD for Discovered host tests',
 						'LLD for host group test',
 						'Linux by Zabbix agent: Mounted filesystem discovery',

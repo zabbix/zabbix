@@ -280,6 +280,7 @@ char	*CONFIG_DBNAME			= NULL;
 char	*CONFIG_DBSCHEMA		= NULL;
 char	*CONFIG_DBUSER			= NULL;
 char	*CONFIG_DBPASSWORD		= NULL;
+int	CONFIG_DBREAD_ONLY_RECOVERABLE	= 0;
 char	*CONFIG_VAULTTOKEN		= NULL;
 char	*CONFIG_VAULTURL		= NULL;
 char	*CONFIG_VAULTDBPATH		= NULL;
@@ -580,6 +581,9 @@ static void	zbx_set_defaults(void)
 
 	if (NULL == CONFIG_DBHOST)
 		CONFIG_DBHOST = zbx_strdup(CONFIG_DBHOST, "localhost");
+
+	if (NULL != CONFIG_HA_NODE_NAME && '\0' != *CONFIG_HA_NODE_NAME)
+		CONFIG_DBREAD_ONLY_RECOVERABLE = 1;
 
 	if (NULL == CONFIG_SNMPTRAP_FILE)
 		CONFIG_SNMPTRAP_FILE = zbx_strdup(CONFIG_SNMPTRAP_FILE, "/tmp/zabbix_traps.tmp");
@@ -1152,8 +1156,6 @@ static void	zbx_check_db(void)
 		result = FAIL;
 	}
 
-	DBconnect(ZBX_DB_CONNECT_NORMAL);
-
 	if (SUCCEED == DBfield_exists("config", "dbversion_status"))
 	{
 		zbx_json_initarray(&db_version_json, ZBX_JSON_STAT_BUF_LEN);
@@ -1188,8 +1190,6 @@ static void	zbx_check_db(void)
 		zbx_db_flush_version_requirements(db_version_json.buffer);
 		zbx_json_free(&db_version_json);
 	}
-
-	DBclose();
 
 	if (SUCCEED != result)
 	{
@@ -1748,25 +1748,26 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
+	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 	if (ZBX_DB_UNKNOWN == (db_type = zbx_db_get_database_type()))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot use database \"%s\": database is not a Zabbix database",
 				CONFIG_DBNAME);
-		exit(EXIT_FAILURE);
+		goto out;
 	}
 	else if (ZBX_DB_SERVER != db_type)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot use database \"%s\": its \"users\" table is empty (is this the"
 				" Zabbix proxy database?)", CONFIG_DBNAME);
-		exit(EXIT_FAILURE);
+		goto out;
 	}
 
 	if (SUCCEED != init_database_cache(&error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database cache: %s", error);
 		zbx_free(error);
-		return FAIL;
+		goto out;
 	}
 
 	DBcheck_character_set();
@@ -1780,7 +1781,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	}
 
 	if (SUCCEED != zbx_db_check_instanceid())
-		exit(EXIT_FAILURE);
+		goto out;
+	DBclose();
 
 	if (FAIL == zbx_export_init(&error))
 	{
@@ -1842,13 +1844,17 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		{
 			zabbix_log(LOG_LEVEL_INFORMATION, "\"%s\" node started in \"%s\" mode", CONFIG_HA_NODE_NAME,
 					zbx_ha_status_str(ha_status));
-
 		}
 	}
 
 	ha_status_old = ha_status;
 
-	if (ZBX_NODE_STATUS_STANDBY == ha_status)
+	if (ZBX_NODE_STATUS_ACTIVE == ha_status)
+	{
+		/* reset ha dispatcher heartbeat timings */
+		zbx_ha_dispatch_message(NULL, ZBX_HA_RTC_STATE_RESET, NULL, NULL, NULL);
+	}
+	else if (ZBX_NODE_STATUS_STANDBY == ha_status)
 		standby_warning_time = time(NULL);
 
 	while (ZBX_IS_RUNNING())
@@ -1856,12 +1862,14 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		time_t			now;
 		zbx_ipc_client_t	*client;
 		zbx_ipc_message_t	*message;
+		int			rtc_state;
 
-		(void)zbx_ipc_service_recv(&rtc.service, &rtc_timeout, &client, &message);
+		rtc_state = zbx_ipc_service_recv(&rtc.service, &rtc_timeout, &client, &message);
 
 		if (NULL == message || ZBX_IPC_SERVICE_HA_RTC_FIRST <= message->code)
 		{
-			if (SUCCEED != zbx_ha_dispatch_message(message, &ha_status, &ha_failover_delay, &error))
+			if (SUCCEED != zbx_ha_dispatch_message(message, rtc_state, &ha_status, &ha_failover_delay,
+					&error))
 			{
 				zabbix_log(LOG_LEVEL_CRIT, "HA manager error: %s", error);
 				sig_exiting = ZBX_EXIT_FAILURE;
@@ -1922,6 +1930,12 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 						server_teardown(&rtc, &listen_sock);
 						ha_status_old = ha_status;
 					}
+					else
+					{
+						/* reset ha dispatcher heartbeat timings */
+						zbx_ha_dispatch_message(NULL, ZBX_HA_RTC_STATE_RESET, NULL, NULL, NULL);
+					}
+
 					break;
 				case ZBX_NODE_STATUS_STANDBY:
 					server_teardown(&rtc, &listen_sock);
@@ -1974,6 +1988,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_on_exit(ZBX_EXIT_STATUS(), &exit_args);
 
 	return SUCCEED;
+out:
+	DBclose();
+	exit(EXIT_FAILURE);
 }
 
 void	zbx_on_exit(int ret, void *on_exit_args)
