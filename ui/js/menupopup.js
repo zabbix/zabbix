@@ -1558,17 +1558,23 @@ function getMenuPopupURLItems(tree, trigger_elm) {
 			}
 
 			if (typeof data.params !== 'undefined') {
-				item.clickCallback = function(e) {
-					jQuery(this)
-						.closest('.menu-popup-top')
-						.menuPopup('close', trigger_elm, false);
-					Script.openUrl(data.params.scriptid, data.params.confirmation, trigger_elm,
-						data.params.hostid, data.params.eventid, data.params.url, data.params.target,
-						data.params.manualinput, data.params.manualinput_prompt, data.params.manualinput_validator_type,
-						data.params.manualinput_validator, data.params.manualinput_default_value
-					);
-					cancelEvent(e);
-				};
+				if (data.params.scriptid) {
+					item.clickCallback = function (e) {
+						jQuery(this)
+							.closest('.menu-popup-top')
+							.menuPopup('close', trigger_elm, false);
+						Script.openUrl(data.params.scriptid, data.params.confirmation, trigger_elm,
+							data.params.hostid, data.params.eventid, data.params.url, data.params.target,
+							data.params.manualinput, data.params.manualinput_prompt,
+							data.params.manualinput_validator_type, data.params.manualinput_validator,
+							data.params.manualinput_default_value
+						);
+						cancelEvent(e);
+					};
+				}
+				else {
+					item.url = data.params.url;
+				}
 			}
 
 			items[items.length] = item;
