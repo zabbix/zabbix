@@ -13520,7 +13520,7 @@ msgid "Menu path"
 msgstr "Cesta v menu"
 
 #: widgets/piechart/includes/WidgetForm.php:138
-msgid "Merge sectors smaller than "
+msgid "Merge sectors smaller than"
 msgstr "Sloučit sektory menší než"
 
 #: app/partials/scheduledreport.formgrid.html.php:178

@@ -4868,6 +4868,8 @@ form.dashboard-widget-piechart {
     display: none;
     line-height: 24px;
     color: #cacaca; }
+  form.dashboard-widget-piechart #merge_percent {
+    margin-left: 5px; }
 
 div.dashboard-widget-piechart {
   overflow-x: hidden; }
