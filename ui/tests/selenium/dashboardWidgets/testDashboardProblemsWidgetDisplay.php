@@ -14,29 +14,16 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
+require_once dirname(__FILE__).'/../common/testWidgets.php';
 
 /**
  * @backup config, hstgrp, widget
  *
+ * @dataSource UserPermissions
+ *
  * @onBefore prepareDashboardData, prepareProblemsData
  */
-class testDashboardProblemsWidgetDisplay extends CWebTest {
-
-	/**
-	 * Attach MessageBehavior and TableBehavior to the test.
-	 *
-	 * @return array
-	 */
-	public function getBehaviors() {
-		return [
-			CMessageBehavior::class,
-			CTableBehavior::class
-		];
-	}
+class testDashboardProblemsWidgetDisplay extends testWidgets {
 
 	protected static $dashboardid;
 	protected static $time;
@@ -46,6 +33,23 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 	protected static $symptom_problemid2;
 	protected static $eventid_for_widget_text;
 	protected static $eventid_for_widget_unsigned;
+
+	/**
+	 * Attach Behaviors to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [
+			CMessageBehavior::class,
+			CTableBehavior::class,
+			CWidgetBehavior::class,
+			[
+				'class' => CTagBehavior::class,
+				'tag_selector' => 'id:tags_table_tags'
+			]
+		];
+	}
 
 	public function prepareDashboardData() {
 		$response = CDataHelper::call('dashboard.create', [
@@ -440,9 +444,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 					'Tags' => [
 						'tags' => [
 							[
-								'action' => USER_ACTION_UPDATE,
-								'index' => 0,
-								'tag' => 'Delta',
+								'name' => 'Delta',
 								'operator' => 'Exists'
 							]
 						]
@@ -474,9 +476,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 					'Tags' => [
 						'tags' => [
 							[
-								'action' => USER_ACTION_UPDATE,
-								'index' => 0,
-								'tag' => 'Eta',
+								'name' => 'Eta',
 								'operator' => 'Equals',
 								'value' => 'e'
 							]
@@ -516,14 +516,12 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 						'evaluation' => 'Or',
 						'tags' => [
 							[
-								'action' => USER_ACTION_UPDATE,
-								'index' => 0,
-								'tag' => 'Theta',
+								'name' => 'Theta',
 								'operator' => 'Contains',
 								'value' => 't'
 							],
 							[
-								'tag' => 'Tag4',
+								'name' => 'Tag4',
 								'operator' => 'Exists'
 							]
 						]
@@ -562,14 +560,12 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 						'evaluation' => 'And/Or',
 						'tags' => [
 							[
-								'action' => USER_ACTION_UPDATE,
-								'index' => 0,
-								'tag' => 'Theta',
+								'name' => 'Theta',
 								'operator' => 'Equals',
 								'value' => 't'
 							],
 							[
-								'tag' => 'Kappa',
+								'name' => 'Kappa',
 								'operator' => 'Does not exist'
 							]
 						]
@@ -770,26 +766,21 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 	public function testDashboardProblemsWidgetDisplay_CheckTable($data) {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
 		$dashboard = CDashboardElement::find()->one();
-		$dialog = CDashboardElement::find()->one()->edit()->addWidget();
-		$form = $dialog->asForm();
-
-		// Fill Problems widget filter.
-		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Problems')]);
-		$form->fill($data['fields']);
+		$form = $this->openWidgetAndFill($dashboard, 'Problems', $data['fields']);
 
 		if (array_key_exists('Tags', $data)) {
 			$form->getField('id:evaltype')->fill(CTestArrayHelper::get($data['Tags'], 'evaluation', 'And/Or'));
-			$form->getField('id:tags_table_tags')->asMultifieldTable()->fill($data['Tags']['tags']);
+			$this->setTags($data['Tags']['tags']);
 		}
 
 		$form->submit();
 
 		// Check saved dashboard.
-		$dialog->ensureNotPresent();
+		$form->waitUntilNotVisible();
 		$dashboard->save();
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 
-		// Assert Problems widget's table.
+		// Assert widget's table.
 		$dashboard->getWidget($data['fields']['Name'])->waitUntilReady();
 		$table = $this->query('class:list-table')->asTable()->one();
 
@@ -867,7 +858,8 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 			foreach ($data['check_tag_ellipsis'] as $problem => $ellipsis_text) {
 				$table->findRow('Problem • Severity', $problem)->getColumn('Tags')->query('class:zi-more')
 						->waitUntilClickable()->one()->click();
-				$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->asOverlayDialog()->waitUntilVisible()->one();
+				$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->asOverlayDialog()
+						->waitUntilVisible()->one();
 				$this->assertEquals($ellipsis_text, $hint->getText());
 				$hint->close();
 			}
@@ -877,22 +869,10 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 		if (CTestArrayHelper::get($data, 'check_suppressed_icon')) {
 			$table->findRow('Problem • Severity', $data['check_suppressed_icon']['problem'])->getColumn('Info')
 					->query('class:zi-eye-off')->waitUntilClickable()->one()->click();
-			$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->asOverlayDialog()->waitUntilVisible()->one();
+			$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->asOverlayDialog()
+					->waitUntilVisible()->one();
 			$this->assertEquals($data['check_suppressed_icon']['text'], $hint->getText());
 			$hint->close();
 		}
-	}
-
-	/**
-	 * Function for deletion widgets from test dashboard after case.
-	 */
-	public static function deleteWidgets() {
-		DBexecute('DELETE FROM widget'.
-				' WHERE dashboard_pageid'.
-				' IN (SELECT dashboard_pageid'.
-					' FROM dashboard_page'.
-					' WHERE dashboardid='.self::$dashboardid.
-				')'
-		);
 	}
 }
