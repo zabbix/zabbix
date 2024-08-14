@@ -1,8 +1,75 @@
+Changes for 7.0.3rc1
+
+New features:
+...G.....T [ZBXNEXT-9000] changed query table for ASM disk group metrics in Oracle Database plugin and Oracle by ODBC template (knaglis)
+..F....PS. [ZBXNEXT-9218] added proxy group discovery internal item (mprihodko)
+
+Bug fixes:
+........S. [ZBX-24800] fixed global scripts being executed on Zabbix server instead of Zabbix proxy when used in actions (vso)
+A........T [ZBX-24930] fixed inability to import latest official templates to 7.0.0 version (abiba, vmaksimovs)
+..F....... [ZBX-24940] fixed issue with dependent trigger copying (vmaksimovs, vmurzins)
+....I..... [ZBX-24576] fixed built-in dashboard "Local network" map element highlight overlapping the widget header (Ivo)
+....I..... [ZBX-24547] removed duplicate matching name "Problems by severity" in built-in "Global view" dashboard (Ivo)
+..F....... [ZBX-23844] fixed long names of icons and background images overlapping each other (agriscenko)
+..F....... [ZBX-24835] fixed case-conversion and preg functions working incorrectly with the Turkish locale (agriscenko)
+........S. [ZBX-23510] removed redundant userdirectory_usrgrp_3 index (arimdjonoks)
+.......PS. [ZBX-24926] fixed bad argument error when using latest libcurl (vso)
+...G...... [ZBX-23495] fixed Zabbix agent 2 still sending active check heartbeats when they are disabled (dgoloscapov)
+..F....... [ZBX-24708] fixed hint visualization issues in Graph widget (apoga)
+..F....... [ZBX-24769] fixed radio buttons in SVG graph data set becoming unresponsive after deleting another data set (agriscenko)
+........S. [ZBX-24879] fixed ODBC login with special characters in the password field (sboidenko)
+..F....... [ZBX-24947] fixed PHP runtime errors while processing frontend notifications (Sasha)
+.........T [ZBX-24927] fixed duplicate references in dashboard widgets (akotsegubov)
+..F....... [ZBX-23867] fixed inherited timeout not being passed to LLD testing form (agriscenko)
+...G...PS. [ZBX-24779] fixed signal propagation issues when using Zabbix as a PID1 in a container (dgoloscapov)
+A......... [ZBX-24543] removed restriction to remove a user group or removing a user from a user group when the user belongs to only one user group (gcalenko)
+A......... [ZBX-24251] fixed login error when SAML authentication is enabled without a SAML userdirectory (gcalenko)
+...G...... [ZBX-24824] improved loadable plugin connection broker (rzvejs)
+A......... [ZBX-24583] fixed inability to export/import web scenario with digest authentication (jfreibergs)
+..F....... [ZBX-23954] fixed Pie chart widget displaying "No data" if data is 0 (wczerneha)
+..F....... [ZBX-23927] fixed the incorrect layering of dropdown menu in Graph and Pie chart widgets (wczerneha)
+..F....... [ZBX-23877] fixed different displaying in left/right axis for SVG Graph widget (wczerneha)
+..F....... [ZBX-21815] fixed issue with undefined offset for media type when it was deleted before saving the user (wczerneha)
+.........T [ZBX-24617] fixed hardcoded region in AWS by HTTP template (egordymov)
+..F....... [ZBX-23905] fixed double scroll in script dialogs (apoga)
+..F....... [ZBX-23714] fixed items popup layout (apoga)
+.........T [ZBX-24859] fixed JavaScript in S3 buckets discovery rule (egordymov)
+..F....... [ZBX-18767] fixed word breaks in flexible text input fields and trigger expressions (ddauksa)
+
+--------------------------------------------------------------------------------
+Changes for 7.0.2
+
+7.0.2rc2 was released as 7.0.2 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 7.0.2rc2
+
+Bug fixes:
+.......PS. [ZBX-24658] fixed host-proxy mapping update on proxies with forced full configuration sync (wiper)
+A......... [ZBX-24683] fixed validation rules in event.get() and problem.get() methods (Sasha)
+........S. [ZBX-24915] fixed housekeeper delete parameter (askolmeisters)
+
+--------------------------------------------------------------------------------
 Changes for 7.0.2rc1
 
 New features:
+....I...S. [ZBXNEXT-9230] converted history_bin table to hypertable for TimescaleDB (asestakovs)
+.........T [ZBXNEXT-9217] added AWS Lambda by HTTP template (egordymov)
+.......PS. [ZBXNEXT-9293] updated max supported MySQL version to 9.0 (mprihodko)
+........S. [ZBXNEXT-9285] added {EVENT.UPDATE.STATUS} support for Service update notifications (MVekslers)
 
 Bug fixes:
+.......PS. [ZBX-24889] fixed crash when VMware eventlog data is still not collected (MVekslers)
+...G...... [ZBX-24460] removed sending length of data in reserved field when compression is not used in Zabbix agent 2 (dgoloscapov)
+.......PS. [ZBX-24524] fixed "New values per second" statistic to include dependent items in calculation (asestakovs)
+........S. [ZBX-24743] fixed wrong DB error handling on host tag deletion by network discovery action operation (mprihodko)
+..F....... [ZBX-24695] fixed hintbox sizing (apoga)
+.........T [ZBX-24773] fixed duplicate item preprocessing in Kubernetes Kubelet by HTTP template (egordymov)
+..F....... [ZBX-24651] fixed errors in minimum size widgets (apoga)
+..F....... [ZBX-24613] fixed disappearing "Back" button on refresh in submaps of Map widget (apoga)
+..F....... [ZBX-24163] fixed submap addition in Map navigation tree widget to not append same submaps repeatedly (apoga)
+A......... [ZBX-24772] fixed inability to access actions targeting users having at least one common user group with the current user of Admin role (vmaksimovs)
+........S. [ZBX-24821] made 'execute_on' value being recorded in audit only for shell scripts (arimdjonoks)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.1
@@ -141,6 +208,8 @@ A......... [ZBX-24299] fixed possibility to alter readonly error fields with Hos
 .......PS. [ZBX-17382] improved get[oid] and walk[oid] to display UTF-8 text instead of hex if MIB files are not installed (vso)
 .......PS. [ZBX-24540] fixed crash when expanding host interface macros on main Zabbix agent interface (wiper)
 ........S. [ZBX-23690] optimized maintenance calculations for large number of hosts x maintenances (wiper)
+A......... [ZBX-25017] fixed sensitive data exposure from audit log (gcalenko)
+.......PS. [ZBX-25018] removed direct pointer access in custom javascript objects (wiper)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.0
@@ -159,6 +228,10 @@ Bug fixes:
 ..F....... [ZBX-24535] fixed history period calculation in Item value widget when override trend period is active (averza)
 ...G...... [ZBX-24531] fixed compile time data not being set for agent2 (jxl)
 .........T [ZBX-23788] added SNMP OID ifAlias in Network interfaces discovery (egordymov)
+..F.....S. [ZBX-25015] fixed information exposure in System information widget for users without proper permissions (vmurzins)
+....I..... [ZBX-25011] fixed access for non-admin user to options of installed MSI (MVekslers)
+........S. [ZBX-25012] implemented phone number validation check to avoid AT commands injection (sboidenko)
+........S. [ZBX-25013] fixed exploit to read files using SMS (sboidenko)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.0rc2
@@ -896,8 +969,12 @@ A.F....... [ZBX-21976] added support of OneLogin and Azure SCIM, fixed some issu
 Changes for 6.4.18rc1
 
 New features:
+.......PS. [ZBXNEXT-9293] updated max supported MySQL version to 9.0 (mprihodko)
 
 Bug fixes:
+A........T [ZBX-24930] fixed inability to import latest official templates to minor versions up to 6.4.16 (abiba, vmaksimovs)
+..F....... [ZBX-24835] fixed case-conversion and preg functions working incorrectly with the Turkish locale (agriscenko)
+..F....... [ZBX-24909] fixed resolving of macro functions in the "Item value" widget (Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 6.4.17
@@ -998,6 +1075,12 @@ A......... [ZBX-24481] fixed inability to unset value map from existing item or 
 ..F....... [ZBX-24152] fixed host form submission with Enter button if the form is opened in a popup and focus is in a flexible text area field (Ivo)
 .........T [ZBX-23788] added SNMP OID ifAlias in Network interfaces discovery (egordymov)
 ....I..... [ZBX-24482] fixed the presence of the http_proxy field in the initial data (Sasha)
+..F.....S. [ZBX-25015] fixed information exposure in System information widget for users without proper permissions (vmurzins)
+....I..... [ZBX-25011] fixed access for non-admin user to options of installed MSI (MVekslers)
+........S. [ZBX-25012] implemented phone number validation check to avoid AT commands injection (sboidenko)
+........S. [ZBX-25013] fixed exploit to read files using SMS (sboidenko)
+A......... [ZBX-25017] fixed sensitive data exposure from audit log (gcalenko)
+.......PS. [ZBX-25018] removed direct pointer access in custom javascript objects (wiper)
 
 --------------------------------------------------------------------------------
 Changes for 6.4.15
@@ -2788,11 +2871,38 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 ..F....... [ZBXNEXT-7138] added modal form for API tokens in User settings->API tokens and Administration->General->API tokens (epulke)
 
 --------------------------------------------------------------------------------
-Changes for 6.0.33rc1
+Changes for 6.0.34rc1
 
 New features:
 
 Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 6.0.33
+
+6.0.33rc1 was released as 6.0.33 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 6.0.33rc1
+
+New features:
+...G.....T [ZBXNEXT-9000] changed query table for ASM disk group metrics in Oracle Database plugin and Oracle by ODBC template (knaglis)
+.........T [ZBXNEXT-9217] added AWS Lambda by HTTP template (egordymov)
+.......PS. [ZBXNEXT-9293] updated max supported MySQL version to 9.0 (mprihodko)
+
+Bug fixes:
+..F....... [ZBX-24947] fixed PHP runtime errors while processing frontend notifications (Sasha)
+...G...... [ZBX-24824] improved loadable plugin connection broker (rzvejs)
+A......... [ZBX-24583] fixed inability to export/import web scenario with digest authentication (jfreibergs)
+..F....... [ZBX-23905] fixed double scroll in script dialogs (apoga)
+..F....... [ZBX-18767] fixed word breaks in flexible text input fields and trigger expressions (ddauksa)
+..F....... [ZBX-24909] fixed resolving of macro functions in the "Item value" widget (Sasha)
+.........T [ZBX-24859] fixed JavaScript in S3 buckets discovery rule (egordymov)
+.........T [ZBX-24617] fixed hardcoded region in AWS by HTTP template (egordymov)
+.......PS. [ZBX-24524] fixed "New values per second" statistic to include dependent items in calculation (asestakovs)
+........S. [ZBX-24821] made 'execute_on' value being recorded in audit only for shell scripts (arimdjonoks)
+..F....... [ZBX-23312] fixed discovery edit form being saved incorrectly after dcheck update (dfofanovs)
+.........T [ZBX-24773] fixed duplicate item preprocessing in Kubernetes Kubelet by HTTP template (egordymov)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.32
@@ -2882,6 +2992,12 @@ A......... [ZBX-24481] fixed inability to unset value map from existing item or 
 ..F....... [ZBX-24152] fixed host form submission with Enter button if the form is opened in a popup and focus is in a flexible text area field (Ivo)
 .........T [ZBX-23788] added SNMP OID ifAlias in Network interfaces discovery (egordymov)
 ....I..... [ZBX-24482] fixed the presence of the http_proxy field in the initial data (Sasha)
+..F.....S. [ZBX-25015] fixed information exposure in System information widget for users without proper permissions (vmurzins)
+....I..... [ZBX-25011] fixed access for non-admin user to options of installed MSI (MVekslers)
+........S. [ZBX-25012] implemented phone number validation check to avoid AT commands injection (sboidenko)
+........S. [ZBX-25013] fixed exploit to read files using SMS (sboidenko)
+A......... [ZBX-25017] fixed sensitive data exposure from audit log (gcalenko)
+.......PS. [ZBX-25018] removed direct pointer access in custom javascript objects (wiper)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.30
@@ -5943,13 +6059,28 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
 
 --------------------------------------------------------------------------------
-Changes for 5.0.43rc1
+Changes for 5.0.44rc1
 
 New features:
 
 Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 5.0.43
+
+5.0.43rc1 was released as 5.0.43 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 5.0.43rc1
+
+Bug fixes:
 .........T [ZBX-23788] added SNMP OID ifAlias in Network interfaces discovery (egordymov)
 .....J.... [ZBX-24298] allowed any JNDI service providers back in JMX monitoring (dimir)
+..F.....S. [ZBX-25015] fixed information exposure in System information widget for users without proper permissions (vmurzins)
+....I..... [ZBX-25011] fixed access for non-admin user to options of installed MSI (MVekslers)
+........S. [ZBX-25012] implemented phone number validation check to avoid AT commands injection (sboidenko)
+........S. [ZBX-25013] fixed exploit to read files using SMS (sboidenko)
+A......... [ZBX-25017] fixed sensitive data exposure from audit log (gcalenko)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.42

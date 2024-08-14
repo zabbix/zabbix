@@ -371,6 +371,7 @@ zabbix_export:
           key: 'status.alarms[alarms.0]'
           history: 1h
           value_type: TEXT
+          trends: '0'
           description: |
             MIB: SUNSAVER-MPPT
             Description:Alarms
@@ -528,6 +529,7 @@ zabbix_export:
           key: 'status.array_faults[arrayFaults.0]'
           history: 1h
           value_type: TEXT
+          trends: '0'
           description: |
             MIB: SUNSAVER-MPPT
             Description:Array Faults
@@ -663,6 +665,7 @@ zabbix_export:
           key: 'status.load_faults[loadFaults.0]'
           history: 1h
           value_type: TEXT
+          trends: '0'
           description: |
             MIB: SUNSAVER-MPPT
             Description:Array Faults
@@ -912,6 +915,7 @@ zabbix_export:
           name: 'Battery voltage discovery'
           type: DEPENDENT
           key: battery.voltage.discovery
+          delay: '0'
           description: 'Discovery for battery voltage triggers'
           item_prototypes:
             - uuid: 903b96b7eb37482da469fc802d3da1b0

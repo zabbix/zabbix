@@ -1520,6 +1520,7 @@ int	zbx_proxyconfig_get_data(zbx_dc_proxy_t *proxy, const struct zbx_json_parse 
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() forcing full proxy configuration sync", __func__);
 		proxy_config_revision = 0;
+		proxy_hostmap_revision = 0;
 		zbx_json_addint64(j, ZBX_PROTO_TAG_FULL_SYNC, 1);
 	}
 	else

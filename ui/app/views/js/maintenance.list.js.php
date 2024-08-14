@@ -86,7 +86,7 @@
 
 			const post_data = {
 				maintenanceids,
-				<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>: <?= json_encode(CCsrfTokenHelper::get('maintenance')) ?>
+				[CSRF_TOKEN_NAME]: <?= json_encode(CCsrfTokenHelper::get('maintenance')) ?>
 			};
 
 			return fetch(url, {

@@ -107,6 +107,16 @@ window.widget_svggraph_form = new class {
 						);
 					});
 
+				jQuery(`label[for^="${var_prefix}_"]`, this)
+					.filter(function () {
+						return jQuery(this).attr('for').match(/[a-z]+_\d+_[a-z_]+/);
+					})
+					.each(function () {
+						jQuery(this).attr('for',
+							jQuery(this).attr('for').replace(/([a-z]+_)\d+(_[a-z_]+)/, `$1${k + i}$2`)
+						);
+					});
+
 				jQuery(`[id^="lbl_${var_prefix}_"]`, this)
 					.filter(function () {
 						return jQuery(this).attr('id').match(/lbl_[a-z]+_\d+_[a-z_]+/);
@@ -311,7 +321,7 @@ window.widget_svggraph_form = new class {
 				of: e.target,
 				my: 'left top',
 				at: 'left bottom',
-				within: '.wrapper'
+				within: 'body'
 			}
 		});
 	}

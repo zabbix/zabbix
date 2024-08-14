@@ -114,6 +114,7 @@ zabbix_export:
           key: net.if.walk
           history: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Discovering interfaces from IF-MIB.'
           tags:
             - tag: component
@@ -122,7 +123,9 @@ zabbix_export:
           name: 'SNMP traps (fallback)'
           type: SNMP_TRAP
           key: snmptrap.fallback
+          delay: '0'
           value_type: LOG
+          trends: '0'
           description: 'The item is used to collect all SNMP traps unmatched by other snmptrap items'
           logtimefmt: 'hh:mm:sszyyyy/MM/dd'
           tags:
@@ -135,6 +138,7 @@ zabbix_export:
           key: 'system.contact[sysContact.0]'
           delay: 15m
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: SNMPv2-MIB
             The textual identification of the contact person for this managed node, together with information on how to contact this person.  If no contact information is known, the value is the zero-length string.
@@ -153,6 +157,7 @@ zabbix_export:
           key: system.cpu.walk
           history: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Discovering TPLINK-SYSMONITOR-MIB::tpSysMonitorCpuTable, displays the CPU utilization of all UNITs.'
           tags:
             - tag: component
@@ -164,6 +169,7 @@ zabbix_export:
           key: 'system.descr[sysDescr.0]'
           delay: 15m
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: SNMPv2-MIB
             A textual description of the entity. This value should
@@ -183,6 +189,7 @@ zabbix_export:
           key: system.hw.firmware
           delay: 1h
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: TPLINK-SYSINFO-MIB
             The software version of the product.
@@ -211,6 +218,7 @@ zabbix_export:
           key: system.hw.model
           delay: 1h
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: TPLINK-SYSINFO-MIB
             The hardware version of the product.
@@ -229,6 +237,7 @@ zabbix_export:
           key: system.hw.serialnumber
           delay: 1h
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: TPLINK-SYSINFO-MIB
             The Serial number of the product.
@@ -281,6 +290,7 @@ zabbix_export:
           key: system.hw.version
           delay: 1h
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: TPLINK-SYSINFO-MIB
             The hardware version of the product.
@@ -298,6 +308,7 @@ zabbix_export:
           key: 'system.location[sysLocation.0]'
           delay: 15m
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: SNMPv2-MIB
             Physical location of the node (e.g., `equipment room`, `3rd floor`). If not provided, the value is a zero-length string.
@@ -316,6 +327,7 @@ zabbix_export:
           key: system.name
           delay: 15m
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: SNMPv2-MIB
             An administratively-assigned name for this managed node.By convention, this is the node's fully-qualified domain name.  If the name is unknown, the value is the zero-length string.
@@ -365,6 +377,7 @@ zabbix_export:
           key: 'system.objectid[sysObjectID.0]'
           delay: 15m
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: SNMPv2-MIB
             The vendor's authoritative identification of the network management subsystem contained in the entity.  This value is allocated within the SMI enterprises subtree (1.3.6.1.4.1) and provides an easy and unambiguous means for determining`what kind of box' is being managed.  For example, if vendor`Flintstones, Inc.' was assigned the subtree1.3.6.1.4.1.4242, it could assign the identifier 1.3.6.1.4.1.4242.1.1 to its `Fred Router'.
@@ -382,6 +395,7 @@ zabbix_export:
           key: vm.memory.walk
           history: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Discovering TPLINK-SYSMONITOR-MIB::tpSysMonitorMemoryTable, displays the memory utilization of all UNITs.'
           tags:
             - tag: component
@@ -421,12 +435,14 @@ zabbix_export:
           name: 'CPU Discovery'
           type: DEPENDENT
           key: cpu.discovery
+          delay: '0'
           description: 'Discovering TPLINK-SYSMONITOR-MIB::tpSysMonitorCpuTable, displays the CPU utilization of all UNITs.'
           item_prototypes:
             - uuid: 84929a905e144746b047a20bbfb7ae40
               name: '#{#SNMPVALUE}: CPU utilization'
               type: DEPENDENT
               key: 'system.cpu.util[tpSysMonitorCpu1Minute.{#SNMPINDEX}]'
+              delay: '0'
               value_type: FLOAT
               units: '%'
               description: |
@@ -481,12 +497,14 @@ zabbix_export:
           name: 'Memory Discovery'
           type: DEPENDENT
           key: memory.discovery
+          delay: '0'
           description: 'Discovering TPLINK-SYSMONITOR-MIB::tpSysMonitorMemoryTable, displays the memory utilization of all UNITs.'
           item_prototypes:
             - uuid: 5800682fc8f8439eb404707f995ec9a6
               name: '#{#SNMPVALUE}: Memory utilization'
               type: DEPENDENT
               key: 'vm.memory.util[tpSysMonitorMemoryUtilization.{#SNMPINDEX}]'
+              delay: '0'
               value_type: FLOAT
               units: '%'
               description: |
@@ -542,45 +560,59 @@ zabbix_export:
           name: 'Network interfaces discovery'
           type: DEPENDENT
           key: net.if.discovery
+          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#IFADMINSTATUS}'
                 value: '{$NET.IF.IFADMINSTATUS.MATCHES}'
+                formulaid: A
               - macro: '{#IFADMINSTATUS}'
                 value: '{$NET.IF.IFADMINSTATUS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: B
               - macro: '{#IFALIAS}'
                 value: '{$NET.IF.IFALIAS.MATCHES}'
+                formulaid: C
               - macro: '{#IFALIAS}'
                 value: '{$NET.IF.IFALIAS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: D
               - macro: '{#IFDESCR}'
                 value: '{$NET.IF.IFDESCR.MATCHES}'
+                formulaid: E
               - macro: '{#IFDESCR}'
                 value: '{$NET.IF.IFDESCR.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: F
               - macro: '{#IFNAME}'
                 value: '{$NET.IF.IFNAME.MATCHES}'
+                formulaid: G
               - macro: '{#IFNAME}'
                 value: '{$NET.IF.IFNAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: H
               - macro: '{#IFOPERSTATUS}'
                 value: '{$NET.IF.IFOPERSTATUS.MATCHES}'
+                formulaid: I
               - macro: '{#IFOPERSTATUS}'
                 value: '{$NET.IF.IFOPERSTATUS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: J
               - macro: '{#IFTYPE}'
                 value: '{$NET.IF.IFTYPE.MATCHES}'
+                formulaid: K
               - macro: '{#IFTYPE}'
                 value: '{$NET.IF.IFTYPE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: L
           description: 'Discovering interfaces from IF-MIB.'
           item_prototypes:
             - uuid: 27f1c9ccfc744b5eb215d032fbbe2ff8
               name: 'Interface {#IFNAME}({#IFALIAS}): Inbound packets discarded'
               type: DEPENDENT
               key: 'net.if.in.discards[ifInDiscards.{#SNMPINDEX}]'
+              delay: '0'
               description: |
                 MIB: IF-MIB
                 The number of inbound packets which were chosen to be discarded
@@ -594,6 +626,8 @@ zabbix_export:
                     - '1.3.6.1.2.1.2.2.1.13.{#SNMPINDEX}'
                     - '0'
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 3m
@@ -610,6 +644,7 @@ zabbix_export:
               name: 'Interface {#IFNAME}({#IFALIAS}): Inbound packets with errors'
               type: DEPENDENT
               key: 'net.if.in.errors[ifInErrors.{#SNMPINDEX}]'
+              delay: '0'
               description: |
                 MIB: IF-MIB
                 For packet-oriented interfaces, the number of inbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.  For character-oriented or fixed-length interfaces, the number of inbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
@@ -619,6 +654,8 @@ zabbix_export:
                     - '1.3.6.1.2.1.2.2.1.14.{#SNMPINDEX}'
                     - '0'
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 3m
@@ -635,6 +672,7 @@ zabbix_export:
               name: 'Interface {#IFNAME}({#IFALIAS}): Bits received'
               type: DEPENDENT
               key: 'net.if.in[ifInOctets.{#SNMPINDEX}]'
+              delay: '0'
               units: bps
               description: |
                 MIB: IF-MIB
@@ -645,6 +683,8 @@ zabbix_export:
                     - '1.3.6.1.2.1.2.2.1.10.{#SNMPINDEX}'
                     - '0'
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
                 - type: MULTIPLIER
                   parameters:
                     - '8'
@@ -661,6 +701,7 @@ zabbix_export:
               name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets discarded'
               type: DEPENDENT
               key: 'net.if.out.discards[ifOutDiscards.{#SNMPINDEX}]'
+              delay: '0'
               description: |
                 MIB: IF-MIB
                 The number of outbound packets which were chosen to be discarded
@@ -674,6 +715,8 @@ zabbix_export:
                     - '1.3.6.1.2.1.2.2.1.19.{#SNMPINDEX}'
                     - '0'
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 3m
@@ -690,6 +733,7 @@ zabbix_export:
               name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets with errors'
               type: DEPENDENT
               key: 'net.if.out.errors[ifOutErrors.{#SNMPINDEX}]'
+              delay: '0'
               description: |
                 MIB: IF-MIB
                 For packet-oriented interfaces, the number of outbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.  For character-oriented or fixed-length interfaces, the number of outbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
@@ -699,6 +743,8 @@ zabbix_export:
                     - '1.3.6.1.2.1.2.2.1.20.{#SNMPINDEX}'
                     - '0'
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 3m
@@ -715,6 +761,7 @@ zabbix_export:
               name: 'Interface {#IFNAME}({#IFALIAS}): Bits sent'
               type: DEPENDENT
               key: 'net.if.out[ifOutOctets.{#SNMPINDEX}]'
+              delay: '0'
               units: bps
               description: |
                 MIB: IF-MIB
@@ -725,6 +772,8 @@ zabbix_export:
                     - '1.3.6.1.2.1.2.2.1.16.{#SNMPINDEX}'
                     - '0'
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
                 - type: MULTIPLIER
                   parameters:
                     - '8'
@@ -741,6 +790,7 @@ zabbix_export:
               name: 'Interface {#IFNAME}({#IFALIAS}): Speed'
               type: DEPENDENT
               key: 'net.if.speed[ifSpeed.{#SNMPINDEX}]'
+              delay: '0'
               trends: '0'
               units: bps
               description: |
@@ -772,6 +822,7 @@ zabbix_export:
               name: 'Interface {#IFNAME}({#IFALIAS}): Operational status'
               type: DEPENDENT
               key: 'net.if.status[ifOperStatus.{#SNMPINDEX}]'
+              delay: '0'
               trends: '0'
               description: |
                 MIB: IF-MIB
@@ -821,6 +872,7 @@ zabbix_export:
               name: 'Interface {#IFNAME}({#IFALIAS}): Interface type'
               type: DEPENDENT
               key: 'net.if.type[ifType.{#SNMPINDEX}]'
+              delay: '0'
               trends: '0'
               description: |
                 MIB: IF-MIB

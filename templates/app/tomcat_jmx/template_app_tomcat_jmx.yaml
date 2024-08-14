@@ -25,6 +25,7 @@ zabbix_export:
           type: JMX
           key: 'jmx["Catalina:type=Server",serverInfo]'
           value_type: CHAR
+          trends: '0'
           username: '{$TOMCAT.USER}'
           password: '{$TOMCAT.PASSWORD}'
           description: 'The version of the Tomcat.'
@@ -60,6 +61,7 @@ zabbix_export:
             conditions:
               - macro: '{#JMXATTR}'
                 value: ^name$
+                formulaid: A
           description: 'Discovery for ProtocolHandler'
           item_prototypes:
             - uuid: 830f58f8ad6640d989a70c01f7aa2ad8
@@ -67,6 +69,7 @@ zabbix_export:
               type: JMX
               key: 'jmx[{#JMXOBJ},compression]'
               value_type: CHAR
+              trends: '0'
               username: '{$TOMCAT.USER}'
               password: '{$TOMCAT.PASSWORD}'
               description: 'Gzip compression status on {#JMXNAME}. Enabling gzip compression may save server bandwidth.'
@@ -103,9 +106,11 @@ zabbix_export:
             conditions:
               - macro: '{#JMXNAME}'
                 value: '{$TOMCAT.LLD.FILTER.REQUEST_PROCESSOR.MATCHES}'
+                formulaid: A
               - macro: '{#JMXNAME}'
                 value: '{$TOMCAT.LLD.FILTER.REQUEST_PROCESSOR.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: B
           description: 'Discovery for GlobalRequestProcessor'
           item_prototypes:
             - uuid: d7cb07f3f5e04792850332c416284dd9
@@ -118,6 +123,8 @@ zabbix_export:
               description: 'Bytes received rate by processor {#JMXNAME}'
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 - tag: component
@@ -136,6 +143,8 @@ zabbix_export:
               description: 'Bytes sent rate by processor {#JMXNAME}'
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 - tag: component
@@ -153,6 +162,8 @@ zabbix_export:
               description: 'Error rate of request processor {#JMXNAME}'
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 - tag: component
@@ -192,6 +203,8 @@ zabbix_export:
               description: 'Rate of requests served by request processor {#JMXNAME}'
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 - tag: component
@@ -228,9 +241,11 @@ zabbix_export:
             conditions:
               - macro: '{#JMXHOST}'
                 value: '{$TOMCAT.LLD.FILTER.MANAGER.MATCHES}'
+                formulaid: A
               - macro: '{#JMXHOST}'
                 value: '{$TOMCAT.LLD.FILTER.MANAGER.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: B
           description: 'Discovery for contexts'
           item_prototypes:
             - uuid: c20bb67db247471ba686d2ea371b7c73
@@ -288,6 +303,8 @@ zabbix_export:
               description: 'Rate of sessions we rejected due to maxActive being reached.'
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 - tag: component
@@ -305,6 +322,8 @@ zabbix_export:
               description: 'Rate of sessions created by this application per second.'
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 - tag: component
@@ -353,9 +372,11 @@ zabbix_export:
             conditions:
               - macro: '{#JMXNAME}'
                 value: '{$TOMCAT.LLD.FILTER.THREAD_POOL.MATCHES}'
+                formulaid: A
               - macro: '{#JMXNAME}'
                 value: '{$TOMCAT.LLD.FILTER.THREAD_POOL.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: B
           description: 'Discovery for ThreadPool'
           item_prototypes:
             - uuid: 7d7418c72ced48eca2a92e30021b611b
