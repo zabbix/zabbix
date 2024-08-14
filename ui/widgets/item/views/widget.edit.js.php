@@ -146,7 +146,8 @@ window.widget_item_form = new class {
 	#promiseGetItemType() {
 		const ms_item_data = $('#itemid').multiSelect('getData');
 
-		if (ms_item_data.length === 0) {
+		// The ID is empty string for unavailable widgets.
+		if (ms_item_data.length === 0 || ms_item_data[0].id === '') {
 			return Promise.resolve(null);
 		}
 
