@@ -301,7 +301,10 @@ int	expr_dc_get_interface_value(zbx_uint64_t hostid, zbx_uint64_t itemid, char *
 	zbx_dc_interface_t	interface;
 
 	if (SUCCEED != (res = zbx_dc_config_get_interface(&interface, hostid, itemid)))
-		return res;
+	{
+		*replace_to = zbx_strdup(*replace_to, "");
+		return SUCCEED;
+	}
 
 	switch (request)
 	{

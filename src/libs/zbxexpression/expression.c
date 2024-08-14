@@ -2803,11 +2803,7 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 					/* return error if strict macro resolving failed */
 					zbx_snprintf(error, maxerrlen, "Invalid macro '%.*s' value",
 							(int)(token.loc.r - token.loc.l + 1), *data + token.loc.l);
-				}
 
-				if (0 != (macro_type & (ZBX_MACRO_TYPE_SCRIPT | ZBX_MACRO_TYPE_SCRIPT_NORMAL |
-						ZBX_MACRO_TYPE_SCRIPT_RECOVERY)))
-				{
 					res = FAIL;
 				}
 			}
