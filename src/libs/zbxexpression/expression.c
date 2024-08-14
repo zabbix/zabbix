@@ -832,7 +832,7 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 				}
 				else if (0 == strcmp(m, MVAR_EVENT_SYMPTOMS))
 				{
-					expr_db_get_event_symptoms(event, &replace_to);
+					ret = expr_db_get_event_symptoms(event, &replace_to);
 				}
 				else if (0 == strcmp(m, MVAR_EVENT_STATUS) || 0 == strcmp(m, MVAR_EVENT_VALUE))
 				{
