@@ -469,11 +469,12 @@ static int	resolve_host_target_macros(const char *m, const zbx_dc_host_t *dc_hos
  * Purpose: request cause event value by macro.                               *
  *                                                                            *
  ******************************************************************************/
-static void	get_event_cause_value(const char *macro, char **replace_to, const zbx_db_event *event,
+static int	get_event_cause_value(const char *macro, char **replace_to, const zbx_db_event *event,
 		zbx_db_event **cause_event, zbx_db_event **cause_recovery_event, const zbx_uint64_t *recipient_userid,
 		const char *tz, char *error, int maxerrlen)
 {
-	zbx_db_event		*c_event;
+	zbx_db_event	*c_event;
+	int		ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() eventid = " ZBX_FS_UI64 ", event name = '%s'", __func__, event->eventid,
 			event->name);
@@ -608,8 +609,12 @@ static void	get_event_cause_value(const char *macro, char **replace_to, const zb
 
 		resolve_opdata(c_event, replace_to, tz, error, maxerrlen);
 	}
+
+	ret = SUCCEED;
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
 }
 
 static int	is_strict_macro(const char *macro)
@@ -822,7 +827,7 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 				}
 				else if (0 == strncmp(m, MVAR_EVENT_CAUSE, ZBX_CONST_STRLEN(MVAR_EVENT_CAUSE)))
 				{
-					get_event_cause_value(m, &replace_to, event, &cause_event,
+					ret = get_event_cause_value(m, &replace_to, event, &cause_event,
 							&cause_recovery_event, userid, tz, error, maxerrlen);
 				}
 				else if (0 == strcmp(m, MVAR_EVENT_SYMPTOMS))
