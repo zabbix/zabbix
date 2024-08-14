@@ -171,20 +171,6 @@ void	zbx_proxy_counter_ptr_free(zbx_proxy_counter_t *proxy_counter)
 static zbx_get_program_type_f	get_program_type_cb = NULL;
 static zbx_get_config_forks_f	get_config_forks_cb = NULL;
 
-/******************************************************************************
- *                                                                            *
- * Purpose: validate macro value when expanding user macros                   *
- *                                                                            *
- * Parameters: macro   - [IN] the user macro                                  *
- *             value   - [IN] the macro value                                 *
- *             error   - [OUT] the error message                              *
- *                                                                            *
- * Return value: SUCCEED - the value is valid                                 *
- *               FAIL    - otherwise                                          *
- *                                                                            *
- ******************************************************************************/
-typedef int (*zbx_value_validator_func_t)(const char *macro, const char *value, char **error);
-
 zbx_dc_config_t	*config = NULL;
 
 zbx_dc_config_t	*get_dc_config(void)
@@ -686,7 +672,7 @@ int	DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_INTERFACE *interface
 
 	seed = get_item_nextcheck_seed(item, item->interfaceid, item->type, item->key);
 
-	if (0 == strncmp(item->delay, "{$", ZBX_CONST_STRLEN("{$")))
+	if (NULL != strstr(item->delay, "{$"))
 	{
 		char	*delay_s;
 
@@ -1856,14 +1842,12 @@ static void	DCsync_hosts(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_vector_u
 
 		ZBX_STR2UCHAR(status, row[10]);
 
-
 		host = (ZBX_DC_HOST *)DCfind_id(&config->hosts, hostid, sizeof(ZBX_DC_HOST), &found);
 		host->revision = revision;
 
 		/* see whether we should and can update 'hosts_h' and 'proxies_p' indexes at this point */
 
 		update_index_h = 0;
-
 
 		if (0 == found || 0 != strcmp(host->host, row[2]))
 		{
