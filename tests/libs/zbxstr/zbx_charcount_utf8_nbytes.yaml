@@ -1,0 +1,20 @@
+test case: "Hello"
+in:
+  text: "Hello"
+  size: 5
+out:
+  result: 5
+---
+test case: "€uro"
+in:
+  text: "€uro"
+  size: 4
+out:
+  result: 2
+---
+test case: "𐍈A"
+in:
+  text: "𐍈A"
+  size: 4
+out:
+  result: 1

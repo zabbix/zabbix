@@ -13,7 +13,14 @@ BINARIES_tests = \
 	zbx_del_zeros\
 	zbx_str_n_in_list\
 	zbx_get_escape_string_len\
-	zbx_str_in_list
+	zbx_str_in_list\
+	zbx_strsplit_first\
+	zbx_strsplit_last\
+	zbx_strlcpy_utf8\
+	zbx_utf8_char_len\
+	zbx_strlen_utf8_nchars\
+	zbx_charcount_utf8_nbytes\
+	zbx_is_utf8
 
 
 noinst_PROGRAMS = $(BINARIES_tests)
@@ -221,6 +228,111 @@ zbx_str_in_list_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
 
 zbx_str_in_list_CFLAGS = $(STR_COMPILER_FLAGS)
 
+# zbx_strsplit_first
+
+zbx_strsplit_first_SOURCES = \
+	zbx_strsplit_first.c \
+	$(COMMON_SRC_FILES)
+
+zbx_strsplit_first_LDADD = \
+	$(STR_LIBS)
+
+zbx_strsplit_first_LDADD += @SERVER_LIBS@
+
+zbx_strsplit_first_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
+
+zbx_strsplit_first_CFLAGS = $(STR_COMPILER_FLAGS)
+
+
+# zbx_strsplit_last
+
+zbx_strsplit_last_SOURCES = \
+	zbx_strsplit_last.c \
+	$(COMMON_SRC_FILES)
+
+zbx_strsplit_last_LDADD = \
+	$(STR_LIBS)
+
+zbx_strsplit_last_LDADD += @SERVER_LIBS@
+
+zbx_strsplit_last_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
+
+zbx_strsplit_last_CFLAGS = $(STR_COMPILER_FLAGS)
+
+# zbx_strlcpy_utf8
+
+zbx_strlcpy_utf8_SOURCES = \
+	zbx_strlcpy_utf8.c \
+	$(COMMON_SRC_FILES)
+
+zbx_strlcpy_utf8_LDADD = \
+	$(STR_LIBS)
+
+zbx_strlcpy_utf8_LDADD += @SERVER_LIBS@
+
+zbx_strlcpy_utf8_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
+
+zbx_strlcpy_utf8_CFLAGS = $(STR_COMPILER_FLAGS)
+
+# zbx_utf8_char_len
+
+zbx_utf8_char_len_SOURCES = \
+	zbx_utf8_char_len.c \
+	$(COMMON_SRC_FILES)
+
+zbx_utf8_char_len_LDADD = \
+	$(STR_LIBS)
+
+zbx_utf8_char_len_LDADD += @SERVER_LIBS@
+
+zbx_utf8_char_len_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
+
+zbx_utf8_char_len_CFLAGS = $(STR_COMPILER_FLAGS)
+
+# zbx_strlen_utf8_nchars
+
+zbx_strlen_utf8_nchars_SOURCES = \
+	zbx_strlen_utf8_nchars.c \
+	$(COMMON_SRC_FILES)
+
+zbx_strlen_utf8_nchars_LDADD = \
+	$(STR_LIBS)
+
+zbx_strlen_utf8_nchars_LDADD += @SERVER_LIBS@
+
+zbx_strlen_utf8_nchars_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
+
+zbx_strlen_utf8_nchars_CFLAGS = $(STR_COMPILER_FLAGS)
+
+# zbx_charcount_utf8_nbytes
+
+zbx_charcount_utf8_nbytes_SOURCES = \
+	zbx_charcount_utf8_nbytes.c \
+	$(COMMON_SRC_FILES)
+
+zbx_charcount_utf8_nbytes_LDADD = \
+	$(STR_LIBS)
+
+zbx_charcount_utf8_nbytes_LDADD += @SERVER_LIBS@
+
+zbx_charcount_utf8_nbytes_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
+
+zbx_charcount_utf8_nbytes_CFLAGS = $(STR_COMPILER_FLAGS)
+
+# zbx_is_utf8
+
+zbx_is_utf8_SOURCES = \
+	zbx_is_utf8.c \
+	$(COMMON_SRC_FILES)
+
+zbx_is_utf8_LDADD = \
+	$(STR_LIBS)
+
+zbx_is_utf8_LDADD += @SERVER_LIBS@
+
+zbx_is_utf8_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
+
+zbx_is_utf8_CFLAGS = $(STR_COMPILER_FLAGS)
 
 #endif
 

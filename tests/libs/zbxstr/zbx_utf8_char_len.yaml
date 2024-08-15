@@ -1,0 +1,24 @@
+test case: "ASCII Character"
+in:
+  text: 'H'
+out:
+  return: 1
+---
+test case: "2-Byte UTF-8 Character"
+in:
+  text: '©'
+out:
+  return: 2
+---
+test case: "3-Byte UTF-8 Character"
+in:
+  text: '€'
+out:
+  return: 3
+---
+test case: "4-Byte UTF-8 Character"
+in:
+  text: '𐍈'
+out:
+  return: 4
+

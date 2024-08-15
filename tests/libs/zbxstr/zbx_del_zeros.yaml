@@ -1,22 +1,22 @@
-test case: "10.0100 -> 10.01" 
+test case: "10.0100 -> 10.01"
 in:
   string: "10.0100"
 out:
   string: "10.01"
 ---
-test case: "10. -> 10" 
+test case: "10. -> 10"
 in:
   string: "10."
 out:
   string: "10"
 ---
-test case: "1.000e10 -> 1.000e10" 
+test case: "1.000e10 -> 1.000e10"
 in:
   string: "1.000e10"
 out:
   string: "1.000e10"
 ---
-test case: "1000 -> 1000" 
+test case: "1000 -> 1000"
 in:
   string: "1000"
 out:

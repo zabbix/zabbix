@@ -1,4 +1,4 @@
-test case: "a,b,ccc,ddd - succeed" 
+test case: "a,b,ccc,ddd - succeed"
 in:
   list: "a,b,ccc,ddd"
   value: "ccc"
@@ -6,7 +6,7 @@ in:
 out:
   return: SUCCEED
 ---
-test case: "a,b,ccc,ddd - fail" 
+test case: "a,b,ccc,ddd - fail"
 in:
   list: "a,b,cc,ddd"
   value: "ccc"
@@ -14,7 +14,7 @@ in:
 out:
   return: FAIL
 ---
-test case: "aa.aaa.aaaa.aaaaa - succeeed" 
+test case: "aa.aaa.aaaa.aaaaa - succeeed"
 in:
   list: "aa.aaa.aaaa.aaaaa"
   value: "aaaa"

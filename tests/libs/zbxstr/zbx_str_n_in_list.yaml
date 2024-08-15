@@ -1,4 +1,4 @@
-test case: "a,b,ccc,ddd - succeed" 
+test case: "a,b,ccc,ddd - succeed"
 in:
   list: "a,b,ccc,ddd"
   value: "ccc"
@@ -7,7 +7,7 @@ in:
 out:
   return: SUCCEED
 ---
-test case: "a,b,ccc,ddd - fail" 
+test case: "a,b,ccc,ddd - fail"
 in:
   list: "a,b,cc,ddd"
   value: "ccc"
@@ -16,7 +16,7 @@ in:
 out:
   return: FAIL
 ---
-test case: "aa.aaa.aaaa.aaaaa - succeed" 
+test case: "aa.aaa.aaaa.aaaaa - succeed"
 in:
   list: "aa.aaa.aaaa.aaaaa"
   value: "aaaa"
@@ -25,7 +25,7 @@ in:
 out:
   return: SUCCEED
 ---
-test case: "a,b,ccc,ddd - wrong lenght" 
+test case: "a,b,ccc,ddd - wrong lenght"
 in:
   list: "a,b,ccc,ddd"
   value: "ccc"
@@ -34,7 +34,7 @@ in:
 out:
   return: FAIL
 ---
-test case: "%%%!%%%%%!%%%%%!%%% - succeed" 
+test case: "%%%!%%%%%!%%%%%!%%% - succeed"
 in:
   list: "%%%!%%%%%!%%%%%!%%%"
   value: "%%%%%"
@@ -43,7 +43,7 @@ in:
 out:
   return: SUCCEED
 ---
-test case: "aa.bbb.bbbb.bbbbb - wrong lenght" 
+test case: "aa.bbb.bbbb.bbbbb - wrong lenght"
 in:
   list: "aa.bbb.bbbb.bbbbb"
   value: "aaaa"

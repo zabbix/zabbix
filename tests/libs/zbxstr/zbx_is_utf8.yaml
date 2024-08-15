@@ -1,0 +1,17 @@
+test case: "succeed Hello"
+in:
+  string: "Hello"
+out:
+  return: SUCCEED
+---
+test case: "succeed €uro"
+in:
+  string: "€uro"
+out:
+  return: SUCCEED
+---
+test case: "succeed \xE2\x82"
+in:
+  string: "\xE2\x82"
+out:
+  return: SUCCEED

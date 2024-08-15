@@ -1,0 +1,31 @@
+test case: "Copy simple ASCII string"
+in:
+  src: "Hello, World!"
+  dst: "Hello, World!"
+  size: 20
+out:
+  result: 13
+---
+test case: "Copy UTF-8 string"
+in:
+  src: "Привет"
+  dst: "Привет"
+  size: 16
+out:
+  result: 12
+---
+test case: "Copy UTF-8 string with truncation"
+in:
+  src: "Привет"
+  dst: "При"
+  size: 8
+out:
+  result: 6
+---
+test case: "Copy empty string"
+in:
+  src: ""
+  dst: ""
+  size: 10
+out:
+  result: 0

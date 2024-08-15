@@ -20,14 +20,10 @@
 
 void	zbx_mock_test_entry(void **state)
 {
-
-	char  *src, *exp_result, *act_result;
-
 	ZBX_UNUSED(state);
 
-	src = zbx_mock_get_parameter_string("in.string");
-
-	exp_result = zbx_mock_get_parameter_string("out.string");
+	char	*src = zbx_mock_get_parameter_string("in.string");
+	char	*exp_result = zbx_mock_get_parameter_string("out.string");
 
 	zbx_del_zeros(src);
 

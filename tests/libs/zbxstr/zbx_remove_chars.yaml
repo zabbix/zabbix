@@ -1,4 +1,4 @@
-test case: "abc c" 
+test case: "abc c"
 in:
   string: "abc"
   list: "c"

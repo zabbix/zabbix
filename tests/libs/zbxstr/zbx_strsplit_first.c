@@ -22,11 +22,15 @@ void	zbx_mock_test_entry(void **state)
 {
 	ZBX_UNUSED(state);
 
-	const char	*list = zbx_mock_get_parameter_string("in.list");
-	const char	*value = zbx_mock_get_parameter_string("in.value");
+	const char	*src = zbx_mock_get_parameter_string("in.src");
 	char		delimiter = *zbx_mock_get_parameter_string("in.delimiter");
-	int			exp_result = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
-	int			act_result = zbx_str_in_list(list,  value, delimiter);
+	char		*left = zbx_mock_get_parameter_string("in.left");
+	char		*right = zbx_mock_get_parameter_string("in.right");
+	char		*exp_result_left = zbx_mock_get_parameter_string("out.result_left");
+	char		*exp_result_right = zbx_mock_get_parameter_string("out.result_right");
 
-	zbx_mock_assert_int_eq("return value", exp_result, act_result);
+	zbx_strsplit_first(src, delimiter, &left, &right);
+
+	zbx_mock_assert_str_eq("return value",  exp_result_left, left);
+	zbx_mock_assert_str_eq("return value",  exp_result_right, right);
 }

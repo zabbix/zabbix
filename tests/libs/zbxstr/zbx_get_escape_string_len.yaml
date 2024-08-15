@@ -1,25 +1,25 @@
-test case: "Hello" 
+test case: "Hello"
 in:
   src: "Hello"
   charlist: "!"
 out:
   return: 5
 ---
-test case: "123 !!!" 
+test case: "123 !!!"
 in:
   src: "123 !!!"
   charlist: "!"
 out:
   return: 10
 ---
-test case: "whitespace" 
+test case: "whitespace"
 in:
   src: " "
   charlist: "!"
 out:
   return: 1
 ---
-test case: "abbcccdddd" 
+test case: "abbcccdddd"
 in:
   src: "abbcccdddd"
   charlist: "abc"
