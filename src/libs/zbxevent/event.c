@@ -197,7 +197,7 @@ void	zbx_event_get_tag(const char *text, const zbx_db_event *event, char **repla
 	}
 
 	if (FAIL == ret)
-		*replace_to = zbx_strdup(*replace_to, "*UNKNOWN*");
+		*replace_to = zbx_strdup(*replace_to, STR_UNKNOWN_VARIABLE);
 }
 
 /******************************************************************************

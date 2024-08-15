@@ -77,8 +77,6 @@ static char	*format_user_fullname(const char *name, const char *surname, const c
 	return buf;
 }
 
-#define STR_UNKNOWN_VARIABLE		"*UNKNOWN*"
-
 /* macros that can be indexed */
 static const char	*ex_macros[] =
 {
