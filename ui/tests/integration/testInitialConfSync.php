@@ -132,14 +132,6 @@ class testInitialConfSync extends CIntegrationTest
 			]
 		],
 		[
-			'template_items' =>
-			[
-				'insert' => '54',
-				'update' => '0',
-				'delete' => '0'
-			]
-		],
-		[
 			'item_discovery' =>
 			[
 				'insert' => '5',
@@ -882,6 +874,14 @@ class testInitialConfSync extends CIntegrationTest
 				"0",
 				"delete" =>
 				"5"
+			]
+		],
+		[
+			'template_items' =>
+			[
+				'insert' => '59',
+				'update' => '0',
+				'delete' => '0'
 			]
 		],
 		[
