@@ -9,7 +9,12 @@ BINARIES_tests = \
 	zbx_ltrim_utf8 \
 	zbx_rtrim_utf8 \
 	zbx_is_ascii_string\
-	zbx_remove_chars 
+	zbx_remove_chars\
+	zbx_del_zeros\
+	zbx_str_n_in_list\
+	zbx_get_escape_string_len\
+	zbx_str_in_list
+
 
 noinst_PROGRAMS = $(BINARIES_tests)
 
@@ -156,5 +161,66 @@ zbx_remove_chars_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
 
 zbx_remove_chars_CFLAGS = $(STR_COMPILER_FLAGS)
 
+# zbx_del_zeros
+
+zbx_del_zeros_SOURCES = \
+	zbx_del_zeros.c \
+	$(COMMON_SRC_FILES)
+
+zbx_del_zeros_LDADD = \
+	$(STR_LIBS)
+
+zbx_del_zeros_LDADD += @SERVER_LIBS@
+
+zbx_del_zeros_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
+
+zbx_del_zeros_CFLAGS = $(STR_COMPILER_FLAGS)
+
+# zbx_str_n_in_list
+
+zbx_str_n_in_list_SOURCES = \
+	zbx_str_n_in_list.c \
+	$(COMMON_SRC_FILES)
+
+zbx_str_n_in_list_LDADD = \
+	$(STR_LIBS)
+
+zbx_str_n_in_list_LDADD += @SERVER_LIBS@
+
+zbx_str_n_in_list_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
+
+zbx_str_n_in_list_CFLAGS = $(STR_COMPILER_FLAGS)
+
+# zbx_get_escape_string_len
+
+zbx_get_escape_string_len_SOURCES = \
+	zbx_get_escape_string_len.c \
+	$(COMMON_SRC_FILES)
+
+zbx_get_escape_string_len_LDADD = \
+	$(STR_LIBS)
+
+zbx_get_escape_string_len_LDADD += @SERVER_LIBS@
+
+zbx_get_escape_string_len_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
+
+zbx_get_escape_string_len_CFLAGS = $(STR_COMPILER_FLAGS)
+
+# zbx_str_in_list
+
+zbx_str_in_list_SOURCES = \
+	zbx_str_in_list.c \
+	$(COMMON_SRC_FILES)
+
+zbx_str_in_list_LDADD = \
+	$(STR_LIBS)
+
+zbx_str_in_list_LDADD += @SERVER_LIBS@
+
+zbx_str_in_list_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
+
+zbx_str_in_list_CFLAGS = $(STR_COMPILER_FLAGS)
+
 
 #endif
+

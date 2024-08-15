@@ -1,0 +1,24 @@
+test case: "a,b,ccc,ddd - succeed" 
+in:
+  list: "a,b,ccc,ddd"
+  value: "ccc"
+  delimiter: ','
+out:
+  return: SUCCEED
+---
+test case: "a,b,ccc,ddd - fail" 
+in:
+  list: "a,b,cc,ddd"
+  value: "ccc"
+  delimiter: ','
+out:
+  return: FAIL
+---
+test case: "aa.aaa.aaaa.aaaaa - succeeed" 
+in:
+  list: "aa.aaa.aaaa.aaaaa"
+  value: "aaaa"
+  delimiter: '.'
+out:
+  return: SUCCEED
+...
