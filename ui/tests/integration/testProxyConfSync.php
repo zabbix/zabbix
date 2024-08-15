@@ -106,7 +106,7 @@ class testProxyConfSync extends CIntegrationTest
 			]
 		],
 		[
-			'template_items' =>
+			'item_discovery' =>
 			[
 				'insert' => '0',
 				'update' => '0',
@@ -114,7 +114,7 @@ class testProxyConfSync extends CIntegrationTest
 			]
 		],
 		[
-			'item_discovery' =>
+			'template_items' =>
 			[
 				'insert' => '0',
 				'update' => '0',
