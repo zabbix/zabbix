@@ -101,4 +101,15 @@ class CTestArrayHelper {
 
 		return $array;
 	}
+
+	/**
+	 * Check if array is nested.
+	 *
+	 * @param	array	$array	nested or not nested array under attention
+	 *
+	 * @return	boolean
+	 */
+	public static function isNested($array) {
+		return (count($array) !== count($array, COUNT_RECURSIVE));
+	}
 }
