@@ -29,6 +29,7 @@ import (
 	"sync"
 	"time"
 
+	"golang.org/x/sync/errgroup"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/zbxerr"
@@ -229,7 +230,6 @@ type raidParameters struct {
 type runner struct {
 	plugin       *Plugin
 	mux          sync.Mutex
-	wg           sync.WaitGroup
 	names        chan string
 	err          chan error
 	done         chan struct{}
@@ -237,6 +237,7 @@ type runner struct {
 	megaRaidDone chan struct{}
 	raids        chan raidParameters
 	megaraids    chan raidParameters
+	jsonRunner   bool
 	devices      map[string]deviceParser
 	jsonDevices  map[string]jsonDevice
 }
@@ -282,6 +283,100 @@ func (p *Plugin) execute(jsonRunner bool) (*runner, error) {
 
 	r.executeRaids(raidDev, jsonRunner)
 	r.executeMegaRaids(megaraidDev, jsonRunner)
+	r.parseOutput(jsonRunner)
+
+	return r, err
+}
+
+// type dispatcher struct {
+// 	quitChan    chan struct{}
+// 	requestChan chan func()
+// 	wg          sync.WaitGroup
+// }
+
+// func NewDispatcher(workerCnt int) *dispatcher {
+// 	pool := &dispatcher{
+// 		quitChan:    make(chan struct{}),
+// 		requestChan: make(chan func()),
+// 		wg:          sync.WaitGroup{},
+// 	}
+
+// 	for i := 0; i < workerCnt; i++ {
+// 		go pool.worker()
+// 	}
+
+// 	return pool
+// }
+
+// func (p *dispatcher) execute(fn func()) {
+// 	p.wg.Add(1)
+// 	p.requestChan <- fn
+// }
+
+// func (p *dispatcher) worker() {
+// 	for {
+// 		select {
+// 		case request := <-p.requestChan:
+// 			request()
+// 			p.wg.Done()
+// 		case <-p.quitChan:
+// 			return
+// 		}
+// 	}
+// }
+
+// func (p *dispatcher) wait() {
+// 	p.wg.Wait()
+// }
+
+// func (p *dispatcher) shutdown() {
+// 	close(p.quitChan)
+// 	p.wg.Wait()
+// }
+
+func (p *Plugin) execute(jsonRunner bool) (*runner, error) {
+	basicDev, raidDev, megaraidDev, err := p.getDevices()
+	if err != nil {
+		return nil, err
+	}
+
+	r := &runner{
+		names:      make(chan string, len(basicDev)),
+		err:        make(chan error, cpuCount),
+		done:       make(chan struct{}),
+		plugin:     p,
+		jsonRunner: jsonRunner,
+	}
+
+	if jsonRunner {
+		r.jsonDevices = make(map[string]jsonDevice)
+	} else {
+		r.devices = make(map[string]deviceParser)
+	}
+
+	var g errgroup.Group
+	g.SetLimit(2)
+
+	for _, dvc := range basicDev {
+		g.Go(func() error {
+			return r.getBasicDevice(dvc.Name)
+		})
+	}
+
+	// for _, dvc := range raidDev {
+	// 	g.Go(func() error {
+	// 		return r.getRaidDevice(dvc.Name, dvc.DevType)
+	// 	})
+	// }
+
+	for _, dvc := range megaraidDev {
+		g.Go(func() error {
+			return r.getMegaRaidDevice(dvc.Name, dvc.DevType)
+		})
+	}
+
+	g.Wait()
+
 	r.parseOutput(jsonRunner)
 
 	return r, err
@@ -506,6 +601,77 @@ func cutPrefix(in string) string {
 	return strings.TrimPrefix(in, "/dev/")
 }
 
+func (r *runner) getBasicDevice(dvcName string) error {
+	devices, err := r.plugin.ctl.Execute("-a", dvcName, "-j")
+	if err != nil {
+		return errs.Wrap(err, "failed to execute smartctl")
+	}
+
+	var dp deviceParser
+
+	if err = json.Unmarshal(devices, &dp); err != nil {
+		return errs.WrapConst(err, zbxerr.ErrorCannotUnmarshalJSON)
+	}
+
+	if dp.SmartStatus == nil {
+		r.plugin.Debugf("skipping device %s", dp.Info.Name)
+		return nil // Is there actually error nil. Could be beter return not crytical error later to ignore.
+	}
+
+	dp.Info.name = dvcName
+
+	r.setDevicesData(dp, devices)
+	return nil
+}
+
+func (r *runner) getRaidDevice(dvcName string, dvcType string) error {
+	return nil
+}
+
+// TODO: Predefinition of errors could be needed
+func (r *runner) getMegaRaidDevice(dvcName string, dvcType string) error {
+	device, err := r.plugin.ctl.Execute(
+		"-a", dvcName, "-d", dvcType, "-j",
+	)
+	if err != nil {
+		return errs.Wrapf( // Check if wrapping is done correctly
+			err,
+			"failed to get megaraid device with name %s",
+			dvcName,
+		)
+	}
+
+	var dp deviceParser
+	err = json.Unmarshal(device, &dp)
+	if err != nil {
+		return errs.Wrapf( // Check if wrapping is done correctly
+			err,
+			"failed to unmarshal megaraid device with name %s",
+			dvcName,
+		)
+	}
+
+	err = dp.checkErr()
+	if err != nil {
+		return errs.Wrapf( // Check if wrapping is done correctly
+			err,
+			"got error from smartctl for megaraid devices with name %s",
+			dvcName,
+		)
+	}
+
+	if dp.SmartStatus == nil {
+		return nil //Error could be needed.
+	}
+
+	dp.Info.Name = fmt.Sprintf("%s %s", dvcName, dvcType)
+	dp.Info.name = dvcName
+	dp.Info.raidType = dvcType
+
+	r.setDevicesData(dp, device)
+	return nil
+}
+
 // getBasicDevices sets non raid device information returned by smartctl.
 // Sets device data to runner 'devices' field.
 // If jsonRunner is true, sets raw json outputs to runner 'jsonDevices' map instead.
@@ -632,6 +798,7 @@ func getRaidDevices(
 			}
 
 			devices = append(devices, data)
+			i++
 		}
 
 		return devices
@@ -724,6 +891,20 @@ func (r *runner) setRaidDevices(
 	}
 
 	return false
+}
+
+func (r *runner) setDevicesData(dp deviceParser, device []byte) {
+	r.mux.Lock()
+	defer r.mux.Unlock()
+
+	if r.jsonRunner {
+		r.jsonDevices[dp.Info.Name] = jsonDevice{
+			dp.SerialNumber,
+			string(device),
+		}
+	} else {
+		r.devices[dp.Info.Name] = dp
+	}
 }
 
 func (r *runner) parseOutput(jsonRunner bool) {
