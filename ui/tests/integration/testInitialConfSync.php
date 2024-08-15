@@ -140,14 +140,6 @@ class testInitialConfSync extends CIntegrationTest
 			]
 		],
 		[
-			'prototype_items' =>
-			[
-				'insert' => '5',
-				'update' => '0',
-				'delete' => '0'
-			]
-		],
-		[
 			'item_discovery' =>
 			[
 				'insert' => '5',

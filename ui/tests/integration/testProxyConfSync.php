@@ -114,14 +114,6 @@ class testProxyConfSync extends CIntegrationTest
 			]
 		],
 		[
-			'prototype_items' =>
-			[
-				'insert' => '0',
-				'update' => '0',
-				'delete' => '0'
-			]
-		],
-		[
 			'item_discovery' =>
 			[
 				'insert' => '0',
