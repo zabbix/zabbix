@@ -302,7 +302,7 @@ int	expr_dc_get_interface_value(zbx_uint64_t hostid, zbx_uint64_t itemid, char *
 
 	if (SUCCEED != (res = zbx_dc_config_get_interface(&interface, hostid, itemid)))
 	{
-		*replace_to = zbx_strdup(*replace_to, "");
+		*replace_to = zbx_strdup(*replace_to, "*UNKNOWN*");
 		return SUCCEED;
 	}
 
