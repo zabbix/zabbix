@@ -31,7 +31,6 @@ import (
 
 	"golang.org/x/sync/errgroup"
 	"golang.zabbix.com/sdk/errs"
-	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
@@ -222,24 +221,12 @@ type table struct {
 	Thresh   int    `json:"thresh"`
 }
 
-type raidParameters struct {
-	name  string
-	rType string
-}
-
 type runner struct {
-	plugin       *Plugin
-	mux          sync.Mutex
-	names        chan string
-	err          chan error
-	done         chan struct{}
-	raidDone     chan struct{}
-	megaRaidDone chan struct{}
-	raids        chan raidParameters
-	megaraids    chan raidParameters
-	jsonRunner   bool
-	devices      map[string]deviceParser
-	jsonDevices  map[string]jsonDevice
+	plugin      *Plugin
+	mux         sync.Mutex
+	jsonRunner  bool
+	devices     map[string]deviceParser
+	jsonDevices map[string]jsonDevice
 }
 
 //nolint:gochecknoinits
@@ -250,11 +237,6 @@ func init() {
 	}
 }
 
-// execute returns the smartctl runner with all devices data returned by smartctl.
-// If jsonRunner is 'true' the returned data is in json format in 'jsonDevices' field.
-// If jsonRunner is 'false' the returned data is 'devices' field.
-// Currently looks for 5 raid types "3ware", "areca", "cciss", "megaraid", "sat".
-// It returns an error if there is an issue with getting or parsing results from smartctl.
 func (p *Plugin) execute(jsonRunner bool) (*runner, error) {
 	basicDev, raidDev, megaraidDev, err := p.getDevices()
 	if err != nil {
@@ -262,88 +244,6 @@ func (p *Plugin) execute(jsonRunner bool) (*runner, error) {
 	}
 
 	r := &runner{
-		names:        make(chan string, len(basicDev)),
-		err:          make(chan error, cpuCount),
-		done:         make(chan struct{}),
-		raidDone:     make(chan struct{}),
-		megaRaidDone: make(chan struct{}),
-		plugin:       p,
-	}
-
-	if jsonRunner {
-		r.jsonDevices = make(map[string]jsonDevice)
-	} else {
-		r.devices = make(map[string]deviceParser)
-	}
-
-	err = r.executeBase(basicDev, jsonRunner)
-	if err != nil {
-		return nil, err
-	}
-
-	r.executeRaids(raidDev, jsonRunner)
-	r.executeMegaRaids(megaraidDev, jsonRunner)
-	r.parseOutput(jsonRunner)
-
-	return r, err
-}
-
-// type dispatcher struct {
-// 	quitChan    chan struct{}
-// 	requestChan chan func()
-// 	wg          sync.WaitGroup
-// }
-
-// func NewDispatcher(workerCnt int) *dispatcher {
-// 	pool := &dispatcher{
-// 		quitChan:    make(chan struct{}),
-// 		requestChan: make(chan func()),
-// 		wg:          sync.WaitGroup{},
-// 	}
-
-// 	for i := 0; i < workerCnt; i++ {
-// 		go pool.worker()
-// 	}
-
-// 	return pool
-// }
-
-// func (p *dispatcher) execute(fn func()) {
-// 	p.wg.Add(1)
-// 	p.requestChan <- fn
-// }
-
-// func (p *dispatcher) worker() {
-// 	for {
-// 		select {
-// 		case request := <-p.requestChan:
-// 			request()
-// 			p.wg.Done()
-// 		case <-p.quitChan:
-// 			return
-// 		}
-// 	}
-// }
-
-// func (p *dispatcher) wait() {
-// 	p.wg.Wait()
-// }
-
-// func (p *dispatcher) shutdown() {
-// 	close(p.quitChan)
-// 	p.wg.Wait()
-// }
-
-func (p *Plugin) execute(jsonRunner bool) (*runner, error) {
-	basicDev, raidDev, megaraidDev, err := p.getDevices()
-	if err != nil {
-		return nil, err
-	}
-
-	r := &runner{
-		names:      make(chan string, len(basicDev)),
-		err:        make(chan error, cpuCount),
-		done:       make(chan struct{}),
 		plugin:     p,
 		jsonRunner: jsonRunner,
 	}
@@ -363,11 +263,15 @@ func (p *Plugin) execute(jsonRunner bool) (*runner, error) {
 		})
 	}
 
-	// for _, dvc := range raidDev {
-	// 	g.Go(func() error {
-	// 		return r.getRaidDevice(dvc.Name, dvc.DevType)
-	// 	})
-	// }
+	for _, dvc := range raidDev {
+		for _, devType := range []DeviceType{
+			ThreeWare, Areca, CCISS, SAT, SCSI,
+		} {
+			g.Go(func() error {
+				return r.getRaidDevice(dvc.Name, devType)
+			})
+		}
+	}
 
 	for _, dvc := range megaraidDev {
 		g.Go(func() error {
@@ -380,153 +284,6 @@ func (p *Plugin) execute(jsonRunner bool) (*runner, error) {
 	r.parseOutput(jsonRunner)
 
 	return r, err
-}
-
-// executeBase executed runners for basic devices retrieved from smartctl.
-func (r *runner) executeBase(basicDev []deviceInfo, jsonRunner bool) error {
-	r.startBasicRunners(jsonRunner)
-
-	for _, dev := range basicDev {
-		r.names <- dev.Name
-	}
-
-	close(r.names)
-
-	return r.waitForExecution()
-}
-
-// executeRaids executes runners for raid devices (except megaraid) retrieved from smartctl
-func (r *runner) executeRaids(raids []deviceInfo, jsonRunner bool) {
-	type job struct {
-		deviceName string
-		deviceType DeviceType
-	}
-
-	var (
-		jobs        = make(chan job)
-		results     = make(chan []*SmartCtlDeviceData)
-		workerWG    = sync.WaitGroup{}
-		collectorWG = sync.WaitGroup{}
-	)
-
-	// workers
-	for i := 0; i < cpuCount; i++ {
-		workerWG.Add(1)
-
-		go func() {
-			defer workerWG.Done()
-
-			for j := range jobs {
-				results <- getRaidDevices(
-					r.plugin.ctl, r.plugin, j.deviceName, j.deviceType,
-				)
-			}
-		}()
-	}
-
-	// result collector
-	collectorWG.Add(1)
-
-	go func() {
-		defer collectorWG.Done()
-
-		for res := range results {
-			for _, data := range res {
-				if jsonRunner {
-					r.jsonDevices[data.Device.Info.Name] = jsonDevice{
-						data.Device.SerialNumber,
-						string(data.Data),
-					}
-
-					continue
-				}
-
-				r.devices[data.Device.Info.Name] = *data.Device
-			}
-		}
-	}()
-
-	// job dispatcher
-	for _, dev := range raids {
-		for _, devType := range []DeviceType{
-			ThreeWare, Areca, CCISS, SAT, SCSI,
-		} {
-			jobs <- job{
-				deviceName: dev.Name,
-				deviceType: devType,
-			}
-		}
-	}
-
-	// no more jobs can be accepted, but some workers may still be active
-	close(jobs)
-	// wait for all workers to exit, meaning that no new results will be produced
-	workerWG.Wait()
-	close(results)
-	// wait for collector to finnish processing last result
-	collectorWG.Wait()
-}
-
-// executeMegaRaids executes runners for megaraid devices retrieved from smartctl
-func (r *runner) executeMegaRaids(megaraids []deviceInfo, jsonRunner bool) {
-	r.megaraids = make(chan raidParameters, len(megaraids))
-
-	r.startMegaRaidRunners(jsonRunner)
-	for _, mr := range megaraids {
-		r.megaraids <- raidParameters{mr.Name, mr.DevType}
-	}
-
-	close(r.megaraids)
-
-	r.waitForRaidExecution(r.megaRaidDone)
-}
-
-// startBasicRunners starts runners to get basic device information.
-// Runner count is based on cpu core count.
-func (r *runner) startBasicRunners(jsonRunner bool) {
-	r.wg.Add(cpuCount)
-
-	for i := 0; i < cpuCount; i++ {
-		go r.getBasicDevices(jsonRunner)
-	}
-}
-
-// startRaidRunners starts runners to get raid device information.
-// Runner count is based on cpu core count.
-func (r *runner) startMegaRaidRunners(jsonRunner bool) {
-	r.wg.Add(cpuCount)
-
-	for i := 0; i < cpuCount; i++ {
-		go r.getMegaRaidDevices(jsonRunner)
-	}
-}
-
-// waitForExecution waits for all execution to stop.
-// Returns the first error a runner sends.
-func (r *runner) waitForExecution() error {
-	go func() {
-		r.wg.Wait()
-
-		close(r.done)
-	}()
-
-	select {
-	case <-r.done:
-		return nil
-	case err := <-r.err:
-		return err
-	}
-}
-
-// waitForRaidExecution waits for all execution to stop.
-func (r *runner) waitForRaidExecution(done chan struct{}) {
-	go func() {
-		r.wg.Wait()
-
-		close(done)
-	}()
-
-	<-done
 }
 
 // checkVersion checks the version of smartctl.
@@ -624,7 +381,7 @@ func (r *runner) getBasicDevice(dvcName string) error {
 	return nil
 }
 
-func (r *runner) getRaidDevice(dvcName string, dvcType string) error {
+func (r *runner) getRaidDevice(dvcName string, dvcType DeviceType) error {
 	return nil
 }
 
@@ -672,46 +429,6 @@ func (r *runner) getMegaRaidDevice(dvcName string, dvcType string) error {
 	return nil
 }
 
-// getBasicDevices sets non raid device information returned by smartctl.
-// Sets device data to runner 'devices' field.
-// If jsonRunner is true, sets raw json outputs to runner 'jsonDevices' map instead.
-// It sends an error if there is an issue with getting or parsing results from smartctl.
-func (r *runner) getBasicDevices(jsonRunner bool) {
-	defer r.wg.Done()
-
-	for name := range r.names {
-		devices, err := r.plugin.ctl.Execute("-a", name, "-j")
-		if err != nil {
-			r.err <- errs.Wrap(err, "failed to execute smartctl")
-			return
-		}
-
-		var dp deviceParser
-
-		if err = json.Unmarshal(devices, &dp); err != nil {
-			r.err <- errs.WrapConst(err, zbxerr.ErrorCannotUnmarshalJSON)
-			return
-		}
-
-		if dp.SmartStatus == nil {
-			r.plugin.Debugf("skipping device %s", dp.Info.Name)
-			return
-		}
-
-		dp.Info.name = name
-
-		r.mux.Lock()
-
-		if jsonRunner {
-			r.jsonDevices[name] = jsonDevice{dp.SerialNumber, string(devices)}
-		} else {
-			r.devices[name] = dp
-		}
-
-		r.mux.Unlock()
-	}
-}
-
 // getAllDeviceInfoByType returns all device information by device type.
 //
 // runs: smartctl -a <deviceName> -d <deviceType> -j
@@ -753,40 +470,32 @@ func getAllDeviceInfoByType(
 	}, nil
 }
 
-func getRaidDevices(
-	ctl SmartController,
-	logr log.Logger,
-	deviceName string,
-	deviceType DeviceType,
-) []*SmartCtlDeviceData {
+func (r *runner) getRaidDevices(deviceName string, deviceType DeviceType) error {
 	switch deviceType {
 	case SAT, SCSI:
-		data, err := getAllDeviceInfoByType(ctl, deviceName, string(deviceType))
+		data, err := getAllDeviceInfoByType(r.plugin.ctl, deviceName, string(deviceType))
 		if err != nil {
 			logr.Debugf(
 				"failed to get device %q info by type %q: %s",
 				deviceName, deviceType, err.Error(),
 			)
 
-			return []*SmartCtlDeviceData{}
+			return nil
 		}
 
-		return []*SmartCtlDeviceData{data}
+		r.setDevicesData(*data.Device, data.Data)
 	default:
-		var (
-			devices []*SmartCtlDeviceData
-			i       int
-		)
+		var driveNumber int
 
 		if deviceType == Areca {
-			i = 1
+			driveNumber = 1
 		}
 
 		for {
 			data, err := getAllDeviceInfoByType(
-				ctl,
+				r.plugin.ctl,
 				deviceName,
-				fmt.Sprintf("%s,%d", deviceType, i),
+				fmt.Sprintf("%s,%d", deviceType, driveNumber),
 			)
 			if err != nil {
 				logr.Debugf(
@@ -797,102 +506,14 @@ func getRaidDevices(
 				break
 			}
 
-			devices = append(devices, data)
-			i++
+			r.setDevicesData(*data.Device, data.Data)
+			driveNumber++
 		}
-
-		return devices
+		return nil
 	}
 }
 
-// getMegaRaidDevices sets megaraid device information returned by smartctl.
-// Works by executing megaraid based on megaraid name in info_name field.
-// Sets device data to runner 'devices' field.
-// If jsonRunner is true, sets raw json outputs to runner 'jsonDevices' map instead.
-// It logs an error when there is an issue with getting or parsing results from smartctl.
-func (r *runner) getMegaRaidDevices(jsonRunner bool) {
-	defer r.wg.Done()
-
-	for {
-		raid, ok := <-r.megaraids
-		if !ok {
-			return
-		}
-
-		device, err := r.plugin.ctl.Execute(
-			"-a", raid.name, "-d", raid.rType, "-j",
-		)
-		if err != nil {
-			r.plugin.Tracef(
-				"failed to get megaraid device with name %s, %s",
-				raid.name,
-				err.Error(),
-			)
-
-			continue
-		}
-
-		var dp deviceParser
-		if err = json.Unmarshal(device, &dp); err != nil {
-			r.plugin.Tracef(
-				"failed to unmarshal megaraid device with name %s, %s",
-				raid.name,
-				err.Error(),
-			)
-
-			continue
-		}
-
-		err = dp.checkErr()
-		if err != nil {
-			r.plugin.Tracef(
-				"got error from smartctl for megaraid devices with name %s, %s",
-				raid.name, err.Error(),
-			)
-
-			continue
-		}
-
-		if dp.SmartStatus == nil {
-			continue
-		}
-
-		dp.Info.Name = fmt.Sprintf("%s %s", raid.name, raid.rType)
-		dp.Info.name = raid.name
-		dp.Info.raidType = raid.rType
-
-		r.setRaidDevices(dp, device, raid.rType, jsonRunner)
-	}
-}
-
-// setRaidDevices sets device data to runner.
-// If json runner then raw byte data is set, else sets parsed data
-// Returns true if the runner should go to next raid value.
-func (r *runner) setRaidDevices(
-	dp deviceParser, //nolint:gocritic
-	device []byte,
-	raidType string,
-	jsonRunner bool,
-) bool {
-	r.mux.Lock()
-	defer r.mux.Unlock()
-
-	if jsonRunner {
-		r.jsonDevices[dp.Info.Name] = jsonDevice{
-			dp.SerialNumber,
-			string(device),
-		}
-	} else {
-		r.devices[dp.Info.Name] = dp
-	}
-
-	if raidType == satType {
-		return true
-	}
-
-	return false
-}
-
+// TODO: use SmartCtlDeviceData as single input param
 func (r *runner) setDevicesData(dp deviceParser, device []byte) {
 	r.mux.Lock()
 	defer r.mux.Unlock()
