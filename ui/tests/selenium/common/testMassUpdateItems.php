@@ -1647,6 +1647,21 @@ class testMassUpdateItems extends CWebTest{
 			// #7.
 			[
 				[
+					'expected' => TEST_BAD,
+					'names' => [
+						'2_Item_Tags_Preprocessing',
+						'2_Item_No_Tags_Preprocessing'
+					],
+					'Preprocessing steps' => [
+						['type' => 'Check for not supported value', 'parameter_1' => 'any error'],
+						['type' => 'Check for not supported value', 'parameter_1' => 'any error']
+					],
+					'details' => 'Invalid parameter "/1/preprocessing/2": value (type, params)=(26, -1) already exists.'
+				]
+			],
+			// #8.
+			[
+				[
 					'names' => [
 						'1_Item_Tags_Preprocessing',
 						'2_Item_Tags_Preprocessing'
@@ -1654,7 +1669,7 @@ class testMassUpdateItems extends CWebTest{
 					'Preprocessing steps' => []
 				]
 			],
-			// #8.
+			// #9.
 			[
 				[
 					'names' => [
@@ -1689,7 +1704,7 @@ class testMassUpdateItems extends CWebTest{
 					]
 				]
 			],
-			// #9.
+			// #10.
 			[
 				[
 					'names' => [
@@ -1697,6 +1712,8 @@ class testMassUpdateItems extends CWebTest{
 						'2_Item_Tags_Preprocessing'
 					],
 					'Preprocessing steps' => [
+						['type' => 'Check for not supported value', 'parameter_1' => 'error matches','parameter_2' => '^test.*$',
+							'on_fail' => true, 'error_handler' => 'Set value to', 'error_handler_params' => 'custom value'],
 						['type' => 'Replace', 'parameter_1' => 'text', 'parameter_2' => 'REPLACEMENT'],
 						['type' => 'Right trim', 'parameter_1' => 'abc'],
 						['type' => 'Left trim', 'parameter_1' => 'def'],
