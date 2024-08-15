@@ -80,6 +80,7 @@ zabbix_export:
           key: 'battery.last_replace_date[upsBasicBatteryLastReplaceDate]'
           delay: 1h
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: PowerNet-MIB
             The date when the UPS system's batteries were last replaced
@@ -513,7 +514,9 @@ zabbix_export:
           name: 'SNMP traps (fallback)'
           type: SNMP_TRAP
           key: snmptrap.fallback
+          delay: '0'
           value_type: LOG
+          trends: '0'
           description: 'The item is used to collect all SNMP traps unmatched by other snmptrap items'
           logtimefmt: 'hh:mm:sszyyyy/MM/dd'
           tags:
@@ -526,6 +529,7 @@ zabbix_export:
           key: 'system.contact[sysContact.0]'
           delay: 15m
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: SNMPv2-MIB
             The textual identification of the contact person for this managed
@@ -546,6 +550,7 @@ zabbix_export:
           key: 'system.descr[sysDescr.0]'
           delay: 15m
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: SNMPv2-MIB
             A textual description of the entity. This value should
@@ -588,6 +593,7 @@ zabbix_export:
           key: 'system.location[sysLocation.0]'
           delay: 15m
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: SNMPv2-MIB
             The physical location of this node (e.g., `telephone closet, 3rd floor').  If the location is unknown, the value is the zero-length string.
@@ -606,6 +612,7 @@ zabbix_export:
           key: 'system.model[upsBasicIdentModel]'
           delay: 15m
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: PowerNet-MIB
             The UPS model name (e.g. 'APC Smart-UPS 600').
@@ -623,6 +630,7 @@ zabbix_export:
           key: 'system.name[sysName.0]'
           delay: 15m
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: SNMPv2-MIB
             An administratively-assigned name for this managed node.By
@@ -674,6 +682,7 @@ zabbix_export:
           key: 'system.objectid[sysObjectID.0]'
           delay: 15m
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: SNMPv2-MIB
             The vendor's authoritative identification of the network management
@@ -696,6 +705,7 @@ zabbix_export:
           key: 'system.sn[upsAdvIdentSerialNumber]'
           delay: 15m
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: PowerNet-MIB
             An 8-character string identifying the serial number of
@@ -779,6 +789,7 @@ zabbix_export:
               - macro: '{#CARTRIDGE_STATUS}'
                 value: ^$
                 operator: NOT_MATCHES_REGEX
+                formulaid: A
           item_prototypes:
             - uuid: a168ef9da6504b31a8234b272f1a1a80
               name: '{#BATTERY_PACK}.{#CARTRIDGE_INDEX}: Battery estimated replace date'
@@ -787,6 +798,7 @@ zabbix_export:
               key: 'battery.estimated_replace_date[upsHighPrecBatteryPackCartridgeReplaceDate.{#BATTERY_PACK}.{#CARTRIDGE_INDEX}]'
               delay: 1h
               value_type: CHAR
+              trends: '0'
               description: |
                 MIB: PowerNet-MIB
                 The battery cartridge estimated battery replace date.
@@ -805,6 +817,7 @@ zabbix_export:
               snmp_oid: '1.3.6.1.4.1.318.1.1.1.2.3.10.2.1.7.{#SNMPINDEX}'
               key: 'battery.pack.cartridge_health[upsHighPrecBatteryPackCartridgeHealth.{#BATTERY_PACK}.{#CARTRIDGE_INDEX}]'
               value_type: CHAR
+              trends: '0'
               description: |
                 MIB: PowerNet-MIB
                 The battery cartridge health.
@@ -848,6 +861,7 @@ zabbix_export:
               snmp_oid: '1.3.6.1.4.1.318.1.1.1.2.3.10.2.1.10.{#SNMPINDEX}'
               key: 'battery.pack.status[upsHighPrecBatteryPackCartridgeStatus.{#BATTERY_PACK}.{#CARTRIDGE_INDEX}]'
               value_type: CHAR
+              trends: '0'
               description: |
                 MIB: PowerNet-MIB
                 The battery cartridge status.
@@ -933,6 +947,7 @@ zabbix_export:
               key: 'system.sn[upsHighPrecBatteryPackSerialNumber.{#BATTERY_PACK}.{#CARTRIDGE_INDEX}]'
               delay: 15m
               value_type: CHAR
+              trends: '0'
               description: |
                 MIB: PowerNet-MIB
                 The battery pack serial number.
@@ -1047,6 +1062,7 @@ zabbix_export:
                 conditions:
                   - macro: '{#EXTERNAL_SENSOR1_NAME}'
                     value: Temp
+                    formulaid: A
               operations:
                 - operationobject: ITEM_PROTOTYPE
                   operator: LIKE
@@ -1156,6 +1172,7 @@ zabbix_export:
                 conditions:
                   - macro: '{#EXTERNAL_SENSOR2_NAME}'
                     value: Temp
+                    formulaid: A
               operations:
                 - operationobject: ITEM_PROTOTYPE
                   operator: LIKE

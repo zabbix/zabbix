@@ -107,10 +107,10 @@ window.trigger_edit_popup = new class {
 					{dialogue_class: 'modal-popup-generic'}
 				);
 			}
-			else if (e.target.name === 'correlation_mode') {
+			else if (e.target.name === 'correlation_mode' && !e.target.readOnly) {
 				this.#changeCorrelationMode();
 			}
-			else if (e.target.name === 'recovery_mode') {
+			else if (e.target.name === 'recovery_mode' && !e.target.readOnly) {
 				this.#changeRecoveryMode();
 			}
 			else if (e.target.id === 'recovery-expression-constructor'
@@ -665,7 +665,7 @@ window.trigger_edit_popup = new class {
 		}
 
 		delete form_fields.context;
-		delete form_fields._csrf_token;
+		delete form_fields[CSRF_TOKEN_NAME];
 
 		this.db_trigger.dependencies = [];
 
@@ -798,9 +798,7 @@ window.trigger_edit_popup = new class {
 
 		const curl = new Curl('zabbix.php');
 		curl.setArgument('action', action);
-		curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
-			<?= json_encode(CCsrfTokenHelper::get('trigger')) ?>
-		);
+		curl.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('trigger')) ?>);
 
 		this.#post(curl.getUrl(), {triggerids: [this.triggerid]}, (response) => {
 			overlayDialogueDestroy(this.overlay.dialogueid);

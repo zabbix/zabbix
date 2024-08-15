@@ -64,6 +64,7 @@ zabbix_export:
           type: JMX
           key: 'jmx["java.lang:type=Compilation","Name"]'
           value_type: CHAR
+          trends: '0'
           username: '{$JMX.USER}'
           password: '{$JMX.PASSWORD}'
           description: 'Displays the total number of classes unloaded since the Java virtual machine has started execution.'
@@ -294,6 +295,7 @@ zabbix_export:
           key: 'jmx["java.lang:type=Runtime","VmName"]'
           delay: 1h
           value_type: CHAR
+          trends: '0'
           username: '{$JMX.USER}'
           password: '{$JMX.PASSWORD}'
           preprocessing:
@@ -319,6 +321,7 @@ zabbix_export:
           key: 'jmx["java.lang:type=Runtime","VmVersion"]'
           delay: 1h
           value_type: CHAR
+          trends: '0'
           username: '{$JMX.USER}'
           password: '{$JMX.PASSWORD}'
           preprocessing:
@@ -397,6 +400,8 @@ zabbix_export:
               description: 'Displays the total number of collections that have occurred per second.'
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 - tag: collection
@@ -445,6 +450,7 @@ zabbix_export:
             conditions:
               - macro: '{#JMXNAME}'
                 value: '{$JMX.MEM.POOL.NAME.MATCHES}'
+                formulaid: A
           description: 'Memory pools metrics discovery.'
           item_prototypes:
             - uuid: 8b3da0f9b0b64b58b25ffed71a679ed0

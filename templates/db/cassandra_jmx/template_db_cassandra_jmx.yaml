@@ -27,6 +27,7 @@ zabbix_export:
           type: JMX
           key: 'jmx["org.apache.cassandra.db:type=StorageService","ClusterName"]'
           value_type: CHAR
+          trends: '0'
           username: '{$CASSANDRA.USER}'
           password: '{$CASSANDRA.PASSWORD}'
           preprocessing:
@@ -42,6 +43,7 @@ zabbix_export:
           type: JMX
           key: 'jmx["org.apache.cassandra.db:type=StorageService","ReleaseVersion"]'
           value_type: CHAR
+          trends: '0'
           username: '{$CASSANDRA.USER}'
           password: '{$CASSANDRA.PASSWORD}'
           preprocessing:
@@ -264,6 +266,8 @@ zabbix_export:
           description: 'Rate of cache hits.'
           preprocessing:
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             - tag: component
@@ -279,6 +283,8 @@ zabbix_export:
           description: 'Rate of cache requests.'
           preprocessing:
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             - tag: component
@@ -379,6 +385,8 @@ zabbix_export:
           description: 'The number of client requests per second.'
           preprocessing:
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             - tag: component
@@ -445,6 +453,8 @@ zabbix_export:
           description: 'The number of local write requests per second.'
           preprocessing:
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             - tag: component
@@ -1004,9 +1014,11 @@ zabbix_export:
             conditions:
               - macro: '{#JMXKEYSPACE}'
                 value: '{$CASSANDRA.KEY_SPACE.MATCHES}'
+                formulaid: A
               - macro: '{#JMXKEYSPACE}'
                 value: '{$CASSANDRA.KEY_SPACE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: B
           description: 'Info about keyspaces and tables'
           item_prototypes:
             - uuid: 22c24ee8cfd34623b137c6cad5a2299d
@@ -1278,6 +1290,8 @@ zabbix_export:
               description: 'The number of client requests per second.'
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 - tag: component
@@ -1522,6 +1536,8 @@ zabbix_export:
               description: 'The number of local write requests per second.'
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 - tag: component

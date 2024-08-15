@@ -111,7 +111,9 @@ zabbix_export:
           name: 'SNMP traps (fallback)'
           type: SNMP_TRAP
           key: snmptrap.fallback
+          delay: '0'
           value_type: LOG
+          trends: '0'
           description: 'The item is used to collect all SNMP traps unmatched by other snmptrap items.'
           logtimefmt: 'hh:mm:sszyyyy/MM/dd'
           tags:
@@ -124,6 +126,7 @@ zabbix_export:
           key: system.contact
           delay: 15m
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: SNMPv2-MIB
             The textual identification of the contact person for this managed node, together with information on how to contact this person. If no contact information is known, the value is the zero-length string.
@@ -146,6 +149,8 @@ zabbix_export:
             Number of interrupts processed.
           preprocessing:
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           tags:
             - tag: component
               value: cpu
@@ -211,6 +216,8 @@ zabbix_export:
             Number of context switches.
           preprocessing:
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           tags:
             - tag: component
               value: cpu
@@ -221,6 +228,7 @@ zabbix_export:
           key: system.descr
           delay: 15m
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: SNMPv2-MIB
             System description of the host.
@@ -238,6 +246,7 @@ zabbix_export:
           key: system.location
           delay: 15m
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: SNMPv2-MIB
             The physical location of this node. If the location is unknown, the value is the zero-length string.
@@ -256,6 +265,7 @@ zabbix_export:
           key: system.name
           delay: 15m
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: SNMPv2-MIB
             The host name of the system.
@@ -287,6 +297,7 @@ zabbix_export:
           key: system.objectid
           delay: 15m
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: SNMPv2-MIB
             The vendor authoritative identification of the network management subsystem contained in the entity. This value is allocated within the SMI enterprises subtree (1.3.6.1.4.1) and provides an easy and unambiguous means for determining what kind of box is being managed.
@@ -446,6 +457,8 @@ zabbix_export:
             Total amount of cache hits in the ARC per second.
           preprocessing:
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           tags:
             - tag: component
               value: memory
@@ -495,6 +508,8 @@ zabbix_export:
             Total amount of cache misses in the ARC per second.
           preprocessing:
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           tags:
             - tag: component
               value: memory
@@ -553,6 +568,8 @@ zabbix_export:
             Hits to the L2 cache per second.
           preprocessing:
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           tags:
             - tag: component
               value: memory
@@ -569,6 +586,8 @@ zabbix_export:
             Misses to the L2 cache per second.
           preprocessing:
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           tags:
             - tag: component
               value: memory
@@ -586,6 +605,8 @@ zabbix_export:
             Read rate from L2 cache in bytes per second.
           preprocessing:
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           tags:
             - tag: component
               value: memory
@@ -625,6 +646,8 @@ zabbix_export:
             Write rate from L2 cache in bytes per second.
           preprocessing:
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           tags:
             - tag: component
               value: memory
@@ -807,6 +830,7 @@ zabbix_export:
           name: 'CPU discovery'
           type: DEPENDENT
           key: cpu.discovery
+          delay: '0'
           description: 'This discovery will create set of per core CPU metrics from UCD-SNMP-MIB, using {#CPU.COUNT} in preprocessing. That''s the only reason why LLD is used.'
           item_prototypes:
             - uuid: 03eaea043f2b4aee9ccc562ae5390656
@@ -834,6 +858,8 @@ zabbix_export:
                 The amount of time the CPU has been servicing hardware interrupts.
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
                 - type: JAVASCRIPT
                   parameters:
                     - 'return value/{#CPU.COUNT}'
@@ -852,6 +878,8 @@ zabbix_export:
                 The amount of time the CPU has been waiting for I/O to complete.
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
                 - type: JAVASCRIPT
                   parameters:
                     - 'return value/{#CPU.COUNT}'
@@ -870,6 +898,8 @@ zabbix_export:
                 The time the CPU has spent running users' processes that have been niced.
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
                 - type: JAVASCRIPT
                   parameters:
                     - 'return value/{#CPU.COUNT}'
@@ -888,6 +918,8 @@ zabbix_export:
                 The time the CPU has spent running the kernel and its processes.
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
                 - type: JAVASCRIPT
                   parameters:
                     - 'return value/{#CPU.COUNT}'
@@ -906,6 +938,8 @@ zabbix_export:
                 The time the CPU has spent running users' processes that are not niced.
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
                 - type: JAVASCRIPT
                   parameters:
                     - 'return value/{#CPU.COUNT}'
@@ -916,6 +950,7 @@ zabbix_export:
               name: 'CPU utilization'
               type: DEPENDENT
               key: 'system.cpu.util[{#SNMPINDEX}]'
+              delay: '0'
               value_type: FLOAT
               units: '%'
               description: 'The CPU utilization expressed in %.'
@@ -1003,34 +1038,46 @@ zabbix_export:
             conditions:
               - macro: '{#IFADMINSTATUS}'
                 value: '{$NET.IF.IFADMINSTATUS.MATCHES}'
+                formulaid: A
               - macro: '{#IFADMINSTATUS}'
                 value: '{$NET.IF.IFADMINSTATUS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: B
               - macro: '{#IFALIAS}'
                 value: '{$NET.IF.IFALIAS.MATCHES}'
+                formulaid: C
               - macro: '{#IFALIAS}'
                 value: '{$NET.IF.IFALIAS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: D
               - macro: '{#IFDESCR}'
                 value: '{$NET.IF.IFDESCR.MATCHES}'
+                formulaid: E
               - macro: '{#IFDESCR}'
                 value: '{$NET.IF.IFDESCR.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: F
               - macro: '{#IFNAME}'
                 value: '@Network interfaces for discovery'
+                formulaid: G
               - macro: '{#IFNAME}'
                 value: '{$NET.IF.IFNAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: H
               - macro: '{#IFOPERSTATUS}'
                 value: '{$NET.IF.IFOPERSTATUS.MATCHES}'
+                formulaid: I
               - macro: '{#IFOPERSTATUS}'
                 value: '{$NET.IF.IFOPERSTATUS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: J
               - macro: '{#IFTYPE}'
                 value: '{$NET.IF.IFTYPE.MATCHES}'
+                formulaid: K
               - macro: '{#IFTYPE}'
                 value: '{$NET.IF.IFTYPE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: L
           description: 'Discovering interfaces from IF-MIB.'
           item_prototypes:
             - uuid: 71257fe84dde4281854f4f74f0ea1e4c
@@ -1047,6 +1094,8 @@ zabbix_export:
                 and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               tags:
                 - tag: component
                   value: network
@@ -1064,6 +1113,8 @@ zabbix_export:
                 For packet-oriented interfaces, the number of inbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.  For character-oriented or fixed-length interfaces, the number of inbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               tags:
                 - tag: component
                   value: network
@@ -1098,6 +1149,8 @@ zabbix_export:
                 The total number of octets received on the interface, including framing characters. This object is a 64-bit version of ifInOctets. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
                 - type: MULTIPLIER
                   parameters:
                     - '8'
@@ -1122,6 +1175,8 @@ zabbix_export:
                 and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               tags:
                 - tag: component
                   value: network
@@ -1139,6 +1194,8 @@ zabbix_export:
                 For packet-oriented interfaces, the number of outbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.  For character-oriented or fixed-length interfaces, the number of outbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               tags:
                 - tag: component
                   value: network
@@ -1173,6 +1230,8 @@ zabbix_export:
                 The total number of octets transmitted out of the interface, including framing characters. This object is a 64-bit version of ifOutOctets.Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
                 - type: MULTIPLIER
                   parameters:
                     - '8'
@@ -1444,9 +1503,11 @@ zabbix_export:
             conditions:
               - macro: '{#DATASET_NAME}'
                 value: '{$DATASET.NAME.MATCHES}'
+                formulaid: A
               - macro: '{#DATASET_NAME}'
                 value: '{$DATASET.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: B
           description: 'ZFS datasets discovery from FREENAS-MIB.'
           item_prototypes:
             - uuid: 3c3eab95b8e74e608fe3b7abab98c76b
@@ -1662,6 +1723,8 @@ zabbix_export:
                   parameters:
                     - '{#POOL_ALLOC_UNITS}'
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               tags:
                 - tag: component
                   value: storage
@@ -1679,6 +1742,8 @@ zabbix_export:
                 The number of read I/O operations sent to the pool or device, including metadata requests (averaged since system booted).
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               tags:
                 - tag: component
                   value: storage
@@ -1738,6 +1803,8 @@ zabbix_export:
                   parameters:
                     - '{#POOL_ALLOC_UNITS}'
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               tags:
                 - tag: component
                   value: storage
@@ -1755,6 +1822,8 @@ zabbix_export:
                 The number of write I/O operations sent to the pool or device (averaged since system booted).
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               tags:
                 - tag: component
                   value: storage
@@ -1931,9 +2000,11 @@ zabbix_export:
             conditions:
               - macro: '{#DEVNAME}'
                 value: '{$VFS.DEV.DEVNAME.MATCHES}'
+                formulaid: A
               - macro: '{#DEVNAME}'
                 value: '{$VFS.DEV.DEVNAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: B
           description: 'Block devices are discovered from UCD-DISKIO-MIB::diskIOTable (http://net-snmp.sourceforge.net/docs/mibs/ucdDiskIOMIB.html#diskIOTable).'
           item_prototypes:
             - uuid: ba220c4106cb4bff9dd60c92aee7919a
@@ -1948,6 +2019,8 @@ zabbix_export:
                 The number of read accesses from this device since boot.
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               tags:
                 - tag: component
                   value: storage
@@ -1980,6 +2053,8 @@ zabbix_export:
                 The number of write accesses from this device since boot.
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               tags:
                 - tag: component
                   value: storage

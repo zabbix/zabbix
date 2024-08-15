@@ -25,7 +25,9 @@ zabbix_export:
           name: 'Subject alternative name'
           type: DEPENDENT
           key: cert.alternative_names
+          delay: '0'
           value_type: TEXT
+          trends: '0'
           description: 'The subject alternative name extension allows identities to be bound to the subject of the certificate.  These identities may be included in addition to or in place of the identity in the subject field of the certificate.  Defined options include an Internet electronic mail address, a DNS name, an IP address, and a Uniform Resource Identifier (URI).'
           preprocessing:
             - type: JSONPATH
@@ -40,7 +42,9 @@ zabbix_export:
           name: Issuer
           type: DEPENDENT
           key: cert.issuer
+          delay: '0'
           value_type: TEXT
+          trends: '0'
           description: 'The field identifies the entity that has signed and issued the certificate.'
           preprocessing:
             - type: JSONPATH
@@ -55,7 +59,9 @@ zabbix_export:
           name: 'Last validation status'
           type: DEPENDENT
           key: cert.message
+          delay: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Last check result message.'
           preprocessing:
             - type: JSONPATH
@@ -70,6 +76,7 @@ zabbix_export:
           name: 'Expires on'
           type: DEPENDENT
           key: cert.not_after
+          delay: '0'
           units: unixtime
           description: 'The date on which the certificate validity period ends.'
           preprocessing:
@@ -98,6 +105,7 @@ zabbix_export:
           name: 'Valid from'
           type: DEPENDENT
           key: cert.not_before
+          delay: '0'
           units: unixtime
           description: 'The date on which the certificate validity period begins.'
           preprocessing:
@@ -113,7 +121,9 @@ zabbix_export:
           name: 'Public key algorithm'
           type: DEPENDENT
           key: cert.public_key_algorithm
+          delay: '0'
           value_type: CHAR
+          trends: '0'
           description: 'The digital signature algorithm is used to verify the signature of a certificate.'
           preprocessing:
             - type: JSONPATH
@@ -128,7 +138,9 @@ zabbix_export:
           name: 'Serial number'
           type: DEPENDENT
           key: cert.serial_number
+          delay: '0'
           value_type: CHAR
+          trends: '0'
           description: 'The serial number is a positive integer assigned by the CA to each certificate. It is unique for each certificate issued by a given CA. Non-conforming CAs may issue certificates with serial numbers that are negative or zero.'
           preprocessing:
             - type: JSONPATH
@@ -143,7 +155,9 @@ zabbix_export:
           name: Fingerprint
           type: DEPENDENT
           key: cert.sha1_fingerprint
+          delay: '0'
           value_type: CHAR
+          trends: '0'
           description: 'The Certificate Signature (SHA1 Fingerprint or Thumbprint) is the hash of the entire certificate in DER form.'
           preprocessing:
             - type: JSONPATH
@@ -171,7 +185,9 @@ zabbix_export:
           name: 'Signature algorithm'
           type: DEPENDENT
           key: cert.signature_algorithm
+          delay: '0'
           value_type: CHAR
+          trends: '0'
           description: 'The algorithm identifier for the algorithm used by the CA to sign the certificate.'
           preprocessing:
             - type: JSONPATH
@@ -186,7 +202,9 @@ zabbix_export:
           name: Subject
           type: DEPENDENT
           key: cert.subject
+          delay: '0'
           value_type: TEXT
+          trends: '0'
           description: 'The field identifies the entity associated with the public key stored in the subject public key field.'
           preprocessing:
             - type: JSONPATH
@@ -201,7 +219,9 @@ zabbix_export:
           name: 'Validation result'
           type: DEPENDENT
           key: cert.validation
+          delay: '0'
           value_type: CHAR
+          trends: '0'
           description: 'The certificate validation result. Possible values: valid/invalid/valid-but-self-signed'
           preprocessing:
             - type: JSONPATH
@@ -225,7 +245,9 @@ zabbix_export:
           name: Version
           type: DEPENDENT
           key: cert.version
+          delay: '0'
           value_type: CHAR
+          trends: '0'
           description: 'The version of the encoded certificate.'
           preprocessing:
             - type: JSONPATH
@@ -242,6 +264,7 @@ zabbix_export:
           delay: 15m
           history: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Returns the JSON with attributes of a certificate of the requested site.'
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT

@@ -26,6 +26,7 @@ zabbix_export:
           name: 'REST Client requests: 2xx, rate'
           type: DEPENDENT
           key: kubernetes.controller.client_http_requests_200.rate
+          delay: '0'
           value_type: FLOAT
           description: 'Number of HTTP requests with 2xx status code per second.'
           preprocessing:
@@ -36,6 +37,8 @@ zabbix_export:
                 - sum
               error_handler: DISCARD_VALUE
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           master_item:
             key: kubernetes.controller.get_metrics
           tags:
@@ -47,6 +50,7 @@ zabbix_export:
           name: 'REST Client requests: 3xx, rate'
           type: DEPENDENT
           key: kubernetes.controller.client_http_requests_300.rate
+          delay: '0'
           value_type: FLOAT
           description: 'Number of HTTP requests with 3xx status code per second.'
           preprocessing:
@@ -57,6 +61,8 @@ zabbix_export:
                 - sum
               error_handler: DISCARD_VALUE
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           master_item:
             key: kubernetes.controller.get_metrics
           tags:
@@ -68,6 +74,7 @@ zabbix_export:
           name: 'REST Client requests: 4xx, rate'
           type: DEPENDENT
           key: kubernetes.controller.client_http_requests_400.rate
+          delay: '0'
           value_type: FLOAT
           description: 'Number of HTTP requests with 4xx status code per second.'
           preprocessing:
@@ -78,6 +85,8 @@ zabbix_export:
                 - sum
               error_handler: DISCARD_VALUE
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           master_item:
             key: kubernetes.controller.get_metrics
           tags:
@@ -89,6 +98,7 @@ zabbix_export:
           name: 'REST Client requests: 5xx, rate'
           type: DEPENDENT
           key: kubernetes.controller.client_http_requests_500.rate
+          delay: '0'
           value_type: FLOAT
           description: 'Number of HTTP requests with 5xx status code per second.'
           preprocessing:
@@ -99,6 +109,8 @@ zabbix_export:
                 - sum
               error_handler: DISCARD_VALUE
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           master_item:
             key: kubernetes.controller.get_metrics
           tags:
@@ -120,6 +132,7 @@ zabbix_export:
           name: CPU
           type: DEPENDENT
           key: kubernetes.controller.cpu.util
+          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'Total user and system CPU usage ratio.'
@@ -130,6 +143,8 @@ zabbix_export:
                 - value
                 - ''
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
             - type: MULTIPLIER
               parameters:
                 - '100'
@@ -144,6 +159,7 @@ zabbix_export:
           key: kubernetes.controller.get_metrics
           history: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Get raw metrics from Controller instance /metrics endpoint.'
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
@@ -161,6 +177,7 @@ zabbix_export:
           name: Goroutines
           type: DEPENDENT
           key: kubernetes.controller.go_goroutines
+          delay: '0'
           value_type: FLOAT
           description: 'Number of goroutines that currently exist.'
           preprocessing:
@@ -179,6 +196,7 @@ zabbix_export:
           name: 'Go threads'
           type: DEPENDENT
           key: kubernetes.controller.go_threads
+          delay: '0'
           value_type: FLOAT
           description: 'Number of OS threads created.'
           preprocessing:
@@ -197,6 +215,7 @@ zabbix_export:
           name: 'Leader election status'
           type: DEPENDENT
           key: kubernetes.controller.leader_election_master_status
+          delay: '0'
           value_type: FLOAT
           description: 'Gauge of if the reporting system is master of the relevant lease, 0 indicates backup, 1 indicates master.'
           valuemap:
@@ -217,6 +236,7 @@ zabbix_export:
           name: 'Fds max'
           type: DEPENDENT
           key: kubernetes.controller.max_fds
+          delay: '0'
           value_type: FLOAT
           description: 'Maximum allowed open file descriptors.'
           preprocessing:
@@ -235,6 +255,7 @@ zabbix_export:
           name: 'Fds open'
           type: DEPENDENT
           key: kubernetes.controller.open_fds
+          delay: '0'
           value_type: FLOAT
           description: 'Number of open file descriptors.'
           preprocessing:
@@ -253,6 +274,7 @@ zabbix_export:
           name: 'Resident memory, bytes'
           type: DEPENDENT
           key: kubernetes.controller.process_resident_memory_bytes
+          delay: '0'
           value_type: FLOAT
           units: B
           description: 'Resident memory size in bytes.'
@@ -272,6 +294,7 @@ zabbix_export:
           name: 'Virtual memory, bytes'
           type: DEPENDENT
           key: kubernetes.controller.process_virtual_memory_bytes
+          delay: '0'
           value_type: FLOAT
           units: B
           description: 'Virtual memory size in bytes.'
@@ -292,11 +315,13 @@ zabbix_export:
           name: 'Workqueue metrics discovery'
           type: DEPENDENT
           key: kubernetes.controller.workqueue.discovery
+          delay: '0'
           item_prototypes:
             - uuid: 70277a128a254462ad0bf7a023738ba0
               name: '["{#NAME}"]: Workqueue duration seconds bucket, {#LE}'
               type: DEPENDENT
               key: 'kubernetes.controller.duration_seconds_bucket[{#LE},"{#NAME}"]'
+              delay: '0'
               history: 1h
               value_type: FLOAT
               trends: '0'
@@ -320,6 +345,7 @@ zabbix_export:
               name: '["{#NAME}"]: Queue duration seconds bucket, {#LE}'
               type: DEPENDENT
               key: 'kubernetes.controller.queue_duration_seconds_bucket[{#LE},"{#NAME}"]'
+              delay: '0'
               history: 1h
               value_type: FLOAT
               trends: '0'
@@ -343,6 +369,7 @@ zabbix_export:
               name: '["{#NAME}"]: Workqueue adds total, rate'
               type: DEPENDENT
               key: 'kubernetes.controller.workqueue_adds_total["{#NAME}"]'
+              delay: '0'
               value_type: FLOAT
               discover: NO_DISCOVER
               description: 'Total number of adds handled by workqueue per second.'
@@ -354,6 +381,8 @@ zabbix_export:
                     - ''
                   error_handler: DISCARD_VALUE
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               master_item:
                 key: kubernetes.controller.get_metrics
               tags:
@@ -365,6 +394,7 @@ zabbix_export:
               name: '["{#NAME}"]: Workqueue depth'
               type: DEPENDENT
               key: 'kubernetes.controller.workqueue_depth["{#NAME}"]'
+              delay: '0'
               value_type: FLOAT
               discover: NO_DISCOVER
               description: 'Current depth of workqueue.'
@@ -386,6 +416,7 @@ zabbix_export:
               name: '["{#NAME}"]: Workqueue longest running processor, sec'
               type: DEPENDENT
               key: 'kubernetes.controller.workqueue_longest_running_processor_seconds["{#NAME}"]'
+              delay: '0'
               value_type: FLOAT
               discover: NO_DISCOVER
               units: s
@@ -468,6 +499,7 @@ zabbix_export:
               name: '["{#NAME}"]: Workqueue retries, rate'
               type: DEPENDENT
               key: 'kubernetes.controller.workqueue_retries_total["{#NAME}"]'
+              delay: '0'
               value_type: FLOAT
               discover: NO_DISCOVER
               description: 'Total number of retries handled by workqueue per second.'
@@ -479,6 +511,8 @@ zabbix_export:
                     - ''
                   error_handler: DISCARD_VALUE
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               master_item:
                 key: kubernetes.controller.get_metrics
               tags:
@@ -490,6 +524,7 @@ zabbix_export:
               name: '["{#NAME}"]: Workqueue unfinished work, sec'
               type: DEPENDENT
               key: 'kubernetes.controller.workqueue_unfinished_work_seconds["{#NAME}"]'
+              delay: '0'
               value_type: FLOAT
               discover: NO_DISCOVER
               units: s
@@ -666,6 +701,7 @@ zabbix_export:
                 conditions:
                   - macro: '{#TYPE}'
                     value: buckets
+                    formulaid: A
               operations:
                 - operationobject: ITEM_PROTOTYPE
                   operator: LIKE
@@ -677,6 +713,7 @@ zabbix_export:
                 conditions:
                   - macro: '{#TYPE}'
                     value: totals
+                    formulaid: A
               operations:
                 - operationobject: ITEM_PROTOTYPE
                   operator: NOT_LIKE

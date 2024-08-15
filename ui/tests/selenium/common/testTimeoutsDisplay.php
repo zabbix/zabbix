@@ -236,7 +236,7 @@ class testTimeoutsDisplay extends CWebTest {
 			// Discovery rule doesn't have overlay.
 			if ($button_name === 'Create discovery rule') {
 				$this->page->waitUntilReady();
-				$selector = 'id:timeout';
+				$selector = 'id:inherited_timeout';
 			}
 			else {
 				COverlayDialogElement::find()->waitUntilReady()->one();
@@ -284,7 +284,7 @@ class testTimeoutsDisplay extends CWebTest {
 			// Discovery rule doesn't have overlay.
 			if ($table_selector === 'name:discovery') {
 				$this->page->waitUntilReady();
-				$selector = 'id:timeout';
+				$selector = 'id:inherited_timeout';
 			}
 			else {
 				COverlayDialogElement::find()->waitUntilReady()->one();
