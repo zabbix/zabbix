@@ -98,17 +98,17 @@ class testProxyConfSync extends CIntegrationTest
 			]
 		],
 		[
-			'items' =>
+			'item_discovery' =>
 			[
-				'insert' => '78',
+				'insert' => '0',
 				'update' => '0',
 				'delete' => '0'
 			]
 		],
 		[
-			'item_discovery' =>
+			'items' =>
 			[
-				'insert' => '0',
+				'insert' => '78',
 				'update' => '0',
 				'delete' => '0'
 			]
