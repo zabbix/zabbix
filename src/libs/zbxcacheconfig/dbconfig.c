@@ -10397,8 +10397,12 @@ void	zbx_dc_config_get_active_items_by_hostid(zbx_dc_item_t *items, zbx_uint64_t
  *          updating preprocessing revision if any changes were detected      *
  *                                                                            *
  ******************************************************************************/
-static void	dc_preproc_sync_preprocitem(zbx_pp_item_preproc_t *preproc, const ZBX_DC_PREPROCITEM *preprocitem)
+static void	dc_preproc_sync_preprocitem(zbx_pp_item_preproc_t *preproc, const ZBX_DC_PREPROCITEM *preprocitem,
+		zbx_pp_item_preproc_t *preproc_old, int *changed)
 {
+	if (NULL != preproc_old && preprocitem->preproc_ops.values_num != preproc_old->steps_num)
+		*changed = 1;
+
 	preproc->steps = (zbx_pp_step_t *)zbx_malloc(NULL, sizeof(zbx_pp_step_t) *
 			(size_t)preprocitem->preproc_ops.values_num);
 
@@ -10411,6 +10415,17 @@ static void	dc_preproc_sync_preprocitem(zbx_pp_item_preproc_t *preproc, const ZB
 
 		preproc->steps[i].params =  zbx_strdup(NULL, op->params);
 		preproc->steps[i].error_handler_params = zbx_strdup(NULL, op->error_handler_params);
+
+		if (NULL != preproc_old && *changed == 0)
+		{
+			if ((op->type != preproc_old->steps[i].type) ||
+				(op->error_handler != preproc_old->steps[i].error_handler) ||
+				(0 != strcmp(op->params, preproc_old->steps[i].params)) ||
+				(0 != strcmp(op->error_handler_params, preproc_old->steps[i].error_handler_params)))
+			{
+				*changed = 1;
+			}
+		}
 	}
 
 	preproc->steps_num = preprocitem->preproc_ops.values_num;
@@ -10437,7 +10452,9 @@ static void	dc_preproc_sync_masteritem(zbx_pp_item_preproc_t *preproc, const ZBX
 
 static void	dc_preproc_sync_item(zbx_hashset_t *items, ZBX_DC_ITEM *dc_item, zbx_uint64_t revision)
 {
-	zbx_pp_item_t	*pp_item;
+	zbx_pp_item_t		*pp_item;
+	zbx_pp_item_preproc_t	*pp_old = NULL;
+	int			steps_changed = 0;
 
 	if (NULL == (pp_item = (zbx_pp_item_t *)zbx_hashset_search(items, &dc_item->itemid)))
 	{
@@ -10446,7 +10463,7 @@ static void	dc_preproc_sync_item(zbx_hashset_t *items, ZBX_DC_ITEM *dc_item, zbx
 		pp_item = (zbx_pp_item_t *)zbx_hashset_insert(items, &pp_item_local, sizeof(pp_item_local));
 	}
 	else
-		zbx_pp_item_preproc_release(pp_item->preproc);
+		pp_old = pp_item->preproc;
 
 	pp_item->preproc = zbx_pp_item_preproc_create(dc_item->hostid, dc_item->type, dc_item->value_type, dc_item->flags);
 	pp_item->revision = revision;
@@ -10455,7 +10472,7 @@ static void	dc_preproc_sync_item(zbx_hashset_t *items, ZBX_DC_ITEM *dc_item, zbx
 		dc_preproc_sync_masteritem(pp_item->preproc, dc_item->master_item);
 
 	if (NULL != dc_item->preproc_item)
-		dc_preproc_sync_preprocitem(pp_item->preproc, dc_item->preproc_item);
+		dc_preproc_sync_preprocitem(pp_item->preproc, dc_item->preproc_item, pp_old, &steps_changed);
 
 	for (int i = 0; i < pp_item->preproc->steps_num; i++)
 	{
@@ -10464,6 +10481,17 @@ static void	dc_preproc_sync_item(zbx_hashset_t *items, ZBX_DC_ITEM *dc_item, zbx
 			pp_item->preproc->history_num++;
 			pp_item->preproc->mode = ZBX_PP_PROCESS_SERIAL;
 		}
+	}
+
+	if (NULL != pp_old)
+	{
+		if (0 == steps_changed)
+		{
+			pp_item->preproc->history = pp_old->history;
+			zbx_pp_item_preproc_release(pp_old, 0);
+		}
+		else
+			zbx_pp_item_preproc_release(pp_old, 1);
 	}
 }
 

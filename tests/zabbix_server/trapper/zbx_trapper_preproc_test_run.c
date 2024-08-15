@@ -117,7 +117,7 @@ int	__wrap_zbx_preprocessor_test(unsigned char value_type, const char *value, co
 
 	preproc->steps_num = 0;
 	zbx_free(preproc->steps);
-	zbx_pp_item_preproc_release(preproc);
+	zbx_pp_item_preproc_release(preproc, 1);
 
 	zbx_free(results_out);
 	pp_context_destroy(&ctx);
