@@ -32,7 +32,7 @@ $url = (new CUrl('host_discovery.php'))
 
 $form = (new CForm('post', $url))
 	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
-	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('host_discovery.php')))->removeId())
+	->addItem((new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('host_discovery.php')))->removeId())
 	->setId('host-discovery-form')
 	->setName('itemForm')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
@@ -714,9 +714,8 @@ $item_tab->addItem([
 			->setReadonly($data['limited'])
 			->setModern(),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CTextBox('timeout', $data['timeout'],
-			$data['limited'] || $data['custom_timeout'] == ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED)
-		)
+		(new CTextBox('inherited_timeout', $data['inherited_timeout'], true))->setWidth(ZBX_TEXTAREA_TINY_WIDTH),
+		(new CTextBox('timeout', $data['timeout'], $data['limited']))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 			->setAriaRequired(),
 		$edit_source_timeouts_link
@@ -1034,7 +1033,7 @@ if (!empty($data['itemid'])) {
 
 	$buttons[] = (new CSimpleButton(_('Test')))->setId('test_item');
 	$buttons[] = (new CButtonDelete(_('Delete discovery rule?'), url_params(['form', 'itemid', 'hostid', 'context']).
-		'&'.CCsrfTokenHelper::CSRF_TOKEN_NAME.'='.CCsrfTokenHelper::get('host_discovery.php'),
+		'&'.CSRF_TOKEN_NAME.'='.CCsrfTokenHelper::get('host_discovery.php'),
 		'context'
 	))->setEnabled(!$data['limited']);
 	$buttons[] = new CButtonCancel(url_param('context'));
@@ -1081,7 +1080,7 @@ $html_page->show();
 		'form_name' => $form->getName(),
 		'counter' => $data['counter'],
 		'context' => $data['context'],
-		'token' => [CCsrfTokenHelper::CSRF_TOKEN_NAME => CCsrfTokenHelper::get('item')],
+		'token' => [CSRF_TOKEN_NAME => CCsrfTokenHelper::get('item')],
 		'readonly' => $data['limited'],
 		'query_fields' => $data['query_fields'],
 		'headers' => $data['headers']

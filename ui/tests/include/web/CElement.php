@@ -778,6 +778,8 @@ class CElement extends CBaseElement implements IWaitable {
 	 */
 	public function scrollIntoView() {
 		CElementQuery::getDriver()->executeScript('arguments[0].scrollIntoView({behavior:\'instant\',block:\'end\',inline:\'nearest\'});', [$this]);
+
+		return $this;
 	}
 
 	/**

@@ -247,6 +247,7 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 		& > li {
 			margin-right: 5px;
 			line-height: 24px;
+			white-space: nowrap;
 
 			> ul {
 				display: flex;
@@ -262,6 +263,12 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 						content: "/";
 					}
 				}
+			}
+		}
+
+		.wide {
+			li > span {
+				max-width: 500px;
 			}
 		}
 
@@ -545,6 +552,13 @@ form {
 .wordbreak {
 	white-space: pre-wrap;
 	word-break: break-word;
+}
+
+.line-clamp {
+	display: -webkit-box;
+	overflow: hidden;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: var(--line-clamp);
 }
 
 // Filters.
@@ -2128,7 +2142,7 @@ select {
 	min-height: 24px;
 	overflow: hidden;
 	resize: none;
-	word-break: break-all;
+	word-break: break-word;
 	height: 24px;
 	line-height: 14px;
 	white-space: break-spaces;

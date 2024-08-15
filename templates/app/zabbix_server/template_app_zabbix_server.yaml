@@ -1838,8 +1838,7 @@ zabbix_export:
                   - macro: '{#PROXY.GROUP}'
                     operator: EXISTS
               operations:
-                - operationobject: ITEM_PROTOTYPE
-                  operator: REGEXP
+                - operator: REGEXP
                   tags:
                     - tag: proxy-group
                       value: '{#PROXY.GROUP}'
@@ -2206,7 +2205,7 @@ zabbix_export:
                       value: '1'
                     - type: STRING
                       name: reference
-                      value: AAACE
+                      value: AAACF
                     - type: INTEGER
                       name: show_problems
                       value: '1'
@@ -2856,7 +2855,7 @@ zabbix_export:
                       value: '1'
                     - type: STRING
                       name: reference
-                      value: AAABG
+                      value: AAABI
                     - type: INTEGER
                       name: show_problems
                       value: '1'

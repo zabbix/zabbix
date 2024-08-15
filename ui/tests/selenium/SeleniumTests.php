@@ -159,7 +159,8 @@ require_once dirname(__FILE__).'/latestData/testPageItemHistory.php';
 require_once dirname(__FILE__).'/latestData/testPageMonitoringLatestData.php';
 
 // LLD.
-require_once dirname(__FILE__).'/lld/testFormLowLevelDiscovery.php';
+require_once dirname(__FILE__).'/lld/testFormLowLevelDiscoveryFromHost.php';
+require_once dirname(__FILE__).'/lld/testFormLowLevelDiscoveryFromTemplate.php';
 require_once dirname(__FILE__).'/lld/testFormLowLevelDiscoveryOverrides.php';
 require_once dirname(__FILE__).'/lld/testFormTestLowLevelDiscovery.php';
 require_once dirname(__FILE__).'/lld/testInheritanceDiscoveryRule.php';
@@ -193,6 +194,7 @@ require_once dirname(__FILE__).'/multiselects/testMultiselects.php';
 require_once dirname(__FILE__).'/multiselects/testMultiselectsErrorsHostsTemplates.php';
 require_once dirname(__FILE__).'/multiselects/testMultiselectsLatestData.php';
 require_once dirname(__FILE__).'/multiselects/testMultiselectsProblems.php';
+require_once dirname(__FILE__).'/multiselects/testMultiselectsWithoutData.php';
 
 // Network discovery.
 require_once dirname(__FILE__).'/networkDiscovery/testFormNetworkDiscovery.php';
@@ -337,6 +339,7 @@ require_once dirname(__FILE__).'/testPageBrowserWarning.php';
 require_once dirname(__FILE__).'/testPageInventory.php';
 require_once dirname(__FILE__).'/testPageSearch.php';
 require_once dirname(__FILE__).'/testPageStatusOfZabbix.php';
+require_once dirname(__FILE__).'/testPagesWithoutData.php';
 require_once dirname(__FILE__).'/testSidebarMenu.php';
 require_once dirname(__FILE__).'/testTimezone.php';
 require_once dirname(__FILE__).'/testUrlParameters.php';
@@ -493,7 +496,8 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageMonitoringLatestData');
 
 		// LLD.
-		$suite->addTestSuite('testFormLowLevelDiscovery');
+		$suite->addTestSuite('testFormLowLevelDiscoveryFromHost');
+		$suite->addTestSuite('testFormLowLevelDiscoveryFromTemplate');
 		$suite->addTestSuite('testFormLowLevelDiscoveryOverrides');
 		$suite->addTestSuite('testFormTestLowLevelDiscovery');
 		$suite->addTestSuite('testInheritanceDiscoveryRule');
@@ -527,6 +531,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testMultiselectsErrorsHostsTemplates');
 		$suite->addTestSuite('testMultiselectsLatestData');
 		$suite->addTestSuite('testMultiselectsProblems');
+		$suite->addTestSuite('testMultiselectsWithoutData');
 
 		// Network discovery.
 		$suite->addTestSuite('testFormNetworkDiscovery');
@@ -671,6 +676,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageInventory');
 		$suite->addTestSuite('testPageSearch');
 		$suite->addTestSuite('testPageStatusOfZabbix');
+		$suite->addTestSuite('testPagesWithoutData');
 		$suite->addTestSuite('testSidebarMenu');
 		$suite->addTestSuite('testTimezone');
 		$suite->addTestSuite('testUrlParameters');

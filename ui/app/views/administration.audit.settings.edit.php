@@ -25,7 +25,7 @@ $html_page = (new CHtmlPage())
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_AUDITLOG_EDIT));
 
 $form = (new CForm())
-	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('audit')))->removeId())
+	->addItem((new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('audit')))->removeId())
 	->setId('audit-settings')
 	->setAction(
 		(new CUrl('zabbix.php'))

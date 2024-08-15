@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-06-09 15:05+0000\n"
+"PO-Revision-Date: 2024-07-27 07:34+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -956,7 +956,7 @@ msgstr "Afegeix un giny nou"
 
 #: widgets/navtree/Widget.php:34
 msgid "Add child element"
-msgstr ""
+msgstr "Afegir un element fill"
 
 #: widgets/navtree/Widget.php:39
 msgid "Add child elements"
@@ -995,7 +995,7 @@ msgstr "Afegir trigger d'equip"
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:260
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:263
 msgid "Add item"
-msgstr ""
+msgstr "Afegir un element"
 
 #: app/partials/massupdate.macros.tab.php:96
 #: app/partials/massupdate.valuemaps.tab.php:38
@@ -1655,6 +1655,10 @@ msgstr "Cal triar, com a mínim, un dia de la setmana o un dia del mes."
 msgid "At least one host group or host must be selected."
 msgstr "S'ha de triar, com a mínim, almenys un grup d'equips o un equip."
 
+#: include/classes/setup/CFrontendSetup.php:252
+msgid "At least one of MySQL or PostgreSQL should be supported."
+msgstr "Com a mínim hauria d'admetre MySQL o PostgreSQL."
+
 #: include/classes/setup/CFrontendSetup.php:241
 msgid "At least one of MySQL, PostgreSQL or Oracle should be supported."
 msgstr "Com a mínim MySQL, PostgreSQL o Oracle haurien d'ésser suportats."
@@ -1874,6 +1878,11 @@ msgstr "Disponibilitat"
 msgid "Availability report"
 msgstr "Informe de disponibilitat"
 
+#: app/controllers/CControllerAvailabilityReportTrigger.php:70
+#: app/views/reports.availabilityreport.trigger.php:23
+msgid "Availability report graph"
+msgstr "Gràfic de l'informe de disponibilitat"
+
 #: include/classes/html/CHostAvailability.php:80
 #: widgets/hostavail/views/widget.view.php:32
 msgid "Available"
@@ -1903,7 +1912,7 @@ msgstr "Eviteu paraules de pas fàcils d'endevinar"
 
 #: jsLoader.php:172
 msgid "Awaiting data"
-msgstr ""
+msgstr "Esperant dades"
 
 #: widgets/svggraph/views/widget.edit.php:51
 msgid "Axes"
@@ -5430,7 +5439,7 @@ msgstr "Crea'n un de nou"
 
 #: jsLoader.php:372
 msgid "Create new report"
-msgstr ""
+msgstr "Crea un informe nou"
 
 #: app/views/administration.proxy.list.php:239
 msgid "Create proxy"
@@ -9558,7 +9567,7 @@ msgstr "Elements del grup d'equips"
 
 #: jsLoader.php:292
 msgid "Host group is not selected."
-msgstr ""
+msgstr "El grup d'equips no s'ha pas seleccionat."
 
 #: include/views/monitoring.sysmap.edit.php:168
 msgid "Host group label type"
@@ -9641,7 +9650,7 @@ msgstr "Visió general de l'inventari d'equips"
 
 #: jsLoader.php:289
 msgid "Host is not selected."
-msgstr ""
+msgstr "L'equip no s'ha pas seleccionat."
 
 #: include/views/monitoring.sysmap.edit.php:183
 msgid "Host label type"
@@ -12528,6 +12537,10 @@ msgstr "Llista de proxys Zabbix amb nom, mode, xifrat, compressió, versió, dar
 msgid "List of Zabbix proxies with name, mode, encryption, compression, version, last seen, host count, item count, required values per second (vps), compatibility (current/outdated/unsupported), timeouts, proxy group name, state (unknown/offline/online). Returns JSON."
 msgstr "Llista de proxys Zabbix amb nom, mode, xifrat, compressió, versió, darrera connexió, nombre d'equips, recompte d'elements, valors consultats per segon (vps) i compatibilitat (actual / no actualitzat / no suportat), temps d'espera, nom del grup de proxys, estat (desconegut / desconnectat / en línia). Retorna un JSON."
 
+#: include/classes/data/CItemData.php:2935
+msgid "List of Zabbix proxy groups configuration data and real-time data. Configuration data includes proxy group name, failover delay, and minimum number of online proxies required for the group to be online. Real-time data includes number of online proxies, percentage of online proxies, and state of proxy group (unknown, offline, recovering, online, degrading). This item does not return groupless proxies. Returns JSON."
+msgstr ""
+
 #: include/classes/data/CItemData.php:1559
 msgid "List of block devices and their type. Returns JSON"
 msgstr "Llista de dispositius de bloc i el seu tipus. Retorna un JSON"
@@ -12963,7 +12976,7 @@ msgstr "Tipus d'etiqueta d'element del mapa"
 
 #: jsLoader.php:290
 msgid "Map is not selected."
-msgstr ""
+msgstr "El mapa no s'ha pas triat."
 
 #: sysmap.php:128
 msgid "Map is updated! Return to map list?"
@@ -15215,6 +15228,19 @@ msgstr "En línia"
 #: app/views/administration.proxygroup.list.php:80
 msgid "Online proxies"
 msgstr "Proxys en línia"
+
+#: include/classes/api/services/CUser.php:874
+#: include/classes/api/services/CUser.php:882
+#: include/classes/api/services/CUser.php:889
+#, c-format
+msgid "Only Super admin or Admin users can update \"%1$s\" parameter."
+msgstr "Només els usuaris Super admin o Admins poden actualitzar el paràmetre \"%1$s\"."
+
+#: include/classes/api/services/CUser.php:812
+#: include/classes/api/services/CUser.php:853
+#, c-format
+msgid "Only Super admin users can update \"%1$s\" parameter."
+msgstr "Només els usuaris Super admin poden actualitzar el paràmetre \"%1$s\"."
 
 #: include/classes/api/services/CDRule.php:509
 msgid "Only Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 checks can be made unique."
@@ -20885,7 +20911,7 @@ msgstr "El trigger de la plantilla \"%1$s\" té una dependència amb el trigger 
 
 #: jsLoader.php:291
 msgid "Trigger is not selected."
-msgstr ""
+msgstr "No s'ha triat pas el trigger."
 
 #: include/views/monitoring.sysmap.edit.php:198
 msgid "Trigger label type"
@@ -22941,7 +22967,7 @@ msgstr "Veure com a"
 
 #: jsLoader.php:417
 msgid "View related reports"
-msgstr ""
+msgstr "Veure informes relacionats"
 
 #: include/classes/data/CItemData.php:1735
 msgid "Virtual space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
@@ -23154,7 +23180,7 @@ msgstr "El giny és massa petit per al nombre especificat de columnes i files."
 
 #: jsLoader.php:205
 msgid "Widgets"
-msgstr ""
+msgstr "Ginys"
 
 #: graphs.php:39 include/views/configuration.graph.edit.php:100
 #: include/views/configuration.graph.list.php:170
@@ -23530,7 +23556,7 @@ msgstr "Heu d'iniciar sessió per veure aquesta pàgina."
 
 #: jsLoader.php:287
 msgid "You need to have at least one image uploaded to create map element. Images can be uploaded in Administration->General->Images section."
-msgstr ""
+msgstr "Heu de tindre almenys una imatge penjada per crear un element del mapa. Les imatges es poden penjar a la secció Administració->General->Imatges."
 
 #: include/classes/db/DB.php:133
 msgid "Your database is not working properly. Please wait a few minutes and try to repeat this action. If the problem still persists, please contact system administrator. The problem might be caused by long running transaction or row level lock accomplished by your database management system."
@@ -25542,7 +25568,7 @@ msgstr "right() - Retorna els caràcters de recompte més a la dreta"
 
 #: widgets/navtree/Widget.php:41
 msgid "root"
-msgstr ""
+msgstr "arrel"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:966
 msgid "round() - Rounds a value to decimal places"
