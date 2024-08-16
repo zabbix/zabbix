@@ -144,11 +144,16 @@ foreach ($data['alerts'] as $alert) {
 			: (new CSpan(_('Executed')))->addClass(ZBX_STYLE_GREEN);
 	}
 	elseif ($alert['status'] == ALERT_STATUS_NOT_SENT || $alert['status'] == ALERT_STATUS_NEW) {
-		$status = (new CSpan([
-			_('In progress').':',
-			BR(),
-			_n('%1$s retry left', '%1$s retries left', $mediatype['maxattempts'] - $alert['retries'])
-		]))->addClass(ZBX_STYLE_YELLOW);
+		if ($alert['alerttype'] == ALERT_TYPE_MESSAGE) {
+			$status = (new CSpan([
+				_('In progress').':',
+				BR(),
+				_n('%1$s retry left', '%1$s retries left', $mediatype['maxattempts'] - $alert['retries'])
+			]))->addClass(ZBX_STYLE_YELLOW);
+		}
+		else {
+			$status = (new CSpan(_('In progress')))->addClass(ZBX_STYLE_YELLOW);
+		}
 	}
 	else {
 		$status = (new CSpan(_('Failed')))->addClass(ZBX_STYLE_RED);
