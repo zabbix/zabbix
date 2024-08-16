@@ -28,6 +28,8 @@ Link this template to the local Zabbix server host.
 |----|-----------|-------|
 |{$PROXY.LAST_SEEN.MAX}|<p>The maximum number of seconds that Zabbix proxy has not been seen.</p>|`600`|
 |{$PROXY.GROUP.AVAIL.PERCENT.MIN}|<p>Minimum threshold for proxy group availability percentage trigger.</p>|`75`|
+|{$PROXY.GROUP.DISCOVERY.NAME.MATCHES}|<p>Filter to include discovered proxy groups by their name.</p>|`.*`|
+|{$PROXY.GROUP.DISCOVERY.NAME.NOT_MATCHES}|<p>Filter to exclude discovered proxy groups by their name.</p>|`CHANGE_IF_NEEDED`|
 |{$ZABBIX.SERVER.UTIL.MAX}|<p>Default maximum threshold for percentage utilization triggers (use macro context for specification).</p>|`75`|
 |{$ZABBIX.SERVER.UTIL.MIN}|<p>Default minimum threshold for percentage utilization triggers (use macro context for specification).</p>|`65`|
 |{$ZABBIX.SERVER.UTIL.MAX:"value cache"}|<p>Maximum threshold for value cache utilization trigger.</p>|`95`|

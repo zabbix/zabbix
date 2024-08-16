@@ -1856,6 +1856,14 @@ zabbix_export:
           name: 'Zabbix proxy groups discovery'
           type: DEPENDENT
           key: zabbix.proxy.groups.discovery
+          filter:
+            evaltype: AND
+            conditions:
+              - macro: '{#PROXY.GROUP.NAME}'
+                value: '{$PROXY.GROUP.DISCOVERY.NAME.MATCHES}'
+              - macro: '{#PROXY.GROUP.NAME}'
+                value: '{$PROXY.GROUP.DISCOVERY.NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
           description: 'LLD rule with item and trigger prototypes for the proxy groups discovery.'
           item_prototypes:
             - uuid: f48cf3314ff6460596468e7e6b8525de
@@ -2100,6 +2108,12 @@ zabbix_export:
         - macro: '{$PROXY.GROUP.AVAIL.PERCENT.MIN}'
           value: '75'
           description: 'Minimum threshold for proxy group availability percentage trigger.'
+        - macro: '{$PROXY.GROUP.DISCOVERY.NAME.MATCHES}'
+          value: '.*'
+          description: 'Filter to include discovered proxy groups by their name.'
+        - macro: '{$PROXY.GROUP.DISCOVERY.NAME.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Filter to exclude discovered proxy groups by their name.'
         - macro: '{$PROXY.LAST_SEEN.MAX}'
           value: '600'
           description: 'The maximum number of seconds that Zabbix proxy has not been seen.'
