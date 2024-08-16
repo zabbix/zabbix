@@ -210,6 +210,7 @@ A......... [ZBX-24299] fixed possibility to alter readonly error fields with Hos
 ........S. [ZBX-23690] optimized maintenance calculations for large number of hosts x maintenances (wiper)
 A......... [ZBX-25017] fixed sensitive data exposure from audit log (gcalenko)
 .......PS. [ZBX-25018] removed direct pointer access in custom javascript objects (wiper)
+........S. [ZBX-25019] introduced limits to WebDriver performance data collection (dgoloscapov)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.0
@@ -232,6 +233,7 @@ Bug fixes:
 ....I..... [ZBX-25011] fixed access for non-admin user to options of installed MSI (MVekslers)
 ........S. [ZBX-25012] implemented phone number validation check to avoid AT commands injection (sboidenko)
 ........S. [ZBX-25013] fixed exploit to read files using SMS (sboidenko)
+........S. [ZBX-25016] fixed IP and DNS address validation when user macro is used for interface (vso, wiper)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.0rc2
@@ -320,6 +322,7 @@ A......... [ZBX-24258] fixed issue causing error when removing the old MFA metho
 .......PS. [ZBX-24354] fixed item status flapping (vso)
 ........S. [ZBX-24363] fixed proxyid being ignored in item test (kprutkovs)
 ....I..... [ZBX-24087] fixed Timeout option description for Zabbix agent 2 (dgoloscapov)
+........S. [ZBX-25016] fixed IP and DNS address validation when user macro is used for interface (vso, wiper)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.0beta3
@@ -1081,6 +1084,7 @@ A......... [ZBX-24481] fixed inability to unset value map from existing item or 
 ........S. [ZBX-25013] fixed exploit to read files using SMS (sboidenko)
 A......... [ZBX-25017] fixed sensitive data exposure from audit log (gcalenko)
 .......PS. [ZBX-25018] removed direct pointer access in custom javascript objects (wiper)
+........S. [ZBX-25016] fixed IP and DNS address validation when user macro is used for interface (vso, wiper)
 
 --------------------------------------------------------------------------------
 Changes for 6.4.15
