@@ -48,7 +48,7 @@ const (
 	shutdownInactive = -1
 	// max allowed capacity if not overwritten in plugin.
 	defaultMaxCapacity = 1000
-	// default plugin capacity used when no capacity is provided in system settings or hardcoded by the plugin
+	// default plugin capacity used when no capacity is provided in system settings or hardcoded by the plugin.
 	defaultCapacity = 100
 )
 

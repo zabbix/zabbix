@@ -333,7 +333,10 @@ func main() {
 		}
 		// create default configuration for testing options
 		if !argConfig {
-			_ = conf.UnmarshalStrict([]byte{}, &agent.Options)
+			err = conf.UnmarshalStrict([]byte{}, &agent.Options)
+			if err != nil {
+				fatalExit("failed to create test configuration", err)
+			}
 		}
 	}
 
@@ -398,10 +401,12 @@ func main() {
 
 		if _, err = agent.InitUserParameterPlugin(agent.Options.UserParameter, agent.Options.UnsafeUserParameters,
 			agent.Options.UserParameterDir); err != nil {
+
 			fatalExit("cannot initialize user parameters", err)
 		}
 
 		var m *scheduler.Manager
+
 		if m, err = scheduler.NewManager(&agent.Options, systemOpt); err != nil {
 			fatalExit("cannot create scheduling manager", err)
 		}
