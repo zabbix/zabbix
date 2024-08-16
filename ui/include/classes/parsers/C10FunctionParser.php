@@ -93,7 +93,7 @@ class C10FunctionParser extends CParser {
 		}
 
 		if ($pos < strlen($source) - 1  && $source[$pos + 1] === ')') {
-			$pos+=2;
+			$pos += 2;
 
 			return true;
 		}

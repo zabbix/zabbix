@@ -260,8 +260,8 @@ class CMacroFunction {
 	private static function expandParameters(string $parameter): string {
 		$expanded = '';
 		$length = strlen($parameter);
-		$i = 0;
 		$characters = str_split($parameter);
+		$i = 0;
 
 		while ($i < $length) {
 			// Handle escape sequences.
@@ -307,22 +307,17 @@ class CMacroFunction {
 						$expanded .= chr($ascii);
 					}
 
-					unset($characters[$i - 1], $characters[$i], $characters[$i + 1]);
-
 					$i += 2;
 				}
 				else {
 					$expanded .= $parameter[$i];
 
-					unset($characters[$i]);
 					$i ++;
 				}
 			}
 
 			if (array_key_exists($i, $characters)) {
 				$expanded .= $parameter[$i];
-
-				unset($characters[$i]);
 			}
 
 			$i++;
