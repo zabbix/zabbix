@@ -4006,7 +4006,9 @@ class testDashboardWidgetCommunication extends testWidgets {
 			$dashboard->pasteWidget();
 		}
 		else {
+			$replace_widget = $dashboard->getWidget($data['paste']['widget']);
 			$dashboard->replaceWidget($data['paste']['widget']);
+			$replace_widget->waitUntilNotPresent();
 		}
 
 		$dashboard->waitUntilReady();
