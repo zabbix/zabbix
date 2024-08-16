@@ -1,11 +1,11 @@
 [
     {
-        "value": "&amp;&quot;&lt;&gt;&#39;",
+        "value": "&amp;&quot;&lt;&gt;&#39;&#039;",
         "macrofunc": {
             "function": "htmldecode",
             "parameters": []
         },
-        "result": "&\"<>'"
+        "result": "&\"<>''"
     },
     {
         "value": "&gt;",

@@ -383,7 +383,6 @@ class CMacroFunction {
 	 */
 	private static function macrofuncHtmldecode(string $value, array $parameters): string {
 		return $parameters ? UNRESOLVED_MACRO_STRING : html_entity_decode($value, ENT_QUOTES, 'UTF-8');
-
 	}
 
 	/**
