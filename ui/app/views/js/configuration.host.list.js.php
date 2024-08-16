@@ -33,7 +33,9 @@
 
 			this.initFilter();
 
-			document.forms['hosts'].addEventListener('click', e => {
+			const form = document.forms['hosts'];
+
+			form.addEventListener('click', e => {
 				if (e.target.classList.contains('js-edit-template')) {
 					this.editTemplate({templateid: e.target.dataset.templateid});
 				}
@@ -49,32 +51,54 @@
 				else if (e.target.classList.contains('js-disable-host')) {
 					this.disable(e.target, {hostids: [e.target.dataset.hostid]});
 				}
-				else if (e.target.classList.contains('js-massenable-host')) {
-					const message = Object.keys(chkbxRange.getSelectedIds()).length > 1
-						? <?= json_encode(_('Enable selected hosts?')) ?>
-						: <?= json_encode(_('Enable selected host?')) ?>;
+			});
 
-					if (window.confirm(message)) {
-						this.enable(e.target, {hostids: Object.keys(chkbxRange.getSelectedIds())});
-					}
-				}
-				else if (e.target.classList.contains('js-massdisable-host')) {
-					const message = Object.keys(chkbxRange.getSelectedIds()).length > 1
-						? <?= json_encode(_('Disable selected hosts?')) ?>
-						: <?= json_encode(_('Disable selected host?')) ?>;
+			form.querySelector('.js-massenable-host').addEventListener('click', e => {
+				const hostids = Object.keys(chkbxRange.getSelectedIds());
 
-					if (window.confirm(message)) {
-						this.disable(e.target, {hostids: Object.keys(chkbxRange.getSelectedIds())});
-					}
+				const message = hostids.length > 1
+					? <?= json_encode(_('Enable selected hosts?')) ?>
+					: <?= json_encode(_('Enable selected host?')) ?>;
+
+				if (window.confirm(message)) {
+					this.enable(e.target, {hostids});
 				}
+			});
+
+			form.querySelector('.js-massdisable-host').addEventListener('click', e => {
+				const hostids = Object.keys(chkbxRange.getSelectedIds());
+
+				const message = hostids.length > 1
+					? <?= json_encode(_('Disable selected hosts?')) ?>
+					: <?= json_encode(_('Disable selected host?')) ?>;
+
+				if (window.confirm(message)) {
+					this.disable(e.target, {hostids});
+				}
+			});
+
+			form.querySelector('.js-massupdate-host').addEventListener('click', e => {
+				openMassupdatePopup('popup.massupdate.host', {
+					[CSRF_TOKEN_NAME]: this.csrf_token
+				}, {
+					dialogue_class: 'modal-popup-static',
+					trigger_element: e.target
+				})
+			});
+
+			form.querySelector('.js-massdelete-host').addEventListener('click', e => {
+				this.massDeleteHosts(e.target);
 			});
 		},
 
 		enable(target, parameters) {
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'host.enable');
+
 			target.classList.add('is-loading');
+
 			this.postAction(curl, parameters)
+				.then(response => this.reload(response))
 				.finally(() => {
 					target.classList.remove('is-loading');
 					target.blur();
@@ -84,8 +108,11 @@
 		disable(target, parameters) {
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'host.disable');
+
 			target.classList.add('is-loading');
+
 			this.postAction(curl, parameters)
+				.then(response => this.reload(response))
 				.finally(() => {
 					target.classList.remove('is-loading');
 					target.blur();
@@ -93,18 +120,15 @@
 		},
 
 		postAction(curl, data) {
-			const action = curl.getArgument('action');
-
 			return fetch(curl.getUrl(), {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({
 					...data,
-					_csrf_token: this.csrf_token
+					[CSRF_TOKEN_NAME]: this.csrf_token
 				})
 			})
-				.then((response) => response.json())
-				.then((response) => this.events.elementSuccess({detail: {action, ...response}}))
+				.then(response => response.json())
 				.catch(() => {
 					clearMessages();
 
@@ -121,7 +145,7 @@
 				prevent_navigation: true
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => this.reload(e.detail.success));
+			overlay.$dialogue[0].addEventListener('dialogue.submit', e => this.reload({success: e.detail.success}));
 		},
 
 		editProxy(proxyid) {
@@ -131,7 +155,7 @@
 				prevent_navigation: true
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => this.reload(e.detail.success));
+			overlay.$dialogue[0].addEventListener('dialogue.submit', e => this.reload({success: e.detail.success}));
 		},
 
 		editProxyGroup(proxy_groupid) {
@@ -141,14 +165,23 @@
 				prevent_navigation: true
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => this.reload(e.detail.success));
+			overlay.$dialogue[0].addEventListener('dialogue.submit', e => this.reload({success: e.detail.success}));
 		},
 
-		reload(success) {
-			postMessageOk(success.title);
+		reload(result) {
+			if ('error' in result) {
+				if ('title' in result.error) {
+					postMessageError(result.error.title);
+				}
 
-			if ('messages' in success) {
-				postMessageDetails('success', success.messages);
+				postMessageDetails('error', result.error.messages);
+			}
+			else if ('success' in result) {
+				postMessageOk(result.success.title);
+
+				if ('messages' in result.success) {
+					postMessageDetails('success', result.success.messages);
+				}
 			}
 
 			uncheckTableRows('hosts');
@@ -234,7 +267,7 @@
 
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'host.massdelete');
-			curl.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('host')) ?>);
+			curl.setArgument(CSRF_TOKEN_NAME, this.csrf_token);
 
 			fetch(curl.getUrl(), {
 				method: 'POST',
@@ -280,14 +313,7 @@
 			elementSuccess(e) {
 				const data = e.detail;
 
-				if ('error' in data) {
-					if ('title' in data.error) {
-						postMessageError(data.error.title);
-					}
-
-					postMessageDetails('error', data.error.messages);
-				}
-				else if ('success' in data) {
+				if ('success' in data) {
 					postMessageOk(data.success.title);
 
 					if ('messages' in data.success) {

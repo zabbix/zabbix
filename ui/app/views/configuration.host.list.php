@@ -563,11 +563,13 @@ $form->addItem([
 			'content' => (new CSimpleButton(_('Enable')))
 				->addClass(ZBX_STYLE_BTN_ALT)
 				->addClass('js-massenable-host')
+				->addClass('js-no-chkbxrange')
 		],
 		'host.disable' => [
 			'content' => (new CSimpleButton(_('Disable')))
 				->addClass(ZBX_STYLE_BTN_ALT)
 				->addClass('js-massdisable-host')
+				->addClass('js-no-chkbxrange')
 		],
 		'host.export' => [
 			'content' => new CButtonExport('export.hosts', $action_url
@@ -578,22 +580,14 @@ $form->addItem([
 		'popup.massupdate.host' => [
 			'content' => (new CSimpleButton(_('Mass update')))
 				->addClass(ZBX_STYLE_BTN_ALT)
+				->addClass('js-massupdate-host')
 				->addClass('js-no-chkbxrange')
-				->onClick(
-					"openMassupdatePopup('popup.massupdate.host', {".
-						CSRF_TOKEN_NAME.": '".$csrf_token.
-					"'}, {
-						dialogue_class: 'modal-popup-static',
-						trigger_element: this
-					});"
-				)
 		],
 		'host.massdelete' => [
 			'content' => (new CSimpleButton(_('Delete')))
-				->onClick('view.massDeleteHosts(this);')
 				->addClass(ZBX_STYLE_BTN_ALT)
+				->addClass('js-massdelete-host')
 				->addClass('js-no-chkbxrange')
-				->removeId()
 		]
 	], 'hosts')
 ]);
