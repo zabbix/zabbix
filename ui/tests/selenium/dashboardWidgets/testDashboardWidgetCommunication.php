@@ -4016,12 +4016,14 @@ class testDashboardWidgetCommunication extends testWidgets {
 		}
 		else {
 			if ($data['select']['widget'] === 'new') {
-				$broadcaster = $dashboard->query('class:new-widget')->waitUntilPresent()->one();
+				$broadcaster = $dashboard->query('class:new-widget')->waitUntilReady()->one();
 			}
 			else {
 				$broadcaster = $dashboard->getWidget($data['select']['widget']);
 			}
+
 			$this->getWidgetElement($data['select']['element'], $broadcaster)->click();
+			$dashboard->waitUntilReady();
 			$this->checkDataOnListener($data['expected']);
 		}
 
