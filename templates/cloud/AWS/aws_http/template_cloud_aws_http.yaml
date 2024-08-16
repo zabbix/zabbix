@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-04-05T14:43:52Z'
+  date: '2024-07-26T10:44:28Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -92,7 +92,7 @@ zabbix_export:
             					AWS.params[field] = params[field];
             				});
             		}
-            		['region_match', 'region_not_match'].forEach(function (field) {
+            		['describe_region', 'region_match', 'region_not_match'].forEach(function (field) {
             			if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
             				throw 'Required param is not set: "' + field + '".';
             			}
@@ -212,9 +212,8 @@ zabbix_export:
             			'Version': '2016-11-15'
             		};
             
-            		result = AWS.request('POST', 'us-east-1', 'ec2', 'ec2.amazonaws.com', AWS.prepareParams(payload), '', '');
+            		regions = AWS.getField(AWS.request('POST', AWS.params.describe_region, 'ec2', 'ec2.' + AWS.params.describe_region + '.amazonaws.com', AWS.prepareParams(payload), '', ''), 'DescribeRegionsResponse.regionInfo.item');
             
-            		regions = AWS.getField(result, 'DescribeRegionsResponse.regionInfo.item')
             		if (!Array.isArray(regions))
             			regions = [regions]
             		return regions
@@ -333,6 +332,8 @@ zabbix_export:
               value: '{$AWS.ACCESS.KEY.ID}'
             - name: auth_type
               value: '{$AWS.AUTH_TYPE}'
+            - name: describe_region
+              value: '{$AWS.DESCRIBE.REGION}'
             - name: proxy
               value: '{$AWS.PROXY}'
             - name: region_match
@@ -403,7 +404,7 @@ zabbix_export:
             					AWS.params[field] = params[field];
             				});
             		}
-            		['region_match', 'region_not_match'].forEach(function (field) {
+            		['describe_region', 'region_match', 'region_not_match'].forEach(function (field) {
             			if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
             				throw 'Required param is not set: "' + field + '".';
             			}
@@ -515,9 +516,8 @@ zabbix_export:
             			'Version': '2016-11-15'
             		};
             
-            		result = AWS.request('POST', 'us-east-1', 'ec2', 'ec2.amazonaws.com', AWS.prepareParams(payload), '', '');
+            		regions = AWS.getField(AWS.request('POST', AWS.params.describe_region, 'ec2', 'ec2.' + AWS.params.describe_region + '.amazonaws.com', AWS.prepareParams(payload), '', ''), 'DescribeRegionsResponse.regionInfo.item');
             
-            		regions = AWS.getField(result, 'DescribeRegionsResponse.regionInfo.item')
             		if (!Array.isArray(regions))
             			regions = [regions]
             		return regions
@@ -661,6 +661,8 @@ zabbix_export:
               value: '{$AWS.ACCESS.KEY.ID}'
             - name: auth_type
               value: '{$AWS.AUTH_TYPE}'
+            - name: describe_region
+              value: '{$AWS.DESCRIBE.REGION}'
             - name: proxy
               value: '{$AWS.PROXY}'
             - name: region_match
@@ -772,7 +774,7 @@ zabbix_export:
             					AWS.params[field] = params[field];
             				});
             		}
-            		['region_match', 'region_not_match'].forEach(function (field) {
+            		['describe_region', 'region_match', 'region_not_match'].forEach(function (field) {
             			if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
             				throw 'Required param is not set: "' + field + '".';
             			}
@@ -882,7 +884,7 @@ zabbix_export:
             			'Version': '2016-11-15'
             		};
             
-            		regions = AWS.getField(AWS.request('regions', 'POST', 'us-east-1', 'ec2', 'ec2.amazonaws.com', AWS.prepareParams(payload), '', ''), 'DescribeRegionsResponse.regionInfo.item');
+            		regions = AWS.getField(AWS.request('regions', 'POST', AWS.params.describe_region, 'ec2', 'ec2.' + AWS.params.describe_region + '.amazonaws.com', AWS.prepareParams(payload), '', ''), 'DescribeRegionsResponse.regionInfo.item');
             
             		if (!Array.isArray(regions))
             			regions = [regions]
@@ -993,6 +995,8 @@ zabbix_export:
               value: '{$AWS.ACCESS.KEY.ID}'
             - name: auth_type
               value: '{$AWS.AUTH_TYPE}'
+            - name: describe_region
+              value: '{$AWS.DESCRIBE.REGION}'
             - name: proxy
               value: '{$AWS.PROXY}'
             - name: region_match
@@ -1039,6 +1043,317 @@ zabbix_export:
                   operator: REGEXP
                   templates:
                     - name: 'AWS ELB Network Load Balancer by HTTP'
+        - uuid: 691d96408dbc4c5c9235932cdbe70648
+          name: 'Lambda discovery'
+          type: SCRIPT
+          key: aws.lambda.discovery
+          delay: 12h
+          params: |
+            var AWS = {
+            	params: {},
+            	metadata: 'http://169.254.169.254/latest/meta-data/iam/security-credentials',
+            
+            	getField: function (data, path) {
+            		var steps = path.split('.');
+            		for (var i = 0; i < steps.length; i++) {
+            			var step = steps[i];
+            			if (typeof data !== 'object' || typeof data[step] === 'undefined') {
+            				throw 'Required field was not found: ' + path;
+            			}
+            
+            			data = data[step];
+            		}
+            
+            		return data;
+            	},
+            
+            	setParams: function (params) {
+            		AWS.params['proxy'] = params.proxy;
+            		switch (AWS.getField(params, 'auth_type')) {
+            			case 'role_base':
+            				AWS.params['auth_type'] = 'role_base';
+            				var request = new HttpRequest();
+            				if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
+            					request.setProxy(AWS.params.proxy);
+            				}
+            				var IamRoleName = request.get(AWS.metadata);
+            
+            				if (request.getStatus() !== 200 || IamRoleName === null || IamRoleName === '') {
+            					throw 'Error getting security credentials from instance metadata. Role not found.';
+            				}
+            
+            				credentials = request.get(AWS.metadata + '/' + encodeURI(IamRoleName));
+            
+            				if (request.getStatus() !== 200 || credentials === null || credentials === '') {
+            					throw 'Error getting security credentials from instance metadata.';
+            				}
+            
+            				try {
+            					credentials = JSON.parse(credentials);
+            				}
+            				catch (error) {
+            					throw 'Failed to parse response received from instance metadata. Check debug log for more information.';
+            				}
+            
+            				['AccessKeyId', 'SecretAccessKey', 'Token'].forEach(function (field) {
+            					if (typeof credentials !== 'object' || typeof credentials[field] === 'undefined' || credentials[field] === '') {
+            						throw 'Required credentials is not set: "' + field + '".';
+            					};
+            					AWS.params[field] = credentials[field];
+            				});
+            				break;
+            			case 'access_key':
+            			default:
+            				AWS.params['auth_type'] = 'access_key';
+            				['AccessKeyId', 'SecretAccessKey'].forEach(function (field) {
+            					if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            						throw 'Required param is not set: "' + field + '".';
+            					}
+            					AWS.params[field] = params[field];
+            				});
+            		}
+            		['describe_region', 'region_match', 'region_not_match'].forEach(function (field) {
+            			if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            				throw 'Required param is not set: "' + field + '".';
+            			}
+            			AWS.params[field] = params[field];
+            		});
+            	},
+            
+            	sign: function (key, message) {
+            		var hex = hmac('sha256', key, message);
+            
+            		if ((hex.length % 2) === 1) {
+            			throw 'Invalid length of a hex string!';
+            		}
+            
+            		var result = new Int8Array(hex.length / 2);
+            		for (var i = 0, b = 0; i < hex.length; i += 2, b++) {
+            			result[b] = parseInt(hex.substring(i, i + 2), 16);
+            		}
+            
+            		return result;
+            	},
+            
+            	prepareParams: function (params) {
+            		var result = [];
+            
+            		Object.keys(params).sort().forEach(function (key) {
+            			if (typeof params[key] !== 'object') {
+            				result.push(key + '=' + encodeURIComponent(params[key]));
+            			}
+            			else {
+            				result.push(prepareObject(key, params[key]));
+            			}
+            		});
+            
+            		return result.join('&');
+            	},
+            
+            	request: function (get, method, region, service, host, params, data, uri) {
+            		if (typeof data === 'undefined' || data === null) {
+            			data = '';
+            		}
+            
+            		var amzdate = (new Date()).toISOString().replace(/\.\d+Z/, 'Z').replace(/[-:]/g, ''),
+            			date = amzdate.replace(/T\d+Z/, ''),
+            
+            			canonical_uri = '/' + uri,
+            			canonical_headers = 'content-encoding:amz-1.0\n' + 'host:' + host + '\n' + 'x-amz-date:' + amzdate + '\n',
+            			signed_headers = 'content-encoding;host;x-amz-date',
+            			canonical_request = method + '\n' + canonical_uri + '\n' + params + '\n' + canonical_headers + '\n' + signed_headers + '\n' + sha256(data),
+            			credential_scope = date + '/' + region + '/' + service + '/' + 'aws4_request',
+            			request_string = 'AWS4-HMAC-SHA256' + '\n' + amzdate + '\n' + credential_scope + '\n' + sha256(canonical_request),
+            			key = AWS.sign('AWS4' + AWS.params.SecretAccessKey, date);
+            
+            		key = AWS.sign(key, region);
+            		key = AWS.sign(key, service);
+            		key = AWS.sign(key, 'aws4_request');
+            
+            		var request = new HttpRequest(),
+            			url = 'https://' + host + canonical_uri + '?' + params;
+            
+            		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
+            			request.setProxy(AWS.params.proxy);
+            		}
+            		request.addHeader('x-amz-date: ' + amzdate);
+            		request.addHeader('x-amz-content-sha256:' + sha256(data));
+            		request.addHeader('Accept: application/json');
+            		request.addHeader('Content-Type: application/json');
+            		request.addHeader('Content-Encoding: amz-1.0');
+            		request.addHeader('Authorization: ' + 'AWS4-HMAC-SHA256 Credential=' + AWS.params.AccessKeyId + '/' + credential_scope + ', ' + 'SignedHeaders=' + signed_headers + ', ' + 'Signature=' + hmac('sha256', key, request_string));
+            		if (AWS.params.auth_type === 'role_base')
+            			request.addHeader('X-Amz-Security-Token: ' + AWS.params.Token);
+            
+            		switch (get) {
+            			case 'regions':
+            				Zabbix.log(4, '[ AWS Lambda ] Sending request: ' + url);
+            				response = request.post(url, data);
+            				Zabbix.log(4, '[ AWS Lambda ] Received response with status code ' + request.getStatus() + ': ' + response);
+            				if (request.getStatus() !== 200) {
+            					throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+            				}
+            				try {
+            					response = XML.toJson(response);
+            				} catch (error) {
+            					throw 'Failed to parse response received from AWS CloudWatch API. Check debug log for more information.';
+            				}
+            				break;
+            
+            			case 'lambda':
+            				Zabbix.log(4, '[ AWS Lambda ] Sending request: ' + url);
+            				response = request.get(url);
+            				Zabbix.log(4, '[ AWS Lambda ] Received response with status code ' + request.getStatus() + ': ' + response);
+            				if (request.getStatus() !== 200) {
+            					throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+            				}
+            				break;
+            
+            			default:
+            				throw 'Error: Invalid option "get" for request function';
+            		}
+            
+            		return JSON.parse(response);
+            	},
+            
+            	listRegions: function () {
+            		var payload = {
+            			'Action': 'DescribeRegions',
+            			'Version': '2016-11-15'
+            		};
+            
+            		regions = AWS.getField(AWS.request('regions', 'POST', AWS.params.describe_region, 'ec2', 'ec2.' + AWS.params.describe_region + '.amazonaws.com', AWS.prepareParams(payload), '', ''), 'DescribeRegionsResponse.regionInfo.item');
+            
+            		if (!Array.isArray(regions))
+            			regions = [regions]
+            
+            		return regions
+            	},
+            
+            	listFunctions: function () {
+            		var lldArray = [],
+            			regions = AWS.listRegions();
+            		payload = {
+            			'FunctionVersion': 'ALL',
+            			'MaxItems': '10000'
+            		};
+            
+            		regions.forEach(function (region) {
+            			var region_name = AWS.getField(region, 'regionName');
+            			if (region_name.match(AWS.params.region_match) === null ||
+            				region_name.match(AWS.params.region_not_match) !== null)
+            				return;
+            			lambdaFunction = AWS.getField(AWS.request('lambda', 'GET', region_name, 'lambda', 'lambda.' + region_name + '.amazonaws.com', AWS.prepareParams(payload), '', '2015-03-31/functions'), 'Functions');
+            			if (!Array.isArray(lambdaFunction))
+            				lambdaFunction = [lambdaFunction]
+            
+            			lambdaFunction.forEach(function (lambdaFunction) {
+            				lldArray.push(
+            					{
+            						name: AWS.getField(lambdaFunction, 'FunctionName'),
+            						arn: AWS.getField(lambdaFunction, 'FunctionArn'),
+            						runtime: AWS.getField(lambdaFunction, 'Runtime'),
+            						version: AWS.getField(lambdaFunction, 'Version'),
+            						region: region_name
+            					}
+            				)
+            			});
+            		});
+            
+            		return lldArray;
+            	}
+            };
+            
+            try {
+            	AWS.setParams(JSON.parse(value));
+            
+            	return JSON.stringify(AWS.listFunctions());
+            }
+            catch (error) {
+            	error += (String(error).endsWith('.')) ? '' : '.';
+            	Zabbix.log(3, '[ AWS Lambda ] ERROR: ' + error);
+            	return JSON.stringify({ 'error': error });
+            }
+          filter:
+            evaltype: AND
+            conditions:
+              - macro: '{#AWS.LAMBDA.NAME}'
+                value: '{$AWS.LAMBDA.LLD.FILTER.NAME.MATCHES}'
+                formulaid: A
+              - macro: '{#AWS.LAMBDA.NAME}'
+                value: '{$AWS.LAMBDA.LLD.FILTER.NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+              - macro: '{#AWS.LAMBDA.REGION}'
+                value: '{$AWS.LAMBDA.LLD.FILTER.REGION.MATCHES}'
+                formulaid: C
+              - macro: '{#AWS.LAMBDA.REGION}'
+                value: '{$AWS.LAMBDA.LLD.FILTER.REGION.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: D
+              - macro: '{#AWS.LAMBDA.RUNTIME}'
+                value: '{$AWS.LAMBDA.LLD.FILTER.RUNTIME.MATCHES}'
+                formulaid: E
+              - macro: '{#AWS.LAMBDA.RUNTIME}'
+                value: '{$AWS.LAMBDA.LLD.FILTER.RUNTIME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: F
+          description: 'Get Lambda functions.'
+          host_prototypes:
+            - uuid: 7b468bda682c402b96fd55210aa85155
+              host: '{#AWS.LAMBDA.NAME}'
+              name: '{#AWS.LAMBDA.NAME}'
+              group_links:
+                - group:
+                    name: Templates/Cloud
+              templates:
+                - name: 'AWS Lambda by HTTP'
+              macros:
+                - macro: '{$AWS.LAMBDA.ARN}'
+                  value: '{#AWS.LAMBDA.ARN}'
+                  description: 'The Amazon Resource Names (ARN) of the Lambda function.'
+                - macro: '{$AWS.LAMBDA.NAME}'
+                  value: '{#AWS.LAMBDA.NAME}'
+                  description: 'Lambda function name.'
+                - macro: '{$AWS.REGION}'
+                  value: '{#AWS.LAMBDA.REGION}'
+                  description: 'Lambda function region.'
+              tags:
+                - tag: name
+                  value: '{#AWS.LAMBDA.NAME}'
+                - tag: region
+                  value: '{#AWS.LAMBDA.REGION}'
+                - tag: runtime
+                  value: '{#AWS.LAMBDA.RUNTIME}'
+                - tag: service
+                  value: lambda
+          timeout: '{$AWS.DATA.TIMEOUT}'
+          parameters:
+            - name: AccessKeyId
+              value: '{$AWS.ACCESS.KEY.ID}'
+            - name: auth_type
+              value: '{$AWS.AUTH_TYPE}'
+            - name: describe_region
+              value: '{$AWS.DESCRIBE.REGION}'
+            - name: proxy
+              value: '{$AWS.PROXY}'
+            - name: region_match
+              value: '{$AWS.LAMBDA.LLD.FILTER.REGION.MATCHES}'
+            - name: region_not_match
+              value: '{$AWS.LAMBDA.LLD.FILTER.REGION.NOT_MATCHES}'
+            - name: SecretAccessKey
+              value: '{$AWS.SECRET.ACCESS.KEY}'
+          lld_macro_paths:
+            - lld_macro: '{#AWS.LAMBDA.ARN}'
+              path: $.arn
+            - lld_macro: '{#AWS.LAMBDA.NAME}'
+              path: $.name
+            - lld_macro: '{#AWS.LAMBDA.REGION}'
+              path: $.region
+            - lld_macro: '{#AWS.LAMBDA.RUNTIME}'
+              path: $.runtime
+            - lld_macro: '{#AWS.LAMBDA.VERSION}'
+              path: $.version
         - uuid: c1127e674b7548b2802cd8771f3a4768
           name: 'RDS instances discovery'
           type: SCRIPT
@@ -1108,7 +1423,7 @@ zabbix_export:
             					AWS.params[field] = params[field];
             				});
             		}
-            		['region_match', 'region_not_match'].forEach(function (field) {
+            		['describe_region', 'region_match', 'region_not_match'].forEach(function (field) {
             			if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
             				throw 'Required param is not set: "' + field + '".';
             			}
@@ -1212,9 +1527,8 @@ zabbix_export:
             			'Version': '2016-11-15'
             		};
             
-            		result = AWS.request('POST', 'us-east-1', 'ec2', 'ec2.amazonaws.com', AWS.prepareParams(payload), '', '');
+            		regions = AWS.getField(AWS.request('POST', AWS.params.describe_region, 'ec2', 'ec2.' + AWS.params.describe_region + '.amazonaws.com', AWS.prepareParams(payload), '', ''), 'DescribeRegionsResponse.regionInfo.item');
             
-            		regions = AWS.getField(result, 'DescribeRegionsResponse.regionInfo.item')
             		if (!Array.isArray(regions))
             			regions = [regions]
             		return regions
@@ -1314,6 +1628,8 @@ zabbix_export:
               value: '{$AWS.ACCESS.KEY.ID}'
             - name: auth_type
               value: '{$AWS.AUTH_TYPE}'
+            - name: describe_region
+              value: '{$AWS.DESCRIBE.REGION}'
             - name: proxy
               value: '{$AWS.PROXY}'
             - name: region_match
@@ -1396,6 +1712,12 @@ zabbix_export:
             					AWS.params[field] = params[field];
             				});
             		}
+            		['request_region'].forEach(function (field) {
+            			if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            				throw 'Required param is not set: "' + field + '".';
+            			}
+            			AWS.params[field] = params[field];
+            		});
             	},
             
             	sign: function (key, message) {
@@ -1497,11 +1819,12 @@ zabbix_export:
             			'Version': '2006-03-01'
             		};
             
-            		var result = AWS.getField(AWS.request('GET', 'us-east-1', 's3', 's3.us-east-1.amazonaws.com', AWS.prepareParams(payload), '', ''), 'ListAllMyBucketsResult.Buckets.Bucket');
+            		var result = AWS.getField(AWS.request('GET', AWS.params.request_region, 's3', 's3.' + AWS.params.request_region + '.amazonaws.com', AWS.prepareParams(payload), '', ''), 'ListAllMyBucketsResult.Buckets');
             
             		if (result === null) {
             			return [];
             		}
+            		result = AWS.getField(result, 'Bucket');
             
             		return Array.isArray(result) ? result : [result];
             
@@ -1562,6 +1885,8 @@ zabbix_export:
               value: '{$AWS.AUTH_TYPE}'
             - name: proxy
               value: '{$AWS.PROXY}'
+            - name: request_region
+              value: '{$AWS.REQUEST.REGION}'
             - name: SecretAccessKey
               value: '{$AWS.SECRET.ACCESS.KEY}'
           lld_macro_paths:
@@ -1581,6 +1906,9 @@ zabbix_export:
         - macro: '{$AWS.DATA.TIMEOUT}'
           value: 60s
           description: 'A response timeout for an API.'
+        - macro: '{$AWS.DESCRIBE.REGION}'
+          value: us-east-1
+          description: 'Region used in POST request `DescribeRegions`.'
         - macro: '{$AWS.EC2.LLD.FILTER.NAME.MATCHES}'
           value: '.*'
           description: 'Filter of discoverable EC2 instances by namespace.'
@@ -1613,22 +1941,40 @@ zabbix_export:
           description: 'Filter to exclude discovered ECS clusters by status.'
         - macro: '{$AWS.ELB.LLD.FILTER.NAME.MATCHES}'
           value: '.*'
-          description: 'Filter of discoverable ELB load balancer by name.'
+          description: 'Filter of discoverable ELB load balancers by name.'
         - macro: '{$AWS.ELB.LLD.FILTER.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered ELB load balancer by name.'
+          description: 'Filter to exclude discovered ELB load balancers by name.'
         - macro: '{$AWS.ELB.LLD.FILTER.REGION.MATCHES}'
           value: '.*'
-          description: 'Filter of discoverable ELB load balancer by region.'
+          description: 'Filter of discoverable ELB load balancers by region.'
         - macro: '{$AWS.ELB.LLD.FILTER.REGION.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered ELB load balancer by region.'
+          description: 'Filter to exclude discovered ELB load balancers by region.'
         - macro: '{$AWS.ELB.LLD.FILTER.STATE.MATCHES}'
           value: active
-          description: 'Filter of discoverable ELB load balancer by status.'
+          description: 'Filter of discoverable ELB load balancers by status.'
         - macro: '{$AWS.ELB.LLD.FILTER.STATE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'Filter to exclude discovered ELB load balancer by status.'
+        - macro: '{$AWS.LAMBDA.LLD.FILTER.NAME.MATCHES}'
+          value: '.*'
+          description: 'Filter of discoverable Lambda functions by name.'
+        - macro: '{$AWS.LAMBDA.LLD.FILTER.NAME.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Filter to exclude discovered Lambda functions by name.'
+        - macro: '{$AWS.LAMBDA.LLD.FILTER.REGION.MATCHES}'
+          value: '.*'
+          description: 'Filter of discoverable Lambda functions by region.'
+        - macro: '{$AWS.LAMBDA.LLD.FILTER.REGION.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Filter to exclude discovered Lambda functions by region.'
+        - macro: '{$AWS.LAMBDA.LLD.FILTER.RUNTIME.MATCHES}'
+          value: '.*'
+          description: 'Filter of discoverable Lambda functions by Runtime.'
+        - macro: '{$AWS.LAMBDA.LLD.FILTER.RUNTIME.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Filter to exclude discovered Lambda functions by Runtime.'
         - macro: '{$AWS.PROXY}'
           description: 'Sets HTTP proxy value. If this macro is empty then no proxy is used.'
         - macro: '{$AWS.RDS.LLD.FILTER.NAME.MATCHES}'
@@ -1643,6 +1989,9 @@ zabbix_export:
         - macro: '{$AWS.RDS.LLD.FILTER.REGION.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'Filter to exclude discovered RDS instances by region.'
+        - macro: '{$AWS.REQUEST.REGION}'
+          value: us-east-1
+          description: 'Region used in GET request `ListBuckets`.'
         - macro: '{$AWS.S3.LLD.FILTER.NAME.MATCHES}'
           value: '.*'
           description: 'Filter of discoverable S3 buckets by namespace.'

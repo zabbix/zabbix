@@ -79,7 +79,7 @@ var AddValueMap = class {
 		const cell = document.createElement('td');
 		const link = document.createElement('a');
 		link.textContent = this.data.name;
-		link.classList.add('wordwrap');
+		link.classList.add('wordbreak');
 		link.href = 'javascript:void(0);';
 		link.addEventListener('click', (e) => {
 			const valuemap_names = [];
@@ -126,7 +126,7 @@ var AddValueMap = class {
 		hellip.innerHTML = '&hellip;';
 		arrow_cell.textContent = '⇒';
 		mappings_table.classList.add('mappings-table');
-		cell.classList.add('wordwrap');
+		cell.classList.add('wordbreak');
 
 		for (let mapping of this.data.mappings) {
 			mapping = {value: '', ...mapping};
