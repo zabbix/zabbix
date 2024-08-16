@@ -4018,7 +4018,7 @@ class testDashboardWidgetCommunication extends testWidgets {
 		}
 		else {
 			if ($data['select']['widget'] === 'new') {
-				$broadcaster = $dashboard->query('class:new-widget')->waitUntilReady()->one();
+				$broadcaster = $dashboard->query('class:new-widget')->asWidget()->waitUntilReady()->one();
 			}
 			else {
 				$broadcaster = $dashboard->getWidget($data['select']['widget']);
