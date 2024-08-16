@@ -175,6 +175,8 @@
 				}
 
 				postMessageDetails('error', result.error.messages);
+
+				uncheckTableRows('hosts', response.keepids ?? []);
 			}
 			else if ('success' in result) {
 				postMessageOk(result.success.title);
@@ -182,9 +184,9 @@
 				if ('messages' in result.success) {
 					postMessageDetails('success', result.success.messages);
 				}
-			}
 
-			uncheckTableRows('hosts');
+				uncheckTableRows('hosts');
+			}
 
 			location.href = location.href;
 		},
@@ -274,29 +276,8 @@
 				headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
 				body: urlEncodeData({hostids: Object.keys(chkbxRange.getSelectedIds())})
 			})
-				.then((response) => response.json())
-				.then((response) => {
-					if ('error' in response) {
-						if ('title' in response.error) {
-							postMessageError(response.error.title);
-						}
-
-						postMessageDetails('error', response.error.messages);
-
-						uncheckTableRows('hosts', response.keepids ?? []);
-					}
-					else if ('success' in response) {
-						postMessageOk(response.success.title);
-
-						if ('messages' in response.success) {
-							postMessageDetails('success', response.success.messages);
-						}
-
-						uncheckTableRows('hosts');
-					}
-
-					location.href = location.href;
-				})
+				.then(response => response.json())
+				.then(response => this.reload(response))
 				.catch(() => {
 					clearMessages();
 
