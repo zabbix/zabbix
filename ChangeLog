@@ -3,6 +3,11 @@ Changes for 6.0.34rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-24650] fixed {ITEM.LOG.SEVERITY} macro to resolve to event severity instead of trigger severity (esekace)
+........S. [ZBX-24760] fixed default timezone in macro {EVENT.DATE} & {EVENT.TIME} expansion (mprihodko)
+..F....... [ZBX-21838] fixed max in table setting not being used to limit action count in mediatype list (agriscenko)
+..F....... [ZBX-24835] fixed case-conversion and preg functions working incorrectly with the Turkish locale (agriscenko)
+..F....... [ZBX-23844] fixed long names of icons and background images overlapping each other (agriscenko)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.33
