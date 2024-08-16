@@ -17,9 +17,11 @@
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 
 /**
- * @backup profiles
+ * @backup !profiles, !problem, !problem_tag, !service_problem, !event_symptom
  *
  * @onBefore prepareData
+ *
+ * @onAfter clearData
  */
 class testCauseAndSymptomEvents extends CWebTest {
 
@@ -35,12 +37,12 @@ class testCauseAndSymptomEvents extends CWebTest {
 		];
 	}
 
-	protected static $groupids;
-	protected static $triggerids;
-	protected static $hostsids;
 	const COLLAPSE_XPATH = 'xpath:.//button[(@title="Collapse")]';
 	const EXPAND_XPATH = 'xpath:.//button[(@title="Expand")]';
 	const SYMPTOM_XPATH = 'xpath:.//span[(@title="Symptom")]';
+	protected static $groupids;
+	protected static $triggerids;
+	protected static $hostsids;
 
 	public function prepareData() {
 		// Create host groups for hosts.
@@ -215,7 +217,7 @@ class testCauseAndSymptomEvents extends CWebTest {
 
 		// Check collapsed symptom count.
 		$cause = $table->findRow('Problem', 'Problem trap>150 [Cause]');
-		$cause->query('class:entity-count')->one()->isVisible();
+		$this->assertTrue($cause->query('class:entity-count')->one()->isVisible());
 		$this->assertEquals(1, $cause->query('class:entity-count')->one()->getText());
 
 		// Check 'Event details' rank value for 'Cause' event.
@@ -251,6 +253,8 @@ class testCauseAndSymptomEvents extends CWebTest {
 	}
 
 	/**
+	 * Check 'cause and symptom' elements collapsed/expanded state.
+	 *
 	 * @param boolean $collapsed	are symptom events in collapsed state or not
 	 * @param string $name			cause event name
 	 */
@@ -411,12 +415,7 @@ class testCauseAndSymptomEvents extends CWebTest {
 		$this->assertTrue($context_menu->hasItems(array_keys($data['options'])));
 
 		foreach ($data['options'] as $problem_options => $link) {
-			if ($link === 'menu-popup-item disabled') {
-				$this->assertFalse($context_menu->getItem($problem_options)->isEnabled());
-			}
-			else {
-				$this->assertTrue($context_menu->getItem($problem_options)->isEnabled());
-			}
+			$this->assertFalse($context_menu->getItem($problem_options)->isEnabled($link === 'menu-popup-item disabled'));
 		}
 	}
 
@@ -442,7 +441,8 @@ class testCauseAndSymptomEvents extends CWebTest {
 					'select_all' => true,
 					'problems' => ['Battery problem trap [Cause]', 'Battery problem trap2 [Cause]',
 						'Battery problem linked [Cause]', 'Battery problem linked [Symptom]',
-						'Battery problem linked [Symptom2]'],
+						'Battery problem linked [Symptom2]'
+					],
 					'state' => true
 				]
 			],
@@ -453,7 +453,8 @@ class testCauseAndSymptomEvents extends CWebTest {
 					'expand' => true,
 					'problems' => ['Battery problem trap [Cause]', 'Battery problem trap2 [Cause]',
 						'Battery problem linked [Cause]', 'Battery problem linked [Symptom]',
-						'Battery problem linked [Symptom2]'],
+						'Battery problem linked [Symptom2]'
+					],
 					'state' => true
 				]
 			],
@@ -492,7 +493,6 @@ class testCauseAndSymptomEvents extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=problem.view&hostids[]='.
 				self::$hostsids['hostids']['Host for Cause and Symptom update']
 		);
-		$form = CFilterElement::find()->one()->getForm();
 		$table = $this->query('class:list-table')->asTable()->waitUntilPresent()->one();
 		$count = count($data['problems']);
 		$table->findRows('Problem', $data['problems']);
@@ -515,11 +515,10 @@ class testCauseAndSymptomEvents extends CWebTest {
 			$table->findRow('Problem', $data['problems'][0])->query('link:Update')->waitUntilClickable()->one()->click();
 		}
 
-		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
-		$form = $dialog->query('id:acknowledge_form')->asForm()->one();
+		$form = COverlayDialogElement::find()->one()->waitUntilReady()->query('id:acknowledge_form')->asForm()->one();
 
 		// Check 'Problem' field value and 'Convert to cause' checkbox state.
-		$problem = $count > 1 ? $count.' problems selected.' : $data['problems'][0];
+		$problem = ($count > 1) ? $count.' problems selected.' : $data['problems'][0];
 		$this->assertEquals($problem, ($form->getField('Problem')->getText()));
 		$this->assertTrue($form->getField('id:change_rank')->isEnabled($data['state']));
 	}
@@ -534,8 +533,9 @@ class testCauseAndSymptomEvents extends CWebTest {
 						'Show symptoms' => false,
 						'Show timeline' => false
 					],
-					'headers' => ['', '', '', 'Time', 'Severity', 'Recovery time', 'Status', 'Info',
-						'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags'],
+					'headers' => ['', '', '', 'Time', 'Severity', 'Recovery time', 'Status', 'Info', 'Host', 'Problem',
+						'Duration', 'Update', 'Actions', 'Tags'
+					],
 					'result' => [
 						['Problem' => 'Problem trap>150 [Cause]'],
 						['Problem' => 'Problem trap>10 [Symptom]']
@@ -550,8 +550,9 @@ class testCauseAndSymptomEvents extends CWebTest {
 						'Show symptoms' => true,
 						'Show timeline' => false
 					],
-					'headers' => ['', '', '', 'Time', 'Severity', 'Recovery time', 'Status', 'Info',
-						'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags'],
+					'headers' => ['', '', '', 'Time', 'Severity', 'Recovery time', 'Status', 'Info', 'Host', 'Problem',
+						'Duration', 'Update', 'Actions', 'Tags'
+					],
 					'result' => [
 						['Problem' => 'Problem trap>150 [Cause]'],
 						['Problem' => 'Problem trap>10 [Symptom]'],
@@ -570,8 +571,9 @@ class testCauseAndSymptomEvents extends CWebTest {
 						'Problem trap>10 [Symptom]' => 'Disable',
 						'Problem trap>150 [Cause]' => 'Enable'
 					],
-					'headers' => ['', 'Time', '', '', 'Severity', 'Recovery time', 'Status', 'Info',
-						'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags'],
+					'headers' => ['', 'Time', '', '', 'Severity', 'Recovery time', 'Status', 'Info', 'Host', 'Problem',
+						'Duration', 'Update', 'Actions', 'Tags'
+					],
 					'result' => 'Problem trap>150 [Cause]'
 				]
 			],
@@ -586,8 +588,9 @@ class testCauseAndSymptomEvents extends CWebTest {
 						'Problem trap>10 [Symptom]' => 'Disable',
 						'Problem trap>150 [Cause]' => 'Enable'
 					],
-					'headers' => ['', 'Time', '', '', 'Severity', 'Recovery time', 'Status', 'Info',
-						'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags'],
+					'headers' => ['', 'Time', '', '', 'Severity', 'Recovery time', 'Status', 'Info', 'Host', 'Problem',
+						'Duration', 'Update', 'Actions', 'Tags'
+					],
 					'result' => 'Problem trap>150 [Cause]'
 				]
 			],
@@ -602,8 +605,9 @@ class testCauseAndSymptomEvents extends CWebTest {
 						'Problem trap>10 [Symptom]' => 'Enable',
 						'Problem trap>150 [Cause]' => 'Disable'
 					],
-					'headers' => ['', '', 'Time', '', '', 'Severity', 'Recovery time', 'Status', 'Info',
-						'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags'],
+					'headers' => ['', '', 'Time', '', '', 'Severity', 'Recovery time', 'Status', 'Info', 'Host', 'Problem',
+						'Duration', 'Update', 'Actions', 'Tags'
+					],
 					'result' => 'Problem trap>10 [Symptom]'
 				]
 			],
@@ -618,8 +622,9 @@ class testCauseAndSymptomEvents extends CWebTest {
 						'Problem trap>10 [Symptom]' => 'Enable',
 						'Problem trap>150 [Cause]' => 'Disable'
 					],
-					'headers' => ['', 'Time', '', '', 'Severity', 'Recovery time', 'Status', 'Info',
-						'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags']
+					'headers' => ['', 'Time', '', '', 'Severity', 'Recovery time', 'Status', 'Info', 'Host', 'Problem',
+						'Duration', 'Update', 'Actions', 'Tags'
+					]
 				]
 			],
 			// #6 No data is shown when cause and symptom triggers are disabled but "Show symptoms" => true.
@@ -629,8 +634,9 @@ class testCauseAndSymptomEvents extends CWebTest {
 						'Hosts' => 'Host for Cause and Symptom check',
 						'Show symptoms' => true
 					],
-					'headers' => ['', 'Time', '', '', 'Severity', 'Recovery time', 'Status', 'Info',
-						'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags']
+					'headers' => ['', 'Time', '', '', 'Severity', 'Recovery time', 'Status', 'Info', 'Host', 'Problem',
+						'Duration', 'Update', 'Actions', 'Tags'
+					]
 				]
 			],
 			// #7 No data is shown when cause and symptom triggers are disabled but "Show symptoms" => false.
@@ -640,8 +646,9 @@ class testCauseAndSymptomEvents extends CWebTest {
 						'Hosts' => 'Host for Cause and Symptom check',
 						'Show symptoms' => false
 					],
-					'headers' => ['', 'Time', '', '', 'Severity', 'Recovery time', 'Status', 'Info',
-						'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags']
+					'headers' => ['', 'Time', '', '', 'Severity', 'Recovery time', 'Status', 'Info', 'Host', 'Problem',
+						'Duration', 'Update', 'Actions', 'Tags'
+					]
 				]
 			]
 		];
@@ -688,10 +695,8 @@ class testCauseAndSymptomEvents extends CWebTest {
 			);
 		}
 
-		$form = CFilterElement::find()->one()->getForm();
-		$form->fill($data['fields']);
-		$form->submit();
 		$table = $this->query('class:list-table')->asTable()->waitUntilPresent()->one();
+		CFilterElement::find()->one()->getForm()->fill($data['fields'])->submit();
 		$table->waitUntilReloaded();
 		$this->assertEquals($data['headers'], $table->getHeadersText());
 
@@ -724,5 +729,23 @@ class testCauseAndSymptomEvents extends CWebTest {
 				$this->assertTableData();
 			}
 		}
+	}
+
+	/**
+	 * Delete all created data after test.
+	 */
+	public static function clearData() {
+		// Delete Hosts.
+		CDataHelper::call('host.delete', [
+			self::$hostsids['hostids']['Host for Cause and Symptom check'],
+			self::$hostsids['hostids']['Host for Cause and Symptom check2'],
+			self::$hostsids['hostids']['Host for Cause and Symptom update']
+		]);
+
+		// Delete Host groups.
+		CDataHelper::call('hostgroup.delete', [
+			self::$groupids['Group for Cause and Symptom check'],
+			self::$groupids['Group for Cause and Symptom update']
+		]);
 	}
 }
