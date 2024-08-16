@@ -4006,9 +4006,7 @@ class testDashboardWidgetCommunication extends testWidgets {
 			$dashboard->pasteWidget();
 		}
 		else {
-			$replace_widget = $dashboard->getWidget($data['paste']['widget']);
 			$dashboard->replaceWidget($data['paste']['widget']);
-			$replace_widget->waitUntilNotPresent();
 		}
 
 		$dashboard->waitUntilReady();
@@ -4018,7 +4016,7 @@ class testDashboardWidgetCommunication extends testWidgets {
 		}
 		else {
 			if ($data['select']['widget'] === 'new') {
-				$broadcaster = $dashboard->query('class:new-widget')->asWidget()->waitUntilReady()->one();
+				$broadcaster = $dashboard->query('class:new-widget')->waitUntilPresent()->one();
 			}
 			else {
 				$broadcaster = $dashboard->getWidget($data['select']['widget']);
