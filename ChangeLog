@@ -183,6 +183,7 @@ New features:
 ..F....PS. [ZBXNEXT-9218] added proxy group discovery internal item (mprihodko)
 
 Bug fixes:
+........S. [ZBX-24800] fixed global scripts being executed on Zabbix server instead of Zabbix proxy when used in actions (vso)
 A........T [ZBX-24930] fixed inability to import latest official templates to 7.0.0 version (abiba, vmaksimovs)
 ..F....... [ZBX-24940] fixed issue with dependent trigger copying (vmaksimovs, vmurzins)
 ....I..... [ZBX-24576] fixed built-in dashboard "Local network" map element highlight overlapping the widget header (Ivo)
@@ -385,6 +386,8 @@ A......... [ZBX-24299] fixed possibility to alter readonly error fields with Hos
 .......PS. [ZBX-17382] improved get[oid] and walk[oid] to display UTF-8 text instead of hex if MIB files are not installed (vso)
 .......PS. [ZBX-24540] fixed crash when expanding host interface macros on main Zabbix agent interface (wiper)
 ........S. [ZBX-23690] optimized maintenance calculations for large number of hosts x maintenances (wiper)
+A......... [ZBX-25017] fixed sensitive data exposure from audit log (gcalenko)
+.......PS. [ZBX-25018] removed direct pointer access in custom javascript objects (wiper)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.0
@@ -403,6 +406,10 @@ Bug fixes:
 ..F....... [ZBX-24535] fixed history period calculation in Item value widget when override trend period is active (averza)
 ...G...... [ZBX-24531] fixed compile time data not being set for agent2 (jxl)
 .........T [ZBX-23788] added SNMP OID ifAlias in Network interfaces discovery (egordymov)
+..F.....S. [ZBX-25015] fixed information exposure in System information widget for users without proper permissions (vmurzins)
+....I..... [ZBX-25011] fixed access for non-admin user to options of installed MSI (MVekslers)
+........S. [ZBX-25012] implemented phone number validation check to avoid AT commands injection (sboidenko)
+........S. [ZBX-25013] fixed exploit to read files using SMS (sboidenko)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.0rc2
@@ -1246,6 +1253,12 @@ A......... [ZBX-24481] fixed inability to unset value map from existing item or 
 ..F....... [ZBX-24152] fixed host form submission with Enter button if the form is opened in a popup and focus is in a flexible text area field (Ivo)
 .........T [ZBX-23788] added SNMP OID ifAlias in Network interfaces discovery (egordymov)
 ....I..... [ZBX-24482] fixed the presence of the http_proxy field in the initial data (Sasha)
+..F.....S. [ZBX-25015] fixed information exposure in System information widget for users without proper permissions (vmurzins)
+....I..... [ZBX-25011] fixed access for non-admin user to options of installed MSI (MVekslers)
+........S. [ZBX-25012] implemented phone number validation check to avoid AT commands injection (sboidenko)
+........S. [ZBX-25013] fixed exploit to read files using SMS (sboidenko)
+A......... [ZBX-25017] fixed sensitive data exposure from audit log (gcalenko)
+.......PS. [ZBX-25018] removed direct pointer access in custom javascript objects (wiper)
 
 --------------------------------------------------------------------------------
 Changes for 6.4.15
@@ -3036,6 +3049,18 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 ..F....... [ZBXNEXT-7138] added modal form for API tokens in User settings->API tokens and Administration->General->API tokens (epulke)
 
 --------------------------------------------------------------------------------
+Changes for 6.0.34rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 6.0.33
+
+6.0.33rc1 was released as 6.0.33 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 6.0.33rc1
 
 New features:
@@ -3145,6 +3170,12 @@ A......... [ZBX-24481] fixed inability to unset value map from existing item or 
 ..F....... [ZBX-24152] fixed host form submission with Enter button if the form is opened in a popup and focus is in a flexible text area field (Ivo)
 .........T [ZBX-23788] added SNMP OID ifAlias in Network interfaces discovery (egordymov)
 ....I..... [ZBX-24482] fixed the presence of the http_proxy field in the initial data (Sasha)
+..F.....S. [ZBX-25015] fixed information exposure in System information widget for users without proper permissions (vmurzins)
+....I..... [ZBX-25011] fixed access for non-admin user to options of installed MSI (MVekslers)
+........S. [ZBX-25012] implemented phone number validation check to avoid AT commands injection (sboidenko)
+........S. [ZBX-25013] fixed exploit to read files using SMS (sboidenko)
+A......... [ZBX-25017] fixed sensitive data exposure from audit log (gcalenko)
+.......PS. [ZBX-25018] removed direct pointer access in custom javascript objects (wiper)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.30
@@ -6206,11 +6237,28 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
 
 --------------------------------------------------------------------------------
+Changes for 5.0.44rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 5.0.43
+
+5.0.43rc1 was released as 5.0.43 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 5.0.43rc1
 
 Bug fixes:
 .........T [ZBX-23788] added SNMP OID ifAlias in Network interfaces discovery (egordymov)
 .....J.... [ZBX-24298] allowed any JNDI service providers back in JMX monitoring (dimir)
+..F.....S. [ZBX-25015] fixed information exposure in System information widget for users without proper permissions (vmurzins)
+....I..... [ZBX-25011] fixed access for non-admin user to options of installed MSI (MVekslers)
+........S. [ZBX-25012] implemented phone number validation check to avoid AT commands injection (sboidenko)
+........S. [ZBX-25013] fixed exploit to read files using SMS (sboidenko)
+A......... [ZBX-25017] fixed sensitive data exposure from audit log (gcalenko)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.42

@@ -13,9 +13,6 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-// These tests should be run first.
-require_once dirname(__FILE__).'/multiselects/testMultiselectsWithoutData.php';
-require_once dirname(__FILE__).'/testPagesWithoutData.php';
 
 // Actions.
 require_once dirname(__FILE__).'/actions/testFormAction.php';
@@ -196,6 +193,7 @@ require_once dirname(__FILE__).'/multiselects/testMultiselects.php';
 require_once dirname(__FILE__).'/multiselects/testMultiselectsErrorsHostsTemplates.php';
 require_once dirname(__FILE__).'/multiselects/testMultiselectsLatestData.php';
 require_once dirname(__FILE__).'/multiselects/testMultiselectsProblems.php';
+require_once dirname(__FILE__).'/multiselects/testMultiselectsWithoutData.php';
 
 // Network discovery.
 require_once dirname(__FILE__).'/networkDiscovery/testFormNetworkDiscovery.php';
@@ -341,6 +339,7 @@ require_once dirname(__FILE__).'/testPageBrowserWarning.php';
 require_once dirname(__FILE__).'/testPageInventory.php';
 require_once dirname(__FILE__).'/testPageSearch.php';
 require_once dirname(__FILE__).'/testPageStatusOfZabbix.php';
+require_once dirname(__FILE__).'/testPagesWithoutData.php';
 require_once dirname(__FILE__).'/testSidebarMenu.php';
 require_once dirname(__FILE__).'/testTimezone.php';
 require_once dirname(__FILE__).'/testUrlParameters.php';
@@ -351,10 +350,6 @@ use PHPUnit\Framework\TestSuite;
 class SeleniumTests {
 	public static function suite() {
 		$suite = new TestSuite('selenium');
-
-		// These tests should be run first.
-		$suite->addTestSuite('testMultiselectsWithoutData');
-		$suite->addTestSuite('testPagesWithoutData');
 
 		// Actions.
 		$suite->addTestSuite('testFormAction');
@@ -535,6 +530,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testMultiselectsErrorsHostsTemplates');
 		$suite->addTestSuite('testMultiselectsLatestData');
 		$suite->addTestSuite('testMultiselectsProblems');
+		$suite->addTestSuite('testMultiselectsWithoutData');
 
 		// Network discovery.
 		$suite->addTestSuite('testFormNetworkDiscovery');
@@ -680,6 +676,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageInventory');
 		$suite->addTestSuite('testPageSearch');
 		$suite->addTestSuite('testPageStatusOfZabbix');
+		$suite->addTestSuite('testPagesWithoutData');
 		$suite->addTestSuite('testSidebarMenu');
 		$suite->addTestSuite('testTimezone');
 		$suite->addTestSuite('testUrlParameters');
