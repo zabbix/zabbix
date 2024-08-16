@@ -45,7 +45,7 @@ const (
 	// inactive shutdown value
 	shutdownInactive = -1
 
-	maxItemTimeout = 600
+	maxItemTimeout = 600 // seconds
 )
 
 type Request struct {
