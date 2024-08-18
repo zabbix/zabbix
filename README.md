@@ -23,3 +23,13 @@ Zabbix documentation is available at [zabbix.com/documentation](https://www.zabb
 ## License
 
 Zabbix is distributed under [AGPL-3.0-only](COPYING)
+
+## Try Zabbix in a Virtual Environment
+
+If you are a new to Zabbix, you can practice using it by installing in an isolated environment like a virtual box in your local computer. First you have to install a virtual box and install an operating system like Ubuntu with a graphical UI. Note the OS version so you can download the relevant zabbix version for your Operating System. For example, you can install Oracle virtual box and install latest ubuntu version with a GUI on it. 
+Oracle Virtual Box 👉 [Download oracle virtual box](https://www.virtualbox.org/wiki/Downloads)
+Ubuntu Desktop 👉 [Download Ubuntu Desktop](https://ubuntu.com/download/desktop)
+
+**Install Zabbix Server in Ubuntu**
+
+When you have configured your virtual environment, you can start installing Zabbix Server in ubuntu desktop. For that, you have to select the relevant zabbix package from the website.
