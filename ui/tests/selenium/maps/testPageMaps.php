@@ -286,53 +286,55 @@ class testPageMaps extends CWebTest {
 				]
 			],
 			// TODO: Uncomment the test cases after issue in ZBX-24652 is fixed. Update the numbering of all test cases.
+			/*
 			// # View results with multiple spaces for Name.
-//			[
-//				[
-//					'filter' => [
-//						'Name' => '           '
-//					]
-//				]
-//			],
-//			// # View results with single space in the name.
-//			[
-//				[
-//					'filter' => [
-//						'Name' => ' '
-//					],
-//					'expected' => [
-//						self::SYSMAP_FIRST_A,
-//						'Local network',
-//						self::SYSMAP_SPACES_NAME,
-//						self::SYSMAP_HIGH_HEIGHT,
-//						self::SYSMAP_HIGH_WIDTH,
-//						'Map with icon mapping',
-//						self::SYSMAP_LOW_HEIGHT,
-//						self::SYSMAP_LOW_WIDTH,
-//						self::SYSMAP_NAME_WITH_SYMBOLS,
-//						'Public map with image',
-//						self::SYSMAP_TO_DELETE,
-//						'Test map 1',
-//						self::SYSMAP_FIRST_Z
-//					]
-//				]
-//			],
-//			// # View results if request has trailing spaces.
-//			[
-//				[
-//					'filter' => [
-//						'Name' => 'spaces   '
-//					]
-//				]
-//			],
-//			// # View results if request has leading spaces.
-//			[
-//				[
-//					'filter' => [
-//						'Name' => '   spaces'
-//					]
-//				]
-//			],
+			[
+				[
+					'filter' => [
+						'Name' => '           '
+					]
+				]
+			],
+			// # View results with single space in the name.
+			[
+				[
+					'filter' => [
+						'Name' => ' '
+					],
+					'expected' => [
+						self::SYSMAP_FIRST_A,
+						'Local network',
+						self::SYSMAP_SPACES_NAME,
+						self::SYSMAP_HIGH_HEIGHT,
+						self::SYSMAP_HIGH_WIDTH,
+						'Map with icon mapping',
+						self::SYSMAP_LOW_HEIGHT,
+						self::SYSMAP_LOW_WIDTH,
+						self::SYSMAP_NAME_WITH_SYMBOLS,
+						'Public map with image',
+						self::SYSMAP_TO_DELETE,
+						'Test map 1',
+						self::SYSMAP_FIRST_Z
+					]
+				]
+			],
+			// # View results if request has trailing spaces.
+			[
+				[
+					'filter' => [
+						'Name' => 'spaces   '
+					]
+				]
+			],
+			// # View results if request has leading spaces.
+			[
+				[
+					'filter' => [
+						'Name' => '   spaces'
+					]
+				]
+			],
+			*/
 			// #1 View results with request that has spaces separating the words.
 			[
 				[
