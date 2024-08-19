@@ -233,16 +233,19 @@ static void	httppairs_free(zbx_vector_ptr_pair_t *pairs)
  *             maxerrlen    - [IN] size of error message buffer (can be 0 if  *
  *                                 'error' is NULL)                           *
  *                                                                            *
+ * Return value: SUCCEED if macro data were resolved successfully.            *
+ *               Otherwise FAIL.                                              *
+ *                                                                            *
  ******************************************************************************/
 static int	macro_httptest_field_resolv(zbx_macro_resolv_data_t *p, va_list args, char **replace_with, char **data,
 		char *error, size_t maxerrlen)
 {
-	int				ret = SUCCEED;
-	zbx_dc_interface_t		interface;
+	int			ret = SUCCEED;
+	zbx_dc_interface_t	interface;
 
 	/* Passed arguments */
-	zbx_dc_um_handle_t		*um_handle = va_arg(args, zbx_dc_um_handle_t *);
-	const zbx_dc_host_t		*dc_host = va_arg(args, const zbx_dc_host_t *);
+	zbx_dc_um_handle_t	*um_handle = va_arg(args, zbx_dc_um_handle_t *);
+	const zbx_dc_host_t	*dc_host = va_arg(args, const zbx_dc_host_t *);
 
 	ZBX_UNUSED(data);
 	ZBX_UNUSED(error);
@@ -255,9 +258,13 @@ static int	macro_httptest_field_resolv(zbx_macro_resolv_data_t *p, va_list args,
 		p->pos = p->token.loc.r;
 	}
 	else if (0 == strcmp(p->macro, MVAR_HOST_HOST) || 0 == strcmp(p->macro, MVAR_HOSTNAME))
+	{
 		*replace_with = zbx_strdup(*replace_with, dc_host->host);
+	}
 	else if (0 == strcmp(p->macro, MVAR_HOST_NAME))
+	{
 		*replace_with = zbx_strdup(*replace_with, dc_host->name);
+	}
 	else if (0 == strcmp(p->macro, MVAR_HOST_IP) || 0 == strcmp(p->macro, MVAR_IPADDRESS))
 	{
 		if (SUCCEED == (ret = zbx_dc_config_get_interface(&interface, dc_host->hostid, 0)))
@@ -383,7 +390,6 @@ static int	httpstep_load_pairs(zbx_dc_host_t *host, zbx_httpstep_t *httpstep)
 	zbx_ptr_pair_t		pair;
 	zbx_vector_ptr_pair_t	*vector, headers, query_fields, post_fields;
 	char			*key, *value, *url = NULL, query_delimiter = '?';
-	zbx_dc_um_handle_t	*um_handle;
 
 	httpstep->url = NULL;
 	httpstep->posts = NULL;
@@ -409,7 +415,7 @@ static int	httpstep_load_pairs(zbx_dc_host_t *host, zbx_httpstep_t *httpstep)
 
 		/* from now on variable values can contain macros so proper URL encoding can be performed */
 
-		um_handle = zbx_dc_open_user_macros_secure();
+		zbx_dc_um_handle_t	*um_handle = zbx_dc_open_user_macros_secure();
 		ret = zbx_substitute_macros(&value, NULL, 0, &macro_httptest_field_resolv, um_handle, host);
 		zbx_dc_close_user_macros(um_handle);
 
@@ -423,23 +429,24 @@ static int	httpstep_load_pairs(zbx_dc_host_t *host, zbx_httpstep_t *httpstep)
 
 		/* variable names cannot contain macros, and both variable names and variable values cannot contain */
 		/* another variables */
-
-		um_handle = zbx_dc_open_user_macros();
-
-		if (ZBX_HTTPFIELD_VARIABLE != type &&
-				(SUCCEED != (ret = zbx_substitute_macros(&key, NULL, 0, &macro_httptest_field_resolv,
-				um_handle, host)) ||
-				SUCCEED != (ret = http_substitute_variables(httpstep->httptest, &key)) ||
-				SUCCEED != (ret = http_substitute_variables(httpstep->httptest, &value))))
+		if (ZBX_HTTPFIELD_VARIABLE != type)
 		{
-			zbx_dc_close_user_macros(um_handle);
-			httppairs_free(&httpstep->variables);
-			zbx_free(key);
-			zbx_free(value);
-			goto out;
-		}
+			um_handle = zbx_dc_open_user_macros();
 
-		zbx_dc_close_user_macros(um_handle);
+			if ((SUCCEED != (ret = zbx_substitute_macros(&key, NULL, 0, &macro_httptest_field_resolv,
+					um_handle, host)) ||
+					SUCCEED != (ret = http_substitute_variables(httpstep->httptest, &key)) ||
+					SUCCEED != (ret = http_substitute_variables(httpstep->httptest, &value))))
+			{
+				zbx_dc_close_user_macros(um_handle);
+				httppairs_free(&httpstep->variables);
+				zbx_free(key);
+				zbx_free(value);
+				goto out;
+			}
+
+			zbx_dc_close_user_macros(um_handle);
+		}
 
 		/* keys and values of query fields / post fields should be encoded */
 		if (ZBX_HTTPFIELD_QUERY_FIELD == type || ZBX_HTTPFIELD_POST_FIELD == type)
@@ -581,7 +588,6 @@ static int	httptest_load_pairs(zbx_dc_host_t *host, zbx_httptest_t *httptest)
 	zbx_ptr_pair_t		pair;
 	zbx_vector_ptr_pair_t	*vector, headers;
 	char			*key, *value;
-	zbx_dc_um_handle_t	*um_handle;
 
 	zbx_vector_ptr_pair_create(&headers);
 	zbx_vector_ptr_pair_create(&httptest->variables);
@@ -600,7 +606,7 @@ static int	httptest_load_pairs(zbx_dc_host_t *host, zbx_httptest_t *httptest)
 		value = zbx_strdup(NULL, row[1]);
 
 		/* from now on variable values can contain macros so proper URL encoding can be performed */
-		um_handle = zbx_dc_open_user_macros_secure();
+		zbx_dc_um_handle_t	*um_handle = zbx_dc_open_user_macros_secure();
 		ret = zbx_substitute_macros(&value, NULL, 0, &macro_httptest_field_resolv, um_handle, host);
 		zbx_dc_close_user_macros(um_handle);
 
@@ -614,19 +620,22 @@ static int	httptest_load_pairs(zbx_dc_host_t *host, zbx_httptest_t *httptest)
 
 		/* variable names cannot contain macros, and both variable names and variable values cannot contain */
 		/* another variables */
-		um_handle = zbx_dc_open_user_macros();
-
-		if (ZBX_HTTPFIELD_VARIABLE != type && SUCCEED != (ret = zbx_substitute_macros(&key, NULL, 0,
-				&macro_httptest_field_resolv, um_handle, host)))
+		if (ZBX_HTTPFIELD_VARIABLE != type)
 		{
-			zbx_dc_close_user_macros(um_handle);
-			httppairs_free(&httptest->variables);
-			zbx_free(key);
-			zbx_free(value);
-			goto out;
-		}
+			um_handle = zbx_dc_open_user_macros();
 
-		zbx_dc_close_user_macros(um_handle);
+			if (SUCCEED != (ret = zbx_substitute_macros(&key, NULL, 0, &macro_httptest_field_resolv,
+					um_handle, host)))
+			{
+				zbx_dc_close_user_macros(um_handle);
+				httppairs_free(&httptest->variables);
+				zbx_free(key);
+				zbx_free(value);
+				goto out;
+			}
+
+			zbx_dc_close_user_macros(um_handle);
+		}
 
 		switch (type)
 		{
@@ -673,7 +682,6 @@ static void	process_httptest(zbx_dc_host_t *host, zbx_httptest_t *httptest, int 
 	double			speed_download = 0;
 	int			speed_download_num = 0, lastfailedstep = 0;
 #ifdef HAVE_LIBCURL
-	zbx_dc_um_handle_t	*um_handle;
 	zbx_db_row_t		row;
 	zbx_httpstat_t		stat;
 	char			errbuf[CURL_ERROR_SIZE];
@@ -756,7 +764,7 @@ static void	process_httptest(zbx_dc_host_t *host, zbx_httptest_t *httptest, int 
 
 		db_httpstep.url = zbx_strdup(NULL, row[3]);
 
-		um_handle = zbx_dc_open_user_macros_secure();
+		zbx_dc_um_handle_t	*um_handle = zbx_dc_open_user_macros_secure();
 		zbx_substitute_macros(&db_httpstep.url, NULL, 0, &macro_httptest_field_resolv, um_handle, host);
 		zbx_dc_close_user_macros(um_handle);
 
