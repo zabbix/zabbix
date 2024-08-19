@@ -65,6 +65,9 @@ var (
 
 	//go:embed outputs/all_disc_info_mac.json
 	OutputAllDiscInfoMac []byte
+
+	//go:embed outputs/permissions_denied.json
+	OutputPremissionsDenied []byte
 )
 
 // EnvironmentCollection is a collection of all the smartctl command outputs,

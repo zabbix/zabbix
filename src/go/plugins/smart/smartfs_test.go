@@ -51,7 +51,6 @@ func Test_getBasicDeviceInfo(t *testing.T) {
 		name           string
 		deviceName     string
 		expectations   expectation
-		fields         fields
 		args           args
 		expectedResult SmartCtlDeviceData
 		wantErr        bool
@@ -63,10 +62,6 @@ func Test_getBasicDeviceInfo(t *testing.T) {
 				args: []string{"-a", "/dev/sda", "-j"},
 				err:  nil,
 				out:  mock.OutputAllDiscInfoSDA,
-			},
-			fields{
-				jsonDevices: map[string]jsonDevice{},
-				devices:     map[string]deviceParser{},
 			},
 			args{
 				[]deviceInfo{
@@ -99,16 +94,12 @@ func Test_getBasicDeviceInfo(t *testing.T) {
 			false,
 		},
 		{
-			"+valid",
+			"-smart_error",
 			"/dev/sda",
 			expectation{
 				args: []string{"-a", "/dev/sda", "-j"},
-				err:  nil,
-				out:  mock.OutputAllDiscInfoSDA,
-			},
-			fields{
-				jsonDevices: map[string]jsonDevice{},
-				devices:     map[string]deviceParser{},
+				err:  errors.New("failed to exec smart control"),
+				out:  []byte{},
 			},
 			args{
 				[]deviceInfo{
@@ -120,25 +111,29 @@ func Test_getBasicDeviceInfo(t *testing.T) {
 				},
 				false,
 			},
-			SmartCtlDeviceData{
-				Device: &deviceParser{
-					ModelName:    "SAMSUNG MZVL21T0HCLR-00BH1",
-					SerialNumber: "S641NX0T509005",
-					Info: deviceInfo{
+			SmartCtlDeviceData{},
+			true,
+		},
+		{
+			"-smart_permissions_denied",
+			"/dev/sda",
+			expectation{
+				args: []string{"-a", "/dev/sda", "-j"},
+				err:  errors.New("permissions denied"),
+				out:  []byte{},
+			},
+			args{
+				[]deviceInfo{
+					{
 						Name:     "/dev/sda",
 						InfoName: "/dev/sda",
 						DevType:  "nvme",
-						name:     "/dev/sda",
 					},
-					Smartctl: smartctlField{
-						Version: []int{7, 1},
-					},
-					SmartStatus:     &smartStatus{SerialNumber: true},
-					SmartAttributes: smartAttributes{},
 				},
-				Data: mock.OutputAllDiscInfoSDA,
+				false,
 			},
-			false,
+			SmartCtlDeviceData{},
+			true,
 		},
 	}
 	for _, tt := range tests {
@@ -166,24 +161,26 @@ func Test_getBasicDeviceInfo(t *testing.T) {
 				)
 			}
 
-			if diff := cmp.Diff(
-				*tt.expectedResult.Device, *result.Device,
-				cmp.AllowUnexported(deviceInfo{}),
-			); diff != "" {
-				t.Fatalf(
-					"runner.executeBase() jsonDevices mismatch (-want +got):\n%s",
-					diff,
-				)
-			}
+			if !tt.wantErr {
+				if diff := cmp.Diff(
+					*tt.expectedResult.Device, *result.Device,
+					cmp.AllowUnexported(deviceInfo{}),
+				); diff != "" {
+					t.Fatalf(
+						"runner.executeBase() jsonDevices mismatch (-want +got):\n%s",
+						diff,
+					)
+				}
 
-			if diff := cmp.Diff(
-				tt.expectedResult.Data, result.Data,
-				cmp.AllowUnexported(deviceInfo{}),
-			); diff != "" {
-				t.Fatalf(
-					"runner.executeBase() devices mismatch (-want +got):\n%s",
-					diff,
-				)
+				if diff := cmp.Diff(
+					tt.expectedResult.Data, result.Data,
+					cmp.AllowUnexported(deviceInfo{}),
+				); diff != "" {
+					t.Fatalf(
+						"runner.executeBase() devices mismatch (-want +got):\n%s",
+						diff,
+					)
+				}
 			}
 
 			if err := mockController.ExpectationsWhereMet(); err != nil {
@@ -196,8 +193,173 @@ func Test_getBasicDeviceInfo(t *testing.T) {
 	}
 }
 
-/*
+// func Test_getRaidDeviceInfo(t *testing.T) {
+// 	type expectation struct {
+// 		args []string
+// 		err  error
+// 		out  []byte
+// 	}
 
+// 	type fields struct {
+// 		devices     map[string]deviceParser
+// 		jsonDevices map[string]jsonDevice
+// 	}
+
+// 	type args struct {
+// 		basicDev   []deviceInfo
+// 		jsonRunner bool
+// 	}
+
+// 	tests := []struct {
+// 		name           string
+// 		deviceName     string
+// 		expectations   expectation
+// 		fields         fields
+// 		args           args
+// 		expectedResult SmartCtlDeviceData
+// 		wantErr        bool
+// 	}{
+// 		{
+// 			"+valid",
+// 			"/dev/sda",
+// 			expectation{
+// 				args: []string{"-a", "/dev/sda", "-j"},
+// 				err:  nil,
+// 				out:  mock.OutputAllDiscInfoSDA,
+// 			},
+// 			fields{
+// 				jsonDevices: map[string]jsonDevice{},
+// 				devices:     map[string]deviceParser{},
+// 			},
+// 			args{
+// 				[]deviceInfo{
+// 					{
+// 						Name:     "/dev/sda",
+// 						InfoName: "/dev/sda",
+// 						DevType:  "nvme",
+// 					},
+// 				},
+// 				false,
+// 			},
+// 			SmartCtlDeviceData{
+// 				Device: &deviceParser{
+// 					ModelName:    "SAMSUNG MZVL21T0HCLR-00BH1",
+// 					SerialNumber: "S641NX0T509005",
+// 					Info: deviceInfo{
+// 						Name:     "/dev/sda",
+// 						InfoName: "/dev/sda",
+// 						DevType:  "nvme",
+// 						name:     "/dev/sda",
+// 					},
+// 					Smartctl: smartctlField{
+// 						Version: []int{7, 1},
+// 					},
+// 					SmartStatus:     &smartStatus{SerialNumber: true},
+// 					SmartAttributes: smartAttributes{},
+// 				},
+// 				Data: mock.OutputAllDiscInfoSDA,
+// 			},
+// 			false,
+// 		},
+// 		{
+// 			"+valid",
+// 			"/dev/sda",
+// 			expectation{
+// 				args: []string{"-a", "/dev/sda", "-j"},
+// 				err:  nil,
+// 				out:  mock.OutputAllDiscInfoSDA,
+// 			},
+// 			fields{
+// 				jsonDevices: map[string]jsonDevice{},
+// 				devices:     map[string]deviceParser{},
+// 			},
+// 			args{
+// 				[]deviceInfo{
+// 					{
+// 						Name:     "/dev/sda",
+// 						InfoName: "/dev/sda",
+// 						DevType:  "nvme",
+// 					},
+// 				},
+// 				false,
+// 			},
+// 			SmartCtlDeviceData{
+// 				Device: &deviceParser{
+// 					ModelName:    "SAMSUNG MZVL21T0HCLR-00BH1",
+// 					SerialNumber: "S641NX0T509005",
+// 					Info: deviceInfo{
+// 						Name:     "/dev/sda",
+// 						InfoName: "/dev/sda",
+// 						DevType:  "nvme",
+// 						name:     "/dev/sda",
+// 					},
+// 					Smartctl: smartctlField{
+// 						Version: []int{7, 1},
+// 					},
+// 					SmartStatus:     &smartStatus{SerialNumber: true},
+// 					SmartAttributes: smartAttributes{},
+// 				},
+// 				Data: mock.OutputAllDiscInfoSDA,
+// 			},
+// 			false,
+// 		},
+// 	}
+// 	for _, tt := range tests {
+// 		tt := tt
+// 		t.Run(tt.name, func(t *testing.T) {
+// 			t.Parallel()
+
+// 			cpuCount = 1
+
+// 			mockController := &mock.MockController{}
+
+// 			mockController.ExpectExecute().
+// 				WithArgs(tt.expectations.args...).
+// 				WillReturnOutput(tt.expectations.out).
+// 				WillReturnError(tt.expectations.err)
+
+// 			log.New("test")
+
+// 			result, err := getBasicDeviceInfo(mockController, tt.deviceName)
+// 			if (err != nil) != tt.wantErr {
+// 				t.Fatalf(
+// 					"runner.executeBase() error = %v, wantErr %v",
+// 					err,
+// 					tt.wantErr,
+// 				)
+// 			}
+
+// 			if diff := cmp.Diff(
+// 				*tt.expectedResult.Device, *result.Device,
+// 				cmp.AllowUnexported(deviceInfo{}),
+// 			); diff != "" {
+// 				t.Fatalf(
+// 					"runner.executeBase() jsonDevices mismatch (-want +got):\n%s",
+// 					diff,
+// 				)
+// 			}
+
+// 			if diff := cmp.Diff(
+// 				tt.expectedResult.Data, result.Data,
+// 				cmp.AllowUnexported(deviceInfo{}),
+// 			); diff != "" {
+// 				t.Fatalf(
+// 					"runner.executeBase() devices mismatch (-want +got):\n%s",
+// 					diff,
+// 				)
+// 			}
+
+// 			if err := mockController.ExpectationsWhereMet(); err != nil {
+// 				t.Fatalf(
+// 					"runner.executeBase() expectations where not met, error = %v",
+// 					err,
+// 				)
+// 			}
+// 		})
+// 	}
+// }
+
+/*
 //nolint:paralleltest,tparallel
 
 func Test_runner_executeBase(t *testing.T) {

@@ -223,7 +223,6 @@ type table struct {
 
 type runner struct {
 	plugin      *Plugin
-	resultChan  chan SmartCtlDeviceData
 	devices     map[string]deviceParser
 	jsonDevices map[string]jsonDevice
 }
@@ -286,9 +285,11 @@ func (p *Plugin) execute(jsonRunner bool) (*runner, error) {
 		}
 	}
 
-	for _, dvc := range megaraidDev {
+	for _, device := range megaraidDev {
+		name := device.Name
+		dtype := device.DevType
 		g.Go(func() error {
-			device, err := getRaidDeviceInfo(p.ctl, dvc.Name, dvc.DevType)
+			device, err := getRaidDeviceInfo(p.ctl, name, dtype)
 			if err != nil {
 				return err
 			}
@@ -299,10 +300,10 @@ func (p *Plugin) execute(jsonRunner bool) (*runner, error) {
 		})
 	}
 
-	go r.setDevicesData(jsonRunner)
+	go r.setDevicesData(resultChan, jsonRunner)
 
 	g.Wait()
-	close(r.resultChan)
+	close(resultChan)
 
 	r.parseOutput(jsonRunner)
 
@@ -390,9 +391,10 @@ func (r *runner) getRaidDevice(deviceName string, deviceType DeviceType, resultC
 				"failed to get device %q info by type %q: %s",
 				deviceName, deviceType, err.Error(),
 			)
-			resultChan <- *device
-			return nil
+
+			return err
 		}
+		resultChan <- *device
 	default:
 		var driveNumber int
 
@@ -518,10 +520,10 @@ func getBasicDeviceInfo(
 	return &data, nil
 }
 
-func (r *runner) setDevicesData(jsonRunner bool) {
+func (r *runner) setDevicesData(resultChan chan SmartCtlDeviceData, jsonRunner bool) {
 	for {
 		// Wait for data from dataChan
-		data, ok := <-r.resultChan
+		data, ok := <-resultChan
 		if !ok {
 			return
 		}
