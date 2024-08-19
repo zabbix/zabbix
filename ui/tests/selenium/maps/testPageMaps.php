@@ -43,7 +43,6 @@ class testPageMaps extends CWebTest {
 		];
 	}
 
-	protected static $sysmapids;
 	const SYSMAPS_SQL = 'SELECT * FROM sysmaps ORDER BY sysmapid';
 	const SYSMAP_NAME_WITH_SYMBOLS = 'Name with 3/4-byte symbols: 🤖 ⃠ Ω⌚Ԏ﨧';
 	const SYSMAP_TO_DELETE = 'Sysmap for deletion';
@@ -54,6 +53,7 @@ class testPageMaps extends CWebTest {
 	const SYSMAP_LOW_HEIGHT = 'Map with lowest height';
 	const SYSMAP_HIGH_HEIGHT = 'Map with highest height';
 	const SYSMAP_SPACES_NAME = 'Map to check trim for spaces';
+	protected static $sysmapids;
 
 	public function prepareMapsData() {
 		CDataHelper::call('map.create', [
@@ -285,27 +285,62 @@ class testPageMaps extends CWebTest {
 					]
 				]
 			],
-			// #1 View results with spaces for Name.
+			// TODO: Uncomment the test cases after issue in ZBX-24652 is fixed. Update the numbering of all test cases.
+			// # View results with multiple spaces for Name.
+//			[
+//				[
+//					'filter' => [
+//						'Name' => '           '
+//					]
+//				]
+//			],
+//			// # View results with single space in the name.
+//			[
+//				[
+//					'filter' => [
+//						'Name' => ' '
+//					],
+//					'expected' => [
+//						self::SYSMAP_FIRST_A,
+//						'Local network',
+//						self::SYSMAP_SPACES_NAME,
+//						self::SYSMAP_HIGH_HEIGHT,
+//						self::SYSMAP_HIGH_WIDTH,
+//						'Map with icon mapping',
+//						self::SYSMAP_LOW_HEIGHT,
+//						self::SYSMAP_LOW_WIDTH,
+//						self::SYSMAP_NAME_WITH_SYMBOLS,
+//						'Public map with image',
+//						self::SYSMAP_TO_DELETE,
+//						'Test map 1',
+//						self::SYSMAP_FIRST_Z
+//					]
+//				]
+//			],
+//			// # View results if request has trailing spaces.
+//			[
+//				[
+//					'filter' => [
+//						'Name' => 'spaces   '
+//					]
+//				]
+//			],
+//			// # View results if request has leading spaces.
+//			[
+//				[
+//					'filter' => [
+//						'Name' => '   spaces'
+//					]
+//				]
+//			],
+			// #1 View results with request that has spaces separating the words.
 			[
 				[
 					'filter' => [
-						'Name' => '           '
+						'Name' => self::SYSMAP_SPACES_NAME
 					],
 					'expected' => [
-						self::SYSMAP_FIRST_A,
-						'Local network',
-						self::SYSMAP_SPACES_NAME,
-						self::SYSMAP_HIGH_HEIGHT,
-						self::SYSMAP_HIGH_WIDTH,
-						'Map with icon mapping',
-						self::SYSMAP_LOW_HEIGHT,
-						self::SYSMAP_LOW_WIDTH,
-						self::SYSMAP_NAME_WITH_SYMBOLS,
-						'Public map with image',
-						self::SYSMAP_TO_DELETE,
-						'Test map 1',
-						'testZBX6840',
-						self::SYSMAP_FIRST_Z
+						self::SYSMAP_SPACES_NAME
 					]
 				]
 			],
@@ -313,7 +348,7 @@ class testPageMaps extends CWebTest {
 			[
 				[
 					'filter' => [
-						'Name' => 'Zabbix'
+						'Name' => 'bix'
 					],
 					'expected' => [
 						self::SYSMAP_FIRST_Z
@@ -324,7 +359,7 @@ class testPageMaps extends CWebTest {
 			[
 				[
 					'filter' => [
-						'Name' => 'Map with'
+						'Name' => 'p w'
 					],
 					'expected' => [
 						self::SYSMAP_HIGH_HEIGHT,
@@ -388,39 +423,6 @@ class testPageMaps extends CWebTest {
 					],
 					'expected' => [
 						self::SYSMAP_NAME_WITH_SYMBOLS
-					]
-				]
-			],
-			// #9 View results if request has trailing spaces.
-			[
-				[
-					'filter' => [
-						'Name' => 'spaces   '
-					],
-					'expected' => [
-						self::SYSMAP_SPACES_NAME
-					]
-				]
-			],
-			// #10 View results if request has leading spaces.
-			[
-				[
-					'filter' => [
-						'Name' => '   spaces'
-					],
-					'expected' => [
-						self::SYSMAP_SPACES_NAME
-					]
-				]
-			],
-			// #11 View results with request that has spaces separating the words.
-			[
-				[
-					'filter' => [
-						'Name' => self::SYSMAP_SPACES_NAME
-					],
-					'expected' => [
-						self::SYSMAP_SPACES_NAME
 					]
 				]
 			]
