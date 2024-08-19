@@ -174,6 +174,8 @@ A......... [ZBX-24299] fixed possibility to alter readonly error fields with Hos
 .......PS. [ZBX-24540] fixed crash when expanding host interface macros on main Zabbix agent interface (wiper)
 .......PS. [ZBX-17382] improved get[oid] and walk[oid] to display UTF-8 text instead of hex if MIB files are not installed (vso)
 ........S. [ZBX-23690] optimized maintenance calculations for large number of hosts x maintenances (wiper)
+........S. [ZBX-25016] fixed IP and DNS address validation when user macro is used for interface (vso, wiper)
+........S. [ZBX-25019] introduced limits to WebDriver performance data collection (dgoloscapov)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.3rc1
@@ -388,6 +390,7 @@ A......... [ZBX-24299] fixed possibility to alter readonly error fields with Hos
 ........S. [ZBX-23690] optimized maintenance calculations for large number of hosts x maintenances (wiper)
 A......... [ZBX-25017] fixed sensitive data exposure from audit log (gcalenko)
 .......PS. [ZBX-25018] removed direct pointer access in custom javascript objects (wiper)
+........S. [ZBX-25019] introduced limits to WebDriver performance data collection (dgoloscapov)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.0
@@ -410,6 +413,7 @@ Bug fixes:
 ....I..... [ZBX-25011] fixed access for non-admin user to options of installed MSI (MVekslers)
 ........S. [ZBX-25012] implemented phone number validation check to avoid AT commands injection (sboidenko)
 ........S. [ZBX-25013] fixed exploit to read files using SMS (sboidenko)
+........S. [ZBX-25016] fixed IP and DNS address validation when user macro is used for interface (vso, wiper)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.0rc2
@@ -498,6 +502,7 @@ A......... [ZBX-24258] fixed issue causing error when removing the old MFA metho
 .......PS. [ZBX-24354] fixed item status flapping (vso)
 ........S. [ZBX-24363] fixed proxyid being ignored in item test (kprutkovs)
 ....I..... [ZBX-24087] fixed Timeout option description for Zabbix agent 2 (dgoloscapov)
+........S. [ZBX-25016] fixed IP and DNS address validation when user macro is used for interface (vso, wiper)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.0beta3
@@ -1259,6 +1264,7 @@ A......... [ZBX-24481] fixed inability to unset value map from existing item or 
 ........S. [ZBX-25013] fixed exploit to read files using SMS (sboidenko)
 A......... [ZBX-25017] fixed sensitive data exposure from audit log (gcalenko)
 .......PS. [ZBX-25018] removed direct pointer access in custom javascript objects (wiper)
+........S. [ZBX-25016] fixed IP and DNS address validation when user macro is used for interface (vso, wiper)
 
 --------------------------------------------------------------------------------
 Changes for 6.4.15
@@ -3054,6 +3060,11 @@ Changes for 6.0.34rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-24650] fixed {ITEM.LOG.SEVERITY} macro to resolve to event severity instead of trigger severity (esekace)
+........S. [ZBX-24760] fixed default timezone in macro {EVENT.DATE} & {EVENT.TIME} expansion (mprihodko)
+..F....... [ZBX-21838] fixed max in table setting not being used to limit action count in mediatype list (agriscenko)
+..F....... [ZBX-24835] fixed case-conversion and preg functions working incorrectly with the Turkish locale (agriscenko)
+..F....... [ZBX-23844] fixed long names of icons and background images overlapping each other (agriscenko)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.33
