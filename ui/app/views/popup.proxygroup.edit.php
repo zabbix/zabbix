@@ -20,7 +20,7 @@
  */
 
 $form = (new CForm('post'))
-	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('proxygroup')))->removeId())
+	->addItem((new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('proxygroup')))->removeId())
 	->setId('proxy-group-form')
 	->setName('proxy_group_form')
 	->addItem(getMessages());

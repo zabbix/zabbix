@@ -22,7 +22,7 @@
 $this->includeJsFile('administration.timeouts.edit.js.php');
 
 $form = (new CForm())
-	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('timeouts')))->removeId())
+	->addItem((new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('timeouts')))->removeId())
 	->setId('timeouts-form')
 	->setName('timeouts_form')
 	->setAction(

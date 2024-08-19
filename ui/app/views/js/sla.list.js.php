@@ -142,9 +142,7 @@
 		_post(target, slaids, curl) {
 			target.classList.add('is-loading');
 
-			curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
-				<?= json_encode(CCsrfTokenHelper::get('sla')) ?>
-			);
+			curl.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('sla')) ?>);
 
 			return fetch(curl.getUrl(), {
 				method: 'POST',

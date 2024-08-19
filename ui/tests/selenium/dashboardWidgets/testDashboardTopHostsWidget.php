@@ -14,14 +14,10 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../behaviors/CTagBehavior.php';
-require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 require_once dirname(__FILE__).'/../common/testWidgets.php';
 
 /**
- * @dataSource TopHostsWidget, ItemValueWidget, AllItemValueTypes
+ * @dataSource AllItemValueTypes, ItemValueWidget, GlobalMacros, TopHostsWidget
  *
  * @backup dashboard
  *
@@ -30,7 +26,7 @@ require_once dirname(__FILE__).'/../common/testWidgets.php';
 class testDashboardTopHostsWidget extends testWidgets {
 
 	/**
-	 * Attach MessageBehavior and TagBehavior to the test.
+	 * Attach Behaviors to the test.
 	 */
 	public function getBehaviors() {
 		return [
@@ -39,7 +35,8 @@ class testDashboardTopHostsWidget extends testWidgets {
 				'class' => CTagBehavior::class,
 				'tag_selector' => 'id:tags_table_tags'
 			],
-			CTableBehavior::class
+			CTableBehavior::class,
+			CWidgetBehavior::class
 		];
 	}
 
@@ -48,6 +45,8 @@ class testDashboardTopHostsWidget extends testWidgets {
 	protected static $top_hosts_itemids;
 	protected static $dashboardids;
 	protected static $other_dashboardids;
+	protected static $dashboardid;
+
 	const DASHBOARD_UPDATE = 'top_host_update';
 	const DASHBOARD_CREATE = 'top_host_create';
 	const DASHBOARD_DELETE = 'top_host_delete';
@@ -92,6 +91,136 @@ class testDashboardTopHostsWidget extends testWidgets {
 		CDataHelper::addItemData(self::$top_hosts_itemids['top_hosts_trap_text'], 'Text for text item');
 		CDataHelper::addItemData(self::$top_hosts_itemids['top_hosts_trap_log'], 'Logs for text item');
 		CDataHelper::addItemData(self::$top_hosts_itemids['top_hosts_trap_char'], 'characters_here');
+	}
+
+	public function prepareTopHostsDisplayData() {
+		$dashboards = CDataHelper::call('dashboard.create', [
+			'name' => 'Dashboard for Top Hosts display check',
+			'auto_start' => 0,
+			'pages' => [
+				[
+					'name' => 'First Page',
+					'display_period' => 3600
+				]
+			]
+		]);
+		self::$dashboardid = $dashboards['dashboardids'][0];
+
+		$template_groups = CDataHelper::call('templategroup.create', [['name' => 'Top Hosts test template group']]);
+		$template_group = $template_groups['groupids'][0];
+
+		$templates = CDataHelper::createTemplates([
+			[
+				'host' => 'Template1',
+				'groups' => ['groupid' => $template_group],
+				'items' => [
+					[
+						'name' => 'Item1',
+						'key_' => 'key[1]',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_UINT64
+					],
+					[
+						'name' => 'Item2',
+						'key_' => 'key[2]',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_UINT64
+					]
+				]
+			],
+			[
+				'host' => 'Template2',
+				'groups' => ['groupid' => $template_group],
+				'items' => [
+					[
+						'name' => 'Item1',
+						'key_' => 'key[1]',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_UINT64
+					]
+				]
+			]
+		]);
+
+		$template1 = $templates['templateids']['Template1'];
+		$template2 = $templates['templateids']['Template2'];
+
+		$host_groups = CDataHelper::call('hostgroup.create', [['name' => 'Top Hosts test host group']]);
+		$host_group = $host_groups['groupids'][0];
+
+		CDataHelper::call('host.create', [
+			[
+				'host' => 'HostA',
+				'groups' => ['groupid' => $host_group],
+				'templates' => [['templateid' => $template1]],
+				'tags' => [['tag' => 'host', 'value' => 'A']]
+			],
+			[
+				'host' => 'HostB',
+				'groups' => ['groupid' => $host_group],
+				'templates' => [['templateid' => $template1]],
+				'tags' => [['tag' => 'host', 'value' => 'B']]
+			],
+			[
+				'host' => 'HostC',
+				'groups' => ['groupid' => $host_group],
+				'templates' => [['templateid' => $template2]],
+				'tags' => [['tag' => 'host', 'value' => 'B'], ['tag' => 'host', 'value' => 'C'], ['tag' => 'tag']]
+			]
+		]);
+
+		$hostids = CDataHelper::getIds('host');
+
+		$itemids = [];
+		foreach ($hostids as $host) {
+			$itemids[] = CDBHelper::getValue('SELECT itemid FROM items WHERE key_='.
+					zbx_dbstr('key[1]').' AND hostid='.zbx_dbstr($host)
+			);
+		}
+
+		foreach ($itemids as $i => $itemid) {
+			CDataHelper::addItemData($itemid, $i);
+		}
+
+		// Create item on host in maintenance and add data to it.
+		$response = CDataHelper::createHosts([
+			[
+				'host' => 'Host in maintenance',
+				'groups' => [['groupid' => $host_group]],
+				'items' => [
+					[
+						'name' => 'Maintenance trapper',
+						'key_' => 'maintenance_trap',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_UINT64
+					]
+				]
+			]
+		]);
+
+		$maintenance_itemid = $response['itemids']['Host in maintenance:maintenance_trap'];
+		$maintenance_hostid = $response['hostids']['Host in maintenance'];
+
+		CDataHelper::addItemData($maintenance_itemid, 100);
+
+		// Create Maintenance and host in maintenance.
+		$maintenances = CDataHelper::call('maintenance.create', [
+			[
+				'name' => 'Maintenance for Top Hosts widget',
+				'maintenance_type' => MAINTENANCE_TYPE_NORMAL,
+				'description' => 'Maintenance for icon check in Top Hosts widget',
+				'active_since' => time() - 100,
+				'active_till' => time() + 31536000,
+				'hosts' => [['hostid' => $maintenance_hostid]],
+				'timeperiods' => [[]]
+			]
+		]);
+		$maintenanceid = $maintenances['maintenanceids'][0];
+
+		DBexecute('UPDATE hosts SET maintenanceid='.zbx_dbstr($maintenanceid).
+			', maintenance_status=1, maintenance_type='.MAINTENANCE_TYPE_NORMAL.', maintenance_from='.zbx_dbstr(time()-1000).
+			' WHERE hostid='.zbx_dbstr($maintenance_hostid)
+		);
 	}
 
 	public function testDashboardTopHostsWidget_Layout() {
@@ -2194,7 +2323,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 
 			// Check error message in column form.
 			if (array_key_exists('column_error', $data)) {
-				// Count of days mentioned in error depends ot presence of leap year february in selected period.
+				// Count of days mentioned in error depends on presence of leap year february in selected period.
 				if (CTestArrayHelper::get($data, 'days_count')) {
 					$data['column_error'] = str_replace('{days}', CDateTimeHelper::countDays('now', 'P2Y'), $data['column_error']);
 				}
@@ -5138,24 +5267,29 @@ class testDashboardTopHostsWidget extends testWidgets {
 	 * Function used to create Top Hosts widget with special columns.
 	 *
 	 * @param array     $data			data provider values
-	 * @param string    $name		    name of the dashboard where to create Top Hosts widget
+	 * @param string    $dashboardid    id of the dashboard where to create Top Hosts widget
 	 * @param string	$widget_name	name of the widget to be created
+	 *
+	 * @return CDashboardElement
 	 */
-	protected function createTopHostsWidget($data, $name, $widget_name = null) {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.$name);
+	protected function createTopHostsWidget($data, $dashboardid, $widget_name = null) {
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.$dashboardid);
 		$dashboard = CDashboardElement::find()->one();
-		$form = $dashboard->edit()->addWidget()->asForm();
-		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Top hosts')]);
+		$fields = array_key_exists('main_fields', $data) ? $data['main_fields'] : ['Name' => $widget_name];
+		$form = $this->openWidgetAndFill($dashboard, 'Top hosts', $fields);
 
-		if ($widget_name) {
-			$form->fill(['Name' => $widget_name]);
+		// Fill Tags.
+		if (array_key_exists('Tags', $data)) {
+			$form->getField('id:evaltype')->fill(CTestArrayHelper::get($data['Tags'], 'evaluation', 'And/Or'));
+			$this->setTags($data['Tags']['tags']);
 		}
 
 		// Add new column(s) and save widget.
 		$this->fillColumnForm($data, 'create');
 
-		if (array_key_exists('main_fields', $data)) {
-			$form->fill($data['main_fields']);
+		// 'Order by' can only be filled after columns are added.
+		if (array_key_exists('Order by', $data)) {
+			$form->fill(['Order by' => $data['Order by']]);
 		}
 
 		$form->submit();
@@ -5168,6 +5302,8 @@ class testDashboardTopHostsWidget extends testWidgets {
 		$dashboard->save();
 		$dashboard->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
+
+		return $dashboard;
 	}
 
 	/**
@@ -5216,5 +5352,316 @@ class testDashboardTopHostsWidget extends testWidgets {
 		$this->checkAvailableItems('zabbix.php?action=dashboard.view&dashboardid='
 				.self::$dashboardids[self::DASHBOARD_CREATE], self::DEFAULT_WIDGET_NAME
 		);
+	}
+
+	public static function getCheckWidgetTableData() {
+		return [
+			// #0 Filtered by hosts, in column: item which came from two different templates.
+			[
+				[
+					'main_fields' => [
+						'Name' => 'Item on different hosts from one template',
+						'Hosts' => ['HostA', 'HostB', 'HostC']
+					],
+					'column_fields' => [
+						[
+							'Name' => 'Host',
+							'Data' => 'Host name'
+						],
+						[
+							'Name' => 'Column1',
+							'Item name' => [
+								'values' => 'Item1',
+								'context' => ['values' => 'HostA']
+							]
+						]
+					],
+					'result' => [
+						['Host' => 'HostC', 'Column1' => '2.00'],
+						['Host' => 'HostB', 'Column1' => '1.00'],
+						['Host' => 'HostA', 'Column1' => '0.00']
+					],
+					'headers' => ['Host', 'Column1']
+				]
+			],
+			// #1 Filtered by host group, Host limit is set less than filtered result.
+			[
+				[
+					'main_fields' => [
+						'Name' => 'Show lines < then possible result',
+						'Host groups' => ['Top Hosts test host group'],
+						'Host limit' => 2
+					],
+					'column_fields' => [
+						[
+							'Name' => 'Item',
+							'Item name' => [
+								'values' => 'Item1',
+								'context' => ['values' => 'HostA']
+							]
+						]
+					],
+					'result' => [
+						['Item' => '2.00'],
+						['Item' => '1.00']
+					],
+					'headers' => ['Item']
+				]
+			],
+			// #2 Filtered so that widget shows No data.
+			// TODO: This case is failing until ZBX-24828 is fixed.
+//			[
+//				[
+//					'main_fields' => [
+//						'Name' => 'No data'
+//					],
+//					'column_fields' => [
+//						[
+//							'fields' => [
+//								'Name' => 'Item2',
+//								'Item name' => [
+//									'values' => 'Item2',
+//									'context' => ['values' => 'HostA']
+//								]
+//							]
+//						]
+//					],
+//					'result' => [],
+//					'headers' => ['Item2']
+//				]
+//			],
+			// #3 Filtered by tags, columns: text and item, order newest in bottom.
+			[
+				[
+					'main_fields' => [
+						'Name' => 'Hosts filtered by tag'
+					],
+					'Tags' => [
+						'tags' => [
+							[
+								'name' => 'host',
+								'operator' => 'Equals',
+								'value' => 'B'
+							]
+						]
+					],
+					'column_fields' => [
+						[
+							'Name' => 'Text column',
+							'Data' => 'Text',
+							'Text' => '🙂🙃み け め 𒁥 test_text:'
+						],
+						[
+							'Name' => '🙂🙃み け め 𒁥',
+							'Item name' => [
+								'values' => 'Item1',
+								'context' => ['values' => 'HostA']
+							]
+						]
+					],
+					'result' => [
+						['Text column' => '🙂🙃み け め 𒁥 test_text:', '🙂🙃み け め 𒁥' => '1.00'],
+						['Text column' => '🙂🙃み け め 𒁥 test_text:', '🙂🙃み け め 𒁥' => '2.00']
+					],
+					'headers' => ['Text column', '🙂🙃み け め 𒁥']
+				]
+			],
+			// #4 Filtered by tags with OR operator, different macros used in columns.
+			[
+				[
+					'main_fields' => [
+						'Name' => 'Hosts filtered by tag, macros in columns'
+					],
+					'Tags' => [
+						'evaluation' => 'Or',
+						'tags' => [
+							[
+								'name' => 'host',
+								'operator' => 'Equals',
+								'value' => 'B'
+							],
+							[
+								'name' => 'tag',
+								'operator' => 'Exists'
+							]
+						]
+					],
+					'column_fields' => [
+						[
+							'Name' => 'Host name',
+							'Data' => 'Host name'
+						],
+						[
+							'Name' => 'Text: Macro in host',
+							'Data' => 'Text',
+							'Text' => '{HOST.HOST}' // This will be resolved in widget.
+						],
+						[
+							'Name' => '{#LLD_MACRO}',
+							'Item name' => [
+								'values' => 'Item1',
+								'context' => ['values' => 'HostB']
+							]
+						],
+						[
+							'Name' => '{HOST.HOST}',
+							'Item name' => [
+								'values' => 'Item1',
+								'context' => ['values' => 'HostB']
+							]
+						],
+						[
+							'Name' => '{$USERMACRO}',
+							'Item name' => [
+								'values' => 'Item2',
+								'context' => ['values' => 'HostA']
+							]
+						],
+						[
+							'Name' => '{$1} Resolved',
+							'Data' => 'Text',
+							'Text' => '{$1}' // This will be resolved in widget.
+						]
+					],
+					'Order by' => 'Host name',
+					'result' => [
+						[
+							'Host name' => 'HostB',
+							'Text: Macro in host' => 'HostB',  // Resolved global macro.
+							'{#LLD_MACRO}' => '1.00',
+							'{HOST.HOST}' => '1.00',
+							'{$USERMACRO}' => '',
+							'{$1} Resolved' => 'Numeric macro' // Resolved user macro.
+						],
+						[
+							'Host name' => 'HostC',
+							'Text: Macro in host' => 'HostC', // Resolved global macro.
+							'{#LLD_MACRO}' => '2.00',
+							'{HOST.HOST}' => '2.00',
+							'{$USERMACRO}' => '',
+							'{$1} Resolved' => 'Numeric macro' // Resolved user macro.
+						]
+					],
+					'headers' => ['Host name', 'Text: Macro in host', '{#LLD_MACRO}', '{HOST.HOST}',
+						'{$USERMACRO}', '{$1} Resolved'
+					]
+				]
+			],
+			// #5 Filtered by Host group, not including Host in maintenance.
+			[
+				[
+					'main_fields' => [
+						'Name' => 'Hosts group without maintenance',
+						'Host groups' => 'Top Hosts test host group'
+					],
+					'column_fields' => [
+						[
+							'Name' => 'Host',
+							'Data' => 'Host name'
+						],
+						[
+							'Name' => 'Maintenance Trapper',
+							'Item name' => [
+								'values' => 'Maintenance trapper',
+								'context' => ['values' => 'Host in maintenance']
+							]
+						],
+						[
+							'Name' => 'Item1',
+							'Item name' => [
+								'values' => 'Item1',
+								'context' => ['values' => 'HostA']
+							],
+							'Decimal places' => 5
+						]
+					],
+					'result' => [
+						['Host' => 'HostA', 'Maintenance Trapper' => '', 'Item1' => '0.00000'],
+						['Host' => 'HostB', 'Maintenance Trapper' => '', 'Item1' => '1.00000'],
+						['Host' => 'HostC', 'Maintenance Trapper' => '', 'Item1' => '2.00000']
+					],
+					'headers' => ['Host', 'Maintenance Trapper', 'Item1']
+				]
+			],
+			// #6 Filtered by Host group, including Host in maintenance.
+			[
+				[
+					'main_fields' => [
+						'Name' => 'Hosts group with maintenance',
+						'Host groups' => 'Top Hosts test host group',
+						'Show hosts in maintenance' => true
+					],
+					'column_fields' => [
+						[
+							'Name' => 'Host',
+							'Data' => 'Host name'
+						],
+						[
+							'Name' => 'Maintenance Trapper',
+							'Item name' => [
+								'values' => 'Maintenance trapper',
+								'context' => ['values' => 'Host in maintenance']
+							],
+							'Decimal places' => 4
+						],
+						[
+							'Name' => 'Item1',
+							'Item name' => [
+								'values' => 'Item1',
+								'context' => ['values' => 'HostA']
+							]
+						]
+					],
+					'result' => [
+						['Host' => 'HostA', 'Maintenance Trapper' => '', 'Item1' => '0.00'],
+						['Host' => 'HostB', 'Maintenance Trapper' => '', 'Item1' => '1.00'],
+						['Host' => 'HostC', 'Maintenance Trapper' => '', 'Item1' => '2.00'],
+						['Host' => 'Host in maintenance', 'Maintenance Trapper' => '100.0000', 'Item1' => '']
+					],
+					'headers' => ['Host', 'Maintenance Trapper', 'Item1'],
+					'check_maintenance' => [
+						'Host in maintenance' => "Maintenance for Top Hosts widget [Maintenance with data collection]\n".
+								"Maintenance for icon check in Top Hosts widget"
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getCheckWidgetTableData
+	 *
+	 * @onBeforeOnce prepareTopHostsDisplayData
+	 *
+	 * @onAfter deleteWidgets
+	 */
+	public function testDashboardTopHostsWidget_CheckWidgetTable($data) {
+		$dashboard = $this->createTopHostsWidget($data, static::$dashboardid);
+
+		// Assert widget's table.
+		$dashboard->getWidget($data['main_fields']['Name'])->waitUntilReady();
+		$table = $this->query('class:list-table')->asTable()->one();
+
+		if (empty($data['result'])) {
+			$this->assertTableData();
+		}
+		else {
+			$this->assertTableHasData($data['result']);
+		}
+
+		// Assert table headers depending on widget settings.
+		$this->assertEquals($data['headers'], $table->getHeadersText());
+
+		// Check maintenance icon and hint text.
+		if (CTestArrayHelper::get($data, 'check_maintenance')) {
+			foreach ($data['check_maintenance'] as $host => $hint_text) {
+				$this->query('xpath://td/a[text()='.CXPathHelper::escapeQuotes($host).
+						']/..//button[contains(@class,"wrench")]')->waitUntilClickable()->one()->click();
+				$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->waitUntilPresent();
+				$this->assertEquals($hint_text, $hint->one()->getText());
+				$hint->one()->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click();
+				$hint->waitUntilNotPresent();
+			}
+		}
 	}
 }

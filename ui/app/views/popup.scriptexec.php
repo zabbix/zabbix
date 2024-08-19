@@ -47,7 +47,7 @@ if ($data['success']) {
 }
 
 $form = (new CForm())
-	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('scriptexec')))->removeId())
+	->addItem((new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('scriptexec')))->removeId())
 	->addItem($form_items);
 
 $output = [

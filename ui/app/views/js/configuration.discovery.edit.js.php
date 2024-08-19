@@ -343,9 +343,7 @@ window.drule_edit_popup = new class {
 	delete() {
 		const curl = new Curl('zabbix.php');
 		curl.setArgument('action', 'discovery.delete');
-		curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
-			<?= json_encode(CCsrfTokenHelper::get('discovery'), JSON_THROW_ON_ERROR) ?>
-		);
+		curl.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('discovery')) ?>);
 
 		this.#post(curl.getUrl(), {druleids: [this.druleid]}, (response) => {
 			overlayDialogueDestroy(this.overlay.dialogueid);
