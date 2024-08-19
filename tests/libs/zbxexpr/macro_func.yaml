@@ -401,5 +401,16 @@ out:
   value: '&'
   return: SUCCEED
 
+---
+test case: htmldecode &#039;
+in:
+  function: 'htmldecode'
+  params: ''
+  data: '&#039;'
+
+out:
+  value: ''''
+  return: SUCCEED
+
 
 ...
