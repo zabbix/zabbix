@@ -178,6 +178,11 @@ A......... [ZBX-24299] fixed possibility to alter readonly error fields with Hos
 ........S. [ZBX-25019] introduced limits to WebDriver performance data collection (dgoloscapov)
 
 --------------------------------------------------------------------------------
+Changes for 7.0.3
+
+7.0.3rc1 was released as 7.0.3 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 7.0.3rc1
 
 New features:
