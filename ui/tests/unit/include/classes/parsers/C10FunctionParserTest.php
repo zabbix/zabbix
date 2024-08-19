@@ -35,10 +35,16 @@ class C10FunctionParserTest extends TestCase {
 						'type' => C10FunctionParser::PARAM_ARRAY,
 						'raw' => '()',
 						'pos' => 4,
-						'parameters' => []
+						'parameters' => [
+							0 => [
+								'type' => C10FunctionParser::PARAM_UNQUOTED,
+								'raw' => '',
+								'pos' => 1
+							]
+						]
 					]
 				],
-				[]
+				['']
 			],
 			[
 				'{host:item.func()}', 11,
@@ -51,10 +57,16 @@ class C10FunctionParserTest extends TestCase {
 						'type' => C10FunctionParser::PARAM_ARRAY,
 						'raw' => '()',
 						'pos' => 4,
-						'parameters' => []
+						'parameters' => [
+							0 => [
+								'type' => C10FunctionParser::PARAM_UNQUOTED,
+								'raw' => '',
+								'pos' => 1
+							]
+						]
 					]
 				],
-				[]
+				['']
 			],
 			[
 				'last("")', 0,
@@ -521,7 +533,6 @@ class C10FunctionParserTest extends TestCase {
 			'parameters' => $function_parser->getParameters(),
 			'params_raw' => $function_parser->getParamsRaw()
 		]);
-
 		$this->assertSame(strlen($expected['match']), $function_parser->getLength());
 		$this->assertSame($unquoted_params, $function_parser->getParams());
 
