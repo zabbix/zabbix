@@ -2880,7 +2880,7 @@ zbx_vmware_cust_query_t	*zbx_vmware_service_add_cust_query(zbx_vmware_service_t 
 	cq.value = NULL;
 	cq.error = NULL;
 	cq.state = (ZBX_VMWARE_CQ_NEW | ZBX_VMWARE_CQ_SEPARATE);
-	cq.last_pooled = 0;
+	cq.last_pooled = time(NULL);
 
 	if (VMWARE_DVSWITCH_FETCH_DV_PORTS == query_type)
 	{
