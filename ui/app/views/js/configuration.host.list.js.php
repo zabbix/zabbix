@@ -176,7 +176,7 @@
 
 				postMessageDetails('error', result.error.messages);
 
-				uncheckTableRows('hosts', response.keepids ?? []);
+				uncheckTableRows('hosts', result.keepids ?? []);
 			}
 			else if ('success' in result) {
 				postMessageOk(result.success.title);
