@@ -34,6 +34,27 @@ import (
 	"golang.zabbix.com/sdk/log"
 )
 
+func Test_execute(t *testing.T) {
+	tests := []struct {
+		name       string
+		jsonRunner bool
+	}{}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			p := Plugin{
+				ctl: &mock.MockController{},
+			}
+
+			p.execute(tt.jsonRunner)
+
+		})
+	}
+}
+
 func Test_getBasicDeviceInfo(t *testing.T) {
 	type expectation struct {
 		args []string
@@ -1228,7 +1249,7 @@ func Test_runner_executeBase(t *testing.T) {
 
 */
 
-func Test_getRaidDeviceInfo(t *testing.T) {
+func Test_getAllDeviceInfoByType(t *testing.T) {
 	t.Parallel()
 
 	sampleValidSmartInfoScan := []byte(`{
@@ -1602,7 +1623,7 @@ func Test_getRaidDeviceInfo(t *testing.T) {
 				WillReturnOutput(tt.fields.out).
 				WillReturnError(tt.fields.err)
 
-			got, err := getRaidDeviceInfo(
+			got, err := getAllDeviceInfoByType(
 				m,
 				tt.args.deviceName,
 				tt.args.deviceType,

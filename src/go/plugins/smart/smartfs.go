@@ -246,8 +246,6 @@ func (p *Plugin) execute(jsonRunner bool) (*runner, error) {
 		plugin: p,
 	}
 
-	resultChan := make(chan *SmartCtlDeviceData)
-
 	if jsonRunner {
 		r.jsonDevices = make(map[string]jsonDevice)
 	} else {
@@ -257,6 +255,14 @@ func (p *Plugin) execute(jsonRunner bool) (*runner, error) {
 	var g errgroup.Group
 
 	g.SetLimit(2)
+
+	resultChan := make(chan *SmartCtlDeviceData)
+
+	go func() {
+		for data := range resultChan {
+			r.setDevicesData(data, jsonRunner)
+		}
+	}()
 
 	for _, device := range basicDev {
 		name := device.Name
@@ -297,9 +303,11 @@ func (p *Plugin) execute(jsonRunner bool) (*runner, error) {
 		name := device.Name
 		dtype := device.DevType
 		g.Go(func() error {
-			device, err := getRaidDeviceInfo(p.ctl, name, dtype)
+
+			device, err := getAllDeviceInfoByType(p.ctl, name, dtype)
 			if err != nil {
-				return err
+				p.Tracef("got error executing for megaraid %s", err.Error())
+				return nil //ignoring megaraid devices as it was before
 			}
 
 			resultChan <- device
@@ -307,12 +315,6 @@ func (p *Plugin) execute(jsonRunner bool) (*runner, error) {
 			return nil
 		})
 	}
-
-	go func() {
-		for data := range resultChan {
-			r.setDevicesData(data, jsonRunner)
-		}
-	}()
 
 	err = g.Wait()
 
@@ -395,73 +397,54 @@ func cutPrefix(in string) string {
 	return strings.TrimPrefix(in, "/dev/")
 }
 
-func getRaidDevices(
+func getBasicDeviceInfo(
 	ctl SmartController,
-	logr log.Logger,
 	deviceName string,
-	deviceType DeviceType,
-) []*SmartCtlDeviceData {
-	switch deviceType {
-	case SAT, SCSI:
-		data, err := getRaidDeviceInfo(ctl, deviceName, string(deviceType))
-		if err != nil {
-			logr.Debugf(
-				"failed to get device %q info by type %q: %s",
-				deviceName, deviceType, err.Error(),
-			)
+) (*SmartCtlDeviceData, error) {
 
-			return []*SmartCtlDeviceData{}
-		}
+	device, err := ctl.Execute("-a", deviceName, "-j")
 
-		return []*SmartCtlDeviceData{data}
-	default:
-		var (
-			devices   []*SmartCtlDeviceData
-			devNumber int
-		)
-
-		if deviceType == Areca {
-			devNumber = 1
-		}
-
-		for {
-			data, err := getRaidDeviceInfo(
-				ctl,
-				deviceName,
-				fmt.Sprintf("%s,%d", deviceType, devNumber),
-			)
-			if err != nil {
-				logr.Debugf(
-					"failed to get device %q info by type %q: %s",
-					deviceName, deviceType, err.Error(),
-				)
-
-				break
-			}
-
-			devices = append(devices, data)
-			devNumber++
-		}
-
-		return devices
+	if err != nil {
+		return nil, errs.Wrap(err, "failed to execute smartctl")
 	}
+
+	dp := &deviceParser{}
+
+	err = json.Unmarshal(device, dp)
+	if err != nil {
+		return nil, errs.WrapConst(
+			err,
+			zbxerr.ErrorCannotMarshalJSON,
+		)
+	}
+
+	err = dp.checkErr()
+	if err != nil {
+		return nil, errs.Wrap(err, "smartctl returned error")
+	}
+
+	if dp.SmartStatus == nil {
+		return nil, errs.New("smartctl returned no smart status")
+	}
+
+	dp.Info.name = deviceName
+
+	return &SmartCtlDeviceData{
+		Device: dp,
+		Data:   device,
+	}, nil
 }
 
 // getAllDeviceInfoByType returns all device information by device type.
 //
 // runs: smartctl -a <deviceName> -d <deviceType> -j
 // returns error if .smart_status field is not present in the output.
-func getRaidDeviceInfo(
+func getAllDeviceInfoByType(
 	ctl SmartController,
 	deviceName, deviceType string,
 ) (*SmartCtlDeviceData, error) {
 
-	var (
-		err    error
-		device []byte
-	)
-
-	device, err = ctl.Execute("-a", deviceName, "-d", deviceType, "-j")
+	device, err := ctl.Execute("-a", deviceName, "-d", deviceType, "-j")
 
 	if err != nil {
 		return nil, errs.Wrap(err, "failed to execute smartctl")
@@ -497,47 +480,56 @@ func getRaidDeviceInfo(
 	}, nil
 }
 
-func getBasicDeviceInfo(
+func getRaidDevices(
 	ctl SmartController,
+	logr log.Logger,
 	deviceName string,
-) (*SmartCtlDeviceData, error) {
+	deviceType DeviceType,
+) []*SmartCtlDeviceData {
+	switch deviceType {
+	case SAT, SCSI:
+		data, err := getAllDeviceInfoByType(ctl, deviceName, string(deviceType))
+		if err != nil {
+			logr.Debugf(
+				"failed to get device %q info by type %q: %s",
+				deviceName, deviceType, err.Error(),
+			)
 
-	var (
-		err    error
-		device []byte
-	)
+			return []*SmartCtlDeviceData{}
+		}
 
-	device, err = ctl.Execute("-a", deviceName, "-j")
-
-	if err != nil {
-		return nil, errs.Wrap(err, "failed to execute smartctl")
-	}
-
-	dp := &deviceParser{}
-
-	err = json.Unmarshal(device, dp)
-	if err != nil {
-		return nil, errs.Wrap(
-			err,
-			"failed to parse (unmarshal json) smartctl output",
+		return []*SmartCtlDeviceData{data}
+	default:
+		var (
+			devices   []*SmartCtlDeviceData
+			devNumber int
 		)
+
+		if deviceType == Areca {
+			devNumber = 1
+		}
+
+		for {
+			data, err := getAllDeviceInfoByType(
+				ctl,
+				deviceName,
+				fmt.Sprintf("%s,%d", deviceType, devNumber),
+			)
+			if err != nil {
+				logr.Debugf(
+					"failed to get device %q info by type %q: %s",
+					deviceName, deviceType, err.Error(),
+				)
+
+				break
+			}
+
+			devices = append(devices, data)
+			devNumber++
+		}
+
+		return devices
 	}
-
-	err = dp.checkErr()
-	if err != nil {
-		return nil, errs.Wrap(err, "smartctl returned error")
-	}
-
-	if dp.SmartStatus == nil {
-		return nil, errs.New("smartctl returned no smart status")
-	}
-
-	dp.Info.name = deviceName
-
-	return &SmartCtlDeviceData{
-		Device: dp,
-		Data:   device,
-	}, nil
 }
 
 func (r *runner) setDevicesData(data *SmartCtlDeviceData, jsonRunner bool) {
@@ -552,7 +544,6 @@ func (r *runner) setDevicesData(data *SmartCtlDeviceData, jsonRunner bool) {
 	}
 }
 
-// No tests yet
 func (r *runner) parseOutput(jsonRunner bool) {
 	found := make(map[string]bool)
 
