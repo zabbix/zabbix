@@ -317,8 +317,7 @@ class testFormAlarmNotification extends CWebTest {
 		);
 
 		// Check close button.
-		$alarm_dialog->query('xpath:.//button[@title="Close"]')->one()->click();
-		$alarm_dialog->ensureNotPresent();
+		$alarm_dialog->query('xpath:.//button[@title="Close"]')->one()->click()->waitUntilNotVisible();
 	}
 
 	/**
@@ -373,8 +372,7 @@ class testFormAlarmNotification extends CWebTest {
 
 		// Check close button and close the problems.
 		$alarm_dialog = $this->getAlarmOverlay();
-		$alarm_dialog->query('xpath:.//button[@title="Close"]')->one()->click();
-		$alarm_dialog->ensureNotPresent();
+		$alarm_dialog->query('xpath:.//button[@title="Close"]')->one()->click()->waitUntilNotVisible();
 	}
 
 	public static function getDisplayedProblemsData() {
@@ -472,8 +470,7 @@ class testFormAlarmNotification extends CWebTest {
 		$this->assertEquals($data['trigger_name'], $triggered_alarms);
 
 		// Check close button and close the problems.
-		$alarm_dialog->query('xpath:.//button[@title="Close"]')->one()->click();
-		$alarm_dialog->ensureNotPresent();
+		$alarm_dialog->query('xpath:.//button[@title="Close"]')->one()->click()->waitUntilNotVisible();
 	}
 
 	public static function getNotificationSettingsData() {
@@ -660,8 +657,7 @@ class testFormAlarmNotification extends CWebTest {
 			$this->assertEquals($data['trigger_name'], $triggered_alarms);
 
 			// Check close button.
-			$alarm_dialog->query('xpath:.//button[@title="Close"]')->one()->click();
-			$alarm_dialog->ensureNotPresent();
+			$alarm_dialog->query('xpath:.//button[@title="Close"]')->one()->click()->waitUntilNotVisible();
 		}
 	}
 
@@ -702,15 +698,7 @@ class testFormAlarmNotification extends CWebTest {
 	}
 
 	protected function getAlarmOverlay() {
-		try {
-			return $this->query('xpath://div['.CXPathHelper::fromClass('overlay-dialogue notif').']')->waitUntilVisible(5)
-					->asOverlayDialog()->one();
-		}
-		catch (Exception $e) {
-			$this->page->refresh()->waitUntilReady();
-			return $this->query('xpath://div['.CXPathHelper::fromClass('overlay-dialogue notif').']')->waitUntilVisible()
-					->asOverlayDialog()->one();
-		}
+		return $this->query('xpath://div['.CXPathHelper::fromClass('overlay-dialogue notif').']')->waitUntilVisible()->one();
 	}
 
 	/**
@@ -724,7 +712,7 @@ class testFormAlarmNotification extends CWebTest {
 	}
 
 	/**
-	 * Acknowledge and close triggered problem.
+	 * Open problem page with filter reset.
 	 */
 	protected function openResetedPage() {
 		$this->page->login()->open('zabbix.php?action=problem.view&filter_reset=1')->waitUntilReady();
