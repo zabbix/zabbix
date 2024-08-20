@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-08-12T08:52:13Z'
+  date: '2024-08-20T09:49:50Z'
   groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -265,7 +265,7 @@ zabbix_export:
             
             	return JSON.stringify({ 'error': error });
             }
-          description: 'Get raw data on the daily costs by service'
+          description: 'Get raw data on the daily costs by service.'
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
               parameters:
@@ -568,6 +568,7 @@ zabbix_export:
             
             	return JSON.stringify({ 'error': error });
             }
+          description: 'Get raw data on the monthly costs by service.'
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
               parameters:

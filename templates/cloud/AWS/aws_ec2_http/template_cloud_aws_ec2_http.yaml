@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-08-12T08:50:21Z'
+  date: '2024-08-20T09:48:41Z'
   groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -45,6 +45,7 @@ zabbix_export:
               expression: 'length(last(/AWS EC2 by HTTP/aws.ec2.alarms.check))>0'
               name: 'AWS EC2: Failed to get alarms data'
               priority: WARNING
+              description: 'Failed to get CloudWatch alarms for EC2.'
               tags:
                 - tag: scope
                   value: availability
@@ -1394,6 +1395,7 @@ zabbix_export:
               expression: 'length(last(/AWS EC2 by HTTP/aws.ec2.metrics.check))>0'
               name: 'AWS EC2: Failed to get metrics data'
               priority: WARNING
+              description: 'Failed to get CloudWatch metrics for EC2.'
               tags:
                 - tag: scope
                   value: availability
@@ -1615,6 +1617,7 @@ zabbix_export:
               expression: 'length(last(/AWS EC2 by HTTP/aws.ec2.volumes.check))>0'
               name: 'AWS EC2: Failed to get volumes info'
               priority: WARNING
+              description: 'Failed to get CloudWatch volumes for EC2.'
               tags:
                 - tag: scope
                   value: availability
@@ -1696,6 +1699,7 @@ zabbix_export:
                   expression: 'last(/AWS EC2 by HTTP/aws.ec2.alarm.state["{#ALARM_NAME}"])=1'
                   name: 'AWS EC2 Alarms: [{#ALARM_NAME}] has ''Insufficient data'' state'
                   priority: INFO
+                  description: 'Either the alarm has just started, the metric is not available, or not enough data is available for the metric to determine the alarm state.'
                   tags:
                     - tag: scope
                       value: notice

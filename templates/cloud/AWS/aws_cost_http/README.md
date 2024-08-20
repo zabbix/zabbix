@@ -159,8 +159,8 @@ Additional information about metrics and used API methods:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|AWS Cost: Get monthly costs||Script|aws.get.monthly.costs<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|AWS Cost: Get daily costs|<p>Get raw data on the daily costs by service</p>|Script|aws.get.daily.costs<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|AWS Cost: Get monthly costs|<p>Get raw data on the monthly costs by service.</p>|Script|aws.get.monthly.costs<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|AWS Cost: Get daily costs|<p>Get raw data on the daily costs by service.</p>|Script|aws.get.daily.costs<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 
 ### LLD rule AWS daily costs by services discovery
 

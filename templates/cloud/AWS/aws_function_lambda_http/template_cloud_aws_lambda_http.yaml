@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-08-12T08:51:59Z'
+  date: '2024-08-20T11:46:34Z'
   groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -978,7 +978,7 @@ zabbix_export:
           value: 60s
           description: 'API response timeout.'
         - macro: '{$AWS.LAMBDA.ARN}'
-          description: 'Amazon Resource Names (ARN) of the load balancer.'
+          description: 'The Amazon Resource Names (ARN) of the Lambda function.'
         - macro: '{$AWS.LAMBDA.LLD.FILTER.ALARM_NAME.MATCHES}'
           value: '.*'
           description: 'Filter of discoverable alarms by name.'
@@ -995,7 +995,7 @@ zabbix_export:
           description: 'Sets the HTTP proxy value. If this macro is empty, no proxy is used.'
         - macro: '{$AWS.REGION}'
           value: us-west-1
-          description: 'AWS Application Load Balancer region code.'
+          description: 'AWS Lambda function region code.'
         - macro: '{$AWS.SECRET.ACCESS.KEY}'
           type: SECRET_TEXT
           description: 'Secret access key.'

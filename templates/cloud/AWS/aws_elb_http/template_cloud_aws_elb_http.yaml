@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-08-12T08:51:42Z'
+  date: '2024-08-20T09:49:28Z'
   groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -2291,32 +2291,8 @@ zabbix_export:
                   item:
                     host: 'AWS ELB Application Load Balancer by HTTP'
                     key: 'aws.elb.alb.target_groups.healthy_state_routing["{#AWS.ELB.TARGET.GROUP.NAME}"]'
-            - uuid: a2668f5bf6a240a296b047c1b979f9dc
-              name: 'AWS ELB ALB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}]: Unhealthy Host'
-              graph_items:
-                - drawtype: GRADIENT_LINE
-                  color: FF0000
-                  item:
-                    host: 'AWS ELB Application Load Balancer by HTTP'
-                    key: 'aws.elb.alb.target_groups.unhealthy_host_count["{#AWS.ELB.TARGET.GROUP.NAME}"]'
-            - uuid: 54645b74585c4b45a971c13d1127698d
-              name: 'AWS ELB ALB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}]: Unhealthy State DNS'
-              graph_items:
-                - drawtype: GRADIENT_LINE
-                  color: FF0000
-                  item:
-                    host: 'AWS ELB Application Load Balancer by HTTP'
-                    key: 'aws.elb.alb.target_groups.unhealthy_state_dns["{#AWS.ELB.TARGET.GROUP.NAME}"]'
-            - uuid: 8da12e20218e4367968b8fcf0f56991a
-              name: 'AWS ELB ALB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}]: Unhealthy State Routing'
-              graph_items:
-                - drawtype: GRADIENT_LINE
-                  color: FF0000
-                  item:
-                    host: 'AWS ELB Application Load Balancer by HTTP'
-                    key: 'aws.elb.alb.target_groups.unhealthy_state_routing["{#AWS.ELB.TARGET.GROUP.NAME}"]'
             - uuid: ec38c670cabf422ea79f41866c90ee66
-              name: 'AWS ELB ALB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}] HTTP Code Target Group'
+              name: 'AWS ELB ALB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}]: HTTP Code Target Group'
               graph_items:
                 - drawtype: BOLD_LINE
                   color: 199C0D
@@ -2341,6 +2317,30 @@ zabbix_export:
                   item:
                     host: 'AWS ELB Application Load Balancer by HTTP'
                     key: 'aws.elb.alb.target_groups.http_5xx_count["{#AWS.ELB.TARGET.GROUP.NAME}"]'
+            - uuid: a2668f5bf6a240a296b047c1b979f9dc
+              name: 'AWS ELB ALB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}]: Unhealthy Host'
+              graph_items:
+                - drawtype: GRADIENT_LINE
+                  color: FF0000
+                  item:
+                    host: 'AWS ELB Application Load Balancer by HTTP'
+                    key: 'aws.elb.alb.target_groups.unhealthy_host_count["{#AWS.ELB.TARGET.GROUP.NAME}"]'
+            - uuid: 54645b74585c4b45a971c13d1127698d
+              name: 'AWS ELB ALB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}]: Unhealthy State DNS'
+              graph_items:
+                - drawtype: GRADIENT_LINE
+                  color: FF0000
+                  item:
+                    host: 'AWS ELB Application Load Balancer by HTTP'
+                    key: 'aws.elb.alb.target_groups.unhealthy_state_dns["{#AWS.ELB.TARGET.GROUP.NAME}"]'
+            - uuid: 8da12e20218e4367968b8fcf0f56991a
+              name: 'AWS ELB ALB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}]: Unhealthy State Routing'
+              graph_items:
+                - drawtype: GRADIENT_LINE
+                  color: FF0000
+                  item:
+                    host: 'AWS ELB Application Load Balancer by HTTP'
+                    key: 'aws.elb.alb.target_groups.unhealthy_state_routing["{#AWS.ELB.TARGET.GROUP.NAME}"]'
           master_item:
             key: aws.elb.alb.get_target_groups
           lld_macro_paths:
@@ -2509,7 +2509,7 @@ zabbix_export:
                       name: graphid
                       value:
                         host: 'AWS ELB Application Load Balancer by HTTP'
-                        name: 'AWS ELB ALB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}] HTTP Code Target Group'
+                        name: 'AWS ELB ALB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}]: HTTP Code Target Group'
                 - type: GRAPH_PROTOTYPE
                   x: '12'
                   width: '12'

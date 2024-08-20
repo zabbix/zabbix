@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-08-12T08:50:38Z'
+  date: '2024-08-20T11:45:45Z'
   groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -46,6 +46,7 @@ zabbix_export:
               name: 'AWS RDS: Failed to get alarms data'
               opdata: '{ITEM.LASTVALUE1}'
               priority: WARNING
+              description: 'Failed to get CloudWatch alarms for RDS.'
               tags:
                 - tag: scope
                   value: availability
@@ -408,6 +409,7 @@ zabbix_export:
               name: 'AWS RDS: Failed to get events data'
               opdata: '{ITEM.LASTVALUE1}'
               priority: WARNING
+              description: 'Failed to get CloudWatch events for RDS.'
               tags:
                 - tag: scope
                   value: availability
@@ -1664,6 +1666,7 @@ zabbix_export:
               name: 'AWS RDS: Failed to get instance data'
               opdata: '{ITEM.LASTVALUE1}'
               priority: WARNING
+              description: 'Failed to get CloudWatch instance info for RDS.'
               tags:
                 - tag: scope
                   value: availability
@@ -1695,6 +1698,7 @@ zabbix_export:
               name: 'AWS RDS: Failed to get metrics data'
               opdata: '{ITEM.LASTVALUE1}'
               priority: WARNING
+              description: 'Failed to get CloudWatch metrics for RDS.'
               tags:
                 - tag: scope
                   value: availability
@@ -2290,6 +2294,7 @@ zabbix_export:
                   expression: 'last(/AWS RDS instance by HTTP/aws.rds.alarm.state["{#ALARM_NAME}"])=1'
                   name: 'AWS RDS Alarms: [{#ALARM_NAME}] has ''Insufficient data'' state'
                   priority: INFO
+                  description: 'Either the alarm has just started, the metric is not available, or not enough data is available for the metric to determine the alarm state.'
                   tags:
                     - tag: scope
                       value: notice
