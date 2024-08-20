@@ -809,10 +809,6 @@ class CHost extends CHostGeneral {
 		}
 		unset($host);
 
-		$hosts = $this->extendObjectsByKey($hosts, $db_hosts, 'hostid', ['tls_connect', 'tls_accept', 'tls_issuer',
-			'tls_subject', 'tls_psk_identity', 'tls_psk'
-		]);
-
 		foreach ($hosts as $host) {
 			// Extend host inventory with the required data.
 			if (array_key_exists('inventory', $host) && $host['inventory']) {
@@ -824,13 +820,8 @@ class CHost extends CHostGeneral {
 				}
 			}
 
-			$data = $host;
-			$data['hosts'] = ['hostid' => $host['hostid']];
-			$result = $this->massUpdate($data);
-
-			if (!$result) {
-				self::exception(ZBX_API_ERROR_INTERNAL, _('Host update failed.'));
-			}
+			$data = ['hosts' => ['hostid' => $host['hostid']]] + $host;
+			$this->massUpdateForce($data, $db_hosts);
 		}
 
 		$this->updateTags(array_column($hosts, 'tags', 'hostid'));
@@ -1033,6 +1024,15 @@ class CHost extends CHostGeneral {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Template "%1$s" already exists.', $data['host']));
 			}
 		}
+
+		$this->massUpdateForce($data, $db_hosts);
+
+		return ['hostids' => $hostids];
+	}
+
+	protected function massUpdateForce($data, $db_hosts) {
+		$hosts = zbx_toArray($data['hosts']);
+		$hostids = array_column($hosts, 'hostid');
 
 		if (isset($data['groups'])) {
 			$updateGroups = $data['groups'];
@@ -1283,8 +1283,6 @@ class CHost extends CHostGeneral {
 		}
 
 		$this->addAuditBulk(CAudit::ACTION_UPDATE, CAudit::RESOURCE_HOST, $new_hosts, $db_hosts);
-
-		return ['hostids' => $inputHostIds];
 	}
 
 	/**
@@ -2141,7 +2139,11 @@ class CHost extends CHostGeneral {
 		]];
 
 		$db_hosts = $this->get([
-			'output' => ['hostid', 'host', 'flags', 'tls_connect', 'tls_accept', 'tls_issuer', 'tls_subject'],
+			'output' => [
+				'hostid', 'host', 'flags', 'tls_connect', 'tls_accept', 'tls_issuer', 'tls_subject', 'proxy_hostid',
+				'status', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'name', 'description',
+				'inventory_mode'
+			],
 			'hostids' => array_column($hosts, 'hostid'),
 			'editable' => true,
 			'preservekeys' => true

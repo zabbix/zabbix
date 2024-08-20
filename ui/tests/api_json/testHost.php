@@ -830,6 +830,28 @@ class testHost extends CAPITest {
 						['hostid' => ':host:host.massupdate.psk5']
 					]
 				]
+			],
+			'Can update "tls_psk_identity" for multiple hosts having same values of "tls_psk"' => [
+				[
+					'tls_psk_identity' => 'massupdate.tls_psk_identity',
+					'tls_accept' => HOST_ENCRYPTION_PSK,
+					'tls_connect' => HOST_ENCRYPTION_PSK,
+					'hosts' => [
+						['hostid' => ':host:host.massupdate.psk3'],
+						['hostid' => ':host:host.massupdate.psk4']
+					]
+				]
+			],
+			'Can update "tls_psk" for multiple hosts having same values of "tls_psk_identity"' => [
+				[
+					'tls_psk' => '11111111111111111111111111111111',
+					'tls_accept' => HOST_ENCRYPTION_PSK,
+					'tls_connect' => HOST_ENCRYPTION_PSK,
+					'hosts' => [
+						['hostid' => ':host:host.massupdate.psk3'],
+						['hostid' => ':host:host.massupdate.psk4']
+					]
+				]
 			]
 		];
 	}
