@@ -1039,7 +1039,7 @@ int	zbx_mregexp_sub_precompiled(const char *string, const zbx_regexp_t *regexp, 
 int	zbx_regexp_repl(const char *string, const char *pattern, const char *output_template, char **out)
 {
 	zbx_regexp_t		*regexp = NULL;
-	int			mi, shift = 0, ret = FAIL;
+	int			mi, shift = 0, ret = FAIL, len;
 	char			*out_str = zbx_strdup(NULL, string), *ptr = out_str, *error = NULL;
 	zbx_vector_match_t	matches;
 	size_t			i;
@@ -1061,10 +1061,10 @@ int	zbx_regexp_repl(const char *string, const char *pattern, const char *output_
 
 	zbx_vector_match_create(&matches);
 
+	len = strlen(ptr);
 	/* collect all matches */
 	for (;;)
 	{
-		int		len = strlen(ptr);
 		zbx_match_t	*match;
 
 		match = zbx_malloc(NULL, sizeof(zbx_match_t));
