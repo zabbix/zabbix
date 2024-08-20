@@ -298,17 +298,9 @@ class testAlarmNotification extends CWebTest {
 			}
 		}
 
-		$this->page->open('zabbix.php?action=problem.view')->waitUntilReady();
-
-		// Close problem.
+		// Close problem and open Problem page.
 		CDBHelper::setTriggerProblem('Not_classified_trigger_4', TRIGGER_VALUE_FALSE);
-
-		/**
-		 * There can be an issue when trigger problem with setTriggerProblem method and refreshing page right after it.
-		 * Need to wait at least 1 second.
-		 */
-		sleep(1);
-		$this->page->refresh()->waitUntilReady();
+		$this->page->open('zabbix.php?action=problem.view')->waitUntilReady();
 
 		// Check that problem resolved and problem color is green now.
 		$this->assertEquals('Resolved Host for alarm item', $alarm_dialog->query('xpath:.//h4')->one()->getText());
