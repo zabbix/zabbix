@@ -26,7 +26,7 @@ use Widgets\Clock\Widget;
 const CLOCK_CLASSES = [
 	Widget::SHOW_DATE => 'clock-date',
 	Widget::SHOW_TIME => 'clock-time',
-	Widget::SHOW_TIMEZONE => 'clock-time-zone',
+	Widget::SHOW_TIMEZONE => 'clock-time-zone'
 ];
 
 $view = new CWidgetView($data);
