@@ -31,6 +31,7 @@ import (
 
 	"golang.org/x/sync/errgroup"
 	"golang.zabbix.com/sdk/errs"
+	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
@@ -245,7 +246,7 @@ func (p *Plugin) execute(jsonRunner bool) (*runner, error) {
 		plugin: p,
 	}
 
-	resultChan := make(chan SmartCtlDeviceData)
+	resultChan := make(chan *SmartCtlDeviceData)
 
 	if jsonRunner {
 		r.jsonDevices = make(map[string]jsonDevice)
@@ -266,7 +267,7 @@ func (p *Plugin) execute(jsonRunner bool) (*runner, error) {
 				return err
 			}
 
-			resultChan <- *device
+			resultChan <- device
 
 			return nil
 		})
@@ -280,7 +281,14 @@ func (p *Plugin) execute(jsonRunner bool) (*runner, error) {
 			dtype := deviveType
 
 			g.Go(func() error {
-				return r.getRaidDevice(name, dtype, resultChan)
+				devices := getRaidDevices(p.ctl, p.Base, name, dtype)
+				if err != nil {
+					return err
+				}
+				for _, device := range devices {
+					resultChan <- device
+				}
+				return nil
 			})
 		}
 	}
@@ -294,7 +302,7 @@ func (p *Plugin) execute(jsonRunner bool) (*runner, error) {
 				return err
 			}
 
-			resultChan <- *device
+			resultChan <- device
 
 			return nil
 		})
@@ -382,45 +390,56 @@ func cutPrefix(in string) string {
 	return strings.TrimPrefix(in, "/dev/")
 }
 
-func (r *runner) getRaidDevice(deviceName string, deviceType DeviceType, resultChan chan SmartCtlDeviceData) error {
+func getRaidDevices(
+	ctl SmartController,
+	logr log.Logger,
+	deviceName string,
+	deviceType DeviceType,
+) []*SmartCtlDeviceData {
 	switch deviceType {
 	case SAT, SCSI:
-		device, err := getRaidDeviceInfo(r.plugin.ctl, deviceName, string(deviceType))
+		data, err := getRaidDeviceInfo(ctl, deviceName, string(deviceType))
 		if err != nil {
-			r.plugin.Debugf(
+			logr.Debugf(
 				"failed to get device %q info by type %q: %s",
 				deviceName, deviceType, err.Error(),
 			)
 
-			return err
+			return []*SmartCtlDeviceData{}
 		}
-		resultChan <- *device
+
+		return []*SmartCtlDeviceData{data}
 	default:
-		var driveNumber int
+		var (
+			devices   []*SmartCtlDeviceData
+			devNumber int
+		)
 
 		if deviceType == Areca {
-			driveNumber = 1
+			devNumber = 1
 		}
 
 		for {
-			device, err := getRaidDeviceInfo(
-				r.plugin.ctl,
+			data, err := getRaidDeviceInfo(
+				ctl,
 				deviceName,
-				fmt.Sprintf("%s,%d", deviceType, driveNumber),
+				fmt.Sprintf("%s,%d", deviceType, devNumber),
 			)
 			if err != nil {
-				r.plugin.Debugf(
+				logr.Debugf(
 					"failed to get device %q info by type %q: %s",
 					deviceName, deviceType, err.Error(),
 				)
 
 				break
 			}
-			resultChan <- *device
-			driveNumber++
+
+			devices = append(devices, data)
+			devNumber++
 		}
+
+		return devices
 	}
-	return nil
 }
 
 // getAllDeviceInfoByType returns all device information by device type.
@@ -467,12 +486,10 @@ func getRaidDeviceInfo(
 
 	dp.Info.raidType = deviceType
 
-	data := SmartCtlDeviceData{
+	return &SmartCtlDeviceData{
 		Device: dp,
 		Data:   device,
-	}
-
-	return &data, nil
+	}, nil
 }
 
 func getBasicDeviceInfo(
@@ -512,15 +529,13 @@ func getBasicDeviceInfo(
 
 	dp.Info.name = deviceName
 
-	data := SmartCtlDeviceData{
+	return &SmartCtlDeviceData{
 		Device: dp,
 		Data:   device,
-	}
-
-	return &data, nil
+	}, nil
 }
 
-func (r *runner) setDevicesData(resultChan chan SmartCtlDeviceData, jsonRunner bool) {
+func (r *runner) setDevicesData(resultChan chan *SmartCtlDeviceData, jsonRunner bool) {
 	for {
 		// Wait for data from dataChan
 		data, ok := <-resultChan
