@@ -25,6 +25,7 @@
 
 void	wd_element_create(duk_context *ctx, zbx_webdriver_t *wd, const char *elementid);
 void	wd_element_create_array(duk_context *ctx, zbx_webdriver_t *wd, const zbx_vector_str_t *elements);
+const char	*wd_element_get_id(void *el);
 
 #endif
 

@@ -893,6 +893,30 @@ void	es_obj_attach_data(zbx_es_env_t *env, void *data, zbx_es_obj_type_t type)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: get data pointer attached to specified object                     *
+ *                                                                            *
+ * Parameters: env  - [IN]                                                    *
+ *             type - [IN] object type                                        *
+ *             idx -  [IN] object index on stack                              *
+ *                                                                            *
+ * Comments: This function must be used only from object methods.             *
+ *                                                                            *
+ ******************************************************************************/
+void	*es_obj_get_data(zbx_es_env_t *env, zbx_es_obj_type_t type, duk_idx_t idx)
+{
+	zbx_es_obj_data_t	obj_local, *obj;
+
+	obj_local.heapptr = duk_require_heapptr(env->ctx, idx);
+
+	if (NULL != (obj = zbx_hashset_search(&env->objmap, &obj_local)) && obj->type == type)
+		return obj->data;
+
+	return NULL;
+}
+
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: get data pointer attached to current object                       *
  *                                                                            *
  * Parameters: env  - [IN]                                                    *
@@ -901,18 +925,15 @@ void	es_obj_attach_data(zbx_es_env_t *env, void *data, zbx_es_obj_type_t type)
  * Comments: This function must be used only from object methods.             *
  *                                                                            *
  ******************************************************************************/
-void	*es_obj_get_data(zbx_es_env_t *env, zbx_es_obj_type_t type)
+void	*es_obj_get_this(zbx_es_env_t *env, zbx_es_obj_type_t type)
 {
-	zbx_es_obj_data_t	obj_local, *obj;
+	void	*data;
 
 	duk_push_this(env->ctx);
-	obj_local.heapptr = duk_require_heapptr(env->ctx, -1);
+	data = es_obj_get_data(env, type, -1);
 	duk_pop(env->ctx);
 
-	if (NULL != (obj = zbx_hashset_search(&env->objmap, &obj_local)) && obj->type == type)
-		return obj->data;
-
-	return NULL;
+	return data;
 }
 
 /******************************************************************************

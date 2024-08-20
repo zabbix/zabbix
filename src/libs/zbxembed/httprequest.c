@@ -99,7 +99,7 @@ static zbx_es_httprequest_t *es_httprequest(duk_context *ctx)
 		return NULL;
 	}
 
-	if (NULL == (request = (zbx_es_httprequest_t *)es_obj_get_data(env, ES_OBJ_HTTPREQUEST)))
+	if (NULL == (request = (zbx_es_httprequest_t *)es_obj_get_this(env, ES_OBJ_HTTPREQUEST)))
 		(void)duk_push_error_object(ctx, DUK_RET_EVAL_ERROR, "cannot find native data attached to object");
 
 	return request;

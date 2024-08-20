@@ -48,7 +48,7 @@ static zbx_wd_element_t *wd_element(duk_context *ctx)
 		return NULL;
 	}
 
-	if (NULL == (el = (zbx_wd_element_t *)es_obj_get_data(env, ES_OBJ_ELEMENT)))
+	if (NULL == (el = (zbx_wd_element_t *)es_obj_get_this(env, ES_OBJ_ELEMENT)))
 		(void)duk_push_error_object(ctx, DUK_RET_EVAL_ERROR, "cannot find native data attached to object");
 
 	return el;
@@ -380,6 +380,16 @@ void	wd_element_create_array(duk_context *ctx, zbx_webdriver_t *wd, const zbx_ve
 		wd_element_create(ctx, wd, elements->values[i]);
 		duk_put_prop_index(ctx, arr, (duk_uarridx_t)i);
 	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get element id                                                    *
+ *                                                                            *
+ ******************************************************************************/
+const char	*wd_element_get_id(void *wd)
+{
+	return ((zbx_wd_element_t *)wd)->id;
 }
 
 #endif
