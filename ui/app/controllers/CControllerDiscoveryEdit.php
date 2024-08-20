@@ -169,7 +169,7 @@ class CControllerDiscoveryEdit extends CController {
 
 		foreach ($checkid_usage_count as $dcheck_id => $usage_count) {
 			foreach($this->drule['dchecks'] as &$dcheck) {
-				if ($dcheck['dcheckid'] == $dcheck_id) {
+				if (bccomp($dcheck['dcheckid'], $dcheck_id) == 0) {
 					$dcheck['warning'] = $usage_count > 0
 						? _n(
 							'This check cannot be removed, as it is used as a condition in %1$s discovery action.',
