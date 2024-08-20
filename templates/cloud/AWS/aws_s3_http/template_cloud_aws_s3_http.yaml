@@ -45,6 +45,7 @@ zabbix_export:
               name: 'Failed to get alarms data'
               opdata: '{ITEM.LASTVALUE1}'
               priority: WARNING
+              description: 'Failed to get CloudWatch alarms for S3 bucket.'
               tags:
                 - tag: scope
                   value: availability
@@ -763,6 +764,7 @@ zabbix_export:
               name: 'Failed to get metrics data'
               opdata: '{ITEM.LASTVALUE1}'
               priority: WARNING
+              description: 'Failed to get CloudWatch metrics for S3 bucket.'
               tags:
                 - tag: scope
                   value: availability
@@ -832,6 +834,7 @@ zabbix_export:
                   expression: 'last(/AWS S3 bucket by HTTP/aws.s3.alarm.state["{#ALARM_NAME}"])=1'
                   name: '[{#ALARM_NAME}] has ''Insufficient data'' state'
                   priority: INFO
+                  description: 'Either the alarm has just started, the metric is not available, or not enough data is available for the metric to determine the alarm state.'
                   tags:
                     - tag: scope
                       value: notice

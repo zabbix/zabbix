@@ -11,7 +11,8 @@ For more information, please refer to the [CloudWatch pricing](https://aws.amazo
 
 Additional information about metrics and used API methods:
 
-* Full metrics list related to S3: https://docs.aws.amazon.com/AmazonS3/latest/userguide/metrics-dimensions.html
+* [Full metrics list related to S3](https://docs.aws.amazon.com/AmazonS3/latest/userguide/metrics-dimensions.html)
+* [DescribeAlarms API method](https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_DescribeAlarms.html)
 
 ## Requirements
 
@@ -146,9 +147,6 @@ For more information about manage access keys, see [official documentation](http
 
 Also, see the Macros section for a list of macros used for LLD filters.
 
-Additional information about metrics and used API methods:
-* Full metrics list related to S3: https://docs.aws.amazon.com/AmazonS3/latest/userguide/metrics-dimensions.html
-
 ### Macros used
 
 |Name|Description|Default|
@@ -182,8 +180,8 @@ Additional information about metrics and used API methods:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Failed to get metrics data||`length(last(/AWS S3 bucket by HTTP/aws.s3.metrics.check))>0`|Warning||
-|Failed to get alarms data||`length(last(/AWS S3 bucket by HTTP/aws.s3.alarms.check))>0`|Warning||
+|Failed to get metrics data|<p>Failed to get CloudWatch metrics for S3 bucket.</p>|`length(last(/AWS S3 bucket by HTTP/aws.s3.metrics.check))>0`|Warning||
+|Failed to get alarms data|<p>Failed to get CloudWatch alarms for S3 bucket.</p>|`length(last(/AWS S3 bucket by HTTP/aws.s3.alarms.check))>0`|Warning||
 
 ### LLD rule Bucket Alarms discovery
 
@@ -203,7 +201,7 @@ Additional information about metrics and used API methods:
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
 |[{#ALARM_NAME}] has 'Alarm' state|<p>Alarm "{#ALARM_NAME}" has 'Alarm' state.<br>Reason: {ITEM.LASTVALUE2}</p>|`last(/AWS S3 bucket by HTTP/aws.s3.alarm.state["{#ALARM_NAME}"])=2 and length(last(/AWS S3 bucket by HTTP/aws.s3.alarm.state_reason["{#ALARM_NAME}"]))>0`|Average||
-|[{#ALARM_NAME}] has 'Insufficient data' state||`last(/AWS S3 bucket by HTTP/aws.s3.alarm.state["{#ALARM_NAME}"])=1`|Info||
+|[{#ALARM_NAME}] has 'Insufficient data' state|<p>Either the alarm has just started, the metric is not available, or not enough data is available for the metric to determine the alarm state.</p>|`last(/AWS S3 bucket by HTTP/aws.s3.alarm.state["{#ALARM_NAME}"])=1`|Info||
 
 ### LLD rule Request Metrics discovery
 

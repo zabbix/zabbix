@@ -10,10 +10,10 @@ This template uses the GetMetricData CloudWatch API calls to list and retrieve m
 For more information, please refer to the [CloudWatch pricing](https://aws.amazon.com/cloudwatch/pricing/) page.
 
 Additional information about metrics and used API methods:
-* Full metrics list related to EBS: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using_cloudwatch_ebs.html
-* Full metrics list related to EC2: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/viewing_metrics_with_cloudwatch.html
-* DescribeAlarms API method: https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_DescribeAlarms.html
-* DescribeVolumes API method: https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeVolumes.html
+* [Full metrics list related to EBS](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using_cloudwatch_ebs.html)
+* [Full metrics list related to EC2](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/viewing_metrics_with_cloudwatch.html)
+* [DescribeAlarms API method](https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_DescribeAlarms.html)
+* [DescribeVolumes API method](https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeVolumes.html)
 
 
 ## Requirements
@@ -147,12 +147,6 @@ For more information about manage access keys, see [official documentation](http
 
 Also, see the Macros section for a list of macros used for LLD filters.
 
-Additional information about metrics and used API methods:
-* Full metrics list related to EBS: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using_cloudwatch_ebs.html
-* Full metrics list related to EC2: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/viewing_metrics_with_cloudwatch.html
-* DescribeAlarms API method: https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_DescribeAlarms.html
-* DescribeVolumes API method: https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeVolumes.html
-
 
 ### Macros used
 
@@ -217,9 +211,9 @@ Additional information about metrics and used API methods:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Failed to get metrics data||`length(last(/AWS EC2 by HTTP/aws.ec2.metrics.check))>0`|Warning||
-|Failed to get alarms data||`length(last(/AWS EC2 by HTTP/aws.ec2.alarms.check))>0`|Warning||
-|Failed to get volumes info||`length(last(/AWS EC2 by HTTP/aws.ec2.volumes.check))>0`|Warning||
+|Failed to get metrics data|<p>Failed to get CloudWatch metrics for EC2.</p>|`length(last(/AWS EC2 by HTTP/aws.ec2.metrics.check))>0`|Warning||
+|Failed to get alarms data|<p>Failed to get CloudWatch alarms for EC2.</p>|`length(last(/AWS EC2 by HTTP/aws.ec2.alarms.check))>0`|Warning||
+|Failed to get volumes info|<p>Failed to get CloudWatch volumes for EC2.</p>|`length(last(/AWS EC2 by HTTP/aws.ec2.volumes.check))>0`|Warning||
 |Instance CPU Credit balance is too low|<p>The number of earned CPU credits has been less than {$AWS.EC2.CPU.CREDIT.BALANCE.MIN.WARN} in the last 5 minutes.</p>|`max(/AWS EC2 by HTTP/aws.ec2.cpu.credit_balance,5m)<{$AWS.EC2.CPU.CREDIT.BALANCE.MIN.WARN}`|Warning||
 |Instance has spent too many CPU surplus credits|<p>The number of spent surplus credits that are not paid down and which thus incur an additional charge is over {$AWS.EC2.CPU.CREDIT.SURPLUS.BALANCE.MAX.WARN}.</p>|`last(/AWS EC2 by HTTP/aws.ec2.cpu.surplus_credit_charged)>{$AWS.EC2.CPU.CREDIT.SURPLUS.BALANCE.MAX.WARN}`|Warning||
 |High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/AWS EC2 by HTTP/aws.ec2.cpu_utilization,15m)>{$AWS.EC2.CPU.UTIL.WARN.MAX}`|Warning||
@@ -247,7 +241,7 @@ Additional information about metrics and used API methods:
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
 |[{#ALARM_NAME}] has 'Alarm' state|<p>Alarm "{#ALARM_NAME}" has 'Alarm' state.<br>Reason: {ITEM.LASTVALUE2}</p>|`last(/AWS EC2 by HTTP/aws.ec2.alarm.state["{#ALARM_NAME}"])=2 and length(last(/AWS EC2 by HTTP/aws.ec2.alarm.state_reason["{#ALARM_NAME}"]))>0`|Average||
-|[{#ALARM_NAME}] has 'Insufficient data' state||`last(/AWS EC2 by HTTP/aws.ec2.alarm.state["{#ALARM_NAME}"])=1`|Info||
+|[{#ALARM_NAME}] has 'Insufficient data' state|<p>Either the alarm has just started, the metric is not available, or not enough data is available for the metric to determine the alarm state.</p>|`last(/AWS EC2 by HTTP/aws.ec2.alarm.state["{#ALARM_NAME}"])=1`|Info||
 
 ### LLD rule Instance Volumes discovery
 

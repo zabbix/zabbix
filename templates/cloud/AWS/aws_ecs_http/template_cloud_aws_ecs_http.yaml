@@ -45,6 +45,7 @@ zabbix_export:
               name: 'Failed to get alarms data'
               opdata: '{ITEM.LASTVALUE1}'
               priority: WARNING
+              description: 'Failed to get CloudWatch alarms for ECS Cluster.'
               tags:
                 - tag: scope
                   value: availability
@@ -53,7 +54,7 @@ zabbix_export:
           type: DEPENDENT
           key: aws.ecs.container_instance_count
           value_type: FLOAT
-          description: '''The number of EC2 instances running the Amazon ECS agent that are registered with a cluster.'''
+          description: 'The number of EC2 instances running the Amazon ECS agent that are registered with a cluster.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -70,8 +71,8 @@ zabbix_export:
           key: aws.ecs.cpu_reserved
           value_type: FLOAT
           description: |
-            'A number of CPU units reserved by tasks in the resource that is specified by the dimension set that you're using.
-             This metric is only collected for tasks that have a defined CPU reservation in their task definition.'
+            A number of CPU units reserved by tasks in the resource that is specified by the dimension set that you're using.
+            This metric is only collected for tasks that have a defined CPU reservation in their task definition.
           valuemap:
             name: 'CPU Reserved'
           preprocessing:
@@ -988,8 +989,8 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           description: |
-            'The memory being used by tasks in the resource that is specified by the dimension set that you're using.
-             This metric is only collected for tasks that have a defined memory reservation in their task definition.'
+            The memory being used by tasks in the resource that is specified by the dimension set that you're using.
+            This metric is only collected for tasks that have a defined memory reservation in their task definition.
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1038,6 +1039,7 @@ zabbix_export:
               name: 'Failed to get metrics data'
               opdata: '{ITEM.LASTVALUE1}'
               priority: WARNING
+              description: 'Failed to get CloudWatch metrics for ECS Cluster.'
               tags:
                 - tag: scope
                   value: availability
@@ -1048,8 +1050,8 @@ zabbix_export:
           value_type: FLOAT
           units: Bps
           description: |
-            'The number of bytes received by the resource that is specified by the dimensions that you're using.
-             This metric is only available for containers in tasks using the awsvpc or bridge network modes.'
+            The number of bytes received by the resource that is specified by the dimensions that you're using.
+            This metric is only available for containers in tasks using the awsvpc or bridge network modes.
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1067,8 +1069,8 @@ zabbix_export:
           value_type: FLOAT
           units: Bps
           description: |
-            'The number of bytes transmitted by the resource that is specified by the dimensions that you're using.
-             This metric is only available for containers in tasks using the awsvpc or bridge network modes.'
+            The number of bytes transmitted by the resource that is specified by the dimensions that you're using.
+            This metric is only available for containers in tasks using the awsvpc or bridge network modes.
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1084,7 +1086,7 @@ zabbix_export:
           type: DEPENDENT
           key: aws.ecs.service_count
           value_type: FLOAT
-          description: '''The number of services in the cluster.'''
+          description: 'The number of services in the cluster.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1100,7 +1102,7 @@ zabbix_export:
           type: DEPENDENT
           key: aws.ecs.task_count
           value_type: FLOAT
-          description: '''The number of tasks running in the cluster.'''
+          description: 'The number of tasks running in the cluster.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1180,6 +1182,7 @@ zabbix_export:
                   expression: 'last(/AWS ECS Cluster by HTTP/aws.ecs.alarm.state["{#ALARM_NAME}"])=1'
                   name: '[{#ALARM_NAME}] has ''Insufficient data'' state'
                   priority: INFO
+                  description: 'Either the alarm has just started, the metric is not available, or not enough data is available for the metric to determine the alarm state.'
                   tags:
                     - tag: scope
                       value: notice
@@ -1211,7 +1214,7 @@ zabbix_export:
               name: '[{#ALARM_NAME}] has ''Alarm'' state'
               priority: AVERAGE
               description: |
-                Alarm "{#ALARM_NAME}" has 'Alarm' state.
+                Alarm "{#ALARM_NAME}" has `Alarm` state.
                 Reason: {ITEM.LASTVALUE2}
               tags:
                 - tag: scope
@@ -1261,8 +1264,8 @@ zabbix_export:
               value_type: FLOAT
               units: '%'
               description: |
-                "A number of CPU units used by tasks in the resource that is specified by the dimension set that you're using.
-                 This metric is only collected for tasks that have a defined CPU reservation in their task definition."
+                A number of CPU units used by tasks in the resource that is specified by the dimension set that you're using.
+                This metric is only collected for tasks that have a defined CPU reservation in their task definition.
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1298,8 +1301,8 @@ zabbix_export:
               key: 'aws.ecs.services.cpu_reserved["{#AWS.ECS.SERVICE.NAME}"]'
               value_type: FLOAT
               description: |
-                "A number of CPU units reserved by tasks in the resource that is specified by the dimension set that you're using.
-                 This metric is only collected for tasks that have a defined CPU reservation in their task definition."
+                A number of CPU units reserved by tasks in the resource that is specified by the dimension set that you're using.
+                This metric is only collected for tasks that have a defined CPU reservation in their task definition.
               valuemap:
                 name: 'CPU Reserved'
               preprocessing:
@@ -1682,8 +1685,8 @@ zabbix_export:
               value_type: FLOAT
               units: '%'
               description: |
-                'The memory being used by tasks in the resource that is specified by the dimension set that you're using.
-                This metric is only collected for tasks that have a defined memory reservation in their task definition.'
+                The memory being used by tasks in the resource that is specified by the dimension set that you're using.
+                This metric is only collected for tasks that have a defined memory reservation in their task definition.
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1720,8 +1723,8 @@ zabbix_export:
               value_type: FLOAT
               units: B
               description: |
-                'The memory that is reserved by tasks in the resource that is specified by the dimension set that you're using.
-                This metric is only collected for tasks that have a defined memory reservation in their task definition.'
+                The memory that is reserved by tasks in the resource that is specified by the dimension set that you're using.
+                This metric is only collected for tasks that have a defined memory reservation in their task definition.
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1746,8 +1749,8 @@ zabbix_export:
               value_type: FLOAT
               units: B
               description: |
-                'The memory being used by tasks in the resource that is specified by the dimension set that you're using.
-                This metric is only collected for tasks that have a defined memory reservation in their task definition.'
+                The memory being used by tasks in the resource that is specified by the dimension set that you're using.
+                This metric is only collected for tasks that have a defined memory reservation in their task definition.
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1772,8 +1775,8 @@ zabbix_export:
               value_type: FLOAT
               units: Bps
               description: |
-                'The number of bytes received by the resource that is specified by the dimensions that you're using.
-                This metric is only available for containers in tasks using the awsvpc or bridge network modes.'
+                The number of bytes received by the resource that is specified by the dimensions that you're using.
+                This metric is only available for containers in tasks using the awsvpc or bridge network modes.
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1795,8 +1798,8 @@ zabbix_export:
               value_type: FLOAT
               units: Bps
               description: |
-                'The number of bytes transmitted by the resource that is specified by the dimensions that you're using.
-                This metric is only available for containers in tasks using the awsvpc or bridge network modes.'
+                The number of bytes transmitted by the resource that is specified by the dimensions that you're using.
+                This metric is only available for containers in tasks using the awsvpc or bridge network modes.
               preprocessing:
                 - type: JSONPATH
                   parameters:

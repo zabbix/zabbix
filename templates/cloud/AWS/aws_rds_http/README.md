@@ -11,9 +11,9 @@ For more information, please refer to the [CloudWatch pricing](https://aws.amazo
 
 Additional information about metrics and used API methods:
 
-* Full metrics list related to RDS: https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/rds-metrics.html
-* Full metrics list related to Amazon Aurora: https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.AuroraMySQL.Monitoring.Metrics.html#Aurora.AuroraMySQL.Monitoring.Metrics.instances
-* DescribeAlarms API method: https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_DescribeAlarms.html
+* [Full metrics list related to RDS](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/rds-metrics.html)
+* [Full metrics list related to Amazon Aurora](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.AuroraMySQL.Monitoring.Metrics.html#Aurora.AuroraMySQL.Monitoring.Metrics.instances)
+* [DescribeAlarms API method](https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_DescribeAlarms.html)
 
 
 ## Requirements
@@ -148,11 +148,6 @@ For more information about manage access keys, see [official documentation](http
 
 Also, see the Macros section for a list of macros used for LLD filters.
 
-Additional information about metrics and used API methods:
-* Full metrics list related to RDS: https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/rds-metrics.html
-* Full metrics list related to Amazon Aurora: https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.AuroraMySQL.Monitoring.Metrics.html#Aurora.AuroraMySQL.Monitoring.Metrics.instances
-* DescribeAlarms API method: https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_DescribeAlarms.html
-
 
 ### Macros used
 
@@ -239,10 +234,10 @@ Additional information about metrics and used API methods:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Failed to get metrics data||`length(last(/AWS RDS instance by HTTP/aws.rds.metrics.check))>0`|Warning||
-|Failed to get instance data||`length(last(/AWS RDS instance by HTTP/aws.rds.instance_info.check))>0`|Warning||
-|Failed to get alarms data||`length(last(/AWS RDS instance by HTTP/aws.rds.alarms.check))>0`|Warning||
-|Failed to get events data||`length(last(/AWS RDS instance by HTTP/aws.rds.events.check))>0`|Warning||
+|Failed to get metrics data|<p>Failed to get CloudWatch metrics for RDS.</p>|`length(last(/AWS RDS instance by HTTP/aws.rds.metrics.check))>0`|Warning||
+|Failed to get instance data|<p>Failed to get CloudWatch instance info for RDS.</p>|`length(last(/AWS RDS instance by HTTP/aws.rds.instance_info.check))>0`|Warning||
+|Failed to get alarms data|<p>Failed to get CloudWatch alarms for RDS.</p>|`length(last(/AWS RDS instance by HTTP/aws.rds.alarms.check))>0`|Warning||
+|Failed to get events data|<p>Failed to get CloudWatch events for RDS.</p>|`length(last(/AWS RDS instance by HTTP/aws.rds.events.check))>0`|Warning||
 |Read replica in error state|<p>The status of a read replica.<br>False if the instance is in an error state.</p>|`last(/AWS RDS instance by HTTP/aws.rds.read_replica_state)=0`|Average||
 |Burst balance is too low||`max(/AWS RDS instance by HTTP/aws.rds.burst_balance,5m)<{$AWS.RDS.BURST.CREDIT.BALANCE.MIN.WARN}`|Warning||
 |High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/AWS RDS instance by HTTP/aws.rds.cpu.utilization,15m)>{$AWS.RDS.CPU.UTIL.WARN.MAX}`|Warning||
@@ -268,7 +263,7 @@ Additional information about metrics and used API methods:
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
 |[{#ALARM_NAME}] has 'Alarm' state|<p>Alarm "{#ALARM_NAME}" has 'Alarm' state.<br>Reason: {ITEM.LASTVALUE2}</p>|`last(/AWS RDS instance by HTTP/aws.rds.alarm.state["{#ALARM_NAME}"])=2 and length(last(/AWS RDS instance by HTTP/aws.rds.alarm.state_reason["{#ALARM_NAME}"]))>0`|Average||
-|[{#ALARM_NAME}] has 'Insufficient data' state||`last(/AWS RDS instance by HTTP/aws.rds.alarm.state["{#ALARM_NAME}"])=1`|Info||
+|[{#ALARM_NAME}] has 'Insufficient data' state|<p>Either the alarm has just started, the metric is not available, or not enough data is available for the metric to determine the alarm state.</p>|`last(/AWS RDS instance by HTTP/aws.rds.alarm.state["{#ALARM_NAME}"])=1`|Info||
 
 ### LLD rule Aurora metrics discovery
 
