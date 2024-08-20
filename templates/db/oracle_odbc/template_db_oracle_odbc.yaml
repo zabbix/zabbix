@@ -32,6 +32,7 @@ zabbix_export:
           delay: 1h
           history: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             SELECT d.dest_name
             FROM v$archive_dest d , v$database db WHERE d.status != 'INACTIVE' AND db.log_mode = 'ARCHIVELOG';
@@ -48,6 +49,7 @@ zabbix_export:
           delay: 1h
           history: '0'
           value_type: TEXT
+          trends: '0'
           params: 'SELECT name AS dgname FROM v$asm_diskgroup;'
           username: '{$ORACLE.USER}'
           password: '{$ORACLE.PASSWORD}'
@@ -62,6 +64,7 @@ zabbix_export:
           delay: 1h
           history: '0'
           value_type: TEXT
+          trends: '0'
           params: 'SELECT name as DBNAME, DECODE(CDB, ''YES'', ''CDB'', ''No-CDB'') AS TYPE  FROM V$DATABASE;'
           username: '{$ORACLE.USER}'
           password: '{$ORACLE.PASSWORD}'
@@ -75,6 +78,7 @@ zabbix_export:
           key: 'db.odbc.get[get_instance_state,,"Driver={$ORACLE.DRIVER};DBQ=//{$ORACLE.HOST}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           history: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             SELECT
             INSTANCE_NAME,
@@ -98,6 +102,7 @@ zabbix_export:
           delay: 1h
           history: '0'
           value_type: TEXT
+          trends: '0'
           params: 'SELECT name as DBNAME FROM V$PDBS;'
           username: '{$ORACLE.USER}'
           password: '{$ORACLE.PASSWORD}'
@@ -112,6 +117,7 @@ zabbix_export:
           delay: 0;m0-59
           history: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             SELECT 'SYS::' || METRIC_NAME AS METRIC, ROUND(VALUE,3) as VALUE
              FROM V$SYSMETRIC WHERE GROUP_ID = 2
@@ -183,6 +189,7 @@ zabbix_export:
           delay: 1h
           history: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             SELECT NVL(CON$NAME, 'DB') CON_NAME,
             TABLESPACE_NAME TABLESPACE,
@@ -214,6 +221,7 @@ zabbix_export:
           name: 'Active parallel sessions'
           type: DEPENDENT
           key: oracle.active_parallel_sessions
+          delay: '0'
           value_type: FLOAT
           description: 'The number of active parallel sessions.'
           preprocessing:
@@ -229,6 +237,7 @@ zabbix_export:
           name: 'Active serial sessions'
           type: DEPENDENT
           key: oracle.active_serial_sessions
+          delay: '0'
           value_type: FLOAT
           description: 'The number of active serial sessions.'
           preprocessing:
@@ -244,6 +253,7 @@ zabbix_export:
           name: 'Average active sessions'
           type: DEPENDENT
           key: oracle.active_sessions
+          delay: '0'
           value_type: FLOAT
           description: 'The average number of active sessions at a point in time that are either working or waiting.'
           preprocessing:
@@ -259,6 +269,7 @@ zabbix_export:
           name: 'Archiver state'
           type: DEPENDENT
           key: oracle.archiver_state
+          delay: '0'
           description: 'The status of automatic archiving.'
           valuemap:
             name: 'Oracle archiver state'
@@ -275,6 +286,7 @@ zabbix_export:
           name: 'Buffer cache hit ratio'
           type: DEPENDENT
           key: oracle.buffer_cache_hit_ratio
+          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'The ratio of buffer cache hits ((LogRead - PhyRead)/LogRead).'
@@ -291,6 +303,7 @@ zabbix_export:
           name: 'Global cache blocks corrupted'
           type: DEPENDENT
           key: oracle.cache_blocks_corrupt
+          delay: '0'
           units: Rps
           description: 'The number of blocks that encountered corruption or checksum failure during the interconnect.'
           preprocessing:
@@ -306,6 +319,7 @@ zabbix_export:
           name: 'Global cache blocks lost'
           type: DEPENDENT
           key: oracle.cache_blocks_lost
+          delay: '0'
           units: Rps
           description: 'The number of lost global cache blocks.'
           preprocessing:
@@ -321,6 +335,7 @@ zabbix_export:
           name: 'Cursor cache hit ratio'
           type: DEPENDENT
           key: oracle.cursor_cache_hit_ratio
+          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'The ratio of cursor cache hits (CursorCacheHit/SoftParse).'
@@ -337,6 +352,7 @@ zabbix_export:
           name: 'Database CPU time ratio'
           type: DEPENDENT
           key: oracle.database_cpu_time_ratio
+          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'The ratio calculated by dividing the total CPU (used by the database) by the Oracle time model statistic DB time.'
@@ -353,6 +369,7 @@ zabbix_export:
           name: 'Database wait time ratio'
           type: DEPENDENT
           key: oracle.database_wait_time_ratio
+          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'Wait time - the time that the server process spends waiting for available shared resources to be released by other server processes such as latches, locks, data buffers, etc.'
@@ -369,6 +386,7 @@ zabbix_export:
           name: 'Datafiles count'
           type: DEPENDENT
           key: oracle.db_files_count
+          delay: '0'
           description: 'The current number of datafiles.'
           preprocessing:
             - type: JSONPATH
@@ -383,6 +401,7 @@ zabbix_export:
           name: 'Datafiles limit'
           type: DEPENDENT
           key: oracle.db_files_limit
+          delay: '0'
           description: 'The maximum allowable number of datafiles.'
           preprocessing:
             - type: JSONPATH
@@ -397,6 +416,7 @@ zabbix_export:
           name: 'Disk sort per second'
           type: DEPENDENT
           key: oracle.disk_sorts
+          delay: '0'
           value_type: FLOAT
           units: Rps
           description: 'The number of sorts going to disk per second.'
@@ -413,6 +433,7 @@ zabbix_export:
           name: 'Enqueue timeouts per second'
           type: DEPENDENT
           key: oracle.enqueue_timeouts_rate
+          delay: '0'
           value_type: FLOAT
           units: Rps
           description: 'Enqueue timeouts per second.'
@@ -429,6 +450,7 @@ zabbix_export:
           name: 'FRA, Number of files'
           type: DEPENDENT
           key: oracle.fra_number_of_files
+          delay: '0'
           description: 'The number of files in the FRA.'
           preprocessing:
             - type: JSONPATH
@@ -445,6 +467,7 @@ zabbix_export:
           name: 'FRA, Number of restore points'
           type: DEPENDENT
           key: oracle.fra_restore_point
+          delay: '0'
           value_type: FLOAT
           description: 'Number of restore points in the FRA.'
           preprocessing:
@@ -460,6 +483,7 @@ zabbix_export:
           name: 'FRA, Space limit'
           type: DEPENDENT
           key: oracle.fra_space_limit
+          delay: '0'
           units: B
           description: 'The maximum amount of disk space (in bytes) that the database can use for the Fast Recovery Area (FRA).'
           preprocessing:
@@ -477,6 +501,7 @@ zabbix_export:
           name: 'FRA, Space reclaimable'
           type: DEPENDENT
           key: oracle.fra_space_reclaimable
+          delay: '0'
           units: B
           description: 'The total amount of disk space (in bytes) that can be created by deleting obsolete, redundant, and other low-priority files from the FRA.'
           preprocessing:
@@ -494,6 +519,7 @@ zabbix_export:
           name: 'FRA, Used space'
           type: DEPENDENT
           key: oracle.fra_space_used
+          delay: '0'
           units: B
           description: 'The amount of disk space (in bytes) used by FRA files created in the current and all the previous FRAs.'
           preprocessing:
@@ -511,6 +537,7 @@ zabbix_export:
           name: 'FRA, Usable space in %'
           type: DEPENDENT
           key: oracle.fra_usable_pct
+          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'Percentage of space usable in the FRA.'
@@ -529,6 +556,7 @@ zabbix_export:
           name: 'GC CR block received per second'
           type: DEPENDENT
           key: oracle.gc_cr_block_received_rate
+          delay: '0'
           value_type: FLOAT
           units: Rps
           description: 'The global cache (GC) and the consistent read (CR) block received per second.'
@@ -545,6 +573,7 @@ zabbix_export:
           name: 'Instance role'
           type: DEPENDENT
           key: oracle.instance.role
+          delay: '0'
           description: 'Indicates whether the instance is an active instance or an inactive secondary instance.'
           valuemap:
             name: 'Oracle instance role'
@@ -561,7 +590,9 @@ zabbix_export:
           name: 'Instance hostname'
           type: DEPENDENT
           key: oracle.instance_hostname
+          delay: '0'
           value_type: CHAR
+          trends: '0'
           description: 'The name of the host machine.'
           preprocessing:
             - type: JSONPATH
@@ -587,7 +618,9 @@ zabbix_export:
           name: 'Instance name'
           type: DEPENDENT
           key: oracle.instance_name
+          delay: '0'
           value_type: CHAR
+          trends: '0'
           description: 'The name of the instance.'
           preprocessing:
             - type: JSONPATH
@@ -613,6 +646,7 @@ zabbix_export:
           name: 'Instance status'
           type: DEPENDENT
           key: oracle.instance_status
+          delay: '0'
           description: 'The status of the instance.'
           valuemap:
             name: 'Oracle instance status'
@@ -629,6 +663,7 @@ zabbix_export:
           name: 'Library cache hit ratio'
           type: DEPENDENT
           key: oracle.library_cache_hit_ratio
+          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'The ratio of library cache hits (Hits/Pins).'
@@ -645,6 +680,7 @@ zabbix_export:
           name: 'Logons per second'
           type: DEPENDENT
           key: oracle.logons_rate
+          delay: '0'
           value_type: FLOAT
           units: Rps
           description: 'The number of logon attempts.'
@@ -661,6 +697,7 @@ zabbix_export:
           name: 'Long table scans per second'
           type: DEPENDENT
           key: oracle.long_table_scans_rate
+          delay: '0'
           value_type: FLOAT
           units: Rps
           description: 'The number of long table scans per second. A table is considered long if it is not cached and if its high water mark is greater than five blocks.'
@@ -677,6 +714,7 @@ zabbix_export:
           name: 'Memory sorts ratio'
           type: DEPENDENT
           key: oracle.memory_sorts_ratio
+          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'The percentage of sorts (from `ORDER BY` clauses or index building) that are done to disk vs. in-memory.'
@@ -693,6 +731,7 @@ zabbix_export:
           name: 'PGA, Global memory bound'
           type: DEPENDENT
           key: oracle.pga_global_bound
+          delay: '0'
           units: B
           description: 'The maximum size of a work area executed in automatic mode.'
           preprocessing:
@@ -710,6 +749,7 @@ zabbix_export:
           name: 'PGA, Aggregate target parameter'
           type: DEPENDENT
           key: oracle.pga_target
+          delay: '0'
           units: B
           description: 'The current value of the `PGA_AGGREGATE_TARGET` initialization parameter. If this parameter is not set, then its value is "0" and automatic management of the PGA memory is disabled.'
           preprocessing:
@@ -727,6 +767,7 @@ zabbix_export:
           name: 'Physical reads per second'
           type: DEPENDENT
           key: oracle.physical_reads_rate
+          delay: '0'
           value_type: FLOAT
           units: Rps
           description: 'Reads per second.'
@@ -743,6 +784,7 @@ zabbix_export:
           name: 'Physical reads bytes per second'
           type: DEPENDENT
           key: oracle.physical_read_bytes_rate
+          delay: '0'
           value_type: FLOAT
           units: Bps
           description: 'Read bytes per second.'
@@ -759,6 +801,7 @@ zabbix_export:
           name: 'Physical writes per second'
           type: DEPENDENT
           key: oracle.physical_writes_rate
+          delay: '0'
           value_type: FLOAT
           units: Rps
           description: 'Writes per second.'
@@ -775,6 +818,7 @@ zabbix_export:
           name: 'Physical writes bytes per second'
           type: DEPENDENT
           key: oracle.physical_write_bytes_rate
+          delay: '0'
           value_type: FLOAT
           units: Bps
           description: 'Write bytes per second.'
@@ -791,6 +835,7 @@ zabbix_export:
           name: 'Number of processes'
           type: DEPENDENT
           key: oracle.processes_count
+          delay: '0'
           description: 'The current number of user processes.'
           preprocessing:
             - type: JSONPATH
@@ -805,6 +850,7 @@ zabbix_export:
           name: 'Processes limit'
           type: DEPENDENT
           key: oracle.processes_limit
+          delay: '0'
           description: 'The maximum number of user processes.'
           preprocessing:
             - type: JSONPATH
@@ -819,6 +865,7 @@ zabbix_export:
           name: 'Redo logs available to switch'
           type: DEPENDENT
           key: oracle.redo_logs_available
+          delay: '0'
           description: 'The number of inactive/unused redo logs available for log switching.'
           preprocessing:
             - type: JSONPATH
@@ -843,6 +890,7 @@ zabbix_export:
           name: 'Rows per sort'
           type: DEPENDENT
           key: oracle.rows_per_sort
+          delay: '0'
           value_type: FLOAT
           description: 'The average number of rows per sort for all types of sorts performed.'
           preprocessing:
@@ -858,6 +906,7 @@ zabbix_export:
           name: 'SQL service response time'
           type: DEPENDENT
           key: oracle.service_response_time
+          delay: '0'
           value_type: FLOAT
           units: s
           description: 'The Structured Query Language (SQL) service response time expressed in seconds.'
@@ -877,6 +926,7 @@ zabbix_export:
           name: 'Active background sessions'
           type: DEPENDENT
           key: oracle.session_active_background
+          delay: '0'
           value_type: FLOAT
           description: 'The number of active background sessions.'
           preprocessing:
@@ -894,6 +944,7 @@ zabbix_export:
           name: 'Active user sessions'
           type: DEPENDENT
           key: oracle.session_active_user
+          delay: '0'
           value_type: FLOAT
           description: 'The number of active user sessions.'
           preprocessing:
@@ -911,6 +962,7 @@ zabbix_export:
           name: 'Sessions concurrency'
           type: DEPENDENT
           key: oracle.session_concurrency_rate
+          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'The percentage of concurrency. Concurrency is a database behavior when different transactions request to change the same resource. In the case of modifying data transactions, it sequentially temporarily blocks the right to change the data, and the rest of the transactions wait for access. When the access to a resource is locked for a long time, the concurrency grows (like the transaction queue), often leaving an extremely negative impact on performance. A high contention value does not indicate the root cause of the problem, but is a signal to search for it.'
@@ -937,6 +989,7 @@ zabbix_export:
           name: 'Session count'
           type: DEPENDENT
           key: oracle.session_count
+          delay: '0'
           value_type: FLOAT
           description: 'The session count.'
           preprocessing:
@@ -952,6 +1005,7 @@ zabbix_export:
           name: 'Inactive user sessions'
           type: DEPENDENT
           key: oracle.session_inactive_user
+          delay: '0'
           value_type: FLOAT
           description: 'The number of inactive user sessions.'
           preprocessing:
@@ -969,6 +1023,7 @@ zabbix_export:
           name: 'Sessions limit'
           type: DEPENDENT
           key: oracle.session_limit
+          delay: '0'
           description: 'The user and system sessions.'
           preprocessing:
             - type: JSONPATH
@@ -983,6 +1038,7 @@ zabbix_export:
           name: 'Sessions lock rate'
           type: DEPENDENT
           key: oracle.session_lock_rate
+          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'The percentage of locked sessions. Locks are mechanisms that prevent destructive interaction between transactions accessing the same resource - either user objects, such as tables and rows or system objects not visible to users, such as shared data structures in memory and data dictionary rows.'
@@ -1009,6 +1065,7 @@ zabbix_export:
           name: 'Sessions locked over {$ORACLE.SESSION.LOCK.MAX.TIME}s'
           type: DEPENDENT
           key: oracle.session_long_time_locked
+          delay: '0'
           value_type: FLOAT
           description: 'The count of the prolongedly locked sessions. (You can change the duration of the maximum session lock in seconds for a query using the `{$ORACLE.SESSION.LOCK.MAX.TIME}` macro. Default = 600 s).'
           preprocessing:
@@ -1034,6 +1091,7 @@ zabbix_export:
           name: 'SGA, buffer cache'
           type: DEPENDENT
           key: oracle.sga_buffer_cache
+          delay: '0'
           units: B
           description: 'The size of standard block cache.'
           preprocessing:
@@ -1053,6 +1111,7 @@ zabbix_export:
           name: 'SGA, fixed'
           type: DEPENDENT
           key: oracle.sga_fixed
+          delay: '0'
           units: B
           description: 'The fixed System Global Area (SGA) is an internal housekeeping area.'
           preprocessing:
@@ -1072,6 +1131,7 @@ zabbix_export:
           name: 'SGA, java pool'
           type: DEPENDENT
           key: oracle.sga_java_pool
+          delay: '0'
           units: B
           description: 'The memory is allocated from the Java pool.'
           preprocessing:
@@ -1091,6 +1151,7 @@ zabbix_export:
           name: 'SGA, large pool'
           type: DEPENDENT
           key: oracle.sga_large_pool
+          delay: '0'
           units: B
           description: 'The memory is allocated from a large pool.'
           preprocessing:
@@ -1110,6 +1171,7 @@ zabbix_export:
           name: 'SGA, log buffer'
           type: DEPENDENT
           key: oracle.sga_log_buffer
+          delay: '0'
           units: B
           description: 'The number of bytes allocated for the redo log buffer.'
           preprocessing:
@@ -1129,6 +1191,7 @@ zabbix_export:
           name: 'SGA, shared pool'
           type: DEPENDENT
           key: oracle.sga_shared_pool
+          delay: '0'
           units: B
           description: 'The memory is allocated from a shared pool.'
           preprocessing:
@@ -1148,6 +1211,7 @@ zabbix_export:
           name: 'Shared pool free %'
           type: DEPENDENT
           key: oracle.shared_pool_free
+          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'Free memory of a shared pool expressed in %.'
@@ -1174,6 +1238,7 @@ zabbix_export:
           name: 'Total sorts per user call'
           type: DEPENDENT
           key: oracle.sorts_per_user_call
+          delay: '0'
           value_type: FLOAT
           description: 'The total sorts per user call.'
           preprocessing:
@@ -1189,6 +1254,7 @@ zabbix_export:
           name: 'Temp space used'
           type: DEPENDENT
           key: oracle.temp_space_used
+          delay: '0'
           value_type: FLOAT
           units: B
           description: 'Used temporary space.'
@@ -1205,6 +1271,7 @@ zabbix_export:
           name: 'PGA, Total allocated'
           type: DEPENDENT
           key: oracle.total_pga_allocated
+          delay: '0'
           units: B
           description: 'The current amount of the PGA memory allocated by the instance. The Oracle Database attempts to keep this number below the value of the `PGA_AGGREGATE_TARGET` initialization parameter. However, it is possible for the PGA allocated to exceed that value by a small percentage and for a short period of time when the work area workload is increasing very rapidly or when `PGA_AGGREGATE_TARGET` is set to a small value.'
           preprocessing:
@@ -1222,6 +1289,7 @@ zabbix_export:
           name: 'PGA, Total freeable'
           type: DEPENDENT
           key: oracle.total_pga_freeable
+          delay: '0'
           units: B
           description: 'The number of bytes of the PGA memory in all processes that could be freed back to the OS.'
           preprocessing:
@@ -1239,6 +1307,7 @@ zabbix_export:
           name: 'PGA, Total inuse'
           type: DEPENDENT
           key: oracle.total_pga_used
+          delay: '0'
           units: B
           description: 'The amount of Program Global Area (PGA) memory currently consumed by work areas. This number can be used to determine how much memory is consumed by other consumers of the PGA memory (for example, PL/SQL or Java).'
           preprocessing:
@@ -1256,6 +1325,7 @@ zabbix_export:
           name: Uptime
           type: DEPENDENT
           key: oracle.uptime
+          delay: '0'
           trends: '0'
           units: s
           description: 'The Oracle instance uptime expressed in seconds.'
@@ -1295,6 +1365,7 @@ zabbix_export:
           name: 'User ''{$ORACLE.USER}'' expire password'
           type: DEPENDENT
           key: oracle.user_expire_password
+          delay: '0'
           value_type: FLOAT
           units: days
           description: 'The number of days before the Zabbix account password expires.'
@@ -1321,6 +1392,7 @@ zabbix_export:
           name: 'User rollbacks per second'
           type: DEPENDENT
           key: oracle.user_rollbacks_rate
+          delay: '0'
           value_type: FLOAT
           units: Rps
           description: 'The number of times that users manually issued the `ROLLBACK` statement or an error occurred during the users'' transactions.'
@@ -1337,7 +1409,9 @@ zabbix_export:
           name: Version
           type: DEPENDENT
           key: oracle.version
+          delay: '0'
           value_type: CHAR
+          trends: '0'
           description: 'The Oracle Server version.'
           preprocessing:
             - type: JSONPATH
@@ -1388,6 +1462,7 @@ zabbix_export:
           name: 'Archive log discovery'
           type: DEPENDENT
           key: oracle.archivelog.discovery
+          delay: '0'
           description: 'Used for the discovery of the log archive.'
           item_prototypes:
             - uuid: 1a6e01f90dca47459975632c14ce5a39
@@ -1397,6 +1472,7 @@ zabbix_export:
               delay: 5m
               history: '0'
               value_type: TEXT
+              trends: '0'
               params: |
                 SELECT
                 d.dest_name, DECODE (d.status, 'VALID',3, 'DEFERRED', 2, 'ERROR', 1, 0) AS status,
@@ -1421,7 +1497,9 @@ zabbix_export:
               name: 'Archivelog ''{#DEST_NAME}'': Error'
               type: DEPENDENT
               key: 'oracle.archivelog_error["{#DEST_NAME}"]'
+              delay: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Displays the error message.'
               preprocessing:
                 - type: JSONPATH
@@ -1441,6 +1519,7 @@ zabbix_export:
               name: 'Archivelog ''{#DEST_NAME}'': Last sequence'
               type: DEPENDENT
               key: 'oracle.archivelog_log_sequence["{#DEST_NAME}"]'
+              delay: '0'
               description: 'Identifies the sequence number of the last archived redo log to be archived.'
               preprocessing:
                 - type: JSONPATH
@@ -1457,6 +1536,7 @@ zabbix_export:
               name: 'Archivelog ''{#DEST_NAME}'': Status'
               type: DEPENDENT
               key: 'oracle.archivelog_log_status["{#DEST_NAME}"]'
+              delay: '0'
               description: |
                 Identifies the current status of the destination where:
                 1 - VALID;
@@ -1500,6 +1580,7 @@ zabbix_export:
           name: 'ASM disk groups discovery'
           type: DEPENDENT
           key: oracle.asm.discovery
+          delay: '0'
           description: 'Used for discovering the ASM disk groups.'
           item_prototypes:
             - uuid: 63fad55a2ced487aa30017b33bf1692e
@@ -1508,13 +1589,14 @@ zabbix_export:
               key: 'db.odbc.get[get_asm_{#DGNAME}_stat,,"Driver={$ORACLE.DRIVER};DBQ=//{$ORACLE.HOST}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
               history: '0'
               value_type: TEXT
+              trends: '0'
               params: |
                 SELECT
                 name AS dgname,
                 ROUND(total_mb / DECODE(TYPE, 'NORMAL', 2, 'HIGH', 3, 'EXTERN', 1)*1024*1024) AS size_byte,
                 ROUND(usable_file_mb*1024*1024 ) AS free_size_byte,
                 ROUND(100-(usable_file_mb /(total_mb / DECODE(TYPE, 'NORMAL', 2, 'HIGH', 3, 'EXTERN', 1)))* 100, 2) AS used_percent
-                FROM v$asm_diskgroup
+                FROM v$asm_diskgroup_stat
                 WHERE name = '{#DGNAME}';
               username: '{$ORACLE.USER}'
               password: '{$ORACLE.PASSWORD}'
@@ -1533,6 +1615,7 @@ zabbix_export:
               name: 'ASM ''{#DGNAME}'': Free size'
               type: DEPENDENT
               key: 'oracle.asm_free_size["{#DGNAME}"]'
+              delay: '0'
               units: B
               description: 'The free size of the ASM disk group.'
               preprocessing:
@@ -1550,6 +1633,7 @@ zabbix_export:
               name: 'ASM ''{#DGNAME}'': Total size'
               type: DEPENDENT
               key: 'oracle.asm_total_size["{#DGNAME}"]'
+              delay: '0'
               units: B
               description: 'The total size of the ASM disk group.'
               preprocessing:
@@ -1567,6 +1651,7 @@ zabbix_export:
               name: 'ASM ''{#DGNAME}'': Used size, percent'
               type: DEPENDENT
               key: 'oracle.asm_used_pct["{#DGNAME}"]'
+              delay: '0'
               value_type: FLOAT
               units: '%'
               description: 'Usage of the ASM disk group expressed in %.'
@@ -1625,14 +1710,17 @@ zabbix_export:
           name: 'Database discovery'
           type: DEPENDENT
           key: oracle.db.discovery
+          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#DBNAME}'
                 value: '{$ORACLE.DBNAME.MATCHES}'
+                formulaid: A
               - macro: '{#DBNAME}'
                 value: '{$ORACLE.DBNAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: B
           description: 'Used for database discovery.'
           item_prototypes:
             - uuid: 5de7c786988d49d0b50f28d2d622db62
@@ -1641,6 +1729,7 @@ zabbix_export:
               key: 'db.odbc.get[get_cdb_{#DBNAME}_info,,"Driver={$ORACLE.DRIVER};DBQ=//{$ORACLE.HOST}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
               history: '0'
               value_type: TEXT
+              trends: '0'
               params: |
                 SELECT name as DBNAME,
                 DECODE(open_mode, 'MOUNTED', 1, 'READ ONLY', 2, 'READ WRITE', 3, 'READ ONLY WITH APPLY', 4, 'MIGRATE', 5, 0) AS open_mode,
@@ -1666,6 +1755,7 @@ zabbix_export:
               name: 'Oracle Database ''{#DBNAME}'': Force logging'
               type: DEPENDENT
               key: 'oracle.db_force_logging["{#DBNAME}"]'
+              delay: '0'
               description: 'Indicates whether the database is under force logging mode (`YES`/`NO`).'
               valuemap:
                 name: 'Oracle force log status'
@@ -1689,6 +1779,7 @@ zabbix_export:
               name: 'Oracle Database ''{#DBNAME}'': Log mode'
               type: DEPENDENT
               key: 'oracle.db_log_mode["{#DBNAME}"]'
+              delay: '0'
               description: |
                 The archive log mode where:
                 0 - NOARCHIVELOG;
@@ -1716,6 +1807,7 @@ zabbix_export:
               name: 'Oracle Database ''{#DBNAME}'': Open status'
               type: DEPENDENT
               key: 'oracle.db_open_mode["{#DBNAME}"]'
+              delay: '0'
               description: |
                 1 - MOUNTED;
                 2 - READ WRITE;
@@ -1765,6 +1857,7 @@ zabbix_export:
               name: 'Oracle Database ''{#DBNAME}'': Role'
               type: DEPENDENT
               key: 'oracle.db_role["{#DBNAME}"]'
+              delay: '0'
               description: |
                 The current role of the database where:
                 1 - SNAPSHOT STANDBY;
@@ -1821,14 +1914,17 @@ zabbix_export:
           name: 'PDB discovery'
           type: DEPENDENT
           key: oracle.pdb.discovery
+          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#DBNAME}'
                 value: '{$ORACLE.DBNAME.MATCHES}'
+                formulaid: A
               - macro: '{#DBNAME}'
                 value: '{$ORACLE.DBNAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: B
           description: 'Used for the discovery of the pluggable database (PDB).'
           item_prototypes:
             - uuid: cedcebd0b7ce474c9681022fcc75df1c
@@ -1837,6 +1933,7 @@ zabbix_export:
               key: 'db.odbc.get[get_pdb_{#DBNAME}_info,,"Driver={$ORACLE.DRIVER};DBQ=//{$ORACLE.HOST}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
               history: '0'
               value_type: TEXT
+              trends: '0'
               params: |
                 SELECT
                 name as DBNAME,
@@ -1860,6 +1957,7 @@ zabbix_export:
               name: 'Oracle Database ''{#DBNAME}'': Open status'
               type: DEPENDENT
               key: 'oracle.pdb_open_mode["{#DBNAME}"]'
+              delay: '0'
               description: |
                 1 - MOUNTED;
                 2 - READ WRITE;
@@ -1911,19 +2009,24 @@ zabbix_export:
           name: 'Tablespace discovery'
           type: DEPENDENT
           key: oracle.tablespace.discovery
+          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#CON_NAME}'
                 value: '{$ORACLE.TABLESPACE.CONTAINER.MATCHES}'
+                formulaid: A
               - macro: '{#CON_NAME}'
                 value: '{$ORACLE.TABLESPACE.CONTAINER.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: B
               - macro: '{#TABLESPACE}'
                 value: '{$ORACLE.TABLESPACE.NAME.MATCHES}'
+                formulaid: C
               - macro: '{#TABLESPACE}'
                 value: '{$ORACLE.TABLESPACE.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: D
           description: 'Used for the discovery of tablespaces in DBMS.'
           item_prototypes:
             - uuid: 972be2e777e44c539d0ddd7918b79e88
@@ -1932,6 +2035,7 @@ zabbix_export:
               key: 'db.odbc.get[get_{#CON_NAME}_tablespace_{#TABLESPACE}_stats,,"Driver={$ORACLE.DRIVER};DBQ=//{$ORACLE.HOST}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
               history: '0'
               value_type: TEXT
+              trends: '0'
               params: |
                 SELECT df.CON_NAME,
                        df.TABLESPACE_NAME                  AS TABLESPACE,
@@ -2068,6 +2172,7 @@ zabbix_export:
               name: 'Oracle ''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Tablespace allocated, bytes'
               type: DEPENDENT
               key: 'oracle.tbs_alloc_bytes["{#CON_NAME}","{#TABLESPACE}"]'
+              delay: '0'
               units: B
               description: 'Currently allocated bytes for the tablespace (sum of the current size of datafiles).'
               preprocessing:
@@ -2089,6 +2194,7 @@ zabbix_export:
               name: 'Oracle ''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Tablespace free, bytes'
               type: DEPENDENT
               key: 'oracle.tbs_free_bytes["{#CON_NAME}","{#TABLESPACE}"]'
+              delay: '0'
               units: B
               description: 'Free bytes of the allocated space.'
               preprocessing:
@@ -2110,6 +2216,7 @@ zabbix_export:
               name: 'Oracle ''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Tablespace MAX size, bytes'
               type: DEPENDENT
               key: 'oracle.tbs_max_bytes["{#CON_NAME}","{#TABLESPACE}"]'
+              delay: '0'
               units: B
               description: 'The maximum size of the tablespace.'
               preprocessing:
@@ -2131,6 +2238,7 @@ zabbix_export:
               name: 'Oracle ''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Open status'
               type: DEPENDENT
               key: 'oracle.tbs_status["{#CON_NAME}","{#TABLESPACE}"]'
+              delay: '0'
               description: |
                 The tablespace status where:
                 1 - ONLINE;
@@ -2179,6 +2287,7 @@ zabbix_export:
               name: 'Oracle ''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Tablespace used, bytes'
               type: DEPENDENT
               key: 'oracle.tbs_used_bytes["{#CON_NAME}","{#TABLESPACE}"]'
+              delay: '0'
               units: B
               description: 'Currently used bytes for the tablespace (current size of datafiles minus the free space).'
               preprocessing:
@@ -2200,6 +2309,7 @@ zabbix_export:
               name: 'Oracle ''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Tablespace usage, percent'
               type: DEPENDENT
               key: 'oracle.tbs_used_file_pct["{#CON_NAME}","{#TABLESPACE}"]'
+              delay: '0'
               value_type: FLOAT
               units: '%'
               description: 'Used bytes/allocated bytes*100.'
@@ -2244,6 +2354,7 @@ zabbix_export:
               name: 'Oracle ''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Tablespace usage from MAX, percent'
               type: DEPENDENT
               key: 'oracle.tbs_used_from_max_pct["{#CON_NAME}","{#TABLESPACE}"]'
+              delay: '0'
               value_type: FLOAT
               units: '%'
               description: 'Used bytes/max bytes*100.'
@@ -2288,6 +2399,7 @@ zabbix_export:
               name: 'Oracle ''{#CON_NAME}'' TBS ''{#TABLESPACE}'': Tablespace allocated, percent'
               type: DEPENDENT
               key: 'oracle.tbs_used_pct["{#CON_NAME}","{#TABLESPACE}"]'
+              delay: '0'
               value_type: FLOAT
               units: '%'
               description: 'Allocated bytes/max bytes*100.'

@@ -28,6 +28,7 @@ zabbix_export:
           name: 'Builds duration'
           type: DEPENDENT
           key: travis.builds.duration
+          delay: '0'
           units: s
           description: 'Sum of all builds durations in all repos.'
           preprocessing:
@@ -44,6 +45,7 @@ zabbix_export:
           name: Builds
           type: DEPENDENT
           key: travis.builds.total
+          delay: '0'
           description: 'Total count of builds in all repos.'
           preprocessing:
             - type: JSONPATH
@@ -60,6 +62,7 @@ zabbix_export:
           key: travis.get_builds
           history: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Getting builds using Travis API.'
           url: 'https://{$TRAVIS.API.URL}/builds'
           query_fields:
@@ -80,6 +83,7 @@ zabbix_export:
           type: HTTP_AGENT
           key: travis.get_health
           value_type: TEXT
+          trends: '0'
           description: 'Getting home JSON using Travis API.'
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
@@ -125,6 +129,7 @@ zabbix_export:
           key: travis.get_jobs
           history: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Getting jobs using Travis API.'
           url: 'https://{$TRAVIS.API.URL}/jobs'
           headers:
@@ -143,6 +148,7 @@ zabbix_export:
           key: travis.get_repos
           history: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Getting repos using Travis API.'
           url: 'https://{$TRAVIS.API.URL}/repos'
           query_fields:
@@ -162,6 +168,7 @@ zabbix_export:
           name: 'Jobs active'
           type: DEPENDENT
           key: travis.jobs.active
+          delay: '0'
           description: 'Active jobs in all repos.'
           preprocessing:
             - type: JSONPATH
@@ -178,6 +185,7 @@ zabbix_export:
           name: 'Jobs in queue'
           type: DEPENDENT
           key: travis.jobs.queue
+          delay: '0'
           description: 'Jobs in queue in all repos.'
           preprocessing:
             - type: JSONPATH
@@ -194,6 +202,7 @@ zabbix_export:
           name: 'Jobs passed'
           type: DEPENDENT
           key: travis.jobs.total
+          delay: '0'
           description: 'Total count of passed jobs in all repos.'
           preprocessing:
             - type: JSONPATH
@@ -209,12 +218,14 @@ zabbix_export:
           name: 'Repos metrics discovery'
           type: DEPENDENT
           key: travis.repos.discovery
+          delay: '0'
           description: 'Metrics for Repos statistics.'
           item_prototypes:
             - uuid: 3ff94b65151e4378b3ef46d049aff1f7
               name: 'Repo [{#SLUG}]: Builds failed'
               type: DEPENDENT
               key: 'travis.repo.builds.failed[{#SLUG}]'
+              delay: '0'
               description: 'Count of all failed builds in {#SLUG} repo.'
               preprocessing:
                 - type: JAVASCRIPT
@@ -254,6 +265,7 @@ zabbix_export:
               name: 'Repo [{#SLUG}]: Builds passed'
               type: DEPENDENT
               key: 'travis.repo.builds.passed[{#SLUG}]'
+              delay: '0'
               description: 'Count of all passed builds in {#SLUG} repo.'
               preprocessing:
                 - type: JAVASCRIPT
@@ -270,6 +282,7 @@ zabbix_export:
               name: 'Repo [{#SLUG}]: Builds total'
               type: DEPENDENT
               key: 'travis.repo.builds.total[{#SLUG}]'
+              delay: '0'
               description: 'Count of total builds in {#SLUG} repo.'
               preprocessing:
                 - type: JSONPATH
@@ -286,6 +299,7 @@ zabbix_export:
               name: 'Repo [{#SLUG}]: Cache files'
               type: DEPENDENT
               key: 'travis.repo.caches.files[{#SLUG}]'
+              delay: '0'
               description: 'Count of cache files in {#SLUG} repo.'
               preprocessing:
                 - type: JSONPATH
@@ -302,6 +316,7 @@ zabbix_export:
               name: 'Repo [{#SLUG}]: Cache size'
               type: DEPENDENT
               key: 'travis.repo.caches.size[{#SLUG}]'
+              delay: '0'
               units: B
               description: 'Total size of cache files in {#SLUG} repo.'
               preprocessing:
@@ -321,7 +336,9 @@ zabbix_export:
               name: 'Repo [{#SLUG}]: Description'
               type: DEPENDENT
               key: 'travis.repo.description[{#SLUG}]'
+              delay: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Description of Travis repo (git project description).'
               preprocessing:
                 - type: JSONPATH
@@ -343,6 +360,7 @@ zabbix_export:
               key: 'travis.repo.get_builds[{#SLUG}]'
               history: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Getting builds of {#SLUG} using Travis API.'
               url: 'https://{$TRAVIS.API.URL}/repo/{#ID}/builds'
               query_fields:
@@ -366,6 +384,7 @@ zabbix_export:
               key: 'travis.repo.get_caches[{#SLUG}]'
               history: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Getting caches of {#SLUG} using Travis API.'
               url: 'https://{$TRAVIS.API.URL}/repo/{#ID}/caches'
               query_fields:
@@ -387,6 +406,7 @@ zabbix_export:
               name: 'Repo [{#SLUG}]: Last build duration'
               type: DEPENDENT
               key: 'travis.repo.last_build.duration[{#SLUG}]'
+              delay: '0'
               units: s
               description: 'Last build duration in {#SLUG} repo.'
               preprocessing:
@@ -408,6 +428,7 @@ zabbix_export:
               name: 'Repo [{#SLUG}]: Last build id'
               type: DEPENDENT
               key: 'travis.repo.last_build.id[{#SLUG}]'
+              delay: '0'
               description: 'Last build id in {#SLUG} repo.'
               preprocessing:
                 - type: JSONPATH
@@ -427,6 +448,7 @@ zabbix_export:
               name: 'Repo [{#SLUG}]: Last build number'
               type: DEPENDENT
               key: 'travis.repo.last_build.number[{#SLUG}]'
+              delay: '0'
               description: 'Last build number in {#SLUG} repo.'
               preprocessing:
                 - type: JSONPATH
@@ -446,7 +468,9 @@ zabbix_export:
               name: 'Repo [{#SLUG}]: Last build state'
               type: DEPENDENT
               key: 'travis.repo.last_build.state[{#SLUG}]'
+              delay: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Last build state in {#SLUG} repo.'
               preprocessing:
                 - type: JSONPATH

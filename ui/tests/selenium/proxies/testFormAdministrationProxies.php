@@ -522,7 +522,7 @@ class testFormAdministrationProxies extends CWebTest {
 					$this->assertEquals($maxlength, $field->getAttribute('maxlength'));
 				}
 
-				// Check that "Address for active agents" field and that it's is displayed only when a proxy group is selected.
+				// Check that "Address for active agents" field and that it is displayed only when a proxy group is selected.
 				$address_field = $form->getField('Address for active agents');
 				$this->assertFalse($address_field->isDisplayed());
 				$form->fill(['Proxy group' => 'Online proxy group']);

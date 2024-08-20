@@ -63,9 +63,9 @@ class testMultiselectsProblems extends testMultiselectDialogs {
 		$this->page->login()->open('zabbix.php?action=problem.view');
 		$filter_form = $this->query('name:zbx_filter')->asForm()->one();
 		$multiselects = [
-			['Host groups' => 'Host groups'],
-			['Hosts' => 'Hosts', 'Host group' => 'Host groups'],
-			['Triggers' => 'Triggers', 'Host' => 'Hosts', 'Host group' => 'Host groups']
+			['Host groups' => ['title' => 'Host groups']],
+			['Hosts' => ['title' => 'Hosts'], 'Host group' => ['title' => 'Host groups']],
+			['Triggers' => ['title' => 'Triggers'], 'Host' => ['title' => 'Hosts'], 'Host group' => ['title' => 'Host groups']]
 		];
 
 		// Check all multiselects in filter before one of the multiselects is filled.

@@ -39,7 +39,7 @@ static void	get_exp_value_and_compare(const char *param, size_t found_value)
 	if (FAIL == zbx_is_uint32(zbx_mock_get_parameter_string(param), &expected_value))
 			fail_msg("Invalid %s value", param);
 
-	/* compare expected token vaues to values found */
+	/* compare expected token values to values found */
 	if (expected_value != found_value)
 	{
 		fail_msg("Position "ZBX_FS_SIZE_T" of '%s' not equal to expected "ZBX_FS_SIZE_T,

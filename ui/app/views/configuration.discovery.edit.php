@@ -19,11 +19,9 @@
  * @var array $data
  */
 
-$csrf_token = CCsrfTokenHelper::get('discovery');
-
 // Create form.
 $form = (new CForm())
-	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token))->removeId())
+	->addItem((new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('discovery')))->removeId())
 	->setId('discoveryForm')
 	->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN))
 	->addStyle('display: none;');
