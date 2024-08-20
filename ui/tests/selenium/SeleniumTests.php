@@ -97,7 +97,6 @@ require_once dirname(__FILE__).'/mediaTypes/testFormAdministrationMediaTypes.php
 require_once dirname(__FILE__).'/mediaTypes/testFormAdministrationMediaTypeMessageTemplates.php';
 require_once dirname(__FILE__).'/mediaTypes/testFormAdministrationMediaTypeWebhook.php';
 require_once dirname(__FILE__).'/testFormAdministrationUserGroups.php';
-require_once dirname(__FILE__).'/testFormAlarmNotification.php';
 require_once dirname(__FILE__).'/testFormApiTokensAdministrationGeneral.php';
 require_once dirname(__FILE__).'/testFormApiTokensUserSettings.php';
 require_once dirname(__FILE__).'/eventCorrelation/testFormEventCorrelation.php';
@@ -160,6 +159,7 @@ require_once dirname(__FILE__).'/users/testFormUser.php';
 require_once dirname(__FILE__).'/users/testFormUserMedia.php';
 require_once dirname(__FILE__).'/users/testFormUserProfile.php';
 require_once dirname(__FILE__).'/users/testFormUserPermissions.php';
+require_once dirname(__FILE__).'/users/testAlarmNotification.php';
 require_once dirname(__FILE__).'/testFormValueMappingsHost.php';
 require_once dirname(__FILE__).'/testFormValueMappingsTemplate.php';
 require_once dirname(__FILE__).'/roles/testFormUserRoles.php';
@@ -332,7 +332,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormAdministrationMediaTypeWebhook');
 		$suite->addTestSuite('testFormAdministrationScripts');
 		$suite->addTestSuite('testFormAdministrationUserGroups');
-		$suite->addTestSuite('testFormAlarmNotification');
 		$suite->addTestSuite('testFormApiTokensAdministrationGeneral');
 		$suite->addTestSuite('testFormApiTokensUserSettings');
 		$suite->addTestSuite('testFormEventCorrelation');
@@ -393,6 +392,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormUserMedia');
 		$suite->addTestSuite('testFormUserProfile');
 		$suite->addTestSuite('testFormUserPermissions');
+		$suite->addTestSuite('testAlarmNotification');
 		$suite->addTestSuite('testFormValueMappingsHost');
 		$suite->addTestSuite('testFormValueMappingsTemplate');
 		$suite->addTestSuite('testFormUserRoles');
