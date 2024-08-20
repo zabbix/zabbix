@@ -4090,12 +4090,10 @@ z-select {
 
 form.dashboard-widget-clock .fields-group.fields-group-date, form.dashboard-widget-clock .fields-group.fields-group-time, form.dashboard-widget-clock .fields-group.fields-group-tzone {
   display: grid;
-  grid-template-columns: 60px 120px repeat(2, minmax(60px, max-content) auto);
+  grid-template-columns: 60px 120px 60px auto;
   align-items: center;
   column-gap: 10px;
   row-gap: 5px; }
-  form.dashboard-widget-clock .fields-group.fields-group-date .field-size input, form.dashboard-widget-clock .fields-group.fields-group-time .field-size input, form.dashboard-widget-clock .fields-group.fields-group-tzone .field-size input {
-    margin-right: 5px; }
 form.dashboard-widget-clock .fields-group.fields-group-time .field-format {
   grid-column: 4 / -1; }
 form.dashboard-widget-clock .fields-group.fields-group-tzone .form-field.field-tzone-timezone, form.dashboard-widget-clock .fields-group.fields-group-tzone .form-field.field-tzone-format {
@@ -4103,7 +4101,7 @@ form.dashboard-widget-clock .fields-group.fields-group-tzone .form-field.field-t
 
 div.dashboard-widget-clock .clock-digital {
   box-sizing: border-box;
-  min-height: 100%;
+  height: 100%;
   padding: 10px;
   display: flex;
   flex-direction: column;
@@ -4111,18 +4109,25 @@ div.dashboard-widget-clock .clock-digital {
   align-items: center; }
   div.dashboard-widget-clock .clock-digital .clock-date,
   div.dashboard-widget-clock .clock-digital .clock-time,
-  div.dashboard-widget-clock .clock-digital .clock-time-zone {
+  div.dashboard-widget-clock .clock-digital .clock-time-zone,
+  div.dashboard-widget-clock .clock-digital .clock-disabled {
     max-width: 100%;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    font-size: calc(var(--content-height) * var(--widget-clock-font) / 1.14);
-    line-height: 1.14;
-    flex-shrink: 0; }
+    line-height: 1.14; }
+  div.dashboard-widget-clock .clock-digital .clock-time-zone span:first-of-type {
+    margin-right: 0.2em; }
+  div.dashboard-widget-clock .clock-digital .clock-time-zone.separated {
+    text-align: center; }
+    div.dashboard-widget-clock .clock-digital .clock-time-zone.separated span {
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-right: 0; }
   div.dashboard-widget-clock .clock-digital .bold {
     font-weight: bold; }
   div.dashboard-widget-clock .clock-digital .clock-disabled {
-    font-size: calc(var(--content-height) * 0.6 / 1.14);
     color: #cacaca;
     font-weight: bold; }
 
