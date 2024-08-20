@@ -354,7 +354,7 @@ static void	async_poller_init(zbx_poller_config_t *poller_config, zbx_thread_pol
 	struct timeval	tv = {1, 0};
 	char		*error = NULL;
 
-	zabbix_log(LOG_LEVEL_WARNING, "In %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_hashset_create_ext(&poller_config->interfaces, 100, ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC, (zbx_clean_func_t)zbx_interface_status_clean,
@@ -403,13 +403,13 @@ static void	async_poller_init(zbx_poller_config_t *poller_config, zbx_thread_pol
 		exit(EXIT_FAILURE);
 	}
 
-	zabbix_log(LOG_LEVEL_WARNING, "End of %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 static void	async_poller_dns_init(zbx_poller_config_t *poller_config, zbx_thread_poller_args *poller_args_in)
 {
 	char	*timeout;
-zabbix_log(LOG_LEVEL_WARNING, "async_poller_dns_init event_get_version= %s", event_get_version());
+
 	if (NULL == (poller_config->dnsbase = evdns_base_new(poller_config->base, 1)))
 	{
 		int	ret;
