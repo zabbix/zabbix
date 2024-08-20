@@ -24,6 +24,7 @@ import (
 	"errors"
 	stdlog "log"
 	"os"
+	"reflect"
 	"testing"
 	"time"
 
@@ -317,6 +318,98 @@ func Test_setDeviceData(t *testing.T) {
 					"runner.setDevicesData() jsonDevices mismatch (-want +got):\n%s",
 					diff,
 				)
+			}
+		})
+	}
+}
+
+func Test_parseOutput(t *testing.T) {
+	tests := []struct {
+		name          string
+		jsonRunner    bool
+		initialState  runner
+		expectedState runner
+	}{
+		{
+			name:       "+jsonRunner with unique devices",
+			jsonRunner: true,
+			initialState: runner{
+				jsonDevices: map[string]jsonDevice{
+					"/dev/sda": {"Serial123", "data1"},
+					"/dev/sdb": {"Serial456", "data2"},
+				},
+			},
+			expectedState: runner{
+				jsonDevices: map[string]jsonDevice{
+					"/dev/sda": {"Serial123", "data1"},
+					"/dev/sdb": {"Serial456", "data2"},
+				},
+			},
+		},
+		{
+			name:       "+jsonRunner with duplicate devices",
+			jsonRunner: true,
+			initialState: runner{
+				jsonDevices: map[string]jsonDevice{
+					"/dev/sda": {"Serial123", "data1"},
+					"/dev/sdb": {"Serial123", "data2"},
+				},
+			},
+			expectedState: runner{
+				jsonDevices: map[string]jsonDevice{
+					"/dev/sda": {"Serial123", "data1"},
+				},
+			},
+		},
+		{
+			name:       "+non-jsonRunner with unique devices",
+			jsonRunner: false,
+			initialState: runner{
+				devices: map[string]deviceParser{
+					"/dev/sda": {SerialNumber: "Serial123"},
+					"/dev/sdb": {SerialNumber: "Serial456"},
+				},
+			},
+			expectedState: runner{
+				devices: map[string]deviceParser{
+					"/dev/sda": {SerialNumber: "Serial123"},
+					"/dev/sdb": {SerialNumber: "Serial456"},
+				},
+			},
+		},
+		{
+			name:       "+non-jsonRunner with duplicate devices",
+			jsonRunner: false,
+			initialState: runner{
+				devices: map[string]deviceParser{
+					"/dev/sda": {SerialNumber: "Serial123"},
+					"/dev/sdb": {SerialNumber: "Serial123"},
+				},
+			},
+			expectedState: runner{
+				devices: map[string]deviceParser{
+					"/dev/sda": {SerialNumber: "Serial123"},
+				},
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			runner := &tt.initialState
+
+			runner.parseOutput(tt.jsonRunner)
+
+			if tt.jsonRunner {
+				if !reflect.DeepEqual(runner.jsonDevices, tt.expectedState.jsonDevices) {
+					t.Errorf("jsonDevices = %v, want %v", runner.jsonDevices, tt.expectedState.jsonDevices)
+				}
+			} else {
+				if !reflect.DeepEqual(runner.devices, tt.expectedState.devices) {
+					t.Errorf("devices = %v, want %v", runner.devices, tt.expectedState.devices)
+				}
 			}
 		})
 	}
