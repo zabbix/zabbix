@@ -323,9 +323,7 @@ class testDashboardClockWidget extends testWidgets {
 				}
 
 				// Check form fields' maximal lengths.
-				foreach (['Name' =>  255] as $field => $length) {
-					$this->assertEquals($length, $form->getField($field)->getAttribute('maxlength'));
-				}
+				$this->assertEquals(255, $form->getField('Name')->getAttribute('maxlength'));
 
 				// Now remove the Time checkbox from Show field and check that only its Advanced config disappeared.
 				$form->fill(['id:show_2' => false]);
