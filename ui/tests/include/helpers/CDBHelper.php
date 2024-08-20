@@ -546,9 +546,9 @@ class CDBHelper {
 	/**
 	 * Create problem or resolved events of trigger.
 	 *
-	 * @param array $triggers_names         triggers names where problems should be triggered
-	 * @param int   $value 			   		TRIGGER_VALUE_FALSE
-	 * @param array|string $event_fields    clock, ns or acknowledged parameter with value
+	 * @param array|string $triggers_names    triggers names where problems should be triggered
+	 * @param int          $value 			  TRIGGER_VALUE_FALSE
+	 * @param array        $event_fields      clock, ns or acknowledged parameter with value
 	 *
 	 * @return array
 	 */
