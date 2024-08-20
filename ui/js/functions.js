@@ -114,23 +114,21 @@ jQuery.escapeHtml = function(html) {
 function validateNumericBox(obj, allow_empty, allow_negative) {
 	let num;
 
-	if (obj != null) {
-		num = parseInt(obj.value, 10);
+	num = parseInt(obj.value, 10);
 
-		if (isNaN(num)) {
-			num = allow_empty ? '' : '0';
-		}
+	if (isNaN(num)) {
+		num = allow_empty ? '' : '0';
+	}
 
-		if (num !== '') {
-			if (num < 0) {
-				if (!allow_negative) {
-					num = Math.abs(num);
-					num = addPads(num, obj);
-				}
-			}
-			else {
+	if (num !== '') {
+		if (num < 0) {
+			if (!allow_negative) {
+				num = Math.abs(num);
 				num = addPads(num, obj);
 			}
+		}
+		else {
+			num = addPads(num, obj);
 		}
 	}
 
@@ -138,12 +136,11 @@ function validateNumericBox(obj, allow_empty, allow_negative) {
 }
 
 /**
- * Adds leading zeroes for the given number. If number of leading zeroes is is greater than field maxlength, it is a
- * misconfiguration. In that case limit the leading zeroes to maxlength and show a warning message in console.
+ * Adds leading zeroes for the given number.
  *
- * @param {number} num       The number to proccess and add leading zeroes.
- * @param {HTMLElement} obj  The HTML input element containing the numeric value. Checks for "data-pads-length" and
- *                           "maxlength" attributes.
+ * @param {number} num       The number to process and add leading zeroes.
+ * @param {HTMLElement} obj  The HTML input element containing the numeric value. Checks for "data-pads-length"
+ *                           attribute.
  *
  * @return {string}          To add leading zeroes, returned number has to be in string format.
  */
@@ -154,12 +151,6 @@ function addPads(num, obj) {
 		let pads_length = obj.dataset.padsLength;
 
 		if (num.length < pads_length) {
-			if (obj.hasAttribute('maxlength') && pads_length > obj.maxLength) {
-				pads_length = obj.maxLength;
-
-				console.warn('Pads length exceed "maxlength" attribute for object: ', obj);
-			}
-
 			num = num.padStart(pads_length, '0');
 		}
 	}
