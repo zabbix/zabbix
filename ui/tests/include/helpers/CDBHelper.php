@@ -546,11 +546,17 @@ class CDBHelper {
 	/**
 	 * Create problem or resolved events of trigger.
 	 *
-	 * @param array $triggers_names
-	 * @param int   $value TRIGGER_VALUE_FALSE
-	 * @param array $event_fields
+	 * @param array $triggers_names         triggers names where problems should be triggered
+	 * @param int   $value 			   		TRIGGER_VALUE_FALSE
+	 * @param array|string $event_fields    clock, ns or acknowledged parameter with value
+	 *
+	 * @return array
 	 */
 	public static function setTriggerProblem($triggers_names, $value = TRIGGER_VALUE_TRUE, $event_fields = []) {
+		if (!is_array($triggers_names)) {
+			$triggers_names = [$triggers_names];
+		}
+
 		$eventids = [];
 		foreach ($triggers_names as $trigger_name) {
 			$trigger = DB::find('triggers', ['description' => $trigger_name]);

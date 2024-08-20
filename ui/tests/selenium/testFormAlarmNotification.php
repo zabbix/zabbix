@@ -123,8 +123,7 @@ class testFormAlarmNotification extends CWebTest {
 				]
 			]
 		]);
-		self::$hostid = $response['hostids'][self::HOST_NAME];
-		$maintenance_hostid = $response['hostids']['Host for maintenance alarm'];
+		self::$hostid = $response['hostids'];
 
 		CDataHelper::call('trigger.create', [
 			[
@@ -209,26 +208,28 @@ class testFormAlarmNotification extends CWebTest {
 				'name' => 'Alarm notification maintenance',
 				'active_since' => time() - 1000,
 				'active_till' => time() + 31536000,
-				'hosts' => [['hostid' => $maintenance_hostid]],
+				'hosts' => [['hostid' => self::$hostid['Host for maintenance alarm']]],
 				'timeperiods' => [[]]
 			]
 		]);
 		self::$maintenanceid = $maintenance['maintenanceids'][0];
 
 		DBexecute('UPDATE hosts SET maintenanceid='.zbx_dbstr(self::$maintenanceid).
-			', maintenance_status=1, maintenance_type='.MAINTENANCE_TYPE_NORMAL.', maintenance_from='.zbx_dbstr(time()-1000).
-			' WHERE hostid='.zbx_dbstr($maintenance_hostid)
+			', maintenance_status='.HOST_MAINTENANCE_STATUS_ON.', maintenance_type='.MAINTENANCE_TYPE_NORMAL.', maintenance_from='.zbx_dbstr(time()-1000).
+			' WHERE hostid='.zbx_dbstr(self::$hostid['Host for maintenance alarm'])
 		);
 	}
 
 	/**
 	 * Check Alarm notification overlay dialog layout.
+	 *
+	 * @onAfter openResetedPage
 	 */
 	public function testFormAlarmNotification_Layout() {
 		// Trigger problem.
 		$time = time();
 		$event_time = date('Y-m-d H:i:s', $time);
-		self::$eventids = CDBHelper::setTriggerProblem(['Not_classified_trigger_4'], TRIGGER_VALUE_TRUE, ['clock' => $time]);
+		self::$eventids = CDBHelper::setTriggerProblem('Not_classified_trigger_4', TRIGGER_VALUE_TRUE, ['clock' => $time]);
 
 		$this->page->login()->open('zabbix.php?action=problem.view')->waitUntilReady();
 
@@ -240,7 +241,6 @@ class testFormAlarmNotification extends CWebTest {
 
 		// Check that link for host and trigger filtering works.
 		foreach (['Hosts' => self::HOST_NAME, 'Triggers' => 'Not_classified_trigger_4'] as $field => $name) {
-			$this->assertTrue($alarm_dialog->query('link', $name)->one()->isClickable());
 			$alarm_dialog->query('link', $name)->waitUntilClickable()->one()->click();
 			$this->page->waitUntilReady();
 
@@ -263,11 +263,9 @@ class testFormAlarmNotification extends CWebTest {
 		$this->page->assertHeader('Event details');
 
 		// Check that events details opened for correct trigger/host.
-		$table = $this->query('class:list-table')->asTable()->one()->waitUntilReady();
-		foreach (['Host' => 'Host for alarm item', 'Trigger' => 'Not_classified_trigger_4'] as $parameter => $value) {
-			$this->assertTrue($table->query('xpath:.//td[text()='.CXPathHelper::escapeQuotes($parameter).
-					']/following::td/a[text()='.CXPathHelper::escapeQuotes($value).']')->exists(), 'Failed: '.$parameter);
-		}
+		$table = $this->query('xpath://div[@id="hat_triggerdetails"]/table')->asTable()->one();
+		$this->assertEquals(['Host', 'Host for alarm item'], $table->getRow(0)->getColumns()->asText());
+		$this->assertEquals(['Trigger', 'Not_classified_trigger_4'], $table->getRow(1)->getColumns()->asText());
 
 		// Check displayed icons.
 		foreach (['Mute' => 'btn-sound', 'Snooze' => 'btn-alarm'] as $button => $class) {
@@ -303,7 +301,7 @@ class testFormAlarmNotification extends CWebTest {
 		$this->page->open('zabbix.php?action=problem.view')->waitUntilReady();
 
 		// Close problem.
-		CDBHelper::setTriggerProblem(['Not_classified_trigger_4'], TRIGGER_VALUE_FALSE);
+		CDBHelper::setTriggerProblem('Not_classified_trigger_4', TRIGGER_VALUE_FALSE);
 
 		/**
 		 * There can be an issue when trigger problem with setTriggerProblem method and refreshing page right after it.
@@ -379,7 +377,7 @@ class testFormAlarmNotification extends CWebTest {
 		$alarm_dialog->ensureNotPresent();
 	}
 
-	public static function getDisplayedAlarmsData() {
+	public static function getDisplayedProblemsData() {
 		return [
 			// #0 Not classified.
 			[
@@ -451,20 +449,17 @@ class testFormAlarmNotification extends CWebTest {
 	}
 
 	/**
-	 * Check that alarms displayed in alarm notification overlay.
+	 * Check that correct problems displayed in alarm notification overlay.
 	 *
-	 * @dataProvider getDisplayedAlarmsData
+	 * @dataProvider getDisplayedProblemsData
 	 */
-	public function testFormAlarmNotification_DisplayedAlarms($data) {
+	public function testFormAlarmNotification_DisplayedProblems($data) {
 		// Trigger problem.
 		self::$eventids = CDBHelper::setTriggerProblem($data['trigger_name']);
 
 		// Open problem page and filter with correct host.
-		$this->page->login()->open('zabbix.php?action=problem.view&filter_reset=1')->waitUntilReady();
-		$this->page->open('zabbix.php?action=problem.view&unacknowledged=1&show_suppressed=1&sort=name&sortorder=ASC')->waitUntilReady();
-		$this->query('name:zbx_filter')->asForm()->one()->fill(['Hosts' => [self::HOST_NAME]])->submit();
-		$this->query('class:list-table')->asTable()->one()->waitUntilReloaded();
-		$this->page->refresh()->waitUntilReady();
+		$this->page->login()->open('zabbix.php?action=problem.view&unacknowledged=1&sort=name&sortorder=ASC&hostids%5B%5D='.
+				self::$hostid[self::HOST_NAME])->waitUntilReady();
 
 		// Check that problems displayed in table.
 		$this->assertTableDataColumn($data['trigger_name'], 'Problem');
@@ -632,9 +627,6 @@ class testFormAlarmNotification extends CWebTest {
 		$form->submit();
 		$this->page->waitUntilReady();
 
-		$this->page->open('zabbix.php?action=problem.view&filter_reset=1')->waitUntilReady();
-		$this->page->open('zabbix.php?action=problem.view&unacknowledged=1&show_suppressed=1&sort=name&sortorder=ASC')->waitUntilReady();
-
 		// Trigger problem.
 		if (array_key_exists('suppressed_problem', $data)) {
 			self::$eventids = CDBHelper::setTriggerProblem($data['suppressed_problem']);
@@ -649,11 +641,8 @@ class testFormAlarmNotification extends CWebTest {
 			self::$eventids = CDBHelper::setTriggerProblem(self::ALL_TRIGGERS);
 		}
 
-		// Filter problems by Hosts and refresh page for alarm overlay to appear.
-		$table = $this->query('class:list-table')->asTable()->one();
-		$this->query('name:zbx_filter')->asForm()->one()->fill(['Hosts' => [self::HOST_NAME, 'Host for maintenance alarm']])->submit();
-		$table->waitUntilReloaded();
-		$this->page->refresh()->waitUntilReady();
+		$this->page->login()->open('zabbix.php?action=problem.view&unacknowledged=1&show_suppressed=1&sort=name&sortorder=ASC&hostids%5B%5D='.
+				self::$hostid[self::HOST_NAME].'&hostids%5B%5D='.self::$hostid['Host for maintenance alarm'])->waitUntilReady();
 
 		// Check that problems displayed in table.
 		$triggered_problems = (array_key_exists('suppressed_problem', $data)) ? $data['suppressed_problem'] : self::ALL_TRIGGERS;
@@ -713,8 +702,15 @@ class testFormAlarmNotification extends CWebTest {
 	}
 
 	protected function getAlarmOverlay() {
-		return $this->query('xpath://div['.CXPathHelper::fromClass('overlay-dialogue notif').']')->waitUntilVisible(10)
-				->asOverlayDialog()->one();
+		try {
+			return $this->query('xpath://div['.CXPathHelper::fromClass('overlay-dialogue notif').']')->waitUntilVisible(5)
+					->asOverlayDialog()->one();
+		}
+		catch (Exception $e) {
+			$this->page->refresh()->waitUntilReady();
+			return $this->query('xpath://div['.CXPathHelper::fromClass('overlay-dialogue notif').']')->waitUntilVisible()
+					->asOverlayDialog()->one();
+		}
 	}
 
 	/**
@@ -725,5 +721,12 @@ class testFormAlarmNotification extends CWebTest {
 			'eventids' => self::$eventids,
 			'action' => 3
 		]);
+	}
+
+	/**
+	 * Acknowledge and close triggered problem.
+	 */
+	protected function openResetedPage() {
+		$this->page->login()->open('zabbix.php?action=problem.view&filter_reset=1')->waitUntilReady();
 	}
 }

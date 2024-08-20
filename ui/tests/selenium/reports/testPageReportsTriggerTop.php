@@ -271,7 +271,7 @@ class testPageReportsTriggerTop extends CWebTest {
 
 		foreach ($trigger_data as $params) {
 			for ($i = 1; $i <= $params['problem_count']; $i++) {
-				CDBHelper::setTriggerProblem([$params['name']], TRIGGER_VALUE_TRUE, ['clock' => $params['time']]);
+				CDBHelper::setTriggerProblem($params['name'], TRIGGER_VALUE_TRUE, ['clock' => $params['time']]);
 			}
 		}
 	}
@@ -832,7 +832,7 @@ class testPageReportsTriggerTop extends CWebTest {
 
 	public function testPageReportsTriggerTop_ContextMenu() {
 		// Create problem.
-		CDBHelper::setTriggerProblem(['First test trigger with tag priority'], TRIGGER_VALUE_TRUE);
+		CDBHelper::setTriggerProblem('First test trigger with tag priority', TRIGGER_VALUE_TRUE);
 
 		$this->page->login()->open(self::LINK)->waitUntilReady();
 
