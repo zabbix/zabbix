@@ -308,9 +308,14 @@ func (p *Plugin) execute(jsonRunner bool) (*runner, error) {
 		})
 	}
 
-	go r.setDevicesData(resultChan, jsonRunner)
+	go func() {
+		for data := range resultChan {
+			r.setDevicesData(data, jsonRunner)
+		}
+	}()
 
-	g.Wait()
+	err = g.Wait()
+
 	close(resultChan)
 
 	r.parseOutput(jsonRunner)
@@ -535,23 +540,15 @@ func getBasicDeviceInfo(
 	}, nil
 }
 
-func (r *runner) setDevicesData(resultChan chan *SmartCtlDeviceData, jsonRunner bool) {
-	for {
-		// Wait for data from dataChan
-		data, ok := <-resultChan
-		if !ok {
-			return
+func (r *runner) setDevicesData(data *SmartCtlDeviceData, jsonRunner bool) {
+	// Process the received data
+	if jsonRunner {
+		r.jsonDevices[data.Device.Info.Name] = jsonDevice{
+			data.Device.SerialNumber,
+			string(data.Data),
 		}
-
-		// Process the received data
-		if jsonRunner {
-			r.jsonDevices[data.Device.Info.Name] = jsonDevice{
-				data.Device.SerialNumber,
-				string(data.Data),
-			}
-		} else {
-			r.devices[data.Device.Info.Name] = *data.Device
-		}
+	} else {
+		r.devices[data.Device.Info.Name] = *data.Device
 	}
 }
 

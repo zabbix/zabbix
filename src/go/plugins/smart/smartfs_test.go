@@ -29,6 +29,7 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"golang.zabbix.com/agent2/plugins/smart/mock"
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
 )
 
@@ -189,6 +190,132 @@ func Test_getBasicDeviceInfo(t *testing.T) {
 				t.Fatalf(
 					"runner.executeBase() expectations where not met, error = %v",
 					err,
+				)
+			}
+		})
+	}
+}
+
+func Test_setDeviceData(t *testing.T) {
+	type fields struct {
+		devices     map[string]deviceParser
+		jsonDevices map[string]jsonDevice
+	}
+
+	tests := []struct {
+		name         string
+		data         *SmartCtlDeviceData
+		jsonRunner   bool
+		expectFields fields
+	}{
+		{
+			"+jsonRunner",
+			&SmartCtlDeviceData{
+				Device: &deviceParser{
+					ModelName:    "SAMSUNG MZVL21T0HCLR-00BH1",
+					SerialNumber: "S641NX0T509005",
+					Info: deviceInfo{
+						Name:     "/dev/sda",
+						InfoName: "/dev/sda",
+						DevType:  "nvme",
+						name:     "/dev/sda",
+					},
+					Smartctl: smartctlField{
+						Version: []int{7, 1},
+					},
+					SmartStatus:     &smartStatus{SerialNumber: true},
+					SmartAttributes: smartAttributes{},
+				},
+				Data: mock.OutputAllDiscInfoSDA,
+			},
+			true, //jsonRunner
+			fields{
+				devices: map[string]deviceParser{},
+				jsonDevices: map[string]jsonDevice{
+					"/dev/sda": {
+						serialNumber: "S641NX0T509005",
+						jsonData:     string(mock.OutputAllDiscInfoSDA),
+					},
+				},
+			},
+		},
+		{
+			"+notjsonRunner",
+			&SmartCtlDeviceData{
+				Device: &deviceParser{
+					ModelName:    "SAMSUNG MZVL21T0HCLR-00BH1",
+					SerialNumber: "S641NX0T509005",
+					Info: deviceInfo{
+						Name:     "/dev/sda",
+						InfoName: "/dev/sda",
+						DevType:  "nvme",
+						name:     "/dev/sda",
+					},
+					Smartctl: smartctlField{
+						Version: []int{7, 1},
+					},
+					SmartStatus:     &smartStatus{SerialNumber: true},
+					SmartAttributes: smartAttributes{},
+				},
+				Data: mock.OutputAllDiscInfoSDA,
+			},
+			false, //jsonRunner
+			fields{
+				devices: map[string]deviceParser{
+					"/dev/sda": {
+						ModelName:    "SAMSUNG MZVL21T0HCLR-00BH1",
+						SerialNumber: "S641NX0T509005",
+						Info: deviceInfo{
+							Name:     "/dev/sda",
+							InfoName: "/dev/sda",
+							DevType:  "nvme",
+							name:     "/dev/sda",
+						},
+						Smartctl: smartctlField{
+							Version: []int{7, 1},
+						},
+						SmartStatus:     &smartStatus{SerialNumber: true},
+						SmartAttributes: smartAttributes{},
+					}},
+				jsonDevices: map[string]jsonDevice{},
+			},
+		},
+	}
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			runner := &runner{
+				devices:     make(map[string]deviceParser),
+				jsonDevices: make(map[string]jsonDevice),
+			}
+
+			runner.setDevicesData(tt.data, tt.jsonRunner)
+
+			diff := cmp.Diff(
+				runner.devices,
+				tt.expectFields.devices,
+				cmp.AllowUnexported(deviceInfo{}),
+			)
+
+			if diff != "" {
+				t.Fatalf(
+					"runner.setDevicesData() devices mismatch (-want +got):\n%s",
+					diff,
+				)
+			}
+
+			diff = cmp.Diff(
+				runner.jsonDevices,
+				tt.expectFields.jsonDevices,
+				cmp.AllowUnexported(jsonDevice{}),
+			)
+
+			if diff != "" {
+				t.Fatalf(
+					"runner.setDevicesData() jsonDevices mismatch (-want +got):\n%s",
+					diff,
 				)
 			}
 		})
@@ -1002,407 +1129,409 @@ func Test_runner_executeBase(t *testing.T) {
 
 
 
-	func Test_getAllDeviceInfoByType(t *testing.T) {
-		t.Parallel()
 
-		sampleValidSmartInfoScan := []byte(`{
-	        "json_format_version": [1, 0],
-	        "smartctl": {
-	          "version": [7, 3],
-	          "svn_revision": "5338",
-	          "platform_info": "x86_64-linux-6.1.0-13-amd64",
-	          "build_info": "(local build)",
-	          "argv": ["smartctl", "-a", "-j", "/dev/sda", "-d", "scsi"],
-	          "exit_status": 0
-	        },
-	        "local_time": {
-	          "time_t": 1705569652,
-	          "asctime": "Thu Jan 18 10:20:52 2024 CET"
-	        },
-	        "device": {
-	          "name": "/dev/sda",
-	          "info_name": "/dev/sda",
-	          "type": "scsi",
-	          "protocol": "SCSI"
-	        },
-	        "scsi_vendor": "SAMSUNG",
-	        "scsi_product": "MZILT960HBHQ/007",
-	        "scsi_model_name": "SAMSUNG MZILT960HBHQ/007",
-	        "scsi_revision": "GXA0",
-	        "scsi_version": "SPC-5",
-	        "user_capacity": {
-	          "blocks": 1875385008,
-	          "bytes": 960197124096
-	        },
-	        "logical_block_size": 512,
-	        "physical_block_size": 4096,
-	        "scsi_lb_provisioning": {
-	          "name": "resource provisioned",
-	          "value": 1,
-	          "management_enabled": {
-	            "name": "LBPME",
-	            "value": 1
-	          },
-	          "read_zeros": {
-	            "name": "LBPRZ",
-	            "value": 1
-	          }
-	        },
-	        "rotation_rate": 0,
-	        "form_factor": {
-	          "scsi_value": 3,
-	          "name": "2.5 inches"
-	        },
-	        "logical_unit_id": "0x5002538b731302a0",
-	        "serial_number": "S5G1NC0W102239",
-	        "device_type": {
-	          "scsi_terminology": "Peripheral Device Type [PDT]",
-	          "scsi_value": 0,
-	          "name": "disk"
-	        },
-	        "scsi_transport_protocol": {
-	          "name": "SAS (SPL-4)",
-	          "value": 6
-	        },
-	        "smart_support": {
-	          "available": true,
-	          "enabled": true
-	        },
-	        "temperature_warning": {
-	          "enabled": true
-	        },
-	        "smart_status": {
-	          "passed": true
-	        },
-	        "scsi_percentage_used_endurance_indicator": 0,
-	        "temperature": {
-	          "current": 35,
-	          "drive_trip": 74
-	        },
-	        "power_on_time": {
-	          "hours": 3862,
-	          "minutes": 30
-	        },
-	        "scsi_start_stop_cycle_counter": {
-	          "year_of_manufacture": "2023",
-	          "week_of_manufacture": "01",
-	          "accumulated_start_stop_cycles": 5,
-	          "specified_load_unload_count_over_device_lifetime": 0,
-	          "accumulated_load_unload_cycles": 0
-	        },
-	        "scsi_grown_defect_list": 0,
-	        "scsi_error_counter_log": {
-	          "read": {
-	            "errors_corrected_by_eccfast": 0,
-	            "errors_corrected_by_eccdelayed": 0,
-	            "errors_corrected_by_rereads_rewrites": 0,
-	            "total_errors_corrected": 0,
-	            "correction_algorithm_invocations": 0,
-	            "gigabytes_processed": "12.699",
-	            "total_uncorrected_errors": 0
-	          },
-	          "write": {
-	            "errors_corrected_by_eccfast": 0,
-	            "errors_corrected_by_eccdelayed": 0,
-	            "errors_corrected_by_rereads_rewrites": 0,
-	            "total_errors_corrected": 0,
-	            "correction_algorithm_invocations": 0,
-	            "gigabytes_processed": "6082.745",
-	            "total_uncorrected_errors": 0
-	          },
-	          "verify": {
-	            "errors_corrected_by_eccfast": 0,
-	            "errors_corrected_by_eccdelayed": 0,
-	            "errors_corrected_by_rereads_rewrites": 0,
-	            "total_errors_corrected": 0,
-	            "correction_algorithm_invocations": 0,
-	            "gigabytes_processed": "0.001",
-	            "total_uncorrected_errors": 0
-	          }
-	        },
-	        "scsi_pending_defects": {
-	          "count": 0
-	        },
-	        "scsi_self_test_0": {
-	          "code": {
-	            "value": 1,
-	            "string": "Background short"
-	          },
-	          "result": {
-	            "value": 0,
-	            "string": "Completed"
-	          },
-	          "power_on_time": {
-	            "hours": 5,
-	            "aka": "accumulated_power_on_hours"
-	          }
-	        },
-	        "scsi_extended_self_test_seconds": 3600
-	      }`)
-		//nolint:lll
-		sampleFailedSmartInfoScan := []byte(`{
-	        "json_format_version": [1, 0],
-	        "smartctl": {
-	          "version": [7, 3],
-	          "svn_revision": "5338",
-	          "platform_info": "x86_64-w64-mingw32-2016-1607",
-	          "build_info": "(sf-7.3-1)",
-	          "argv": ["smartctl", "-a", "/dev/sda", "-d", "3ware,0", "-j"],
-	          "messages": [
-	            {
-	              "string": "/dev/sda: Unknown device type '3ware,0'",
-	              "severity": "error"
-	            },
-	            {
-	              "string": "=======> VALID ARGUMENTS ARE: ata, scsi[+TYPE], nvme[,NSID], sat[,auto][,N][+TYPE], usbcypress[,X], usbjmicron[,p][,x][,N], usbprolific, usbsunplus, sntasmedia, sntjmicron[,NSID], sntrealtek, intelliprop,N[+TYPE], jmb39x[-q],N[,sLBA][,force][+TYPE], jms56x,N[,sLBA][,force][+TYPE], aacraid,H,L,ID, areca,N[/E], auto, test <=======",
-	              "severity": "error"
-	            }
-	          ],
-	          "exit_status": 1
-	        },
-	        "local_time": {
-	          "time_t": 1663357978,
-	          "asctime": "Fri Sep 16 22:52:58 2022 BST"
-	        }
-	      }`)
-		sampleMissingSmartStatusSmartInfoScan := []byte(`{
-	        "json_format_version": [1, 0],
-	        "smartctl": {
-	          "version": [7, 3],
-	          "svn_revision": "5338",
-	          "platform_info": "x86_64-linux-6.1.0-13-amd64",
-	          "build_info": "(local build)",
-	          "argv": ["smartctl", "-a", "-j", "/dev/sda", "-d", "scsi"],
-	          "exit_status": 0
-	        },
-	        "local_time": {
-	          "time_t": 1705569652,
-	          "asctime": "Thu Jan 18 10:20:52 2024 CET"
-	        },
-	        "device": {
-	          "name": "/dev/sda",
-	          "info_name": "/dev/sda",
-	          "type": "scsi",
-	          "protocol": "SCSI"
-	        },
-	        "scsi_vendor": "SAMSUNG",
-	        "scsi_product": "MZILT960HBHQ/007",
-	        "scsi_model_name": "SAMSUNG MZILT960HBHQ/007",
-	        "scsi_revision": "GXA0",
-	        "scsi_version": "SPC-5",
-	        "user_capacity": {
-	          "blocks": 1875385008,
-	          "bytes": 960197124096
-	        },
-	        "logical_block_size": 512,
-	        "physical_block_size": 4096,
-	        "scsi_lb_provisioning": {
-	          "name": "resource provisioned",
-	          "value": 1,
-	          "management_enabled": {
-	            "name": "LBPME",
-	            "value": 1
-	          },
-	          "read_zeros": {
-	            "name": "LBPRZ",
-	            "value": 1
-	          }
-	        },
-	        "rotation_rate": 0,
-	        "form_factor": {
-	          "scsi_value": 3,
-	          "name": "2.5 inches"
-	        },
-	        "logical_unit_id": "0x5002538b731302a0",
-	        "serial_number": "S5G1NC0W102239",
-	        "device_type": {
-	          "scsi_terminology": "Peripheral Device Type [PDT]",
-	          "scsi_value": 0,
-	          "name": "disk"
-	        },
-	        "scsi_transport_protocol": {
-	          "name": "SAS (SPL-4)",
-	          "value": 6
-	        },
-	        "smart_support": {
-	          "available": true,
-	          "enabled": true
-	        },
-	        "temperature_warning": {
-	          "enabled": true
-	        },
-	        "scsi_percentage_used_endurance_indicator": 0,
-	        "temperature": {
-	          "current": 35,
-	          "drive_trip": 74
-	        },
-	        "power_on_time": {
-	          "hours": 3862,
-	          "minutes": 30
-	        },
-	        "scsi_start_stop_cycle_counter": {
-	          "year_of_manufacture": "2023",
-	          "week_of_manufacture": "01",
-	          "accumulated_start_stop_cycles": 5,
-	          "specified_load_unload_count_over_device_lifetime": 0,
-	          "accumulated_load_unload_cycles": 0
-	        },
-	        "scsi_grown_defect_list": 0,
-	        "scsi_error_counter_log": {
-	          "read": {
-	            "errors_corrected_by_eccfast": 0,
-	            "errors_corrected_by_eccdelayed": 0,
-	            "errors_corrected_by_rereads_rewrites": 0,
-	            "total_errors_corrected": 0,
-	            "correction_algorithm_invocations": 0,
-	            "gigabytes_processed": "12.699",
-	            "total_uncorrected_errors": 0
-	          },
-	          "write": {
-	            "errors_corrected_by_eccfast": 0,
-	            "errors_corrected_by_eccdelayed": 0,
-	            "errors_corrected_by_rereads_rewrites": 0,
-	            "total_errors_corrected": 0,
-	            "correction_algorithm_invocations": 0,
-	            "gigabytes_processed": "6082.745",
-	            "total_uncorrected_errors": 0
-	          },
-	          "verify": {
-	            "errors_corrected_by_eccfast": 0,
-	            "errors_corrected_by_eccdelayed": 0,
-	            "errors_corrected_by_rereads_rewrites": 0,
-	            "total_errors_corrected": 0,
-	            "correction_algorithm_invocations": 0,
-	            "gigabytes_processed": "0.001",
-	            "total_uncorrected_errors": 0
-	          }
-	        },
-	        "scsi_pending_defects": {
-	          "count": 0
-	        },
-	        "scsi_self_test_0": {
-	          "code": {
-	            "value": 1,
-	            "string": "Background short"
-	          },
-	          "result": {
-	            "value": 0,
-	            "string": "Completed"
-	          },
-	          "power_on_time": {
-	            "hours": 5,
-	            "aka": "accumulated_power_on_hours"
-	          }
-	        },
-	        "scsi_extended_self_test_seconds": 3600
-	      }`)
-
-		type fields struct {
-			out []byte
-			err error
-		}
-
-		type args struct {
-			deviceName string
-			deviceType string
-		}
-
-		tests := []struct {
-			name    string
-			fields  fields
-			args    args
-			want    *SmartCtlDeviceData
-			wantErr bool
-		}{
-			{
-				"+valid",
-				fields{out: sampleValidSmartInfoScan},
-				args{deviceName: "/dev/sda", deviceType: "raid,1,2,3"},
-				&SmartCtlDeviceData{
-					Device: &deviceParser{
-						SerialNumber: "S5G1NC0W102239",
-						Info: deviceInfo{
-							Name:     "/dev/sda raid,1,2,3",
-							InfoName: "/dev/sda",
-							DevType:  "scsi",
-							name:     "/dev/sda",
-							raidType: "raid,1,2,3",
-						},
-						Smartctl:    smartctlField{Version: []int{7, 3}},
-						SmartStatus: &smartStatus{SerialNumber: true},
-					},
-					Data: sampleValidSmartInfoScan,
-				},
-				false,
-			},
-			{
-				"-executeErr",
-				fields{out: sampleValidSmartInfoScan, err: errs.New("fail")},
-				args{deviceName: "/dev/sda", deviceType: "raid,1,2,3"},
-				nil,
-				true,
-			},
-			{
-				"-unmarshalErr",
-				fields{out: []byte("{")},
-				args{deviceName: "/dev/sda", deviceType: "raid,1,2,3"},
-				nil,
-				true,
-			},
-			{
-				"-smartctlErr",
-				fields{out: sampleFailedSmartInfoScan},
-				args{deviceName: "/dev/sda", deviceType: "raid,1,2,3"},
-				nil,
-				true,
-			},
-			{
-				"-missingSmartStatus",
-				fields{out: sampleMissingSmartStatusSmartInfoScan},
-				args{deviceName: "/dev/sda", deviceType: "raid,1,2,3"},
-				nil,
-				true,
-			},
-		}
-		for _, tt := range tests {
-			tt := tt
-			t.Run(tt.name, func(t *testing.T) {
-				t.Parallel()
-
-				m := mock.NewMockController(t)
-
-				m.ExpectExecute().
-					WithArgs("-a", "/dev/sda", "-d", "raid,1,2,3", "-j").
-					WillReturnOutput(tt.fields.out).
-					WillReturnError(tt.fields.err)
-
-				got, err := getAllDeviceInfoByType(
-					m,
-					tt.args.deviceName,
-					tt.args.deviceType,
-				)
-				if (err != nil) != tt.wantErr {
-					t.Fatalf(
-						"getAllDeviceInfoByType() error = %v, wantErr %v",
-						err, tt.wantErr,
-					)
-				}
-
-				if diff := cmp.Diff(
-					tt.want, got,
-					cmp.AllowUnexported(deviceParser{}, deviceInfo{}),
-				); diff != "" {
-					t.Fatalf(
-						"getAllDeviceInfoByType() mismatch (-want +got):\n%s", diff,
-					)
-				}
-			})
-		}
-	}
 
 
 
 */
+
+func Test_getRaidDeviceInfo(t *testing.T) {
+	t.Parallel()
+
+	sampleValidSmartInfoScan := []byte(`{
+		"json_format_version": [1, 0],
+		"smartctl": {
+		  "version": [7, 3],
+		  "svn_revision": "5338",
+		  "platform_info": "x86_64-linux-6.1.0-13-amd64",
+		  "build_info": "(local build)",
+		  "argv": ["smartctl", "-a", "-j", "/dev/sda", "-d", "scsi"],
+		  "exit_status": 0
+		},
+		"local_time": {
+		  "time_t": 1705569652,
+		  "asctime": "Thu Jan 18 10:20:52 2024 CET"
+		},
+		"device": {
+		  "name": "/dev/sda",
+		  "info_name": "/dev/sda",
+		  "type": "scsi",
+		  "protocol": "SCSI"
+		},
+		"scsi_vendor": "SAMSUNG",
+		"scsi_product": "MZILT960HBHQ/007",
+		"scsi_model_name": "SAMSUNG MZILT960HBHQ/007",
+		"scsi_revision": "GXA0",
+		"scsi_version": "SPC-5",
+		"user_capacity": {
+		  "blocks": 1875385008,
+		  "bytes": 960197124096
+		},
+		"logical_block_size": 512,
+		"physical_block_size": 4096,
+		"scsi_lb_provisioning": {
+		  "name": "resource provisioned",
+		  "value": 1,
+		  "management_enabled": {
+			"name": "LBPME",
+			"value": 1
+		  },
+		  "read_zeros": {
+			"name": "LBPRZ",
+			"value": 1
+		  }
+		},
+		"rotation_rate": 0,
+		"form_factor": {
+		  "scsi_value": 3,
+		  "name": "2.5 inches"
+		},
+		"logical_unit_id": "0x5002538b731302a0",
+		"serial_number": "S5G1NC0W102239",
+		"device_type": {
+		  "scsi_terminology": "Peripheral Device Type [PDT]",
+		  "scsi_value": 0,
+		  "name": "disk"
+		},
+		"scsi_transport_protocol": {
+		  "name": "SAS (SPL-4)",
+		  "value": 6
+		},
+		"smart_support": {
+		  "available": true,
+		  "enabled": true
+		},
+		"temperature_warning": {
+		  "enabled": true
+		},
+		"smart_status": {
+		  "passed": true
+		},
+		"scsi_percentage_used_endurance_indicator": 0,
+		"temperature": {
+		  "current": 35,
+		  "drive_trip": 74
+		},
+		"power_on_time": {
+		  "hours": 3862,
+		  "minutes": 30
+		},
+		"scsi_start_stop_cycle_counter": {
+		  "year_of_manufacture": "2023",
+		  "week_of_manufacture": "01",
+		  "accumulated_start_stop_cycles": 5,
+		  "specified_load_unload_count_over_device_lifetime": 0,
+		  "accumulated_load_unload_cycles": 0
+		},
+		"scsi_grown_defect_list": 0,
+		"scsi_error_counter_log": {
+		  "read": {
+			"errors_corrected_by_eccfast": 0,
+			"errors_corrected_by_eccdelayed": 0,
+			"errors_corrected_by_rereads_rewrites": 0,
+			"total_errors_corrected": 0,
+			"correction_algorithm_invocations": 0,
+			"gigabytes_processed": "12.699",
+			"total_uncorrected_errors": 0
+		  },
+		  "write": {
+			"errors_corrected_by_eccfast": 0,
+			"errors_corrected_by_eccdelayed": 0,
+			"errors_corrected_by_rereads_rewrites": 0,
+			"total_errors_corrected": 0,
+			"correction_algorithm_invocations": 0,
+			"gigabytes_processed": "6082.745",
+			"total_uncorrected_errors": 0
+		  },
+		  "verify": {
+			"errors_corrected_by_eccfast": 0,
+			"errors_corrected_by_eccdelayed": 0,
+			"errors_corrected_by_rereads_rewrites": 0,
+			"total_errors_corrected": 0,
+			"correction_algorithm_invocations": 0,
+			"gigabytes_processed": "0.001",
+			"total_uncorrected_errors": 0
+		  }
+		},
+		"scsi_pending_defects": {
+		  "count": 0
+		},
+		"scsi_self_test_0": {
+		  "code": {
+			"value": 1,
+			"string": "Background short"
+		  },
+		  "result": {
+			"value": 0,
+			"string": "Completed"
+		  },
+		  "power_on_time": {
+			"hours": 5,
+			"aka": "accumulated_power_on_hours"
+		  }
+		},
+		"scsi_extended_self_test_seconds": 3600
+	  }`)
+	//nolint:lll
+	sampleFailedSmartInfoScan := []byte(`{
+		"json_format_version": [1, 0],
+		"smartctl": {
+		  "version": [7, 3],
+		  "svn_revision": "5338",
+		  "platform_info": "x86_64-w64-mingw32-2016-1607",
+		  "build_info": "(sf-7.3-1)",
+		  "argv": ["smartctl", "-a", "/dev/sda", "-d", "3ware,0", "-j"],
+		  "messages": [
+			{
+			  "string": "/dev/sda: Unknown device type '3ware,0'",
+			  "severity": "error"
+			},
+			{
+			  "string": "=======> VALID ARGUMENTS ARE: ata, scsi[+TYPE], nvme[,NSID], sat[,auto][,N][+TYPE], usbcypress[,X], usbjmicron[,p][,x][,N], usbprolific, usbsunplus, sntasmedia, sntjmicron[,NSID], sntrealtek, intelliprop,N[+TYPE], jmb39x[-q],N[,sLBA][,force][+TYPE], jms56x,N[,sLBA][,force][+TYPE], aacraid,H,L,ID, areca,N[/E], auto, test <=======",
+			  "severity": "error"
+			}
+		  ],
+		  "exit_status": 1
+		},
+		"local_time": {
+		  "time_t": 1663357978,
+		  "asctime": "Fri Sep 16 22:52:58 2022 BST"
+		}
+	  }`)
+	sampleMissingSmartStatusSmartInfoScan := []byte(`{
+		"json_format_version": [1, 0],
+		"smartctl": {
+		  "version": [7, 3],
+		  "svn_revision": "5338",
+		  "platform_info": "x86_64-linux-6.1.0-13-amd64",
+		  "build_info": "(local build)",
+		  "argv": ["smartctl", "-a", "-j", "/dev/sda", "-d", "scsi"],
+		  "exit_status": 0
+		},
+		"local_time": {
+		  "time_t": 1705569652,
+		  "asctime": "Thu Jan 18 10:20:52 2024 CET"
+		},
+		"device": {
+		  "name": "/dev/sda",
+		  "info_name": "/dev/sda",
+		  "type": "scsi",
+		  "protocol": "SCSI"
+		},
+		"scsi_vendor": "SAMSUNG",
+		"scsi_product": "MZILT960HBHQ/007",
+		"scsi_model_name": "SAMSUNG MZILT960HBHQ/007",
+		"scsi_revision": "GXA0",
+		"scsi_version": "SPC-5",
+		"user_capacity": {
+		  "blocks": 1875385008,
+		  "bytes": 960197124096
+		},
+		"logical_block_size": 512,
+		"physical_block_size": 4096,
+		"scsi_lb_provisioning": {
+		  "name": "resource provisioned",
+		  "value": 1,
+		  "management_enabled": {
+			"name": "LBPME",
+			"value": 1
+		  },
+		  "read_zeros": {
+			"name": "LBPRZ",
+			"value": 1
+		  }
+		},
+		"rotation_rate": 0,
+		"form_factor": {
+		  "scsi_value": 3,
+		  "name": "2.5 inches"
+		},
+		"logical_unit_id": "0x5002538b731302a0",
+		"serial_number": "S5G1NC0W102239",
+		"device_type": {
+		  "scsi_terminology": "Peripheral Device Type [PDT]",
+		  "scsi_value": 0,
+		  "name": "disk"
+		},
+		"scsi_transport_protocol": {
+		  "name": "SAS (SPL-4)",
+		  "value": 6
+		},
+		"smart_support": {
+		  "available": true,
+		  "enabled": true
+		},
+		"temperature_warning": {
+		  "enabled": true
+		},
+		"scsi_percentage_used_endurance_indicator": 0,
+		"temperature": {
+		  "current": 35,
+		  "drive_trip": 74
+		},
+		"power_on_time": {
+		  "hours": 3862,
+		  "minutes": 30
+		},
+		"scsi_start_stop_cycle_counter": {
+		  "year_of_manufacture": "2023",
+		  "week_of_manufacture": "01",
+		  "accumulated_start_stop_cycles": 5,
+		  "specified_load_unload_count_over_device_lifetime": 0,
+		  "accumulated_load_unload_cycles": 0
+		},
+		"scsi_grown_defect_list": 0,
+		"scsi_error_counter_log": {
+		  "read": {
+			"errors_corrected_by_eccfast": 0,
+			"errors_corrected_by_eccdelayed": 0,
+			"errors_corrected_by_rereads_rewrites": 0,
+			"total_errors_corrected": 0,
+			"correction_algorithm_invocations": 0,
+			"gigabytes_processed": "12.699",
+			"total_uncorrected_errors": 0
+		  },
+		  "write": {
+			"errors_corrected_by_eccfast": 0,
+			"errors_corrected_by_eccdelayed": 0,
+			"errors_corrected_by_rereads_rewrites": 0,
+			"total_errors_corrected": 0,
+			"correction_algorithm_invocations": 0,
+			"gigabytes_processed": "6082.745",
+			"total_uncorrected_errors": 0
+		  },
+		  "verify": {
+			"errors_corrected_by_eccfast": 0,
+			"errors_corrected_by_eccdelayed": 0,
+			"errors_corrected_by_rereads_rewrites": 0,
+			"total_errors_corrected": 0,
+			"correction_algorithm_invocations": 0,
+			"gigabytes_processed": "0.001",
+			"total_uncorrected_errors": 0
+		  }
+		},
+		"scsi_pending_defects": {
+		  "count": 0
+		},
+		"scsi_self_test_0": {
+		  "code": {
+			"value": 1,
+			"string": "Background short"
+		  },
+		  "result": {
+			"value": 0,
+			"string": "Completed"
+		  },
+		  "power_on_time": {
+			"hours": 5,
+			"aka": "accumulated_power_on_hours"
+		  }
+		},
+		"scsi_extended_self_test_seconds": 3600
+	  }`)
+
+	type fields struct {
+		out []byte
+		err error
+	}
+
+	type args struct {
+		deviceName string
+		deviceType string
+	}
+
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		want    *SmartCtlDeviceData
+		wantErr bool
+	}{
+		{
+			"+valid",
+			fields{out: sampleValidSmartInfoScan},
+			args{deviceName: "/dev/sda", deviceType: "raid,1,2,3"},
+			&SmartCtlDeviceData{
+				Device: &deviceParser{
+					SerialNumber: "S5G1NC0W102239",
+					Info: deviceInfo{
+						Name:     "/dev/sda raid,1,2,3",
+						InfoName: "/dev/sda",
+						DevType:  "scsi",
+						name:     "/dev/sda",
+						raidType: "raid,1,2,3",
+					},
+					Smartctl:    smartctlField{Version: []int{7, 3}},
+					SmartStatus: &smartStatus{SerialNumber: true},
+				},
+				Data: sampleValidSmartInfoScan,
+			},
+			false,
+		},
+		{
+			"-executeErr",
+			fields{out: sampleValidSmartInfoScan, err: errs.New("fail")},
+			args{deviceName: "/dev/sda", deviceType: "raid,1,2,3"},
+			nil,
+			true,
+		},
+		{
+			"-unmarshalErr",
+			fields{out: []byte("{")},
+			args{deviceName: "/dev/sda", deviceType: "raid,1,2,3"},
+			nil,
+			true,
+		},
+		{
+			"-smartctlErr",
+			fields{out: sampleFailedSmartInfoScan},
+			args{deviceName: "/dev/sda", deviceType: "raid,1,2,3"},
+			nil,
+			true,
+		},
+		{
+			"-missingSmartStatus",
+			fields{out: sampleMissingSmartStatusSmartInfoScan},
+			args{deviceName: "/dev/sda", deviceType: "raid,1,2,3"},
+			nil,
+			true,
+		},
+	}
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			m := mock.NewMockController(t)
+
+			m.ExpectExecute().
+				WithArgs("-a", "/dev/sda", "-d", "raid,1,2,3", "-j").
+				WillReturnOutput(tt.fields.out).
+				WillReturnError(tt.fields.err)
+
+			got, err := getRaidDeviceInfo(
+				m,
+				tt.args.deviceName,
+				tt.args.deviceType,
+			)
+			if (err != nil) != tt.wantErr {
+				t.Fatalf(
+					"getAllDeviceInfoByType() error = %v, wantErr %v",
+					err, tt.wantErr,
+				)
+			}
+
+			if diff := cmp.Diff(
+				tt.want, got,
+				cmp.AllowUnexported(deviceParser{}, deviceInfo{}),
+			); diff != "" {
+				t.Fatalf(
+					"getAllDeviceInfoByType() mismatch (-want +got):\n%s", diff,
+				)
+			}
+		})
+	}
+}
 
 //nolint:paralleltest,tparallel
 
