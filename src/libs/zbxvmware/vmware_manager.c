@@ -194,20 +194,33 @@ static void	vmware_job_schedule(zbx_vmware_t *vmw, zbx_vmware_job_t *job, time_t
 			job->nextcheck = time_now + cache_update_period;
 			break;
 		case ZBX_VMWARE_UPDATE_EVENTLOG:
-			if (0 == job->ttl)
-				job->ttl = cache_update_period * 2;
+			job->ttl = 2 * (0 != job->service->eventlog.interval &&
+					job->service->eventlog.interval > perf_update_period ?
+					job->service->eventlog.interval : perf_update_period) +
+					ZBX_VMWARE_EVENTLOG_MIN_INTERVAL;
 
 			job->nextcheck = time_now + (0 == job->service->eventlog.interval ? perf_update_period :
 					(ZBX_VMWARE_EVENTLOG_MIN_INTERVAL > job->service->eventlog.interval ?
 					ZBX_VMWARE_EVENTLOG_MIN_INTERVAL : job->service->eventlog.interval));
+
+			/* shift events collection before calling poller */
+			if (job->nextcheck > time_now + ZBX_VMWARE_EVENTLOG_MIN_INTERVAL * 2 &&
+					job->nextcheck > (job->service->eventlog.lastaccess +
+					job->service->eventlog.interval))
+			{
+				job->nextcheck -= ZBX_VMWARE_EVENTLOG_MIN_INTERVAL;
+			}
+
+			if (job->nextcheck > time_now + ZBX_VMWARE_SERVICE_TTL)
+				job->nextcheck = time_now + ZBX_VMWARE_SERVICE_TTL;
 			break;
 	}
 
 	zbx_binary_heap_insert(&vmw->jobs_queue, &elem_new);
 	zbx_vmware_unlock();
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() type:%s nextcheck:%s", __func__, vmware_job_type_string(job),
-			zbx_time2str(job->nextcheck, NULL));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() type:%s nextcheck:%s ttl:" ZBX_FS_TIME_T, __func__,
+			vmware_job_type_string(job), zbx_time2str(job->nextcheck, NULL), job->ttl);
 
 #undef ZBX_VMWARE_EVENTLOG_MIN_INTERVAL
 #undef ZBX_VMWARE_SERVICE_TTL

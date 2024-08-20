@@ -1212,13 +1212,6 @@ int	check_vcenter_eventlog(AGENT_REQUEST *request, const zbx_dc_item_t *item, AG
 	if (NULL == (service = get_vmware_service(url, item->username, item->password, result, &ret)))
 		goto unlock;
 
-	if (0 == (service->jobs_type & ZBX_VMWARE_UPDATE_EVENTLOG))
-	{
-		service->jobs_type |= ZBX_VMWARE_REQ_UPDATE_EVENTLOG;
-		ret = SYSINFO_RET_OK;
-		goto unlock;
-	}
-
 	lastaccess = time(NULL);
 
 	if (0 != service->eventlog.lastaccess)
@@ -1226,11 +1219,14 @@ int	check_vcenter_eventlog(AGENT_REQUEST *request, const zbx_dc_item_t *item, AG
 
 	service->eventlog.lastaccess = lastaccess;
 
+	if (0 == (service->jobs_type & ZBX_VMWARE_UPDATE_EVENTLOG))
+		service->jobs_type |= ZBX_VMWARE_REQ_UPDATE_EVENTLOG;
+
 	if (severity != service->eventlog.severity)
 		service->eventlog.severity = severity;
 
 	if (ZBX_VMWARE_EVENT_KEY_UNINITIALIZED == service->eventlog.last_key ||
-			(0 != skip_old && 0 != service->eventlog.last_key ))
+			(0 != skip_old && && service->eventlog.owner_itemid != item->itemid))
 	{
 		/* this may happen if recreate item vmware.eventlog for same service URL */
 		service->eventlog.last_key = request->lastlogsize;

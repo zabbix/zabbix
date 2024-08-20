@@ -2146,8 +2146,8 @@ static void	vmware_service_copy_cust_query_response(zbx_vector_cq_value_ptr_t *c
 		{
 			vmware_shared_strfree(cq_values->values[i]->instance->value);
 			cq_values->values[i]->instance->value = vmware_shared_strdup(cq_values->values[i]->response);
-			cq_values->values[i]->instance->state = (unsigned char)(ZBX_VMWARE_CQ_READY |
-					(cq_values->values[i]->instance->state & ZBX_VMWARE_CQ_SEPARATE));
+			cq_values->values[i]->instance->state = ZBX_VMWARE_CQ_READY |
+					(cq_values->values[i]->instance->state & ZBX_VMWARE_CQ_SEPARATE);
 		}
 	}
 }
