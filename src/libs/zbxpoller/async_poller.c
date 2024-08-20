@@ -47,7 +47,7 @@ static void	process_async_result(zbx_dc_item_context_t *item, zbx_poller_config_
 	zbx_timespec_t		timespec;
 	zbx_interface_status_t	*interface_status;
 
-	zabbix_log(LOG_LEVEL_WARNING, "In %s() key:'%s' host:'%s' addr:'%s'", __func__, item->key, item->host,
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s' host:'%s' addr:'%s'", __func__, item->key, item->host,
 			item->interface.addr);
 
 	zbx_timespec(&timespec);
@@ -107,10 +107,10 @@ static void	process_async_result(zbx_dc_item_context_t *item, zbx_poller_config_
 	poller_config->processing--;
 	poller_config->processed++;
 
-	zabbix_log(LOG_LEVEL_WARNING, "finished processing itemid:" ZBX_FS_UI64 " processing:%d", item->itemid,
+	zabbix_log(LOG_LEVEL_DEBUG, "finished processing itemid:" ZBX_FS_UI64 " processing:%d", item->itemid,
 			poller_config->processing);
 
-	zabbix_log(LOG_LEVEL_WARNING, "End of %s():%s", __func__, zbx_result_string(item->ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(item->ret));
 }
 
 static void	process_agent_result(void *data)
@@ -146,7 +146,7 @@ static void	process_httpagent_result(CURL *easy_handle, CURLcode err, void *arg)
 	zbx_poller_config_t		*poller_config;
 	CURLcode			err_info;
 
-	zabbix_log(LOG_LEVEL_WARNING, "In %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	poller_config = (zbx_poller_config_t *)arg;
 
