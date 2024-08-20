@@ -2248,32 +2248,8 @@ zabbix_export:
                   item:
                     host: 'AWS ELB Application Load Balancer by HTTP'
                     key: 'aws.elb.alb.target_groups.healthy_state_routing["{#AWS.ELB.TARGET.GROUP.NAME}"]'
-            - uuid: a2668f5bf6a240a296b047c1b979f9dc
-              name: 'AWS ELB ALB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}]: Unhealthy Host'
-              graph_items:
-                - drawtype: GRADIENT_LINE
-                  color: FF0000
-                  item:
-                    host: 'AWS ELB Application Load Balancer by HTTP'
-                    key: 'aws.elb.alb.target_groups.unhealthy_host_count["{#AWS.ELB.TARGET.GROUP.NAME}"]'
-            - uuid: 54645b74585c4b45a971c13d1127698d
-              name: 'AWS ELB ALB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}]: Unhealthy State DNS'
-              graph_items:
-                - drawtype: GRADIENT_LINE
-                  color: FF0000
-                  item:
-                    host: 'AWS ELB Application Load Balancer by HTTP'
-                    key: 'aws.elb.alb.target_groups.unhealthy_state_dns["{#AWS.ELB.TARGET.GROUP.NAME}"]'
-            - uuid: 8da12e20218e4367968b8fcf0f56991a
-              name: 'AWS ELB ALB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}]: Unhealthy State Routing'
-              graph_items:
-                - drawtype: GRADIENT_LINE
-                  color: FF0000
-                  item:
-                    host: 'AWS ELB Application Load Balancer by HTTP'
-                    key: 'aws.elb.alb.target_groups.unhealthy_state_routing["{#AWS.ELB.TARGET.GROUP.NAME}"]'
             - uuid: ec38c670cabf422ea79f41866c90ee66
-              name: 'AWS ELB ALB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}] HTTP Code Target Group'
+              name: 'AWS ELB ALB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}]: HTTP Code Target Group'
               graph_items:
                 - drawtype: BOLD_LINE
                   color: 199C0D
@@ -2298,6 +2274,30 @@ zabbix_export:
                   item:
                     host: 'AWS ELB Application Load Balancer by HTTP'
                     key: 'aws.elb.alb.target_groups.http_5xx_count["{#AWS.ELB.TARGET.GROUP.NAME}"]'
+            - uuid: a2668f5bf6a240a296b047c1b979f9dc
+              name: 'AWS ELB ALB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}]: Unhealthy Host'
+              graph_items:
+                - drawtype: GRADIENT_LINE
+                  color: FF0000
+                  item:
+                    host: 'AWS ELB Application Load Balancer by HTTP'
+                    key: 'aws.elb.alb.target_groups.unhealthy_host_count["{#AWS.ELB.TARGET.GROUP.NAME}"]'
+            - uuid: 54645b74585c4b45a971c13d1127698d
+              name: 'AWS ELB ALB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}]: Unhealthy State DNS'
+              graph_items:
+                - drawtype: GRADIENT_LINE
+                  color: FF0000
+                  item:
+                    host: 'AWS ELB Application Load Balancer by HTTP'
+                    key: 'aws.elb.alb.target_groups.unhealthy_state_dns["{#AWS.ELB.TARGET.GROUP.NAME}"]'
+            - uuid: 8da12e20218e4367968b8fcf0f56991a
+              name: 'AWS ELB ALB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}]: Unhealthy State Routing'
+              graph_items:
+                - drawtype: GRADIENT_LINE
+                  color: FF0000
+                  item:
+                    host: 'AWS ELB Application Load Balancer by HTTP'
+                    key: 'aws.elb.alb.target_groups.unhealthy_state_routing["{#AWS.ELB.TARGET.GROUP.NAME}"]'
           master_item:
             key: aws.elb.alb.get_target_groups
           lld_macro_paths:
@@ -2558,7 +2558,7 @@ zabbix_export:
                       value: 'Healthy Host Count'
                     - type: STRING
                       name: ds.0.items.0
-                      value: 'AWS ELB ALB Target Groups: *: Healthy Host Count'
+                      value: '*: Healthy Host Count'
                     - type: INTEGER
                       name: legend_aggregation
                       value: '1'
@@ -2576,7 +2576,7 @@ zabbix_export:
                       value: 'HTTP Code Target Group'
                     - type: STRING
                       name: ds.0.items.0
-                      value: 'AWS ELB ALB Target Groups: *: HTTP Code Target*'
+                      value: '*: HTTP Code Target*'
                     - type: INTEGER
                       name: ds.0.transparency
                       value: '6'
@@ -2603,7 +2603,7 @@ zabbix_export:
                       value: '5'
                     - type: STRING
                       name: ds.0.items.0
-                      value: 'AWS ELB ALB Target Groups: *: Request Count Per Target'
+                      value: '*: Request Count Per Target'
                     - type: INTEGER
                       name: ds.0.missingdatafunc
                       value: '2'
@@ -2630,7 +2630,7 @@ zabbix_export:
                       value: 'Unhealthy Host Count'
                     - type: STRING
                       name: ds.0.items.0
-                      value: 'AWS ELB ALB Target Groups: *: Unhealthy Host Count'
+                      value: '*: Unhealthy Host Count'
                     - type: INTEGER
                       name: legend_aggregation
                       value: '1'
@@ -2654,7 +2654,7 @@ zabbix_export:
                       value: 'Healthy State Routing'
                     - type: STRING
                       name: ds.0.items.0
-                      value: 'AWS ELB ALB Target Groups: *: Healthy State Routing'
+                      value: '*: Healthy State Routing'
                     - type: INTEGER
                       name: legend_aggregation
                       value: '1'
@@ -2675,7 +2675,7 @@ zabbix_export:
                       value: 'Unhealthy State Routing'
                     - type: STRING
                       name: ds.0.items.0
-                      value: 'AWS ELB ALB Target Groups: *: Unhealthy State Routing'
+                      value: '*: Unhealthy State Routing'
                     - type: INTEGER
                       name: legend_aggregation
                       value: '1'
@@ -2699,7 +2699,7 @@ zabbix_export:
                       value: 'Healthy State DNS'
                     - type: STRING
                       name: ds.0.items.0
-                      value: 'AWS ELB ALB Target Groups: *: Healthy State DNS'
+                      value: '*: Healthy State DNS'
                     - type: INTEGER
                       name: legend_aggregation
                       value: '1'
@@ -2720,7 +2720,7 @@ zabbix_export:
                       value: 'Unhealthy State DNS'
                     - type: STRING
                       name: ds.0.items.0
-                      value: 'AWS ELB ALB Target Groups: *: Unhealthy State DNS'
+                      value: '*: Unhealthy State DNS'
                     - type: INTEGER
                       name: legend_aggregation
                       value: '1'

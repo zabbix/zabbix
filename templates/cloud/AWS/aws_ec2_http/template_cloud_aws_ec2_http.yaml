@@ -46,6 +46,7 @@ zabbix_export:
               expression: 'length(last(/AWS EC2 by HTTP/aws.ec2.alarms.check))>0'
               name: 'Failed to get alarms data'
               priority: WARNING
+              description: 'Failed to get CloudWatch alarms for EC2.'
               tags:
                 - tag: scope
                   value: availability
@@ -1378,6 +1379,7 @@ zabbix_export:
               expression: 'length(last(/AWS EC2 by HTTP/aws.ec2.metrics.check))>0'
               name: 'Failed to get metrics data'
               priority: WARNING
+              description: 'Failed to get CloudWatch metrics for EC2.'
               tags:
                 - tag: scope
                   value: availability
@@ -1591,6 +1593,7 @@ zabbix_export:
               expression: 'length(last(/AWS EC2 by HTTP/aws.ec2.volumes.check))>0'
               name: 'Failed to get volumes info'
               priority: WARNING
+              description: 'Failed to get CloudWatch volumes for EC2.'
               tags:
                 - tag: scope
                   value: availability
@@ -1671,6 +1674,7 @@ zabbix_export:
                   expression: 'last(/AWS EC2 by HTTP/aws.ec2.alarm.state["{#ALARM_NAME}"])=1'
                   name: '[{#ALARM_NAME}] has ''Insufficient data'' state'
                   priority: INFO
+                  description: 'Either the alarm has just started, the metric is not available, or not enough data is available for the metric to determine the alarm state.'
                   tags:
                     - tag: scope
                       value: notice

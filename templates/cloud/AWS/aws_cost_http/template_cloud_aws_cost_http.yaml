@@ -267,7 +267,7 @@ zabbix_export:
             
             	return JSON.stringify({ 'error': error });
             }
-          description: 'Get raw data on the daily costs by service'
+          description: 'Get raw data on the daily costs by service.'
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
               parameters:
@@ -570,6 +570,7 @@ zabbix_export:
             
             	return JSON.stringify({ 'error': error });
             }
+          description: 'Get raw data on the monthly costs by service.'
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
               parameters:
