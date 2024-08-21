@@ -782,19 +782,19 @@ static char	*regexp_sub_replace(const char *text, const char *output_template, z
 				continue;
 
 			case '@':
-				/* artificial construct to replace the first captured group or fail */
-				/* if the regular expression pattern contains no groups             */
-				if (-1 == match[1].rm_so)
-				{
-					zbx_free(ptr);
-					goto out;
-				}
+					/* artificial construct to replace the first captured group or fail */
+					/* if the regular expression pattern contains no groups             */
+					if (-1 == match[1].rm_so)
+					{
+						zbx_free(ptr);
+						goto out;
+					}
 
-				strncpy_alloc(&ptr, &size, &offset, text + match[1].rm_so,
-						(size_t)(match[1].rm_eo - match[1].rm_so), limit);
+					strncpy_alloc(&ptr, &size, &offset, text + match[1].rm_so,
+							(size_t)(match[1].rm_eo - match[1].rm_so), limit);
 
-				pstart = pgroup + 1;
-				continue;
+					pstart = pgroup + 1;
+					continue;
 
 			default:
 				strncpy_alloc(&ptr, &size, &offset, pstart, (size_t)(pgroup - pstart), limit);
@@ -1040,7 +1040,7 @@ int	zbx_regexp_repl(const char *string, const char *pattern, const char *output_
 {
 	zbx_regexp_t		*regexp = NULL;
 	int			mi, shift = 0, ret = FAIL, len;
-	char			*out_str = zbx_strdup(NULL, string), *ptr = out_str, *error = NULL;
+	char			*out_str = zbx_strdup(NULL, string), *error = NULL;
 	zbx_vector_match_t	matches;
 	size_t			i;
 
@@ -1061,7 +1061,7 @@ int	zbx_regexp_repl(const char *string, const char *pattern, const char *output_
 
 	zbx_vector_match_create(&matches);
 
-	len = strlen(ptr);
+	len = strlen(out_str);
 	/* collect all matches */
 	for (;;)
 	{
@@ -1072,7 +1072,8 @@ int	zbx_regexp_repl(const char *string, const char *pattern, const char *output_
 		for (i = 0; i < ARRSIZE(match->groups); i++)
 			match->groups[i].rm_so = match->groups[i].rm_eo = -1;
 
-		if (ZBX_REGEXP_MATCH != regexp_exec(ptr, regexp, 0, ZBX_REGEXP_GROUPS_MAX, match->groups, NULL, shift))
+		if (ZBX_REGEXP_MATCH != regexp_exec(out_str, regexp, 0, ZBX_REGEXP_GROUPS_MAX, match->groups, NULL,
+							shift))
 		{
 			zbx_free(match);
 			break;
@@ -1092,7 +1093,7 @@ int	zbx_regexp_repl(const char *string, const char *pattern, const char *output_
 	for (mi = matches.values_num - 1; 0 <= mi; mi--)
 	{
 		zbx_regmatch_t	*groups = matches.values[mi]->groups;
-		char		*replace;
+		char		*replace, *ptr;
 
 		if ('\0' == *output_template)
 			replace = zbx_strdup(NULL, output_template);
