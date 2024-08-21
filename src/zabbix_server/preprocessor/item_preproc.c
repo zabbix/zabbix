@@ -176,10 +176,22 @@ static int	item_preproc_multiplier_variant(unsigned char value_type, zbx_variant
  * Return value: FAIL - for further error handling                            *
  *                                                                            *
  ******************************************************************************/
-static int	item_preproc_validate_notsupport(char **errmsg)
+static int	item_preproc_validate_notsupport(zbx_variant_t *value, char **errmsg)
 {
-	*errmsg = zbx_dsprintf(*errmsg, "item is not supported");
-	return FAIL;
+	int	ret = SUCCEED;
+
+	if (ZBX_VARIANT_ERR == value->type)
+	{
+		*errmsg = zbx_strdup(NULL, value->data.str);
+		ret = FAIL;
+	}
+	else if (ZBX_VARIANT_NONE == value->type)
+	{
+		*errmsg = zbx_dsprintf(*errmsg, "item is not supported");
+		ret = FAIL;
+	}
+
+	return ret;
 }
 
 /******************************************************************************
@@ -2121,7 +2133,7 @@ int	zbx_item_preproc(zbx_preproc_cache_t *cache, unsigned char value_type, zbx_v
 			ret = item_preproc_str_replace(value, op->params, error);
 			break;
 		case ZBX_PREPROC_VALIDATE_NOT_SUPPORTED:
-			ret = item_preproc_validate_notsupport(error);
+			ret = item_preproc_validate_notsupport(value, error);
 			break;
 		case ZBX_PREPROC_XML_TO_JSON:
 			ret = item_preproc_xml_to_json(value, error);
