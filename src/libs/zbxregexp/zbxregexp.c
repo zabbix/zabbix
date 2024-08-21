@@ -1061,7 +1061,7 @@ int	zbx_regexp_repl(const char *string, const char *pattern, const char *output_
 
 	zbx_vector_match_create(&matches);
 
-	len = strlen(out_str);
+	len = strlen(string);
 	/* collect all matches */
 	for (;;)
 	{
@@ -1072,8 +1072,8 @@ int	zbx_regexp_repl(const char *string, const char *pattern, const char *output_
 		for (i = 0; i < ARRSIZE(match->groups); i++)
 			match->groups[i].rm_so = match->groups[i].rm_eo = -1;
 
-		if (ZBX_REGEXP_MATCH != regexp_exec(out_str, regexp, 0, ZBX_REGEXP_GROUPS_MAX, match->groups, NULL,
-							shift))
+		if (ZBX_REGEXP_MATCH != regexp_exec(string, regexp, 0, ZBX_REGEXP_GROUPS_MAX, match->groups, NULL,
+				shift))
 		{
 			zbx_free(match);
 			break;
@@ -1086,7 +1086,7 @@ int	zbx_regexp_repl(const char *string, const char *pattern, const char *output_
 			break;
 
 		if (shift == match->groups[0].rm_so)
-			shift ++;
+			shift++;
 	}
 
 	/* create pattern based string for each match and relplace matched string with this string */
@@ -1125,9 +1125,7 @@ int	zbx_regexp_repl(const char *string, const char *pattern, const char *output_
 			zbx_free(replace);
 		}
 		else
-		{
 			goto out;
-		}
 	}
 	ret = SUCCEED;
 out:
