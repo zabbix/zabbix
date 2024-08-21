@@ -21,7 +21,7 @@ zabbix_export:
         - name: Templates/Cloud
       items:
         - uuid: 397bcf955a7449b79dab4770fe17922f
-          name: 'AWS Lambda: Get alarms check'
+          name: 'Get alarms check'
           type: DEPENDENT
           key: aws.lambda.alarms.check
           value_type: CHAR
@@ -42,8 +42,8 @@ zabbix_export:
           triggers:
             - uuid: 77f2bf7f1086488289b1cf1931e8fd90
               expression: 'length(last(/AWS Lambda by HTTP/aws.lambda.alarms.check))>0'
-              name: 'AWS Lambda: Failed to get alarms data'
-              event_name: 'AWS Lambda: Failed to get CloudWatch alarms for the Lambda function'
+              name: 'Failed to get alarms data'
+              event_name: 'Failed to get CloudWatch alarms for the Lambda function'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'Failed to get CloudWatch alarms for the Lambda function.'
@@ -51,7 +51,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: 57c7e41184d74cc98c2eea33bfe28028
-          name: 'AWS Lambda: Async events dropped sum'
+          name: 'Async events dropped sum'
           type: DEPENDENT
           key: aws.lambda.async_events_dropped.sum
           description: 'The number of events that are dropped without successfully executing the function. If you configure a dead-letter queue (DLQ) or an `OnFailure` destination, events are sent there before they''re dropped.'
@@ -66,7 +66,7 @@ zabbix_export:
             - tag: component
               value: asynchronous
         - uuid: d8000a6335b14e0dae702787e4bf9db2
-          name: 'AWS Lambda: Async events received sum'
+          name: 'Async events received sum'
           type: DEPENDENT
           key: aws.lambda.async_events_received.sum
           description: 'The number of events that Lambda successfully queues for processing. This metric provides insight into the number of events that a Lambda function receives.'
@@ -81,7 +81,7 @@ zabbix_export:
             - tag: component
               value: asynchronous
         - uuid: 48b180f52bbf4c93b64433a97e00a029
-          name: 'AWS Lambda: Async event age average'
+          name: 'Async event age average'
           type: DEPENDENT
           key: aws.lambda.async_event_age.avg
           value_type: FLOAT
@@ -101,7 +101,7 @@ zabbix_export:
             - tag: component
               value: asynchronous
         - uuid: 7eaf67dc1859405aa55f22ea8d85e7c5
-          name: 'AWS Lambda: Total concurrent executions'
+          name: 'Total concurrent executions'
           type: DEPENDENT
           key: aws.lambda.concurrent_executions.max
           description: 'The number of function instances that are processing events. If this number reaches your concurrent executions quota for the Region or the reserved concurrency limit on the function, then Lambda will throttle additional invocation requests.'
@@ -116,7 +116,7 @@ zabbix_export:
             - tag: component
               value: concurrency
         - uuid: 82536a92c0f84d67aabbe69e38e7f3a2
-          name: 'AWS Lambda: Dead letter errors sum'
+          name: 'Dead letter errors sum'
           type: DEPENDENT
           key: aws.lambda.dead_letter_errors.sum
           description: 'For asynchronous invocation, the number of times that Lambda attempts to send an event to a dead-letter queue (DLQ) but fails. Dead-letter errors can occur due to misconfigured resources or size limits.'
@@ -131,7 +131,7 @@ zabbix_export:
             - tag: component
               value: invocation
         - uuid: 370d8ac63e024a94a493c95e528f4604
-          name: 'AWS Lambda: Duration average'
+          name: 'Duration average'
           type: DEPENDENT
           key: aws.lambda.duration.avg
           value_type: FLOAT
@@ -151,7 +151,7 @@ zabbix_export:
             - tag: component
               value: performance
         - uuid: 1b16f879dc5648d0b50e060d1f056fab
-          name: 'AWS Lambda: Errors sum'
+          name: 'Errors sum'
           type: DEPENDENT
           key: aws.lambda.errors.sum
           description: 'The number of invocations that result in a function error. Function errors include exceptions that your code throws and exceptions that the Lambda runtime throws. The runtime returns errors for issues such as timeouts and configuration errors.'
@@ -166,7 +166,7 @@ zabbix_export:
             - tag: component
               value: invocation
         - uuid: c80b25e889004287b6131c00000a3ad7
-          name: 'AWS CloudWatch: Get Lambda alarms data'
+          name: 'Get Lambda alarms data'
           type: SCRIPT
           key: aws.lambda.get_alarms
           delay: 0s;m/1
@@ -222,6 +222,34 @@ zabbix_export:
             				['AccessKeyId', 'SecretAccessKey', 'Token'].forEach(function (field) {
             					if (typeof credentials !== 'object' || typeof credentials[field] === 'undefined' || credentials[field] === '') {
             						throw 'Required credentials are not set: "' + field + '".';
+            					};
+            					AWS.params[field] = credentials[field];
+            				});
+            				break;
+            			case 'assume_role':
+            				AWS.params['auth_type'] = 'assume_role';
+            
+            				['AccessKeyId', 'SecretAccessKey', 'sts_region', 'role_arn'].forEach(function (field) {
+            					if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            						throw 'Required param is not set: "' + field + '".';
+            					}
+            					AWS.params[field] = params[field];
+            				});
+            
+            				role_arn_regex = /role\/(.+)$/;
+            
+            				var payload = {
+            					'Action': 'AssumeRole',
+            					'Version': '2011-06-15',
+            					'RoleArn': AWS.params.role_arn,
+            					'RoleSessionName': AWS.params.role_arn.match(role_arn_regex)[1] + 'Session',
+            				};
+            
+            				credentials = AWS.getField(AWS.request('GET', AWS.params.sts_region, 'sts', AWS.prepareParams(payload), ''), 'AssumeRoleResponse.AssumeRoleResult.Credentials');
+            
+            				['AccessKeyId', 'SecretAccessKey', 'SessionToken'].forEach(function (field) {
+            					if (typeof credentials !== 'object' || typeof credentials[field] === 'undefined' || credentials[field] === '') {
+            						throw 'Required credentials is not set: "' + field + '".';
             					};
             					AWS.params[field] = credentials[field];
             				});
@@ -287,13 +315,11 @@ zabbix_export:
             			canonical_request = method + '\n' + canonical_uri + '\n' + params + '\n' + canonical_headers + '\n' + signed_headers + '\n' + sha256(data),
             			credential_scope = date + '/' + region + '/' + service + '/' + 'aws4_request',
             			request_string = 'AWS4-HMAC-SHA256' + '\n' + amzdate + '\n' + credential_scope + '\n' + sha256(canonical_request),
-            			key = AWS.sign('AWS4' + AWS.params.SecretAccessKey, date);
-            
-            		key = AWS.sign(key, region);
-            		key = AWS.sign(key, service);
-            		key = AWS.sign(key, 'aws4_request');
-            
-            		var request = new HttpRequest(),
+            			key = AWS.sign('AWS4' + AWS.params.SecretAccessKey, date),
+            			key = AWS.sign(key, region),
+            			key = AWS.sign(key, service),
+            			key = AWS.sign(key, 'aws4_request'),
+            			request = new HttpRequest(),
             			url = 'https://' + host + canonical_uri + '?' + params;
             
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
@@ -304,31 +330,24 @@ zabbix_export:
             		request.addHeader('Content-Type: application/json');
             		request.addHeader('Content-Encoding: amz-1.0');
             		request.addHeader('Authorization: ' + 'AWS4-HMAC-SHA256 Credential=' + AWS.params.AccessKeyId + '/' + credential_scope + ', ' + 'SignedHeaders=' + signed_headers + ', ' + 'Signature=' + hmac('sha256', key, request_string));
-            		if (AWS.params.auth_type === 'role_base')
-            			request.addHeader('X-Amz-Security-Token: ' + AWS.params.Token);
+            		if (AWS.params.auth_type === 'role_base' || (AWS.params.auth_type === 'assume_role' & !params.includes('AssumeRole'))) {
+            			request.addHeader('X-Amz-Security-Token: ' + (AWS.params.auth_type === 'role_base' ? AWS.params.Token : AWS.params.SessionToken));
+            		}
             
             		Zabbix.log(4, '[ AWS Lambda Alarms ] Sending request: ' + url);
-            
             		response = request.get(url);
-            
             		Zabbix.log(4, '[ AWS Lambda Alarms ] Received response with status code ' + request.getStatus() + ': ' + response);
             
             		if (request.getStatus() !== 200) {
             			throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
             		}
             
-            		if (response[0] === '<') {
-            			try {
-            				response = XML.toJson(response);
-            			}
-            			catch (error) {
-            				throw 'Failed to parse response received from AWS CloudWatch API. Check debug log for more information.';
-            			}
+            		try {
+            			response = JSON.parse(response);
             		}
-            
-            		if (response !== null) {
+            		catch (error) {
             			try {
-            				response = JSON.parse(response);
+            				response = JSON.parse(XML.toJson(response));
             			}
             			catch (error) {
             				throw 'Failed to parse response received from AWS CloudWatch API. Check debug log for more information.';
@@ -352,11 +371,9 @@ zabbix_export:
             			alarms_list = AWS.getField(alarms, 'MetricAlarms');
             
             			if (!Array.isArray(alarms_list))
-            				alarms_list = [alarms_list]
+            				alarms_list = [alarms_list];
             			alarms_list.forEach(function (alarm) {
             				var dimensions = alarm.Dimensions;
-            
-            				Zabbix.log(4, '[ AWS Lambda Alarms ] dimensions: ' + JSON.stringify(dimensions));
             
             				if (Array.isArray(alarm.Metrics)) {
             					alarm.Metrics.forEach(function (metric) {
@@ -378,7 +395,7 @@ zabbix_export:
             
             		return result;
             	}
-            }
+            };
             
             try {
             	AWS.setParams(JSON.parse(value));
@@ -408,13 +425,17 @@ zabbix_export:
               value: '{$AWS.PROXY}'
             - name: region
               value: '{$AWS.REGION}'
+            - name: role_arn
+              value: '{$AWS.ASSUME.ROLE.ARN}'
             - name: SecretAccessKey
               value: '{$AWS.SECRET.ACCESS.KEY}'
+            - name: sts_region
+              value: '{$AWS.STS.REGION}'
           tags:
             - tag: component
               value: raw
         - uuid: 24c4972d090f4e72abc473752aac27d8
-          name: 'AWS Lambda: Get metrics data'
+          name: 'Get metrics data'
           type: SCRIPT
           key: aws.lambda.get_metrics
           delay: 0s;m/1
@@ -475,6 +496,34 @@ zabbix_export:
             					AWS.params[field] = credentials[field];
             				});
             				break;
+            			case 'assume_role':
+            				AWS.params['auth_type'] = 'assume_role';
+            
+            				['AccessKeyId', 'SecretAccessKey', 'sts_region', 'role_arn'].forEach(function (field) {
+            					if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            						throw 'Required param is not set: "' + field + '".';
+            					}
+            					AWS.params[field] = params[field];
+            				});
+            
+            				role_arn_regex = /role\/(.+)$/;
+            
+            				var payload = {
+            					'Action': 'AssumeRole',
+            					'Version': '2011-06-15',
+            					'RoleArn': AWS.params.role_arn,
+            					'RoleSessionName': AWS.params.role_arn.match(role_arn_regex)[1] + 'Session',
+            				};
+            
+            				credentials = AWS.getField(AWS.request('POST', AWS.params.sts_region, 'sts', AWS.prepareParams(payload), ''), 'AssumeRoleResponse.AssumeRoleResult.Credentials');
+            
+            				['AccessKeyId', 'SecretAccessKey', 'SessionToken'].forEach(function (field) {
+            					if (typeof credentials !== 'object' || typeof credentials[field] === 'undefined' || credentials[field] === '') {
+            						throw 'Required credentials is not set: "' + field + '".';
+            					};
+            					AWS.params[field] = credentials[field];
+            				});
+            				break;
             			default:
             				AWS.params['auth_type'] = 'access_key';
             				['AccessKeyId', 'SecretAccessKey'].forEach(function (field) {
@@ -506,6 +555,21 @@ zabbix_export:
             		}
             
             		return result;
+            	},
+            
+            	prepareParams: function (params) {
+            		var result = [];
+            
+            		Object.keys(params).sort().forEach(function (key) {
+            			if (typeof params[key] !== 'object') {
+            				result.push(key + '=' + encodeURIComponent(params[key]));
+            			}
+            			else {
+            				result.push(prepareObject(key, params[key]));
+            			}
+            		});
+            
+            		return result.join('&');
             	},
             
             	renderMetricQuery: function (period, name) {
@@ -546,7 +610,7 @@ zabbix_export:
             		return metric_payload;
             	},
             
-            	request: function (method, region, service, data) {
+            	request: function (method, region, service, params, data) {
             		if (typeof data === 'undefined' || data === null) {
             			data = JSON.stringify([]);
             		}
@@ -556,28 +620,18 @@ zabbix_export:
             		var amzdate = (new Date()).toISOString().replace(/\.\d+Z/, 'Z').replace(/[-:]/g, ''),
             			date = amzdate.replace(/T\d+Z/, ''),
             			canonical_uri = '/',
-            			host = service + '.' + region + '.amazonaws.com';
-            
-            		if (AWS.params.auth_type === 'role_base') {
-            			var canonical_headers = 'content-encoding:amz-1.0\n' + 'host:' + host + '\n' + 'x-amz-date:' + amzdate + '\n' + 'x-amz-security-token:' + AWS.params.Token + '\n',
-            				signed_headers = 'content-encoding;host;x-amz-date;x-amz-security-token';
-            		} else {
-            			var canonical_headers = 'content-encoding:amz-1.0\n' + 'host:' + host + '\n' + 'x-amz-date:' + amzdate + '\n',
-            				signed_headers = 'content-encoding;host;x-amz-date';
-            		}
-            
-            		canonical_request = method + '\n' + canonical_uri + '\n' + '\n' + canonical_headers + '\n' + signed_headers + '\n' + sha256(data);
-            		url = 'https://' + host + canonical_uri;
-            
-            		var credential_scope = date + '/' + region + '/' + service + '/' + 'aws4_request',
+            			host = service + '.' + region + '.amazonaws.com',
+            			canonical_headers = 'content-encoding:amz-1.0\n' + 'host:' + host + '\n' + 'x-amz-date:' + amzdate + '\n',
+            			signed_headers = 'content-encoding;host;x-amz-date',
+            			canonical_request = method + '\n' + canonical_uri + '\n' + params + '\n' + canonical_headers + '\n' + signed_headers + '\n' + sha256(data),
+            			credential_scope = date + '/' + region + '/' + service + '/' + 'aws4_request',
             			request_string = 'AWS4-HMAC-SHA256' + '\n' + amzdate + '\n' + credential_scope + '\n' + sha256(canonical_request),
-            			key = AWS.sign('AWS4' + AWS.params.SecretAccessKey, date);
-            
-            		key = AWS.sign(key, region);
-            		key = AWS.sign(key, service);
-            		key = AWS.sign(key, 'aws4_request');
-            
-            		var request = new HttpRequest();
+            			key = AWS.sign('AWS4' + AWS.params.SecretAccessKey, date),
+            			key = AWS.sign(key, region),
+            			key = AWS.sign(key, service),
+            			key = AWS.sign(key, 'aws4_request'),
+            			request = new HttpRequest(),
+            			url = 'https://' + host + canonical_uri + '?' + params;
             
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
             			request.setProxy(AWS.params.proxy);
@@ -589,8 +643,9 @@ zabbix_export:
             		request.addHeader('Content-Type: application/json');
             		request.addHeader('Content-Encoding: amz-1.0');
             		request.addHeader('Authorization: ' + 'AWS4-HMAC-SHA256 Credential=' + AWS.params.AccessKeyId + '/' + credential_scope + ', ' + 'SignedHeaders=' + signed_headers + ', ' + 'Signature=' + hmac('sha256', key, request_string));
-            		if (AWS.params.auth_type === 'role_base')
-            			request.addHeader('X-Amz-Security-Token: ' + AWS.params.Token);
+            		if (AWS.params.auth_type === 'role_base' || (AWS.params.auth_type === 'assume_role' & !params.includes('AssumeRole'))) {
+            			request.addHeader('X-Amz-Security-Token: ' + (AWS.params.auth_type === 'role_base' ? AWS.params.Token : AWS.params.SessionToken));
+            		}
             
             		Zabbix.log(4, '[ AWS Lambda Get metrics ] Sending request: ' + url);
             		response = request.post(url, data);
@@ -612,7 +667,7 @@ zabbix_export:
             			'MetricDataQueries': AWS.renderMetricQuery(AWS.request_period, AWS.params.name)
             		};
             
-            		return AWS.getField(AWS.request('POST', AWS.params.region, 'monitoring', payload), 'MetricDataResults');
+            		return AWS.getField(AWS.request('POST', AWS.params.region, 'monitoring', '', payload), 'MetricDataResults');
             	}
             };
             
@@ -645,13 +700,17 @@ zabbix_export:
               value: '{$AWS.PROXY}'
             - name: region
               value: '{$AWS.REGION}'
+            - name: role_arn
+              value: '{$AWS.ASSUME.ROLE.ARN}'
             - name: SecretAccessKey
               value: '{$AWS.SECRET.ACCESS.KEY}'
+            - name: sts_region
+              value: '{$AWS.STS.REGION}'
           tags:
             - tag: component
               value: raw
         - uuid: 1bab5865e01b4233bc2bb5cb17516360
-          name: 'AWS Lambda: Invocations sum'
+          name: 'Invocations sum'
           type: DEPENDENT
           key: aws.lambda.invocations.sum
           description: 'The number of times that your function code is invoked, including successful invocations and invocations that result in a function error. Invocations aren''t recorded if the invocation request is throttled or otherwise results in an invocation error. The value of `Invocations` equals the number of requests billed.'
@@ -666,7 +725,7 @@ zabbix_export:
             - tag: component
               value: invocation
         - uuid: 2bfa15a2c1ef4f66a8b2065e34a1a690
-          name: 'AWS Lambda: Get metrics check'
+          name: 'Get metrics check'
           type: DEPENDENT
           key: aws.lambda.metrics.check
           value_type: CHAR
@@ -687,8 +746,8 @@ zabbix_export:
           triggers:
             - uuid: 95ed5e8c560f4c6e89ed9d1a754ed032
               expression: 'length(last(/AWS Lambda by HTTP/aws.lambda.metrics.check))>0'
-              name: 'AWS Lambda: Failed to get metrics data'
-              event_name: 'AWS Lambda: Failed to get CloudWatch metrics for the Lambda function'
+              name: 'Failed to get metrics data'
+              event_name: 'Failed to get CloudWatch metrics for the Lambda function'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'Failed to get CloudWatch metrics for the Lambda function.'
@@ -696,7 +755,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: 9f141ce56187497794d109c030c43a06
-          name: 'AWS Lambda: Throttles sum'
+          name: 'Throttles sum'
           type: DEPENDENT
           key: aws.lambda.throttles.sum
           description: 'The number of invocation requests that are throttled. When all function instances are processing requests and no concurrency is available to scale up, Lambda rejects additional requests with a `TooManyRequestsException` error.'
@@ -711,7 +770,7 @@ zabbix_export:
             - tag: component
               value: invocation
         - uuid: b0ecd33e96734ac69447c095032dea55
-          name: 'AWS Lambda: Unreserved concurrent executions maximum'
+          name: 'Unreserved concurrent executions maximum'
           type: DEPENDENT
           key: aws.lambda.unreserved_concurrent_executions.max
           description: 'For a Region, the number of events that function without reserved concurrency are processing.'
@@ -746,7 +805,7 @@ zabbix_export:
           description: 'Used for the discovery of alarm Lambda functions.'
           item_prototypes:
             - uuid: 893819314ae34f31bde78612679da46b
-              name: 'AWS Lambda Alarms: [{#ALARM_NAME}]: Get metrics'
+              name: '[{#ALARM_NAME}]: Get metrics'
               type: DEPENDENT
               key: 'aws.lambda.alarm.get_metrics["{#ALARM_NAME}"]'
               history: '0'
@@ -763,7 +822,7 @@ zabbix_export:
                 - tag: component
                   value: raw
             - uuid: 2e34c9ed36c64a6aade389e739340529
-              name: 'AWS Lambda Alarms: [{#ALARM_NAME}]: State'
+              name: '[{#ALARM_NAME}]: State'
               type: DEPENDENT
               key: 'aws.lambda.alarm.state["{#ALARM_NAME}"]'
               description: |
@@ -795,8 +854,8 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: fc0d5744b0284362897a2d3191727d66
                   expression: 'last(/AWS Lambda by HTTP/aws.lambda.alarm.state["{#ALARM_NAME}"])=1'
-                  name: 'AWS Lambda Alarms: [{#ALARM_NAME}] has ''Insufficient data'' state'
-                  event_name: 'AWS Lambda Alarms: [{#ALARM_NAME}] has ''Insufficient data'' state'
+                  name: '[{#ALARM_NAME}] has ''Insufficient data'' state'
+                  event_name: '[{#ALARM_NAME}] has ''Insufficient data'' state'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: INFO
                   description: 'Either the alarm has just started, the metric is not available, or not enough data is available for the metric to determine the alarm state.'
@@ -804,7 +863,7 @@ zabbix_export:
                     - tag: scope
                       value: notice
             - uuid: 7a314dfe3f4e4142bf4827f6cb6285bd
-              name: 'AWS Lambda Alarms: [{#ALARM_NAME}]: State reason'
+              name: '[{#ALARM_NAME}]: State reason'
               type: DEPENDENT
               key: 'aws.lambda.alarm.state_reason["{#ALARM_NAME}"]'
               value_type: TEXT
@@ -828,8 +887,8 @@ zabbix_export:
           trigger_prototypes:
             - uuid: c3ce7372e8cf4ff48eee7f91870dc58d
               expression: 'last(/AWS Lambda by HTTP/aws.lambda.alarm.state["{#ALARM_NAME}"])=2 and length(last(/AWS Lambda by HTTP/aws.lambda.alarm.state_reason["{#ALARM_NAME}"]))>0'
-              name: 'AWS Lambda Alarms: [{#ALARM_NAME}] has ''Alarm'' state'
-              event_name: 'AWS Lambda Alarms: [{#ALARM_NAME}] has ''Alarm'' state (reason: {ITEM.LASTVALUE2})'
+              name: '[{#ALARM_NAME}] has ''Alarm'' state'
+              event_name: '[{#ALARM_NAME}] has ''Alarm'' state (reason: {ITEM.LASTVALUE2})'
               opdata: 'Reason: {ITEM.LASTVALUE2}'
               priority: AVERAGE
               description: |
@@ -872,14 +931,16 @@ zabbix_export:
       macros:
         - macro: '{$AWS.ACCESS.KEY.ID}'
           description: 'Access key ID.'
+        - macro: '{$AWS.ASSUME.ROLE.ARN}'
+          description: 'ARN assume role; add when using the `assume_role` authorization method.'
         - macro: '{$AWS.AUTH_TYPE}'
           value: access_key
-          description: 'Authorization method. Possible values: `role_base`, `access_key`.'
+          description: 'Authorization method. Possible values: `access_key`, `assume_role`, `role_base`.'
         - macro: '{$AWS.DATA.TIMEOUT}'
           value: 60s
           description: 'API response timeout.'
         - macro: '{$AWS.LAMBDA.ARN}'
-          description: 'Amazon Resource Names (ARN) of the load balancer.'
+          description: 'The Amazon Resource Names (ARN) of the Lambda function.'
         - macro: '{$AWS.LAMBDA.LLD.FILTER.ALARM_NAME.MATCHES}'
           value: '.*'
           description: 'Filter of discoverable alarms by name.'
@@ -896,18 +957,21 @@ zabbix_export:
           description: 'Sets the HTTP proxy value. If this macro is empty, no proxy is used.'
         - macro: '{$AWS.REGION}'
           value: us-west-1
-          description: 'AWS Application Load Balancer region code.'
+          description: 'AWS Lambda function region code.'
         - macro: '{$AWS.SECRET.ACCESS.KEY}'
           type: SECRET_TEXT
           description: 'Secret access key.'
+        - macro: '{$AWS.STS.REGION}'
+          value: us-east-1
+          description: 'Region used in assume role request.'
       dashboards:
         - uuid: aab5dac54efa4d0cbc0f7980220e172e
           name: 'Overview AWS Lambda function'
           pages:
-            - name: 'AWS Lambda: Invocation metrics'
+            - name: 'Invocation metrics'
               widgets:
                 - type: graph
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -920,7 +984,7 @@ zabbix_export:
                       value: ECCBA
                 - type: graph
                   'y': '5'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -933,7 +997,7 @@ zabbix_export:
                       value: DBBFF
                 - type: graph
                   'y': '10'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -946,7 +1010,7 @@ zabbix_export:
                       value: FBDDF
                 - type: graph
                   'y': '15'
-                  width: '24'
+                  width: '72'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -957,10 +1021,10 @@ zabbix_export:
                     - type: STRING
                       name: reference
                       value: BDAAA
-            - name: 'AWS Lambda: Asynchronous invocation metrics'
+            - name: 'Asynchronous invocation metrics'
               widgets:
                 - type: graph
-                  width: '8'
+                  width: '24'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -972,8 +1036,8 @@ zabbix_export:
                       name: reference
                       value: CAADA
                 - type: graph
-                  x: '8'
-                  width: '8'
+                  x: '24'
+                  width: '24'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -985,8 +1049,8 @@ zabbix_export:
                       name: reference
                       value: EAFEB
                 - type: graph
-                  x: '16'
-                  width: '8'
+                  x: '48'
+                  width: '24'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -997,10 +1061,10 @@ zabbix_export:
                     - type: STRING
                       name: reference
                       value: ECADD
-            - name: 'AWS Lambda: Concurrency metrics'
+            - name: 'Concurrency metrics'
               widgets:
                 - type: graph
-                  width: '12'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -1012,8 +1076,8 @@ zabbix_export:
                       name: reference
                       value: CAECA
                 - type: graph
-                  x: '12'
-                  width: '12'
+                  x: '36'
+                  width: '36'
                   height: '5'
                   fields:
                     - type: GRAPH
