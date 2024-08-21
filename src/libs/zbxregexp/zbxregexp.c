@@ -1039,10 +1039,12 @@ int	zbx_mregexp_sub_precompiled(const char *string, const zbx_regexp_t *regexp, 
 int	zbx_regexp_repl(const char *string, const char *pattern, const char *output_template, char **out)
 {
 	zbx_regexp_t		*regexp = NULL;
-	int			mi, shift = 0, ret = FAIL, len;
+	int			mi, shift = 0, ret = FAIL, len = strlen(string);
 	char			*out_str = zbx_strdup(NULL, string), *error = NULL;
 	zbx_vector_match_t	matches;
 	size_t			i;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() len:%d", __func__, len);
 
 	zbx_free(*out);
 
@@ -1061,7 +1063,7 @@ int	zbx_regexp_repl(const char *string, const char *pattern, const char *output_
 
 	zbx_vector_match_create(&matches);
 
-	len = strlen(string);
+	
 	/* collect all matches */
 	for (;;)
 	{
@@ -1088,6 +1090,8 @@ int	zbx_regexp_repl(const char *string, const char *pattern, const char *output_
 		if (shift == match->groups[0].rm_so)
 			shift++;
 	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "replacing:%d matches %s()", matches.values_num, __func__);
 
 	/* create pattern based string for each match and relplace matched string with this string */
 	for (mi = matches.values_num - 1; 0 <= mi; mi--)
@@ -1133,6 +1137,8 @@ out:
 	zbx_vector_match_destroy(&matches);
 	*out = out_str;
 	zbx_replace_invalid_utf8(*out);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
