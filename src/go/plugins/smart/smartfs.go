@@ -259,7 +259,7 @@ func (p *Plugin) execute(jsonRunner bool) (*runner, error) {
 
 	var g errgroup.Group
 
-	g.SetLimit(2)
+	g.SetLimit(p.workerCount)
 
 	resultChan := make(chan *SmartCtlDeviceData)
 	collectorDone := make(chan struct{})
@@ -333,6 +333,10 @@ func (p *Plugin) execute(jsonRunner bool) (*runner, error) {
 	err = g.Wait()
 
 	close(resultChan)
+	if err != nil {
+		return nil, errs.Wrap(err, "got error executing worker pool")
+	}
+
 	<-collectorDone
 
 	r.parseOutput(jsonRunner)

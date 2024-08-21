@@ -138,6 +138,69 @@ func Test_getBasicDeviceInfo(t *testing.T) {
 			SmartCtlDeviceData{},
 			true,
 		},
+		{
+			name:       "+invalid_json",
+			deviceName: "/dev/sda",
+			expectations: expectation{
+				args: []string{"-a", "/dev/sda", "-j"},
+				err:  nil,
+				out:  []byte(`{"invalid json"`), // Corrupted or incomplete JSON
+			},
+			args: args{
+				[]deviceInfo{
+					{
+						Name:     "/dev/sda",
+						InfoName: "/dev/sda",
+						DevType:  "nvme",
+					},
+				},
+				false,
+			},
+			expectedResult: SmartCtlDeviceData{},
+			wantErr:        true, // Expect an error due to invalid JSON
+		},
+		{
+			name:       "+no_device_found",
+			deviceName: "/dev/sdx", // Assuming this is an invalid or nonexistent device
+			expectations: expectation{
+				args: []string{"-a", "/dev/sdx", "-j"},
+				err:  errors.New("device not found"), // Simulate a "device not found" error
+				out:  []byte{},
+			},
+			args: args{
+				[]deviceInfo{
+					{
+						Name:     "/dev/sdx",
+						InfoName: "/dev/sdx",
+						DevType:  "nvme",
+					},
+				},
+				false,
+			},
+			expectedResult: SmartCtlDeviceData{},
+			wantErr:        true, // Expect an error because the device doesn't exist
+		},
+		{
+			name:       "+no_smart_status",
+			deviceName: "/dev/sda",
+			expectations: expectation{
+				args: []string{"-a", "/dev/sda", "-j"},
+				err:  nil,
+				out:  []byte(`{"smartctl":{},"device":{},"model_name":"Example Model"}`), // No SmartStatus field
+			},
+			args: args{
+				[]deviceInfo{
+					{
+						Name:     "/dev/sda",
+						InfoName: "/dev/sda",
+						DevType:  "nvme",
+					},
+				},
+				false,
+			},
+			expectedResult: SmartCtlDeviceData{},
+			wantErr:        true, // Expect an error due to missing SmartStatus
+		},
 	}
 	for _, tt := range tests {
 		tt := tt
@@ -437,11 +500,19 @@ func Test_parseOutput(t *testing.T) {
 			runner.parseOutput(tt.jsonRunner)
 
 			if tt.jsonRunner {
-				if diff := cmp.Diff(runner.jsonDevices, tt.expectedState.jsonDevices, cmp.AllowUnexported(jsonDevice{}, deviceInfo{})); diff != "" {
+				if diff := cmp.Diff(
+					runner.jsonDevices,
+					tt.expectedState.jsonDevices,
+					cmp.AllowUnexported(jsonDevice{}, deviceInfo{}),
+				); diff != "" {
 					t.Errorf("jsonDevices mismatch (-got +want):\n%s", diff)
 				}
 			} else {
-				if diff := cmp.Diff(runner.devices, tt.expectedState.devices, cmp.AllowUnexported(deviceParser{}, deviceInfo{})); diff != "" {
+				if diff := cmp.Diff(
+					runner.devices,
+					tt.expectedState.devices,
+					cmp.AllowUnexported(deviceParser{}, deviceInfo{}),
+				); diff != "" {
 					t.Errorf("devices mismatch (-got +want):\n%s", diff)
 				}
 			}
@@ -2562,27 +2633,6 @@ func TestPlugin_scanDevices(t *testing.T) {
 	}
 }
 
-// func Test_execute(t *testing.T) {
-// 	tests := []struct {
-// 		name       string
-// 		jsonRunner bool
-// 	}{}
-
-// 	for _, tt := range tests {
-// 		tt := tt
-// 		t.Run(tt.name, func(t *testing.T) {
-// 			t.Parallel()
-
-// 			p := Plugin{
-// 				ctl: &mock.MockController{},
-// 			}
-
-// 			p.execute(tt.jsonRunner)
-
-// 		})
-// 	}
-// }
-
 func TestPlugin_execute(t *testing.T) {
 	t.Parallel()
 
@@ -2605,13 +2655,13 @@ func TestPlugin_execute(t *testing.T) {
 		wantErr         bool
 	}{
 		{
-			"+ all about 1 basic device",
+			"+ 2 basic device scan",
 			args{false},
 			[]expectation{
 				{
 					[]string{"--scan", "-j"},
 					nil,
-					mock.OutputScanBasic,
+					mock.Outputs.Get("only_basic").AllDevicesScan,
 				},
 				{
 					[]string{"--scan", "-d", "sat", "-j"},
@@ -2621,77 +2671,12 @@ func TestPlugin_execute(t *testing.T) {
 				{
 					[]string{"-a", "/dev/sda", "-j"},
 					nil,
-					[]byte(`{
-						"json_format_version": [1, 0],
-						"smartctl": {
-						  "version": [7, 1],
-						  "svn_revision": "5022",
-						  "platform_info": "x86_64-w64-mingw32-w10-b19045",
-						  "build_info": "(sf-7.1-1)",
-						  "argv": ["smartctl", "-a", "/dev/sda", "-j"],
-						  "exit_status": 0
-						},
-						"device": {
-						  "name": "/dev/sda",
-						  "info_name": "/dev/sda",
-						  "type": "nvme",
-						  "protocol": "NVMe"
-						},
-						"model_name": "SAMSUNG MZVLB1T0HBLR-000L7",
-						"serial_number": "S3XY1234567890",
-						"firmware_version": "EXA7301Q",
-						"smart_status": {
-						  "passed": true
-						},
-						"temperature": {
-						  "current": 30,
-						  "highest": 65,
-						  "lowest": 20
-						},
-						"power_cycle_count": 12,
-						"power_on_hours": 3456,
-						"nvme_smart_health_information_log": {
-						  "critical_warning": 0,
-						  "temperature": 30,
-						  "available_spare": 100,
-						  "available_spare_threshold": 10,
-						  "percentage_used": 5,
-						  "data_units_read": 1234567,
-						  "data_units_written": 7654321,
-						  "host_reads": 987654,
-						  "host_writes": 456789,
-						  "controller_busy_time": 123,
-						  "power_cycles": 12,
-						  "power_on_hours": 3456,
-						  "unsafe_shutdowns": 3,
-						  "media_errors": 0,
-						  "num_err_log_entries": 5,
-						  "warning_temp_time": 0,
-						  "critical_comp_time": 0
-						},
-						"self_test": {
-						  "status": "Completed without error",
-						  "remaining_percent": 0,
-						  "test_type": "Short",
-						  "time_hours": 3450,
-						  "lba_of_first_error": 0
-						},
-						"error_log": {
-						  "summary": {
-							"errors_logged": 1,
-							"most_recent_error": {
-							  "error_type": "Media error",
-							  "lba": 1234567890,
-							  "status": "Error Unrecovered Read Error",
-							  "details": "Data error at LBA 1234567890",
-							  "occurred_at": {
-								"power_on_hours": 3400,
-								"power_cycle_number": 10
-							  }
-							}
-						  }
-						}
-					  }`),
+					mock.Outputs.Get("only_basic").AllSmartInfoScans.Get("-a /dev/sda -j"),
+				},
+				{
+					[]string{"-a", "/dev/sdb", "-j"},
+					nil,
+					mock.Outputs.Get("only_basic").AllSmartInfoScans.Get("-a /dev/sdb -j"),
 				},
 			},
 			nil,
@@ -2711,7 +2696,15 @@ func TestPlugin_execute(t *testing.T) {
 					SmartStatus: &smartStatus{
 						SerialNumber: true,
 					},
-				}},
+				},
+				"/dev/sdb": {
+					ModelName:    "SAMSUNG MZVLB512HBJQ-000L7",
+					SerialNumber: "S3XY0987654321",
+					Info:         deviceInfo{Name: "/dev/sdb", InfoName: "/dev/sdb", DevType: "nvme", name: "/dev/sdb"},
+					Smartctl:     smartctlField{Version: []int{7, 1}},
+					SmartStatus:  &smartStatus{SerialNumber: true},
+				},
+			},
 			false,
 		},
 	}
@@ -2731,7 +2724,8 @@ func TestPlugin_execute(t *testing.T) {
 			}
 
 			p := &Plugin{
-				ctl: m,
+				ctl:         m,
+				workerCount: 1,
 			}
 
 			got, err := p.execute(tt.args.jsonRunner)
