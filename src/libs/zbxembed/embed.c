@@ -378,7 +378,7 @@ static void	es_objmap_destroy(zbx_hashset_t *objmap)
 
 	zbx_hashset_iter_reset(objmap, &iter);
 	while (NULL != (obj = (zbx_es_obj_data_t *)zbx_hashset_iter_next(&iter)))
-		es_httorequest_free(obj->data);
+		es_httprequest_free(obj->data);
 
 	zbx_hashset_destroy(objmap);
 }
