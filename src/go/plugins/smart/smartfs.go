@@ -21,6 +21,7 @@ package smart
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"runtime"
 	"sort"
@@ -74,6 +75,10 @@ var (
 	cpuCount     int
 	lastVerCheck time.Time
 	versionMux   sync.Mutex
+)
+
+var (
+	ErrNoSmartStatus = errors.New("smartctl returned no smart status")
 )
 
 // SmartCtlDeviceData describes all data collected from smartctl for a particular
@@ -269,6 +274,12 @@ func (p *Plugin) execute(jsonRunner bool) (*runner, error) {
 
 		g.Go(func() error {
 			device, err := getBasicDeviceInfo(p.ctl, name)
+
+			if errors.Is(err, ErrNoSmartStatus) {
+				r.plugin.Debugf("skipping device %s", name)
+				return nil
+			}
+
 			if err != nil {
 				return err
 			}
@@ -307,7 +318,7 @@ func (p *Plugin) execute(jsonRunner bool) (*runner, error) {
 			device, err := getAllDeviceInfoByType(p.ctl, name, dtype)
 			if err != nil {
 				p.Tracef("got error executing for megaraid %s", err.Error())
-				return nil //ignoring megaraid devices as it was before
+				return nil
 			}
 
 			resultChan <- device
@@ -424,7 +435,11 @@ func getBasicDeviceInfo(
 	}
 
 	if dp.SmartStatus == nil {
-		return nil, errs.New("smartctl returned no smart status")
+		return nil, errs.Wrapf(
+			ErrNoSmartStatus,
+			"got no smart status for device %s",
+			deviceName,
+		)
 	}
 
 	dp.Info.name = deviceName
@@ -501,19 +516,19 @@ func getRaidDevices(
 		return []*SmartCtlDeviceData{data}
 	default:
 		var (
-			devices   []*SmartCtlDeviceData
-			devNumber int
+			devices []*SmartCtlDeviceData
+			i       int
 		)
 
 		if deviceType == Areca {
-			devNumber = 1
+			i = 1
 		}
 
 		for {
 			data, err := getAllDeviceInfoByType(
 				ctl,
 				deviceName,
-				fmt.Sprintf("%s,%d", deviceType, devNumber),
+				fmt.Sprintf("%s,%d", deviceType, i),
 			)
 			if err != nil {
 				logr.Debugf(
@@ -525,7 +540,7 @@ func getRaidDevices(
 			}
 
 			devices = append(devices, data)
-			devNumber++
+			i++
 		}
 
 		return devices
@@ -533,6 +548,9 @@ func getRaidDevices(
 }
 
 func (r *runner) setDevicesData(data *SmartCtlDeviceData, jsonRunner bool) {
+	if data == nil {
+		return
+	}
 	// Process the received data
 	if jsonRunner {
 		r.jsonDevices[data.Device.Info.Name] = jsonDevice{

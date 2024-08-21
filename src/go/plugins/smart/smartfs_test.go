@@ -302,6 +302,15 @@ func Test_setDeviceData(t *testing.T) {
 				jsonDevices: map[string]jsonDevice{},
 			},
 		},
+		{
+			"-nil pointer as data",
+			nil,
+			false, //jsonRunner
+			fields{
+				devices:     map[string]deviceParser{},
+				jsonDevices: map[string]jsonDevice{},
+			},
+		},
 	}
 	for _, tt := range tests {
 		tt := tt
