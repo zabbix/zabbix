@@ -6,6 +6,10 @@
 This template uses the GetMetricData CloudWatch API calls to list and retrieve metrics.
 For more information, please refer to the [CloudWatch pricing](https://aws.amazon.com/cloudwatch/pricing/) page.
 
+Additional information about metrics and API methods used in the template:
+* [Full metrics list related to AWS Lambda](https://docs.aws.amazon.com/lambda/latest/dg/monitoring-metrics.html)
+* [DescribeAlarms API method](https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_DescribeAlarms.html)
+
 
 ## Requirements
 
@@ -41,8 +45,43 @@ Add the following required permissions to your Zabbix IAM policy in order to col
         }
     ]
   }
-  ```
-
+```
+For using assume role authorization, add the appropriate permissions to the role you are using:
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": "sts:AssumeRole",
+            "Resource": "arn:aws:iam::{Account}:user/{UserName}"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "cloudwatch:DescribeAlarms",
+                "cloudwatch:GetMetricData"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+```
+Next, add a principal to the trust relationships of the role you are using:
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "arn:aws:iam::{Account}:user/{UserName}"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+```
 If you are using role-based authorization, set the appropriate permissions:
 ```json
 {
@@ -67,8 +106,32 @@ If you are using role-based authorization, set the appropriate permissions:
     ]
 }
 ```
+Next, add a principal to the trust relationships of the role you are using:
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": {
+                "Service": [
+                    "ec2.amazonaws.com"
+                ]
+            },
+            "Action": [
+                "sts:AssumeRole"
+            ]
+        }
+    ]
+}
+```
+**Note**, Using role-based authorization is only possible when you use a Zabbix server or proxy inside AWS.
 
-Set the macros `{$AWS.AUTH_TYPE}`, `{$AWS.REGION}`, and `{$AWS.LAMBDA.ARN}`. If you are using access key-based authorization, set the macros `{$AWS.ACCESS.KEY.ID}` and `{$AWS.SECRET.ACCESS.KEY}`.
+Set the macros: `{$AWS.AUTH_TYPE}`, `{$AWS.REGION}`, and `{$AWS.LAMBDA.ARN}`.
+
+If you are using access key-based authorization, set the macros `{$AWS.ACCESS.KEY.ID}` and `{$AWS.SECRET.ACCESS.KEY}`.
+
+If you are using access assume role authorization, set the following macros: `{$AWS.ACCESS.KEY.ID}`, `{$AWS.SECRET.ACCESS.KEY}`, `{$AWS.STS.REGION}`, `{$AWS.ASSUME.ROLE.ARN}`.
 
 For more information about managing access keys, see the [official AWS documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys).
 
@@ -83,9 +146,11 @@ See the section below for a list of macros used for LLD filters.
 |{$AWS.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, no proxy is used.</p>||
 |{$AWS.ACCESS.KEY.ID}|<p>Access key ID.</p>||
 |{$AWS.SECRET.ACCESS.KEY}|<p>Secret access key.</p>||
-|{$AWS.REGION}|<p>AWS Application Load Balancer region code.</p>|`us-west-1`|
-|{$AWS.AUTH_TYPE}|<p>Authorization method. Possible values: `role_base`, `access_key`.</p>|`access_key`|
-|{$AWS.LAMBDA.ARN}|<p>Amazon Resource Names (ARN) of the load balancer.</p>||
+|{$AWS.REGION}|<p>AWS Lambda function region code.</p>|`us-west-1`|
+|{$AWS.AUTH_TYPE}|<p>Authorization method. Possible values: `access_key`, `assume_role`, `role_base`.</p>|`access_key`|
+|{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
+|{$AWS.ASSUME.ROLE.ARN}|<p>ARN assume role; add when using the `assume_role` authorization method.</p>||
+|{$AWS.LAMBDA.ARN}|<p>The Amazon Resource Names (ARN) of the Lambda function.</p>||
 |{$AWS.LAMBDA.LLD.FILTER.ALARM_SERVICE_NAMESPACE.MATCHES}|<p>Filter of discoverable alarms by namespace.</p>|`.*`|
 |{$AWS.LAMBDA.LLD.FILTER.ALARM_SERVICE_NAMESPACE.NOT_MATCHES}|<p>Filter to exclude discovered alarms by namespace.</p>|`CHANGE_IF_NEEDED`|
 |{$AWS.LAMBDA.LLD.FILTER.ALARM_NAME.MATCHES}|<p>Filter of discoverable alarms by name.</p>|`.*`|
