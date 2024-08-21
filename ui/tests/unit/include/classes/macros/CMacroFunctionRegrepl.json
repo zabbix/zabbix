@@ -205,9 +205,9 @@
         "value": "test_value",
         "macrofunc": {
             "function": "regrepl",
-            "parameters": ["com\/", "newParam"]
+            "parameters": ["com/", "newParam"]
         },
-        "result": "*UNKNOWN*"
+        "result": "test_value"
     },
     {
         "value": "test_value",
@@ -232,5 +232,45 @@
             "parameters": ["\\w+$", "test"]
         },
         "result": "regrepl test"
+    },
+    {
+        "value": "test/macro/functions",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["[/]", "\\/"]
+        },
+        "result": "test\\/macro\\/functions"
+    },
+    {
+        "value": "test/macro/functions",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["/", "\\/"]
+        },
+        "result": "test\\/macro\\/functions"
+    },
+    {
+        "value": "value_ППП_aaa_123",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["П", "A"]
+        },
+        "result": "value_AAA_aaa_123"
+    },
+    {
+        "value": "абвгшд",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["[абвгдшДЙя]", "test"]
+        },
+        "result": "testtesttesttesttesttest"
+    },
+    {
+        "value": "абвгшд",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["[абвгдшДЙя]", "б"]
+        },
+        "result": "бббббб"
     }
 ]

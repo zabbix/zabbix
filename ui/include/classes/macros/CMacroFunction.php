@@ -137,17 +137,26 @@ class CMacroFunction {
 			return UNRESOLVED_MACRO_STRING;
 		}
 
+		$value = mb_convert_encoding($value, 'UTF-8');
+
 		try {
 			for ($i = 0; $i < $parameter_count; $i += 2) {
 				$pattern = $parameters[$i];
 				$replacement = $parameters[$i + 1];
 
+				$pattern = mb_convert_encoding($pattern, 'UTF-8');
+				$replacement = mb_convert_encoding($replacement, 'UTF-8');
+
 				if ($pattern === '' || !is_string($replacement)) {
 					continue;
 				}
 
-				if ($pattern[0] !== '/' && substr($pattern, -1) !== '/') {
-					$pattern = '/' . $pattern . '/';
+				// Escape '/' characters
+				$pattern = str_replace('/', '\\/', $pattern);
+
+				// Add the 'u' modifier to treat it as UTF-8 for multibyte characters and ensure pattern ends with '/'.
+				if ($pattern[0] !== '/' || substr($pattern, -1) !== '/') {
+					$pattern = '/' . $pattern . '/u';
 				}
 
 				if (@preg_match($pattern, '') === false) {
@@ -157,7 +166,7 @@ class CMacroFunction {
 				$value = preg_replace($pattern, $replacement, $value);
 			}
 		}
-		catch (Exception $e) {
+		catch (Exception) {
 			return UNRESOLVED_MACRO_STRING;
 		}
 
