@@ -1063,7 +1063,6 @@ int	zbx_regexp_repl(const char *string, const char *pattern, const char *output_
 
 	zbx_vector_match_create(&matches);
 
-	
 	/* collect all matches */
 	for (;;)
 	{
