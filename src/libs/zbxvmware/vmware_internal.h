@@ -173,7 +173,7 @@ void	vmware_service_cq_prop_value(const char *fn_parent, xmlDoc *xdoc, zbx_vecto
 #define ZBX_XPATH_OBJS_BY_TYPE(type)									\
 	"/*/*/*/*/*[local-name()='objects']/*[local-name()='obj'][@type='" type "']"
 
-char	*evt_msg_strpool_strdup(const char *str, zbx_uint64_t *len);
+char	*evt_msg_strpool_strdup(const char *str, zbx_uint64_t *len, zbx_uint32_t *ref_num);
 void	evt_msg_strpool_strfree(char *str);
 
 #define ZBX_XNN(NN)			"*[local-name()='" NN "']"
@@ -207,7 +207,7 @@ void	zbx_vmware_key_value_free(zbx_vmware_key_value_t value);
 #define REFCOUNT_FIELD_SIZE	sizeof(zbx_uint32_t)
 
 int	vmware_shared_strsearch(const char *str);
-char	*vmware_strpool_strdup(const char *str, zbx_hashset_t *strpool, zbx_uint64_t *len);
+char	*vmware_strpool_strdup(const char *str, zbx_hashset_t *strpool, zbx_uint64_t *len, zbx_uint32_t *ref_num);
 char	*vmware_shared_strdup(const char *str);
 void	vmware_strpool_strfree(char *str, zbx_hashset_t *strpool, zbx_uint64_t *len);
 void	vmware_shared_strfree(char *str);

@@ -469,6 +469,7 @@ static int	vmware_service_put_event_data(zbx_vector_vmware_event_ptr_t *events, 
 	int				nodes_det = 0;
 	unsigned int			i;
 	zbx_uint64_t			sz;
+	zbx_uint32_t			ref_num;
 	static event_hostinfo_node_t	host_nodes[] =
 	{
 		{ ZBX_XPATH_EVT_INFO("datacenter"),		ZBX_HOSTINFO_NODES_DATACENTER,	NULL },
@@ -582,7 +583,7 @@ static int	vmware_service_put_event_data(zbx_vector_vmware_event_ptr_t *events, 
 	event = (zbx_vmware_event_t *)zbx_malloc(event, sizeof(zbx_vmware_event_t));
 	event->key = xml_event.id;
 	event->timestamp = xml_event.created_time;
-	event->message = evt_msg_strpool_strdup(message, &sz);
+	event->message = evt_msg_strpool_strdup(message, &sz, &ref_num);
 	zbx_free(message);
 	zbx_vector_vmware_event_ptr_append(events, event);
 

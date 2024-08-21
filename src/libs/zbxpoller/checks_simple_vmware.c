@@ -1226,7 +1226,7 @@ int	check_vcenter_eventlog(AGENT_REQUEST *request, const zbx_dc_item_t *item, AG
 		service->eventlog.severity = severity;
 
 	if (ZBX_VMWARE_EVENT_KEY_UNINITIALIZED == service->eventlog.last_key ||
-			(0 != skip_old && && service->eventlog.owner_itemid != item->itemid))
+			(0 != skip_old && service->eventlog.owner_itemid != item->itemid))
 	{
 		/* this may happen if recreate item vmware.eventlog for same service URL */
 		service->eventlog.last_key = request->lastlogsize;

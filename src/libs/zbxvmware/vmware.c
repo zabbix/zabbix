@@ -131,7 +131,7 @@ int	vmware_shared_strsearch(const char *str)
 	return NULL == zbx_hashset_search(&vmware->strpool, str - REFCOUNT_FIELD_SIZE) ? FAIL : SUCCEED;
 }
 
-char	*vmware_strpool_strdup(const char *str, zbx_hashset_t *strpool, zbx_uint64_t *len)
+char	*vmware_strpool_strdup(const char *str, zbx_hashset_t *strpool, zbx_uint64_t *len, zbx_uint32_t *ref_num)
 {
 	void	*ptr;
 
@@ -152,6 +152,9 @@ char	*vmware_strpool_strdup(const char *str, zbx_hashset_t *strpool, zbx_uint64_
 
 	(*(zbx_uint32_t *)ptr)++;
 
+	if (NULL != ref_num)
+		*ref_num = *(zbx_uint32_t *)ptr;
+
 	return (char *)ptr + REFCOUNT_FIELD_SIZE;
 }
 
@@ -160,7 +163,7 @@ char	*vmware_shared_strdup(const char *str)
 	char		*strdup;
 	zbx_uint64_t	len;
 
-	strdup = vmware_strpool_strdup(str, &vmware->strpool, &len);
+	strdup = vmware_strpool_strdup(str, &vmware->strpool, &len, NULL);
 
 	if (0 < len)
 		vmware->strpool_sz += zbx_shmem_required_chunk_size(len);
@@ -202,9 +205,9 @@ void	evt_msg_strpool_strfree(char *str)
 	vmware_strpool_strfree(str, &evt_msg_strpool, NULL);
 }
 
-char	*evt_msg_strpool_strdup(const char *str, zbx_uint64_t *len)
+char	*evt_msg_strpool_strdup(const char *str, zbx_uint64_t *len, zbx_uint32_t *ref_num)
 {
-	return vmware_strpool_strdup(str, &evt_msg_strpool, len);
+	return vmware_strpool_strdup(str, &evt_msg_strpool, len, ref_num);
 }
 
 static size_t	curl_write_cb(void *ptr, size_t size, size_t nmemb, void *userdata)
