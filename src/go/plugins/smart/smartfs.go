@@ -262,18 +262,21 @@ func (p *Plugin) execute(jsonRunner bool) (*runner, error) {
 	g.SetLimit(2)
 
 	resultChan := make(chan *SmartCtlDeviceData)
+	collectorDone := make(chan struct{})
 
 	go func() {
 		for data := range resultChan {
 			r.setDevicesData(data, jsonRunner)
 		}
+
+		close(collectorDone)
 	}()
 
 	for _, device := range basicDev {
 		name := device.Name
 
 		g.Go(func() error {
-			device, err := getBasicDeviceInfo(p.ctl, name)
+			deviceInfo, err := getBasicDeviceInfo(p.ctl, name)
 
 			if errors.Is(err, ErrNoSmartStatus) {
 				r.plugin.Debugf("skipping device %s", name)
@@ -284,7 +287,7 @@ func (p *Plugin) execute(jsonRunner bool) (*runner, error) {
 				return err
 			}
 
-			resultChan <- device
+			resultChan <- deviceInfo
 
 			return nil
 		})
@@ -330,6 +333,7 @@ func (p *Plugin) execute(jsonRunner bool) (*runner, error) {
 	err = g.Wait()
 
 	close(resultChan)
+	<-collectorDone
 
 	r.parseOutput(jsonRunner)
 

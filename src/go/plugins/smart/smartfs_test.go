@@ -24,7 +24,6 @@ import (
 	"errors"
 	stdlog "log"
 	"os"
-	"reflect"
 	"testing"
 	"time"
 
@@ -33,27 +32,6 @@ import (
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
 )
-
-func Test_execute(t *testing.T) {
-	tests := []struct {
-		name       string
-		jsonRunner bool
-	}{}
-
-	for _, tt := range tests {
-		tt := tt
-		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
-
-			p := Plugin{
-				ctl: &mock.MockController{},
-			}
-
-			p.execute(tt.jsonRunner)
-
-		})
-	}
-}
 
 func Test_getBasicDeviceInfo(t *testing.T) {
 	type expectation struct {
@@ -422,6 +400,32 @@ func Test_parseOutput(t *testing.T) {
 				},
 			},
 		},
+		{
+			name:       "+jsonRunner with two duplicate devices",
+			jsonRunner: false,
+			initialState: runner{
+				devices: map[string]deviceParser{
+					"/dev/sda": {SerialNumber: "Serial123"},
+					"/dev/sdb": {SerialNumber: "Serial123"},
+					"/dev/sdc": {SerialNumber: "Serial123"},
+				},
+			},
+			expectedState: runner{
+				devices: map[string]deviceParser{
+					"/dev/sda": {SerialNumber: "Serial123"},
+				},
+			},
+		},
+		{
+			name:       "+jsonRunner without devices",
+			jsonRunner: false,
+			initialState: runner{
+				devices: map[string]deviceParser{},
+			},
+			expectedState: runner{
+				devices: map[string]deviceParser{},
+			},
+		},
 	}
 
 	for _, tt := range tests {
@@ -433,277 +437,277 @@ func Test_parseOutput(t *testing.T) {
 			runner.parseOutput(tt.jsonRunner)
 
 			if tt.jsonRunner {
-				if !reflect.DeepEqual(runner.jsonDevices, tt.expectedState.jsonDevices) {
-					t.Errorf("jsonDevices = %v, want %v", runner.jsonDevices, tt.expectedState.jsonDevices)
+				if diff := cmp.Diff(runner.jsonDevices, tt.expectedState.jsonDevices, cmp.AllowUnexported(jsonDevice{}, deviceInfo{})); diff != "" {
+					t.Errorf("jsonDevices mismatch (-got +want):\n%s", diff)
 				}
 			} else {
-				if !reflect.DeepEqual(runner.devices, tt.expectedState.devices) {
-					t.Errorf("devices = %v, want %v", runner.devices, tt.expectedState.devices)
+				if diff := cmp.Diff(runner.devices, tt.expectedState.devices, cmp.AllowUnexported(deviceParser{}, deviceInfo{})); diff != "" {
+					t.Errorf("devices mismatch (-got +want):\n%s", diff)
 				}
 			}
+
 		})
 	}
 }
 
-/*
 //nolint:paralleltest,tparallel
 
-func Test_runner_executeBase(t *testing.T) {
-	log.DefaultLogger = stdlog.New(os.Stdout, "", stdlog.LstdFlags)
+// func Test_runner_executeBase(t *testing.T) {
+// 	log.DefaultLogger = stdlog.New(os.Stdout, "", stdlog.LstdFlags)
 
-	type expectation struct {
-		args []string
-		err  error
-		out  []byte
-	}
+// 	type expectation struct {
+// 		args []string
+// 		err  error
+// 		out  []byte
+// 	}
 
-	type fields struct {
-		devices     map[string]deviceParser
-		jsonDevices map[string]jsonDevice
-	}
+// 	type fields struct {
+// 		devices     map[string]deviceParser
+// 		jsonDevices map[string]jsonDevice
+// 	}
 
-	type args struct {
-		basicDev   []deviceInfo
-		jsonRunner bool
-	}
+// 	type args struct {
+// 		basicDev   []deviceInfo
+// 		jsonRunner bool
+// 	}
 
-	tests := []struct {
-		name            string
-		expectations    []expectation
-		fields          fields
-		args            args
-		wantJsonDevices map[string]jsonDevice
-		wantDevices     map[string]deviceParser
-		wantErr         bool
-	}{
-		{
-			"+valid",
-			[]expectation{
-				{
-					args: []string{"-a", "/dev/sda", "-j"},
-					err:  nil,
-					out:  mock.OutputAllDiscInfoSDA,
-				},
-			},
-			fields{
-				jsonDevices: map[string]jsonDevice{},
-				devices:     map[string]deviceParser{},
-			},
-			args{
-				[]deviceInfo{
-					{
-						Name:     "/dev/sda",
-						InfoName: "/dev/sda",
-						DevType:  "nvme",
-					},
-				},
-				false,
-			},
-			map[string]jsonDevice{},
-			map[string]deviceParser{
-				"/dev/sda": {
-					ModelName:    "SAMSUNG MZVL21T0HCLR-00BH1",
-					SerialNumber: "S641NX0T509005",
-					Info: deviceInfo{
-						Name:     "/dev/sda",
-						InfoName: "/dev/sda",
-						DevType:  "nvme",
-						name:     "/dev/sda",
-					},
-					Smartctl: smartctlField{
-						Version: []int{7, 1},
-					},
-					SmartStatus:     &smartStatus{SerialNumber: true},
-					SmartAttributes: smartAttributes{},
-				},
-			},
-			false,
-		},
-		{
-			"+multiple",
-			[]expectation{
-				{
-					args: []string{"-a", "/dev/sda", "-j"},
-					err:  nil,
-					out:  mock.OutputAllDiscInfoSDA,
-				},
-				{
-					args: []string{
-						"-a",
-						"IOService:/AppleARMPE/arm-io@10F00000/AppleT811xIO/ans@77400000/AppleASCWrapV4/iop-ans-nub/RTBuddy(ANS2)/RTBuddyService/AppleANS3NVMeController/NS_01@1", //nolint:lll
-						"-j",
-					},
-					err: nil,
-					out: mock.OutputAllDiscInfoMac,
-				},
-			},
-			fields{
-				jsonDevices: map[string]jsonDevice{},
-				devices:     map[string]deviceParser{},
-			},
-			args{
-				[]deviceInfo{
-					{
-						Name:     "/dev/sda",
-						InfoName: "/dev/sda",
-						DevType:  "nvme",
-					},
-					{
-						Name:     "IOService:/AppleARMPE/arm-io@10F00000/AppleT811xIO/ans@77400000/AppleASCWrapV4/iop-ans-nub/RTBuddy(ANS2)/RTBuddyService/AppleANS3NVMeController/NS_01@1", //nolint:lll
-						InfoName: "IOService:/AppleARMPE/arm-io@10F00000/AppleT811xIO/ans@77400000/AppleASCWrapV4/iop-ans-nub/RTBuddy(ANS2)/RTBuddyService/AppleANS3NVMeController/NS_01@1", //nolint:lll
-						DevType:  "nvme",
-					},
-				},
-				false,
-			},
-			map[string]jsonDevice{},
-			map[string]deviceParser{
-				"/dev/sda": {
-					ModelName:    "SAMSUNG MZVL21T0HCLR-00BH1",
-					SerialNumber: "S641NX0T509005",
-					Info: deviceInfo{
-						Name:     "/dev/sda",
-						InfoName: "/dev/sda",
-						DevType:  "nvme",
-						name:     "/dev/sda",
-					},
-					Smartctl: smartctlField{
-						Version: []int{7, 1},
-					},
-					SmartStatus:     &smartStatus{SerialNumber: true},
-					SmartAttributes: smartAttributes{},
-				},
-				"IOService:/AppleARMPE/arm-io@10F00000/AppleT811xIO/ans@77400000/AppleASCWrapV4/iop-ans-nub/RTBuddy(ANS2)/RTBuddyService/AppleANS3NVMeController/NS_01@1": { //nolint:lll
-					ModelName:    "APPLE SSD AP0512Z",
-					SerialNumber: "0ba02202c4bc1a1e",
-					Info: deviceInfo{
-						Name:     "IOService:/AppleARMPE/arm-io@10F00000/AppleT811xIO/ans@77400000/AppleASCWrapV4/iop-ans-nub/RTBuddy(ANS2)/RTBuddyService/AppleANS3NVMeController/NS_01@1", //nolint:lll
-						InfoName: "IOService:/AppleARMPE/arm-io@10F00000/AppleT811xIO/ans@77400000/AppleASCWrapV4/iop-ans-nub/RTBuddy(ANS2)/RTBuddyService/AppleANS3NVMeController/NS_01@1", //nolint:lll
-						DevType:  "nvme",
-						name:     "IOService:/AppleARMPE/arm-io@10F00000/AppleT811xIO/ans@77400000/AppleASCWrapV4/iop-ans-nub/RTBuddy(ANS2)/RTBuddyService/AppleANS3NVMeController/NS_01@1", //nolint:lll
-					},
-					Smartctl: smartctlField{
-						Version:    []int{7, 4},
-						ExitStatus: 4,
-						Messages: []message{
-							{
-								"Read 1 entries from Error Information Log failed: GetLogPage failed: system=0x38, sub=0x0, code=745", //nolint:lll
-							},
-						},
-					},
-					SmartStatus:     &smartStatus{SerialNumber: true},
-					SmartAttributes: smartAttributes{},
-				},
-			},
-			false,
-		},
-		{
-			"+jsonRunner",
-			[]expectation{
-				{
-					args: []string{"-a", "/dev/sda", "-j"},
-					err:  nil,
-					out:  mock.OutputAllDiscInfoSDA,
-				},
-			},
-			fields{
-				jsonDevices: map[string]jsonDevice{},
-				devices:     map[string]deviceParser{},
-			},
-			args{
-				[]deviceInfo{
-					{
-						Name:     "/dev/sda",
-						InfoName: "/dev/sda",
-						DevType:  "nvme",
-					},
-				},
-				true,
-			},
-			map[string]jsonDevice{
-				"/dev/sda": {
-					serialNumber: "S641NX0T509005",
-					jsonData:     string(mock.OutputAllDiscInfoSDA),
-				},
-			},
-			map[string]deviceParser{},
-			false,
-		},
-	}
-	for _, tt := range tests {
-		tt := tt
-		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
+// 	tests := []struct {
+// 		name            string
+// 		expectations    []expectation
+// 		fields          fields
+// 		args            args
+// 		wantJsonDevices map[string]jsonDevice
+// 		wantDevices     map[string]deviceParser
+// 		wantErr         bool
+// 	}{
+// 		{
+// 			"+valid",
+// 			[]expectation{
+// 				{
+// 					args: []string{"-a", "/dev/sda", "-j"},
+// 					err:  nil,
+// 					out:  mock.OutputAllDiscInfoSDA,
+// 				},
+// 			},
+// 			fields{
+// 				jsonDevices: map[string]jsonDevice{},
+// 				devices:     map[string]deviceParser{},
+// 			},
+// 			args{
+// 				[]deviceInfo{
+// 					{
+// 						Name:     "/dev/sda",
+// 						InfoName: "/dev/sda",
+// 						DevType:  "nvme",
+// 					},
+// 				},
+// 				false,
+// 			},
+// 			map[string]jsonDevice{},
+// 			map[string]deviceParser{
+// 				"/dev/sda": {
+// 					ModelName:    "SAMSUNG MZVL21T0HCLR-00BH1",
+// 					SerialNumber: "S641NX0T509005",
+// 					Info: deviceInfo{
+// 						Name:     "/dev/sda",
+// 						InfoName: "/dev/sda",
+// 						DevType:  "nvme",
+// 						name:     "/dev/sda",
+// 					},
+// 					Smartctl: smartctlField{
+// 						Version: []int{7, 1},
+// 					},
+// 					SmartStatus:     &smartStatus{SerialNumber: true},
+// 					SmartAttributes: smartAttributes{},
+// 				},
+// 			},
+// 			false,
+// 		},
+// 		{
+// 			"+multiple",
+// 			[]expectation{
+// 				{
+// 					args: []string{"-a", "/dev/sda", "-j"},
+// 					err:  nil,
+// 					out:  mock.OutputAllDiscInfoSDA,
+// 				},
+// 				{
+// 					args: []string{
+// 						"-a",
+// 						"IOService:/AppleARMPE/arm-io@10F00000/AppleT811xIO/ans@77400000/AppleASCWrapV4/iop-ans-nub/RTBuddy(ANS2)/RTBuddyService/AppleANS3NVMeController/NS_01@1", //nolint:lll
+// 						"-j",
+// 					},
+// 					err: nil,
+// 					out: mock.OutputAllDiscInfoMac,
+// 				},
+// 			},
+// 			fields{
+// 				jsonDevices: map[string]jsonDevice{},
+// 				devices:     map[string]deviceParser{},
+// 			},
+// 			args{
+// 				[]deviceInfo{
+// 					{
+// 						Name:     "/dev/sda",
+// 						InfoName: "/dev/sda",
+// 						DevType:  "nvme",
+// 					},
+// 					{
+// 						Name:     "IOService:/AppleARMPE/arm-io@10F00000/AppleT811xIO/ans@77400000/AppleASCWrapV4/iop-ans-nub/RTBuddy(ANS2)/RTBuddyService/AppleANS3NVMeController/NS_01@1", //nolint:lll
+// 						InfoName: "IOService:/AppleARMPE/arm-io@10F00000/AppleT811xIO/ans@77400000/AppleASCWrapV4/iop-ans-nub/RTBuddy(ANS2)/RTBuddyService/AppleANS3NVMeController/NS_01@1", //nolint:lll
+// 						DevType:  "nvme",
+// 					},
+// 				},
+// 				false,
+// 			},
+// 			map[string]jsonDevice{},
+// 			map[string]deviceParser{
+// 				"/dev/sda": {
+// 					ModelName:    "SAMSUNG MZVL21T0HCLR-00BH1",
+// 					SerialNumber: "S641NX0T509005",
+// 					Info: deviceInfo{
+// 						Name:     "/dev/sda",
+// 						InfoName: "/dev/sda",
+// 						DevType:  "nvme",
+// 						name:     "/dev/sda",
+// 					},
+// 					Smartctl: smartctlField{
+// 						Version: []int{7, 1},
+// 					},
+// 					SmartStatus:     &smartStatus{SerialNumber: true},
+// 					SmartAttributes: smartAttributes{},
+// 				},
+// 				"IOService:/AppleARMPE/arm-io@10F00000/AppleT811xIO/ans@77400000/AppleASCWrapV4/iop-ans-nub/RTBuddy(ANS2)/RTBuddyService/AppleANS3NVMeController/NS_01@1": { //nolint:lll
+// 					ModelName:    "APPLE SSD AP0512Z",
+// 					SerialNumber: "0ba02202c4bc1a1e",
+// 					Info: deviceInfo{
+// 						Name:     "IOService:/AppleARMPE/arm-io@10F00000/AppleT811xIO/ans@77400000/AppleASCWrapV4/iop-ans-nub/RTBuddy(ANS2)/RTBuddyService/AppleANS3NVMeController/NS_01@1", //nolint:lll
+// 						InfoName: "IOService:/AppleARMPE/arm-io@10F00000/AppleT811xIO/ans@77400000/AppleASCWrapV4/iop-ans-nub/RTBuddy(ANS2)/RTBuddyService/AppleANS3NVMeController/NS_01@1", //nolint:lll
+// 						DevType:  "nvme",
+// 						name:     "IOService:/AppleARMPE/arm-io@10F00000/AppleT811xIO/ans@77400000/AppleASCWrapV4/iop-ans-nub/RTBuddy(ANS2)/RTBuddyService/AppleANS3NVMeController/NS_01@1", //nolint:lll
+// 					},
+// 					Smartctl: smartctlField{
+// 						Version:    []int{7, 4},
+// 						ExitStatus: 4,
+// 						Messages: []message{
+// 							{
+// 								"Read 1 entries from Error Information Log failed: GetLogPage failed: system=0x38, sub=0x0, code=745", //nolint:lll
+// 							},
+// 						},
+// 					},
+// 					SmartStatus:     &smartStatus{SerialNumber: true},
+// 					SmartAttributes: smartAttributes{},
+// 				},
+// 			},
+// 			false,
+// 		},
+// 		{
+// 			"+jsonRunner",
+// 			[]expectation{
+// 				{
+// 					args: []string{"-a", "/dev/sda", "-j"},
+// 					err:  nil,
+// 					out:  mock.OutputAllDiscInfoSDA,
+// 				},
+// 			},
+// 			fields{
+// 				jsonDevices: map[string]jsonDevice{},
+// 				devices:     map[string]deviceParser{},
+// 			},
+// 			args{
+// 				[]deviceInfo{
+// 					{
+// 						Name:     "/dev/sda",
+// 						InfoName: "/dev/sda",
+// 						DevType:  "nvme",
+// 					},
+// 				},
+// 				true,
+// 			},
+// 			map[string]jsonDevice{
+// 				"/dev/sda": {
+// 					serialNumber: "S641NX0T509005",
+// 					jsonData:     string(mock.OutputAllDiscInfoSDA),
+// 				},
+// 			},
+// 			map[string]deviceParser{},
+// 			false,
+// 		},
+// 	}
+// 	for _, tt := range tests {
+// 		tt := tt
+// 		t.Run(tt.name, func(t *testing.T) {
+// 			t.Parallel()
 
-			cpuCount = 1
+// 			cpuCount = 1
 
-			m := &mock.MockController{}
+// 			m := &mock.MockController{}
 
-			for _, e := range tt.expectations {
-				m.ExpectExecute().
-					WithArgs(e.args...).
-					WillReturnOutput(e.out).
-					WillReturnError(e.err)
-			}
+// 			for _, e := range tt.expectations {
+// 				m.ExpectExecute().
+// 					WithArgs(e.args...).
+// 					WillReturnOutput(e.out).
+// 					WillReturnError(e.err)
+// 			}
 
-			log.New("test")
+// 			log.New("test")
 
-			r := &runner{
-				plugin: &Plugin{
-					ctl:  m,
-					Base: plugin.Base{Logger: log.New("test")},
-				},
-				names:       make(chan string, 10),
-				err:         make(chan error, 10),
-				done:        make(chan struct{}),
-				devices:     tt.fields.devices,
-				jsonDevices: tt.fields.jsonDevices,
-			}
+// 			r := &runner{
+// 				plugin: &Plugin{
+// 					ctl:  m,
+// 					Base: plugin.Base{Logger: log.New("test")},
+// 				},
+// 				names:       make(chan string, 10),
+// 				err:         make(chan error, 10),
+// 				done:        make(chan struct{}),
+// 				devices:     tt.fields.devices,
+// 				jsonDevices: tt.fields.jsonDevices,
+// 			}
 
-			defer func() {
-				close(r.err)
-			}()
+// 			defer func() {
+// 				close(r.err)
+// 			}()
 
-			err := r.executeBase(tt.args.basicDev, tt.args.jsonRunner)
-			if (err != nil) != tt.wantErr {
-				t.Fatalf(
-					"runner.executeBase() error = %v, wantErr %v",
-					err,
-					tt.wantErr,
-				)
-			}
+// 			err := r.executeBase(tt.args.basicDev, tt.args.jsonRunner)
+// 			if (err != nil) != tt.wantErr {
+// 				t.Fatalf(
+// 					"runner.executeBase() error = %v, wantErr %v",
+// 					err,
+// 					tt.wantErr,
+// 				)
+// 			}
 
-			if diff := cmp.Diff(
-				tt.wantJsonDevices, r.jsonDevices,
-				cmp.AllowUnexported(jsonDevice{}),
-			); diff != "" {
-				t.Fatalf(
-					"runner.executeBase() jsonDevices mismatch (-want +got):\n%s",
-					diff,
-				)
-			}
+// 			if diff := cmp.Diff(
+// 				tt.wantJsonDevices, r.jsonDevices,
+// 				cmp.AllowUnexported(jsonDevice{}),
+// 			); diff != "" {
+// 				t.Fatalf(
+// 					"runner.executeBase() jsonDevices mismatch (-want +got):\n%s",
+// 					diff,
+// 				)
+// 			}
 
-			if diff := cmp.Diff(
-				tt.wantDevices, r.devices,
-				cmp.AllowUnexported(deviceInfo{}),
-			); diff != "" {
-				t.Fatalf(
-					"runner.executeBase() devices mismatch (-want +got):\n%s",
-					diff,
-				)
-			}
+// 			if diff := cmp.Diff(
+// 				tt.wantDevices, r.devices,
+// 				cmp.AllowUnexported(deviceInfo{}),
+// 			); diff != "" {
+// 				t.Fatalf(
+// 					"runner.executeBase() devices mismatch (-want +got):\n%s",
+// 					diff,
+// 				)
+// 			}
 
-			if err := m.ExpectationsWhereMet(); err != nil {
-				t.Fatalf(
-					"runner.executeBase() expectations where not met, error = %v",
-					err,
-				)
-			}
-		})
-	}
-}
+// 			if err := m.ExpectationsWhereMet(); err != nil {
+// 				t.Fatalf(
+// 					"runner.executeBase() expectations where not met, error = %v",
+// 					err,
+// 				)
+// 			}
+// 		})
+// 	}
+// }
 
-
+/*
 
 //nolint:paralleltest,tparallel
 
@@ -2553,6 +2557,194 @@ func TestPlugin_scanDevices(t *testing.T) {
 					"Plugin.scanDevices() expectations where not met, error = %v",
 					err,
 				)
+			}
+		})
+	}
+}
+
+// func Test_execute(t *testing.T) {
+// 	tests := []struct {
+// 		name       string
+// 		jsonRunner bool
+// 	}{}
+
+// 	for _, tt := range tests {
+// 		tt := tt
+// 		t.Run(tt.name, func(t *testing.T) {
+// 			t.Parallel()
+
+// 			p := Plugin{
+// 				ctl: &mock.MockController{},
+// 			}
+
+// 			p.execute(tt.jsonRunner)
+
+// 		})
+// 	}
+// }
+
+func TestPlugin_execute(t *testing.T) {
+	t.Parallel()
+
+	type args struct {
+		jsonRunner bool
+	}
+
+	type expectation struct {
+		args []string
+		err  error
+		out  []byte
+	}
+
+	tests := []struct {
+		name            string
+		args            args
+		expectations    []expectation
+		wantJSONDevices map[string]jsonDevice
+		wantDevices     map[string]deviceParser
+		wantErr         bool
+	}{
+		{
+			"+ all about 1 basic device",
+			args{false},
+			[]expectation{
+				{
+					[]string{"--scan", "-j"},
+					nil,
+					mock.OutputScanBasic,
+				},
+				{
+					[]string{"--scan", "-d", "sat", "-j"},
+					nil,
+					[]byte("{}"),
+				},
+				{
+					[]string{"-a", "/dev/sda", "-j"},
+					nil,
+					[]byte(`{
+						"json_format_version": [1, 0],
+						"smartctl": {
+						  "version": [7, 1],
+						  "svn_revision": "5022",
+						  "platform_info": "x86_64-w64-mingw32-w10-b19045",
+						  "build_info": "(sf-7.1-1)",
+						  "argv": ["smartctl", "-a", "/dev/sda", "-j"],
+						  "exit_status": 0
+						},
+						"device": {
+						  "name": "/dev/sda",
+						  "info_name": "/dev/sda",
+						  "type": "nvme",
+						  "protocol": "NVMe"
+						},
+						"model_name": "SAMSUNG MZVLB1T0HBLR-000L7",
+						"serial_number": "S3XY1234567890",
+						"firmware_version": "EXA7301Q",
+						"smart_status": {
+						  "passed": true
+						},
+						"temperature": {
+						  "current": 30,
+						  "highest": 65,
+						  "lowest": 20
+						},
+						"power_cycle_count": 12,
+						"power_on_hours": 3456,
+						"nvme_smart_health_information_log": {
+						  "critical_warning": 0,
+						  "temperature": 30,
+						  "available_spare": 100,
+						  "available_spare_threshold": 10,
+						  "percentage_used": 5,
+						  "data_units_read": 1234567,
+						  "data_units_written": 7654321,
+						  "host_reads": 987654,
+						  "host_writes": 456789,
+						  "controller_busy_time": 123,
+						  "power_cycles": 12,
+						  "power_on_hours": 3456,
+						  "unsafe_shutdowns": 3,
+						  "media_errors": 0,
+						  "num_err_log_entries": 5,
+						  "warning_temp_time": 0,
+						  "critical_comp_time": 0
+						},
+						"self_test": {
+						  "status": "Completed without error",
+						  "remaining_percent": 0,
+						  "test_type": "Short",
+						  "time_hours": 3450,
+						  "lba_of_first_error": 0
+						},
+						"error_log": {
+						  "summary": {
+							"errors_logged": 1,
+							"most_recent_error": {
+							  "error_type": "Media error",
+							  "lba": 1234567890,
+							  "status": "Error Unrecovered Read Error",
+							  "details": "Data error at LBA 1234567890",
+							  "occurred_at": {
+								"power_on_hours": 3400,
+								"power_cycle_number": 10
+							  }
+							}
+						  }
+						}
+					  }`),
+				},
+			},
+			nil,
+			map[string]deviceParser{
+				"/dev/sda": {
+					ModelName:    "SAMSUNG MZVLB1T0HBLR-000L7",
+					SerialNumber: "S3XY1234567890",
+					Info: deviceInfo{
+						Name:     "/dev/sda",
+						InfoName: "/dev/sda",
+						DevType:  "nvme",
+						name:     "/dev/sda",
+					},
+					Smartctl: smartctlField{
+						Version: []int{7, 1},
+					},
+					SmartStatus: &smartStatus{
+						SerialNumber: true,
+					},
+				}},
+			false,
+		},
+	}
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			m := mock.NewMockController(t)
+			// for request of all devices
+
+			for _, e := range tt.expectations {
+				m.ExpectExecute().
+					WithArgs(e.args...).
+					WillReturnOutput(e.out).
+					WillReturnError(e.err)
+			}
+
+			p := &Plugin{
+				ctl: m,
+			}
+
+			got, err := p.execute(tt.args.jsonRunner)
+			if (err != nil) != tt.wantErr {
+				t.Fatalf("Plugin.execute() error = %v, wantErr %v", err, tt.wantErr)
+			}
+
+			if diff := cmp.Diff(tt.wantJSONDevices, got.jsonDevices, cmp.AllowUnexported(deviceInfo{})); diff != "" {
+				t.Fatalf("Plugin.execute() runner.jsonDevices = %s", diff)
+			}
+
+			if diff := cmp.Diff(tt.wantDevices, got.devices, cmp.AllowUnexported(deviceInfo{})); diff != "" {
+				t.Fatalf("Plugin.execute() runner.devices = %s", diff)
 			}
 		})
 	}
