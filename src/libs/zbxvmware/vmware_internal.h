@@ -68,8 +68,15 @@ int	zbx_soap_post(const char *fn_parent, CURL *easyhandle, const char *request, 
 void		vmware_eventlog_data_shared_free(zbx_vmware_eventlog_data_t *data_eventlog);
 zbx_uint64_t	zbx_vmware_get_evt_req_chunk_sz(void);
 
-#define zbx_xml_free_doc(xdoc)		if (NULL != xdoc)		\
-						xmlFreeDoc(xdoc)
+#define zbx_xml_doc_free(xdoc)		do					\
+					{					\
+						if (NULL != xdoc)		\
+						{				\
+							xmlFreeDoc(xdoc);	\
+							xdoc = NULL;		\
+						}				\
+					}					\
+					while(0)
 
 #define ZBX_VPXD_STATS_MAXQUERYMETRICS				64
 #define ZBX_MAXQUERYMETRICS_UNLIMITED				1000

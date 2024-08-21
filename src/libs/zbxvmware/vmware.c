@@ -369,7 +369,7 @@ int	zbx_soap_post(const char *fn_parent, CURL *easyhandle, const char *request, 
 		}
 		else
 		{
-			zbx_xml_free_doc(doc);
+			zbx_xml_doc_free(doc);
 		}
 	}
 	else
@@ -1046,7 +1046,7 @@ out:
 	zbx_free(error_object);
 	zbx_free(username_esc);
 	zbx_free(password_esc);
-	zbx_xml_free_doc(doc);
+	zbx_xml_doc_free(doc);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
@@ -1177,13 +1177,13 @@ static	int	vmware_service_get_contents(CURL *easyhandle, char **version, char **
 
 	if (SUCCEED != zbx_soap_post(__func__, easyhandle, ZBX_POST_VMWARE_CONTENTS, &doc, NULL, error))
 	{
-		zbx_xml_free_doc(doc);
+		zbx_xml_doc_free(doc);
 		return FAIL;
 	}
 
 	*version = zbx_xml_doc_read_value(doc, ZBX_XPATH_VMWARE_ABOUT("version"));
 	*fullname = zbx_xml_doc_read_value(doc, ZBX_XPATH_VMWARE_ABOUT("fullName"));
-	zbx_xml_free_doc(doc);
+	zbx_xml_doc_free(doc);
 
 	if (NULL == *version)
 	{
@@ -1290,7 +1290,7 @@ static int	vmware_service_alarm_details_update(const zbx_vmware_service_t *servi
 		*error = zbx_dsprintf(*error, "Cannot update alarm details:%s", alarm_id);
 	}
 out:
-	zbx_xml_free_doc(doc_details);
+	zbx_xml_doc_free(doc_details);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() index:%d", __func__, ret);
 
@@ -1723,7 +1723,7 @@ out:
 	zbx_vector_cq_value_ptr_destroy(&cqvs);
 	zbx_vector_str_clear_ext(&ids, zbx_str_free);
 	zbx_vector_str_destroy(&ids);
-	zbx_xml_free_doc(doc);
+	zbx_xml_doc_free(doc);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
@@ -1917,8 +1917,7 @@ static int	vmware_service_get_clusters_and_resourcepools(zbx_vmware_service_t *s
 
 	while (NULL != iter->token)
 	{
-		zbx_xml_free_doc(cluster_data);
-		cluster_data = NULL;
+		zbx_xml_doc_free(cluster_data);
 
 		if (SUCCEED != zbx_property_collection_next(__func__, iter, &cluster_data, error))
 			goto clean;
@@ -1991,7 +1990,7 @@ static int	vmware_service_get_clusters_and_resourcepools(zbx_vmware_service_t *s
 
 	ret = SUCCEED;
 clean:
-	zbx_xml_free_doc(cluster_data);
+	zbx_xml_doc_free(cluster_data);
 	zbx_vector_vmware_rpool_chunk_ptr_clear_ext(&rp_chunks, vmware_rp_chunk_free);
 	zbx_vector_vmware_rpool_chunk_ptr_destroy(&rp_chunks);
 	zbx_vector_vmware_cluster_ptr_clear_ext(&cl_chunks, vmware_cluster_free);
@@ -2245,7 +2244,7 @@ static void	vmware_service_dvswitch_load(CURL *easyhandle, zbx_vector_cq_value_p
 
 		criteria[0] = '\0';
 		offset = 0;
-		zbx_xml_free_doc(doc);
+		zbx_xml_doc_free(doc);
 
 		for (int j = 0; j < cqv->instance->query_params->values_num; j++)
 		{
@@ -2295,7 +2294,7 @@ static void	vmware_service_dvswitch_load(CURL *easyhandle, zbx_vector_cq_value_p
 				(int)strlen(cqv->response));
 	}
 
-	zbx_xml_free_doc(doc);
+	zbx_xml_doc_free(doc);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() count: %d / %d", __func__, count, cq_values->values_num);
 #	undef	ZBX_POST_FETCH_DV_PORTS
@@ -2395,7 +2394,7 @@ static void	vmware_service_props_load(CURL *easyhandle, const char *collector, z
 		if (0 == (cqv->instance->state & ZBX_VMWARE_CQ_SEPARATE))
 			continue;
 
-		zbx_xml_free_doc(doc);
+		zbx_xml_doc_free(doc);
 		zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_OBJ_PROP, collector, cqv->instance->soap_type,
 				cqv->instance->key, cqv->instance->soap_type, cqv->instance->id);
 		total++;
@@ -2413,7 +2412,7 @@ static void	vmware_service_props_load(CURL *easyhandle, const char *collector, z
 		count++;
 	}
 
-	zbx_xml_free_doc(doc);
+	zbx_xml_doc_free(doc);
 
 	zbx_vector_cq_value_ptr_destroy(&cq_resp);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() count: %d / %d", __func__, count, total);

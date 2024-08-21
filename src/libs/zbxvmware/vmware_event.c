@@ -227,7 +227,7 @@ static int	vmware_service_get_event_session(const zbx_vmware_service_t *service,
 
 	ret = SUCCEED;
 out:
-	zbx_xml_free_doc(doc);
+	zbx_xml_doc_free(doc);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s event_session:'%s'", __func__, zbx_result_string(ret),
 			ZBX_NULL2EMPTY_STR(*event_session));
 
@@ -440,13 +440,14 @@ out:
  *             xdoc           - [IN] xml document with eventlog records       *
  *             evt_severities - [IN] dictionary of severity for event types   *
  *             alloc_sz       - [OUT] allocated memory size for events        *
+ *             shared_sz      - [OUT] estimated shared memory size for events *
  *                                                                            *
  * Return value: SUCCEED - operation has completed successfully               *
  *               FAIL    - operation has failed                               *
  *                                                                            *
  ******************************************************************************/
 static int	vmware_service_put_event_data(zbx_vector_vmware_event_ptr_t *events, zbx_id_xmlnode_t xml_event,
-		xmlDoc *xdoc, const zbx_hashset_t *evt_severities, zbx_uint64_t *alloc_sz)
+		xmlDoc *xdoc, const zbx_hashset_t *evt_severities, zbx_uint64_t *alloc_sz, zbx_uint64_t *shared_sz)
 {
 #define ZBX_HOSTINFO_NODES_DATACENTER		0x01
 #define ZBX_HOSTINFO_NODES_COMPRES		0x02
@@ -588,7 +589,12 @@ static int	vmware_service_put_event_data(zbx_vector_vmware_event_ptr_t *events, 
 	zbx_vector_vmware_event_ptr_append(events, event);
 
 	if (0 < sz)
+	{
 		*alloc_sz += zbx_shmem_required_chunk_size(sz);
+
+		if (1 == ref_num)
+			shared_sz += zbx_shmem_required_chunk_size(sz);
+	}
 
 	return SUCCEED;
 #undef ZBX_HOSTINFO_NODES_DATACENTER
@@ -814,8 +820,8 @@ clean:
  *                                                                            *
  ******************************************************************************/
 static int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CURL *easyhandle,
-		zbx_uint64_t last_key, time_t last_ts, unsigned char *skip_old, zbx_vector_vmware_event_ptr_t *events,
-		zbx_uint64_t *alloc_sz, char **error)
+		const zbx_uint64_t last_key, const time_t last_ts, const zbx_uint64_t shmem_free_sz,
+		unsigned char *skip_old, zbx_vector_vmware_event_ptr_t *events, zbx_uint64_t *alloc_sz, char **error)
 {
 #	define ATTEMPTS_NUM	4
 #	define EVENT_TAG	1
@@ -864,15 +870,14 @@ static int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CU
 
 	do
 	{
-		zbx_xml_free_doc(doc);
-		doc = NULL;
+		zbx_xml_doc_free(doc);
 
 		if ((ZBX_MAXQUERYMETRICS_UNLIMITED / 2) >= soap_count)
 			soap_count = soap_count * 2;
 		else if (ZBX_MAXQUERYMETRICS_UNLIMITED != soap_count)
 			soap_count = ZBX_MAXQUERYMETRICS_UNLIMITED;
 
-		if (0 != events->values_num && (LAST_KEY(events) - eventlog_last_key -1) < (unsigned int)soap_count)
+		if (0 != events->values_num && (LAST_KEY(events) - eventlog_last_key - 1) < (unsigned int)soap_count)
 		{
 			soap_count = (int)(LAST_KEY(events) - eventlog_last_key - 1);
 		}
@@ -906,7 +911,7 @@ end_session:
 	}
 out:
 	zbx_free(event_session);
-	zbx_xml_free_doc(doc);
+	zbx_xml_doc_free(doc);
 
 	if (SUCCEED == ret && 10 == soap_count && 0 == events->values_num && 0 == *skip_old)
 		zabbix_log(LOG_LEVEL_WARNING, "vmware events collector returned empty result");
@@ -1017,7 +1022,7 @@ clean:
 	xmlXPathFreeObject(xpathObj);
 	xmlXPathFreeContext(xpathCtx);
 out:
-	zbx_xml_free_doc(doc);
+	zbx_xml_doc_free(doc);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s last_key:" ZBX_FS_UI64, __func__, zbx_result_string(ret),
 			(SUCCEED == ret ? xml_event.id : 0));
 	return ret;
@@ -1061,7 +1066,7 @@ int	zbx_vmware_service_eventlog_update(zbx_vmware_service_t *service, const char
 	int				ret = FAIL;
 	ZBX_HTTPPAGE			page;	/* 347K/87K */
 	unsigned char			evt_pause = 0, evt_skip_old;
-	zbx_uint64_t			evt_last_key, events_sz = 0;
+	zbx_uint64_t			evt_last_key, events_sz = 0, shmem_free_sz;
 	time_t				evt_last_ts;
 	char				msg[MAX_STRING_LEN / 8];
 
@@ -1076,6 +1081,7 @@ int	zbx_vmware_service_eventlog_update(zbx_vmware_service_t *service, const char
 	evt_last_key = service->eventlog.last_key;
 	evt_skip_old = service->eventlog.skip_old;
 	evt_last_ts = service->eventlog.last_ts;
+	shmem_free_sz = vmware_shmem_get_vmware_mem()->free_size;
 	zbx_vmware_unlock();
 
 	if (NULL == (easyhandle = curl_easy_init()))
@@ -1108,7 +1114,7 @@ int	zbx_vmware_service_eventlog_update(zbx_vmware_service_t *service, const char
 		/* we stopped last time or item can't accept values 	*/
 		if (ZBX_VMWARE_EVENT_KEY_UNINITIALIZED != evt_last_key && 0 == evt_skip_old &&
 				SUCCEED != vmware_service_get_event_data(service, easyhandle, evt_last_key, evt_last_ts,
-				&evt_skip_old, &evt_data->events, &events_sz, &evt_data->error))
+				shmem_free_sz, &evt_skip_old, &evt_data->events, &events_sz, &evt_data->error))
 		{
 			goto clean;
 		}
