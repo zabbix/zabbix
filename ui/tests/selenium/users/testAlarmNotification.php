@@ -644,7 +644,7 @@ class testAlarmNotification extends CWebTest {
 			// Find appeared Alarm notification overlay dialog and check triggered problems by trigger name.
 			$alarm_dialog = $this->getAlarmOverlay();
 			$triggered_alarms = $alarm_dialog->query('xpath:.//ul[@class="notif-body"]/li//a[contains(@href, "triggerids")]')
-					->all()->asText();
+					->waitUntilVisible()->all()->asText();
 			sort($triggered_alarms);
 			$this->assertEquals($data['trigger_name'], $triggered_alarms);
 
