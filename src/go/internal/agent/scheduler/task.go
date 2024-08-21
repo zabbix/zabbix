@@ -165,12 +165,10 @@ type exporterTask struct {
 
 func invokeExport(a plugin.Accessor, key string, params []string, ctx plugin.ContextProvider) (any, error) {
 	exporter, _ := a.(plugin.Exporter)
-	var timeout int
+	timeout := ctx.Timeout()
 
 	if a.HandleTimeout() {
 		timeout = maxItemTimeout
-	} else {
-		timeout = ctx.Timeout()
 	}
 
 	var ret any
