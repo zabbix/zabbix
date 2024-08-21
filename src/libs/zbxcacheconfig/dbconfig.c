@@ -2931,9 +2931,10 @@ static void	dc_masteritem_free(ZBX_DC_MASTERITEM *masteritem)
  *                                                                            *
  * Parameters: master_itemid - [IN] the master item identifier                *
  *             dep_itemid    - [IN] the dependent item identifier             *
+ *             revision      - [IN] the configuration revision                *
  *                                                                            *
  ******************************************************************************/
-static void	dc_masteritem_remove_depitem(zbx_uint64_t master_itemid, zbx_uint64_t dep_itemid)
+static void	dc_masteritem_remove_depitem(zbx_uint64_t master_itemid, zbx_uint64_t dep_itemid, zbx_uint64_t revision)
 {
 	ZBX_DC_MASTERITEM	*masteritem;
 	ZBX_DC_ITEM		*item;
@@ -2960,6 +2961,8 @@ static void	dc_masteritem_remove_depitem(zbx_uint64_t master_itemid, zbx_uint64_
 		dc_masteritem_free(item->master_item);
 		item->master_item = NULL;
 	}
+	else
+		masteritem->revision = revision;
 }
 
 /******************************************************************************
@@ -3108,7 +3111,7 @@ static zbx_vector_ptr_t	*dc_item_parameters(const ZBX_DC_ITEM *item, unsigned ch
 	}
 }
 
-static void	dc_item_type_free(ZBX_DC_ITEM *item, zbx_item_type_t type)
+static void	dc_item_type_free(ZBX_DC_ITEM *item, zbx_item_type_t type, zbx_uint64_t revision)
 {
 	switch (type)
 	{
@@ -3180,7 +3183,7 @@ static void	dc_item_type_free(ZBX_DC_ITEM *item, zbx_item_type_t type)
 		case ITEM_TYPE_SNMPTRAP:
 			break;
 		case ITEM_TYPE_DEPENDENT:
-			dc_masteritem_remove_depitem(item->itemtype.depitem->master_itemid, item->itemid);
+			dc_masteritem_remove_depitem(item->itemtype.depitem->master_itemid, item->itemid, revision);
 
 			__config_shmem_free_func(item->itemtype.depitem);
 			break;
@@ -3220,7 +3223,7 @@ static void	dc_item_type_free(ZBX_DC_ITEM *item, zbx_item_type_t type)
 }
 
 static void	dc_item_type_update(int found, ZBX_DC_ITEM *item, zbx_item_type_t *old_type,
-		zbx_vector_ptr_t *dep_items, char **row)
+		zbx_vector_ptr_t *dep_items, char **row, zbx_uint64_t revision)
 {
 	zbx_vector_ptr_t	parameters_local, *parameters = NULL;
 
@@ -3229,7 +3232,7 @@ static void	dc_item_type_update(int found, ZBX_DC_ITEM *item, zbx_item_type_t *o
 		if (NULL != (parameters = dc_item_parameters(item, *old_type)))
 			parameters_local = *parameters;
 
-		dc_item_type_free(item, *old_type);
+		dc_item_type_free(item, *old_type, revision);
 		found = 0;
 	}
 
@@ -3245,7 +3248,7 @@ static void	dc_item_type_update(int found, ZBX_DC_ITEM *item, zbx_item_type_t *o
 					if (NULL != (parameters = dc_item_parameters(item, item->type)))
 						parameters_local = *parameters;
 
-					dc_item_type_free(item, item->type);
+					dc_item_type_free(item, item->type, revision);
 				}
 
 				item->itemtype.trapitem = NULL;
@@ -3753,7 +3756,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 		item->interfaceid = interfaceid;
 
 		dc_item_value_type_update(found, item, &old_value_type, row);
-		dc_item_type_update(found, item, &old_type, &dep_items, row);
+		dc_item_type_update(found, item, &old_type, &dep_items, row, revision);
 
 		/* process item intervals and update item nextcheck */
 
@@ -3839,7 +3842,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 		zbx_uint64_pair_t	pair;
 
 		depitem = (ZBX_DC_ITEM *)dep_items.values[i];
-		dc_masteritem_remove_depitem(depitem->itemtype.depitem->last_master_itemid, depitem->itemid);
+		dc_masteritem_remove_depitem(depitem->itemtype.depitem->last_master_itemid, depitem->itemid, revision);
 
 		if (NULL == (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items,
 				&depitem->itemtype.depitem->master_itemid)))
@@ -3858,6 +3861,8 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 			zbx_vector_uint64_pair_create_ext(&item->master_item->dep_itemids, __config_shmem_malloc_func,
 					__config_shmem_realloc_func, __config_shmem_free_func);
 		}
+
+		item->master_item->revision = revision;
 
 		zbx_vector_uint64_pair_append(&item->master_item->dep_itemids, pair);
 
@@ -3910,7 +3915,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 		if (NULL != (parameters = dc_item_parameters(item, item->type)))
 			zbx_vector_ptr_destroy(parameters);
 
-		dc_item_type_free(item, item->type);
+		dc_item_type_free(item, item->type, revision);
 
 		/* items */
 
@@ -6004,6 +6009,8 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync, zbx_uint64_t revision)
 		zbx_vector_dc_item_ptr_append(&items, item);
 
 		ZBX_STR2UINT64(item_preprocid, row[0]);
+
+		preprocitem->revision = revision;
 
 		op = (zbx_dc_preproc_op_t *)DCfind_id_ext(&config->preprocops, item_preprocid,
 				sizeof(zbx_dc_preproc_op_t), &found, uniq);
@@ -10397,12 +10404,8 @@ void	zbx_dc_config_get_active_items_by_hostid(zbx_dc_item_t *items, zbx_uint64_t
  *          updating preprocessing revision if any changes were detected      *
  *                                                                            *
  ******************************************************************************/
-static void	dc_preproc_sync_preprocitem(zbx_pp_item_preproc_t *preproc, const ZBX_DC_PREPROCITEM *preprocitem,
-		zbx_pp_item_preproc_t *preproc_old, int *changed)
+static void	dc_preproc_sync_preprocitem(zbx_pp_item_preproc_t *preproc, const ZBX_DC_PREPROCITEM *preprocitem)
 {
-	if (NULL != preproc_old && preprocitem->preproc_ops.values_num != preproc_old->steps_num)
-		*changed = 1;
-
 	preproc->steps = (zbx_pp_step_t *)zbx_malloc(NULL, sizeof(zbx_pp_step_t) *
 			(size_t)preprocitem->preproc_ops.values_num);
 
@@ -10415,17 +10418,6 @@ static void	dc_preproc_sync_preprocitem(zbx_pp_item_preproc_t *preproc, const ZB
 
 		preproc->steps[i].params =  zbx_strdup(NULL, op->params);
 		preproc->steps[i].error_handler_params = zbx_strdup(NULL, op->error_handler_params);
-
-		if (NULL != preproc_old && *changed == 0)
-		{
-			if ((op->type != preproc_old->steps[i].type) ||
-				(op->error_handler != preproc_old->steps[i].error_handler) ||
-				(0 != strcmp(op->params, preproc_old->steps[i].params)) ||
-				(0 != strcmp(op->error_handler_params, preproc_old->steps[i].error_handler_params)))
-			{
-				*changed = 1;
-			}
-		}
 	}
 
 	preproc->steps_num = preprocitem->preproc_ops.values_num;
@@ -10454,7 +10446,6 @@ static void	dc_preproc_sync_item(zbx_hashset_t *items, ZBX_DC_ITEM *dc_item, zbx
 {
 	zbx_pp_item_t		*pp_item;
 	zbx_pp_item_preproc_t	*pp_old = NULL;
-	int			steps_changed = 0;
 
 	if (NULL == (pp_item = (zbx_pp_item_t *)zbx_hashset_search(items, &dc_item->itemid)))
 	{
@@ -10463,7 +10454,12 @@ static void	dc_preproc_sync_item(zbx_hashset_t *items, ZBX_DC_ITEM *dc_item, zbx
 		pp_item = (zbx_pp_item_t *)zbx_hashset_insert(items, &pp_item_local, sizeof(pp_item_local));
 	}
 	else
-		pp_old = pp_item->preproc;
+	{
+		if (pp_item->revision < dc_item->revision)
+			pp_old = pp_item->preproc;
+		else
+			zbx_pp_item_preproc_release(pp_item->preproc);
+	}
 
 	pp_item->preproc = zbx_pp_item_preproc_create(dc_item->hostid, dc_item->type, dc_item->value_type, dc_item->flags);
 	pp_item->revision = revision;
@@ -10472,7 +10468,7 @@ static void	dc_preproc_sync_item(zbx_hashset_t *items, ZBX_DC_ITEM *dc_item, zbx
 		dc_preproc_sync_masteritem(pp_item->preproc, dc_item->master_item);
 
 	if (NULL != dc_item->preproc_item)
-		dc_preproc_sync_preprocitem(pp_item->preproc, dc_item->preproc_item, pp_old, &steps_changed);
+		dc_preproc_sync_preprocitem(pp_item->preproc, dc_item->preproc_item);
 
 	for (int i = 0; i < pp_item->preproc->steps_num; i++)
 	{
@@ -10485,13 +10481,9 @@ static void	dc_preproc_sync_item(zbx_hashset_t *items, ZBX_DC_ITEM *dc_item, zbx
 
 	if (NULL != pp_old)
 	{
-		if (0 == steps_changed)
-		{
-			pp_item->preproc->history = pp_old->history;
-			zbx_pp_item_preproc_release(pp_old, 0);
-		}
-		else
-			zbx_pp_item_preproc_release(pp_old, 1);
+		pp_item->preproc->history = pp_old->history;
+		pp_old->history = NULL;
+		zbx_pp_item_preproc_release(pp_old);
 	}
 }
 
@@ -10517,6 +10509,26 @@ static void	dc_preproc_add_item_rec(ZBX_DC_ITEM *dc_item, zbx_vector_dc_item_ptr
 			dc_preproc_add_item_rec(dep_item, items_sync);
 		}
 	}
+}
+
+static int	dc_preproc_item_changed(ZBX_DC_ITEM *dc_item, zbx_pp_item_t *pp_item)
+{
+	if (dc_item->type != pp_item->preproc->type)
+		return SUCCEED;
+
+	if (NULL != dc_item->master_item)
+	{
+		if (dc_item->master_item->revision > pp_item->revision)
+			return SUCCEED;
+	}
+
+	if (NULL != dc_item->preproc_item)
+	{
+		if (dc_item->preproc_item->revision > pp_item->revision)
+			return SUCCEED;
+	}
+
+	return FAIL;
 }
 
 /******************************************************************************
@@ -10585,15 +10597,20 @@ void	zbx_dc_config_get_preprocessable_items(zbx_hashset_t *items, zbx_dc_um_shar
 		{
 			/* Update unchanged item preprocessing revision and remove from sync list if already synced,  */
 			/* dependent items might have been unchanged but need to be added if their master is enabled. */
-			if (items_sync.values[i]->revision <= *revision &&
-					NULL != (pp_item = (zbx_pp_item_t *)zbx_hashset_search(items,
-						&items_sync.values[i]->itemid)))
+			ZBX_DC_ITEM	*dci = items_sync.values[i];
+
+			if (NULL != (pp_item = (zbx_pp_item_t *)zbx_hashset_search(items,
+						&dci->itemid)))
 			{
-				pp_item->revision = config->revision.config;
-				zbx_vector_dc_item_ptr_remove_noorder(&items_sync, i);
+				if (FAIL == dc_preproc_item_changed(dci, pp_item))
+				{
+					pp_item->revision = config->revision.config;
+					zbx_vector_dc_item_ptr_remove_noorder(&items_sync, i);
+					continue;
+				}
 			}
-			else
-				i++;
+
+			i++;
 		}
 
 		for (i = 0; i < items_sync.values_num; i++)

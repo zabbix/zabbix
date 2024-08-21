@@ -34,6 +34,7 @@ ZBX_VECTOR_DECL(pp_step_history, zbx_pp_step_history_t)
 typedef struct
 {
 	zbx_vector_pp_step_history_t	step_history;
+	unsigned int			refcount;
 }
 zbx_pp_history_t;
 
@@ -89,7 +90,7 @@ zbx_pp_item_preproc_t;
 zbx_pp_item_preproc_t	*zbx_pp_item_preproc_copy(zbx_pp_item_preproc_t *preproc);
 zbx_pp_item_preproc_t	*zbx_pp_item_preproc_create(zbx_uint64_t hostid, unsigned char type, unsigned char value_type,
 		unsigned char flags);
-void	zbx_pp_item_preproc_release(zbx_pp_item_preproc_t *preproc, int clear_history);
+void	zbx_pp_item_preproc_release(zbx_pp_item_preproc_t *preproc);
 int	zbx_pp_preproc_has_history(int type);
 
 typedef struct

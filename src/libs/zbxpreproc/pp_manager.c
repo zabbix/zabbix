@@ -930,7 +930,7 @@ static void	preprocessor_add_test_request(zbx_pp_manager_t *manager, zbx_ipc_cli
 	preproc = zbx_pp_item_preproc_create(0, 0, 0, 0);
 	zbx_preprocessor_unpack_test_request(preproc, &value, &ts, message->data);
 	zbx_pp_manager_queue_test(manager, preproc, &value, ts, client);
-	zbx_pp_item_preproc_release(preproc, 1);
+	zbx_pp_item_preproc_release(preproc);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -986,6 +986,7 @@ static void	preprocessor_reply_test_result(zbx_pp_task_t *task)
 
 	zbx_ipc_client_send(client, ZBX_IPC_PREPROCESSOR_TEST_RESULT, data, len);
 	zbx_free(data);
+	zbx_pp_history_free(history);
 }
 
 /******************************************************************************

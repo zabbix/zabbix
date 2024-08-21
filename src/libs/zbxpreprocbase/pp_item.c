@@ -64,7 +64,7 @@ void	zbx_pp_step_free(zbx_pp_step_t *step)
  * Purpose: free item preprocessing data                                      *
  *                                                                            *
  ******************************************************************************/
-static void	pp_item_preproc_free(zbx_pp_item_preproc_t *preproc, int clear_history)
+static void	pp_item_preproc_free(zbx_pp_item_preproc_t *preproc)
 {
 	for (int i = 0; i < preproc->steps_num; i++)
 	{
@@ -75,7 +75,7 @@ static void	pp_item_preproc_free(zbx_pp_item_preproc_t *preproc, int clear_histo
 	zbx_free(preproc->steps);
 	zbx_free(preproc->dep_itemids);
 
-	if (NULL != preproc->history && 1 == clear_history)
+	if (NULL != preproc->history)
 		zbx_pp_history_free(preproc->history);
 
 	zbx_free(preproc);
@@ -107,12 +107,12 @@ zbx_pp_item_preproc_t	*zbx_pp_item_preproc_copy(zbx_pp_item_preproc_t *preproc)
  * Parameters: preproc - [IN] item preprocessing data                         *
  *                                                                            *
  ******************************************************************************/
-void	zbx_pp_item_preproc_release(zbx_pp_item_preproc_t *preproc, int clear_history)
+void	zbx_pp_item_preproc_release(zbx_pp_item_preproc_t *preproc)
 {
 	if (NULL == preproc || 0 != --preproc->refcount)
 		return;
 
-	pp_item_preproc_free(preproc, clear_history);
+	pp_item_preproc_free(preproc);
 }
 
 /******************************************************************************
@@ -143,5 +143,5 @@ int	zbx_pp_preproc_has_history(int type)
 
 void	zbx_pp_item_clear(zbx_pp_item_t *item)
 {
-	zbx_pp_item_preproc_release(item->preproc, 1);
+	zbx_pp_item_preproc_release(item->preproc);
 }

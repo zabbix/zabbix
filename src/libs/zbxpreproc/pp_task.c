@@ -89,7 +89,7 @@ static void	pp_task_test_clear(zbx_pp_task_test_t *task)
 	zbx_variant_clear(&task->result);
 	pp_free_results(task->results, task->results_num);
 
-	zbx_pp_item_preproc_release(task->preproc, 1);
+	zbx_pp_item_preproc_release(task->preproc);
 	zbx_ipc_client_release(task->client);
 }
 
@@ -152,7 +152,7 @@ static void	pp_task_value_clear(zbx_pp_task_value_t *task)
 
 	zbx_variant_clear(&task->value);
 	zbx_variant_clear(&task->result);
-	zbx_pp_item_preproc_release(task->preproc, 1);
+	zbx_pp_item_preproc_release(task->preproc);
 	pp_cache_release(task->cache);
 	zbx_dc_um_shared_handle_release(task->um_handle);
 }
@@ -220,7 +220,7 @@ zbx_pp_task_t	*pp_task_dependent_create(zbx_uint64_t itemid, zbx_pp_item_preproc
  ******************************************************************************/
 static void	pp_task_dependent_clear(zbx_pp_task_dependent_t *task)
 {
-	zbx_pp_item_preproc_release(task->preproc, 1);
+	zbx_pp_item_preproc_release(task->preproc);
 	pp_cache_release(task->cache);
 
 	if (NULL != task->primary)
