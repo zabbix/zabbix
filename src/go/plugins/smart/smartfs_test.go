@@ -2724,9 +2724,10 @@ func TestPlugin_execute(t *testing.T) {
 			}
 
 			p := &Plugin{
-				ctl:         m,
-				workerCount: 1,
+				ctl: m,
 			}
+
+			cpuCount = 1
 
 			got, err := p.execute(tt.args.jsonRunner)
 			if (err != nil) != tt.wantErr {

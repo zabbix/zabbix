@@ -54,9 +54,8 @@ type Options struct {
 // Plugin -
 type Plugin struct {
 	plugin.Base
-	options     Options
-	ctl         SmartController
-	workerCount int
+	options Options
+	ctl     SmartController
 }
 
 func init() {

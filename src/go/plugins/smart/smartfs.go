@@ -78,7 +78,7 @@ var (
 )
 
 var (
-	ErrNoSmartStatus = errors.New("smartctl returned no smart status")
+	ErrNoSmartStatus = errs.New("smartctl returned no smart status")
 )
 
 // SmartCtlDeviceData describes all data collected from smartctl for a particular
@@ -259,7 +259,7 @@ func (p *Plugin) execute(jsonRunner bool) (*runner, error) {
 
 	var g errgroup.Group
 
-	g.SetLimit(p.workerCount)
+	g.SetLimit(cpuCount)
 
 	resultChan := make(chan *SmartCtlDeviceData)
 	collectorDone := make(chan struct{})
@@ -489,7 +489,7 @@ func getAllDeviceInfoByType(
 	}
 
 	if dp.SmartStatus == nil {
-		return nil, errs.New("smartctl returned no smart status")
+		return nil, ErrNoSmartStatus
 	}
 
 	dp.Info.Name = fmt.Sprintf("%s %s", deviceName, deviceType)
