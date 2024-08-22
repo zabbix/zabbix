@@ -144,7 +144,7 @@ class C70ImportConverterTest extends CImportConverterTest {
 														[
 															'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_INTEGER,
 															'name' => 'show.2',
-															'value' => '3',
+															'value' => '3'
 														],
 														[
 															'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_INTEGER,
@@ -157,7 +157,7 @@ class C70ImportConverterTest extends CImportConverterTest {
 															'value' => '30'
 														]
 													]
-												],
+												]
 											]
 										]
 									]
@@ -199,7 +199,7 @@ class C70ImportConverterTest extends CImportConverterTest {
 															'value' => '3'
 														]
 													]
-												],
+												]
 											]
 										]
 									]

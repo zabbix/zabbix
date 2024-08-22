@@ -142,11 +142,11 @@ class C70ImportConverter extends CConverter {
 
 						$fields_to_remove = ['time_size', 'date_size', 'tzone_size'];
 
-						$widget['fields'] = array_filter($widget['fields'],
+						$widget['fields'] = array_values(array_filter($widget['fields'],
 							static function (array $field) use ($fields_to_remove): bool {
 								return !in_array($field['name'], $fields_to_remove, true);
 							}
-						);
+						));
 					}
 				}
 				unset($widget);
