@@ -46,10 +46,14 @@
 					this.editProxyGroup(e.target.dataset.proxy_groupid);
 				}
 				else if (e.target.classList.contains('js-enable-host')) {
-					this.enable(e.target, {hostids: [e.target.dataset.hostid]});
+					if (window.confirm(<?= json_encode(_('Enable selected host?')) ?>)) {
+						this.enable(e.target, {hostids: [e.target.dataset.hostid]});
+					}
 				}
 				else if (e.target.classList.contains('js-disable-host')) {
-					this.disable(e.target, {hostids: [e.target.dataset.hostid]});
+					if (window.confirm(<?= json_encode(_('Disable selected host?')) ?>)) {
+						this.disable(e.target, {hostids: [e.target.dataset.hostid]});
+					}
 				}
 			});
 
