@@ -41,6 +41,10 @@
 #include <net-snmp/library/large_fd_set.h>
 #include "zbxself.h"
 
+#ifndef EVDNS_BASE_INITIALIZE_NAMESERVERS
+#	define EVDNS_BASE_INITIALIZE_NAMESERVERS	1
+#endif
+
 /*
  * SNMP Dynamic Index Cache
  * ========================
@@ -3682,7 +3686,7 @@ void	get_values_snmp(zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes,
 			goto out;
 		}
 
-		if (NULL == (dnsbase = evdns_base_new(snmp_result.base, 1)))
+		if (NULL == (dnsbase = evdns_base_new(snmp_result.base, EVDNS_BASE_INITIALIZE_NAMESERVERS)))
 		{
 			int	ret;
 

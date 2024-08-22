@@ -30,13 +30,17 @@
 #include "zbxstr.h"
 #include "zbxpoller.h"
 
+#ifndef EVDNS_BASE_INITIALIZE_NAMESERVERS
+#	define EVDNS_BASE_INITIALIZE_NAMESERVERS	1
+#endif
+
 static ZBX_THREAD_LOCAL int log_worker_id;
 
 static int	discovery_async_poller_dns_init(discovery_poller_config_t *poller_config)
 {
 	char	*timeout;
 
-	if (NULL == (poller_config->dnsbase = evdns_base_new(poller_config->base, 1)))
+	if (NULL == (poller_config->dnsbase = evdns_base_new(poller_config->base, EVDNS_BASE_INITIALIZE_NAMESERVERS)))
 	{
 		int	ret;
 

@@ -42,6 +42,10 @@
 
 #include <event2/dns.h>
 
+#ifndef EVDNS_BASE_INITIALIZE_NAMESERVERS
+#	define EVDNS_BASE_INITIALIZE_NAMESERVERS	1
+#endif
+
 static void	process_async_result(zbx_dc_item_context_t *item, zbx_poller_config_t *poller_config)
 {
 	zbx_timespec_t		timespec;
@@ -410,7 +414,7 @@ static void	async_poller_dns_init(zbx_poller_config_t *poller_config, zbx_thread
 {
 	char	*timeout;
 
-	if (NULL == (poller_config->dnsbase = evdns_base_new(poller_config->base, 1)))
+	if (NULL == (poller_config->dnsbase = evdns_base_new(poller_config->base, EVDNS_BASE_INITIALIZE_NAMESERVERS)))
 	{
 		int	ret;
 
