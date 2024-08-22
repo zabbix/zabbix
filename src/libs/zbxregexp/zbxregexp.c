@@ -1083,12 +1083,6 @@ int	zbx_regexp_repl(const char *string, const char *pattern, const char *output_
 			break;
 		}
 
-		if (ZBX_REGEX_REPL_TIMEOUT < zbx_time() - starttime)
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "timeout after %d matches %s()",
-					matches.values_num, __func__);
-			goto out;
-		}
 		shift = match->groups[0].rm_eo;
 
 		zbx_vector_match_append(&matches, match);
@@ -1097,6 +1091,13 @@ int	zbx_regexp_repl(const char *string, const char *pattern, const char *output_
 
 		if (shift == match->groups[0].rm_so)
 			shift++;
+
+		if (ZBX_REGEX_REPL_TIMEOUT < zbx_time() - starttime)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "timeout after %d matches %s()",
+					matches.values_num, __func__);
+			goto out;
+		}
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "replacing:%d matches %s()", matches.values_num, __func__);
