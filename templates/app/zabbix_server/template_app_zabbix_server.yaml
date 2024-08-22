@@ -980,7 +980,7 @@ zabbix_export:
           key: 'zabbix[proxy group,discovery]'
           history: '0'
           value_type: TEXT
-          description: 'The master item of Zabbix proxy groups statistics.'
+          description: 'The master item of Zabbix proxy groups'' statistics.'
           tags:
             - tag: component
               value: raw
@@ -1987,7 +1987,7 @@ zabbix_export:
               key: 'zabbix.proxy.group.settings[{#PROXY.GROUP.NAME}]'
               history: '0'
               value_type: TEXT
-              description: 'The settings for the discovered proxy.'
+              description: 'The settings for the discovered proxy group.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -2071,7 +2071,7 @@ zabbix_export:
               key: 'zabbix.proxy.group.stats[{#PROXY.GROUP.NAME}]'
               history: '0'
               value_type: TEXT
-              description: 'The statistics for the discovered proxy.'
+              description: 'The statistics for the discovered proxy group.'
               preprocessing:
                 - type: JSONPATH
                   parameters:

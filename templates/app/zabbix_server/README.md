@@ -40,7 +40,7 @@ Link this template to the local Zabbix server host.
 |----|-----------|----|-----------------------|
 |Zabbix stats cluster|<p>The master item of Zabbix cluster statistics.</p>|Zabbix internal|zabbix[cluster,discovery,nodes]|
 |Zabbix proxies stats|<p>The master item of Zabbix proxies' statistics.</p>|Zabbix internal|zabbix[proxy,discovery]|
-|Zabbix proxy groups stats|<p>The master item of Zabbix proxy groups statistics.</p>|Zabbix internal|zabbix[proxy group,discovery]|
+|Zabbix proxy groups stats|<p>The master item of Zabbix proxy groups' statistics.</p>|Zabbix internal|zabbix[proxy group,discovery]|
 |Queue over 10 minutes|<p>The number of monitored items in the queue, which are delayed at least by 10 minutes.</p>|Zabbix internal|zabbix[queue,10m]|
 |Queue|<p>The number of monitored items in the queue, which are delayed at least by 6 seconds.</p>|Zabbix internal|zabbix[queue]|
 |Utilization of alert manager internal processes, in %|<p>The average percentage of the time during which the alert manager processes have been busy for the last minute.</p>|Zabbix internal|zabbix[process,alert manager,avg,busy]|
@@ -210,11 +210,11 @@ Link this template to the local Zabbix server host.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Proxy group [{#PROXY.GROUP.NAME}]: Stats|<p>The statistics for the discovered proxy.</p>|Dependent item|zabbix.proxy.group.stats[{#PROXY.GROUP.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.rtdata["{#PROXY.GROUP.NAME}"]`</p></li></ul>|
+|Proxy group [{#PROXY.GROUP.NAME}]: Stats|<p>The statistics for the discovered proxy group.</p>|Dependent item|zabbix.proxy.group.stats[{#PROXY.GROUP.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.rtdata["{#PROXY.GROUP.NAME}"]`</p></li></ul>|
 |Proxy group [{#PROXY.GROUP.NAME}]: State|<p>State of the Zabbix proxy group.</p><p></p><p>Possible values:</p><p>0 - unknown;</p><p>1 - offline;</p><p>2 - recovering;</p><p>3 - online;</p><p>4 - degrading.</p>|Dependent item|zabbix.proxy.group.state[{#PROXY.GROUP.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.state`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
 |Proxy group [{#PROXY.GROUP.NAME}]: Available proxies|<p>Count of available proxies in the Zabbix proxy group.</p>|Dependent item|zabbix.proxy.group.avail.proxies[{#PROXY.GROUP.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.available`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
 |Proxy group [{#PROXY.GROUP.NAME}]: Available proxies, in %|<p>Percentage of available proxies in the Zabbix proxy group.</p>|Dependent item|zabbix.proxy.group.avail.proxies.percent[{#PROXY.GROUP.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.pavailable`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
-|Proxy group [{#PROXY.GROUP.NAME}]: Settings|<p>The settings for the discovered proxy.</p>|Dependent item|zabbix.proxy.group.settings[{#PROXY.GROUP.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data[?(@.name=="{#PROXY.GROUP.NAME}")].first()`</p></li></ul>|
+|Proxy group [{#PROXY.GROUP.NAME}]: Settings|<p>The settings for the discovered proxy group.</p>|Dependent item|zabbix.proxy.group.settings[{#PROXY.GROUP.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data[?(@.name=="{#PROXY.GROUP.NAME}")].first()`</p></li></ul>|
 |Proxy group [{#PROXY.GROUP.NAME}]: Failover period|<p>Failover period in the Zabbix proxy group.</p>|Dependent item|zabbix.proxy.group.failover[{#PROXY.GROUP.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.failover_delay`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
 |Proxy group [{#PROXY.GROUP.NAME}]: Minimum number of proxies|<p>Minimum number of proxies online in the Zabbix proxy group.</p>|Dependent item|zabbix.proxy.group.online.min[{#PROXY.GROUP.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.min_online`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
 
