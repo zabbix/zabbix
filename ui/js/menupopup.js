@@ -1541,8 +1541,8 @@ function appendTreeItem(tree, name, items, params) {
 /**
  * Build URL menu items from tree.
  *
- * @param {object} tree        Menu tree object to where menu items are.
- * @param {Node}   trigger_elm UI element which triggered opening of overlay dialogue.
+ * @param {object} tree         Menu tree object to where menu items are.
+ * @param {Node}   trigger_elm  UI element which triggered opening of overlay dialogue.
  *
  * @return {array}
  */
@@ -1553,12 +1553,12 @@ function getMenuPopupURLItems(tree, trigger_elm) {
 		Object.values(tree).map((data) => {
 			const item = {label: data.name};
 
-			if (typeof data.items !== 'undefined' && objectSize(data.items) > 0) {
+			if (data.items !== undefined && objectSize(data.items) > 0) {
 				item.items = getMenuPopupURLItems(data.items, trigger_elm);
 			}
 
-			if (typeof data.params !== 'undefined') {
-				if (data.params.scriptid) {
+			if (data.params !== undefined) {
+				if (data.params.scriptid !== undefined) {
 					item.clickCallback = function(e) {
 						jQuery(this)
 							.closest('.menu-popup-top')
