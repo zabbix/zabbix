@@ -392,7 +392,7 @@
 			let clear_checkboxes = false;
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'item.execute');
-			data['<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>'] = <?= json_encode(CCsrfTokenHelper::get('item')) ?>;
+			data[CSRF_TOKEN_NAME] = <?= json_encode(CCsrfTokenHelper::get('item')) ?>;
 
 			fetch(curl.getUrl(), {
 				method: 'POST',

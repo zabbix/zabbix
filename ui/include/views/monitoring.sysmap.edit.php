@@ -34,7 +34,7 @@ if ($data['form_refresh'] == 0) {
 // Create sysmap form.
 $form = (new CForm())
 	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
-	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('sysmaps.php')))->removeId())
+	->addItem((new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('sysmaps.php')))->removeId())
 	->setId('sysmap-form')
 	->setName('map.edit.php')
 	->addVar('form', getRequest('form', 1))
@@ -416,7 +416,7 @@ if (hasRequest('sysmapid') && getRequest('sysmapid') > 0 && getRequest('form') !
 		[
 			new	CButton('clone', _('Clone')),
 			new CButtonDelete(_('Delete selected map?'), url_params(['form', 'sysmapid']).'&'.
-				CCsrfTokenHelper::CSRF_TOKEN_NAME.'='.CCsrfTokenHelper::get('sysmaps.php')
+				CSRF_TOKEN_NAME.'='.CCsrfTokenHelper::get('sysmaps.php')
 			),
 			new CButtonCancel()
 		]

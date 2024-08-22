@@ -32,6 +32,7 @@ zabbix_export:
           key: ipmi.get
           history: '0'
           value_type: TEXT
+          trends: '0'
           description: 'The master item that receives all sensors with values for LLD and dependent elements from BMC.'
           tags:
             - tag: component
@@ -41,24 +42,30 @@ zabbix_export:
           name: 'Discrete sensors discovery'
           type: DEPENDENT
           key: ipmi.discrete.discovery
+          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#SENSOR_READING_TYPE}'
                 value: threshold
                 operator: NOT_MATCHES_REGEX
+                formulaid: A
               - macro: '{#SENSOR_TYPE}'
                 value: '{$IPMI.SENSOR_TYPE.MATCHES}'
+                formulaid: B
               - macro: '{#SENSOR_TYPE}'
                 value: '{$IPMI.SENSOR_TYPE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: C
           description: 'Discovery of the discrete IPMI sensors.'
           item_prototypes:
             - uuid: 6ce86fa51c614f94b2250e14af8d9385
               name: '{#SENSOR_ID}'
               type: DEPENDENT
               key: 'ipmi.state_text[{#SENSOR_ID}]'
+              delay: '0'
               value_type: CHAR
+              trends: '0'
               description: 'It is a state of the discrete IPMI sensor.'
               preprocessing:
                 - type: JSONPATH
@@ -99,22 +106,27 @@ zabbix_export:
           name: 'Threshold sensors discovery'
           type: DEPENDENT
           key: ipmi.sensors.discovery
+          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#SENSOR_READING_TYPE}'
                 value: threshold
+                formulaid: A
               - macro: '{#SENSOR_TYPE}'
                 value: '{$IPMI.SENSOR_TYPE.MATCHES}'
+                formulaid: B
               - macro: '{#SENSOR_TYPE}'
                 value: '{$IPMI.SENSOR_TYPE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: C
           description: 'Discovery of the threshold IPMI sensors.'
           item_prototypes:
             - uuid: 77e8c8c6e2444667b5da698c802dbae0
               name: '{#SENSOR_ID}, {#SENSOR_UNIT}'
               type: DEPENDENT
               key: 'ipmi.value[{#SENSOR_ID}]'
+              delay: '0'
               value_type: FLOAT
               description: 'It is a state of the threshold IPMI sensor.'
               preprocessing:

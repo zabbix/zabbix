@@ -118,6 +118,7 @@ zabbix_export:
           key: 'status.alarms[alarms.0]'
           history: 1h
           value_type: TEXT
+          trends: '0'
           description: |
             MIB: TRISTAR
             Description:Alarms
@@ -307,6 +308,7 @@ zabbix_export:
           key: 'status.faults[faults.0]'
           history: 1h
           value_type: TEXT
+          trends: '0'
           description: |
             MIB: TRISTAR
             Description:Battery voltage
@@ -572,6 +574,7 @@ zabbix_export:
           name: 'Battery voltage discovery'
           type: DEPENDENT
           key: battery.voltage.discovery
+          delay: '0'
           description: 'Discovery for battery voltage triggers'
           item_prototypes:
             - uuid: e1960caed8c44606bb684e28cdfac3c7
@@ -682,6 +685,7 @@ zabbix_export:
           name: 'Charge mode discovery'
           type: DEPENDENT
           key: controlmode.charge.discovery
+          delay: '0'
           lifetime: 1h
           description: 'Discovery for device in charge mode'
           item_prototypes:
@@ -762,6 +766,7 @@ zabbix_export:
           name: 'Charge + Diversion mode discovery'
           type: DEPENDENT
           key: controlmode.charge_diversion.discovery
+          delay: '0'
           lifetime: 1h
           description: 'Discovery for device in charge and diversion modes'
           item_prototypes:
@@ -841,6 +846,7 @@ zabbix_export:
           name: 'Diversion mode discovery'
           type: DEPENDENT
           key: controlmode.diversion.discovery
+          delay: '0'
           lifetime: 1h
           description: 'Discovery for device in diversion mode'
           item_prototypes:
@@ -878,6 +884,7 @@ zabbix_export:
           name: 'Load mode discovery'
           type: DEPENDENT
           key: controlmode.load.discovery
+          delay: '0'
           lifetime: 1h
           description: 'Discovery for device in load mode'
           item_prototypes:
@@ -940,6 +947,7 @@ zabbix_export:
           name: 'Load + Diversion mode discovery'
           type: DEPENDENT
           key: controlmode.load_diversion.discovery
+          delay: '0'
           lifetime: 1h
           description: 'Discovery for device in load and diversion modes'
           item_prototypes:

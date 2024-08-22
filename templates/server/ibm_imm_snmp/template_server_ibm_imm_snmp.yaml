@@ -117,7 +117,9 @@ zabbix_export:
           name: 'SNMP traps (fallback)'
           type: SNMP_TRAP
           key: snmptrap.fallback
+          delay: '0'
           value_type: LOG
+          trends: '0'
           description: 'The item is used to collect all SNMP traps unmatched by other snmptrap items'
           logtimefmt: 'hh:mm:sszyyyy/MM/dd'
           tags:
@@ -130,6 +132,7 @@ zabbix_export:
           key: 'system.contact[sysContact.0]'
           delay: 15m
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: SNMPv2-MIB
             The textual identification of the contact person for this managed node, together with information on how to contact this person.  If no contact information is known, the value is the zero-length string.
@@ -148,6 +151,7 @@ zabbix_export:
           key: 'system.descr[sysDescr.0]'
           delay: 15m
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: SNMPv2-MIB
             A textual description of the entity. This value should
@@ -167,6 +171,7 @@ zabbix_export:
           key: system.hw.model
           delay: 1h
           value_type: CHAR
+          trends: '0'
           description: 'MIB: IMM-MIB'
           inventory_link: MODEL
           preprocessing:
@@ -183,6 +188,7 @@ zabbix_export:
           key: system.hw.serialnumber
           delay: 1h
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: IMM-MIB
             Machine serial number VPD information
@@ -235,6 +241,7 @@ zabbix_export:
           key: 'system.location[sysLocation.0]'
           delay: 15m
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: SNMPv2-MIB
             Physical location of the node (e.g., `equipment room`, `3rd floor`). If not provided, the value is a zero-length string.
@@ -253,6 +260,7 @@ zabbix_export:
           key: system.name
           delay: 15m
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: SNMPv2-MIB
             An administratively-assigned name for this managed node.By convention, this is the node's fully-qualified domain name.  If the name is unknown, the value is the zero-length string.
@@ -302,6 +310,7 @@ zabbix_export:
           key: 'system.objectid[sysObjectID.0]'
           delay: 15m
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: SNMPv2-MIB
             The vendor's authoritative identification of the network management subsystem contained in the entity.  This value is allocated within the SMI enterprises subtree (1.3.6.1.4.1) and provides an easy and unambiguous means for determining`what kind of box' is being managed.  For example, if vendor`Flintstones, Inc.' was assigned the subtree1.3.6.1.4.1.4242, it could assign the identifier 1.3.6.1.4.1.4242.1.1 to its `Fred Router'.
@@ -434,6 +443,7 @@ zabbix_export:
               key: 'sensor.fan.status[fanHealthStatus.{#SNMPINDEX}]'
               delay: 3m
               value_type: CHAR
+              trends: '0'
               description: |
                 MIB: IMM-MIB
                 A description of the fan component status.
@@ -464,6 +474,7 @@ zabbix_export:
               key: 'system.hw.physicaldisk.part_number[diskFruName.{#SNMPINDEX}]'
               delay: 1h
               value_type: CHAR
+              trends: '0'
               description: |
                 MIB: IMM-MIB
                 disk module FRU name.
@@ -479,6 +490,7 @@ zabbix_export:
               key: 'system.hw.physicaldisk.status[diskHealthStatus.{#SNMPINDEX}]'
               delay: 3m
               value_type: CHAR
+              trends: '0'
               description: 'MIB: IMM-MIB'
               tags:
                 - tag: component
@@ -512,6 +524,7 @@ zabbix_export:
               key: 'sensor.psu.status[powerHealthStatus.{#SNMPINDEX}]'
               delay: 3m
               value_type: CHAR
+              trends: '0'
               description: |
                 MIB: IMM-MIB
                 A description of the power module status.
@@ -538,6 +551,7 @@ zabbix_export:
             conditions:
               - macro: '{#SNMPVALUE}'
                 value: '(DIMM|PSU|PCH|RAID|RR|PCI).*'
+                formulaid: A
           description: 'Scanning IMM-MIB::tempTable'
           item_prototypes:
             - uuid: 02af08c624bc444aae5d1f1b8f8b5d4a
@@ -610,6 +624,7 @@ zabbix_export:
             conditions:
               - macro: '{#SNMPVALUE}'
                 value: 'Ambient.*'
+                formulaid: A
           description: 'Scanning IMM-MIB::tempTable with Ambient filter'
           item_prototypes:
             - uuid: c29ef915c0a6419eabd041ea34775c45
@@ -682,6 +697,7 @@ zabbix_export:
             conditions:
               - macro: '{#SNMPVALUE}'
                 value: 'CPU [0-9]* Temp'
+                formulaid: A
           description: 'Scanning IMM-MIB::tempTable with CPU filter'
           item_prototypes:
             - uuid: 87da5286971d4f6487c3220c85850658

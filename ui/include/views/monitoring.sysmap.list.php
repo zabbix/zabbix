@@ -36,7 +36,7 @@ $html_page = (new CHtmlPage())
 						->onClick(
 							'return PopUp("popup.import", '.
 								json_encode([ 'rules_preset' => 'map',
-									CCsrfTokenHelper::CSRF_TOKEN_NAME => CCsrfTokenHelper::get('import')
+									CSRF_TOKEN_NAME => CCsrfTokenHelper::get('import')
 								]).
 						', {
 								dialogueid: "popup_import",
