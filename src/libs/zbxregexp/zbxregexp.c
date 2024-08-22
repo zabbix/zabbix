@@ -15,6 +15,7 @@
 #include "zbxregexp.h"
 
 #include "zbxstr.h"
+#include "zbxtime.h"
 
 #ifdef HAVE_PCRE_H
 #ifdef HAVE_PCRE2_H
@@ -67,6 +68,7 @@ zbx_regmatch_t;
 #define ZBX_REGEXP_GROUPS_MAX	10	/* Max number of supported capture groups in regular expressions. */
 					/* Group \0 contains the matching part of string, groups \1 ...\9 */
 					/* contain captured groups (substrings).                          */
+#define ZBX_REGEX_REPL_TIMEOUT	3	/* Regex matches processing timeout in seconds */
 
 ZBX_PTR_VECTOR_IMPL(expression, zbx_expression_t *)
 
@@ -1043,6 +1045,7 @@ int	zbx_regexp_repl(const char *string, const char *pattern, const char *output_
 	char			*out_str = zbx_strdup(NULL, string), *error = NULL;
 	zbx_vector_match_t	matches;
 	size_t			i;
+	double			starttime = zbx_time();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() len:%d", __func__, len);
 
@@ -1080,6 +1083,12 @@ int	zbx_regexp_repl(const char *string, const char *pattern, const char *output_
 			break;
 		}
 
+		if (ZBX_REGEX_REPL_TIMEOUT < zbx_time() - starttime)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "timeout after %d matches %s()",
+					matches.values_num, __func__);
+			goto out;
+		}
 		shift = match->groups[0].rm_eo;
 
 		zbx_vector_match_append(&matches, match);
