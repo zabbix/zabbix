@@ -31,7 +31,6 @@ class testDataDisplayInGraphs extends CWebTest {
 	protected static $hostid;
 	protected static $itemids;
 	protected static $dashboardid;
-	protected static $db_type;
 
 	const TIMESTAMPS = [
 			'history' => [
@@ -2110,9 +2109,6 @@ class testDataDisplayInGraphs extends CWebTest {
 		]);
 
 		self::$dashboardid = $dashboard_responce['dashboardids'][0];
-
-		global $DB;
-		self::$db_type = $DB['TYPE'];
 	}
 
 	public function getMonitoringGraphData() {
@@ -2170,6 +2166,7 @@ class testDataDisplayInGraphs extends CWebTest {
 
 		// Set time selector to display the time period, required for the corresponding data type.
 		$this->setTimeSelector(self::TIMESTAMPS[$data['type']]);
+		$this->page->waitUntilReady();
 
 		// Switch to filter tab and fill in the name pattern to return only graphs with certain type.
 		CFilterElement::find()->one()->selectTab('Filter');
@@ -2181,7 +2178,10 @@ class testDataDisplayInGraphs extends CWebTest {
 			: 'monitoring_hosts_'.$data['type'].'_';
 
 		// Check screenshots of graphs for each option in 'Show' field.
-		foreach (['All graphs', 'Host graphs', 'Simple graphs'] as $show) {
+		$show_data = $data['type'] === 'trends'
+			? ['All graphs' => 8, 'Host graphs' => 6, 'Simple graphs' => 2]
+			: ['All graphs' => 6, 'Host graphs' => 4, 'Simple graphs' => 2];
+		foreach ($show_data as $show => $count) {
 			// Pie widget displays data in non-fixed time period, so only host graph screenshot will not differ each time.
 			if ($data['type'] === 'pie' && $show !== 'Host graphs') {
 				continue;
@@ -2194,6 +2194,7 @@ class testDataDisplayInGraphs extends CWebTest {
 			}
 
 			$filter_form->submit();
+			$this->page->waitUntilReady();
 
 			// Switch to kiosk mode if screenshot needs to be checked in Kiosk mode.
 			if (CTestArrayHelper::get($data, 'kiosk_mode')) {
@@ -2203,11 +2204,11 @@ class testDataDisplayInGraphs extends CWebTest {
 
 			// Wait for all graphs to load and check the screenshots of all graphs of the desired type.
 			$charts_table = $this->query('id:charts')->waitUntilVisible()->one();
-			foreach ($charts_table->query('class:center')->all() as $graph) {
+			foreach ($charts_table->query('class:center')->waitUntilCount($count)->all() as $graph) {
 				$graph->waitUntilClassesNotPresent('is-loading');
 			}
 
-			$this->assertScreenshot($charts_table, $screenshot_string.$show.self::$db_type);
+			$this->assertScreenshot($charts_table, $screenshot_string.$show);
 
 			// Switch back to normal view to avoid impacting following scenarios.
 			if (CTestArrayHelper::get($data, 'kiosk_mode')) {
@@ -2250,7 +2251,7 @@ class testDataDisplayInGraphs extends CWebTest {
 
 		// Wait for the image source to change and check graph screenshot.
 		$image->waitUntilAttributesNotPresent(['src' => $old_source]);
-		$screenshot_id = 'latest_data_'.$data['type'].self::$db_type;
+		$screenshot_id = 'latest_data_'.$data['type'];
 		$this->assertScreenshot($this->query('class:center')->one(), $screenshot_id);
 
 		$this->checkKioskMode('class:center', $screenshot_id);
@@ -2320,7 +2321,7 @@ class testDataDisplayInGraphs extends CWebTest {
 			$dashboard->waitUntilReady();
 		}
 
-		$screenshot_id = 'dashboard_'.$data['page'].'_page_'.CTestArrayHelper::get($data, 'type', 'svg').self::$db_type;
+		$screenshot_id = 'dashboard_'.$data['page'].'_page_'.CTestArrayHelper::get($data, 'type', 'svg');
 		$this->assertScreenshot($dashboard, $screenshot_id);
 
 		$this->checkKioskMode('class:dashboard-grid', $screenshot_id);

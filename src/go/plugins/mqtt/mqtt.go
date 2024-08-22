@@ -15,7 +15,6 @@
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-**
 **/
 
 /*
@@ -27,18 +26,17 @@
 package mqtt
 
 import (
-	"crypto/rand"
 	"crypto/tls"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"math/rand"
 	"net/url"
 	"strings"
 	"time"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"golang.zabbix.com/agent2/pkg/itemutil"
-	"golang.zabbix.com/agent2/pkg/version"
 	"golang.zabbix.com/agent2/pkg/watch"
 	"golang.zabbix.com/sdk/metric"
 	"golang.zabbix.com/sdk/plugin"
@@ -284,10 +282,6 @@ func (p *Plugin) EventSourceByKey(rawKey string) (es watch.EventSource, err erro
 		return nil, err
 	}
 
-	if err != nil {
-		return nil, err
-	}
-
 	topic := params["Topic"]
 	username := params["User"]
 	password := params["Password"]
@@ -304,7 +298,8 @@ func (p *Plugin) EventSourceByKey(rawKey string) (es watch.EventSource, err erro
 	var client *mqttClient
 	var ok bool
 
-	opt, err := p.createOptions(getClientID(),
+	opt, err := p.createOptions(
+		getClientID(rand.NewSource(time.Now().UnixNano())),
 		username,
 		password,
 		broker,
@@ -343,14 +338,20 @@ func (p *Plugin) EventSourceByKey(rawKey string) (es watch.EventSource, err erro
 	return sub, nil
 }
 
-func getClientID() string {
-	b := make([]byte, 16)
-	_, err := rand.Read(b)
-	if err != nil {
-		impl.Errf("failed to generate a uuid for mqtt Client ID: %s", err.Error)
-		return "Zabbix agent 2 " + version.Long()
+func getClientID(src rand.Source) string {
+	const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+
+	var result = make([]byte, 8)
+
+	//nolint:gosec
+	// we are okey with using a weaker random number generator as this is not intended to be a secure token
+	r := rand.New(src)
+
+	for i := range result {
+		result[i] = charset[r.Intn(len(charset))]
 	}
-	return fmt.Sprintf("Zabbix agent 2 %s %x-%x-%x-%x-%x", version.Long(), b[0:4], b[4:6], b[6:8], b[8:10], b[10:])
+
+	return "ZabbixAgent2" + string(result)
 }
 
 func hasWildCards(topic string) bool {

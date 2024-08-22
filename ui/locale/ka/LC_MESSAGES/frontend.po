@@ -4378,6 +4378,10 @@ msgstr "მედიის ტიპის შექმნა"
 msgid "Create new"
 msgstr "ახლის შექმნა"
 
+#: jsLoader.php:363
+msgid "Create new report"
+msgstr ""
+
 #: app/views/administration.proxy.list.php:37
 msgid "Create proxy"
 msgstr "პროქსის შექმნა"
@@ -6776,6 +6780,10 @@ msgstr ""
 msgid "Failed to update dashboard properties."
 msgstr ""
 
+#: app/views/js/popup.dashboard.share.edit.js.php:86
+msgid "Failed to update dashboard sharing."
+msgstr ""
+
 #: jsLoader.php:142
 msgid "Failed to update widget properties."
 msgstr ""
@@ -7892,6 +7900,10 @@ msgstr ""
 msgid "Host group elements"
 msgstr "ჰოსტის ჯგუფის ელემენტები"
 
+#: jsLoader.php:287
+msgid "Host group is not selected."
+msgstr ""
+
 #: include/views/monitoring.sysmap.edit.php:165
 msgid "Host group label type"
 msgstr "ჰოსტების ჯგუფის ჭდის ტიპი"
@@ -7965,6 +7977,10 @@ msgstr "ჰოსტის ინვენტარი"
 #: hostinventoriesoverview.php:26 hostinventoriesoverview.php:146
 msgid "Host inventory overview"
 msgstr "ჰოსტის ინვენტარის მიმოხილვა"
+
+#: jsLoader.php:284
+msgid "Host is not selected."
+msgstr ""
 
 #: include/views/monitoring.sysmap.edit.php:180
 msgid "Host label type"
@@ -11142,6 +11158,10 @@ msgstr "რუკის ელემენტი ჭდის მდებარ
 msgid "Map element label type"
 msgstr "რუკის ელემენტის ჭდის ტიპი"
 
+#: jsLoader.php:285
+msgid "Map is not selected."
+msgstr ""
+
 #: sysmap.php:128
 msgid "Map is updated! Return to map list?"
 msgstr ""
@@ -13070,6 +13090,18 @@ msgstr "ერთი"
 #: app/views/popup.maintenance.period.php:75 include/maintenances.inc.php:25
 msgid "One time only"
 msgstr "მხოლოდ ერთხელ"
+
+#: include/classes/api/services/CUser.php:800
+#: include/classes/api/services/CUser.php:807
+#, c-format
+msgid "Only Super admin or Admin users can update \"%1$s\" parameter."
+msgstr ""
+
+#: include/classes/api/services/CUser.php:725
+#: include/classes/api/services/CUser.php:766
+#, c-format
+msgid "Only Super admin users can update \"%1$s\" parameter."
+msgstr ""
 
 #: include/classes/api/services/CDRule.php:488
 msgid "Only Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 checks can be made unique."
@@ -15077,6 +15109,12 @@ msgstr ""
 #: app/views/js/administration.regex.edit.js.php:172
 #: include/classes/helpers/CRegexHelper.php:29
 msgid "Result is TRUE"
+msgstr ""
+
+#: app/controllers/CControllerPopupItemTestSend.php:433
+#: app/controllers/CControllerPopupItemTestSend.php:461
+#, c-format
+msgid "Result is truncated due to its size (%1$s)."
 msgstr ""
 
 #: app/views/popup.testtriggerexpr.php:30
@@ -17964,6 +18002,10 @@ msgstr ""
 msgid "Trigger in template \"%1$s\" has dependency with trigger in template \"%2$s\"."
 msgstr ""
 
+#: jsLoader.php:286
+msgid "Trigger is not selected."
+msgstr ""
+
 #: include/views/monitoring.sysmap.edit.php:195
 msgid "Trigger label type"
 msgstr ""
@@ -19604,6 +19646,10 @@ msgstr "ნახვა"
 msgid "View as"
 msgstr ""
 
+#: jsLoader.php:397
+msgid "View related reports"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1234
 msgid "Virtual space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr ""
@@ -20139,6 +20185,10 @@ msgstr ""
 
 #: include/func.inc.php:1724
 msgid "You must login to view this page."
+msgstr ""
+
+#: jsLoader.php:282
+msgid "You need to have at least one image uploaded to create map element. Images can be uploaded in Administration->General->Images section."
 msgstr ""
 
 #: include/classes/db/DB.php:135
@@ -21856,6 +21906,10 @@ msgstr "მარჯვენა"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:924
 msgid "right() - Returns the rightmost count characters"
+msgstr ""
+
+#: jsLoader.php:199
+msgid "root"
 msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:937

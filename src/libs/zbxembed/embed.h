@@ -22,6 +22,7 @@
 
 #include "common.h"
 #include "duktape.h"
+#include "zbxalgo.h"
 
 #define ZBX_ES_LOG_MEMORY_LIMIT	(ZBX_MEBIBYTE * 8)
 #define ZBX_ES_LOG_MSG_LIMIT	8000
@@ -53,10 +54,16 @@ struct zbx_es_env
 
 	int		http_req_objects;
 	int		logged_msgs;
+
+	zbx_hashset_t	objmap;
 };
 
 zbx_es_env_t	*zbx_es_get_env(duk_context *ctx);
 
 int	es_duktape_string_decode(const char *duk_str, char **out_str);
+
+void	es_obj_attach_data(zbx_es_env_t *env, void *data);
+void	*es_obj_get_data(zbx_es_env_t *env);
+void	*es_obj_detach_data(zbx_es_env_t *env);
 
 #endif /* ZABBIX_EMBED_H */

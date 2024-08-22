@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-05-07T08:24:06Z'
+  date: '2024-06-12T11:59:26Z'
   groups:
     - uuid: 846977d1dfed4968bc5f8bdb363285bc
       name: 'Templates/Operating systems'
@@ -372,17 +372,6 @@ zabbix_export:
           tags:
             - tag: component
               value: system
-          triggers:
-            - uuid: c5c52f75d4214a68b095e8bf55a6a934
-              expression: 'fuzzytime(/Windows by Zabbix agent active/system.localtime,{$SYSTEM.FUZZYTIME.MAX})=0'
-              name: 'Windows: System time is out of sync'
-              event_name: 'Windows: System time is out of sync (diff with Zabbix server > {$SYSTEM.FUZZYTIME.MAX}s)'
-              priority: WARNING
-              description: 'The host''s system time is different from Zabbix server time.'
-              manual_close: 'YES'
-              tags:
-                - tag: scope
-                  value: notice
         - uuid: 16a7ae509f0c4f9d8631efae88fe6324
           name: 'Windows: Operating system architecture'
           type: ZABBIX_ACTIVE
@@ -1367,9 +1356,6 @@ zabbix_export:
         - macro: '{$SWAP.PFREE.MIN.WARN}'
           value: '20'
           description: 'The warning threshold of the minimum free swap.'
-        - macro: '{$SYSTEM.FUZZYTIME.MAX}'
-          value: '60'
-          description: 'The threshold for difference of system time in seconds.'
         - macro: '{$VFS.DEV.DEVNAME.MATCHES}'
           value: '.*'
           description: 'This macro is used in physical disks discovery. Can be overridden on the host or linked template level.'

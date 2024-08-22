@@ -19,7 +19,7 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix],[6.0.30rc1])
+AC_INIT([Zabbix],[6.0.34rc1])
 AC_CONFIG_SRCDIR(src/zabbix_server/server.c)
 AM_INIT_AUTOMAKE([subdir-objects tar-pax])
 
@@ -48,7 +48,7 @@ dnl *****************************************************************
 
 AC_PROG_EGREP
 
-AC_CHECK_HEADERS(stdio.h stdlib.h string.h unistd.h netdb.h signal.h \
+AC_CHECK_HEADERS(stdio.h stdlib.h string.h unistd.h netdb.h signal.h malloc.h \
   syslog.h time.h errno.h sys/types.h sys/stat.h netinet/in.h \
   math.h sys/socket.h dirent.h ctype.h \
   fcntl.h sys/param.h arpa/inet.h \
@@ -57,7 +57,7 @@ AC_CHECK_HEADERS(stdio.h stdlib.h string.h unistd.h netdb.h signal.h \
   sys/time.h kstat.h sys/syscall.h sys/sysmacros.h \
   stdint.h mach/host_info.h mach/mach_host.h pwd.h \
   sys/var.h arpa/nameser.h assert.h sys/dkstat.h sys/disk.h sys/sched.h \
-  zone.h nlist.h kvm.h linux/kernel.h procinfo.h sys/dk.h \
+  zone.h nlist.h kvm.h procinfo.h sys/dk.h \
   sys/resource.h pthread.h windows.h process.h conio.h sys/wait.h \
   stdarg.h winsock2.h pdh.h psapi.h sys/sem.h sys/ipc.h sys/shm.h Winldap.h \
   Winber.h lber.h ws2tcpip.h inttypes.h sys/file.h grp.h \
@@ -884,6 +884,7 @@ AC_CHECK_FUNCS(tzset)
 AC_CHECK_FUNCS(unsetenv)
 AC_CHECK_FUNCS(sigqueue)
 AC_CHECK_FUNCS(round)
+AC_CHECK_FUNCS(malloc_trim)
 
 dnl *****************************************************************
 dnl *                                                               *

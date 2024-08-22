@@ -256,11 +256,6 @@ This template has been tested on:
 
 Refer to the vendor documentation.
 
-### Macros used
-
-|Name|Description|Default|
-|----|-----------|-------|
-|{$SYSTEM.FUZZYTIME.MAX}|<p>The threshold for difference of system time in seconds.</p>|`60`|
 
 ### Items
 
@@ -279,7 +274,6 @@ Refer to the vendor documentation.
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
 |Windows: Host has been restarted|<p>The device uptime is less than 10 minutes.</p>|`last(/Windows generic by Zabbix agent active/system.uptime)<10m`|Warning|**Manual close**: Yes|
-|Windows: System time is out of sync|<p>The host's system time is different from Zabbix server time.</p>|`fuzzytime(/Windows generic by Zabbix agent active/system.localtime,{$SYSTEM.FUZZYTIME.MAX})=0`|Warning|**Manual close**: Yes|
 |Windows: System name has changed|<p>The name of the system has changed. Acknowledge to close the problem manually.</p>|`change(/Windows generic by Zabbix agent active/system.hostname) and length(last(/Windows generic by Zabbix agent active/system.hostname))>0`|Info|**Manual close**: Yes|
 
 # Windows network by Zabbix agent active
