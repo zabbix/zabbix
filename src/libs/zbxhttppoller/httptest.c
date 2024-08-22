@@ -215,8 +215,7 @@ static void	httppairs_free(zbx_vector_ptr_pair_t *pairs)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: resolves macros in HTTP test field                                *
- *          (ZBX_MACRO_TYPE_HTTPTEST_FIELD) context                           *
+ * Purpose: resolves macros in HTTP test field context                        *
  *                                                                            *
  * Parameters: p            - [IN] macro resolver data structure              *
  *             args         - [IN] list of variadic parameters                *
