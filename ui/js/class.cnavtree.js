@@ -143,6 +143,11 @@ if (typeof (zbx_widget_navtree_trigger) !== typeof (Function)) {
 				clearTimeout(this.changing_parent);
 			}
 
+			this.dragDirection = {
+				vertical: this._getDragVerticalDirection(),
+				horizontal: this._getDragHorizontalDirection()
+			};
+
 			// re-arrange
 			for (var i = this.items.length - 1; i >= 0; i--) {
 
