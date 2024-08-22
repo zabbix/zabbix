@@ -189,13 +189,13 @@ class CMacroFunction {
 
 		[$searchlist, $replacementlist] = $parameters;
 
-		if ($searchlist === '' || $replacementlist === '') {
-			return $value;
-		}
-
 		// Expand the parameters, in case escape characters or ranges are used.
 		$searchlist = self::expandParameters($searchlist);
 		$replacementlist = self::expandParameters($replacementlist);
+
+		if ($searchlist === '' || $replacementlist === '') {
+			return $value;
+		}
 
 		// In case of incorrect parameters (e.g., invalid range) return UNKNOWN macro string.
 		if ($searchlist === UNRESOLVED_MACRO_STRING || $replacementlist === UNRESOLVED_MACRO_STRING) {
