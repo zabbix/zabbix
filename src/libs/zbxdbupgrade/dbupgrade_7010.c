@@ -90,7 +90,7 @@ static int	DBpatch_7010004(void)
 
 	if (ZBX_DB_OK > zbx_db_execute(
 			"delete from widget_field"
-			" where name in ('time_size','data_size','tzone_size')"
+			" where name in ('time_size','date_size','tzone_size')"
 				" and widgetid in (select widgetid from widget where type='clock')"))
 	{
 		return FAIL;
