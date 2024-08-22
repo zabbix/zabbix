@@ -3434,7 +3434,6 @@ out:
  *             get_config_forks        - [IN]                                   *
  *             program_type            - [IN]                                   *
  *             escalationids           - [IN]                                   *
- *             triggerids              - [IN]                                   *
  *                                                                              *
  * Return value: count of deleted escalations                                   *
  *                                                                              *
@@ -3449,7 +3448,7 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 		const char *default_timezone, int process_num, int config_timeout, int config_trapper_timeout,
 		const char *config_source_ip, const char *config_ssh_key_location,
 		zbx_get_config_forks_f get_config_forks, int config_enable_global_scripts, unsigned char program_type,
-		zbx_vector_uint64_t *escalationids, zbx_vector_uint64_t *triggerids)
+		zbx_vector_uint64_t *escalationids)
 {
 	int				ret = 0;
 	zbx_db_result_t			result;
@@ -3467,14 +3466,10 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 	zbx_vector_uint64_create(&eventids);
 	zbx_vector_uint64_create(&problem_eventids);
 
-	if (((NULL != escalationids) && (NULL != triggerids)) && ((0 != escalationids->values_num) ||
-			(0 != triggerids->values_num)))
+	if (NULL != escalationids && 0 != escalationids->values_num)
 	{
 		zbx_db_add_condition_alloc(&filter, &filter_alloc, &filter_offset, "escalationid",
 				escalationids->values, escalationids->values_num);
-		zbx_strcpy_alloc(&filter, &filter_alloc, &filter_offset, " and ");
-		zbx_db_add_condition_alloc(&filter, &filter_alloc, &filter_offset, "triggerid",
-				triggerids->values, triggerids->values_num);
 	}
 	else
 	{
@@ -3623,6 +3618,21 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 	return ret;	/* performance metric */
 }
 
+static	void deserialize_escalationids(zbx_vector_uint64_t *escalationids, const unsigned char *data)
+{
+	zbx_uint64_t		escalationid;
+	int			size;
+	const unsigned char	*ptr = data;
+
+	ptr += zbx_deserialize_value(ptr, &size);
+
+	for (int i = 0; i < size; i++)
+	{
+		ptr += zbx_deserialize_value(ptr, &escalationid);
+		zbx_vector_uint64_append(escalationids, escalationid);
+	}
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: periodically checks table escalations and generates alerts        *
@@ -3632,9 +3642,11 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
  ******************************************************************************/
 ZBX_THREAD_ENTRY(escalator_thread, args)
 {
+#define ESCALATOR_BATCH_SIZE	1000
+
 	zbx_thread_escalator_args	*escalator_args_in = (zbx_thread_escalator_args *)
 							(((zbx_thread_args_t *)args)->args);
-	int				sleeptime = -1, sleeptime_after_notify = 0, escalations_count = 0,
+	int				sleeptime = -1, escalations_count = 0,
 					old_escalations_count = 0, notify = 0;
 	double				total_sec = 0.0, old_total_sec = 0.0;
 	time_t				last_stat_time;
@@ -3646,6 +3658,7 @@ ZBX_THREAD_ENTRY(escalator_thread, args)
 	zbx_ipc_async_socket_t		rtc;
 	zbx_ipc_socket_t		alerter;
 	char				*error = NULL;
+	zbx_vector_uint64_t		escalationids;
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
@@ -3671,20 +3684,17 @@ ZBX_THREAD_ENTRY(escalator_thread, args)
 	zbx_rtc_subscribe(process_type, process_num, rtc_msgs, ARRSIZE(rtc_msgs), escalator_args_in->config_timeout,
 			&rtc);
 
+	zbx_vector_uint64_create(&escalationids);
+
 	while (ZBX_IS_RUNNING())
 	{
-		int			now, nextcheck, ret;
+		int			now, nextcheck;
 		double			sec;
 		zbx_config_t		cfg;
 		zbx_uint32_t		rtc_cmd;
-		time_t			wait_start_time;
-		zbx_vector_uint64_t	escalationids, triggerids;
 
 #		define STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not */
 						/* faster than once in STAT_INTERVAL seconds */
-
-		zbx_vector_uint64_create(&escalationids);
-		zbx_vector_uint64_create(&triggerids);
 
 		sec = zbx_time();
 		zbx_update_env(get_process_type_string(process_type), sec);
@@ -3698,50 +3708,29 @@ ZBX_THREAD_ENTRY(escalator_thread, args)
 
 		zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_DEFAULT_TIMEZONE);
 
-		if (NULL != rtc_data && 0 != notify)
-		{
-			zbx_uint64_t	escalationid, triggerid;
-			zbx_uint32_t	notify_size;
-			unsigned char	*ptr = rtc_data;
-
-			ptr += zbx_deserialize_value(ptr, &notify_size);
-
-			for (zbx_uint32_t i = 0; i < notify_size; i++)
-			{
-				ptr += zbx_deserialize_value(ptr, &escalationid);
-				zbx_vector_uint64_append(&escalationids, escalationid);
-				ptr += zbx_deserialize_value(ptr, &triggerid);
-				zbx_vector_uint64_append(&triggerids, triggerid);
-			}
-
-			zbx_free(rtc_data);
-		}
-
 		nextcheck = time(NULL) + CONFIG_ESCALATOR_FREQUENCY;
 		escalations_count += process_escalations(time(NULL), &nextcheck, ZBX_ESCALATION_SOURCE_TRIGGER,
 				cfg.default_timezone, process_num, escalator_args_in->config_timeout,
 				escalator_args_in->config_trapper_timeout, escalator_args_in->config_source_ip,
 				escalator_args_in->config_ssh_key_location, escalator_args_in->get_process_forks_cb_arg,
-				escalator_args_in->config_enable_global_scripts, info->program_type, &escalationids,
-				&triggerids);
+				escalator_args_in->config_enable_global_scripts, info->program_type, &escalationids);
 		escalations_count += process_escalations(time(NULL), &nextcheck, ZBX_ESCALATION_SOURCE_ITEM,
 				cfg.default_timezone, process_num, escalator_args_in->config_timeout,
 				escalator_args_in->config_trapper_timeout, escalator_args_in->config_source_ip,
 				escalator_args_in->config_ssh_key_location, escalator_args_in->get_process_forks_cb_arg,
-				escalator_args_in->config_enable_global_scripts, info->program_type, NULL, NULL);
+				escalator_args_in->config_enable_global_scripts, info->program_type, NULL);
 		escalations_count += process_escalations(time(NULL), &nextcheck, ZBX_ESCALATION_SOURCE_SERVICE,
 				cfg.default_timezone, process_num, escalator_args_in->config_timeout,
 				escalator_args_in->config_trapper_timeout, escalator_args_in->config_source_ip,
 				escalator_args_in->config_ssh_key_location, escalator_args_in->get_process_forks_cb_arg,
-				escalator_args_in->config_enable_global_scripts, info->program_type, NULL, NULL);
+				escalator_args_in->config_enable_global_scripts, info->program_type, NULL);
 		escalations_count += process_escalations(time(NULL), &nextcheck, ZBX_ESCALATION_SOURCE_DEFAULT,
 				cfg.default_timezone, process_num, escalator_args_in->config_timeout,
 				escalator_args_in->config_trapper_timeout, escalator_args_in->config_source_ip,
 				escalator_args_in->config_ssh_key_location, escalator_args_in->get_process_forks_cb_arg,
-				escalator_args_in->config_enable_global_scripts, info->program_type, NULL, NULL);
+				escalator_args_in->config_enable_global_scripts, info->program_type, NULL);
 
-		zbx_vector_uint64_destroy(&escalationids);
-		zbx_vector_uint64_destroy(&triggerids);
+		zbx_vector_uint64_clear(&escalationids);
 
 		if (0 != notify)
 			(void)zbx_ipc_socket_write(&alerter, ZBX_IPC_ALERTER_SYNC_ALERTS, NULL, 0);
@@ -3777,39 +3766,42 @@ ZBX_THREAD_ENTRY(escalator_thread, args)
 		}
 
 		notify = 0;
-		wait_start_time = time(NULL);
 
 		do
 		{
-			if (0 == sleeptime_after_notify)
-				sleeptime_after_notify = sleeptime;
-			zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
-			ret = zbx_rtc_wait(&rtc, info, &rtc_cmd, &rtc_data, sleeptime_after_notify);
-			zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
-			sleeptime_after_notify -= (int)(time(NULL) - wait_start_time);
-			if (0 > sleeptime_after_notify)
-				sleeptime_after_notify = 0;
+			if (SUCCEED != zbx_rtc_wait(&rtc, info, &rtc_cmd, &rtc_data, sleeptime))
+				break;
 
-			if (SUCCEED == ret && 0 != rtc_cmd)
+			switch (rtc_cmd)
 			{
-				if (ZBX_RTC_SHUTDOWN == rtc_cmd)
-					goto end_loop;
-
-				if (ZBX_RTC_ESCALATOR_NOTIFY == rtc_cmd)
-				{
-					notify = 1;
+				case ZBX_RTC_SHUTDOWN:
+					zbx_set_exiting_with_succeed();
 					break;
-				}
+				case ZBX_RTC_ESCALATOR_NOTIFY:
+					deserialize_escalationids(&escalationids, rtc_data);
+					zbx_free(rtc_data);
+
+					notify = 1;
+					sleeptime = 0;
+
+					if (ESCALATOR_BATCH_SIZE <= escalationids.values_num)
+						rtc_cmd = 0;
+					break;
 			}
+
 		}
-		while (0 != sleeptime_after_notify);
+		while (0 != rtc_cmd);
 
 #		undef STAT_INTERVAL
 	}
-end_loop:
+
+	zbx_vector_uint64_destroy(&escalationids);
+
 	zbx_ipc_socket_close(&alerter);
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 
 	while (1)
 		zbx_sleep(SEC_PER_MIN);
+
+#undef ESCALATOR_BATCH_SIZE
 }
