@@ -58,9 +58,8 @@ static char	*mock_get_vault(zbx_mock_handle_t hvault)
 
 	while (ZBX_MOCK_END_OF_VECTOR != zbx_mock_vector_element(hvault, &hkvset))
 	{
-		const char	*path;
+		const char	*path = zbx_mock_get_object_member_string(hkvset, "path");
 
-		path = zbx_mock_get_object_member_string(hkvset, "path");
 		zbx_json_addobject(&j, path);
 
 		hkvs = zbx_mock_get_object_member_handle(hkvset, "values");
@@ -72,7 +71,6 @@ static char	*mock_get_vault(zbx_mock_handle_t hvault)
 		}
 
 		zbx_json_close(&j);
-
 	}
 
 	vault = zbx_strdup(NULL, j.buffer);

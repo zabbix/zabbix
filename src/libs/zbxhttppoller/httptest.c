@@ -227,11 +227,11 @@ static void	httppairs_free(zbx_vector_ptr_pair_t *pairs)
  *                                      information                           *
  *             replace_with - [OUT] pointer to value to replace macro with    *
  *             data         - [IN/OUT] pointer to original input raw string   *
- *                                  (for macro in macro resolving)            *
+ *                                  (for macro in macro resolving), not used  *
  *             error        - [OUT] pointer to pre-allocated error message    *
- *                                  buffer (can be NULL)                      *
+ *                                  buffer (can be NULL), not used            *
  *             maxerrlen    - [IN] size of error message buffer (can be 0 if  *
- *                                 'error' is NULL)                           *
+ *                                 'error' is NULL), not used                 *
  *                                                                            *
  * Return value: SUCCEED if macro data were resolved successfully.            *
  *               Otherwise FAIL.                                              *

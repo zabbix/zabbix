@@ -16,7 +16,6 @@ BINARIES_tests = \
 	zbx_function_param_parse_ext \
 	zbx_substitute_macros \
 	zbx_substitute_macros1
-	
 
 if SERVER
 BINARIES_tests += zbx_substitute_macros_um
