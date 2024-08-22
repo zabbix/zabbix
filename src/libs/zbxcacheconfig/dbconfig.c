@@ -3562,6 +3562,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 	ZBX_DC_HOST		*host = NULL;
 
 	ZBX_DC_ITEM		*item;
+	ZBX_DC_TEMPLATE_ITEM	*template_item;
 	ZBX_DC_ITEM		*depitem;
 	ZBX_DC_INTERFACE_ITEM	*interface_snmpitem;
 	ZBX_DC_ITEM_HK		*item_hk, item_hk_local;
@@ -3573,7 +3574,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 	zbx_hashset_uniq_t	uniq = ZBX_HASHSET_UNIQ_FALSE;
 	unsigned char		status, type, value_type, old_poller_type, item_flags;
 	int			found, ret, i,  old_nextcheck;
-	zbx_uint64_t		itemid, hostid, interfaceid;
+	zbx_uint64_t		itemid, hostid, interfaceid, templateid;
 	zbx_vector_ptr_t	dep_items;
 
 	zbx_vector_ptr_create(&dep_items);
@@ -3601,6 +3602,19 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 		ZBX_STR2UINT64(hostid, row[1]);
 		ZBX_STR2UCHAR(status, row[2]);
 		ZBX_STR2UCHAR(type, row[3]);
+		ZBX_DBROW2UINT64(templateid, row[48]);
+
+		if (SUCCEED == zbx_db_is_null(row[12]))
+		{
+			/* template items should include both template items and prototypes */
+			template_item = (ZBX_DC_TEMPLATE_ITEM *)DCfind_id(&config->template_items, itemid,
+					sizeof(ZBX_DC_TEMPLATE_ITEM), &found);
+
+			template_item->hostid = hostid;
+			template_item->templateid = templateid;
+
+			continue;
+		}
 
 		if (NULL == host || host->hostid != hostid)
 		{
@@ -3875,11 +3889,17 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 	/* remove deleted items from cache */
 	for (; SUCCEED == ret; ret = zbx_dbsync_next(sync, &rowid, &row, &tag))
 	{
-		if (NULL != deleted_itemids)
-			zbx_vector_uint64_append(deleted_itemids, rowid);
+		if (NULL != (template_item = (ZBX_DC_TEMPLATE_ITEM *)zbx_hashset_search(&config->template_items,
+				&rowid)))
+		{
+			zbx_hashset_remove_direct(&config->template_items, template_item);
+		}
 
 		if (NULL == (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &rowid)))
 			continue;
+
+		if (NULL != deleted_itemids)
+			zbx_vector_uint64_append(deleted_itemids, rowid);
 
 		if (NULL != (host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &item->hostid)))
 		{
@@ -4014,78 +4034,6 @@ static void	DCsync_item_discovery(zbx_dbsync_t *sync)
 		}
 
 		zbx_hashset_remove_direct(&config->item_discovery, item_discovery);
-	}
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-}
-
-static void	DCsync_template_items(zbx_dbsync_t *sync)
-{
-	char			**row;
-	zbx_uint64_t		rowid, itemid;
-	unsigned char		tag;
-	int			ret, found;
-	ZBX_DC_TEMPLATE_ITEM	*item;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
-	{
-		/* removed rows will be always added at the end */
-		if (ZBX_DBSYNC_ROW_REMOVE == tag)
-			break;
-
-		ZBX_STR2UINT64(itemid, row[0]);
-		item = (ZBX_DC_TEMPLATE_ITEM *)DCfind_id(&config->template_items, itemid, sizeof(ZBX_DC_TEMPLATE_ITEM),
-				&found);
-
-		ZBX_STR2UINT64(item->hostid, row[1]);
-		ZBX_DBROW2UINT64(item->templateid, row[2]);
-	}
-
-	/* remove deleted template items from buffer */
-	for (; SUCCEED == ret; ret = zbx_dbsync_next(sync, &rowid, &row, &tag))
-	{
-		if (NULL == (item = (ZBX_DC_TEMPLATE_ITEM *)zbx_hashset_search(&config->template_items, &rowid)))
-			continue;
-
-		zbx_hashset_remove_direct(&config->template_items, item);
-	}
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-}
-
-static void	DCsync_prototype_items(zbx_dbsync_t *sync)
-{
-	char			**row;
-	zbx_uint64_t		rowid, itemid;
-	unsigned char		tag;
-	int			ret, found;
-	ZBX_DC_PROTOTYPE_ITEM	*item;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
-	{
-		/* removed rows will be always added at the end */
-		if (ZBX_DBSYNC_ROW_REMOVE == tag)
-			break;
-
-		ZBX_STR2UINT64(itemid, row[0]);
-		item = (ZBX_DC_PROTOTYPE_ITEM *)DCfind_id(&config->prototype_items, itemid,
-				sizeof(ZBX_DC_PROTOTYPE_ITEM), &found);
-
-		ZBX_STR2UINT64(item->hostid, row[1]);
-		ZBX_DBROW2UINT64(item->templateid, row[2]);
-	}
-
-	/* remove deleted prototype items from buffer */
-	for (; SUCCEED == ret; ret = zbx_dbsync_next(sync, &rowid, &row, &tag))
-	{
-		if (NULL == (item = (ZBX_DC_PROTOTYPE_ITEM *)zbx_hashset_search(&config->prototype_items, &rowid)))
-			continue;
-
-		zbx_hashset_remove_direct(&config->prototype_items, item);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -7725,8 +7673,8 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 	static int	sync_status = ZBX_DBSYNC_STATUS_UNKNOWN;
 
 	int		i, flags, changelog_num, dberr = ZBX_DB_FAIL;
-	double		sec, csec, hsec, hisec, htsec, gmsec, hmsec, ifsec, idsec, isec, tisec, pisec, tsec, dsec, fsec,
-			expr_sec, csec2, hsec2, hisec2, ifsec2, idsec2, isec2, tisec2, pisec2, tsec2, dsec2, fsec2,
+	double		sec, csec, hsec, hisec, htsec, gmsec, hmsec, ifsec, idsec, isec, tsec, dsec, fsec,
+			expr_sec, csec2, hsec2, hisec2, ifsec2, idsec2, isec2, tsec2, dsec2, fsec2,
 			expr_sec2, action_sec, action_sec2, action_op_sec, action_op_sec2, action_condition_sec,
 			action_condition_sec2, trigger_tag_sec, trigger_tag_sec2, host_tag_sec, host_tag_sec2,
 			correlation_sec, correlation_sec2, corr_condition_sec, corr_condition_sec2, corr_operation_sec,
@@ -7737,7 +7685,7 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 			proxy_group_sec2, hp_sec, hp_sec2;
 
 	zbx_dbsync_t	config_sync, hosts_sync, hi_sync, htmpl_sync, gmacro_sync, hmacro_sync, if_sync, items_sync,
-			template_items_sync, prototype_items_sync, item_discovery_sync, triggers_sync, tdep_sync,
+			item_discovery_sync, triggers_sync, tdep_sync,
 			func_sync, expr_sync, action_sync, action_op_sync, action_condition_sync, trigger_tag_sync,
 			item_tag_sync, host_tag_sync, correlation_sync, corr_condition_sync, corr_operation_sync,
 			hgroups_sync, itempp_sync, itemscrp_sync, maintenance_sync, maintenance_period_sync,
@@ -7807,8 +7755,6 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 	zbx_dbsync_init(&hmacro_sync, mode);
 	zbx_dbsync_init(&if_sync, mode);
 	zbx_dbsync_init_changelog(&items_sync, changelog_sync_mode);
-	zbx_dbsync_init(&template_items_sync, mode);
-	zbx_dbsync_init_changelog(&prototype_items_sync, changelog_sync_mode);
 	zbx_dbsync_init(&item_discovery_sync, mode);
 	zbx_dbsync_init_changelog(&triggers_sync, changelog_sync_mode);
 	zbx_dbsync_init(&tdep_sync, mode);
@@ -8064,12 +8010,6 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 
 	/* sync item data to support item lookups when resolving macros during configuration sync */
 
-	/* fetch prototype items before items to avoid item fetch consuming prototype changelog records */
-	sec = zbx_time();
-	if (FAIL == zbx_dbsync_compare_prototype_items(&prototype_items_sync))
-		goto out;
-	pisec = zbx_time() - sec;
-
 	sec = zbx_time();
 	if (FAIL == zbx_dbsync_compare_interfaces(&if_sync))
 		goto out;
@@ -8079,11 +8019,6 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 	if (FAIL == zbx_dbsync_compare_items(&items_sync))
 		goto out;
 	isec = zbx_time() - sec;
-
-	sec = zbx_time();
-	if (FAIL == zbx_dbsync_compare_template_items(&template_items_sync))
-		goto out;
-	tisec = zbx_time() - sec;
 
 	sec = zbx_time();
 	if (FAIL == zbx_dbsync_compare_item_discovery(&item_discovery_sync))
@@ -8115,16 +8050,8 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 	/* relies on hosts, proxies and interfaces, must be after DCsync_{hosts,interfaces}() */
 
 	sec = zbx_time();
-	DCsync_prototype_items(&prototype_items_sync);
-	pisec2 = zbx_time() - sec;
-
-	sec = zbx_time();
 	DCsync_items(&items_sync, new_revision, flags, synced, deleted_itemids, pnew_items);
 	isec2 = zbx_time() - sec;
-
-	sec = zbx_time();
-	DCsync_template_items(&template_items_sync);
-	tisec2 = zbx_time() - sec;
 
 	sec = zbx_time();
 	DCsync_item_discovery(&item_discovery_sync);
@@ -8322,12 +8249,12 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
 	{
-		total = csec + hsec + hisec + htsec + gmsec + hmsec + ifsec + idsec + isec +  tisec + pisec + tsec +
+		total = csec + hsec + hisec + htsec + gmsec + hmsec + ifsec + idsec + isec  + tsec +
 				dsec + fsec + expr_sec + action_sec + action_op_sec + action_condition_sec +
 				trigger_tag_sec + correlation_sec + corr_condition_sec + corr_operation_sec +
 				hgroups_sec + itempp_sec + maintenance_sec + item_tag_sec + drules_sec + httptest_sec +
 				connector_sec + proxy_sec + proxy_group_sec + hp_sec;
-		total2 = csec2 + hsec2 + hisec2 + ifsec2 + idsec2 + isec2 + tisec2 + pisec2 + tsec2 + dsec2 + fsec2 +
+		total2 = csec2 + hsec2 + hisec2 + ifsec2 + idsec2 + isec2 + tsec2 + dsec2 + fsec2 +
 				expr_sec2 + action_op_sec2 + action_sec2 + action_condition_sec2 + trigger_tag_sec2 +
 				correlation_sec2 + corr_condition_sec2 + corr_operation_sec2 + hgroups_sec2 +
 				itempp_sec2 + maintenance_sec2 + item_tag_sec2 + update_sec + um_cache_sec +
@@ -8381,14 +8308,6 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
 				__func__, isec, isec2, items_sync.add_num, items_sync.update_num,
 				items_sync.remove_num);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() template_items      : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
-				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
-				__func__, tisec, tisec2, template_items_sync.add_num,
-				template_items_sync.update_num, template_items_sync.remove_num);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() prototype_items      : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
-				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
-				__func__, pisec, pisec2, prototype_items_sync.add_num,
-				prototype_items_sync.update_num, prototype_items_sync.remove_num);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() item_discovery      : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
 				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
 				__func__, idsec, idsec2, item_discovery_sync.add_num, item_discovery_sync.update_num,
@@ -8548,6 +8467,8 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 				config->items.num_data, config->items.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() items_hk   : %d (%d slots)", __func__,
 				config->items_hk.num_data, config->items_hk.num_slots);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() template_items   : %d (%d slots)", __func__,
+				config->template_items.num_data, config->template_items.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() preprocitems: %d (%d slots)", __func__,
 				config->preprocops.num_data, config->preprocops.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() functions  : %d (%d slots)", __func__,
@@ -8708,8 +8629,6 @@ clean:
 	zbx_dbsync_clear(&host_tag_sync);
 	zbx_dbsync_clear(&if_sync);
 	zbx_dbsync_clear(&items_sync);
-	zbx_dbsync_clear(&template_items_sync);
-	zbx_dbsync_clear(&prototype_items_sync);
 	zbx_dbsync_clear(&item_discovery_sync);
 	zbx_dbsync_clear(&triggers_sync);
 	zbx_dbsync_clear(&tdep_sync);
@@ -9158,7 +9077,6 @@ int	zbx_init_configuration_cache(zbx_get_program_type_f get_program_type, zbx_ge
 	CREATE_HASHSET(config->items_params, 0);
 	CREATE_HASHSET(config->template_items, 0);
 	CREATE_HASHSET(config->item_discovery, 0);
-	CREATE_HASHSET(config->prototype_items, 0);
 	CREATE_HASHSET(config->functions, 0);
 	CREATE_HASHSET(config->triggers, 0);
 	CREATE_HASHSET(config->trigdeps, 0);
@@ -15649,10 +15567,10 @@ void	zbx_get_item_tags(zbx_uint64_t itemid, zbx_vector_item_tag_t *item_tags)
 		if (NULL != (item_discovery = (ZBX_DC_ITEM_DISCOVERY *)zbx_hashset_search(&config->item_discovery,
 				&itemid)))
 		{
-			ZBX_DC_PROTOTYPE_ITEM	*prototype_item;
+			ZBX_DC_TEMPLATE_ITEM	*prototype_item;
 
-			if (NULL != (prototype_item = (ZBX_DC_PROTOTYPE_ITEM *)zbx_hashset_search(
-					&config->prototype_items, &item_discovery->parent_itemid)))
+			if (NULL != (prototype_item = (ZBX_DC_TEMPLATE_ITEM *)zbx_hashset_search(
+					&config->template_items, &item_discovery->parent_itemid)))
 			{
 				if (0 != prototype_item->templateid)
 					zbx_gather_tags_from_template_chain(prototype_item->templateid, item_tags);
