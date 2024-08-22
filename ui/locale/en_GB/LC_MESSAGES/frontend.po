@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-04-02 17:26+0300\n"
-"PO-Revision-Date: 2023-09-19 06:34+0000\n"
-"Last-Translator: Sergejs <sergejs.maklakovs@zabbix.com>\n"
+"PO-Revision-Date: 2024-08-14 14:08+0000\n"
+"Last-Translator: Jurijs <jurijs.klopovskis@zabbix.com>\n"
 "Language-Team: none\n"
 "Language: en_GB\n"
 "MIME-Version: 1.0\n"
@@ -3949,7 +3949,7 @@ msgstr "Configuration of network maps"
 #: app/controllers/CControllerProxyEdit.php:161
 #: app/controllers/CControllerProxyList.php:177
 msgid "Configuration of proxies"
-msgstr "onfiguration of proxies"
+msgstr "Configuration of proxies"
 
 #: app/controllers/CControllerRegExEdit.php:111
 #: app/controllers/CControllerRegExList.php:53

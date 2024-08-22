@@ -51,6 +51,7 @@ class CElementFilter {
 	const NOT_ENABLED = 'not enabled';
 	const DISABLED = 'disabled';
 	const NOT_DISABLED = 'not disabled';
+	const COUNT = 'count';
 
 	private $type;
 	private $params = [];
@@ -130,7 +131,8 @@ class CElementFilter {
 			static::ENABLED => 'getEnabledCondition',
 			static::NOT_ENABLED => 'getNotEnabledCondition',
 			static::DISABLED => 'getNotEnabledCondition',
-			static::NOT_DISABLED => 'getEnabledCondition'
+			static::NOT_DISABLED => 'getEnabledCondition',
+			static::COUNT => 'getCountCondition'
 		];
 
 		if (!array_key_exists($condition, $conditions)) {

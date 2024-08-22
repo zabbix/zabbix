@@ -107,7 +107,7 @@
 			$textarea.css('margin-left', $line_numbers.outerWidth());
 		}
 
-		var height_offset = 190,
+		var height_offset = 220,
 			$content = $('<div>', {class: 'multilineinput-container'}),
 			monospace_font = obj.options.monospace_font ? ' monospace-font' : '',
 			$textarea = $('<textarea>', {

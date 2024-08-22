@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 require_once dirname(__FILE__).'/js/configuration.item.prototype.list.js.php';
@@ -176,7 +177,7 @@ foreach ($data['items'] as $item) {
 	$itemTable->addRow([
 		new CCheckBox('group_itemid['.$item['itemid'].']', $item['itemid']),
 		$wizard,
-		$description,
+		(new CCol($description))->addClass(ZBX_STYLE_WORDWRAP),
 		(new CDiv($item['key_']))->addClass(ZBX_STYLE_WORDWRAP),
 		$item['delay'],
 		$item['history'],

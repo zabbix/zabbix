@@ -698,7 +698,6 @@ class CUser extends CApiService {
 		self::checkOwnUsername($user, $db_user);
 		self::checkOwnRole($user, $db_user);
 		self::checkOwnUserGroups($user, $db_user);
-		self::checkOwnMedia($user, $db_user);
 	}
 
 	private static function getOwnUser(array $users): ?array {
@@ -766,46 +765,6 @@ class CUser extends CApiService {
 					_s('Only Super admin users can update "%1$s" parameter.', 'usrgrps')
 				);
 			}
-		}
-	}
-
-	private static function checkOwnMedia(array $user, array $db_user): void {
-		if (self::$userData['type'] != USER_TYPE_ZABBIX_USER || !array_key_exists('medias', $user)) {
-			return;
-		}
-
-		$db_medias = $db_user['medias'];
-
-		foreach ($user['medias'] as $media) {
-			$media['sendto'] = implode("\n", $media['sendto']);
-
-			$media += [
-				'active' => DB::getDefault('media', 'active'),
-				'severity' => DB::getDefault('media', 'severity'),
-				'period' => DB::getDefault('media', 'period')
-			];
-
-			$db_media_found = false;
-
-			foreach ($db_medias as $i => $db_media) {
-				if (!DB::getUpdatedValues('media', $media, $db_media)) {
-					$db_media_found = true;
-					unset($db_medias[$i]);
-					break;
-				}
-			}
-
-			if (!$db_media_found) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Only Super admin or Admin users can update "%1$s" parameter.', 'medias')
-				);
-			}
-		}
-
-		if ($db_medias) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Only Super admin or Admin users can update "%1$s" parameter.', 'medias')
-			);
 		}
 	}
 
