@@ -1089,32 +1089,35 @@ static void	add_command_alert(zbx_db_insert_t *db_insert, int alerts_num, zbx_ui
 		const zbx_db_event *event, const zbx_db_event *r_event, zbx_uint64_t actionid, int esc_step,
 		const char *message, zbx_alert_status_t status, const char *error)
 {
-	int	now, alerttype = ALERT_TYPE_COMMAND, alert_status = status;
-	char	*tmp = NULL;
+	int		now, alerttype = ALERT_TYPE_COMMAND, alert_status = status;
+	char		*tmp = NULL;
+	zbx_uint64_t	eventid, p_eventid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (0 == alerts_num)
 	{
 		zbx_db_insert_prepare(db_insert, "alerts", "alertid", "actionid", "eventid", "clock", "message",
-				"status", "error", "esc_step", "alerttype", (NULL != r_event ? "p_eventid" : NULL),
-				(char *)NULL);
+				"status", "error", "esc_step", "alerttype", "p_eventid", (char *)NULL);
+	}
+
+	if (NULL == r_event)
+	{
+		eventid = event->eventid;
+		p_eventid = 0;
+	}
+	else
+	{
+		eventid = r_event->eventid;
+		p_eventid = event->eventid;
 	}
 
 	now = (int)time(NULL);
 
 	tmp = zbx_dsprintf(tmp, "%s:%s", host, message);
 
-	if (NULL == r_event)
-	{
-		zbx_db_insert_add_values(db_insert, alertid, actionid, event->eventid, now, tmp, alert_status,
-				error, esc_step, (int)alerttype);
-	}
-	else
-	{
-		zbx_db_insert_add_values(db_insert, alertid, actionid, r_event->eventid, now, tmp, alert_status,
-				error, esc_step, (int)alerttype, event->eventid);
-	}
+	zbx_db_insert_add_values(db_insert, alertid, actionid, eventid, now, tmp, alert_status,
+			error, esc_step, (int)alerttype, p_eventid);
 
 	zbx_free(tmp);
 
@@ -1616,7 +1619,7 @@ static void	add_message_alert(const zbx_db_event *event, const zbx_db_event *r_e
 	zbx_db_row_t	row;
 	int		now, priority, have_alerts = 0;
 	zbx_db_insert_t	db_insert;
-	zbx_uint64_t	ackid;
+	zbx_uint64_t	ackid, eventid, p_eventid;
 	char		*period = NULL;
 	const char	*error;
 
@@ -1656,6 +1659,17 @@ static void	add_message_alert(const zbx_db_event *event, const zbx_db_event *r_e
 		priority = NULL == service_alarm ? event->severity : service_alarm->value;
 	else
 		priority = TRIGGER_SEVERITY_NOT_CLASSIFIED;
+
+	if (NULL == r_event)
+	{
+		eventid = event->eventid;
+		p_eventid = 0;
+	}
+	else
+	{
+		eventid = r_event->eventid;
+		p_eventid = event->eventid;
+	}
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
@@ -1717,8 +1731,8 @@ static void	add_message_alert(const zbx_db_event *event, const zbx_db_event *r_e
 			have_alerts = 1;
 			zbx_db_insert_prepare(&db_insert, "alerts", "alertid", "actionid", "eventid", "userid",
 					"clock", "mediatypeid", "sendto", "subject", "message", "status", "error",
-					"esc_step", "alerttype", "acknowledgeid", "parameters",
-					(NULL != r_event ? "p_eventid" : NULL), (char *)NULL);
+					"esc_step", "alerttype", "acknowledgeid", "parameters", "p_eventid",
+					(char *)NULL);
 		}
 
 		if (MEDIA_TYPE_EXEC == type)
@@ -1732,18 +1746,9 @@ static void	add_message_alert(const zbx_db_event *event, const zbx_db_event *r_e
 					message, ack, service_alarm, service, &params, tz);
 		}
 
-		if (NULL != r_event)
-		{
-			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), actionid, r_event->eventid, userid,
-					now, mediatypeid, row[1], subject, message, status, perror, esc_step,
-					(int)ALERT_TYPE_MESSAGE, ackid, params, event->eventid);
-		}
-		else
-		{
-			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), actionid, event->eventid, userid,
-					now, mediatypeid, row[1], subject, message, status, perror, esc_step,
-					(int)ALERT_TYPE_MESSAGE, ackid, params);
-		}
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), actionid, eventid, userid,
+				now, mediatypeid, row[1], subject, message, status, perror, esc_step,
+				(int)ALERT_TYPE_MESSAGE, ackid, params, p_eventid);
 
 		zbx_free(params);
 	}
@@ -1762,20 +1767,14 @@ err_alert:
 				"subject", "message", "status", "retries", "error", "esc_step", "alerttype",
 				"acknowledgeid", (NULL != r_event ? "p_eventid" : NULL), (char *)NULL);
 
-		if (NULL != r_event)
-		{
 /* max number of retries for alerts */
 #define ALERT_MAX_RETRIES	3
-			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), actionid, r_event->eventid, userid,
-					now, subject, message, (int)ALERT_STATUS_FAILED, (int)ALERT_MAX_RETRIES, error,
-					esc_step, (int)ALERT_TYPE_MESSAGE, ackid, event->eventid);
-		}
-		else
-		{
-			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), actionid, event->eventid, userid,
-					now, subject, message, (int)ALERT_STATUS_FAILED, (int)ALERT_MAX_RETRIES, error,
-					esc_step, (int)ALERT_TYPE_MESSAGE, ackid);
-		}
+
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), actionid, eventid, userid,
+				now, subject, message, (int)ALERT_STATUS_FAILED, (int)ALERT_MAX_RETRIES, error,
+				esc_step, (int)ALERT_TYPE_MESSAGE, ackid, p_eventid);
+
+#undef ALERT_MAX_RETRIES
 	}
 
 	if (0 != have_alerts)
