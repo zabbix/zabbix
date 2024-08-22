@@ -120,6 +120,63 @@ static void	add_message_alert(const zbx_db_event *event, const zbx_db_event *r_e
 		const zbx_db_acknowledge *ack, const zbx_service_alarm_t *service_alarm, const zbx_db_service *service,
 		int err_type, const char *tz);
 
+typedef enum
+{
+	ALERTER_NOTIFY,
+	ALERTER_FLUSH,
+	ALERTER_LAZY_FLUSH,
+	ALERTER_CLOSE,
+}
+zbx_alerter_notify_mode_t;
+
+static void	notify_alerter(zbx_alerter_notify_mode_t mode)
+{
+	static zbx_ipc_socket_t	alerter;
+	static time_t		notify_time;
+	static int		alerts_num;
+	time_t			now;
+
+	now = time(NULL);
+
+	switch (mode)
+	{
+		case ALERTER_CLOSE:
+			zbx_ipc_socket_close(&alerter);
+			return;
+		case ALERTER_NOTIFY:
+			if (notify_time == now && INT_MAX > alerts_num)
+			{
+				alerts_num++;
+				return;
+			}
+			break;
+		case ALERTER_LAZY_FLUSH:
+			if (notify_time == now)
+				return;
+			ZBX_FALLTHROUGH;
+		case ALERTER_FLUSH:
+			if (0 == alerts_num)
+				return;
+	}
+
+	if (0 == alerter.fd)
+	{
+		char	*error = NULL;
+
+		if (SUCCEED != zbx_ipc_socket_open(&alerter, ZBX_IPC_SERVICE_ALERTER, SEC_PER_MIN, &error))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "cannot open IPC connection to alert manager: %s", error);
+			zbx_free(error);
+			exit(EXIT_FAILURE);
+		}
+	}
+
+	notify_time = now;
+	alerts_num = 0;
+
+	(void)zbx_ipc_socket_write(&alerter, ZBX_IPC_ALERTER_SYNC_ALERTS, NULL, 0);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: checks user access to event by tags                               *
@@ -1499,6 +1556,10 @@ skip:
 	{
 		zbx_db_insert_execute(&db_insert);
 		zbx_db_insert_clean(&db_insert);
+
+		/* because alerts are inserted without transaction there no need to wait for */
+		/* commit and alerter notification can be sent immediately                   */
+		notify_alerter(ALERTER_NOTIFY);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -1782,6 +1843,10 @@ err_alert:
 		zbx_db_insert_autoincrement(&db_insert, "alertid");
 		zbx_db_insert_execute(&db_insert);
 		zbx_db_insert_clean(&db_insert);
+
+		/* because alerts are inserted without transaction there no need to wait for */
+		/* commit and alerter notification can be sent immediately                   */
+		notify_alerter(ALERTER_NOTIFY);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -3647,7 +3712,7 @@ ZBX_THREAD_ENTRY(escalator_thread, args)
 	zbx_thread_escalator_args	*escalator_args_in = (zbx_thread_escalator_args *)
 							(((zbx_thread_args_t *)args)->args);
 	int				sleeptime = -1, escalations_count = 0,
-					old_escalations_count = 0, notify = 0;
+					old_escalations_count = 0;
 	double				total_sec = 0.0, old_total_sec = 0.0;
 	time_t				last_stat_time;
 	const zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
@@ -3732,13 +3797,13 @@ ZBX_THREAD_ENTRY(escalator_thread, args)
 
 		zbx_vector_uint64_clear(&escalationids);
 
-		if (0 != notify)
-			(void)zbx_ipc_socket_write(&alerter, ZBX_IPC_ALERTER_SYNC_ALERTS, NULL, 0);
-
 		zbx_config_clean(&cfg);
 		total_sec += zbx_time() - sec;
 
 		sleeptime = zbx_calculate_sleeptime(nextcheck, CONFIG_ESCALATOR_FREQUENCY);
+
+		/* throttle notification flushing if escalator is not going to sleep */
+		notify_alerter(0 == sleeptime ? ALERTER_LAZY_FLUSH : ALERTER_FLUSH);
 
 		now = time(NULL);
 
@@ -3765,8 +3830,6 @@ ZBX_THREAD_ENTRY(escalator_thread, args)
 			last_stat_time = now;
 		}
 
-		notify = 0;
-
 		do
 		{
 			if (SUCCEED != zbx_rtc_wait(&rtc, info, &rtc_cmd, &rtc_data, sleeptime))
@@ -3781,7 +3844,6 @@ ZBX_THREAD_ENTRY(escalator_thread, args)
 					deserialize_escalationids(&escalationids, rtc_data);
 					zbx_free(rtc_data);
 
-					notify = 1;
 					sleeptime = 0;
 
 					if (ESCALATOR_BATCH_SIZE <= escalationids.values_num)
@@ -3796,8 +3858,8 @@ ZBX_THREAD_ENTRY(escalator_thread, args)
 	}
 
 	zbx_vector_uint64_destroy(&escalationids);
+	notify_alerter(ALERTER_CLOSE);
 
-	zbx_ipc_socket_close(&alerter);
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 
 	while (1)
