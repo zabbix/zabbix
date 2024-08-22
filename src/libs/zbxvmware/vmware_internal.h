@@ -181,7 +181,7 @@ void	vmware_service_cq_prop_value(const char *fn_parent, xmlDoc *xdoc, zbx_vecto
 	"/*/*/*/*/*[local-name()='objects']/*[local-name()='obj'][@type='" type "']"
 
 char	*evt_msg_strpool_strdup(const char *str, zbx_uint64_t *len, zbx_uint32_t *ref_num);
-void	evt_msg_strpool_strfree(char *str);
+void	evt_msg_strpool_strfree(char *str, zbx_uint64_t *mem_sz);
 
 #define ZBX_XNN(NN)			"*[local-name()='" NN "']"
 #define ZBX_XPATH_NN(NN)			ZBX_XNN(NN)

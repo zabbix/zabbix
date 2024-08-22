@@ -200,9 +200,14 @@ void	vmware_shared_strfree(char *str)
 		vmware->strpool_sz -= zbx_shmem_required_chunk_size(len);
 }
 
-void	evt_msg_strpool_strfree(char *str)
+void	evt_msg_strpool_strfree(char *str, zbx_uint64_t *mem_sz)
 {
-	vmware_strpool_strfree(str, &evt_msg_strpool, NULL);
+	zbx_uint64_t	len;
+
+	vmware_strpool_strfree(str, &evt_msg_strpool, &len);
+
+	if (NULL != mem_sz && 0 < len)
+		*mem_sz -= zbx_shmem_required_chunk_size(len);
 }
 
 char	*evt_msg_strpool_strdup(const char *str, zbx_uint64_t *len, zbx_uint32_t *ref_num)

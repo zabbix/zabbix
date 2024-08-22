@@ -56,7 +56,7 @@ event_hostinfo_node_t;
  ******************************************************************************/
 void	vmware_event_free(zbx_vmware_event_t *event)
 {
-	evt_msg_strpool_strfree(event->message);
+	evt_msg_strpool_strfree(event->message, NULL);
 	zbx_free(event);
 }
 
@@ -440,23 +440,27 @@ out:
  *             xdoc           - [IN] xml document with eventlog records       *
  *             evt_severities - [IN] dictionary of severity for event types   *
  *             alloc_sz       - [OUT] allocated memory size for events        *
- *             shared_sz      - [OUT] estimated shared memory size for events *
+ *             shmem_sz       - [OUT] estimated shared memory size for events *
  *                                                                            *
  * Return value: SUCCEED - operation has completed successfully               *
  *               FAIL    - operation has failed                               *
  *                                                                            *
+ * Comments: we calculate two memory models (alloc_sz and shmem_sz), because  *
+ *           we have no info about real state of shmem strpool. Thereby we    *
+ *           compute worst-case scenario (shmem_sz) for pagination algorithm. *
+ *                                                                            *
  ******************************************************************************/
 static int	vmware_service_put_event_data(zbx_vector_vmware_event_ptr_t *events, zbx_id_xmlnode_t xml_event,
-		xmlDoc *xdoc, const zbx_hashset_t *evt_severities, zbx_uint64_t *alloc_sz, zbx_uint64_t *shared_sz)
+		xmlDoc *xdoc, const zbx_hashset_t *evt_severities, zbx_uint64_t *alloc_sz, zbx_uint64_t *shmem_sz)
 {
-#define ZBX_HOSTINFO_NODES_DATACENTER		0x01
-#define ZBX_HOSTINFO_NODES_COMPRES		0x02
-#define ZBX_HOSTINFO_NODES_HOST			0x04
-#define ZBX_HOSTINFO_NODES_VM			0x08
-#define ZBX_HOSTINFO_NODES_DS			0x10
-#define ZBX_HOSTINFO_NODES_NET			0x20
-#define ZBX_HOSTINFO_NODES_DVS			0x40
-#define ZBX_HOSTINFO_NODES_MASK_ALL									\
+#	define ZBX_HOSTINFO_NODES_DATACENTER		0x01
+#	define ZBX_HOSTINFO_NODES_COMPRES		0x02
+#	define ZBX_HOSTINFO_NODES_HOST			0x04
+#	define ZBX_HOSTINFO_NODES_VM			0x08
+#	define ZBX_HOSTINFO_NODES_DS			0x10
+#	define ZBX_HOSTINFO_NODES_NET			0x20
+#	define ZBX_HOSTINFO_NODES_DVS			0x40
+#	define ZBX_HOSTINFO_NODES_MASK_ALL									\
 		(ZBX_HOSTINFO_NODES_DATACENTER | ZBX_HOSTINFO_NODES_COMPRES | ZBX_HOSTINFO_NODES_HOST | \
 		ZBX_HOSTINFO_NODES_VM | ZBX_HOSTINFO_NODES_DS | ZBX_HOSTINFO_NODES_NET | ZBX_HOSTINFO_NODES_DVS)
 
@@ -587,27 +591,28 @@ static int	vmware_service_put_event_data(zbx_vector_vmware_event_ptr_t *events, 
 	event->message = evt_msg_strpool_strdup(message, &sz, &ref_num);
 	zbx_free(message);
 	zbx_vector_vmware_event_ptr_append(events, event);
+	*shmem_sz += sizeof(zbx_vmware_event_t) + sizeof(event);
 
 	if (0 < sz)
 	{
 		*alloc_sz += zbx_shmem_required_chunk_size(sz);
 
 		if (1 == ref_num)
-			shared_sz += zbx_shmem_required_chunk_size(sz);
+			*shmem_sz += zbx_shmem_required_chunk_size(sz);
 	}
 
 	return SUCCEED;
-#undef ZBX_HOSTINFO_NODES_DATACENTER
-#undef ZBX_HOSTINFO_NODES_COMPRES
-#undef ZBX_HOSTINFO_NODES_HOST
-#undef ZBX_HOSTINFO_NODES_VM
-#undef ZBX_HOSTINFO_NODES_DS
-#undef ZBX_HOSTINFO_NODES_NET
-#undef ZBX_HOSTINFO_NODES_DVS
-#undef ZBX_HOSTINFO_NODES_MASK_ALL
 
-#	undef	ZBX_XPATH_EVT_INFO
-#	undef	ZBX_XPATH_EVT_ARGUMENT
+#	undef ZBX_HOSTINFO_NODES_DATACENTER
+#	undef ZBX_HOSTINFO_NODES_COMPRES
+#	undef ZBX_HOSTINFO_NODES_HOST
+#	undef ZBX_HOSTINFO_NODES_VM
+#	undef ZBX_HOSTINFO_NODES_DS
+#	undef ZBX_HOSTINFO_NODES_NET
+#	undef ZBX_HOSTINFO_NODES_DVS
+#	undef ZBX_HOSTINFO_NODES_MASK_ALL
+#	undef ZBX_XPATH_EVT_INFO
+#	undef ZBX_XPATH_EVT_ARGUMENT
 }
 
 /******************************************************************************
@@ -657,6 +662,7 @@ static time_t	vmware_service_parse_event_ts(xmlDoc *doc, xmlNode *node, zbx_uint
  *             xdoc       - [IN] xml document with eventlog records           *
  *             eventlog   - [IN] VMware event log state                       *
  *             alloc_sz   - [OUT] allocated memory size for events            *
+ *             shmem_sz   - [OUT] estimated shared memory size for events     *
  *             node_count - [OUT] count of xml event nodes                    *
  *             skip_old   - [OUT] detected event key reset                    *
  *                                                                            *
@@ -665,7 +671,7 @@ static time_t	vmware_service_parse_event_ts(xmlDoc *doc, xmlNode *node, zbx_uint
  ******************************************************************************/
 static int	vmware_service_parse_event_data(zbx_vector_vmware_event_ptr_t *events, zbx_uint64_t last_key,
 		time_t last_ts, const int is_prop, xmlDoc *xdoc, const zbx_vmware_eventlog_state_t *eventlog,
-		zbx_uint64_t *alloc_sz, int *node_count, unsigned char *skip_old)
+		zbx_uint64_t *alloc_sz, zbx_uint64_t *shmem_sz, int *node_count, unsigned char *skip_old)
 {
 #	define LAST_KEY(evs)	(evs->values[evs->values_num - 1]->key)
 
@@ -774,7 +780,7 @@ static int	vmware_service_parse_event_data(zbx_vector_vmware_event_ptr_t *events
 		for (int i = ids.values_num - 1; i >= 0; i--)
 		{
 			if (SUCCEED == vmware_service_put_event_data(events, ids.values[i], xdoc,
-					&eventlog->evt_severities, alloc_sz))
+					&eventlog->evt_severities, alloc_sz, shmem_sz))
 			{
 				parsed_num++;
 			}
@@ -806,6 +812,29 @@ clean:
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: removing NEW events from "head" of vector                         *
+ *                                                                            *
+ * Parameters: count    - [IN] number of events to delete                     *
+ *             shmem_sz - [IN/OUT] allocated memory size for events           *
+ *             events   - [IN/OUT] pointer to output variable                 *
+ *                                                                            *
+ ******************************************************************************/
+static	void vmware_service_clear_event_data_num(const int count, zbx_uint64_t *shmem_sz,
+		zbx_vector_vmware_event_ptr_t *events)
+{
+	int	i;
+
+	for (i = 0; i < count && i < events->values_num; i++)
+	{
+		evt_msg_strpool_strfree(events->values[i]->message, shmem_sz);
+		zbx_free(events->values[i]);
+		*shmem_sz -= sizeof(zbx_vmware_event_t) + sizeof(events->values[i]);
+		zbx_vector_vmware_event_ptr_remove(events, i);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
  * Parameters: service    - [IN] vmware service                               *
  *             easyhandle - [IN] CURL handle                                  *
  *             last_key   - [IN] ID of last processed event                   *
@@ -832,7 +861,7 @@ static int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CU
 	int		ret = FAIL, node_count = 1, soap_retry = ATTEMPTS_NUM,
 			soap_count = 5; /* 10 - initial value of eventlog records number in one response */
 	xmlDoc		*doc = NULL;
-	zbx_uint64_t	eventlog_last_key;
+	zbx_uint64_t	eventlog_last_key, shmem_estimation_sz = 0;
 	time_t		eventlog_last_ts;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -859,7 +888,7 @@ static int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CU
 		goto end_session;
 
 	if (0 < vmware_service_parse_event_data(events, eventlog_last_key, eventlog_last_ts, EVENT_TAG, doc,
-			&service->eventlog, alloc_sz, NULL, skip_old) &&
+			&service->eventlog, alloc_sz, &shmem_estimation_sz, NULL, skip_old) &&
 			(0 != *skip_old || LAST_KEY(events) == eventlog_last_key + 1))
 	{
 		zabbix_log(LOG_LEVEL_TRACE, "%s() latestPage events:%d", __func__, events->values_num);
@@ -890,9 +919,12 @@ static int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CU
 
 		if (0 != node_count)
 			soap_retry = ATTEMPTS_NUM;
+
+		if (shmem_estimation_sz > shmem_free_sz)
+			vmware_service_clear_event_data_num(soap_count, &shmem_estimation_sz, events);
 	}
 	while ((0 < vmware_service_parse_event_data(events, eventlog_last_key, eventlog_last_ts, RETURNVAL_TAG, doc,
-			&service->eventlog, alloc_sz, &node_count, skip_old) ||
+			&service->eventlog, alloc_sz, &shmem_estimation_sz, &node_count, skip_old) ||
 			(0 == node_count && 0 < soap_retry--)) && 0 == *skip_old);
 
 	if (0 != eventlog_last_key && 0 != events->values_num && LAST_KEY(events) != eventlog_last_key + 1)
@@ -1011,7 +1043,7 @@ static int	vmware_service_get_last_event_data(const zbx_vmware_service_t *servic
 	xml_event.created_time = vmware_service_parse_event_ts(doc, xpathObj->nodesetval->nodeTab[0], xml_event.id);
 
 	if (SUCCEED != vmware_service_put_event_data(events, xml_event, doc, &service->eventlog.evt_severities,
-			alloc_sz))
+			alloc_sz, NULL))
 	{
 		*error = zbx_dsprintf(*error, "Cannot retrieve last eventlog data for key "ZBX_FS_UI64, xml_event.id);
 		goto clean;
