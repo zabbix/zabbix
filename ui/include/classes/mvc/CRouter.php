@@ -16,6 +16,26 @@
 
 class CRouter {
 	/**
+	 * Layout used for view rendering.
+	 */
+	private ?string $layout = null;
+
+	/**
+	 * Controller class for action handling.
+	 */
+	private ?string $controller = null;
+
+	/**
+	 * View used to generate HTML, CSV, JSON and other content.
+	 */
+	private ?string $view = null;
+
+	/**
+	 * Unique action (request) identifier.
+	 */
+	private ?string $action = null;
+
+	/**
 	 * Mapping between action and corresponding controller, layout and view.
 	 */
 	private array $routes = [
@@ -401,26 +421,6 @@ class CRouter {
 		'sysmaps.php'					=> ['CLegacyAction', null, null],
 		'tr_events.php'					=> ['CLegacyAction', null, null]
 	];
-
-	/**
-	 * Layout used for view rendering.
-	 */
-	private ?string $layout = null;
-
-	/**
-	 * Controller class for action handling.
-	 */
-	private ?string $controller = null;
-
-	/**
-	 * View used to generate HTML, CSV, JSON and other content.
-	 */
-	private ?string $view = null;
-
-	/**
-	 * Unique action (request) identifier.
-	 */
-	private ?string $action = null;
 
 	private const DASHBOARD_ACTIONS = [
 		'dashboard.print',
