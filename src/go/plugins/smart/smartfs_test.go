@@ -97,7 +97,7 @@ func Test_getBasicDeviceInfo(t *testing.T) {
 			false,
 		},
 		{
-			"-smart_error",
+			"-smartError",
 			"/dev/sda",
 			expectation{
 				args: []string{"-a", "/dev/sda", "-j"},
@@ -120,7 +120,7 @@ func Test_getBasicDeviceInfo(t *testing.T) {
 			true,
 		},
 		{
-			"-smart_permissions_denied",
+			"-smartPermissionsDenied",
 			"/dev/sda",
 			expectation{
 				args: []string{"-a", "/dev/sda", "-j"},
@@ -141,7 +141,7 @@ func Test_getBasicDeviceInfo(t *testing.T) {
 			true,
 		},
 		{
-			name:       "+invalid_json",
+			name:       "+invalidJSON",
 			deviceName: "/dev/sda",
 			expectations: expectation{
 				args: []string{"-a", "/dev/sda", "-j"},
@@ -162,7 +162,7 @@ func Test_getBasicDeviceInfo(t *testing.T) {
 			wantErr:        true, // Expect an error due to invalid JSON
 		},
 		{
-			name:       "+no_device_found",
+			name:       "+noDeviceFound",
 			deviceName: "/dev/sdx", // Assuming this is an invalid or nonexistent device
 			expectations: expectation{
 				args: []string{"-a", "/dev/sdx", "-j"},
@@ -183,7 +183,7 @@ func Test_getBasicDeviceInfo(t *testing.T) {
 			wantErr:        true, // Expect an error because the device doesn't exist
 		},
 		{
-			name:       "+no_smart_status",
+			name:       "+noSmartStatus",
 			deviceName: "/dev/sda",
 			expectations: expectation{
 				args: []string{"-a", "/dev/sda", "-j"},
@@ -262,6 +262,8 @@ func Test_getBasicDeviceInfo(t *testing.T) {
 }
 
 func Test_setDeviceData(t *testing.T) {
+	t.Parallel()
+
 	type fields struct {
 		devices     map[string]deviceParser
 		jsonDevices map[string]jsonDevice
@@ -305,7 +307,7 @@ func Test_setDeviceData(t *testing.T) {
 			},
 		},
 		{
-			"+notjsonRunner",
+			"+notJSONRunner",
 			&SmartCtlDeviceData{
 				Device: &deviceParser{
 					ModelName:    "SAMSUNG MZVL21T0HCLR-00BH1",
@@ -346,7 +348,7 @@ func Test_setDeviceData(t *testing.T) {
 			},
 		},
 		{
-			"-nil pointer as data",
+			"-nilPointerAsData",
 			nil,
 			false, //jsonRunner
 			fields{
@@ -397,6 +399,8 @@ func Test_setDeviceData(t *testing.T) {
 }
 
 func Test_parseOutput(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		name          string
 		jsonRunner    bool
@@ -404,15 +408,15 @@ func Test_parseOutput(t *testing.T) {
 		expectedState runner
 	}{
 		{
-			name:       "+jsonRunner with unique devices",
-			jsonRunner: true,
-			initialState: runner{
+			"+jsonRunnerWithUniqueDevices",
+			true,
+			runner{
 				jsonDevices: map[string]jsonDevice{
 					"/dev/sda": {"Serial123", "data1"},
 					"/dev/sdb": {"Serial456", "data2"},
 				},
 			},
-			expectedState: runner{
+			runner{
 				jsonDevices: map[string]jsonDevice{
 					"/dev/sda": {"Serial123", "data1"},
 					"/dev/sdb": {"Serial456", "data2"},
@@ -420,30 +424,30 @@ func Test_parseOutput(t *testing.T) {
 			},
 		},
 		{
-			name:       "+jsonRunner with duplicate devices",
-			jsonRunner: true,
-			initialState: runner{
+			"+jsonRunnerWithDuplicateDevices",
+			true,
+			runner{
 				jsonDevices: map[string]jsonDevice{
 					"/dev/sda": {"Serial123", "data1"},
 					"/dev/sdb": {"Serial123", "data2"},
 				},
 			},
-			expectedState: runner{
+			runner{
 				jsonDevices: map[string]jsonDevice{
 					"/dev/sda": {"Serial123", "data1"},
 				},
 			},
 		},
 		{
-			name:       "+non-jsonRunner with unique devices",
-			jsonRunner: false,
-			initialState: runner{
+			"+nonJSONRunnerWithUniqueDevices",
+			false,
+			runner{
 				devices: map[string]deviceParser{
 					"/dev/sda": {SerialNumber: "Serial123"},
 					"/dev/sdb": {SerialNumber: "Serial456"},
 				},
 			},
-			expectedState: runner{
+			runner{
 				devices: map[string]deviceParser{
 					"/dev/sda": {SerialNumber: "Serial123"},
 					"/dev/sdb": {SerialNumber: "Serial456"},
@@ -451,43 +455,43 @@ func Test_parseOutput(t *testing.T) {
 			},
 		},
 		{
-			name:       "+non-jsonRunner with duplicate devices",
-			jsonRunner: false,
-			initialState: runner{
+			"+nonJSONRunnerWithDuplicateDevices",
+			false,
+			runner{
 				devices: map[string]deviceParser{
 					"/dev/sda": {SerialNumber: "Serial123"},
 					"/dev/sdb": {SerialNumber: "Serial123"},
 				},
 			},
-			expectedState: runner{
+			runner{
 				devices: map[string]deviceParser{
 					"/dev/sda": {SerialNumber: "Serial123"},
 				},
 			},
 		},
 		{
-			name:       "+jsonRunner with two duplicate devices",
-			jsonRunner: false,
-			initialState: runner{
+			"+jsonRunnerWithTwoDuplicateDevices",
+			false,
+			runner{
 				devices: map[string]deviceParser{
 					"/dev/sda": {SerialNumber: "Serial123"},
 					"/dev/sdb": {SerialNumber: "Serial123"},
 					"/dev/sdc": {SerialNumber: "Serial123"},
 				},
 			},
-			expectedState: runner{
+			runner{
 				devices: map[string]deviceParser{
 					"/dev/sda": {SerialNumber: "Serial123"},
 				},
 			},
 		},
 		{
-			name:       "+jsonRunner without devices",
-			jsonRunner: false,
-			initialState: runner{
+			"+jsonRunnerWithoutDevices",
+			false,
+			runner{
 				devices: map[string]deviceParser{},
 			},
-			expectedState: runner{
+			runner{
 				devices: map[string]deviceParser{},
 			},
 		},
@@ -497,28 +501,17 @@ func Test_parseOutput(t *testing.T) {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			runner := &tt.initialState
+			r := &tt.initialState
 
-			runner.parseOutput(tt.jsonRunner)
+			r.parseOutput(tt.jsonRunner)
 
-			if tt.jsonRunner {
-				if diff := cmp.Diff(
-					runner.jsonDevices,
-					tt.expectedState.jsonDevices,
-					cmp.AllowUnexported(jsonDevice{}, deviceInfo{}),
-				); diff != "" {
-					t.Errorf("jsonDevices mismatch (-got +want):\n%s", diff)
-				}
-			} else {
-				if diff := cmp.Diff(
-					runner.devices,
-					tt.expectedState.devices,
-					cmp.AllowUnexported(deviceParser{}, deviceInfo{}),
-				); diff != "" {
-					t.Errorf("devices mismatch (-got +want):\n%s", diff)
-				}
+			if diff := cmp.Diff(
+				*r,
+				tt.expectedState,
+				cmp.AllowUnexported(jsonDevice{}, deviceInfo{}, runner{}),
+			); diff != "" {
+				t.Fatalf("runner mismatch (-got +want):\n%s", diff)
 			}
-
 		})
 	}
 }
@@ -1905,9 +1898,9 @@ func Test_getRaidDevices(t *testing.T) {
 	}
 }
 
-//nolint:paralleltest
+func TestPlugin_checkVersion(t *testing.T) { //nolint:tparallel
+	t.Parallel()
 
-func TestPlugin_checkVersion(t *testing.T) {
 	type expect struct {
 		exec bool
 	}
@@ -1994,9 +1987,12 @@ func TestPlugin_checkVersion(t *testing.T) {
 }
 
 func Test_evaluateVersion(t *testing.T) {
+	t.Parallel()
+
 	type args struct {
 		versionDigits []int
 	}
+
 	tests := []struct {
 		name    string
 		args    args
@@ -2010,9 +2006,11 @@ func Test_evaluateVersion(t *testing.T) {
 		{"-empty", args{}, true},
 	}
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			if err := evaluateVersion(tt.args.versionDigits); (err != nil) != tt.wantErr {
-				t.Errorf(
+				t.Fatalf(
 					"evaluateVersion() error = %v, wantErr %v",
 					err,
 					tt.wantErr,
@@ -2023,9 +2021,12 @@ func Test_evaluateVersion(t *testing.T) {
 }
 
 func Test_cutPrefix(t *testing.T) {
+	t.Parallel()
+
 	type args struct {
 		in string
 	}
+
 	tests := []struct {
 		name string
 		args args
@@ -2035,16 +2036,21 @@ func Test_cutPrefix(t *testing.T) {
 		{"-no_prefix", args{"sda"}, "sda"},
 		{"-empty", args{""}, ""},
 	}
+
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			if got := cutPrefix(tt.args.in); got != tt.want {
-				t.Errorf("cutPrefix() = %v, want %v", got, tt.want)
+				t.Fatalf("cutPrefix() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
 func Test_deviceParser_checkErr(t *testing.T) {
+	t.Parallel()
+
 	type fields struct {
 		Smartctl smartctlField
 		rawResp  []byte
@@ -2057,7 +2063,7 @@ func Test_deviceParser_checkErr(t *testing.T) {
 		wantMsg string
 	}{
 		{
-			"+no_err",
+			"+noErr",
 			fields{Smartctl: smartctlField{Messages: nil, ExitStatus: 0}},
 			false,
 			"",
@@ -2088,7 +2094,7 @@ func Test_deviceParser_checkErr(t *testing.T) {
 			"",
 		},
 		{
-			"+no_err",
+			"+noErr",
 			fields{Smartctl: smartctlField{Messages: nil, ExitStatus: 4}},
 			false,
 			"",
@@ -2104,7 +2110,7 @@ func Test_deviceParser_checkErr(t *testing.T) {
 			"Barfoo.",
 		},
 		{
-			"-error_status_one",
+			"-errorStatusOne",
 			fields{
 				Smartctl: smartctlField{
 					Messages: []message{{"barfoo"}}, ExitStatus: 1,
@@ -2114,7 +2120,7 @@ func Test_deviceParser_checkErr(t *testing.T) {
 			"Barfoo.",
 		},
 		{
-			"-error_status_two",
+			"-errorStatusTwo",
 			fields{
 				Smartctl: smartctlField{
 					Messages: []message{{"foobar"}}, ExitStatus: 2,
@@ -2124,7 +2130,7 @@ func Test_deviceParser_checkErr(t *testing.T) {
 			"Foobar.",
 		},
 		{
-			"-two_err",
+			"-twoErr",
 			fields{
 				Smartctl: smartctlField{
 					Messages: []message{{"foobar"}, {"barfoo"}}, ExitStatus: 2,
@@ -2134,7 +2140,7 @@ func Test_deviceParser_checkErr(t *testing.T) {
 			"Foobar, barfoo.",
 		},
 		{
-			"-unknown_err/no message",
+			"-unknownErr/noMessage",
 			fields{
 				Smartctl: smartctlField{
 					Messages: []message{}, ExitStatus: 2,
@@ -2146,7 +2152,9 @@ func Test_deviceParser_checkErr(t *testing.T) {
 	}
 
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			dp := deviceParser{Smartctl: tt.fields.Smartctl}
 
 			if tt.fields.rawResp != nil {
@@ -2657,7 +2665,7 @@ func TestPlugin_execute(t *testing.T) {
 		wantErr         bool
 	}{
 		{
-			"+ 2 basic device scan",
+			"+twoBasicDevices",
 			args{false},
 			[]expectation{
 				{
