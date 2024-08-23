@@ -46,6 +46,8 @@ const (
 	// default plugin capacity used when no capacity is provided in system settings or hardcoded by the plugin as well
 	// as max allowed capacity if not overwritten in plugin.
 	defaultMaxCapacity = 1000
+	// default plugin capacity used when no capacity is provided in system settings or hardcoded by the plugin.
+	defaultCapacity = 1000
 
 	maxItemTimeout = 600 // seconds
 	minItemTimeout = 1   // seconds
@@ -841,7 +843,7 @@ func NewManager(options *agent.AgentOptions, systemOpt agent.PluginSystemOptions
 				tasks: make(performerHeap, 0),
 				maxCapacity: getPluginCapacity(
 					systemOpt[metric.Plugin.Name()].Capacity,
-					defaultMaxCapacity,
+					defaultCapacity,
 					metric.Plugin.MaxCapacity(),
 					defaultMaxCapacity,
 					metric.Plugin.Name(),
