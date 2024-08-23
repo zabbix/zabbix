@@ -131,6 +131,7 @@ func (p *Plugin) register() error {
 			},
 			ProtocolVersion: comms.ProtocolVersion,
 		},
+		p.timeout,
 	)
 	if err != nil {
 		return errs.Wrap(err, "failed to send register request to plugin")
@@ -367,6 +368,7 @@ func (p *Plugin) Validate(privateOptions any) error {
 			},
 			PrivateOptions: opts,
 		},
+		p.timeout,
 	)
 	if err != nil {
 		return errs.Wrap(err, "failed to send validate request to plugin")
@@ -381,6 +383,11 @@ func (p *Plugin) Validate(privateOptions any) error {
 
 // Export sends an `export` request to the plugin.
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (any, error) {
+	respTimeout := p.timeout
+	if ctx.Timeout() != 0 {
+		respTimeout = time.Second*time.Duration(ctx.Timeout()) + time.Millisecond*500
+	}
+
 	resp, err := DoWithResponseAs[comms.ExportResponse](
 		p.broker,
 		&comms.ExportRequest{
@@ -391,6 +398,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 			Params:  params,
 			Timeout: ctx.Timeout(),
 		},
+		respTimeout,
 	)
 	if err != nil {
 		return nil, err

@@ -62,10 +62,11 @@ type request struct {
 // requestWithResponse describes a request that expects a response from the plugin.
 // out, err chan are closed when response or error is received.
 type requestWithResponse struct {
-	id  uint32
-	in  any
-	out chan []byte
-	err chan error
+	id      uint32
+	in      any
+	out     chan []byte
+	err     chan error
+	timeout time.Duration
 }
 
 func newBroker(
@@ -137,16 +138,6 @@ func (b *pluginBroker) reader() {
 	}
 }
 
-func getRequestTimeout(r *requestWithResponse, b *pluginBroker) time.Duration {
-	if v, ok := r.in.(*comms.ExportRequest); ok {
-		if v.Timeout != 0 {
-			return time.Second*time.Duration(v.Timeout) + time.Millisecond*500
-		}
-	}
-
-	return b.timeout
-}
-
 func (b *pluginBroker) writer() {
 	for r := range b.tx {
 		go func(r any) {
@@ -165,8 +156,7 @@ func (b *pluginBroker) writer() {
 				b.requestsMutex.Unlock()
 
 				go func(id uint32) {
-					t := getRequestTimeout(r, b)
-					time.Sleep(t)
+					time.Sleep(r.timeout)
 
 					b.requestsMutex.Lock()
 					defer b.requestsMutex.Unlock()
@@ -179,7 +169,7 @@ func (b *pluginBroker) writer() {
 					req.err <- errs.Wrapf(
 						ErrBrokerTimeout,
 						"timeout %s reached while waiting for response from plugin",
-						t.String(),
+						r.timeout.String(),
 					)
 					close(req.out)
 					close(req.err)
@@ -292,7 +282,7 @@ func (b *pluginBroker) Do(data any) error {
 
 // DoWithResponseAs same as pluginBroker.DoWithResponse but unmarshals the
 // response into T.
-func DoWithResponseAs[T any](broker *pluginBroker, data any) (*T, error) {
+func DoWithResponseAs[T any](broker *pluginBroker, data any, timeout time.Duration) (*T, error) {
 	dataBytes, err := broker.DoWithResponse(data)
 	if err != nil {
 		return nil, err
