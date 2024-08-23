@@ -372,7 +372,7 @@ func main() {
 		os.Exit(0)
 	}
 
-	systemOpt, err := agent.Options.LoadSystemOptions()
+	systemOpt, err := agent.Options.RemovePluginSystemOptions()
 	if err != nil {
 		fatalExit("cannot initialize plugin system option", err)
 	}
@@ -399,9 +399,11 @@ func main() {
 			fatalExit("failed to load key access rules", err)
 		}
 
-		if _, err = agent.InitUserParameterPlugin(agent.Options.UserParameter, agent.Options.UnsafeUserParameters,
-			agent.Options.UserParameterDir); err != nil {
-
+		if _, err = agent.InitUserParameterPlugin(
+			agent.Options.UserParameter,
+			agent.Options.UnsafeUserParameters,
+			agent.Options.UserParameterDir,
+		); err != nil {
 			fatalExit("cannot initialize user parameters", err)
 		}
 

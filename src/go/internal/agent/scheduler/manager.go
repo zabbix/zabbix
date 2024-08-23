@@ -644,7 +644,6 @@ func NewManager(options *agent.AgentOptions, systemOpt agent.PluginSystemOptions
 				forceActiveChecksOnStart: getPluginForceActiveChecks(
 					systemOpt[metric.Plugin.Name()].ForceActiveChecksOnStart,
 					options.ForceActiveChecksOnStart,
-					metric.Plugin.Name(),
 				),
 				index:    -1,
 				refcount: 0,
@@ -724,14 +723,18 @@ func peekTask(tasks performerHeap) performer {
 }
 
 func getPluginCapacity(
-	pluginCapacity, defaultCapacity, hardCodedMaxCapacity, defaultMaxCapacity int, pluginName string,
+	pluginCapacity, defaultCapacity, pluginMaxCapacity, defaultMaxCapacity int, pluginName string,
 ) int {
 	capacity := pluginCapacity
 	if capacity == 0 {
 		capacity = defaultCapacity
 	}
 
-	maxCapacity := getMaxCapacity(defaultMaxCapacity, hardCodedMaxCapacity)
+	maxCapacity := defaultMaxCapacity
+
+	if pluginMaxCapacity > 0 {
+		maxCapacity = pluginMaxCapacity
+	}
 
 	if capacity > maxCapacity {
 		log.Warningf(
@@ -747,38 +750,15 @@ func getPluginCapacity(
 	return capacity
 }
 
-func getMaxCapacity(defaultMaxCap, hardcodedMaxCap int) int {
-	if hardcodedMaxCap > 0 {
-		return hardcodedMaxCap
-	}
-
-	return defaultMaxCap
-}
-
 func getPluginForceActiveChecks(
 	pluginActiveCheck *int,
 	globalActiveCheck int,
-	pluginName string,
 ) bool {
 	if pluginActiveCheck == nil {
-		return activeCheckToBool(globalActiveCheck)
+		return globalActiveCheck == 1
 	}
 
-	if *pluginActiveCheck > 1 || *pluginActiveCheck < 0 {
-		log.Warningf(
-			"invalid Plugins.%s.System.ForceActiveChecksOnStart configuration parameter: %d",
-			pluginName,
-			*pluginActiveCheck,
-		)
-
-		return activeCheckToBool(globalActiveCheck)
-	}
-
-	return activeCheckToBool(*pluginActiveCheck)
-}
-
-func activeCheckToBool(in int) bool {
-	return in == 1
+	return *pluginActiveCheck == 1
 }
 
 func getPluginInterfaceNames(p plugin.Accessor) string {

@@ -166,7 +166,7 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 					output:   sink,
 				}
 
-				if !scheduling && (firstActiveChecksRefreshed || p.forceActiveChecksOnStart) {
+				if !scheduling && !firstActiveChecksRefreshed && p.forceActiveChecksOnStart {
 					task.scheduled = time.Unix(now.Unix(), priorityExporterTaskNs)
 				} else if err = task.reschedule(now); err != nil {
 					return
