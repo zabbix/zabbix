@@ -1015,14 +1015,14 @@ ZBX_THREAD_ENTRY(zbx_alert_syncer_thread, args)
 #define ZBX_POLL_INTERVAL		1
 	zbx_thread_alert_syncer_args	*alert_syncer_args_in = (zbx_thread_alert_syncer_args *)
 							(((zbx_thread_args_t *)args)->args);
-	int				sleeptime, freq_watchdog;
+	int				sleeptime, freq_watchdog, alerts_num;
 	zbx_am_db_t			amdb;
 	char				*error = NULL;
 	const zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
 	int				server_num = ((zbx_thread_args_t *)args)->info.server_num;
 	int				process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
-	double				time_cleanup = 0,  time_watchdog = 0, time_results = 0;
+	double				time_cleanup = 0,  time_watchdog = 0, time_results = 0, sec1;
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
@@ -1044,13 +1044,19 @@ ZBX_THREAD_ENTRY(zbx_alert_syncer_thread, args)
 	if (ZBX_WATCHDOG_ALERT_FREQUENCY < (freq_watchdog = alert_syncer_args_in->confsyncer_frequency))
 		freq_watchdog = ZBX_WATCHDOG_ALERT_FREQUENCY;
 
-	zbx_setproctitle("%s [started, idle %d sec]", get_process_type_string(process_type), sleeptime);
+	zbx_setproctitle("%s [queuing alerts]", get_process_type_string(process_type));
+
+	sec1 = zbx_time();
+	alerts_num = am_db_queue_alerts(&amdb);
+
+	zbx_setproctitle("%s [queued %d alerts(s) in " ZBX_FS_DBL " sec]",
+			get_process_type_string(process_type), alerts_num, zbx_time() - sec1);
+
 
 	while (ZBX_IS_RUNNING())
 	{
-		int			alerts_num = 0, results_num = 0;
+		int			results_num = 0;
 		zbx_ipc_message_t	*message = NULL;
-		double			sec1;
 
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
 		if (SUCCEED != zbx_ipc_async_socket_recv(&amdb.am, sleeptime, &message))
