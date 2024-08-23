@@ -819,15 +819,6 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							'type' => 'complex_field',
 							'contents' => [
 								[
-									'field' => 'Size',
-									'fieldid' => 'date_size',
-									'value' => 20,
-									'attributes' => [
-										'maxlength' => 3
-									],
-									'symbol_after' => '%'
-								],
-								[
 									'field' => 'Bold',
 									'type' => 'checkbox',
 									'fieldid' => 'date_bold',
@@ -845,15 +836,6 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							// TODO: remove flag here and in other complex fields when DEV-2652 is fixed.
 							'field_locator' => 'xpath:.//div[@class="fields-group fields-group-time"]',
 							'contents' => [
-								[
-									'field' => 'Size',
-									'fieldid' => 'time_size',
-									'value' => 30,
-									'attributes' => [
-										'maxlength' => 3
-									],
-									'symbol_after' => '%'
-								],
 								[
 									'field' => 'Bold',
 									'type' => 'checkbox',
@@ -884,15 +866,6 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							'type' => 'complex_field',
 							'field_locator' => 'xpath:.//div[@class="fields-group fields-group-tzone"]',
 							'contents' => [
-								[
-									'field' => 'Size',
-									'fieldid' => 'tzone_size',
-									'value' => 20,
-									'attributes' => [
-										'maxlength' => 3
-									],
-									'symbol_after' => '%'
-								],
 								[
 									'field' => 'Bold',
 									'type' => 'checkbox',
@@ -1581,15 +1554,6 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 									'type' => 'radio_button',
 									'possible_values' => ['Left', 'Center', 'Right'],
 									'value' => 'Center'
-								],
-								[
-									'field' => 'Size',
-									'fieldid' => 'time_size',
-									'value' => 15,
-									'attributes' => [
-										'maxlength' => 3
-									],
-									'symbol_after' => '%'
 								],
 								[
 									'field' => 'Vertical position',
@@ -2770,70 +2734,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'trim' => 'Name'
 				]
 			],
-			// #11 Clock widget with empty date size.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Type' => CFormElement::RELOADABLE_FILL('Clock'),
-						'Name' => 'Clock widget with empty date size',
-						'Clock type' => 'Digital',
-						'Show' => ['Date', 'Time', 'Time zone'],
-						'Advanced configuration' => true,
-						'id:date_size' => '',
-						'id:time_size' => '',
-						'id:tzone_size' => ''
-					],
-					'error_message' => [
-						'Invalid parameter "Size": value must be one of 1-100.',
-						'Invalid parameter "Size": value must be one of 1-100.',
-						'Invalid parameter "Size": value must be one of 1-100.'
-					]
-				]
-			],
-			// #12 Clock widget with 0 date size.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Type' => CFormElement::RELOADABLE_FILL('Clock'),
-						'Name' => 'Clock widget with 0 date size',
-						'Clock type' => 'Digital',
-						'Show' => ['Date', 'Time', 'Time zone'],
-						'Advanced configuration' => true,
-						'id:date_size' => 0,
-						'id:time_size' => 0,
-						'id:tzone_size' => 0
-					],
-					'error_message' => [
-						'Invalid parameter "Size": value must be one of 1-100.',
-						'Invalid parameter "Size": value must be one of 1-100.',
-						'Invalid parameter "Size": value must be one of 1-100.'
-					]
-				]
-			],
-			// #13 Clock widget with out of range date size.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Type' => CFormElement::RELOADABLE_FILL('Clock'),
-						'Name' => 'Clock widget with too big date size',
-						'Clock type' => 'Digital',
-						'Show' => ['Date', 'Time', 'Time zone'],
-						'Advanced configuration' => true,
-						'id:date_size' => 101,
-						'id:time_size' => 101,
-						'id:tzone_size' => 101
-					],
-					'error_message' => [
-						'Invalid parameter "Size": value must be one of 1-100.',
-						'Invalid parameter "Size": value must be one of 1-100.',
-						'Invalid parameter "Size": value must be one of 1-100.'
-					]
-				]
-			],
-			// #14 Discovery status widget.
+			// #11 Discovery status widget.
 			[
 				[
 					'fields' => [
@@ -2842,7 +2743,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					]
 				]
 			],
-			// #15 Favorite graphs widget.
+			// #12 Favorite graphs widget.
 			[
 				[
 					'fields' => [
@@ -2851,7 +2752,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					]
 				]
 			],
-			// #16 Favorite maps widget.
+			// #13 Favorite maps widget.
 			[
 				[
 					'fields' => [
@@ -2860,7 +2761,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					]
 				]
 			],
-			// #17 Gauge widget with empty Item, Min, Mix and Description.
+			// #14 Gauge widget with empty Item, Min, Mix and Description.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2880,7 +2781,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					]
 				]
 			],
-			// #18 Gauge widget with non-numeric Min and Max.
+			// #15 Gauge widget with non-numeric Min and Max.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2900,7 +2801,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					]
 				]
 			],
-			// #19 Gauge widget with non-numeric gauge element sizes.
+			// #16 Gauge widget with non-numeric gauge element sizes.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2941,7 +2842,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					]
 				]
 			],
-			// #20 Gauge widget with 0 gauge element sizes.
+			// #17 Gauge widget with 0 gauge element sizes.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2977,7 +2878,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					]
 				]
 			],
-			// #21 Gauge widget with too big gauge element sizes.
+			// #18 Gauge widget with too big gauge element sizes.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -3013,7 +2914,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					]
 				]
 			],
-			// #22 Gauge widget with non-numeric threshold.
+			// #19 Gauge widget with non-numeric threshold.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -3035,7 +2936,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'error_message' => 'Invalid parameter "Thresholds/1/threshold": a number is expected.'
 				]
 			],
-			// #23 Gauge widget with negative threshold.
+			// #20 Gauge widget with negative threshold.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -3057,7 +2958,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'error_message' => 'Invalid parameter "Thresholds": value must be no less than "0".'
 				]
 			],
-			// #24 Gauge widget with too high threshold.
+			// #21 Gauge widget with too high threshold.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -3079,7 +2980,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'error_message' => 'Invalid parameter "Thresholds": value must be no greater than "100".'
 				]
 			],
-			// #25 Gauge widget with too much value and scale decimal places.
+			// #22 Gauge widget with too much value and scale decimal places.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -3100,7 +3001,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					]
 				]
 			],
-			// #26 Gauge widget with minimum parameters.
+			// #23 Gauge widget with minimum parameters.
 			[
 				[
 					'fields' => [
@@ -3113,7 +3014,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					]
 				]
 			],
-			// #27 Gauge widget with all parameters defined.
+			// #24 Gauge widget with all parameters defined.
 			[
 				[
 					'fields' => [
@@ -3163,7 +3064,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					]
 				]
 			],
-			// #28 Geomap with non-numeric Initial view.
+			// #25 Geomap with non-numeric Initial view.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -3176,7 +3077,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							' separated latitude and longitude) are expected.'
 				]
 			],
-			// #29 Geomap with a single coordinate in Initial view.
+			// #26 Geomap with a single coordinate in Initial view.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -3189,7 +3090,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							' separated latitude and longitude) are expected.'
 				]
 			],
-			// #30 Geomap with out of range latitude in Initial view.
+			// #27 Geomap with out of range latitude in Initial view.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -3202,7 +3103,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							' separated latitude and longitude) are expected.'
 				]
 			],
-			// #31 Geomap with out of range longitude in Initial view.
+			// #28 Geomap with out of range longitude in Initial view.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -3215,7 +3116,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							' separated latitude and longitude) are expected.'
 				]
 			],
-			// #32 Geomap with minimal set of parameters.
+			// #29 Geomap with minimal set of parameters.
 			[
 				[
 					'fields' => [
@@ -3224,7 +3125,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					]
 				]
 			],
-			// #33 Geomap with all possible parameters.
+			// #30 Geomap with all possible parameters.
 			[
 				[
 					'fields' => [
@@ -3235,7 +3136,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					]
 				]
 			],
-			// #34 Graph Classic widget with missing graph.
+			// #31 Graph Classic widget with missing graph.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -3248,7 +3149,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'error_message' => 'Invalid parameter "Graph": cannot be empty.'
 				]
 			],
-			// #35 Graph Classic widget with missing item.
+			// #32 Graph Classic widget with missing item.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -3261,7 +3162,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'error_message' => 'Invalid parameter "Item": cannot be empty.'
 				]
 			],
-			// #36 Graph Classic widget with graph and legend.
+			// #33 Graph Classic widget with graph and legend.
 			[
 				[
 					'fields' => [
@@ -3276,7 +3177,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					]
 				]
 			],
-			// #37 Graph Classic widget with Simple graph and without legend.
+			// #34 Graph Classic widget with Simple graph and without legend.
 			[
 				[
 					'fields' => [
@@ -3291,7 +3192,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					]
 				]
 			],
-			// #38 Graph prototype widget with missing graph prototype.
+			// #35 Graph prototype widget with missing graph prototype.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -3306,7 +3207,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					]
 				]
 			],
-			// #39 Graph prototype widget with missing Columns and Rows.
+			// #36 Graph prototype widget with missing Columns and Rows.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -3327,7 +3228,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					]
 				]
 			],
-			// #40 Graph prototype widget with missing item prototype.
+			// #37 Graph prototype widget with missing item prototype.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -3340,7 +3241,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'error_message' => 'Invalid parameter "Item prototype": cannot be empty.'
 				]
 			],
-			// #41 Graph prototype widget with too high number of Columns and Rows.
+			// #38 Graph prototype widget with too high number of Columns and Rows.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -3361,7 +3262,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					]
 				]
 			],
-			// #42 Graph prototype widget with negative number of Columns.
+			// #39 Graph prototype widget with negative number of Columns.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -3382,7 +3283,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					]
 				]
 			],
-			// #43 Graph prototype widget with graph prototype, legend, 2 rows and 2 columns.
+			// #40 Graph prototype widget with graph prototype, legend, 2 rows and 2 columns.
 			[
 				[
 					'fields' => [
@@ -3399,7 +3300,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					]
 				]
 			],
-			// #44 Graph prototype widget with simple graph prototype, without legend, 1 row and 1 column.
+			// #41 Graph prototype widget with simple graph prototype, without legend, 1 row and 1 column.
 			[
 				[
 					'fields' => [
@@ -3416,7 +3317,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					]
 				]
 			],
-			// #45 Host availability widget with minimal set of parameters.
+			// #42 Host availability widget with minimal set of parameters.
 			[
 				[
 					'fields' => [
@@ -3425,7 +3326,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					]
 				]
 			],
-			// #46 Host availability widget with all possible parameters defined.
+			// #43 Host availability widget with all possible parameters defined.
 			[
 				[
 					'fields' => [
@@ -3445,7 +3346,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					]
 				]
 			],
-			// #47 Item value widget with missing field values.
+			// #44 Item value widget with missing field values.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -3455,7 +3356,6 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 						'Advanced configuration' => true,
 						'id:description' => '',
 						'id:desc_size' => '',
-						'id:time_size' => '',
 						'id:decimal_size' => '',
 						'id:value_size' => '',
 						'id:units_size' => '',
@@ -3477,7 +3377,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					]
 				]
 			],
-			// #48 Item value widget with non-numeric field values.
+			// #45 Item value widget with non-numeric field values.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -3522,7 +3422,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					]
 				]
 			],
-			// #49 Item value widget with too low field values.
+			// #46 Item value widget with too low field values.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -3556,7 +3456,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					]
 				]
 			],
-			// #50 Item value widget with out of range field values.
+			// #47 Item value widget with out of range field values.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -3591,7 +3491,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'days_count' => true
 				]
 			],
-			// #51 Item value widget with minimal set of parameters.
+			// #49 Item value widget with minimal set of parameters.
 			[
 				[
 					'fields' => [
@@ -3604,7 +3504,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					]
 				]
 			],
-			// #52 Item value widget with all possible parameters.
+			// #50 Item value widget with all possible parameters.
 			[
 				[
 					'fields' => [
@@ -3659,7 +3559,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					]
 				]
 			],
-			// #53 Map widget with missing map.
+			// #51 Map widget with missing map.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -3670,7 +3570,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'error_message' => 'Invalid parameter "Map": cannot be empty.'
 				]
 			],
-			// #54 Map widget with map.
+			// #52 Map widget with map.
 			[
 				[
 					'fields' => [
@@ -3680,7 +3580,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					]
 				]
 			],
-			// #55 Map navigation tree widget.
+			// #53 Map navigation tree widget.
 			[
 				[
 					'fields' => [
@@ -3691,7 +3591,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					]
 				]
 			],
-			// #56 Item history widget with empty Items parameter.
+			// #54 Item history widget with empty Items parameter.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -3706,7 +3606,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					]
 				]
 			],
-			// #57 Item history widget with too high value of Show lines parameter.
+			// #55 Item history widget with too high value of Show lines parameter.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -3725,7 +3625,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'error_message' => 'Invalid parameter "Show lines": value must be one of 1-100.'
 				]
 			],
-			// #58 Item history widget with negative Show lines parameter.
+			// #56 Item history widget with negative Show lines parameter.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -3744,7 +3644,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'error_message' => 'Invalid parameter "Show lines": value must be one of 1-100.'
 				]
 			],
-			// #59 Item history widget with Values location = Bottom, Show timestamp =true and Column header = Off.
+			// #57 Item history widget with Values location = Bottom, Show timestamp =true and Column header = Off.
 			[
 				[
 					'fields' => [
@@ -3765,7 +3665,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					]
 				]
 			],
-			// #60 Item history widget with Vertical layout and Horizontal header.
+			// #58 Item history widget with Vertical layout and Horizontal header.
 			[
 				[
 					'fields' => [
@@ -3784,7 +3684,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					]
 				]
 			],
-			// #61 Problem hosts widget with default parameters.
+			// #59 Problem hosts widget with default parameters.
 			[
 				[
 
@@ -3794,7 +3694,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					]
 				]
 			],
-			// #62 Problem hosts widget with all possible parameters.
+			// #60 Problem hosts widget with all possible parameters.
 			[
 				[
 
@@ -3813,7 +3713,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					]
 				]
 			],
-			// #63 Problems widget with empty Show lines parameter (reset to 0).
+			// #61 Problems widget with empty Show lines parameter (reset to 0).
 			[
 				[
 					'expected' => TEST_BAD,
@@ -3825,7 +3725,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'error_message' => 'Invalid parameter "Show lines": value must be one of 1-100.'
 				]
 			],
-			// #64 Problems widget with too high value of Show lines parameter.
+			// #62 Problems widget with too high value of Show lines parameter.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -3837,7 +3737,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'error_message' => 'Invalid parameter "Show lines": value must be one of 1-100.'
 				]
 			],
-			// #65 Problems widget with negative Show lines parameter.
+			// #63 Problems widget with negative Show lines parameter.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -3849,7 +3749,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'error_message' => 'Invalid parameter "Show lines": value must be one of 1-100.'
 				]
 			],
-			// #66 Problems widget with default parameters.
+			// #64 Problems widget with default parameters.
 			[
 				[
 					'fields' => [
@@ -3858,7 +3758,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					]
 				]
 			],
-			// #67 Problems widget with all possible parameters.
+			// #65 Problems widget with all possible parameters.
 			[
 				[
 					'fields' => [
@@ -3886,7 +3786,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					]
 				]
 			],
-			// #68 Problems by severity widget with default parameters.
+			// #66 Problems by severity widget with default parameters.
 			[
 				[
 					'fields' => [
@@ -3895,7 +3795,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					]
 				]
 			],
-			// #69 Problems by severity widget with all possible parameters.
+			// #67 Problems by severity widget with all possible parameters.
 			[
 				[
 					'fields' => [
@@ -3916,7 +3816,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					]
 				]
 			],
-			// #70 SLA report widget with missing SLA.
+			// #68 SLA report widget with missing SLA.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -3928,7 +3828,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'error_message' => 'Invalid parameter "SLA": cannot be empty.'
 				]
 			],
-			// #71 SLA widget with non-numeric show periods.
+			// #69 SLA widget with non-numeric show periods.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -3945,7 +3845,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'error_message' => 'Invalid parameter "Show periods": value must be one of 1-100.'
 				]
 			],
-			// #72 SLA widget with too large value in show periods.
+			// #70 SLA widget with too large value in show periods.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -3959,7 +3859,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'error_message' => 'Invalid parameter "Show periods": value must be one of 1-100.'
 				]
 			],
-			// #73 SLA widget with floating point value in show periods.
+			// #71 SLA widget with floating point value in show periods.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -3976,7 +3876,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'error_message' => 'Invalid parameter "Show periods": value must be one of 1-100.'
 				]
 			],
-			// #74 SLA widget with negative value in show periods.
+			// #72 SLA widget with negative value in show periods.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -3990,7 +3890,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'error_message' => 'Invalid parameter "Show periods": value must be one of 1-100.'
 				]
 			],
-			// #75 SLA widget with string type From and To dates.
+			// #73 SLA widget with string type From and To dates.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -4008,7 +3908,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					]
 				]
 			],
-			// #76 SLA widget with wrong From date and To date format.
+			// #74 SLA widget with wrong From date and To date format.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -4026,7 +3926,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					]
 				]
 			],
-			// #77 SLA widget with From date and To date too far in the past.
+			// #75 SLA widget with From date and To date too far in the past.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -4044,7 +3944,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					]
 				]
 			],
-			// #78 SLA widget with From date and To date too far in the future.
+			// #76 SLA widget with From date and To date too far in the future.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -4062,7 +3962,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					]
 				]
 			],
-			// #79 SLA widget with minimal set of parameters.
+			// #77 SLA widget with minimal set of parameters.
 			[
 				[
 					'fields' => [
@@ -4073,7 +3973,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'page' => '2nd page'
 				]
 			],
-			// #80 SLA widget with all possible parameters set.
+			// #78 SLA widget with all possible parameters set.
 			[
 				[
 					'fields' => [
@@ -4089,7 +3989,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'page' => '2nd page'
 				]
 			],
-			// #81 SLA widget with dynamic From and To.
+			// #79 SLA widget with dynamic From and To.
 			[
 				[
 					'fields' => [
@@ -4102,7 +4002,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'page' => '2nd page'
 				]
 			],
-			// #82 System information widget with default parameters.
+			// #80 System information widget with default parameters.
 			[
 				[
 					'fields' => [
@@ -4112,7 +4012,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'page' => '2nd page'
 				]
 			],
-			// #83 System information widget with all parameters specified.
+			// #81 System information widget with all parameters specified.
 			[
 				[
 					'fields' => [
@@ -4124,7 +4024,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'page' => '2nd page'
 				]
 			],
-			// #84 Top triggers widget with empty Trigger limit.
+			// #82 Top triggers widget with empty Trigger limit.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -4137,7 +4037,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'error_message' => 'Invalid parameter "Trigger limit": value must be one of 1-100.'
 				]
 			],
-			// #85 Top triggers widget with non-numeric Trigger limit.
+			// #83 Top triggers widget with non-numeric Trigger limit.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -4153,7 +4053,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'error_message' => 'Invalid parameter "Trigger limit": value must be one of 1-100.'
 				]
 			],
-			// #86 Top triggers widget with zero Trigger limit.
+			// #84 Top triggers widget with zero Trigger limit.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -4166,7 +4066,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'error_message' => 'Invalid parameter "Trigger limit": value must be one of 1-100.'
 				]
 			],
-			// #87 Top triggers widget with out of range Trigger limit.
+			// #85 Top triggers widget with out of range Trigger limit.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -4179,7 +4079,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'error_message' => 'Invalid parameter "Trigger limit": value must be one of 1-100.'
 				]
 			],
-			// #88 Top triggers widget with default parameters.
+			// #86 Top triggers widget with default parameters.
 			[
 				[
 					'fields' => [
@@ -4189,7 +4089,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'page' => '2nd page'
 				]
 			],
-			// #89 Top triggers widget with all possible parameters.
+			// #87 Top triggers widget with all possible parameters.
 			[
 				[
 					'fields' => [
@@ -4207,7 +4107,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'page' => '2nd page'
 				]
 			],
-			// #90 Trigger overview widget with default parameters.
+			// #88 Trigger overview widget with default parameters.
 			[
 				[
 					'fields' => [
@@ -4217,7 +4117,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'page' => '2nd page'
 				]
 			],
-			// #91 Trigger overview widget with all possible parameters.
+			// #89 Trigger overview widget with all possible parameters.
 			[
 				[
 					'fields' => [
@@ -4235,7 +4135,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'page' => '2nd page'
 				]
 			],
-			// #92 URL widget with special symbols in URL.
+			// #90 URL widget with special symbols in URL.
 			[
 				[
 					'fields' => [
@@ -4247,7 +4147,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'page' => '2nd page'
 				]
 			],
-			// #93 URL widget with trailing and leading spaces in URL.
+			// #91 URL widget with trailing and leading spaces in URL.
 			[
 				[
 					'fields' => [
@@ -4259,7 +4159,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'page' => '2nd page'
 				]
 			],
-			// #94 URL widget with empty URL (after trimming).
+			// #92 URL widget with empty URL (after trimming).
 			[
 				[
 					'expected' => TEST_BAD,
@@ -4273,7 +4173,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'error_message' => 'Invalid parameter "URL": cannot be empty.'
 				]
 			],
-			// #95 Web monitoring widget with default parameters.
+			// #93 Web monitoring widget with default parameters.
 			[
 				[
 					'fields' => [
@@ -4283,7 +4183,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'page' => '2nd page'
 				]
 			],
-			// #96 Web monitoring widget with all possible parameters.
+			// #94 Web monitoring widget with all possible parameters.
 			[
 				[
 					'fields' => [
@@ -4299,7 +4199,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'page' => '2nd page'
 				]
 			],
-			// #97 Data overview widget with default parameters.
+			// #95 Data overview widget with default parameters.
 			[
 				[
 					'fields' => [
@@ -4309,7 +4209,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'page' => '2nd page'
 				]
 			],
-			// #98 Data overview widget with all possible parameters.
+			// #96 Data overview widget with all possible parameters.
 			[
 				[
 					'fields' => [

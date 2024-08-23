@@ -231,7 +231,7 @@ window.widget_pie_chart_form = new class {
 				of: e.target,
 				my: 'left top',
 				at: 'left bottom',
-				within: '.wrapper'
+				within: 'body'
 			}
 		});
 	}
@@ -794,8 +794,8 @@ window.widget_pie_chart_form = new class {
 
 		this.#form.querySelector('[for=legend_lines]')
 			.textContent = legend_lines_mode == <?= WidgetForm::LEGEND_LINES_MODE_VARIABLE ?>
-				? '<?= _('Maximum number of rows') ?>'
-				: '<?= _('Number of rows') ?>';
+				? <?= json_encode(_('Maximum number of rows')) ?>
+				: <?= json_encode(_('Number of rows')) ?>;
 
 		// Trigger event to update tab indicators.
 		document.getElementById('tabs').dispatchEvent(new Event(TAB_INDICATOR_UPDATE_EVENT));

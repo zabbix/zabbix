@@ -187,9 +187,7 @@
 		 * @param {object}  url           The URL to send the POST request to.
 		 */
 		#post(target, mediatypeids, url) {
-			url.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
-				<?= json_encode(CCsrfTokenHelper::get('mediatype')) ?>
-			);
+			url.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('mediatype')) ?>);
 
 			target.classList.add('is-loading');
 
