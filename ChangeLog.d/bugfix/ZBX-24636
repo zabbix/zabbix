@@ -1,0 +1,1 @@
+........S. [ZBX-24636] fixed {HOST.CONN}, {HOST.DNS} and {HOST.IP} to be resolved to unknown in notifications instead of stopping resolving and to be resolved to empty when there is no interface (vso)
