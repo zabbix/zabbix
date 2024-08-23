@@ -639,6 +639,7 @@ function createFontSelect(string $name): CSelect {
 							->setId('massLabel')
 							->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 							->setRows(2)
+							->setMaxlength(DB::getFieldLength('sysmaps_elements', 'label'))
 							->disableSpellcheck()
 					)
 					->addRow(
