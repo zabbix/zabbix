@@ -35,6 +35,7 @@ zabbix_export:
           delay: '{$OPENSTACK.AUTH.INTERVAL}'
           history: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             
             const request_path = '/v3/auth/tokens';
@@ -156,10 +157,12 @@ zabbix_export:
           name: 'OpenStack: Nova discovery'
           type: DEPENDENT
           key: openstack.services.nova.discovery
+          delay: '0'
           filter:
             conditions:
               - macro: '{#SERVICE_NAME}'
                 value: ^Nova$
+                formulaid: A
           description: 'Discovers OpenStack services from the monitoring user''s services catalog.'
           host_prototypes:
             - uuid: 580d769292ec48379c5b84cd5c72533b
@@ -230,6 +233,7 @@ zabbix_export:
           delay: '{$OPENSTACK.NOVA.INTERVAL.AVAILABILITY_ZONE}'
           history: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Gets a list of availability zones and its data.'
           preprocessing:
             - type: JSONPATH
@@ -253,6 +257,7 @@ zabbix_export:
           delay: '{$OPENSTACK.NOVA.INTERVAL.HYPERVISOR}'
           history: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Gets a list of hypervisors and its data.'
           preprocessing:
             - type: JSONPATH
@@ -276,6 +281,7 @@ zabbix_export:
           delay: '{$OPENSTACK.NOVA.INTERVAL.LIMITS}'
           history: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Gets absolute limits for the project.'
           preprocessing:
             - type: JSONPATH
@@ -296,6 +302,7 @@ zabbix_export:
           name: 'Instances count, current'
           type: DEPENDENT
           key: openstack.nova.limits.instances.current
+          delay: '0'
           description: 'Number of servers in each tenant.'
           preprocessing:
             - type: JSONPATH
@@ -324,6 +331,7 @@ zabbix_export:
           name: 'Instances count, max'
           type: DEPENDENT
           key: openstack.nova.limits.instances.max
+          delay: '0'
           description: 'Number of allowed servers for each tenant.'
           preprocessing:
             - type: JSONPATH
@@ -338,6 +346,7 @@ zabbix_export:
           name: 'RAM usage, current'
           type: DEPENDENT
           key: openstack.nova.limits.ram.current
+          delay: '0'
           units: b
           description: 'Amount of used server RAM.'
           preprocessing:
@@ -371,6 +380,7 @@ zabbix_export:
           name: 'RAM usage, max'
           type: DEPENDENT
           key: openstack.nova.limits.ram.max
+          delay: '0'
           units: b
           description: 'Amount of allowed server RAM.'
           preprocessing:
@@ -389,6 +399,7 @@ zabbix_export:
           name: 'vCPUs usage, current'
           type: DEPENDENT
           key: openstack.nova.limits.vcpu.current
+          delay: '0'
           description: 'Number of used server cores in each tenant.'
           preprocessing:
             - type: JSONPATH
@@ -417,6 +428,7 @@ zabbix_export:
           name: 'vCPUs usage, max'
           type: DEPENDENT
           key: openstack.nova.limits.vcpu.max
+          delay: '0'
           description: 'Number of allowed server cores for each tenant.'
           preprocessing:
             - type: JSONPATH
@@ -434,6 +446,7 @@ zabbix_export:
           delay: '{$OPENSTACK.NOVA.INTERVAL.SERVERS}'
           history: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Gets a list of servers.'
           preprocessing:
             - type: JSONPATH
@@ -457,6 +470,7 @@ zabbix_export:
           delay: '{$OPENSTACK.NOVA.INTERVAL.SERVICES}'
           history: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Gets a list of compute services and its data.'
           preprocessing:
             - type: JSONPATH
@@ -480,6 +494,7 @@ zabbix_export:
           delay: '{$OPENSTACK.NOVA.INTERVAL.TENANTS}'
           history: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             
             const request_path = '/os-simple-tenant-usage';
@@ -593,20 +608,24 @@ zabbix_export:
           name: 'Nova: Availability zones discovery'
           type: DEPENDENT
           key: openstack.nova.availability_zone.discovery
+          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#ZONE_NAME}'
                 value: '{$OPENSTACK.AVAILABILITY_ZONE.DISCOVERY.NAME.MATCHES}'
+                formulaid: A
               - macro: '{#ZONE_NAME}'
                 value: '{$OPENSTACK.AVAILABILITY_ZONE.DISCOVERY.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: B
           description: 'Discovers OpenStack Nova availability zones.'
           item_prototypes:
             - uuid: 46f1348ce86742a6a645e137b0ecea63
               name: 'Availability zone [{#ZONE_NAME}]: Host count'
               type: DEPENDENT
               key: 'openstack.nova.availability_zone.host_count[{#ZONE_NAME}]'
+              delay: '0'
               description: 'Count of hosts and service objects under single availability zone.'
               preprocessing:
                 - type: JSONPATH
@@ -628,8 +647,10 @@ zabbix_export:
               name: 'Availability zone [{#ZONE_NAME}]: Raw data'
               type: DEPENDENT
               key: 'openstack.nova.availability_zone.raw[{#ZONE_NAME}]'
+              delay: '0'
               history: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Raw data of the availability zone.'
               preprocessing:
                 - type: JSONPATH
@@ -646,6 +667,7 @@ zabbix_export:
               name: 'Availability zone [{#ZONE_NAME}]: State'
               type: DEPENDENT
               key: 'openstack.nova.availability_zone.state[{#ZONE_NAME}]'
+              delay: '0'
               description: 'Current state of the availability zone.'
               valuemap:
                 name: 'Availability zone state'
@@ -656,6 +678,8 @@ zabbix_export:
                   error_handler: CUSTOM_ERROR
                   error_handler_params: 'Could not parse the detailed availability zone report'
                 - type: BOOL_TO_DECIMAL
+                  parameters:
+                    - ''
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
@@ -690,32 +714,41 @@ zabbix_export:
           name: 'Nova: Hypervisor discovery'
           type: DEPENDENT
           key: openstack.nova.hypervisors.discovery
+          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#HOSTNAME}'
                 value: '{$OPENSTACK.HYPERVISOR.DISCOVERY.HOSTNAME.MATCHES}'
+                formulaid: A
               - macro: '{#HOSTNAME}'
                 value: '{$OPENSTACK.HYPERVISOR.DISCOVERY.HOSTNAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: B
               - macro: '{#HOST_IP}'
                 value: '{$OPENSTACK.HYPERVISOR.DISCOVERY.IP.MATCHES}'
+                formulaid: C
               - macro: '{#HOST_IP}'
                 value: '{$OPENSTACK.HYPERVISOR.DISCOVERY.IP.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: D
               - macro: '{#TYPE}'
                 value: '{$OPENSTACK.HYPERVISOR.DISCOVERY.TYPE.MATCHES}'
+                formulaid: E
               - macro: '{#TYPE}'
                 value: '{$OPENSTACK.HYPERVISOR.DISCOVERY.TYPE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: F
           description: 'Discovers OpenStack Nova hypervisors.'
           item_prototypes:
             - uuid: 3edd8fcf7d3643119b7b21111155fcc0
               name: 'Hypervisor [{#ID}]:[{#HOSTNAME}]: Raw data'
               type: DEPENDENT
               key: 'openstack.nova.hypervisors.raw[{#ID}]'
+              delay: '0'
               history: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Raw data of the hypervisor.'
               preprocessing:
                 - type: JSONPATH
@@ -732,6 +765,7 @@ zabbix_export:
               name: 'Hypervisor [{#ID}]:[{#HOSTNAME}]: State'
               type: DEPENDENT
               key: 'openstack.nova.hypervisors.state[{#ID}]'
+              delay: '0'
               description: 'State of the hypervisor.'
               valuemap:
                 name: 'General state'
@@ -774,6 +808,7 @@ zabbix_export:
               name: 'Hypervisor [{#ID}]:[{#HOSTNAME}]: Status'
               type: DEPENDENT
               key: 'openstack.nova.hypervisors.status[{#ID}]'
+              delay: '0'
               description: 'Status of the hypervisor.'
               valuemap:
                 name: 'General status'
@@ -816,6 +851,7 @@ zabbix_export:
               name: 'Hypervisor [{#ID}]:[{#HOSTNAME}]: Version'
               type: DEPENDENT
               key: 'openstack.nova.hypervisors.version[{#ID}]'
+              delay: '0'
               value_type: FLOAT
               description: 'Hypervisor version.'
               preprocessing:
@@ -864,14 +900,17 @@ zabbix_export:
           name: 'Nova: Servers discovery'
           type: DEPENDENT
           key: openstack.nova.server.discovery
+          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#SERVER_NAME}'
                 value: '{$OPENSTACK.SERVER.DISCOVERY.NAME.MATCHES}'
+                formulaid: A
               - macro: '{#SERVER_NAME}'
                 value: '{$OPENSTACK.SERVER.DISCOVERY.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: B
           description: 'Discovers OpenStack Nova servers.'
           item_prototypes:
             - uuid: 84fd4be0c5f84744ac6bd93d4d4e8f0e
@@ -967,26 +1006,33 @@ zabbix_export:
           name: 'Nova: Compute services discovery'
           type: DEPENDENT
           key: openstack.nova.services.discovery
+          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#BINARY}'
                 value: '{$OPENSTACK.SERVICES.DISCOVERY.BINARY.MATCHES}'
+                formulaid: A
               - macro: '{#BINARY}'
                 value: '{$OPENSTACK.SERVICES.DISCOVERY.BINARY.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: B
               - macro: '{#HOST}'
                 value: '{$OPENSTACK.SERVICES.DISCOVERY.HOST.MATCHES}'
+                formulaid: C
               - macro: '{#HOST}'
                 value: '{$OPENSTACK.SERVICES.DISCOVERY.HOST.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: D
           description: 'Discovers OpenStack compute services.'
           item_prototypes:
             - uuid: 3bd724dad043411187a86466cf8ee2c6
               name: 'Compute service [{#HOST}]:[{#BINARY}]:[{#ID}]: Disabling reason'
               type: DEPENDENT
               key: 'openstack.nova.services.disabled.reason[{#ID}]'
+              delay: '0'
               value_type: CHAR
+              trends: '0'
               description: 'Reason for disabling a service.'
               valuemap:
                 name: 'Compute service disabling reason'
@@ -1010,8 +1056,10 @@ zabbix_export:
               name: 'Compute service [{#HOST}]:[{#BINARY}]:[{#ID}]: Raw data'
               type: DEPENDENT
               key: 'openstack.nova.services.raw[{#ID}]'
+              delay: '0'
               history: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Raw data of the service.'
               preprocessing:
                 - type: JSONPATH
@@ -1028,6 +1076,7 @@ zabbix_export:
               name: 'Compute service [{#HOST}]:[{#BINARY}]:[{#ID}]: State'
               type: DEPENDENT
               key: 'openstack.nova.services.state[{#ID}]'
+              delay: '0'
               description: 'State of the service.'
               valuemap:
                 name: 'General state'
@@ -1070,6 +1119,7 @@ zabbix_export:
               name: 'Compute service [{#HOST}]:[{#BINARY}]:[{#ID}]: Status'
               type: DEPENDENT
               key: 'openstack.nova.services.status[{#ID}]'
+              delay: '0'
               description: 'Status of the service.'
               valuemap:
                 name: 'General status'
@@ -1125,12 +1175,14 @@ zabbix_export:
           name: 'Nova: Tenant discovery'
           type: DEPENDENT
           key: openstack.nova.tenant.discovery
+          delay: '0'
           description: 'Discovers tenants and their usage data.'
           item_prototypes:
             - uuid: 73e8e9b39da64358948407efd6aded6b
               name: 'Tenant [{#TENANT_ID}]: Total disk usage'
               type: DEPENDENT
               key: 'openstack.nova.tenant.disk_usage[{#TENANT_ID}]'
+              delay: '0'
               value_type: FLOAT
               units: '!hours'
               description: |
@@ -1159,8 +1211,10 @@ zabbix_export:
               name: 'Tenant [{#TENANT_ID}]: Raw data'
               type: DEPENDENT
               key: 'openstack.nova.tenant.raw[{#TENANT_ID}]'
+              delay: '0'
               history: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Raw data of the tenant.'
               preprocessing:
                 - type: JSONPATH
@@ -1177,6 +1231,7 @@ zabbix_export:
               name: 'Tenant [{#TENANT_ID}]: Total hours'
               type: DEPENDENT
               key: 'openstack.nova.tenant.total_hours[{#TENANT_ID}]'
+              delay: '0'
               value_type: FLOAT
               units: '!hours'
               description: 'Total duration that the servers exist (in hours).'
@@ -1203,6 +1258,7 @@ zabbix_export:
               name: 'Tenant [{#TENANT_ID}]: Total memory usage'
               type: DEPENDENT
               key: 'openstack.nova.tenant.total_memory_mb_usage[{#TENANT_ID}]'
+              delay: '0'
               value_type: FLOAT
               units: '!hours'
               description: |
@@ -1231,6 +1287,7 @@ zabbix_export:
               name: 'Tenant [{#TENANT_ID}]: Total vCPUs usage'
               type: DEPENDENT
               key: 'openstack.nova.tenant.total_vcpu[{#TENANT_ID}]'
+              delay: '0'
               value_type: FLOAT
               units: '!hours'
               description: |

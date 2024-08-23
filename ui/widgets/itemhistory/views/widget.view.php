@@ -208,13 +208,16 @@ function makeValueCell(array $column, array $item_value, bool $text_wordbreak = 
 						->addClass($cell_class)
 						->setAttribute('data-itemid', $item_value['itemid'])
 						->setAttribute('data-clock', $item_value['clock'].'.'.$item_value['ns']),
-					(new CCol(new CDiv($item_value['formatted_value'])))
+					(new CCol(
+						(new CSpan($item_value['formatted_value']))->setHint(
+							(new CDiv($item_value['value']))->addClass(ZBX_STYLE_HINTBOX_WRAP)
+						)
+					))
 						->addClass($cell_class)
 						->setAttribute('data-itemid', $item_value['itemid'])
 						->setAttribute('data-clock', $item_value['clock'].'.'.$item_value['ns'])
 						->addStyle('width: 0;')
 						->addClass(ZBX_STYLE_NOWRAP)
-						->setHint((new CDiv($item_value['value']))->addClass(ZBX_STYLE_HINTBOX_WRAP))
 				];
 			}
 			else {
@@ -233,12 +236,15 @@ function makeValueCell(array $column, array $item_value, bool $text_wordbreak = 
 				}
 
 				return [
-					(new CCol($item_value['formatted_value']))
+					(new CCol(
+						(new CSpan($item_value['formatted_value']))->setHint(
+							(new CDiv($item_value['value']))->addClass(ZBX_STYLE_HINTBOX_WRAP)
+						)
+					))
 						->addClass($cell_class)
 						->setAttribute('data-itemid', $item_value['itemid'])
 						->setAttribute('data-clock', $item_value['clock'].'.'.$item_value['ns'])
 						->setAttribute('bgcolor', $color !== '' ? '#'.$color : null)
-						->setHint((new CDiv($item_value['value']))->addClass(ZBX_STYLE_HINTBOX_WRAP))
 						->setColSpan(2)
 				];
 			}
@@ -261,16 +267,26 @@ function makeValueCell(array $column, array $item_value, bool $text_wordbreak = 
 				case CWidgetFieldColumnsList::DISPLAY_AS_IS:
 					$cell
 						->addItem(
-							new CDiv(zbx_nl2br($item_value['value']))
+							(new CSpan(zbx_nl2br($item_value['value'])))->setHint(
+								(new CDiv($item_value['value']))->addClass(ZBX_STYLE_HINTBOX_WRAP)
+							)
 						)
 						->addClass($text_wordbreak ? ZBX_STYLE_WORDBREAK : ZBX_STYLE_NOWRAP);
 
 					break;
 
 				case CWidgetFieldColumnsList::DISPLAY_SINGLE_LINE:
+					$single_line_value = substr($item_value['value'], 0, $column['max_length']);
+
+					if (strlen($item_value['value']) > $column['max_length']) {
+						$single_line_value .= '...';
+					}
+
 					$cell
 						->addItem(
-							new CDiv(substr($item_value['value'], 0, $column['max_length']))
+							(new CSpan($single_line_value))->setHint(
+								(new CDiv($item_value['value']))->addClass(ZBX_STYLE_HINTBOX_WRAP)
+							)
 						)
 						->addClass(ZBX_STYLE_NOWRAP);
 

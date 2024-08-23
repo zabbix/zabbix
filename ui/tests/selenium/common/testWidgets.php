@@ -14,9 +14,13 @@
 **/
 
 
+require_once dirname(__FILE__).'/../../include/CWebTest.php';
+
 class testWidgets extends CWebTest {
 	const HOST_ALL_ITEMS = 'Host for all item value types';
 	const TABLE_SELECTOR = 'xpath://form[@name="itemform"]//table';
+
+	protected static $dashboardid;
 
 	/**
 	 * Gets widget and widget_field tables to compare hash values, excludes widget_fieldid because it can change.
@@ -182,5 +186,18 @@ class testWidgets extends CWebTest {
 		$form = $dashboard->getWidget($widget_name)->edit()->asForm();
 		$form->fill($configuration);
 		$form->submit();
+	}
+
+	/**
+	 * Function for deletion widgets from test dashboard after case.
+	 */
+	public static function deleteWidgets() {
+		DBexecute('DELETE FROM widget'.
+			' WHERE dashboard_pageid'.
+			' IN (SELECT dashboard_pageid'.
+				' FROM dashboard_page'.
+				' WHERE dashboardid='.zbx_dbstr(static::$dashboardid).
+			')'
+		);
 	}
 }

@@ -61,6 +61,7 @@ zabbix_export:
           key: zyxel.3528.contact
           delay: 1h
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: RFC1213-MIB
             The textual identification of the contact person
@@ -106,6 +107,7 @@ zabbix_export:
           key: zyxel.3528.fwversion
           delay: 1h
           value_type: CHAR
+          trends: '0'
           description: 'MIB: ZYXEL-MES3528-MIB'
           inventory_link: SOFTWARE_FULL
           preprocessing:
@@ -171,6 +173,7 @@ zabbix_export:
           key: zyxel.3528.location
           delay: 1h
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: RFC1213-MIB
             The physical location of this node (e.g.,
@@ -190,6 +193,7 @@ zabbix_export:
           key: zyxel.3528.mac
           delay: 1h
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: IF-MIB
             The interface's address at the protocol layer
@@ -212,6 +216,7 @@ zabbix_export:
           key: zyxel.3528.model
           delay: 1h
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: RFC1213-MIB
             A textual description of the entity.  This value
@@ -244,6 +249,7 @@ zabbix_export:
           key: zyxel.3528.name
           delay: 1h
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: RFC1213-MIB
             An administratively-assigned name for this
@@ -284,6 +290,7 @@ zabbix_export:
           key: zyxel.3528.serialnumber
           delay: 1h
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: ZYXEL-MES3528-MIB
             Serial number
@@ -318,14 +325,18 @@ zabbix_export:
             conditions:
               - macro: '{#ZYXEL.IF.LINKUPTYPE}'
                 value: '{$ZYXEL.LLD.FILTER.IF.LINKUPTYPE.MATCHES}'
+                formulaid: A
               - macro: '{#ZYXEL.IF.LINKUPTYPE}'
                 value: '{$ZYXEL.LLD.FILTER.IF.LINKUPTYPE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: B
               - macro: '{#ZYXEL.IF.NAME}'
                 value: '{$ZYXEL.LLD.FILTER.IF.NAME.MATCHES}'
+                formulaid: C
               - macro: '{#ZYXEL.IF.NAME}'
                 value: '{$ZYXEL.LLD.FILTER.IF.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: D
           item_prototypes:
             - uuid: 6dc0efb31738415a884d15020d9e30a9
               name: 'Port {#SNMPINDEX}: Administrative status'
@@ -356,6 +367,7 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.2.1.2.2.1.2.{#SNMPINDEX}'
               key: 'zyxel.3528.net.if.descr[{#SNMPINDEX}]'
               value_type: CHAR
+              trends: '0'
               description: |
                 MIB: IF-MIB
                 A textual string containing information about the interface
@@ -406,6 +418,8 @@ zabbix_export:
                 address at this sub-layer.
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               tags:
                 - tag: component
                   value: network
@@ -427,6 +441,8 @@ zabbix_export:
                 includes both Group and Functional addresses.
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               tags:
                 - tag: component
                   value: network
@@ -449,6 +465,8 @@ zabbix_export:
                   parameters:
                     - '8'
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               tags:
                 - tag: component
                   value: network
@@ -469,6 +487,8 @@ zabbix_export:
                 or broadcast address at this sub-layer
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               tags:
                 - tag: component
                   value: network
@@ -527,6 +547,7 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.890.1.5.8.51.24.1.1.3.{#SNMPINDEX}'
               key: 'zyxel.3528.net.if.name[{#SNMPINDEX}]'
               value_type: CHAR
+              trends: '0'
               description: |
                 MIB:  ZYXEL-MES3528-MIB
                 A textual string containing information about the interface
@@ -597,6 +618,8 @@ zabbix_export:
                 were discarded or not sent.
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               tags:
                 - tag: component
                   value: network
@@ -619,6 +642,8 @@ zabbix_export:
                 includes both Group and Functional addresses.
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               tags:
                 - tag: component
                   value: network
@@ -642,6 +667,8 @@ zabbix_export:
                   parameters:
                     - '8'
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               tags:
                 - tag: component
                   value: network
@@ -663,6 +690,8 @@ zabbix_export:
                 those that were discarded or not sent.
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               tags:
                 - tag: component
                   value: network
@@ -782,6 +811,7 @@ zabbix_export:
                   - macro: '{#ZYXEL.IF.NAME}'
                     value: '{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES}'
                     operator: NOT_MATCHES_REGEX
+                    formulaid: A
               operations:
                 - operationobject: TRIGGER_PROTOTYPE
                   operator: REGEXP
@@ -798,9 +828,11 @@ zabbix_export:
             conditions:
               - macro: '{#ZYXEL.SFP.DESCRIPTION}'
                 value: '{$ZYXEL.LLD.FILTER.SFPDDM.DESC.MATCHES}'
+                formulaid: A
               - macro: '{#ZYXEL.SFP.DESCRIPTION}'
                 value: '{$ZYXEL.LLD.FILTER.SFPDDM.DESC.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: B
           description: 'SFP DDM module discovery.'
           item_prototypes:
             - uuid: 732084ce0daf4e8085c43e16982e4aba
@@ -887,9 +919,11 @@ zabbix_export:
             conditions:
               - macro: '{#ZYXEL.SFP.STATUS}'
                 value: '{$ZYXEL.LLD.FILTER.SFP.STATUS.MATCHES}'
+                formulaid: A
               - macro: '{#ZYXEL.SFP.STATUS}'
                 value: '{$ZYXEL.LLD.FILTER.SFP.STATUS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: B
           description: 'SFP module discovery.'
           item_prototypes:
             - uuid: 2d09724ecd8147d298ae2a2486921ccb
@@ -899,6 +933,7 @@ zabbix_export:
               key: 'zyxel.3528.sfp.datecode[{#SNMPINDEX}]'
               delay: '{$ZYXEL.LLD.SFP.UPDATE}'
               value_type: CHAR
+              trends: '0'
               description: |
                 MIB: ZYXEL-MES3528-MIB
                 Transceiver module vendor's manufacturing date code.
@@ -920,6 +955,7 @@ zabbix_export:
               key: 'zyxel.3528.sfp.part[{#SNMPINDEX}]'
               delay: '{$ZYXEL.LLD.SFP.UPDATE}'
               value_type: CHAR
+              trends: '0'
               description: |
                 MIB: ZYXEL-MES3528-MIB
                 Part number provided by transceiver module vendor.
@@ -941,6 +977,7 @@ zabbix_export:
               key: 'zyxel.3528.sfp.revision[{#SNMPINDEX}]'
               delay: '{$ZYXEL.LLD.SFP.UPDATE}'
               value_type: CHAR
+              trends: '0'
               description: |
                 MIB: ZYXEL-MES3528-MIB
                 Revision level for part number provided by transceiver module vendor.
@@ -962,6 +999,7 @@ zabbix_export:
               key: 'zyxel.3528.sfp.serialnumber[{#SNMPINDEX}]'
               delay: '{$ZYXEL.LLD.SFP.UPDATE}'
               value_type: CHAR
+              trends: '0'
               description: |
                 MIB: ZYXEL-MES3528-MIB
                 Serial number provided by transceiver module vendor.
@@ -1016,6 +1054,7 @@ zabbix_export:
               key: 'zyxel.3528.sfp.transceiver[{#SNMPINDEX}]'
               delay: '{$ZYXEL.LLD.SFP.UPDATE}'
               value_type: CHAR
+              trends: '0'
               description: |
                 MIB: ZYXEL-MES3528-MIB
                 Transceiver module type names.
@@ -1037,6 +1076,7 @@ zabbix_export:
               key: 'zyxel.3528.sfp.vendor[{#SNMPINDEX}]'
               delay: '{$ZYXEL.LLD.SFP.UPDATE}'
               value_type: CHAR
+              trends: '0'
               description: |
                 MIB: ZYXEL-MES3528-MIB
                 Transceiver module vendor name.
