@@ -759,6 +759,7 @@ function createFontSelect(string $name): CSelect {
 							->setId('linklabel')
 							->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 							->setRows(2)
+							->setMaxlength(DB::getFieldLength('sysmaps_links', 'label'))
 							->disableSpellcheck()
 					)
 					->addRow(new CLabel(_('Connect to'), 'label-selementid2'), (new CSelect('selementid2'))

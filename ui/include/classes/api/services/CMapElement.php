@@ -321,6 +321,13 @@ abstract class CMapElement extends CApiService {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 				}
 			}
+
+			if (array_key_exists('label', $link)
+					&& mb_strlen($link['label']) > DB::getFieldLength('sysmaps_links', 'label')) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+					'label', _('value is too long')
+				));
+			}
 		}
 
 		return true;
