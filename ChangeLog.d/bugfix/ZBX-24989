@@ -1,1 +1,0 @@
-.......PS. [ZBX-24989] fixed memory leak in poller and snmp poller with SNMP agent item type when engine ID is frequently changed (vso)
