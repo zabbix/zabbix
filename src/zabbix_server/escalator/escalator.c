@@ -1689,6 +1689,17 @@ static void	add_message_alert(const zbx_db_event *event, const zbx_db_event *r_e
 	now = time(NULL);
 	ackid = (NULL == ack ? 0 : ack->acknowledgeid);
 
+	if (NULL == r_event)
+	{
+		eventid = event->eventid;
+		p_eventid = 0;
+	}
+	else
+	{
+		eventid = r_event->eventid;
+		p_eventid = event->eventid;
+	}
+
 	if (ZBX_ALERT_MESSAGE_ERR_USR == err_type)
 		goto err_alert;
 
@@ -1720,17 +1731,6 @@ static void	add_message_alert(const zbx_db_event *event, const zbx_db_event *r_e
 		priority = NULL == service_alarm ? event->severity : service_alarm->value;
 	else
 		priority = TRIGGER_SEVERITY_NOT_CLASSIFIED;
-
-	if (NULL == r_event)
-	{
-		eventid = event->eventid;
-		p_eventid = 0;
-	}
-	else
-	{
-		eventid = r_event->eventid;
-		p_eventid = event->eventid;
-	}
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
