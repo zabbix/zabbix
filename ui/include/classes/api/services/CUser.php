@@ -378,7 +378,7 @@ class CUser extends CApiService {
 
 			/*
 			 * If user is created without a password (e.g. for GROUP_GUI_ACCESS_LDAP), store an empty string
-			 * as his password in database.
+			 * as their password in database.
 			 */
 			$user['passwd'] = array_key_exists('passwd', $user)
 				? password_hash($user['passwd'], PASSWORD_BCRYPT, ['cost' => ZBX_BCRYPT_COST])
@@ -753,7 +753,7 @@ class CUser extends CApiService {
 
 			if ($disabled_user_group) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_('User cannot add himself to a disabled group or a group with disabled GUI access.')
+					_('User cannot add oneself to a disabled group or a group with disabled GUI access.')
 				);
 			}
 		}
@@ -1288,7 +1288,7 @@ class CUser extends CApiService {
 			$db_user = $db_users[$userid];
 
 			if (bccomp($userid, self::$userData['userid']) == 0) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('User is not allowed to delete himself.'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('User is not allowed to delete oneself.'));
 			}
 
 			if ($db_user['username'] == ZBX_GUEST_USER) {
