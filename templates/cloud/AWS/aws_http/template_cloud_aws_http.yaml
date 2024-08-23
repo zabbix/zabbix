@@ -85,7 +85,34 @@ zabbix_export:
             					AWS.params[field] = credentials[field];
             				});
             				break;
-            			case 'access_key':
+            			case 'assume_role':
+            				AWS.params['auth_type'] = 'assume_role';
+            
+            				['AccessKeyId', 'SecretAccessKey', 'sts_region', 'role_arn'].forEach(function (field) {
+            					if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            						throw 'Required param is not set: "' + field + '".';
+            					}
+            					AWS.params[field] = params[field];
+            				});
+            
+            				role_arn_regex = /role\/(.+)$/;
+            
+            				var payload = {
+            					'Action': 'AssumeRole',
+            					'Version': '2011-06-15',
+            					'RoleArn': AWS.params.role_arn,
+            					'RoleSessionName': AWS.params.role_arn.match(role_arn_regex)[1] + 'Session',
+            				};
+            
+            				credentials = AWS.getField(AWS.request('GET', AWS.params.sts_region, 'sts', AWS.prepareParams(payload)), 'AssumeRoleResponse.AssumeRoleResult.Credentials');
+            
+            				['AccessKeyId', 'SecretAccessKey', 'SessionToken'].forEach(function (field) {
+            					if (typeof credentials !== 'object' || typeof credentials[field] === 'undefined' || credentials[field] === '') {
+            						throw 'Required credentials is not set: "' + field + '".';
+            					};
+            					AWS.params[field] = credentials[field];
+            				});
+            				break;
             			default:
             				AWS.params['auth_type'] = 'access_key';
             				['AccessKeyId', 'SecretAccessKey'].forEach(function (field) {
@@ -133,27 +160,25 @@ zabbix_export:
             		return result.join('&');
             	},
             
-            	request: function (method, region, service, host, params, data, uri) {
+            	request: function (method, region, service, params, data) {
             		if (typeof data === 'undefined' || data === null) {
             			data = '';
             		}
             
             		var amzdate = (new Date()).toISOString().replace(/\.\d+Z/, 'Z').replace(/[-:]/g, ''),
             			date = amzdate.replace(/T\d+Z/, ''),
-            
-            			canonical_uri = '/' + uri,
+            			canonical_uri = '/',
+            			host = service + '.' + region + '.amazonaws.com',
             			canonical_headers = 'content-encoding:amz-1.0\n' + 'host:' + host + '\n' + 'x-amz-date:' + amzdate + '\n',
             			signed_headers = 'content-encoding;host;x-amz-date',
             			canonical_request = method + '\n' + canonical_uri + '\n' + params + '\n' + canonical_headers + '\n' + signed_headers + '\n' + sha256(data),
             			credential_scope = date + '/' + region + '/' + service + '/' + 'aws4_request',
             			request_string = 'AWS4-HMAC-SHA256' + '\n' + amzdate + '\n' + credential_scope + '\n' + sha256(canonical_request),
-            			key = AWS.sign('AWS4' + AWS.params.SecretAccessKey, date);
-            
-            		key = AWS.sign(key, region);
-            		key = AWS.sign(key, service);
-            		key = AWS.sign(key, 'aws4_request');
-            
-            		var request = new HttpRequest(),
+            			key = AWS.sign('AWS4' + AWS.params.SecretAccessKey, date),
+            			key = AWS.sign(key, region),
+            			key = AWS.sign(key, service),
+            			key = AWS.sign(key, 'aws4_request'),
+            			request = new HttpRequest(),
             			url = 'https://' + host + canonical_uri + '?' + params;
             
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
@@ -165,28 +190,31 @@ zabbix_export:
             		request.addHeader('Content-Type: application/json');
             		request.addHeader('Content-Encoding: amz-1.0');
             		request.addHeader('Authorization: ' + 'AWS4-HMAC-SHA256 Credential=' + AWS.params.AccessKeyId + '/' + credential_scope + ', ' + 'SignedHeaders=' + signed_headers + ', ' + 'Signature=' + hmac('sha256', key, request_string));
-            		if (AWS.params.auth_type === 'role_base')
-            			request.addHeader('X-Amz-Security-Token: ' + AWS.params.Token);
+            		if (AWS.params.auth_type === 'role_base' || (AWS.params.auth_type === 'assume_role' & !params.includes('AssumeRole'))) {
+            			request.addHeader('X-Amz-Security-Token: ' + (AWS.params.auth_type === 'role_base' ? AWS.params.Token : AWS.params.SessionToken));
+            		}
             
             		Zabbix.log(4, '[ AWS EC2 ] Sending request: ' + url);
-            
-            		response = request.post(url, data);
-            
+            		response = request.get(url);
             		Zabbix.log(4, '[ AWS EC2 ] Received response with status code ' + request.getStatus() + ': ' + response);
             
             		if (request.getStatus() !== 200) {
             			throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
             		}
-            		if (response !== null) {
+            
+            		try {
+            			response = JSON.parse(response);
+            		}
+            		catch (error) {
             			try {
-            				response = XML.toJson(response);
+            				response = JSON.parse(XML.toJson(response));
             			}
             			catch (error) {
-            				throw 'Failed to parse response received from AWS CloudWatch API. Check debug log for more information.';
+            				throw 'Failed to parse response received from AWS API. Check debug log for more information.';
             			}
             		}
             
-            		return JSON.parse(response);
+            		return response;
             	},
             
             	tagToNameInstances: function (instance) {
@@ -204,7 +232,7 @@ zabbix_export:
             			);
             			return instanceName;
             		}
-            		catch (error){
+            		catch (error) {
             			return AWS.getField(instance, 'instanceId');
             		}
             	},
@@ -215,7 +243,7 @@ zabbix_export:
             			'Version': '2016-11-15'
             		};
             
-            		regions = AWS.getField(AWS.request('POST', AWS.params.describe_region, 'ec2', 'ec2.' + AWS.params.describe_region + '.amazonaws.com', AWS.prepareParams(payload), '', ''), 'DescribeRegionsResponse.regionInfo.item');
+            		regions = AWS.getField(AWS.request('GET', AWS.params.describe_region, 'ec2', AWS.prepareParams(payload)), 'DescribeRegionsResponse.regionInfo.item');
             
             		if (!Array.isArray(regions))
             			regions = [regions]
@@ -236,7 +264,7 @@ zabbix_export:
             				region_name.match(AWS.params.region_not_match) !== null)
             				return;
             
-            			result = AWS.request('POST', region_name, 'ec2', AWS.getField(region, 'regionEndpoint'), AWS.prepareParams(payload), '', '');
+            			result = AWS.request('GET', region_name, 'ec2', AWS.prepareParams(payload), '');
             
             			if (typeof result !== 'object'
             				|| typeof result.DescribeInstancesResponse !== 'object'
@@ -343,8 +371,12 @@ zabbix_export:
               value: '{$AWS.EC2.LLD.FILTER.REGION.MATCHES}'
             - name: region_not_match
               value: '{$AWS.EC2.LLD.FILTER.REGION.NOT_MATCHES}'
+            - name: role_arn
+              value: '{$AWS.ASSUME.ROLE.ARN}'
             - name: SecretAccessKey
               value: '{$AWS.SECRET.ACCESS.KEY}'
+            - name: sts_region
+              value: '{$AWS.STS.REGION}'
           lld_macro_paths:
             - lld_macro: '{#AWS.EC2.INSTANCE.ID}'
               path: $.instanceId
@@ -397,7 +429,34 @@ zabbix_export:
             					AWS.params[field] = credentials[field];
             				});
             				break;
-            			case 'access_key':
+            			case 'assume_role':
+            				AWS.params['auth_type'] = 'assume_role';
+            
+            				['AccessKeyId', 'SecretAccessKey', 'sts_region', 'role_arn'].forEach(function (field) {
+            					if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            						throw 'Required param is not set: "' + field + '".';
+            					}
+            					AWS.params[field] = params[field];
+            				});
+            
+            				role_arn_regex = /role\/(.+)$/;
+            
+            				var payload = {
+            					'Action': 'AssumeRole',
+            					'Version': '2011-06-15',
+            					'RoleArn': AWS.params.role_arn,
+            					'RoleSessionName': AWS.params.role_arn.match(role_arn_regex)[1] + 'Session',
+            				};
+            
+            				credentials = AWS.getField(AWS.request('GET', AWS.params.sts_region, 'sts', AWS.prepareParams(payload)), 'AssumeRoleResponse.AssumeRoleResult.Credentials');
+            
+            				['AccessKeyId', 'SecretAccessKey', 'SessionToken'].forEach(function (field) {
+            					if (typeof credentials !== 'object' || typeof credentials[field] === 'undefined' || credentials[field] === '') {
+            						throw 'Required credentials is not set: "' + field + '".';
+            					};
+            					AWS.params[field] = credentials[field];
+            				});
+            				break;
             			default:
             				AWS.params['auth_type'] = 'access_key';
             				['AccessKeyId', 'SecretAccessKey'].forEach(function (field) {
@@ -458,24 +517,26 @@ zabbix_export:
             
             	},
             
-            	request: function (method, region, service, host, params, data, uri) {
+            	request: function (method, region, service, params, data) {
             		if (typeof data === 'undefined' || data === null) {
             			data = '';
             		}
             		var amzdate = (new Date()).toISOString().replace(/\.\d+Z/, 'Z').replace(/[-:]/g, ''),
             			date = amzdate.replace(/T\d+Z/, ''),
-            			canonical_uri = '/' + uri,
+            			canonical_uri = '/',
+            			host = service + '.' + region + '.amazonaws.com',
             			canonical_headers = 'content-encoding:amz-1.0\n' + 'host:' + host + '\n' + 'x-amz-date:' + amzdate + '\n',
             			signed_headers = 'content-encoding;host;x-amz-date',
             			canonical_request = method + '\n' + canonical_uri + '\n' + params + '\n' + canonical_headers + '\n' + signed_headers + '\n' + sha256(data),
             			credential_scope = date + '/' + region + '/' + service + '/' + 'aws4_request',
             			request_string = 'AWS4-HMAC-SHA256' + '\n' + amzdate + '\n' + credential_scope + '\n' + sha256(canonical_request),
-            			key = AWS.sign('AWS4' + AWS.params.SecretAccessKey, date);
-            		key = AWS.sign(key, region);
-            		key = AWS.sign(key, service);
-            		key = AWS.sign(key, 'aws4_request');
-            		var request = new HttpRequest(),
+            			key = AWS.sign('AWS4' + AWS.params.SecretAccessKey, date),
+            			key = AWS.sign(key, region),
+            			key = AWS.sign(key, service),
+            			key = AWS.sign(key, 'aws4_request'),
+            			request = new HttpRequest(),
             			url = 'https://' + host + canonical_uri + '?' + params;
+            
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
             			request.setProxy(AWS.params.proxy);
             		}
@@ -485,13 +546,12 @@ zabbix_export:
             		request.addHeader('Content-Type: application/x-www-form-urlencoded');
             		request.addHeader('Content-Encoding: amz-1.0');
             		request.addHeader('Authorization: ' + 'AWS4-HMAC-SHA256 Credential=' + AWS.params.AccessKeyId + '/' + credential_scope + ', ' + 'SignedHeaders=' + signed_headers + ', ' + 'Signature=' + hmac('sha256', key, request_string));
-            		if (AWS.params.auth_type === 'role_base')
-            			request.addHeader('X-Amz-Security-Token: ' + AWS.params.Token);
+            		if (AWS.params.auth_type === 'role_base' || (AWS.params.auth_type === 'assume_role' & !params.includes('AssumeRole'))) {
+            			request.addHeader('X-Amz-Security-Token: ' + (AWS.params.auth_type === 'role_base' ? AWS.params.Token : AWS.params.SessionToken));
+            		}
             
             		Zabbix.log(4, '[ AWS ECS ] Sending request: ' + url);
-            
-            		response = request.post(url, data);
-            
+            		response = request.get(url);
             		Zabbix.log(4, '[ AWS ECS ] Received response with status code ' + request.getStatus() + ': ' + response);
             
             		if (request.getStatus() !== 200) {
@@ -519,10 +579,11 @@ zabbix_export:
             			'Version': '2016-11-15'
             		};
             
-            		regions = AWS.getField(AWS.request('POST', AWS.params.describe_region, 'ec2', 'ec2.' + AWS.params.describe_region + '.amazonaws.com', AWS.prepareParams(payload), '', ''), 'DescribeRegionsResponse.regionInfo.item');
+            		regions = AWS.getField(AWS.request('GET', AWS.params.describe_region, 'ec2', AWS.prepareParams(payload)), 'DescribeRegionsResponse.regionInfo.item');
             
             		if (!Array.isArray(regions))
             			regions = [regions]
+            
             		return regions
             	},
             
@@ -542,7 +603,7 @@ zabbix_export:
             				region_name.match(AWS.params.region_not_match) !== null)
             				return;
             
-            			result = AWS.request('POST', region_name, 'ecs', 'ecs.' + region_name + '.amazonaws.com', AWS.prepareParams(payload), '', '');
+            			result = AWS.request('GET', region_name, 'ecs', AWS.prepareParams(payload));
             			ECSClusters = AWS.getField(result, 'ListClustersResponse.ListClustersResult.clusterArns')
             			for (k in ECSClusters) {
             				clusters = ECSClusters[k];
@@ -557,17 +618,18 @@ zabbix_export:
             				});
             			}
             		});
+            
             		return data;
             	},
             
             	decribeClusters: function (cluster_name, region_name) {
-            		var payload = {},
-            			result;
-            		payload['Action'] = 'DescribeClusters';
-            		payload['Version'] = '2014-11-13';
-            		payload['clusters.clusterName'] = cluster_name;
-            		payload['include.statistics'] = 'STATISTICS';
-            		result = AWS.request('POST', region_name, 'ecs', 'ecs.' + region_name + '.amazonaws.com', AWS.prepareParams(payload), '', '');
+            		var payload = {
+            			'Action': 'DescribeClusters',
+            			'Version': '2014-11-13',
+            			'clusters.clusterName': cluster_name,
+            			'include.statistics': 'STATISTICS'
+            		};
+            		result = AWS.request('GET', region_name, 'ecs', AWS.prepareParams(payload));
             
             		return result;
             
@@ -605,7 +667,9 @@ zabbix_export:
             
             		}
             	})
+            
             	return JSON.stringify(DescribeClusters);
+            
             }
             catch (error) {
             	error += (String(error).endsWith('.')) ? '' : '.';
@@ -672,8 +736,12 @@ zabbix_export:
               value: '{$AWS.ECS.LLD.FILTER.REGION.MATCHES}'
             - name: region_not_match
               value: '{$AWS.ECS.LLD.FILTER.REGION.NOT_MATCHES}'
+            - name: role_arn
+              value: '{$AWS.ASSUME.ROLE.ARN}'
             - name: SecretAccessKey
               value: '{$AWS.SECRET.ACCESS.KEY}'
+            - name: sts_region
+              value: '{$AWS.STS.REGION}'
           lld_macro_paths:
             - lld_macro: '{#AWS.ECS.CLUSTER.INFRASTRUCTURE}'
               path: $.infrastructure
@@ -767,7 +835,34 @@ zabbix_export:
             					AWS.params[field] = credentials[field];
             				});
             				break;
-            			case 'access_key':
+            			case 'assume_role':
+            				AWS.params['auth_type'] = 'assume_role';
+            
+            				['AccessKeyId', 'SecretAccessKey', 'sts_region', 'role_arn'].forEach(function (field) {
+            					if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            						throw 'Required param is not set: "' + field + '".';
+            					}
+            					AWS.params[field] = params[field];
+            				});
+            
+            				role_arn_regex = /role\/(.+)$/;
+            
+            				var payload = {
+            					'Action': 'AssumeRole',
+            					'Version': '2011-06-15',
+            					'RoleArn': AWS.params.role_arn,
+            					'RoleSessionName': AWS.params.role_arn.match(role_arn_regex)[1] + 'Session',
+            				};
+            
+            				credentials = AWS.getField(AWS.request('GET', AWS.params.sts_region, 'sts', AWS.prepareParams(payload)), 'AssumeRoleResponse.AssumeRoleResult.Credentials');
+            
+            				['AccessKeyId', 'SecretAccessKey', 'SessionToken'].forEach(function (field) {
+            					if (typeof credentials !== 'object' || typeof credentials[field] === 'undefined' || credentials[field] === '') {
+            						throw 'Required credentials is not set: "' + field + '".';
+            					};
+            					AWS.params[field] = credentials[field];
+            				});
+            				break;
             			default:
             				AWS.params['auth_type'] = 'access_key';
             				['AccessKeyId', 'SecretAccessKey'].forEach(function (field) {
@@ -815,27 +910,25 @@ zabbix_export:
             		return result.join('&');
             	},
             
-            	request: function (get, method, region, service, host, params, data, uri) {
+            	request: function (method, region, service, params, data) {
             		if (typeof data === 'undefined' || data === null) {
             			data = '';
             		}
             
             		var amzdate = (new Date()).toISOString().replace(/\.\d+Z/, 'Z').replace(/[-:]/g, ''),
             			date = amzdate.replace(/T\d+Z/, ''),
-            
-            			canonical_uri = '/' + uri,
+            			canonical_uri = '/',
+            			host = service + '.' + region + '.amazonaws.com',
             			canonical_headers = 'content-encoding:amz-1.0\n' + 'host:' + host + '\n' + 'x-amz-date:' + amzdate + '\n',
             			signed_headers = 'content-encoding;host;x-amz-date',
             			canonical_request = method + '\n' + canonical_uri + '\n' + params + '\n' + canonical_headers + '\n' + signed_headers + '\n' + sha256(data),
             			credential_scope = date + '/' + region + '/' + service + '/' + 'aws4_request',
             			request_string = 'AWS4-HMAC-SHA256' + '\n' + amzdate + '\n' + credential_scope + '\n' + sha256(canonical_request),
-            			key = AWS.sign('AWS4' + AWS.params.SecretAccessKey, date);
-            
-            		key = AWS.sign(key, region);
-            		key = AWS.sign(key, service);
-            		key = AWS.sign(key, 'aws4_request');
-            
-            		var request = new HttpRequest(),
+            			key = AWS.sign('AWS4' + AWS.params.SecretAccessKey, date),
+            			key = AWS.sign(key, region),
+            			key = AWS.sign(key, service),
+            			key = AWS.sign(key, 'aws4_request'),
+            			request = new HttpRequest(),
             			url = 'https://' + host + canonical_uri + '?' + params;
             
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
@@ -847,38 +940,31 @@ zabbix_export:
             		request.addHeader('Content-Type: application/json');
             		request.addHeader('Content-Encoding: amz-1.0');
             		request.addHeader('Authorization: ' + 'AWS4-HMAC-SHA256 Credential=' + AWS.params.AccessKeyId + '/' + credential_scope + ', ' + 'SignedHeaders=' + signed_headers + ', ' + 'Signature=' + hmac('sha256', key, request_string));
-            		if (AWS.params.auth_type === 'role_base')
-            			request.addHeader('X-Amz-Security-Token: ' + AWS.params.Token);
-            
-            		switch (get) {
-            			case 'regions':
-            				Zabbix.log(4, '[ AWS ELB ] Sending request: ' + url);
-            				response = request.post(url, data);
-            				Zabbix.log(4, '[ AWS ELB ] Received response with status code ' + request.getStatus() + ': ' + response);
-            				if (request.getStatus() !== 200) {
-            					throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
-            				}
-            				try {
-            					response = XML.toJson(response);
-            				} catch (error) {
-            					throw 'Failed to parse response received from AWS CloudWatch API. Check debug log for more information.';
-            				}
-            				break;
-            
-            			case 'balancer':
-            				Zabbix.log(4, '[ AWS ELB ] Sending request: ' + url);
-            				response = request.get(url);
-            				Zabbix.log(4, '[ AWS ELB ] Received response with status code ' + request.getStatus() + ': ' + response);
-            				if (request.getStatus() !== 200) {
-            					throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
-            				}
-            				break;
-            
-            			default:
-            				throw 'Error: Invalid option "get" for request function';
+            		if (AWS.params.auth_type === 'role_base' || (AWS.params.auth_type === 'assume_role' & !params.includes('AssumeRole'))) {
+            			request.addHeader('X-Amz-Security-Token: ' + (AWS.params.auth_type === 'role_base' ? AWS.params.Token : AWS.params.SessionToken));
             		}
             
-            		return JSON.parse(response);
+            		Zabbix.log(4, '[ AWS ELB ] Sending request: ' + url);
+            		response = request.get(url);
+            		Zabbix.log(4, '[ AWS ELB ] Received response with status code ' + request.getStatus() + ': ' + response);
+            
+            		if (request.getStatus() !== 200) {
+            			throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+            		}
+            
+            		try {
+            			response = JSON.parse(response);
+            		}
+            		catch (error) {
+            			try {
+            				response = JSON.parse(XML.toJson(response));
+            			}
+            			catch (error) {
+            				throw 'Failed to parse response received from AWS API. Check debug log for more information.';
+            			}
+            		}
+            
+            		return response;
             	},
             
             	listRegions: function () {
@@ -887,7 +973,7 @@ zabbix_export:
             			'Version': '2016-11-15'
             		};
             
-            		regions = AWS.getField(AWS.request('regions', 'POST', AWS.params.describe_region, 'ec2', 'ec2.' + AWS.params.describe_region + '.amazonaws.com', AWS.prepareParams(payload), '', ''), 'DescribeRegionsResponse.regionInfo.item');
+            		regions = AWS.getField(AWS.request('GET', AWS.params.describe_region, 'ec2', AWS.prepareParams(payload)), 'DescribeRegionsResponse.regionInfo.item');
             
             		if (!Array.isArray(regions))
             			regions = [regions]
@@ -907,7 +993,7 @@ zabbix_export:
             			if (region_name.match(AWS.params.region_match) === null ||
             				region_name.match(AWS.params.region_not_match) !== null)
             				return;
-            			elb = AWS.getField(AWS.request('balancer', 'GET', region_name, 'elasticloadbalancing', 'elasticloadbalancing.' + region_name + '.amazonaws.com', AWS.prepareParams(payload), '', ''), 'DescribeLoadBalancersResponse.DescribeLoadBalancersResult.LoadBalancers');
+            			elb = AWS.getField(AWS.request('GET', region_name, 'elasticloadbalancing', AWS.prepareParams(payload)), 'DescribeLoadBalancersResponse.DescribeLoadBalancersResult.LoadBalancers');
             			if (!Array.isArray(elb))
             				elb = [elb]
             
@@ -1006,8 +1092,12 @@ zabbix_export:
               value: '{$AWS.ELB.LLD.FILTER.REGION.MATCHES}'
             - name: region_not_match
               value: '{$AWS.ELB.LLD.FILTER.REGION.NOT_MATCHES}'
+            - name: role_arn
+              value: '{$AWS.ASSUME.ROLE.ARN}'
             - name: SecretAccessKey
               value: '{$AWS.SECRET.ACCESS.KEY}'
+            - name: sts_region
+              value: '{$AWS.STS.REGION}'
           lld_macro_paths:
             - lld_macro: '{#AWS.ELB.ARN}'
               path: $.arn
@@ -1105,7 +1195,34 @@ zabbix_export:
             					AWS.params[field] = credentials[field];
             				});
             				break;
-            			case 'access_key':
+            			case 'assume_role':
+            				AWS.params['auth_type'] = 'assume_role';
+            
+            				['AccessKeyId', 'SecretAccessKey', 'sts_region', 'role_arn'].forEach(function (field) {
+            					if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            						throw 'Required param is not set: "' + field + '".';
+            					}
+            					AWS.params[field] = params[field];
+            				});
+            
+            				role_arn_regex = /role\/(.+)$/;
+            
+            				var payload = {
+            					'Action': 'AssumeRole',
+            					'Version': '2011-06-15',
+            					'RoleArn': AWS.params.role_arn,
+            					'RoleSessionName': AWS.params.role_arn.match(role_arn_regex)[1] + 'Session',
+            				};
+            
+            				credentials = AWS.getField(AWS.request('GET', AWS.params.sts_region, 'sts', AWS.prepareParams(payload), '', ''), 'AssumeRoleResponse.AssumeRoleResult.Credentials');
+            
+            				['AccessKeyId', 'SecretAccessKey', 'SessionToken'].forEach(function (field) {
+            					if (typeof credentials !== 'object' || typeof credentials[field] === 'undefined' || credentials[field] === '') {
+            						throw 'Required credentials is not set: "' + field + '".';
+            					};
+            					AWS.params[field] = credentials[field];
+            				});
+            				break;
             			default:
             				AWS.params['auth_type'] = 'access_key';
             				['AccessKeyId', 'SecretAccessKey'].forEach(function (field) {
@@ -1153,27 +1270,25 @@ zabbix_export:
             		return result.join('&');
             	},
             
-            	request: function (get, method, region, service, host, params, data, uri) {
+            	request: function (method, region, service, params, data, uri) {
             		if (typeof data === 'undefined' || data === null) {
             			data = '';
             		}
             
             		var amzdate = (new Date()).toISOString().replace(/\.\d+Z/, 'Z').replace(/[-:]/g, ''),
             			date = amzdate.replace(/T\d+Z/, ''),
-            
             			canonical_uri = '/' + uri,
+            			host = service + '.' + region + '.amazonaws.com',
             			canonical_headers = 'content-encoding:amz-1.0\n' + 'host:' + host + '\n' + 'x-amz-date:' + amzdate + '\n',
             			signed_headers = 'content-encoding;host;x-amz-date',
             			canonical_request = method + '\n' + canonical_uri + '\n' + params + '\n' + canonical_headers + '\n' + signed_headers + '\n' + sha256(data),
             			credential_scope = date + '/' + region + '/' + service + '/' + 'aws4_request',
             			request_string = 'AWS4-HMAC-SHA256' + '\n' + amzdate + '\n' + credential_scope + '\n' + sha256(canonical_request),
-            			key = AWS.sign('AWS4' + AWS.params.SecretAccessKey, date);
-            
-            		key = AWS.sign(key, region);
-            		key = AWS.sign(key, service);
-            		key = AWS.sign(key, 'aws4_request');
-            
-            		var request = new HttpRequest(),
+            			key = AWS.sign('AWS4' + AWS.params.SecretAccessKey, date),
+            			key = AWS.sign(key, region),
+            			key = AWS.sign(key, service),
+            			key = AWS.sign(key, 'aws4_request'),
+            			request = new HttpRequest(),
             			url = 'https://' + host + canonical_uri + '?' + params;
             
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
@@ -1185,38 +1300,31 @@ zabbix_export:
             		request.addHeader('Content-Type: application/json');
             		request.addHeader('Content-Encoding: amz-1.0');
             		request.addHeader('Authorization: ' + 'AWS4-HMAC-SHA256 Credential=' + AWS.params.AccessKeyId + '/' + credential_scope + ', ' + 'SignedHeaders=' + signed_headers + ', ' + 'Signature=' + hmac('sha256', key, request_string));
-            		if (AWS.params.auth_type === 'role_base')
-            			request.addHeader('X-Amz-Security-Token: ' + AWS.params.Token);
-            
-            		switch (get) {
-            			case 'regions':
-            				Zabbix.log(4, '[ AWS Lambda ] Sending request: ' + url);
-            				response = request.post(url, data);
-            				Zabbix.log(4, '[ AWS Lambda ] Received response with status code ' + request.getStatus() + ': ' + response);
-            				if (request.getStatus() !== 200) {
-            					throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
-            				}
-            				try {
-            					response = XML.toJson(response);
-            				} catch (error) {
-            					throw 'Failed to parse response received from AWS CloudWatch API. Check debug log for more information.';
-            				}
-            				break;
-            
-            			case 'lambda':
-            				Zabbix.log(4, '[ AWS Lambda ] Sending request: ' + url);
-            				response = request.get(url);
-            				Zabbix.log(4, '[ AWS Lambda ] Received response with status code ' + request.getStatus() + ': ' + response);
-            				if (request.getStatus() !== 200) {
-            					throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
-            				}
-            				break;
-            
-            			default:
-            				throw 'Error: Invalid option "get" for request function';
+            		if (AWS.params.auth_type === 'role_base' || (AWS.params.auth_type === 'assume_role' & !params.includes('AssumeRole'))) {
+            			request.addHeader('X-Amz-Security-Token: ' + (AWS.params.auth_type === 'role_base' ? AWS.params.Token : AWS.params.SessionToken));
             		}
             
-            		return JSON.parse(response);
+            		Zabbix.log(4, '[ AWS Lambda ] Sending request: ' + url);
+            		response = request.get(url);
+            		Zabbix.log(4, '[ AWS Lambda ] Received response with status code ' + request.getStatus() + ': ' + response);
+            
+            		if (request.getStatus() !== 200) {
+            			throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+            		}
+            
+            		try {
+            			response = JSON.parse(response);
+            		}
+            		catch (error) {
+            			try {
+            				response = JSON.parse(XML.toJson(response));
+            			}
+            			catch (error) {
+            				throw 'Failed to parse response received from AWS API. Check debug log for more information.';
+            			}
+            		}
+            
+            		return response;
             	},
             
             	listRegions: function () {
@@ -1225,7 +1333,7 @@ zabbix_export:
             			'Version': '2016-11-15'
             		};
             
-            		regions = AWS.getField(AWS.request('regions', 'POST', AWS.params.describe_region, 'ec2', 'ec2.' + AWS.params.describe_region + '.amazonaws.com', AWS.prepareParams(payload), '', ''), 'DescribeRegionsResponse.regionInfo.item');
+            		regions = AWS.getField(AWS.request('GET', AWS.params.describe_region, 'ec2', AWS.prepareParams(payload), '', ''), 'DescribeRegionsResponse.regionInfo.item');
             
             		if (!Array.isArray(regions))
             			regions = [regions]
@@ -1246,7 +1354,7 @@ zabbix_export:
             			if (region_name.match(AWS.params.region_match) === null ||
             				region_name.match(AWS.params.region_not_match) !== null)
             				return;
-            			lambdaFunction = AWS.getField(AWS.request('lambda', 'GET', region_name, 'lambda', 'lambda.' + region_name + '.amazonaws.com', AWS.prepareParams(payload), '', '2015-03-31/functions'), 'Functions');
+            			lambdaFunction = AWS.getField(AWS.request('GET', region_name, 'lambda', AWS.prepareParams(payload), '', '2015-03-31/functions'), 'Functions');
             			if (!Array.isArray(lambdaFunction))
             				lambdaFunction = [lambdaFunction]
             
@@ -1344,8 +1452,12 @@ zabbix_export:
               value: '{$AWS.LAMBDA.LLD.FILTER.REGION.MATCHES}'
             - name: region_not_match
               value: '{$AWS.LAMBDA.LLD.FILTER.REGION.NOT_MATCHES}'
+            - name: role_arn
+              value: '{$AWS.ASSUME.ROLE.ARN}'
             - name: SecretAccessKey
               value: '{$AWS.SECRET.ACCESS.KEY}'
+            - name: sts_region
+              value: '{$AWS.STS.REGION}'
           lld_macro_paths:
             - lld_macro: '{#AWS.LAMBDA.ARN}'
               path: $.arn
@@ -1416,7 +1528,34 @@ zabbix_export:
             					AWS.params[field] = credentials[field];
             				});
             				break;
-            			case 'access_key':
+            			case 'assume_role':
+            				AWS.params['auth_type'] = 'assume_role';
+            
+            				['AccessKeyId', 'SecretAccessKey', 'sts_region', 'role_arn'].forEach(function (field) {
+            					if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            						throw 'Required param is not set: "' + field + '".';
+            					}
+            					AWS.params[field] = params[field];
+            				});
+            
+            				role_arn_regex = /role\/(.+)$/;
+            
+            				var payload = {
+            					'Action': 'AssumeRole',
+            					'Version': '2011-06-15',
+            					'RoleArn': AWS.params.role_arn,
+            					'RoleSessionName': AWS.params.role_arn.match(role_arn_regex)[1] + 'Session',
+            				};
+            
+            				credentials = AWS.getField(AWS.request('GET', AWS.params.sts_region, 'sts', AWS.prepareParams(payload)), 'AssumeRoleResponse.AssumeRoleResult.Credentials');
+            
+            				['AccessKeyId', 'SecretAccessKey', 'SessionToken'].forEach(function (field) {
+            					if (typeof credentials !== 'object' || typeof credentials[field] === 'undefined' || credentials[field] === '') {
+            						throw 'Required credentials is not set: "' + field + '".';
+            					};
+            					AWS.params[field] = credentials[field];
+            				});
+            				break;
             			default:
             				AWS.params['auth_type'] = 'access_key';
             				['AccessKeyId', 'SecretAccessKey'].forEach(function (field) {
@@ -1464,27 +1603,25 @@ zabbix_export:
             		return result.join('&');
             	},
             
-            	request: function (method, region, service, host, params, data, uri) {
+            	request: function (method, region, service, params, data) {
             		if (typeof data === 'undefined' || data === null) {
             			data = '';
             		}
             
             		var amzdate = (new Date()).toISOString().replace(/\.\d+Z/, 'Z').replace(/[-:]/g, ''),
             			date = amzdate.replace(/T\d+Z/, ''),
-            
-            			canonical_uri = '/' + uri,
+            			canonical_uri = '/',
+            			host = service + '.' + region + '.amazonaws.com',
             			canonical_headers = 'content-encoding:amz-1.0\n' + 'host:' + host + '\n' + 'x-amz-date:' + amzdate + '\n',
             			signed_headers = 'content-encoding;host;x-amz-date',
             			canonical_request = method + '\n' + canonical_uri + '\n' + params + '\n' + canonical_headers + '\n' + signed_headers + '\n' + sha256(data),
             			credential_scope = date + '/' + region + '/' + service + '/' + 'aws4_request',
             			request_string = 'AWS4-HMAC-SHA256' + '\n' + amzdate + '\n' + credential_scope + '\n' + sha256(canonical_request),
-            			key = AWS.sign('AWS4' + AWS.params.SecretAccessKey, date);
-            
-            		key = AWS.sign(key, region);
-            		key = AWS.sign(key, service);
-            		key = AWS.sign(key, 'aws4_request');
-            
-            		var request = new HttpRequest(),
+            			key = AWS.sign('AWS4' + AWS.params.SecretAccessKey, date),
+            			key = AWS.sign(key, region),
+            			key = AWS.sign(key, service),
+            			key = AWS.sign(key, 'aws4_request'),
+            			request = new HttpRequest(),
             			url = 'https://' + host + canonical_uri + '?' + params;
             
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
@@ -1496,13 +1633,12 @@ zabbix_export:
             		request.addHeader('Content-Type: application/json');
             		request.addHeader('Content-Encoding: amz-1.0');
             		request.addHeader('Authorization: ' + 'AWS4-HMAC-SHA256 Credential=' + AWS.params.AccessKeyId + '/' + credential_scope + ', ' + 'SignedHeaders=' + signed_headers + ', ' + 'Signature=' + hmac('sha256', key, request_string));
-            		if (AWS.params.auth_type === 'role_base')
-            			request.addHeader('X-Amz-Security-Token: ' + AWS.params.Token);
+            		if (AWS.params.auth_type === 'role_base' || (AWS.params.auth_type === 'assume_role' & !params.includes('AssumeRole'))) {
+            			request.addHeader('X-Amz-Security-Token: ' + (AWS.params.auth_type === 'role_base' ? AWS.params.Token : AWS.params.SessionToken));
+            		}
             
             		Zabbix.log(4, '[ AWS RDS ] Sending request: ' + url);
-            
-            		response = request.post(url, data);
-            
+            		response = request.get(url);
             		Zabbix.log(4, '[ AWS RDS ] Received response with status code ' + request.getStatus() + ': ' + response);
             
             		if (request.getStatus() !== 200) {
@@ -1530,7 +1666,7 @@ zabbix_export:
             			'Version': '2016-11-15'
             		};
             
-            		regions = AWS.getField(AWS.request('POST', AWS.params.describe_region, 'ec2', 'ec2.' + AWS.params.describe_region + '.amazonaws.com', AWS.prepareParams(payload), '', ''), 'DescribeRegionsResponse.regionInfo.item');
+            		regions = AWS.getField(AWS.request('GET', AWS.params.describe_region, 'ec2', AWS.prepareParams(payload)), 'DescribeRegionsResponse.regionInfo.item');
             
             		if (!Array.isArray(regions))
             			regions = [regions]
@@ -1551,7 +1687,7 @@ zabbix_export:
             				region_name.match(AWS.params.region_not_match) !== null)
             				return;
             
-            			result = AWS.request('POST', region_name, 'rds', 'rds.' + region_name + '.amazonaws.com', AWS.prepareParams(payload), '', '');
+            			result = AWS.request('GET', region_name, 'rds', AWS.prepareParams(payload));
             
             			databases = AWS.getField(result, 'DescribeDBInstancesResponse.DescribeDBInstancesResult.DBInstances')
             			if (!Array.isArray(databases))
@@ -1639,8 +1775,12 @@ zabbix_export:
               value: '{$AWS.RDS.LLD.FILTER.REGION.MATCHES}'
             - name: region_not_match
               value: '{$AWS.RDS.LLD.FILTER.REGION.NOT_MATCHES}'
+            - name: role_arn
+              value: '{$AWS.ASSUME.ROLE.ARN}'
             - name: SecretAccessKey
               value: '{$AWS.SECRET.ACCESS.KEY}'
+            - name: sts_region
+              value: '{$AWS.STS.REGION}'
           lld_macro_paths:
             - lld_macro: '{#AWS.RDS.INSTANCE.ID}'
               path: $.DBInstanceIdentifier
@@ -1705,7 +1845,34 @@ zabbix_export:
             					AWS.params[field] = credentials[field];
             				});
             				break;
-            			case 'access_key':
+            			case 'assume_role':
+            				AWS.params['auth_type'] = 'assume_role';
+            
+            				['AccessKeyId', 'SecretAccessKey', 'sts_region', 'role_arn'].forEach(function (field) {
+            					if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            						throw 'Required param is not set: "' + field + '".';
+            					}
+            					AWS.params[field] = params[field];
+            				});
+            
+            				role_arn_regex = /role\/(.+)$/;
+            
+            				var payload = {
+            					'Action': 'AssumeRole',
+            					'Version': '2011-06-15',
+            					'RoleArn': AWS.params.role_arn,
+            					'RoleSessionName': AWS.params.role_arn.match(role_arn_regex)[1] + 'Session',
+            				};
+            
+            				credentials = AWS.getField(AWS.request('GET', AWS.params.sts_region, 'sts', AWS.prepareParams(payload)), 'AssumeRoleResponse.AssumeRoleResult.Credentials');
+            
+            				['AccessKeyId', 'SecretAccessKey', 'SessionToken'].forEach(function (field) {
+            					if (typeof credentials !== 'object' || typeof credentials[field] === 'undefined' || credentials[field] === '') {
+            						throw 'Required credentials is not set: "' + field + '".';
+            					};
+            					AWS.params[field] = credentials[field];
+            				});
+            				break;
             			default:
             				AWS.params['auth_type'] = 'access_key';
             				['AccessKeyId', 'SecretAccessKey'].forEach(function (field) {
@@ -1753,20 +1920,22 @@ zabbix_export:
             		return result.join('&');
             	},
             
-            	request: function (method, region, service, host, params, data, uri) {
+            	request: function (method, region, service, params, data) {
             		if (typeof data === 'undefined' || data === null) {
             			data = '';
             		}
             
             		var amzdate = (new Date()).toISOString().replace(/\.\d+Z/, 'Z').replace(/[-:]/g, ''),
             			date = amzdate.replace(/T\d+Z/, ''),
+            			canonical_uri = '/',
+            			host = service + '.' + region + '.amazonaws.com';
             
-            			canonical_uri = '/' + uri;
-            
-            		if (AWS.params.auth_type === 'role_base') {
-            			var canonical_headers = 'content-encoding:amz-1.0\n' + 'host:' + host + '\n' + 'x-amz-date:' + amzdate + '\n' + 'x-amz-security-token:' + AWS.params.Token + '\n',
+            		if (AWS.params.auth_type === 'role_base' || (AWS.params.auth_type === 'assume_role' & !params.includes('AssumeRole'))) {
+            			token = AWS.params.auth_type === 'role_base' ? AWS.params.Token : AWS.params.SessionToken;
+            			var canonical_headers = 'content-encoding:amz-1.0\n' + 'host:' + host + '\n' + 'x-amz-date:' + amzdate + '\n' + 'x-amz-security-token:' + token + '\n',
             				signed_headers = 'content-encoding;host;x-amz-date;x-amz-security-token';
-            		} else {
+            		}
+            		else {
             			var canonical_headers = 'content-encoding:amz-1.0\n' + 'host:' + host + '\n' + 'x-amz-date:' + amzdate + '\n',
             				signed_headers = 'content-encoding;host;x-amz-date';
             		}
@@ -1774,13 +1943,11 @@ zabbix_export:
             		var canonical_request = method + '\n' + canonical_uri + '\n' + params + '\n' + canonical_headers + '\n' + signed_headers + '\n' + sha256(data),
             			credential_scope = date + '/' + region + '/' + service + '/' + 'aws4_request',
             			request_string = 'AWS4-HMAC-SHA256' + '\n' + amzdate + '\n' + credential_scope + '\n' + sha256(canonical_request),
-            			key = AWS.sign('AWS4' + AWS.params.SecretAccessKey, date);
-            
-            		key = AWS.sign(key, region);
-            		key = AWS.sign(key, service);
-            		key = AWS.sign(key, 'aws4_request');
-            
-            		var request = new HttpRequest(),
+            			key = AWS.sign('AWS4' + AWS.params.SecretAccessKey, date),
+            			key = AWS.sign(key, region),
+            			key = AWS.sign(key, service),
+            			key = AWS.sign(key, 'aws4_request'),
+            			request = new HttpRequest(),
             			url = 'https://' + host + canonical_uri + '?' + params;
             
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
@@ -1792,28 +1959,31 @@ zabbix_export:
             		request.addHeader('Content-Type: application/json');
             		request.addHeader('Content-Encoding: amz-1.0');
             		request.addHeader('Authorization: ' + 'AWS4-HMAC-SHA256 Credential=' + AWS.params.AccessKeyId + '/' + credential_scope + ', ' + 'SignedHeaders=' + signed_headers + ', ' + 'Signature=' + hmac('sha256', key, request_string));
-            		if (AWS.params.auth_type === 'role_base')
-            			request.addHeader('X-Amz-Security-Token: ' + AWS.params.Token);
+            		if (AWS.params.auth_type === 'role_base' || (AWS.params.auth_type === 'assume_role' & !params.includes('AssumeRole'))) {
+            			request.addHeader('X-Amz-Security-Token: ' + token);
+            		}
             
             		Zabbix.log(4, '[ AWS S3 ] Sending request: ' + url);
-            
             		response = request.get(url);
-            
             		Zabbix.log(4, '[ AWS S3 ] Received response with status code ' + request.getStatus() + ': ' + response);
             
             		if (request.getStatus() !== 200) {
             			throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
             		}
-            		if (response !== null) {
+            
+            		try {
+            			response = JSON.parse(response);
+            		}
+            		catch (error) {
             			try {
-            				response = XML.toJson(response);
+            				response = JSON.parse(XML.toJson(response));
             			}
             			catch (error) {
-            				throw 'Failed to parse response received from AWS CloudWatch API. Check debug log for more information.';
+            				throw 'Failed to parse response received from AWS API. Check debug log for more information.';
             			}
             		}
             
-            		return JSON.parse(response);
+            		return response;
             	},
             
             	listBuckets: function () {
@@ -1822,7 +1992,7 @@ zabbix_export:
             			'Version': '2006-03-01'
             		};
             
-            		var result = AWS.getField(AWS.request('GET', AWS.params.request_region, 's3', 's3.' + AWS.params.request_region + '.amazonaws.com', AWS.prepareParams(payload), '', ''), 'ListAllMyBucketsResult.Buckets');
+            		var result = AWS.getField(AWS.request('GET', AWS.params.request_region, 's3', AWS.prepareParams(payload)), 'ListAllMyBucketsResult.Buckets');
             
             		if (result === null) {
             			return [];
@@ -1863,8 +2033,6 @@ zabbix_export:
               group_links:
                 - group:
                     name: Applications
-              group_prototypes:
-                - name: '{#AWS.S3.REGION}'
               templates:
                 - name: 'AWS S3 bucket by HTTP'
               macros:
@@ -1892,8 +2060,12 @@ zabbix_export:
               value: '{$AWS.PROXY}'
             - name: request_region
               value: '{$AWS.REQUEST.REGION}'
+            - name: role_arn
+              value: '{$AWS.ASSUME.ROLE.ARN}'
             - name: SecretAccessKey
               value: '{$AWS.SECRET.ACCESS.KEY}'
+            - name: sts_region
+              value: '{$AWS.STS.REGION}'
           lld_macro_paths:
             - lld_macro: '{#AWS.S3.NAME}'
               path: $.Name
@@ -1905,9 +2077,11 @@ zabbix_export:
       macros:
         - macro: '{$AWS.ACCESS.KEY.ID}'
           description: 'Access key ID.'
+        - macro: '{$AWS.ASSUME.ROLE.ARN}'
+          description: 'ARN assume role; add when using the `assume_role` authorization method.'
         - macro: '{$AWS.AUTH_TYPE}'
           value: access_key
-          description: 'Authorization method. Possible values: role_base, access_key.'
+          description: 'Authorization method. Possible values: `access_key`, `assume_role`, `role_base`.'
         - macro: '{$AWS.DATA.TIMEOUT}'
           value: 60s
           description: 'A response timeout for an API.'
@@ -2006,3 +2180,6 @@ zabbix_export:
         - macro: '{$AWS.SECRET.ACCESS.KEY}'
           type: SECRET_TEXT
           description: 'Secret access key.'
+        - macro: '{$AWS.STS.REGION}'
+          value: us-east-1
+          description: 'Region used in assume role request.'
