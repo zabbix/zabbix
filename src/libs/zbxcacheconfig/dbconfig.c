@@ -3552,6 +3552,55 @@ static void	dc_item_value_type_update(int found, ZBX_DC_ITEM *item, zbx_item_val
 	}
 }
 
+static void	make_item_unsupported_if_zero_pollers(ZBX_DC_ITEM *item, unsigned char poller_type,
+		const char *start_poller_config_name)
+{
+	if (0 == get_config_forks_cb(poller_type))
+	{
+		time_t		now = time(NULL);
+		zbx_timespec_t	ts = {now, 0};
+		char		*msg = zbx_dsprintf(NULL, "%s are disabled in configuration", start_poller_config_name);
+
+		zbx_dc_add_history(item->itemid, item->value_type, 0, NULL, &ts, ITEM_STATE_NOTSUPPORTED, msg);
+
+		zbx_free(msg);
+	}
+}
+
+static void	process_zero_pollers_items(ZBX_DC_ITEM *item)
+{
+	switch (item->type)
+	{
+		case ITEM_TYPE_ZABBIX:
+			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_AGENT_POLLER, "Agent pollers");
+			break;
+		case ITEM_TYPE_JMX:
+			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_JAVAPOLLER, "Java pollers");
+			break;
+		case ITEM_TYPE_DB_MONITOR:
+			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_ODBCPOLLER, "ODBC pollers");
+			break;
+		case ITEM_TYPE_HTTPAGENT:
+			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_HTTPAGENT_POLLER,
+					"HTTPAgent pollers");
+			break;
+		case ITEM_TYPE_SNMP:
+			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_SNMP_POLLER, "SNMP pollers");
+			break;
+		case ITEM_TYPE_BROWSER:
+			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_BROWSERPOLLER, "Browser pollers");
+			break;
+		case ITEM_TYPE_SCRIPT:
+			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_POLLER, "pollers");
+			break;
+		case ITEM_TYPE_IPMI:
+			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_IPMIPOLLER, "IPMI pollers");
+			break;
+		default:
+			return;
+	}
+}
+
 static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, zbx_synced_new_config_t synced,
 		zbx_vector_uint64_t *deleted_itemids, zbx_vector_dc_item_ptr_t *new_items)
 {
@@ -3816,6 +3865,9 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 			if (SUCCEED == zbx_is_counted_in_item_queue(item->type, item->key))
 			{
 				char	*error = NULL;
+
+				if ((0 != (flags & ZBX_ITEM_TYPE_CHANGED)) || (0 != (flags & ZBX_ITEM_NEW)))
+					process_zero_pollers_items(item);
 
 				if (FAIL == DCitem_nextcheck_update(item, interface, flags, now, &error))
 				{
