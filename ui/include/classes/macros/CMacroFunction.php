@@ -137,15 +137,10 @@ class CMacroFunction {
 			return UNRESOLVED_MACRO_STRING;
 		}
 
-		$value = mb_convert_encoding($value, 'UTF-8');
-
 		try {
 			for ($i = 0; $i < $parameter_count; $i += 2) {
 				$pattern = $parameters[$i];
 				$replacement = $parameters[$i + 1];
-
-				$pattern = mb_convert_encoding($pattern, 'UTF-8');
-				$replacement = mb_convert_encoding($replacement, 'UTF-8');
 
 				if ($pattern === '' || !is_string($replacement)) {
 					continue;
