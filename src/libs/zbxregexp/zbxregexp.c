@@ -1049,17 +1049,15 @@ int	zbx_regexp_repl(const char *string, const char *pattern, const char *output_
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() len:%d", __func__, len);
 
-	zbx_free(*out);
-
 	if ('\0' == *pattern)
 	{
+		zbx_free(*out);
 		*out = out_str;
 		return SUCCEED;
 	}
 
 	if (FAIL == regexp_prepare(pattern, ZBX_REGEXP_MULTILINE, &regexp, &error))
 	{
-		*out = out_str;
 		zbx_free(error);
 		return FAIL;
 	}
@@ -1141,12 +1139,14 @@ int	zbx_regexp_repl(const char *string, const char *pattern, const char *output_
 			goto out;
 	}
 	ret = SUCCEED;
+	zbx_free(*out);
+	*out = out_str;
+#if !defined(HAVE_PCRE2_H)
+	zbx_replace_invalid_utf8(*out);
+#endif
 out:
 	zbx_vector_match_clear_ext(&matches, zbx_match_free);
 	zbx_vector_match_destroy(&matches);
-	*out = out_str;
-	zbx_replace_invalid_utf8(*out);
-
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
