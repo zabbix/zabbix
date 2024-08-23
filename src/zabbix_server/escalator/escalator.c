@@ -1556,10 +1556,6 @@ skip:
 	{
 		zbx_db_insert_execute(&db_insert);
 		zbx_db_insert_clean(&db_insert);
-
-		/* because alerts are inserted without transaction there no need to wait for */
-		/* commit and alerter notification can be sent immediately                   */
-		notify_alerter(ALERTER_NOTIFY);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
