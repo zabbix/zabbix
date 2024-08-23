@@ -308,6 +308,7 @@ func (p *Plugin) execute(jsonRunner bool) (*runner, error) {
 				for _, device := range devices {
 					resultChan <- device
 				}
+
 				return nil
 			})
 		}
@@ -315,12 +316,13 @@ func (p *Plugin) execute(jsonRunner bool) (*runner, error) {
 
 	for _, device := range megaraidDev {
 		name := device.Name
-		dtype := device.DevType
+		devType := device.DevType
 		g.Go(func() error {
 
-			device, err := getAllDeviceInfoByType(p.ctl, name, dtype)
+			device, err := getAllDeviceInfoByType(p.ctl, name, devType)
 			if err != nil {
 				p.Tracef("got error executing for megaraid %s", err.Error())
+
 				return nil
 			}
 
@@ -333,6 +335,7 @@ func (p *Plugin) execute(jsonRunner bool) (*runner, error) {
 	err = g.Wait()
 
 	close(resultChan)
+
 	if err != nil {
 		return nil, errs.Wrap(err, "got error executing worker pool")
 	}
@@ -431,9 +434,9 @@ func getBasicDeviceInfo(
 
 	err = json.Unmarshal(device, dp)
 	if err != nil {
-		return nil, errs.WrapConst(
+		return nil, errs.Wrap(
 			err,
-			zbxerr.ErrorCannotMarshalJSON,
+			"failed to unmarshal json",
 		)
 	}
 
