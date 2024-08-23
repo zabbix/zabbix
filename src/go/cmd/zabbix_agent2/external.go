@@ -21,16 +21,9 @@ import (
 
 	"golang.zabbix.com/agent2/internal/agent"
 	"golang.zabbix.com/agent2/plugins/external"
-	"golang.zabbix.com/sdk/conf"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
 )
-
-type pluginOptions struct {
-	System struct {
-		Path string
-	}
-}
 
 func initExternalPlugins(options *agent.AgentOptions, sysOptions agent.PluginSystemOptions) (string, error) {
 	paths := make(map[string]string)
@@ -42,7 +35,7 @@ func initExternalPlugins(options *agent.AgentOptions, sysOptions agent.PluginSys
 		}
 
 		if !filepath.IsAbs(*s.Path) {
-			return "", errs.Errorf("path %q not absolute", *s.Path)
+			return "", errs.Errorf("loadable plugin %q path %q is not absolute", name, *s.Path)
 		}
 
 		paths[name] = *s.Path
@@ -53,7 +46,7 @@ func initExternalPlugins(options *agent.AgentOptions, sysOptions agent.PluginSys
 	}
 
 	timeout := getTimeout()
-	socket := agent.Options.ExternalPluginsSocket
+	socket := options.ExternalPluginsSocket
 
 	err := os.RemoveAll(socket)
 	if err != nil {
@@ -91,24 +84,4 @@ func getTimeout() time.Duration {
 	}
 
 	return time.Second * time.Duration(agent.Options.ExternalPluginTimeout)
-}
-
-func removePathField(privateOptions any) any {
-	if root, ok := privateOptions.(*conf.Node); ok {
-		for i, v := range root.Nodes {
-			if node, ok := v.(*conf.Node); ok {
-				if node.Name == "Path" {
-					root.Nodes = remove(root.Nodes, i)
-					return root
-				}
-			}
-		}
-	}
-
-	return privateOptions
-}
-
-func remove(s []any, i int) []any {
-	s[i] = s[len(s)-1]
-	return s[:len(s)-1]
 }

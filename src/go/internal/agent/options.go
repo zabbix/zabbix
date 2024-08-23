@@ -87,7 +87,7 @@ type PluginSystemOptions map[string]SystemOptions
 // SystemOptions holds reserved plugin options.
 type SystemOptions struct {
 	Path                     *string `conf:"optional"`
-	ForceActiveChecksOnStart *int    `conf:"optional"`
+	ForceActiveChecksOnStart *int    `conf:"optional,range=0:1"`
 	Capacity                 int     `conf:"optional"`
 }
 
@@ -95,14 +95,15 @@ type pluginOptions struct {
 	System SystemOptions `conf:"optional"`
 }
 
-// LoadSystemOptions removes system configuration from plugin options and added to system options.
-func (a *AgentOptions) LoadSystemOptions() (PluginSystemOptions, error) {
+// RemovePluginSystemOptions removes system configuration from plugin options and returns them as separate
+// PluginSystemOptions that is a map where map key is the option name and map value is the corresponding value.
+func (a *AgentOptions) RemovePluginSystemOptions() (PluginSystemOptions, error) {
 	out := make(PluginSystemOptions)
 
 	for name, p := range a.Plugins {
 		var o pluginOptions
 		if err := conf.Unmarshal(p, &o); err != nil {
-			return nil, errs.Errorf("failed to unmarshal options for plugin %s, %s", name, err.Error())
+			return nil, errs.Wrapf(err, "failed to unmarshal options for plugin %s ", name)
 		}
 
 		a.Plugins[name] = removeSystem(p)
@@ -413,15 +414,21 @@ func requireNoCipherAll(options *AgentOptions) error {
 }
 
 func removeSystem(privateOptions any) any {
-	if root, ok := privateOptions.(*conf.Node); ok {
-		for i, v := range root.Nodes {
-			if node, ok := v.(*conf.Node); ok {
-				if node.Name == "System" {
-					root.Nodes = slices.Delete(root.Nodes, i, i+1)
+	root, ok := privateOptions.(*conf.Node)
+	if !ok {
+		return privateOptions
+	}
 
-					return root
-				}
-			}
+	for i, v := range root.Nodes {
+		node, ok := v.(*conf.Node)
+		if !ok {
+			continue
+		}
+
+		if node.Name == "System" {
+			root.Nodes = slices.Delete(root.Nodes, i, i+1)
+
+			return root
 		}
 	}
 
