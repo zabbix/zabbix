@@ -358,7 +358,8 @@ function createFontSelect(string $name): CSelect {
 							(new CTextArea('text'))
 								->addStyle('margin-bottom: 4px;')
 								->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-								->setRows(3),
+								->setRows(3)
+								->setMaxlength(DB::getFieldLength('sysmap_shape', 'text')),
 							BR(),
 							_('Font'),
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
@@ -511,7 +512,8 @@ function createFontSelect(string $name): CSelect {
 							->setLabel(_('Text')),
 						(new CTextArea('mass_text'))
 								->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-								->setRows(2),
+								->setRows(2)
+								->setMaxlength(DB::getFieldLength('sysmap_shape', 'text')),
 						null, 'shape_figure_row'
 					)
 					->addRow((new CCheckBox('chkbox_font'))
