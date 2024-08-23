@@ -114,7 +114,9 @@ func Test_getBasicDeviceInfo(t *testing.T) {
 				},
 				false,
 			},
-			SmartCtlDeviceData{Data: mock.OutputPremissionsDenied},
+			SmartCtlDeviceData{
+				Data: mock.Outputs.Get("WSL_with_no_permissions").AllSmartInfoScans.Get("-a /dev/sda -j"),
+			},
 			true,
 		},
 		{
@@ -1731,9 +1733,9 @@ func Test_getAllDeviceInfoByType(t *testing.T) {
 	}
 }
 
-//nolint:paralleltest,tparallel
-
 func Test_getRaidDevices(t *testing.T) {
+	t.Parallel()
+
 	log.DefaultLogger = stdlog.New(os.Stdout, "", stdlog.LstdFlags)
 
 	type expectation struct {
@@ -2661,7 +2663,7 @@ func TestPlugin_execute(t *testing.T) {
 				{
 					[]string{"--scan", "-j"},
 					nil,
-					mock.Outputs.Get("only_basic").AllDevicesScan,
+					mock.Outputs.Get("ai_gen_with_2_basic_devices").AllDevicesScan,
 				},
 				{
 					[]string{"--scan", "-d", "sat", "-j"},
@@ -2671,12 +2673,12 @@ func TestPlugin_execute(t *testing.T) {
 				{
 					[]string{"-a", "/dev/sda", "-j"},
 					nil,
-					mock.Outputs.Get("only_basic").AllSmartInfoScans.Get("-a /dev/sda -j"),
+					mock.Outputs.Get("ai_gen_with_2_basic_devices").AllSmartInfoScans.Get("-a /dev/sda -j"),
 				},
 				{
 					[]string{"-a", "/dev/sdb", "-j"},
 					nil,
-					mock.Outputs.Get("only_basic").AllSmartInfoScans.Get("-a /dev/sdb -j"),
+					mock.Outputs.Get("ai_gen_with_2_basic_devices").AllSmartInfoScans.Get("-a /dev/sdb -j"),
 				},
 			},
 			nil,

@@ -1475,7 +1475,7 @@
       }
     }
   },
-  "only_basic": {
+  "ai_gen_with_2_basic_devices": {
     "version": {},
     "all_devices_scan": {
       "json_format_version": [1, 0],
@@ -1548,6 +1548,30 @@
         "firmware_version": "EXA7301R",
         "smart_status": {
           "passed": true
+        }
+      }
+    }
+  },
+  "WSL_with_no_permissions": {
+    "version": {},
+    "all_devices_scan": {},
+    "raid_devices_scan": {},
+    "all_smart_info_scans": {
+      "-a /dev/sda -j": {
+        "json_format_version": [1, 0],
+        "smartctl": {
+          "version": [7, 2],
+          "svn_revision": "5155",
+          "platform_info": "x86_64-linux-5.15.153.1-microsoft-standard-WSL2",
+          "build_info": "(local build)",
+          "argv": ["smartctl", "-a", "/dev/sda", "-j"],
+          "messages": [
+            {
+              "string": "Smartctl open device: /dev/sda failed: Permission denied",
+              "severity": "error"
+            }
+          ],
+          "exit_status": 2
         }
       }
     }
