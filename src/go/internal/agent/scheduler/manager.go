@@ -46,7 +46,10 @@ const (
 	shutdownInactive = -1
 
 	maxItemTimeout = 600 // seconds
+	minItemTimeout = 1   // seconds
 )
+
+var ErrUnsupportedTimeout = errs.New("unsupported timeout value")
 
 type Request struct {
 	Itemid      uint64  `json:"itemid"`
@@ -188,14 +191,12 @@ func (m *Manager) cleanupClient(c *client, now time.Time) {
 	}
 }
 
-func parseItemTimeout(s string) (seconds int, e error) {
-	const invalidTimeoutError = "Unsupported timeout value."
-
+func parseItemTimeout(s string) (int, error) {
 	if s == "" {
-		e = errors.New(invalidTimeoutError)
-
-		return
+		return 0, errs.Wrapf(ErrUnsupportedTimeout, "value cannot be empty")
 	}
+
+	var seconds int
 
 	if intVal, err := strconv.Atoi(s); err != nil {
 		var mult int
@@ -205,15 +206,11 @@ func parseItemTimeout(s string) (seconds int, e error) {
 		} else if strings.HasSuffix(s, "s") {
 			mult = 1
 		} else {
-			e = errors.New(invalidTimeoutError)
-
-			return
+			return 0, errs.Wrapf(ErrUnsupportedTimeout, "invalid time suffix format")
 		}
 
 		if val, err := strconv.Atoi(s[:len(s)-1]); err != nil {
-			e = errors.New(invalidTimeoutError)
-
-			return
+			return 0, errs.Wrapf(ErrUnsupportedTimeout, "cannot parse '%s' as seconds", s)
 		} else {
 			seconds = val * mult
 		}
@@ -221,14 +218,13 @@ func parseItemTimeout(s string) (seconds int, e error) {
 		seconds = intVal
 	}
 
-	if seconds > maxItemTimeout {
-		e = errors.New(invalidTimeoutError)
-	}
-
-	return
+	return seconds, nil
 }
 
-func ParseItemTimeoutAny(timeoutIn any) (timeout int, err error) {
+func ParseItemTimeoutAny(timeoutIn any) (int, error) {
+	var timeout int
+	var err error
+
 	switch v := timeoutIn.(type) {
 	case nil:
 		timeout = agent.Options.Timeout
@@ -241,9 +237,12 @@ func ParseItemTimeoutAny(timeoutIn any) (timeout int, err error) {
 	default:
 		err = fmt.Errorf("unexpected timeout %q of type %T", timeoutIn, timeoutIn)
 	}
+
 	if err == nil {
-		if timeout > 600 || timeout < 1 {
-			err = fmt.Errorf("Unsupported timeout value.")
+		if timeout > maxItemTimeout {
+			err = errs.Wrapf(ErrUnsupportedTimeout, "timeout %d is too large, max - %d", timeout, maxItemTimeout)
+		} else if timeout < minItemTimeout {
+			err = errs.Wrapf(ErrUnsupportedTimeout, "timeout %d is too small, min - %d", timeout, minItemTimeout)
 		}
 	}
 
