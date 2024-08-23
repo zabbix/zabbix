@@ -171,15 +171,17 @@ $graphTable = (new CTableInfo())
 	->setPageNavigation($data['paging']);
 
 $csrf_token = CCsrfTokenHelper::get('graphs.php');
-$hosts = null;
 
 foreach ($data['graphs'] as $graph) {
+	$hosts = null;
 	$graphid = $graph['graphid'];
 
 	if (!$this->data['hostid']) {
-		$hosts = [];
-
 		foreach ($graph['hosts'] as $host) {
+			if ($hosts) {
+				$hosts[] = ', ';
+			}
+
 			$hosts[] = (new CLink($host['name']))
 				->setAttribute('data-hostid', $host['hostid'])
 				->addClass('js-edit-'.$data['context']);
