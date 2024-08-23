@@ -177,7 +177,7 @@ func (p *Plugin) Validate(options interface{}) error {
 
 	err := conf.UnmarshalStrict(options, &o)
 	if err != nil {
-		return errs.Errorf("plugin config validation failed, %s", err.Error())
+		return errs.Wrap(err, "plugin config validation failed")
 	}
 
 	return nil

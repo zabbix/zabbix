@@ -22,7 +22,7 @@ import (
 	"golang.zabbix.com/sdk/conf"
 )
 
-func TestAgentOptions_LoadSystemOptions(t *testing.T) {
+func TestAgentOptions_RemovePluginSystemOptions(t *testing.T) {
 	t.Parallel()
 
 	testPath := "path/to/plugin"
@@ -185,14 +185,14 @@ func TestAgentOptions_LoadSystemOptions(t *testing.T) {
 			false,
 		},
 		{
-			"+empty",
+			"-empty",
 			fields{map[string]any{}},
 			PluginSystemOptions{},
 			&AgentOptions{Plugins: map[string]any{}},
 			false,
 		},
 		{
-			"+nil",
+			"-nil",
 			fields{nil},
 			PluginSystemOptions{},
 			&AgentOptions{Plugins: nil},
@@ -217,17 +217,17 @@ func TestAgentOptions_LoadSystemOptions(t *testing.T) {
 				Plugins: tt.fields.Plugins,
 			}
 
-			got, err := a.LoadSystemOptions()
+			got, err := a.RemovePluginSystemOptions()
 			if (err != nil) != tt.wantErr {
-				t.Fatalf("AgentOptions.LoadSystemOptions() error = %v, wantErr %v", err, tt.wantErr)
+				t.Fatalf("AgentOptions.RemovePluginSystemOptions() error = %v, wantErr %v", err, tt.wantErr)
 			}
 
 			if diff := cmp.Diff(tt.wantOpt.Plugins, a.Plugins, cmpopts.IgnoreUnexported(conf.Node{})); diff != "" {
-				t.Fatalf("AgentOptions.LoadSystemOptions() Agent options = %s", diff)
+				t.Fatalf("AgentOptions.RemovePluginSystemOptions() Agent options = %s", diff)
 			}
 
 			if diff := cmp.Diff(tt.wantSysOpt, got); diff != "" {
-				t.Fatalf("AgentOptions.LoadSystemOptions() System options = %s", diff)
+				t.Fatalf("AgentOptions.RemovePluginSystemOptions() System options = %s", diff)
 			}
 		})
 	}

@@ -16,6 +16,7 @@ package redis
 
 import (
 	"golang.zabbix.com/sdk/conf"
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/plugin"
 )
 
@@ -63,7 +64,7 @@ func (p *Plugin) Validate(options interface{}) error {
 
 	err = conf.UnmarshalStrict(options, &opts)
 	if err != nil {
-		return err
+		return errs.Wrap(err, "plugin config validation failed")
 	}
 
 	return err

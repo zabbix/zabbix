@@ -1908,6 +1908,7 @@ func Test_getPluginCapacity(t *testing.T) {
 		defaultMaxCapacity   int
 		pluginName           string
 	}
+
 	tests := []struct {
 		name string
 		args args
@@ -2010,7 +2011,6 @@ func Test_getPluginForceActiveChecks(t *testing.T) {
 	type args struct {
 		pluginActiveCheck *int
 		globalActiveCheck int
-		pluginName        string
 	}
 
 	tests := []struct {
@@ -2023,7 +2023,6 @@ func Test_getPluginForceActiveChecks(t *testing.T) {
 			args{
 				&activeChecksOn,
 				0,
-				"Test",
 			},
 			true,
 		},
@@ -2032,7 +2031,6 @@ func Test_getPluginForceActiveChecks(t *testing.T) {
 			args{
 				&activeChecksOff,
 				1,
-				"Test",
 			},
 			false,
 		},
@@ -2041,18 +2039,32 @@ func Test_getPluginForceActiveChecks(t *testing.T) {
 			args{
 				nil,
 				1,
-				"Test",
 			},
 			true,
 		},
 		{
-			"+invalidPluginCheck",
+			"+bothActiveCheckOn",
+			args{
+				&activeChecksOn,
+				1,
+			},
+			true,
+		},
+		{
+			"+bothActiveCheckOff",
+			args{
+				&activeChecksOff,
+				0,
+			},
+			false,
+		},
+		{
+			"-invalidPluginCheck",
 			args{
 				&activeChecksInvalid,
 				1,
-				"Test",
 			},
-			true,
+			false,
 		},
 	}
 	for _, tt := range tests {
@@ -2060,7 +2072,7 @@ func Test_getPluginForceActiveChecks(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			got := getPluginForceActiveChecks(tt.args.pluginActiveCheck, tt.args.globalActiveCheck, tt.args.pluginName)
+			got := getPluginForceActiveChecks(tt.args.pluginActiveCheck, tt.args.globalActiveCheck)
 			if diff := cmp.Diff(tt.want, got); diff != "" {
 				t.Fatalf("getPluginForceActiveChecks() = %s", diff)
 			}

@@ -255,7 +255,7 @@ func run() error {
 		return nil
 	}
 
-	systemOpt, err := agent.Options.LoadSystemOptions()
+	systemOpt, err := agent.Options.RemovePluginSystemOptions()
 	if err != nil {
 		fatalExit("cannot initialize plugin system option", err)
 	}
