@@ -1,1 +1,1 @@
-A.F....... [ZBX-24750] restricted the maximum length of map label values (Ivo)
+A.F....... [ZBX-24750] fixed issues with maximum field length for map elements and shapes (Ivo)
