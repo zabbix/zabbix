@@ -6,7 +6,7 @@
 The template to monitor single MongoDB server by Zabbix that work without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
-`MongoDB node by Zabbix Agent 2` — collects metrics by polling zabbix-agent2.
+`MongoDB node by Zabbix agent 2` — collects metrics by polling zabbix-agent2.
 
 ## Requirements
 
