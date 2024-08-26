@@ -553,8 +553,10 @@
 
 					default:
 						$on_fail
+							.prop('checked', false)
 							.prop('disabled', false)
-							.prop('readonly', false);
+							.prop('readonly', false)
+							.trigger('change');
 						$row.find('[name*="[test]"]').prop('disabled', false);
 						break;
 				}
