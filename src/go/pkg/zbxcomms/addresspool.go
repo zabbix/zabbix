@@ -69,7 +69,7 @@ func (a *addressPool) nextAddress() {
 	a.pool = append(a.pool[:0], a.pool[1:]...)
 }
 
-func (a *addressPool) next() {
+func (a *addressPool) Next() {
 	a.mu.Lock()
 	defer a.mu.Unlock()
 

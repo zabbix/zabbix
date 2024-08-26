@@ -29,7 +29,7 @@ func (a singleAddress) String() string {
 	return string(a)
 }
 
-func (a singleAddress) next() {
+func (a singleAddress) Next() {
 }
 
 func (a singleAddress) reset() {

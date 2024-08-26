@@ -212,6 +212,7 @@ func (c *Connector) refreshActiveChecks() {
 				c.hostname)
 			c.lastActiveCheckErrors = errs
 		}
+
 		return
 	}
 
@@ -221,6 +222,13 @@ func (c *Connector) refreshActiveChecks() {
 	}
 
 	var response activeChecksResponse
+	parse_success := false
+
+	defer func() {
+		if !parse_success {
+			c.address.Next()
+		}
+	}()
 
 	err = json.Unmarshal(data, &response)
 	if err != nil {
@@ -341,6 +349,7 @@ func (c *Connector) refreshActiveChecks() {
 	c.taskManager.UpdateTasks(c.clientID, c.resultCache.(resultcache.Writer), c.firstActiveChecksRefreshed,
 		response.Expressions, response.Data, now)
 
+	parse_success = true
 	c.firstActiveChecksRefreshed = true
 }
 
