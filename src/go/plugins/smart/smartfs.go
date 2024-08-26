@@ -20,6 +20,7 @@
 package smart
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -257,7 +258,12 @@ func (p *Plugin) execute(jsonRunner bool) (*runner, error) {
 		r.devices = make(map[string]deviceParser)
 	}
 
-	var g errgroup.Group
+	// Create a context that will be canceled if any of the goroutines return an error.
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	// Create an error group with the context.
+	g, _ := errgroup.WithContext(ctx)
 
 	g.SetLimit(cpuCount)
 
