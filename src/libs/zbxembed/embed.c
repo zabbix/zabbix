@@ -375,10 +375,10 @@ out:
 
 static void	es_objmap_destroy(zbx_hashset_t *objmap)
 {
+#ifdef HAVE_LIBCURL
 	zbx_hashset_iter_t	iter;
 	zbx_es_obj_data_t	*obj;
 
-#ifdef HAVE_LIBCURL
 	zbx_hashset_iter_reset(objmap, &iter);
 	while (NULL != (obj = (zbx_es_obj_data_t *)zbx_hashset_iter_next(&iter)))
 	{
