@@ -270,7 +270,11 @@ func TestPlugin_execute(t *testing.T) {
 			// removing mock controller
 			got.plugin = nil
 
-			if diff := cmp.Diff(tt.expectedState, got, cmp.AllowUnexported(jsonDevice{}, deviceInfo{}, runner{})); diff != "" {
+			if diff := cmp.Diff(
+				tt.expectedState,
+				got,
+				cmp.AllowUnexported(jsonDevice{}, deviceInfo{}, runner{}),
+			); diff != "" {
 				t.Fatalf("Plugin.execute() runner = %s", diff)
 			}
 		})
@@ -1330,30 +1334,20 @@ func Test_setDeviceData(t *testing.T) {
 
 			runner.setDevicesData(tt.data, tt.jsonRunner)
 
-			diff := cmp.Diff(
+			if diff := cmp.Diff(
 				runner.devices,
 				tt.expectFields.devices,
 				cmp.AllowUnexported(deviceInfo{}),
-			)
-
-			if diff != "" {
-				t.Fatalf(
-					"runner.setDevicesData() devices mismatch (-want +got):\n%s",
-					diff,
-				)
+			); diff != "" {
+				t.Fatalf("runner.setDevicesData() devices mismatch (-want +got):\n%s", diff)
 			}
 
-			diff = cmp.Diff(
+			if diff := cmp.Diff(
 				runner.jsonDevices,
 				tt.expectFields.jsonDevices,
 				cmp.AllowUnexported(jsonDevice{}),
-			)
-
-			if diff != "" {
-				t.Fatalf(
-					"runner.setDevicesData() jsonDevices mismatch (-want +got):\n%s",
-					diff,
-				)
+			); diff != "" {
+				t.Fatalf("runner.setDevicesData() jsonDevices mismatch (-want +got):\n%s", diff)
 			}
 		})
 	}
@@ -2357,22 +2351,6 @@ func Test_runner_executeBase(t *testing.T) {
 
 			log.New("test")
 
-			// r := &runner{
-			// 	plugin: &Plugin{
-			// 		ctl:  m,
-			// 		Base: plugin.Base{Logger: log.New("test")},
-			// 	},
-			// 	names:       make(chan string, 10),
-			// 	err:         make(chan error, 10),
-			// 	done:        make(chan struct{}),
-			// 	devices:     tt.fields.devices,
-			// 	jsonDevices: tt.fields.jsonDevices,
-			// }
-
-			// defer func() {
-			// 	close(r.err)
-			// }()
-
 			plugin := &Plugin{
 				ctl:  m,
 				Base: plugin.Base{Logger: log.New("test")},
@@ -2380,7 +2358,6 @@ func Test_runner_executeBase(t *testing.T) {
 
 			r, err := plugin.execute(tt.args.jsonRunner)
 
-			// err := r.executeBase(tt.args.basicDev, tt.args.jsonRunner)
 			if (err != nil) != tt.wantErr {
 				t.Fatalf(
 					"runner.executeBase() error = %v, wantErr %v",
@@ -2825,16 +2802,6 @@ func Test_runner_executeRaids(t *testing.T) {
 					WillReturnError(e.err)
 			}
 
-			// r := &runner{
-			// 	plugin: &Plugin{
-			// 		ctl:  m,
-			// 		Base: plugin.Base{Logger: log.New("test")},
-			// 	},
-			// 	raidDone:    make(chan struct{}),
-			// 	devices:     tt.fields.devices,
-			// 	jsonDevices: tt.fields.jsonDevices,
-			// }
-
 			plugin := &Plugin{
 				ctl:  m,
 				Base: plugin.Base{Logger: log.New("test")},
@@ -3036,17 +3003,6 @@ func Test_runner_executeMegaRaids(t *testing.T) {
 			},
 			nil,
 		},
-		// {
-		// 	"-noDevices",
-		// 	[]expectation{},
-		// 	fields{
-		// 		jsonDevices: map[string]jsonDevice{},
-		// 		devices:     map[string]deviceParser{},
-		// 	},
-		// 	args{},
-		// 	map[string]jsonDevice{},
-		// 	map[string]deviceParser{},
-		// },
 	}
 	for _, tt := range tests {
 		tt := tt
@@ -3063,19 +3019,6 @@ func Test_runner_executeMegaRaids(t *testing.T) {
 					WillReturnOutput(e.out).
 					WillReturnError(e.err)
 			}
-
-			// r := &runner{
-			// 	plugin: &Plugin{
-			// 		ctl:  m,
-			// 		Base: plugin.Base{Logger: log.New("test")},
-			// 	},
-			// 	megaRaidDone: make(chan struct{}),
-			// 	megaraids:    make(chan raidParameters, 10),
-			// 	devices:      tt.fields.devices,
-			// 	jsonDevices:  tt.fields.jsonDevices,
-			// }
-
-			// r.executeMegaRaids(tt.args.megaraids, tt.args.jsonRunner)
 
 			plugin := &Plugin{
 				ctl:  m,
