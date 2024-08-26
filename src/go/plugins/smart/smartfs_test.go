@@ -304,11 +304,6 @@ func Test_getBasicDeviceInfo(t *testing.T) {
 		out  []byte
 	}
 
-	type fields struct {
-		devices     map[string]deviceParser
-		jsonDevices map[string]jsonDevice
-	}
-
 	type args struct {
 		basicDev   []deviceInfo
 		jsonRunner bool
@@ -359,50 +354,6 @@ func Test_getBasicDeviceInfo(t *testing.T) {
 				Data: mock.OutputAllDiscInfoSDA,
 			},
 			false,
-		},
-		{
-			"-smartError",
-			"/dev/sda",
-			expectation{
-				args: []string{"-a", "/dev/sda", "-j"},
-				err:  errors.New("failed to exec smart control"),
-				out:  []byte{},
-			},
-			args{
-				[]deviceInfo{
-					{
-						Name:     "/dev/sda",
-						InfoName: "/dev/sda",
-						DevType:  "nvme",
-					},
-				},
-				false,
-			},
-			SmartCtlDeviceData{
-				Data: mock.Outputs.Get("WSL_with_no_permissions").AllSmartInfoScans.Get("-a /dev/sda -j"),
-			},
-			true,
-		},
-		{
-			"-smartPermissionsDenied",
-			"/dev/sda",
-			expectation{
-				args: []string{"-a", "/dev/sda", "-j"},
-				err:  errors.New("permissions denied"),
-				out:  []byte{},
-			},
-			args{
-				[]deviceInfo{
-					{
-						Name:     "/dev/sda",
-						InfoName: "/dev/sda",
-						DevType:  "nvme",
-					},
-				},
-				false,
-			},
-			SmartCtlDeviceData{},
-			true,
 		},
 		{
 			name:       "+invalidJSON",
@@ -466,6 +417,50 @@ func Test_getBasicDeviceInfo(t *testing.T) {
 			},
 			expectedResult: SmartCtlDeviceData{},
 			wantErr:        true, // Expect an error due to missing SmartStatus
+		},
+		{
+			"-smartError",
+			"/dev/sda",
+			expectation{
+				args: []string{"-a", "/dev/sda", "-j"},
+				err:  errors.New("failed to exec smart control"),
+				out:  []byte{},
+			},
+			args{
+				[]deviceInfo{
+					{
+						Name:     "/dev/sda",
+						InfoName: "/dev/sda",
+						DevType:  "nvme",
+					},
+				},
+				false,
+			},
+			SmartCtlDeviceData{
+				Data: mock.Outputs.Get("WSL_with_no_permissions").AllSmartInfoScans.Get("-a /dev/sda -j"),
+			},
+			true,
+		},
+		{
+			"-smartPermissionsDenied",
+			"/dev/sda",
+			expectation{
+				args: []string{"-a", "/dev/sda", "-j"},
+				err:  errors.New("permissions denied"),
+				out:  []byte{},
+			},
+			args{
+				[]deviceInfo{
+					{
+						Name:     "/dev/sda",
+						InfoName: "/dev/sda",
+						DevType:  "nvme",
+					},
+				},
+				false,
+			},
+			SmartCtlDeviceData{},
+			true,
 		},
 	}
 	for _, tt := range tests {
