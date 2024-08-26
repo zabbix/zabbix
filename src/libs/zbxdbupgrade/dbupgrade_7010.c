@@ -83,6 +83,14 @@ static int	DBpatch_7010003(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_7010004(void)
+{
+	if (FAIL == zbx_db_index_exists("auditlog", "auditlog_5"))
+		return DBcreate_index("auditlog", "auditlog_5", "ip", 0);
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(7010)
@@ -93,5 +101,6 @@ DBPATCH_ADD(7010000, 0, 1)
 DBPATCH_ADD(7010001, 0, 1)
 DBPATCH_ADD(7010002, 0, 1)
 DBPATCH_ADD(7010003, 0, 1)
+DBPATCH_ADD(7010004, 0, 1)
 
 DBPATCH_END()
