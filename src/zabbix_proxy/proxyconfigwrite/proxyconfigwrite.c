@@ -659,7 +659,7 @@ static int	proxyconfig_delete_rows(const zbx_table_data_t *td, char **error)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: prepare existing rows for udpate/delete                           *
+ * Purpose: prepare existing rows for update/delete                           *
  *                                                                            *
  * Parameters: td    - [IN] the table data object                             *
  *             error - [OUT] the error message                                *

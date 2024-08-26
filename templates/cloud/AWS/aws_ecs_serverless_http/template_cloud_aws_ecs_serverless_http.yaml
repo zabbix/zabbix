@@ -24,7 +24,9 @@ zabbix_export:
           name: 'Get alarms check'
           type: DEPENDENT
           key: aws.ecs.alarms.check
+          delay: '0'
           value_type: CHAR
+          trends: '0'
           description: 'Data collection check.'
           preprocessing:
             - type: JSONPATH
@@ -45,6 +47,7 @@ zabbix_export:
               name: 'Failed to get alarms data'
               opdata: '{ITEM.LASTVALUE1}'
               priority: WARNING
+              description: 'Failed to get CloudWatch alarms for ECS Cluster.'
               tags:
                 - tag: scope
                   value: availability
@@ -52,8 +55,9 @@ zabbix_export:
           name: 'Container Instance Count'
           type: DEPENDENT
           key: aws.ecs.container_instance_count
+          delay: '0'
           value_type: FLOAT
-          description: '''The number of EC2 instances running the Amazon ECS agent that are registered with a cluster.'''
+          description: 'The number of EC2 instances running the Amazon ECS agent that are registered with a cluster.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -68,9 +72,10 @@ zabbix_export:
           name: 'CPU Utilization'
           type: DEPENDENT
           key: aws.ecs.cpu_utilization
+          delay: '0'
           value_type: FLOAT
           units: '%'
-          description: 'Cluster CPU utilization'
+          description: 'Cluster CPU utilization.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -98,9 +103,10 @@ zabbix_export:
           name: 'Ephemeral Storage Utilization'
           type: DEPENDENT
           key: aws.ecs.disk.utilization
+          delay: '0'
           value_type: FLOAT
           units: '%'
-          description: '''The calculated Disk Utilization'''
+          description: 'The calculated Disk Utilization.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -115,11 +121,12 @@ zabbix_export:
           name: 'Ephemeral Storage Reserved'
           type: DEPENDENT
           key: aws.ecs.ephemeral.storage.reserved
+          delay: '0'
           value_type: FLOAT
           units: B
           description: |
-            'The number of bytes reserved from ephemeral storage in the resource that is specified by the dimensions that you're using. Ephemeral storage is used for the container root filesystem and any bind mount host volumes defined in the container image and task definition. The amount of ephemeral storage can’t be changed in a running task.
-             This metric is only available for tasks that run on Fargate Linux platform version 1.4.0 or later.'
+            The number of bytes reserved from ephemeral storage in the resource that is specified by the dimensions that you're using. Ephemeral storage is used for the container root filesystem and any bind mount host volumes defined in the container image and task definition. The amount of ephemeral storage can’t be changed in a running task.
+            This metric is only available for tasks that run on Fargate Linux platform version 1.4.0 or later.
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -137,11 +144,12 @@ zabbix_export:
           name: 'Ephemeral Storage Utilized'
           type: DEPENDENT
           key: aws.ecs.ephemeral.storage.utilized
+          delay: '0'
           value_type: FLOAT
           units: B
           description: |
-            'The number of bytes used from ephemeral storage in the resource that is specified by the dimensions that you're using. Ephemeral storage is used for the container root filesystem and any bind mount host volumes defined in the container image and task definition. The amount of ephemeral storage can’t be changed in a running task.
-             This metric is only available for tasks that run on Fargate Linux platform version 1.4.0 or later.'
+            The number of bytes used from ephemeral storage in the resource that is specified by the dimensions that you're using. Ephemeral storage is used for the container root filesystem and any bind mount host volumes defined in the container image and task definition. The amount of ephemeral storage can’t be changed in a running task.
+            This metric is only available for tasks that run on Fargate Linux platform version 1.4.0 or later.
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -162,6 +170,7 @@ zabbix_export:
           delay: 0s;m/1
           history: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             var AWS = {
             	params: {},
@@ -216,7 +225,34 @@ zabbix_export:
             					AWS.params[field] = credentials[field];
             				});
             				break;
-            			case 'access_key':
+            			case 'assume_role':
+            				AWS.params['auth_type'] = 'assume_role';
+            
+            				['AccessKeyId', 'SecretAccessKey', 'sts_region', 'role_arn'].forEach(function (field) {
+            					if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            						throw 'Required param is not set: "' + field + '".';
+            					}
+            					AWS.params[field] = params[field];
+            				});
+            
+            				role_arn_regex = /role\/(.+)$/;
+            
+            				var payload = {
+            					'Action': 'AssumeRole',
+            					'Version': '2011-06-15',
+            					'RoleArn': AWS.params.role_arn,
+            					'RoleSessionName': AWS.params.role_arn.match(role_arn_regex)[1] + 'Session',
+            				};
+            
+            				credentials = AWS.getField(AWS.request('GET', AWS.params.sts_region, 'sts', AWS.prepareParams(payload), ''), 'AssumeRoleResponse.AssumeRoleResult.Credentials');
+            
+            				['AccessKeyId', 'SecretAccessKey', 'SessionToken'].forEach(function (field) {
+            					if (typeof credentials !== 'object' || typeof credentials[field] === 'undefined' || credentials[field] === '') {
+            						throw 'Required credentials is not set: "' + field + '".';
+            					};
+            					AWS.params[field] = credentials[field];
+            				});
+            				break;
             			default:
             				AWS.params['auth_type'] = 'access_key';
             				['AccessKeyId', 'SecretAccessKey'].forEach(function (field) {
@@ -278,13 +314,11 @@ zabbix_export:
             			canonical_request = method + '\n' + canonical_uri + '\n' + params + '\n' + canonical_headers + '\n' + signed_headers + '\n' + sha256(data),
             			credential_scope = date + '/' + region + '/' + service + '/' + 'aws4_request',
             			request_string = 'AWS4-HMAC-SHA256' + '\n' + amzdate + '\n' + credential_scope + '\n' + sha256(canonical_request),
-            			key = AWS.sign('AWS4' + AWS.params.SecretAccessKey, date);
-            
-            		key = AWS.sign(key, region);
-            		key = AWS.sign(key, service);
-            		key = AWS.sign(key, 'aws4_request');
-            
-            		var request = new HttpRequest(),
+            			key = AWS.sign('AWS4' + AWS.params.SecretAccessKey, date),
+            			key = AWS.sign(key, region),
+            			key = AWS.sign(key, service),
+            			key = AWS.sign(key, 'aws4_request'),
+            			request = new HttpRequest(),
             			url = 'https://' + host + canonical_uri + '?' + params;
             
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
@@ -295,31 +329,24 @@ zabbix_export:
             		request.addHeader('Content-Type: application/json');
             		request.addHeader('Content-Encoding: amz-1.0');
             		request.addHeader('Authorization: ' + 'AWS4-HMAC-SHA256 Credential=' + AWS.params.AccessKeyId + '/' + credential_scope + ', ' + 'SignedHeaders=' + signed_headers + ', ' + 'Signature=' + hmac('sha256', key, request_string));
-            		if (AWS.params.auth_type === 'role_base')
-            			request.addHeader('X-Amz-Security-Token: ' + AWS.params.Token);
+            		if (AWS.params.auth_type === 'role_base' || (AWS.params.auth_type === 'assume_role' & !params.includes('AssumeRole'))) {
+            			request.addHeader('X-Amz-Security-Token: ' + (AWS.params.auth_type === 'role_base' ? AWS.params.Token : AWS.params.SessionToken));
+            		}
             
             		Zabbix.log(4, '[ AWS ECS ] Sending request: ' + url);
-            
             		response = request.get(url);
-            
             		Zabbix.log(4, '[ AWS ECS ] Received response with status code ' + request.getStatus() + ': ' + response);
             
             		if (request.getStatus() !== 200) {
             			throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
             		}
             
-            		if (response[0] === '<') {
-            			try {
-            				response = XML.toJson(response);
-            			}
-            			catch (error) {
-            				throw 'Failed to parse response received from AWS CloudWatch API. Check debug log for more information.';
-            			}
+            		try {
+            			response = JSON.parse(response);
             		}
-            
-            		if (response !== null) {
+            		catch (error) {
             			try {
-            				response = JSON.parse(response);
+            				response = JSON.parse(XML.toJson(response));
             			}
             			catch (error) {
             				throw 'Failed to parse response received from AWS CloudWatch API. Check debug log for more information.';
@@ -343,7 +370,7 @@ zabbix_export:
             			alarms_list = AWS.getField(alarms, 'MetricAlarms');
             
             			if (!Array.isArray(alarms_list))
-            				alarms_list = [alarms_list]
+            				alarms_list = [alarms_list];
             			alarms_list.forEach(function (alarm) {
             				var dimensions = alarm.Dimensions;
             
@@ -400,8 +427,12 @@ zabbix_export:
               value: '{$AWS.PROXY}'
             - name: region
               value: '{$AWS.REGION}'
+            - name: role_arn
+              value: '{$AWS.ASSUME.ROLE.ARN}'
             - name: SecretAccessKey
               value: '{$AWS.SECRET.ACCESS.KEY}'
+            - name: sts_region
+              value: '{$AWS.STS.REGION}'
           tags:
             - tag: component
               value: raw
@@ -412,6 +443,7 @@ zabbix_export:
           delay: 5m
           history: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             var AWS = {
             	params: {},
@@ -452,7 +484,33 @@ zabbix_export:
             					AWS.params[field] = credentials[field];
             				});
             				break;
-            			case 'access_key':
+            			case 'assume_role':
+            				AWS.params['auth_type'] = 'assume_role';
+            
+            				['AccessKeyId', 'SecretAccessKey', 'sts_region', 'role_arn'].forEach(function (field) {
+            					if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            						throw 'Required param is not set: "' + field + '".';
+            					}
+            					AWS.params[field] = params[field];
+            				});
+            
+            				role_arn_regex = /role\/(.+)$/;
+            
+            				var payload = {
+            					'Action': 'AssumeRole',
+            					'Version': '2011-06-15',
+            					'RoleArn': AWS.params.role_arn,
+            					'RoleSessionName': AWS.params.role_arn.match(role_arn_regex)[1] + 'Session',
+            				};
+            
+            				credentials = AWS.getField(AWS.request('GET', AWS.params.sts_region, 'sts', AWS.prepareParams(payload)), 'AssumeRoleResponse.AssumeRoleResult.Credentials');
+            				['AccessKeyId', 'SecretAccessKey', 'SessionToken'].forEach(function (field) {
+            					if (typeof credentials !== 'object' || typeof credentials[field] === 'undefined' || credentials[field] === '') {
+            						throw 'Required credentials is not set: "' + field + '".';
+            					};
+            					AWS.params[field] = credentials[field];
+            				});
+            				break;
             			default:
             				AWS.params['auth_type'] = 'access_key';
             				['AccessKeyId', 'SecretAccessKey'].forEach(function (field) {
@@ -514,27 +572,25 @@ zabbix_export:
             		return result.join('&');
             	},
             
-            	request: function (method, region, service, host, params, data, uri) {
+            	request: function (method, region, service, params, data) {
             		if (typeof data === 'undefined' || data === null) {
             			data = '';
             		}
             
             		var amzdate = (new Date()).toISOString().replace(/\.\d+Z/, 'Z').replace(/[-:]/g, ''),
             			date = amzdate.replace(/T\d+Z/, ''),
-            
-            			canonical_uri = '/' + uri,
+            			canonical_uri = '/',
+            			host = service + '.' + region + '.amazonaws.com',
             			canonical_headers = 'content-encoding:amz-1.0\n' + 'host:' + host + '\n' + 'x-amz-date:' + amzdate + '\n',
             			signed_headers = 'content-encoding;host;x-amz-date',
             			canonical_request = method + '\n' + canonical_uri + '\n' + params + '\n' + canonical_headers + '\n' + signed_headers + '\n' + sha256(data),
             			credential_scope = date + '/' + region + '/' + service + '/' + 'aws4_request',
             			request_string = 'AWS4-HMAC-SHA256' + '\n' + amzdate + '\n' + credential_scope + '\n' + sha256(canonical_request),
-            			key = AWS.sign('AWS4' + AWS.params.SecretAccessKey, date);
-            
-            		key = AWS.sign(key, region);
-            		key = AWS.sign(key, service);
-            		key = AWS.sign(key, 'aws4_request');
-            
-            		var request = new HttpRequest(),
+            			key = AWS.sign('AWS4' + AWS.params.SecretAccessKey, date),
+            			key = AWS.sign(key, region),
+            			key = AWS.sign(key, service),
+            			key = AWS.sign(key, 'aws4_request'),
+            			request = new HttpRequest(),
             			url = 'https://' + host + canonical_uri + '?' + params;
             
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
@@ -546,13 +602,12 @@ zabbix_export:
             		request.addHeader('Content-Type: application/x-www-form-urlencoded');
             		request.addHeader('Content-Encoding: amz-1.0');
             		request.addHeader('Authorization: ' + 'AWS4-HMAC-SHA256 Credential=' + AWS.params.AccessKeyId + '/' + credential_scope + ', ' + 'SignedHeaders=' + signed_headers + ', ' + 'Signature=' + hmac('sha256', key, request_string));
-            		if (AWS.params.auth_type === 'role_base')
-            			request.addHeader('X-Amz-Security-Token: ' + AWS.params.Token);
+            		if (AWS.params.auth_type === 'role_base' || (AWS.params.auth_type === 'assume_role' & !params.includes('AssumeRole'))) {
+            			request.addHeader('X-Amz-Security-Token: ' + (AWS.params.auth_type === 'role_base' ? AWS.params.Token : AWS.params.SessionToken));
+            		}
             
             		Zabbix.log(4, '[ AWS ECS ] Sending request: ' + url);
-            
-            		response = request.post(url, data);
-            
+            		response = request.get(url);
             		Zabbix.log(4, '[ AWS ECS ] Received response with status code ' + request.getStatus() + ': ' + response);
             
             		if (request.getStatus() !== 200) {
@@ -563,24 +618,26 @@ zabbix_export:
             			response = JSON.parse(response);
             		}
             		catch (error) {
-            			throw 'Failed to parse response received from AWS API. Check debug log for more information.';
+            			try {
+            				response = JSON.parse(XML.toJson(response));
+            			}
+            			catch (error) {
+            				throw 'Failed to parse response received from AWS CloudWatch API. Check debug log for more information.';
+            			}
             		}
             
             		return response;
             	},
             
             	listServices: function () {
-            		var payload = {},
-            			result,
-            			ECSClusters_Services,
+            		var payload = {
+            			'Action': 'ListServices',
+            			'Version': '2014-11-13',
+            			'cluster': AWS.params.cluster_name
+            		},
             			services = [];
             
-            		payload['Action'] = 'ListServices';
-            		payload['Version'] = '2014-11-13';
-            		payload['cluster'] = AWS.params.cluster_name;
-            
-            		result = AWS.request('POST', AWS.params.region, 'ecs', 'ecs.' + AWS.params.region + '.amazonaws.com', AWS.prepareParams(payload), '', '');
-            		ECSClusters_Services = AWS.getField(result, 'ListServicesResponse.ListServicesResult.serviceArns')
+            		ECSClusters_Services = AWS.getField(AWS.request('GET', AWS.params.region, 'ecs', AWS.prepareParams(payload)), 'ListServicesResponse.ListServicesResult.serviceArns');
             
             		for (k in ECSClusters_Services) {
             			id = ECSClusters_Services[k];
@@ -599,47 +656,12 @@ zabbix_export:
             			return services;
             		else
             			return [services];
-            
-            	},
-            
-            
-            	ListTasks: function () {
-            		var payload = {},
-            			result,
-            			ECSClusters_Services_Tasks,
-            			tasks = [];
-            
-            		payload['Action'] = 'ListTasks';
-            		payload['Version'] = '2014-11-13';
-            		payload['cluster'] = AWS.params.cluster_name;
-            		payload['status'] = AWS.params.status;
-            
-            		result = AWS.request('POST', AWS.params.region, 'ecs', 'ecs.' + AWS.params.region + '.amazonaws.com', AWS.prepareParams(payload), '', '');
-            		ECSClusters_Services_Tasks = AWS.getField(result, 'ListTasksResponse.ListTasksResult.taskArns')
-            		for (k in ECSClusters_Services_Tasks) {
-            			id = ECSClusters_Services_Tasks[k];
-            			json = {};
-            			input = id.split(AWS.params.cluster_name + '/');
-            			for (var i = 1; i < input.length; i += 2) {
-            				json[input[i]] = input[i + 1];
-            			}
-            			tasks.push({
-            				'task_id': input[1],
-            			});
-            		}
-            
-            		if (Array.isArray(tasks))
-            			return tasks;
-            		else
-            			return [tasks];
             	}
             };
             
             try {
             	AWS.setParams(JSON.parse(value));
-            	var services = AWS.listServices(),
-            		tasks = AWS.ListTasks();
-            	return JSON.stringify(({ services, tasks }));
+            	return JSON.stringify(AWS.listServices());
             }
             catch (error) {
             	error += (String(error).endsWith('.')) ? '' : '.';
@@ -665,8 +687,12 @@ zabbix_export:
               value: '{$AWS.PROXY}'
             - name: region
               value: '{$AWS.REGION}'
+            - name: role_arn
+              value: '{$AWS.ASSUME.ROLE.ARN}'
             - name: SecretAccessKey
               value: '{$AWS.SECRET.ACCESS.KEY}'
+            - name: sts_region
+              value: '{$AWS.STS.REGION}'
           tags:
             - tag: component
               value: raw
@@ -677,6 +703,7 @@ zabbix_export:
           delay: 0s;m/1
           history: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             var AWS = {
             	params: {},
@@ -718,7 +745,34 @@ zabbix_export:
             					AWS.params[field] = credentials[field];
             				});
             				break;
-            			case 'access_key':
+            			case 'assume_role':
+            				AWS.params['auth_type'] = 'assume_role';
+            
+            				['AccessKeyId', 'SecretAccessKey', 'sts_region', 'role_arn'].forEach(function (field) {
+            					if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            						throw 'Required param is not set: "' + field + '".';
+            					}
+            					AWS.params[field] = params[field];
+            				});
+            
+            				role_arn_regex = /role\/(.+)$/;
+            
+            				var payload = {
+            					'Action': 'AssumeRole',
+            					'Version': '2011-06-15',
+            					'RoleArn': AWS.params.role_arn,
+            					'RoleSessionName': AWS.params.role_arn.match(role_arn_regex)[1] + 'Session',
+            				};
+            
+            				credentials = AWS.getField(AWS.request('GET', AWS.params.sts_region, 'sts', AWS.prepareParams(payload), ''), 'AssumeRoleResponse.AssumeRoleResult.Credentials');
+            
+            				['AccessKeyId', 'SecretAccessKey', 'SessionToken'].forEach(function (field) {
+            					if (typeof credentials !== 'object' || typeof credentials[field] === 'undefined' || credentials[field] === '') {
+            						throw 'Required credentials is not set: "' + field + '".';
+            					};
+            					AWS.params[field] = credentials[field];
+            				});
+            				break;
             			default:
             				AWS.params['auth_type'] = 'access_key';
             				['AccessKeyId', 'SecretAccessKey'].forEach(function (field) {
@@ -866,13 +920,11 @@ zabbix_export:
             			canonical_request = method + '\n' + canonical_uri + '\n' + params + '\n' + canonical_headers + '\n' + signed_headers + '\n' + sha256(data),
             			credential_scope = date + '/' + region + '/' + service + '/' + 'aws4_request',
             			request_string = 'AWS4-HMAC-SHA256' + '\n' + amzdate + '\n' + credential_scope + '\n' + sha256(canonical_request),
-            			key = AWS.sign('AWS4' + AWS.params.SecretAccessKey, date);
-            
-            		key = AWS.sign(key, region);
-            		key = AWS.sign(key, service);
-            		key = AWS.sign(key, 'aws4_request');
-            
-            		var request = new HttpRequest(),
+            			key = AWS.sign('AWS4' + AWS.params.SecretAccessKey, date),
+            			key = AWS.sign(key, region),
+            			key = AWS.sign(key, service),
+            			key = AWS.sign(key, 'aws4_request'),
+            			request = new HttpRequest(),
             			url = 'https://' + host + canonical_uri + '?' + params;
             
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
@@ -883,22 +935,24 @@ zabbix_export:
             		request.addHeader('Content-Type: application/json');
             		request.addHeader('Content-Encoding: amz-1.0');
             		request.addHeader('Authorization: ' + 'AWS4-HMAC-SHA256 Credential=' + AWS.params.AccessKeyId + '/' + credential_scope + ', ' + 'SignedHeaders=' + signed_headers + ', ' + 'Signature=' + hmac('sha256', key, request_string));
-            		if (AWS.params.auth_type === 'role_base')
-            			request.addHeader('X-Amz-Security-Token: ' + AWS.params.Token);
+            		if (AWS.params.auth_type === 'role_base' || (AWS.params.auth_type === 'assume_role' & !params.includes('AssumeRole'))) {
+            			request.addHeader('X-Amz-Security-Token: ' + (AWS.params.auth_type === 'role_base' ? AWS.params.Token : AWS.params.SessionToken));
+            		}
             
             		Zabbix.log(4, '[ AWS ECS  ] Sending request: ' + url);
-            
             		response = request.get(url);
-            
             		Zabbix.log(4, '[ AWS ECS ] Received response with status code ' + request.getStatus() + ': ' + response);
             
             		if (request.getStatus() !== 200) {
             			throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
             		}
             
-            		if (response !== null) {
+            		try {
+            			response = JSON.parse(response);
+            		}
+            		catch (error) {
             			try {
-            				response = JSON.parse(response);
+            				response = JSON.parse(XML.toJson(response));
             			}
             			catch (error) {
             				throw 'Failed to parse response received from AWS CloudWatch API. Check debug log for more information.';
@@ -973,8 +1027,12 @@ zabbix_export:
               value: '{$AWS.PROXY}'
             - name: region
               value: '{$AWS.REGION}'
+            - name: role_arn
+              value: '{$AWS.ASSUME.ROLE.ARN}'
             - name: SecretAccessKey
               value: '{$AWS.SECRET.ACCESS.KEY}'
+            - name: sts_region
+              value: '{$AWS.STS.REGION}'
           tags:
             - tag: component
               value: raw
@@ -982,11 +1040,12 @@ zabbix_export:
           name: 'Memory Utilization'
           type: DEPENDENT
           key: aws.ecs.memory_utilization
+          delay: '0'
           value_type: FLOAT
           units: '%'
           description: |
-            'The memory being used by tasks in the resource that is specified by the dimension set that you're using.
-             This metric is only collected for tasks that have a defined memory reservation in their task definition.'
+            The memory being used by tasks in the resource that is specified by the dimension set that you're using.
+            This metric is only collected for tasks that have a defined memory reservation in their task definition.
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1014,7 +1073,9 @@ zabbix_export:
           name: 'Get metrics check'
           type: DEPENDENT
           key: aws.ecs.metrics.check
+          delay: '0'
           value_type: CHAR
+          trends: '0'
           description: 'Data collection check.'
           preprocessing:
             - type: JSONPATH
@@ -1035,6 +1096,7 @@ zabbix_export:
               name: 'Failed to get metrics data'
               opdata: '{ITEM.LASTVALUE1}'
               priority: WARNING
+              description: 'Failed to get CloudWatch metrics for ECS Cluster.'
               tags:
                 - tag: scope
                   value: availability
@@ -1042,11 +1104,12 @@ zabbix_export:
           name: 'Network rx bytes'
           type: DEPENDENT
           key: aws.ecs.network.rx
+          delay: '0'
           value_type: FLOAT
           units: Bps
           description: |
-            'The number of bytes received by the resource that is specified by the dimensions that you're using.
-             This metric is only available for containers in tasks using the awsvpc or bridge network modes.'
+            The number of bytes received by the resource that is specified by the dimensions that you're using.
+            This metric is only available for containers in tasks using the awsvpc or bridge network modes.
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1061,11 +1124,12 @@ zabbix_export:
           name: 'Network tx bytes'
           type: DEPENDENT
           key: aws.ecs.network.tx
+          delay: '0'
           value_type: FLOAT
           units: Bps
           description: |
-            'The number of bytes transmitted by the resource that is specified by the dimensions that you're using.
-             This metric is only available for containers in tasks using the awsvpc or bridge network modes.'
+            The number of bytes transmitted by the resource that is specified by the dimensions that you're using.
+            This metric is only available for containers in tasks using the awsvpc or bridge network modes.
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1080,8 +1144,9 @@ zabbix_export:
           name: 'Service Count'
           type: DEPENDENT
           key: aws.ecs.service_count
+          delay: '0'
           value_type: FLOAT
-          description: '''The number of services in the cluster.'''
+          description: 'The number of services in the cluster.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1096,8 +1161,9 @@ zabbix_export:
           name: 'Task Count'
           type: DEPENDENT
           key: aws.ecs.task_count
+          delay: '0'
           value_type: FLOAT
-          description: '''The number of tasks running in the cluster.'''
+          description: 'The number of tasks running in the cluster.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1113,27 +1179,34 @@ zabbix_export:
           name: 'Cluster Alarms discovery'
           type: DEPENDENT
           key: aws.ecs.alarms.discovery
+          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#ALARM_NAME}'
                 value: '{$AWS.ECS.LLD.FILTER.ALARM_NAME.MATCHES}'
+                formulaid: A
               - macro: '{#ALARM_NAME}'
                 value: '{$AWS.ECS.LLD.FILTER.ALARM_NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: B
               - macro: '{#ALARM_SERVICE_NAMESPACE}'
                 value: '{$AWS.ECS.LLD.FILTER.ALARM_SERVICE_NAMESPACE.MATCHES}'
+                formulaid: C
               - macro: '{#ALARM_SERVICE_NAMESPACE}'
                 value: '{$AWS.ECS.LLD.FILTER.ALARM_SERVICE_NAMESPACE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: D
           description: 'Discovery instance alarms.'
           item_prototypes:
             - uuid: a0cee89be68746ad8ad30de7ba1f444c
               name: '[{#ALARM_NAME}]: Get metrics'
               type: DEPENDENT
               key: 'aws.ecs.alarm.get_metrics["{#ALARM_NAME}"]'
+              delay: '0'
               history: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Get alarm metrics about the state and its reason.'
               preprocessing:
                 - type: JSONPATH
@@ -1149,6 +1222,7 @@ zabbix_export:
               name: '[{#ALARM_NAME}]: State'
               type: DEPENDENT
               key: 'aws.ecs.alarm.state["{#ALARM_NAME}"]'
+              delay: '0'
               description: |
                 The state value for the alarm. Possible values: 0 (OK), 1 (INSUFFICIENT_DATA), 2 (ALARM).
                 Alarm description:
@@ -1177,6 +1251,7 @@ zabbix_export:
                   expression: 'last(/AWS ECS Serverless Cluster by HTTP/aws.ecs.alarm.state["{#ALARM_NAME}"])=1'
                   name: '[{#ALARM_NAME}] has ''Insufficient data'' state'
                   priority: INFO
+                  description: 'Either the alarm has just started, the metric is not available, or not enough data is available for the metric to determine the alarm state.'
                   tags:
                     - tag: scope
                       value: notice
@@ -1184,7 +1259,9 @@ zabbix_export:
               name: '[{#ALARM_NAME}]: State reason'
               type: DEPENDENT
               key: 'aws.ecs.alarm.state_reason["{#ALARM_NAME}"]'
+              delay: '0'
               value_type: TEXT
+              trends: '0'
               description: |
                 An explanation for the alarm state, in text format.
                 Alarm description:
@@ -1208,7 +1285,7 @@ zabbix_export:
               name: '[{#ALARM_NAME}] has ''Alarm'' state'
               priority: AVERAGE
               description: |
-                Alarm "{#ALARM_NAME}" has 'Alarm' state. 
+                Alarm "{#ALARM_NAME}" has 'Alarm' state.
                 Reason: {ITEM.LASTVALUE2}
               tags:
                 - tag: scope
@@ -1241,25 +1318,29 @@ zabbix_export:
           name: 'Cluster Services discovery'
           type: DEPENDENT
           key: aws.ecs.services.discovery
+          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#AWS.ECS.SERVICE.NAME}'
                 value: '{$AWS.ECS.LLD.FILTER.SERVICE.MATCHES}'
+                formulaid: A
               - macro: '{#AWS.ECS.SERVICE.NAME}'
                 value: '{$AWS.ECS.LLD.FILTER.SERVICE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: B
           description: 'Discovery {$AWS.ECS.CLUSTER.NAME} services.'
           item_prototypes:
             - uuid: e098ff8ab20a468ba4a38ff621ff7aa6
               name: '[{#AWS.ECS.SERVICE.NAME}]: CPU Utilization'
               type: DEPENDENT
               key: 'aws.ecs.services.cpu.utilization["{#AWS.ECS.SERVICE.NAME}"]'
+              delay: '0'
               value_type: FLOAT
               units: '%'
               description: |
-                "A number of CPU units used by tasks in the resource that is specified by the dimension set that you're using.
-                 This metric is only collected for tasks that have a defined CPU reservation in their task definition."
+                A number of CPU units used by tasks in the resource that is specified by the dimension set that you're using.
+                This metric is only collected for tasks that have a defined CPU reservation in their task definition.
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1293,10 +1374,11 @@ zabbix_export:
               name: '[{#AWS.ECS.SERVICE.NAME}]: CPU Reserved'
               type: DEPENDENT
               key: 'aws.ecs.services.cpu_reserved["{#AWS.ECS.SERVICE.NAME}"]'
+              delay: '0'
               value_type: FLOAT
               description: |
-                "A number of CPU units reserved by tasks in the resource that is specified by the dimension set that you're using.
-                 This metric is only collected for tasks that have a defined CPU reservation in their task definition."
+                A number of CPU units reserved by tasks in the resource that is specified by the dimension set that you're using.
+                This metric is only collected for tasks that have a defined CPU reservation in their task definition.
               valuemap:
                 name: 'CPU Reserved'
               preprocessing:
@@ -1317,6 +1399,7 @@ zabbix_export:
               name: '[{#AWS.ECS.SERVICE.NAME}]: Desired Task'
               type: DEPENDENT
               key: 'aws.ecs.services.desired.task["{#AWS.ECS.SERVICE.NAME}"]'
+              delay: '0'
               value_type: FLOAT
               description: 'The desired number of tasks for an {#AWS.ECS.SERVICE.NAME} service.'
               preprocessing:
@@ -1338,11 +1421,12 @@ zabbix_export:
               name: '[{#AWS.ECS.SERVICE.NAME}]: Ephemeral storage reserved'
               type: DEPENDENT
               key: 'aws.ecs.services.ephemeral.storage.reserved["{#AWS.ECS.SERVICE.NAME}"]'
+              delay: '0'
               value_type: FLOAT
               units: B
               description: |
-                'The number of bytes reserved from ephemeral storage in the resource that is specified by the dimensions that you're using. Ephemeral storage is used for the container root filesystem and any bind mount host volumes defined in the container image and task definition. The amount of ephemeral storage can’t be changed in a running task.
-                This metric is only available for tasks that run on Fargate Linux platform version 1.4.0 or later.'
+                The number of bytes reserved from ephemeral storage in the resource that is specified by the dimensions that you're using. Ephemeral storage is used for the container root filesystem and any bind mount host volumes defined in the container image and task definition. The amount of ephemeral storage can’t be changed in a running task.
+                This metric is only available for tasks that run on Fargate Linux platform version 1.4.0 or later.
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1364,11 +1448,12 @@ zabbix_export:
               name: '[{#AWS.ECS.SERVICE.NAME}]: Ephemeral storage utilized'
               type: DEPENDENT
               key: 'aws.ecs.services.ephemeral.storage.utilized["{#AWS.ECS.SERVICE.NAME}"]'
+              delay: '0'
               value_type: FLOAT
               units: B
               description: |
-                'The number of bytes used from ephemeral storage in the resource that is specified by the dimensions that you're using. Ephemeral storage is used for the container root filesystem and any bind mount host volumes defined in the container image and task definition. The amount of ephemeral storage can’t be changed in a running task.
-                This metric is only available for tasks that run on Fargate Linux platform version 1.4.0 or later.'
+                The number of bytes used from ephemeral storage in the resource that is specified by the dimensions that you're using. Ephemeral storage is used for the container root filesystem and any bind mount host volumes defined in the container image and task definition. The amount of ephemeral storage can’t be changed in a running task.
+                This metric is only available for tasks that run on Fargate Linux platform version 1.4.0 or later.
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1393,6 +1478,7 @@ zabbix_export:
               delay: 0s;m/5
               history: '0'
               value_type: TEXT
+              trends: '0'
               params: |
                 var AWS = {
                 	params: {},
@@ -1434,7 +1520,34 @@ zabbix_export:
                 					AWS.params[field] = credentials[field];
                 				});
                 				break;
-                			case 'access_key':
+                			case 'assume_role':
+                				AWS.params['auth_type'] = 'assume_role';
+                
+                				['AccessKeyId', 'SecretAccessKey', 'sts_region', 'role_arn'].forEach(function (field) {
+                					if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+                						throw 'Required param is not set: "' + field + '".';
+                					}
+                					AWS.params[field] = params[field];
+                				});
+                
+                				role_arn_regex = /role\/(.+)$/;
+                
+                				var payload = {
+                					'Action': 'AssumeRole',
+                					'Version': '2011-06-15',
+                					'RoleArn': AWS.params.role_arn,
+                					'RoleSessionName': AWS.params.role_arn.match(role_arn_regex)[1] + 'Session',
+                				};
+                
+                				credentials = AWS.getField(AWS.request('GET', AWS.params.sts_region, 'sts', AWS.prepareParams(payload), ''), 'AssumeRoleResponse.AssumeRoleResult.Credentials');
+                
+                				['AccessKeyId', 'SecretAccessKey', 'SessionToken'].forEach(function (field) {
+                					if (typeof credentials !== 'object' || typeof credentials[field] === 'undefined' || credentials[field] === '') {
+                						throw 'Required credentials is not set: "' + field + '".';
+                					};
+                					AWS.params[field] = credentials[field];
+                				});
+                				break;
                 			default:
                 				AWS.params['auth_type'] = 'access_key';
                 				['AccessKeyId', 'SecretAccessKey'].forEach(function (field) {
@@ -1591,13 +1704,11 @@ zabbix_export:
                 			canonical_request = method + '\n' + canonical_uri + '\n' + params + '\n' + canonical_headers + '\n' + signed_headers + '\n' + sha256(data),
                 			credential_scope = date + '/' + region + '/' + service + '/' + 'aws4_request',
                 			request_string = 'AWS4-HMAC-SHA256' + '\n' + amzdate + '\n' + credential_scope + '\n' + sha256(canonical_request),
-                			key = AWS.sign('AWS4' + AWS.params.SecretAccessKey, date);
-                
-                		key = AWS.sign(key, region);
-                		key = AWS.sign(key, service);
-                		key = AWS.sign(key, 'aws4_request');
-                
-                		var request = new HttpRequest(),
+                			key = AWS.sign('AWS4' + AWS.params.SecretAccessKey, date),
+                			key = AWS.sign(key, region),
+                			key = AWS.sign(key, service),
+                			key = AWS.sign(key, 'aws4_request'),
+                			request = new HttpRequest(),
                 			url = 'https://' + host + canonical_uri + '?' + params;
                 
                 		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
@@ -1608,22 +1719,24 @@ zabbix_export:
                 		request.addHeader('Content-Type: application/json');
                 		request.addHeader('Content-Encoding: amz-1.0');
                 		request.addHeader('Authorization: ' + 'AWS4-HMAC-SHA256 Credential=' + AWS.params.AccessKeyId + '/' + credential_scope + ', ' + 'SignedHeaders=' + signed_headers + ', ' + 'Signature=' + hmac('sha256', key, request_string));
-                		if (AWS.params.auth_type === 'role_base')
-                			request.addHeader('X-Amz-Security-Token: ' + AWS.params.Token);
+                		if (AWS.params.auth_type === 'role_base' || (AWS.params.auth_type === 'assume_role' & !params.includes('AssumeRole'))) {
+                			request.addHeader('X-Amz-Security-Token: ' + (AWS.params.auth_type === 'role_base' ? AWS.params.Token : AWS.params.SessionToken));
+                		}
                 
                 		Zabbix.log(4, '[ AWS ECS  ] Sending request: ' + url);
-                
                 		response = request.get(url);
-                
                 		Zabbix.log(4, '[ AWS ECS ] Received response with status code ' + request.getStatus() + ': ' + response);
                 
                 		if (request.getStatus() !== 200) {
                 			throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
                 		}
                 
-                		if (response !== null) {
+                		try {
+                			response = JSON.parse(response);
+                		}
+                		catch (error) {
                 			try {
-                				response = JSON.parse(response);
+                				response = JSON.parse(XML.toJson(response));
                 			}
                 			catch (error) {
                 				throw 'Failed to parse response received from AWS CloudWatch API. Check debug log for more information.';
@@ -1682,10 +1795,14 @@ zabbix_export:
                   value: '{$AWS.PROXY}'
                 - name: region
                   value: '{$AWS.REGION}'
+                - name: role_arn
+                  value: '{$AWS.ASSUME.ROLE.ARN}'
                 - name: SecretAccessKey
                   value: '{$AWS.SECRET.ACCESS.KEY}'
                 - name: service_name
                   value: '{#AWS.ECS.SERVICE.NAME}'
+                - name: sts_region
+                  value: '{$AWS.STS.REGION}'
               tags:
                 - tag: component
                   value: raw
@@ -1697,11 +1814,12 @@ zabbix_export:
               name: '[{#AWS.ECS.SERVICE.NAME}]: Memory utilization'
               type: DEPENDENT
               key: 'aws.ecs.services.memory.utilization["{#AWS.ECS.SERVICE.NAME}"]'
+              delay: '0'
               value_type: FLOAT
               units: '%'
               description: |
-                'The memory being used by tasks in the resource that is specified by the dimension set that you're using.
-                This metric is only collected for tasks that have a defined memory reservation in their task definition.'
+                The memory being used by tasks in the resource that is specified by the dimension set that you're using.
+                This metric is only collected for tasks that have a defined memory reservation in their task definition.
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1735,11 +1853,12 @@ zabbix_export:
               name: '[{#AWS.ECS.SERVICE.NAME}]: Memory reserved'
               type: DEPENDENT
               key: 'aws.ecs.services.memory_reserved["{#AWS.ECS.SERVICE.NAME}"]'
+              delay: '0'
               value_type: FLOAT
               units: B
               description: |
-                'The memory that is reserved by tasks in the resource that is specified by the dimension set that you're using.
-                This metric is only collected for tasks that have a defined memory reservation in their task definition.'
+                The memory that is reserved by tasks in the resource that is specified by the dimension set that you're using.
+                This metric is only collected for tasks that have a defined memory reservation in their task definition.
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1761,11 +1880,12 @@ zabbix_export:
               name: '[{#AWS.ECS.SERVICE.NAME}]: Memory utilized'
               type: DEPENDENT
               key: 'aws.ecs.services.memory_utilized["{#AWS.ECS.SERVICE.NAME}"]'
+              delay: '0'
               value_type: FLOAT
               units: B
               description: |
-                'The memory being used by tasks in the resource that is specified by the dimension set that you're using.
-                This metric is only collected for tasks that have a defined memory reservation in their task definition.'
+                The memory being used by tasks in the resource that is specified by the dimension set that you're using.
+                This metric is only collected for tasks that have a defined memory reservation in their task definition.
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1787,11 +1907,12 @@ zabbix_export:
               name: '[{#AWS.ECS.SERVICE.NAME}]: Network rx bytes'
               type: DEPENDENT
               key: 'aws.ecs.services.network.rx["{#AWS.ECS.SERVICE.NAME}"]'
+              delay: '0'
               value_type: FLOAT
               units: Bps
               description: |
-                'The number of bytes received by the resource that is specified by the dimensions that you're using.
-                This metric is only available for containers in tasks using the awsvpc or bridge network modes.'
+                The number of bytes received by the resource that is specified by the dimensions that you're using.
+                This metric is only available for containers in tasks using the awsvpc or bridge network modes.
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1810,11 +1931,12 @@ zabbix_export:
               name: '[{#AWS.ECS.SERVICE.NAME}]: Network tx bytes'
               type: DEPENDENT
               key: 'aws.ecs.services.network.tx["{#AWS.ECS.SERVICE.NAME}"]'
+              delay: '0'
               value_type: FLOAT
               units: Bps
               description: |
-                'The number of bytes transmitted by the resource that is specified by the dimensions that you're using.
-                This metric is only available for containers in tasks using the awsvpc or bridge network modes.'
+                The number of bytes transmitted by the resource that is specified by the dimensions that you're using.
+                This metric is only available for containers in tasks using the awsvpc or bridge network modes.
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1833,6 +1955,7 @@ zabbix_export:
               name: '[{#AWS.ECS.SERVICE.NAME}]: Pending Task'
               type: DEPENDENT
               key: 'aws.ecs.services.pending.task["{#AWS.ECS.SERVICE.NAME}"]'
+              delay: '0'
               value_type: FLOAT
               description: 'The number of tasks currently in the `pending` state.'
               preprocessing:
@@ -1854,6 +1977,7 @@ zabbix_export:
               name: '[{#AWS.ECS.SERVICE.NAME}]: Running Task'
               type: DEPENDENT
               key: 'aws.ecs.services.running.task["{#AWS.ECS.SERVICE.NAME}"]'
+              delay: '0'
               value_type: FLOAT
               description: 'The number of tasks currently in the `running` state.'
               preprocessing:
@@ -1875,9 +1999,10 @@ zabbix_export:
               name: '[{#AWS.ECS.SERVICE.NAME}]: Storage read bytes'
               type: DEPENDENT
               key: 'aws.ecs.services.storage.read.bytes["{#AWS.ECS.SERVICE.NAME}"]'
+              delay: '0'
               value_type: FLOAT
               units: B
-              description: '''The number of bytes read from storage in the resource that is specified by the dimensions that you''re using.'''
+              description: 'The number of bytes read from storage in the resource that is specified by the dimensions that you''re using.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1896,9 +2021,10 @@ zabbix_export:
               name: '[{#AWS.ECS.SERVICE.NAME}]: Storage write bytes'
               type: DEPENDENT
               key: 'aws.ecs.services.storage.write.bytes["{#AWS.ECS.SERVICE.NAME}"]'
+              delay: '0'
               value_type: FLOAT
               units: B
-              description: '''The number of bytes written to storage in the resource that is specified by the dimensions that you''re using.'''
+              description: 'The number of bytes written to storage in the resource that is specified by the dimensions that you''re using.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1917,6 +2043,7 @@ zabbix_export:
               name: '[{#AWS.ECS.SERVICE.NAME}]: Task Set'
               type: DEPENDENT
               key: 'aws.ecs.services.task.set["{#AWS.ECS.SERVICE.NAME}"]'
+              delay: '0'
               value_type: FLOAT
               description: 'The number of task sets in the {#AWS.ECS.SERVICE.NAME} service.'
               preprocessing:
@@ -1969,9 +2096,6 @@ zabbix_export:
             - lld_macro: '{#AWS.ECS.SERVICE.NAME}'
               path: $.service_name
           preprocessing:
-            - type: JSONPATH
-              parameters:
-                - $.services
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 3h
@@ -1985,9 +2109,11 @@ zabbix_export:
       macros:
         - macro: '{$AWS.ACCESS.KEY.ID}'
           description: 'Access key ID.'
+        - macro: '{$AWS.ASSUME.ROLE.ARN}'
+          description: 'ARN assume role; add when using the `assume_role` authorization method.'
         - macro: '{$AWS.AUTH_TYPE}'
           value: access_key
-          description: 'Authorization method. Possible values: role_base, access_key.'
+          description: 'Authorization method. Possible values: `access_key`, `assume_role`, `role_base`.'
         - macro: '{$AWS.ECS.CLUSTER.CPU.UTIL.WARN}'
           value: '70'
           description: 'The warning threshold of the cluster CPU utilization expressed in %.'
@@ -2028,6 +2154,9 @@ zabbix_export:
         - macro: '{$AWS.SECRET.ACCESS.KEY}'
           type: SECRET_TEXT
           description: 'Secret access key.'
+        - macro: '{$AWS.STS.REGION}'
+          value: us-east-1
+          description: 'Region used in assume role request.'
       dashboards:
         - uuid: 21cc12db2b0f4289b0660fcf5538b65d
           name: 'Overview AWS ECS Serverless Cluster'

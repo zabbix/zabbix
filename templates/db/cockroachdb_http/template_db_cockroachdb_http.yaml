@@ -36,6 +36,7 @@ zabbix_export:
           name: 'CA certificate expiration date'
           type: DEPENDENT
           key: cockroachdb.cert.expire_date.ca
+          delay: '0'
           value_type: FLOAT
           trends: '0'
           units: unixtime
@@ -69,6 +70,7 @@ zabbix_export:
           name: 'Node certificate expiration date'
           type: DEPENDENT
           key: cockroachdb.cert.expire_date.node
+          delay: '0'
           value_type: FLOAT
           trends: '0'
           units: unixtime
@@ -102,6 +104,7 @@ zabbix_export:
           name: 'Clock offset'
           type: DEPENDENT
           key: cockroachdb.clock.offset
+          delay: '0'
           value_type: FLOAT
           units: s
           description: 'Mean clock offset of the node against the rest of the cluster.'
@@ -133,6 +136,7 @@ zabbix_export:
           name: 'CPU: System time'
           type: DEPENDENT
           key: cockroachdb.cpu.system_time
+          delay: '0'
           value_type: FLOAT
           units: s
           description: 'System CPU time.'
@@ -143,6 +147,8 @@ zabbix_export:
                 - value
                 - ''
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
             - type: MULTIPLIER
               parameters:
                 - '1.0E-9'
@@ -155,6 +161,7 @@ zabbix_export:
           name: 'CPU: User time'
           type: DEPENDENT
           key: cockroachdb.cpu.user_time
+          delay: '0'
           value_type: FLOAT
           units: s
           description: 'User CPU time.'
@@ -165,6 +172,8 @@ zabbix_export:
                 - value
                 - ''
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
             - type: MULTIPLIER
               parameters:
                 - '1.0E-9'
@@ -177,6 +186,7 @@ zabbix_export:
           name: 'CPU: Utilization'
           type: DEPENDENT
           key: cockroachdb.cpu.util
+          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'The CPU utilization expressed in %.'
@@ -198,6 +208,7 @@ zabbix_export:
           name: 'File descriptors: Limit'
           type: DEPENDENT
           key: cockroachdb.descriptors.limit
+          delay: '0'
           value_type: FLOAT
           description: 'Open file descriptors soft limit of the process.'
           preprocessing:
@@ -218,6 +229,7 @@ zabbix_export:
           name: 'File descriptors: Open'
           type: DEPENDENT
           key: cockroachdb.descriptors.open
+          delay: '0'
           value_type: FLOAT
           description: 'The number of open file descriptors.'
           preprocessing:
@@ -235,6 +247,7 @@ zabbix_export:
           name: 'Disk: IOPS in progress, rate'
           type: DEPENDENT
           key: cockroachdb.disk.iops.in_progress.rate
+          delay: '0'
           value_type: FLOAT
           description: 'Number of disk IO operations currently in progress on this host.'
           preprocessing:
@@ -244,6 +257,8 @@ zabbix_export:
                 - value
                 - ''
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           master_item:
             key: cockroachdb.get_metrics
           tags:
@@ -253,6 +268,7 @@ zabbix_export:
           name: 'Disk: Read IOPS, rate'
           type: DEPENDENT
           key: cockroachdb.disk.iops.read.rate
+          delay: '0'
           value_type: FLOAT
           description: 'Number of disk read operations per second across all disks since this process started.'
           preprocessing:
@@ -262,6 +278,8 @@ zabbix_export:
                 - value
                 - ''
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           master_item:
             key: cockroachdb.get_metrics
           tags:
@@ -271,6 +289,7 @@ zabbix_export:
           name: 'Disk: Write IOPS, rate'
           type: DEPENDENT
           key: cockroachdb.disk.iops.write.rate
+          delay: '0'
           value_type: FLOAT
           description: 'Disk write operations per second across all disks since this process started.'
           preprocessing:
@@ -280,6 +299,8 @@ zabbix_export:
                 - value
                 - ''
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           master_item:
             key: cockroachdb.get_metrics
           tags:
@@ -289,6 +310,7 @@ zabbix_export:
           name: 'Disk: Reads, rate'
           type: DEPENDENT
           key: cockroachdb.disk.read.rate
+          delay: '0'
           value_type: FLOAT
           units: Bps
           description: 'Bytes read from all disks per second since this process started'
@@ -299,6 +321,8 @@ zabbix_export:
                 - value
                 - ''
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           master_item:
             key: cockroachdb.get_metrics
           tags:
@@ -308,6 +332,7 @@ zabbix_export:
           name: 'Disk: Writes, rate'
           type: DEPENDENT
           key: cockroachdb.disk.write.rate
+          delay: '0'
           value_type: FLOAT
           units: Bps
           description: 'Bytes written to all disks per second since this process started.'
@@ -318,6 +343,8 @@ zabbix_export:
                 - value
                 - ''
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           master_item:
             key: cockroachdb.get_metrics
           tags:
@@ -327,6 +354,7 @@ zabbix_export:
           name: 'GC: Pause time'
           type: DEPENDENT
           key: cockroachdb.gc.pause_time
+          delay: '0'
           value_type: FLOAT
           units: s
           description: 'The amount of processor time used by Go''s garbage collector across all nodes. During garbage collection, application code execution is paused.'
@@ -337,6 +365,8 @@ zabbix_export:
                 - value
                 - ''
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
             - type: MULTIPLIER
               parameters:
                 - '1.0E-9'
@@ -349,6 +379,7 @@ zabbix_export:
           name: 'GC: Runs, rate'
           type: DEPENDENT
           key: cockroachdb.gc.runs.rate
+          delay: '0'
           value_type: FLOAT
           description: 'The number of times that Go''s garbage collector was invoked per second across all nodes.'
           preprocessing:
@@ -358,6 +389,8 @@ zabbix_export:
                 - value
                 - ''
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           master_item:
             key: cockroachdb.get_metrics
           tags:
@@ -406,6 +439,7 @@ zabbix_export:
           key: cockroachdb.get_metrics
           history: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Get raw metrics from the Prometheus endpoint.'
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
@@ -445,6 +479,7 @@ zabbix_export:
           name: 'Go: Goroutines count'
           type: DEPENDENT
           key: cockroachdb.go.goroutines.count
+          delay: '0'
           value_type: FLOAT
           description: 'Current number of Goroutines. This count should rise and fall based on load.'
           preprocessing:
@@ -462,6 +497,7 @@ zabbix_export:
           name: 'Liveness heartbeats, rate'
           type: DEPENDENT
           key: cockroachdb.heartbeaths.success.rate
+          delay: '0'
           description: 'Number of successful node liveness heartbeats per second from this node.'
           preprocessing:
             - type: PROMETHEUS_PATTERN
@@ -470,6 +506,8 @@ zabbix_export:
                 - value
                 - ''
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           master_item:
             key: cockroachdb.get_metrics
           tags:
@@ -479,6 +517,7 @@ zabbix_export:
           name: 'KV transactions: Aborted, rate'
           type: DEPENDENT
           key: cockroachdb.kv.transactions.aborted.rate
+          delay: '0'
           value_type: FLOAT
           description: 'Number of aborted KV transactions per second.'
           preprocessing:
@@ -488,6 +527,8 @@ zabbix_export:
                 - value
                 - ''
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           master_item:
             key: cockroachdb.get_metrics
           tags:
@@ -497,6 +538,7 @@ zabbix_export:
           name: 'KV transactions: Committed, rate'
           type: DEPENDENT
           key: cockroachdb.kv.transactions.committed.rate
+          delay: '0'
           value_type: FLOAT
           description: 'Number of KV transactions (including 1PC) committed per second.'
           preprocessing:
@@ -506,6 +548,8 @@ zabbix_export:
                 - value
                 - ''
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           master_item:
             key: cockroachdb.get_metrics
           tags:
@@ -515,6 +559,7 @@ zabbix_export:
           name: 'Live nodes count'
           type: DEPENDENT
           key: cockroachdb.live_count
+          delay: '0'
           description: 'The number of live nodes in the cluster (will be 0 if this node is not itself live).'
           preprocessing:
             - type: PROMETHEUS_PATTERN
@@ -534,6 +579,7 @@ zabbix_export:
           name: 'Memory: Allocated by Cgo'
           type: DEPENDENT
           key: cockroachdb.memory.cgo.allocated
+          delay: '0'
           value_type: FLOAT
           units: B
           description: 'Current bytes of memory allocated by the C layer.'
@@ -554,6 +600,7 @@ zabbix_export:
           name: 'Memory: Managed by Cgo'
           type: DEPENDENT
           key: cockroachdb.memory.cgo.managed
+          delay: '0'
           value_type: FLOAT
           units: B
           description: 'Total bytes of memory managed by the C layer.'
@@ -574,6 +621,7 @@ zabbix_export:
           name: 'Memory: Allocated by Go'
           type: DEPENDENT
           key: cockroachdb.memory.go.allocated
+          delay: '0'
           value_type: FLOAT
           units: B
           description: 'Current bytes of memory allocated by the Go layer.'
@@ -594,6 +642,7 @@ zabbix_export:
           name: 'Memory: Managed by Go'
           type: DEPENDENT
           key: cockroachdb.memory.go.managed
+          delay: '0'
           value_type: FLOAT
           units: B
           description: 'Total bytes of memory managed by the Go layer.'
@@ -614,6 +663,7 @@ zabbix_export:
           name: 'Memory: Allocated by SQL'
           type: DEPENDENT
           key: cockroachdb.memory.sql
+          delay: '0'
           value_type: FLOAT
           units: B
           description: 'Current SQL statement memory usage for root.'
@@ -634,6 +684,7 @@ zabbix_export:
           name: 'Memory: Total usage'
           type: DEPENDENT
           key: cockroachdb.memory.total
+          delay: '0'
           value_type: FLOAT
           units: B
           description: 'Resident set size (RSS) of memory in use by the node.'
@@ -652,6 +703,7 @@ zabbix_export:
           name: 'Network: Bytes received, rate'
           type: DEPENDENT
           key: cockroachdb.network.bytes.received.rate
+          delay: '0'
           value_type: FLOAT
           units: Bps
           description: 'Bytes received per second on all network interfaces since this process started.'
@@ -662,6 +714,8 @@ zabbix_export:
                 - value
                 - ''
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           master_item:
             key: cockroachdb.get_metrics
           tags:
@@ -671,6 +725,7 @@ zabbix_export:
           name: 'Network: Bytes sent, rate'
           type: DEPENDENT
           key: cockroachdb.network.bytes.sent.rate
+          delay: '0'
           value_type: FLOAT
           units: Bps
           description: 'Bytes sent per second on all network interfaces since this process started.'
@@ -681,6 +736,8 @@ zabbix_export:
                 - value
                 - ''
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           master_item:
             key: cockroachdb.get_metrics
           tags:
@@ -690,6 +747,7 @@ zabbix_export:
           name: 'Slow requests: DistSender RPCs'
           type: DEPENDENT
           key: cockroachdb.slow_requests.rpc
+          delay: '0'
           value_type: FLOAT
           description: 'Number of RPCs stuck or retrying for a long time.'
           preprocessing:
@@ -707,6 +765,7 @@ zabbix_export:
           name: 'SQL: Bytes received, rate'
           type: DEPENDENT
           key: cockroachdb.sql.bytes.received.rate
+          delay: '0'
           value_type: FLOAT
           units: Bps
           description: 'Total amount of incoming SQL client network traffic in bytes per second.'
@@ -717,6 +776,8 @@ zabbix_export:
                 - value
                 - ''
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           master_item:
             key: cockroachdb.get_metrics
           tags:
@@ -726,6 +787,7 @@ zabbix_export:
           name: 'SQL: Bytes sent, rate'
           type: DEPENDENT
           key: cockroachdb.sql.bytes.sent.rate
+          delay: '0'
           value_type: FLOAT
           units: Bps
           description: 'Total amount of outgoing SQL client network traffic in bytes per second.'
@@ -736,6 +798,8 @@ zabbix_export:
                 - value
                 - ''
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           master_item:
             key: cockroachdb.get_metrics
           tags:
@@ -745,6 +809,7 @@ zabbix_export:
           name: 'SQL: Schema changes, rate'
           type: DEPENDENT
           key: cockroachdb.sql.schema_changes.rate
+          delay: '0'
           value_type: FLOAT
           description: 'Total number of SQL DDL statements successfully executed per second.'
           preprocessing:
@@ -754,6 +819,8 @@ zabbix_export:
                 - value
                 - ''
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           master_item:
             key: cockroachdb.get_metrics
           tags:
@@ -763,6 +830,7 @@ zabbix_export:
           name: 'SQL sessions: Open'
           type: DEPENDENT
           key: cockroachdb.sql.sessions
+          delay: '0'
           value_type: FLOAT
           description: 'Total number of open SQL sessions.'
           preprocessing:
@@ -780,6 +848,7 @@ zabbix_export:
           name: 'SQL statements: Active'
           type: DEPENDENT
           key: cockroachdb.sql.statements.active
+          delay: '0'
           value_type: FLOAT
           description: 'Total number of SQL statements currently active.'
           preprocessing:
@@ -797,6 +866,7 @@ zabbix_export:
           name: 'SQL statements: Contention, rate'
           type: DEPENDENT
           key: cockroachdb.sql.statements.contention.rate
+          delay: '0'
           value_type: FLOAT
           description: 'Total number of SQL statements that experienced contention per second.'
           preprocessing:
@@ -806,6 +876,8 @@ zabbix_export:
                 - value
                 - ''
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           master_item:
             key: cockroachdb.get_metrics
           tags:
@@ -815,6 +887,7 @@ zabbix_export:
           name: 'SQL statements: DELETE, rate'
           type: DEPENDENT
           key: cockroachdb.sql.statements.delete.rate
+          delay: '0'
           value_type: FLOAT
           description: 'A moving average of the number of DELETE statements successfully executed per second.'
           preprocessing:
@@ -824,6 +897,8 @@ zabbix_export:
                 - value
                 - ''
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           master_item:
             key: cockroachdb.get_metrics
           tags:
@@ -833,6 +908,7 @@ zabbix_export:
           name: 'SQL statements: Denials, rate'
           type: DEPENDENT
           key: cockroachdb.sql.statements.denials.rate
+          delay: '0'
           value_type: FLOAT
           description: 'The number of statements denied per second by a feature flag.'
           preprocessing:
@@ -842,6 +918,8 @@ zabbix_export:
                 - value
                 - ''
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           master_item:
             key: cockroachdb.get_metrics
           tags:
@@ -851,6 +929,7 @@ zabbix_export:
           name: 'SQL statements: Errors, rate'
           type: DEPENDENT
           key: cockroachdb.sql.statements.errors.rate
+          delay: '0'
           value_type: FLOAT
           description: 'Total number of statements which returned a planning or runtime error per second.'
           preprocessing:
@@ -860,6 +939,8 @@ zabbix_export:
                 - value
                 - ''
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           master_item:
             key: cockroachdb.get_metrics
           tags:
@@ -878,6 +959,7 @@ zabbix_export:
           name: 'SQL statements: Executed, rate'
           type: DEPENDENT
           key: cockroachdb.sql.statements.executed.rate
+          delay: '0'
           value_type: FLOAT
           description: 'Number of SQL queries executed per second.'
           preprocessing:
@@ -887,6 +969,8 @@ zabbix_export:
                 - value
                 - ''
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           master_item:
             key: cockroachdb.get_metrics
           tags:
@@ -896,6 +980,7 @@ zabbix_export:
           name: 'SQL statements: Active flows distributed, rate'
           type: DEPENDENT
           key: cockroachdb.sql.statements.flows.active.rate
+          delay: '0'
           value_type: FLOAT
           description: 'The number of distributed SQL flows currently active per second.'
           preprocessing:
@@ -905,6 +990,8 @@ zabbix_export:
                 - value
                 - ''
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           master_item:
             key: cockroachdb.get_metrics
           tags:
@@ -914,6 +1001,7 @@ zabbix_export:
           name: 'SQL statements: INSERT, rate'
           type: DEPENDENT
           key: cockroachdb.sql.statements.insert.rate
+          delay: '0'
           value_type: FLOAT
           description: 'A moving average of the number of INSERT statements successfully executed per second.'
           preprocessing:
@@ -923,6 +1011,8 @@ zabbix_export:
                 - value
                 - ''
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           master_item:
             key: cockroachdb.get_metrics
           tags:
@@ -932,6 +1022,7 @@ zabbix_export:
           name: 'SQL statements: SELECT, rate'
           type: DEPENDENT
           key: cockroachdb.sql.statements.select.rate
+          delay: '0'
           value_type: FLOAT
           description: 'A moving average of the number of SELECT statements successfully executed per second.'
           preprocessing:
@@ -941,6 +1032,8 @@ zabbix_export:
                 - value
                 - ''
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           master_item:
             key: cockroachdb.get_metrics
           tags:
@@ -950,6 +1043,7 @@ zabbix_export:
           name: 'SQL statements: UPDATE, rate'
           type: DEPENDENT
           key: cockroachdb.sql.statements.update.rate
+          delay: '0'
           value_type: FLOAT
           description: 'A moving average of the number of UPDATE statements successfully executed per second.'
           preprocessing:
@@ -959,6 +1053,8 @@ zabbix_export:
                 - value
                 - ''
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           master_item:
             key: cockroachdb.get_metrics
           tags:
@@ -968,6 +1064,7 @@ zabbix_export:
           name: 'SQL transactions: Aborted, rate'
           type: DEPENDENT
           key: cockroachdb.sql.transactions.aborted.rate
+          delay: '0'
           value_type: FLOAT
           description: 'Total number of SQL transaction abort errors per second.'
           preprocessing:
@@ -977,6 +1074,8 @@ zabbix_export:
                 - value
                 - ''
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           master_item:
             key: cockroachdb.get_metrics
           tags:
@@ -986,6 +1085,7 @@ zabbix_export:
           name: 'SQL transactions: Committed, rate'
           type: DEPENDENT
           key: cockroachdb.sql.transactions.committed.rate
+          delay: '0'
           value_type: FLOAT
           description: 'Total number of SQL transaction COMMIT statements successfully executed per second.'
           preprocessing:
@@ -995,6 +1095,8 @@ zabbix_export:
                 - value
                 - ''
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           master_item:
             key: cockroachdb.get_metrics
           tags:
@@ -1004,6 +1106,7 @@ zabbix_export:
           name: 'SQL transactions: Initiated, rate'
           type: DEPENDENT
           key: cockroachdb.sql.transactions.initiated.rate
+          delay: '0'
           value_type: FLOAT
           description: 'Total number of SQL transaction BEGIN statements successfully executed per second.'
           preprocessing:
@@ -1013,6 +1116,8 @@ zabbix_export:
                 - value
                 - ''
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           master_item:
             key: cockroachdb.get_metrics
           tags:
@@ -1022,6 +1127,7 @@ zabbix_export:
           name: 'SQL transactions: Open'
           type: DEPENDENT
           key: cockroachdb.sql.transactions.open
+          delay: '0'
           value_type: FLOAT
           description: 'Total number of currently open SQL transactions.'
           preprocessing:
@@ -1039,6 +1145,7 @@ zabbix_export:
           name: 'SQL transactions: Rolled back, rate'
           type: DEPENDENT
           key: cockroachdb.sql.transactions.rollbacks.rate
+          delay: '0'
           value_type: FLOAT
           description: 'Total number of SQL transaction ROLLBACK statements successfully executed per second.'
           preprocessing:
@@ -1048,6 +1155,8 @@ zabbix_export:
                 - value
                 - ''
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           master_item:
             key: cockroachdb.get_metrics
           tags:
@@ -1057,6 +1166,7 @@ zabbix_export:
           name: 'Time series: Sample errors, rate'
           type: DEPENDENT
           key: cockroachdb.ts.samples.errors.rate
+          delay: '0'
           value_type: FLOAT
           description: 'The number of errors encountered while attempting to write metrics to disk, per second.'
           preprocessing:
@@ -1066,6 +1176,8 @@ zabbix_export:
                 - value
                 - ''
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           master_item:
             key: cockroachdb.get_metrics
           tags:
@@ -1075,6 +1187,7 @@ zabbix_export:
           name: 'Time series: Samples written, rate'
           type: DEPENDENT
           key: cockroachdb.ts.samples.written.rate
+          delay: '0'
           value_type: FLOAT
           description: 'The number of successfully written metric samples per second.'
           preprocessing:
@@ -1084,6 +1197,8 @@ zabbix_export:
                 - value
                 - ''
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           master_item:
             key: cockroachdb.get_metrics
           tags:
@@ -1093,6 +1208,7 @@ zabbix_export:
           name: Uptime
           type: DEPENDENT
           key: cockroachdb.uptime
+          delay: '0'
           value_type: FLOAT
           units: s
           description: 'Process uptime.'
@@ -1133,7 +1249,9 @@ zabbix_export:
           name: Version
           type: DEPENDENT
           key: cockroachdb.version
+          delay: '0'
           value_type: CHAR
+          trends: '0'
           description: 'Build information.'
           preprocessing:
             - type: PROMETHEUS_PATTERN
@@ -1187,12 +1305,14 @@ zabbix_export:
           name: 'Storage metrics discovery'
           type: DEPENDENT
           key: cockroachdb.store.discovery
+          delay: '0'
           description: 'Discover per store metrics.'
           item_prototypes:
             - uuid: a12e4937d2c44eacada535774e74653a
               name: 'Storage [{#STORE}]: Queue processing failures: Consistency, rate'
               type: DEPENDENT
               key: 'cockroachdb.queue.processing_failures.consistency.[{#STORE},rate]'
+              delay: '0'
               value_type: FLOAT
               description: 'Number of replicas which failed processing in the consistency checker queue per second.'
               preprocessing:
@@ -1202,6 +1322,8 @@ zabbix_export:
                     - value
                     - ''
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               master_item:
                 key: cockroachdb.get_metrics
               tags:
@@ -1211,6 +1333,7 @@ zabbix_export:
               name: 'Storage [{#STORE}]: Queue processing failures: GC, rate'
               type: DEPENDENT
               key: 'cockroachdb.queue.processing_failures.gc.[{#STORE},rate]'
+              delay: '0'
               value_type: FLOAT
               description: 'Number of replicas which failed processing in the GC queue per second.'
               preprocessing:
@@ -1220,6 +1343,8 @@ zabbix_export:
                     - value
                     - ''
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               master_item:
                 key: cockroachdb.get_metrics
               tags:
@@ -1229,6 +1354,7 @@ zabbix_export:
               name: 'Storage [{#STORE}]: Queue processing failures: Replica GC, rate'
               type: DEPENDENT
               key: 'cockroachdb.queue.processing_failures.gc_replica.[{#STORE},rate]'
+              delay: '0'
               value_type: FLOAT
               description: 'Number of replicas which failed processing in the replica GC queue per second.'
               preprocessing:
@@ -1238,6 +1364,8 @@ zabbix_export:
                     - value
                     - ''
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               master_item:
                 key: cockroachdb.get_metrics
               tags:
@@ -1247,6 +1375,7 @@ zabbix_export:
               name: 'Storage [{#STORE}]: Queue processing failures: Raft log, rate'
               type: DEPENDENT
               key: 'cockroachdb.queue.processing_failures.raftlog.[{#STORE},rate]'
+              delay: '0'
               value_type: FLOAT
               description: 'Number of replicas which failed processing in the Raft log queue per second.'
               preprocessing:
@@ -1256,6 +1385,8 @@ zabbix_export:
                     - value
                     - ''
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               master_item:
                 key: cockroachdb.get_metrics
               tags:
@@ -1265,6 +1396,7 @@ zabbix_export:
               name: 'Storage [{#STORE}]: Queue processing failures: Raft snapshot, rate'
               type: DEPENDENT
               key: 'cockroachdb.queue.processing_failures.raftsnapshot.[{#STORE},rate]'
+              delay: '0'
               value_type: FLOAT
               description: 'Number of replicas which failed processing in the Raft repair queue per second.'
               preprocessing:
@@ -1274,6 +1406,8 @@ zabbix_export:
                     - value
                     - ''
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               master_item:
                 key: cockroachdb.get_metrics
               tags:
@@ -1283,6 +1417,7 @@ zabbix_export:
               name: 'Storage [{#STORE}]: Queue processing failures: Replicate, rate'
               type: DEPENDENT
               key: 'cockroachdb.queue.processing_failures.replicate.[{#STORE},rate]'
+              delay: '0'
               value_type: FLOAT
               description: 'Number of replicas which failed processing in the replicate queue per second.'
               preprocessing:
@@ -1292,6 +1427,8 @@ zabbix_export:
                     - value
                     - ''
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               master_item:
                 key: cockroachdb.get_metrics
               tags:
@@ -1301,6 +1438,7 @@ zabbix_export:
               name: 'Storage [{#STORE}]: Queue processing failures: Split, rate'
               type: DEPENDENT
               key: 'cockroachdb.queue.processing_failures.split.[{#STORE},rate]'
+              delay: '0'
               value_type: FLOAT
               description: 'Number of replicas which failed processing in the split queue per second.'
               preprocessing:
@@ -1310,6 +1448,8 @@ zabbix_export:
                     - value
                     - ''
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               master_item:
                 key: cockroachdb.get_metrics
               tags:
@@ -1319,6 +1459,7 @@ zabbix_export:
               name: 'Storage [{#STORE}]: Queue processing failures: Time series maintenance, rate'
               type: DEPENDENT
               key: 'cockroachdb.queue.processing_failures.tsmaintenance.[{#STORE},rate]'
+              delay: '0'
               value_type: FLOAT
               description: 'Number of replicas which failed processing in the time series maintenance queue per second.'
               preprocessing:
@@ -1328,6 +1469,8 @@ zabbix_export:
                     - value
                     - ''
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               master_item:
                 key: cockroachdb.get_metrics
               tags:
@@ -1337,6 +1480,7 @@ zabbix_export:
               name: 'Storage [{#STORE}]: Ranges count'
               type: DEPENDENT
               key: 'cockroachdb.ranges.[{#STORE},count]'
+              delay: '0'
               value_type: FLOAT
               description: 'Number of ranges.'
               preprocessing:
@@ -1354,6 +1498,7 @@ zabbix_export:
               name: 'Storage [{#STORE}]: Ranges unavailable'
               type: DEPENDENT
               key: 'cockroachdb.ranges.[{#STORE},unavailable]'
+              delay: '0'
               value_type: FLOAT
               description: 'Number of ranges with fewer live replicas than needed for quorum.'
               preprocessing:
@@ -1371,6 +1516,7 @@ zabbix_export:
               name: 'Storage [{#STORE}]: Ranges underreplicated'
               type: DEPENDENT
               key: 'cockroachdb.ranges.[{#STORE},underreplicated]'
+              delay: '0'
               value_type: FLOAT
               description: 'Number of ranges with fewer live replicas than the replication target.'
               preprocessing:
@@ -1388,6 +1534,7 @@ zabbix_export:
               name: 'Storage [{#STORE}]: Rebalancing: Average queries, rate'
               type: DEPENDENT
               key: 'cockroachdb.rebalancing.queries.average.[{#STORE},rate]'
+              delay: '0'
               value_type: FLOAT
               description: 'Number of kv-level requests received per second by the store, averaged over a large time period as used in rebalancing decisions.'
               preprocessing:
@@ -1405,6 +1552,7 @@ zabbix_export:
               name: 'Storage [{#STORE}]: Rebalancing: Average writes, rate'
               type: DEPENDENT
               key: 'cockroachdb.rebalancing.writes.average.[{#STORE},rate]'
+              delay: '0'
               value_type: FLOAT
               description: 'Number of keys written (i.e. applied by raft) per second to the store, averaged over a large time period as used in rebalancing decisions.'
               preprocessing:
@@ -1422,6 +1570,7 @@ zabbix_export:
               name: 'Storage [{#STORE}]: Replication: Replicas'
               type: DEPENDENT
               key: 'cockroachdb.replication.replicas.[{#STORE},count]'
+              delay: '0'
               value_type: FLOAT
               description: 'Number of replicas.'
               preprocessing:
@@ -1439,6 +1588,7 @@ zabbix_export:
               name: 'Storage [{#STORE}]: Replication: Replicas quiesced'
               type: DEPENDENT
               key: 'cockroachdb.replication.replicas.[{#STORE},quiesced]'
+              delay: '0'
               value_type: FLOAT
               description: 'Number of quiesced replicas.'
               preprocessing:
@@ -1456,6 +1606,7 @@ zabbix_export:
               name: 'Storage [{#STORE}]: Replication: Lease holders'
               type: DEPENDENT
               key: 'cockroachdb.replication.[{#STORE},lease_holders]'
+              delay: '0'
               value_type: FLOAT
               description: 'Number of lease holders.'
               preprocessing:
@@ -1473,6 +1624,7 @@ zabbix_export:
               name: 'Storage [{#STORE}]: RocksDB cache hits, rate'
               type: DEPENDENT
               key: 'cockroachdb.rocksdb.cache.hits.[{#STORE},rate]'
+              delay: '0'
               value_type: FLOAT
               description: 'Count of block cache hits per second.'
               preprocessing:
@@ -1482,6 +1634,8 @@ zabbix_export:
                     - value
                     - ''
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               master_item:
                 key: cockroachdb.get_metrics
               tags:
@@ -1491,6 +1645,7 @@ zabbix_export:
               name: 'Storage [{#STORE}]: RocksDB cache misses, rate'
               type: DEPENDENT
               key: 'cockroachdb.rocksdb.cache.misses.[{#STORE},rate]'
+              delay: '0'
               value_type: FLOAT
               description: 'Count of block cache misses per second.'
               preprocessing:
@@ -1500,6 +1655,8 @@ zabbix_export:
                     - value
                     - ''
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               master_item:
                 key: cockroachdb.get_metrics
               tags:
@@ -1520,6 +1677,7 @@ zabbix_export:
               name: 'Storage [{#STORE}]: RocksDB read amplification'
               type: DEPENDENT
               key: 'cockroachdb.rocksdb.[{#STORE},read_amp]'
+              delay: '0'
               value_type: FLOAT
               description: 'The average number of real read operations executed per logical read operation.'
               preprocessing:
@@ -1537,6 +1695,7 @@ zabbix_export:
               name: 'Storage [{#STORE}]: RocksDB SSTables'
               type: DEPENDENT
               key: 'cockroachdb.rocksdb.[{#STORE},sstables]'
+              delay: '0'
               value_type: FLOAT
               description: 'The number of SSTables in use.'
               preprocessing:
@@ -1554,6 +1713,7 @@ zabbix_export:
               name: 'Storage [{#STORE}]: Slow requests: Latch acquisitions'
               type: DEPENDENT
               key: 'cockroachdb.slow_requests.[{#STORE},latch_acquisitions]'
+              delay: '0'
               value_type: FLOAT
               description: 'Number of requests that have been stuck for a long time acquiring latches.'
               preprocessing:
@@ -1571,6 +1731,7 @@ zabbix_export:
               name: 'Storage [{#STORE}]: Slow requests: Lease acquisitions'
               type: DEPENDENT
               key: 'cockroachdb.slow_requests.[{#STORE},lease_acquisitions]'
+              delay: '0'
               value_type: FLOAT
               description: 'Number of requests that have been stuck for a long time acquiring a lease.'
               preprocessing:
@@ -1588,6 +1749,7 @@ zabbix_export:
               name: 'Storage [{#STORE}]: Slow requests: Raft proposals'
               type: DEPENDENT
               key: 'cockroachdb.slow_requests.[{#STORE},raft_proposals]'
+              delay: '0'
               value_type: FLOAT
               description: 'Number of requests that have been stuck for a long time in raft.'
               preprocessing:
@@ -1605,6 +1767,7 @@ zabbix_export:
               name: 'Storage [{#STORE}]: Bytes: Live'
               type: DEPENDENT
               key: 'cockroachdb.storage.bytes.[{#STORE},live]'
+              delay: '0'
               value_type: FLOAT
               units: B
               description: 'Number of logical bytes stored in live key-value pairs on this node. Live data excludes historical and deleted data.'
@@ -1623,6 +1786,7 @@ zabbix_export:
               name: 'Storage [{#STORE}]: Bytes: Logical'
               type: DEPENDENT
               key: 'cockroachdb.storage.bytes.[{#STORE},logical]'
+              delay: '0'
               value_type: FLOAT
               units: B
               description: 'Number of logical bytes stored in key-value pairs on this node. This includes historical and deleted data.'
@@ -1641,6 +1805,7 @@ zabbix_export:
               name: 'Storage [{#STORE}]: Bytes: System'
               type: DEPENDENT
               key: 'cockroachdb.storage.bytes.[{#STORE},system]'
+              delay: '0'
               value_type: FLOAT
               units: B
               description: 'Number of physical bytes stored in system key-value pairs.'
@@ -1659,6 +1824,7 @@ zabbix_export:
               name: 'Storage [{#STORE}]: Capacity available'
               type: DEPENDENT
               key: 'cockroachdb.storage.capacity.[{#STORE},available]'
+              delay: '0'
               value_type: FLOAT
               units: B
               description: 'Available storage capacity.'
@@ -1715,6 +1881,7 @@ zabbix_export:
               name: 'Storage [{#STORE}]: Capacity total'
               type: DEPENDENT
               key: 'cockroachdb.storage.capacity.[{#STORE},total]'
+              delay: '0'
               value_type: FLOAT
               units: B
               description: 'Total storage capacity. This value may be explicitly set using --store. If a store size has not been set, this metric displays the actual disk capacity.'
@@ -1736,6 +1903,7 @@ zabbix_export:
               name: 'Storage [{#STORE}]: Capacity used'
               type: DEPENDENT
               key: 'cockroachdb.storage.capacity.[{#STORE},used]'
+              delay: '0'
               value_type: FLOAT
               units: B
               description: 'Disk space in use by CockroachDB data on this node. This excludes the Cockroach binary, operating system, and other system files.'
