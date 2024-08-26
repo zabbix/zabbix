@@ -1042,24 +1042,21 @@ int	zbx_regexp_repl(const char *string, const char *pattern, const char *output_
 {
 	zbx_regexp_t		*regexp = NULL;
 	int			mi, shift = 0, ret = FAIL, len = strlen(string);
-	char			*out_str = zbx_strdup(NULL, string), *error = NULL;
+	char			*out_str, *error = NULL;
 	zbx_vector_match_t	matches;
 	size_t			i;
 	double			starttime = zbx_time();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() len:%d", __func__, len);
 
-	zbx_free(*out);
-
 	if ('\0' == *pattern)
 	{
-		*out = out_str;
+		*out = zbx_strdup(*out, string);
 		return SUCCEED;
 	}
 
 	if (FAIL == regexp_prepare(pattern, ZBX_REGEXP_MULTILINE, &regexp, &error))
 	{
-		*out = out_str;
 		zbx_free(error);
 		return FAIL;
 	}
@@ -1101,7 +1098,7 @@ int	zbx_regexp_repl(const char *string, const char *pattern, const char *output_
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "replacing:%d matches %s()", matches.values_num, __func__);
-
+	out_str = zbx_strdup(NULL, string);
 	/* create pattern based string for each match and relplace matched string with this string */
 	for (mi = matches.values_num - 1; 0 <= mi; mi--)
 	{
@@ -1109,10 +1106,14 @@ int	zbx_regexp_repl(const char *string, const char *pattern, const char *output_
 		char		*replace, *ptr;
 
 		if ('\0' == *output_template)
+		{
 			replace = zbx_strdup(NULL, output_template);
+		}
 		else
+		{
 			replace = regexp_sub_replace(string, output_template, groups, ZBX_REGEXP_GROUPS_MAX,
-						MAX_EXECUTE_OUTPUT_LEN);
+					MAX_EXECUTE_OUTPUT_LEN);
+		}
 
 		if (NULL != replace)
 		{
@@ -1123,6 +1124,7 @@ int	zbx_regexp_repl(const char *string, const char *pattern, const char *output_
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "macro function output exceeded limit of %d Kb",
 						MAX_EXECUTE_OUTPUT_LEN / ZBX_KIBIBYTE);
+				zbx_free(out_str);
 				zbx_free(replace);
 				goto out;
 			}
@@ -1138,16 +1140,21 @@ int	zbx_regexp_repl(const char *string, const char *pattern, const char *output_
 			zbx_free(replace);
 		}
 		else
+		{
+			zbx_free(out_str);
 			goto out;
+		}
 	}
 	ret = SUCCEED;
-out:
-	zbx_vector_match_clear_ext(&matches, zbx_match_free);
-	zbx_vector_match_destroy(&matches);
+	zbx_free(*out);
 	*out = out_str;
 #if !defined(HAVE_PCRE2_H)
 	zbx_replace_invalid_utf8(*out);
 #endif
+
+out:
+	zbx_vector_match_clear_ext(&matches, zbx_match_free);
+	zbx_vector_match_destroy(&matches);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
