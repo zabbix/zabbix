@@ -242,6 +242,11 @@ func init() {
 	}
 }
 
+// execute returns the smartctl runner with all devices data returned by smartctl.
+// If jsonRunner is 'true' the returned data is in json format in 'jsonDevices' field.
+// If jsonRunner is 'false' the returned data is 'devices' field.
+// Currently looks for 5 raid types "3ware", "areca", "cciss", "megaraid", "sat".
+// It returns an error if there is an issue with getting or parsing results from smartctl.
 func (p *Plugin) execute(jsonRunner bool) (*runner, error) {
 	basicDev, raidDev, megaraidDev, err := p.getDevices()
 	if err != nil {
