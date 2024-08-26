@@ -27,7 +27,7 @@ require (
 	golang.org/x/net v0.18.0
 	golang.org/x/sys v0.14.0
 	golang.org/x/text v0.14.0
-	golang.zabbix.com/sdk v1.2.2-0.20240830080334-eed8ecf689b8
+	golang.zabbix.com/sdk v1.2.2-0.20240826155058-2433669a9fb1
 )
 
 require (

@@ -123,8 +123,25 @@ func main() {
 	if err != nil {
 		fatalCloseOSItems()
 
-		fmt.Fprintf(os.Stderr, "zabbix_agent2 [%d]: ERROR: %s\n", os.Getpid(), err.Error())
-		os.Exit(1)
+		cliErr := &errs.CLIError{}
+
+		if !errors.As(err, &cliErr) {
+			fmt.Fprintf(
+				os.Stderr,
+				"zabbix_agent2 [%d]: ERROR: %s\n",
+				os.Getpid(),
+				err.Error(),
+			)
+			os.Exit(1)
+		}
+
+		fmt.Fprintf(
+			os.Stderr,
+			"zabbix_agent2 [%d]: ERROR: %s\n",
+			os.Getpid(),
+			cliErr.Message,
+		)
+		os.Exit(cliErr.ExitCode)
 	}
 
 	os.Exit(0)
@@ -178,7 +195,12 @@ func run() error {
 	err = conf.Load(args.configPath, &agent.Options)
 	if err != nil {
 		if args.configPath != "" || args.testConfig {
-			return eventLogErr(errs.Wrap(err, "failed to load configuration"))
+			return eventLogErr(
+				errors.Join(
+					errs.NewCLIError(err.Error(), 1),
+					errs.Wrap(err, "failed to load configuration"),
+				),
+			)
 		}
 
 		// create default configuration for testing options
@@ -597,7 +619,10 @@ func parseArgs() (string, *Arguments, error) {
 	if err != nil {
 		fmt.Fprint(os.Stdout, usageMessage())
 
-		return "", nil, errs.Wrap(err, "failed to parse command line arguments")
+		return "", nil, errors.Join(
+			errs.NewCLIError(err.Error(), 1),
+			errs.Wrap(err, "failed to parse command line arguments"),
+		)
 	}
 
 	return f.Usage(), args, nil
