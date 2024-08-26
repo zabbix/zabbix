@@ -529,7 +529,7 @@ $mfa_tab = (new CFormGrid())
 							new CColHeader(_('Type')),
 							(new CColHeader(_('User groups')))->addClass(ZBX_STYLE_NOWRAP),
 							_('Default'),
-							_('Action')
+							''
 						]))->addClass(ZBX_STYLE_GREY)
 					)
 					->addItem(

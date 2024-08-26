@@ -46,7 +46,7 @@ $action_tab = (new CFormGrid())
 $condition_table = (new CTable())
 	->setId('conditionTable')
 	->setAttribute('style', 'width: 100%;')
-	->setHeader([_('Label'), _('Name'), _('Action')]);
+	->setHeader([_('Label'), _('Name'), '']);
 
 $formula = (new CTextBox('formula', $data['formula'], false, DB::getFieldLength('actions', 'formula')))
 	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)

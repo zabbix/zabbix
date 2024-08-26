@@ -167,7 +167,7 @@ $condition_old_new_tag_template = (new CTemplateTag('condition-old-new-tag-row-t
 $condition_table = (new CTable())
 	->setId('condition_table')
 	->addClass(ZBX_STYLE_TABLE_FORMS)
-	->setHeader([_('Label'), _('Name'), _('Action')])
+	->setHeader([_('Label'), _('Name'), ''])
 	->addItem([
 		$condition_tag_template,
 		$condition_hostgroup_template,

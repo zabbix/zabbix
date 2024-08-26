@@ -108,7 +108,7 @@ $form_grid->addItem([
 	(new CFormField(
 		(new CTable())
 			->setAttribute('style', 'width: 100%;')
-			->setHeader([_('Type'), _('Actions')])
+			->setHeader([_('Type'), ''])
 			->addItem(
 				(new CTag('tfoot', true))
 					->addItem(

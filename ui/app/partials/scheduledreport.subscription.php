@@ -28,7 +28,7 @@ $table = (new CTable())
 		(new CColHeader(_('Recipient')))->setWidth('38%'),
 		(new CColHeader(_('Generate report by')))->setWidth('30%'),
 		_('Status'),
-		_('Action')
+		''
 	])
 	->addItem(
 		(new CTag('tfoot', true))->addItem(

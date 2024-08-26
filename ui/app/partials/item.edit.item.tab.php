@@ -646,7 +646,7 @@ $formgrid
 				(new CTable())
 					->setId('delay-flex-table')
 					->setHeader([
-						_('Type'), _('Interval'), _('Period'), $item['discovered'] ? null : _('Action')
+						_('Type'), _('Interval'), _('Period'), ''
 					])
 					->setFooter((new CCol(
 						(new CButtonLink(_('Add')))
