@@ -1,0 +1,15 @@
+---
+test case: " empty strings "
+in:
+  string1: ""
+  string2: ""
+out:
+  val: SUCCEED
+---
+test case: " apple apple "
+in:
+  string1: "apple"
+  string2: "apple"
+out:
+  val: SUCCEED
+...

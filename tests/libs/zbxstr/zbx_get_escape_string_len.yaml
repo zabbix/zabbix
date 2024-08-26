@@ -33,3 +33,4 @@ in:
   charlist: "!!!"
 out:
   return: 0
+...

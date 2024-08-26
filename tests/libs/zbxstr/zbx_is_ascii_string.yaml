@@ -52,6 +52,6 @@ in:
   string: ""
 out:
   return: SUCCEED
-
+...
 
 

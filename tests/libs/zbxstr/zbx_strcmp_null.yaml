@@ -1,0 +1,7 @@
+---
+test case: " empty strings "
+in:
+  string1: ""
+  string2: ""
+out:
+  val: SUCCEED

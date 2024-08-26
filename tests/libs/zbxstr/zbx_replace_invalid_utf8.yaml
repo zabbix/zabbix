@@ -1,0 +1,19 @@
+---
+test case: "Hello\xC2\xA9 World\xFE"
+in:
+  string: "Hello\xC2\xA9 World\xFE"
+out:
+  string: "Hello\xC2\xA9 World\xFE"
+---
+test case: "Hello World"
+in:
+  string: "Hello World"
+out:
+  string: "Hello World"
+---
+test case: "\xA9 \xFE"
+in:
+  string: "\xA9 \xFE"
+out:
+  string: "\xA9 \xFE"
+...
