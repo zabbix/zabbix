@@ -176,7 +176,7 @@ foreach ($data['graphs'] as $graph) {
 	$hosts = null;
 	$graphid = $graph['graphid'];
 
-	if (!$this->data['hostid']) {
+	if ($this->data['hostid'] == 0) {
 		foreach ($graph['hosts'] as $host) {
 			if ($hosts) {
 				$hosts[] = ', ';
