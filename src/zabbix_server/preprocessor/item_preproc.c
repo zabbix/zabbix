@@ -173,7 +173,8 @@ static int	item_preproc_multiplier_variant(unsigned char value_type, zbx_variant
  *                                                                            *
  * Purpose: executes during notsupported item preprocessing                   *
  *                                                                            *
- * Return value: FAIL - for further error handling                            *
+ * Return value: SUCCEED - has value and no error                             *
+ *               FAIL - for further error handling                            *
  *                                                                            *
  ******************************************************************************/
 static int	item_preproc_validate_notsupport(zbx_variant_t *value, char **errmsg)

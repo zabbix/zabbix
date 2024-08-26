@@ -1039,6 +1039,8 @@ static void	preprocessor_enqueue_dependent(zbx_preprocessing_manager_t *manager,
 {
 	zbx_preproc_item_t	*item, item_local;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid: " ZBX_FS_UI64, __func__, itemid);
+
 	item_local.itemid = itemid;
 	if (NULL != (item = (zbx_preproc_item_t *)zbx_hashset_search(&manager->item_config, &item_local)) &&
 			0 != item->dep_itemids_num)
