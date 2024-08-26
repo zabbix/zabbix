@@ -303,9 +303,6 @@ func (p *Plugin) execute(jsonRunner bool) (*runner, error) {
 
 			g.Go(func() error {
 				devices := getRaidDevices(p.ctl, p.Base, name, dtype)
-				if err != nil {
-					return err
-				}
 				for _, device := range devices {
 					resultChan <- device
 				}

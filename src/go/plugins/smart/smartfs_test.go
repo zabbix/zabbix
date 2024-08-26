@@ -147,6 +147,78 @@ func TestPlugin_execute(t *testing.T) {
 			false,
 		},
 		{
+			"+smartInfoErrorBasicDevice",
+			args{false},
+			[]expectation{
+				{
+					[]string{"--scan", "-j"},
+					nil,
+					mock.Outputs.Get("ai_gen_with_2_basic_devices").AllDevicesScan,
+				},
+				{
+					[]string{"--scan", "-d", "sat", "-j"},
+					nil,
+					[]byte("{}"),
+				},
+				{
+					[]string{"-a", "/dev/sda", "-j"},
+					errs.New("unknown error"),
+					mock.Outputs.Get("ai_gen_with_2_basic_devices").AllSmartInfoScans.Get("-a /dev/sda -j"),
+				},
+				{
+					[]string{"-a", "/dev/sdb", "-j"},
+					nil,
+					mock.Outputs.Get("ai_gen_with_2_basic_devices").AllSmartInfoScans.Get("-a /dev/sdb -j"),
+				},
+			},
+			&runner{
+				devices: map[string]deviceParser{},
+			},
+			true,
+		},
+		{
+			"-smartInfoErrorMegaraid",
+			args{false},
+			[]expectation{
+				{
+					args: []string{"--scan", "-j"},
+					err:  nil,
+					out:  []byte(`{}`),
+				},
+				{
+					args: []string{"--scan", "-d", "sat", "-j"},
+					err:  nil,
+					out: []byte(`{								
+								"json_format_version": [1, 0],
+								"smartctl": {
+									"version": [7, 1],
+									"svn_revision": "5022",
+									"platform_info": "x86_64-w64-mingw32-w10-b19045",
+									"build_info": "(sf-7.1-1)"
+								},
+								"devices": [
+									{
+									"name": "optimus_prime",
+									"info_name": "optimus_prime",
+									"type": "megaraid",
+									"protocol": "transformer"
+									}
+								]}`),
+				},
+				{
+					args: []string{
+						"-a", "optimus_prime", "-d", "megaraid", "-j",
+					},
+					err: errs.New("unexpected error"),
+					out: mock.OutputAllDiscInfoSDA,
+				},
+			},
+			&runner{
+				devices: map[string]deviceParser{},
+			},
+			false,
+		},
+		{
 			"-smartError",
 			args{false},
 			[]expectation{
