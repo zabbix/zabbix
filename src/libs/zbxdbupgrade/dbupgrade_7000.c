@@ -56,6 +56,14 @@ static int	DBpatch_7000003(void)
 	return DBdrop_index("userdirectory_usrgrp", "userdirectory_usrgrp_3");
 }
 
+static int	DBpatch_7000004(void)
+{
+	if (FAIL == zbx_db_index_exists("auditlog", "auditlog_5"))
+		return DBcreate_index("auditlog", "auditlog_5", "ip", 0);
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(7000)
@@ -66,5 +74,6 @@ DBPATCH_ADD(7000000, 0, 1)
 DBPATCH_ADD(7000001, 0, 0)
 DBPATCH_ADD(7000002, 0, 0)
 DBPATCH_ADD(7000003, 0, 0)
+DBPATCH_ADD(7000004, 0, 0)
 
 DBPATCH_END()
