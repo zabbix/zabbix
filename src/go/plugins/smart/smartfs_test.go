@@ -109,6 +109,44 @@ func TestPlugin_execute(t *testing.T) {
 			false,
 		},
 		{
+			"+oneDeviceWithNoSmart",
+			args{false},
+			[]expectation{
+				{
+					[]string{"--scan", "-j"},
+					nil,
+					mock.Outputs.Get("ai_gen_with_2_basic_devices").AllDevicesScan,
+				},
+				{
+					[]string{"--scan", "-d", "sat", "-j"},
+					nil,
+					[]byte("{}"),
+				},
+				{
+					[]string{"-a", "/dev/sda", "-j"},
+					ErrNoSmartStatus,
+					mock.Outputs.Get("ai_gen_with_2_basic_devices").AllSmartInfoScans.Get("-a /dev/sda -j"),
+				},
+				{
+					[]string{"-a", "/dev/sdb", "-j"},
+					nil,
+					mock.Outputs.Get("ai_gen_with_2_basic_devices").AllSmartInfoScans.Get("-a /dev/sdb -j"),
+				},
+			},
+			&runner{
+				devices: map[string]deviceParser{
+					"/dev/sdb": {
+						ModelName:    "SAMSUNG MZVLB512HBJQ-000L7",
+						SerialNumber: "S3XY0987654321",
+						Info:         deviceInfo{Name: "/dev/sdb", InfoName: "/dev/sdb", DevType: "nvme", name: "/dev/sdb"},
+						Smartctl:     smartctlField{Version: []int{7, 1}},
+						SmartStatus:  &smartStatus{SerialNumber: true},
+					},
+				},
+			},
+			false,
+		},
+		{
 			"-smartError",
 			args{false},
 			[]expectation{
@@ -138,7 +176,8 @@ func TestPlugin_execute(t *testing.T) {
 			}
 
 			p := &Plugin{
-				ctl: m,
+				ctl:  m,
+				Base: plugin.Base{Logger: log.New("test")},
 			}
 
 			cpuCount = 1

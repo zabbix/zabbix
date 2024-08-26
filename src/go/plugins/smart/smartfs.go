@@ -280,6 +280,7 @@ func (p *Plugin) execute(jsonRunner bool) (*runner, error) {
 
 			if errors.Is(err, ErrNoSmartStatus) {
 				r.plugin.Debugf("skipping device %s", name)
+
 				return nil
 			}
 
