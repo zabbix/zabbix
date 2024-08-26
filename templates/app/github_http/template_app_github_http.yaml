@@ -60,33 +60,21 @@ zabbix_export:
       groups:
         - name: Templates/Applications
       items:
-        - uuid: 3b4799f0efc64f91836eb081b66f3e3b
-          name: 'Number of closed issues'
-          type: DEPENDENT
-          key: github.repo.issues.closed
-          description: 'The number of closed issues in the repository.'
-          preprocessing:
-            - type: JSONPATH
-              parameters:
-                - $.issues.closed
-          master_item:
-            key: github.repo.issues.get
-          tags:
-            - tag: component
-              value: issues
-        - uuid: f88f02dc593844a89eb601e833a1a19c
-          name: 'Get issues count'
+        - uuid: e348ae4bd2c04b5c88df2f5cb422eb61
+          name: 'Get branches'
           type: SCRIPT
-          key: github.repo.issues.get
-          delay: '{$GITHUB.INTERVAL:"get_issues_count"}'
+          key: github.repo.branches.get
+          delay: '{$GITHUB.INTERVAL:"get_branches"}'
           history: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             var github = {
             	params: {},
             
-            	setParams: function (params) {
-            		['api_url', 'user_agent', 'api_version', 'repo_owner', 'repo_name', 'pagination_required', 'api_token'].forEach(function (field) {
+            	setParams: function (params, required) {
+            		required = required || [];
+            		required.concat(['api_url', 'user_agent', 'api_version', 'repo_owner', 'repo_name', 'pagination_required', 'api_token']).forEach(function (field) {
             			if (typeof params !== 'object' || typeof params[field] === 'undefined'
             				|| params[field] === '') {
             				throw 'Required parameter is not set: "' + field + '".';
@@ -151,7 +139,186 @@ zabbix_export:
             				url = '';
             			}
             		}
-            		
+            
+            		final_data.headers = request.getHeaders();
+            
+            		delete request;
+            
+            		return final_data;
+            	},
+            
+            	parseData: function (response_data) {
+            		if (!response_data) {
+            			return [];
+            		}
+            
+            		const normalization_required = "total_count" in response_data && !("url" in response_data);
+            		if (!normalization_required) return response_data;
+            
+            		delete response_data.incomplete_results;
+            		delete response_data.repository_selection;
+            		delete response_data.total_count;
+            
+            		const namespaceKey = Object.keys(response_data)[0];
+            		response_data = response_data[namespaceKey];
+            
+            		return response_data;
+            	},
+            
+            	itemsCount: function (response_data) {
+            		const last_page_number = /<[^>]+page=(\d+)>;\s*rel="last"/i;
+            
+            		if (response_data.headers.link){
+            			return response_data.headers.link.match(last_page_number)[1];
+            		}
+            
+            		return response_data.data.length;
+            	}
+            }
+            
+            try {
+            	github.setParams(JSON.parse(value), ['api_query']);
+            
+            	var result = github.apiRequest(github.params.api_url + github.params.api_query + '?' + github.params.query_params || '', github.params.pagination_required);
+            
+            	return JSON.stringify(result);
+            }
+            catch (error) {
+            	error += (String(error).endsWith('.')) ? '' : '.';
+            	Zabbix.log(3, '[ GitHub Repo ] ERROR: ' + error);
+            	return JSON.stringify({ error: error });
+            }
+          description: |
+            Get the repository branches.
+            
+            Information about endpoint:
+            https://docs.github.com/en/rest/branches/branches?apiVersion=2022-11-28#list-branches
+          preprocessing:
+            - type: CHECK_REGEX_ERROR
+              parameters:
+                - 'API rate limit exceeded'
+                - \0
+              error_handler: DISCARD_VALUE
+          timeout: '{$GITHUB.TIMEOUT:"get_branches"}'
+          parameters:
+            - name: api_query
+              value: 'repos/{$GITHUB.REPO.OWNER}/{$GITHUB.REPO.NAME}/branches'
+            - name: api_token
+              value: '{$GITHUB.API.TOKEN}'
+            - name: api_url
+              value: '{$GITHUB.API.URL}'
+            - name: api_version
+              value: '{$GITHUB.API_VERSION}'
+            - name: http_proxy
+              value: '{$GITHUB.HTTP_PROXY}'
+            - name: pagination_required
+              value: 'true'
+            - name: query_params
+              value: 'per_page={$GITHUB.RESULTS_PER_PAGE:"branches_discovery"}'
+            - name: repo_name
+              value: '{$GITHUB.REPO.NAME}'
+            - name: repo_owner
+              value: '{$GITHUB.REPO.OWNER}'
+            - name: user_agent
+              value: '{$GITHUB.USER_AGENT}'
+          tags:
+            - tag: component
+              value: raw
+        - uuid: 3b4799f0efc64f91836eb081b66f3e3b
+          name: 'Number of closed issues'
+          type: DEPENDENT
+          key: github.repo.issues.closed
+          delay: '0'
+          description: 'The number of closed issues in the repository.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.issues.closed
+          master_item:
+            key: github.repo.issues.get
+          tags:
+            - tag: component
+              value: issues
+        - uuid: f88f02dc593844a89eb601e833a1a19c
+          name: 'Get issues count'
+          type: SCRIPT
+          key: github.repo.issues.get
+          delay: '{$GITHUB.INTERVAL:"get_issues_count"}'
+          history: '0'
+          value_type: TEXT
+          trends: '0'
+          params: |
+            var github = {
+            	params: {},
+            
+            	setParams: function (params, required) {
+            		required = required || [];
+            		required.concat(['api_url', 'user_agent', 'api_version', 'repo_owner', 'repo_name', 'pagination_required', 'api_token']).forEach(function (field) {
+            			if (typeof params !== 'object' || typeof params[field] === 'undefined'
+            				|| params[field] === '') {
+            				throw 'Required parameter is not set: "' + field + '".';
+            			}
+            		});
+            
+            		github.params = params;
+            
+            		if (typeof github.params.api_url === 'string' && !github.params.api_url.endsWith('/')) {
+            			github.params.api_url += '/';
+            		}
+            	},
+            
+            	apiRequest: function (url, pagination_required) {
+            		const next_pattern = /<([^>]+)>;\s*rel="next"/i;
+            		var request = new HttpRequest(),
+            			response,
+            			headers,
+            			final_data = {
+            				headers: {},
+            				data: []
+            			};
+            
+            		pagination_required = (typeof pagination_required !== 'undefined') ? pagination_required : 'true';
+            
+            		request.addHeader('User-Agent: ' + github.params.user_agent);
+            		request.addHeader('Accept: application/vnd.github+json');
+            		request.addHeader('X-GitHub-Api-Version: ' + github.params.api_version);
+            		request.addHeader('Authorization: Bearer ' + github.params.api_token);
+            
+            		if (typeof github.params.http_proxy !== 'undefined' && github.params.http_proxy !== '') {
+            			request.setProxy(github.params.http_proxy);
+            			Zabbix.log(4, '[ GitHub Repo ] Using HTTP proxy: ' + github.params.http_proxy);
+            		}
+            
+            		while (url) {
+            			Zabbix.log(4, '[ GitHub Repo ] Sending request: ' + url);
+            
+            			response = request.get(url);
+            
+            			Zabbix.log(4, '[ GitHub Repo ] Received response with status code ' + request.getStatus() + ': ' + response);
+            
+            			if (request.getStatus() < 200 || request.getStatus() >= 300) {
+            				throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+            			}
+            
+            			try {
+            				response = JSON.parse(response);
+            			}
+            			catch (error) {
+            				throw 'Failed to parse response received from API. Check debug log for more information.';
+            			}
+            
+            			var parsed_data = github.parseData(response);
+            			final_data.data = final_data.data.concat(parsed_data);
+            
+            			headers = request.getHeaders();
+            
+            			url = ((headers.link || '').match(next_pattern) || [])[1];
+            
+            			if (pagination_required === 'false') {
+            				url = '';
+            			}
+            		}
+            
             		final_data.headers = request.getHeaders();
             
             		delete request;
@@ -211,8 +378,7 @@ zabbix_export:
             	issues_count = github.apiRequest(github.params.api_url + 'repos/' + github.params.repo_owner + '/' + github.params.repo_name + '/pulls?state=open&per_page=1', github.params.pagination_required);
             	issues_count_result.pr.open = github.itemsCount(issues_count);
             
-            	issues_count = github.apiRequest(github.params.api_url + 'repos/' + github.params.repo_owner + '/' + github.params.repo_name + '/pulls?state=closed&per_page=1', github.params.pagination_required);
-            	issues_count_result.pr.closed = github.itemsCount(issues_count);
+            	issues_count_result.pr.closed = issues_count_result.pr.total - issues_count_result.pr.open;
             
             
             	issues_count = github.apiRequest(github.params.api_url + 'repos/' + github.params.repo_owner + '/' + github.params.repo_name + '/issues?state=all&per_page=1', github.params.pagination_required);
@@ -221,8 +387,7 @@ zabbix_export:
             	issues_count = github.apiRequest(github.params.api_url + 'repos/' + github.params.repo_owner + '/' + github.params.repo_name + '/issues?state=open&per_page=1', github.params.pagination_required);
             	issues_count_result.issues.open = github.itemsCount(issues_count) - issues_count_result.pr.open;
             
-            	issues_count = github.apiRequest(github.params.api_url + 'repos/' + github.params.repo_owner + '/' + github.params.repo_name + '/issues?state=closed&per_page=1', github.params.pagination_required);
-            	issues_count_result.issues.closed = github.itemsCount(issues_count) - issues_count_result.pr.closed;
+            	issues_count_result.issues.closed = issues_count_result.issues.total - issues_count_result.issues.open;
             
             	return JSON.stringify(issues_count_result);
             }
@@ -239,6 +404,12 @@ zabbix_export:
             
             Information about pull requests endpoint:
             https://docs.github.com/en/rest/pulls/pulls?apiVersion=2022-11-28#list-pull-requests
+          preprocessing:
+            - type: CHECK_REGEX_ERROR
+              parameters:
+                - 'API rate limit exceeded'
+                - \0
+              error_handler: DISCARD_VALUE
           timeout: '{$GITHUB.TIMEOUT:"get_issues_count"}'
           parameters:
             - name: api_token
@@ -264,6 +435,7 @@ zabbix_export:
           name: 'Number of open issues'
           type: DEPENDENT
           key: github.repo.issues.open
+          delay: '0'
           description: 'The number of open issues in the repository.'
           preprocessing:
             - type: JSONPATH
@@ -278,6 +450,7 @@ zabbix_export:
           name: 'Number of issues'
           type: DEPENDENT
           key: github.repo.issues.total
+          delay: '0'
           description: 'The total number of issues in the repository.'
           preprocessing:
             - type: JSONPATH
@@ -302,6 +475,7 @@ zabbix_export:
           name: 'Number of closed PRs'
           type: DEPENDENT
           key: github.repo.pr.closed
+          delay: '0'
           description: 'The number of closed pull requests in the repository.'
           preprocessing:
             - type: JSONPATH
@@ -316,6 +490,7 @@ zabbix_export:
           name: 'Number of open PRs'
           type: DEPENDENT
           key: github.repo.pr.open
+          delay: '0'
           description: 'The number of open pull requests in the repository.'
           preprocessing:
             - type: JSONPATH
@@ -330,6 +505,7 @@ zabbix_export:
           name: 'Number of PRs'
           type: DEPENDENT
           key: github.repo.pr.total
+          delay: '0'
           description: 'The total number of pull requests in the repository.'
           preprocessing:
             - type: JSONPATH
@@ -359,8 +535,9 @@ zabbix_export:
             var github = {
             	params: {},
             
-            	setParams: function (params) {
-            		['api_url', 'api_query', 'user_agent', 'api_version', 'repo_owner', 'repo_name', 'pagination_required', 'api_token'].forEach(function (field) {
+            	setParams: function (params, required) {
+            		required = required || [];
+            		required.concat(['api_url', 'user_agent', 'api_version', 'repo_owner', 'repo_name', 'pagination_required', 'api_token']).forEach(function (field) {
             			if (typeof params !== 'object' || typeof params[field] === 'undefined'
             				|| params[field] === '') {
             				throw 'Required parameter is not set: "' + field + '".';
@@ -425,7 +602,7 @@ zabbix_export:
             				url = '';
             			}
             		}
-            		
+            
             		final_data.headers = request.getHeaders();
             
             		delete request;
@@ -463,7 +640,7 @@ zabbix_export:
             }
             
             try {
-            	github.setParams(JSON.parse(value));
+            	github.setParams(JSON.parse(value), ['api_query']);
             
             	var result = github.apiRequest(github.params.api_url + github.params.api_query + '?' + github.params.query_params || '', github.params.pagination_required);
             
@@ -480,6 +657,11 @@ zabbix_export:
             Information about endpoint:
             https://docs.github.com/en/rest/releases/releases?apiVersion=2022-11-28#list-releases
           preprocessing:
+            - type: CHECK_REGEX_ERROR
+              parameters:
+                - 'API rate limit exceeded'
+                - \0
+              error_handler: DISCARD_VALUE
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
@@ -512,6 +694,7 @@ zabbix_export:
           name: 'Repository forks'
           type: DEPENDENT
           key: github.repo.repository.forks.count
+          delay: '0'
           description: 'The number of the repository forks.'
           preprocessing:
             - type: JSONPATH
@@ -532,12 +715,14 @@ zabbix_export:
           delay: '{$GITHUB.INTERVAL:"get_repo"}'
           history: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             var github = {
             	params: {},
             
-            	setParams: function (params) {
-            		['api_url', 'api_query', 'user_agent', 'api_version', 'repo_owner', 'repo_name', 'pagination_required', 'api_token'].forEach(function (field) {
+            	setParams: function (params, required) {
+            		required = required || [];
+            		required.concat(['api_url', 'user_agent', 'api_version', 'repo_owner', 'repo_name', 'pagination_required', 'api_token']).forEach(function (field) {
             			if (typeof params !== 'object' || typeof params[field] === 'undefined'
             				|| params[field] === '') {
             				throw 'Required parameter is not set: "' + field + '".';
@@ -602,7 +787,7 @@ zabbix_export:
             				url = '';
             			}
             		}
-            		
+            
             		final_data.headers = request.getHeaders();
             
             		delete request;
@@ -626,11 +811,21 @@ zabbix_export:
             		response_data = response_data[namespaceKey];
             
             		return response_data;
+            	},
+            
+            	itemsCount: function (response_data) {
+            		const last_page_number = /<[^>]+page=(\d+)>;\s*rel="last"/i;
+            
+            		if (response_data.headers.link){
+            			return response_data.headers.link.match(last_page_number)[1];
+            		}
+            
+            		return response_data.data.length;
             	}
             }
             
             try {
-            	github.setParams(JSON.parse(value));
+            	github.setParams(JSON.parse(value), ['api_query']);
             
             	var repo_data = github.apiRequest(github.params.api_url + github.params.api_query);
             
@@ -682,7 +877,9 @@ zabbix_export:
           name: 'Get repository data check'
           type: DEPENDENT
           key: github.repo.repository.get.check
-          value_type: CHAR
+          delay: '0'
+          value_type: TEXT
+          trends: '0'
           description: 'The data collection check.'
           preprocessing:
             - type: JSONPATH
@@ -700,9 +897,9 @@ zabbix_export:
           triggers:
             - uuid: fea49679a888491c96516b421703131b
               expression: 'length(last(/GitHub repository by HTTP/github.repo.repository.get.check))>0'
-              name: 'GitHub: Failed to get data from API'
-              priority: HIGH
-              description: 'Failed to get data from API. Check the debug log for more information.'
+              name: 'GitHub: There are errors in requests to API'
+              priority: AVERAGE
+              description: 'Errors have been received in response to API request. Check the latest values for details.'
               tags:
                 - tag: scope
                   value: availability
@@ -710,6 +907,7 @@ zabbix_export:
           name: 'Repository is a fork'
           type: DEPENDENT
           key: github.repo.repository.is_fork
+          delay: '0'
           description: 'Indicates, whether the repository is a fork.'
           valuemap:
             name: Boolean
@@ -718,6 +916,8 @@ zabbix_export:
               parameters:
                 - $.data..fork.first()
             - type: BOOL_TO_DECIMAL
+              parameters:
+                - ''
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
@@ -730,6 +930,7 @@ zabbix_export:
           name: 'Repository size'
           type: DEPENDENT
           key: github.repo.repository.size
+          delay: '0'
           units: B
           description: 'The size of the repository.'
           preprocessing:
@@ -751,6 +952,7 @@ zabbix_export:
           name: 'Repository stargazers'
           type: DEPENDENT
           key: github.repo.repository.stargazers
+          delay: '0'
           description: 'The number of GitHub users who starred the repository.'
           preprocessing:
             - type: JSONPATH
@@ -768,6 +970,7 @@ zabbix_export:
           name: 'Repository watchers'
           type: DEPENDENT
           key: github.repo.repository.watchers
+          delay: '0'
           description: 'The number of GitHub users who are subscribed to the repository.'
           preprocessing:
             - type: JSONPATH
@@ -785,6 +988,7 @@ zabbix_export:
           name: 'Requests limit'
           type: DEPENDENT
           key: github.repo.requests.limit
+          delay: '0'
           description: |
             The API requests limit.
             
@@ -806,6 +1010,7 @@ zabbix_export:
           name: 'Requests used'
           type: DEPENDENT
           key: github.repo.requests.used
+          delay: '0'
           description: |
             The number of used API requests.
             
@@ -824,6 +1029,7 @@ zabbix_export:
           name: 'Requests limit utilization, in %'
           type: DEPENDENT
           key: github.repo.requests.util
+          delay: '0'
           value_type: FLOAT
           units: '%'
           description: |
@@ -896,12 +1102,14 @@ zabbix_export:
           delay: '{$GITHUB.INTERVAL:"get_runners"}'
           history: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             var github = {
             	params: {},
             
-            	setParams: function (params) {
-            		['api_url', 'api_query', 'user_agent', 'api_version', 'repo_owner', 'repo_name', 'pagination_required', 'api_token'].forEach(function (field) {
+            	setParams: function (params, required) {
+            		required = required || [];
+            		required.concat(['api_url', 'user_agent', 'api_version', 'repo_owner', 'repo_name', 'pagination_required', 'api_token']).forEach(function (field) {
             			if (typeof params !== 'object' || typeof params[field] === 'undefined'
             				|| params[field] === '') {
             				throw 'Required parameter is not set: "' + field + '".';
@@ -966,158 +1174,7 @@ zabbix_export:
             				url = '';
             			}
             		}
-            		
-            		final_data.headers = request.getHeaders();
             
-            		delete request;
-            
-            		return final_data;
-            	},
-            
-            	parseData: function (response_data) {
-            		if (!response_data) {
-            			return [];
-            		}
-            
-            		const normalization_required = "total_count" in response_data && !("url" in response_data);
-            		if (!normalization_required) return response_data;
-            
-            		delete response_data.incomplete_results;
-            		delete response_data.repository_selection;
-            		delete response_data.total_count;
-            
-            		const namespaceKey = Object.keys(response_data)[0];
-            		response_data = response_data[namespaceKey];
-            
-            		return response_data;
-            	}
-            }
-            
-            try {
-            	github.setParams(JSON.parse(value));
-            
-            	var result = github.apiRequest(github.params.api_url + github.params.api_query + '?' + github.params.query_params || '', github.params.pagination_required);
-            
-            	return JSON.stringify(result);
-            }
-            catch (error) {
-            	error += (String(error).endsWith('.')) ? '' : '.';
-            	Zabbix.log(3, '[ GitHub Repo ] ERROR: ' + error);
-            	return JSON.stringify({ error: error });
-            }
-          description: |
-            Get the repository self-hosted runners.
-            
-            Note, that an admin access to the repository is required to use this endpoint:
-            https://docs.github.com/en/rest/actions/self-hosted-runners?apiVersion=2022-11-28#list-self-hosted-runners-for-a-repository
-          preprocessing:
-            - type: CHECK_JSON_ERROR
-              parameters:
-                - $.error
-            - type: JSONPATH
-              parameters:
-                - $.data
-          timeout: '{$GITHUB.TIMEOUT:"get_runners"}'
-          parameters:
-            - name: api_query
-              value: 'repos/{$GITHUB.REPO.OWNER}/{$GITHUB.REPO.NAME}/actions/runners'
-            - name: api_token
-              value: '{$GITHUB.API.TOKEN}'
-            - name: api_url
-              value: '{$GITHUB.API.URL}'
-            - name: api_version
-              value: '{$GITHUB.API_VERSION}'
-            - name: http_proxy
-              value: '{$GITHUB.HTTP_PROXY}'
-            - name: pagination_required
-              value: 'true'
-            - name: query_params
-              value: 'per_page={$GITHUB.RESULTS_PER_PAGE:"get_runners"}'
-            - name: repo_name
-              value: '{$GITHUB.REPO.NAME}'
-            - name: repo_owner
-              value: '{$GITHUB.REPO.OWNER}'
-            - name: user_agent
-              value: '{$GITHUB.USER_AGENT}'
-          tags:
-            - tag: component
-              value: raw
-        - uuid: 49d81fc72a6a455ebee7304592056930
-          name: 'Number of tags'
-          type: SCRIPT
-          key: github.repo.tags.count
-          delay: '{$GITHUB.INTERVAL:"get_tags_count"}'
-          params: |
-            var github = {
-            	params: {},
-            
-            	setParams: function (params) {
-            		['api_url', 'api_query', 'user_agent', 'api_version', 'repo_owner', 'repo_name', 'pagination_required', 'api_token'].forEach(function (field) {
-            			if (typeof params !== 'object' || typeof params[field] === 'undefined'
-            				|| params[field] === '') {
-            				throw 'Required parameter is not set: "' + field + '".';
-            			}
-            		});
-            
-            		github.params = params;
-            
-            		if (typeof github.params.api_url === 'string' && !github.params.api_url.endsWith('/')) {
-            			github.params.api_url += '/';
-            		}
-            	},
-            
-            	apiRequest: function (url, pagination_required) {
-            		const next_pattern = /<([^>]+)>;\s*rel="next"/i;
-            		var request = new HttpRequest(),
-            			response,
-            			headers,
-            			final_data = {
-            				headers: {},
-            				data: []
-            			};
-            
-            		pagination_required = (typeof pagination_required !== 'undefined') ? pagination_required : 'true';
-            
-            		request.addHeader('User-Agent: ' + github.params.user_agent);
-            		request.addHeader('Accept: application/vnd.github+json');
-            		request.addHeader('X-GitHub-Api-Version: ' + github.params.api_version);
-            		request.addHeader('Authorization: Bearer ' + github.params.api_token);
-            
-            		if (typeof github.params.http_proxy !== 'undefined' && github.params.http_proxy !== '') {
-            			request.setProxy(github.params.http_proxy);
-            			Zabbix.log(4, '[ GitHub Repo ] Using HTTP proxy: ' + github.params.http_proxy);
-            		}
-            
-            		while (url) {
-            			Zabbix.log(4, '[ GitHub Repo ] Sending request: ' + url);
-            
-            			response = request.get(url);
-            
-            			Zabbix.log(4, '[ GitHub Repo ] Received response with status code ' + request.getStatus() + ': ' + response);
-            
-            			if (request.getStatus() < 200 || request.getStatus() >= 300) {
-            				throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
-            			}
-            
-            			try {
-            				response = JSON.parse(response);
-            			}
-            			catch (error) {
-            				throw 'Failed to parse response received from API. Check debug log for more information.';
-            			}
-            
-            			var parsed_data = github.parseData(response);
-            			final_data.data = final_data.data.concat(parsed_data);
-            
-            			headers = request.getHeaders();
-            
-            			url = ((headers.link || '').match(next_pattern) || [])[1];
-            
-            			if (pagination_required === 'false') {
-            				url = '';
-            			}
-            		}
-            		
             		final_data.headers = request.getHeaders();
             
             		delete request;
@@ -1155,11 +1212,11 @@ zabbix_export:
             }
             
             try {
-            	github.setParams(JSON.parse(value));
+            	github.setParams(JSON.parse(value), ['api_query']);
             
             	var result = github.apiRequest(github.params.api_url + github.params.api_query + '?' + github.params.query_params || '', github.params.pagination_required);
             
-            	return github.itemsCount(result);
+            	return JSON.stringify(result);
             }
             catch (error) {
             	error += (String(error).endsWith('.')) ? '' : '.';
@@ -1167,18 +1224,20 @@ zabbix_export:
             	return JSON.stringify({ error: error });
             }
           description: |
-            The number of tags in the repository.
+            Get the repository self-hosted runners.
             
-            Information about endpoint:
-            https://docs.github.com/en/rest/repos/repos?apiVersion=2022-11-28#list-repository-tags
+            Note, that an admin access to the repository is required to use this endpoint:
+            https://docs.github.com/en/rest/actions/self-hosted-runners?apiVersion=2022-11-28#list-self-hosted-runners-for-a-repository
           preprocessing:
-            - type: DISCARD_UNCHANGED_HEARTBEAT
+            - type: CHECK_REGEX_ERROR
               parameters:
-                - 6h
-          timeout: '{$GITHUB.TIMEOUT:"get_tags_count"}'
+                - 'API rate limit exceeded'
+                - \0
+              error_handler: DISCARD_VALUE
+          timeout: '{$GITHUB.TIMEOUT:"get_runners"}'
           parameters:
             - name: api_query
-              value: 'repos/{$GITHUB.REPO.OWNER}/{$GITHUB.REPO.NAME}/tags'
+              value: 'repos/{$GITHUB.REPO.OWNER}/{$GITHUB.REPO.NAME}/actions/runners'
             - name: api_token
               value: '{$GITHUB.API.TOKEN}'
             - name: api_url
@@ -1188,9 +1247,9 @@ zabbix_export:
             - name: http_proxy
               value: '{$GITHUB.HTTP_PROXY}'
             - name: pagination_required
-              value: 'false'
+              value: 'true'
             - name: query_params
-              value: per_page=1
+              value: 'per_page={$GITHUB.RESULTS_PER_PAGE:"get_runners"}'
             - name: repo_name
               value: '{$GITHUB.REPO.NAME}'
             - name: repo_owner
@@ -1199,19 +1258,48 @@ zabbix_export:
               value: '{$GITHUB.USER_AGENT}'
           tags:
             - tag: component
-              value: tags
-      discovery_rules:
-        - uuid: 8142a17a53f44cd9b3d3991b9e3da91d
-          name: 'Branches discovery'
+              value: raw
+        - uuid: 35507c347ff44527a7deb3aaf4846d33
+          name: 'Get self-hosted runners check'
+          type: DEPENDENT
+          key: github.repo.runners.get.check
+          delay: '0'
+          value_type: TEXT
+          trends: '0'
+          description: 'The self-hosted runners data collection check.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.error
+              error_handler: CUSTOM_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          master_item:
+            key: github.repo.runners.get
+          tags:
+            - tag: component
+              value: status
+          triggers:
+            - uuid: 30877fea1bd14e22b8b5c4a040001bb5
+              expression: 'find(/GitHub repository by HTTP/github.repo.runners.get.check,,"iregexp","Must have admin rights to Repository")=1'
+              name: 'GitHub: No access to repository self-hosted runners'
+              priority: AVERAGE
+              description: |
+                An admin access to the repository is required to use this endpoint:
+                https://docs.github.com/en/rest/actions/self-hosted-runners?apiVersion=2022-11-28#list-self-hosted-runners-for-a-repository
+        - uuid: 49d81fc72a6a455ebee7304592056930
+          name: 'Number of tags'
           type: SCRIPT
-          key: github.repo.branches.discovery
-          delay: 1h
+          key: github.repo.tags.count
+          delay: '{$GITHUB.INTERVAL:"get_tags_count"}'
           params: |
             var github = {
             	params: {},
             
-            	setParams: function (params) {
-            		['api_url', 'api_query', 'user_agent', 'api_version', 'repo_owner', 'repo_name', 'pagination_required', 'api_token'].forEach(function (field) {
+            	setParams: function (params, required) {
+            		required = required || [];
+            		required.concat(['api_url', 'user_agent', 'api_version', 'repo_owner', 'repo_name', 'pagination_required', 'api_token']).forEach(function (field) {
             			if (typeof params !== 'object' || typeof params[field] === 'undefined'
             				|| params[field] === '') {
             				throw 'Required parameter is not set: "' + field + '".';
@@ -1276,7 +1364,7 @@ zabbix_export:
             				url = '';
             			}
             		}
-            		
+            
             		final_data.headers = request.getHeaders();
             
             		delete request;
@@ -1300,29 +1388,256 @@ zabbix_export:
             		response_data = response_data[namespaceKey];
             
             		return response_data;
+            	},
+            
+            	itemsCount: function (response_data) {
+            		const last_page_number = /<[^>]+page=(\d+)>;\s*rel="last"/i;
+            
+            		if (response_data.headers.link){
+            			return response_data.headers.link.match(last_page_number)[1];
+            		}
+            
+            		return response_data.data.length;
             	}
             }
             
             try {
-            	github.setParams(JSON.parse(value));
+            	github.setParams(JSON.parse(value), ['api_query']);
             
             	var result = github.apiRequest(github.params.api_url + github.params.api_query + '?' + github.params.query_params || '', github.params.pagination_required);
             
-            	return JSON.stringify(result);
+            	return github.itemsCount(result);
             }
             catch (error) {
             	error += (String(error).endsWith('.')) ? '' : '.';
             	Zabbix.log(3, '[ GitHub Repo ] ERROR: ' + error);
             	return JSON.stringify({ error: error });
             }
+          description: |
+            The number of tags in the repository.
+            
+            Information about endpoint:
+            https://docs.github.com/en/rest/repos/repos?apiVersion=2022-11-28#list-repository-tags
+          preprocessing:
+            - type: CHECK_REGEX_ERROR
+              parameters:
+                - 'API rate limit exceeded'
+                - \0
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          timeout: '{$GITHUB.TIMEOUT:"get_tags_count"}'
+          parameters:
+            - name: api_query
+              value: 'repos/{$GITHUB.REPO.OWNER}/{$GITHUB.REPO.NAME}/tags'
+            - name: api_token
+              value: '{$GITHUB.API.TOKEN}'
+            - name: api_url
+              value: '{$GITHUB.API.URL}'
+            - name: api_version
+              value: '{$GITHUB.API_VERSION}'
+            - name: http_proxy
+              value: '{$GITHUB.HTTP_PROXY}'
+            - name: pagination_required
+              value: 'false'
+            - name: query_params
+              value: per_page=1
+            - name: repo_name
+              value: '{$GITHUB.REPO.NAME}'
+            - name: repo_owner
+              value: '{$GITHUB.REPO.OWNER}'
+            - name: user_agent
+              value: '{$GITHUB.USER_AGENT}'
+          tags:
+            - tag: component
+              value: tags
+        - uuid: d45dbcb0493d4258ac2cdba10648b3b3
+          name: 'Get workflows'
+          type: SCRIPT
+          key: github.repo.workflows.get
+          delay: '{$GITHUB.INTERVAL:"get_workflows"}'
+          history: '0'
+          value_type: TEXT
+          trends: '0'
+          params: |
+            var github = {
+            	params: {},
+            
+            	setParams: function (params, required) {
+            		required = required || [];
+            		required.concat(['api_url', 'user_agent', 'api_version', 'repo_owner', 'repo_name', 'pagination_required', 'api_token']).forEach(function (field) {
+            			if (typeof params !== 'object' || typeof params[field] === 'undefined'
+            				|| params[field] === '') {
+            				throw 'Required parameter is not set: "' + field + '".';
+            			}
+            		});
+            
+            		github.params = params;
+            
+            		if (typeof github.params.api_url === 'string' && !github.params.api_url.endsWith('/')) {
+            			github.params.api_url += '/';
+            		}
+            	},
+            
+            	apiRequest: function (url, pagination_required) {
+            		const next_pattern = /<([^>]+)>;\s*rel="next"/i;
+            		var request = new HttpRequest(),
+            			response,
+            			headers,
+            			final_data = {
+            				headers: {},
+            				data: []
+            			};
+            
+            		pagination_required = (typeof pagination_required !== 'undefined') ? pagination_required : 'true';
+            
+            		request.addHeader('User-Agent: ' + github.params.user_agent);
+            		request.addHeader('Accept: application/vnd.github+json');
+            		request.addHeader('X-GitHub-Api-Version: ' + github.params.api_version);
+            		request.addHeader('Authorization: Bearer ' + github.params.api_token);
+            
+            		if (typeof github.params.http_proxy !== 'undefined' && github.params.http_proxy !== '') {
+            			request.setProxy(github.params.http_proxy);
+            			Zabbix.log(4, '[ GitHub Repo ] Using HTTP proxy: ' + github.params.http_proxy);
+            		}
+            
+            		while (url) {
+            			Zabbix.log(4, '[ GitHub Repo ] Sending request: ' + url);
+            
+            			response = request.get(url);
+            
+            			Zabbix.log(4, '[ GitHub Repo ] Received response with status code ' + request.getStatus() + ': ' + response);
+            
+            			if (request.getStatus() < 200 || request.getStatus() >= 300) {
+            				throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+            			}
+            
+            			try {
+            				response = JSON.parse(response);
+            			}
+            			catch (error) {
+            				throw 'Failed to parse response received from API. Check debug log for more information.';
+            			}
+            
+            			var parsed_data = github.parseData(response);
+            			final_data.data = final_data.data.concat(parsed_data);
+            
+            			headers = request.getHeaders();
+            
+            			url = ((headers.link || '').match(next_pattern) || [])[1];
+            
+            			if (pagination_required === 'false') {
+            				url = '';
+            			}
+            		}
+            
+            		final_data.headers = request.getHeaders();
+            
+            		delete request;
+            
+            		return final_data;
+            	},
+            
+            	parseData: function (response_data) {
+            		if (!response_data) {
+            			return [];
+            		}
+            
+            		const normalization_required = "total_count" in response_data && !("url" in response_data);
+            		if (!normalization_required) return response_data;
+            
+            		delete response_data.incomplete_results;
+            		delete response_data.repository_selection;
+            		delete response_data.total_count;
+            
+            		const namespaceKey = Object.keys(response_data)[0];
+            		response_data = response_data[namespaceKey];
+            
+            		return response_data;
+            	},
+            
+            	itemsCount: function (response_data) {
+            		const last_page_number = /<[^>]+page=(\d+)>;\s*rel="last"/i;
+            
+            		if (response_data.headers.link){
+            			return response_data.headers.link.match(last_page_number)[1];
+            		}
+            
+            		return response_data.data.length;
+            	}
+            }
+            
+            try {
+            	github.setParams(JSON.parse(value), ['api_query']);
+            
+            	var repo_data = github.apiRequest(github.params.api_url + github.params.api_query);
+            
+            	if (repo_data.data[0].fork === false) {
+            		var repo_community_profile = github.apiRequest(github.params.api_url + github.params.api_query + '/community/profile');
+            
+            		repo_data.data[0].zbx_community_profile = repo_community_profile.data[0];
+            	}
+            
+            	return JSON.stringify(repo_data);
+            }
+            catch (error) {
+            	error += (String(error).endsWith('.')) ? '' : '.';
+            	Zabbix.log(3, '[ GitHub Repo ] ERROR: ' + error);
+            	return JSON.stringify({ error: error });
+            }
+          description: |
+            Get the repository workflows.
+            
+            Information about endpoint:
+            https://docs.github.com/en/rest/actions/workflows?apiVersion=2022-11-28#list-repository-workflows
+          preprocessing:
+            - type: CHECK_REGEX_ERROR
+              parameters:
+                - 'API rate limit exceeded'
+                - \0
+              error_handler: DISCARD_VALUE
+          timeout: '{$GITHUB.TIMEOUT:"get_workflows"}'
+          parameters:
+            - name: api_query
+              value: 'repos/{$GITHUB.REPO.OWNER}/{$GITHUB.REPO.NAME}/actions/workflows'
+            - name: api_token
+              value: '{$GITHUB.API.TOKEN}'
+            - name: api_url
+              value: '{$GITHUB.API.URL}'
+            - name: api_version
+              value: '{$GITHUB.API_VERSION}'
+            - name: http_proxy
+              value: '{$GITHUB.HTTP_PROXY}'
+            - name: pagination_required
+              value: 'true'
+            - name: query_params
+              value: 'per_page={$GITHUB.RESULTS_PER_PAGE:"workflows_discovery"}'
+            - name: repo_name
+              value: '{$GITHUB.REPO.NAME}'
+            - name: repo_owner
+              value: '{$GITHUB.REPO.OWNER}'
+            - name: user_agent
+              value: '{$GITHUB.USER_AGENT}'
+          tags:
+            - tag: component
+              value: raw
+      discovery_rules:
+        - uuid: 8142a17a53f44cd9b3d3991b9e3da91d
+          name: 'Branches discovery'
+          type: DEPENDENT
+          key: github.repo.branches.discovery
+          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#BRANCH_NAME}'
                 value: '{$GITHUB.BRANCH.NAME.MATCHES}'
+                formulaid: A
               - macro: '{#BRANCH_NAME}'
                 value: '{$GITHUB.BRANCH.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: B
           description: |
             Discovers repository branches.
             
@@ -1338,8 +1653,9 @@ zabbix_export:
                 var github = {
                 	params: {},
                 
-                	setParams: function (params) {
-                		['api_url', 'api_query', 'user_agent', 'api_version', 'repo_owner', 'repo_name', 'pagination_required', 'api_token'].forEach(function (field) {
+                	setParams: function (params, required) {
+                		required = required || [];
+                		required.concat(['api_url', 'user_agent', 'api_version', 'repo_owner', 'repo_name', 'pagination_required', 'api_token']).forEach(function (field) {
                 			if (typeof params !== 'object' || typeof params[field] === 'undefined'
                 				|| params[field] === '') {
                 				throw 'Required parameter is not set: "' + field + '".';
@@ -1404,7 +1720,7 @@ zabbix_export:
                 				url = '';
                 			}
                 		}
-                		
+                
                 		final_data.headers = request.getHeaders();
                 
                 		delete request;
@@ -1442,7 +1758,7 @@ zabbix_export:
                 }
                 
                 try {
-                	github.setParams(JSON.parse(value));
+                	github.setParams(JSON.parse(value), ['api_query']);
                 
                 	var result = github.apiRequest(github.params.api_url + github.params.api_query + '?' + github.params.query_params || '', github.params.pagination_required);
                 
@@ -1459,6 +1775,11 @@ zabbix_export:
                 Information about endpoint:
                 https://docs.github.com/en/rest/commits/commits?apiVersion=2022-11-28#list-commits
               preprocessing:
+                - type: CHECK_REGEX_ERROR
+                  parameters:
+                    - 'API rate limit exceeded'
+                    - \0
+                  error_handler: DISCARD_VALUE
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
@@ -1499,28 +1820,8 @@ zabbix_export:
                   item:
                     host: 'GitHub repository by HTTP'
                     key: 'github.repo.branches.commits.total[{#BRANCH_NAME}]'
-          timeout: '{$GITHUB.TIMEOUT:"branches_discovery"}'
-          parameters:
-            - name: api_query
-              value: 'repos/{$GITHUB.REPO.OWNER}/{$GITHUB.REPO.NAME}/branches'
-            - name: api_token
-              value: '{$GITHUB.API.TOKEN}'
-            - name: api_url
-              value: '{$GITHUB.API.URL}'
-            - name: api_version
-              value: '{$GITHUB.API_VERSION}'
-            - name: http_proxy
-              value: '{$GITHUB.HTTP_PROXY}'
-            - name: pagination_required
-              value: 'true'
-            - name: query_params
-              value: 'per_page={$GITHUB.RESULTS_PER_PAGE:"branches_discovery"}'
-            - name: repo_name
-              value: '{$GITHUB.REPO.NAME}'
-            - name: repo_owner
-              value: '{$GITHUB.REPO.OWNER}'
-            - name: user_agent
-              value: '{$GITHUB.USER_AGENT}'
+          master_item:
+            key: github.repo.branches.get
           lld_macro_paths:
             - lld_macro: '{#BRANCH_NAME}'
               path: $.name
@@ -1532,6 +1833,7 @@ zabbix_export:
           name: 'Community profile metrics discovery'
           type: DEPENDENT
           key: github.repo.community_profile.discovery
+          delay: '0'
           description: |
             Discovers community profile metrics (the repository must not be a fork).
             
@@ -1542,6 +1844,7 @@ zabbix_export:
               name: 'Health percentage score'
               type: DEPENDENT
               key: 'github.repo.repository.health[{#SINGLETON}]'
+              delay: '0'
               units: '%'
               description: |
                 The health percentage score is defined as a percentage of how many of the recommended community health files are present.
@@ -1585,19 +1888,24 @@ zabbix_export:
           name: 'Self-hosted runners discovery'
           type: DEPENDENT
           key: github.repo.runners.discovery
+          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#RUNNER_NAME}'
                 value: '{$GITHUB.RUNNER.NAME.MATCHES}'
+                formulaid: A
               - macro: '{#RUNNER_NAME}'
                 value: '{$GITHUB.RUNNER.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: B
               - macro: '{#RUNNER_OS}'
                 value: '{$GITHUB.RUNNER.OS.MATCHES}'
+                formulaid: C
               - macro: '{#RUNNER_OS}'
                 value: '{$GITHUB.RUNNER.OS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: D
           description: |
             Discovers repository self-hosted runners.
             
@@ -1608,6 +1916,7 @@ zabbix_export:
               name: 'Runner [{#RUNNER_NAME}]: Busy'
               type: DEPENDENT
               key: 'github.repo.runners.busy[{#RUNNER_NAME}]'
+              delay: '0'
               trends: '0'
               description: 'Indicates whether the runner is currently executing a job.'
               valuemap:
@@ -1615,8 +1924,10 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$[?(@.id == "{#RUNNER_ID}")].busy.first()'
+                    - '$.data[?(@.id == "{#RUNNER_ID}")].busy.first()'
                 - type: BOOL_TO_DECIMAL
+                  parameters:
+                    - ''
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
@@ -1633,6 +1944,7 @@ zabbix_export:
               name: 'Runner [{#RUNNER_NAME}]: Online'
               type: DEPENDENT
               key: 'github.repo.runners.online[{#RUNNER_NAME}]'
+              delay: '0'
               trends: '0'
               description: 'Indicates whether the runner is connected to GitHub and is ready to execute jobs.'
               valuemap:
@@ -1640,7 +1952,7 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$[?(@.id == "{#RUNNER_ID}")].status.first()'
+                    - '$.data[?(@.id == "{#RUNNER_ID}")].status.first()'
                 - type: JAVASCRIPT
                   parameters:
                     - |
@@ -1681,6 +1993,10 @@ zabbix_export:
             - lld_macro: '{#RUNNER_OS}'
               path: $.os
           preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.data
+              error_handler: DISCARD_VALUE
             - type: JAVASCRIPT
               parameters:
                 - |
@@ -1700,131 +2016,26 @@ zabbix_export:
                 - 1h
         - uuid: df2e23b12f914d7d89c182ff451da054
           name: 'Workflows discovery'
-          type: SCRIPT
+          type: DEPENDENT
           key: github.repo.workflows.discovery
-          delay: 1h
-          params: |
-            var github = {
-            	params: {},
-            
-            	setParams: function (params) {
-            		['api_url', 'api_query', 'user_agent', 'api_version', 'repo_owner', 'repo_name', 'pagination_required', 'api_token'].forEach(function (field) {
-            			if (typeof params !== 'object' || typeof params[field] === 'undefined'
-            				|| params[field] === '') {
-            				throw 'Required parameter is not set: "' + field + '".';
-            			}
-            		});
-            
-            		github.params = params;
-            
-            		if (typeof github.params.api_url === 'string' && !github.params.api_url.endsWith('/')) {
-            			github.params.api_url += '/';
-            		}
-            	},
-            
-            	apiRequest: function (url, pagination_required) {
-            		const next_pattern = /<([^>]+)>;\s*rel="next"/i;
-            		var request = new HttpRequest(),
-            			response,
-            			headers,
-            			final_data = {
-            				headers: {},
-            				data: []
-            			};
-            
-            		pagination_required = (typeof pagination_required !== 'undefined') ? pagination_required : 'true';
-            
-            		request.addHeader('User-Agent: ' + github.params.user_agent);
-            		request.addHeader('Accept: application/vnd.github+json');
-            		request.addHeader('X-GitHub-Api-Version: ' + github.params.api_version);
-            		request.addHeader('Authorization: Bearer ' + github.params.api_token);
-            
-            		if (typeof github.params.http_proxy !== 'undefined' && github.params.http_proxy !== '') {
-            			request.setProxy(github.params.http_proxy);
-            			Zabbix.log(4, '[ GitHub Repo ] Using HTTP proxy: ' + github.params.http_proxy);
-            		}
-            
-            		while (url) {
-            			Zabbix.log(4, '[ GitHub Repo ] Sending request: ' + url);
-            
-            			response = request.get(url);
-            
-            			Zabbix.log(4, '[ GitHub Repo ] Received response with status code ' + request.getStatus() + ': ' + response);
-            
-            			if (request.getStatus() < 200 || request.getStatus() >= 300) {
-            				throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
-            			}
-            
-            			try {
-            				response = JSON.parse(response);
-            			}
-            			catch (error) {
-            				throw 'Failed to parse response received from API. Check debug log for more information.';
-            			}
-            
-            			var parsed_data = github.parseData(response);
-            			final_data.data = final_data.data.concat(parsed_data);
-            
-            			headers = request.getHeaders();
-            
-            			url = ((headers.link || '').match(next_pattern) || [])[1];
-            
-            			if (pagination_required === 'false') {
-            				url = '';
-            			}
-            		}
-            		
-            		final_data.headers = request.getHeaders();
-            
-            		delete request;
-            
-            		return final_data;
-            	},
-            
-            	parseData: function (response_data) {
-            		if (!response_data) {
-            			return [];
-            		}
-            
-            		const normalization_required = "total_count" in response_data && !("url" in response_data);
-            		if (!normalization_required) return response_data;
-            
-            		delete response_data.incomplete_results;
-            		delete response_data.repository_selection;
-            		delete response_data.total_count;
-            
-            		const namespaceKey = Object.keys(response_data)[0];
-            		response_data = response_data[namespaceKey];
-            
-            		return response_data;
-            	}
-            }
-            
-            try {
-            	github.setParams(JSON.parse(value));
-            
-            	var result = github.apiRequest(github.params.api_url + github.params.api_query + '?' + github.params.query_params || '', github.params.pagination_required);
-            
-            	return JSON.stringify(result);
-            }
-            catch (error) {
-            	error += (String(error).endsWith('.')) ? '' : '.';
-            	Zabbix.log(3, '[ GitHub Repo ] ERROR: ' + error);
-            	return JSON.stringify({ error: error });
-            }
+          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#WORKFLOW_NAME}'
                 value: '{$GITHUB.WORKFLOW.NAME.MATCHES}'
+                formulaid: A
               - macro: '{#WORKFLOW_NAME}'
                 value: '{$GITHUB.WORKFLOW.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: B
               - macro: '{#WORKFLOW_STATE}'
                 value: '{$GITHUB.WORKFLOW.STATE.MATCHES}'
+                formulaid: C
               - macro: '{#WORKFLOW_STATE}'
                 value: '{$GITHUB.WORKFLOW.STATE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: D
           description: |
             Discovers repository workflows. By default only the active workflows are being discovered.
             
@@ -1835,6 +2046,7 @@ zabbix_export:
               name: 'Workflow [{#WORKFLOW_NAME}]: Last run conclusion'
               type: DEPENDENT
               key: 'github.repo.workflows.last_run.conclusion[{#WORKFLOW_NAME}]'
+              delay: '0'
               trends: '0'
               description: |
                 The conclusion of the last workflow run. Possible values:
@@ -1896,6 +2108,7 @@ zabbix_export:
               name: 'Workflow [{#WORKFLOW_NAME}]: Last run duration'
               type: DEPENDENT
               key: 'github.repo.workflows.last_run.duration[{#WORKFLOW_NAME}]'
+              delay: '0'
               units: s
               description: 'The duration of the last workflow run.'
               preprocessing:
@@ -1925,12 +2138,14 @@ zabbix_export:
               delay: '{$GITHUB.INTERVAL:"get_last_run:{#WORKFLOW_NAME}"}'
               history: '0'
               value_type: TEXT
+              trends: '0'
               params: |
                 var github = {
                 	params: {},
                 
-                	setParams: function (params) {
-                		['api_url', 'api_query', 'user_agent', 'api_version', 'repo_owner', 'repo_name', 'pagination_required', 'api_token'].forEach(function (field) {
+                	setParams: function (params, required) {
+                		required = required || [];
+                		required.concat(['api_url', 'user_agent', 'api_version', 'repo_owner', 'repo_name', 'pagination_required', 'api_token']).forEach(function (field) {
                 			if (typeof params !== 'object' || typeof params[field] === 'undefined'
                 				|| params[field] === '') {
                 				throw 'Required parameter is not set: "' + field + '".';
@@ -1995,7 +2210,7 @@ zabbix_export:
                 				url = '';
                 			}
                 		}
-                		
+                
                 		final_data.headers = request.getHeaders();
                 
                 		delete request;
@@ -2019,11 +2234,21 @@ zabbix_export:
                 		response_data = response_data[namespaceKey];
                 
                 		return response_data;
+                	},
+                
+                	itemsCount: function (response_data) {
+                		const last_page_number = /<[^>]+page=(\d+)>;\s*rel="last"/i;
+                
+                		if (response_data.headers.link){
+                			return response_data.headers.link.match(last_page_number)[1];
+                		}
+                
+                		return response_data.data.length;
                 	}
                 }
                 
                 try {
-                	github.setParams(JSON.parse(value));
+                	github.setParams(JSON.parse(value), ['api_query']);
                 
                 	var result = github.apiRequest(github.params.api_url + github.params.api_query + '?' + github.params.query_params || '', github.params.pagination_required);
                 
@@ -2040,6 +2265,11 @@ zabbix_export:
                 Information about endpoint:
                 https://docs.github.com/en/rest/actions/workflow-runs?apiVersion=2022-11-28#list-workflow-runs-for-a-workflow
               preprocessing:
+                - type: CHECK_REGEX_ERROR
+                  parameters:
+                    - 'API rate limit exceeded'
+                    - \0
+                  error_handler: DISCARD_VALUE
                 - type: JSONPATH
                   parameters:
                     - $.data.first()
@@ -2076,6 +2306,7 @@ zabbix_export:
               name: 'Workflow [{#WORKFLOW_NAME}]: Last run start date'
               type: DEPENDENT
               key: 'github.repo.workflows.last_run.start_date[{#WORKFLOW_NAME}]'
+              delay: '0'
               trends: '0'
               units: unixtime
               description: 'The date when the last workflow run has started.'
@@ -2100,6 +2331,7 @@ zabbix_export:
               name: 'Workflow [{#WORKFLOW_NAME}]: Last run status'
               type: DEPENDENT
               key: 'github.repo.workflows.last_run.status[{#WORKFLOW_NAME}]'
+              delay: '0'
               trends: '0'
               description: |
                 The status of the last workflow run. Possible values:
@@ -2160,6 +2392,7 @@ zabbix_export:
               name: 'Workflow [{#WORKFLOW_NAME}]: Last run update date'
               type: DEPENDENT
               key: 'github.repo.workflows.last_run.update_date[{#WORKFLOW_NAME}]'
+              delay: '0'
               trends: '0'
               units: unixtime
               description: 'The date when the last workflow run has been updated.'
@@ -2180,28 +2413,8 @@ zabbix_export:
                   value: workflow
                 - tag: workflow
                   value: '{#WORKFLOW_NAME}'
-          timeout: '{$GITHUB.TIMEOUT:"workflows_discovery"}'
-          parameters:
-            - name: api_query
-              value: 'repos/{$GITHUB.REPO.OWNER}/{$GITHUB.REPO.NAME}/actions/workflows'
-            - name: api_token
-              value: '{$GITHUB.API.TOKEN}'
-            - name: api_url
-              value: '{$GITHUB.API.URL}'
-            - name: api_version
-              value: '{$GITHUB.API_VERSION}'
-            - name: http_proxy
-              value: '{$GITHUB.HTTP_PROXY}'
-            - name: pagination_required
-              value: 'true'
-            - name: query_params
-              value: 'per_page={$GITHUB.RESULTS_PER_PAGE:"workflows_discovery"}'
-            - name: repo_name
-              value: '{$GITHUB.REPO.NAME}'
-            - name: repo_owner
-              value: '{$GITHUB.REPO.OWNER}'
-            - name: user_agent
-              value: '{$GITHUB.USER_AGENT}'
+          master_item:
+            key: github.repo.workflows.get
           lld_macro_paths:
             - lld_macro: '{#WORKFLOW_ID}'
               path: $.id
@@ -2241,6 +2454,9 @@ zabbix_export:
         - macro: '{$GITHUB.INTERVAL}'
           value: 1m
           description: 'The update interval for the script items that retrieve data from API. Can be used with context if needed (check the context values in particular items).'
+        - macro: '{$GITHUB.INTERVAL:"get_(branches|workflows)"}'
+          value: 1h
+          description: 'The update interval for the script items that retrieve the branches and workflows. Used only for related metrics discovery.'
         - macro: '{$GITHUB.INTERVAL:"get_repo"}'
           value: 15m
           description: 'The update interval for the script item that retrieves the repository information.'
