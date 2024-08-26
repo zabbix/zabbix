@@ -137,6 +137,9 @@ class CMacroFunction {
 			return UNRESOLVED_MACRO_STRING;
 		}
 
+		// Maximum allowed length (64KB) in bytes.
+		$max_length = 65536;
+
 		try {
 			for ($i = 0; $i < $parameter_count; $i += 2) {
 				$pattern = $parameters[$i];
@@ -156,6 +159,23 @@ class CMacroFunction {
 
 				if (@preg_match($pattern, '') === false) {
 					return UNRESOLVED_MACRO_STRING;
+				}
+
+				// Get all matches of the pattern in the string
+				$matches = [];
+
+				if (@preg_match_all($pattern, $value, $matches) === false) {
+					return UNRESOLVED_MACRO_STRING;
+				}
+
+				// Estimate the new length of value after replacements, and return *UNKNOWN* if it exceeds 64KB.
+				foreach ($matches[0] as $match) {
+					$length_difference = strlen($replacement) - strlen($match);
+					$potential_length = strlen($value) + $length_difference * count($matches[0]);
+
+					if ($potential_length > $max_length) {
+						return UNRESOLVED_MACRO_STRING;
+					}
 				}
 
 				$value = preg_replace($pattern, $replacement, $value);
