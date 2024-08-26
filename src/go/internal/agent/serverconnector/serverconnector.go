@@ -408,9 +408,11 @@ run:
 				c.refreshActiveChecks()
 				lastRefresh = time.Now()
 			}
-			if now.Sub(lastHeartbeat) > time.Second*time.Duration(c.options.HeartbeatFrequency) {
-				c.sendHeartbeatMsg()
-				lastHeartbeat = time.Now()
+			if c.options.HeartbeatFrequency > 0 {
+				if now.Sub(lastHeartbeat) > time.Second*time.Duration(c.options.HeartbeatFrequency) {
+					c.sendHeartbeatMsg()
+					lastHeartbeat = time.Now()
+				}
 			}
 		case u := <-c.input:
 			if u == nil {

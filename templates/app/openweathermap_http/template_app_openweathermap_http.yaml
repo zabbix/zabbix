@@ -47,6 +47,7 @@ zabbix_export:
           delay: 10m
           history: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             var params = JSON.parse(value),
             	request = new HttpRequest(),
@@ -178,7 +179,9 @@ zabbix_export:
           name: 'Get data collection errors'
           type: DEPENDENT
           key: openweathermap.get.errors
+          delay: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Errors from get data requests by script item.'
           preprocessing:
             - type: JSONPATH
@@ -210,6 +213,7 @@ zabbix_export:
           name: 'Locations discovery'
           type: DEPENDENT
           key: openweathermap.locations.discovery
+          delay: '0'
           lifetime: 0d
           description: 'Weather metrics discovery by location.'
           item_prototypes:
@@ -217,6 +221,7 @@ zabbix_export:
               name: '[{#LOCATION}, {#COUNTRY}]: Cloudiness'
               type: DEPENDENT
               key: 'openweathermap.clouds[{#ID}]'
+              delay: '0'
               units: '%'
               description: 'Cloudiness in %.'
               preprocessing:
@@ -239,7 +244,9 @@ zabbix_export:
               name: '[{#LOCATION}, {#COUNTRY}]: Short weather status'
               type: DEPENDENT
               key: 'openweathermap.description[{#ID}]'
+              delay: '0'
               value_type: CHAR
+              trends: '0'
               description: 'Short weather status description.'
               preprocessing:
                 - type: JSONPATH
@@ -261,6 +268,7 @@ zabbix_export:
               name: '[{#LOCATION}, {#COUNTRY}]: Humidity'
               type: DEPENDENT
               key: 'openweathermap.humidity[{#ID}]'
+              delay: '0'
               units: '%'
               description: 'Humidity in %.'
               preprocessing:
@@ -283,8 +291,10 @@ zabbix_export:
               name: '[{#LOCATION}, {#COUNTRY}]: Data'
               type: DEPENDENT
               key: 'openweathermap.location.data[{#ID}]'
+              delay: '0'
               history: '0'
               value_type: TEXT
+              trends: '0'
               description: 'JSON with result of OpenWeatherMap API request by location.'
               preprocessing:
                 - type: JSONPATH
@@ -303,6 +313,7 @@ zabbix_export:
               name: '[{#LOCATION}, {#COUNTRY}]: Atmospheric pressure'
               type: DEPENDENT
               key: 'openweathermap.pressure[{#ID}]'
+              delay: '0'
               units: Pa
               description: 'Atmospheric pressure in Pa.'
               preprocessing:
@@ -328,6 +339,7 @@ zabbix_export:
               name: '[{#LOCATION}, {#COUNTRY}]: Rain volume for the last one hour'
               type: DEPENDENT
               key: 'openweathermap.rain[{#ID}]'
+              delay: '0'
               value_type: FLOAT
               units: m
               description: 'Rain volume for the lat one hour in m.'
@@ -356,6 +368,7 @@ zabbix_export:
               name: '[{#LOCATION}, {#COUNTRY}]: Snow volume for the last one hour'
               type: DEPENDENT
               key: 'openweathermap.snow[{#ID}]'
+              delay: '0'
               value_type: FLOAT
               units: m
               description: 'Snow volume for the lat one hour in m.'
@@ -384,6 +397,7 @@ zabbix_export:
               name: '[{#LOCATION}, {#COUNTRY}]: Temperature'
               type: DEPENDENT
               key: 'openweathermap.temp[{#ID}]'
+              delay: '0'
               value_type: FLOAT
               units: '{#TEMP.UNIT}'
               description: 'Atmospheric temperature value.'
@@ -430,6 +444,7 @@ zabbix_export:
               name: '[{#LOCATION}, {#COUNTRY}]: Visibility'
               type: DEPENDENT
               key: 'openweathermap.visibility[{#ID}]'
+              delay: '0'
               units: m
               description: 'Visibility in m.'
               preprocessing:
@@ -452,6 +467,7 @@ zabbix_export:
               name: '[{#LOCATION}, {#COUNTRY}]: Wind direction'
               type: DEPENDENT
               key: 'openweathermap.wind.direction[{#ID}]'
+              delay: '0'
               value_type: FLOAT
               units: deg
               description: 'Wind direction in degrees.'
@@ -477,6 +493,7 @@ zabbix_export:
               name: '[{#LOCATION}, {#COUNTRY}]: Wind speed'
               type: DEPENDENT
               key: 'openweathermap.wind.speed[{#ID}]'
+              delay: '0'
               value_type: FLOAT
               units: '{#WIND.UNIT}'
               description: 'Wind speed value.'

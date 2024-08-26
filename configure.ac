@@ -14,7 +14,7 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix],[7.0.3rc1])
+AC_INIT([Zabbix],[7.0.4rc1])
 AC_CONFIG_SRCDIR(src/zabbix_server/server.c)
 AM_INIT_AUTOMAKE([subdir-objects tar-pax])
 
@@ -1570,6 +1570,8 @@ if test "x$have_ipcservice" = "xyes"; then
 	LIBEVENT_CHECK_CONFIG([no])
 	if test "x$found_libevent" != "xyes"; then
 		AC_MSG_ERROR([Unable to use libevent (libevent check failed)])
+	elif test "x$accept_libevent_version" != "xyes"; then
+		AC_MSG_ERROR([Libevent library version requirement not met (>= 2.0.10)])
 	fi
 
 	SERVER_LDFLAGS="$SERVER_LDFLAGS $LIBEVENT_LDFLAGS"
