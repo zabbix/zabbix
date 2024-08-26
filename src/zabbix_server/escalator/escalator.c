@@ -1822,7 +1822,7 @@ err_alert:
 
 		zbx_db_insert_prepare(&db_insert, "alerts", "alertid", "actionid", "eventid", "userid", "clock",
 				"subject", "message", "status", "retries", "error", "esc_step", "alerttype",
-				"acknowledgeid", (NULL != r_event ? "p_eventid" : NULL), (char *)NULL);
+				"acknowledgeid", "p_eventid", (char *)NULL);
 
 /* max number of retries for alerts */
 #define ALERT_MAX_RETRIES	3
