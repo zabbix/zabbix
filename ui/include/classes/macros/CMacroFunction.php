@@ -149,8 +149,8 @@ class CMacroFunction {
 					continue;
 				}
 
-				// Escape '/' characters
-				$pattern = str_replace('/', '\\/', $pattern);
+				// Escape '/' characters that are not already escaped.
+				$pattern = preg_replace('/\\\?\//', '\\/', $pattern);
 
 				// Add the 'u' modifier to treat it as UTF-8 for multibyte characters and ensure pattern ends with '/'.
 				if ($pattern[0] !== '/' || substr($pattern, -1) !== '/') {

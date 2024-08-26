@@ -250,6 +250,14 @@
         "result": "test\\/macro\\/functions"
     },
     {
+        "value": "test/macro/functions",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["[\\/]", "test"]
+        },
+        "result": "testtestmacrotestfunctions"
+    },
+    {
         "value": "value_ППП_aaa_123",
         "macrofunc": {
             "function": "regrepl",
