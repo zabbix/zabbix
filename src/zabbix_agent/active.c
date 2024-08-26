@@ -293,7 +293,7 @@ static int	mode_parameter_is_skip(unsigned char flags, const char *itemkey)
  *             host - address of host                                         *
  *             port - port number on host                                     *
  *                                                                            *
- * Return value: returns SUCCEED on successful parsing,                       *
+ * Return value: returns SUCCEED on successful parsing or no checks           *
  *               FAIL on an incorrect format of string                        *
  *                                                                            *
  * Comments:                                                                  *
@@ -339,6 +339,7 @@ static int	parse_list_of_checks(char *str, const char *host, unsigned short port
 		else
 			zabbix_log(LOG_LEVEL_WARNING, "no active checks on server");
 
+		ret = SUCCEED;
 		goto out;
 	}
 
@@ -656,7 +657,7 @@ static int	refresh_active_checks(zbx_vector_ptr_t *addrs)
 							" is working again", ((zbx_addr_t *)addrs->values[0])->ip,
 							((zbx_addr_t *)addrs->values[0])->port);
 				}
-				parse_list_of_checks(s.buffer, ((zbx_addr_t *)addrs->values[0])->ip,
+				ret = parse_list_of_checks(s.buffer, ((zbx_addr_t *)addrs->values[0])->ip,
 						((zbx_addr_t *)addrs->values[0])->port);
 			}
 			else
@@ -674,6 +675,13 @@ static int	refresh_active_checks(zbx_vector_ptr_t *addrs)
 		}
 
 		zbx_tcp_close(&s);
+
+
+		if (SUCCEED != ret)
+		{
+			/* initiate failover on exchange failure */
+			zbx_addrs_failover(addrs);
+		}
 	}
 
 	if (SUCCEED != ret && SUCCEED == last_ret)
@@ -857,6 +865,12 @@ static int	send_buffer(zbx_vector_ptr_t *addrs, zbx_vector_pre_persistent_t *pre
 		}
 
 		zbx_tcp_close(&s);
+
+		if (FAIL == ret)
+		{
+			/* initiate failover on exchange failure */
+			zbx_addrs_failover(addrs);
+		}
 	}
 
 	zbx_json_free(&json);

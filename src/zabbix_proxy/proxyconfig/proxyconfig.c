@@ -130,6 +130,9 @@ static void	process_configuration_sync(size_t *data_size)
 		DCupdate_interfaces_availability();
 	}
 error:
+	/* initiate failover on invalid response */
+	zbx_addrs_failover(&zbx_addrs);
+
 	disconnect_server(&sock);
 out:
 	zbx_free(error);
