@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2023-09-22 06:12+0000\n"
-"Last-Translator: diana.dauksa <diana.dauksa@zabbix.com>\n"
+"PO-Revision-Date: 2024-08-23 07:25+0000\n"
+"Last-Translator: Dzulfikar Dzulfikar <dzoelfi.local@gmail.com>\n"
 "Language-Team: none\n"
 "Language: id\n"
 "MIME-Version: 1.0\n"
@@ -25,7 +25,7 @@ msgstr ""
 #: include/classes/db/PostgresqlDbBackend.php:96
 #, c-format
 msgid "\"%1$s\" instead \"%2$s\""
-msgstr ""
+msgstr "\"%1$s\" sebagai pengganti \"%2$s\""
 
 #: include/classes/import/validators/C10XmlValidator.php:322
 #: include/classes/import/validators/C10XmlValidator.php:340
@@ -43,13 +43,13 @@ msgstr ""
 #: include/classes/import/validators/C62XmlValidator.php:2054
 #, c-format
 msgid "\"%1$s\" is expected"
-msgstr ""
+msgstr "\"%1$s\" diharapkan"
 
 #: include/classes/api/services/CReport.php:220
 #: include/classes/api/services/CReport.php:615
 #, c-format
 msgid "\"%1$s\" must be an empty string or greater than \"%2$s\"."
-msgstr ""
+msgstr "\"%1$s\" harus berupa string kosong atau lebih besar dari \"%2$s\"."
 
 #: include/classes/import/validators/C10XmlValidator.php:359
 #: include/classes/import/validators/C10XmlValidator.php:382
@@ -67,7 +67,7 @@ msgstr ""
 #: include/classes/api/services/CDRule.php:579
 #, c-format
 msgid "%1$d characters exceeds maximum length of %2$d characters"
-msgstr ""
+msgstr "%1$d karakter melebihi panjang maksimum %2$d karakter"
 
 #: include/func.inc.php:462
 #, c-format
@@ -79,17 +79,17 @@ msgstr[0] ""
 #, c-format
 msgctxt "screen reader"
 msgid "%1$d matches for %2$s found"
-msgstr ""
+msgstr "%1$d pencocokkan untuk %2$s ditemukan"
 
 #: widgets/hostnavigator/Widget.php:39
 #, c-format
 msgid "%1$d of %1$d+ hosts are shown"
-msgstr ""
+msgstr "%1$d dari %1$d+ host ditampilkan"
 
 #: widgets/itemnavigator/Widget.php:39
 #, c-format
 msgid "%1$d of %1$d+ items are shown"
-msgstr ""
+msgstr "%1$d dari %1$d+ item ditampilkan"
 
 #: widgets/problems/actions/WidgetView.php:78
 #, c-format
@@ -100,7 +100,7 @@ msgstr[0] ""
 #: app/controllers/CControllerPopupAcknowledgeEdit.php:132
 #, c-format
 msgid "%1$d problems selected."
-msgstr ""
+msgstr "%1$d masalah dipilih."
 
 #: chart4.php:95
 #, c-format
@@ -110,13 +110,13 @@ msgstr "%1$s (tahun %2$s)"
 #: include/classes/core/CModuleManager.php:159
 #, c-format
 msgid "%1$s - thrown by module located at %2$s."
-msgstr ""
+msgstr "%1$s - dilemparkan oleh modul yang terletak di %2$s."
 
 #: include/classes/import/readers/CXmlImportReader.php:52
 #: include/classes/validators/CApiInputValidator.php:4025
 #, c-format
 msgid "%1$s [Line: %2$s | Column: %3$s]"
-msgstr ""
+msgstr "%1$s [Baris: %2$s | Kolom: %3$s]"
 
 #: include/actions.inc.php:1813
 #, c-format
@@ -128,12 +128,12 @@ msgstr[0] ""
 #: jsLoader.php:321
 #, c-format
 msgid "%1$s characters"
-msgstr ""
+msgstr "%1$s karakter"
 
 #: jsLoader.php:322
 #, c-format
 msgid "%1$s characters remaining"
-msgstr ""
+msgstr "%1$s karakter tersisa"
 
 #: app/views/popup.acknowledge.edit.php:60
 #: app/views/popup.acknowledge.edit.php:65
@@ -145,7 +145,7 @@ msgstr[0] ""
 #: app/views/popup.usergroupmapping.edit.php:87
 #, c-format
 msgid "%1$s group pattern"
-msgstr ""
+msgstr "%1$s pola grup"
 
 #: include/maps.inc.php:416
 #, c-format
@@ -203,7 +203,7 @@ msgstr ""
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s preselected, use down,up arrow keys and enter to select"
-msgstr ""
+msgstr "%1$s telah dipilih sebelumnya, gunakan tombol panah bawah, atas dan enter untuk memilih"
 
 #: include/maps.inc.php:341 include/maps.inc.php:345 include/maps.inc.php:352
 #: include/maps.inc.php:401
@@ -246,34 +246,34 @@ msgstr[0] ""
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s, Severity, %2$s"
-msgstr ""
+msgstr "%1$s, Tingkat keparahan, %2$s"
 
 #: jsLoader.php:335
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s, read only"
-msgstr ""
+msgstr "%1$s, hanya baca"
 
 #: jsLoader.php:391
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s, selected"
-msgstr ""
+msgstr "%1$s, dipilih"
 
 #: app/controllers/CControllerMediatypeEnable.php:86
 #, c-format
 msgid "%1$s. %2$s: %3$s. %4$s."
-msgstr ""
+msgstr "%1$s. %2$s: %3$s. %4$s."
 
 #: include/classes/core/CModuleManager.php:153
 #, c-format
 msgid "%1$s.php class must extend %2$s for module located at %3$s."
-msgstr ""
+msgstr "%1$s.php class harus memperpanjang %2$s untuk modul yang terletak di %3$s."
 
 #: app/controllers/CControllerMediatypeEnable.php:105
 #, c-format
 msgid "%1$s: %2$s"
-msgstr ""
+msgstr "%1$s: %2$s"
 
 #: include/classes/graph/CSvgGraph.php:1418
 #, c-format
@@ -296,26 +296,26 @@ msgstr[0] "%d perangkat"
 #, c-format
 msgctxt "user fullname"
 msgid "(%1$s %2$s)"
-msgstr ""
+msgstr "(%1$s %2$s)"
 
 #: app/views/popup.operation.edit.php:84
 msgid "(0 - infinitely)"
-msgstr ""
+msgstr "(0 - tak terhingga)"
 
 #: app/views/popup.operation.edit.php:95
 msgid "(0 - use action default)"
-msgstr ""
+msgstr "(0 - gunakan tindakan bawaan)"
 
 #: app/views/configuration.hostgroup.list.php:38
 #: app/views/configuration.templategroup.list.php:36
 msgid "(Only super admins can create groups)"
-msgstr ""
+msgstr "(Hanya super admin yang dapat membuat group)"
 
 #: app/partials/configuration.tags.tab.php:86
 #: app/partials/hostmacros.inherited.list.html.php:204
 #: app/partials/hostmacros.list.html.php:105
 msgid "(created by host discovery)"
-msgstr ""
+msgstr "(dibuat oleh penemuan host)"
 
 #: include/views/configuration.item.edit.php:648
 #: include/views/configuration.item.prototype.edit.php:619
@@ -328,7 +328,7 @@ msgstr ""
 
 #: app/partials/configuration.host.edit.html.php:133
 msgid "(linked by host discovery)"
-msgstr ""
+msgstr "(ditautkan oleh penemuan host)"
 
 #: app/partials/configuration.host.edit.html.php:261
 #: app/views/popup.itemtestedit.view.php:254
@@ -339,7 +339,7 @@ msgstr "(tanpa proxy)"
 
 #: include/classes/setup/CSetupWizard.php:541
 msgid "0 - use default port"
-msgstr ""
+msgstr "0 - gunakan port bawaan"
 
 #: include/triggers.inc.php:1218
 msgid "0 or 1"
@@ -358,16 +358,16 @@ msgstr "10 detik"
 #: tests/selenium/modules/clock32/includes/WidgetForm.php:116
 #: widgets/clock/includes/WidgetForm.php:116
 msgid "12-hour"
-msgstr ""
+msgstr "12-jam"
 
 #: tests/selenium/modules/clock32/includes/WidgetForm.php:115
 #: widgets/clock/includes/WidgetForm.php:115
 msgid "24-hour"
-msgstr ""
+msgstr "24-jam"
 
 #: app/views/popup.sla.edit.php:101 include/classes/helpers/CSlaHelper.php:254
 msgid "24x7"
-msgstr ""
+msgstr "24x7"
 
 #: app/views/administration.queue.overview.php:49
 #: app/views/administration.queue.overview.proxy.php:49
@@ -396,11 +396,11 @@ msgstr "500 isi terbaru"
 #: app/views/js/popup.itemtestedit.view.js.php:37
 #: app/views/js/popup.itemtestedit.view.js.php:44
 msgid "<empty string>"
-msgstr ""
+msgstr "<string kosong>"
 
 #: include/forms.inc.php:1402 include/views/js/item.preprocessing.js.php:364
 msgid "<label name>"
-msgstr ""
+msgstr "<nama label>"
 
 #: include/views/monitoring.sysmap.edit.php:131
 msgid "<manual>"
@@ -419,7 +419,7 @@ msgstr ""
 #: widgets/geomap/Widget.php:48
 msgctxt "abbreviation of severity level"
 msgid "A"
-msgstr ""
+msgstr "A"
 
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:199
 msgid "ADD OVERRIDE"
@@ -427,34 +427,34 @@ msgstr ""
 
 #: tests/selenium/modules/clock32/Widget.php:46
 msgid "ALARM CLOCK"
-msgstr ""
+msgstr "JAM ALARM"
 
 #: app/views/administration.user.list.php:137
 msgid "API access"
-msgstr ""
+msgstr "Akses API"
 
 #: app/views/mfa.edit.php:102
 msgid "API hostname"
-msgstr ""
+msgstr "Nama host API"
 
 #: app/controllers/CControllerPopupGeneric.php:422
 #: app/views/administration.userrole.edit.php:310
 msgid "API methods"
-msgstr ""
+msgstr "Metode API"
 
 #: app/controllers/CControllerAuditLogList.php:222
 msgid "API token"
-msgstr ""
+msgstr "token API"
 
 #: include/classes/api/services/CToken.php:287
 #, c-format
 msgid "API token \"%1$s\" already exists for userid \"%2$s\"."
-msgstr ""
+msgstr "Token API \"%1$s\" sudah ada untuk userid \"%2$s\"."
 
 #: app/controllers/CControllerTokenCreate.php:116
 #: app/controllers/CControllerTokenCreate.php:129
 msgid "API token added"
-msgstr ""
+msgstr "Token API ditambahkan"
 
 #: app/controllers/CControllerTokenDelete.php:64
 msgid "API token deleted"
@@ -473,12 +473,12 @@ msgstr[0] ""
 
 #: include/classes/api/services/CUser.php:1807
 msgid "API token expired."
-msgstr ""
+msgstr "Token API kedaluwarsa."
 
 #: app/controllers/CControllerTokenUpdate.php:107
 #: app/controllers/CControllerTokenUpdate.php:135
 msgid "API token updated"
-msgstr ""
+msgstr "Token API diperbarui"
 
 #: app/controllers/CControllerPopupTokenEdit.php:116
 #: app/controllers/CControllerPopupTokenView.php:75
@@ -490,7 +490,7 @@ msgstr ""
 #: include/classes/helpers/CMenuHelper.php:467
 #: include/classes/helpers/CRoleHelper.php:495 include/html.inc.php:848
 msgid "API tokens"
-msgstr ""
+msgstr "token API"
 
 #: widgets/gauge/includes/WidgetForm.php:265
 #: widgets/item/includes/WidgetForm.php:209
@@ -503,7 +503,7 @@ msgstr ""
 
 #: include/classes/core/ZBase.php:757 include/func.inc.php:1683
 msgid "Access denied"
-msgstr ""
+msgstr "Akses ditolak"
 
 #: sysmap.php:78
 msgid "Access denied!"
@@ -512,27 +512,27 @@ msgstr "Akses ditolak!"
 #: app/views/administration.user.edit.php:673
 #: app/views/administration.userrole.edit.php:296
 msgid "Access to API"
-msgstr ""
+msgstr "Akses ke API"
 
 #: app/views/administration.user.edit.php:525
 #: app/views/administration.userrole.edit.php:88
 msgid "Access to UI elements"
-msgstr ""
+msgstr "Akses ke elemen UI"
 
 #: app/views/administration.user.edit.php:702
 #: app/views/administration.userrole.edit.php:345
 msgid "Access to actions"
-msgstr ""
+msgstr "Akses ke tindakan"
 
 #: app/views/administration.user.edit.php:643
 #: app/views/administration.userrole.edit.php:244
 msgid "Access to modules"
-msgstr ""
+msgstr "Akses ke modul"
 
 #: app/views/administration.user.edit.php:547
 #: app/views/administration.userrole.edit.php:156
 msgid "Access to services"
-msgstr ""
+msgstr "Akses ke layanan"
 
 #: include/actions.inc.php:165 include/classes/screens/CScreenProblem.php:1181
 msgid "Ack"
@@ -640,17 +640,17 @@ msgstr "Tindakan"
 #: widgets/actionlog/views/widget.view.php:38
 msgctxt "compact table header"
 msgid "Action"
-msgstr ""
+msgstr "Tindakan"
 
 #: include/classes/api/services/CAction.php:2824
 #, c-format
 msgid "Action \"%1$s\" already exists."
-msgstr ""
+msgstr "Tindakan \"%1$s\" sudah tersedia."
 
 #: include/classes/api/services/CRole.php:754
 #, c-format
 msgid "Action \"%2$s\" is not available for user role \"%1$s\"."
-msgstr ""
+msgstr "Tindakan \"%2$s\" tidak tersedia untuk peran pengguna \"%1$s\"."
 
 #: app/controllers/CControllerActionCreate.php:264
 msgid "Action added"
@@ -659,10 +659,9 @@ msgstr "Aksi ditambahkan"
 #: include/classes/core/ZBase.php:603
 #, c-format
 msgid "Action class %1$s must extend %2$s class."
-msgstr ""
+msgstr "Tindakan class %1$s harus memperpanjang %2$s class."
 
 #: app/controllers/CControllerActionDelete.php:79
-#, fuzzy
 msgid "Action deleted"
 msgid_plural "Actions deleted"
 msgstr[0] "Aksi dihapus"
@@ -682,13 +681,13 @@ msgstr[0] ""
 #: include/classes/helpers/CMenuHelper.php:150
 #: include/classes/helpers/CRoleHelper.php:430 widgets/actionlog/Widget.php:29
 msgid "Action log"
-msgstr ""
+msgstr "Log tindakan"
 
 #: app/views/administration.script.edit.php:82
 #: app/views/administration.script.list.php:67
 #: app/views/administration.script.list.php:107
 msgid "Action operation"
-msgstr ""
+msgstr "Operasi tindakan"
 
 #: app/controllers/CControllerActionUpdate.php:267
 msgid "Action updated"
@@ -697,7 +696,7 @@ msgstr "Aksi diperbarui"
 #: include/classes/api/services/CDashboardGeneral.php:672
 #, c-format
 msgid "Action with ID \"%1$s\" is not available."
-msgstr ""
+msgstr "Tindakan dengan ID \"%1$s\" tidak tersedia."
 
 #: app/controllers/CControllerPopupGeneric.php:496
 #: app/controllers/CControllerPopupGeneric.php:504
@@ -723,7 +722,7 @@ msgstr "Aksi"
 #: widgets/problems/includes/WidgetProblems.php:107
 msgctxt "compact table header"
 msgid "Actions"
-msgstr ""
+msgstr "Tindakan"
 
 #: app/partials/administration.ha.nodes.php:50
 #: app/views/administration.proxy.list.php:54
@@ -739,7 +738,7 @@ msgstr "Aktif"
 
 #: include/hosts.inc.php:497
 msgid "Active checks"
-msgstr ""
+msgstr "Pemeriksaan aktif"
 
 #: app/views/maintenance.edit.php:144 app/views/maintenance.list.php:96
 msgid "Active since"
@@ -922,39 +921,39 @@ msgstr "Tambah"
 #: app/views/js/administration.mediatype.edit.js.php:129
 #: app/views/js/mediatype.edit.js.php:389
 msgid "Add (message type limit reached)"
-msgstr ""
+msgstr "Tambah (batas tipe pesan tercapai)"
 
 #: widgets/tophosts/views/widget.edit.php:63
 msgid "Add a column"
-msgstr ""
+msgstr "Tambahkan kolom"
 
 #: jsLoader.php:156
 msgid "Add a new widget"
-msgstr ""
+msgstr "Tambahkan widget baru"
 
 #: widgets/navtree/Widget.php:34
 msgid "Add child element"
-msgstr ""
+msgstr "Tambahkan anak elemen"
 
 #: widgets/navtree/Widget.php:39
 msgid "Add child elements"
-msgstr ""
+msgstr "Tambahkan anak elemen"
 
 #: app/partials/service.list.edit.php:117
 msgid "Add child service"
-msgstr ""
+msgstr "Tambahkan anak layanan"
 
 #: app/views/js/popup.service.edit.js.php:375
 msgid "Add child services"
-msgstr ""
+msgstr "Tambahkan anak layanan"
 
 #: app/partials/configuration.valuemap.php:57
 msgid "Add from host"
-msgstr ""
+msgstr "Tambahkan dari host"
 
 #: app/partials/configuration.valuemap.php:54
 msgid "Add from template"
-msgstr ""
+msgstr "Tambahkan dari templat"
 
 #: include/actions.inc.php:629 include/actions.inc.php:860
 msgid "Add host"
@@ -962,37 +961,37 @@ msgstr "Tambah host"
 
 #: include/actions.inc.php:653 include/actions.inc.php:871
 msgid "Add host tags"
-msgstr ""
+msgstr "Tambahkan label host"
 
 #: app/partials/trigger.edit.dependencies.tab.php:65
 #: app/partials/trigger.edit.dependencies.tab.php:91
 #: app/views/trigger.massupdate.php:155
 msgid "Add host trigger"
-msgstr ""
+msgstr "Tambahkan pemicu host"
 
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:260
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:263
 msgid "Add item"
-msgstr ""
+msgstr "Tambahkan item"
 
 #: app/partials/massupdate.macros.tab.php:96
 #: app/partials/massupdate.valuemaps.tab.php:38
 msgid "Add missing"
-msgstr ""
+msgstr "Tambahkan yang hilang"
 
 #: widgets/navtree/Widget.php:40
 msgid "Add multiple maps"
-msgstr ""
+msgstr "Tambahkan beberapa peta"
 
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:89
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:93
 msgid "Add new data set"
-msgstr ""
+msgstr "Tambahkan data set baru"
 
 #: app/partials/configuration.host.edit.html.php:242
 #: include/views/configuration.host.prototype.edit.php:286
 msgid "Add new interface"
-msgstr ""
+msgstr "Tambahkan antarmuka baru"
 
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:53
 msgid "Add new override"
@@ -1001,15 +1000,15 @@ msgstr ""
 #: app/views/js/configuration.dashboard.edit.js.php:239
 #: app/views/js/monitoring.dashboard.view.js.php:366
 msgid "Add page"
-msgstr ""
+msgstr "Tambahkan halaman"
 
 #: app/views/js/popup.service.edit.js.php:405
 msgid "Add parent services"
-msgstr ""
+msgstr "Tambahkan induk layanan"
 
 #: include/classes/helpers/CRoleHelper.php:543
 msgid "Add problem comments"
-msgstr ""
+msgstr "Tambahkan komentar masalah"
 
 #: app/partials/trigger.edit.dependencies.tab.php:77
 #: app/partials/trigger.edit.dependencies.tab.php:87
@@ -1020,19 +1019,19 @@ msgstr "Tambah bentuk dasar"
 
 #: app/controllers/CControllerPopupScheduledReportEdit.php:129
 msgid "Add scheduled report"
-msgstr ""
+msgstr "Tambahkan laporan terjadwal"
 
 #: app/views/js/administration.userrole.edit.js.php:232
 msgid "Add services"
-msgstr ""
+msgstr "Tambahkan layanan"
 
 #: widgets/navtree/views/navtreeitem.edit.php:80
 msgid "Add submaps"
-msgstr ""
+msgstr "Tambahkan sub peta"
 
 #: app/controllers/CControllerFavoriteDelete.php:74 include/html.inc.php:177
 msgid "Add to favorites"
-msgstr ""
+msgstr "Tambahkan ke favorit"
 
 #: include/actions.inc.php:864
 msgid "Add to host group"
@@ -1044,44 +1043,44 @@ msgstr "Tambahkan ke grup host"
 
 #: app/partials/scheduledreport.subscription.php:42
 msgid "Add user"
-msgstr ""
+msgstr "Tambah user"
 
 #: app/partials/scheduledreport.subscription.php:45
 msgid "Add user group"
-msgstr ""
+msgstr "Tambah user grup"
 
 #: app/controllers/CControllerDashboardWidgetEdit.php:68
 #: app/views/js/configuration.dashboard.edit.js.php:235
 #: app/views/js/monitoring.dashboard.view.js.php:362
 #: include/classes/html/widgets/CWidgetFormView.php:169
 msgid "Add widget"
-msgstr ""
+msgstr "Tambah widget"
 
 #: app/controllers/CControllerAuditLogList.php:379
 #: app/controllers/CControllerPopupImportCompare.php:167
 msgid "Added"
-msgstr ""
+msgstr "Ditambahkan"
 
 #: jsLoader.php:333
 #, c-format
 msgctxt "screen reader"
 msgid "Added, %1$s"
-msgstr ""
+msgstr "Ditambahkan, %1$s"
 
 #: app/views/popup.service.statusrule.edit.php:94
 msgid "Additional rule"
-msgstr ""
+msgstr "Aturan tambahan"
 
 #: app/views/popup.service.edit.php:185
 msgid "Additional rules"
-msgstr ""
+msgstr "Aturan tambahan"
 
 #: app/controllers/CControllerProxyCreate.php:82
 #: app/controllers/CControllerProxyUpdate.php:76
 #: app/partials/administration.ha.nodes.php:28
 #: app/views/popup.proxy.edit.php:40
 msgid "Address"
-msgstr ""
+msgstr "Alamat"
 
 #: app/controllers/CControllerProxyCreate.php:72
 #: app/controllers/CControllerProxyCreate.php:80
@@ -1089,7 +1088,7 @@ msgstr ""
 #: app/controllers/CControllerProxyUpdate.php:75
 #: app/views/popup.proxy.edit.php:90
 msgid "Address for active agents"
-msgstr ""
+msgstr "Alamat untuk agen aktif"
 
 #: include/hosts.inc.php:63 include/users.inc.php:53
 msgid "Admin"
@@ -1106,7 +1105,7 @@ msgstr "Administrasi"
 #: widgets/clock/views/widget.edit.php:53
 #: widgets/gauge/views/widget.edit.php:54 widgets/item/views/widget.edit.php:48
 msgid "Advanced configuration"
-msgstr ""
+msgstr "Konfigurasi lanjutan"
 
 #: include/views/monitoring.sysmap.edit.php:162
 msgid "Advanced labels"
@@ -1114,14 +1113,14 @@ msgstr "Advanced labels"
 
 #: app/views/popup.import.php:148
 msgid "Advanced options"
-msgstr ""
+msgstr "Opsi lanjutan"
 
 #: include/views/configuration.host.discovery.edit.php:721
 #: include/views/configuration.host.discovery.edit.php:737
 #: include/views/configuration.host.discovery.list.php:157
 #: include/views/configuration.host.discovery.list.php:172
 msgid "After"
-msgstr ""
+msgstr "Setelah"
 
 #: app/views/js/mfa.edit.js.php:168
 msgid "After this change, users who have already enrolled in this MFA method will have to complete the enrollment process again because TOTP secrets will be reset."
@@ -1130,7 +1129,7 @@ msgstr ""
 #: widgets/gauge/includes/WidgetForm.php:266
 #: widgets/item/includes/WidgetForm.php:210
 msgid "After value"
-msgstr ""
+msgstr "Nilai setelah"
 
 #: include/events.inc.php:339
 msgid "Age"
@@ -1148,19 +1147,19 @@ msgstr "Agen"
 
 #: widgets/hostavail/views/widget.view.php:82
 msgid "Agent (active)"
-msgstr ""
+msgstr "Agen (aktif)"
 
 #: widgets/hostavail/views/widget.view.php:83
 msgid "Agent (passive)"
-msgstr ""
+msgstr "Agen (pasif)"
 
 #: include/classes/data/CItemData.php:911
 msgid "Agent availability check. Returns nothing - unavailable; 1 - available"
-msgstr ""
+msgstr "Pemeriksaan ketersediaan agen. Tidak mengembalikan apa pun - tidak tersedia; 1 - tersedia"
 
 #: app/views/configuration.host.list.php:213
 msgid "Agent encryption"
-msgstr ""
+msgstr "Enkripsi agen"
 
 #: include/classes/data/CItemData.php:895
 msgid "Agent host metadata. Returns string"
@@ -21805,6 +21804,11 @@ msgstr ""
 msgid "User cannot add himself to a disabled group or a group with disabled GUI access."
 msgstr "User tidak dapat menambah dirinya sendiri ke grup non-aktif atau grup dengan akses GUI non-aktif."
 
+#: include/classes/api/services/CUserGroup.php:673
+#: include/classes/api/services/CUser.php:843
+msgid "User cannot add oneself to a disabled group or a group with disabled GUI access."
+msgstr ""
+
 #: app/views/administration.user.edit.php:461
 #: include/classes/api/services/CUser.php:980
 msgid "User cannot change own role."
@@ -21937,6 +21941,10 @@ msgstr ""
 #: include/classes/api/services/CUser.php:1282
 msgid "User is not allowed to delete himself."
 msgstr "User tidak diizinkan menghapus dirinya sendiri."
+
+#: include/classes/api/services/CUser.php:1837
+msgid "User is not allowed to delete oneself."
+msgstr ""
 
 #: app/views/administration.authentication.edit.php:462
 #: app/views/popup.ldap.edit.php:222

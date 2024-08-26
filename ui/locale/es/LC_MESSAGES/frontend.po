@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-08-01 07:33+0000\n"
+"PO-Revision-Date: 2024-08-02 18:22+0000\n"
 "Last-Translator: Vicente Salvador <vicentesalvadorcubedo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
@@ -12540,7 +12540,7 @@ msgstr "Lista de servidores proxy de Zabbix con nombre, modo, cifrado, compresi�
 
 #: include/classes/data/CItemData.php:2935
 msgid "List of Zabbix proxy groups configuration data and real-time data. Configuration data includes proxy group name, failover delay, and minimum number of online proxies required for the group to be online. Real-time data includes number of online proxies, percentage of online proxies, and state of proxy group (unknown, offline, recovering, online, degrading). This item does not return groupless proxies. Returns JSON."
-msgstr ""
+msgstr "Lista de datos de configuración de grupos de proxy de Zabbix y datos en tiempo real. Los datos de configuración incluyen el nombre del grupo de proxy, el retraso de conmutación por error y la cantidad mínima de servidores proxy en línea necesarios para que el grupo esté en línea. Los datos en tiempo real incluyen la cantidad de servidores proxy en línea, el porcentaje de servidores proxy en línea y el estado del grupo de servidores proxy (desconocido, fuera de línea, en recuperación, en línea, degradante). Esta métrica no devuelve proxies sin grupo. Devuelve JSON."
 
 #: include/classes/data/CItemData.php:1559
 msgid "List of block devices and their type. Returns JSON"
@@ -19324,7 +19324,7 @@ msgstr "Estático"
 
 #: include/classes/data/CItemData.php:2841
 msgid "Statistics and availability of Zabbix write cache. Cache - one of values (modes: all, float, uint, str, log, text, not supported), history (modes: pfree, free, total, used, pused), index (modes: pfree, free, total, used, pused), trend (modes: pfree, free, total, used, pused)."
-msgstr "Estadísticas y disponibilidad de caché de escritura de Zabbix. Caché - values/valores (modos: all, float, uint, str, log, text, not supported), history/historial (modos: pfree, free, total, used, pused), index/índice (modes: pfree, free, total, used, pused), trend/tendencia (modes: pfree, free, total, used, pused)."
+msgstr "Estadísticas y disponibilidad de caché de escritura de Zabbix. Caché - valores (modos: all, float, uint, str, log, text, not supported), historial (modos: pfree, free, total, used, pused), índice (modos: pfree, free, total, used, pused), tendencia (modos: pfree, free, total, used, pused)."
 
 #: include/classes/data/CItemData.php:2848
 msgid "Statistics and availability of proxy memory buffer. Mode (modes: pfree, free, total, used, pused)."
@@ -21963,6 +21963,11 @@ msgstr "Cadena de agente de usuario"
 msgid "User cannot add himself to a disabled group or a group with disabled GUI access."
 msgstr "El usuario no puede agregarse a un grupo desactivado o a un grupo con acceso GUI desactivado."
 
+#: include/classes/api/services/CUserGroup.php:673
+#: include/classes/api/services/CUser.php:843
+msgid "User cannot add oneself to a disabled group or a group with disabled GUI access."
+msgstr ""
+
 #: app/views/administration.user.edit.php:461
 #: include/classes/api/services/CUser.php:980
 msgid "User cannot change own role."
@@ -22098,6 +22103,10 @@ msgstr "La entrada del usuario se ha probado con éxito."
 #: include/classes/api/services/CUser.php:1282
 msgid "User is not allowed to delete himself."
 msgstr "El usuario no puede eliminarse a sí mismo."
+
+#: include/classes/api/services/CUser.php:1837
+msgid "User is not allowed to delete oneself."
+msgstr ""
 
 #: app/views/administration.authentication.edit.php:462
 #: app/views/popup.ldap.edit.php:222
