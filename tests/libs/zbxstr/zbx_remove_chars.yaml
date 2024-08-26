@@ -1,3 +1,4 @@
+---
 test case: "abc c"
 in:
   string: "abc"
@@ -25,4 +26,11 @@ in:
   list: "$"
 out:
   return: "123"
-
+---
+test case: "empty string"
+in:
+  string: ""
+  list: ""
+out:
+  return: ""
+...

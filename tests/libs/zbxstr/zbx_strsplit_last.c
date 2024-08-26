@@ -24,10 +24,10 @@ void	zbx_mock_test_entry(void **state)
 
 	const char	*src = zbx_mock_get_parameter_string("in.src");
 	char		delimiter = *zbx_mock_get_parameter_string("in.delimiter");
-	char		*left = zbx_mock_get_parameter_string("in.left");
-	char		*right = zbx_mock_get_parameter_string("in.right");
-	char		*exp_result_left = zbx_mock_get_parameter_string("out.result_left");
-	char		*exp_result_right = zbx_mock_get_parameter_string("out.result_right");
+	char	*left = zbx_mock_get_parameter_string("in.left");
+	char	*right = zbx_mock_get_parameter_string("in.right");
+	char	*exp_result_left = zbx_mock_get_parameter_string("out.result_left");
+	char	*exp_result_right = zbx_mock_get_parameter_string("out.result_right");
 
 	zbx_strsplit_last(src, delimiter, &left, &right);
 

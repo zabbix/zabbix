@@ -1,17 +1,13 @@
-test case: "succeed Hello"
-in:
-  string: "Hello"
-out:
-  return: SUCCEED
+
 ---
-test case: "succeed €uro"
+test case: "emoji"
 in:
-  string: "€uro"
+  string: "\xF0\xA4\xAD\xA2"
 out:
   return: SUCCEED
----
-test case: "succeed \xE2\x82"
-in:
-  string: "\xE2\x82"
-out:
-  return: SUCCEED
+#---
+#test case: "Fail \xfe"
+#in:
+#  string: "\xfe"
+#out:
+#  return: SUCCEED

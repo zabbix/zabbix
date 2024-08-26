@@ -1,3 +1,4 @@
+---
 test case: "/path/to/file.txt - /"
 in:
   src: "/path/to/file.txt"
@@ -27,3 +28,13 @@ in:
 out:
   result_left: "00000////"
   result_right: "0000"
+---
+test case: "00000///// - /"
+in:
+  src: "00000/////"
+  delimiter: '/'
+  left: NULL
+  right: NULL
+out:
+  result_left: "00000////"
+  result_right: ""

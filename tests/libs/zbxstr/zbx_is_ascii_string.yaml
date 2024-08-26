@@ -1,3 +1,4 @@
+---
 test case: "succeed 0123456789"
 in:
   string: "0123456789"

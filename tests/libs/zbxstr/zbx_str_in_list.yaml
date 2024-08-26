@@ -1,3 +1,4 @@
+---
 test case: "a,b,ccc,ddd - succeed"
 in:
   list: "a,b,ccc,ddd"
@@ -6,7 +7,7 @@ in:
 out:
   return: SUCCEED
 ---
-test case: "a,b,ccc,ddd - fail"
+test case: "a,b,cc,ddd - fail"
 in:
   list: "a,b,cc,ddd"
   value: "ccc"
@@ -21,4 +22,13 @@ in:
   delimiter: '.'
 out:
   return: SUCCEED
+---
+test case: "empty string"
+in:
+  list: ""
+  value: ""
+  delimiter: ''
+out:
+  return: SUCCEED
 ...
+

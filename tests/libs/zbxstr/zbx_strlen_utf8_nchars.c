@@ -27,5 +27,5 @@ void	zbx_mock_test_entry(void **state)
 	size_t		exp_result = zbx_mock_get_parameter_uint64("out.result");
 	size_t		act_result = zbx_strlen_utf8_nchars(text, utf8_maxlen);
 
-	zbx_mock_assert_int_eq("return value",  exp_result, act_result);
+	zbx_mock_assert_uint64_eq("return value",  exp_result, act_result);
 }

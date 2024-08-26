@@ -18,3 +18,10 @@ in:
   size: 4
 out:
   result: 1
+---
+test case: "empty string"
+in:
+  text: ""
+  size: 0
+out:
+  result: 0

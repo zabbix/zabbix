@@ -1,3 +1,4 @@
+---
 test case: "user@example.com - @"
 in:
   src: "user@example.com"

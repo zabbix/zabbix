@@ -1,3 +1,4 @@
+---
 test case: "10.0100 -> 10.01"
 in:
   string: "10.0100"
@@ -21,3 +22,28 @@ in:
   string: "1000"
 out:
   string: "1000"
+---
+test case: "0 -> 0"
+in:
+  string: "0"
+out:
+  string: "0"
+---
+test case: "-0 -> -0"
+in:
+  string: "-0"
+out:
+  string: "-0"
+---
+test case: "+0 -> +0"
+in:
+  string: "+0"
+out:
+  string: "+0"
+---
+test case: "empty -> empty"
+in:
+  string: ""
+out:
+  string: ""
+

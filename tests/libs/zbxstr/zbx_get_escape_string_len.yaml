@@ -1,3 +1,4 @@
+---
 test case: "Hello"
 in:
   src: "Hello"
@@ -25,3 +26,10 @@ in:
   charlist: "abc"
 out:
   return: 16
+---
+test case: "empty string"
+in:
+  src: ""
+  charlist: "!!!"
+out:
+  return: 0

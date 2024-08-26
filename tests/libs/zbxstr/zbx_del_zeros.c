@@ -22,10 +22,11 @@ void	zbx_mock_test_entry(void **state)
 {
 	ZBX_UNUSED(state);
 
-	char	*src = zbx_mock_get_parameter_string("in.string");
-	char	*exp_result = zbx_mock_get_parameter_string("out.string");
+	char		*src = zbx_strdup(NULL ,zbx_mock_get_parameter_string("in.string"));
+	const char	*exp_result = zbx_mock_get_parameter_string("out.string");
 
 	zbx_del_zeros(src);
 
 	zbx_mock_assert_str_eq("return value",  exp_result, src);
+	zbx_free(src);
 }

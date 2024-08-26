@@ -20,7 +20,11 @@ BINARIES_tests = \
 	zbx_utf8_char_len\
 	zbx_strlen_utf8_nchars\
 	zbx_charcount_utf8_nbytes\
-	zbx_is_utf8
+	zbx_is_utf8\
+	zbx_replace_invalid_utf8\
+	zbx_trim_str_list\
+	zbx_strcmp_null\
+	zbx_strcmp_natural
 
 
 noinst_PROGRAMS = $(BINARIES_tests)
@@ -333,6 +337,66 @@ zbx_is_utf8_LDADD += @SERVER_LIBS@
 zbx_is_utf8_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
 
 zbx_is_utf8_CFLAGS = $(STR_COMPILER_FLAGS)
+
+# zbx_replace_invalid_utf8
+
+zbx_replace_invalid_utf8_SOURCES = \
+	zbx_replace_invalid_utf8.c \
+	$(COMMON_SRC_FILES)
+
+zbx_replace_invalid_utf8_LDADD = \
+	$(STR_LIBS)
+
+zbx_replace_invalid_utf8_LDADD += @SERVER_LIBS@
+
+zbx_replace_invalid_utf8_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
+
+zbx_replace_invalid_utf8_CFLAGS = $(STR_COMPILER_FLAGS)
+
+# zbx_trim_str_list
+
+zbx_trim_str_list_SOURCES = \
+	zbx_trim_str_list.c \
+	$(COMMON_SRC_FILES)
+
+zbx_trim_str_list_LDADD = \
+	$(STR_LIBS)
+
+zbx_trim_str_list_LDADD += @SERVER_LIBS@
+
+zbx_trim_str_list_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
+
+zbx_trim_str_list_CFLAGS = $(STR_COMPILER_FLAGS)
+
+# zbx_strcmp_null
+
+zbx_strcmp_null_SOURCES = \
+	zbx_strcmp_null.c \
+	$(COMMON_SRC_FILES)
+
+zbx_strcmp_null_LDADD = \
+	$(STR_LIBS)
+
+zbx_strcmp_null_LDADD += @SERVER_LIBS@
+
+zbx_strcmp_null_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
+
+zbx_strcmp_null_CFLAGS = $(STR_COMPILER_FLAGS)
+
+# zbx_strcmp_natural
+
+zbx_strcmp_natural_SOURCES = \
+	zbx_strcmp_natural.c \
+	$(COMMON_SRC_FILES)
+
+zbx_strcmp_natural_LDADD = \
+	$(STR_LIBS)
+
+zbx_strcmp_natural_LDADD += @SERVER_LIBS@
+
+zbx_strcmp_natural_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
+
+zbx_strcmp_natural_CFLAGS = $(STR_COMPILER_FLAGS)
 
 #endif
 
