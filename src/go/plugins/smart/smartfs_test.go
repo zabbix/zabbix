@@ -48,12 +48,11 @@ func TestPlugin_execute(t *testing.T) {
 	}
 
 	tests := []struct {
-		name            string
-		args            args
-		expectations    []expectation
-		wantJSONDevices map[string]jsonDevice
-		wantDevices     map[string]deviceParser
-		wantErr         bool
+		name          string
+		args          args
+		expectations  []expectation
+		expectedState *runner
+		wantErr       bool
 	}{
 		{
 			"+twoBasicDevices",
@@ -80,33 +79,47 @@ func TestPlugin_execute(t *testing.T) {
 					mock.Outputs.Get("ai_gen_with_2_basic_devices").AllSmartInfoScans.Get("-a /dev/sdb -j"),
 				},
 			},
-			nil,
-			map[string]deviceParser{
-				"/dev/sda": {
-					ModelName:    "SAMSUNG MZVLB1T0HBLR-000L7",
-					SerialNumber: "S3XY1234567890",
-					Info: deviceInfo{
-						Name:     "/dev/sda",
-						InfoName: "/dev/sda",
-						DevType:  "nvme",
-						name:     "/dev/sda",
+			&runner{
+				devices: map[string]deviceParser{
+					"/dev/sda": {
+						ModelName:    "SAMSUNG MZVLB1T0HBLR-000L7",
+						SerialNumber: "S3XY1234567890",
+						Info: deviceInfo{
+							Name:     "/dev/sda",
+							InfoName: "/dev/sda",
+							DevType:  "nvme",
+							name:     "/dev/sda",
+						},
+						Smartctl: smartctlField{
+							Version: []int{7, 1},
+						},
+						SmartStatus: &smartStatus{
+							SerialNumber: true,
+						},
 					},
-					Smartctl: smartctlField{
-						Version: []int{7, 1},
+					"/dev/sdb": {
+						ModelName:    "SAMSUNG MZVLB512HBJQ-000L7",
+						SerialNumber: "S3XY0987654321",
+						Info:         deviceInfo{Name: "/dev/sdb", InfoName: "/dev/sdb", DevType: "nvme", name: "/dev/sdb"},
+						Smartctl:     smartctlField{Version: []int{7, 1}},
+						SmartStatus:  &smartStatus{SerialNumber: true},
 					},
-					SmartStatus: &smartStatus{
-						SerialNumber: true,
-					},
-				},
-				"/dev/sdb": {
-					ModelName:    "SAMSUNG MZVLB512HBJQ-000L7",
-					SerialNumber: "S3XY0987654321",
-					Info:         deviceInfo{Name: "/dev/sdb", InfoName: "/dev/sdb", DevType: "nvme", name: "/dev/sdb"},
-					Smartctl:     smartctlField{Version: []int{7, 1}},
-					SmartStatus:  &smartStatus{SerialNumber: true},
 				},
 			},
 			false,
+		},
+		{
+			"-smartError",
+			args{false},
+			[]expectation{
+				{
+					[]string{"--scan", "-j"},
+					errs.New("test error"),
+					[]byte(""),
+				},
+			},
+			nil,
+			true,
 		},
 	}
 	for _, tt := range tests {
@@ -135,12 +148,19 @@ func TestPlugin_execute(t *testing.T) {
 				t.Fatalf("Plugin.execute() error = %v, wantErr %v", err, tt.wantErr)
 			}
 
-			if diff := cmp.Diff(tt.wantJSONDevices, got.jsonDevices, cmp.AllowUnexported(deviceInfo{})); diff != "" {
-				t.Fatalf("Plugin.execute() runner.jsonDevices = %s", diff)
+			if err != nil {
+				if got != nil {
+					t.Fatal("Plugin.execute() wanted runner on error to be nil")
+				}
+
+				return
 			}
 
-			if diff := cmp.Diff(tt.wantDevices, got.devices, cmp.AllowUnexported(deviceInfo{})); diff != "" {
-				t.Fatalf("Plugin.execute() runner.devices = %s", diff)
+			// removing mock controller
+			got.plugin = nil
+
+			if diff := cmp.Diff(tt.expectedState, got, cmp.AllowUnexported(jsonDevice{}, deviceInfo{}, runner{})); diff != "" {
+				t.Fatalf("Plugin.execute() runner = %s", diff)
 			}
 		})
 	}

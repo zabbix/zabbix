@@ -344,7 +344,7 @@ func (p *Plugin) execute(jsonRunner bool) (*runner, error) {
 
 	r.parseOutput(jsonRunner)
 
-	return r, err
+	return r, nil
 }
 
 // checkVersion checks the version of smartctl.
