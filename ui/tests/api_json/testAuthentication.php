@@ -330,7 +330,7 @@ class testAuthentication extends CAPITest {
 				'authentication' => [
 					'ldap_userdirectoryid' => 99999
 				],
-				'expected_error' => 'Invalid parameter "/ldap_userdirectoryid": referred object does not exist.'
+				'expected_error' => 'Invalid parameter "/ldap_userdirectoryid": object does not exist.'
 			],
 			'Reject invalid ldap_jit_status' => [
 				'authentication' => [
@@ -360,7 +360,7 @@ class testAuthentication extends CAPITest {
 				'authentication' => [
 					'ldap_auth_enabled' => ZBX_AUTH_LDAP_ENABLED
 				],
-				'expected_error' => 'At least one LDAP server must exist.'
+				'expected_error' => 'Default LDAP server must be specified.'
 			],
 			'Disable LDAP with deprovision group and userdirectoryid' => [
 				'authentication' => [
@@ -371,11 +371,10 @@ class testAuthentication extends CAPITest {
 				],
 				'expected_error' => null
 			],
-			'Enable LDAP-only auth' => [
+			'Enable LDAP auth and set it as default auth type' => [
 				'authentication' => [
 					'authentication_type' => ZBX_AUTH_LDAP,
 					'ldap_auth_enabled' => ZBX_AUTH_LDAP_ENABLED,
-					'disabled_usrgrpid' => self::TEST_DATA_TO_RESOLVE['disabled_usrgrpid'],
 					'ldap_userdirectoryid' => self::TEST_DATA_TO_RESOLVE['ldap_userdirectoryid']
 				],
 				'expected_error' => null
@@ -390,7 +389,7 @@ class testAuthentication extends CAPITest {
 				'authentication' => [
 					'ldap_userdirectoryid' => '0'
 				],
-				'expected_error' => 'At least one LDAP server must exist.'
+				'expected_error' => 'Default LDAP server must be specified.'
 			],
 			'Change authentication_type and disable LDAP' => [
 				'authentication' => [
@@ -403,7 +402,7 @@ class testAuthentication extends CAPITest {
 				'authentication' => [
 					'ldap_userdirectoryid' => 99999
 				],
-				'expected_error' => 'Invalid parameter "/ldap_userdirectoryid": referred object does not exist.'
+				'expected_error' => 'Invalid parameter "/ldap_userdirectoryid": object does not exist.'
 			],
 			'Accept set userdirectoryid to 0 while LDAP is disabled' => [
 				'authentication' => [
@@ -415,28 +414,28 @@ class testAuthentication extends CAPITest {
 				'authentication' => [
 					'ldap_auth_enabled' => ZBX_AUTH_LDAP_ENABLED
 				],
-				'expected_error' => 'At least one LDAP server must exist.'
+				'expected_error' => 'Default LDAP server must be specified.'
 			],
 			'Reject enabling LDAP with set userdirectoryid=0' => [
 				'authentication' => [
 					'ldap_auth_enabled' => ZBX_AUTH_LDAP_ENABLED,
 					'ldap_userdirectoryid' => '0'
 				],
-				'expected_error' => 'At least one LDAP server must exist.'
+				'expected_error' => 'Default LDAP server must be specified.'
 			],
 			'Enable LDAP with non-existing userdirectoryid' => [
 				'authentication' => [
 					'ldap_auth_enabled' => ZBX_AUTH_LDAP_ENABLED,
 					'ldap_userdirectoryid' => 99999
 				],
-				'expected_error' => 'Invalid parameter "/ldap_userdirectoryid": referred object does not exist.'
+				'expected_error' => 'Invalid parameter "/ldap_userdirectoryid": object does not exist.'
 			],
 			'Disable LDAP and set non-exist userdirectoryid' => [
 				'authentication' => [
 					'ldap_auth_enabled' => ZBX_AUTH_LDAP_DISABLED,
 					'ldap_userdirectoryid' => 99999
 				],
-				'expected_error' => 'Invalid parameter "/ldap_userdirectoryid": referred object does not exist.'
+				'expected_error' => 'Invalid parameter "/ldap_userdirectoryid": object does not exist.'
 			],
 			'Disable LDAP with existing userdirectoryid' => [
 				'authentication' => [
