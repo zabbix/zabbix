@@ -6010,8 +6010,6 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync, zbx_uint64_t revision)
 
 		ZBX_STR2UINT64(item_preprocid, row[0]);
 
-		preprocitem->revision = revision;
-
 		op = (zbx_dc_preproc_op_t *)DCfind_id_ext(&config->preprocops, item_preprocid,
 				sizeof(zbx_dc_preproc_op_t), &found, uniq);
 
