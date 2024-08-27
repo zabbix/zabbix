@@ -1522,7 +1522,7 @@ class testDashboardPieChartWidget extends testWidgets {
 			// Need additional steps when Data set type is Item list, but only if Host is set at all.
 			if ($type === self::TYPE_ITEM_LIST && array_key_exists('host', $data_set)) {
 				// Select Host.
-				$form->query('button:Add')->one()->click();
+				$form->query('button:Add item')->one()->click();
 				$dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
 				$select = $dialog->query('class:multiselect-control')->asMultiselect()->one();
 				$select->fill($data_set['host']);
@@ -1534,7 +1534,7 @@ class testDashboardPieChartWidget extends testWidgets {
 				foreach ($data_set['items'] as $item) {
 					// Get the correct checkbox in table by knowing only link text;
 					$checkbox_xpath = 'xpath:.//a[text()='.CXPathHelper::escapeQuotes($item['name']).
-							']/../preceding-sibling::td/input[@type="checkbox"]';
+							']/../../preceding-sibling::td/input[@type="checkbox"]';
 					$table->query($checkbox_xpath)->waitUntilPresent()->asCheckbox()->one()->check();
 				}
 

@@ -32,7 +32,7 @@ class CRedirectButtonTest extends CTagTest {
 			],
 			// CSRF token argument exists
 			[
-				['caption', (new CUrl('http://localhost'))->setArgument(CCsrfTokenHelper::CSRF_TOKEN_NAME, 'value')],
+				['caption', (new CUrl('http://localhost'))->setArgument(CSRF_TOKEN_NAME, 'value')],
 				'<button type="button" data-post="1" data-url="http://localhost?_csrf_token=value">caption</button>'
 			],
 			// caption encoding

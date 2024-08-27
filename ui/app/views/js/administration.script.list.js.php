@@ -99,9 +99,7 @@
 		}
 
 		#post(target, scriptids, url) {
-			url.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
-				<?= json_encode(CCsrfTokenHelper::get('script')) ?>
-			);
+			url.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('script')) ?>);
 
 			target.classList.add('is-loading');
 

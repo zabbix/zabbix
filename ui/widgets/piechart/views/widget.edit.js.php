@@ -84,7 +84,7 @@ window.widget_pie_chart_form = new class {
 					jQuery.colorpicker('hide');
 				}
 
-				if (e.target.classList.contains('js-click-expend')
+				if (e.target.classList.contains('js-click-expand')
 						|| e.target.classList.contains('color-picker-preview')
 						|| e.target.classList.contains('<?= ZBX_STYLE_BTN_GREY ?>')) {
 					jQuery('#data_sets').zbx_vertical_accordion('expandNth',
@@ -136,8 +136,16 @@ window.widget_pie_chart_form = new class {
 		}
 
 		this.#dataset_wrapper.addEventListener('click', (e) => {
-			if (e.target.classList.contains('js-add')) {
+			if (e.target.classList.contains('js-add-item')) {
 				this.#selectItems();
+			}
+
+			if (e.target.classList.contains('js-add-widget')) {
+				this.#selectWidget();
+			}
+
+			if (e.target.matches('.single-item-table-row .table-col-name a')) {
+				this.#editItem(e.target);
 			}
 
 			if (e.target.classList.contains('element-table-remove')) {
@@ -165,14 +173,17 @@ window.widget_pie_chart_form = new class {
 			}
 
 			for (let i = 0; i < list.values.length; i++) {
-				this.#addSingleItem(list.values[i].itemid, list.values[i].name, list.values[i].type);
+				this.#addSingleItem({
+					itemid: list.values[i].itemid,
+					name: list.values[i].name,
+					type: list.values[i].type
+				});
 			}
 
-			this.#updateSingleItemsLinks();
 			this.#initSingleItemSortable(this.#getOpenedDataset());
 		}
 
-		this.#updateSingleItemsLinks();
+		this.updateSingleItemsReferences();
 		this.#initDataSetSortable();
 
 		this.#initSingleItemSortable(this.#getOpenedDataset());
@@ -220,7 +231,7 @@ window.widget_pie_chart_form = new class {
 				of: e.target,
 				my: 'left top',
 				at: 'left bottom',
-				within: '.wrapper'
+				within: 'body'
 			}
 		});
 	}
@@ -274,14 +285,15 @@ window.widget_pie_chart_form = new class {
 
 		if (dataset.dataset.type == <?= CWidgetFieldDataSet::DATASET_TYPE_SINGLE_ITEM ?>) {
 			for (const row of dataset.querySelectorAll('.single-item-table-row')) {
-				this.#addSingleItem(
-					row.querySelector(`[name^='ds[${dataset.getAttribute('data-set')}][itemids]`).value,
-					row.querySelector('.table-col-name a').textContent,
-					row.querySelector(`.table-col-type z-select`).value
-				);
+				this.#addSingleItem({
+					itemid: row.querySelector(`[name$='[itemids][]`).value,
+					reference: row.querySelector(`[name$='[references][]`).value,
+					name: row.querySelector('.table-col-name a').textContent,
+					type: row.querySelector(`.table-col-type z-select`).value
+				});
 			}
 
-			this.#updateSingleItemsLinks();
+			this.updateSingleItemsReferences();
 			this.#initSingleItemSortable(cloned_dataset);
 		}
 		else {
@@ -336,7 +348,7 @@ window.widget_pie_chart_form = new class {
 		}
 
 		this.#initDataSetSortable();
-		this.#updateSingleItemsLinks();
+		this.updateSingleItemsReferences();
 		this.#updateForm();
 	}
 
@@ -404,25 +416,159 @@ window.widget_pie_chart_form = new class {
 		}
 	}
 
-	#addSingleItem(itemid, name, type) {
+	#editItem(target) {
 		const dataset = this.#getOpenedDataset();
-		const items_table = dataset.querySelector('.single-item-table');
+		const dataset_index = dataset.getAttribute('data-set');
 
-		if (items_table.querySelector(`input[value="${itemid}"]`) !== null) {
-			return;
+		const row = target.closest('.single-item-table-row');
+		const row_index = row.rowIndex;
+
+		const itemid_input = row.querySelector('input[name$="[itemids][]"');
+
+		if (itemid_input.value !== '0') {
+			const excludeids = [];
+
+			for (const input of dataset.querySelectorAll('.single-item-table-row input[name$="[itemids][]"]')) {
+				if (input.value !== '0') {
+					excludeids.push(input.value);
+				}
+			}
+
+			if (this.#templateid === null) {
+				PopUp('popup.generic', {
+					srctbl: 'items',
+					srcfld1: 'itemid',
+					srcfld2: 'name',
+					dstfrm: widget_svggraph_form._form.id,
+					dstfld1: `items_${dataset_index}_${row_index}_itemid`,
+					dstfld2: `items_${dataset_index}_${row_index}_name`,
+					numeric: 1,
+					writeonly: 1,
+					with_webitems: 1,
+					real_hosts: 1,
+					resolve_macros: 1,
+					excludeids
+				}, {dialogue_class: 'modal-popup-generic'});
+			}
+			else {
+				PopUp('popup.generic', {
+					srctbl: 'items',
+					srcfld1: 'itemid',
+					srcfld2: 'name',
+					dstfrm: widget_svggraph_form._form.id,
+					dstfld1: `items_${dataset_index}_${row_index}_itemid`,
+					dstfld2: `items_${dataset_index}_${row_index}_name`,
+					numeric: 1,
+					writeonly: 1,
+					with_webitems: 1,
+					hostid: this.#templateid,
+					hide_host_filter: 1,
+					excludeids
+				}, {dialogue_class: 'modal-popup-generic'});
+			}
+		}
+		else {
+			const exclude_typed_references = [];
+
+			for (const input of dataset.querySelectorAll('.single-item-table-row input[name$="[references][]"]')) {
+				if (input.value !== '') {
+					exclude_typed_references.push(input.value);
+				}
+			}
+
+			this.#selectWidget(row, exclude_typed_references);
+		}
+	}
+
+	#selectWidget(row = null, exclude_typed_references = []) {
+		const widgets = ZABBIX.Dashboard.getReferableWidgets({
+			type: CWidgetsData.DATA_TYPE_ITEM_ID,
+			widget_context: ZABBIX.Dashboard.getEditingWidgetContext()
+		});
+
+		widgets.sort((a, b) => a.getHeaderName().localeCompare(b.getHeaderName()));
+
+		const result = [];
+
+		for (const widget of widgets) {
+			const typed_reference = CWidgetBase.createTypedReference({
+				reference: widget.getFields().reference,
+				type: CWidgetsData.DATA_TYPE_ITEM_ID
+			});
+
+			if (exclude_typed_references.includes(typed_reference)) {
+				continue;
+			}
+
+			result.push({
+				id: CWidgetBase.createTypedReference({
+					reference: widget.getFields().reference,
+					type: CWidgetsData.DATA_TYPE_ITEM_ID
+				}),
+				name: widget.getHeaderName()
+			});
+
 		}
 
-		const dataset_index = dataset.getAttribute('data-set');
-		const template = new Template(document.querySelector('#dataset-item-row-tmpl').innerHTML);
-		const item_next_index = items_table.querySelectorAll('.single-item-table-row').length + 1;
+		const popup = new CWidgetSelectPopup(result);
 
-		items_table.querySelector('tbody').insertAdjacentHTML('beforeend', template.evaluate({
+		popup.on('dialogue.submit', (e) => {
+			if (row === null) {
+				this.#addSingleItem({
+					reference: e.detail.reference,
+					name: e.detail.name,
+					type: e.detail.type
+				});
+			}
+			else {
+				const name_col = row.querySelector('.table-col-name');
+				const name_col_link = name_col.querySelector('a');
+				const type_input = row.querySelector('z-select');
+				const references_input = row.querySelector('[name$="[references][]"');
+
+				name_col.classList.remove('unavailable-widget');
+				name_col_link.textContent = e.detail.name;
+				type_input.textContent = e.detail.type;
+				references_input.value = e.detail.reference;
+			}
+		});
+	}
+
+	#addSingleItem({itemid = '0', reference = '', name, type} = {}) {
+		const dataset = this.#getOpenedDataset();
+		const dataset_index = dataset.getAttribute('data-set');
+
+		const items_tbody = dataset.querySelector('.single-item-table tbody');
+
+		if (itemid !== '0') {
+			if (items_tbody.querySelector(`input[name$="[itemids][]"][value="${itemid}"]`) !== null) {
+				return;
+			}
+		}
+		else {
+			if (items_tbody.querySelector(`input[name$="[references][]"][value="${reference}"]`) !== null) {
+				return;
+			}
+		}
+
+		const items_new_index = items_tbody.rows.length + 1;
+
+		const template = new Template(document.querySelector('#dataset-item-row-tmpl').innerHTML);
+
+		const row = template.evaluateToElement({
 			dsNum: dataset_index,
-			rowNum: item_next_index,
+			rowNum: items_new_index,
 			name: name,
 			itemid: itemid,
+			reference,
 			type: type
-		}));
+		})
+
+		if (itemid === '0') {
+			row.querySelector('.table-col-name .reference-hint').classList.remove(ZBX_STYLE_DISPLAY_NONE);
+		}
+
+		items_tbody.appendChild(row);
 
 		const used_colors = [];
 
@@ -432,7 +578,7 @@ window.widget_pie_chart_form = new class {
 			}
 		}
 
-		jQuery(`#items_${dataset_index}_${item_next_index}_color`)
+		jQuery(`#items_${dataset_index}_${items_new_index}_color`)
 			.val(colorPalette.getNextColor(used_colors))
 			.colorpicker();
 	}
@@ -443,7 +589,6 @@ window.widget_pie_chart_form = new class {
 		const dataset = this.#getOpenedDataset();
 
 		this.#updateSingleItemsOrder(dataset);
-		this.#updateSingleItemsLinks();
 		this.#initSingleItemSortable(dataset);
 	}
 
@@ -464,57 +609,42 @@ window.widget_pie_chart_form = new class {
 
 		sortable.on(CSortable.EVENT_SORT, () => {
 			this.#updateSingleItemsOrder(dataset);
-			this.#updateSingleItemsLinks();
 		});
 
 		this.#single_items_sortable.set(dataset, sortable);
 	}
 
-	#updateSingleItemsLinks() {
+	updateSingleItemsReferences() {
+		const widgets = ZABBIX.Dashboard
+			.getReferableWidgets({
+				type: CWidgetsData.DATA_TYPE_ITEM_ID,
+				widget_context: ZABBIX.Dashboard.getEditingWidgetContext()
+			})
+			.reduce((map, widget) => map.set(widget.getFields().reference, widget.getHeaderName()), new Map());
+
 		for (const dataset of this.#dataset_wrapper.querySelectorAll('.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>')) {
-			const dataset_index = dataset.getAttribute('data-set');
-			const size = dataset.querySelectorAll('.single-item-table-row').length + 1;
+			for (const row of dataset.querySelectorAll('.single-item-table-row')) {
+				const itemid_input = row.querySelector('input[name$="[itemids][]"');
+				const reference_input = row.querySelector('input[name$="[references][]"');
 
-			for (let i = 0; i < size; i++) {
-				jQuery(`#items_${dataset_index}_${i}_name`).off('click').on('click', () => {
-					let ids = [];
-					for (let i = 0; i < size; i++) {
-						ids.push(jQuery(`#items_${dataset_index}_${i}_input`).val());
-					}
+				if (itemid_input.value !== '0') {
+					continue;
+				}
 
-					if (this.#templateid === null) {
-						PopUp('popup.generic', {
-							srctbl: 'items',
-							srcfld1: 'itemid',
-							srcfld2: 'name',
-							dstfrm: this.#form.id,
-							dstfld1: `items_${dataset_index}_${i}_input`,
-							dstfld2: `items_${dataset_index}_${i}_name`,
-							numeric: 1,
-							writeonly: 1,
-							with_webitems: 1,
-							real_hosts: 1,
-							resolve_macros: 1,
-							excludeids: ids
-						}, {dialogue_class: 'modal-popup-generic'});
-					}
-					else {
-						PopUp('popup.generic', {
-							srctbl: 'items',
-							srcfld1: 'itemid',
-							srcfld2: 'name',
-							dstfrm: this.#form.id,
-							dstfld1: `items_${dataset_index}_${i}_input`,
-							dstfld2: `items_${dataset_index}_${i}_name`,
-							numeric: 1,
-							writeonly: 1,
-							with_webitems: 1,
-							hostid: this.#templateid,
-							hide_host_filter: 1,
-							excludeids: ids
-						}, {dialogue_class: 'modal-popup-generic'});
-					}
-				});
+				const name_col = row.querySelector('.table-col-name');
+				const name_col_link = name_col.querySelector('a');
+				const name_col_hint = name_col.querySelector('.reference-hint');
+
+				const {reference} = CWidgetBase.parseTypedReference(reference_input.value);
+
+				if (reference !== '') {
+					name_col_link.textContent = widgets.get(reference);
+				} else {
+					name_col.classList.add('unavailable-widget');
+					name_col_link.textContent = <?= json_encode(_('Unavailable widget')) ?>;
+				}
+
+				name_col_hint.classList.remove(ZBX_STYLE_DISPLAY_NONE);
 			}
 		}
 	}
@@ -664,8 +794,8 @@ window.widget_pie_chart_form = new class {
 
 		this.#form.querySelector('[for=legend_lines]')
 			.textContent = legend_lines_mode == <?= WidgetForm::LEGEND_LINES_MODE_VARIABLE ?>
-				? '<?= _('Maximum number of rows') ?>'
-				: '<?= _('Number of rows') ?>';
+				? <?= json_encode(_('Maximum number of rows')) ?>
+				: <?= json_encode(_('Number of rows')) ?>;
 
 		// Trigger event to update tab indicators.
 		document.getElementById('tabs').dispatchEvent(new Event(TAB_INDICATOR_UPDATE_EVENT));

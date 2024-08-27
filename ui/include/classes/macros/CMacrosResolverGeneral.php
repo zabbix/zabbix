@@ -167,7 +167,7 @@ class CMacrosResolverGeneral {
 				if ($macro_parser->parse($text, $pos) != CParser::PARSE_FAIL) {
 					$macros[$pos] = $macro_parser->getMatch();
 					$pos += $macro_parser->getLength() - 1;
-					break;;
+					break;
 				}
 			}
 		}
@@ -1012,7 +1012,7 @@ class CMacrosResolverGeneral {
 							break;
 
 						case 'ITEM.LOG.SEVERITY':
-							$value = CSeverityHelper::getName((int) $history[$itemid][0]['severity']);
+							$value = get_item_logtype_description($history[$itemid][0]['severity']);
 							break;
 
 						case 'ITEM.LOG.NSEVERITY':
@@ -1266,7 +1266,7 @@ class CMacrosResolverGeneral {
 						$value = $history[$function['itemid']][0]['source'];
 						break;
 					case 'ITEM.LOG.SEVERITY':
-						$value = CSeverityHelper::getName((int) $history[$function['itemid']][0]['severity']);
+						$value = get_item_logtype_description($history[$function['itemid']][0]['severity']);
 						break;
 					case 'ITEM.LOG.NSEVERITY':
 						$value = $history[$function['itemid']][0]['severity'];

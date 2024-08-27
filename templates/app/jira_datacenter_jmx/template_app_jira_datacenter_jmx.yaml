@@ -41,7 +41,6 @@ zabbix_export:
           type: JMX
           key: 'jmx.discovery[attributes,"com.atlassian.jira:type=jira.license"]'
           history: '0'
-          trends: '0'
           value_type: TEXT
           username: '{$JMX.USER}'
           password: '{$JMX.PASSWORD}'
@@ -76,7 +75,6 @@ zabbix_export:
           name: 'DB: Connections: Limit'
           type: JMX
           key: 'jmx["com.atlassian.jira:name=BasicDataSource,connectionpool=connections",MaxTotal]'
-          history: 7d
           username: '{$JMX.USER}'
           password: '{$JMX.PASSWORD}'
           description: 'Total allowed database connection count.'
@@ -88,7 +86,6 @@ zabbix_export:
           name: 'DB: Connections: Active'
           type: JMX
           key: 'jmx["com.atlassian.jira:name=BasicDataSource,connectionpool=connections",NumActive]'
-          history: 7d
           username: '{$JMX.USER}'
           password: '{$JMX.PASSWORD}'
           description: 'Active database connection count.'
@@ -100,7 +97,6 @@ zabbix_export:
           name: 'DB: Reads'
           type: JMX
           key: 'jmx["com.atlassian.jira:type=db.reads",invocation\.count]'
-          history: 7d
           value_type: FLOAT
           units: rps
           username: '{$JMX.USER}'
@@ -110,8 +106,6 @@ zabbix_export:
             Units: rps - read operations per second.
           preprocessing:
             - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             - tag: component
@@ -120,7 +114,6 @@ zabbix_export:
           name: 'DB: Writes'
           type: JMX
           key: 'jmx["com.atlassian.jira:type=db.writes",invocation\.count]'
-          history: 7d
           value_type: FLOAT
           units: wps
           username: '{$JMX.USER}'
@@ -130,8 +123,6 @@ zabbix_export:
             Units: wps - write operations per second.
           preprocessing:
             - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             - tag: component
@@ -140,7 +131,6 @@ zabbix_export:
           name: 'Entity: Attachments'
           type: JMX
           key: 'jmx["com.atlassian.jira:type=entity.attachments.total",Value]'
-          history: 7d
           username: '{$JMX.USER}'
           password: '{$JMX.PASSWORD}'
           description: 'The number of attachments.'
@@ -154,7 +144,6 @@ zabbix_export:
           name: 'Entity: Components'
           type: JMX
           key: 'jmx["com.atlassian.jira:type=entity.components.total",Value]'
-          history: 7d
           username: '{$JMX.USER}'
           password: '{$JMX.PASSWORD}'
           description: 'The number of components.'
@@ -166,7 +155,6 @@ zabbix_export:
           name: 'Entity: Custom fields'
           type: JMX
           key: 'jmx["com.atlassian.jira:type=entity.customfields.total",Value]'
-          history: 7d
           username: '{$JMX.USER}'
           password: '{$JMX.PASSWORD}'
           description: 'The number of custom fields.'
@@ -178,7 +166,6 @@ zabbix_export:
           name: 'Entity: Filters'
           type: JMX
           key: 'jmx["com.atlassian.jira:type=entity.filters.total",Value]'
-          history: 7d
           username: '{$JMX.USER}'
           password: '{$JMX.PASSWORD}'
           description: 'The number of filters.'
@@ -190,7 +177,6 @@ zabbix_export:
           name: 'Entity: Issues'
           type: JMX
           key: 'jmx["com.atlassian.jira:type=entity.issues.total",Value]'
-          history: 7d
           username: '{$JMX.USER}'
           password: '{$JMX.PASSWORD}'
           description: 'The number of issues.'
@@ -206,7 +192,6 @@ zabbix_export:
           name: 'Entity: Versions created'
           type: JMX
           key: 'jmx["com.atlassian.jira:type=entity.versions.total",Value]'
-          history: 7d
           username: '{$JMX.USER}'
           password: '{$JMX.PASSWORD}'
           description: 'The number of versions created.'
@@ -218,14 +203,11 @@ zabbix_export:
           name: 'Issue: Created per minute'
           type: JMX
           key: 'jmx["com.atlassian.jira:type=issue.created.count",Value]'
-          history: 7d
           username: '{$JMX.USER}'
           password: '{$JMX.PASSWORD}'
           description: 'Issues created per minute.'
           preprocessing:
             - type: SIMPLE_CHANGE
-              parameters:
-                - ''
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             - tag: component
@@ -236,14 +218,11 @@ zabbix_export:
           name: 'Issue: Search per minute'
           type: JMX
           key: 'jmx["com.atlassian.jira:type=issue.search.count",Value]'
-          history: 7d
           username: '{$JMX.USER}'
           password: '{$JMX.PASSWORD}'
           description: 'Issue searches performed per minute.'
           preprocessing:
             - type: SIMPLE_CHANGE
-              parameters:
-                - ''
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             - tag: component
@@ -254,14 +233,11 @@ zabbix_export:
           name: 'Issue: Updates per minute'
           type: JMX
           key: 'jmx["com.atlassian.jira:type=issue.updated.count",Value]'
-          history: 7d
           username: '{$JMX.USER}'
           password: '{$JMX.PASSWORD}'
           description: 'Issue updates performed per minute.'
           preprocessing:
             - type: SIMPLE_CHANGE
-              parameters:
-                - ''
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             - tag: component
@@ -273,7 +249,6 @@ zabbix_export:
           type: JMX
           key: 'jmx["com.atlassian.jira:type=metrics,category00=db,category01=connection,category02=failures,name=counter",Count]'
           delay: 0;m0-59
-          history: 7d
           value_type: FLOAT
           units: fpm
           username: '{$JMX.USER}'
@@ -283,8 +258,6 @@ zabbix_export:
             Units: fpm - fails per minute.
           preprocessing:
             - type: SIMPLE_CHANGE
-              parameters:
-                - ''
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             - tag: component
@@ -293,7 +266,6 @@ zabbix_export:
           name: 'DB: Connections: Latency'
           type: JMX
           key: 'jmx["com.atlassian.jira:type=metrics,category00=db,category01=connection,category02=latency,name=value",Value]'
-          history: 7d
           value_type: FLOAT
           units: ms
           username: '{$JMX.USER}'
@@ -307,7 +279,6 @@ zabbix_export:
           name: 'DB: Pool: Connections: Active'
           type: JMX
           key: 'jmx["com.atlassian.jira:type=metrics,category00=db,category01=connection,category02=pool,category03=numActive,name=value",Value]'
-          history: 7d
           username: '{$JMX.USER}'
           password: '{$JMX.PASSWORD}'
           description: 'Active connection count of the database pool.'
@@ -319,7 +290,6 @@ zabbix_export:
           name: 'DB: Pool: Connections: Idle'
           type: JMX
           key: 'jmx["com.atlassian.jira:type=metrics,category00=db,category01=connection,category02=pool,category03=numIdle,name=value",Value]'
-          history: 7d
           username: '{$JMX.USER}'
           password: '{$JMX.PASSWORD}'
           description: 'Idle connection count of the database pool.'
@@ -342,7 +312,6 @@ zabbix_export:
           name: 'DB: Connections: State'
           type: JMX
           key: 'jmx["com.atlassian.jira:type=metrics,category00=db,category01=connection,category02=state,name=value",Value]'
-          history: 7d
           username: '{$JMX.USER}'
           password: '{$JMX.PASSWORD}'
           description: 'The state of the database connection.'
@@ -367,7 +336,6 @@ zabbix_export:
           name: 'HTTP: Pool: Connections: Active'
           type: JMX
           key: 'jmx["com.atlassian.jira:type=metrics,category00=http,category01=connection,category02=pool,category03=numActive,name=value",Value]'
-          history: 7d
           value_type: FLOAT
           username: '{$JMX.USER}'
           password: '{$JMX.PASSWORD}'
@@ -380,7 +348,6 @@ zabbix_export:
           name: 'HTTP: Pool: Connections: Idle'
           type: JMX
           key: 'jmx["com.atlassian.jira:type=metrics,category00=http,category01=connection,category02=pool,category03=numIdle,name=value",Value]'
-          history: 7d
           value_type: FLOAT
           username: '{$JMX.USER}'
           password: '{$JMX.PASSWORD}'
@@ -404,7 +371,6 @@ zabbix_export:
           name: 'HTTP: Sessions: Active'
           type: JMX
           key: 'jmx["com.atlassian.jira:type=metrics,category00=http,category01=connection,category02=sessions,category03=active,name=value",Value]'
-          history: 7d
           value_type: FLOAT
           username: '{$JMX.USER}'
           password: '{$JMX.PASSWORD}'
@@ -417,7 +383,6 @@ zabbix_export:
           name: 'HTTP: Requests per minute'
           type: JMX
           key: 'jmx["com.atlassian.jira:type=metrics,category00=http,category01=requests,name=value",Value]'
-          history: 7d
           value_type: FLOAT
           username: '{$JMX.USER}'
           password: '{$JMX.PASSWORD}'
@@ -430,7 +395,6 @@ zabbix_export:
           name: 'Mail: Queue: Processing state'
           type: JMX
           key: 'jmx["com.atlassian.jira:type=metrics,category00=mail,category01=queue,category02=jobRunning,name=value",Value]'
-          history: 7d
           value_type: FLOAT
           username: '{$JMX.USER}'
           password: '{$JMX.PASSWORD}'
@@ -445,7 +409,6 @@ zabbix_export:
           name: 'Mail: Sent per minute'
           type: JMX
           key: 'jmx["com.atlassian.jira:type=metrics,category00=mail,category01=queue,category02=numEmailsSentPerMin,name=value",Value]'
-          history: 7d
           value_type: FLOAT
           username: '{$JMX.USER}'
           password: '{$JMX.PASSWORD}'
@@ -458,7 +421,6 @@ zabbix_export:
           name: 'Mail: Queue: Error'
           type: JMX
           key: 'jmx["com.atlassian.jira:type=metrics,category00=mail,category01=queue,category02=numErrors,name=value",Value]'
-          history: 7d
           value_type: FLOAT
           username: '{$JMX.USER}'
           password: '{$JMX.PASSWORD}'
@@ -486,7 +448,6 @@ zabbix_export:
           name: 'Mail: Queue'
           type: JMX
           key: 'jmx["com.atlassian.jira:type=metrics,category00=mail,category01=queue,category02=numItems,name=value",Value]'
-          history: 7d
           value_type: FLOAT
           username: '{$JMX.USER}'
           password: '{$JMX.PASSWORD}'
@@ -512,7 +473,6 @@ zabbix_export:
           name: 'Mail: Processed per minute'
           type: JMX
           key: 'jmx["com.atlassian.jira:type=metrics,category00=mail,category01=queue,category02=numItemsProcessedPerMin,name=value",Value]'
-          history: 7d
           value_type: FLOAT
           username: '{$JMX.USER}'
           password: '{$JMX.PASSWORD}'
@@ -525,14 +485,11 @@ zabbix_export:
           name: 'Quicksearch: Concurrent searches'
           type: JMX
           key: 'jmx["com.atlassian.jira:type=quicksearch.concurrent.search",Value]'
-          history: 7d
           username: '{$JMX.USER}'
           password: '{$JMX.PASSWORD}'
           description: 'The number of concurrent searches that are being performed in real-time by using the quick search.'
           preprocessing:
             - type: SIMPLE_CHANGE
-              parameters:
-                - ''
           jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
           tags:
             - tag: component
@@ -550,11 +507,9 @@ zabbix_export:
             conditions:
               - macro: '{#JMXCATEGORY01}'
                 value: '{$JIRA_DC.LLD.FILTER.MATCHES.HOMEFOLDERS}'
-                formulaid: A
               - macro: '{#JMXCATEGORY01}'
                 value: '{$JIRA_DC.LLD.FILTER.NOT.MATCHES.HOMEFOLDERS}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
           description: 'Discovery of the Jira storage metrics.'
           item_prototypes:
             - uuid: 933c9c8b11e848f88775ee9b54f8d292
@@ -562,7 +517,6 @@ zabbix_export:
               type: JMX
               key: 'jmx["{#JMXOBJ}",Value]'
               delay: 15m
-              history: 7d
               value_type: FLOAT
               units: s
               username: '{$JMX.USER}'
@@ -609,11 +563,9 @@ zabbix_export:
             conditions:
               - macro: '{#JMXNAME}'
                 value: '{$JIRA_DC.LLD.FILTER.MATCHES.INDEXING}'
-                formulaid: A
               - macro: '{#JMXNAME}'
                 value: '{$JIRA_DC.LLD.FILTER.NOT.MATCHES.INDEXING}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
           description: 'Discovery of the Jira indexing metrics.'
           item_prototypes:
             - uuid: 2b02e3232de34ae9803f80ac94ade79c
@@ -621,7 +573,6 @@ zabbix_export:
               type: JMX
               key: 'jmx["com.atlassian.jira:type=metrics,category00=indexing,name={#JMXNAME}",Mean]'
               delay: 15m
-              history: 7d
               value_type: FLOAT
               units: s
               username: '{$JMX.USER}'
@@ -660,11 +611,9 @@ zabbix_export:
             conditions:
               - macro: '{#JMXNAME}'
                 value: '{$JIRA_DC.LLD.FILTER.MATCHES.ISSUE}'
-                formulaid: A
               - macro: '{#JMXNAME}'
                 value: '{$JIRA_DC.LLD.FILTER.NOT.MATCHES.ISSUE}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
           description: 'Discovery of the Jira issue latency metrics.'
           item_prototypes:
             - uuid: da6d68fa14f24f58bcbe1157b9818321
@@ -672,7 +621,6 @@ zabbix_export:
               type: JMX
               key: 'jmx["{#JMXOBJ}",Mean]'
               delay: 15m
-              history: 7d
               value_type: FLOAT
               units: s
               username: '{$JMX.USER}'
@@ -711,18 +659,15 @@ zabbix_export:
             conditions:
               - macro: '{#JMXCATEGORY01}'
                 value: '{$JIRA_DC.LLD.FILTER.MATCHES.MAIL}'
-                formulaid: A
               - macro: '{#JMXCATEGORY01}'
                 value: '{$JIRA_DC.LLD.FILTER.NOT.MATCHES.MAIL}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
           description: 'Discovery of the Jira connected mail servers.'
           item_prototypes:
             - uuid: 5281bee6b829433a875c0e026d805206
               name: 'Mail [{#JMXCATEGORY01},{#JMXNAME}]: Connection state'
               type: JMX
               key: 'jmx["{#JMXOBJ}",Connected]'
-              history: 7d
               username: '{$JMX.USER}'
               password: '{$JMX.PASSWORD}'
               description: 'Shows connection state of Jira to discovered mail server: `{#JMXCATEGORY01}-{#JMXNAME}`'
@@ -730,8 +675,6 @@ zabbix_export:
                 name: 'Connection availability'
               preprocessing:
                 - type: BOOL_TO_DECIMAL
-                  parameters:
-                    - ''
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 - tag: component
@@ -753,14 +696,11 @@ zabbix_export:
               name: 'Mail [{#JMXCATEGORY01},{#JMXNAME}]: Failures per minute'
               type: JMX
               key: 'jmx["{#JMXOBJ}",TotalFailures]'
-              history: 7d
               username: '{$JMX.USER}'
               password: '{$JMX.PASSWORD}'
               description: 'Count of failed connections to discovered mail server `{#JMXCATEGORY01}-{#JMXNAME}` per minute'
               preprocessing:
                 - type: SIMPLE_CHANGE
-                  parameters:
-                    - ''
               jmx_endpoint: 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi'
               tags:
                 - tag: component
@@ -788,25 +728,20 @@ zabbix_export:
           name: ' License discovery'
           type: DEPENDENT
           key: jmx.license.discovery
-          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#LICENSE.TYPE}'
                 value: '{$JIRA_DC.LLD.FILTER.MATCHES.LICENSE}'
-                formulaid: A
               - macro: '{#LICENSE.TYPE}'
                 value: '{$JIRA_DC.LLD.FILTER.NOT.MATCHES.LICENSE}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
           description: 'Discovery of the Jira licenses.'
           item_prototypes:
             - uuid: e2f1224ac6de4a24a50bf6b4356fdd25
               name: 'License [{#LICENSE.TYPE}]: Users: Current'
               type: DEPENDENT
               key: 'jmx.license.get.user.current["{#LICENSE.TYPE}"]'
-              delay: '0'
-              history: 7d
               value_type: FLOAT
               description: 'Current user count for `{#LICENSE.TYPE}`.'
               valuemap:
@@ -828,8 +763,6 @@ zabbix_export:
               name: 'License [{#LICENSE.TYPE}]: Users: Maximum'
               type: DEPENDENT
               key: 'jmx.license.get.user.max["{#LICENSE.TYPE}"]'
-              delay: '0'
-              history: 7d
               value_type: FLOAT
               description: |
                 User count limit for `{#LICENSE.TYPE}`.
@@ -1638,7 +1571,7 @@ zabbix_export:
                       value: '1'
                     - type: STRING
                       name: reference
-                      value: AABAA
+                      value: AABAC
             - name: Mail
               widgets:
                 - type: item

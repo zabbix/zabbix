@@ -42,6 +42,10 @@
 #include <net-snmp/library/large_fd_set.h>
 #include "zbxself.h"
 
+#ifndef EVDNS_BASE_INITIALIZE_NAMESERVERS
+#	define EVDNS_BASE_INITIALIZE_NAMESERVERS	1
+#endif
+
 /*
  * SNMP Dynamic Index Cache
  * ========================
@@ -237,8 +241,6 @@ typedef struct
 }
 zbx_snmp_engineid_record_t;
 
-#undef ZBX_SNMP_MAX_ENGINEID_LEN
-
 static zbx_hash_t	snmp_engineid_cache_hash(const void *data)
 {
 	const zbx_snmp_engineid_record_t	*hv = (const zbx_snmp_engineid_record_t *)data;
@@ -296,6 +298,16 @@ static int	zbx_snmp_cache_handle_engineid(netsnmp_session *session, zbx_dc_item_
 
 	if (0 == engineid_cache_initialized)
 		return SUCCEED;
+
+	if (ZBX_SNMP_MAX_ENGINEID_LEN < session->securityEngineIDLen)
+	{
+		ret = FAIL;
+		item_context->ret = NOTSUPPORTED;
+		SET_MSG_RESULT(&item_context->result, zbx_dsprintf(NULL, "Invalid SNMP engineId length "
+				"\"" ZBX_FS_UI64 "\"", session->securityEngineIDLen));
+
+		goto out;
+	}
 
 	local_record.engineid_len = session->securityEngineIDLen;
 	memcpy(&local_record.engineid, session->securityEngineID, session->securityEngineIDLen);
@@ -380,6 +392,9 @@ static int	zbx_snmp_cache_handle_engineid(netsnmp_session *session, zbx_dc_item_
 			zbx_free(hosts);
 
 			ret = FAIL;
+			item_context->ret = NOTSUPPORTED;
+			SET_MSG_RESULT(&item_context->result, zbx_dsprintf(NULL, "SNMP engineId is not unique"));
+
 			goto out;
 #undef	ZBX_SNMP_ENGINEID_WARNING_PERIOD
 		}
@@ -387,6 +402,8 @@ static int	zbx_snmp_cache_handle_engineid(netsnmp_session *session, zbx_dc_item_
 out:
 	return ret;
 }
+
+#undef ZBX_SNMP_MAX_ENGINEID_LEN
 
 void	zbx_housekeep_snmp_engineid_cache(void)
 {
@@ -1048,7 +1065,7 @@ static char	*zbx_snmp_get_octet_string(const struct variable_list *var, unsigned
 
 	if (ZBX_ASN_OCTET_STR_UTF_8 == snmp_asn_octet_str && NULL == hint)
 	{
-		/* avoid convertion to Hex-STRING for valid UTF-8 strings without hints */
+		/* avoid conversion to Hex-STRING for valid UTF-8 strings without hints */
 		if (NULL != (strval_dyn = zbx_sprint_asn_octet_str_dyn(var)))
 		{
 			type = ZBX_SNMP_STR_ASCII;
@@ -3014,12 +3031,7 @@ static int	snmp_task_process(short event, void *data, int *fd, const char *addr,
 			}
 
 			if (FAIL == zbx_snmp_cache_handle_engineid(session, &snmp_context->item))
-			{
-				snmp_context->item.ret = NOTSUPPORTED;
-				SET_MSG_RESULT(&snmp_context->item.result, zbx_dsprintf(NULL,
-						"SNMP engineId is not unique"));
 				goto stop;
-			}
 
 			if (SNMPERR_SUCCESS != create_user_from_session(session))
 			{

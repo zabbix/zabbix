@@ -29,7 +29,7 @@ $csrf_token = CCsrfTokenHelper::get('userrole');
 
 $form = (new CForm())
 	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
-	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token))->removeId())
+	->addItem((new CVar(CSRF_TOKEN_NAME, $csrf_token))->removeId())
 	->setId('userrole-form')
 	->setName('user_role_form')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID);
@@ -121,7 +121,7 @@ foreach ($data['labels']['sections'] as $section_key => $section_label) {
 					->setVertical()
 					->setColumns(3)
 					->setLayoutFixed()
-					->setEnabled(!$data['readonly'])
+					->setReadonly($data['readonly'])
 			)
 		]);
 	}
@@ -320,7 +320,7 @@ $form_grid
 				'name' => 'api_methods[]',
 				'object_name' => 'api_methods',
 				'data' => $data['rules']['api'],
-				'disabled' => $data['readonly'] || !$data['rules']['api.access'],
+				'readonly' => $data['readonly'] || !$data['rules']['api.access'],
 				'popup' => [
 					'parameters' => [
 						'srctbl' => 'api_methods',
@@ -383,7 +383,7 @@ if ($data['roleid'] !== null) {
 		(new CRedirectButton(_('Delete'),
 			(new CUrl('zabbix.php'))->setArgument('action', 'userrole.delete')
 				->setArgument('roleids', [$data['roleid']])
-				->setArgument(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token),
+				->setArgument(CSRF_TOKEN_NAME, $csrf_token),
 			_('Delete selected role?')
 		))
 			->setId('delete')

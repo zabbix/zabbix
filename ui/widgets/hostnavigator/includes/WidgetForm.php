@@ -23,7 +23,7 @@ use Zabbix\Widgets\{
 
 use Zabbix\Widgets\Fields\{
 	CWidgetFieldCheckBox,
-	CWidgetFieldHostPatternSelect,
+	CWidgetFieldPatternSelectHost,
 	CWidgetFieldIntegerBox,
 	CWidgetFieldMultiSelectGroup,
 	CWidgetFieldMultiSelectOverrideHost,
@@ -57,7 +57,7 @@ class WidgetForm extends CWidgetForm {
 			)
 			->addField($this->isTemplateDashboard()
 				? null
-				: new CWidgetFieldHostPatternSelect('hosts', _('Host patterns'))
+				: new CWidgetFieldPatternSelectHost('hosts', _('Host patterns'))
 			)
 			->addField($this->isTemplateDashboard()
 				? null

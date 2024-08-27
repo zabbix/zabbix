@@ -207,7 +207,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			// #16 Discovery rule update.
 			[
 				[
-					'db' => 'SELECT * FROM drules',
+					'db' => 'SELECT * FROM host_discovery',
 					'link' => 'host_discovery.php?form=update&itemid=400430&context=host',
 					'incorrect_request' => true
 				]
@@ -215,7 +215,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			// #17 Discovery rule create.
 			[
 				[
-					'db' => 'SELECT * FROM drules',
+					'db' => 'SELECT * FROM host_discovery',
 					'link' => 'host_discovery.php?form=create&hostid=50001&context=host',
 					'incorrect_request' => true
 				]
@@ -287,7 +287,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			// #26 Discovery create.
 			[
 				[
-					'db' => 'SELECT * FROM host_discovery',
+					'db' => 'SELECT * FROM drules',
 					'link' => 'zabbix.php?action=discovery.list',
 					'overlay' => 'create'
 				]
@@ -295,7 +295,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			// #27 Discovery update.
 			[
 				[
-					'db' => 'SELECT * FROM host_discovery',
+					'db' => 'SELECT * FROM drules',
 					'link' => 'zabbix.php?action=discovery.list',
 					'overlay' => 'update'
 				]

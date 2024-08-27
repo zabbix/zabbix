@@ -1,0 +1,70 @@
+---
+test case: "No data"
+in:
+  expression: ""
+out:
+  result: ""
+  return: SUCCEED
+---
+test case: "No data with parameter"
+in:
+  expression: ""
+  param1: "value"
+out:
+  result: ""
+  return: SUCCEED
+---
+test case: "Empty data"
+in:
+  expression: "empty"
+out:
+  result: "empty"
+  return: SUCCEED
+---
+test case: "Empty value"
+in:
+  expression: "empty {VALUE}"
+out:
+  result: "empty (null)"
+  return: SUCCEED
+---
+test case: "Empty value 2"
+in:
+  expression: "empty {VALUE}"
+  param1: ""
+out:
+  result: "empty "
+  return: SUCCEED
+---
+test case: "Value"
+in:
+  expression: "{VALUE}"
+  param1: "value"
+out:
+  result: "value"
+  return: SUCCEED
+---
+test case: "Value and one"
+in:
+  expression: "{VALUE} one"
+  param1: "value"
+out:
+  result: "value one"
+  return: SUCCEED
+---
+test case: "One value"
+in:
+  expression: "one {VALUE}"
+  param1: "value"
+out:
+  result: "one value"
+  return: SUCCEED
+---
+test case: "Multiple values"
+in:
+  expression: "one {VALUE} two {VALUE} {VALUE} {VALUE}"
+  param1: "value"
+out:
+  result: "one value two value value value"
+  return: SUCCEED
+...

@@ -24,8 +24,7 @@ function organizeInterfaces(interface_ids_by_types, item_interface_types, item_t
 	const  INTERFACE_TYPE_ANY = -1,
 		INTERFACE_TYPE_OPT = -2,
 		$interface_select = $('#interface-select'),
-		interface_select_node = $interface_select.get(0),
-		selected_interfaceid = +$('#selectedInterfaceId').val();
+		interface_select_node = $interface_select.get(0);
 
 	if (!interface_select_node) {
 		return;
@@ -84,10 +83,6 @@ function organizeInterfaces(interface_ids_by_types, item_interface_types, item_t
 		));
 		$interface_select.show();
 		$('#interface_not_defined').hide();
-	}
-
-	if (selected_interfaceid) {
-		interface_select_node.value = selected_interfaceid;
 	}
 
 	const allowed_opt_interface = (interface_type == INTERFACE_TYPE_OPT);

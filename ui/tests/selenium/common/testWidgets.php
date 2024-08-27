@@ -14,9 +14,13 @@
 **/
 
 
+require_once dirname(__FILE__).'/../../include/CWebTest.php';
+
 class testWidgets extends CWebTest {
 	const HOST_ALL_ITEMS = 'Host for all item value types';
 	const TABLE_SELECTOR = 'xpath://form[@name="itemform"]//table';
+
+	protected static $dashboardid;
 
 	/**
 	 * Gets widget and widget_field tables to compare hash values, excludes widget_fieldid because it can change.
@@ -44,20 +48,20 @@ class testWidgets extends CWebTest {
 		$widget_form = $widget_dialog->asForm();
 		$widget_form->fill(['Type' => CFormElement::RELOADABLE_FILL($widget)]);
 
-		// Assign the form from where the last Select button will be clicked.
-		$select_form = $widget_form;
+		// Assign the dialog from where the last Select button will be clicked.
+		$select_dialog = $widget_dialog;
 
 		// Item types expected in items table. For the most cases theses are all items except of Binary and dependent.
-		$item_types = ($widget === 'Item navigator')
+		$item_types = (in_array($widget, ['Item navigator', 'Item history', 'Honeycomb']))
 			? ['Binary item', 'Character item', 'Float item', 'Log item', 'Text item', 'Unsigned item', 'Unsigned_dependent item']
 			: ['Character item', 'Float item', 'Log item', 'Text item', 'Unsigned item', 'Unsigned_dependent item'];
 
 		switch ($widget) {
 			case 'Top hosts':
+			case 'Item history':
 				$widget_form->getFieldContainer('Columns')->query('button:Add')->one()->waitUntilClickable()->click();
-
-				// For Top hosts widget final dialog is New column dialog.
-				$select_form = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+				$column_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+				$select_dialog = $column_dialog;
 				break;
 
 			case 'Clock':
@@ -79,6 +83,10 @@ class testWidgets extends CWebTest {
 				// For Graph prototype only numeric item prototypes are available.
 				$item_types = ['Float item prototype', 'Unsigned item prototype', 'Unsigned_dependent item prototype'];
 				break;
+
+			case 'Honeycomb':
+				$select_dialog = $widget_form->getFieldContainer('Item patterns');
+				break;
 		}
 
 		if ($widget === 'Item navigator') {
@@ -90,7 +98,7 @@ class testWidgets extends CWebTest {
 				: 'button:Select';
 		}
 
-		$select_form->query($select_button)->one()->waitUntilClickable()->click();
+		$select_dialog->query($select_button)->one()->waitUntilClickable()->click();
 
 		// Open the dialog where items will be tested.
 		$items_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
@@ -104,13 +112,13 @@ class testWidgets extends CWebTest {
 		$table->waitUntilReloaded();
 		$this->assertTableDataColumn($item_types, 'Name', self::TABLE_SELECTOR);
 
-		$items_dialog->close();
+		// Close all dialogs.
+		$dialogs = COverlayDialogElement::find()->all();
 
-		if ($widget === 'Top hosts') {
-			$select_form->close();
+		$dialog_count = $dialogs->count();
+		for ($i = $dialog_count - 1; $i >= 0; $i--) {
+			$dialogs->get($i)->close(true);
 		}
-
-		$widget_dialog->close();
 	}
 
 	/**
@@ -178,5 +186,18 @@ class testWidgets extends CWebTest {
 		$form = $dashboard->getWidget($widget_name)->edit()->asForm();
 		$form->fill($configuration);
 		$form->submit();
+	}
+
+	/**
+	 * Function for deletion widgets from test dashboard after case.
+	 */
+	public static function deleteWidgets() {
+		DBexecute('DELETE FROM widget'.
+			' WHERE dashboard_pageid'.
+			' IN (SELECT dashboard_pageid'.
+				' FROM dashboard_page'.
+				' WHERE dashboardid='.zbx_dbstr(static::$dashboardid).
+			')'
+		);
 	}
 }

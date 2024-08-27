@@ -247,7 +247,7 @@ class CElasticsearchHelper {
 			}
 
 			$field_type = $schema['fields'][$field]['type'];
-			if (in_array($field_type, [DB::FIELD_TYPE_TEXT, DB::FIELD_TYPE_NCLOB, DB::FIELD_TYPE_CHAR])) {
+			if ($field_type === DB::FIELD_TYPE_CHAR || $field_type === DB::FIELD_TYPE_TEXT) {
 				continue;
 			}
 
@@ -297,7 +297,7 @@ class CElasticsearchHelper {
 			}
 
 			$field_type = $schema['fields'][$field]['type'];
-			if (!in_array($field_type, [DB::FIELD_TYPE_TEXT, DB::FIELD_TYPE_NCLOB, DB::FIELD_TYPE_CHAR])) {
+			if ($field_type !== DB::FIELD_TYPE_CHAR && $field_type !== DB::FIELD_TYPE_TEXT) {
 				continue;
 			}
 

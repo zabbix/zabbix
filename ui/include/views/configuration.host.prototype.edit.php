@@ -42,7 +42,7 @@ $url = (new CUrl('host_prototypes.php'))
 
 $form = (new CForm('post', $url))
 	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
-	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('host_prototypes.php')))->removeId())
+	->addItem((new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('host_prototypes.php')))->removeId())
 	->setId('host-prototype-form')
 	->setName('hostPrototypeForm')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
@@ -176,7 +176,7 @@ $host_tab->addRow(
 	(new CMultiSelect([
 		'name' => 'group_links[]',
 		'object_name' => 'hostGroup',
-		'disabled' => (bool) $host_prototype['templateid'],
+		'readonly' => (bool) $host_prototype['templateid'],
 		'data' => $data['groups_ms'],
 		'popup' => [
 			'parameters' => [
@@ -264,7 +264,7 @@ $host_tab->addRow(
 		(new CRadioButtonList('custom_interfaces', (int) $host_prototype['custom_interfaces']))
 			->addValue(_('Inherit'), HOST_PROT_INTERFACES_INHERIT)
 			->addValue(_('Custom'), HOST_PROT_INTERFACES_CUSTOM)
-			->setModern(true)
+			->setModern()
 			->setReadonly($host_prototype['templateid'] != 0),
 		(new CDiv([$interface_header, $agent_interfaces, $snmp_interfaces, $jmx_interfaces, $ipmi_interfaces]))
 			->setId('interfaces-table')
@@ -406,7 +406,7 @@ $macro_tab = (new CFormList('macrosFormList'))
 	->addRow(null, (new CRadioButtonList('show_inherited_macros', (int) $data['show_inherited_macros']))
 		->addValue(_('Host prototype macros'), 0)
 		->addValue(_('Inherited and host prototype macros'), 1)
-		->setModern(true)
+		->setModern()
 	)
 	->addRow(
 		null,
@@ -512,7 +512,7 @@ $tabs->addTab('inventoryTab', _('Inventory'),
 				->addValue(_('Manual'), HOST_INVENTORY_MANUAL)
 				->addValue(_('Automatic'), HOST_INVENTORY_AUTOMATIC)
 				->setReadonly($host_prototype['templateid'] != 0)
-				->setModern(true)
+				->setModern()
 		),
 	TAB_INDICATOR_INVENTORY
 );
@@ -524,23 +524,27 @@ $encryption_tab = (new CFormList('encryption'))
 			->addValue(_('No encryption'), HOST_ENCRYPTION_NONE)
 			->addValue(_('PSK'), HOST_ENCRYPTION_PSK)
 			->addValue(_('Certificate'), HOST_ENCRYPTION_CERTIFICATE)
-			->setModern(true)
-			->setEnabled(false)
+			->setModern()
+			->setEnabled($data['context'] !== 'template')
+			->setReadonly($data['context'] !== 'template')
 	)
 	->addRow(_('Connections from host'),
 		(new CList())
 			->addClass(ZBX_STYLE_LIST_CHECK_RADIO)
 			->addItem((new CCheckBox('tls_in_none'))
 				->setLabel(_('No encryption'))
-				->setAttribute('disabled', 'disabled')
+				->setEnabled($data['context'] !== 'template')
+				->setReadonly($data['context'] !== 'template')
 			)
 			->addItem((new CCheckBox('tls_in_psk'))
 				->setLabel(_('PSK'))
-				->setAttribute('disabled', 'disabled')
+				->setEnabled($data['context'] !== 'template')
+				->setReadonly($data['context'] !== 'template')
 			)
 			->addItem((new CCheckBox('tls_in_cert'))
 				->setLabel(_('Certificate'))
-				->setAttribute('disabled', 'disabled')
+				->setEnabled($data['context'] !== 'template')
+				->setReadonly($data['context'] !== 'template')
 			)
 	)
 	->addRow(_('PSK'),
@@ -551,14 +555,14 @@ $encryption_tab = (new CFormList('encryption'))
 		'tls_psk'
 	)
 	->addRow(_('Issuer'),
-		(new CTextBox('tls_issuer', $parent_host['tls_issuer'], false, 1024))
+		(new CTextBox('tls_issuer', $parent_host['tls_issuer'], $data['context'] !== 'template', 1024))
 			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
-			->setAttribute('disabled', 'disabled')
+			->setEnabled($data['context'] !== 'template')
 	)
 	->addRow(_x('Subject', 'encryption certificate'),
-		(new CTextBox('tls_subject', $parent_host['tls_subject'], false, 1024))
+		(new CTextBox('tls_subject', $parent_host['tls_subject'], $data['context'] !== 'template', 1024))
 			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
-			->setAttribute('disabled', 'disabled')
+			->setEnabled($data['context'] !== 'template')
 	);
 
 $tabs->addTab('encryptionTab', _('Encryption'), $encryption_tab, TAB_INDICATOR_ENCRYPTION);
@@ -570,7 +574,7 @@ if ($host_prototype['hostid'] != 0) {
 			new CSubmit('clone', _('Clone')),
 			(new CButtonDelete(
 				_('Delete selected host prototype?'),
-				url_params(['form', 'hostid', 'parent_discoveryid', 'context']).'&'.CCsrfTokenHelper::CSRF_TOKEN_NAME.
+				url_params(['form', 'hostid', 'parent_discoveryid', 'context']).'&'.CSRF_TOKEN_NAME.
 				'='.CCsrfTokenHelper::get('host_prototypes.php'), 'context'
 			))->setEnabled($host_prototype['templateid'] == 0),
 			new CButtonCancel(url_params(['parent_discoveryid', 'context']))

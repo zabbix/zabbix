@@ -205,6 +205,9 @@ function getSystemStatusData(array $filter) {
 
 		$visible_problems = [];
 
+		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
+		$problems = CScreenProblem::sortData(['problems' => $problems], $limit, 'clock', ZBX_SORT_DOWN)['problems'];
+
 		foreach ($problems as $eventid => $problem) {
 			$trigger = $data['triggers'][$problem['objectid']];
 
@@ -347,6 +350,25 @@ function getSystemStatusTotals(array $data) {
 		}
 	}
 
+	foreach ($groups_totals[0]['stats'] as &$stat) {
+		if ($stat['count'] > 0 || $stat['count_unack'] > 0) {
+			$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
+
+			if ($stat['count'] > 0) {
+				$stat['problems'] = CScreenProblem::sortData(['problems' => $stat['problems']], $limit, 'clock',
+					ZBX_SORT_DOWN
+				)['problems'];
+			}
+
+			if ($stat['count_unack'] > 0) {
+				$stat['problems_unack'] = CScreenProblem::sortData(['problems' => $stat['problems_unack']], $limit,
+					'clock', ZBX_SORT_DOWN
+				)['problems'];
+			}
+		}
+	}
+	unset($stat);
+
 	return $groups_totals;
 }
 
@@ -466,9 +488,6 @@ function getSeverityTableCell($severity, array $data, array $stat, $is_total = f
 		return '';
 	}
 
-	$severity_name = $is_total ? ' '.CSeverityHelper::getName($severity) : '';
-	$ext_ack = array_key_exists('ext_ack', $data['filter']) ? $data['filter']['ext_ack'] : EXTACK_OPTION_ALL;
-
 	$allTriggersNum = $stat['count'];
 	if ($allTriggersNum) {
 		$allTriggersNum = (new CLinkAction($allTriggersNum))
@@ -485,24 +504,27 @@ function getSeverityTableCell($severity, array $data, array $stat, $is_total = f
 			));
 	}
 
+	$ext_ack = array_key_exists('ext_ack', $data['filter']) ? $data['filter']['ext_ack'] : EXTACK_OPTION_ALL;
+	$severity_name = $is_total ? CSeverityHelper::getName($severity) : '';
+
 	switch ($ext_ack) {
 		case EXTACK_OPTION_ALL:
 			return CSeverityHelper::makeSeverityCell($severity, [
 				(new CSpan($allTriggersNum))->addClass(ZBX_STYLE_TOTALS_LIST_COUNT),
-				$severity_name
+				(new CSpan($severity_name))->addClass(ZBX_STYLE_TOTALS_LIST_NAME)->setTitle($severity_name)
 			], false, $is_total);
 
 		case EXTACK_OPTION_UNACK:
 			return CSeverityHelper::makeSeverityCell($severity, [
 				(new CSpan($unackTriggersNum))->addClass(ZBX_STYLE_TOTALS_LIST_COUNT),
-				$severity_name
+				(new CSpan($severity_name))->addClass(ZBX_STYLE_TOTALS_LIST_NAME)->setTitle($severity_name)
 			], false, $is_total);
 
 		case EXTACK_OPTION_BOTH:
 			return CSeverityHelper::makeSeverityCell($severity, [
 				(new CSpan([$unackTriggersNum, ' '._('of').' ', $allTriggersNum]))
 					->addClass(ZBX_STYLE_TOTALS_LIST_COUNT),
-				$severity_name
+				(new CSpan($severity_name))->addClass(ZBX_STYLE_TOTALS_LIST_NAME)->setTitle($severity_name)
 			], false, $is_total);
 
 		default:

@@ -50,7 +50,6 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.33333.8.45.0
           key: 'control.mode[controlMode.0]'
-          history: 7d
           value_type: FLOAT
           description: |
             MIB: TRISTAR
@@ -71,7 +70,6 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.33333.8.39.0
           key: 'counter.charge_amp_hours[ahResettable.0]'
-          history: 7d
           value_type: FLOAT
           units: Ah
           description: |
@@ -93,7 +91,6 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.33333.8.49.0
           key: 'counter.charge_kw_hours[kilowattHours.0]'
-          history: 7d
           value_type: FLOAT
           units: '!kWh'
           description: |
@@ -120,7 +117,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.4.1.33333.8.42.0
           key: 'status.alarms[alarms.0]'
           history: 1h
-          trends: '0'
           value_type: TEXT
           description: |
             MIB: TRISTAR
@@ -310,7 +306,6 @@ zabbix_export:
           snmp_oid: 1.3.6.1.4.1.33333.8.43.0
           key: 'status.faults[faults.0]'
           history: 1h
-          trends: '0'
           value_type: TEXT
           description: |
             MIB: TRISTAR
@@ -456,7 +451,6 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.25.1.1.0
           key: status.hw.uptime
-          history: 7d
           units: uptime
           description: 'The amount of time since this host was last initialized. Note that this is different from sysUpTime in the SNMPv2-MIB [RFC1907] because sysUpTime is the uptime of the network management portion of the system.'
           preprocessing:
@@ -476,7 +470,6 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.3.0
           key: status.net.uptime
-          history: 7d
           units: uptime
           description: 'The time (in hundredths of a second) since the network management portion of the system was last re-initialized.'
           preprocessing:
@@ -502,7 +495,6 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.33333.8.37.0
           key: 'temp.battery[batteryTemperature.0]'
-          history: 7d
           value_type: FLOAT
           units: C
           description: |
@@ -563,7 +555,6 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.33333.8.36.0
           key: 'temp.heatsink[heatsinkTemperature.0]'
-          history: 7d
           value_type: FLOAT
           units: C
           description: |
@@ -581,7 +572,6 @@ zabbix_export:
           name: 'Battery voltage discovery'
           type: DEPENDENT
           key: battery.voltage.discovery
-          delay: '0'
           description: 'Discovery for battery voltage triggers'
           item_prototypes:
             - uuid: e1960caed8c44606bb684e28cdfac3c7
@@ -589,7 +579,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: 1.3.6.1.4.1.33333.8.30.0
               key: 'battery.voltage[batteryVoltage.0{#SINGLETON}]'
-              history: 7d
               value_type: FLOAT
               units: V
               description: |
@@ -693,7 +682,6 @@ zabbix_export:
           name: 'Charge mode discovery'
           type: DEPENDENT
           key: controlmode.charge.discovery
-          delay: '0'
           lifetime: 1h
           description: 'Discovery for device in charge mode'
           item_prototypes:
@@ -702,7 +690,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: 1.3.6.1.4.1.33333.8.32.0
               key: 'array.voltage[arrayloadVoltage.0{#SINGLETON}]'
-              history: 7d
               value_type: FLOAT
               units: V
               description: |
@@ -728,7 +715,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: 1.3.6.1.4.1.33333.8.33.0
               key: 'charge.current[chargeCurrent.0{#SINGLETON}]'
-              history: 7d
               value_type: FLOAT
               units: A
               description: |
@@ -776,7 +762,6 @@ zabbix_export:
           name: 'Charge + Diversion mode discovery'
           type: DEPENDENT
           key: controlmode.charge_diversion.discovery
-          delay: '0'
           lifetime: 1h
           description: 'Discovery for device in charge and diversion modes'
           item_prototypes:
@@ -785,7 +770,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: 1.3.6.1.4.1.33333.8.46.0
               key: 'charge.state[controlState.0{#SINGLETON}]'
-              history: 7d
               value_type: FLOAT
               description: |
                 MIB: TRISTAR
@@ -825,7 +809,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: 1.3.6.1.4.1.33333.8.38.0
               key: 'target.voltage[targetVoltage.0{#SINGLETON}]'
-              history: 7d
               value_type: FLOAT
               units: V
               description: |
@@ -858,7 +841,6 @@ zabbix_export:
           name: 'Diversion mode discovery'
           type: DEPENDENT
           key: controlmode.diversion.discovery
-          delay: '0'
           lifetime: 1h
           description: 'Discovery for device in diversion mode'
           item_prototypes:
@@ -867,7 +849,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: 1.3.6.1.4.1.33333.8.48.0
               key: 'diversion.pwm_duty_cycle[pwmDutyCycle.0{#SINGLETON}]'
-              history: 7d
               value_type: FLOAT
               description: |
                 MIB: TRISTAR
@@ -897,7 +878,6 @@ zabbix_export:
           name: 'Load mode discovery'
           type: DEPENDENT
           key: controlmode.load.discovery
-          delay: '0'
           lifetime: 1h
           description: 'Discovery for device in load mode'
           item_prototypes:
@@ -906,7 +886,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: 1.3.6.1.4.1.33333.8.47.0
               key: 'load.state[loadState.0{#SINGLETON}]'
-              history: 7d
               value_type: FLOAT
               description: |
                 MIB: TRISTAR
@@ -961,7 +940,6 @@ zabbix_export:
           name: 'Load + Diversion mode discovery'
           type: DEPENDENT
           key: controlmode.load_diversion.discovery
-          delay: '0'
           lifetime: 1h
           description: 'Discovery for device in load and diversion modes'
           item_prototypes:
@@ -970,7 +948,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: 1.3.6.1.4.1.33333.8.34.0
               key: 'load.current[loadCurrent.0{#SINGLETON}]'
-              history: 7d
               value_type: FLOAT
               units: A
               description: |
@@ -996,7 +973,6 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: 1.3.6.1.4.1.33333.8.32.0
               key: 'load.voltage[arrayloadVoltage.0{#SINGLETON}]'
-              history: 7d
               value_type: FLOAT
               units: V
               description: |

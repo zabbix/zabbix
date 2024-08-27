@@ -7,7 +7,7 @@
 	"version": "1.0",
 	"author": "Zabbix",
 	"description": "Displays top N hosts that have the highest or the lowest item value (for example, CPU load) with an option to add progress-bar visualizations and customize report columns.",
-	"url": "https://www.zabbix.com/documentation/7.2/en/manual/web_interface/frontend_sections/dashboards/widgets/top_hosts",
+	"url": "web_interface/frontend_sections/dashboards/widgets/top_hosts",
 	"widget": {
 		"js_class": "CWidgetTopHosts",
 		"in": {

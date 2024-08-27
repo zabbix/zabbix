@@ -755,7 +755,7 @@ class CTestDataHelper {
 		self::convertPropertyReference($user_groups, 'usrgrpid');
 		self::convertPropertyReference($user_groups, 'templategroup_rights.id');
 		self::convertPropertyReference($user_groups, 'hostgroup_rights.id');
-		self::convertPropertyReference($user_groups, 'users');
+		self::convertPropertyReference($user_groups, 'users.usrgrpid');
 	}
 
 	private static function createUsers(array $users): void {

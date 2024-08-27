@@ -27,6 +27,10 @@
 #	include	"zbxfile.h"
 #endif
 
+#if defined(_WINDOWS) || defined(__MINGW32__)
+#	include "zbxlog.h"
+#endif
+
 #include "zbxalgo.h"
 #include "zbxregexp.h"
 #include "zbxstr.h"

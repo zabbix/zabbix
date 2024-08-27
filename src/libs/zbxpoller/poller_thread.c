@@ -845,6 +845,9 @@ ZBX_THREAD_ENTRY(zbx_poller_thread, args)
 	const zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
 	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
 	zbx_uint32_t		rtc_msgs[] = {ZBX_RTC_SNMP_CACHE_RELOAD};
+#ifdef HAVE_NETSNMP
+	time_t			last_snmp_engineid_hk_time = 0;
+#endif
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
@@ -947,6 +950,16 @@ ZBX_THREAD_ENTRY(zbx_poller_thread, args)
 			if (ZBX_RTC_SHUTDOWN == rtc_cmd)
 				break;
 		}
+#ifdef HAVE_NETSNMP
+#define	SNMP_ENGINEID_HK_INTERVAL	86400
+		if ((ZBX_POLLER_TYPE_NORMAL == poller_type || ZBX_POLLER_TYPE_UNREACHABLE == poller_type) &&
+				time(NULL) >= SNMP_ENGINEID_HK_INTERVAL + last_snmp_engineid_hk_time)
+		{
+			last_snmp_engineid_hk_time = time(NULL);
+			zbx_clear_cache_snmp(process_type, process_num);
+		}
+#undef SNMP_ENGINEID_HK_INTERVAL
+#endif
 	}
 
 	scriptitem_es_engine_destroy();

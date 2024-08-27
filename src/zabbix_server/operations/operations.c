@@ -891,11 +891,12 @@ static void	discovered_host_tags_save(zbx_uint64_t hostid, zbx_vector_db_tag_ptr
 			}
 		}
 
-		res = zbx_db_insert_execute(&db_insert_tag);
-
-		zbx_db_insert_clean(&db_insert_tag);
-
-		if (SUCCEED == res)
+		if (SUCCEED != (res = zbx_db_insert_execute(&db_insert_tag)))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "failed to add tags to discovered host, hostid = " ZBX_FS_UI64,
+					hostid);
+		}
+		else
 		{
 			hosttagid = first_hosttagid;
 
@@ -911,11 +912,8 @@ static void	discovered_host_tags_save(zbx_uint64_t hostid, zbx_vector_db_tag_ptr
 				}
 			}
 		}
-		else
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "failed to add tags to discovered host, hostid = " ZBX_FS_UI64,
-					hostid);
-		}
+
+		zbx_db_insert_clean(&db_insert_tag);
 	}
 
 	if (SUCCEED == res && 0 != del_tagids.values_num)
@@ -927,7 +925,12 @@ static void	discovered_host_tags_save(zbx_uint64_t hostid, zbx_vector_db_tag_ptr
 		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hosttagid", del_tagids.values,
 				del_tagids.values_num);
 
-		if (ZBX_DB_OK == zbx_db_execute("%s", sql))
+		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "failed to delete tags from a discovered host, hostid = "
+					ZBX_FS_UI64, hostid);
+		}
+		else
 		{
 			for (int i = 0; i < host_tags->values_num; i++)
 			{
@@ -939,11 +942,6 @@ static void	discovered_host_tags_save(zbx_uint64_t hostid, zbx_vector_db_tag_ptr
 							hostid, tag->tagid);
 				}
 			}
-		}
-		else
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "failed to delete tags from a discovered host, hostid = "
-					ZBX_FS_UI64, hostid);
 		}
 
 		zbx_free(sql);
@@ -989,7 +987,7 @@ void	op_host_del(const zbx_db_event *event)
 	zbx_vector_uint64_t	hostids;
 	zbx_vector_str_t	hostnames;
 	zbx_uint64_t		hostid;
-	char			*hostname = NULL;
+	char			*hostname = NULL, *hostname_esc = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1005,8 +1003,8 @@ void	op_host_del(const zbx_db_event *event)
 	zbx_vector_str_append(&hostnames, zbx_strdup(NULL, hostname));
 
 	zbx_db_delete_hosts_with_prototypes(&hostids, &hostnames, zbx_map_db_event_to_audit_context(event));
-
-	zbx_db_execute("delete from autoreg_host where host='%s'", hostname);
+	hostname_esc = zbx_db_dyn_escape_string(hostname);
+	zbx_db_execute("delete from autoreg_host where host='%s'", hostname_esc);
 
 	zbx_vector_str_clear_ext(&hostnames, zbx_str_free);
 	zbx_vector_str_destroy(&hostnames);
@@ -1015,6 +1013,7 @@ void	op_host_del(const zbx_db_event *event)
 	zbx_audit_host_del(zbx_map_db_event_to_audit_context(event), hostid, hostname);
 out:
 	zbx_free(hostname);
+	zbx_free(hostname_esc);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 

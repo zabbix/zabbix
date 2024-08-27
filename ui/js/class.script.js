@@ -157,7 +157,7 @@ class Script {
 					overlay.recoverFocus();
 					overlay.containFocus();
 
-					const messages = [t('Invalid URL: %1$s').replace('%1$s', e.detail.url)];
+					const messages = [sprintf(t('Invalid URL: %1$s'), e.detail.url)];
 					const title = t('Cannot open URL');
 					const message_box = makeMessageBox('bad', messages, title)[0];
 
@@ -359,7 +359,7 @@ class Script {
 			eventid: eventid ?? undefined,
 			hostid: hostid ?? undefined,
 			manualinput: manualinput ?? undefined,
-			_csrf_token: csrf_token
+			[CSRF_TOKEN_NAME]: csrf_token
 		}, {
 			dialogue_class: 'modal-popup-medium', trigger_element
 		});

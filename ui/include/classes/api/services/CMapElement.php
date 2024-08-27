@@ -64,16 +64,14 @@ abstract class CMapElement extends CApiService {
 					$url_validate_options['allow_inventory_macro'] = INVENTORY_URL_MACRO_NONE;
 				}
 
-				foreach ($selement['urls'] as $url_data) {
+				foreach ($selement['urls'] as &$url_data) {
 					if (!CHtmlUrlValidator::validate($url_data['url'], $url_validate_options)) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong value for "url" field.'));
 					}
-				}
-			}
 
-			if ($update && array_key_exists('selementid', $selement)
-						&& array_key_exists($selement['selementid'], $db_selements)) {
-				$db_selement = $db_selements[$selement['selementid']];
+					unset($url_data['sysmapelementurlid'], $url_data['selementid']);
+				}
+				unset($url_data);
 			}
 
 			if (!$elementtype_validator->validate($selement['elementtype'])) {

@@ -59,6 +59,12 @@ else {
 					if ($data['readonly']) {
 						// Make all links inside inactive.
 						$obj = new CSpan($obj->items);
+
+						// Decode HTML entities in trigger expressions.
+						foreach ($obj->items as &$obj_item) {
+							$obj_item = htmlspecialchars_decode($obj_item, ENT_NOQUOTES);
+						}
+						unset($obj_item);
 					}
 					else {
 						$obj->addClass(($data['expression_type'] === TRIGGER_EXPRESSION)
@@ -83,7 +89,7 @@ else {
 							)
 							->removeId()
 						: null,
-					(new CDiv($e['list']))->addClass(ZBX_STYLE_WORDWRAP),
+					(new CDiv($e['list']))->addClass(ZBX_STYLE_WORDBREAK),
 					!$data['readonly']
 						? (new CCol((new CButtonLink(_('Remove')))
 							->addClass(($data['expression_type'] === TRIGGER_EXPRESSION)

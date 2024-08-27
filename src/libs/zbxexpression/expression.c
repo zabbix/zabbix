@@ -14,7 +14,6 @@
 
 #include "zbxexpression.h"
 #include "expression.h"
-#include "evalfunc.h"
 #include "datafunc.h"
 
 #ifdef HAVE_LIBXML2
@@ -25,7 +24,6 @@
 #include "zbxeval.h"
 #include "zbxdbwrap.h"
 #include "zbxcachevalue.h"
-#include "macrofunc.h"
 #include "zbxstr.h"
 #include "zbxexpr.h"
 #include "zbxparam.h"
@@ -79,49 +77,6 @@ static char	*format_user_fullname(const char *name, const char *surname, const c
 
 	return buf;
 }
-
-#define STR_UNKNOWN_VARIABLE		"*UNKNOWN*"
-
-/* macros that can be indexed */
-static const char	*ex_macros[] =
-{
-	MVAR_INVENTORY_TYPE, MVAR_INVENTORY_TYPE_FULL,
-	MVAR_INVENTORY_NAME, MVAR_INVENTORY_ALIAS, MVAR_INVENTORY_OS, MVAR_INVENTORY_OS_FULL, MVAR_INVENTORY_OS_SHORT,
-	MVAR_INVENTORY_SERIALNO_A, MVAR_INVENTORY_SERIALNO_B, MVAR_INVENTORY_TAG,
-	MVAR_INVENTORY_ASSET_TAG, MVAR_INVENTORY_MACADDRESS_A, MVAR_INVENTORY_MACADDRESS_B,
-	MVAR_INVENTORY_HARDWARE, MVAR_INVENTORY_HARDWARE_FULL, MVAR_INVENTORY_SOFTWARE, MVAR_INVENTORY_SOFTWARE_FULL,
-	MVAR_INVENTORY_SOFTWARE_APP_A, MVAR_INVENTORY_SOFTWARE_APP_B, MVAR_INVENTORY_SOFTWARE_APP_C,
-	MVAR_INVENTORY_SOFTWARE_APP_D, MVAR_INVENTORY_SOFTWARE_APP_E, MVAR_INVENTORY_CONTACT, MVAR_INVENTORY_LOCATION,
-	MVAR_INVENTORY_LOCATION_LAT, MVAR_INVENTORY_LOCATION_LON, MVAR_INVENTORY_NOTES, MVAR_INVENTORY_CHASSIS,
-	MVAR_INVENTORY_MODEL, MVAR_INVENTORY_HW_ARCH, MVAR_INVENTORY_VENDOR, MVAR_INVENTORY_CONTRACT_NUMBER,
-	MVAR_INVENTORY_INSTALLER_NAME, MVAR_INVENTORY_DEPLOYMENT_STATUS, MVAR_INVENTORY_URL_A, MVAR_INVENTORY_URL_B,
-	MVAR_INVENTORY_URL_C, MVAR_INVENTORY_HOST_NETWORKS, MVAR_INVENTORY_HOST_NETMASK, MVAR_INVENTORY_HOST_ROUTER,
-	MVAR_INVENTORY_OOB_IP, MVAR_INVENTORY_OOB_NETMASK, MVAR_INVENTORY_OOB_ROUTER, MVAR_INVENTORY_HW_DATE_PURCHASE,
-	MVAR_INVENTORY_HW_DATE_INSTALL, MVAR_INVENTORY_HW_DATE_EXPIRY, MVAR_INVENTORY_HW_DATE_DECOMM,
-	MVAR_INVENTORY_SITE_ADDRESS_A, MVAR_INVENTORY_SITE_ADDRESS_B, MVAR_INVENTORY_SITE_ADDRESS_C,
-	MVAR_INVENTORY_SITE_CITY, MVAR_INVENTORY_SITE_STATE, MVAR_INVENTORY_SITE_COUNTRY, MVAR_INVENTORY_SITE_ZIP,
-	MVAR_INVENTORY_SITE_RACK, MVAR_INVENTORY_SITE_NOTES, MVAR_INVENTORY_POC_PRIMARY_NAME,
-	MVAR_INVENTORY_POC_PRIMARY_EMAIL, MVAR_INVENTORY_POC_PRIMARY_PHONE_A, MVAR_INVENTORY_POC_PRIMARY_PHONE_B,
-	MVAR_INVENTORY_POC_PRIMARY_CELL, MVAR_INVENTORY_POC_PRIMARY_SCREEN, MVAR_INVENTORY_POC_PRIMARY_NOTES,
-	MVAR_INVENTORY_POC_SECONDARY_NAME, MVAR_INVENTORY_POC_SECONDARY_EMAIL, MVAR_INVENTORY_POC_SECONDARY_PHONE_A,
-	MVAR_INVENTORY_POC_SECONDARY_PHONE_B, MVAR_INVENTORY_POC_SECONDARY_CELL, MVAR_INVENTORY_POC_SECONDARY_SCREEN,
-	MVAR_INVENTORY_POC_SECONDARY_NOTES,
-	/* PROFILE.* is deprecated, use INVENTORY.* instead */
-	MVAR_PROFILE_DEVICETYPE, MVAR_PROFILE_NAME, MVAR_PROFILE_OS, MVAR_PROFILE_SERIALNO,
-	MVAR_PROFILE_TAG, MVAR_PROFILE_MACADDRESS, MVAR_PROFILE_HARDWARE, MVAR_PROFILE_SOFTWARE,
-	MVAR_PROFILE_CONTACT, MVAR_PROFILE_LOCATION, MVAR_PROFILE_NOTES,
-	MVAR_HOST_HOST, MVAR_HOSTNAME, MVAR_HOST_NAME, MVAR_HOST_DESCRIPTION, MVAR_PROXY_NAME, MVAR_PROXY_DESCRIPTION,
-	MVAR_HOST_CONN, MVAR_HOST_DNS, MVAR_HOST_IP, MVAR_HOST_PORT, MVAR_IPADDRESS, MVAR_HOST_ID,
-	MVAR_ITEM_ID, MVAR_ITEM_NAME, MVAR_ITEM_NAME_ORIG, MVAR_ITEM_DESCRIPTION, MVAR_ITEM_DESCRIPTION_ORIG,
-	MVAR_ITEM_KEY, MVAR_ITEM_KEY_ORIG, MVAR_TRIGGER_KEY,
-	MVAR_ITEM_LASTVALUE,
-	MVAR_ITEM_STATE,
-	MVAR_ITEM_VALUE, MVAR_ITEM_VALUETYPE,
-	MVAR_ITEM_LOG_DATE, MVAR_ITEM_LOG_TIME, MVAR_ITEM_LOG_AGE, MVAR_ITEM_LOG_SOURCE,
-	MVAR_ITEM_LOG_SEVERITY, MVAR_ITEM_LOG_NSEVERITY, MVAR_ITEM_LOG_EVENTID,
-	MVAR_FUNCTION_VALUE, MVAR_FUNCTION_RECOVERY_VALUE,
-	NULL
-};
 
 /* macros that are supported in expression macro */
 static const char	*expr_macros[] = {MVAR_HOST_HOST, MVAR_HOSTNAME, MVAR_ITEM_KEY, NULL};
@@ -185,83 +140,6 @@ static void	get_current_event_value(const char *macro, const zbx_db_event *event
 	{
 		*replace_to = zbx_dsprintf(*replace_to, "%d", event->value);
 	}
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: check if a token contains indexed macro.                          *
- *                                                                            *
- ******************************************************************************/
-static int	is_indexed_macro(const char *str, const zbx_token_t *token)
-{
-	const char	*p;
-
-	switch (token->type)
-	{
-		case ZBX_TOKEN_MACRO:
-			p = str + token->loc.r - 1;
-			break;
-		case ZBX_TOKEN_USER_FUNC_MACRO:
-		case ZBX_TOKEN_FUNC_MACRO:
-			p = str + token->data.func_macro.macro.r - 1;
-			break;
-		default:
-			THIS_SHOULD_NEVER_HAPPEN;
-			return FAIL;
-	}
-
-	return '1' <= *p && *p <= '9' ? 1 : 0;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: check if a macro in string is one of the list and extract index.  *
- *                                                                            *
- * Parameters: str          - [IN] string containing potential macro          *
- *             strloc       - [IN] part of the string to check                *
- *             macros       - [IN] list of allowed macros (without indices)   *
- *             N_functionid - [OUT] index of the macro in string (if valid)   *
- *                                                                            *
- * Return value: unindexed macro from the allowed list or NULL.               *
- *                                                                            *
- * Comments: example: N_functionid is untouched if function returns NULL, for *
- *           a valid unindexed macro N_function is 1.                         *
- *                                                                            *
- ******************************************************************************/
-static const char	*macro_in_list(const char *str, zbx_strloc_t strloc, const char **macros, int *N_functionid)
-{
-	const char	**macro, *m;
-	size_t		i;
-
-	for (macro = macros; NULL != *macro; macro++)
-	{
-		for (m = *macro, i = strloc.l; '\0' != *m && i <= strloc.r && str[i] == *m; m++, i++)
-			;
-
-		/* check whether macro has ended while strloc hasn't or vice-versa */
-		if (('\0' == *m && i <= strloc.r) || ('\0' != *m && i > strloc.r))
-			continue;
-
-		/* strloc either fully matches macro... */
-		if ('\0' == *m)
-		{
-			if (NULL != N_functionid)
-				*N_functionid = 1;
-
-			break;
-		}
-
-		/* ...or there is a mismatch, check if it's in a pre-last character and it's an index */
-		if (i == strloc.r - 1 && '1' <= str[i] && str[i] <= '9' && str[i + 1] == *m && '\0' == *(m + 1))
-		{
-			if (NULL != N_functionid)
-				*N_functionid = str[i] - '0';
-
-			break;
-		}
-	}
-
-	return *macro;
 }
 
 /******************************************************************************
@@ -472,11 +350,12 @@ static int	resolve_host_target_macros(const char *m, const zbx_dc_host_t *dc_hos
  * Purpose: request cause event value by macro.                               *
  *                                                                            *
  ******************************************************************************/
-static void	get_event_cause_value(const char *macro, char **replace_to, const zbx_db_event *event,
+static int	get_event_cause_value(const char *macro, char **replace_to, const zbx_db_event *event,
 		zbx_db_event **cause_event, zbx_db_event **cause_recovery_event, const zbx_uint64_t *recipient_userid,
 		const char *tz, char *error, int maxerrlen)
 {
-	zbx_db_event		*c_event;
+	zbx_db_event	*c_event;
+	int		ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() eventid = " ZBX_FS_UI64 ", event name = '%s'", __func__, event->eventid,
 			event->name);
@@ -611,8 +490,12 @@ static void	get_event_cause_value(const char *macro, char **replace_to, const zb
 
 		resolve_opdata(c_event, replace_to, tz, error, maxerrlen);
 	}
+
+	ret = SUCCEED;
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
 }
 
 static int	is_strict_macro(const char *macro)
@@ -671,7 +554,13 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 	if (0 != (macro_type & (ZBX_MACRO_TYPE_MESSAGE_NORMAL | ZBX_MACRO_TYPE_MESSAGE_RECOVERY |
 			ZBX_MACRO_TYPE_MESSAGE_UPDATE | ZBX_MACRO_TYPE_EVENT_NAME)))
 	{
-		token_search |= ZBX_TOKEN_SEARCH_EXPRESSION_MACRO;
+
+		const zbx_db_event	*c_event;
+
+		c_event = ((NULL != r_event) ? r_event : event);
+
+		if (NULL != c_event && EVENT_SOURCE_TRIGGERS == c_event->source)
+			token_search |= ZBX_TOKEN_SEARCH_EXPRESSION_MACRO;
 	}
 
 	if (SUCCEED != zbx_token_find(*data, pos, &token, token_search))
@@ -701,8 +590,9 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 				pos = token.loc.r + 1;
 				continue;
 			case ZBX_TOKEN_MACRO:
-				if (0 != is_indexed_macro(*data, &token) &&
-						NULL != (m = macro_in_list(*data, token.loc, ex_macros, &N_functionid)))
+				if (0 != zbx_is_indexed_macro(*data, &token) &&
+						NULL != (m = zbx_macro_in_list(*data, token.loc,
+						zbx_get_indexable_macros(), &N_functionid)))
 				{
 					indexed_macro = 1;
 				}
@@ -716,10 +606,10 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 			case ZBX_TOKEN_USER_FUNC_MACRO:
 			case ZBX_TOKEN_FUNC_MACRO:
 				raw_value = 1;
-				indexed_macro = is_indexed_macro(*data, &token);
-				if (NULL == (m_ptr = func_get_macro_from_func(*data, &token.data.func_macro, &N_functionid))
-						|| SUCCEED != zbx_token_find(*data, token.data.func_macro.macro.l,
-						&inner_token, token_search))
+				indexed_macro = zbx_is_indexed_macro(*data, &token);
+				if (NULL == (m_ptr = zbx_get_macro_from_func(*data, &token.data.func_macro,
+						&N_functionid)) || SUCCEED != zbx_token_find(*data,
+						token.data.func_macro.macro.l, &inner_token, token_search))
 				{
 					/* Ignore functions with macros not supporting them, but do not skip the */
 					/* whole token, nested macro should be resolved in this case. */
@@ -819,12 +709,12 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 				}
 				else if (0 == strncmp(m, MVAR_EVENT_CAUSE, ZBX_CONST_STRLEN(MVAR_EVENT_CAUSE)))
 				{
-					get_event_cause_value(m, &replace_to, event, &cause_event,
+					ret = get_event_cause_value(m, &replace_to, event, &cause_event,
 							&cause_recovery_event, userid, tz, error, maxerrlen);
 				}
 				else if (0 == strcmp(m, MVAR_EVENT_SYMPTOMS))
 				{
-					expr_db_get_event_symptoms(event, &replace_to);
+					ret = expr_db_get_event_symptoms(event, &replace_to);
 				}
 				else if (0 == strcmp(m, MVAR_EVENT_STATUS) || 0 == strcmp(m, MVAR_EVENT_VALUE))
 				{
@@ -1030,14 +920,14 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 				else if (0 == strcmp(m, MVAR_TRIGGER_EXPRESSION_EXPLAIN))
 				{
 					zbx_db_trigger_explain_expression(&c_event->trigger, &replace_to,
-							evaluate_function, 0);
+							zbx_evaluate_function, 0);
 				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_EXPRESSION_RECOVERY_EXPLAIN))
 				{
 					if (TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION == c_event->trigger.recovery_mode)
 					{
 						zbx_db_trigger_explain_expression(&c_event->trigger, &replace_to,
-								evaluate_function, 1);
+								zbx_evaluate_function, 1);
 					}
 					else
 						replace_to = zbx_strdup(replace_to, "");
@@ -1045,12 +935,12 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 				else if (1 == indexed_macro && 0 == strcmp(m, MVAR_FUNCTION_VALUE))
 				{
 					zbx_db_trigger_get_function_value(&c_event->trigger, N_functionid,
-							&replace_to, evaluate_function, 0);
+							&replace_to, zbx_evaluate_function, 0);
 				}
 				else if (1 == indexed_macro && 0 == strcmp(m, MVAR_FUNCTION_RECOVERY_VALUE))
 				{
 					zbx_db_trigger_get_function_value(&c_event->trigger, N_functionid,
-							&replace_to, evaluate_function, 1);
+							&replace_to, zbx_evaluate_function, 1);
 				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_HOSTGROUP_NAME))
 				{
@@ -1315,14 +1205,14 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 				else if (0 == strcmp(m, MVAR_TRIGGER_EXPRESSION_EXPLAIN))
 				{
 					zbx_db_trigger_explain_expression(&c_event->trigger, &replace_to,
-							evaluate_function, 0);
+							zbx_evaluate_function, 0);
 				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_EXPRESSION_RECOVERY_EXPLAIN))
 				{
 					if (TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION == c_event->trigger.recovery_mode)
 					{
 						zbx_db_trigger_explain_expression(&c_event->trigger, &replace_to,
-								evaluate_function, 1);
+								zbx_evaluate_function, 1);
 					}
 					else
 						replace_to = zbx_strdup(replace_to, "");
@@ -1330,12 +1220,12 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 				else if (1 == indexed_macro && 0 == strcmp(m, MVAR_FUNCTION_VALUE))
 				{
 					zbx_db_trigger_get_function_value(&c_event->trigger, N_functionid,
-							&replace_to, evaluate_function, 0);
+							&replace_to, zbx_evaluate_function, 0);
 				}
 				else if (1 == indexed_macro && 0 == strcmp(m, MVAR_FUNCTION_RECOVERY_VALUE))
 				{
 					zbx_db_trigger_get_function_value(&c_event->trigger, N_functionid,
-							&replace_to, evaluate_function, 1);
+							&replace_to, zbx_evaluate_function, 1);
 				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_HOSTGROUP_NAME))
 				{
@@ -2046,6 +1936,13 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 								tz));
 					}
 				}
+				else if (0 == strcmp(m, MVAR_EVENT_UPDATE_STATUS))
+				{
+					if (0 != (macro_type & ZBX_MACRO_TYPE_MESSAGE_UPDATE) && NULL != service_alarm)
+						replace_to = zbx_strdup(replace_to, "1");
+					else
+						replace_to = zbx_strdup(replace_to, "0");
+				}
 				else if (0 == strcmp(m, MVAR_EVENT_STATUS) || 0 == strcmp(m, MVAR_EVENT_VALUE))
 				{
 					get_current_event_value(m, c_event, &replace_to);
@@ -2202,12 +2099,12 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 					else if (0 == strcmp(m, MVAR_TRIGGER_EXPRESSION_EXPLAIN))
 					{
 						zbx_db_trigger_explain_expression(&event->trigger, &replace_to,
-								evaluate_function, 0);
+								zbx_evaluate_function, 0);
 					}
 					else if (1 == indexed_macro && 0 == strcmp(m, MVAR_FUNCTION_VALUE))
 					{
 						zbx_db_trigger_get_function_value(&event->trigger, N_functionid,
-								&replace_to, evaluate_function, 0);
+								&replace_to, zbx_evaluate_function, 0);
 					}
 				}
 			}
@@ -2793,11 +2690,12 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 					/* return error if strict macro resolving failed */
 					zbx_snprintf(error, maxerrlen, "Invalid macro '%.*s' value",
 							(int)(token.loc.r - token.loc.l + 1), *data + token.loc.l);
+
+					res = FAIL;
 				}
-				res = FAIL;
 			}
-			else
-				replace_to = zbx_strdup(replace_to, STR_UNKNOWN_VARIABLE);
+
+			replace_to = zbx_strdup(replace_to, STR_UNKNOWN_VARIABLE);
 		}
 
 		if (ZBX_TOKEN_USER_MACRO == token.type || (ZBX_TOKEN_MACRO == token.type && 0 == indexed_macro))
@@ -3251,7 +3149,7 @@ int	zbx_expr_macro_index(const char *macro)
 	loc.l = 0;
 	loc.r = strlen(macro) - 1;
 
-	if (NULL != macro_in_list(macro, loc, expr_macros, &func_num))
+	if (NULL != zbx_macro_in_list(macro, loc, expr_macros, &func_num))
 		return func_num;
 
 	return -1;
