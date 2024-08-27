@@ -23,6 +23,14 @@
 #include "webdriver.h"
 #include "zbxalgo.h"
 
+typedef struct
+{
+	char		*id;
+	zbx_webdriver_t	*wd;
+}
+zbx_wd_element_t;
+
+void	wd_element_free(zbx_wd_element_t *el);
 void	wd_element_create(duk_context *ctx, zbx_webdriver_t *wd, const char *elementid);
 void	wd_element_create_array(duk_context *ctx, zbx_webdriver_t *wd, const zbx_vector_str_t *elements);
 
