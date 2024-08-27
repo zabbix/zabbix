@@ -1,7 +1,28 @@
 ---
-test case: " empty strings "
+test case: " aaaa & bbbb "
 in:
-  string1: ""
-  string2: ""
+  string1: "aaaa"
+  string2: "bbbb"
+out:
+  val: FAIL
+---
+test case: " aaaa & aaaa "
+in:
+  string1: "aaaa"
+  string2: "aaaa"
+out:
+  val: SUCCEED
+---
+test case: " 123 & 123 "
+in:
+  string1: "123"
+  string2: "123"
+out:
+  val: SUCCEED
+---
+test case: " !@# & !@# "
+in:
+  string1: "!@#"
+  string2: "!@#"
 out:
   val: SUCCEED

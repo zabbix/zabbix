@@ -12,3 +12,11 @@ in:
   del: 'a'
 out:
   string: "apple , banana , cherry , date"
+---
+test case: "  a  "
+in:
+  string: "  a  "
+  del: 'a'
+out:
+  string: "a"
+
