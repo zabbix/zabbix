@@ -48,13 +48,6 @@ class CWidgetFieldColumnsList extends CWidgetField {
 
 	public const DEFAULT_DECIMAL_PLACES = 2;
 
-	// Predefined colors for thresholds and highlights. Each next threshold/highlight takes the next sequential value
-	// from the palette.
-	public const DEFAULT_COLOR_PALETTE = [
-		'E65660', 'FCCB1D', '3BC97D', '2ED3B7', '19D0D7', '29C2FA', '58B0FE', '5D98FE', '859AFA', 'E580FA',
-		'F773C7', 'FC5F7E', 'FC738E', 'FF6D2E', 'F48D48', 'F89C3A', 'FBB318', 'FECF62', '87CE40', 'A3E86D'
-	];
-
 	private array $time_period_fields = [];
 
 	public function __construct(string $name, string $label = null) {

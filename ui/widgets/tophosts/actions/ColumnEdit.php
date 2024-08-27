@@ -26,6 +26,7 @@ use Zabbix\Widgets\CWidgetField;
 use Zabbix\Widgets\Fields\CWidgetFieldTimePeriod;
 
 use Widgets\TopHosts\Includes\CWidgetFieldColumnsList;
+use Widgets\TopHosts\Widget;
 
 class ColumnEdit extends CController {
 
@@ -107,7 +108,7 @@ class ColumnEdit extends CController {
 		if (!$this->hasInput('update')) {
 			$data = [
 				'action' => $this->getAction(),
-				'colors' => CWidgetFieldColumnsList::DEFAULT_COLOR_PALETTE,
+				'colors' => Widget::DEFAULT_COLOR_PALETTE,
 				'templateid' => $this->hasInput('templateid') ? $this->getInput('templateid') : null,
 				'errors' => hasErrorMessages() ? getMessages() : null,
 				'user' => [

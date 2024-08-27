@@ -23,6 +23,7 @@ use API,
 	CParser;
 
 use Widgets\ItemHistory\Includes\CWidgetFieldColumnsList;
+use Widgets\ItemHistory\Widget;
 
 class ColumnEdit extends CController {
 
@@ -133,7 +134,7 @@ class ColumnEdit extends CController {
 		if (!$this->hasInput('update')) {
 			$data = [
 				'action' => $this->getAction(),
-				'colors' => CWidgetFieldColumnsList::DEFAULT_COLOR_PALETTE,
+				'colors' => Widget::DEFAULT_COLOR_PALETTE,
 				'ms_item' => $item_ms,
 				'item_value_type' => $item_value_type,
 				'templateid' => $this->hasInput('templateid') ? $this->getInput('templateid') : null,
