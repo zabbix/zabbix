@@ -138,3 +138,11 @@ void	zbx_pp_history_clear(zbx_pp_history_t *history)
 
 	zbx_vector_pp_step_history_destroy(&history->step_history);
 }
+
+zbx_pp_history_t	*zbx_pp_history_clone(zbx_pp_history_t *history)
+{
+	if (NULL != history)
+		history->refcount++;
+
+	return history;
+}

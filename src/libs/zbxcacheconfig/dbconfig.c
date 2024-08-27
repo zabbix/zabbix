@@ -10424,6 +10424,8 @@ static void	dc_preproc_sync_preprocitem(zbx_pp_item_preproc_t *preproc, const ZB
 	}
 
 	preproc->steps_num = preprocitem->preproc_ops.values_num;
+
+	preproc->pp_revision = preprocitem->revision;
 }
 
 /******************************************************************************
@@ -10448,7 +10450,7 @@ static void	dc_preproc_sync_masteritem(zbx_pp_item_preproc_t *preproc, const ZBX
 static void	dc_preproc_sync_item(zbx_hashset_t *items, ZBX_DC_ITEM *dc_item, zbx_uint64_t revision)
 {
 	zbx_pp_item_t		*pp_item;
-	zbx_pp_item_preproc_t	*pp_old = NULL;
+	zbx_pp_history_t	*history = NULL;
 
 	if (NULL == (pp_item = (zbx_pp_item_t *)zbx_hashset_search(items, &dc_item->itemid)))
 	{
@@ -10458,10 +10460,10 @@ static void	dc_preproc_sync_item(zbx_hashset_t *items, ZBX_DC_ITEM *dc_item, zbx
 	}
 	else
 	{
-		if (pp_item->revision < dc_item->revision)
-			pp_old = pp_item->preproc;
-		else
-			zbx_pp_item_preproc_release(pp_item->preproc);
+		if (NULL != dc_item->preproc_item && pp_item->preproc->pp_revision == dc_item->preproc_item->revision)
+			history = zbx_pp_history_clone(pp_item->preproc->history);
+
+		zbx_pp_item_preproc_release(pp_item->preproc);
 	}
 
 	pp_item->preproc = zbx_pp_item_preproc_create(dc_item->hostid, dc_item->type, dc_item->value_type, dc_item->flags);
@@ -10482,12 +10484,7 @@ static void	dc_preproc_sync_item(zbx_hashset_t *items, ZBX_DC_ITEM *dc_item, zbx
 		}
 	}
 
-	if (NULL != pp_old)
-	{
-		pp_item->preproc->history = pp_old->history;
-		pp_old->history = NULL;
-		zbx_pp_item_preproc_release(pp_old);
-	}
+	pp_item->preproc->history = history;
 }
 
 static void	dc_preproc_add_item_rec(ZBX_DC_ITEM *dc_item, zbx_vector_dc_item_ptr_t *items_sync)
@@ -10524,6 +10521,8 @@ static int	dc_preproc_item_changed(ZBX_DC_ITEM *dc_item, zbx_pp_item_t *pp_item)
 		if (dc_item->master_item->revision > pp_item->revision)
 			return SUCCEED;
 	}
+	else if (0 < pp_item->preproc->dep_itemids_num)
+			return SUCCEED;
 
 	if (NULL != dc_item->preproc_item)
 	{
