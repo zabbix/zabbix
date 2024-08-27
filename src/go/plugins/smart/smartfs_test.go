@@ -381,11 +381,11 @@ func Test_evaluateVersion(t *testing.T) {
 		args    args
 		wantErr bool
 	}{
-		{"+correct_version", args{[]int{7, 1}}, false},
-		{"+correct_version_one_digit", args{[]int{8}}, false},
-		{"+correct_version_multiple_digits", args{[]int{7, 1, 2}}, false},
-		{"-incorrect_version", args{[]int{7, 0}}, true},
-		{"-malformed_version", args{[]int{-7, 0}}, true},
+		{"+correctVersion", args{[]int{7, 1}}, false},
+		{"+correctVersionOneDigit", args{[]int{8}}, false},
+		{"+correctVersionMultipleDigits", args{[]int{7, 1, 2}}, false},
+		{"-incorrectVersion", args{[]int{7, 0}}, true},
+		{"-malformedVersion", args{[]int{-7, 0}}, true},
 		{"-empty", args{}, true},
 	}
 	for _, tt := range tests {
@@ -415,8 +415,8 @@ func Test_cutPrefix(t *testing.T) {
 		args args
 		want string
 	}{
-		{"+has_prefix", args{"/dev/sda"}, "sda"},
-		{"-no_prefix", args{"sda"}, "sda"},
+		{"+hasPrefix", args{"/dev/sda"}, "sda"},
+		{"-noPrefix", args{"sda"}, "sda"},
 		{"-empty", args{""}, ""},
 	}
 
@@ -1229,39 +1229,41 @@ func Test_getRaidDevices(t *testing.T) {
 func Test_setDeviceData(t *testing.T) {
 	t.Parallel()
 
-	type fields struct {
-		devices     map[string]deviceParser
-		jsonDevices map[string]jsonDevice
+	type args struct {
+		jsonRunner bool
+		data       *SmartCtlDeviceData
 	}
 
 	tests := []struct {
-		name         string
-		data         *SmartCtlDeviceData
-		jsonRunner   bool
-		expectFields fields
+		name          string
+		arguments     args
+		expectedState *runner
 	}{
 		{
 			"+jsonRunner",
-			&SmartCtlDeviceData{
-				Device: &deviceParser{
-					ModelName:    "SAMSUNG MZVL21T0HCLR-00BH1",
-					SerialNumber: "S641NX0T509005",
-					Info: deviceInfo{
-						Name:     "/dev/sda",
-						InfoName: "/dev/sda",
-						DevType:  "nvme",
-						name:     "/dev/sda",
+
+			args{
+				true,
+				&SmartCtlDeviceData{
+					Device: &deviceParser{
+						ModelName:    "SAMSUNG MZVL21T0HCLR-00BH1",
+						SerialNumber: "S641NX0T509005",
+						Info: deviceInfo{
+							Name:     "/dev/sda",
+							InfoName: "/dev/sda",
+							DevType:  "nvme",
+							name:     "/dev/sda",
+						},
+						Smartctl: smartctlField{
+							Version: []int{7, 1},
+						},
+						SmartStatus:     &smartStatus{SerialNumber: true},
+						SmartAttributes: smartAttributes{},
 					},
-					Smartctl: smartctlField{
-						Version: []int{7, 1},
-					},
-					SmartStatus:     &smartStatus{SerialNumber: true},
-					SmartAttributes: smartAttributes{},
+					Data: mock.OutputAllDiscInfoSDA,
 				},
-				Data: mock.OutputAllDiscInfoSDA,
-			},
-			true, //jsonRunner
-			fields{
+			}, //jsonRunner
+			&runner{
 				devices: map[string]deviceParser{},
 				jsonDevices: map[string]jsonDevice{
 					"/dev/sda": {
@@ -1273,26 +1275,29 @@ func Test_setDeviceData(t *testing.T) {
 		},
 		{
 			"+notJSONRunner",
-			&SmartCtlDeviceData{
-				Device: &deviceParser{
-					ModelName:    "SAMSUNG MZVL21T0HCLR-00BH1",
-					SerialNumber: "S641NX0T509005",
-					Info: deviceInfo{
-						Name:     "/dev/sda",
-						InfoName: "/dev/sda",
-						DevType:  "nvme",
-						name:     "/dev/sda",
+
+			args{
+				false,
+				&SmartCtlDeviceData{
+					Device: &deviceParser{
+						ModelName:    "SAMSUNG MZVL21T0HCLR-00BH1",
+						SerialNumber: "S641NX0T509005",
+						Info: deviceInfo{
+							Name:     "/dev/sda",
+							InfoName: "/dev/sda",
+							DevType:  "nvme",
+							name:     "/dev/sda",
+						},
+						Smartctl: smartctlField{
+							Version: []int{7, 1},
+						},
+						SmartStatus:     &smartStatus{SerialNumber: true},
+						SmartAttributes: smartAttributes{},
 					},
-					Smartctl: smartctlField{
-						Version: []int{7, 1},
-					},
-					SmartStatus:     &smartStatus{SerialNumber: true},
-					SmartAttributes: smartAttributes{},
+					Data: mock.OutputAllDiscInfoSDA,
 				},
-				Data: mock.OutputAllDiscInfoSDA,
-			},
-			false, //jsonRunner
-			fields{
+			}, //jsonRunner
+			&runner{
 				devices: map[string]deviceParser{
 					"/dev/sda": {
 						ModelName:    "SAMSUNG MZVL21T0HCLR-00BH1",
@@ -1314,9 +1319,11 @@ func Test_setDeviceData(t *testing.T) {
 		},
 		{
 			"-nilPointerAsData",
-			nil,
-			false, //jsonRunner
-			fields{
+			args{
+				false,
+				nil,
+			}, //jsonRunner
+			&runner{
 				devices:     map[string]deviceParser{},
 				jsonDevices: map[string]jsonDevice{},
 			},
@@ -1327,27 +1334,19 @@ func Test_setDeviceData(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			runner := &runner{
+			r := &runner{
 				devices:     make(map[string]deviceParser),
 				jsonDevices: make(map[string]jsonDevice),
 			}
 
-			runner.setDevicesData(tt.data, tt.jsonRunner)
+			r.setDevicesData(tt.arguments.data, tt.arguments.jsonRunner)
 
 			if diff := cmp.Diff(
-				runner.devices,
-				tt.expectFields.devices,
-				cmp.AllowUnexported(deviceInfo{}),
+				tt.expectedState,
+				r,
+				cmp.AllowUnexported(jsonDevice{}, deviceInfo{}, runner{}),
 			); diff != "" {
-				t.Fatalf("runner.setDevicesData() devices mismatch (-want +got):\n%s", diff)
-			}
-
-			if diff := cmp.Diff(
-				runner.jsonDevices,
-				tt.expectFields.jsonDevices,
-				cmp.AllowUnexported(jsonDevice{}),
-			); diff != "" {
-				t.Fatalf("runner.setDevicesData() jsonDevices mismatch (-want +got):\n%s", diff)
+				t.Fatalf("Plugin.execute() runner = %s", diff)
 			}
 		})
 	}
@@ -2076,24 +2075,17 @@ func Test_runner_executeBase(t *testing.T) {
 		out  []byte
 	}
 
-	type fields struct {
-		devices     map[string]deviceParser
-		jsonDevices map[string]jsonDevice
-	}
-
 	type args struct {
 		basicDev   []deviceInfo
 		jsonRunner bool
 	}
 
 	tests := []struct {
-		name            string
-		expectations    []expectation
-		fields          fields
-		args            args
-		wantJsonDevices map[string]jsonDevice
-		wantDevices     map[string]deviceParser
-		wantErr         bool
+		name          string
+		expectations  []expectation
+		args          args
+		expectedState *runner
+		wantErr       bool
 	}{
 		{
 			"+valid",
@@ -2129,10 +2121,6 @@ func Test_runner_executeBase(t *testing.T) {
 					out:  mock.OutputAllDiscInfoSDA,
 				},
 			},
-			fields{
-				jsonDevices: map[string]jsonDevice{},
-				devices:     map[string]deviceParser{},
-			},
 			args{
 				[]deviceInfo{
 					{
@@ -2143,22 +2131,24 @@ func Test_runner_executeBase(t *testing.T) {
 				},
 				false,
 			},
-			nil,
-			map[string]deviceParser{
-				"/dev/sda": {
-					ModelName:    "SAMSUNG MZVL21T0HCLR-00BH1",
-					SerialNumber: "S641NX0T509005",
-					Info: deviceInfo{
-						Name:     "/dev/sda",
-						InfoName: "/dev/sda",
-						DevType:  "nvme",
-						name:     "/dev/sda",
+			&runner{
+				jsonDevices: nil,
+				devices: map[string]deviceParser{
+					"/dev/sda": {
+						ModelName:    "SAMSUNG MZVL21T0HCLR-00BH1",
+						SerialNumber: "S641NX0T509005",
+						Info: deviceInfo{
+							Name:     "/dev/sda",
+							InfoName: "/dev/sda",
+							DevType:  "nvme",
+							name:     "/dev/sda",
+						},
+						Smartctl: smartctlField{
+							Version: []int{7, 1},
+						},
+						SmartStatus:     &smartStatus{SerialNumber: true},
+						SmartAttributes: smartAttributes{},
 					},
-					Smartctl: smartctlField{
-						Version: []int{7, 1},
-					},
-					SmartStatus:     &smartStatus{SerialNumber: true},
-					SmartAttributes: smartAttributes{},
 				},
 			},
 			false,
@@ -2214,10 +2204,6 @@ func Test_runner_executeBase(t *testing.T) {
 					out: mock.OutputAllDiscInfoMac,
 				},
 			},
-			fields{
-				jsonDevices: map[string]jsonDevice{},
-				devices:     map[string]deviceParser{},
-			},
 			args{
 				[]deviceInfo{
 					{
@@ -2233,43 +2219,45 @@ func Test_runner_executeBase(t *testing.T) {
 				},
 				false,
 			},
-			nil,
-			map[string]deviceParser{
-				"/dev/sda": {
-					ModelName:    "SAMSUNG MZVL21T0HCLR-00BH1",
-					SerialNumber: "S641NX0T509005",
-					Info: deviceInfo{
-						Name:     "/dev/sda",
-						InfoName: "/dev/sda",
-						DevType:  "nvme",
-						name:     "/dev/sda",
+			&runner{
+				jsonDevices: nil,
+				devices: map[string]deviceParser{
+					"/dev/sda": {
+						ModelName:    "SAMSUNG MZVL21T0HCLR-00BH1",
+						SerialNumber: "S641NX0T509005",
+						Info: deviceInfo{
+							Name:     "/dev/sda",
+							InfoName: "/dev/sda",
+							DevType:  "nvme",
+							name:     "/dev/sda",
+						},
+						Smartctl: smartctlField{
+							Version: []int{7, 1},
+						},
+						SmartStatus:     &smartStatus{SerialNumber: true},
+						SmartAttributes: smartAttributes{},
 					},
-					Smartctl: smartctlField{
-						Version: []int{7, 1},
-					},
-					SmartStatus:     &smartStatus{SerialNumber: true},
-					SmartAttributes: smartAttributes{},
-				},
-				"IOService:/AppleARMPE/arm-io@10F00000/AppleT811xIO/ans@77400000/AppleASCWrapV4/iop-ans-nub/RTBuddy(ANS2)/RTBuddyService/AppleANS3NVMeController/NS_01@1": { //nolint:lll
-					ModelName:    "APPLE SSD AP0512Z",
-					SerialNumber: "0ba02202c4bc1a1e",
-					Info: deviceInfo{
-						Name:     "IOService:/AppleARMPE/arm-io@10F00000/AppleT811xIO/ans@77400000/AppleASCWrapV4/iop-ans-nub/RTBuddy(ANS2)/RTBuddyService/AppleANS3NVMeController/NS_01@1", //nolint:lll
-						InfoName: "IOService:/AppleARMPE/arm-io@10F00000/AppleT811xIO/ans@77400000/AppleASCWrapV4/iop-ans-nub/RTBuddy(ANS2)/RTBuddyService/AppleANS3NVMeController/NS_01@1", //nolint:lll
-						DevType:  "nvme",
-						name:     "IOService:/AppleARMPE/arm-io@10F00000/AppleT811xIO/ans@77400000/AppleASCWrapV4/iop-ans-nub/RTBuddy(ANS2)/RTBuddyService/AppleANS3NVMeController/NS_01@1", //nolint:lll
-					},
-					Smartctl: smartctlField{
-						Version:    []int{7, 4},
-						ExitStatus: 4,
-						Messages: []message{
-							{
-								"Read 1 entries from Error Information Log failed: GetLogPage failed: system=0x38, sub=0x0, code=745", //nolint:lll
+					"IOService:/AppleARMPE/arm-io@10F00000/AppleT811xIO/ans@77400000/AppleASCWrapV4/iop-ans-nub/RTBuddy(ANS2)/RTBuddyService/AppleANS3NVMeController/NS_01@1": { //nolint:lll
+						ModelName:    "APPLE SSD AP0512Z",
+						SerialNumber: "0ba02202c4bc1a1e",
+						Info: deviceInfo{
+							Name:     "IOService:/AppleARMPE/arm-io@10F00000/AppleT811xIO/ans@77400000/AppleASCWrapV4/iop-ans-nub/RTBuddy(ANS2)/RTBuddyService/AppleANS3NVMeController/NS_01@1", //nolint:lll
+							InfoName: "IOService:/AppleARMPE/arm-io@10F00000/AppleT811xIO/ans@77400000/AppleASCWrapV4/iop-ans-nub/RTBuddy(ANS2)/RTBuddyService/AppleANS3NVMeController/NS_01@1", //nolint:lll
+							DevType:  "nvme",
+							name:     "IOService:/AppleARMPE/arm-io@10F00000/AppleT811xIO/ans@77400000/AppleASCWrapV4/iop-ans-nub/RTBuddy(ANS2)/RTBuddyService/AppleANS3NVMeController/NS_01@1", //nolint:lll
+						},
+						Smartctl: smartctlField{
+							Version:    []int{7, 4},
+							ExitStatus: 4,
+							Messages: []message{
+								{
+									"Read 1 entries from Error Information Log failed: GetLogPage failed: system=0x38, sub=0x0, code=745", //nolint:lll
+								},
 							},
 						},
+						SmartStatus:     &smartStatus{SerialNumber: true},
+						SmartAttributes: smartAttributes{},
 					},
-					SmartStatus:     &smartStatus{SerialNumber: true},
-					SmartAttributes: smartAttributes{},
 				},
 			},
 			false,
@@ -2309,10 +2297,6 @@ func Test_runner_executeBase(t *testing.T) {
 					out:  mock.OutputAllDiscInfoSDA,
 				},
 			},
-			fields{
-				jsonDevices: map[string]jsonDevice{},
-				devices:     map[string]deviceParser{},
-			},
 			args{
 				[]deviceInfo{
 					{
@@ -2323,13 +2307,15 @@ func Test_runner_executeBase(t *testing.T) {
 				},
 				true,
 			},
-			map[string]jsonDevice{
-				"/dev/sda": {
-					serialNumber: "S641NX0T509005",
-					jsonData:     string(mock.OutputAllDiscInfoSDA),
+			&runner{
+				jsonDevices: map[string]jsonDevice{
+					"/dev/sda": {
+						serialNumber: "S641NX0T509005",
+						jsonData:     string(mock.OutputAllDiscInfoSDA),
+					},
 				},
+				devices: nil,
 			},
-			nil,
 			false,
 		},
 	}
@@ -2366,24 +2352,15 @@ func Test_runner_executeBase(t *testing.T) {
 				)
 			}
 
-			if diff := cmp.Diff(
-				tt.wantJsonDevices, r.jsonDevices,
-				cmp.AllowUnexported(jsonDevice{}),
-			); diff != "" {
-				t.Fatalf(
-					"runner.executeBase() jsonDevices mismatch (-want +got):\n%s",
-					diff,
-				)
-			}
+			// removing mock plugin
+			r.plugin = nil
 
 			if diff := cmp.Diff(
-				tt.wantDevices, r.devices,
-				cmp.AllowUnexported(deviceInfo{}),
+				tt.expectedState,
+				r,
+				cmp.AllowUnexported(jsonDevice{}, deviceInfo{}, runner{}),
 			); diff != "" {
-				t.Fatalf(
-					"runner.executeBase() devices mismatch (-want +got):\n%s",
-					diff,
-				)
+				t.Fatalf("Plugin.execute() runner = %s", diff)
 			}
 
 			if err := m.ExpectationsWhereMet(); err != nil {
@@ -2396,9 +2373,9 @@ func Test_runner_executeBase(t *testing.T) {
 	}
 }
 
-//nolint:paralleltest,tparallel
-
 func Test_runner_executeRaids(t *testing.T) {
+	t.Parallel()
+
 	log.DefaultLogger = stdlog.New(os.Stdout, "", stdlog.LstdFlags)
 	cpuCount = 1
 
@@ -2437,23 +2414,16 @@ func Test_runner_executeRaids(t *testing.T) {
 		out  []byte
 	}
 
-	type fields struct {
-		devices     map[string]deviceParser
-		jsonDevices map[string]jsonDevice
-	}
-
 	type args struct {
 		raids      []deviceInfo
 		jsonRunner bool
 	}
 
 	tests := []struct {
-		name            string
-		expectations    []expectation
-		fields          fields
-		args            args
-		wantJsonDevices map[string]jsonDevice
-		wantDevices     map[string]deviceParser
+		name          string
+		expectations  []expectation
+		args          args
+		expectedState *runner
 	}{
 		{
 			"+valid",
@@ -2518,10 +2488,6 @@ func Test_runner_executeRaids(t *testing.T) {
 					out: sampleFailedAllSmartInfoScan,
 				},
 			},
-			fields{
-				jsonDevices: map[string]jsonDevice{},
-				devices:     map[string]deviceParser{},
-			},
 			args{
 				[]deviceInfo{
 					{
@@ -2532,60 +2498,62 @@ func Test_runner_executeRaids(t *testing.T) {
 				},
 				false,
 			},
-			nil,
-			map[string]deviceParser{
-				"/dev/sda sat": {
-					ModelName:    "INTEL SSDSC2BB120G6",
-					SerialNumber: "PHWA619301M9120CGN",
-					Info: deviceInfo{
-						Name:     "/dev/sda sat",
-						InfoName: "/dev/sda [SAT]",
-						DevType:  "sat",
-						name:     "/dev/sda",
-						raidType: "sat",
-					},
-					Smartctl:    smartctlField{Version: []int{7, 3}},
-					SmartStatus: &smartStatus{SerialNumber: true},
-					SmartAttributes: smartAttributes{ //nolint:dupl
-						Table: []table{
-							{Attrname: "Reallocated_Sector_Ct", ID: 5},
-							{Attrname: "Power_On_Hours", ID: 9},
-							{Attrname: "Power_Cycle_Count", ID: 12},
-							{
-								Attrname: "Available_Reservd_Space",
-								ID:       170,
-								Thresh:   10,
+			&runner{
+				jsonDevices: nil,
+				devices: map[string]deviceParser{
+					"/dev/sda sat": {
+						ModelName:    "INTEL SSDSC2BB120G6",
+						SerialNumber: "PHWA619301M9120CGN",
+						Info: deviceInfo{
+							Name:     "/dev/sda sat",
+							InfoName: "/dev/sda [SAT]",
+							DevType:  "sat",
+							name:     "/dev/sda",
+							raidType: "sat",
+						},
+						Smartctl:    smartctlField{Version: []int{7, 3}},
+						SmartStatus: &smartStatus{SerialNumber: true},
+						SmartAttributes: smartAttributes{ //nolint:dupl
+							Table: []table{
+								{Attrname: "Reallocated_Sector_Ct", ID: 5},
+								{Attrname: "Power_On_Hours", ID: 9},
+								{Attrname: "Power_Cycle_Count", ID: 12},
+								{
+									Attrname: "Available_Reservd_Space",
+									ID:       170,
+									Thresh:   10,
+								},
+								{Attrname: "Program_Fail_Count", ID: 171},
+								{Attrname: "Erase_Fail_Count", ID: 172},
+								{Attrname: "Unsafe_Shutdown_Count", ID: 174},
+								{
+									Attrname: "Power_Loss_Cap_Test",
+									ID:       175,
+									Thresh:   10,
+								},
+								{Attrname: "SATA_Downshift_Count", ID: 183},
+								{Attrname: "End-to-End_Error", ID: 184, Thresh: 90},
+								{Attrname: "Reported_Uncorrect", ID: 187},
+								{Attrname: "Temperature_Case", ID: 190},
+								{Attrname: "Unsafe_Shutdown_Count", ID: 192},
+								{Attrname: "Temperature_Internal", ID: 194},
+								{Attrname: "Current_Pending_Sector", ID: 197},
+								{Attrname: "CRC_Error_Count", ID: 199},
+								{Attrname: "Host_Writes_32MiB", ID: 225},
+								{Attrname: "Workld_Media_Wear_Indic", ID: 226},
+								{Attrname: "Workld_Host_Reads_Perc", ID: 227},
+								{Attrname: "Workload_Minutes", ID: 228},
+								{
+									Attrname: "Available_Reservd_Space",
+									ID:       232,
+									Thresh:   10,
+								},
+								{Attrname: "Media_Wearout_Indicator", ID: 233},
+								{Attrname: "Thermal_Throttle", ID: 234},
+								{Attrname: "Host_Writes_32MiB", ID: 241},
+								{Attrname: "Host_Reads_32MiB", ID: 242},
+								{Attrname: "NAND_Writes_32MiB", ID: 243},
 							},
-							{Attrname: "Program_Fail_Count", ID: 171},
-							{Attrname: "Erase_Fail_Count", ID: 172},
-							{Attrname: "Unsafe_Shutdown_Count", ID: 174},
-							{
-								Attrname: "Power_Loss_Cap_Test",
-								ID:       175,
-								Thresh:   10,
-							},
-							{Attrname: "SATA_Downshift_Count", ID: 183},
-							{Attrname: "End-to-End_Error", ID: 184, Thresh: 90},
-							{Attrname: "Reported_Uncorrect", ID: 187},
-							{Attrname: "Temperature_Case", ID: 190},
-							{Attrname: "Unsafe_Shutdown_Count", ID: 192},
-							{Attrname: "Temperature_Internal", ID: 194},
-							{Attrname: "Current_Pending_Sector", ID: 197},
-							{Attrname: "CRC_Error_Count", ID: 199},
-							{Attrname: "Host_Writes_32MiB", ID: 225},
-							{Attrname: "Workld_Media_Wear_Indic", ID: 226},
-							{Attrname: "Workld_Host_Reads_Perc", ID: 227},
-							{Attrname: "Workload_Minutes", ID: 228},
-							{
-								Attrname: "Available_Reservd_Space",
-								ID:       232,
-								Thresh:   10,
-							},
-							{Attrname: "Media_Wearout_Indicator", ID: 233},
-							{Attrname: "Thermal_Throttle", ID: 234},
-							{Attrname: "Host_Writes_32MiB", ID: 241},
-							{Attrname: "Host_Reads_32MiB", ID: 242},
-							{Attrname: "NAND_Writes_32MiB", ID: 243},
 						},
 					},
 				},
@@ -2654,10 +2622,6 @@ func Test_runner_executeRaids(t *testing.T) {
 					out: sampleFailedAllSmartInfoScan,
 				},
 			},
-			fields{
-				jsonDevices: map[string]jsonDevice{},
-				devices:     map[string]deviceParser{},
-			},
 			args{
 				[]deviceInfo{
 					{
@@ -2668,16 +2632,18 @@ func Test_runner_executeRaids(t *testing.T) {
 				},
 				true,
 			},
-			map[string]jsonDevice{
-				"/dev/sda sat": {
-					serialNumber: "PHWA619301M9120CGN",
-					jsonData: string(
-						mock.Outputs.Get("env_1").
-							AllSmartInfoScans.Get("-a /dev/sda -d sat -j"),
-					),
+			&runner{
+				jsonDevices: map[string]jsonDevice{
+					"/dev/sda sat": {
+						serialNumber: "PHWA619301M9120CGN",
+						jsonData: string(
+							mock.Outputs.Get("env_1").
+								AllSmartInfoScans.Get("-a /dev/sda -d sat -j"),
+						),
+					},
 				},
+				devices: nil,
 			},
-			nil,
 		},
 		{
 			"+HBA_with_SAS_1",
@@ -2739,29 +2705,27 @@ func Test_runner_executeRaids(t *testing.T) {
 						AllSmartInfoScans.Get("-a /dev/sda -d scsi -j"),
 				},
 			},
-			fields{
-				jsonDevices: map[string]jsonDevice{},
-				devices:     map[string]deviceParser{},
-			},
 			args{
 				[]deviceInfo{
 					{Name: "/dev/sda", InfoName: "/dev/sda", DevType: "scsi"},
 				},
 				false,
 			},
-			nil,
-			map[string]deviceParser{
-				"/dev/sda scsi": {
-					SerialNumber: "S5G1NC0W102239",
-					Info: deviceInfo{
-						Name:     "/dev/sda scsi",
-						InfoName: "/dev/sda",
-						DevType:  "scsi",
-						name:     "/dev/sda",
-						raidType: "scsi",
+			&runner{
+				jsonDevices: nil,
+				devices: map[string]deviceParser{
+					"/dev/sda scsi": {
+						SerialNumber: "S5G1NC0W102239",
+						Info: deviceInfo{
+							Name:     "/dev/sda scsi",
+							InfoName: "/dev/sda",
+							DevType:  "scsi",
+							name:     "/dev/sda",
+							raidType: "scsi",
+						},
+						Smartctl:    smartctlField{Version: []int{7, 3}},
+						SmartStatus: &smartStatus{SerialNumber: true},
 					},
-					Smartctl:    smartctlField{Version: []int{7, 3}},
-					SmartStatus: &smartStatus{SerialNumber: true},
 				},
 			},
 		},
@@ -2779,13 +2743,11 @@ func Test_runner_executeRaids(t *testing.T) {
 					out:  []byte(`{}`),
 				},
 			},
-			fields{
-				jsonDevices: map[string]jsonDevice{},
+			args{[]deviceInfo{}, false},
+			&runner{
+				jsonDevices: nil,
 				devices:     map[string]deviceParser{},
 			},
-			args{[]deviceInfo{}, false},
-			nil,
-			map[string]deviceParser{},
 		},
 	}
 	for _, tt := range tests {
@@ -2812,24 +2774,15 @@ func Test_runner_executeRaids(t *testing.T) {
 				t.Fatalf("got unexpected error: %s", err.Error())
 			}
 
-			if diff := cmp.Diff(
-				tt.wantJsonDevices, r.jsonDevices,
-				cmp.AllowUnexported(jsonDevice{}),
-			); diff != "" {
-				t.Fatalf(
-					"runner.executeRaids() jsonDevices mismatch (-want +got):\n%s",
-					diff,
-				)
-			}
+			// removing mock plugin
+			r.plugin = nil
 
 			if diff := cmp.Diff(
-				tt.wantDevices, r.devices,
-				cmp.AllowUnexported(deviceInfo{}),
+				tt.expectedState,
+				r,
+				cmp.AllowUnexported(jsonDevice{}, deviceInfo{}, runner{}),
 			); diff != "" {
-				t.Fatalf(
-					"runner.executeRaids() devices mismatch (-want +got):\n%s",
-					diff,
-				)
+				t.Fatalf("Plugin.execute() runner = %s", diff)
 			}
 
 			if err := m.ExpectationsWhereMet(); err != nil {
@@ -2842,9 +2795,9 @@ func Test_runner_executeRaids(t *testing.T) {
 	}
 }
 
-//nolint:paralleltest,tparallel
-
 func Test_runner_executeMegaRaids(t *testing.T) {
+	t.Parallel()
+
 	log.DefaultLogger = stdlog.New(os.Stdout, "", stdlog.LstdFlags)
 
 	type expectation struct {
@@ -2853,23 +2806,16 @@ func Test_runner_executeMegaRaids(t *testing.T) {
 		out  []byte
 	}
 
-	type fields struct {
-		devices     map[string]deviceParser
-		jsonDevices map[string]jsonDevice
-	}
-
 	type args struct {
 		megaraids  []deviceInfo
 		jsonRunner bool
 	}
 
 	tests := []struct {
-		name            string
-		expectations    []expectation
-		fields          fields
-		args            args
-		wantJsonDevices map[string]jsonDevice
-		wantDevices     map[string]deviceParser
+		name          string
+		expectations  []expectation
+		args          args
+		expectedState *runner
 	}{
 		{
 			"+valid",
@@ -2907,10 +2853,6 @@ func Test_runner_executeMegaRaids(t *testing.T) {
 					out: mock.OutputAllDiscInfoSDA,
 				},
 			},
-			fields{
-				jsonDevices: map[string]jsonDevice{},
-				devices:     map[string]deviceParser{},
-			},
 			args{
 				[]deviceInfo{
 					{
@@ -2923,23 +2865,25 @@ func Test_runner_executeMegaRaids(t *testing.T) {
 				},
 				false,
 			},
-			nil,
-			map[string]deviceParser{
-				"optimus_prime megaraid": {
-					ModelName:    "SAMSUNG MZVL21T0HCLR-00BH1",
-					SerialNumber: "S641NX0T509005",
-					Info: deviceInfo{
-						Name:     "optimus_prime megaraid",
-						InfoName: "/dev/sda",
-						DevType:  "nvme",
-						name:     "optimus_prime",
-						raidType: "megaraid",
+			&runner{
+				jsonDevices: nil,
+				devices: map[string]deviceParser{
+					"optimus_prime megaraid": {
+						ModelName:    "SAMSUNG MZVL21T0HCLR-00BH1",
+						SerialNumber: "S641NX0T509005",
+						Info: deviceInfo{
+							Name:     "optimus_prime megaraid",
+							InfoName: "/dev/sda",
+							DevType:  "nvme",
+							name:     "optimus_prime",
+							raidType: "megaraid",
+						},
+						Smartctl: smartctlField{
+							Version: []int{7, 1},
+						},
+						SmartStatus:     &smartStatus{SerialNumber: true},
+						SmartAttributes: smartAttributes{},
 					},
-					Smartctl: smartctlField{
-						Version: []int{7, 1},
-					},
-					SmartStatus:     &smartStatus{SerialNumber: true},
-					SmartAttributes: smartAttributes{},
 				},
 			},
 		},
@@ -2979,10 +2923,6 @@ func Test_runner_executeMegaRaids(t *testing.T) {
 					out: mock.OutputAllDiscInfoSDA,
 				},
 			},
-			fields{
-				jsonDevices: map[string]jsonDevice{},
-				devices:     map[string]deviceParser{},
-			},
 			args{
 				[]deviceInfo{
 					{
@@ -2995,13 +2935,15 @@ func Test_runner_executeMegaRaids(t *testing.T) {
 				},
 				true,
 			},
-			map[string]jsonDevice{
-				"optimus_prime megaraid": {
-					serialNumber: "S641NX0T509005",
-					jsonData:     string(mock.OutputAllDiscInfoSDA),
+			&runner{
+				jsonDevices: map[string]jsonDevice{
+					"optimus_prime megaraid": {
+						serialNumber: "S641NX0T509005",
+						jsonData:     string(mock.OutputAllDiscInfoSDA),
+					},
 				},
+				devices: nil,
 			},
-			nil,
 		},
 	}
 	for _, tt := range tests {
@@ -3030,24 +2972,15 @@ func Test_runner_executeMegaRaids(t *testing.T) {
 				t.Fatalf("got unexpected error: %s", err.Error())
 			}
 
-			if diff := cmp.Diff(
-				tt.wantJsonDevices, r.jsonDevices,
-				cmp.AllowUnexported(jsonDevice{}),
-			); diff != "" {
-				t.Fatalf(
-					"runner.executeMegaRaids() jsonDevices mismatch (-want +got):\n%s",
-					diff,
-				)
-			}
+			// removing mock plugin
+			r.plugin = nil
 
 			if diff := cmp.Diff(
-				tt.wantDevices, r.devices,
-				cmp.AllowUnexported(deviceInfo{}),
+				tt.expectedState,
+				r,
+				cmp.AllowUnexported(jsonDevice{}, deviceInfo{}, runner{}),
 			); diff != "" {
-				t.Fatalf(
-					"runner.executeMegaRaids() devices mismatch (-want +got):\n%s",
-					diff,
-				)
+				t.Fatalf("Plugin.execute() runner = %s", diff)
 			}
 
 			if err := m.ExpectationsWhereMet(); err != nil {
