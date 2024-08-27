@@ -10527,6 +10527,8 @@ static int	dc_preproc_item_changed(ZBX_DC_ITEM *dc_item, zbx_pp_item_t *pp_item)
 		if (dc_item->preproc_item->revision > pp_item->revision)
 			return SUCCEED;
 	}
+	else if (0 < pp_item->preproc->steps_num)
+			return SUCCEED;
 
 	return FAIL;
 }
