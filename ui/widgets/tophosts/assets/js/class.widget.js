@@ -105,7 +105,7 @@ class CWidgetTopHosts extends CWidget {
 	#makeUrls() {
 		const urls = [];
 
-		this.#binary_buttons = new Map();
+		this.#binary_buttons.clear();
 
 		for (const button of this.#table_body.querySelectorAll('.js-show-binary')) {
 			const cell = button.closest('td');

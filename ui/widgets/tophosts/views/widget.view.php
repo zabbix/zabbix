@@ -196,13 +196,8 @@ function shouldUseDoubleColumnHeader(array $column_config): bool {
 
 function getFormattedValue(array $column, array $column_config): string {
 	if (in_array($column['item']['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])) {
-		return formatAggregatedHistoryValue(
-			$column['value'],
-			$column['item'],
-			$column_config['aggregate_function'],
-			false,
-			true,
-			[
+		return formatAggregatedHistoryValue($column['value'], $column['item'], $column_config['aggregate_function'],
+			false, true, [
 				'decimals' => $column_config['decimal_places'],
 				'decimals_exact' => true,
 				'small_scientific' => false,
@@ -212,11 +207,7 @@ function getFormattedValue(array $column, array $column_config): string {
 	}
 
 	if ($column['item']['value_type'] != ITEM_VALUE_TYPE_BINARY) {
-		return formatAggregatedHistoryValue(
-			$column['value'],
-			$column['item'],
-			$column_config['aggregate_function']
-		);
+		return formatAggregatedHistoryValue($column['value'], $column['item'], $column_config['aggregate_function']);
 	}
 
 	if ($column_config['display_value_as'] != CWidgetFieldColumnsList::DISPLAY_VALUE_AS_BINARY) {
