@@ -450,7 +450,7 @@ func Test_getBasicDeviceInfo(t *testing.T) {
 		deviceName     string
 		expectations   expectation
 		args           args
-		expectedResult SmartCtlDeviceData
+		expectedResult *SmartCtlDeviceData
 		wantErr        bool
 	}{
 		{
@@ -471,7 +471,7 @@ func Test_getBasicDeviceInfo(t *testing.T) {
 				},
 				false,
 			},
-			SmartCtlDeviceData{
+			&SmartCtlDeviceData{
 				Device: &deviceParser{
 					ModelName:    "SAMSUNG MZVL21T0HCLR-00BH1",
 					SerialNumber: "S641NX0T509005",
@@ -492,7 +492,7 @@ func Test_getBasicDeviceInfo(t *testing.T) {
 			false,
 		},
 		{
-			name:       "+invalidJSON",
+			name:       "-invalidJSON",
 			deviceName: "/dev/sda",
 			expectations: expectation{
 				args: []string{"-a", "/dev/sda", "-j"},
@@ -509,11 +509,11 @@ func Test_getBasicDeviceInfo(t *testing.T) {
 				},
 				false,
 			},
-			expectedResult: SmartCtlDeviceData{},
+			expectedResult: nil,
 			wantErr:        true, // Expect an error due to invalid JSON
 		},
 		{
-			name:       "+noDeviceFound",
+			name:       "-noDeviceFound",
 			deviceName: "/dev/sdx", // Assuming this is an invalid or nonexistent device
 			expectations: expectation{
 				args: []string{"-a", "/dev/sdx", "-j"},
@@ -530,11 +530,11 @@ func Test_getBasicDeviceInfo(t *testing.T) {
 				},
 				false,
 			},
-			expectedResult: SmartCtlDeviceData{},
+			expectedResult: nil,
 			wantErr:        true, // Expect an error because the device doesn't exist
 		},
 		{
-			name:       "+noSmartStatus",
+			name:       "-noSmartStatus",
 			deviceName: "/dev/sda",
 			expectations: expectation{
 				args: []string{"-a", "/dev/sda", "-j"},
@@ -551,7 +551,7 @@ func Test_getBasicDeviceInfo(t *testing.T) {
 				},
 				false,
 			},
-			expectedResult: SmartCtlDeviceData{},
+			expectedResult: nil,
 			wantErr:        true, // Expect an error due to missing SmartStatus
 		},
 		{
@@ -572,9 +572,7 @@ func Test_getBasicDeviceInfo(t *testing.T) {
 				},
 				false,
 			},
-			SmartCtlDeviceData{
-				Data: mock.Outputs.Get("WSL_with_no_permissions").AllSmartInfoScans.Get("-a /dev/sda -j"),
-			},
+			nil,
 			true,
 		},
 		{
@@ -595,7 +593,7 @@ func Test_getBasicDeviceInfo(t *testing.T) {
 				},
 				false,
 			},
-			SmartCtlDeviceData{},
+			nil,
 			true,
 		},
 	}
@@ -613,8 +611,6 @@ func Test_getBasicDeviceInfo(t *testing.T) {
 				WillReturnOutput(tt.expectations.out).
 				WillReturnError(tt.expectations.err)
 
-			log.New("test")
-
 			result, err := getBasicDeviceInfo(mockController, tt.deviceName)
 			if (err != nil) != tt.wantErr {
 				t.Fatalf(
@@ -624,27 +620,25 @@ func Test_getBasicDeviceInfo(t *testing.T) {
 				)
 			}
 
-			if !tt.wantErr {
-				if diff := cmp.Diff(
-					*tt.expectedResult.Device, *result.Device,
-					cmp.AllowUnexported(deviceInfo{}),
-				); diff != "" {
-					t.Fatalf(
-						"runner.executeBase() jsonDevices mismatch (-want +got):\n%s",
-						diff,
-					)
-				}
-
-				if diff := cmp.Diff(
-					tt.expectedResult.Data, result.Data,
-					cmp.AllowUnexported(deviceInfo{}),
-				); diff != "" {
-					t.Fatalf(
-						"runner.executeBase() devices mismatch (-want +got):\n%s",
-						diff,
-					)
-				}
+			if diff := cmp.Diff(
+				tt.expectedResult, result,
+				cmp.AllowUnexported(deviceInfo{}),
+			); diff != "" {
+				t.Fatalf(
+					"runner.executeBase() jsonDevices mismatch (-want +got):\n%s",
+					diff,
+				)
 			}
+
+			// if diff := cmp.Diff(
+			// 	tt.expectedResult.Data, result.Data,
+			// 	cmp.AllowUnexported(deviceInfo{}),
+			// ); diff != "" {
+			// 	t.Fatalf(
+			// 		"runner.executeBase() devices mismatch (-want +got):\n%s",
+			// 		diff,
+			// 	)
+			// }
 
 			if err := mockController.ExpectationsWhereMet(); err != nil {
 				t.Fatalf(
@@ -2323,8 +2317,6 @@ func Test_runner_executeBase(t *testing.T) {
 					WillReturnOutput(e.out).
 					WillReturnError(e.err)
 			}
-
-			log.New("test")
 
 			plugin := &Plugin{
 				ctl:  m,
