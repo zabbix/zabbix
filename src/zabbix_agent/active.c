@@ -866,7 +866,7 @@ static int	send_buffer(zbx_vector_ptr_t *addrs, zbx_vector_pre_persistent_t *pre
 
 		zbx_tcp_close(&s);
 
-		if (FAIL == ret)
+		if (SUCCEED == !ret)
 		{
 			/* initiate failover on exchange failure */
 			zbx_addrs_failover(addrs);

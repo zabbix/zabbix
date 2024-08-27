@@ -120,7 +120,7 @@ retry:
 
 		zbx_tcp_close(&sock);
 
-		if (FAIL == ret && 0 < --retries)
+		if (SUCCEED != ret && 0 < --retries)
 		{
 			zbx_addrs_failover(&zbx_addrs);
 			goto retry;
