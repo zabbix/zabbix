@@ -251,7 +251,7 @@ $host_permissions_form_grid = (new CFormGrid())
 				(new CTable())
 					->setId('hostgroup-right-table')
 					->setAttribute('style', 'width: 100%;')
-					->setHeader([_('Host groups'), _('Permissions')])
+					->setHeader([_('Host groups'), _('Permissions'), ''])
 					->addRow((new CRow())->addClass('js-hostgroup-right-row-placeholder'))
 					->addItem(
 						(new CTag('tfoot', true))

@@ -222,7 +222,7 @@ $steps_tab = (new CFormGrid())->addItem([
 					(new CColHeader(_('Status codes')))
 						->addClass(ZBX_STYLE_NOWRAP)
 						->setWidth('90'),
-					(new CColHeader(''))->setWidth('50')
+					(new CColHeader(_('Action')))->setWidth('50')
 				])
 				->addItem(
 					(new CTag('tfoot', true))->addItem(

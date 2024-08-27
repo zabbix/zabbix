@@ -22,7 +22,7 @@
 $tag_filter_table = (new CTable())
 	->setId('tag-filter-table')
 	->setAttribute('style', 'width: 100%;')
-	->setHeader([_('Host groups'), _('Tags'), '']);
+	->setHeader([_('Host groups'), _('Tags'), _('Action')]);
 
 foreach ($data['tag_filters'] as $key => $tag_filter) {
 	$action = [

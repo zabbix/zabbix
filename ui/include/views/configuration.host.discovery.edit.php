@@ -814,7 +814,7 @@ $condition_tab->addItem([
 $condition_table = (new CTable())
 	->setId('conditions')
 	->addStyle('width: 100%;')
-	->setHeader([_('Label'), _('Macro'), '', _('Regular expression')]);
+	->setHeader([_('Label'), _('Macro'), '', _('Regular expression'), '']);
 
 $operators = CSelect::createOptionsFromArray([
 	CONDITION_OPERATOR_REGEXP => _('matches'),
@@ -974,7 +974,7 @@ $overrides_list = (new CTable())
 		(new CColHeader())->setWidth('15'),
 		(new CColHeader(_('Name')))->setWidth('350'),
 		(new CColHeader(_('Stop processing')))->setWidth('100'),
-		(new CColHeader())->setWidth('50')
+		(new CColHeader(_('Action')))->setWidth('50')
 	])
 	->addRow(
 		(new CCol(

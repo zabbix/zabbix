@@ -58,7 +58,7 @@ $form_grid = (new CFormGrid())
 				(new CTable())
 					->setId('mappings-table')
 					->addClass(ZBX_STYLE_TABLE_FORMS)
-					->setHeader(['', _('Type'), _('Value'), '', _('Mapped to'), _('Action'), ''])
+					->setHeader(['', _('Type'), _('Value'), '', _('Mapped to'), ''])
 					->setFooter(
 						(new CCol(
 							(new CButtonLink(_('Add')))->addClass('element-table-add')

@@ -27,7 +27,7 @@ $table = (new CTable())
 		(new CTableColumn(_('Value')))
 			->addStyle('width: '.ZBX_TEXTAREA_MAPPING_NEWVALUE_WIDTH.'px;')
 			->addClass('table-col-handle'),
-		(new CTableColumn(''))
+		(new CTableColumn(_('Action')))
 			->addClass('table-col-handle')
 	]);
 

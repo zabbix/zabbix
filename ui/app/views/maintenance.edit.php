@@ -33,7 +33,7 @@ $form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 $timeperiods = (new CTable())
 	->setId('timeperiods')
 	->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-	->setHeader(new CRowHeader([_('Period type'), _('Schedule'), _('Period'), '']))
+	->setHeader(new CRowHeader([_('Period type'), _('Schedule'), _('Period'), _('Action')]))
 	->addItem(
 		(new CTag('tfoot', true))
 			->addItem(
