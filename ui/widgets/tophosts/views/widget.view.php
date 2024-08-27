@@ -123,8 +123,6 @@ else {
 								->setAttribute('data-itemid', $column['item']['itemid'])
 								->setAttribute('data-clock', $column['value']['clock'].'.'.$column['value']['ns'])
 								->setColSpan(2);
-
-							break;
 						}
 						else {
 							$value = $column_config['aggregate_function'] == AGGREGATE_COUNT
@@ -141,12 +139,9 @@ else {
 									(new CDiv($value))->addClass(ZBX_STYLE_HINTBOX_WRAP)
 								)
 								->setColSpan(2);
-
-							break;
 						}
 					}
-
-					if ($column_config['display_value_as'] == CWidgetFieldColumnsList::DISPLAY_VALUE_AS_TEXT) {
+					elseif ($column_config['display_value_as'] == CWidgetFieldColumnsList::DISPLAY_VALUE_AS_TEXT) {
 						if (array_key_exists('highlights', $column_config)) {
 							$value_to_check = $column['item']['value_type'] == ITEM_VALUE_TYPE_BINARY
 								? $column['value']
@@ -169,11 +164,8 @@ else {
 										(new CDiv($column['value']))->addClass(ZBX_STYLE_HINTBOX_WRAP)
 									)
 							);
-
-						break;
 					}
-
-					if ($column_config['display'] == CWidgetFieldColumnsList::DISPLAY_AS_IS) {
+					elseif ($column_config['display'] == CWidgetFieldColumnsList::DISPLAY_AS_IS) {
 						$row[] = (new CCol())
 							->setAttribute('bgcolor', $color !== '' ? '#'.$color : null)
 							->addItem(
@@ -183,45 +175,44 @@ else {
 										(new CDiv($column['value']))->addClass(ZBX_STYLE_HINTBOX_WRAP)
 									)
 							);
-
-						break;
 					}
+					else {
+						$bar_gauge = (new CBarGauge())
+							->setValue($column['value'])
+							->setAttribute('fill', $color !== '' ? '#'.$color : Widget::DEFAULT_FILL)
+							->setAttribute('min', $column['is_binary_units']
+								? $column_config['min_binary']
+								: $column_config['min']
+							)
+							->setAttribute('max', $column['is_binary_units']
+								? $column_config['max_binary']
+								: $column_config['max']
+							);
 
-					$bar_gauge = (new CBarGauge())
-						->setValue($column['value'])
-						->setAttribute('fill', $color !== '' ? '#'.$color : Widget::DEFAULT_FILL)
-						->setAttribute('min', $column['is_binary_units']
-							? $column_config['min_binary']
-							: $column_config['min']
-						)
-						->setAttribute('max', $column['is_binary_units']
-							? $column_config['max_binary']
-							: $column_config['max']
-						);
-
-					if ($column_config['display'] == CWidgetFieldColumnsList::DISPLAY_BAR) {
-						$bar_gauge->setAttribute('solid', 1);
-					}
-
-					if (array_key_exists('thresholds', $column_config)) {
-						foreach ($column_config['thresholds'] as $threshold) {
-							$threshold_value = $column['is_binary_units']
-								? $threshold['threshold_binary']
-								: $threshold['threshold'];
-
-							$bar_gauge->addThreshold($threshold_value, '#'.$threshold['color']);
+						if ($column_config['display'] == CWidgetFieldColumnsList::DISPLAY_BAR) {
+							$bar_gauge->setAttribute('solid', 1);
 						}
-					}
 
-					$row[] = new CCol($bar_gauge);
-					$row[] = (new CCol())
-						->addStyle('width: 0;')
-						->addItem(
-							(new CDiv($formatted_value))
-								->addClass(ZBX_STYLE_CURSOR_POINTER)
-								->addClass(ZBX_STYLE_NOWRAP)
-								->setHint((new CDiv($column['value']))->addClass(ZBX_STYLE_HINTBOX_WRAP))
-						);
+						if (array_key_exists('thresholds', $column_config)) {
+							foreach ($column_config['thresholds'] as $threshold) {
+								$threshold_value = $column['is_binary_units']
+									? $threshold['threshold_binary']
+									: $threshold['threshold'];
+
+								$bar_gauge->addThreshold($threshold_value, '#'.$threshold['color']);
+							}
+						}
+
+						$row[] = new CCol($bar_gauge);
+						$row[] = (new CCol())
+							->addStyle('width: 0;')
+							->addItem(
+								(new CDiv($formatted_value))
+									->addClass(ZBX_STYLE_CURSOR_POINTER)
+									->addClass(ZBX_STYLE_NOWRAP)
+									->setHint((new CDiv($column['value']))->addClass(ZBX_STYLE_HINTBOX_WRAP))
+							);
+					}
 
 					break;
 			}

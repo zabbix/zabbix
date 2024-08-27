@@ -152,7 +152,7 @@ class CWidgetFieldColumnsList extends CWidgetField {
 				}
 			}
 
-			if (array_key_exists('thresholds', $value) && $value['thresholds']) {
+			if (array_key_exists('thresholds', $value)) {
 				foreach ($value['thresholds'] as $threshold_index => $threshold) {
 					$widget_fields[] = [
 						'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -167,7 +167,7 @@ class CWidgetFieldColumnsList extends CWidgetField {
 				}
 			}
 
-			if (array_key_exists('highlights', $value) && $value['highlights']) {
+			if (array_key_exists('highlights', $value)) {
 				foreach ($value['highlights'] as $highlight_index => $highlight) {
 					$widget_fields[] = [
 						'type' => ZBX_WIDGET_FIELD_TYPE_STR,
