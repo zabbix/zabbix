@@ -332,6 +332,23 @@ class CControllerTriggerList extends CController {
 			unset($dependencyTrigger);
 		}
 
+		if (getRequest('context') === 'host') {
+			$editable_hosts = API::Host()->get([
+				'output' => ['hostids'],
+				'editable' => true
+			]);
+
+			$data['editable_hosts'] = array_column($editable_hosts, 'hostid');
+		}
+		else {
+			$editable_hosts = API::Template()->get([
+				'output' => ['templateids'],
+				'editable' => true
+			]);
+
+			$data['editable_hosts'] = array_column($editable_hosts, 'templateid');
+		}
+
 		CProfile::update($prefix.'trigger.list.sort', $sort, PROFILE_TYPE_STR);
 		CProfile::update($prefix.'trigger.list.sortorder', $sort_order, PROFILE_TYPE_STR);
 

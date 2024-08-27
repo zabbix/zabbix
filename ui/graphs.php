@@ -671,6 +671,15 @@ else {
 		? API::GraphPrototype()->get($options)
 		: API::Graph()->get($options);
 
+	if (getRequest('context') === 'host') {
+		$editable_hosts = API::Host()->get([
+			'output' => ['hostids'],
+			'editable' => true
+		]);
+
+		$data['editable_hosts'] = array_column($editable_hosts, 'hostid');
+	}
+
 	if ($sort_field === 'graphtype') {
 		foreach ($data['graphs'] as $gnum => $graph) {
 			$data['graphs'][$gnum]['graphtype'] = graphType($graph['graphtype']);

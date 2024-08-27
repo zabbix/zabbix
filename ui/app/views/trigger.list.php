@@ -321,9 +321,11 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 				$hosts[] = ', ';
 			}
 
-			$hosts[] = (new CLink($host['name']))
-				->setAttribute('data-hostid', $host['hostid'])
-				->addClass('js-edit-'.$data['context']);
+			$hosts[] = in_array($host['hostid'], $data['editable_hosts'])
+				? (new CLink($host['name']))
+					->setAttribute('data-hostid', $host['hostid'])
+					->addClass('js-edit-'.$data['context'])
+				: $host['name'];
 		}
 
 		$hosts = (new CCol($hosts))->addClass(ZBX_STYLE_WORDBREAK);
