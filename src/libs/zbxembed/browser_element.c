@@ -115,7 +115,7 @@ static duk_ret_t	wd_element_send_keys(duk_context *ctx)
 	zbx_wd_element_t	*el;
 	char			*error = NULL, *keys = NULL;
 	int			err_index = -1;
-	const char		*keys_cesu;
+	const char		*keys_cesu = NULL;
 
 	if (!duk_is_null(ctx, 0) && !duk_is_undefined(ctx, 0))
 		keys_cesu = duk_safe_to_string(ctx, 0);
@@ -215,7 +215,7 @@ static duk_ret_t	wd_element_get_attribute(duk_context *ctx)
 	zbx_wd_element_t	*el;
 	char			*error = NULL, *name = NULL, *value = NULL;
 	int			err_index = -1;
-	const char		*name_cesu;
+	const char		*name_cesu = NULL;
 
 	if (!duk_is_null(ctx, 0) && !duk_is_undefined(ctx, 0))
 		name_cesu = duk_safe_to_string(ctx, 0);
@@ -268,7 +268,7 @@ static duk_ret_t	wd_element_get_property(duk_context *ctx)
 	zbx_wd_element_t	*el;
 	char			*error = NULL, *name = NULL, *value = NULL;
 	int			err_index = -1;
-	const char		*name_cesu;
+	const char		*name_cesu = NULL;
 
 	if (!duk_is_null(ctx, 0) && !duk_is_undefined(ctx, 0))
 		name_cesu = duk_safe_to_string(ctx, 0);
