@@ -24,7 +24,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"runtime"
 	"sort"
 	"strconv"
 	"strings"
@@ -73,7 +72,6 @@ const (
 )
 
 var (
-	cpuCount     int
 	lastVerCheck time.Time
 	versionMux   sync.Mutex
 
@@ -233,14 +231,6 @@ type runner struct {
 	jsonDevices map[string]jsonDevice
 }
 
-//nolint:gochecknoinits
-func init() {
-	cpuCount = runtime.NumCPU()
-	if cpuCount < 1 {
-		cpuCount = 1
-	}
-}
-
 // execute returns the smartctl runner with all devices data returned by smartctl.
 // If jsonRunner is 'true' the returned data is in json format in 'jsonDevices' field.
 // If jsonRunner is 'false' the returned data is 'devices' field.
@@ -269,7 +259,7 @@ func (p *Plugin) execute(jsonRunner bool) (*runner, error) {
 	// Create an error group with the context.
 	g, _ := errgroup.WithContext(ctx)
 
-	g.SetLimit(cpuCount)
+	g.SetLimit(p.cpuCount)
 
 	resultChan := make(chan *SmartCtlDeviceData)
 	collectorDone := make(chan struct{})

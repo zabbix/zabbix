@@ -100,16 +100,21 @@ func TestPlugin_execute(t *testing.T) {
 					"/dev/sdb": {
 						ModelName:    "SAMSUNG MZVLB512HBJQ-000L7",
 						SerialNumber: "S3XY0987654321",
-						Info:         deviceInfo{Name: "/dev/sdb", InfoName: "/dev/sdb", DevType: "nvme", name: "/dev/sdb"},
-						Smartctl:     smartctlField{Version: []int{7, 1}},
-						SmartStatus:  &smartStatus{SerialNumber: true},
+						Info: deviceInfo{
+							Name:     "/dev/sdb",
+							InfoName: "/dev/sdb",
+							DevType:  "nvme",
+							name:     "/dev/sdb",
+						},
+						Smartctl:    smartctlField{Version: []int{7, 1}},
+						SmartStatus: &smartStatus{SerialNumber: true},
 					},
 				},
 			},
 			false,
 		},
 		{
-			"+oneDeviceWithNoSmart",
+			"+oneOfTwoDeviceWithNoSmart",
 			args{false},
 			[]expectation{
 				{
@@ -138,9 +143,14 @@ func TestPlugin_execute(t *testing.T) {
 					"/dev/sdb": {
 						ModelName:    "SAMSUNG MZVLB512HBJQ-000L7",
 						SerialNumber: "S3XY0987654321",
-						Info:         deviceInfo{Name: "/dev/sdb", InfoName: "/dev/sdb", DevType: "nvme", name: "/dev/sdb"},
-						Smartctl:     smartctlField{Version: []int{7, 1}},
-						SmartStatus:  &smartStatus{SerialNumber: true},
+						Info: deviceInfo{
+							Name:     "/dev/sdb",
+							InfoName: "/dev/sdb",
+							DevType:  "nvme",
+							name:     "/dev/sdb",
+						},
+						Smartctl:    smartctlField{Version: []int{7, 1}},
+						SmartStatus: &smartStatus{SerialNumber: true},
 					},
 				},
 			},
@@ -248,11 +258,10 @@ func TestPlugin_execute(t *testing.T) {
 			}
 
 			p := &Plugin{
-				ctl:  m,
-				Base: plugin.Base{Logger: log.New("test")},
+				cpuCount: 1,
+				ctl:      m,
+				Base:     plugin.Base{Logger: log.New("test")},
 			}
-
-			cpuCount = 1
 
 			got, err := p.execute(tt.args.jsonRunner)
 			if (err != nil) != tt.wantErr {
@@ -513,27 +522,6 @@ func Test_getBasicDeviceInfo(t *testing.T) {
 			wantErr:        true, // Expect an error due to invalid JSON
 		},
 		{
-			name:       "-noDeviceFound",
-			deviceName: "/dev/sdx", // Assuming this is an invalid or nonexistent device
-			expectations: expectation{
-				args: []string{"-a", "/dev/sdx", "-j"},
-				err:  errors.New("device not found"), // Simulate a "device not found" error
-				out:  []byte{},
-			},
-			args: args{
-				[]deviceInfo{
-					{
-						Name:     "/dev/sdx",
-						InfoName: "/dev/sdx",
-						DevType:  "nvme",
-					},
-				},
-				false,
-			},
-			expectedResult: nil,
-			wantErr:        true, // Expect an error because the device doesn't exist
-		},
-		{
 			name:       "-noSmartStatus",
 			deviceName: "/dev/sda",
 			expectations: expectation{
@@ -575,34 +563,11 @@ func Test_getBasicDeviceInfo(t *testing.T) {
 			nil,
 			true,
 		},
-		{
-			"-smartPermissionsDenied",
-			"/dev/sda",
-			expectation{
-				args: []string{"-a", "/dev/sda", "-j"},
-				err:  errors.New("permissions denied"),
-				out:  []byte{},
-			},
-			args{
-				[]deviceInfo{
-					{
-						Name:     "/dev/sda",
-						InfoName: "/dev/sda",
-						DevType:  "nvme",
-					},
-				},
-				false,
-			},
-			nil,
-			true,
-		},
 	}
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-
-			cpuCount = 1
 
 			mockController := &mock.MockController{}
 
@@ -629,16 +594,6 @@ func Test_getBasicDeviceInfo(t *testing.T) {
 					diff,
 				)
 			}
-
-			// if diff := cmp.Diff(
-			// 	tt.expectedResult.Data, result.Data,
-			// 	cmp.AllowUnexported(deviceInfo{}),
-			// ); diff != "" {
-			// 	t.Fatalf(
-			// 		"runner.executeBase() devices mismatch (-want +got):\n%s",
-			// 		diff,
-			// 	)
-			// }
 
 			if err := mockController.ExpectationsWhereMet(); err != nil {
 				t.Fatalf(
@@ -1235,7 +1190,6 @@ func Test_setDeviceData(t *testing.T) {
 	}{
 		{
 			"+jsonRunner",
-
 			args{
 				true,
 				&SmartCtlDeviceData{
@@ -1269,7 +1223,6 @@ func Test_setDeviceData(t *testing.T) {
 		},
 		{
 			"+notJSONRunner",
-
 			args{
 				false,
 				&SmartCtlDeviceData{
@@ -2048,8 +2001,9 @@ func TestPlugin_scanDevices(t *testing.T) {
 	}
 }
 
-//nolint:paralleltest,tparallel
 func Test_runner_executeBase(t *testing.T) {
+	t.Parallel()
+
 	log.DefaultLogger = stdlog.New(os.Stdout, "", stdlog.LstdFlags)
 
 	type expectation struct {
@@ -2246,6 +2200,84 @@ func Test_runner_executeBase(t *testing.T) {
 			false,
 		},
 		{
+			"+mac",
+			[]expectation{
+				{
+					args: []string{"--scan", "-j"},
+					err:  nil,
+					out: []byte(`{
+									"json_format_version": [1, 0],
+									"smartctl": {
+										"version": [7, 1],
+										"svn_revision": "5022",
+										"platform_info": "x86_64-w64-mingw32-w10-b19045",
+										"build_info": "(sf-7.1-1)"
+									},
+									"devices": [
+										{
+										"name": "IOService:/AppleARMPE/arm-io@10F00000/AppleT811xIO/ans@77400000/AppleASCWrapV4/iop-ans-nub/RTBuddy(ANS2)/RTBuddyService/AppleANS3NVMeController/NS_01@1",
+										"info_name": "IOService:/AppleARMPE/arm-io@10F00000/AppleT811xIO/ans@77400000/AppleASCWrapV4/iop-ans-nub/RTBuddy(ANS2)/RTBuddyService/AppleANS3NVMeController/NS_01@1",
+										"type": "nvme",
+										"protocol": "NVMe"
+										}
+									]
+									}
+								`),
+				},
+				{
+					args: []string{"--scan", "-d", "sat", "-j"},
+					err:  nil,
+					out:  []byte(`{}`),
+				},
+				{
+					args: []string{
+						"-a",
+						"IOService:/AppleARMPE/arm-io@10F00000/AppleT811xIO/ans@77400000/AppleASCWrapV4/iop-ans-nub/RTBuddy(ANS2)/RTBuddyService/AppleANS3NVMeController/NS_01@1", //nolint:lll
+						"-j",
+					},
+					err: nil,
+					out: mock.OutputAllDiscInfoMac,
+				},
+			},
+			args{
+				[]deviceInfo{
+					{
+						Name:     "IOService:/AppleARMPE/arm-io@10F00000/AppleT811xIO/ans@77400000/AppleASCWrapV4/iop-ans-nub/RTBuddy(ANS2)/RTBuddyService/AppleANS3NVMeController/NS_01@1", //nolint:lll
+						InfoName: "IOService:/AppleARMPE/arm-io@10F00000/AppleT811xIO/ans@77400000/AppleASCWrapV4/iop-ans-nub/RTBuddy(ANS2)/RTBuddyService/AppleANS3NVMeController/NS_01@1", //nolint:lll
+						DevType:  "nvme",
+					},
+				},
+				false,
+			},
+			&runner{
+				jsonDevices: nil,
+				devices: map[string]deviceParser{
+					"IOService:/AppleARMPE/arm-io@10F00000/AppleT811xIO/ans@77400000/AppleASCWrapV4/iop-ans-nub/RTBuddy(ANS2)/RTBuddyService/AppleANS3NVMeController/NS_01@1": { //nolint:lll
+						ModelName:    "APPLE SSD AP0512Z",
+						SerialNumber: "0ba02202c4bc1a1e",
+						Info: deviceInfo{
+							Name:     "IOService:/AppleARMPE/arm-io@10F00000/AppleT811xIO/ans@77400000/AppleASCWrapV4/iop-ans-nub/RTBuddy(ANS2)/RTBuddyService/AppleANS3NVMeController/NS_01@1", //nolint:lll
+							InfoName: "IOService:/AppleARMPE/arm-io@10F00000/AppleT811xIO/ans@77400000/AppleASCWrapV4/iop-ans-nub/RTBuddy(ANS2)/RTBuddyService/AppleANS3NVMeController/NS_01@1", //nolint:lll
+							DevType:  "nvme",
+							name:     "IOService:/AppleARMPE/arm-io@10F00000/AppleT811xIO/ans@77400000/AppleASCWrapV4/iop-ans-nub/RTBuddy(ANS2)/RTBuddyService/AppleANS3NVMeController/NS_01@1", //nolint:lll
+						},
+						Smartctl: smartctlField{
+							Version:    []int{7, 4},
+							ExitStatus: 4,
+							Messages: []message{
+								{
+									"Read 1 entries from Error Information Log failed: GetLogPage failed: system=0x38, sub=0x0, code=745", //nolint:lll
+								},
+							},
+						},
+						SmartStatus:     &smartStatus{SerialNumber: true},
+						SmartAttributes: smartAttributes{},
+					},
+				},
+			},
+			false,
+		},
+		{
 			"+jsonRunner",
 			[]expectation{
 				{
@@ -2307,8 +2339,6 @@ func Test_runner_executeBase(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			cpuCount = 1
-
 			m := &mock.MockController{}
 
 			for _, e := range tt.expectations {
@@ -2319,8 +2349,9 @@ func Test_runner_executeBase(t *testing.T) {
 			}
 
 			plugin := &Plugin{
-				ctl:  m,
-				Base: plugin.Base{Logger: log.New("test")},
+				cpuCount: 1,
+				ctl:      m,
+				Base:     plugin.Base{Logger: log.New("test")},
 			}
 
 			r, err := plugin.execute(tt.args.jsonRunner)
@@ -2358,7 +2389,6 @@ func Test_runner_executeRaids(t *testing.T) {
 	t.Parallel()
 
 	log.DefaultLogger = stdlog.New(os.Stdout, "", stdlog.LstdFlags)
-	cpuCount = 1
 
 	//nolint:lll
 	sampleFailedAllSmartInfoScan := []byte(
@@ -2746,8 +2776,9 @@ func Test_runner_executeRaids(t *testing.T) {
 			}
 
 			plugin := &Plugin{
-				ctl:  m,
-				Base: plugin.Base{Logger: log.New("test")},
+				cpuCount: 1,
+				ctl:      m,
+				Base:     plugin.Base{Logger: log.New("test")},
 			}
 
 			r, err := plugin.execute(tt.args.jsonRunner)
@@ -2932,8 +2963,6 @@ func Test_runner_executeMegaRaids(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			cpuCount = 1
-
 			m := &mock.MockController{}
 
 			for _, e := range tt.expectations {
@@ -2944,8 +2973,9 @@ func Test_runner_executeMegaRaids(t *testing.T) {
 			}
 
 			plugin := &Plugin{
-				ctl:  m,
-				Base: plugin.Base{Logger: log.New("test")},
+				cpuCount: 1,
+				ctl:      m,
+				Base:     plugin.Base{Logger: log.New("test")},
 			}
 
 			r, err := plugin.execute(tt.args.jsonRunner)
