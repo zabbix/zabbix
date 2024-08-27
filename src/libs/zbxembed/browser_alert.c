@@ -23,14 +23,6 @@
 
 #include "zbxembed.h"
 
-typedef struct
-{
-	zbx_webdriver_t	*wd;
-}
-zbx_wd_alert_t;
-
-#ifdef HAVE_LIBCURL
-
 /******************************************************************************
  *                                                                            *
  * Purpose: return backing C structure embedded in alert object               *
@@ -54,6 +46,12 @@ static zbx_wd_alert_t *wd_alert(duk_context *ctx)
 	return alert;
 }
 
+void	wd_alert_free(zbx_wd_alert_t *alert)
+{
+	webdriver_release(alert->wd);
+	zbx_free(alert);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: alert destructor                                                  *
@@ -70,10 +68,7 @@ static duk_ret_t	wd_alert_dtor(duk_context *ctx)
 		return duk_error(ctx, DUK_RET_EVAL_ERROR, "cannot access internal environment");
 
 	if (NULL != (alert = (zbx_wd_alert_t *)es_obj_detach_data(env, ES_OBJ_ALERT)))
-	{
-		webdriver_release(alert->wd);
-		zbx_free(alert);
-	}
+		wd_alert_free(alert);
 
 	return 0;
 }
@@ -166,21 +161,6 @@ static const duk_function_list_entry	alert_methods[] = {
 	{0}
 };
 
-#else
-
-static duk_ret_t	wd_alert_ctor(duk_context *ctx)
-{
-	if (!duk_is_constructor_call(ctx))
-		return DUK_RET_EVAL_ERROR;
-
-	return duk_error(ctx, DUK_RET_EVAL_ERROR, "missing cURL library");
-}
-
-static const duk_function_list_entry	alert_methods[] = {
-	{NULL, NULL, 0}
-};
-#endif
-
 /******************************************************************************
  *                                                                            *
  * Purpose: create alert and push it on stack                                 *
@@ -197,3 +177,4 @@ void	wd_alert_create(duk_context *ctx, zbx_webdriver_t *wd, const char *text)
 }
 
 #endif
+

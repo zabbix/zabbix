@@ -23,6 +23,9 @@
 
 #include "zbxjson.h"
 #include "zbxstr.h"
+#include "webdriver.h"
+#include "browser_element.h"
+#include "browser_alert.h"
 
 #define ZBX_ES_MEMORY_LIMIT	(1024 * 1024 * 512)
 #define ZBX_ES_STACK_LIMIT	1000
@@ -372,6 +375,36 @@ out:
 	return ret;
 }
 
+static void	es_objmap_destroy(zbx_hashset_t *objmap)
+{
+#ifdef HAVE_LIBCURL
+	zbx_hashset_iter_t	iter;
+	zbx_es_obj_data_t	*obj;
+
+	zbx_hashset_iter_reset(objmap, &iter);
+	while (NULL != (obj = (zbx_es_obj_data_t *)zbx_hashset_iter_next(&iter)))
+	{
+		switch (obj->type)
+		{
+			case ES_OBJ_HTTPREQUEST:
+				es_httprequest_free(obj->data);
+				break;
+			case ES_OBJ_BROWSER:
+				webdriver_release((zbx_webdriver_t *)obj->data);
+				break;
+			case ES_OBJ_ELEMENT:
+				wd_element_free((zbx_wd_element_t *)obj->data);
+				break;
+			case ES_OBJ_ALERT:
+				wd_alert_free((zbx_wd_alert_t *)obj->data);
+				break;
+		}
+	}
+#endif
+
+	zbx_hashset_destroy(objmap);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: destroys initialized embedded scripting engine environment        *
@@ -397,9 +430,11 @@ int	zbx_es_destroy_env(zbx_es_t *es, char **error)
 	}
 
 	duk_destroy_heap(es->env->ctx);
+	es_objmap_destroy(&es->env->objmap);
+
 	zbx_es_debug_disable(es);
+
 	zbx_free(es->env->browser_endpoint);
-	zbx_hashset_destroy(&es->env->objmap);
 	zbx_free(es->env->error);
 	zbx_free(es->env);
 
