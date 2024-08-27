@@ -114,10 +114,7 @@ else {
 						if ($column['item']['value_type'] == ITEM_VALUE_TYPE_BINARY
 								&& $column_config['aggregate_function'] != AGGREGATE_COUNT) {
 							$row[] = (new CCol(
-								(new CButton(null, _('Show')))
-									->addClass($column_config['show_thumbnail'] ? 'btn-thumbnail' : ZBX_STYLE_BTN_LINK)
-									->addClass('js-show-binary')
-									->setAttribute('data-alt', $column_config['name'])
+								createBinaryShowButton($column_config['name'], $column_config['show_thumbnail'])
 							))
 								->setAttribute('bgcolor', $color !== '' ? '#'.$color : null)
 								->setAttribute('data-itemid', $column['item']['itemid'])
@@ -130,9 +127,7 @@ else {
 								: base64_encode($column['value']);
 
 							$row[] = (new CCol(
-								(new CButton(null, _('Show')))
-									->addClass(ZBX_STYLE_BTN_LINK)
-									->setAttribute('data-alt', $column_config['name'])
+								createNonBinaryShowButton($column_config['name'])
 							))
 								->setAttribute('bgcolor', $color !== '' ? '#'.$color : null)
 								->setHint(
@@ -155,53 +150,15 @@ else {
 							}
 						}
 
-						$row[] = (new CCol())
-							->setAttribute('bgcolor', $color !== '' ? '#'.$color : null)
-							->addItem(
-								(new CDiv($formatted_value))
-									->addClass(ZBX_STYLE_CURSOR_POINTER)
-									->setHint(
-										(new CDiv($column['value']))->addClass(ZBX_STYLE_HINTBOX_WRAP)
-									)
-							);
+						$row[] = createTextColumn($formatted_value, $column['value'], $color);
+
 					}
 					elseif ($column_config['display'] == CWidgetFieldColumnsList::DISPLAY_AS_IS) {
-						$row[] = (new CCol())
-							->setAttribute('bgcolor', $color !== '' ? '#'.$color : null)
-							->addItem(
-								(new CDiv($formatted_value))
-									->addClass(ZBX_STYLE_CURSOR_POINTER)
-									->setHint(
-										(new CDiv($column['value']))->addClass(ZBX_STYLE_HINTBOX_WRAP)
-									)
-							);
+						$row[] = createTextColumn($formatted_value, $column['value'], $color);
+
 					}
 					else {
-						$bar_gauge = (new CBarGauge())
-							->setValue($column['value'])
-							->setAttribute('fill', $color !== '' ? '#'.$color : Widget::DEFAULT_FILL)
-							->setAttribute('min', $column['is_binary_units']
-								? $column_config['min_binary']
-								: $column_config['min']
-							)
-							->setAttribute('max', $column['is_binary_units']
-								? $column_config['max_binary']
-								: $column_config['max']
-							);
-
-						if ($column_config['display'] == CWidgetFieldColumnsList::DISPLAY_BAR) {
-							$bar_gauge->setAttribute('solid', 1);
-						}
-
-						if (array_key_exists('thresholds', $column_config)) {
-							foreach ($column_config['thresholds'] as $threshold) {
-								$threshold_value = $column['is_binary_units']
-									? $threshold['threshold_binary']
-									: $threshold['threshold'];
-
-								$bar_gauge->addThreshold($threshold_value, '#'.$threshold['color']);
-							}
-						}
+						$bar_gauge = createBarGauge($column, $column_config, $color);
 
 						$row[] = new CCol($bar_gauge);
 						$row[] = (new CCol())
@@ -237,14 +194,6 @@ function shouldUseDoubleColumnHeader(array $column_config): bool {
 				&& $column_config['display'] != CWidgetFieldColumnsList::DISPLAY_AS_IS));
 }
 
-/**
- * Retrieves the formatted value for a given column based on its value type and display configuration.
- *
- * @param array $column Array representing the column's properties ('item' and 'value').
- * @param array $column_config Array representing the column's configuration and formatting options.
- *
- * @return string The formatted value as a string based on the column's value type and display configuration.
- */
 function getFormattedValue(array $column, array $column_config): string {
 	if (in_array($column['item']['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])) {
 		return formatAggregatedHistoryValue(
@@ -276,4 +225,59 @@ function getFormattedValue(array $column, array $column_config): string {
 	}
 
 	return '';
+}
+
+function createBinaryShowButton(string $column_name, bool $show_thumbnail = false): CButton {
+	return (new CButton(null, _('Show')))
+		->addClass($show_thumbnail ? 'btn-thumbnail' : ZBX_STYLE_BTN_LINK)
+		->addClass('js-show-binary')
+		->setAttribute('data-alt', $column_name);
+}
+
+function createNonBinaryShowButton(string $column_name): CButton {
+	return (new CButton(null, _('Show')))
+		->addClass(ZBX_STYLE_BTN_LINK)
+		->setAttribute('data-alt', $column_name);
+}
+
+function createTextColumn(string $formatted_value, string $hint_value, string $color): CCol {
+	return (new CCol())
+		->setAttribute('bgcolor', $color !== '' ? '#'.$color : null)
+		->addItem(
+			(new CDiv($formatted_value))
+				->addClass(ZBX_STYLE_CURSOR_POINTER)
+				->setHint(
+					(new CDiv($hint_value))->addClass(ZBX_STYLE_HINTBOX_WRAP)
+				)
+		);
+}
+
+function createBarGauge(array $column, array $column_config, string $color): CBarGauge {
+	$bar_gauge = (new CBarGauge())
+		->setValue($column['value'])
+		->setAttribute('fill', $color !== '' ? '#'.$color : Widget::DEFAULT_FILL)
+		->setAttribute('min', $column['is_binary_units']
+			? $column_config['min_binary']
+			: $column_config['min']
+		)
+		->setAttribute('max', $column['is_binary_units']
+			? $column_config['max_binary']
+			: $column_config['max']
+		);
+
+	if ($column_config['display'] == CWidgetFieldColumnsList::DISPLAY_BAR) {
+		$bar_gauge->setAttribute('solid', 1);
+	}
+
+	if (array_key_exists('thresholds', $column_config)) {
+		foreach ($column_config['thresholds'] as $threshold) {
+			$threshold_value = $column['is_binary_units']
+				? $threshold['threshold_binary']
+				: $threshold['threshold'];
+
+			$bar_gauge->addThreshold($threshold_value, '#'.$threshold['color']);
+		}
+	}
+
+	return $bar_gauge;
 }
