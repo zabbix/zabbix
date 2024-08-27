@@ -1,0 +1,1 @@
+..F....... [ZBX-24691] fixed issue with SNMPv3 authentication protocol and privacy protocol values not getting sent to server for item testing (gcalenko)
