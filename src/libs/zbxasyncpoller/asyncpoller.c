@@ -191,6 +191,24 @@ static void	async_dns_event(int err, struct evutil_addrinfo *ai, void *arg)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot resolve DNS name: %s", evutil_gai_strerror(err));
 		task->error = zbx_strdup(task->error, evutil_gai_strerror(err));
+
+		if (err == EVUTIL_EAI_NONAME)
+		{
+			static double		time = 0;
+
+			if (60.0 < zbx_time() - time)
+			{
+				int	ret;
+
+				time = zbx_time();
+				if (0 != (ret = evdns_base_resolv_conf_parse(task->dnsbase, DNS_OPTIONS_ALL,
+						ZBX_RES_CONF_FILE)))
+				{
+					zabbix_log(LOG_LEVEL_ERR, "cannot parse resolv.conf result: %s",
+						zbx_resolv_conf_errstr(ret));
+				}
+			}
+		}
 		async_event(-1, EV_TIMEOUT, task);
 	}
 	else
