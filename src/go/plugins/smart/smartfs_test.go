@@ -992,94 +992,6 @@ func TestPlugin_execute(t *testing.T) {
 	}
 }
 
-func TestPlugin_checkVersion(t *testing.T) { //nolint:tparallel
-	t.Parallel()
-
-	type expect struct {
-		exec bool
-	}
-
-	type fields struct {
-		execErr      error
-		execOut      []byte
-		lastVerCheck time.Time
-	}
-
-	tests := []struct {
-		name    string
-		expect  expect
-		fields  fields
-		wantErr bool
-	}{
-		{
-			"+valid",
-			expect{true},
-			fields{execOut: mock.OutputVersionValid},
-			false,
-		},
-		{
-			"-noCheck",
-			expect{false},
-			fields{
-				lastVerCheck: time.Now(),
-			},
-			false,
-		},
-		{
-			"-executeErr",
-			expect{true},
-			fields{
-				execOut: mock.OutputVersionValid,
-				execErr: errors.New("fail"),
-			},
-			true,
-		},
-		{
-			"-unmarshalErr",
-			expect{true},
-			fields{execOut: []byte("{")},
-			true,
-		},
-		{
-			"-evaluateVersionErr",
-			expect{true},
-			fields{execOut: mock.OutputVersionInvalid},
-			true,
-		},
-	}
-	//nolint:paralleltest
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			lastVerCheck = tt.fields.lastVerCheck
-
-			m := mock.NewMockController(t)
-
-			if tt.expect.exec {
-				m.ExpectExecute().
-					WithArgs("-j", "-V").
-					WillReturnOutput(tt.fields.execOut).
-					WillReturnError(tt.fields.execErr)
-			}
-
-			p := &Plugin{ctl: m}
-
-			if err := p.checkVersion(); (err != nil) != tt.wantErr {
-				t.Fatalf(
-					"Plugin.checkVersion() error = %v, wantErr %v",
-					err, tt.wantErr,
-				)
-			}
-
-			if err := m.ExpectationsWhereMet(); err != nil {
-				t.Fatalf(
-					"Plugin.checkVersion() expectations where not met, error = %v",
-					err,
-				)
-			}
-		})
-	}
-}
-
 func Test_evaluateVersion(t *testing.T) {
 	t.Parallel()
 
@@ -1300,6 +1212,235 @@ func Test_getBasicDeviceInfo(t *testing.T) {
 			if err := mockController.ExpectationsWhereMet(); err != nil {
 				t.Fatalf(
 					"runner.executeBase() expectations where not met, error = %v",
+					err,
+				)
+			}
+		})
+	}
+}
+
+func Test_deviceParser_checkErr(t *testing.T) {
+	t.Parallel()
+
+	type fields struct {
+		Smartctl smartctlField
+		rawResp  []byte
+	}
+
+	tests := []struct {
+		name    string
+		fields  fields
+		wantErr bool
+		wantMsg string
+	}{
+		{
+			"+noErr",
+			fields{Smartctl: smartctlField{Messages: nil, ExitStatus: 0}},
+			false,
+			"",
+		},
+		{
+			"+rawRespErr",
+			fields{
+				rawResp: mock.Outputs.Get("env_1").
+					AllSmartInfoScans.Get("-a /dev/sda -d 3ware,0 -j"),
+			},
+			true,
+			"/dev/sda: Unknown device type '3ware,0', =======> VALID " +
+				"ARGUMENTS ARE: ata, scsi[+TYPE], nvme[,NSID], " +
+				"sat[,auto][,N][+TYPE], usbcypress[,X], " +
+				"usbjmicron[,p][,x][,N], usbprolific, usbsunplus, " +
+				"sntasmedia, sntjmicron[,NSID], sntrealtek, " +
+				"intelliprop,N[+TYPE], jmb39x[-q],N[,sLBA][,force][+TYPE], " +
+				"jms56x,N[,sLBA][,force][+TYPE], aacraid,H,L,ID, areca,N[/E], " +
+				"auto, test <=======.",
+		},
+		{
+			"+rawRespNoErr",
+			fields{
+				rawResp: mock.Outputs.Get("env_1").
+					AllSmartInfoScans.Get("-a /dev/sda -d sat -j"),
+			},
+			false,
+			"",
+		},
+		{
+			"+noErr",
+			fields{Smartctl: smartctlField{Messages: nil, ExitStatus: 4}},
+			false,
+			"",
+		},
+		{
+			"+warning",
+			fields{
+				Smartctl: smartctlField{
+					Messages: []message{{"barfoo"}}, ExitStatus: 3,
+				},
+			},
+			true,
+			"Barfoo.",
+		},
+		{
+			"-errorStatusOne",
+			fields{
+				Smartctl: smartctlField{
+					Messages: []message{{"barfoo"}}, ExitStatus: 1,
+				},
+			},
+			true,
+			"Barfoo.",
+		},
+		{
+			"-errorStatusTwo",
+			fields{
+				Smartctl: smartctlField{
+					Messages: []message{{"foobar"}}, ExitStatus: 2,
+				},
+			},
+			true,
+			"Foobar.",
+		},
+		{
+			"-twoErr",
+			fields{
+				Smartctl: smartctlField{
+					Messages: []message{{"foobar"}, {"barfoo"}}, ExitStatus: 2,
+				},
+			},
+			true,
+			"Foobar, barfoo.",
+		},
+		{
+			"-unknownErr/noMessage",
+			fields{
+				Smartctl: smartctlField{
+					Messages: []message{}, ExitStatus: 2,
+				},
+			},
+			true,
+			"Unknown error from smartctl.",
+		},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			dp := deviceParser{Smartctl: tt.fields.Smartctl}
+
+			if tt.fields.rawResp != nil {
+				dpFromRaw := deviceParser{}
+
+				err := json.Unmarshal(tt.fields.rawResp, &dpFromRaw)
+				if err != nil {
+					t.Fatalf("deviceParser.checkErr() error = %v", err)
+				}
+
+				dp = dpFromRaw
+			}
+
+			err := dp.checkErr()
+			if (err != nil) != tt.wantErr {
+				t.Fatalf(
+					"deviceParser.checkErr() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
+			}
+
+			if err != nil {
+				if diff := cmp.Diff(tt.wantMsg, err.Error()); diff != "" {
+					t.Fatalf(
+						"deviceParser.checkErr() error message mismatch (-want +got):\n%s",
+						diff,
+					)
+				}
+			}
+		})
+	}
+}
+
+func TestPlugin_checkVersion(t *testing.T) { //nolint:tparallel
+	t.Parallel()
+
+	type expect struct {
+		exec bool
+	}
+
+	type fields struct {
+		execErr      error
+		execOut      []byte
+		lastVerCheck time.Time
+	}
+
+	tests := []struct {
+		name    string
+		expect  expect
+		fields  fields
+		wantErr bool
+	}{
+		{
+			"+valid",
+			expect{true},
+			fields{execOut: mock.OutputVersionValid},
+			false,
+		},
+		{
+			"-noCheck",
+			expect{false},
+			fields{
+				lastVerCheck: time.Now(),
+			},
+			false,
+		},
+		{
+			"-executeErr",
+			expect{true},
+			fields{
+				execOut: mock.OutputVersionValid,
+				execErr: errors.New("fail"),
+			},
+			true,
+		},
+		{
+			"-unmarshalErr",
+			expect{true},
+			fields{execOut: []byte("{")},
+			true,
+		},
+		{
+			"-evaluateVersionErr",
+			expect{true},
+			fields{execOut: mock.OutputVersionInvalid},
+			true,
+		},
+	}
+	//nolint:paralleltest
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			lastVerCheck = tt.fields.lastVerCheck
+
+			m := mock.NewMockController(t)
+
+			if tt.expect.exec {
+				m.ExpectExecute().
+					WithArgs("-j", "-V").
+					WillReturnOutput(tt.fields.execOut).
+					WillReturnError(tt.fields.execErr)
+			}
+
+			p := &Plugin{ctl: m}
+
+			if err := p.checkVersion(); (err != nil) != tt.wantErr {
+				t.Fatalf(
+					"Plugin.checkVersion() error = %v, wantErr %v",
+					err, tt.wantErr,
+				)
+			}
+
+			if err := m.ExpectationsWhereMet(); err != nil {
+				t.Fatalf(
+					"Plugin.checkVersion() expectations where not met, error = %v",
 					err,
 				)
 			}
@@ -2103,147 +2244,6 @@ func Test_parseOutput(t *testing.T) {
 				cmp.AllowUnexported(jsonDevice{}, deviceInfo{}, runner{}),
 			); diff != "" {
 				t.Fatalf("runner mismatch (-got +want):\n%s", diff)
-			}
-		})
-	}
-}
-
-func Test_deviceParser_checkErr(t *testing.T) {
-	t.Parallel()
-
-	type fields struct {
-		Smartctl smartctlField
-		rawResp  []byte
-	}
-
-	tests := []struct {
-		name    string
-		fields  fields
-		wantErr bool
-		wantMsg string
-	}{
-		{
-			"+noErr",
-			fields{Smartctl: smartctlField{Messages: nil, ExitStatus: 0}},
-			false,
-			"",
-		},
-		{
-			"+rawRespErr",
-			fields{
-				rawResp: mock.Outputs.Get("env_1").
-					AllSmartInfoScans.Get("-a /dev/sda -d 3ware,0 -j"),
-			},
-			true,
-			"/dev/sda: Unknown device type '3ware,0', =======> VALID " +
-				"ARGUMENTS ARE: ata, scsi[+TYPE], nvme[,NSID], " +
-				"sat[,auto][,N][+TYPE], usbcypress[,X], " +
-				"usbjmicron[,p][,x][,N], usbprolific, usbsunplus, " +
-				"sntasmedia, sntjmicron[,NSID], sntrealtek, " +
-				"intelliprop,N[+TYPE], jmb39x[-q],N[,sLBA][,force][+TYPE], " +
-				"jms56x,N[,sLBA][,force][+TYPE], aacraid,H,L,ID, areca,N[/E], " +
-				"auto, test <=======.",
-		},
-		{
-			"+rawRespNoErr",
-			fields{
-				rawResp: mock.Outputs.Get("env_1").
-					AllSmartInfoScans.Get("-a /dev/sda -d sat -j"),
-			},
-			false,
-			"",
-		},
-		{
-			"+noErr",
-			fields{Smartctl: smartctlField{Messages: nil, ExitStatus: 4}},
-			false,
-			"",
-		},
-		{
-			"+warning",
-			fields{
-				Smartctl: smartctlField{
-					Messages: []message{{"barfoo"}}, ExitStatus: 3,
-				},
-			},
-			true,
-			"Barfoo.",
-		},
-		{
-			"-errorStatusOne",
-			fields{
-				Smartctl: smartctlField{
-					Messages: []message{{"barfoo"}}, ExitStatus: 1,
-				},
-			},
-			true,
-			"Barfoo.",
-		},
-		{
-			"-errorStatusTwo",
-			fields{
-				Smartctl: smartctlField{
-					Messages: []message{{"foobar"}}, ExitStatus: 2,
-				},
-			},
-			true,
-			"Foobar.",
-		},
-		{
-			"-twoErr",
-			fields{
-				Smartctl: smartctlField{
-					Messages: []message{{"foobar"}, {"barfoo"}}, ExitStatus: 2,
-				},
-			},
-			true,
-			"Foobar, barfoo.",
-		},
-		{
-			"-unknownErr/noMessage",
-			fields{
-				Smartctl: smartctlField{
-					Messages: []message{}, ExitStatus: 2,
-				},
-			},
-			true,
-			"Unknown error from smartctl.",
-		},
-	}
-
-	for _, tt := range tests {
-		tt := tt
-		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
-			dp := deviceParser{Smartctl: tt.fields.Smartctl}
-
-			if tt.fields.rawResp != nil {
-				dpFromRaw := deviceParser{}
-
-				err := json.Unmarshal(tt.fields.rawResp, &dpFromRaw)
-				if err != nil {
-					t.Fatalf("deviceParser.checkErr() error = %v", err)
-				}
-
-				dp = dpFromRaw
-			}
-
-			err := dp.checkErr()
-			if (err != nil) != tt.wantErr {
-				t.Fatalf(
-					"deviceParser.checkErr() error = %v, wantErr %v",
-					err,
-					tt.wantErr,
-				)
-			}
-
-			if err != nil {
-				if diff := cmp.Diff(tt.wantMsg, err.Error()); diff != "" {
-					t.Fatalf(
-						"deviceParser.checkErr() error message mismatch (-want +got):\n%s",
-						diff,
-					)
-				}
 			}
 		})
 	}
