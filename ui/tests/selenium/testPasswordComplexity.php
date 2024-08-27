@@ -982,7 +982,7 @@ class testPasswordComplexity extends CWebTest {
 	}
 
 	/**
-	 * Check user changes his own password accordingly to complexity rules.
+	 * Check if user changes their own password according to complexity rules.
 	 *
 	 * @dataProvider getCommonPasswordData
 	 * @dataProvider getUserPasswordData
@@ -994,7 +994,7 @@ class testPasswordComplexity extends CWebTest {
 	}
 
 	/**
-	 * Check Admin changes his own password accordingly to complexity rules.
+	 * Check if Admin changes their own password according to complexity rules.
 	 *
 	 * @dataProvider getCommonPasswordData
 	 * @dataProvider getAdminPasswordData
@@ -1030,7 +1030,7 @@ class testPasswordComplexity extends CWebTest {
 	 * @param string    $admin_password    password used for Admin user login
 	 * @param int       $userid            id of the user whose password is changed
 	 * @param boolean   $update            false if create, true if update
-	 * @param $own      $own               true if user changes his password himself
+	 * @param $own      $own               true if user changes their password themselves
 	 */
 	private function checkPasswordComplexity($data, $admin_password, $userid = null, $update = false, $own = false,
 			$user_password = null) {
