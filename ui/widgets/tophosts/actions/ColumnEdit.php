@@ -102,7 +102,7 @@ class ColumnEdit extends CController {
 	}
 
 	protected function doAction(): void {
-		$input = $this->getInputAll();
+		$input = $this->getInputAll() + self::getColumnDefaults();
 		unset($input['update']);
 
 		if (!$this->hasInput('update')) {
@@ -114,7 +114,7 @@ class ColumnEdit extends CController {
 				'user' => [
 					'debug_mode' => $this->getDebugMode()
 				]
-			] + $input + self::getColumnDefaults();
+			] + $input;
 
 			$data['time_period_field'] = (new CWidgetFieldTimePeriod('time_period', 'Time period'))
 				->setDefaultPeriod(['from' => 'now-1h', 'to' => 'now'])
@@ -126,15 +126,12 @@ class ColumnEdit extends CController {
 			$data['time_period_field']->setValue($data['time_period']);
 
 			$this->setResponse(new CControllerResponseData($data));
-
-			return;
 		}
+		else {
+			$number_parser = new CNumberParser(['with_size_suffix' => true, 'with_time_suffix' => true]);
 
-		$number_parser = new CNumberParser(['with_size_suffix' => true, 'with_time_suffix' => true]);
+			$thresholds = [];
 
-		$thresholds = [];
-
-		if (array_key_exists('thresholds', $input)) {
 			foreach ($input['thresholds'] as $threshold) {
 				$order_threshold = trim($threshold['threshold']);
 
@@ -143,28 +140,26 @@ class ColumnEdit extends CController {
 				}
 			}
 
-			unset($input['thresholds']);
-		}
-
-		if ($thresholds) {
-			uasort($thresholds,
-				static function (array $threshold_1, array $threshold_2): int {
-					return $threshold_1['order_threshold'] <=> $threshold_2['order_threshold'];
-				}
-			);
-
 			$input['thresholds'] = [];
 
-			foreach ($thresholds as $threshold) {
-				unset($threshold['order_threshold']);
+			if ($thresholds) {
+				uasort($thresholds,
+					static function (array $threshold_1, array $threshold_2): int {
+						return $threshold_1['order_threshold'] <=> $threshold_2['order_threshold'];
+					}
+				);
 
-				$input['thresholds'][] = $threshold;
+				foreach ($thresholds as $threshold) {
+					unset($threshold['order_threshold']);
+
+					$input['thresholds'][] = $threshold;
+				}
 			}
-		}
 
-		$this->setResponse(
-			(new CControllerResponseData(['main_block' => json_encode($input, JSON_THROW_ON_ERROR)]))->disableView()
-		);
+			$this->setResponse(
+				(new CControllerResponseData(['main_block' => json_encode($input, JSON_THROW_ON_ERROR)]))->disableView()
+			);
+		}
 	}
 
 	/**
