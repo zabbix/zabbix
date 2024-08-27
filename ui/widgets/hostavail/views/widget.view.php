@@ -53,11 +53,12 @@ if (count($data['interface_types']) == 1 || $data['only_totals'] == 1) {
 		);
 
 	foreach ($interface_states_fields as $state => $field) {
+		$count = $state != INTERFACE_AVAILABLE_TOTAL ? $counts[$state] : $data['total_hosts_sum'];
+
 		$table->addItem(
 			(new CDiv([
-				(new CSpan($state != INTERFACE_AVAILABLE_TOTAL ? $counts[$state] : $data['total_hosts_sum']))
-					->addClass(ZBX_STYLE_TOTALS_LIST_COUNT),
-				$field['name']
+				(new CSpan($count))->addClass(ZBX_STYLE_TOTALS_LIST_COUNT)->setTitle($count),
+				(new CSpan($field['name']))->addClass(ZBX_STYLE_TOTALS_LIST_NAME)->setTitle($field['name'])
 			]))->addClass($field['style'])
 		);
 	}

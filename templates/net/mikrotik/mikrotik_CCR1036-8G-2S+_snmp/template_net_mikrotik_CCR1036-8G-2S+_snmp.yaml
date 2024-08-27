@@ -106,6 +106,7 @@ zabbix_export:
           key: net.if.walk
           history: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Discovering interfaces from IF-MIB.'
           tags:
             - tag: component
@@ -117,6 +118,7 @@ zabbix_export:
           key: net.if.wireless.walk
           history: '0'
           value_type: TEXT
+          trends: '0'
           tags:
             - tag: component
               value: raw
@@ -127,6 +129,7 @@ zabbix_export:
           key: sensor.cpu.temp.walk
           history: '0'
           value_type: TEXT
+          trends: '0'
           description: |
             MIB: MIKROTIK-MIB
             Discovering CPU temperature sensors.
@@ -140,6 +143,7 @@ zabbix_export:
           key: sensor.temp.walk
           history: '0'
           value_type: TEXT
+          trends: '0'
           description: |
             MIB: MIKROTIK-MIB
             Discovering temperature sensors.
@@ -150,7 +154,9 @@ zabbix_export:
           name: 'SNMP traps (fallback)'
           type: SNMP_TRAP
           key: snmptrap.fallback
+          delay: '0'
           value_type: LOG
+          trends: '0'
           description: 'The item is used to collect all SNMP traps unmatched by other snmptrap items'
           logtimefmt: 'hh:mm:sszyyyy/MM/dd'
           tags:
@@ -163,6 +169,7 @@ zabbix_export:
           key: 'system.contact[sysContact.0]'
           delay: 15m
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: SNMPv2-MIB
             The textual identification of the contact person for this managed node, together with information on how to contact this person.  If no contact information is known, the value is the zero-length string.
@@ -181,6 +188,7 @@ zabbix_export:
           key: system.cpu.walk
           history: '0'
           value_type: TEXT
+          trends: '0'
           description: |
             MIB: HOST-RESOURCES-MIB
             Discovering system CPUs.
@@ -194,6 +202,7 @@ zabbix_export:
           key: 'system.descr[sysDescr.0]'
           delay: 15m
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: SNMPv2-MIB
             A textual description of the entity. This value should
@@ -213,6 +222,7 @@ zabbix_export:
           key: system.hw.firmware
           delay: 1h
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: MIKROTIK-MIB
             Current firmware version.
@@ -241,6 +251,7 @@ zabbix_export:
           key: system.hw.model
           delay: 1h
           value_type: CHAR
+          trends: '0'
           inventory_link: MODEL
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -256,6 +267,7 @@ zabbix_export:
           key: system.hw.serialnumber
           delay: 1h
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: MIKROTIK-MIB
             RouterBOARD serial number.
@@ -308,6 +320,7 @@ zabbix_export:
           key: 'system.location[sysLocation.0]'
           delay: 15m
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: SNMPv2-MIB
             Physical location of the node (e.g., `equipment room`, `3rd floor`). If not provided, the value is a zero-length string.
@@ -326,6 +339,7 @@ zabbix_export:
           key: system.name
           delay: 15m
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: SNMPv2-MIB
             An administratively-assigned name for this managed node.By convention, this is the node's fully-qualified domain name.  If the name is unknown, the value is the zero-length string.
@@ -375,6 +389,7 @@ zabbix_export:
           key: 'system.objectid[sysObjectID.0]'
           delay: 15m
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: SNMPv2-MIB
             The vendor's authoritative identification of the network management subsystem contained in the entity.  This value is allocated within the SMI enterprises subtree (1.3.6.1.4.1) and provides an easy and unambiguous means for determining`what kind of box' is being managed.  For example, if vendor`Flintstones, Inc.' was assigned the subtree1.3.6.1.4.1.4242, it could assign the identifier 1.3.6.1.4.1.4242.1.1 to its `Fred Router'.
@@ -392,6 +407,7 @@ zabbix_export:
           key: 'system.sw.os[mtxrLicVersion.0]'
           delay: 1h
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: MIKROTIK-MIB
             Software version.
@@ -423,6 +439,7 @@ zabbix_export:
           key: vfs.fs.walk
           history: '0'
           value_type: TEXT
+          trends: '0'
           description: |
             MIB: HOST-RESOURCES-MIB
             Discovering mounted filesystems.
@@ -527,12 +544,14 @@ zabbix_export:
           name: 'CPU discovery'
           type: DEPENDENT
           key: hrProcessorLoad.discovery
+          delay: '0'
           description: 'HOST-RESOURCES-MIB::hrProcessorTable discovery.'
           item_prototypes:
             - uuid: 76610d269fa74931b5942475c179e840
               name: '#{#SNMPINDEX}: CPU utilization'
               type: DEPENDENT
               key: 'system.cpu.util[hrProcessorLoad.{#SNMPINDEX}]'
+              delay: '0'
               value_type: FLOAT
               units: '%'
               description: |
@@ -585,6 +604,7 @@ zabbix_export:
           name: 'Temperature CPU discovery'
           type: DEPENDENT
           key: mtxrHlProcessorTemperature.discovery
+          delay: '0'
           description: |
             MIKROTIK-MIB::mtxrHlProcessorTemperature
             Since temperature of CPU is not available on all Mikrotik hardware, this is done to avoid unsupported items.
@@ -593,6 +613,7 @@ zabbix_export:
               name: 'CPU: Temperature'
               type: DEPENDENT
               key: 'sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}]'
+              delay: '0'
               value_type: FLOAT
               units: °C
               description: |
@@ -677,6 +698,7 @@ zabbix_export:
           name: 'Temperature sensor discovery'
           type: DEPENDENT
           key: mtxrHlTemperature.discovery
+          delay: '0'
           description: |
             MIKROTIK-MIB::mtxrHlTemperature
             Since temperature sensor is not available on all Mikrotik hardware, this is done to avoid unsupported items.
@@ -685,6 +707,7 @@ zabbix_export:
               name: 'Device: Temperature'
               type: DEPENDENT
               key: 'sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}]'
+              delay: '0'
               value_type: FLOAT
               units: °C
               description: |
@@ -771,19 +794,23 @@ zabbix_export:
           name: 'LTE modem discovery'
           type: DEPENDENT
           key: mtxrLTEModem.discovery
+          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#IFNAME}'
                 value: '{$IFNAME.LTEMODEM.MATCHES}'
+                formulaid: A
               - macro: '{#IFTYPE}'
                 value: ^1$
+                formulaid: B
           description: 'MIKROTIK-MIB::mtxrLTEModemInterfaceIndex.'
           item_prototypes:
             - uuid: 774a4dd9c60a441b8bcac9a771f89a3d
               name: 'Interface {#IFNAME}({#IFALIAS}): LTE modem RSRP'
               type: DEPENDENT
               key: 'lte.modem.rsrp[mtxrLTEModemSignalRSRP.{#SNMPINDEX}]'
+              delay: '0'
               value_type: FLOAT
               units: dbm
               description: |
@@ -818,6 +845,7 @@ zabbix_export:
               name: 'Interface {#IFNAME}({#IFALIAS}): LTE modem RSRQ'
               type: DEPENDENT
               key: 'lte.modem.rsrq[mtxrLTEModemSignalRSRQ.{#SNMPINDEX}]'
+              delay: '0'
               value_type: FLOAT
               units: db
               description: |
@@ -852,6 +880,7 @@ zabbix_export:
               name: 'Interface {#IFNAME}({#IFALIAS}): LTE modem RSSI'
               type: DEPENDENT
               key: 'lte.modem.rssi[mtxrLTEModemSignalRSSI.{#SNMPINDEX}]'
+              delay: '0'
               value_type: FLOAT
               units: dbm
               description: |
@@ -886,6 +915,7 @@ zabbix_export:
               name: 'Interface {#IFNAME}({#IFALIAS}): LTE modem SINR'
               type: DEPENDENT
               key: 'lte.modem.sinr[mtxrLTEModemSignalSINR.{#SNMPINDEX}]'
+              delay: '0'
               value_type: FLOAT
               units: db
               description: |
@@ -960,19 +990,23 @@ zabbix_export:
           name: 'AP channel discovery'
           type: DEPENDENT
           key: mtxrWlAp.discovery
+          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#IFADMINSTATUS}'
                 value: ^1$
+                formulaid: A
               - macro: '{#IFTYPE}'
                 value: ^71$
+                formulaid: B
           description: 'MIKROTIK-MIB::mtxrWlAp.'
           item_prototypes:
             - uuid: 98d33e0d19a7401293471c0c26f8657e
               name: 'Interface {#IFNAME}({#IFALIAS}): AP authenticated clients'
               type: DEPENDENT
               key: 'ssid.authclient[mtxrWlApAuthClientCount.{#SNMPINDEX}]'
+              delay: '0'
               description: |
                 MIB: MIKROTIK-MIB
                 mtxrWlApAuthClientCount Number of authentication clients.
@@ -994,7 +1028,9 @@ zabbix_export:
               name: 'Interface {#IFNAME}({#IFALIAS}): AP band'
               type: DEPENDENT
               key: 'ssid.band[mtxrWlApBand.{#SNMPINDEX}]'
+              delay: '0'
               value_type: CHAR
+              trends: '0'
               description: |
                 MIB: MIKROTIK-MIB
                 mtxrWlApBand
@@ -1019,7 +1055,9 @@ zabbix_export:
               name: 'Interface {#IFNAME}({#IFALIAS}): SSID'
               type: DEPENDENT
               key: 'ssid.name[mtxrWlApSsid.{#SNMPINDEX}]'
+              delay: '0'
               value_type: CHAR
+              trends: '0'
               description: |
                 MIB: MIKROTIK-MIB
                 mtxrWlApSsid Service Set Identifier.
@@ -1044,6 +1082,7 @@ zabbix_export:
               name: 'Interface {#IFNAME}({#IFALIAS}): AP noise floor'
               type: DEPENDENT
               key: 'ssid.noise[mtxrWlApNoiseFloor.{#SNMPINDEX}]'
+              delay: '0'
               value_type: FLOAT
               description: |
                 MIB: MIKROTIK-MIB
@@ -1069,6 +1108,7 @@ zabbix_export:
               name: 'Interface {#IFNAME}({#IFALIAS}): AP registered clients'
               type: DEPENDENT
               key: 'ssid.regclient[mtxrWlApClientCount.{#SNMPINDEX}]'
+              delay: '0'
               description: |
                 MIB: MIKROTIK-MIB
                 mtxrWlApClientCount Client established connection to AP, but didn't finish all authentication procedures for full connection.
@@ -1110,19 +1150,23 @@ zabbix_export:
           name: 'CAPsMAN AP channel discovery'
           type: DEPENDENT
           key: mtxrWlCMChannel.discovery
+          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#IFNAME}'
                 value: '{$IFNAME.WIFI.MATCHES}'
+                formulaid: A
               - macro: '{#IFTYPE}'
                 value: ^1$
+                formulaid: B
           description: 'MIKROTIK-MIB::mtxrWlCMChannel.'
           item_prototypes:
             - uuid: 220f9e350c134b59bbaa38142996274b
               name: 'Interface {#IFNAME}({#IFALIAS}): AP authenticated clients'
               type: DEPENDENT
               key: 'ssid.authclient[mtxrWlCMAuthClientCount.{#SNMPINDEX}]'
+              delay: '0'
               description: |
                 MIB: MIKROTIK-MIB
                 mtxrWlCMAuthClientCount Number of authentication clients.
@@ -1144,7 +1188,9 @@ zabbix_export:
               name: 'Interface {#IFNAME}({#IFALIAS}): AP channel'
               type: DEPENDENT
               key: 'ssid.channel[mtxrWlCMChannel.{#SNMPINDEX}]'
+              delay: '0'
               value_type: CHAR
+              trends: '0'
               description: |
                 MIB: MIKROTIK-MIB
                 mtxrWlCMChannel
@@ -1169,6 +1215,7 @@ zabbix_export:
               name: 'Interface {#IFNAME}({#IFALIAS}): AP registered clients'
               type: DEPENDENT
               key: 'ssid.regclient[mtxrWlCMRegClientCount.{#SNMPINDEX}]'
+              delay: '0'
               description: |
                 MIB: MIKROTIK-MIB
                 mtxrWlCMRegClientCount Client established connection to AP, but didn't finish all authentication procedures for full connection.
@@ -1190,7 +1237,9 @@ zabbix_export:
               name: 'Interface {#IFNAME}({#IFALIAS}): AP state'
               type: DEPENDENT
               key: 'ssid.state[mtxrWlCMState.{#SNMPINDEX}]'
+              delay: '0'
               value_type: CHAR
+              trends: '0'
               description: |
                 MIB: MIKROTIK-MIB
                 mtxrWlCMState Wireless interface state.
@@ -1243,45 +1292,59 @@ zabbix_export:
           name: 'Network interfaces discovery'
           type: DEPENDENT
           key: net.if.discovery
+          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#IFADMINSTATUS}'
                 value: '{$NET.IF.IFADMINSTATUS.MATCHES}'
+                formulaid: A
               - macro: '{#IFADMINSTATUS}'
                 value: '{$NET.IF.IFADMINSTATUS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: B
               - macro: '{#IFALIAS}'
                 value: '{$NET.IF.IFALIAS.MATCHES}'
+                formulaid: C
               - macro: '{#IFALIAS}'
                 value: '{$NET.IF.IFALIAS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: D
               - macro: '{#IFDESCR}'
                 value: '{$NET.IF.IFDESCR.MATCHES}'
+                formulaid: E
               - macro: '{#IFDESCR}'
                 value: '{$NET.IF.IFDESCR.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: F
               - macro: '{#IFNAME}'
                 value: '{$NET.IF.IFNAME.MATCHES}'
+                formulaid: G
               - macro: '{#IFNAME}'
                 value: '{$NET.IF.IFNAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: H
               - macro: '{#IFOPERSTATUS}'
                 value: '{$NET.IF.IFOPERSTATUS.MATCHES}'
+                formulaid: I
               - macro: '{#IFOPERSTATUS}'
                 value: '{$NET.IF.IFOPERSTATUS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: J
               - macro: '{#IFTYPE}'
                 value: '{$NET.IF.IFTYPE.MATCHES}'
+                formulaid: K
               - macro: '{#IFTYPE}'
                 value: '{$NET.IF.IFTYPE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: L
           description: 'Discovering interfaces from IF-MIB.'
           item_prototypes:
             - uuid: f499f2a08c364fe6b7ba7c2edbeaa25a
               name: 'Interface {#IFNAME}({#IFALIAS}): Inbound packets discarded'
               type: DEPENDENT
               key: 'net.if.in.discards[ifInDiscards.{#SNMPINDEX}]'
+              delay: '0'
               description: |
                 MIB: IF-MIB
                 The number of inbound packets which were chosen to be discarded
@@ -1295,6 +1358,8 @@ zabbix_export:
                     - '1.3.6.1.2.1.2.2.1.13.{#SNMPINDEX}'
                     - '0'
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 3m
@@ -1311,6 +1376,7 @@ zabbix_export:
               name: 'Interface {#IFNAME}({#IFALIAS}): Inbound packets with errors'
               type: DEPENDENT
               key: 'net.if.in.errors[ifInErrors.{#SNMPINDEX}]'
+              delay: '0'
               description: |
                 MIB: IF-MIB
                 For packet-oriented interfaces, the number of inbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.  For character-oriented or fixed-length interfaces, the number of inbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
@@ -1320,6 +1386,8 @@ zabbix_export:
                     - '1.3.6.1.2.1.2.2.1.14.{#SNMPINDEX}'
                     - '0'
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 3m
@@ -1336,6 +1404,7 @@ zabbix_export:
               name: 'Interface {#IFNAME}({#IFALIAS}): Bits received'
               type: DEPENDENT
               key: 'net.if.in[ifHCInOctets.{#SNMPINDEX}]'
+              delay: '0'
               units: bps
               description: |
                 MIB: IF-MIB
@@ -1346,6 +1415,8 @@ zabbix_export:
                     - '1.3.6.1.2.1.31.1.1.1.6.{#SNMPINDEX}'
                     - '0'
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
                 - type: MULTIPLIER
                   parameters:
                     - '8'
@@ -1362,6 +1433,7 @@ zabbix_export:
               name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets discarded'
               type: DEPENDENT
               key: 'net.if.out.discards[ifOutDiscards.{#SNMPINDEX}]'
+              delay: '0'
               description: |
                 MIB: IF-MIB
                 The number of outbound packets which were chosen to be discarded
@@ -1375,6 +1447,8 @@ zabbix_export:
                     - '1.3.6.1.2.1.2.2.1.19.{#SNMPINDEX}'
                     - '0'
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 3m
@@ -1391,6 +1465,7 @@ zabbix_export:
               name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets with errors'
               type: DEPENDENT
               key: 'net.if.out.errors[ifOutErrors.{#SNMPINDEX}]'
+              delay: '0'
               description: |
                 MIB: IF-MIB
                 For packet-oriented interfaces, the number of outbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.  For character-oriented or fixed-length interfaces, the number of outbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
@@ -1400,6 +1475,8 @@ zabbix_export:
                     - '1.3.6.1.2.1.2.2.1.20.{#SNMPINDEX}'
                     - '0'
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 3m
@@ -1416,6 +1493,7 @@ zabbix_export:
               name: 'Interface {#IFNAME}({#IFALIAS}): Bits sent'
               type: DEPENDENT
               key: 'net.if.out[ifHCOutOctets.{#SNMPINDEX}]'
+              delay: '0'
               units: bps
               description: |
                 MIB: IF-MIB
@@ -1426,6 +1504,8 @@ zabbix_export:
                     - '1.3.6.1.2.1.31.1.1.1.10.{#SNMPINDEX}'
                     - '0'
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
                 - type: MULTIPLIER
                   parameters:
                     - '8'
@@ -1442,6 +1522,7 @@ zabbix_export:
               name: 'Interface {#IFNAME}({#IFALIAS}): Speed'
               type: DEPENDENT
               key: 'net.if.speed[ifHighSpeed.{#SNMPINDEX}]'
+              delay: '0'
               trends: '0'
               units: bps
               description: |
@@ -1473,6 +1554,7 @@ zabbix_export:
               name: 'Interface {#IFNAME}({#IFALIAS}): Operational status'
               type: DEPENDENT
               key: 'net.if.status[ifOperStatus.{#SNMPINDEX}]'
+              delay: '0'
               trends: '0'
               description: |
                 MIB: IF-MIB
@@ -1522,6 +1604,7 @@ zabbix_export:
               name: 'Interface {#IFNAME}({#IFALIAS}): Interface type'
               type: DEPENDENT
               key: 'net.if.type[ifType.{#SNMPINDEX}]'
+              delay: '0'
               trends: '0'
               description: |
                 MIB: IF-MIB
@@ -1691,13 +1774,16 @@ zabbix_export:
           name: 'Storage discovery'
           type: DEPENDENT
           key: storage.discovery
+          delay: '0'
           filter:
             evaltype: OR
             conditions:
               - macro: '{#STORAGE_TYPE}'
                 value: .+4$
+                formulaid: A
               - macro: '{#STORAGE_TYPE}'
                 value: .+hrStorageFixedDisk
+                formulaid: B
           description: 'HOST-RESOURCES-MIB::hrStorage discovery with storage filter.'
           item_prototypes:
             - uuid: dbb260b0d9334f60a27e59536c05873c
@@ -1717,6 +1803,7 @@ zabbix_export:
               name: 'Disk-{#SNMPINDEX}: Total space'
               type: DEPENDENT
               key: 'vfs.fs.total[hrStorageSize.{#SNMPINDEX}]'
+              delay: '0'
               units: B
               description: |
                 MIB: HOST-RESOURCES-MIB
@@ -1748,6 +1835,7 @@ zabbix_export:
               name: 'Disk-{#SNMPINDEX}: Used space'
               type: DEPENDENT
               key: 'vfs.fs.used[hrStorageSize.{#SNMPINDEX}]'
+              delay: '0'
               units: B
               description: |
                 MIB: HOST-RESOURCES-MIB

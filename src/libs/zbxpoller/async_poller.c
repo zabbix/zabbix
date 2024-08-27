@@ -42,6 +42,10 @@
 
 #include <event2/dns.h>
 
+#ifndef EVDNS_BASE_INITIALIZE_NAMESERVERS
+#	define EVDNS_BASE_INITIALIZE_NAMESERVERS	1
+#endif
+
 static void	process_async_result(zbx_dc_item_context_t *item, zbx_poller_config_t *poller_config)
 {
 	zbx_timespec_t		timespec;
@@ -628,6 +632,7 @@ ZBX_THREAD_ENTRY(zbx_async_poller_thread, args)
 		{
 			last_snmp_engineid_hk_time = time(NULL);
 			zbx_housekeep_snmp_engineid_cache();
+			poller_config.clear_cache = 1;
 		}
 #undef SNMP_ENGINEID_HK_INTERVAL
 #endif
@@ -635,11 +640,6 @@ ZBX_THREAD_ENTRY(zbx_async_poller_thread, args)
 
 	if (ZBX_POLLER_TYPE_HTTPAGENT != poller_type)
 	{
-#ifdef HAVE_NETSNMP
-		if (ZBX_POLLER_TYPE_SNMP == poller_type)
-			zbx_destroy_snmp_engineid_cache();
-#endif
-
 		async_poller_dns_destroy(&poller_config);
 	}
 
@@ -655,6 +655,11 @@ ZBX_THREAD_ENTRY(zbx_async_poller_thread, args)
 	}
 
 	async_poller_destroy(&poller_config);
+
+#ifdef HAVE_NETSNMP
+	if (ZBX_POLLER_TYPE_SNMP == poller_type)
+		zbx_destroy_snmp_engineid_cache();
+#endif
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 
