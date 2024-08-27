@@ -102,7 +102,9 @@ zabbix_export:
           name: 'SNMP traps (fallback)'
           type: SNMP_TRAP
           key: snmptrap.fallback
+          delay: '0'
           value_type: LOG
+          trends: '0'
           description: 'The item is used to collect all SNMP traps unmatched by other snmptrap items'
           logtimefmt: 'hh:mm:sszyyyy/MM/dd'
           tags:
@@ -115,6 +117,7 @@ zabbix_export:
           key: 'system.contact[sysContact.0]'
           delay: 15m
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: SNMPv2-MIB
             The textual identification of the contact person for this managed node, together with information on how to contact this person.  If no contact information is known, the value is the zero-length string.
@@ -157,6 +160,7 @@ zabbix_export:
           key: 'system.descr[sysDescr.0]'
           delay: 15m
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: SNMPv2-MIB
             A textual description of the entity. This value should
@@ -176,6 +180,7 @@ zabbix_export:
           key: system.hw.model
           delay: 1h
           value_type: CHAR
+          trends: '0'
           description: 'MIB: SNMPv2-MIB'
           inventory_link: MODEL
           preprocessing:
@@ -219,6 +224,7 @@ zabbix_export:
           key: 'system.location[sysLocation.0]'
           delay: 15m
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: SNMPv2-MIB
             Physical location of the node (e.g., `equipment room`, `3rd floor`). If not provided, the value is a zero-length string.
@@ -237,6 +243,7 @@ zabbix_export:
           key: system.name
           delay: 15m
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: SNMPv2-MIB
             An administratively-assigned name for this managed node.By convention, this is the node's fully-qualified domain name.  If the name is unknown, the value is the zero-length string.
@@ -286,6 +293,7 @@ zabbix_export:
           key: 'system.objectid[sysObjectID.0]'
           delay: 15m
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: SNMPv2-MIB
             The vendor's authoritative identification of the network management subsystem contained in the entity.  This value is allocated within the SMI enterprises subtree (1.3.6.1.4.1) and provides an easy and unambiguous means for determining`what kind of box' is being managed.  For example, if vendor`Flintstones, Inc.' was assigned the subtree1.3.6.1.4.1.4242, it could assign the identifier 1.3.6.1.4.1.4242.1.1 to its `Fred Router'.
@@ -303,6 +311,7 @@ zabbix_export:
           key: 'system.sw.os[sysDescr.0]'
           delay: 1h
           value_type: CHAR
+          trends: '0'
           description: 'MIB: SNMPv2-MIB'
           inventory_link: OS
           preprocessing:
@@ -436,6 +445,7 @@ zabbix_export:
             conditions:
               - macro: '{#ENT_SN}'
                 value: .+
+                formulaid: A
           item_prototypes:
             - uuid: ec087163f366430fbd688390bce17980
               name: '{#ENT_NAME}: Hardware serial number'
@@ -444,6 +454,7 @@ zabbix_export:
               key: 'system.hw.serialnumber[tmnxHwSerialNumber.{#SNMPINDEX}]'
               delay: 1h
               value_type: CHAR
+              trends: '0'
               description: 'MIB: TIMETRA-CHASSIS-MIB'
               preprocessing:
                 - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -473,6 +484,7 @@ zabbix_export:
             conditions:
               - macro: '{#SNMPVALUE}'
                 value: '[^1]'
+                formulaid: A
           item_prototypes:
             - uuid: be9fb466b33f4d078b6aae15123bc7d6
               name: '#{#SNMPINDEX}: Fan status'
@@ -512,34 +524,46 @@ zabbix_export:
             conditions:
               - macro: '{#IFADMINSTATUS}'
                 value: '{$NET.IF.IFADMINSTATUS.MATCHES}'
+                formulaid: A
               - macro: '{#IFADMINSTATUS}'
                 value: '{$NET.IF.IFADMINSTATUS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: B
               - macro: '{#IFALIAS}'
                 value: '{$NET.IF.IFALIAS.MATCHES}'
+                formulaid: C
               - macro: '{#IFALIAS}'
                 value: '{$NET.IF.IFALIAS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: D
               - macro: '{#IFDESCR}'
                 value: '{$NET.IF.IFDESCR.MATCHES}'
+                formulaid: E
               - macro: '{#IFDESCR}'
                 value: '{$NET.IF.IFDESCR.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: F
               - macro: '{#IFNAME}'
                 value: '{$NET.IF.IFNAME.MATCHES}'
+                formulaid: G
               - macro: '{#IFNAME}'
                 value: '{$NET.IF.IFNAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: H
               - macro: '{#IFOPERSTATUS}'
                 value: '{$NET.IF.IFOPERSTATUS.MATCHES}'
+                formulaid: I
               - macro: '{#IFOPERSTATUS}'
                 value: '{$NET.IF.IFOPERSTATUS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: J
               - macro: '{#IFTYPE}'
                 value: '{$NET.IF.IFTYPE.MATCHES}'
+                formulaid: K
               - macro: '{#IFTYPE}'
                 value: '{$NET.IF.IFTYPE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: L
           description: 'Discovering interfaces from IF-MIB.'
           item_prototypes:
             - uuid: cc997c10a3a94fb183bc793367d8da43
@@ -557,6 +581,8 @@ zabbix_export:
                 and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               tags:
                 - tag: component
                   value: network
@@ -575,6 +601,8 @@ zabbix_export:
                 For packet-oriented interfaces, the number of inbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.  For character-oriented or fixed-length interfaces, the number of inbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               tags:
                 - tag: component
                   value: network
@@ -594,6 +622,8 @@ zabbix_export:
                 The total number of octets received on the interface, including framing characters. This object is a 64-bit version of ifInOctets. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
                 - type: MULTIPLIER
                   parameters:
                     - '8'
@@ -619,6 +649,8 @@ zabbix_export:
                 and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               tags:
                 - tag: component
                   value: network
@@ -637,6 +669,8 @@ zabbix_export:
                 For packet-oriented interfaces, the number of outbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.  For character-oriented or fixed-length interfaces, the number of outbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
               tags:
                 - tag: component
                   value: network
@@ -656,6 +690,8 @@ zabbix_export:
                 The total number of octets transmitted out of the interface, including framing characters. This object is a 64-bit version of ifOutOctets.Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
                 - type: MULTIPLIER
                   parameters:
                     - '8'
@@ -884,8 +920,10 @@ zabbix_export:
             conditions:
               - macro: '{#IFOPERSTATUS}'
                 value: '1'
+                formulaid: A
               - macro: '{#SNMPVALUE}'
                 value: (2|3)
+                formulaid: B
           description: 'Discovering interfaces from IF-MIB and EtherLike-MIB. Interfaces with up(1) Operational Status are discovered.'
           item_prototypes:
             - uuid: f4d62611a75244c29766118b8856d976
@@ -1034,6 +1072,7 @@ zabbix_export:
             conditions:
               - macro: '{#TEMP_SENSOR}'
                 value: '1'
+                formulaid: A
           item_prototypes:
             - uuid: c6a233ce51d44b63963f2345f709e6b3
               name: '{#SNMPVALUE}: Temperature'

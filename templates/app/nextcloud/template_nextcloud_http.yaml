@@ -23,6 +23,7 @@ zabbix_export:
           name: 'Active users, last 1 hour'
           type: DEPENDENT
           key: nextcloud.serverinfo.active_users.last1h
+          delay: '0'
           description: 'The number of active users in the last 1 hour.'
           preprocessing:
             - type: JSONPATH
@@ -41,6 +42,7 @@ zabbix_export:
           name: 'Active users, last 5 minutes'
           type: DEPENDENT
           key: nextcloud.serverinfo.active_users.last5m
+          delay: '0'
           description: 'The number of active users in the last 5 minutes.'
           preprocessing:
             - type: JSONPATH
@@ -59,6 +61,7 @@ zabbix_export:
           name: 'Active users, last 24 hours'
           type: DEPENDENT
           key: nextcloud.serverinfo.active_users.last24hours
+          delay: '0'
           description: 'The number of active users in the last day.'
           preprocessing:
             - type: JSONPATH
@@ -77,6 +80,7 @@ zabbix_export:
           name: 'Apps installed'
           type: DEPENDENT
           key: nextcloud.serverinfo.apps.installed
+          delay: '0'
           description: 'The number of installed applications.'
           preprocessing:
             - type: JSONPATH
@@ -105,6 +109,7 @@ zabbix_export:
           name: 'Apps update available'
           type: DEPENDENT
           key: nextcloud.serverinfo.apps.update
+          delay: '0'
           description: 'The number of applications for which an update is available.'
           preprocessing:
             - type: JSONPATH
@@ -133,7 +138,9 @@ zabbix_export:
           name: 'Web server'
           type: DEPENDENT
           key: nextcloud.serverinfo.apps.webserver
+          delay: '0'
           value_type: CHAR
+          trends: '0'
           description: 'Web server description.'
           preprocessing:
             - type: JSONPATH
@@ -152,6 +159,7 @@ zabbix_export:
           name: 'CPU load, avg 1m'
           type: DEPENDENT
           key: nextcloud.serverinfo.cpu.avg.1m
+          delay: '0'
           value_type: FLOAT
           description: 'The average system load (the number of processes in the system run queue), last 1 minute.'
           preprocessing:
@@ -181,6 +189,7 @@ zabbix_export:
           name: 'CPU load, avg 5m'
           type: DEPENDENT
           key: nextcloud.serverinfo.cpu.avg.5m
+          delay: '0'
           value_type: FLOAT
           description: 'The average system load (the number of processes in the system run queue), last 5 minutes.'
           preprocessing:
@@ -200,6 +209,7 @@ zabbix_export:
           name: 'CPU load, avg 15m'
           type: DEPENDENT
           key: nextcloud.serverinfo.cpu.avg.15m
+          delay: '0'
           value_type: FLOAT
           description: 'The average system load (the number of processes in the system run queue), last 15 minutes.'
           preprocessing:
@@ -219,6 +229,7 @@ zabbix_export:
           name: 'Database size'
           type: DEPENDENT
           key: nextcloud.serverinfo.db.size
+          delay: '0'
           units: B
           description: 'Size of database.'
           preprocessing:
@@ -238,7 +249,9 @@ zabbix_export:
           name: 'Database type'
           type: DEPENDENT
           key: nextcloud.serverinfo.db.type
+          delay: '0'
           value_type: CHAR
+          trends: '0'
           description: 'Database type.'
           preprocessing:
             - type: JSONPATH
@@ -257,7 +270,9 @@ zabbix_export:
           name: 'Database version'
           type: DEPENDENT
           key: nextcloud.serverinfo.db.version
+          delay: '0'
           value_type: CHAR
+          trends: '0'
           description: 'Database description.'
           preprocessing:
             - type: JSONPATH
@@ -287,6 +302,7 @@ zabbix_export:
           name: 'Free space'
           type: DEPENDENT
           key: nextcloud.serverinfo.freespace
+          delay: '0'
           units: B
           description: 'The amount of free disk space.'
           preprocessing:
@@ -323,6 +339,7 @@ zabbix_export:
           key: nextcloud.serverinfo.get_data
           history: '0'
           value_type: TEXT
+          trends: '0'
           authtype: BASIC
           username: '{$NEXTCLOUD.USER.NAME}'
           password: '{$NEXTCLOUD.USER.PASSWORD}'
@@ -336,6 +353,8 @@ zabbix_export:
               error_handler: CUSTOM_VALUE
               error_handler_params: '<ocs><meta><status>failure</status><statuscode>999</statuscode><message/></meta><data><message>Unknown error</message></data></ocs>'
             - type: XML_TO_JSON
+              parameters:
+                - ''
           timeout: 10s
           url: '{$NEXTCLOUD.SCHEMA}://{$NEXTCLOUD.ADDRESS}/ocs/v2.php/apps/serverinfo/api/v1/info'
           status_codes: '200,401'
@@ -350,6 +369,7 @@ zabbix_export:
           name: 'Memory free'
           type: DEPENDENT
           key: nextcloud.serverinfo.mem.free
+          delay: '0'
           units: B
           description: 'The amount of free RAM.'
           preprocessing:
@@ -372,6 +392,7 @@ zabbix_export:
           name: 'Memory used, in %'
           type: DEPENDENT
           key: nextcloud.serverinfo.mem.pused
+          delay: '0'
           units: '%'
           description: 'RAM usage, in percent.'
           preprocessing:
@@ -419,6 +440,7 @@ zabbix_export:
           name: 'Memory total'
           type: DEPENDENT
           key: nextcloud.serverinfo.mem.total
+          delay: '0'
           units: B
           description: 'The size of the RAM.'
           preprocessing:
@@ -441,6 +463,7 @@ zabbix_export:
           name: 'PHP maximum execution time'
           type: DEPENDENT
           key: nextcloud.serverinfo.php.max_execution_time
+          delay: '0'
           units: s
           description: 'By default, the maximum execution time for PHP scripts is set to 30 seconds. If a script runs for longer than 30 seconds, PHP stops the script and reports an error. You can control the amount of time PHP allows scripts to run by changing the ''max_execution_time'' directive in your php.ini file.'
           preprocessing:
@@ -460,6 +483,7 @@ zabbix_export:
           name: 'PHP memory free'
           type: DEPENDENT
           key: nextcloud.serverinfo.php.memory.free
+          delay: '0'
           units: B
           description: 'PHP free memory size.'
           preprocessing:
@@ -479,6 +503,7 @@ zabbix_export:
           name: 'PHP memory limit'
           type: DEPENDENT
           key: nextcloud.serverinfo.php.memory.limit
+          delay: '0'
           units: B
           description: 'By default, the PHP memory limit is generally set to 128 MB, but it can be customized based on the application''s specific needs. The php.ini file is usually the standard location to set the PHP memory limit.'
           preprocessing:
@@ -498,6 +523,7 @@ zabbix_export:
           name: 'PHP memory used, in %'
           type: DEPENDENT
           key: nextcloud.serverinfo.php.memory.pused
+          delay: '0'
           units: '%'
           description: 'PHP memory used percentage'
           preprocessing:
@@ -545,6 +571,7 @@ zabbix_export:
           name: 'PHP memory used'
           type: DEPENDENT
           key: nextcloud.serverinfo.php.memory.used
+          delay: '0'
           units: B
           description: 'PHP memory used'
           preprocessing:
@@ -564,6 +591,7 @@ zabbix_export:
           name: 'PHP memory wasted'
           type: DEPENDENT
           key: nextcloud.serverinfo.php.memory.wasted
+          delay: '0'
           units: B
           description: 'Memory allocated to the service but not in use.'
           preprocessing:
@@ -583,6 +611,7 @@ zabbix_export:
           name: 'PHP memory wasted, in %'
           type: DEPENDENT
           key: nextcloud.serverinfo.php.memory.wasted_percentage
+          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'Memory allocated to the service but not in use, in percent.'
@@ -603,6 +632,7 @@ zabbix_export:
           name: 'PHP maximum upload file size'
           type: DEPENDENT
           key: nextcloud.serverinfo.php.upload_max_filesize
+          delay: '0'
           units: B
           description: 'By default, the maximum upload file size for PHP scripts is set to 128 megabytes. However, you may want to change this limit. For example, you can set a lower limit to prevent users from uploading large files to your site. To do this, change the ''upload_max_filesize'' and ''post_max_size'' directives.'
           preprocessing:
@@ -622,7 +652,9 @@ zabbix_export:
           name: 'PHP version'
           type: DEPENDENT
           key: nextcloud.serverinfo.php.version
+          delay: '0'
           value_type: CHAR
+          trends: '0'
           description: 'PHP version'
           preprocessing:
             - type: JSONPATH
@@ -652,7 +684,9 @@ zabbix_export:
           name: 'Server information status'
           type: DEPENDENT
           key: nextcloud.serverinfo.status
+          delay: '0'
           value_type: CHAR
+          trends: '0'
           description: 'Server information API status'
           preprocessing:
             - type: JSONPATH
@@ -680,6 +714,7 @@ zabbix_export:
           name: 'Swap free'
           type: DEPENDENT
           key: nextcloud.serverinfo.swap.free
+          delay: '0'
           units: B
           description: 'The amount of free swap.'
           preprocessing:
@@ -702,6 +737,7 @@ zabbix_export:
           name: 'Swap used, in %'
           type: DEPENDENT
           key: nextcloud.serverinfo.swap.pused
+          delay: '0'
           units: '%'
           description: 'Swap usage, in percent.'
           preprocessing:
@@ -749,6 +785,7 @@ zabbix_export:
           name: 'Swap total'
           type: DEPENDENT
           key: nextcloud.serverinfo.swap.total
+          delay: '0'
           units: B
           description: 'The size of the swap memory.'
           preprocessing:
@@ -771,7 +808,9 @@ zabbix_export:
           name: Version
           type: DEPENDENT
           key: nextcloud.serverinfo.version
+          delay: '0'
           value_type: CHAR
+          trends: '0'
           description: 'Nextcloud service version.'
           preprocessing:
             - type: JSONPATH
@@ -811,9 +850,11 @@ zabbix_export:
             conditions:
               - macro: '{#NEXTCLOUD.USER}'
                 value: '{$NEXTCLOUD.LLD.FILTER.USER.MATCHES}'
+                formulaid: A
               - macro: '{#NEXTCLOUD.USER}'
                 value: '{$NEXTCLOUD.LLD.FILTER.USER.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: B
           lifetime: 1d
           description: 'User discovery.'
           item_prototypes:
@@ -821,7 +862,9 @@ zabbix_export:
               name: 'User "{#NEXTCLOUD.USER}": Display name'
               type: DEPENDENT
               key: 'nextcloud.user.displayname[{#NEXTCLOUD.USER}]'
+              delay: '0'
               value_type: CHAR
+              trends: '0'
               description: 'User visible name.'
               preprocessing:
                 - type: JSONPATH
@@ -842,6 +885,7 @@ zabbix_export:
               name: 'User "{#NEXTCLOUD.USER}": Status'
               type: DEPENDENT
               key: 'nextcloud.user.enabled[{#NEXTCLOUD.USER}]'
+              delay: '0'
               description: 'User account status.'
               valuemap:
                 name: 'User status'
@@ -875,6 +919,7 @@ zabbix_export:
               key: 'nextcloud.user.get_data[{#NEXTCLOUD.USER}]'
               history: '0'
               value_type: TEXT
+              trends: '0'
               authtype: BASIC
               username: '{$NEXTCLOUD.USER.NAME}'
               password: '{$NEXTCLOUD.USER.PASSWORD}'
@@ -886,6 +931,8 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '<ocs><meta><status>failure</status><statuscode>999</statuscode><message/></meta><data><message>Unknown error</message></data></ocs>'
                 - type: XML_TO_JSON
+                  parameters:
+                    - ''
               timeout: 10s
               url: '{$NEXTCLOUD.SCHEMA}://{$NEXTCLOUD.ADDRESS}/ocs/v1.php/cloud/users/{#NEXTCLOUD.USER}'
               status_codes: '200,401'
@@ -902,6 +949,7 @@ zabbix_export:
               name: 'User "{#NEXTCLOUD.USER}": Last login, days ago'
               type: DEPENDENT
               key: 'nextcloud.user.inactive[{#NEXTCLOUD.USER}]'
+              delay: '0'
               value_type: FLOAT
               units: '!days ago'
               description: 'The number of days since the user has last logged in.'
@@ -956,7 +1004,9 @@ zabbix_export:
               name: 'User "{#NEXTCLOUD.USER}": Language'
               type: DEPENDENT
               key: 'nextcloud.user.language[{#NEXTCLOUD.USER}]'
+              delay: '0'
               value_type: CHAR
+              trends: '0'
               description: 'User language.'
               preprocessing:
                 - type: JSONPATH
@@ -977,6 +1027,7 @@ zabbix_export:
               name: 'User "{#NEXTCLOUD.USER}": Last login'
               type: DEPENDENT
               key: 'nextcloud.user.lastLogin[{#NEXTCLOUD.USER}]'
+              delay: '0'
               units: unixtime
               description: 'The time the user has last logged in.'
               preprocessing:
@@ -1001,6 +1052,7 @@ zabbix_export:
               name: 'User "{#NEXTCLOUD.USER}": Quota free space'
               type: DEPENDENT
               key: 'nextcloud.user.quota.free[{#NEXTCLOUD.USER}]'
+              delay: '0'
               units: B
               description: 'The size of the free available space in the user''s storage.'
               preprocessing:
@@ -1022,6 +1074,7 @@ zabbix_export:
               name: 'User "{#NEXTCLOUD.USER}": Quota used space, in %'
               type: DEPENDENT
               key: 'nextcloud.user.quota.pused[{#NEXTCLOUD.USER}]'
+              delay: '0'
               value_type: FLOAT
               units: '%'
               description: 'Usage of the allocated storage space, in percent.'
@@ -1054,6 +1107,7 @@ zabbix_export:
               name: 'User "{#NEXTCLOUD.USER}": Quota total space '
               type: DEPENDENT
               key: 'nextcloud.user.quota.total[{#NEXTCLOUD.USER}]'
+              delay: '0'
               units: B
               description: 'The size of space available in the user''s storage.'
               preprocessing:
@@ -1075,6 +1129,7 @@ zabbix_export:
               name: 'User "{#NEXTCLOUD.USER}": Quota used space'
               type: DEPENDENT
               key: 'nextcloud.user.quota.used[{#NEXTCLOUD.USER}]'
+              delay: '0'
               units: B
               description: 'The size of the used available space in the user storage.'
               preprocessing:
@@ -1096,6 +1151,7 @@ zabbix_export:
               name: 'User "{#NEXTCLOUD.USER}": Quota'
               type: DEPENDENT
               key: 'nextcloud.user.quota[{#NEXTCLOUD.USER}]'
+              delay: '0'
               value_type: FLOAT
               units: B
               description: 'The size of space available in the user''s storage.'
@@ -1124,7 +1180,9 @@ zabbix_export:
               name: 'User "{#NEXTCLOUD.USER}": Storage location'
               type: DEPENDENT
               key: 'nextcloud.user.storageLocation[{#NEXTCLOUD.USER}]'
+              delay: '0'
               value_type: CHAR
+              trends: '0'
               description: 'The location of the user''s store.'
               preprocessing:
                 - type: JSONPATH

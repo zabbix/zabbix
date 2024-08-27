@@ -35,7 +35,12 @@ class testPageAlertsScripts extends CWebTest {
 	public function getBehaviors() {
 		return [
 			CMessageBehavior::class,
-			CTableBehavior::class
+			[
+				'class' => CTableBehavior::class,
+				'column_names' => ['', 'Name', 'Scope', 'Count', 'Used in actions', 'Type', 'Execute on', 'Commands',
+					'User group', 'Host group', 'Host access'
+				]
+			]
 		];
 	}
 
@@ -107,6 +112,7 @@ class testPageAlertsScripts extends CWebTest {
 					[
 						'Name' => self::$custom_script,
 						'Scope' => 'Action operation',
+						'Count' => '1',
 						'Used in actions' => self::$custom_action,
 						'Type' => 'Script',
 						'Execute on' => 'Server (proxy)',
@@ -118,6 +124,7 @@ class testPageAlertsScripts extends CWebTest {
 					[
 						'Name' => 'Detect operating system',
 						'Scope' => 'Manual host action',
+						'Count' => '',
 						'Used in actions' => '',
 						'Type' => 'Script',
 						'Execute on' => 'Server (proxy)',
@@ -129,6 +136,7 @@ class testPageAlertsScripts extends CWebTest {
 					[
 						'Name' => self::$script_scope_event,
 						'Scope' => 'Manual event action',
+						'Count' => '',
 						'Used in actions' => '',
 						'Type' => 'Script',
 						'Execute on' => 'Server (proxy)',
@@ -140,6 +148,7 @@ class testPageAlertsScripts extends CWebTest {
 					[
 						'Name' => 'Ping',
 						'Scope' => 'Manual host action',
+						'Count' => '',
 						'Used in actions' => '',
 						'Type' => 'Script',
 						'Execute on' => 'Server (proxy)',
@@ -151,6 +160,7 @@ class testPageAlertsScripts extends CWebTest {
 					[
 						'Name' => 'Reboot',
 						'Scope' => 'Action operation',
+						'Count' => '3',
 						'Used in actions' => 'Autoregistration action 1, Autoregistration action 2, Minimal trigger action',
 						'Type' => 'Script',
 						'Execute on' => 'Server (proxy)',
@@ -162,6 +172,7 @@ class testPageAlertsScripts extends CWebTest {
 					[
 						'Name' => self::HOST_GROUP_SCRIPT,
 						'Scope' => 'Action operation',
+						'Count' => '',
 						'Used in actions' => '',
 						'Type' => 'Webhook',
 						'Execute on' => '',
@@ -173,6 +184,7 @@ class testPageAlertsScripts extends CWebTest {
 					[
 						'Name' => self::$script_for_filter,
 						'Scope' => 'Manual event action',
+						'Count' => '',
 						'Used in actions' => '',
 						'Type' => 'Script',
 						'Execute on' => 'Server (proxy)',
@@ -184,6 +196,7 @@ class testPageAlertsScripts extends CWebTest {
 					[
 						'Name' => 'Selenium script',
 						'Scope' => 'Action operation',
+						'Count' => '',
 						'Used in actions' => '',
 						'Type' => 'Script',
 						'Execute on' => 'Server (proxy)',
@@ -195,6 +208,7 @@ class testPageAlertsScripts extends CWebTest {
 					[
 						'Name' => 'Traceroute',
 						'Scope' => 'Manual host action',
+						'Count' => '',
 						'Used in actions' => '',
 						'Type' => 'Script',
 						'Execute on' => 'Server (proxy)',
@@ -259,7 +273,7 @@ class testPageAlertsScripts extends CWebTest {
 		);
 
 		// Check sortable headers.
-		$this->assertEquals(['Name', 'Commands'], $table->getHeaders()->query('tag:a')->asText());
+		$this->assertEquals(['Name', 'Commands'], $table->getSortableHeaders()->asText());
 
 		// Check Script table content.
 		$this->assertTableHasData($data);

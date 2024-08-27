@@ -233,6 +233,9 @@ function setupLocale(string $language, string &$error = null): bool {
 	// Make sure LC_NUMERIC is set to C to force PHP to always use a point instead of a comma for decimal numbers.
 	setlocale(LC_NUMERIC, 'C');
 
+	// Reset the LC_CTYPE category so that case-conversion and preg functions work correctly with the Turkish locale.
+	setlocale(LC_CTYPE, 'C');
+
 	if (!$locale_set) {
 		$error = 'Locale for language "'.$language.'" is not found on the web server. Tried to set: '.
 			implode(', ', $locale_variants).'. Unable to translate Zabbix interface.';
