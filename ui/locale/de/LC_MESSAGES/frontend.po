@@ -22020,6 +22020,11 @@ msgstr "Zeichenfolge des Benutzeragenten"
 msgid "User cannot add himself to a disabled group or a group with disabled GUI access."
 msgstr "Benutzer kann sich nicht selbst eintragen in eine deaktiverte Gruppe oder eine ohne Zugriff auf die Oberfläche."
 
+#: include/classes/api/services/CUserGroup.php:673
+#: include/classes/api/services/CUser.php:843
+msgid "User cannot add oneself to a disabled group or a group with disabled GUI access."
+msgstr ""
+
 #: app/views/administration.user.edit.php:461
 #: include/classes/api/services/CUser.php:980
 msgid "User cannot change own role."
@@ -22155,6 +22160,10 @@ msgstr ""
 #: include/classes/api/services/CUser.php:1282
 msgid "User is not allowed to delete himself."
 msgstr "Benutzer darf sich nicht selbst löschen."
+
+#: include/classes/api/services/CUser.php:1837
+msgid "User is not allowed to delete oneself."
+msgstr ""
 
 #: app/views/administration.authentication.edit.php:462
 #: app/views/popup.ldap.edit.php:222

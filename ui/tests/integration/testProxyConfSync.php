@@ -106,22 +106,6 @@ class testProxyConfSync extends CIntegrationTest
 			]
 		],
 		[
-			'template_items' =>
-			[
-				'insert' => '0',
-				'update' => '0',
-				'delete' => '0'
-			]
-		],
-		[
-			'prototype_items' =>
-			[
-				'insert' => '0',
-				'update' => '0',
-				'delete' => '0'
-			]
-		],
-		[
 			'item_discovery' =>
 			[
 				'insert' => '0',
@@ -428,28 +412,6 @@ class testProxyConfSync extends CIntegrationTest
 				"0",
 				"update" =>
 				"49",
-				"delete" =>
-				"0"
-			]
-		],
-		[
-			"template_items" =>
-			[
-				"insert" =>
-				"0",
-				"update" =>
-				"0",
-				"delete" =>
-				"0"
-			]
-		],
-		[
-			"prototype_items" =>
-			[
-				"insert" =>
-				"0",
-				"update" =>
-				"0",
 				"delete" =>
 				"0"
 			]
@@ -824,28 +786,6 @@ class testProxyConfSync extends CIntegrationTest
 		],
 		[
 			"items" =>
-			[
-				"insert" =>
-				"0",
-				"update" =>
-				"0",
-				"delete" =>
-				"78"
-			]
-		],
-		[
-			"template_items" =>
-			[
-				"insert" =>
-				"0",
-				"update" =>
-				"0",
-				"delete" =>
-				"0"
-			]
-		],
-		[
-			"prototype_items" =>
 			[
 				"insert" =>
 				"0",
