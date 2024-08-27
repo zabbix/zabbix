@@ -435,7 +435,7 @@ static void	add_command(const char *key, zbx_uint64_t id, int timeout)
  *           <key>:<refresh time>:<last log size>:<modification time>           *
  *                                                                              *
  ********************************************************************************/
-static void	parse_list_of_checks(char *str, const char *host, unsigned short port,
+static int	parse_list_of_checks(char *str, const char *host, unsigned short port,
 		zbx_uint32_t *config_revision_local, int config_timeout, const char *config_hostname,
 		zbx_vector_addr_ptr_t *addrs, const zbx_config_tls_t *config_tls, const char *config_source_ip,
 		int config_buffer_send, int config_buffer_size)
@@ -448,7 +448,7 @@ static void	parse_list_of_checks(char *str, const char *host, unsigned short por
 	struct zbx_json_parse	jp, jp_data, jp_row;
 	zbx_active_metric_t	*metric;
 	zbx_vector_uint64_t	received_itemids;
-	int			mtime, expression_type, case_sensitive, timeout, i;
+	int			mtime, expression_type, case_sensitive, timeout, i, ret = FAIL;
 	zbx_uint32_t		config_revision;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -474,6 +474,7 @@ static void	parse_list_of_checks(char *str, const char *host, unsigned short por
 		else
 			zabbix_log(LOG_LEVEL_ERR, "no active checks on server");
 
+		ret = SUCCEED;
 		goto out;
 	}
 
@@ -671,19 +672,24 @@ static void	parse_list_of_checks(char *str, const char *host, unsigned short por
 			zbx_add_regexp_ex(&regexps, name, expression, expression_type, exp_delimiter, case_sensitive);
 		}
 	}
+
+	ret = SUCCEED;
 out:
+
 	zbx_vector_uint64_destroy(&received_itemids);
 	zbx_free(delay);
 	zbx_free(name);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+
+	return ret;
 }
 
-static void	parse_list_of_commands(char *str, int config_timeout)
+static int	parse_list_of_commands(char *str, int config_timeout)
 {
 	const char		*p;
 	char			*cmd = NULL, tmp[MAX_STRING_LEN], error[MAX_STRING_LEN], *key = NULL;
-	int			timeout, commands_num = 0;
+	int			timeout, commands_num = 0, ret = FAIL;
 	zbx_uint64_t		command_id;
 	struct zbx_json_parse	jp, jp_data, jp_row;
 	size_t			cmd_alloc = 0, key_alloc;
@@ -766,11 +772,15 @@ static void	parse_list_of_commands(char *str, int config_timeout)
 			commands_num++;
 		}
 	}
+
+	ret = SUCCEED;
 out:
 	zbx_free(key);
 	zbx_free(cmd);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+
+	return ret;
 }
 
 /************************************************************************************************
@@ -853,7 +863,7 @@ static int	refresh_active_checks(zbx_vector_addr_ptr_t *addrs, const zbx_config_
 		int config_buffer_size)
 {
 	static ZBX_THREAD_LOCAL int	last_ret = SUCCEED;
-	int				ret, level;
+	int				ret, level, rc;
 	struct zbx_json			json;
 	char				*data = NULL;
 
@@ -923,9 +933,15 @@ static int	refresh_active_checks(zbx_vector_addr_ptr_t *addrs, const zbx_config_
 					((zbx_addr_t *)addrs->values[0])->port);
 		}
 
-		parse_list_of_checks(data, ((zbx_addr_t *)addrs->values[0])->ip, ((zbx_addr_t *)addrs->values[0])->port,
-				config_revision_local, config_timeout, config_hostname, addrs, config_tls,
-				config_source_ip, config_buffer_send, config_buffer_size);
+		rc = parse_list_of_checks(data, ((zbx_addr_t *)addrs->values[0])->ip,
+				((zbx_addr_t *)addrs->values[0])->port, config_revision_local, config_timeout,
+				config_hostname, addrs, config_tls, config_source_ip, config_buffer_send,
+				config_buffer_size);
+
+		rc |= parse_list_of_commands(data, config_timeout);
+
+		if (SUCCEED != ret)
+			zbx_addrs_failover(addrs);
 
 		parse_list_of_commands(data, config_timeout);
 
@@ -1224,6 +1240,8 @@ static int	send_buffer(zbx_vector_addr_ptr_t *addrs, zbx_vector_pre_persistent_t
 		{
 			ret = FAIL;
 			zabbix_log(LOG_LEVEL_DEBUG, "NOT OK");
+
+			zbx_addrs_failover(addrs);
 		}
 		else
 			zabbix_log(LOG_LEVEL_DEBUG, "OK");
@@ -1856,6 +1874,8 @@ static void	send_heartbeat_msg(zbx_vector_addr_ptr_t *addrs, const zbx_config_tl
 				((zbx_addr_t *)addrs->values[0])->ip, ((zbx_addr_t *)addrs->values[0])->port, error);
 
 		zbx_free(error);
+
+		zbx_addrs_failover(addrs);
 	}
 
 	last_ret = ret;
