@@ -290,7 +290,7 @@ func (p *Plugin) execute(jsonRunner bool) (*runner, error) {
 			deviceInfo, err := getBasicDeviceInfo(p.ctl, name)
 
 			if errors.Is(err, ErrNoSmartStatus) {
-				r.plugin.Debugf("skipping device %s", name)
+				p.Logger.Debugf("skipping device with no smart status: %s", name)
 
 				return nil
 			}
@@ -712,7 +712,7 @@ func formatDeviceOutput(
 func (p *Plugin) scanDevices(args ...string) ([]deviceInfo, error) {
 	out, err := p.ctl.Execute(args...)
 	if err != nil {
-		return nil, err
+		return nil, errs.Wrapf(err, "got error executing scanDevices with arguments: %s", args)
 	}
 
 	var d devices
