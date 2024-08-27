@@ -76,9 +76,8 @@ var (
 	cpuCount     int
 	lastVerCheck time.Time
 	versionMux   sync.Mutex
-)
 
-var (
+	// ErrNoSmartStatus error indicated that device has no smart status
 	ErrNoSmartStatus = errs.New("smartctl returned no smart status")
 )
 
