@@ -276,7 +276,8 @@ int	config_forks[ZBX_PROCESS_TYPE_COUNT] = {
 	1, /* ZBX_PROCESS_TYPE_INTERNAL_POLLER */
 	1, /* ZBX_PROCESS_TYPE_DBCONFIGWORKER */
 	1, /* ZBX_PROCESS_TYPE_PG_MANAGER */
-	1 /* ZBX_PROCESS_TYPE_BROWSERPOLLER */
+	1, /* ZBX_PROCESS_TYPE_BROWSERPOLLER */
+	1, /* ZBX_PROCESS_TYPE_HA_MANAGER */
 };
 
 static int	get_config_forks(unsigned char process_type)
@@ -408,6 +409,11 @@ static int	get_process_info_by_thread(int local_server_num, unsigned char *local
 	{
 		/* fail if the main process is queried */
 		return FAIL;
+	}
+	else if (local_server_num <= (server_count += config_forks[ZBX_PROCESS_TYPE_HA_MANAGER]))
+	{
+		*local_process_type = ZBX_PROCESS_TYPE_HA_MANAGER;
+		*local_process_num = local_server_num - server_count + config_forks[ZBX_PROCESS_TYPE_HA_MANAGER];
 	}
 	else if (local_server_num <= (server_count += config_forks[ZBX_PROCESS_TYPE_SERVICEMAN]))
 	{
@@ -1215,9 +1221,9 @@ static void	zbx_on_exit(int ret, void *on_exit_args)
 
 		/* free vmware support */
 		zbx_vmware_destroy();
-
-		zbx_free_selfmon_collector();
 	}
+
+	zbx_free_selfmon_collector();
 
 	zbx_uninitialize_events();
 
@@ -1636,13 +1642,6 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 
 	zbx_vps_monitor_init(config_vps_limit, config_vps_overcommit_limit);
 
-	if (SUCCEED != zbx_init_selfmon_collector(get_config_forks, &error))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize self-monitoring: %s", error);
-		zbx_free(error);
-		return FAIL;
-	}
-
 	if (0 != config_forks[ZBX_PROCESS_TYPE_VMWARE] && SUCCEED != zbx_vmware_init(&config_vmware_cache_size, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize VMware cache: %s", error);
@@ -2036,7 +2035,6 @@ static void	server_teardown(zbx_rtc_t *rtc, zbx_socket_t *listen_sock)
 	zbx_tfc_destroy();
 	zbx_vc_destroy();
 	zbx_vmware_destroy();
-	zbx_free_selfmon_collector();
 	zbx_free_configuration_cache();
 	zbx_free_database_cache(ZBX_SYNC_NONE, &events_cbs, config_history_storage_pipelines);
 	zbx_deinit_remote_commands_cache();
@@ -2330,6 +2328,14 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize history storage: %s", error);
 		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
+
+	if (SUCCEED != zbx_init_selfmon_collector(get_config_forks, &error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize self-monitoring: %s", error);
+		zbx_free(error);
+		zbx_free_selfmon_collector();
 		exit(EXIT_FAILURE);
 	}
 
