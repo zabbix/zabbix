@@ -133,9 +133,9 @@ $form_grid->addItem([
 
 // Display item value as.
 $form_grid->addItem([
-	(new CLabel(_('Display item value as'), 'display_item_as'))->addClass('js-display-as-row'),
+	(new CLabel(_('Display item value as'), 'display_value_as'))->addClass('js-display-as-row'),
 	(new CFormField(
-		(new CRadioButtonList('display_item_as', (int) $data['display_item_as']))
+		(new CRadioButtonList('display_value_as', (int) $data['display_value_as']))
 			->addValue(_('Numeric'), CWidgetFieldColumnsList::DISPLAY_VALUE_AS_NUMERIC)
 			->addValue(_('Text'), CWidgetFieldColumnsList::DISPLAY_VALUE_AS_TEXT)
 			->addValue(_('Binary'), CWidgetFieldColumnsList::DISPLAY_VALUE_AS_BINARY)
@@ -157,22 +157,22 @@ $form_grid->addItem([
 
 // Min value.
 $form_grid->addItem([
-	(new CLabel(_('Min'), 'min'))->addClass('js-min-row'),
+	(new CLabel(_('Min'), 'min'))->addClass('js-min-max-row'),
 	(new CFormField(
 		(new CTextBox('min', $data['min']))
 			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 			->setAttribute('placeholder', _('calculated'))
-	))->addClass('js-min-row')
+	))->addClass('js-min-max-row')
 ]);
 
 // Max value.
 $form_grid->addItem([
-	(new CLabel(_('Max'), 'max'))->addClass('js-max-row'),
+	(new CLabel(_('Max'), 'max'))->addClass('js-min-max-row'),
 	(new CFormField(
 		(new CTextBox('max', $data['max']))
 			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 			->setAttribute('placeholder', _('calculated'))
-	))->addClass('js-max-row')
+	))->addClass('js-min-max-row')
 ]);
 
 // Thresholds table.

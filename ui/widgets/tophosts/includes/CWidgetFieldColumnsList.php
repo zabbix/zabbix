@@ -119,7 +119,7 @@ class CWidgetFieldColumnsList extends CWidgetField {
 			'text' => ZBX_WIDGET_FIELD_TYPE_STR,
 			'item' => ZBX_WIDGET_FIELD_TYPE_STR,
 			'base_color' => ZBX_WIDGET_FIELD_TYPE_STR,
-			'display_item_as' => ZBX_WIDGET_FIELD_TYPE_INT32,
+			'display_value_as' => ZBX_WIDGET_FIELD_TYPE_INT32,
 			'display' => ZBX_WIDGET_FIELD_TYPE_INT32,
 			'min' => ZBX_WIDGET_FIELD_TYPE_STR,
 			'max' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -131,7 +131,7 @@ class CWidgetFieldColumnsList extends CWidgetField {
 
 		$column_defaults = [
 			'base_color' => '',
-			'display_item_as' => CWidgetFieldColumnsList::DISPLAY_VALUE_AS_NUMERIC,
+			'display_value_as' => CWidgetFieldColumnsList::DISPLAY_VALUE_AS_NUMERIC,
 			'display' => CWidgetFieldColumnsList::DISPLAY_AS_IS,
 			'min' => '',
 			'max' => '',
@@ -206,7 +206,7 @@ class CWidgetFieldColumnsList extends CWidgetField {
 												'type' => API_STRING_UTF8]
 			]],
 			'base_color'			=> ['type' => API_COLOR, 'default' => ''],
-			'display_item_as'		=> ['type' => API_MULTIPLE, 'rules' => [
+			'display_value_as'		=> ['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'data', 'in' => self::DATA_ITEM_VALUE],
 											'type' => API_INT32, 'default' => self::DISPLAY_VALUE_AS_NUMERIC, 'in' => implode(',', [self::DISPLAY_VALUE_AS_NUMERIC, self::DISPLAY_VALUE_AS_TEXT, self::DISPLAY_VALUE_AS_BINARY])],
 										['else' => true,

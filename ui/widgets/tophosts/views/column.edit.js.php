@@ -58,8 +58,10 @@ window.tophosts_column_edit_form = new class {
 		this.#thresholds_table = document.getElementById('thresholds_table');
 		this.#highlights_table = document.getElementById('highlights_table');
 
-		$('[name="data"], [name="aggregate_function"], [name="display"], [name="history"]', this.#form)
-			.on('change', () => this.#updateForm());
+		this.#form.querySelectorAll('[name="data"], [name="aggregate_function"], [name="display"], [name="history"]')
+			.forEach(element => {
+				element.addEventListener('change', () => this.#updateForm());
+			});
 
 		// Initialize item multiselect.
 		$('#item').on('change', () => {
@@ -88,7 +90,7 @@ window.tophosts_column_edit_form = new class {
 		colorPalette.setThemeColors(colors);
 
 		// Initialize Display item value as and Display event listener
-		document.getElementById('display_item_as').addEventListener('change', () => this.#updateForm());
+		document.getElementById('display_value_as').addEventListener('change', () => this.#updateForm());
 		document.getElementById('display').addEventListener('change', () => this.#updateForm());
 
 		// Initialize thresholds table.
@@ -236,7 +238,7 @@ window.tophosts_column_edit_form = new class {
 		const display_as_binary = <?= CWidgetFieldColumnsList::DISPLAY_VALUE_AS_BINARY ?>;
 
 		if (item_change) {
-			document.querySelectorAll('[name=display_item_as]').forEach(element => {
+			document.querySelectorAll('[name=display_value_as]').forEach(element => {
 				element.checked = (element.value == display_as_text && is_item_type_text)
 					|| (element.value == display_as_binary && is_item_type_binary)
 					|| (element.value == display_as_numeric && (is_item_type_numeric
@@ -244,19 +246,20 @@ window.tophosts_column_edit_form = new class {
 			});
 		}
 
-		const display_item_as = document.querySelector('[name=display_item_as]:checked').value;
+		const display_value_as = document.querySelector('[name=display_value_as]:checked').value;
 		const display_numeric_as_is = document.querySelector('[name=display]:checked')
 			.value == <?= CWidgetFieldColumnsList::DISPLAY_AS_IS ?>;
-		const show_min_max = data_item_value && display_item_as == display_as_numeric && !display_numeric_as_is;
+		const show_min_max = data_item_value && display_value_as == display_as_numeric && !display_numeric_as_is;
+		const show_numeric_value_fields = data_item_value && display_value_as == display_as_numeric;
 
 		// Update aggregate function options based on item value display type.
 		const aggregation_function_select = document.querySelector('z-select[name=aggregate_function]');
 
 		[<?= AGGREGATE_MIN ?>, <?= AGGREGATE_MAX ?>, <?= AGGREGATE_AVG ?>, <?= AGGREGATE_SUM ?>].forEach(option => {
-			aggregation_function_select.getOptionByValue(option).disabled = display_item_as != display_as_numeric;
-			aggregation_function_select.getOptionByValue(option).hidden = display_item_as != display_as_numeric;
+			aggregation_function_select.getOptionByValue(option).disabled = display_value_as != display_as_numeric;
+			aggregation_function_select.getOptionByValue(option).hidden = display_value_as != display_as_numeric;
 
-			if (aggregation_function_select.value == option && display_item_as != display_as_numeric) {
+			if (aggregation_function_select.value == option && display_value_as != display_as_numeric) {
 				aggregation_function_select.value = <?= AGGREGATE_NONE ?>;
 			}
 		});
@@ -266,14 +269,13 @@ window.tophosts_column_edit_form = new class {
 			'js-text-row': data_text,
 			'js-item-row': data_item_value,
 			'js-display-as-row': data_item_value,
-			'js-display-row': data_item_value && display_item_as == display_as_numeric,
-			'js-highlights-row': data_item_value && display_item_as == display_as_text,
-			'js-min-row': show_min_max,
-			'js-max-row': show_min_max,
-			'js-thresholds-row': data_item_value && display_item_as == display_as_numeric,
-			'js-decimals-row': data_item_value && display_item_as == display_as_numeric,
-			'js-history-row': data_item_value && display_item_as == display_as_numeric,
-			'js-display-as-image-row': data_item_value && display_item_as == display_as_binary,
+			'js-display-row': show_numeric_value_fields,
+			'js-highlights-row': data_item_value && display_value_as == display_as_text,
+			'js-min-max-row': show_min_max,
+			'js-thresholds-row': show_numeric_value_fields,
+			'js-decimals-row': show_numeric_value_fields,
+			'js-history-row': show_numeric_value_fields,
+			'js-display-as-image-row': data_item_value && display_value_as == display_as_binary,
 			'js-advanced-configuration-fieldset': data_item_value
 		}
 
@@ -287,19 +289,19 @@ window.tophosts_column_edit_form = new class {
 
 		// Toggle disable/enable of input fields.
 		$('#item', this.#form).multiSelect(data_item_value ? 'enable' : 'disable');
-		$(this.#thresholds_table).toggleClass('disabled', display_item_as != display_as_numeric);
-		$(this.#highlights_table).toggleClass('disabled', display_item_as != display_as_text);
+		$(this.#thresholds_table).toggleClass('disabled', display_value_as != display_as_numeric);
+		$(this.#highlights_table).toggleClass('disabled', display_value_as != display_as_text);
 
 		const inputs = {
 			'text': data_text,
-			'display_item_as': data_item_value,
-			'display': display_item_as == display_as_numeric,
+			'display_value_as': data_item_value,
+			'display': display_value_as == display_as_numeric,
 			'min': show_min_max,
 			'max': show_min_max,
-			'decimal_places': display_item_as == display_as_numeric,
-			'show_thumbnail': display_item_as == display_as_binary,
+			'decimal_places': display_value_as == display_as_numeric,
+			'show_thumbnail': display_value_as == display_as_binary,
 			'aggregate_function': data_item_value,
-			'history': display_item_as == display_as_numeric
+			'history': display_value_as == display_as_numeric
 		}
 
 		for (const input_name in inputs) {

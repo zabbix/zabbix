@@ -110,7 +110,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			elseif ($column['data'] == CWidgetFieldColumnsList::DATA_ITEM_VALUE) {
 				$item_names[$column_index] = $column['item'];
 
-				if ($column['display_item_as'] == CWidgetFieldColumnsList::DISPLAY_VALUE_AS_BINARY
+				if ($column['display_value_as'] == CWidgetFieldColumnsList::DISPLAY_VALUE_AS_BINARY
 						&& $column['show_thumbnail'] == 1) {
 					$show_thumbnail = true;
 				}
@@ -191,7 +191,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				$master_entities_max = reset($master_entity_values);
 			}
 			elseif ($master_column['data'] != CWidgetFieldColumnsList::DATA_ITEM_VALUE
-					|| $master_column['display_item_as'] != CWidgetFieldColumnsList::DISPLAY_VALUE_AS_BINARY) {
+					|| $master_column['display_value_as'] != CWidgetFieldColumnsList::DISPLAY_VALUE_AS_BINARY) {
 				natcasesort($master_entity_values);
 			}
 		}
@@ -203,7 +203,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				$master_entities_max = end($master_entity_values);
 			}
 			elseif ($master_column['data'] != CWidgetFieldColumnsList::DATA_ITEM_VALUE
-					|| $master_column['display_item_as'] != CWidgetFieldColumnsList::DISPLAY_VALUE_AS_BINARY) {
+					|| $master_column['display_value_as'] != CWidgetFieldColumnsList::DISPLAY_VALUE_AS_BINARY) {
 				natcasesort($master_entity_values);
 				$master_entity_values = array_reverse($master_entity_values, true);
 			}
@@ -473,7 +473,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			foreach ($items_by_value_type as $value_type => $items) {
 				if ($value_type == ITEM_VALUE_TYPE_BINARY) {
 					$itemids = array_keys($items);
-					$output = $column['display_item_as'] == CWidgetFieldColumnsList::DISPLAY_VALUE_AS_BINARY
+					$output = $column['display_value_as'] == CWidgetFieldColumnsList::DISPLAY_VALUE_AS_BINARY
 						? ['itemid', 'clock', 'ns']
 						: ['itemid', 'value'];
 
@@ -495,7 +495,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 							if ($db_values) {
 								$result[$db_values[0]['itemid']] =
-									$column['display_item_as'] == CWidgetFieldColumnsList::DISPLAY_VALUE_AS_BINARY
+									$column['display_value_as'] == CWidgetFieldColumnsList::DISPLAY_VALUE_AS_BINARY
 										? [
 											'clock' => $db_values[0]['clock'],
 											'ns' => $db_values[0]['ns']
@@ -533,7 +533,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			foreach ($items_by_value_type as $value_type => $items) {
 				if ($value_type == ITEM_VALUE_TYPE_BINARY) {
 					$itemids = array_keys($items);
-					$output = $column['display_item_as'] == CWidgetFieldColumnsList::DISPLAY_VALUE_AS_BINARY
+					$output = $column['display_value_as'] == CWidgetFieldColumnsList::DISPLAY_VALUE_AS_BINARY
 						? ['itemid', 'clock', 'ns']
 						: ['itemid', 'value'];
 
@@ -549,7 +549,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 						if ($db_values) {
 							$result[$db_values[0]['itemid']] =
-								$column['display_item_as'] == CWidgetFieldColumnsList::DISPLAY_VALUE_AS_BINARY
+								$column['display_value_as'] == CWidgetFieldColumnsList::DISPLAY_VALUE_AS_BINARY
 									? [
 										'clock' => $db_values[0]['clock'],
 										'ns' => $db_values[0]['ns']

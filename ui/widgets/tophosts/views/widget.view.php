@@ -108,28 +108,9 @@ else {
 					break;
 
 				case CWidgetFieldColumnsList::DATA_ITEM_VALUE:
-					if (in_array($column['item']['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])) {
-						$formatted_value = formatAggregatedHistoryValue($column['value'], $column['item'],
-							$column_config['aggregate_function'], false, true, [
-								'decimals' => $column_config['decimal_places'],
-								'decimals_exact' => true,
-								'small_scientific' => false,
-								'zero_as_zero' => false
-							]
-						);
-					}
-					elseif ($column['item']['value_type'] != ITEM_VALUE_TYPE_BINARY) {
-						$formatted_value = formatAggregatedHistoryValue($column['value'], $column['item'],
-							$column_config['aggregate_function']
-						);
-					}
-					elseif ($column_config['display_item_as'] != CWidgetFieldColumnsList::DISPLAY_VALUE_AS_BINARY) {
-						$max_length = 20;
-						$formatted_value = substr($column['value'], 0, $max_length)
-							.(strlen($column['value']) > $max_length ? '...' : '');
-					}
+					$formatted_value = getFormattedValue($column, $column_config);
 
-					if ($column_config['display_item_as'] == CWidgetFieldColumnsList::DISPLAY_VALUE_AS_BINARY) {
+					if ($column_config['display_value_as'] == CWidgetFieldColumnsList::DISPLAY_VALUE_AS_BINARY) {
 						if ($column['item']['value_type'] == ITEM_VALUE_TYPE_BINARY
 								&& $column_config['aggregate_function'] != AGGREGATE_COUNT) {
 							$row[] = (new CCol(
@@ -165,7 +146,7 @@ else {
 						}
 					}
 
-					if ($column_config['display_item_as'] == CWidgetFieldColumnsList::DISPLAY_VALUE_AS_TEXT) {
+					if ($column_config['display_value_as'] == CWidgetFieldColumnsList::DISPLAY_VALUE_AS_TEXT) {
 						if (array_key_exists('highlights', $column_config)) {
 							$value_to_check = $column['item']['value_type'] == ITEM_VALUE_TYPE_BINARY
 								? $column['value']
@@ -260,7 +241,48 @@ else {
 
 function shouldUseDoubleColumnHeader(array $column_config): bool {
 	return $column_config['data'] == CWidgetFieldColumnsList::DATA_ITEM_VALUE
-			&& (($column_config['display_item_as'] == CWidgetFieldColumnsList::DISPLAY_VALUE_AS_NUMERIC
-				&& $column_config['display'] != CWidgetFieldColumnsList::DISPLAY_AS_IS)
-					|| $column_config['display_item_as'] == CWidgetFieldColumnsList::DISPLAY_VALUE_AS_BINARY);
+		&& ($column_config['display_value_as'] == CWidgetFieldColumnsList::DISPLAY_VALUE_AS_BINARY
+			|| ($column_config['display_value_as'] == CWidgetFieldColumnsList::DISPLAY_VALUE_AS_NUMERIC
+				&& $column_config['display'] != CWidgetFieldColumnsList::DISPLAY_AS_IS));
+}
+
+/**
+ * Retrieves the formatted value for a given column based on its value type and display configuration.
+ *
+ * @param array $column Array representing the column's properties ('item' and 'value').
+ * @param array $column_config Array representing the column's configuration and formatting options.
+ *
+ * @return string The formatted value as a string based on the column's value type and display configuration.
+ */
+function getFormattedValue(array $column, array $column_config): string {
+	if (in_array($column['item']['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])) {
+		return formatAggregatedHistoryValue(
+			$column['value'],
+			$column['item'],
+			$column_config['aggregate_function'],
+			false,
+			true,
+			[
+				'decimals' => $column_config['decimal_places'],
+				'decimals_exact' => true,
+				'small_scientific' => false,
+				'zero_as_zero' => false
+			]
+		);
+	}
+
+	if ($column['item']['value_type'] != ITEM_VALUE_TYPE_BINARY) {
+		return formatAggregatedHistoryValue(
+			$column['value'],
+			$column['item'],
+			$column_config['aggregate_function']
+		);
+	}
+
+	if ($column_config['display_value_as'] != CWidgetFieldColumnsList::DISPLAY_VALUE_AS_BINARY) {
+		return substr($column['value'], 0, Widget::TEXT_MAX_LENGTH).
+			(strlen($column['value']) > Widget::TEXT_MAX_LENGTH ? '...' : '');
+	}
+
+	return '';
 }
