@@ -104,19 +104,16 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$items = [];
 
 		foreach ($columns as $column_index => $column) {
-			switch ($column['data']) {
-				case CWidgetFieldColumnsList::DATA_TEXT:
-					$has_text_column = true;
-					break 2;
+			if ($column['data'] == CWidgetFieldColumnsList::DATA_TEXT) {
+				$has_text_column = true;
+			}
+			elseif ($column['data'] == CWidgetFieldColumnsList::DATA_ITEM_VALUE) {
+				$item_names[$column_index] = $column['item'];
 
-				case CWidgetFieldColumnsList::DATA_ITEM_VALUE:
-					$item_names[$column_index] = $column['item'];
-
-					if ($column['display_item_as'] == CWidgetFieldColumnsList::DISPLAY_VALUE_AS_BINARY
-							&& $column['show_thumbnail'] == 1) {
-						$show_thumbnail = true;
-					}
-					break;
+				if ($column['display_item_as'] == CWidgetFieldColumnsList::DISPLAY_VALUE_AS_BINARY
+						&& $column['show_thumbnail'] == 1) {
+					$show_thumbnail = true;
+				}
 			}
 		}
 
