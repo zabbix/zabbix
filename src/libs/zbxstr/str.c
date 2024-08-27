@@ -1713,7 +1713,7 @@ int	zbx_replace_mem_dyn(char **data, size_t *data_alloc, size_t *data_len, size_
 		const char *from, size_t sz_from)
 {
 	size_t	sz_changed = sz_from - sz_to;
-
+	printf("%ld\n", sz_changed);
 	if (0 != sz_changed)
 	{
 		char	*to;

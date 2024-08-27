@@ -1,19 +1,41 @@
 ---
-test case: "Hello\xC2\xA9 World\xFE"
+test case: "\xfe\xfe\xfe\xfe"
 in:
-  string: "Hello\xC2\xA9 World\xFE"
+  buffer_length: 4
+  buffer: &buffer
+    - '\xfe\xfe\xfe\x00'
 out:
-  string: "Hello\xC2\xA9 World\xFE"
+  buffer_length: 4
+  buffer: &buffer
+    - '\x3f\x3f\x3f\x00'
 ---
-test case: "Hello World"
+test case: "null terminated"
 in:
-  string: "Hello World"
+  buffer_length: 1
+  buffer: &buffer
+    - '\x00'
 out:
-  string: "Hello World"
+  buffer_length: 1
+  buffer: &buffer
+    - '\x00'
 ---
-test case: "\xA9 \xFE"
+test case: "\x48\x65\x6c\x6c\x6f\x20\x77\x6f\x72\x6c\x64\xfe\x00"
 in:
-  string: "\xA9 \xFE"
+  buffer_length: 13
+  buffer: &buffer
+    - '\x48\x65\x6c\x6c\x6f\x20\x77\x6f\x72\x6c\x64\xfe\x00'
 out:
-  string: "\xA9 \xFE"
+  buffer_length: 13
+  buffer: &buffer
+    - '\x48\x65\x6c\x6c\x6f\x20\x77\x6f\x72\x6c\x64\x3f\x00'
+---
+test case: "\x74\x65\x73\x74\x00"
+in:
+  buffer_length: 5
+  buffer: &buffer
+    - '\x74\x65\x73\x74\x00'
+out:
+  buffer_length: 5
+  buffer: &buffer
+    - '\x74\x65\x73\x74\x00'
 ...

@@ -24,7 +24,8 @@ BINARIES_tests = \
 	zbx_replace_invalid_utf8\
 	zbx_trim_str_list\
 	zbx_strcmp_null\
-	zbx_strcmp_natural
+	zbx_strcmp_natural\
+	zbx_replace_mem_dyn
 
 
 noinst_PROGRAMS = $(BINARIES_tests)
@@ -397,6 +398,21 @@ zbx_strcmp_natural_LDADD += @SERVER_LIBS@
 zbx_strcmp_natural_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
 
 zbx_strcmp_natural_CFLAGS = $(STR_COMPILER_FLAGS)
+
+# zbx_replace_mem_dyn
+
+zbx_replace_mem_dyn_SOURCES = \
+	zbx_replace_mem_dyn.c \
+	$(COMMON_SRC_FILES)
+
+zbx_replace_mem_dyn_LDADD = \
+	$(STR_LIBS)
+
+zbx_replace_mem_dyn_LDADD += @SERVER_LIBS@
+
+zbx_replace_mem_dyn_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
+
+zbx_replace_mem_dyn_CFLAGS = $(STR_COMPILER_FLAGS)
 
 #endif
 

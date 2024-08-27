@@ -15,18 +15,21 @@
 #include "zbxmockdata.h"
 #include "zbxmockutil.h"
 #include "zbxmockassert.h"
+#include "zbxmockhelper.h"
 
 #include "zbxstr.h"
 
 void	zbx_mock_test_entry(void **state)
 {
 	ZBX_UNUSED(state);
+	size_t		in_buffer_length = zbx_mock_get_parameter_uint64("in.buffer_length");
+	size_t		out_buffer_length = zbx_mock_get_parameter_uint64("out.buffer_length");
+	char		*in_buffer = zbx_yaml_assemble_binary_sequence("in.buffer", &in_buffer_length);
+	char		*out_buffer = zbx_yaml_assemble_binary_sequence("out.buffer", &out_buffer_length);
 
-	char		*text = zbx_strdup(NULL ,zbx_mock_get_parameter_string("in.string"));
-	const char	*exp_result = zbx_mock_get_parameter_string("out.string");
+	zbx_replace_invalid_utf8(in_buffer);
+	zbx_mock_assert_str_eq("Unexpected error message X", out_buffer, in_buffer);
+	zbx_free(in_buffer);
+	zbx_free(out_buffer);
 
-	zbx_replace_invalid_utf8(text);
-
-	zbx_mock_assert_str_eq("return value",  exp_result, text);
-	zbx_free(text);
 }

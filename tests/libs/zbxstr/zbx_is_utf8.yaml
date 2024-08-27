@@ -1,13 +1,33 @@
-
 ---
-test case: "emoji"
+test case: "\xfe\xfe\xfe\xfe - FAIL"
 in:
-  string: "\xF0\xA4\xAD\xA2"
+  buffer_length: 4
+  buffer: &buffer
+    - '\xfe\xfe\xfe\xfe'
 out:
-  return: SUCCEED
-#---
-#test case: "Fail \xfe"
-#in:
-#  string: "\xfe"
-#out:
-#  return: SUCCEED
+  return: 'FAIL'
+---
+test case: "\xF4\x90\x80\x80\x00 - FAIL"
+in:
+  buffer_length: 5
+  buffer: &buffer
+    - '\xF4\x90\x80\x80\x00'
+out:
+  return: 'FAIL'
+---
+test case: "\x61\x00- SUCCEED"
+in:
+  buffer_length: 2
+  buffer: &buffer
+    - '\x61\x00'
+out:
+  return: 'SUCCEED'
+---
+test case: "\x48\x65\x6c\x6c\x6f\x20\x77\x6f\x72\x6c\x64\x21\x00- SUCCEED"
+in:
+  buffer_length: 13
+  buffer: &buffer
+    - '\x48\x65\x6c\x6c\x6f\x20\x77\x6f\x72\x6c\x64\x21\x00'
+out:
+  return: 'SUCCEED'
+...

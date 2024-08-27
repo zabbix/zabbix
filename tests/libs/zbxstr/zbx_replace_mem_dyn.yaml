@@ -1,0 +1,25 @@
+---
+test case: "1 Test"
+in:
+  data: "HelloWorld"
+  data_alloc: 11
+  data_len: 10
+  offset: 5
+  sz_to: 5
+  from: "Earth"
+  sz_from: 5
+out:
+  exp_result: 0
+---
+test case: "2 Test"
+in:
+  data: "HelloWorld"
+  data_alloc: 11
+  data_len: 11
+  offset: 5
+  sz_to: 5
+  from: "BeautifulPeople"
+  sz_from: 15
+out:
+  exp_result: 10
+
