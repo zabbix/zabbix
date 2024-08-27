@@ -77,16 +77,16 @@ func TestPlugin_execute(t *testing.T) {
 	}
 
 	tests := []struct {
-		name          string
-		args          args
-		expectations  []expectation
-		expectedState *runner
-		wantErr       bool
+		name         string
+		args         args
+		expectations []expectation
+		wantRunner   *runner
+		wantErr      bool
 	}{
 		{
-			name: "+twoBasicDevices",
-			args: args{false},
-			expectations: []expectation{
+			"+twoBasicDevices",
+			args{false},
+			[]expectation{
 				{
 					args: []string{"--scan", "-j"},
 					err:  nil,
@@ -108,7 +108,7 @@ func TestPlugin_execute(t *testing.T) {
 					out:  mock.Outputs.Get("ai_gen_with_2_basic_devices").AllSmartInfoScans.Get("-a /dev/sdb -j"),
 				},
 			},
-			expectedState: &runner{
+			&runner{
 				devices: map[string]deviceParser{
 					"/dev/sda": {
 						ModelName:    "SAMSUNG MZVLB1T0HBLR-000L7",
@@ -140,12 +140,12 @@ func TestPlugin_execute(t *testing.T) {
 					},
 				},
 			},
-			wantErr: false,
+			false,
 		},
 		{
-			name: "+oneOfTwoDeviceWithNoSmart",
-			args: args{false},
-			expectations: []expectation{
+			"+oneOfTwoDeviceWithNoSmart",
+			args{false},
+			[]expectation{
 				{
 					args: []string{"--scan", "-j"},
 					err:  nil,
@@ -167,7 +167,7 @@ func TestPlugin_execute(t *testing.T) {
 					out:  mock.Outputs.Get("ai_gen_with_2_basic_devices").AllSmartInfoScans.Get("-a /dev/sdb -j"),
 				},
 			},
-			expectedState: &runner{
+			&runner{
 				devices: map[string]deviceParser{
 					"/dev/sdb": {
 						ModelName:    "SAMSUNG MZVLB512HBJQ-000L7",
@@ -183,12 +183,12 @@ func TestPlugin_execute(t *testing.T) {
 					},
 				},
 			},
-			wantErr: false,
+			false,
 		},
 		{
-			name: "+smartInfoErrorBasicDevice",
-			args: args{false},
-			expectations: []expectation{
+			"+smartInfoErrorBasicDevice",
+			args{false},
+			[]expectation{
 				{
 					args: []string{"--scan", "-j"},
 					err:  nil,
@@ -210,13 +210,13 @@ func TestPlugin_execute(t *testing.T) {
 					out:  mock.Outputs.Get("ai_gen_with_2_basic_devices").AllSmartInfoScans.Get("-a /dev/sdb -j"),
 				},
 			},
-			expectedState: nil,
-			wantErr:       true,
+			nil,
+			true,
 		},
 		{
-			name: "-smartInfoErrorMegaraid",
-			args: args{false},
-			expectations: []expectation{
+			"-smartInfoErrorMegaraid",
+			args{false},
+			[]expectation{
 				{
 					args: []string{"--scan", "-j"},
 					err:  nil,
@@ -250,30 +250,30 @@ func TestPlugin_execute(t *testing.T) {
 					out: mock.OutputAllDiscInfoSDA,
 				},
 			},
-			expectedState: &runner{
+			&runner{
 				devices: map[string]deviceParser{},
 			},
-			wantErr: false,
+			false,
 		},
 		{
-			name: "-smartError",
-			args: args{false},
-			expectations: []expectation{
+			"-smartError",
+			args{false},
+			[]expectation{
 				{
 					args: []string{"--scan", "-j"},
 					err:  errs.New("test error"),
 					out:  []byte(""),
 				},
 			},
-			expectedState: nil,
-			wantErr:       true,
+			nil,
+			true,
 		},
 		{
-			name: "+valid",
-			args: args{
+			"+valid",
+			args{
 				jsonRunner: false,
 			},
-			expectations: []expectation{
+			[]expectation{
 				{
 					args: []string{"--scan", "-j"},
 					err:  nil,
@@ -305,7 +305,7 @@ func TestPlugin_execute(t *testing.T) {
 					out:  mock.OutputAllDiscInfoSDA,
 				},
 			},
-			expectedState: &runner{
+			&runner{
 				jsonDevices: nil,
 				devices: map[string]deviceParser{
 					"/dev/sda": {
@@ -325,14 +325,14 @@ func TestPlugin_execute(t *testing.T) {
 					},
 				},
 			},
-			wantErr: false,
+			false,
 		},
 		{
-			name: "+multiple",
-			args: args{
+			"+multiple",
+			args{
 				jsonRunner: false,
 			},
-			expectations: []expectation{
+			[]expectation{
 				{
 					args: []string{"--scan", "-j"},
 					err:  nil,
@@ -381,7 +381,7 @@ func TestPlugin_execute(t *testing.T) {
 					out: mock.OutputAllDiscInfoMac,
 				},
 			},
-			expectedState: &runner{
+			&runner{
 				jsonDevices: nil,
 				devices: map[string]deviceParser{
 					"/dev/sda": {
@@ -422,14 +422,14 @@ func TestPlugin_execute(t *testing.T) {
 					},
 				},
 			},
-			wantErr: false,
+			false,
 		},
 		{
-			name: "+mac",
-			args: args{
+			"+mac",
+			args{
 				jsonRunner: false,
 			},
-			expectations: []expectation{
+			[]expectation{
 				{
 					args: []string{"--scan", "-j"},
 					err:  nil,
@@ -467,7 +467,7 @@ func TestPlugin_execute(t *testing.T) {
 					out: mock.OutputAllDiscInfoMac,
 				},
 			},
-			expectedState: &runner{
+			&runner{
 				jsonDevices: nil,
 				devices: map[string]deviceParser{
 					"IOService:/AppleARMPE/arm-io@10F00000/AppleT811xIO/ans@77400000/AppleASCWrapV4/iop-ans-nub/RTBuddy(ANS2)/RTBuddyService/AppleANS3NVMeController/NS_01@1": { //nolint:lll
@@ -493,14 +493,14 @@ func TestPlugin_execute(t *testing.T) {
 					},
 				},
 			},
-			wantErr: false,
+			false,
 		},
 		{
-			name: "+jsonRunner",
-			args: args{
+			"+jsonRunner",
+			args{
 				jsonRunner: true,
 			},
-			expectations: []expectation{
+			[]expectation{
 				{
 					args: []string{"--scan", "-j"},
 					err:  nil,
@@ -533,7 +533,7 @@ func TestPlugin_execute(t *testing.T) {
 					out:  mock.OutputAllDiscInfoSDA,
 				},
 			},
-			expectedState: &runner{
+			&runner{
 				jsonDevices: map[string]jsonDevice{
 					"/dev/sda": {
 						serialNumber: "S641NX0T509005",
@@ -542,14 +542,14 @@ func TestPlugin_execute(t *testing.T) {
 				},
 				devices: nil,
 			},
-			wantErr: false,
+			false,
 		},
 		{
-			name: "+valid_raid",
-			args: args{
+			"+validRAID",
+			args{
 				jsonRunner: false,
 			},
-			expectations: []expectation{
+			[]expectation{
 				{
 					args: []string{"--scan", "-j"},
 					err:  nil,
@@ -610,7 +610,7 @@ func TestPlugin_execute(t *testing.T) {
 					out: sampleFailedAllSmartInfoScan,
 				},
 			},
-			expectedState: &runner{
+			&runner{
 				jsonDevices: nil,
 				devices: map[string]deviceParser{
 					"/dev/sda sat": {
@@ -670,13 +670,14 @@ func TestPlugin_execute(t *testing.T) {
 					},
 				},
 			},
+			false,
 		},
 		{
-			name: "+env1JSON",
-			args: args{
+			"+env1JSON",
+			args{
 				jsonRunner: true,
 			},
-			expectations: []expectation{
+			[]expectation{
 				{
 					args: []string{"--scan", "-j"},
 					err:  nil,
@@ -737,7 +738,7 @@ func TestPlugin_execute(t *testing.T) {
 					out: sampleFailedAllSmartInfoScan,
 				},
 			},
-			expectedState: &runner{
+			&runner{
 				jsonDevices: map[string]jsonDevice{
 					"/dev/sda sat": {
 						serialNumber: "PHWA619301M9120CGN",
@@ -749,13 +750,14 @@ func TestPlugin_execute(t *testing.T) {
 				},
 				devices: nil,
 			},
+			false,
 		},
 		{
-			name: "+HBA_with_SAS_1",
-			args: args{
+			"+HBAWithSAS1",
+			args{
 				jsonRunner: false,
 			},
-			expectations: []expectation{
+			[]expectation{
 				{
 					args: []string{"--scan", "-j"},
 					err:  nil,
@@ -813,7 +815,7 @@ func TestPlugin_execute(t *testing.T) {
 						AllSmartInfoScans.Get("-a /dev/sda -d scsi -j"),
 				},
 			},
-			expectedState: &runner{
+			&runner{
 				jsonDevices: nil,
 				devices: map[string]deviceParser{
 					"/dev/sda scsi": {
@@ -830,13 +832,14 @@ func TestPlugin_execute(t *testing.T) {
 					},
 				},
 			},
+			false,
 		},
 		{
-			name: "+valid_megaraid",
-			args: args{
+			"+validMegaraid",
+			args{
 				jsonRunner: false,
 			},
-			expectations: []expectation{
+			[]expectation{
 				{
 					args: []string{"--scan", "-j"},
 					err:  nil,
@@ -870,7 +873,7 @@ func TestPlugin_execute(t *testing.T) {
 					out: mock.OutputAllDiscInfoSDA,
 				},
 			},
-			expectedState: &runner{
+			&runner{
 				jsonDevices: nil,
 				devices: map[string]deviceParser{
 					"optimus_prime megaraid": {
@@ -891,13 +894,14 @@ func TestPlugin_execute(t *testing.T) {
 					},
 				},
 			},
+			false,
 		},
 		{
-			name: "+JSONRunner_megaraid",
-			args: args{
+			"+JSONRunnerMegaraid",
+			args{
 				jsonRunner: true,
 			},
-			expectations: []expectation{
+			[]expectation{
 				{
 					args: []string{"--scan", "-j"},
 					err:  nil,
@@ -931,7 +935,7 @@ func TestPlugin_execute(t *testing.T) {
 					out: mock.OutputAllDiscInfoSDA,
 				},
 			},
-			expectedState: &runner{
+			&runner{
 				jsonDevices: map[string]jsonDevice{
 					"optimus_prime megaraid": {
 						serialNumber: "S641NX0T509005",
@@ -940,6 +944,7 @@ func TestPlugin_execute(t *testing.T) {
 				},
 				devices: nil,
 			},
+			false,
 		},
 	}
 
@@ -973,7 +978,7 @@ func TestPlugin_execute(t *testing.T) {
 			}
 
 			if diff := cmp.Diff(
-				tt.expectedState,
+				tt.wantRunner,
 				r,
 				cmp.AllowUnexported(jsonDevice{}, deviceInfo{}, runner{}),
 			); diff != "" {
