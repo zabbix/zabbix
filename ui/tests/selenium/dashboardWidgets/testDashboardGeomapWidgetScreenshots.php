@@ -223,9 +223,9 @@ class testDashboardGeomapWidgetScreenshots extends CWebTest {
 		self::$zoom_dashboardid = $dashboards['dashboardids'][0];
 
 		// Create events and problems.
-		foreach (['Trigger Riga', 'Trigger Tallin', 'Trigger Vilnius', 'Trigger Oslo', 'Trigger Bergen'] as $name) {
-			CDBHelper::setTriggerProblem($name, TRIGGER_VALUE_TRUE);
-		}
+		CDBHelper::setTriggerProblem(['Trigger Riga', 'Trigger Tallin', 'Trigger Vilnius', 'Trigger Oslo', 'Trigger Bergen'],
+				TRIGGER_VALUE_TRUE
+		);
 	}
 
 	public static function getZoomWidgetData() {

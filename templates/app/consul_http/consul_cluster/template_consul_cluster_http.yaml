@@ -32,6 +32,7 @@ zabbix_export:
           key: consul.get_catalog_services
           history: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Catalog of services registered in a given datacenter.'
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
@@ -53,6 +54,7 @@ zabbix_export:
           key: consul.get_cluster_serf
           history: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Get Serf Health Status for all agents in cluster.'
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
@@ -75,6 +77,7 @@ zabbix_export:
           type: HTTP_AGENT
           key: consul.get_leader
           value_type: TEXT
+          trends: '0'
           description: 'Current leader address.'
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
@@ -113,6 +116,7 @@ zabbix_export:
           key: consul.get_nodes
           history: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Catalog of nodes registered in a given datacenter.'
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
@@ -153,6 +157,7 @@ zabbix_export:
           name: 'Nodes: critical'
           type: DEPENDENT
           key: consul.nodes_critical
+          delay: '0'
           description: 'Number of agents on current dc with serf health status ''critical''.'
           preprocessing:
             - type: JSONPATH
@@ -179,6 +184,7 @@ zabbix_export:
           name: 'Nodes: passing'
           type: DEPENDENT
           key: consul.nodes_passing
+          delay: '0'
           description: 'Number of agents on current dc with serf health status ''passing''.'
           preprocessing:
             - type: JSONPATH
@@ -196,6 +202,7 @@ zabbix_export:
           name: 'Nodes: total'
           type: DEPENDENT
           key: consul.nodes_total
+          delay: '0'
           description: 'Number of nodes on current dc.'
           preprocessing:
             - type: JSONPATH
@@ -213,6 +220,7 @@ zabbix_export:
           name: 'Nodes: warning'
           type: DEPENDENT
           key: consul.nodes_warning
+          delay: '0'
           description: 'Number of agents on current dc with serf health status ''warning''.'
           preprocessing:
             - type: JSONPATH
@@ -239,6 +247,7 @@ zabbix_export:
           name: 'Services: total'
           type: DEPENDENT
           key: consul.services_total
+          delay: '0'
           description: 'Number of services on current dc.'
           preprocessing:
             - type: JAVASCRIPT
@@ -257,18 +266,22 @@ zabbix_export:
           name: 'Consul cluster nodes discovery'
           type: DEPENDENT
           key: consul.lld_nodes
+          delay: '0'
           filter:
             conditions:
               - macro: '{#NODE_NAME}'
                 value: '{$CONSUL.LLD.FILTER.NODE_NAME.MATCHES}'
+                formulaid: A
               - macro: '{#NODE_NAME}'
                 value: '{$CONSUL.LLD.FILTER.NODE_NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: B
           item_prototypes:
             - uuid: ddb71b90bde94760a4a456c15e647917
               name: 'Node ["{#NODE_NAME}"]: Serf Health'
               type: DEPENDENT
               key: 'consul.serf.health["{#NODE_NAME}"]'
+              delay: '0'
               description: 'Node Serf Health Status.'
               valuemap:
                 name: 'Consul health state'
@@ -343,13 +356,16 @@ zabbix_export:
           name: 'Consul cluster services discovery'
           type: DEPENDENT
           key: consul.lld_services
+          delay: '0'
           filter:
             conditions:
               - macro: '{#SERVICE_NAME}'
                 value: '{$CONSUL.LLD.FILTER.SERVICE_NAME.MATCHES}'
+                formulaid: A
               - macro: '{#SERVICE_NAME}'
                 value: '{$CONSUL.LLD.FILTER.SERVICE_NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: B
           item_prototypes:
             - uuid: 38576dd458a94259ab273204ffe9aebd
               name: '["{#SERVICE_NAME}"]: Get raw service state'
@@ -357,6 +373,7 @@ zabbix_export:
               key: 'consul.get_service_stats["{#SERVICE_NAME}"]'
               history: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Retrieve service instances providing the service indicated on the path.'
               preprocessing:
                 - type: CHECK_NOT_SUPPORTED
@@ -379,6 +396,7 @@ zabbix_export:
               name: 'Service ["{#SERVICE_NAME}"]: Nodes critical'
               type: DEPENDENT
               key: 'consul.service.nodes_critical["{#SERVICE_NAME}"]'
+              delay: '0'
               description: 'The number of nodes with service status `critical` from those registered.'
               preprocessing:
                 - type: JSONPATH
@@ -408,6 +426,7 @@ zabbix_export:
               name: 'Service ["{#SERVICE_NAME}"]: Nodes passing'
               type: DEPENDENT
               key: 'consul.service.nodes_passing["{#SERVICE_NAME}"]'
+              delay: '0'
               description: 'The number of nodes with service status `passing` from those registered.'
               preprocessing:
                 - type: JSONPATH
@@ -427,6 +446,7 @@ zabbix_export:
               name: 'Service ["{#SERVICE_NAME}"]: Nodes warning'
               type: DEPENDENT
               key: 'consul.service.nodes_warning["{#SERVICE_NAME}"]'
+              delay: '0'
               description: 'The number of nodes with service status `warning` from those registered.'
               preprocessing:
                 - type: JSONPATH

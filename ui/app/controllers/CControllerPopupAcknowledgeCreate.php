@@ -238,8 +238,8 @@ class CControllerPopupAcknowledgeCreate extends CController {
 		while ($eventid_groups['readable']) {
 			$data = $this->getAcknowledgeOptions($eventid_groups);
 			/*
-			 * No actions to perform. This can happen only if user has selected action he has no permissions to do
-			 * for any of selected events. This can happen, when you will perform one action on multiple problems,
+			 * No actions to perform. This can happen only if user has selected an action they do not have permission to
+			 * do for any of selected events. This can happen, when user performs one action on multiple problems,
 			 * where only some of these problems can perform this action (ex. close problem).
 			 */
 			if ($data['action'] == ZBX_PROBLEM_UPDATE_NONE) {
