@@ -404,7 +404,7 @@ run:
 				c.resultCache.Upload(nil)
 				lastFlush = now
 			}
-			if now.Sub(lastRefresh) > time.Second*time.Duration(c.options.RefreshActiveChecks) {
+			if now.Sub(lastRefresh) > time.Second*time.Duration(c.options.RefreshActiveChecks - 1) {
 				c.refreshActiveChecks()
 				lastRefresh = time.Now()
 			}
