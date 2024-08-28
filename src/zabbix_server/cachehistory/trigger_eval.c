@@ -645,6 +645,9 @@ void	zbx_evaluate_expressions(zbx_vector_dc_trigger_t *triggers, const zbx_vecto
 			{
 				zbx_history_sync_item_t	*item;
 
+				if (NULL == items)
+					continue;
+
 				item = (zbx_history_sync_item_t *)bsearch(&tr->itemids.values[j], items,
 						(size_t)items_num, sizeof(zbx_history_sync_item_t),
 						dc_item_compare_by_itemid);
