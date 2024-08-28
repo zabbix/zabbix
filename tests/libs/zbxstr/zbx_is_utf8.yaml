@@ -1,5 +1,5 @@
 ---
-test case: "\xfe\xfe\xfe\xfe - FAIL"
+test case: "Invalid 1 - FAIL"
 in:
   buffer_length: 4
   buffer: &buffer
@@ -7,7 +7,7 @@ in:
 out:
   return: 'FAIL'
 ---
-test case: "\xF4\x90\x80\x80\x00 - FAIL"
+test case: "Invalid 2 - FAIL"
 in:
   buffer_length: 5
   buffer: &buffer
@@ -15,7 +15,7 @@ in:
 out:
   return: 'FAIL'
 ---
-test case: "\x61\x00- SUCCEED"
+test case: "a- SUCCEED"
 in:
   buffer_length: 2
   buffer: &buffer
@@ -23,7 +23,7 @@ in:
 out:
   return: 'SUCCEED'
 ---
-test case: "\x48\x65\x6c\x6c\x6f\x20\x77\x6f\x72\x6c\x64\x21\x00- SUCCEED"
+test case: "Hello world- SUCCEED"
 in:
   buffer_length: 13
   buffer: &buffer
