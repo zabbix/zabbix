@@ -2214,7 +2214,7 @@ func Test_parseOutput(t *testing.T) {
 			},
 		},
 		{
-			"+jsonRunnerWithoutDevices",
+			"-jsonRunnerWithoutDevices",
 			false,
 			runner{
 				devices: map[string]deviceParser{},
