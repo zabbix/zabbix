@@ -231,6 +231,8 @@ tests/libs/zbxstr/zbx_truncate_value
 tests/libs/zbxstr/zbx_replace_mem_dyn
 tests/libs/zbxstr/zbx_replace_string
 tests/libs/zbxstr/zbx_substr
+tests/libs/zbxstr/zbx_str_linefeed
+tests/libs/zbxstr/zbx_str_printable_dyn
 tests/libs/zbxexpression/zbx_evaluate_function
 tests/libs/zbxodbc/odbc_pass
 tests/libs/zbxstr/zbx_charcount_utf8_nbytes

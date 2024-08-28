@@ -1,0 +1,41 @@
+---
+test case: "Delimiter (|)"
+in:
+  scr: "HelloWorldHelloWorldHelloWorld"
+  delim: "|"
+  maxline: 5
+out:
+  string: "Hello|World|Hello|World|Hello|World"
+---
+test case: "Wrapping a Short String (No Wrapping Needed)"
+in:
+  scr: "Short"
+  delim: "|"
+  maxline: 10
+out:
+  string: "Short"
+---
+test case: "Empty String"
+in:
+  scr: ""
+  delim: "|"
+  maxline: 10
+out:
+  string: ""
+---
+test case: "Delimiter (%)"
+in:
+  scr: "HelloWorldHelloWorldHelloWorld"
+  delim: "%"
+  maxline: 5
+out:
+  string: "Hello%World%Hello%World%Hello%World"
+---
+test case: "Delimiter (' ')"
+in:
+  scr: "HelloWorldHelloWorldHelloWorld"
+  delim: ' '
+  maxline: 5
+out:
+  string: "Hello World Hello World Hello World"
+...

@@ -1,0 +1,37 @@
+---
+test case: "Input with Tab"
+in:
+  string: "Hello\tWorld!"
+out:
+  string: "Hello\\tWorld!"
+---
+test case: "Input with Newline"
+in:
+  string: "Hello\nWorld!"
+out:
+  string: "Hello\\nWorld!"
+---
+test case: "Input with Carriage Return"
+in:
+  string: "Hello\rWorld!"
+out:
+  string: "Hello\\rWorld!"
+---
+test case: "Input with Mixed Special Characters"
+in:
+  string: "Line1\nLine2\tLine3\rEnd"
+out:
+  string: "Line1\\nLine2\\tLine3\\rEnd"
+---
+test case: "Input with No Special Characters"
+in:
+  string: "SimpleText"
+out:
+  string: "SimpleText"
+---
+test case: "Empty String"
+in:
+  string: ""
+out:
+  string: ""
+...
