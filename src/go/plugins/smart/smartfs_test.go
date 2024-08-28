@@ -141,7 +141,7 @@ func TestPlugin_execute(t *testing.T) {
 			false,
 		},
 		{
-			"+oneOfTwoDeviceWithNoSmart",
+			"-basicDeviceNoSmartData",
 			args{false},
 			[]expectation{
 				{
@@ -156,8 +156,27 @@ func TestPlugin_execute(t *testing.T) {
 				},
 				{
 					args: []string{"-a", "/dev/sda", "-j"},
-					err:  ErrNoSmartStatus,
-					out:  mock.Outputs.Get("ai_gen_with_2_basic_devices").AllSmartInfoScans.Get("-a /dev/sda -j"),
+					err:  nil,
+					out: []byte(`{
+									"json_format_version": [1, 0],
+									"smartctl": {
+									"version": [7, 1],
+									"svn_revision": "5022",
+									"platform_info": "x86_64-w64-mingw32-w10-b19045",
+									"build_info": "(sf-7.1-1)",
+									"argv": ["smartctl", "-a", "/dev/sda", "-j"],
+									"exit_status": 0
+									},
+									"device": {
+									"name": "/dev/sda",
+									"info_name": "/dev/sda",
+									"type": "nvme",
+									"protocol": "NVMe"
+									},
+									"model_name": "SAMSUNG MZVLB1T0HBLR-000L7",
+									"serial_number": "S3XY1234567890",
+									"firmware_version": "EXA7301Q"
+								}`),
 				},
 				{
 					args: []string{"-a", "/dev/sdb", "-j"},
