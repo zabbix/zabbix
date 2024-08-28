@@ -25,10 +25,10 @@ void	zbx_mock_test_entry(void **state)
 	ZBX_UNUSED(state);
 
 	char		*src = zbx_strdup(NULL,zbx_mock_get_parameter_string("in.data"));
-	char		*value = zbx_mock_get_parameter_string("in.value");
+	const char		*value = zbx_mock_get_parameter_string("in.value");
 	size_t		left = zbx_mock_get_parameter_uint64("in.l");
 	size_t		right = zbx_mock_get_parameter_uint64("in.r");
-	char		*exp_result = zbx_mock_get_parameter_string("out.return");
+	const char		*exp_result = zbx_mock_get_parameter_string("out.return");
 
 	zbx_replace_string(&src, left, &right, value);
 	zbx_mock_assert_str_eq("return value", exp_result, src);

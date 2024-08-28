@@ -4,14 +4,14 @@ in:
   string: " apple , banana , cherry , date "
   del: ','
 out:
-  string: "apple , banana , cherry , date"
+  string: "apple,banana,cherry,date"
 ---
-test case: " apple , banana , cherry , date "
+test case: " apple . banana . cherry . date "
 in:
-  string: " apple , banana , cherry , date "
-  del: 'a'
+  string: " apple . banana . cherry . date "
+  del: '.'
 out:
-  string: "apple , banana , cherry , date"
+  string: "apple.banana.cherry.date"
 ---
 test case: "  a  "
 in:
