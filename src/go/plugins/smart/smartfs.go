@@ -253,11 +253,10 @@ func (p *Plugin) execute(jsonRunner bool) (*runner, error) {
 	}
 
 	// Create a context that will be canceled if any of the goroutines return an error.
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	ctx := context.Background()
 
 	// Create an error group with the context.
-	g, _ := errgroup.WithContext(ctx)
+	g, ctx := errgroup.WithContext(ctx)
 
 	g.SetLimit(p.cpuCount)
 
@@ -276,21 +275,26 @@ func (p *Plugin) execute(jsonRunner bool) (*runner, error) {
 		name := device.Name
 
 		g.Go(func() error {
-			deviceInfo, err := getBasicDeviceInfo(p.ctl, name)
+			select {
+			case <-ctx.Done():
+				return errs.Wrap(ctx.Err(), "errgroup context canceled") // Return error if context is canceled
+			default:
+				deviceInfo, err := getBasicDeviceInfo(p.ctl, name)
 
-			if errors.Is(err, ErrNoSmartStatus) {
-				p.Logger.Debugf("skipping device with no smart status: %s", name)
+				if errors.Is(err, ErrNoSmartStatus) {
+					p.Logger.Debugf("skipping device with no smart status: %s", name)
+
+					return nil
+				}
+
+				if err != nil {
+					return err
+				}
+
+				resultChan <- deviceInfo
 
 				return nil
 			}
-
-			if err != nil {
-				return err
-			}
-
-			resultChan <- deviceInfo
-
-			return nil
 		})
 	}
 
@@ -302,12 +306,17 @@ func (p *Plugin) execute(jsonRunner bool) (*runner, error) {
 			dtype := deviveType
 
 			g.Go(func() error {
-				devices := getRaidDevices(p.ctl, p.Base, name, dtype)
-				for _, device := range devices {
-					resultChan <- device
-				}
+				select {
+				case <-ctx.Done():
+					return errs.Wrap(ctx.Err(), "errgroup context canceled") // Return error if context is canceled
+				default:
+					devices := getRaidDevices(p.ctl, p.Base, name, dtype)
+					for _, device := range devices {
+						resultChan <- device
+					}
 
-				return nil
+					return nil
+				}
 			})
 		}
 	}
@@ -316,17 +325,22 @@ func (p *Plugin) execute(jsonRunner bool) (*runner, error) {
 		name := device.Name
 		devType := device.DevType
 		g.Go(func() error {
+			select {
+			case <-ctx.Done():
+				return errs.Wrap(ctx.Err(), "errgroup context canceled") // Return error if context is canceled
+			default:
 
-			device, err := getAllDeviceInfoByType(p.ctl, name, devType)
-			if err != nil {
-				p.Tracef("got error executing for megaraid %s", err.Error())
+				device, err := getAllDeviceInfoByType(p.ctl, name, devType)
+				if err != nil {
+					p.Tracef("got error executing for megaraid %s", err.Error())
+
+					return nil
+				}
+
+				resultChan <- device
 
 				return nil
 			}
-
-			resultChan <- device
-
-			return nil
 		})
 	}
 

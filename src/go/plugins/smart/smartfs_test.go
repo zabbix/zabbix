@@ -186,7 +186,7 @@ func TestPlugin_execute(t *testing.T) {
 			false,
 		},
 		{
-			"+smartInfoErrorBasicDevice",
+			"-smartInfoErrorBasicDevice",
 			args{false},
 			[]expectation{
 				{
@@ -203,11 +203,6 @@ func TestPlugin_execute(t *testing.T) {
 					args: []string{"-a", "/dev/sda", "-j"},
 					err:  errs.New("unknown error"),
 					out:  mock.Outputs.Get("ai_gen_with_2_basic_devices").AllSmartInfoScans.Get("-a /dev/sda -j"),
-				},
-				{
-					args: []string{"-a", "/dev/sdb", "-j"},
-					err:  nil,
-					out:  mock.Outputs.Get("ai_gen_with_2_basic_devices").AllSmartInfoScans.Get("-a /dev/sdb -j"),
 				},
 			},
 			nil,
