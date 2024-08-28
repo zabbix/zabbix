@@ -383,9 +383,11 @@ func (p *Plugin) Validate(privateOptions any) error {
 
 // Export sends an `export` request to the plugin.
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (any, error) {
+	const CommsDelayBufferTime = time.Millisecond*500
+
 	respTimeout := p.timeout
 	if ctx.Timeout() != 0 {
-		respTimeout = time.Second*time.Duration(ctx.Timeout()) + time.Millisecond*500
+		respTimeout = time.Second*time.Duration(ctx.Timeout()) + CommsDelayBufferTime
 	}
 
 	resp, err := DoWithResponseAs[comms.ExportResponse](

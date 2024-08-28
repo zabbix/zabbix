@@ -229,7 +229,7 @@ func (b *pluginBroker) close() {
 
 // DoWithResponse sends a request to the plugin and blocks until a response is received.
 // Data must be a pointer.
-func (b *pluginBroker) DoWithResponse(data any) ([]byte, error) {
+func (b *pluginBroker) DoWithResponse(data any, timeout time.Duration) ([]byte, error) {
 	id := b.requestID.Add(1)
 
 	data, err := setID(data, id)
@@ -238,10 +238,11 @@ func (b *pluginBroker) DoWithResponse(data any) ([]byte, error) {
 	}
 
 	r := &requestWithResponse{
-		id:  id,
-		in:  data,
-		out: make(chan []byte),
-		err: make(chan error),
+		id:      id,
+		in:      data,
+		out:     make(chan []byte),
+		err:     make(chan error),
+		timeout: timeout,
 	}
 
 	b.tx <- r
@@ -283,7 +284,7 @@ func (b *pluginBroker) Do(data any) error {
 // DoWithResponseAs same as pluginBroker.DoWithResponse but unmarshals the
 // response into T.
 func DoWithResponseAs[T any](broker *pluginBroker, data any, timeout time.Duration) (*T, error) {
-	dataBytes, err := broker.DoWithResponse(data)
+	dataBytes, err := broker.DoWithResponse(data, timeout)
 	if err != nil {
 		return nil, err
 	}

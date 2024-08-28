@@ -49,6 +49,7 @@ const (
 	minItemTimeout = 1   // seconds
 )
 
+// ErrUnsupportedTimeout is thrown if timeout value cannot be parsed or exceeds limit (> maxTimeout or 0).
 var ErrUnsupportedTimeout = errs.New("unsupported timeout value")
 
 type Request struct {
@@ -221,8 +222,11 @@ func parseItemTimeout(s string) (int, error) {
 	return seconds, nil
 }
 
+// ParseItemTimeoutAny converts item timeout to seconds (if it is in form of suffixes time) and
+// validates it (whether it is within limits).
 func ParseItemTimeoutAny(timeoutIn any) (int, error) {
 	var timeout int
+
 	var err error
 
 	switch v := timeoutIn.(type) {
@@ -235,14 +239,18 @@ func ParseItemTimeoutAny(timeoutIn any) (int, error) {
 	case string:
 		timeout, err = parseItemTimeout(v)
 	default:
-		err = fmt.Errorf("unexpected timeout %q of type %T", timeoutIn, timeoutIn)
+		err = errs.Wrapf(ErrUnsupportedTimeout, "unexpected timeout %q of type %T", timeoutIn, timeoutIn)
 	}
 
 	if err == nil {
 		if timeout > maxItemTimeout {
-			err = errs.Wrapf(ErrUnsupportedTimeout, "timeout %d is too large, max - %d", timeout, maxItemTimeout)
+			err = errs.Wrapf(
+				ErrUnsupportedTimeout, "timeout %d is too large, max - %d", timeout, maxItemTimeout,
+			)
 		} else if timeout < minItemTimeout {
-			err = errs.Wrapf(ErrUnsupportedTimeout, "timeout %d is too small, min - %d", timeout, minItemTimeout)
+			err = errs.Wrapf(
+				ErrUnsupportedTimeout, "timeout %d is too small, min - %d", timeout, minItemTimeout,
+			)
 		}
 	}
 
