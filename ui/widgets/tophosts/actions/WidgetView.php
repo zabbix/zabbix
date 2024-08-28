@@ -478,43 +478,48 @@ class WidgetView extends CControllerDashboardWidgetView {
 						: ['itemid', 'value'];
 
 					foreach ($itemids as $itemid) {
-						if ($column['aggregate_function'] == AGGREGATE_LAST
-								|| $column['aggregate_function'] == AGGREGATE_FIRST) {
-							$db_values = API::History()->get([
-								'output' => $output,
-								'history' => ITEM_VALUE_TYPE_BINARY,
-								'itemids' => [$itemid],
-								'time_from' => $column['time_period']['from_ts'],
-								'time_till' => $column['time_period']['to_ts'],
-								'sortfield' => ['clock', 'ns'],
-								'sortorder' => $column['aggregate_function'] == AGGREGATE_LAST
-									? ZBX_SORT_DOWN
-									: ZBX_SORT_UP,
-								'limit' => 1
-							]);
+						switch ($column['aggregate_function']) {
+							case AGGREGATE_LAST:
+							case AGGREGATE_FIRST:
+								$db_values = API::History()->get([
+									'output' => $output,
+									'history' => ITEM_VALUE_TYPE_BINARY,
+									'itemids' => $itemid,
+									'time_from' => $column['time_period']['from_ts'],
+									'time_till' => $column['time_period']['to_ts'],
+									'sortfield' => ['clock', 'ns'],
+									'sortorder' => $column['aggregate_function'] == AGGREGATE_LAST
+										? ZBX_SORT_DOWN
+										: ZBX_SORT_UP,
+									'limit' => 1
+								]);
 
-							if ($db_values) {
-								$result[$db_values[0]['itemid']] =
-									$column['display_value_as'] == CWidgetFieldColumnsList::DISPLAY_VALUE_AS_BINARY
-										? [
-											'clock' => $db_values[0]['clock'],
-											'ns' => $db_values[0]['ns']
-										]
-										: $db_values[0]['value'];
-							}
-						}
-						else {
-							$db_values = API::History()->get([
-								'output' => ['itemid'],
-								'history' => ITEM_VALUE_TYPE_BINARY,
-								'itemids' => [$itemid],
-								'time_from' => $column['time_period']['from_ts'],
-								'time_till' => $column['time_period']['to_ts']
-							]);
+								if ($db_values) {
+									$result[$db_values[0]['itemid']] =
+										$column['display_value_as'] == CWidgetFieldColumnsList::DISPLAY_VALUE_AS_BINARY
+											? [
+												'clock' => $db_values[0]['clock'],
+												'ns' => $db_values[0]['ns']
+											]
+											: $db_values[0]['value'];
+								}
 
-							if ($db_values) {
-								$result[$db_values[0]['itemid']] = count($db_values);
-							}
+								break;
+
+							case AGGREGATE_COUNT:
+								$db_values = API::History()->get([
+									'output' => ['itemid'],
+									'history' => ITEM_VALUE_TYPE_BINARY,
+									'itemids' => $itemid,
+									'time_from' => $column['time_period']['from_ts'],
+									'time_till' => $column['time_period']['to_ts']
+								]);
+
+								if ($db_values) {
+									$result[$db_values[0]['itemid']] = count($db_values);
+								}
+
+								break;
 						}
 					}
 				}
@@ -541,7 +546,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 						$db_values = API::History()->get([
 							'output' => $output,
 							'history' => ITEM_VALUE_TYPE_BINARY,
-							'itemids' => [$itemid],
+							'itemids' => $itemid,
 							'sortfield' => ['clock', 'ns'],
 							'sortorder' => ZBX_SORT_DOWN,
 							'limit' => 1
