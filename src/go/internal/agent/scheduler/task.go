@@ -24,6 +24,7 @@ import (
 	"golang.zabbix.com/agent2/internal/agent/resultcache"
 	"golang.zabbix.com/agent2/pkg/itemutil"
 	"golang.zabbix.com/agent2/pkg/zbxlib"
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/plugin"
 )
@@ -182,11 +183,10 @@ func invokeExport(a plugin.Accessor, key string, params []string, ctx plugin.Con
 
 	select {
 	case <-tc:
+		return ret, err //nolint:wrapcheck
 	case <-time.After(time.Second * time.Duration(timeout)):
-		err = fmt.Errorf("Timeout occurred while gathering data.")
+		return nil, errs.New("timeout occurred while gathering data")
 	}
-
-	return ret, err
 }
 
 func (t *exporterTask) perform(s Scheduler) {
