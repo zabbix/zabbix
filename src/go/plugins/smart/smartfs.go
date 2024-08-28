@@ -282,7 +282,7 @@ func (p *Plugin) execute(jsonRunner bool) (*runner, error) {
 				deviceInfo, err := getBasicDeviceInfo(p.ctl, name)
 
 				if errors.Is(err, ErrNoSmartStatus) {
-					p.Logger.Debugf("skipping device with no smart status: %s", name)
+					p.Logger.Debugf("skipping device with no smart status: %q", name)
 
 					return nil
 				}
@@ -303,14 +303,14 @@ func (p *Plugin) execute(jsonRunner bool) (*runner, error) {
 			ThreeWare, Areca, CCISS, SAT, SCSI,
 		} {
 			name := device.Name
-			dtype := deviveType
+			devType := deviveType
 
 			g.Go(func() error {
 				select {
 				case <-ctx.Done():
 					return errs.Wrap(ctx.Err(), "errgroup context canceled") // Return error if context is canceled
 				default:
-					devices := getRaidDevices(p.ctl, p.Base, name, dtype)
+					devices := getRaidDevices(p.ctl, p.Base, name, devType)
 					for _, device := range devices {
 						resultChan <- device
 					}
@@ -431,11 +431,7 @@ func cutPrefix(in string) string {
 	return strings.TrimPrefix(in, "/dev/")
 }
 
-func getBasicDeviceInfo(
-	ctl SmartController,
-	deviceName string,
-) (*SmartCtlDeviceData, error) {
-
+func getBasicDeviceInfo(ctl SmartController, deviceName string) (*SmartCtlDeviceData, error) {
 	device, err := ctl.Execute("-a", deviceName, "-j")
 
 	if err != nil {
@@ -446,10 +442,7 @@ func getBasicDeviceInfo(
 
 	err = json.Unmarshal(device, dp)
 	if err != nil {
-		return nil, errs.Wrap(
-			err,
-			"failed to unmarshal json",
-		)
+		return nil, errs.Wrap(err, "failed to unmarshal JSON")
 	}
 
 	err = dp.checkErr()
@@ -458,11 +451,7 @@ func getBasicDeviceInfo(
 	}
 
 	if dp.SmartStatus == nil {
-		return nil, errs.Wrapf(
-			ErrNoSmartStatus,
-			"got no smart status for device %s",
-			deviceName,
-		)
+		return nil, errs.Wrapf(ErrNoSmartStatus, "got no smart status for device %s", deviceName)
 	}
 
 	dp.Info.name = deviceName
@@ -492,10 +481,7 @@ func getAllDeviceInfoByType(
 
 	err = json.Unmarshal(device, dp)
 	if err != nil {
-		return nil, errs.Wrap(
-			err,
-			"failed to parse (unmarshal json) smartctl output",
-		)
+		return nil, errs.Wrap(err, "failed to parse (unmarshal JSON) smartctl output")
 	}
 
 	err = dp.checkErr()
