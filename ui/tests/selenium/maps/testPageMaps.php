@@ -39,6 +39,8 @@ class testPageMaps extends CWebTest {
 	}
 
 	const SYSMAPS_SQL = 'SELECT * FROM sysmaps ORDER BY sysmapid';
+	const SYSMAP_NAME_LOW_NUMBER = '999 for sorting test';
+	const SYSMAP_NAME_HIGH_NUMBER = '1111 for sorting test';
 	const SYSMAP_NAME_WITH_SYMBOLS = 'Name with 3/4-byte symbols: 🤖 ⃠ Ω⌚Ԏ﨧';
 	const SYSMAP_TO_DELETE = 'Sysmap for deletion';
 	const SYSMAP_FIRST_A = 'A map to check alphabetical sorting';
@@ -47,11 +49,21 @@ class testPageMaps extends CWebTest {
 	const SYSMAP_HIGH_WIDTH = 'Map with highest width';
 	const SYSMAP_LOW_HEIGHT = 'Map with lowest height';
 	const SYSMAP_HIGH_HEIGHT = 'Map with highest height';
-	const SYSMAP_SPACES_NAME = 'Map to check trim for spaces';
+	const SYSMAP_SPACES_NAME = 'Map to check that there is no trim for spaces';
 	protected static $sysmapids;
 
 	public function prepareMapsData() {
 		CDataHelper::call('map.create', [
+			[
+				'name' => self::SYSMAP_NAME_LOW_NUMBER,
+				'width' => 600,
+				'height' => 600
+			],
+			[
+				'name' => self::SYSMAP_NAME_HIGH_NUMBER,
+				'width' => 600,
+				'height' => 600
+			],
 			[
 				'name' => self::SYSMAP_NAME_WITH_SYMBOLS,
 				'width' => 600,
@@ -106,6 +118,16 @@ class testPageMaps extends CWebTest {
 		return [
 			[
 				[
+					[
+						'Name' => self::SYSMAP_NAME_LOW_NUMBER,
+						'Width' => '600',
+						'Height' => '600'
+					],
+					[
+						'Name' => self::SYSMAP_NAME_HIGH_NUMBER,
+						'Width' => '600',
+						'Height' => '600'
+					],
 					[
 						'Name' => self::SYSMAP_NAME_WITH_SYMBOLS,
 						'Width' => '600',
@@ -197,17 +219,18 @@ class testPageMaps extends CWebTest {
 		$filter = CFilterElement::find()->one();
 		$form = $filter->getForm();
 
-		$form->checkValue(['Name' => '']);
-		$this->assertEquals(255, $form->getField('Name')->getAttribute('maxlength'));
+		$this->assertEquals(['Name'], $form->getLabels()->asText());
+		$name_field = $form->getField('Name');
+		$this->assertEquals('', $name_field->getValue());
+		$this->assertEquals(255, $name_field->getAttribute('maxlength'));
 
 		// Check filter expanding/collapsing.
 		$this->assertTrue($filter->isExpanded());
 		foreach ([false, true] as $state) {
 			$filter->expand($state);
 
-			// Leave the page and reopen the previous page to make sure the filter state is still saved.
-			$this->page->open('zabbix.php?action=discovery.view')->waitUntilReady();
-			$this->page->open('sysmaps.php')->waitUntilReady();
+			// Refresh the page to make sure the filter state is still saved.
+			$this->page->refresh();
 			$this->assertTrue($filter->isExpanded($state));
 		}
 
@@ -263,6 +286,8 @@ class testPageMaps extends CWebTest {
 						'Name' => ''
 					],
 					'expected' => [
+						self::SYSMAP_NAME_LOW_NUMBER,
+						self::SYSMAP_NAME_HIGH_NUMBER,
 						self::SYSMAP_FIRST_A,
 						'Local network',
 						self::SYSMAP_SPACES_NAME,
@@ -297,6 +322,8 @@ class testPageMaps extends CWebTest {
 						'Name' => ' '
 					],
 					'expected' => [
+						self::SYSMAP_NAME_LOW_NUMBER,
+						self::SYSMAP_NAME_HIGH_NUMBER,
 						self::SYSMAP_FIRST_A,
 						'Local network',
 						self::SYSMAP_SPACES_NAME,
@@ -387,6 +414,8 @@ class testPageMaps extends CWebTest {
 						'Name' => 'SORTING'
 					],
 					'expected' => [
+						self::SYSMAP_NAME_LOW_NUMBER,
+						self::SYSMAP_NAME_HIGH_NUMBER,
 						self::SYSMAP_FIRST_A,
 						self::SYSMAP_FIRST_Z
 					]
@@ -399,6 +428,8 @@ class testPageMaps extends CWebTest {
 						'Name' => 'sorting'
 					],
 					'expected' => [
+						self::SYSMAP_NAME_LOW_NUMBER,
+						self::SYSMAP_NAME_HIGH_NUMBER,
 						self::SYSMAP_FIRST_A,
 						self::SYSMAP_FIRST_Z
 					]
@@ -439,10 +470,11 @@ class testPageMaps extends CWebTest {
 		$this->page->waitUntilReady();
 
 		// Check that expected maps are returned in the list.
-		$this->assertTableDataColumn(CTestArrayHelper::get($data, 'expected', []));
+		$expected_data = CTestArrayHelper::get($data, 'expected', []);
+		$this->assertTableDataColumn($expected_data);
 
 		// Check the displaying amount.
-		$this->assertTableStats(count(CTestArrayHelper::get($data, 'expected', [])));
+		$this->assertTableStats(count($expected_data));
 
 		// Reset filter to not influence further tests.
 		$this->query('button:Reset')->one()->click();
@@ -484,9 +516,10 @@ class testPageMaps extends CWebTest {
 		$this->page->login()->open('sysmaps.php');
 
 		// Sysmap count that will be selected before delete action.
-		$count_names = count(CTestArrayHelper::get($data, 'name', []));
+		$map_names = CTestArrayHelper::get($data, 'name', []);
+		$count_names = count($map_names);
 		$plural = ($count_names === 1) ? '' : 's';
-		$this->selectTableRows(CTestArrayHelper::get($data, 'name'));
+		$this->selectTableRows($map_names);
 		$this->query('button:Delete')->one()->waitUntilClickable()->click();
 		$this->assertEquals('Delete selected map'.$plural.'?', $this->page->getAlertText());
 		$this->page->acceptAlert();
