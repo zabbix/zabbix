@@ -117,7 +117,7 @@ window.widget_tophosts_form = new class {
 		const data = e.detail;
 
 		if (!data.edit) {
-			this.#addVar('sort_order[columns][]', this.#column_index);
+			this.#addVar('sortorder[columns][]', this.#column_index);
 		}
 
 		for (const [data_key, data_value] of Object.entries(data)) {
