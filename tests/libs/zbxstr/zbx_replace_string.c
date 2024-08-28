@@ -11,10 +11,11 @@
 ** You should have received a copy of the GNU Affero General Public License along with this program.
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
+
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
-#include "zbxmockutil.h"
 #include "zbxmockassert.h"
+#include "zbxmockutil.h"
 #include "zbxmockhelper.h"
 
 #include "zbxstr.h"
@@ -23,16 +24,13 @@ void	zbx_mock_test_entry(void **state)
 {
 	ZBX_UNUSED(state);
 
-	char		*data = zbx_strdup(NULL, zbx_mock_get_parameter_string("in.data"));
-	size_t		data_alloc = zbx_mock_get_parameter_uint64("in.data_alloc");
-	size_t		data_len = zbx_mock_get_parameter_uint64("in.data_len");
-	size_t		offset = zbx_mock_get_parameter_uint64("in.offset");
-	size_t		sz_to = zbx_mock_get_parameter_uint64("in.sz_to");
-	const char		*from = zbx_mock_get_parameter_string("in.from");
-	size_t		sz_from = zbx_mock_get_parameter_uint64("in.sz_from");
-	int		exp_result = atoi(zbx_mock_get_parameter_string("out.exp_result"));
-	int		act_result = zbx_replace_mem_dyn(&data, &data_alloc, &data_len, offset, sz_to, from, sz_from);
+	char		*src = zbx_strdup(NULL,zbx_mock_get_parameter_string("in.data"));
+	char		*value = zbx_mock_get_parameter_string("in.value");
+	size_t		left = zbx_mock_get_parameter_uint64("in.l");
+	size_t		right = zbx_mock_get_parameter_uint64("in.r");
+	char		*exp_result = zbx_mock_get_parameter_string("out.return");
 
-	zbx_mock_assert_int_eq("Unexpected error message X", exp_result, act_result);
-	zbx_free(data);
+	zbx_replace_string(&src, left, &right, value);
+	zbx_mock_assert_str_eq("return value", exp_result, src);
+	zbx_free(src);
 }

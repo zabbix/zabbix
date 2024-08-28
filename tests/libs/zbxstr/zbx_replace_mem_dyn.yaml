@@ -1,5 +1,5 @@
 ---
-test case: "1 Test"
+test case: "Replacing with a Block of the Same Size"
 in:
   data: "HelloWorld"
   data_alloc: 11
@@ -9,9 +9,21 @@ in:
   from: "Earth"
   sz_from: 5
 out:
-  exp_result: 0
+  exp_result: "0"
 ---
-test case: "2 Test"
+test case: "Replacing with a Larger Block (No Reallocation Needed)"
+in:
+  data: "HelloWorld"
+  data_alloc: 20
+  data_len: 10
+  offset: 5
+  sz_to: 5
+  from: "Everyone"
+  sz_from: 8
+out:
+  exp_result: "3"
+---
+test case: "Replacing with a Larger Block (Reallocation Needed)"
 in:
   data: "HelloWorld"
   data_alloc: 11
@@ -21,5 +33,29 @@ in:
   from: "BeautifulPeople"
   sz_from: 15
 out:
-  exp_result: 10
-
+  exp_result: "10"
+---
+test case: "Replacing with a Smaller Block"
+in:
+  data: "HelloWorld"
+  data_alloc: 11
+  data_len: 10
+  offset: 5
+  sz_to: 5
+  from: "You"
+  sz_from: 3
+out:
+  exp_result: "-2"
+---
+test case: "Replacing with an Empty Block"
+in:
+  data: "HelloWorld"
+  data_alloc: 11
+  data_len: 10
+  offset: 5
+  sz_to: 5
+  from: ""
+  sz_from: 0
+out:
+  exp_result: "-5"
+...

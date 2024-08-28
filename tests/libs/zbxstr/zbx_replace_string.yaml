@@ -1,0 +1,46 @@
+---
+test case: "Replacement with Same Length: Hello, World! -> Hello, Earth!"
+in:
+  data: "Hello, World!"
+  value: "Earth"
+  l: 7
+  r: 11
+out:
+  return: "Hello, Earth!"
+---
+test case: "Replacement with a Longer String: Hello, World! -> Hello, Universe!"
+in:
+  data: "Hello, World!"
+  value: "Universe"
+  l: 7
+  r: 11
+out:
+  return: "Hello, Universe!"
+---
+test case: "Replacement with a Shorter String: Hello, Universe! -> Hello, World!"
+in:
+  data: "Hello, Universe!"
+  value: "World"
+  l: 7
+  r: 14
+out:
+  return: "Hello, World!"
+---
+test case: "Replacement with a Empty String: Hello, World! -> Hello, !"
+in:
+  data: "Hello, World!"
+  value: ""
+  l: 7
+  r: 11
+out:
+  return: "Hello, !"
+---
+test case: "Replacement with a String Larger than the Original Data: Hi! -> Greetings, everyone!"
+in:
+  data: "Hi!"
+  value: "Greetings, everyone!"
+  l: 0
+  r: 2
+out:
+  return: "Greetings, everyone!"
+...

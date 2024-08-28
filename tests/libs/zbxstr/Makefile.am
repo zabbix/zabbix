@@ -25,7 +25,9 @@ BINARIES_tests = \
 	zbx_trim_str_list\
 	zbx_strcmp_null\
 	zbx_strcmp_natural\
-	zbx_replace_mem_dyn
+	zbx_replace_mem_dyn\
+	zbx_substr\
+	zbx_replace_string
 
 
 noinst_PROGRAMS = $(BINARIES_tests)
@@ -413,6 +415,36 @@ zbx_replace_mem_dyn_LDADD += @SERVER_LIBS@
 zbx_replace_mem_dyn_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
 
 zbx_replace_mem_dyn_CFLAGS = $(STR_COMPILER_FLAGS)
+
+# zbx_substr
+
+zbx_substr_SOURCES = \
+	zbx_substr.c \
+	$(COMMON_SRC_FILES)
+
+zbx_substr_LDADD = \
+	$(STR_LIBS)
+
+zbx_substr_LDADD += @SERVER_LIBS@
+
+zbx_substr_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
+
+zbx_substr_CFLAGS = $(STR_COMPILER_FLAGS)
+
+# zbx_replace_string
+
+zbx_replace_string_SOURCES = \
+	zbx_replace_string.c \
+	$(COMMON_SRC_FILES)
+
+zbx_replace_string_LDADD = \
+	$(STR_LIBS)
+
+zbx_replace_string_LDADD += @SERVER_LIBS@
+
+zbx_replace_string_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
+
+zbx_replace_string_CFLAGS = $(STR_COMPILER_FLAGS)
 
 #endif
 

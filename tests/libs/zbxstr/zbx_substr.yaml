@@ -1,0 +1,33 @@
+---
+test case: "Hello, World! -> W"
+in:
+  string: "Hello, World!"
+  left: 7
+  right: 7
+out:
+  return: "W"
+---
+test case: "Hello, World! -> Hello"
+in:
+  string: "Hello, World!"
+  left: 0
+  right: 4
+out:
+  return: "Hello"
+---
+test case: "Hello, World! -> World"
+in:
+  string: "Hello, World!"
+  left: 7
+  right: 11
+out:
+  return: "World"
+---
+test case: "!@#$%^&*() -> @#$%^&"
+in:
+  string: "!@#$%^&*()"
+  left: 1
+  right: 6
+out:
+  return: "@#$%^&"
+...
