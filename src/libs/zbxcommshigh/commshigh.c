@@ -29,7 +29,7 @@ void	zbx_addrs_failover(zbx_vector_addr_ptr_t *addrs)
 {
 	if (1 < addrs->values_num)
 	{
-		zbx_addr_t	*addr = (zbx_addr_t *)addrs->values[0];
+		zbx_addr_t	*addr = addrs->values[0];
 
 		zbx_vector_addr_ptr_remove(addrs, 0);
 		zbx_vector_addr_ptr_append(addrs, addr);
