@@ -387,7 +387,7 @@ func (c *Connector) sendHeartbeatMsg() {
 }
 
 func (c *Connector) run() {
-	var lastRefresh time.Time
+	lastRefresh := time.Unix(1<<63-1, 0)
 	var lastFlush time.Time
 	var lastHeartbeat time.Time
 
