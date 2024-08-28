@@ -171,20 +171,6 @@ void	zbx_proxy_counter_ptr_free(zbx_proxy_counter_t *proxy_counter)
 static zbx_get_program_type_f	get_program_type_cb = NULL;
 static zbx_get_config_forks_f	get_config_forks_cb = NULL;
 
-/******************************************************************************
- *                                                                            *
- * Purpose: validate macro value when expanding user macros                   *
- *                                                                            *
- * Parameters: macro   - [IN] the user macro                                  *
- *             value   - [IN] the macro value                                 *
- *             error   - [OUT] the error message                              *
- *                                                                            *
- * Return value: SUCCEED - the value is valid                                 *
- *               FAIL    - otherwise                                          *
- *                                                                            *
- ******************************************************************************/
-typedef int (*zbx_value_validator_func_t)(const char *macro, const char *value, char **error);
-
 zbx_dc_config_t	*config = NULL;
 
 zbx_dc_config_t	*get_dc_config(void)
@@ -686,7 +672,7 @@ int	DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_INTERFACE *interface
 
 	seed = get_item_nextcheck_seed(item, item->interfaceid, item->type, item->key);
 
-	if (0 == strncmp(item->delay, "{$", ZBX_CONST_STRLEN("{$")))
+	if (NULL != strstr(item->delay, "{$"))
 	{
 		char	*delay_s;
 
@@ -1856,14 +1842,12 @@ static void	DCsync_hosts(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_vector_u
 
 		ZBX_STR2UCHAR(status, row[10]);
 
-
 		host = (ZBX_DC_HOST *)DCfind_id(&config->hosts, hostid, sizeof(ZBX_DC_HOST), &found);
 		host->revision = revision;
 
 		/* see whether we should and can update 'hosts_h' and 'proxies_p' indexes at this point */
 
 		update_index_h = 0;
-
 
 		if (0 == found || 0 != strcmp(host->host, row[2]))
 		{
@@ -3552,6 +3536,55 @@ static void	dc_item_value_type_update(int found, ZBX_DC_ITEM *item, zbx_item_val
 	}
 }
 
+static void	make_item_unsupported_if_zero_pollers(ZBX_DC_ITEM *item, unsigned char poller_type,
+		const char *start_poller_config_name)
+{
+	if (0 == get_config_forks_cb(poller_type))
+	{
+		time_t		now = time(NULL);
+		zbx_timespec_t	ts = {now, 0};
+		char		*msg = zbx_dsprintf(NULL, "%s are disabled in configuration", start_poller_config_name);
+
+		zbx_dc_add_history(item->itemid, item->value_type, 0, NULL, &ts, ITEM_STATE_NOTSUPPORTED, msg);
+
+		zbx_free(msg);
+	}
+}
+
+static void	process_zero_pollers_items(ZBX_DC_ITEM *item)
+{
+	switch (item->type)
+	{
+		case ITEM_TYPE_ZABBIX:
+			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_AGENT_POLLER, "Agent pollers");
+			break;
+		case ITEM_TYPE_JMX:
+			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_JAVAPOLLER, "Java pollers");
+			break;
+		case ITEM_TYPE_DB_MONITOR:
+			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_ODBCPOLLER, "ODBC pollers");
+			break;
+		case ITEM_TYPE_HTTPAGENT:
+			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_HTTPAGENT_POLLER,
+					"HTTPAgent pollers");
+			break;
+		case ITEM_TYPE_SNMP:
+			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_SNMP_POLLER, "SNMP pollers");
+			break;
+		case ITEM_TYPE_BROWSER:
+			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_BROWSERPOLLER, "Browser pollers");
+			break;
+		case ITEM_TYPE_SCRIPT:
+			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_POLLER, "pollers");
+			break;
+		case ITEM_TYPE_IPMI:
+			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_IPMIPOLLER, "IPMI pollers");
+			break;
+		default:
+			return;
+	}
+}
+
 static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, zbx_synced_new_config_t synced,
 		zbx_vector_uint64_t *deleted_itemids, zbx_vector_dc_item_ptr_t *new_items)
 {
@@ -3816,6 +3849,9 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 			if (SUCCEED == zbx_is_counted_in_item_queue(item->type, item->key))
 			{
 				char	*error = NULL;
+
+				if ((0 != (flags & ZBX_ITEM_TYPE_CHANGED)) || (0 != (flags & ZBX_ITEM_NEW)))
+					process_zero_pollers_items(item);
 
 				if (FAIL == DCitem_nextcheck_update(item, interface, flags, now, &error))
 				{

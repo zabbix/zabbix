@@ -974,6 +974,16 @@ zabbix_export:
           tags:
             - tag: component
               value: raw
+        - uuid: efba7193b9aa48c385e98c9babfaa689
+          name: 'Zabbix proxy groups stats'
+          type: INTERNAL
+          key: 'zabbix[proxy group,discovery]'
+          history: '0'
+          value_type: TEXT
+          description: 'The master item of Zabbix proxy groups'' statistics.'
+          tags:
+            - tag: component
+              value: raw
         - uuid: 2b2f695ed1ef4a7a871c80df9c911e90
           name: 'Queue over 10 minutes'
           type: INTERNAL
@@ -1842,6 +1852,251 @@ zabbix_export:
                   tags:
                     - tag: proxy-group
                       value: '{#PROXY.GROUP}'
+        - uuid: 60eaeee3a90542aeae9762d36c804cce
+          name: 'Zabbix proxy groups discovery'
+          type: DEPENDENT
+          key: zabbix.proxy.groups.discovery
+          filter:
+            evaltype: AND
+            conditions:
+              - macro: '{#PROXY.GROUP.NAME}'
+                value: '{$PROXY.GROUP.DISCOVERY.NAME.MATCHES}'
+              - macro: '{#PROXY.GROUP.NAME}'
+                value: '{$PROXY.GROUP.DISCOVERY.NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+          description: 'LLD rule with item and trigger prototypes for the proxy groups discovery.'
+          item_prototypes:
+            - uuid: f48cf3314ff6460596468e7e6b8525de
+              name: 'Proxy group [{#PROXY.GROUP.NAME}]: Available proxies, in %'
+              type: DEPENDENT
+              key: 'zabbix.proxy.group.avail.proxies.percent[{#PROXY.GROUP.NAME}]'
+              units: '%'
+              description: 'Percentage of available proxies in the Zabbix proxy group.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.pavailable
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+              master_item:
+                key: 'zabbix.proxy.group.stats[{#PROXY.GROUP.NAME}]'
+              tags:
+                - tag: component
+                  value: proxy-group
+                - tag: proxy-group-name
+                  value: '{#PROXY.GROUP.NAME}'
+              trigger_prototypes:
+                - uuid: bbbaf1aaa1a64e57bad2ec53cc0e96f6
+                  expression: 'max(/Zabbix server health/zabbix.proxy.group.avail.proxies.percent[{#PROXY.GROUP.NAME}],3m)<{$PROXY.GROUP.AVAIL.PERCENT.MIN}'
+                  name: 'Proxy group [{#PROXY.GROUP.NAME}]: Availability too low'
+                  event_name: 'Proxy group [{#PROXY.GROUP.NAME}]: Availability below {$PROXY.GROUP.AVAIL.PERCENT.MIN}%'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'The availability of proxies in a proxy group is below {$PROXY.GROUP.AVAIL.PERCENT.MIN}% for at least 3 minutes.'
+                  tags:
+                    - tag: scope
+                      value: availability
+            - uuid: 848a42e7022f4cfab65044e710859f80
+              name: 'Proxy group [{#PROXY.GROUP.NAME}]: Available proxies'
+              type: DEPENDENT
+              key: 'zabbix.proxy.group.avail.proxies[{#PROXY.GROUP.NAME}]'
+              description: 'Count of available proxies in the Zabbix proxy group.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.available
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+              master_item:
+                key: 'zabbix.proxy.group.stats[{#PROXY.GROUP.NAME}]'
+              tags:
+                - tag: component
+                  value: proxy-group
+                - tag: proxy-group-name
+                  value: '{#PROXY.GROUP.NAME}'
+            - uuid: 7fa43a19cb4a448bbf7b1bc3ddf17594
+              name: 'Proxy group [{#PROXY.GROUP.NAME}]: Failover period'
+              type: DEPENDENT
+              key: 'zabbix.proxy.group.failover[{#PROXY.GROUP.NAME}]'
+              value_type: FLOAT
+              units: s
+              description: 'Failover period in the Zabbix proxy group.'
+              valuemap:
+                name: 'Proxy group invalid value'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.failover_delay
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+              master_item:
+                key: 'zabbix.proxy.group.settings[{#PROXY.GROUP.NAME}]'
+              tags:
+                - tag: component
+                  value: proxy-group
+                - tag: proxy-group-name
+                  value: '{#PROXY.GROUP.NAME}'
+              trigger_prototypes:
+                - uuid: 9d38306e2e1741eba5a910ccf380c484
+                  expression: 'last(/Zabbix server health/zabbix.proxy.group.failover[{#PROXY.GROUP.NAME}],#1)=-1'
+                  name: 'Proxy group [{#PROXY.GROUP.NAME}]: Failover invalid value'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'Proxy group failover has an invalid value.'
+                  tags:
+                    - tag: scope
+                      value: notice
+            - uuid: 150df878b45d4a259131f8bdf9e89fc1
+              name: 'Proxy group [{#PROXY.GROUP.NAME}]: Minimum number of proxies'
+              type: DEPENDENT
+              key: 'zabbix.proxy.group.online.min[{#PROXY.GROUP.NAME}]'
+              value_type: FLOAT
+              description: 'Minimum number of proxies online in the Zabbix proxy group.'
+              valuemap:
+                name: 'Proxy group invalid value'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.min_online
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+              master_item:
+                key: 'zabbix.proxy.group.settings[{#PROXY.GROUP.NAME}]'
+              tags:
+                - tag: component
+                  value: proxy-group
+                - tag: proxy-group-name
+                  value: '{#PROXY.GROUP.NAME}'
+              trigger_prototypes:
+                - uuid: ba1aa13dc8204c76be4fa85a6411de4d
+                  expression: 'last(/Zabbix server health/zabbix.proxy.group.online.min[{#PROXY.GROUP.NAME}],#1)=-1'
+                  name: 'Proxy group [{#PROXY.GROUP.NAME}]: Minimum number of proxies invalid value'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'Proxy group minimum number of proxies has an invalid value.'
+                  tags:
+                    - tag: scope
+                      value: notice
+            - uuid: b493eccc24ea4343ae3caf0651d46b6c
+              name: 'Proxy group [{#PROXY.GROUP.NAME}]: Settings'
+              type: DEPENDENT
+              key: 'zabbix.proxy.group.settings[{#PROXY.GROUP.NAME}]'
+              history: '0'
+              value_type: TEXT
+              description: 'The settings for the discovered proxy group.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.data[?(@.name=="{#PROXY.GROUP.NAME}")].first()'
+              master_item:
+                key: 'zabbix[proxy group,discovery]'
+              tags:
+                - tag: component
+                  value: proxy-group
+                - tag: component
+                  value: raw
+                - tag: proxy-group-name
+                  value: '{#PROXY.GROUP.NAME}'
+            - uuid: 8a2d84926a4b4e9a810dfac576dd8451
+              name: 'Proxy group [{#PROXY.GROUP.NAME}]: State'
+              type: DEPENDENT
+              key: 'zabbix.proxy.group.state[{#PROXY.GROUP.NAME}]'
+              description: |
+                State of the Zabbix proxy group.
+                
+                Possible values:
+                0 - unknown;
+                1 - offline;
+                2 - recovering;
+                3 - online;
+                4 - degrading.
+              valuemap:
+                name: 'Proxy group state'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.state
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+              master_item:
+                key: 'zabbix.proxy.group.stats[{#PROXY.GROUP.NAME}]'
+              tags:
+                - tag: component
+                  value: proxy-group
+                - tag: proxy-group-name
+                  value: '{#PROXY.GROUP.NAME}'
+              trigger_prototypes:
+                - uuid: 770cb8447a26472c9d825c874fccc030
+                  expression: 'last(/Zabbix server health/zabbix.proxy.group.state[{#PROXY.GROUP.NAME}],#1)=4'
+                  name: 'Proxy group [{#PROXY.GROUP.NAME}]: Status "degrading"'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'The state of the Zabbix proxy group is "degrading".'
+                  dependencies:
+                    - name: 'Proxy group [{#PROXY.GROUP.NAME}]: Status "offline"'
+                      expression: 'last(/Zabbix server health/zabbix.proxy.group.state[{#PROXY.GROUP.NAME}],#1)=1'
+                  tags:
+                    - tag: scope
+                      value: availability
+                - uuid: ecd98a89c19045dea28c2c635f3b5db9
+                  expression: 'last(/Zabbix server health/zabbix.proxy.group.state[{#PROXY.GROUP.NAME}],#1)=1'
+                  name: 'Proxy group [{#PROXY.GROUP.NAME}]: Status "offline"'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  description: 'The state of the Zabbix proxy group is "offline".'
+                  tags:
+                    - tag: scope
+                      value: availability
+                - uuid: e0c6041d678b46df8f633bda8ab24a1a
+                  expression: 'last(/Zabbix server health/zabbix.proxy.group.state[{#PROXY.GROUP.NAME}],#1)<>last(/Zabbix server health/zabbix.proxy.group.state[{#PROXY.GROUP.NAME}],#2) and length(last(/Zabbix server health/zabbix.proxy.group.state[{#PROXY.GROUP.NAME}]))>0'
+                  name: 'Proxy group [{#PROXY.GROUP.NAME}]: Status changed'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: INFO
+                  description: 'The state of the Zabbix proxy group has changed. Acknowledge to close the problem manually.'
+                  manual_close: 'YES'
+                  dependencies:
+                    - name: 'Proxy group [{#PROXY.GROUP.NAME}]: Status "degrading"'
+                      expression: 'last(/Zabbix server health/zabbix.proxy.group.state[{#PROXY.GROUP.NAME}],#1)=4'
+                  tags:
+                    - tag: scope
+                      value: availability
+            - uuid: aab08b95d317451089604077e6d8543c
+              name: 'Proxy group [{#PROXY.GROUP.NAME}]: Stats'
+              type: DEPENDENT
+              key: 'zabbix.proxy.group.stats[{#PROXY.GROUP.NAME}]'
+              history: '0'
+              value_type: TEXT
+              description: 'The statistics for the discovered proxy group.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.rtdata["{#PROXY.GROUP.NAME}"]'
+              master_item:
+                key: 'zabbix[proxy group,discovery]'
+              tags:
+                - tag: component
+                  value: proxy-group
+                - tag: component
+                  value: raw
+                - tag: proxy-group-name
+                  value: '{#PROXY.GROUP.NAME}'
+          master_item:
+            key: 'zabbix[proxy group,discovery]'
+          lld_macro_paths:
+            - lld_macro: '{#PROXY.GROUP.NAME}'
+              path: $.name
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.data
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
       tags:
         - tag: class
           value: software
@@ -1850,6 +2105,15 @@ zabbix_export:
         - tag: target
           value: zabbix
       macros:
+        - macro: '{$PROXY.GROUP.AVAIL.PERCENT.MIN}'
+          value: '75'
+          description: 'Minimum threshold for proxy group availability percentage trigger.'
+        - macro: '{$PROXY.GROUP.DISCOVERY.NAME.MATCHES}'
+          value: '.*'
+          description: 'Filter to include discovered proxy groups by their name.'
+        - macro: '{$PROXY.GROUP.DISCOVERY.NAME.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Filter to exclude discovered proxy groups by their name.'
         - macro: '{$PROXY.LAST_SEEN.MAX}'
           value: '600'
           description: 'The maximum number of seconds that Zabbix proxy has not been seen.'
@@ -2967,6 +3231,24 @@ zabbix_export:
           mappings:
             - value: '-1'
               newvalue: Never
+        - uuid: 8c23fc3b231b439a8eec4d0d60859c90
+          name: 'Proxy group invalid value'
+          mappings:
+            - value: '-1'
+              newvalue: 'Invalid value'
+        - uuid: acd6475b06334535be452cd984a11f6b
+          name: 'Proxy group state'
+          mappings:
+            - value: '0'
+              newvalue: Unknown
+            - value: '1'
+              newvalue: Offline
+            - value: '2'
+              newvalue: Recovering
+            - value: '3'
+              newvalue: Online
+            - value: '4'
+              newvalue: Degrading
         - uuid: 7c52b5e2d2434edeba089e136a7eb845
           name: 'Proxy mode'
           mappings:

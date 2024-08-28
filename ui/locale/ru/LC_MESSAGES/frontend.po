@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-07-29 08:02+0000\n"
-"Last-Translator: Andrew <i@ashekhov.ru>\n"
+"PO-Revision-Date: 2024-08-21 08:58+0000\n"
+"Last-Translator: Andrey <i@ashekhov.ru>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -1687,7 +1687,7 @@ msgstr "Должна поддерживаться по крайней мере �
 
 #: include/classes/setup/CFrontendSetup.php:241
 msgid "At least one of MySQL, PostgreSQL or Oracle should be supported."
-msgstr "Должна поддерживаться по крайней мере одна база данных из MySQL, PostgreSQL или Oracle."
+msgstr "Должна поддерживаться по крайней мере одна база данных: MySQL, PostgreSQL или Oracle."
 
 #: app/views/correlation.edit.php:264
 msgid "At least one operation must be selected."
@@ -12683,7 +12683,7 @@ msgstr "Список Zabbix прокси с именем, режимом, шиф
 
 #: include/classes/data/CItemData.php:2935
 msgid "List of Zabbix proxy groups configuration data and real-time data. Configuration data includes proxy group name, failover delay, and minimum number of online proxies required for the group to be online. Real-time data includes number of online proxies, percentage of online proxies, and state of proxy group (unknown, offline, recovering, online, degrading). This item does not return groupless proxies. Returns JSON."
-msgstr ""
+msgstr "Список данных конфигурации и данных в реальном времени для групп прокси Zabbix. Данные конфигурации включают название группы прокси, задержку переключения на резервный узел и минимальное количество онлайн-прокси, необходимое для того, чтобы группа считалась онлайн. Данные в реальном времени включают количество онлайн-прокси, процент онлайн-прокси и состояние группы прокси (неизвестно, офлайн, восстанавливается, онлайн, деградирует). Этот элемент не возвращает прокси без группы. Возвращает JSON."
 
 #: include/classes/data/CItemData.php:1559
 msgid "List of block devices and their type. Returns JSON"
@@ -15389,13 +15389,13 @@ msgstr "Онлайн прокси"
 #: include/classes/api/services/CUser.php:889
 #, c-format
 msgid "Only Super admin or Admin users can update \"%1$s\" parameter."
-msgstr "Только пользователи с правами Супер-администратора или Администратора могут обновлять параметр «%1$s»."
+msgstr "Только пользователи с правами Супер-администратора или Администратора могут обновлять параметр \"%1$s\"."
 
 #: include/classes/api/services/CUser.php:812
 #: include/classes/api/services/CUser.php:853
 #, c-format
 msgid "Only Super admin users can update \"%1$s\" parameter."
-msgstr "Только пользователи с правами Супер-администратора могут обновлять параметр «%1$s»."
+msgstr "Только пользователи с правами Супер-администратора могут обновлять параметр \"%1$s\"."
 
 #: include/classes/api/services/CDRule.php:509
 msgid "Only Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 checks can be made unique."
@@ -22142,6 +22142,11 @@ msgstr "Строка user agent"
 msgid "User cannot add himself to a disabled group or a group with disabled GUI access."
 msgstr "Пользователь не может добавить себя в отключенную группу или в группу с отключенным доступом к Веб-интерфейсу."
 
+#: include/classes/api/services/CUserGroup.php:673
+#: include/classes/api/services/CUser.php:843
+msgid "User cannot add oneself to a disabled group or a group with disabled GUI access."
+msgstr ""
+
 #: app/views/administration.user.edit.php:461
 #: include/classes/api/services/CUser.php:980
 msgid "User cannot change own role."
@@ -22280,6 +22285,10 @@ msgstr "Ввод данных пользователем успешно прот
 #: include/classes/api/services/CUser.php:1282
 msgid "User is not allowed to delete himself."
 msgstr "Пользователю не разрешается удалять самого себя."
+
+#: include/classes/api/services/CUser.php:1837
+msgid "User is not allowed to delete oneself."
+msgstr ""
 
 #: app/views/administration.authentication.edit.php:462
 #: app/views/popup.ldap.edit.php:222

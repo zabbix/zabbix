@@ -14,7 +14,7 @@
 
 
 /**
- * In case if user has set incredibly long notification timeout - he would end up never seeing them, because JS would
+ * In case if user has set incredibly long notification timeout - they would end up never seeing them, because JS would
  * execute scheduled timeout immediately. So limit the upper bound.
  */
 ZBX_Notification.max_timeout = Math.pow(2, 30);
