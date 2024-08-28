@@ -34,7 +34,7 @@ dnl *                     Checks for programs                       *
 dnl *                                                               *
 dnl *****************************************************************
 
-AC_PROG_CC([cc c99 gcc clang])
+AC_PROG_CC
 AM_PROG_CC_C_O
 
 dnl *****************************************************************
@@ -1522,6 +1522,7 @@ ZBXJS_LIBS="$ZBXJS_LIBS $ZLIB_LIBS $LIBPTHREAD_LIBS"
 
 AM_CONDITIONAL(HAVE_IPMI, [test "x$have_ipmi" = "xyes"])
 AM_CONDITIONAL(HAVE_LIBXML2, test "x$have_libxml2" = "xyes")
+AM_CONDITIONAL(HAVE_UNIXODBC, test "x$have_unixodbc" = "xyes")
 
 AM_CONDITIONAL(HAVE_SSH, [test "x$have_ssh" = "xyes (libssh)"])
 AM_CONDITIONAL(HAVE_SSH2, [test "x$have_ssh" = "xyes (libssh2)"])

@@ -6,16 +6,10 @@ form.dashboard-widget-clock {
 		&.fields-group-time,
 		&.fields-group-tzone {
 			display: grid;
-			grid-template-columns: 60px 120px repeat(2, minmax(60px, max-content) auto);
+			grid-template-columns: 60px 120px 60px auto;
 			align-items: center;
 			column-gap: 10px;
 			row-gap: 5px;
-
-			.field-size {
-				input {
-					margin-right: 5px;
-				}
-			}
 		}
 
 		&.fields-group-time {
@@ -42,7 +36,7 @@ div.dashboard-widget-clock {
 		$line-height: 1.14;
 
 		box-sizing: border-box;
-		min-height: 100%;
+		height: 100%;
 		padding: 10px;
 		display: flex;
 		flex-direction: column;
@@ -51,14 +45,30 @@ div.dashboard-widget-clock {
 
 		.clock-date,
 		.clock-time,
-		.clock-time-zone {
+		.clock-time-zone,
+		.clock-disabled {
 			max-width: 100%;
 			white-space: nowrap;
 			overflow: hidden;
 			text-overflow: ellipsis;
-			font-size: calc(var(--content-height) * var(--widget-clock-font) / #{$line-height});
 			line-height: $line-height;
-			flex-shrink: 0;
+		}
+
+		.clock-time-zone {
+			span:first-of-type {
+				margin-right: 0.2em;
+			}
+
+			&.separated {
+				text-align: center;
+
+				span {
+					display: block;
+					overflow: hidden;
+					text-overflow: ellipsis;
+					margin-right: 0;
+				}
+			}
 		}
 
 		.bold {
@@ -66,7 +76,6 @@ div.dashboard-widget-clock {
 		}
 
 		.clock-disabled {
-			font-size: calc(var(--content-height) * 0.6 / #{$line-height});
 			color: $font-alt-color;
 			font-weight: bold;
 		}
