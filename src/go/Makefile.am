@@ -21,10 +21,6 @@ AGENT_GOLDFLAGS += -X main.applicationName=zabbix_agent2
 WEBSERVICE_GOLDFLAGS = ${GOLDFLAGS}
 WEBSERVICE_GOLDFLAGS += -X main.applicationName=zabbix_web_service
 
-if HAVE_PCRE
-AGENT_GOTAGS = pcre
-endif
-
 if HAVE_PCRE2
 AGENT_GOTAGS = pcre2
 endif
