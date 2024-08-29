@@ -31,30 +31,30 @@ class testFormMap extends CLegacyWebTest {
 	 */
 	public function possibleGridOptions() {
 		return [
-			// grid size, show grid, auto align
-			['20x20', 1, 1],
-			['40x40', 1, 1],
-			['50x50', 1, 1],
-			['75x75', 1, 1],
-			['100x100', 1, 1],
+			// Array value description: grid dimensions, show grid, auto align.
+			['20x20', SYSMAP_GRID_SHOW_ON, SYSMAP_GRID_ALIGN_ON],
+			['40x40', SYSMAP_GRID_SHOW_ON, SYSMAP_GRID_ALIGN_ON],
+			['50x50', SYSMAP_GRID_SHOW_ON, SYSMAP_GRID_ALIGN_ON],
+			['75x75', SYSMAP_GRID_SHOW_ON, SYSMAP_GRID_ALIGN_ON],
+			['100x100', SYSMAP_GRID_SHOW_ON, SYSMAP_GRID_ALIGN_ON],
 
-			['20x20', 1, 0],
-			['40x40', 1, 0],
-			['50x50', 1, 0],
-			['75x75', 1, 0],
-			['100x100', 1, 0],
+			['20x20', SYSMAP_GRID_SHOW_ON, SYSMAP_GRID_ALIGN_OFF],
+			['40x40', SYSMAP_GRID_SHOW_ON, SYSMAP_GRID_ALIGN_OFF],
+			['50x50', SYSMAP_GRID_SHOW_ON, SYSMAP_GRID_ALIGN_OFF],
+			['75x75', SYSMAP_GRID_SHOW_ON, SYSMAP_GRID_ALIGN_OFF],
+			['100x100', SYSMAP_GRID_SHOW_ON, SYSMAP_GRID_ALIGN_OFF],
 
-			['20x20', 0, 1],
-			['40x40', 0, 1],
-			['50x50', 0, 1],
-			['75x75', 0, 1],
-			['100x100', 0, 1],
+			['20x20', SYSMAP_GRID_SHOW_OFF, SYSMAP_GRID_ALIGN_ON],
+			['40x40', SYSMAP_GRID_SHOW_OFF, SYSMAP_GRID_ALIGN_ON],
+			['50x50', SYSMAP_GRID_SHOW_OFF, SYSMAP_GRID_ALIGN_ON],
+			['75x75', SYSMAP_GRID_SHOW_OFF, SYSMAP_GRID_ALIGN_ON],
+			['100x100', SYSMAP_GRID_SHOW_OFF, SYSMAP_GRID_ALIGN_ON],
 
-			['20x20', 0, 0],
-			['40x40', 0, 0],
-			['50x50', 0, 0],
-			['75x75', 0, 0],
-			['100x100', 0, 0]
+			['20x20', SYSMAP_GRID_SHOW_OFF, SYSMAP_GRID_ALIGN_OFF],
+			['40x40', SYSMAP_GRID_SHOW_OFF, SYSMAP_GRID_ALIGN_OFF],
+			['50x50', SYSMAP_GRID_SHOW_OFF, SYSMAP_GRID_ALIGN_OFF],
+			['75x75', SYSMAP_GRID_SHOW_OFF, SYSMAP_GRID_ALIGN_OFF],
+			['100x100', SYSMAP_GRID_SHOW_OFF, SYSMAP_GRID_ALIGN_OFF]
 		];
 	}
 
@@ -174,39 +174,37 @@ class testFormMap extends CLegacyWebTest {
 
 	/**
 	 * @dataProvider allMaps
+	 *
 	 * @browsers chrome
 	 */
 	public function testFormMap_SimpleUpdateConstructor($map) {
 		$name = $map['name'];
 		$sysmapid = $map['sysmapid'];
 
-		$sqlMap = 'SELECT * FROM sysmaps WHERE name='.zbx_dbstr($name).' ORDER BY sysmapid';
-		$oldHashMap = CDBHelper::getHash($sqlMap);
-		$sqlElements = 'SELECT * FROM sysmaps_elements WHERE sysmapid='.zbx_dbstr($sysmapid).' ORDER BY selementid';
-		$oldHashElements = CDBHelper::getHash($sqlElements);
-		$sqlLinks = 'SELECT * FROM sysmaps_links WHERE sysmapid='.zbx_dbstr($sysmapid).' ORDER BY linkid';
-		$oldHashLinks = CDBHelper::getHash($sqlLinks);
-		$sqlLinkTriggers = 'SELECT slt.* FROM sysmaps_link_triggers slt, sysmaps_links sl WHERE slt.linkid = sl.linkid'.
-				' AND sl.sysmapid='.zbx_dbstr($sysmapid).' ORDER BY slt.linktriggerid';
-		$oldHashLinkTriggers = CDBHelper::getHash($sqlLinkTriggers);
+		$sql_maps_elements = 'SELECT * FROM sysmaps sm INNER JOIN sysmaps_elements sme ON '.
+				'sme.sysmapid = sm.sysmapid ORDER BY sme.selementid';
+		$sql_links_triggers = 'SELECT * FROM sysmaps_links sl INNER JOIN sysmaps_link_triggers slt ON '.
+				'slt.linkid = sl.linkid ORDER BY slt.linktriggerid';
+		$hash_maps_elements = CDBHelper::getHash($sql_maps_elements);
+		$hash_links_triggers = CDBHelper::getHash($sql_links_triggers);
 
 		$this->page->login()->open('sysmaps.php')->waitUntilReady();
-		$this->assertTitleAndHeader();
+		$this->page->assertTitle('Configuration of network maps');
+		$this->page->assertHeader('Maps');
 		$this->query('link', $name)->one()->click();
 		$this->page->waitUntilReady();
-		$this->assertTitleAndHeader('Maps', 'Network maps');
 
 		$element = $this->query('xpath://div[@id="flickerfreescreen_mapimg"]/div/*[name()="svg"]')
 				->waitUntilPresent()->one();
 
-		$this->assertScreenshotExcept($element, [
+		$exclude = [
 			'query'	=> 'class:map-timestamp',
 			'color'	=> '#ffffff'
-		], 'view_'.$sysmapid);
+		];
+		$this->assertScreenshotExcept($element, $exclude, 'view_'.$sysmapid);
 
 		$this->query('button:Edit map')->one()->click();
 		$this->page->waitUntilReady();
-		$this->assertTitleAndHeader('Network maps');
 		$this->assertScreenshot($this->query('id:map-area')->waitUntilPresent()->one(), 'edit_'.$sysmapid);
 		$this->query('button:Update')->one()->click();
 
@@ -215,28 +213,15 @@ class testFormMap extends CLegacyWebTest {
 		$this->page->acceptAlert();
 
 		$this->assertTrue($this->query('link', $name)->one()->isPresent());
-		$this->assertTitleAndHeader();
+		$this->page->assertHeader('Maps');
 
 		$hash_data = [
-			$oldHashMap => $sqlMap,
-			$oldHashElements => $sqlElements,
-			$oldHashLinks => $sqlLinks,
-			$oldHashLinkTriggers => $sqlLinkTriggers
+			$hash_maps_elements => $sql_maps_elements,
+			$hash_links_triggers => $sql_links_triggers
 		];
 
 		foreach ($hash_data as $old => $new) {
 			$this->assertEquals($old, CDBHelper::getHash($new));
 		}
-	}
-
-	/**
-	 * Check title and header on the pages related to sysmap.
-	 *
-	 * @param string	$header		expected header of the page
-	 * @param string	$title		expected title of the page
-	 */
-	protected function assertTitleAndHeader($header = 'Maps', $title = 'Configuration of network maps') {
-		$this->page->assertTitle($title);
-		$this->page->assertHeader($header);
 	}
 }

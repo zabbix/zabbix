@@ -54,7 +54,7 @@ class testPageMaps extends CWebTest {
 	const SYSMAP_HIGH_WIDTH = 'Map with highest width';
 	const SYSMAP_LOW_HEIGHT = 'Map with lowest height';
 	const SYSMAP_HIGH_HEIGHT = 'Map with highest height';
-	const SYSMAP_SPACES_NAME = 'Map to check trim for spaces';
+	const SYSMAP_SPACES_NAME = 'Map to check that there is no trim for spaces';
 	protected static $sysmapids;
 
 	public function prepareMapsData() {
