@@ -216,7 +216,7 @@ static void	zbx_async_dns_update_host_addresses(struct evdns_base *dnsbase)
 	static double	mtime = 0;
 	zbx_stat_t	buf_r, buf_h;
 
-	if (0 != mtime && 60 < zbx_time() - mtime)
+	if (60 < zbx_time() - mtime)
 	{
 		int	ret_h = zbx_stat("/etc/hosts", &buf_h), ret_r = zbx_stat("/etc/resolv.conf", &buf_r);
 
@@ -235,8 +235,8 @@ static void	zbx_async_dns_update_host_addresses(struct evdns_base *dnsbase)
 		}
 		time_r = buf_r.st_mtime;
 		time_h = buf_h.st_mtime;
+		mtime = zbx_time();
 	}
-	mtime = zbx_time();
 }
 
 void	zbx_async_poller_add_task(struct event_base *ev, struct evdns_base *dnsbase, const char *addr,
