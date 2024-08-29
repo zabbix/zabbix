@@ -576,6 +576,7 @@ ZBX_THREAD_ENTRY(zbx_async_poller_thread, args)
 		zbx_uint32_t	rtc_cmd;
 		unsigned char	*rtc_data;
 
+		zbx_async_dns_update_host_addresses(&poller_config.base);
 		if (ZBX_PROCESS_STATE_BUSY == poller_config.state)
 		{
 			zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
