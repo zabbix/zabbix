@@ -830,13 +830,11 @@ zbx_es_env_t	*zbx_es_get_env(duk_context *ctx)
  * Comments: This function must be used only from object constructor          *
  *                                                                            *
  ******************************************************************************/
-void	*es_obj_attach_data(zbx_es_env_t *env, void *data)
+void	*es_obj_attach_data(zbx_es_env_t *env, void *objptr, void *data)
 {
 	zbx_es_obj_data_t	obj_local;
 
-	duk_push_this(env->ctx);
-	obj_local.heapptr = duk_require_heapptr(env->ctx, -1);
-	duk_pop(env->ctx);
+	obj_local.heapptr = objptr;
 
 	obj_local.data = data;
 	zbx_hashset_insert(&env->objmap, &obj_local, sizeof(obj_local));
