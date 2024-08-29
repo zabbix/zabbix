@@ -1,5 +1,3 @@
-!/build/win32/**/Makefile
-!/build/win64/**/Makefile
 !/src/modules/dummy/Makefile
 *.a
 *.o
@@ -52,6 +50,8 @@ build/win32/project/MSG00001.bin
 build/win32/project/messages.h
 build/win32/project/messages.rc
 build/win32/project/resource.res
+!/build/win32/**/Makefile
+!/build/win64/**/Makefile
 database/mysql/data.sql
 database/mysql/schema.sql
 database/mysql/option-patches
