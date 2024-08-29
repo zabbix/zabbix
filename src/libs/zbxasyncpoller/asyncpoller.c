@@ -210,7 +210,7 @@ static void	async_dns_event(int err, struct evutil_addrinfo *ai, void *arg)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-void	zbx_async_dns_update_host_addresses(struct evdns_base *dnsbase)
+static void	zbx_async_dns_update_host_addresses(struct evdns_base *dnsbase)
 {
 	static time_t	time_r = 0, time_h = 0;
 	static double	mtime = 0;
