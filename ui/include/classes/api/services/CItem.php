@@ -1042,11 +1042,12 @@ class CItem extends CItemGeneral {
 		return true;
 	}
 
-	/**
-	 * @param array $options    Array of query options.
-	 * @param array $result     Query results.
-	 */
-	private function addRelatedInterfaces(array $options, array &$result): void {
+	public function addRelatedObjects(array $options, array $result) {
+		$result = parent::addRelatedObjects($options, $result);
+
+		$itemids = array_keys($result);
+
+		// adding interfaces
 		if ($options['selectInterfaces'] !== null && $options['selectInterfaces'] != API_OUTPUT_COUNT) {
 			$relationMap = $this->createRelationMap($result, 'itemid', 'interfaceid');
 			$interfaces = API::HostInterface()->get([
@@ -1057,14 +1058,9 @@ class CItem extends CItemGeneral {
 			]);
 			$result = $relationMap->mapMany($result, $interfaces, 'interfaces');
 		}
-	}
 
-	/**
-	 * @param array $options    Array of query options.
-	 * @param array $result     Query results.
-	 */
-	private function addRelatedTriggers(array $options, array &$result): void {
-		if ($options['selectTriggers'] !== null) {
+		// adding triggers
+		if (!is_null($options['selectTriggers'])) {
 			if ($options['selectTriggers'] != API_OUTPUT_COUNT) {
 				$triggers = [];
 				$relationMap = $this->createRelationMap($result, 'itemid', 'triggerid', 'functions');
@@ -1088,7 +1084,7 @@ class CItem extends CItemGeneral {
 				$triggers = API::Trigger()->get([
 					'countOutput' => true,
 					'groupCount' => true,
-					'itemids' => array_keys($result)
+					'itemids' => $itemids
 				]);
 				$triggers = zbx_toHash($triggers, 'itemid');
 
@@ -1099,13 +1095,45 @@ class CItem extends CItemGeneral {
 				}
 			}
 		}
-	}
 
-	/**
-	 * @param array $options    Array of query options.
-	 * @param array $result     Query results.
-	 */
-	private function addRelatedDiscoveryRule(array $options, array &$result): void {
+		// adding graphs
+		if (!is_null($options['selectGraphs'])) {
+			if ($options['selectGraphs'] != API_OUTPUT_COUNT) {
+				$graphs = [];
+				$relationMap = $this->createRelationMap($result, 'itemid', 'graphid', 'graphs_items');
+				$related_ids = $relationMap->getRelatedIds();
+
+				if ($related_ids) {
+					$graphs = API::Graph()->get([
+						'output' => $options['selectGraphs'],
+						'graphids' => $related_ids,
+						'preservekeys' => true
+					]);
+
+					if (!is_null($options['limitSelects'])) {
+						order_result($graphs, 'name');
+					}
+				}
+
+				$result = $relationMap->mapMany($result, $graphs, 'graphs', $options['limitSelects']);
+			}
+			else {
+				$graphs = API::Graph()->get([
+					'countOutput' => true,
+					'groupCount' => true,
+					'itemids' => $itemids
+				]);
+				$graphs = zbx_toHash($graphs, 'itemid');
+
+				foreach ($result as $itemid => $item) {
+					$result[$itemid]['graphs'] = array_key_exists($itemid, $graphs)
+						? $graphs[$itemid]['rowscount']
+						: '0';
+				}
+			}
+		}
+
+		// adding discoveryrule
 		if ($options['selectDiscoveryRule'] !== null && $options['selectDiscoveryRule'] != API_OUTPUT_COUNT) {
 			$discoveryRules = [];
 			$relationMap = new CRelationMap();
@@ -1113,7 +1141,7 @@ class CItem extends CItemGeneral {
 			$dbRules = DBselect(
 				'SELECT id1.itemid,id2.parent_itemid'.
 					' FROM item_discovery id1,item_discovery id2,items i'.
-					' WHERE '.dbConditionInt('id1.itemid', array_keys($result)).
+					' WHERE '.dbConditionInt('id1.itemid', $itemids).
 					' AND id1.parent_itemid=id2.itemid'.
 					' AND i.itemid=id1.itemid'.
 					' AND i.flags='.ZBX_FLAG_DISCOVERY_CREATED
@@ -1127,7 +1155,7 @@ class CItem extends CItemGeneral {
 			$dbRules = DBselect(
 				'SELECT id.parent_itemid,id.itemid'.
 					' FROM item_discovery id,items i'.
-					' WHERE '.dbConditionInt('id.itemid', array_keys($result)).
+					' WHERE '.dbConditionInt('id.itemid', $itemids).
 					' AND i.itemid=id.itemid'.
 					' AND i.flags='.ZBX_FLAG_DISCOVERY_PROTOTYPE
 			);
@@ -1148,13 +1176,8 @@ class CItem extends CItemGeneral {
 
 			$result = $relationMap->mapOne($result, $discoveryRules, 'discoveryRule');
 		}
-	}
 
-	/**
-	 * @param array $options    Array of query options.
-	 * @param array $result     Query results.
-	 */
-	private function addRelatedItemDiscovery(array $options, array &$result): void {
+		// adding item discovery
 		if ($options['selectItemDiscovery'] !== null) {
 			$itemDiscoveries = API::getApiService()->select('item_discovery', [
 				'output' => $this->outputExtend($options['selectItemDiscovery'], ['itemdiscoveryid', 'itemid']),
@@ -1168,12 +1191,8 @@ class CItem extends CItemGeneral {
 			);
 			$result = $relationMap->mapOne($result, $itemDiscoveries, 'itemDiscovery');
 		}
-	}
-	/**
-	 * @param array $options    Array of query options.
-	 * @param array $result     Query results.
-	 */
-	private function addHistoryData(array $options, array &$result): void {
+
+		// adding history data
 		$requestedOutput = [];
 		if ($this->outputIsRequested('lastclock', $options['output'])) {
 			$requestedOutput['lastclock'] = true;
@@ -1212,24 +1231,29 @@ class CItem extends CItemGeneral {
 			}
 			unset($item);
 		}
-	}
 
-	public function addRelatedObjects(array $options, array $result): array {
-		$result_chunks = array_chunk($result, CItemGeneral::CHUNK_SIZE, true);
-		$result = [];
+		// Adding item tags.
+		if ($options['selectTags'] !== null) {
+			$options['selectTags'] = ($options['selectTags'] !== API_OUTPUT_EXTEND)
+				? (array) $options['selectTags']
+				: ['tag', 'value'];
 
-		foreach ($result_chunks as $result_chunk) {
-			$result_chunk = parent::addRelatedObjects($options, $result_chunk);
+			$options['selectTags'] = array_intersect(['tag', 'value'], $options['selectTags']);
+			$requested_output = array_flip($options['selectTags']);
 
-			$this->addRelatedInterfaces($options, $result_chunk);
-			$this->addRelatedTriggers($options, $result_chunk);
-			$this->addRelatedGraphs($options, $result_chunk);
-			$this->addRelatedDiscoveryRule($options, $result_chunk);
-			$this->addRelatedItemDiscovery($options, $result_chunk);
-			$this->addHistoryData($options, $result_chunk);
-			$this->addRelatedItemTags($options, $result_chunk);
+			$db_tags = DBselect(
+				'SELECT '.implode(',', array_merge($options['selectTags'], ['itemid'])).
+				' FROM item_tag'.
+				' WHERE '.dbConditionInt('itemid', $itemids)
+			);
 
-			$result += $result_chunk;
+			array_walk($result, function (&$item) {
+				$item['tags'] = [];
+			});
+
+			while ($db_tag = DBfetch($db_tags)) {
+				$result[$db_tag['itemid']]['tags'][] = array_intersect_key($db_tag, $requested_output);
+			}
 		}
 
 		return $result;
