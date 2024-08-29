@@ -923,14 +923,14 @@ func Test_getBasicDeviceInfo(t *testing.T) {
 			false,
 		},
 		{
-			name:       "-invalidJSON",
-			deviceName: "/dev/sda",
-			expectations: expectation{
+			"-invalidJSON",
+			"/dev/sda",
+			expectation{
 				args: []string{"-a", "/dev/sda", "-j"},
 				err:  nil,
 				out:  []byte(`{`), // Corrupted or incomplete JSON
 			},
-			args: args{
+			args{
 				[]deviceInfo{
 					{
 						Name:     "/dev/sda",
@@ -940,18 +940,18 @@ func Test_getBasicDeviceInfo(t *testing.T) {
 				},
 				false,
 			},
-			expectedResult: nil,
-			wantErr:        true, // Expect an error due to invalid JSON
+			nil,
+			true, // Expect an error due to invalid JSON
 		},
 		{
-			name:       "-noSmartStatus",
-			deviceName: "/dev/sda",
-			expectations: expectation{
+			"-noSmartStatus",
+			"/dev/sda",
+			expectation{
 				args: []string{"-a", "/dev/sda", "-j"},
 				err:  nil,
 				out:  []byte(`{"smartctl":{},"device":{},"model_name":"Example Model"}`), // No SmartStatus field
 			},
-			args: args{
+			args{
 				[]deviceInfo{
 					{
 						Name:     "/dev/sda",
@@ -961,8 +961,8 @@ func Test_getBasicDeviceInfo(t *testing.T) {
 				},
 				false,
 			},
-			expectedResult: nil,
-			wantErr:        true, // Expect an error due to missing SmartStatus
+			nil,
+			true, // Expect an error due to missing SmartStatus
 		},
 		{
 			"-smartError",
