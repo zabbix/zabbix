@@ -70,7 +70,7 @@ static duk_ret_t	wd_element_dtor(duk_context *ctx)
 	if (NULL == (env = zbx_es_get_env(ctx)))
 		return duk_error(ctx, DUK_RET_EVAL_ERROR, "cannot access internal environment");
 
-	if (NULL != (el = (zbx_wd_element_t *)es_obj_detach_data(env, ES_OBJ_ELEMENT)))
+	if (NULL != (el = (zbx_wd_element_t *)es_obj_detach_data(env, duk_require_heapptr(ctx, -1), ES_OBJ_ELEMENT)))
 		wd_element_free(el);
 
 	return 0;
@@ -96,7 +96,7 @@ static duk_ret_t	wd_element_ctor(duk_context *ctx, zbx_webdriver_t *wd, const ch
 	el->id = zbx_strdup(NULL, elementid);
 
 	duk_push_object(ctx);
-	es_obj_attach_data(env, el, ES_OBJ_ELEMENT);
+	es_obj_attach_data(env, duk_require_heapptr(ctx, -1), el, ES_OBJ_ELEMENT);
 
 	duk_push_c_function(ctx, wd_element_dtor, 1);
 	duk_set_finalizer(ctx, -2);

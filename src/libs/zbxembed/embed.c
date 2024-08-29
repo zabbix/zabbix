@@ -913,15 +913,16 @@ int	es_is_chained_constructor_call(duk_context *ctx)
  *                                                                            *
  * Purpose: attach data pointer to current object                             *
  *                                                                            *
- * Comments: The object must be on the top of the stack (-1)                  *
- *           This function must be used only from object constructor          *
+ * Comments: This function must be used only from object constructor          *
  *                                                                            *
  ******************************************************************************/
-void	es_obj_attach_data(zbx_es_env_t *env, void *data, zbx_es_obj_type_t type)
+void	es_obj_attach_data(zbx_es_env_t *env, void *objptr, void *data, zbx_es_obj_type_t type)
 {
 	zbx_es_obj_data_t	obj_local;
 
-	obj_local.heapptr = duk_require_heapptr(env->ctx, -1);
+	duk_push_this(env->ctx);
+	obj_local.heapptr = objptr;
+	duk_pop(env->ctx);
 
 	obj_local.data = data;
 	obj_local.type = type;
@@ -956,8 +957,8 @@ void	*es_obj_get_data(zbx_es_env_t *env, zbx_es_obj_type_t type)
  *                                                                            *
  * Purpose: detach data pointer from current object                           *
  *                                                                            *
- * Parameters: env  - [IN]                                                    *
- *             type - [IN] object type                                        *
+ * Parameters: env    - [IN]                                                  *
+ *             objptr - [IN] object js heap pointer                           *
  *                                                                            *
  * Return value: detached data pointer                                        *
  *                                                                            *
@@ -967,18 +968,23 @@ void	*es_obj_get_data(zbx_es_env_t *env, zbx_es_obj_type_t type)
  *           This function must be used only from object destructor.          *
  *                                                                            *
  ******************************************************************************/
-void	*es_obj_detach_data(zbx_es_env_t *env, zbx_es_obj_type_t type)
+void	*es_obj_detach_data(zbx_es_env_t *env, void *objptr, zbx_es_obj_type_t type)
 {
-	zbx_es_obj_data_t	obj_local, *obj;
-	void			*data;
+	if (NULL != objptr)
+	{
+		zbx_es_obj_data_t	obj_local, *obj;
+		void			*data;
 
-	obj_local.heapptr = duk_require_heapptr(env->ctx, -1);
+		obj_local.heapptr = objptr;
 
-	if (NULL == (obj = zbx_hashset_search(&env->objmap, &obj_local)) || obj->type != type)
+		if (NULL == (obj = zbx_hashset_search(&env->objmap, &obj_local)) || obj->type != type)
+			return NULL;
+
+		data = obj->data;
+		zbx_hashset_remove_direct(&env->objmap, obj);
+
+		return data;
+	}
+	else
 		return NULL;
-
-	data = obj->data;
-	zbx_hashset_remove_direct(&env->objmap, obj);
-
-	return data;
 }
