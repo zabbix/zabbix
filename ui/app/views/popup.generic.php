@@ -488,7 +488,6 @@ switch ($data['popup_type']) {
 	case 'items':
 	case 'template_items':
 	case 'item_prototypes':
-
 		if ($options['srcfld2'] !== '' && $options['dstfld2'] !== '') {
 			// TODO: this condition must be removed after all item and item_prototype fields changing to multiselect
 			foreach ($data['table_records'] as &$item) {
@@ -536,8 +535,16 @@ switch ($data['popup_type']) {
 
 				$table->addRow([
 					$data['multiselect'] ? new CCheckBox('item['.$checkbox_key.']', $item['itemid']) : null,
-					$description,
-					(new CDiv($item['key_']))->addClass(ZBX_STYLE_WORDWRAP),
+					(new CDiv($description))
+						->addClass(ZBX_STYLE_WORDBREAK)
+						->addClass(ZBX_STYLE_LINE_CLAMP)
+						->addStyle('--line-clamp: 4;')
+						->setTitle($item['name']),
+					(new CDiv($item['key_']))
+						->addClass(ZBX_STYLE_WORDWRAP)
+						->addClass(ZBX_STYLE_LINE_CLAMP)
+						->addStyle('--line-clamp: 4;')
+						->setTitle($item['key_']),
 					item_type2str($item['type']),
 					itemValueTypeString($item['value_type']),
 					($data['popup_type'] === 'items')
@@ -570,16 +577,25 @@ switch ($data['popup_type']) {
 					$data['multiselect']
 						? new CCheckBox('item['.$item['itemid'].']', $item_pattern)
 						: null,
-					(new CLink($item['name']))
-						->setAttribute('data-reference', $options['reference'])
-						->setAttribute('data-pattern', $item_pattern)
-						->setAttribute('data-parentid', $options['parentid'])
-						->onClick('
-							addValue(this.dataset.reference, this.dataset.pattern, this.dataset.parentid ?? null);
-							popup_generic.closePopup(event);
-						')
-						->addClass(ZBX_STYLE_WORDBREAK),
-					(new CDiv($item['key_']))->addClass(ZBX_STYLE_WORDWRAP),
+					(new CDiv(
+						(new CLink($item['name']))
+							->setAttribute('data-reference', $options['reference'])
+							->setAttribute('data-pattern', $item_pattern)
+							->setAttribute('data-parentid', $options['parentid'])
+							->onClick('
+								addValue(this.dataset.reference, this.dataset.pattern, this.dataset.parentid ?? null);
+								popup_generic.closePopup(event);
+							')
+					))
+						->addClass(ZBX_STYLE_WORDBREAK)
+						->addClass(ZBX_STYLE_LINE_CLAMP)
+						->addStyle('--line-clamp: 4;')
+						->setTitle($item['name']),
+					(new CDiv($item['key_']))
+						->addClass(ZBX_STYLE_WORDWRAP)
+						->addClass(ZBX_STYLE_LINE_CLAMP)
+						->addStyle('--line-clamp: 4;')
+						->setTitle($item['key_']),
 					item_type2str($item['type']),
 					itemValueTypeString($item['value_type']),
 					($data['popup_type'] === 'items')

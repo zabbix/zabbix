@@ -1756,7 +1756,7 @@ class testManualActionScripts extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Name' => 'Host Telnet without confirmation message and with input type - string',
+						'Name' => 'A Host Telnet without confirmation message and with input type - string',
 						'Scope' => 'Manual host action',
 						'Type' => 'Telnet',
 						'Username' => 'zabbix',
@@ -1785,7 +1785,7 @@ class testManualActionScripts extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Name' => 'Host Telnet without confirmation message and with input type - dropdown',
+						'Name' => 'A Host Telnet without confirmation message and with input type - dropdown',
 						'Scope' => 'Manual host action',
 						'Type' => 'Telnet',
 						'Username' => 'zabbix',
@@ -1866,7 +1866,7 @@ class testManualActionScripts extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Name' => 'Host Telnet with confirmation message and with input type - string',
+						'Name' => 'A Host Telnet with confirmation message and with input type - string',
 						'Scope' => 'Manual host action',
 						'Type' => 'Telnet',
 						'Username' => 'zabbix',
@@ -1897,7 +1897,7 @@ class testManualActionScripts extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Name' => 'Host Telnet with confirmation message and with input type - dropdown',
+						'Name' => 'A Host Telnet with confirmation message and with input type - dropdown',
 						'Scope' => 'Manual host action',
 						'Type' => 'Telnet',
 						'Username' => 'zabbix',

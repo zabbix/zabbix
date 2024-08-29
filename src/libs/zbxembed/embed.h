@@ -70,8 +70,17 @@ int	es_duktape_string_decode(const char *duk_str, char **out_str);
 duk_ret_t	es_super(duk_context *ctx, const char *base, int args);
 int	es_is_chained_constructor_call(duk_context *ctx);
 
-void	es_obj_attach_data(zbx_es_env_t *env, void *data);
-void	*es_obj_get_data(zbx_es_env_t *env);
-void	*es_obj_detach_data(zbx_es_env_t *env);
+typedef enum
+{
+	ES_OBJ_HTTPREQUEST,
+	ES_OBJ_BROWSER,
+	ES_OBJ_ELEMENT,
+	ES_OBJ_ALERT
+}
+zbx_es_obj_type_t;
+
+void	es_obj_attach_data(zbx_es_env_t *env, void *objptr, void *data, zbx_es_obj_type_t type);
+void	*es_obj_get_data(zbx_es_env_t *env, zbx_es_obj_type_t type);
+void	*es_obj_detach_data(zbx_es_env_t *env, void *objptr, zbx_es_obj_type_t type);
 
 #endif /* ZABBIX_EMBED_H */

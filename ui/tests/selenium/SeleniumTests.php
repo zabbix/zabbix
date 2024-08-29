@@ -193,6 +193,7 @@ require_once dirname(__FILE__).'/multiselects/testMultiselects.php';
 require_once dirname(__FILE__).'/multiselects/testMultiselectsErrorsHostsTemplates.php';
 require_once dirname(__FILE__).'/multiselects/testMultiselectsLatestData.php';
 require_once dirname(__FILE__).'/multiselects/testMultiselectsProblems.php';
+require_once dirname(__FILE__).'/multiselects/testMultiselectsWithoutData.php';
 
 // Network discovery.
 require_once dirname(__FILE__).'/networkDiscovery/testFormNetworkDiscovery.php';
@@ -311,6 +312,7 @@ require_once dirname(__FILE__).'/users/testFormUserGroups.php';
 require_once dirname(__FILE__).'/users/testFormUserMedia.php';
 require_once dirname(__FILE__).'/users/testFormUserPermissions.php';
 require_once dirname(__FILE__).'/users/testFormUserProfile.php';
+require_once dirname(__FILE__).'/users/testAlarmNotification.php';
 require_once dirname(__FILE__).'/users/testPageUserGroups.php';
 require_once dirname(__FILE__).'/users/testPageUsers.php';
 
@@ -337,6 +339,7 @@ require_once dirname(__FILE__).'/testPageBrowserWarning.php';
 require_once dirname(__FILE__).'/testPageInventory.php';
 require_once dirname(__FILE__).'/testPageSearch.php';
 require_once dirname(__FILE__).'/testPageStatusOfZabbix.php';
+require_once dirname(__FILE__).'/testPagesWithoutData.php';
 require_once dirname(__FILE__).'/testSidebarMenu.php';
 require_once dirname(__FILE__).'/testTimezone.php';
 require_once dirname(__FILE__).'/testUrlParameters.php';
@@ -527,6 +530,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testMultiselectsErrorsHostsTemplates');
 		$suite->addTestSuite('testMultiselectsLatestData');
 		$suite->addTestSuite('testMultiselectsProblems');
+		$suite->addTestSuite('testMultiselectsWithoutData');
 
 		// Network discovery.
 		$suite->addTestSuite('testFormNetworkDiscovery');
@@ -644,6 +648,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormUserGroups');
 		$suite->addTestSuite('testFormUserMedia');
 		$suite->addTestSuite('testFormUserPermissions');
+		$suite->addTestSuite('testAlarmNotification');
 		$suite->addTestSuite('testFormUserProfile');
 		$suite->addTestSuite('testPageUserGroups');
 		$suite->addTestSuite('testPageUsers');
@@ -671,6 +676,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageInventory');
 		$suite->addTestSuite('testPageSearch');
 		$suite->addTestSuite('testPageStatusOfZabbix');
+		$suite->addTestSuite('testPagesWithoutData');
 		$suite->addTestSuite('testSidebarMenu');
 		$suite->addTestSuite('testTimezone');
 		$suite->addTestSuite('testUrlParameters');

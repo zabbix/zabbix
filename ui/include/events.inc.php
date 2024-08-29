@@ -93,7 +93,7 @@ function make_event_details(array $event, array $allowed) {
 	$table = (new CTableInfo())
 		->addRow([
 			_('Event'),
-			(new CCol($event['name']))->addClass(ZBX_STYLE_WORDWRAP)
+			(new CCol($event['name']))->addClass(ZBX_STYLE_WORDBREAK)
 		])
 		->addRow([
 			_('Operational data'),
@@ -710,6 +710,7 @@ function makeTags(array $list, bool $html = true, string $key = 'eventid', int $
 								']);'
 							)
 							->addClass(ZBX_STYLE_BTN_TAG)
+							->addClass(ZBX_STYLE_TAG)
 							->setHint(getTagString($tag), '', false);
 					}
 					else {
@@ -746,6 +747,7 @@ function makeTags(array $list, bool $html = true, string $key = 'eventid', int $
 								']);'
 							)
 							->addClass(ZBX_STYLE_BTN_TAG)
+							->addClass(ZBX_STYLE_TAG)
 							->setHint(getTagString($tag), '', false);
 					}
 					else {

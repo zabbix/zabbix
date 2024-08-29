@@ -43,7 +43,7 @@ class CRedirectButton extends CSimpleButton {
 	 */
 	public function setUrl($url, $confirmation = null) {
 		if ($url instanceof CUrl) {
-			if ($url->hasArgument(CCsrfTokenHelper::CSRF_TOKEN_NAME)) {
+			if ($url->hasArgument(CSRF_TOKEN_NAME)) {
 				$this->setAttribute('data-post', 1);
 			}
 

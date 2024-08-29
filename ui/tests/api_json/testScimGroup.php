@@ -1908,6 +1908,7 @@ class testScimGroup extends CAPIScimTest {
 		CDataHelper::call('user.delete', array_values(self::$data['userids']));
 
 		// Delete userdirectories.
+		CDataHelper::call('authentication.update', ['saml_auth_enabled' => ZBX_AUTH_SAML_DISABLED]);
 		CDataHelper::call('userdirectory.delete', array_values(self::$data['userdirectoryids']));
 
 		// Delete scim groups and its members.

@@ -21,7 +21,10 @@ require_once dirname(__FILE__).'/../../include/CWebTest.php';
  */
 class testLowLevelDiscovery extends CWebTest {
 	const SQL = 'SELECT * FROM items WHERE flags=1 ORDER BY itemid';
+	const SIMPLE_UPDATE_CLONE_LLD = 'LLD for simple update or clone scenario';
 
+	protected static $context = 'host';
+	protected static $groupid;
 	protected static $templateid;
 	protected static $hostid;
 	protected static $update_lld;
@@ -40,11 +43,9 @@ class testLowLevelDiscovery extends CWebTest {
 
 	/**
 	 * Test for LLD Form initial layout check without changing the LLD type.
-	 *
-	 * @param string $context    is LLD created on Host or on Template
 	 */
-	protected function checkInitialLayout($context = 'host') {
-		$url = ($context === 'template')
+	protected function checkInitialLayout() {
+		$url = (static::$context === 'template')
 			? static::$templateid.'&context=template'
 			: static::$empty_hostid.'&context=host';
 
@@ -66,7 +67,7 @@ class testLowLevelDiscovery extends CWebTest {
 				'Delete lost resources', 'Disable lost resources'
 		];
 
-		if ($context === 'template') {
+		if (static::$context === 'template') {
 			$required_labels = array_values(array_diff($required_labels, ['Host interface']));
 		}
 
@@ -125,6 +126,7 @@ class testLowLevelDiscovery extends CWebTest {
 			'id:delay_flex_0_delay' => ['placeholder' => '50s', 'maxlength' => 255],
 			'id:delay_flex_0_period' => ['placeholder' => '1-7,00:00-24:00', 'maxlength' => 255],
 			'id:timeout' => ['value' => '3s', 'maxlength' => 255],
+			'id:inherited_timeout' => ['value' => '3s', 'maxlength' => 255],
 			'id:custom_timeout' => ['labels' => ['Global', 'Override'], 'value' => 'Global'],
 			'Delete lost resources' => ['value' => '7d', 'maxlength' => 255],
 			'Disable lost resources' => ['value' => '1h', 'maxlength' => 255],
@@ -155,7 +157,7 @@ class testLowLevelDiscovery extends CWebTest {
 			'Overrides' => ['value' => []]
 		];
 
-		if ($context === 'template') {
+		if (static::$context === 'template') {
 			unset($fields['Host interface']);
 		}
 
@@ -172,7 +174,7 @@ class testLowLevelDiscovery extends CWebTest {
 			]
 		];
 
-		if ($context === 'template') {
+		if (static::$context === 'template') {
 			$visible_fields['Discovery rule'] = array_values(array_diff($visible_fields['Discovery rule'], ['Host interface']));
 		}
 
@@ -183,31 +185,8 @@ class testLowLevelDiscovery extends CWebTest {
 			// Check buttons default values and parameters in fields in every tab.
 			switch ($tab) {
 				case 'Preprocessing':
-					$preprocessing_container = $form->getFieldContainer('Preprocessing steps');
-					$preprocessing_container->query('button:Add')->waitUntilClickable()->one()->click();
-					$this->assertTrue($preprocessing_container->query('id:preprocessing')->one()->isVisible());
-					$this->assertEquals(4, $preprocessing_container->query('button', ['Add', 'Test', 'Remove', 'Test all steps'])
-							->all()->filter(new CElementFilter(CElementFilter::CLICKABLE))->count()
-					);
-
-					$preprocessing_fields = [
-						'id:preprocessing_0_type' => ['value' => 'Regular expression', 'options' => ['Regular expression',
-								'Replace', 'XML XPath', 'JSONPath', 'CSV to JSON', 'XML to JSON', 'SNMP walk value',
-								'SNMP walk to JSON', 'SNMP get value', 'JavaScript', 'Matches regular expression',
-								'Does not match regular expression', 'Check for error in JSON', 'Check for error in XML',
-								'Discard unchanged with heartbeat', 'Prometheus to JSON'
-							]
-						],
-						'id:preprocessing_0_params_0' => ['value' => '', 'placeholder' => 'pattern', 'maxlength' => 255],
-						'id:preprocessing_0_params_1' => ['value' => '', 'placeholder' => 'output', 'maxlength' => 255],
-						'id:preprocessing_0_on_fail' => ['value' => false]
-					];
-
-					$this->checkFieldsParameters($preprocessing_fields);
-
-					foreach (array_keys($preprocessing_fields) as $key) {
-						$this->assertTrue($form->getField($key)->isEnabled());
-					}
+					// Other Preprocessing checks are performed in testFormPreprocessingLowLevelDiscovery.
+					$this->assertTrue($form->getField('Preprocessing steps')->isVisible());
 					break;
 
 				case 'LLD macros':
@@ -418,10 +397,9 @@ class testLowLevelDiscovery extends CWebTest {
 	 * Test for LLD Form's layout check depending on LLD type.
 	 *
 	 * @param array $data        data provider
-	 * @param string $context    is LLD created on Host or on Template
 	 */
-	protected function checkLayoutDependingOnType($data, $context = 'host') {
-		$url = ($context === 'template')
+	protected function checkLayoutDependingOnType($data) {
+		$url = (static::$context === 'template')
 			? static::$templateid.'&context=template'
 			: static::$empty_hostid.'&context=host';
 
@@ -433,7 +411,7 @@ class testLowLevelDiscovery extends CWebTest {
 		$permanent_fields = ['Name', 'Type', 'Key', 'Delete lost resources', 'Disable lost resources', 'Description', 'Enabled'];
 
 		// Host interface field doesn't exist for Template.
-		if ($context === 'template') {
+		if (static::$context === 'template') {
 			$data['fields'] = array_values(array_diff($data['fields'], ['Host interface']));
 		}
 
@@ -480,7 +458,7 @@ class testLowLevelDiscovery extends CWebTest {
 			case 'Zabbix agent';
 			case 'JMX agent':
 			case 'IPMI agent':
-				if ($context === 'host') {
+				if (static::$context === 'host') {
 					// Check red interface info message.
 					$this->assertTrue($form->query('xpath:.//span[@class="red" and text()="No interface found"]')
 							->one()->isVisible()
@@ -545,11 +523,19 @@ class testLowLevelDiscovery extends CWebTest {
 
 				// Timeout fields' dependency.
 				$timeout_array = [
-					'Global' => ['enabled' => false, 'visible' => true],
-					'Override' => ['enabled' => true, 'visible' => true]
+					'Global' => [
+						'id:inherited_timeout' => ['enabled' => false, 'visible' => true],
+						'id:timeout' => ['enabled' => false, 'visible' => false]
+					],
+					'Override' => [
+						'id:inherited_timeout' => ['enabled' => false, 'visible' => false],
+						'id:timeout' => ['enabled' => true, 'visible' => true]
+					]
 				];
-				foreach ($timeout_array as $timeout => $status) {
-					$this->checkFieldsDependency($form, ['id:custom_timeout' => $timeout], ['id:timeout' => $status]);
+				foreach ($timeout_array as $timeout => $statuses) {
+					foreach ($statuses as $id => $status) {
+						$this->checkFieldsDependency($form, ['id:custom_timeout' => $timeout], [$id => $status]);
+					}
 				}
 
 				// Check Timeouts link.
@@ -630,18 +616,16 @@ class testLowLevelDiscovery extends CWebTest {
 
 	/**
 	 * Test for checking LLD update form without any changes.
-	 *
-	 * @param string $context    is LLD updated on Host or on Template
 	 */
-	protected function checkSimpleUpdate($context = 'host') {
+	protected function checkSimpleUpdate() {
 		$old_hash = CDBHelper::getHash(self::SQL);
 
-		$url = ($context === 'template')
+		$url = (static::$context === 'template')
 			? static::$templateid.'&context=template'
 			: static::$hostid.'&context=host';
 
 		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.$url);
-		$this->query('link:LLD for simple update scenario')->waitUntilClickable()->one()->click();
+		$this->query('link', self::SIMPLE_UPDATE_CLONE_LLD)->waitUntilClickable()->one()->click();
 		$this->query('button:Update')->waitUntilClickable()->one()->click();
 		$this->assertMessage(TEST_GOOD, 'Discovery rule updated');
 		$this->page->assertTitle('Configuration of discovery rules');
@@ -2340,9 +2324,8 @@ class testLowLevelDiscovery extends CWebTest {
 	 *
 	 * @param array   $data       data provider
 	 * @param boolean $update     true for update scenario, false for create
-	 * @param string  $context    is LLD updated on Host or on Template
 	 */
-	protected function checkForm($data, $update = false, $context = 'host') {
+	protected function checkForm($data, $update = false) {
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			$old_hash = CDBHelper::getHash(self::SQL);
 		}
@@ -2354,7 +2337,7 @@ class testLowLevelDiscovery extends CWebTest {
 			$data['fields']['Key'] = 'upd.'.$data['fields']['Key'];
 		}
 
-		$url = ($context === 'template')
+		$url = (static::$context === 'template')
 			? static::$templateid.'&context=template'
 			: static::$interfaces_hostid.'&context=host';
 
@@ -2363,7 +2346,7 @@ class testLowLevelDiscovery extends CWebTest {
 				->one()->click();
 		$form = $this->query('id:host-discovery-form')->asForm()->waitUntilVisible()->one();
 
-		if ($context === 'template') {
+		if (static::$context === 'template') {
 			unset($data['fields']['Host interface']);
 		}
 
@@ -2471,14 +2454,14 @@ class testLowLevelDiscovery extends CWebTest {
 			}
 
 			// Rewrite complex interface value for SNMP.
-			if ($context === 'host') {
+			if (static::$context === 'host') {
 				if (CTestArrayHelper::get($data, 'checked_interface', false)) {
 					$data['fields']['Host interface'] = $data['checked_interface'];
 				}
 			}
 
 			if ($data['fields']['Type'] === 'Dependent item') {
-				$data['fields']['Master item'] = ($context === 'template')
+				$data['fields']['Master item'] = (static::$context === 'template')
 					? 'Template with LLD: Master item'
 					: 'Host for LLD form test with all interfaces: Master item';
 			}
@@ -2536,6 +2519,258 @@ class testLowLevelDiscovery extends CWebTest {
 		}
 	}
 
+	/**
+	 * Data for checking that LLD fields are being cloned correctly.
+	 * Note that preprocessing cloning is fully checked in
+	 * testFormPreprocessingCloneHost and testFormPreprocessingCloneTemplate.
+	 */
+	public static function getCloneData() {
+		return [
+			// #0 Clone with the same fields.
+			[
+				[
+					'expected' => TEST_BAD
+				]
+			],
+			// #1 Clone with just change LLD key but the same other fields.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Key' => 'simple_update_clone_key[cloned]'
+					],
+					'expected_fields' => [
+						'Name' => self::SIMPLE_UPDATE_CLONE_LLD,
+						'Type' => 'HTTP agent',
+						'Key' => 'simple_update_clone_key[cloned]',
+						'URL' => 'https://www.test.com/search',
+						'name:query_fields[0][name]' => 'test_name1',
+						'name:query_fields[0][value]' => 'value1',
+						'name:query_fields[1][name]' => '2',
+						'name:query_fields[1][value]' => 'value2',
+						'Request type' => 'HEAD',
+						'Request body type' => 'JSON data',
+						'Request body' => '{"zabbix_export": {"version": "6.0","date": "2024-03-20T20:05:14Z"}}',
+						'name:headers[0][name]' => 'name1',
+						'name:headers[0][value]' => 'value',
+						'Required status codes' => '400, 600',
+						'Follow redirects' => true,
+						'Retrieve mode' => 'Headers',
+						'HTTP proxy' => '161.1.1.5',
+						'HTTP authentication' => 'NTLM',
+						'id:http_username' => 'user',
+						'id:http_password' => 'pass',
+						'SSL verify peer' => true,
+						'SSL verify host' => true,
+						'SSL certificate file' => '/home/test/certdb/ca.crt',
+						'SSL key file' => '/home/test/certdb/postgresql-server.crt',
+						'SSL key password' => '/home/test/certdb/postgresql-server.key',
+						'Update interval' => '1h',
+						'id:custom_timeout' => 'Override',
+						'id:timeout' => '10s',
+						'id:lifetime_type' => 'After',
+						'id:lifetime' => '15d',
+						'id:enabled_lifetime_type' => 'Never',
+						'Enable trapping' => true,
+						'Allowed hosts' => '127.0.2.3',
+						'Description' => 'LLD for test',
+						'Enabled' => true,
+						// Preprocessing tab.
+						'id:preprocessing_0_type' => 'Replace',
+						'id:preprocessing_0_params_0' => 'a',
+						'id:preprocessing_0_params_1' => 'b',
+						// LLD macros tab.
+						'id:lld_macro_paths_0_lld_macro' => '{#MACRO}',
+						'id:lld_macro_paths_0_path' => '$.path',
+						// Filters tab.
+						'id:conditions_0_macro' => '{#MACRO}',
+						'name:conditions[0][operator]' => 'does not match',
+						'id:conditions_0_value' => 'expression'
+					],
+					'Overrides' => [
+						'Name' => 'Override',
+						'If filter matches' => 'Stop processing',
+						'id:overrides_filters_0_macro' => '{#MACRO}',
+						'name:overrides_filters[0][operator]' => 'exists'
+					]
+				]
+			],
+			// #2 Clone with all fields change.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => self::SIMPLE_UPDATE_CLONE_LLD.' cloned with field changes',
+						'Type' => 'SSH agent',
+						'Key' => 'simple_update_clone_key[cloned_2]',
+						'Host interface' => '127.0.0.1:10050',
+						'User name' => 'cloned_username',
+						'Password' => 'cloned_password',
+						'Executed script' => 'test_script',
+						'Update interval' => '65s',
+						'id:delay_flex_0_type' => 'Scheduling',
+						'id:delay_flex_0_schedule' => 'wd3-4h3-5',
+						'id:lifetime_type' => 'Immediately',
+						'Description' => 'New cloned description',
+						'Enabled' => false
+					],
+					'Preprocessing' => [
+						['type' => 'Prometheus to JSON', 'parameter_1' => '{label_name!~"name"}']
+					],
+					'LLD macros' => [
+						['LLD macro' => '{#CLONED_MACRO}', 'JSONPath' => '$.cloned.path.a']
+					],
+					'Filters' => [
+						[
+							'Macro' => '{#CLONED_FILTER_MACRO}',
+							'Regular expression' => 'cloned_expression',
+							'operator' => 'matches'
+						]
+					],
+					'change_overrides' => true,
+					'Overrides' => [
+						'Name' => 'New Cloned override',
+						'If filter matches' => 'Continue overrides',
+						'id:overrides_filters_0_macro' => '{#NEW_CLONED_MACRO}',
+						'name:overrides_filters[0][operator]' => 'does not exist'
+					],
+					'expected_fields' => [
+						'Name' => self::SIMPLE_UPDATE_CLONE_LLD.' cloned with field changes',
+						'Type' => 'SSH agent',
+						'Key' => 'simple_update_clone_key[cloned_2]',
+						'Host interface' => '127.0.0.1:10050',
+						'User name' => 'cloned_username',
+						'Password' => 'cloned_password',
+						'Executed script' => 'test_script',
+						'Update interval' => '65s',
+						'id:delay_flex_0_type' => 'Scheduling',
+						'id:delay_flex_0_schedule' => 'wd3-4h3-5',
+						'id:lifetime_type' => 'Immediately',
+						'Description' => 'New cloned description',
+						'Enabled' => false,
+						// Preprocessing tab.
+						'id:preprocessing_0_type' => 'Prometheus to JSON',
+						'id:preprocessing_0_params_0' => '{label_name!~"name"}',
+						// LLD macros tab.
+						'id:lld_macro_paths_0_lld_macro' => '{#CLONED_MACRO}',
+						'id:lld_macro_paths_0_path' => '$.cloned.path.a',
+						// Filters tab.
+						'id:conditions_0_macro' => '{#CLONED_FILTER_MACRO}',
+						'name:conditions[0][operator]' => 'matches',
+						'id:conditions_0_value' => 'cloned_expression'
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * Test for checking LLD cloning.
+	 *
+	 * @param  array $data       given data provider
+	 */
+	public function checkClone($data) {
+		if ($data['expected'] === TEST_BAD) {
+			$old_hash = CDBHelper::getHash(self::SQL);
+		}
+
+		$url = (static::$context === 'template')
+			? static::$templateid.'&context=template'
+			: static::$hostid.'&context=host';
+
+		$host_name = (static::$context === 'template') ? 'Template with LLD' : 'Host for LLD form test';
+		$original_key = 'simple_update_clone_key';
+		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.$url);
+		$this->query('link', self::SIMPLE_UPDATE_CLONE_LLD)->waitUntilClickable()->one()->click();
+		$form = $this->query('id:host-discovery-form')->asForm()->waitUntilVisible()->one();
+		$form->query('button:Clone')->waitUntilClickable()->one()->click();
+		$form->invalidate();
+		$this->assertEquals(['Add', 'Test', 'Cancel'], $form->query('xpath:.//div[@class="form-actions"]/button')
+				->all()->filter(CElementFilter::CLICKABLE)->asText()
+		);
+
+		if (CTestArrayHelper::get($data, 'fields')) {
+			if (static::$context === 'template') {
+				unset($data['fields']['Host interface']);
+				unset($data['expected_fields']['Host interface']);
+			}
+
+			$form->fill($data['fields']);
+		}
+
+		// Change Preprocessing.
+		if (array_key_exists('Preprocessing', $data)) {
+			$form->selectTab('Preprocessing');
+			$form->query('name:preprocessing[0][remove]')->waitUntilClickable()->one()->click();
+			$this->addPreprocessingSteps($data['Preprocessing']);
+		}
+
+		// Change LLD macros.
+		if (array_key_exists('LLD macros', $data)) {
+			$form->selectTab('LLD macros');
+			$this->fillComplexFields($data['LLD macros'], $form, 'LLD macros', 'textarea');
+		}
+
+		// Change Filters.
+		if (array_key_exists('Filters', $data)) {
+			$form->selectTab('Filters');
+			$this->fillComplexFields($data['Filters'], $form, 'Filters', 'input');
+		}
+
+		// Change Overrides.
+		if (array_key_exists('Overrides', $data) && CTestArrayHelper::get($data, 'change_overrides')) {
+			$form->selectTab('Overrides');
+			$form->query('link:Override')->waitUntilClickable()->one()->click();
+			$override_dialog_form = COverlayDialogElement::find()->all()->last()->asForm()->waitUntilReady();
+			$override_dialog_form->fill($data['Overrides']);
+			$override_dialog_form->submit();
+			$override_dialog_form->waitUntilNotVisible();
+		}
+
+		$form->submit();
+
+		if ($data['expected'] === TEST_GOOD) {
+			$this->assertMessage(TEST_GOOD, 'Discovery rule created');
+
+			// Check that LLD created on the right host.
+			$this->page->assertHeader('Discovery rules');
+			$this->assertTrue($this->query('xpath://ul[@class="breadcrumbs"]//a[text()='.
+					CXPathHelper::escapeQuotes($host_name).']')->one()->isClickable()
+			);
+
+			// Open created new LLD form.
+			$this->query('class:list-table')->asTable()->one()->findRow('Key', $data['fields']['Key'])
+					->getColumn('Name')->query('tag:a')->waitUntilClickable()->one()->click();
+			$form->invalidate();
+			$form->checkValue($data['expected_fields']);
+
+			if (array_key_exists('Overrides', $data)) {
+				$form->selectTab('Overrides');
+				$override_name = CTestArrayHelper::get($data, 'change_overrides', false)
+					? $data['Overrides']['Name']
+					: 'Override';
+				$form->query('link', $override_name)->waitUntilClickable()->one()->click();
+				$override_dialog_form = COverlayDialogElement::find()->all()->last()->asForm()->waitUntilReady();
+				$override_dialog_form->checkValue($data['Overrides']);
+				$override_dialog_form->submit();
+				$override_dialog_form->waitUntilNotVisible();
+			}
+
+			// Check that original LLD remained in DB.
+			$this->assertEquals(1, CDBHelper::getCount(
+				'SELECT * FROM items'.
+				' WHERE key_='.zbx_dbstr($original_key).
+					' AND flags=1'
+			));
+		}
+		else {
+			$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
+			$this->assertMessage(TEST_BAD, 'Cannot add discovery rule', 'An LLD rule with key "'.$original_key.'"'.
+					' already exists on the '.static::$context.' "'.$host_name.'".'
+			);
+		}
+	}
+
 	public static function getCancelData() {
 		return [
 			[['action' => 'Add']],
@@ -2549,10 +2784,9 @@ class testLowLevelDiscovery extends CWebTest {
 	 * Check cancelling LLD form.
 	 *
 	 * @param array  $data       given data provider
-	 * @param string $context    is LLD updated on Host or on Template
 	 */
-	protected function checkCancel($data, $context = 'host') {
-		$url = ($context === 'template')
+	protected function checkCancel($data) {
+		$url = (static::$context === 'template')
 			? static::$templateid.'&context=template'
 			: static::$hostid.'&context=host';
 
@@ -2656,14 +2890,14 @@ class testLowLevelDiscovery extends CWebTest {
 				$form->query('link:Cancel override')->waitUntilClickable()->one()->click();
 			}
 
-			$overlay_dialog_form = COverlayDialogElement::find()->all()->last()->asForm()->waitUntilReady();
-			$overlay_dialog_form->fill($fields['overrides_fields']['filters']);
-			$overlay_dialog_form->getFieldContainer('Operations')->query('button:Add')->waitUntilClickable()->one()->click();
+			$override_dialog_form = COverlayDialogElement::find()->all()->last()->asForm()->waitUntilReady();
+			$override_dialog_form->fill($fields['overrides_fields']['filters']);
+			$override_dialog_form->getFieldContainer('Operations')->query('button:Add')->waitUntilClickable()->one()->click();
 			$operation_dialog_form = COverlayDialogElement::find()->all()->last()->asForm()->waitUntilReady();
 			$operation_dialog_form->fill($fields['overrides_fields']['operations']);
 			$operation_dialog_form->submit();
 			$operation_dialog_form->waitUntilNotVisible();
-			$overlay_dialog_form->submit();
+			$override_dialog_form->submit();
 			$operation_dialog_form->waitUntilNotVisible();
 		}
 
@@ -2675,11 +2909,9 @@ class testLowLevelDiscovery extends CWebTest {
 
 	/**
 	 * Check deleting LLD from Host or Template.
-	 *
-	 * @param string $context    is LLD deleted from Host or from Template
 	 */
-	protected function checkDelete($context = 'host') {
-		$url = ($context === 'template')
+	protected function checkDelete() {
+		$url = (static::$context === 'template')
 			? static::$templateid.'&context=template'
 			: static::$hostid.'&context=host';
 
@@ -2809,5 +3041,18 @@ class testLowLevelDiscovery extends CWebTest {
 				}
 			}
 		}
+	}
+
+	protected static function deleteData() {
+		$hostids = CDBHelper::getColumn('SELECT hostid FROM hosts_groups WHERE groupid='.zbx_dbstr(static::$groupid),
+				'hostid'
+		);
+
+		$delete_methods = (static::$context === 'host')
+			? ['host' => 'host.delete', 'group' => 'hostgroup.delete']
+			: ['host' => 'template.delete', 'group' => 'templategroup.delete'];
+
+		CDataHelper::call($delete_methods['host'], array_values($hostids));
+		CDataHelper::call($delete_methods['group'], [static::$groupid]);
 	}
 }
