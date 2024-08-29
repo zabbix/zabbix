@@ -197,7 +197,15 @@
         "value": "oldparam=value",
         "macrofunc": {
             "function": "regrepl",
-            "parameters": ["oldparam","newParam\/"]
+            "parameters": ["oldparam","newParam\\/"]
+        },
+        "result": "newParam\\/=value"
+    },
+    {
+        "value": "oldparam=value",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["oldparam","newParam/"]
         },
         "result": "newParam/=value"
     },
@@ -298,5 +306,21 @@
             "parameters": ["2{0}", "test", "2{0}", "test" ,"2{0}", "test" ,"2{0}", "test"]
         },
         "result": "testttesteteststestttestttestttesteteststestttestetestttesteteststesttteststestttesteteststestttestttestttesteteststestttestttestttesteteststestttestttestttesteteststestttestetestttesteteststesttteststestttesteteststestttestttestttesteteststestttestetestttesteteststestttestttestttesteteststestttestetestttesteteststesttteststestttesteteststestttestttestttesteteststesttteststestttesteteststestttestttestttesteteststestttestetestttesteteststesttteststestttesteteststestttestttestttesteteststestttestttestttesteteststestttestttestttesteteststestttestetestttesteteststesttteststestttesteteststestttestttestttesteteststestttestatestttesteteststestttestttestttesteteststestttestetestttesteteststesttteststestttesteteststestttestttestttesteteststestttestttestttesteteststestttestttestttesteteststestttestetestttesteteststesttteststestttesteteststestttestttestttesteteststestttestetestttesteteststestttestttestttesteteststestttestetestttesteteststesttteststestttesteteststestttestttestttesteteststesttteststestttesteteststestttestttestttesteteststestttestetestttesteteststesttteststestttesteteststestttestttestttesteteststestttestttestttesteteststestttestttestttesteteststestttestetestttesteteststesttteststestttesteteststestttestttestttesteteststestttestbtestttesteteststestttestttestttesteteststestttestetestttesteteststesttteststestttesteteststestttestttestttesteteststestttestttestttesteteststestttestttestttesteteststestttestetestttesteteststesttteststestttesteteststestttestttestttesteteststestttestetestttesteteststestttestttestttesteteststestttestetestttesteteststesttteststestttesteteststestttestttestttesteteststesttteststestttesteteststestttestttestttesteteststestttestetestttesteteststesttteststestttesteteststestttestttestttesteteststestttestttestttesteteststestttestttestttesteteststestttestetestttesteteststesttteststestttesteteststestttestttestttesteteststestttestctestttesteteststestttestttestttesteteststestttestetestttesteteststesttteststestttesteteststestttestttestttesteteststestttestttestttesteteststestttestttestttesteteststestttestetestttesteteststesttteststestttesteteststestttestttestttesteteststestttestetestttesteteststestttestttestttesteteststestttestetestttesteteststesttteststestttesteteststestttestttestttesteteststesttteststestttesteteststestttestttestttesteteststestttestetestttesteteststesttteststestttesteteststestttestttestttesteteststestttestttestttesteteststestttestttestttesteteststestttestetestttesteteststesttteststestttesteteststestttestttestttesteteststestttestdtestttesteteststestttestttestttesteteststestttestetestttesteteststesttteststestttesteteststestttestttestttesteteststestttestttestttesteteststestttestttestttesteteststestttestetestttesteteststesttteststestttesteteststestttestttestttesteteststestttestetestttesteteststestttestttestttesteteststestttestetestttesteteststesttteststestttesteteststestttestttestttesteteststesttteststestttesteteststestttestttestttesteteststestttestetestttesteteststesttteststestttesteteststestttestttestttesteteststestttestttestttesteteststestttestttestttesteteststestttestetestttesteteststesttteststestttesteteststestttestttestttesteteststestttestetestttesteteststestttestttestttesteteststestttestetestttesteteststesttteststestttesteteststestttestttestttesteteststestttestttestttesteteststestttestttestttesteteststestttestetestttesteteststesttteststestttesteteststestttestttestttesteteststestttestetestttesteteststestttestttestttesteteststestttestetestttesteteststesttteststestttesteteststestttestttestttesteteststesttteststestttesteteststestttestttestttesteteststestttestetestttesteteststesttteststestttesteteststestttestttestttesteteststestttestttestttesteteststestttestttestttesteteststestttestetestttesteteststesttteststestttesteteststestttestttestttesteteststestttestftestttesteteststestttestttestttesteteststestttestetestttesteteststesttteststestttesteteststestttestttestttesteteststestttestttestttesteteststestttestttestttesteteststestttestetestttesteteststesttteststestttesteteststestttestttestttesteteststestttestetestttesteteststestttestttestttesteteststestttestetestttesteteststesttteststestttesteteststestttestttestttesteteststesttteststestttesteteststestttestttestttesteteststestttestetestttesteteststesttteststestttesteteststestttestttestttesteteststestttestttestttesteteststestttestttestttesteteststestttestetestttesteteststesttteststestttesteteststestttestttestttesteteststestttest"
+    },
+    {
+        "value": "abcdefghijk",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["([a])([b])([c])([d])([e])([f])([g])([h])([i])([j])([k])", "X\\10"]
+        },
+        "result": "Xa0"
+    },
+    {
+        "value": "abcdefghijk",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["([a])([b])([c])([d])([e])([f])([g])([h])([i])([j])([k])", "X\\30"]
+        },
+        "result": "Xc0"
     }
 ]

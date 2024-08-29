@@ -149,6 +149,8 @@ class CMacroFunction {
 					continue;
 				}
 
+				$replacement = self::handleReplacement($replacement);
+
 				// Escape '/' characters that are not already escaped.
 				$pattern = preg_replace('/\\\?\//', '\\/', $pattern);
 
@@ -164,9 +166,7 @@ class CMacroFunction {
 				// Get all matches of the pattern in the string
 				$matches = [];
 
-				if (@preg_match_all($pattern, $value, $matches) === false) {
-					return UNRESOLVED_MACRO_STRING;
-				}
+				@preg_match_all($pattern, $value, $matches);
 
 				// Estimate the new length of value after replacements, and return *UNKNOWN* if it exceeds 64KB.
 				foreach ($matches[0] as $match) {
@@ -178,7 +178,17 @@ class CMacroFunction {
 					}
 				}
 
-				$value = preg_replace($pattern, $replacement, $value);
+				$replacement = function(array $matches) use ($replacement) {
+					$result = $replacement;
+
+					for ($i = 1; $i <= 9; $i++) {
+						$result = str_replace('\\' . $i, $matches[$i] ?? '', $result);
+					}
+
+					return $result;
+				};
+
+				$value = preg_replace_callback($pattern, $replacement, $value);
 			}
 		}
 		catch (Exception) {
@@ -186,6 +196,38 @@ class CMacroFunction {
 		}
 
 		return $value;
+	}
+
+	/**
+	 * Handle escape sequences in replacement string.
+	 *
+	 * @param string $replacement The replacement string to be processed.
+	 */
+	private static function handleReplacement(string $replacement): string {
+		$upd_replacement = '';
+		$length = strlen($replacement);
+		$i = 0;
+
+		while ($i < $length) {
+			if ($replacement[$i] === '\\') {
+				if ($i + 1 < $length && $replacement[$i + 1] === '\\') {
+					// Append the char as-is and skip the next character.
+					$upd_replacement .= $replacement[$i];
+					$i++;
+				}
+				else {
+					// Append the single backslash and the next character as-is.
+					$upd_replacement .= '\\' . $replacement[$i + 1];
+					$i++;
+				}
+			}
+			else {
+				$upd_replacement .= $replacement[$i];
+			}
+			$i++;
+		}
+
+		return $upd_replacement;
 	}
 
 	/**
