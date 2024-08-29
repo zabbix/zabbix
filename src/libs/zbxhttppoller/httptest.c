@@ -1205,9 +1205,9 @@ int	process_httptests(int now, const char *config_source_ip, const char *config_
 
 			um_handle = zbx_dc_open_user_macros();
 			zbx_substitute_macros(&httptest.httptest.ssl_cert_file, NULL, 0, &macro_httptest_field_resolv,
-					um_handle, host);
+					um_handle, &host);
 			zbx_substitute_macros(&httptest.httptest.ssl_key_file, NULL, 0, &macro_httptest_field_resolv,
-					um_handle, host);
+					um_handle, &host);
 			zbx_dc_close_user_macros(um_handle);
 
 			httptest.httptest.ssl_key_password = zbx_strdup(NULL, row[13]);
