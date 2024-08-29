@@ -281,13 +281,13 @@ func (p *Plugin) execute(jsonRunner bool) (*runner, error) {
 			default:
 				deviceInfo, err := getBasicDeviceInfo(p.ctl, name) //nolint:govet
 
-				if errors.Is(err, ErrNoSmartStatus) {
-					p.Logger.Debugf("skipping device with no smart status: %q", name)
-
-					return nil
-				}
-
 				if err != nil {
+					if errors.Is(err, ErrNoSmartStatus) {
+						p.Logger.Debugf("skipping device with no smart status: %s", name)
+
+						return nil
+					}
+
 					return err
 				}
 
