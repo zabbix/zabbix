@@ -1989,6 +1989,56 @@ func Test_runner_parseOutput(t *testing.T) {
 			},
 		},
 		{
+			"+bothFieldsSetJSONRunner",
+			args{
+				true,
+			},
+			fields{
+				devices: map[string]deviceParser{
+					"/dev/sda": {SerialNumber: "Serial123"},
+					"/dev/sdb": {SerialNumber: "Serial123"},
+				},
+				jsonDevices: map[string]jsonDevice{
+					"/dev/sda": {"Serial123", "data1"},
+					"/dev/sdb": {"Serial123", "data2"},
+				},
+			},
+			runner{
+				devices: map[string]deviceParser{
+					"/dev/sda": {SerialNumber: "Serial123"},
+					"/dev/sdb": {SerialNumber: "Serial123"},
+				},
+				jsonDevices: map[string]jsonDevice{
+					"/dev/sda": {"Serial123", "data1"},
+				},
+			},
+		},
+		{
+			"+bothFieldsSetDeviceRunner",
+			args{
+				false,
+			},
+			fields{
+				devices: map[string]deviceParser{
+					"/dev/sda": {SerialNumber: "Serial123"},
+					"/dev/sdb": {SerialNumber: "Serial123"},
+				},
+				jsonDevices: map[string]jsonDevice{
+					"/dev/sda": {"Serial123", "data1"},
+					"/dev/sdb": {"Serial123", "data2"},
+				},
+			},
+			runner{
+				devices: map[string]deviceParser{
+					"/dev/sda": {SerialNumber: "Serial123"},
+				},
+				jsonDevices: map[string]jsonDevice{
+					"/dev/sda": {"Serial123", "data1"},
+					"/dev/sdb": {"Serial123", "data2"},
+				},
+			},
+		},
+		{
 			"+nonJSONRunnerWithUniqueDevices",
 			args{
 				false,
@@ -2051,6 +2101,23 @@ func Test_runner_parseOutput(t *testing.T) {
 			},
 			runner{
 				devices: map[string]deviceParser{},
+			},
+		},
+		{
+			"-prevData",
+			args{
+				true,
+			},
+			fields{
+				jsonDevices: map[string]jsonDevice{
+					"/dev/sda": {"Serial123", "data1"},
+					"/dev/sdb": {"Serial123", "data2"},
+				},
+			},
+			runner{
+				jsonDevices: map[string]jsonDevice{
+					"/dev/sda": {"Serial123", "data1"},
+				},
 			},
 		},
 	}
