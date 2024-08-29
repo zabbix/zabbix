@@ -203,6 +203,104 @@ func TestPlugin_execute(t *testing.T) {
 			false,
 		},
 		{
+			"+multiple",
+			args{
+				jsonRunner: false,
+			},
+			[]expectation{
+				{
+					args: []string{"--scan", "-j"},
+					err:  nil,
+					//nolint:lll
+					out: []byte(`{
+									"json_format_version": [1, 0],
+									"smartctl": {
+										"version": [7, 1],
+										"svn_revision": "5022",
+										"platform_info": "x86_64-w64-mingw32-w10-b19045",
+										"build_info": "(sf-7.1-1)"
+									},
+									"devices": [
+										{
+										"name": "/dev/sda",
+										"info_name": "/dev/sda",
+										"type": "nvme",
+										"protocol": "NVMe"
+										},
+										{
+										"name": "IOService:/AppleARMPE/arm-io@10F00000/AppleT811xIO/ans@77400000/AppleASCWrapV4/iop-ans-nub/RTBuddy(ANS2)/RTBuddyService/AppleANS3NVMeController/NS_01@1",
+										"info_name": "IOService:/AppleARMPE/arm-io@10F00000/AppleT811xIO/ans@77400000/AppleASCWrapV4/iop-ans-nub/RTBuddy(ANS2)/RTBuddyService/AppleANS3NVMeController/NS_01@1",
+										"type": "nvme",
+										"protocol": "NVMe"
+										}
+									]
+									}
+								`),
+				},
+				{
+					args: []string{"--scan", "-d", "sat", "-j"},
+					err:  nil,
+					out:  []byte(`{}`),
+				},
+				{
+					args: []string{"-a", "/dev/sda", "-j"},
+					err:  nil,
+					out:  mock.OutputAllDiscInfoSDA,
+				},
+				{
+					args: []string{
+						"-a",
+						"IOService:/AppleARMPE/arm-io@10F00000/AppleT811xIO/ans@77400000/AppleASCWrapV4/iop-ans-nub/RTBuddy(ANS2)/RTBuddyService/AppleANS3NVMeController/NS_01@1", //nolint:lll
+						"-j",
+					},
+					err: nil,
+					out: mock.OutputAllDiscInfoMac,
+				},
+			},
+			&runner{
+				jsonDevices: nil,
+				devices: map[string]deviceParser{
+					"/dev/sda": {
+						ModelName:    "SAMSUNG MZVL21T0HCLR-00BH1",
+						SerialNumber: "S641NX0T509005",
+						Info: deviceInfo{
+							Name:     "/dev/sda",
+							InfoName: "/dev/sda",
+							DevType:  "nvme",
+							name:     "/dev/sda",
+						},
+						Smartctl: smartctlField{
+							Version: []int{7, 1},
+						},
+						SmartStatus:     &smartStatus{SerialNumber: true},
+						SmartAttributes: smartAttributes{},
+					},
+					"IOService:/AppleARMPE/arm-io@10F00000/AppleT811xIO/ans@77400000/AppleASCWrapV4/iop-ans-nub/RTBuddy(ANS2)/RTBuddyService/AppleANS3NVMeController/NS_01@1": { //nolint:lll
+						ModelName:    "APPLE SSD AP0512Z",
+						SerialNumber: "0ba02202c4bc1a1e",
+						Info: deviceInfo{
+							Name:     "IOService:/AppleARMPE/arm-io@10F00000/AppleT811xIO/ans@77400000/AppleASCWrapV4/iop-ans-nub/RTBuddy(ANS2)/RTBuddyService/AppleANS3NVMeController/NS_01@1", //nolint:lll
+							InfoName: "IOService:/AppleARMPE/arm-io@10F00000/AppleT811xIO/ans@77400000/AppleASCWrapV4/iop-ans-nub/RTBuddy(ANS2)/RTBuddyService/AppleANS3NVMeController/NS_01@1", //nolint:lll
+							DevType:  "nvme",
+							name:     "IOService:/AppleARMPE/arm-io@10F00000/AppleT811xIO/ans@77400000/AppleASCWrapV4/iop-ans-nub/RTBuddy(ANS2)/RTBuddyService/AppleANS3NVMeController/NS_01@1", //nolint:lll
+						},
+						Smartctl: smartctlField{
+							Version:    []int{7, 4},
+							ExitStatus: 4,
+							Messages: []message{
+								{
+									"Read 1 entries from Error Information Log failed: GetLogPage failed: system=0x38, sub=0x0, code=745", //nolint:lll
+								},
+							},
+						},
+						SmartStatus:     &smartStatus{SerialNumber: true},
+						SmartAttributes: smartAttributes{},
+					},
+				},
+			},
+			false,
+		},
+		{
 			"+mac",
 			args{
 				jsonRunner: false,
