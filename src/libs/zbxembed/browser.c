@@ -67,7 +67,7 @@ static duk_ret_t	es_browser_dtor(duk_context *ctx)
 
 	zabbix_log(LOG_LEVEL_TRACE, "Browser::~Browser()");
 
-	if (NULL != (wd = (zbx_webdriver_t *)es_obj_detach_data(env, ES_OBJ_BROWSER)))
+	if (NULL != (wd = (zbx_webdriver_t *)es_obj_detach_data(env, duk_require_heapptr(ctx, -1), ES_OBJ_BROWSER)))
 	{
 		webdriver_release(wd);
 		env->browser_objects--;
@@ -89,6 +89,7 @@ static duk_ret_t	es_browser_ctor(duk_context *ctx)
 	zbx_es_env_t	*env;
 	int		err_index = -1;
 	char		*error = NULL, *capabilities = NULL;
+	void		*objptr = NULL;
 
 	if (!duk_is_constructor_call(ctx))
 		return DUK_RET_TYPE_ERROR;
@@ -128,7 +129,8 @@ static duk_ret_t	es_browser_ctor(duk_context *ctx)
 	}
 
 	duk_push_this(ctx);
-	es_obj_attach_data(env, wd, ES_OBJ_BROWSER);
+	objptr = duk_require_heapptr(ctx, -1);
+	es_obj_attach_data(env, objptr, wd, ES_OBJ_BROWSER);
 	wd->browser = duk_get_heapptr(ctx, -1);
 
 	if (SUCCEED != webdriver_open_session(wd, capabilities, &error))
@@ -147,7 +149,7 @@ out:
 	{
 		if (NULL != wd)
 		{
-			(void)es_obj_detach_data(env, ES_OBJ_BROWSER);
+			(void)es_obj_detach_data(env, objptr, ES_OBJ_BROWSER);
 			webdriver_release(wd);
 		}
 
