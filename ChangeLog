@@ -1,8 +1,28 @@
 Changes for 7.0.4rc1
 
 New features:
+.........T [ZBXNEXT-9398] added new mediatype webhook MS Teams Workflow (abiba)
+.........T [ZBXNEXT-9341] added assume role authorization in AWS templates (egordymov)
 
 Bug fixes:
+........S. [ZBX-24636] fixed {HOST.CONN}, {HOST.DNS} and {HOST.IP} to be resolved to unknown in notifications instead of stopping resolving and to be resolved to empty when there is no interface (vso)
+..F....... [ZBX-24554] added improvements and fixes for binary item usage in Item history widget (dfofanovs)
+..F....... [ZBX-24728] fixed Item history widget column namings being too long after item selection (dfofanovs)
+A......... [ZBX-24339] fixed validation of invalid API methods being passed down in user role rules (Ivo)
+........S. [ZBX-24760] fixed default timezone in macro {EVENT.DATE} & {EVENT.TIME} expansion (mprihodko)
+.......PS. [ZBX-24787] fixed execution of remote commands when agent interface is not present (dgoloscapov)
+..F....... [ZBX-24147] fixed translation strings and comments to gender neutral ones (dpetra)
+........S. [ZBX-25023] fixed usage of old libevent library versions (sboidenko)
+..F....... [ZBX-24650] fixed {ITEM.LOG.SEVERITY} macro to resolve to event severity instead of trigger severity (esekace)
+..F....... [ZBX-24903] fixed row count in script dialog of script item (apoga)
+..F....... [ZBX-24730] fixed hintboxes in icon mapping (apoga)
+..F....... [ZBX-24200] fixed long custom severity names and count in Problems by severity widget (apoga)
+..F....... [ZBX-24466] fixed configuration map import not resetting element icons (talbergs)
+..F....... [ZBX-21663] implemented ability to keep timeselector expanded when changing pages in problem view (vmurzins)
+.......PS. [ZBX-24989] fixed memory leak in poller and snmp poller with SNMP agent item type when engine ID is frequently changed (vso)
+..F....... [ZBX-23174] fixed frontend maintenance configuration not following documentation (agriscenko)
+..F....... [ZBX-21838] fixed action names in mediatype and script lists being displayed differently; added total number of actions each mediatype/script being used in (agriscenko)
+........S. [ZBX-25009] improved configuration syncer performance when reading items and hostmacro table (vso)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.3
@@ -986,6 +1006,7 @@ Changes for 6.4.19rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-24879] fixed ODBC login with special characters in the password field (sboidenko)
 
 --------------------------------------------------------------------------------
 Changes for 6.4.18
@@ -2902,8 +2923,19 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 Changes for 6.0.34rc1
 
 New features:
+.........T [ZBXNEXT-9398] added new mediatype webhook MS Teams Workflow (abiba)
+.........T [ZBXNEXT-9341] added assume role authorization in AWS templates (egordymov)
 
 Bug fixes:
+..F....... [ZBX-24147] fixed translation strings and comments to gender neutral ones (dpetra)
+..F....... [ZBX-24903] fixed row count in script dialog of script item (apoga)
+..F....... [ZBX-24466] fixed configuration map import not resetting element icons (talbergs)
+..F....... [ZBX-21663] implemented ability to keep timeselector expanded when changing pages in problem view (vmurzins)
+..F....... [ZBX-23871] fixed incorrect order of "query_fields" and "headers" being sent to server in item test form (Ivo)
+..F....... [ZBX-23174] fixed frontend maintenance configuration not following documentation (agriscenko)
+A......... [ZBX-24339] fixed validation of invalid API methods being passed down in user role rules (Ivo)
+........S. [ZBX-24394] made trigger housekeeper documentation more precise (dgoloscapov)
+........S. [ZBX-24879] fixed ODBC login with special characters in the password field (sboidenko)
 ..F....... [ZBX-24650] fixed {ITEM.LOG.SEVERITY} macro to resolve to event severity instead of trigger severity (esekace)
 ........S. [ZBX-24760] fixed default timezone in macro {EVENT.DATE} & {EVENT.TIME} expansion (mprihodko)
 ..F....... [ZBX-21838] fixed max in table setting not being used to limit action count in mediatype list (agriscenko)
@@ -6097,6 +6129,7 @@ Changes for 5.0.44rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-24966] fixed sorting in Map navigation tree widget (apoga)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.43
