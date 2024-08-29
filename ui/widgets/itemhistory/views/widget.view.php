@@ -29,13 +29,13 @@ use Widgets\ItemHistory\Includes\{
 };
 
 $table = (new CTableInfo())->addClass($data['show_thumbnail'] ? 'show-thumbnail' : null);
-$is_layout_vertical = $data['layout'] == WidgetForm::LAYOUT_VERTICAL;
-$column_count = count($data['columns']);
 
 if ($data['error'] !== null) {
 	$table->setNoDataMessage($data['error']);
 }
 else {
+	$is_layout_vertical = $data['layout'] == WidgetForm::LAYOUT_VERTICAL;
+
 	if ($data['show_column_header'] != WidgetForm::COLUMN_HEADER_OFF) {
 		$table_header = [];
 
@@ -108,6 +108,7 @@ else {
 
 	if ($is_layout_vertical) {
 		$column_indexes = array_keys($data['columns']);
+		$column_count = count($data['columns']);
 
 		foreach ($rows as $row) {
 			$table_row = [];
@@ -272,14 +273,13 @@ function makeValueCell(array $column, array $item_value, bool $text_wordbreak = 
 							)
 						)
 						->addClass($text_wordbreak ? ZBX_STYLE_WORDBREAK : ZBX_STYLE_NOWRAP);
-
 					break;
 
 				case CWidgetFieldColumnsList::DISPLAY_SINGLE_LINE:
-					$single_line_value = substr($item_value['value'], 0, $column['max_length']);
+					$single_line_value = [mb_substr($item_value['value'], 0, $column['max_length'])];
 
 					if (strlen($item_value['value']) > $column['max_length']) {
-						$single_line_value .= '...';
+						$single_line_value[] = HELLIP();
 					}
 
 					$cell
@@ -289,14 +289,12 @@ function makeValueCell(array $column, array $item_value, bool $text_wordbreak = 
 							)
 						)
 						->addClass(ZBX_STYLE_NOWRAP);
-
 					break;
 
 				case CWidgetFieldColumnsList::DISPLAY_HTML:
 					$cell->addItem(
 						new CJsScript($item_value['value'])
 					);
-
 					break;
 			}
 
