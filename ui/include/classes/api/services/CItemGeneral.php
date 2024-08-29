@@ -52,7 +52,7 @@ abstract class CItemGeneral extends CApiService {
 	 *
 	 * @var int
 	 */
-	protected const CHUNK_SIZE = 1000;
+	public const CHUNK_SIZE = 1000;
 
 	/**
 	 * @abstract
