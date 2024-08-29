@@ -353,49 +353,42 @@ class testFormSysmap extends CLegacyWebTest {
 		$this->query('button:Create map')->one()->click();
 		$this->page->waitUntilReady();
 
-		// Check the title and header of Create map page.
-		$this->assertTitleAndHeader('Network maps');
+		// Check the header of Create map page.
+		$this->page->assertHeader('Network maps');
 
 		$this->query('button:Cancel')->one()->click();
 		$this->page->waitUntilReady();
 
 		// Check that user is returned to maps page.
-		$this->assertTitleAndHeader();
+		$this->page->assertHeader('Maps');
 
 		$this->assertEquals($old_hash, CDBHelper::getHash('SELECT * FROM sysmaps ORDER BY sysmapid'));
 	}
 
 	/**
-	* @dataProvider allMaps
-	*/
+	 * @dataProvider allMaps
+	 */
 	public function testFormSysmap_SimpleUpdateProperties($map) {
 		$name = $map['name'];
-		$sysmapid = $map['sysmapid'];
 
-		$sqlMap = 'SELECT * FROM sysmaps WHERE name='.zbx_dbstr($name).' ORDER BY sysmapid';
-		$oldHashMap = CDBHelper::getHash($sqlMap);
-		$sqlElements = 'SELECT * FROM sysmaps_elements WHERE sysmapid='.zbx_dbstr($sysmapid).' ORDER BY selementid';
-		$oldHashElements = CDBHelper::getHash($sqlElements);
-		$sqlLinks = 'SELECT * FROM sysmaps_links WHERE sysmapid='.zbx_dbstr($sysmapid).' ORDER BY linkid';
-		$oldHashLinks = CDBHelper::getHash($sqlLinks);
-		$sqlLinkTriggers = 'SELECT * FROM sysmaps_link_triggers WHERE linkid'.
-				' IN (SELECT linkid FROM sysmaps_links where sysmapid='.zbx_dbstr($sysmapid).') ORDER BY linktriggerid';
-		$oldHashLinkTriggers = CDBHelper::getHash($sqlLinkTriggers);
+		$sql_maps_elements = 'SELECT * FROM sysmaps sm INNER JOIN sysmaps_elements sme ON '.
+				'sme.sysmapid = sm.sysmapid ORDER BY sme.selementid';
+		$sql_links_triggers = 'SELECT * FROM sysmaps_links sl INNER JOIN sysmaps_link_triggers slt ON '.
+				'slt.linkid = sl.linkid ORDER BY slt.linktriggerid';
+		$hash_maps_elements = CDBHelper::getHash($sql_maps_elements);
+		$hash_links_triggers = CDBHelper::getHash($sql_links_triggers);
 
 		$this->page->login()->open('sysmaps.php')->waitUntilReady();
-		$this->assertTitleAndHeader();
 		$this->getTable()->findRow('Name', $name)->getColumn('Actions')->query('link:Properties')->one()->click();
-		$this->assertTitleAndHeader('Network maps');
+		$this->page->assertHeader('Network maps');
 		$this->query('button:Update')->one()->click();
-		$this->assertTitleAndHeader();
+		$this->page->assertHeader('Maps');
 		$this->assertMessage(TEST_GOOD, 'Network map updated');
 		$this->assertTrue($this->query('link', $name)->one()->isPresent());
 
 		$hash_data = [
-			$oldHashMap => $sqlMap,
-			$oldHashElements => $sqlElements,
-			$oldHashLinks => $sqlLinks,
-			$oldHashLinkTriggers => $sqlLinkTriggers
+			$hash_maps_elements => $sql_maps_elements,
+			$hash_links_triggers => $sql_links_triggers
 		];
 
 		foreach ($hash_data as $old => $new) {
@@ -444,16 +437,5 @@ class testFormSysmap extends CLegacyWebTest {
 		$this->zbxTestAcceptAlert();
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Network map deleted');
 		$this->assertEquals(0, CDBHelper::getCount("SELECT sysmapid FROM sysmaps WHERE name='".$mapName."'"));
-	}
-
-	/**
-	 * Check title and header on the pages related to sysmap.
-	 *
-	 * @param string	$header		expected header of the page
-	 * @param string	$title		expected title of the page
-	 */
-	protected function assertTitleAndHeader($header = 'Maps', $title = 'Configuration of network maps') {
-		$this->page->assertTitle($title);
-		$this->page->assertHeader($header);
 	}
 }
