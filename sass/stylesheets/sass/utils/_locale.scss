@@ -1,0 +1,18 @@
+.list-table {
+	thead {
+		th {
+			.text-vertical {
+				&:lang(ja) {
+					transform: unset;
+				}
+
+				&:lang(ko) {
+					transform: unset;
+				}
+				&:lang(zh) {
+					transform: unset;
+				}
+			}
+		}
+	}
+}

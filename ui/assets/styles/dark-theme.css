@@ -556,6 +556,13 @@ svg a {
   border-radius: 50%;
   background: #59db8f; }
 
+.list-table thead th .text-vertical:lang(ja) {
+  transform: unset; }
+.list-table thead th .text-vertical:lang(ko) {
+  transform: unset; }
+.list-table thead th .text-vertical:lang(zh) {
+  transform: unset; }
+
 .ui-resizable-border-n {
   border-top: 1px solid #768d99;
   height: 5px;
