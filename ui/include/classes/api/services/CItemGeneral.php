@@ -85,11 +85,18 @@ abstract class CItemGeneral extends CApiService {
 	protected const VALUE_TYPE_FIELD_NAMES = [];
 
 	/**
+	 * Maximum number of inheritable items per iteration.
+	 *
+	 * @var int
+	 */
+	protected const INHERIT_CHUNK_SIZE = 1000;
+
+	/**
 	 * Maximum number of items per iteration.
 	 *
 	 * @var int
 	 */
-	protected const CHUNK_SIZE = 1000;
+	public const CHUNK_SIZE = 1000;
 
 	/**
 	 * @abstract
@@ -716,11 +723,11 @@ abstract class CItemGeneral extends CApiService {
 		$last = 0;
 
 		foreach ($items as $i => $item) {
-			$hosts_chunks = array_chunk($tpl_links[$item['hostid']], self::CHUNK_SIZE, true);
+			$hosts_chunks = array_chunk($tpl_links[$item['hostid']], self::INHERIT_CHUNK_SIZE, true);
 
 			foreach ($hosts_chunks as $hosts) {
-				if ($chunks[$last]['size'] < self::CHUNK_SIZE) {
-					$_hosts = array_slice($hosts, 0, self::CHUNK_SIZE - $chunks[$last]['size'], true);
+				if ($chunks[$last]['size'] < self::INHERIT_CHUNK_SIZE) {
+					$_hosts = array_slice($hosts, 0, self::INHERIT_CHUNK_SIZE - $chunks[$last]['size'], true);
 
 					$can_add_hosts = !array_intersect_key($chunks[$last]['hosts'],
 						array_diff_key($tpl_links[$item['hostid']], $_hosts)
