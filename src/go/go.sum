@@ -99,6 +99,8 @@ golang.zabbix.com/sdk v1.2.2-0.20241126142911-f24a7742d7dd h1:kETJZ4NETHV59Lwi08
 golang.zabbix.com/sdk v1.2.2-0.20241126142911-f24a7742d7dd/go.mod h1:KFfJAnUsBIfLemmPVz7TJPliJAwYUSuj4v3n5W1qrCQ=
 golang.zabbix.com/sdk v1.2.2-0.20240823100626-55cc5171ea8d h1:qPdyM/C3qtNqWjk3WxnnaS80ls4KTQqyCSHmK/RremA=
 golang.zabbix.com/sdk v1.2.2-0.20240823100626-55cc5171ea8d/go.mod h1:KFfJAnUsBIfLemmPVz7TJPliJAwYUSuj4v3n5W1qrCQ=
+golang.zabbix.com/sdk v1.2.2-0.20240829081953-9c3f075ea54a h1:XrEAFILydVO+zKRYzPBjJE9w/CcGQ+yYfuRzi/OFiVY=
+golang.zabbix.com/sdk v1.2.2-0.20240829081953-9c3f075ea54a/go.mod h1:KFfJAnUsBIfLemmPVz7TJPliJAwYUSuj4v3n5W1qrCQ=
 google.golang.org/protobuf v1.34.1 h1:9ddQBjfCyZPOHPUiPxpYESBLc+T8P3E+Vo4IbKZgFWg=
 google.golang.org/protobuf v1.34.1/go.mod h1:c6P6GXX6sHbq/GpV6MGZEdwhWPcYBgnhAHhKbcUYpos=
 gopkg.in/asn1-ber.v1 v1.0.0-20181015200546-f715ec2f112d h1:TxyelI5cVkbREznMhfzycHdkp5cLA7DpE+GKjSslYhM=
