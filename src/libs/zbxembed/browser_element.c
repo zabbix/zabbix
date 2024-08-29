@@ -102,6 +102,11 @@ static duk_ret_t	wd_element_ctor(duk_context *ctx, zbx_webdriver_t *wd, const ch
 	duk_push_object(ctx);
 	es_obj_attach_data(env, duk_require_heapptr(ctx, -1), el, ES_OBJ_ELEMENT);
 
+	duk_push_string(ctx, "browser");
+	duk_push_heapptr(ctx, wd->browser);
+	duk_def_prop(ctx, -3, DUK_DEFPROP_HAVE_VALUE | DUK_DEFPROP_CLEAR_WRITABLE | DUK_DEFPROP_HAVE_ENUMERABLE |
+			DUK_DEFPROP_HAVE_CONFIGURABLE);
+
 	duk_push_c_function(ctx, wd_element_dtor, 1);
 	duk_set_finalizer(ctx, -2);
 
