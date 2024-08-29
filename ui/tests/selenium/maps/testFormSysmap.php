@@ -358,7 +358,7 @@ class testFormSysmap extends CLegacyWebTest {
 		$this->query('button:Create map')->one()->click();
 		$this->page->waitUntilReady();
 
-		// Check header of Create map page.
+		// Check the header of Create map page.
 		$this->page->assertHeader('Network maps');
 
 		$this->query('button:Cancel')->one()->click();
