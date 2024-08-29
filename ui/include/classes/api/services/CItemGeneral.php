@@ -92,13 +92,6 @@ abstract class CItemGeneral extends CApiService {
 	protected const INHERIT_CHUNK_SIZE = 1000;
 
 	/**
-	 * Maximum number of items per iteration.
-	 *
-	 * @var int
-	 */
-	public const CHUNK_SIZE = 1000;
-
-	/**
 	 * @abstract
 	 *
 	 * @param array $options
@@ -1909,77 +1902,6 @@ abstract class CItemGeneral extends CApiService {
 					'/'.($i + 1).'/interfaceid',
 					_s('the host interface ID of type "%1$s" is expected', interfaceType2str($interface_type))
 				));
-			}
-		}
-	}
-
-	/**
-	 * @param array $options    Array of query options.
-	 * @param array $result     Query results.
-	 */
-	protected function addRelatedGraphs(array $options, array &$result): void {
-		if ($options['selectGraphs'] !== null) {
-			if ($options['selectGraphs'] != API_OUTPUT_COUNT) {
-				$graphs = [];
-				$relationMap = $this->createRelationMap($result, 'itemid', 'graphid', 'graphs_items');
-				$related_ids = $relationMap->getRelatedIds();
-
-				if ($related_ids) {
-					$graphs = API::Graph()->get([
-						'output' => $options['selectGraphs'],
-						'graphids' => $related_ids,
-						'preservekeys' => true
-					]);
-
-					if (!is_null($options['limitSelects'])) {
-						order_result($graphs, 'name');
-					}
-				}
-
-				$result = $relationMap->mapMany($result, $graphs, 'graphs', $options['limitSelects']);
-			}
-			else {
-				$graphs = API::Graph()->get([
-					'countOutput' => true,
-					'groupCount' => true,
-					'itemids' => array_keys($result)
-				]);
-				$graphs = zbx_toHash($graphs, 'itemid');
-
-				foreach ($result as $itemid => $item) {
-					$result[$itemid]['graphs'] = array_key_exists($itemid, $graphs)
-						? $graphs[$itemid]['rowscount']
-						: '0';
-				}
-			}
-		}
-	}
-
-	/**
-	 * @param array $options    Array of query options.
-	 * @param array $result     Query results.
-	 */
-	protected function addRelatedItemTags(array $options, array &$result): void {
-		if ($options['selectTags'] !== null) {
-			$options['selectTags'] = ($options['selectTags'] !== API_OUTPUT_EXTEND)
-				? (array) $options['selectTags']
-				: ['tag', 'value'];
-
-			$options['selectTags'] = array_intersect(['tag', 'value'], $options['selectTags']);
-			$requested_output = array_flip($options['selectTags']);
-
-			array_walk($result, static function (&$item) {
-				$item['tags'] = [];
-			});
-
-			$db_tags = DBselect(
-				'SELECT '.implode(',', array_merge($options['selectTags'], ['itemid'])).
-				' FROM item_tag'.
-				' WHERE '.dbConditionInt('itemid', array_keys($result))
-			);
-
-			while ($db_tag = DBfetch($db_tags)) {
-				$result[$db_tag['itemid']]['tags'][] = array_intersect_key($db_tag, $requested_output);
 			}
 		}
 	}
