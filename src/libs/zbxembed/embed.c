@@ -825,12 +825,10 @@ zbx_es_env_t	*zbx_es_get_env(duk_context *ctx)
  *                                                                            *
  * Purpose: attach data pointer to current object                             *
  *                                                                            *
- * Return value: pointer of the js object the data was attached to            *
- *                                                                            *
  * Comments: This function must be used only from object constructor          *
  *                                                                            *
  ******************************************************************************/
-void	*es_obj_attach_data(zbx_es_env_t *env, void *objptr, void *data)
+void	es_obj_attach_data(zbx_es_env_t *env, void *objptr, void *data)
 {
 	zbx_es_obj_data_t	obj_local;
 

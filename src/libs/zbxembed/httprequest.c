@@ -170,10 +170,11 @@ static duk_ret_t	es_httprequest_ctor(duk_context *ctx)
 		return duk_error(ctx, DUK_RET_EVAL_ERROR, "maximum count of HttpRequest objects was reached");
 
 	duk_push_this(ctx);
+	objptr = duk_require_heapptr(ctx, -1);
 
 	request = (zbx_es_httprequest_t *)zbx_malloc(NULL, sizeof(zbx_es_httprequest_t));
 	memset(request, 0, sizeof(zbx_es_httprequest_t));
-	objptr = es_obj_attach_data(env, duk_require_heapptr(ctx, -1), request);
+	es_obj_attach_data(env, objptr, request);
 
 	if (NULL == (request->handle = curl_easy_init()))
 	{
