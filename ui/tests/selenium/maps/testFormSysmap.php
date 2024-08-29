@@ -355,7 +355,7 @@ class testFormSysmap extends CLegacyWebTest {
 	public function testFormSysmap_CancelCreate() {
 		$old_hash = CDBHelper::getHash('SELECT * FROM sysmaps ORDER BY sysmapid');
 		$this->page->login()->open('sysmaps.php');
-		$this->query('button:Create map')->one()->click();
+		$this->query('button:Create map')->waitUntilClickable()->one()->click();
 		$this->page->waitUntilReady();
 
 		// Check the header of Create map page.
