@@ -1841,11 +1841,11 @@ func Test_getPluginCapacity(t *testing.T) {
 	t.Parallel()
 
 	type args struct {
-		pluginSystemOptions  int
-		defaultCapacity      int
-		hardCodedMaxCapacity int
-		defaultMaxCapacity   int
-		pluginName           string
+		pluginSystemOptions int
+		defaultCapacity     int
+		pluginMaxCapacity   int
+		defaultMaxCapacity  int
+		pluginName          string
 	}
 
 	tests := []struct {
@@ -1940,7 +1940,7 @@ func Test_getPluginCapacity(t *testing.T) {
 			got := getPluginCapacity(
 				tt.args.pluginSystemOptions,
 				tt.args.defaultCapacity,
-				tt.args.hardCodedMaxCapacity,
+				tt.args.pluginMaxCapacity,
 				tt.args.defaultMaxCapacity,
 				tt.args.pluginName,
 			)

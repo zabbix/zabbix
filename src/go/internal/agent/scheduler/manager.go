@@ -699,12 +699,10 @@ func (m *Manager) addUserParamsPlugin(key string) {
 		}
 	}
 
-	capacity := defaultMaxCapacity
-
 	pagent := &pluginAgent{
 		impl:         metric.Plugin,
 		tasks:        make(performerHeap, 0),
-		maxCapacity:  capacity,
+		maxCapacity:  defaultMaxCapacity,
 		usedCapacity: 0,
 		index:        -1,
 		refcount:     0,

@@ -30,11 +30,12 @@ import (
 
 var impl Plugin
 
+// Options holds plugin options.
 type Options struct {
 	Interval int
 }
 
-// Plugin -
+// Plugin main plugin structure holding all the required data for plugin to operate over multiple exports.
 type Plugin struct {
 	plugin.Base
 	// counter int
@@ -48,7 +49,10 @@ func init() {
 	}
 }
 
-func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
+// Export returns plugin metric data.
+//
+//nolint:unparam // used for unused error parameter, which is needed for Exporter interface.
+func (p *Plugin) Export(key string, params []string, _ plugin.ContextProvider) (any, error) {
 	p.Debugf("export %s%v, with interval: %d", key, params, p.options.Interval)
 
 	if len(params) == 0 {
@@ -66,7 +70,8 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	return fmt.Sprintf("debug full test response, with parameters: %s", out), nil
 }
 
-func (p *Plugin) Configure(global *plugin.GlobalOptions, private interface{}) {
+// Configure loads the plugin configuration.
+func (p *Plugin) Configure(_ *plugin.GlobalOptions, private any) {
 	err := conf.UnmarshalStrict(private, &p.options)
 	if err != nil {
 		p.Warningf("cannot unmarshal configuration options: %s", err)
@@ -75,7 +80,8 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, private interface{}) {
 	p.Debugf("configure: interval=%d", p.options.Interval)
 }
 
-func (p *Plugin) Validate(private interface{}) error {
+// Validate validates the plugin configuration.
+func (p *Plugin) Validate(private any) error {
 	p.Debugf("executing Validate")
 
 	err := conf.UnmarshalStrict(private, &p.options)
@@ -86,10 +92,12 @@ func (p *Plugin) Validate(private interface{}) error {
 	return nil
 }
 
+// Start is run when plugin is started, useful for initialization of requirements.
 func (p *Plugin) Start() {
 	p.Debugf("executing Start")
 }
 
+// Stop is run when plugin is started, useful for clean up.
 func (p *Plugin) Stop() {
 	p.Debugf("executing Stop")
 }
