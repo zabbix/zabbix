@@ -163,11 +163,11 @@ try
 	}
 	el.click();
 
-	el = browser.findElement("xpath", "//button[contains(@confirm_plural, 'Disable selected host')]");
+	el = browser.findElement("xpath", "//button[text()='Disable']");
 
 	if (el === null)
 	{
-		throw Error("cannot find //button[contains(@confirm_plural, 'Disable selected host')]");
+		throw Error("cannot find //button[text()='Disable']");
 	}
 	el.click();
 
