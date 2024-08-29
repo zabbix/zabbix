@@ -33,6 +33,7 @@ static zbx_wd_element_t *wd_element(duk_context *ctx)
 {
 	zbx_wd_element_t	*el;
 	zbx_es_env_t		*env;
+	void			*objptr;
 
 	if (NULL == (env = zbx_es_get_env(ctx)))
 	{
@@ -41,7 +42,11 @@ static zbx_wd_element_t *wd_element(duk_context *ctx)
 		return NULL;
 	}
 
-	if (NULL == (el = (zbx_wd_element_t *)es_obj_get_data(env, ES_OBJ_ELEMENT)))
+	duk_push_this(ctx);
+	objptr = duk_require_heapptr(ctx, -1);
+	duk_pop(ctx);
+
+	if (NULL == (el = (zbx_wd_element_t *)es_obj_get_data(env, objptr, ES_OBJ_ELEMENT)))
 		(void)duk_push_error_object(ctx, DUK_RET_EVAL_ERROR, "cannot find native data attached to object");
 
 	return el;
