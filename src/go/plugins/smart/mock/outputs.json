@@ -1475,15 +1475,14 @@
       }
     }
   },
-  "ai_gen_with_2_basic_devices": {
+  "stas_gen_with_2_basic_devices": {
     "version": {},
     "all_devices_scan": {
       "json_format_version": [1, 0],
       "smartctl": {
         "version": [7, 1],
-        "svn_revision": "5022",
-        "platform_info": "x86_64-w64-mingw32-w10-b19045",
-        "build_info": "(sf-7.1-1)",
+        "platform_info": "xstas",
+        "build_info": "(2001)",
         "argv": ["smartctl", "--scan", "-j"],
         "exit_status": 0
       },
@@ -1508,9 +1507,7 @@
         "json_format_version": [1, 0],
         "smartctl": {
           "version": [7, 1],
-          "svn_revision": "5022",
-          "platform_info": "x86_64-w64-mingw32-w10-b19045",
-          "build_info": "(sf-7.1-1)",
+          "platform_info": "xstas",
           "argv": ["smartctl", "-a", "/dev/sda", "-j"],
           "exit_status": 0
         },
@@ -1520,9 +1517,9 @@
           "type": "nvme",
           "protocol": "NVMe"
         },
-        "model_name": "SAMSUNG MZVLB1T0HBLR-000L7",
-        "serial_number": "S3XY1234567890",
-        "firmware_version": "EXA7301Q",
+        "model_name": "RIGHT LEG",
+        "serial_number": "42069",
+        "firmware_version": "OUTDATED",
         "smart_status": {
           "passed": true
         }
@@ -1531,9 +1528,8 @@
         "json_format_version": [1, 0],
         "smartctl": {
           "version": [7, 1],
-          "svn_revision": "5022",
-          "platform_info": "x86_64-w64-mingw32-w10-b19045",
-          "build_info": "(sf-7.1-1)",
+          "platform_info": "xstas",
+          "build_info": "(2001)",
           "argv": ["smartctl", "-a", "/dev/sdb", "-j"],
           "exit_status": 0
         },
@@ -1543,9 +1539,9 @@
           "type": "nvme",
           "protocol": "NVMe"
         },
-        "model_name": "SAMSUNG MZVLB512HBJQ-000L7",
-        "serial_number": "S3XY0987654321",
-        "firmware_version": "EXA7301R",
+        "model_name": "LEFT LEG",
+        "serial_number": "42070",
+        "firmware_version": "NEW",
         "smart_status": {
           "passed": true
         }

@@ -88,7 +88,7 @@ func TestPlugin_execute(t *testing.T) {
 				{
 					args: []string{"--scan", "-j"},
 					err:  nil,
-					out:  mock.Outputs.Get("ai_gen_with_2_basic_devices").AllDevicesScan,
+					out:  mock.Outputs.Get("stas_gen_with_2_basic_devices").AllDevicesScan,
 				},
 				{
 					args: []string{"--scan", "-d", "sat", "-j"},
@@ -98,19 +98,19 @@ func TestPlugin_execute(t *testing.T) {
 				{
 					args: []string{"-a", "/dev/sda", "-j"},
 					err:  nil,
-					out:  mock.Outputs.Get("ai_gen_with_2_basic_devices").AllSmartInfoScans.Get("-a /dev/sda -j"),
+					out:  mock.Outputs.Get("stas_gen_with_2_basic_devices").AllSmartInfoScans.Get("-a /dev/sda -j"),
 				},
 				{
 					args: []string{"-a", "/dev/sdb", "-j"},
 					err:  nil,
-					out:  mock.Outputs.Get("ai_gen_with_2_basic_devices").AllSmartInfoScans.Get("-a /dev/sdb -j"),
+					out:  mock.Outputs.Get("stas_gen_with_2_basic_devices").AllSmartInfoScans.Get("-a /dev/sdb -j"),
 				},
 			},
 			&runner{
 				devices: map[string]deviceParser{
 					"/dev/sda": {
-						ModelName:    "SAMSUNG MZVLB1T0HBLR-000L7",
-						SerialNumber: "S3XY1234567890",
+						ModelName:    "RIGHT LEG",
+						SerialNumber: "42069",
 						Info: deviceInfo{
 							Name:     "/dev/sda",
 							InfoName: "/dev/sda",
@@ -125,8 +125,8 @@ func TestPlugin_execute(t *testing.T) {
 						},
 					},
 					"/dev/sdb": {
-						ModelName:    "SAMSUNG MZVLB512HBJQ-000L7",
-						SerialNumber: "S3XY0987654321",
+						ModelName:    "LEFT LEG",
+						SerialNumber: "42070",
 						Info: deviceInfo{
 							Name:     "/dev/sdb",
 							InfoName: "/dev/sdb",
@@ -141,98 +141,15 @@ func TestPlugin_execute(t *testing.T) {
 			false,
 		},
 		{
-			"-basicDeviceNoSmartData",
-			args{false},
+			"+validMegaraid",
+			args{
+				jsonRunner: false,
+			},
 			[]expectation{
 				{
 					args: []string{"--scan", "-j"},
 					err:  nil,
-					out:  mock.Outputs.Get("ai_gen_with_2_basic_devices").AllDevicesScan,
-				},
-				{
-					args: []string{"--scan", "-d", "sat", "-j"},
-					err:  nil,
-					out:  []byte("{}"),
-				},
-				{
-					args: []string{"-a", "/dev/sda", "-j"},
-					err:  nil,
-					out: []byte(`{
-									"json_format_version": [1, 0],
-									"smartctl": {
-									"version": [7, 1],
-									"svn_revision": "5022",
-									"platform_info": "x86_64-w64-mingw32-w10-b19045",
-									"build_info": "(sf-7.1-1)",
-									"argv": ["smartctl", "-a", "/dev/sda", "-j"],
-									"exit_status": 0
-									},
-									"device": {
-									"name": "/dev/sda",
-									"info_name": "/dev/sda",
-									"type": "nvme",
-									"protocol": "NVMe"
-									},
-									"model_name": "SAMSUNG MZVLB1T0HBLR-000L7",
-									"serial_number": "S3XY1234567890",
-									"firmware_version": "EXA7301Q"
-								}`),
-				},
-				{
-					args: []string{"-a", "/dev/sdb", "-j"},
-					err:  nil,
-					out:  mock.Outputs.Get("ai_gen_with_2_basic_devices").AllSmartInfoScans.Get("-a /dev/sdb -j"),
-				},
-			},
-			&runner{
-				devices: map[string]deviceParser{
-					"/dev/sdb": {
-						ModelName:    "SAMSUNG MZVLB512HBJQ-000L7",
-						SerialNumber: "S3XY0987654321",
-						Info: deviceInfo{
-							Name:     "/dev/sdb",
-							InfoName: "/dev/sdb",
-							DevType:  "nvme",
-							name:     "/dev/sdb",
-						},
-						Smartctl:    smartctlField{Version: []int{7, 1}},
-						SmartStatus: &smartStatus{SerialNumber: true},
-					},
-				},
-			},
-			false,
-		},
-		{
-			"-smartInfoErrorBasicDevice",
-			args{false},
-			[]expectation{
-				{
-					args: []string{"--scan", "-j"},
-					err:  nil,
-					out:  mock.Outputs.Get("ai_gen_with_2_basic_devices").AllDevicesScan,
-				},
-				{
-					args: []string{"--scan", "-d", "sat", "-j"},
-					err:  nil,
-					out:  []byte("{}"),
-				},
-				{
-					args: []string{"-a", "/dev/sda", "-j"},
-					err:  errs.New("unknown error"),
-					out:  mock.Outputs.Get("ai_gen_with_2_basic_devices").AllSmartInfoScans.Get("-a /dev/sda -j"),
-				},
-			},
-			nil,
-			true,
-		},
-		{
-			"-smartInfoErrorMegaraid",
-			args{false},
-			[]expectation{
-				{
-					args: []string{"--scan", "-j"},
-					err:  nil,
-					out:  []byte("{}"),
+					out:  []byte(`{}`),
 				},
 				{
 					args: []string{"--scan", "-d", "sat", "-j"},
@@ -258,177 +175,25 @@ func TestPlugin_execute(t *testing.T) {
 					args: []string{
 						"-a", "optimus_prime", "-d", "megaraid", "-j",
 					},
-					err: errs.New("unexpected error"),
+					err: nil,
 					out: mock.OutputAllDiscInfoSDA,
 				},
 			},
 			&runner{
-				devices: map[string]deviceParser{},
-			},
-			false,
-		},
-		{
-			"-smartError",
-			args{false},
-			[]expectation{
-				{
-					args: []string{"--scan", "-j"},
-					err:  errs.New("test error"),
-					out:  []byte(""),
-				},
-			},
-			nil,
-			true,
-		},
-		{
-			"+valid",
-			args{
-				jsonRunner: false,
-			},
-			[]expectation{
-				{
-					args: []string{"--scan", "-j"},
-					err:  nil,
-					out: []byte(`{
-								"json_format_version": [1, 0],
-								"smartctl": {
-									"version": [7, 1],
-									"svn_revision": "5022",
-									"platform_info": "x86_64-w64-mingw32-w10-b19045",
-									"build_info": "(sf-7.1-1)"
-								},
-								"devices": [
-									{
-									"name": "/dev/sda",
-									"info_name": "/dev/sda",
-									"type": "nvme",
-									"protocol": "NVMe"
-									}
-								]}`),
-				},
-				{
-					args: []string{"--scan", "-d", "sat", "-j"},
-					err:  nil,
-					out:  []byte(`{}`),
-				},
-				{
-					args: []string{"-a", "/dev/sda", "-j"},
-					err:  nil,
-					out:  mock.OutputAllDiscInfoSDA,
-				},
-			},
-			&runner{
 				jsonDevices: nil,
 				devices: map[string]deviceParser{
-					"/dev/sda": {
+					"optimus_prime megaraid": {
 						ModelName:    "SAMSUNG MZVL21T0HCLR-00BH1",
 						SerialNumber: "S641NX0T509005",
 						Info: deviceInfo{
-							Name:     "/dev/sda",
+							Name:     "optimus_prime megaraid",
 							InfoName: "/dev/sda",
 							DevType:  "nvme",
-							name:     "/dev/sda",
+							name:     "optimus_prime",
+							raidType: "megaraid",
 						},
 						Smartctl: smartctlField{
 							Version: []int{7, 1},
-						},
-						SmartStatus:     &smartStatus{SerialNumber: true},
-						SmartAttributes: smartAttributes{},
-					},
-				},
-			},
-			false,
-		},
-		{
-			"+multiple",
-			args{
-				jsonRunner: false,
-			},
-			[]expectation{
-				{
-					args: []string{"--scan", "-j"},
-					err:  nil,
-					//nolint:lll
-					out: []byte(`{
-									"json_format_version": [1, 0],
-									"smartctl": {
-										"version": [7, 1],
-										"svn_revision": "5022",
-										"platform_info": "x86_64-w64-mingw32-w10-b19045",
-										"build_info": "(sf-7.1-1)"
-									},
-									"devices": [
-										{
-										"name": "/dev/sda",
-										"info_name": "/dev/sda",
-										"type": "nvme",
-										"protocol": "NVMe"
-										},
-										{
-										"name": "IOService:/AppleARMPE/arm-io@10F00000/AppleT811xIO/ans@77400000/AppleASCWrapV4/iop-ans-nub/RTBuddy(ANS2)/RTBuddyService/AppleANS3NVMeController/NS_01@1",
-										"info_name": "IOService:/AppleARMPE/arm-io@10F00000/AppleT811xIO/ans@77400000/AppleASCWrapV4/iop-ans-nub/RTBuddy(ANS2)/RTBuddyService/AppleANS3NVMeController/NS_01@1",
-										"type": "nvme",
-										"protocol": "NVMe"
-										}
-									]
-									}
-								`),
-				},
-				{
-					args: []string{"--scan", "-d", "sat", "-j"},
-					err:  nil,
-					out:  []byte(`{}`),
-				},
-				{
-					args: []string{"-a", "/dev/sda", "-j"},
-					err:  nil,
-					out:  mock.OutputAllDiscInfoSDA,
-				},
-				{
-					args: []string{
-						"-a",
-						"IOService:/AppleARMPE/arm-io@10F00000/AppleT811xIO/ans@77400000/AppleASCWrapV4/iop-ans-nub/RTBuddy(ANS2)/RTBuddyService/AppleANS3NVMeController/NS_01@1", //nolint:lll
-						"-j",
-					},
-					err: nil,
-					out: mock.OutputAllDiscInfoMac,
-				},
-			},
-			&runner{
-				jsonDevices: nil,
-				devices: map[string]deviceParser{
-					"/dev/sda": {
-						ModelName:    "SAMSUNG MZVL21T0HCLR-00BH1",
-						SerialNumber: "S641NX0T509005",
-						Info: deviceInfo{
-							Name:     "/dev/sda",
-							InfoName: "/dev/sda",
-							DevType:  "nvme",
-							name:     "/dev/sda",
-						},
-						Smartctl: smartctlField{
-							Version: []int{7, 1},
-						},
-						SmartStatus:     &smartStatus{SerialNumber: true},
-						SmartAttributes: smartAttributes{},
-					},
-					"IOService:/AppleARMPE/arm-io@10F00000/AppleT811xIO/ans@77400000/AppleASCWrapV4/iop-ans-nub/RTBuddy(ANS2)/RTBuddyService/AppleANS3NVMeController/NS_01@1": { //nolint:lll
-						ModelName:    "APPLE SSD AP0512Z",
-						SerialNumber: "0ba02202c4bc1a1e",
-						Info: deviceInfo{
-							Name:     "IOService:/AppleARMPE/arm-io@10F00000/AppleT811xIO/ans@77400000/AppleASCWrapV4/iop-ans-nub/RTBuddy(ANS2)/RTBuddyService/AppleANS3NVMeController/NS_01@1", //nolint:lll
-							InfoName: "IOService:/AppleARMPE/arm-io@10F00000/AppleT811xIO/ans@77400000/AppleASCWrapV4/iop-ans-nub/RTBuddy(ANS2)/RTBuddyService/AppleANS3NVMeController/NS_01@1", //nolint:lll
-							DevType:  "nvme",
-							name:     "IOService:/AppleARMPE/arm-io@10F00000/AppleT811xIO/ans@77400000/AppleASCWrapV4/iop-ans-nub/RTBuddy(ANS2)/RTBuddyService/AppleANS3NVMeController/NS_01@1", //nolint:lll
-						},
-						Smartctl: smartctlField{
-							Version:    []int{7, 4},
-							ExitStatus: 4,
-							Messages: []message{
-								{
-									"Read 1 entries from Error Information Log failed: GetLogPage failed: system=0x38, sub=0x0, code=745", //nolint:lll
-								},
-							},
 						},
 						SmartStatus:     &smartStatus{SerialNumber: true},
 						SmartAttributes: smartAttributes{},
@@ -510,7 +275,7 @@ func TestPlugin_execute(t *testing.T) {
 			false,
 		},
 		{
-			"+jsonRunner",
+			"+basicJSONRunner",
 			args{
 				jsonRunner: true,
 			},
@@ -688,7 +453,7 @@ func TestPlugin_execute(t *testing.T) {
 			false,
 		},
 		{
-			"+env1JSON",
+			"+singleRAIDDeviceFromEnv1",
 			args{
 				jsonRunner: true,
 			},
@@ -851,15 +616,36 @@ func TestPlugin_execute(t *testing.T) {
 			false,
 		},
 		{
-			"+validMegaraid",
-			args{
-				jsonRunner: false,
-			},
+			"-basicSmartScanError",
+			args{false},
 			[]expectation{
 				{
 					args: []string{"--scan", "-j"},
 					err:  nil,
-					out:  []byte(`{}`),
+					out:  mock.Outputs.Get("stas_gen_with_2_basic_devices").AllDevicesScan,
+				},
+				{
+					args: []string{"--scan", "-d", "sat", "-j"},
+					err:  nil,
+					out:  []byte("{}"),
+				},
+				{
+					args: []string{"-a", "/dev/sda", "-j"},
+					err:  errs.New("unknown error"),
+					out:  mock.Outputs.Get("stas_gen_with_2_basic_devices").AllSmartInfoScans.Get("-a /dev/sda -j"),
+				},
+			},
+			nil,
+			true,
+		},
+		{
+			"-megaraidSmartScanError",
+			args{false},
+			[]expectation{
+				{
+					args: []string{"--scan", "-j"},
+					err:  nil,
+					out:  []byte("{}"),
 				},
 				{
 					args: []string{"--scan", "-d", "sat", "-j"},
@@ -885,80 +671,87 @@ func TestPlugin_execute(t *testing.T) {
 					args: []string{
 						"-a", "optimus_prime", "-d", "megaraid", "-j",
 					},
-					err: nil,
+					err: errs.New("unexpected error"),
 					out: mock.OutputAllDiscInfoSDA,
 				},
 			},
 			&runner{
-				jsonDevices: nil,
-				devices: map[string]deviceParser{
-					"optimus_prime megaraid": {
-						ModelName:    "SAMSUNG MZVL21T0HCLR-00BH1",
-						SerialNumber: "S641NX0T509005",
-						Info: deviceInfo{
-							Name:     "optimus_prime megaraid",
-							InfoName: "/dev/sda",
-							DevType:  "nvme",
-							name:     "optimus_prime",
-							raidType: "megaraid",
-						},
-						Smartctl: smartctlField{
-							Version: []int{7, 1},
-						},
-						SmartStatus:     &smartStatus{SerialNumber: true},
-						SmartAttributes: smartAttributes{},
-					},
-				},
+				devices: map[string]deviceParser{},
 			},
 			false,
 		},
 		{
-			"+JSONRunnerMegaraid",
-			args{
-				jsonRunner: true,
+			"-basicDeviceScanError",
+			args{false},
+			[]expectation{
+				{
+					args: []string{"--scan", "-j"},
+					err:  errs.New("test error"),
+					out:  []byte(""),
+				},
 			},
+			nil,
+			true,
+		},
+		{
+			"-basicDeviceNoSmart",
+			args{false},
 			[]expectation{
 				{
 					args: []string{"--scan", "-j"},
 					err:  nil,
-					out:  []byte(`{}`),
+					out:  mock.Outputs.Get("stas_gen_with_2_basic_devices").AllDevicesScan,
 				},
 				{
 					args: []string{"--scan", "-d", "sat", "-j"},
 					err:  nil,
-					out: []byte(`{								
-								"json_format_version": [1, 0],
-								"smartctl": {
-									"version": [7, 1],
-									"svn_revision": "5022",
-									"platform_info": "x86_64-w64-mingw32-w10-b19045",
-									"build_info": "(sf-7.1-1)"
-								},
-								"devices": [
-									{
-									"name": "optimus_prime",
-									"info_name": "optimus_prime",
-									"type": "megaraid",
-									"protocol": "transformer"
-									}
-								]}`),
+					out:  []byte("{}"),
 				},
 				{
-					args: []string{
-						"-a", "optimus_prime", "-d", "megaraid", "-j",
-					},
-					err: nil,
-					out: mock.OutputAllDiscInfoSDA,
+					args: []string{"-a", "/dev/sda", "-j"},
+					err:  nil,
+					out: []byte(`{
+									"json_format_version": [1, 0],
+									"smartctl": {
+									"version": [7, 1],
+									"svn_revision": "5022",
+									"platform_info": "xstas",
+									"build_info": "(2001)",
+									"argv": ["smartctl", "-a", "/dev/sdb", "-j"],
+									"exit_status": 0
+									},
+									"device": {
+									"name": "/dev/sdb",
+									"info_name": "/dev/sdb",
+									"type": "nvme",
+									"protocol": "NVMe"
+									},
+									"model_name": "LEFT LEG",
+									"serial_number": "42070",
+									"firmware_version": "NEW"
+								}`),
+				},
+				{
+					args: []string{"-a", "/dev/sdb", "-j"},
+					err:  nil,
+					out:  mock.Outputs.Get("stas_gen_with_2_basic_devices").AllSmartInfoScans.Get("-a /dev/sdb -j"),
 				},
 			},
 			&runner{
-				jsonDevices: map[string]jsonDevice{
-					"optimus_prime megaraid": {
-						serialNumber: "S641NX0T509005",
-						jsonData:     string(mock.OutputAllDiscInfoSDA),
+				devices: map[string]deviceParser{
+					"/dev/sdb": {
+						ModelName:    "LEFT LEG",
+						SerialNumber: "42070",
+						Info: deviceInfo{
+							Name:     "/dev/sdb",
+							InfoName: "/dev/sdb",
+							DevType:  "nvme",
+							name:     "/dev/sdb",
+						},
+						Smartctl:    smartctlField{Version: []int{7, 1}},
+						SmartStatus: &smartStatus{SerialNumber: true},
 					},
 				},
-				devices: nil,
 			},
 			false,
 		},
@@ -988,7 +781,6 @@ func TestPlugin_execute(t *testing.T) {
 				t.Fatalf("Plugin.execute() error = %v, wantErr %v", err, tt.wantErr)
 			}
 
-			// removing mock plugin for further runner comparison
 			if r != nil {
 				r.plugin = nil
 			}
@@ -2162,7 +1954,7 @@ func Test_runner_parseOutput(t *testing.T) {
 		expectedState runner
 	}{
 		{
-			"+jsonRunnerWithUniqueDevices",
+			"+validJSONRunner",
 			args{
 				true,
 			},
