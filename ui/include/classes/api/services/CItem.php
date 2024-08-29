@@ -410,39 +410,50 @@ class CItem extends CItemGeneral {
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect(self::createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
-		while ($item = DBfetch($res)) {
-			// Items share table with item prototypes. Therefore remove item unrelated fields.
-			unset($item['discover']);
-
-			if (!$options['countOutput']) {
-				$result[$item['itemid']] = $item;
-				continue;
-			}
-
-			if ($options['groupCount']) {
-				$result[] = $item;
-			}
-			else {
-				$result = $item['rowscount'];
-			}
-		}
 
 		if ($options['countOutput']) {
+			while ($item = DBfetch($res)) {
+				// Items share table with item prototypes. Therefore remove item unrelated fields.
+				unset($item['discover']);
+
+				if ($options['groupCount']) {
+					$result[] = $item;
+				}
+				else {
+					$result = $item['rowscount'];
+				}
+			}
+
 			return $result;
 		}
 
-		if ($result) {
-			if (self::dbDistinct($sqlParts)) {
-				$result = $this->addNclobFieldValues($options, $result);
+		$_result = [];
+		$item = false;
+
+		do {
+			while (count($_result) < CItemGeneral::CHUNK_SIZE && $item = DBfetch($res)) {
+				// Items share table with item prototypes. Therefore remove item unrelated fields.
+				unset($item['discover']);
+
+				$_result[$item['itemid']] = $item;
 			}
 
-			self::prepareItemsForApi($result, false);
+			if ($_result) {
+				if (self::dbDistinct($sqlParts)) {
+					$_result = $this->addNclobFieldValues($options, $_result);
+				}
 
-			$result = $this->addRelatedObjects($options, $result);
-			$result = $this->unsetExtraFields($result, ['hostid', 'interfaceid', 'value_type', 'valuemapid'],
-				$options['output']
-			);
-		}
+				self::prepareItemsForApi($_result, false);
+
+				$_result = $this->addRelatedObjects($options, $_result);
+				$_result = $this->unsetExtraFields($_result, ['hostid', 'interfaceid', 'value_type', 'valuemapid'],
+					$options['output']
+				);
+			}
+
+			$result += $_result;
+			$_result = [];
+		} while ($item !== false);
 
 		// removing keys (hash -> array)
 		if (!$options['preservekeys']) {

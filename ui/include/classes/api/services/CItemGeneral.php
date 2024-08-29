@@ -92,6 +92,13 @@ abstract class CItemGeneral extends CApiService {
 	protected const INHERIT_CHUNK_SIZE = 1000;
 
 	/**
+	 * Maximum number of items per iteration.
+	 *
+	 * @var int
+	 */
+	protected const CHUNK_SIZE = 1000;
+
+	/**
 	 * @abstract
 	 *
 	 * @param array $options

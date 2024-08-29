@@ -267,32 +267,55 @@ class CItemPrototype extends CItemGeneral {
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect(self::createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
-		while ($item = DBfetch($res)) {
-			if ($options['countOutput']) {
-				if ($options['groupCount'])
-					$result[] = $item;
-				else
-					$result = $item['rowscount'];
-			}
-			else {
-				$result[$item['itemid']] = $item;
-			}
-		}
 
 		if ($options['countOutput']) {
+			while ($item = DBfetch($res)) {
+				if ($options['groupCount']) {
+					$result[] = $item;
+				}
+				else {
+					$result = $item['rowscount'];
+				}
+			}
+
 			return $result;
 		}
 
-		if ($result) {
-			if (self::dbDistinct($sqlParts)) {
-				$result = $this->addNclobFieldValues($options, $result);
+		$_result = [];
+		$item = false;
+
+		do {
+			while (count($_result) < CItemGeneral::CHUNK_SIZE && $item = DBfetch($res)) {
+				$_result[$item['itemid']] = $item;
 			}
 
-			self::prepareItemsForApi($result, false);
+			if ($_result) {
+				if (self::dbDistinct($sqlParts)) {
+					$_result = $this->addNclobFieldValues($options, $_result);
+				}
 
-			$result = $this->addRelatedObjects($options, $result);
-			$result = $this->unsetExtraFields($result, ['hostid', 'valuemapid'], $options['output']);
+				self::prepareItemsForApi($_result, false);
+
+				$_result = $this->addRelatedObjects($options, $_result);
+				$_result = $this->unsetExtraFields($_result, ['hostid', 'valuemapid'], $options['output']);
+			}
+
+			$result += $_result;
+			$_result = [];
+		} while ($item !== false);
+
+		// Decode ITEM_TYPE_HTTPAGENT encoded fields.
+		foreach ($result as &$item) {
+			if (array_key_exists('query_fields', $item)) {
+				$query_fields = ($item['query_fields'] !== '') ? json_decode($item['query_fields'], true) : [];
+				$item['query_fields'] = json_last_error() ? [] : $query_fields;
+			}
+
+			if (array_key_exists('headers', $item)) {
+				$item['headers'] = $this->headersStringToArray($item['headers']);
+			}
 		}
+		unset($item);
 
 		if (!$options['preservekeys']) {
 			$result = zbx_cleanHashes($result);
