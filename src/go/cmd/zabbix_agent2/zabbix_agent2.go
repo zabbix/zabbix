@@ -268,18 +268,20 @@ func run() error {
 	defer cleanUpExternal()
 
 	if args.test != "" || args.print || args.testConfig {
-		manager, err = prepareMetricPrintManager(args.verbose, systemOpt)
+		var m *scheduler.Manager
+
+		m, err = prepareMetricPrintManager(args.verbose, systemOpt)
 		if err != nil {
 			return errs.Wrap(err, "failed to prepare metric print manager")
 		}
 
 		if args.test != "" {
-			checkMetric(manager, args.test)
+			checkMetric(m, args.test)
 		} else if args.print {
-			checkMetrics(manager)
+			checkMetrics(m)
 		}
 
-		manager.Stop()
+		m.Stop()
 		monitor.Wait(monitor.Scheduler)
 		cleanUpExternal()
 
