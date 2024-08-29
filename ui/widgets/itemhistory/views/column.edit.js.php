@@ -45,16 +45,11 @@ window.item_history_column_edit = new class {
 	#highlights_table;
 
 	/**
-	 * @type {string}
-	 */
-	#old_multiselect_item_name;
-
-	/**
 	 * @type {number|null}
 	 */
 	#item_value_type;
 
-	init({form_id, thresholds, highlights, colors, item_value_type, multiselect_item_name}) {
+	init({form_id, templateid, thresholds, highlights, colors, item_value_type, multiselect_item_name}) {
 		this.#overlay = overlays_stack.getById('item-history-column-edit-overlay');
 		this.#dialogue = this.#overlay.$dialogue[0];
 		this.#form = document.getElementById(form_id);
@@ -63,7 +58,18 @@ window.item_history_column_edit = new class {
 		this.#highlights_table = document.getElementById('highlights_table');
 
 		this.#item_value_type = item_value_type;
-		this.#old_multiselect_item_name = multiselect_item_name.substring(0, 255);
+
+		let current_item_name = multiselect_item_name;
+
+		if (templateid !== '') {
+			current_item_name = current_item_name.substring(
+				current_item_name.indexOf(NAME_DELIMITER) + NAME_DELIMITER.length
+			);
+		}
+
+		current_item_name = current_item_name.substring(0, 255).trim();
+
+		const name_field = this.#form.querySelector('[name="name"]');
 
 		// Initialize item multiselect
 		$('#itemid').on('change', () => {
@@ -82,12 +88,18 @@ window.item_history_column_edit = new class {
 						this.#overlay.unsetLoading();
 					});
 
-				const name_field = this.#form.querySelector('[name=name]');
-				const name_value = name_field.value.substring(0, 255);
+				if (name_field.value === '' || name_field.value === current_item_name) {
+					current_item_name = ms_item_data[0].prefix + ms_item_data[0].name;
 
-				if (name_value === '' || this.#old_multiselect_item_name === name_value) {
-					name_field.value = ms_item_data[0].prefix + ms_item_data[0].name;
-					this.#old_multiselect_item_name = name_field.value;
+					if (templateid !== '') {
+						current_item_name = current_item_name.substring(
+							current_item_name.indexOf(NAME_DELIMITER) + NAME_DELIMITER.length
+						);
+					}
+
+					current_item_name = current_item_name.substring(0, 255).trim();
+
+					name_field.value = current_item_name;
 				}
 			}
 			else {

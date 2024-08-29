@@ -85,13 +85,29 @@ static int	DBpatch_7010003(void)
 
 static int	DBpatch_7010004(void)
 {
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute(
+			"delete from widget_field"
+			" where name in ('time_size','date_size','tzone_size')"
+				" and widgetid in (select widgetid from widget where type='clock')"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7010005(void)
+{
 	if (FAIL == zbx_db_index_exists("items", "items_10"))
 		return DBcreate_index("items", "items_10", "uuid", 0);
 
 	return SUCCEED;
 }
 
-static int	DBpatch_7010005(void)
+static int	DBpatch_7010006(void)
 {
 	if (FAIL == zbx_db_index_exists("hosts", "hosts_9"))
 		return DBcreate_index("hosts", "hosts_9", "uuid", 0);
@@ -99,7 +115,7 @@ static int	DBpatch_7010005(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_7010006(void)
+static int	DBpatch_7010007(void)
 {
 	if (FAIL == zbx_db_index_exists("hstgrp", "hstgrp_2"))
 		return DBcreate_index("hstgrp", "hstgrp_2", "uuid", 0);
@@ -107,7 +123,7 @@ static int	DBpatch_7010006(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_7010007(void)
+static int	DBpatch_7010008(void)
 {
 	if (FAIL == zbx_db_index_exists("httptest", "httptest_5"))
 		return DBcreate_index("httptest", "httptest_5", "uuid", 0);
@@ -115,7 +131,7 @@ static int	DBpatch_7010007(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_7010008(void)
+static int	DBpatch_7010009(void)
 {
 	if (FAIL == zbx_db_index_exists("valuemap", "valuemap_2"))
 		return DBcreate_index("valuemap", "valuemap_2", "uuid", 0);
@@ -123,7 +139,7 @@ static int	DBpatch_7010008(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_7010009(void)
+static int	DBpatch_7010010(void)
 {
 	if (FAIL == zbx_db_index_exists("triggers", "triggers_4"))
 		return DBcreate_index("triggers", "triggers_4", "uuid", 0);
@@ -131,7 +147,7 @@ static int	DBpatch_7010009(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_7010010(void)
+static int	DBpatch_7010011(void)
 {
 	if (FAIL == zbx_db_index_exists("graphs", "graphs_5"))
 		return DBcreate_index("graphs", "graphs_5", "uuid", 0);
@@ -139,7 +155,7 @@ static int	DBpatch_7010010(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_7010011(void)
+static int	DBpatch_7010012(void)
 {
 	if (FAIL == zbx_db_index_exists("services", "services_1"))
 		return DBcreate_index("services", "services_1", "uuid", 0);
@@ -147,7 +163,7 @@ static int	DBpatch_7010011(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_7010012(void)
+static int	DBpatch_7010013(void)
 {
 	if (FAIL == zbx_db_index_exists("dashboard", "dashboard_3"))
 		return DBcreate_index("dashboard", "dashboard_3", "uuid", 0);
@@ -174,5 +190,6 @@ DBPATCH_ADD(7010009, 0, 1)
 DBPATCH_ADD(7010010, 0, 1)
 DBPATCH_ADD(7010011, 0, 1)
 DBPATCH_ADD(7010012, 0, 1)
+DBPATCH_ADD(7010013, 0, 1)
 
 DBPATCH_END()

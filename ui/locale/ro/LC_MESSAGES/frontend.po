@@ -22161,6 +22161,11 @@ msgstr ""
 msgid "User cannot add himself to a disabled group or a group with disabled GUI access."
 msgstr "Utilizatorul nu poate să se adauge unui grup dezactivat sau  unui grup cu acces GUI dezactivat."
 
+#: include/classes/api/services/CUserGroup.php:673
+#: include/classes/api/services/CUser.php:843
+msgid "User cannot add oneself to a disabled group or a group with disabled GUI access."
+msgstr ""
+
 #: app/views/administration.user.edit.php:461
 #: include/classes/api/services/CUser.php:980
 msgid "User cannot change own role."
@@ -22299,6 +22304,10 @@ msgstr ""
 #: include/classes/api/services/CUser.php:1282
 msgid "User is not allowed to delete himself."
 msgstr "Utilizatorului nu îi este permis să se șteargă."
+
+#: include/classes/api/services/CUser.php:1837
+msgid "User is not allowed to delete oneself."
+msgstr ""
 
 #: app/views/administration.authentication.edit.php:462
 #: app/views/popup.ldap.edit.php:222

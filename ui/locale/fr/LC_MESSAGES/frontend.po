@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-07-27 07:32+0000\n"
+"PO-Revision-Date: 2024-08-05 13:45+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -12540,7 +12540,7 @@ msgstr "Liste des proxys Zabbix avec nom, mode, cryptage, compression, version, 
 
 #: include/classes/data/CItemData.php:2935
 msgid "List of Zabbix proxy groups configuration data and real-time data. Configuration data includes proxy group name, failover delay, and minimum number of online proxies required for the group to be online. Real-time data includes number of online proxies, percentage of online proxies, and state of proxy group (unknown, offline, recovering, online, degrading). This item does not return groupless proxies. Returns JSON."
-msgstr ""
+msgstr "Liste des données de configuration et données temps réel des groupes proxy Zabbix. Les données de configuration incluent le nom du groupe de proxys, le délai de basculement et le nombre minimum de proxys en ligne requis pour que le groupe soit en ligne. Les données temps réel incluent le nombre de proxys en ligne, le pourcentage de proxys en ligne et l'état du groupe de proxys (inconnu, hors ligne, en récupération, en ligne, dégradé). Cet élément ne renvoie pas de proxys sans groupe. Retourne un JSON."
 
 #: include/classes/data/CItemData.php:1559
 msgid "List of block devices and their type. Returns JSON"
@@ -21963,6 +21963,11 @@ msgstr "Chaîne de caractères du \"user agent\""
 msgid "User cannot add himself to a disabled group or a group with disabled GUI access."
 msgstr "Un utilisateur ne peut pas s'ajouter à un groupe désactivé ou à un groupe sans accès GUI."
 
+#: include/classes/api/services/CUserGroup.php:673
+#: include/classes/api/services/CUser.php:843
+msgid "User cannot add oneself to a disabled group or a group with disabled GUI access."
+msgstr ""
+
 #: app/views/administration.user.edit.php:461
 #: include/classes/api/services/CUser.php:980
 msgid "User cannot change own role."
@@ -22098,6 +22103,10 @@ msgstr "La saisie de l'utilisateur a été testée avec succès."
 #: include/classes/api/services/CUser.php:1282
 msgid "User is not allowed to delete himself."
 msgstr "Un utilisateur n'est pas autorisé à s'effacer lui-même."
+
+#: include/classes/api/services/CUser.php:1837
+msgid "User is not allowed to delete oneself."
+msgstr ""
 
 #: app/views/administration.authentication.edit.php:462
 #: app/views/popup.ldap.edit.php:222

@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2023-09-22 06:10+0000\n"
-"Last-Translator: diana.dauksa <diana.dauksa@zabbix.com>\n"
+"PO-Revision-Date: 2024-08-21 16:00+0000\n"
+"Last-Translator: Yaron <sh.yaron@gmail.com>\n"
 "Language-Team: none\n"
 "Language: he\n"
 "MIME-Version: 1.0\n"
@@ -85,12 +85,12 @@ msgstr "נמצאו %1$d תוצאות לחיפוש %2$s"
 #: widgets/hostnavigator/Widget.php:39
 #, c-format
 msgid "%1$d of %1$d+ hosts are shown"
-msgstr ""
+msgstr "%1$d מתוך %1$d+ מארחים מופיעים"
 
 #: widgets/itemnavigator/Widget.php:39
 #, c-format
 msgid "%1$d of %1$d+ items are shown"
-msgstr ""
+msgstr "%1$d מתוך %1$d+ פריטים מופיעים"
 
 #: widgets/problems/actions/WidgetView.php:78
 #, c-format
@@ -452,7 +452,7 @@ msgstr "גישה ל־API"
 
 #: app/views/mfa.edit.php:102
 msgid "API hostname"
-msgstr ""
+msgstr "שם מארח API"
 
 #: app/controllers/CControllerPopupGeneric.php:422
 #: app/views/administration.userrole.edit.php:310
@@ -949,7 +949,7 @@ msgstr "הוספה (הגעת לגבול כמות סוגי הודעות)"
 
 #: widgets/tophosts/views/widget.edit.php:63
 msgid "Add a column"
-msgstr ""
+msgstr "הוספת עמודה"
 
 #: jsLoader.php:156
 msgid "Add a new widget"
@@ -957,7 +957,7 @@ msgstr "הוספת וידג׳ט חדש"
 
 #: widgets/navtree/Widget.php:34
 msgid "Add child element"
-msgstr ""
+msgstr "הוספת פריט צאצא"
 
 #: widgets/navtree/Widget.php:39
 msgid "Add child elements"
@@ -985,7 +985,7 @@ msgstr "הוספת מארח"
 
 #: include/actions.inc.php:653 include/actions.inc.php:871
 msgid "Add host tags"
-msgstr ""
+msgstr "הוספת תגיות מארח"
 
 #: app/partials/trigger.edit.dependencies.tab.php:65
 #: app/partials/trigger.edit.dependencies.tab.php:91
@@ -996,7 +996,7 @@ msgstr "הוספת הקפצת מארח"
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:260
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:263
 msgid "Add item"
-msgstr ""
+msgstr "הוספת פריט"
 
 #: app/partials/massupdate.macros.tab.php:96
 #: app/partials/massupdate.valuemaps.tab.php:38
@@ -1112,7 +1112,7 @@ msgstr "כתובת"
 #: app/controllers/CControllerProxyUpdate.php:75
 #: app/views/popup.proxy.edit.php:90
 msgid "Address for active agents"
-msgstr ""
+msgstr "כתובת לסוכנים פעילים"
 
 #: include/hosts.inc.php:63 include/users.inc.php:53
 msgid "Admin"
@@ -1144,7 +1144,7 @@ msgstr "אפשרויות מתקדמות"
 #: include/views/configuration.host.discovery.list.php:157
 #: include/views/configuration.host.discovery.list.php:172
 msgid "After"
-msgstr ""
+msgstr "אחרי"
 
 #: app/views/js/mfa.edit.js.php:168
 msgid "After this change, users who have already enrolled in this MFA method will have to complete the enrollment process again because TOTP secrets will be reset."
@@ -1171,11 +1171,11 @@ msgstr "סוכן"
 
 #: widgets/hostavail/views/widget.view.php:82
 msgid "Agent (active)"
-msgstr ""
+msgstr "סוכן (פעיל)"
 
 #: widgets/hostavail/views/widget.view.php:83
 msgid "Agent (passive)"
-msgstr ""
+msgstr "סוכן (סביל)"
 
 #: include/classes/data/CItemData.php:911
 msgid "Agent availability check. Returns nothing - unavailable; 1 - available"
@@ -1443,7 +1443,7 @@ msgstr "וגם/או"
 
 #: widgets/gauge/includes/WidgetForm.php:170
 msgid "Angle"
-msgstr ""
+msgstr "זווית"
 
 #: app/views/popup.sla.edit.php:79 include/classes/helpers/CSlaHelper.php:43
 msgid "Annually"
@@ -1537,11 +1537,11 @@ msgstr "אפריל"
 
 #: widgets/gauge/includes/WidgetForm.php:246
 msgid "Arc background"
-msgstr ""
+msgstr "רקע קשת"
 
 #: widgets/gauge/includes/WidgetForm.php:305
 msgid "Arc size"
-msgstr ""
+msgstr "גודל קשת"
 
 #: app/views/popup.tabfilter.edit.php:76
 msgid "Are you sure you want to delete this filter?"
@@ -1587,7 +1587,7 @@ msgstr "תג נכס"
 
 #: app/partials/configuration.host.edit.html.php:331
 msgid "Assigned proxy"
-msgstr ""
+msgstr "מתווך מוקצה"
 
 #: include/classes/helpers/CMaintenanceHelper.php:86
 #, c-format
@@ -1717,7 +1717,7 @@ msgstr "מאפיין"
 
 #: app/views/administration.geomaps.edit.php:86
 msgid "Attribution text"
-msgstr ""
+msgstr "טקסט שיוך"
 
 #: app/controllers/CControllerAuditLogList.php:190
 #: app/views/administration.audit.settings.edit.php:29
@@ -1882,7 +1882,7 @@ msgstr "דוח זמינות"
 #: app/controllers/CControllerAvailabilityReportTrigger.php:70
 #: app/views/reports.availabilityreport.trigger.php:23
 msgid "Availability report graph"
-msgstr ""
+msgstr "תרשים דוח זמינות"
 
 #: include/classes/html/CHostAvailability.php:80
 #: widgets/hostavail/views/widget.view.php:32
@@ -1913,7 +1913,7 @@ msgstr "מומלץ להימנע מססמאות שקל לנחש"
 
 #: jsLoader.php:172
 msgid "Awaiting data"
-msgstr ""
+msgstr "נתונים ממתינים"
 
 #: widgets/svggraph/views/widget.edit.php:51
 msgid "Axes"
@@ -2103,7 +2103,7 @@ msgstr "קידום לחזית"
 #: app/views/administration.timeouts.edit.php:130
 #: app/views/popup.proxy.edit.php:342 include/items.inc.php:99
 msgid "Browser"
-msgstr ""
+msgstr "דפדפן"
 
 #: include/locales.inc.php:35
 msgid "Bulgarian (bg_BG)"
@@ -2172,15 +2172,15 @@ msgstr "CRLF"
 
 #: tests/selenium/modules/module_number_7/Module.php:17
 msgid "CSRF test"
-msgstr ""
+msgstr "בדיקת CSRF"
 
 #: tests/selenium/modules/module_number_7/views/csrf.form.view.php:25
 msgid "CSRF token test"
-msgstr ""
+msgstr "בדיקת אסימון CSRF"
 
 #: tests/selenium/modules/module_number_7/actions/CsrfFormUpdate.php:35
 msgid "CSRF token validation succeeded."
-msgstr ""
+msgstr "תיקוף אסימון CSRF הצליח."
 
 #: include/items.inc.php:1554
 msgid "CSV to JSON"
@@ -2354,7 +2354,7 @@ msgstr "לא ניתן להוסיף מתווך"
 #: app/controllers/CControllerProxyGroupCreate.php:42
 #: app/controllers/CControllerProxyGroupCreate.php:74
 msgid "Cannot add proxy group"
-msgstr ""
+msgstr "לא ניתן להוסיף קבוצת מתווך"
 
 #: app/controllers/CControllerRegExCreate.php:41
 #: app/controllers/CControllerRegExCreate.php:72
@@ -2419,7 +2419,7 @@ msgstr "לא ניתן להוסיף וידג׳ט: אין מספיק מקום פנ
 #: include/classes/api/services/CItem.php:1542
 #, c-format
 msgid "Cannot assign the inventory field \"%1$s\" to the item with key \"%2$s\" of host \"%3$s\", because it is already populated by the item with key \"%4$s\"."
-msgstr ""
+msgstr "לא ניתן להקצות את שדה המלאי „%1$s” לפריט עם המפתח „%2$s” של המארח „%3$s”, מכיוון שכבר יש בו את הפריט עם המפתח „%4$s”."
 
 #: include/classes/api/services/CItem.php:1541
 #, c-format
@@ -2647,11 +2647,10 @@ msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
 msgstr "לא ניתן למחוק את המשתמש הפנימי של Zabbix בשם „%1$s”, יש לנסות להשבית את המשתמש הזה."
 
 #: app/controllers/CControllerActionDelete.php:87
-#, fuzzy
 msgid "Cannot delete action"
 msgid_plural "Cannot delete actions"
 msgstr[0] "לא ניתן למחוק את המשימה"
-msgstr[1] "לא ניתן למחוק את המשימה"
+msgstr[1] "לא ניתן למחוק את המשימות"
 
 #: include/classes/api/services/CRole.php:368
 #, c-format
@@ -2694,18 +2693,16 @@ msgstr[0] "לא ניתן למחוק את יחס האירוע"
 msgstr[1] "לא ניתן למחוק את יחסי האירועים"
 
 #: graphs.php:281 graphs.php:338
-#, fuzzy
 msgid "Cannot delete graph"
 msgid_plural "Cannot delete graphs"
 msgstr[0] "לא ניתן למחוק את התרשים"
-msgstr[1] "לא ניתן למחוק את התרשים"
+msgstr[1] "לא ניתן למחוק את התרשימים"
 
 #: graphs.php:273 graphs.php:317
-#, fuzzy
 msgid "Cannot delete graph prototype"
 msgid_plural "Cannot delete graph prototypes"
 msgstr[0] "לא ניתן למחוק את אבטיפוס התרשים"
-msgstr[1] "לא ניתן למחוק את אבטיפוס התרשים"
+msgstr[1] "לא ניתן למחוק את אבטיפוסי התרשים"
 
 #: app/controllers/CControllerHostMassDelete.php:76
 #, fuzzy
@@ -2819,12 +2816,12 @@ msgstr[1] "לא ניתן למחוק מתווכים"
 #: app/controllers/CControllerProxyGroupDelete.php:78
 msgid "Cannot delete proxy group"
 msgid_plural "Cannot delete proxy groups"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "לא ניתן למחוק קבוצת מתווכים"
+msgstr[1] "לא ניתן למחוק קבוצות מתווכים"
 
 #: app/controllers/CControllerProxyGroupDelete.php:39
 msgid "Cannot delete proxy groups"
-msgstr ""
+msgstr "לא ניתן למחוק קבוצות מתווכים"
 
 #: include/classes/api/services/CRole.php:362
 #, c-format
@@ -3666,7 +3663,7 @@ msgstr "לא ניתן לעדכן כמותית את שמות התצוגה למא�
 
 #: jsLoader.php:435
 msgid "Cannot open URL"
-msgstr ""
+msgstr "לא ניתן לפתוח כתובת"
 
 #: include/classes/api/services/CHostBase.php:1561
 #, c-format
@@ -4021,11 +4018,10 @@ msgstr "לא ניתן לעדכן קבוצות עבור המארח שהתגלה �
 #: app/controllers/CControllerHostUpdate.php:36
 #: app/controllers/CControllerHostUpdate.php:160
 #: app/controllers/CControllerPopupMassupdateHost.php:521
-#, fuzzy
 msgid "Cannot update host"
 msgid_plural "Cannot update hosts"
 msgstr[0] "לא ניתן לעדכן מארח"
-msgstr[1] "לא ניתן לעדכן מארח"
+msgstr[1] "לא ניתן לעדכן מארחים"
 
 #: include/classes/api/services/CHost.php:982
 msgid "Cannot update host encryption settings. Connection settings for both directions should be specified."
@@ -4961,7 +4957,7 @@ msgstr "מחובר"
 
 #: app/views/administration.timeouts.edit.php:148
 msgid "Connection"
-msgstr ""
+msgstr "חיבור"
 
 #: app/views/administration.mediatype.edit.php:91
 #: app/views/mediatype.edit.php:105
@@ -5455,7 +5451,7 @@ msgstr "יצירת חדש"
 
 #: jsLoader.php:372
 msgid "Create new report"
-msgstr ""
+msgstr "יצירת דוח חדש"
 
 #: app/views/administration.proxy.list.php:239
 msgid "Create proxy"
@@ -5463,7 +5459,7 @@ msgstr "יצירת מתווך"
 
 #: app/views/administration.proxygroup.list.php:168
 msgid "Create proxy group"
-msgstr ""
+msgstr "יצירת קבוצת מתווכנים"
 
 #: app/views/reports.scheduledreport.list.php:37
 msgid "Create report"
@@ -5715,7 +5711,7 @@ msgstr "יומי"
 
 #: include/locales.inc.php:40
 msgid "Danish (da_DK)"
-msgstr ""
+msgstr "דנית (da_DK)"
 
 #: include/classes/core/ZBase.php:381
 msgid "Dark"
@@ -5761,7 +5757,7 @@ msgstr ""
 
 #: app/views/monitoring.host.dashboard.view.php:144
 msgid "Dashboard list"
-msgstr ""
+msgstr "רשימת לוחות מחוונים"
 
 #: app/views/dashboard.page.properties.edit.php:59
 msgid "Dashboard page properties"
@@ -6100,7 +6096,7 @@ msgstr "מצב מאגר כבררת מחדל למארחים"
 
 #: app/views/administration.script.edit.php:358
 msgid "Default input string"
-msgstr ""
+msgstr "מחרוזת קלט כברירת מחדל"
 
 #: app/views/administration.gui.edit.php:73
 #: include/classes/setup/CSetupWizard.php:458
@@ -6272,7 +6268,7 @@ msgstr "למחוק קישורים בין הפריטים הנבחרים?"
 #: include/views/configuration.host.discovery.edit.php:716
 #: include/views/configuration.host.discovery.list.php:151
 msgid "Delete lost resources"
-msgstr ""
+msgstr "מחיקת משאבים אבודים"
 
 #: app/views/maintenance.edit.php:275
 msgid "Delete maintenance period?"
@@ -6460,11 +6456,11 @@ msgstr "למחוק את המתווכים הנבחרים?"
 #: app/views/js/administration.proxygroup.list.js.php:88
 #: app/views/popup.proxygroup.edit.php:147
 msgid "Delete selected proxy group?"
-msgstr ""
+msgstr "למחוק את קבוצת המתווכים הנבחרת?"
 
 #: app/views/js/administration.proxygroup.list.js.php:87
 msgid "Delete selected proxy groups?"
-msgstr ""
+msgstr "למחוק את קבוצות המתווכים הנבחרות?"
 
 #: app/views/js/administration.proxy.list.js.php:144
 #: app/views/popup.proxy.edit.php:367
@@ -6699,7 +6695,7 @@ msgstr "תיאור"
 
 #: widgets/gauge/includes/WidgetForm.php:204
 msgid "Description size"
-msgstr ""
+msgstr "גודל תיאור"
 
 #: include/classes/data/CItemData.php:1503
 msgid "Detailed listing of installed packages. Returns text in JSON format"
@@ -6815,7 +6811,7 @@ msgstr "להשבית את המארחים שמנוטרים על ידי המתוו
 #: include/views/configuration.host.discovery.edit.php:730
 #: include/views/configuration.host.discovery.list.php:166
 msgid "Disable lost resources"
-msgstr ""
+msgstr "השבתת משאבים אבודים"
 
 #: app/views/administration.token.list.php:211
 #: app/views/administration.user.token.list.php:164
@@ -7057,7 +7053,7 @@ msgstr "פעולות גילוי"
 
 #: app/views/configuration.discovery.edit.php:52
 msgid "Discovery by"
-msgstr ""
+msgstr "התגלה על ידי"
 
 #: app/views/configuration.discovery.edit.php:63
 msgid "Discovery by proxy"
@@ -7215,7 +7211,7 @@ msgstr "הצגת תרשים"
 
 #: widgets/itemhistory/views/column.edit.php:241
 msgid "Display local time"
-msgstr ""
+msgstr "הצגת השעון המקומי"
 
 #: widgets/svggraph/includes/WidgetForm.php:364
 msgid "Display min/avg/max"
@@ -7267,7 +7263,7 @@ msgstr "מכנה החילוק"
 #: include/views/configuration.item.prototype.edit.php:839
 #: include/views/configuration.item.prototype.edit.php:854
 msgid "Do not store"
-msgstr ""
+msgstr "לא לאחסן"
 
 #: jsLoader.php:213 jsLoader.php:358
 msgid "Do you wish to replace the conditional expression?"
@@ -7569,7 +7565,7 @@ msgstr "מזהה המפה ריק."
 
 #: widgets/itemhistory/Widget.php:32
 msgid "Empty value."
-msgstr ""
+msgstr "ערך ריק."
 
 #: app/views/action.list.php:167 app/views/administration.token.list.php:204
 #: app/views/administration.user.token.list.php:157
@@ -7666,7 +7662,7 @@ msgstr "הפעלת סדר וניקיון פנימיים"
 
 #: app/views/administration.authentication.edit.php:564
 msgid "Enable multi-factor authentication"
-msgstr ""
+msgstr "הפעלת אימות דו־שלבי"
 
 #: app/views/administration.token.list.php:205
 #: app/views/administration.user.token.list.php:158
@@ -7794,7 +7790,7 @@ msgstr "הפעלת לכידה"
 
 #: app/views/administration.script.edit.php:333
 msgid "Enable user input"
-msgstr ""
+msgstr "הפעלת קלט משתמש"
 
 #: app/partials/administration.system.info.php:238
 #: app/partials/configuration.filter.items.php:193
@@ -8456,7 +8452,7 @@ msgstr "שם השדה"
 #: include/views/configuration.item.edit.php:633
 #: include/views/configuration.item.prototype.edit.php:604
 msgid "Field requirements:"
-msgstr ""
+msgstr "דרישות שדה:"
 
 #: include/classes/data/CItemData.php:1607
 msgid "File checksum, calculated by the UNIX cksum algorithm. Returns integer for crc32 (default) and string for md5, sha256"
@@ -8545,7 +8541,7 @@ msgstr "מסנן נמחק"
 #: app/partials/monitoring.latest.view.html.php:36
 #: app/views/popup.generic.php:180
 msgid "Filter is not set"
-msgstr ""
+msgstr "לא הוגדר מסנן"
 
 #: app/controllers/CControllerPopupTabFilterEdit.php:115
 msgid "Filter properties"
@@ -8698,7 +8694,7 @@ msgstr "הודעות בפני המערכת"
 #: app/views/administration.user.edit.php:731
 #: app/views/administration.user.edit.php:826
 msgid "Frontend notifications"
-msgstr ""
+msgstr "התראות מנשק משתמש"
 
 #: app/partials/monitoring.latest.filter.php:158
 #: app/partials/monitoring.problem.filter.php:262
@@ -9098,7 +9094,7 @@ msgstr ""
 #: widgets/hostnavigator/includes/CWidgetFieldHostGrouping.php:74
 #: widgets/hostnavigator/includes/WidgetForm.php:102
 msgid "Group by"
-msgstr ""
+msgstr "קיבוץ לפי"
 
 #: app/views/popup.ldap.edit.php:126
 msgid "Group configuration"
@@ -9385,7 +9381,7 @@ msgstr "בית"
 
 #: widgets/honeycomb/Widget.php:29
 msgid "Honeycomb"
-msgstr ""
+msgstr "חלת דבש"
 
 #: widgets/hostavail/includes/WidgetForm.php:56
 #: widgets/problemsbysv/includes/WidgetForm.php:88
@@ -9791,7 +9787,7 @@ msgstr "נתב המארח"
 
 #: widgets/hostnavigator/includes/WidgetForm.php:69
 msgid "Host status"
-msgstr ""
+msgstr "מצב מארח"
 
 #: include/hosts.inc.php:289
 msgid "Host subnet mask"
@@ -9799,11 +9795,11 @@ msgstr "מסכת רשת של המארח"
 
 #: widgets/itemnavigator/Widget.php:43
 msgid "Host tag"
-msgstr ""
+msgstr "תגית מארח"
 
 #: widgets/itemnavigator/includes/CWidgetFieldItemGroupingView.php:80
 msgid "Host tag value"
-msgstr ""
+msgstr "ערך תגית מארח"
 
 #: widgets/tophosts/includes/WidgetForm.php:125
 msgid "Host tags"
@@ -9820,11 +9816,10 @@ msgstr "עדכון המארח נכשל."
 
 #: app/controllers/CControllerHostUpdate.php:150
 #: app/controllers/CControllerPopupMassupdateHost.php:510
-#, fuzzy
 msgid "Host updated"
 msgid_plural "Hosts updated"
 msgstr[0] "המארח עודכן"
-msgstr[1] "המארח עודכן"
+msgstr[1] "המארחים עודכנו"
 
 #: include/classes/api/services/CDashboardGeneral.php:583
 #, c-format
@@ -11206,11 +11201,11 @@ msgstr ""
 
 #: app/views/administration.script.edit.php:349
 msgid "Input type"
-msgstr ""
+msgstr "סוג קלט"
 
 #: app/views/administration.script.edit.php:376
 msgid "Input validation rule"
-msgstr ""
+msgstr "כלל תיקוף קלט"
 
 #: app/views/popup.triggerexpr.php:275
 msgid "Insert"
@@ -11885,7 +11880,7 @@ msgstr[1] "פריטים מופעלים"
 
 #: widgets/itemhistory/Widget.php:26
 msgid "Item history"
-msgstr ""
+msgstr "היסטוריית פריט"
 
 #: include/actions.inc.php:1074
 msgid "Item in \"not supported\" state"
@@ -11893,7 +11888,7 @@ msgstr "פריט במצב „לא נתמך”"
 
 #: widgets/itemnavigator/includes/WidgetForm.php:107
 msgid "Item limit"
-msgstr ""
+msgstr "מגבלת פריט"
 
 #: widgets/piechart/views/widget.edit.js.php:209
 #: widgets/svggraph/views/widget.edit.js.php:287
@@ -11902,11 +11897,11 @@ msgstr "פריט ברשימה"
 
 #: widgets/tophosts/views/column.edit.php:123
 msgid "Item name"
-msgstr ""
+msgstr "שם פריט"
 
 #: widgets/itemnavigator/Widget.php:29
 msgid "Item navigator"
-msgstr ""
+msgstr "נווט פריט"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1622
 msgid "Item not selected"
@@ -11922,7 +11917,7 @@ msgstr "תבנית פריט"
 #: widgets/piechart/views/widget.edit.js.php:208
 #: widgets/svggraph/views/widget.edit.js.php:279
 msgid "Item patterns"
-msgstr ""
+msgstr "תבניות פריט"
 
 #: app/controllers/CControllerAuditLogList.php:241
 #: app/views/popup.lldoperation.php:49 app/views/popup.massupdate.item.php:512
@@ -11970,11 +11965,11 @@ msgstr "אבות טיפוס פריט"
 
 #: widgets/itemnavigator/Widget.php:44
 msgid "Item tag"
-msgstr ""
+msgstr "תגית פריט"
 
 #: widgets/itemnavigator/includes/CWidgetFieldItemGroupingView.php:81
 msgid "Item tag value"
-msgstr ""
+msgstr "ערך תגית פריט"
 
 #: app/partials/configuration.tags.tab.php:165
 #: widgets/dataover/includes/WidgetForm.php:51
@@ -11983,7 +11978,7 @@ msgstr "תגיות פריט"
 
 #: app/views/administration.timeouts.edit.php:178
 msgid "Item test"
-msgstr ""
+msgstr "בדיקת פריט"
 
 #: jsLoader.php:400
 msgid "Item type does not use interface"
@@ -12403,7 +12398,7 @@ msgstr "נתונים עדכניים"
 
 #: app/partials/administration.system.info.php:101
 msgid "Latest release"
-msgstr ""
+msgstr "מהדורה עדכנית"
 
 #: jsLoader.php:376
 msgid "Latest values"
@@ -13783,7 +13778,7 @@ msgstr "השתקה"
 #: jsLoader.php:286
 #, c-format
 msgid "Mute for %1$s"
-msgstr ""
+msgstr "השתקה למשך %1$s"
 
 #: app/views/monitoring.dashboard.list.php:95
 msgid "My"
@@ -14114,7 +14109,7 @@ msgstr "תנאי חדש"
 
 #: app/views/connector.edit.php:298 app/views/connector.edit.php:327
 msgid "New connector"
-msgstr ""
+msgstr "מחבר חדש"
 
 #: app/controllers/CControllerDashboardView.php:174
 #: app/controllers/CControllerTemplateDashboardEdit.php:79
@@ -14124,7 +14119,7 @@ msgstr "לוח מחוונים חדש"
 #: app/views/configuration.discovery.edit.php:244
 #: app/views/configuration.discovery.edit.php:285
 msgid "New discovery rule"
-msgstr ""
+msgstr "כלל גילוי חדש"
 
 #: jsLoader.php:270
 msgid "New element"
@@ -14165,7 +14160,7 @@ msgstr "קבוצת מארחים חדשה"
 
 #: app/views/item.edit.php:218
 msgid "New item"
-msgstr ""
+msgstr "פריט חדש"
 
 #: app/views/item.prototype.edit.php:191
 msgid "New item prototype"
@@ -14178,7 +14173,7 @@ msgstr ""
 
 #: app/views/mediatype.edit.php:507 app/views/mediatype.edit.php:546
 msgid "New media type"
-msgstr ""
+msgstr "סוג מדיה חדש"
 
 #: app/views/popup.mediatypemapping.edit.php:76
 msgid "New media type mapping"
@@ -14195,7 +14190,7 @@ msgstr "מתווך חדש"
 #: app/views/popup.proxygroup.edit.php:127
 #: app/views/popup.proxygroup.edit.php:156
 msgid "New proxy group"
-msgstr ""
+msgstr "קבוצת מתווכים חדשה"
 
 #: app/views/administration.regex.list.php:37
 msgid "New regular expression"
@@ -14204,7 +14199,7 @@ msgstr "ביטוי רגולרי חדש"
 #: app/views/administration.script.edit.php:369
 #: app/views/administration.script.edit.php:409
 msgid "New script"
-msgstr ""
+msgstr "סקריפט חדש"
 
 #: app/views/popup.service.edit.php:336 app/views/popup.service.edit.php:365
 msgid "New service"
@@ -14212,11 +14207,11 @@ msgstr "שירות חדש"
 
 #: app/views/webscenario.step.edit.php:295
 msgid "New step of web scenario"
-msgstr ""
+msgstr "שלב חדש בתרחיש רשת"
 
 #: app/controllers/CControllerUsergroupTagFilterEdit.php:65
 msgid "New tag filter"
-msgstr ""
+msgstr "מסנן תגיות חדש"
 
 #: app/views/correlation.condition.edit.php:136
 msgid "New tag name"
@@ -14224,7 +14219,7 @@ msgstr "שם תגית חדש"
 
 #: app/views/template.edit.php:347
 msgid "New template"
-msgstr ""
+msgstr "תבנית חדשה"
 
 #: app/views/configuration.templategroup.edit.php:52
 #: app/views/popup.templategroup.edit.php:59
@@ -14233,7 +14228,7 @@ msgstr "קבוצת תבניות חדשה"
 
 #: app/views/trigger.edit.php:144
 msgid "New trigger"
-msgstr ""
+msgstr "הקפצה חדשה"
 
 #: app/views/trigger.prototype.edit.php:144
 msgid "New trigger prototype"
@@ -14246,7 +14241,7 @@ msgstr "הקפצות חדשות"
 #: app/partials/administration.system.info.php:58
 #: app/partials/administration.system.info.php:63
 msgid "New update available"
-msgstr ""
+msgstr "עדכון חדש זמין"
 
 #: app/views/popup.usergroupmapping.edit.php:112
 msgid "New user group mapping"
@@ -14254,11 +14249,11 @@ msgstr "מיפוי קבוצת משתמשים חדש"
 
 #: widgets/itemhistory/includes/WidgetForm.php:96
 msgid "New values"
-msgstr ""
+msgstr "ערכים חדשים"
 
 #: app/views/monitoring.host.dashboard.view.php:146
 msgid "Next dashboard"
-msgstr ""
+msgstr "לוח המחוונים הבא"
 
 #: app/views/configuration.dashboard.edit.php:114
 #: app/views/monitoring.dashboard.view.php:184
@@ -14337,7 +14332,7 @@ msgstr "אין איסוף נתונים"
 #: app/views/search.php:394 include/classes/html/CTableInfo.php:72
 #: widgets/hostnavigator/Widget.php:40
 msgid "No data found"
-msgstr ""
+msgstr "לא נמצאו נתונים"
 
 #: include/classes/html/CTableInfo.php:35
 msgid "No data found."
@@ -15321,7 +15316,7 @@ msgstr "רק הקפצות שמוקצות למארחים מופעלים שתלו�
 
 #: jsLoader.php:439
 msgid "Open URL"
-msgstr ""
+msgstr "פתיחת כתובת"
 
 #: app/views/administration.script.edit.php:228
 msgid "Open in a new window"
@@ -15463,7 +15458,7 @@ msgstr "סדר"
 
 #: widgets/tophosts/includes/WidgetForm.php:144
 msgid "Order by"
-msgstr ""
+msgstr "סידור לפי"
 
 #: widgets/tophosts/includes/WidgetForm.php:150
 msgid "Order column"
@@ -16395,7 +16390,7 @@ msgstr "שם מסך איש קשר ראשי"
 #: widgets/honeycomb/includes/WidgetForm.php:148
 #: widgets/honeycomb/views/widget.edit.php:84
 msgid "Primary label"
-msgstr ""
+msgstr "תווית עיקרית"
 
 #: app/partials/configuration.host.interface.row.php:207
 #: app/views/discovery.check.edit.php:148
@@ -16691,12 +16686,12 @@ msgstr[1] "מתווכים נמחקו"
 #: app/views/popup.proxygroup.edit.php:112
 #: include/views/configuration.host.prototype.edit.php:303
 msgid "Proxy group"
-msgstr ""
+msgstr "קבוצת מתווכים"
 
 #: include/classes/api/services/CProxyGroup.php:369
 #, c-format
 msgid "Proxy group \"%1$s\" already exists."
-msgstr ""
+msgstr "קבוצת המתווכים „%1$s” כבר קיימת."
 
 #: include/classes/import/importers/CHostImporter.php:348
 #, c-format
@@ -16710,7 +16705,7 @@ msgstr ""
 
 #: app/controllers/CControllerProxyGroupCreate.php:66
 msgid "Proxy group added"
-msgstr ""
+msgstr "נוספה קבוצת מתווכים"
 
 #: app/controllers/CControllerProxyGroupDelete.php:70
 msgid "Proxy group deleted"
@@ -16728,11 +16723,11 @@ msgstr ""
 #: include/classes/helpers/CMenuHelper.php:378
 #: include/classes/helpers/CRoleHelper.php:512
 msgid "Proxy groups"
-msgstr ""
+msgstr "קבוצות מתווכים"
 
 #: app/partials/configuration.host.edit.html.php:334
 msgid "Proxy is not assigned yet."
-msgstr ""
+msgstr "המתווך לא מוקצה עדיין."
 
 #: app/views/popup.proxy.edit.php:59
 msgid "Proxy mode"
@@ -16779,7 +16774,7 @@ msgstr "קובץ מפתח ציבורי"
 
 #: app/controllers/CControllerAuditLogList.php:210
 msgid "Push"
-msgstr ""
+msgstr "דחיפה"
 
 #: include/classes/helpers/CSlaHelper.php:64
 msgid "Quarter"
@@ -16970,7 +16965,7 @@ msgstr "מזהה סדרת רשומות"
 #: app/views/administration.proxygroup.list.php:57
 #: app/views/administration.proxygroup.list.php:103
 msgid "Recovering"
-msgstr ""
+msgstr "שחזור"
 
 #: app/views/administration.user.edit.php:752 app/views/trigger.list.php:323
 #: app/views/trigger.prototype.list.php:146
@@ -17093,7 +17088,7 @@ msgstr "דוחות קשורים"
 
 #: app/partials/administration.system.info.php:72
 msgid "Release notes"
-msgstr ""
+msgstr "הערות מהדורה"
 
 #: jsLoader.php:158
 msgid "Release to create a widget."
@@ -17284,7 +17279,7 @@ msgstr "הסרת מארח"
 
 #: include/actions.inc.php:656 include/actions.inc.php:872
 msgid "Remove host tags"
-msgstr ""
+msgstr "הסרת תגיות מארח"
 
 #: widgets/favgraphs/views/widget.view.php:43
 #: widgets/favmaps/views/widget.view.php:42
@@ -18369,7 +18364,7 @@ msgstr "שם תצוגה של איש קשר משני"
 #: widgets/honeycomb/includes/WidgetForm.php:195
 #: widgets/honeycomb/views/widget.edit.php:98
 msgid "Secondary label"
-msgstr ""
+msgstr "תווית משנית"
 
 #: tests/selenium/modules/clock32/includes/WidgetForm.php:111
 #: widgets/clock/includes/WidgetForm.php:111
@@ -18673,7 +18668,7 @@ msgstr "שירותים עודכנו"
 
 #: include/classes/api/services/CUser.php:1696
 msgid "Session ID or token is expected."
-msgstr ""
+msgstr "אמור להיות מזהה הפעלה או אסימון."
 
 #: include/classes/core/ZBase.php:269 include/classes/core/ZBase.php:554
 #: index_sso.php:262 index_sso.php:269
@@ -18852,21 +18847,21 @@ msgstr "הצגה"
 #: widgets/piechart/includes/WidgetForm.php:205
 #: widgets/svggraph/includes/WidgetForm.php:355
 msgid "Show aggregation function"
-msgstr ""
+msgstr "הצגת פונקציית צבירה"
 
 #: widgets/gauge/includes/WidgetForm.php:302
 msgid "Show arc"
-msgstr ""
+msgstr "הצגת קשת"
 
 #: widgets/itemhistory/includes/WidgetForm.php:105
 msgid "Show column header"
-msgstr ""
+msgstr "הצגת כותרת עמודה"
 
 #: widgets/hostavail/includes/WidgetForm.php:62
 #: widgets/tophosts/includes/WidgetForm.php:136
 #: widgets/web/includes/WidgetForm.php:66
 msgid "Show data in maintenance"
-msgstr ""
+msgstr "הצגת נתונים תוך כדי עבודות תחזוקה"
 
 #: app/partials/monitoring.latest.filter.php:196
 #: app/partials/monitoring.problem.filter.php:305
@@ -18885,7 +18880,7 @@ msgstr "הצגת מארחים במצב תחזוקה"
 
 #: widgets/gauge/includes/WidgetForm.php:299
 msgid "Show labels"
-msgstr ""
+msgstr "הצגת תוויות"
 
 #: include/views/configuration.graph.edit.php:118
 #: widgets/graph/includes/WidgetForm.php:75
@@ -18907,7 +18902,7 @@ msgstr "הצגת מספר הרשומות"
 
 #: widgets/hostavail/includes/WidgetForm.php:66
 msgid "Show only totals"
-msgstr ""
+msgstr "הצגת סיכומים בלבד"
 
 #: app/partials/monitoring.problem.filter.php:281
 #: widgets/problemsbysv/includes/WidgetForm.php:98
@@ -18979,11 +18974,11 @@ msgstr "הצגת ציר זמן"
 
 #: widgets/itemhistory/includes/WidgetForm.php:102
 msgid "Show timestamp"
-msgstr ""
+msgstr "הצגת חותם זמן"
 
 #: widgets/piechart/includes/WidgetForm.php:150
 msgid "Show total value"
-msgstr ""
+msgstr "הצגת ערך כולל"
 
 #: include/views/configuration.graph.edit.php:131
 msgid "Show triggers"
@@ -18995,11 +18990,11 @@ msgstr "הצגת מפות לא זמינות"
 
 #: widgets/gauge/includes/WidgetForm.php:292
 msgid "Show units"
-msgstr ""
+msgstr "הצגת יחידות"
 
 #: widgets/piechart/includes/WidgetForm.php:210
 msgid "Show value"
-msgstr ""
+msgstr "הצגת ערך"
 
 #: app/views/administration.gui.edit.php:110
 msgid "Show warning if Zabbix server is down"
@@ -19082,7 +19077,7 @@ msgstr "בודדת"
 
 #: widgets/itemhistory/views/column.edit.php:150
 msgid "Single line"
-msgstr ""
+msgstr "שורה אחידה"
 
 #: widgets/itemhistory/views/column.edit.php:140
 msgid "Single line - result will be displayed in a single line and truncated to specified length."
@@ -19538,7 +19533,7 @@ msgstr "אחסון פרטי הגישה תחת"
 #: include/views/configuration.item.prototype.edit.php:840
 #: include/views/configuration.item.prototype.edit.php:855
 msgid "Store up to"
-msgstr ""
+msgstr "אחסון עד"
 
 #: include/classes/setup/CSetupWizard.php:755
 #: include/classes/setup/CSetupWizard.php:756
@@ -19560,7 +19555,7 @@ msgstr "פונקציות מחרוזות"
 
 #: widgets/piechart/includes/WidgetForm.php:137
 msgid "Stroke width"
-msgstr ""
+msgstr "עובי קו מתאר"
 
 #: include/items.inc.php:1545 include/items.inc.php:1549
 #: include/items.inc.php:1553 include/items.inc.php:1557
@@ -19595,7 +19590,7 @@ msgstr "תת־מפה"
 
 #: tests/selenium/modules/module_number_7/views/csrf.form.view.php:20
 msgid "Submit"
-msgstr ""
+msgstr "הגשה"
 
 #: app/controllers/CControllerPopupScheduledReportSubscriptionEdit.php:167
 msgid "Subscription"
@@ -19834,7 +19829,7 @@ msgstr "תגית להתאמה"
 
 #: app/views/usergroup.tagfilter.edit.php:75
 msgid "Tag list"
-msgstr ""
+msgstr "רשימת תגיות"
 
 #: app/partials/monitoring.latest.filter.php:156
 #: app/partials/monitoring.problem.filter.php:260 include/actions.inc.php:67
@@ -20183,13 +20178,13 @@ msgstr "הנבדק"
 
 #: app/views/administration.script.edit.php:345
 msgid "Test user input"
-msgstr ""
+msgstr "בדיקת קלט משתמש"
 
 #: app/controllers/CControllerPopupItemTestGetValue.php:152
 #: app/controllers/CControllerPopupItemTestSend.php:256
 #: app/views/popup.itemtestedit.view.php:256
 msgid "Test with"
-msgstr ""
+msgstr "בדיקה עם"
 
 #: app/partials/configuration.filter.items.php:146
 #: app/views/popup.massupdate.item.php:151
@@ -21992,6 +21987,11 @@ msgstr "מחרוזת סוכן משתמש"
 msgid "User cannot add himself to a disabled group or a group with disabled GUI access."
 msgstr "המשתמש לא יכול להוסיף את עצמו לקבוצת משתמשים מושבתת או לקבוצה שהגישה שלה למנשק המשתמש הושבתה."
 
+#: include/classes/api/services/CUserGroup.php:673
+#: include/classes/api/services/CUser.php:843
+msgid "User cannot add oneself to a disabled group or a group with disabled GUI access."
+msgstr ""
+
 #: app/views/administration.user.edit.php:461
 #: include/classes/api/services/CUser.php:980
 msgid "User cannot change own role."
@@ -22127,6 +22127,10 @@ msgstr ""
 #: include/classes/api/services/CUser.php:1282
 msgid "User is not allowed to delete himself."
 msgstr "למשתמש אין הרשאה למחוק את עצמו."
+
+#: include/classes/api/services/CUser.php:1837
+msgid "User is not allowed to delete oneself."
+msgstr ""
 
 #: app/views/administration.authentication.edit.php:462
 #: app/views/popup.ldap.edit.php:222

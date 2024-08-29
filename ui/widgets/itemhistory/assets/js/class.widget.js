@@ -46,6 +46,10 @@ class CWidgetItemHistory extends CWidget {
 			this.#markSelected(this.#selected_itemid, this.#selected_clock);
 
 			this.#values_table.addEventListener('click', (e) => {
+				if (e.target.closest('[data-hintbox="1"]') !== null) {
+					return;
+				}
+
 				const element = e.target.closest('.has-broadcast-data');
 
 				if (element !== null) {
@@ -249,25 +253,24 @@ class CWidgetItemHistory extends CWidget {
 				container.innerHTML = '';
 				container.append(content);
 
+				e.target.resize_observer = new ResizeObserver((entries) => {
+					entries.forEach(entry => {
+						if (entry.contentBoxSize) {
+							const overlay = content.closest('.dashboard-widget-itemhistory-hintbox-image');
+							const size = entry.contentBoxSize[0];
+
+							overlay.style.width = `${size.inlineSize}px`;
+							overlay.style.height = `${size.blockSize}px`;
+						}
+					})
+				});
+				e.target.resize_observer.observe(content);
+
 				if (!content.complete) {
 					hint_box.classList.add('is-loading');
 
 					content.addEventListener('load', () => {
 						hint_box.classList.remove('is-loading');
-						e.target.resize_observer = new ResizeObserver((entries) => {
-							entries.forEach(entry => {
-								if (entry.devicePixelContentBoxSize) {
-									const overlay = content.closest('.dashboard-widget-itemhistory-hintbox-image');
-									const size = entry.devicePixelContentBoxSize[0];
-
-									overlay.style.width = `${size.inlineSize}px`;
-									overlay.style.height = `${size.blockSize}px`;
-
-									requestAnimationFrame(() => hintBox.onResize(e, button));
-								}
-							})
-						});
-						e.target.resize_observer.observe(content);
 					});
 
 					content.addEventListener('error', () => {

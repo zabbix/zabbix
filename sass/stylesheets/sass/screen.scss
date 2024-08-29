@@ -3417,8 +3417,7 @@ svg {
 		flex: 1;
 		align-items: center;
 		display: flex;
-		line-height: 18px;
-		overflow: hidden;
+		line-height: 20px;
 		padding: 0 10px;
 		position: relative;
 	}
@@ -3434,18 +3433,24 @@ svg {
 			min-width: 55px;
 			text-align: center;
 		}
+
+		.count,
+		.name {
+			@extend %overflow-ellipsis;
+			width: 100%;
+		}
 	}
 
 	&.totals-list-vertical {
 		flex-direction: column;
+		min-width: min-content;
 
 		> div {
-			min-height: 21px;
-			padding-top: 3px;
-		}
-
-		.count {
-			margin-right: 5px;
+			column-gap: 5px;
+			min-height: 20px;
+			padding-top: 2px;
+			padding-bottom: 2px;
+			white-space: nowrap;
 		}
 	}
 }

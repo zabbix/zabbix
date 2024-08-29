@@ -81,8 +81,8 @@ typedef enum
 }
 zbx_es_obj_type_t;
 
-void	es_obj_attach_data(zbx_es_env_t *env, void *data, zbx_es_obj_type_t type);
+void	es_obj_attach_data(zbx_es_env_t *env, void *objptr, void *data, zbx_es_obj_type_t type);
 void	*es_obj_get_data(zbx_es_env_t *env, zbx_es_obj_type_t type);
-void	*es_obj_detach_data(zbx_es_env_t *env, zbx_es_obj_type_t type);
+void	*es_obj_detach_data(zbx_es_env_t *env, void *objptr, zbx_es_obj_type_t type);
 
 #endif /* ZABBIX_EMBED_H */
