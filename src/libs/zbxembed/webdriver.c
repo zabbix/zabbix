@@ -573,7 +573,8 @@ int	webdriver_find_element(zbx_webdriver_t *wd, const char *strategy, const char
 	if (SUCCEED != webdriver_session_query(wd, "POST", "element", json.buffer, &jp, error))
 	{
 		/* throw exception in the case of connection errors */
-		if (404 != wd->error->http_code || 0 == strcmp(wd->error->error, WEBDRIVER_INVALID_SESSIONID_ERROR))
+		if (NULL == wd->error || 404 != wd->error->http_code ||
+				0 == strcmp(wd->error->error, WEBDRIVER_INVALID_SESSIONID_ERROR))
 			goto out;
 
 		/* otherwise log the error and return NULL element */
@@ -1170,8 +1171,11 @@ int	webdriver_get_alert(zbx_webdriver_t *wd, char **text, char **error)
 	if (SUCCEED != webdriver_session_query(wd, "GET", "alert/text", NULL, &jp, error))
 	{
 		/* throw exception in the case of connection errors */
-		if (404 != wd->error->http_code || 0 == strcmp(wd->error->error, WEBDRIVER_INVALID_SESSIONID_ERROR))
+		if (NULL == wd->error || 404 != wd->error->http_code ||
+				0 == strcmp(wd->error->error, WEBDRIVER_INVALID_SESSIONID_ERROR))
+		{
 			goto out;
+		}
 
 		/* otherwise log the error and return NULL alert */
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot get alert text: %s", error);
