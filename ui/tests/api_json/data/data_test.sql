@@ -1562,21 +1562,21 @@ INSERT INTO hosts_templates (hosttemplateid, hostid, templateid) VALUES (50004, 
 INSERT INTO hosts_templates (hosttemplateid, hostid, templateid) VALUES (50005, 99014, 99025);
 INSERT INTO hosts_templates (hosttemplateid, hostid, templateid) VALUES (50006, 99015, 99026);
 INSERT INTO hosts_templates (hosttemplateid, hostid, templateid) VALUES (50007, 99024, 99027);
-INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (1000, 99013, 'OS', 'Windows');
-INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (1001, 99014, 'Browser', 'Firefox');
-INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (1002, 99015, 'OS', 'Linux');
-INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (1003, 99016, 'Browser', 'Chrome');
-INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (1004, 99018, 'Other', '');
-INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (1005, 99019, 'OS', 'Android');
-INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (1006, 99020, 'Browser', 'IE');
-INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (1007, 99021, 'OS', '');
-INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (1008, 99022, 'OS', 'Mac');
-INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (1009, 99023, 'Browser', '');
-INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (1010, 99024, 'OS', 'Win7');
-INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (1011, 99025, 'Browser', 'FF');
-INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (1012, 99026, 'OS', 'Ubuntu Bionic Beaver');
-INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (1013, 99025, 'Webbrowser', 'Mozilla');
-INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (1014, 99027, 'office', 'Riga');
+INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (100990, 99013, 'OS', 'Windows');
+INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (100991, 99014, 'Browser', 'Firefox');
+INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (100992, 99015, 'OS', 'Linux');
+INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (100993, 99016, 'Browser', 'Chrome');
+INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (100994, 99018, 'Other', '');
+INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (100995, 99019, 'OS', 'Android');
+INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (100996, 99020, 'Browser', 'IE');
+INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (100997, 99021, 'OS', '');
+INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (100998, 99022, 'OS', 'Mac');
+INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (100999, 99023, 'Browser', '');
+INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (109910, 99024, 'OS', 'Win7');
+INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (109911, 99025, 'Browser', 'FF');
+INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (109912, 99026, 'OS', 'Ubuntu Bionic Beaver');
+INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (109913, 99025, 'Webbrowser', 'Mozilla');
+INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (109914, 99027, 'office', 'Riga');
 INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, status, params, description, posts, headers) VALUES (58736, 99013, NULL, 2, 3, 'Item', 'item', 0, 90, 0, '', '', '', '');
 INSERT INTO triggers (triggerid, description, expression, comments, value) VALUES (50172, 'trigger1', '{50232}=1', '', '1');
 INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50232, 50172, 58736, 'last', '$');
@@ -1650,6 +1650,12 @@ INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (5
 -- services
 INSERT INTO services (serviceid, name, description) VALUES (1, 'API Service for delete', '');
 INSERT INTO services (serviceid, name, description) VALUES (2, 'API Service for update', '');
+
+-- sla
+INSERT INTO sla (slaid, name, period, slo, effective_date, timezone, status, description) VALUES (50038, 'Sla for delete 1', 0, 99.9999, 2147483637, 'Europe/Riga', 0, 'Pasta servera atjaunošana');
+INSERT INTO sla (slaid, name, period, slo, effective_date, timezone, status, description) VALUES (50039, 'Sla for delete 2', 1, 99.9999, 2147483547, 'Europe/Riga', 1, 'Pasta servera atjaunošana');
+INSERT INTO sla (slaid, name, period, slo, effective_date, timezone, status, description) VALUES (50040, 'Sla for delete 3', 2, 99.9999, 2147482647, 'Europe/Riga', 0, 'Pasta servera atjaunošana');
+INSERT INTO sla (slaid, name, period, slo, effective_date, timezone, status, description) VALUES (50041, 'Sla for getSli', 2, 99.9999, 2147482647, 'Europe/Riga', 0, 'Pasta servera atjaunošana');
 
 -- high availability nodes
 INSERT INTO ha_node (name,address,port,status,ha_nodeid) VALUES ('node1','192.168.1.5','10051','0','ckuo7i1nv00090sajelcon0su');

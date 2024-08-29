@@ -110,6 +110,8 @@ class CControllerProblemView extends CControllerProblem {
 		}
 
 		$filter = $filter_tabs[$profile->selected];
+		$filter = self::sanitizeFilter($filter);
+
 		$refresh_curl = new CUrl('zabbix.php');
 		$filter['action'] = 'problem.view.refresh';
 		array_map([$refresh_curl, 'setArgument'], array_keys($filter), $filter);
@@ -129,6 +131,7 @@ class CControllerProblemView extends CControllerProblem {
 				'selected' => $profile->selected,
 				'support_custom_time' => 1,
 				'expanded' => $profile->expanded,
+				'expanded_timeselector' => $profile->expanded_timeselector,
 				'page' => $filter['page'],
 				'timeselector' => [
 					'from' => $profile->from,

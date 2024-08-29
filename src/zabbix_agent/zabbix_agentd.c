@@ -1306,8 +1306,17 @@ void	zbx_on_exit(int ret, void *on_exit_args)
 #ifdef _WINDOWS
 	ZBX_UNUSED(on_exit_args);
 #endif
-	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called with ret:%d", ret);
 
+	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called with ret:%d", ret);
+#ifndef _WINDOWS
+	if (NULL != on_exit_args)
+	{
+		zbx_on_exit_args_t	*args = (zbx_on_exit_args_t *)on_exit_args;
+
+		if (NULL != args->listen_sock)
+			zbx_tcp_unlisten(args->listen_sock);
+	}
+#endif
 	zbx_free_service_resources(ret);
 
 #if defined(_WINDOWS) && (defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
@@ -1320,16 +1329,7 @@ void	zbx_on_exit(int ret, void *on_exit_args)
 #ifdef _WINDOWS
 	while (0 == WSACleanup())
 		;
-#else
-	if (NULL != on_exit_args)
-	{
-		zbx_on_exit_args_t	*args = (zbx_on_exit_args_t *)on_exit_args;
-
-		if (NULL != args->listen_sock)
-			zbx_tcp_unlisten(args->listen_sock);
-	}
 #endif
-
 	exit(EXIT_SUCCESS);
 }
 

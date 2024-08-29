@@ -39,6 +39,7 @@ extern char	*CONFIG_DB_TLS_CIPHER_13;
 extern int	CONFIG_DBPORT;
 extern int	CONFIG_HISTSYNCER_FORKS;
 extern int	CONFIG_UNAVAILABLE_DELAY;
+extern int	CONFIG_DBREAD_ONLY_RECOVERABLE;
 
 typedef enum
 {
@@ -411,15 +412,9 @@ zbx_uint32_t	zbx_deserialize_mediatype(const unsigned char *data, DB_MEDIATYPE *
 
 typedef struct
 {
-	zbx_uint64_t	alertid;
-	zbx_uint64_t 	actionid;
-	int		clock;
-	zbx_uint64_t	mediatypeid;
 	char		*sendto;
 	char		*subject;
 	char		*message;
-	zbx_alert_status_t	status;
-	int		retries;
 }
 DB_ALERT;
 

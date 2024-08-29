@@ -15,7 +15,7 @@ Zabbix version: 6.0 and higher.
 ## Tested versions
 
 This template has been tested on:
-- VMWare 6.0
+- VMware 6.0
 
 ## Configuration
 
@@ -23,16 +23,18 @@ This template has been tested on:
 
 ## Setup
 
-1. Compile zabbix server with required options (--with-libxml2 and --with-libcurl)
-2. Set the StartVMwareCollectors option in Zabbix server configuration file to 1 or more
+1. Compile Zabbix server with the required options (`--with-libxml2` and `--with-libcurl`)
+2. Set the `StartVMwareCollectors` option in Zabbix server configuration file to "1" or more
 3. Create a new host
-4. Set the host macros (on host or template level) required for VMware authentication:
+4. Set the host macros (on the host or template level) required for VMware authentication:
 ```text
 {$VMWARE.URL}
 {$VMWARE.USERNAME}
 {$VMWARE.PASSWORD}
 ```
-5. Link the template to host created early
+5. Link the template to host created earlier
+
+Note: To enable discovery of hardware sensors of VMware Hypervisors, set the macro `{$VMWARE.HV.SENSOR.DISCOVERY}` to the value `true` on the host level.
 
 ### Macros used
 
@@ -41,6 +43,11 @@ This template has been tested on:
 |{$VMWARE.URL}|<p>VMware service (vCenter or ESX hypervisor) SDK URL (https://servername/sdk)</p>||
 |{$VMWARE.USERNAME}|<p>VMware service user name</p>||
 |{$VMWARE.PASSWORD}|<p>VMware service {$USERNAME} user password</p>||
+|{$VMWARE.HV.SENSOR.DISCOVERY}|<p>Set "true"/"false" to enable or disable monitoring of hardware sensors.</p>|`false`|
+|{$VMWARE.HV.SENSOR.DISCOVERY.NAME.MATCHES}|<p>Sets the regex string of hardware sensor names to allow in discovery.</p>|`.*`|
+|{$VMWARE.HV.SENSOR.DISCOVERY.NAME.NOT_MATCHES}|<p>Sets the regex string of hardware sensor names to ignore in discovery.</p>|`CHANGE_IF_NEEDED`|
+|{$VMWARE.DATASTORE.SPACE.CRIT}|<p>The critical threshold of the datastore free space.</p>|`10`|
+|{$VMWARE.DATASTORE.SPACE.WARN}|<p>The warning threshold of the datastore free space.</p>|`20`|
 
 ### Items
 
@@ -62,6 +69,13 @@ This template has been tested on:
 |----|-----------|----|-----------------------|
 |VMware: Status of "{#CLUSTER.NAME}" cluster|<p>VMware cluster status.</p>|Simple check|vmware.cluster.status[{$VMWARE.URL},{#CLUSTER.NAME}]|
 
+### Trigger prototypes for Discover VMware clusters
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|VMware: The {#CLUSTER.NAME} status is Red|<p>A cluster enabled for DRS becomes invalid (red) when the tree is no longer internally consistent, that is, resource constraints are not observed. See also: https://docs.vmware.com/en/VMware-vSphere/8.0/vsphere-resource-management/GUID-C7417CAA-BD38-41D0-9529-9E7A5898BB12.html</p>|`last(/VMware/vmware.cluster.status[{$VMWARE.URL},{#CLUSTER.NAME}])=3`|High||
+|VMware: The {#CLUSTER.NAME} status is Yellow|<p>A cluster becomes overcommitted (yellow) when the tree of resource pools and virtual machines is internally consistent but the cluster does not have the capacity to support all resources reserved by the child resource pools. See also: https://docs.vmware.com/en/VMware-vSphere/8.0/vsphere-resource-management/GUID-ED8240A0-FB54-4A31-BD3D-F23FE740F10C.html</p>|`last(/VMware/vmware.cluster.status[{$VMWARE.URL},{#CLUSTER.NAME}])=2`|Average|**Depends on**:<br><ul><li>VMware: The {#CLUSTER.NAME} status is Red</li></ul>|
+
 ### LLD rule Discover VMware datastores
 
 |Name|Description|Type|Key and additional info|
@@ -73,9 +87,16 @@ This template has been tested on:
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |VMware: Average read latency of the datastore {#DATASTORE}|<p>Amount of time for a read operation from the datastore (milliseconds).</p>|Simple check|vmware.datastore.read[{$VMWARE.URL},{#DATASTORE},latency]|
-|VMware: Free space on datastore {#DATASTORE} (percentage)|<p>VMware datastore space in percentage from total.</p>|Simple check|vmware.datastore.size[{$VMWARE.URL},{#DATASTORE},pfree]|
+|VMware: Free space on datastore {#DATASTORE} (percentage)|<p>VMware datastore free space in percentage from total.</p>|Simple check|vmware.datastore.size[{$VMWARE.URL},{#DATASTORE},pfree]|
 |VMware: Total size of datastore {#DATASTORE}|<p>VMware datastore space in bytes.</p>|Simple check|vmware.datastore.size[{$VMWARE.URL},{#DATASTORE}]|
 |VMware: Average write latency of the datastore {#DATASTORE}|<p>Amount of time for a write operation to the datastore (milliseconds).</p>|Simple check|vmware.datastore.write[{$VMWARE.URL},{#DATASTORE},latency]|
+
+### Trigger prototypes for Discover VMware datastores
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|VMware: {#DATASTORE}: Free space is critically low|<p>Datastore free space has fallen below critical threshold.</p>|`last(/VMware/vmware.datastore.size[{$VMWARE.URL},{#DATASTORE},pfree])<{$VMWARE.DATASTORE.SPACE.CRIT}`|High||
+|VMware: {#DATASTORE}: Free space is low|<p>Datastore free space has fallen below warning threshold.</p>|`last(/VMware/vmware.datastore.size[{$VMWARE.URL},{#DATASTORE},pfree])<{$VMWARE.DATASTORE.SPACE.WARN}`|Warning|**Depends on**:<br><ul><li>VMware: {#DATASTORE}: Free space is critically low</li></ul>|
 
 ### LLD rule Discover VMware hypervisors
 
@@ -193,9 +214,14 @@ This template has been tested on:
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$VMWARE.URL}|<p>VMware service (vCenter or ESX hypervisor) SDK URL (https://servername/sdk)</p>||
-|{$VMWARE.USERNAME}|<p>VMware service user name</p>||
-|{$VMWARE.PASSWORD}|<p>VMware service {$USERNAME} user password</p>||
+|{$VMWARE.URL}|<p>VMware service (vCenter or ESX hypervisor) SDK URL (https://servername/sdk).</p>||
+|{$VMWARE.USERNAME}|<p>VMware service user name.</p>||
+|{$VMWARE.PASSWORD}|<p>VMware service {$USERNAME} user password.</p>||
+|{$VMWARE.HV.SENSOR.DISCOVERY}|<p>Set "true"/"false" to enable or disable monitoring of hardware sensors.</p>|`false`|
+|{$VMWARE.HV.SENSOR.DISCOVERY.NAME.MATCHES}|<p>Sets the regex string of hardware sensor names to allow in discovery.</p>|`.*`|
+|{$VMWARE.HV.SENSOR.DISCOVERY.NAME.NOT_MATCHES}|<p>Sets the regex string of hardware sensor names to ignore in discovery.</p>|`CHANGE_IF_NEEDED`|
+|{$VMWARE.HV.DATASTORE.SPACE.CRIT}|<p>The critical threshold of the datastore free space.</p>|`10`|
+|{$VMWARE.HV.DATASTORE.SPACE.WARN}|<p>The warning threshold of the datastore free space.</p>|`20`|
 
 ### Items
 
@@ -248,7 +274,7 @@ This template has been tested on:
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |VMware: Average read latency of the datastore {#DATASTORE}|<p>Average amount of time for a read operation from the datastore (milliseconds).</p>|Simple check|vmware.hv.datastore.read[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE},latency]|
-|VMware: Free space on datastore {#DATASTORE} (percentage)|<p>VMware datastore space in percentage from total.</p>|Simple check|vmware.hv.datastore.size[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE},pfree]|
+|VMware: Free space on datastore {#DATASTORE} (percentage)|<p>VMware datastore free space in percentage from total.</p>|Simple check|vmware.hv.datastore.size[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE},pfree]|
 |VMware: Total size of datastore {#DATASTORE}|<p>VMware datastore space in bytes.</p>|Simple check|vmware.hv.datastore.size[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE}]|
 |VMware: Average write latency of the datastore {#DATASTORE}|<p>Average amount of time for a write operation to the datastore (milliseconds).</p>|Simple check|vmware.hv.datastore.write[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE},latency]|
 |VMware: Multipath count for datastore {#DATASTORE}|<p>Number of available datastore paths.</p>|Simple check|vmware.hv.datastore.multipath[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE}]|
@@ -257,13 +283,15 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
+|VMware: {#DATASTORE}: Free space is critically low|<p>Datastore free space has fallen below critical threshold.</p>|`last(/VMware Hypervisor/vmware.hv.datastore.size[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE},pfree])<{$VMWARE.HV.DATASTORE.SPACE.CRIT}`|High||
+|VMware: {#DATASTORE}: Free space is low|<p>Datastore free space has fallen below warning threshold.</p>|`last(/VMware Hypervisor/vmware.hv.datastore.size[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE},pfree])<{$VMWARE.HV.DATASTORE.SPACE.WARN}`|Warning|**Depends on**:<br><ul><li>VMware: {#DATASTORE}: Free space is critically low</li></ul>|
 |VMware: The multipath count has been changed|<p>The number of available datastore paths less than registered ({#MULTIPATH.COUNT}).</p>|`last(/VMware Hypervisor/vmware.hv.datastore.multipath[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE}],#1)<>last(/VMware Hypervisor/vmware.hv.datastore.multipath[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE}],#2) and last(/VMware Hypervisor/vmware.hv.datastore.multipath[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE}])<{#MULTIPATH.COUNT}`|Average|**Manual close**: Yes|
 
 ### LLD rule Healthcheck discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Healthcheck discovery|<p>VMware Rollup Health State sensor discovery</p>|Dependent item|vmware.hv.healthcheck.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Set value to: `[]`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Healthcheck discovery|<p>VMware Rollup Health State sensor discovery.</p>|Dependent item|vmware.hv.healthcheck.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Set value to: `[]`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 
 ### Item prototypes for Healthcheck discovery
 
@@ -277,6 +305,25 @@ This template has been tested on:
 |----|-----------|----------|--------|--------------------------------|
 |VMware: The {$VMWARE.HV.UUID} health is Red|<p>One or more components in the appliance might be in an unusable status and the appliance might become unresponsive soon. Security patches might be available.</p>|`last(/VMware Hypervisor/vmware.hv.sensor.health.state[{#SINGLETON}])="Red"`|High|**Depends on**:<br><ul><li>VMware: The {$VMWARE.HV.UUID} health is Red</li></ul>|
 |VMware: The {$VMWARE.HV.UUID} health is Yellow|<p>One or more components in the appliance might become overloaded soon.</p>|`last(/VMware Hypervisor/vmware.hv.sensor.health.state[{#SINGLETON}])="Yellow"`|Average|**Depends on**:<br><ul><li>VMware: The {$VMWARE.HV.UUID} health is Red</li><li>VMware: The {$VMWARE.HV.UUID} health is Yellow</li><li>VMware: The {$VMWARE.HV.UUID} health is Red</li></ul>|
+
+### LLD rule Sensor discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Sensor discovery|<p>VMware hardware sensor discovery. The data is retrieved from numeric sensor probes and provides information about the health of the physical system.</p>|Dependent item|vmware.hv.sensors.discovery<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+
+### Item prototypes for Sensor discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|VMware: Sensor [{#NAME}] health state|<p>VMware hardware sensor health state. One of the following:</p><p>- Unknown</p><p>- Green</p><p>- Yellow</p><p>- Red</p>|Dependent item|vmware.hv.sensor.state["{#NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+
+### Trigger prototypes for Sensor discovery
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|VMware: Sensor [{#NAME}] health state is Red|<p>One or more components in the appliance might be in an unusable status and the appliance might become unresponsive soon.</p>|`last(/VMware Hypervisor/vmware.hv.sensor.state["{#NAME}"])=3`|High|**Depends on**:<br><ul><li>VMware: The {$VMWARE.HV.UUID} health is Red</li></ul>|
+|VMware: Sensor [{#NAME}] health state is Yellow|<p>One or more components in the appliance might become overloaded soon.</p>|`last(/VMware Hypervisor/vmware.hv.sensor.state["{#NAME}"])=2`|Average|**Depends on**:<br><ul><li>VMware: The {$VMWARE.HV.UUID} health is Red</li><li>VMware: The {$VMWARE.HV.UUID} health is Yellow</li><li>VMware: Sensor [{#NAME}] health state is Red</li></ul>|
 
 ## Feedback
 

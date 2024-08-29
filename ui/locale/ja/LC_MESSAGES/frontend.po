@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-04-02 17:26+0300\n"
-"PO-Revision-Date: 2024-01-26 09:48+0000\n"
-"Last-Translator: JK <kim.jongkwon@zabbix.com>\n"
+"PO-Revision-Date: 2024-04-25 07:50+0000\n"
+"Last-Translator: Akira <g42getd@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -3166,7 +3166,7 @@ msgstr "メディアタイプを更新できません"
 
 #: app/controllers/CControllerModuleUpdate.php:139
 msgid "Cannot update module"
-msgstr ""
+msgstr "モジュールを更新できません"
 
 #: sysmaps.php:189
 msgid "Cannot update network map"
@@ -3530,11 +3530,11 @@ msgstr "ヒストリとトレンドを削除"
 
 #: include/views/configuration.item.list.php:293
 msgid "Clear history and trends of selected items?"
-msgstr ""
+msgstr "選択したアイテムのヒストリとトレンドを削除しますか？"
 
 #: include/views/configuration.httpconf.list.php:218
 msgid "Clear history and trends of selected web scenarios?"
-msgstr ""
+msgstr "選択したWebシナリオのヒストリとトレンドを削除しますか？"
 
 #: app/views/popup.massupdate.host.php:68
 #: app/views/popup.massupdate.template.php:71
@@ -4389,6 +4389,10 @@ msgstr "メディアタイプの作成"
 #: app/views/popup.import.php:97 jsLoader.php:361
 msgid "Create new"
 msgstr "新規作成"
+
+#: jsLoader.php:363
+msgid "Create new report"
+msgstr ""
 
 #: app/views/administration.proxy.list.php:37
 msgid "Create proxy"
@@ -6788,6 +6792,10 @@ msgstr "ダッシュボードページのプロパティの変更に失敗しま
 msgid "Failed to update dashboard properties."
 msgstr "ダッシュボードのプロパティの変更に失敗しました。"
 
+#: app/views/js/popup.dashboard.share.edit.js.php:86
+msgid "Failed to update dashboard sharing."
+msgstr ""
+
 #: jsLoader.php:142
 msgid "Failed to update widget properties."
 msgstr "ウィジェットのプロパティの変更に失敗しました。"
@@ -7904,6 +7912,10 @@ msgstr "ホストグループ\"%1$s\"は組み込まれたグループなので�
 msgid "Host group elements"
 msgstr "ホストグループ内のホスト"
 
+#: jsLoader.php:287
+msgid "Host group is not selected."
+msgstr ""
+
 #: include/views/monitoring.sysmap.edit.php:165
 msgid "Host group label type"
 msgstr "ホストグループのラベルタイプ"
@@ -7977,6 +7989,10 @@ msgstr "ホストインベントリ"
 #: hostinventoriesoverview.php:26 hostinventoriesoverview.php:146
 msgid "Host inventory overview"
 msgstr "ホストインベントリの概要"
+
+#: jsLoader.php:284
+msgid "Host is not selected."
+msgstr ""
 
 #: include/views/monitoring.sysmap.edit.php:180
 msgid "Host label type"
@@ -10139,6 +10155,10 @@ msgstr[0] "アイテムを有効にしました"
 msgid "Item in \"not supported\" state"
 msgstr "アイテムが\"取得不可\"の状態"
 
+#: app/views/popup.tophosts.column.edit.php:103
+msgid "Item name"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:1562
 msgid "Item not selected"
 msgstr "アイテムが選択されていません"
@@ -11150,6 +11170,10 @@ msgstr "アイコンのラベルの位置"
 msgid "Map element label type"
 msgstr "アイコンのラベルのタイプ"
 
+#: jsLoader.php:285
+msgid "Map is not selected."
+msgstr ""
+
 #: sysmap.php:128
 msgid "Map is updated! Return to map list?"
 msgstr "マップを更新しました！ マップ一覧に戻りますか？"
@@ -11654,7 +11678,7 @@ msgstr[0] ""
 
 #: app/controllers/CControllerModuleUpdate.php:128
 msgid "Module updated"
-msgstr ""
+msgstr "モジュールを更新しました"
 
 #: include/classes/api/services/CRole.php:707
 #, c-format
@@ -13078,6 +13102,18 @@ msgstr "1つ"
 #: app/views/popup.maintenance.period.php:75 include/maintenances.inc.php:25
 msgid "One time only"
 msgstr "一度限り"
+
+#: include/classes/api/services/CUser.php:800
+#: include/classes/api/services/CUser.php:807
+#, c-format
+msgid "Only Super admin or Admin users can update \"%1$s\" parameter."
+msgstr ""
+
+#: include/classes/api/services/CUser.php:725
+#: include/classes/api/services/CUser.php:766
+#, c-format
+msgid "Only Super admin users can update \"%1$s\" parameter."
+msgstr ""
 
 #: include/classes/api/services/CDRule.php:488
 msgid "Only Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 checks can be made unique."
@@ -15086,6 +15122,12 @@ msgstr "結果が偽"
 #: include/classes/helpers/CRegexHelper.php:29
 msgid "Result is TRUE"
 msgstr "結果が真"
+
+#: app/controllers/CControllerPopupItemTestSend.php:433
+#: app/controllers/CControllerPopupItemTestSend.php:461
+#, c-format
+msgid "Result is truncated due to its size (%1$s)."
+msgstr ""
 
 #: app/views/popup.testtriggerexpr.php:30
 msgid "Result type"
@@ -17972,6 +18014,10 @@ msgstr "トリガーが\"不明\"の状態"
 msgid "Trigger in template \"%1$s\" has dependency with trigger in template \"%2$s\"."
 msgstr "テンプレート\"%1$s\"のトリガーはテンプレート\"%2$s\"のトリガーと依存関係が設定されています。"
 
+#: jsLoader.php:286
+msgid "Trigger is not selected."
+msgstr ""
+
 #: include/views/monitoring.sysmap.edit.php:195
 msgid "Trigger label type"
 msgstr "トリガーラベルタイプ"
@@ -19612,6 +19658,10 @@ msgstr "ビュー"
 msgid "View as"
 msgstr "表示形式"
 
+#: jsLoader.php:397
+msgid "View related reports"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1234
 msgid "Virtual space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr "バイト単位もしくはトータルからのパーセンテージでの仮想メモリサイズ。バイト単位であれば整数値を返し、パーセンテージであれば浮動小数点値を返す。"
@@ -20148,6 +20198,10 @@ msgstr "このページを表示する権限がありません。"
 #: include/func.inc.php:1724
 msgid "You must login to view this page."
 msgstr "このページを表示するためにはログインする必要があります"
+
+#: jsLoader.php:282
+msgid "You need to have at least one image uploaded to create map element. Images can be uploaded in Administration->General->Images section."
+msgstr ""
 
 #: include/classes/db/DB.php:135
 msgid "Your database is not working properly. Please wait a few minutes and try to repeat this action. If the problem still persists, please contact system administrator. The problem might be caused by long running transaction or row level lock accomplished by your database management system."
@@ -21068,11 +21122,11 @@ msgstr "データの保存期間設定(全体設定)"
 
 #: include/classes/api/services/CGraphGeneral.php:836
 msgid "graph prototype with the same UUID already exists"
-msgstr ""
+msgstr "同じUUIDのグラフプロトタイプがすでに存在します"
 
 #: include/classes/api/services/CGraphGeneral.php:830
 msgid "graph with the same UUID already exists"
-msgstr ""
+msgstr "同じUUIDのグラフがすでに存在します"
 
 #: include/func.inc.php:594 include/func.inc.php:661 jsLoader.php:225
 msgctxt "hour short"
@@ -21096,7 +21150,7 @@ msgstr "ホストグループ"
 
 #: include/classes/api/services/CHostGroup.php:819
 msgid "host group with the same UUID already exists"
-msgstr ""
+msgstr "同じUUIDのホストグループがすでに存在します"
 
 #: include/classes/widgets/CWidgetHelper.php:816
 #: include/classes/widgets/CWidgetHelper.php:1177
@@ -21106,7 +21160,7 @@ msgstr "ホストパターン"
 
 #: include/classes/api/services/CHostPrototype.php:1236
 msgid "host prototype with the same UUID already exists"
-msgstr ""
+msgstr "同じUUIDのホストプロトタイプがすでに存在します"
 
 #: include/classes/api/services/CMap.php:844
 #: include/classes/api/services/CMap.php:1311
@@ -21325,11 +21379,11 @@ msgstr "アイテムパターン"
 
 #: include/classes/api/services/CItemGeneral.php:715
 msgid "item prototype with the same UUID already exists"
-msgstr ""
+msgstr "同じUUIDのアイテムプロトタイプがすでに存在します"
 
 #: include/classes/api/services/CItemGeneral.php:703
 msgid "item with the same UUID already exists"
-msgstr ""
+msgstr "同じUUIDのアイテムがすでに存在します"
 
 #: include/classes/parsers/CItemKey.php:54
 msgid "key is empty"
@@ -21869,6 +21923,10 @@ msgstr "右"
 msgid "right() - Returns the rightmost count characters"
 msgstr "right() - 右端の文字を返す"
 
+#: jsLoader.php:199
+msgid "root"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:937
 msgid "round() - Rounds a value to decimal places"
 msgstr "round() - 小数点以下桁数で四捨五入"
@@ -22042,11 +22100,11 @@ msgstr "テンプレートID\"%1$s\"が%2$s回使用されています"
 
 #: include/classes/api/services/CTemplateDashboard.php:395
 msgid "template dashboard with the same UUID already exists"
-msgstr ""
+msgstr "同じUUIDのテンプレートダッシュボードがすでに存在します"
 
 #: include/classes/api/services/CTemplate.php:449
 msgid "template with the same UUID already exists"
-msgstr ""
+msgstr "同じUUIDのテンプレートがすでに存在します"
 
 #: include/classes/validators/CApiInputValidator.php:2932
 msgid "the last new line feed is missing"
@@ -22167,7 +22225,7 @@ msgstr "トリガーのプロトタイプは他のテンプレートやホスト
 
 #: include/classes/api/services/CTriggerGeneral.php:686
 msgid "trigger prototype with the same UUID already exists"
-msgstr ""
+msgstr "同じUUIDのトリガープロトタイプがすでに存在します"
 
 #: include/classes/api/services/CTriggerGeneral.php:2257
 msgid "trigger with linkages cannot be moved to another template or host"
@@ -22175,7 +22233,7 @@ msgstr "リンクのあるトリガーは他のテンプレートやホストに
 
 #: include/classes/api/services/CTriggerGeneral.php:680
 msgid "trigger with the same UUID already exists"
-msgstr ""
+msgstr "同じUUIDのトリガーがすでに存在します"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1138
 msgid "trim() - Remove specified characters from the beginning and the end of a string"
@@ -22384,7 +22442,7 @@ msgstr "値が長すぎます"
 
 #: include/classes/api/services/CValueMap.php:501
 msgid "value map with the same UUID already exists"
-msgstr ""
+msgstr "同じUUIDの値のマッピングがすでに存在します"
 
 #: include/classes/api/services/CReport.php:198
 #: include/classes/api/services/CReport.php:582
@@ -22486,7 +22544,7 @@ msgstr "w"
 
 #: include/classes/api/services/CHttpTest.php:438
 msgid "web scenario with the same UUID already exists"
-msgstr ""
+msgstr "同じUUIDのWebシナリオがすでに存在します"
 
 #: include/classes/api/services/CTask.php:443
 msgid "wrong discovery rule type"

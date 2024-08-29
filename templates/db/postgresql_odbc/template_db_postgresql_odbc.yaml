@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-11-01T20:49:26Z'
+  date: '2024-04-18T09:50:27Z'
   groups:
     - uuid: 748ad4d098d447d492bb935c907f652f
       name: Templates/Databases
@@ -82,7 +82,7 @@ zabbix_export:
           params: |
             SELECT count(*)
               FROM pg_catalog.pg_stat_activity
-                WHERE query like '%%autovacuum%%'
+                WHERE backend_type = 'autovacuum worker'
                   AND state <> 'idle'
                   AND pid <> pg_catalog.pg_backend_pid()
           username: '{$PG.USER}'

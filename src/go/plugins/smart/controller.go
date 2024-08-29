@@ -27,8 +27,8 @@ import (
 	"strings"
 	"time"
 
-	"git.zabbix.com/ap/plugin-support/errs"
-	"git.zabbix.com/ap/plugin-support/log"
+	"golang.zabbix.com/sdk/errs"
+	"golang.zabbix.com/sdk/log"
 )
 
 var _ SmartController = (*SmartCtl)(nil)
@@ -71,6 +71,7 @@ func (s *SmartCtl) Execute(args ...string) ([]byte, error) {
 	}
 
 	cmd := "sudo"
+
 	cmdArgs := append([]string{"-n", s.commandPath}, args...)
 
 	if runtime.GOOS == "windows" {
@@ -85,7 +86,9 @@ func (s *SmartCtl) Execute(args ...string) ([]byte, error) {
 		"executing smartctl command: %s %s", cmd, strings.Join(cmdArgs, " "),
 	)
 
-	out, err := exec.CommandContext(ctx, cmd, cmdArgs...).CombinedOutput()
+	//nolint:gosec
+	out, err := exec.CommandContext(ctx, cmd, cmdArgs...).
+		CombinedOutput()
 	if err != nil {
 		exitErr := &exec.ExitError{}
 		if errors.As(err, &exitErr) {

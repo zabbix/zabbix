@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-04-02 17:26+0300\n"
-"PO-Revision-Date: 2024-03-29 12:11+0000\n"
+"PO-Revision-Date: 2024-06-14 12:51+0000\n"
 "Last-Translator: Albert <albert.przybylski@aplitt.pl>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
@@ -537,7 +537,7 @@ msgstr "Potwierdzenie"
 
 #: include/classes/helpers/CRoleHelper.php:464
 msgid "Acknowledge problems"
-msgstr "Potwierdź problemy"
+msgstr "Potwierdzanie problemów"
 
 #: app/views/popup.condition.common.php:733 include/actions.inc.php:2083
 #: include/events.inc.php:196
@@ -936,7 +936,7 @@ msgstr "Dodaj usługi nadrzędne"
 
 #: include/classes/helpers/CRoleHelper.php:462
 msgid "Add problem comments"
-msgstr "Dodaj komentarz do problemu"
+msgstr "Dodawanie komentarza do problemu"
 
 #: app/views/popup.massupdate.trigger.php:95
 #: include/views/configuration.graph.edit.php:448
@@ -1446,7 +1446,7 @@ msgstr "Próby"
 
 #: app/views/administration.geomaps.edit.php:86
 msgid "Attribution text"
-msgstr "Atrybucja tekstu"
+msgstr "Tekst atrybucji"
 
 #: app/views/administration.housekeeping.edit.php:250
 #: include/classes/helpers/CMenuHelper.php:148
@@ -1715,14 +1715,14 @@ msgstr "Niebieski"
 #: include/views/configuration.item.edit.php:458
 #: include/views/configuration.item.prototype.edit.php:436
 msgid "Body"
-msgstr "Obiekt"
+msgstr "Treść"
 
 #: app/views/popup.httpstep.php:167
 #: include/views/configuration.host.discovery.edit.php:403
 #: include/views/configuration.item.edit.php:460
 #: include/views/configuration.item.prototype.edit.php:438
 msgid "Body and headers"
-msgstr "Obiekty i nagłówki"
+msgstr "Treść i nagłówki"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:131
 #: include/classes/widgets/forms/CWidgetFormItem.php:212
@@ -3520,7 +3520,7 @@ msgstr "Zmiana na sekundę"
 #: app/views/popup.acknowledge.edit.php:71
 #: include/classes/helpers/CRoleHelper.php:463
 msgid "Change severity"
-msgstr "Stopień zmian"
+msgstr "Zmiana poziomu problemu"
 
 #: include/classes/html/CMacroValue.php:164
 msgid "Change type"
@@ -3783,7 +3783,7 @@ msgstr "Zakończ problem"
 
 #: include/classes/helpers/CRoleHelper.php:465
 msgid "Close problems"
-msgstr "Zakończ problemy"
+msgstr "Możliwość zakończenia problemów"
 
 #: include/classes/html/CCollapsibleUiWidget.php:55
 #: include/classes/widgets/CWidgetHelper.php:1171 jsLoader.php:312
@@ -4407,7 +4407,7 @@ msgstr "Tworzenie i edycja pulpitów"
 
 #: include/classes/helpers/CRoleHelper.php:458
 msgid "Create and edit maintenance"
-msgstr "Tworzenie i edycja wsparcia"
+msgstr "Tworzenie i edycja okresów utrzymania"
 
 #: include/classes/helpers/CRoleHelper.php:454
 msgid "Create and edit maps"
@@ -4551,6 +4551,10 @@ msgstr "Utwórz typ mediów"
 #: app/views/popup.import.php:97 jsLoader.php:361
 msgid "Create new"
 msgstr "Utwórz nowy"
+
+#: jsLoader.php:363
+msgid "Create new report"
+msgstr ""
 
 #: app/views/administration.proxy.list.php:37
 msgid "Create proxy"
@@ -6740,7 +6744,7 @@ msgstr "Wykonaj na"
 
 #: include/classes/helpers/CRoleHelper.php:466
 msgid "Execute scripts"
-msgstr "Wykonaj skrypty"
+msgstr "Możliwość wykonania skryptów"
 
 #: include/actions.inc.php:2135
 #: include/views/administration.auditacts.list.php:80
@@ -6959,6 +6963,10 @@ msgstr "Nie udało się zaktualizować właściwości strony pulpitu."
 #: jsLoader.php:141
 msgid "Failed to update dashboard properties."
 msgstr "Nie udało się zaktualizować właściwości pulpitu."
+
+#: app/views/js/popup.dashboard.share.edit.js.php:86
+msgid "Failed to update dashboard sharing."
+msgstr ""
 
 #: jsLoader.php:142
 msgid "Failed to update widget properties."
@@ -8086,6 +8094,10 @@ msgstr "Grupa hostów \"%1$s\" jest wewnętrzna i nie może zostać usunięta."
 msgid "Host group elements"
 msgstr "Elementy grupy hostów"
 
+#: jsLoader.php:287
+msgid "Host group is not selected."
+msgstr ""
+
 #: include/views/monitoring.sysmap.edit.php:165
 msgid "Host group label type"
 msgstr "Typ etykiety grupy hostów"
@@ -8159,6 +8171,10 @@ msgstr "Inwentarz hosta"
 #: hostinventoriesoverview.php:26 hostinventoriesoverview.php:146
 msgid "Host inventory overview"
 msgstr "Przegląd inwentarza hosta"
+
+#: jsLoader.php:284
+msgid "Host is not selected."
+msgstr ""
 
 #: include/views/monitoring.sysmap.edit.php:180
 msgid "Host label type"
@@ -8596,13 +8612,13 @@ msgstr[2] "Jeśli mniej niż %2$s usług podrzędnych ma status %1$s lub niższy
 #: include/classes/helpers/CServiceHelper.php:45
 #, c-format
 msgid "If less than %2$s child services have %1$s status or below"
-msgstr "Jeśli mniej niż %2$s usługa podrzędna ma status %1$s lub niższy"
+msgstr "Jeśli mniej niż %2$s usług podrzędnych ma status %1$s lub niższy"
 
 #: include/classes/helpers/CServiceHelper.php:50
 #: include/classes/helpers/CServiceHelper.php:101
 #, c-format
 msgid "If less than %2$s of child services have %1$s status or below"
-msgstr "Jeśli mniej niż %2$s usługa podrzędna ma status %1$s lub niższy"
+msgstr "Jeśli mniej niż %2$s usług podrzędnych ma status %1$s lub niższy"
 
 #: include/classes/api/services/CReport.php:368
 msgid "If no user groups are specified, at least one user must be included in the mailing list."
@@ -9804,7 +9820,7 @@ msgstr "Akcje wewnętrzne"
 
 #: app/views/administration.housekeeping.edit.php:67
 msgid "Internal data storage period"
-msgstr "Część wewnętrzna przechowywania danych"
+msgstr "Okres przechowywania danych wewnętrznych"
 
 #: include/classes/api/helpers/CApiHostHelper.php:90
 #: include/classes/api/services/CGraphGeneral.php:713
@@ -10332,6 +10348,10 @@ msgstr[2] "Włączono pozycje"
 #: include/actions.inc.php:1265
 msgid "Item in \"not supported\" state"
 msgstr "Pozycja w stanie \"niewspierany\"."
+
+#: app/views/popup.tophosts.column.edit.php:103
+msgid "Item name"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1562
 msgid "Item not selected"
@@ -11358,6 +11378,10 @@ msgstr "Lokalizacja etykiety elementu mapy"
 msgid "Map element label type"
 msgstr "Typ elementu etykiety mapy"
 
+#: jsLoader.php:285
+msgid "Map is not selected."
+msgstr ""
+
 #: sysmap.php:128
 msgid "Map is updated! Return to map list?"
 msgstr "Mapa zaktualizowana! Wrócić do listy map?"
@@ -11651,11 +11675,11 @@ msgstr "Pamięć użyta przez proces w bajtach. Zwraca liczbę całkowitą"
 
 #: app/views/administration.mediatype.edit.php:256
 msgid "Menu entry URL"
-msgstr "UWL wejścia do menu"
+msgstr "URL elementu menu"
 
 #: app/views/administration.mediatype.edit.php:247
 msgid "Menu entry name"
-msgstr "Nazwa wejścia do menu"
+msgstr "Nazwa elementu menu"
 
 #: app/views/administration.script.edit.php:107
 msgid "Menu path"
@@ -13244,7 +13268,7 @@ msgstr "Paź"
 
 #: include/items.inc.php:1990
 msgid "Octal to decimal"
-msgstr "System ósekmowy do dziesiętnego"
+msgstr "System ósemkowy do dziesiętnego"
 
 #: include/func.inc.php:109 include/func.inc.php:262 jsLoader.php:246
 msgid "October"
@@ -13304,6 +13328,18 @@ msgstr "Jeden"
 #: app/views/popup.maintenance.period.php:75 include/maintenances.inc.php:25
 msgid "One time only"
 msgstr "Jednorazowo"
+
+#: include/classes/api/services/CUser.php:800
+#: include/classes/api/services/CUser.php:807
+#, c-format
+msgid "Only Super admin or Admin users can update \"%1$s\" parameter."
+msgstr ""
+
+#: include/classes/api/services/CUser.php:725
+#: include/classes/api/services/CUser.php:766
+#, c-format
+msgid "Only Super admin users can update \"%1$s\" parameter."
+msgstr ""
 
 #: include/classes/api/services/CDRule.php:488
 msgid "Only Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 checks can be made unique."
@@ -14483,7 +14519,7 @@ msgstr "Wykorzystanie CPU przez proces. Zwraca liczbę zmiennoprzecinkową"
 
 #: app/views/administration.mediatype.edit.php:235
 msgid "Process tags"
-msgstr "Znaczniki procesu"
+msgstr "Przetwarzanie znaczników"
 
 #: include/classes/helpers/CMenuHelper.php:395
 msgid "Profile"
@@ -15319,6 +15355,12 @@ msgstr "Wynik jest NIEPRAWDZIWY"
 msgid "Result is TRUE"
 msgstr "Wynik jest PRAWDZIWY"
 
+#: app/controllers/CControllerPopupItemTestSend.php:433
+#: app/controllers/CControllerPopupItemTestSend.php:461
+#, c-format
+msgid "Result is truncated due to its size (%1$s)."
+msgstr ""
+
 #: app/views/popup.testtriggerexpr.php:30
 msgid "Result type"
 msgstr "Typ wyniku"
@@ -15751,7 +15793,7 @@ msgstr "Hasło klucza SSL"
 #: include/views/configuration.item.edit.php:526
 #: include/views/configuration.item.prototype.edit.php:503
 msgid "SSL verify host"
-msgstr "Host weryfikacji SSL"
+msgstr "Weryfikacja hosta SSL"
 
 #: app/views/administration.mediatype.edit.php:87
 #: include/views/configuration.host.discovery.edit.php:453
@@ -15759,7 +15801,7 @@ msgstr "Host weryfikacji SSL"
 #: include/views/configuration.item.edit.php:518
 #: include/views/configuration.item.prototype.edit.php:495
 msgid "SSL verify peer"
-msgstr "Podmiot weryfikujący SSL"
+msgstr "Weryfikacja podmiotu SSL"
 
 #: app/views/administration.mediatype.edit.php:84
 msgid "SSL/TLS"
@@ -17081,7 +17123,7 @@ msgstr "Temat"
 #: include/views/configuration.host.prototype.edit.php:426
 msgctxt "encryption certificate"
 msgid "Subject"
-msgstr "Temat"
+msgstr "Podmiot"
 
 #: jsLoader.php:387
 msgid "Submap"
@@ -18186,7 +18228,7 @@ msgstr[2] "Skopiowano wyzwalacze"
 
 #: app/views/administration.housekeeping.edit.php:49
 msgid "Trigger data storage period"
-msgstr "Okres wyzwalacza magazynu danych"
+msgstr "Okres przechowywania danych wyzwalaczy"
 
 #: triggers.php:440
 msgid "Trigger deleted"
@@ -18229,6 +18271,10 @@ msgstr "Wyzwalacz w stanie \"nieznany\""
 #, c-format
 msgid "Trigger in template \"%1$s\" has dependency with trigger in template \"%2$s\"."
 msgstr "Wyzwalacz w szablonie \"%1$s\" jest zależny od wyzwalacza w szablonie \"%2$s\"."
+
+#: jsLoader.php:286
+msgid "Trigger is not selected."
+msgstr ""
 
 #: include/views/monitoring.sysmap.edit.php:195
 msgid "Trigger label type"
@@ -19884,6 +19930,10 @@ msgstr "Podgląd"
 msgid "View as"
 msgstr "Podgląd jako"
 
+#: jsLoader.php:397
+msgid "View related reports"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1234
 msgid "Virtual space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr "Rozmiar przestrzeni wirtualnej w bajtach lub procentach ogółem. Zwraca liczbę całkowitą dla bajtów; liczbę zmiennoprzecinkową dla procentów"
@@ -20424,6 +20474,10 @@ msgstr "Nie masz uprawnień do dostępu do tej strony."
 #: include/func.inc.php:1724
 msgid "You must login to view this page."
 msgstr "Należy się zalogować, aby zobaczyć tą stronę."
+
+#: jsLoader.php:282
+msgid "You need to have at least one image uploaded to create map element. Images can be uploaded in Administration->General->Images section."
+msgstr ""
 
 #: include/classes/db/DB.php:135
 msgid "Your database is not working properly. Please wait a few minutes and try to repeat this action. If the problem still persists, please contact system administrator. The problem might be caused by long running transaction or row level lock accomplished by your database management system."
@@ -22144,6 +22198,10 @@ msgstr "prawidłowy"
 #: app/controllers/CControllerPopupTriggerExpr.php:924
 msgid "right() - Returns the rightmost count characters"
 msgstr "right() - Zwraca określoną liczę znaków z prawej strony ciągu"
+
+#: jsLoader.php:199
+msgid "root"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:937
 msgid "round() - Rounds a value to decimal places"

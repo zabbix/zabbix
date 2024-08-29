@@ -280,7 +280,7 @@ function makeItemSubfilter(array &$filter_data, array $items, string $context) {
 		}
 
 		// state
-		if ($context === 'host' && $filter_data['filter_state'] == -1) {
+		if ($context === 'host' && $filter_data['filter_state'] == -1 && $item['status'] == ITEM_STATUS_ACTIVE) {
 			if (!isset($item_params['state'][$item['state']])) {
 				$item_params['state'][$item['state']] = [
 					'name' => itemState($item['state']),
@@ -1450,12 +1450,12 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 
 			case ZBX_PREPROC_VALIDATE_NOT_SUPPORTED:
 				$on_fail
-					->setEnabled(false)
+					->setReadonly(true)
 					->setChecked(true);
 				break;
 
 			default:
-				$on_fail->setEnabled(!$readonly);
+				$on_fail->setReadonly($readonly);
 
 				if ($step['error_handler'] != ZBX_PREPROC_FAIL_DEFAULT) {
 					$on_fail->setChecked(true);
@@ -2046,38 +2046,100 @@ function getTriggerFormData(array $data) {
  * Renders tag table row.
  *
  * @param int|string $index
- * @param string     $tag      (optional)
- * @param string     $value    (optional)
- * @param array      $options  (optional)
+ * @param array	     $tag
+ * @param string     $tag['tag']                      Tag name.
+ * @param string     $tag['value']                    Tag value.
+ * @param int        $tag['type']                     (optional) Tag ownership type.
+ * @param array      $tag['parent_templates']         (optional) List of templates that tags are inherited from.
+ * @param array      $options
+ * @param bool       $options['add_post_js']          (optional) Parameter passed to CTextAreaFlexible.
+ * @param bool       $options['show_inherited_tags']  (optional) Render row in inherited tag mode. This enables usage of $tag['type'].
+ * @param string     $options['field_name']           (optional) Re-define default field name.
+ * @param bool       $options['readonly']             (optional) Render row in read-only mode.
  *
  * @return CRow
  */
-function renderTagTableRow($index, $tag = '', $value = '', array $options = []) {
-	$options = array_merge([
+function renderTagTableRow($index, array $tag, array $options = []) {
+	$options += [
 		'readonly' => false,
-		'field_name' => 'tags'
-	], $options);
+		'field_name' => 'tags',
+		'show_inherited_tags' => false
+	];
+
+	$textarea_options = array_intersect_key($options, array_flip(['readonly', 'add_post_js']));
+
+	$tag += [
+		'type' => ZBX_PROPERTY_OWN,
+		'parent_templates' => []
+	];
+
+	$tag_field = (new CTextAreaFlexible($options['field_name'].'['.$index.'][tag]', $tag['tag'], $textarea_options))
+		->setAdaptiveWidth(ZBX_TEXTAREA_TAG_WIDTH)
+		->setAttribute('placeholder', _('tag'));
+
+	$type_field = $options['show_inherited_tags']
+		? new CVar($options['field_name'].'['.$index.'][type]', $tag['type'])
+		: null;
+
+	$value_field = (new CTextAreaFlexible($options['field_name'].'['.$index.'][value]', $tag['value'],
+			$textarea_options
+		))
+		->setAdaptiveWidth(ZBX_TEXTAREA_TAG_VALUE_WIDTH)
+		->setAttribute('placeholder', _('value'));
+
+	$action = $options['show_inherited_tags'] && ($tag['type'] & ZBX_PROPERTY_INHERITED)
+		? (new CButton($options['field_name'].'['.$index.'][disable]', _('Remove')))
+			->addClass(ZBX_STYLE_BTN_LINK)
+			->addClass('element-table-disable')
+			->setEnabled(!$options['readonly'])
+		: (new CButton($options['field_name'].'['.$index.'][remove]', _('Remove')))
+			->addClass(ZBX_STYLE_BTN_LINK)
+			->addClass('element-table-remove')
+			->setEnabled(!$options['readonly']);
 
 	return (new CRow([
-		(new CCol(
-			(new CTextAreaFlexible($options['field_name'].'['.$index.'][tag]', $tag, $options))
-				->setAdaptiveWidth(ZBX_TEXTAREA_TAG_WIDTH)
-				->setAttribute('placeholder', _('tag'))
-		))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
-		(new CCol(
-			(new CTextAreaFlexible($options['field_name'].'['.$index.'][value]', $value, $options))
-				->setAdaptiveWidth(ZBX_TEXTAREA_TAG_VALUE_WIDTH)
-				->setAttribute('placeholder', _('value'))
-		))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
-		(new CCol(
-			(new CButton($options['field_name'].'['.$index.'][remove]', _('Remove')))
-				->addClass(ZBX_STYLE_BTN_LINK)
-				->addClass('element-table-remove')
-				->setEnabled(!$options['readonly'])
-		))
+		(new CCol([$tag_field, $type_field]))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
+		(new CCol($value_field))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
+		(new CCol($action))
 			->addClass(ZBX_STYLE_NOWRAP)
-			->addClass(ZBX_STYLE_TOP)
+			->addClass(ZBX_STYLE_TOP),
+		$options['show_inherited_tags']
+			? new CCol(makeParentTemplatesList($tag['parent_templates']))
+			: null
 	]))->addClass('form_row');
+}
+
+/**
+ * Function to render templates as HTML links or span tags, based on user permissions to edit each particular template.
+ */
+function makeParentTemplatesList(array $parent_templates): array {
+	if (!$parent_templates) {
+		return [];
+	}
+
+	CArrayHelper::sort($parent_templates, ['name']);
+
+	$allowed_ui_conf_templates = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
+	$template_list = [];
+
+	foreach ($parent_templates as $templateid => $template) {
+		if ($allowed_ui_conf_templates && $template['permission'] == PERM_READ_WRITE) {
+			$template_list[] = (new CLink($template['name'],
+				(new CUrl('templates.php'))
+					->setArgument('form', 'update')
+					->setArgument('templateid', $templateid)
+			))->setTarget('_blank');
+		}
+		else {
+			$template_list[] = (new CSpan($template['name']))->addClass(ZBX_STYLE_GREY);
+		}
+
+		$template_list[] = ', ';
+	}
+
+	array_pop($template_list);
+
+	return $template_list;
 }
 
 /**
@@ -2102,7 +2164,7 @@ function renderTagTable(array $tags, $readonly = false, array $options = []) {
 	}
 
 	foreach ($tags as $index => $tag) {
-		$table->addRow(renderTagTableRow($index, $tag['tag'], $tag['value'], $row_options));
+		$table->addRow(renderTagTableRow($index, $tag, $row_options));
 	}
 
 	return $table->setFooter(new CCol(

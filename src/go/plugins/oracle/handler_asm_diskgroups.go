@@ -23,7 +23,7 @@ import (
 	"context"
 	"fmt"
 
-	"git.zabbix.com/ap/plugin-support/zbxerr"
+	"golang.zabbix.com/sdk/zbxerr"
 )
 
 func asmDiskGroupsHandler(ctx context.Context, conn OraClient, params map[string]string,
@@ -69,7 +69,7 @@ func getDiskGRoupQuery(name string) string {
 			) RETURNING CLOB 
 		)
 	 FROM 
-		 V$ASM_DISKGROUP
+		 V$ASM_DISKGROUP_STAT
 	 %s
 `, whereStr)
 }

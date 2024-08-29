@@ -1,5 +1,4 @@
 <?php declare(strict_types = 0);
-
 /*
 ** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
@@ -298,6 +297,33 @@ abstract class CControllerHost extends CController {
 		}
 
 		return $data;
+	}
+
+	/**
+	 * Clean the filter from non-existing host group IDs.
+	 *
+	 * @param array $filter
+	 *
+	 * $filter = [
+	 *     'groupids' => (array)  Group IDs from filter to check.
+	 * ]
+	 *
+	 * @return array
+	 */
+	protected static function sanitizeFilter(array $filter): array {
+		if ($filter['groupids']) {
+			$groups = API::HostGroup()->get([
+				'output' => [],
+				'groupids' => $filter['groupids'],
+				'preservekeys' => true
+			]);
+
+			$filter['groupids'] = array_filter($filter['groupids'], function($groupid) use ($groups) {
+				return array_key_exists($groupid, $groups);
+			});
+		}
+
+		return $filter;
 	}
 
 	/**

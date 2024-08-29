@@ -48,7 +48,6 @@ class testPageMaintenance extends CWebTest {
 	const APPROACHING_MAINTENANCE = 'Approaching maintenance';
 	const HOST_MAINTENANCE = 'Maintenance with assigned host';
 	const MULTIPLE_GROUPS_MAINTENANCE = 'Maintenance with 2 host groups';
-	// TODO: 'c' in name should be changed to 'ȼ' after fix ZBX-23362
 	const FILTER_NAME_MAINTENANCE = 'Maintenance для фильтра - ʍąɨɲţ€ɲąɲc€🙂';
 	const ACTIVE_MAINTENANCE = 'Active maintenance';
 	const DESCRIPTION_MAINTENANCE = 'Description maintenance';

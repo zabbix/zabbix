@@ -151,13 +151,13 @@ $ipmi_tab->addRow(
 )
 ->addRow(
 	(new CVisibilityBox('visible[ipmi_username]', 'ipmi_username', _('Original')))->setLabel(_('Username')),
-	(new CTextBox('ipmi_username', ''))
+	(new CTextBox('ipmi_username', '', false, DB::getFieldLength('hosts', 'ipmi_username')))
 		->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 		->disableAutocomplete()
 )
 ->addRow(
 	(new CVisibilityBox('visible[ipmi_password]', 'ipmi_password', _('Original')))->setLabel(_('Password')),
-	(new CTextBox('ipmi_password', ''))
+	(new CTextBox('ipmi_password', '', false, DB::getFieldLength('hosts', 'ipmi_password')))
 		->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 		->disableAutocomplete()
 );
