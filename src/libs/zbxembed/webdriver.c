@@ -275,6 +275,13 @@ static int	webdriver_session_query(zbx_webdriver_t *wd, const char *method, cons
 		goto out;
 	}
 
+	if (0 == wd->data_offset)
+	{
+		*error = zbx_dsprintf(NULL, "cannot perform request %s session/%s: received empty response",
+				method, ZBX_NULL2EMPTY_STR(command));
+		goto out;
+	}
+
 	zabbix_log(LOG_LEVEL_TRACE, "webdriver response: %s", wd->data);
 
 	if (NULL == jp)
