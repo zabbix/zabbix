@@ -836,8 +836,6 @@ void	es_obj_attach_data(zbx_es_env_t *env, void *objptr, void *data)
 
 	obj_local.data = data;
 	zbx_hashset_insert(&env->objmap, &obj_local, sizeof(obj_local));
-
-	return obj_local.heapptr;
 }
 
 /******************************************************************************
