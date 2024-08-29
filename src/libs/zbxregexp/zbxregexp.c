@@ -17,32 +17,17 @@
 #include "zbxstr.h"
 #include "zbxtime.h"
 
-#ifdef HAVE_PCRE_H
-#ifdef HAVE_PCRE2_H
-#error "cannot use both pcre and pcre2 at the same time!"
-#endif
-#define ZBX_REGEXP_MULTILINE PCRE_MULTILINE
-#ifdef PCRE_NO_AUTO_CAPTURE
-#define ZBX_REGEXP_NO_AUTO_CAPTURE PCRE_NO_AUTO_CAPTURE
-#endif
-#define ZBX_REGEXP_CASELESS PCRE_CASELESS
+#define ZBX_REGEXP_MULTILINE PCRE2_MULTILINE
+#define ZBX_REGEXP_CASELESS PCRE2_CASELESS
+
+#ifdef PCRE2_NO_AUTO_CAPTURE
+#	define ZBX_REGEXP_NO_AUTO_CAPTURE PCRE2_NO_AUTO_CAPTURE
 #endif
 
-#if !defined(HAVE_PCRE_H) && !defined(HAVE_PCRE2_H)
-#error "must use pcre or pcre2!"
-#endif
-
-#ifdef HAVE_PCRE2_H
-#	define ZBX_REGEXP_MULTILINE PCRE2_MULTILINE
-#	ifdef PCRE2_NO_AUTO_CAPTURE
-#		define ZBX_REGEXP_NO_AUTO_CAPTURE PCRE2_NO_AUTO_CAPTURE
-#	endif
-#	define ZBX_REGEXP_CASELESS PCRE2_CASELESS
-#	ifdef PCRE2_MATCH_INVALID_UTF
-#		define ZBX_REGEXP_COMPILE_FLAGS	(PCRE2_MATCH_INVALID_UTF | PCRE2_UTF)
-#	else
-#		define ZBX_REGEXP_COMPILE_FLAGS	(PCRE2_UTF)
-#	endif
+#ifdef PCRE2_MATCH_INVALID_UTF
+#	define ZBX_REGEXP_COMPILE_FLAGS	(PCRE2_MATCH_INVALID_UTF | PCRE2_UTF)
+#else
+#	define ZBX_REGEXP_COMPILE_FLAGS	(PCRE2_UTF)
 #endif
 
 struct zbx_regexp
@@ -51,7 +36,6 @@ struct zbx_regexp
 	pcre2_match_context	*match_ctx;
 };
 
-/* maps to ovector of pcre_exec() */
 typedef struct
 {
 	int rm_so;
@@ -102,10 +86,7 @@ static char	*decode_pcre2_compile_error(int error_code, PCRE2_SIZE error_offset,
  *     pattern   - [IN] regular expression as a text string. Empty            *
  *                      string ("") is allowed, it will match everything.     *
  *                      NULL is not allowed.                                  *
- *     flags     - [IN] regexp compilation parameters passed to pcre_compile  *
- *                      or pcre2_compile.                                     *
- *                      ZBX_REGEXP_CASELESS, ZBX_REGEXP_NO_AUTO_CAPTURE,      *
- *                      ZBX_REGEXP_MULTILINE.                                 *
+ *     flags     - [IN] option bitmask as passed to pcre2_compile             *
  *     regexp    - [OUT] compiled regexp. Can be NULL if only regexp          *
  *                       compilation is checked, Cleanup in caller.           *
  *     err_msg   - [OUT] dynamically allocated error message. Can be NULL to  *
@@ -175,23 +156,22 @@ static int	regexp_compile(const char *pattern, int flags, zbx_regexp_t **regexp,
 	return SUCCEED;
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: Compile a regular expression with default options. Capture groups *
- *          are disabled by default (if PCRE_NO_AUTO_CAPTURE is supported).   *
- *          If you need to compile a regular expression that contains capture *
- *          groups use function zbx_regexp_compile_ext() instead.             *
- *                                                                            *
- * Parameters:                                                                *
- *     pattern   - [IN] regular expression as a text string. Empty            *
- *                      string ("") is allowed, it will match everything.     *
- *                      NULL is not allowed.                                  *
- *     regexp    - [OUT] compiled regular expression.                         *
- *     err_msg   - [OUT] error message if any.                                *
- *                                                                            *
- * Return value: SUCCEED or FAIL                                              *
- *                                                                            *
- ******************************************************************************/
+/********************************************************************************
+ *                                                                              *
+ * Purpose: Compile a regular expression with default options.                  *
+ *          Capture groups are disabled if PCRE2_NO_AUTO_CAPTURE is supported.  *
+ *          For capture group control, see zbx_regexp_compile_ext() instead.    *
+ *                                                                              *
+ * Parameters:                                                                  *
+ *     pattern   - [IN] regular expression as a text string. Empty              *
+ *                      string ("") is allowed, it will match everything.       *
+ *                      NULL is not allowed.                                    *
+ *     regexp    - [OUT] compiled regular expression.                           *
+ *     err_msg   - [OUT] error message if any.                                  *
+ *                                                                              *
+ * Return value: SUCCEED or FAIL                                                *
+ *                                                                              *
+ ********************************************************************************/
 int	zbx_regexp_compile(const char *pattern, zbx_regexp_t **regexp, char **err_msg)
 {
 #ifdef ZBX_REGEXP_NO_AUTO_CAPTURE
@@ -211,9 +191,7 @@ int	zbx_regexp_compile(const char *pattern, zbx_regexp_t **regexp, char **err_ms
  *                      string ("") is allowed, it will match everything.     *
  *                      NULL is not allowed.                                  *
  *     regexp    - [OUT] compiled regular expression.                         *
- *     flags     - [IN] regexp compilation parameters passed to pcre_compile. *
- *                      ZBX_REGEXP_CASELESS, ZBX_REGEXP_NO_AUTO_CAPTURE,      *
- *                      ZBX_REGEXP_MULTILINE.                                 *
+ *     flags     - [IN] option bitmask as passed to pcre2_compile             *
  *     err_msg   - [OUT] error message if any.                                *
  *                                                                            *
  ******************************************************************************/
@@ -327,8 +305,8 @@ static char	*decode_pcre2_match_error(int error_code)
 
 /***********************************************************************************
  *                                                                                 *
- * Purpose: wrapper for pcre_exec() and pcre2_match(), searches for a given        *
- *          pattern, specified by regexp, in the string                            *
+ * Purpose: wrapper for pcre2_match(), searches for a given pattern,               *
+ *          specified by regexp, in the string                                     *
  *                                                                                 *
  * Parameters:                                                                     *
  *     string         - [IN] string to be matched against 'regexp'                 *
@@ -407,7 +385,7 @@ static int	regexp_exec(const char *string, const zbx_regexp_t *regexp, int flags
 
 /******************************************************************************
  *                                                                            *
- * Purpose: wrapper for pcre_free                                             *
+ * Purpose: Free allocated zbx_regexp_t and owned allocated members.          *
  *                                                                            *
  * Parameters: regexp - [IN] compiled regular expression                      *
  *                                                                            *
@@ -726,8 +704,7 @@ out:
  *                                    If output template is NULL or contains     *
  *                                    empty string then the whole input string   *
  *                                    is used as output value.                   *
- *            flags            - [IN] the pcre_compile() function flags.         *
- *                                    See pcre_compile() manual.                 *
+ *            flags            - [IN] option bitmask as passed to pcre2_compile  *
  *            group_check      - [IN] check if pattern matches but does not      *
  *                                    contain group to capture                   *
  *            out              - [OUT] the output value if the input string      *
@@ -791,8 +768,7 @@ static int	regexp_sub(const char *string, const char *pattern, const char *outpu
  *                                    If output template is NULL or contains     *
  *                                    empty string then the whole input string   *
  *                                    is used as output value.                   *
- *            flags            - [IN] the pcre_compile() function flags.         *
- *                                    See pcre_compile() manual.                 *
+ *            flags            - [IN] option bitmask as passed to pcre2_compile  *
  *            out              - [OUT] the output value if the input string      *
  *                                     matches the specified regular expression  *
  *                                     or NULL otherwise                         *
