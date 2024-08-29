@@ -22,6 +22,7 @@ zabbix_export:
           key: agent.hostname
           delay: 1h
           value_type: CHAR
+          trends: '0'
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -43,6 +44,7 @@ zabbix_export:
           key: agent.version
           delay: 1h
           value_type: CHAR
+          trends: '0'
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -169,6 +171,7 @@ zabbix_export:
           key: agent.hostname
           delay: 1h
           value_type: CHAR
+          trends: '0'
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -203,6 +206,7 @@ zabbix_export:
           key: agent.version
           delay: 1h
           value_type: CHAR
+          trends: '0'
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:

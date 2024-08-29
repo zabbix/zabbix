@@ -218,7 +218,7 @@ $form->addItem([
 			'redirect' => (new CUrl('zabbix.php'))
 				->setArgument('action', 'usergroup.massupdate')
 				->setArgument('users_status', GROUP_STATUS_ENABLED)
-				->setArgument(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token)
+				->setArgument(CSRF_TOKEN_NAME, $csrf_token)
 				->getUrl()
 		],
 		[
@@ -228,7 +228,7 @@ $form->addItem([
 			'redirect' => (new CUrl('zabbix.php'))
 				->setArgument('action', 'usergroup.massupdate')
 				->setArgument('users_status', GROUP_STATUS_DISABLED)
-				->setArgument(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token)
+				->setArgument(CSRF_TOKEN_NAME, $csrf_token)
 				->getUrl()
 		],
 		[
@@ -238,7 +238,7 @@ $form->addItem([
 			'redirect' => (new CUrl('zabbix.php'))
 				->setArgument('action', 'usergroup.massupdate')
 				->setArgument('debug_mode', GROUP_DEBUG_MODE_ENABLED)
-				->setArgument(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token)
+				->setArgument(CSRF_TOKEN_NAME, $csrf_token)
 				->getUrl()
 		],
 		[
@@ -248,7 +248,7 @@ $form->addItem([
 			'redirect' => (new CUrl('zabbix.php'))
 				->setArgument('action', 'usergroup.massupdate')
 				->setArgument('debug_mode', GROUP_DEBUG_MODE_DISABLED)
-				->setArgument(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token)
+				->setArgument(CSRF_TOKEN_NAME, $csrf_token)
 				->getUrl()
 		],
 		'usergroup.delete' => [

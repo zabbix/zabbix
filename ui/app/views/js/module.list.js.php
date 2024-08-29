@@ -97,9 +97,7 @@
 		}
 
 		_post(target, moduleids, curl) {
-			curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
-				<?= json_encode(CCsrfTokenHelper::get('module')) ?>
-			);
+			curl.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('module')) ?>);
 
 			target.classList.add('is-loading');
 

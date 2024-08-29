@@ -615,7 +615,7 @@ class testHostConnMacroValidation extends CIntegrationTest {
 		]);
 
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "cannot resolve macro '{HOST.CONN}'", true, 60, 1);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "In get_value_external() key:'script[{HOST.CONN}]'", true, 60, 1);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "In get_value_external() key:'script[*UNKNOWN*]'", true, 60, 1);
 	}
 
 	/**

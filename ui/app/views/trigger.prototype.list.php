@@ -153,9 +153,9 @@ foreach ($data['triggers'] as $trigger) {
 	$trigger_table->addRow([
 		$checkBox,
 		CSeverityHelper::makeSeverityCell((int) $trigger['priority']),
-		$description,
-		$trigger['opdata'],
-		(new CDiv($expression))->addClass(ZBX_STYLE_WORDWRAP),
+		(new CCol($description))->addClass(ZBX_STYLE_WORDBREAK),
+		(new CCol($trigger['opdata']))->addClass(ZBX_STYLE_WORDBREAK),
+		(new CDiv($expression))->addClass(ZBX_STYLE_WORDBREAK),
 		$status,
 		$discover,
 		$data['tags'][$triggerid]
@@ -206,7 +206,7 @@ $html_page
 		'context' => $data['context'],
 		'hostid' => $data['hostid'],
 		'parent_discoveryid' => $data['parent_discoveryid'],
-		'token' => [CCsrfTokenHelper::CSRF_TOKEN_NAME => CCsrfTokenHelper::get('trigger')]
+		'token' => [CSRF_TOKEN_NAME => CCsrfTokenHelper::get('trigger')]
 	]).');
 '))
 	->setOnDocumentReady()

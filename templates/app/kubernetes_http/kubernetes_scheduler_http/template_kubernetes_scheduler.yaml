@@ -26,6 +26,7 @@ zabbix_export:
           name: 'REST Client requests: 2xx, rate'
           type: DEPENDENT
           key: kubernetes.scheduler.client_http_requests_200.rate
+          delay: '0'
           value_type: FLOAT
           description: 'Number of HTTP requests with 2xx status code per second.'
           preprocessing:
@@ -36,6 +37,8 @@ zabbix_export:
                 - sum
               error_handler: DISCARD_VALUE
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           master_item:
             key: kubernetes.scheduler.get_metrics
           tags:
@@ -47,6 +50,7 @@ zabbix_export:
           name: 'REST Client requests: 3xx, rate'
           type: DEPENDENT
           key: kubernetes.scheduler.client_http_requests_300.rate
+          delay: '0'
           value_type: FLOAT
           description: 'Number of HTTP requests with 3xx status code per second.'
           preprocessing:
@@ -57,6 +61,8 @@ zabbix_export:
                 - sum
               error_handler: DISCARD_VALUE
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           master_item:
             key: kubernetes.scheduler.get_metrics
           tags:
@@ -68,6 +74,7 @@ zabbix_export:
           name: 'REST Client requests: 4xx, rate'
           type: DEPENDENT
           key: kubernetes.scheduler.client_http_requests_400.rate
+          delay: '0'
           value_type: FLOAT
           description: 'Number of HTTP requests with 4xx status code per second.'
           preprocessing:
@@ -78,6 +85,8 @@ zabbix_export:
                 - sum
               error_handler: DISCARD_VALUE
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           master_item:
             key: kubernetes.scheduler.get_metrics
           tags:
@@ -89,6 +98,7 @@ zabbix_export:
           name: 'REST Client requests: 5xx, rate'
           type: DEPENDENT
           key: kubernetes.scheduler.client_http_requests_500.rate
+          delay: '0'
           value_type: FLOAT
           description: 'Number of HTTP requests with 5xx status code per second.'
           preprocessing:
@@ -99,6 +109,8 @@ zabbix_export:
                 - sum
               error_handler: DISCARD_VALUE
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           master_item:
             key: kubernetes.scheduler.get_metrics
           tags:
@@ -120,6 +132,7 @@ zabbix_export:
           name: CPU
           type: DEPENDENT
           key: kubernetes.scheduler.cpu.util
+          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'Total user and system CPU usage ratio.'
@@ -130,6 +143,8 @@ zabbix_export:
                 - value
                 - ''
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
             - type: MULTIPLIER
               parameters:
                 - '100'
@@ -144,6 +159,7 @@ zabbix_export:
           key: kubernetes.scheduler.get_metrics
           history: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Get raw metrics from Scheduler instance /metrics endpoint.'
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
@@ -161,6 +177,7 @@ zabbix_export:
           name: Goroutines
           type: DEPENDENT
           key: kubernetes.scheduler.go_goroutines
+          delay: '0'
           value_type: FLOAT
           description: 'Number of goroutines that currently exist.'
           preprocessing:
@@ -179,6 +196,7 @@ zabbix_export:
           name: 'Go threads'
           type: DEPENDENT
           key: kubernetes.scheduler.go_threads
+          delay: '0'
           value_type: FLOAT
           description: 'Number of OS threads created.'
           preprocessing:
@@ -197,6 +215,7 @@ zabbix_export:
           name: 'Fds max'
           type: DEPENDENT
           key: kubernetes.scheduler.max_fds
+          delay: '0'
           value_type: FLOAT
           description: 'Maximum allowed open file descriptors.'
           preprocessing:
@@ -215,6 +234,7 @@ zabbix_export:
           name: 'Fds open'
           type: DEPENDENT
           key: kubernetes.scheduler.open_fds
+          delay: '0'
           value_type: FLOAT
           description: 'Number of open file descriptors.'
           preprocessing:
@@ -233,6 +253,7 @@ zabbix_export:
           name: 'Resident memory, bytes'
           type: DEPENDENT
           key: kubernetes.scheduler.process_resident_memory_bytes
+          delay: '0'
           value_type: FLOAT
           units: B
           description: 'Resident memory size in bytes.'
@@ -252,6 +273,7 @@ zabbix_export:
           name: 'Virtual memory, bytes'
           type: DEPENDENT
           key: kubernetes.scheduler.process_virtual_memory_bytes
+          delay: '0'
           value_type: FLOAT
           units: B
           description: 'Virtual memory size in bytes.'
@@ -271,6 +293,7 @@ zabbix_export:
           name: 'Schedule attempts: error'
           type: DEPENDENT
           key: kubernetes.scheduler.scheduler_schedule_attempts.error.rate
+          delay: '0'
           value_type: FLOAT
           description: 'Number of attempts to schedule pods with result "error" per second.'
           preprocessing:
@@ -281,6 +304,8 @@ zabbix_export:
                 - sum
               error_handler: DISCARD_VALUE
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           master_item:
             key: kubernetes.scheduler.get_metrics
           tags:
@@ -300,6 +325,7 @@ zabbix_export:
           name: 'Schedule attempts: scheduled'
           type: DEPENDENT
           key: kubernetes.scheduler.scheduler_schedule_attempts.scheduled.rate
+          delay: '0'
           value_type: FLOAT
           description: 'Number of attempts to schedule pods with result "scheduled" per second.'
           preprocessing:
@@ -310,6 +336,8 @@ zabbix_export:
                 - sum
               error_handler: DISCARD_VALUE
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           master_item:
             key: kubernetes.scheduler.get_metrics
           tags:
@@ -319,6 +347,7 @@ zabbix_export:
           name: 'Schedule attempts: unschedulable'
           type: DEPENDENT
           key: kubernetes.scheduler.scheduler_schedule_attempts.unschedulable.rate
+          delay: '0'
           value_type: FLOAT
           description: 'Number of attempts to schedule pods with result "unschedulable" per second.'
           preprocessing:
@@ -329,6 +358,8 @@ zabbix_export:
                 - sum
               error_handler: DISCARD_VALUE
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           master_item:
             key: kubernetes.scheduler.get_metrics
           tags:
@@ -349,12 +380,14 @@ zabbix_export:
           name: 'e2e scheduling histogram'
           type: DEPENDENT
           key: kubernetes.controller.e2e_scheduling.discovery
+          delay: '0'
           description: 'Discovery raw data and percentile items of e2e scheduling latency.'
           item_prototypes:
             - uuid: eaeb8c321626466bbf7c08008a82b9c8
               name: '["{#RESULT}"]: e2e scheduling seconds bucket, {#LE}'
               type: DEPENDENT
               key: 'kubernetes.scheduler.e2e_scheduling_bucket[{#LE},"{#RESULT}"]'
+              delay: '0'
               history: 1h
               value_type: FLOAT
               trends: '0'
@@ -499,8 +532,10 @@ zabbix_export:
                 conditions:
                   - macro: '{#TYPE}'
                     value: buckets
+                    formulaid: A
               operations:
-                - operator: LIKE
+                - operationobject: ITEM_PROTOTYPE
+                  operator: LIKE
                   value: bucket
                   discover: DISCOVER
             - name: 'total item'
@@ -509,20 +544,24 @@ zabbix_export:
                 conditions:
                   - macro: '{#TYPE}'
                     value: totals
+                    formulaid: A
               operations:
-                - operator: NOT_LIKE
+                - operationobject: ITEM_PROTOTYPE
+                  operator: NOT_LIKE
                   value: bucket
                   discover: DISCOVER
         - uuid: 8cfc88eb0f6b4ae09d93bd9fc275659d
           name: 'Binding histogram'
           type: DEPENDENT
           key: kubernetes.scheduler.binding.discovery
+          delay: '0'
           description: 'Discovery raw data of binding latency.'
           item_prototypes:
             - uuid: 17a3d7122cd844ea905059020532907b
               name: 'Binding duration bucket, {#LE}'
               type: DEPENDENT
               key: 'kubernetes.scheduler.binding_duration[{#LE}]'
+              delay: '0'
               history: 1h
               value_type: FLOAT
               trends: '0'
@@ -649,8 +688,10 @@ zabbix_export:
                 conditions:
                   - macro: '{#TYPE}'
                     value: buckets
+                    formulaid: A
               operations:
-                - operator: LIKE
+                - operationobject: ITEM_PROTOTYPE
+                  operator: LIKE
                   value: bucket
                   discover: DISCOVER
             - name: 'total item'
@@ -659,20 +700,24 @@ zabbix_export:
                 conditions:
                   - macro: '{#TYPE}'
                     value: totals
+                    formulaid: A
               operations:
-                - operator: NOT_LIKE
+                - operationobject: ITEM_PROTOTYPE
+                  operator: NOT_LIKE
                   value: bucket
                   discover: DISCOVER
         - uuid: 5d4a17f09a7e4ad3b4ac72c30bac5e7d
           name: 'Scheduling algorithm histogram'
           type: DEPENDENT
           key: kubernetes.scheduler.scheduling_algorithm.discovery
+          delay: '0'
           description: 'Discovery raw data of scheduling algorithm latency.'
           item_prototypes:
             - uuid: c794f7fbd7494bb69d9c51140c443236
               name: 'Scheduling algorithm duration bucket, {#LE}'
               type: DEPENDENT
               key: 'kubernetes.scheduler.scheduling_algorithm_duration[{#LE}]'
+              delay: '0'
               history: 1h
               value_type: FLOAT
               trends: '0'
@@ -799,8 +844,10 @@ zabbix_export:
                 conditions:
                   - macro: '{#TYPE}'
                     value: buckets
+                    formulaid: A
               operations:
-                - operator: LIKE
+                - operationobject: ITEM_PROTOTYPE
+                  operator: LIKE
                   value: bucket
                   discover: DISCOVER
             - name: 'total item'
@@ -809,8 +856,10 @@ zabbix_export:
                 conditions:
                   - macro: '{#TYPE}'
                     value: totals
+                    formulaid: A
               operations:
-                - operator: NOT_LIKE
+                - operationobject: ITEM_PROTOTYPE
+                  operator: NOT_LIKE
                   value: bucket
                   discover: DISCOVER
       tags:

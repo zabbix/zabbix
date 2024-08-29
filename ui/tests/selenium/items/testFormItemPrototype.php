@@ -514,6 +514,13 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'key' => 'item-prototype-preprocessing[{#KEY}]',
 					'preprocessing' => true
 				]
+			],
+			[
+				[
+					'host' => 'Simple form test host',
+					'type' => 'Dependent item',
+					'value_type' => 'Numeric (unsigned)'
+				]
 			]
 		];
 	}
@@ -899,15 +906,12 @@ class testFormItemPrototype extends CLegacyWebTest {
 				$this->assertFalse($form->getField('Update interval')->isDisplayed());
 		}
 
+		$value_types = ($type === 'Dependent item')
+			? ['Numeric (unsigned)', 'Numeric (float)', 'Character', 'Log', 'Text', 'Binary']
+			: ['Numeric (unsigned)', 'Numeric (float)', 'Character', 'Log', 'Text'];
+
 		if (!isset($templateid)) {
-			$this->assertEquals($form->getField('Type of information')->asDropdown()->getOptions()->asText(), [
-					'Numeric (unsigned)',
-					'Numeric (float)',
-					'Character',
-					'Log',
-					'Text',
-					'Binary'
-			]);
+			$this->assertEquals($value_types, $form->getField('Type of information')->asDropdown()->getOptions()->asText());
 
 			foreach (['Numeric (unsigned)', 'Numeric (float)', 'Character', 'Log', 'Text'] as $info_type) {
 				$this->zbxTestIsEnabled('//*[@id="value_type"]//li[text()='.CXPathHelper::escapeQuotes($info_type).']');
@@ -930,8 +934,8 @@ class testFormItemPrototype extends CLegacyWebTest {
 			$this->assertFalse($form->query('id:units')->one()->isDisplayed());
 		}
 
-		// Custom intervals isn't visible for type 'SNMP trap' and 'Zabbix trapper'
-		if ($type === 'SNMP trap' || $type === 'Zabbix trapper') {
+		// Custom intervals field isn't visible for some item types.
+		if (in_array($type, ['SNMP trap', 'Zabbix trapper', 'Dependent item'])) {
 			$this->assertFalse($form->getField('Custom intervals')->isDisplayed());
 			$this->assertFalse($form->query("xpath://div[@id='js-item-flex-intervals-field']//button[@class='btn-link element-table-add']")
 					->one()->isDisplayed());

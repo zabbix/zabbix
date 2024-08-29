@@ -20,7 +20,7 @@
  */
 
 $form = (new CForm())
-	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('maintenance')))->removeId())
+	->addItem((new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('maintenance')))->removeId())
 	->setId('maintenance-form')
 	->setName('maintenance_form')
 	->addVar('maintenanceid', $data['maintenanceid'] ?: 0)
@@ -219,6 +219,7 @@ $form->addItem(
 				(new CTextArea('description', $data['description']))
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 					->setReadonly(!$data['allowed_edit'])
+					->setMaxlength(DB::getFieldLength('maintenances', 'description'))
 			)
 		])
 	);
