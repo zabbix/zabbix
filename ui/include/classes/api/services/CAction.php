@@ -3294,7 +3294,7 @@ class CAction extends CApiService {
 
 			foreach ($action['filter']['conditions'] as $condition) {
 				if ($condition['conditiontype'] == CONDITION_TYPE_DCHECK) {
-					$druleids[$condition['value']] = true;
+					$dcheckids[$condition['value']] = true;
 				}
 			}
 		}
@@ -3379,7 +3379,7 @@ class CAction extends CApiService {
 			}
 		}
 
-		if ($serviceids) {
+		if (!$serviceids) {
 			return;
 		}
 
