@@ -75,7 +75,7 @@ var (
 	lastVerCheck time.Time
 	versionMux   sync.Mutex
 
-	// ErrNoSmartStatus error indicated that device has no smart status
+	// ErrNoSmartStatus error indicated that device has no smart status.
 	ErrNoSmartStatus = errs.New("smartctl returned no smart status")
 )
 
@@ -279,7 +279,7 @@ func (p *Plugin) execute(jsonRunner bool) (*runner, error) {
 			case <-ctx.Done():
 				return errs.Wrap(ctx.Err(), "errgroup context canceled") // Return error if context is canceled
 			default:
-				deviceInfo, err := getBasicDeviceInfo(p.ctl, name)
+				deviceInfo, err := getBasicDeviceInfo(p.ctl, name) //nolint:govet
 
 				if errors.Is(err, ErrNoSmartStatus) {
 					p.Logger.Debugf("skipping device with no smart status: %q", name)
@@ -306,17 +306,12 @@ func (p *Plugin) execute(jsonRunner bool) (*runner, error) {
 			devType := deviveType
 
 			g.Go(func() error {
-				select {
-				case <-ctx.Done():
-					return errs.Wrap(ctx.Err(), "errgroup context canceled") // Return error if context is canceled
-				default:
-					devices := getRaidDevices(p.ctl, p.Base, name, devType)
-					for _, device := range devices {
-						resultChan <- device
-					}
-
-					return nil
+				devices := getRaidDevices(p.ctl, p.Base, name, devType)
+				for _, device := range devices {
+					resultChan <- device
 				}
+
+				return nil
 			})
 		}
 	}
@@ -325,22 +320,16 @@ func (p *Plugin) execute(jsonRunner bool) (*runner, error) {
 		name := device.Name
 		devType := device.DevType
 		g.Go(func() error {
-			select {
-			case <-ctx.Done():
-				return errs.Wrap(ctx.Err(), "errgroup context canceled") // Return error if context is canceled
-			default:
-
-				device, err := getAllDeviceInfoByType(p.ctl, name, devType)
-				if err != nil {
-					p.Tracef("got error executing for megaraid %s", err.Error())
-
-					return nil
-				}
-
-				resultChan <- device
+			device, err := getAllDeviceInfoByType(p.ctl, name, devType) //nolint:govet
+			if err != nil {
+				p.Tracef("got error executing for megaraid %s", err.Error())
 
 				return nil
 			}
+
+			resultChan <- device
+
+			return nil
 		})
 	}
 
