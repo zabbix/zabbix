@@ -427,7 +427,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 							}
 						}
 						elseif ($step['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) {
-							unset($step['result']);
+							//unset($step['result']);
 						}
 						elseif (array_key_exists('truncated', $step) && $step['truncated']) {
 							$step['warning'] = _s('Result is truncated due to its size (%1$s).',
