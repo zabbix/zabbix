@@ -319,6 +319,7 @@ func (p *Plugin) execute(jsonRunner bool) (*runner, error) {
 	for _, device := range megaraidDev {
 		name := device.Name
 		devType := device.DevType
+
 		g.Go(func() error {
 			device, err := getAllDeviceInfoByType(p.ctl, name, devType) //nolint:govet
 			if err != nil {
