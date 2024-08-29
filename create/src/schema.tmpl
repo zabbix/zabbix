@@ -108,6 +108,7 @@ INDEX		|5		|maintenanceid
 INDEX		|6		|name_upper
 INDEX		|7		|templateid
 INDEX		|8		|proxy_groupid
+INDEX		|9		|uuid
 CHANGELOG	|1
 UPD_TRIG_FUNC	|name		|name_upper	|hostid	|upper
 
@@ -118,6 +119,7 @@ FIELD		|flags		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|uuid		|t_varchar(32)	|''	|NOT NULL	|0
 FIELD		|type		|t_integer	|'0'	|NOT NULL	|0
 UNIQUE		|1		|type,name
+INDEX		|2		|uuid
 
 TABLE|hgset_group|hgsetid,groupid|ZBX_TEMPLATE
 FIELD		|hgsetid	|t_id		|	|NOT NULL	|0			|1|hgset
@@ -206,6 +208,7 @@ FIELD		|uuid		|t_varchar(32)	|''	|NOT NULL	|0
 UNIQUE		|2		|hostid,name
 INDEX		|3		|status
 INDEX		|4		|templateid
+INDEX		|5		|uuid
 CHANGELOG	|11
 
 TABLE|httpstep|httpstepid|ZBX_TEMPLATE
@@ -247,6 +250,7 @@ FIELD		|hostid		|t_id		|	|NOT NULL	|0			|1|hosts
 FIELD		|name		|t_varchar(64)	|''	|NOT NULL	|0
 FIELD		|uuid		|t_varchar(32)	|''	|NOT NULL	|0
 UNIQUE		|1		|hostid,name
+INDEX		|2		|uuid
 
 TABLE|items|itemid|ZBX_TEMPLATE
 FIELD		|itemid		|t_id		|	|NOT NULL	|0
@@ -311,6 +315,7 @@ INDEX		|5		|valuemapid
 INDEX		|6		|interfaceid
 INDEX		|7		|master_itemid
 INDEX		|8		|key_(768)
+INDEX		|10		|uuid
 CHANGELOG	|3
 
 TABLE|httpstepitem|httpstepitemid|ZBX_TEMPLATE
@@ -704,6 +709,7 @@ FIELD		|url_name	|t_varchar(64)	|''	|NOT NULL	|0
 INDEX		|1		|status
 INDEX		|2		|value,lastchange
 INDEX		|3		|templateid
+INDEX		|4		|uuid
 CHANGELOG	|5
 
 TABLE|trigger_depends|triggerdepid|ZBX_TEMPLATE
@@ -749,6 +755,7 @@ INDEX		|1		|name
 INDEX		|2		|templateid
 INDEX		|3		|ymin_itemid
 INDEX		|4		|ymax_itemid
+INDEX		|5		|uuid
 
 TABLE|graphs_items|gitemid|ZBX_TEMPLATE
 FIELD		|gitemid	|t_id		|	|NOT NULL	|0
@@ -860,6 +867,7 @@ FIELD		|propagation_value|t_integer	|'0'	|NOT NULL	|0
 FIELD		|description	|t_text		|''	|NOT NULL	|0
 FIELD		|uuid		|t_varchar(32)	|''	|NOT NULL	|0
 FIELD		|created_at	|t_integer	|'0'	|NOT NULL	|0
+INDEX		|1		|uuid
 
 TABLE|services_links|linkid|ZBX_DATA
 FIELD		|linkid		|t_id		|	|NOT NULL	|0
@@ -1703,6 +1711,7 @@ FIELD		|auto_start	|t_integer	|'1'	|NOT NULL	|0
 FIELD		|uuid		|t_varchar(32)	|''	|NOT NULL	|0
 INDEX		|1		|userid
 INDEX		|2		|templateid
+INDEX		|3		|uuid
 
 TABLE|dashboard_user|dashboard_userid|ZBX_DASHBOARD
 FIELD		|dashboard_userid|t_id		|	|NOT NULL	|0
@@ -2319,4 +2328,4 @@ TABLE|dbversion|dbversionid|
 FIELD		|dbversionid	|t_id		|	|NOT NULL	|0
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|1		|7010004	|7010004
+ROW		|1		|7010013	|7010013
