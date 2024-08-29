@@ -16,7 +16,6 @@
 #include "browser_element.h"
 #include "browser_error.h"
 #include "browser_perf.h"
-#include "embed.h"
 #include "config.h"
 #include "duktape.h"
 #include "embed.h"
