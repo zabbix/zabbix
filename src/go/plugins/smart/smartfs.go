@@ -252,7 +252,7 @@ func (p *Plugin) execute(jsonRunner bool) (*runner, error) {
 		r.devices = make(map[string]deviceParser)
 	}
 
-	// Create a context that will be canceled if any of the goroutines return an error.
+	// Create a context that will be canceled if basic runner returns an error.
 	ctx := context.Background()
 
 	// Create an error group with the context.
@@ -459,9 +459,7 @@ func getAllDeviceInfoByType(
 	ctl SmartController,
 	deviceName, deviceType string,
 ) (*SmartCtlDeviceData, error) {
-
 	device, err := ctl.Execute("-a", deviceName, "-d", deviceType, "-j")
-
 	if err != nil {
 		return nil, errs.Wrap(err, "failed to execute smartctl")
 	}
