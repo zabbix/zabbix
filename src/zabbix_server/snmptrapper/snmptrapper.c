@@ -273,7 +273,7 @@ static void	process_trap(const char *addr, char *begin, char *end)
  ******************************************************************************/
 static void	parse_traps(int flag)
 {
-	char	*c, *line, *begin = NULL, *end = NULL, *addr = NULL, *pzbegin, *pzaddr = NULL, *pzdate = NULL;
+	char	*c, *line, *begin = NULL, *end = NULL, *addr = NULL, *pzbegin = NULL, *pzaddr = NULL, *pzdate = NULL;
 
 	c = line = buffer;
 
@@ -303,9 +303,14 @@ static void	parse_traps(int flag)
 		/* process the previous trap */
 		if (NULL != begin)
 		{
-			*(line - 1) = '\0';
-			*pzdate = '\0';
-			*pzaddr = '\0';
+			if (line > buffer + 1)
+				*(line - 1) = '\0';
+
+			if (NULL != pzdate)
+				*pzdate = '\0';
+
+			if (NULL != pzaddr)
+				*pzaddr = '\0';
 
 			process_trap(addr, begin, end);
 			end = NULL;
@@ -355,9 +360,14 @@ static void	parse_traps(int flag)
 	{
 		if (NULL != end)
 		{
-			*(line - 1) = '\0';
-			*pzdate = '\0';
-			*pzaddr = '\0';
+			if (line > buffer + 1)
+				*(line - 1) = '\0';
+
+			if (NULL != pzdate)
+				*pzdate = '\0';
+
+			if (NULL != pzaddr)
+				*pzaddr = '\0';
 
 			process_trap(addr, begin, end);
 			offset = 0;
