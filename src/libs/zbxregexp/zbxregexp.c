@@ -187,7 +187,8 @@ int	zbx_regexp_compile(const char *pattern, zbx_regexp_t **regexp, char **err_ms
  *     err_msg   - [OUT] error message if any.                                *
  *                                                                            *
  ******************************************************************************/
-int	zbx_regexp_compile_ext(const char *pattern, zbx_regexp_t **regexp, uint32_t flags, char **err_msg)
+int	zbx_regexp_compile_ext(const char *pattern, zbx_regexp_t **regexp,
+		zbx_uint32_t flags, char **err_msg)
 {
 	return regexp_compile(pattern, flags, regexp, err_msg);
 }
