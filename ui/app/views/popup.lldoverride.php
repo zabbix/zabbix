@@ -173,7 +173,7 @@ $operations_list = (new CTable())
 	->addStyle('width: 100%;')
 	->setHeader([
 		_('Condition'),
-		(new CColHeader(''))->setWidth('50')
+		(new CColHeader('Actions'))->setWidth('50')
 	])
 	->addRow(
 		(new CCol(

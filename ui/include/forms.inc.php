@@ -359,7 +359,7 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 				(new CDiv(_('Name')))->addClass('step-name'),
 				(new CDiv(_('Parameters')))->addClass('step-parameters'),
 				(new CDiv(_('Custom on fail')))->addClass('step-on-fail'),
-				(new CDiv(_('Action')))->addClass('step-action')
+				(new CDiv(_('Actions')))->addClass('step-action')
 			]))
 				->addClass('preprocessing-list-head')
 				->addStyle(!$preprocessing ? 'display: none;' : null)

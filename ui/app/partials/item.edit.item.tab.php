@@ -153,7 +153,7 @@ $formgrid = (new CFormGrid())
 					->setHeader([
 						(new CColHeader(_('Name')))->setWidth('50%'),
 						(new CColHeader(_('Value')))->setWidth('50%'),
-						_('Action')
+						''
 					])
 					->setFooter((new CCol(
 						(new CButtonLink(_('Add')))

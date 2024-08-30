@@ -330,7 +330,7 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 	$media_table_info = (new CTable())
 		->setId('media-table')
 		->setAttribute('style', 'width: 100%;')
-		->setHeader([_('Type'), _('Send to'), _('When active'), _('Use if severity'), _('Status'), _('Action')]);
+		->setHeader([_('Type'), _('Send to'), _('When active'), _('Use if severity'), _('Status'), _('Actions')]);
 
 	foreach ($data['medias'] as $index => $media) {
 		if (!array_key_exists($media['mediatypeid'], $data['mediatypes'])) {
