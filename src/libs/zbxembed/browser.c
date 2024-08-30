@@ -696,12 +696,16 @@ static duk_ret_t	es_browser_add_cookie(duk_context *ctx)
 	int		err_index = -1;
 	const char	*cookie_cesu;
 
+	if (NULL == (wd = es_webdriver(ctx)))
+		return duk_throw(ctx);
+
 	duk_push_heapptr(ctx, wd->env->json_stringify);
 	duk_dup(ctx, 0);
 	duk_pcall(ctx, 1);
 
 	cookie_cesu = duk_safe_to_string(ctx, -1);
 
+	/* to be sure that the object is not freed during argument evaluation - acquire it again */
 	if (NULL == (wd = es_webdriver(ctx)))
 		return duk_throw(ctx);
 
