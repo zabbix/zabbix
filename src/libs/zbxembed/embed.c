@@ -349,6 +349,25 @@ int	zbx_es_init_env(zbx_es_t *es, const char *config_source_ip, char **error)
 	duk_def_prop(es->env->ctx, -3, DUK_DEFPROP_HAVE_VALUE | DUK_DEFPROP_CLEAR_WRITABLE | DUK_DEFPROP_HAVE_ENUMERABLE |
 			DUK_DEFPROP_HAVE_CONFIGURABLE);
 
+	/* JSON parse/stringify is used internally, store them into stash to prevent them */
+	/* from being freed when assigning null to them in scripts                        */
+	duk_get_global_string(es->env->ctx, "JSON");			/* [stash,JSON] */
+	duk_push_string(es->env->ctx, "\xff""\xff""duk_json_parse");	/* [stash,JSON,"_parse"] */
+	duk_get_prop_string(es->env->ctx, -2, "parse");			/* [stash,JSON,"_parse",JSON.parse] */
+	es->env->json_parse = duk_get_heapptr(es->env->ctx, -1);
+
+	duk_def_prop(es->env->ctx, -4, DUK_DEFPROP_HAVE_VALUE | DUK_DEFPROP_CLEAR_WRITABLE | DUK_DEFPROP_HAVE_ENUMERABLE |
+			DUK_DEFPROP_HAVE_CONFIGURABLE);	/* [stash,JSON] */
+
+	duk_push_string(es->env->ctx, "\xff""\xff""duk_json_stringify");	/* [stash,JSON,"_stringify"] */
+	duk_get_prop_string(es->env->ctx, -2, "stringify");	/* [stash,JSON,"_stringify",JSON.stringify] */
+	es->env->json_stringify = duk_get_heapptr(es->env->ctx, -1);
+
+	duk_def_prop(es->env->ctx, -4, DUK_DEFPROP_HAVE_VALUE | DUK_DEFPROP_CLEAR_WRITABLE | DUK_DEFPROP_HAVE_ENUMERABLE |
+			DUK_DEFPROP_HAVE_CONFIGURABLE);	/* [stash,JSON] */
+
+	duk_pop(es->env->ctx);
+
 	/* initialize HttpRequest prototype */
 	if (FAIL == zbx_es_init_httprequest(es, error))
 		goto out;

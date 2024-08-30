@@ -62,6 +62,9 @@ struct zbx_es_env
 	int		browser_objects;
 	int		constructor_chain;
 
+	void		*json_parse;
+	void		*json_stringify;
+
 	zbx_hashset_t	objmap;
 };
 
