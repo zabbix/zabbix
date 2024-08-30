@@ -16,19 +16,6 @@
 
 #include "zbxstr.h"
 
-#define ZBX_REGEXP_MULTILINE PCRE2_MULTILINE
-#define ZBX_REGEXP_CASELESS PCRE2_CASELESS
-
-#ifdef PCRE2_NO_AUTO_CAPTURE
-#	define ZBX_REGEXP_NO_AUTO_CAPTURE PCRE2_NO_AUTO_CAPTURE
-#endif
-
-#ifdef PCRE2_MATCH_INVALID_UTF
-#	define ZBX_REGEXP_COMPILE_FLAGS	(PCRE2_MATCH_INVALID_UTF | PCRE2_UTF)
-#else
-#	define ZBX_REGEXP_COMPILE_FLAGS	(PCRE2_UTF)
-#endif
-
 struct zbx_regexp
 {
 	pcre2_code		*pcre2_regexp;
@@ -84,12 +71,12 @@ static int	regexp_compile(const char *pattern, int flags, zbx_regexp_t **regexp,
 	pcre2_code	*pcre2_regexp;
 	int		error = 0;
 	PCRE2_SIZE 	error_offset = 0;
-#ifdef ZBX_REGEXP_NO_AUTO_CAPTURE
-	/* If ZBX_REGEXP_NO_AUTO_CAPTURE bit is set in 'flags' but regular expression contains references to numbered */
-	/* capturing groups then reset ZBX_REGEXP_NO_AUTO_CAPTURE bit. */
+#ifdef PCRE2_NO_AUTO_CAPTURE
+	/* If PCRE2_NO_AUTO_CAPTURE bit is set in 'flags' but regular expression contains references to numbered */
+	/* capturing groups then reset PCRE2_NO_AUTO_CAPTURE bit. */
 	/* Otherwise the regular expression might not compile. */
 
-	if (0 != (flags & ZBX_REGEXP_NO_AUTO_CAPTURE))
+	if (0 != (flags & PCRE2_NO_AUTO_CAPTURE))
 	{
 		const char	*pstart = pattern, *offset;
 
@@ -99,7 +86,7 @@ static int	regexp_compile(const char *pattern, int flags, zbx_regexp_t **regexp,
 
 			if (('1' <= *offset && *offset <= '9') || 'g' == *offset)
 			{
-				flags ^= ZBX_REGEXP_NO_AUTO_CAPTURE;
+				flags ^= PCRE2_NO_AUTO_CAPTURE;
 				break;
 			}
 
@@ -112,8 +99,12 @@ static int	regexp_compile(const char *pattern, int flags, zbx_regexp_t **regexp,
 #endif
 	*err_msg = NULL;
 
+	flags |= PCRE2_UTF;
+#ifdef PCRE2_MATCH_INVALID_UTF
+	flags |= PCRE2_MATCH_INVALID_UTF;
+#endif
 	if (NULL == (pcre2_regexp = pcre2_compile((PCRE2_SPTR)pattern, PCRE2_ZERO_TERMINATED,
-			ZBX_REGEXP_COMPILE_FLAGS | flags, &error, &error_offset, NULL)))
+			flags, &error, &error_offset, NULL)))
 	{
 		*err_msg = decode_pcre2_compile_error(error, error_offset, flags);
 		return FAIL;
@@ -158,11 +149,12 @@ static int	regexp_compile(const char *pattern, int flags, zbx_regexp_t **regexp,
  ********************************************************************************/
 int	zbx_regexp_compile(const char *pattern, zbx_regexp_t **regexp, char **err_msg)
 {
-#ifdef ZBX_REGEXP_NO_AUTO_CAPTURE
-	return regexp_compile(pattern, ZBX_REGEXP_MULTILINE | ZBX_REGEXP_NO_AUTO_CAPTURE, regexp, err_msg);
-#else
-	return regexp_compile(pattern, ZBX_REGEXP_MULTILINE, regexp, err_msg);
+	uint32_t flags = PCRE2_MULTILINE;
+
+#ifdef PCRE2_NO_AUTO_CAPTURE
+	flags |= PCRE2_NO_AUTO_CAPTURE;
 #endif
+	return regexp_compile(pattern, flags, regexp, err_msg);
 }
 
 /******************************************************************************
@@ -538,7 +530,7 @@ static int	zbx_regexp2(const char *string, const char *pattern, int flags, char 
  *************************************************************************************************/
 char	*zbx_regexp_match(const char *string, const char *pattern, int *len)
 {
-	return zbx_regexp(string, pattern, ZBX_REGEXP_MULTILINE, len);
+	return zbx_regexp(string, pattern, PCRE2_MULTILINE, len);
 }
 
 /******************************************************************************
@@ -716,10 +708,10 @@ static int	regexp_sub(const char *string, const char *pattern, const char *outpu
 		return SUCCEED;
 	}
 
-#ifdef ZBX_REGEXP_NO_AUTO_CAPTURE
+#ifdef PCRE2_NO_AUTO_CAPTURE
 	/* no subpatterns without an output template */
 	if (NULL == output_template || '\0' == *output_template)
-		flags |= ZBX_REGEXP_NO_AUTO_CAPTURE;
+		flags |= PCRE2_NO_AUTO_CAPTURE;
 #endif
 
 	if (FAIL == regexp_prepare(pattern, flags, &regexp, &error))
@@ -778,10 +770,10 @@ static int	regexp_sub2(const char *string, const char *pattern, const char *outp
 	unsigned int	i;
 	int		ret;
 
-#ifdef ZBX_REGEXP_NO_AUTO_CAPTURE
+#ifdef PCRE2_NO_AUTO_CAPTURE
 	/* no subpatterns without an output template */
 	if (NULL == output_template || '\0' == *output_template)
-		flags |= ZBX_REGEXP_NO_AUTO_CAPTURE;
+		flags |= PCRE2_NO_AUTO_CAPTURE;
 #endif
 
 	if (SUCCEED != regexp_prepare(pattern, flags, &regexp, err_msg))
@@ -878,7 +870,7 @@ int	zbx_mregexp_sub_precompiled(const char *string, const zbx_regexp_t *regexp, 
  *********************************************************************************/
 int	zbx_regexp_sub(const char *string, const char *pattern, const char *output_template, char **out)
 {
-	return regexp_sub(string, pattern, output_template, ZBX_REGEXP_MULTILINE, out);
+	return regexp_sub(string, pattern, output_template, PCRE2_MULTILINE, out);
 }
 
 /*********************************************************************************
@@ -900,7 +892,7 @@ int	zbx_mregexp_sub(const char *string, const char *pattern, const char *output_
  *********************************************************************************/
 int	zbx_iregexp_sub(const char *string, const char *pattern, const char *output_template, char **out)
 {
-	return regexp_sub(string, pattern, output_template, ZBX_REGEXP_CASELESS, out);
+	return regexp_sub(string, pattern, output_template, PCRE2_CASELESS, out);
 }
 
 /******************************************************************************
@@ -976,10 +968,10 @@ void	zbx_add_regexp_ex(zbx_vector_expression_t *regexps, const char *name, const
 static int	regexp_match_ex_regsub(const char *string, const char *pattern, int case_sensitive,
 		const char *output_template, char **output)
 {
-	int	regexp_flags = ZBX_REGEXP_MULTILINE, ret = FAIL;
+	int	regexp_flags = PCRE2_MULTILINE, ret = FAIL;
 
 	if (ZBX_IGNORE_CASE == case_sensitive)
-		regexp_flags |= ZBX_REGEXP_CASELESS;
+		regexp_flags |= PCRE2_CASELESS;
 
 	if (NULL == output)
 	{
@@ -1038,11 +1030,11 @@ static int	regexp_match_ex_regsub(const char *string, const char *pattern, int c
 static int	regexp_match_ex_regsub2(const char *string, const char *pattern, int case_sensitive,
 		const char *output_template, char **output, char **err_msg)
 {
-	int	regexp_flags = ZBX_REGEXP_MULTILINE, ret;
+	int	regexp_flags = PCRE2_MULTILINE, ret;
 	char	*err_msg_local = NULL;
 
 	if (ZBX_IGNORE_CASE == case_sensitive)
-		regexp_flags |= ZBX_REGEXP_CASELESS;
+		regexp_flags |= PCRE2_CASELESS;
 
 	if (NULL == output)
 		ret = zbx_regexp2(string, pattern, regexp_flags, NULL, NULL, &err_msg_local);
