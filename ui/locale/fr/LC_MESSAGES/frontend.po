@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-08-05 13:45+0000\n"
+"PO-Revision-Date: 2024-08-26 18:27+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -21966,7 +21966,7 @@ msgstr "Un utilisateur ne peut pas s'ajouter à un groupe désactivé ou à un g
 #: include/classes/api/services/CUserGroup.php:673
 #: include/classes/api/services/CUser.php:843
 msgid "User cannot add oneself to a disabled group or a group with disabled GUI access."
-msgstr ""
+msgstr "L'utilisateur ne peut pas s'ajouter à un groupe désactivé ou à un groupe avec un accès GUI désactivé."
 
 #: app/views/administration.user.edit.php:461
 #: include/classes/api/services/CUser.php:980
@@ -22106,7 +22106,7 @@ msgstr "Un utilisateur n'est pas autorisé à s'effacer lui-même."
 
 #: include/classes/api/services/CUser.php:1837
 msgid "User is not allowed to delete oneself."
-msgstr ""
+msgstr "L'utilisateur n'est pas autorisé à se supprimer."
 
 #: app/views/administration.authentication.edit.php:462
 #: app/views/popup.ldap.edit.php:222

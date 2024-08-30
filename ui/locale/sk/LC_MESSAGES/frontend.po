@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-08-26 09:03+0000\n"
-"Last-Translator: Jurijs <jurijs.klopovskis@zabbix.com>\n"
+"PO-Revision-Date: 2024-08-27 12:15+0000\n"
+"Last-Translator: Tomáš Heřmánek <tomas.hermanek@initmax.cz>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
 "MIME-Version: 1.0\n"
@@ -9826,7 +9826,7 @@ msgstr "Host vzory"
 
 #: app/views/usergroup.edit.php:270
 msgid "Host permissions"
-msgstr "Povolenia hosta"
+msgstr "Oprávnenia hosta"
 
 #: app/controllers/CControllerAuditLogList.php:235
 #: app/views/popup.lldoperation.php:52
@@ -16637,7 +16637,7 @@ msgstr "Problém vyriešený"
 
 #: app/views/usergroup.edit.php:273
 msgid "Problem tag filter"
-msgstr "Filter problémových značiek"
+msgstr "Filter problém tagov"
 
 #: app/views/popup.service.edit.php:60 app/views/popup.service.edit.php:245
 #: app/views/popup.services.php:61 app/views/reports.toptriggers.list.php:108
@@ -20184,7 +20184,7 @@ msgstr "Meno šablóny"
 
 #: app/views/usergroup.edit.php:267
 msgid "Template permissions"
-msgstr "Template povolenia"
+msgstr "Oprávnenia šablóny"
 
 #: report2.php:398
 msgid "Template trigger"
@@ -21020,7 +21020,7 @@ msgstr "URL triggra"
 #: app/views/action.list.php:32 include/classes/helpers/CMenuHelper.php:231
 #: include/classes/helpers/CRoleHelper.php:470
 msgid "Trigger actions"
-msgstr "Akcie triggra"
+msgstr "Akcie spúčťačov"
 
 #: app/controllers/CControllerTriggerCreate.php:123
 msgid "Trigger added"
@@ -22146,7 +22146,7 @@ msgstr "Používateľ nemôže sám seba pridať do vypnutej skupiny alebo do sk
 #: include/classes/api/services/CUserGroup.php:673
 #: include/classes/api/services/CUser.php:843
 msgid "User cannot add oneself to a disabled group or a group with disabled GUI access."
-msgstr ""
+msgstr "Používateľ nemôže sám seba pridať do vypnutej skupiny alebo do skupiny s vypnutým GUI prístupom."
 
 #: app/views/administration.user.edit.php:461
 #: include/classes/api/services/CUser.php:980
@@ -22289,7 +22289,7 @@ msgstr "Používateľ nemá dovolené zmazať sám seba."
 
 #: include/classes/api/services/CUser.php:1837
 msgid "User is not allowed to delete oneself."
-msgstr ""
+msgstr "Používateľ nemá dovolené zmazať sám seba."
 
 #: app/views/administration.authentication.edit.php:462
 #: app/views/popup.ldap.edit.php:222
