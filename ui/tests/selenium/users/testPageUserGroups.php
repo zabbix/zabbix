@@ -92,7 +92,7 @@ class testPageUserGroups extends CLegacyWebTest {
 		$this->zbxTestAcceptAlert();
 		$this->zbxTestCheckTitle('Configuration of user groups');
 		if ($cannotDisable) {
-			$this->zbxTestTextPresent('User cannot add himself to a disabled group or a group with disabled GUI access.');
+			$this->zbxTestTextPresent('User cannot add oneself to a disabled group or a group with disabled GUI access.');
 		}
 		else {
 			$this->zbxTestTextPresent('User group updated');

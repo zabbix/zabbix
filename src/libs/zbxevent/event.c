@@ -54,10 +54,13 @@ int	zbx_eventdata_compare(const zbx_eventdata_t *d1, const zbx_eventdata_t *d2)
  * Purpose: build string from event data                                      *
  *                                                                            *
  ******************************************************************************/
-void	zbx_eventdata_to_str(const zbx_vector_eventdata_t *eventdata, char **replace_to)
+int	zbx_eventdata_to_str(const zbx_vector_eventdata_t *eventdata, char **replace_to)
 {
 	int		i;
 	const char	*d = "";
+
+	if (0 == eventdata->values_num)
+		return FAIL;
 
 	for (i = 0; i < eventdata->values_num; i++)
 	{
@@ -68,6 +71,8 @@ void	zbx_eventdata_to_str(const zbx_vector_eventdata_t *eventdata, char **replac
 				zbx_age2str(time(NULL) - e->clock), e->tags);
 		d = "\n";
 	}
+
+	return SUCCEED;
 }
 
 /******************************************************************************
@@ -159,6 +164,7 @@ void	zbx_event_get_json_tags(const zbx_db_event *event, char **replace_to)
 void	zbx_event_get_tag(const char *text, const zbx_db_event *event, char **replace_to)
 {
 	char	*name;
+	int	ret = FAIL;
 
 	if (SUCCEED == zbx_str_extract(text, strlen(text) - 1, &name))
 	{
@@ -179,6 +185,7 @@ void	zbx_event_get_tag(const char *text, const zbx_db_event *event, char **repla
 				if (0 == strcmp(name, tag->tag))
 				{
 					*replace_to = zbx_strdup(*replace_to, tag->value);
+					ret = SUCCEED;
 					break;
 				}
 			}
@@ -188,6 +195,9 @@ void	zbx_event_get_tag(const char *text, const zbx_db_event *event, char **repla
 
 		zbx_free(name);
 	}
+
+	if (FAIL == ret)
+		*replace_to = zbx_strdup(*replace_to, STR_UNKNOWN_VARIABLE);
 }
 
 /******************************************************************************

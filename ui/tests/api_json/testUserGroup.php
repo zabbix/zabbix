@@ -156,7 +156,7 @@ class testUserGroup extends CAPITest {
 					'gui_access' => GROUP_GUI_ACCESS_DISABLED,
 					'users' => ['userid' => 1]
 				],
-				'expected_error' => 'User cannot add himself to a disabled group or a group with disabled GUI access.'
+				'expected_error' => 'User cannot add oneself to a disabled group or a group with disabled GUI access.'
 			],
 			[
 				'group' => [
@@ -164,7 +164,7 @@ class testUserGroup extends CAPITest {
 					'users_status' => 1,
 					'users' => ['userid' => 1]
 				],
-				'expected_error' => 'User cannot add himself to a disabled group or a group with disabled GUI access.'
+				'expected_error' => 'User cannot add oneself to a disabled group or a group with disabled GUI access.'
 			],
 			// Check successfully creation of user group.
 			[
@@ -276,7 +276,7 @@ class testUserGroup extends CAPITest {
 					'usrgrpid' => '7',
 					'users_status' => 1
 				]],
-				'expected_error' => 'User cannot add himself to a disabled group or a group with disabled GUI access.'
+				'expected_error' => 'User cannot add oneself to a disabled group or a group with disabled GUI access.'
 			],
 			[
 				'group' => [[
@@ -284,7 +284,7 @@ class testUserGroup extends CAPITest {
 					'usrgrpid' => '7',
 					'gui_access' => GROUP_GUI_ACCESS_DISABLED
 				]],
-				'expected_error' => 'User cannot add himself to a disabled group or a group with disabled GUI access.'
+				'expected_error' => 'User cannot add oneself to a disabled group or a group with disabled GUI access.'
 			],
 			[
 				'group' => [[
@@ -293,7 +293,7 @@ class testUserGroup extends CAPITest {
 					'gui_access' => GROUP_GUI_ACCESS_DISABLED,
 					'users' => ['userid' => 1]
 				]],
-				'expected_error' => 'User cannot add himself to a disabled group or a group with disabled GUI access.'
+				'expected_error' => 'User cannot add oneself to a disabled group or a group with disabled GUI access.'
 			],
 			[
 				'group' => [[
@@ -302,7 +302,7 @@ class testUserGroup extends CAPITest {
 					'users_status' => 1,
 					'users' => ['userid' => 1]
 				]],
-				'expected_error' => 'User cannot add himself to a disabled group or a group with disabled GUI access.'
+				'expected_error' => 'User cannot add oneself to a disabled group or a group with disabled GUI access.'
 			],
 			'Can remove user with one group from group users' => [
 				'group' => [[

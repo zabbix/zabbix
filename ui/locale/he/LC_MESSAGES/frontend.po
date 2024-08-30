@@ -21983,6 +21983,11 @@ msgstr "מחרוזת סוכן משתמש"
 msgid "User cannot add himself to a disabled group or a group with disabled GUI access."
 msgstr "המשתמש לא יכול להוסיף את עצמו לקבוצת משתמשים מושבתת או לקבוצה שהגישה שלה למנשק המשתמש הושבתה."
 
+#: include/classes/api/services/CUserGroup.php:673
+#: include/classes/api/services/CUser.php:843
+msgid "User cannot add oneself to a disabled group or a group with disabled GUI access."
+msgstr ""
+
 #: app/views/administration.user.edit.php:461
 #: include/classes/api/services/CUser.php:980
 msgid "User cannot change own role."
@@ -22118,6 +22123,10 @@ msgstr ""
 #: include/classes/api/services/CUser.php:1282
 msgid "User is not allowed to delete himself."
 msgstr "למשתמש אין הרשאה למחוק את עצמו."
+
+#: include/classes/api/services/CUser.php:1837
+msgid "User is not allowed to delete oneself."
+msgstr ""
 
 #: app/views/administration.authentication.edit.php:462
 #: app/views/popup.ldap.edit.php:222

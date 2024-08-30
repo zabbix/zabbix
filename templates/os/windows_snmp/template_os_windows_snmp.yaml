@@ -122,6 +122,7 @@ zabbix_export:
           key: net.if.walk
           history: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Discovering interfaces from IF-MIB.'
           tags:
             - tag: component
@@ -130,7 +131,9 @@ zabbix_export:
           name: 'SNMP traps (fallback)'
           type: SNMP_TRAP
           key: snmptrap.fallback
+          delay: '0'
           value_type: LOG
+          trends: '0'
           description: 'The item is used to collect all SNMP traps unmatched by other snmptrap items'
           logtimefmt: 'hh:mm:sszyyyy/MM/dd'
           tags:
@@ -143,6 +146,7 @@ zabbix_export:
           key: 'system.contact[sysContact.0]'
           delay: 15m
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: SNMPv2-MIB
             The textual identification of the contact person for this managed node, together with information on how to contact this person.  If no contact information is known, the value is the zero-length string.
@@ -190,6 +194,7 @@ zabbix_export:
           key: 'system.descr[sysDescr.0]'
           delay: 15m
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: SNMPv2-MIB
             A textual description of the entity. This value should
@@ -232,6 +237,7 @@ zabbix_export:
           key: 'system.location[sysLocation.0]'
           delay: 15m
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: SNMPv2-MIB
             Physical location of the node (e.g., `equipment room`, `3rd floor`). If not provided, the value is a zero-length string.
@@ -250,6 +256,7 @@ zabbix_export:
           key: system.name
           delay: 15m
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: SNMPv2-MIB
             An administratively-assigned name for this managed node.By convention, this is the node's fully-qualified domain name.  If the name is unknown, the value is the zero-length string.
@@ -299,6 +306,7 @@ zabbix_export:
           key: 'system.objectid[sysObjectID.0]'
           delay: 15m
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: SNMPv2-MIB
             The vendor's authoritative identification of the network management subsystem contained in the entity.  This value is allocated within the SMI enterprises subtree (1.3.6.1.4.1) and provides an easy and unambiguous means for determining`what kind of box' is being managed.  For example, if vendor`Flintstones, Inc.' was assigned the subtree1.3.6.1.4.1.4242, it could assign the identifier 1.3.6.1.4.1.4242.1.1 to its `Fred Router'.
@@ -316,6 +324,7 @@ zabbix_export:
           key: vfs.fs.walk
           history: '0'
           value_type: TEXT
+          trends: '0'
           description: 'HOST-RESOURCES-MIB::hrStorage discovery.'
           preprocessing:
             - type: SNMP_WALK_TO_JSON
@@ -373,45 +382,59 @@ zabbix_export:
           name: 'Network interfaces discovery'
           type: DEPENDENT
           key: net.if.discovery
+          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#IFADMINSTATUS}'
                 value: '{$NET.IF.IFADMINSTATUS.MATCHES}'
+                formulaid: A
               - macro: '{#IFADMINSTATUS}'
                 value: '{$NET.IF.IFADMINSTATUS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: B
               - macro: '{#IFALIAS}'
                 value: '{$NET.IF.IFALIAS.MATCHES}'
+                formulaid: C
               - macro: '{#IFALIAS}'
                 value: '{$NET.IF.IFALIAS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: D
               - macro: '{#IFDESCR}'
                 value: '{$NET.IF.IFDESCR.MATCHES}'
+                formulaid: E
               - macro: '{#IFDESCR}'
                 value: '{$NET.IF.IFDESCR.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: F
               - macro: '{#IFNAME}'
                 value: '{$NET.IF.IFNAME.MATCHES}'
+                formulaid: G
               - macro: '{#IFNAME}'
                 value: '{$NET.IF.IFNAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: H
               - macro: '{#IFOPERSTATUS}'
                 value: '{$NET.IF.IFOPERSTATUS.MATCHES}'
+                formulaid: I
               - macro: '{#IFOPERSTATUS}'
                 value: '{$NET.IF.IFOPERSTATUS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: J
               - macro: '{#IFTYPE}'
                 value: '{$NET.IF.IFTYPE.MATCHES}'
+                formulaid: K
               - macro: '{#IFTYPE}'
                 value: '{$NET.IF.IFTYPE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: L
           description: 'Discovering interfaces from IF-MIB.'
           item_prototypes:
             - uuid: 9208bd833e4044f395ac14c8213885de
               name: 'Interface {#IFNAME}({#IFALIAS}): Inbound packets discarded'
               type: DEPENDENT
               key: 'net.if.in.discards[ifInDiscards.{#SNMPINDEX}]'
+              delay: '0'
               description: |
                 MIB: IF-MIB
                 The number of inbound packets which were chosen to be discarded
@@ -425,6 +448,8 @@ zabbix_export:
                     - '1.3.6.1.2.1.2.2.1.13.{#SNMPINDEX}'
                     - '0'
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 3m
@@ -441,6 +466,7 @@ zabbix_export:
               name: 'Interface {#IFNAME}({#IFALIAS}): Inbound packets with errors'
               type: DEPENDENT
               key: 'net.if.in.errors[ifInErrors.{#SNMPINDEX}]'
+              delay: '0'
               description: |
                 MIB: IF-MIB
                 For packet-oriented interfaces, the number of inbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.  For character-oriented or fixed-length interfaces, the number of inbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
@@ -450,6 +476,8 @@ zabbix_export:
                     - '1.3.6.1.2.1.2.2.1.14.{#SNMPINDEX}'
                     - '0'
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 3m
@@ -466,6 +494,7 @@ zabbix_export:
               name: 'Interface {#IFNAME}({#IFALIAS}): Bits received'
               type: DEPENDENT
               key: 'net.if.in[ifInOctets.{#SNMPINDEX}]'
+              delay: '0'
               units: bps
               description: |
                 MIB: IF-MIB
@@ -476,6 +505,8 @@ zabbix_export:
                     - '1.3.6.1.2.1.2.2.1.10.{#SNMPINDEX}'
                     - '0'
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
                 - type: MULTIPLIER
                   parameters:
                     - '8'
@@ -492,6 +523,7 @@ zabbix_export:
               name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets discarded'
               type: DEPENDENT
               key: 'net.if.out.discards[ifOutDiscards.{#SNMPINDEX}]'
+              delay: '0'
               description: |
                 MIB: IF-MIB
                 The number of outbound packets which were chosen to be discarded
@@ -505,6 +537,8 @@ zabbix_export:
                     - '1.3.6.1.2.1.2.2.1.19.{#SNMPINDEX}'
                     - '0'
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 3m
@@ -521,6 +555,7 @@ zabbix_export:
               name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets with errors'
               type: DEPENDENT
               key: 'net.if.out.errors[ifOutErrors.{#SNMPINDEX}]'
+              delay: '0'
               description: |
                 MIB: IF-MIB
                 For packet-oriented interfaces, the number of outbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.  For character-oriented or fixed-length interfaces, the number of outbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
@@ -530,6 +565,8 @@ zabbix_export:
                     - '1.3.6.1.2.1.2.2.1.20.{#SNMPINDEX}'
                     - '0'
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 3m
@@ -546,6 +583,7 @@ zabbix_export:
               name: 'Interface {#IFNAME}({#IFALIAS}): Bits sent'
               type: DEPENDENT
               key: 'net.if.out[ifOutOctets.{#SNMPINDEX}]'
+              delay: '0'
               units: bps
               description: |
                 MIB: IF-MIB
@@ -556,6 +594,8 @@ zabbix_export:
                     - '1.3.6.1.2.1.2.2.1.16.{#SNMPINDEX}'
                     - '0'
                 - type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
                 - type: MULTIPLIER
                   parameters:
                     - '8'
@@ -572,6 +612,7 @@ zabbix_export:
               name: 'Interface {#IFNAME}({#IFALIAS}): Speed'
               type: DEPENDENT
               key: 'net.if.speed[ifHighSpeed.{#SNMPINDEX}]'
+              delay: '0'
               trends: '0'
               units: bps
               description: |
@@ -603,6 +644,7 @@ zabbix_export:
               name: 'Interface {#IFNAME}({#IFALIAS}): Operational status'
               type: DEPENDENT
               key: 'net.if.status[ifOperStatus.{#SNMPINDEX}]'
+              delay: '0'
               trends: '0'
               description: |
                 MIB: IF-MIB
@@ -652,6 +694,7 @@ zabbix_export:
               name: 'Interface {#IFNAME}({#IFALIAS}): Interface type'
               type: DEPENDENT
               key: 'net.if.type[ifType.{#SNMPINDEX}]'
+              delay: '0'
               trends: '0'
               description: |
                 MIB: IF-MIB
@@ -819,25 +862,31 @@ zabbix_export:
           name: 'Mounted filesystem discovery'
           type: DEPENDENT
           key: 'vfs.fs.discovery[snmp]'
+          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#FSNAME}'
                 value: '{$VFS.FS.FSNAME.MATCHES}'
+                formulaid: A
               - macro: '{#FSNAME}'
                 value: '{$VFS.FS.FSNAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: B
               - macro: '{#FSTYPE}'
                 value: '{$VFS.FS.FSTYPE.MATCHES}'
+                formulaid: C
               - macro: '{#FSTYPE}'
                 value: '{$VFS.FS.FSTYPE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: D
           description: 'HOST-RESOURCES-MIB::hrStorage discovery with storage filter.'
           item_prototypes:
             - uuid: 1524fab7760340b1a6eb8f5368d11edd
               name: 'FS [{#FSNAME}]: Space: Used, in %'
               type: DEPENDENT
               key: 'vfs.fs.pused[{#SNMPINDEX}]'
+              delay: '0'
               value_type: FLOAT
               units: '%'
               description: 'The space utilization expressed in % for {#FSNAME}.'
@@ -896,6 +945,7 @@ zabbix_export:
               name: 'FS [{#FSNAME}]: Space: Total'
               type: DEPENDENT
               key: 'vfs.fs.total[hrStorageSize.{#SNMPINDEX}]'
+              delay: '0'
               value_type: FLOAT
               units: B
               description: |
@@ -921,6 +971,7 @@ zabbix_export:
               name: 'FS [{#FSNAME}]: Space: Used'
               type: DEPENDENT
               key: 'vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]'
+              delay: '0'
               value_type: FLOAT
               units: B
               description: |
@@ -944,8 +995,10 @@ zabbix_export:
               name: 'FS [{#FSNAME}]: Get data'
               type: DEPENDENT
               key: 'vfs.fs.walk.data[hrStorage.{#SNMPINDEX}]'
+              delay: '0'
               history: 1h
               value_type: TEXT
+              trends: '0'
               description: |
                 HOST-RESOURCES-MIB::hrStorage.
                 Intermediate data for subsequent processing.
@@ -1036,27 +1089,34 @@ zabbix_export:
           name: 'Memory discovery'
           type: DEPENDENT
           key: vm.memory.discovery
+          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#MEMNAME}'
                 value: '{$MEMORY.NAME.MATCHES}'
+                formulaid: A
               - macro: '{#MEMNAME}'
                 value: '{$MEMORY.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: B
               - macro: '{#MEMTYPE}'
                 value: '{$MEMORY.TYPE.MATCHES}'
+                formulaid: C
               - macro: '{#MEMTYPE}'
                 value: '{$MEMORY.TYPE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: D
           description: 'HOST-RESOURCES-MIB::hrStorage discovery with memory filter'
           item_prototypes:
             - uuid: ef95155004f64f9f95a794c1e5fe9131
               name: '{#MEMNAME}: Get data'
               type: DEPENDENT
               key: 'vm.memory.data[{#SNMPINDEX}]'
+              delay: '0'
               history: 1h
               value_type: TEXT
+              trends: '0'
               description: |
                 MIB: HOST-RESOURCES-MIB
                 The amount of the storage represented by this entry that is allocated, in units of hrStorageAllocationUnits.
@@ -1082,6 +1142,7 @@ zabbix_export:
               name: '{#MEMNAME}: Used'
               type: DEPENDENT
               key: 'vm.memory.used[hrStorageUsed.{#SNMPINDEX}]'
+              delay: '0'
               units: B
               description: |
                 MIB: HOST-RESOURCES-MIB
@@ -1102,6 +1163,7 @@ zabbix_export:
               name: '{#MEMNAME}: Utilization'
               type: DEPENDENT
               key: 'vm.memory.util[{#SNMPINDEX}]'
+              delay: '0'
               value_type: FLOAT
               units: '%'
               description: 'Memory utilization in %.'
@@ -1140,6 +1202,7 @@ zabbix_export:
               name: '{#MEMNAME}: Total'
               type: DEPENDENT
               key: 'vm.memory.walk.data.total[hrStorageSize.{#SNMPINDEX}]'
+              delay: '0'
               units: B
               description: |
                 MIB: HOST-RESOURCES-MIB
