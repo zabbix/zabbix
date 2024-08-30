@@ -1,1 +1,0 @@
-..F....... [ZBX-24039] fixed blank page with a JSON error is returned in case if user attempts to enable/disable a host that is removed by another user (wczerneha)

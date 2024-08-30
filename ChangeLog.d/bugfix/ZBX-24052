@@ -1,1 +1,0 @@
-..F....... [ZBX-24052] fixed the error when applying subfilter by tag on graph page if item tag contains special characters (wczerneha)
