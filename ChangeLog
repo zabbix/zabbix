@@ -1,6 +1,10 @@
 Changes for 7.2.0alpha1
 
 New features:
+.........T [ZBXNEXT-9248] added GitHub repository by HTTP template (drasikhov)
+........S. [ZBXNEXT-9408] updated max supported TimescaleDB version to 2.16 (mprihodko)
+.........T [ZBXNEXT-8937] added support IMDSv2 in role base authorization for AWS templates (egordymov)
+.........T [ZBXNEXT-9245] added proxy group discovery in Zabbix server health template (knaglis)
 ........S. [ZBXNEXT-8656] added PubkeyAcceptedKeyTypes SSH public key algorithm configuration option (sboidenko)
 .......PS. [ZBXNEXT-9326] made items become unsupported when there are no pollers (arimdjonoks)
 .........T [ZBXNEXT-9398] added new mediatype webhook MS Teams Workflow (abiba)
@@ -31,6 +35,25 @@ A.F.I..PS. [ZBXNEXT-9176] removed support of Oracle DB (agriscenko, sboidenko)
 .......PS. [ZBXNEXT-8990] extended VMware event log with username (asestakovs)
 
 Bug fixes:
+...G...... [ZBX-24471] fixed system.run[,nowait] to include double quotes the same way as system.run[,wait] (asestakovs)
+...G...... [ZBX-24619] updated atomic variables to be more safe (esneiders)
+..F....... [ZBX-24052] fixed the error when applying subfilter by tag on graph page if item tag contains special characters (wczerneha)
+........S. [ZBX-24760] fixed default timezone in macro {EVENT.DATE} & {EVENT.TIME} expansion (mprihodko)
+..F....... [ZBX-24051] fixed disappeared space between tags after applying tag values subfilter on the Latest data page (wczerneha)
+....I...S. [ZBX-24819] fixed slow template cloning (asestakovs)
+..F....... [ZBX-24039] fixed blank page with a JSON error is returned in case if user attempts to enable/disable a host that is removed by another user (wczerneha)
+..F....... [ZBX-24570] fixed right Y axis being enabled by default in SVG graph widget (agriscenko)
+..F....... [ZBX-24725] added missing maxlength parameter to description fields (aplich)
+..F....... [ZBX-24691] fixed issue with SNMPv3 authentication protocol and privacy protocol values not getting sent to server for item testing (gcalenko)
+..F....... [ZBX-24874] fixed item preprocessing Custom on fail checkbox readonly and disable state toggling (ddauksa)
+A......... [ZBX-23315] prevented attempt to update host triggers when importing template through hosts page (epulke, jfreibergs)
+....I..... [ZBX-23881] dropped preference list when searching for compiler (jxl)
+A.F....... [ZBX-24750] fixed issues with maximum field length for map elements and shapes (Ivo)
+........S. [ZBX-25081] reduced the alerts table polling in alert syncer (wiper)
+........S. [ZBX-25020] fixed macro usage in http agent custom interval (sboidenko)
+..F....... [ZBX-24966] fixed sorting in Map navigation tree widget (apoga)
+.......P.. [ZBX-24675] fixed Zabbix Proxy configuration synchronization for entries with maximum length names (asestakovs)
+..F....... [ZBX-24431] prevented showing the disabled items in the case when not supported state has been selected (aplich)
 ........S. [ZBX-24636] fixed {HOST.CONN}, {HOST.DNS} and {HOST.IP} to be resolved to unknown in notifications instead of stopping resolving and to be resolved to empty when there is no interface (vso)
 ..F....... [ZBX-24554] added improvements and fixes for binary item usage in Item history widget (dfofanovs)
 ..F....... [ZBX-24728] fixed Item history widget column namings being too long after item selection (dfofanovs)
@@ -204,10 +227,32 @@ A......... [ZBX-24299] fixed possibility to alter readonly error fields with Hos
 Changes for 7.0.4rc1
 
 New features:
+.........T [ZBXNEXT-9248] added GitHub repository by HTTP template (drasikhov)
+........S. [ZBXNEXT-9408] updated max supported TimescaleDB version to 2.16 (mprihodko)
+.........T [ZBXNEXT-8937] added support IMDSv2 in role base authorization for AWS templates (egordymov)
+.........T [ZBXNEXT-9245] added proxy group discovery in Zabbix server health template (knaglis)
 .........T [ZBXNEXT-9398] added new mediatype webhook MS Teams Workflow (abiba)
 .........T [ZBXNEXT-9341] added assume role authorization in AWS templates (egordymov)
 
 Bug fixes:
+...G...... [ZBX-24471] fixed system.run[,nowait] to include double quotes the same way as system.run[,wait] (asestakovs)
+...G...... [ZBX-24619] updated atomic variables to be more safe (esneiders)
+..F....... [ZBX-24052] fixed the error when applying subfilter by tag on graph page if item tag contains special characters (wczerneha)
+..F....... [ZBX-24051] fixed disappeared space between tags after applying tag values subfilter on the Latest data page (wczerneha)
+....I...S. [ZBX-24819] fixed slow template cloning (asestakovs)
+..F....... [ZBX-24039] fixed blank page with a JSON error is returned in case if user attempts to enable/disable a host that is removed by another user (wczerneha)
+..F....... [ZBX-24570] fixed right Y axis being enabled by default in SVG graph widget (agriscenko)
+..F....... [ZBX-24725] added missing maxlength parameter to description fields (aplich)
+..F....... [ZBX-24691] fixed issue with SNMPv3 authentication protocol and privacy protocol values not getting sent to server for item testing (gcalenko)
+..F....... [ZBX-24874] fixed item preprocessing Custom on fail checkbox readonly and disable state toggling (ddauksa)
+A......... [ZBX-23315] prevented attempt to update host triggers when importing template through hosts page (epulke, jfreibergs)
+A.F....... [ZBX-24750] fixed issues with maximum field length for map elements and shapes (Ivo)
+........S. [ZBX-25081] reduced the alerts table polling in alert syncer (wiper)
+........S. [ZBX-25020] fixed macro usage in http agent custom interval (sboidenko)
+..F....... [ZBX-24966] fixed sorting in Map navigation tree widget (apoga)
+.......P.. [ZBX-24675] fixed Zabbix Proxy configuration synchronization for entries with maximum length names (asestakovs)
+........S. [ZBX-24394] made trigger housekeeper documentation more precise (dgoloscapov)
+..F....... [ZBX-24431] prevented showing the disabled items in the case when not supported state has been selected (aplich)
 ........S. [ZBX-24636] fixed {HOST.CONN}, {HOST.DNS} and {HOST.IP} to be resolved to unknown in notifications instead of stopping resolving and to be resolved to empty when there is no interface (vso)
 ..F....... [ZBX-24554] added improvements and fixes for binary item usage in Item history widget (dfofanovs)
 ..F....... [ZBX-24728] fixed Item history widget column namings being too long after item selection (dfofanovs)
@@ -1207,8 +1252,12 @@ A.F....... [ZBX-21976] added support of OneLogin and Azure SCIM, fixed some issu
 Changes for 6.4.19rc1
 
 New features:
+........S. [ZBXNEXT-9408] updated max supported TimescaleDB version to 2.16 (mprihodko)
 
 Bug fixes:
+....I...S. [ZBX-24819] fixed slow template cloning (asestakovs)
+..F....... [ZBX-24966] fixed sorting in Map navigation tree widget (apoga)
+.......PS. [ZBX-24926] fixed bad argument error when using latest libcurl (vso)
 ........S. [ZBX-24879] fixed ODBC login with special characters in the password field (sboidenko)
 
 --------------------------------------------------------------------------------
@@ -3126,10 +3175,26 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 Changes for 6.0.34rc1
 
 New features:
+.........T [ZBXNEXT-9248] added GitHub repository by HTTP template (drasikhov)
+........S. [ZBXNEXT-9408] updated max supported TimescaleDB version to 2.16 (mprihodko)
+.........T [ZBXNEXT-8937] added support IMDSv2 in role base authorization for AWS templates (egordymov)
 .........T [ZBXNEXT-9398] added new mediatype webhook MS Teams Workflow (abiba)
 .........T [ZBXNEXT-9341] added assume role authorization in AWS templates (egordymov)
 
 Bug fixes:
+...G...... [ZBX-24471] fixed system.run[,nowait] to include double quotes the same way as system.run[,wait] (asestakovs)
+...G...... [ZBX-24619] updated atomic variables to be more safe (esneiders)
+..F....... [ZBX-24052] fixed the error when applying subfilter by tag on graph page if item tag contains special characters (wczerneha)
+....I...S. [ZBX-24819] fixed slow template cloning (asestakovs)
+..F....... [ZBX-24570] fixed right Y axis being enabled by default in SVG graph widget (agriscenko)
+..F....... [ZBX-24725] added missing maxlength parameter to description fields (aplich)
+..F....... [ZBX-24874] fixed item preprocessing Custom on fail checkbox readonly and disable state toggling (ddauksa)
+A......... [ZBX-23315] prevented attempt to update host triggers when importing template through hosts page (epulke, jfreibergs)
+..F....... [ZBX-24691] fixed issue with SNMPv3 authentication protocol and privacy protocol values not getting sent to server for item testing (gcalenko)
+A.F....... [ZBX-24750] fixed issues with maximum field length for map elements and shapes (Ivo)
+..F....... [ZBX-24966] fixed sorting in Map navigation tree widget (apoga)
+.......PS. [ZBX-24926] fixed bad argument error when using latest libcurl (vso)
+..F....... [ZBX-24431] prevented showing the disabled items in the case when not supported state has been selected (aplich)
 ..F....... [ZBX-24147] fixed translation strings and comments to gender neutral ones (dpetra)
 ..F....... [ZBX-24903] fixed row count in script dialog of script item (apoga)
 ..F....... [ZBX-24466] fixed configuration map import not resetting element icons (talbergs)
