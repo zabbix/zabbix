@@ -5,7 +5,7 @@ New features:
 .......PS. [ZBXNEXT-9326] made items become unsupported when there are no pollers (arimdjonoks)
 .........T [ZBXNEXT-9398] added new mediatype webhook MS Teams Workflow (abiba)
 .........T [ZBXNEXT-9341] added assume role authorization in AWS templates (egordymov)
-..F....... [ZBXNEXT-9297] improved Clock widget (type - digital) elements sizing (apoga, dfofanovs)
+A.F.I..... [ZBXNEXT-9297] improved Clock widget (type - digital) elements sizing (apoga, dfofanovs)
 ...G.....T [ZBXNEXT-9000] changed query table for ASM disk group metrics in Oracle Database plugin and Oracle by ODBC template (knaglis)
 ..F....PS. [ZBXNEXT-9218] added proxy group discovery internal item (mprihodko)
 ....I...S. [ZBXNEXT-9230] converted history_bin table to hypertable for TimescaleDB (asestakovs)
