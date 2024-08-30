@@ -61,7 +61,7 @@ static char	*decode_pcre2_compile_error(int error_code, PCRE2_SIZE error_offset,
 	if (0 > (ret = pcre2_get_error_message(error_code, (PCRE2_UCHAR *)buf, sizeof(buf))))
 		return zbx_dsprintf(NULL, "pcre2_get_error_message(%d, ...) failed with error %d", error_code, ret);
 
-	return zbx_dsprintf(NULL, "%s, position %zu, flags:0x%x", buf, (size_t)error_offset, flags);
+	return zbx_dsprintf(NULL, "%s, position %zu, flags:0x%x", buf, (size_t)error_offset, (unsigned int)flags);
 #undef BUF_SIZE
 }
 
