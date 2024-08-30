@@ -245,7 +245,7 @@ static duk_ret_t	wd_element_get_attribute(duk_context *ctx)
 		goto out;
 	}
 
-	duk_push_string(ctx, value);
+	es_push_result_string(ctx, value, strlen(value));
 out:
 	zbx_free(value);
 	zbx_free(name);
@@ -298,7 +298,7 @@ static duk_ret_t	wd_element_get_property(duk_context *ctx)
 		goto out;
 	}
 
-	duk_push_string(ctx, value);
+	es_push_result_string(ctx, value, strlen(value));
 out:
 	zbx_free(value);
 	zbx_free(name);
@@ -331,7 +331,7 @@ static duk_ret_t	wd_element_get_text(duk_context *ctx)
 		goto out;
 	}
 
-	duk_push_string(ctx, value);
+	es_push_result_string(ctx, value, strlen(value));
 out:
 	zbx_free(value);
 

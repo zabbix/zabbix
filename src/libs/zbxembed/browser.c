@@ -26,6 +26,7 @@
 #include "zbxtime.h"
 #include "zbxtypes.h"
 #include "zbxvariant.h"
+#include "zbxstr.h"
 
 #ifdef HAVE_LIBCURL
 
@@ -233,7 +234,7 @@ static duk_ret_t	es_browser_get_url(duk_context *ctx)
 		return duk_throw(ctx);
 	}
 
-	duk_push_string(ctx, url);
+	es_push_result_string(ctx, url, strlen(url));
 	zbx_free(url);
 
 	return 1;
@@ -454,7 +455,7 @@ static void	es_browser_push_error(duk_context *ctx, zbx_webdriver_t *wd)
 	duk_put_prop_string(ctx, -2, "http_status");
 	duk_push_string(ctx, error_code);
 	duk_put_prop_string(ctx, -2, "code");
-	duk_push_string(ctx, wd->last_error_message);
+	es_push_result_string(ctx, wd->last_error_message, strlen(wd->last_error_message));
 	duk_put_prop_string(ctx, -2, "message");
 }
 
@@ -671,7 +672,7 @@ static duk_ret_t	es_browser_get_cookies(duk_context *ctx)
 		goto out;
 	}
 	duk_push_heapptr(ctx, wd->env->json_parse);
-	duk_push_string(ctx, cookies);
+	es_push_result_string(ctx, cookies, strlen(cookies));
 	duk_pcall(ctx, 1);
 out:
 	zbx_free(cookies);
@@ -753,7 +754,7 @@ static duk_ret_t	es_browser_get_screenshot(duk_context *ctx)
 		return duk_throw(ctx);
 	}
 
-	duk_push_string(ctx, screenshot);
+	es_push_result_string(ctx, screenshot, strlen(screenshot));
 	zbx_free(screenshot);
 
 	return 1;
@@ -887,7 +888,7 @@ static duk_ret_t	es_browser_get_page_source(duk_context *ctx)
 		return duk_throw(ctx);
 	}
 
-	duk_push_string(ctx, source);
+	es_push_result_string(ctx, source, strlen(source));
 	zbx_free(source);
 
 	return 1;
@@ -919,6 +920,7 @@ static duk_ret_t	es_browser_get_alert(duk_context *ctx)
 
 	if (NULL != alert)
 	{
+		zbx_replace_invalid_utf8(alert);
 		wd_alert_create(ctx, wd, alert);
 		zbx_free(alert);
 	}
@@ -983,7 +985,7 @@ out:
 static duk_ret_t	es_browser_get_raw_perf_entries(duk_context *ctx)
 {
 	zbx_webdriver_t		*wd;
-	char			*error = NULL;
+	char			*error = NULL, *result = NULL;
 	struct zbx_json_parse	jp;
 
 	if (NULL == (wd = es_webdriver(ctx)))
@@ -998,7 +1000,12 @@ static duk_ret_t	es_browser_get_raw_perf_entries(duk_context *ctx)
 	}
 
 	duk_push_heapptr(ctx, wd->env->json_parse);
-	duk_push_lstring(ctx, jp.start, jp.end - jp.start + 1);
+
+	result = zbx_substr(wd->data, jp.start - wd->data, jp.end - wd->data);
+	zbx_replace_invalid_utf8(result);
+	es_push_result_string(ctx, result, strlen(result));
+	zbx_free(result);
+
 	duk_pcall(ctx, 1);
 
 	return 1;
@@ -1048,8 +1055,15 @@ static duk_ret_t	es_browser_get_raw_perf_entries_by_type(duk_context *ctx)
 	}
 	else
 	{
+		char	*result = NULL;
+
 		duk_push_heapptr(ctx, wd->env->json_parse);
-		duk_push_lstring(ctx, jp.start, jp.end - jp.start + 1);
+
+		result = zbx_substr(wd->data, jp.start - wd->data, jp.end - wd->data);
+		zbx_replace_invalid_utf8(result);
+		es_push_result_string(ctx, result, strlen(result));
+		zbx_free(result);
+
 		duk_pcall(ctx, 1);
 	}
 
