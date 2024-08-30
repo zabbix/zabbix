@@ -292,7 +292,7 @@ zabbix_export:
             }
             
             return JSON.stringify({'health': Vcenter.health_status, 'error': Vcenter.error_msg});
-          description: 'Gets overall health of the system. This item works only with VMware vCenter version above 6.5.'
+          description: 'Gets overall health of the system. This item works only with VMware vCenter versions above 6.5.'
           timeout: '10'
           parameters:
             - name: password
@@ -315,10 +315,10 @@ zabbix_export:
             VMware Overall health of system. One of the following:
             - Gray: No health data is available for this service.
             - Green: Service is healthy.
-            - Yellow: The service is healthy state, but experiencing some levels of problems.
+            - Yellow: The service is in a healthy state, but experiencing some level of problems.
             - Orange: The service health is degraded. The service might have serious problems.
-            - Red: The service is unavaiable, not functioning properly, or will stop functioning soon.
-            - Not available: The health status is unavaiable. (Not supported on the vCenter or ESXi side).
+            - Red: The service is unavailable, not functioning properly, or will stop functioning soon.
+            - Not available: The health status is unavailable (not supported on the vCenter or ESXi side).
           valuemap:
             name: 'VMware Overall Health VC State'
           preprocessing:
@@ -339,7 +339,7 @@ zabbix_export:
               name: 'Overall Health VC State is not Green'
               opdata: 'Current Overall Health VC State: {ITEM.LASTVALUE}'
               priority: AVERAGE
-              description: 'One or more components in the appliance might be in an unusable status and the appliance might become unresponsive soon.'
+              description: 'One or more components in the appliance might be in an unusable status and the appliance might soon become unresponsive.'
               tags:
                 - tag: scope
                   value: availability
@@ -364,7 +364,7 @@ zabbix_export:
               value: system
       discovery_rules:
         - uuid: a1f545a8acb5423884a3ef46b0aaa1c6
-          name: 'VMware alarms discovery'
+          name: 'VMware alarm discovery'
           type: DEPENDENT
           key: vmware.alarms.discovery
           delay: '0'
@@ -454,7 +454,7 @@ zabbix_export:
                   value: 'VMware: *'
                   severity: INFO
         - uuid: 16ffc933cce74cf28a6edf306aa99782
-          name: 'VMware clusters discovery'
+          name: 'VMware cluster discovery'
           type: SIMPLE
           key: 'vmware.cluster.discovery[{$VMWARE.URL}]'
           delay: 1h
@@ -470,9 +470,9 @@ zabbix_export:
               password: '{$VMWARE.PASSWORD}'
               description: |
                 VMware cluster status. One of the following:
-                - Gray: Unknown
-                - Green: Ok
-                - Yellow: It might have a problem
+                - Gray: Unknown;
+                - Green: OK;
+                - Yellow: It might have a problem;
                 - Red: It has a problem.
               valuemap:
                 name: 'VMware status'
@@ -486,7 +486,7 @@ zabbix_export:
                   expression: 'last(/VMware/vmware.cluster.status[{$VMWARE.URL},{#CLUSTER.NAME}])=3'
                   name: 'The [{#CLUSTER.NAME}] status is Red'
                   priority: HIGH
-                  description: 'A cluster enabled for DRS becomes invalid (red) when the tree is no longer internally consistent, that is, resource constraints are not observed. See also: https://docs.vmware.com/en/VMware-vSphere/8.0/vsphere-resource-management/GUID-C7417CAA-BD38-41D0-9529-9E7A5898BB12.html'
+                  description: 'A cluster enabled for DRS becomes invalid (red) when the tree is no longer internally consistent, that is, when resource constraints are not observed. See also: https://docs.vmware.com/en/VMware-vSphere/8.0/vsphere-resource-management/GUID-C7417CAA-BD38-41D0-9529-9E7A5898BB12.html'
                   tags:
                     - tag: scope
                       value: availability
@@ -496,7 +496,7 @@ zabbix_export:
                   expression: 'last(/VMware/vmware.cluster.status[{$VMWARE.URL},{#CLUSTER.NAME}])=2'
                   name: 'The [{#CLUSTER.NAME}] status is Yellow'
                   priority: AVERAGE
-                  description: 'A cluster becomes overcommitted (yellow) when the tree of resource pools and virtual machines is internally consistent but the cluster does not have the capacity to support all resources reserved by the child resource pools. See also: https://docs.vmware.com/en/VMware-vSphere/8.0/vsphere-resource-management/GUID-ED8240A0-FB54-4A31-BD3D-F23FE740F10C.html'
+                  description: 'A cluster becomes overcommitted (yellow) when the tree of resource pools and virtual machines is internally consistent but the cluster does not have the capacity to support all the resources reserved by the child resource pools. See also: https://docs.vmware.com/en/VMware-vSphere/8.0/vsphere-resource-management/GUID-ED8240A0-FB54-4A31-BD3D-F23FE740F10C.html'
                   dependencies:
                     - name: 'The [{#CLUSTER.NAME}] status is Red'
                       expression: 'last(/VMware/vmware.cluster.status[{$VMWARE.URL},{#CLUSTER.NAME}])=3'
@@ -506,7 +506,7 @@ zabbix_export:
                     - tag: scope
                       value: performance
         - uuid: 8fb6a45cbe074b0cb6df53758e2c6623
-          name: 'VMware datastores discovery'
+          name: 'VMware datastore discovery'
           type: SIMPLE
           key: 'vmware.datastore.discovery[{$VMWARE.URL}]'
           delay: 1h
@@ -529,12 +529,12 @@ zabbix_export:
                 - tag: type
                   value: '{#DATASTORE.TYPE}'
             - uuid: 54c2631edeb04ef39701ad3bf03be1af
-              name: 'Average read IOps of the datastore [{#DATASTORE}]'
+              name: 'Average read IOPS of the datastore [{#DATASTORE}]'
               type: SIMPLE
               key: 'vmware.datastore.read[{$VMWARE.URL},{#DATASTORE},rps]'
               username: '{$VMWARE.USERNAME}'
               password: '{$VMWARE.PASSWORD}'
-              description: 'IOps for a read operation from the datastore (milliseconds).'
+              description: 'IOPS for a read operation from the datastore (milliseconds).'
               tags:
                 - tag: component
                   value: datastore
@@ -551,7 +551,7 @@ zabbix_export:
               units: '%'
               username: '{$VMWARE.USERNAME}'
               password: '{$VMWARE.PASSWORD}'
-              description: 'VMware datastore free space in percentage from total.'
+              description: 'VMware datastore free space (percentage from the total).'
               tags:
                 - tag: component
                   value: datastore
@@ -565,7 +565,7 @@ zabbix_export:
                   name: '[{#DATASTORE}]: Free space is critically low'
                   event_name: 'Datastore free space is critically low ([{#DATASTORE}] free space < {$VMWARE.DATASTORE.SPACE.CRIT}%)'
                   priority: HIGH
-                  description: 'Datastore free space has fallen below critical threshold.'
+                  description: 'Datastore free space has fallen below the critical threshold.'
                   tags:
                     - tag: scope
                       value: capacity
@@ -574,7 +574,7 @@ zabbix_export:
                   name: '[{#DATASTORE}]: Free space is low'
                   event_name: 'Datastore free space is low ([{#DATASTORE}] free space < {$VMWARE.DATASTORE.SPACE.WARN}%)'
                   priority: WARNING
-                  description: 'Datastore free space has fallen below warning threshold.'
+                  description: 'Datastore free space has fallen below the warning threshold.'
                   dependencies:
                     - name: '[{#DATASTORE}]: Free space is critically low'
                       expression: 'last(/VMware/vmware.datastore.size[{$VMWARE.URL},{#DATASTORE},pfree])<{$VMWARE.DATASTORE.SPACE.CRIT}'
@@ -616,12 +616,12 @@ zabbix_export:
                 - tag: type
                   value: '{#DATASTORE.TYPE}'
             - uuid: 0026edd933404faf992d08628c9ab364
-              name: 'Average write IOps of the datastore [{#DATASTORE}]'
+              name: 'Average write IOPS of the datastore [{#DATASTORE}]'
               type: SIMPLE
               key: 'vmware.datastore.write[{$VMWARE.URL},{#DATASTORE},rps]'
               username: '{$VMWARE.USERNAME}'
               password: '{$VMWARE.PASSWORD}'
-              description: 'IOps for a write operation to the datastore (milliseconds).'
+              description: 'IOPS for a write operation to the datastore (milliseconds).'
               tags:
                 - tag: component
                   value: datastore
@@ -643,7 +643,7 @@ zabbix_export:
                   value: Average
                   discover: NO_DISCOVER
         - uuid: a5bc075e89f248e7b411d8f960897a08
-          name: 'VMware hypervisors discovery'
+          name: 'VMware hypervisor discovery'
           type: SIMPLE
           key: 'vmware.hv.discovery[{$VMWARE.URL}]'
           delay: 1h
@@ -670,7 +670,7 @@ zabbix_export:
               interfaces:
                 - ip: '{#HV.IP}'
         - uuid: 9fd559f4e88c4677a1b874634dd686f5
-          name: 'VMware VMs discovery'
+          name: 'VMware VM discovery'
           type: SIMPLE
           key: 'vmware.vm.discovery[{$VMWARE.URL}]'
           delay: 1h
@@ -720,13 +720,13 @@ zabbix_export:
           description: 'Set "true"/"false" to enable or disable monitoring of hardware sensors.'
         - macro: '{$VMWARE.HV.SENSOR.DISCOVERY.NAME.MATCHES}'
           value: '.*'
-          description: 'Sets the regex string of hardware sensor names to allow in discovery.'
+          description: 'Sets the regex string of hardware sensor names to be allowed in discovery.'
         - macro: '{$VMWARE.HV.SENSOR.DISCOVERY.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Sets the regex string of hardware sensor names to ignore in discovery.'
+          description: 'Sets the regex string of hardware sensor names to be ignored in discovery.'
         - macro: '{$VMWARE.PASSWORD}'
           type: SECRET_TEXT
-          description: 'VMware service {$USERNAME} user password.'
+          description: 'VMware service `{$USERNAME}` user password.'
         - macro: '{$VMWARE.PROXY}'
           description: 'Sets the HTTP proxy for script items. If this parameter is empty, then no proxy is used.'
         - macro: '{$VMWARE.URL}'
@@ -1058,9 +1058,9 @@ zabbix_export:
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
           description: |
-            Displays whether a snapshot consolidation is needed or not. One of the following:
-            - True
-            - False
+            Displays whether snapshot consolidation is needed or not. One of the following:
+            - True;
+            - False.
           valuemap:
             name: 'VMware Consolidation'
           preprocessing:
@@ -1089,14 +1089,14 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: 31389342688f4b0696a49431923a528f
-          name: 'CPU latency in percents'
+          name: 'CPU latency in percent'
           type: SIMPLE
           key: 'vmware.vm.cpu.latency[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
           value_type: FLOAT
           units: '%'
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
-          description: 'Percentage of time the virtual machine is unable to run because it is contending for access to the physical CPU(s).'
+          description: 'Percentage of time the VM is unable to run because it is contending for access to the physical CPU(s).'
           tags:
             - tag: component
               value: cpu
@@ -1116,14 +1116,14 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: f4d72109b7ee4e0bb65aab1de85b6b05
-          name: 'CPU readiness latency in percents'
+          name: 'CPU readiness latency in percent'
           type: SIMPLE
           key: 'vmware.vm.cpu.readiness[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
           value_type: FLOAT
           units: '%'
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
-          description: 'Percentage of time that the virtual machine was ready, but could not get scheduled to run on the physical CPU.'
+          description: 'Percentage of time that the virtual machine was ready, but was unable to get scheduled to run on the physical CPU.'
           tags:
             - tag: component
               value: cpu
@@ -1134,23 +1134,23 @@ zabbix_export:
           units: ms
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
-          description: 'Time that the virtual machine was ready, but could not get scheduled to run on the physical CPU during last measurement interval (VMware vCenter/ESXi Server performance counter sampling interval - 20 seconds).'
+          description: 'Time that the VM was ready, but unable to get scheduled to run on the physical CPU during the last measurement interval (VMware vCenter/ESXi Server performance counter sampling interval - 20 seconds).'
           tags:
             - tag: component
               value: cpu
         - uuid: 50de05f27f33425cb207a3fdece7ecb1
-          name: 'CPU swap-in latency in percents'
+          name: 'CPU swap-in latency in percent'
           type: SIMPLE
           key: 'vmware.vm.cpu.swapwait[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
           units: '%'
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
-          description: 'Percentage of CPU time spent waiting for swap-in.'
+          description: 'Percentage of CPU time spent waiting for a swap-in.'
           tags:
             - tag: component
               value: cpu
         - uuid: 50606be978814b51b4bae54340965cdc
-          name: 'CPU usage in percents'
+          name: 'CPU usage in percent'
           type: SIMPLE
           key: 'vmware.vm.cpu.usage.perf[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
           value_type: FLOAT
@@ -1168,7 +1168,7 @@ zabbix_export:
           units: Hz
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
-          description: 'Current upper-bound on CPU usage. The upper-bound is based on the host the virtual machine is current running on, as well as limits configured on the virtual machine itself or any parent resource pool. Valid while the virtual machine is running.'
+          description: 'Current upper-bound on CPU usage. The upper-bound is based on the host the VM is current running on, as well as limits configured on the VM itself or any parent resource pool. Valid while the VM is running.'
           tags:
             - tag: component
               value: cpu
@@ -1312,7 +1312,7 @@ zabbix_export:
           units: B
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
-          description: 'The amount of host physical memory allocated to the VM, accounting for saving from memory sharing with other VMs.'
+          description: 'The amount of host physical memory allocated to the VM, accounting for the amount saved from memory sharing with other VMs.'
           tags:
             - tag: component
               value: memory
@@ -1333,7 +1333,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: e82daa73e03e43b9838d9e414d710e38
-          name: 'Host memory usage in percents'
+          name: 'Host memory usage in percent'
           type: SIMPLE
           key: 'vmware.vm.memory.usage[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
           value_type: FLOAT
@@ -1351,10 +1351,10 @@ zabbix_export:
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
           description: |
-            The current power state of the virtual machine. One of the following:
-            - Powered off
-            - Powered on
-            - Suspended
+            The current power state of the VM. One of the following:
+            - Powered off;
+            - Powered on;
+            - Suspended.
           valuemap:
             name: 'VMware VirtualMachinePowerState'
           preprocessing:
@@ -1369,7 +1369,7 @@ zabbix_export:
           type: DEPENDENT
           key: vmware.vm.snapshot.count
           delay: '0'
-          description: 'Snapshots count of the guest VM.'
+          description: 'Snapshot count of the guest VM.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1407,7 +1407,7 @@ zabbix_export:
           delay: '0'
           value_type: CHAR
           trends: '0'
-          description: 'Snapshots latest date of the guest VM.'
+          description: 'Latest snapshot date of the guest VM.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1427,13 +1427,13 @@ zabbix_export:
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
           description: |
-            VMware Virtual Machine state. One of the following:
-            - Not running
-            - Resetting
-            - Running
-            - Shutting down
-            - Standby
-            - Unknown
+            VMware virtual machine state. One of the following:
+            - Not running;
+            - Resetting;
+            - Running;
+            - Shutting down;
+            - Standby;
+            - Unknown.
           valuemap:
             name: 'VMware Virtual Machine state'
           preprocessing:
@@ -1474,7 +1474,7 @@ zabbix_export:
           units: B
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
-          description: 'Total storage space, in bytes, committed to this virtual machine across all datastores.'
+          description: 'Total storage space, in bytes, committed to this VM across all datastores.'
           tags:
             - tag: component
               value: storage
@@ -1485,7 +1485,7 @@ zabbix_export:
           units: B
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
-          description: 'Additional storage space, in bytes, potentially used by this virtual machine on all datastores.'
+          description: 'Additional storage space, in bytes, potentially used by this VM on all datastores.'
           tags:
             - tag: component
               value: storage
@@ -1496,7 +1496,7 @@ zabbix_export:
           units: B
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
-          description: 'Total storage space, in bytes, occupied by the virtual machine across all datastores, that is not shared with any other virtual machine.'
+          description: 'Total storage space, in bytes, occupied by the VM across all datastores that is not shared with any other VM.'
           tags:
             - tag: component
               value: storage
@@ -1507,7 +1507,7 @@ zabbix_export:
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
           description: |
-            VMware Tools status monitoring. One of the following:
+            Monitoring of VMware Tools. One of the following:
             - Guest tools executing scripts: VMware Tools is starting.
             - Guest tools not running: VMware Tools is not running.
             - Guest tools running: VMware Tools is running.
@@ -1550,7 +1550,7 @@ zabbix_export:
           trends: '0'
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
-          description: 'Monitoring VMware Tools version.'
+          description: 'Monitoring of the VMware Tools version.'
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -1636,7 +1636,7 @@ zabbix_export:
               units: Bps
               username: '{$VMWARE.USERNAME}'
               password: '{$VMWARE.PASSWORD}'
-              description: 'VMware virtual machine network utilization (combined transmit-rates and receive-rates) during the interval.'
+              description: 'VMware virtual machine network utilization (combined transmit and receive rates) during the interval.'
               preprocessing:
                 - type: MULTIPLIER
                   parameters:
@@ -1785,7 +1785,7 @@ zabbix_export:
               units: '%'
               username: '{$VMWARE.USERNAME}'
               password: '{$VMWARE.PASSWORD}'
-              description: 'VMware virtual machine file system statistics (percentages).'
+              description: 'VMware virtual machine file system statistics (percentage).'
               tags:
                 - tag: component
                   value: filesystem
@@ -1798,7 +1798,7 @@ zabbix_export:
                   event_name: '[{#FSNAME}]: Disk space is critically low (below {$VMWARE.VM.FS.PFREE.MIN.CRIT:"{#FSNAME}"}% for 5m)'
                   opdata: 'Space free: {ITEM.LASTVALUE}'
                   priority: AVERAGE
-                  description: 'The disk free space on [{#FSNAME}] is less than `{$VMWARE.VM.FS.PFREE.MIN.CRIT:"{#FSNAME}"}`% for 5m.'
+                  description: 'The disk free space on [{#FSNAME}] has been less than `{$VMWARE.VM.FS.PFREE.MIN.CRIT:"{#FSNAME}"}`% for 5m.'
                   manual_close: 'YES'
                   tags:
                     - tag: scope
@@ -1809,7 +1809,7 @@ zabbix_export:
                   event_name: '[{#FSNAME}]: Disk space is low (below {$VMWARE.VM.FS.PFREE.MIN.WARN:"{#FSNAME}"}% for 5m)'
                   opdata: 'Space free: {ITEM.LASTVALUE}'
                   priority: WARNING
-                  description: 'The disk free space on [{#FSNAME}] is less than `{$VMWARE.VM.FS.PFREE.MIN.WARN:"{#FSNAME}"}`% for 5m.'
+                  description: 'The disk free space on [{#FSNAME}] has been less than `{$VMWARE.VM.FS.PFREE.MIN.WARN:"{#FSNAME}"}`% for 5m.'
                   manual_close: 'YES'
                   dependencies:
                     - name: '[{#FSNAME}]: Disk space is critically low'
@@ -1858,20 +1858,20 @@ zabbix_export:
       macros:
         - macro: '{$VMWARE.PASSWORD}'
           type: SECRET_TEXT
-          description: 'VMware service {$USERNAME} user password.'
+          description: 'VMware service `{$USERNAME}` user password.'
         - macro: '{$VMWARE.URL}'
           description: 'VMware service (vCenter or ESX hypervisor) SDK URL (https://servername/sdk).'
         - macro: '{$VMWARE.USERNAME}'
           description: 'VMware service user name.'
         - macro: '{$VMWARE.VM.FS.PFREE.MIN.CRIT}'
           value: '10'
-          description: 'VMware guest free space threshold for critical trigger.'
+          description: 'VMware guest free space threshold for the critical trigger.'
         - macro: '{$VMWARE.VM.FS.PFREE.MIN.WARN}'
           value: '20'
-          description: 'VMware guest free space threshold for warning trigger.'
+          description: 'VMware guest free space threshold for the warning trigger.'
         - macro: '{$VMWARE.VM.FS.TRIGGER.USED}'
           value: '0'
-          description: 'VMware guest free space trigger use. Set 1/0 to enable or disable trigger for free space.'
+          description: 'VMware guest used free space trigger. Set to "1"/"0" to enable or disable the trigger.'
       dashboards:
         - uuid: ea7f45fa45e4429abb2fd3a675765483
           name: 'Guest VM overview'
@@ -2676,7 +2676,7 @@ zabbix_export:
                       name: value_bold
                       value: '0'
                 - type: item
-                  name: 'CPU readiness latency in percents'
+                  name: 'CPU readiness latency in percent'
                   x: '51'
                   'y': '8'
                   width: '21'
@@ -2709,7 +2709,7 @@ zabbix_export:
                       name: value_bold
                       value: '0'
                 - type: item
-                  name: 'CPU readiness latency in percents'
+                  name: 'CPU readiness latency in percent'
                   x: '51'
                   'y': '10'
                   width: '21'
@@ -3517,8 +3517,8 @@ zabbix_export:
           key: 'icmpping[]'
           description: |
             Checks if the hypervisor is running and accepting ICMP pings. One of the following:
-            - Down
-            - Up
+            - Down;
+            - Up.
           valuemap:
             name: 'Service state'
           preprocessing:
@@ -3535,7 +3535,7 @@ zabbix_export:
               expression: 'last(/VMware Hypervisor/icmpping[])=0'
               name: 'Hypervisor is down'
               priority: AVERAGE
-              description: 'The service is unavailable or does not accept ICMP ping.'
+              description: 'The service is unavailable or is not accepting ICMP pings.'
               manual_close: 'YES'
               tags:
                 - tag: scope
@@ -3565,9 +3565,9 @@ zabbix_export:
           password: '{$VMWARE.PASSWORD}'
           description: |
             VMware hypervisor connection state. One of the following:
-            - Connected
-            - Disconnected
-            - Not responding
+            - Connected;
+            - Disconnected;
+            - Not responding.
           valuemap:
             name: 'VMware Connection state'
           preprocessing:
@@ -3587,7 +3587,7 @@ zabbix_export:
             - tag: component
               value: availability
         - uuid: c4ebd62118464e7a8d1945f80d70f8ae
-          name: 'CPU usage in percents'
+          name: 'CPU usage in percent'
           type: SIMPLE
           key: 'vmware.hv.cpu.usage.perf[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
           value_type: FLOAT
@@ -3617,7 +3617,7 @@ zabbix_export:
           units: '%'
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
-          description: 'CPU usage as a percentage during the interval depends on power management or HT.'
+          description: 'CPU utilization as a percentage during the interval depends on power management or hyper-threading.'
           tags:
             - tag: component
               value: cpu
@@ -3663,7 +3663,7 @@ zabbix_export:
           units: Hz
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
-          description: 'The speed of the CPU cores. This is an average value if there are multiple speeds. The product of CPU frequency and number of cores is approximately equal to the sum of the MHz for all the individual cores on the host.'
+          description: 'The speed of the CPU cores. This is an average value if there are multiple speeds. The product of CPU frequency and the number of cores is approximately equal to the sum of the MHz for all the individual cores on the host.'
           tags:
             - tag: component
               value: cpu
@@ -3791,22 +3791,22 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 8f935e9718294cd4a67d02f4723a1713
-          name: 'Number of broadcast received'
+          name: 'Number of broadcasts received'
           type: SIMPLE
           key: 'vmware.hv.network.in[{$VMWARE.URL},{$VMWARE.HV.UUID},broadcast]'
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
-          description: 'VMware hypervisor network input statistics (broadcast).'
+          description: 'VMware hypervisor network input statistics (broadcasts).'
           tags:
             - tag: component
               value: network
         - uuid: 720c58685828440bacda845bfd848d6a
-          name: 'Number of dropped received'
+          name: 'Number of dropped received packets'
           type: SIMPLE
           key: 'vmware.hv.network.in[{$VMWARE.URL},{$VMWARE.HV.UUID},dropped]'
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
-          description: 'VMware hypervisor network input statistics (dropped).'
+          description: 'VMware hypervisor network input statistics (packets dropped).'
           tags:
             - tag: component
               value: network
@@ -3832,22 +3832,22 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 16496c407daa43b9863c05416b294992
-          name: 'Number of broadcast transmitted'
+          name: 'Number of broadcasts transmitted'
           type: SIMPLE
           key: 'vmware.hv.network.out[{$VMWARE.URL},{$VMWARE.HV.UUID},broadcast]'
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
-          description: 'VMware hypervisor network output statistics (broadcast).'
+          description: 'VMware hypervisor network output statistics (broadcasts).'
           tags:
             - tag: component
               value: network
         - uuid: f001256bbfc34cc0898c5eaef422973e
-          name: 'Number of dropped transmitted'
+          name: 'Number of dropped transmitted packets'
           type: SIMPLE
           key: 'vmware.hv.network.out[{$VMWARE.URL},{$VMWARE.HV.UUID},dropped]'
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
-          description: 'VMware hypervisor network output statistics (dropped).'
+          description: 'VMware hypervisor network output statistics (packets dropped).'
           tags:
             - tag: component
               value: network
@@ -3896,7 +3896,7 @@ zabbix_export:
           trends: '0'
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
-          description: 'Master item for sensors data.'
+          description: 'Master item for sensor data.'
           tags:
             - tag: component
               value: raw
@@ -3908,9 +3908,9 @@ zabbix_export:
           password: '{$VMWARE.PASSWORD}'
           description: |
             The overall alarm status of the host. One of the following:
-            - Gray: Unknown
-            - Green: Ok
-            - Yellow: It might have a problem
+            - Gray: Unknown;
+            - Green: OK;
+            - Yellow: It might have a problem;
             - Red: It has a problem.
           valuemap:
             name: 'VMware status'
@@ -3922,7 +3922,7 @@ zabbix_export:
               expression: 'last(/VMware Hypervisor/vmware.hv.status[{$VMWARE.URL},{$VMWARE.HV.UUID}])=3'
               name: 'The {$VMWARE.HV.UUID} health is Red'
               priority: HIGH
-              description: 'One or more components in the appliance might be in an unusable status and the appliance might become unresponsive soon. Security patches might be available.'
+              description: 'One or more components in the appliance might be in an unusable status and the appliance might soon become unresponsive. Security patches might be available.'
               tags:
                 - tag: scope
                   value: availability
@@ -3932,7 +3932,7 @@ zabbix_export:
               expression: 'last(/VMware Hypervisor/vmware.hv.status[{$VMWARE.URL},{$VMWARE.HV.UUID}])=2'
               name: 'The {$VMWARE.HV.UUID} health is Yellow'
               priority: AVERAGE
-              description: 'One or more components in the appliance might become overloaded soon.'
+              description: 'One or more components in the appliance might soon become overloaded.'
               dependencies:
                 - name: 'The {$VMWARE.HV.UUID} health is Red'
                   expression: 'last(/VMware Hypervisor/vmware.hv.status[{$VMWARE.URL},{$VMWARE.HV.UUID}])=3'
@@ -4018,7 +4018,7 @@ zabbix_export:
                   event_name: 'The multipath count for datastore [{#DATASTORE}] has been changed'
                   opdata: 'Current: {ITEM.LASTVALUE}, Registered: {#MULTIPATH.COUNT}'
                   priority: AVERAGE
-                  description: 'The number of available datastore paths less than registered ({#MULTIPATH.COUNT}).'
+                  description: 'The number of available datastore paths is less than registered (`{#MULTIPATH.COUNT}`).'
                   manual_close: 'YES'
                   tags:
                     - tag: scope
@@ -4038,12 +4038,12 @@ zabbix_export:
                 - tag: type
                   value: '{#DATASTORE.TYPE}'
             - uuid: 1d7761e9ad0c48c1a3f6b1b48290c16b
-              name: 'Average read IOps of the datastore [{#DATASTORE}]'
+              name: 'Average read IOPS of the datastore [{#DATASTORE}]'
               type: SIMPLE
               key: 'vmware.hv.datastore.read[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE},rps]'
               username: '{$VMWARE.USERNAME}'
               password: '{$VMWARE.PASSWORD}'
-              description: 'Average IOps for a read operation from the datastore.'
+              description: 'Average IOPS for a read operation from the datastore.'
               tags:
                 - tag: component
                   value: datastore
@@ -4060,7 +4060,7 @@ zabbix_export:
               units: '%'
               username: '{$VMWARE.USERNAME}'
               password: '{$VMWARE.PASSWORD}'
-              description: 'VMware datastore free space in percentage from total.'
+              description: 'VMware datastore free space (percentage from the total).'
               tags:
                 - tag: component
                   value: datastore
@@ -4074,7 +4074,7 @@ zabbix_export:
                   name: '[{#DATASTORE}]: Free space is critically low'
                   event_name: 'Datastore free space is critically low ([{#DATASTORE}] free space < {$VMWARE.HV.DATASTORE.SPACE.CRIT}%)'
                   priority: HIGH
-                  description: 'Datastore free space has fallen below critical threshold.'
+                  description: 'Datastore free space has fallen below the critical threshold.'
                   tags:
                     - tag: scope
                       value: capacity
@@ -4083,7 +4083,7 @@ zabbix_export:
                   name: '[{#DATASTORE}]: Free space is low'
                   event_name: 'Datastore free space is low ([{#DATASTORE}] free space < {$VMWARE.HV.DATASTORE.SPACE.WARN}%)'
                   priority: WARNING
-                  description: 'Datastore free space has fallen below warning threshold.'
+                  description: 'Datastore free space has fallen below the warning threshold.'
                   dependencies:
                     - name: '[{#DATASTORE}]: Free space is critically low'
                       expression: 'last(/VMware Hypervisor/vmware.hv.datastore.size[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE},pfree])<{$VMWARE.HV.DATASTORE.SPACE.CRIT}'
@@ -4125,12 +4125,12 @@ zabbix_export:
                 - tag: type
                   value: '{#DATASTORE.TYPE}'
             - uuid: 4514c4ccf00142e48b243f69dee0b533
-              name: 'Average write IOps of the datastore [{#DATASTORE}]'
+              name: 'Average write IOPS of the datastore [{#DATASTORE}]'
               type: SIMPLE
               key: 'vmware.hv.datastore.write[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE},rps]'
               username: '{$VMWARE.USERNAME}'
               password: '{$VMWARE.PASSWORD}'
-              description: 'Average IOps for a write operation to the datastore (milliseconds).'
+              description: 'Average IOPS for a write operation to the datastore (milliseconds).'
               tags:
                 - tag: component
                   value: datastore
@@ -4176,10 +4176,10 @@ zabbix_export:
               key: 'vmware.hv.sensor.health.state[{#SINGLETON}]'
               delay: '0'
               description: |
-                The host health state rollup sensor value. One of the following:
-                - Gray: Unknown
-                - Green: Ok
-                - Yellow: It might have a problem
+                The host's Rollup Health State sensor value. One of the following:
+                - Gray: Unknown;
+                - Green: OK;
+                - Yellow: It might have a problem;
                 - Red: It has a problem.
               valuemap:
                 name: 'VMware status'
@@ -4210,7 +4210,7 @@ zabbix_export:
                   expression: 'last(/VMware Hypervisor/vmware.hv.sensor.health.state[{#SINGLETON}])=3'
                   name: 'The {$VMWARE.HV.UUID} health is Red'
                   priority: HIGH
-                  description: 'One or more components in the appliance might be in an unusable status and the appliance might become unresponsive soon. Security patches might be available.'
+                  description: 'One or more components in the appliance might be in an unusable status and the appliance might soon become unresponsive. Security patches might be available.'
                   dependencies:
                     - name: 'The {$VMWARE.HV.UUID} health is Red'
                       expression: 'last(/VMware Hypervisor/vmware.hv.status[{$VMWARE.URL},{$VMWARE.HV.UUID}])=3'
@@ -4223,7 +4223,7 @@ zabbix_export:
                   expression: 'last(/VMware Hypervisor/vmware.hv.sensor.health.state[{#SINGLETON}])=2'
                   name: 'The {$VMWARE.HV.UUID} health is Yellow'
                   priority: AVERAGE
-                  description: 'One or more components in the appliance might become overloaded soon.'
+                  description: 'One or more components in the appliance might soon become overloaded.'
                   dependencies:
                     - name: 'The {$VMWARE.HV.UUID} health is Red'
                       expression: 'last(/VMware Hypervisor/vmware.hv.sensor.health.state[{#SINGLETON}])=3'
@@ -4251,7 +4251,7 @@ zabbix_export:
               parameters:
                 - 6h
         - uuid: cabe1fbdd4e04ef396afaa5dfd1a3423
-          name: 'Network interfaces discovery'
+          name: 'Network interface discovery'
           type: SIMPLE
           key: 'vmware.hv.net.if.discovery[{$VMWARE.URL},{$VMWARE.HV.UUID}]'
           delay: 1h
@@ -4304,9 +4304,9 @@ zabbix_export:
               delay: '0'
               description: |
                 VMware hardware sensor health state. One of the following:
-                - Gray: Unknown
-                - Green: Ok
-                - Yellow: It might have a problem
+                - Gray: Unknown;
+                - Green: OK;
+                - Yellow: It might have a problem;
                 - Red: It has a problem.
               valuemap:
                 name: 'VMware status'
@@ -4341,7 +4341,7 @@ zabbix_export:
                   expression: 'last(/VMware Hypervisor/vmware.hv.sensor.state["{#NAME}"])=3'
                   name: 'Sensor [{#NAME}] health state is Red'
                   priority: HIGH
-                  description: 'One or more components in the appliance might be in an unusable status and the appliance might become unresponsive soon.'
+                  description: 'One or more components in the appliance might be in an unusable status and the appliance might soon become unresponsive.'
                   dependencies:
                     - name: 'The {$VMWARE.HV.UUID} health is Red'
                       expression: 'last(/VMware Hypervisor/vmware.hv.status[{$VMWARE.URL},{$VMWARE.HV.UUID}])=3'
@@ -4354,7 +4354,7 @@ zabbix_export:
                   expression: 'last(/VMware Hypervisor/vmware.hv.sensor.state["{#NAME}"])=2'
                   name: 'Sensor [{#NAME}] health state is Yellow'
                   priority: AVERAGE
-                  description: 'One or more components in the appliance might become overloaded soon.'
+                  description: 'One or more components in the appliance might soon become overloaded.'
                   dependencies:
                     - name: 'Sensor [{#NAME}] health state is Red'
                       expression: 'last(/VMware Hypervisor/vmware.hv.sensor.state["{#NAME}"])=3'
@@ -4398,7 +4398,7 @@ zabbix_export:
           type: DEPENDENT
           key: vmware.hv.serial.number.discovery
           delay: '0'
-          description: 'VMware hypervisor serial number discovery. This item works only with VMware hypervisor version above 6.7.'
+          description: 'VMware hypervisor serial number discovery. This item works only with VMware hypervisor versions above 6.7.'
           item_prototypes:
             - uuid: fcd12a13f97848b78b610e86a24417b2
               name: 'Serial number'
@@ -4489,16 +4489,16 @@ zabbix_export:
           description: 'The warning threshold of the datastore free space.'
         - macro: '{$VMWARE.HV.SENSOR.DISCOVERY}'
           value: 'false'
-          description: 'Set "true"/"false" to enable or disable monitoring of hardware sensors.'
+          description: 'Set to "true"/"false" to enable or disable the monitoring of hardware sensors.'
         - macro: '{$VMWARE.HV.SENSOR.DISCOVERY.NAME.MATCHES}'
           value: '.*'
-          description: 'Sets the regex string of hardware sensor names to allow in discovery.'
+          description: 'Sets the regex string of hardware sensor names to be allowed in discovery.'
         - macro: '{$VMWARE.HV.SENSOR.DISCOVERY.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Sets the regex string of hardware sensor names to ignore in discovery.'
+          description: 'Sets the regex string of hardware sensor names to be ignored in discovery.'
         - macro: '{$VMWARE.PASSWORD}'
           type: SECRET_TEXT
-          description: 'VMware service {$USERNAME} user password.'
+          description: 'VMware service `{$USERNAME}` user password.'
         - macro: '{$VMWARE.URL}'
           description: 'VMware service (vCenter or ESX hypervisor) SDK URL (https://servername/sdk).'
         - macro: '{$VMWARE.USERNAME}'
