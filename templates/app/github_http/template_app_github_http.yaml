@@ -15,43 +15,47 @@ zabbix_export:
         
         Setup:
         
-        1. Create an access token for the monitoring.
+        1. Create an access token for monitoring
         
-        One of the simplest ways to send authenticated requests is to use a personal access token (either a classic or a fine-grained):
+        One of the simplest ways to send authenticated requests is to use a personal access token - either a classic or a fine-grained one:
         https://docs.github.com/en/rest/authentication/authenticating-to-the-rest-api?apiVersion=2022-11-28#authenticating-with-a-personal-access-token
         
-        For example, you could create a new classic personal access token by following the instructions in the official documentation:
+        Classic personal access token
+        
+        You can create a new classic personal access token by following the instructions in the official documentation:
         https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-personal-access-token-classic
         
-        For public repositories no additional permission scopes are required. For the private repositories the "repo" scope must be set (full control of private repositories) for the monitoring to work.
+        For public repositories, no additional permission scopes are required. For monitoring to work on private repositories, the "repo" scope must be set to have full control of private repositories.
         
         Additional information about OAuth scopes is available in the official documentation:
         https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/scopes-for-oauth-apps#available-scopes
         
-        Note, that authenticated users must have admin access to the repository and the "repo" scope must be set to get the information about self-hosted runners:
+        Note that authenticated users must have admin access to the repository and the "repo" scope must be set to get information about self-hosted runners:
         https://docs.github.com/en/rest/actions/self-hosted-runners?apiVersion=2022-11-28#list-self-hosted-runners-for-a-repository
         
-        Also, you could use a fine-grained personal access token:
+        Fine-grained personal access token
+        
+        Alternatively, you can use a fine-grained personal access token:
         https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-fine-grained-personal-access-token
         
-        Note, that in order to use fine-grained tokens to monitor organization-owned repositories organizations must opt in to fine-grained personal access tokens and set up a personal access token policy:
+        In order to use fine-grained tokens to monitor organization-owned repositories, organizations must opt in to fine-grained personal access tokens and set up a personal access token policy:
         https://docs.github.com/en/organizations/managing-programmatic-access-to-your-organization/setting-a-personal-access-token-policy-for-your-organization
         
         The fine-grained token needs to have the following permissions set to provide access to the repository resources:
-        - "Actions" repository permissions (read)
-        - "Administration" repository permissions (read)
-        - "Contents" repository permissions (read)
-        - "Issues" repository permissions (read)
-        - "Metadata" repository permissions (read)
-        - "Pull requests" repository permissions (read)
+        - "Actions" repository permissions (read);
+        - "Administration" repository permissions (read);
+        - "Contents" repository permissions (read);
+        - "Issues" repository permissions (read);
+        - "Metadata" repository permissions (read);
+        - "Pull requests" repository permissions (read).
         
-        2. Set the access token that you've created in step 1 in the "{$GITHUB.API.TOKEN}" macro.
-        3. Change the API URL in the "{$GITHUB.API.URL}" macro if needed (for self-hosted installations).
-        4. Set the repository owner name in the "{$GITHUB.REPO.OWNER}" macro.
-        5. Set the repository name in the "{$GITHUB.REPO.NAME}" macro.
-        6. Set the LLD rules filters if needed (you may want to use it to also stay within rate limits, as on large repositories LLD rules may generate a lot of script items):
+        2. Set the access token that you've created in step 1 in the "{$GITHUB.API.TOKEN}" macro
+        3. Change the API URL in the "{$GITHUB.API.URL}" macro if needed (for self-hosted installations)
+        4. Set the repository owner name in the "{$GITHUB.REPO.OWNER}" macro
+        5. Set the repository name in the "{$GITHUB.REPO.NAME}" macro
+        6. Set the LLD rule filters if needed (you may want to use it to also stay within rate limits as on large repositories, LLD rules may generate a lot of script items)
         
-        Note, that update intervals and timeouts for script items can be changed individually via "{$GITHUB.INTERVAL}" and "{$GITHUB.TIMEOUT}" macros with context. Depending on the repository being monitored it can be adjusted if needed (if you are exceeding rate limits, you can increase update intervals for some script items to stay within per hour request limits). But be aware that it may also affect the triggers (check whether the item is used in triggers and adjust thresholds and/or evaluation periods if needed).
+        Note: Update intervals and timeouts for script items can be changed individually via "{$GITHUB.INTERVAL}" and "{$GITHUB.TIMEOUT}" macros with context. Depending on the repository being monitored, it can be adjusted if needed (if you are exceeding rate limits, you can increase update intervals for some script items to stay within per hour request limits). But be aware that it may also affect the triggers (check whether the item is used in triggers and adjust thresholds and/or evaluation periods if needed).
         
         Generated by official Zabbix template tool "Templator"
       vendor:
@@ -240,7 +244,7 @@ zabbix_export:
             - tag: component
               value: issues
         - uuid: f88f02dc593844a89eb601e833a1a19c
-          name: 'Get issues count'
+          name: 'Get issue count'
           type: SCRIPT
           key: github.repo.issues.get
           delay: '{$GITHUB.INTERVAL:"get_issues_count"}'
@@ -397,12 +401,12 @@ zabbix_export:
             	return JSON.stringify({ error: error });
             }
           description: |
-            Get the count of issues and PRs in the repository (total, open, closed).
+            Get the count of issues and pull requests in the repository (total, open, closed).
             
-            Information about issues endpoint:
+            Information about endpoint for issues:
             https://docs.github.com/en/rest/issues/issues?apiVersion=2022-11-28#list-repository-issues
             
-            Information about pull requests endpoint:
+            Information about endpoint for pull requests:
             https://docs.github.com/en/rest/pulls/pulls?apiVersion=2022-11-28#list-pull-requests
           preprocessing:
             - type: CHECK_REGEX_ERROR
@@ -466,7 +470,7 @@ zabbix_export:
               expression: 'last(/GitHub repository by HTTP/github.repo.issues.total)>last(/GitHub repository by HTTP/github.repo.issues.total,#2)'
               name: 'GitHub: The total number of issues has increased'
               priority: WARNING
-              description: 'The total number of issues has increased, which means that either a new single or multiple issues have been opened.'
+              description: 'The total number of issues has increased which means that either a new issue (or multiple) has been opened.'
               type: MULTIPLE
               tags:
                 - tag: scope
@@ -521,7 +525,7 @@ zabbix_export:
               expression: 'last(/GitHub repository by HTTP/github.repo.pr.total)>last(/GitHub repository by HTTP/github.repo.pr.total,#2)'
               name: 'GitHub: The total number of PRs has increased'
               priority: INFO
-              description: 'The total number of pull requests has increased, which means that either a new single or multiple pull requests have been opened.'
+              description: 'The total number of pull requests has increased which means that either a new pull request (or multiple) has been opened.'
               type: MULTIPLE
               tags:
                 - tag: scope
@@ -652,7 +656,7 @@ zabbix_export:
             	return JSON.stringify({ error: error });
             }
           description: |
-            The number of releases in the repository. Note, that this number also includes draft releases.
+            The number of releases in the repository. Note that this number also includes draft releases.
             
             Information about endpoint:
             https://docs.github.com/en/rest/releases/releases?apiVersion=2022-11-28#list-releases
@@ -695,7 +699,7 @@ zabbix_export:
           type: DEPENDENT
           key: github.repo.repository.forks.count
           delay: '0'
-          description: 'The number of the repository forks.'
+          description: 'The number of repository forks.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -880,7 +884,7 @@ zabbix_export:
           delay: '0'
           value_type: TEXT
           trends: '0'
-          description: 'The data collection check.'
+          description: 'Data collection check.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -899,7 +903,7 @@ zabbix_export:
               expression: 'length(last(/GitHub repository by HTTP/github.repo.repository.get.check))>0'
               name: 'GitHub: There are errors in requests to API'
               priority: AVERAGE
-              description: 'Errors have been received in response to API request. Check the latest values for details.'
+              description: 'Errors have been received in response to API requests. Check the latest values for details.'
               tags:
                 - tag: scope
                   value: availability
@@ -908,7 +912,7 @@ zabbix_export:
           type: DEPENDENT
           key: github.repo.repository.is_fork
           delay: '0'
-          description: 'Indicates, whether the repository is a fork.'
+          description: 'Indicates whether the repository is a fork.'
           valuemap:
             name: Boolean
           preprocessing:
@@ -953,7 +957,7 @@ zabbix_export:
           type: DEPENDENT
           key: github.repo.repository.stargazers
           delay: '0'
-          description: 'The number of GitHub users who starred the repository.'
+          description: 'The number of GitHub users who have starred the repository.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -985,12 +989,12 @@ zabbix_export:
             - tag: component
               value: repository
         - uuid: 1166ecf4aa624b469805406da0b1f552
-          name: 'Requests limit'
+          name: 'Request limit'
           type: DEPENDENT
           key: github.repo.requests.limit
           delay: '0'
           description: |
-            The API requests limit.
+            API request limit.
             
             Information about request limits in GitHub REST API documentation:
             https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api?apiVersion=2022-11-28
@@ -1026,14 +1030,14 @@ zabbix_export:
             - tag: component
               value: request-limits
         - uuid: e4b52ac7188944298fd6ca306ed4f8b8
-          name: 'Requests limit utilization, in %'
+          name: 'Request limit utilization, in %'
           type: DEPENDENT
           key: github.repo.requests.util
           delay: '0'
           value_type: FLOAT
           units: '%'
           description: |
-            The calculated usage of API requests limit in %.
+            The calculated utilization of the API request limit in %.
             
             Information about request limits in GitHub REST API documentation:
             https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api?apiVersion=2022-11-28
@@ -1057,18 +1061,18 @@ zabbix_export:
               expression: 'max(/GitHub repository by HTTP/github.repo.requests.util,1h)>{$GITHUB.REQUESTS.UTIL.WARN}'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'max(/GitHub repository by HTTP/github.repo.requests.util,1h)>{$GITHUB.REQUESTS.UTIL.WARN}-5'
-              name: 'GitHub: API requests limit utilization is high'
-              event_name: 'GitHub: API requests limit utilization is high (usage is > {$GITHUB.REQUESTS.UTIL.WARN})'
+              name: 'GitHub: API request limit utilization is high'
+              event_name: 'GitHub: API request limit utilization is high (usage is > {$GITHUB.REQUESTS.UTIL.WARN})'
               priority: WARNING
               description: |
-                The API requests limit utilization is high. It can be lowered by increasing the update intervals for script items (by setting up higher values in corresponding context macros).
+                The API request limit utilization is high. It can be lowered by increasing the update intervals for script items (by setting up higher values in corresponding context macros).
                 
-                The trigger will be resolved automatically if the limits usage will drop by 5% below the trigger threshold.
+                The trigger will be resolved automatically if the limit usage drops 5% below the trigger threshold.
                 
                 Information about request limits in GitHub REST API documentation:
                 https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api?apiVersion=2022-11-28
               dependencies:
-                - name: 'GitHub: API requests limit utilization is very high'
+                - name: 'GitHub: API request limit utilization is very high'
                   expression: 'max(/GitHub repository by HTTP/github.repo.requests.util,1h)>{$GITHUB.REQUESTS.UTIL.HIGH}'
                   recovery_expression: 'max(/GitHub repository by HTTP/github.repo.requests.util,1h)>{$GITHUB.REQUESTS.UTIL.HIGH}-5'
               tags:
@@ -1080,13 +1084,13 @@ zabbix_export:
               expression: 'max(/GitHub repository by HTTP/github.repo.requests.util,1h)>{$GITHUB.REQUESTS.UTIL.HIGH}'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'max(/GitHub repository by HTTP/github.repo.requests.util,1h)>{$GITHUB.REQUESTS.UTIL.HIGH}-5'
-              name: 'GitHub: API requests limit utilization is very high'
-              event_name: 'GitHub: API requests limit utilization is very high (usage is > {$GITHUB.REQUESTS.UTIL.HIGH})'
+              name: 'GitHub: API request limit utilization is very high'
+              event_name: 'GitHub: API request limit utilization is very high (usage is > {$GITHUB.REQUESTS.UTIL.HIGH})'
               priority: AVERAGE
               description: |
-                The API requests limit utilization is very high. It can be lowered by increasing the update intervals for script items (by setting up higher values in corresponding context macros).
+                The API request limit utilization is very high. It can be lowered by increasing the update intervals for script items (by setting up higher values in corresponding context macros).
                 
-                The trigger will be resolved automatically if the limits usage will drop by 5% below the trigger threshold.
+                The trigger will be resolved automatically if the limit usage drops 5% below the trigger threshold.
                 
                 Information about request limits in GitHub REST API documentation:
                 https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api?apiVersion=2022-11-28
@@ -1224,9 +1228,9 @@ zabbix_export:
             	return JSON.stringify({ error: error });
             }
           description: |
-            Get the repository self-hosted runners.
+            Get the self-hosted runners of the repository.
             
-            Note, that an admin access to the repository is required to use this endpoint:
+            Note that admin access to the repository is required to use this endpoint:
             https://docs.github.com/en/rest/actions/self-hosted-runners?apiVersion=2022-11-28#list-self-hosted-runners-for-a-repository
           preprocessing:
             - type: CHECK_REGEX_ERROR
@@ -1260,13 +1264,13 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 35507c347ff44527a7deb3aaf4846d33
-          name: 'Get self-hosted runners check'
+          name: 'Get self-hosted runner check'
           type: DEPENDENT
           key: github.repo.runners.get.check
           delay: '0'
           value_type: TEXT
           trends: '0'
-          description: 'The self-hosted runners data collection check.'
+          description: 'Carry out a self-hosted runners data collection check.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1286,7 +1290,7 @@ zabbix_export:
               name: 'GitHub: No access to repository self-hosted runners'
               priority: AVERAGE
               description: |
-                An admin access to the repository is required to use this endpoint:
+                Admin access to the repository is required to use this endpoint:
                 https://docs.github.com/en/rest/actions/self-hosted-runners?apiVersion=2022-11-28#list-self-hosted-runners-for-a-repository
         - uuid: 49d81fc72a6a455ebee7304592056930
           name: 'Number of tags'
@@ -1624,7 +1628,7 @@ zabbix_export:
               value: raw
       discovery_rules:
         - uuid: 8142a17a53f44cd9b3d3991b9e3da91d
-          name: 'Branches discovery'
+          name: 'Branch discovery'
           type: DEPENDENT
           key: github.repo.branches.discovery
           delay: '0'
@@ -1830,7 +1834,7 @@ zabbix_export:
               parameters:
                 - $.data
         - uuid: 8a3dbc58ccd845bbb92a671997a3bbec
-          name: 'Community profile metrics discovery'
+          name: 'Discovery of community profile metrics'
           type: DEPENDENT
           key: github.repo.community_profile.discovery
           delay: '0'
@@ -1885,7 +1889,7 @@ zabbix_export:
               parameters:
                 - 6h
         - uuid: b77b33e77ddb457d9fd7912f97f179fd
-          name: 'Self-hosted runners discovery'
+          name: 'Self-hosted runner discovery'
           type: DEPENDENT
           key: github.repo.runners.discovery
           delay: '0'
@@ -1907,9 +1911,9 @@ zabbix_export:
                 operator: NOT_MATCHES_REGEX
                 formulaid: D
           description: |
-            Discovers repository self-hosted runners.
+            Discovers self-hosted runners of the repository.
             
-            Note, that an admin access to the repository is required to use this endpoint:
+            Note that admin access to the repository is required to use this endpoint:
             https://docs.github.com/en/rest/actions/self-hosted-runners?apiVersion=2022-11-28#list-self-hosted-runners-for-a-repository
           item_prototypes:
             - uuid: 6cf4664f14744eb88eaee6e82330cd79
@@ -1979,7 +1983,7 @@ zabbix_export:
                   expression: 'last(/GitHub repository by HTTP/github.repo.runners.online[{#RUNNER_NAME}],#2)=1 and last(/GitHub repository by HTTP/github.repo.runners.online[{#RUNNER_NAME}])=0'
                   name: 'GitHub: Runner [{#RUNNER_NAME}]: The runner has become offline'
                   priority: WARNING
-                  description: 'The runner was online previously but now it is not connected to GitHub. This could be because the machine is offline, the self-hosted runner application is not running on the machine, or the self-hosted runner application cannot communicate with GitHub.'
+                  description: 'The runner was online previously, but is currently not connected to GitHub. This could be because the machine is offline, the self-hosted runner application is not running on the machine, or the self-hosted runner application cannot communicate with GitHub.'
                   tags:
                     - tag: scope
                       value: availability
@@ -2015,7 +2019,7 @@ zabbix_export:
               parameters:
                 - 1h
         - uuid: df2e23b12f914d7d89c182ff451da054
-          name: 'Workflows discovery'
+          name: 'Workflow discovery'
           type: DEPENDENT
           key: github.repo.workflows.discovery
           delay: '0'
@@ -2037,7 +2041,7 @@ zabbix_export:
                 operator: NOT_MATCHES_REGEX
                 formulaid: D
           description: |
-            Discovers repository workflows. By default only the active workflows are being discovered.
+            Discovers repository workflows. By default, only the active workflows are discovered.
             
             Information about endpoint:
             https://docs.github.com/en/rest/actions/workflows?apiVersion=2022-11-28#list-repository-workflows
@@ -2309,7 +2313,7 @@ zabbix_export:
               delay: '0'
               trends: '0'
               units: unixtime
-              description: 'The date when the last workflow run has started.'
+              description: 'The date when the last workflow run was started.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -2371,7 +2375,7 @@ zabbix_export:
                   name: 'GitHub: Workflow [{#WORKFLOW_NAME}]: The workflow has been in progress for too long'
                   event_name: 'GitHub: Workflow [{#WORKFLOW_NAME}]: The workflow has been in progress for too long (over {$GITHUB.WORKFLOW.STATUS.IN_PROGRESS.THRESH:"workflow_in_progress:{#WORKFLOW_NAME}"})'
                   priority: WARNING
-                  description: 'The last workflow run has been in the "in_progress" status for too long. The default threshold is provided as an example and can be adjusted for particular workflows with context macros.'
+                  description: 'The last workflow run has been in the "in_progress" status for too long. The default threshold is provided as an example and can be adjusted for relevant workflows with context macros.'
                   tags:
                     - tag: scope
                       value: availability
@@ -2382,7 +2386,7 @@ zabbix_export:
                   name: 'GitHub: Workflow [{#WORKFLOW_NAME}]: The workflow has been in the queue for too long'
                   event_name: 'GitHub: Workflow [{#WORKFLOW_NAME}]: The workflow has been in the queue for too long (over {$GITHUB.WORKFLOW.STATUS.QUEUED.THRESH:"workflow_queued:{#WORKFLOW_NAME}"})'
                   priority: WARNING
-                  description: 'The last workflow run has been in the "queued" status for too long. This may mean that it fails to be assigned to a runner. The default threshold is provided as an example and can be adjusted for particular workflows with context macros.'
+                  description: 'The last workflow run has been in the "queued" status for too long. This may mean that it has failed to be assigned to a runner. The default threshold is provided as an example and can be adjusted for relevant workflows with context macros.'
                   tags:
                     - tag: scope
                       value: availability
@@ -2395,7 +2399,7 @@ zabbix_export:
               delay: '0'
               trends: '0'
               units: unixtime
-              description: 'The date when the last workflow run has been updated.'
+              description: 'The date when the last workflow run was updated.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -2445,18 +2449,18 @@ zabbix_export:
           description: 'The API version that is used in headers for HTTP requests.'
         - macro: '{$GITHUB.BRANCH.NAME.MATCHES}'
           value: .+
-          description: 'The repository branch name regex filter to use in branch related metrics discovery for including.'
+          description: 'The repository branch name regex filter to use in branch-related metric discovery - for including.'
         - macro: '{$GITHUB.BRANCH.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'The repository branch name regex filter to use in branch related metrics discovery for excluding.'
+          description: 'The repository branch name regex filter to use in branch-related metric discovery - for excluding.'
         - macro: '{$GITHUB.HTTP_PROXY}'
           description: 'The HTTP proxy for script items (set if needed). If the macro is empty, then no proxy is used.'
         - macro: '{$GITHUB.INTERVAL}'
           value: 1m
-          description: 'The update interval for the script items that retrieve data from API. Can be used with context if needed (check the context values in particular items).'
+          description: 'The update interval for the script items that retrieve data from the API. Can be used with context if needed (check the context values in relevant items).'
         - macro: '{$GITHUB.INTERVAL:"get_(branches|workflows)"}'
           value: 1h
-          description: 'The update interval for the script items that retrieve the branches and workflows. Used only for related metrics discovery.'
+          description: 'The update interval for the script items that retrieve the branches and workflows. Used only for related metric discovery.'
         - macro: '{$GITHUB.INTERVAL:"get_repo"}'
           value: 15m
           description: 'The update interval for the script item that retrieves the repository information.'
@@ -2465,13 +2469,13 @@ zabbix_export:
           description: 'The update interval for the script item that retrieves the information about self-hosted runners.'
         - macro: '{$GITHUB.INTERVAL:regex:"get_(tags|releases|issues)_count"}'
           value: 1h
-          description: 'The update interval for the script items that retrieve the number of tags, releases, issues and PRs (total, open, closed).'
+          description: 'The update interval for the script items that retrieve the number of tags, releases, issues, and pull requests (total, open, closed).'
         - macro: '{$GITHUB.INTERVAL:regex:"get_commits_count:.+"}'
           value: 1h
           description: 'The update interval for the script items that retrieve the commits count in discovered branches.'
         - macro: '{$GITHUB.INTERVAL:regex:"get_last_run:.+"}'
           value: 15m
-          description: 'The update interval for the script items that retrieve the information about last workflow run results.'
+          description: 'The update interval for the script items that retrieve the information about the last workflow run results.'
         - macro: '{$GITHUB.REPO.NAME}'
           value: '<SET THE REPO NAME>'
           description: 'Set the repository name here.'
@@ -2480,49 +2484,49 @@ zabbix_export:
           description: 'Set the repository owner here.'
         - macro: '{$GITHUB.REQUESTS.UTIL.HIGH}'
           value: '90'
-          description: 'The percentage of used API request limits used in a trigger expression as a threshold.'
+          description: 'The threshold percentage of utilized API requests in a High trigger expression.'
         - macro: '{$GITHUB.REQUESTS.UTIL.WARN}'
           value: '80'
-          description: 'The percentage of used API request limits used in a trigger expression as a threshold.'
+          description: 'The threshold percentage of utilized API requests in a Warning trigger expression.'
         - macro: '{$GITHUB.RESULTS_PER_PAGE}'
           value: '100'
-          description: 'The number of results to fetch per page. Can be used with context and adjusted if needed (check the context values in script parameters of particular items).'
+          description: 'The number of results to fetch per page. Can be used with context and adjusted if needed (check the context values in script parameters of relevant items).'
         - macro: '{$GITHUB.RUNNER.NAME.MATCHES}'
           value: .+
-          description: 'The repository self-hosted runner name regex filter to use in self-hosted runner related metrics discovery for including.'
+          description: 'The repository self-hosted runner name regex filter to use in discovering metrics related to the self-hosted runner - for including.'
         - macro: '{$GITHUB.RUNNER.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'The repository self-hosted runner name regex filter to use in self-hosted runner related metrics discovery for excluding.'
+          description: 'The repository self-hosted runner name regex filter to use in discovering metrics related to the self-hosted runner - for excluding.'
         - macro: '{$GITHUB.RUNNER.OS.MATCHES}'
           value: .+
-          description: 'The repository self-hosted runner OS regex filter to use in self-hosted runner related metrics discovery for including.'
+          description: 'The repository self-hosted runner OS regex filter to use in discovering metrics related to the self-hosted runner - for including.'
         - macro: '{$GITHUB.RUNNER.OS.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'The repository self-hosted runner OS regex filter to use in self-hosted runner related metrics discovery for excluding.'
+          description: 'The repository self-hosted runner OS regex filter to use in discovering metrics related to the self-hosted runner - for excluding.'
         - macro: '{$GITHUB.TIMEOUT}'
           value: 15s
-          description: 'The timeout threshold for the script items that retrieve data from API. Can be used with context if needed (check the context values in particular items).'
+          description: 'The timeout threshold for the script items that retrieve data from the API. Can be used with context if needed (check the context values in relevant items).'
         - macro: '{$GITHUB.USER_AGENT}'
           value: Zabbix/7.0
           description: 'The user agent that is used in headers for HTTP requests.'
         - macro: '{$GITHUB.WORKFLOW.NAME.MATCHES}'
           value: .+
-          description: 'The repository workflow name regex filter to use in workflow related metrics discovery for including.'
+          description: 'The repository workflow name regex filter to use in workflow-related metric discovery - for including.'
         - macro: '{$GITHUB.WORKFLOW.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'The repository workflow name regex filter to use in workflow related metrics discovery for excluding.'
+          description: 'The repository workflow name regex filter to use in workflow-related metric discovery - for excluding.'
         - macro: '{$GITHUB.WORKFLOW.STATE.MATCHES}'
           value: active
-          description: 'The repository workflow state regex filter to use in workflow related metrics discovery for including.'
+          description: 'The repository workflow state regex filter to use in workflow-related metric discovery - for including.'
         - macro: '{$GITHUB.WORKFLOW.STATE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'The repository workflow state regex filter to use in workflow related metrics discovery for excluding.'
+          description: 'The repository workflow state regex filter to use in workflow-related metric discovery - for excluding.'
         - macro: '{$GITHUB.WORKFLOW.STATUS.IN_PROGRESS.THRESH}'
           value: 24h
-          description: 'The time threshold used in the trigger of workflow run being in the queue for too long. Can be used with context if needed.'
+          description: 'The time threshold used in the trigger of a workflow run that has been in the queue for too long. Can be used with context if needed.'
         - macro: '{$GITHUB.WORKFLOW.STATUS.QUEUED.THRESH}'
           value: 1h
-          description: 'The time threshold used in the trigger of workflow run being in the queue for too long. Can be used with context if needed.'
+          description: 'The time threshold used in the trigger of a workflow run that has been in the queue for too long. Can be used with context if needed.'
       dashboards:
         - uuid: 09870c778f4740da8430b1383225b2c6
           name: 'Repository overview'
