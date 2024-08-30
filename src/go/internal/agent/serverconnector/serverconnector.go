@@ -387,9 +387,7 @@ func (c *Connector) sendHeartbeatMsg() {
 }
 
 func (c *Connector) run() {
-	var lastRefresh int64
-	var lastFlush int64
-	var lastHeartbeat int64
+	var lastRefresh, lastFlush, lastHeartbeat int64
 
 	defer log.PanicHook()
 	log.Debugf("[%d] starting server connector for %s", c.clientID, c.address)
@@ -411,7 +409,7 @@ run:
 				lastRefresh = time.Now().Unix()
 			}
 			if c.options.HeartbeatFrequency > 0 {
-				if (now - lastHeartbeat) > int64(c.options.HeartbeatFrequency) {
+				if (now - lastHeartbeat) >= int64(c.options.HeartbeatFrequency) {
 					c.sendHeartbeatMsg()
 					lastHeartbeat = time.Now().Unix()
 				}
