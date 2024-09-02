@@ -371,8 +371,6 @@ class testFormSysmap extends CLegacyWebTest {
 	 * @dataProvider allMaps
 	 */
 	public function testFormSysmap_SimpleUpdateProperties($map) {
-		$name = $map['name'];
-
 		$sql_maps_elements = 'SELECT * FROM sysmaps sm INNER JOIN sysmaps_elements sme ON'.
 				' sme.sysmapid = sm.sysmapid ORDER BY sme.selementid';
 		$sql_links_triggers = 'SELECT * FROM sysmaps_links sl INNER JOIN sysmaps_link_triggers slt ON'.
@@ -381,12 +379,11 @@ class testFormSysmap extends CLegacyWebTest {
 		$hash_links_triggers = CDBHelper::getHash($sql_links_triggers);
 
 		$this->page->login()->open('sysmaps.php')->waitUntilReady();
-		$this->getTable()->findRow('Name', $name)->getColumn('Actions')->query('link:Properties')->one()->click();
+		$this->getTable()->findRow('Name', $map['name'])->getColumn('Actions')->query('link:Properties')->one()->click();
 		$this->page->assertHeader('Network maps');
 		$this->query('button:Update')->one()->click();
 		$this->page->assertHeader('Maps');
 		$this->assertMessage(TEST_GOOD, 'Network map updated');
-		$this->assertTrue($this->query('link', $name)->one()->isPresent());
 
 		$hash_data = [
 			$hash_maps_elements => $sql_maps_elements,

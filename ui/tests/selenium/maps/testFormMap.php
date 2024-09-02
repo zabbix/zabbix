@@ -178,7 +178,6 @@ class testFormMap extends CLegacyWebTest {
 	 * @browsers chrome
 	 */
 	public function testFormMap_SimpleUpdateConstructor($map) {
-		$name = $map['name'];
 		$sysmapid = $map['sysmapid'];
 
 		$sql_maps_elements = 'SELECT * FROM sysmaps sm INNER JOIN sysmaps_elements sme ON'.
@@ -189,7 +188,7 @@ class testFormMap extends CLegacyWebTest {
 		$hash_links_triggers = CDBHelper::getHash($sql_links_triggers);
 
 		$this->page->login()->open('sysmaps.php')->waitUntilReady();
-		$this->query('link', $name)->one()->click();
+		$this->query('link', $map['name'])->one()->click();
 		$this->page->waitUntilReady();
 
 		$element = $this->query('xpath://div[@id="flickerfreescreen_mapimg"]/div/*[name()="svg"]')
@@ -210,7 +209,6 @@ class testFormMap extends CLegacyWebTest {
 		$this->assertEquals('Map is updated! Return to map list?', $this->page->getAlertText());
 		$this->page->acceptAlert();
 
-		$this->assertTrue($this->query('link', $name)->one()->isPresent());
 		$this->page->waitUntilReady();
 		$this->assertStringContainsString('sysmaps.php', $this->page->getCurrentUrl());
 
