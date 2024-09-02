@@ -490,7 +490,7 @@ time_t	zbx_mktime(struct tm *time, const char *tz)
 #if defined(HAVE_GETENV) && defined(HAVE_PUTENV) && defined(HAVE_UNSETENV) && defined(HAVE_TZSET) && \
 		!defined(_WINDOWS) && !defined(__MINGW32__)
 	char		*old_tz;
-	struct tm	*tm;
+	time_t		ret;
 
 	if (NULL == tz || 0 == strcmp(tz, "system"))
 		return mktime(time);
@@ -500,7 +500,7 @@ time_t	zbx_mktime(struct tm *time, const char *tz)
 
 	setenv("TZ", tz, 1);
 	tzset();
-	tm = mktime(time);
+	ret = (time_t)mktime(time);
 
 	if (NULL != old_tz)
 	{
@@ -512,9 +512,9 @@ time_t	zbx_mktime(struct tm *time, const char *tz)
 
 	tzset();
 
-	return tm;
+	return ret;
 #else
-	return mktime(time);
+	return (time_t)mktime(time);
 #endif
 }
 
