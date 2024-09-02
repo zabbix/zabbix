@@ -85,7 +85,7 @@ int	zbx_tm_parse_period(const char *period, size_t *len, int *multiplier, zbx_ti
 
 	return SUCCEED;
 }
-
+#include <log.h>
 /******************************************************************************
  *                                                                            *
  * Purpose: add seconds to the time and adjust result by dst                  *
@@ -99,14 +99,25 @@ static void	tm_add_seconds(struct tm *tm, int seconds)
 	time_t		time_new;
 	struct tm	tm_new = *tm;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "tm_add_seconds(): [year:%d, mon:%d, mday:%d, hour:%d, min:%d, sec:%d, "
+			"wday:%d, yday:%d, isdst:%d] seconds:%d",
+			tm->tm_year, tm->tm_mon, tm->tm_mday, tm->tm_hour, tm->tm_min, tm->tm_sec,
+			tm->tm_wday, tm->tm_yday, tm->tm_isdst, seconds);
+
 	if (-1 == (time_new = mktime(&tm_new)))
 	{
+		zabbix_log(LOG_LEVEL_INFORMATION, "mktime() error");
 		THIS_SHOULD_NEVER_HAPPEN;
 		return;
 	}
 
 	time_new += seconds;
 	localtime_r(&time_new, &tm_new);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "    [year:%d, mon:%d, mday:%d, hour:%d, min:%d, sec:%d, "
+			"wday:%d, yday:%d, isdst:%d] seconds:%d",
+			tm_new.tm_year, tm_new.tm_mon, tm_new.tm_mday, tm_new.tm_hour, tm_new.tm_min, tm_new.tm_sec,
+			tm_new.tm_wday, tm_new.tm_yday, tm_new.tm_isdst, seconds);
 
 	if (tm->tm_isdst != tm_new.tm_isdst && -1 != tm->tm_isdst && -1 != tm_new.tm_isdst)
 	{
@@ -184,6 +195,12 @@ static void	tm_add(struct tm *tm, int multiplier, zbx_time_unit_t base)
  ******************************************************************************/
 void	zbx_tm_add(struct tm *tm, int multiplier, zbx_time_unit_t base)
 {
+	zabbix_log(LOG_LEVEL_DEBUG, "zbx_tm_add(): [year:%d, mon:%d, mday:%d, hour:%d, min:%d, sec:%d, "
+			"wday:%d, yday:%d, isdst:%d] multiplier:%d base:%d",
+			tm->tm_year, tm->tm_mon, tm->tm_mday, tm->tm_hour, tm->tm_min, tm->tm_sec,
+			tm->tm_wday, tm->tm_yday, tm->tm_isdst, multiplier, base);
+
+
 	if (ZBX_TIME_UNIT_MONTH == base || ZBX_TIME_UNIT_YEAR == base)
 	{
 		int	days_max;
@@ -331,6 +348,11 @@ void	zbx_tm_sub(struct tm *tm, int multiplier, zbx_time_unit_t base)
  ******************************************************************************/
 void	zbx_tm_round_up(struct tm *tm, zbx_time_unit_t base)
 {
+	zabbix_log(LOG_LEVEL_DEBUG, "zbx_tm_round_up(): [year:%d, mon:%d, mday:%d, hour:%d, min:%d, sec:%d, "
+			"wday:%d, yday:%d, isdst:%d] base:%d",
+			tm->tm_year, tm->tm_mon, tm->tm_mday, tm->tm_hour, tm->tm_min, tm->tm_sec,
+			tm->tm_wday, tm->tm_yday, tm->tm_isdst, base);
+
 	if (0 != tm->tm_sec)
 	{
 		tm->tm_sec = 0;
