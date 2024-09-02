@@ -155,7 +155,7 @@ $html_page
 (new CScriptTag('view.init('.json_encode([
 	'delete_url' => (new CUrl('zabbix.php'))
 		->setArgument('action', 'templategroup.delete')
-		->setArgument(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('templategroup'))
+		->setArgument(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('templategroup'))
 		->getUrl()
 ]).');'))
 	->setOnDocumentReady()

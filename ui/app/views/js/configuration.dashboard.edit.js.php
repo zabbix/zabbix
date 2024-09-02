@@ -132,9 +132,7 @@
 			const curl = new Curl('zabbix.php');
 
 			curl.setArgument('action', 'template.dashboard.update');
-			curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
-				<?= json_encode(CCsrfTokenHelper::get('template')) ?>
-			);
+			curl.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('template')) ?>);
 
 			fetch(curl.getUrl(), {
 				method: 'POST',

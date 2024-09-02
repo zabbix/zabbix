@@ -44,7 +44,15 @@ window.ZABBIX = Object.create({
 		let ls = this.namespace('instances.localStorage');
 		ls && ls.destruct();
 
-		redirect(`index.php?reconnect=1&_csrf_token=${csrf_token}`, 'post', '_csrf_token', true);
+		redirect(`index.php?reconnect=1&${CSRF_TOKEN_NAME}=${csrf_token}`, 'post', CSRF_TOKEN_NAME, true);
+	}
+});
+
+document.addEventListener('click', e => {
+	const element = e.target;
+
+	if (element.matches('input[type="radio"][readonly], input[type="checkbox"][readonly]')) {
+		e.preventDefault();
 	}
 });
 
@@ -389,7 +397,7 @@ jQuery(function($) {
 
 		if (typeof confirmation === 'undefined' || (typeof confirmation !== 'undefined' && confirm(confirmation))) {
 			if (button.attr('data-post')) {
-				return redirect(button.attr('data-url'), 'post', '_csrf_token', true);
+				return redirect(button.attr('data-url'), 'post', CSRF_TOKEN_NAME, true);
 			}
 
 			window.location = button.attr('data-url');

@@ -22,7 +22,7 @@ try
 	Zabbix.log(5, "getUrl: '"+ browser.getUrl()+"'")
 
 	browser.setScriptTimeout(5000);
-	browser.setSessionTimeout(2500);
+	browser.setSessionTimeout(1000);
 
 	try
 	{
@@ -163,11 +163,11 @@ try
 	}
 	el.click();
 
-	el = browser.findElement("xpath", "//button[@confirm_plural='Disable selected hosts?']");
+	el = browser.findElement("xpath", "//button[text()='Disable']");
 
 	if (el === null)
 	{
-		throw Error("cannot find //button[@confirm_plural='Disable selected hosts?']");
+		throw Error("cannot find //button[text()='Disable']");
 	}
 	el.click();
 

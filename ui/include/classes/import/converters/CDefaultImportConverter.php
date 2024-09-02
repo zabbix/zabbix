@@ -103,11 +103,7 @@ class CDefaultImportConverter extends CConverter {
 			return true;
 		}
 		elseif (is_array($multiple_rule['if'])) {
-			$field_name = $multiple_rule['if']['tag'];
-
-			return array_key_exists($field_name, $data)
-				? array_key_exists($data[$field_name], $multiple_rule['if']['in'])
-				: false;
+			return array_key_exists($data[$multiple_rule['if']['tag']], $multiple_rule['if']['in']);
 		}
 		elseif ($multiple_rule['if'] instanceof Closure) {
 			return call_user_func($multiple_rule['if'], $data);

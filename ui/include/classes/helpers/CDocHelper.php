@@ -67,7 +67,7 @@ class CDocHelper {
 	const DATA_COLLECTION_HOST_ITEM_PROTOTYPE_LIST =			'web_interface/frontend_sections/data_collection/hosts/discovery/item_prototypes';
 	const DATA_COLLECTION_HOST_EDIT =							'config/hosts/host#configuration';
 	const DATA_COLLECTION_HOST_LIST =							'web_interface/frontend_sections/data_collection/hosts';
-	const DATA_COLLECTION_HOST_PROTOTYPE_EDIT =					'vm_monitoring#host-prototypes';
+	const DATA_COLLECTION_HOST_PROTOTYPE_EDIT =					'discovery/low_level_discovery/host_prototypes';
 	const DATA_COLLECTION_HOST_PROTOTYPE_LIST =					'web_interface/frontend_sections/data_collection/hosts/discovery/host_prototypes';
 	const DATA_COLLECTION_HOST_TRIGGERS_LIST =					'web_interface/frontend_sections/data_collection/hosts/triggers';
 	const DATA_COLLECTION_HOST_TRIGGER_PROTOTYPE_LIST =			'web_interface/frontend_sections/data_collection/hosts/discovery/trigger_prototypes';
@@ -139,9 +139,9 @@ class CDocHelper {
 	const QUEUE_OVERVIEW =										'web_interface/frontend_sections/administration/queue#overview-by-item-type';
 	const QUEUE_OVERVIEW_PROXY =								'web_interface/frontend_sections/administration/queue#overview-by-proxy';
 	const REPORT_STATUS =										'web_interface/frontend_sections/reports/status_of_zabbix';
-	const REPORT2 =												'web_interface/frontend_sections/reports/availability';
 	const REPORT4 =												'web_interface/frontend_sections/reports/notifications';
 	const REPORTS_AUDITLOG_LIST =								'web_interface/frontend_sections/reports/audit_log';
+	const REPORTS_AVAILABILITYREPORT_LIST =						'web_interface/frontend_sections/reports/availability';
 	const REPORTS_SCHEDULEDREPORT_EDIT =						'config/reports#configuration';
 	const REPORTS_SCHEDULEDREPORT_LIST =						'web_interface/frontend_sections/reports/scheduled';
 	const REPORTS_TOPTRIGGERS =									'web_interface/frontend_sections/reports/triggers_top';

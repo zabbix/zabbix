@@ -156,7 +156,7 @@ function itemGetValueTest(overlay) {
 		url = new Curl('zabbix.php');
 
 	url.setArgument('action', 'popup.itemtest.getvalue');
-	url.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>', <?= json_encode(CCsrfTokenHelper::get('itemtest')) ?>);
+	url.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('itemtest')) ?>);
 
 	post_data = jQuery.extend(post_data, {
 		interface: {
@@ -246,7 +246,7 @@ function itemCompleteTest(overlay) {
 		url = new Curl('zabbix.php');
 
 	url.setArgument('action', 'popup.itemtest.send');
-	url.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>', <?= json_encode(CCsrfTokenHelper::get('itemtest')) ?>);
+	url.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('itemtest')) ?>);
 
 	post_data = jQuery.extend(post_data, {
 		get_value: form_data['get_value'] || 0,
@@ -354,7 +354,7 @@ function itemCompleteTest(overlay) {
 					$result_row.append(jQuery('<div>')
 						.append(
 							jQuery('<span>', {'class': '<?= ZBX_STYLE_GREY ?>'})
-								.text('<?= _('Result with value map applied') ?>'),
+								.text(<?= json_encode(_('Result with value map applied')) ?>),
 							$mapped_value
 						)
 					);
@@ -568,7 +568,7 @@ jQuery(document).ready(function($) {
 					$('#interface_port').prop('disabled', false);
 				<?php endif ?>
 
-				$submit_btn.html('<?= _('Get value and test') ?>');
+				$submit_btn.html(<?= json_encode(_('Get value and test')) ?>);
 				$rows.show();
 
 				<?php if ($data['show_snmp_form']): ?>
@@ -649,7 +649,7 @@ jQuery(document).ready(function($) {
 					$('#interface_port').prop('disabled', false);
 				<?php endif ?>
 
-				$submit_btn.html('<?= _('Test') ?>');
+				$submit_btn.html(<?= json_encode(_('Test')) ?>);
 				$rows.hide();
 			}
 		}).trigger('change');

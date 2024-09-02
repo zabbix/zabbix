@@ -335,7 +335,8 @@ class C72XmlValidator extends CXmlValidatorGeneral {
 		CXmlConstantValue::ITEM_TYPE_TELNET => CXmlConstantName::TELNET,
 		CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT,
 		CXmlConstantValue::ITEM_TYPE_SNMP => CXmlConstantName::SNMP_AGENT,
-		CXmlConstantValue::ITEM_TYPE_SCRIPT => CXmlConstantName::SCRIPT
+		CXmlConstantValue::ITEM_TYPE_SCRIPT => CXmlConstantName::SCRIPT,
+		CXmlConstantValue::ITEM_TYPE_BROWSER => CXmlConstantName::BROWSER
 	];
 
 	private $ITEM_TYPE_INTERFACE = [
@@ -372,7 +373,8 @@ class C72XmlValidator extends CXmlValidatorGeneral {
 		CXmlConstantValue::ITEM_TYPE_SSH => CXmlConstantName::SSH,
 		CXmlConstantValue::ITEM_TYPE_TELNET => CXmlConstantName::TELNET,
 		CXmlConstantValue::ITEM_TYPE_CALCULATED => CXmlConstantName::CALCULATED,
-		CXmlConstantValue::ITEM_TYPE_SCRIPT => CXmlConstantName::SCRIPT
+		CXmlConstantValue::ITEM_TYPE_SCRIPT => CXmlConstantName::SCRIPT,
+		CXmlConstantValue::ITEM_TYPE_BROWSER => CXmlConstantName::BROWSER
 	];
 
 	private $ITEM_VALUE_TYPE = [
@@ -557,7 +559,8 @@ class C72XmlValidator extends CXmlValidatorGeneral {
 		CXmlConstantValue::NONE => CXmlConstantName::NONE,
 		CXmlConstantValue::BASIC => CXmlConstantName::BASIC,
 		CXmlConstantValue::NTLM => CXmlConstantName::NTLM,
-		CXmlConstantValue::KERBEROS => CXmlConstantName::KERBEROS
+		CXmlConstantValue::KERBEROS => CXmlConstantName::KERBEROS,
+		CXmlConstantValue::DIGEST => CXmlConstantName::DIGEST
 	];
 
 	private $ENABLED_LIFETIME_TYPES = [
@@ -784,7 +787,7 @@ class C72XmlValidator extends CXmlValidatorGeneral {
 								['else' => true, 'type' => XML_IGNORE_TAG]
 							]],
 							'parameters' =>				['type' => XML_MULTIPLE, 'rules' => [
-								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_SCRIPT => CXmlConstantName::SCRIPT]], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'parameter', 'rules' => [
+								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_SCRIPT => CXmlConstantName::SCRIPT, CXmlConstantValue::ITEM_TYPE_BROWSER => CXmlConstantName::BROWSER]], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'parameter', 'rules' => [
 									'parameter' =>			['type' => XML_ARRAY, 'rules' => [
 										'name' =>				['type' => XML_STRING | XML_REQUIRED],
 										'value' =>				['type' => XML_STRING, 'default' => '']
@@ -1162,7 +1165,7 @@ class C72XmlValidator extends CXmlValidatorGeneral {
 										['else' => true, 'type' => XML_IGNORE_TAG]
 									]],
 									'parameters' =>				['type' => XML_MULTIPLE, 'rules' => [
-										['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_SCRIPT => CXmlConstantName::SCRIPT]], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'parameter', 'rules' => [
+										['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_SCRIPT => CXmlConstantName::SCRIPT, CXmlConstantValue::ITEM_TYPE_BROWSER => CXmlConstantName::BROWSER]], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'parameter', 'rules' => [
 											'parameter' =>			['type' => XML_ARRAY, 'rules' => [
 												'name' =>				['type' => XML_STRING | XML_REQUIRED],
 												'value' =>				['type' => XML_STRING, 'default' => '']
@@ -1479,7 +1482,7 @@ class C72XmlValidator extends CXmlValidatorGeneral {
 								['else' => true, 'type' => XML_IGNORE_TAG]
 							]],
 							'parameters' =>				['type' => XML_MULTIPLE, 'rules' => [
-								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_SCRIPT => CXmlConstantName::SCRIPT]], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'parameter', 'rules' => [
+								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_SCRIPT => CXmlConstantName::SCRIPT, CXmlConstantValue::ITEM_TYPE_BROWSER => CXmlConstantName::BROWSER]], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'parameter', 'rules' => [
 									'parameter' =>			['type' => XML_ARRAY, 'rules' => [
 										'name' =>				['type' => XML_STRING | XML_REQUIRED],
 										'value' =>				['type' => XML_STRING, 'default' => '']
@@ -1605,7 +1608,7 @@ class C72XmlValidator extends CXmlValidatorGeneral {
 									]],
 									'operations' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'operation', 'rules' => [
 										'operation' =>				['type' => XML_ARRAY, 'rules' => [
-											'operationobject' =>		['type' => XML_STRING, 'in' => $this->LLD_OVERRIDE_OPERATION_OBJECT],
+											'operationobject' =>		['type' => XML_STRING, 'in' => $this->LLD_OVERRIDE_OPERATION_OBJECT, 'default' => CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_ITEM_PROTOTYPE],
 											'operator' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::CONDITION_OPERATOR_EQUAL, 'in' => $this->CONDITION_OPERATOR],
 											'value' =>					['type' => XML_STRING, 'default' => ''],
 											'discover' =>				['type' => XML_STRING, 'in' => [CXmlConstantValue::LLD_OVERRIDE_OPERATION_DISCOVER => CXmlConstantName::DISCOVER, CXmlConstantValue::LLD_OVERRIDE_OPERATION_NO_DISCOVER => CXmlConstantName::NO_DISCOVER]],
@@ -1999,7 +2002,7 @@ class C72XmlValidator extends CXmlValidatorGeneral {
 								['else' => true, 'type' => XML_IGNORE_TAG]
 							]],
 							'parameters' =>				['type' => XML_MULTIPLE, 'rules' => [
-								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_SCRIPT => CXmlConstantName::SCRIPT]], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'parameter', 'rules' => [
+								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_SCRIPT => CXmlConstantName::SCRIPT, CXmlConstantValue::ITEM_TYPE_BROWSER => CXmlConstantName::BROWSER]], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'parameter', 'rules' => [
 									'parameter' =>			['type' => XML_ARRAY, 'rules' => [
 										'name' =>				['type' => XML_STRING | XML_REQUIRED],
 										'value' =>				['type' => XML_STRING, 'default' => '']
@@ -2372,7 +2375,7 @@ class C72XmlValidator extends CXmlValidatorGeneral {
 										['else' => true, 'type' => XML_IGNORE_TAG]
 									]],
 									'parameters' =>				['type' => XML_MULTIPLE, 'rules' => [
-										['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_SCRIPT => CXmlConstantName::SCRIPT]], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'parameter', 'rules' => [
+										['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_SCRIPT => CXmlConstantName::SCRIPT, CXmlConstantValue::ITEM_TYPE_BROWSER => CXmlConstantName::BROWSER]], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'parameter', 'rules' => [
 											'parameter' =>			['type' => XML_ARRAY, 'rules' => [
 												'name' =>				['type' => XML_STRING | XML_REQUIRED],
 												'value' =>				['type' => XML_STRING, 'default' => '']
@@ -2693,7 +2696,7 @@ class C72XmlValidator extends CXmlValidatorGeneral {
 								['else' => true, 'type' => XML_IGNORE_TAG]
 							]],
 							'parameters' =>				['type' => XML_MULTIPLE, 'rules' => [
-								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_SCRIPT => CXmlConstantName::SCRIPT]], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'parameter', 'rules' => [
+								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_SCRIPT => CXmlConstantName::SCRIPT, CXmlConstantValue::ITEM_TYPE_BROWSER => CXmlConstantName::BROWSER]], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'parameter', 'rules' => [
 									'parameter' =>			['type' => XML_ARRAY, 'rules' => [
 										'name' =>				['type' => XML_STRING | XML_REQUIRED],
 										'value' =>				['type' => XML_STRING, 'default' => '']
@@ -2819,7 +2822,7 @@ class C72XmlValidator extends CXmlValidatorGeneral {
 									]],
 									'operations' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'operation', 'rules' => [
 										'operation' =>				['type' => XML_ARRAY, 'rules' => [
-											'operationobject' =>		['type' => XML_STRING, 'in' => $this->LLD_OVERRIDE_OPERATION_OBJECT],
+											'operationobject' =>		['type' => XML_STRING, 'in' => $this->LLD_OVERRIDE_OPERATION_OBJECT, 'default' => CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_ITEM_PROTOTYPE],
 											'operator' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::CONDITION_OPERATOR_EQUAL, 'in' => $this->CONDITION_OPERATOR],
 											'value' =>					['type' => XML_STRING, 'default' => ''],
 											'discover' =>				['type' => XML_STRING, 'in' => [CXmlConstantValue::LLD_OVERRIDE_OPERATION_DISCOVER => CXmlConstantName::DISCOVER, CXmlConstantValue::LLD_OVERRIDE_OPERATION_NO_DISCOVER => CXmlConstantName::NO_DISCOVER]],

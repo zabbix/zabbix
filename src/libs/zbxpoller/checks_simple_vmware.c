@@ -1239,20 +1239,24 @@ int	check_vcenter_eventlog(AGENT_REQUEST *request, const zbx_dc_item_t *item, AG
 		service->eventlog.skip_old = skip_old;
 		service->eventlog.owner_itemid = item->itemid;
 	}
+	else if (item->itemid != service->eventlog.owner_itemid)
+	{
+		/* To protect against data fragmentation among multiple vmware event items. */
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Duplicate VMware eventlog item is not supported"));
+		goto unlock;
+	}
 	else if (0 != service->eventlog.oom)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Not enough shared memory to store VMware events."));
 		goto unlock;
 	}
+	else if (NULL == service->eventlog.data)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s():eventlog data is still not collected", __func__);
+	}
 	else if (NULL != service->eventlog.data->error)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, service->eventlog.data->error));
-		goto unlock;
-	}
-	else if (item->itemid != service->eventlog.owner_itemid)
-	{
-		/* To protect against data fragmentation among multiple vmware event items. */
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Duplicate VMware eventlog item is not supported"));
 		goto unlock;
 	}
 	else if (0 < service->eventlog.data->events.values_num)

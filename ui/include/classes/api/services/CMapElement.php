@@ -52,6 +52,13 @@ abstract class CMapElement extends CApiService {
 				}
 			}
 
+			if (array_key_exists('label', $selement)
+					&& mb_strlen($selement['label']) > DB::getFieldLength('sysmaps_elements', 'label')) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+					'label', _('value is too long')
+				));
+			}
+
 			if (array_key_exists('urls', $selement)) {
 				$url_validate_options = ['allow_user_macro' => false];
 				if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST) {
@@ -64,16 +71,14 @@ abstract class CMapElement extends CApiService {
 					$url_validate_options['allow_inventory_macro'] = INVENTORY_URL_MACRO_NONE;
 				}
 
-				foreach ($selement['urls'] as $url_data) {
+				foreach ($selement['urls'] as &$url_data) {
 					if (!CHtmlUrlValidator::validate($url_data['url'], $url_validate_options)) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong value for "url" field.'));
 					}
-				}
-			}
 
-			if ($update && array_key_exists('selementid', $selement)
-						&& array_key_exists($selement['selementid'], $db_selements)) {
-				$db_selement = $db_selements[$selement['selementid']];
+					unset($url_data['sysmapelementurlid'], $url_data['selementid']);
+				}
+				unset($url_data);
 			}
 
 			if (!$elementtype_validator->validate($selement['elementtype'])) {
@@ -313,6 +318,13 @@ abstract class CMapElement extends CApiService {
 				if (!isset($dbLinks[$link['linkid']])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 				}
+			}
+
+			if (array_key_exists('label', $link)
+					&& mb_strlen($link['label']) > DB::getFieldLength('sysmaps_links', 'label')) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+					'label', _('value is too long')
+				));
 			}
 		}
 

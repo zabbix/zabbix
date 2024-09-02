@@ -24,8 +24,6 @@ zabbix_export:
           name: 'Get alarms check'
           type: DEPENDENT
           key: aws.rds.alarms.check
-          delay: '0'
-          trends: '0'
           value_type: CHAR
           description: 'Data collection check.'
           preprocessing:
@@ -47,6 +45,7 @@ zabbix_export:
               name: 'Failed to get alarms data'
               opdata: '{ITEM.LASTVALUE1}'
               priority: WARNING
+              description: 'Failed to get CloudWatch alarms for RDS.'
               tags:
                 - tag: scope
                   value: availability
@@ -54,7 +53,6 @@ zabbix_export:
           name: 'Disk: Binlog Usage'
           type: DEPENDENT
           key: aws.rds.bin_log_disk_usage
-          delay: '0'
           value_type: FLOAT
           units: B
           description: 'The amount of disk space occupied by binary logs on the master. Applies to MySQL read replicas.'
@@ -76,7 +74,6 @@ zabbix_export:
           name: 'Burst balance'
           type: DEPENDENT
           key: aws.rds.burst_balance
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'The percent of General Purpose SSD (gp2) burst-bucket I/O credits available.'
@@ -104,8 +101,6 @@ zabbix_export:
           name: Class
           type: DEPENDENT
           key: aws.rds.class
-          delay: '0'
-          trends: '0'
           value_type: CHAR
           description: 'Contains the name of the compute and memory capacity class of the DB instance.'
           preprocessing:
@@ -124,7 +119,6 @@ zabbix_export:
           name: 'Credit CPU: Balance'
           type: DEPENDENT
           key: aws.rds.cpu.credit_balance
-          delay: '0'
           value_type: FLOAT
           description: |
             The number of CPU credits that an instance has accumulated, reported at 5-minute intervals.
@@ -159,7 +153,6 @@ zabbix_export:
           name: 'Credit CPU: Usage'
           type: DEPENDENT
           key: aws.rds.cpu.credit_usage
-          delay: '0'
           value_type: FLOAT
           description: |
             The number of CPU credits consumed during the specified period, reported at 5-minute intervals.
@@ -182,7 +175,6 @@ zabbix_export:
           name: 'CPU: Utilization'
           type: DEPENDENT
           key: aws.rds.cpu.utilization
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'The percentage of CPU utilization.'
@@ -213,7 +205,6 @@ zabbix_export:
           name: 'Create time'
           type: DEPENDENT
           key: aws.rds.create_time
-          delay: '0'
           value_type: FLOAT
           units: unixtime
           description: 'Provides the date and time the DB instance was created.'
@@ -230,7 +221,6 @@ zabbix_export:
           name: Connections
           type: DEPENDENT
           key: aws.rds.database_connections
-          delay: '0'
           value_type: FLOAT
           description: |
             The number of client network connections to the database instance.
@@ -255,7 +245,6 @@ zabbix_export:
           name: 'Disk: Queue depth'
           type: DEPENDENT
           key: aws.rds.disk_queue_depth
-          delay: '0'
           value_type: FLOAT
           description: 'The number of outstanding read/write requests waiting to access the disk.'
           preprocessing:
@@ -272,7 +261,6 @@ zabbix_export:
           name: 'EBS: Byte balance'
           type: DEPENDENT
           key: aws.rds.ebs_byte_balance
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: |
@@ -302,7 +290,6 @@ zabbix_export:
           name: 'EBS: IO balance'
           type: DEPENDENT
           key: aws.rds.ebs_io_balance
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: |
@@ -332,8 +319,6 @@ zabbix_export:
           name: Engine
           type: DEPENDENT
           key: aws.rds.engine
-          delay: '0'
-          trends: '0'
           value_type: CHAR
           description: 'Database engine.'
           preprocessing:
@@ -352,8 +337,6 @@ zabbix_export:
           name: 'Engine version'
           type: DEPENDENT
           key: aws.rds.engine.version
-          delay: '0'
-          trends: '0'
           value_type: CHAR
           description: 'Indicates the database engine version.'
           preprocessing:
@@ -372,8 +355,6 @@ zabbix_export:
           name: 'Get events check'
           type: DEPENDENT
           key: aws.rds.events.check
-          delay: '0'
-          trends: '0'
           value_type: CHAR
           description: 'Data collection check.'
           preprocessing:
@@ -395,6 +376,7 @@ zabbix_export:
               name: 'Failed to get events data'
               opdata: '{ITEM.LASTVALUE1}'
               priority: WARNING
+              description: 'Failed to get CloudWatch events for RDS.'
               tags:
                 - tag: scope
                   value: availability
@@ -402,7 +384,6 @@ zabbix_export:
           name: 'SQLServer: Failed agent jobs'
           type: DEPENDENT
           key: aws.rds.failed_sql_server_agent_jobs_count
-          delay: '0'
           value_type: FLOAT
           units: Rpm
           description: 'The number of failed Microsoft SQL Server Agent jobs during the last minute.'
@@ -422,7 +403,6 @@ zabbix_export:
           name: 'Memory, freeable'
           type: DEPENDENT
           key: aws.rds.freeable_memory
-          delay: '0'
           value_type: FLOAT
           units: B
           description: |
@@ -443,13 +423,12 @@ zabbix_export:
           name: 'Storage: Local free'
           type: DEPENDENT
           key: aws.rds.free_local_storage
-          delay: '0'
           value_type: FLOAT
           units: B
           description: |
             The amount of local storage available, in bytes.
             
-            Unlike for other DB engines, for Aurora DB instances this metric reports the amount of storage available to each DB instance. 
+            Unlike for other DB engines, for Aurora DB instances this metric reports the amount of storage available to each DB instance.
             This value depends on the DB instance class. You can increase the amount of free storage space for an instance by choosing a larger DB instance class for your instance.
             (This doesn't apply to Aurora Serverless v2.)
           preprocessing:
@@ -466,7 +445,6 @@ zabbix_export:
           name: 'Storage: Space free'
           type: DEPENDENT
           key: aws.rds.free_storage_space
-          delay: '0'
           value_type: FLOAT
           units: B
           description: 'The amount of available storage space.'
@@ -486,12 +464,11 @@ zabbix_export:
           key: aws.rds.get_alarms
           delay: 0s;m/1
           history: '0'
-          trends: '0'
           value_type: TEXT
           params: |
             var AWS = {
             	params: {},
-            	metadata: 'http://169.254.169.254/latest/meta-data/iam/security-credentials',
+            	metadata: 'http://169.254.169.254/latest/',
             
             	getField: function (data, path) {
             		var steps = path.split('.');
@@ -516,13 +493,20 @@ zabbix_export:
             				if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
             					request.setProxy(AWS.params.proxy);
             				}
-            				var IamRoleName = request.get(AWS.metadata);
+            				request.addHeader('X-aws-ec2-metadata-token-ttl-seconds: 21600');
+            				var token = request.put(AWS.metadata + 'api/token');
+            
+            				if (request.getStatus() !== 200 || token === null || token === '') {
+            					throw 'Error getting IMDSv2 session token.';
+            				}
+            				request.addHeader('X-aws-ec2-metadata-token: ' + token);
+            				var IamRoleName = request.get(AWS.metadata + 'meta-data/iam/security-credentials');
             
             				if (request.getStatus() !== 200 || IamRoleName === null || IamRoleName === '') {
             					throw 'Error getting security credentials from instance metadata. Role not found.';
             				}
             
-            				credentials = request.get(AWS.metadata + '/' + encodeURI(IamRoleName));
+            				credentials = request.get(AWS.metadata + 'meta-data/iam/security-credentials/' + encodeURI(IamRoleName));
             
             				if (request.getStatus() !== 200 || credentials === null || credentials === '') {
             					throw 'Error getting security credentials from instance metadata.';
@@ -537,12 +521,39 @@ zabbix_export:
             
             				['AccessKeyId', 'SecretAccessKey', 'Token'].forEach(function (field) {
             					if (typeof credentials !== 'object' || typeof credentials[field] === 'undefined' || credentials[field] === '') {
-            						throw 'Required credentials is not set: "' + field + '".';
+            						throw 'Required credentials are not set: "' + field + '".';
             					};
             					AWS.params[field] = credentials[field];
             				});
             				break;
-            			case 'access_key':
+            			case 'assume_role':
+            				AWS.params['auth_type'] = 'assume_role';
+            
+            				['AccessKeyId', 'SecretAccessKey', 'sts_region', 'role_arn'].forEach(function (field) {
+            					if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            						throw 'Required param is not set: "' + field + '".';
+            					}
+            					AWS.params[field] = params[field];
+            				});
+            
+            				role_arn_regex = /role\/(.+)$/;
+            
+            				var payload = {
+            					'Action': 'AssumeRole',
+            					'Version': '2011-06-15',
+            					'RoleArn': AWS.params.role_arn,
+            					'RoleSessionName': AWS.params.role_arn.match(role_arn_regex)[1] + 'Session',
+            				};
+            
+            				credentials = AWS.getField(AWS.request('GET', AWS.params.sts_region, 'sts', AWS.prepareParams(payload), ''), 'AssumeRoleResponse.AssumeRoleResult.Credentials');
+            
+            				['AccessKeyId', 'SecretAccessKey', 'SessionToken'].forEach(function (field) {
+            					if (typeof credentials !== 'object' || typeof credentials[field] === 'undefined' || credentials[field] === '') {
+            						throw 'Required credentials are not set: "' + field + '".';
+            					};
+            					AWS.params[field] = credentials[field];
+            				});
+            				break;
             			default:
             				AWS.params['auth_type'] = 'access_key';
             				['AccessKeyId', 'SecretAccessKey'].forEach(function (field) {
@@ -604,13 +615,11 @@ zabbix_export:
             			canonical_request = method + '\n' + canonical_uri + '\n' + params + '\n' + canonical_headers + '\n' + signed_headers + '\n' + sha256(data),
             			credential_scope = date + '/' + region + '/' + service + '/' + 'aws4_request',
             			request_string = 'AWS4-HMAC-SHA256' + '\n' + amzdate + '\n' + credential_scope + '\n' + sha256(canonical_request),
-            			key = AWS.sign('AWS4' + AWS.params.SecretAccessKey, date);
-            
-            		key = AWS.sign(key, region);
-            		key = AWS.sign(key, service);
-            		key = AWS.sign(key, 'aws4_request');
-            
-            		var request = new HttpRequest(),
+            			key = AWS.sign('AWS4' + AWS.params.SecretAccessKey, date),
+            			key = AWS.sign(key, region),
+            			key = AWS.sign(key, service),
+            			key = AWS.sign(key, 'aws4_request'),
+            			request = new HttpRequest(),
             			url = 'https://' + host + canonical_uri + '?' + params;
             
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
@@ -621,31 +630,24 @@ zabbix_export:
             		request.addHeader('Content-Type: application/json');
             		request.addHeader('Content-Encoding: amz-1.0');
             		request.addHeader('Authorization: ' + 'AWS4-HMAC-SHA256 Credential=' + AWS.params.AccessKeyId + '/' + credential_scope + ', ' + 'SignedHeaders=' + signed_headers + ', ' + 'Signature=' + hmac('sha256', key, request_string));
-            		if (AWS.params.auth_type === 'role_base')
-            			request.addHeader('X-Amz-Security-Token: ' + AWS.params.Token);
+            		if (AWS.params.auth_type === 'role_base' || (AWS.params.auth_type === 'assume_role' & !params.includes('AssumeRole'))) {
+            			request.addHeader('X-Amz-Security-Token: ' + (AWS.params.auth_type === 'role_base' ? AWS.params.Token : AWS.params.SessionToken));
+            		}
             
             		Zabbix.log(4, '[ AWS RDS ] Sending request: ' + url);
-            
             		response = request.get(url);
-            
             		Zabbix.log(4, '[ AWS RDS ] Received response with status code ' + request.getStatus() + ': ' + response);
             
             		if (request.getStatus() !== 200) {
             			throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
             		}
             
-            		if (response[0] === '<') {
-            			try {
-            				response = XML.toJson(response);
-            			}
-            			catch (error) {
-            				throw 'Failed to parse response received from AWS CloudWatch API. Check debug log for more information.';
-            			}
+            		try {
+            			response = JSON.parse(response);
             		}
-            
-            		if (response !== null) {
+            		catch (error) {
             			try {
-            				response = JSON.parse(response);
+            				response = JSON.parse(XML.toJson(response));
             			}
             			catch (error) {
             				throw 'Failed to parse response received from AWS CloudWatch API. Check debug log for more information.';
@@ -723,8 +725,12 @@ zabbix_export:
               value: '{$AWS.PROXY}'
             - name: region
               value: '{$AWS.REGION}'
+            - name: role_arn
+              value: '{$AWS.ASSUME.ROLE.ARN}'
             - name: SecretAccessKey
               value: '{$AWS.SECRET.ACCESS.KEY}'
+            - name: sts_region
+              value: '{$AWS.STS.REGION}'
           tags:
             - tag: component
               value: raw
@@ -734,12 +740,11 @@ zabbix_export:
           key: aws.rds.get_events
           delay: 0s;m/10
           history: '0'
-          trends: '0'
           value_type: TEXT
           params: |
             var AWS = {
             	params: {},
-            	metadata: 'http://169.254.169.254/latest/meta-data/iam/security-credentials',
+            	metadata: 'http://169.254.169.254/latest/',
             
             	getField: function (data, path) {
             		var steps = path.split('.');
@@ -764,13 +769,20 @@ zabbix_export:
             				if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
             					request.setProxy(AWS.params.proxy);
             				}
-            				var IamRoleName = request.get(AWS.metadata);
+            				request.addHeader('X-aws-ec2-metadata-token-ttl-seconds: 21600');
+            				var token = request.put(AWS.metadata + 'api/token');
+            
+            				if (request.getStatus() !== 200 || token === null || token === '') {
+            					throw 'Error getting IMDSv2 session token.';
+            				}
+            				request.addHeader('X-aws-ec2-metadata-token: ' + token);
+            				var IamRoleName = request.get(AWS.metadata + 'meta-data/iam/security-credentials');
             
             				if (request.getStatus() !== 200 || IamRoleName === null || IamRoleName === '') {
             					throw 'Error getting security credentials from instance metadata. Role not found.';
             				}
             
-            				credentials = request.get(AWS.metadata + '/' + encodeURI(IamRoleName));
+            				credentials = request.get(AWS.metadata + 'meta-data/iam/security-credentials/' + encodeURI(IamRoleName));
             
             				if (request.getStatus() !== 200 || credentials === null || credentials === '') {
             					throw 'Error getting security credentials from instance metadata.';
@@ -785,12 +797,39 @@ zabbix_export:
             
             				['AccessKeyId', 'SecretAccessKey', 'Token'].forEach(function (field) {
             					if (typeof credentials !== 'object' || typeof credentials[field] === 'undefined' || credentials[field] === '') {
-            						throw 'Required credentials is not set: "' + field + '".';
+            						throw 'Required credentials are not set: "' + field + '".';
             					};
             					AWS.params[field] = credentials[field];
             				});
             				break;
-            			case 'access_key':
+            			case 'assume_role':
+            				AWS.params['auth_type'] = 'assume_role';
+            
+            				['AccessKeyId', 'SecretAccessKey', 'sts_region', 'role_arn'].forEach(function (field) {
+            					if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            						throw 'Required param is not set: "' + field + '".';
+            					}
+            					AWS.params[field] = params[field];
+            				});
+            
+            				role_arn_regex = /role\/(.+)$/;
+            
+            				var payload = {
+            					'Action': 'AssumeRole',
+            					'Version': '2011-06-15',
+            					'RoleArn': AWS.params.role_arn,
+            					'RoleSessionName': AWS.params.role_arn.match(role_arn_regex)[1] + 'Session',
+            				};
+            
+            				credentials = AWS.getField(AWS.request('GET', AWS.params.sts_region, 'sts', AWS.prepareParams(payload), ''), 'AssumeRoleResponse.AssumeRoleResult.Credentials');
+            
+            				['AccessKeyId', 'SecretAccessKey', 'SessionToken'].forEach(function (field) {
+            					if (typeof credentials !== 'object' || typeof credentials[field] === 'undefined' || credentials[field] === '') {
+            						throw 'Required credentials are not set: "' + field + '".';
+            					};
+            					AWS.params[field] = credentials[field];
+            				});
+            				break;
             			default:
             				AWS.params['auth_type'] = 'access_key';
             				['AccessKeyId', 'SecretAccessKey'].forEach(function (field) {
@@ -852,13 +891,11 @@ zabbix_export:
             			canonical_request = method + '\n' + canonical_uri + '\n' + params + '\n' + canonical_headers + '\n' + signed_headers + '\n' + sha256(data),
             			credential_scope = date + '/' + region + '/' + service + '/' + 'aws4_request',
             			request_string = 'AWS4-HMAC-SHA256' + '\n' + amzdate + '\n' + credential_scope + '\n' + sha256(canonical_request),
-            			key = AWS.sign('AWS4' + AWS.params.SecretAccessKey, date);
-            
-            		key = AWS.sign(key, region);
-            		key = AWS.sign(key, service);
-            		key = AWS.sign(key, 'aws4_request');
-            
-            		var request = new HttpRequest(),
+            			key = AWS.sign('AWS4' + AWS.params.SecretAccessKey, date),
+            			key = AWS.sign(key, region),
+            			key = AWS.sign(key, service),
+            			key = AWS.sign(key, 'aws4_request'),
+            			request = new HttpRequest(),
             			url = 'https://' + host + canonical_uri + '?' + params;
             
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
@@ -869,31 +906,24 @@ zabbix_export:
             		request.addHeader('Content-Type: application/json');
             		request.addHeader('Content-Encoding: amz-1.0');
             		request.addHeader('Authorization: ' + 'AWS4-HMAC-SHA256 Credential=' + AWS.params.AccessKeyId + '/' + credential_scope + ', ' + 'SignedHeaders=' + signed_headers + ', ' + 'Signature=' + hmac('sha256', key, request_string));
-            		if (AWS.params.auth_type === 'role_base')
-            			request.addHeader('X-Amz-Security-Token: ' + AWS.params.Token);
+            		if (AWS.params.auth_type === 'role_base' || (AWS.params.auth_type === 'assume_role' & !params.includes('AssumeRole'))) {
+            			request.addHeader('X-Amz-Security-Token: ' + (AWS.params.auth_type === 'role_base' ? AWS.params.Token : AWS.params.SessionToken));
+            		}
             
             		Zabbix.log(4, '[ AWS RDS ] Sending request: ' + url);
-            
             		response = request.get(url);
-            
             		Zabbix.log(4, '[ AWS RDS ] Received response with status code ' + request.getStatus() + ': ' + response);
             
             		if (request.getStatus() !== 200) {
             			throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
             		}
             
-            		if (response[0] === '<') {
-            			try {
-            				response = XML.toJson(response);
-            			}
-            			catch (error) {
-            				throw 'Failed to parse response received from AWS RDS API. Check debug log for more information.';
-            			}
+            		try {
+            			response = JSON.parse(response);
             		}
-            
-            		if (response !== null) {
+            		catch (error) {
             			try {
-            				response = JSON.parse(response);
+            				response = JSON.parse(XML.toJson(response));
             			}
             			catch (error) {
             				throw 'Failed to parse response received from AWS RDS API. Check debug log for more information.';
@@ -961,8 +991,12 @@ zabbix_export:
               value: '{$AWS.PROXY}'
             - name: region
               value: '{$AWS.REGION}'
+            - name: role_arn
+              value: '{$AWS.ASSUME.ROLE.ARN}'
             - name: SecretAccessKey
               value: '{$AWS.SECRET.ACCESS.KEY}'
+            - name: sts_region
+              value: '{$AWS.STS.REGION}'
           tags:
             - tag: component
               value: raw
@@ -972,13 +1006,12 @@ zabbix_export:
           key: aws.rds.get_instance_info
           delay: 5m
           history: '0'
-          trends: '0'
           value_type: TEXT
           params: |
             var AWS = {
             	params: {},
             	request_period: 600,
-            	metadata: 'http://169.254.169.254/latest/meta-data/iam/security-credentials',
+            	metadata: 'http://169.254.169.254/latest/',
             
             	getField: function (data, path) {
             		var steps = path.split('.');
@@ -1003,13 +1036,20 @@ zabbix_export:
             				if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
             					request.setProxy(AWS.params.proxy);
             				}
-            				var IamRoleName = request.get(AWS.metadata);
+            				request.addHeader('X-aws-ec2-metadata-token-ttl-seconds: 21600');
+            				var token = request.put(AWS.metadata + 'api/token');
+            
+            				if (request.getStatus() !== 200 || token === null || token === '') {
+            					throw 'Error getting IMDSv2 session token.';
+            				}
+            				request.addHeader('X-aws-ec2-metadata-token: ' + token);
+            				var IamRoleName = request.get(AWS.metadata + 'meta-data/iam/security-credentials');
             
             				if (request.getStatus() !== 200 || IamRoleName === null || IamRoleName === '') {
             					throw 'Error getting security credentials from instance metadata. Role not found.';
             				}
             
-            				credentials = request.get(AWS.metadata + '/' + encodeURI(IamRoleName));
+            				credentials = request.get(AWS.metadata + 'meta-data/iam/security-credentials/' + encodeURI(IamRoleName));
             
             				if (request.getStatus() !== 200 || credentials === null || credentials === '') {
             					throw 'Error getting security credentials from instance metadata.';
@@ -1024,12 +1064,39 @@ zabbix_export:
             
             				['AccessKeyId', 'SecretAccessKey', 'Token'].forEach(function (field) {
             					if (typeof credentials !== 'object' || typeof credentials[field] === 'undefined' || credentials[field] === '') {
-            						throw 'Required credentials is not set: "' + field + '".';
+            						throw 'Required credentials are not set: "' + field + '".';
             					};
             					AWS.params[field] = credentials[field];
             				});
             				break;
-            			case 'access_key':
+            			case 'assume_role':
+            				AWS.params['auth_type'] = 'assume_role';
+            
+            				['AccessKeyId', 'SecretAccessKey', 'sts_region', 'role_arn'].forEach(function (field) {
+            					if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            						throw 'Required param is not set: "' + field + '".';
+            					}
+            					AWS.params[field] = params[field];
+            				});
+            
+            				role_arn_regex = /role\/(.+)$/;
+            
+            				var payload = {
+            					'Action': 'AssumeRole',
+            					'Version': '2011-06-15',
+            					'RoleArn': AWS.params.role_arn,
+            					'RoleSessionName': AWS.params.role_arn.match(role_arn_regex)[1] + 'Session',
+            				};
+            
+            				credentials = AWS.getField(AWS.request('GET', AWS.params.sts_region, 'sts', AWS.prepareParams(payload), ''), 'AssumeRoleResponse.AssumeRoleResult.Credentials');
+            
+            				['AccessKeyId', 'SecretAccessKey', 'SessionToken'].forEach(function (field) {
+            					if (typeof credentials !== 'object' || typeof credentials[field] === 'undefined' || credentials[field] === '') {
+            						throw 'Required credentials are not set: "' + field + '".';
+            					};
+            					AWS.params[field] = credentials[field];
+            				});
+            				break;
             			default:
             				AWS.params['auth_type'] = 'access_key';
             				['AccessKeyId', 'SecretAccessKey'].forEach(function (field) {
@@ -1091,13 +1158,11 @@ zabbix_export:
             			canonical_request = method + '\n' + canonical_uri + '\n' + params + '\n' + canonical_headers + '\n' + signed_headers + '\n' + sha256(data),
             			credential_scope = date + '/' + region + '/' + service + '/' + 'aws4_request',
             			request_string = 'AWS4-HMAC-SHA256' + '\n' + amzdate + '\n' + credential_scope + '\n' + sha256(canonical_request),
-            			key = AWS.sign('AWS4' + AWS.params.SecretAccessKey, date);
-            
-            		key = AWS.sign(key, region);
-            		key = AWS.sign(key, service);
-            		key = AWS.sign(key, 'aws4_request');
-            
-            		var request = new HttpRequest(),
+            			key = AWS.sign('AWS4' + AWS.params.SecretAccessKey, date),
+            			key = AWS.sign(key, region),
+            			key = AWS.sign(key, service),
+            			key = AWS.sign(key, 'aws4_request'),
+            			request = new HttpRequest(),
             			url = 'https://' + host + canonical_uri + '?' + params;
             
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
@@ -1108,27 +1173,30 @@ zabbix_export:
             		request.addHeader('Content-Type: application/json');
             		request.addHeader('Content-Encoding: amz-1.0');
             		request.addHeader('Authorization: ' + 'AWS4-HMAC-SHA256 Credential=' + AWS.params.AccessKeyId + '/' + credential_scope + ', ' + 'SignedHeaders=' + signed_headers + ', ' + 'Signature=' + hmac('sha256', key, request_string));
-            		if (AWS.params.auth_type === 'role_base')
-            			request.addHeader('X-Amz-Security-Token: ' + AWS.params.Token);
+            		if (AWS.params.auth_type === 'role_base' || (AWS.params.auth_type === 'assume_role' & !params.includes('AssumeRole'))) {
+            			request.addHeader('X-Amz-Security-Token: ' + (AWS.params.auth_type === 'role_base' ? AWS.params.Token : AWS.params.SessionToken));
+            		}
             
             		Zabbix.log(4, '[ AWS RDS ] Sending request: ' + url);
-            
             		response = request.get(url);
-            
             		Zabbix.log(4, '[ AWS RDS ] Received response with status code ' + request.getStatus() + ': ' + response);
             
             		if (request.getStatus() !== 200) {
             			throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
             		}
             
-            		if (response !== null) {
+            		try {
+            			response = JSON.parse(response);
+            		}
+            		catch (error) {
             			try {
-            				response = JSON.parse(response);
+            				response = JSON.parse(XML.toJson(response));
             			}
             			catch (error) {
             				throw 'Failed to parse response received from AWS RDS API. Check debug log for more information.';
             			}
             		}
+            
             		return response;
             	},
             
@@ -1159,6 +1227,7 @@ zabbix_export:
             catch (error) {
             	error += (String(error).endsWith('.')) ? '' : '.';
             	Zabbix.log(3, '[ AWS RDS ] ERROR: ' + error);
+            
             	return JSON.stringify({ 'error': error });
             }
           description: |
@@ -1180,8 +1249,12 @@ zabbix_export:
               value: '{$AWS.PROXY}'
             - name: region
               value: '{$AWS.REGION}'
+            - name: role_arn
+              value: '{$AWS.ASSUME.ROLE.ARN}'
             - name: SecretAccessKey
               value: '{$AWS.SECRET.ACCESS.KEY}'
+            - name: sts_region
+              value: '{$AWS.STS.REGION}'
           tags:
             - tag: component
               value: raw
@@ -1191,13 +1264,12 @@ zabbix_export:
           key: aws.rds.get_metrics
           delay: 0s;m/5
           history: '0'
-          trends: '0'
           value_type: TEXT
           params: |
             var AWS = {
             	params: {},
             	request_period: 600,
-            	metadata: 'http://169.254.169.254/latest/meta-data/iam/security-credentials',
+            	metadata: 'http://169.254.169.254/latest/',
             
             	getField: function (data, path) {
             		var steps = path.split('.');
@@ -1222,13 +1294,20 @@ zabbix_export:
             				if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
             					request.setProxy(AWS.params.proxy);
             				}
-            				var IamRoleName = request.get(AWS.metadata);
+            				request.addHeader('X-aws-ec2-metadata-token-ttl-seconds: 21600');
+            				var token = request.put(AWS.metadata + 'api/token');
+            
+            				if (request.getStatus() !== 200 || token === null || token === '') {
+            					throw 'Error getting IMDSv2 session token.';
+            				}
+            				request.addHeader('X-aws-ec2-metadata-token: ' + token);
+            				var IamRoleName = request.get(AWS.metadata + 'meta-data/iam/security-credentials');
             
             				if (request.getStatus() !== 200 || IamRoleName === null || IamRoleName === '') {
             					throw 'Error getting security credentials from instance metadata. Role not found.';
             				}
             
-            				credentials = request.get(AWS.metadata + '/' + encodeURI(IamRoleName));
+            				credentials = request.get(AWS.metadata + 'meta-data/iam/security-credentials/' + encodeURI(IamRoleName));
             
             				if (request.getStatus() !== 200 || credentials === null || credentials === '') {
             					throw 'Error getting security credentials from instance metadata.';
@@ -1243,12 +1322,39 @@ zabbix_export:
             
             				['AccessKeyId', 'SecretAccessKey', 'Token'].forEach(function (field) {
             					if (typeof credentials !== 'object' || typeof credentials[field] === 'undefined' || credentials[field] === '') {
-            						throw 'Required credentials is not set: "' + field + '".';
+            						throw 'Required credentials are not set: "' + field + '".';
             					};
             					AWS.params[field] = credentials[field];
             				});
             				break;
-            			case 'access_key':
+            			case 'assume_role':
+            				AWS.params['auth_type'] = 'assume_role';
+            
+            				['AccessKeyId', 'SecretAccessKey', 'sts_region', 'role_arn'].forEach(function (field) {
+            					if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            						throw 'Required param is not set: "' + field + '".';
+            					}
+            					AWS.params[field] = params[field];
+            				});
+            
+            				role_arn_regex = /role\/(.+)$/;
+            
+            				var payload = {
+            					'Action': 'AssumeRole',
+            					'Version': '2011-06-15',
+            					'RoleArn': AWS.params.role_arn,
+            					'RoleSessionName': AWS.params.role_arn.match(role_arn_regex)[1] + 'Session',
+            				};
+            
+            				credentials = AWS.getField(AWS.request('POST', AWS.params.sts_region, 'sts', AWS.prepareParams(payload), ''), 'AssumeRoleResponse.AssumeRoleResult.Credentials');
+            
+            				['AccessKeyId', 'SecretAccessKey', 'SessionToken'].forEach(function (field) {
+            					if (typeof credentials !== 'object' || typeof credentials[field] === 'undefined' || credentials[field] === '') {
+            						throw 'Required credentials are not set: "' + field + '".';
+            					};
+            					AWS.params[field] = credentials[field];
+            				});
+            				break;
             			default:
             				AWS.params['auth_type'] = 'access_key';
             				['AccessKeyId', 'SecretAccessKey'].forEach(function (field) {
@@ -1279,6 +1385,21 @@ zabbix_export:
             		}
             
             		return result;
+            	},
+            
+            	prepareParams: function (params) {
+            		var result = [];
+            
+            		Object.keys(params).sort().forEach(function (key) {
+            			if (typeof params[key] !== 'object') {
+            				result.push(key + '=' + encodeURIComponent(params[key]));
+            			}
+            			else {
+            				result.push(prepareObject(key, params[key]));
+            			}
+            		});
+            
+            		return result.join('&');
             	},
             
             	renderMetricQuery: function (period, db_instance_id) {
@@ -1381,27 +1502,13 @@ zabbix_export:
             		return metric_payload;
             
             	},
-            	prepareParams: function (params) {
-            		var result = [];
             
-            		Object.keys(params).sort().forEach(function (key) {
-            			if (typeof params[key] !== 'object') {
-            				result.push(key + '=' + encodeURIComponent(params[key]));
-            			}
-            			else {
-            				result.push(prepareObject(key, params[key]));
-            			}
-            		});
-            
-            		return result.join('&');
-            	},
-            
-            	request: function (method, region, service, request_data) {
-            		if (typeof request_data === 'undefined' || request_data === null) {
-            			request_data = '';
+            	request: function (method, region, service, params, data) {
+            		if (typeof data === 'undefined' || data === null) {
+            			data = '';
             		}
             		else {
-            			request_data = JSON.stringify(request_data);
+            			data = JSON.stringify(data);
             		}
             
             		var amzdate = (new Date()).toISOString().replace(/\.\d+Z/, 'Z').replace(/[-:]/g, ''),
@@ -1410,17 +1517,15 @@ zabbix_export:
             			canonical_uri = '/',
             			canonical_headers = 'content-encoding:amz-1.0\n' + 'host:' + host + '\n' + 'x-amz-date:' + amzdate + '\n',
             			signed_headers = 'content-encoding;host;x-amz-date',
-            			canonical_request = method + '\n' + canonical_uri + '\n' + '\n' + canonical_headers + '\n' + signed_headers + '\n' + sha256(request_data),
+            			canonical_request = method + '\n' + canonical_uri + '\n' + params + '\n' + canonical_headers + '\n' + signed_headers + '\n' + sha256(data),
             			credential_scope = date + '/' + region + '/' + service + '/' + 'aws4_request',
             			request_string = 'AWS4-HMAC-SHA256' + '\n' + amzdate + '\n' + credential_scope + '\n' + sha256(canonical_request),
-            			key = AWS.sign('AWS4' + AWS.params.SecretAccessKey, date);
-            
-            		key = AWS.sign(key, region);
-            		key = AWS.sign(key, service);
-            		key = AWS.sign(key, 'aws4_request');
-            
-            		var request = new HttpRequest(),
-            			url = 'https://' + host + canonical_uri;
+            			key = AWS.sign('AWS4' + AWS.params.SecretAccessKey, date),
+            			key = AWS.sign(key, region),
+            			key = AWS.sign(key, service),
+            			key = AWS.sign(key, 'aws4_request'),
+            			request = new HttpRequest(),
+            			url = 'https://' + host + canonical_uri + '?' + params;
             
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
             			request.setProxy(AWS.params.proxy);
@@ -1431,21 +1536,24 @@ zabbix_export:
             		request.addHeader('Content-Type: application/json');
             		request.addHeader('Content-Encoding: amz-1.0');
             		request.addHeader('Authorization: ' + 'AWS4-HMAC-SHA256 Credential=' + AWS.params.AccessKeyId + '/' + credential_scope + ', ' + 'SignedHeaders=' + signed_headers + ', ' + 'Signature=' + hmac('sha256', key, request_string));
-            		if (AWS.params.auth_type === 'role_base')
-            			request.addHeader('X-Amz-Security-Token: ' + AWS.params.Token);
+            		if (AWS.params.auth_type === 'role_base' || (AWS.params.auth_type === 'assume_role' & !params.includes('AssumeRole'))) {
+            			request.addHeader('X-Amz-Security-Token: ' + (AWS.params.auth_type === 'role_base' ? AWS.params.Token : AWS.params.SessionToken));
+            		}
             
             		Zabbix.log(4, '[ AWS RDS ] Sending request: ' + url);
-            
-            		response = request.post(url, request_data);
+            		response = request.post(url, data);
             		Zabbix.log(4, '[ AWS RDS ] Received response with status code ' + request.getStatus() + ': ' + response);
             
             		if (request.getStatus() !== 200) {
             			throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
             		}
             
-            		if (response !== null) {
+            		try {
+            			response = JSON.parse(response);
+            		}
+            		catch (error) {
             			try {
-            				response = JSON.parse(response);
+            				response = JSON.parse(XML.toJson(response));
             			}
             			catch (error) {
             				throw 'Failed to parse response received from AWS CloudWatch API. Check debug log for more information.';
@@ -1464,7 +1572,7 @@ zabbix_export:
             		payload['EndTime'] = end_time;
             		payload['ScanBy'] = 'TimestampDescending';
             		payload['MetricDataQueries'] = AWS.renderMetricQuery(AWS.request_period, AWS.params.db_instance_id);
-            		result = AWS.request('POST', AWS.params.region, 'monitoring', payload);
+            		result = AWS.request('POST', AWS.params.region, 'monitoring', '', payload);
             		if (typeof result !== 'object' || typeof result.MetricDataResults !== 'object') {
             			throw 'Cannot get metrics data from AWS CloudWatch API. Check debug log for more information.';
             		}
@@ -1504,8 +1612,12 @@ zabbix_export:
               value: '{$AWS.PROXY}'
             - name: region
               value: '{$AWS.REGION}'
+            - name: role_arn
+              value: '{$AWS.ASSUME.ROLE.ARN}'
             - name: SecretAccessKey
               value: '{$AWS.SECRET.ACCESS.KEY}'
+            - name: sts_region
+              value: '{$AWS.STS.REGION}'
           tags:
             - tag: component
               value: raw
@@ -1513,8 +1625,6 @@ zabbix_export:
           name: 'Get instance info check'
           type: DEPENDENT
           key: aws.rds.instance_info.check
-          delay: '0'
-          trends: '0'
           value_type: CHAR
           description: 'Data collection check.'
           preprocessing:
@@ -1536,6 +1646,7 @@ zabbix_export:
               name: 'Failed to get instance data'
               opdata: '{ITEM.LASTVALUE1}'
               priority: WARNING
+              description: 'Failed to get CloudWatch instance info for RDS.'
               tags:
                 - tag: scope
                   value: availability
@@ -1543,8 +1654,6 @@ zabbix_export:
           name: 'Get metrics check'
           type: DEPENDENT
           key: aws.rds.metrics.check
-          delay: '0'
-          trends: '0'
           value_type: CHAR
           description: 'Data collection check.'
           preprocessing:
@@ -1566,6 +1675,7 @@ zabbix_export:
               name: 'Failed to get metrics data'
               opdata: '{ITEM.LASTVALUE1}'
               priority: WARNING
+              description: 'Failed to get CloudWatch metrics for RDS.'
               tags:
                 - tag: scope
                   value: availability
@@ -1573,7 +1683,6 @@ zabbix_export:
           name: 'Network: Receive throughput'
           type: DEPENDENT
           key: aws.rds.network_receive_throughput.rate
-          delay: '0'
           value_type: FLOAT
           units: Bps
           description: 'The incoming (Receive) network traffic on the DB instance, including both customer database traffic and Amazon RDS traffic used for monitoring and replication.'
@@ -1591,7 +1700,6 @@ zabbix_export:
           name: 'Network: Throughput'
           type: DEPENDENT
           key: aws.rds.network_throughput.rate
-          delay: '0'
           value_type: FLOAT
           units: Bps
           description: 'The amount of network throughput both received from and transmitted to clients by each instance in the Aurora MySQL DB cluster, in bytes per second. This throughput doesn''t include network traffic between instances in the DB cluster and the cluster volume.'
@@ -1609,7 +1717,6 @@ zabbix_export:
           name: 'Network: Transmit throughput'
           type: DEPENDENT
           key: aws.rds.network_transmit_throughput.rate
-          delay: '0'
           value_type: FLOAT
           units: Bps
           description: 'The outgoing (Transmit) network traffic on the DB instance, including both customer database traffic and Amazon RDS traffic used for monitoring and replication.'
@@ -1627,7 +1734,6 @@ zabbix_export:
           name: 'Disk: Read IOPS'
           type: DEPENDENT
           key: aws.rds.read_iops.rate
-          delay: '0'
           value_type: FLOAT
           units: Rps
           description: 'The average number of disk I/O operations per second. Aurora PostgreSQL-Compatible Edition reports read and write IOPS separately, in 1-minute intervals.'
@@ -1645,7 +1751,6 @@ zabbix_export:
           name: 'Disk: Read IOPS, local storage'
           type: DEPENDENT
           key: aws.rds.read_iops_local_storage.rate
-          delay: '0'
           value_type: FLOAT
           units: Rps
           description: 'The average number of disk read I/O operations to local storage per second. Only applies to Multi-AZ DB clusters.'
@@ -1663,7 +1768,6 @@ zabbix_export:
           name: 'Disk: Read latency'
           type: DEPENDENT
           key: aws.rds.read_latency
-          delay: '0'
           value_type: FLOAT
           units: s
           description: 'The average amount of time taken per disk I/O operation.'
@@ -1681,7 +1785,6 @@ zabbix_export:
           name: 'Disk: Read latency, local storage'
           type: DEPENDENT
           key: aws.rds.read_latency_local_storage
-          delay: '0'
           value_type: FLOAT
           units: s
           description: 'The average amount of time taken per disk I/O operation for local storage. Only applies to Multi-AZ DB clusters.'
@@ -1699,8 +1802,6 @@ zabbix_export:
           name: 'Read replica: State'
           type: DEPENDENT
           key: aws.rds.read_replica_state
-          delay: '0'
-          trends: '0'
           value_type: CHAR
           description: |
             The status of a read replica. If the instance isn't a read replica, this is blank.
@@ -1713,8 +1814,6 @@ zabbix_export:
                 - $..StatusInfos..Normal.first()
               error_handler: DISCARD_VALUE
             - type: BOOL_TO_DECIMAL
-              parameters:
-                - ''
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 3h
@@ -1738,8 +1837,6 @@ zabbix_export:
           name: 'Read replica: Status'
           type: DEPENDENT
           key: aws.rds.read_replica_status
-          delay: '0'
-          trends: '0'
           value_type: CHAR
           description: |
             The status of a read replica. If the instance isn't a read replica, this is blank.
@@ -1761,7 +1858,6 @@ zabbix_export:
           name: 'Disk: Read throughput'
           type: DEPENDENT
           key: aws.rds.read_throughput.rate
-          delay: '0'
           value_type: FLOAT
           units: Bps
           description: 'The average number of bytes read from disk per second.'
@@ -1779,7 +1875,6 @@ zabbix_export:
           name: 'Disk: Read throughput, local storage'
           type: DEPENDENT
           key: aws.rds.read_throughput_local_storage.rate
-          delay: '0'
           value_type: FLOAT
           units: Bps
           description: 'The average number of bytes read from disk per second for local storage. Only applies to Multi-AZ DB clusters.'
@@ -1797,7 +1892,6 @@ zabbix_export:
           name: 'Replication: Lag'
           type: DEPENDENT
           key: aws.rds.replica_lag
-          delay: '0'
           value_type: FLOAT
           units: s
           description: 'The amount of time a read replica DB instance lags behind the source DB instance. Applies to MySQL, MariaDB, Oracle, PostgreSQL, and SQL Server read replicas.'
@@ -1825,8 +1919,6 @@ zabbix_export:
           name: Status
           type: DEPENDENT
           key: aws.rds.status
-          delay: '0'
-          trends: '0'
           value_type: CHAR
           description: |
             Specifies the current state of this database.
@@ -1847,7 +1939,6 @@ zabbix_export:
           name: 'Storage: Allocated'
           type: DEPENDENT
           key: aws.rds.storage.allocated
-          delay: '0'
           value_type: FLOAT
           units: '!GiB'
           description: 'Specifies the allocated storage size specified in gibibytes (GiB).'
@@ -1867,7 +1958,6 @@ zabbix_export:
           name: 'Storage: Max allocated'
           type: DEPENDENT
           key: aws.rds.storage.max_allocated
-          delay: '0'
           value_type: FLOAT
           units: '!GiB'
           description: |
@@ -1891,7 +1981,6 @@ zabbix_export:
           name: 'Network: Receive throughput'
           type: DEPENDENT
           key: aws.rds.storage_network_receive_throughput
-          delay: '0'
           value_type: FLOAT
           units: Bps
           description: |
@@ -1911,7 +2000,6 @@ zabbix_export:
           name: 'Network: Transmit throughput'
           type: DEPENDENT
           key: aws.rds.storage_network_transmit_throughput
-          delay: '0'
           value_type: FLOAT
           units: Bps
           description: |
@@ -1931,8 +2019,6 @@ zabbix_export:
           name: 'Storage type'
           type: DEPENDENT
           key: aws.rds.storage_type
-          delay: '0'
-          trends: '0'
           value_type: CHAR
           description: 'Specifies the storage type associated with DB instance.'
           preprocessing:
@@ -1951,12 +2037,11 @@ zabbix_export:
           name: 'Swap usage'
           type: DEPENDENT
           key: aws.rds.swap_usage
-          delay: '0'
           value_type: FLOAT
           units: B
           description: |
-            The amount of swap space used. 
-            This metric is available for the Aurora PostgreSQL DB instance classes db.t3.medium, db.t3.large, db.r4.large, db.r4.xlarge, db.r5.large, db.r5.xlarge, db.r6g.large, and db.r6g.xlarge. 
+            The amount of swap space used.
+            This metric is available for the Aurora PostgreSQL DB instance classes db.t3.medium, db.t3.large, db.r4.large, db.r4.xlarge, db.r5.large, db.r5.xlarge, db.r6g.large, and db.r6g.xlarge.
             For Aurora MySQL, this metric applies only to db.t* DB instance classes.
             This metric is not available for SQL Server.
           preprocessing:
@@ -1973,7 +2058,6 @@ zabbix_export:
           name: 'Disk: Write IOPS'
           type: DEPENDENT
           key: aws.rds.write_iops.rate
-          delay: '0'
           value_type: FLOAT
           units: Rps
           description: 'The number of write records generated per second. This is more or less the number of log records generated by the database. These do not correspond to 8K page writes, and do not correspond to network packets sent.'
@@ -1991,7 +2075,6 @@ zabbix_export:
           name: 'Disk: Write IOPS, local storage'
           type: DEPENDENT
           key: aws.rds.write_iops_local_storage.rate
-          delay: '0'
           value_type: FLOAT
           units: Rps
           description: 'The average number of disk write I/O operations per second on local storage in a Multi-AZ DB cluster.'
@@ -2009,7 +2092,6 @@ zabbix_export:
           name: 'Disk: Write latency'
           type: DEPENDENT
           key: aws.rds.write_latency
-          delay: '0'
           value_type: FLOAT
           units: s
           description: 'The average amount of time taken per disk I/O operation.'
@@ -2027,7 +2109,6 @@ zabbix_export:
           name: 'Disk: Write latency, local storage'
           type: DEPENDENT
           key: aws.rds.write_latency_local_storage
-          delay: '0'
           value_type: FLOAT
           units: s
           description: 'The average amount of time taken per disk I/O operation on local storage in a Multi-AZ DB cluster.'
@@ -2045,7 +2126,6 @@ zabbix_export:
           name: 'Disk: Write throughput'
           type: DEPENDENT
           key: aws.rds.write_throughput.rate
-          delay: '0'
           value_type: FLOAT
           units: Bps
           description: 'The average number of bytes written to persistent storage every second.'
@@ -2063,7 +2143,6 @@ zabbix_export:
           name: 'Disk: Write throughput, local storage'
           type: DEPENDENT
           key: aws.rds.write_throughput_local_storage.rate
-          delay: '0'
           value_type: FLOAT
           units: Bps
           description: 'The average number of bytes written to disk per second for local storage.'
@@ -2082,31 +2161,25 @@ zabbix_export:
           name: 'Instance Alarms discovery'
           type: DEPENDENT
           key: aws.rds.alarms.discovery
-          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#ALARM_NAME}'
                 value: '{$AWS.RDS.LLD.FILTER.ALARM_NAME.MATCHES}'
-                formulaid: A
               - macro: '{#ALARM_NAME}'
                 value: '{$AWS.RDS.LLD.FILTER.ALARM_NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
               - macro: '{#ALARM_SERVICE_NAMESPACE}'
                 value: '{$AWS.RDS.LLD.FILTER.ALARM_SERVICE_NAMESPACE.MATCHES}'
-                formulaid: C
               - macro: '{#ALARM_SERVICE_NAMESPACE}'
                 value: '{$AWS.RDS.LLD.FILTER.ALARM_SERVICE_NAMESPACE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: D
           description: 'Discovery instance alarms.'
           item_prototypes:
             - uuid: aab5aaf6e27740c6ac92f5494b3aef4b
               name: '[{#ALARM_NAME}]: State'
               type: DEPENDENT
               key: 'aws.rds.alarm.state["{#ALARM_NAME}"]'
-              delay: '0'
               description: |
                 The state value for the alarm. Possible values: 0 (OK), 1 (INSUFFICIENT_DATA), 2 (ALARM).
                 Alarm description:
@@ -2135,6 +2208,7 @@ zabbix_export:
                   expression: 'last(/AWS RDS instance by HTTP/aws.rds.alarm.state["{#ALARM_NAME}"])=1'
                   name: '[{#ALARM_NAME}] has ''Insufficient data'' state'
                   priority: INFO
+                  description: 'Either the alarm has just started, the metric is not available, or not enough data is available for the metric to determine the alarm state.'
                   tags:
                     - tag: scope
                       value: notice
@@ -2142,8 +2216,6 @@ zabbix_export:
               name: '[{#ALARM_NAME}]: State reason'
               type: DEPENDENT
               key: 'aws.rds.alarm.state_reason["{#ALARM_NAME}"]'
-              delay: '0'
-              trends: '0'
               value_type: TEXT
               description: |
                 An explanation for the alarm state, in text format.
@@ -2168,7 +2240,7 @@ zabbix_export:
               name: '[{#ALARM_NAME}] has ''Alarm'' state'
               priority: AVERAGE
               description: |
-                Alarm "{#ALARM_NAME}" has 'Alarm' state. 
+                Alarm "{#ALARM_NAME}" has 'Alarm' state.
                 Reason: {ITEM.LASTVALUE2}
               tags:
                 - tag: scope
@@ -2201,7 +2273,6 @@ zabbix_export:
           name: 'Aurora metrics discovery'
           type: DEPENDENT
           key: aws.rds.aurora.discovery
-          delay: '0'
           description: |
             Discovery Amazon Aurora metrics.
             https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.AuroraMySQL.Monitoring.Metrics.html#Aurora.AuroraMySQL.Monitoring.Metrics.instances
@@ -2210,7 +2281,6 @@ zabbix_export:
               name: 'Replication: Lag, max'
               type: DEPENDENT
               key: 'aws.rds.aurora_replica_lag.max[{#SINGLETON}]'
-              delay: '0'
               value_type: FLOAT
               units: ms
               description: 'The maximum amount of lag between the primary instance and each Aurora DB instance in the DB cluster.'
@@ -2230,7 +2300,6 @@ zabbix_export:
               name: 'Replication: Lag, min'
               type: DEPENDENT
               key: 'aws.rds.aurora_replica_lag.min[{#SINGLETON}]'
-              delay: '0'
               value_type: FLOAT
               units: ms
               description: 'The minimum amount of lag between the primary instance and each Aurora DB instance in the DB cluster.'
@@ -2250,7 +2319,6 @@ zabbix_export:
               name: 'Replication: Lag'
               type: DEPENDENT
               key: 'aws.rds.aurora_replica_lag[{#SINGLETON}]'
-              delay: '0'
               value_type: FLOAT
               units: ms
               description: 'For an Aurora replica, the amount of lag when replicating updates from the primary instance.'
@@ -2270,7 +2338,6 @@ zabbix_export:
               name: 'Buffer Cache hit ratio'
               type: DEPENDENT
               key: 'aws.rds.buffer_cache_hit_ratio[{#SINGLETON}]'
-              delay: '0'
               value_type: FLOAT
               units: '%'
               description: 'The percentage of requests that are served by the buffer cache.'
@@ -2290,7 +2357,6 @@ zabbix_export:
               name: 'Operations: Commit latency'
               type: DEPENDENT
               key: 'aws.rds.commit_latency[{#SINGLETON}]'
-              delay: '0'
               value_type: FLOAT
               units: ms
               description: 'The amount of latency for commit operations.'
@@ -2310,7 +2376,6 @@ zabbix_export:
               name: 'Operations: Commit throughput'
               type: DEPENDENT
               key: 'aws.rds.commit_throughput.rate[{#SINGLETON}]'
-              delay: '0'
               value_type: FLOAT
               description: 'The average number of commit operations per second.'
               preprocessing:
@@ -2329,7 +2394,6 @@ zabbix_export:
               name: 'Deadlocks, rate'
               type: DEPENDENT
               key: 'aws.rds.deadlocks.rate[{#SINGLETON}]'
-              delay: '0'
               value_type: FLOAT
               description: 'The average number of deadlocks in the database per second.'
               preprocessing:
@@ -2348,7 +2412,6 @@ zabbix_export:
               name: 'Engine uptime'
               type: DEPENDENT
               key: 'aws.rds.engine_uptime[{#SINGLETON}]'
-              delay: '0'
               value_type: FLOAT
               units: s
               description: 'The amount of time that the instance has been running.'
@@ -2368,7 +2431,6 @@ zabbix_export:
               name: 'Rollback segment history list length'
               type: DEPENDENT
               key: 'aws.rds.rollback_segment_history_list_length[{#SINGLETON}]'
-              delay: '0'
               value_type: FLOAT
               description: 'The undo logs that record committed transactions with delete-marked records. These records are scheduled to be processed by the InnoDB purge operation.'
               preprocessing:
@@ -2387,7 +2449,6 @@ zabbix_export:
               name: 'Row lock time'
               type: DEPENDENT
               key: 'aws.rds.row_locktime[{#SINGLETON}]'
-              delay: '0'
               value_type: FLOAT
               units: ms
               description: 'The total time spent acquiring row locks for InnoDB tables.'
@@ -2407,7 +2468,6 @@ zabbix_export:
               name: 'Operations: Select latency'
               type: DEPENDENT
               key: 'aws.rds.select_latency[{#SINGLETON}]'
-              delay: '0'
               value_type: FLOAT
               units: ms
               description: 'The amount of latency for select queries.'
@@ -2427,7 +2487,6 @@ zabbix_export:
               name: 'Operations: Select throughput'
               type: DEPENDENT
               key: 'aws.rds.select_throughput.rate[{#SINGLETON}]'
-              delay: '0'
               value_type: FLOAT
               units: rps
               description: 'The average number of select queries per second.'
@@ -2447,7 +2506,6 @@ zabbix_export:
               name: 'Network: Throughput'
               type: DEPENDENT
               key: 'aws.rds.storage_network_throughput[{#SINGLETON}]'
-              delay: '0'
               value_type: FLOAT
               units: Bps
               description: 'The amount of network throughput received from and sent to the Aurora storage subsystem by each instance in the Aurora MySQL DB cluster.'
@@ -2501,31 +2559,25 @@ zabbix_export:
           name: 'Instance Events discovery'
           type: DEPENDENT
           key: aws.rds.events.discovery
-          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#EVENT_CATEGORY}'
                 value: '{$AWS.RDS.LLD.FILTER.EVENT_CATEGORY.MATCHES}'
-                formulaid: A
               - macro: '{#EVENT_CATEGORY}'
                 value: '{$AWS.RDS.LLD.FILTER.EVENT_CATEGORY.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
               - macro: '{#EVENT_SOURCE_TYPE}'
                 value: '{$AWS.RDS.LLD.FILTER.EVENT_SOURCE_TYPE.MATCHES}'
-                formulaid: C
               - macro: '{#EVENT_SOURCE_TYPE}'
                 value: '{$AWS.RDS.LLD.FILTER.EVENT_SOURCE_TYPE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: D
           description: 'Discovery instance events.'
           item_prototypes:
             - uuid: 21b9df85f2e841c48204c7cb4fb5caeb
               name: '[{#EVENT_CATEGORY}]: {#EVENT_SOURCE_TYPE}/{#EVENT_SOURCE_ID} : Date'
               type: DEPENDENT
               key: 'aws.rds.event_date["{#EVENT_CATEGORY}/{#EVENT_SOURCE_TYPE}/{#EVENT_SOURCE_ID}"]'
-              delay: '0'
               value_type: FLOAT
               units: unixtime
               description: 'Provides the text of this event.'
@@ -2551,8 +2603,6 @@ zabbix_export:
               name: '[{#EVENT_CATEGORY}]: {#EVENT_SOURCE_TYPE}/{#EVENT_SOURCE_ID}: Message'
               type: DEPENDENT
               key: 'aws.rds.event_message["{#EVENT_CATEGORY}/{#EVENT_SOURCE_TYPE}/{#EVENT_SOURCE_ID}"]'
-              delay: '0'
-              trends: '0'
               value_type: TEXT
               description: 'Provides the text of this event.'
               preprocessing:
@@ -2602,7 +2652,6 @@ zabbix_export:
           name: 'Aurora MySQL metrics discovery'
           type: DEPENDENT
           key: aws.rds.postgresql.discovery
-          delay: '0'
           description: |
             Discovery Aurora MySQL metrics.
             Storage types:
@@ -2613,7 +2662,6 @@ zabbix_export:
               name: 'Connections: Aborted'
               type: DEPENDENT
               key: 'aws.rds.aurora_clients_aborted[{#SINGLETON}]'
-              delay: '0'
               value_type: FLOAT
               description: 'The number of client connections that have not been closed properly.'
               preprocessing:
@@ -2632,11 +2680,10 @@ zabbix_export:
               name: 'Replication: Binlog lag'
               type: DEPENDENT
               key: 'aws.rds.aurora_replication_binlog_lag[{#SINGLETON}]'
-              delay: '0'
               value_type: FLOAT
               units: s
               description: |
-                The amount of time that a binary log replica DB cluster running on Aurora MySQL-Compatible Edition lags behind the binary log replication source. 
+                The amount of time that a binary log replica DB cluster running on Aurora MySQL-Compatible Edition lags behind the binary log replication source.
                 A lag means that the source is generating records faster than the replica can apply them.
                 The metric value indicates the following:
                 
@@ -2659,7 +2706,6 @@ zabbix_export:
               name: 'Transactions: Active, rate'
               type: DEPENDENT
               key: 'aws.rds.aurora_transactions_active.rate[{#SINGLETON}]'
-              delay: '0'
               value_type: FLOAT
               units: Rps
               description: |
@@ -2681,7 +2727,6 @@ zabbix_export:
               name: 'Backtrack: Window, actual'
               type: DEPENDENT
               key: 'aws.rds.backtrack_window_actual[{#SINGLETON}]'
-              delay: '0'
               value_type: FLOAT
               units: '!minutes'
               description: 'The difference between the target backtrack window and the actual backtrack window.'
@@ -2701,7 +2746,6 @@ zabbix_export:
               name: 'Backtrack: Window, alert'
               type: DEPENDENT
               key: 'aws.rds.backtrack_window_alert[{#SINGLETON}]'
-              delay: '0'
               value_type: FLOAT
               description: 'The number of times that the actual backtrack window is smaller than the target backtrack window for a given period of time.'
               preprocessing:
@@ -2720,7 +2764,6 @@ zabbix_export:
               name: 'Transactions: Blocked, rate'
               type: DEPENDENT
               key: 'aws.rds.blocked_transactions.rate[{#SINGLETON}]'
-              delay: '0'
               value_type: FLOAT
               units: Rps
               description: 'The average number of transactions in the database that are blocked per second.'
@@ -2740,7 +2783,6 @@ zabbix_export:
               name: 'DDL: Latency'
               type: DEPENDENT
               key: 'aws.rds.ddl_latency[{#SINGLETON}]'
-              delay: '0'
               value_type: FLOAT
               units: ms
               description: 'The amount of latency for data definition language (DDL) requests - for example, create, alter, and drop requests.'
@@ -2760,7 +2802,6 @@ zabbix_export:
               name: 'DDL: Throughput'
               type: DEPENDENT
               key: 'aws.rds.ddl_throughput.rate[{#SINGLETON}]'
-              delay: '0'
               value_type: FLOAT
               units: Rps
               description: 'The average number of DDL requests per second.'
@@ -2780,7 +2821,6 @@ zabbix_export:
               name: 'Operations: Delete latency'
               type: DEPENDENT
               key: 'aws.rds.delete_latency[{#SINGLETON}]'
-              delay: '0'
               value_type: FLOAT
               units: ms
               description: 'The amount of latency for delete queries.'
@@ -2800,7 +2840,6 @@ zabbix_export:
               name: 'Operations: Delete throughput'
               type: DEPENDENT
               key: 'aws.rds.delete_throughput.rate[{#SINGLETON}]'
-              delay: '0'
               value_type: FLOAT
               units: Rps
               description: 'The average number of delete queries per second.'
@@ -2820,7 +2859,6 @@ zabbix_export:
               name: 'DML: Latency'
               type: DEPENDENT
               key: 'aws.rds.dml_latency[{#SINGLETON}]'
-              delay: '0'
               value_type: FLOAT
               units: ms
               description: 'The amount of latency for inserts, updates, and deletes.'
@@ -2840,7 +2878,6 @@ zabbix_export:
               name: 'DML: Throughput'
               type: DEPENDENT
               key: 'aws.rds.dml_throughput.rate[{#SINGLETON}]'
-              delay: '0'
               value_type: FLOAT
               units: rate
               description: 'The average number of inserts, updates, and deletes per second.'
@@ -2860,7 +2897,6 @@ zabbix_export:
               name: 'Operations: Insert latency'
               type: DEPENDENT
               key: 'aws.rds.insert_latency[{#SINGLETON}]'
-              delay: '0'
               value_type: FLOAT
               units: ms
               description: 'The amount of latency for insert queries, in milliseconds.'
@@ -2880,7 +2916,6 @@ zabbix_export:
               name: 'Operations: Insert throughput'
               type: DEPENDENT
               key: 'aws.rds.insert_throughput.rate[{#SINGLETON}]'
-              delay: '0'
               value_type: FLOAT
               units: Rps
               description: 'The average number of insert queries per second.'
@@ -2900,7 +2935,6 @@ zabbix_export:
               name: 'Login failures, rate'
               type: DEPENDENT
               key: 'aws.rds.login_failures.rate[{#SINGLETON}]'
-              delay: '0'
               value_type: FLOAT
               description: 'The average number of failed login attempts per second.'
               preprocessing:
@@ -2919,7 +2953,6 @@ zabbix_export:
               name: 'Binary log files, number'
               type: DEPENDENT
               key: 'aws.rds.num_binary_log_files[{#SINGLETON}]'
-              delay: '0'
               value_type: FLOAT
               description: 'The number of binlog files generated.'
               preprocessing:
@@ -2940,7 +2973,6 @@ zabbix_export:
               name: 'Queries, rate'
               type: DEPENDENT
               key: 'aws.rds.queries.rate[{#SINGLETON}]'
-              delay: '0'
               value_type: FLOAT
               description: 'The average number of queries executed per second.'
               preprocessing:
@@ -2959,7 +2991,6 @@ zabbix_export:
               name: 'Resultset cache hit ratio'
               type: DEPENDENT
               key: 'aws.rds.result_set_cache_hit_ratio[{#SINGLETON}]'
-              delay: '0'
               value_type: FLOAT
               units: '%'
               description: 'The percentage of requests that are served by the Resultset cache.'
@@ -2979,7 +3010,6 @@ zabbix_export:
               name: 'Binary log files, size'
               type: DEPENDENT
               key: 'aws.rds.sum_binary_log_files[{#SINGLETON}]'
-              delay: '0'
               value_type: FLOAT
               units: B
               description: 'The total size of the binlog files.'
@@ -3001,7 +3031,6 @@ zabbix_export:
               name: 'Operations: Update latency'
               type: DEPENDENT
               key: 'aws.rds.update_latency[{#SINGLETON}]'
-              delay: '0'
               value_type: FLOAT
               units: ms
               description: 'The amount of latency for update queries.'
@@ -3023,7 +3052,6 @@ zabbix_export:
               name: 'Operations: Update throughput'
               type: DEPENDENT
               key: 'aws.rds.update_throughput.rate[{#SINGLETON}]'
-              delay: '0'
               value_type: FLOAT
               units: Rps
               description: 'The average number of update queries per second.'
@@ -3119,9 +3147,11 @@ zabbix_export:
       macros:
         - macro: '{$AWS.ACCESS.KEY.ID}'
           description: 'Access key ID.'
+        - macro: '{$AWS.ASSUME.ROLE.ARN}'
+          description: 'ARN assume role; add when using the `assume_role` authorization method.'
         - macro: '{$AWS.AUTH_TYPE}'
           value: access_key
-          description: 'Authorization method. Possible values: role_base, access_key.'
+          description: 'Authorization method. Possible values: `access_key`, `assume_role`, `role_base`.'
         - macro: '{$AWS.EBS.BYTE.CREDIT.BALANCE.MIN.WARN}'
           value: '20'
           description: 'Minimum percentage of Byte credits remaining for trigger expression.'
@@ -3171,6 +3201,9 @@ zabbix_export:
         - macro: '{$AWS.SECRET.ACCESS.KEY}'
           type: SECRET_TEXT
           description: 'Secret access key.'
+        - macro: '{$AWS.STS.REGION}'
+          value: us-east-1
+          description: 'Region used in assume role request.'
       valuemaps:
         - uuid: 4ff4cda021a4464ebbebb42b7ee02673
           name: 'Alarm state'

@@ -32,8 +32,6 @@ void	zbx_db_save_trigger_changes(const zbx_vector_trigger_diff_ptr_t *trigger_di
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
 	for (i = 0; i < trigger_diff->values_num; i++)
 	{
 		char	delim = ' ';
@@ -77,10 +75,7 @@ void	zbx_db_save_trigger_changes(const zbx_vector_trigger_diff_ptr_t *trigger_di
 		zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 	}
 
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (sql_offset > 16)	/* in ORACLE always present begin..end; */
-		zbx_db_execute("%s", sql);
+	(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
 
 	zbx_free(sql);
 

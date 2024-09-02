@@ -45,37 +45,35 @@ $html_page = (new CHtmlPage())
 			->setAttribute('aria-label', _('Content controls'))
 	);
 
-if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
-	$filter = (new CTabFilter())
-		->setId('monitoring_latest_filter')
-		->setOptions($data['tabfilter_options'])
-		->addTemplate(new CPartial($data['filter_view'], $data['filter_defaults']));
 
-	if ($data['mandatory_filter_set'] && $data['items'] || $data['subfilter_set']) {
-		$filter->addSubfilter(new CPartial('monitoring.latest.subfilter',
-			array_intersect_key($data, array_flip(['subfilters', 'subfilters_expanded'])))
-		);
-	}
+$filter = (new CTabFilter())
+	->setId('monitoring_latest_filter')
+	->setOptions($data['tabfilter_options'])
+	->addTemplate(new CPartial($data['filter_view'], $data['filter_defaults']));
 
-	foreach ($data['filter_tabs'] as $tab) {
-		$tab['tab_view'] = $data['filter_view'];
-		$filter->addTemplatedTab($tab['filter_name'], $tab);
-	}
-
-	// Set javascript options for tab filter initialization in monitoring.latest.view.js.php file.
-	$data['filter_options'] = $filter->options;
-	$html_page->addItem($filter);
+if ($data['mandatory_filter_set'] && $data['items'] || $data['subfilter_set']) {
+	$filter->addSubfilter(new CPartial('monitoring.latest.subfilter',
+		array_intersect_key($data, array_flip(['subfilters', 'subfilters_expanded'])))
+	);
 }
-else {
-	$data['filter_options'] = null;
+
+foreach ($data['filter_tabs'] as $tab) {
+	$tab['tab_view'] = $data['filter_view'];
+	$filter->addTemplatedTab($tab['filter_name'], $tab);
 }
+
+// Set javascript options for tab filter initialization in monitoring.latest.view.js.php file.
+$data['filter_options'] = $filter->options;
 
 $html_page
-	->addItem(new CPartial('monitoring.latest.view.html', array_intersect_key($data,
-		array_flip(['filter', 'sort_field', 'sort_order', 'view_curl', 'paging', 'hosts', 'items', 'history', 'config',
-			'tags', 'maintenances', 'items_rw', 'mandatory_filter_set', 'subfilter_set'
-		])
-	)))
+	->addItem($filter)
+	->addItem(
+		new CPartial('monitoring.latest.view.html', array_intersect_key($data,
+			array_flip(['filter', 'sort_field', 'sort_order', 'view_curl', 'paging', 'hosts', 'items', 'history',
+				'config', 'tags', 'maintenances', 'items_rw', 'mandatory_filter_set', 'subfilter_set'
+			])
+		))
+	)
 	->show();
 
 (new CScriptTag('
@@ -85,7 +83,8 @@ $html_page
 		'refresh_data' => $data['refresh_data'],
 		'refresh_interval' => $data['refresh_interval'],
 		'checkbox_object' => 'itemids',
-		'filter_set' => $data['mandatory_filter_set'] || $data['subfilter_set']
+		'filter_set' => $data['mandatory_filter_set'] || $data['subfilter_set'],
+		'layout_mode' => $web_layout_mode
 	]).');
 '))
 	->setOnDocumentReady()

@@ -42,7 +42,6 @@ zabbix_export:
           name: 'Total bytes'
           type: DEPENDENT
           key: apache.bytes
-          delay: '0'
           value_type: FLOAT
           units: B
           description: 'The total bytes served.'
@@ -62,7 +61,6 @@ zabbix_export:
           name: 'Bytes per second'
           type: DEPENDENT
           key: apache.bytes.rate
-          delay: '0'
           value_type: FLOAT
           units: Bps
           description: |
@@ -77,8 +75,6 @@ zabbix_export:
               parameters:
                 - '1024'
             - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           master_item:
             key: apache.get_status
           tags:
@@ -89,7 +85,6 @@ zabbix_export:
           type: HTTP_AGENT
           key: apache.get_status
           history: 1h
-          trends: '0'
           value_type: TEXT
           description: |
             Getting data from a machine-readable version of the Apache status page.
@@ -156,7 +151,6 @@ zabbix_export:
           name: 'Total requests'
           type: DEPENDENT
           key: apache.requests
-          delay: '0'
           description: 'The total number of the Apache server accesses.'
           preprocessing:
             - type: JSONPATH
@@ -171,7 +165,6 @@ zabbix_export:
           name: 'Requests per second'
           type: DEPENDENT
           key: apache.requests.rate
-          delay: '0'
           value_type: FLOAT
           description: |
             It is calculated as a rate of change for the "Total requests" statistics.
@@ -181,8 +174,6 @@ zabbix_export:
               parameters:
                 - '$["Total Accesses"]'
             - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           master_item:
             key: apache.get_status
           tags:
@@ -192,7 +183,6 @@ zabbix_export:
           name: Uptime
           type: DEPENDENT
           key: apache.uptime
-          delay: '0'
           units: uptime
           description: 'The service uptime expressed in seconds.'
           preprocessing:
@@ -219,8 +209,6 @@ zabbix_export:
           name: Version
           type: DEPENDENT
           key: apache.version
-          delay: '0'
-          trends: '0'
           value_type: CHAR
           description: 'The Apache service version.'
           preprocessing:
@@ -250,7 +238,6 @@ zabbix_export:
           name: 'Workers idle cleanup'
           type: DEPENDENT
           key: apache.workers.cleanup
-          delay: '0'
           description: 'The number of workers in cleanup state.'
           preprocessing:
             - type: JSONPATH
@@ -265,7 +252,6 @@ zabbix_export:
           name: 'Workers closing connection'
           type: DEPENDENT
           key: apache.workers.closing
-          delay: '0'
           description: 'The number of workers in closing state.'
           preprocessing:
             - type: JSONPATH
@@ -280,7 +266,6 @@ zabbix_export:
           name: 'Workers DNS lookup'
           type: DEPENDENT
           key: apache.workers.dnslookup
-          delay: '0'
           description: 'The number of workers in `dnslookup` state.'
           preprocessing:
             - type: JSONPATH
@@ -295,7 +280,6 @@ zabbix_export:
           name: 'Workers finishing'
           type: DEPENDENT
           key: apache.workers.finishing
-          delay: '0'
           description: 'The number of workers in finishing state.'
           preprocessing:
             - type: JSONPATH
@@ -310,7 +294,6 @@ zabbix_export:
           name: 'Workers keepalive (read)'
           type: DEPENDENT
           key: apache.workers.keepalive
-          delay: '0'
           description: 'The number of workers in `keepalive` state.'
           preprocessing:
             - type: JSONPATH
@@ -325,7 +308,6 @@ zabbix_export:
           name: 'Workers logging'
           type: DEPENDENT
           key: apache.workers.logging
-          delay: '0'
           description: 'The number of workers in logging state.'
           preprocessing:
             - type: JSONPATH
@@ -340,7 +322,6 @@ zabbix_export:
           name: 'Workers reading request'
           type: DEPENDENT
           key: apache.workers.reading
-          delay: '0'
           description: 'The number of workers in reading state.'
           preprocessing:
             - type: JSONPATH
@@ -355,7 +336,6 @@ zabbix_export:
           name: 'Workers sending reply'
           type: DEPENDENT
           key: apache.workers.sending
-          delay: '0'
           description: 'The number of workers in sending state.'
           preprocessing:
             - type: JSONPATH
@@ -370,7 +350,6 @@ zabbix_export:
           name: 'Workers slot with no current process'
           type: DEPENDENT
           key: apache.workers.slot
-          delay: '0'
           description: 'The number of slots with no current process.'
           preprocessing:
             - type: JSONPATH
@@ -385,7 +364,6 @@ zabbix_export:
           name: 'Workers starting up'
           type: DEPENDENT
           key: apache.workers.starting
-          delay: '0'
           description: 'The number of workers in starting state.'
           preprocessing:
             - type: JSONPATH
@@ -400,7 +378,6 @@ zabbix_export:
           name: 'Workers waiting for connection'
           type: DEPENDENT
           key: apache.workers.waiting
-          delay: '0'
           description: 'The number of workers in waiting state.'
           preprocessing:
             - type: JSONPATH
@@ -415,7 +392,6 @@ zabbix_export:
           name: 'Total workers busy'
           type: DEPENDENT
           key: apache.workers_total.busy
-          delay: '0'
           description: 'The total number of busy worker threads/processes.'
           preprocessing:
             - type: JSONPATH
@@ -430,7 +406,6 @@ zabbix_export:
           name: 'Total workers idle'
           type: DEPENDENT
           key: apache.workers_total.idle
-          delay: '0'
           description: 'The total number of idle worker threads/processes.'
           preprocessing:
             - type: JSONPATH
@@ -494,7 +469,6 @@ zabbix_export:
           name: 'Event MPM discovery'
           type: DEPENDENT
           key: apache.mpm.event.discovery
-          delay: '0'
           description: |
             The discovery of additional metrics if the event Multi-Processing Module (MPM) is used.
             For more details see [Apache MPM event](https://httpd.apache.org/docs/current/mod/event.html).
@@ -503,7 +477,6 @@ zabbix_export:
               name: 'Bytes per request'
               type: DEPENDENT
               key: 'apache.bytes[per_request{#SINGLETON}]'
-              delay: '0'
               value_type: FLOAT
               units: B
               description: 'The average number of client requests per second.'
@@ -520,7 +493,6 @@ zabbix_export:
               name: 'Connections async closing'
               type: DEPENDENT
               key: 'apache.connections[async_closing{#SINGLETON}]'
-              delay: '0'
               description: 'The number of asynchronous connections in closing state (applicable only to the event MPM).'
               preprocessing:
                 - type: JSONPATH
@@ -535,7 +507,6 @@ zabbix_export:
               name: 'Connections async keepalive'
               type: DEPENDENT
               key: 'apache.connections[async_keep_alive{#SINGLETON}]'
-              delay: '0'
               description: 'The number of asynchronous connections in keepalive state (applicable only to the event MPM).'
               preprocessing:
                 - type: JSONPATH
@@ -550,7 +521,6 @@ zabbix_export:
               name: 'Connections async writing'
               type: DEPENDENT
               key: 'apache.connections[async_writing{#SINGLETON}]'
-              delay: '0'
               description: 'The number of asynchronous connections in writing state (applicable only to the event MPM).'
               preprocessing:
                 - type: JSONPATH
@@ -565,7 +535,6 @@ zabbix_export:
               name: 'Connections total'
               type: DEPENDENT
               key: 'apache.connections[total{#SINGLETON}]'
-              delay: '0'
               description: 'The number of total connections.'
               preprocessing:
                 - type: JSONPATH
@@ -580,7 +549,6 @@ zabbix_export:
               name: 'Number of async processes'
               type: DEPENDENT
               key: 'apache.process[num{#SINGLETON}]'
-              delay: '0'
               description: 'The number of asynchronous processes.'
               preprocessing:
                 - type: JSONPATH

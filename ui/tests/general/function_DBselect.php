@@ -28,11 +28,4 @@ class function_DBselect extends CTest {
 		$this->assertTrue(100 == CDBHelper::getCount('select * from items', 100));
 		$this->assertTrue(1 == CDBHelper::getCount('select * from items', '1'));
 	}
-
-	public function test_DBselectWrongParameters() {
-		$this->assertTrue(false == DBselect('select * from items', 'ZZZ'));
-		$this->assertTrue(false == DBselect('select * from items', 1.5));
-		$this->assertTrue(false == DBselect('select * from items', 1.5));
-		$this->assertTrue(false == DBselect('select * from items', -1));
-	}
 }

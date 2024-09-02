@@ -27,12 +27,11 @@ zabbix_export:
           key: aws.get.daily.costs
           delay: 0s;h/6
           history: '0'
-          trends: '0'
           value_type: TEXT
           params: |
             var AWS = {
             	params: {},
-            	metadata: 'http://169.254.169.254/latest/meta-data/iam/security-credentials',
+            	metadata: 'http://169.254.169.254/latest/',
             
             	setParams: function (params) {
             		AWS.params['proxy'] = params.proxy;
@@ -43,13 +42,20 @@ zabbix_export:
             				if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
             					request.setProxy(AWS.params.proxy);
             				}
-            				var IamRoleName = request.get(AWS.metadata);
+            				request.addHeader('X-aws-ec2-metadata-token-ttl-seconds: 21600');
+            				var token = request.put(AWS.metadata + 'api/token');
+            
+            				if (request.getStatus() !== 200 || token === null || token === '') {
+            					throw 'Error getting IMDSv2 session token.';
+            				}
+            				request.addHeader('X-aws-ec2-metadata-token: ' + token);
+            				var IamRoleName = request.get(AWS.metadata + 'meta-data/iam/security-credentials');
             
             				if (request.getStatus() !== 200 || IamRoleName === null || IamRoleName === '') {
             					throw 'Error getting security credentials from instance metadata. Role not found.';
             				}
             
-            				credentials = request.get(AWS.metadata + '/' + encodeURI(IamRoleName));
+            				credentials = request.get(AWS.metadata + 'meta-data/iam/security-credentials/' + encodeURI(IamRoleName));
             
             				if (request.getStatus() !== 200 || credentials === null || credentials === '') {
             					throw 'Error getting security credentials from instance metadata.';
@@ -64,12 +70,39 @@ zabbix_export:
             
             				['AccessKeyId', 'SecretAccessKey', 'Token'].forEach(function (field) {
             					if (typeof credentials !== 'object' || typeof credentials[field] === 'undefined' || credentials[field] === '') {
-            						throw 'Required credentials is not set: "' + field + '".';
+            						throw 'Required credentials are not set: "' + field + '".';
             					};
             					AWS.params[field] = credentials[field];
             				});
             				break;
-            			case 'access_key':
+            			case 'assume_role':
+            				AWS.params['auth_type'] = 'assume_role';
+            
+            				['AccessKeyId', 'SecretAccessKey', 'sts_region', 'role_arn'].forEach(function (field) {
+            					if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            						throw 'Required param is not set: "' + field + '".';
+            					}
+            					AWS.params[field] = params[field];
+            				});
+            
+            				role_arn_regex = /role\/(.+)$/;
+            
+            				var payload = {
+            					'Action': 'AssumeRole',
+            					'Version': '2011-06-15',
+            					'RoleArn': AWS.params.role_arn,
+            					'RoleSessionName': AWS.params.role_arn.match(role_arn_regex)[1] + 'Session',
+            				};
+            
+            				credentials = AWS.getField(AWS.request('POST', AWS.params.sts_region, 'sts', AWS.prepareParams(payload), ''), 'AssumeRoleResponse.AssumeRoleResult.Credentials');
+            
+            				['AccessKeyId', 'SecretAccessKey', 'SessionToken'].forEach(function (field) {
+            					if (typeof credentials !== 'object' || typeof credentials[field] === 'undefined' || credentials[field] === '') {
+            						throw 'Required credentials are not set: "' + field + '".';
+            					};
+            					AWS.params[field] = credentials[field];
+            				});
+            				break;
             			default:
             				AWS.params['auth_type'] = 'access_key';
             				['AccessKeyId', 'SecretAccessKey'].forEach(function (field) {
@@ -107,6 +140,21 @@ zabbix_export:
             		return result;
             	},
             
+            	prepareParams: function (params) {
+            		var result = [];
+            
+            		Object.keys(params).sort().forEach(function (key) {
+            			if (typeof params[key] !== 'object') {
+            				result.push(key + '=' + encodeURIComponent(params[key]));
+            			}
+            			else {
+            				result.push(prepareObject(key, params[key]));
+            			}
+            		});
+            
+            		return result.join('&');
+            	},
+            
             	getField: function (data, path) {
             		var steps = path.split('.');
             		for (var i = 0; i < steps.length; i++) {
@@ -121,28 +169,29 @@ zabbix_export:
             
             	},
             
-            	request: function (method, region, service, host, data, uri, target) {
+            	request: function (method, region, service, params, data, target) {
             		if (typeof data === 'undefined' || data === null) {
             			data = '';
+            		}
+            		else {
+            			data = JSON.stringify(data);
             		}
             
             		var amzdate = (new Date()).toISOString().replace(/\.\d+Z/, 'Z').replace(/[-:]/g, ''),
             			date = amzdate.replace(/T\d+Z/, ''),
-            
-            			canonical_uri = '/' + uri,
+            			canonical_uri = '/',
+            			host = service + '.' + region + '.amazonaws.com',
             			canonical_headers = 'content-encoding:amz-1.0\n' + 'host:' + host + '\n' + 'x-amz-date:' + amzdate + '\n',
             			signed_headers = 'content-encoding;host;x-amz-date',
-            			canonical_request = method + '\n' + canonical_uri + '\n' + '' + '\n' + canonical_headers + '\n' + signed_headers + '\n' + sha256(data),
+            			canonical_request = method + '\n' + canonical_uri + '\n' + params + '\n' + canonical_headers + '\n' + signed_headers + '\n' + sha256(data),
             			credential_scope = date + '/' + region + '/' + service + '/' + 'aws4_request',
             			request_string = 'AWS4-HMAC-SHA256' + '\n' + amzdate + '\n' + credential_scope + '\n' + sha256(canonical_request),
-            			key = AWS.sign('AWS4' + AWS.params.SecretAccessKey, date);
-            
-            		key = AWS.sign(key, region);
-            		key = AWS.sign(key, service);
-            		key = AWS.sign(key, 'aws4_request');
-            
-            		var request = new HttpRequest(),
-            			url = 'https://' + host + canonical_uri;
+            			key = AWS.sign('AWS4' + AWS.params.SecretAccessKey, date),
+            			key = AWS.sign(key, region),
+            			key = AWS.sign(key, service),
+            			key = AWS.sign(key, 'aws4_request'),
+            			request = new HttpRequest(),
+            			url = 'https://' + host + canonical_uri + '?' + params;
             
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
             			request.setProxy(AWS.params.proxy);
@@ -154,13 +203,12 @@ zabbix_export:
             		request.addHeader('Content-Encoding: amz-1.0');
             		request.addHeader('X-Amz-Target: ' + target);
             		request.addHeader('Authorization: ' + 'AWS4-HMAC-SHA256 Credential=' + AWS.params.AccessKeyId + '/' + credential_scope + ', ' + 'SignedHeaders=' + signed_headers + ', ' + 'Signature=' + hmac('sha256', key, request_string));
-            		if (AWS.params.auth_type === 'role_base')
-            			request.addHeader('X-Amz-Security-Token: ' + AWS.params.Token);
+            		if (AWS.params.auth_type === 'role_base' || (AWS.params.auth_type === 'assume_role' & !params.includes('AssumeRole'))) {
+            			request.addHeader('X-Amz-Security-Token: ' + (AWS.params.auth_type === 'role_base' ? AWS.params.Token : AWS.params.SessionToken));
+            		}
             
             		Zabbix.log(4, '[ AWS Billing ] Sending request: ' + url);
-            
             		response = request.post(url, data);
-            
             		Zabbix.log(4, '[ AWS Billing ] Received response with the status code ' + request.getStatus() + ': ' + response);
             
             		if (request.getStatus() !== 200) {
@@ -185,7 +233,7 @@ zabbix_export:
             			},
             			'Dimension': 'SERVICE'
             		};
-            		return AWS.getField(AWS.request('POST', AWS.params.region, 'ce', 'ce.' + AWS.params.region + '.amazonaws.com', JSON.stringify(body_raw_dimension), '', 'AWSInsightsIndexService.GetDimensionValues'), 'DimensionValues');
+            		return AWS.getField(AWS.request('POST', AWS.params.region, 'ce', '', body_raw_dimension, 'AWSInsightsIndexService.GetDimensionValues'), 'DimensionValues');
             
             	},
             
@@ -207,7 +255,7 @@ zabbix_export:
             			'Metrics': ['BlendedCost']
             		};
             
-            		return AWS.getField(AWS.request('POST', AWS.params.region, 'ce', 'ce.' + AWS.params.region + '.amazonaws.com', JSON.stringify(body_raw_cost), '', 'AWSInsightsIndexService.GetCostAndUsage'), 'ResultsByTime');
+            		return AWS.getField(AWS.request('POST', AWS.params.region, 'ce', '', body_raw_cost, 'AWSInsightsIndexService.GetCostAndUsage'), 'ResultsByTime');
             
             	}
             
@@ -225,7 +273,7 @@ zabbix_export:
             
             	return JSON.stringify({ 'error': error });
             }
-          description: 'Get raw data on the daily costs by service'
+          description: 'Get raw data on the daily costs by service.'
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
               parameters:
@@ -240,8 +288,12 @@ zabbix_export:
               value: '{$AWS.PROXY}'
             - name: region
               value: '{$AWS.BILLING.REGION}'
+            - name: role_arn
+              value: '{$AWS.ASSUME.ROLE.ARN}'
             - name: SecretAccessKey
               value: '{$AWS.SECRET.ACCESS.KEY}'
+            - name: sts_region
+              value: '{$AWS.STS.REGION}'
           tags:
             - tag: component
               value: raw
@@ -251,12 +303,11 @@ zabbix_export:
           key: aws.get.monthly.costs
           delay: 0s;h9
           history: '0'
-          trends: '0'
           value_type: TEXT
           params: |
             var AWS = {
             	params: {},
-            	metadata: 'http://169.254.169.254/latest/meta-data/iam/security-credentials',
+            	metadata: 'http://169.254.169.254/latest/',
             
             	setParams: function (params) {
             		AWS.params['proxy'] = params.proxy;
@@ -267,13 +318,20 @@ zabbix_export:
             				if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
             					request.setProxy(AWS.params.proxy);
             				}
-            				var IamRoleName = request.get(AWS.metadata);
+            				request.addHeader('X-aws-ec2-metadata-token-ttl-seconds: 21600');
+            				var token = request.put(AWS.metadata + 'api/token');
+            
+            				if (request.getStatus() !== 200 || token === null || token === '') {
+            					throw 'Error getting IMDSv2 session token.';
+            				}
+            				request.addHeader('X-aws-ec2-metadata-token: ' + token);
+            				var IamRoleName = request.get(AWS.metadata + 'meta-data/iam/security-credentials');
             
             				if (request.getStatus() !== 200 || IamRoleName === null || IamRoleName === '') {
             					throw 'Error getting security credentials from instance metadata. Role not found.';
             				}
             
-            				credentials = request.get(AWS.metadata + '/' + encodeURI(IamRoleName));
+            				credentials = request.get(AWS.metadata + 'meta-data/iam/security-credentials/' + encodeURI(IamRoleName));
             
             				if (request.getStatus() !== 200 || credentials === null || credentials === '') {
             					throw 'Error getting security credentials from instance metadata.';
@@ -288,12 +346,39 @@ zabbix_export:
             
             				['AccessKeyId', 'SecretAccessKey', 'Token'].forEach(function (field) {
             					if (typeof credentials !== 'object' || typeof credentials[field] === 'undefined' || credentials[field] === '') {
-            						throw 'Required credentials is not set: "' + field + '".';
+            						throw 'Required credentials are not set: "' + field + '".';
             					};
             					AWS.params[field] = credentials[field];
             				});
             				break;
-            			case 'access_key':
+            			case 'assume_role':
+            				AWS.params['auth_type'] = 'assume_role';
+            
+            				['AccessKeyId', 'SecretAccessKey', 'sts_region', 'role_arn'].forEach(function (field) {
+            					if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            						throw 'Required param is not set: "' + field + '".';
+            					}
+            					AWS.params[field] = params[field];
+            				});
+            
+            				role_arn_regex = /role\/(.+)$/;
+            
+            				var payload = {
+            					'Action': 'AssumeRole',
+            					'Version': '2011-06-15',
+            					'RoleArn': AWS.params.role_arn,
+            					'RoleSessionName': AWS.params.role_arn.match(role_arn_regex)[1] + 'Session',
+            				};
+            
+            				credentials = AWS.getField(AWS.request('POST', AWS.params.sts_region, 'sts', AWS.prepareParams(payload), ''), 'AssumeRoleResponse.AssumeRoleResult.Credentials');
+            
+            				['AccessKeyId', 'SecretAccessKey', 'SessionToken'].forEach(function (field) {
+            					if (typeof credentials !== 'object' || typeof credentials[field] === 'undefined' || credentials[field] === '') {
+            						throw 'Required credentials are not set: "' + field + '".';
+            					};
+            					AWS.params[field] = credentials[field];
+            				});
+            				break;
             			default:
             				AWS.params['auth_type'] = 'access_key';
             				['AccessKeyId', 'SecretAccessKey'].forEach(function (field) {
@@ -332,6 +417,21 @@ zabbix_export:
             		return result;
             	},
             
+            	prepareParams: function (params) {
+            		var result = [];
+            
+            		Object.keys(params).sort().forEach(function (key) {
+            			if (typeof params[key] !== 'object') {
+            				result.push(key + '=' + encodeURIComponent(params[key]));
+            			}
+            			else {
+            				result.push(prepareObject(key, params[key]));
+            			}
+            		});
+            
+            		return result.join('&');
+            	},
+            
             	getField: function (data, path) {
             		var steps = path.split('.');
             		for (var i = 0; i < steps.length; i++) {
@@ -346,28 +446,29 @@ zabbix_export:
             
             	},
             
-            	request: function (method, region, service, host, data, uri, target) {
+            	request: function (method, region, service, params, data, target) {
             		if (typeof data === 'undefined' || data === null) {
             			data = '';
+            		}
+            		else {
+            			data = JSON.stringify(data);
             		}
             
             		var amzdate = (new Date()).toISOString().replace(/\.\d+Z/, 'Z').replace(/[-:]/g, ''),
             			date = amzdate.replace(/T\d+Z/, ''),
-            
-            			canonical_uri = '/' + uri,
+            			canonical_uri = '/',
+            			host = service + '.' + region + '.amazonaws.com',
             			canonical_headers = 'content-encoding:amz-1.0\n' + 'host:' + host + '\n' + 'x-amz-date:' + amzdate + '\n',
             			signed_headers = 'content-encoding;host;x-amz-date',
-            			canonical_request = method + '\n' + canonical_uri + '\n' + '' + '\n' + canonical_headers + '\n' + signed_headers + '\n' + sha256(data),
+            			canonical_request = method + '\n' + canonical_uri + '\n' + params + '\n' + canonical_headers + '\n' + signed_headers + '\n' + sha256(data),
             			credential_scope = date + '/' + region + '/' + service + '/' + 'aws4_request',
             			request_string = 'AWS4-HMAC-SHA256' + '\n' + amzdate + '\n' + credential_scope + '\n' + sha256(canonical_request),
-            			key = AWS.sign('AWS4' + AWS.params.SecretAccessKey, date);
-            
-            		key = AWS.sign(key, region);
-            		key = AWS.sign(key, service);
-            		key = AWS.sign(key, 'aws4_request');
-            
-            		var request = new HttpRequest(),
-            			url = 'https://' + host + canonical_uri;
+            			key = AWS.sign('AWS4' + AWS.params.SecretAccessKey, date),
+            			key = AWS.sign(key, region),
+            			key = AWS.sign(key, service),
+            			key = AWS.sign(key, 'aws4_request'),
+            			request = new HttpRequest(),
+            			url = 'https://' + host + canonical_uri + '?' + params;
             
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
             			request.setProxy(AWS.params.proxy);
@@ -379,13 +480,12 @@ zabbix_export:
             		request.addHeader('Content-Encoding: amz-1.0');
             		request.addHeader('X-Amz-Target: ' + target);
             		request.addHeader('Authorization: ' + 'AWS4-HMAC-SHA256 Credential=' + AWS.params.AccessKeyId + '/' + credential_scope + ', ' + 'SignedHeaders=' + signed_headers + ', ' + 'Signature=' + hmac('sha256', key, request_string));
-            		if (AWS.params.auth_type === 'role_base')
-            			request.addHeader('X-Amz-Security-Token: ' + AWS.params.Token);
+            		if (AWS.params.auth_type === 'role_base' || (AWS.params.auth_type === 'assume_role' & !params.includes('AssumeRole'))) {
+            			request.addHeader('X-Amz-Security-Token: ' + (AWS.params.auth_type === 'role_base' ? AWS.params.Token : AWS.params.SessionToken));
+            		}
             
             		Zabbix.log(4, '[ AWS Billing ] Sending request: ' + url);
-            
             		response = request.post(url, data);
-            
             		Zabbix.log(4, '[ AWS Billing ] Received response with the status code ' + request.getStatus() + ': ' + response);
             
             		if (request.getStatus() !== 200) {
@@ -410,7 +510,7 @@ zabbix_export:
             			},
             			'Dimension': 'SERVICE'
             		};
-            		return AWS.getField(AWS.request('POST', AWS.params.region, 'ce', 'ce.' + AWS.params.region + '.amazonaws.com', JSON.stringify(body_raw_dimension), '', 'AWSInsightsIndexService.GetDimensionValues'), 'DimensionValues');
+            		return AWS.getField(AWS.request('POST', AWS.params.region, 'ce', '', body_raw_dimension, 'AWSInsightsIndexService.GetDimensionValues'), 'DimensionValues');
             
             	},
             
@@ -423,7 +523,7 @@ zabbix_export:
             			'Granularity': 'MONTHLY',
             			'Metrics': ['BlendedCost']
             		};
-            		result = AWS.getField(AWS.request('POST', AWS.params.region, 'ce', 'ce.' + AWS.params.region + '.amazonaws.com', JSON.stringify(body_raw_cost), '', 'AWSInsightsIndexService.GetCostAndUsage'), 'ResultsByTime');
+            		result = AWS.getField(AWS.request('POST', AWS.params.region, 'ce', '', body_raw_cost, 'AWSInsightsIndexService.GetCostAndUsage'), 'ResultsByTime');
             
             		return result.map(function (data) {
             			return {
@@ -450,7 +550,7 @@ zabbix_export:
             			'Granularity': 'MONTHLY',
             			'Metrics': ['BlendedCost']
             		};
-            		MetricData = AWS.getField(AWS.request('POST', AWS.params.region, 'ce', 'ce.' + AWS.params.region + '.amazonaws.com', JSON.stringify(body_raw_cost), '', 'AWSInsightsIndexService.GetCostAndUsage'), 'ResultsByTime');
+            		MetricData = AWS.getField(AWS.request('POST', AWS.params.region, 'ce', '', body_raw_cost, 'AWSInsightsIndexService.GetCostAndUsage'), 'ResultsByTime');
             		var services = [];
             		MetricData.forEach(function (data) {
             			month = AWS.getField(data, 'TimePeriod.Start').slice(0, 7);
@@ -482,6 +582,7 @@ zabbix_export:
             
             	return JSON.stringify({ 'error': error });
             }
+          description: 'Get raw data on the monthly costs by service.'
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
               parameters:
@@ -498,8 +599,12 @@ zabbix_export:
               value: '{$AWS.PROXY}'
             - name: region
               value: '{$AWS.BILLING.REGION}'
+            - name: role_arn
+              value: '{$AWS.ASSUME.ROLE.ARN}'
             - name: SecretAccessKey
               value: '{$AWS.SECRET.ACCESS.KEY}'
+            - name: sts_region
+              value: '{$AWS.STS.REGION}'
           tags:
             - tag: component
               value: raw
@@ -508,24 +613,20 @@ zabbix_export:
           name: 'AWS monthly costs by services discovery'
           type: DEPENDENT
           key: aws.cost.service.monthly.discovery
-          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#AWS.BILLING.SERVICE.NAME}'
                 value: '{$AWS.BILLING.LLD.FILTER.SERVICE.MATCHES}'
-                formulaid: A
               - macro: '{#AWS.BILLING.SERVICE.NAME}'
                 value: '{$AWS.BILLING.LLD.FILTER.SERVICE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
           description: 'Discovery of monthly costs by services.'
           item_prototypes:
             - uuid: d01ee8df0e204f1a857b8188df47402a
               name: '[{#AWS.BILLING.SERVICE.NAME}]: Month [{#AWS.BILLING.MONTH}] Blended cost'
               type: DEPENDENT
               key: 'aws.monthly.service.cost["{#AWS.BILLING.SERVICE.NAME}", "{#AWS.BILLING.MONTH}"]'
-              delay: '0'
               value_type: FLOAT
               units: '{#AWS.BILLING.UNIT}'
               description: 'The monthly cost by service {#AWS.BILLING.SERVICE.NAME}.'
@@ -573,24 +674,20 @@ zabbix_export:
           name: 'AWS daily costs by services discovery'
           type: DEPENDENT
           key: aws.daily.services.costs.discovery
-          delay: '0'
           filter:
             evaltype: AND
             conditions:
               - macro: '{#AWS.BILLING.SERVICE.NAME}'
                 value: '{$AWS.BILLING.LLD.FILTER.SERVICE.MATCHES}'
-                formulaid: A
               - macro: '{#AWS.BILLING.SERVICE.NAME}'
                 value: '{$AWS.BILLING.LLD.FILTER.SERVICE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
           description: 'Discovery of daily blended costs by services.'
           item_prototypes:
             - uuid: b6e121c3a1eb49858e942beab12660e2
               name: 'Service [{#AWS.BILLING.SERVICE.NAME}]: Blended daily cost'
               type: DEPENDENT
               key: 'aws.daily.service.cost["{#AWS.BILLING.SERVICE.NAME}"]'
-              delay: '0'
               value_type: FLOAT
               units: '{#AWS.BILLING.UNIT}'
               description: 'The daily blended cost of the {#AWS.BILLING.SERVICE.NAME} service for the previous day.'
@@ -630,14 +727,12 @@ zabbix_export:
           name: 'AWS monthly costs discovery'
           type: DEPENDENT
           key: aws.monthly.cost.discovery
-          delay: '0'
           description: 'Discovery of monthly costs.'
           item_prototypes:
             - uuid: aaf85a53d1804c858fc20189f0483bad
               name: '[{#AWS.BILLING.MONTH}]: Blended cost per month'
               type: DEPENDENT
               key: 'aws.monthly.cost["{#AWS.BILLING.MONTH}"]'
-              delay: '0'
               value_type: FLOAT
               units: '{#AWS.BILLING.UNIT}'
               description: 'The blended cost by month {#AWS.BILLING.MONTH}.'
@@ -686,9 +781,11 @@ zabbix_export:
       macros:
         - macro: '{$AWS.ACCESS.KEY.ID}'
           description: 'Access key ID.'
+        - macro: '{$AWS.ASSUME.ROLE.ARN}'
+          description: 'ARN assume role; add when using the `assume_role` authorization method.'
         - macro: '{$AWS.AUTH_TYPE}'
           value: access_key
-          description: 'Authorization method. Possible values: role_base, access_key.'
+          description: 'Authorization method. Possible values: `access_key`, `assume_role`, `role_base`.'
         - macro: '{$AWS.BILLING.LLD.FILTER.SERVICE.MATCHES}'
           value: '.*'
           description: 'Filter of discoverable discovered billing service by name.'
@@ -706,6 +803,9 @@ zabbix_export:
         - macro: '{$AWS.SECRET.ACCESS.KEY}'
           type: SECRET_TEXT
           description: 'Secret access key.'
+        - macro: '{$AWS.STS.REGION}'
+          value: us-east-1
+          description: 'Region used in assume role request.'
       dashboards:
         - uuid: e1e4edbf129142b4b27a9471db1ed8e2
           name: 'Overview AWS Costs'

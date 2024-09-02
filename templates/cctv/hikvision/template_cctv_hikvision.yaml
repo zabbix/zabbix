@@ -32,8 +32,6 @@ zabbix_export:
           name: 'Boot loader released date'
           type: DEPENDENT
           key: hikvision_cam.boot_released_date
-          delay: '0'
-          trends: '0'
           value_type: CHAR
           preprocessing:
             - type: JSONPATH
@@ -52,8 +50,6 @@ zabbix_export:
           name: 'Boot loader version'
           type: DEPENDENT
           key: hikvision_cam.boot_version
-          delay: '0'
-          trends: '0'
           value_type: CHAR
           inventory_link: SOFTWARE_APP_E
           preprocessing:
@@ -73,7 +69,6 @@ zabbix_export:
           name: 'CPU utilization'
           type: DEPENDENT
           key: hikvision_cam.cpu.util
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'CPU utilization in %'
@@ -105,8 +100,6 @@ zabbix_export:
           name: 'Current device time'
           type: DEPENDENT
           key: hikvision_cam.current_device_time
-          delay: '0'
-          trends: '0'
           value_type: CHAR
           preprocessing:
             - type: JSONPATH
@@ -122,8 +115,6 @@ zabbix_export:
           name: 'Device description'
           type: DEPENDENT
           key: hikvision_cam.device_description
-          delay: '0'
-          trends: '0'
           value_type: CHAR
           inventory_link: NOTES
           preprocessing:
@@ -143,8 +134,6 @@ zabbix_export:
           name: 'Device ID'
           type: DEPENDENT
           key: hikvision_cam.device_id
-          delay: '0'
-          trends: '0'
           value_type: CHAR
           preprocessing:
             - type: JSONPATH
@@ -163,8 +152,6 @@ zabbix_export:
           name: 'Device location'
           type: DEPENDENT
           key: hikvision_cam.device_location
-          delay: '0'
-          trends: '0'
           value_type: CHAR
           inventory_link: LOCATION
           preprocessing:
@@ -184,8 +171,6 @@ zabbix_export:
           name: 'Device name'
           type: DEPENDENT
           key: hikvision_cam.device_name
-          delay: '0'
-          trends: '0'
           value_type: CHAR
           inventory_link: NAME
           preprocessing:
@@ -205,8 +190,6 @@ zabbix_export:
           name: 'Device type'
           type: DEPENDENT
           key: hikvision_cam.device_type
-          delay: '0'
-          trends: '0'
           value_type: CHAR
           inventory_link: TYPE
           preprocessing:
@@ -226,8 +209,6 @@ zabbix_export:
           name: 'Encoder released date'
           type: DEPENDENT
           key: hikvision_cam.encoder_released_date
-          delay: '0'
-          trends: '0'
           value_type: CHAR
           inventory_link: SOFTWARE_APP_D
           preprocessing:
@@ -247,8 +228,6 @@ zabbix_export:
           name: 'Encoder version'
           type: DEPENDENT
           key: hikvision_cam.encoder_version
-          delay: '0'
-          trends: '0'
           value_type: CHAR
           inventory_link: SOFTWARE_APP_C
           preprocessing:
@@ -268,8 +247,6 @@ zabbix_export:
           name: 'Firmware released date'
           type: DEPENDENT
           key: hikvision_cam.firmware_released_date
-          delay: '0'
-          trends: '0'
           value_type: CHAR
           inventory_link: SOFTWARE_APP_B
           preprocessing:
@@ -289,8 +266,6 @@ zabbix_export:
           name: 'Firmware version'
           type: DEPENDENT
           key: hikvision_cam.firmware_version
-          delay: '0'
-          trends: '0'
           value_type: CHAR
           inventory_link: SOFTWARE_APP_A
           preprocessing:
@@ -322,7 +297,6 @@ zabbix_export:
           type: HTTP_AGENT
           key: hikvision_cam.get_info
           history: '0'
-          trends: '0'
           value_type: TEXT
           authtype: DIGEST
           username: '{$USER}'
@@ -335,8 +309,6 @@ zabbix_export:
               error_handler: CUSTOM_VALUE
               error_handler_params: '{"html":{"head":{"title":"Connection error"}}}'
             - type: XML_TO_JSON
-              parameters:
-                - ''
               error_handler: CUSTOM_VALUE
               error_handler_params: '{"html":{"head":{"title":"Connection error"}}}'
           url: 'http://{$HIKVISION_ISAPI_HOST}:{$HIKVISION_ISAPI_PORT}/ISAPI/System/deviceInfo'
@@ -348,7 +320,6 @@ zabbix_export:
           name: 'Get device info: Login status'
           type: DEPENDENT
           key: hikvision_cam.get_info.login_status
-          delay: '0'
           valuemap:
             name: 'Login status'
           preprocessing:
@@ -377,7 +348,6 @@ zabbix_export:
           type: HTTP_AGENT
           key: hikvision_cam.get_status
           history: '0'
-          trends: '0'
           value_type: TEXT
           authtype: DIGEST
           username: '{$USER}'
@@ -390,8 +360,6 @@ zabbix_export:
               error_handler: CUSTOM_VALUE
               error_handler_params: '{"html":{"head":{"title":"Connection error"}}}'
             - type: XML_TO_JSON
-              parameters:
-                - ''
               error_handler: CUSTOM_VALUE
               error_handler_params: '{"html":{"head":{"title":"Connection error"}}}'
           url: 'http://{$HIKVISION_ISAPI_HOST}:{$HIKVISION_ISAPI_PORT}/ISAPI/System/status'
@@ -403,7 +371,6 @@ zabbix_export:
           name: 'Get system status: Login status'
           type: DEPENDENT
           key: hikvision_cam.get_status.login_status
-          delay: '0'
           valuemap:
             name: 'Login status'
           preprocessing:
@@ -432,7 +399,6 @@ zabbix_export:
           type: HTTP_AGENT
           key: hikvision_cam.get_streaming
           history: '0'
-          trends: '0'
           value_type: TEXT
           authtype: DIGEST
           username: '{$USER}'
@@ -445,8 +411,6 @@ zabbix_export:
               error_handler: CUSTOM_VALUE
               error_handler_params: '{"html":{"head":{"title":"Connection error"}}}'
             - type: XML_TO_JSON
-              parameters:
-                - ''
               error_handler: CUSTOM_VALUE
               error_handler_params: '{"html":{"head":{"title":"Connection error"}}}'
           url: 'http://{$HIKVISION_ISAPI_HOST}:{$HIKVISION_ISAPI_PORT}/ISAPI/Streaming/channels'
@@ -458,7 +422,6 @@ zabbix_export:
           name: 'Get streaming channels: Login status'
           type: DEPENDENT
           key: hikvision_cam.get_streaming.login_status
-          delay: '0'
           valuemap:
             name: 'Login status'
           preprocessing:
@@ -486,8 +449,6 @@ zabbix_export:
           name: 'Hardware version'
           type: DEPENDENT
           key: hikvision_cam.hardware_version
-          delay: '0'
-          trends: '0'
           value_type: CHAR
           preprocessing:
             - type: JSONPATH
@@ -506,8 +467,6 @@ zabbix_export:
           name: MACaddress
           type: DEPENDENT
           key: hikvision_cam.mac_address
-          delay: '0'
-          trends: '0'
           value_type: CHAR
           inventory_link: MACADDRESS_A
           preprocessing:
@@ -527,7 +486,6 @@ zabbix_export:
           name: 'Memory utilization'
           type: DEPENDENT
           key: hikvision_cam.memory.usage
-          delay: '0'
           value_type: FLOAT
           units: '%'
           description: 'Memory utilization in %'
@@ -558,8 +516,6 @@ zabbix_export:
           name: Model
           type: DEPENDENT
           key: hikvision_cam.model
-          delay: '0'
-          trends: '0'
           value_type: CHAR
           inventory_link: MODEL
           preprocessing:
@@ -579,8 +535,6 @@ zabbix_export:
           name: 'Serial number'
           type: DEPENDENT
           key: hikvision_cam.serial_number
-          delay: '0'
-          trends: '0'
           value_type: CHAR
           inventory_link: SERIALNO_A
           preprocessing:
@@ -611,8 +565,6 @@ zabbix_export:
           name: 'Supported beep'
           type: DEPENDENT
           key: hikvision_cam.support_beep
-          delay: '0'
-          trends: '0'
           value_type: CHAR
           preprocessing:
             - type: JSONPATH
@@ -631,8 +583,6 @@ zabbix_export:
           name: 'Supported video loss'
           type: DEPENDENT
           key: hikvision_cam.support_video_loss
-          delay: '0'
-          trends: '0'
           value_type: CHAR
           preprocessing:
             - type: JSONPATH
@@ -651,8 +601,6 @@ zabbix_export:
           name: 'System contact'
           type: DEPENDENT
           key: hikvision_cam.system_contact
-          delay: '0'
-          trends: '0'
           value_type: CHAR
           inventory_link: CONTACT
           preprocessing:
@@ -672,8 +620,6 @@ zabbix_export:
           name: 'Telecontrol ID'
           type: DEPENDENT
           key: hikvision_cam.telecontrol_id
-          delay: '0'
-          trends: '0'
           value_type: CHAR
           preprocessing:
             - type: JSONPATH
@@ -692,7 +638,6 @@ zabbix_export:
           name: Uptime
           type: DEPENDENT
           key: hikvision_cam.uptime
-          delay: '0'
           trends: '0'
           units: uptime
           description: 'The system uptime expressed in the following format: "N days, hh:mm:ss".'
@@ -731,7 +676,6 @@ zabbix_export:
               name: 'Channel "{#PTZ_CHANNEL_ID}": Get PTZ info: Channel "{#PTZ_CHANNEL_ID}": Login status'
               type: DEPENDENT
               key: 'hikvision_cam.get_ptz.login_status[{#PTZ_CHANNEL_ID}]'
-              delay: '0'
               valuemap:
                 name: 'Login status'
               preprocessing:
@@ -791,7 +735,6 @@ zabbix_export:
               type: HTTP_AGENT
               key: 'hikvision_cam.get_ptz[{#PTZ_CHANNEL_ID}]'
               history: '0'
-              trends: '0'
               value_type: TEXT
               authtype: DIGEST
               username: '{$USER}'
@@ -804,8 +747,6 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '{"html":{"head":{"title":"Connection error"}}}'
                 - type: XML_TO_JSON
-                  parameters:
-                    - ''
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '{"html":{"head":{"title":"Connection error"}}}'
               url: 'http://{$HIKVISION_ISAPI_HOST}:{$HIKVISION_ISAPI_PORT}/ISAPI/PTZCtrl/channels/{#PTZ_CHANNEL_ID}/status'
@@ -817,7 +758,6 @@ zabbix_export:
               name: 'Channel "{#PTZ_CHANNEL_ID}": Absolute zoom'
               type: DEPENDENT
               key: 'hikvision_cam.ptz.absolute_zoom[{#PTZ_CHANNEL_ID}]'
-              delay: '0'
               value_type: FLOAT
               units: '!x'
               preprocessing:
@@ -843,7 +783,6 @@ zabbix_export:
               name: 'Channel "{#PTZ_CHANNEL_ID}": Azimuth'
               type: DEPENDENT
               key: 'hikvision_cam.ptz.azimuth[{#PTZ_CHANNEL_ID}]'
-              delay: '0'
               value_type: FLOAT
               units: '!°'
               preprocessing:
@@ -869,7 +808,6 @@ zabbix_export:
               name: 'Channel "{#PTZ_CHANNEL_ID}": Elevation'
               type: DEPENDENT
               key: 'hikvision_cam.ptz.elevation[{#PTZ_CHANNEL_ID}]'
-              delay: '0'
               value_type: FLOAT
               units: '!°'
               preprocessing:
@@ -908,8 +846,6 @@ zabbix_export:
           status_codes: '200,401'
           preprocessing:
             - type: XML_TO_JSON
-              parameters:
-                - ''
             - type: JAVASCRIPT
               parameters:
                 - |
@@ -936,13 +872,11 @@ zabbix_export:
             conditions:
               - macro: '{#CHANNEL_ENABLED}'
                 value: 'true'
-                formulaid: A
           item_prototypes:
             - uuid: 90ef1dd6e3d04ce8ab84731377c07ea6
               name: 'Channel "{#CHANNEL_ID}": Constant bitRate'
               type: DEPENDENT
               key: 'hikvision_cam.constant_bit_rate[{#CHANNEL_ID}]'
-              delay: '0'
               units: '!kbit/s'
               preprocessing:
                 - type: JSONPATH
@@ -967,7 +901,6 @@ zabbix_export:
               name: 'Channel "{#CHANNEL_ID}": Fixed quality'
               type: DEPENDENT
               key: 'hikvision_cam.fixed_quality[{#CHANNEL_ID}]'
-              delay: '0'
               units: '%'
               preprocessing:
                 - type: JSONPATH
@@ -992,7 +925,6 @@ zabbix_export:
               name: 'Channel "{#CHANNEL_ID}": GovLength'
               type: DEPENDENT
               key: 'hikvision_cam.gov_length[{#CHANNEL_ID}]'
-              delay: '0'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1016,8 +948,6 @@ zabbix_export:
               name: 'Channel "{#CHANNEL_ID}": H264Profile'
               type: DEPENDENT
               key: 'hikvision_cam.h264Profile[{#CHANNEL_ID}]'
-              delay: '0'
-              trends: '0'
               value_type: CHAR
               preprocessing:
                 - type: JSONPATH
@@ -1042,7 +972,6 @@ zabbix_export:
               name: 'Channel "{#CHANNEL_ID}": Key frame interval'
               type: DEPENDENT
               key: 'hikvision_cam.key_frame_interval[{#CHANNEL_ID}]'
-              delay: '0'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1070,7 +999,6 @@ zabbix_export:
               name: 'Channel "{#CHANNEL_ID}": Frame rate (max)'
               type: DEPENDENT
               key: 'hikvision_cam.max_frame_rate[{#CHANNEL_ID}]'
-              delay: '0'
               units: '!fps'
               preprocessing:
                 - type: JSONPATH
@@ -1099,7 +1027,6 @@ zabbix_export:
               name: 'Channel "{#CHANNEL_ID}": Smoothing'
               type: DEPENDENT
               key: 'hikvision_cam.smoothing[{#CHANNEL_ID}]'
-              delay: '0'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1123,8 +1050,6 @@ zabbix_export:
               name: 'Channel "{#CHANNEL_ID}": Snapshot image type'
               type: DEPENDENT
               key: 'hikvision_cam.snap_shot_image_type[{#CHANNEL_ID}]'
-              delay: '0'
-              trends: '0'
               value_type: CHAR
               preprocessing:
                 - type: JSONPATH
@@ -1149,7 +1074,6 @@ zabbix_export:
               name: 'Channel "{#CHANNEL_ID}": VBR lower'
               type: DEPENDENT
               key: 'hikvision_cam.vbr_lower_cap[{#CHANNEL_ID}]'
-              delay: '0'
               units: '!kbit/s'
               preprocessing:
                 - type: JSONPATH
@@ -1174,7 +1098,6 @@ zabbix_export:
               name: 'Channel "{#CHANNEL_ID}": VBR upper'
               type: DEPENDENT
               key: 'hikvision_cam.vbr_upper_cap[{#CHANNEL_ID}]'
-              delay: '0'
               units: '!kbit/s'
               preprocessing:
                 - type: JSONPATH
@@ -1196,8 +1119,6 @@ zabbix_export:
               name: 'Channel "{#CHANNEL_ID}": Video codec type'
               type: DEPENDENT
               key: 'hikvision_cam.video_codec_type[{#CHANNEL_ID}]'
-              delay: '0'
-              trends: '0'
               value_type: CHAR
               preprocessing:
                 - type: JSONPATH
@@ -1222,8 +1143,6 @@ zabbix_export:
               name: 'Channel "{#CHANNEL_ID}": Video quality control type'
               type: DEPENDENT
               key: 'hikvision_cam.video_quality_control_type[{#CHANNEL_ID}]'
-              delay: '0'
-              trends: '0'
               value_type: CHAR
               preprocessing:
                 - type: JSONPATH
@@ -1248,7 +1167,6 @@ zabbix_export:
               name: 'Channel "{#CHANNEL_ID}": Resolution height'
               type: DEPENDENT
               key: 'hikvision_cam.video_resolution_height[{#CHANNEL_ID}]'
-              delay: '0'
               units: '!px'
               preprocessing:
                 - type: JSONPATH
@@ -1273,7 +1191,6 @@ zabbix_export:
               name: 'Channel "{#CHANNEL_ID}": Resolution width'
               type: DEPENDENT
               key: 'hikvision_cam.video_resolution_width[{#CHANNEL_ID}]'
-              delay: '0'
               units: '!px'
               preprocessing:
                 - type: JSONPATH
@@ -1298,8 +1215,6 @@ zabbix_export:
               name: 'Channel "{#CHANNEL_ID}": Video scan type'
               type: DEPENDENT
               key: 'hikvision_cam.video_scan_type[{#CHANNEL_ID}]'
-              delay: '0'
-              trends: '0'
               value_type: CHAR
               preprocessing:
                 - type: JSONPATH
@@ -1351,8 +1266,6 @@ zabbix_export:
           status_codes: '200,401'
           preprocessing:
             - type: XML_TO_JSON
-              parameters:
-                - ''
             - type: JAVASCRIPT
               parameters:
                 - |
@@ -1376,13 +1289,12 @@ zabbix_export:
                   - macro: '{#CHANNEL_ID}'
                     value: '{$HIKVISION_MAIN_CHANNEL_ID}'
                     operator: NOT_MATCHES_REGEX
-                    formulaid: A
               operations:
                 - operationobject: TRIGGER_PROTOTYPE
                   operator: LIKE
                   value: 'Invalid video stream resolution parameters'
-                  status: ENABLED
                   discover: NO_DISCOVER
+                  status: ENABLED
       tags:
         - tag: class
           value: device

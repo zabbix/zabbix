@@ -555,11 +555,41 @@ type commandTask struct {
 	id     uint64
 	params []string
 	output resultcache.Writer
+	timeout int
+}
+
+func (t *commandTask) ClientID() (clientid uint64) {
+        return agent.MaxBuiltinClientID;
+}
+
+func (t *commandTask) Output() (output plugin.ResultWriter) {
+        return nil
+}
+
+func (t *commandTask) ItemID() (itemid uint64) {
+        return 0
+}
+
+func (t *commandTask) Meta() (meta *plugin.Meta) {
+        return nil
+}
+
+func (t *commandTask) GlobalRegexp() plugin.RegexpMatcher {
+        return nil
+}
+
+func (t *commandTask) Timeout() int {
+        return t.timeout
+}
+
+func (t *commandTask) Delay() string {
+        return ""
 }
 
 func (t *commandTask) isRecurring() bool {
 	return false
 }
+
 func (t *commandTask) perform(s Scheduler) {
 	// execute remote command
 	go func() {
@@ -567,7 +597,7 @@ func (t *commandTask) perform(s Scheduler) {
 
 		var cr *resultcache.CommandResult
 
-		if ret, err := e.Export("system.run", t.params, nil); err == nil {
+		if ret, err := e.Export("system.run", t.params, t); err == nil {
 			if ret != nil {
 				cr = &resultcache.CommandResult{
 					ID:     t.id,

@@ -25,15 +25,6 @@ class CImportDataAdapterTest extends TestCase {
 	 */
 	protected $sources = [];
 
-	/**
-	 * @beforeClass prepareData
-	 */
-	public static function prepareData() {
-		global $DB;
-
-		$DB['TYPE'] = ZBX_DB_ORACLE;
-	}
-
 	public function testEmptyXml() {
 		$adapter = $this->getAdapter($this->getEmptyXml());
 
@@ -3096,9 +3087,7 @@ class CImportDataAdapterTest extends TestCase {
 
 		$source = (new CConstantImportConverter($schema))->convert($source);
 		$source = (new CDefaultImportConverter($schema))->convert($source);
-		$source = (new CImportDataNormalizer($schema))
-			->setValueMode(CXmlConstantValue::class)
-			->normalize($source);
+		$source = (new CImportDataNormalizer($schema))->normalize($source);
 
 		$adapter = new CImportDataAdapter();
 		$adapter->load($source);

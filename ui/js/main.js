@@ -409,7 +409,7 @@ var hintBox = {
 		});
 	},
 
-	createBox: function(e, target, hintText, className, isStatic, styles, appendTo) {
+	createBox: function(e, target, hintText, className, isStatic, styles, appendTo, reposition_on_resize = true) {
 		var hintboxid = hintBox.getUniqueId(),
 			box = jQuery('<div>', {'data-hintboxid': hintboxid}).addClass('overlay-dialogue wordbreak'),
 			appendTo = appendTo || '.wrapper';
@@ -490,8 +490,10 @@ var hintBox = {
 			childList: true
 		});
 
-		target.resize_observer = new ResizeObserver(() => hintBox.onResize(e, target));
-		target.resize_observer.observe(box[0]);
+		if (reposition_on_resize) {
+			target.resize_observer = new ResizeObserver(() => hintBox.onResize(e, target));
+			target.resize_observer.observe(box[0]);
+		}
 
 		return box;
 	},
@@ -510,7 +512,28 @@ var hintBox = {
 			jQuery(target).data('return-control', jQuery(e.target));
 
 			if (resizeAfterLoad) {
+				const resetSize = () => {
+					for (const css_property of ['width', 'height']) {
+						target.hintBoxItem[0].style[css_property] = null;
+					}
+				};
+
+				resetSize();
+
+				const preloader = document.createElement('div');
+				preloader.id = 'hintbox-preloader';
+				preloader.className = 'is-loading hintbox-preloader';
+
+				target.hintBoxItem[0].append(preloader);
+
+				hintText[0].style.display = 'none';
+
 				hintText.one('load', function(e) {
+					resetSize();
+
+					preloader.remove();
+					hintText[0].style.display = null;
+
 					hintBox.positionElement(e, target, target.hintBoxItem);
 				});
 			}
@@ -603,8 +626,8 @@ var hintBox = {
 			};
 
 		if ($host[0].clientWidth > hint_width) {
-			css.width = $elem.width();
-			css.height = $elem.height();
+			css.width = Math.ceil($elem.width());
+			css.height = Math.ceil($elem.height());
 		}
 
 		if (event_x + event_offset + hint_width <= host_x_max) {
@@ -644,6 +667,9 @@ var hintBox = {
 		}
 
 		hintBox.deleteHint(target);
+
+		target = target instanceof jQuery ? target[0] : target;
+
 		target.dispatchEvent(new CustomEvent('onHideHint.hintBox'));
 	},
 

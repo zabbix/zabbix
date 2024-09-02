@@ -27,6 +27,10 @@ use Facebook\WebDriver\WebDriverKeys;
  */
 class testDocumentationLinks extends CWebTest {
 
+	// LLD and host prototype for case 'Host LLD host prototype edit form'.
+	protected static $lldid;
+	protected static $host_prototypeid;
+
 	public function prepareData() {
 		self::$version = substr(ZABBIX_VERSION, 0, 3);
 
@@ -86,6 +90,33 @@ class testDocumentationLinks extends CWebTest {
 				'timeperiods' => [[]]
 			]
 		]);
+
+		// Create host prototype.
+		$response = CDataHelper::createHosts([
+			[
+				'host' => 'Host with host prototype for documentations links',
+				'groups' => [['groupid' => 4]], // Zabbix server
+				'discoveryrules' => [
+					[
+						'name' => 'Drule for documentation links check',
+						'key_' => 'drule',
+						'type' => ITEM_TYPE_TRAPPER,
+						'delay' => 0
+					]
+				]
+			]
+		]);
+		self::$lldid = $response['discoveryruleids']['Host with host prototype for documentations links:drule'];
+
+		CDataHelper::call('hostprototype.create', [
+			[
+				'host' => 'Host prototype for documentation links test {#H}',
+				'ruleid' => self::$lldid,
+				'groupLinks' => [['groupid'=> 4]] // Zabbix servers.
+			]
+		]);
+		$prototype_hostids = CDataHelper::getIds('host');
+		self::$host_prototypeid = $prototype_hostids['Host prototype for documentation links test {#H}'];
 	}
 
 	/**
@@ -475,7 +506,7 @@ class testDocumentationLinks extends CWebTest {
 			// #40 Availability report view.
 			[
 				[
-					'url' => 'report2.php',
+					'url' => 'zabbix.php?action=availabilityreport.list',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/reports/availability'
 				]
 			],
@@ -971,14 +1002,14 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'url' => 'host_prototypes.php?form=create&parent_discoveryid=15011&context=template',
-					'doc_link' => '/en/manual/vm_monitoring#host-prototypes'
+					'doc_link' => '/en/manual/discovery/low_level_discovery/host_prototypes'
 				]
 			],
 			// #89 Template LLD host prototype edit form.
 			[
 				[
 					'url' => 'host_prototypes.php?form=update&parent_discoveryid=15011&hostid=99000&context=template',
-					'doc_link' => '/en/manual/vm_monitoring#host-prototypes'
+					'doc_link' => '/en/manual/discovery/low_level_discovery/host_prototypes'
 				]
 			],
 			// #90 Template Web scenario list view.
@@ -1380,14 +1411,14 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'url' => 'host_prototypes.php?form=create&parent_discoveryid=90001&context=host',
-					'doc_link' => '/en/manual/vm_monitoring#host-prototypes'
+					'doc_link' => '/en/manual/discovery/low_level_discovery/host_prototypes'
 				]
 			],
 			// #129 Host LLD host prototype edit form.
 			[
 				[
-					'url' => 'host_prototypes.php?form=update&parent_discoveryid=90001&hostid=99200&context=host',
-					'doc_link' => '/en/manual/vm_monitoring#host-prototypes'
+					'url' => 'host_prototype',
+					'doc_link' => '/en/manual/discovery/low_level_discovery/host_prototypes'
 				]
 			],
 			// #130 Host Web scenario list view.
@@ -2672,6 +2703,11 @@ class testDocumentationLinks extends CWebTest {
 	 * @dataProvider getGeneralDocumentationLinkData
 	 */
 	public function testDocumentationLinks_checkGeneralLinks($data) {
+		if ($data['url'] === 'host_prototype') {
+			$data['url'] = 'host_prototypes.php?form=update&parent_discoveryid='.self::$lldid.
+					'&hostid='.self::$host_prototypeid.'&context=host';
+		}
+
 		$this->page->login()->open($data['url'])->waitUntilReady();
 
 		// Execute the corresponding callback function to open the form with doc link.
