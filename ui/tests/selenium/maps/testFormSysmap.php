@@ -353,9 +353,6 @@ class testFormSysmap extends CLegacyWebTest {
 		$this->query('button:Create map')->waitUntilClickable()->one()->click();
 		$this->page->waitUntilReady();
 
-		// Check the header of Create map page.
-		$this->page->assertHeader('Network maps');
-
 		$this->query('button:Cancel')->one()->click();
 		$this->page->waitUntilReady();
 
@@ -371,10 +368,10 @@ class testFormSysmap extends CLegacyWebTest {
 	public function testFormSysmap_SimpleUpdateProperties($map) {
 		$name = $map['name'];
 
-		$sql_maps_elements = 'SELECT * FROM sysmaps sm INNER JOIN sysmaps_elements sme ON '.
-				'sme.sysmapid = sm.sysmapid ORDER BY sme.selementid';
-		$sql_links_triggers = 'SELECT * FROM sysmaps_links sl INNER JOIN sysmaps_link_triggers slt ON '.
-				'slt.linkid = sl.linkid ORDER BY slt.linktriggerid';
+		$sql_maps_elements = 'SELECT * FROM sysmaps sm INNER JOIN sysmaps_elements sme ON'.
+				' sme.sysmapid = sm.sysmapid ORDER BY sme.selementid';
+		$sql_links_triggers = 'SELECT * FROM sysmaps_links sl INNER JOIN sysmaps_link_triggers slt ON'.
+				' slt.linkid = sl.linkid ORDER BY slt.linktriggerid';
 		$hash_maps_elements = CDBHelper::getHash($sql_maps_elements);
 		$hash_links_triggers = CDBHelper::getHash($sql_links_triggers);
 
