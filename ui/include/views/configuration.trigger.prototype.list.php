@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 require_once dirname(__FILE__).'/js/configuration.trigger.prototype.list.js.php';
@@ -180,7 +181,7 @@ foreach ($data['triggers'] as $trigger) {
 		CSeverityHelper::makeSeverityCell((int) $trigger['priority']),
 		(new CCol($description))->addClass(ZBX_STYLE_WORDBREAK),
 		(new CCol($trigger['opdata']))->addClass(ZBX_STYLE_WORDBREAK),
-		(new CDiv($expression))->addClass(ZBX_STYLE_WORDWRAP),
+		(new CDiv($expression))->addClass(ZBX_STYLE_WORDBREAK),
 		$status,
 		$discover,
 		$data['tags'][$triggerid]

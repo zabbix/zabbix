@@ -271,7 +271,7 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 	if ($data['show_info_column']) {
 		$info_icons = [];
 		if ($trigger['status'] == TRIGGER_STATUS_ENABLED && $trigger['error']) {
-			$info_icons[] = makeErrorIcon((new CDiv($trigger['error']))->addClass(ZBX_STYLE_WORDWRAP));
+			$info_icons[] = makeErrorIcon((new CDiv($trigger['error']))->addClass(ZBX_STYLE_WORDBREAK));
 		}
 
 		if (array_key_exists('ts_delete', $trigger['triggerDiscovery'])
@@ -335,7 +335,7 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 		$hosts,
 		(new CCol($description))->addClass(ZBX_STYLE_WORDBREAK),
 		(new CCol($trigger['opdata']))->addClass(ZBX_STYLE_WORDBREAK),
-		(new CDiv($expression))->addClass(ZBX_STYLE_WORDWRAP),
+		(new CDiv($expression))->addClass(ZBX_STYLE_WORDBREAK),
 		$status,
 		$data['show_info_column'] ? makeInformationList($info_icons) : null,
 		$data['tags'][$triggerid]

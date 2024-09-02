@@ -280,7 +280,7 @@ function makeItemSubfilter(array &$filter_data, array $items, string $context) {
 		}
 
 		// state
-		if ($context === 'host' && $filter_data['filter_state'] == -1) {
+		if ($context === 'host' && $filter_data['filter_state'] == -1 && $item['status'] == ITEM_STATUS_ACTIVE) {
 			if (!isset($item_params['state'][$item['state']])) {
 				$item_params['state'][$item['state']] = [
 					'name' => itemState($item['state']),
@@ -1450,12 +1450,12 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 
 			case ZBX_PREPROC_VALIDATE_NOT_SUPPORTED:
 				$on_fail
-					->setEnabled(false)
+					->setReadonly(true)
 					->setChecked(true);
 				break;
 
 			default:
-				$on_fail->setEnabled(!$readonly);
+				$on_fail->setReadonly($readonly);
 
 				if ($step['error_handler'] != ZBX_PREPROC_FAIL_DEFAULT) {
 					$on_fail->setChecked(true);
