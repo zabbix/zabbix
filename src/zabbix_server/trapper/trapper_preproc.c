@@ -21,6 +21,7 @@
 
 #include "preproc.h"
 #include "../preprocessor/preproc_history.h"
+#include "../preprocessor/item_preproc.h"
 #include "trapper_auth.h"
 
 #define ZBX_STATE_NOT_SUPPORTED	1

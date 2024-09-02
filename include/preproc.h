@@ -56,7 +56,6 @@ int	zbx_preprocessor_test(unsigned char value_type, const char *value, const zbx
 
 int	zbx_preprocessor_get_diag_stats(int *total, int *queued, int *processing, int *done,
 		int *pending, char **error);
-int	zbx_item_preproc_handle_error(zbx_variant_t *value, const zbx_preproc_op_t *op, char **error);
 
 int	zbx_preprocessor_get_top_items(int limit, zbx_vector_ptr_t *items, char **error);
 int	zbx_preprocessor_get_top_oldest_preproc_items(int limit, zbx_vector_ptr_t *items, char **error);

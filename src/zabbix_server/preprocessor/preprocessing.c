@@ -1250,7 +1250,7 @@ static void	agent_result_set_value(zbx_variant_t *value, zbx_item_value_type_t v
 			type = ZBX_VARIANT_STR;
 	}
 
-	if (value->type == ZBX_VARIANT_ERR)
+	if (ZBX_VARIANT_ERR == value->type)
 	{
 		*error = zbx_strdup(NULL, value->data.err);
 		return;
