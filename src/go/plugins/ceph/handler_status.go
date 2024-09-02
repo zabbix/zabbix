@@ -16,11 +16,53 @@ package ceph
 
 import (
 	"encoding/json"
-	"fmt"
 	"strings"
 
-	"golang.zabbix.com/sdk/zbxerr"
+	"golang.zabbix.com/sdk/errs"
 )
+
+// pgStates is a list of all possible placement group states according to the Ceph's documentation.
+// https://docs.ceph.com/en/octopus/rados/operations/pg-states/
+var pgStates = []string{
+	"creating",
+	"activating",
+	"active",
+	"clean",
+	"down",
+	"laggy",
+	"wait",
+	"scrubbing",
+	"deep",
+	"degraded",
+	"inconsistent",
+	"peering",
+	"repair",
+	"recovering",
+	"forced_recovery",
+	"recovery_wait",
+	"recovery_toofull",
+	"recovery_unfound",
+	"backfilling",
+	"forced_backfill",
+	"backfill_wait",
+	"backfill_toofull",
+	"backfill_unfound",
+	"incomplete",
+	"stale",
+	"remapped",
+	"undersized",
+	"peered",
+	"snaptrim",
+	"snaptrim_wait",
+	"snaptrim_error",
+	"unknown",
+}
+
+var healthMap = map[string]int8{
+	"HEALTH_OK":   0,
+	"HEALTH_WARN": 1,
+	"HEALTH_ERR":  2,
+}
 
 type cephStatus struct {
 	PgMap struct {
@@ -33,14 +75,20 @@ type cephStatus struct {
 	Health struct {
 		Status string `json:"status"`
 	} `json:"health"`
-	OsdMap struct {
-		NumOsds   uint64 `json:"num_osds"`
-		NumInOsds uint64 `json:"num_in_osds"`
-		NumUpOsds uint64 `json:"num_up_osds"`
+	OSDMap struct {
+		NumOsds   *uint64 `json:"num_osds"`
+		NumInOsds *uint64 `json:"num_in_osds"`
+		NumUpOsds *uint64 `json:"num_up_osds"`
+		OSDMap    *struct {
+			NumOsds   uint64 `json:"num_osds"`
+			NumInOsds uint64 `json:"num_in_osds"`
+			NumUpOsds uint64 `json:"num_up_osds"`
+		} `json:"osdmap"`
 	} `json:"osdmap"`
 	MonMap struct {
-		NumMons           uint64 `json:"num_mons"`
-		MinMonReleaseName string `json:"min_mon_release_name"`
+		NumMons           *uint64    `json:"num_mons"`
+		MinMonReleaseName string     `json:"min_mon_release_name"`
+		Mons              []struct{} `json:"mons"`
 	} `json:"monmap"`
 }
 
@@ -55,67 +103,78 @@ type outStatus struct {
 	MinMonReleaseName string            `json:"min_mon_release_name"`
 }
 
-// pgStates is a list of all possible placement group states according to the Ceph's documentation.
-// https://docs.ceph.com/en/octopus/rados/operations/pg-states/
-var pgStates = []string{"creating", "activating", "active", "clean", "down", "laggy", "wait", "scrubbing", "deep",
-	"degraded", "inconsistent", "peering", "repair", "recovering", "forced_recovery", "recovery_wait",
-	"recovery_toofull", "recovery_unfound", "backfilling", "forced_backfill", "backfill_wait", "backfill_toofull",
-	"backfill_unfound", "incomplete", "stale", "remapped", "undersized", "peered", "snaptrim", "snaptrim_wait",
-	"snaptrim_error", "unknown"}
-
-var healthMap = map[string]int8{
-	"HEALTH_OK":   0,
-	"HEALTH_WARN": 1,
-	"HEALTH_ERR":  2,
-}
-
 // statusHandler returns data provided by "status" command.
-func statusHandler(data map[command][]byte) (interface{}, error) {
-	var status cephStatus
+func statusHandler(data map[command][]byte) (any, error) {
+	cStatus := &cephStatus{}
 
-	err := json.Unmarshal(data[cmdStatus], &status)
+	err := json.Unmarshal(data[cmdStatus], cStatus)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotUnmarshalJSON.Wrap(err)
+		return nil, errs.Wrap(err, "failed to unmarshal status output")
 	}
 
-	var intHealth int8
-
-	if val, ok := healthMap[status.Health.Status]; ok {
-		intHealth = val
-	} else {
-		return nil, zbxerr.ErrorCannotParseResult.Wrap(fmt.Errorf("unknown health status %q", status.Health.Status))
+	intHealth, ok := healthMap[cStatus.Health.Status]
+	if !ok {
+		return nil, errs.Errorf(
+			"unknown health status %q", cStatus.Health.Status,
+		)
 	}
 
-	var pgStats = make(map[string]uint64)
+	pgStats := make(map[string]uint64)
 
 	for _, s := range pgStates {
 		pgStats[s] = 0
 	}
 
-	for _, pbs := range status.PgMap.PgsByState {
+	for _, pbs := range cStatus.PgMap.PgsByState {
 		for _, s := range strings.Split(pbs.StateName, "+") {
 			if _, ok := pgStats[s]; ok {
 				pgStats[s] += pbs.Count
 			} else {
-				return nil, zbxerr.ErrorCannotParseResult.Wrap(fmt.Errorf("unknown pg state %q", s))
+				return nil, errs.Errorf("unknown pg state %q", s)
 			}
 		}
 	}
 
-	out := outStatus{
+	status := outStatus{
 		OverallStatus:     intHealth,
-		NumMon:            status.MonMap.NumMons,
-		NumOsd:            status.OsdMap.NumOsds,
-		NumOsdIn:          status.OsdMap.NumInOsds,
-		NumOsdUp:          status.OsdMap.NumUpOsds,
-		NumPg:             status.PgMap.NumPgs,
+		NumPg:             cStatus.PgMap.NumPgs,
 		PgStates:          pgStats,
-		MinMonReleaseName: status.MonMap.MinMonReleaseName,
+		MinMonReleaseName: cStatus.MonMap.MinMonReleaseName,
 	}
 
-	jsonRes, err := json.Marshal(out)
+	switch {
+	case cStatus.MonMap.NumMons != nil:
+		status.NumMon = *cStatus.MonMap.NumMons
+	case cStatus.MonMap.Mons != nil:
+		status.NumMon = uint64(len(cStatus.MonMap.Mons))
+	default:
+		return nil, errs.New(
+			"unable to get data for num_mon: " +
+				"both monmap.num_mons and monmap.mons are empty",
+		)
+	}
+
+	switch {
+	case cStatus.OSDMap.NumOsds != nil &&
+		cStatus.OSDMap.NumInOsds != nil &&
+		cStatus.OSDMap.NumUpOsds != nil:
+		status.NumOsd = *cStatus.OSDMap.NumOsds
+		status.NumOsdIn = *cStatus.OSDMap.NumInOsds
+		status.NumOsdUp = *cStatus.OSDMap.NumUpOsds
+	case cStatus.OSDMap.OSDMap != nil:
+		status.NumOsd = cStatus.OSDMap.OSDMap.NumOsds
+		status.NumOsdIn = cStatus.OSDMap.OSDMap.NumInOsds
+		status.NumOsdUp = cStatus.OSDMap.OSDMap.NumUpOsds
+	default:
+		return nil, errs.New(
+			"unable to get data for num_osd, num_osd_in and num_osd_up: " +
+				"both osdmap.num_* and osdmap.osdmap.num_* are empty",
+		)
+	}
+
+	jsonRes, err := json.Marshal(status)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotMarshalJSON.Wrap(err)
+		return nil, errs.Wrap(err, "failed to marshal status output")
 	}
 
 	return string(jsonRes), nil

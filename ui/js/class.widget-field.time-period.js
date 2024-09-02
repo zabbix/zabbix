@@ -108,19 +108,21 @@ class CWidgetFieldTimePeriod {
 		if (CWidgetBase.FOREIGN_REFERENCE_KEY in value) {
 			const {reference} = CWidgetBase.parseTypedReference(value[CWidgetBase.FOREIGN_REFERENCE_KEY]);
 
-			if (reference === CDashboard.REFERENCE_DASHBOARD) {
-				this.#data_source = CWidgetFieldTimePeriod.DATA_SOURCE_DASHBOARD;
-			}
-			else {
-				this.#data_source = CWidgetFieldTimePeriod.DATA_SOURCE_WIDGET;
-			}
+			this.#data_source = reference === CDashboard.REFERENCE_DASHBOARD
+				? CWidgetFieldTimePeriod.DATA_SOURCE_DASHBOARD
+				: CWidgetFieldTimePeriod.DATA_SOURCE_WIDGET;
 
 			this.#selectTypedReference(value[CWidgetBase.FOREIGN_REFERENCE_KEY]);
 		}
 		else {
-			this.#data_source = CWidgetFieldTimePeriod.DATA_SOURCE_DEFAULT;
-			this.#date_from_input.value = value.from;
-			this.#date_to_input.value = value.to;
+			this.#data_source = 'data_source' in value
+				? Number(value.data_source)
+				: CWidgetFieldTimePeriod.DATA_SOURCE_DEFAULT;
+
+			if (this.#data_source === CWidgetFieldTimePeriod.DATA_SOURCE_DEFAULT) {
+				this.#date_from_input.value = value.from;
+				this.#date_to_input.value = value.to;
+			}
 		}
 
 		this.#updateField();

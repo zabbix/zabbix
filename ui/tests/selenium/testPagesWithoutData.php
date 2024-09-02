@@ -19,7 +19,7 @@ require_once dirname(__FILE__).'/../include/CWebTest.php';
 /**
  * Test for checking empty pages and tables.
  *
- * @onBefore prepareEmptyData
+ * @onBefore clearData, prepareEmptyData
  *
  * @backup profiles
  */
@@ -41,6 +41,17 @@ class testPagesWithoutData extends CWebTest {
 	 */
 	public function getBehaviors() {
 		return [CTableBehavior::class];
+	}
+
+	/**
+	 * Function for finding and deleting data created before with previous tests.
+	 */
+	public function clearData() {
+		// Delete SLA.
+		$slaids = CDBHelper::getColumn('SELECT * FROM sla', 'slaid');
+		if ($slaids !== []) {
+			CDataHelper::call('sla.delete', array_values($slaids));
+		}
 	}
 
 	public function prepareEmptyData() {

@@ -18,5 +18,6 @@
 #include "zbxembed.h"
 
 int	zbx_es_init_httprequest(zbx_es_t *es, char **error);
+void	es_httprequest_free(void *data);
 
 #endif
