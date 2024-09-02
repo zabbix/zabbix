@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-08-06 01:58+0000\n"
+"PO-Revision-Date: 2024-08-27 01:48+0000\n"
 "Last-Translator: NoYoWiFi <1284524409@qq.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_CN\n"
@@ -21790,7 +21790,7 @@ msgstr "用户不能将自己加进一个取消的群组或已关闭图形接口
 #: include/classes/api/services/CUserGroup.php:673
 #: include/classes/api/services/CUser.php:843
 msgid "User cannot add oneself to a disabled group or a group with disabled GUI access."
-msgstr ""
+msgstr "用户无法将自己添加到已禁用的组或图形用户界面访问已禁用的组中。"
 
 #: app/views/administration.user.edit.php:461
 #: include/classes/api/services/CUser.php:980
@@ -21927,7 +21927,7 @@ msgstr "用户是不允许删除自己"
 
 #: include/classes/api/services/CUser.php:1837
 msgid "User is not allowed to delete oneself."
-msgstr ""
+msgstr "用户不允许删除自己。"
 
 #: app/views/administration.authentication.edit.php:462
 #: app/views/popup.ldap.edit.php:222

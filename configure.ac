@@ -34,7 +34,7 @@ dnl *                     Checks for programs                       *
 dnl *                                                               *
 dnl *****************************************************************
 
-AC_PROG_CC([cc c99 gcc clang])
+AC_PROG_CC
 AM_PROG_CC_C_O
 
 dnl *****************************************************************
@@ -1550,8 +1550,6 @@ if test "x$have_ipcservice" = "xyes"; then
 	LIBEVENT_CHECK_CONFIG([no])
 	if test "x$found_libevent" != "xyes"; then
 		AC_MSG_ERROR([Unable to use libevent (libevent check failed)])
-	elif test "x$accept_libevent_version" != "xyes"; then
-		AC_MSG_ERROR([Libevent library version requirement not met (>= 2.0.10)])
 	fi
 
 	SERVER_LDFLAGS="$SERVER_LDFLAGS $LIBEVENT_LDFLAGS"

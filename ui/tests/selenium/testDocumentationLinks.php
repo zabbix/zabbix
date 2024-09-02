@@ -1002,14 +1002,14 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'url' => 'host_prototypes.php?form=create&parent_discoveryid=15011&context=template',
-					'doc_link' => '/en/manual/vm_monitoring#host-prototypes'
+					'doc_link' => '/en/manual/discovery/low_level_discovery/host_prototypes'
 				]
 			],
 			// #89 Template LLD host prototype edit form.
 			[
 				[
 					'url' => 'host_prototypes.php?form=update&parent_discoveryid=15011&hostid=99000&context=template',
-					'doc_link' => '/en/manual/vm_monitoring#host-prototypes'
+					'doc_link' => '/en/manual/discovery/low_level_discovery/host_prototypes'
 				]
 			],
 			// #90 Template Web scenario list view.
@@ -1411,14 +1411,14 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'url' => 'host_prototypes.php?form=create&parent_discoveryid=90001&context=host',
-					'doc_link' => '/en/manual/vm_monitoring#host-prototypes'
+					'doc_link' => '/en/manual/discovery/low_level_discovery/host_prototypes'
 				]
 			],
 			// #129 Host LLD host prototype edit form.
 			[
 				[
 					'url' => 'host_prototype',
-					'doc_link' => '/en/manual/vm_monitoring#host-prototypes'
+					'doc_link' => '/en/manual/discovery/low_level_discovery/host_prototypes'
 				]
 			],
 			// #130 Host Web scenario list view.
