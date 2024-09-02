@@ -322,5 +322,13 @@
             "parameters": ["([a])([b])([c])([d])([e])([f])([g])([h])([i])([j])([k])", "X\\30"]
         },
         "result": "Xc0"
+    },
+    {
+        "value": "abcdefghijk",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["([a])([b])([c])([d])([e])([f])([g])([h])([i])([j])([k])", "X\\0"]
+        },
+        "result": "Xabcdefghijk"
     }
 ]
