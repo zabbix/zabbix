@@ -485,7 +485,7 @@ const struct tm	*zbx_localtime_now(const time_t *time)
  * Return value: Universal Coordinate Time                                    *
  *                                                                            *
  ******************************************************************************/
-time_t	*zbx_mktime(struct tm *time, const char *tz)
+time_t	zbx_mktime(struct tm *time, const char *tz)
 {
 #if defined(HAVE_GETENV) && defined(HAVE_PUTENV) && defined(HAVE_UNSETENV) && defined(HAVE_TZSET) && \
 		!defined(_WINDOWS) && !defined(__MINGW32__)
