@@ -73,7 +73,7 @@ Additional resources:
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
 |Failed to get Overall Health VC State|<p>Failed to get data. Check debug log for more information.</p>|`length(last(/VMware FQDN/vmware.health.check))>0`|Warning||
-|Overall Health VC State is not Green|<p>One or more components in the appliance might be in an unusable status and the appliance might soon become unresponsive.</p>|`last(/VMware FQDN/vmware.health.state)>0`|Average||
+|Overall Health VC State is not Green|<p>One or more components in the appliance might be in an unusable status and the appliance might soon become unresponsive.</p>|`last(/VMware FQDN/vmware.health.state)>0 and last(/VMware FQDN/vmware.health.state)<>6`|Average||
 
 ### LLD rule VMware alarm discovery
 
