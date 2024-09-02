@@ -389,27 +389,27 @@ class CItem extends CItemGeneral {
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-		$res = DBselect(self::createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
+		$resource = DBselect(self::createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 
 		$result = [];
 
 		if ($options['countOutput']) {
 			if ($options['groupCount']) {
-				while ($item = DBfetch($res)) {
+				while ($item = DBfetch($resource)) {
 					$result[] = $item;
 				}
 
 				return $result;
 			}
 
-			return DBfetch($res)['rowscount'];
+			return DBfetch($resource)['rowscount'];
 		}
 
 		$_result = [];
 		$item = false;
 
 		do {
-			while (count($_result) < CItemGeneral::CHUNK_SIZE && $item = DBfetch($res)) {
+			while (count($_result) < CItemGeneral::CHUNK_SIZE && $item = DBfetch($resource)) {
 				// Items share table with item prototypes. Therefore remove item unrelated fields.
 				unset($item['discover']);
 
