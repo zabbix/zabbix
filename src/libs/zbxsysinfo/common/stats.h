@@ -20,6 +20,10 @@
 #	include "zbxnix.h"
 #endif
 
+#ifdef _AIX
+#	include "../sysinfo.h"
+#endif
+
 #include "cpustat.h"
 
 #if defined(HAVE_KSTAT_H) && defined(HAVE_VMINFO_T_UPDATES)	/* Solaris */
