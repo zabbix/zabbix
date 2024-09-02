@@ -168,7 +168,7 @@ $form_grid->addItem([
 $header_row = [
 	'',
 	_('Threshold'),
-	(new CColHeader(_('Action')))->setWidth('100%')
+	(new CColHeader(''))->setWidth('100%')
 ];
 
 $thresholds = (new CDiv(

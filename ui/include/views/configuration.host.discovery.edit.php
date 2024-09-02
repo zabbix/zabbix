@@ -123,7 +123,7 @@ $parameters_table = (new CTable())
 	->setHeader([
 		(new CColHeader(_('Name')))->setWidth('50%'),
 		(new CColHeader(_('Value')))->setWidth('50%'),
-		_('Action')
+		''
 	])
 	->setAttribute('style', 'width: 100%;');
 

@@ -392,7 +392,7 @@ $message_templates_form_grid = (new CFormGrid())
 				->setHeader([
 					_('Message type'),
 					_('Template'),
-					_('Action')
+					_('Actions')
 				])
 				->addItem(
 					(new CTag('tfoot', true))

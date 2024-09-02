@@ -24,10 +24,16 @@ $operations_table = (new CTable())
 	->setAttribute('style', 'width: 100%;');
 
 if (in_array($data['eventsource'], [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE])) {
-	$operations_table->setHeader([_('Steps'), _('Details'), _('Start in'), _('Duration'), _('Actions')]);
+	$operations_table->setHeader([
+		_('Steps'),
+		_('Details'),
+		_('Start in'),
+		_('Duration'),
+		(new CColHeader(_('Actions')))->setWidth('90px')
+	]);
 }
 else {
-	$operations_table->setHeader([_('Details'), _('Action')]);
+	$operations_table->setHeader([_('Details'), (new CColHeader(_('Actions')))->setWidth('90px')]);
 }
 
 if (array_key_exists('descriptions', $data)) {
