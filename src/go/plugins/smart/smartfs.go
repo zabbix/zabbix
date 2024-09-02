@@ -226,7 +226,6 @@ type table struct {
 }
 
 type runner struct {
-	plugin      *Plugin
 	devices     map[string]deviceParser
 	jsonDevices map[string]jsonDevice
 }
@@ -242,9 +241,7 @@ func (p *Plugin) execute(jsonRunner bool) (*runner, error) {
 		return nil, err
 	}
 
-	r := &runner{
-		plugin: p,
-	}
+	r := &runner{}
 
 	if jsonRunner {
 		r.jsonDevices = make(map[string]jsonDevice)

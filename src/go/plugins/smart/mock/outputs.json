@@ -1475,7 +1475,7 @@
       }
     }
   },
-  "stas_gen_with_2_basic_devices": {
+  "manually_created_2_basic_devices": {
     "version": {},
     "all_devices_scan": {
       "json_format_version": [1, 0],

@@ -88,7 +88,7 @@ func TestPlugin_execute(t *testing.T) {
 				{
 					args: []string{"--scan", "-j"},
 					err:  nil,
-					out:  mock.Outputs.Get("stas_gen_with_2_basic_devices").AllDevicesScan,
+					out:  mock.Outputs.Get("manually_created_2_basic_devices").AllDevicesScan,
 				},
 				{
 					args: []string{"--scan", "-d", "sat", "-j"},
@@ -98,12 +98,12 @@ func TestPlugin_execute(t *testing.T) {
 				{
 					args: []string{"-a", "/dev/sda", "-j"},
 					err:  nil,
-					out:  mock.Outputs.Get("stas_gen_with_2_basic_devices").AllSmartInfoScans.Get("-a /dev/sda -j"),
+					out:  mock.Outputs.Get("manually_created_2_basic_devices").AllSmartInfoScans.Get("-a /dev/sda -j"),
 				},
 				{
 					args: []string{"-a", "/dev/sdb", "-j"},
 					err:  nil,
-					out:  mock.Outputs.Get("stas_gen_with_2_basic_devices").AllSmartInfoScans.Get("-a /dev/sdb -j"),
+					out:  mock.Outputs.Get("manually_created_2_basic_devices").AllSmartInfoScans.Get("-a /dev/sdb -j"),
 				},
 			},
 			&runner{
@@ -203,7 +203,7 @@ func TestPlugin_execute(t *testing.T) {
 			false,
 		},
 		{
-			"+multiple",
+			"+basicMultipleDevices",
 			args{
 				jsonRunner: false,
 			},
@@ -301,7 +301,7 @@ func TestPlugin_execute(t *testing.T) {
 			false,
 		},
 		{
-			"+mac",
+			"+basicMac",
 			args{
 				jsonRunner: false,
 			},
@@ -426,7 +426,6 @@ func TestPlugin_execute(t *testing.T) {
 			args{
 				jsonRunner: false,
 			},
-			//nolint:dupl
 			[]expectation{
 				{
 					args: []string{"--scan", "-j"},
@@ -555,7 +554,6 @@ func TestPlugin_execute(t *testing.T) {
 			args{
 				jsonRunner: true,
 			},
-			//nolint:dupl
 			[]expectation{
 				{
 					args: []string{"--scan", "-j"},
@@ -720,7 +718,7 @@ func TestPlugin_execute(t *testing.T) {
 				{
 					args: []string{"--scan", "-j"},
 					err:  nil,
-					out:  mock.Outputs.Get("stas_gen_with_2_basic_devices").AllDevicesScan,
+					out:  mock.Outputs.Get("manually_created_2_basic_devices").AllDevicesScan,
 				},
 				{
 					args: []string{"--scan", "-d", "sat", "-j"},
@@ -730,7 +728,7 @@ func TestPlugin_execute(t *testing.T) {
 				{
 					args: []string{"-a", "/dev/sda", "-j"},
 					err:  errs.New("unknown error"),
-					out:  mock.Outputs.Get("stas_gen_with_2_basic_devices").AllSmartInfoScans.Get("-a /dev/sda -j"),
+					out:  mock.Outputs.Get("manually_created_2_basic_devices").AllSmartInfoScans.Get("-a /dev/sda -j"),
 				},
 			},
 			nil,
@@ -798,7 +796,7 @@ func TestPlugin_execute(t *testing.T) {
 				{
 					args: []string{"--scan", "-j"},
 					err:  nil,
-					out:  mock.Outputs.Get("stas_gen_with_2_basic_devices").AllDevicesScan,
+					out:  mock.Outputs.Get("manually_created_2_basic_devices").AllDevicesScan,
 				},
 				{
 					args: []string{"--scan", "-d", "sat", "-j"},
@@ -832,7 +830,7 @@ func TestPlugin_execute(t *testing.T) {
 				{
 					args: []string{"-a", "/dev/sdb", "-j"},
 					err:  nil,
-					out:  mock.Outputs.Get("stas_gen_with_2_basic_devices").AllSmartInfoScans.Get("-a /dev/sdb -j"),
+					out:  mock.Outputs.Get("manually_created_2_basic_devices").AllSmartInfoScans.Get("-a /dev/sdb -j"),
 				},
 			},
 			&runner{
@@ -877,10 +875,6 @@ func TestPlugin_execute(t *testing.T) {
 			r, err := plugin.execute(tt.args.jsonRunner)
 			if (err != nil) != tt.wantErr {
 				t.Fatalf("Plugin.execute() error = %v, wantErr %v", err, tt.wantErr)
-			}
-
-			if r != nil {
-				r.plugin = nil
 			}
 
 			if diff := cmp.Diff(
@@ -1929,9 +1923,9 @@ func Test_setDeviceData(t *testing.T) {
 	}
 
 	tests := []struct {
-		name          string
-		arguments     args
-		expectedState *runner
+		name       string
+		args       args
+		wantRunner *runner
 	}{
 		{
 			"+validJsonRunner",
@@ -2020,10 +2014,10 @@ func Test_setDeviceData(t *testing.T) {
 				jsonDevices: make(map[string]jsonDevice),
 			}
 
-			r.setDevicesData(tt.arguments.data, tt.arguments.jsonRunner)
+			r.setDevicesData(tt.args.data, tt.args.jsonRunner)
 
 			if diff := cmp.Diff(
-				tt.expectedState,
+				tt.wantRunner,
 				r,
 				cmp.AllowUnexported(jsonDevice{}, deviceInfo{}, runner{}),
 			); diff != "" {
@@ -2046,10 +2040,10 @@ func Test_runner_parseOutput(t *testing.T) {
 	}
 
 	tests := []struct {
-		name          string
-		args          args
-		initialState  fields
-		expectedState runner
+		name       string
+		args       args
+		fields     fields
+		wantRunner runner
 	}{
 		{
 			"+validJSONRunner",
@@ -2202,7 +2196,7 @@ func Test_runner_parseOutput(t *testing.T) {
 			},
 		},
 		{
-			"-prevData",
+			"-dataDifferenceLoss",
 			args{
 				true,
 			},
@@ -2225,15 +2219,15 @@ func Test_runner_parseOutput(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			r := &runner{
-				devices:     tt.initialState.devices,
-				jsonDevices: tt.initialState.jsonDevices,
+				devices:     tt.fields.devices,
+				jsonDevices: tt.fields.jsonDevices,
 			}
 
 			r.parseOutput(tt.args.jsonRunner)
 
 			if diff := cmp.Diff(
 				*r,
-				tt.expectedState,
+				tt.wantRunner,
 				cmp.AllowUnexported(jsonDevice{}, deviceInfo{}, runner{}),
 			); diff != "" {
 				t.Fatalf("runner.parseOutput() runner = %s", diff)
