@@ -88,8 +88,6 @@ class CItem extends CItemGeneral {
 	 * @return array|int item data as array or false if error
 	 */
 	public function get($options = []) {
-		$result = [];
-
 		$sqlParts = [
 			'select'	=> ['items' => 'i.itemid'],
 			'from'		=> ['items' => 'items i'],
@@ -411,17 +409,16 @@ class CItem extends CItemGeneral {
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect(self::createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 
-		if ($options['countOutput']) {
-			while ($item = DBfetch($res)) {
-				// Items share table with item prototypes. Therefore remove item unrelated fields.
-				unset($item['discover']);
+		$result = [];
 
-				if ($options['groupCount']) {
+		if ($options['countOutput']) {
+			if ($options['groupCount']) {
+				while ($item = DBfetch($res)) {
 					$result[] = $item;
 				}
-				else {
-					$result = $item['rowscount'];
-				}
+			}
+			else {
+				$result = DBfetch($res)['rowscount'];
 			}
 
 			return $result;
