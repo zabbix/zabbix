@@ -335,7 +335,7 @@ zabbix_export:
               value: health
           triggers:
             - uuid: 426ea642132848b8b77d42d2235c244c
-              expression: 'last(/VMware FQDN/vmware.health.state)>0'
+              expression: 'last(/VMware FQDN/vmware.health.state)>0 and last(/VMware FQDN/vmware.health.state)<>6'
               name: 'Overall Health VC State is not Green'
               opdata: 'Current Overall Health VC State: {ITEM.LASTVALUE}'
               priority: AVERAGE
