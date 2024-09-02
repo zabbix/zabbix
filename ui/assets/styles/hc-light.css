@@ -1,5 +1,6 @@
 @charset "UTF-8";
-.sidebar .server-name, .dashboard-navigation-tabs .sortable li div span, .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .sortable li div span, .dashboard-grid-widget-header h4, .dashboard-grid-iterator-header h4, .list-table .action-container .link-action, div.dashboard-widget-map .btn-back-map-container a:focus .btn-back-map .btn-back-map-content, div.dashboard-widget-map .btn-back-map-container a:hover .btn-back-map .btn-back-map-content, form.dashboard-widget-tophosts #list_columns .text, .menu-popup .menu-popup-item, .menu-popup h3, .notif-body h4, .overlay-descr-url, .tag, .overflow-ellipsis, .overflow-ellipsis td:not(.wordbreak, .wordwrap), .overflow-ellipsis th, .overflow-ellipsis th a {
+.sidebar .server-name, .dashboard-navigation-tabs .sortable li div span, .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .sortable li div span, .dashboard-grid-widget-header h4, .dashboard-grid-iterator-header h4, .list-table .action-container .link-action, div.dashboard-widget-map .btn-back-map-container a:focus .btn-back-map .btn-back-map-content, div.dashboard-widget-map .btn-back-map-container a:hover .btn-back-map .btn-back-map-content, form.dashboard-widget-tophosts #list_columns .text, .menu-popup .menu-popup-item, .menu-popup h3, .notif-body h4, .overlay-descr-url, .tag, .overflow-ellipsis, .overflow-ellipsis td:not(.wordbreak, .wordwrap), .overflow-ellipsis th, .overflow-ellipsis th a, .totals-list.totals-list-horizontal .count,
+.totals-list.totals-list-horizontal .name {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap; }
@@ -5408,6 +5409,12 @@ form.is-loading {
   white-space: pre-wrap;
   word-break: break-word; }
 
+.line-clamp {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: var(--line-clamp); }
+
 .filter-btn-container {
   position: relative;
   text-align: right; }
@@ -6326,7 +6333,7 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
   min-height: 24px;
   overflow: hidden;
   resize: none;
-  word-break: break-all;
+  word-break: break-word;
   height: 24px;
   line-height: 14px;
   white-space: break-spaces; }
@@ -7213,8 +7220,7 @@ svg {
   flex: 1;
   align-items: center;
   display: flex;
-  line-height: 18px;
-  overflow: hidden;
+  line-height: 20px;
   padding: 0 10px;
   position: relative; }
 .totals-list .count {
@@ -7224,13 +7230,18 @@ svg {
   justify-content: center;
   min-width: 55px;
   text-align: center; }
+.totals-list.totals-list-horizontal .count,
+.totals-list.totals-list-horizontal .name {
+  width: 100%; }
 .totals-list.totals-list-vertical {
-  flex-direction: column; }
+  flex-direction: column;
+  min-width: min-content; }
   .totals-list.totals-list-vertical > div {
-    min-height: 21px;
-    padding-top: 3px; }
-  .totals-list.totals-list-vertical .count {
-    margin-right: 5px; }
+    column-gap: 5px;
+    min-height: 20px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    white-space: nowrap; }
 
 .macro-input-group {
   position: relative;
