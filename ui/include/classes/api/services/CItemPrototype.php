@@ -70,8 +70,6 @@ class CItemPrototype extends CItemGeneral {
 	 * Get ItemPrototype data.
 	 */
 	public function get($options = []) {
-		$result = [];
-
 		$sqlParts = [
 			'select'	=> ['items' => 'i.itemid'],
 			'from'		=> ['items' => 'items i'],
@@ -275,14 +273,16 @@ class CItemPrototype extends CItemGeneral {
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect(self::createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 
+		$result = [];
+
 		if ($options['countOutput']) {
-			while ($item = DBfetch($res)) {
-				if ($options['groupCount']) {
+			if ($options['groupCount']) {
+				while ($item = DBfetch($res)) {
 					$result[] = $item;
 				}
-				else {
-					$result = $item['rowscount'];
-				}
+			}
+			else {
+				$result = DBfetch($res)['rowscount'];
 			}
 
 			return $result;
