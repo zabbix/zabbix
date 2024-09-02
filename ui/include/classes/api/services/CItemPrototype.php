@@ -273,12 +273,11 @@ class CItemPrototype extends CItemGeneral {
 				while ($item = DBfetch($res)) {
 					$result[] = $item;
 				}
-			}
-			else {
-				$result = DBfetch($res)['rowscount'];
+
+				return $result;
 			}
 
-			return $result;
+			return DBfetch($res)['rowscount'];
 		}
 
 		$_result = [];
