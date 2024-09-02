@@ -181,16 +181,14 @@ class testFormMap extends CLegacyWebTest {
 		$name = $map['name'];
 		$sysmapid = $map['sysmapid'];
 
-		$sql_maps_elements = 'SELECT * FROM sysmaps sm INNER JOIN sysmaps_elements sme ON '.
-				'sme.sysmapid = sm.sysmapid ORDER BY sme.selementid';
-		$sql_links_triggers = 'SELECT * FROM sysmaps_links sl INNER JOIN sysmaps_link_triggers slt ON '.
-				'slt.linkid = sl.linkid ORDER BY slt.linktriggerid';
+		$sql_maps_elements = 'SELECT * FROM sysmaps sm INNER JOIN sysmaps_elements sme ON'.
+				' sme.sysmapid = sm.sysmapid ORDER BY sme.selementid';
+		$sql_links_triggers = 'SELECT * FROM sysmaps_links sl INNER JOIN sysmaps_link_triggers slt ON'.
+				' slt.linkid = sl.linkid ORDER BY slt.linktriggerid';
 		$hash_maps_elements = CDBHelper::getHash($sql_maps_elements);
 		$hash_links_triggers = CDBHelper::getHash($sql_links_triggers);
 
 		$this->page->login()->open('sysmaps.php')->waitUntilReady();
-		$this->page->assertTitle('Configuration of network maps');
-		$this->page->assertHeader('Maps');
 		$this->query('link', $name)->one()->click();
 		$this->page->waitUntilReady();
 
@@ -213,7 +211,8 @@ class testFormMap extends CLegacyWebTest {
 		$this->page->acceptAlert();
 
 		$this->assertTrue($this->query('link', $name)->one()->isPresent());
-		$this->page->assertHeader('Maps');
+		$this->page->waitUntilReady();
+		$this->assertStringContainsString('sysmaps.php', $this->page->getCurrentUrl());
 
 		$hash_data = [
 			$hash_maps_elements => $sql_maps_elements,

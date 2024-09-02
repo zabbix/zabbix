@@ -522,7 +522,6 @@ class testPageMaps extends CWebTest {
 
 		// Sysmap count that will be selected before delete action.
 		$map_names = CTestArrayHelper::get($data, 'name', []);
-		$count_names = count($map_names);
 		$this->selectTableRows($map_names);
 		$this->query('button:Delete')->one()->waitUntilClickable()->click();
 		$this->assertEquals('Delete selected maps?', $this->page->getAlertText());
@@ -532,7 +531,7 @@ class testPageMaps extends CWebTest {
 		$this->assertSelectedCount(0);
 
 		$all = CDBHelper::getCount(self::SYSMAPS_SQL);
-		$db_check = ($count_names > 0)
+		$db_check = (count($map_names) > 0)
 			? CDBHelper::getCount('SELECT NULL FROM sysmaps WHERE name IN ('.CDBHelper::escape($data['name']).')')
 			: $all;
 		$this->assertEquals(0, $db_check);
