@@ -31,7 +31,7 @@ func main() {
 		panic(fmt.Sprintf("failed to create plugin handler %s", err.Error()))
 	}
 
-	impl.Logger = &h
+	impl.Logger = h
 
 	err = h.Execute()
 	if err != nil {

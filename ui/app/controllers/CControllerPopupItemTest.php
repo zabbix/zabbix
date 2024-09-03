@@ -557,18 +557,32 @@ abstract class CControllerPopupItemTest extends CController {
 				break;
 
 			case ITEM_TYPE_HTTPAGENT:
+				/*
+				 * Sort "query_fields" and "headers" fields' "name" and "value" parameters in accordance with "sortoder"
+				 * array values.
+				 */
+				foreach (['query_fields', 'headers'] as $field) {
+					if (!array_key_exists($field, $input)) {
+						$input[$field] = [];
+					}
+
+					if ($input[$field] && array_key_exists('sortorder', $input[$field])) {
+						array_multisort($input[$field]['sortorder'], $input[$field]['name'], $input[$field]['value']);
+					}
+				}
+
 				$data += [
 					'key' => $input['key'],
 					'http_authtype' => array_key_exists('http_authtype', $input)
 						? $input['http_authtype']
 						: HTTPTEST_AUTH_NONE,
 					'follow_redirects' => array_key_exists('follow_redirects', $input) ? $input['follow_redirects'] : 0,
-					'headers' => array_key_exists('headers', $input) ? $input['headers'] : [],
+					'headers' => $input['headers'],
 					'http_proxy' => array_key_exists('http_proxy', $input) ? $input['http_proxy'] : null,
 					'output_format' => array_key_exists('output_format', $input) ? $input['output_format'] : 0,
 					'posts' => array_key_exists('posts', $input) ? $input['posts'] : null,
 					'post_type' => array_key_exists('post_type', $input) ? $input['post_type'] : ZBX_POSTTYPE_RAW,
-					'query_fields' => array_key_exists('query_fields', $input) ? $input['query_fields'] : [],
+					'query_fields' => $input['query_fields'],
 					'request_method' => array_key_exists('request_method', $input)
 						? $input['request_method']
 						: HTTPCHECK_REQUEST_GET,

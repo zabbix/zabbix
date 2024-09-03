@@ -209,6 +209,9 @@ class CMapImporter extends CImporter {
 					}
 					$selement[$id_field] = $imageid;
 				}
+				else {
+					$selement[$id_field] = 0;
+				}
 			}
 		}
 		unset($selement);
