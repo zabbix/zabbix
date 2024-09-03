@@ -133,7 +133,7 @@ class CMacroFunction {
 	private static function macrofuncRegrepl(string $value, array $parameters): string {
 		$parameter_count = count($parameters);
 
-		if ($parameter_count === 0 || $parameter_count % 2 !== 0) {
+		if ($parameter_count == 0 || $parameter_count % 2 != 0) {
 			return UNRESOLVED_MACRO_STRING;
 		}
 
@@ -145,7 +145,7 @@ class CMacroFunction {
 				$pattern = $parameters[$i];
 				$replacement = $parameters[$i + 1];
 
-				if ($pattern === '' || !is_string($replacement)) {
+				if ($pattern === '') {
 					continue;
 				}
 
@@ -156,7 +156,7 @@ class CMacroFunction {
 
 				// Add the 'u' modifier to treat it as UTF-8 for multibyte characters and ensure pattern ends with '/'.
 				if ($pattern[0] !== '/' || substr($pattern, -1) !== '/') {
-					$pattern = '/' . $pattern . '/u';
+					$pattern = '/'.$pattern.'/u';
 				}
 
 				if (@preg_match($pattern, '') === false) {
@@ -165,8 +165,7 @@ class CMacroFunction {
 
 				// Get all matches of the pattern in the string
 				$matches = [];
-
-				@preg_match_all($pattern, $value, $matches);
+				preg_match_all($pattern, $value, $matches);
 
 				// Estimate the new length of value after replacements, and return *UNKNOWN* if it exceeds 64KB.
 				foreach ($matches[0] as $match) {
@@ -186,7 +185,7 @@ class CMacroFunction {
 
 					// Replace /1 - /9 with the capturing group values.
 					for ($i = 1; $i <= 9; $i++) {
-						$result = str_replace('\\' . $i, $matches[$i] ?? '', $result);
+						$result = str_replace('\\'.$i, $matches[$i] ?? '', $result);
 					}
 
 					return $result;
@@ -206,6 +205,8 @@ class CMacroFunction {
 	 * Handle escape sequences in replacement string.
 	 *
 	 * @param string $replacement The replacement string to be processed.
+	 *
+	 * @return string
 	 */
 	private static function handleReplacement(string $replacement): string {
 		$upd_replacement = '';
@@ -243,7 +244,7 @@ class CMacroFunction {
 	 * @return string
 	 */
 	private static function macrofuncTr(string $value, array $parameters): string {
-		if (count($parameters) !== 2) {
+		if (count($parameters) != 2) {
 			return UNRESOLVED_MACRO_STRING;
 		}
 
@@ -303,15 +304,10 @@ class CMacroFunction {
 
 		// Build the translation map for byte-level replacement.
 		$translation_map = array_combine($searchlist_bytes, $replacementlist_bytes);
-		if ($translation_map === false) {
-			$translation_map = [];
-		}
 
 		// Translate the string based on byte values.
 		$value_bytes = array_values(unpack('C*', $value));
-		$translated_bytes = array_map(function ($byte) use ($translation_map) {
-			return $translation_map[$byte] ?? $byte;
-		}, $value_bytes);
+		$translated_bytes = array_map(static fn($byte) => $translation_map[$byte] ?? $byte, $value_bytes);
 
 		// Convert bytes back to string.
 		$converted_string = implode(array_map('chr', $translated_bytes));
@@ -324,7 +320,7 @@ class CMacroFunction {
 	 *
 	 * @param string $parameter  [IN] Function parameters - an array containing search-list and replacement-list.
 	 *
-	 * @return string | null
+	 * @return string|null
 	 */
 	private static function expandParameters(string $parameter): string | null {
 		$expanded = '';
@@ -355,9 +351,9 @@ class CMacroFunction {
 			}
 
 			// Handle ranges.
-			if (array_key_exists($i, $characters) && $parameter[$i] === '-' && $i + 1 !== $length) {
+			if (array_key_exists($i, $characters) && $parameter[$i] === '-' && $i + 1 != $length) {
 				// If the first element is '-', and it is part of a range, do not interpret it as a separate character.
-				if ($i === 0 && $parameter[$i] === '-' && $parameter[$i + 1] === '-') {
+				if ($i == 0 && $parameter[$i] === '-' && $parameter[$i + 1] === '-') {
 					$i++;
 
 					continue;
