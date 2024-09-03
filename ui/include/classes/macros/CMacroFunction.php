@@ -220,8 +220,7 @@ class CMacroFunction {
 					$i++;
 				}
 				else {
-					// Append the single backslash and the next character as-is.
-					$upd_replacement .= '\\' . $replacement[$i + 1];
+					$upd_replacement .= $i + 1 < $length ? '\\'.$replacement[$i + 1] : $replacement[$i];
 					$i++;
 				}
 			}
