@@ -664,7 +664,6 @@ static time_t	vmware_service_parse_event_ts(xmlDoc *doc, xmlNode *node, zbx_uint
  *             is_prop    - [IN] read events from RetrieveProperties xml      *
  *             xdoc       - [IN] xml document with eventlog records           *
  *             eventlog   - [IN] VMware event log state                       *
- *             alloc_sz   - [OUT] allocated memory size for events            *
  *             strpool_sz - [OUT] estimated shared memory size for events     *
  *             node_count - [OUT] count of xml event nodes                    *
  *             skip_old   - [OUT] detected event key reset                    *
@@ -1013,7 +1012,7 @@ static int	vmware_service_get_last_event_data(const zbx_vmware_service_t *servic
 	xmlXPathContext		*xpathCtx;
 	xmlXPathObject		*xpathObj;
 
-	zabbix_log(LOG_LEVEL_WARNING, "In %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_VMWARE_LASTEVENT,
 			get_vmware_service_objects()[service->type].property_collector,
@@ -1070,7 +1069,7 @@ clean:
 	xmlXPathFreeContext(xpathCtx);
 out:
 	zbx_xml_doc_free(doc);
-	zabbix_log(LOG_LEVEL_WARNING, "End of %s():%s last_key:" ZBX_FS_UI64, __func__, zbx_result_string(ret),
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s last_key:" ZBX_FS_UI64, __func__, zbx_result_string(ret),
 			(SUCCEED == ret ? xml_event.id : 0));
 	return ret;
 
