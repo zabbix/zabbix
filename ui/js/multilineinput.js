@@ -94,7 +94,7 @@
 			$line_numbers.append(li);
 
 			while (diff < 0) {
-				$line_numbers.find('li:eq(0)').remove();
+				$line_numbers[0].querySelector('li:last-child').remove();
 				diff++;
 			}
 

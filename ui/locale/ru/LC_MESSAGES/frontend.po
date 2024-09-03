@@ -22133,6 +22133,11 @@ msgstr "Строка user agent"
 msgid "User cannot add himself to a disabled group or a group with disabled GUI access."
 msgstr "Пользователь не может добавить себя в отключенную группу или в группу с отключенным доступом к Веб-интерфейсу."
 
+#: include/classes/api/services/CUserGroup.php:673
+#: include/classes/api/services/CUser.php:843
+msgid "User cannot add oneself to a disabled group or a group with disabled GUI access."
+msgstr ""
+
 #: app/views/administration.user.edit.php:461
 #: include/classes/api/services/CUser.php:980
 msgid "User cannot change own role."
@@ -22271,6 +22276,10 @@ msgstr "Ввод данных пользователем успешно прот
 #: include/classes/api/services/CUser.php:1282
 msgid "User is not allowed to delete himself."
 msgstr "Пользователю не разрешается удалять самого себя."
+
+#: include/classes/api/services/CUser.php:1837
+msgid "User is not allowed to delete oneself."
+msgstr ""
 
 #: app/views/administration.authentication.edit.php:462
 #: app/views/popup.ldap.edit.php:222
