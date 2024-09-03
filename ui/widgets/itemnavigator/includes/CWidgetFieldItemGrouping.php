@@ -51,7 +51,7 @@ class CWidgetFieldItemGrouping extends CWidgetField {
 		$group_by = $this->getValue();
 
 		$result = array_filter($group_by, function(array $row): bool {
-			return !(($row['attribute'] === self::GROUP_BY_HOST_TAG || $row['attribute'] === self::GROUP_BY_ITEM_TAG)
+			return !(($row['attribute'] == self::GROUP_BY_HOST_TAG || $row['attribute'] == self::GROUP_BY_ITEM_TAG)
 				&& $row['tag_name'] === '');
 		});
 
@@ -63,7 +63,7 @@ class CWidgetFieldItemGrouping extends CWidgetField {
 			return implode(array_values($row));
 		}, $result);
 
-		if (count($result) !== count(array_unique($result))) {
+		if (count($result) != count(array_unique($result))) {
 			$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Group by'), _('rows must be unique'));
 		}
 
