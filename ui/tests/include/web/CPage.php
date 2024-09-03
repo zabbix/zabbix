@@ -464,6 +464,15 @@ class CPage {
 	}
 
 	/**
+	 * Wait until alert is present.
+	 */
+	public function waitUntilAlertIsPresent($timeout = null) {
+		CElementQuery::wait($timeout)->until(WebDriverExpectedCondition::alertIsPresent(),
+				'Failed to wait for alert to be present.'
+		);
+	}
+
+	/**
 	 * Check if alert is present.
 	 *
 	 * @return boolean
@@ -490,7 +499,7 @@ class CPage {
 	 * Wait until alert is present and accept it.
 	 */
 	public function acceptAlert() {
-		CElementQuery::wait()->until(WebDriverExpectedCondition::alertIsPresent());
+		$this->waitUntilAlertIsPresent();
 		$this->driver->switchTo()->alert()->accept();
 	}
 
@@ -498,7 +507,7 @@ class CPage {
 	 * Wait until alert is present and dismiss it.
 	 */
 	public function dismissAlert() {
-		CElementQuery::wait()->until(WebDriverExpectedCondition::alertIsPresent());
+		$this->waitUntilAlertIsPresent();
 		$this->driver->switchTo()->alert()->dismiss();
 	}
 
