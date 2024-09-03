@@ -1671,7 +1671,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: resolves macros in report (ZBX_MACRO_TYPE_REPORT) context         *
+ * Purpose: resolves macros in report context                                 *
  *                                                                            *
  * Parameters: p            - [IN] macro resolver data structure              *
  *             args         - [IN] list of variadic parameters                *
