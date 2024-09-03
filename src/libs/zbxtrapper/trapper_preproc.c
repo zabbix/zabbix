@@ -19,6 +19,7 @@
 #include "zbxpreprocbase.h"
 #include "zbxtime.h"
 #include "zbxvariant.h"
+#include "zbxstr.h"
 
 /******************************************************************************
  *                                                                            *
@@ -241,8 +242,9 @@ int	zbx_trapper_preproc_test_run(const struct zbx_json_parse *jp_item, const str
 		const struct zbx_json_parse *jp_steps, char *value, size_t value_size, int state, struct zbx_json *json,
 		char **error)
 {
-	char				*values[2] = {NULL, NULL}, *preproc_error = NULL;
+	char				*values[2] = {NULL, NULL}, *preproc_error = NULL, error_buff;
 	int				i, single, bypass_first, ret = FAIL, values_num = 0, first_step_type;
+	size_t		error_lenght = 240;
 	unsigned char			value_type;
 	zbx_vector_pp_step_ptr_t	steps;
 	zbx_timespec_t			ts[2];
@@ -294,6 +296,8 @@ int	zbx_trapper_preproc_test_run(const struct zbx_json_parse *jp_item, const str
 		if (ZBX_VARIANT_ERR == results.values[results.values_num - 1]->value.type)
 		{
 			preproc_error = zbx_strdup(NULL, results.values[results.values_num - 1]->value.data.err);
+			error_buff = (char *)zbx_malloc(NULL, error_lenght);
+			preproc_error = zbx_truncate_value(preproc_error, error_lenght, error_buff, error_lenght);
 			break;
 		}
 

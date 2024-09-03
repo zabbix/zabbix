@@ -38,3 +38,14 @@ in:
 out:
   result_left: ""
   result_right: "usr/bin"
+---
+test case: "usr|bin/ - /"
+in:
+  src: "usr|bin/"
+  delimiter: '/'
+  left: NULL
+  right: NULL
+out:
+  result_left: "usr|bin"
+  result_right: ""
+...

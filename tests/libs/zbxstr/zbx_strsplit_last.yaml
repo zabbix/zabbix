@@ -38,4 +38,14 @@ in:
 out:
   result_left: "00000////"
   result_right: ""
+---
+test case: "!11111"
+in:
+  src: "!11111"
+  delimiter: '!'
+  left: NULL
+  right: NULL
+out:
+  result_left: ""
+  result_right: "11111"
 

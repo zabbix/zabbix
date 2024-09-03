@@ -24,6 +24,7 @@ void	zbx_mock_test_entry(void **state)
 	ZBX_UNUSED(state);
 
 	char		*data = zbx_strdup(NULL, zbx_mock_get_parameter_string("in.data"));
+	const char		*data_out = zbx_mock_get_parameter_string("out.data");
 	size_t		data_alloc = zbx_mock_get_parameter_uint64("in.data_alloc");
 	size_t		data_len = zbx_mock_get_parameter_uint64("in.data_len");
 	size_t		offset = zbx_mock_get_parameter_uint64("in.offset");
@@ -33,6 +34,8 @@ void	zbx_mock_test_entry(void **state)
 	int		exp_result = atoi(zbx_mock_get_parameter_string("out.exp_result"));
 	int		act_result = zbx_replace_mem_dyn(&data, &data_alloc, &data_len, offset, sz_to, from, sz_from);
 
-	zbx_mock_assert_int_eq("Unexpected error message X", exp_result, act_result);
+	zbx_mock_assert_int_eq("Unexpected error message int X", exp_result, act_result);
+	printf("%s", data);
+	zbx_mock_assert_str_eq("Unexpected error message str X", data_out, data);
 	zbx_free(data);
 }

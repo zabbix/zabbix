@@ -15,7 +15,7 @@ in:
 out:
   return: FAIL
 ---
-test case: "aa.aaa.aaaa.aaaaa - succeeed"
+test case: "aa.aaa.aaaa.aaaaa - succeed"
 in:
   list: "aa.aaa.aaaa.aaaaa"
   value: "aaaa"
@@ -23,12 +23,37 @@ in:
 out:
   return: SUCCEED
 ---
-test case: "empty string"
+test case: "NULL"
 in:
   list: ""
   value: ""
   delimiter: ''
 out:
   return: SUCCEED
+---
+test case: "empty list"
+in:
+  list: ""
+  value: "bb"
+  delimiter: '.'
+out:
+  return: FAIL
+---
+test case: "empty delimiter"
+in:
+  list: "a.bb.ccc"
+  value: "bb"
+  delimiter: ''
+out:
+  return: FAIL
+---
+test case: "empty charlist"
+in:
+  list: "a.bb.ccc"
+  value: ""
+  delimiter: '.'
+out:
+  return: FAIL
 ...
+
 

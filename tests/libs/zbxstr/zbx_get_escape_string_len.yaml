@@ -33,4 +33,11 @@ in:
   charlist: "!!!"
 out:
   return: 0
+---
+test case: "empty charlist"
+in:
+  src: "test"
+  charlist: ""
+out:
+  return: 4
 ...

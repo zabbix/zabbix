@@ -19,3 +19,11 @@ in:
   size: 1
 out:
   result: 4
+---
+test case: "Empty"
+in:
+  text: ""
+  size: 0
+out:
+  result: 0
+...

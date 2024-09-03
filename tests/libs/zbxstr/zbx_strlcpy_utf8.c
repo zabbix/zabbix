@@ -23,7 +23,7 @@ void	zbx_mock_test_entry(void **state)
 	ZBX_UNUSED(state);
 
 	const char	*src = zbx_mock_get_parameter_string("in.src");
-	char		*dst = (char *)zbx_mock_get_parameter_string("in.dst");
+	const char	*dst = zbx_mock_get_parameter_string("in.dst");
 	size_t		size = zbx_mock_get_parameter_uint64("in.size");
 	size_t		exp_result = zbx_mock_get_parameter_uint64("out.result");
 	size_t		act_result = zbx_strlcpy_utf8(dst, src, size);

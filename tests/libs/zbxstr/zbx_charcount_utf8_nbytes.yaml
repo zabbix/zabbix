@@ -1,3 +1,4 @@
+---
 test case: "Hello"
 in:
   text: "Hello"
@@ -25,3 +26,4 @@ in:
   size: 0
 out:
   result: 0
+...
