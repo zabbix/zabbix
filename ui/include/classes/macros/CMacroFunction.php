@@ -177,7 +177,7 @@ class CMacroFunction {
 					}
 				}
 
-				$replacement = function(array $matches) use ($replacement) {
+				$replacement = static function(array $matches) use ($replacement) {
 					$result = $replacement;
 
 					// Replace \0 with the entire matched string (backreference to a full match).
@@ -322,7 +322,7 @@ class CMacroFunction {
 	 *
 	 * @return string|null
 	 */
-	private static function expandParameters(string $parameter): string | null {
+	private static function expandParameters(string $parameter): ?string {
 		$expanded = '';
 		$length = strlen($parameter);
 		$characters = str_split($parameter);
@@ -399,7 +399,7 @@ class CMacroFunction {
 	 * @return string
 	 */
 	private static function macrofuncBtoa(string $value, array $parameters): string {
-		return self::removeDefaultParameter($parameters) === [] ? base64_encode($value) : UNRESOLVED_MACRO_STRING;
+		return self::removeDefaultParameter($parameters) == [] ? base64_encode($value) : UNRESOLVED_MACRO_STRING;
 	}
 
 	/**
@@ -410,7 +410,7 @@ class CMacroFunction {
 	 * @return string
 	 */
 	private static function macrofuncUrlencode(string $value, array $parameters): string {
-		return self::removeDefaultParameter($parameters) === [] ? rawurlencode($value) : UNRESOLVED_MACRO_STRING;
+		return self::removeDefaultParameter($parameters) == [] ? rawurlencode($value) : UNRESOLVED_MACRO_STRING;
 	}
 
 	/**
@@ -426,7 +426,7 @@ class CMacroFunction {
 		// Replace encoded '&#039;' with '&#39;' to align with server-side encoding.
 		$encoded = str_replace('&#039;', '&#39;', $encoded);
 
-		return self::removeDefaultParameter($parameters) === []
+		return self::removeDefaultParameter($parameters) == []
 			? $encoded
 			: UNRESOLVED_MACRO_STRING;
 	}
@@ -439,7 +439,7 @@ class CMacroFunction {
 	 * @return string
 	 */
 	private static function macrofuncUrldecode(string $value, array $parameters): string {
-		return self::removeDefaultParameter($parameters) === [] ? urldecode($value) : UNRESOLVED_MACRO_STRING;
+		return self::removeDefaultParameter($parameters) == [] ? urldecode($value) : UNRESOLVED_MACRO_STRING;
 	}
 
 	/**
@@ -450,7 +450,7 @@ class CMacroFunction {
 	 * @return string
 	 */
 	private static function macrofuncHtmldecode(string $value, array $parameters): string {
-		return self::removeDefaultParameter($parameters) === []
+		return self::removeDefaultParameter($parameters) == []
 			? html_entity_decode($value, ENT_QUOTES, 'UTF-8')
 			: UNRESOLVED_MACRO_STRING;
 	}
@@ -463,7 +463,7 @@ class CMacroFunction {
 	 * @return string
 	 */
 	private static function macrofuncLowercase(string $value, array $parameters): string {
-		return self::removeDefaultParameter($parameters) === [] ? strtolower($value) : UNRESOLVED_MACRO_STRING;
+		return self::removeDefaultParameter($parameters) == [] ? strtolower($value) : UNRESOLVED_MACRO_STRING;
 	}
 
 	/**
@@ -474,7 +474,7 @@ class CMacroFunction {
 	 * @return string
 	 */
 	private static function macrofuncUppercase(string $value, array $parameters): string {
-		return self::removeDefaultParameter($parameters) === [] ? strtoupper($value) : UNRESOLVED_MACRO_STRING;
+		return self::removeDefaultParameter($parameters) == [] ? strtoupper($value) : UNRESOLVED_MACRO_STRING;
 	}
 
 	/**
