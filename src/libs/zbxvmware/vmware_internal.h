@@ -65,6 +65,7 @@ void	zbx_vmware_shared_tags_replace(const zbx_vector_vmware_entity_tags_ptr_t *s
 int	zbx_soap_post(const char *fn_parent, CURL *easyhandle, const char *request, xmlDoc **xdoc,
 		char **token , char **error);
 
+void		vmware_eventlog_msg_shared_free(zbx_vector_vmware_event_ptr_t *events);
 void		vmware_eventlog_data_shared_free(zbx_vmware_eventlog_data_t *data_eventlog);
 zbx_uint64_t	zbx_vmware_get_evt_req_chunk_sz(void);
 
@@ -180,8 +181,8 @@ void	vmware_service_cq_prop_value(const char *fn_parent, xmlDoc *xdoc, zbx_vecto
 #define ZBX_XPATH_OBJS_BY_TYPE(type)									\
 	"/*/*/*/*/*[local-name()='objects']/*[local-name()='obj'][@type='" type "']"
 
-char	*evt_msg_strpool_strdup(const char *str, zbx_uint64_t *len, zbx_uint32_t *ref_num);
-void	evt_msg_strpool_strfree(char *str, zbx_uint64_t *mem_sz);
+char	*evt_msg_strpool_strdup(const char *str, zbx_uint64_t *strpool_sz);
+void	evt_msg_strpool_strfree(char *str, zbx_uint64_t *strpool_sz);
 
 #define ZBX_XNN(NN)			"*[local-name()='" NN "']"
 #define ZBX_XPATH_NN(NN)			ZBX_XNN(NN)
@@ -214,7 +215,8 @@ void	zbx_vmware_key_value_free(zbx_vmware_key_value_t value);
 #define REFCOUNT_FIELD_SIZE	sizeof(zbx_uint32_t)
 
 int	vmware_shared_strsearch(const char *str);
-char	*vmware_strpool_strdup(const char *str, zbx_hashset_t *strpool, zbx_uint64_t *len, zbx_uint32_t *ref_num);
+zbx_uint64_t	vmware_evt_strpool_overlap_mem(void);
+char	*vmware_strpool_strdup(const char *str, zbx_hashset_t *strpool, zbx_uint64_t *len);
 char	*vmware_shared_strdup(const char *str);
 void	vmware_strpool_strfree(char *str, zbx_hashset_t *strpool, zbx_uint64_t *len);
 void	vmware_shared_strfree(char *str);

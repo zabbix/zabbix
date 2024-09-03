@@ -131,7 +131,29 @@ int	vmware_shared_strsearch(const char *str)
 	return NULL == zbx_hashset_search(&vmware->strpool, str - REFCOUNT_FIELD_SIZE) ? FAIL : SUCCEED;
 }
 
-char	*vmware_strpool_strdup(const char *str, zbx_hashset_t *strpool, zbx_uint64_t *len, zbx_uint32_t *ref_num)
+zbx_uint64_t	vmware_evt_strpool_overlap_mem(void)
+{
+	void			*ptr;
+	zbx_hashset_iter_t	iter;
+	zbx_uint64_t		common_sz = 0;
+
+	zbx_hashset_iter_reset(&evt_msg_strpool, &iter);
+
+	while (NULL != (ptr = zbx_hashset_iter_next(&iter)))
+	{
+		const char	*str = (char *)ptr + REFCOUNT_FIELD_SIZE;
+
+		if (FAIL == vmware_shared_strsearch(str))
+			continue;
+
+		common_sz += zbx_shmem_required_chunk_size(strlen(str) +
+				REFCOUNT_FIELD_SIZE + 1 + ZBX_HASHSET_ENTRY_OFFSET);
+	}
+
+	return common_sz;
+}
+
+char	*vmware_strpool_strdup(const char *str, zbx_hashset_t *strpool, zbx_uint64_t *len)
 {
 	void	*ptr;
 
@@ -147,13 +169,10 @@ char	*vmware_strpool_strdup(const char *str, zbx_hashset_t *strpool, zbx_uint64_
 	ptr = zbx_hashset_insert_ext(strpool, str - REFCOUNT_FIELD_SIZE, sz, REFCOUNT_FIELD_SIZE, sz,
 			ZBX_HASHSET_UNIQ_FALSE);
 
-	if (NULL != len)
-		*len = sz + ZBX_HASHSET_ENTRY_OFFSET;
-
 	(*(zbx_uint32_t *)ptr)++;
 
-	if (NULL != ref_num)
-		*ref_num = *(zbx_uint32_t *)ptr;
+	if (NULL != len && 1 == *(zbx_uint32_t *)ptr)
+		*len = sz + ZBX_HASHSET_ENTRY_OFFSET;
 
 	return (char *)ptr + REFCOUNT_FIELD_SIZE;
 }
@@ -163,7 +182,7 @@ char	*vmware_shared_strdup(const char *str)
 	char		*strdup;
 	zbx_uint64_t	len;
 
-	strdup = vmware_strpool_strdup(str, &vmware->strpool, &len, NULL);
+	strdup = vmware_strpool_strdup(str, &vmware->strpool, &len);
 
 	if (0 < len)
 		vmware->strpool_sz += zbx_shmem_required_chunk_size(len);
@@ -200,19 +219,27 @@ void	vmware_shared_strfree(char *str)
 		vmware->strpool_sz -= zbx_shmem_required_chunk_size(len);
 }
 
-void	evt_msg_strpool_strfree(char *str, zbx_uint64_t *mem_sz)
+void	evt_msg_strpool_strfree(char *str, zbx_uint64_t *strpool_sz)
 {
 	zbx_uint64_t	len;
 
 	vmware_strpool_strfree(str, &evt_msg_strpool, &len);
 
-	if (NULL != mem_sz && 0 < len)
-		*mem_sz -= zbx_shmem_required_chunk_size(len);
+	if (NULL != strpool_sz && 0 < len)
+		*strpool_sz -= zbx_shmem_required_chunk_size(len);
 }
 
-char	*evt_msg_strpool_strdup(const char *str, zbx_uint64_t *len, zbx_uint32_t *ref_num)
+char	*evt_msg_strpool_strdup(const char *str, zbx_uint64_t *strpool_sz)
 {
-	return vmware_strpool_strdup(str, &evt_msg_strpool, len, ref_num);
+	char		*strdup;
+	zbx_uint64_t	len;
+
+	strdup = vmware_strpool_strdup(str, &evt_msg_strpool, &len);
+
+	if (NULL != strpool_sz && 0 < len)
+		*strpool_sz += zbx_shmem_required_chunk_size(len);
+
+	return strdup;
 }
 
 static size_t	curl_write_cb(void *ptr, size_t size, size_t nmemb, void *userdata)
@@ -603,6 +630,23 @@ static void	vmware_data_shared_free(zbx_vmware_data_t *data)
 /******************************************************************************
  *                                                                            *
  * Purpose: frees shared resources allocated to store vmware service event    *
+ *          log messages                                                      *
+ *                                                                            *
+ * Parameters: events - [IN] vmware service event vector of messages          *
+ *                                                                            *
+ ******************************************************************************/
+void	vmware_eventlog_msg_shared_free(zbx_vector_vmware_event_ptr_t *events)
+{
+	if (NULL != events)
+	{
+		zbx_vector_vmware_event_ptr_clear_ext(events, vmware_shmem_event_free);
+		zbx_vector_vmware_event_ptr_destroy(events);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: frees shared resources allocated to store vmware service event    *
  *          log data                                                          *
  *                                                                            *
  * Parameters: evt_data - [IN] vmware service event log data                  *
@@ -612,8 +656,7 @@ void	vmware_eventlog_data_shared_free(zbx_vmware_eventlog_data_t *evt_data)
 {
 	if (NULL != evt_data)
 	{
-		zbx_vector_vmware_event_ptr_clear_ext(&evt_data->events, vmware_shmem_event_free);
-		zbx_vector_vmware_event_ptr_destroy(&evt_data->events);
+		vmware_eventlog_msg_shared_free(&evt_data->events);
 
 		if (NULL != evt_data->error)
 			vmware_shared_strfree(evt_data->error);
