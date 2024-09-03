@@ -538,13 +538,15 @@ func getRaidDevices(
 }
 
 func (r *runner) setDevicesData(data *SmartCtlDeviceData, jsonRunner bool) {
-	if jsonRunner {
-		r.jsonDevices[data.Device.Info.Name] = jsonDevice{
-			data.Device.SerialNumber,
-			string(data.Data),
-		}
-	} else {
+	if !jsonRunner {
 		r.devices[data.Device.Info.Name] = *data.Device
+
+		return
+	}
+
+	r.jsonDevices[data.Device.Info.Name] = jsonDevice{
+		data.Device.SerialNumber,
+		string(data.Data),
 	}
 }
 
