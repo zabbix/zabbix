@@ -172,11 +172,10 @@
 					const input = e.target;
 
 					const start = input.selectionStart;
-					const end = input.selectionEnd;
 
-					input.value = input.value.substring(0, start) + "\t" + input.value.substring(end);
+					input.value = input.value.substring(0, start) + "\t" + input.value.substring(input.selectionEnd);
 
-					input.selectionStart = end;
+					input.selectionStart = input.selectionEnd;
 					input.selectionEnd = start + 1;
 				}
 			});
