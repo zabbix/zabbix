@@ -144,11 +144,10 @@ class CLocalApiClient extends CApiClient {
 			$response->errorMessage = $e->getMessage();
 
 			if ($e instanceof DBException) {
-				$api_service = $this->serviceFactory->getObject($api);
+				$user_data = $requiresAuthentication ? $this->serviceFactory->getObject($api)::$userData : null;
 
-				if ($api_service::$userData === null || $api_service::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+				if ($user_data === null || $user_data['type'] != USER_TYPE_SUPER_ADMIN) {
 					$response->errorMessage = _('System error occurred. Please contact Zabbix administrator.');
-					$response->errorCode = -1;
 				}
 			}
 

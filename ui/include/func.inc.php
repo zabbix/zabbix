@@ -1856,7 +1856,7 @@ function makeMessageBox(string $class, array $messages, string $title = null, bo
 function filter_messages(): array {
 	if (!CSettingsHelper::getPublic(CSettingsHelper::SHOW_TECHNICAL_ERRORS)
 			&& CWebUser::getType() != USER_TYPE_SUPER_ADMIN && !CWebUser::getDebugMode()) {
-		$messages = array_unique(CMessageHelper::getMessages(), SORT_REGULAR);
+		$messages = CMessageHelper::getMessages();
 		CMessageHelper::clear(false);
 
 		$generic_exists = false;
@@ -2404,6 +2404,11 @@ function getUserGraphTheme() {
  * @return bool
  */
 function zbx_err_handler($errno, $errstr, $errfile, $errline) {
+	if (API::getWrapper() === null) {
+		// PHP error/warning in API code should not be seen in frontend.
+		return false;
+	}
+
 	// Suppress errors when calling with error control operator @function_name().
 	if ((error_reporting()
 			& ~(E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR)) == 0) {
