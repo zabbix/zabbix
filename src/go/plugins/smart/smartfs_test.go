@@ -502,7 +502,7 @@ func TestPlugin_execute(t *testing.T) {
 						},
 						Smartctl:    smartctlField{Version: []int{7, 3}},
 						SmartStatus: &smartStatus{SerialNumber: true},
-						SmartAttributes: smartAttributes{ //nolint:dupl
+						SmartAttributes: smartAttributes{
 							Table: []table{
 								{Attrname: "Reallocated_Sector_Ct", ID: 5},
 								{Attrname: "Power_On_Hours", ID: 9},
@@ -852,13 +852,13 @@ func TestPlugin_execute(t *testing.T) {
 			false,
 		},
 	}
-
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
 			m := mock.NewMockController(t)
+
 			for _, e := range tt.expectations {
 				m.ExpectExecute().
 					WithArgs(e.args...).
@@ -887,68 +887,6 @@ func TestPlugin_execute(t *testing.T) {
 
 			if err := m.ExpectationsWhereMet(); err != nil {
 				t.Fatalf("Plugin.execute() expectations were not met, error = %v", err)
-			}
-		})
-	}
-}
-
-func Test_evaluateVersion(t *testing.T) {
-	t.Parallel()
-
-	type args struct {
-		versionDigits []int
-	}
-
-	tests := []struct {
-		name    string
-		args    args
-		wantErr bool
-	}{
-		{"+correctVersion", args{[]int{7, 1}}, false},
-		{"+correctVersionOneDigit", args{[]int{8}}, false},
-		{"+correctVersionMultipleDigits", args{[]int{7, 1, 2}}, false},
-		{"-incorrectVersion", args{[]int{7, 0}}, true},
-		{"-malformedVersion", args{[]int{-7, 0}}, true},
-		{"-empty", args{}, true},
-	}
-	for _, tt := range tests {
-		tt := tt
-		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
-			if err := evaluateVersion(tt.args.versionDigits); (err != nil) != tt.wantErr {
-				t.Fatalf(
-					"evaluateVersion() error = %v, wantErr %v",
-					err,
-					tt.wantErr,
-				)
-			}
-		})
-	}
-}
-
-func Test_cutPrefix(t *testing.T) {
-	t.Parallel()
-
-	type args struct {
-		in string
-	}
-
-	tests := []struct {
-		name string
-		args args
-		want string
-	}{
-		{"+hasPrefix", args{"/dev/sda"}, "sda"},
-		{"-noPrefix", args{"sda"}, "sda"},
-		{"-empty", args{""}, ""},
-	}
-
-	for _, tt := range tests {
-		tt := tt
-		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
-			if got := cutPrefix(tt.args.in); got != tt.want {
-				t.Fatalf("cutPrefix() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -1114,6 +1052,64 @@ func Test_getBasicDeviceInfo(t *testing.T) {
 					"getBasicDeviceInfo() expectations where not met, error = %v",
 					err,
 				)
+			}
+		})
+	}
+}
+
+func Test_evaluateVersion(t *testing.T) {
+	t.Parallel()
+
+	type args struct {
+		versionDigits []int
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{"+correctVersion", args{[]int{7, 1}}, false},
+		{"+correctVersionOneDigit", args{[]int{8}}, false},
+		{"+correctVersionMultipleDigits", args{[]int{7, 1, 2}}, false},
+		{"-incorrectVersion", args{[]int{7, 0}}, true},
+		{"-malformedVersion", args{[]int{-7, 0}}, true},
+		{"-empty", args{}, true},
+	}
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			if err := evaluateVersion(tt.args.versionDigits); (err != nil) != tt.wantErr {
+				t.Fatalf(
+					"evaluateVersion() error = %v, wantErr %v",
+					err,
+					tt.wantErr,
+				)
+			}
+		})
+	}
+}
+
+func Test_cutPrefix(t *testing.T) {
+	t.Parallel()
+	type args struct {
+		in string
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{"+hasPrefix", args{"/dev/sda"}, "sda"},
+		{"-noPrefix", args{"sda"}, "sda"},
+		{"-empty", args{""}, ""},
+	}
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			if got := cutPrefix(tt.args.in); got != tt.want {
+				t.Fatalf("cutPrefix() = %v, want %v", got, tt.want)
 			}
 		})
 	}

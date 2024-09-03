@@ -277,7 +277,6 @@ func (p *Plugin) execute(jsonRunner bool) (*runner, error) {
 				return errs.Wrap(ctx.Err(), "errgroup context canceled") // Return error if context is canceled
 			default:
 				deviceInfo, err := getBasicDeviceInfo(p.ctl, name) //nolint:govet
-
 				if err != nil {
 					if errors.Is(err, ErrNoSmartStatus) {
 						p.Logger.Debugf("skipping device with no smart status: %d", name)
@@ -420,7 +419,6 @@ func cutPrefix(in string) string {
 
 func getBasicDeviceInfo(ctl SmartController, deviceName string) (*SmartCtlDeviceData, error) {
 	device, err := ctl.Execute("-a", deviceName, "-j")
-
 	if err != nil {
 		return nil, errs.Wrap(err, "failed to execute smartctl")
 	}
@@ -454,8 +452,7 @@ func getBasicDeviceInfo(ctl SmartController, deviceName string) (*SmartCtlDevice
 // runs: smartctl -a <deviceName> -d <deviceType> -j
 // returns error if .smart_status field is not present in the output.
 func getAllDeviceInfoByType(
-	ctl SmartController,
-	deviceName, deviceType string,
+	ctl SmartController, deviceName, deviceType string,
 ) (*SmartCtlDeviceData, error) {
 	device, err := ctl.Execute("-a", deviceName, "-d", deviceType, "-j")
 	if err != nil {
@@ -480,7 +477,6 @@ func getAllDeviceInfoByType(
 
 	dp.Info.Name = fmt.Sprintf("%s %s", deviceName, deviceType)
 	dp.Info.name = deviceName
-
 	dp.Info.raidType = deviceType
 
 	return &SmartCtlDeviceData{
@@ -500,7 +496,7 @@ func getRaidDevices(
 		data, err := getAllDeviceInfoByType(ctl, deviceName, string(deviceType))
 		if err != nil {
 			logr.Debugf(
-				"failed to get device %q info by type %q: %q",
+				"failed to get device %q info by type %q: %s",
 				deviceName, deviceType, err.Error(),
 			)
 
@@ -526,7 +522,7 @@ func getRaidDevices(
 			)
 			if err != nil {
 				logr.Debugf(
-					"failed to get device %q info by type %q: %q",
+					"failed to get device %q info by type %q: %s",
 					deviceName, deviceType, err.Error(),
 				)
 
@@ -542,7 +538,6 @@ func getRaidDevices(
 }
 
 func (r *runner) setDevicesData(data *SmartCtlDeviceData, jsonRunner bool) {
-	// Process the received data
 	if jsonRunner {
 		r.jsonDevices[data.Device.Info.Name] = jsonDevice{
 			data.Device.SerialNumber,

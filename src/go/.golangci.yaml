@@ -247,6 +247,7 @@ issues:
         - revive
         - wrapcheck
         - maintidx
+        - dupl
 
 severity:
   default-severity: error
