@@ -729,7 +729,7 @@ class CControllerItemList extends CControllerItem {
 				'subfilter_inherited' => [$item['templateid'] > 0 ? 1 : 0],
 				'subfilter_with_triggers' => [count($item['triggers']) > 0 ? 1 : 0],
 				'subfilter_history' => [$item['history']],
-				'subfilter_state' => [$item['state']],
+				'subfilter_state' => $item['status'] == ITEM_STATUS_ACTIVE ? [$item['state']] : [],
 				'subfilter_discovered' => [$item['flags'] == ZBX_FLAG_DISCOVERY_CREATED ? 1 : 0],
 				'subfilter_trends' => [],
 				'subfilter_interval' => [],

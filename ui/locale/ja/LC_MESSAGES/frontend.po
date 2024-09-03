@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-07-12 08:27+0000\n"
-"Last-Translator: Taiki Fujiwara <taiki.fujiwara@cybertrust.co.jp>\n"
+"PO-Revision-Date: 2024-08-19 05:58+0000\n"
+"Last-Translator: Akira <g42getd@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -10029,7 +10029,7 @@ msgstr "このメッセージが間違っている場合は、必要な権限を
 
 #: app/views/administration.miscconfig.edit.php:132
 msgid "Iframe sandboxing exceptions"
-msgstr "Iframeサンドボックスの例外"
+msgstr "iframeサンドボックスの例外"
 
 #: include/classes/helpers/CServiceHelper.php:151
 msgid "Ignore this service"
@@ -21784,6 +21784,11 @@ msgstr "ユーザーエージェント文字列"
 msgid "User cannot add himself to a disabled group or a group with disabled GUI access."
 msgstr "ユーザーは無効のグループやGUIアクセスが無効のグループに自分自身を追加できません。"
 
+#: include/classes/api/services/CUserGroup.php:673
+#: include/classes/api/services/CUser.php:843
+msgid "User cannot add oneself to a disabled group or a group with disabled GUI access."
+msgstr ""
+
 #: app/views/administration.user.edit.php:461
 #: include/classes/api/services/CUser.php:980
 msgid "User cannot change own role."
@@ -21916,6 +21921,10 @@ msgstr ""
 #: include/classes/api/services/CUser.php:1282
 msgid "User is not allowed to delete himself."
 msgstr "自身のユーザーアカウントは削除できません。"
+
+#: include/classes/api/services/CUser.php:1837
+msgid "User is not allowed to delete oneself."
+msgstr ""
 
 #: app/views/administration.authentication.edit.php:462
 #: app/views/popup.ldap.edit.php:222

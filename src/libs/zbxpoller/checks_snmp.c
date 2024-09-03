@@ -42,6 +42,10 @@
 #include <net-snmp/library/large_fd_set.h>
 #include "zbxself.h"
 
+#ifndef EVDNS_BASE_INITIALIZE_NAMESERVERS
+#	define EVDNS_BASE_INITIALIZE_NAMESERVERS	1
+#endif
+
 /*
  * SNMP Dynamic Index Cache
  * ========================
