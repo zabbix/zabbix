@@ -164,6 +164,24 @@
 
 		$textarea[0].setSelectionRange(0, 0);
 
+		if (obj.options.use_tab_for_indent) {
+			$textarea[0].addEventListener('keydown', e => {
+				if (e.which === KEY_TAB) {
+					e.preventDefault();
+
+					const input = e.target;
+
+					const start = input.selectionStart;
+					const end = input.selectionEnd;
+
+					input.value = input.value.substring(0, start) + "\t" + input.value.substring(end);
+
+					input.selectionStart = end;
+					input.selectionEnd = start + 1;
+				}
+			});
+		}
+
 		$textarea
 			.on('change contextmenu keydown keyup paste scroll', function() {
 				var value = $(this).val();
@@ -198,7 +216,8 @@
 							disabled: false,
 							autofocus: false,
 							line_numbers: true,
-							monospace_font: true
+							monospace_font: true,
+							use_tab_for_indent: false
 						}, options)
 					};
 

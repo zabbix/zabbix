@@ -194,7 +194,8 @@ $formgrid = (new CFormGrid())
 				'grow' => 'auto',
 				'rows' => 0,
 				'maxlength' => DB::getFieldLength('items', 'params'),
-				'readonly' => $readonly
+				'readonly' => $readonly,
+				'use_tab_for_indent' => true
 			]))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAriaRequired()
@@ -212,7 +213,8 @@ $formgrid = (new CFormGrid())
 				'grow' => 'auto',
 				'rows' => 0,
 				'maxlength' => DB::getFieldLength('items', 'params'),
-				'readonly' => $readonly
+				'readonly' => $readonly,
+				'use_tab_for_indent' => true
 			]))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAriaRequired()

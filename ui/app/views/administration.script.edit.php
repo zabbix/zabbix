@@ -241,7 +241,8 @@ $form_grid = (new CFormGrid())
 				'placeholder_textarea' => 'return value',
 				'grow' => 'auto',
 				'rows' => 0,
-				'maxlength' => DB::getFieldLength('scripts', 'command')
+				'maxlength' => DB::getFieldLength('scripts', 'command'),
+				'use_tab_for_indent' => true
 			]))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAriaRequired()

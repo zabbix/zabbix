@@ -466,7 +466,8 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 					'grow' => 'auto',
 					'rows' => 0,
 					'maxlength' => $script_maxlength,
-					'readonly' => $readonly
+					'readonly' => $readonly,
+					'use_tab_for_indent' => true
 				]);
 				break;
 
