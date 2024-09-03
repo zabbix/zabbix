@@ -301,6 +301,88 @@ func TestPlugin_execute(t *testing.T) {
 			false,
 		},
 		{
+			"+HBAWithSAS1",
+			args{
+				jsonRunner: false,
+			},
+			[]expectation{
+				{
+					args: []string{"--scan", "-j"},
+					err:  nil,
+					out:  []byte(`{}`),
+				},
+				{
+					args: []string{"--scan", "-d", "sat", "-j"},
+					err:  nil,
+					out: []byte(`{
+								"json_format_version": [1, 0],
+								"smartctl": {
+									"version": [7, 1],
+									"svn_revision": "5022",
+									"platform_info": "x86_64-w64-mingw32-w10-b19045",
+									"build_info": "(sf-7.1-1)"
+								},
+								"devices": [
+									{
+									"name": "/dev/sda",
+									"info_name": "/dev/sda",
+									"type": "sat",
+									"protocol": "sat"
+									}
+								]}`),
+				},
+				{
+					args: []string{
+						"-a", "/dev/sda", "-d", "3ware,0", "-j",
+					},
+					out: sampleFailedAllSmartInfoScan,
+				},
+				{
+					args: []string{
+						"-a", "/dev/sda", "-d", "areca,1", "-j",
+					},
+					out: sampleFailedAllSmartInfoScan,
+				},
+				{
+					args: []string{
+						"-a", "/dev/sda", "-d", "cciss,0", "-j",
+					},
+					out: sampleFailedAllSmartInfoScan,
+				},
+				{
+					args: []string{
+						"-a", "/dev/sda", "-d", "sat", "-j",
+					},
+					out: sampleFailedAllSmartInfoScan,
+				},
+				{
+					args: []string{
+						"-a", "/dev/sda", "-d", "scsi", "-j",
+					},
+					out: mock.Outputs.Get("HBA_with_SAS_1").
+						AllSmartInfoScans.Get("-a /dev/sda -d scsi -j"),
+				},
+			},
+			&runner{
+				jsonDevices: nil,
+				devices: map[string]deviceParser{
+					"/dev/sda scsi": {
+						SerialNumber: "S5G1NC0W102239",
+						Info: deviceInfo{
+							Name:     "/dev/sda scsi",
+							InfoName: "/dev/sda",
+							DevType:  "scsi",
+							name:     "/dev/sda",
+							raidType: "scsi",
+						},
+						Smartctl:    smartctlField{Version: []int{7, 3}},
+						SmartStatus: &smartStatus{SerialNumber: true},
+					},
+				},
+			},
+			false,
+		},
+		{
 			"+validRAID",
 			args{
 				jsonRunner: false,
@@ -565,88 +647,6 @@ func TestPlugin_execute(t *testing.T) {
 						},
 						SmartStatus:     &smartStatus{SerialNumber: true},
 						SmartAttributes: smartAttributes{},
-					},
-				},
-			},
-			false,
-		},
-		{
-			"+HBAWithSAS1",
-			args{
-				jsonRunner: false,
-			},
-			[]expectation{
-				{
-					args: []string{"--scan", "-j"},
-					err:  nil,
-					out:  []byte(`{}`),
-				},
-				{
-					args: []string{"--scan", "-d", "sat", "-j"},
-					err:  nil,
-					out: []byte(`{
-								"json_format_version": [1, 0],
-								"smartctl": {
-									"version": [7, 1],
-									"svn_revision": "5022",
-									"platform_info": "x86_64-w64-mingw32-w10-b19045",
-									"build_info": "(sf-7.1-1)"
-								},
-								"devices": [
-									{
-									"name": "/dev/sda",
-									"info_name": "/dev/sda",
-									"type": "sat",
-									"protocol": "sat"
-									}
-								]}`),
-				},
-				{
-					args: []string{
-						"-a", "/dev/sda", "-d", "3ware,0", "-j",
-					},
-					out: sampleFailedAllSmartInfoScan,
-				},
-				{
-					args: []string{
-						"-a", "/dev/sda", "-d", "areca,1", "-j",
-					},
-					out: sampleFailedAllSmartInfoScan,
-				},
-				{
-					args: []string{
-						"-a", "/dev/sda", "-d", "cciss,0", "-j",
-					},
-					out: sampleFailedAllSmartInfoScan,
-				},
-				{
-					args: []string{
-						"-a", "/dev/sda", "-d", "sat", "-j",
-					},
-					out: sampleFailedAllSmartInfoScan,
-				},
-				{
-					args: []string{
-						"-a", "/dev/sda", "-d", "scsi", "-j",
-					},
-					out: mock.Outputs.Get("HBA_with_SAS_1").
-						AllSmartInfoScans.Get("-a /dev/sda -d scsi -j"),
-				},
-			},
-			&runner{
-				jsonDevices: nil,
-				devices: map[string]deviceParser{
-					"/dev/sda scsi": {
-						SerialNumber: "S5G1NC0W102239",
-						Info: deviceInfo{
-							Name:     "/dev/sda scsi",
-							InfoName: "/dev/sda",
-							DevType:  "scsi",
-							name:     "/dev/sda",
-							raidType: "scsi",
-						},
-						Smartctl:    smartctlField{Version: []int{7, 3}},
-						SmartStatus: &smartStatus{SerialNumber: true},
 					},
 				},
 			},
