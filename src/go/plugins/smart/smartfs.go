@@ -280,7 +280,7 @@ func (p *Plugin) execute(jsonRunner bool) (*runner, error) {
 
 				if err != nil {
 					if errors.Is(err, ErrNoSmartStatus) {
-						p.Logger.Debugf("skipping device with no smart status: %s", name)
+						p.Logger.Debugf("skipping device with no smart status: %d", name)
 
 						return nil
 					}
@@ -296,14 +296,14 @@ func (p *Plugin) execute(jsonRunner bool) (*runner, error) {
 	}
 
 	for _, device := range raidDev {
-		for _, deviveType := range []DeviceType{
+		for _, deviceType := range []DeviceType{
 			ThreeWare, Areca, CCISS, SAT, SCSI,
 		} {
 			name := device.Name
-			devType := deviveType
+			devType := deviceType
 
 			g.Go(func() error {
-				devices := getRaidDevices(p.ctl, p.Base, name, devType)
+				devices := getRaidDevices(p.ctl, p.Base.Logger, name, devType)
 				for _, device := range devices {
 					resultChan <- device
 				}
@@ -320,7 +320,7 @@ func (p *Plugin) execute(jsonRunner bool) (*runner, error) {
 		g.Go(func() error {
 			device, err := getAllDeviceInfoByType(p.ctl, name, devType) //nolint:govet
 			if err != nil {
-				p.Tracef("got error executing for megaraid %s", err.Error())
+				p.Tracef("got error executing for megaraid %q", err.Error())
 
 				return nil
 			}
@@ -438,7 +438,7 @@ func getBasicDeviceInfo(ctl SmartController, deviceName string) (*SmartCtlDevice
 	}
 
 	if dp.SmartStatus == nil {
-		return nil, errs.Wrapf(ErrNoSmartStatus, "got no smart status for device %s", deviceName)
+		return nil, errs.Wrapf(ErrNoSmartStatus, "got no smart status for device %q", deviceName)
 	}
 
 	dp.Info.name = deviceName
@@ -500,7 +500,7 @@ func getRaidDevices(
 		data, err := getAllDeviceInfoByType(ctl, deviceName, string(deviceType))
 		if err != nil {
 			logr.Debugf(
-				"failed to get device %q info by type %q: %s",
+				"failed to get device %q info by type %q: %q",
 				deviceName, deviceType, err.Error(),
 			)
 
@@ -526,7 +526,7 @@ func getRaidDevices(
 			)
 			if err != nil {
 				logr.Debugf(
-					"failed to get device %q info by type %q: %s",
+					"failed to get device %q info by type %q: %q",
 					deviceName, deviceType, err.Error(),
 				)
 
@@ -686,7 +686,7 @@ func formatDeviceOutput(
 func (p *Plugin) scanDevices(args ...string) ([]deviceInfo, error) {
 	out, err := p.ctl.Execute(args...)
 	if err != nil {
-		return nil, errs.Wrapf(err, "got error executing scanDevices with arguments: %s", args)
+		return nil, errs.Wrapf(err, "got error executing scanDevices with arguments: %q", args)
 	}
 
 	var d devices

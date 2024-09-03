@@ -2081,7 +2081,7 @@ func Test_runner_parseOutput(t *testing.T) {
 			},
 		},
 		{
-			"+bothFieldsSetJSONRunner",
+			"+JSONRunnerWithPrevData",
 			args{
 				true,
 			},
@@ -2106,7 +2106,7 @@ func Test_runner_parseOutput(t *testing.T) {
 			},
 		},
 		{
-			"+bothFieldsSetDeviceRunner",
+			"+deviceRunnerWithPrevData",
 			args{
 				false,
 			},
