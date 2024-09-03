@@ -15,6 +15,7 @@
 #include "zbxmockdata.h"
 #include "zbxmockutil.h"
 #include "zbxmockassert.h"
+#include "zbxmockhelper.h"
 
 #include "zbxstr.h"
 
@@ -22,9 +23,10 @@ void	zbx_mock_test_entry(void **state)
 {
 	ZBX_UNUSED(state);
 
-	const char 	*text =  zbx_mock_get_parameter_string("in.text");
+	size_t		in_buffer_length = zbx_mock_get_parameter_uint64("in.buffer_length");
+	char		*in_buffer = zbx_yaml_assemble_binary_sequence("in.buffer", &in_buffer_length);
 	size_t		exp_result = zbx_mock_get_parameter_uint64("out.return");
-	size_t		act_result = zbx_utf8_char_len(text);
+	size_t		act_result = zbx_utf8_char_len(in_buffer);
 
 	zbx_mock_assert_uint64_eq("return value",  exp_result, act_result);
 }
