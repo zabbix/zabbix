@@ -258,7 +258,7 @@ class CMacroFunction {
 		}
 
 		// In case of incorrect parameters (e.g., invalid range) return UNKNOWN macro string.
-		if ($searchlist === UNRESOLVED_MACRO_STRING || $replacementlist === UNRESOLVED_MACRO_STRING) {
+		if ($searchlist === null || $replacementlist === null) {
 			return UNRESOLVED_MACRO_STRING;
 		}
 
@@ -324,9 +324,9 @@ class CMacroFunction {
 	 *
 	 * @param string $parameter  [IN] Function parameters - an array containing search-list and replacement-list.
 	 *
-	 * @return string
+	 * @return string | null
 	 */
-	private static function expandParameters(string $parameter): string {
+	private static function expandParameters(string $parameter): string | null {
 		$expanded = '';
 		$length = strlen($parameter);
 		$characters = str_split($parameter);
@@ -369,7 +369,7 @@ class CMacroFunction {
 
 					// Check if range is valid.
 					if (ord($range_start) > ord($range_end)) {
-						return UNRESOLVED_MACRO_STRING;
+						return null;
 					}
 
 					for ($ascii = ord($range_start) + 1; $ascii <= ord($range_end); $ascii++) {

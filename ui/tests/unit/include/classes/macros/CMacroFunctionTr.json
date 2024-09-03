@@ -390,5 +390,13 @@
             "parameters": ["123", "П"]
         },
         "result": "value_ППП_aaa_П????"
+    },
+    {
+        "value": "*UNKNOWN*",
+        "macrofunc": {
+            "function": "tr",
+            "parameters": ["*UNKNOWN*", "{ITEM.VALUE}"]
+        },
+        "result": "LIAEA.VAL"
     }
 ]

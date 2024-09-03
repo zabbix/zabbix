@@ -330,5 +330,13 @@
             "parameters": ["([a])([b])([c])([d])([e])([f])([g])([h])([i])([j])([k])", "X\\0"]
         },
         "result": "Xabcdefghijk"
+    },
+    {
+        "value": "pārbaude",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["ā", "\\"]
+        },
+        "result": "p\\rbaude"
     }
 ]
