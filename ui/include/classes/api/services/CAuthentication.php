@@ -130,7 +130,7 @@ class CAuthentication extends CApiService {
 			'authentication_type' =>		['type' => API_INT32, 'in' => ZBX_AUTH_INTERNAL.','.ZBX_AUTH_LDAP],
 			'ldap_auth_enabled' =>			['type' => API_MULTIPLE, 'rules' => [
 												['if' => ['field' => 'authentication_type', 'in' => ZBX_AUTH_LDAP], 'type' => API_INT32, 'in' => ZBX_AUTH_LDAP_ENABLED],
-												['else' => true, 'type' => API_INT32, 'in' => ZBX_AUTH_LDAP_DISABLED.','.ZBX_AUTH_LDAP_ENABLED],
+												['else' => true, 'type' => API_INT32, 'in' => ZBX_AUTH_LDAP_DISABLED.','.ZBX_AUTH_LDAP_ENABLED]
 			]],
 			'ldap_case_sensitive' =>		['type' => API_INT32, 'in' => ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE],
 			'ldap_userdirectoryid' =>		['type' => API_ID],
