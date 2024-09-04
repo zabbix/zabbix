@@ -338,5 +338,53 @@
             "parameters": ["ā", "\\"]
         },
         "result": "p\\rbaude"
+    },
+    {
+        "value": "тестовые данные",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["\\A\\w+", "test ", "\\Z", "test"]
+        },
+        "result": "тестовые данныеtest"
+    },
+    {
+        "value": "parbaude",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["\\w+\\z", "test"]
+        },
+        "result": "test"
+    },
+    {
+        "value": "pārbaude",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["\\w+\\z", "test"]
+        },
+        "result": "pātest"
+    },
+    {
+        "value": "pārbaude",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["^\\w+", "test"]
+        },
+        "result": "testārbaude"
+    },
+    {
+        "value": "pārbaude",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["\\w+\\z", "test", "^\\w+", "test"]
+        },
+        "result": "testātest"
+    },
+    {
+        "value": "test123 pārbaude 123",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["\\w+$", "test"]
+        },
+        "result": "test123 pārbaude test"
     }
 ]

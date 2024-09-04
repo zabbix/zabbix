@@ -159,6 +159,11 @@ class CMacroFunction {
 					$pattern = '/'.$pattern.'/u';
 				}
 
+				// Adjust pattern to match ASCII only if the value has multibyte characters and the pattern includes \w.
+				if (!mb_detect_encoding($value, 'ASCII', true)) {
+					$pattern = preg_replace('/\\\w/', '[a-zA-Z0-9_]+', $pattern);
+				}
+
 				if (@preg_match($pattern, '') === false) {
 					return UNRESOLVED_MACRO_STRING;
 				}
