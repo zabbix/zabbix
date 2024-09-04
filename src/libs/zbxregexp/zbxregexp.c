@@ -720,8 +720,8 @@ static void	strncpy_alloc(char **str, size_t *alloc_len, size_t *offset, const c
  *             nmatch          - [IN] the number of items in captured group data *
  *             limit           - [IN] size limit for memory allocation           *
  *                                    0 means no limit                           *
- *             group_check     - [IN] check if the pattern matches but does not  *
- *                                    contain group to capture and return NULL.  *
+ *             group_check     - [IN] check if pattern matches but does not      *
+ *                                    contain group to capture and return NULL   *
  *                                                                               *
  * Return value: Allocated string containing output value                        *
  *                                                                               *
@@ -763,7 +763,7 @@ static char	*regexp_sub_replace(const char *text, const char *output_template, z
 					strncpy_alloc(&ptr, &size, &offset, text + match[group_index].rm_so,
 							match[group_index].rm_eo - match[group_index].rm_so, limit);
 				}
-				else if(0 != group_check)
+				else if (0 != group_check)
 				{
 					zbx_free(ptr);
 					goto out;
@@ -831,8 +831,8 @@ out:
  *                                    is used as output value.                   *
  *            flags            - [IN] the pcre_compile() function flags.         *
  *                                    See pcre_compile() manual.                 *
- *            group_check      - [IN] check if the pattern matches but does not  *
- *                                    contain group to capture.                  *
+ *            group_check      - [IN] check if pattern matches but does not      *
+ *                                    contain group to capture                   *
  *            out              - [OUT] the output value if the input string      *
  *                                     matches the specified regular expression  *
  *                                     or NULL otherwise                         *
@@ -1747,7 +1747,7 @@ void	zbx_wildcard_minimize(char *str)
 	char	*p1, *p2;
 	int	w = 0;
 
-	for(p1 = p2 = str; '\0' != *p2; p2++)
+	for (p1 = p2 = str; '\0' != *p2; p2++)
 	{
 		if ('*' == *p2)
 		{
@@ -1782,13 +1782,13 @@ int	zbx_wildcard_match(const char *value, const char *wildcard)
 {
 	const char *s_pivot = value, *w_pivot = wildcard;
 
-	while('\0' != *value && '*' != *wildcard)
+	while ('\0' != *value && '*' != *wildcard)
 	{
 		if (*value++ != *wildcard++)
 			return 0;
 	}
 
-	while('\0' != *value)
+	while ('\0' != *value)
 	{
 		if ('*' == *wildcard)
 		{
@@ -1812,7 +1812,7 @@ int	zbx_wildcard_match(const char *value, const char *wildcard)
 		}
 	}
 
-	while('*' == *wildcard)
+	while ('*' == *wildcard)
 		wildcard++;
 
 	return '\0' == *wildcard;
