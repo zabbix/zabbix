@@ -99,7 +99,7 @@ foreach ($data['hosts'] as $host) {
 			(new CLink($host['name'], (new CUrl('hostinventories.php'))->setArgument('hostid', $host['hostid'])))
 				->addClass($host['status'] == HOST_STATUS_NOT_MONITORED ? ZBX_STYLE_RED : null)
 		))->addClass(ZBX_STYLE_WORDBREAK),
-		(new CCol($hostgroups))->addClass(ZBX_STYLE_WORDBREAK),
+		(new CCol(implode(', ', $hostgroups)))->addClass(ZBX_STYLE_WORDBREAK),
 		(new CCol(zbx_str2links($host['inventory']['name'])))->addClass(ZBX_STYLE_WORDBREAK),
 		(new CCol(zbx_str2links($host['inventory']['type'])))->addClass(ZBX_STYLE_WORDBREAK),
 		(new CCol(zbx_str2links($host['inventory']['os'])))->addClass(ZBX_STYLE_WORDBREAK),
