@@ -425,7 +425,7 @@ class CItem extends CItemGeneral {
 
 		$_result = [];
 
-		while (true) {
+		do {
 			while ($item = DBfetch($resource)) {
 				// Items share table with item prototypes. Therefore remove item unrelated fields.
 				unset($item['discover']);
@@ -454,7 +454,7 @@ class CItem extends CItemGeneral {
 
 			$result += $_result;
 			$_result = [];
-		}
+		} while ($item !== false);
 
 		// removing keys (hash -> array)
 		if (!$options['preservekeys']) {
