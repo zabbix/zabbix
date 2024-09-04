@@ -81,10 +81,12 @@ zbx_match_t;
 ZBX_PTR_VECTOR_DECL(match, zbx_match_t *)
 ZBX_PTR_VECTOR_IMPL(match, zbx_match_t *)
 
+#ifdef HAVE_PCRE2_H
 static void	zbx_match_free(zbx_match_t *match)
 {
 	zbx_free(match);
 }
+#endif
 
 #if defined(HAVE_PCRE2_H)
 static char	*decode_pcre2_compile_error(int error_code, PCRE2_SIZE error_offset, int flags)
@@ -1040,6 +1042,7 @@ int	zbx_mregexp_sub_precompiled(const char *string, const zbx_regexp_t *regexp, 
  *********************************************************************************/
 int	zbx_regexp_repl(const char *string, const char *pattern, const char *output_template, char **out)
 {
+#ifdef HAVE_PCRE2_H
 	zbx_regexp_t		*regexp = NULL;
 	int			mi, shift = 0, ret = FAIL, len = strlen(string);
 	char			*out_str, *error = NULL;
@@ -1148,9 +1151,6 @@ int	zbx_regexp_repl(const char *string, const char *pattern, const char *output_
 	ret = SUCCEED;
 	zbx_free(*out);
 	*out = out_str;
-#if !defined(HAVE_PCRE2_H)
-	zbx_replace_invalid_utf8(*out);
-#endif
 
 out:
 	zbx_vector_match_clear_ext(&matches, zbx_match_free);
@@ -1159,6 +1159,14 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
+#else
+	ZBX_UNUSED(string);
+	ZBX_UNUSED(pattern);
+	ZBX_UNUSED(output_template);
+	ZBX_UNUSED(out);
+
+	return FAIL;
+#endif
 }
 
 /*********************************************************************************
