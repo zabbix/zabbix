@@ -406,31 +406,36 @@ class CItem extends CItemGeneral {
 		}
 
 		$_result = [];
-		$item = false;
 
-		do {
-			while (count($_result) < CItemGeneral::CHUNK_SIZE && $item = DBfetch($resource)) {
+		while (true) {
+			while ($item = DBfetch($resource)) {
 				// Items share table with item prototypes. Therefore remove item unrelated fields.
 				unset($item['discover']);
 
 				$_result[$item['itemid']] = $item;
-			}
 
-			if ($_result) {
-				if (self::dbDistinct($sqlParts)) {
-					$_result = $this->addNclobFieldValues($options, $_result);
+				if (count($_result) == CItemGeneral::CHUNK_SIZE) {
+					break;
 				}
-
-				$_result = $this->addRelatedObjects($options, $_result);
-				$_result = $this->unsetExtraFields($_result, ['hostid', 'interfaceid', 'value_type', 'valuemapid'],
-					$options['output']
-				);
-				$_result = $this->unsetExtraFields($_result, ['name_upper']);
 			}
+
+			if (!$_result) {
+				break;
+			}
+
+			if (self::dbDistinct($sqlParts)) {
+				$_result = $this->addNclobFieldValues($options, $_result);
+			}
+
+			$_result = $this->addRelatedObjects($options, $_result);
+			$_result = $this->unsetExtraFields($_result, ['hostid', 'interfaceid', 'value_type', 'valuemapid'],
+				$options['output']
+			);
+			$_result = $this->unsetExtraFields($_result, ['name_upper']);
 
 			$result += $_result;
 			$_result = [];
-		} while ($item !== false);
+		}
 
 		// removing keys (hash -> array)
 		if (!$options['preservekeys']) {
