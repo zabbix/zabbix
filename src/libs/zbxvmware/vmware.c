@@ -124,6 +124,28 @@ zbx_vmware_rpool_chunk_t;
 ZBX_PTR_VECTOR_DECL(vmware_rpool_chunk_ptr, zbx_vmware_rpool_chunk_t *)
 ZBX_PTR_VECTOR_IMPL(vmware_rpool_chunk_ptr, zbx_vmware_rpool_chunk_t *)
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: initialization of local process resources                         *
+ *                                                                            *
+ ******************************************************************************/
+void	vmware_local_init(void)
+{
+	zbx_hashset_create(&evt_msg_strpool, 100, vmware_strpool_hash_func, vmware_strpool_compare_func);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: release of local process resources                                *
+ *                                                                            *
+ ******************************************************************************/
+void	vmware_local_destroy(void)
+{
+	zbx_hashset_destroy(&evt_msg_strpool);
+	xmlCleanupParser();
+	curl_global_cleanup();
+}
+
 /* string pool support */
 
 int	vmware_shared_strsearch(const char *str)
@@ -3004,7 +3026,6 @@ void	zbx_vmware_destroy(void)
 	{
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 		zbx_hashset_destroy(&vmware->strpool);
-		zbx_hashset_destroy(&evt_msg_strpool);
 #endif
 		zbx_shmem_destroy(vmware_shmem_get_vmware_mem());
 		vmware_shmem_set_vmware_mem_NULL();
@@ -3236,7 +3257,7 @@ int	zbx_vmware_init(zbx_uint64_t *config_vmware_cache_size, char **error)
 	if (SUCCEED != zbx_mutex_create(&vmware_lock, ZBX_MUTEX_VMWARE, error))
 		return FAIL;
 
-	if (SUCCEED == vmware_shmem_init(config_vmware_cache_size, &vmware, &evt_msg_strpool, error))
+	if (SUCCEED == vmware_shmem_init(config_vmware_cache_size, &vmware, error))
 	{
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 		evt_req_chunk_size = zbx_shmem_required_chunk_size(sizeof(zbx_vmware_event_t));
