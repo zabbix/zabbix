@@ -46,7 +46,8 @@ int	zbx_regexp_match_precompiled(const char *string, const zbx_regexp_t *regexp)
 int	zbx_regexp_match_precompiled2(const char *string, const zbx_regexp_t *regexp, char **err_msg);
 char	*zbx_regexp_match(const char *string, const char *pattern, int *len);
 int	zbx_regexp_sub(const char *string, const char *pattern, const char *output_template, char **out);
-int	zbx_mregexp_sub(const char *string, const char *pattern, const char *output_template, char **out);
+int	zbx_mregexp_sub(const char *string, const char *pattern, const char *output_template, int group_check,
+		char **out);
 int	zbx_iregexp_sub(const char *string, const char *pattern, const char *output_template, char **out);
 int	zbx_mregexp_sub_precompiled(const char *string, const zbx_regexp_t *regexp, const char *output_template,
 		size_t limit, char **out);
