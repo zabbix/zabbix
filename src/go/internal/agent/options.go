@@ -143,6 +143,13 @@ func GetTLSConfig(options *AgentOptions) (cfg *tls.Config, err error) {
 		c.Accept = tls.ConnUnencrypted
 	}
 
+	if (c.Accept|c.Connect)&(tls.ConnPSK|tls.ConnCert) != 0 {
+		c.CipherCert = options.TLSCipherAll
+		c.CipherCert13 = options.TLSCipherAll13
+		c.CipherPSK = options.TLSCipherAll
+		c.CipherPSK13 = options.TLSCipherAll13
+	}
+
 	if (c.Accept|c.Connect)&tls.ConnPSK != 0 {
 		if options.TLSPSKIdentity != "" {
 			c.PSKIdentity = options.TLSPSKIdentity
@@ -163,12 +170,26 @@ func GetTLSConfig(options *AgentOptions) (cfg *tls.Config, err error) {
 		} else {
 			return nil, errors.New("missing TLSPSKFile configuration parameter")
 		}
+
+		if options.TLSCipherPSK != "" {
+			c.CipherPSK = options.TLSCipherPSK
+		}
+		if options.TLSCipherPSK13 != "" {
+			c.CipherPSK13 = options.TLSCipherPSK13
+		}
+
 	} else {
 		if options.TLSPSKIdentity != "" {
 			return nil, errors.New("TLSPSKIdentity configuration parameter set without PSK being used")
 		}
 		if options.TLSPSKFile != "" {
 			return nil, errors.New("TLSPSKFile configuration parameter set without PSK being used")
+		}
+		if options.TLSCipherPSK != "" {
+			return nil, errors.New("TLSCipherPSK configuration parameter set without PSK being used")
+		}
+		if options.TLSCipherPSK13 != "" {
+			return nil, errors.New("TLSCipherPSK13 configuration parameter set without PSK being used")
 		}
 	}
 
@@ -191,6 +212,14 @@ func GetTLSConfig(options *AgentOptions) (cfg *tls.Config, err error) {
 		c.ServerCertIssuer = options.TLSServerCertIssuer
 		c.ServerCertSubject = options.TLSServerCertSubject
 		c.CRLFile = options.TLSCRLFile
+
+		if options.TLSCipherCert != "" {
+			c.CipherCert = options.TLSCipherCert
+		}
+		if options.TLSCipherCert13 != "" {
+			c.CipherCert13 = options.TLSCipherCert13
+		}
+
 	} else {
 		if options.TLSCAFile != "" {
 			return nil, errors.New("TLSCAFile configuration parameter set without certificates being used")
@@ -209,6 +238,12 @@ func GetTLSConfig(options *AgentOptions) (cfg *tls.Config, err error) {
 		}
 		if options.TLSCRLFile != "" {
 			return nil, errors.New("TLSCRLFile configuration parameter set without certificates being used")
+		}
+		if options.TLSCipherCert != "" {
+			return nil, errors.New("TLSCipherCert configuration parameter set without certificates being used")
+		}
+		if options.TLSCipherCert13 != "" {
+			return nil, errors.New("TLSCipherCert13 configuration parameter set without certificates being used")
 		}
 	}
 	return c, nil
