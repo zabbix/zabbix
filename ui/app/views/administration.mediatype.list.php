@@ -132,8 +132,9 @@ foreach ($data['mediatypes'] as $mediaType) {
 	else {
 		$actionLinks = '';
 	}
-	$actionColumn = new CCol($actionLinks);
-	$actionColumn->setAttribute('style', 'white-space: normal;');
+	$actionColumn = (new CCol($actionLinks))
+		->setAttribute('style', 'white-space: normal;')
+		->addClass(ZBX_STYLE_WORDBREAK);
 
 	$statusLink = 'zabbix.php'.
 		'?action='.($mediaType['status'] == MEDIA_TYPE_STATUS_DISABLED
@@ -168,11 +169,11 @@ foreach ($data['mediatypes'] as $mediaType) {
 	// append row
 	$mediaTypeTable->addRow([
 		new CCheckBox('mediatypeids['.$mediaType['mediatypeid'].']', $mediaType['mediatypeid']),
-		(new CCol($name))->addClass(ZBX_STYLE_NOWRAP),
+		(new CCol($name))->addClass(ZBX_STYLE_WORDBREAK),
 		media_type2str($mediaType['typeid']),
 		$status,
 		$actionColumn,
-		$details,
+		(new CCol($details))->addClass(ZBX_STYLE_WORDBREAK),
 		$test_link
 	]);
 }
