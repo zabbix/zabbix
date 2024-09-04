@@ -2041,4 +2041,26 @@ class testFormNetworkDiscovery extends CWebTest {
 			$this->assertEquals(array_keys(array_filter($values)), [$field->getValue()]);
 		}
 	}
+
+	/**
+	 * Checks for the presence of a tooltip icon for the discovery check if it is used in Action.
+	 *
+	 */
+	public function testDiscoveryCheckRemoveIcon(){
+		$this->page->login()->open('zabbix.php?action=discovery.list');
+		$this->query('link', 'Discovery rule for deleting, check used in Action')->waitUntilClickable()->one()->click();
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+		$form = $dialog->asForm();
+
+		// Check if button is disabled
+		$this->assertEquals(false, $form->query('class:js-remove')->waitUntilVisible()->one()->isEnabled());
+
+		// Compare hint text
+		$form->query('class:zi-i-warning')->waitUntilClickable()->one()->click();
+		$this->assertEquals('This check cannot be removed, as it is used as a condition in 1 discovery action.',
+			$this->query('class:hintbox-wrap')->waitUntilClickable()->one()->getText()
+		);
+
+		$dialog->close();
+	}
 }
