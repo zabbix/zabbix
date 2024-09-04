@@ -252,7 +252,7 @@ static void	preprocessing_ar_to_variant(AGENT_RESULT *ar, zbx_variant_t *value)
 	else if (ISSET_MSG(ar))
 		zbx_variant_set_error(value, ar->msg);
 	else
-		THIS_SHOULD_NEVER_HAPPEN;
+		zbx_variant_set_none(value);
 }
 
 /******************************************************************************
