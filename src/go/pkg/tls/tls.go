@@ -1400,8 +1400,8 @@ type Config struct {
 	KeyFile           string
 	ServerCertIssuer  string
 	ServerCertSubject string
-	CipherCert        string
-	CipherCert13      string
+	CipherAll         string
+	CipherAll13       string
 	CipherPSK         string
 	CipherPSK13       string
 }
@@ -1455,16 +1455,16 @@ func Init(config *Config) (err error) {
 			}()
 		}
 
-		if config.CipherCert != "" {
-			cCipherCert = C.CString(config.CipherCert)
+		if config.CipherAll != "" {
+			cCipherCert = C.CString(config.CipherAll)
 			defer func() {
 				log.Tracef("Calling C function \"free()\"")
 				C.free(unsafe.Pointer(cCipherCert))
 			}()
 		}
 
-		if config.CipherCert13 != "" {
-			cCipherCert13 = C.CString(config.CipherCert13)
+		if config.CipherAll13 != "" {
+			cCipherCert13 = C.CString(config.CipherAll13)
 			defer func() {
 				log.Tracef("Calling C function \"free()\"")
 				C.free(unsafe.Pointer(cCipherCert13))

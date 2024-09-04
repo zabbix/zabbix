@@ -143,12 +143,35 @@ func GetTLSConfig(options *AgentOptions) (cfg *tls.Config, err error) {
 		c.Accept = tls.ConnUnencrypted
 	}
 
-	if (c.Accept|c.Connect)&(tls.ConnPSK|tls.ConnCert) != 0 {
-		c.CipherCert = options.TLSCipherAll
-		c.CipherCert13 = options.TLSCipherAll13
-		c.CipherPSK = options.TLSCipherAll
-		c.CipherPSK13 = options.TLSCipherAll13
+	if c.Accept&(tls.ConnPSK|tls.ConnCert) == tls.ConnPSK|tls.ConnCert {
+		if options.TLSCipherCert != "" {
+			return nil, errors.New(`TLSCipherCert configuration parameter cannot be used when the combined list of` +
+				` certificate and PSK ciphersuites are used. Use TLSCipherAll to configure certificate ciphers`)
+		}
+		if options.TLSCipherCert13 != "" {
+			return nil, errors.New(`TLSCipherCert13 configuration parameter cannot be used when the combined list of` +
+				` certificate and PSK ciphersuites are used. Use TLSCipherAll13 to configure certificate ciphers`)
+		}
+		c.CipherAll = options.TLSCipherAll
+		c.CipherAll13 = options.TLSCipherAll13
+	} else {
+		if options.TLSCipherAll != "" {
+			return nil, errors.New(`parameter "TLSCipherAll" cannot be applied: the combined list of certificate` +
+				` and PSK ciphersuites is not used. Most likely parameters "TLSCipherCert" and/or "TLSCipherPSK"` +
+				` are sufficient`)
+		}
+
+		if options.TLSCipherAll13 != "" {
+			return nil, errors.New(`parameter "TLSCipherAll13" cannot be applied: the combined list of certificate` +
+				` and PSK ciphersuites is not used. Most likely parameters "TLSCipherCert13" and/or "TLSCipherPSK13"` +
+				` are sufficient`)
+		}
+
+		c.CipherAll = options.TLSCipherCert
+		c.CipherAll13 = options.TLSCipherCert13
 	}
+	c.CipherPSK = options.TLSCipherPSK
+	c.CipherPSK13 = options.TLSCipherPSK13
 
 	if (c.Accept|c.Connect)&tls.ConnPSK != 0 {
 		if options.TLSPSKIdentity != "" {
@@ -214,10 +237,10 @@ func GetTLSConfig(options *AgentOptions) (cfg *tls.Config, err error) {
 		c.CRLFile = options.TLSCRLFile
 
 		if options.TLSCipherCert != "" {
-			c.CipherCert = options.TLSCipherCert
+			c.CipherAll = options.TLSCipherCert
 		}
 		if options.TLSCipherCert13 != "" {
-			c.CipherCert13 = options.TLSCipherCert13
+			c.CipherAll13 = options.TLSCipherCert13
 		}
 
 	} else {
