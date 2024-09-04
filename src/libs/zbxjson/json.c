@@ -168,7 +168,7 @@ static size_t	__zbx_json_stringsize_limit(const char *string, zbx_json_type_t ty
 {
 	size_t		len = 0, len_cutoff = 0;
 	const char	*sptr, *str_cutoff = NULL;
-	char		buffer[] = {"null"};
+	char		*buffer = "null";
 
 	for (sptr = (NULL != string ? string : buffer); '\0' != *sptr; sptr++)
 	{
@@ -255,7 +255,7 @@ static char	zbx_num2hex(unsigned char c)
 static char	*__zbx_json_insstring_limit(char *p, const char *string, zbx_json_type_t type, size_t str_len)
 {
 	const char	*sptr;
-	char		buffer[] = {"null"};
+	char		*buffer = "null";
 
 	if (NULL != string && ZBX_JSON_TYPE_STRING == type)
 		*p++ = '"';
