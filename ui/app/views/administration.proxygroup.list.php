@@ -139,7 +139,7 @@ foreach ($data['proxy_groups'] as $proxy_groupid => $proxy_group) {
 		$proxy_group['proxy_count_online'],
 		$proxy_group['min_online'],
 		(new CCol($proxy_count_total))->addClass(ZBX_STYLE_CELL_WIDTH),
-		$proxies
+		(new CCol($proxies))->addClass(ZBX_STYLE_WORDBREAK)
 	]);
 }
 
