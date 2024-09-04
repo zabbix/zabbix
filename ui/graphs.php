@@ -671,7 +671,7 @@ else {
 		? API::GraphPrototype()->get($options)
 		: API::Graph()->get($options);
 
-	if (getRequest('context') === 'host') {
+	if ($data['context'] === 'host') {
 		$editable_hosts = API::Host()->get([
 			'output' => ['hostids'],
 			'editable' => true

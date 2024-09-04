@@ -186,10 +186,8 @@ foreach ($data['graphs'] as $graph) {
 				->setAttribute('data-hostid', $host['hostid'])
 				->addClass('js-edit-'.$data['context']);
 
-			if (array_key_exists('editable_hosts', $data)) {
-				$hosts[] = in_array($host['hostid'], $data['editable_hosts'])
-					? $host_link
-					: $host['name'];
+			if ($data['context'] ==='host') {
+				$hosts[] = in_array($host['hostid'], $data['editable_hosts']) ? $host_link : $host['name'];
 			}
 			else {
 				$hosts[] = $host_link;
