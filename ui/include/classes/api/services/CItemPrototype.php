@@ -281,27 +281,32 @@ class CItemPrototype extends CItemGeneral {
 		}
 
 		$_result = [];
-		$item = false;
 
-		do {
-			while (count($_result) < CItemGeneral::CHUNK_SIZE && $item = DBfetch($resource)) {
+		while (true) {
+			while ($item = DBfetch($resource)) {
 				$_result[$item['itemid']] = $item;
-			}
 
-			if ($_result) {
-				if (self::dbDistinct($sqlParts)) {
-					$_result = $this->addNclobFieldValues($options, $_result);
+				if (count($_result) == CItemGeneral::CHUNK_SIZE) {
+					break;
 				}
-
-				self::prepareItemsForApi($_result, false);
-
-				$_result = $this->addRelatedObjects($options, $_result);
-				$_result = $this->unsetExtraFields($_result, ['hostid', 'valuemapid'], $options['output']);
 			}
+
+			if (!$_result) {
+				break;
+			}
+
+			if (self::dbDistinct($sqlParts)) {
+				$_result = $this->addNclobFieldValues($options, $_result);
+			}
+
+			self::prepareItemsForApi($_result, false);
+
+			$_result = $this->addRelatedObjects($options, $_result);
+			$_result = $this->unsetExtraFields($_result, ['hostid', 'valuemapid'], $options['output']);
 
 			$result += $_result;
 			$_result = [];
-		} while ($item !== false);
+		}
 
 		if (!$options['preservekeys']) {
 			$result = zbx_cleanHashes($result);
