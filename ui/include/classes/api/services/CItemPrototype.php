@@ -289,7 +289,7 @@ class CItemPrototype extends CItemGeneral {
 
 		$_result = [];
 
-		while (true) {
+		do {
 			while ($item = DBfetch($resource)) {
 				$_result[$item['itemid']] = $item;
 
@@ -312,7 +312,7 @@ class CItemPrototype extends CItemGeneral {
 
 			$result += $_result;
 			$_result = [];
-		}
+		} while ($item !== false);
 
 		// Decode ITEM_TYPE_HTTPAGENT encoded fields.
 		foreach ($result as &$item) {
