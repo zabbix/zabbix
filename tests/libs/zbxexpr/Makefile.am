@@ -13,12 +13,15 @@ BINARIES_tests = \
 	zbx_user_macro_parse \
 	zbx_get_report_nextcheck \
 	macro_fmttime \
-	macro_regrepl \
 	macro_func \
 	macro_tr \
 	zbx_function_param_parse_ext \
 	zbx_substitute_macros \
 	zbx_substitute_macros1
+
+if HAVE_PCRE2
+BINARIES_tests += macro_regrepl
+endif
 
 noinst_PROGRAMS = $(BINARIES_tests)
 
