@@ -2161,8 +2161,7 @@ button {
 
 .dashboard-list .dashboard-list-item {
   display: flex;
-  justify-content: space-between;
-  height: 18px; }
+  justify-content: space-between; }
   .dashboard-list .dashboard-list-item .status-green {
     background-color: #2f9f5e;
     border-color: #2f9f5e; }

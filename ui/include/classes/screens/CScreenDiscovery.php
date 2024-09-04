@@ -224,7 +224,10 @@ class CScreenDiscovery extends CScreenBase {
 					NBSP(),
 					'('._n('%d device', '%d devices', count($discovery_info)).')'
 				]);
-				$col->setColSpan(count($services) + 3);
+
+				$col
+					->addClass(ZBX_STYLE_WORDBREAK)
+					->setColSpan(count($services) + 3);
 
 				$table->addRow($col);
 			}
