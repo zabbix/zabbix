@@ -295,7 +295,7 @@ class testAuthentication extends CAPITest {
 					'mfaid' =>  self::TEST_DATA_TO_RESOLVE['mfaid']
 				],
 				'expected_error' => null
-			],
+			]
 		];
 	}
 
@@ -521,7 +521,7 @@ class testAuthentication extends CAPITest {
 					'ldap_case_sensitive' => 9999
 				],
 				'expected_error' => 'Invalid parameter "/ldap_case_sensitive": value must be one of '.
-					implode(', ', [ZBX_AUTH_CASE_INSENSITIVE, ZBX_AUTH_CASE_SENSITIVE]).'.',
+					implode(', ', [ZBX_AUTH_CASE_INSENSITIVE, ZBX_AUTH_CASE_SENSITIVE]).'.'
 			],
 			'Valid case sensitive for LDAP auth' => [
 				'authentication' => [
