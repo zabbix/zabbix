@@ -1076,9 +1076,9 @@ AC_CHECK_FUNCS([alarm atexit clock_gettime dup2 fesetround floor getcwd       \
                 getenv gethostname getmntent getmntinfo getpagesize           \
                 gettimeofday hstrerror inet_ntoa localtime_r malloc_trim      \
                 memchr memmove memset mkdir modf munmap pow pstat_getdynamic  \
-                realpath round select setenv setenv sigqueue socket sqrt      \
-                strcasecmp strchr strcspn strdup strerror strpbrk strrchr     \
-                strstr strtol strtoul sysinfo tzset tzset uname unsetenv])
+                realpath round select setenv sigqueue socket sqrt strcasecmp  \
+                strchr strcspn strdup strerror strpbrk strrchr strstr strtol  \
+                strtoul sysinfo tzset uname unsetenv])
 
 dnl *****************************************************************
 dnl *                                                               *
