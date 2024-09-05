@@ -58,10 +58,7 @@ static int	DBpatch_7000003(void)
 
 static int	DBpatch_7000004(void)
 {
-	if (FAIL == zbx_db_index_exists("auditlog", "auditlog_5"))
-		return DBcreate_index("auditlog", "auditlog_5", "ip", 0);
-
-	return SUCCEED;
+	return DBcreate_index("auditlog", "auditlog_5", "ip", 0);
 }
 
 #endif
