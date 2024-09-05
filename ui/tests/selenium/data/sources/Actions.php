@@ -447,13 +447,13 @@ class Actions {
 				' (101, 0, 0, 13545, 1329724790, 1, 0, 0);'
 		);
 
-		DBexecute('INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, '.
+		DBexecute('INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject,'.
 				' message, status, retries, error, esc_step, alerttype, parameters) VALUES '.
 				'(1, '.zbx_dbstr($actionids['Trigger action 2']).', 101, 1, 1329724800, 1, \'igor.danoshaites@zabbix.com\','.
-				'\'PROBLEM: Value of item key1 > 5\', \'Event at 2012.02.20 10:00:00 Hostname: H1 Value of item key1 > 5: '.
+				'\'PROBLEM: Value of item key1 > 5\', \'Event at 2012.02.20 10:00:00 Hostname: H1 Value of item key1 > 5:'.
 				' PROBLEM Last value: 6\', 1, 0, \'\', 1, 0, \'\'),'.
 				'(2, '.zbx_dbstr($actionids['Trigger action 2']).', 101, 1, 1329724810, 1, \'igor.danoshaites@zabbix.com\', '.
-				'\'PROBLEM: Value of item key1 > 6\',\'Event at 2012.02.20 10:00:10 Hostname: H1 Value of item key1 > 6: '.
+				'\'PROBLEM: Value of item key1 > 6\',\'Event at 2012.02.20 10:00:10 Hostname: H1 Value of item key1 > 6:'.
 				' PROBLEM\', 1, 0, \'\', 1, 0, \'\'),'.
 				'(3, '.zbx_dbstr($actionids['Trigger action 2']).', 101, 1, 1329724820, 1, \'igor.danoshaites@zabbix.com\','.
 				'\'PROBLEM: Value of item key1 > 7\', \'Event at 2012.02.20 10:00:20 Hostname: H1 Value of item key1 > 7:'.
@@ -462,7 +462,7 @@ class Actions {
 				'\'PROBLEM: Value of item key1 > 10\', \'Event at 2012.02.20 10:00:30 Hostname: H1 Value of item key1 > 10: PROBLEM\','.
 				' 2, 0, \'Get value from agent failed: cannot connect to [[127.0.0.1]:10050]: [111] Connection refused\', 1, 0, \'\'),'.
 				'(5, '.zbx_dbstr($actionids['Trigger action 2']).', 101, 1, 1329724840, 1, \'igor.danoshaites@zabbix.com\', '.
-				'\'PROBLEM: Value of item key1 > 20\', \'Event at 2012.02.20 10:00:40 Hostname: H1 Value of item key1 > 20: '.
+				'\'PROBLEM: Value of item key1 > 20\', \'Event at 2012.02.20 10:00:40 Hostname: H1 Value of item key1 > 20:'.
 				' PROBLEM\', 0, 0, \'Get value from agent failed: cannot connect to [[127.0.0.1]:10050]: '.
 				'[111] Connection refused\', 1, 0, \'\'),'.
 				'(6, '.zbx_dbstr($actionids['Trigger action 2']).', 101, NULL, 1329724850, NULL, \'\', \'\','.
