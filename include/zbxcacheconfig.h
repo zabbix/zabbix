@@ -864,6 +864,14 @@ void	zbx_dc_config_update_interface_snmp_stats(zbx_uint64_t interfaceid, int max
 int	zbx_dc_config_get_suggested_snmp_vars(zbx_uint64_t interfaceid, int *bulk);
 int	zbx_dc_config_get_interface_by_type(zbx_dc_interface_t *interface, zbx_uint64_t hostid, unsigned char type);
 int	zbx_dc_config_get_interface(zbx_dc_interface_t *interface, zbx_uint64_t hostid, zbx_uint64_t itemid);
+
+#define ZBX_REQUEST_HOST_IP			1
+#define ZBX_REQUEST_HOST_DNS			2
+#define ZBX_REQUEST_HOST_CONN			3
+#define ZBX_REQUEST_HOST_PORT			4
+
+int	zbx_dc_get_interface_value(zbx_uint64_t hostid, zbx_uint64_t itemid, char **replace_to, int request);
+
 int	zbx_dc_config_get_poller_nextcheck(unsigned char poller_type);
 int	zbx_dc_config_get_poller_items(unsigned char poller_type, int config_timeout, int processing,
 		int config_max_concurrent_checks, zbx_dc_item_t **items);
