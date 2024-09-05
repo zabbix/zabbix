@@ -95,7 +95,7 @@ func (p *Plugin) RegisterMetrics(config any) error {
 		func() error {
 			err = p.register()
 			if err != nil {
-				return errs.Wrap(err, "failed to register plugin")
+				return errs.Wrap(err, "failed plugin register request")
 			}
 
 			defer p.Stop()
