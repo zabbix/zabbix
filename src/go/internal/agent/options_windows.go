@@ -56,8 +56,11 @@ type AgentOptions struct {
 	TLSKeyFile               string   `conf:"optional"`
 	TLSServerCertIssuer      string   `conf:"optional"`
 	TLSServerCertSubject     string   `conf:"optional"`
+	TLSCipherCert            string   `conf:"optional"`
 	TLSCipherCert13          string   `conf:"optional"`
+	TLSCipherPSK             string   `conf:"optional"`
 	TLSCipherPSK13           string   `conf:"optional"`
+	TLSCipherAll             string   `conf:"optional"`
 	TLSCipherAll13           string   `conf:"optional"`
 	ExternalPlugins          []string `conf:"optional,name=PluginPath"`
 	ExternalPluginTimeout    int      `conf:"optional,name=PluginTimeout,range=1:30"`
