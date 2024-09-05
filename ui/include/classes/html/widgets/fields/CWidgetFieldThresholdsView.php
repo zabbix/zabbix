@@ -29,7 +29,7 @@ class CWidgetFieldThresholdsView extends CWidgetFieldView {
 			->setHeader([
 				'',
 				_('Threshold'),
-				(new CColHeader(_('Action')))->setWidth('100%')
+				(new CColHeader(''))->setWidth('100%')
 			])
 			->setFooter(new CRow(
 				new CCol(
