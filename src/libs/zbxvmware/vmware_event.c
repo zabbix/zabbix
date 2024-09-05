@@ -74,7 +74,7 @@ static void	evt_msg_strpool_destroy(void)
  * Purpose: frees resources allocated to store event message in strpool       *
  *                                                                            *
  ******************************************************************************/
-void	evt_msg_strpool_strfree(char *str, zbx_uint64_t *strpool_sz)
+static void	evt_msg_strpool_strfree(char *str, zbx_uint64_t *strpool_sz)
 {
 	zbx_uint64_t	len;
 
@@ -89,7 +89,7 @@ void	evt_msg_strpool_strfree(char *str, zbx_uint64_t *strpool_sz)
  * Purpose: store event message in strpool                                    *
  *                                                                            *
  ******************************************************************************/
-char	*evt_msg_strpool_strdup(const char *str, zbx_uint64_t *strpool_sz)
+static char	*evt_msg_strpool_strdup(const char *str, zbx_uint64_t *strpool_sz)
 {
 	char		*strdup;
 	zbx_uint64_t	len;
@@ -107,7 +107,7 @@ char	*evt_msg_strpool_strdup(const char *str, zbx_uint64_t *strpool_sz)
  * Purpose: compute common size of memory for evt strpool and shmem strpool   *
  *                                                                            *
  ******************************************************************************/
-zbx_uint64_t	vmware_evt_strpool_overlap_mem(void)
+static zbx_uint64_t	vmware_evt_strpool_overlap_mem(void)
 {
 	void			*ptr;
 	zbx_hashset_iter_t	iter;
