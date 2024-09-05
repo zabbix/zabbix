@@ -14,19 +14,20 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix],[7.2.0alpha1])
-AC_CONFIG_SRCDIR(src/zabbix_server/server.c)
-AM_INIT_AUTOMAKE([subdir-objects tar-pax])
+AC_INIT([Zabbix], [7.2.0alpha1])
 
 AC_MSG_NOTICE([Configuring $PACKAGE_NAME $PACKAGE_VERSION])
 
-AC_PROG_MAKE_SET
-
-AC_CONFIG_HEADERS(include/common/config.h)
+AC_CONFIG_MACRO_DIR([m4])
+AC_CONFIG_SRCDIR([src/zabbix_server/server.c])
+AC_CONFIG_HEADERS([include/common/config.h])
 
 AC_SUBST(DEFAULT_INCLUDES, ['-I$(top_srcdir)/include/common -I$(top_srcdir)/include'])
 
+AC_CANONICAL_BUILD
 AC_CANONICAL_HOST
+
+AM_INIT_AUTOMAKE([subdir-objects tar-pax])
 
 dnl *****************************************************************
 dnl *                                                               *
@@ -36,6 +37,7 @@ dnl *****************************************************************
 
 AC_PROG_EGREP
 AC_PROG_AWK
+AC_PROG_MAKE_SET
 AC_PROG_CC([cc c99 gcc clang])
 AC_PROG_CXX
 
