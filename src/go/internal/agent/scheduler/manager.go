@@ -194,7 +194,7 @@ func (m *Manager) cleanupClient(c *client, now time.Time) {
 
 func parseItemTimeout(s string) (int, error) {
 	if s == "" {
-		return 0, errs.Wrapf(ErrUnsupportedTimeout, "value cannot be empty")
+		return 0, errs.Wrap(ErrUnsupportedTimeout, "value cannot be empty")
 	}
 
 	var seconds int
@@ -207,11 +207,11 @@ func parseItemTimeout(s string) (int, error) {
 		} else if strings.HasSuffix(s, "s") {
 			mult = 1
 		} else {
-			return 0, errs.Wrapf(ErrUnsupportedTimeout, "invalid time suffix format")
+			return 0, errs.Wrap(ErrUnsupportedTimeout, "invalid time suffix format")
 		}
 
 		if val, err := strconv.Atoi(s[:len(s)-1]); err != nil {
-			return 0, errs.Wrapf(ErrUnsupportedTimeout, "cannot parse '%s' as seconds", s)
+			return 0, errs.Wrapf(ErrUnsupportedTimeout, "cannot parse %q as seconds", s)
 		} else {
 			seconds = val * mult
 		}
