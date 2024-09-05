@@ -260,10 +260,9 @@ static char	*__zbx_json_insstring_limit(char *p, const char *string, zbx_json_ty
 	if (NULL != string && ZBX_JSON_TYPE_STRING == type)
 		*p++ = '"';
 
-	sptr = (NULL != string ? string : buffer);
-	start = sptr;
+	start = (NULL != string ? string : buffer);
 
-	for (;(0 == str_len || (size_t)(sptr - start) < str_len) && '\0' != *sptr; sptr++)
+	for (sptr = start;(0 == str_len || (size_t)(sptr - start) < str_len) && '\0' != *sptr; sptr++)
 	{
 		switch (*sptr)
 		{
