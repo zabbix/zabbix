@@ -532,10 +532,10 @@ static int	rm_get_report_range(int report_time, unsigned char period, struct tm 
 		return FAIL;
 
 	*to = *tm;
-	zbx_tm_round_down(to, period2unit[period]);
+	zbx_tm_round_down(to, period2unit[period], NULL);
 
 	*from = *to;
-	zbx_tm_sub(from, 1, period2unit[period]);
+	zbx_tm_sub(from, 1, period2unit[period], NULL);
 
 	return SUCCEED;
 }
