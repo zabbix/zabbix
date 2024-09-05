@@ -27,7 +27,6 @@
 #include "zbxstr.h"
 #include "zbxalgo.h"
 #include "zbxhistory.h"
-#include "zbxip.h"
 
 /******************************************************************************
  *                                                                            *

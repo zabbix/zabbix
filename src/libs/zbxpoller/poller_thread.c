@@ -61,6 +61,7 @@
 #include "zbxsysinfo.h"
 #include "zbx_expression_constants.h"
 #include "zbxinterface.h"
+#include "zbxexpr.h"
 
 static zbx_get_progname_f	zbx_get_progname_cb = NULL;
 
