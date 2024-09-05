@@ -262,7 +262,7 @@ static char	*__zbx_json_insstring_limit(char *p, const char *string, zbx_json_ty
 
 	start = (NULL != string ? string : buffer);
 
-	for (sptr = start;(0 == str_len || (size_t)(sptr - start) < str_len) && '\0' != *sptr; sptr++)
+	for (sptr = start; (0 == str_len || (size_t)(sptr - start) < str_len) && '\0' != *sptr; sptr++)
 	{
 		switch (*sptr)
 		{
