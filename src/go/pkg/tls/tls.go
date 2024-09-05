@@ -1105,13 +1105,17 @@ func (c *tlsConn) verifyIssuerSubject(cfg *Config) (err error) {
 		var cSubject, cIssuer *C.char
 		if cfg.ServerCertIssuer != "" {
 			cIssuer = C.CString(cfg.ServerCertIssuer)
-			log.Tracef("Calling C function \"free(cIssuer)\"")
-			defer C.free(unsafe.Pointer(cIssuer))
+			defer func() {
+				log.Tracef("Calling C function \"free(cIssuer)\"")
+				C.free(unsafe.Pointer(cIssuer))
+			}()
 		}
 		if cfg.ServerCertSubject != "" {
 			cSubject = C.CString(cfg.ServerCertSubject)
-			log.Tracef("Calling C function \"free(cSubject)\"")
-			defer C.free(unsafe.Pointer(cSubject))
+			defer func() {
+				log.Tracef("Calling C function \"free(cSubject)\"")
+				C.free(unsafe.Pointer(cSubject))
+			}()
 		}
 		log.Tracef("Calling C function \"tls_validate_issuer_and_subject()\"")
 		if 0 != C.tls_validate_issuer_and_subject((*C.tls_t)(c.tls), cIssuer, cSubject) {
@@ -1224,8 +1228,10 @@ func NewClient(nc net.Conn, cfg *Config, timeout time.Duration, shiftDeadline bo
 		hostname := url.Host()
 		if nil == net.ParseIP(hostname) {
 			cHostname = C.CString(hostname)
-			log.Tracef("Calling C function \"free()\"")
-			defer C.free(unsafe.Pointer(cHostname))
+			defer func() {
+				log.Tracef("Calling C function \"free()\"")
+				C.free(unsafe.Pointer(cHostname))
+			}()
 		}
 	}
 
