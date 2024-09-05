@@ -473,7 +473,7 @@ $saml_tab = (new CFormGrid())
 					->addClass($saml_auth_enabled ? null : ZBX_STYLE_DISABLED)
 					->setHeader(
 						(new CRowHeader([
-							_('Name '), 
+							_('Name'),
 							_('Media type'),
 							_('Attribute'),
 							(new CColHeader(_('Action')))->setWidth('12%')
