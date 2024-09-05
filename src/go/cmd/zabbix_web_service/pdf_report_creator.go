@@ -31,9 +31,12 @@ import (
 	"github.com/chromedp/cdproto/network"
 	"github.com/chromedp/cdproto/page"
 	"github.com/chromedp/chromedp"
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/zbxerr"
 )
+
+const netErrCertAuthorityInvalid = "net::ERR_CERT_AUTHORITY_INVALID"
 
 type requestBody struct {
 	URL        string            `json:"url"`
@@ -58,7 +61,9 @@ func logAndWriteError(w http.ResponseWriter, errMsg string, code int) {
 	w.Header().Set("Content-Type", "application/problem+json")
 	w.Header().Set("X-Content-Type-Options", "nosniff")
 	w.WriteHeader(code)
-	json.NewEncoder(w).Encode(map[string]string{"detail": errMsg})
+	encoder := json.NewEncoder(w)
+	encoder.SetEscapeHTML(false)
+	encoder.Encode(map[string]string{"detail": errMsg})
 }
 
 func (h *handler) report(w http.ResponseWriter, r *http.Request) {
@@ -175,9 +180,17 @@ func (h *handler) report(w http.ResponseWriter, r *http.Request) {
 		cookieParams = append(cookieParams, &cookieParam)
 	}
 
+	errEvtC := make(chan string, 1)
+
+	chromedp.ListenTarget(ctx, func(ev interface{}) {
+		if ev, ok := ev.(*network.EventLoadingFailed); ok && ev.ErrorText != "" && len(errEvtC) < cap(errEvtC) {
+			errEvtC <- ev.ErrorText
+		}
+	})
+
 	var buf []byte
 
-	if err = chromedp.Run(ctx, chromedp.Tasks{
+	err = chromedp.Run(ctx, chromedp.Tasks{
 		network.SetCookies(cookieParams),
 		emulation.SetDeviceMetricsOverride(width, height, 1, false),
 		prepareDashboard(u.String()),
@@ -194,7 +207,33 @@ func (h *handler) report(w http.ResponseWriter, r *http.Request) {
 
 			return err
 		}),
-	}); err != nil {
+	})
+
+	if len(errEvtC) != 0 {
+		errorText := <-errEvtC
+
+		if errorText == netErrCertAuthorityInvalid {
+			errorText = fmt.Sprintf(
+				"Invalid certificate authority detected while loading dashboard: '%s'. Fix TLS "+
+					"configuration or configure Zabbix web service to ignore TLS certificate "+
+					"errors when accessing frontend URL.",
+				u.String(),
+			)
+			logAndWriteError(w, errorText, http.StatusInternalServerError)
+
+			return
+		}
+
+		errorText = fmt.Sprintf(
+			"received network.EventLoadingFailed '%s' event while loading dashboard",
+			errorText,
+		)
+		logAndWriteError(w, errorText, http.StatusInternalServerError)
+
+		return
+	}
+
+	if err != nil {
 		logAndWriteError(w, zbxerr.ErrorCannotFetchData.Wrap(err).Error(), http.StatusInternalServerError)
 
 		return
@@ -225,19 +264,20 @@ func prepareDashboard(url string) chromedp.ActionFunc {
 
 func waitForDashboardReady(ctx context.Context, url string) error {
 	const wrapperIsReady = ".wrapper.is-ready"
-	const timeout = time.Minute
+	const timeout = time.Second * 45
 
 	expression := fmt.Sprintf("document.querySelector('%s') !== null", wrapperIsReady)
 	var isReady bool
 
 	err := chromedp.Run(ctx, chromedp.Poll(expression, &isReady, chromedp.WithPollingTimeout(timeout)))
 
-	if errors.Is(err, chromedp.ErrPollingTimeout) {
-		log.Warningf("timeout occurred while dashboard was getting ready, url: '%s'", url)
-	} else if err != nil {
-		log.Warningf("error while dashboard was getting ready: %s, url: '%s'", err.Error(), url)
-	} else if !isReady {
-		log.Warningf("should never happen, dashboard failed to get ready with no error, url: '%s'", url)
+	if err != nil {
+		return errs.Wrapf(err, "dashboard failed to get ready, url: '%s'", url)
+	}
+
+	if !isReady {
+		/* it is expected that either dashboard gets ready or chromedp.ErrPollingTimeout happens */
+		return errs.Errorf("should never happen, dashboard failed to get ready with no error, url: '%s'", url)
 	}
 
 	return nil
