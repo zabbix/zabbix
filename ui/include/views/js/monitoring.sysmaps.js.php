@@ -760,7 +760,7 @@ function createFontSelect(string $name): CSelect {
 		->addRow(_('Links'),
 			(new CDiv(
 				(new CTable())
-					->setHeader([_('From'), _('To'), _('Link indicators'), ''])
+					->setHeader([_('From'), _('To'), _('Link indicators'), _('Action')])
 					->setAttribute('style', 'width: 100%;')
 					->setId('mass-element-links')
 			))
