@@ -1011,14 +1011,14 @@ ZBX_THREAD_ENTRY(zbx_alert_syncer_thread, args)
 #define ZBX_POLL_INTERVAL		1
 	zbx_thread_alert_syncer_args	*alert_syncer_args_in = (zbx_thread_alert_syncer_args *)
 							(((zbx_thread_args_t *)args)->args);
-	int				sleeptime, freq_watchdog, sleeptime_after_notify = 0;
+	int				sleeptime, freq_watchdog, alerts_num;
 	zbx_am_db_t			amdb;
 	char				*error = NULL;
 	const zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
 	int				server_num = ((zbx_thread_args_t *)args)->info.server_num;
 	int				process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
-	double				time_cleanup = 0,  time_watchdog = 0;
+	double				time_cleanup = 0,  time_watchdog = 0, time_results = 0, sec1;
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
@@ -1040,38 +1040,30 @@ ZBX_THREAD_ENTRY(zbx_alert_syncer_thread, args)
 	if (ZBX_WATCHDOG_ALERT_FREQUENCY < (freq_watchdog = alert_syncer_args_in->confsyncer_frequency))
 		freq_watchdog = ZBX_WATCHDOG_ALERT_FREQUENCY;
 
-	zbx_setproctitle("%s [started, idle %d sec]", get_process_type_string(process_type), sleeptime);
+	zbx_setproctitle("%s [queuing alerts]", get_process_type_string(process_type));
+
+	sec1 = zbx_time();
+	alerts_num = am_db_queue_alerts(&amdb);
+
+	zbx_setproctitle("%s [queued %d alerts(s) in " ZBX_FS_DBL " sec]",
+			get_process_type_string(process_type), alerts_num, zbx_time() - sec1);
+
 
 	while (ZBX_IS_RUNNING())
 	{
-		int			alerts_num = 0, results_num = 0;
-		time_t			wait_start_time = time(NULL);
+		int			results_num = 0;
 		zbx_ipc_message_t	*message = NULL;
 
-		while (ZBX_IS_RUNNING())
+		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
+		if (SUCCEED != zbx_ipc_async_socket_recv(&amdb.am, sleeptime, &message))
 		{
-			if (0 == sleeptime_after_notify)
-				sleeptime_after_notify = sleeptime;
-
-			zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
-			if (SUCCEED != zbx_ipc_async_socket_recv(&amdb.am, sleeptime, &message))
-			{
-				zabbix_log(LOG_LEVEL_CRIT, "cannot read alert syncer request");
-				exit(EXIT_FAILURE);
-			}
-			zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
-
-			sleeptime_after_notify -= (int)(time(NULL) - wait_start_time);
-			if (0 > sleeptime_after_notify)
-				sleeptime_after_notify = 0;
-
-			/* exit loop if got message or timeout */
-			if (NULL != message || 0 == sleeptime_after_notify)
-				break;
+			zabbix_log(LOG_LEVEL_CRIT, "cannot read alert syncer request");
+			exit(EXIT_FAILURE);
 		}
+		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
-		double	sec1 = zbx_time();
-		int	req_alerts = 0;
+		sec1 = zbx_time();
+
 		zbx_update_env(get_process_type_string(process_type), sec1);
 
 		if (NULL != message)
@@ -1080,9 +1072,7 @@ ZBX_THREAD_ENTRY(zbx_alert_syncer_thread, args)
 			{
 				case ZBX_IPC_ALERTER_SYNC_ALERTS:
 					zbx_setproctitle("%s [queuing alerts]", get_process_type_string(process_type));
-
 					alerts_num = am_db_queue_alerts(&amdb);
-					req_alerts = 1;
 					break;
 				case ZBX_IPC_ALERTER_RESULTS:
 					results_num = am_db_flush_results(&amdb.mediatypes, message->data);
@@ -1095,21 +1085,14 @@ ZBX_THREAD_ENTRY(zbx_alert_syncer_thread, args)
 
 			zbx_ipc_message_free(message);
 		}
-		else if (0 == sleeptime_after_notify)
-		{
-			zbx_setproctitle("%s [queuing alerts]", get_process_type_string(process_type));
 
-			alerts_num = am_db_queue_alerts(&amdb);
-			req_alerts = 1;
-		}
-		else
+		if (time_results + ZBX_POLL_INTERVAL < sec1)
 		{
-			/* ZBX_IS_RUNNING() is false */
-			break;
-		}
-
-		if (1 == req_alerts && FAIL == zbx_ipc_async_socket_send(&amdb.am, ZBX_IPC_ALERTER_RESULTS, NULL, 0))
+			if (FAIL == zbx_ipc_async_socket_send(&amdb.am, ZBX_IPC_ALERTER_RESULTS, NULL, 0))
 				zabbix_log(LOG_LEVEL_ERR, "failed to request alert results");
+
+			time_results = sec1;
+		}
 
 		if (time_cleanup + SEC_PER_HOUR < sec1)
 		{

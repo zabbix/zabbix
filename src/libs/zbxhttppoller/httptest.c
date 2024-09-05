@@ -28,6 +28,8 @@
 #include "zbxdbhigh.h"
 #include "zbxstr.h"
 #include "zbxtime.h"
+#include "zbx_expression_constants.h"
+#include "zbxexpr.h"
 
 #ifdef HAVE_LIBCURL
 
@@ -211,6 +213,76 @@ static void	httppairs_free(zbx_vector_ptr_pair_t *pairs)
 	zbx_vector_ptr_pair_destroy(pairs);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: resolves macros in HTTP test field context                        *
+ *                                                                            *
+ * Parameters: p            - [IN] macro resolver data structure              *
+ *             args         - [IN] list of variadic parameters                *
+ *                                 Expected content:                          *
+ *                                  - zbx_dc_um_handle_t *um_handle: user     *
+ *                                      macro cache handle                    *
+ *                                  - const zbx_dc_host_t *dc_host: host      *
+ *                                      information                           *
+ *             replace_with - [OUT] pointer to value to replace macro with    *
+ *             data         - [IN/OUT] pointer to original input raw string   *
+ *                                  (for macro in macro resolving), not used  *
+ *             error        - [OUT] pointer to pre-allocated error message    *
+ *                                  buffer (can be NULL), not used            *
+ *             maxerrlen    - [IN] size of error message buffer (can be 0 if  *
+ *                                 'error' is NULL), not used                 *
+ *                                                                            *
+ * Return value: SUCCEED if macro data were resolved successfully.            *
+ *               Otherwise FAIL.                                              *
+ *                                                                            *
+ ******************************************************************************/
+static int	macro_httptest_field_resolv(zbx_macro_resolv_data_t *p, va_list args, char **replace_with, char **data,
+		char *error, size_t maxerrlen)
+{
+	int			ret = SUCCEED;
+	zbx_dc_interface_t	interface;
+
+	/* Passed arguments */
+	zbx_dc_um_handle_t	*um_handle = va_arg(args, zbx_dc_um_handle_t *);
+	const zbx_dc_host_t	*dc_host = va_arg(args, const zbx_dc_host_t *);
+
+	ZBX_UNUSED(data);
+	ZBX_UNUSED(error);
+	ZBX_UNUSED(maxerrlen);
+
+	if (ZBX_TOKEN_USER_MACRO == p->token.type || (ZBX_TOKEN_USER_FUNC_MACRO == p->token.type &&
+				0 == strncmp(p->macro, MVAR_USER_MACRO, ZBX_CONST_STRLEN(MVAR_USER_MACRO))))
+	{
+		zbx_dc_get_user_macro(um_handle, p->macro, &dc_host->hostid, 1, replace_with);
+		p->pos = p->token.loc.r;
+	}
+	else if (0 == strcmp(p->macro, MVAR_HOST_HOST) || 0 == strcmp(p->macro, MVAR_HOSTNAME))
+	{
+		*replace_with = zbx_strdup(*replace_with, dc_host->host);
+	}
+	else if (0 == strcmp(p->macro, MVAR_HOST_NAME))
+	{
+		*replace_with = zbx_strdup(*replace_with, dc_host->name);
+	}
+	else if (0 == strcmp(p->macro, MVAR_HOST_IP) || 0 == strcmp(p->macro, MVAR_IPADDRESS))
+	{
+		if (SUCCEED == (ret = zbx_dc_config_get_interface(&interface, dc_host->hostid, 0)))
+			*replace_with = zbx_strdup(*replace_with, interface.ip_orig);
+	}
+	else if	(0 == strcmp(p->macro, MVAR_HOST_DNS))
+	{
+		if (SUCCEED == (ret = zbx_dc_config_get_interface(&interface, dc_host->hostid, 0)))
+			*replace_with = zbx_strdup(*replace_with, interface.dns_orig);
+	}
+	else if (0 == strcmp(p->macro, MVAR_HOST_CONN))
+	{
+		if (SUCCEED == (ret = zbx_dc_config_get_interface(&interface, dc_host->hostid, 0)))
+			*replace_with = zbx_strdup(*replace_with, interface.addr);
+	}
+
+	return ret;
+}
+
 #ifdef HAVE_LIBCURL
 static void	process_step_data(zbx_uint64_t httpstepid, zbx_httpstat_t *stat, zbx_timespec_t *ts)
 {
@@ -341,8 +413,12 @@ static int	httpstep_load_pairs(zbx_dc_host_t *host, zbx_httpstep_t *httpstep)
 		value = zbx_strdup(NULL, row[1]);
 
 		/* from now on variable values can contain macros so proper URL encoding can be performed */
-		if (SUCCEED != (ret = zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, host, NULL,
-				NULL, NULL, NULL, NULL, NULL, &value, ZBX_MACRO_TYPE_HTTPTEST_FIELD, NULL, 0)))
+
+		zbx_dc_um_handle_t	*um_handle = zbx_dc_open_user_macros_secure();
+		ret = zbx_substitute_macros(&value, NULL, 0, &macro_httptest_field_resolv, um_handle, host);
+		zbx_dc_close_user_macros(um_handle);
+
+		if (SUCCEED != ret)
 		{
 			zbx_free(value);
 			goto out;
@@ -352,16 +428,23 @@ static int	httpstep_load_pairs(zbx_dc_host_t *host, zbx_httpstep_t *httpstep)
 
 		/* variable names cannot contain macros, and both variable names and variable values cannot contain */
 		/* another variables */
-		if (ZBX_HTTPFIELD_VARIABLE != type &&
-				(SUCCEED != (ret = zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, host,
-				NULL, NULL, NULL, NULL, NULL, NULL, &key, ZBX_MACRO_TYPE_HTTPTEST_FIELD, NULL, 0)) ||
-				SUCCEED != (ret = http_substitute_variables(httpstep->httptest, &key)) ||
-				SUCCEED != (ret = http_substitute_variables(httpstep->httptest, &value))))
+		if (ZBX_HTTPFIELD_VARIABLE != type)
 		{
-			httppairs_free(&httpstep->variables);
-			zbx_free(key);
-			zbx_free(value);
-			goto out;
+			um_handle = zbx_dc_open_user_macros();
+
+			if ((SUCCEED != (ret = zbx_substitute_macros(&key, NULL, 0, &macro_httptest_field_resolv,
+					um_handle, host)) ||
+					SUCCEED != (ret = http_substitute_variables(httpstep->httptest, &key)) ||
+					SUCCEED != (ret = http_substitute_variables(httpstep->httptest, &value))))
+			{
+				zbx_dc_close_user_macros(um_handle);
+				httppairs_free(&httpstep->variables);
+				zbx_free(key);
+				zbx_free(value);
+				goto out;
+			}
+
+			zbx_dc_close_user_macros(um_handle);
 		}
 
 		/* keys and values of query fields / post fields should be encoded */
@@ -522,8 +605,11 @@ static int	httptest_load_pairs(zbx_dc_host_t *host, zbx_httptest_t *httptest)
 		value = zbx_strdup(NULL, row[1]);
 
 		/* from now on variable values can contain macros so proper URL encoding can be performed */
-		if (SUCCEED != (ret = zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, host, NULL,
-				NULL, NULL, NULL, NULL, NULL, &value, ZBX_MACRO_TYPE_HTTPTEST_FIELD, NULL, 0)))
+		zbx_dc_um_handle_t	*um_handle = zbx_dc_open_user_macros_secure();
+		ret = zbx_substitute_macros(&value, NULL, 0, &macro_httptest_field_resolv, um_handle, host);
+		zbx_dc_close_user_macros(um_handle);
+
+		if (SUCCEED != ret)
 		{
 			zbx_free(value);
 			goto out;
@@ -533,14 +619,21 @@ static int	httptest_load_pairs(zbx_dc_host_t *host, zbx_httptest_t *httptest)
 
 		/* variable names cannot contain macros, and both variable names and variable values cannot contain */
 		/* another variables */
-		if (ZBX_HTTPFIELD_VARIABLE != type && SUCCEED != (ret = zbx_substitute_simple_macros(NULL, NULL, NULL,
-				NULL, NULL, host, NULL, NULL, NULL, NULL, NULL, NULL, &key,
-				ZBX_MACRO_TYPE_HTTPTEST_FIELD, NULL, 0)))
+		if (ZBX_HTTPFIELD_VARIABLE != type)
 		{
-			httppairs_free(&httptest->variables);
-			zbx_free(key);
-			zbx_free(value);
-			goto out;
+			um_handle = zbx_dc_open_user_macros();
+
+			if (SUCCEED != (ret = zbx_substitute_macros(&key, NULL, 0, &macro_httptest_field_resolv,
+					um_handle, host)))
+			{
+				zbx_dc_close_user_macros(um_handle);
+				httppairs_free(&httptest->variables);
+				zbx_free(key);
+				zbx_free(value);
+				goto out;
+			}
+
+			zbx_dc_close_user_macros(um_handle);
 		}
 
 		switch (type)
@@ -669,13 +762,18 @@ static void	process_httptest(zbx_dc_host_t *host, zbx_httptest_t *httptest, int 
 		db_httpstep.name = row[2];
 
 		db_httpstep.url = zbx_strdup(NULL, row[3]);
-		zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, host, NULL, NULL, NULL, NULL, NULL,
-				NULL, &db_httpstep.url, ZBX_MACRO_TYPE_HTTPTEST_FIELD, NULL, 0);
+
+		zbx_dc_um_handle_t	*um_handle = zbx_dc_open_user_macros_secure();
+		zbx_substitute_macros(&db_httpstep.url, NULL, 0, &macro_httptest_field_resolv, um_handle, host);
+		zbx_dc_close_user_macros(um_handle);
+
 		http_substitute_variables(httptest, &db_httpstep.url);
 
 		db_httpstep.required = zbx_strdup(NULL, row[6]);
-		zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, host, NULL, NULL, NULL, NULL, NULL, NULL,
-				&db_httpstep.required, ZBX_MACRO_TYPE_HTTPTEST_FIELD, NULL, 0);
+
+		um_handle = zbx_dc_open_user_macros();
+		zbx_substitute_macros(&db_httpstep.required, NULL, 0, &macro_httptest_field_resolv, um_handle, host);
+		zbx_dc_close_user_macros(um_handle);
 
 		db_httpstep.status_codes = zbx_strdup(NULL, row[7]);
 		zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL, NULL, NULL, NULL,
@@ -686,8 +784,12 @@ static void	process_httptest(zbx_dc_host_t *host, zbx_httptest_t *httptest, int 
 		if (ZBX_POSTTYPE_RAW == db_httpstep.post_type)
 		{
 			db_httpstep.posts = zbx_strdup(NULL, row[5]);
-			zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, host, NULL, NULL, NULL,
-					NULL, NULL, NULL, &db_httpstep.posts, ZBX_MACRO_TYPE_HTTPTEST_FIELD, NULL, 0);
+
+			um_handle = zbx_dc_open_user_macros_secure();
+			zbx_substitute_macros(&db_httpstep.posts, NULL, 0, &macro_httptest_field_resolv, um_handle,
+					host);
+			zbx_dc_close_user_macros(um_handle);
+
 			http_substitute_variables(httptest, &db_httpstep.posts);
 		}
 		else
@@ -1034,8 +1136,6 @@ int	process_httptests(int now, const char *config_source_ip, const char *config_
 	if (SUCCEED != zbx_dc_httptest_next(now, &httptestid, nextcheck))
 		goto out;
 
-	um_handle = zbx_dc_open_user_macros();
-
 	/* create macro cache to use in HTTP tests */
 	zbx_vector_ptr_pair_create(&httptest.macros);
 
@@ -1101,12 +1201,14 @@ int	process_httptests(int now, const char *config_source_ip, const char *config_
 			httptest.httptest.retries = atoi(row[10]);
 
 			httptest.httptest.ssl_cert_file = zbx_strdup(NULL, row[11]);
-			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &host, NULL, NULL, NULL, NULL, NULL,
-					NULL, &httptest.httptest.ssl_cert_file, ZBX_MACRO_TYPE_HTTPTEST_FIELD, NULL, 0);
-
 			httptest.httptest.ssl_key_file = zbx_strdup(NULL, row[12]);
-			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &host, NULL, NULL, NULL, NULL, NULL,
-					NULL, &httptest.httptest.ssl_key_file, ZBX_MACRO_TYPE_HTTPTEST_FIELD, NULL, 0);
+
+			um_handle = zbx_dc_open_user_macros();
+			zbx_substitute_macros(&httptest.httptest.ssl_cert_file, NULL, 0, &macro_httptest_field_resolv,
+					um_handle, &host);
+			zbx_substitute_macros(&httptest.httptest.ssl_key_file, NULL, 0, &macro_httptest_field_resolv,
+					um_handle, &host);
+			zbx_dc_close_user_macros(um_handle);
 
 			httptest.httptest.ssl_key_password = zbx_strdup(NULL, row[13]);
 			zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, &host.hostid, NULL, NULL, NULL,
@@ -1150,8 +1252,6 @@ int	process_httptests(int now, const char *config_source_ip, const char *config_
 
 	/* destroy the macro cache used in HTTP tests */
 	zbx_vector_ptr_pair_destroy(&httptest.macros);
-
-	zbx_dc_close_user_macros(um_handle);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 

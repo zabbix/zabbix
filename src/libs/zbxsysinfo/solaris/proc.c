@@ -16,6 +16,7 @@
 #include "../sysinfo.h"
 
 #include "../common/stats.h"
+#include "../common/procstat.h"
 
 #include "zbxregexp.h"
 #include "zbxstr.h"

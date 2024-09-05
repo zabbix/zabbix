@@ -171,20 +171,6 @@ void	zbx_proxy_counter_ptr_free(zbx_proxy_counter_t *proxy_counter)
 static zbx_get_program_type_f	get_program_type_cb = NULL;
 static zbx_get_config_forks_f	get_config_forks_cb = NULL;
 
-/******************************************************************************
- *                                                                            *
- * Purpose: validate macro value when expanding user macros                   *
- *                                                                            *
- * Parameters: macro   - [IN] the user macro                                  *
- *             value   - [IN] the macro value                                 *
- *             error   - [OUT] the error message                              *
- *                                                                            *
- * Return value: SUCCEED - the value is valid                                 *
- *               FAIL    - otherwise                                          *
- *                                                                            *
- ******************************************************************************/
-typedef int (*zbx_value_validator_func_t)(const char *macro, const char *value, char **error);
-
 zbx_dc_config_t	*config = NULL;
 
 zbx_dc_config_t	*get_dc_config(void)
@@ -626,6 +612,7 @@ char	*dc_expand_user_and_func_macros_dyn(const char *text, const zbx_uint64_t *h
 	{
 		const char	*value = NULL;
 		char		*out = NULL;
+		zbx_token_t	inner_token;
 
 		if (ZBX_TOKEN_USER_MACRO != token.type && ZBX_TOKEN_USER_FUNC_MACRO != token.type)
 			continue;
@@ -641,8 +628,13 @@ char	*dc_expand_user_and_func_macros_dyn(const char *text, const zbx_uint64_t *h
 				if (NULL != value)
 					out = zbx_strdup(NULL, value);
 
-				(void)zbx_calculate_macro_function(text + token.loc.l, &token.data.func_macro, &out);
-				value = out;
+				if (SUCCEED == zbx_token_find(text + token.loc.l, 0, &inner_token,
+						ZBX_TOKEN_SEARCH_BASIC))
+				{
+					(void)zbx_calculate_macro_function(text + token.loc.l,
+							&inner_token.data.func_macro, &out);
+					value = out;
+				}
 				break;
 			case ZBX_TOKEN_USER_MACRO:
 				um_cache_resolve_const(config->um_cache, hostids, hostids_num, text + token.loc.l, env,
@@ -686,7 +678,7 @@ int	DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_INTERFACE *interface
 
 	seed = get_item_nextcheck_seed(item, item->interfaceid, item->type, item->key);
 
-	if (0 == strncmp(item->delay, "{$", ZBX_CONST_STRLEN("{$")))
+	if (NULL != strstr(item->delay, "{$"))
 	{
 		char	*delay_s;
 
@@ -1856,14 +1848,12 @@ static void	DCsync_hosts(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_vector_u
 
 		ZBX_STR2UCHAR(status, row[10]);
 
-
 		host = (ZBX_DC_HOST *)DCfind_id(&config->hosts, hostid, sizeof(ZBX_DC_HOST), &found);
 		host->revision = revision;
 
 		/* see whether we should and can update 'hosts_h' and 'proxies_p' indexes at this point */
 
 		update_index_h = 0;
-
 
 		if (0 == found || 0 != strcmp(host->host, row[2]))
 		{
@@ -4401,7 +4391,7 @@ static int	dc_function_calculate_trends_nextcheck(const zbx_dc_um_handle_t *um_h
 
 	if (ZBX_TIME_UNIT_HOUR == trend_base)
 	{
-		zbx_tm_round_up(&tm, trend_base);
+		zbx_tm_round_up(&tm, trend_base, NULL);
 
 		if (-1 == (*nextcheck = mktime(&tm)))
 		{
@@ -4431,7 +4421,7 @@ static int	dc_function_calculate_trends_nextcheck(const zbx_dc_um_handle_t *um_h
 			break;
 		}
 
-		zbx_tm_add(&tm, 1, trend_base);
+		zbx_tm_add(&tm, 1, trend_base, NULL);
 		if (-1 == (next = mktime(&tm)))
 		{
 			*error = zbx_strdup(*error, zbx_strerror(errno));
@@ -16412,6 +16402,7 @@ int	zbx_dc_expand_user_and_func_macros(const zbx_dc_um_handle_t *um_handle, char
 	{
 		const char	*value = NULL;
 		char		*out = NULL;
+		zbx_token_t	inner_token;
 
 		switch(token.type)
 		{
@@ -16422,8 +16413,14 @@ int	zbx_dc_expand_user_and_func_macros(const zbx_dc_um_handle_t *um_handle, char
 				if (NULL != value)
 					out = zbx_strdup(NULL, value);
 
-				ret = zbx_calculate_macro_function(*text + token.loc.l, &token.data.func_macro, &out);
-				value = out;
+				if (SUCCEED == zbx_token_find(*text + token.loc.l, 0, &inner_token,
+						ZBX_TOKEN_SEARCH_BASIC))
+				{
+					ret = zbx_calculate_macro_function(*text + token.loc.l,
+							&inner_token.data.func_macro, &out);
+					value = out;
+				}
+
 				break;
 			case ZBX_TOKEN_USER_MACRO:
 				um_cache_resolve_const(dc_um_get_cache(um_handle), hostids, hostids_num, *text +
