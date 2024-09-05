@@ -46,7 +46,7 @@ dnl *
 AC_MSG_CHECKING(whether compiler continues when given unrecognized flags)
 cc_rejects_unknown_flags=
 dnl Be mindful of the flag you're passing.
-dnl Depending on the compiler's argument parsing, this may be interpretted
+dnl Depending on the compiler's argument parsing, this may be interpreted
 dnl as another flag. Be very explicit.
 saved_CFLAGS="$CFLAGS"
 CFLAGS="--ThisFlagShouldCauseACompilerInvocationFailure"
