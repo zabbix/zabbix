@@ -763,7 +763,7 @@ static char	*regexp_sub_replace(const char *text, const char *output_template, z
 					strncpy_alloc(&ptr, &size, &offset, text + match[group_index].rm_so,
 							match[group_index].rm_eo - match[group_index].rm_so, limit);
 				}
-				else if (ZBX_GROUP_CHECK_ENABLE == group_check)
+				else if (ZBX_REGEXP_GROUP_CHECK_ENABLE == group_check)
 				{
 					zbx_free(ptr);
 					goto out;
@@ -938,7 +938,7 @@ static int	regexp_sub2(const char *string, const char *pattern, const char *outp
 	if (ZBX_REGEXP_MATCH == (ret = regexp_exec(string, regexp, 0, ZBX_REGEXP_GROUPS_MAX, match, err_msg)))
 	{
 		*out = regexp_sub_replace(string, output_template, match, ZBX_REGEXP_GROUPS_MAX, 0,
-				ZBX_GROUP_CHECK_DISABLE);
+				ZBX_REGEXP_GROUP_CHECK_DISABLE);
 	}
 
 	if (FAIL == ret)
@@ -989,7 +989,7 @@ int	zbx_mregexp_sub_precompiled(const char *string, const zbx_regexp_t *regexp, 
 
 	if (ZBX_REGEXP_MATCH == regexp_exec(string, regexp, 0, ZBX_REGEXP_GROUPS_MAX, match, NULL) &&
 			NULL != (*out = regexp_sub_replace(string, output_template, match, ZBX_REGEXP_GROUPS_MAX,
-			limit, ZBX_GROUP_CHECK_DISABLE)))
+			limit, ZBX_REGEXP_GROUP_CHECK_DISABLE)))
 	{
 		return SUCCEED;
 	}
