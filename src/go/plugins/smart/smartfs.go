@@ -249,11 +249,8 @@ func (p *Plugin) execute(jsonRunner bool) (*runner, error) {
 		r.devices = make(map[string]deviceParser)
 	}
 
-	// Create a context that will be canceled if basic runner returns an error.
-	ctx := context.Background()
-
 	// Create an error group with the context.
-	g, ctx := errgroup.WithContext(ctx)
+	g, ctx := errgroup.WithContext(context.Background())
 
 	g.SetLimit(p.cpuCount)
 
@@ -279,7 +276,7 @@ func (p *Plugin) execute(jsonRunner bool) (*runner, error) {
 				deviceInfo, err := getBasicDeviceInfo(p.ctl, name) //nolint:govet
 				if err != nil {
 					if errors.Is(err, ErrNoSmartStatus) {
-						p.Logger.Debugf("skipping device with no smart status: %d", name)
+						p.Logger.Debugf("skipping device with no smart status: %q", name)
 
 						return nil
 					}

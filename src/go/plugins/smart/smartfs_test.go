@@ -1725,7 +1725,7 @@ func Test_getRaidDevices(t *testing.T) {
 						},
 						Smartctl:    smartctlField{Version: []int{7, 3}},
 						SmartStatus: &smartStatus{SerialNumber: true},
-						SmartAttributes: smartAttributes{ //nolint:dupl
+						SmartAttributes: smartAttributes{
 							Table: []table{
 								{Attrname: "Reallocated_Sector_Ct", ID: 5},
 								{Attrname: "Power_On_Hours", ID: 9},
