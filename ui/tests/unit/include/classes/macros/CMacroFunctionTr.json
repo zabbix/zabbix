@@ -398,5 +398,13 @@
             "parameters": ["*UNKNOWN*", "{ITEM.VALUE}"]
         },
         "result": "LIAEA.VAL"
+    },
+    {
+        "value": "test",
+        "macrofunc": {
+            "function": "tr",
+            "parameters": ["a-z", "\\"]
+        },
+        "result": "\\\\\\\\"
     }
 ]

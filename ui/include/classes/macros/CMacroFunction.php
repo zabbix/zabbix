@@ -328,6 +328,10 @@ class CMacroFunction {
 	 * @return string|null
 	 */
 	private static function expandParameters(string $parameter): ?string {
+		if ($parameter === '\\') {
+			return $parameter;
+		}
+
 		$expanded = '';
 		$length = strlen($parameter);
 		$characters = str_split($parameter);
