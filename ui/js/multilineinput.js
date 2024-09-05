@@ -166,7 +166,7 @@
 
 		if (obj.options.use_tab_for_indent) {
 			$textarea[0].addEventListener('keydown', e => {
-				if (e.which === KEY_TAB) {
+				if (e.key === 'Tab') {
 					e.preventDefault();
 
 					const input = e.target;
