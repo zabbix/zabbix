@@ -22,7 +22,7 @@
 $operations_table = (new CTable())
 	->setId('rec-table')
 	->setAttribute('style', 'width: 100%;')
-	->setHeader([_('Details'), (new CColHeader(_('Actions')))->setWidth('90px')]);
+	->setHeader([_('Details'), (new CColHeader(_('Actions')))->setWidth('10%')]);
 
 $i = 0;
 foreach ($data['action']['recovery_operations'] as $operationid => $operation) {

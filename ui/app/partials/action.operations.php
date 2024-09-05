@@ -29,11 +29,11 @@ if (in_array($data['eventsource'], [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL
 		_('Details'),
 		_('Start in'),
 		_('Duration'),
-		(new CColHeader(_('Actions')))->setWidth('90px')
+		(new CColHeader(_('Actions')))->setWidth('10%')
 	]);
 }
 else {
-	$operations_table->setHeader([_('Details'), (new CColHeader(_('Actions')))->setWidth('90px')]);
+	$operations_table->setHeader([_('Details'), (new CColHeader(_('Actions')))->setWidth('10%')]);
 }
 
 if (array_key_exists('descriptions', $data)) {
