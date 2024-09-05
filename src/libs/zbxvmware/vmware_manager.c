@@ -248,7 +248,6 @@ ZBX_THREAD_ENTRY(zbx_vmware_thread, args)
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
-	vmware_local_init();
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
 #define JOB_TIMEOUT	1
@@ -302,7 +301,8 @@ ZBX_THREAD_ENTRY(zbx_vmware_thread, args)
 	}
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
-	vmware_local_destroy();
+	xmlCleanupParser();
+	curl_global_cleanup();
 
 	while (1)
 		zbx_sleep(SEC_PER_MIN);

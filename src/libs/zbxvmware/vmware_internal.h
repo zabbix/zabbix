@@ -55,9 +55,6 @@ zbx_vmware_service_objects_t;
 #define VMWARE_SERVICE_OBJECTS_ARR_SIZE	3
 zbx_vmware_service_objects_t	*get_vmware_service_objects(void);
 
-void	vmware_local_init(void);
-void	vmware_local_destroy(void);
-
 int	zbx_vmware_service_update(zbx_vmware_service_t *service, const char *config_source_ip,
 		int config_vmware_timeout, int cache_update_period);
 int	zbx_vmware_service_update_tags(zbx_vmware_service_t *service, const char *config_source_ip,

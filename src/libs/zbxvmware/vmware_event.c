@@ -47,6 +47,88 @@ typedef struct
 }
 event_hostinfo_node_t;
 
+static zbx_hashset_t	evt_msg_strpool;
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: initialization of strpool resources                               *
+ *                                                                            *
+ ******************************************************************************/
+static void	evt_msg_strpool_init(void)
+{
+	zbx_hashset_create(&evt_msg_strpool, 100, vmware_strpool_hash_func, vmware_strpool_compare_func);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: release of strpool resources                                      *
+ *                                                                            *
+ ******************************************************************************/
+static void	evt_msg_strpool_destroy(void)
+{
+	zbx_hashset_destroy(&evt_msg_strpool);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: frees resources allocated to store event message in strpool       *
+ *                                                                            *
+ ******************************************************************************/
+void	evt_msg_strpool_strfree(char *str, zbx_uint64_t *strpool_sz)
+{
+	zbx_uint64_t	len;
+
+	vmware_strpool_strfree(str, &evt_msg_strpool, &len);
+
+	if (NULL != strpool_sz && 0 < len)
+		*strpool_sz -= zbx_shmem_required_chunk_size(len);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: store event message in strpool                                    *
+ *                                                                            *
+ ******************************************************************************/
+char	*evt_msg_strpool_strdup(const char *str, zbx_uint64_t *strpool_sz)
+{
+	char		*strdup;
+	zbx_uint64_t	len;
+
+	strdup = vmware_strpool_strdup(str, &evt_msg_strpool, &len);
+
+	if (NULL != strpool_sz && 0 < len)
+		*strpool_sz += zbx_shmem_required_chunk_size(len);
+
+	return strdup;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: compute common size of memory for evt strpool and shmem strpool   *
+ *                                                                            *
+ ******************************************************************************/
+zbx_uint64_t	vmware_evt_strpool_overlap_mem(void)
+{
+	void			*ptr;
+	zbx_hashset_iter_t	iter;
+	zbx_uint64_t		common_sz = 0;
+
+	zbx_hashset_iter_reset(&evt_msg_strpool, &iter);
+
+	while (NULL != (ptr = zbx_hashset_iter_next(&iter)))
+	{
+		const char	*str = (char *)ptr + REFCOUNT_FIELD_SIZE;
+
+		if (FAIL == vmware_shared_strsearch(str))
+			continue;
+
+		common_sz += zbx_shmem_required_chunk_size(strlen(str) +
+				REFCOUNT_FIELD_SIZE + 1 + ZBX_HASHSET_ENTRY_OFFSET);
+	}
+
+	return common_sz;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: frees resources allocated to store vmware event                   *
@@ -1122,6 +1204,8 @@ int	zbx_vmware_service_eventlog_update(zbx_vmware_service_t *service, const char
 	zbx_vector_vmware_event_ptr_create(&evt_data->events);
 	page.alloc = 0;
 
+	evt_msg_strpool_init();
+
 	zbx_vmware_lock();
 	evt_last_key = service->eventlog.last_key;
 	evt_skip_old = service->eventlog.skip_old;
@@ -1277,6 +1361,7 @@ out:
 	zbx_vmware_unlock();
 
 	vmware_eventlog_data_free(evt_data);
+	evt_msg_strpool_destroy();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s \tprocessed:" ZBX_FS_SIZE_T " bytes of data. %s", __func__,
 			zbx_result_string(ret), (zbx_fs_size_t)page.alloc, msg);

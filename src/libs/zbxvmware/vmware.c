@@ -66,7 +66,6 @@
 static zbx_mutex_t	vmware_lock = ZBX_MUTEX_NULL;
 
 static zbx_vmware_t	*vmware = NULL;
-static zbx_hashset_t	evt_msg_strpool;
 
 ZBX_PTR_VECTOR_IMPL(vmware_service_ptr, zbx_vmware_service_t *)
 
@@ -124,55 +123,11 @@ zbx_vmware_rpool_chunk_t;
 ZBX_PTR_VECTOR_DECL(vmware_rpool_chunk_ptr, zbx_vmware_rpool_chunk_t *)
 ZBX_PTR_VECTOR_IMPL(vmware_rpool_chunk_ptr, zbx_vmware_rpool_chunk_t *)
 
-/******************************************************************************
- *                                                                            *
- * Purpose: initialization of local process resources                         *
- *                                                                            *
- ******************************************************************************/
-void	vmware_local_init(void)
-{
-	zbx_hashset_create(&evt_msg_strpool, 100, vmware_strpool_hash_func, vmware_strpool_compare_func);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: release of local process resources                                *
- *                                                                            *
- ******************************************************************************/
-void	vmware_local_destroy(void)
-{
-	zbx_hashset_destroy(&evt_msg_strpool);
-	xmlCleanupParser();
-	curl_global_cleanup();
-}
-
 /* string pool support */
 
 int	vmware_shared_strsearch(const char *str)
 {
 	return NULL == zbx_hashset_search(&vmware->strpool, str - REFCOUNT_FIELD_SIZE) ? FAIL : SUCCEED;
-}
-
-zbx_uint64_t	vmware_evt_strpool_overlap_mem(void)
-{
-	void			*ptr;
-	zbx_hashset_iter_t	iter;
-	zbx_uint64_t		common_sz = 0;
-
-	zbx_hashset_iter_reset(&evt_msg_strpool, &iter);
-
-	while (NULL != (ptr = zbx_hashset_iter_next(&iter)))
-	{
-		const char	*str = (char *)ptr + REFCOUNT_FIELD_SIZE;
-
-		if (FAIL == vmware_shared_strsearch(str))
-			continue;
-
-		common_sz += zbx_shmem_required_chunk_size(strlen(str) +
-				REFCOUNT_FIELD_SIZE + 1 + ZBX_HASHSET_ENTRY_OFFSET);
-	}
-
-	return common_sz;
 }
 
 char	*vmware_strpool_strdup(const char *str, zbx_hashset_t *strpool, zbx_uint64_t *len)
@@ -239,29 +194,6 @@ void	vmware_shared_strfree(char *str)
 
 	if (0 < len)
 		vmware->strpool_sz -= zbx_shmem_required_chunk_size(len);
-}
-
-void	evt_msg_strpool_strfree(char *str, zbx_uint64_t *strpool_sz)
-{
-	zbx_uint64_t	len;
-
-	vmware_strpool_strfree(str, &evt_msg_strpool, &len);
-
-	if (NULL != strpool_sz && 0 < len)
-		*strpool_sz -= zbx_shmem_required_chunk_size(len);
-}
-
-char	*evt_msg_strpool_strdup(const char *str, zbx_uint64_t *strpool_sz)
-{
-	char		*strdup;
-	zbx_uint64_t	len;
-
-	strdup = vmware_strpool_strdup(str, &evt_msg_strpool, &len);
-
-	if (NULL != strpool_sz && 0 < len)
-		*strpool_sz += zbx_shmem_required_chunk_size(len);
-
-	return strdup;
 }
 
 static size_t	curl_write_cb(void *ptr, size_t size, size_t nmemb, void *userdata)
