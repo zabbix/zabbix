@@ -56,6 +56,9 @@ type AgentOptions struct {
 	TLSKeyFile               string   `conf:"optional"`
 	TLSServerCertIssuer      string   `conf:"optional"`
 	TLSServerCertSubject     string   `conf:"optional"`
+	TLSCipherCert13          string   `conf:"optional"`
+	TLSCipherPSK13           string   `conf:"optional"`
+	TLSCipherAll13           string   `conf:"optional"`
 	ExternalPlugins          []string `conf:"optional,name=PluginPath"`
 	ExternalPluginTimeout    int      `conf:"optional,name=PluginTimeout,range=1:30"`
 	ExternalPluginsSocket    string   `conf:"optional,name=PluginSocket,default=\\\\.\\pipe\\agent.plugin.sock"`
