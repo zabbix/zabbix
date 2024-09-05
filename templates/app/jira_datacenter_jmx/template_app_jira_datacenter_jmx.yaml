@@ -1571,7 +1571,7 @@ zabbix_export:
                       value: '1'
                     - type: STRING
                       name: reference
-                      value: AABAA
+                      value: AABAC
             - name: Mail
               widgets:
                 - type: item

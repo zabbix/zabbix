@@ -785,7 +785,6 @@ class CUser extends CApiService {
 		self::checkOwnUsername($user, $db_user);
 		self::checkOwnRole($user, $db_user);
 		self::checkOwnUserGroups($user, $db_user);
-		self::checkOwnMedia($user, $db_user);
 	}
 
 	private static function getOwnUser(array $users): ?array {
@@ -841,7 +840,7 @@ class CUser extends CApiService {
 
 			if ($disabled_user_group) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_('User cannot add himself to a disabled group or a group with disabled GUI access.')
+					_('User cannot add oneself to a disabled group or a group with disabled GUI access.')
 				);
 			}
 		}
@@ -853,41 +852,6 @@ class CUser extends CApiService {
 					_s('Only Super admin users can update "%1$s" parameter.', 'usrgrps')
 				);
 			}
-		}
-	}
-
-	private static function checkOwnMedia(array $user, array $db_user): void {
-		if (self::$userData['type'] != USER_TYPE_ZABBIX_USER || !array_key_exists('medias', $user)) {
-			return;
-		}
-
-		$db_medias = $db_user['medias'];
-
-		foreach ($user['medias'] as $media) {
-			if (array_key_exists('mediaid', $media)) {
-				if (array_key_exists('sendto', $media)) {
-					$media['sendto'] = implode("\n", $media['sendto']);
-				}
-
-				if (DB::getUpdatedValues('media', $media, $db_medias[$media['mediaid']])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Only Super admin or Admin users can update "%1$s" parameter.', 'medias')
-					);
-				}
-
-				unset($db_medias[$media['mediaid']]);
-			}
-			else {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Only Super admin or Admin users can update "%1$s" parameter.', 'medias')
-				);
-			}
-		}
-
-		if ($db_medias) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Only Super admin or Admin users can update "%1$s" parameter.', 'medias')
-			);
 		}
 	}
 
@@ -1870,7 +1834,7 @@ class CUser extends CApiService {
 			$db_user = $db_users[$userid];
 
 			if (bccomp($userid, self::$userData['userid']) == 0) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('User is not allowed to delete himself.'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('User is not allowed to delete oneself.'));
 			}
 
 			if ($db_user['username'] == ZBX_GUEST_USER) {

@@ -11,9 +11,9 @@ For more information, please refer to the [CloudWatch pricing](https://aws.amazo
 
 Additional information about metrics and used API methods:
 
-* Full metrics list related to RDS: https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/rds-metrics.html
-* Full metrics list related to Amazon Aurora: https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.AuroraMySQL.Monitoring.Metrics.html#Aurora.AuroraMySQL.Monitoring.Metrics.instances
-* DescribeAlarms API method: https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_DescribeAlarms.html
+* [Full metrics list related to RDS](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/rds-metrics.html)
+* [Full metrics list related to Amazon Aurora](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.AuroraMySQL.Monitoring.Metrics.html#Aurora.AuroraMySQL.Monitoring.Metrics.instances)
+* [DescribeAlarms API method](https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_DescribeAlarms.html)
 
 
 ## Requirements
@@ -43,6 +43,7 @@ Add the following required permissions to your Zabbix IAM policy in order to col
         {
           "Action":[
                 "cloudwatch:DescribeAlarms",
+                "cloudwatch:GetMetricData",
                 "rds:DescribeEvents",
                 "rds:DescribeDBInstances"
           ],
@@ -51,8 +52,45 @@ Add the following required permissions to your Zabbix IAM policy in order to col
         }
     ]
   }
-  ```
-
+```
+For using assume role authorization, add the appropriate permissions to the role you are using:
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": "sts:AssumeRole",
+            "Resource": "arn:aws:iam::{Account}:user/{UserName}"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "cloudwatch:DescribeAlarms",
+                "cloudwatch:GetMetricData",
+                "rds:DescribeEvents",
+                "rds:DescribeDBInstances"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+```
+Next, add a principal to the trust relationships of the role you are using:
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "arn:aws:iam::{Account}:user/{UserName}"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+```
 If you are using role-based authorization, set the appropriate permissions:
 ```json
 {
@@ -68,6 +106,7 @@ If you are using role-based authorization, set the appropriate permissions:
             "Effect": "Allow",
             "Action": [
                 "cloudwatch:DescribeAlarms",
+                "cloudwatch:GetMetricData",
                 "rds:DescribeEvents",
                 "rds:DescribeDBInstances",
                 "ec2:AssociateIamInstanceProfile",
@@ -78,19 +117,36 @@ If you are using role-based authorization, set the appropriate permissions:
     ]
 }
 ```
+Next, add a principal to the trust relationships of the role you are using:
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": {
+                "Service": [
+                    "ec2.amazonaws.com"
+                ]
+            },
+            "Action": [
+                "sts:AssumeRole"
+            ]
+        }
+    ]
+}
+```
+**Note**, Using role-based authorization is only possible when you use a Zabbix server or proxy inside AWS.
 
-Set macros "{$AWS.AUTH_TYPE}", "{$AWS.REGION}", "{$AWS.RDS.INSTANCE.ID}"
+Set the macros: `{$AWS.AUTH_TYPE}`, `{$AWS.REGION}`, `{$AWS.RDS.INSTANCE.ID}`.
 
-If you are using access key-based authorization, set the following macros "{$AWS.ACCESS.KEY.ID}", "{$AWS.SECRET.ACCESS.KEY}"
+If you are using access key-based authorization, set the following macros: `{$AWS.ACCESS.KEY.ID}`, `{$AWS.SECRET.ACCESS.KEY}`.
+
+If you are using access assume role authorization, set the following macros: `{$AWS.ACCESS.KEY.ID}`, `{$AWS.SECRET.ACCESS.KEY}`, `{$AWS.STS.REGION}`, `{$AWS.ASSUME.ROLE.ARN}`.
 
 For more information about manage access keys, see [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys)
 
 Also, see the Macros section for a list of macros used for LLD filters.
-
-Additional information about metrics and used API methods:
-* Full metrics list related to RDS: https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/rds-metrics.html
-* Full metrics list related to Amazon Aurora: https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.AuroraMySQL.Monitoring.Metrics.html#Aurora.AuroraMySQL.Monitoring.Metrics.instances
-* DescribeAlarms API method: https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_DescribeAlarms.html
 
 
 ### Macros used
@@ -101,7 +157,9 @@ Additional information about metrics and used API methods:
 |{$AWS.ACCESS.KEY.ID}|<p>Access key ID.</p>||
 |{$AWS.SECRET.ACCESS.KEY}|<p>Secret access key.</p>||
 |{$AWS.REGION}|<p>Amazon RDS Region code.</p>|`us-west-1`|
-|{$AWS.AUTH_TYPE}|<p>Authorization method. Possible values: role_base, access_key.</p>|`access_key`|
+|{$AWS.AUTH_TYPE}|<p>Authorization method. Possible values: `access_key`, `assume_role`, `role_base`.</p>|`access_key`|
+|{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
+|{$AWS.ASSUME.ROLE.ARN}|<p>ARN assume role; add when using the `assume_role` authorization method.</p>||
 |{$AWS.RDS.INSTANCE.ID}|<p>RDS DB Instance identifier.</p>||
 |{$AWS.RDS.LLD.FILTER.ALARM_SERVICE_NAMESPACE.MATCHES}|<p>Filter of discoverable alarms by namespace.</p>|`.*`|
 |{$AWS.RDS.LLD.FILTER.ALARM_SERVICE_NAMESPACE.NOT_MATCHES}|<p>Filter to exclude discovered alarms by namespace.</p>|`CHANGE_IF_NEEDED`|
@@ -139,7 +197,7 @@ Additional information about metrics and used API methods:
 |Storage: Max allocated|<p>The upper limit in gibibytes (GiB) to which Amazon RDS can automatically scale the storage of the DB instance.</p><p>If limit is not specified returns -1.</p>|Dependent item|aws.rds.storage.max_allocated<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |Read replica: State|<p>The status of a read replica. If the instance isn't a read replica, this is blank.</p><p>Boolean value that is true if the instance is operating normally, or false if the instance is in an error state.</p>|Dependent item|aws.rds.read_replica_state<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..StatusInfos..Normal.first()`</p><p>⛔️Custom on fail: Discard value</p></li><li>Boolean to decimal</li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |Read replica: Status|<p>The status of a read replica. If the instance isn't a read replica, this is blank.</p><p>Status of the DB instance. For a StatusType of read replica, the values can be replicating, replication stop point set, replication stop point reached, error, stopped, or terminated.</p>|Dependent item|aws.rds.read_replica_status<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..StatusInfos..Status.first()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
-|Swap usage|<p>The amount of swap space used. </p><p>This metric is available for the Aurora PostgreSQL DB instance classes db.t3.medium, db.t3.large, db.r4.large, db.r4.xlarge, db.r5.large, db.r5.xlarge, db.r6g.large, and db.r6g.xlarge. </p><p>For Aurora MySQL, this metric applies only to db.t* DB instance classes.</p><p>This metric is not available for SQL Server.</p>|Dependent item|aws.rds.swap_usage<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.Label == "SwapUsage")].Values.first().first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Swap usage|<p>The amount of swap space used.</p><p>This metric is available for the Aurora PostgreSQL DB instance classes db.t3.medium, db.t3.large, db.r4.large, db.r4.xlarge, db.r5.large, db.r5.xlarge, db.r6g.large, and db.r6g.xlarge.</p><p>For Aurora MySQL, this metric applies only to db.t* DB instance classes.</p><p>This metric is not available for SQL Server.</p>|Dependent item|aws.rds.swap_usage<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.Label == "SwapUsage")].Values.first().first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Disk: Write IOPS|<p>The number of write records generated per second. This is more or less the number of log records generated by the database. These do not correspond to 8K page writes, and do not correspond to network packets sent.</p>|Dependent item|aws.rds.write_iops.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.Label == "WriteIOPS")].Values.first().first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Disk: Write latency|<p>The average amount of time taken per disk I/O operation.</p>|Dependent item|aws.rds.write_latency<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.Label == "WriteLatency")].Values.first().first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Disk: Write throughput|<p>The average number of bytes written to persistent storage every second.</p>|Dependent item|aws.rds.write_throughput.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.Label == "WriteThroughput")].Values.first().first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
@@ -153,7 +211,7 @@ Additional information about metrics and used API methods:
 |EBS: Byte balance|<p>The percentage of throughput credits remaining in the burst bucket of your RDS database. This metric is available for basic monitoring only.</p><p>To find the instance sizes that support this metric, see the instance sizes with an asterisk (*) in the EBS optimized by default table (https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-optimized.html#current) in Amazon RDS User Guide for Linux Instances.</p>|Dependent item|aws.rds.ebs_byte_balance<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.Label == "EBSByteBalance%")].Values.first().first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |EBS: IO balance|<p>The percentage of I/O credits remaining in the burst bucket of your RDS database. This metric is available for basic monitoring only.</p><p>To find the instance sizes that support this metric, see the instance sizes with an asterisk (*) in the EBS optimized by default table (https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-optimized.html#current) in Amazon RDS User Guide for Linux Instances.</p>|Dependent item|aws.rds.ebs_io_balance<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.Label == "EBSIOBalance%")].Values.first().first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Memory, freeable|<p>The amount of available random access memory.</p><p></p><p>For MariaDB, MySQL, Oracle, and PostgreSQL DB instances, this metric reports the value of the MemAvailable field of /proc/meminfo.</p>|Dependent item|aws.rds.freeable_memory<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.Label == "FreeableMemory")].Values.first().first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Storage: Local free|<p>The amount of local storage available, in bytes.</p><p></p><p>Unlike for other DB engines, for Aurora DB instances this metric reports the amount of storage available to each DB instance. </p><p>This value depends on the DB instance class. You can increase the amount of free storage space for an instance by choosing a larger DB instance class for your instance.</p><p>(This doesn't apply to Aurora Serverless v2.)</p>|Dependent item|aws.rds.free_local_storage<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.Label == "FreeLocalStorage")].Values.first().first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Storage: Local free|<p>The amount of local storage available, in bytes.</p><p></p><p>Unlike for other DB engines, for Aurora DB instances this metric reports the amount of storage available to each DB instance.</p><p>This value depends on the DB instance class. You can increase the amount of free storage space for an instance by choosing a larger DB instance class for your instance.</p><p>(This doesn't apply to Aurora Serverless v2.)</p>|Dependent item|aws.rds.free_local_storage<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.Label == "FreeLocalStorage")].Values.first().first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Network: Receive throughput|<p>The incoming (receive) network traffic on the DB instance, including both customer database traffic and Amazon RDS traffic used for monitoring and replication.</p><p>For Amazon Aurora: The amount of network throughput received from the Aurora storage subsystem by each instance in the DB cluster.</p>|Dependent item|aws.rds.storage_network_receive_throughput<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Network: Transmit throughput|<p>The outgoing (transmit) network traffic on the DB instance, including both customer database traffic and Amazon RDS traffic used for monitoring and replication.</p><p>For Amazon Aurora: The amount of network throughput sent to the Aurora storage subsystem by each instance in the Aurora MySQL DB cluster.</p>|Dependent item|aws.rds.storage_network_transmit_throughput<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Disk: Read IOPS|<p>The average number of disk I/O operations per second. Aurora PostgreSQL-Compatible Edition reports read and write IOPS separately, in 1-minute intervals.</p>|Dependent item|aws.rds.read_iops.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.Label == "ReadIOPS")].Values.first().first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
@@ -176,10 +234,10 @@ Additional information about metrics and used API methods:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Failed to get metrics data||`length(last(/AWS RDS instance by HTTP/aws.rds.metrics.check))>0`|Warning||
-|Failed to get instance data||`length(last(/AWS RDS instance by HTTP/aws.rds.instance_info.check))>0`|Warning||
-|Failed to get alarms data||`length(last(/AWS RDS instance by HTTP/aws.rds.alarms.check))>0`|Warning||
-|Failed to get events data||`length(last(/AWS RDS instance by HTTP/aws.rds.events.check))>0`|Warning||
+|Failed to get metrics data|<p>Failed to get CloudWatch metrics for RDS.</p>|`length(last(/AWS RDS instance by HTTP/aws.rds.metrics.check))>0`|Warning||
+|Failed to get instance data|<p>Failed to get CloudWatch instance info for RDS.</p>|`length(last(/AWS RDS instance by HTTP/aws.rds.instance_info.check))>0`|Warning||
+|Failed to get alarms data|<p>Failed to get CloudWatch alarms for RDS.</p>|`length(last(/AWS RDS instance by HTTP/aws.rds.alarms.check))>0`|Warning||
+|Failed to get events data|<p>Failed to get CloudWatch events for RDS.</p>|`length(last(/AWS RDS instance by HTTP/aws.rds.events.check))>0`|Warning||
 |Read replica in error state|<p>The status of a read replica.<br>False if the instance is in an error state.</p>|`last(/AWS RDS instance by HTTP/aws.rds.read_replica_state)=0`|Average||
 |Burst balance is too low||`max(/AWS RDS instance by HTTP/aws.rds.burst_balance,5m)<{$AWS.RDS.BURST.CREDIT.BALANCE.MIN.WARN}`|Warning||
 |High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/AWS RDS instance by HTTP/aws.rds.cpu.utilization,15m)>{$AWS.RDS.CPU.UTIL.WARN.MAX}`|Warning||
@@ -204,8 +262,8 @@ Additional information about metrics and used API methods:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|[{#ALARM_NAME}] has 'Alarm' state|<p>Alarm "{#ALARM_NAME}" has 'Alarm' state. <br>Reason: {ITEM.LASTVALUE2}</p>|`last(/AWS RDS instance by HTTP/aws.rds.alarm.state["{#ALARM_NAME}"])=2 and length(last(/AWS RDS instance by HTTP/aws.rds.alarm.state_reason["{#ALARM_NAME}"]))>0`|Average||
-|[{#ALARM_NAME}] has 'Insufficient data' state||`last(/AWS RDS instance by HTTP/aws.rds.alarm.state["{#ALARM_NAME}"])=1`|Info||
+|[{#ALARM_NAME}] has 'Alarm' state|<p>Alarm "{#ALARM_NAME}" has 'Alarm' state.<br>Reason: {ITEM.LASTVALUE2}</p>|`last(/AWS RDS instance by HTTP/aws.rds.alarm.state["{#ALARM_NAME}"])=2 and length(last(/AWS RDS instance by HTTP/aws.rds.alarm.state_reason["{#ALARM_NAME}"]))>0`|Average||
+|[{#ALARM_NAME}] has 'Insufficient data' state|<p>Either the alarm has just started, the metric is not available, or not enough data is available for the metric to determine the alarm state.</p>|`last(/AWS RDS instance by HTTP/aws.rds.alarm.state["{#ALARM_NAME}"])=1`|Info||
 
 ### LLD rule Aurora metrics discovery
 
@@ -250,7 +308,7 @@ Additional information about metrics and used API methods:
 |Backtrack: Window, actual|<p>The difference between the target backtrack window and the actual backtrack window.</p>|Dependent item|aws.rds.backtrack_window_actual[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Backtrack: Window, alert|<p>The number of times that the actual backtrack window is smaller than the target backtrack window for a given period of time.</p>|Dependent item|aws.rds.backtrack_window_alert[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Transactions: Blocked, rate|<p>The average number of transactions in the database that are blocked per second.</p>|Dependent item|aws.rds.blocked_transactions.rate[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Replication: Binlog lag|<p>The amount of time that a binary log replica DB cluster running on Aurora MySQL-Compatible Edition lags behind the binary log replication source. </p><p>A lag means that the source is generating records faster than the replica can apply them.</p><p>The metric value indicates the following:</p><p></p><p>A high value: The replica is lagging the replication source.</p><p>0 or a value close to 0: The replica process is active and current.</p><p>-1: Aurora can't determine the lag, which can happen during replica setup or when the replica is in an error state</p>|Dependent item|aws.rds.aurora_replication_binlog_lag[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Replication: Binlog lag|<p>The amount of time that a binary log replica DB cluster running on Aurora MySQL-Compatible Edition lags behind the binary log replication source.</p><p>A lag means that the source is generating records faster than the replica can apply them.</p><p>The metric value indicates the following:</p><p></p><p>A high value: The replica is lagging the replication source.</p><p>0 or a value close to 0: The replica process is active and current.</p><p>-1: Aurora can't determine the lag, which can happen during replica setup or when the replica is in an error state</p>|Dependent item|aws.rds.aurora_replication_binlog_lag[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Transactions: Active, rate|<p>The average number of current transactions executing on an Aurora database instance per second.</p><p>By default, Aurora doesn't enable this metric. To begin measuring this value, set innodb_monitor_enable='all' in the DB parameter group for a specific DB instance.</p>|Dependent item|aws.rds.aurora_transactions_active.rate[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Connections: Aborted|<p>The number of client connections that have not been closed properly.</p>|Dependent item|aws.rds.aurora_clients_aborted[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.Label == "AbortedClients")].Values.first().first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Operations: Insert latency|<p>The amount of latency for insert queries, in milliseconds.</p>|Dependent item|aws.rds.insert_latency[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.Label == "InsertLatency")].Values.first().first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|

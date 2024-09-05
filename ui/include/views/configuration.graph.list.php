@@ -247,7 +247,7 @@ foreach ($data['graphs'] as $graph) {
 	$graphTable->addRow([
 		new CCheckBox('group_graphid['.$graphid.']', $graphid),
 		$hostList,
-		$name,
+		(new CCol($name))->addClass(ZBX_STYLE_WORDBREAK),
 		$graph['width'],
 		$graph['height'],
 		$graph['graphtype'],

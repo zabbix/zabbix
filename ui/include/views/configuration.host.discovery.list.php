@@ -313,8 +313,8 @@ foreach ($data['discoveries'] as $discovery) {
 
 	$discoveryTable->addRow([
 		$checkbox,
-		$discovery['hosts'][0]['name'],
-		$description,
+		(new CCol($discovery['hosts'][0]['name']))->addClass(ZBX_STYLE_WORDBREAK),
+		(new CCol($description))->addClass(ZBX_STYLE_WORDBREAK),
 		[
 			new CLink(_('Item prototypes'),
 				(new CUrl('zabbix.php'))

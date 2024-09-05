@@ -40,6 +40,10 @@
 #	include "zbxpoller.h"
 #endif
 
+#ifndef EVDNS_BASE_INITIALIZE_NAMESERVERS
+#	define EVDNS_BASE_INITIALIZE_NAMESERVERS	1
+#endif
+
 static ZBX_THREAD_LOCAL int log_worker_id;
 
 static int	discovery_async_poller_dns_init(discovery_poller_config_t *poller_config)

@@ -319,10 +319,10 @@ class CSVGPie {
 		}
 
 		if (this.#config.total_value && total_value.value !== null) {
-			this.#total_value_text = total_value.value;
+			this.#total_value_text = total_value.formatted_value.value;
 
-			if (this.#config.total_value.units_show && total_value.units !== '') {
-				this.#total_value_text += ` ${total_value.units}`;
+			if (this.#config.total_value.units_show && total_value.formatted_value.units !== '') {
+				this.#total_value_text += ` ${total_value.formatted_value.units}`;
 			}
 		}
 
@@ -335,7 +335,9 @@ class CSVGPie {
 		if (sectors.length > 0) {
 			all_sectorids = this.#prepareAllSectorids(all_sectorids);
 			sectors = this.#sortByReference(sectors, all_sectorids);
+		}
 
+		if (total_value.value > 0) {
 			this.#container
 				.selectAll(`.${CSVGPie.ZBX_STYLE_ARC_NO_DATA_OUTER}, .${CSVGPie.ZBX_STYLE_ARC_NO_DATA_INNER}`)
 				.style('display', 'none');

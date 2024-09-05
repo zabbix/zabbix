@@ -532,10 +532,10 @@ static int	rm_get_report_range(int report_time, unsigned char period, struct tm 
 		return FAIL;
 
 	*to = *tm;
-	zbx_tm_round_down(to, period2unit[period]);
+	zbx_tm_round_down(to, period2unit[period], NULL);
 
 	*from = *to;
-	zbx_tm_sub(from, 1, period2unit[period]);
+	zbx_tm_sub(from, 1, period2unit[period], NULL);
 
 	return SUCCEED;
 }
@@ -1671,7 +1671,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: resolves macros in report (ZBX_MACRO_TYPE_REPORT) context         *
+ * Purpose: resolves macros in report context                                 *
  *                                                                            *
  * Parameters: p            - [IN] macro resolver data structure              *
  *             args         - [IN] list of variadic parameters                *

@@ -184,11 +184,21 @@ func eventLogInfo(msg string) (err error) {
 	return nil
 }
 
+// eventLogErr reports err to Windows event log if agent is launched on
+// windows.
+// On success returns parameter err.
+// On failure returns error that occurred during reporting to event log.
 func eventLogErr(err error) error {
 	if isWinLauncher() {
-		return eLog.Error(3, err.Error())
+		elErr := eLog.Error(3, err.Error())
+		if elErr != nil {
+			return errs.Wrapf(
+				elErr, "failed to report error (%s) to event log", err.Error(),
+			)
+		}
 	}
-	return nil
+
+	return err
 }
 
 func validateMultipleAgentFlag() bool {
@@ -606,11 +616,7 @@ func sendServiceStop() {
 
 func runService() {
 	if err := svc.Run(serviceName, &winService{}); err != nil {
-		fatalExit(
-			"use foreground option to run Zabbix agent as console application",
-			err,
-		)
-		return
+		panic(errs.Wrap(err, "use foreground option to run Zabbix agent as console application"))
 	}
 }
 
