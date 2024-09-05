@@ -3107,6 +3107,18 @@ abstract class testFormPreprocessing extends CWebTest {
 						]
 					],
 					[
+						'type' => 'Check for not supported value',
+						'parameters' => [
+							[
+								'selector' => 'xpath:.//z-select[@name="preprocessing[0][params][0]"]',
+								'options' => ['any error', 'error matches', 'error does not match'],
+								'value' => 'any error'
+							]
+						],
+						'on_fail_value' => true,
+						'on_fail_enabled' => false
+					],
+					[
 						'type' => 'Discard unchanged',
 						'on_fail_enabled' => false
 					],
@@ -3130,19 +3142,6 @@ abstract class testFormPreprocessing extends CWebTest {
 						'parameters' => [
 							['placeholder' => '<metric name>{<label name>="<label value>", ...} == <value>', 'maxlength' => 255]
 						]
-					],
-					// TODO: put this step after 'Check for error using regular expression' when ZBX-24874 is fixed.
-					[
-						'type' => 'Check for not supported value',
-						'parameters' => [
-							[
-								'selector' => 'xpath:.//z-select[@name="preprocessing[0][params][0]"]',
-								'options' => ['any error', 'error matches', 'error does not match'],
-								'value' => 'any error'
-							]
-						],
-						'on_fail_value' => true,
-						'on_fail_enabled' => false
 					]
 				]
 			]

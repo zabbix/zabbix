@@ -59,7 +59,7 @@ class CWidgetFieldColumnsList extends CWidgetField {
 		$items = $itemids
 			? API::Item()->get([
 				'output' => $this->isTemplateDashboard() ? ['name'] : ['name_resolved'],
-				'itemid' => $itemids,
+				'itemids' => $itemids,
 				'selectHosts' => $this->isTemplateDashboard() ? null : ['name'],
 				'webitems' => true,
 				'preservekeys' => true

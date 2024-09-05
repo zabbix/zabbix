@@ -29,4 +29,5 @@ SUBDIRS = \
 	zbxtime \
 	zbxeval \
 	zbxfile \
+	zbxodbc \
 	zbxhttp
