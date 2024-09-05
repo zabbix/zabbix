@@ -103,7 +103,9 @@ static int	httpmacro_append_pair(zbx_httptest_t *httptest, const char *pkey, siz
 	{
 		int	rc;
 		/* The value contains regexp pattern, retrieve the first captured group or fail. */
-		rc = zbx_mregexp_sub(data, value_str + REGEXP_PREFIX_SIZE, "\1", 1, (char **)&pair.second);
+		rc = zbx_mregexp_sub(data, value_str + REGEXP_PREFIX_SIZE, "\\1", ZBX_GROUP_CHECK_ENABLE,
+				(char **)&pair.second);
+
 		zbx_free(value_str);
 
 		if (SUCCEED != rc || NULL == pair.second)
