@@ -287,7 +287,7 @@ long	zbx_get_timezone_offset(time_t t, struct tm *tm)
  ******************************************************************************/
 struct tm	*zbx_localtime(const time_t *time, const char *tz)
 {
-#if defined(HAVE_GETENV) && defined(HAVE_PUTENV) && defined(HAVE_UNSETENV) && defined(HAVE_TZSET) && \
+#if defined(HAVE_GETENV) && defined(HAVE_UNSETENV) && defined(HAVE_TZSET) && \
 		!defined(_WINDOWS) && !defined(__MINGW32__)
 	char		*old_tz;
 	struct tm	*tm;
@@ -506,7 +506,7 @@ int	zbx_tm_parse_period(const char *period, size_t *len, int *multiplier, zbx_ti
  ******************************************************************************/
 time_t	zbx_mktime(struct tm *time, const char *tz)
 {
-#if defined(HAVE_GETENV) && defined(HAVE_PUTENV) && defined(HAVE_UNSETENV) && defined(HAVE_TZSET) && \
+#if defined(HAVE_GETENV) && defined(HAVE_UNSETENV) && defined(HAVE_TZSET) && \
 		!defined(_WINDOWS) && !defined(__MINGW32__)
 	char		*old_tz;
 	time_t		ret;
