@@ -1237,8 +1237,6 @@ int	vmware_shmem_init(zbx_uint64_t *config_vmware_cache_size, zbx_vmware_t **vmw
 		__vm_shmem_malloc_func, __vm_shmem_realloc_func, __vm_shmem_free_func);
 	zbx_binary_heap_create_ext(&(*vmware)->jobs_queue, vmware_job_compare_nextcheck, ZBX_BINARY_HEAP_OPTION_EMPTY,
 			__vm_shmem_malloc_func, __vm_shmem_realloc_func, __vm_shmem_free_func);
-#else
-	ZBX_UNUSED(evt_msg_strpool);
 #endif
 	ret = SUCCEED;
 out:
