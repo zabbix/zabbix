@@ -952,19 +952,18 @@ void	es_obj_attach_data(zbx_es_env_t *env, void *objptr, void *data, zbx_es_obj_
  *                                                                            *
  * Purpose: get data pointer attached to current object                       *
  *                                                                            *
- * Parameters: env  - [IN]                                                    *
- *             type - [IN] object type                                        *
+ * Parameters: env    - [IN]                                                  *
+ *             objptr - [IN] js object heap pointer                           *
+ *             type   - [IN] object type                                      *
  *                                                                            *
  * Comments: This function must be used only from object methods.             *
  *                                                                            *
  ******************************************************************************/
-void	*es_obj_get_data(zbx_es_env_t *env, zbx_es_obj_type_t type)
+void	*es_obj_get_data(zbx_es_env_t *env, const void *objptr, zbx_es_obj_type_t type)
 {
 	zbx_es_obj_data_t	obj_local, *obj;
 
-	duk_push_this(env->ctx);
-	obj_local.heapptr = duk_require_heapptr(env->ctx, -1);
-	duk_pop(env->ctx);
+	obj_local.heapptr = objptr;
 
 	if (NULL != (obj = zbx_hashset_search(&env->objmap, &obj_local)) && obj->type == type)
 		return obj->data;
