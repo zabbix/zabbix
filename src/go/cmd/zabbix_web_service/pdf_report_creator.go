@@ -63,7 +63,11 @@ func logAndWriteError(w http.ResponseWriter, errMsg string, code int) {
 	w.WriteHeader(code)
 	encoder := json.NewEncoder(w)
 	encoder.SetEscapeHTML(false)
-	encoder.Encode(map[string]string{"detail": errMsg})
+	err := encoder.Encode(map[string]string{"detail": errMsg})
+
+	if err != nil {
+		log.Errf("Error '%s' happened while encoding error message: '%s'", err.Error(), errMsg)
+	}
 }
 
 func (h *handler) report(w http.ResponseWriter, r *http.Request) {
@@ -182,7 +186,7 @@ func (h *handler) report(w http.ResponseWriter, r *http.Request) {
 
 	errEvtC := make(chan string, 1)
 
-	chromedp.ListenTarget(ctx, func(ev interface{}) {
+	chromedp.ListenTarget(ctx, func(ev any) {
 		if ev, ok := ev.(*network.EventLoadingFailed); ok && ev.ErrorText != "" && len(errEvtC) < cap(errEvtC) {
 			errEvtC <- ev.ErrorText
 		}
@@ -263,8 +267,10 @@ func prepareDashboard(url string) chromedp.ActionFunc {
 }
 
 func waitForDashboardReady(ctx context.Context, url string) error {
-	const wrapperIsReady = ".wrapper.is-ready"
-	const timeout = time.Second * 45
+	const (
+		wrapperIsReady = ".wrapper.is-ready"
+		timeout        = time.Second * 45
+	)
 
 	expression := fmt.Sprintf("document.querySelector('%s') !== null", wrapperIsReady)
 	var isReady bool
