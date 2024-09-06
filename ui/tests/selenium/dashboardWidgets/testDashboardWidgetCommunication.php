@@ -3838,7 +3838,7 @@ class testDashboardWidgetCommunication extends testWidgets {
 				: array_keys(self::DEFAULT_WIDGET_CONTENT[$page]);
 
 			// On slow database selenium deleted widgets that are not loaded yet which causes severe browser errors.
-			sleep(1);
+			sleep(2);
 			$dashboard->deleteWidget($broadcaster);
 			$this->checkUnavailableReference($dashboard, $listeners, $field);
 		}
