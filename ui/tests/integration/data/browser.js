@@ -106,8 +106,6 @@ try
 		Zabbix.log(5, "missing elements handled");
 	}
 
-
-
 	source = browser.getPageSource()
 	Zabbix.log(5, "source: " + source);
 
@@ -159,13 +157,7 @@ try
 
 	el.click();
 
-	el = browser.findElement("link text", "Data collection");
-
-	if (el === null)
-	{
-		throw Error("cannot find Data collection");
-	}
-	el.click();
+	clickElement(browser, "link text", "Data collection");
 
 	el = browser.findElement("xpath", "//li[@id='config' and @class='has-submenu is-expanded']");
 	if (el === null)
@@ -173,27 +165,9 @@ try
 		throw Error("cannot find //li[@id='config' and @class='has-submenu is-expanded']");
 	}
 
-	el = browser.findElement("link text", "Hosts");
-	if (el === null)
-	{
-		throw Error("cannot find Hosts");
-	}
-	el.click();
-
-	el = browser.findElement("xpath", "//input[@id='all_hosts']");
-	if (el === null)
-	{
-		throw Error("cannot find //input[@id='all_hosts']");
-	}
-	el.click();
-
-	el = browser.findElement("xpath", "//button[text()='Disable']");
-
-	if (el === null)
-	{
-		throw Error("cannot find //button[text()='Disable']");
-	}
-	el.click();
+	clickElement(browser, "link text", "Hosts");
+	clickElement(browser, "xpath", "//input[@id='all_hosts']");
+	clickElement(browser, "xpath", "//button[text()='Disable']");
 
 	alert_window = browser.getAlert();
 
@@ -202,12 +176,7 @@ try
 	el = browser.findElements("link text", "Web");
 	Zabbix.log(5, "Web length: " + el.length)
 
-	el = browser.findElement("link text", "Alerts");
-	if (el === null)
-	{
-		throw Error("cannot find Alerts");
-	}
-	el.click();
+	clickElement(browser, "link text", "Alerts");
 
 	el = browser.findElement("xpath", "//li[@id='alerts' and contains(@class,'is-expanded')]");
 	if (el === null)
@@ -217,27 +186,9 @@ try
 
 	Zabbix.sleep(250); // Alerts is clicked and Media Types slide up
 
-	el = browser.findElement("link text", "Media types");
-
-	if (el === null)
-	{
-		throw Error("cannot find Media types");
-	}
-	el.click();
-
-	el = browser.findElement("xpath", "//input[@id='all_media_types']");
-	if (el === null)
-	{
-		throw Error("cannot find //input[@id='all_media_types']");
-	}
-	el.click();
-
-	el = browser.findElement("xpath", "//button[text()='Enable']");
-	if (el === null)
-	{
-		throw Error("cannot find //button[text()='Enable']");
-	}
-	el.click();
+	clickElement(browser, "link text", "Media types");
+	clickElement(browser, "xpath", "//input[@id='all_media_types']");
+	clickElement(browser,"xpath", "//button[text()='Enable']");
 
 	alert_window = browser.getAlert();
 
