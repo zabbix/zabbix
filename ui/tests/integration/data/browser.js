@@ -159,7 +159,7 @@ try
 			el[i].sendKeys("x");
 		}
 	}
-	
+
 	el = findElementStrict(browser, "xpath", "//button[@id='enter']");
 
 	Zabbix.log(5, "getText " + el.getText())
