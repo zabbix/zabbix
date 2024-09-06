@@ -717,13 +717,13 @@ class CEvent extends CApiService {
 				]
 				: array_diff($options['selectAcknowledges'], ['username', 'name', 'surname']);
 
-			$sql_options = [
+			$db_acknowledges = DB::select('acknowledges', [
 				'output' => $this->outputExtend($output, ['acknowledgeid', 'eventid', 'userid']),
 				'filter' => ['eventid' => array_keys($result)],
 				'sortfield' => ['clock'],
-				'sortorder' => [ZBX_SORT_DOWN]
-			];
-			$db_acknowledges = DBfetchArrayAssoc(DBselect(DB::makeSql('acknowledges', $sql_options)), 'acknowledgeid');
+				'sortorder' => [ZBX_SORT_DOWN],
+				'preservekeys' => true
+			]);
 
 			$user_fields = [];
 			foreach (['username', 'name', 'surname'] as $field) {
