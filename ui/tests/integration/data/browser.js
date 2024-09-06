@@ -299,21 +299,21 @@ try
 			throw Error("cannot find url");
 		}
 		el.sendKeys(parameters.url + "zabbix.php?action=queue.overview");
-	
+
 		clickElement(browser2, "xpath", "//button[@class='dialogue-widget-save']");
 
 		el = browser2.findElement("xpath", "//iframe");
 		if (el === null) {
 			throw Error("cannot get iframe");
 		}
-		
+
 		browser2.switchFrame(el);
 
 		el = browser2.findElement("xpath", "//h1[contains(.,'Queue overview')]");
 		if (el === null) {
 			throw Error("cannot find Queue overview");
 		}
-	
+
 		browser2.switchFrame();
 
 		clickElement(browser2, "xpath", "//a[contains(.,'Cancel')]");
