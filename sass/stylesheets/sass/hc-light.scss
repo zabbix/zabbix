@@ -574,6 +574,11 @@ button {
 			&:checked[disabled] + label {
 				background-color: #d3d3d3 !important;
 			}
+
+			&[readonly]:checked:not(:focus) + label {
+				background-color: #B2B4BB !important;
+				-webkit-text-fill-color: #292929;
+			}
 		}
 	}
 }
