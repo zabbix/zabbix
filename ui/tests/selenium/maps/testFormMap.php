@@ -58,6 +58,56 @@ class testFormMap extends CLegacyWebTest {
 	}
 
 	/**
+	 * @dataProvider allMaps
+	 *
+	 * @browsers chrome
+	 */
+	public function testFormMap_SimpleUpdateConstructor($map) {
+		$sysmapid = $map['sysmapid'];
+
+		$sql_maps_elements = 'SELECT * FROM sysmaps sm INNER JOIN sysmaps_elements sme ON'.
+				' sme.sysmapid = sm.sysmapid ORDER BY sme.selementid';
+		$sql_links_triggers = 'SELECT * FROM sysmaps_links sl INNER JOIN sysmaps_link_triggers slt ON'.
+				' slt.linkid = sl.linkid ORDER BY slt.linktriggerid';
+		$hash_maps_elements = CDBHelper::getHash($sql_maps_elements);
+		$hash_links_triggers = CDBHelper::getHash($sql_links_triggers);
+
+		$this->page->login()->open('sysmaps.php')->waitUntilReady();
+		$this->query('link', $map['name'])->one()->click();
+		$this->page->waitUntilReady();
+
+		$element = $this->query('xpath://div[@id="flickerfreescreen_mapimg"]/div/*[name()="svg"]')
+				->waitUntilPresent()->one();
+
+		$exclude = [
+			'query'	=> 'class:map-timestamp',
+			'color'	=> '#ffffff'
+		];
+		$this->assertScreenshotExcept($element, $exclude, 'view_'.$sysmapid);
+
+		$this->query('button:Edit map')->one()->click();
+		$this->page->waitUntilReady();
+		$this->assertScreenshot($this->query('id:map-area')->waitUntilPresent()->one(), 'edit_'.$sysmapid);
+		$this->query('button:Update')->one()->click();
+
+		$this->page->waitUntilAlertIsPresent();
+		$this->assertEquals('Map is updated! Return to map list?', $this->page->getAlertText());
+		$this->page->acceptAlert();
+
+		$this->page->waitUntilReady();
+		$this->assertStringContainsString('sysmaps.php', $this->page->getCurrentUrl());
+
+		$hash_data = [
+			$hash_maps_elements => $sql_maps_elements,
+			$hash_links_triggers => $sql_links_triggers
+		];
+
+		foreach ($hash_data as $old => $new) {
+			$this->assertEquals($old, CDBHelper::getHash($new));
+		}
+	}
+
+	/**
 	 * Test setting of grid options for map
 	 *
 	 * @dataProvider possibleGridOptions
@@ -165,55 +215,5 @@ class testFormMap extends CLegacyWebTest {
 		// TODO: screenshot should be changed after fix ZBX-22528
 		$this->page->removeFocus();
 		$this->assertScreenshot($this->query('id:triggerContainer')->waitUntilVisible()->one(), 'Map element');
-	}
-
-	/**
-	 * @dataProvider allMaps
-	 *
-	 * @browsers chrome
-	 */
-	public function testFormMap_SimpleUpdateConstructor($map) {
-		$sysmapid = $map['sysmapid'];
-
-		$sql_maps_elements = 'SELECT * FROM sysmaps sm INNER JOIN sysmaps_elements sme ON'.
-				' sme.sysmapid = sm.sysmapid ORDER BY sme.selementid';
-		$sql_links_triggers = 'SELECT * FROM sysmaps_links sl INNER JOIN sysmaps_link_triggers slt ON'.
-				' slt.linkid = sl.linkid ORDER BY slt.linktriggerid';
-		$hash_maps_elements = CDBHelper::getHash($sql_maps_elements);
-		$hash_links_triggers = CDBHelper::getHash($sql_links_triggers);
-
-		$this->page->login()->open('sysmaps.php')->waitUntilReady();
-		$this->query('link', $map['name'])->one()->click();
-		$this->page->waitUntilReady();
-
-		$element = $this->query('xpath://div[@id="flickerfreescreen_mapimg"]/div/*[name()="svg"]')
-				->waitUntilPresent()->one();
-
-		$exclude = [
-			'query'	=> 'class:map-timestamp',
-			'color'	=> '#ffffff'
-		];
-		$this->assertScreenshotExcept($element, $exclude, 'view_'.$sysmapid);
-
-		$this->query('button:Edit map')->one()->click();
-		$this->page->waitUntilReady();
-		$this->assertScreenshot($this->query('id:map-area')->waitUntilPresent()->one(), 'edit_'.$sysmapid);
-		$this->query('button:Update')->one()->click();
-
-		$this->page->waitUntilAlertIsPresent();
-		$this->assertEquals('Map is updated! Return to map list?', $this->page->getAlertText());
-		$this->page->acceptAlert();
-
-		$this->page->waitUntilReady();
-		$this->assertStringContainsString('sysmaps.php', $this->page->getCurrentUrl());
-
-		$hash_data = [
-			$hash_maps_elements => $sql_maps_elements,
-			$hash_links_triggers => $sql_links_triggers
-		];
-
-		foreach ($hash_data as $old => $new) {
-			$this->assertEquals($old, CDBHelper::getHash($new));
-		}
 	}
 }

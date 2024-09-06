@@ -7,6 +7,7 @@
 
 # depends on inkscape, pngcrush, awk
 
+AWK=${AWK:-awk}
 pngcrushbin=pngcrush
 
 outputdir="${1:-png_modern}"
@@ -92,5 +93,5 @@ echo
 [[ -s "$pngcrushlog" ]] && {
 	echo "Biggest gain from pngcrush:"
 	sort -n -r -t : -k 2 "$pngcrushlog" | tail -n 1
-	awk 'BEGIN {FS=":"}; {sum+=$2} END { print "Average gain:",sum/NR}' "$pngcrushlog"
+	${AWK} 'BEGIN {FS=":"}; {sum+=$2} END { print "Average gain:",sum/NR}' "$pngcrushlog"
 }

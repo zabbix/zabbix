@@ -588,7 +588,7 @@ static int	macrofunc_fmttime(char **params, size_t nparam, char **out)
 					return FAIL;
 				}
 
-				zbx_tm_round_down(&local_time, unit);
+				zbx_tm_round_down(&local_time, unit, NULL);
 
 				p++;
 			}
@@ -607,9 +607,9 @@ static int	macrofunc_fmttime(char **params, size_t nparam, char **out)
 				}
 
 				if ('+' == op)
-					zbx_tm_add(&local_time, num, unit);
+					zbx_tm_add(&local_time, num, unit, NULL);
 				else
-					zbx_tm_sub(&local_time, num, unit);
+					zbx_tm_sub(&local_time, num, unit, NULL);
 
 				p += len;
 			}

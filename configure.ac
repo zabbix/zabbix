@@ -14,19 +14,20 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix],[7.2.0alpha1])
-AC_CONFIG_SRCDIR(src/zabbix_server/server.c)
-AM_INIT_AUTOMAKE([subdir-objects tar-pax])
+AC_INIT([Zabbix], [7.2.0alpha1])
 
 AC_MSG_NOTICE([Configuring $PACKAGE_NAME $PACKAGE_VERSION])
 
-AC_PROG_MAKE_SET
-
-AC_CONFIG_HEADERS(include/common/config.h)
+AC_CONFIG_MACRO_DIR([m4])
+AC_CONFIG_SRCDIR([src/zabbix_server/server.c])
+AC_CONFIG_HEADERS([include/common/config.h])
 
 AC_SUBST(DEFAULT_INCLUDES, ['-I$(top_srcdir)/include/common -I$(top_srcdir)/include'])
 
+AC_CANONICAL_BUILD
 AC_CANONICAL_HOST
+
+AM_INIT_AUTOMAKE([subdir-objects tar-pax])
 
 dnl *****************************************************************
 dnl *                                                               *
@@ -34,8 +35,130 @@ dnl *                     Checks for programs                       *
 dnl *                                                               *
 dnl *****************************************************************
 
+AC_PROG_EGREP
+AC_PROG_AWK
+AC_PROG_MAKE_SET
 AC_PROG_CC
-AM_PROG_CC_C_O
+AC_PROG_CXX
+
+dnl **
+dnl * Program capability tests
+dnl *
+
+AC_MSG_CHECKING(whether compiler continues when given unrecognized flags)
+cc_rejects_unknown_flags=
+dnl Be mindful of the flag you're passing.
+dnl Depending on the compiler's argument parsing, this may be interpreted
+dnl as another flag. Be very explicit.
+saved_CFLAGS="$CFLAGS"
+CFLAGS="--ThisFlagShouldCauseACompilerInvocationFailure"
+AC_COMPILE_IFELSE([
+    dnl The program should be legal C99 to avoid unrelated failures.
+
+    dnl As the test harness wraps the body in a main() with a
+    dnl successful return, we don't need to provide any code
+    dnl for the compiler to succeed at the test.
+    AC_LANG_PROGRAM([[
+    /* empty preamble */
+    ]], [[
+    /* empty body */
+    ]])], [
+        cc_rejects_unknown_flags="no"
+        AC_MSG_RESULT(yes)
+    ], [
+        cc_rejects_unknown_flags="yes"
+        AC_MSG_RESULT(no)
+    ]
+)
+CFLAGS="$saved_CFLAGS"
+
+dnl The -Werror flag is _not_ supported by compilers such as
+dnl xlc (IBM's C/C++ compiler suite on AIX), where the flag
+dnl `-qhalt` enables the same behavior.
+AC_MSG_CHECKING(whether compiler supports -Werror)
+cc_accepts_werror=
+dnl XXX: The flag to be tested gets _appended_ in case the
+dnl user has provided CFLAGS containing -Wno-error, which would
+dnl negate the effect of -Werror.
+saved_CFLAGS="$CFLAGS"
+CFLAGS="$CFLAGS -Werror"
+AC_COMPILE_IFELSE([
+    dnl The program should be legal C99 to avoid unrelated failures.
+
+    dnl As the test harness wraps the body in a main() with a
+    dnl successful return, we don't really need to provide
+    dnl any code to get the compiler to succeed at the test.
+    dnl The expectation is when the compiler will not recognize
+    dnl the flag and consequently fail the compilation
+    dnl (as opposed to issuing a warning and continuing).
+    dnl If this is not the case, the variable
+    dnl $compiler_rejects_unknown_flags can be tested for this
+    dnl behavior, as set by a previous test.
+    AC_LANG_PROGRAM([[
+    /* empty preamble */
+    ]], [[
+    /* empty body */
+    ]])], [
+        AS_IF([test $cc_rejects_unknown_flags = yes],
+            [
+                cc_accepts_werror="yes"
+                AC_MSG_RESULT(yes)
+            ],
+            [
+                dnl The compilation failed, but as the compiler
+                dnl does not reject unrecognized flags, we can't
+                dnl differentiate between success and the compiler
+                dnl just ignoring it.
+
+                dnl XXX We probably can, by resorting to pretty
+                dnl gnarly output processing; keep it simple for now.
+                cc_accepts_werror="unknown"
+                AC_MSG_RESULT(unknown)
+            ]
+        )
+    ], [
+        cc_accepts_werror="no"
+        AC_MSG_RESULT(no)
+    ]
+)
+CFLAGS="$saved_CFLAGS"
+
+AC_MSG_CHECKING(whether compiler supports -Werror=cpp)
+checked_werror_cpp_CFLAGS=
+AS_IF([test $cc_accepts_werror = yes],
+    [
+        saved_CFLAGS="$CFLAGS"
+        CFLAGS="$CFLAGS -Werror=cpp"
+        AC_COMPILE_IFELSE([
+            dnl XXX: We're forcing a compiler failure here,
+            dnl thus the result setting is inverted, because
+            dnl we're providing a test case that should _fail_
+            dnl compilation. Thus, if it succeeds, the compiler
+            dnl does not support the flag.
+            dnl
+            dnl We've already established whether the compiler
+            dnl continues with invocation errors, and whether
+            dnl it accepts -Werror at all.
+            AC_LANG_PROGRAM([[
+            #warning This preprocessor warning is intentional
+            ]], [[
+            /* empty body */
+            ]])], [
+                dnl Set this explicitly here, regardless of the initial value
+                checked_werror_cpp_CFLAGS=""
+                AC_MSG_RESULT(no)
+            ], [
+                checked_werror_cpp_CFLAGS="-Werror=cpp"
+                AC_MSG_RESULT(yes)
+            ]
+        )
+        CFLAGS="$saved_CFLAGS"
+    ],
+    dnl Default
+    [
+        AC_MSG_RESULT(skipping)
+    ]
+)
 
 dnl *****************************************************************
 dnl *                                                               *
@@ -43,23 +166,76 @@ dnl *                   Checks for header files                     *
 dnl *                                                               *
 dnl *****************************************************************
 
-AC_PROG_EGREP
+AC_HEADER_MAJOR
+AC_HEADER_RESOLV
 
-AC_CHECK_HEADERS(stdio.h stdlib.h string.h unistd.h netdb.h signal.h malloc.h \
-  syslog.h time.h errno.h sys/types.h sys/stat.h netinet/in.h \
-  math.h sys/socket.h dirent.h ctype.h \
-  fcntl.h sys/param.h arpa/inet.h \
-  sys/vfs.h sys/pstat.h sys/sysinfo.h sys/statvfs.h sys/statfs.h \
-  sys/loadavg.h sys/vmmeter.h strings.h vm/vm_param.h \
-  sys/time.h kstat.h sys/syscall.h sys/sysmacros.h \
-  stdint.h mach/host_info.h mach/mach_host.h pwd.h \
-  sys/var.h arpa/nameser.h assert.h sys/dkstat.h sys/disk.h sys/sched.h \
-  zone.h nlist.h kvm.h linux/version.h procinfo.h sys/dk.h \
-  sys/resource.h pthread.h windows.h process.h conio.h sys/wait.h \
-  stdarg.h winsock2.h pdh.h psapi.h sys/sem.h sys/ipc.h sys/shm.h Winldap.h \
-  Winber.h lber.h ws2tcpip.h inttypes.h sys/file.h grp.h \
-  execinfo.h sys/systemcfg.h sys/mnttab.h mntent.h sys/times.h \
-  dlfcn.h sys/utsname.h sys/un.h sys/protosw.h stddef.h limits.h float.h poll.h)
+dnl ISO C Standard Library
+dnl
+AC_CHECK_HEADERS([assert.h ctype.h dirent.h dlfcn.h errno.h float.h          \
+                  inttypes.h limits.h math.h signal.h stdarg.h stddef.h      \
+                  stdint.h stdio.h stdlib.h string.h time.h                  \
+])
+
+dnl POSIX C Standard Library
+dnl
+AC_CHECK_HEADERS([sys/ipc.h sys/resource.h sys/sem.h sys/shm.h sys/socket.h  \
+                  sys/stat.h sys/statfs.h sys/statvfs.h sys/time.h           \
+                  sys/times.h sys/types.h sys/un.h sys/utsname.h sys/wait.h  \
+                  arpa/inet.h fcntl.h grp.h netdb.h netinet/in.h poll.h      \
+                  pthread.h pwd.h strings.h syslog.h termios.h unistd.h      \
+                  utmpx.h                                                    \
+])
+
+dnl X/Open and SUS
+AC_CHECK_HEADERS([sys/timeb.h])
+
+dnl Non-standardized and obsolete non-platform headers
+dnl XXX: sys/syscall.h is not standardized; obsoleted by unistd.h in POSIX;
+dnl      required on AIX to work around a defect in netinet/in6_var.h
+dnl      process.h is a non-standard header shipped by various compilers;
+dnl      effectively obsoleted by unistd.h in POSIX.
+AC_CHECK_HEADERS([sys/syscall.h malloc.h process.h])
+
+dnl GNU C extensions
+dnl
+AC_CHECK_HEADERS([execinfo.h mntent.h sys/sysinfo.h])
+
+dnl AIX
+AC_CHECK_HEADERS([sys/protosw.h sys/systemcfg.h sys/var.h procinfo.h])
+
+dnl BSDs
+dnl XXX: sys/param.h is needed by duktape; shipped everywhere _except_ Linux.
+dnl      sys/vfs.h is a Solaris thing that's spread to BSDs and Linux as part
+dnl      of the ZFS compat layer.
+AC_CHECK_HEADERS([sys/disk.h sys/dkstat.h sys/ioctl.h sys/param.h            \
+                  sys/sched.h sys/vfs.h sys/vmmeter.h arpa/nameser.h kvm.h   \
+])
+
+dnl HP-UX
+AC_CHECK_HEADERS([sys/pstat.h])
+
+dnl Linux
+AC_CHECK_HEADERS([linux/version.h])
+
+dnl MacOS
+AC_CHECK_HEADERS([mach/host_info.h mach/mach_host.h vm/vm_param.h nlist.h])
+dnl maybe MacOS
+AC_CHECK_HEADERS([kstat.h])
+
+dnl Solaris
+dnl
+dnl XXX: sys/loadavg.h declares getloadavg(), which glibc, musl c and
+dnl      BSD libc's have merged into stdlib.h.
+AC_CHECK_HEADERS([sys/dk.h sys/loadavg.h sys/mnttab.h sys/sysmacros.h zone.h])
+
+dnl Windows
+AC_CHECK_HEADERS([Winber.h Winldap.h conio.h pdh.h psapi.h windows.h         \
+                  winsock2.h ws2tcpip.h                                      \
+])
+
+dnl 3rd-Party Libraries
+AC_CHECK_HEADERS([lber.h])
+
 AC_CHECK_HEADERS(resolv.h, [], [], [
 #ifdef HAVE_SYS_TYPES_H
 #  include <sys/types.h>
@@ -99,19 +275,8 @@ AC_CHECK_HEADERS(net/if.h net/if_mib.h, [], [], [
 #endif
 ])
 
-AC_MSG_CHECKING(whether compiler supports -Werror=cpp)
-checked_werror_cpp_CFLAGS=""
 saved_CFLAGS="$CFLAGS"
-CFLAGS="$CFLAGS -Werror=cpp"
-AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[]], [[
-  void f() {};
-]])],[checked_werror_cpp_CFLAGS="-Werror=cpp"
-  AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no)
-])
-CFLAGS="$saved_CFLAGS"
-
-saved_CFLAGS="$CFLAGS"
-CFLAGS="$checked_werror_cpp_CFLAGS $CFLAGS"
+CFLAGS="$CFLAGS $checked_werror_cpp_CFLAGS"
 AC_CHECK_HEADERS(sys/mount.h sys/proc.h sys/sysctl.h sys/user.h, [], [], [
 #ifdef HAVE_SYS_TYPES_H
 #  include <sys/types.h>
@@ -151,6 +316,27 @@ AC_CHECK_HEADERS(libperfstat.h, [], [], [
 #  include <sys/protosw.h>
 #endif
 ])
+
+AC_TYPE_INT16_T
+AC_TYPE_INT32_T
+AC_TYPE_INT64_T
+AC_TYPE_INT8_T
+AC_TYPE_MODE_T
+AC_TYPE_OFF_T
+AC_TYPE_PID_T
+AC_TYPE_SIZE_T
+AC_TYPE_SSIZE_T
+AC_TYPE_UID_T
+AC_TYPE_UINT16_T
+AC_TYPE_UINT32_T
+AC_TYPE_UINT64_T
+AC_TYPE_UINT8_T
+
+AC_CHECK_TYPES([ptrdiff_t])
+
+AC_STRUCT_ST_BLOCKS
+
+AC_CHECK_MEMBERS([struct stat.st_rdev])
 
 dnl Kluge for building wihout pkg-config
 m4_ifdef([PKG_PROG_PKG_CONFIG], [], [ AC_DEFUN([PKG_PROG_PKG_CONFIG], []) ])
@@ -207,9 +393,6 @@ esac
 if test "x$largefile" = "xyes"; then
 	AC_SYS_LARGEFILE
 fi
-
-AC_C_CONST
-AC_TYPE_PID_T
 
 AC_MSG_CHECKING(for socklen_t)
 AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
@@ -882,16 +1065,22 @@ dnl *                 Checks for library functions                  *
 dnl *                                                               *
 dnl *****************************************************************
 
-AC_REPLACE_FUNCS(getloadavg)
-AC_CHECK_FUNCS(hstrerror)
-AC_CHECK_FUNCS(getenv)
-AC_CHECK_FUNCS(putenv)
-AC_CHECK_FUNCS(setenv)
-AC_CHECK_FUNCS(tzset)
-AC_CHECK_FUNCS(unsetenv)
-AC_CHECK_FUNCS(sigqueue)
-AC_CHECK_FUNCS(round)
-AC_CHECK_FUNCS(malloc_trim)
+AC_FUNC_FORK
+AC_FUNC_GETMNTENT
+AC_FUNC_LSTAT_FOLLOWS_SLASHED_SYMLINK
+AC_FUNC_MALLOC
+AC_FUNC_MKTIME
+AC_FUNC_MMAP
+AC_FUNC_REALLOC
+AC_FUNC_STRTOD
+
+AC_CHECK_FUNCS([alarm atexit clock_gettime dup2 fesetround floor getcwd       \
+                getenv gethostname getmntent getmntinfo getpagesize           \
+                gettimeofday hstrerror inet_ntoa localtime_r malloc_trim      \
+                memchr memmove memset mkdir modf munmap pow pstat_getdynamic  \
+                realpath round select setenv sigqueue socket sqrt strcasecmp  \
+                strchr strcspn strdup strerror strpbrk strrchr strstr strtol  \
+                strtoul sysinfo tzset uname unsetenv])
 
 dnl *****************************************************************
 dnl *                                                               *

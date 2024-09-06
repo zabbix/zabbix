@@ -29,9 +29,9 @@ static zbx_history_table_t	areg = {
 		{"host",		ZBX_PROTO_TAG_HOST,		ZBX_JSON_TYPE_STRING,	NULL},
 		{"listen_ip",		ZBX_PROTO_TAG_IP,		ZBX_JSON_TYPE_STRING,	""},
 		{"listen_dns",		ZBX_PROTO_TAG_DNS,		ZBX_JSON_TYPE_STRING,	""},
-		{"listen_port",		ZBX_PROTO_TAG_PORT,		ZBX_JSON_TYPE_STRING,	"0"},
+		{"listen_port",		ZBX_PROTO_TAG_PORT,		ZBX_JSON_TYPE_INT,	"0"},
 		{"host_metadata",	ZBX_PROTO_TAG_HOST_METADATA,	ZBX_JSON_TYPE_STRING,	""},
-		{"flags",		ZBX_PROTO_TAG_FLAGS,		ZBX_JSON_TYPE_STRING,	"0"},
+		{"flags",		ZBX_PROTO_TAG_FLAGS,		ZBX_JSON_TYPE_INT,	"0"},
 		{"tls_accepted",	ZBX_PROTO_TAG_TLS_ACCEPTED,	ZBX_JSON_TYPE_INT,	"0"},
 		{0}
 		}
@@ -212,6 +212,9 @@ static int	pb_autoreg_write_host_mem(zbx_pb_t *pb, const char *host, const char 
  ******************************************************************************/
 static int	pb_autoreg_get_mem(zbx_pb_t *pb, struct zbx_json *j, zbx_uint64_t *lastid, int *more)
 {
+#define	pb_add_json_field_helper(fld_name, type)						\
+	pb_add_json_field(j, &areg, ZBX_STR(fld_name), &row->fld_name, type)
+
 	int			records_num = 0;
 	zbx_list_iterator_t	li;
 	zbx_pb_autoreg_t	*row;
@@ -235,14 +238,14 @@ static int	pb_autoreg_get_mem(zbx_pb_t *pb, struct zbx_json *j, zbx_uint64_t *la
 			(void)zbx_list_iterator_peek(&li, (void **)&row);
 
 			zbx_json_addobject(j, NULL);
-			zbx_json_addint64(j, ZBX_PROTO_TAG_CLOCK, row->clock);
-			zbx_json_addstring(j, ZBX_PROTO_TAG_HOST, row->host, ZBX_JSON_TYPE_STRING);
-			zbx_json_addstring(j, ZBX_PROTO_TAG_IP, row->listen_ip, ZBX_JSON_TYPE_STRING);
-			zbx_json_addstring(j, ZBX_PROTO_TAG_DNS, row->listen_dns, ZBX_JSON_TYPE_STRING);
-			zbx_json_addint64(j, ZBX_PROTO_TAG_PORT, row->listen_port);
-			zbx_json_addstring(j, ZBX_PROTO_TAG_HOST_METADATA, row->host_metadata, ZBX_JSON_TYPE_STRING);
-			zbx_json_addint64(j, ZBX_PROTO_TAG_FLAGS, row->flags);
-			zbx_json_addint64(j, ZBX_PROTO_TAG_TLS_ACCEPTED, row->tls_accepted);
+			pb_add_json_field_helper(clock, ZBX_TYPE_INT);
+			pb_add_json_field_helper(host, ZBX_TYPE_CHAR);
+			pb_add_json_field_helper(listen_ip, ZBX_TYPE_CHAR);
+			pb_add_json_field_helper(listen_dns, ZBX_TYPE_CHAR);
+			pb_add_json_field_helper(listen_port, ZBX_TYPE_INT);
+			pb_add_json_field_helper(host_metadata, ZBX_TYPE_CHAR);
+			pb_add_json_field_helper(flags, ZBX_TYPE_INT);
+			pb_add_json_field_helper(tls_accepted, ZBX_TYPE_INT);
 			zbx_json_close(j);
 
 			records_num++;
@@ -253,6 +256,8 @@ static int	pb_autoreg_get_mem(zbx_pb_t *pb, struct zbx_json *j, zbx_uint64_t *la
 	}
 
 	return records_num;
+
+#	undef	pb_add_json_field_helper
 }
 
 /******************************************************************************
