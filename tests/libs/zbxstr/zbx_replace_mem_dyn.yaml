@@ -15,8 +15,8 @@ out:
 test case: "Replacing with a Larger Block (No Reallocation Needed)"
 in:
   data: "HelloWorld"
-  data_alloc: 14
-  data_len: 10
+  data_alloc: 10
+  data_len: 11
   offset: 5
   sz_to: 5
   from: "Everyone"
@@ -28,7 +28,7 @@ out:
 test case: "Replacing with a Larger Block (Reallocation Needed)"
 in:
   data: "HelloWorld"
-  data_alloc: 10
+  data_alloc: 11
   data_len: 11
   offset: 5
   sz_to: 5

@@ -1717,8 +1717,7 @@ int	zbx_replace_mem_dyn(char **data, size_t *data_alloc, size_t *data_len, size_
 	if (0 != sz_changed)
 	{
 		char	*to;
-		size_t	start_data_len = *data_len;
-		size_t	start_data_alloc = *data_alloc;
+
 		*data_len += sz_changed;
 
 		if (*data_len > *data_alloc)
@@ -1726,11 +1725,6 @@ int	zbx_replace_mem_dyn(char **data, size_t *data_alloc, size_t *data_len, size_
 			while (*data_len > *data_alloc)
 				*data_alloc *= 2;
 
-			*data = (char *)zbx_realloc(*data, *data_alloc);
-		}
-
-		if (start_data_len < *data_len && *data_alloc == start_data_alloc)
-		{
 			*data = (char *)zbx_realloc(*data, *data_alloc);
 		}
 
