@@ -21,6 +21,7 @@
 
 #include "browser_perf.h"
 #include "zbxalgo.h"
+#include "zbxembed.h"
 
 typedef struct
 {
@@ -54,6 +55,8 @@ typedef struct
 	zbx_wd_error_t		*error;
 
 	void			*browser;
+
+	zbx_es_env_t		*env;
 }
 zbx_webdriver_t;
 

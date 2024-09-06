@@ -22,6 +22,13 @@
 #include "duk_config.h"
 #include "webdriver.h"
 
+typedef struct
+{
+	zbx_webdriver_t	*wd;
+}
+zbx_wd_alert_t;
+
+void	wd_alert_free(zbx_wd_alert_t *alert);
 void	wd_alert_create(duk_context *ctx, zbx_webdriver_t *wd, const char *text);
 
 #endif

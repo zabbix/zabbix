@@ -1627,29 +1627,29 @@ class testDashboardItemHistoryWidget extends testWidgets {
 					]
 				]
 			],
-			// TODO: Uncomment after ZBX-24554 (4) is fixed.
-//			[
-//				[
-//					'expected' => TEST_BAD,
-//					'fields' => [
-//						'Name' => 'Time period = empty widget',
-//						'Advanced configuration' => true,
-//						'Time period' => 'Widget'
-//					],
-//					'Columns' => [
-//						[
-//							'fields' => [
-//								'Item' => [
-//									'values' => 'Text item',
-//									'context' => ['values' => 'Host for all item value types']
-//								]
-//							]
-//						]
-//					],
-//					'error' => 'Invalid parameter "Time period/Widget": cannot be empty.'
-//				]
-//			],
 			// #46.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Time period = empty widget',
+						'Advanced configuration' => true,
+						'Time period' => 'Widget'
+					],
+					'Columns' => [
+						[
+							'fields' => [
+								'Item' => [
+									'values' => 'Text item',
+									'context' => ['values' => 'Host for all item value types']
+								]
+							]
+						]
+					],
+					'error' => 'Invalid parameter "Time period/Widget": cannot be empty.'
+				]
+			],
+			// #47.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1676,7 +1676,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 					]
 				]
 			],
-			// #47.
+			// #48.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1703,7 +1703,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 					]
 				]
 			],
-			// #48.
+			// #49.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1724,7 +1724,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 					]
 				]
 			],
-			// #49.
+			// #50.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1748,7 +1748,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 					'check_time' => 'now-1y – now-1M'
 				]
 			],
-			// #50.
+			// #51.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1771,7 +1771,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 					'check_time' => 'future'
 				]
 			],
-			// #51.
+			// #52.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1794,7 +1794,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 					'check_time' => 'past'
 				]
 			],
-			// #52.
+			// #53.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1818,7 +1818,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 					'error' => 'Minimum time period to display is 1 minute.'
 				]
 			],
-			// #53.
+			// #54.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1842,7 +1842,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 					'error' => 'Minimum time period to display is 1 minute.'
 				]
 			],
-			// #54.
+			// #55.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -2429,15 +2429,15 @@ class testDashboardItemHistoryWidget extends testWidgets {
 					'result' => [
 						[
 							'Name' => 'Host name',
-							'Value' => 'lon'
+							'Value' => 'lon...'
 						],
 						[
 							'Name' => 'Host name',
-							'Value' => '<sp'
+							'Value' => '<sp...'
 						],
 						[
 							'Name' => 'Host name',
-							'Value' => '<b>'
+							'Value' => '<b>...'
 						],
 						[
 							'Name' => 'Master item',

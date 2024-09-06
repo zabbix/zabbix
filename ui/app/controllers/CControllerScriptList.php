@@ -113,8 +113,6 @@ class CControllerScriptList extends CController {
 			(new CUrl('zabbix.php'))->setArgument('action', $this->getAction())
 		);
 
-
-
 		/*
 		 * Find script host group name and user group name. Set to NULL if all host/user groups used. Find associated
 		 * actions in any of operations. Collect scriptids for action scope scripts.
@@ -148,6 +146,16 @@ class CControllerScriptList extends CController {
 		unset($script);
 
 		if ($action_scriptids) {
+			$access_to_actions = [
+				EVENT_SOURCE_TRIGGERS => $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TRIGGER_ACTIONS),
+				EVENT_SOURCE_DISCOVERY => $this->checkAccess(CRoleHelper::UI_CONFIGURATION_DISCOVERY_ACTIONS),
+				EVENT_SOURCE_AUTOREGISTRATION => $this->checkAccess(
+					CRoleHelper::UI_CONFIGURATION_AUTOREGISTRATION_ACTIONS
+				),
+				EVENT_SOURCE_INTERNAL => $this->checkAccess(CRoleHelper::UI_CONFIGURATION_INTERNAL_ACTIONS),
+				EVENT_SOURCE_SERVICE => $this->checkAccess(CRoleHelper::UI_CONFIGURATION_SERVICE_ACTIONS)
+			];
+
 			$script_actions = API::Script()->get([
 				'output' => [],
 				'scriptids' => array_keys($action_scriptids),
@@ -156,9 +164,22 @@ class CControllerScriptList extends CController {
 			]);
 
 			foreach ($data['scripts'] as $scriptid => &$script) {
+				$script['action_count_total'] = 0;
+
 				if (array_key_exists($scriptid, $script_actions)) {
 					$script['actions'] = $script_actions[$scriptid]['actions'];
+					$script['action_count_total'] = count($script['actions']);
+
 					CArrayHelper::sort($script['actions'], ['name']);
+
+					$script['actions'] = array_slice($script['actions'], 0,
+						CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE)
+					);
+
+					foreach ($script['actions'] as &$action) {
+						$action['is_editable'] = $access_to_actions[$action['eventsource']];
+					}
+					unset($action);
 				}
 			}
 			unset($script);
@@ -195,10 +216,6 @@ class CControllerScriptList extends CController {
 			}
 			unset($script);
 		}
-
-		$data['config'] = [
-			'max_in_table' => CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE)
-		];
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of scripts'));
