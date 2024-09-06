@@ -56,26 +56,26 @@ class CWidgetHoneycomb extends CWidget {
 		return this.#user_interacting || super.isUserInteracting();
 	}
 
-	onResize() {
-		if (this.getState() !== WIDGET_STATE_ACTIVE) {
-			return;
-		}
-
-		clearTimeout(this.#resize_timeout_id);
-
-		const old_items_max_count = this.#items_max_count;
-		this.#items_max_count = this.#getItemsMaxCount();
-
-		if (this.#items_max_count > old_items_max_count && this.#items_loaded_count >= old_items_max_count) {
-			this._startUpdating();
-		}
-
-		this.#resize_timeout_id = setTimeout(() => {
-			if (this.#honeycomb !== null) {
-				this.#honeycomb.setSize(super._getContentsSize());
-			}
-		}, 100);
-	}
+//	onResize() {
+//		if (this.getState() !== WIDGET_STATE_ACTIVE) {
+//			return;
+//		}
+//
+//		clearTimeout(this.#resize_timeout_id);
+//
+//		const old_items_max_count = this.#items_max_count;
+//		this.#items_max_count = this.#getItemsMaxCount();
+//
+//		if (this.#items_max_count > old_items_max_count && this.#items_loaded_count >= old_items_max_count) {
+//			this._startUpdating();
+//		}
+//
+//		this.#resize_timeout_id = setTimeout(() => {
+//			if (this.#honeycomb !== null) {
+//				this.#honeycomb.setSize(super._getContentsSize());
+//			}
+//		}, 100);
+//	}
 
 	getUpdateRequestData() {
 		return {
