@@ -1171,23 +1171,17 @@ class DB {
 	 */
 	public static function getFilterFields(string $table_name, array $output_fields = null): array {
 		$table_schema = self::getSchema($table_name);
+
+		if ($output_fields !== null) {
+			$table_schema['fields'] = array_intersect_key($table_schema['fields'], array_flip($output_fields));
+		}
+
 		$filter_fields = [];
 
-		if ($output_fields === null) {
-			foreach ($table_schema['fields'] as $field_name => $field_schema) {
-				if ($field_schema['type'] !== self::FIELD_TYPE_TEXT
-						&& $field_schema['type'] !== self::FIELD_TYPE_BLOB) {
-					$filter_fields[] = $field_name;
-				}
-			}
-		}
-		else {
-			foreach ($output_fields as $field_name) {
-				if (array_key_exists($field_name, $table_schema['fields'])
-						&& $table_schema['fields'][$field_name]['type'] !== self::FIELD_TYPE_TEXT
-						&& $table_schema['fields'][$field_name]['type'] !== self::FIELD_TYPE_BLOB) {
-					$filter_fields[] = $field_name;
-				}
+		foreach ($table_schema['fields'] as $field_name => $field_schema) {
+			if ($field_schema['type'] !== self::FIELD_TYPE_TEXT
+					&& $field_schema['type'] !== self::FIELD_TYPE_BLOB) {
+				$filter_fields[] = $field_name;
 			}
 		}
 
@@ -1205,21 +1199,16 @@ class DB {
 	 */
 	public static function getSearchFields(string $table_name, array $output_fields = null): array {
 		$table_schema = self::getSchema($table_name);
+
+		if ($output_fields !== null) {
+			$table_schema['fields'] = array_intersect_key($table_schema['fields'], array_flip($output_fields));
+		}
+
 		$search_fields = [];
 
-		if ($output_fields === null) {
-			foreach ($table_schema['fields'] as $field_name => $field_schema) {
-				if (in_array($field_schema['type'], self::SUPPORTED_SEARCH_TYPES)) {
-					$search_fields[] = $field_name;
-				}
-			}
-		}
-		else {
-			foreach ($output_fields as $field_name) {
-				if (array_key_exists($field_name, $table_schema['fields'])
-						&& in_array($table_schema['fields'][$field_name]['type'], self::SUPPORTED_SEARCH_TYPES)) {
-					$search_fields[] = $field_name;
-				}
+		foreach ($table_schema['fields'] as $field_name => $field_schema) {
+			if (in_array($field_schema['type'], self::SUPPORTED_SEARCH_TYPES)) {
+				$search_fields[] = $field_name;
 			}
 		}
 
