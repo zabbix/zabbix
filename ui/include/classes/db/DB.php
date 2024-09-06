@@ -31,6 +31,8 @@ class DB {
 	const FIELD_TYPE_TEXT = 'text';
 	const FIELD_TYPE_CUID = 'cuid';
 
+	const SUPPORTED_SEARCH_TYPES = [self::FIELD_TYPE_CHAR, self::FIELD_TYPE_TEXT, self::FIELD_TYPE_CUID];
+
 	private static $schema = null;
 
 	/**
@@ -1054,9 +1056,6 @@ class DB {
 		global $DB;
 
 		$table_schema = DB::getSchema($table_name);
-		$unsupported_types = [self::FIELD_TYPE_INT, self::FIELD_TYPE_ID, self::FIELD_TYPE_FLOAT, self::FIELD_TYPE_UINT,
-			self::FIELD_TYPE_BLOB
-		];
 
 		$start = $options['startSearch'] ? '' : '%';
 		$glue = $options['searchByAny'] ? ' OR ' : ' AND ';
@@ -1072,7 +1071,7 @@ class DB {
 
 			$field_schema = $table_schema['fields'][$field_name];
 
-			if (in_array($field_schema['type'], $unsupported_types)) {
+			if (!in_array($field_schema['type'], self::SUPPORTED_SEARCH_TYPES)) {
 				self::exception(self::SCHEMA_ERROR,
 					vsprintf('%s: field "%s.%s" has an unsupported type.', [__FUNCTION__, $table_name, $field_name])
 				);
@@ -1125,7 +1124,7 @@ class DB {
 
 			$field_schema = $table_schema['fields'][$field_name];
 
-			if ($field_schema['type'] == self::FIELD_TYPE_TEXT) {
+			if ($field_schema['type'] === self::FIELD_TYPE_TEXT || $field_schema['type'] === self::FIELD_TYPE_BLOB) {
 				self::exception(self::SCHEMA_ERROR,
 					vsprintf('%s: field "%s.%s" has an unsupported type.', [__FUNCTION__, $table_name, $field_name])
 				);
@@ -1159,6 +1158,72 @@ class DB {
 		}
 
 		return $sql_parts;
+	}
+
+	/**
+	 * Get array of the field names by which filtering is supported from the given table.
+	 * If $output_fields parameter is given, get filterable fields among them in scope of the given table name.
+	 *
+	 * @param string     $table_name
+	 * @param array|null $output_fields
+	 *
+	 * @return array
+	 */
+	public static function getFilterFields(string $table_name, array $output_fields = null): array {
+		$table_schema = self::getSchema($table_name);
+		$filter_fields = [];
+
+		if ($output_fields === null) {
+			foreach ($table_schema['fields'] as $field_name => $field_schema) {
+				if ($field_schema['type'] !== self::FIELD_TYPE_TEXT
+						&& $field_schema['type'] !== self::FIELD_TYPE_BLOB) {
+					$filter_fields[] = $field_name;
+				}
+			}
+		}
+		else {
+			foreach ($output_fields as $field_name) {
+				if (array_key_exists($field_name, $table_schema['fields'])
+						&& $table_schema['fields'][$field_name]['type'] !== self::FIELD_TYPE_TEXT
+						&& $table_schema['fields'][$field_name]['type'] !== self::FIELD_TYPE_BLOB) {
+					$filter_fields[] = $field_name;
+				}
+			}
+		}
+
+		return $filter_fields;
+	}
+
+	/**
+	 * Get array of the field names by which searching is supported from the given table.
+	 * If $output_fields parameter is given, get searchable fields among them in scope of the given table name.
+	 *
+	 * @param string     $table_name
+	 * @param array|null $output_fields
+	 *
+	 * @return array
+	 */
+	public static function getSearchFields(string $table_name, array $output_fields = null): array {
+		$table_schema = self::getSchema($table_name);
+		$search_fields = [];
+
+		if ($output_fields === null) {
+			foreach ($table_schema['fields'] as $field_name => $field_schema) {
+				if (in_array($field_schema['type'], self::SUPPORTED_SEARCH_TYPES)) {
+					$search_fields[] = $field_name;
+				}
+			}
+		}
+		else {
+			foreach ($output_fields as $field_name) {
+				if (array_key_exists($field_name, $table_schema['fields'])
+						&& in_array($table_schema['fields'][$field_name]['type'], self::SUPPORTED_SEARCH_TYPES)) {
+					$search_fields[] = $field_name;
+				}
+			}
+		}
+
+		return $search_fields;
 	}
 
 	/**
