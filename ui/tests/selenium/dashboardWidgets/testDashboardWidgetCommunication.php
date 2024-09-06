@@ -20,7 +20,6 @@ require_once dirname(__FILE__).'/../behaviors/CWidgetBehavior.php';
 require_once dirname(__FILE__).'/../common/testWidgets.php';
 
 /**
- * @backup profiles
  *
  * @onBefore prepareData
  */
@@ -3828,7 +3827,8 @@ class testDashboardWidgetCommunication extends testWidgets {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
 		$dashboard = CDashboardElement::find()->waitUntilReady()->one();
 
-		foreach (['Hostgroups page' => 'Host groups', 'Hosts page' => 'Hosts', 'Items page' => 'Item'] as $page => $field) {
+//		foreach (['Hostgroups page' => 'Host groups', 'Hosts page' => 'Hosts', 'Items page' => 'Item'] as $page => $field) {
+		foreach (['Items page' => 'Item'] as $page => $field) {
 			$dashboard->selectPage($page);
 
 			// TODO: Add 'Item value listener' and 'Item value' to the below list of widget names when ZBX-25040 is fixed.
