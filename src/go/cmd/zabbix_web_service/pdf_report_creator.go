@@ -216,7 +216,8 @@ func (h *handler) report(w http.ResponseWriter, r *http.Request) {
 	if len(errEvtC) != 0 {
 		errorText := <-errEvtC
 
-		if errorText == netErrCertAuthorityInvalid {
+		switch errorText {
+		case netErrCertAuthorityInvalid:
 			errorText = fmt.Sprintf(
 				"Invalid certificate authority detected while loading dashboard: '%s'. Fix TLS "+
 					"configuration or configure Zabbix web service to ignore TLS certificate "+
@@ -224,15 +225,17 @@ func (h *handler) report(w http.ResponseWriter, r *http.Request) {
 				u.String(),
 			)
 			logAndWriteError(w, errorText, http.StatusInternalServerError)
-
-			return
+		default:
+			errorText = fmt.Sprintf(
+				"received network.EventLoadingFailed '%s' event while loading dashboard",
+				errorText,
+			)
+			logAndWriteError(w, errorText, http.StatusInternalServerError)
 		}
 
-		errorText = fmt.Sprintf(
-			"received network.EventLoadingFailed '%s' event while loading dashboard",
-			errorText,
-		)
-		logAndWriteError(w, errorText, http.StatusInternalServerError)
+		if err != nil {
+			log.Errf("%s", err.Error())
+		}
 
 		return
 	}
