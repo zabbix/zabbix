@@ -434,10 +434,6 @@ out:
 
 			BIO_vfree(err);
 		}
-		else
-		{
-			printf("custom error: %s\n", *error);
-		}
 
 		if (NULL != ctx)
 		{
