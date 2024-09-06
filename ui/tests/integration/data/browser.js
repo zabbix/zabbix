@@ -33,6 +33,20 @@ function clickElement(browser, strategy, selector) {
 	}
 }
 
+function findElementStrict(browser, strategy, selector) {
+
+	var el;
+
+	try {
+		el = browser.findElement(strategy, selector);
+	}
+	catch (error) {
+		throw Error("cannot findElement "+ strategy + " " + selector);
+	}
+
+	return el;
+}
+
 // uncomment for foreground
 // opts.capabilities.alwaysMatch['goog:chromeOptions'].args = []
 
@@ -85,7 +99,7 @@ try
 		Zabbix.log(5, "invalid arguments error handled: " + error);
 	}
 	try {
-		var elEarly = browser.findElement(null,null);
+		var elEarly = browser.findElement(null, null);
 	}
 	catch (error) {
 		Zabbix.log(5, "invalid null arguments error handled: " + error);
@@ -145,13 +159,8 @@ try
 			el[i].sendKeys("x");
 		}
 	}
-
-	el = browser.findElement("xpath", "//button[@id='enter']");
-
-	if (el === null)
-	{
-		throw Error("cannot find login button");
-	}
+	
+	el = findElementStrict(browser, "xpath", "//button[@id='enter']");
 
 	Zabbix.log(5, "getText " + el.getText())
 
@@ -159,11 +168,7 @@ try
 
 	clickElement(browser, "link text", "Data collection");
 
-	el = browser.findElement("xpath", "//li[@id='config' and @class='has-submenu is-expanded']");
-	if (el === null)
-	{
-		throw Error("cannot find //li[@id='config' and @class='has-submenu is-expanded']");
-	}
+	findElementStrict(browser,"xpath", "//li[@id='config' and @class='has-submenu is-expanded']");
 
 	clickElement(browser, "link text", "Hosts");
 	clickElement(browser, "xpath", "//input[@id='all_hosts']");
@@ -178,11 +183,7 @@ try
 
 	clickElement(browser, "link text", "Alerts");
 
-	el = browser.findElement("xpath", "//li[@id='alerts' and contains(@class,'is-expanded')]");
-	if (el === null)
-	{
-		throw Error("cannot find //li[@id='alerts' and contains(@class,'is-expanded')]");
-	}
+	findElementStrict(browser, "xpath", "//li[@id='alerts' and contains(@class,'is-expanded')]");
 
 	Zabbix.sleep(250); // Alerts is clicked and Media Types slide up
 
@@ -194,11 +195,7 @@ try
 
 	alert_window.accept();
 
-	el = browser.findElement("xpath", "//a[text()='Enabled']");
-	if (null === el)
-	{
-		throw Error("couldn't enable Media types");
-	}
+	findElementStrict(browser, "xpath", "//a[text()='Enabled']");
 
 	cookies = browser.getCookies()
 
@@ -224,19 +221,11 @@ try
 		browser2.navigate(parameters.url);
 
 		browser2.setElementWaitTimeout(3000);
-		el = browser2.findElement("xpath", "//div[@class='dashboard is-ready']");
-		if (el === null)
-		{
-			throw Error("cannot find dashboard is-ready");
-		}
+		findElementStrict(browser2, "xpath", "//div[@class='dashboard is-ready']");
 
 		browser2.setElementWaitTimeout(0);
 
-		el = browser2.findElement("xpath", "//div[@class='no-data-message']");
-		if (el === null)
-		{
-			throw Error("cannot find no data message");
-		}
+		findElementStrict(browser2, "xpath", "//div[@class='no-data-message']");
 
 		browser2.setElementWaitTimeout(3000);
 
@@ -245,33 +234,20 @@ try
 		clickElement(browser2, "xpath", "//button[contains(.,'Add')]");
 		clickElement(browser2, "xpath", "//button[@id='label-type']");
 		clickElement(browser2, "xpath", "//li[@value='url']");
-		el = browser2.findElement("xpath", "//input[@id='url']");
-		if (el === null) {
-			throw Error("cannot find url");
-		}
+		el = findElementStrict(browser2, "xpath", "//input[@id='url']");
 		el.sendKeys(parameters.url + "zabbix.php?action=queue.overview");
 
 		clickElement(browser2, "xpath", "//button[@class='dialogue-widget-save']");
 
-		el = browser2.findElement("xpath", "//iframe");
-		if (el === null) {
-			throw Error("cannot get iframe");
-		}
-
+		el = findElementStrict(browser2, "xpath", "//iframe");
 		browser2.switchFrame(el);
 
-		el = browser2.findElement("xpath", "//h1[contains(.,'Queue overview')]");
-		if (el === null) {
-			throw Error("cannot find Queue overview");
-		}
+		findElementStrict(browser2, "xpath", "//h1[contains(.,'Queue overview')]");
 
 		browser2.switchFrame();
 		browser2.switchFrame(0);
 
-		el = browser2.findElement("xpath", "//h1[contains(.,'Queue overview')]");
-		if (el === null) {
-			throw Error("cannot find Queue overview");
-		}
+		findElementStrict(browser2, "xpath", "//h1[contains(.,'Queue overview')]");
 
 		browser2.switchFrame();
 
