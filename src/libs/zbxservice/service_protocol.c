@@ -295,7 +295,6 @@ void	zbx_service_deserialize_id_pairs(const unsigned char *data, zbx_vector_uint
 	}
 }
 
-
 void	zbx_service_serialize_rootcause(unsigned char **data, size_t *data_alloc, size_t *data_offset,
 		zbx_uint64_t serviceid, const zbx_vector_uint64_t *eventids)
 {
