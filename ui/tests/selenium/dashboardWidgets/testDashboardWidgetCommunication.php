@@ -3826,6 +3826,7 @@ class testDashboardWidgetCommunication extends testWidgets {
 	public function testDashboardWidgetCommunication_BroadcasterDeletion() {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
 		$dashboard = CDashboardElement::find()->waitUntilReady()->one();
+		$dashboard->edit();
 
 		foreach (['Hostgroups page' => 'Host groups', 'Hosts page' => 'Hosts', 'Items page' => 'Item'] as $page => $field) {
 			$dashboard->selectPage($page);
@@ -3836,8 +3837,7 @@ class testDashboardWidgetCommunication extends testWidgets {
 				? ['Gauge listener', 'Graph (classic) listener', 'SVG graph listener', 'Pie chart listener']
 				: array_keys(self::DEFAULT_WIDGET_CONTENT[$page]);
 
-			$dashboard->getWidget($broadcaster);
-			$dashboard->edit()->deleteWidget($broadcaster);
+			$dashboard->deleteWidget($broadcaster);
 			$this->checkUnavailableReference($dashboard, $listeners, $field);
 		}
 
