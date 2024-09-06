@@ -86,10 +86,6 @@ class CMediatype extends CApiService {
 			return [];
 		}
 
-		if (!$options['countOutput'] && is_array($options['output']) && in_array('content_type', $options['output'])) {
-			self::deprecated('Field "content_type" is deprecated.');
-		}
-
 		$output_fields = self::$userData['type'] == USER_TYPE_SUPER_ADMIN
 			? self::OUTPUT_FIELDS
 			: self::LIMITED_OUTPUT_FIELDS;
@@ -110,6 +106,10 @@ class CMediatype extends CApiService {
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		if (!$options['countOutput'] && is_array($options['output']) && in_array('content_type', $options['output'])) {
+			self::deprecated('Field "content_type" is deprecated.');
 		}
 
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && $options['output'] === API_OUTPUT_EXTEND) {
