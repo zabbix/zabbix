@@ -398,9 +398,10 @@ static void *tls_new_context(const char *ca_file, const char *crl_file, const ch
 #else
 	if (NULL != cipher13)
 	{
-		*error = zbx_strdup(NULL, "cannot set list of TLS 1.3"
+		*error = strdup("cannot set list of TLS 1.3"
 					" certificate ciphersuites: compiled with OpenSSL version older than 1.1.1,"
-					" consider not using parameters \"TLSCipherCert13\""
+					" consider not using parameters \"TLSCipherCert13\"");
+		goto out;
 	}
 #endif
 	if (NULL != cipher)
