@@ -164,7 +164,7 @@
 
 		$textarea[0].setSelectionRange(0, 0);
 
-		if (obj.options.use_tab_for_indent) {
+		if (obj.options.use_tab) {
 			$textarea[0].addEventListener('keydown', e => {
 				if (e.key === 'Tab') {
 					e.preventDefault();
@@ -216,7 +216,7 @@
 							autofocus: false,
 							line_numbers: true,
 							monospace_font: true,
-							use_tab_for_indent: false
+							use_tab: true
 						}, options)
 					};
 

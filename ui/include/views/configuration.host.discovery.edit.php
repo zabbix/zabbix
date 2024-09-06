@@ -232,8 +232,7 @@ $item_tab
 				'grow' => 'auto',
 				'rows' => 0,
 				'maxlength' => DB::getFieldLength('items', 'params'),
-				'readonly' => $data['limited'],
-				'use_tab_for_indent' => true
+				'readonly' => $data['limited']
 			]))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAriaRequired()
@@ -250,8 +249,7 @@ $item_tab
 				'grow' => 'auto',
 				'rows' => 0,
 				'maxlength' => DB::getFieldLength('items', 'params'),
-				'readonly' => $data['limited'],
-				'use_tab_for_indent' => true
+				'readonly' => $data['limited']
 			]))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAriaRequired()

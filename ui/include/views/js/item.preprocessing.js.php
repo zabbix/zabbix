@@ -87,7 +87,8 @@
 </script>
 
 <script type="text/x-jquery-tmpl" id="preprocessing-steps-parameters-multiline-tmpl">
-	<?= (new CMultilineInput('preprocessing[#{rowNum}][params][0]', '', ['add_post_js' => false])) ?>
+	<?= (new CMultilineInput('preprocessing[#{rowNum}][params][0]', '', ['add_post_js' => false, 'use_tab' => false]))
+	?>
 </script>
 
 <script type="text/x-jquery-tmpl" id="preprocessing-steps-parameters-custom-width-chkbox-tmpl">
@@ -347,8 +348,7 @@
 						label_after: '}',
 						grow: 'auto',
 						rows: 0,
-						maxlength: <?= DB::getFieldLength('item_preproc', 'params') ?>,
-						use_tab_for_indent: true
+						maxlength: <?= DB::getFieldLength('item_preproc', 'params') ?>
 					});
 
 				case '<?= ZBX_PREPROC_PROMETHEUS_PATTERN ?>':

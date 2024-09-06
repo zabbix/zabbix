@@ -53,7 +53,7 @@ class CMultilineInput extends CDiv {
 	 * @param bool     $options['monospace_font']        Monospace font type (default: true).
 	 * @param bool     $options['readonly']              Readonly component (default: false).
 	 * @param bool     $options['disabled']              Is disabled (default: false).
-	 * @param bool     $options['use_tab_for_indent]     If true, on tab key pressed, adds indent instead of moving
+	 * @param bool     $options['use_tab]                If true, on tab key pressed, adds indent instead of moving
 	 *                                                   the pointer to the next element
 	 */
 	public function __construct($name = 'multilineinput', $value = '', array $options = []) {

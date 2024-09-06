@@ -300,7 +300,8 @@ $form_grid->addItem([
 	new CFormField(
 		(new CMultilineInput('value', '', [
 			'disabled' => false,
-			'readonly' => false
+			'readonly' => false,
+			'use_tab' => false
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	),
 
@@ -317,7 +318,7 @@ $form_grid->addItem([
 			(new CCheckBox('not_supported'))->setLabel(_('Not supported'))->setChecked((bool) $data['not_supported']),
 			(new CDiv([
 				(new CLabel(_('Error'), 'runtime_error_match'))->setFor('runtime_error'),
-				(new CMultilineInput('runtime_error', '', ['readonly' => false]))
+				(new CMultilineInput('runtime_error', '', ['readonly' => false, 'use_tab' => false]))
 			]))
 		]))
 			->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
@@ -327,7 +328,8 @@ $form_grid->addItem([
 	new CLabel(_('Previous value'), 'prev_item_value'),
 	new CFormField(
 		(new CMultilineInput('prev_value', '', [
-			'disabled' => !$data['show_prev']
+			'disabled' => !$data['show_prev'],
+			'use_tab' => false
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	),
 

@@ -289,8 +289,7 @@ $mediatype_form_grid
 				'placeholder_textarea' => 'return value',
 				'grow' => 'auto',
 				'rows' => 0,
-				'maxlength' => DB::getFieldLength('media_type', 'script'),
-				'use_tab_for_indent' => true
+				'maxlength' => DB::getFieldLength('media_type', 'script')
 			]))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAriaRequired()
