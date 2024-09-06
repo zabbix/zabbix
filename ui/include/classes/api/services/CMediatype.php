@@ -207,7 +207,7 @@ class CMediatype extends CApiService {
 
 		if ($result) {
 			$result = $this->addRelatedObjects($options, $result);
-			$result = $this->unsetExtraFields($result, ['type'], $options['output']);
+			$result = $this->unsetExtraFields($result, ['mediatypeid', 'type'], $options['output']);
 		}
 
 		if (!$options['preservekeys']) {

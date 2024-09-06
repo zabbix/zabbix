@@ -438,6 +438,8 @@ class CAlert extends CApiService {
 			'preservekeys' => true
 		]);
 
+		$mediatypes = $this->unsetExtraFields($mediatypes, ['mediatypeid'], $options['selectMediatypes']);
+
 		$result = $relation_map->mapMany($result, $mediatypes, 'mediatypes');
 	}
 
