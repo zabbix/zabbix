@@ -54,6 +54,8 @@ var browser = new Browser(opts)
 
 try
 {
+	Zabbix.log(3, "navigate");
+
 	browser.setScreenSize(800, 600);
 	browser.navigate(parameters.url);
 
@@ -62,6 +64,7 @@ try
 	browser.setScriptTimeout(5000);
 	browser.setSessionTimeout(1000);
 
+	Zabbix.log(3, "test error handling");
 	try
 	{
 		var elEarly = browser.findElements("text", "Web");
@@ -123,6 +126,7 @@ try
 	source = browser.getPageSource()
 	Zabbix.log(5, "source: " + source);
 
+	Zabbix.log(3, "login");
 	browser.setElementWaitTimeout(5000);
 
 	el = browser.findElement("xpath", "//input[@id='name']");
@@ -166,6 +170,8 @@ try
 
 	el.click();
 
+	Zabbix.log(3, "dismiss alert when disabling hosts");
+
 	clickElement(browser, "link text", "Data collection");
 
 	findElementStrict(browser,"xpath", "//li[@id='config' and @class='has-submenu is-expanded']");
@@ -185,6 +191,7 @@ try
 
 	findElementStrict(browser, "xpath", "//li[@id='alerts' and contains(@class,'is-expanded')]");
 
+	Zabbix.log(3, "accept alert when enabling media types");
 	Zabbix.sleep(250); // Alerts is clicked and Media Types slide up
 
 	clickElement(browser, "link text", "Media types");
@@ -197,6 +204,7 @@ try
 
 	findElementStrict(browser, "xpath", "//a[text()='Enabled']");
 
+	Zabbix.log(3, "get cookies");
 	cookies = browser.getCookies()
 
 	for (i = 0; i < cookies.length; i++)
@@ -206,6 +214,8 @@ try
 			break;
 	}
 
+	Zabbix.log(3, "collect performance entries");
+
 	browser.collectPerfEntries();
 
 	// start second browser, reuse zbx_session cookie and sign out
@@ -213,12 +223,16 @@ try
 
 	try
 	{
+		Zabbix.log(3, "use cookies for second connection");
+
 		Zabbix.log(5, "cookie: " + JSON.stringify(cookies[i]));
 		browser2.navigate(parameters.url);
 		browser2.setScreenSize(800, 600);
 		browser2.addCookie(cookies[i]);
 
 		browser2.navigate(parameters.url);
+
+		Zabbix.log(3, "finished navigation");
 
 		browser2.setElementWaitTimeout(3000);
 		findElementStrict(browser2, "xpath", "//div[@class='dashboard is-ready']");
@@ -228,6 +242,8 @@ try
 		findElementStrict(browser2, "xpath", "//div[@class='no-data-message']");
 
 		browser2.setElementWaitTimeout(3000);
+
+		Zabbix.log(3, "click Dashboards");
 
 		clickElement(browser2, "link text", "Dashboards");
 		clickElement(browser2, "xpath", "//button[contains(.,'Edit dashboard')]");
@@ -253,10 +269,13 @@ try
 
 		clickElement(browser2, "xpath", "//a[contains(.,'Cancel')]");
 
+		Zabbix.log(3, "get screenshot");
+
 		Zabbix.log(5, "screenshot: " + browser2.getScreenshot());
 
 		el = browser2.findElement("link text", "Sign out");
 
+		Zabbix.log(3, "collect performance entries");
 		browser2.collectPerfEntries();
 
 		try
@@ -308,13 +327,18 @@ try
 	}
 	el.click();
 
+	Zabbix.log(3, "logging out");
+
 	browser2.navigate(parameters.url);
+	browser2.setElementWaitTimeout(100);
 	elSignOut = browser2.findElement("link text", "Sign out");
 
 	if (elSignOut != null)
 	{
 		throw Error("logged in without password after sign out");
 	}
+
+	Zabbix.log(3, "logged out");
 
 	var bypass = {};
 
@@ -393,4 +417,6 @@ catch (err)
 
 result = browser.getResult();
 result.browserDashboard = browserDashboardResult;
+
+Zabbix.log(3, "finished");
 return JSON.stringify(result);
