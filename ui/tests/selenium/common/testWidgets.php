@@ -294,15 +294,15 @@ class testWidgets extends CWebTest {
 				else {
 					$db_values = [
 						'Total Hosts' => CDBHelper::getCount($interfaces_sql.'1,2,3,4) AND available='.
-							$db_interfaces['status'][$header].' AND hostid IN ('.$hosts_sql.')'),
+								$db_interfaces['status'][$header].' AND hostid IN ('.$hosts_sql.')'),
 						'Agent (passive)' => CDBHelper::getCount($interfaces_sql.'1) AND available='.
-							$db_interfaces['status'][$header].' AND hostid IN ('.$hosts_sql.')'),
+								$db_interfaces['status'][$header].' AND hostid IN ('.$hosts_sql.')'),
 						'SNMP' => CDBHelper::getCount($interfaces_sql.'2) AND available='.
-							$db_interfaces['status'][$header].' AND hostid IN ('.$hosts_sql.')'),
+								$db_interfaces['status'][$header].' AND hostid IN ('.$hosts_sql.')'),
 						'IPMI' => CDBHelper::getCount($interfaces_sql.'3) AND available='.
-							$db_interfaces['status'][$header].' AND hostid IN ('.$hosts_sql.')'),
+								$db_interfaces['status'][$header].' AND hostid IN ('.$hosts_sql.')'),
 						'JMX' => CDBHelper::getCount($interfaces_sql.'4) AND available='.
-							$db_interfaces['status'][$header].' AND hostid IN ('.$hosts_sql.')')
+								$db_interfaces['status'][$header].' AND hostid IN ('.$hosts_sql.')')
 					];
 				}
 			}

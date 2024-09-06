@@ -105,7 +105,6 @@ class testPageAdministrationGeneralModules extends CWebTest {
 								'y' => 0,
 								'width' => 36,
 								'height' => 4,
-								'view_mode' => 0,
 								'fields' => [
 									[
 										'type' => 1,
@@ -130,7 +129,6 @@ class testPageAdministrationGeneralModules extends CWebTest {
 								'y' => 0,
 								'width' => 36,
 								'height' => 4,
-								'view_mode' => 0,
 								'fields' => [
 									[
 										'type' => 1,
@@ -141,7 +139,6 @@ class testPageAdministrationGeneralModules extends CWebTest {
 							],
 							[
 								'type' => 'favgraphs',
-								'view_mode' => 0,
 								'x' => 18,
 								'y' => 4,
 								'width' => 18,
@@ -154,7 +151,6 @@ class testPageAdministrationGeneralModules extends CWebTest {
 						'widgets' => [
 							[
 								'type' => 'clock345',
-								'view_mode' => 0,
 								'x' => 0,
 								'y' => 0,
 								'width' => 18,
@@ -162,7 +158,6 @@ class testPageAdministrationGeneralModules extends CWebTest {
 							],
 							[
 								'type' => 'favgraphs',
-								'view_mode' => 0,
 								'x' => 18,
 								'y' => 0,
 								'width' => 18,
@@ -176,7 +171,6 @@ class testPageAdministrationGeneralModules extends CWebTest {
 							[
 
 								'type' => 'favgraphs',
-								'view_mode' => 0,
 								'x' => 0,
 								'y' => 0,
 								'width' => 18,
@@ -184,7 +178,6 @@ class testPageAdministrationGeneralModules extends CWebTest {
 							],
 							[
 								'type' => 'systeminfo',
-								'view_mode' => 0,
 								'x' => 18,
 								'y' => 0,
 								'width' => 18,
@@ -202,7 +195,6 @@ class testPageAdministrationGeneralModules extends CWebTest {
 								'y' => 0,
 								'width' => 20,
 								'height' => 6,
-								'view_mode' => 0,
 								'fields' => [
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -223,7 +215,6 @@ class testPageAdministrationGeneralModules extends CWebTest {
 								'y' => 6,
 								'width' => 20,
 								'height' => 6,
-								'view_mode' => 0,
 								'fields' => [
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -249,7 +240,6 @@ class testPageAdministrationGeneralModules extends CWebTest {
 								'y' => 0,
 								'width' => 20,
 								'height' => 4,
-								'view_mode' => 0,
 								'fields' => [
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -280,7 +270,6 @@ class testPageAdministrationGeneralModules extends CWebTest {
 								'y' => 4,
 								'width' => 20,
 								'height' => 4,
-								'view_mode' => 0,
 								'fields' => [
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -306,7 +295,6 @@ class testPageAdministrationGeneralModules extends CWebTest {
 								'y' => 8,
 								'width' => 20,
 								'height' => 4,
-								'view_mode' => 0,
 								'fields' => [
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -338,7 +326,6 @@ class testPageAdministrationGeneralModules extends CWebTest {
 							[
 
 								'type' => 'favgraphs',
-								'view_mode' => 0,
 								'x' => 0,
 								'y' => 0,
 								'width' => 18,
@@ -346,7 +333,6 @@ class testPageAdministrationGeneralModules extends CWebTest {
 							],
 							[
 								'type' => 'systeminfo',
-								'view_mode' => 0,
 								'x' => 18,
 								'y' => 0,
 								'width' => 18,
@@ -359,7 +345,6 @@ class testPageAdministrationGeneralModules extends CWebTest {
 						'widgets' => [
 							[
 								'type' => 'favgraphs',
-								'view_mode' => 0,
 								'x' => 0,
 								'y' => 0,
 								'width' => 18,
@@ -367,7 +352,6 @@ class testPageAdministrationGeneralModules extends CWebTest {
 							],
 							[
 								'type' => 'emptyWidget',
-								'view_mode' => 0,
 								'x' => 18,
 								'y' => 0,
 								'width' => 18,
@@ -423,7 +407,6 @@ class testPageAdministrationGeneralModules extends CWebTest {
 							],
 							[
 								'type' => 'clock345',
-								'view_mode' => 0,
 								'x' => 18,
 								'y' => 0,
 								'width' => 18,

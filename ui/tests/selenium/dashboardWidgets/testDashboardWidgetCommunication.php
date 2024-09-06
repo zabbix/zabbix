@@ -14,9 +14,9 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../behaviors/CWidgetBehavior.php';
 require_once dirname(__FILE__).'/../common/testWidgets.php';
 
 /**
@@ -32,7 +32,8 @@ class testDashboardWidgetCommunication extends testWidgets {
 	public function getBehaviors() {
 		return [
 			CMessageBehavior::class,
-			CTableBehavior::class
+			CTableBehavior::class,
+			CWidgetBehavior::class
 		];
 	}
 
@@ -310,8 +311,8 @@ class testDashboardWidgetCommunication extends testWidgets {
 				'host' => self::FIRST_HOST_NAME,
 				'interfaces' => [
 					'type' => INTERFACE_TYPE_AGENT,
-					'main' => 1,
-					'useip' => 1,
+					'main' => INTERFACE_PRIMARY,
+					'useip' => INTERFACE_USE_IP,
 					'ip' => '127.0.0.1',
 					'dns' => '',
 					'port' => 10050
@@ -350,8 +351,8 @@ class testDashboardWidgetCommunication extends testWidgets {
 				'host' => self::SECOND_HOST_NAME,
 				'interfaces' => [
 					'type' => INTERFACE_TYPE_IPMI,
-					'main' => 1,
-					'useip' => 1,
+					'main' => INTERFACE_PRIMARY,
+					'useip' => INTERFACE_USE_IP,
 					'ip' => '127.0.0.1',
 					'dns' => '',
 					'port' => 12345
@@ -390,8 +391,8 @@ class testDashboardWidgetCommunication extends testWidgets {
 				'host' => self::THIRD_HOST_NAME,
 				'interfaces' => [
 					'type' => INTERFACE_TYPE_JMX,
-					'main' => 1,
-					'useip' => 1,
+					'main' => INTERFACE_PRIMARY,
+					'useip' => INTERFACE_USE_IP,
 					'ip' => '127.0.0.1',
 					'dns' => '',
 					'port' => 623
@@ -623,7 +624,6 @@ class testDashboardWidgetCommunication extends testWidgets {
 								'y' => 0,
 								'width' => 19,
 								'height' => 5,
-								'view_mode' => ZBX_WIDGET_VIEW_MODE_NORMAL,
 								'fields' => [
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_MAP,
@@ -649,7 +649,6 @@ class testDashboardWidgetCommunication extends testWidgets {
 								'y' => 5,
 								'width' => 19,
 								'height' => 3,
-								'view_mode' => ZBX_WIDGET_VIEW_MODE_NORMAL,
 								'fields' => [
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_HOST,
@@ -685,7 +684,6 @@ class testDashboardWidgetCommunication extends testWidgets {
 								'y' => 8,
 								'width' => 19,
 								'height' => 3,
-								'view_mode' => ZBX_WIDGET_VIEW_MODE_NORMAL,
 								'fields' => [
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_HOST,
@@ -721,7 +719,6 @@ class testDashboardWidgetCommunication extends testWidgets {
 								'y' => 11,
 								'width' => 19,
 								'height' => 3,
-								'view_mode' => ZBX_WIDGET_VIEW_MODE_NORMAL,
 								'fields' => [
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_HOST,
@@ -757,7 +754,6 @@ class testDashboardWidgetCommunication extends testWidgets {
 								'y' => 0,
 								'width' => 19,
 								'height' => 5,
-								'view_mode' => ZBX_WIDGET_VIEW_MODE_NORMAL,
 								'fields' => [
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -793,7 +789,6 @@ class testDashboardWidgetCommunication extends testWidgets {
 								'y' => 0,
 								'width' => 14,
 								'height' => 5,
-								'view_mode' => ZBX_WIDGET_VIEW_MODE_NORMAL,
 								'fields' => [
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -839,7 +834,6 @@ class testDashboardWidgetCommunication extends testWidgets {
 								'y' => 0,
 								'width' => 18,
 								'height' => 5,
-								'view_mode' => ZBX_WIDGET_VIEW_MODE_NORMAL,
 								'fields' => [
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -870,7 +864,6 @@ class testDashboardWidgetCommunication extends testWidgets {
 								'y' => 5,
 								'width' => 29,
 								'height' => 3,
-								'view_mode' => ZBX_WIDGET_VIEW_MODE_NORMAL,
 								'fields' => [
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -891,7 +884,6 @@ class testDashboardWidgetCommunication extends testWidgets {
 								'y' => 5,
 								'width' => 22,
 								'height' => 3,
-								'view_mode' => ZBX_WIDGET_VIEW_MODE_NORMAL,
 								'fields' => [
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -932,7 +924,6 @@ class testDashboardWidgetCommunication extends testWidgets {
 								'y' => 8,
 								'width' => 26,
 								'height' => 3,
-								'view_mode' => ZBX_WIDGET_VIEW_MODE_NORMAL,
 								'fields' => [
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -973,7 +964,6 @@ class testDashboardWidgetCommunication extends testWidgets {
 								'y' => 11,
 								'width' => 26,
 								'height' => 3,
-								'view_mode' => ZBX_WIDGET_VIEW_MODE_NORMAL,
 								'fields' => [
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -1014,7 +1004,6 @@ class testDashboardWidgetCommunication extends testWidgets {
 								'y' => 8,
 								'width' => 25,
 								'height' => 3,
-								'view_mode' => ZBX_WIDGET_VIEW_MODE_NORMAL,
 								'fields' => [
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -1110,7 +1099,6 @@ class testDashboardWidgetCommunication extends testWidgets {
 								'y' => 11,
 								'width' => 25,
 								'height' => 3,
-								'view_mode' => ZBX_WIDGET_VIEW_MODE_NORMAL,
 								'fields' => [
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -1156,7 +1144,6 @@ class testDashboardWidgetCommunication extends testWidgets {
 								'y' => 0,
 								'width' => 20,
 								'height' => 5,
-								'view_mode' => ZBX_WIDGET_VIEW_MODE_NORMAL,
 								'fields' => [
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_GROUP,
@@ -1197,7 +1184,6 @@ class testDashboardWidgetCommunication extends testWidgets {
 								'y' => 5,
 								'width' => 20,
 								'height' => 3,
-								'view_mode' => ZBX_WIDGET_VIEW_MODE_NORMAL,
 								'fields' => [
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -1223,7 +1209,6 @@ class testDashboardWidgetCommunication extends testWidgets {
 								'y' => 8,
 								'width' => 20,
 								'height' => 5,
-								'view_mode' => ZBX_WIDGET_VIEW_MODE_NORMAL,
 								'fields' => [
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_MAP,
@@ -1249,7 +1234,6 @@ class testDashboardWidgetCommunication extends testWidgets {
 								'y' => 13,
 								'width' => 25,
 								'height' => 3,
-								'view_mode' => ZBX_WIDGET_VIEW_MODE_NORMAL,
 								'fields' => [
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_GROUP,
@@ -1356,7 +1340,6 @@ class testDashboardWidgetCommunication extends testWidgets {
 								'y' => 16,
 								'width' => 25,
 								'height' => 3,
-								'view_mode' => ZBX_WIDGET_VIEW_MODE_NORMAL,
 								'fields' => [
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -1392,7 +1375,6 @@ class testDashboardWidgetCommunication extends testWidgets {
 								'y' => 0,
 								'width' => 15,
 								'height' => 5,
-								'view_mode' => ZBX_WIDGET_VIEW_MODE_NORMAL,
 								'fields' => [
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -1428,7 +1410,6 @@ class testDashboardWidgetCommunication extends testWidgets {
 								'y' => 0,
 								'width' => 16,
 								'height' => 5,
-								'view_mode' => ZBX_WIDGET_VIEW_MODE_NORMAL,
 								'fields' => [
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -1474,7 +1455,6 @@ class testDashboardWidgetCommunication extends testWidgets {
 								'y' => 0,
 								'width' => 20,
 								'height' => 5,
-								'view_mode' => ZBX_WIDGET_VIEW_MODE_NORMAL,
 								'fields' => [
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -1505,7 +1485,6 @@ class testDashboardWidgetCommunication extends testWidgets {
 								'y' => 5,
 								'width' => 15,
 								'height' => 3,
-								'view_mode' => ZBX_WIDGET_VIEW_MODE_NORMAL,
 								'fields' => [
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -1546,7 +1525,6 @@ class testDashboardWidgetCommunication extends testWidgets {
 								'y' => 5,
 								'width' => 16,
 								'height' => 3,
-								'view_mode' => ZBX_WIDGET_VIEW_MODE_NORMAL,
 								'fields' => [
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -1587,7 +1565,6 @@ class testDashboardWidgetCommunication extends testWidgets {
 								'y' => 5,
 								'width' => 20,
 								'height' => 3,
-								'view_mode' => ZBX_WIDGET_VIEW_MODE_NORMAL,
 								'fields' => [
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -1628,7 +1605,6 @@ class testDashboardWidgetCommunication extends testWidgets {
 								'y' => 8,
 								'width' => 16,
 								'height' => 4,
-								'view_mode' => ZBX_WIDGET_VIEW_MODE_NORMAL,
 								'fields' => [
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -1719,7 +1695,6 @@ class testDashboardWidgetCommunication extends testWidgets {
 								'y' => 8,
 								'width' => 16,
 								'height' => 4,
-								'view_mode' => ZBX_WIDGET_VIEW_MODE_NORMAL,
 								'fields' => [
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -1760,7 +1735,6 @@ class testDashboardWidgetCommunication extends testWidgets {
 								'y' => 8,
 								'width' => 19,
 								'height' => 4,
-								'view_mode' => ZBX_WIDGET_VIEW_MODE_NORMAL,
 								'fields' => [
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -1806,7 +1780,6 @@ class testDashboardWidgetCommunication extends testWidgets {
 								'y' => 0,
 								'width' => 24,
 								'height' => 5,
-								'view_mode' => ZBX_WIDGET_VIEW_MODE_NORMAL,
 								'fields' => [
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -1832,7 +1805,6 @@ class testDashboardWidgetCommunication extends testWidgets {
 								'y' => 5,
 								'width' => 24,
 								'height' => 4,
-								'view_mode' => ZBX_WIDGET_VIEW_MODE_NORMAL,
 								'fields' => [
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -1883,7 +1855,6 @@ class testDashboardWidgetCommunication extends testWidgets {
 								'y' => 10,
 								'width' => 24,
 								'height' => 3,
-								'view_mode' => ZBX_WIDGET_VIEW_MODE_NORMAL,
 								'fields' => [
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_HOST,
@@ -1919,7 +1890,6 @@ class testDashboardWidgetCommunication extends testWidgets {
 								'y' => 0,
 								'width' => 18,
 								'height' => 4,
-								'view_mode' => ZBX_WIDGET_VIEW_MODE_NORMAL,
 								'fields' => [
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -1950,7 +1920,6 @@ class testDashboardWidgetCommunication extends testWidgets {
 								'y' => 0,
 								'width' => 27,
 								'height' => 4,
-								'view_mode' => ZBX_WIDGET_VIEW_MODE_NORMAL,
 								'fields' => [
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
@@ -1981,7 +1950,6 @@ class testDashboardWidgetCommunication extends testWidgets {
 								'y' => 4,
 								'width' => 18,
 								'height' => 3,
-								'view_mode' => ZBX_WIDGET_VIEW_MODE_NORMAL,
 								'fields' => [
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -2007,7 +1975,6 @@ class testDashboardWidgetCommunication extends testWidgets {
 								'y' => 4,
 								'width' => 27,
 								'height' => 3,
-								'view_mode' => ZBX_WIDGET_VIEW_MODE_NORMAL,
 								'fields' => [
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -2058,7 +2025,6 @@ class testDashboardWidgetCommunication extends testWidgets {
 								'y' => 7,
 								'width' => 18,
 								'height' => 3,
-								'view_mode' => ZBX_WIDGET_VIEW_MODE_NORMAL,
 								'fields' => [
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
@@ -2110,7 +2076,6 @@ class testDashboardWidgetCommunication extends testWidgets {
 								'y' => 7,
 								'width' => 18,
 								'height' => 3,
-								'view_mode' => ZBX_WIDGET_VIEW_MODE_NORMAL,
 								'fields' => [
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -2141,7 +2106,6 @@ class testDashboardWidgetCommunication extends testWidgets {
 								'y' => 0,
 								'width' => 19,
 								'height' => 5,
-								'view_mode' => ZBX_WIDGET_VIEW_MODE_NORMAL,
 								'fields' => [
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_MAP,
@@ -2167,7 +2131,6 @@ class testDashboardWidgetCommunication extends testWidgets {
 								'y' => 6,
 								'width' => 19,
 								'height' => 4,
-								'view_mode' => ZBX_WIDGET_VIEW_MODE_NORMAL,
 								'fields' => [
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -2193,7 +2156,6 @@ class testDashboardWidgetCommunication extends testWidgets {
 								'y' => 0,
 								'width' => 20,
 								'height' => 5,
-								'view_mode' => ZBX_WIDGET_VIEW_MODE_NORMAL,
 								'fields' => [
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -2229,7 +2191,6 @@ class testDashboardWidgetCommunication extends testWidgets {
 								'y' => 6,
 								'width' => 20,
 								'height' => 4,
-								'view_mode' => ZBX_WIDGET_VIEW_MODE_NORMAL,
 								'fields' => [
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -2275,7 +2236,6 @@ class testDashboardWidgetCommunication extends testWidgets {
 								'y' => 0,
 								'width' => 20,
 								'height' => 5,
-								'view_mode' => ZBX_WIDGET_VIEW_MODE_NORMAL,
 								'fields' => [
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_MAP,
@@ -2301,7 +2261,6 @@ class testDashboardWidgetCommunication extends testWidgets {
 								'y' => 0,
 								'width' => 20,
 								'height' => 5,
-								'view_mode' => ZBX_WIDGET_VIEW_MODE_NORMAL,
 								'fields' => [
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -2332,7 +2291,6 @@ class testDashboardWidgetCommunication extends testWidgets {
 								'y' => 6,
 								'width' => 20,
 								'height' => 5,
-								'view_mode' => ZBX_WIDGET_VIEW_MODE_NORMAL,
 								'fields' => [
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_GROUP,
@@ -2439,7 +2397,6 @@ class testDashboardWidgetCommunication extends testWidgets {
 								'y' => 6,
 								'width' => 20,
 								'height' => 5,
-								'view_mode' => ZBX_WIDGET_VIEW_MODE_NORMAL,
 								'fields' => [
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -2484,8 +2441,8 @@ class testDashboardWidgetCommunication extends testWidgets {
 
 	public function getWidgetData() {
 		return [
-			// #0 Check broadcasting hostgroups from map widget.
-			[
+			// #0.
+			'Broadcasting hostgroups from map - initial selection' => [
 				[
 					'page' => 'Hostgroups page',
 					'broadcaster' => 'Map hostgroup broadcaster',
@@ -2547,7 +2504,7 @@ class testDashboardWidgetCommunication extends testWidgets {
 				]
 			],
 			// #1.
-			[
+			'Broadcasting hostgroups from map - selecting another value' => [
 				[
 					'page' => 'Hostgroups page',
 					'broadcaster' => 'Map hostgroup broadcaster',
@@ -2608,16 +2565,16 @@ class testDashboardWidgetCommunication extends testWidgets {
 					]
 				]
 			],
-			// #2 Check that clicking on host in broadcasting map resets the selection in hostgroup listeners.
-			[
+			// #2.
+			'Check that clicking on host in broadcasting map resets the selection in hostgroup listeners' => [
 				[
 					'page' => 'Hostgroups page',
 					'broadcaster' => 'Map hostgroup broadcaster',
 					'select_element' => self::SECOND_HOST_NAME
 				]
 			],
-			// #3 Check broadcasting hostgroups from problem hosts widget.
-			[
+			// #3.
+			'Broadcasting hostgroups from problem hosts widget - initial selection' => [
 				[
 					'page' => 'Hostgroups page',
 					'broadcaster' => 'Problem hosts hostgroup broadcaster',
@@ -2679,7 +2636,7 @@ class testDashboardWidgetCommunication extends testWidgets {
 				]
 			],
 			// #4.
-			[
+			'Broadcasting hostgroups from problem hosts widget - selecting another value' => [
 				[
 					'page' => 'Hostgroups page',
 					'broadcaster' => 'Problem hosts hostgroup broadcaster',
@@ -2740,8 +2697,8 @@ class testDashboardWidgetCommunication extends testWidgets {
 					]
 				]
 			],
-			// #5 Check broadcasting hostgroups from problems by severity widget.
-			[
+			// #5.
+			'Broadcasting hostgroups from problems by severity widget - initial selection' => [
 				[
 					'page' => 'Hostgroups page',
 					'broadcaster' => 'Problems by severity hostgroup broadcaster',
@@ -2803,7 +2760,7 @@ class testDashboardWidgetCommunication extends testWidgets {
 				]
 			],
 			// #6.
-			[
+			'Broadcasting hostgroups from problems by severity widget - selecting another value' => [
 				[
 					'page' => 'Hostgroups page',
 					'broadcaster' => 'Problems by severity hostgroup broadcaster',
@@ -2864,8 +2821,8 @@ class testDashboardWidgetCommunication extends testWidgets {
 					]
 				]
 			],
-			// #7 Check broadcasting hostgroups from map widget.
-			[
+			// #7.
+			'Broadcasting hostgroups from web monitoring widget - initial selection' => [
 				[
 					'page' => 'Hostgroups page',
 					'broadcaster' => 'Web monitoring hostgroup broadcaster',
@@ -2927,7 +2884,7 @@ class testDashboardWidgetCommunication extends testWidgets {
 				]
 			],
 			// #8.
-			[
+			'Broadcasting hostgroups from web monitoring widget - selecting another value' => [
 				[
 					'page' => 'Hostgroups page',
 					'broadcaster' => 'Web monitoring hostgroup broadcaster',
@@ -2988,8 +2945,8 @@ class testDashboardWidgetCommunication extends testWidgets {
 					]
 				]
 			],
-			// #9 Check broadcasting hosts from geomap widget.
-			[
+			// #9.
+			'Broadcasting hosts from geomap widget - initial selection' => [
 				[
 					'page' => 'Hosts page',
 					'broadcaster' => 'Geomap host broadcaster',
@@ -3037,7 +2994,7 @@ class testDashboardWidgetCommunication extends testWidgets {
 				]
 			],
 			// #10.
-			[
+			'Broadcasting hosts from geomap widget - selecting another value' => [
 				[
 					'page' => 'Hosts page',
 					'broadcaster' => 'Geomap host broadcaster',
@@ -3084,8 +3041,8 @@ class testDashboardWidgetCommunication extends testWidgets {
 					]
 				]
 			],
-			// #11 Check broadcasting hosts from honeyvomb widget.
-			[
+			// #11.
+			'Broadcasting hosts from honeycomb widget - initial selection' => [
 				[
 					'page' => 'Hosts page',
 					'broadcaster' => 'Honeycomb host broadcaster',
@@ -3133,7 +3090,7 @@ class testDashboardWidgetCommunication extends testWidgets {
 				]
 			],
 			// #12.
-			[
+			'Broadcasting hosts from honeycomb widget - selecting another value' => [
 				[
 					'page' => 'Hosts page',
 					'broadcaster' => 'Honeycomb host broadcaster',
@@ -3180,8 +3137,8 @@ class testDashboardWidgetCommunication extends testWidgets {
 					]
 				]
 			],
-			// #13 Check broadcasting hosts from map widget.
-			[
+			// #13.
+			'Broadcasting hosts from map widget - initial selection' => [
 				[
 					'page' => 'Hosts page',
 					'broadcaster' => 'Map host broadcaster',
@@ -3229,7 +3186,7 @@ class testDashboardWidgetCommunication extends testWidgets {
 				]
 			],
 			// #14.
-			[
+			'Broadcasting hosts from map widget - selecting another value' => [
 				[
 					'page' => 'Hosts page',
 					'broadcaster' => 'Map host broadcaster',
@@ -3276,16 +3233,16 @@ class testDashboardWidgetCommunication extends testWidgets {
 					]
 				]
 			],
-			// #15 Check that clicking on hostgroup in broadcasting map resets the selection in host listeners.
-			[
+			// #15.
+			'Clicking on hostgroup in broadcasting map should reset selection in host listeners' => [
 				[
 					'page' => 'Hosts page',
 					'broadcaster' => 'Map host broadcaster',
 					'select_element' => self::SECOND_HOSTGROUP_NAME
 				]
 			],
-			// #16 Check broadcasting hosts from top hosts widget.
-			[
+			// #16.
+			'Broadcasting hosts from top hosts widget - initial selection' => [
 				[
 					'page' => 'Hosts page',
 					'broadcaster' => 'Top hosts host broadcaster',
@@ -3333,7 +3290,7 @@ class testDashboardWidgetCommunication extends testWidgets {
 				]
 			],
 			// #17.
-			[
+			'Broadcasting hosts from top hosts widget - selecting another value' => [
 				[
 					'page' => 'Hosts page',
 					'broadcaster' => 'Top hosts host broadcaster',
@@ -3380,8 +3337,8 @@ class testDashboardWidgetCommunication extends testWidgets {
 					]
 				]
 			],
-			// #18 Check broadcasting hosts from host navigator widget.
-			[
+			// #18.
+			'Broadcasting hosts from host navigator widget - initial selection' => [
 				[
 					'page' => 'Hosts page',
 					'broadcaster' => 'Host navigator broadcaster',
@@ -3429,7 +3386,7 @@ class testDashboardWidgetCommunication extends testWidgets {
 				]
 			],
 			// #19.
-			[
+			'Broadcasting hosts from host navigator widget - selecting another value' => [
 				[
 					'page' => 'Hosts page',
 					'broadcaster' => 'Host navigator broadcaster',
@@ -3476,8 +3433,8 @@ class testDashboardWidgetCommunication extends testWidgets {
 					]
 				]
 			],
-			// #20 Check broadcasting items from honeycomb widget.
-			[
+			// #20.
+			'Broadcasting items from honeycomb widget - initial selection' => [
 				[
 					'page' => 'Items page',
 					'broadcaster' => 'Honeycomb item broadcaster',
@@ -3506,7 +3463,7 @@ class testDashboardWidgetCommunication extends testWidgets {
 				]
 			],
 			// #21.
-			[
+			'Broadcasting items from honeycomb widget - selecting another value' => [
 				[
 					'page' => 'Items page',
 					'broadcaster' => 'Honeycomb item broadcaster',
@@ -3534,8 +3491,8 @@ class testDashboardWidgetCommunication extends testWidgets {
 					]
 				]
 			],
-			// #22 Check broadcasting items from item history widget.
-			[
+			// #22.
+			'Broadcasting items from item history widget - initial selection' => [
 				[
 					'page' => 'Items page',
 					'broadcaster' => 'Item history item broadcaster',
@@ -3564,7 +3521,7 @@ class testDashboardWidgetCommunication extends testWidgets {
 				]
 			],
 			// #23.
-			[
+			'Broadcasting items from item history widget - selecting another value' => [
 				[
 					'page' => 'Items page',
 					'broadcaster' => 'Item history item broadcaster',
@@ -3592,8 +3549,8 @@ class testDashboardWidgetCommunication extends testWidgets {
 					]
 				]
 			],
-			// #24 Check broadcasting items from item navigator widget.
-			[
+			// #24.
+			'Broadcasting items from item navigator widget - initial selection' => [
 				[
 					'page' => 'Items page',
 					'broadcaster' => 'Item navigator broadcaster',
@@ -3622,7 +3579,7 @@ class testDashboardWidgetCommunication extends testWidgets {
 				]
 			],
 			// #25.
-			[
+			'Broadcasting items from item history widget - selecting another value' => [
 				[
 					'page' => 'Items page',
 					'broadcaster' => 'Item navigator broadcaster',
@@ -3658,14 +3615,12 @@ class testDashboardWidgetCommunication extends testWidgets {
 	 *
 	 * @dataProvider getWidgetData
 	 */
-	public function testDashboardWidgetCommunication_checkDataBroadcasting($data) {
+	public function testDashboardWidgetCommunication_CheckDataBroadcasting($data) {
 		// Change broadcasting widget for listener widgets on corresponding page, if required.
 		if ($data['broadcaster'] !== self::$current_broadcasters[$data['page']]) {
-
 			DBexecute('UPDATE widget_field SET value_str='.zbx_dbstr(self::BROADCASTER_REFERENCES[$data['broadcaster']]).
 					' WHERE value_str='.zbx_dbstr(self::BROADCASTER_REFERENCES[self::$current_broadcasters[$data['page']]])
 			);
-
 			self::$current_broadcasters[$data['page']] = $data['broadcaster'];
 		}
 
@@ -3679,7 +3634,7 @@ class testDashboardWidgetCommunication extends testWidgets {
 		$this->getWidgetElement($data['select_element'], $dashboard->getWidget($data['broadcaster']))->click();
 		$dashboard->waitUntilReady();
 
-		$this->closeOpenedPopups();
+		$this->closeOpenedPopup();
 
 		if (!array_key_exists('expected', $data)) {
 			$data['expected'] = self::DEFAULT_WIDGET_CONTENT[$data['page']];
@@ -3698,8 +3653,7 @@ class testDashboardWidgetCommunication extends testWidgets {
 
 	public function getMixedBroadcastingWidgetData() {
 		return [
-			// Check broadcasting only hostgroup.
-			[
+			'Broadcasting only hostgroup' => [
 				[
 					'page' => 'Multi-broadcasting page',
 					'broadcasters' => [
@@ -3717,8 +3671,7 @@ class testDashboardWidgetCommunication extends testWidgets {
 					]
 				]
 			],
-			// Check broadcasting only host.
-			[
+			'Broadcasting only host' => [
 				[
 					'page' => 'Multi-broadcasting page',
 					'broadcasters' => [
@@ -3737,8 +3690,7 @@ class testDashboardWidgetCommunication extends testWidgets {
 					]
 				]
 			],
-			// Check broadcasting hostgroups and hosts from the same map widget. First click on group and then on host.
-			[
+			'Broadcasting hostgroups and hosts from the same map widget - first group and then host' => [
 				[
 					'page' => 'Multi-broadcasting page',
 					'broadcasters' => [
@@ -3766,8 +3718,7 @@ class testDashboardWidgetCommunication extends testWidgets {
 					]
 				]
 			],
-			// Check broadcasting hostgroups and hosts from the same map widget. First click on host and then on group.
-			[
+			'Broadcasting hostgroups and hosts from the same map widget - first host and then group' => [
 				[
 					'page' => 'Multi-broadcasting page',
 					'broadcasters' => [
@@ -3786,8 +3737,7 @@ class testDashboardWidgetCommunication extends testWidgets {
 					]
 				]
 			],
-			// Check broadcasting linked hostgroup and host from different widgets.
-			[
+			'Broadcasting linked hostgroup and host from different widgets' => [
 				[
 					'page' => 'Multi-broadcasting page',
 					'broadcasters' => [
@@ -3806,8 +3756,7 @@ class testDashboardWidgetCommunication extends testWidgets {
 					]
 				]
 			],
-			// Check broadcasting not linked hostgroups and hosts from different widgets.
-			[
+			'Broadcasting not linked hostgroups and hosts from different widgets' => [
 				[
 					'page' => 'Multi-broadcasting page',
 					'broadcasters' => [
@@ -3831,7 +3780,7 @@ class testDashboardWidgetCommunication extends testWidgets {
 	 *
 	 * @dataProvider getMixedBroadcastingWidgetData
 	 */
-	public function testDashboardWidgetCommunication_checkMixedDataBroadcasting($data) {
+	public function testDashboardWidgetCommunication_CheckMixedDataBroadcasting($data) {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
 		$dashboard = CDashboardElement::find()->waitUntilReady()->one();
 		$dashboard->selectPage('Multi-broadcasting page');
@@ -3840,7 +3789,7 @@ class testDashboardWidgetCommunication extends testWidgets {
 			$this->getWidgetElement($select_element, $dashboard->getWidget($broadcaster))->click();
 			$dashboard->waitUntilReady();
 
-			$this->closeOpenedPopups();
+			$this->closeOpenedPopup();
 		}
 
 		$this->checkDataOnListener($data['expected']);
@@ -3849,7 +3798,7 @@ class testDashboardWidgetCommunication extends testWidgets {
 	/**
 	 * Check state of item listening widgets if nothing is selected in the broadcasting widget.
 	 */
-	public function testDashboardWidgetCommunication_checkNoData() {
+	public function testDashboardWidgetCommunication_CheckNoData() {
 		$no_data_listeners = [
 			'Gauge listener' => 'Awaiting data',
 			'Graph (classic) listener' => 'Awaiting data',
@@ -3875,7 +3824,7 @@ class testDashboardWidgetCommunication extends testWidgets {
 	/**
 	 * Check listener widget behavior when broadcasting widget is deleted.
 	 */
-	public function testDashboardWidgetCommunication_broadcasterDeletion() {
+	public function testDashboardWidgetCommunication_BroadcasterDeletion() {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
 		$dashboard = CDashboardElement::find()->waitUntilReady()->one();
 
@@ -3890,7 +3839,6 @@ class testDashboardWidgetCommunication extends testWidgets {
 
 			$dashboard->edit()->deleteWidget($broadcaster);
 			$this->checkUnavailableReference($dashboard, $listeners, $field);
-
 		}
 
 		$dashboard->cancelEditing();
@@ -3898,8 +3846,7 @@ class testDashboardWidgetCommunication extends testWidgets {
 
 	public function getCopyWidgetsData() {
 		return [
-			// Check copying a broadcasting capable listener over a broadcaster.
-			[
+			'Copy a broadcasting capable listener over a broadcaster' => [
 				[
 					'copy' => 'Honeycomb hostgroup listener',
 					'paste' => [
@@ -3917,8 +3864,7 @@ class testDashboardWidgetCommunication extends testWidgets {
 					]
 				]
 			],
-			// Check copying a non-capable to broadcast widget over a broadcaster and check that listener is broken.
-			[
+			'Copy non-broadcast-capable widget over a broadcaster and check that listener is broken' => [
 				[
 					'copy' => 'Problems host listener',
 					'paste' => [
@@ -3927,8 +3873,7 @@ class testDashboardWidgetCommunication extends testWidgets {
 					'unavailable_widget' => 'Honeycomb hostgroup listener'
 				]
 			],
-			// Check copying a broadcaster on the same page and that the copy does not impact the listener.
-			[
+			'Copy broadcaster on the same page - there should be no impact on listener' => [
 				[
 					'copy' => 'Top hosts host broadcaster',
 					'paste' => [
@@ -3956,8 +3901,7 @@ class testDashboardWidgetCommunication extends testWidgets {
 					]
 				]
 			],
-			// Check copying a listener to the same page and check that it continues to listen to the same broadcaster.
-			[
+			'Copy listener to the same page - it should continue to listen to the same broadcaster' => [
 				[
 					'copy' => 'Problems host listener',
 					'paste' => [
@@ -3975,8 +3919,7 @@ class testDashboardWidgetCommunication extends testWidgets {
 					]
 				]
 			],
-			// Check copying a listener to another page and check this listener is broken.
-			[
+			'Copy a listener to another page - pasted listener is broken' => [
 				[
 					'copy' => 'Problems host listener',
 					'paste' => [
@@ -3991,7 +3934,7 @@ class testDashboardWidgetCommunication extends testWidgets {
 	/**
 	 * @dataProvider getCopyWidgetsData
 	 */
-	public function testDashboardWidgetCommunication_copyWidgets($data) {
+	public function testDashboardWidgetCommunication_CopyWidgets($data) {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
 		$dashboard = CDashboardElement::find()->waitUntilReady()->one();
 		$dashboard->edit()->selectPage('Copy widgets page');
@@ -4031,12 +3974,13 @@ class testDashboardWidgetCommunication extends testWidgets {
 	}
 
 	/**
-	 * Close popups and dialogues that are opened when clicking on element in broadcaster widget.
+	 * Close popup or dialog that is opened when clicking on element in broadcaster widget.
 	 */
-	protected function closeOpenedPopups() {
+	protected function closeOpenedPopup() {
 		if (COverlayDialogElement::find()->one(false)->isValid()) {
 			COverlayDialogElement::find()->one()->close();
 		}
+
 		if (CPopupMenuElement::find()->one(false)->isValid()) {
 			CPopupMenuElement::find()->one()->close();
 		}
@@ -4207,7 +4151,7 @@ class testDashboardWidgetCommunication extends testWidgets {
 
 					foreach (['name', 'value'] as $parameter) {
 						$this->assertEquals($values[$parameter], $this->query('class', 'svg-pie-chart-hintbox-'.$parameter)
-							->one()->getText()
+								->one()->getText()
 						);
 					}
 			}
@@ -4273,18 +4217,5 @@ class testDashboardWidgetCommunication extends testWidgets {
 		}
 
 		return $element->waitUntilClickable()->one();
-	}
-
-	/**
-	 * Return widget type.
-	 *
-	 * @param CWidgetElement	$widget		widget for which type is obtained
-	 *
-	 * @return string
-	 */
-	protected function getWidgetType($widget) {
-		$class_attribute = $widget->query('class:dashboard-grid-widget-contents')->one()->getAttribute('class');
-
-		return str_replace('dashboard-widget-', '', explode(' ', $class_attribute)[1]);
 	}
 }
