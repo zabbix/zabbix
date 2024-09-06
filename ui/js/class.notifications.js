@@ -49,7 +49,6 @@ function ZBX_Notifications(store, tab) {
 	}
 
 	this.active = false;
-	this._csrf_token = null;
 
 	this.poll_interval = ZBX_Notifications.POLL_INTERVAL;
 
@@ -411,14 +410,12 @@ ZBX_Notifications.prototype.handleTabFocusIn = function() {
 };
 
 /**
- * @param {MouseEvent} e
+ * Close the notification box.
  */
-ZBX_Notifications.prototype.handleCloseClicked = function(e) {
+ZBX_Notifications.prototype.handleCloseClicked = function() {
 	const data = {ids: this.getEventIds()};
 
-	if (this._csrf_token !== null) {
-		data[CSRF_TOKEN_NAME] = this._csrf_token;
-	}
+	data[CSRF_TOKEN_NAME] = this._csrf_token;
 
 	this
 		.fetch('notifications.read', data)
@@ -460,9 +457,7 @@ ZBX_Notifications.prototype.handleSnoozeClicked = function() {
 	const latest_event = Math.max(...this.collection.getRawList().map(event => parseInt(event.eventid, 10)));
 	const data = {eventid: latest_event};
 
-	if (this._csrf_token !== null) {
-		data[CSRF_TOKEN_NAME] = this._csrf_token;
-	}
+	data[CSRF_TOKEN_NAME] = this._csrf_token;
 
 	this
 		.fetch('notifications.snooze', data)
@@ -501,14 +496,12 @@ ZBX_Notifications.prototype.handleSnoozeClicked = function() {
 };
 
 /**
- * @param {MouseEvent} e
+ * Mute messages in the notification box.
  */
-ZBX_Notifications.prototype.handleMuteClicked = function(e) {
+ZBX_Notifications.prototype.handleMuteClicked = function() {
 	const data = {muted: this.alarm.muted ? 0 : 1};
 
-	if (this._csrf_token !== null) {
-		data[CSRF_TOKEN_NAME] = this._csrf_token;
-	}
+	data[CSRF_TOKEN_NAME] = this._csrf_token;
 
 	this
 		.fetch('notifications.mute', data)
