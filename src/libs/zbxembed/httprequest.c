@@ -91,6 +91,7 @@ static zbx_es_httprequest_t *es_httprequest(duk_context *ctx)
 {
 	zbx_es_env_t		*env;
 	zbx_es_httprequest_t	*request;
+	void			*objptr;
 
 	if (NULL == (env = zbx_es_get_env(ctx)))
 	{
@@ -99,7 +100,11 @@ static zbx_es_httprequest_t *es_httprequest(duk_context *ctx)
 		return NULL;
 	}
 
-	if (NULL == (request = (zbx_es_httprequest_t *)es_obj_get_data(env, ES_OBJ_HTTPREQUEST)))
+	duk_push_this(ctx);
+	objptr = duk_require_heapptr(ctx, -1);
+	duk_pop(ctx);
+
+	if (NULL == (request = (zbx_es_httprequest_t *)es_obj_get_data(env, objptr, ES_OBJ_HTTPREQUEST)))
 		(void)duk_push_error_object(ctx, DUK_RET_EVAL_ERROR, "cannot find native data attached to object");
 
 	return request;
