@@ -9,6 +9,30 @@ Zabbix.log(5, JSON.stringify(optsFirefox))
 Zabbix.log(5, JSON.stringify(optsSafari))
 Zabbix.log(5, JSON.stringify(optsEdge))
 
+function clickElement(browser, strategy, selector) {
+
+	var el;
+
+	try {
+		el = browser.findElement(strategy, selector);
+	}
+	catch (error) {
+		throw Error("cannot findElement "+ strategy + " " + selector);
+	}
+
+	if (el === null)
+	{
+		throw Error("cannot find "+ strategy + " " + selector);
+	}
+
+	try {
+		el.click();
+	}
+	catch (error) {
+		throw Error("cannot click "+ strategy + " " + selector);
+	}
+}
+
 // uncomment for foreground
 // opts.capabilities.alwaysMatch['goog:chromeOptions'].args = []
 
@@ -254,12 +278,45 @@ try
 		{
 			throw Error("cannot find dashboard is-ready");
 		}
+
 		browser2.setElementWaitTimeout(0);
+
 		el = browser2.findElement("xpath", "//div[@class='no-data-message']");
 		if (el === null)
 		{
 			throw Error("cannot find no data message");
 		}
+
+		browser2.setElementWaitTimeout(3000);
+
+		clickElement(browser2, "link text", "Dashboards");
+		clickElement(browser2, "xpath", "//button[contains(.,'Edit dashboard')]");
+		clickElement(browser2, "xpath", "//button[contains(.,'Add')]");
+		clickElement(browser2, "xpath", "//button[@id='label-type']");
+		clickElement(browser2, "xpath", "//li[@value='url']");
+		el = browser2.findElement("xpath", "//input[@id='url']");
+		if (el === null) {
+			throw Error("cannot find url");
+		}
+		el.sendKeys(parameters.url + "zabbix.php?action=queue.overview");
+	
+		clickElement(browser2, "xpath", "//button[@class='dialogue-widget-save']");
+
+		el = browser2.findElement("xpath", "//iframe");
+		if (el === null) {
+			throw Error("cannot get iframe");
+		}
+		
+		browser2.switchFrame(el);
+
+		el = browser2.findElement("xpath", "//h1[contains(.,'Queue overview')]");
+		if (el === null) {
+			throw Error("cannot find Queue overview");
+		}
+	
+		browser2.switchFrame();
+
+		clickElement(browser2, "xpath", "//a[contains(.,'Cancel')]");
 
 		Zabbix.log(5, "screenshot: " + browser2.getScreenshot());
 
