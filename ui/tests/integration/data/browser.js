@@ -1,9 +1,12 @@
-parameters = JSON.parse(value);
-
 var	opts = Browser.chromeOptions();
 var	optsFirefox = Browser.firefoxOptions();
 var	optsSafari = Browser.safariOptions();
 var	optsEdge = Browser.edgeOptions()
+
+// uncomment for foreground
+// opts.capabilities.alwaysMatch['goog:chromeOptions'].args = []
+
+parameters = JSON.parse(value);
 
 Zabbix.log(5, JSON.stringify(optsFirefox))
 Zabbix.log(5, JSON.stringify(optsSafari))
@@ -47,16 +50,13 @@ function findElementStrict(browser, strategy, selector) {
 	return el;
 }
 
-// uncomment for foreground
-// opts.capabilities.alwaysMatch['goog:chromeOptions'].args = []
-
 var browser = new Browser(opts)
 
 try
 {
 	Zabbix.log(3, "navigate");
 
-	browser.setScreenSize(800, 600);
+	browser.setScreenSize(1280, 720);
 	browser.navigate(parameters.url);
 
 	Zabbix.log(5, "getUrl: '"+ browser.getUrl()+"'")
@@ -227,7 +227,7 @@ try
 
 		Zabbix.log(5, "cookie: " + JSON.stringify(cookies[i]));
 		browser2.navigate(parameters.url);
-		browser2.setScreenSize(800, 600);
+		browser2.setScreenSize(1280, 720);
 		browser2.addCookie(cookies[i]);
 
 		browser2.navigate(parameters.url);
