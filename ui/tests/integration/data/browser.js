@@ -315,6 +315,14 @@ try
 		}
 
 		browser2.switchFrame();
+		browser2.switchFrame(0);
+
+		el = browser2.findElement("xpath", "//h1[contains(.,'Queue overview')]");
+		if (el === null) {
+			throw Error("cannot find Queue overview");
+		}
+
+		browser2.switchFrame();
 
 		clickElement(browser2, "xpath", "//a[contains(.,'Cancel')]");
 
