@@ -15,8 +15,6 @@
 
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 
 /**
  * @backup media_type
@@ -29,6 +27,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 
 	const ZABBIX_ADMIN_GROUPID = 7;
 	const EMAIL_MEDIATYPEID = 1;
+	const MEDIA_NAME = 'Email';
 
 	/**
 	 * Attach MessageBehavior and TableBehavior to the test.
@@ -38,11 +37,12 @@ class testPageAdministrationMediaTypes extends CWebTest {
 	public function getBehaviors() {
 		return [
 			CMessageBehavior::class,
-			CTableBehavior::class
+			[
+				'class' => CTableBehavior::class,
+				'column_names' => ['', 'Name', 'Type', 'Status', 'Count', 'Used in actions', 'Details', 'Actions']
+			]
 		];
 	}
-
-	private static $media_name = 'Email';
 
 	public static function prepareActionData() {
 		CDataHelper::call('action.create', [
@@ -102,24 +102,12 @@ class testPageAdministrationMediaTypes extends CWebTest {
 
 		// Check table headers.
 		$table = $this->query('class:list-table')->asTable()->one();
-		$headers = $table->getHeadersText();
-
-		// Remove the empty header that is associated with the Select all checkbox.
-		unset($headers[0]);
-		$this->assertSame(['Name', 'Type', 'Status', 'Used in actions', 'Details', 'Action'], array_values($headers));
-
-		foreach ($headers as $header) {
-			if (in_array($header, ['Name', 'Type'])) {
-				$this->assertTrue($table->query('link', $header)->one()->isClickable());
-			}
-			else {
-				$this->assertFalse($table->query('link', $header)->one(false)->isValid());
-			}
-		}
+		$this->assertSame(['', 'Name', 'Type', 'Status', 'Used in actions', 'Details', 'Action'], $table->getHeadersText());
+		$this->assertEquals(['Name', 'Type'], $table->getSortableHeaders()->asText());
 
 		// Check table stats and selected mediatype counter.
 		$this->assertTableStats(CDBHelper::getCount('SELECT NULL FROM media_type'));
-		$this->assertEquals('0 selected', $this->query('id:selected_count')->one()->getText());
+		$this->assertSelectedCount(0);
 	}
 
 	/**
@@ -264,7 +252,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=mediatype.list');
 
 		// Get row by column Name.
-		$row = $this->query('class:list-table')->asTable()->one()->findRow('Name', self::$media_name);
+		$row = $this->query('class:list-table')->asTable()->one()->findRow('Name', self::MEDIA_NAME);
 
 		$statuses = ['Disabled', 'Enabled'];
 		foreach ($statuses as $old_status) {
@@ -299,7 +287,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 
 			// Check result in DB.
 			$this->assertEquals($db_status, CDBHelper::getValue('SELECT status FROM media_type WHERE '.
-					'name='.zbx_dbstr(self::$media_name))
+					'name='.zbx_dbstr(self::MEDIA_NAME))
 			);
 		}
 	}
@@ -613,10 +601,10 @@ class testPageAdministrationMediaTypes extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=mediatype.list');
 
 		// Get row by media Name and click on Test button.
-		$this->query('class:list-table')->asTable()->one()->findRow('Name', self::$media_name)
+		$this->query('class:list-table')->asTable()->one()->findRow('Name', self::MEDIA_NAME)
 				->query('button:Test')->waitUntilClickable()->one()->click();
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
-		$this->assertEquals('Test media type "'.self::$media_name.'"', $dialog->getTitle());
+		$this->assertEquals('Test media type "'.self::MEDIA_NAME.'"', $dialog->getTitle());
 		$dialog->asForm()->fill($fields);
 
 		$dialog->getFooter()->query('button:Cancel')->one()->click();
@@ -912,9 +900,9 @@ class testPageAdministrationMediaTypes extends CWebTest {
 		}
 
 		$this->page->login()->open('zabbix.php?action=mediatype.list')->waitUntilReady();
-		$column_text = $this->query('class:list-table')->asTable()->waitUntilPresent()->one()
-				->findRow('Name', $data['name'])->getColumn('Used in actions')->getText();
-
-		$this->assertEquals($expected, $column_text);
+		$row = $this->getTable()->waitUntilPresent()->findRow('Name', $data['name']);
+		$this->assertEquals($expected, $row->getColumn('Used in actions')->getText());
+		$count = ($expected === '') ? '' : count(explode(', ', $expected));
+		$this->assertEquals($count, $row->getColumn('Count')->getText());
 	}
 }

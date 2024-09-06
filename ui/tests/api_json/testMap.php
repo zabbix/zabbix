@@ -291,6 +291,50 @@ class testMap extends CAPITest {
 					]
 				],
 				'expected_error' => 'No permissions to referred object or it does not exist!'
+			],
+			// Fail. Map element label is too long.
+			[
+				'request_data' => [
+					[
+						'name' => 'Map with invalid element label',
+						'width' => '800',
+						'height' => '600',
+						'selements' => [
+							[
+								'elementtype' => '1',
+								'iconid_off' => '151',
+								'label' => self::generateRandomString(2049),
+								'x' => '0',
+								'y' => '0',
+								'elements' => [
+									['sysmapid' => '1']
+								]
+							]
+						]
+					]
+				],
+				'expected_error' => 'Incorrect value for field "label": value is too long.'
+			],
+			// Fail. Map shape text is too long.
+			[
+				'request_data' => [
+					[
+						'name' => 'Map with invalid shape text',
+						'width' => '400',
+						'height' => '400',
+						'shapes' => [
+							[
+								'type' => 0,
+								'x' => 0,
+								'y' => 0,
+								'width' => 100,
+								'height' => 100,
+								'text' => self::generateRandomString(65536)
+							]
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/shape/1/text": value is too long.'
 			]
 		];
 	}
@@ -485,6 +529,46 @@ class testMap extends CAPITest {
 				],
 				'expected_error' => 'Cannot add map element of the map "C" due to circular reference.',
 				'user' => ['user' => 'zabbix-user', 'password' => 'zabbix']
+			],
+			// Success. Map element label is of valid length.
+			[
+				'request_data' => [
+					[
+						'sysmapid' => '10001',
+						'selements' => [
+							[
+								'elementtype' => '1',
+								'iconid_off' => '151',
+								'label' => self::generateRandomString(2048),
+								'x' => '0',
+								'y' => '0',
+								'elements' => [
+									['sysmapid' => '1']
+								]
+							]
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			// Success. Map shape text is of valid length.
+			[
+				'request_data' => [
+					[
+						'sysmapid' => '10001',
+						'shapes' => [
+							[
+								'type' => 0,
+								'x' => 0,
+								'y' => 0,
+								'width' => 100,
+								'height' => 100,
+								'text' => self::generateRandomString(65535)
+							]
+						]
+					]
+				],
+				'expected_error' => null
 			]
 		];
 	}
@@ -498,5 +582,17 @@ class testMap extends CAPITest {
 		}
 
 		$this->call('map.update', $request_data, $expected_error);
+	}
+
+	private static function generateRandomString(int $length): string {
+		$chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+		$char_length = strlen($chars);
+		$string = '';
+
+		for ($i = 0; $i < $length; $i++) {
+			$string .= $chars[rand(0, $char_length - 1)];
+		}
+
+		return $string;
 	}
 }

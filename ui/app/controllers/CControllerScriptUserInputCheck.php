@@ -46,7 +46,7 @@ class CControllerScriptUserInputCheck extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_SCRIPTS);
+		return true;
 	}
 
 	protected function doAction(): void {
