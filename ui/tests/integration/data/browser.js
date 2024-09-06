@@ -419,6 +419,25 @@ try
 	{
 		Zabbix.log(5, "alert click handled " + error);
 	}
+	var elTest = new Object();
+
+	try
+	{
+		browser2.switchFrame(elTest);
+	}
+	catch (error)
+	{
+		Zabbix.log(5, "invalid parameter handled " + error);
+	}
+	try
+	{
+		browser2.switchFrame(0);
+	}
+	catch (error)
+	{
+		Zabbix.log(5, "missing frame error handled " + error);
+	}
+	
 }
 catch (err)
 {
