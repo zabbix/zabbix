@@ -1327,4 +1327,3 @@ class CMacrosResolverGeneral {
 		return $new_array;
 	}
 }
-
