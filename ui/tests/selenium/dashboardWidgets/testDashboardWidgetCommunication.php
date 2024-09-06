@@ -3837,6 +3837,8 @@ class testDashboardWidgetCommunication extends testWidgets {
 				? ['Gauge listener', 'Graph (classic) listener', 'SVG graph listener', 'Pie chart listener']
 				: array_keys(self::DEFAULT_WIDGET_CONTENT[$page]);
 
+			// On slow database selenium deleted widgets that are not loaded yet which causes severe browser errors.
+			sleep(1);
 			$dashboard->deleteWidget($broadcaster);
 			$this->checkUnavailableReference($dashboard, $listeners, $field);
 		}
