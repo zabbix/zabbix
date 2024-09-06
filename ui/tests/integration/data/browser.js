@@ -437,7 +437,6 @@ try
 	{
 		Zabbix.log(5, "missing frame error handled " + error);
 	}
-	
 }
 catch (err)
 {
