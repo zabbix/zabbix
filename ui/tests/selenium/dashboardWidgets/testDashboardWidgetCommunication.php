@@ -3830,7 +3830,7 @@ class testDashboardWidgetCommunication extends testWidgets {
 //		foreach (['Hostgroups page' => 'Host groups', 'Hosts page' => 'Hosts', 'Items page' => 'Item'] as $page => $field) {
 		foreach (['Hosts page' => 'Hosts', 'Items page' => 'Item'] as $page => $field) {
 			$dashboard->selectPage($page);
-
+sleep(2);
 			// TODO: Add 'Item value listener' and 'Item value' to the below list of widget names when ZBX-25040 is fixed.
 			$broadcaster = self::$current_broadcasters[$page];
 			$listeners = ($page === 'Items page')
