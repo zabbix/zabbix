@@ -21,7 +21,7 @@
  * @var array $data
  */
 
-$view = new CWidgetView($data);
+$view = (new CWidgetView($data))->setVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('widget'));
 
 foreach ($data['vars'] as $name => $value) {
 	if ($value !== null) {
@@ -29,6 +29,4 @@ foreach ($data['vars'] as $name => $value) {
 	}
 }
 
-$view
-	->addCsrfToken()
-	->show();
+$view->show();
