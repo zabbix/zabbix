@@ -170,13 +170,16 @@
 					e.preventDefault();
 
 					const input = e.target;
+					const value = input.value;
 
-					const start = input.selectionStart;
+					if (value.length < obj.options.maxlength) {
+						const startSelection = input.selectionStart;
 
-					input.value = input.value.substring(0, start) + "\t" + input.value.substring(input.selectionEnd);
+						input.value = value.substring(0, startSelection) + "\t" + value.substring(input.selectionEnd);
 
-					input.selectionStart = input.selectionEnd;
-					input.selectionEnd = start + 1;
+						input.selectionStart = input.selectionEnd;
+						input.selectionEnd = startSelection + 1;
+					}
 				}
 			});
 		}
