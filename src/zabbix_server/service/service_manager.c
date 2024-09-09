@@ -2770,8 +2770,11 @@ static void	event_remove_maintenanceid(zbx_event_t *event, zbx_uint64_t maintena
 
 	int	i;
 
-	if (FAIL != (i = zbx_vector_uint64_search(event->maintenanceids, maintenanceid, ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+	if (FAIL != (i = zbx_vector_uint64_search(event->maintenanceids, maintenanceid,
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+	{
 		zbx_vector_uint64_remove_noorder(event->maintenanceids, i);
+	}
 
 	if (0 == event->maintenanceids->values_num)
 	{
