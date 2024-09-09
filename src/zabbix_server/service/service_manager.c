@@ -2845,6 +2845,26 @@ static void	process_problem_suppression(zbx_vector_uint64_pair_t *event_maintena
 	zbx_hashset_clear(&service_manager->service_diffs);
 }
 
+static int	compare_tags_and_values(const void *d1, const void *d2)
+{
+	int ret;
+
+	const zbx_tag_t *tag1 = *(const zbx_tag_t * const *)d1;
+	const zbx_tag_t *tag2 = *(const zbx_tag_t * const *)d2;
+
+	if (0 == (ret = strcmp(tag1->tag, tag2->tag)))
+		ret = strcmp(tag1->value, tag2->value);
+
+	return ret;
+}
+
+static void	tag_free(zbx_tag_t *tag)
+{
+	zbx_free(tag->tag);
+	zbx_free(tag->value);
+	zbx_free(tag);
+}
+
 static void	process_problem_tags(zbx_vector_ptr_t *events, zbx_service_manager_t *service_manager)
 {
 	int	i, j;
@@ -2864,7 +2884,21 @@ static void	process_problem_tags(zbx_vector_ptr_t *events, zbx_service_manager_t
 		}
 
 		for (j = 0; j < event->tags.values_num; j++)
-			zbx_vector_ptr_append(&(*ptr)->tags, event->tags.values[j]);
+		{
+			if (FAIL == zbx_vector_ptr_search(&(*ptr)->tags, event->tags.values[j],
+					compare_tags_and_values))
+			{
+				zbx_vector_ptr_append(&(*ptr)->tags, event->tags.values[j]);
+			}
+			else
+			{
+				zbx_tag_t        *tag = (zbx_tag_t *)event->tags.values[j];
+
+				zabbix_log(LOG_LEVEL_DEBUG, "discarded duplicate tag '%s' with value '%s' for eventid "
+						ZBX_FS_UI64, tag->tag, tag->value);
+				tag_free(tag);
+			}
+		}
 
 		event->tags.values_num = 0;
 		event_free(event);
