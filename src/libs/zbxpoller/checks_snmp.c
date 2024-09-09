@@ -2996,7 +2996,7 @@ static int	snmp_task_process(short event, void *data, int *fd, const char *addr,
 				struct timeval	tv = {snmp_context->config_timeout, 0};
 
 				evtimer_add(timeout_event, &tv);
-				
+
 				task_ret = ZBX_ASYNC_TASK_READ;
 				goto stop;
 			}
