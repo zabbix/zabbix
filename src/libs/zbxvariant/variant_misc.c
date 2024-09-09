@@ -73,7 +73,7 @@ int	zbx_variant_to_value_type(zbx_variant_t *value, unsigned char value_type, ch
 		value_desc = zbx_strdup(NULL ,zbx_variant_value_desc(value));
 		zbx_strlcat(buffer, value_desc, char_max);
 		*errmsg = zbx_dsprintf(NULL, "Value of type \"%s\" is not suitable for value type \"%s\". Value \"%s...\"",
-				zbx_variant_type_desc(value), zbx_item_value_type_string(value_type),buffer);			
+		zbx_variant_type_desc(value), zbx_item_value_type_string(value_type),buffer);			
 	}
 
 	return ret;
