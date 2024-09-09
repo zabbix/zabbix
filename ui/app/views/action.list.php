@@ -151,7 +151,6 @@ if ($data['actions']) {
 					->setAttribute('data-actionid', $action['actionid'])
 			))->addClass(ZBX_STYLE_WORDBREAK),
 			(new CCol($conditions))->addClass(ZBX_STYLE_WORDBREAK),
-			$conditions,
 			$operations,
 			$status
 		]);
