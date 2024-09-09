@@ -297,7 +297,6 @@ class CSVGPie {
 		const x = this.#width / 2;
 		const y = (this.#height - box_size * this.#scale) / 2 + this.#radius_outer * this.#scale;
 
-		document.querySelector('.dashboard').insertAdjacentHTML('afterbegin', `PieChart setSize transform: translate(${x} ${y}) scale(${this.#scale})<br>`);
 		this.#container.attr('transform', `translate(${x} ${y}) scale(${this.#scale})`);
 
 		this.#positionValue();
