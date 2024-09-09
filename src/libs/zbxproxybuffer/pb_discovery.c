@@ -20,6 +20,7 @@
 #include "zbxjson.h"
 #include "zbxproxybuffer.h"
 #include "zbxshmem.h"
+#include "zbxdbschema.h"
 
 static zbx_history_table_t	dht = {
 	"proxy_dhistory", "dhistory_lastid",
