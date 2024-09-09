@@ -1,0 +1,416 @@
+---
+test case: btoa simple
+in:
+  function: 'btoa'
+  params: ''
+  data: '12543253'
+
+out:
+  value: 'MTI1NDMyNTM='
+  return: SUCCEED
+
+---
+test case: btoa short
+in:
+  function: 'btoa'
+  params: ''
+  data: 'M'
+
+out:
+  value: 'TQ=='
+  return: SUCCEED
+
+---
+test case: btoa long
+in:
+  function: 'btoa'
+  params: ''
+  data: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1112223334445556667778889990003333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333'
+
+out:
+  value: 'YWJjZGVmZ2hpamtsbW5vcHFyc3R1dnd4eXpBQkNERUZHSElKS0xNTk9QUVJTVFVWV1hZWjExMTIyMjMzMzQ0NDU1NTY2Njc3Nzg4ODk5OTAwMDMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzM='
+  return: SUCCEED
+
+---
+test case: btoa with parameter
+in:
+  function: 'btoa'
+  params: '1'
+  data: ''
+
+out:
+  value: ''
+  return: FAIL
+---
+test case: btoa with parameters
+in:
+  function: 'btoa'
+  params: '1,2,3'
+  data: ''
+out:
+  value: ''
+  return: FAIL
+
+---
+test case: btoa empty data
+in:
+  function: 'btoa'
+  params: ''
+  data: ''
+out:
+  value: ''
+  return: SUCCEED
+
+---
+test case: urlencode long
+in:
+  function: 'urlencode'
+  params: ''
+  data: '"	%	-	.	<	>	\	^	_	`	{	|	}	~ !	#	$	&	(	)	*	+	,	/	:	;	=	?	"	%	-	.	<	>	\	^	_	`	{	|	}	~ !	#	$	&	(	)	*	+	,	/	:	;	=	?	"	%	-	.	<	>	\	^	_	`	{	|	}	~ !	#	$	&	(	)	*	+	,	/	:	;	=	?	"	%	-	.	<	>	\	^	_	`	{	|	}	~ !	#	$	&	(	)	*	+	,	/	:	;	=	?	'
+
+out:
+  value: '%22%09%25%09-%09.%09%3C%09%3E%09%5C%09%5E%09_%09%60%09%7B%09%7C%09%7D%09~%20%21%09%23%09%24%09%26%09%28%09%29%09%2A%09%2B%09%2C%09%2F%09%3A%09%3B%09%3D%09%3F%09%22%09%25%09-%09.%09%3C%09%3E%09%5C%09%5E%09_%09%60%09%7B%09%7C%09%7D%09~%20%21%09%23%09%24%09%26%09%28%09%29%09%2A%09%2B%09%2C%09%2F%09%3A%09%3B%09%3D%09%3F%09%22%09%25%09-%09.%09%3C%09%3E%09%5C%09%5E%09_%09%60%09%7B%09%7C%09%7D%09~%20%21%09%23%09%24%09%26%09%28%09%29%09%2A%09%2B%09%2C%09%2F%09%3A%09%3B%09%3D%09%3F%09%22%09%25%09-%09.%09%3C%09%3E%09%5C%09%5E%09_%09%60%09%7B%09%7C%09%7D%09~%20%21%09%23%09%24%09%26%09%28%09%29%09%2A%09%2B%09%2C%09%2F%09%3A%09%3B%09%3D%09%3F%09'
+  return: SUCCEED
+
+---
+test case: urlencode short
+in:
+  function: 'urlencode'
+  params: ''
+  data: '%'
+
+out:
+  value: '%25'
+  return: SUCCEED
+
+---
+test case: urlencode with parameter
+in:
+  function: 'urlencode'
+  params: '1'
+  data: ''
+
+out:
+  value: ''
+  return: FAIL
+
+---
+test case: urlencode with parameters
+in:
+  function: 'urlencode'
+  params: '1,2,3'
+  data: ''
+out:
+  value: ''
+  return: FAIL
+
+---
+test case: urlencode empty data
+in:
+  function: 'urlencode'
+  params: ''
+  data: ''
+out:
+  value: ''
+  return: SUCCEED
+
+---
+test case: urldecode long
+in:
+  function: 'urldecode'
+  params: ''
+  data: '%22%09%25%09-%09.%09%3C%09%3E%09%5C%09%5E%09_%09%60%09%7B%09%7C%09%7D%09~%20%21%09%23%09%24%09%26%09%28%09%29%09%2A%09%2B%09%2C%09%2F%09%3A%09%3B%09%3D%09%3F%09%22%09%25%09-%09.%09%3C%09%3E%09%5C%09%5E%09_%09%60%09%7B%09%7C%09%7D%09~%20%21%09%23%09%24%09%26%09%28%09%29%09%2A%09%2B%09%2C%09%2F%09%3A%09%3B%09%3D%09%3F%09%22%09%25%09-%09.%09%3C%09%3E%09%5C%09%5E%09_%09%60%09%7B%09%7C%09%7D%09~%20%21%09%23%09%24%09%26%09%28%09%29%09%2A%09%2B%09%2C%09%2F%09%3A%09%3B%09%3D%09%3F%09%22%09%25%09-%09.%09%3C%09%3E%09%5C%09%5E%09_%09%60%09%7B%09%7C%09%7D%09~%20%21%09%23%09%24%09%26%09%28%09%29%09%2A%09%2B%09%2C%09%2F%09%3A%09%3B%09%3D%09%3F%09'
+
+out:
+  value: '"	%	-	.	<	>	\	^	_	`	{	|	}	~ !	#	$	&	(	)	*	+	,	/	:	;	=	?	"	%	-	.	<	>	\	^	_	`	{	|	}	~ !	#	$	&	(	)	*	+	,	/	:	;	=	?	"	%	-	.	<	>	\	^	_	`	{	|	}	~ !	#	$	&	(	)	*	+	,	/	:	;	=	?	"	%	-	.	<	>	\	^	_	`	{	|	}	~ !	#	$	&	(	)	*	+	,	/	:	;	=	?	'
+  return: SUCCEED
+
+---
+test case: urldecode short
+in:
+  function: 'urldecode'
+  params: ''
+  data: '%25'
+
+out:
+  value: '%'
+  return: SUCCEED
+
+---
+test case: urldecode with parameter
+in:
+  function: 'urldecode'
+  params: '1'
+  data: ''
+
+out:
+  value: ''
+  return: FAIL
+
+---
+test case: urldecode with parameters
+in:
+  function: 'urldecode'
+  params: '1,2,3'
+  data: ''
+out:
+  value: ''
+  return: FAIL
+
+---
+test case: urldecode empty data
+in:
+  function: 'urldecode'
+  params: ''
+  data: ''
+out:
+  value: ''
+  return: SUCCEED
+
+---
+test case: lowercase long
+in:
+  function: 'lowercase'
+  params: ''
+  data: 'This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, version 3. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.'
+
+out:
+  value: 'this program is free software: you can redistribute it and/or modify it under the terms of the gnu affero general public license as published by the free software foundation, version 3. this program is distributed in the hope that it will be useful, but without any warranty; without even the implied warranty of merchantability or fitness for a particular purpose. see the gnu affero general public license for more details.'
+  return: SUCCEED
+
+---
+test case: lowercase short
+in:
+  function: 'lowercase'
+  params: ''
+  data: 'T'
+
+out:
+  value: 't'
+  return: SUCCEED
+
+---
+test case: lowercase with parameter
+in:
+  function: 'lowercase'
+  params: '1'
+  data: ''
+
+out:
+  value: ''
+  return: FAIL
+
+---
+test case: lowercase with parameters
+in:
+  function: 'lowercase'
+  params: '1,2,3'
+  data: ''
+out:
+  value: ''
+  return: FAIL
+
+---
+test case: lowercase empty data
+in:
+  function: 'lowercase'
+  params: ''
+  data: ''
+out:
+  value: ''
+  return: SUCCEED
+
+---
+test case: uppercase long
+in:
+  function: 'uppercase'
+  params: ''
+  data: 'This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, version 3. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.'
+
+out:
+  value: 'THIS PROGRAM IS FREE SOFTWARE: YOU CAN REDISTRIBUTE IT AND/OR MODIFY IT UNDER THE TERMS OF THE GNU AFFERO GENERAL PUBLIC LICENSE AS PUBLISHED BY THE FREE SOFTWARE FOUNDATION, VERSION 3. THIS PROGRAM IS DISTRIBUTED IN THE HOPE THAT IT WILL BE USEFUL, BUT WITHOUT ANY WARRANTY; WITHOUT EVEN THE IMPLIED WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE. SEE THE GNU AFFERO GENERAL PUBLIC LICENSE FOR MORE DETAILS.'
+  return: SUCCEED
+
+---
+test case: uppercase short
+in:
+  function: 'uppercase'
+  params: ''
+  data: 'z'
+
+out:
+  value: 'Z'
+  return: SUCCEED
+
+---
+test case: uppercase with parameter
+in:
+  function: 'uppercase'
+  params: '1'
+  data: ''
+
+out:
+  value: ''
+  return: FAIL
+
+---
+test case: uppercase with parameters
+in:
+  function: 'uppercase'
+  params: '1,2,3'
+  data: ''
+out:
+  value: ''
+  return: FAIL
+
+---
+test case: uppercase empty data
+in:
+  function: 'uppercase'
+  params: ''
+  data: ''
+out:
+  value: ''
+  return: SUCCEED
+
+---
+test case: htmlencode long
+in:
+  function: 'htmlencode'
+  params: ''
+  data: '&"<>'''
+
+out:
+  value: '&amp;&quot;&lt;&gt;&#39;'
+  return: SUCCEED
+
+---
+test case: htmlencode short
+in:
+  function: 'htmlencode'
+  params: ''
+  data: '>'
+
+out:
+  value: '&gt;'
+  return: SUCCEED
+
+---
+test case: htmlencode with parameter
+in:
+  function: 'htmlencode'
+  params: '1'
+  data: ''
+
+out:
+  value: ''
+  return: FAIL
+
+---
+test case: htmlencode with parameters
+in:
+  function: 'htmlencode'
+  params: '1,2,3'
+  data: ''
+out:
+  value: ''
+  return: FAIL
+
+---
+test case: htmlencode empty data
+in:
+  function: 'htmlencode'
+  params: ''
+  data: ''
+out:
+  value: ''
+  return: SUCCEED
+
+---
+test case: htmldecode long
+in:
+  function: 'htmldecode'
+  params: ''
+  data: '&amp;&quot;&lt;&gt;&#39;'
+
+out:
+  value: '&"<>'''
+  return: SUCCEED
+
+---
+test case: htmldecode short
+in:
+  function: 'htmldecode'
+  params: ''
+  data: '&gt;'
+
+out:
+  value: '>'
+  return: SUCCEED
+
+---
+test case: htmldecode with parameter
+in:
+  function: 'htmldecode'
+  params: '1'
+  data: ''
+
+out:
+  value: ''
+  return: FAIL
+
+---
+test case: htmldecode with parameters
+in:
+  function: 'htmlencode'
+  params: '1,2,3'
+  data: ''
+out:
+  value: ''
+  return: FAIL
+
+---
+test case: htmldecode empty data
+in:
+  function: 'htmlencode'
+  params: ''
+  data: ''
+out:
+  value: ''
+  return: SUCCEED
+
+---
+test case: htmldecode &amp;lt;
+in:
+  function: 'htmldecode'
+  params: ''
+  data: '&amp;lt;'
+
+out:
+  value: '&lt;'
+  return: SUCCEED
+
+---
+test case: htmldecode &
+in:
+  function: 'htmldecode'
+  params: ''
+  data: '&'
+
+out:
+  value: '&'
+  return: SUCCEED
+
+---
+test case: htmldecode &#039;
+in:
+  function: 'htmldecode'
+  params: ''
+  data: '&#039;'
+
+out:
+  value: ''''
+  return: SUCCEED
+
+
+...
