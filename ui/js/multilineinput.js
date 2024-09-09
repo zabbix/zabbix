@@ -166,7 +166,7 @@
 
 		if (obj.options.use_tab) {
 			$textarea[0].addEventListener('keydown', e => {
-				if (e.key === 'Tab') {
+				if (e.key === 'Tab' && !e.shiftKey) {
 					e.preventDefault();
 
 					const input = e.target;
