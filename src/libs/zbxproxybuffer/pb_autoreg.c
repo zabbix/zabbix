@@ -21,6 +21,7 @@
 #include "zbxjson.h"
 #include "zbxproxybuffer.h"
 #include "zbxshmem.h"
+#include "zbxdbschema.h"
 
 static zbx_history_table_t	areg = {
 	"proxy_autoreg_host", "autoreg_host_lastid",
