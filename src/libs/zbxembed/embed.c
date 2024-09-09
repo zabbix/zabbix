@@ -38,7 +38,7 @@
 
 typedef struct
 {
-	void			*heapptr;	/* js object heap ptr */
+	const void		*heapptr;	/* js object heap ptr */
 	void			*data;
 	zbx_es_obj_type_t	type;
 }
