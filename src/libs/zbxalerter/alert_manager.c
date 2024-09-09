@@ -2417,7 +2417,6 @@ ZBX_THREAD_ENTRY(zbx_alert_manager_thread, args)
 		if (ZBX_IPC_RECV_IMMEDIATE != ret)
 			time_idle += sec - time_now;
 
-
 		if (NULL != message)
 		{
 			switch (message->code)

@@ -1037,8 +1037,6 @@ ZBX_THREAD_ENTRY(zbx_alert_syncer_thread, args)
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
-	sleep(15);
-
 	alert_syncer_register(&amdb.am);
 
 	sleeptime = ZBX_POLL_INTERVAL;
