@@ -71,6 +71,7 @@ int	zbx_uint64match_condition(zbx_uint64_t value, zbx_uint64_t pattern, unsigned
 
 /* token START */
 /* tokens used in expressions */
+#define ZBX_TOKEN_UNKNOWN		0x00000
 #define ZBX_TOKEN_OBJECTID		0x00001
 #define ZBX_TOKEN_MACRO			0x00002
 #define ZBX_TOKEN_LLD_MACRO		0x00004
@@ -81,6 +82,8 @@ int	zbx_uint64match_condition(zbx_uint64_t value, zbx_uint64_t pattern, unsigned
 #define ZBX_TOKEN_LLD_FUNC_MACRO	0x00080
 #define ZBX_TOKEN_EXPRESSION_MACRO	0x00100
 #define ZBX_TOKEN_USER_FUNC_MACRO	0x00200
+#define ZBX_TOKEN_VAR_MACRO		0x00400
+#define ZBX_TOKEN_VAR_FUNC_MACRO	0x00800
 
 /* additional token flags */
 #define ZBX_TOKEN_JSON		0x0010000
@@ -172,6 +175,8 @@ typedef union
 	zbx_token_func_macro_t		lld_func_macro;
 	zbx_token_simple_macro_t	simple_macro;
 	zbx_token_reference_t		reference;
+	zbx_token_macro_t		var_macro;
+	zbx_token_func_macro_t		var_func_macro;
 }
 zbx_token_data_t;
 
@@ -192,6 +197,7 @@ zbx_token_t;
 #define ZBX_TOKEN_SEARCH_EXPRESSION_MACRO	0x02
 #define ZBX_TOKEN_SEARCH_FUNCTIONID		0x04
 #define ZBX_TOKEN_SEARCH_SIMPLE_MACRO		0x08	/* used by the upgrade patches only */
+#define ZBX_TOKEN_SEARCH_VAR_MACRO		0x10	/* web scenario variable support */
 
 typedef int zbx_token_search_t;
 
@@ -279,5 +285,8 @@ int	zbx_substitute_macros(char **data, char *error, size_t maxerrlen, zbx_macro_
 
 /* macro function calculation */
 int	zbx_calculate_macro_function(const char *expression, const zbx_token_func_macro_t *func_macro, char **out);
+
+void	zbx_url_encode(const char *source, char **result);
+int	zbx_url_decode(const char *source, char **result);
 
 #endif /* ZABBIX_EXPR_H */
