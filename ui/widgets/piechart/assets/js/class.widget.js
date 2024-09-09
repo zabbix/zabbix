@@ -38,6 +38,8 @@ class CWidgetPieChart extends CWidget {
 	#pie_chart = null;
 
 	onResize() {
+		document.querySelector('.dashboard').insertAdjacentHTML('afterbegin', `PieChart onResize: ${JSON.stringify(this.#getSize())}<br>`);
+
 		if (this.getState() === WIDGET_STATE_ACTIVE && this.#pie_chart !== null) {
 			this.#pie_chart.setSize(this.#getSize());
 		}
@@ -128,6 +130,8 @@ class CWidgetPieChart extends CWidget {
 			this.#pie_chart = new CSVGPie(padding, response.config);
 			this._body.prepend(this.#pie_chart.getSVGElement());
 		}
+
+		document.querySelector('.dashboard').insertAdjacentHTML('afterbegin', `PieChart setContents - setSize<br>`);
 
 		this.#pie_chart.setSize(this.#getSize());
 

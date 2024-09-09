@@ -249,6 +249,8 @@ class CSVGGauge {
 		// Fix imprecise calculation of "this.#container" dimensions.
 		this.#container.setAttribute('transform', `translate(0 0) scale(${CSVGGauge.SCALE})`);
 
+		document.querySelector('.dashboard').insertAdjacentHTML('afterbegin', `Gauge setSize ${width} ${height}<br>`);
+
 		this.#adjustScalableGroup();
 	}
 
@@ -342,6 +344,8 @@ class CSVGGauge {
 
 			this.#pos_current = pos_new;
 		}
+
+		document.querySelector('.dashboard').insertAdjacentHTML('afterbegin', `Gauge setValue - adjustScalableGroup<br>`);
 
 		this.#adjustScalableGroup();
 	}
@@ -933,6 +937,7 @@ class CSVGGauge {
 				? description_height + description_gap
 				: 0);
 
+		document.querySelector('.dashboard').insertAdjacentHTML('afterbegin', `Gauge adjustScalableGroup transform: translate(${position_x} ${position_y}) scale(${scale})<br>`);
 		this.#container.setAttribute('transform', `translate(${position_x} ${position_y}) scale(${scale})`);
 	}
 
