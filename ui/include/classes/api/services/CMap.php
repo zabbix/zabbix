@@ -1996,6 +1996,11 @@ class CMap extends CMapElement {
 
 			// Urls.
 			if (array_key_exists('urls', $map)) {
+				foreach ($map['urls'] as &$url) {
+					unset($url['sysmapurlid'], $url['sysmapid']);
+				}
+				unset($url);
+
 				$url_diff = zbx_array_diff($map['urls'], $db_map['urls'], 'name');
 
 				foreach ($url_diff['both'] as $updateUrl) {
