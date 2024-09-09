@@ -102,12 +102,14 @@ ZBX_DC_FUNCTION;
 typedef struct
 {
 	zbx_vector_uint64_pair_t	dep_itemids;
+	zbx_uint64_t			revision;
 }
 ZBX_DC_MASTERITEM;
 
 typedef struct
 {
 	zbx_vector_ptr_t	preproc_ops;
+	zbx_uint64_t		revision;
 }
 ZBX_DC_PREPROCITEM;
 
