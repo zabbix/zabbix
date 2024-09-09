@@ -2912,7 +2912,19 @@ static void	process_problem_tags(zbx_vector_events_ptr_t *events, zbx_service_ma
 		}
 
 		for (int j = 0; j < event->tags.values_num; j++)
-			zbx_vector_tags_ptr_append(&(*ptr)->tags, event->tags.values[j]);
+		{
+			if (FAIL == zbx_vector_ptr_search(&(*ptr)->tags, event->tags.values[j],
+					zbx_compare_tags_and_values))
+			{
+				zbx_vector_ptr_append(&(*ptr)->tags, event->tags.values[j]);
+			}
+			else
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "discarded duplicate tag '%s' with value '%s' for eventid "
+						ZBX_FS_UI64, event->tags.values[j]->tag, event->tags.values[j]->value);
+				zbx_free_tag(event->tags.values[j]);
+			}
+		}
 
 		event->tags.values_num = 0;
 		event_free(event);
