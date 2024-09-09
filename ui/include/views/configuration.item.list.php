@@ -208,7 +208,7 @@ foreach ($data['items'] as $item) {
 		$triggerHintTable->addRow([
 			CSeverityHelper::makeSeverityCell((int) $trigger['priority']),
 			$trigger_description,
-			(new CDiv($expression))->addClass(ZBX_STYLE_WORDBREAK),
+			(new CDiv($expression))->addClass(ZBX_STYLE_WORDWRAP),
 			(new CSpan(triggerIndicator($trigger['status'], $trigger['state'])))
 				->addClass(triggerIndicatorStyle($trigger['status'], $trigger['state']))
 		]);
@@ -266,7 +266,7 @@ foreach ($data['items'] as $item) {
 		new CCheckBox('group_itemid['.$item['itemid'].']', $item['itemid']),
 		$wizard,
 		($data['hostid'] == 0) ? $item['host'] : null,
-		(new CCol($description))->addClass(ZBX_STYLE_WORDBREAK),
+		(new CCol($description))->addClass(ZBX_STYLE_WORDWRAP),
 		$triggerInfo,
 		(new CDiv($item['key_']))->addClass(ZBX_STYLE_WORDWRAP),
 		$item['delay'],

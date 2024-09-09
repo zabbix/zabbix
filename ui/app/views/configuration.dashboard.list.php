@@ -57,7 +57,7 @@ foreach ($data['dashboards'] as $dashboardid => $dashboard) {
 					->setArgument('dashboardid', $dashboardid)
 					->getUrl()
 			)
-		))->addClass(ZBX_STYLE_WORDBREAK)
+		))->addClass(ZBX_STYLE_WORDWRAP)
 	]);
 }
 

@@ -59,7 +59,7 @@ foreach($data['regexs'] as $regexid => $regex) {
 		$expressions[] = (new CTable())->addRow([
 			new CCol($numb++),
 			new CCol([' ', RARR(), ' ']),
-			(new CCol($expression['expression']))->addClass(ZBX_STYLE_WORDBREAK),
+			(new CCol($expression['expression']))->addClass(ZBX_STYLE_WORDWRAP),
 			new CCol(' ['.CRegexHelper::expression_type2str($expression['expression_type']).']')
 		]);
 	}
@@ -72,7 +72,7 @@ foreach($data['regexs'] as $regexid => $regex) {
 					->setArgument('action', 'regex.edit')
 					->setArgument('regexid', $regexid)
 			)
-		))->addClass(ZBX_STYLE_WORDBREAK),
+		))->addClass(ZBX_STYLE_WORDWRAP),
 		$expressions
 	]);
 }

@@ -109,13 +109,13 @@ foreach ($this->data['maintenances'] as $maintenance) {
 		new CCheckBox('maintenanceids['.$maintenanceid.']', $maintenanceid),
 		(new CCol(
 			new CLink($maintenance['name'], 'maintenance.php?form=update&maintenanceid='.$maintenanceid)
-		))->addClass(ZBX_STYLE_WORDBREAK),
+		))->addClass(ZBX_STYLE_WORDWRAP),
 		$maintenance['maintenance_type'] ? _('No data collection') : _('With data collection'),
 		zbx_date2str(DATE_TIME_FORMAT, $maintenance['active_since']),
 		zbx_date2str(DATE_TIME_FORMAT, $maintenance['active_till']),
 		$maintenanceStatus,
 		(new CCol($maintenance['description']))
-			->addClass(ZBX_STYLE_WORDBREAK)
+			->addClass(ZBX_STYLE_WORDWRAP)
 			->addStyle('max-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 	]);
 }

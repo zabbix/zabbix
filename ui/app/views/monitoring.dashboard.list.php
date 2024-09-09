@@ -109,7 +109,7 @@ foreach ($data['dashboards'] as $dashboard) {
 					->setArgument('action', 'dashboard.view')
 					->setArgument('dashboardid', $dashboard['dashboardid'])
 					->getUrl()
-			))->addClass(ZBX_STYLE_WORDBREAK),
+			))->addClass(ZBX_STYLE_WORDWRAP),
 			$tags ? new CDiv($tags) : null
 		]))->addClass(ZBX_STYLE_DASHBOARD_LIST_ITEM)
 	]);

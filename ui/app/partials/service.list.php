@@ -103,7 +103,7 @@ foreach ($data['services'] as $serviceid => $service) {
 					->setArgument('serviceid', $serviceid)
 			))->setAttribute('data-serviceid', $serviceid),
 			CViewHelper::showNum($service['children'])
-		]))->addClass(ZBX_STYLE_WORDBREAK),
+		]))->addClass(ZBX_STYLE_WORDWRAP),
 		(new CCol(CSeverityHelper::getName((int) $service['status'])))
 			->addClass(CSeverityHelper::getStyle((int) $service['status'])),
 		$root_cause,

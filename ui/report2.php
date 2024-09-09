@@ -513,7 +513,7 @@ else {
 		);
 
 		$triggerTable->addRow([
-			(new CCol($trigger['host_name']))->addClass(ZBX_STYLE_WORDBREAK),
+			(new CCol($trigger['host_name']))->addClass(ZBX_STYLE_WORDWRAP),
 			$allowed_ui_problems
 				? (new CCol(
 					new CLink($trigger['description'],
@@ -522,8 +522,8 @@ else {
 							->setArgument('filter_set', '1')
 							->setArgument('triggerids', [$trigger['triggerid']])
 					)
-				))->addClass(ZBX_STYLE_WORDBREAK)
-				: (new CCol($trigger['description']))->addClass(ZBX_STYLE_WORDBREAK),
+				))->addClass(ZBX_STYLE_WORDWRAP)
+				: (new CCol($trigger['description']))->addClass(ZBX_STYLE_WORDWRAP),
 			($availability['true'] < 0.00005)
 				? ''
 				: (new CSpan(sprintf('%.4f%%', $availability['true'])))->addClass(ZBX_STYLE_RED),

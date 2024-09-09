@@ -101,8 +101,8 @@ foreach ($data['triggers'] as $trigger) {
 		->setMenuPopup(CMenuPopupHelper::getTrigger($trigger['triggerid'], 0));
 
 	$table->addRow([
-		(new CCol($hostName))->addClass(ZBX_STYLE_WORDBREAK),
-		(new CCol($triggerDescription))->addClass(ZBX_STYLE_WORDBREAK),
+		(new CCol($hostName))->addClass(ZBX_STYLE_WORDWRAP),
+		(new CCol($triggerDescription))->addClass(ZBX_STYLE_WORDWRAP),
 		CSeverityHelper::makeSeverityCell((int) $trigger['priority']),
 		$trigger['cnt_event']
 	]);
