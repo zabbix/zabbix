@@ -1,1 +1,1 @@
-........S. [ZBX-25154] deactivate service manager problem cache if no services are configured (wiper)
+........S. [ZBX-25154] added deactivation of service manager problem cache if no services are configured (wiper)
