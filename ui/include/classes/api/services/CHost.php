@@ -1414,6 +1414,7 @@ class CHost extends CHostGeneral {
 		$maintenance = DBfetch(DBselect(
 			'SELECT m.maintenanceid,m.name'.
 			' FROM maintenances m'.
+			' JOIN maintenances_hosts mh ON m.maintenanceid = mh.maintenanceid'.
 			' WHERE NOT EXISTS ('.
 				'SELECT NULL'.
 				' FROM maintenances_hosts mh'.
