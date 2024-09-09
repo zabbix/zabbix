@@ -1780,7 +1780,7 @@ class CScreenProblem extends CScreenBase {
 					'itemid' => null,
 					'clock' => null,
 					'value' => UNRESOLVED_MACRO_STRING,
-					'original_value' => null,
+					'original_value' => UNRESOLVED_MACRO_STRING,
 					'ns' => null
 				];
 			}
