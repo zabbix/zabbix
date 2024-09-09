@@ -1,0 +1,1 @@
+.......PS. [ZBX-25085] fixed error of data simultaneous sending to multiple destination by zabbix_sender (MVekslers)
