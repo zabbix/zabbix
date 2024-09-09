@@ -3838,7 +3838,6 @@ class testDashboardWidgetCommunication extends testWidgets {
 				: array_keys(self::DEFAULT_WIDGET_CONTENT[$page]);
 
 			$dashboard->deleteWidget($broadcaster);
-			sleep(1);
 			$this->checkUnavailableReference($dashboard, $listeners, $field);
 		}
 
