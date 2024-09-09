@@ -3212,7 +3212,7 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() severities_num:%d", __func__, severities_num);
 }
 
-static void	service_manager_init(zbx_service_manager_t *service_manager)
+static void	service_manager_create_event_cache(zbx_service_manager_t *service_manager)
 {
 	zbx_hashset_create_ext(&service_manager->problem_events, 1000, default_uint64_ptr_hash_func,
 			ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC, (zbx_clean_func_t)event_ptr_free,
@@ -3221,6 +3221,21 @@ static void	service_manager_init(zbx_service_manager_t *service_manager)
 	zbx_hashset_create_ext(&service_manager->recovery_events, 1, default_uint64_ptr_hash_func,
 			ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC, (zbx_clean_func_t)event_ptr_free,
 			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
+
+	zbx_hashset_create(&service_manager->deleted_eventids, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC,
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+}
+
+static void	service_manager_free_event_cache(zbx_service_manager_t *service_manager)
+{
+	zbx_hashset_destroy(&service_manager->deleted_eventids);
+	zbx_hashset_destroy(&service_manager->recovery_events);
+	zbx_hashset_destroy(&service_manager->problem_events);
+}
+
+static void	service_manager_init(zbx_service_manager_t *service_manager)
+{
+	service_manager_create_event_cache(service_manager);
 
 	zbx_hashset_create_ext(&service_manager->services, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC, (zbx_clean_func_t)service_clean,
@@ -3252,9 +3267,6 @@ static void	service_manager_init(zbx_service_manager_t *service_manager)
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC, service_diff_clean, ZBX_DEFAULT_MEM_MALLOC_FUNC,
 			ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
-	zbx_hashset_create(&service_manager->deleted_eventids, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC,
-			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
 	zbx_hashset_create_ext(&service_manager->actions, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC, (zbx_clean_func_t)service_action_clean,
 			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
@@ -3275,15 +3287,14 @@ static void	service_manager_free(zbx_service_manager_t *service_manager)
 	for (i = 0; i < TRIGGER_SEVERITY_COUNT; i++)
 		zbx_free(service_manager->severities[i]);
 
+	service_manager_free_event_cache(service_manager);
+
 	zbx_hashset_destroy(&service_manager->service_rules);
 	zbx_hashset_destroy(&service_manager->service_problems_index);
 	zbx_hashset_destroy(&service_manager->services_links);
 	zbx_hashset_destroy(&service_manager->service_problem_tags);
 	zbx_hashset_destroy(&service_manager->services);
 	zbx_hashset_destroy(&service_manager->service_tags);
-	zbx_hashset_destroy(&service_manager->problem_events);
-	zbx_hashset_destroy(&service_manager->recovery_events);
-	zbx_hashset_destroy(&service_manager->deleted_eventids);
 	zbx_hashset_destroy(&service_manager->actions);
 	zbx_hashset_destroy(&service_manager->action_conditions);
 
@@ -3452,6 +3463,21 @@ static void	cleanup_deleted_problems(zbx_service_manager_t *service_manager, int
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+static int	get_services_num(void)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		ret = 0;
+
+	result = DBselect("select count(*) from services");
+	if (NULL != (row = DBfetch(result)))
+		ret = atoi(row[0]);
+
+	DBfree_result(result);
+
+	return ret;
+}
+
 ZBX_THREAD_ENTRY(service_manager_thread, args)
 {
 	zbx_ipc_service_t	service;
@@ -3463,7 +3489,7 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 	double			time_stat, time_idle = 0, time_now, time_flush = 0, time_cleanup = 0, sec;
 	zbx_service_manager_t	service_manager;
 	zbx_timespec_t		timeout = {1, 0};
-	int			service_cache_reload_requested = 0;
+	int			service_cache_reload_requested = 0, services_num;
 	zbx_ipc_async_socket_t	rtc;
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
@@ -3496,7 +3522,11 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 
 	service_manager_init(&service_manager);
 
-	db_get_events(&service_manager.problem_events);
+	if (0 != (services_num = get_services_num()))
+	{
+		zbx_dc_set_itservices_num(services_num);
+		db_get_events(&service_manager.problem_events);
+	}
 
 	zbx_setproctitle("%s #%d started", get_process_type_string(process_type), process_num);
 
@@ -3545,6 +3575,23 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 				sync_actions(&service_manager, revision);
 				sync_action_conditions(&service_manager, revision);
 				sync_config(&service_manager);
+
+				if (services_num != service_manager.services.num_data)
+				{
+					zbx_dc_set_itservices_num(service_manager.services.num_data);
+
+					if (0 == services_num)
+					{
+						db_get_events(&service_manager.problem_events);
+					}
+					else if (0 == service_manager.services.num_data)
+					{
+						service_manager_free_event_cache(&service_manager);
+						service_manager_create_event_cache(&service_manager);
+					}
+
+					services_num = service_manager.services.num_data;
+				}
 
 				/* load service problems once during startup */
 				if (0 == (int)time_flush)
