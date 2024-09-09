@@ -2338,7 +2338,7 @@ ZBX_THREAD_ENTRY(zbx_alert_manager_thread, args)
 		zbx_ipc_client_t	*client;
 		zbx_ipc_message_t	*message;
 		zbx_am_alerter_t	*alerter;
-		int			ret, sent_num = 0, failed_num = 0, now;
+		int			ret, sent_num = 0, failed_num = 0, syncer_is_ready = 0, now;
 		double			time_now, sec;
 
 		zbx_timespec_t		timeout = {1, 0};
@@ -2418,8 +2418,6 @@ ZBX_THREAD_ENTRY(zbx_alert_manager_thread, args)
 			time_idle += sec - time_now;
 
 
-		static int	syncer_is_ready = 0;
-
 		if (NULL != message)
 		{
 			switch (message->code)
@@ -2430,7 +2428,7 @@ ZBX_THREAD_ENTRY(zbx_alert_manager_thread, args)
 				case ZBX_IPC_ALERT_SYNCER_REGISTER:
 					am_register_alert_syncer(&manager, client, message);
 					syncer_is_ready = 1;
-					break;
+					ZBX_FALLTHROUGH;
 				case ZBX_IPC_ALERTER_SYNC_ALERTS:
 					if (1 == syncer_is_ready && FAIL == zbx_ipc_client_send(manager.syncer_client,
 							ZBX_IPC_ALERTER_SYNC_ALERTS, NULL, 0))
