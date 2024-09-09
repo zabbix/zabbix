@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-03-06T08:27:01Z'
+  date: '2024-08-26T22:52:46Z'
   groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -45,6 +45,7 @@ zabbix_export:
               expression: 'length(last(/AWS EC2 by HTTP/aws.ec2.alarms.check))>0'
               name: 'AWS EC2: Failed to get alarms data'
               priority: WARNING
+              description: 'Failed to get CloudWatch alarms for EC2.'
               tags:
                 - tag: scope
                   value: availability
@@ -454,7 +455,7 @@ zabbix_export:
           params: |
             var AWS = {
             	params: {},
-            	metadata: 'http://169.254.169.254/latest/meta-data/iam/security-credentials',
+            	metadata: 'http://169.254.169.254/latest/',
             
             	getField: function (data, path, val) {
             		var steps = path.split('.');
@@ -482,13 +483,20 @@ zabbix_export:
             				if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
             					request.setProxy(AWS.params.proxy);
             				}
-            				var IamRoleName = request.get(AWS.metadata);
+            				request.addHeader('X-aws-ec2-metadata-token-ttl-seconds: 21600');
+            				var token = request.put(AWS.metadata + 'api/token');
+            
+            				if (request.getStatus() !== 200 || token === null || token === '') {
+            					throw 'Error getting IMDSv2 session token.';
+            				}
+            				request.addHeader('X-aws-ec2-metadata-token: ' + token);
+            				var IamRoleName = request.get(AWS.metadata + 'meta-data/iam/security-credentials');
             
             				if (request.getStatus() !== 200 || IamRoleName === null || IamRoleName === '') {
             					throw 'Error getting security credentials from instance metadata. Role not found.';
             				}
             
-            				credentials = request.get(AWS.metadata + '/' + encodeURI(IamRoleName));
+            				credentials = request.get(AWS.metadata + 'meta-data/iam/security-credentials/' + encodeURI(IamRoleName));
             
             				if (request.getStatus() !== 200 || credentials === null || credentials === '') {
             					throw 'Error getting security credentials from instance metadata.';
@@ -503,12 +511,39 @@ zabbix_export:
             
             				['AccessKeyId', 'SecretAccessKey', 'Token'].forEach(function (field) {
             					if (typeof credentials !== 'object' || typeof credentials[field] === 'undefined' || credentials[field] === '') {
-            						throw 'Required credentials is not set: "' + field + '".';
+            						throw 'Required credentials are not set: "' + field + '".';
             					};
             					AWS.params[field] = credentials[field];
             				});
             				break;
-            			case 'access_key':
+            			case 'assume_role':
+            				AWS.params['auth_type'] = 'assume_role';
+            
+            				['AccessKeyId', 'SecretAccessKey', 'sts_region', 'role_arn'].forEach(function (field) {
+            					if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            						throw 'Required param is not set: "' + field + '".';
+            					}
+            					AWS.params[field] = params[field];
+            				});
+            
+            				role_arn_regex = /role\/(.+)$/;
+            
+            				var payload = {
+            					'Action': 'AssumeRole',
+            					'Version': '2011-06-15',
+            					'RoleArn': AWS.params.role_arn,
+            					'RoleSessionName': AWS.params.role_arn.match(role_arn_regex)[1] + 'Session',
+            				};
+            
+            				credentials = AWS.getField(AWS.request('GET', AWS.params.sts_region, 'sts', AWS.prepareParams(payload), ''), 'AssumeRoleResponse.AssumeRoleResult.Credentials');
+            
+            				['AccessKeyId', 'SecretAccessKey', 'SessionToken'].forEach(function (field) {
+            					if (typeof credentials !== 'object' || typeof credentials[field] === 'undefined' || credentials[field] === '') {
+            						throw 'Required credentials are not set: "' + field + '".';
+            					};
+            					AWS.params[field] = credentials[field];
+            				});
+            				break;
             			default:
             				AWS.params['auth_type'] = 'access_key';
             				['AccessKeyId', 'SecretAccessKey'].forEach(function (field) {
@@ -570,13 +605,11 @@ zabbix_export:
             			canonical_request = method + '\n' + canonical_uri + '\n' + params + '\n' + canonical_headers + '\n' + signed_headers + '\n' + sha256(data),
             			credential_scope = date + '/' + region + '/' + service + '/' + 'aws4_request',
             			request_string = 'AWS4-HMAC-SHA256' + '\n' + amzdate + '\n' + credential_scope + '\n' + sha256(canonical_request),
-            			key = AWS.sign('AWS4' + AWS.params.SecretAccessKey, date);
-            
-            		key = AWS.sign(key, region);
-            		key = AWS.sign(key, service);
-            		key = AWS.sign(key, 'aws4_request');
-            
-            		var request = new HttpRequest(),
+            			key = AWS.sign('AWS4' + AWS.params.SecretAccessKey, date),
+            			key = AWS.sign(key, region),
+            			key = AWS.sign(key, service),
+            			key = AWS.sign(key, 'aws4_request'),
+            			request = new HttpRequest(),
             			url = 'https://' + host + canonical_uri + '?' + params;
             
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
@@ -587,31 +620,24 @@ zabbix_export:
             		request.addHeader('Content-Type: application/json');
             		request.addHeader('Content-Encoding: amz-1.0');
             		request.addHeader('Authorization: ' + 'AWS4-HMAC-SHA256 Credential=' + AWS.params.AccessKeyId + '/' + credential_scope + ', ' + 'SignedHeaders=' + signed_headers + ', ' + 'Signature=' + hmac('sha256', key, request_string));
-            		if (AWS.params.auth_type === 'role_base')
-            			request.addHeader('X-Amz-Security-Token: ' + AWS.params.Token);
+            		if (AWS.params.auth_type === 'role_base' || (AWS.params.auth_type === 'assume_role' & !params.includes('AssumeRole'))) {
+            			request.addHeader('X-Amz-Security-Token: ' + (AWS.params.auth_type === 'role_base' ? AWS.params.Token : AWS.params.SessionToken));
+            		}
             
             		Zabbix.log(4, '[ AWS EC2  ] Sending request: ' + url);
-            
             		response = request.get(url);
-            
             		Zabbix.log(4, '[ AWS EC2 ] Received response with status code ' + request.getStatus() + ': ' + response);
             
             		if (request.getStatus() !== 200) {
             			throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
             		}
             
-            		if (response[0] === '<') {
-            			try {
-            				response = XML.toJson(response);
-            			}
-            			catch (error) {
-            				throw 'Failed to parse response received from AWS CloudWatch API. Check debug log for more information.';
-            			}
+            		try {
+            			response = JSON.parse(response);
             		}
-            
-            		if (response !== null) {
+            		catch (error) {
             			try {
-            				response = JSON.parse(response);
+            				response = JSON.parse(XML.toJson(response));
             			}
             			catch (error) {
             				throw 'Failed to parse response received from AWS CloudWatch API. Check debug log for more information.';
@@ -661,7 +687,7 @@ zabbix_export:
             			alarms_list = AWS.getField(alarms, 'MetricAlarms');
             
             			if (!Array.isArray(alarms_list))
-            				alarms_list = [alarms_list]
+            				alarms_list = [alarms_list];
             			alarms_list.forEach(function (alarm) {
             				var dimensions = alarm.Dimensions;
             
@@ -719,8 +745,12 @@ zabbix_export:
               value: '{$AWS.PROXY}'
             - name: region
               value: '{$AWS.REGION}'
+            - name: role_arn
+              value: '{$AWS.ASSUME.ROLE.ARN}'
             - name: SecretAccessKey
               value: '{$AWS.SECRET.ACCESS.KEY}'
+            - name: sts_region
+              value: '{$AWS.STS.REGION}'
           tags:
             - tag: component
               value: raw
@@ -736,7 +766,7 @@ zabbix_export:
             var AWS = {
             	params: {},
             	request_period: 600,
-            	metadata: 'http://169.254.169.254/latest/meta-data/iam/security-credentials',
+            	metadata: 'http://169.254.169.254/latest/',
             
             	getField: function (data, path) {
             		var steps = path.split('.');
@@ -761,13 +791,20 @@ zabbix_export:
             				if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
             					request.setProxy(AWS.params.proxy);
             				}
-            				var IamRoleName = request.get(AWS.metadata);
+            				request.addHeader('X-aws-ec2-metadata-token-ttl-seconds: 21600');
+            				var token = request.put(AWS.metadata + 'api/token');
+            
+            				if (request.getStatus() !== 200 || token === null || token === '') {
+            					throw 'Error getting IMDSv2 session token.';
+            				}
+            				request.addHeader('X-aws-ec2-metadata-token: ' + token);
+            				var IamRoleName = request.get(AWS.metadata + 'meta-data/iam/security-credentials');
             
             				if (request.getStatus() !== 200 || IamRoleName === null || IamRoleName === '') {
             					throw 'Error getting security credentials from instance metadata. Role not found.';
             				}
             
-            				credentials = request.get(AWS.metadata + '/' + encodeURI(IamRoleName));
+            				credentials = request.get(AWS.metadata + 'meta-data/iam/security-credentials/' + encodeURI(IamRoleName));
             
             				if (request.getStatus() !== 200 || credentials === null || credentials === '') {
             					throw 'Error getting security credentials from instance metadata.';
@@ -782,12 +819,39 @@ zabbix_export:
             
             				['AccessKeyId', 'SecretAccessKey', 'Token'].forEach(function (field) {
             					if (typeof credentials !== 'object' || typeof credentials[field] === 'undefined' || credentials[field] === '') {
-            						throw 'Required credentials is not set: "' + field + '".';
+            						throw 'Required credentials are not set: "' + field + '".';
             					};
             					AWS.params[field] = credentials[field];
             				});
             				break;
-            			case 'access_key':
+            			case 'assume_role':
+            				AWS.params['auth_type'] = 'assume_role';
+            
+            				['AccessKeyId', 'SecretAccessKey', 'sts_region', 'role_arn'].forEach(function (field) {
+            					if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            						throw 'Required param is not set: "' + field + '".';
+            					}
+            					AWS.params[field] = params[field];
+            				});
+            
+            				role_arn_regex = /role\/(.+)$/;
+            
+            				var payload = {
+            					'Action': 'AssumeRole',
+            					'Version': '2011-06-15',
+            					'RoleArn': AWS.params.role_arn,
+            					'RoleSessionName': AWS.params.role_arn.match(role_arn_regex)[1] + 'Session',
+            				};
+            
+            				credentials = AWS.getField(AWS.request('GET', AWS.params.sts_region, 'sts', AWS.prepareParams(payload), ''), 'AssumeRoleResponse.AssumeRoleResult.Credentials');
+            
+            				['AccessKeyId', 'SecretAccessKey', 'SessionToken'].forEach(function (field) {
+            					if (typeof credentials !== 'object' || typeof credentials[field] === 'undefined' || credentials[field] === '') {
+            						throw 'Required credentials are not set: "' + field + '".';
+            					};
+            					AWS.params[field] = credentials[field];
+            				});
+            				break;
             			default:
             				AWS.params['auth_type'] = 'access_key';
             				['AccessKeyId', 'SecretAccessKey'].forEach(function (field) {
@@ -931,13 +995,11 @@ zabbix_export:
             			canonical_request = method + '\n' + canonical_uri + '\n' + params + '\n' + canonical_headers + '\n' + signed_headers + '\n' + sha256(data),
             			credential_scope = date + '/' + region + '/' + service + '/' + 'aws4_request',
             			request_string = 'AWS4-HMAC-SHA256' + '\n' + amzdate + '\n' + credential_scope + '\n' + sha256(canonical_request),
-            			key = AWS.sign('AWS4' + AWS.params.SecretAccessKey, date);
-            
-            		key = AWS.sign(key, region);
-            		key = AWS.sign(key, service);
-            		key = AWS.sign(key, 'aws4_request');
-            
-            		var request = new HttpRequest(),
+            			key = AWS.sign('AWS4' + AWS.params.SecretAccessKey, date),
+            			key = AWS.sign(key, region),
+            			key = AWS.sign(key, service),
+            			key = AWS.sign(key, 'aws4_request'),
+            			request = new HttpRequest(),
             			url = 'https://' + host + canonical_uri + '?' + params;
             
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
@@ -948,22 +1010,24 @@ zabbix_export:
             		request.addHeader('Content-Type: application/json');
             		request.addHeader('Content-Encoding: amz-1.0');
             		request.addHeader('Authorization: ' + 'AWS4-HMAC-SHA256 Credential=' + AWS.params.AccessKeyId + '/' + credential_scope + ', ' + 'SignedHeaders=' + signed_headers + ', ' + 'Signature=' + hmac('sha256', key, request_string));
-            		if (AWS.params.auth_type === 'role_base')
-            			request.addHeader('X-Amz-Security-Token: ' + AWS.params.Token);
+            		if (AWS.params.auth_type === 'role_base' || (AWS.params.auth_type === 'assume_role' & !params.includes('AssumeRole'))) {
+            			request.addHeader('X-Amz-Security-Token: ' + (AWS.params.auth_type === 'role_base' ? AWS.params.Token : AWS.params.SessionToken));
+            		}
             
-            		Zabbix.log(4, '[ AWS EC2  ] Sending request: ' + url);
-            
+            		Zabbix.log(4, '[ AWS EC2 ] Sending request: ' + url);
             		response = request.get(url);
-            
             		Zabbix.log(4, '[ AWS EC2 ] Received response with status code ' + request.getStatus() + ': ' + response);
             
             		if (request.getStatus() !== 200) {
             			throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
             		}
             
-            		if (response !== null) {
+            		try {
+            			response = JSON.parse(response);
+            		}
+            		catch (error) {
             			try {
-            				response = JSON.parse(response);
+            				response = JSON.parse(XML.toJson(response));
             			}
             			catch (error) {
             				throw 'Failed to parse response received from AWS CloudWatch API. Check debug log for more information.';
@@ -1028,8 +1092,12 @@ zabbix_export:
               value: '{$AWS.PROXY}'
             - name: region
               value: '{$AWS.REGION}'
+            - name: role_arn
+              value: '{$AWS.ASSUME.ROLE.ARN}'
             - name: SecretAccessKey
               value: '{$AWS.SECRET.ACCESS.KEY}'
+            - name: sts_region
+              value: '{$AWS.STS.REGION}'
           tags:
             - tag: component
               value: raw
@@ -1045,7 +1113,7 @@ zabbix_export:
             var AWS = {
             	params: {},
             	request_period: 600,
-            	metadata: 'http://169.254.169.254/latest/meta-data/iam/security-credentials',
+            	metadata: 'http://169.254.169.254/latest/',
             
             	getField: function (data, path, val) {
             		var steps = path.split('.');
@@ -1072,13 +1140,20 @@ zabbix_export:
             				if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
             					request.setProxy(AWS.params.proxy);
             				}
-            				var IamRoleName = request.get(AWS.metadata);
+            				request.addHeader('X-aws-ec2-metadata-token-ttl-seconds: 21600');
+            				var token = request.put(AWS.metadata + 'api/token');
+            
+            				if (request.getStatus() !== 200 || token === null || token === '') {
+            					throw 'Error getting IMDSv2 session token.';
+            				}
+            				request.addHeader('X-aws-ec2-metadata-token: ' + token);
+            				var IamRoleName = request.get(AWS.metadata + 'meta-data/iam/security-credentials');
             
             				if (request.getStatus() !== 200 || IamRoleName === null || IamRoleName === '') {
             					throw 'Error getting security credentials from instance metadata. Role not found.';
             				}
             
-            				credentials = request.get(AWS.metadata + '/' + encodeURI(IamRoleName));
+            				credentials = request.get(AWS.metadata + 'meta-data/iam/security-credentials/' + encodeURI(IamRoleName));
             
             				if (request.getStatus() !== 200 || credentials === null || credentials === '') {
             					throw 'Error getting security credentials from instance metadata.';
@@ -1093,12 +1168,39 @@ zabbix_export:
             
             				['AccessKeyId', 'SecretAccessKey', 'Token'].forEach(function (field) {
             					if (typeof credentials !== 'object' || typeof credentials[field] === 'undefined' || credentials[field] === '') {
-            						throw 'Required credentials is not set: "' + field + '".';
+            						throw 'Required credentials are not set: "' + field + '".';
             					};
             					AWS.params[field] = credentials[field];
             				});
             				break;
-            			case 'access_key':
+            			case 'assume_role':
+            				AWS.params['auth_type'] = 'assume_role';
+            
+            				['AccessKeyId', 'SecretAccessKey', 'sts_region', 'role_arn'].forEach(function (field) {
+            					if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            						throw 'Required param is not set: "' + field + '".';
+            					}
+            					AWS.params[field] = params[field];
+            				});
+            
+            				role_arn_regex = /role\/(.+)$/;
+            
+            				var payload = {
+            					'Action': 'AssumeRole',
+            					'Version': '2011-06-15',
+            					'RoleArn': AWS.params.role_arn,
+            					'RoleSessionName': AWS.params.role_arn.match(role_arn_regex)[1] + 'Session',
+            				};
+            
+            				credentials = AWS.getField(AWS.request('GET', AWS.params.sts_region, 'sts', AWS.prepareParams(payload), ''), 'AssumeRoleResponse.AssumeRoleResult.Credentials');
+            
+            				['AccessKeyId', 'SecretAccessKey', 'SessionToken'].forEach(function (field) {
+            					if (typeof credentials !== 'object' || typeof credentials[field] === 'undefined' || credentials[field] === '') {
+            						throw 'Required credentials are not set: "' + field + '".';
+            					};
+            					AWS.params[field] = credentials[field];
+            				});
+            				break;
             			default:
             				AWS.params['auth_type'] = 'access_key';
             				['AccessKeyId', 'SecretAccessKey'].forEach(function (field) {
@@ -1160,13 +1262,11 @@ zabbix_export:
             			canonical_request = method + '\n' + canonical_uri + '\n' + params + '\n' + canonical_headers + '\n' + signed_headers + '\n' + sha256(data),
             			credential_scope = date + '/' + region + '/' + service + '/' + 'aws4_request',
             			request_string = 'AWS4-HMAC-SHA256' + '\n' + amzdate + '\n' + credential_scope + '\n' + sha256(canonical_request),
-            			key = AWS.sign('AWS4' + AWS.params.SecretAccessKey, date);
-            
-            		key = AWS.sign(key, region);
-            		key = AWS.sign(key, service);
-            		key = AWS.sign(key, 'aws4_request');
-            
-            		var request = new HttpRequest(),
+            			key = AWS.sign('AWS4' + AWS.params.SecretAccessKey, date),
+            			key = AWS.sign(key, region),
+            			key = AWS.sign(key, service),
+            			key = AWS.sign(key, 'aws4_request'),
+            			request = new HttpRequest(),
             			url = 'https://' + host + canonical_uri + '?' + params;
             
             		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
@@ -1177,28 +1277,29 @@ zabbix_export:
             		request.addHeader('Content-Type: application/json');
             		request.addHeader('Content-Encoding: amz-1.0');
             		request.addHeader('Authorization: ' + 'AWS4-HMAC-SHA256 Credential=' + AWS.params.AccessKeyId + '/' + credential_scope + ', ' + 'SignedHeaders=' + signed_headers + ', ' + 'Signature=' + hmac('sha256', key, request_string));
-            		if (AWS.params.auth_type === 'role_base')
-            			request.addHeader('X-Amz-Security-Token: ' + AWS.params.Token);
+            		if (AWS.params.auth_type === 'role_base' || (AWS.params.auth_type === 'assume_role' & !params.includes('AssumeRole'))) {
+            			request.addHeader('X-Amz-Security-Token: ' + (AWS.params.auth_type === 'role_base' ? AWS.params.Token : AWS.params.SessionToken));
+            		}
             
             		Zabbix.log(4, '[ AWS EBS ] Sending request: ' + url);
-            
             		response = request.get(url);
-            
             		Zabbix.log(4, '[ AWS EBS ] Received response with status code ' + request.getStatus() + ': ' + response);
             
             		if (request.getStatus() !== 200) {
             			throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
             		}
             
-            		if (response !== null) {
+            		try {
+            			response = JSON.parse(response);
+            		}
+            		catch (error) {
             			try {
-            				response = XML.toJson(response);
+            				response = JSON.parse(XML.toJson(response));
             			}
             			catch (error) {
             				throw 'Failed to parse response received from AWS CloudWatch API. Check debug log for more information.';
             			}
             		}
-            		response = JSON.parse(response)
             
             		return response;
             	},
@@ -1258,8 +1359,12 @@ zabbix_export:
               value: '{$AWS.PROXY}'
             - name: region
               value: '{$AWS.REGION}'
+            - name: role_arn
+              value: '{$AWS.ASSUME.ROLE.ARN}'
             - name: SecretAccessKey
               value: '{$AWS.SECRET.ACCESS.KEY}'
+            - name: sts_region
+              value: '{$AWS.STS.REGION}'
           tags:
             - tag: component
               value: raw
@@ -1311,6 +1416,7 @@ zabbix_export:
               expression: 'length(last(/AWS EC2 by HTTP/aws.ec2.metrics.check))>0'
               name: 'AWS EC2: Failed to get metrics data'
               priority: WARNING
+              description: 'Failed to get CloudWatch metrics for EC2.'
               tags:
                 - tag: scope
                   value: availability
@@ -1347,7 +1453,7 @@ zabbix_export:
           value_type: FLOAT
           units: Bps
           description: |
-            The number of bytes sent out on all network interfaces by the instance. 
+            The number of bytes sent out on all network interfaces by the instance.
             This metric identifies the volume of outgoing network traffic from a single instance.
           preprocessing:
             - type: JSONPATH
@@ -1532,6 +1638,7 @@ zabbix_export:
               expression: 'length(last(/AWS EC2 by HTTP/aws.ec2.volumes.check))>0'
               name: 'AWS EC2: Failed to get volumes info'
               priority: WARNING
+              description: 'Failed to get CloudWatch volumes for EC2.'
               tags:
                 - tag: scope
                   value: availability
@@ -1613,6 +1720,7 @@ zabbix_export:
                   expression: 'last(/AWS EC2 by HTTP/aws.ec2.alarm.state["{#ALARM_NAME}"])=1'
                   name: 'AWS EC2 Alarms: [{#ALARM_NAME}] has ''Insufficient data'' state'
                   priority: INFO
+                  description: 'Either the alarm has just started, the metric is not available, or not enough data is available for the metric to determine the alarm state.'
                   tags:
                     - tag: scope
                       value: notice
@@ -1647,7 +1755,7 @@ zabbix_export:
               name: 'AWS EC2 Alarms: [{#ALARM_NAME}] has ''Alarm'' state'
               priority: AVERAGE
               description: |
-                Alarm "{#ALARM_NAME}" has 'Alarm' state. 
+                Alarm "{#ALARM_NAME}" has 'Alarm' state.
                 Reason: {ITEM.LASTVALUE2}
               tags:
                 - tag: scope
@@ -1880,7 +1988,7 @@ zabbix_export:
               units: '%'
               description: |
                 Used with General Purpose SSD (gp2), Throughput Optimized HDD (st1), and Cold HDD (sc1) volumes only.
-                Provides information about the percentage of I/O credits (for gp2) or throughput credits (for st1 and sc1) remaining in the burst bucket. 
+                Provides information about the percentage of I/O credits (for gp2) or throughput credits (for st1 and sc1) remaining in the burst bucket.
                 Data is reported to CloudWatch only when the volume is active. If the volume is not attached, no data is reported.
               preprocessing:
                 - type: JSONPATH
@@ -1916,7 +2024,7 @@ zabbix_export:
               description: |
                 Used with Provisioned IOPS SSD volumes only.
                 The total amount of read and write operations (normalized to 256K capacity units) consumed in a specified period of time.
-                I/O operations that are smaller than 256K each count as 1 consumed IOPS. I/O operations that are larger than 256K are counted in 256K capacity units. 
+                I/O operations that are smaller than 256K each count as 1 consumed IOPS. I/O operations that are larger than 256K are counted in 256K capacity units.
                 For example, a 1024K I/O would count as 4 consumed IOPS.
               preprocessing:
                 - type: JSONPATH
@@ -2067,8 +2175,8 @@ zabbix_export:
               description: |
                 This metric is not supported with Multi-Attach enabled volumes.
                 The total number of seconds spent by all read operations that completed in a specified period of time.
-                If multiple requests are submitted at the same time, this total could be greater than the length of the period. 
-                For example, for a period of 1 minutes (60 seconds): if 150 operations completed during that period, and each operation took 1 second, the value would be 150 seconds. 
+                If multiple requests are submitted at the same time, this total could be greater than the length of the period.
+                For example, for a period of 1 minutes (60 seconds): if 150 operations completed during that period, and each operation took 1 second, the value would be 150 seconds.
                 For Xen instances, data is reported only when there is read activity on the volume.
               preprocessing:
                 - type: JSONPATH
@@ -2096,7 +2204,7 @@ zabbix_export:
                 This metric is not supported with Multi-Attach enabled volumes.
                 The total number of seconds spent by all write operations that completed in a specified period of time.
                 If multiple requests are submitted at the same time, this total could be greater than the length of the period.
-                For example, for a period of 1 minute (60 seconds): if 150 operations completed during that period, and each operation took 1 second, the value would be 150 seconds. 
+                For example, for a period of 1 minute (60 seconds): if 150 operations completed during that period, and each operation took 1 second, the value would be 150 seconds.
                 For Xen instances, data is reported only when there is write activity on the volume.
               preprocessing:
                 - type: JSONPATH
@@ -2173,7 +2281,7 @@ zabbix_export:
                 var AWS = {
                 	params: {},
                 	request_period: 600,
-                	metadata: 'http://169.254.169.254/latest/meta-data/iam/security-credentials',
+                	metadata: 'http://169.254.169.254/latest/',
                 
                 	getField: function (data, path) {
                 		var steps = path.split('.');
@@ -2198,13 +2306,20 @@ zabbix_export:
                 				if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
                 					request.setProxy(AWS.params.proxy);
                 				}
-                				var IamRoleName = request.get(AWS.metadata);
+                				request.addHeader('X-aws-ec2-metadata-token-ttl-seconds: 21600');
+                				var token = request.put(AWS.metadata + 'api/token');
+                
+                				if (request.getStatus() !== 200 || token === null || token === '') {
+                					throw 'Error getting IMDSv2 session token.';
+                				}
+                				request.addHeader('X-aws-ec2-metadata-token: ' + token);
+                				var IamRoleName = request.get(AWS.metadata + 'meta-data/iam/security-credentials');
                 
                 				if (request.getStatus() !== 200 || IamRoleName === null || IamRoleName === '') {
                 					throw 'Error getting security credentials from instance metadata. Role not found.';
                 				}
                 
-                				credentials = request.get(AWS.metadata + '/' + encodeURI(IamRoleName));
+                				credentials = request.get(AWS.metadata + 'meta-data/iam/security-credentials/' + encodeURI(IamRoleName));
                 
                 				if (request.getStatus() !== 200 || credentials === null || credentials === '') {
                 					throw 'Error getting security credentials from instance metadata.';
@@ -2219,12 +2334,39 @@ zabbix_export:
                 
                 				['AccessKeyId', 'SecretAccessKey', 'Token'].forEach(function (field) {
                 					if (typeof credentials !== 'object' || typeof credentials[field] === 'undefined' || credentials[field] === '') {
-                						throw 'Required credentials is not set: "' + field + '".';
+                						throw 'Required credentials are not set: "' + field + '".';
                 					};
                 					AWS.params[field] = credentials[field];
                 				});
                 				break;
-                			case 'access_key':
+                			case 'assume_role':
+                				AWS.params['auth_type'] = 'assume_role';
+                
+                				['AccessKeyId', 'SecretAccessKey', 'sts_region', 'role_arn'].forEach(function (field) {
+                					if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+                						throw 'Required param is not set: "' + field + '".';
+                					}
+                					AWS.params[field] = params[field];
+                				});
+                
+                				role_arn_regex = /role\/(.+)$/;
+                
+                				var payload = {
+                					'Action': 'AssumeRole',
+                					'Version': '2011-06-15',
+                					'RoleArn': AWS.params.role_arn,
+                					'RoleSessionName': AWS.params.role_arn.match(role_arn_regex)[1] + 'Session',
+                				};
+                
+                				credentials = AWS.getField(AWS.request('GET', AWS.params.sts_region, 'sts', AWS.prepareParams(payload), ''), 'AssumeRoleResponse.AssumeRoleResult.Credentials');
+                
+                				['AccessKeyId', 'SecretAccessKey', 'SessionToken'].forEach(function (field) {
+                					if (typeof credentials !== 'object' || typeof credentials[field] === 'undefined' || credentials[field] === '') {
+                						throw 'Required credentials are not set: "' + field + '".';
+                					};
+                					AWS.params[field] = credentials[field];
+                				});
+                				break;
                 			default:
                 				AWS.params['auth_type'] = 'access_key';
                 				['AccessKeyId', 'SecretAccessKey'].forEach(function (field) {
@@ -2357,13 +2499,11 @@ zabbix_export:
                 			canonical_request = method + '\n' + canonical_uri + '\n' + params + '\n' + canonical_headers + '\n' + signed_headers + '\n' + sha256(data),
                 			credential_scope = date + '/' + region + '/' + service + '/' + 'aws4_request',
                 			request_string = 'AWS4-HMAC-SHA256' + '\n' + amzdate + '\n' + credential_scope + '\n' + sha256(canonical_request),
-                			key = AWS.sign('AWS4' + AWS.params.SecretAccessKey, date);
-                
-                		key = AWS.sign(key, region);
-                		key = AWS.sign(key, service);
-                		key = AWS.sign(key, 'aws4_request');
-                
-                		var request = new HttpRequest(),
+                			key = AWS.sign('AWS4' + AWS.params.SecretAccessKey, date),
+                			key = AWS.sign(key, region),
+                			key = AWS.sign(key, service),
+                			key = AWS.sign(key, 'aws4_request'),
+                			request = new HttpRequest(),
                 			url = 'https://' + host + canonical_uri + '?' + params;
                 
                 		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
@@ -2374,13 +2514,12 @@ zabbix_export:
                 		request.addHeader('Content-Type: application/json');
                 		request.addHeader('Content-Encoding: amz-1.0');
                 		request.addHeader('Authorization: ' + 'AWS4-HMAC-SHA256 Credential=' + AWS.params.AccessKeyId + '/' + credential_scope + ', ' + 'SignedHeaders=' + signed_headers + ', ' + 'Signature=' + hmac('sha256', key, request_string));
-                		if (AWS.params.auth_type === 'role_base')
-                			request.addHeader('X-Amz-Security-Token: ' + AWS.params.Token);
+                		if (AWS.params.auth_type === 'role_base' || (AWS.params.auth_type === 'assume_role' & !params.includes('AssumeRole'))) {
+                			request.addHeader('X-Amz-Security-Token: ' + (AWS.params.auth_type === 'role_base' ? AWS.params.Token : AWS.params.SessionToken));
+                		}
                 
                 		Zabbix.log(4, '[ AWS EBS ] Sending request: ' + url);
-                
                 		response = request.get(url);
-                
                 		Zabbix.log(4, '[ AWS EBS ] Received response with status code ' + request.getStatus() + ': ' + response);
                 
                 		if (request.getStatus() !== 200) {
@@ -2414,9 +2553,9 @@ zabbix_export:
                 		result = AWS.request('GET', AWS.params.region, 'monitoring', AWS.prepareParams(payload));
                 
                 		if (typeof result !== 'object'
-                				|| typeof result.GetMetricDataResponse !== 'object'
-                				|| typeof result.GetMetricDataResponse.GetMetricDataResult !== 'object'
-                				|| typeof result.GetMetricDataResponse.GetMetricDataResult.MetricDataResults !== 'object') {
+                			|| typeof result.GetMetricDataResponse !== 'object'
+                			|| typeof result.GetMetricDataResponse.GetMetricDataResult !== 'object'
+                			|| typeof result.GetMetricDataResponse.GetMetricDataResult.MetricDataResults !== 'object') {
                 			throw 'Cannot get metrics data from AWS CloudWatch API. Check debug log for more information.';
                 		}
                 
@@ -2433,7 +2572,7 @@ zabbix_export:
                 	error += (String(error).endsWith('.')) ? '' : '.';
                 	Zabbix.log(3, '[ AWS EBS ] ERROR: ' + error);
                 
-                	return JSON.stringify({'error': error});
+                	return JSON.stringify({ 'error': error });
                 }
               description: |
                 Get metrics of EBS volume.
@@ -2452,8 +2591,12 @@ zabbix_export:
                   value: '{$AWS.PROXY}'
                 - name: region
                   value: '{$AWS.REGION}'
+                - name: role_arn
+                  value: '{$AWS.ASSUME.ROLE.ARN}'
                 - name: SecretAccessKey
                   value: '{$AWS.SECRET.ACCESS.KEY}'
+                - name: sts_region
+                  value: '{$AWS.STS.REGION}'
                 - name: volume_id
                   value: '{#VOLUME_ID}'
               tags:
@@ -2531,9 +2674,11 @@ zabbix_export:
       macros:
         - macro: '{$AWS.ACCESS.KEY.ID}'
           description: 'Access key ID.'
+        - macro: '{$AWS.ASSUME.ROLE.ARN}'
+          description: 'ARN assume role; add when using the `assume_role` authorization method.'
         - macro: '{$AWS.AUTH_TYPE}'
           value: access_key
-          description: 'Authorization method. Possible values: role_base, access_key.'
+          description: 'Authorization method. Possible values: `access_key`, `assume_role`, `role_base`.'
         - macro: '{$AWS.EBS.BURST.CREDIT.BALANCE.MIN.WARN}'
           value: '20'
           description: 'Minimum percentage of Byte credits remaining for trigger expression.'
@@ -2579,6 +2724,9 @@ zabbix_export:
           description: 'Amazon EC2 Region code.'
         - macro: '{$AWS.SECRET.ACCESS.KEY}'
           description: 'Secret access key.'
+        - macro: '{$AWS.STS.REGION}'
+          value: us-east-1
+          description: 'Region used in assume role request.'
       valuemaps:
         - uuid: 50b7fdfdf6de41f4b4b210a07c10cd77
           name: 'Alarm state'
