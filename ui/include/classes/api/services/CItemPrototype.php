@@ -273,10 +273,10 @@ class CItemPrototype extends CItemGeneral {
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$resource = DBselect(self::createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 
-		$result = [];
-
 		if ($options['countOutput']) {
 			if ($options['groupCount']) {
+				$result = [];
+
 				while ($item = DBfetch($resource)) {
 					$result[] = $item;
 				}
@@ -287,51 +287,33 @@ class CItemPrototype extends CItemGeneral {
 			return DBfetch($resource)['rowscount'];
 		}
 
-		$_result = [];
+		$items = [];
+		$items_chunk = [];
 
 		do {
 			while ($item = DBfetch($resource)) {
-				$_result[$item['itemid']] = $item;
+				$items_chunk[$item['itemid']] = $item;
 
-				if (count($_result) == CItemGeneral::CHUNK_SIZE) {
+				if (count($items_chunk) == CItemGeneral::CHUNK_SIZE) {
 					break;
 				}
 			}
 
-			if (!$_result) {
+			if (!$items_chunk) {
 				break;
 			}
 
-			if (self::dbDistinct($sqlParts)) {
-				$_result = $this->addNclobFieldValues($options, $_result);
-			}
+			$this->prepareChunkObjects($items_chunk, $options, $sqlParts);
 
-			$_result = $this->addRelatedObjects($options, $_result);
-			$_result = $this->unsetExtraFields($_result, ['hostid', 'valuemapid'], $options['output']);
-			$_result = $this->unsetExtraFields($_result, ['name_upper']);
-
-			$result += $_result;
-			$_result = [];
+			$items += $items_chunk;
+			$items_chunk = [];
 		} while ($item !== false);
 
-		// Decode ITEM_TYPE_HTTPAGENT encoded fields.
-		foreach ($result as &$item) {
-			if (array_key_exists('query_fields', $item)) {
-				$query_fields = ($item['query_fields'] !== '') ? json_decode($item['query_fields'], true) : [];
-				$item['query_fields'] = json_last_error() ? [] : $query_fields;
-			}
-
-			if (array_key_exists('headers', $item)) {
-				$item['headers'] = $this->headersStringToArray($item['headers']);
-			}
-		}
-		unset($item);
-
 		if (!$options['preservekeys']) {
-			$result = zbx_cleanHashes($result);
+			$items = array_values($items);
 		}
 
-		return $result;
+		return $items;
 	}
 
 	/**
@@ -350,6 +332,29 @@ class CItemPrototype extends CItemGeneral {
 		if (!CApiInputValidator::validate($api_input_rules, $options_filter, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
+	}
+
+	private function prepareChunkObjects(array &$items, array $options, array $sqlParts): void {
+		if (self::dbDistinct($sqlParts)) {
+			$items = $this->addNclobFieldValues($options, $items);
+		}
+
+		$items = $this->addRelatedObjects($options, $items);
+		$items = $this->unsetExtraFields($items, ['hostid', 'valuemapid'], $options['output']);
+		$items = $this->unsetExtraFields($items, ['name_upper']);
+
+		foreach ($items as &$item) {
+			// Decode ITEM_TYPE_HTTPAGENT encoded fields.
+			if (array_key_exists('query_fields', $item)) {
+				$query_fields = $item['query_fields'] !== '' ? json_decode($item['query_fields'], true) : [];
+				$item['query_fields'] = json_last_error() ? [] : $query_fields;
+			}
+
+			if (array_key_exists('headers', $item)) {
+				$item['headers'] = $this->headersStringToArray($item['headers']);
+			}
+		}
+		unset($item);
 	}
 
 	/**
