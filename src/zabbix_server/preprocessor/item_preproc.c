@@ -1559,10 +1559,10 @@ static int	item_preproc_prometheus_pattern(zbx_preproc_cache_t *cache, zbx_varia
 		if (NULL == (prom_cache = (zbx_prometheus_t *)zbx_preproc_cache_get(cache,
 				ZBX_PREPROC_PROMETHEUS_PATTERN)))
 		{
-			prom_cache = (zbx_prometheus_t *)zbx_malloc(NULL, sizeof(zbx_prometheus_t));
-
 			if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
 				return FAIL;
+
+			prom_cache = (zbx_prometheus_t *)zbx_malloc(NULL, sizeof(zbx_prometheus_t));
 
 			if (SUCCEED != zbx_prometheus_init(prom_cache, value->data.str, &err))
 			{
