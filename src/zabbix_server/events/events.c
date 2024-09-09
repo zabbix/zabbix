@@ -2036,7 +2036,8 @@ void	zbx_events_update_itservices(void)
 	if (NULL == data)
 		return;
 
-	zbx_service_flush(ZBX_IPC_SERVICE_SERVICE_PROBLEMS, data, (zbx_uint32_t)data_offset);
+	if (0 != zbx_dc_get_itservices_num())
+		zbx_service_flush(ZBX_IPC_SERVICE_SERVICE_PROBLEMS, data, (zbx_uint32_t)data_offset);
 	zbx_free(data);
 }
 

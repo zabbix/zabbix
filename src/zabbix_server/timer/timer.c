@@ -157,9 +157,6 @@ static void     service_send_suppression_data(const zbx_vector_uint64_pair_t *ev
 	int             i;
 	zbx_uint32_t	data_len;
 
-	if (0 == event_maintenance->values_num)
-		return;
-
 	data_len = (zbx_uint32_t)(event_maintenance->values_num * sizeof(zbx_uint64_pair_t) + sizeof(int));
 	ptr = data = zbx_malloc(NULL, data_len);
 
@@ -210,7 +207,8 @@ static void	db_remove_expired_event_suppress_data(time_t now)
 			(zbx_fs_time_t)now);
 	zbx_db_commit();
 
-	service_send_suppression_data(&event_maintenance, 0);
+	if (0 != event_maintenance.values_num && 0 != zbx_dc_get_itservices_num())
+		service_send_suppression_data(&event_maintenance, 0);
 
 	zbx_vector_uint64_pair_destroy(&event_maintenance);
 }
@@ -585,8 +583,17 @@ static void	db_update_event_suppress_data(int *suppressed_num, int process_num, 
 cleanup:
 		zbx_db_commit();
 
-		service_send_suppression_data(&del_event_maintenances, 0);
-		service_send_suppression_data(&suppressed, 1);
+		if (0 != del_event_maintenances.values_num || 0 != suppressed.values_num)
+		{
+			if (0 != zbx_dc_get_itservices_num())
+			{
+				if (0 != del_event_maintenances.values_num)
+					service_send_suppression_data(&del_event_maintenances, 0);
+
+				if (0 != suppressed.values_num)
+					service_send_suppression_data(&suppressed, 1);
+			}
+		}
 
 		zbx_db_insert_clean(&db_insert);
 		zbx_free(sql);
