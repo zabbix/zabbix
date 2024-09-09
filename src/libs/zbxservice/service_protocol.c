@@ -35,7 +35,7 @@ void	zbx_service_serialize_event(unsigned char **data, size_t *data_alloc, size_
 
 	zbx_serialize_prepare_value(data_len, maintenance_num);
 	if (NULL != maintenanceids)
-		data_len += (zbx_uint32_t)(maintenanceids->values_num * sizeof(zbx_uint64_t));
+		data_len += (zbx_uint32_t)(maintenanceids->values_num * (int)sizeof(zbx_uint64_t));
 
 	if (0 != tags->values_num)
 	{
@@ -394,7 +394,7 @@ void	zbx_service_deserialize_parentids(const unsigned char *data, zbx_vector_uin
 	if (0 == values_num)
 		return;
 
-	zbx_vector_uint64_reserve(ids, values_num);
+	zbx_vector_uint64_reserve(ids, (size_t)values_num);
 
 	for (i = 0; i < values_num; i++)
 	{
@@ -415,7 +415,7 @@ zbx_uint32_t	zbx_service_serialize_event_severities(unsigned char **data,
 	zbx_event_severity_t	*es;
 
 	size = sizeof(event_severities->values_num);
-	size += (zbx_uint32_t)event_severities->values_num * (sizeof(es->eventid) + sizeof(es->severity));
+	size += (zbx_uint32_t)((size_t)event_severities->values_num * (sizeof(es->eventid) + sizeof(es->severity)));
 	ptr = *data = (unsigned char *)zbx_malloc(NULL, size);
 
 	ptr += zbx_serialize_value(ptr, event_severities->values_num);
