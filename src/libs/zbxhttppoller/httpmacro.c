@@ -18,6 +18,7 @@
 #include "zbxexpr.h"
 #include "zbxvariant.h"
 #include "zbxxml.h"
+#include "zbxexpression.h"
 
 /******************************************************************************
  *                                                                            *
