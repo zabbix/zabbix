@@ -2924,9 +2924,8 @@ static void	process_events(zbx_vector_ptr_t *events, zbx_service_manager_t *serv
 			case TRIGGER_VALUE_PROBLEM:
 				if (NULL != zbx_hashset_search(&service_manager->problem_events, &event))
 				{
-					zabbix_log(LOG_LEVEL_ERR, "cannot process event \"" ZBX_FS_UI64 "\": event"
+					zabbix_log(LOG_LEVEL_DEBUG, "cannot process event \"" ZBX_FS_UI64 "\": event"
 							" already processed", event->eventid);
-					THIS_SHOULD_NEVER_HAPPEN;
 					event_free(event);
 					continue;
 				}
