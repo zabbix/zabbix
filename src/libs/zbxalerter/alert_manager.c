@@ -2417,6 +2417,9 @@ ZBX_THREAD_ENTRY(zbx_alert_manager_thread, args)
 		if (ZBX_IPC_RECV_IMMEDIATE != ret)
 			time_idle += sec - time_now;
 
+
+		static int	syncer_is_ready = 0;
+
 		if (NULL != message)
 		{
 			switch (message->code)
@@ -2426,9 +2429,10 @@ ZBX_THREAD_ENTRY(zbx_alert_manager_thread, args)
 					break;
 				case ZBX_IPC_ALERT_SYNCER_REGISTER:
 					am_register_alert_syncer(&manager, client, message);
+					syncer_is_ready = 1;
 					break;
 				case ZBX_IPC_ALERTER_SYNC_ALERTS:
-					if (FAIL == zbx_ipc_client_send(manager.syncer_client,
+					if (1 == syncer_is_ready && FAIL == zbx_ipc_client_send(manager.syncer_client,
 							ZBX_IPC_ALERTER_SYNC_ALERTS, NULL, 0))
 					{
 						zabbix_log(LOG_LEVEL_ERR, "failed to send message to sync alerts");
