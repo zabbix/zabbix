@@ -36,8 +36,9 @@
  ******************************************************************************/
 static zbx_webdriver_t *es_webdriver(duk_context *ctx)
 {
-	zbx_webdriver_t		*wd;
-	zbx_es_env_t		*env;
+	zbx_webdriver_t	*wd;
+	zbx_es_env_t	*env;
+	void		*objptr;
 
 	if (NULL == (env = zbx_es_get_env(ctx)))
 	{
@@ -46,7 +47,11 @@ static zbx_webdriver_t *es_webdriver(duk_context *ctx)
 		return NULL;
 	}
 
-	if (NULL == (wd = (zbx_webdriver_t *)es_obj_get_data(env, ES_OBJ_BROWSER)))
+	duk_push_this(ctx);
+	objptr = duk_require_heapptr(ctx, -1);
+	duk_pop(ctx);
+
+	if (NULL == (wd = (zbx_webdriver_t *)es_obj_get_data(env, objptr, ES_OBJ_BROWSER)))
 		(void)duk_push_error_object(ctx, DUK_RET_EVAL_ERROR, "cannot find native data attached to object");
 
 	return wd;

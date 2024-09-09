@@ -4391,7 +4391,7 @@ static int	dc_function_calculate_trends_nextcheck(const zbx_dc_um_handle_t *um_h
 
 	if (ZBX_TIME_UNIT_HOUR == trend_base)
 	{
-		zbx_tm_round_up(&tm, trend_base);
+		zbx_tm_round_up(&tm, trend_base, NULL);
 
 		if (-1 == (*nextcheck = mktime(&tm)))
 		{
@@ -4421,7 +4421,7 @@ static int	dc_function_calculate_trends_nextcheck(const zbx_dc_um_handle_t *um_h
 			break;
 		}
 
-		zbx_tm_add(&tm, 1, trend_base);
+		zbx_tm_add(&tm, 1, trend_base, NULL);
 		if (-1 == (next = mktime(&tm)))
 		{
 			*error = zbx_strdup(*error, zbx_strerror(errno));

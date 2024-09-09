@@ -1,6 +1,10 @@
 Changes for 7.2.0alpha1
 
 New features:
+.......PS. [ZBXNEXT-9416] updated max supported MariaDB version to 11.5 (mprihodko)
+.........T [ZBXNEXT-9318] added Microsoft 365 reports by HTTP template (abrosimovs)
+.......PS. [ZBXNEXT-8139] added vmware.vm.hv.maintenance item with HV maintenance status to VM level (MVekslers)
+.........T [ZBXNEXT-7936] updated VMware templates (akotsegubov)
 .........T [ZBXNEXT-9248] added GitHub repository by HTTP template (drasikhov)
 ........S. [ZBXNEXT-9408] updated max supported TimescaleDB version to 2.16 (mprihodko)
 .........T [ZBXNEXT-8937] added support IMDSv2 in role base authorization for AWS templates (egordymov)
@@ -35,6 +39,23 @@ A.F.I..PS. [ZBXNEXT-9176] removed support of Oracle DB (agriscenko, sboidenko)
 .......PS. [ZBXNEXT-8990] extended VMware event log with username (asestakovs)
 
 Bug fixes:
+A......... [ZBX-24485] fixed undefined index error when importing host with technical name already in use by a template (jfreibergs, vmaksimovs)
+.......P.. [ZBX-24731] fixed autoregistration at proxy in cases where custom value is used for the host interface (asestakovs)
+...G...... [ZBX-24801] made frequency of active checks updates in Zabbix agent 2 better correspond to RefreshActiveChecks configuration parameter (arimdjonoks)
+..F....... [ZBX-21618] fixed layout for multiple lists when long names are used (esekace)
+A......... [ZBX-24526] fixed notice when importing a non-template configuration file via the Templates page (jfreibergs)
+........S. [ZBX-22557] fixed time zones conflict lead to report sheduling errors (sboidenko)
+...G...... [ZBX-24245] fixed Zabbix agent 2 and loadable plugin protocol mismatch error (esneiders)
+A......... [ZBX-24792] fixed query generation error in retrieval of alerts by non-Superadmin users without user group (jfreibergs)
+..F....... [ZBX-25026] fixed percentile line being displayed outside of classic graph (Ivo)
+A......... [ZBX-24099] prevented ability to enable LDAP authentication without specifying a user directory (jfreibergs)
+..F....... [ZBX-25084] fixed permission check for scripts with manual input (esekace)
+...G...... [ZBX-25149] fixed Zabbix agent build on AIX and Solaris (arimdjonoks)
+........S. [ZBX-24950] fixed macro function ignoring if text is added before the macro (akozlovs)
+..F....... [ZBX-25122] fixed column configuration form crashing on save in Item history widget (dfofanovs)
+...G...... [ZBX-22761] fixed Zabbix agent 2 runtime command result output to stderr (rzvejs)
+...G...... [ZBX-23535] added alternative data source parsing for key ceph.status (rzvejs)
+...G...... [ZBX-24418] fix Zabbix agent 2 build on mips architectures (rzvejs)
 ...G...... [ZBX-24471] fixed system.run[,nowait] to include double quotes the same way as system.run[,wait] (asestakovs)
 ...G...... [ZBX-24619] updated atomic variables to be more safe (esneiders)
 ..F....... [ZBX-24052] fixed the error when applying subfilter by tag on graph page if item tag contains special characters (wczerneha)
@@ -227,6 +248,9 @@ A......... [ZBX-24299] fixed possibility to alter readonly error fields with Hos
 Changes for 7.0.4rc1
 
 New features:
+.......PS. [ZBXNEXT-9416] updated max supported MariaDB version to 11.5 (mprihodko)
+.........T [ZBXNEXT-9318] added Microsoft 365 reports by HTTP template (abrosimovs)
+.........T [ZBXNEXT-7936] updated VMware templates (akotsegubov)
 .........T [ZBXNEXT-9248] added GitHub repository by HTTP template (drasikhov)
 ........S. [ZBXNEXT-9408] updated max supported TimescaleDB version to 2.16 (mprihodko)
 .........T [ZBXNEXT-8937] added support IMDSv2 in role base authorization for AWS templates (egordymov)
@@ -235,6 +259,21 @@ New features:
 .........T [ZBXNEXT-9341] added assume role authorization in AWS templates (egordymov)
 
 Bug fixes:
+A......... [ZBX-24485] fixed undefined index error when importing host with technical name already in use by a template (jfreibergs, vmaksimovs)
+.......P.. [ZBX-24731] fixed autoregistration at proxy in cases where custom value is used for the host interface (asestakovs)
+...G...... [ZBX-24801] made frequency of active checks updates in Zabbix agent 2 better correspond to RefreshActiveChecks configuration parameter (arimdjonoks)
+A......... [ZBX-24526] fixed notice when importing a non-template configuration file via the Templates page (jfreibergs)
+...G...... [ZBX-24245] fixed Zabbix agent 2 and loadable plugin protocol mismatch error (esneiders)
+........S. [ZBX-22557] fixed time zones conflict lead to report sheduling errors (sboidenko)
+A......... [ZBX-24792] fixed query generation error in retrieval of alerts by non-Superadmin users without user group (jfreibergs)
+..F....... [ZBX-25026] fixed percentile line being displayed outside of classic graph (Ivo)
+A......... [ZBX-24099] prevented ability to enable LDAP authentication without specifying a user directory (jfreibergs)
+..F....... [ZBX-25084] fixed permission check for scripts with manual input (esekace)
+........S. [ZBX-24950] fixed macro function ignoring if text is added before the macro (akozlovs)
+..F....... [ZBX-25122] fixed column configuration form crashing on save in Item history widget (dfofanovs)
+...G...... [ZBX-22761] fixed Zabbix agent 2 runtime command result output to stderr (rzvejs)
+...G...... [ZBX-23535] added alternative data source parsing for key ceph.status (rzvejs)
+...G...... [ZBX-24418] fix Zabbix agent 2 build on mips architectures (rzvejs)
 ...G...... [ZBX-24471] fixed system.run[,nowait] to include double quotes the same way as system.run[,wait] (asestakovs)
 ...G...... [ZBX-24619] updated atomic variables to be more safe (esneiders)
 ..F....... [ZBX-24052] fixed the error when applying subfilter by tag on graph page if item tag contains special characters (wczerneha)
@@ -1252,9 +1291,11 @@ A.F....... [ZBX-21976] added support of OneLogin and Azure SCIM, fixed some issu
 Changes for 6.4.19rc1
 
 New features:
+.......PS. [ZBXNEXT-9416] updated max supported MariaDB version to 11.5 (mprihodko)
 ........S. [ZBXNEXT-9408] updated max supported TimescaleDB version to 2.16 (mprihodko)
 
 Bug fixes:
+.......PS. [ZBX-22754] fixed 'Too old events' error for vmware.eventlog item (MVekslers)
 ....I...S. [ZBX-24819] fixed slow template cloning (asestakovs)
 ..F....... [ZBX-24966] fixed sorting in Map navigation tree widget (apoga)
 .......PS. [ZBX-24926] fixed bad argument error when using latest libcurl (vso)
@@ -3175,6 +3216,8 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 Changes for 6.0.34rc1
 
 New features:
+.......PS. [ZBXNEXT-9416] updated max supported MariaDB version to 11.5 (mprihodko)
+.........T [ZBXNEXT-9318] added Microsoft 365 reports by HTTP template (abrosimovs)
 .........T [ZBXNEXT-9248] added GitHub repository by HTTP template (drasikhov)
 ........S. [ZBXNEXT-9408] updated max supported TimescaleDB version to 2.16 (mprihodko)
 .........T [ZBXNEXT-8937] added support IMDSv2 in role base authorization for AWS templates (egordymov)
@@ -3182,6 +3225,14 @@ New features:
 .........T [ZBXNEXT-9341] added assume role authorization in AWS templates (egordymov)
 
 Bug fixes:
+A......... [ZBX-24485] fixed undefined index error when importing host with technical name already in use by a template (jfreibergs, vmaksimovs)
+...G...... [ZBX-24245] fixed Zabbix agent 2 and loadable plugin protocol mismatch error (esneiders)
+........S. [ZBX-22557] fixed time zones conflict lead to report sheduling errors (sboidenko)
+..F....... [ZBX-21618] fixed layout for multiple lists when long names are used (esekace)
+..F....... [ZBX-25026] fixed percentile line being displayed outside of classic graph (Ivo)
+.......PS. [ZBX-22754] fixed 'Too old events' error for vmware.eventlog item (MVekslers)
+...G...... [ZBX-23535] added alternative data source parsing for key ceph.status (rzvejs)
+...G...... [ZBX-24418] fix Zabbix agent 2 build on mips architectures (rzvejs)
 ...G...... [ZBX-24471] fixed system.run[,nowait] to include double quotes the same way as system.run[,wait] (asestakovs)
 ...G...... [ZBX-24619] updated atomic variables to be more safe (esneiders)
 ..F....... [ZBX-24052] fixed the error when applying subfilter by tag on graph page if item tag contains special characters (wczerneha)
