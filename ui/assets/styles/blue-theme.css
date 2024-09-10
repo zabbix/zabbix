@@ -3099,6 +3099,8 @@ form.is-loading {
   .list-table .list-table-actions {
     text-align: right;
     white-space: nowrap; }
+  .list-table .wordbreak {
+    white-space: normal; }
   .list-table.sticky-header thead {
     position: sticky;
     top: 0;

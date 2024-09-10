@@ -728,6 +728,11 @@ form {
 		white-space: nowrap;
 	}
 
+	.wordbreak {
+		white-space: normal;
+	}
+
+
 	&.sticky-header {
 		thead {
 			position: sticky;
