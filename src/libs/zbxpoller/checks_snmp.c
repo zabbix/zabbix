@@ -2704,6 +2704,9 @@ static int	asynch_response(int operation, struct snmp_session *sp, int reqid, st
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "unexpected response request id:%d expected request id:%d command:%d"
 				" operation:%d", reqid, bulkwalk_context->reqid, pdu->command, operation);
+
+		zbx_free(bulkwalk_context->error);
+		bulkwalk_context->error = zbx_dsprintf(bulkwalk_context->error, "unexpected response");
 		return 0;
 	}
 
@@ -2949,7 +2952,7 @@ static int	snmp_task_process(short event, void *data, int *fd, const char *addr,
 	zbx_poller_config_t	*poller_config = (zbx_poller_config_t *)snmp_context->arg_action;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() %s event:%d fd:%d itemid:" ZBX_FS_UI64, __func__,
-			get_event_string(event), event, *fd, snmp_context->item.itemid);
+			zbx_get_event_string(event), event, *fd, snmp_context->item.itemid);
 
 	bulkwalk_context = snmp_context->bulkwalk_contexts.values[snmp_context->i];
 
@@ -2982,7 +2985,7 @@ static int	snmp_task_process(short event, void *data, int *fd, const char *addr,
 		if (0 < snmp_context->retries--)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "cannot receive response for itemid:" ZBX_FS_UI64
-					" from [[%s]:%hu]: timed out after % seconds, retrying",
+					" from [[%s]:%hu]: timed out, retrying",
 					snmp_context->item.itemid, snmp_context->item.interface.addr,
 					snmp_context->item.interface.port);
 
@@ -3142,13 +3145,13 @@ stop:
 	if (ZBX_ASYNC_TASK_STOP == task_ret && ZBX_ISSET_MSG(&snmp_context->item.result))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "End of %s() %s event:%d fd:%d itemid:" ZBX_FS_UI64 " error:%s",
-				__func__, get_event_string(event), event, *fd, snmp_context->item.itemid,
+				__func__, zbx_get_event_string(event), event, *fd, snmp_context->item.itemid,
 				snmp_context->item.result.msg);
 	}
 	else
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "End of %s() %s event:%d fd:%d itemid:" ZBX_FS_UI64 " state:%s",
-				__func__, get_event_string(event), event, *fd, snmp_context->item.itemid,
+				__func__, zbx_get_event_string(event), event, *fd, snmp_context->item.itemid,
 				zbx_task_state_to_str(task_ret));
 	}
 

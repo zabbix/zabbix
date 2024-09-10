@@ -54,7 +54,7 @@ zbx_async_task_state_t	zbx_async_poller_get_task_state_for_event(short event);
 void			zbx_async_poller_add_task(struct event_base *ev, struct evdns_base *dnsbase, const char *addr,
 		void *data, int timeout, zbx_async_task_process_cb_t process_cb, zbx_async_task_clear_cb_t clear_cb);
 const char		*zbx_resolv_conf_errstr(int error);
-const char		*get_event_string(short event);
+const char		*zbx_get_event_string(short event);
 const char		*zbx_task_state_to_str(zbx_async_task_state_t task_state);
 #endif
 #endif

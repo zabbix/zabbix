@@ -279,7 +279,7 @@ const char	*zbx_resolv_conf_errstr(const int error)
 	}
 }
 
-const char	*get_event_string(short event)
+const char	*zbx_get_event_string(short event)
 {
 
 	if (EV_TIMEOUT & event)
