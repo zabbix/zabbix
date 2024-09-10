@@ -16,7 +16,7 @@
 #include "zbxmockdata.h"
 #include "zbxmockassert.h"
 #include "zbxmockutil.h"
-#include "zbxexpr.h"
+#include "zbxexpression.h"
 
 #define MACROFUNC_INPUT_SIZE	1024
 
