@@ -31,11 +31,12 @@
  ******************************************************************************/
 int	zbx_variant_to_value_type(zbx_variant_t *value, unsigned char value_type, char **errmsg)
 {
-	#define ZBX_MAX_ERROR_DESC_BUFF 240
+	#define	ZBX_MAX_ERROR_DESC_BUFF	240
 	int	ret;
-	char *value_desc;
-	char error_buffer[ZBX_MAX_ERROR_DESC_BUFF];
-	size_t char_max = ZBX_MAX_ERROR_DESC_BUFF - 1;
+	char	*value_desc;
+	char	error_buffer[ZBX_MAX_ERROR_DESC_BUFF];
+	size_t	char_max = ZBX_MAX_ERROR_DESC_BUFF - 1;
+
 	zbx_free(*errmsg);
 	memset(error_buffer, 0, sizeof(error_buffer));
 
@@ -73,12 +74,11 @@ int	zbx_variant_to_value_type(zbx_variant_t *value, unsigned char value_type, ch
 	{
 		value_desc = zbx_strdup(NULL ,zbx_variant_value_desc(value));
 		zbx_strlcat(error_buffer, value_desc, char_max);
-		*errmsg = zbx_dsprintf(NULL, "Value of type \"%s\" is not suitable for value type \"%s\". Value \"%s...\"",
-		zbx_variant_type_desc(value), zbx_item_value_type_string(value_type), error_buffer);
+		*errmsg = zbx_dsprintf(NULL, "Value of type \"%s\" is not suitable for value type \"%s\". Value
+		\"%s...\"", zbx_variant_type_desc(value), zbx_item_value_type_string(value_type), error_buffer);
 		zbx_free(value_desc);
 	}
 
 	return ret;
 	#undef ZBX_MAX_ERROR_DESC_BUFF
 }
-
