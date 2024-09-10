@@ -3287,6 +3287,9 @@ int	zbx_async_check_snmp(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_async_ta
 		goto out;
 	}
 
+	if (ZBX_SNMP_OID == snmp_context->snmp_oid_type)
+		snmp_context->snmp_oid_type = ZBX_SNMP_GET;
+
 	for (int i = 0; i < snmp_context->param_oids.values_num; i++)
 	{
 		zbx_bulkwalk_context_t	*bulkwalk_context;
