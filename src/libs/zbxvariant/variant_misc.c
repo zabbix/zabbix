@@ -33,11 +33,11 @@ int	zbx_variant_to_value_type(zbx_variant_t *value, unsigned char value_type, ch
 {
 	#define ZBX_MAX_ERROR_DESC_BUFF 240
 	int	ret;
-	const char *value_desc;
-	char *error_buffer[ZBX_MAX_ERROR_DESC_BUFF];
+	char *value_desc;
+	char error_buffer[ZBX_MAX_ERROR_DESC_BUFF];
 	size_t char_max = ZBX_MAX_ERROR_DESC_BUFF - 1;
 	zbx_free(*errmsg);
-	memset(error_buffer, 0, ZBX_MAX_ERROR_DESC_BUFF);
+	memset(error_buffer, 0, sizeof(error_buffer));
 
 	switch (value_type)
 	{
