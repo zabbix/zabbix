@@ -3066,7 +3066,7 @@ static int	snmp_task_process(short event, void *data, int *fd, const char *addr,
 			{
 				snmp_context->item.ret = NOTSUPPORTED;
 				SET_MSG_RESULT(&snmp_context->item.result,
-						"snmp_sess_select_info2(): cannot get socket.");
+						zbx_strdup(NULL, "snmp_sess_select_info2(): cannot get socket."));
 				goto stop;
 			}
 
