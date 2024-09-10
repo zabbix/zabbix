@@ -419,7 +419,7 @@ function zbx_db_search($table, $options, &$sql_parts) {
 			continue;
 		}
 
-		if (!in_array($tableSchema['fields'][$field]['type'], DB::SUPPORTED_SEARCH_TYPES)) {
+		if (($tableSchema['fields'][$field]['type'] & DB::SUPPORTED_SEARCH_TYPES) == 0) {
 			continue;
 		}
 
