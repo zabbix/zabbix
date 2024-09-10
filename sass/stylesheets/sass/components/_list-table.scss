@@ -192,6 +192,10 @@
 		}
 	}
 
+	.wordbreak {
+		white-space: normal;
+	}
+
 	&.compact-view {
 		td {
 			padding-top: 2px;
