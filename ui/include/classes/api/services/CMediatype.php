@@ -155,12 +155,12 @@ class CMediatype extends CApiService {
 		}
 
 		// filter
-		if (is_array($options['filter'])) {
+		if ($options['filter'] !== null) {
 			$this->dbFilter('media_type mt', $options, $sqlParts);
 		}
 
 		// search
-		if (is_array($options['search'])) {
+		if ($options['search'] !== null) {
 			zbx_db_search('media_type mt', $options, $sqlParts);
 		}
 
