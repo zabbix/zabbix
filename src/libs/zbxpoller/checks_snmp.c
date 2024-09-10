@@ -2813,21 +2813,10 @@ static int	snmp_bulkwalk_add(zbx_snmp_context_t *snmp_context, int *fd, char *er
 	struct timeval			timeout = {0};
 	fd_set				fdset;
 
-	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
-	{
-		char	buffer[MAX_OID_LEN];
-
-		snprint_objid(buffer, sizeof(buffer), bulkwalk_context->name,  bulkwalk_context->name_length);
-
-		zabbix_log(LOG_LEVEL_DEBUG, "In %s() OID: '%s'",__func__, buffer);
-	}
-
-	netsnmp_session	*session = snmp_sess_session(snmp_context->ssp);
-
-	session->retries = 1;
-
 	if (1 == snmp_context->probe)
 	{
+		netsnmp_session	*session = snmp_sess_session(snmp_context->ssp);
+
 		session->flags |= SNMP_FLAGS_DONT_PROBE;
 
 		if (NULL == (pdu = usm_probe_pdu_create()))
@@ -2839,6 +2828,15 @@ static int	snmp_bulkwalk_add(zbx_snmp_context_t *snmp_context, int *fd, char *er
 	}
 	else
 	{
+		if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
+		{
+			char	buffer[MAX_OID_LEN];
+
+			snprint_objid(buffer, sizeof(buffer), bulkwalk_context->name,  bulkwalk_context->name_length);
+
+			zabbix_log(LOG_LEVEL_DEBUG, "In %s() OID: '%s'",__func__, buffer);
+		}
+
 		/* create PDU */
 		if (NULL == (pdu = snmp_pdu_create(bulkwalk_context->pdu_type)))
 		{
@@ -2984,7 +2982,7 @@ static int	snmp_task_process(short event, void *data, int *fd, const char *addr,
 		if (0 < snmp_context->retries--)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "cannot receive response for itemid:" ZBX_FS_UI64
-					" from [[%s]:%hu]: timed out, retrying",
+					" from [[%s]:%hu]: timed out after % seconds, retrying",
 					snmp_context->item.itemid, snmp_context->item.interface.addr,
 					snmp_context->item.interface.port);
 
@@ -3143,13 +3141,13 @@ static int	snmp_task_process(short event, void *data, int *fd, const char *addr,
 stop:
 	if (ZBX_ASYNC_TASK_STOP == task_ret && ZBX_ISSET_MSG(&snmp_context->item.result))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "End of %s() %s event:%d fd:%d itemid:" ZBX_FS_UI64 " %s requested: %s",
+		zabbix_log(LOG_LEVEL_DEBUG, "End of %s() %s event:%d fd:%d itemid:" ZBX_FS_UI64 " error:%s",
 				__func__, get_event_string(event), event, *fd, snmp_context->item.itemid,
-				zbx_task_state_to_str(task_ret), snmp_context->item.result.msg);
+				snmp_context->item.result.msg);
 	}
 	else
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "End of %s() %s event:%d fd:%d itemid:" ZBX_FS_UI64 " %s requested",
+		zabbix_log(LOG_LEVEL_DEBUG, "End of %s() %s event:%d fd:%d itemid:" ZBX_FS_UI64 " state:%s",
 				__func__, get_event_string(event), event, *fd, snmp_context->item.itemid,
 				zbx_task_state_to_str(task_ret));
 	}
