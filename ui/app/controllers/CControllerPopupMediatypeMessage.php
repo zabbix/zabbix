@@ -64,7 +64,7 @@ class CControllerPopupMediatypeMessage extends CController {
 	}
 
 	protected function checkPermissions() {
-		return true;
+		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_MEDIA_TYPES);
 	}
 
 	protected function doAction() {
