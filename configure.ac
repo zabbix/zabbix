@@ -160,6 +160,31 @@ AS_IF([test $cc_accepts_werror = yes],
     ]
 )
 
+dnl A C99 compliant compiler must support this.
+dnl
+dnl The implementations differ across compilers and platforms.
+dnl GCC allocates the storage blocks in bss during compilation,
+dnl while others elect for the runtime loader to handle the allocation.
+dnl
+dnl This means the proper test would be to run the executable,
+dnl but that would make no sense when cross-compiling,
+dnl so the best we can do is just reject compilers that don't even
+dnl recognize the keyword.
+AC_MSG_CHECKING(whether compiler supports thread-local storage)
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+    #include <stdio.h>
+    ]], [[
+    static __thread int a = 0;
+    (void)a;
+    ]])],
+    [
+        AC_MSG_RESULT(yes)
+    ], [
+        AC_MSG_RESULT(no)
+        AC_MSG_ERROR([compiler does not recognize the __thread keyword])
+    ]
+)
+
 dnl *****************************************************************
 dnl *                                                               *
 dnl *                   Checks for header files                     *
@@ -809,11 +834,6 @@ AC_LINK_IFELSE([AC_LANG_PROGRAM([[]], [[]])],[HAVE_START_GROUP="yes"
 AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no)
 ])
 LDFLAGS="$saved_LDFLAGS"
-
-AC_MSG_CHECKING(for '__thread' compiler support)
-AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <stdio.h>]], [[static __thread int a = 0;]])],[AC_DEFINE(HAVE_THREAD_LOCAL,1,Define to 1 if compiler keyword '__thread' supported.)
-AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no)
-HAVE_THREAD_LOCAL="no"])
 
 AC_MSG_CHECKING(for field updates in struct vminfo_t)
 AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
