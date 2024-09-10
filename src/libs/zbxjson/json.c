@@ -280,14 +280,15 @@ static char	zbx_num2hex(unsigned char c)
 
 static char	*__zbx_json_insstring_limit(char *p, const char *string, zbx_json_type_t type, size_t str_len)
 {
-	const char	*sptr;
+	const char	*sptr, *start;
 	char		buffer[] = {"null"};
 
 	if (NULL != string && ZBX_JSON_TYPE_STRING == type)
 		*p++ = '"';
 
-	for (sptr = (NULL != string ? string : buffer); (0 == str_len || (size_t)(sptr - string) < str_len) &&
-			'\0' != *sptr; sptr++)
+	start = (NULL != string ? string : buffer);
+
+	for (sptr = start; (0 == str_len || (size_t)(sptr - start) < str_len) && '\0' != *sptr; sptr++)
 	{
 		switch (*sptr)
 		{
