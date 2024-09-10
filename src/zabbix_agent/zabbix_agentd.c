@@ -1228,7 +1228,7 @@ static void	signal_redirect_cb(int flags, zbx_signal_handler_f sigusr_handler)
 			}
 			else
 			{
-				if (scope < ZBX_PROCESS_TYPE_MAIN)
+				if (scope < ZBX_PROCESS_TYPE_COUNT)
 				{
 					zbx_signal_process_by_type(ZBX_RTC_GET_SCOPE(flags), ZBX_RTC_GET_DATA(flags),
 							flags, NULL);

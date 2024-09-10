@@ -410,11 +410,6 @@ static int	get_process_info_by_thread(int local_server_num, unsigned char *local
 		/* fail if the main process is queried */
 		return FAIL;
 	}
-	else if (local_server_num <= (server_count += config_forks[ZBX_PROCESS_TYPE_HA_MANAGER]))
-	{
-		*local_process_type = ZBX_PROCESS_TYPE_HA_MANAGER;
-		*local_process_num = local_server_num - server_count + config_forks[ZBX_PROCESS_TYPE_HA_MANAGER];
-	}
 	else if (local_server_num <= (server_count += config_forks[ZBX_PROCESS_TYPE_SERVICEMAN]))
 	{
 		/* start service manager process and load configuration cache in parallel */
@@ -1692,11 +1687,12 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 
 	for (zbx_threads_num = 0, i = 0; i < ZBX_PROCESS_TYPE_COUNT; i++)
 	{
-		/* skip threaded components */
+		/* skip HA manager that is started separately and threaded components */
 		switch (i)
 		{
 			case ZBX_PROCESS_TYPE_PREPROCESSOR:
 			case ZBX_PROCESS_TYPE_DISCOVERER:
+			case ZBX_PROCESS_TYPE_HA_MANAGER:
 				continue;
 		}
 
@@ -2335,7 +2331,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize self-monitoring: %s", error);
 		zbx_free(error);
-		zbx_free_selfmon_collector();
 		exit(EXIT_FAILURE);
 	}
 

@@ -1678,7 +1678,7 @@ int	zbx_ha_start(zbx_rtc_t *rtc, zbx_ha_config_t *ha_config, char **error)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	args.args = (void *)ha_config;
-	args.info.process_type =  ZBX_PROCESS_TYPE_HA_MANAGER;
+	args.info.process_type = ZBX_PROCESS_TYPE_HA_MANAGER;
 	args.info.process_num = ZBX_HA_PROCESS_NUM;
 	zbx_thread_start(ha_manager_thread, &args, &ha_pid);
 
