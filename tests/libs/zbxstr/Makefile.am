@@ -252,7 +252,6 @@ zbx_strsplit_first_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
 
 zbx_strsplit_first_CFLAGS = $(STR_COMPILER_FLAGS)
 
-
 # zbx_strsplit_last
 
 zbx_strsplit_last_SOURCES = \

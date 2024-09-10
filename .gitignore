@@ -222,6 +222,7 @@ tests/libs/zbxprometheus/zbx_prometheus_pattern
 tests/libs/zbxprometheus/zbx_prometheus_to_json
 tests/libs/zbxregexp/wildcard_match
 tests/libs/zbxstr/zbx_charcount_utf8_nbytes
+tests/libs/zbxstr/convert_to_utf8
 tests/libs/zbxstr/zbx_del_zeros
 tests/libs/zbxstr/zbx_dyn_escape_string
 tests/libs/zbxstr/zbx_get_escape_string_len
@@ -233,6 +234,7 @@ tests/libs/zbxstr/zbx_remove_chars
 tests/libs/zbxstr/zbx_replace_invalid_utf8
 tests/libs/zbxstr/zbx_replace_mem_dyn
 tests/libs/zbxstr/zbx_replace_string
+tests/libs/zbxstr/zbx_str_extract
 tests/libs/zbxstr/zbx_str_in_list
 tests/libs/zbxstr/zbx_str_linefeed
 tests/libs/zbxstr/zbx_str_n_in_list
