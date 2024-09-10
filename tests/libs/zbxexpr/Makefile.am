@@ -10,13 +10,16 @@ BINARIES_tests = \
 	is_double_suffix \
 	zbx_user_macro_parse \
 	zbx_get_report_nextcheck \
-	macro_func \
-	macro_tr \
 	zbx_function_param_parse_ext
 
+if SERVER
+BINARIES_tests += macro_func \
+	macro_tr
 if HAVE_PCRE2
 BINARIES_tests += macro_regrepl
 endif
+endif
+
 
 noinst_PROGRAMS = $(BINARIES_tests)
 
@@ -48,16 +51,21 @@ MOCK_TEST_DEPS = \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
 
 EXPR_LIBS = \
-	$(top_srcdir)/src/libs/zbxexpression/libzbxexpression.a \
 	$(top_srcdir)/src/libs/zbxexpr/libzbxexpr.a \
-	$(top_srcdir)/src/libs/zbxregexp/libzbxregexp.a \
-	$(top_srcdir)/src/libs/zbxcrypto/libzbxcrypto.a \
 	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
 	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
 	$(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(MOCK_DATA_DEPS) \
 	$(MOCK_TEST_DEPS)
+
+if SERVER
+EXPR_LIBS += \
+	$(top_srcdir)/src/libs/zbxexpression/libzbxexpression.a \
+        $(top_srcdir)/src/libs/zbxexpr/libzbxexpr.a \
+	$(top_srcdir)/src/libs/zbxregexp/libzbxregexp.a \
+	$(top_srcdir)/src/libs/zbxcrypto/libzbxcrypto.a
+endif
 
 EXPR_COMPILER_FLAGS = \
 	-I@top_srcdir@/tests \
