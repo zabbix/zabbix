@@ -139,7 +139,7 @@ foreach ($data['slas'] as $slaid => $sla) {
 				->addClass('js-edit-sla')
 				->setAttribute('data-slaid', $slaid)
 			: $sla['name']
-		))->addClass(ZBX_STYLE_WORDWRAP),
+		))->addClass(ZBX_STYLE_WORDBREAK),
 		CSlaHelper::getSloTag((float) $sla['slo']),
 		zbx_date2str(DATE_FORMAT, $sla['effective_date'], 'UTC'),
 		CSlaHelper::getPeriodNames()[$sla['period']],

@@ -212,7 +212,7 @@ class CScreenDiscovery extends CScreenBase {
 				);
 
 				$col
-					->addClass(ZBX_STYLE_WORDWRAP)
+					->addClass(ZBX_STYLE_WORDBREAK)
 					->setColSpan(count($services) + 3);
 
 				$table->addRow($col);

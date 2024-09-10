@@ -277,8 +277,8 @@ foreach ($data['discoveries'] as $discovery) {
 
 	$discoveryTable->addRow([
 		new CCheckBox('g_hostdruleid['.$discovery['itemid'].']', $discovery['itemid']),
-		(new CCol($discovery['hosts'][0]['name']))->addClass(ZBX_STYLE_WORDWRAP),
-		(new CCol($description))->addClass(ZBX_STYLE_WORDWRAP),
+		(new CCol($discovery['hosts'][0]['name']))->addClass(ZBX_STYLE_WORDBREAK),
+		(new CCol($description))->addClass(ZBX_STYLE_WORDBREAK),
 		[
 			(new CLink(_('Item prototypes'),
 				(new CUrl('disc_prototypes.php'))

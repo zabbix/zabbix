@@ -198,7 +198,7 @@ $triggers_table = (new CTableInfo())->setHeader([
 		: null,
 	make_sorting_header(_('Name'), 'description', $data['sort'], $data['sortorder'], $url),
 	_('Operational data'),
-	(new CColHeader(_('Expression')))->setWidth('30%'),
+	_('Expression'),
 	make_sorting_header(_('Status'), 'status', $data['sort'], $data['sortorder'], $url),
 	$data['show_info_column'] ? _('Info') : null,
 	_('Tags')
@@ -308,7 +308,7 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 			$hosts[] = $host['name'];
 		}
 
-		$hosts = (new CCol($hosts))->addClass(ZBX_STYLE_WORDWRAP);
+		$hosts = (new CCol($hosts))->addClass(ZBX_STYLE_WORDBREAK);
 	}
 
 	if ($trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
@@ -333,9 +333,9 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 		CSeverityHelper::makeSeverityCell((int) $trigger['priority']),
 		$data['show_value_column'] ? $trigger_value : null,
 		$hosts,
-		(new CCol($description))->addClass(ZBX_STYLE_WORDWRAP),
-		(new CCol($trigger['opdata']))->addClass(ZBX_STYLE_WORDWRAP),
-		(new CDiv($expression))->addClass(ZBX_STYLE_WORDWRAP),
+		(new CCol($description))->addClass(ZBX_STYLE_WORDBREAK),
+		(new CCol($trigger['opdata']))->addClass(ZBX_STYLE_WORDBREAK),
+		(new CDiv($expression))->addClass(ZBX_STYLE_WORDBREAK),
 		$status,
 		$data['show_info_column'] ? makeInformationList($info_icons) : null,
 		$data['tags'][$triggerid]

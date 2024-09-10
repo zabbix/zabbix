@@ -103,7 +103,7 @@ foreach ($data['drules'] as $drule) {
 		(new CCol(new CLink($drule['name'], (new CUrl('zabbix.php'))
 			->setArgument('action', 'discovery.edit')
 			->setArgument('druleid', $drule['druleid'])
-		)))->addClass(ZBX_STYLE_WORDWRAP),
+		)))->addClass(ZBX_STYLE_WORDBREAK),
 		$drule['iprange'],
 		$drule['proxy'],
 		$drule['delay'],

@@ -153,9 +153,9 @@ if ($this->data['actions']) {
 					->setArgument('form', 'update')
 					->setArgument('actionid', $action['actionid'])
 				))
-			))->addClass(ZBX_STYLE_WORDWRAP),
-			(new CCol($conditions))->addClass(ZBX_STYLE_WORDWRAP),
-			(new CCol($operations))->addClass(ZBX_STYLE_WORDWRAP),
+			))->addClass(ZBX_STYLE_WORDBREAK),
+			(new CCol($conditions))->addClass(ZBX_STYLE_WORDBREAK),
+			(new CCol($operations))->addClass(ZBX_STYLE_WORDBREAK),
 			$status
 		]);
 	}

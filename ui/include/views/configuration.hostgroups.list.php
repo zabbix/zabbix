@@ -182,7 +182,7 @@ foreach ($this->data['groups'] as $group) {
 	$hostGroupTable->addRow([
 		new CCheckBox('groups['.$group['groupid'].']', $group['groupid']),
 		(new CCol($name))
-			->addClass(ZBX_STYLE_WORDWRAP)
+			->addClass(ZBX_STYLE_WORDBREAK)
 			->setWidth('15%'),
 		[
 			$data['allowed_ui_conf_hosts']
@@ -203,7 +203,7 @@ foreach ($this->data['groups'] as $group) {
 				: _('Templates'),
 			CViewHelper::showNum($templateCount)
 		],
-		empty($hostsOutput) ? '' : (new CCol($hostsOutput))->addClass(ZBX_STYLE_WORDWRAP),
+		empty($hostsOutput) ? '' : (new CCol($hostsOutput))->addClass(ZBX_STYLE_WORDBREAK),
 		makeInformationList($info_icons)
 	]);
 }
