@@ -152,10 +152,6 @@ foreach ($data['mediatypes'] as $media_type) {
 		}
 	}
 
-	$action_column = (new CCol($actions))
-		->addStyle('white-space: normal;')
-		->addClass(ZBX_STYLE_WORDBREAK);
-
 	$status = (MEDIA_TYPE_STATUS_ACTIVE == $media_type['status'])
 		? (new CLink(_('Enabled')))
 			->addClass(ZBX_STYLE_LINK_ACTION)
@@ -186,7 +182,7 @@ foreach ($data['mediatypes'] as $media_type) {
 		CMediatypeHelper::getMediaTypes($media_type['typeid']),
 		$status,
 		(new CCol($action_count_total))->addClass(ZBX_STYLE_CELL_WIDTH),
-		$action_column,
+		(new CCol($actions))->addClass(ZBX_STYLE_WORDBREAK),
 		(new CCol($details))->addClass(ZBX_STYLE_WORDBREAK),
 		$test_link
 	]);
