@@ -1458,8 +1458,7 @@ footer {
 
 .dashboard-list .dashboard-list-item {
   display: flex;
-  justify-content: space-between;
-  height: 18px; }
+  justify-content: space-between; }
   .dashboard-list .dashboard-list-item .status-green {
     background-color: #555555;
     border-color: #555555; }
@@ -7643,7 +7642,7 @@ td.inactive-bg {
   background-position: -249px -325px; }
 
 .icon-action-close::before {
-  background-position: -224px -325px; }
+  background-position: -224px -285px; }
 
 .icon-action-msg::before {
   background-position: -299px -285px; }

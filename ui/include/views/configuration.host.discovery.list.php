@@ -277,45 +277,45 @@ foreach ($data['discoveries'] as $discovery) {
 
 	$discoveryTable->addRow([
 		new CCheckBox('g_hostdruleid['.$discovery['itemid'].']', $discovery['itemid']),
-		$discovery['hosts'][0]['name'],
-		$description,
+		(new CCol($discovery['hosts'][0]['name']))->addClass(ZBX_STYLE_WORDBREAK),
+		(new CCol($description))->addClass(ZBX_STYLE_WORDBREAK),
 		[
-			new CLink(_('Item prototypes'),
+			(new CLink(_('Item prototypes'),
 				(new CUrl('disc_prototypes.php'))
 					->setArgument('parent_discoveryid', $discovery['itemid'])
 					->setArgument('context', $data['context'])
-			),
+			))->addClass(ZBX_STYLE_NOWRAP),
 			CViewHelper::showNum($discovery['items'])
 		],
 		[
-			new CLink(_('Trigger prototypes'),
+			(new CLink(_('Trigger prototypes'),
 				(new CUrl('trigger_prototypes.php'))
 					->setArgument('parent_discoveryid', $discovery['itemid'])
 					->setArgument('context', $data['context'])
-			),
+			))->addClass(ZBX_STYLE_NOWRAP),
 			CViewHelper::showNum($discovery['triggers'])
 		],
 		[
-			new CLink(_('Graph prototypes'),
+			(new CLink(_('Graph prototypes'),
 				(new CUrl('graphs.php'))
 					->setArgument('parent_discoveryid', $discovery['itemid'])
 					->setArgument('context', $data['context'])
-			),
+			))->addClass(ZBX_STYLE_NOWRAP),
 			CViewHelper::showNum($discovery['graphs'])
 		],
 		($discovery['hosts'][0]['flags'] == ZBX_FLAG_DISCOVERY_NORMAL)
 			? [
-				new CLink(_('Host prototypes'),
+				(new CLink(_('Host prototypes'),
 					(new CUrl('host_prototypes.php'))
 						->setArgument('parent_discoveryid', $discovery['itemid'])
 						->setArgument('context', $data['context'])
-				),
+				))->addClass(ZBX_STYLE_NOWRAP),
 				CViewHelper::showNum($discovery['hostPrototypes'])
 			]
 			: '',
-		(new CDiv($discovery['key_']))->addClass(ZBX_STYLE_WORDWRAP),
+		(new CDiv($discovery['key_']))->addClass(ZBX_STYLE_WORDBREAK),
 		$discovery['delay'],
-		item_type2str($discovery['type']),
+		(new CCol(item_type2str($discovery['type'])))->addClass(ZBX_STYLE_NOWRAP),
 		$status,
 		($data['context'] === 'host') ? makeInformationList($info_icons) : null
 	]);
