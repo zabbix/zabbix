@@ -2866,7 +2866,6 @@ static int	snmp_bulkwalk_add(zbx_snmp_context_t *snmp_context, int *fd, char *er
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() sending", __func__);
 
 	bulkwalk_context->reqid = -1;
-	bulkwalk_context->waiting = 1;
 	bulkwalk_context->operation = 0;
 
 	if (0 == (bulkwalk_context->reqid = snmp_sess_async_send(snmp_context->ssp, pdu, asynch_response,
@@ -3028,6 +3027,8 @@ static int	snmp_task_process(short event, void *data, int *fd, const char *addr,
 	}
 	else if (0 != event)
 	{
+		bulkwalk_context->waiting = 1;
+
 		if (0 != snmp_sess_read2(snmp_context->ssp, &bulkwalk_context->fdset))
 		{
 			char		*tmp_err_str = NULL;
@@ -3047,6 +3048,29 @@ static int	snmp_task_process(short event, void *data, int *fd, const char *addr,
 			}
 
 			zbx_free(tmp_err_str);
+			goto stop;
+		}
+
+		/* socket became readable but callback was not invoked, this can mean that response to previous */
+		/* request arrived after retry and was ignored by the library, continue waiting for response    */
+		if (1 == bulkwalk_context->waiting)
+		{
+			int		numfds = 0, block = 0;
+			struct timeval	timeout = {0};
+
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot process PDU result for itemid:" ZBX_FS_UI64,
+					snmp_context->item.itemid);
+
+			if (1 > snmp_sess_select_info2(snmp_context->ssp, &numfds, &bulkwalk_context->fdset, &timeout,
+					&block))
+			{
+				snmp_context->item.ret = NOTSUPPORTED;
+				SET_MSG_RESULT(&snmp_context->item.result,
+						"snmp_sess_select_info2(): cannot get socket.");
+				goto stop;
+			}
+
+			task_ret = ZBX_ASYNC_TASK_READ;
 			goto stop;
 		}
 
@@ -3078,12 +3102,6 @@ static int	snmp_task_process(short event, void *data, int *fd, const char *addr,
 			SET_MSG_RESULT(&snmp_context->item.result, bulkwalk_context->error);
 			bulkwalk_context->error = NULL;
 			goto stop;
-		}
-
-		if (1 == bulkwalk_context->waiting)
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "cannot process PDU result for itemid:" ZBX_FS_UI64,
-					snmp_context->item.itemid);
 		}
 
 		if (0 == bulkwalk_context->running)
