@@ -184,13 +184,13 @@ window.tophosts_column_edit_form = new class {
 	 * Fetch type of item by item name.
 	 *
 	 * @param {string|null} name
-	 * @param {array|null} groupids  Host group ids from widget main configuration form fields.
-	 * @param {array|null} hostids   Host ids from widget main configuration form fields.
+	 * @param {array}       groupids  Host group ids from widget main configuration form fields.
+	 * @param {array}       hostids   Host ids from widget main configuration form fields.
 	 *
 	 * @return {Promise<any>}  Resolved promise will contain item type of first found item of such name,
 	 *                         or null in case of error or if no item is currently selected.
 	 */
-	#promiseGetItemType(name, groupids = null, hostids = null) {
+	#promiseGetItemType(name, groupids, hostids) {
 		if (name === null) {
 			return Promise.resolve(null);
 		}
