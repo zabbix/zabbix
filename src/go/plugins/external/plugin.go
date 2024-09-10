@@ -387,7 +387,6 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	if ctx.Timeout() != 0 {
 		// add 0.5 seconds to buffer the time it takes to send request and
 		// receive response
-		//nolint:mnd
 		respTimeout = time.Second*time.Duration(ctx.Timeout()) + time.Millisecond*500
 	}
 
