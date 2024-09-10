@@ -1421,7 +1421,6 @@ AC_ARG_ENABLE(agent2,[  --enable-agent2         Turn on build of Zabbix agent 2]
   no)  agent2=no ;;
   *) AC_MSG_ERROR([bad value ${enableval} for --enable-agent2]) ;;
 esac
-test "x$agent2" = "xyes" -a "x$HAVE_THREAD_LOCAL" = "xno" && AC_MSG_ERROR([C compiler is not compatible with agent2 assembly])
 ],
 [agent2=no])
 AM_CONDITIONAL(AGENT2, test "x$agent2" = "xyes")
@@ -1432,7 +1431,6 @@ AC_ARG_ENABLE(webservice,[  --enable-webservice         Turn on build of Zabbix 
   no)  webservice=no ;;
   *) AC_MSG_ERROR([bad value ${enableval} for --enable-webservice]) ;;
 esac
-test "x$webservice" = "xyes" -a "x$HAVE_THREAD_LOCAL" = "xno" && AC_MSG_ERROR([C compiler is not compatible with webservice assembly])
 ],
 [webservice=no])
 AM_CONDITIONAL(WEBSERVICE, test "x$webservice" = "xyes")
