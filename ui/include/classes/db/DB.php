@@ -31,6 +31,9 @@ class DB {
 	const FIELD_TYPE_TEXT = 'text';
 	const FIELD_TYPE_CUID = 'cuid';
 
+	const SUPPORTED_FILTER_TYPES = [self::FIELD_TYPE_INT, self::FIELD_TYPE_CHAR, self::FIELD_TYPE_ID,
+		self::FIELD_TYPE_FLOAT, self::FIELD_TYPE_UINT, self::FIELD_TYPE_CUID
+	];
 	const SUPPORTED_SEARCH_TYPES = [self::FIELD_TYPE_CHAR, self::FIELD_TYPE_TEXT, self::FIELD_TYPE_CUID];
 
 	private static $schema = null;
@@ -1124,7 +1127,7 @@ class DB {
 
 			$field_schema = $table_schema['fields'][$field_name];
 
-			if ($field_schema['type'] === self::FIELD_TYPE_TEXT || $field_schema['type'] === self::FIELD_TYPE_BLOB) {
+			if (!in_array($field_schema['type'], self::SUPPORTED_FILTER_TYPES)) {
 				self::exception(self::SCHEMA_ERROR,
 					vsprintf('%s: field "%s.%s" has an unsupported type.', [__FUNCTION__, $table_name, $field_name])
 				);
@@ -1179,8 +1182,7 @@ class DB {
 		$filter_fields = [];
 
 		foreach ($table_schema['fields'] as $field_name => $field_schema) {
-			if ($field_schema['type'] !== self::FIELD_TYPE_TEXT
-					&& $field_schema['type'] !== self::FIELD_TYPE_BLOB) {
+			if (in_array($field_schema['type'], self::SUPPORTED_FILTER_TYPES)) {
 				$filter_fields[] = $field_name;
 			}
 		}
