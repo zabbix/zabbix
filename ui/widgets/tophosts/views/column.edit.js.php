@@ -195,25 +195,19 @@ window.tophosts_column_edit_form = new class {
 			return Promise.resolve(null);
 		}
 
-		const curl = new Curl('jsrpc.php');
-
-		curl.setArgument('method', 'item_value_type_by_name.get');
-		curl.setArgument('type', <?= PAGE_TYPE_TEXT_RETURN_JSON ?>);
-		curl.setArgument('name', name);
-		curl.setArgument('groupids', groupids);
-		curl.setArgument('hostids', hostids);
-
-		return fetch(curl.getUrl())
-			.then((response) => response.json())
-			.then((response) => {
-				if ('error' in response) {
-					throw {error: response.error};
-				}
-
-				return parseInt(response.result);
-			})
-			.catch((exception) => {
-				console.log('Could not get item type', exception);
+		return ApiCall('item.get', {
+			output: ['value_type'],
+			groupids: groupids.length ? groupids : undefined,
+			hostids: hostids.length ? hostids : undefined,
+			webitems: true,
+			search: {
+				name_resolved: name
+			},
+			limit: 1
+		})
+			.then(response => response.result.length ? parseInt(response.result[0].value_type) : null)
+			.catch(error => {
+				console.log(`Could not get item type: ${error.message}`);
 
 				return null;
 			});
