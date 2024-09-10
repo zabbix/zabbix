@@ -86,8 +86,8 @@ function discovery_object2str($object = null) {
 /**
  * Converts numerical action condition values to their corresponding string values according to action condition type.
  *
- * For action condition types such as: hosts, host groups, templates, proxies, triggers, discovery rules
- * and discovery checks, action condition values contain IDs. All unique IDs are first collected and then queried.
+ * For action condition types such as: host groups, hosts, templates, triggers, discovery rules, discovery checks,
+ * proxies and services, action condition values contain IDs. All unique IDs are first collected and then queried.
  * For other action condition types values are returned as they are or converted using simple string conversion
  * functions according to action condition type.
  *
@@ -97,16 +97,16 @@ function discovery_object2str($object = null) {
  *
  * @return array  Returns an array of actions condition string values.
  */
-function actionConditionValueToString(array $actions) {
+function actionConditionValueToString(array $actions): array {
 	$result = [];
 
-	$groupIds = [];
-	$triggerIds = [];
-	$hostIds = [];
-	$templateIds = [];
-	$proxyIds = [];
-	$dRuleIds = [];
-	$dCheckIds = [];
+	$groupids = [];
+	$triggerids = [];
+	$hostids = [];
+	$templateids = [];
+	$proxyids = [];
+	$druleids = [];
+	$dcheckids = [];
 	$serviceids = [];
 
 	foreach ($actions as $i => $action) {
@@ -118,23 +118,38 @@ function actionConditionValueToString(array $actions) {
 
 			switch ($condition['conditiontype']) {
 				case ZBX_CONDITION_TYPE_HOST_GROUP:
-					$groupIds[$condition['value']] = $condition['value'];
+					if ($condition['value'] != 0) {
+						$groupids[$condition['value']] = $condition['value'];
+					}
+					else {
+						$result[$i][$j] = _('Deleted host group');
+					}
 					break;
 
 				case ZBX_CONDITION_TYPE_TRIGGER:
-					$triggerIds[$condition['value']] = $condition['value'];
+					if ($condition['value'] != 0) {
+						$triggerids[$condition['value']] = $condition['value'];
+					}
+					else {
+						$result[$i][$j] = _('Deleted trigger');
+					}
 					break;
 
 				case ZBX_CONDITION_TYPE_HOST:
-					$hostIds[$condition['value']] = $condition['value'];
+					if ($condition['value'] != 0) {
+						$hostids[$condition['value']] = $condition['value'];
+					}
+					else {
+						$result[$i][$j] = _('Deleted host');
+					}
 					break;
 
 				case ZBX_CONDITION_TYPE_TEMPLATE:
-					$templateIds[$condition['value']] = $condition['value'];
+					$templateids[$condition['value']] = $condition['value'];
 					break;
 
 				case ZBX_CONDITION_TYPE_PROXY:
-					$proxyIds[$condition['value']] = $condition['value'];
+					$proxyids[$condition['value']] = $condition['value'];
 					break;
 
 				case ZBX_CONDITION_TYPE_SERVICE:
@@ -165,11 +180,11 @@ function actionConditionValueToString(array $actions) {
 					break;
 
 				case ZBX_CONDITION_TYPE_DRULE:
-					$dRuleIds[$condition['value']] = $condition['value'];
+					$druleids[$condition['value']] = $condition['value'];
 					break;
 
 				case ZBX_CONDITION_TYPE_DCHECK:
-					$dCheckIds[$condition['value']] = $condition['value'];
+					$dcheckids[$condition['value']] = $condition['value'];
 					break;
 
 				case ZBX_CONDITION_TYPE_DOBJECT:
@@ -196,64 +211,64 @@ function actionConditionValueToString(array $actions) {
 	$hosts = [];
 	$templates = [];
 	$proxies = [];
-	$dRules = [];
-	$dChecks = [];
+	$drules = [];
+	$dchecks = [];
 	$services = [];
 
-	if ($groupIds) {
+	if ($groupids) {
 		$groups = API::HostGroup()->get([
 			'output' => ['name'],
-			'groupids' => $groupIds,
+			'groupids' => $groupids,
 			'preservekeys' => true
 		]);
 	}
 
-	if ($triggerIds) {
+	if ($triggerids) {
 		$triggers = API::Trigger()->get([
 			'output' => ['description'],
-			'triggerids' => $triggerIds,
+			'triggerids' => $triggerids,
 			'expandDescription' => true,
 			'selectHosts' => ['name'],
 			'preservekeys' => true
 		]);
 	}
 
-	if ($hostIds) {
+	if ($hostids) {
 		$hosts = API::Host()->get([
 			'output' => ['name'],
-			'hostids' => $hostIds,
+			'hostids' => $hostids,
 			'preservekeys' => true
 		]);
 	}
 
-	if ($templateIds) {
+	if ($templateids) {
 		$templates = API::Template()->get([
 			'output' => ['name'],
-			'templateids' => $templateIds,
+			'templateids' => $templateids,
 			'preservekeys' => true
 		]);
 	}
 
-	if ($proxyIds) {
+	if ($proxyids) {
 		$proxies = API::Proxy()->get([
 			'output' => ['name'],
-			'proxyids' => $proxyIds,
+			'proxyids' => $proxyids,
 			'preservekeys' => true
 		]);
 	}
 
-	if ($dRuleIds) {
-		$dRules = API::DRule()->get([
+	if ($druleids) {
+		$drules = API::DRule()->get([
 			'output' => ['name'],
-			'druleids' => $dRuleIds,
+			'druleids' => $druleids,
 			'preservekeys' => true
 		]);
 	}
 
-	if ($dCheckIds) {
-		$dChecks = API::DCheck()->get([
+	if ($dcheckids) {
+		$dchecks = API::DCheck()->get([
 			'output' => ['type', 'key_', 'ports', 'allow_redirect'],
-			'dcheckids' => $dCheckIds,
+			'dcheckids' => $dcheckids,
 			'selectDRules' => ['name'],
 			'preservekeys' => true
 		]);
@@ -267,7 +282,7 @@ function actionConditionValueToString(array $actions) {
 		]);
 	}
 
-	if ($groups || $triggers || $hosts || $templates || $proxies || $dRules || $dChecks || $services) {
+	if ($groups || $triggers || $hosts || $templates || $proxies || $drules || $dchecks || $services) {
 		foreach ($actions as $i => $action) {
 			foreach ($action['filter']['conditions'] as $j => $condition) {
 				$id = $condition['value'];
@@ -305,22 +320,22 @@ function actionConditionValueToString(array $actions) {
 						break;
 
 					case ZBX_CONDITION_TYPE_DRULE:
-						if (array_key_exists($id, $dRules)) {
-							$result[$i][$j] = $dRules[$id]['name'];
+						if (array_key_exists($id, $drules)) {
+							$result[$i][$j] = $drules[$id]['name'];
 						}
 						break;
 
 					case ZBX_CONDITION_TYPE_DCHECK:
-						if (array_key_exists($id, $dChecks)) {
-							$drule = reset($dChecks[$id]['drules']);
-							$type = $dChecks[$id]['type'];
-							$key_ = $dChecks[$id]['key_'];
-							$ports = $dChecks[$id]['ports'];
-							$allow_redirect = $dChecks[$id]['allow_redirect'];
+						if (array_key_exists($id, $dchecks)) {
+							$drule = reset($dchecks[$id]['drules']);
+							$type = $dchecks[$id]['type'];
+							$key_ = $dchecks[$id]['key_'];
+							$ports = $dchecks[$id]['ports'];
+							$allow_redirect = $dchecks[$id]['allow_redirect'];
 
-							$dCheck = discovery_check2str($type, $key_, $ports, $allow_redirect);
+							$dcheck = discovery_check2str($type, $key_, $ports, $allow_redirect);
 
-							$result[$i][$j] = $drule['name'].NAME_DELIMITER.$dCheck;
+							$result[$i][$j] = $drule['name'].NAME_DELIMITER.$dcheck;
 						}
 						break;
 
@@ -577,7 +592,18 @@ function getActionOperationDescriptions(array $operations, int $eventsource, arr
 					break;
 				}
 
-				if (array_key_exists('opcommand_hst', $operation) && $operation['opcommand_hst']) {
+				$operation += ['opcommand_hst' => [], 'opcommand_grp' => []];
+
+				if (!$operation['opcommand_hst'] && !$operation['opcommand_grp']) {
+					$result[$i][] = [
+						bold(_s('Run script "%1$s" on deleted object(s)', $scripts[$scriptid]['name'])),
+						BR()
+					];
+
+					break;
+				}
+
+				if ($operation['opcommand_hst']) {
 					$host_list = [];
 
 					foreach ($operation['opcommand_hst'] as $host) {
@@ -602,7 +628,7 @@ function getActionOperationDescriptions(array $operations, int $eventsource, arr
 					}
 				}
 
-				if (array_key_exists('opcommand_grp', $operation) && $operation['opcommand_grp']) {
+				if ($operation['opcommand_grp']) {
 					$host_group_list = [];
 
 					foreach ($operation['opcommand_grp'] as $host_group) {
@@ -675,6 +701,10 @@ function getActionOperationDescriptions(array $operations, int $eventsource, arr
 
 				order_result($host_group_list);
 
+				$host_group_list = $host_group_list
+					? implode(', ', $host_group_list)
+					: italic(_('Deleted host group(s)'));
+
 				if ($operation['operationtype'] == OPERATION_TYPE_GROUP_ADD) {
 					$result[$i][] = bold(_('Add to host groups').': ');
 				}
@@ -682,7 +712,7 @@ function getActionOperationDescriptions(array $operations, int $eventsource, arr
 					$result[$i][] = bold(_('Remove from host groups').': ');
 				}
 
-				$result[$i][] = [implode(', ', $host_group_list), BR()];
+				$result[$i][] = [$host_group_list, BR()];
 				break;
 
 			case OPERATION_TYPE_TEMPLATE_ADD:

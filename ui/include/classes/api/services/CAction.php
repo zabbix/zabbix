@@ -150,8 +150,8 @@ class CAction extends CApiService {
 				' WHERE a.actionid=c.actionid'.
 					' AND c.conditiontype='.ZBX_CONDITION_TYPE_HOST_GROUP.
 				' GROUP BY c.value'.
-				' HAVING MIN(r.permission) IS NULL'.
-					' OR MIN(r.permission)='.PERM_DENY.
+				' HAVING '.dbConditionString('c.value', ['0'], true).
+					' AND (MIN(r.permission) IS NULL OR MIN(r.permission)='.PERM_DENY.')'.
 			')';
 
 			// Check permissions of hosts and templates used in filter conditions.
@@ -162,6 +162,7 @@ class CAction extends CApiService {
 				' LEFT JOIN permission p ON hh.hgsetid=p.hgsetid'.
 					' AND p.ugsetid='.self::$userData['ugsetid'].
 				' WHERE a.actionid=c.actionid'.
+					' AND '.dbConditionString('c.value', ['0'], true).
 					' AND c.conditiontype IN ('.ZBX_CONDITION_TYPE_HOST.','.ZBX_CONDITION_TYPE_TEMPLATE.')'.
 					' AND p.permission IS NULL'.
 			')';
@@ -176,6 +177,7 @@ class CAction extends CApiService {
 				' LEFT JOIN permission p ON hh.hgsetid=p.hgsetid'.
 					' AND p.ugsetid='.self::$userData['ugsetid'].
 				' WHERE a.actionid=c.actionid'.
+					' AND '.dbConditionString('c.value', ['0'], true).
 					' AND c.conditiontype='.ZBX_CONDITION_TYPE_TRIGGER.
 					' AND p.permission IS NULL'.
 			')';
@@ -3406,7 +3408,6 @@ class CAction extends CApiService {
 			if (array_key_exists('filter', $action)) {
 				$actionids['filter'][] = $action['actionid'];
 				$db_actions[$action['actionid']]['filter'] = [];
-				$db_actions[$action['actionid']]['filter']['conditions'] = [];
 			}
 
 			if (!array_intersect_key(array_flip(self::OPERATION_GROUPS), $action)) {
@@ -3428,7 +3429,8 @@ class CAction extends CApiService {
 			$db_filters = DBselect(DB::makeSql('actions', $options));
 
 			while ($db_filter = DBfetch($db_filters)) {
-				$db_actions[$db_filter['actionid']]['filter'] += array_diff_key($db_filter, array_flip(['actionid']));
+				$db_actions[$db_filter['actionid']]['filter'] =
+					array_diff_key($db_filter, array_flip(['actionid'])) + ['conditions' => []];
 			}
 
 			$options = [
@@ -3447,6 +3449,12 @@ class CAction extends CApiService {
 					CConditionHelper::addFormulaIds($db_action['filter']['conditions'],
 						$db_action['filter']['formula']
 					);
+				}
+				else {
+					foreach ($db_action['filter']['conditions'] as &$condition) {
+						$condition['formulaid'] = '';
+					}
+					unset($condition);
 				}
 			}
 			unset($db_action);

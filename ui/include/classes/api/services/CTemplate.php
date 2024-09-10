@@ -842,6 +842,39 @@ class CTemplate extends CHostGeneral {
 		if ($del_links_clear) {
 			$this->checkTriggerDependenciesOfHostTriggers($del_links_clear);
 		}
+
+		self::checkUsedInActions($db_templates);
+	}
+
+	private static function checkUsedInActions(array $templates): void {
+		$templateids = array_keys($templates);
+
+		$db_actions = DBfetchArray(DBselect(
+			'SELECT a.name,c.value AS templateid'.
+			' FROM actions a,conditions c'.
+			' WHERE a.actionid=c.actionid'.
+				' AND c.conditiontype='.ZBX_CONDITION_TYPE_TEMPLATE.
+				' AND '.dbConditionString('c.value', $templateids),
+			1
+		));
+
+		if (!$db_actions) {
+			$db_actions = DBfetchArray(DBselect(
+				'SELECT a.name,ot.templateid'.
+				' FROM actions a,operations o,optemplate ot'.
+				' WHERE a.actionid=o.actionid'.
+					' AND o.operationid=ot.operationid'.
+					' AND '.dbConditionId('ot.templateid', $templateids),
+				1
+			));
+		}
+
+		if ($db_actions) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+				'Cannot delete template "%1$s" because it is used in action "%2$s".',
+				$templates[$db_actions[0]['templateid']]['host'], $db_actions[0]['name']
+			));
+		}
 	}
 
 	/**

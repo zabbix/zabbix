@@ -451,90 +451,6 @@ class CHostGroup extends CApiService {
 		// delete sysmap element
 		DB::delete('sysmaps_elements', ['elementtype' => SYSMAP_ELEMENT_TYPE_HOST_GROUP, 'elementid' => $groupids]);
 
-		// disable actions
-		// actions from conditions
-		$actionids = [];
-		$db_actions = DBselect(
-			'SELECT DISTINCT c.actionid'.
-			' FROM conditions c'.
-			' WHERE c.conditiontype='.ZBX_CONDITION_TYPE_HOST_GROUP.
-				' AND '.dbConditionString('c.value', $groupids)
-		);
-		while ($db_action = DBfetch($db_actions)) {
-			$actionids[$db_action['actionid']] = $db_action['actionid'];
-		}
-
-		// actions from operations
-		$db_actions = DBselect(
-			'SELECT o.actionid'.
-			' FROM operations o,opgroup og'.
-			' WHERE o.operationid=og.operationid AND '.dbConditionInt('og.groupid', $groupids).
-			' UNION'.
-			' SELECT o.actionid'.
-			' FROM operations o,opcommand_grp ocg'.
-			' WHERE o.operationid=ocg.operationid AND '.dbConditionInt('ocg.groupid', $groupids)
-		);
-		while ($db_action = DBfetch($db_actions)) {
-			$actionids[$db_action['actionid']] = $db_action['actionid'];
-		}
-
-		if (!empty($actionids)) {
-			$update = [];
-			$update[] = [
-				'values' => ['status' => ACTION_STATUS_DISABLED],
-				'where' => ['actionid' => $actionids]
-			];
-			DB::update('actions', $update);
-		}
-
-		// delete action conditions
-		DB::delete('conditions', [
-			'conditiontype' => ZBX_CONDITION_TYPE_HOST_GROUP,
-			'value' => $groupids
-		]);
-
-		// delete action operation groups
-		$operationids = [];
-		$db_operations = DBselect(
-			'SELECT DISTINCT og.operationid'.
-			' FROM opgroup og'.
-			' WHERE '.dbConditionInt('og.groupid', $groupids)
-		);
-		while ($db_operation = DBfetch($db_operations)) {
-			$operationids[$db_operation['operationid']] = $db_operation['operationid'];
-		}
-		DB::delete('opgroup', [
-			'groupid' => $groupids
-		]);
-
-		// delete action operation commands
-		$db_operations = DBselect(
-			'SELECT DISTINCT ocg.operationid'.
-			' FROM opcommand_grp ocg'.
-			' WHERE '.dbConditionInt('ocg.groupid', $groupids)
-		);
-		while ($db_operation = DBfetch($db_operations)) {
-			$operationids[$db_operation['operationid']] = $db_operation['operationid'];
-		}
-		DB::delete('opcommand_grp', [
-			'groupid' => $groupids
-		]);
-
-		// delete empty operations
-		$del_operationids = [];
-		$db_operations = DBselect(
-			'SELECT DISTINCT o.operationid'.
-			' FROM operations o'.
-			' WHERE '.dbConditionInt('o.operationid', $operationids).
-				' AND NOT EXISTS (SELECT NULL FROM opgroup og WHERE o.operationid=og.operationid)'.
-				' AND NOT EXISTS (SELECT NULL FROM opcommand_grp ocg WHERE o.operationid=ocg.operationid)'
-		);
-		while ($db_operation = DBfetch($db_operations)) {
-			$del_operationids[$db_operation['operationid']] = $db_operation['operationid'];
-		}
-
-		DB::delete('operations', ['operationid' => $del_operationids]);
-
 		$this->unlinkHosts($db_groups);
 
 		DB::delete('hstgrp', ['groupid' => $groupids]);
@@ -699,6 +615,7 @@ class CHostGroup extends CApiService {
 			);
 		}
 
+		self::checkUsedInActions($db_groups);
 		self::checkMaintenances($groupids);
 	}
 
@@ -811,6 +728,48 @@ class CHostGroup extends CApiService {
 					_s('Cannot update a discovered host group "%1$s".', $db_group['name'])
 				);
 			}
+		}
+	}
+
+	private static function checkUsedInActions(array $groups): void {
+		$groupids = array_keys($groups);
+
+		$db_actions = DBfetchArray(DBselect(
+			'SELECT a.name,c.value AS groupid'.
+			' FROM actions a,conditions c'.
+			' WHERE a.actionid=c.actionid'.
+				' AND c.conditiontype='.ZBX_CONDITION_TYPE_HOST_GROUP.
+				' AND '.dbConditionString('c.value', $groupids),
+			1
+		));
+
+		if (!$db_actions) {
+			$db_actions = DBfetchArray(DBselect(
+				'SELECT a.name,og.groupid'.
+				' FROM actions a,operations o,opgroup og'.
+				' WHERE a.actionid=o.actionid'.
+					' AND o.operationid=og.operationid'.
+					' AND '.dbConditionId('og.groupid', $groupids),
+				1
+			));
+		}
+
+		if (!$db_actions) {
+			$db_actions = DBfetchArray(DBselect(
+				'SELECT a.name,ocg.groupid'.
+				' FROM actions a,operations o,opcommand_grp ocg'.
+				' WHERE a.actionid=o.actionid'.
+					' AND o.operationid=ocg.operationid'.
+					' AND '.dbConditionId('ocg.groupid', $groupids),
+				1
+			));
+		}
+
+		if ($db_actions) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+				'Cannot delete host group "%1$s" because it is used in action "%2$s".',
+				$groups[$db_actions[0]['groupid']]['name'], $db_actions[0]['name']
+			));
 		}
 	}
 

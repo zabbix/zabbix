@@ -48,30 +48,7 @@ class CTriggerManager {
 
 		$del_triggerids = array_keys($del_triggerids);
 
-		// Disable actions.
-		$actionids = [];
-		$conditionids = [];
-
-		$db_actions = DBselect(
-			'SELECT ac.conditionid,ac.actionid'.
-			' FROM conditions ac'.
-			' WHERE ac.conditiontype='.ZBX_CONDITION_TYPE_TRIGGER.
-				' AND '.dbConditionString('ac.value', $del_triggerids)
-		);
-		while ($db_action = DBfetch($db_actions)) {
-			$conditionids[] = $db_action['conditionid'];
-			$actionids[$db_action['actionid']] = true;
-		}
-
-		if ($actionids) {
-			DB::update('actions', [
-				'values' => ['status' => ACTION_STATUS_DISABLED],
-				'where' => ['actionid' => array_keys($actionids)]
-			]);
-
-			// Delete action conditions.
-			DB::delete('conditions', ['conditionid' => $conditionids]);
-		}
+		self::checkUsedInActions($del_triggerids);
 
 		// Remove trigger sysmap elements.
 		$selement_triggerids = [];
@@ -129,5 +106,27 @@ class CTriggerManager {
 			'where' => ['triggerid' => $del_triggerids]
 		]);
 		DB::delete('triggers', ['triggerid' => $del_triggerids]);
+	}
+
+	/**
+	 * @throws APIException
+	 */
+	private static function checkUsedInActions(array $triggerids): void {
+		$db_actions = DBfetchArray(DBselect(
+			'SELECT a.name,t.description AS trigger_name'.
+			' FROM actions a,conditions c,triggers t'.
+			' WHERE a.actionid=c.actionid'.
+				' AND c.conditiontype='.ZBX_CONDITION_TYPE_TRIGGER.
+				' AND '.zbx_dbcast_2bigint('c.value').'=t.triggerid'.
+				' AND '.dbConditionString('c.value', $triggerids),
+			1
+		));
+
+		if ($db_actions) {
+			throw new APIException(ZBX_API_ERROR_PARAMETERS, _s(
+				'Cannot delete trigger "%1$s" because it is used in action "%2$s".', $db_actions[0]['trigger_name'],
+				$db_actions[0]['name']
+			));
+		}
 	}
 }

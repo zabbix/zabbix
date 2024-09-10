@@ -627,6 +627,26 @@ class CTrigger extends CTriggerGeneral {
 				);
 			}
 		}
+
+		self::checkUsedInActions($db_triggers);
+	}
+
+	private static function checkUsedInActions(array $triggers): void {
+		$db_actions = DBfetchArray(DBselect(
+			'SELECT a.name,c.value AS triggerid'.
+			' FROM actions a,conditions c'.
+			' WHERE a.actionid=c.actionid'.
+				' AND c.conditiontype='.ZBX_CONDITION_TYPE_TRIGGER.
+				' AND '.dbConditionString('c.value', array_keys($triggers)),
+			1
+		));
+
+		if ($db_actions) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+				'Cannot delete trigger "%1$s" because it is used in action "%2$s".',
+				$triggers[$db_actions[0]['triggerid']]['description'], $db_actions[0]['name']
+			));
+		}
 	}
 
 	/**

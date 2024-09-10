@@ -433,12 +433,15 @@ class CService extends CApiService {
 		$db_services = $this->doGet([
 			'output' => ['serviceid', 'name', 'readonly'],
 			'selectChildren' => $permissions['rw_services'] !== null ? ['serviceid', 'name'] : null,
-			'serviceids' => $serviceids
+			'serviceids' => $serviceids,
+			'preservekeys' => true
 		], $permissions);
 
 		if (count($db_services) != count($serviceids)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
+
+		self::checkUsedInActions($db_services);
 
 		if ($permissions['rw_services'] === null) {
 			return;
@@ -468,6 +471,24 @@ class CService extends CApiService {
 					}
 				}
 			}
+		}
+	}
+
+	private static function checkUsedInActions(array $services): void {
+		$db_actions = DBfetchArray(DBselect(
+			'SELECT a.name,c.value AS serviceid'.
+			' FROM actions a,conditions c'.
+			' WHERE a.actionid=c.actionid'.
+				' AND c.conditiontype='.ZBX_CONDITION_TYPE_SERVICE.
+				' AND '.dbConditionString('c.value', array_keys($services)),
+			1
+		));
+
+		if ($db_actions) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+				'Cannot delete service "%1$s" because it is used in action "%2$s".',
+				$services[$db_actions[0]['serviceid']]['name'], $db_actions[0]['name']
+			));
 		}
 	}
 
