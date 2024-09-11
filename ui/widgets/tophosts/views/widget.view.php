@@ -151,11 +151,9 @@ else {
 						}
 
 						$row[] = createTextColumn($formatted_value, $column['value'], $color);
-
 					}
 					elseif ($column_config['display'] == CWidgetFieldColumnsList::DISPLAY_AS_IS) {
 						$row[] = createTextColumn($formatted_value, $column['value'], $color);
-
 					}
 					else {
 						$bar_gauge = createBarGauge($column, $column_config, $color);
@@ -247,14 +245,8 @@ function createBarGauge(array $column, array $column_config, string $color): CBa
 	$bar_gauge = (new CBarGauge())
 		->setValue($column['value'])
 		->setAttribute('fill', $color !== '' ? '#'.$color : Widget::DEFAULT_FILL)
-		->setAttribute('min', $column['is_binary_units']
-			? $column_config['min_binary']
-			: $column_config['min']
-		)
-		->setAttribute('max', $column['is_binary_units']
-			? $column_config['max_binary']
-			: $column_config['max']
-		);
+		->setAttribute('min', $column['is_binary_units'] ? $column_config['min_binary'] : $column_config['min'])
+		->setAttribute('max', $column['is_binary_units'] ? $column_config['max_binary'] : $column_config['max']);
 
 	if ($column_config['display'] == CWidgetFieldColumnsList::DISPLAY_BAR) {
 		$bar_gauge->setAttribute('solid', 1);
@@ -262,9 +254,7 @@ function createBarGauge(array $column, array $column_config, string $color): CBa
 
 	if (array_key_exists('thresholds', $column_config)) {
 		foreach ($column_config['thresholds'] as $threshold) {
-			$threshold_value = $column['is_binary_units']
-				? $threshold['threshold_binary']
-				: $threshold['threshold'];
+			$threshold_value = $column['is_binary_units'] ? $threshold['threshold_binary'] : $threshold['threshold'];
 
 			$bar_gauge->addThreshold($threshold_value, '#'.$threshold['color']);
 		}

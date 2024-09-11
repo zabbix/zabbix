@@ -472,12 +472,11 @@ class WidgetView extends CControllerDashboardWidgetView {
 		if ($column['aggregate_function'] != AGGREGATE_NONE) {
 			foreach ($items_by_value_type as $value_type => $items) {
 				if ($value_type == ITEM_VALUE_TYPE_BINARY) {
-					$itemids = array_keys($items);
 					$output = $column['display_value_as'] == CWidgetFieldColumnsList::DISPLAY_VALUE_AS_BINARY
 						? ['itemid', 'clock', 'ns']
 						: ['itemid', 'value'];
 
-					foreach ($itemids as $itemid) {
+					foreach (array_keys($items) as $itemid) {
 						switch ($column['aggregate_function']) {
 							case AGGREGATE_LAST:
 							case AGGREGATE_FIRST:
@@ -537,12 +536,11 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 			foreach ($items_by_value_type as $value_type => $items) {
 				if ($value_type == ITEM_VALUE_TYPE_BINARY) {
-					$itemids = array_keys($items);
 					$output = $column['display_value_as'] == CWidgetFieldColumnsList::DISPLAY_VALUE_AS_BINARY
 						? ['itemid', 'clock', 'ns']
 						: ['itemid', 'value'];
 
-					foreach ($itemids as $itemid) {
+					foreach (array_keys($items) as $itemid) {
 						$db_values = API::History()->get([
 							'output' => $output,
 							'history' => ITEM_VALUE_TYPE_BINARY,
