@@ -674,6 +674,7 @@ else {
 	if ($data['context'] === 'host') {
 		$editable_hosts = API::Host()->get([
 			'output' => ['hostids'],
+			'graphids' => array_column($data['graphs'], 'graphid'),
 			'editable' => true
 		]);
 

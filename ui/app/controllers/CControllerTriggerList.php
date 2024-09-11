@@ -335,10 +335,12 @@ class CControllerTriggerList extends CController {
 		$editable_hosts = $data['context'] === 'host'
 			? API::Host()->get([
 				'output' => ['hostids'],
+				'triggerids' => array_column($triggers, 'triggerid'),
 				'editable' => true
 			])
 			: API::Template()->get([
 				'output' => ['templateids'],
+				'triggerids' => array_column($triggers, 'triggerid'),
 				'editable' => true
 			]);
 
