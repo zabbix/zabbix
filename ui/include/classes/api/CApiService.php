@@ -951,7 +951,7 @@ class CApiService {
 		$filter = [];
 		foreach ($options['filter'] as $field => $value) {
 			// Skip missing fields, text fields and empty values.
-			if (!isset($tableSchema['fields'][$field])
+			if (!array_key_exists($field, $tableSchema['fields'])
 					|| ($tableSchema['fields'][$field]['type'] & DB::SUPPORTED_FILTER_TYPES) == 0
 					|| zbx_empty($value)) {
 				continue;
