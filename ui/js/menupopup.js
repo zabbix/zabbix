@@ -1088,6 +1088,7 @@ function getMenuPopupItem(options) {
 
 			config_urls.push({
 				label: t('Host'),
+				disabled: !options.isWriteable,
 				clickCallback: (e) => {
 					action === 'item.list' ? view.editHost(e, options.hostid) : view.editHost(options.hostid);
 				}
