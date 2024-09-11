@@ -59,7 +59,8 @@ static int	agent_task_process(short event, void *data, int *fd, const char *addr
 	ZBX_UNUSED(fd);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() step '%s' event:%d itemid:" ZBX_FS_UI64 " addr:%s", __func__,
-				get_agent_step_string(agent_context->step), event, agent_context->item.itemid, addr);
+				get_agent_step_string(agent_context->step), event, agent_context->item.itemid,
+				ZBX_NULL2EMPTY_STR(addr));
 
 	if (NULL != poller_config && ZBX_PROCESS_STATE_IDLE == poller_config->state)
 	{
