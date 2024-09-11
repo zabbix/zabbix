@@ -42,6 +42,7 @@ class testPageReportsAudit extends CWebTest {
 	 * Audit log resourceid.
 	 */
 	protected static $id;
+	const ip = '';
 
 	/**
 	 * Check audit page layout.
@@ -73,7 +74,7 @@ class testPageReportsAudit extends CWebTest {
 		}
 
 		// Check form labels.
-		$this->assertEquals(['Users', 'Actions', 'Resource', 'Resource ID', 'Recordset ID'], $form->getLabels()->asText());
+		$this->assertEquals(['Users', 'Actions', 'Resource', 'Resource ID', 'Recordset ID', 'IP'], $form->getLabels()->asText());
 
 		// Check that resource values set as All by default.
 		$this->assertTrue($form->checkValue(['Resource' => 'All']));
@@ -455,6 +456,29 @@ class testPageReportsAudit extends CWebTest {
 				[
 					'fields' => [
 						'Resource' => 'Web scenario'
+					],
+					'no_data' => true
+				]
+			],
+			// #16 Get server IP and fill it into IP field
+			[
+				[
+					'fields' => [
+						'IP' => explode(' ', $_SERVER['SSH_CONNECTION'])[2],
+						'Actions' => [
+							'Add',
+							'Delete',
+							'Login'
+						]
+					],
+					'result_count' => 15
+				]
+			],
+			// #17
+			[
+				[
+					'fields' => [
+						'IP' => 'google.com'
 					],
 					'no_data' => true
 				]
