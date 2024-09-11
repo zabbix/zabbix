@@ -716,7 +716,6 @@ else {
 		'selectDiscoveryRule' => ['itemid', 'name'],
 		'selectGraphDiscovery'	=> ['status', 'ts_delete'],
 		'selectHosts' => ($data['hostid'] == 0) ? ['name'] : null,
-		'selectTemplates' => ($data['hostid'] == 0) ? ['name'] : null,
 		'graphids' => zbx_objectValues($data['graphs'], 'graphid'),
 		'preservekeys' => true
 	];
