@@ -933,7 +933,7 @@ class CMediatype extends CApiService {
 		self::addRelatedActions($options, $result);
 
 		// adding message templates
-		if ($options['selectMessageTemplates'] !== null) {
+		if (array_key_exists('selectMessageTemplates', $options) && $options['selectMessageTemplates'] !== null) {
 			$message_templates = [];
 
 			$relation_map = $this->createRelationMap($result, 'mediatypeid', 'mediatype_messageid',
