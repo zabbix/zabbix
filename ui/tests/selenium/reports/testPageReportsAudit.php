@@ -464,14 +464,10 @@ class testPageReportsAudit extends CWebTest {
 			[
 				[
 					'fields' => [
-						'IP' => explode(' ', $_SERVER['SSH_CLIENT'])[0],
-						'Actions' => [
-							'Add',
-							'Delete',
-							'Login'
-						]
+						'IP' => '111.222.33.44',
+						'Actions' => 'Login'
 					],
-					'result_count' => 15
+					'result_count' => 1
 				]
 			],
 			// #17
@@ -521,6 +517,9 @@ class testPageReportsAudit extends CWebTest {
 	 * @depends testPageReportsAudit_DisabledEnabled
 	 */
 	public function testPageReportsAudit_CheckFilter($data) {
+		// Update IP address for each row
+		DBexecute("UPDATE auditlog SET IP = '111.222.33.44'");
+
 		$this->page->login()->open('zabbix.php?action=auditlog.list&filter_rst=1')->waitUntilReady();
 		$form = $this->query('name:zbx_filter')->asForm()->one();
 		$table = $this->query('class:list-table')->asTable()->one();
