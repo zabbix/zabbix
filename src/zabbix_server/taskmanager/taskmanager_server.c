@@ -1017,9 +1017,11 @@ static void	tm_service_manager_send_suppression_action(zbx_uint64_t eventid, zbx
 {
 	unsigned char	*data = NULL, *ptr;
 	zbx_uint64_t	maintenanceid = 0;
-	zbx_uint32_t	data_len = 2 * sizeof(zbx_uint64_t);
+	zbx_uint32_t	data_len = 2 * sizeof(zbx_uint64_t) + sizeof(int);
+	int		events_num = 1;
 
 	ptr = data = (unsigned char *)zbx_malloc(NULL, (size_t)data_len);
+	ptr += zbx_serialize_value(ptr, events_num);
 	ptr += zbx_serialize_value(ptr, eventid);
 	(void)zbx_serialize_value(ptr, maintenanceid);
 

@@ -309,7 +309,7 @@ static void	db_get_events(zbx_hashset_t *problem_events)
 		{
 			zbx_uint64_t	maintenanceid;
 
-			ZBX_STR2UINT64(maintenanceid, row[1]);
+			ZBX_DBROW2UINT64(maintenanceid, row[1]);
 			event_add_maintenanceid(*ptr, maintenanceid);
 		}
 	}
