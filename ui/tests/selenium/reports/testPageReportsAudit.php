@@ -464,7 +464,7 @@ class testPageReportsAudit extends CWebTest {
 			[
 				[
 					'fields' => [
-						'IP' => explode(' ', $_SERVER['SSH_CONNECTION'])[2],
+						'IP' => explode(' ', $_SERVER['SSH_CONNECTION'])[3],
 						'Actions' => [
 							'Add',
 							'Delete',
