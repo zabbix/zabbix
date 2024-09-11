@@ -118,7 +118,7 @@ func (h *handler) report(w http.ResponseWriter, r *http.Request) {
 		opts = append(opts, chromedp.Flag("ignore-certificate-errors", "1"))
 	}
 
-	allocCtx, cancel := chromedp.NewExecAllocator(context.Background(), opts...)
+	allocCtx, cancel := chromedp.NewExecAllocator(r.Context(), opts...)
 	defer cancel()
 
 	ctx, cancel := chromedp.NewContext(allocCtx)
