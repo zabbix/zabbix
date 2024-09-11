@@ -764,6 +764,13 @@ else {
 
 	order_result($data['graphs'], $sort_field, $sort_order);
 
+	foreach ($data['graphs'] as &$graph) {
+		if (array_key_exists('hosts', $graph)) {
+			CArrayHelper::sort($graph['hosts'], ['name']);
+		}
+	}
+	unset($graph);
+
 	$data['parent_templates'] = getGraphParentTemplates($data['graphs'], ($data['parent_discoveryid'] === null)
 		? ZBX_FLAG_DISCOVERY_NORMAL
 		: ZBX_FLAG_DISCOVERY_PROTOTYPE

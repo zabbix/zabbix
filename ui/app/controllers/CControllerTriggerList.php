@@ -250,6 +250,12 @@ class CControllerTriggerList extends CController {
 				'nopermissions' => true
 			]);
 
+
+			foreach ($triggers as &$trigger) {
+				CArrayHelper::sort($trigger['hosts'], ['name']);
+			}
+			unset($trigger);
+
 			$items = API::Item()->get([
 				'output' => ['itemid'],
 				'selectTriggers' => ['triggerid'],
