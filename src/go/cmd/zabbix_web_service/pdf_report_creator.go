@@ -63,8 +63,8 @@ func logAndWriteError(w http.ResponseWriter, errMsg string, code int) {
 	w.WriteHeader(code)
 	encoder := json.NewEncoder(w)
 	encoder.SetEscapeHTML(false)
-	err := encoder.Encode(map[string]string{"detail": errMsg})
 
+	err := encoder.Encode(map[string]string{"detail": errMsg})
 	if err != nil {
 		log.Errf("Error '%s' happened while encoding error message: '%s'", err.Error(), errMsg)
 	}
@@ -187,9 +187,26 @@ func (h *handler) report(w http.ResponseWriter, r *http.Request) {
 	errEvtC := make(chan string, 1)
 
 	chromedp.ListenTarget(ctx, func(ev any) {
-		if ev, ok := ev.(*network.EventLoadingFailed); ok && ev.ErrorText != "" && len(errEvtC) < cap(errEvtC) {
-			errEvtC <- ev.ErrorText
+		failEvent, ok := ev.(*network.EventLoadingFailed)
+		if !ok || failEvent.ErrorText == "" || len(errEvtC) == cap(errEvtC) {
+			return
 		}
+
+		if failEvent.ErrorText == netErrCertAuthorityInvalid {
+			errEvtC <- fmt.Sprintf(
+				"Invalid certificate authority detected while loading dashboard: '%s'. Fix TLS "+
+					"configuration or configure Zabbix web service to ignore TLS certificate "+
+					"errors when accessing frontend URL.",
+				u.String(),
+			)
+
+			return
+		}
+
+		errEvtC <- fmt.Sprintf(
+			"received network.EventLoadingFailed '%s' event while loading dashboard",
+			failEvent.ErrorText,
+		)
 	})
 
 	var buf []byte
@@ -214,24 +231,7 @@ func (h *handler) report(w http.ResponseWriter, r *http.Request) {
 	})
 
 	if len(errEvtC) != 0 {
-		errorText := <-errEvtC
-
-		switch errorText {
-		case netErrCertAuthorityInvalid:
-			errorText = fmt.Sprintf(
-				"Invalid certificate authority detected while loading dashboard: '%s'. Fix TLS "+
-					"configuration or configure Zabbix web service to ignore TLS certificate "+
-					"errors when accessing frontend URL.",
-				u.String(),
-			)
-			logAndWriteError(w, errorText, http.StatusInternalServerError)
-		default:
-			errorText = fmt.Sprintf(
-				"received network.EventLoadingFailed '%s' event while loading dashboard",
-				errorText,
-			)
-			logAndWriteError(w, errorText, http.StatusInternalServerError)
-		}
+		logAndWriteError(w, <-errEvtC, http.StatusInternalServerError)
 
 		if err != nil {
 			log.Errf("%s", err.Error())
@@ -270,23 +270,24 @@ func prepareDashboard(url string) chromedp.ActionFunc {
 }
 
 func waitForDashboardReady(ctx context.Context, url string) error {
-	const (
-		wrapperIsReady = ".wrapper.is-ready"
-		timeout        = time.Second * 45
-	)
-
-	expression := fmt.Sprintf("document.querySelector('%s') !== null", wrapperIsReady)
 	var isReady bool
 
-	err := chromedp.Run(ctx, chromedp.Poll(expression, &isReady, chromedp.WithPollingTimeout(timeout)))
-
+	err := chromedp.Run(
+		ctx,
+		chromedp.Poll(
+			"document.querySelector('.wrapper.is-ready') !== null",
+			&isReady,
+			chromedp.WithPollingTimeout(time.Second*45),
+		),
+	)
 	if err != nil {
 		return errs.Wrapf(err, "dashboard failed to get ready, url: '%s'", url)
 	}
 
 	if !isReady {
-		/* it is expected that either dashboard gets ready or chromedp.ErrPollingTimeout happens */
-		return errs.Errorf("should never happen, dashboard failed to get ready with no error, url: '%s'", url)
+		/* Should never happen: */
+		/* it is expected that either dashboard gets ready or chromedp.ErrPollingTimeout happens. */
+		return errs.Errorf("dashboard failed to get ready with no error, url: '%s'", url)
 	}
 
 	return nil
