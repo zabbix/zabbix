@@ -902,6 +902,8 @@ void	zbx_proc_get_matching_pids(const zbx_vector_ptr_t *processes, const char *p
 #ifdef HAVE_ZONE_H
 	zoneid_t		zoneid;
 #endif
+	zbx_regexp_t		*proccomm_rxp = NULL;
+	char			*rxp_error = NULL;
 
 	zabbix_log(LOG_LEVEL_TRACE, "In %s() procname:%s username:%s cmdline:%s zone:%llu", __func__,
 			ZBX_NULL2EMPTY_STR(procname), ZBX_NULL2EMPTY_STR(username), ZBX_NULL2EMPTY_STR(cmdline),
@@ -916,6 +918,13 @@ void	zbx_proc_get_matching_pids(const zbx_vector_ptr_t *processes, const char *p
 	else
 		usrinfo = NULL;
 
+	if (SUCCEED != zbx_regexp_compile(cmdline, &proccomm_rxp, &rxp_error))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() Invalid regular expression: %s", __func__, rxp_error);
+		zbx_free(rxp_error);
+		goto out;
+	}
+
 #ifdef HAVE_ZONE_H
 	zoneid = getzoneid();
 #endif
@@ -924,7 +933,7 @@ void	zbx_proc_get_matching_pids(const zbx_vector_ptr_t *processes, const char *p
 	{
 		proc = (zbx_sysinfo_proc_t *)processes->values[i];
 
-		if (SUCCEED != proc_match_props(proc, usrinfo, procname, cmdline))
+		if (SUCCEED != proc_match_props(proc, usrinfo, procname, proccomm_rxp))
 			continue;
 
 #ifdef HAVE_ZONE_H
