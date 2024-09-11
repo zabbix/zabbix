@@ -70,7 +70,7 @@ $tags_form_list = (new CFormList('tags-form-list'))
 				->setModern(true)
 				->addStyle('margin-bottom: 10px;'),
 			renderTagTable([['tag' => '', 'value' => '']])
-				->setHeader([_('Name'), _('Value'), _('Action')])
+				->setHeader([_('Name'), _('Value'), ''])
 				->addClass('tags-table')
 		]))->setId('tags-field')
 	);

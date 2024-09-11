@@ -175,7 +175,11 @@ function createFontSelect(string $name): CSelect {
 					->addRow((new CLabel(_('Triggers'), 'triggerContainer'))->setAsteriskMark(), [
 						(new CDiv([
 							(new CTable())
-								->setHeader(['', _('Name'), ''])
+								->setHeader([
+									'',
+									_('Name'),
+									(new CColHeader(_('Action')))->addStyle('padding: 0 5px;')
+								])
 								->setId('triggerContainer')
 								->setAttribute('style', 'width: 100%;')
 						]))
@@ -804,7 +808,7 @@ function createFontSelect(string $name): CSelect {
 					->addRow(_('Link indicators'),
 						(new CDiv([
 							(new CTable())
-								->setHeader([_('Trigger'), _('Type'), _('Color'), _('Action')])
+								->setHeader([_('Trigger'), _('Type'), _('Color'), ''])
 								->setAttribute('style', 'width: 100%;')
 								->setId('linkTriggerscontainer'),
 							(new CButtonLink(_('Add')))->onClick(
