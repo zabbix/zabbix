@@ -918,7 +918,7 @@ void	zbx_proc_get_matching_pids(const zbx_vector_ptr_t *processes, const char *p
 	else
 		usrinfo = NULL;
 
-	if (SUCCEED != zbx_regexp_compile(cmdline, &proccomm_rxp, &rxp_error))
+	if (NULL != cmdline && SUCCEED != zbx_regexp_compile(cmdline, &proccomm_rxp, &rxp_error))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() Invalid regular expression: %s", __func__, rxp_error);
 		zbx_free(rxp_error);
