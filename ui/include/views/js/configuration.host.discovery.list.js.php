@@ -56,7 +56,7 @@
 				}
 			})
 
-			document.addEventListener('click', (e) => {
+			document.querySelector('form[name="discovery"]').addEventListener('click', (e) => {
 				if (e.target.classList.contains('js-edit-host')) {
 					this.editHost(e, e.target.dataset.hostid);
 				}

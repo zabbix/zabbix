@@ -36,14 +36,10 @@
 					new CTagFilterItem(rows[rows.length - 1]);
 				});
 
-			this.initEvents()
-		},
-
-		initEvents() {
 			// Init existing fields once loaded.
 			document.querySelectorAll('#filter-tags .form_row').forEach(row => new CTagFilterItem(row));
 
-			document.addEventListener('click', (e) => {
+			document.querySelector('form[name="scenarios"]').addEventListener('click', (e) => {
 				if (e.target.classList.contains('js-edit-host')) {
 					this.editHost(e, e.target.dataset.hostid);
 				}
