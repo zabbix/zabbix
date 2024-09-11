@@ -441,7 +441,7 @@ zabbix_export:
           params: |
             var AWS = {
             	params: {},
-            	metadata: 'http://169.254.169.254/latest/meta-data/iam/security-credentials',
+            	metadata: 'http://169.254.169.254/latest/',
             
             	getField: function (data, path, val) {
             		var steps = path.split('.');
@@ -469,13 +469,20 @@ zabbix_export:
             				if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
             					request.setProxy(AWS.params.proxy);
             				}
-            				var IamRoleName = request.get(AWS.metadata);
+            				request.addHeader('X-aws-ec2-metadata-token-ttl-seconds: 21600');
+            				var token = request.put(AWS.metadata + 'api/token');
+            
+            				if (request.getStatus() !== 200 || token === null || token === '') {
+            					throw 'Error getting IMDSv2 session token.';
+            				}
+            				request.addHeader('X-aws-ec2-metadata-token: ' + token);
+            				var IamRoleName = request.get(AWS.metadata + 'meta-data/iam/security-credentials');
             
             				if (request.getStatus() !== 200 || IamRoleName === null || IamRoleName === '') {
             					throw 'Error getting security credentials from instance metadata. Role not found.';
             				}
             
-            				credentials = request.get(AWS.metadata + '/' + encodeURI(IamRoleName));
+            				credentials = request.get(AWS.metadata + 'meta-data/iam/security-credentials/' + encodeURI(IamRoleName));
             
             				if (request.getStatus() !== 200 || credentials === null || credentials === '') {
             					throw 'Error getting security credentials from instance metadata.';
@@ -490,7 +497,7 @@ zabbix_export:
             
             				['AccessKeyId', 'SecretAccessKey', 'Token'].forEach(function (field) {
             					if (typeof credentials !== 'object' || typeof credentials[field] === 'undefined' || credentials[field] === '') {
-            						throw 'Required credentials is not set: "' + field + '".';
+            						throw 'Required credentials are not set: "' + field + '".';
             					};
             					AWS.params[field] = credentials[field];
             				});
@@ -518,7 +525,7 @@ zabbix_export:
             
             				['AccessKeyId', 'SecretAccessKey', 'SessionToken'].forEach(function (field) {
             					if (typeof credentials !== 'object' || typeof credentials[field] === 'undefined' || credentials[field] === '') {
-            						throw 'Required credentials is not set: "' + field + '".';
+            						throw 'Required credentials are not set: "' + field + '".';
             					};
             					AWS.params[field] = credentials[field];
             				});
@@ -745,7 +752,7 @@ zabbix_export:
             var AWS = {
             	params: {},
             	request_period: 600,
-            	metadata: 'http://169.254.169.254/latest/meta-data/iam/security-credentials',
+            	metadata: 'http://169.254.169.254/latest/',
             
             	getField: function (data, path) {
             		var steps = path.split('.');
@@ -770,13 +777,20 @@ zabbix_export:
             				if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
             					request.setProxy(AWS.params.proxy);
             				}
-            				var IamRoleName = request.get(AWS.metadata);
+            				request.addHeader('X-aws-ec2-metadata-token-ttl-seconds: 21600');
+            				var token = request.put(AWS.metadata + 'api/token');
+            
+            				if (request.getStatus() !== 200 || token === null || token === '') {
+            					throw 'Error getting IMDSv2 session token.';
+            				}
+            				request.addHeader('X-aws-ec2-metadata-token: ' + token);
+            				var IamRoleName = request.get(AWS.metadata + 'meta-data/iam/security-credentials');
             
             				if (request.getStatus() !== 200 || IamRoleName === null || IamRoleName === '') {
             					throw 'Error getting security credentials from instance metadata. Role not found.';
             				}
             
-            				credentials = request.get(AWS.metadata + '/' + encodeURI(IamRoleName));
+            				credentials = request.get(AWS.metadata + 'meta-data/iam/security-credentials/' + encodeURI(IamRoleName));
             
             				if (request.getStatus() !== 200 || credentials === null || credentials === '') {
             					throw 'Error getting security credentials from instance metadata.';
@@ -791,7 +805,7 @@ zabbix_export:
             
             				['AccessKeyId', 'SecretAccessKey', 'Token'].forEach(function (field) {
             					if (typeof credentials !== 'object' || typeof credentials[field] === 'undefined' || credentials[field] === '') {
-            						throw 'Required credentials is not set: "' + field + '".';
+            						throw 'Required credentials are not set: "' + field + '".';
             					};
             					AWS.params[field] = credentials[field];
             				});
@@ -819,7 +833,7 @@ zabbix_export:
             
             				['AccessKeyId', 'SecretAccessKey', 'SessionToken'].forEach(function (field) {
             					if (typeof credentials !== 'object' || typeof credentials[field] === 'undefined' || credentials[field] === '') {
-            						throw 'Required credentials is not set: "' + field + '".';
+            						throw 'Required credentials are not set: "' + field + '".';
             					};
             					AWS.params[field] = credentials[field];
             				});
@@ -1085,7 +1099,7 @@ zabbix_export:
             var AWS = {
             	params: {},
             	request_period: 600,
-            	metadata: 'http://169.254.169.254/latest/meta-data/iam/security-credentials',
+            	metadata: 'http://169.254.169.254/latest/',
             
             	getField: function (data, path, val) {
             		var steps = path.split('.');
@@ -1112,13 +1126,20 @@ zabbix_export:
             				if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
             					request.setProxy(AWS.params.proxy);
             				}
-            				var IamRoleName = request.get(AWS.metadata);
+            				request.addHeader('X-aws-ec2-metadata-token-ttl-seconds: 21600');
+            				var token = request.put(AWS.metadata + 'api/token');
+            
+            				if (request.getStatus() !== 200 || token === null || token === '') {
+            					throw 'Error getting IMDSv2 session token.';
+            				}
+            				request.addHeader('X-aws-ec2-metadata-token: ' + token);
+            				var IamRoleName = request.get(AWS.metadata + 'meta-data/iam/security-credentials');
             
             				if (request.getStatus() !== 200 || IamRoleName === null || IamRoleName === '') {
             					throw 'Error getting security credentials from instance metadata. Role not found.';
             				}
             
-            				credentials = request.get(AWS.metadata + '/' + encodeURI(IamRoleName));
+            				credentials = request.get(AWS.metadata + 'meta-data/iam/security-credentials/' + encodeURI(IamRoleName));
             
             				if (request.getStatus() !== 200 || credentials === null || credentials === '') {
             					throw 'Error getting security credentials from instance metadata.';
@@ -1133,7 +1154,7 @@ zabbix_export:
             
             				['AccessKeyId', 'SecretAccessKey', 'Token'].forEach(function (field) {
             					if (typeof credentials !== 'object' || typeof credentials[field] === 'undefined' || credentials[field] === '') {
-            						throw 'Required credentials is not set: "' + field + '".';
+            						throw 'Required credentials are not set: "' + field + '".';
             					};
             					AWS.params[field] = credentials[field];
             				});
@@ -1161,7 +1182,7 @@ zabbix_export:
             
             				['AccessKeyId', 'SecretAccessKey', 'SessionToken'].forEach(function (field) {
             					if (typeof credentials !== 'object' || typeof credentials[field] === 'undefined' || credentials[field] === '') {
-            						throw 'Required credentials is not set: "' + field + '".';
+            						throw 'Required credentials are not set: "' + field + '".';
             					};
             					AWS.params[field] = credentials[field];
             				});
@@ -2218,7 +2239,7 @@ zabbix_export:
                 var AWS = {
                 	params: {},
                 	request_period: 600,
-                	metadata: 'http://169.254.169.254/latest/meta-data/iam/security-credentials',
+                	metadata: 'http://169.254.169.254/latest/',
                 
                 	getField: function (data, path) {
                 		var steps = path.split('.');
@@ -2243,13 +2264,20 @@ zabbix_export:
                 				if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
                 					request.setProxy(AWS.params.proxy);
                 				}
-                				var IamRoleName = request.get(AWS.metadata);
+                				request.addHeader('X-aws-ec2-metadata-token-ttl-seconds: 21600');
+                				var token = request.put(AWS.metadata + 'api/token');
+                
+                				if (request.getStatus() !== 200 || token === null || token === '') {
+                					throw 'Error getting IMDSv2 session token.';
+                				}
+                				request.addHeader('X-aws-ec2-metadata-token: ' + token);
+                				var IamRoleName = request.get(AWS.metadata + 'meta-data/iam/security-credentials');
                 
                 				if (request.getStatus() !== 200 || IamRoleName === null || IamRoleName === '') {
                 					throw 'Error getting security credentials from instance metadata. Role not found.';
                 				}
                 
-                				credentials = request.get(AWS.metadata + '/' + encodeURI(IamRoleName));
+                				credentials = request.get(AWS.metadata + 'meta-data/iam/security-credentials/' + encodeURI(IamRoleName));
                 
                 				if (request.getStatus() !== 200 || credentials === null || credentials === '') {
                 					throw 'Error getting security credentials from instance metadata.';
@@ -2264,7 +2292,7 @@ zabbix_export:
                 
                 				['AccessKeyId', 'SecretAccessKey', 'Token'].forEach(function (field) {
                 					if (typeof credentials !== 'object' || typeof credentials[field] === 'undefined' || credentials[field] === '') {
-                						throw 'Required credentials is not set: "' + field + '".';
+                						throw 'Required credentials are not set: "' + field + '".';
                 					};
                 					AWS.params[field] = credentials[field];
                 				});
@@ -2292,7 +2320,7 @@ zabbix_export:
                 
                 				['AccessKeyId', 'SecretAccessKey', 'SessionToken'].forEach(function (field) {
                 					if (typeof credentials !== 'object' || typeof credentials[field] === 'undefined' || credentials[field] === '') {
-                						throw 'Required credentials is not set: "' + field + '".';
+                						throw 'Required credentials are not set: "' + field + '".';
                 					};
                 					AWS.params[field] = credentials[field];
                 				});
@@ -2483,9 +2511,9 @@ zabbix_export:
                 		result = AWS.request('GET', AWS.params.region, 'monitoring', AWS.prepareParams(payload));
                 
                 		if (typeof result !== 'object'
-                				|| typeof result.GetMetricDataResponse !== 'object'
-                				|| typeof result.GetMetricDataResponse.GetMetricDataResult !== 'object'
-                				|| typeof result.GetMetricDataResponse.GetMetricDataResult.MetricDataResults !== 'object') {
+                			|| typeof result.GetMetricDataResponse !== 'object'
+                			|| typeof result.GetMetricDataResponse.GetMetricDataResult !== 'object'
+                			|| typeof result.GetMetricDataResponse.GetMetricDataResult.MetricDataResults !== 'object') {
                 			throw 'Cannot get metrics data from AWS CloudWatch API. Check debug log for more information.';
                 		}
                 
@@ -2502,7 +2530,7 @@ zabbix_export:
                 	error += (String(error).endsWith('.')) ? '' : '.';
                 	Zabbix.log(3, '[ AWS EBS ] ERROR: ' + error);
                 
-                	return JSON.stringify({'error': error});
+                	return JSON.stringify({ 'error': error });
                 }
               description: |
                 Get metrics of EBS volume.

@@ -388,7 +388,7 @@ static void	compare_trap(const char *date, const char *trap, int snmp_timestamp,
 static void	parse_traps(int flag, int snmp_timestamp, const char *snmp_id_bin, int *skip,
 		const char *config_node_name)
 {
-	char	*c, *line, *begin = NULL, *end = NULL, *addr = NULL, *pzbegin, *pzaddr = NULL, *pzdate = NULL,
+	char	*c, *line, *begin = NULL, *end = NULL, *addr = NULL, *pzbegin = NULL, *pzaddr = NULL, *pzdate = NULL,
 		*last_date = NULL, *last_trap = NULL;
 
 	c = line = buffer;
@@ -419,9 +419,14 @@ static void	parse_traps(int flag, int snmp_timestamp, const char *snmp_id_bin, i
 		/* process the previous trap */
 		if (NULL != begin)
 		{
-			*(line - 1) = '\0';
-			*pzdate = '\0';
-			*pzaddr = '\0';
+			if (line > buffer + 1)
+				*(line - 1) = '\0';
+
+			if (NULL != pzdate)
+				*pzdate = '\0';
+
+			if (NULL != pzaddr)
+				*pzaddr = '\0';
 
 			if (NULL != skip && 1 == *skip)
 			{
@@ -486,9 +491,14 @@ static void	parse_traps(int flag, int snmp_timestamp, const char *snmp_id_bin, i
 	{
 		if (NULL != end)
 		{
-			*(line - 1) = '\0';
-			*pzdate = '\0';
-			*pzaddr = '\0';
+			if (line > buffer + 1)
+				*(line - 1) = '\0';
+
+			if (NULL != pzdate)
+				*pzdate = '\0';
+
+			if (NULL != pzaddr)
+				*pzaddr = '\0';
 
 			if (NULL != skip && 1 == *skip)
 			{
