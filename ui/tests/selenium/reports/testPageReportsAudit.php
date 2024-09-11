@@ -467,7 +467,7 @@ class testPageReportsAudit extends CWebTest {
 						'IP' => '111.222.33.44',
 						'Actions' => 'Login'
 					],
-					'result_count' => 1
+					'result_count' => 2
 				]
 			],
 			// #17
