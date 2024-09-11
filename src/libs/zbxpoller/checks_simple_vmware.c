@@ -1257,7 +1257,7 @@ int	check_vcenter_eventlog(AGENT_REQUEST *request, const zbx_dc_item_t *item, AG
 	else if (0 < service->eventlog.data->events.values_num)
 	{
 		/* Some times request->lastlogsize value gets stuck due to concurrent update of history cache */
-		/* thereby we can rely to value of the request->lastlogsize and have to return events based on */
+		/* thereby we can't rely to value of the request->lastlogsize and have to return events based on */
 		/* internal state of the service->eventlog */
 		vmware_get_events(&service->eventlog.data->events, &service->eventlog, item, add_results);
 		service->eventlog.last_key = service->eventlog.data->events.values[0]->key;

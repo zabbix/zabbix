@@ -535,15 +535,10 @@ out:
  *             xml_event      - [IN] xml node and id of parsed event          *
  *             xdoc           - [IN] xml document with eventlog records       *
  *             evt_severities - [IN] dictionary of severity for event types   *
- *             alloc_sz       - [OUT] allocated memory size for events        *
  *             strpool_sz     - [OUT] estimated shared memory size for events *
  *                                                                            *
  * Return value: SUCCEED - operation has completed successfully               *
  *               FAIL    - operation has failed                               *
- *                                                                            *
- * Comments: we calculate two memory models (alloc_sz and shmem_sz), because  *
- *           we have no info about real state of shmem strpool. Thereby we    *
- *           compute worst-case scenario (shmem_sz) for pagination algorithm. *
  *                                                                            *
  ******************************************************************************/
 static int	vmware_service_put_event_data(zbx_vector_vmware_event_ptr_t *events, zbx_id_xmlnode_t xml_event,
@@ -910,7 +905,7 @@ clean:
  *                                                                            *
  * Purpose: removing NEW events from "head" of vector                         *
  *                                                                            *
- * Parameters: count      - [IN] number of events to delete                   *
+ * Parameters: max_mem    - [IN] available memory size                        *
  *             strpool_sz - [IN/OUT] allocated memory size for events         *
  *             events     - [IN/OUT] pointer to output variable               *
  *                                                                            *
@@ -936,14 +931,15 @@ static	void vmware_service_clear_event_data_mem(const zbx_uint64_t max_mem, zbx_
 
 /******************************************************************************
  *                                                                            *
- * Parameters: service    - [IN] vmware service                               *
- *             easyhandle - [IN] CURL handle                                  *
- *             last_key   - [IN] ID of last processed event                   *
- *             last_ts    - [IN] the create time of last processed event      *
- *             skip_old   - [IN/OUT] reset last_key of event                  *
- *             events     - [OUT] pointer to output variable                  *
- *             strpool_sz - [OUT] allocated memory size for events            *
- *             error      - [OUT] error message in case of failure            *
+ * Parameters: service       - [IN] vmware service                            *
+ *             easyhandle    - [IN] CURL handle                               *
+ *             last_key      - [IN] ID of last processed event                *
+ *             last_ts       - [IN] the create time of last processed event   *
+ *             shmem_free_sz - [IN] free size of shared memory                *
+ *             skip_old      - [IN/OUT] reset last_key of event               *
+ *             events        - [OUT] pointer to output variable               *
+ *             strpool_sz    - [OUT] allocated memory size for events         *
+ *             error         - [OUT] error message in case of failure         *
  *                                                                            *
  * Return value: SUCCEED - operation has completed successfully               *
  *               FAIL    - operation has failed                               *
@@ -1059,7 +1055,7 @@ out:
  * Parameters: service    - [IN] vmware service                               *
  *             easyhandle - [IN] CURL handle                                  *
  *             events     - [OUT] pointer to output variable                  *
- *             alloc_sz   - [OUT] allocated memory size for events            *
+ *             strpool_sz - [OUT] allocated memory size for events            *
  *             error      - [OUT] error message in case of failure            *
  *                                                                            *
  * Return value: SUCCEED - operation has completed successfully               *
@@ -1322,7 +1318,7 @@ out:
 						zbx_vmware_get_vmware()->strpool_sz,
 						vmware_shmem_get_vmware_mem()->total_size);
 			}
-			else if (0 == evt_pause)
+			else
 			{
 				int	level;
 
