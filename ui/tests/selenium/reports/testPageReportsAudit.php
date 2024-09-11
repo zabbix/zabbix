@@ -458,6 +458,25 @@ class testPageReportsAudit extends CWebTest {
 					],
 					'no_data' => true
 				]
+			],
+			// #16
+			[
+				[
+					'fields' => [
+						'IP' => '111.222.33.44',
+						'Actions' => 'Login'
+					],
+					'result_count' => 2
+				]
+			],
+			// #17
+			[
+				[
+					'fields' => [
+						'IP' => 'google.com'
+					],
+					'no_data' => true
+				]
 			]
 			// TODO: uncomment after ZBX-21097 fix
 			// #16
@@ -497,6 +516,9 @@ class testPageReportsAudit extends CWebTest {
 	 * @depends testPageReportsAudit_DisabledEnabled
 	 */
 	public function testPageReportsAudit_CheckFilter($data) {
+		// Update IP address for each row
+		DBexecute("UPDATE auditlog SET IP = '111.222.33.44'");
+
 		$this->page->login()->open('zabbix.php?action=auditlog.list&filter_rst=1')->waitUntilReady();
 		$form = $this->query('name:zbx_filter')->asForm()->one();
 		$table = $this->query('class:list-table')->asTable()->one();
