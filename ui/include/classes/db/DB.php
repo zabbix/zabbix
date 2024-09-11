@@ -301,12 +301,12 @@ class DB {
 					$updated_values[$name] = $new_values[$name];
 				}
 			}
-			else if ($spec['type'] & (self::FIELD_TYPE_INT | self::FIELD_TYPE_UINT | self::FIELD_TYPE_FLOAT)) {
+			elseif ($spec['type'] & (self::FIELD_TYPE_INT | self::FIELD_TYPE_UINT | self::FIELD_TYPE_FLOAT)) {
 				if ($new_values[$name] != $old_values[$name]) {
 					$updated_values[$name] = $new_values[$name];
 				}
 			}
-			else if ($new_values[$name] !== $old_values[$name]) {
+			elseif ($new_values[$name] !== $old_values[$name]) {
 				$updated_values[$name] = $new_values[$name];
 			}
 		}
@@ -352,28 +352,28 @@ class DB {
 					}
 					$values[$field] = zbx_dbstr($values[$field]);
 				}
-				else if ($tableSchema['fields'][$field]['type'] & (self::FIELD_TYPE_ID | self::FIELD_TYPE_UINT)) {
+				elseif ($tableSchema['fields'][$field]['type'] & (self::FIELD_TYPE_ID | self::FIELD_TYPE_UINT)) {
 					if (!zbx_ctype_digit($values[$field])) {
 						self::exception(self::DBEXECUTE_ERROR, _s('Incorrect value "%1$s" for unsigned int field "%2$s".', $values[$field], $field));
 					}
 					$values[$field] = zbx_dbstr($values[$field]);
 				}
-				else if ($tableSchema['fields'][$field]['type'] & self::FIELD_TYPE_INT) {
+				elseif ($tableSchema['fields'][$field]['type'] & self::FIELD_TYPE_INT) {
 					if (!zbx_is_int($values[$field])) {
 						self::exception(self::DBEXECUTE_ERROR, _s('Incorrect value "%1$s" for int field "%2$s".', $values[$field], $field));
 					}
 					$values[$field] = zbx_dbstr($values[$field]);
 				}
-				else if ($tableSchema['fields'][$field]['type'] & self::FIELD_TYPE_FLOAT) {
+				elseif ($tableSchema['fields'][$field]['type'] & self::FIELD_TYPE_FLOAT) {
 					if (!is_numeric($values[$field])) {
 						self::exception(self::DBEXECUTE_ERROR, _s('Incorrect value "%1$s" for float field "%2$s".', $values[$field], $field));
 					}
 					$values[$field] = zbx_dbstr($values[$field]);
 				}
-				else if ($tableSchema['fields'][$field]['type'] & self::FIELD_TYPE_TEXT) {
+				elseif ($tableSchema['fields'][$field]['type'] & self::FIELD_TYPE_TEXT) {
 					$values[$field] = zbx_dbstr($values[$field]);
 				}
-				else if ($tableSchema['fields'][$field]['type'] & self::FIELD_TYPE_BLOB) {
+				elseif ($tableSchema['fields'][$field]['type'] & self::FIELD_TYPE_BLOB) {
 					switch ($DB['TYPE']) {
 						case ZBX_DB_MYSQL:
 							$values[$field] = zbx_dbstr($values[$field]);
@@ -492,7 +492,7 @@ class DB {
 				$row = [$table_schema['key'] => $id] + $row;
 				$id = bcadd($id, 1, 0);
 			}
-			else if ($table_schema['fields'][$table_schema['key']]['type'] & self::FIELD_TYPE_CUID) {
+			elseif ($table_schema['fields'][$table_schema['key']]['type'] & self::FIELD_TYPE_CUID) {
 				$id = CCuid::generate();
 				$resultids[$key] = $id;
 				$row = [$table_schema['key'] => $id] + $row;
@@ -1000,7 +1000,7 @@ class DB {
 			if ($field_schema['type'] & self::FIELD_TYPE_ID) {
 				$sql_parts['where'][] = dbConditionId($field_name, $options[$pk_option]);
 			}
-			else if ($field_schema['type'] & (self::FIELD_TYPE_INT | self::FIELD_TYPE_UINT)) {
+			elseif ($field_schema['type'] & (self::FIELD_TYPE_INT | self::FIELD_TYPE_UINT)) {
 				$sql_parts['where'][] = dbConditionInt($field_name, $options[$pk_option]);
 			}
 			else {
@@ -1120,7 +1120,7 @@ class DB {
 			if ($field_schema['type'] & self::FIELD_TYPE_ID) {
 				$filter[] = dbConditionId(self::fieldId($field_name, $table_alias), $value);
 			}
-			else if ($field_schema['type'] & (self::FIELD_TYPE_INT | self::FIELD_TYPE_UINT)) {
+			elseif ($field_schema['type'] & (self::FIELD_TYPE_INT | self::FIELD_TYPE_UINT)) {
 				$filter[] = dbConditionInt(self::fieldId($field_name, $table_alias), $value);
 			}
 			else {

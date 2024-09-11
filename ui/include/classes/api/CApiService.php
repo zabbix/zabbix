@@ -972,7 +972,7 @@ class CApiService {
 					$values[] = $val;
 				}
 			}
-			else if ($tableSchema['fields'][$field]['type'] & DB::FIELD_TYPE_ID) {
+			elseif ($tableSchema['fields'][$field]['type'] & DB::FIELD_TYPE_ID) {
 				foreach ((array) $value as $val) {
 					if (!is_int($val) && (!is_string($val) || !ctype_digit($val))) {
 						continue;
@@ -985,7 +985,7 @@ class CApiService {
 					$values[] = $val;
 				}
 			}
-			else if ($tableSchema['fields'][$field]['type'] & DB::FIELD_TYPE_UINT) {
+			elseif ($tableSchema['fields'][$field]['type'] & DB::FIELD_TYPE_UINT) {
 				foreach ((array) $value as $val) {
 					if (!is_int($val) && (!is_string($val) || !ctype_digit($val))) {
 						continue;
@@ -998,7 +998,7 @@ class CApiService {
 					$values[] = $val;
 				}
 			}
-			else if ($tableSchema['fields'][$field]['type'] & DB::FIELD_TYPE_FLOAT) {
+			elseif ($tableSchema['fields'][$field]['type'] & DB::FIELD_TYPE_FLOAT) {
 				foreach ((array) $value as $val) {
 					if (!is_numeric($val)) {
 						continue;
@@ -1015,7 +1015,7 @@ class CApiService {
 			if ($tableSchema['fields'][$field]['type'] & DB::FIELD_TYPE_ID) {
 				$filter[$field] = dbConditionId($fieldName, $values);
 			}
-			else if ($tableSchema['fields'][$field]['type'] & (DB::FIELD_TYPE_INT | DB::FIELD_TYPE_UINT)) {
+			elseif ($tableSchema['fields'][$field]['type'] & (DB::FIELD_TYPE_INT | DB::FIELD_TYPE_UINT)) {
 				$filter[$field] = dbConditionInt($fieldName, $values);
 			}
 			else {
