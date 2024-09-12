@@ -15,6 +15,7 @@
 #include "zbxasyncpoller.h"
 #include "zbxcommon.h"
 #include "zbxcomms.h"
+#include "zbxtime.h"
 
 #ifdef HAVE_LIBEVENT
 #include "zbxip.h"
@@ -208,6 +209,35 @@ static void	async_dns_event(int err, struct evutil_addrinfo *ai, void *arg)
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+void	zbx_async_dns_update_host_addresses(struct evdns_base *dnsbase)
+{
+	static time_t	time_r = 0, time_h = 0;
+	static double	mtime = 0;
+	zbx_stat_t	buf_r, buf_h;
+
+	if (60 < zbx_time() - mtime)
+	{
+		int	ret_h = zbx_stat("/etc/hosts", &buf_h), ret_r = zbx_stat("/etc/resolv.conf", &buf_r);
+
+		if ((0 == ret_r && time_r != buf_r.st_mtime && 0 != time_r) ||
+			(0 == ret_h && time_h != buf_h.st_mtime && 0 != time_h))
+		{
+			int	ret;
+
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() update host addresses", __func__);
+			evdns_base_clear_host_addresses(dnsbase);
+			if (0 != (ret = evdns_base_resolv_conf_parse(dnsbase, DNS_OPTIONS_ALL, ZBX_RES_CONF_FILE)))
+			{
+				zabbix_log(LOG_LEVEL_ERR, "cannot parse resolv.conf result: %s",
+					zbx_resolv_conf_errstr(ret));
+			}
+		}
+		time_r = buf_r.st_mtime;
+		time_h = buf_h.st_mtime;
+		mtime = zbx_time();
+	}
 }
 
 void	zbx_async_poller_add_task(struct event_base *ev, struct evdns_base *dnsbase, const char *addr,

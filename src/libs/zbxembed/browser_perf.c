@@ -119,7 +119,9 @@ static int	wd_perf_init_attribute_from_json(zbx_wd_attr_t *attr, const char *nam
 			return FAIL;
 		}
 
-		json_raw = zbx_variant_data_bin_create(jp_value.start, (zbx_uint32_t)(jp_value.end - jp_value.start + 1));
+		json_raw = zbx_variant_data_bin_create(jp_value.start,
+				(zbx_uint32_t)(jp_value.end - jp_value.start + 1));
+		zbx_replace_invalid_utf8(json_raw);
 		zbx_variant_set_bin(&attr->value, json_raw);
 	}
 	else
@@ -142,6 +144,7 @@ static int	wd_perf_init_attribute_from_json(zbx_wd_attr_t *attr, const char *nam
 			case ZBX_JSON_TYPE_STRING:
 			case ZBX_JSON_TYPE_TRUE:
 			case ZBX_JSON_TYPE_FALSE:
+				zbx_replace_invalid_utf8(value);
 				zbx_variant_set_str(&attr->value, value);
 				break;
 			case ZBX_JSON_TYPE_NULL:

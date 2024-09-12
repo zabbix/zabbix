@@ -1387,6 +1387,9 @@ void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_event
 
 				do
 				{
+					if (0 == trends_num)
+						break;
+
 					zbx_db_begin();
 
 					DBmass_update_trends(trends, trends_num, &trends_diff);
@@ -1400,6 +1403,9 @@ void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_event
 
 				do
 				{
+					if (0 == item_diff.values_num && 0 == inventory_values.values_num)
+						break;
+
 					zbx_db_begin();
 
 					zbx_db_mass_update_items(&item_diff, &inventory_values);

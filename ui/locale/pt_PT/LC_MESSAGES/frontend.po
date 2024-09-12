@@ -21983,6 +21983,11 @@ msgstr "Mensagem do agente de utilizador"
 msgid "User cannot add himself to a disabled group or a group with disabled GUI access."
 msgstr "Um utilizador não pode adicionar-se a si próprio a um grupo desactivado ou a um grupo com acesso à GUI desactivado."
 
+#: include/classes/api/services/CUserGroup.php:673
+#: include/classes/api/services/CUser.php:843
+msgid "User cannot add oneself to a disabled group or a group with disabled GUI access."
+msgstr ""
+
 #: app/views/administration.user.edit.php:461
 #: include/classes/api/services/CUser.php:980
 msgid "User cannot change own role."
@@ -22118,6 +22123,10 @@ msgstr ""
 #: include/classes/api/services/CUser.php:1282
 msgid "User is not allowed to delete himself."
 msgstr "Um utilizador não pode eliminar-se a si próprio."
+
+#: include/classes/api/services/CUser.php:1837
+msgid "User is not allowed to delete oneself."
+msgstr ""
 
 #: app/views/administration.authentication.edit.php:462
 #: app/views/popup.ldap.edit.php:222
