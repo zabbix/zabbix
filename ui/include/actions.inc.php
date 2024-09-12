@@ -639,6 +639,8 @@ function getActionOperationDescriptions(int $eventsource, array $actions, int $t
 							break;
 						}
 
+						$operation += ['opcommand_hst' => [], 'opcommand_grp' => []];
+
 						if (!$operation['opcommand_hst'] && !$operation['opcommand_grp']) {
 							$result[$i][$j][] = [
 								bold(_s('Run script "%1$s" on deleted object(s)', $scripts[$scriptid]['name'])),
@@ -825,6 +827,8 @@ function getActionOperationDescriptions(int $eventsource, array $actions, int $t
 
 							break;
 						}
+
+						$operation += ['opcommand_hst' => [], 'opcommand_grp' => []];
 
 						if (!$operation['opcommand_hst'] && !$operation['opcommand_grp']) {
 							$result[$i][$j][] = [
