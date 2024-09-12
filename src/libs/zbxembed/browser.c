@@ -26,7 +26,7 @@
 #include "webdriver.h"
 #include "zbxalgo.h"
 #include "zbxcommon.h"
-#include "zbxembed.h"
+#include "zbxjson.h"
 #include "zbxtime.h"
 #include "zbxtypes.h"
 #include "zbxvariant.h"
