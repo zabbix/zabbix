@@ -1012,7 +1012,7 @@ class CMacrosResolverGeneral {
 							break;
 
 						case 'ITEM.LOG.SEVERITY':
-							$value = CSeverityHelper::getName((int) $history[$itemid][0]['severity']);
+							$value = get_item_logtype_description($history[$itemid][0]['severity']);
 							break;
 
 						case 'ITEM.LOG.NSEVERITY':
@@ -1266,7 +1266,7 @@ class CMacrosResolverGeneral {
 						$value = $history[$function['itemid']][0]['source'];
 						break;
 					case 'ITEM.LOG.SEVERITY':
-						$value = CSeverityHelper::getName((int) $history[$function['itemid']][0]['severity']);
+						$value = get_item_logtype_description($history[$function['itemid']][0]['severity']);
 						break;
 					case 'ITEM.LOG.NSEVERITY':
 						$value = $history[$function['itemid']][0]['severity'];
@@ -2715,7 +2715,7 @@ class CMacrosResolverGeneral {
 				// Searching context coincidence, if regex array not empty.
 				elseif ($context !== null && count($host_macros[$hostid][$macro]['regex'])) {
 					foreach ($host_macros[$hostid][$macro]['regex'] as $regex => $val) {
-						if (preg_match('/'.strtr(trim($regex, '/'), ['/' => '\\/']).'/', $context) === 1) {
+						if (preg_match('/'.preg_quote(trim($regex, '/'), '/').'/', $context) === 1) {
 							return [
 								'value' => $val,
 								'value_default' => $value_default

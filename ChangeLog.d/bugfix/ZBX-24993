@@ -1,0 +1,1 @@
+........S. [ZBX-24993] removed reset of preprocessing history during configuration sync when preprocessing steps remain unchanged (dgoloscapov)

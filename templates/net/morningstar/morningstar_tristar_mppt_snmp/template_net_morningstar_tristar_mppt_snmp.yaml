@@ -308,6 +308,7 @@ zabbix_export:
           key: 'status.alarms[alarms.0]'
           history: 1h
           value_type: TEXT
+          trends: '0'
           description: |
             MIB: TRISTAR-MPPT
             Description:Faults
@@ -507,6 +508,7 @@ zabbix_export:
           key: 'status.faults[faults.0]'
           history: 1h
           value_type: TEXT
+          trends: '0'
           description: |
             MIB: TRISTAR-MPPT
             Description:Faults
@@ -786,6 +788,7 @@ zabbix_export:
           name: 'Battery voltage discovery'
           type: DEPENDENT
           key: battery.voltage.discovery
+          delay: '0'
           description: 'Discovery for battery voltage triggers'
           item_prototypes:
             - uuid: 763cce63817f471095bdce7a6127b0bf
