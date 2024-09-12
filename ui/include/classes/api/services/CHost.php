@@ -809,6 +809,10 @@ class CHost extends CHostGeneral {
 		}
 		unset($host);
 
+		$hosts = $this->extendObjectsByKey($hosts, $db_hosts, 'hostid', ['tls_connect', 'tls_accept', 'tls_issuer',
+			'tls_subject', 'tls_psk_identity', 'tls_psk'
+		]);
+
 		foreach ($hosts as $host) {
 			// Extend host inventory with the required data.
 			if (array_key_exists('inventory', $host) && $host['inventory']) {
@@ -820,8 +824,13 @@ class CHost extends CHostGeneral {
 				}
 			}
 
-			$data = ['hosts' => ['hostid' => $host['hostid']]] + $host;
-			$this->massUpdateForce($data, $db_hosts);
+			$data = $host;
+			$data['hosts'] = ['hostid' => $host['hostid']];
+			$result = $this->massUpdate($data);
+
+			if (!$result) {
+				self::exception(ZBX_API_ERROR_INTERNAL, _('Host update failed.'));
+			}
 		}
 
 		$this->updateTags(array_column($hosts, 'tags', 'hostid'));
@@ -900,18 +909,20 @@ class CHost extends CHostGeneral {
 
 		sort($hostids);
 
-		$tls_fields = ['tls_connect', 'tls_accept', 'tls_issuer', 'tls_subject', 'tls_psk_identity', 'tls_psk'];
 		$db_hosts = $this->get([
 			'output' => ['hostid', 'proxy_hostid', 'host', 'status', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username',
-				'ipmi_password', 'name', 'description', 'inventory_mode'
+				'ipmi_password', 'name', 'description', 'tls_connect', 'tls_accept', 'tls_issuer', 'tls_subject',
+				'tls_psk_identity', 'tls_psk', 'inventory_mode'
 			],
 			'hostids' => $hostids,
 			'editable' => true,
 			'preservekeys' => true
 		]);
 
-		if (count($hosts) != count($db_hosts)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		foreach ($hosts as $host) {
+			if (!array_key_exists($host['hostid'], $db_hosts)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
+			}
 		}
 
 		// Check inventory mode value.
@@ -925,7 +936,10 @@ class CHost extends CHostGeneral {
 			$this->checkValidator($data['inventory_mode'], $inventory_mode);
 		}
 
-		if (array_intersect_key($data, array_flip($tls_fields))) {
+		// Check connection fields only for massupdate action.
+		if (array_key_exists('tls_connect', $data) || array_key_exists('tls_accept', $data)
+				|| array_key_exists('tls_psk_identity', $data) || array_key_exists('tls_psk', $data)
+				|| array_key_exists('tls_issuer', $data) || array_key_exists('tls_subject', $data)) {
 			if (!array_key_exists('tls_connect', $data) || !array_key_exists('tls_accept', $data)) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _(
 					'Cannot update host encryption settings. Connection settings for both directions should be specified.'
@@ -934,36 +948,19 @@ class CHost extends CHostGeneral {
 
 			// Clean PSK fields.
 			if ($data['tls_connect'] != HOST_ENCRYPTION_PSK && !($data['tls_accept'] & HOST_ENCRYPTION_PSK)) {
-				$data += [
-					'tls_psk_identity' => DB::getDefault('hosts', 'tls_psk_identity'),
-					'tls_psk' => DB::getDefault('hosts', 'tls_psk')
-				];
+				$data['tls_psk_identity'] = '';
+				$data['tls_psk'] = '';
 			}
 
 			// Clean certificate fields.
 			if ($data['tls_connect'] != HOST_ENCRYPTION_CERTIFICATE
 					&& !($data['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE)) {
-				$data += [
-					'tls_issuer' => DB::getDefault('hosts', 'tls_issuer'),
-					'tls_subject' => DB::getDefault('hosts', 'tls_subject')
-				];
+				$data['tls_issuer'] = '';
+				$data['tls_subject'] = '';
 			}
-
-			$tls_values = array_intersect_key($data, array_flip($tls_fields));
-			$db_hosts_tls_data = DB::select('hosts', [
-				'output' => $tls_fields,
-				'hostids' => array_keys($db_hosts),
-				'preservekeys' => true
-			]);
-
-			foreach ($hosts as &$host) {
-				$host += $tls_values;
-				$db_hosts[$host['hostid']] += $db_hosts_tls_data[$host['hostid']];
-			}
-			unset($host);
-
-			$this->validateEncryption($hosts, $db_hosts);
 		}
+
+		$this->validateEncryption([$data]);
 
 		if (array_key_exists('groups', $data) && !$data['groups'] && $db_hosts) {
 			$host = reset($db_hosts);
@@ -1024,15 +1021,6 @@ class CHost extends CHostGeneral {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Template "%1$s" already exists.', $data['host']));
 			}
 		}
-
-		$this->massUpdateForce($data, $db_hosts);
-
-		return ['hostids' => $hostids];
-	}
-
-	protected function massUpdateForce($data, $db_hosts) {
-		$hosts = zbx_toArray($data['hosts']);
-		$hostids = array_column($hosts, 'hostid');
 
 		if (isset($data['groups'])) {
 			$updateGroups = $data['groups'];
@@ -1283,6 +1271,8 @@ class CHost extends CHostGeneral {
 		}
 
 		$this->addAuditBulk(CAudit::ACTION_UPDATE, CAudit::RESOURCE_HOST, $new_hosts, $db_hosts);
+
+		return ['hostids' => $inputHostIds];
 	}
 
 	/**
@@ -2142,11 +2132,7 @@ class CHost extends CHostGeneral {
 		]];
 
 		$db_hosts = $this->get([
-			'output' => [
-				'hostid', 'host', 'flags', 'tls_connect', 'tls_accept', 'tls_issuer', 'tls_subject', 'proxy_hostid',
-				'status', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'name', 'description',
-				'inventory_mode'
-			],
+			'output' => ['hostid', 'host', 'flags', 'tls_connect', 'tls_accept', 'tls_issuer', 'tls_subject'],
 			'hostids' => array_column($hosts, 'hostid'),
 			'editable' => true,
 			'preservekeys' => true
