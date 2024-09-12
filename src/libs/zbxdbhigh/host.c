@@ -5427,6 +5427,11 @@ void	DBdelete_hosts(const zbx_vector_uint64_t *hostids, const zbx_vector_str_t *
 	for (i = 0; i < hostids->values_num; i++)
 		DBdelete_action_conditions(CONDITION_TYPE_HOST, hostids->values[i]);
 
+	/* delete host opcommands */
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from opcommand_hst where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids->values, hostids->values_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+
 	/* delete host */
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from hosts where");
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids->values, hostids->values_num);
@@ -5936,6 +5941,16 @@ void	DBdelete_groups(zbx_vector_uint64_t *groupids)
 				selementids.values_num);
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 	}
+
+	/* delete opcommands */
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from opcommand_grp where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "groupid", groupids->values, groupids->values_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+
+	/* delete opgroups */
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from opgroup where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "groupid", groupids->values, groupids->values_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 
 	/* groups */
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from hstgrp where");
