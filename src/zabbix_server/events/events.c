@@ -2089,7 +2089,7 @@ static void	add_event_suppress_data(zbx_vector_ptr_t *event_refs, zbx_vector_uin
 
 			for (int j = 0; j < event_queries.values_num; j++)
 			{
-				zbx_db_event        *event = (zbx_db_event *)event_refs->values[j];
+				zbx_db_event	*event = (zbx_db_event *)event_refs->values[j];
 
 				query = event_queries.values[j];
 
