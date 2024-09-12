@@ -8416,7 +8416,7 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 				itempp_sec2 + maintenance_sec2 + item_tag_sec2 + update_sec + um_cache_sec +
 				drules_sec2 + httptest_sec2 + connector_sec2 + proxy_sec2 + proxy_group_sec2 + hp_sec2;
 
-		zbx_int64_t	total_used = used + cused + autoreg_used + autoreg_host_used + proxy_group_used + um_cache_used + host_tag_used +
+		zbx_int64_t	total_used = cused + autoreg_used + autoreg_host_used + proxy_group_used + um_cache_used + host_tag_used +
 			proxy_used + hused + hiused + hgroups_used + maintenance_used + connector_used + hp_used + ifused +
 			piused + iused + tiused + idused + itempp_used + itemscrp_used + fused + tused +
 			dused + expr_used + action_used + action_op_used + action_condition_used + trigger_tag_used +
