@@ -15,6 +15,7 @@
 #include "zbxasyncpoller.h"
 #include "zbxcommon.h"
 #include "zbxcomms.h"
+#include "zbxtime.h"
 
 #ifdef HAVE_LIBEVENT
 #include "zbxip.h"

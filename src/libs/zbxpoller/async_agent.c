@@ -22,6 +22,7 @@
 #include "zbxself.h"
 #include "zbxagentget.h"
 #include "zbxversion.h"
+#include "zbxstr.h"
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 #	include "zbxip.h"
