@@ -83,6 +83,25 @@ static int	DBpatch_7010003(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_7010004(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	/* 0 - HOST_STATUS_MONITORED */
+	/* 1 - HOST_STATUS_NOT_MONITORED */
+	if (ZBX_DB_OK > zbx_db_execute(
+			"update items"
+				" set uuid=''"
+				" where hostid in (select hostid from hosts where status in (0,1))"
+					" and uuid" ZBX_SQL_STRCMP, ZBX_SQL_STRVAL_NE("")))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(7010)
@@ -93,5 +112,6 @@ DBPATCH_ADD(7010000, 0, 1)
 DBPATCH_ADD(7010001, 0, 1)
 DBPATCH_ADD(7010002, 0, 1)
 DBPATCH_ADD(7010003, 0, 1)
+DBPATCH_ADD(7010004, 0, 1)
 
 DBPATCH_END()
