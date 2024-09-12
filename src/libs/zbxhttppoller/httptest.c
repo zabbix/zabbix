@@ -279,6 +279,11 @@ static int	macro_httptest_field_resolv(zbx_macro_resolv_data_t *p, va_list args,
 		if (SUCCEED == (ret = zbx_dc_config_get_interface(&interface, dc_host->hostid, 0)))
 			*replace_with = zbx_strdup(*replace_with, interface.addr);
 	}
+	else if (0 == strcmp(p->macro, MVAR_HOST_PORT))
+	{
+		if (SUCCEED == (ret = zbx_dc_config_get_interface(&interface, dc_host->hostid, 0)))
+			*replace_with = zbx_strdup(*replace_with, interface.port_orig);
+	}
 
 	return ret;
 }

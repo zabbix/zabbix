@@ -215,6 +215,15 @@
 #define ZBX_PROTO_TAG_DEL_HOSTPROXYIDS		"del_hostproxyids"
 #define ZBX_PROTO_TAG_RESET			"reset"
 #define ZBX_PROTO_TAG_VARIANT			"variant"
+#define ZBX_PROTO_TAG_ACKNOWLEDGE		"acknowledge"
+#define ZBX_PROTO_TAG_UNACKNOWLEDGE		"unacknowledge"
+#define ZBX_PROTO_TAG_SUPPRESS_TILL		"suppress_till"
+#define ZBX_PROTO_TAG_UPDATE_SUPPPRESS		"update_suppress"
+#define ZBX_PROTO_TAG_UPDATE_UNSUPPPRESS	"update_unsuppress"
+#define ZBX_PROTO_TAG_UPDATE_MESSAGE		"update_message"
+#define ZBX_PROTO_TAG_UPDATE_SEVERITY		"update_severity"
+#define ZBX_PROTO_TAG_OLDSEVERITY		"oldseverity"
+#define ZBX_PROTO_TAG_NEWSEVERITY		"newseverity"
 
 #define ZBX_PROTO_VALUE_FAILED		"failed"
 #define ZBX_PROTO_VALUE_SUCCESS		"success"
@@ -315,7 +324,7 @@ void	zbx_json_free(struct zbx_json *j);
 void	zbx_json_addobject(struct zbx_json *j, const char *name);
 void	zbx_json_addarray(struct zbx_json *j, const char *name);
 void	zbx_json_addstring(struct zbx_json *j, const char *name, const char *string, zbx_json_type_t type);
-size_t	zbx_json_addstring_limit( struct zbx_json *j, const char *name, const char *string, zbx_json_type_t type,
+size_t	zbx_json_addstring_limit(struct zbx_json *j, const char *name, const char *string, zbx_json_type_t type,
 		size_t max_size);
 void	zbx_json_adduint64(struct zbx_json *j, const char *name, zbx_uint64_t value);
 void	zbx_json_addint64(struct zbx_json *j, const char *name, zbx_int64_t value);

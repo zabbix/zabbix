@@ -154,6 +154,75 @@ void	zbx_event_get_json_tags(const zbx_db_event *event, char **replace_to)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: format event actions in JSON format                               *
+ *                                                                            *
+ * Parameters: ack        - [IN] problem update data                          *
+ *             tz         - [IN] time zone                                    *
+ *             replace_to - [OUT] replacement string                          *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_event_get_json_actions(const zbx_db_acknowledge *ack, const char *tz, char **replace_to)
+{
+	struct zbx_json	json;
+
+	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
+	zbx_json_adduint64(&json, ZBX_PROTO_TAG_UPDATE_SEVERITY, ack->action & ZBX_PROBLEM_UPDATE_SEVERITY ? 1 : 0);
+
+	if (ack->action & ZBX_PROBLEM_UPDATE_SEVERITY)
+	{
+		zbx_config_t	cfg;
+
+		zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_SEVERITY_NAME);
+		zbx_json_addstring(&json, ZBX_PROTO_TAG_OLDSEVERITY, cfg.severity_name[ack->old_severity],
+				ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json, ZBX_PROTO_TAG_NEWSEVERITY, cfg.severity_name[ack->new_severity],
+				ZBX_JSON_TYPE_STRING);
+	}
+	zbx_json_adduint64(&json, ZBX_PROTO_TAG_UPDATE_MESSAGE, ack->action & ZBX_PROBLEM_UPDATE_MESSAGE ? 1 : 0);
+
+	if (ack->action & ZBX_PROBLEM_UPDATE_MESSAGE)
+	{
+		zbx_json_addstring(&json, ZBX_PROTO_TAG_MESSAGE, ack->message, ZBX_JSON_TYPE_STRING);
+	}
+
+	zbx_json_adduint64(&json, ZBX_PROTO_TAG_ACKNOWLEDGE, ack->action & ZBX_PROBLEM_UPDATE_ACKNOWLEDGE ? 1 : 0);
+
+	if (ack->action & ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE)
+		zbx_json_adduint64(&json, ZBX_PROTO_TAG_UNACKNOWLEDGE, 1);
+
+	zbx_json_adduint64(&json, ZBX_PROTO_TAG_UPDATE_SUPPPRESS, ack->action & ZBX_PROBLEM_UPDATE_SUPPRESS ? 1 : 0);
+
+	if (ack->action & ZBX_PROBLEM_UPDATE_UNSUPPRESS)
+		zbx_json_adduint64(&json, ZBX_PROTO_TAG_UPDATE_UNSUPPPRESS, 1);
+
+	if (ack->action & ZBX_PROBLEM_UPDATE_SUPPRESS)
+	{
+		char	*suppress_until_buf = NULL;
+
+		if (0 == ack->suppress_until)
+		{
+			suppress_until_buf = zbx_strdup(NULL, "indefinitely");
+		}
+		else
+		{
+			suppress_until_buf = zbx_dsprintf(NULL, "%s %s",
+					zbx_date2str((time_t)ack->suppress_until, tz),
+					zbx_time2str((time_t)ack->suppress_until, tz));
+		}
+		zbx_json_addstring(&json, ZBX_PROTO_TAG_SUPPRESS_TILL, suppress_until_buf, ZBX_JSON_TYPE_STRING);
+		zbx_free(suppress_until_buf);
+	}
+
+	zbx_json_addstring(&json, ZBX_PROTO_TAG_MTIME, zbx_time2str(ack->clock, tz), ZBX_JSON_TYPE_STRING);
+	zbx_json_adduint64(&json, ZBX_PROTO_TAG_TIMESTAMP, (zbx_uint64_t)ack->clock);
+
+	zbx_json_close(&json);
+	*replace_to = zbx_strdup(*replace_to, json.buffer);
+	zbx_json_free(&json);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: get event tag value by name                                       *
  *                                                                            *
  * Parameters: macro      - [IN] the macro                                    *
@@ -230,6 +299,10 @@ void	zbx_event_get_macro_value(const char *macro, const zbx_db_event *event, cha
 	else if (0 == strcmp(macro, MVAR_EVENT_TIME))
 	{
 		*replace_to = zbx_strdup(*replace_to, zbx_time2str(event->clock, tz));
+	}
+	else if (0 == strcmp(macro, MVAR_EVENT_TIMESTAMP))
+	{
+		*replace_to = zbx_dsprintf(*replace_to, "%d", event->clock);
 	}
 	else if (0 == strcmp(macro, MVAR_EVENT_SOURCE))
 	{
