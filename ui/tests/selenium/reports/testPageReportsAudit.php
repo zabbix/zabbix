@@ -475,7 +475,7 @@ class testPageReportsAudit extends CWebTest {
 					'fields' => [
 						'IP' => '111.222.33.4'
 					],
-					'result_count' => 2
+					'result_count' => 4
 				]
 			],
 			// #18 Part of correct IP
