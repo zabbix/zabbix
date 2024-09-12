@@ -21,64 +21,95 @@
 
 class CApiPskHelper {
 
-	/**
-	 * Check tls_psk_identity have same tls_psk value across all hosts, proxies and autoregistration.
-	 *
-	 * @param array  $psk_pairs
-	 * @param string $psk_pair[]['tls_psk']
-	 * @param string $psk_pair[]['tls_psk_identity']
-	 * @param string $psk_pair[]['hostid']            (optional) required on host or proxy update
-	 * @param string $psk_pair[]['autoreg_tlsid']     (optional) required on autoregistration update
-	 *
-	 * @throws APIException
-	 */
-	public static function checkPskIndentityPskPairs(array $psk_pairs) {
-		$psk_pair_index = [];
+	public static function checkPskOfIdentitiesAmongGivenPairs(array $psk_pairs): void {
+		$tls_psk_by_identity = [];
 
 		foreach ($psk_pairs as $i => $psk_pair) {
-			if (array_key_exists($psk_pair['tls_psk_identity'], $psk_pair_index)
-					&& $psk_pairs[$psk_pair_index[$psk_pair['tls_psk_identity']]]['tls_psk'] !== $psk_pair['tls_psk']) {
-				throw new APIException(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-					'/'.($i + 1).'/tls_psk', _('another value of tls_psk exists for same tls_psk_identity'))
-				);
+			if (array_key_exists($psk_pair['tls_psk_identity'], $tls_psk_by_identity)
+					&& $tls_psk_by_identity[$psk_pair['tls_psk_identity']] !== $psk_pair['tls_psk']) {
+				throw new APIException(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+					'/'.($i + 1).'/tls_psk',
+					_('another tls_psk value is already associated with given tls_psk_identity')
+				));
 			}
 
-			$psk_pair_index[$psk_pair['tls_psk_identity']] = $i;
+			$tls_psk_by_identity[$psk_pair['tls_psk_identity']] = $psk_pair['tls_psk'];
+		}
+	}
+
+	public static function checkPskOfIdentitiesInAutoregistration(array $psk_pairs): void {
+		$object_indexes = [];
+		$psk_conditions = [];
+
+		foreach ($psk_pairs as $i => $psk_pair) {
+			if (!array_key_exists($psk_pair['tls_psk_identity'], $object_indexes)) {
+				$object_indexes[$psk_pair['tls_psk_identity']] = $i;
+				$psk_conditions[] = dbConditionString('tls_psk_identity', [$psk_pair['tls_psk_identity']]).
+					' AND '.dbConditionString('tls_psk', [$psk_pair['tls_psk']], true);
+			}
 		}
 
-		$check_psk_identities = array_keys($psk_pair_index);
-		$exclude_autoregid = array_unique(array_column($psk_pairs, 'autoreg_tlsid'));
-		$autoreg = DBfetch(DBselect(
-			'SELECT tls_psk_identity,tls_psk FROM config_autoreg_tls'.
-			' WHERE '.dbConditionId('autoreg_tlsid', $exclude_autoregid, true).
-				' AND '.dbConditionString('tls_psk_identity', $check_psk_identities)
+		$row = DBfetch(DBselect(
+			'SELECT NULL'.
+			' FROM config_autoreg_tls'.
+			' WHERE ('.implode(') OR (', $psk_conditions).')'
 		));
 
-		if ($autoreg) {
-			$i = $psk_pair_index[$autoreg['tls_psk_identity']];
+		if ($row) {
+			$i = $object_indexes[$row['tls_psk_identity']];
 
-			if ($psk_pairs[$i]['tls_psk'] !== $autoreg['tls_psk']) {
-				throw new APIException(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-					'/'.($i + 1).'/tls_psk', _('another value of tls_psk exists for same tls_psk_identity'))
-				);
+			throw new APIException(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+				'/'.($i + 1).'/tls_psk', _('another tls_psk value is already associated with given tls_psk_identity')
+			));
+		}
+	}
+
+	public static function checkPskOfIdentitiesAmongHostsAndProxies(array $psk_pairs, array $hostids = null): void {
+		$object_indexes = [];
+		$psk_conditions = [];
+
+		foreach ($psk_pairs as $i => $psk_pair) {
+			if (!array_key_exists($psk_pair['tls_psk_identity'], $object_indexes)) {
+				$object_indexes[$psk_pair['tls_psk_identity']] = $i;
+				$psk_conditions[] = dbConditionString('tls_psk_identity', [$psk_pair['tls_psk_identity']]).
+					' AND '.dbConditionString('tls_psk', [$psk_pair['tls_psk']], true);
 			}
 		}
 
-		$exclude_hostids = array_unique(array_column($psk_pairs, 'hostid'));
-		$cursor = DBselect(
-			'SELECT tls_psk_identity,tls_psk FROM hosts'.
-			' WHERE '.dbConditionId('hostid', $exclude_hostids, true).
-				' AND '.dbConditionString('tls_psk_identity', $check_psk_identities)
-		);
+		$conditions = $hostids === null
+			? '('.implode(') OR (', $psk_conditions).')'
+			: '(('.implode(') OR (', $psk_conditions).'))'.
+				' AND '.dbConditionId('hostid', $hostids, true);
 
-		while ($db_row = DBfetch($cursor)) {
-			$i = $psk_pair_index[$db_row['tls_psk_identity']];
+		$row = DBfetch(DBselect(
+			'SELECT tls_psk_identity'.
+			' FROM hosts'.
+			' WHERE '.$conditions,
+			1
+		));
 
-			if ($psk_pairs[$i]['tls_psk'] !== $db_row['tls_psk']) {
-				throw new APIException(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-					'/'.($i + 1).'/tls_psk', _('another value of tls_psk exists for same tls_psk_identity'))
-				);
-			}
+		if ($row) {
+			$i = $object_indexes[$row['tls_psk_identity']];
+
+			throw new APIException(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+				'/'.($i + 1).'/tls_psk', _('another tls_psk value is already associated with given tls_psk_identity')
+			));
+		}
+	}
+
+	public static function checkPskOfIdentityAmongHostsAndProxies(array $psk_pair): void {
+		$row = DBfetch(DBselect(
+			'SELECT NULL'.
+			' FROM hosts'.
+			' WHERE '.dbConditionString('tls_psk_identity', [$psk_pair['tls_psk_identity']]).
+				' AND '.dbConditionString('tls_psk', [$psk_pair['tls_psk']], true),
+			1
+		));
+
+		if ($row) {
+			throw new APIException(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', '/tls_psk',
+				_('another tls_psk value is already associated with given tls_psk_identity')
+			));
 		}
 	}
 }

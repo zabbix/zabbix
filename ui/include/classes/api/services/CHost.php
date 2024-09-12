@@ -1793,6 +1793,7 @@ class CHost extends CHostGeneral {
 		$min_accept_type = HOST_ENCRYPTION_NONE;
 		$max_accept_type = HOST_ENCRYPTION_NONE | HOST_ENCRYPTION_PSK | HOST_ENCRYPTION_CERTIFICATE;
 		$psk_pairs = [];
+		$psk_hostids = $db_hosts !== null ? [] : null;
 
 		foreach ($hosts as $i => $host) {
 			foreach (['tls_connect', 'tls_accept'] as $field_name) {
@@ -1852,7 +1853,7 @@ class CHost extends CHostGeneral {
 					];
 
 					if ($db_hosts !== null) {
-						$psk_pairs[$i]['hostid'] = $host['hostid'];
+						$psk_hostids[] = $host['hostid'];
 					}
 				}
 			}
@@ -1887,7 +1888,9 @@ class CHost extends CHostGeneral {
 		}
 
 		if ($psk_pairs) {
-			CApiPskHelper::checkPskIndentityPskPairs($psk_pairs);
+			CApiPskHelper::checkPskOfIdentitiesAmongGivenPairs($psk_pairs);
+			CApiPskHelper::checkPskOfIdentitiesInAutoregistration($psk_pairs);
+			CApiPskHelper::checkPskOfIdentitiesAmongHostsAndProxies($psk_pairs, $psk_hostids);
 		}
 	}
 

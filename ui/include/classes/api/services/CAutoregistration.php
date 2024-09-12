@@ -178,9 +178,15 @@ class CAutoregistration extends CApiService {
 		}
 
 		if ($tls_accept & HOST_ENCRYPTION_PSK) {
-			$psk_pair = array_intersect_key($autoreg + $db_autoreg, array_flip(['tls_psk_identity', 'tls_psk']));
-			$psk_pair['autoreg_tlsid'] = $db_autoreg['autoreg_tlsid'];
-			CApiPskHelper::checkPskIndentityPskPairs([$psk_pair]);
+			$tls_psk_fields = array_flip(['tls_psk_identity', 'tls_psk']);
+
+			$psk_pair = array_intersect_key($autoreg, $tls_psk_fields);
+
+			if ($psk_pair) {
+				$psk_pair += array_intersect_key($db_autoreg, $tls_psk_fields);
+
+				CApiPskHelper::checkPskOfIdentityAmongHostsAndProxies($psk_pair);
+			}
 		}
 	}
 }

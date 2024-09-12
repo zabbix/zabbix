@@ -625,30 +625,30 @@ class CProxy extends CApiService {
 	private static function checkTlsPsk(array $proxies, array $db_proxies = null): void {
 		$psk_pairs = [];
 		$tls_psk_fields = array_flip(['tls_psk_identity', 'tls_psk']);
+		$psk_proxyids = $db_proxies !== null ? [] : null;
 
 		foreach ($proxies as $i => $proxy) {
 			$psk_pair = array_intersect_key($proxy, $tls_psk_fields);
 
-			if (!$psk_pair) {
-				continue;
-			}
-			elseif ($proxy['status'] == HOST_STATUS_PROXY_PASSIVE && $proxy['tls_connect'] != HOST_ENCRYPTION_PSK) {
-				continue;
-			}
-			elseif ($proxy['status'] == HOST_STATUS_PROXY_ACTIVE && ($proxy['tls_accept'] & HOST_ENCRYPTION_PSK) == 0) {
+			if (!$psk_pair
+					|| ($proxy['status'] == HOST_STATUS_PROXY_PASSIVE && $proxy['tls_connect'] != HOST_ENCRYPTION_PSK)
+					|| ($proxy['status'] == HOST_STATUS_PROXY_ACTIVE
+						&& ($proxy['tls_accept'] & HOST_ENCRYPTION_PSK) == 0)) {
 				continue;
 			}
 
 			if ($db_proxies !== null) {
 				$psk_pair += array_intersect_key($db_proxies[$proxy['proxyid']], $tls_psk_fields);
-				$psk_pair['hostid'] = $proxy['proxyid'];
+				$psk_proxyids[] = $proxy['proxyid'];
 			}
 
 			$psk_pairs[$i] = $psk_pair;
 		}
 
 		if ($psk_pairs) {
-			CApiPskHelper::checkPskIndentityPskPairs($psk_pairs);
+			CApiPskHelper::checkPskOfIdentitiesAmongGivenPairs($psk_pairs);
+			CApiPskHelper::checkPskOfIdentitiesInAutoregistration($psk_pairs);
+			CApiPskHelper::checkPskOfIdentitiesAmongHostsAndProxies($psk_pairs, $psk_proxyids);
 		}
 	}
 
