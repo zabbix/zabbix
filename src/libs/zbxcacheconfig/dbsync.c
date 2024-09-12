@@ -12,7 +12,6 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#include "zbxalgo.h"
 #include "zbxcacheconfig.h"
 #include "dbsync.h"
 #include "user_macro.h"
@@ -2071,14 +2070,11 @@ static char	**dbsync_trigger_preproc_row(zbx_dbsync_t *sync, char **row)
 	zbx_eval_context_t	ctx, ctx_r;
 	char			*error = NULL;
 	unsigned char		mode, timer = ZBX_TRIGGER_TIMER_DEFAULT, flags;
-	zbx_vector_uint64_t	functionids;
 
 	ZBX_STR2UCHAR(flags, row[19]);
 
 	if (ZBX_FLAG_DISCOVERY_PROTOTYPE == flags)
 		return row;
-
-	zbx_vector_uint64_create(&functionids);
 
 	memcpy(sync->row, row, sizeof(char *) * (size_t)sync->columns_num);
 	row = sync->row;
@@ -2090,15 +2086,6 @@ static char	**dbsync_trigger_preproc_row(zbx_dbsync_t *sync, char **row)
 	}
 	else
 	{
-		zbx_eval_get_functionids(&ctx, &functionids);
-
-		if (0 != functionids.values_num &&
-				NULL == zbx_hashset_search(&dbsync_env.cache->functions, &functionids.values[0]))
-		{
-			row[19] = NULL;
-			goto out;
-		}
-
 		if (SUCCEED == zbx_eval_check_timer_functions(&ctx))
 			timer |= ZBX_TRIGGER_TIMER_EXPRESSION;
 	}
@@ -2121,6 +2108,7 @@ static char	**dbsync_trigger_preproc_row(zbx_dbsync_t *sync, char **row)
 	}
 
 	row[16] = encode_expression(&ctx);
+	zbx_eval_clear(&ctx);
 
 	if (TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION == mode)
 	{
@@ -2129,9 +2117,6 @@ static char	**dbsync_trigger_preproc_row(zbx_dbsync_t *sync, char **row)
 	}
 
 	row[18] = zbx_dsprintf(NULL, "%d", timer);
-out:
-	zbx_eval_clear(&ctx);
-	zbx_vector_uint64_destroy(&functionids);
 
 	return sync->row;
 }
