@@ -304,7 +304,7 @@ class CConfigurationExport {
 			$this->gatherImages($options['images']);
 		}
 
-		if ($options['mediaTypes']) {
+		if ($options['mediaTypes'] && CApiService::$userData['type'] == USER_TYPE_SUPER_ADMIN) {
 			$this->gatherMediaTypes($options['mediaTypes']);
 		}
 	}
