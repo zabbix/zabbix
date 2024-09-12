@@ -26,6 +26,7 @@
 #include "zbxtime.h"
 #include "zbxtypes.h"
 #include "zbxvariant.h"
+#include "zbxstr.h"
 
 #ifdef HAVE_LIBCURL
 
@@ -36,8 +37,9 @@
  ******************************************************************************/
 static zbx_webdriver_t *es_webdriver(duk_context *ctx)
 {
-	zbx_webdriver_t		*wd;
-	zbx_es_env_t		*env;
+	zbx_webdriver_t	*wd;
+	zbx_es_env_t	*env;
+	void		*objptr;
 
 	if (NULL == (env = zbx_es_get_env(ctx)))
 	{
@@ -46,7 +48,11 @@ static zbx_webdriver_t *es_webdriver(duk_context *ctx)
 		return NULL;
 	}
 
-	if (NULL == (wd = (zbx_webdriver_t *)es_obj_get_data(env, ES_OBJ_BROWSER)))
+	duk_push_this(ctx);
+	objptr = duk_require_heapptr(ctx, -1);
+	duk_pop(ctx);
+
+	if (NULL == (wd = (zbx_webdriver_t *)es_obj_get_data(env, objptr, ES_OBJ_BROWSER)))
 		(void)duk_push_error_object(ctx, DUK_RET_EVAL_ERROR, "cannot find native data attached to object");
 
 	return wd;
@@ -94,10 +100,15 @@ static duk_ret_t	es_browser_ctor(duk_context *ctx)
 	if (!duk_is_constructor_call(ctx))
 		return DUK_RET_TYPE_ERROR;
 
-	duk_get_global_string(ctx, "JSON");
-	duk_push_string(ctx, "stringify");
+	if (NULL == (env = zbx_es_get_env(ctx)))
+	{
+		err_index = duk_push_error_object(ctx, DUK_RET_TYPE_ERROR, "cannot access internal environment");
+		goto out;
+	}
+
+	duk_push_heapptr(ctx, env->json_stringify);
 	duk_dup(ctx, 0);
-	duk_pcall_prop(ctx, -3, 1);
+	duk_pcall(ctx, 1);
 
 	if (SUCCEED != es_duktape_string_decode(duk_safe_to_string(ctx, -1), &capabilities))
 	{
@@ -127,6 +138,8 @@ static duk_ret_t	es_browser_ctor(duk_context *ctx)
 		err_index = duk_push_error_object(ctx, DUK_RET_TYPE_ERROR, "cannot create webdriver: %s", error);
 		goto out;
 	}
+
+	wd->env = env;
 
 	duk_push_this(ctx);
 	objptr = duk_require_heapptr(ctx, -1);
@@ -226,7 +239,7 @@ static duk_ret_t	es_browser_get_url(duk_context *ctx)
 		return duk_throw(ctx);
 	}
 
-	duk_push_string(ctx, url);
+	es_push_result_string(ctx, url, strlen(url));
 	zbx_free(url);
 
 	return 1;
@@ -359,7 +372,7 @@ out:
  * Return value: value matching the variant type                              *
  *                                                                            *
  ******************************************************************************/
-static void	es_browser_get_variant(duk_context *ctx, const zbx_variant_t *var)
+static void	es_browser_get_variant(zbx_es_env_t *env, duk_context *ctx, const zbx_variant_t *var)
 {
 	const char	*str;
 	duk_idx_t	idx;
@@ -381,17 +394,15 @@ static void	es_browser_get_variant(duk_context *ctx, const zbx_variant_t *var)
 			break;
 		case ZBX_VARIANT_BIN:
 			len = zbx_variant_data_bin_get(var->data.bin, (const void **)&str);
-			duk_get_global_string(ctx, "JSON");
-			duk_push_string(ctx, "parse");
+			duk_push_heapptr(ctx, env->json_parse);
 			duk_push_lstring(ctx, str, len);
-			duk_pcall_prop(ctx, -3, 1);
-			duk_remove(ctx, -2);	/* remove global JSON object from stack */
+			duk_pcall(ctx, 1);
 			break;
 		case ZBX_VARIANT_VECTOR:
 			idx = duk_push_array(ctx);
 			for (int i = 0; i < var->data.vector->values_num; i++)
 			{
-				es_browser_get_variant(ctx, &var->data.vector->values[i]);
+				es_browser_get_variant(env, ctx, &var->data.vector->values[i]);
 				duk_put_prop_index(ctx, idx, (duk_uarridx_t)i);
 			}
 			break;
@@ -406,7 +417,7 @@ static void	es_browser_get_variant(duk_context *ctx, const zbx_variant_t *var)
  * Purpose: push performance entry object on stack                            *
  *                                                                            *
  ******************************************************************************/
-static void	es_browser_push_performance_entry(duk_context *ctx, zbx_wd_perf_entry_t *entry)
+static void	es_browser_push_performance_entry(zbx_es_env_t *env, duk_context *ctx, zbx_wd_perf_entry_t *entry)
 {
 	zbx_hashset_iter_t		iter;
 	zbx_wd_attr_t			*attr;
@@ -417,7 +428,7 @@ static void	es_browser_push_performance_entry(duk_context *ctx, zbx_wd_perf_entr
 	zbx_hashset_iter_reset(&entry->attrs, &iter);
 	while (NULL != (attr = (zbx_wd_attr_t *)zbx_hashset_iter_next(&iter)))
 	{
-		es_browser_get_variant(ctx, &attr->value);
+		es_browser_get_variant(env, ctx, &attr->value);
 		duk_put_prop_string(ctx, idx, attr->name);
 	}
 }
@@ -449,7 +460,7 @@ static void	es_browser_push_error(duk_context *ctx, zbx_webdriver_t *wd)
 	duk_put_prop_string(ctx, -2, "http_status");
 	duk_push_string(ctx, error_code);
 	duk_put_prop_string(ctx, -2, "code");
-	duk_push_string(ctx, wd->last_error_message);
+	es_push_result_string(ctx, wd->last_error_message, strlen(wd->last_error_message));
 	duk_put_prop_string(ctx, -2, "message");
 }
 
@@ -506,11 +517,11 @@ static duk_ret_t	es_browser_get_result(duk_context *ctx)
 
 			if (NULL != details->navigation)
 			{
-				es_browser_push_performance_entry(ctx, details->navigation);
+				es_browser_push_performance_entry(wd->env, ctx, details->navigation);
 				duk_put_prop_string(ctx, idx, "navigation");
 			}
 
-			es_browser_push_performance_entry(ctx, details->resource);
+			es_browser_push_performance_entry(wd->env, ctx, details->resource);
 			duk_put_prop_string(ctx, idx, "resource");
 
 			if (0 != details->user.values_num)
@@ -520,7 +531,7 @@ static duk_ret_t	es_browser_get_result(duk_context *ctx)
 				idx_user = duk_push_array(ctx);
 				for (int j = 0; j < details->user.values_num; j++)
 				{
-					es_browser_push_performance_entry(ctx, details->user.values[j]);
+					es_browser_push_performance_entry(wd->env, ctx, details->user.values[j]);
 					duk_put_prop_index(ctx, idx_user, (duk_uarridx_t)j);
 				}
 
@@ -533,9 +544,9 @@ static duk_ret_t	es_browser_get_result(duk_context *ctx)
 		duk_put_prop_string(ctx, idx_perf, "details");
 
 		idx_summary = duk_push_object(ctx);
-		es_browser_push_performance_entry(ctx, wd->perf.navigation_summary);
+		es_browser_push_performance_entry(wd->env, ctx, wd->perf.navigation_summary);
 		duk_put_prop_string(ctx, idx_summary, "navigation");
-		es_browser_push_performance_entry(ctx, wd->perf.resource_summary);
+		es_browser_push_performance_entry(wd->env, ctx, wd->perf.resource_summary);
 		duk_put_prop_string(ctx, idx_summary, "resource");
 		duk_put_prop_string(ctx, idx_perf, "summary");
 
@@ -665,10 +676,9 @@ static duk_ret_t	es_browser_get_cookies(duk_context *ctx)
 		zbx_free(error);
 		goto out;
 	}
-	duk_get_global_string(ctx, "JSON");
-	duk_push_string(ctx, "parse");
-	duk_push_string(ctx, cookies);
-	duk_pcall_prop(ctx, -3, 1);
+	duk_push_heapptr(ctx, wd->env->json_parse);
+	es_push_result_string(ctx, cookies, strlen(cookies));
+	duk_pcall(ctx, 1);
 out:
 	zbx_free(cookies);
 
@@ -692,13 +702,16 @@ static duk_ret_t	es_browser_add_cookie(duk_context *ctx)
 	int		err_index = -1;
 	const char	*cookie_cesu;
 
-	duk_get_global_string(ctx, "JSON");
-	duk_push_string(ctx, "stringify");
+	if (NULL == (wd = es_webdriver(ctx)))
+		return duk_throw(ctx);
+
+	duk_push_heapptr(ctx, wd->env->json_stringify);
 	duk_dup(ctx, 0);
-	duk_pcall_prop(ctx, -3, 1);
+	duk_pcall(ctx, 1);
 
 	cookie_cesu = duk_safe_to_string(ctx, -1);
 
+	/* to be sure that the object is not freed during argument evaluation - acquire it again */
 	if (NULL == (wd = es_webdriver(ctx)))
 		return duk_throw(ctx);
 
@@ -746,7 +759,7 @@ static duk_ret_t	es_browser_get_screenshot(duk_context *ctx)
 		return duk_throw(ctx);
 	}
 
-	duk_push_string(ctx, screenshot);
+	es_push_result_string(ctx, screenshot, strlen(screenshot));
 	zbx_free(screenshot);
 
 	return 1;
@@ -880,7 +893,7 @@ static duk_ret_t	es_browser_get_page_source(duk_context *ctx)
 		return duk_throw(ctx);
 	}
 
-	duk_push_string(ctx, source);
+	es_push_result_string(ctx, source, strlen(source));
 	zbx_free(source);
 
 	return 1;
@@ -912,6 +925,7 @@ static duk_ret_t	es_browser_get_alert(duk_context *ctx)
 
 	if (NULL != alert)
 	{
+		zbx_replace_invalid_utf8(alert);
 		wd_alert_create(ctx, wd, alert);
 		zbx_free(alert);
 	}
@@ -976,7 +990,7 @@ out:
 static duk_ret_t	es_browser_get_raw_perf_entries(duk_context *ctx)
 {
 	zbx_webdriver_t		*wd;
-	char			*error = NULL;
+	char			*error = NULL, *result = NULL;
 	struct zbx_json_parse	jp;
 
 	if (NULL == (wd = es_webdriver(ctx)))
@@ -990,11 +1004,14 @@ static duk_ret_t	es_browser_get_raw_perf_entries(duk_context *ctx)
 		return duk_throw(ctx);
 	}
 
-	duk_get_global_string(ctx, "JSON");
-	duk_push_string(ctx, "parse");
-	duk_push_lstring(ctx, jp.start, jp.end - jp.start + 1);
-	duk_pcall_prop(ctx, -3, 1);
-	duk_remove(ctx, -2);	/* remove global JSON object from stack */
+	duk_push_heapptr(ctx, wd->env->json_parse);
+
+	result = zbx_substr(wd->data, jp.start - wd->data, jp.end - wd->data);
+	zbx_replace_invalid_utf8(result);
+	es_push_result_string(ctx, result, strlen(result));
+	zbx_free(result);
+
+	duk_pcall(ctx, 1);
 
 	return 1;
 }
@@ -1043,11 +1060,16 @@ static duk_ret_t	es_browser_get_raw_perf_entries_by_type(duk_context *ctx)
 	}
 	else
 	{
-		duk_get_global_string(ctx, "JSON");
-		duk_push_string(ctx, "parse");
-		duk_push_lstring(ctx, jp.start, jp.end - jp.start + 1);
-		duk_pcall_prop(ctx, -3, 1);
-		duk_remove(ctx, -2);	/* remove global JSON object from stack */
+		char	*result = NULL;
+
+		duk_push_heapptr(ctx, wd->env->json_parse);
+
+		result = zbx_substr(wd->data, jp.start - wd->data, jp.end - wd->data);
+		zbx_replace_invalid_utf8(result);
+		es_push_result_string(ctx, result, strlen(result));
+		zbx_free(result);
+
+		duk_pcall(ctx, 1);
 	}
 
 	zbx_free(entry_type);

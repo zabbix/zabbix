@@ -36,7 +36,7 @@
 
 typedef struct
 {
-	void			*heapptr;	/* js object heap ptr */
+	const void		*heapptr;	/* js object heap ptr */
 	void			*data;
 	zbx_es_obj_type_t	type;
 }
@@ -252,6 +252,19 @@ fail:
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: push result string on duktape value stack                         *
+ *                                                                            *
+ * Comments: The string might be modified by this function.                   *
+ *                                                                            *
+ ******************************************************************************/
+void	es_push_result_string(duk_context *ctx, char *str, size_t size)
+{
+	zbx_replace_invalid_utf8(str);
+	duk_push_lstring(ctx, str, size);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: timeout checking callback                                         *
  *                                                                            *
  ******************************************************************************/
@@ -346,6 +359,25 @@ int	zbx_es_init_env(zbx_es_t *es, const char *config_source_ip, char **error)
 	duk_push_pointer(es->env->ctx, (void *)es->env);
 	duk_def_prop(es->env->ctx, -3, DUK_DEFPROP_HAVE_VALUE | DUK_DEFPROP_CLEAR_WRITABLE | DUK_DEFPROP_HAVE_ENUMERABLE |
 			DUK_DEFPROP_HAVE_CONFIGURABLE);
+
+	/* JSON parse/stringify is used internally, store them into stash to prevent them */
+	/* from being freed when assigning null to them in scripts                        */
+	duk_get_global_string(es->env->ctx, "JSON");			/* [stash,JSON] */
+	duk_push_string(es->env->ctx, "\xff""\xff""duk_json_parse");	/* [stash,JSON,"_parse"] */
+	duk_get_prop_string(es->env->ctx, -2, "parse");			/* [stash,JSON,"_parse",JSON.parse] */
+	es->env->json_parse = duk_get_heapptr(es->env->ctx, -1);
+
+	duk_def_prop(es->env->ctx, -4, DUK_DEFPROP_HAVE_VALUE | DUK_DEFPROP_CLEAR_WRITABLE | DUK_DEFPROP_HAVE_ENUMERABLE |
+			DUK_DEFPROP_HAVE_CONFIGURABLE);	/* [stash,JSON] */
+
+	duk_push_string(es->env->ctx, "\xff""\xff""duk_json_stringify");	/* [stash,JSON,"_stringify"] */
+	duk_get_prop_string(es->env->ctx, -2, "stringify");	/* [stash,JSON,"_stringify",JSON.stringify] */
+	es->env->json_stringify = duk_get_heapptr(es->env->ctx, -1);
+
+	duk_def_prop(es->env->ctx, -4, DUK_DEFPROP_HAVE_VALUE | DUK_DEFPROP_CLEAR_WRITABLE | DUK_DEFPROP_HAVE_ENUMERABLE |
+			DUK_DEFPROP_HAVE_CONFIGURABLE);	/* [stash,JSON] */
+
+	duk_pop(es->env->ctx);
 
 	/* initialize HttpRequest prototype */
 	if (FAIL == zbx_es_init_httprequest(es, error))
@@ -931,19 +963,18 @@ void	es_obj_attach_data(zbx_es_env_t *env, void *objptr, void *data, zbx_es_obj_
  *                                                                            *
  * Purpose: get data pointer attached to current object                       *
  *                                                                            *
- * Parameters: env  - [IN]                                                    *
- *             type - [IN] object type                                        *
+ * Parameters: env    - [IN]                                                  *
+ *             objptr - [IN] js object heap pointer                           *
+ *             type   - [IN] object type                                      *
  *                                                                            *
  * Comments: This function must be used only from object methods.             *
  *                                                                            *
  ******************************************************************************/
-void	*es_obj_get_data(zbx_es_env_t *env, zbx_es_obj_type_t type)
+void	*es_obj_get_data(zbx_es_env_t *env, const void *objptr, zbx_es_obj_type_t type)
 {
 	zbx_es_obj_data_t	obj_local, *obj;
 
-	duk_push_this(env->ctx);
-	obj_local.heapptr = duk_require_heapptr(env->ctx, -1);
-	duk_pop(env->ctx);
+	obj_local.heapptr = objptr;
 
 	if (NULL != (obj = zbx_hashset_search(&env->objmap, &obj_local)) && obj->type == type)
 		return obj->data;
