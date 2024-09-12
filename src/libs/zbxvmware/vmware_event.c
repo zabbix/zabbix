@@ -768,6 +768,9 @@ static int	vmware_service_parse_event_data(zbx_vector_vmware_event_ptr_t *events
 	xpathCtx = xmlXPathNewContext(xdoc);
 	zbx_vector_id_xmlnode_create(&ids);
 
+	if (NULL != node_count)
+		*node_count = 0;
+
 	if (NULL == (xpathObj = xmlXPathEvalExpression((const xmlChar *)(0 == is_prop ? "/*/*/*"
 			ZBX_XPATH_LN("returnval") : "/*/*/*" ZBX_XPATH_LN("returnval") "/*/*/*" ZBX_XPATH_LN("Event")),
 			xpathCtx)))
@@ -778,9 +781,6 @@ static int	vmware_service_parse_event_data(zbx_vector_vmware_event_ptr_t *events
 
 	if (0 != xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
 	{
-		if (NULL != node_count)
-			*node_count = 0;
-
 		zabbix_log(LOG_LEVEL_DEBUG, "Cannot find items in evenlog list.");
 		goto clean;
 	}
@@ -955,7 +955,7 @@ static int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CU
 #	define LAST_KEY(evs)	(evs->values[evs->values_num - 1]->key)
 
 	char		*event_session = NULL, *err = NULL;
-	int		ret = FAIL, node_count = 1, soap_retry = ATTEMPTS_NUM,
+	int		ret = FAIL, parsed_count = -1, node_count = -1, soap_retry = ATTEMPTS_NUM,
 			soap_count = 5; /* 10 - initial value of eventlog records number in one response */
 	xmlDoc		*doc = NULL;
 
@@ -982,6 +982,9 @@ static int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CU
 
 	do
 	{
+		if (0 == parsed_count && 0 != node_count)
+			break;
+
 		zbx_xml_doc_free(doc);
 
 		if ((ZBX_MAXQUERYMETRICS_UNLIMITED / 2) >= soap_count)
@@ -1000,7 +1003,7 @@ static int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CU
 			goto end_session;
 		}
 
-		if (0 != node_count)
+		if (0 != node_count && soap_retry != ATTEMPTS_NUM)
 			soap_retry = ATTEMPTS_NUM;
 
 		if (shmem_free_sz < *strpool_sz + vmware_service_evt_vector_memsize(events))
@@ -1009,8 +1012,8 @@ static int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CU
 		if (shmem_free_sz < *strpool_sz + vmware_service_evt_vector_memsize(events) && 0 == events->values_num)
 			break;
 	}
-	while ((0 < vmware_service_parse_event_data(events, last_key, last_ts, RETURNVAL_TAG, doc,
-			&service->eventlog, strpool_sz, &node_count, skip_old) ||
+	while ((0 < (parsed_count = vmware_service_parse_event_data(events, last_key, last_ts, RETURNVAL_TAG, doc,
+			&service->eventlog, strpool_sz, &node_count, skip_old)) ||
 			(0 == node_count && 0 < soap_retry--)) && 0 == *skip_old &&
 			(0 == events->values_num || LAST_KEY(events) != last_key + 1));
 
