@@ -5942,6 +5942,11 @@ void	DBdelete_groups(zbx_vector_uint64_t *groupids)
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 	}
 
+	/* reset script.groupid */
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update scripts set groupid=null where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "groupid", groupids->values, groupids->values_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+
 	/* delete opcommands */
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from opcommand_grp where");
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "groupid", groupids->values, groupids->values_num);
