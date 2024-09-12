@@ -322,12 +322,23 @@ static void	evaluate_item_functions(zbx_hashset_t *funcs, const zbx_vector_uint6
 			continue;
 		}
 
-		if (ZBX_FUNCTION_TYPE_TRENDS == func->type && 0 == item->trends)
+		if (ZBX_FUNCTION_TYPE_TRENDS == func->type)
 		{
-			zbx_free(func->error);
-			func->error = zbx_eval_format_function_error(func->function, item->host.host,
-					item->key_orig, func->parameter, "item trends are disabled");
-			continue;
+			if (ITEM_VALUE_TYPE_FLOAT != item->value_type && ITEM_VALUE_TYPE_UINT64 != item->value_type)
+			{
+				zbx_free(func->error);
+				func->error = zbx_eval_format_function_error(func->function, item->host.host,
+						item->key_orig, func->parameter, "trend functions are supported only "
+						"for numeric types");
+				continue;
+			}
+			else if (0 == item->trends)
+			{
+				zbx_free(func->error);
+				func->error = zbx_eval_format_function_error(func->function, item->host.host,
+						item->key_orig, func->parameter, "item trends are disabled");
+				continue;
+			}
 		}
 
 		if (HOST_STATUS_MONITORED != item->host.status)
