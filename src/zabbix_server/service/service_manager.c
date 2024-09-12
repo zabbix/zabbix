@@ -2921,7 +2921,8 @@ static void	process_problem_tags(zbx_vector_events_ptr_t *events, zbx_service_ma
 			else
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "discarded duplicate tag '%s' with value '%s' for eventid "
-						ZBX_FS_UI64, event->tags.values[j]->tag, event->tags.values[j]->value);
+						ZBX_FS_UI64, event->tags.values[j]->tag, event->tags.values[j]->value,
+						event->eventid);
 				zbx_free_tag(event->tags.values[j]);
 			}
 		}
