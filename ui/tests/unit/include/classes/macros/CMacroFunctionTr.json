@@ -1,0 +1,410 @@
+[
+    {
+        "value": "abc",
+        "macrofunc": {
+            "function": "tr",
+            "parameters": ["abc", "xyzq"]
+        },
+        "result": "xyz"
+    },
+    {
+        "value": "abcdef",
+        "macrofunc": {
+            "function": "tr",
+            "parameters": ["abc", "xyzq"]
+        },
+        "result": "xyzdef"
+    },
+    {
+        "value": "abc",
+        "macrofunc": {
+            "function": "tr",
+            "parameters": ["a-c", "xyz"]
+        },
+        "result": "xyz"
+    },
+    {
+        "value": "abcdef",
+        "macrofunc": {
+            "function": "tr",
+            "parameters": ["a-c", "xyz"]
+        },
+        "result": "xyzdef"
+    },
+    {
+        "value": "abcdef",
+        "macrofunc": {
+            "function": "tr",
+            "parameters": ["a-z", "xyz"]
+        },
+        "result": "xyzzzz"
+    },
+    {
+        "value": "ABC",
+        "macrofunc": {
+            "function": "tr",
+            "parameters": ["A-Z", "a-z"]
+        },
+        "result": "abc"
+    },
+    {
+        "value": "test_value",
+        "macrofunc": {
+            "function": "tr",
+            "parameters": ["z-a", "abc"]
+        },
+        "result": "*UNKNOWN*"
+    },
+    {
+        "value": "test_12345",
+        "macrofunc": {
+            "function": "tr",
+            "parameters": ["0-9", "ab"]
+        },
+        "result": "test_bbbbb"
+    },
+    {
+        "value": "test_012345",
+        "macrofunc": {
+            "function": "tr",
+            "parameters": ["0-9", "ab"]
+        },
+        "result": "test_abbbbb"
+    },
+    {
+        "value": "test_012345",
+        "macrofunc": {
+            "function": "tr",
+            "parameters": ["0-9a-z", "*"]
+        },
+        "result": "****_******"
+    },
+    {
+        "value": "test\\'abc'\\def'",
+        "macrofunc": {
+            "function": "tr",
+            "parameters": ["\\\\\\'", "\\/\\\""]
+        },
+        "result": "test\/\"abc\"/def\""
+    },
+    {
+        "value": "test\\'abc'\\def'",
+        "macrofunc": {
+            "function": "tr",
+            "parameters": ["\\\\'", "\\n"]
+        },
+        "result": "test\n\nabc\n\ndef\n"
+    },
+    {
+        "value": "test",
+        "macrofunc": {
+            "function": "tr",
+            "parameters": ["a--z"]
+        },
+        "result": "*UNKNOWN*"
+    },
+    {
+        "value": "test",
+        "macrofunc": {
+            "function": "tr",
+            "parameters": ["a--z", "0-9a-z", "*"]
+        },
+        "result": "*UNKNOWN*"
+    },
+    {
+        "value": "test",
+        "macrofunc": {
+            "function": "tr",
+            "parameters": ["a--z", "xyz"]
+        },
+        "result": "*UNKNOWN*"
+    },
+    {
+        "value": "testing_%^&*(",
+        "macrofunc": {
+            "function": "tr",
+            "parameters": ["--a-z", "xyz"]
+        },
+        "result": "testingz%z&*("
+    },
+    {
+        "value": "testing_%^&*(",
+        "macrofunc": {
+            "function": "tr",
+            "parameters": ["--az", "xyz"]
+        },
+        "result": "testingz%z&*("
+    },
+    {
+        "value": "test_the_VALUE_12345",
+        "macrofunc": {
+            "function": "tr",
+            "parameters": ["0-9abcA-L", "*"]
+        },
+        "result": "test_the_V**U*_*****"
+    },
+    {
+        "value": "1234567890",
+        "macrofunc": {
+            "function": "tr",
+            "parameters": ["0-9", "*---a-z"]
+        },
+        "result": "+,--abcde*"
+    },
+    {
+        "value": "abc abc abc",
+        "macrofunc": {
+            "function": "tr",
+            "parameters": ["aa", "12"]
+        },
+        "result": "2bc 2bc 2bc"
+    },
+    {
+        "value": "ABCabc123",
+        "macrofunc": {
+            "function": "tr",
+            "parameters": ["[a-z]", "[A-Z]"]
+        },
+        "result": "ABCABC123"
+    },
+    {
+        "value": "ABCabc123",
+        "macrofunc": {
+            "function": "tr",
+            "parameters": ["A-Z", "a-z"]
+        },
+        "result": "abcabc123"
+    },
+    {
+        "value": "ABCabc123",
+        "macrofunc": {
+            "function": "tr",
+            "parameters": ["A-Z0-9", "*"]
+        },
+        "result": "***abc***"
+    },
+    {
+        "value": "ABCabc123",
+        "macrofunc": {
+            "function": "tr",
+            "parameters": ["A-Z0-9a-z", "*"]
+        },
+        "result": "*********"
+    },
+    {
+        "value": "ABCabc123",
+        "macrofunc": {
+            "function": "tr",
+            "parameters": ["A-Za-z", "a-zA-Z"]
+        },
+        "result": "abcABC123"
+    },
+    {
+        "value": "A*",
+        "macrofunc": {
+            "function": "tr",
+            "parameters": ["", "*"]
+        },
+        "result": "A*"
+    },
+    {
+        "value": "A*",
+        "macrofunc": {
+            "function": "tr",
+            "parameters": ["A*", ""]
+        },
+        "result": "A*"
+    },
+    {
+        "value": "",
+        "macrofunc": {
+            "function": "tr",
+            "parameters": ["*", "*"]
+        },
+        "result": ""
+    },
+    {
+        "value": "ABCabc123",
+        "macrofunc": {
+            "function": "tr",
+            "parameters": ["b-a", "*"]
+        },
+        "result": "*UNKNOWN*"
+    },
+    {
+        "value": "ABCabc123",
+        "macrofunc": {
+            "function": "tr",
+            "parameters": ["a", "2-0"]
+        },
+        "result": "*UNKNOWN*"
+    },
+    {
+        "value": "a\\b",
+        "macrofunc": {
+            "function": "tr",
+            "parameters": ["\\\\", "\\/"]
+        },
+        "result": "a/b"
+    },
+    {
+        "value": "a\"b",
+        "macrofunc": {
+            "function": "tr",
+            "parameters": ["\"", "b"]
+        },
+        "result": "abb"
+    },
+    {
+        "value": "a''b",
+        "macrofunc": {
+            "function": "tr",
+            "parameters": ["\\''", "b"]
+        },
+        "result": "abbb"
+    },
+    {
+        "value": "a''b",
+        "macrofunc": {
+            "function": "tr",
+            "parameters": ["''", "b"]
+        },
+        "result": "abbb"
+    },
+    {
+        "value": "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ111222333444555666777888999000",
+        "macrofunc": {
+            "function": "tr",
+            "parameters": ["a-z0-9ABCDEFGHIJKLMNOPQRSTUVWXYZ", "0-9*"]
+        },
+        "result": "0123456789************************************************************************"
+    },
+    {
+        "value": "[0123456789]",
+        "macrofunc": {
+            "function": "tr",
+            "parameters": ["0-9a-z0-9", "**********A-Za-z"]
+        },
+        "result": "[abcdefghij]"
+    },
+    {
+        "value": "$0123456789$",
+        "macrofunc": {
+            "function": "tr",
+            "parameters": ["0-7", "a-c"]
+        },
+        "result": "$abcccccc89$"
+    },
+    {
+        "value": "$0123456789$",
+        "macrofunc": {
+            "function": "tr",
+            "parameters": ["a-Z -} -} -} -} -} -} -} -}", "*"]
+        },
+        "result": "*UNKNOWN*"
+    },
+    {
+        "value": "0zA",
+        "macrofunc": {
+            "function": "tr",
+            "parameters": ["0-\\", "*"]
+        },
+        "result": "*z*"
+    },
+    {
+        "value": "bcA",
+        "macrofunc": {
+            "function": "tr",
+            "parameters": ["\\\\-z", "*"]
+        },
+        "result": "**A"
+    },
+    {
+        "value": "---",
+        "macrofunc": {
+            "function": "tr",
+            "parameters": ["\\-", "*"]
+        },
+        "result": "***"
+    },
+    {
+        "value": "*A*",
+        "macrofunc": {
+            "function": "tr",
+            "parameters": ["*", "\\-"]
+        },
+        "result": "-A-"
+    },
+    {
+        "value": "ABCabc123",
+        "macrofunc": {
+            "function": "tr",
+            "parameters": ["\\", "\\\\-"]
+        },
+        "result": "ABCabc123"
+    },
+    {
+        "value": "ыABCabc123ыы",
+        "macrofunc": {
+            "function": "tr",
+            "parameters": ["ы", "в"]
+        },
+        "result": "вABCabc123вв"
+    },
+    {
+        "value": "value_12345",
+        "macrofunc": {
+            "function": "tr",
+            "parameters": ["5", "П"]
+        },
+        "result": "value_1234?"
+    },
+    {
+        "value": "abcde_12345",
+        "macrofunc": {
+            "function": "tr",
+            "parameters": ["a-c", "Я"]
+        },
+        "result": "Я?de_12345"
+    },
+    {
+        "value": "abcde_12345",
+        "macrofunc": {
+            "function": "tr",
+            "parameters": ["a-c", "ЯA-Я"]
+        },
+        "result": "ЯAde_12345"
+    },
+    {
+        "value": "value_ППП_aaa_123",
+        "macrofunc": {
+            "function": "tr",
+            "parameters": ["123", "П"]
+        },
+        "result": "value_ППП_aaa_П?"
+    },
+    {
+        "value": "value_ППП_aaa_123321",
+        "macrofunc": {
+            "function": "tr",
+            "parameters": ["123", "П"]
+        },
+        "result": "value_ППП_aaa_П????"
+    },
+    {
+        "value": "*UNKNOWN*",
+        "macrofunc": {
+            "function": "tr",
+            "parameters": ["*UNKNOWN*", "{ITEM.VALUE}"]
+        },
+        "result": "LIAEA.VAL"
+    },
+    {
+        "value": "test",
+        "macrofunc": {
+            "function": "tr",
+            "parameters": ["a-z", "\\"]
+        },
+        "result": "\\\\\\\\"
+    }
+]

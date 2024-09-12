@@ -35,6 +35,7 @@ int	zbx_mock_str_to_return_code(const char *str);
 unsigned char	zbx_mock_str_to_value_type(const char *str);
 unsigned char	zbx_mock_str_to_variant(const char *str);
 void	zbx_mock_str_to_token_type(const char *str, int *out);
+void	zbx_mock_str_to_token_search(const char *str, int *out);
 int	zbx_mock_str_to_item_type(const char *str);
 int	zbx_mock_str_to_family(const char *str);
 

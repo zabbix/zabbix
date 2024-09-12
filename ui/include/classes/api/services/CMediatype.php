@@ -37,6 +37,8 @@ class CMediatype extends CApiService {
 		'description', 'provider', 'parameters'
 	];
 
+	public const LIMITED_OUTPUT_FIELDS = ['mediatypeid', 'type', 'name', 'status', 'description', 'maxattempts'];
+
 	/**
 	 * @param array $options
 	 *
@@ -62,15 +64,11 @@ class CMediatype extends CApiService {
 			'userids'					=> null,
 			'editable'					=> false,
 			// filter
-			'filter'					=> null,
-			'search'					=> null,
 			'searchByAny'				=> null,
 			'startSearch'				=> false,
 			'excludeSearch'				=> false,
 			'searchWildcardsEnabled'	=> null,
 			// output
-			'output'					=> API_OUTPUT_EXTEND,
-			'selectMessageTemplates'	=> null,
 			'selectUsers'				=> null,
 			'countOutput'				=> false,
 			'groupCount'				=> false,
@@ -82,25 +80,40 @@ class CMediatype extends CApiService {
 
 		$options = zbx_array_merge($defOptions, $options);
 
-		if (!$options['countOutput'] && is_array($options['output']) && in_array('content_type', $options['output'])) {
-			self::deprecated('Field "content_type" is deprecated.');
+		// permission check
+		if ((self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN && $options['editable'])
+				|| self::$userData['type'] == USER_TYPE_ZABBIX_USER) {
+			return [];
 		}
 
+		$output_fields = self::$userData['type'] == USER_TYPE_SUPER_ADMIN
+			? self::OUTPUT_FIELDS
+			: self::LIMITED_OUTPUT_FIELDS;
+
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
-			'selectActions' =>  ['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', CAction::OUTPUT_FIELDS), 'default' => null]
+			// filter
+			'filter' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => DB::getFilterFields('media_type', $output_fields)],
+			'search' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => DB::getSearchFields('media_type', $output_fields)],
+
+			// output
+			'output' =>					['type' => API_OUTPUT, 'in' => implode(',', $output_fields), 'default' => API_OUTPUT_EXTEND],
+			'selectMessageTemplates' =>	['type' => API_MULTIPLE, 'rules' => [
+											['if' => static fn(): bool => self::$userData['type'] == USER_TYPE_SUPER_ADMIN, 'type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['eventsource', 'recovery', 'subject', 'message']), 'default' => null],
+											['else' => true, 'type' => API_UNEXPECTED]
+			]],
+			'selectActions' =>  		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', CAction::OUTPUT_FIELDS), 'default' => null]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		// permission check
-		if (self::$userData['type'] == USER_TYPE_SUPER_ADMIN) {
+		if (!$options['countOutput'] && is_array($options['output']) && in_array('content_type', $options['output'])) {
+			self::deprecated('Field "content_type" is deprecated.');
 		}
-		elseif (!$options['editable'] && self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN) {
-		}
-		elseif ($options['editable'] || self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			return [];
+
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && $options['output'] === API_OUTPUT_EXTEND) {
+			$options['output'] = self::LIMITED_OUTPUT_FIELDS;
 		}
 
 		// mediatypeids
@@ -113,6 +126,16 @@ class CMediatype extends CApiService {
 		if (!is_null($options['mediaids'])) {
 			zbx_value2array($options['mediaids']);
 
+			if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+				$_options = [
+					'output' => ['mediaid'],
+					'filter' => ['userid' => self::$userData['userid']]
+				];
+				$accessible_mediaids = DBfetchColumn(DBselect(DB::makeSql('media', $_options)), 'mediaid');
+
+				$options['mediaids'] = array_intersect($options['mediaids'], $accessible_mediaids);
+			}
+
 			$sqlParts['from']['media'] = 'media m';
 			$sqlParts['where'][] = dbConditionInt('m.mediaid', $options['mediaids']);
 			$sqlParts['where']['mmt'] = 'm.mediatypeid=mt.mediatypeid';
@@ -122,18 +145,22 @@ class CMediatype extends CApiService {
 		if (!is_null($options['userids'])) {
 			zbx_value2array($options['userids']);
 
+			if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+				$options['userids'] = array_intersect($options['userids'], [self::$userData['userid']]);
+			}
+
 			$sqlParts['from']['media'] = 'media m';
 			$sqlParts['where'][] = dbConditionInt('m.userid', $options['userids']);
 			$sqlParts['where']['mmt'] = 'm.mediatypeid=mt.mediatypeid';
 		}
 
 		// filter
-		if (is_array($options['filter'])) {
+		if ($options['filter'] !== null) {
 			$this->dbFilter('media_type mt', $options, $sqlParts);
 		}
 
 		// search
-		if (is_array($options['search'])) {
+		if ($options['search'] !== null) {
 			zbx_db_search('media_type mt', $options, $sqlParts);
 		}
 
@@ -180,7 +207,7 @@ class CMediatype extends CApiService {
 
 		if ($result) {
 			$result = $this->addRelatedObjects($options, $result);
-			$result = $this->unsetExtraFields($result, ['type'], $options['output']);
+			$result = $this->unsetExtraFields($result, ['mediatypeid', 'type'], $options['output']);
 		}
 
 		if (!$options['preservekeys']) {
@@ -906,7 +933,7 @@ class CMediatype extends CApiService {
 		self::addRelatedActions($options, $result);
 
 		// adding message templates
-		if ($options['selectMessageTemplates'] !== null && $options['selectMessageTemplates'] != API_OUTPUT_COUNT) {
+		if (array_key_exists('selectMessageTemplates', $options) && $options['selectMessageTemplates'] !== null) {
 			$message_templates = [];
 
 			$relation_map = $this->createRelationMap($result, 'mediatypeid', 'mediatype_messageid',
@@ -932,9 +959,23 @@ class CMediatype extends CApiService {
 
 		// adding users
 		if ($options['selectUsers'] !== null && $options['selectUsers'] != API_OUTPUT_COUNT) {
+			$user_condition = self::$userData['type'] != USER_TYPE_SUPER_ADMIN
+				? ['userid' => self::$userData['userid']]
+				: [];
+			$_options = [
+				'output' => ['mediatypeid', 'userid'],
+				'filter' => ['mediatypeid' => array_keys($result)] + $user_condition
+			];
+			$medias = DBselect(DB::makeSql('media', $_options));
+
+			$relation_map = new CRelationMap();
+
+			while ($media = DBfetch($medias)) {
+				$relation_map->addRelation($media['mediatypeid'], $media['userid']);
+			}
+
 			$users = [];
-			$relationMap = $this->createRelationMap($result, 'mediatypeid', 'userid', 'media');
-			$related_ids = $relationMap->getRelatedIds();
+			$related_ids = $relation_map->getRelatedIds();
 
 			if ($related_ids) {
 				$users = API::User()->get([
@@ -944,7 +985,7 @@ class CMediatype extends CApiService {
 				]);
 			}
 
-			$result = $relationMap->mapMany($result, $users, 'users');
+			$result = $relation_map->mapMany($result, $users, 'users');
 		}
 
 		if ($this->outputIsRequested('parameters', $options['output'])) {

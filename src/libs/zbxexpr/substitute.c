@@ -216,7 +216,7 @@ static int	substitute_macros_args(zbx_token_search_t search, char **data, char *
 	}
 
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End %s(): data:'%s'", __func__, *data);
+	zabbix_log(LOG_LEVEL_DEBUG, "End %s()", __func__);
 
 	return res;
 }

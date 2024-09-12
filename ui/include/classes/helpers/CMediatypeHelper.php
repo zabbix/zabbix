@@ -154,10 +154,10 @@ class CMediatypeHelper {
 				'name' => _('Problem'),
 				'template' => [
 					'subject' => 'Problem: {EVENT.NAME}',
-					'html' => '<b>Problem started</b> at {EVENT.TIME} on {EVENT.DATE}<br>'.
-						'<b>Problem name:</b> {EVENT.NAME}<br><b>Host:</b> {HOST.NAME}<br>'.
-						'<b>Severity:</b> {EVENT.SEVERITY}<br><b>Operational data:</b> {EVENT.OPDATA}<br>'.
-						'<b>Original problem ID:</b> {EVENT.ID}<br>{TRIGGER.URL}',
+					'html' => '<b>Problem started</b> at {{EVENT.TIME}.htmlencode()} on {{EVENT.DATE}.htmlencode()}<br>'.
+						'<b>Problem name:</b> {{EVENT.NAME}.htmlencode()}<br><b>Host:</b> {{HOST.NAME}.htmlencode()}<br>'.
+						'<b>Severity:</b> {{EVENT.SEVERITY}.htmlencode()}<br><b>Operational data:</b> {{EVENT.OPDATA}.htmlencode()}<br>'.
+						'<b>Original problem ID:</b> {{EVENT.ID}.htmlencode()}<br>{{TRIGGER.URL}.htmlencode()}',
 					'sms' => "{EVENT.SEVERITY}: {EVENT.NAME}\nHost: {HOST.NAME}\n{EVENT.DATE} {EVENT.TIME}",
 					'text' => "Problem started at {EVENT.TIME} on {EVENT.DATE}\n".
 						"Problem name: {EVENT.NAME}\nHost: {HOST.NAME}\nSeverity: {EVENT.SEVERITY}\n".
@@ -170,9 +170,9 @@ class CMediatypeHelper {
 				'name' => _('Problem recovery'),
 				'template' => [
 					'subject' => 'Resolved in {EVENT.DURATION}: {EVENT.NAME}',
-					'html' => '<b>Problem has been resolved</b> at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}<br>'.
-						'<b>Problem name:</b> {EVENT.NAME}<br><b>Problem duration:</b> {EVENT.DURATION}<br><b>Host:</b> {HOST.NAME}<br>'.
-						'<b>Severity:</b> {EVENT.SEVERITY}<br><b>Original problem ID:</b> {EVENT.ID}<br>{TRIGGER.URL}',
+					'html' => '<b>Problem has been resolved</b> at {{EVENT.RECOVERY.TIME}.htmlencode()} on {{EVENT.RECOVERY.DATE}.htmlencode()}<br>'.
+						'<b>Problem name:</b> {{EVENT.NAME}.htmlencode()}<br><b>Problem duration:</b> {{EVENT.DURATION}.htmlencode()}<br><b>Host:</b> {{HOST.NAME}.htmlencode()}<br>'.
+						'<b>Severity:</b> {{EVENT.SEVERITY}.htmlencode()}<br><b>Original problem ID:</b> {{EVENT.ID}.htmlencode()}<br>{{TRIGGER.URL}.htmlencode()}',
 					'sms' => "Resolved in {EVENT.DURATION}: {EVENT.NAME}\nHost: {HOST.NAME}\n{EVENT.DATE} {EVENT.TIME}",
 					'text' => "Problem has been resolved at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}\n".
 						"Problem name: {EVENT.NAME}\nProblem duration: {EVENT.DURATION}\nHost: {HOST.NAME}\nSeverity: {EVENT.SEVERITY}\n".
@@ -186,9 +186,9 @@ class CMediatypeHelper {
 				'template' => [
 					'subject' => 'Updated problem in {EVENT.AGE}: {EVENT.NAME}',
 					'html' =>
-						'<b>{USER.FULLNAME} {EVENT.UPDATE.ACTION} problem</b> at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.<br>'.
-						'{EVENT.UPDATE.MESSAGE}<br><br><b>Current problem status:</b> {EVENT.STATUS}<br>'.
-						'<b>Age:</b> {EVENT.AGE}<br><b>Acknowledged:</b> {EVENT.ACK.STATUS}.',
+						'<b>{{USER.FULLNAME}.htmlencode()} {{EVENT.UPDATE.ACTION}.htmlencode()} problem</b> at {{EVENT.UPDATE.DATE}.htmlencode()} {{EVENT.UPDATE.TIME}.htmlencode()}.<br>'.
+						'{{EVENT.UPDATE.MESSAGE}.htmlencode()}<br><br><b>Current problem status:</b> {{EVENT.STATUS}.htmlencode()}<br>'.
+						'<b>Age:</b> {{EVENT.AGE}.htmlencode()}<br><b>Acknowledged:</b> {{EVENT.ACK.STATUS}.htmlencode()}.',
 					'sms' => '{USER.FULLNAME} {EVENT.UPDATE.ACTION} problem in {EVENT.AGE} at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}',
 					'text' =>
 						"{USER.FULLNAME} {EVENT.UPDATE.ACTION} problem at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.\n".
@@ -203,13 +203,13 @@ class CMediatypeHelper {
 				'template' => [
 					'subject' => 'Service "{SERVICE.NAME}" problem: {EVENT.NAME}',
 					'html' =>
-						'<b>Service problem started</b> at {EVENT.TIME} on {EVENT.DATE}<br>'.
-						'<b>Service problem name:</b> {EVENT.NAME}<br>'.
-						'<b>Service:</b> {SERVICE.NAME}<br>'.
-						'<b>Severity:</b> {EVENT.SEVERITY}<br>'.
-						'<b>Original problem ID:</b> {EVENT.ID}<br>'.
-						'<b>Service description:</b> {SERVICE.DESCRIPTION}<br><br>'.
-						'{SERVICE.ROOTCAUSE}',
+						'<b>Service problem started</b> at {{EVENT.TIME}.htmlencode()} on {{EVENT.DATE}.htmlencode()}<br>'.
+						'<b>Service problem name:</b> {{EVENT.NAME}.htmlencode()}<br>'.
+						'<b>Service:</b> {{SERVICE.NAME}.htmlencode()}<br>'.
+						'<b>Severity:</b> {{EVENT.SEVERITY}.htmlencode()}<br>'.
+						'<b>Original problem ID:</b> {{EVENT.ID}.htmlencode()}<br>'.
+						'<b>Service description:</b> {{SERVICE.DESCRIPTION}.htmlencode()}<br><br>'.
+						'{{SERVICE.ROOTCAUSE}.htmlencode()}',
 					'sms' => "{EVENT.NAME}\n{EVENT.DATE} {EVENT.TIME}",
 					'text' =>
 						"Service problem started at {EVENT.TIME} on {EVENT.DATE}\n".
@@ -228,12 +228,12 @@ class CMediatypeHelper {
 				'template' => [
 					'subject' => 'Service "{SERVICE.NAME}" resolved in {EVENT.DURATION}: {EVENT.NAME}',
 					'html' =>
-						'<b>Service "{SERVICE.NAME}" has been resolved</b> at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}<br>'.
-						'<b>Problem name:</b> {EVENT.NAME}<br>'.
-						'<b>Problem duration:</b> {EVENT.DURATION}<br>'.
-						'<b>Severity:</b> {EVENT.SEVERITY}<br>'.
-						'<b>Original problem ID:</b> {EVENT.ID}<br>'.
-						'<b>Service description:</b> {SERVICE.DESCRIPTION}',
+						'<b>Service "{{SERVICE.NAME}.htmlencode()}" has been resolved</b> at {{EVENT.RECOVERY.TIME}.htmlencode()} on {{EVENT.RECOVERY.DATE}.htmlencode()}<br>'.
+						'<b>Problem name:</b> {{EVENT.NAME}.htmlencode()}<br>'.
+						'<b>Problem duration:</b> {{EVENT.DURATION}.htmlencode()}<br>'.
+						'<b>Severity:</b> {{EVENT.SEVERITY}.htmlencode()}<br>'.
+						'<b>Original problem ID:</b> {{EVENT.ID}.htmlencode()}<br>'.
+						'<b>Service description:</b> {{SERVICE.DESCRIPTION}.htmlencode()}',
 					'sms' => "{EVENT.NAME}\n{EVENT.DATE} {EVENT.TIME}",
 					'text' =>
 						"Service \"{SERVICE.NAME}\" has been resolved at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}\n".
@@ -251,10 +251,10 @@ class CMediatypeHelper {
 				'template' => [
 					'subject' => 'Changed "{SERVICE.NAME}" service status to {EVENT.UPDATE.SEVERITY} in {EVENT.AGE}',
 					'html' =>
-						'<b>Changed "{SERVICE.NAME}" service status</b> to {EVENT.UPDATE.SEVERITY} at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.<br>'.
-						'<b>Current problem age</b> is {EVENT.AGE}.<br>'.
-						'<b>Service description:</b> {SERVICE.DESCRIPTION}<br><br>'.
-						'{SERVICE.ROOTCAUSE}',
+						'<b>Changed "{{SERVICE.NAME}.htmlencode()}" service status</b> to {{EVENT.UPDATE.SEVERITY}.htmlencode()} at {{EVENT.UPDATE.DATE}.htmlencode()} {{EVENT.UPDATE.TIME}.htmlencode()}.<br>'.
+						'<b>Current problem age</b> is {{EVENT.AGE}.htmlencode()}.<br>'.
+						'<b>Service description:</b> {{SERVICE.DESCRIPTION}.htmlencode()}<br><br>'.
+						'{{SERVICE.ROOTCAUSE}.htmlencode()}',
 					'sms' => "{EVENT.NAME}\n{EVENT.DATE} {EVENT.TIME}",
 					'text' =>
 						"Changed \"{SERVICE.NAME}\" service status to {EVENT.UPDATE.SEVERITY} at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.\n".
@@ -269,15 +269,15 @@ class CMediatypeHelper {
 				'name' => _('Discovery'),
 				'template' => [
 					'subject' => 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}',
-					'html' => '<b>Discovery rule:</b> {DISCOVERY.RULE.NAME}<br><br>'.
-						'<b>Device IP:</b> {DISCOVERY.DEVICE.IPADDRESS}<br>'.
-						'<b>Device DNS:</b> {DISCOVERY.DEVICE.DNS}<br>'.
-						'<b>Device status:</b> {DISCOVERY.DEVICE.STATUS}<br>'.
-						'<b>Device uptime:</b> {DISCOVERY.DEVICE.UPTIME}<br><br>'.
-						'<b>Device service name:</b> {DISCOVERY.SERVICE.NAME}<br>'.
-						'<b>Device service port:</b> {DISCOVERY.SERVICE.PORT}<br>'.
-						'<b>Device service status:</b> {DISCOVERY.SERVICE.STATUS}<br>'.
-						'<b>Device service uptime:</b> {DISCOVERY.SERVICE.UPTIME}',
+					'html' => '<b>Discovery rule:</b> {{DISCOVERY.RULE.NAME}.htmlencode()}<br><br>'.
+						'<b>Device IP:</b> {{DISCOVERY.DEVICE.IPADDRESS}.htmlencode()}<br>'.
+						'<b>Device DNS:</b> {{DISCOVERY.DEVICE.DNS}.htmlencode()}<br>'.
+						'<b>Device status:</b> {{DISCOVERY.DEVICE.STATUS}.htmlencode()}<br>'.
+						'<b>Device uptime:</b> {{DISCOVERY.DEVICE.UPTIME}.htmlencode()}<br><br>'.
+						'<b>Device service name:</b> {{DISCOVERY.SERVICE.NAME}.htmlencode()}<br>'.
+						'<b>Device service port:</b> {{DISCOVERY.SERVICE.PORT}.htmlencode()}<br>'.
+						'<b>Device service status:</b> {{DISCOVERY.SERVICE.STATUS}.htmlencode()}<br>'.
+						'<b>Device service uptime:</b> {{DISCOVERY.SERVICE.UPTIME}.htmlencode()}',
 					'sms' => 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}',
 					'text' => "Discovery rule: {DISCOVERY.RULE.NAME}\n\n".
 						"Device IP: {DISCOVERY.DEVICE.IPADDRESS}\nDevice DNS: {DISCOVERY.DEVICE.DNS}\n".
@@ -295,7 +295,7 @@ class CMediatypeHelper {
 				'name' => _('Autoregistration'),
 				'template' => [
 					'subject' => 'Autoregistration: {HOST.HOST}',
-					'html' => '<b>Host name:</b> {HOST.HOST}<br><b>Host IP:</b> {HOST.IP}<br><b>Agent port:</b> {HOST.PORT}',
+					'html' => '<b>Host name:</b> {{HOST.HOST}.htmlencode()}<br><b>Host IP:</b> {{HOST.IP}.htmlencode()}<br><b>Agent port:</b> {{HOST.PORT}.htmlencode()}',
 					'sms' => "Autoregistration: {HOST.HOST}\nHost IP: {HOST.IP}\nAgent port: {HOST.PORT}",
 					'text' => "Host name: {HOST.HOST}\nHost IP: {HOST.IP}\nAgent port: {HOST.PORT}"
 				]
