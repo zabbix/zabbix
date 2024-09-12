@@ -68,6 +68,7 @@ static zbx_vmware_job_t	*vmware_job_get(zbx_vmware_t *vmw, time_t time_now)
 	zbx_binary_heap_elem_t	*elem;
 	zbx_vmware_job_t	*job = NULL;
 	time_t			lastaccess;
+	int			revision;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() queue:%d", __func__, vmw->jobs_queue.elems_num);
 
@@ -89,8 +90,9 @@ static zbx_vmware_job_t	*vmware_job_get(zbx_vmware_t *vmw, time_t time_now)
 	job->nextcheck = 0;
 	lastaccess = (ZBX_VMWARE_UPDATE_EVENTLOG == job->type) ? job->service->eventlog.lastaccess :
 			job->service->lastaccess;
+	revision = (ZBX_VMWARE_UPDATE_EVENTLOG == job->type) ? job->service->eventlog.job_revision : 0;
 
-	if (0 != lastaccess && 0 != job->ttl && time_now - lastaccess > job->ttl)
+	if ((0 != lastaccess && 0 != job->ttl && time_now - lastaccess > job->ttl) || job->revision != revision)
 	{
 		job->expired = SUCCEED;
 	}
@@ -194,8 +196,7 @@ static void	vmware_job_schedule(zbx_vmware_t *vmw, zbx_vmware_job_t *job, time_t
 			job->nextcheck = time_now + cache_update_period;
 			break;
 		case ZBX_VMWARE_UPDATE_EVENTLOG:
-			job->ttl = 2 * (0 != job->service->eventlog.interval &&
-					job->service->eventlog.interval > perf_update_period ?
+			job->ttl = 2 * (0 != job->service->eventlog.interval ?
 					job->service->eventlog.interval : perf_update_period) +
 					ZBX_VMWARE_EVENTLOG_MIN_INTERVAL;
 

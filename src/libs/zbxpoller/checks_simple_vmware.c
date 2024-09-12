@@ -1214,8 +1214,13 @@ int	check_vcenter_eventlog(AGENT_REQUEST *request, const zbx_dc_item_t *item, AG
 
 	lastaccess = time(NULL);
 
-	if (0 != service->eventlog.lastaccess)
+	if (0 != service->eventlog.lastaccess &&
+			service->eventlog.interval != lastaccess - service->eventlog.lastaccess)
+	{
+		service->jobs_type |= ZBX_VMWARE_REQ_UPDATE_EVENTLOG;
+		service->eventlog.job_revision++;
 		service->eventlog.interval = lastaccess - service->eventlog.lastaccess;
+	}
 
 	service->eventlog.lastaccess = lastaccess;
 

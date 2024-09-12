@@ -2829,6 +2829,7 @@ zbx_vmware_service_t	*zbx_vmware_get_service(const char* url, const char* userna
 	service->eventlog.severity = 0;
 	service->eventlog.req_sz = 0;
 	service->eventlog.oom = 0;
+	service->eventlog.job_revision = 0;
 	service->jobs_num = 0;
 	vmware_shmem_vector_vmware_entity_tags_ptr_create_ext(&service->data_tags.entity_tags);
 	service->data_tags.error = NULL;
@@ -3033,6 +3034,7 @@ static void	zbx_vmware_job_create(zbx_vmware_t *vmw, zbx_vmware_service_t *servi
 	job->nextcheck = 0;
 	job->ttl = 0;
 	job->type = job_type;
+	job->revision = (ZBX_VMWARE_UPDATE_EVENTLOG == job->type) ? service->eventlog.job_revision : 0;
 	job->service = service;
 	service->jobs_num++;
 	service->jobs_type |= job_type;

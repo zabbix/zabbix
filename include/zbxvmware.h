@@ -384,6 +384,7 @@ typedef struct
 	time_t		lastaccess;	/* timestamp when vmware.eventlog[] item was polled last time */
 	time_t		interval;	/* last interval of vmware.eventlog[] item */
 	zbx_uint64_t	owner_itemid;	/* single item that will receive all events */
+	int		job_revision;	/* actual revision of the responsible (last created) job */
 
 	/* service event log data object that is swapped with new one during service event log update */
 	zbx_vmware_eventlog_data_t	*data;
@@ -582,6 +583,7 @@ struct zbx_vmware_job
 #define ZBX_VMWARE_UPDATE_EVENTLOG	8
 	int				type;
 	int				expired;
+	int				revision;
 	zbx_vmware_service_t		*service;
 };
 
