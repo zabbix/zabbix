@@ -608,45 +608,56 @@ class testPageReportsAudit extends CWebTest {
 		}
 	}
 
-	/**
-	 * Check that audit log can be filtered by recordsetid.
-	 */
-	public function testPageReportsAudit_CheckRecordsetFilter() {
-		$this->page->login()->open('zabbix.php?action=auditlog.list&filter_rst=1')->waitUntilReady();
-		$form = $this->query('name:zbx_filter')->asForm()->one();
-		$table = $this->query('class:list-table')->asTable()->one();
-		$form->query('button:Reset')->one()->click();
-
-		// Click on Recordset ID in first row.
-		$table->getRow(0)->getColumn('Recordset ID')->query('xpath:.//a')->one()->click();
-		$recordsetid = $table->getRow(0)->getColumn('Recordset ID')->getText();
-
-		// Check that correct Recordset ID displayed in filter form.
-		$this->assertTrue($form->checkValue(['Recordset ID' => $recordsetid]));
-
-		// Compare result cout on page and in DB.
-		$recordsetid_count = CDBHelper::getCount('SELECT NULL FROM auditlog WHERE recordsetid='.zbx_dbstr($recordsetid));
-		$this->assertEquals($recordsetid_count, $table->getRows()->count());
+	public static function getClickableTablePlaces() {
+		return [
+			// #0
+			[
+				[
+					'table_column' => 'IP',
+					'sql' => 'SELECT NULL FROM auditlog WHERE ip=',
+					'label' => 'IP',
+				]
+			],
+			// #1
+			[
+				[
+					'table_column' => 'ID',
+					'sql' => 'SELECT NULL FROM auditlog WHERE resourceid=',
+					'label' => 'Resource ID',
+				]
+			],
+			// #2
+			[
+				[
+					'table_column' => 'Recordset ID',
+					'sql' => 'SELECT NULL FROM auditlog WHERE recordsetid=',
+					'label' => 'Recordset ID',
+				]
+			]
+		];
 	}
 
 	/**
-	 * Check that audit log can be filtered by IP.
+	 * Check that audit log can be filtered by IP, ID and Recordset ID column values.
+	 *
+	 * @dataProvider getClickableTablePlaces
+	 *
 	 */
-	public function testPageReportsAudit_CheckIpFilter() {
+	public function testPageReportsAudit_CheckClickableTable($data) {
 		$this->page->login()->open('zabbix.php?action=auditlog.list&filter_rst=1')->waitUntilReady();
 		$form = $this->query('name:zbx_filter')->asForm()->one();
 		$table = $this->query('class:list-table')->asTable()->one();
 		$form->query('button:Reset')->one()->click();
 
-		// Click on IP in first table row.
-		$table->getRow(0)->getColumn('IP')->query('xpath:.//a')->one()->click();
-		$ip = $table->getRow(0)->getColumn('IP')->getText();
+		// Click on the link in the first row of the table.
+		$table->getRow(0)->getColumn($data['table_column'])->query('xpath:.//a')->one()->click();
+		$column = $table->getRow(0)->getColumn($data['table_column'])->getText();
 
 		// Check that correct IP displayed in filter form.
-		$this->assertTrue($form->checkValue(['IP' => $ip]));
+		$this->assertTrue($form->checkValue([$data['label'] => $column]));
 
 		// Compare result cout on page and in DB.
-		$recordsetid_count = CDBHelper::getCount('SELECT NULL FROM auditlog WHERE ip='.zbx_dbstr($ip));
+		$recordsetid_count = CDBHelper::getCount($data['sql'].''.zbx_dbstr($column));
 		$this->assertEquals($recordsetid_count, $table->getRows()->count());
 	}
 
