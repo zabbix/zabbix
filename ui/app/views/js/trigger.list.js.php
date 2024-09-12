@@ -79,26 +79,11 @@
 						'context': this.context
 					})
 				}
-				else if (target.id === 'js-copy') {
-					this.#copy();
-				}
-				else if (target.id === 'js-massenable-trigger') {
-					this.#enable(target, Object.keys(chkbxRange.getSelectedIds()), true);
-				}
 				else if (target.classList.contains('js-enable-trigger')) {
 					this.#enable(target, [target.dataset.triggerid]);
 				}
-				else if (target.id === 'js-massdisable-trigger') {
-					this.#disable(target, Object.keys(chkbxRange.getSelectedIds()), true);
-				}
 				else if (target.classList.contains('js-disable-trigger')) {
 					this.#disable(target, [target.dataset.triggerid]);
-				}
-				else if (target.id === 'js-massdelete-trigger') {
-					this.#delete(target, Object.keys(chkbxRange.getSelectedIds()));
-				}
-				else if (target.id === 'js-massupdate-trigger') {
-					this.#massupdate(target);
 				}
 				else if (target.classList.contains('js-edit-host')) {
 					this.editHost(e, target.dataset.hostid);
@@ -107,12 +92,22 @@
 					this.editTemplate(e, target.dataset.hostid);
 				}
 			});
-			document.addEventListener('click', (e) => {
-				const target = e.target;
 
-				if (target.id === 'js-create') {
-					this.#edit({'hostid': target.dataset.hostid, 'context': this.context})
-				}
+			document.getElementById('js-create').addEventListener('click', (e) => {
+				this.#edit({'hostid': e.target.dataset.hostid, 'context': this.context});
+			});
+			document.getElementById('js-copy').addEventListener('click', () => this.#copy());
+			document.getElementById('js-massenable-trigger').addEventListener('click', (e) => {
+				this.#enable(e.target, Object.keys(chkbxRange.getSelectedIds()), true);
+			});
+			document.getElementById('js-massdisable-trigger').addEventListener('click', (e) => {
+				this.#disable(e.target, Object.keys(chkbxRange.getSelectedIds()), true);
+			});
+			document.getElementById('js-massupdate-trigger').addEventListener('click', (e) => {
+				this.#massupdate(e.target);
+			});
+			document.getElementById('js-massdelete-trigger').addEventListener('click', (e) => {
+				this.#delete(e.target, Object.keys(chkbxRange.getSelectedIds()));
 			});
 		}
 
