@@ -414,7 +414,8 @@ $html_page
 		'checkbox_hash' => $data['checkbox_hash'],
 		'checkbox_object' => 'g_triggerid',
 		'context' => $data['context'],
-		'token' => [CSRF_TOKEN_NAME => CCsrfTokenHelper::get('trigger')]
+		'token' => [CSRF_TOKEN_NAME => CCsrfTokenHelper::get('trigger')],
+		'form_name' => $triggers_form->getName()
 	]).');
 '))
 	->setOnDocumentReady()

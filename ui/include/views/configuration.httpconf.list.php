@@ -264,7 +264,8 @@ $html_page
 
 (new CScriptTag('
 	view.init('.json_encode([
-		'checkbox_hash' => $data['hostid']
+		'checkbox_hash' => $data['hostid'],
+		'form_name' => $httpForm->getName()
 	]).');
 '))
 	->setOnDocumentReady()

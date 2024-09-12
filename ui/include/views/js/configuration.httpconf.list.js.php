@@ -25,8 +25,9 @@
 
 <script>
 	const view = {
-		init({checkbox_hash}) {
+		init({checkbox_hash, form_name}) {
 			this.checkbox_hash = checkbox_hash;
+			this.form = document.forms[form_name];
 
 			$('#filter-tags')
 				.dynamicRows({template: '#filter-tag-row-tmpl'})
@@ -39,12 +40,14 @@
 			// Init existing fields once loaded.
 			document.querySelectorAll('#filter-tags .form_row').forEach(row => new CTagFilterItem(row));
 
-			document.querySelector('form[name="scenarios"]').addEventListener('click', (e) => {
-				if (e.target.classList.contains('js-edit-host')) {
-					this.editHost(e, e.target.dataset.hostid);
+			this.form.addEventListener('click', (e) => {
+				const target = e.target;
+
+				if (target.classList.contains('js-edit-host')) {
+					this.editHost(e, target.dataset.hostid);
 				}
-				else if (e.target.classList.contains('js-edit-template')) {
-					this.editTemplate(e, e.target.dataset.hostid);
+				else if (target.classList.contains('js-edit-template')) {
+					this.editTemplate(e, target.dataset.hostid);
 				}
 			});
 		},

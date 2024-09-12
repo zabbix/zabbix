@@ -29,8 +29,8 @@
 			this.checkbox_hash = checkbox_hash;
 			this.checkbox_object = checkbox_object;
 			this.context = context;
-			this.form = document.forms[form_name];
 			this.token = token;
+			this.form = document.forms[form_name];
 
 			this.initEvents();
 		},
@@ -54,14 +54,11 @@
 				if (target.classList.contains('js-update-item')) {
 					this.editItem(target, target.dataset);
 				}
-			})
-
-			document.querySelector('form[name="discovery"]').addEventListener('click', (e) => {
-				if (e.target.classList.contains('js-edit-host')) {
-					this.editHost(e, e.target.dataset.hostid);
+				else if (target.classList.contains('js-edit-host')) {
+					this.editHost(e, target.dataset.hostid);
 				}
-				else if (e.target.classList.contains('js-edit-template')) {
-					this.editTemplate(e, e.target.dataset.hostid);
+				else if (target.classList.contains('js-edit-template')) {
+					this.editTemplate(e, target.dataset.hostid);
 				}
 			});
 		},

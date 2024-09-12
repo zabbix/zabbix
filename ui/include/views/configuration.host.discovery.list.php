@@ -414,8 +414,8 @@ $html_page
 		'context' => $data['context'],
 		'checkbox_hash' => $data['checkbox_hash'],
 		'checkbox_object' => 'g_hostdruleid',
-		'form_name' => $discoveryForm->getName(),
-		'token' => [CSRF_TOKEN_NAME, CCsrfTokenHelper::get('item')]
+		'token' => [CSRF_TOKEN_NAME, CCsrfTokenHelper::get('item')],
+		'form_name' => $discoveryForm->getName()
 	]).');
 '))
 	->setOnDocumentReady()

@@ -296,7 +296,8 @@ $graphForm->addItem([
 		'checkbox_hash' => $data['parent_discoveryid'] ?? $data['hostid'],
 		'checkbox_object' => 'group_graphid',
 		'context' => $data['context'],
-		'parent_discoveryid' => $data['parent_discoveryid']
+		'parent_discoveryid' => $data['parent_discoveryid'],
+		'form_name' => $graphForm->getName()
 	]).');
 '))
 	->setOnDocumentReady()
