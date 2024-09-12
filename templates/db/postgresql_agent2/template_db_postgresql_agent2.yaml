@@ -20,7 +20,7 @@ zabbix_export:
         
         3. Edit the `pg_hba.conf` configuration file to allow connections for the user `zbx_monitor`. You can check the PostgreSQL documentation for examples (https://www.postgresql.org/docs/current/auth-pg-hba-conf.html).
         
-        4. Set the connection string for the PostgreSQL instance in the `{$PG.CONNSTRING}` macro as URI, such as `<protocol(host:port)>`, or specify the named session - `<sessionname>`.
+        4. Set the connection string for the PostgreSQL instance in the `{$PG.CONNSTRING.AGENT2}` macro as URI, such as `<protocol(host:port)>`, or specify the named session - `<sessionname>`.
         
         Note: if you want to use SSL/TLS encryption to protect communications with the remote PostgreSQL instance, a named session must be used. In that case, the instance URI should be specified in the `Plugins.PostgreSQL.Sessions.*.Uri` parameter in the PostgreSQL plugin configuration files alongside all the encryption parameters (type, cerfiticate/key filepaths if needed etc.).
         
@@ -34,7 +34,7 @@ zabbix_export:
         Plugins.PostgreSQL.Sessions.myconn.Uri=tcp://<instanceip>:5432
         Plugins.PostgreSQL.Sessions.myconn.TLSConnect=required
         
-        Then set the `{$PG.CONNSTRING}` macro to `myconn` to use this named session.
+        Then set the `{$PG.CONNSTRING.AGENT2}` macro to `myconn` to use this named session.
         
         5. Set the password that you specified in step 2 in the macro `{$PG.PASSWORD}`.
         
@@ -118,7 +118,7 @@ zabbix_export:
               value: raw
         - uuid: d9169b4b31554063b9d01d0d27b4beee
           name: 'Count of autovacuum workers'
-          key: 'pgsql.autovacuum.count["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
+          key: 'pgsql.autovacuum.count["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]'
           value_type: FLOAT
           description: 'Number of autovacuum workers.'
           tags:
@@ -822,7 +822,7 @@ zabbix_export:
               value: raw
         - uuid: 0377fe6f2f8d4539b649c636ab012415
           name: 'Age of oldest xid'
-          key: 'pgsql.oldest.xid["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
+          key: 'pgsql.oldest.xid["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]'
           value_type: FLOAT
           description: 'Age of oldest xid.'
           tags:
@@ -830,7 +830,7 @@ zabbix_export:
               value: transactions
           triggers:
             - uuid: 2a5c11571d9d46f093ed9081f9d51504
-              expression: 'last(/PostgreSQL by Zabbix agent 2/pgsql.oldest.xid["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]) > 18000000'
+              expression: 'last(/PostgreSQL by Zabbix agent 2/pgsql.oldest.xid["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]) > 18000000'
               name: 'Oldest xid is too big'
               priority: AVERAGE
               tags:
@@ -838,7 +838,7 @@ zabbix_export:
                   value: availability
         - uuid: 56323e572fa443228987c62039153825
           name: Ping
-          key: 'pgsql.ping["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
+          key: 'pgsql.ping["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]'
           description: 'Used to test a connection to see if it is alive. It is set to 0 if the query is unsuccessful.'
           valuemap:
             name: 'Service state'
@@ -853,7 +853,7 @@ zabbix_export:
               value: health
           triggers:
             - uuid: 48a24a78519d47349200f0b41ceec56a
-              expression: 'last(/PostgreSQL by Zabbix agent 2/pgsql.ping["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"])=0'
+              expression: 'last(/PostgreSQL by Zabbix agent 2/pgsql.ping["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"])=0'
               name: 'Service is down'
               priority: HIGH
               description: 'Last test of a connection was unsuccessful.'
@@ -871,14 +871,14 @@ zabbix_export:
               value: raw
         - uuid: a171db459d6144e4ad294579fb8dc56d
           name: 'Replication: Standby count'
-          key: 'pgsql.replication.count["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
+          key: 'pgsql.replication.count["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]'
           description: 'Number of standby servers.'
           tags:
             - tag: component
               value: replication
         - uuid: da9ce769f9444a3f9600ce64c4ab2857
           name: 'Replication: Lag in bytes'
-          key: 'pgsql.replication.lag.b["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
+          key: 'pgsql.replication.lag.b["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]'
           units: B
           description: 'Replication lag with master, in bytes.'
           tags:
@@ -886,7 +886,7 @@ zabbix_export:
               value: replication
         - uuid: 5a9eb8ee4a484911903688e620eb618b
           name: 'Replication: Lag in seconds'
-          key: 'pgsql.replication.lag.sec["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
+          key: 'pgsql.replication.lag.sec["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]'
           units: s
           description: 'Replication lag with master, in seconds.'
           tags:
@@ -903,7 +903,7 @@ zabbix_export:
               value: raw
         - uuid: 4085b836bf614f3d910818074c386845
           name: 'Replication: Recovery role'
-          key: 'pgsql.replication.recovery_role["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
+          key: 'pgsql.replication.recovery_role["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]'
           description: 'Replication role: 1 — recovery is still in progress (standby mode), 0 — master mode.'
           valuemap:
             name: 'PostgreSQL recovery role'
@@ -912,7 +912,7 @@ zabbix_export:
               value: replication
         - uuid: 3c83904cbad74ff7a0d10136a233e6c6
           name: 'Replication: Status'
-          key: 'pgsql.replication.status["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
+          key: 'pgsql.replication.status["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]'
           description: 'Replication status: 0 — streaming is down, 1 — streaming is up, 2 — master mode.'
           valuemap:
             name: 'PostgreSQL replication status'
@@ -921,7 +921,7 @@ zabbix_export:
               value: replication
         - uuid: efa946a67e5844ecb905c68a2a6b85bb
           name: Uptime
-          key: 'pgsql.uptime["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
+          key: 'pgsql.uptime["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]'
           value_type: FLOAT
           units: s
           description: 'Time since the server started.'
@@ -930,7 +930,7 @@ zabbix_export:
               value: application
           triggers:
             - uuid: 5fbabc5f60b74a369a13a260d25cce3c
-              expression: 'last(/PostgreSQL by Zabbix agent 2/pgsql.uptime["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]) < 10m'
+              expression: 'last(/PostgreSQL by Zabbix agent 2/pgsql.uptime["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]) < 10m'
               name: 'Service has been restarted'
               event_name: 'Service has been restarted (uptime < 10m)'
               priority: AVERAGE
@@ -1019,7 +1019,7 @@ zabbix_export:
       discovery_rules:
         - uuid: b1a4bfe1031a40529a7c38ac6bed3c6d
           name: 'Database discovery'
-          key: 'pgsql.db.discovery["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
+          key: 'pgsql.db.discovery["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]'
           delay: 1h
           filter:
             evaltype: AND
@@ -1033,7 +1033,7 @@ zabbix_export:
           item_prototypes:
             - uuid: 1419ff1331734a4088349332e118ca94
               name: 'DB [{#DBNAME}]: Database age'
-              key: 'pgsql.db.age["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}","{#DBNAME}"]'
+              key: 'pgsql.db.age["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}","{#DBNAME}"]'
               delay: 10m
               description: 'Database age.'
               tags:
@@ -1043,7 +1043,7 @@ zabbix_export:
                   value: '{#DBNAME}'
             - uuid: 4367ba7fdffd459ea2b18e1877bc74ca
               name: 'DB [{#DBNAME}]: Bloating tables'
-              key: 'pgsql.db.bloating_tables["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}","{#DBNAME}"]'
+              key: 'pgsql.db.bloating_tables["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}","{#DBNAME}"]'
               description: 'Number of bloating tables.'
               tags:
                 - tag: component
@@ -1052,7 +1052,7 @@ zabbix_export:
                   value: '{#DBNAME}'
             - uuid: b614a0909eec40bc841bf7446e842544
               name: 'DB [{#DBNAME}]: Database size'
-              key: 'pgsql.db.size["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}","{#DBNAME}"]'
+              key: 'pgsql.db.size["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}","{#DBNAME}"]'
               delay: 5m
               units: B
               description: 'Database size.'
@@ -1832,7 +1832,7 @@ zabbix_export:
                   color: 199C0D
                   item:
                     host: 'PostgreSQL by Zabbix agent 2'
-                    key: 'pgsql.db.bloating_tables["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}","{#DBNAME}"]'
+                    key: 'pgsql.db.bloating_tables["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}","{#DBNAME}"]'
             - uuid: 4d46d39a1d1146c19a57b2b5b8086708
               name: 'DB [{#DBNAME}]: pg_stat_database metrics'
               graph_items:
@@ -1946,7 +1946,7 @@ zabbix_export:
                   color: 199C0D
                   item:
                     host: 'PostgreSQL by Zabbix agent 2'
-                    key: 'pgsql.db.size["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}","{#DBNAME}"]'
+                    key: 'pgsql.db.size["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}","{#DBNAME}"]'
             - uuid: 918a6fd8bd0e49c98f759778f44ab606
               name: 'DB [{#DBNAME}]: Slow queries'
               ymin_type_1: FIXED
@@ -1967,7 +1967,7 @@ zabbix_export:
                     key: 'pgsql.queries.tx.slow_count["{#DBNAME}"]'
         - uuid: e94f9017c06644a2bbcb48697381556d
           name: 'Replication discovery'
-          key: 'pgsql.replication.process.discovery["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
+          key: 'pgsql.replication.process.discovery["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]'
           delay: 15m
           filter:
             evaltype: AND
@@ -2073,7 +2073,7 @@ zabbix_export:
         - macro: '{$PG.CONFLICTS.MAX.WARN}'
           value: '0'
           description: 'Maximum number of recovery conflicts for trigger expression.'
-        - macro: '{$PG.CONNSTRING}'
+        - macro: '{$PG.CONNSTRING.AGENT2}'
           value: 'tcp://localhost:5432'
           description: 'URI or named session of the PostgreSQL instance.'
         - macro: '{$PG.CONN_TOTAL_PCT.MAX.WARN}'
