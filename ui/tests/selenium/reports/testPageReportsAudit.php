@@ -460,23 +460,58 @@ class testPageReportsAudit extends CWebTest {
 					'no_data' => true
 				]
 			],
-			// #16 Get server IP and fill it into IP field
+			// #16 IPv4 address
 			[
 				[
 					'fields' => [
-						'IP' => '111.222.33.44',
-						'Actions' => 'Login'
+						'IP' => '111.222.33.44'
+					],
+					'result_count' => 1
+				]
+			],
+			// #17 Another correct IP
+			[
+				[
+					'fields' => [
+						'IP' => '111.222.33.4'
 					],
 					'result_count' => 2
 				]
 			],
-			// #17
+			// #18 Part of correct IP
 			[
 				[
 					'fields' => [
-						'IP' => 'google.com'
+						'IP' => '111.222'
 					],
 					'no_data' => true
+				]
+			],
+			// #19 IP is not in the list
+			[
+				[
+					'fields' => [
+						'IP' => '66.66.66.66'
+					],
+					'no_data' => true
+				]
+			],
+			// #20 IPv6 address
+			[
+				[
+					'fields' => [
+						'IP' => 'fe80::fd4a:c2bd:74e:99ab'
+					],
+					'result_count' => 2
+				]
+			],
+			// #21 Domain address
+			[
+				[
+					'fields' => [
+						'IP' => 'domain'
+					],
+					'result_count' => 6
 				]
 			]
 			// TODO: uncomment after ZBX-21097 fix
@@ -502,12 +537,21 @@ class testPageReportsAudit extends CWebTest {
 	}
 
 	/**
+	 * Set IP addresses in database rows.
+	 */
+	protected function setIpAddressValues() {
+		foreach (['3' => '111.222.33.4', '15' => '111.222.33.44', '0' => 'domain', '40' => 'fe80::fd4a:c2bd:74e:99ab'] as $type => $ip) {
+			DBexecute("UPDATE auditlog SET ip=".zbx_dbstr($ip)." WHERE resourcetype=".zbx_dbstr($type));
+		}
+	}
+
+	/**
 	 * Check audit filter. This checks can be executed only after all other scenarios completed.
 	 * There are used values and data that was created before in this autotest.
 	 *
 	 * @dataProvider getCheckFilterData
 	 *
-	 * @onBeforeOnce prepareLoginData
+	 * @onBeforeOnce prepareLoginData, setIpAddressValues
 	 *
 	 * @depends testPageReportsAudit_Add
 	 * @depends testPageReportsAudit_Update
@@ -517,9 +561,6 @@ class testPageReportsAudit extends CWebTest {
 	 * @depends testPageReportsAudit_DisabledEnabled
 	 */
 	public function testPageReportsAudit_CheckFilter($data) {
-		// Update IP address for each row
-		DBexecute("UPDATE auditlog SET IP = '111.222.33.44'");
-
 		$this->page->login()->open('zabbix.php?action=auditlog.list&filter_rst=1')->waitUntilReady();
 		$form = $this->query('name:zbx_filter')->asForm()->one();
 		$table = $this->query('class:list-table')->asTable()->one();
@@ -586,6 +627,27 @@ class testPageReportsAudit extends CWebTest {
 
 		// Compare result cout on page and in DB.
 		$recordsetid_count = CDBHelper::getCount('SELECT NULL FROM auditlog WHERE recordsetid='.zbx_dbstr($recordsetid));
+		$this->assertEquals($recordsetid_count, $table->getRows()->count());
+	}
+
+	/**
+	 * Check that audit log can be filtered by IP.
+	 */
+	public function testPageReportsAudit_CheckIpFilter() {
+		$this->page->login()->open('zabbix.php?action=auditlog.list&filter_rst=1')->waitUntilReady();
+		$form = $this->query('name:zbx_filter')->asForm()->one();
+		$table = $this->query('class:list-table')->asTable()->one();
+		$form->query('button:Reset')->one()->click();
+
+		// Click on IP in first table row.
+		$table->getRow(0)->getColumn('IP')->query('xpath:.//a')->one()->click();
+		$ip = $table->getRow(0)->getColumn('IP')->getText();
+
+		// Check that correct IP displayed in filter form.
+		$this->assertTrue($form->checkValue(['IP' => $ip]));
+
+		// Compare result cout on page and in DB.
+		$recordsetid_count = CDBHelper::getCount('SELECT NULL FROM auditlog WHERE ip='.zbx_dbstr($ip));
 		$this->assertEquals($recordsetid_count, $table->getRows()->count());
 	}
 
