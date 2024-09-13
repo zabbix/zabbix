@@ -20,6 +20,7 @@
 #include "zbxstr.h"
 #include "zbxtime.h"
 #include "zbxcurl.h"
+#include "zbxnum.h"
 
 #define WEBDRIVER_INVALID_SESSIONID_ERROR	"invalid session id"
 #define WEBDRIVER_ELEMENT_ID			"element-6066-11e4-a52e-4f735466cecf"
