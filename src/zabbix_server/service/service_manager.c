@@ -26,6 +26,7 @@
 #include "service_actions.h"
 #include "zbxserialize.h"
 #include "zbxrtc.h"
+#include "dbcache.h"
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;
@@ -2765,10 +2766,10 @@ static void	event_add_maintenanceid(zbx_event_t *event, zbx_uint64_t maintenance
 
 static void	event_remove_maintenanceid(zbx_event_t *event, zbx_uint64_t maintenanceid)
 {
+	int	i;
+
 	if (NULL == event->maintenanceids)
 		return;
-
-	int	i;
 
 	if (FAIL != (i = zbx_vector_uint64_search(event->maintenanceids, maintenanceid,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
