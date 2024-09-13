@@ -1221,7 +1221,7 @@ class DB {
 			if ($field_schema['type'] & self::FIELD_TYPE_ID) {
 				$filter[] = dbConditionId(self::fieldId($field_name, $table_alias), $value);
 			}
-			if ($field_schema['type'] & (self::FIELD_TYPE_INT | self::FIELD_TYPE_UINT)) {
+			elseif ($field_schema['type'] & (self::FIELD_TYPE_INT | self::FIELD_TYPE_UINT)) {
 				$filter[] = dbConditionInt(self::fieldId($field_name, $table_alias), $value);
 			}
 			else {

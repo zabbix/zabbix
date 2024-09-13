@@ -49,6 +49,17 @@ check_fields($fields);
 
 validateTimeSelectorPeriod(getRequest('from'), getRequest('to'));
 
+$options = [
+	'output' => ['hostid', 'host', 'name'],
+	'hostids' => [10001, 10002, 10003, 10000, 9999, 9998],
+	'filter' => [
+		'maintenanceid' => [1]
+	],
+	'sortfield' => ['host', 'name'],
+	'sortorder' => [ZBX_SORT_DOWN, ZBX_SORT_UP]
+];
+SDII(DB::makeSql('hosts', $options, 'h'));
+
 if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 	require_once dirname(__FILE__).'/include/page_footer.php';
 	exit;
