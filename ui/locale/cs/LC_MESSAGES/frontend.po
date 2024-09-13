@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-08-26 10:49+0000\n"
+"PO-Revision-Date: 2024-08-26 10:48+0000\n"
 "Last-Translator: Tomáš Heřmánek <tomas.hermanek@initmax.cz>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: cs\n"
@@ -20521,6 +20521,14 @@ msgstr "Téma"
 msgid "These parameters will be passed to the script as command-line arguments in the specified order."
 msgstr "Tyto parametry budou předány do skriptu jako argumenty příkazového řádku ve specifikovaném pořadí."
 
+#: app/controllers/CControllerDiscoveryEdit.php:175
+#, c-format
+msgid "This check cannot be removed, as it is used as a condition in %1$s discovery action."
+msgid_plural "This check cannot be removed, as it is used as a condition in %1$s discovery actions."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
 #: include/func.inc.php:2566
 msgid "This day last week"
 msgstr "Tento den v minulém týdnu"
@@ -22612,6 +22620,10 @@ msgstr "Seznam datastorů hypervisoru VMware, \"url\" - URL služby VMware, \"uu
 msgid "VMware hypervisor health state rollup sensor, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns 0 - gray; 1 - green; 2 - yellow; 3 - red"
 msgstr "Stav senzoru rollupu hypervizoru VMware, \"url\" – URL služby VMware, \"uuid\" – globální unikátní identifikátor hypervizoru VMware. Vrací 0 - šedá; 1 - zelená; 2 - žlutá; 3 - červená"
 
+#: include/classes/data/CItemData.php:2237
+msgid "VMware hypervisor maintenance status, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns 0 - not in maintenance; 1 - in maintenance"
+msgstr ""
+
 #: include/classes/data/CItemData.php:2051
 msgid "VMware hypervisor model, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
 msgstr "Model hypervisoru VMware, \"url\" - URL služby VMware, \"uuid\" - globální unikátní identifikátor hypervisoru VMware"
@@ -22747,6 +22759,10 @@ msgstr "Použití hostované paměti virtuálního stroje VMware, \"url\" - URL 
 #: include/classes/data/CItemData.php:2387
 msgid "VMware virtual machine host memory usage, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
 msgstr "Velikost využité paměti virtuálního stroje VMware, \"url\" - URL služby VMware, \"uuid\" - globální unikátní identifikátor virtuálního stroje VMware"
+
+#: include/classes/data/CItemData.php:2482
+msgid "VMware virtual machine hypervisor maintenance status, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier. Returns 0 - not in maintenance; 1 - in maintenance"
+msgstr ""
 
 #: include/classes/data/CItemData.php:2331
 msgid "VMware virtual machine hypervisor name, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"

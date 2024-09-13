@@ -20349,6 +20349,13 @@ msgstr "Tema"
 msgid "These parameters will be passed to the script as command-line arguments in the specified order."
 msgstr "Els paràmetre es passaran a l'script com arguments de línia de comandes en l'ordre donat."
 
+#: app/controllers/CControllerDiscoveryEdit.php:175
+#, c-format
+msgid "This check cannot be removed, as it is used as a condition in %1$s discovery action."
+msgid_plural "This check cannot be removed, as it is used as a condition in %1$s discovery actions."
+msgstr[0] ""
+msgstr[1] ""
+
 #: include/func.inc.php:2566
 msgid "This day last week"
 msgstr "Aquest dia de la setmana passada"
@@ -22427,6 +22434,10 @@ msgstr "Llistat dels magatzem de dades de l'hipervisor de VMware, \"url\" - URL 
 msgid "VMware hypervisor health state rollup sensor, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns 0 - gray; 1 - green; 2 - yellow; 3 - red"
 msgstr "Sensor acumulatiu d'estat de salut de l'hipervisor de VMware, \"url\" - URL del servei de VMware, \"uuid\" - identificador únic global de l'hipervisor de VMware. Retorna 0 - gris; 1 - verd; 2 - groc; 3 - vermell"
 
+#: include/classes/data/CItemData.php:2237
+msgid "VMware hypervisor maintenance status, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns 0 - not in maintenance; 1 - in maintenance"
+msgstr ""
+
 #: include/classes/data/CItemData.php:2051
 msgid "VMware hypervisor model, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
 msgstr "Model d'hipervisor de VMware, \"url\" - URL del servei de VMware, \"uuid\" - identificador únic global de l'hipervisor de VMware"
@@ -22562,6 +22573,10 @@ msgstr "Ús de memòria convidada de la màquina virtual de VMware, \"url\" - UR
 #: include/classes/data/CItemData.php:2387
 msgid "VMware virtual machine host memory usage, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
 msgstr "Ús de memòria convidada de la màquina virtual de VMware, \"url\" - URL del servei de VMware, \"uuid\" - identificador únic global de la màquina virtual de VMware"
+
+#: include/classes/data/CItemData.php:2482
+msgid "VMware virtual machine hypervisor maintenance status, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier. Returns 0 - not in maintenance; 1 - in maintenance"
+msgstr ""
 
 #: include/classes/data/CItemData.php:2331
 msgid "VMware virtual machine hypervisor name, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"

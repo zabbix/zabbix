@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-08-21 16:00+0000\n"
+"PO-Revision-Date: 2024-09-02 15:37+0000\n"
 "Last-Translator: Yaron <sh.yaron@gmail.com>\n"
 "Language-Team: none\n"
 "Language: he\n"
@@ -2705,11 +2705,10 @@ msgstr[0] "לא ניתן למחוק את אבטיפוס התרשים"
 msgstr[1] "לא ניתן למחוק את אבטיפוסי התרשים"
 
 #: app/controllers/CControllerHostMassDelete.php:76
-#, fuzzy
 msgid "Cannot delete host"
 msgid_plural "Cannot delete hosts"
 msgstr[0] "לא ניתן למחוק מארח"
-msgstr[1] "לא ניתן למחוק מארח"
+msgstr[1] "לא ניתן למחוק מארחים"
 
 #: include/classes/api/services/CHost.php:1461
 #, c-format
@@ -2764,18 +2763,16 @@ msgid "Cannot delete inventory."
 msgstr "לא ניתן למחוק את המאגר."
 
 #: items.php:524 items.php:736
-#, fuzzy
 msgid "Cannot delete item"
 msgid_plural "Cannot delete items"
 msgstr[0] "לא ניתן למחוק פריט"
-msgstr[1] "לא ניתן למחוק פריט"
+msgstr[1] "לא ניתן למחוק פריטים"
 
 #: disc_prototypes.php:302 disc_prototypes.php:500
-#, fuzzy
 msgid "Cannot delete item prototype"
 msgid_plural "Cannot delete item prototypes"
-msgstr[0] "לא ניתן למחוק אבטיפוס של פרי"
-msgstr[1] "לא ניתן למחוק אבטיפוס של פרי"
+msgstr[0] "לא ניתן למחוק אבטיפוס של פריט"
+msgstr[1] "לא ניתן למחוק אבטיפוס של פריטים"
 
 #: app/controllers/CControllerMaintenanceDelete.php:71
 msgid "Cannot delete maintenance period"
@@ -2797,11 +2794,10 @@ msgstr[0] "לא ניתן למחוק מודול: %1$s."
 msgstr[1] "לא ניתן למחוק מודולים: %1$s."
 
 #: sysmaps.php:266
-#, fuzzy
 msgid "Cannot delete network map"
 msgid_plural "Cannot delete network maps"
 msgstr[0] "לא ניתן למחוק מפת רשת"
-msgstr[1] "לא ניתן למחוק מפת רשת"
+msgstr[1] "לא ניתן למחוק מפות רשת"
 
 #: app/controllers/CControllerProxyDelete.php:39
 msgid "Cannot delete proxies"
@@ -2864,11 +2860,10 @@ msgid "Cannot delete service \"%1$s\": %2$s."
 msgstr "לא ניתן למחוק את השירות „%1$s”:‏ %2$s."
 
 #: app/controllers/CControllerTemplateDelete.php:143
-#, fuzzy
 msgid "Cannot delete template"
 msgid_plural "Cannot delete templates"
 msgstr[0] "לא ניתן למחוק תבנית"
-msgstr[1] "לא ניתן למחוק תבנית"
+msgstr[1] "לא ניתן למחוק תבניות"
 
 #: app/controllers/CControllerTemplateGroupDelete.php:75
 msgid "Cannot delete template group"
@@ -3594,17 +3589,17 @@ msgstr ""
 #: include/classes/api/services/CHostBase.php:1003
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\", because its parent template \"%3$s\" would be linked to host \"%4$s\" twice."
-msgstr ""
+msgstr "לא ניתן לקשר את התבנית „%1$s” לתבנית „%2$s”, מכיוון שתבנית האב שלה „%3$s” תקושר למארח „%4$s” פעמיים."
 
 #: include/classes/api/services/CHostBase.php:1000
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\", because its parent template \"%3$s\" would be linked to host prototype \"%4$s\" twice."
-msgstr ""
+msgstr "לא ניתן לקשר את התבנית „%1$s” לתבנית „%2$s”, מכיוון שתבנית האב שלה „%3$s” תקושר לאבטיפוס של המארח „%4$s” פעמיים."
 
 #: include/classes/api/services/CHostBase.php:997
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\", because its parent template \"%3$s\" would be linked to template \"%4$s\" twice."
-msgstr ""
+msgstr "לא ניתן לקשר את התבנית „%1$s” לתבנית „%2$s”, מכיוון שתבנית האב שלה „%3$s” תקושר לתבנית „%4$s” פעמיים."
 
 #: include/classes/api/services/CHostBase.php:866
 #, c-format
@@ -4054,11 +4049,10 @@ msgid "Cannot update interface for discovered host \"%1$s\"."
 msgstr "לא ניתן לעדכן את המנשק עבור המארח שהתגלה „%1$s“."
 
 #: app/controllers/CControllerPopupMassupdateItem.php:279 items.php:670
-#, fuzzy
 msgid "Cannot update item"
 msgid_plural "Cannot update items"
 msgstr[0] "לא ניתן לעדכן את הפריט"
-msgstr[1] "לא ניתן לעדכן את הפריט"
+msgstr[1] "לא ניתן לעדכן את הפריטים"
 
 #: app/controllers/CControllerPopupMassupdateItem.php:278
 #: disc_prototypes.php:457 disc_prototypes.php:484 disc_prototypes.php:523
@@ -4101,7 +4095,7 @@ msgstr "לא ניתן לעדכן את המתווך עבור המארח שהתג�
 #: app/controllers/CControllerProxyGroupUpdate.php:43
 #: app/controllers/CControllerProxyGroupUpdate.php:82
 msgid "Cannot update proxy group"
-msgstr ""
+msgstr "לא ניתן לעדכן את קבוצת המתווכים"
 
 #: include/classes/api/services/CRole.php:768
 #, c-format
@@ -4156,11 +4150,10 @@ msgstr "לא ניתן לעדכן את הצעד עבור תרחיש הרשת שב
 #: app/controllers/CControllerTemplateMassupdate.php:353
 #: app/controllers/CControllerTemplateUpdate.php:49
 #: app/controllers/CControllerTemplateUpdate.php:196
-#, fuzzy
 msgid "Cannot update template"
 msgid_plural "Cannot update templates"
 msgstr[0] "לא ניתן לעדכן את התבנית"
-msgstr[1] "לא ניתן לעדכן את התבנית"
+msgstr[1] "לא ניתן לעדכן את התבניות"
 
 #: app/controllers/CControllerTemplateGroupUpdate.php:41
 #: app/controllers/CControllerTemplateGroupUpdate.php:94
@@ -4170,11 +4163,10 @@ msgstr "לא ניתן לעדכן את קבוצת התבניות"
 #: app/controllers/CControllerTriggerMassupdate.php:212
 #: app/controllers/CControllerTriggerUpdate.php:58
 #: app/controllers/CControllerTriggerUpdate.php:155
-#, fuzzy
 msgid "Cannot update trigger"
 msgid_plural "Cannot update triggers"
 msgstr[0] "לא ניתן לעדכן את ההקפצה"
-msgstr[1] "לא ניתן לעדכן את ההקפצה"
+msgstr[1] "לא ניתן לעדכן את ההקפצות"
 
 #: include/classes/api/services/CTriggerGeneral.php:2305
 #, c-format
@@ -4293,7 +4285,7 @@ msgstr "החלפת PSK"
 
 #: app/views/mfa.edit.php:128
 msgid "Change client secret"
-msgstr ""
+msgstr "החלפת סוד לקוח"
 
 #: widgets/item/includes/WidgetForm.php:131
 #: widgets/item/includes/WidgetForm.php:249
@@ -4480,19 +4472,19 @@ msgstr "פינוי היסטוריה ומגמות"
 
 #: include/views/configuration.item.list.php:315
 msgid "Clear history and trends of selected item?"
-msgstr ""
+msgstr "לפנות את ההיסטוריה והמגמות של הפריט הנבחר?"
 
 #: include/views/configuration.item.list.php:316
 msgid "Clear history and trends of selected items?"
-msgstr ""
+msgstr "לפנות את ההיסטוריה והמגמות של הפריטים הנבחרים?"
 
 #: include/views/configuration.httpconf.list.php:238
 msgid "Clear history and trends of selected web scenario?"
-msgstr ""
+msgstr "לפנות את ההיסטוריה והמגמות של תרחיש הרשת הנבחר?"
 
 #: include/views/configuration.httpconf.list.php:239
 msgid "Clear history and trends of selected web scenarios?"
-msgstr ""
+msgstr "לפנות את ההיסטוריה והמגמות של תרחישי הרשת הנבחרים?"
 
 #: app/views/popup.massupdate.host.php:66 app/views/template.massupdate.php:70
 msgid "Clear when unlinking"
@@ -4508,11 +4500,11 @@ msgstr "יש ללחוץ כדי לצפות או לערוך"
 
 #: app/views/mfa.edit.php:111
 msgid "Client ID"
-msgstr ""
+msgstr "מזהה לקוח"
 
 #: app/views/mfa.edit.php:120
 msgid "Client secret"
-msgstr ""
+msgstr "סוד לקוח"
 
 #: widgets/clock/Widget.php:46
 msgid "Clock"
@@ -4555,11 +4547,11 @@ msgstr "שכפול"
 #: app/views/configuration.host.edit.php:61
 #: app/views/js/popup.host.edit.js.php:44 host_prototypes.php:203
 msgid "Cloned host parameter values have been modified."
-msgstr ""
+msgstr "ערכי משתני המארח ששוכפלו נערכו."
 
 #: app/views/js/template.edit.js.php:40
 msgid "Cloned template parameter values have been modified."
-msgstr ""
+msgstr "ערכי משתני התבנית ששוכפלו נערכו."
 
 #: app/views/popup.import.compare.php:47 app/views/popup.token.view.php:84
 #: include/func.inc.php:1814 include/views/js/monitoring.sysmaps.js.php:86
@@ -4600,7 +4592,7 @@ msgstr "סגירת תקלות"
 
 #: app/views/mfa.edit.php:90
 msgid "Code length"
-msgstr ""
+msgstr "אורך קוד"
 
 #: app/views/js/monitoring.problem.view.js.php:194
 #: app/views/js/monitoring.problem.view.js.php:221
@@ -4652,7 +4644,7 @@ msgstr ""
 
 #: widgets/gauge/views/widget.edit.php:92
 msgid "Colors"
-msgstr ""
+msgstr "צבעים"
 
 #: widgets/graphprototype/includes/WidgetForm.php:82
 #: widgets/tophosts/includes/WidgetForm.php:140
@@ -4680,7 +4672,7 @@ msgstr "פקודות"
 
 #: app/views/administration.timeouts.edit.php:138
 msgid "Communication"
-msgstr ""
+msgstr "תקשורת"
 
 #: include/items.inc.php:946
 msgctxt "SNMP Community"
@@ -4843,7 +4835,7 @@ msgstr "הגדרת מתווכים"
 
 #: app/controllers/CControllerProxyGroupList.php:131
 msgid "Configuration of proxy groups"
-msgstr ""
+msgstr "הגדרת קבוצות מתווכים"
 
 #: app/controllers/CControllerRegExEdit.php:111
 #: app/controllers/CControllerRegExList.php:53
@@ -4869,7 +4861,7 @@ msgstr "הגדרת תבניות"
 
 #: app/controllers/CControllerTimeoutsEdit.php:110
 msgid "Configuration of timeouts"
-msgstr ""
+msgstr "הגדרת תום זמנים"
 
 #: app/controllers/CControllerTrigDisplayEdit.php:132
 msgid "Configuration of trigger displaying options"
@@ -5164,7 +5156,7 @@ msgstr "שם הקשר"
 
 #: app/views/script.userinput.edit.php:82
 msgid "Continue"
-msgstr ""
+msgstr "המשך"
 
 #: app/views/popup.lldoverride.php:54
 msgid "Continue overrides"
@@ -7319,7 +7311,7 @@ msgstr "נקודה"
 
 #: widgets/piechart/includes/WidgetForm.php:122
 msgid "Doughnut"
-msgstr ""
+msgstr "עוגייה"
 
 #: widgets/discovery/views/widget.view.php:37
 msgctxt "discovery results in dashboard"
@@ -7366,11 +7358,11 @@ msgstr "סגנון ציור"
 
 #: app/views/administration.script.edit.php:353
 msgid "Dropdown"
-msgstr ""
+msgstr "תפריט נפתח"
 
 #: app/views/administration.script.edit.php:366
 msgid "Dropdown options"
-msgstr ""
+msgstr "אפשרויות התפריט הנפתח"
 
 #: app/controllers/CControllerAuthenticationEdit.php:362
 #: app/controllers/CControllerAuthenticationEdit.php:479
@@ -8726,7 +8718,7 @@ msgstr "הגישה למנשק המשתמש מושבתת."
 
 #: widgets/gauge/Widget.php:46
 msgid "Gauge"
-msgstr ""
+msgstr "מד"
 
 #: include/classes/helpers/CMenuHelper.php:338
 #: include/classes/helpers/CRoleHelper.php:507
@@ -8789,7 +8781,7 @@ msgstr "הביטוי שסופק אינו מאקרו"
 #: include/views/configuration.item.edit.php:866
 #: include/views/configuration.item.prototype.edit.php:820
 msgid "Global"
-msgstr ""
+msgstr "כללי"
 
 #: include/classes/api/services/CIconMap.php:366
 #, c-format
@@ -8934,11 +8926,10 @@ msgstr[0] "הועתק תרשים"
 msgstr[1] "הועתקו תרשימים"
 
 #: graphs.php:281 graphs.php:337
-#, fuzzy
 msgid "Graph deleted"
 msgid_plural "Graphs deleted"
 msgstr[0] "תרשים נמחק"
-msgstr[1] "תרשים נמחק"
+msgstr[1] "תרשימים נמחקו"
 
 #: app/controllers/CControllerAuditLogList.php:230
 #: app/views/popup.lldoperation.php:51
@@ -9665,7 +9656,7 @@ msgstr "סקירת מאגר מארח"
 
 #: jsLoader.php:289
 msgid "Host is not selected."
-msgstr ""
+msgstr "המארח לא נבחר."
 
 #: include/views/monitoring.sysmap.edit.php:183
 msgid "Host label type"
@@ -9673,12 +9664,12 @@ msgstr "סוג תווית מארח"
 
 #: widgets/tophosts/includes/WidgetForm.php:159
 msgid "Host limit"
-msgstr ""
+msgstr "מגבלת מארחים"
 
 #: widgets/dataover/includes/WidgetForm.php:65
 #: widgets/trigover/includes/WidgetForm.php:72
 msgid "Host location"
-msgstr ""
+msgstr "מקום מארח"
 
 #: app/partials/configuration.host.edit.html.php:326
 msgid "Host macros"
@@ -9702,7 +9693,7 @@ msgstr "שם מארח"
 
 #: widgets/hostnavigator/Widget.php:29
 msgid "Host navigator"
-msgstr ""
+msgstr "מנווט מארחים"
 
 #: include/hosts.inc.php:284
 msgid "Host networks"
@@ -9710,7 +9701,7 @@ msgstr "רשתות המארח"
 
 #: widgets/hostnavigator/includes/WidgetForm.php:65
 msgid "Host patterns"
-msgstr ""
+msgstr "תבניות מארחים"
 
 #: app/views/usergroup.edit.php:270
 msgid "Host permissions"
@@ -9727,11 +9718,10 @@ msgid "Host prototype added"
 msgstr "נוסף אבטיפוס מארח"
 
 #: host_prototypes.php:139 host_prototypes.php:318
-#, fuzzy
 msgid "Host prototype deleted"
 msgid_plural "Host prototypes deleted"
 msgstr[0] "נמחק אבטיפוס מארח"
-msgstr[1] "נמחק אבטיפוס מארח"
+msgstr[1] "נמחקו אבות טיפוס מארחים"
 
 #: include/views/configuration.host.prototype.edit.php:370
 msgid "Host prototype macros"
@@ -10208,7 +10198,7 @@ msgstr "סוג תווית תמונה"
 
 #: widgets/itemhistory/Widget.php:33
 msgid "Image loading error."
-msgstr ""
+msgstr "שגיאת טעינת תמונה."
 
 #: include/classes/helpers/CUploadFile.php:129
 #, c-format
@@ -10412,7 +10402,7 @@ msgstr "לכלול את רשומת תפריט האירוע"
 
 #: widgets/hostavail/includes/WidgetForm.php:62
 msgid "Include hosts in maintenance"
-msgstr ""
+msgstr "לכלול מארחים במצב תחזוקה"
 
 #: include/classes/data/CItemData.php:1117
 msgid "Incoming traffic statistics on network interface. Returns integer"
@@ -12507,7 +12497,7 @@ msgstr "מחווני קישור"
 
 #: include/actions.inc.php:866
 msgid "Link template"
-msgstr ""
+msgstr "קישור תבנית"
 
 #: app/controllers/CControllerPopupLldOperation.php:142
 #: app/views/popup.lldoperation.php:236 app/views/popup.massupdate.host.php:71
@@ -12933,7 +12923,7 @@ msgstr "פעולת מארח ידנית"
 
 #: app/views/script.userinput.edit.php:100
 msgid "Manual input"
-msgstr ""
+msgstr "קלט ידני"
 
 #: app/views/popup.acknowledge.edit.php:84
 msgid "Manual problem suppression. Date-time input accepts relative and absolute time format."
@@ -13164,7 +13154,7 @@ msgstr "מספר עמודות ושורות מרבי בטבלאות סקירה"
 #: widgets/piechart/includes/WidgetForm.php:209
 #: widgets/svggraph/includes/WidgetForm.php:359
 msgid "Max number of rows"
-msgstr ""
+msgstr "מספר השורות המרבי"
 
 #: app/views/administration.gui.edit.php:138
 msgid "Max period for time selector"
@@ -13172,7 +13162,7 @@ msgstr "הטווח המרבי לבורר זמן"
 
 #: app/views/connector.edit.php:164
 msgid "Max records per message"
-msgstr ""
+msgstr "כמות הרשומות המרבית להודעה"
 
 #: app/controllers/CControllerPopupItemTest.php:1324
 #: app/controllers/CControllerPopupItemTest.php:1330
@@ -13193,11 +13183,11 @@ msgstr "רמת תקריב מרבית"
 
 #: app/views/configuration.discovery.edit.php:84
 msgid "Maximum concurrent checks"
-msgstr ""
+msgstr "מספר הבדיקות המרבי בו־זמנית"
 
 #: app/views/configuration.discovery.edit.php:85
 msgid "Maximum concurrent checks per type"
-msgstr ""
+msgstr "מספר הבדיקות המרבי בו־זמנית לסוג"
 
 #: include/classes/data/CItemData.php:1018
 msgid "Maximum number of opened files supported by OS. Returns integer"
@@ -13210,7 +13200,7 @@ msgstr "מספר התהליכים המרבי שנתמך על ידי מערכת �
 #: widgets/piechart/views/widget.edit.js.php:680
 #: widgets/svggraph/views/widget.edit.js.php:805
 msgid "Maximum number of rows"
-msgstr ""
+msgstr "מספר השורות המרבי"
 
 #: app/partials/administration.system.info.php:149
 #, c-format
@@ -13312,7 +13302,7 @@ msgstr "מיפוי סוגי מדיה"
 
 #: app/views/administration.timeouts.edit.php:158
 msgid "Media type test"
-msgstr ""
+msgstr "בדיקת סוג מדיה"
 
 #: app/controllers/CControllerMediatypeTestSend.php:50
 #: app/controllers/CControllerMediatypeTestSend.php:174
@@ -13468,7 +13458,7 @@ msgstr "השיטה לא נמצאה."
 
 #: app/views/administration.authentication.edit.php:572
 msgid "Methods"
-msgstr ""
+msgstr "שיטות"
 
 #: include/httptest.inc.php:392
 msgid "Microsoft Edge"
@@ -13493,7 +13483,7 @@ msgstr "מזערי"
 
 #: app/views/popup.proxygroup.edit.php:59
 msgid "Minimum number of proxies"
-msgstr ""
+msgstr "כמות המתווכים המזערית"
 
 #: app/views/administration.authentication.edit.php:81
 msgid "Minimum password length"
@@ -13501,7 +13491,7 @@ msgstr "אורך ססמה מזערי"
 
 #: app/views/administration.proxygroup.list.php:81
 msgid "Minimum proxies"
-msgstr ""
+msgstr "כמות מתווכים מזערית"
 
 #: app/partials/administration.system.info.php:142
 #, c-format
@@ -13602,12 +13592,12 @@ msgstr "חסר מפתח „%1$s” למארח „%2$s”."
 
 #: widgets/hostavail/views/widget.view.php:38
 msgid "Mixed"
-msgstr ""
+msgstr "מעורבב"
 
 #: widgets/hostavail/views/widget.view.php:39
 msgctxt "compact table header"
 msgid "Mixed"
-msgstr ""
+msgstr "מעורבב"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:273
 #: app/views/administration.proxy.list.php:50
@@ -13640,18 +13630,18 @@ msgstr[1] "נמחקו מודולים: %1$s."
 #: app/controllers/CControllerModuleDisable.php:67
 msgid "Module disabled"
 msgid_plural "Modules disabled"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "מודול הושבת"
+msgstr[1] "מודולים הושבתו"
 
 #: app/controllers/CControllerModuleEnable.php:91
 msgid "Module enabled"
 msgid_plural "Modules enabled"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "מודול הופעל"
+msgstr[1] "מודולים הופעלו"
 
 #: app/controllers/CControllerModuleUpdate.php:94
 msgid "Module updated"
-msgstr ""
+msgstr "מודול עודכן"
 
 #: include/classes/api/services/CRole.php:707
 #, c-format
@@ -14028,7 +14018,7 @@ msgstr "ניווט לתצוגה הראשונית"
 #: widgets/gauge/includes/WidgetForm.php:190
 #: widgets/gauge/views/widget.edit.php:197
 msgid "Needle"
-msgstr ""
+msgstr "נעץ"
 
 #: app/views/administration.housekeeping.edit.php:77
 msgid "Network discovery data storage period"
@@ -14043,11 +14033,10 @@ msgid "Network map added"
 msgstr "נוספה מפת רשת"
 
 #: sysmaps.php:265
-#, fuzzy
 msgid "Network map deleted"
 msgid_plural "Network maps deleted"
 msgstr[0] "מפת רשת נמחקה"
-msgstr[1] "מפת רשת נמחקה"
+msgstr[1] "מפות רשת נמחקו"
 
 #: sysmaps.php:188
 msgid "Network map updated"
@@ -20371,6 +20360,13 @@ msgstr "ערכת עיצוב"
 msgid "These parameters will be passed to the script as command-line arguments in the specified order."
 msgstr ""
 
+#: app/controllers/CControllerDiscoveryEdit.php:175
+#, c-format
+msgid "This check cannot be removed, as it is used as a condition in %1$s discovery action."
+msgid_plural "This check cannot be removed, as it is used as a condition in %1$s discovery actions."
+msgstr[0] ""
+msgstr[1] ""
+
 #: include/func.inc.php:2566
 msgid "This day last week"
 msgstr "היום הזה בשבוע שעבר"
@@ -22452,6 +22448,10 @@ msgstr ""
 msgid "VMware hypervisor health state rollup sensor, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns 0 - gray; 1 - green; 2 - yellow; 3 - red"
 msgstr ""
 
+#: include/classes/data/CItemData.php:2237
+msgid "VMware hypervisor maintenance status, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns 0 - not in maintenance; 1 - in maintenance"
+msgstr ""
+
 #: include/classes/data/CItemData.php:2051
 msgid "VMware hypervisor model, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
 msgstr ""
@@ -22586,6 +22586,10 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:2387
 msgid "VMware virtual machine host memory usage, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
+#: include/classes/data/CItemData.php:2482
+msgid "VMware virtual machine hypervisor maintenance status, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier. Returns 0 - not in maintenance; 1 - in maintenance"
 msgstr ""
 
 #: include/classes/data/CItemData.php:2331

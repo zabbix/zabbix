@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2023-10-19 11:17+0000\n"
-"Last-Translator: diana.dauksa <diana.dauksa@zabbix.com>\n"
+"PO-Revision-Date: 2024-08-31 18:01+0000\n"
+"Last-Translator: Mehmet Oğuzhan ÖZKURT <oguzhan@oguzhanozkurt.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: tr\n"
 "MIME-Version: 1.0\n"
@@ -19,14 +19,14 @@ msgstr ""
 #: app/controllers/CControllerSlaReportList.php:182
 #, c-format
 msgid "\"%1$s\" date must be less than \"%2$s\" date."
-msgstr ""
+msgstr "\"%1$s\" tarihi \"%2$s\" tarihinden daha erken olmalıdır."
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:142
 #: include/classes/db/PostgresqlDbBackend.php:96
 #, c-format
 msgid "\"%1$s\" instead \"%2$s\""
-msgstr ""
+msgstr "\"%2$s\" yerine \"%1$s\""
 
 #: include/classes/import/validators/C10XmlValidator.php:322
 #: include/classes/import/validators/C10XmlValidator.php:340
@@ -50,13 +50,13 @@ msgstr "\"%1$s\" bekleniyor"
 #: include/classes/api/services/CReport.php:615
 #, c-format
 msgid "\"%1$s\" must be an empty string or greater than \"%2$s\"."
-msgstr ""
+msgstr "\"%1$s\" boş bir dize olmalı veya \"%2$s\" değerinden büyük olmalıdır."
 
 #: include/classes/import/validators/C10XmlValidator.php:359
 #: include/classes/import/validators/C10XmlValidator.php:382
 #: include/classes/import/validators/C10XmlValidator.php:404
 msgid "\"host:key\" pair is expected"
-msgstr "\"anamakine:anahtar\" çifti bekleniyor"
+msgstr "\"host:key\" çifti bekleniyor"
 
 #: include/forms.inc.php:1330
 #: include/views/configuration.host.discovery.edit.php:932
@@ -81,29 +81,29 @@ msgstr[1] "%1$d gün"
 #, c-format
 msgctxt "screen reader"
 msgid "%1$d matches for %2$s found"
-msgstr ""
+msgstr "%2$s için %1$d eşleşme bulundu"
 
 #: widgets/hostnavigator/Widget.php:39
 #, c-format
 msgid "%1$d of %1$d+ hosts are shown"
-msgstr ""
+msgstr "%1$d+ ana makineden %1$d tanesi gösteriliyor."
 
 #: widgets/itemnavigator/Widget.php:39
 #, c-format
 msgid "%1$d of %1$d+ items are shown"
-msgstr ""
+msgstr "%1$d+ öğeden %1$d tanesi gösteriliyor"
 
 #: widgets/problems/actions/WidgetView.php:78
 #, c-format
 msgid "%1$d of %3$d%2$s problem is shown"
 msgid_plural "%1$d of %3$d%2$s problems are shown"
-msgstr[0] "%3$d%2$s problemden %1$d kadarı gösteriliyor"
+msgstr[0] "%3$d%2$s problemden %1$d tanesi gösteriliyor"
 msgstr[1] "%3$d%2$s problemden %1$d kadarı gösteriliyor"
 
 #: app/controllers/CControllerPopupAcknowledgeEdit.php:132
 #, c-format
 msgid "%1$d problems selected."
-msgstr ""
+msgstr "%1$d problem seçildi."
 
 #: chart4.php:95
 #, c-format
@@ -113,7 +113,7 @@ msgstr "%1$s (yıl %2$s)"
 #: include/classes/core/CModuleManager.php:159
 #, c-format
 msgid "%1$s - thrown by module located at %2$s."
-msgstr ""
+msgstr "%1$s - %2$s konumunda bulunan modül tarafından atıldı."
 
 #: include/classes/import/readers/CXmlImportReader.php:52
 #: include/classes/validators/CApiInputValidator.php:4025
@@ -126,18 +126,18 @@ msgstr "%1$s [Satır: %2$s | Sütun: %3$s]"
 msgctxt "screen reader"
 msgid "%1$s action"
 msgid_plural "%1$s actions"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s işlem"
+msgstr[1] "%1$s işlemler"
 
 #: jsLoader.php:321
 #, c-format
 msgid "%1$s characters"
-msgstr ""
+msgstr "%1$s karakterler"
 
 #: jsLoader.php:322
 #, c-format
 msgid "%1$s characters remaining"
-msgstr ""
+msgstr "%1$s karakter kaldı"
 
 #: app/views/popup.acknowledge.edit.php:60
 #: app/views/popup.acknowledge.edit.php:65
@@ -145,26 +145,26 @@ msgstr ""
 msgid "%1$s event"
 msgid_plural "%1$s events"
 msgstr[0] "%1$s olay"
-msgstr[1] "%1$s olay"
+msgstr[1] "%1$s olaylar"
 
 #: app/views/popup.usergroupmapping.edit.php:87
 #, c-format
 msgid "%1$s group pattern"
-msgstr ""
+msgstr "%1$s grup modeli"
 
 #: include/maps.inc.php:416
 #, c-format
 msgid "%1$s host in maintenance"
 msgid_plural "%1$s hosts in maintenance"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s ana makinesi bakımda"
+msgstr[1] "%1$s ana makineleri bakımda"
 
 #: include/func.inc.php:2647
 #, c-format
 msgid "%1$s hour"
 msgid_plural "%1$s hours"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s saat"
+msgstr[1] "%1$s saat"
 
 #: include/views/monitoring.history.php:32
 #: widgets/plaintext/actions/WidgetView.php:126
@@ -173,15 +173,15 @@ msgstr[1] ""
 msgid "%1$s item"
 msgid_plural "%1$s items"
 msgstr[0] "%1$s öğe"
-msgstr[1] "%1$s öğe"
+msgstr[1] "%1$s öğeler"
 
 #: include/actions.inc.php:1662
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s message"
 msgid_plural "%1$s messages"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s mesajı"
+msgstr[1] "%1$s mesajlar"
 
 #: include/classes/core/CWidget.php:200 include/classes/core/CWidget.php:201
 #: include/classes/core/CWidget.php:202 include/classes/core/CWidget.php:203
@@ -197,39 +197,39 @@ msgstr[1] "%1$s dakika"
 #, c-format
 msgid "%1$s of %2$s element in problem state"
 msgid_plural "%1$s of %2$s elements in problem state"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%2$s öğesinden %1$s tanesi problemli durumda"
+msgstr[1] "%2$s öğelerinden %1$s tanesi problemli durumda"
 
 #: app/views/administration.miscconfig.edit.php:127
 #, c-format
 msgid "%1$s or %2$s - allows the page to be displayed only in a frame on the same origin as the page itself"
-msgstr ""
+msgstr "%1$s veya %2$s - sayfanın yalnızca sayfanın kendisi ile aynı kaynaktaki bir çerçevede görüntülenmesine olanak tanır"
 
 #: app/views/administration.miscconfig.edit.php:130
 #, c-format
 msgid "%1$s or %2$s - prevents the page from being displayed in a frame, regardless of the site attempting to do so"
-msgstr ""
+msgstr "%1$s veya %2$s - sitenin bunu yapmaya çalışmasına bakılmaksızın sayfanın bir çerçeve içinde görüntülenmesini önler"
 
 #: jsLoader.php:341
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s preselected, use down,up arrow keys and enter to select"
-msgstr ""
+msgstr "%1$s önceden seçildi, seçmek için aşağı, yukarı ok tuşlarını ve enter'ı kullanın"
 
 #: include/maps.inc.php:341 include/maps.inc.php:345 include/maps.inc.php:352
 #: include/maps.inc.php:401
 #, c-format
 msgid "%1$s problem"
 msgid_plural "%1$s problems"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s problemi"
+msgstr[1] "%1$s problemleri"
 
 #: include/classes/helpers/CMapHelper.php:319
 #, c-format
 msgid "%1$s problem in total"
 msgid_plural "%1$s problems in total"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Toplamda %1$s problem"
+msgstr[1] "Toplamda %1$s problemler"
 
 #: app/views/reports.actionlog.list.csv.php:70
 #: app/views/reports.actionlog.list.php:154 include/actions.inc.php:2114
@@ -238,7 +238,7 @@ msgstr[1] ""
 msgid "%1$s retry left"
 msgid_plural "%1$s retries left"
 msgstr[0] "Kalan deneme sayısı %1$s"
-msgstr[1] "Kalan deneme sayısı %1$s"
+msgstr[1] "Kalan deneme sayıları %1$s"
 
 #: app/views/administration.user.edit.php:741
 #: include/classes/core/CWidget.php:198 include/classes/core/CWidget.php:199
@@ -247,69 +247,69 @@ msgstr[1] "Kalan deneme sayısı %1$s"
 msgid "%1$s second"
 msgid_plural "%1$s seconds"
 msgstr[0] "%1$s saniye"
-msgstr[1] "%1$s saniye"
+msgstr[1] "%1$s saniyeler"
 
 #: include/maps.inc.php:369 include/maps.inc.php:372 include/maps.inc.php:379
 #: include/maps.inc.php:384
 #, c-format
 msgid "%1$s unacknowledged problem"
 msgid_plural "%1$s unacknowledged problems"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s onaylanmayan sorun"
+msgstr[1] "%1$s onaylanmayan sorunlar"
 
 #: widgets/problemhosts/views/widget.view.php:117
 #: widgets/problems/includes/WidgetProblems.php:347
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s, Severity, %2$s"
-msgstr ""
+msgstr "%1$s, Önem Derecesi, %2$s"
 
 #: jsLoader.php:335
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s, read only"
-msgstr ""
+msgstr "%1$s, salt okunur"
 
 #: jsLoader.php:391
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s, selected"
-msgstr ""
+msgstr "%1$s, seçildi"
 
 #: app/controllers/CControllerMediatypeEnable.php:86
 #, c-format
 msgid "%1$s. %2$s: %3$s. %4$s."
-msgstr ""
+msgstr "%1$s. %2$s: %3$s. %4$s."
 
 #: include/classes/core/CModuleManager.php:153
 #, c-format
 msgid "%1$s.php class must extend %2$s for module located at %3$s."
-msgstr ""
+msgstr "%3$s konumunda bulunan modül için %1$s.php sınıfının %2$s'yi genişletmesi gerekir."
 
 #: app/controllers/CControllerMediatypeEnable.php:105
 #, c-format
 msgid "%1$s: %2$s"
-msgstr ""
+msgstr "%1$s: %2$s"
 
 #: include/classes/graph/CSvgGraph.php:1418
 #, c-format
 msgid "%1$sth percentile: %2$s"
-msgstr ""
+msgstr "%1$s. yüzdelik: %2$s"
 
 # son kısım tarihindeydi de olabilir, arayüzden bakılmalı
 #: include/func.inc.php:2050
 #, c-format
 msgid "%4$s failed login attempt logged. Last failed attempt was from %1$s on %2$s at %3$s."
 msgid_plural "%4$s failed login attempts logged. Last failed attempt was from %1$s on %2$s at %3$s."
-msgstr[0] "%4$s başarısız oturum açma girişimi kaydedildi. Son başarısız deneme %1$s adresinden %2$s %3$s tarihinde yapıldı."
-msgstr[1] "%4$s başarısız oturum açma girişimi kaydedildi. Son başarısız deneme %1$s adresinden %2$s %3$s tarihinde yapıldı."
+msgstr[0] "%4$s başarısız oturum açma girişimi kaydedildi. Son başarısız deneme %1$s adresinden %2$s %3$s saatinde yapıldı."
+msgstr[1] "%4$s başarısız oturum açma girişimleri kaydedildi. Son başarısız deneme %1$s adresinden %2$s %3$s tarihinde yapıldı."
 
 #: include/classes/screens/CScreenDiscovery.php:223
 #, c-format
 msgid "%d device"
 msgid_plural "%d devices"
 msgstr[0] "%d aygıt"
-msgstr[1] "%d aygıt"
+msgstr[1] "%d aygıtlar"
 
 #: include/users.inc.php:143
 #, c-format
@@ -323,7 +323,7 @@ msgstr "(0 - sonsuz)"
 
 #: app/views/popup.operation.edit.php:95
 msgid "(0 - use action default)"
-msgstr "(0 - eylem öntanımlısını kullan)"
+msgstr "(0 - varsayılan eylemi kullan)"
 
 #: app/views/configuration.hostgroup.list.php:38
 #: app/views/configuration.templategroup.list.php:36
@@ -334,20 +334,20 @@ msgstr "(Yalnızca süper yöneticiler grup oluşturabilir)"
 #: app/partials/hostmacros.inherited.list.html.php:204
 #: app/partials/hostmacros.list.html.php:105
 msgid "(created by host discovery)"
-msgstr ""
+msgstr "(ana makine keşfi tarafından oluşturuldu)"
 
 #: include/views/configuration.item.edit.php:648
 #: include/views/configuration.item.prototype.edit.php:619
 msgid "(legacy) to retrieve a single value synchronously, optionally combined with other values"
-msgstr ""
+msgstr "(eski) tek bir değeri eş zamanlı olarak almak, isteğe bağlı olarak diğer değerlerle birleştirmek"
 
 #: include/views/configuration.host.discovery.edit.php:553
 msgid "(legacy) to retrieve a subtree in JSON"
-msgstr ""
+msgstr "(eski) JSON'da bir alt ağacı almak için"
 
 #: app/partials/configuration.host.edit.html.php:133
 msgid "(linked by host discovery)"
-msgstr ""
+msgstr "(ana makine keşfiyle bağlantılı)"
 
 #: app/partials/configuration.host.edit.html.php:261
 #: app/views/popup.itemtestedit.view.php:254
@@ -377,16 +377,16 @@ msgstr "10 saniye"
 #: tests/selenium/modules/clock32/includes/WidgetForm.php:116
 #: widgets/clock/includes/WidgetForm.php:116
 msgid "12-hour"
-msgstr ""
+msgstr "12-saat"
 
 #: tests/selenium/modules/clock32/includes/WidgetForm.php:115
 #: widgets/clock/includes/WidgetForm.php:115
 msgid "24-hour"
-msgstr ""
+msgstr "24-saat"
 
 #: app/views/popup.sla.edit.php:101 include/classes/helpers/CSlaHelper.php:254
 msgid "24x7"
-msgstr ""
+msgstr "24x7"
 
 #: app/views/administration.queue.overview.php:49
 #: app/views/administration.queue.overview.proxy.php:49
@@ -415,11 +415,11 @@ msgstr "son 500 değer"
 #: app/views/js/popup.itemtestedit.view.js.php:37
 #: app/views/js/popup.itemtestedit.view.js.php:44
 msgid "<empty string>"
-msgstr ""
+msgstr "<boş dize>"
 
 #: include/forms.inc.php:1402 include/views/js/item.preprocessing.js.php:364
 msgid "<label name>"
-msgstr ""
+msgstr "<etiket adı>"
 
 # <elle> olmayabilir, el kitabına bağlantı için olabilir
 #: include/views/monitoring.sysmap.edit.php:131
@@ -430,78 +430,78 @@ msgstr "<elle>"
 #: include/views/js/item.preprocessing.js.php:362
 #: include/views/js/item.preprocessing.js.php:371
 msgid "<metric name>{<label name>=\"<label value>\", ...} == <value>"
-msgstr ""
+msgstr "<metrik adı>{<etiket adı>=\"<etiket değeri>\", ...} == <value>"
 
 #: app/views/administration.script.edit.php:94
 msgid "<sub-menu/sub-menu/...>"
-msgstr ""
+msgstr "<alt menü/alt menü/...>"
 
 #: widgets/geomap/Widget.php:48
 msgctxt "abbreviation of severity level"
 msgid "A"
-msgstr ""
+msgstr "A"
 
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:199
 msgid "ADD OVERRIDE"
-msgstr ""
+msgstr "GEÇERSİZ KILMA EKLE"
 
 #: tests/selenium/modules/clock32/Widget.php:46
 msgid "ALARM CLOCK"
-msgstr ""
+msgstr "ÇALAR SAAT"
 
 #: app/views/administration.user.list.php:137
 msgid "API access"
-msgstr ""
+msgstr "API erişimi"
 
 #: app/views/mfa.edit.php:102
 msgid "API hostname"
-msgstr ""
+msgstr "API ana makine adı"
 
 #: app/controllers/CControllerPopupGeneric.php:422
 #: app/views/administration.userrole.edit.php:310
 msgid "API methods"
-msgstr ""
+msgstr "API yöntemleri"
 
 #: app/controllers/CControllerAuditLogList.php:222
 msgid "API token"
-msgstr ""
+msgstr "API jetonu"
 
 #: include/classes/api/services/CToken.php:287
 #, c-format
 msgid "API token \"%1$s\" already exists for userid \"%2$s\"."
-msgstr ""
+msgstr "\"%1$s\" API jetonu \"%2$s\" kullanıcı kimliği için zaten mevcut."
 
 #: app/controllers/CControllerTokenCreate.php:116
 #: app/controllers/CControllerTokenCreate.php:129
 msgid "API token added"
-msgstr ""
+msgstr "API jetonu eklendi"
 
 #: app/controllers/CControllerTokenDelete.php:64
 msgid "API token deleted"
 msgid_plural "API tokens deleted"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "API jetonu silindi"
+msgstr[1] "API jetonları silindi"
 
 #: app/controllers/CControllerTokenDisable.php:63
 msgid "API token disabled"
 msgid_plural "API tokens disabled"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "API jetonu devre dışı bırakıldı"
+msgstr[1] "API jetonları devre dışı bırakıldı"
 
 #: app/controllers/CControllerTokenEnable.php:63
 msgid "API token enabled"
 msgid_plural "API tokens enabled"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "API jetonu etkinleştirildi"
+msgstr[1] "API jetonları etkinleştirildi"
 
 #: include/classes/api/services/CUser.php:1807
 msgid "API token expired."
-msgstr ""
+msgstr "API jetonunun süresi doldu."
 
 #: app/controllers/CControllerTokenUpdate.php:107
 #: app/controllers/CControllerTokenUpdate.php:135
 msgid "API token updated"
-msgstr ""
+msgstr "API jetonu güncellendi"
 
 #: app/controllers/CControllerPopupTokenEdit.php:116
 #: app/controllers/CControllerPopupTokenView.php:75
@@ -513,16 +513,16 @@ msgstr ""
 #: include/classes/helpers/CMenuHelper.php:467
 #: include/classes/helpers/CRoleHelper.php:495 include/html.inc.php:848
 msgid "API tokens"
-msgstr ""
+msgstr "API jetonları"
 
 #: widgets/gauge/includes/WidgetForm.php:265
 #: widgets/item/includes/WidgetForm.php:209
 msgid "Above value"
-msgstr ""
+msgstr "Değerin üstünde"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:370
 msgid "Abscissa"
-msgstr ""
+msgstr "Apsis"
 
 #: include/classes/core/ZBase.php:757 include/func.inc.php:1683
 msgid "Access denied"
@@ -535,27 +535,27 @@ msgstr "Erişim reddedildi!"
 #: app/views/administration.user.edit.php:673
 #: app/views/administration.userrole.edit.php:296
 msgid "Access to API"
-msgstr ""
+msgstr "API'ya erişim"
 
 #: app/views/administration.user.edit.php:525
 #: app/views/administration.userrole.edit.php:88
 msgid "Access to UI elements"
-msgstr ""
+msgstr "Kullanıcı arayüzü öğelerine erişim"
 
 #: app/views/administration.user.edit.php:702
 #: app/views/administration.userrole.edit.php:345
 msgid "Access to actions"
-msgstr ""
+msgstr "Eylemlere erişim"
 
 #: app/views/administration.user.edit.php:643
 #: app/views/administration.userrole.edit.php:244
 msgid "Access to modules"
-msgstr ""
+msgstr "Modüllere erişim"
 
 #: app/views/administration.user.edit.php:547
 #: app/views/administration.userrole.edit.php:156
 msgid "Access to services"
-msgstr ""
+msgstr "Hizmetlere erişim"
 
 #: include/actions.inc.php:165 include/classes/screens/CScreenProblem.php:1181
 msgid "Ack"
@@ -567,7 +567,7 @@ msgstr "Onay"
 
 #: include/classes/helpers/CRoleHelper.php:545
 msgid "Acknowledge problems"
-msgstr ""
+msgstr "Onaylanan problemler"
 
 #: app/partials/monitoring.problem.filter.php:147
 #: app/views/popup.condition.edit.php:784 include/actions.inc.php:1533
@@ -582,12 +582,12 @@ msgstr "Onaylanmış PROBLEM olayları"
 
 #: app/views/administration.trigdisplay.edit.php:77
 msgid "Acknowledged RESOLVED events"
-msgstr ""
+msgstr "Onaylanan ÇÖZÜLMÜŞ olaylar"
 
 #: app/partials/monitoring.problem.filter.php:142
 #: widgets/problems/views/widget.edit.php:105
 msgid "Acknowledgement status"
-msgstr ""
+msgstr "Onay durumu"
 
 #: app/controllers/CControllerAuditLogList.php:221
 #: app/partials/action.operations.php:32 app/partials/action.operations.php:35
@@ -663,7 +663,7 @@ msgstr "Eylem"
 #: widgets/actionlog/views/widget.view.php:38
 msgctxt "compact table header"
 msgid "Action"
-msgstr ""
+msgstr "Eylem"
 
 #: include/classes/api/services/CAction.php:2824
 #, c-format
@@ -673,7 +673,7 @@ msgstr "\"%1$s\" eylemi halihazırda var."
 #: include/classes/api/services/CRole.php:754
 #, c-format
 msgid "Action \"%2$s\" is not available for user role \"%1$s\"."
-msgstr ""
+msgstr "\"%2$s\" eylemi \"%1$s\" kullanıcı rolü için kullanılamaz."
 
 #: app/controllers/CControllerActionCreate.php:264
 msgid "Action added"
@@ -682,14 +682,13 @@ msgstr "Eylem eklendi"
 #: include/classes/core/ZBase.php:603
 #, c-format
 msgid "Action class %1$s must extend %2$s class."
-msgstr ""
+msgstr "%1$s Eylem sınıfı, %2$s sınıfını genişletmelidir."
 
 #: app/controllers/CControllerActionDelete.php:79
-#, fuzzy
 msgid "Action deleted"
 msgid_plural "Actions deleted"
 msgstr[0] "Eylem silindi"
-msgstr[1] "Eylem silindi"
+msgstr[1] "Eylemler silindi"
 
 #: app/controllers/CControllerActionDisable.php:84
 msgid "Action disabled"
@@ -714,7 +713,7 @@ msgstr "Eylem günlüğü"
 #: app/views/administration.script.list.php:67
 #: app/views/administration.script.list.php:107
 msgid "Action operation"
-msgstr ""
+msgstr "Eylem işlemi"
 
 #: app/controllers/CControllerActionUpdate.php:267
 msgid "Action updated"
@@ -723,7 +722,7 @@ msgstr "Eylem güncellendi"
 #: include/classes/api/services/CDashboardGeneral.php:672
 #, c-format
 msgid "Action with ID \"%1$s\" is not available."
-msgstr ""
+msgstr "%1$s kimlikli eylem mevcut değil."
 
 #: app/controllers/CControllerPopupGeneric.php:496
 #: app/controllers/CControllerPopupGeneric.php:504
@@ -749,7 +748,7 @@ msgstr "Eylemler"
 #: widgets/problems/includes/WidgetProblems.php:107
 msgctxt "compact table header"
 msgid "Actions"
-msgstr ""
+msgstr "Eylemler"
 
 #: app/partials/administration.ha.nodes.php:50
 #: app/views/administration.proxy.list.php:54
@@ -765,7 +764,7 @@ msgstr "Aktif"
 
 #: include/hosts.inc.php:497
 msgid "Active checks"
-msgstr ""
+msgstr "Aktif kontroller"
 
 #: app/views/maintenance.edit.php:144 app/views/maintenance.list.php:96
 msgid "Active since"
@@ -948,39 +947,39 @@ msgstr "Ekle"
 #: app/views/js/administration.mediatype.edit.js.php:129
 #: app/views/js/mediatype.edit.js.php:389
 msgid "Add (message type limit reached)"
-msgstr ""
+msgstr "Ekle (mesaj türü sınırına ulaşıldı)"
 
 #: widgets/tophosts/views/widget.edit.php:63
 msgid "Add a column"
-msgstr ""
+msgstr "Bir sütun ekle"
 
 #: jsLoader.php:156
 msgid "Add a new widget"
-msgstr "Yeni bir parçacık ekle"
+msgstr "Yeni bir araç ekle"
 
 #: widgets/navtree/Widget.php:34
 msgid "Add child element"
-msgstr ""
+msgstr "Alt öğe ekle"
 
 #: widgets/navtree/Widget.php:39
 msgid "Add child elements"
-msgstr ""
+msgstr "Alt öğeler ekle"
 
 #: app/partials/service.list.edit.php:117
 msgid "Add child service"
-msgstr ""
+msgstr "Alt hizmet ekle"
 
 #: app/views/js/popup.service.edit.js.php:375
 msgid "Add child services"
-msgstr ""
+msgstr "Alt hizmetler ekle"
 
 #: app/partials/configuration.valuemap.php:57
 msgid "Add from host"
-msgstr ""
+msgstr "Ana makineden ekle"
 
 #: app/partials/configuration.valuemap.php:54
 msgid "Add from template"
-msgstr ""
+msgstr "Şablondan ekle"
 
 #: include/actions.inc.php:629 include/actions.inc.php:860
 msgid "Add host"
@@ -988,23 +987,23 @@ msgstr "Ana makine ekle"
 
 #: include/actions.inc.php:653 include/actions.inc.php:871
 msgid "Add host tags"
-msgstr ""
+msgstr "Ana makine etiketleri ekle"
 
 #: app/partials/trigger.edit.dependencies.tab.php:65
 #: app/partials/trigger.edit.dependencies.tab.php:91
 #: app/views/trigger.massupdate.php:155
 msgid "Add host trigger"
-msgstr ""
+msgstr "Ana makine tetikleyicisi ekle"
 
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:260
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:263
 msgid "Add item"
-msgstr ""
+msgstr "Öğe ekle"
 
 #: app/partials/massupdate.macros.tab.php:96
 #: app/partials/massupdate.valuemaps.tab.php:38
 msgid "Add missing"
-msgstr ""
+msgstr "Eksik olanı ekle"
 
 #: widgets/navtree/Widget.php:40
 msgid "Add multiple maps"
@@ -1013,29 +1012,29 @@ msgstr "Birden çok harita ekle"
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:89
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:93
 msgid "Add new data set"
-msgstr ""
+msgstr "Yeni veri kümesi ekle"
 
 #: app/partials/configuration.host.edit.html.php:242
 #: include/views/configuration.host.prototype.edit.php:286
 msgid "Add new interface"
-msgstr ""
+msgstr "Yeni arayüz ekle"
 
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:53
 msgid "Add new override"
-msgstr ""
+msgstr "Yeni geçersiz kılma ekle"
 
 #: app/views/js/configuration.dashboard.edit.js.php:239
 #: app/views/js/monitoring.dashboard.view.js.php:366
 msgid "Add page"
-msgstr ""
+msgstr "Sayfa ekle"
 
 #: app/views/js/popup.service.edit.js.php:405
 msgid "Add parent services"
-msgstr ""
+msgstr "Ebeveyn hizmetleri ekle"
 
 #: include/classes/helpers/CRoleHelper.php:543
 msgid "Add problem comments"
-msgstr ""
+msgstr "Problem yorumları ekle"
 
 #: app/partials/trigger.edit.dependencies.tab.php:77
 #: app/partials/trigger.edit.dependencies.tab.php:87
@@ -1046,11 +1045,11 @@ msgstr "Prototip ekle"
 
 #: app/controllers/CControllerPopupScheduledReportEdit.php:129
 msgid "Add scheduled report"
-msgstr ""
+msgstr "Planlanmış rapor ekle"
 
 #: app/views/js/administration.userrole.edit.js.php:232
 msgid "Add services"
-msgstr ""
+msgstr "Hizmet ekle"
 
 #: widgets/navtree/views/navtreeitem.edit.php:80
 msgid "Add submaps"
@@ -1058,7 +1057,7 @@ msgstr "Alt haritalar ekle"
 
 #: app/controllers/CControllerFavoriteDelete.php:74 include/html.inc.php:177
 msgid "Add to favorites"
-msgstr ""
+msgstr "Favorilere ekle"
 
 #: include/actions.inc.php:864
 msgid "Add to host group"
@@ -1070,44 +1069,44 @@ msgstr "Ana makine gruplarına ekle"
 
 #: app/partials/scheduledreport.subscription.php:42
 msgid "Add user"
-msgstr ""
+msgstr "Kullanıcı Ekle"
 
 #: app/partials/scheduledreport.subscription.php:45
 msgid "Add user group"
-msgstr ""
+msgstr "Kullanıcı grubu ekle"
 
 #: app/controllers/CControllerDashboardWidgetEdit.php:68
 #: app/views/js/configuration.dashboard.edit.js.php:235
 #: app/views/js/monitoring.dashboard.view.js.php:362
 #: include/classes/html/widgets/CWidgetFormView.php:169
 msgid "Add widget"
-msgstr "Parçacık ekle"
+msgstr "Araç ekle"
 
 #: app/controllers/CControllerAuditLogList.php:379
 #: app/controllers/CControllerPopupImportCompare.php:167
 msgid "Added"
-msgstr ""
+msgstr "Eklendi"
 
 #: jsLoader.php:333
 #, c-format
 msgctxt "screen reader"
 msgid "Added, %1$s"
-msgstr ""
+msgstr "%1$s Eklendi"
 
 #: app/views/popup.service.statusrule.edit.php:94
 msgid "Additional rule"
-msgstr ""
+msgstr "Ek kural"
 
 #: app/views/popup.service.edit.php:185
 msgid "Additional rules"
-msgstr ""
+msgstr "Ek kurallar"
 
 #: app/controllers/CControllerProxyCreate.php:82
 #: app/controllers/CControllerProxyUpdate.php:76
 #: app/partials/administration.ha.nodes.php:28
 #: app/views/popup.proxy.edit.php:40
 msgid "Address"
-msgstr ""
+msgstr "Adres"
 
 #: app/controllers/CControllerProxyCreate.php:72
 #: app/controllers/CControllerProxyCreate.php:80
@@ -1115,7 +1114,7 @@ msgstr ""
 #: app/controllers/CControllerProxyUpdate.php:75
 #: app/views/popup.proxy.edit.php:90
 msgid "Address for active agents"
-msgstr ""
+msgstr "Aktif ajanlar için adres"
 
 #: include/hosts.inc.php:63 include/users.inc.php:53
 msgid "Admin"
@@ -1132,7 +1131,7 @@ msgstr "Yönetim"
 #: widgets/clock/views/widget.edit.php:53
 #: widgets/gauge/views/widget.edit.php:54 widgets/item/views/widget.edit.php:48
 msgid "Advanced configuration"
-msgstr ""
+msgstr "Gelişmiş yapılandırma"
 
 #: include/views/monitoring.sysmap.edit.php:162
 msgid "Advanced labels"
@@ -1140,23 +1139,23 @@ msgstr "Gelişmiş etiket"
 
 #: app/views/popup.import.php:148
 msgid "Advanced options"
-msgstr ""
+msgstr "Gelişmiş seçenekler"
 
 #: include/views/configuration.host.discovery.edit.php:721
 #: include/views/configuration.host.discovery.edit.php:737
 #: include/views/configuration.host.discovery.list.php:157
 #: include/views/configuration.host.discovery.list.php:172
 msgid "After"
-msgstr ""
+msgstr "Sonra"
 
 #: app/views/js/mfa.edit.js.php:168
 msgid "After this change, users who have already enrolled in this MFA method will have to complete the enrollment process again because TOTP secrets will be reset."
-msgstr ""
+msgstr "Bu değişiklikten sonra, daha önce bu MFA yöntemine kayıt yaptırmış olan kullanıcıların TOTP şifreleri sıfırlanacağı için kayıt işlemini tekrar tamamlamaları gerekecektir."
 
 #: widgets/gauge/includes/WidgetForm.php:266
 #: widgets/item/includes/WidgetForm.php:210
 msgid "After value"
-msgstr ""
+msgstr "Değerden sonra"
 
 #: include/events.inc.php:339
 msgid "Age"
@@ -1170,79 +1169,79 @@ msgstr "Şu yaştan küçük"
 #: include/items.inc.php:350 include/views/configuration.httpconf.edit.php:109
 #: jsLoader.php:308
 msgid "Agent"
-msgstr "Aracı"
+msgstr "Ajan"
 
 #: widgets/hostavail/views/widget.view.php:82
 msgid "Agent (active)"
-msgstr ""
+msgstr "Ajan (aktif)"
 
 #: widgets/hostavail/views/widget.view.php:83
 msgid "Agent (passive)"
-msgstr ""
+msgstr "Ajan (pasif)"
 
 #: include/classes/data/CItemData.php:911
 msgid "Agent availability check. Returns nothing - unavailable; 1 - available"
-msgstr "Aracı mevcudiyetini kontrol et. Hiçbir şey döndürmez - mevcut değil; 1 - mevcut"
+msgstr "Ajan müsaitlik kontrolü. Hiçbir şey dönmezse - müsait değil; 1 dönerse müsait"
 
 #: app/views/configuration.host.list.php:213
 msgid "Agent encryption"
-msgstr "Aracı şifrelemesi"
+msgstr "Ajan şifrelemesi"
 
 #: include/classes/data/CItemData.php:895
 msgid "Agent host metadata. Returns string"
-msgstr ""
+msgstr "Ajan ana bilgisayar meta verileri. Dize döndürür"
 
 #: include/classes/data/CItemData.php:903
 msgid "Agent host name. Returns string"
-msgstr "Aracı ana makine adı. String döndürür"
+msgstr "Ajan  ana makine adı. Dize döndürür"
 
 #: include/views/inventory.host.view.php:64
 msgid "Agent interfaces"
-msgstr "Aracı arayüzleri"
+msgstr "Ajan arayüzleri"
 
 #: include/classes/data/CItemData.php:919
 msgid "Agent variant check. Returns 1 - for Zabbix agent; 2 - for Zabbix agent 2"
-msgstr ""
+msgstr "Ajan varyant kontrolü. Zabbix ajanı için 1 döndürür; Zabbix ajanı 2 için 2 döndürür."
 
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:417
 msgid "Aggregate"
-msgstr ""
+msgstr "Toplam"
 
 #: app/views/popup.triggerexpr.php:126
 msgid "Aggregate functions"
-msgstr ""
+msgstr "Toplama işlevleri"
 
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:283
 msgid "Aggregates each item in the data set."
-msgstr ""
+msgstr "Veri kümesindeki her bir öğeyi toplar."
 
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:305
 msgid "Aggregates the whole data set."
-msgstr ""
+msgstr "Tüm veri kümesini toplar."
 
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:282
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:384
 #: widgets/tophosts/views/column.edit.php:142
 msgid "Aggregation function"
-msgstr ""
+msgstr "Toplama işlevi"
 
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:406
 #: widgets/tophosts/views/column.edit.php:165
 msgid "Aggregation interval"
-msgstr ""
+msgstr "Toplama aralığı"
 
 #: include/actions.inc.php:2048
 msgid "Alert message"
-msgstr ""
+msgstr "Uyarı mesajı"
 
 #: include/classes/helpers/CMenuHelper.php:292
 #: include/classes/helpers/CRoleHelper.php:348
 msgid "Alerts"
-msgstr ""
+msgstr "Uyarılar"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1145
 msgid "Algorithm"
-msgstr ""
+msgstr "Algoritma"
 
 #: include/hosts.inc.php:114
 msgid "Alias"
@@ -1250,7 +1249,7 @@ msgstr "Rumuz"
 
 #: include/views/monitoring.sysmap.constructor.php:75
 msgid "Align map elements"
-msgstr ""
+msgstr "Harita öğelerini hizala"
 
 #: app/controllers/CControllerAuditLogList.php:187
 #: app/partials/configuration.filter.items.php:134
@@ -1294,7 +1293,7 @@ msgstr "Tüm panolar"
 
 #: app/views/monitoring.charts.view.php:82
 msgid "All graphs"
-msgstr ""
+msgstr "Tüm grafikler"
 
 #: app/views/administration.user.edit.php:483
 #: app/views/administration.user.edit.php:484
@@ -1325,12 +1324,12 @@ msgstr "Etiket değerleri eşleşiyorsa tüm problemler"
 
 #: app/controllers/CControllerServiceListGeneral.php:150
 msgid "All services"
-msgstr ""
+msgstr "Tüm hizmetler"
 
 #: app/partials/usergroup.tagfilters.php:43
 #: app/views/usergroup.tagfilter.edit.php:74
 msgid "All tags"
-msgstr ""
+msgstr "Tüm etiketler"
 
 #: include/html.inc.php:318
 msgid "All templates"
@@ -1338,7 +1337,7 @@ msgstr "Tüm şablonlar"
 
 #: app/views/administration.userrole.edit.php:314
 msgid "Allow list"
-msgstr ""
+msgstr "İzin verilenler listesi"
 
 #: app/partials/trigger.edit.trigger.tab.php:259
 #: app/views/trigger.massupdate.php:58 include/triggers.inc.php:615
@@ -1348,7 +1347,7 @@ msgstr "Elle kapatmaya izin ver"
 #: app/views/discovery.check.edit.php:160
 #: app/views/popup.discovery.check.php:128
 msgid "Allow redirect"
-msgstr ""
+msgstr "Yönlendirmeye izin ver"
 
 #: app/views/popup.massupdate.item.php:403
 #: include/views/configuration.host.discovery.edit.php:763
@@ -1359,12 +1358,12 @@ msgstr "İzin verilen ana makineler"
 
 #: app/views/administration.user.edit.php:693
 msgid "Allowed methods"
-msgstr ""
+msgstr "İzin verilen yöntemler"
 
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:326
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:450
 msgid "Also used as legend label for aggregated data sets."
-msgstr ""
+msgstr "Ayrıca toplu veri kümeleri için gösterge etiketi olarak da kullanılır."
 
 #: include/classes/setup/CSetupWizard.php:1034
 msgid "Alternatively, you can install it manually:"
@@ -1411,7 +1410,7 @@ msgstr ""
 #: tests/selenium/modules/clock32/includes/WidgetForm.php:74
 #: widgets/clock/includes/WidgetForm.php:74
 msgid "Analog"
-msgstr ""
+msgstr "Analog"
 
 #: app/partials/trigger.edit.trigger.tab.php:111
 #: app/partials/trigger.edit.trigger.tab.php:191
@@ -1446,15 +1445,15 @@ msgstr "Ve/Veya"
 
 #: widgets/gauge/includes/WidgetForm.php:170
 msgid "Angle"
-msgstr ""
+msgstr "Açı"
 
 #: app/views/popup.sla.edit.php:79 include/classes/helpers/CSlaHelper.php:43
 msgid "Annually"
-msgstr ""
+msgstr "Yıllık"
 
 #: jsLoader.php:201
 msgid "Another widget is used as data source."
-msgstr ""
+msgstr "Veri kaynağı olarak başka bir araç kullanılıyor."
 
 #: app/partials/monitoring.host.filter.php:134 app/views/action.list.php:95
 #: app/views/administration.proxy.list.php:53
@@ -1479,7 +1478,7 @@ msgstr "Herhangi"
 #: app/views/js/trigger.edit.js.php:886
 #: app/views/js/trigger.massupdate.js.php:67
 msgid "Any changes made in the current form will be lost."
-msgstr ""
+msgstr "Mevcut formda yapılan değişiklikler kaybolacaktır."
 
 #: app/views/js/administration.regex.edit.js.php:164
 #: include/classes/helpers/CRegexHelper.php:27
@@ -1488,11 +1487,11 @@ msgstr "Herhangi karakter dizgisini içeren"
 
 #: app/views/js/popup.import.js.php:109
 msgid "Any existing host entities not present in the import file will be deleted. Click OK to proceed."
-msgstr ""
+msgstr "İçe aktarma dosyasında bulunmayan mevcut tüm ana makine varlıkları silinecektir. Devam etmek için Tamam'a tıklayın."
 
 #: app/views/js/popup.import.js.php:106
 msgid "Any existing template entities not present in the import file will be deleted. Click OK to proceed."
-msgstr ""
+msgstr "İçe aktarma dosyasında bulunmayan mevcut şablon varlıkları silinecektir. Devam etmek için Tamam'a tıklayın."
 
 #: include/classes/core/CJsonRpc.php:225
 msgid "Application error."
@@ -1515,20 +1514,20 @@ msgstr "Uygula"
 
 #: app/partials/configuration.hostgroup.edit.html.php:88
 msgid "Apply permissions and tag filters to all subgroups"
-msgstr ""
+msgstr "Tüm alt gruplara izinleri ve etiket filtrelerini uygula"
 
 #: app/partials/configuration.templategroup.edit.html.php:47
 msgid "Apply permissions to all subgroups"
-msgstr ""
+msgstr "Tüm alt gruplara izinleri uygula"
 
 #: app/views/maintenance.list.php:72 app/views/maintenance.list.php:109
 msgctxt "maintenance status"
 msgid "Approaching"
-msgstr "Yaklaşma"
+msgstr "Yaklaşıyor"
 
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:429
 msgid "Approximation"
-msgstr ""
+msgstr "Yaklaştırma"
 
 #: include/func.inc.php:239
 msgid "Apr"
@@ -1540,23 +1539,23 @@ msgstr "Nisan"
 
 #: widgets/gauge/includes/WidgetForm.php:246
 msgid "Arc background"
-msgstr ""
+msgstr "Yay arka planı"
 
 #: widgets/gauge/includes/WidgetForm.php:305
 msgid "Arc size"
-msgstr ""
+msgstr "Yay boyutu"
 
 #: app/views/popup.tabfilter.edit.php:76
 msgid "Are you sure you want to delete this filter?"
-msgstr ""
+msgstr "Bu filtreyi silmek istediğinizden emin misiniz?"
 
 #: app/views/js/administration.macros.edit.js.php:87
 msgid "Are you sure you want to delete?"
-msgstr ""
+msgstr "Silmek istediğinize emin misiniz?"
 
 #: include/classes/html/CButtonQMessage.php:52
 msgid "Are you sure you want to perform this action?"
-msgstr ""
+msgstr "Bu işlemi gerçekleştirmek istediğinizden emin misiniz?"
 
 #: include/views/js/monitoring.sysmaps.js.php:125
 msgid "Area size"
@@ -1573,7 +1572,7 @@ msgstr "Aritmetik"
 #: include/classes/helpers/CServiceHelper.php:148
 #: widgets/tophosts/views/column.edit.php:182
 msgid "As is"
-msgstr ""
+msgstr "Olduğu gibi"
 
 #: include/views/monitoring.history.php:97
 msgid "As plain text"
@@ -1582,7 +1581,7 @@ msgstr "Düz metin olarak"
 #: app/views/administration.authentication.edit.php:366
 #: app/views/administration.authentication.edit.php:403
 msgid "Assertions"
-msgstr ""
+msgstr "Beyanlar"
 
 #: include/hosts.inc.php:149
 msgid "Asset tag"
@@ -1590,66 +1589,66 @@ msgstr "Varlık etiketi"
 
 #: app/partials/configuration.host.edit.html.php:331
 msgid "Assigned proxy"
-msgstr ""
+msgstr "Atanmış vekil"
 
 #: include/classes/helpers/CMaintenanceHelper.php:86
 #, c-format
 msgid "At %1$s %2$s of every %3$s week"
 msgid_plural "At %1$s %2$s of every %3$s weeks"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Her %3$s haftanın %1$s %2$s'inde"
+msgstr[1] "Her %3$s haftanın %1$s %2$s'inde"
 
 #: include/classes/helpers/CMaintenanceHelper.php:71
 #, c-format
 msgid "At %1$s every %2$s day"
 msgid_plural "At %1$s every %2$s days"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Her %2$s günde %1$s"
+msgstr[1] "Her %2$s günde %1$s"
 
 #: include/classes/helpers/CMaintenanceHelper.php:114
 #, c-format
 msgid "At %1$s on %2$s %3$s of every %4$s"
-msgstr ""
+msgstr "Her %4$s'nin %2$s %3$s %1$s'de"
 
 #: include/classes/helpers/CMaintenanceHelper.php:119
 #, c-format
 msgid "At %1$s on day %2$s of every %3$s"
-msgstr ""
+msgstr "Her %3$s gününün %2$s gününde %1$s'de"
 
 #: app/views/maintenance.timeperiod.edit.php:189
 msgid "At (hour:minute)"
-msgstr "Zamanında (saat:dakika)"
+msgstr "(saat:dakika)'da"
 
 #: include/classes/api/services/CAuthentication.php:153
 msgid "At least one LDAP server must exist."
-msgstr ""
+msgstr "En az bir LDAP sunucusunun mevcut olması gerekir."
 
 #: include/classes/api/services/CAuthentication.php:234
 msgid "At least one MFA method must exist."
-msgstr ""
+msgstr "En az bir MFA yöntemi mevcut olmalıdır."
 
 #: app/views/administration.userrole.edit.php:137
 msgid "At least one UI element must be checked."
-msgstr ""
+msgstr "En az bir arayüz öğesinin işaretlenmesi gerekiyor."
 
 #: include/classes/api/services/CRole.php:480
 #, c-format
 msgid "At least one UI element must be enabled for user role \"%1$s\"."
-msgstr ""
+msgstr "\"%1$s\" kullanıcı rolü için en az bir arayüz öğesinin etkinleştirilmesi gerekir."
 
 #: app/controllers/CControllerPopupLldOperation.php:121
 msgid "At least one action is mandatory."
-msgstr ""
+msgstr "En az bir eylem zorunludur."
 
 #: include/classes/api/services/CUser.php:547
 #: include/classes/api/services/CUser.php:1316
 #, c-format
 msgid "At least one active user must exist with role \"%1$s\"."
-msgstr ""
+msgstr "En az bir aktif kullanıcı \"%1$s\" rolünde olmalıdır."
 
 #: include/classes/api/services/CMaintenance.php:686
 msgid "At least one day of the week or day of the month must be specified."
-msgstr ""
+msgstr "Haftanın veya ayın en az bir günü belirtilmelidir."
 
 #: app/controllers/CControllerMaintenanceCreate.php:62
 #: app/controllers/CControllerMaintenanceUpdate.php:63
@@ -1657,48 +1656,48 @@ msgstr ""
 #: include/classes/api/services/CMaintenance.php:385
 #: include/classes/api/services/CMaintenance.php:577
 msgid "At least one host group or host must be selected."
-msgstr ""
+msgstr "En az bir ana makine grubu veya ana makine seçilmelidir."
 
 #: include/classes/setup/CFrontendSetup.php:252
 msgid "At least one of MySQL or PostgreSQL should be supported."
-msgstr ""
+msgstr "MySQL veya PostgreSQL'den en az biri desteklenmelidir."
 
 #: include/classes/setup/CFrontendSetup.php:241
 msgid "At least one of MySQL, PostgreSQL or Oracle should be supported."
-msgstr ""
+msgstr "MySQL, PostgreSQL veya Oracle'dan en az biri desteklenmelidir."
 
 #: app/views/correlation.edit.php:264
 msgid "At least one operation must be selected."
-msgstr ""
+msgstr "En az bir işlem seçilmelidir."
 
 #: app/views/popup.action.edit.php:179 app/views/popup.action.edit.php:252
 msgid "At least one operation must exist."
-msgstr ""
+msgstr "En az bir işlem mevcut olmalıdır."
 
 #: include/classes/api/services/CHostGroup.php:1655
 #, c-format
 msgid "At least one parameter \"%1$s\" or \"%2$s\" must be enabled."
-msgstr ""
+msgstr "En az bir \"%1$s\" veya \"%2$s\" parametresi etkinleştirilmelidir."
 
 #: widgets/gauge/views/widget.edit.php:50
 msgid "At least one parameter must be enabled."
-msgstr ""
+msgstr "En az bir parametrenin etkinleştirilmesi gerekir."
 
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:283
 msgid "At least one update operation or message is mandatory"
-msgstr ""
+msgstr "En az bir güncelleme işlemi veya mesajı zorunludur"
 
 #: app/views/popup.acknowledge.edit.php:147
 msgid "At least one update operation or message must exist."
-msgstr ""
+msgstr "En az bir güncelleme işlemi veya mesajı mevcut olmalıdır."
 
 #: app/views/popup.operation.edit.php:102
 msgid "At least one user or user group must be selected."
-msgstr ""
+msgstr "En az bir kullanıcı veya kullanıcı grubu seçilmelidir."
 
 #: include/classes/api/services/CReport.php:363
 msgid "At least one user or user group must be specified."
-msgstr ""
+msgstr "En az bir kullanıcı veya kullanıcı grubu belirtilmelidir."
 
 #: app/views/administration.mediatype.edit.php:354
 #: app/views/mediatype.edit.php:464
@@ -1716,11 +1715,11 @@ msgstr "Girişimler"
 #: app/views/popup.ldap.edit.php:267
 #: app/views/popup.mediatypemapping.edit.php:59
 msgid "Attribute"
-msgstr ""
+msgstr "Öznitelik"
 
 #: app/views/administration.geomaps.edit.php:86
 msgid "Attribution text"
-msgstr ""
+msgstr "Atıf metni"
 
 #: app/controllers/CControllerAuditLogList.php:190
 #: app/views/administration.audit.settings.edit.php:29
@@ -1736,7 +1735,7 @@ msgstr "Denetim günlüğü"
 
 #: app/views/administration.housekeeping.edit.php:242
 msgid "Audit settings"
-msgstr ""
+msgstr "Denetim ayarları"
 
 #: include/func.inc.php:243
 msgid "Aug"
@@ -1748,11 +1747,11 @@ msgstr "Ağustos"
 
 #: app/views/popup.token.view.php:45
 msgid "Auth token"
-msgstr ""
+msgstr "Kimlik doğrulama jetonu"
 
 #: app/views/administration.authentication.edit.php:372
 msgid "AuthN requests"
-msgstr ""
+msgstr "AuthN istekleri"
 
 #: app/controllers/CControllerAuditLogList.php:223
 #: app/views/administration.authentication.edit.php:562
@@ -1774,7 +1773,7 @@ msgstr "Kimlik doğrulama algoritması"
 #: include/classes/api/services/CUser.php:2347
 #, c-format
 msgid "Authentication failed: %1$s."
-msgstr ""
+msgstr "Kimlik doğrulama başarısız oldu: %1$s."
 
 #: app/views/administration.script.edit.php:122
 #: app/views/popup.massupdate.item.php:162
@@ -1800,20 +1799,20 @@ msgstr "Kimlik doğrulama protokolü"
 
 #: app/controllers/CControllerAuthenticationUpdate.php:302
 msgid "Authentication settings updated"
-msgstr ""
+msgstr "Kimlik doğrulama ayarları güncellendi"
 
 #: app/views/module.edit.php:44 app/views/module.list.php:87
 msgid "Author"
-msgstr ""
+msgstr "Yazar"
 
 #: app/views/administration.miscconfig.edit.php:87
 msgid "Authorization"
-msgstr ""
+msgstr "Yetkilendirme"
 
 #: widgets/piechart/includes/WidgetForm.php:154
 #: widgets/tophosts/views/column.edit.php:204
 msgid "Auto"
-msgstr ""
+msgstr "Otomatik"
 
 #: widgets/piechart/includes/WidgetForm.php:114
 #: widgets/svggraph/includes/WidgetForm.php:245
@@ -1821,7 +1820,7 @@ msgstr ""
 #: widgets/svggraph/includes/WidgetForm.php:329
 msgctxt "history source selection method"
 msgid "Auto"
-msgstr ""
+msgstr "Otomatik"
 
 #: app/views/administration.user.edit.php:294
 msgid "Auto-login"
@@ -1861,16 +1860,16 @@ msgstr "Otomatik simge seçimi"
 #: include/classes/helpers/CMediatypeHelper.php:300
 #: include/classes/helpers/CMenuHelper.php:342 include/html.inc.php:908
 msgid "Autoregistration"
-msgstr ""
+msgstr "Otomatik kaydolma"
 
 #: app/views/action.list.php:44 include/classes/helpers/CMenuHelper.php:258
 #: include/classes/helpers/CRoleHelper.php:473
 msgid "Autoregistration actions"
-msgstr ""
+msgstr "Otomatik kayıt işlemleri"
 
 #: app/views/administration.housekeeping.edit.php:87
 msgid "Autoregistration data storage period"
-msgstr ""
+msgstr "Otomatik kayıt olma veri saklama süresi"
 
 #: app/partials/monitoring.host.view.html.php:37
 #: app/views/configuration.host.list.php:212
@@ -1885,7 +1884,7 @@ msgstr "Kullanılırlık raporu"
 #: app/controllers/CControllerAvailabilityReportTrigger.php:70
 #: app/views/reports.availabilityreport.trigger.php:23
 msgid "Availability report graph"
-msgstr ""
+msgstr "Erişilebilirlik raporu grafiği"
 
 #: include/classes/html/CHostAvailability.php:80
 #: widgets/hostavail/views/widget.view.php:32
@@ -1895,7 +1894,7 @@ msgstr "Mevcut"
 #: widgets/hostavail/views/widget.view.php:33
 msgctxt "compact table header"
 msgid "Available"
-msgstr ""
+msgstr "Mevcut"
 
 #: app/views/administration.trigdisplay.edit.php:128
 #: widgets/geomap/Widget.php:42
@@ -1904,23 +1903,23 @@ msgstr "Ortalama"
 
 #: include/classes/data/CItemData.php:2478
 msgid "Average number of outstanding read requests to the virtual disk during the collection interval , \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - disk device instance"
-msgstr ""
+msgstr "Toplama aralığı sırasında sanal diske yapılan ortalama bekleyen okuma isteği sayısı, \"url\" - VMware hizmet URL'si, \"uuid\" - VMware sanal makinesi genel benzersiz tanımlayıcısı, \"instance\" - disk aygıtı örneği"
 
 #: include/classes/data/CItemData.php:2513
 msgid "Average number of outstanding write requests to the virtual disk during the collection interval, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - disk device instance"
-msgstr ""
+msgstr "Toplama aralığı sırasında sanal diske yapılan ortalama bekleyen yazma isteği sayısı, \"url\" - VMware hizmet URL'si, \"uuid\" - VMware sanal makinesi genel benzersiz tanımlayıcısı, \"instance\" - disk aygıtı örneği"
 
 #: app/views/administration.authentication.edit.php:131
 msgid "Avoid easy-to-guess passwords"
-msgstr ""
+msgstr "Tahmin edilmesi kolay parolalardan kaçının"
 
 #: jsLoader.php:172
 msgid "Awaiting data"
-msgstr ""
+msgstr "Veri bekleniyor"
 
 #: widgets/svggraph/views/widget.edit.php:51
 msgid "Axes"
-msgstr ""
+msgstr "Eksen"
 
 #: include/classes/setup/CSetupWizard.php:381
 #: include/classes/setup/CSetupWizard.php:878
@@ -1939,7 +1938,7 @@ msgstr "Arkaplan"
 #: widgets/clock/includes/WidgetForm.php:88
 #: widgets/item/includes/WidgetForm.php:258
 msgid "Background color"
-msgstr ""
+msgstr "Arkaplan rengi"
 
 #: include/views/monitoring.sysmap.edit.php:125
 msgid "Background image"
@@ -1950,7 +1949,7 @@ msgstr "Arkaplan resmi"
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:218
 #: widgets/tophosts/views/column.edit.php:183
 msgid "Bar"
-msgstr ""
+msgstr "Çubuk"
 
 #: app/views/popup.ldap.edit.php:67
 msgid "Base DN"
@@ -1959,7 +1958,7 @@ msgstr "Base DN"
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:201
 #: widgets/tophosts/views/column.edit.php:213
 msgid "Base color"
-msgstr ""
+msgstr "Temel renk"
 
 #: app/views/connector.edit.php:128 include/httptest.inc.php:28
 msgid "Basic"
@@ -1976,19 +1975,19 @@ msgstr ""
 #: widgets/gauge/includes/WidgetForm.php:264
 #: widgets/item/includes/WidgetForm.php:208
 msgid "Before value"
-msgstr ""
+msgstr "Değerden önce"
 
 #: widgets/gauge/includes/WidgetForm.php:267
 #: widgets/item/includes/WidgetForm.php:211
 msgid "Below value"
-msgstr ""
+msgstr "Değerin altında"
 
 #: app/partials/configuration.filter.items.php:147
 #: app/views/popup.massupdate.item.php:152 include/items.inc.php:133
 #: include/views/configuration.item.edit.php:127
 #: include/views/configuration.item.prototype.edit.php:112
 msgid "Binary"
-msgstr ""
+msgstr "İkili"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1455
 #, c-format
@@ -2593,7 +2592,7 @@ msgstr "Simge haritası oluşturulamıyor"
 #: app/controllers/CControllerMaintenanceCreate.php:72
 #: app/controllers/CControllerMaintenanceCreate.php:150
 msgid "Cannot create maintenance period"
-msgstr ""
+msgstr "Bakım dönemi oluşturulamıyor"
 
 #: app/controllers/CControllerProxyConfigRefresh.php:79
 msgid "Cannot create request"
@@ -2706,25 +2705,23 @@ msgstr[0] "Grafik silinemiyor"
 msgstr[1] "Grafik silinemiyor"
 
 #: graphs.php:273 graphs.php:317
-#, fuzzy
 msgid "Cannot delete graph prototype"
 msgid_plural "Cannot delete graph prototypes"
 msgstr[0] "Grafik prototipi silinemiyor"
-msgstr[1] "Grafik prototipi silinemiyor"
+msgstr[1] ""
 
 #: app/controllers/CControllerHostMassDelete.php:76
-#, fuzzy
 msgid "Cannot delete host"
 msgid_plural "Cannot delete hosts"
 msgstr[0] "Ana makine silinemiyor"
-msgstr[1] "Ana makine silinemiyor"
+msgstr[1] ""
 
 #: include/classes/api/services/CHost.php:1461
 #, c-format
 msgid "Cannot delete host %1$s because maintenance \"%2$s\" must contain at least one host or host group."
 msgid_plural "Cannot delete hosts %1$s because maintenance \"%2$s\" must contain at least one host or host group."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "\"%2$s\" bakım en az bir ana makine veya ana makine grubu içermesi gerektiğinden %1$s ana makinesi silinemiyor."
+msgstr[1] "\"%2$s\" bakım en az bir ana makine veya ana makine grubu içermesi gerektiğinden %1$s ana makineleri silinemiyor."
 
 #: app/controllers/CControllerHostGroupDelete.php:75
 msgid "Cannot delete host group"
@@ -2736,8 +2733,8 @@ msgstr[1] ""
 #, c-format
 msgid "Cannot delete host group %1$s because maintenance \"%2$s\" must contain at least one host or host group."
 msgid_plural "Cannot delete host groups %1$s because maintenance \"%2$s\" must contain at least one host or host group."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "\"%2$s\" bakım en az bir ana makine veya ana makine grubu içermesi gerektiğinden %1$s ana makine grubu silinemiyor."
+msgstr[1] "\"%2$s\" bakım en az bir ana makine veya ana makine grubu içermesi gerektiğinden %1$s ana makine grupları silinemiyor."
 
 #: app/controllers/CControllerHostGroupDelete.php:39
 #: app/controllers/CControllerTemplateGroupDelete.php:39
@@ -2772,14 +2769,12 @@ msgid "Cannot delete inventory."
 msgstr "Envanter silinemiyor."
 
 #: items.php:524 items.php:736
-#, fuzzy
 msgid "Cannot delete item"
 msgid_plural "Cannot delete items"
 msgstr[0] "Öğe silinemiyor"
-msgstr[1] "Öğe silinemiyor"
+msgstr[1] ""
 
 #: disc_prototypes.php:302 disc_prototypes.php:500
-#, fuzzy
 msgid "Cannot delete item prototype"
 msgid_plural "Cannot delete item prototypes"
 msgstr[0] "Öğe prototipi silinemiyor"
@@ -2788,8 +2783,8 @@ msgstr[1] "Öğe prototipi silinemiyor"
 #: app/controllers/CControllerMaintenanceDelete.php:71
 msgid "Cannot delete maintenance period"
 msgid_plural "Cannot delete maintenance periods"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Bakım süresi silinemiyor"
+msgstr[1] "Bakım süreleri silinemiyor"
 
 #: app/controllers/CControllerMediatypeDelete.php:69
 msgid "Cannot delete media type"
@@ -4084,7 +4079,7 @@ msgstr "Makrolar güncellenemiyor"
 #: app/controllers/CControllerMaintenanceUpdate.php:73
 #: app/controllers/CControllerMaintenanceUpdate.php:152
 msgid "Cannot update maintenance period"
-msgstr ""
+msgstr "Bakım süresi güncellenemiyor"
 
 #: app/controllers/CControllerMediatypeUpdate.php:78
 msgid "Cannot update media type"
@@ -5283,7 +5278,7 @@ msgstr ""
 
 #: include/classes/helpers/CRoleHelper.php:539
 msgid "Create and edit maintenance"
-msgstr ""
+msgstr "Bakım oluştur ve düzenle"
 
 #: include/classes/helpers/CRoleHelper.php:535
 msgid "Create and edit maps"
@@ -6425,7 +6420,7 @@ msgstr "Seçilen öğeler silinsin mi?"
 
 #: app/views/js/maintenance.list.js.php:77
 msgid "Delete selected maintenance period?"
-msgstr ""
+msgstr "Seçilen bakım dönemleri silinsin mi?"
 
 #: app/views/js/maintenance.list.js.php:76
 msgid "Delete selected maintenance periods?"
@@ -10331,7 +10326,7 @@ msgstr ""
 #: app/views/configuration.host.list.php:295 include/hostgroups.inc.php:209
 #: include/triggers.inc.php:1632 include/views/inventory.host.view.php:42
 msgid "Inaccessible maintenance"
-msgstr ""
+msgstr "Erişilemeyen bakım"
 
 #: include/classes/widgets/fields/CWidgetFieldMultiSelectMap.php:31
 #: widgets/navtree/actions/NavTreeItemEdit.php:83
@@ -10413,7 +10408,7 @@ msgstr ""
 
 #: widgets/hostavail/includes/WidgetForm.php:62
 msgid "Include hosts in maintenance"
-msgstr ""
+msgstr "Ana makineleri bakıma dahil edin"
 
 #: include/classes/data/CItemData.php:1117
 msgid "Incoming traffic statistics on network interface. Returns integer"
@@ -12859,13 +12854,13 @@ msgstr "Bakım dönemi"
 
 #: app/controllers/CControllerMaintenanceCreate.php:142
 msgid "Maintenance period created"
-msgstr ""
+msgstr "Bakım dönemi oluşturuldu"
 
 #: app/controllers/CControllerMaintenanceDelete.php:61
 msgid "Maintenance period deleted"
 msgid_plural "Maintenance periods deleted"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Bakım dönemi silindi"
+msgstr[1] "Bakım dönemleri silindi"
 
 #: app/views/maintenance.timeperiod.edit.php:197
 msgid "Maintenance period length"
@@ -12873,7 +12868,7 @@ msgstr "Bakım dönemi uzunluğu"
 
 #: app/controllers/CControllerMaintenanceUpdate.php:144
 msgid "Maintenance period updated"
-msgstr ""
+msgstr "Bakım dönemi güncellendi."
 
 #: app/views/maintenance.list.php:146
 msgid "Maintenance periods"
@@ -12894,7 +12889,7 @@ msgstr "Veri toplamayarak bakım"
 #: include/html.inc.php:1002
 #, c-format
 msgid "Maintenance: %1$s"
-msgstr ""
+msgstr "Bakım: %1$s "
 
 #: app/views/popup.token.view.php:49
 msgid "Make sure to copy the auth token as you won't be able to view it after the page is closed."
@@ -14170,7 +14165,7 @@ msgstr ""
 #: app/controllers/CControllerMaintenanceTimePeriodEdit.php:142
 #: app/views/maintenance.edit.php:255 app/views/maintenance.edit.php:285
 msgid "New maintenance period"
-msgstr ""
+msgstr "Yeni bakım dönemi"
 
 #: app/views/mediatype.edit.php:507 app/views/mediatype.edit.php:546
 msgid "New media type"
@@ -17645,7 +17640,7 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:2666
 msgid "Returns current maintenance status of the host."
-msgstr "Ana makinenin mevcut bakım durumunu döndürür."
+msgstr "Seçili ana makinenin mevcut bakım durumunu döndürür."
 
 #: include/classes/data/CItemData.php:2708
 msgid "Returns information associated with Zabbix Java gateway. Valid params are: ping, version."
@@ -18863,7 +18858,7 @@ msgstr ""
 #: widgets/tophosts/includes/WidgetForm.php:136
 #: widgets/web/includes/WidgetForm.php:66
 msgid "Show data in maintenance"
-msgstr ""
+msgstr "Bakımda verileri göster"
 
 #: app/partials/monitoring.latest.filter.php:196
 #: app/partials/monitoring.problem.filter.php:305
@@ -19445,7 +19440,7 @@ msgstr ""
 
 #: include/classes/helpers/CMapHelper.php:287
 msgid "Status maintenance"
-msgstr ""
+msgstr "Bakım durumu"
 
 #: app/controllers/CControllerDiscoveryView.php:90
 #: app/views/monitoring.discovery.view.php:34
@@ -20373,6 +20368,13 @@ msgstr "Tema"
 #: app/views/mediatype.edit.php:189 app/views/mediatype.test.edit.php:48
 msgid "These parameters will be passed to the script as command-line arguments in the specified order."
 msgstr ""
+
+#: app/controllers/CControllerDiscoveryEdit.php:175
+#, c-format
+msgid "This check cannot be removed, as it is used as a condition in %1$s discovery action."
+msgid_plural "This check cannot be removed, as it is used as a condition in %1$s discovery actions."
+msgstr[0] ""
+msgstr[1] ""
 
 #: include/func.inc.php:2566
 msgid "This day last week"
@@ -22455,6 +22457,10 @@ msgstr ""
 msgid "VMware hypervisor health state rollup sensor, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns 0 - gray; 1 - green; 2 - yellow; 3 - red"
 msgstr ""
 
+#: include/classes/data/CItemData.php:2237
+msgid "VMware hypervisor maintenance status, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns 0 - not in maintenance; 1 - in maintenance"
+msgstr ""
+
 #: include/classes/data/CItemData.php:2051
 msgid "VMware hypervisor model, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
 msgstr ""
@@ -22591,6 +22597,10 @@ msgstr ""
 msgid "VMware virtual machine host memory usage, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
 msgstr ""
 
+#: include/classes/data/CItemData.php:2482
+msgid "VMware virtual machine hypervisor maintenance status, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier. Returns 0 - not in maintenance; 1 - in maintenance"
+msgstr ""
+
 #: include/classes/data/CItemData.php:2331
 msgid "VMware virtual machine hypervisor name, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
 msgstr ""
@@ -22673,7 +22683,7 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:2086
 msgid "VVMware hypervisor maintenance status, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns 0 - not in maintenance; 1 - in maintenance"
-msgstr ""
+msgstr "VVMware hipervizör bakım durumu, \"url\" - VMware servis URL, \"uuid\" - VMware hipervizör genel benzersiz tanımlayıcı. Bakımda değilse 0 döner; bakımda ise 1 döner."
 
 #: app/views/administration.miscconfig.edit.php:112
 msgid "Valid URI schemes"

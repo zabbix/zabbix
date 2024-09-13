@@ -20180,6 +20180,12 @@ msgstr "테마"
 msgid "These parameters will be passed to the script as command-line arguments in the specified order."
 msgstr "이러한 매개변수는 지정된 순서에 따라 명령줄 인수로 스크립트에 전달됩니다."
 
+#: app/controllers/CControllerDiscoveryEdit.php:175
+#, c-format
+msgid "This check cannot be removed, as it is used as a condition in %1$s discovery action."
+msgid_plural "This check cannot be removed, as it is used as a condition in %1$s discovery actions."
+msgstr[0] ""
+
 #: include/func.inc.php:2566
 msgid "This day last week"
 msgstr "저번주의 오늘"
@@ -22245,6 +22251,10 @@ msgstr "VMware 하이퍼바이저 데이터 저장소 목록, \"url\" - VMware �
 msgid "VMware hypervisor health state rollup sensor, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns 0 - gray; 1 - green; 2 - yellow; 3 - red"
 msgstr "VMware 하이퍼바이저 상태 롤업 센서, \"url\" - VMware 서비스 URL, \"uuid\" - VMware 하이퍼바이저 전역 고유 식별자입니다. 0 - 회색을 반환합니다. 1 - 녹색; 2 - 노란색; 3 - 빨간색"
 
+#: include/classes/data/CItemData.php:2237
+msgid "VMware hypervisor maintenance status, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns 0 - not in maintenance; 1 - in maintenance"
+msgstr ""
+
 #: include/classes/data/CItemData.php:2051
 msgid "VMware hypervisor model, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
 msgstr "VMware 하이퍼바이저 모델, \"url\" - VMware 서비스 URL, \"uuid\" - VMware 하이퍼바이저 전역 고유 식별자"
@@ -22380,6 +22390,10 @@ msgstr "VMware 가상 머신 게스트 메모리 사용량, \"url\" - VMware 서
 #: include/classes/data/CItemData.php:2387
 msgid "VMware virtual machine host memory usage, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
 msgstr "VMware 가상 머신 호스트 메모리 사용량, \"url\" - VMware 서비스 URL, \"uuid\" - VMware 가상 머신 전역 고유 식별자"
+
+#: include/classes/data/CItemData.php:2482
+msgid "VMware virtual machine hypervisor maintenance status, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier. Returns 0 - not in maintenance; 1 - in maintenance"
+msgstr ""
 
 #: include/classes/data/CItemData.php:2331
 msgid "VMware virtual machine hypervisor name, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"

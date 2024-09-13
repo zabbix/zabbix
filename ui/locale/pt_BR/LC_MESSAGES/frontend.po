@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-08-26 07:18+0000\n"
+"PO-Revision-Date: 2024-09-02 13:32+0000\n"
 "Last-Translator: Francys Nivea <francysnivea@hotmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
@@ -20354,6 +20354,13 @@ msgstr "Tema"
 msgid "These parameters will be passed to the script as command-line arguments in the specified order."
 msgstr "Esses parâmetros serão passados para o script como argumentos de linha de comando na ordem especificada."
 
+#: app/controllers/CControllerDiscoveryEdit.php:175
+#, c-format
+msgid "This check cannot be removed, as it is used as a condition in %1$s discovery action."
+msgid_plural "This check cannot be removed, as it is used as a condition in %1$s discovery actions."
+msgstr[0] ""
+msgstr[1] ""
+
 #: include/func.inc.php:2566
 msgid "This day last week"
 msgstr "Este dia na semana passada"
@@ -21970,7 +21977,7 @@ msgstr "Um usuário não pode se adicionar em um grupo desativado ou em um grupo
 #: include/classes/api/services/CUserGroup.php:673
 #: include/classes/api/services/CUser.php:843
 msgid "User cannot add oneself to a disabled group or a group with disabled GUI access."
-msgstr ""
+msgstr "Usuário não pode se adicionar a um grupo desabilitado ou a um grupo com acesso de interface desabilitado."
 
 #: app/views/administration.user.edit.php:461
 #: include/classes/api/services/CUser.php:980
@@ -22110,7 +22117,7 @@ msgstr "Um usuário não pode excluir a si mesmo."
 
 #: include/classes/api/services/CUser.php:1837
 msgid "User is not allowed to delete oneself."
-msgstr ""
+msgstr "Usuário não pode excluir a si mesmo."
 
 #: app/views/administration.authentication.edit.php:462
 #: app/views/popup.ldap.edit.php:222
@@ -22432,6 +22439,10 @@ msgstr "Lista de datastores do hipervisor da VMware, \"url\" - URL do serviço d
 msgid "VMware hypervisor health state rollup sensor, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns 0 - gray; 1 - green; 2 - yellow; 3 - red"
 msgstr "Sensor de rollup de estado de integridade do hypervisor VMware, \"url\" - URL do serviço VMware, \"uuid\" - identificador exclusivo global do hypervisor VMware. Retorna 0 - cinza; 1 - verde; 2 - amarelo; 3 - vermelho"
 
+#: include/classes/data/CItemData.php:2237
+msgid "VMware hypervisor maintenance status, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns 0 - not in maintenance; 1 - in maintenance"
+msgstr ""
+
 #: include/classes/data/CItemData.php:2051
 msgid "VMware hypervisor model, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
 msgstr "Modelo do hipervisor da VMware, \"url\" - URL do serviço da VMware, \"uuid\" - identificador exclusivo global do hipervisor da VMware"
@@ -22567,6 +22578,10 @@ msgstr "Uso de memória de convidado da máquina virtual VMware, \"url\" - URL d
 #: include/classes/data/CItemData.php:2387
 msgid "VMware virtual machine host memory usage, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
 msgstr "Uso de memória do host da máquina virtual VMware, \"url\" - URL do serviço VMware, \"uuid\" - identificador exclusivo global da máquina virtual VMware"
+
+#: include/classes/data/CItemData.php:2482
+msgid "VMware virtual machine hypervisor maintenance status, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier. Returns 0 - not in maintenance; 1 - in maintenance"
+msgstr ""
 
 #: include/classes/data/CItemData.php:2331
 msgid "VMware virtual machine hypervisor name, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"

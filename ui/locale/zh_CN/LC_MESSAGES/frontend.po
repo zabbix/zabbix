@@ -20182,6 +20182,12 @@ msgstr "主题"
 msgid "These parameters will be passed to the script as command-line arguments in the specified order."
 msgstr "这些参数将按指定顺序作为命令行参数传递给脚本。"
 
+#: app/controllers/CControllerDiscoveryEdit.php:175
+#, c-format
+msgid "This check cannot be removed, as it is used as a condition in %1$s discovery action."
+msgid_plural "This check cannot be removed, as it is used as a condition in %1$s discovery actions."
+msgstr[0] ""
+
 #: include/func.inc.php:2566
 msgid "This day last week"
 msgstr "上周的这一天"
@@ -22247,6 +22253,10 @@ msgstr "VMware 虚拟机管理程序数据存储列表，“url”- VMware 服�
 msgid "VMware hypervisor health state rollup sensor, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns 0 - gray; 1 - green; 2 - yellow; 3 - red"
 msgstr "VMware 虚拟机管理程序健康状态汇总传感器，“url”- VMware 服务 URL，“uuid”- VMware 虚拟机管理程序全局唯一标识符。返回 0 - 灰色； 1 - 绿色； 2-黄色； 3 - 红色"
 
+#: include/classes/data/CItemData.php:2237
+msgid "VMware hypervisor maintenance status, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns 0 - not in maintenance; 1 - in maintenance"
+msgstr ""
+
 #: include/classes/data/CItemData.php:2051
 msgid "VMware hypervisor model, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
 msgstr "VMware 虚拟机管理程序模型，“url”- VMware 服务 URL，“uuid”- VMware 虚拟机管理程序全局唯一标识符"
@@ -22382,6 +22392,10 @@ msgstr "VMware 虚拟机访客内存使用情况，“url”- VMware 服务 URL�
 #: include/classes/data/CItemData.php:2387
 msgid "VMware virtual machine host memory usage, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
 msgstr "VMware虚拟机主机内存使用情况，“url”-VMware服务URL，“uuid”-VMware虚拟机全局唯一标识符"
+
+#: include/classes/data/CItemData.php:2482
+msgid "VMware virtual machine hypervisor maintenance status, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier. Returns 0 - not in maintenance; 1 - in maintenance"
+msgstr ""
 
 #: include/classes/data/CItemData.php:2331
 msgid "VMware virtual machine hypervisor name, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
