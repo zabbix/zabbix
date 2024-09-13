@@ -898,6 +898,10 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 				{
 					replace_to = zbx_strdup(replace_to, zbx_time2str(time(NULL), tz));
 				}
+				else if (0 == indexed_macro && 0 == strcmp(m, MVAR_TIMESTAMP))
+				{
+					replace_to = zbx_dsprintf(replace_to, "%ld", (long)time(NULL));
+				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_DESCRIPTION) ||
 						0 == strcmp(m, MVAR_TRIGGER_COMMENT))
 				{
@@ -1199,6 +1203,10 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 				{
 					replace_to = zbx_strdup(replace_to, zbx_time2str(time(NULL), tz));
 				}
+				else if (0 == indexed_macro && 0 == strcmp(m, MVAR_TIMESTAMP))
+				{
+					replace_to = zbx_dsprintf(replace_to, "%ld", (long)time(NULL));
+				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_DESCRIPTION) ||
 						0 == strcmp(m, MVAR_TRIGGER_COMMENT))
 				{
@@ -1446,6 +1454,10 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 				{
 					replace_to = zbx_strdup(replace_to, zbx_time2str(time(NULL), tz));
 				}
+				else if (0 == strcmp(m, MVAR_TIMESTAMP))
+				{
+					replace_to = zbx_dsprintf(replace_to, "%ld", (long)time(NULL));
+				}
 				else if (0 == strcmp(m, MVAR_ALERT_SENDTO))
 				{
 					if (NULL != alert)
@@ -1546,6 +1558,10 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 				else if (0 == strcmp(m, MVAR_TIME))
 				{
 					replace_to = zbx_strdup(replace_to, zbx_time2str(time(NULL), tz));
+				}
+				else if (0 == strcmp(m, MVAR_TIMESTAMP))
+				{
+					replace_to = zbx_dsprintf(replace_to, "%ld", (long)time(NULL));
 				}
 				else if (0 == strcmp(m, MVAR_ALERT_SENDTO))
 				{
@@ -1711,6 +1727,10 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 				{
 					replace_to = zbx_strdup(replace_to, zbx_time2str(time(NULL), tz));
 				}
+				else if (0 == strcmp(m, MVAR_TIMESTAMP))
+				{
+					replace_to = zbx_dsprintf(replace_to, "%ld", (long)time(NULL));
+				}
 				else if (0 == strcmp(m, MVAR_ALERT_SENDTO))
 				{
 					if (NULL != alert)
@@ -1867,6 +1887,10 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 				{
 					replace_to = zbx_strdup(replace_to, zbx_time2str(time(NULL), tz));
 				}
+				else if (0 == strcmp(m, MVAR_TIMESTAMP))
+				{
+					replace_to = zbx_dsprintf(replace_to, "%ld", (long)time(NULL));
+				}
 				else if (0 == strcmp(m, MVAR_ALERT_SENDTO))
 				{
 					if (NULL != alert)
@@ -1908,6 +1932,10 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 				else if (0 == strcmp(m, MVAR_TIME))
 				{
 					replace_to = zbx_strdup(replace_to, zbx_time2str(time(NULL), tz));
+				}
+				else if (0 == strcmp(m, MVAR_TIMESTAMP))
+				{
+					replace_to = zbx_dsprintf(replace_to, "%ld", (long)time(NULL));
 				}
 				else if (0 == strcmp(m, MVAR_DATE))
 				{
@@ -2123,6 +2151,10 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 					{
 						replace_to = zbx_strdup(replace_to, zbx_time2str(time(NULL), tz));
 					}
+					else if (0 == strcmp(m, MVAR_TIMESTAMP))
+					{
+						replace_to = zbx_dsprintf(replace_to, "%ld", (long)time(NULL));
+					}
 					else if (0 == strcmp(m, MVAR_TRIGGER_EXPRESSION_EXPLAIN))
 					{
 						zbx_db_trigger_explain_expression(&event->trigger, &replace_to,
@@ -2305,14 +2337,17 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 			}
 			else if (0 == strcmp(m, MVAR_HOST_PORT))
 			{
-				if (INTERFACE_TYPE_UNKNOWN != c_interface->type)
+				if (0 == (macro_type & ZBX_MACRO_TYPE_ALLOWED_HOSTS))
 				{
-					zbx_dsprintf(replace_to, "%u", c_interface->port);
-				}
-				else
-				{
-					ret = expr_dc_get_interface_value(c_hostid, c_itemid, &replace_to,
-							ZBX_REQUEST_HOST_PORT);
+					if (INTERFACE_TYPE_UNKNOWN != c_interface->type)
+					{
+						zbx_dsprintf(replace_to, "%u", c_interface->port);
+					}
+					else
+					{
+						ret = expr_dc_get_interface_value(c_hostid, c_itemid, &replace_to,
+								ZBX_REQUEST_HOST_PORT);
+					}
 				}
 			}
 			else if (0 != (macro_type & ZBX_MACRO_TYPE_SCRIPT_PARAMS_FIELD))
