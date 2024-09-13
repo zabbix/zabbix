@@ -57,16 +57,17 @@ static void	hp_item_value_free(zbx_hp_item_value_t *hp)
  *                                                                            *
  * Purpose: creates item value from json data                                 *
  *                                                                            *
- * Parameters: pnext     - [IN] json data                                     *
- *             now       - [IN] current time                                  *
- *             ns_offset - [IN/OUT] nanosecond offset to apply when json data *
- *                                  does not include ns tag                   *
- *             error     - [OUT] error message                                *
+ * Parameters: pnext        - [IN] json data                                  *
+ *             ts           - [IN] current time                               *
+ *             unique_shift - [IN/OUT] offset to apply when json data does    *
+ *                                     not include ns tag                     *
+ *             error        - [OUT] error message                             *
  *                                                                            *
  * Return value: created value or NULL in case of error                       *
  *                                                                            *
  ******************************************************************************/
-static zbx_hp_item_value_t	*create_item_value(const char *pnext, time_t now, int *ns_offset, char **error)
+static zbx_hp_item_value_t	*create_item_value(const char *pnext, zbx_timespec_t *ts, zbx_timespec_t *unique_shift,
+		char **error)
 {
 	char			*str = NULL;
 	size_t			str_alloc = 0;
@@ -145,11 +146,19 @@ static zbx_hp_item_value_t	*create_item_value(const char *pnext, time_t now, int
 	}
 	else
 	{
-		hp->ts.ns = (*ns_offset)++;
-	}
+		if (0 == hp->ts.sec)
+			hp->ts.sec = ts->sec;
 
-	if (0 == hp->ts.sec)
-		hp->ts.sec = (int)now;
+		hp->ts.ns = ts->ns + unique_shift->ns++;
+
+		if (hp->ts.ns > 999999999)
+		{
+			unique_shift->sec++;
+			unique_shift->ns = hp->ts.ns = 0;
+		}
+
+		hp->ts.sec += unique_shift->sec;
+	}
 
 	if (SUCCEED != zbx_json_value_by_name_dyn(&jp, ZBX_PROTO_TAG_VALUE, &str, &str_alloc, NULL))
 	{
@@ -677,10 +686,10 @@ static int	process_history_push(zbx_socket_t *sock, const struct zbx_json_parse 
 	struct zbx_json_parse		jp_data;
 	char				clientip[MAX_STRING_LEN];
 	struct addrinfo			hints, *ai = NULL;
-	int				ret = FAIL, ns_offset = 0, hostkeys_num = 0, itemids_num = 0,
-					processed_num = 0, failed_num = 0;
+	int				ret = FAIL, hostkeys_num = 0, itemids_num = 0, processed_num = 0,
+					failed_num = 0;
 	const char			*pnext = NULL;
-	time_t				now;
+	zbx_timespec_t			ts, unique_shift = {0, 0};
 	zbx_vector_hp_item_value_ptr_t	values;
 	double				time_start;
 
@@ -723,14 +732,14 @@ static int	process_history_push(zbx_socket_t *sock, const struct zbx_json_parse 
 		goto out;
 	}
 
-	now = time(NULL);
+	zbx_timespec(&ts);
 
 	while (NULL != (pnext = zbx_json_next(&jp_data, pnext)))
 	{
 		char			*errmsg = NULL;
 		zbx_hp_item_value_t	*hp;
 
-		if (NULL == (hp = create_item_value(pnext, now, &ns_offset, &errmsg)))
+		if (NULL == (hp = create_item_value(pnext, &ts, &unique_shift, &errmsg)))
 		{
 			*error = zbx_dsprintf(NULL, "Cannot parse item #%d data: %s.", hostkeys_num + itemids_num + 1,
 					errmsg);

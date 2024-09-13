@@ -12,6 +12,15 @@ BINARIES_tests = \
 	zbx_get_report_nextcheck \
 	zbx_function_param_parse_ext
 
+if SERVER
+BINARIES_tests += macro_func \
+	macro_tr
+if HAVE_PCRE2
+BINARIES_tests += macro_regrepl
+endif
+endif
+
+
 noinst_PROGRAMS = $(BINARIES_tests)
 
 COMMON_SRC_FILES = \
@@ -49,6 +58,14 @@ EXPR_LIBS = \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(MOCK_DATA_DEPS) \
 	$(MOCK_TEST_DEPS)
+
+if SERVER
+EXPR_LIBS += \
+	$(top_srcdir)/src/libs/zbxexpression/libzbxexpression.a \
+        $(top_srcdir)/src/libs/zbxexpr/libzbxexpr.a \
+	$(top_srcdir)/src/libs/zbxregexp/libzbxregexp.a \
+	$(top_srcdir)/src/libs/zbxcrypto/libzbxcrypto.a
+endif
 
 EXPR_COMPILER_FLAGS = \
 	-I@top_srcdir@/tests \
@@ -220,3 +237,44 @@ zbx_function_param_parse_ext_LDADD += @SERVER_LIBS@
 zbx_function_param_parse_ext_LDFLAGS = @SERVER_LDFLAGS@
 
 zbx_function_param_parse_ext_CFLAGS = $(EXPR_COMPILER_FLAGS)
+
+
+macro_tr_SOURCES = \
+	macro_tr.c \
+	$(COMMON_SRC_FILES)
+
+macro_tr_LDADD = \
+	$(EXPR_LIBS)
+
+macro_tr_LDADD += @SERVER_LIBS@
+
+macro_tr_LDFLAGS = @SERVER_LDFLAGS@
+
+macro_tr_CFLAGS = $(EXPR_COMPILER_FLAGS)
+
+macro_regrepl_SOURCES = \
+	macro_regrepl.c \
+	$(COMMON_SRC_FILES)
+
+macro_regrepl_LDADD = \
+	$(EXPR_LIBS)
+
+macro_regrepl_LDADD += @SERVER_LIBS@
+
+macro_regrepl_LDFLAGS = @SERVER_LDFLAGS@
+
+macro_regrepl_CFLAGS = $(EXPR_COMPILER_FLAGS)
+
+
+macro_func_SOURCES = \
+	macro_func.c \
+	$(COMMON_SRC_FILES)
+
+macro_func_LDADD = \
+	$(EXPR_LIBS)
+
+macro_func_LDADD += @SERVER_LIBS@
+
+macro_func_LDFLAGS = @SERVER_LDFLAGS@
+
+macro_func_CFLAGS = $(EXPR_COMPILER_FLAGS)

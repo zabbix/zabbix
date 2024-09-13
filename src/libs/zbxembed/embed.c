@@ -36,7 +36,7 @@
 
 typedef struct
 {
-	void			*heapptr;	/* js object heap ptr */
+	const void		*heapptr;	/* js object heap ptr */
 	void			*data;
 	zbx_es_obj_type_t	type;
 }
@@ -248,6 +248,19 @@ fail:
 	zbx_free(*out_str);
 
 	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: push result string on duktape value stack                         *
+ *                                                                            *
+ * Comments: The string might be modified by this function.                   *
+ *                                                                            *
+ ******************************************************************************/
+void	es_push_result_string(duk_context *ctx, char *str, size_t size)
+{
+	zbx_replace_invalid_utf8(str);
+	duk_push_lstring(ctx, str, size);
 }
 
 /******************************************************************************
