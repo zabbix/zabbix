@@ -866,3 +866,57 @@ void	zbx_pb_get_mem_stats(zbx_shmem_stats_t *stats)
 
 	pb_unlock();
 }
+
+void	pb_add_json_field(struct zbx_json *j, zbx_history_table_t *history_table, const char *fld_name, void *value,
+		int type)
+{
+	union
+	{
+		int		val_int;
+		zbx_uint64_t	val_u64;
+	}
+	def;
+
+	zbx_history_field_t	*fld = history_table->fields;
+
+	while (NULL != fld->field && 0 != strcmp(fld->field, fld_name))
+		fld++;
+
+	if (NULL == fld->field ) {
+		zabbix_log(LOG_LEVEL_WARNING, "%s() error of table:%s unknown field name:%s", __func__,
+				history_table->table, fld_name);
+		THIS_SHOULD_NEVER_HAPPEN;
+		return;
+	}
+
+	switch (type)
+	{
+		case ZBX_TYPE_CHAR:
+			if (NULL != fld->default_value && (0 == strcmp(fld->default_value, *(char**)value)))
+				break;
+
+			zbx_json_addstring(j, fld->tag, *(char**)value, ZBX_JSON_TYPE_STRING);
+			break;
+		case ZBX_TYPE_INT:
+			if (NULL != fld->default_value && (SUCCEED == zbx_is_int(fld->default_value, &def.val_int) &&
+					def.val_int == *(int*)value))
+			{
+				break;
+			}
+
+			zbx_json_addint64(j, fld->tag, *(int*)value);
+			break;
+		case ZBX_TYPE_UINT:
+			if (NULL != fld->default_value && (SUCCEED == zbx_is_uint64(fld->default_value, &def.val_u64) &&
+					def.val_u64 == *(zbx_uint64_t*)value))
+			{
+				break;
+			}
+
+			zbx_json_adduint64(j, fld->tag, *(zbx_uint64_t*)value);
+			break;
+		default:
+			zabbix_log(LOG_LEVEL_WARNING, "%s() unsupported type:%d", __func__, type);
+			THIS_SHOULD_NEVER_HAPPEN;
+	}
+}

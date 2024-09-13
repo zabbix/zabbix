@@ -1,0 +1,49 @@
+---
+test case: "No data"
+include:
+  - &include01 zbx_substitute_macros_um_01.inc.yaml
+in:
+  config: *include01
+  hostid: 0
+  user_macro: 0
+  expression: ""
+out:
+  result: ""
+  return: SUCCEED
+---
+test case: Substitution using default user macro cache
+include:
+  - &include01 zbx_substitute_macros_um_01.inc.yaml
+in:
+  config: *include01
+  hostid: 0
+  user_macro: 0
+  expression: "{$TEXT_VALUE} {$SECRET_VALUE} {$VAULT_VALUE}"
+out:
+  result: "text value ****** ******"
+  return: SUCCEED
+---
+test case: Substitution using secure user macro cache
+include:
+  - &include01 zbx_substitute_macros_um_01.inc.yaml
+in:
+  config: *include01
+  hostid: 0
+  user_macro: 1
+  expression: "{$TEXT_VALUE} {$SECRET_VALUE} {$VAULT_VALUE}"
+out:
+  result: "text value secret value vault value"
+  return: SUCCEED
+---
+test case: Substitution using masked user macro cache
+include:
+  - &include01 zbx_substitute_macros_um_01.inc.yaml
+in:
+  config: *include01
+  hostid: 0
+  user_macro: 2
+  expression: "{$TEXT_VALUE} {$SECRET_VALUE} {$VAULT_VALUE}"
+out:
+  result: "text value ****** ******"
+  return: SUCCEED
+...

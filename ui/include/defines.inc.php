@@ -17,7 +17,7 @@ define('ZABBIX_VERSION',		'7.2.0alpha1');
 define('ZABBIX_API_VERSION',	'7.2.0');
 define('ZABBIX_EXPORT_VERSION',	'7.2');
 
-define('ZABBIX_DB_VERSION',		7010003);
+define('ZABBIX_DB_VERSION',		7010013);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -2206,6 +2206,7 @@ define('ZBX_STYLE_TOTALS_LIST', 'totals-list');
 define('ZBX_STYLE_TOTALS_LIST_HORIZONTAL', 'totals-list-horizontal');
 define('ZBX_STYLE_TOTALS_LIST_VERTICAL', 'totals-list-vertical');
 define('ZBX_STYLE_TOTALS_LIST_COUNT', 'count');
+define('ZBX_STYLE_TOTALS_LIST_NAME', 'name');
 define('ZBX_STYLE_TREEVIEW', 'treeview');
 define('ZBX_STYLE_UPPERCASE', 'uppercase');
 define('ZBX_STYLE_WARNING_BG', 'warning-bg');

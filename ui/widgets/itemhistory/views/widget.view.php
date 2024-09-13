@@ -206,13 +206,16 @@ function makeValueCell(array $column, array $item_value, string $cell_class = nu
 						->addClass($cell_class)
 						->setAttribute('data-itemid', $item_value['itemid'])
 						->setAttribute('data-clock', $item_value['clock'].'.'.$item_value['ns']),
-					(new CCol(new CDiv($item_value['formatted_value'])))
+					(new CCol(
+						(new CSpan($item_value['formatted_value']))->setHint(
+							(new CDiv($item_value['value']))->addClass(ZBX_STYLE_HINTBOX_WRAP)
+						)
+					))
 						->addClass($cell_class)
 						->setAttribute('data-itemid', $item_value['itemid'])
 						->setAttribute('data-clock', $item_value['clock'].'.'.$item_value['ns'])
 						->addStyle('width: 0;')
 						->addClass(ZBX_STYLE_NOWRAP)
-						->setHint((new CDiv($item_value['value']))->addClass(ZBX_STYLE_HINTBOX_WRAP))
 				];
 			}
 			else {
@@ -231,12 +234,15 @@ function makeValueCell(array $column, array $item_value, string $cell_class = nu
 				}
 
 				return [
-					(new CCol($item_value['formatted_value']))
+					(new CCol(
+						(new CSpan($item_value['formatted_value']))->setHint(
+							(new CDiv($item_value['value']))->addClass(ZBX_STYLE_HINTBOX_WRAP)
+						)
+					))
 						->addClass($cell_class)
 						->setAttribute('data-itemid', $item_value['itemid'])
 						->setAttribute('data-clock', $item_value['clock'].'.'.$item_value['ns'])
 						->setAttribute('bgcolor', $color !== '' ? '#'.$color : null)
-						->setHint((new CDiv($item_value['value']))->addClass(ZBX_STYLE_HINTBOX_WRAP))
 						->setColSpan(2)
 				];
 			}
@@ -255,11 +261,14 @@ function makeValueCell(array $column, array $item_value, string $cell_class = nu
 
 			$value = $column['display'] == CWidgetFieldColumnsList::DISPLAY_SINGLE_LINE
 				? substr($item_value['value'], 0, $column['max_length'])
+					.(strlen($item_value['value']) > $column['max_length'] ? '...' : '')
 				: $item_value['value'];
 
 			return [
 				(new CCol($column['display'] != CWidgetFieldColumnsList::DISPLAY_HTML
-					? new CDiv($value)
+					? (new CSpan($value))->setHint(
+						(new CDiv($item_value['value']))->addClass(ZBX_STYLE_HINTBOX_WRAP)
+					)
 					: new CJsScript($value)
 				))
 					->addClass($column['display'] == CWidgetFieldColumnsList::DISPLAY_SINGLE_LINE

@@ -102,12 +102,14 @@ ZBX_DC_FUNCTION;
 typedef struct
 {
 	zbx_vector_uint64_pair_t	dep_itemids;
+	zbx_uint64_t			revision;
 }
 ZBX_DC_MASTERITEM;
 
 typedef struct
 {
 	zbx_vector_ptr_t	preproc_ops;
+	zbx_uint64_t		revision;
 }
 ZBX_DC_PREPROCITEM;
 
@@ -317,14 +319,6 @@ typedef struct
 	zbx_uint64_t		templateid;
 }
 ZBX_DC_TEMPLATE_ITEM;
-
-typedef struct
-{
-	zbx_uint64_t		itemid;
-	zbx_uint64_t		hostid;
-	zbx_uint64_t		templateid;
-}
-ZBX_DC_PROTOTYPE_ITEM;
 
 typedef struct
 {
@@ -984,8 +978,7 @@ typedef struct
 	zbx_hashset_t		items;
 	zbx_hashset_t		items_hk;		/* hostid, key */
 	zbx_hashset_t		item_discovery;
-	zbx_hashset_t		template_items;		/* template items selected from items table */
-	zbx_hashset_t		prototype_items;	/* item prototypes selected from items table */
+	zbx_hashset_t		template_items;		/* template and prototype items from items table */
 	zbx_hashset_t		functions;
 	zbx_hashset_t		triggers;
 	zbx_hashset_t		trigdeps;

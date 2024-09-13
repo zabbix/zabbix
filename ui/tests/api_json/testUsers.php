@@ -1162,7 +1162,7 @@ class testUsers extends CAPITest {
 				]],
 				'expected_error' => 'Not allowed to set password for user "guest".'
 			],
-			// Check super admin type user password change for himself/herself.
+			// Check super admin type user password change for oneself.
 			[
 				'user' => [[
 					'userid' => '1',
@@ -1292,7 +1292,7 @@ class testUsers extends CAPITest {
 				]],
 				'expected_error' => null
 			],
-			// Check user group, admin can't add himself to a disabled group or a group with disabled GUI access.
+			// Check user group, admin can't add oneself to a disabled group or a group with disabled GUI access.
 			[
 				'user' => [[
 					'userid' => '1',
@@ -1301,7 +1301,7 @@ class testUsers extends CAPITest {
 						['usrgrpid' => '12']
 					]
 				]],
-				'expected_error' => 'User cannot add himself to a disabled group or a group with disabled GUI access.'
+				'expected_error' => 'User cannot add oneself to a disabled group or a group with disabled GUI access.'
 			],
 			[
 				'user' => [[
@@ -1311,7 +1311,7 @@ class testUsers extends CAPITest {
 						['usrgrpid' => '9']
 					]
 				]],
-				'expected_error' => 'User cannot add himself to a disabled group or a group with disabled GUI access.'
+				'expected_error' => 'User cannot add oneself to a disabled group or a group with disabled GUI access.'
 			],
 			// Check user properties, super-admin user type.
 			[
@@ -2496,10 +2496,10 @@ class testUsers extends CAPITest {
 				'user' => ['9', '9'],
 				'expected_error' => 'Invalid parameter "/2": value (9) already exists.'
 			],
-			// Try delete himself.
+			// Try delete oneself.
 			[
 				'user' => ['1'],
-				'expected_error' => 'User is not allowed to delete himself.'
+				'expected_error' => 'User is not allowed to delete oneself.'
 			],
 			// Try delete internal user.
 			[

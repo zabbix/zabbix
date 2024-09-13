@@ -1,0 +1,1 @@
+...G...... [ZBX-25195] fixed crash in Zabbix agent for Solaris when using 'cmdline' as a parameter for an item key (MVekslers)

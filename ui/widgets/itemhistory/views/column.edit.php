@@ -259,6 +259,7 @@ $form
 		(new CScriptTag('
 			item_history_column_edit.init('.json_encode([
 				'form_id' => $form->getId(),
+				'templateid' => $data['templateid'],
 				'thresholds' => $data['thresholds'],
 				'highlights' => $data['highlights'],
 				'colors' => $data['colors'],
