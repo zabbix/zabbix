@@ -20365,6 +20365,13 @@ msgstr ""
 msgid "These parameters will be passed to the script as command-line arguments in the specified order."
 msgstr ""
 
+#: app/controllers/CControllerDiscoveryEdit.php:175
+#, c-format
+msgid "This check cannot be removed, as it is used as a condition in %1$s discovery action."
+msgid_plural "This check cannot be removed, as it is used as a condition in %1$s discovery actions."
+msgstr[0] ""
+msgstr[1] ""
+
 #: include/func.inc.php:2566
 msgid "This day last week"
 msgstr ""
