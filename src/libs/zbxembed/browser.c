@@ -1082,6 +1082,76 @@ static duk_ret_t	es_browser_get_raw_perf_entries_by_type(duk_context *ctx)
 	return 1;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get browser element id                                            *
+ *                                                                            *
+ * Parameters: ctx - [IN]                                                     *
+ *             idx - [IN] element object index on stack                       *
+ *                                                                            *
+ * Return value: Allocated element id string or NULL                          *
+ *                                                                            *
+ ******************************************************************************/
+static char	*es_browser_get_element_id(duk_context *ctx, duk_idx_t idx)
+{
+	zbx_es_env_t	*env;
+	void		*el;
+
+	if (duk_get_type(ctx, 0) != DUK_TYPE_OBJECT)
+		return NULL;
+
+	if (NULL == (env = zbx_es_get_env(ctx)))
+		return NULL;
+
+	if (NULL == (el = es_obj_get_data(env, duk_require_heapptr(ctx, idx), ES_OBJ_ELEMENT)))
+		return NULL;
+
+	return zbx_strdup(NULL, wd_element_get_id(el));
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: set custom error                                                  *
+ *                                                                            *
+ * Stack 0 - script                                                           *
+ *                                                                            *
+ ******************************************************************************/
+static duk_ret_t	es_browser_switch_frame(duk_context *ctx)
+{
+	zbx_webdriver_t	*wd;
+	char		*frame = NULL, *error = NULL;
+	int		err_index = -1;
+
+	if (NULL == (wd = es_webdriver(ctx)))
+		return duk_throw(ctx);
+
+	if (!duk_is_null(ctx, 0) && !duk_is_undefined(ctx, 0))
+	{
+		if (duk_get_type(ctx, 0) == DUK_TYPE_NUMBER)
+		{
+			frame = zbx_dsprintf(NULL, "%.0f", duk_get_number(ctx, 0));
+		}
+		else if (NULL == (frame = es_browser_get_element_id(ctx, 0)))
+		{
+			(void)browser_push_error(ctx, wd, "invalid parameter");
+			return duk_throw(ctx);
+		}
+	}
+
+	if (SUCCEED != webdriver_switch_frame(wd, frame, &error))
+	{
+		err_index = browser_push_error(ctx, wd, "cannot switch frame: %s", error);
+		zbx_free(error);
+	}
+
+	zbx_free(frame);
+
+	if (-1 != err_index)
+		return duk_throw(ctx);
+
+	return 0;
+}
+
 #ifdef BROWSER_EXECUTE_SCRIPT
 /******************************************************************************
  *                                                                            *
@@ -1164,6 +1234,7 @@ static const duk_function_list_entry	browser_methods[] = {
 	{"getRawPerfEntriesByType", es_browser_get_raw_perf_entries_by_type, 1},
 	{"getPageSource", es_browser_get_page_source, 0},
 	{"getAlert", es_browser_get_alert, 0},
+	{"switchFrame", es_browser_switch_frame, 1},
 #ifdef BROWSER_EXECUTE_SCRIPT
 	{"executeScript", es_browser_execute_script, 1},
 #endif

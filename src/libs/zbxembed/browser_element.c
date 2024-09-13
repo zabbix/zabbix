@@ -401,5 +401,15 @@ void	wd_element_create_array(duk_context *ctx, zbx_webdriver_t *wd, const zbx_ve
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get element id                                                    *
+ *                                                                            *
+ ******************************************************************************/
+const char	*wd_element_get_id(void *wd)
+{
+	return ((zbx_wd_element_t *)wd)->id;
+}
+
 #endif
 
