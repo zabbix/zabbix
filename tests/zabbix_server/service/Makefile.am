@@ -16,7 +16,10 @@ COMMON_LIBS = \
 	$(top_srcdir)/src/zabbix_server/service/libservice_server.a \
 	$(top_srcdir)/src/libs/zbxcacheconfig/libzbxcacheconfig.a \
 	$(top_builddir)/src/libs/zbxpgservice/libzbxpgservice.a \
+        $(top_srcdir)/src/libs/zbxpreprocbase/libzbxpreprocbase.a \
+	$(top_srcdir)/src/libs/zbxinterface/libzbxinterface.a \
 	$(top_srcdir)/src/libs/zbxcachehistory/libzbxcachehistory.a \
+	$(top_srcdir)/src/libs/zbxexport/libzbxexport.a \
 	$(top_srcdir)/src/libs/zbxescalations/libzbxescalations.a \
 	$(top_srcdir)/src/libs/zbxrtc/libzbxrtc_service.a \
 	$(top_srcdir)/src/libs/zbxrtc/libzbxrtc.a \
@@ -37,6 +40,8 @@ COMMON_LIBS = \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo_http.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/simple/libsimplesysinfo.a \
+	$(top_srcdir)/src/libs/zbxsysinfo/alias/libalias.a \
+	$(top_srcdir)/src/libs/zbxparam/libzbxparam.a \
 	$(top_srcdir)/src/libs/zbxhistory/libzbxhistory.a \
 	$(top_srcdir)/src/libs/zbxmodules/libzbxmodules.a \
 	$(top_srcdir)/src/libs/zbxhttp/libzbxhttp.a \
@@ -65,6 +70,7 @@ COMMON_LIBS = \
 	$(top_srcdir)/src/libs/zbxmutexs/libzbxmutexs.a \
 	$(top_srcdir)/src/libs/zbxprof/libzbxprof.a \
 	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
+	$(top_srcdir)/src/libs/zbxfile/libzbxfile.a \
 	$(top_srcdir)/src/libs/zbxip/libzbxip.a \
 	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
 	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
