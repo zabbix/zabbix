@@ -345,10 +345,8 @@ class DB {
 					$updated_values[$name] = $new_values[$name];
 				}
 			}
-			else {
-				if ($new_values[$name] !== $old_values[$name]) {
-					$updated_values[$name] = $new_values[$name];
-				}
+			elseif ($new_values[$name] !== $old_values[$name]) {
+				$updated_values[$name] = $new_values[$name];
 			}
 		}
 
