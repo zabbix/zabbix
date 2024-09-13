@@ -32,6 +32,7 @@
 #include "zbxthreads.h"
 #include "zbxtime.h"
 #include "zbxmedia.h"
+#include "zbxcacheconfig.h"
 
 typedef struct
 {
@@ -740,7 +741,8 @@ static void	am_service_add_event_tags(zbx_vector_events_tags_t *events_tags)
 	if (NULL == data)
 		return;
 
-	zbx_service_flush(ZBX_IPC_SERVICE_SERVICE_PROBLEMS_TAGS, data, data_offset);
+	if (0 != zbx_dc_get_itservices_num())
+		zbx_service_flush(ZBX_IPC_SERVICE_SERVICE_PROBLEMS_TAGS, data, data_offset);
 	zbx_free(data);
 }
 
