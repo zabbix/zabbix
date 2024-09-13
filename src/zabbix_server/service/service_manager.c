@@ -2817,10 +2817,10 @@ static void	event_add_maintenanceid(zbx_event_t *event, zbx_uint64_t maintenance
 
 static void	event_remove_maintenanceid(zbx_event_t *event, zbx_uint64_t maintenanceid)
 {
+	int	i;
+
 	if (NULL == event->maintenanceids)
 		return;
-
-	int	i;
 
 	if (FAIL != (i = zbx_vector_uint64_search(event->maintenanceids, maintenanceid, ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
 		zbx_vector_uint64_remove_noorder(event->maintenanceids, i);
@@ -3503,9 +3503,8 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 	int				ret, events_num = 0, tags_update_num = 0, problems_delete_num = 0,
 					service_update_num = 0, service_cache_reload_requested = 0,
 					server_num = ((zbx_thread_args_t *)args)->info.server_num,
-					process_num = ((zbx_thread_args_t *)args)->info.process_num;
-	double				time_stat, time_idle = 0, time_now, time_flush = 0, time_cleanup = 0, sec,
-					services_num;
+					process_num = ((zbx_thread_args_t *)args)->info.process_num, services_num;
+	double				time_stat, time_idle = 0, time_now, time_flush = 0, time_cleanup = 0, sec;
 	zbx_service_manager_t		service_manager;
 	zbx_timespec_t			timeout = {1, 0};
 	const zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;

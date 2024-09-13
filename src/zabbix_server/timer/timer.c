@@ -157,7 +157,7 @@ static void     service_send_suppression_data(const zbx_vector_uint64_pair_t *ev
 	int             i;
 	zbx_uint32_t	data_len;
 
-	data_len = (zbx_uint32_t)(event_maintenance->values_num * sizeof(zbx_uint64_pair_t) + sizeof(int));
+	data_len = (zbx_uint32_t)((size_t)event_maintenance->values_num * sizeof(zbx_uint64_pair_t) + sizeof(int));
 	ptr = data = zbx_malloc(NULL, data_len);
 
 	ptr += zbx_serialize_value(ptr, event_maintenance->values_num);
@@ -365,7 +365,7 @@ static void	db_get_query_events(zbx_vector_event_suppress_query_ptr_t *event_que
 		}
 
 		ZBX_DBROW2UINT64(pair.first, row[1]);
-		pair.second = atoi(row[2]);
+		pair.second = (zbx_uint64_t)atoi(row[2]);
 		zbx_vector_uint64_pair_append(&data->maintenances, pair);
 	}
 	zbx_db_free_result(result);
