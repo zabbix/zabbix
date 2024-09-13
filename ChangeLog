@@ -1,6 +1,7 @@
 Changes for 6.0.34rc1
 
 New features:
+.........T [ZBXNEXT-9418] split {$PG.CONNSTRING} macro in PostgreSQL templates (abrosimovs)
 .......PS. [ZBXNEXT-9416] updated max supported MariaDB version to 11.5 (mprihodko)
 .........T [ZBXNEXT-9318] added Microsoft 365 reports by HTTP template (abrosimovs)
 .........T [ZBXNEXT-9248] added GitHub repository by HTTP template (drasikhov)
@@ -10,6 +11,11 @@ New features:
 .........T [ZBXNEXT-9341] added assume role authorization in AWS templates (egordymov)
 
 Bug fixes:
+..F....... [ZBX-24030] fixed manually closed problem action icon visibility in high-contrast theme (esekace)
+.......PS. [ZBX-21843] fixed "Check for not supported value" preprocessing step for dependent items (askolmeisters)
+........S. [ZBX-25154] added deactivation of service manager problem cache if no services are configured (wiper)
+..F....... [ZBX-24997] fixed script execution status in Action log page (esekace)
+...G...PS. [ZBX-25127] fixed crash in JSON library due to null pointer arithmetic (vso)
 A......... [ZBX-24485] fixed undefined index error when importing host with technical name already in use by a template (jfreibergs, vmaksimovs)
 ...G...... [ZBX-24245] fixed Zabbix agent 2 and loadable plugin protocol mismatch error (esneiders)
 ........S. [ZBX-22557] fixed time zones conflict lead to report sheduling errors (sboidenko)
