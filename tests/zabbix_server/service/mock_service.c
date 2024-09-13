@@ -38,18 +38,6 @@ void	__wrap_zbx_rtc_notify_finished_sync(int config_timeout, zbx_uint32_t code, 
 		void *rtc);
 void	__wrap_zbx_dc_set_itservices_num(int num);
 
-void	__wrap_zbx_recalc_time_period(int *tm_start, int table_group)
-{
-	ZBX_UNUSED(tm_start);
-	ZBX_UNUSED(table_group);
-}
-
-void	__wrap_zbx_config_get(void *cfg, int flags)
-{
-	ZBX_UNUSED(cfg);
-	ZBX_UNUSED(flags);
-}
-
 void	__wrap_zbx_dc_set_itservices_num(int num)
 {
 	ZBX_UNUSED(num);
