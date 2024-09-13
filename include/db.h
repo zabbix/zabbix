@@ -369,6 +369,8 @@ typedef struct
 	int			severity;
 	unsigned char		suppressed;
 
+	zbx_vector_uint64_t	*maintenanceids;	/* maintenance ids suppressing event */
+
 	zbx_vector_ptr_t	tags;	/* used for both zbx_tag_t and zbx_host_tag_t */
 
 #define ZBX_FLAGS_DB_EVENT_UNSET		0x0000
@@ -795,10 +797,10 @@ typedef struct
 	int			ns;
 	int			value;
 	int			severity;
+	int			mtime;
 
 	zbx_vector_ptr_t	tags;
-	int			suppressed;
-	int			mtime;
+	zbx_vector_uint64_t	*maintenanceids;
 }
 zbx_event_t;
 
@@ -833,6 +835,8 @@ void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ptr
 void	zbx_db_free_event(DB_EVENT *event);
 void	zbx_db_get_eventid_r_eventid_pairs(zbx_vector_uint64_t *eventids, zbx_vector_uint64_pair_t *event_pairs,
 		zbx_vector_uint64_t *r_eventids);
+void	zbx_db_event_add_maintenanceid(DB_EVENT *event, zbx_uint64_t maintenanceid);
+
 void	zbx_db_trigger_get_expression(const DB_TRIGGER *trigger, char **expression);
 void	zbx_db_trigger_get_recovery_expression(const DB_TRIGGER *trigger, char **expression);
 void	zbx_db_trigger_clean(DB_TRIGGER *trigger);
