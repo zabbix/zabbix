@@ -418,7 +418,8 @@ out:
 
 	zbx_free(preproc_error);
 
-	if (NULL != not_supported_step) zbx_preproc_op_free(not_supported_step);
+	if (NULL != not_supported_step)
+		zbx_preproc_op_free(not_supported_step);
 
 	zbx_vector_ptr_clear_ext(&history, (zbx_clean_func_t)zbx_preproc_op_history_free);
 	zbx_vector_ptr_destroy(&history);
