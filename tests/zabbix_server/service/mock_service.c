@@ -53,6 +53,11 @@ void	__wrap_zbx_config_get(void *cfg, int flags)
 	ZBX_UNUSED(flags);
 }
 
+void	__wrap_zbx_dc_set_itservices_num(int num)
+{
+	ZBX_UNUSED(num);
+}
+
 /* stubs to satisfy hard link dependenceies */
 
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
