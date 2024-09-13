@@ -642,6 +642,7 @@ class testPageReportsAudit extends CWebTest {
 	 *
 	 * @dataProvider getClickableTablePlaces
 	 *
+	 * @depends testPageReportsAudit_CheckFilter
 	 */
 	public function testPageReportsAudit_CheckClickableTable($data) {
 		$this->page->login()->open('zabbix.php?action=auditlog.list&filter_rst=1')->waitUntilReady();
@@ -653,11 +654,11 @@ class testPageReportsAudit extends CWebTest {
 		$table->getRow(0)->getColumn($data['table_column'])->query('xpath:.//a')->one()->click();
 		$column = $table->getRow(0)->getColumn($data['table_column'])->getText();
 
-		// Check that correct IP displayed in filter form.
+		// Check that correct column value displayed in filter form.
 		$this->assertTrue($form->checkValue([$data['label'] => $column]));
 
 		// Compare result cout on page and in DB.
-		$recordsetid_count = CDBHelper::getCount($data['sql'].''.zbx_dbstr($column));
+		$recordsetid_count = CDBHelper::getCount($data['sql'].zbx_dbstr($column));
 		$this->assertEquals($recordsetid_count, $table->getRows()->count());
 	}
 
