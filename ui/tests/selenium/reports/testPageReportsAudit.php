@@ -616,7 +616,7 @@ class testPageReportsAudit extends CWebTest {
 				[
 					'table_column' => 'IP',
 					'sql' => 'SELECT NULL FROM auditlog WHERE ip=',
-					'label' => 'IP',
+					'label' => 'IP'
 				]
 			],
 			// #1
@@ -624,7 +624,7 @@ class testPageReportsAudit extends CWebTest {
 				[
 					'table_column' => 'ID',
 					'sql' => 'SELECT NULL FROM auditlog WHERE resourceid=',
-					'label' => 'Resource ID',
+					'label' => 'Resource ID'
 				]
 			],
 			// #2
@@ -632,7 +632,7 @@ class testPageReportsAudit extends CWebTest {
 				[
 					'table_column' => 'Recordset ID',
 					'sql' => 'SELECT NULL FROM auditlog WHERE recordsetid=',
-					'label' => 'Recordset ID',
+					'label' => 'Recordset ID'
 				]
 			]
 		];
