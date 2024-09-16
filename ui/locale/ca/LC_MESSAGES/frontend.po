@@ -3315,12 +3315,12 @@ msgstr[1] "No es pot pas importar la plantilla \"%1$s\", doncs les plantilles en
 
 #: include/classes/api/services/CItemGeneral.php:689
 #, c-format
-msgid "Cannot inherit LDD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
+msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
 msgstr "No es poden pas heretar les regles LLD la clau \"%1$s\" dels models \"%2$s\" i \"%3$s\", doncs la clau ha d'ésser única a l'equip \"%4$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:690
 #, c-format
-msgid "Cannot inherit LDD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
+msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
 msgstr "No es poden pas heretar les regles LLD la clau \"%1$s\" dels models \"%2$s\" i \"%3$s\", doncs la clau ha d'ésser única a la plantilla \"%4$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:819
