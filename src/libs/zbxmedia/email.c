@@ -297,6 +297,7 @@ static char	*smtp_prepare_payload(zbx_vector_ptr_t *from_mails, zbx_vector_ptr_t
 
 	tmp = string_replace(mailsubject, "\r\n", " ");
 	localsubject = string_replace(tmp, "\n", " ");
+	zbx_replace_invalid_utf8(localsubject);
 	zbx_free(tmp);
 
 	if (FAIL == is_ascii_string(localsubject))
@@ -317,6 +318,7 @@ static char	*smtp_prepare_payload(zbx_vector_ptr_t *from_mails, zbx_vector_ptr_t
 
 		tmp = string_replace(mailbody, "\r\n", "\n");
 		tmp_body = string_replace(tmp, "\n", "\r\n");
+		zbx_replace_invalid_utf8(tmp_body);
 		localbody = email_encode_part(tmp_body, strlen(tmp_body));
 		zbx_free(tmp_body);
 		zbx_free(tmp);
