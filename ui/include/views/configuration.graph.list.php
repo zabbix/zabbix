@@ -173,20 +173,26 @@ $graphTable = (new CTableInfo())
 $csrf_token = CCsrfTokenHelper::get('graphs.php');
 
 foreach ($data['graphs'] as $graph) {
+	$hosts = null;
 	$graphid = $graph['graphid'];
 
-	$hostList = null;
-
-	if (empty($this->data['hostid'])) {
-		$hostList = [];
+	if ($this->data['hostid'] == 0) {
 		foreach ($graph['hosts'] as $host) {
-			$hostList[$host['name']] = $host['name'];
-		}
+			if ($hosts) {
+				$hosts[] = ', ';
+			}
 
-		foreach ($graph['templates'] as $template) {
-			$hostList[$template['name']] = $template['name'];
+			$host_link = (new CLink($host['name']))
+				->setAttribute('data-hostid', $host['hostid'])
+				->addClass('js-edit-'.$data['context']);
+
+			if ($data['context'] ==='host') {
+				$hosts[] = in_array($host['hostid'], $data['editable_hosts']) ? $host_link : $host['name'];
+			}
+			else {
+				$hosts[] = $host_link;
+			}
 		}
-		$hostList = implode(', ', $hostList);
 	}
 
 	$flag = ($data['parent_discoveryid'] === null) ? ZBX_FLAG_DISCOVERY_NORMAL : ZBX_FLAG_DISCOVERY_PROTOTYPE;
@@ -246,7 +252,7 @@ foreach ($data['graphs'] as $graph) {
 
 	$graphTable->addRow([
 		new CCheckBox('group_graphid['.$graphid.']', $graphid),
-		$hostList,
+		$hosts,
 		(new CCol($name))->addClass(ZBX_STYLE_WORDBREAK),
 		$graph['width'],
 		$graph['height'],
@@ -290,7 +296,8 @@ $graphForm->addItem([
 		'checkbox_hash' => $data['parent_discoveryid'] ?? $data['hostid'],
 		'checkbox_object' => 'group_graphid',
 		'context' => $data['context'],
-		'parent_discoveryid' => $data['parent_discoveryid']
+		'parent_discoveryid' => $data['parent_discoveryid'],
+		'form_name' => $graphForm->getName()
 	]).');
 '))
 	->setOnDocumentReady()
