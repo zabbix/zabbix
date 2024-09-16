@@ -47,7 +47,8 @@ static const char	*get_agent_step_string(zbx_zabbix_agent_step_t step)
 	}
 }
 
-static int	agent_task_process(short event, void *data, int *fd, const char *addr, char *dnserr)
+static int	agent_task_process(short event, void *data, int *fd, const char *addr, char *dnserr,
+		struct event *timeout_event)
 {
 	zbx_agent_context	*agent_context = (zbx_agent_context *)data;
 	ssize_t			received_len;
@@ -58,6 +59,7 @@ static int	agent_task_process(short event, void *data, int *fd, const char *addr
 	socklen_t		optlen = sizeof(int);
 
 	ZBX_UNUSED(fd);
+	ZBX_UNUSED(timeout_event);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() step '%s' event:%d itemid:" ZBX_FS_UI64 " addr:%s", __func__,
 				get_agent_step_string(agent_context->step), event, agent_context->item.itemid,
@@ -263,7 +265,7 @@ stop:
 out:
 	zbx_tcp_send_context_clear(&agent_context->tcp_send_context);
 	if (ZABBIX_AGENT_STEP_CONNECT_INIT == agent_context->step)
-		return agent_task_process(0, data, fd, addr, dnserr);
+		return agent_task_process(0, data, fd, addr, dnserr, NULL);
 
 	return ZBX_ASYNC_TASK_STOP;
 }
