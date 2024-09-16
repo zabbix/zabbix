@@ -189,6 +189,12 @@ foreach ($data['items'] as $item) {
 
 	$disabled_by_lld = $disable_source == ZBX_DISABLE_SOURCE_LLD;
 
+	$host = $data['hostid'] == 0
+		? (new CLink($item['hosts'][0]['name']))
+			->setAttribute('data-hostid', $item['hosts'][0]['hostid'])
+			->addClass('js-edit-'.$data['context'])
+		: null;
+
 	$row = [
 		(new CCheckBox('itemids['.$item['itemid'].']', $item['itemid']))
 			->setAttribute('data-actions', $can_execute ? 'execute' : null),
@@ -200,7 +206,7 @@ foreach ($data['items'] as $item) {
 					'backurl' => $list_url
 				])
 			),
-		$data['hostid'] != 0 ? null : $item['hosts'][0]['name'],
+		$host,
 		(new CCol($name))->addClass(ZBX_STYLE_WORDBREAK),
 		$item['triggers']
 			? [
