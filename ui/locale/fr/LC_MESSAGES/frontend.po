@@ -3325,13 +3325,13 @@ msgstr[1] "Impossible d'importer le modèle \"%1$s\", les modèles liés \"%2$s\
 
 #: include/classes/api/services/CItemGeneral.php:689
 #, c-format
-msgid "Cannot inherit LDD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
-msgstr "Impossible d'hériter des règles LDD avec la clé \"%1$s\" des modèles \"%2$s\" et \"%3$s\", car la clé doit être unique sur l'hôte \"%4$s\"."
+msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
+msgstr "Impossible d'hériter des règles LLD avec la clé \"%1$s\" des modèles \"%2$s\" et \"%3$s\", car la clé doit être unique sur l'hôte \"%4$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:690
 #, c-format
-msgid "Cannot inherit LDD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
-msgstr "Impossible d'hériter des règles LDD avec la clé \"%1$s\" des modèles \"%2$s\" et \"%3$s\", car la clé doit être unique sur le modèle \"%4$s\"."
+msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
+msgstr "Impossible d'hériter des règles LLD avec la clé \"%1$s\" des modèles \"%2$s\" et \"%3$s\", car la clé doit être unique sur le modèle \"%4$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:819
 #, c-format
@@ -17588,7 +17588,7 @@ msgstr "Réessayer"
 
 #: include/classes/data/CItemData.php:997
 msgid "Return a JSON array with LLD macros describing the MBean objects or their attributes. Can be used for LLD."
-msgstr "Retourne un tableau JSON avec les macros LDD décrivant les objets MBean ou leurs attributs. Peut être utilisé pour la découverte bas niveau."
+msgstr "Retourne un tableau JSON avec les macros LLD décrivant les objets MBean ou leurs attributs. Peut être utilisé pour la découverte bas niveau."
 
 #: include/classes/data/CItemData.php:1004
 msgid "Return a JSON array with MBean objects or their attributes. Compared to jmx.discovery it does not define LLD macros. Can be used for LLD."

@@ -3238,13 +3238,13 @@ msgstr[0] "无法导入模板 \"%1$s\",被关联的模板\"%2$s\"不存在."
 
 #: include/classes/api/services/CItemGeneral.php:689
 #, c-format
-msgid "Cannot inherit LDD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
-msgstr "无法使用“%2$s”和“%3$s”模板的键“%1$s”继承 LDD 规则，键在主机“%4$s”上必须是唯一的。"
+msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
+msgstr "无法使用“%2$s”和“%3$s”模板的键“%1$s”继承 LLD 规则，键在主机“%4$s”上必须是唯一的。"
 
 #: include/classes/api/services/CItemGeneral.php:690
 #, c-format
-msgid "Cannot inherit LDD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
-msgstr "无法使用“%2$s”和“%3$s”模板的键“%1$s”继承 LDD 规则，键在模板“%4$s”上必须是唯一的。"
+msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
+msgstr "无法使用“%2$s”和“%3$s”模板的键“%1$s”继承 LLD 规则，键在模板“%4$s”上必须是唯一的。"
 
 #: include/classes/api/services/CItemGeneral.php:819
 #, c-format

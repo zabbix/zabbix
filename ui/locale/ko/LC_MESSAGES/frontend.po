@@ -3235,13 +3235,13 @@ msgstr[0] "템플릿 \"%1$s\"를 가져올 수 없습니다. 링크되어 있는
 
 #: include/classes/api/services/CItemGeneral.php:689
 #, c-format
-msgid "Cannot inherit LDD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
-msgstr "키가 호스트 \"%4$s\"에서 고유해야 하므로 \"%2$s\" 및 \"%3$s\" 템플릿의 \"%1$s\" 키를 사용하여 LDD 규칙을 상속할 수 없습니다."
+msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
+msgstr "키가 호스트 \"%4$s\"에서 고유해야 하므로 \"%2$s\" 및 \"%3$s\" 템플릿의 \"%1$s\" 키를 사용하여 LLD 규칙을 상속할 수 없습니다."
 
 #: include/classes/api/services/CItemGeneral.php:690
 #, c-format
-msgid "Cannot inherit LDD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
-msgstr "키가 템플릿 \"%4$s\"에서 고유해야 하므로 \"%2$s\" 및 \"%3$s\" 템플릿의 \"%1$s\" 키가 있는 LDD 규칙을 상속할 수 없습니다."
+msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
+msgstr "키가 템플릿 \"%4$s\"에서 고유해야 하므로 \"%2$s\" 및 \"%3$s\" 템플릿의 \"%1$s\" 키가 있는 LLD 규칙을 상속할 수 없습니다."
 
 #: include/classes/api/services/CItemGeneral.php:819
 #, c-format

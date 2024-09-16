@@ -3415,12 +3415,12 @@ msgstr[2] "Není možné importovat šablonu \"%1$s\", připojené šablony \"%2
 
 #: include/classes/api/services/CItemGeneral.php:689
 #, c-format
-msgid "Cannot inherit LDD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
+msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
 msgstr "Nelze zdědit LLD pravidla s klíčem \"%1$s\" z obou šablon \"%2$s\" a \"%3$s\", protože klíč musí být unikátní na hostu \"%4$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:690
 #, c-format
-msgid "Cannot inherit LDD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
+msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
 msgstr "Nelze zdědit LLD pravidla s klíčem \"%1$s\" z obou šablon \"%2$s\" a \"%3$s\", protože klíč musí být unikátní na šabloně \"%4$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:819
