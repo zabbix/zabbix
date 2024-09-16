@@ -1007,10 +1007,12 @@ static int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CU
 			soap_retry = ATTEMPTS_NUM;
 
 		if (shmem_free_sz < *strpool_sz + vmware_service_evt_vector_memsize(events))
+		{
 			vmware_service_clear_event_data_mem(shmem_free_sz, strpool_sz, events);
 
-		if (shmem_free_sz < *strpool_sz + vmware_service_evt_vector_memsize(events) && 0 == events->values_num)
-			break;
+			if (shmem_free_sz < *strpool_sz + vmware_service_evt_vector_memsize(events))
+				break;
+		}
 	}
 	while ((0 < (parsed_count = vmware_service_parse_event_data(events, last_key, last_ts, RETURNVAL_TAG, doc,
 			&service->eventlog, strpool_sz, &node_count, skip_old)) ||
