@@ -3326,13 +3326,13 @@ msgstr[1] "Não é possível importar o template \"%1$s\", vinculado com os temp
 
 #: include/classes/api/services/CItemGeneral.php:689
 #, c-format
-msgid "Cannot inherit LDD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
-msgstr "Não é possível herdar regras de LDD com a chave \"%1$s\" dos modelos \"%2$s\" e \"%3$s\", porque a chave deve ser exclusiva no host \"%4$s\"."
+msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
+msgstr "Não é possível herdar regras de LLD com a chave \"%1$s\" dos modelos \"%2$s\" e \"%3$s\", porque a chave deve ser exclusiva no host \"%4$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:690
 #, c-format
-msgid "Cannot inherit LDD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
-msgstr "Não é possível herdar regras de LDD com a chave \"%1$s\" dos modelos \"%2$s\" e \"%3$s\", porque a chave deve ser exclusiva no modelo \"%4$s\"."
+msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
+msgstr "Não é possível herdar regras de LLD com a chave \"%1$s\" dos modelos \"%2$s\" e \"%3$s\", porque a chave deve ser exclusiva no modelo \"%4$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:819
 #, c-format

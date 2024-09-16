@@ -3334,13 +3334,13 @@ msgstr[1] "Kan ikke importere skabelonen \"%1$s\", linkede skabeloner \"%2$s\" f
 
 #: include/classes/api/services/CItemGeneral.php:689
 #, c-format
-msgid "Cannot inherit LDD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
-msgstr "Kan ikke arve LDD-regler med nøglen \"%1$s\" til både \"%2$s\" og \"%3$s\" skabeloner, fordi nøglen skal være unik på værten \"%4$s\"."
+msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
+msgstr "Kan ikke arve LLD-regler med nøglen \"%1$s\" til både \"%2$s\" og \"%3$s\" skabeloner, fordi nøglen skal være unik på værten \"%4$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:690
 #, c-format
-msgid "Cannot inherit LDD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
-msgstr "Kan ikke arve LDD-regler med nøglen \"%1$s\" til både \"%2$s\" og \"%3$s\" skabeloner, fordi nøglen skal være unik på skabelonen \"%4$s\"."
+msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
+msgstr "Kan ikke arve LLD-regler med nøglen \"%1$s\" til både \"%2$s\" og \"%3$s\" skabeloner, fordi nøglen skal være unik på skabelonen \"%4$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:819
 #, c-format
