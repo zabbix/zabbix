@@ -3089,7 +3089,7 @@ int	zbx_vmware_job_remove(zbx_vmware_job_t *job)
 	jobs_num = --job->service->jobs_num;
 	revision = job->revision;
 
-	if (job->revision == job->service->eventlog.job_revision)
+	if (0 == job->revision || job->revision == job->service->eventlog.job_revision)
 		job->service->jobs_flag &= ~ (job->type);
 
 	vmware_shmem_vmware_job_free(job);
