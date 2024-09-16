@@ -3406,12 +3406,12 @@ msgstr[2] "Не удалось импортировать шаблон \"%1$s\",
 
 #: include/classes/api/services/CItemGeneral.php:689
 #, c-format
-msgid "Cannot inherit LDD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
+msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
 msgstr "Не удалось унаследовать LDD правила с ключом \"%1$s\" с обоих шаблонов \"%2$s\" и \"%3$s\", так как ключ должен быть уникален на узле сети \"%4$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:690
 #, c-format
-msgid "Cannot inherit LDD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
+msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
 msgstr "Не удалось унаследовать LDD правила с ключом \"%1$s\" с обоих шаблонов \"%2$s\" и \"%3$s\", так как ключ должен быть уникален у шаблона \"%4$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:819
