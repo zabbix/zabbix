@@ -93,7 +93,7 @@
 				}
 			});
 
-			document.getElementById('js-create').addEventListener('click', (e) => {
+			document.getElementById('js-create')?.addEventListener('click', (e) => {
 				this.#edit({'hostid': e.target.dataset.hostid, 'context': this.context});
 			});
 			document.getElementById('js-copy').addEventListener('click', () => this.#copy());
