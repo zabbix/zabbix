@@ -121,7 +121,8 @@ static int	vmware_job_exec(zbx_vmware_job_t *job, const char *config_source_ip, 
 {
 	int	ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() type:%s", __func__, vmware_job_type_string(job));
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() type:%s revision:%d", __func__, vmware_job_type_string(job),
+			job->revision);
 
 	if (ZBX_VMWARE_UPDATE_CONF != job->type && 0 == (job->service->state & ZBX_VMWARE_STATE_READY))
 		goto out;
@@ -203,14 +204,6 @@ static void	vmware_job_schedule(zbx_vmware_t *vmw, zbx_vmware_job_t *job, time_t
 			job->nextcheck = time_now + (0 == job->service->eventlog.interval ? perf_update_period :
 					(ZBX_VMWARE_EVENTLOG_MIN_INTERVAL > job->service->eventlog.interval ?
 					ZBX_VMWARE_EVENTLOG_MIN_INTERVAL : job->service->eventlog.interval));
-
-			/* shift events collection before calling poller */
-			if (job->nextcheck > time_now + ZBX_VMWARE_EVENTLOG_MIN_INTERVAL * 2 &&
-					job->nextcheck > (job->service->eventlog.lastaccess +
-					job->service->eventlog.interval))
-			{
-				job->nextcheck -= ZBX_VMWARE_EVENTLOG_MIN_INTERVAL;
-			}
 
 			if (job->nextcheck > time_now + ZBX_VMWARE_SERVICE_TTL)
 				job->nextcheck = time_now + ZBX_VMWARE_SERVICE_TTL;

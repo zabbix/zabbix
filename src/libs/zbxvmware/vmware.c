@@ -2805,11 +2805,13 @@ zbx_vmware_service_t	*zbx_vmware_get_service(const char* url, const char* userna
 				0 == strcmp(service->password, password))
 		{
 			service->lastaccess = now;
-			zbx_vmware_jobs_create(vmw, service);
 
 			/* return NULL if the service is not ready yet */
 			if (0 == (service->state & (ZBX_VMWARE_STATE_READY | ZBX_VMWARE_STATE_FAILED)))
 				service = NULL;
+
+			if (NULL != service)
+				zbx_vmware_jobs_create(vmw, service);
 
 			goto out;
 		}
@@ -2830,10 +2832,10 @@ zbx_vmware_service_t	*zbx_vmware_get_service(const char* url, const char* userna
 	service->eventlog.req_sz = 0;
 	service->eventlog.oom = 0;
 	service->eventlog.job_revision = 0;
-	service->jobs_num = 0;
+	memset(service->jobs_num, 0, sizeof(service->jobs_num));
 	vmware_shmem_vector_vmware_entity_tags_ptr_create_ext(&service->data_tags.entity_tags);
 	service->data_tags.error = NULL;
-	service->jobs_type = ZBX_VMWARE_REQ_UPDATE_ALL;
+	service->jobs_flag = ZBX_VMWARE_REQ_UPDATE_ALL;
 
 	vmware_shmem_service_hashset_create(service);
 
@@ -3017,6 +3019,23 @@ int	zbx_vmware_get_statistics(zbx_vmware_stats_t *stats)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: convert bitmap of job flag to job type                            *
+ *                                                                            *
+ ******************************************************************************/
+static	int vmware_job_flag2type(int req_type)
+{
+	int	i;
+
+	if (0 == req_type)
+		THIS_SHOULD_NEVER_HAPPEN;
+
+	for (i = 0; 1 < (req_type >> i); i++);
+
+	return i;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: creates job to update vmware data periodically and increase       *
  *          service ref counter                                               *
  *                                                                            *
@@ -3025,7 +3044,7 @@ int	zbx_vmware_get_statistics(zbx_vmware_stats_t *stats)
  *             job_type - [IN] vmware job type                                *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_vmware_job_create(zbx_vmware_t *vmw, zbx_vmware_service_t *service, int job_type)
+static void	zbx_vmware_job_create(zbx_vmware_t *vmw, zbx_vmware_service_t *service, int job_flag)
 {
 	zbx_vmware_job_t	*job;
 	zbx_binary_heap_elem_t	elem_new = {.key = 0};
@@ -3033,11 +3052,11 @@ static void	zbx_vmware_job_create(zbx_vmware_t *vmw, zbx_vmware_service_t *servi
 	job = vmware_shmem_vmware_job_malloc();
 	job->nextcheck = 0;
 	job->ttl = 0;
-	job->type = job_type;
-	job->revision = (ZBX_VMWARE_UPDATE_EVENTLOG == job->type) ? service->eventlog.job_revision : 0;
+	job->type = vmware_job_flag2type(job_flag);
+	job->revision = (ZBX_VMWARE_UPDATE_EVENTLOG == job->type) ? ++service->eventlog.job_revision : 0;
 	job->service = service;
-	service->jobs_num++;
-	service->jobs_type |= job_type;
+	service->jobs_num[job->type]++;
+	service->jobs_flag |= job_flag;
 	job->expired = FAIL;
 	elem_new.data = job;
 	zbx_binary_heap_insert(&vmw->jobs_queue, &elem_new);
@@ -3053,18 +3072,18 @@ static void	zbx_vmware_job_create(zbx_vmware_t *vmw, zbx_vmware_service_t *servi
  ******************************************************************************/
 static void	zbx_vmware_jobs_create(zbx_vmware_t *vmw, zbx_vmware_service_t *service)
 {
-	int	type = 0x1, jobs_type = service->jobs_type >> ZBX_VMWARE_REQ;
+	int	req_flag = 0x1, jobs_req = service->jobs_flag >> ZBX_VMWARE_REQ;
 
-	while (0 != jobs_type)
+	while (0 != jobs_req)
 	{
-		if (0 != (jobs_type & type))
+		if (0 != (jobs_req & req_flag))
 		{
-			zbx_vmware_job_create(vmw, service, type);
-			service->jobs_type &= ~ (type << ZBX_VMWARE_REQ);
-			jobs_type &= ~ type;
+			zbx_vmware_job_create(vmw, service, req_flag);
+			service->jobs_flag &= ~ (req_flag << ZBX_VMWARE_REQ);
+			jobs_req &= ~ req_flag;
 		}
 
-		type <<= 0x1;
+		req_flag <<= 0x1;
 	}
 }
 
@@ -3079,30 +3098,36 @@ static void	zbx_vmware_jobs_create(zbx_vmware_t *vmw, zbx_vmware_service_t *serv
  ******************************************************************************/
 int	zbx_vmware_job_remove(zbx_vmware_job_t *job)
 {
+#	define JOB_TYPE2FLAG(j)	(0x1 << j->type)
+
 	zbx_vmware_service_t	*service = job->service;
-	int			jobs_num, job_type;
+	int			i, jobs_num = 0, job_type, revision;
 
 	zbx_vmware_lock();
 
-	if (ZBX_VMWARE_UPDATE_EVENTLOG == job->type)
-	{
-		job->service->eventlog.lastaccess = 0;
-		job->service->eventlog.interval = 0;
-	}
-
 	job_type = job->type;
-	job->service->jobs_type &= ~ job->type;
-	job->service->jobs_num--;
-	jobs_num = job->service->jobs_num;
+	job->service->jobs_num[job->type]--;
+
+	if (0 == job->service->jobs_num[job->type])
+		job->service->jobs_flag &= ~ JOB_TYPE2FLAG(job);
+
+	for (i = 0; i < (int)ARRSIZE(job->service->jobs_num); i++)
+		jobs_num += job->service->jobs_num[i];
+
+	revision = job->revision;
 	vmware_shmem_vmware_job_free(job);
+
 	zbx_vmware_unlock();
 
 	if (0 == jobs_num)
 		zbx_vmware_service_remove(service);
 
-	zabbix_log(LOG_LEVEL_WARNING, "%s() service jobs_num:%d job_type:%X", __func__, jobs_num, job_type);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() service jobs_num:%d job_type:%X revision:%d", __func__, jobs_num,
+			job_type, revision);
 
 	return 0 == jobs_num ? 1 : 0;
+
+#	undef	JOB_TYPE2FLAG
 }
 
 /******************************************************************************
