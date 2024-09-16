@@ -6222,8 +6222,6 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 --------------------------------------------------------------------------------
 Changes for 5.0.44rc1
 
-New features:
-
 Bug fixes:
 ..F....... [ZBX-24966] fixed sorting in Map navigation tree widget (apoga)
 
