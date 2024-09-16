@@ -2832,7 +2832,7 @@ zbx_vmware_service_t	*zbx_vmware_get_service(const char* url, const char* userna
 	service->eventlog.req_sz = 0;
 	service->eventlog.oom = 0;
 	service->eventlog.job_revision = 0;
-	memset(service->jobs_num, 0, sizeof(service->jobs_num));
+	service->jobs_num = 0;
 	vmware_shmem_vector_vmware_entity_tags_ptr_create_ext(&service->data_tags.entity_tags);
 	service->data_tags.error = NULL;
 	service->jobs_flag = ZBX_VMWARE_REQ_UPDATE_ALL;
@@ -3016,24 +3016,6 @@ int	zbx_vmware_get_statistics(zbx_vmware_stats_t *stats)
 }
 
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
-
-/******************************************************************************
- *                                                                            *
- * Purpose: convert bitmap of job flag to job type                            *
- *                                                                            *
- ******************************************************************************/
-static	int vmware_job_flag2type(int req_type)
-{
-	int	i;
-
-	if (0 == req_type)
-		THIS_SHOULD_NEVER_HAPPEN;
-
-	for (i = 0; 1 < (req_type >> i); i++);
-
-	return i;
-}
-
 /******************************************************************************
  *                                                                            *
  * Purpose: creates job to update vmware data periodically and increase       *
@@ -3052,10 +3034,10 @@ static void	zbx_vmware_job_create(zbx_vmware_t *vmw, zbx_vmware_service_t *servi
 	job = vmware_shmem_vmware_job_malloc();
 	job->nextcheck = 0;
 	job->ttl = 0;
-	job->type = vmware_job_flag2type(job_flag);
+	job->type = job_flag;
 	job->revision = (ZBX_VMWARE_UPDATE_EVENTLOG == job->type) ? ++service->eventlog.job_revision : 0;
 	job->service = service;
-	service->jobs_num[job->type]++;
+	service->jobs_num++;
 	service->jobs_flag |= job_flag;
 	job->expired = FAIL;
 	elem_new.data = job;
@@ -3098,23 +3080,18 @@ static void	zbx_vmware_jobs_create(zbx_vmware_t *vmw, zbx_vmware_service_t *serv
  ******************************************************************************/
 int	zbx_vmware_job_remove(zbx_vmware_job_t *job)
 {
-#	define JOB_TYPE2FLAG(j)	(0x1 << j->type)
-
 	zbx_vmware_service_t	*service = job->service;
-	int			i, jobs_num = 0, job_type, revision;
+	int			jobs_num = 0, job_type, revision;
 
 	zbx_vmware_lock();
 
 	job_type = job->type;
-	job->service->jobs_num[job->type]--;
-
-	if (0 == job->service->jobs_num[job->type])
-		job->service->jobs_flag &= ~ JOB_TYPE2FLAG(job);
-
-	for (i = 0; i < (int)ARRSIZE(job->service->jobs_num); i++)
-		jobs_num += job->service->jobs_num[i];
-
+	jobs_num = --job->service->jobs_num;
 	revision = job->revision;
+
+	if (job->revision == job->service->eventlog.job_revision)
+		job->service->jobs_flag &= ~ (job->type);
+
 	vmware_shmem_vmware_job_free(job);
 
 	zbx_vmware_unlock();
@@ -3126,8 +3103,6 @@ int	zbx_vmware_job_remove(zbx_vmware_job_t *job)
 			job_type, revision);
 
 	return 0 == jobs_num ? 1 : 0;
-
-#	undef	JOB_TYPE2FLAG
 }
 
 /******************************************************************************

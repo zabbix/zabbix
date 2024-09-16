@@ -1223,7 +1223,7 @@ int	check_vcenter_eventlog(AGENT_REQUEST *request, const zbx_dc_item_t *item, AG
 
 	service->eventlog.lastaccess = lastaccess;
 
-	if (0 == (service->jobs_flag & ZBX_VMWARE_FLAG_UPDATE_EVENTLOG))
+	if (0 == (service->jobs_flag & ZBX_VMWARE_UPDATE_EVENTLOG))
 		service->jobs_flag |= ZBX_VMWARE_REQ_UPDATE_EVENTLOG;
 
 	if (severity != service->eventlog.severity)
