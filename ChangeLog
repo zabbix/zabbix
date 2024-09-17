@@ -1,6 +1,7 @@
 Changes for 7.2.0alpha1
 
 New features:
+..F....... [ZBXNEXT-9221] added links to host configuration forms in entity lists (esekace)
 ..F.I..... [ZBXNEXT-466] added the ability to filter audit log entries by IP (Ivo)
 .........T [ZBXNEXT-9418] split {$PG.CONNSTRING} macro in PostgreSQL templates (abrosimovs)
 ..F....... [ZBXNEXT-9122] added a warning icon for discovery checks used in action conditions (esekace)
@@ -43,6 +44,10 @@ A.F.I..PS. [ZBXNEXT-9176] removed support of Oracle DB (agriscenko, sboidenko)
 .......PS. [ZBXNEXT-8990] extended VMware event log with username (asestakovs)
 
 Bug fixes:
+.......PS. [ZBX-25176] added retry to asynchronous SNMP pollers to avoid failure if one of packets is lost (vso)
+........S. [ZBX-25238] fixed crash when deleting proxy group and proxy at same moment (vso)
+..F....... [ZBX-25239] fixed translation strings (averza)
+...G...... [ZBX-24954] added support of TLS cipher configuration to Zabbix agent 2 (wiper)
 .......PS. [ZBX-25073] added switchFrame() method to browser object (wiper)
 ........S. [ZBX-25154] added deactivation of service manager problem cache if no services are configured (wiper)
 ...G...... [ZBX-25195] fixed crash in Zabbix agent for Solaris when using 'cmdline' as a parameter for an item key (MVekslers)
@@ -266,6 +271,7 @@ A......... [ZBX-24299] fixed possibility to alter readonly error fields with Hos
 Changes for 7.0.4rc1
 
 New features:
+..F....... [ZBXNEXT-9221] added links to host configuration forms in entity lists (esekace)
 ..F.I..... [ZBXNEXT-466] added the ability to filter audit log entries by IP (Ivo)
 .........T [ZBXNEXT-9418] split {$PG.CONNSTRING} macro in PostgreSQL templates (abrosimovs)
 ..F.I...S. [ZBXNEXT-9208] implemented new macro functions and support for macro functions, JSONPath and XPath extractions in web scenario steps (esekace, sboidenko)
@@ -281,6 +287,10 @@ New features:
 .........T [ZBXNEXT-9341] added assume role authorization in AWS templates (egordymov)
 
 Bug fixes:
+........S. [ZBX-25238] fixed crash when deleting proxy group and proxy at same moment (vso)
+.......PS. [ZBX-25176] added retry to asynchronous SNMP pollers to avoid failure if one of packets is lost (vso)
+..F....... [ZBX-25239] fixed translation strings (averza)
+...G...... [ZBX-24954] added support of TLS cipher configuration to Zabbix agent 2 (wiper)
 ........S. [ZBX-25154] added deactivation of service manager problem cache if no services are configured (wiper)
 .......PS. [ZBX-25073] added switchFrame() method to browser object (wiper)
 ...G...... [ZBX-25195] fixed crash in Zabbix agent for Solaris when using 'cmdline' as a parameter for an item key (MVekslers)
