@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-08-19 05:58+0000\n"
-"Last-Translator: Akira <g42getd@gmail.com>\n"
+"PO-Revision-Date: 2024-08-31 15:59+0000\n"
+"Last-Translator: Atsushi Tanaka <kha00760@nifty.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -934,7 +934,7 @@ msgstr "新しいウィジェットを追加"
 
 #: widgets/navtree/Widget.php:34
 msgid "Add child element"
-msgstr ""
+msgstr "子の要素を追加"
 
 #: widgets/navtree/Widget.php:39
 msgid "Add child elements"
@@ -973,7 +973,7 @@ msgstr "ホストトリガーを追加"
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:260
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:263
 msgid "Add item"
-msgstr ""
+msgstr "アイテムを追加"
 
 #: app/partials/massupdate.macros.tab.php:96
 #: app/partials/massupdate.valuemaps.tab.php:38
@@ -1857,7 +1857,7 @@ msgstr "稼働レポート"
 #: app/controllers/CControllerAvailabilityReportTrigger.php:70
 #: app/views/reports.availabilityreport.trigger.php:23
 msgid "Availability report graph"
-msgstr ""
+msgstr "稼働レポートグラフ"
 
 #: include/classes/html/CHostAvailability.php:80
 #: widgets/hostavail/views/widget.view.php:32
@@ -4262,7 +4262,7 @@ msgstr "XML内のエラーチェック"
 
 #: include/items.inc.php:1622
 msgid "Check for error using regular expression"
-msgstr "正規表現使用時のエラーチェック"
+msgstr "正規表現によるエラーチェック"
 
 #: include/items.inc.php:1626
 msgid "Check for not supported value"
@@ -13506,7 +13506,7 @@ msgstr "月曜"
 
 #: app/views/configuration.host.list.php:145
 msgid "Monitored by"
-msgstr "監視するもの"
+msgstr "監視元"
 
 #: app/partials/configuration.host.edit.html.php:255
 #: app/views/popup.massupdate.host.php:124
@@ -19348,7 +19348,7 @@ msgstr "資格情報保存先"
 #: include/views/configuration.item.prototype.edit.php:840
 #: include/views/configuration.item.prototype.edit.php:855
 msgid "Store up to"
-msgstr ""
+msgstr "保存期間"
 
 #: include/classes/setup/CSetupWizard.php:755
 #: include/classes/setup/CSetupWizard.php:756
@@ -20178,6 +20178,12 @@ msgstr "テーマ"
 #: app/views/mediatype.edit.php:189 app/views/mediatype.test.edit.php:48
 msgid "These parameters will be passed to the script as command-line arguments in the specified order."
 msgstr "これらのパラメーターは、指定された順序でコマンドライン引数としてスクリプトに渡されます。"
+
+#: app/controllers/CControllerDiscoveryEdit.php:175
+#, c-format
+msgid "This check cannot be removed, as it is used as a condition in %1$s discovery action."
+msgid_plural "This check cannot be removed, as it is used as a condition in %1$s discovery actions."
+msgstr[0] ""
 
 #: include/func.inc.php:2566
 msgid "This day last week"
@@ -21669,7 +21675,7 @@ msgstr ""
 
 #: app/partials/configuration.host.interface.row.php:222
 msgid "Use combined requests"
-msgstr "組み合わせたリクエストの使用"
+msgstr "複数データの一括取得を使用"
 
 #: app/views/administration.trigdisplay.edit.php:36
 msgid "Use custom event status colors"
@@ -22244,6 +22250,10 @@ msgstr ""
 msgid "VMware hypervisor health state rollup sensor, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns 0 - gray; 1 - green; 2 - yellow; 3 - red"
 msgstr ""
 
+#: include/classes/data/CItemData.php:2237
+msgid "VMware hypervisor maintenance status, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns 0 - not in maintenance; 1 - in maintenance"
+msgstr ""
+
 #: include/classes/data/CItemData.php:2051
 msgid "VMware hypervisor model, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
 msgstr ""
@@ -22378,6 +22388,10 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:2387
 msgid "VMware virtual machine host memory usage, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
+#: include/classes/data/CItemData.php:2482
+msgid "VMware virtual machine hypervisor maintenance status, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier. Returns 0 - not in maintenance; 1 - in maintenance"
 msgstr ""
 
 #: include/classes/data/CItemData.php:2331
@@ -23003,7 +23017,7 @@ msgstr "指定された列と行の数に対してウィジェットが小さす
 
 #: jsLoader.php:205
 msgid "Widgets"
-msgstr ""
+msgstr "ウィジェット"
 
 #: graphs.php:39 include/views/configuration.graph.edit.php:100
 #: include/views/configuration.graph.list.php:170
@@ -23671,7 +23685,7 @@ msgstr "すべてのメディア"
 #: include/classes/screens/CScreenDiscovery.php:207
 #: include/discovery.inc.php:84
 msgid "allow redirect"
-msgstr ""
+msgstr "リダイレクトを許可"
 
 #: include/classes/api/services/CItemGeneral.php:2114
 msgid "allowed count of dependency levels would be exceeded"
@@ -23687,7 +23701,7 @@ msgstr "IPアドレスを指定してください"
 
 #: include/classes/validators/CApiInputValidator.php:2807
 msgid "an IP or DNS is expected"
-msgstr ""
+msgstr "IPアドレスかDNS名を指定してください"
 
 #: include/classes/api/services/CDRule.php:495
 #: include/classes/api/services/CDRule.php:502
@@ -23718,7 +23732,7 @@ msgstr "配列かオブジェクトで指定してください"
 
 #: include/classes/api/services/CUser.php:990
 msgid "an email address is expected"
-msgstr ""
+msgstr "メールアドレスを指定してください"
 
 #: include/classes/import/validators/C10XmlValidator.php:363
 #: include/classes/import/validators/C10XmlValidator.php:386
@@ -23815,7 +23829,7 @@ msgstr "少なくとも1つの曜日を選択する必要があります"
 #: widgets/gauge/includes/WidgetForm.php:137
 #: widgets/item/includes/WidgetForm.php:90
 msgid "at least one option must be selected"
-msgstr ""
+msgstr "少なくとも1つのオプションが選択されている必要があります"
 
 #: widgets/svggraph/includes/CWidgetFieldOverride.php:87
 msgid "at least one override option must be specified"

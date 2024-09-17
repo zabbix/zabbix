@@ -966,6 +966,7 @@ typedef struct
 	unsigned int		auto_registration_actions;	/* number of enabled auto resistration actions */
 
 	zbx_dc_revision_t	revision;
+	int		        itservices_num;
 
 	/* maintenance processing management */
 	unsigned char		maintenance_update;		/* flag to trigger maintenance update by timers  */

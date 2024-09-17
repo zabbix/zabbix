@@ -3427,13 +3427,13 @@ msgstr[2] "Не вдалося імпортувати шаблон \"%1$s\", п�
 
 #: include/classes/api/services/CItemGeneral.php:689
 #, c-format
-msgid "Cannot inherit LDD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
-msgstr "Неможливо успадкувати правила LDD із ключем \"%1$s\" обох шаблонів \"%2$s\" і \"%3$s\", оскільки ключ має бути унікальним на хості \"%4$s\"."
+msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
+msgstr "Неможливо успадкувати правила LLD із ключем \"%1$s\" обох шаблонів \"%2$s\" і \"%3$s\", оскільки ключ має бути унікальним на хості \"%4$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:690
 #, c-format
-msgid "Cannot inherit LDD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
-msgstr "Неможливо успадкувати правила LDD із ключем \"%1$s\" обох шаблонів \"%2$s\" і \"%3$s\", оскільки ключ має бути унікальним у шаблоні \"%4$s\"."
+msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
+msgstr "Неможливо успадкувати правила LLD із ключем \"%1$s\" обох шаблонів \"%2$s\" і \"%3$s\", оскільки ключ має бути унікальним у шаблоні \"%4$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:819
 #, c-format
@@ -20549,6 +20549,14 @@ msgstr "Тема інтерфейсу"
 msgid "These parameters will be passed to the script as command-line arguments in the specified order."
 msgstr ""
 
+#: app/controllers/CControllerDiscoveryEdit.php:175
+#, c-format
+msgid "This check cannot be removed, as it is used as a condition in %1$s discovery action."
+msgid_plural "This check cannot be removed, as it is used as a condition in %1$s discovery actions."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
 #: include/func.inc.php:2566
 msgid "This day last week"
 msgstr "Цей день попереднього тижня"
@@ -22643,6 +22651,10 @@ msgstr ""
 msgid "VMware hypervisor health state rollup sensor, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns 0 - gray; 1 - green; 2 - yellow; 3 - red"
 msgstr ""
 
+#: include/classes/data/CItemData.php:2237
+msgid "VMware hypervisor maintenance status, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns 0 - not in maintenance; 1 - in maintenance"
+msgstr ""
+
 #: include/classes/data/CItemData.php:2051
 msgid "VMware hypervisor model, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
 msgstr ""
@@ -22777,6 +22789,10 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:2387
 msgid "VMware virtual machine host memory usage, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
+#: include/classes/data/CItemData.php:2482
+msgid "VMware virtual machine hypervisor maintenance status, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier. Returns 0 - not in maintenance; 1 - in maintenance"
 msgstr ""
 
 #: include/classes/data/CItemData.php:2331
