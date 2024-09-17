@@ -20,7 +20,6 @@ require_once dirname(__FILE__).'/../behaviors/CWidgetBehavior.php';
 require_once dirname(__FILE__).'/../common/testWidgets.php';
 
 /**
- *
  * @onBefore prepareData
  */
 class testDashboardWidgetCommunication extends testWidgets {
@@ -2580,7 +2579,7 @@ class testDashboardWidgetCommunication extends testWidgets {
 							'Trapper item' => '3'
 						],
 						'Geomap listener' => [
-						self::GEOMAP_FILTERED_ICON_INDEX => [
+							self::GEOMAP_FILTERED_ICON_INDEX => [
 								'Host' => self::FIRST_HOST_NAME,
 								'I' => '1'
 							]
@@ -2641,7 +2640,7 @@ class testDashboardWidgetCommunication extends testWidgets {
 							'Trapper item' => '5'
 						],
 						'Geomap listener' => [
-						self::GEOMAP_FILTERED_ICON_INDEX => [
+							self::GEOMAP_FILTERED_ICON_INDEX => [
 								'Host' => self::THIRD_HOST_NAME,
 								'H' => '1'
 							]
@@ -2702,7 +2701,7 @@ class testDashboardWidgetCommunication extends testWidgets {
 							'Trapper item' => '4'
 						],
 						'Geomap listener' => [
-						self::GEOMAP_FILTERED_ICON_INDEX => [
+							self::GEOMAP_FILTERED_ICON_INDEX => [
 								'Host' => self::SECOND_HOST_NAME,
 								'W' => '1'
 							]
@@ -2763,7 +2762,7 @@ class testDashboardWidgetCommunication extends testWidgets {
 							'Trapper item' => '5'
 						],
 						'Geomap listener' => [
-						self::GEOMAP_FILTERED_ICON_INDEX => [
+							self::GEOMAP_FILTERED_ICON_INDEX => [
 								'Host' => self::THIRD_HOST_NAME,
 								'H' => '1'
 							]
@@ -2824,7 +2823,7 @@ class testDashboardWidgetCommunication extends testWidgets {
 							'Trapper item' => '3'
 						],
 						'Geomap listener' => [
-						self::GEOMAP_FILTERED_ICON_INDEX => [
+							self::GEOMAP_FILTERED_ICON_INDEX => [
 								'Host' => self::FIRST_HOST_NAME,
 								'I' => '1'
 							]
@@ -2885,7 +2884,7 @@ class testDashboardWidgetCommunication extends testWidgets {
 							'Trapper item' => '4'
 						],
 						'Geomap listener' => [
-						self::GEOMAP_FILTERED_ICON_INDEX => [
+							self::GEOMAP_FILTERED_ICON_INDEX => [
 								'Host' => self::SECOND_HOST_NAME,
 								'W' => '1'
 							]
@@ -2946,7 +2945,7 @@ class testDashboardWidgetCommunication extends testWidgets {
 							'Trapper item' => '3'
 						],
 						'Geomap listener' => [
-						self::GEOMAP_FILTERED_ICON_INDEX => [
+							self::GEOMAP_FILTERED_ICON_INDEX => [
 								'Host' => self::FIRST_HOST_NAME,
 								'I' => '1'
 							]
@@ -2993,7 +2992,7 @@ class testDashboardWidgetCommunication extends testWidgets {
 							'Trapper item' => '4'
 						],
 						'Geomap listener' => [
-						self::GEOMAP_FILTERED_ICON_INDEX => [
+							self::GEOMAP_FILTERED_ICON_INDEX => [
 								'Host' => self::SECOND_HOST_NAME,
 								'W' => '1'
 							]
@@ -3040,7 +3039,7 @@ class testDashboardWidgetCommunication extends testWidgets {
 							'Trapper item' => '5'
 						],
 						'Geomap listener' => [
-						self::GEOMAP_FILTERED_ICON_INDEX => [
+							self::GEOMAP_FILTERED_ICON_INDEX => [
 								'Host' => self::THIRD_HOST_NAME,
 								'H' => '1'
 							]
@@ -3087,7 +3086,7 @@ class testDashboardWidgetCommunication extends testWidgets {
 							'Trapper item' => '3'
 						],
 						'Geomap listener' => [
-						self::GEOMAP_FILTERED_ICON_INDEX => [
+							self::GEOMAP_FILTERED_ICON_INDEX => [
 								'Host' => self::FIRST_HOST_NAME,
 								'I' => '1'
 							]
@@ -3134,7 +3133,7 @@ class testDashboardWidgetCommunication extends testWidgets {
 							'Trapper item' => '4'
 						],
 						'Geomap listener' => [
-						self::GEOMAP_FILTERED_ICON_INDEX => [
+							self::GEOMAP_FILTERED_ICON_INDEX => [
 								'Host' => self::SECOND_HOST_NAME,
 								'W' => '1'
 							]
@@ -3181,7 +3180,7 @@ class testDashboardWidgetCommunication extends testWidgets {
 							'Trapper item' => '5'
 						],
 						'Geomap listener' => [
-						self::GEOMAP_FILTERED_ICON_INDEX => [
+							self::GEOMAP_FILTERED_ICON_INDEX => [
 								'Host' => self::THIRD_HOST_NAME,
 								'H' => '1'
 							]
@@ -3235,7 +3234,7 @@ class testDashboardWidgetCommunication extends testWidgets {
 							'Trapper item' => '3'
 						],
 						'Geomap listener' => [
-						self::GEOMAP_FILTERED_ICON_INDEX => [
+							self::GEOMAP_FILTERED_ICON_INDEX => [
 								'Host' => self::FIRST_HOST_NAME,
 								'I' => '1'
 							]
@@ -3282,7 +3281,7 @@ class testDashboardWidgetCommunication extends testWidgets {
 							'Trapper item' => '4'
 						],
 						'Geomap listener' => [
-						self::GEOMAP_FILTERED_ICON_INDEX => [
+							self::GEOMAP_FILTERED_ICON_INDEX => [
 								'Host' => self::SECOND_HOST_NAME,
 								'W' => '1'
 							]
@@ -3329,7 +3328,7 @@ class testDashboardWidgetCommunication extends testWidgets {
 							'Trapper item' => '5'
 						],
 						'Geomap listener' => [
-						self::GEOMAP_FILTERED_ICON_INDEX => [
+							self::GEOMAP_FILTERED_ICON_INDEX => [
 								'Host' => self::THIRD_HOST_NAME,
 								'H' => '1'
 							]
@@ -3376,7 +3375,7 @@ class testDashboardWidgetCommunication extends testWidgets {
 							'Trapper item' => '3'
 						],
 						'Geomap listener' => [
-						self::GEOMAP_FILTERED_ICON_INDEX => [
+							self::GEOMAP_FILTERED_ICON_INDEX => [
 								'Host' => self::FIRST_HOST_NAME,
 								'I' => '1'
 							]
