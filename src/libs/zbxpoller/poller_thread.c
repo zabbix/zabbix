@@ -288,7 +288,7 @@ static int	macro_jmx_endpoint_resolv(zbx_macro_resolv_data_t *p, va_list args, c
 		}
 		else if (0 == strcmp(p->macro, MVAR_HOST_NAME))
 		{
-				*replace_with = zbx_strdup(*replace_with, dc_item->host.name);
+			*replace_with = zbx_strdup(*replace_with, dc_item->host.name);
 		}
 		else if (0 == strcmp(p->macro, MVAR_HOST_IP) || 0 == strcmp(p->macro, MVAR_IPADDRESS))
 		{
