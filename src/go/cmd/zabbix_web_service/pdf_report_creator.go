@@ -188,25 +188,12 @@ func (h *handler) report(w http.ResponseWriter, r *http.Request) {
 
 	chromedp.ListenTarget(ctx, func(ev any) {
 		failEvent, ok := ev.(*network.EventLoadingFailed)
-		if !ok || failEvent.ErrorText == "" || len(errEvtC) == cap(errEvtC) {
+		if !ok {
 			return
 		}
 
-		if failEvent.ErrorText == netErrCertAuthorityInvalid {
-			errEvtC <- fmt.Sprintf(
-				"Invalid certificate authority detected while loading dashboard: '%s'. Fix TLS "+
-					"configuration or configure Zabbix web service to ignore TLS certificate "+
-					"errors when accessing frontend URL.",
-				u.String(),
-			)
-
-			return
-		}
-
-		errEvtC <- fmt.Sprintf(
-			"received network.EventLoadingFailed '%s' event while loading dashboard",
-			failEvent.ErrorText,
-		)
+		errEvtC <- failEvent.ErrorText
+		cancel()
 	})
 
 	var buf []byte
@@ -230,12 +217,29 @@ func (h *handler) report(w http.ResponseWriter, r *http.Request) {
 		}),
 	})
 
-	if len(errEvtC) != 0 {
-		logAndWriteError(w, <-errEvtC, http.StatusInternalServerError)
+	if errors.Is(err, context.Canceled) && len(errEvtC) > 0 {
+		errStr := <-errEvtC
 
-		if err != nil {
-			log.Errf("%s", err.Error())
+		switch errStr {
+		case netErrCertAuthorityInvalid:
+			errStr = fmt.Sprintf(
+				"Invalid certificate authority detected while loading dashboard: '%s'. Fix TLS "+
+					"configuration or configure Zabbix web service to ignore TLS certificate "+
+					"errors when accessing frontend URL.",
+				u.String(),
+			)
+		case "":
+			errStr = "network.EventLoadingFailed event with empty ErrorText was received while loading " +
+				"dashboard."
+		default:
+			errStr = fmt.Sprintf(
+				"network.EventLoadingFailed event with ErrorText = '%s' was received while loading "+
+					"dashboard.",
+				errStr,
+			)
 		}
+
+		logAndWriteError(w, errStr, http.StatusInternalServerError)
 
 		return
 	}
