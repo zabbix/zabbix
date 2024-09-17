@@ -180,7 +180,7 @@ class testHost extends CAPITest {
 						'tls_psk' => '5fce1b3e34b520afeffb37ce08c7cd66'
 					]
 				],
-				'expected_error' => 'Incorrect value for field "tls_psk_identity": cannot be empty.'
+				'expected_error' => 'Invalid parameter "/1": the parameter "tls_psk_identity" is missing.'
 			],
 			'Field "tls_psk_identity" cannot be empty when "tls_connect" is HOST_ENCRYPTION_PSK' => [
 				'host' => [
@@ -191,7 +191,7 @@ class testHost extends CAPITest {
 						'tls_psk_identity' => ''
 					]
 				],
-				'expected_error' => 'Incorrect value for field "tls_psk_identity": cannot be empty.'
+				'expected_error' => 'Invalid parameter "/1/tls_psk_identity": cannot be empty.'
 			],
 			'Field "tls_psk_identity" cannot be set when "tls_connect" is not set to HOST_ENCRYPTION_PSK' => [
 				'host' => [
@@ -201,7 +201,7 @@ class testHost extends CAPITest {
 						'tls_psk_identity' => 'identity'
 					]
 				],
-				'expected_error' => 'Incorrect value for field "tls_psk_identity": should be empty.'
+				'expected_error' => 'Invalid parameter "/1/tls_psk_identity": value must be empty.'
 			],
 			'Field "tls_psk_identity" is required when "tls_accept" HOST_ENCRYPTION_PSK flag is set' => [
 				'host' => [
@@ -212,7 +212,7 @@ class testHost extends CAPITest {
 						'tls_psk' => '5fce1b3e34b520afeffb37ce08c7cd66'
 					]
 				],
-				'expected_error' => 'Incorrect value for field "tls_psk_identity": cannot be empty.'
+				'expected_error' => 'Invalid parameter "/1": the parameter "tls_psk_identity" is missing.'
 			],
 			'Field "tls_psk_identity" cannot be empty when "tls_accept" HOST_ENCRYPTION_PSK flag is set' => [
 				'host' => [
@@ -223,7 +223,7 @@ class testHost extends CAPITest {
 						'tls_psk_identity' => ''
 					]
 				],
-				'expected_error' => 'Incorrect value for field "tls_psk_identity": cannot be empty.'
+				'expected_error' => 'Invalid parameter "/1/tls_psk_identity": cannot be empty.'
 			],
 			'Field "tls_psk" is required when "tls_connect" is HOST_ENCRYPTION_PSK' => [
 				'host' => [
@@ -234,7 +234,7 @@ class testHost extends CAPITest {
 						'tls_psk_identity' => 'example'
 					]
 				],
-				'expected_error' => 'Incorrect value for field "tls_psk": cannot be empty.'
+				'expected_error' => 'Invalid parameter "/1": the parameter "tls_psk" is missing.'
 			],
 			'Field "tls_psk" cannot be empty when "tls_connect" is HOST_ENCRYPTION_PSK' => [
 				'host' => [
@@ -246,7 +246,7 @@ class testHost extends CAPITest {
 						'tls_psk' => ''
 					]
 				],
-				'expected_error' => 'Incorrect value for field "tls_psk": cannot be empty.'
+				'expected_error' => 'Invalid parameter "/1/tls_psk": cannot be empty.'
 			],
 			'Field "tls_psk" cannot be set when "tls_connect" is not set to HOST_ENCRYPTION_PSK' => [
 				'host' => [
@@ -256,7 +256,7 @@ class testHost extends CAPITest {
 						'tls_psk' => '5fce1b3e34b520afeffb37ce08c7cd66'
 					]
 				],
-				'expected_error' => 'Incorrect value for field "tls_psk": should be empty.'
+				'expected_error' => 'Invalid parameter "/1/tls_psk": value must be empty.'
 			],
 			'Field "tls_psk" is required when "tls_accept" HOST_ENCRYPTION_PSK flag is set' => [
 				'host' => [
@@ -267,7 +267,7 @@ class testHost extends CAPITest {
 						'tls_psk_identity' => 'example'
 					]
 				],
-				'expected_error' => 'Incorrect value for field "tls_psk": cannot be empty.'
+				'expected_error' => 'Invalid parameter "/1": the parameter "tls_psk" is missing.'
 			],
 			'Field "tls_psk" cannot be empty when "tls_accept" HOST_ENCRYPTION_PSK flag is set' => [
 				'host' => [
@@ -279,7 +279,7 @@ class testHost extends CAPITest {
 						'tls_psk' => ''
 					]
 				],
-				'expected_error' => 'Incorrect value for field "tls_psk": cannot be empty.'
+				'expected_error' => 'Invalid parameter "/1/tls_psk": cannot be empty.'
 			],
 			'Field "tls_psk" should have correct format' => [
 				'host' => [
@@ -291,7 +291,7 @@ class testHost extends CAPITest {
 						'tls_psk' => 'fb48829a6f9ebbb70294a75ca09167rr'
 					]
 				],
-				'expected_error' => 'Incorrect value for field "tls_psk": an even number of hexadecimal characters is expected.'
+				'expected_error' => 'Invalid parameter "/1/tls_psk": an even number of hexadecimal characters is expected.'
 			],
 			'Field "tls_psk" cannot have different values for same "tls_psk_identity"' => [
 				'host' => [
@@ -310,7 +310,7 @@ class testHost extends CAPITest {
 						'tls_psk' => 'fb48829a6f9ebbb70294a75ca0916772'
 					]
 				],
-				'expected_error' => 'Incorrect value for field "/2/tls_psk": another value of tls_psk exists for same tls_psk_identity.'
+				'expected_error' => 'Invalid parameter "/2/tls_psk": another tls_psk value is already associated with given tls_psk_identity.'
 			],
 			'Field "tls_psk" cannot have different values for same "tls_psk_identity" with database check' => [
 				'host' => [
@@ -322,7 +322,7 @@ class testHost extends CAPITest {
 						'tls_psk' => '5fce1b3e34b520afeffb37ce08c7cd66'
 					]
 				],
-				'expected_error' => 'Incorrect value for field "/1/tls_psk": another value of tls_psk exists for same tls_psk_identity.'
+				'expected_error' => 'Invalid parameter "/1/tls_psk": another tls_psk value is already associated with given tls_psk_identity.'
 			],
 			'Field "tls_psk_identity" should have same value of "tls_psk" across all hosts and autoregistration' => [
 				'host' => [
@@ -334,7 +334,7 @@ class testHost extends CAPITest {
 						'tls_psk' => '5fce1b3e34b520afeffb37ce08c7cd66'
 					]
 				],
-				'expected_error' => 'Incorrect value for field "/1/tls_psk": another value of tls_psk exists for same tls_psk_identity.'
+				'expected_error' => 'Invalid parameter "/1/tls_psk": another tls_psk value is already associated with given tls_psk_identity.'
 			]
 		];
 	}
@@ -568,79 +568,79 @@ class testHost extends CAPITest {
 				'host' => [
 					['hostid' => ':host:psk1.example.com', 'tls_psk_identity' => '']
 				],
-				'expected_error' => 'Incorrect value for field "tls_psk_identity": cannot be empty.'
+				'expected_error' => 'Invalid parameter "/1/tls_psk_identity": cannot be empty.'
 			],
 			'Field "tls_psk" cannot have different values for same "tls_psk_identity" on change "tls_psk_identity"' => [
 				'host' => [
 					['hostid' => ':host:psk3.example.com', 'tls_psk_identity' => 'example.com']
 				],
-				'expected_error' => 'Incorrect value for field "/1/tls_psk": another value of tls_psk exists for same tls_psk_identity.'
+				'expected_error' => 'Invalid parameter "/1/tls_psk": another tls_psk value is already associated with given tls_psk_identity.'
 			],
 			'Field "tls_psk" cannot be empty when "tls_connect" is HOST_ENCRYPTION_PSK' => [
 				'host' => [
 					['hostid' => ':host:psk1.example.com', 'tls_psk' => '']
 				],
-				'expected_error' => 'Incorrect value for field "tls_psk": cannot be empty.'
+				'expected_error' => 'Invalid parameter "/1/tls_psk": cannot be empty.'
 			],
 			'Field "tls_psk" cannot have different values for same "tls_psk_identity" on change "tls_psk"' => [
 				'host' => [
 					['hostid' => ':host:psk1.example.com', 'tls_psk' => 'de4f735c561e5444b0932f7ebd636b85']
 				],
-				'expected_error' => 'Incorrect value for field "/1/tls_psk": another value of tls_psk exists for same tls_psk_identity.'
+				'expected_error' => 'Invalid parameter "/1/tls_psk": another tls_psk value is already associated with given tls_psk_identity.'
 			],
 			'Field "tls_psk_identity" should have same value of "tls_psk" across all hosts and autoregistration' => [
 				'host' => [
 					['hostid' => ':host:psk1.example.com', 'tls_psk_identity' => 'autoregistration']
 				],
-				'expected_error' => 'Incorrect value for field "/1/tls_psk": another value of tls_psk exists for same tls_psk_identity.'
+				'expected_error' => 'Invalid parameter "/1/tls_psk": another tls_psk value is already associated with given tls_psk_identity.'
 			],
 			'Field "tls_psk" only default value is allowed when host "tls_connect" != HOST_ENCRYPTION_PSK' => [
 				'host' => [
 					['hostid' => ':host:psk3.example.com', 'tls_psk' => 'de4f735c561e5444b0932f7ebd636b85', 'tls_connect' => HOST_ENCRYPTION_NONE]
 				],
-				'expected_error' => 'Incorrect value for field "tls_psk": should be empty.'
+				'expected_error' => 'Invalid parameter "/1/tls_psk": value must be empty.'
 			],
 			'Field "tls_psk" only default value is allowed when host "tls_accept" != HOST_ENCRYPTION_PSK' => [
 				'host' => [
 					['hostid' => ':host:psk4.example.com', 'tls_psk' => 'de4f735c561e5444b0932f7ebd636b85', 'tls_accept' => HOST_ENCRYPTION_NONE]
 				],
-				'expected_error' => 'Incorrect value for field "tls_psk": should be empty.'
+				'expected_error' => 'Invalid parameter "/1/tls_psk": value must be empty.'
 			],
 			'Field "tls_psk_identity" only default value is allowed when host "tls_connect" != HOST_ENCRYPTION_PSK' => [
 				'host' => [
 					['hostid' => ':host:psk3.example.com', 'tls_psk_identity' => 'psk3.example.com', 'tls_connect' => HOST_ENCRYPTION_NONE]
 				],
-				'expected_error' => 'Incorrect value for field "tls_psk_identity": should be empty.'
+				'expected_error' => 'Invalid parameter "/1/tls_psk_identity": value must be empty.'
 			],
 			'Field "tls_psk_identity" only default value is allowed when host "tls_accept" != HOST_ENCRYPTION_PSK' => [
 				'host' => [
 					['hostid' => ':host:psk4.example.com', 'tls_psk_identity' => 'psk4.example.com', 'tls_accept' => HOST_ENCRYPTION_NONE]
 				],
-				'expected_error' => 'Incorrect value for field "tls_psk_identity": should be empty.'
+				'expected_error' => 'Invalid parameter "/1/tls_psk_identity": value must be empty.'
 			],
 			'Field "tls_issuer" only default value is allowed when host "tls_connect" != HOST_ENCRYPTION_CERTIFICATE' => [
 				'host' => [
 					['hostid' => ':host:psk3.example.com', 'tls_issuer' => 'psk4.example.com', 'tls_connect' => HOST_ENCRYPTION_NONE]
 				],
-				'expected_error' => 'Incorrect value for field "tls_issuer": should be empty.'
+				'expected_error' => 'Invalid parameter "/1/tls_issuer": value must be empty.'
 			],
 			'Field "tls_issuer" only default value is allowed when host "tls_accept" != HOST_ENCRYPTION_CERTIFICATE' => [
 				'host' => [
 					['hostid' => ':host:psk4.example.com', 'tls_issuer' => 'psk4.example.com', 'tls_accept' => HOST_ENCRYPTION_NONE]
 				],
-				'expected_error' => 'Incorrect value for field "tls_issuer": should be empty.'
+				'expected_error' => 'Invalid parameter "/1/tls_issuer": value must be empty.'
 			],
 			'Field "tls_subject" only default value is allowed when host "tls_connect" != HOST_ENCRYPTION_CERTIFICATE' => [
 				'host' => [
 					['hostid' => ':host:psk3.example.com', 'tls_subject' => 'psk4.example.com', 'tls_connect' => HOST_ENCRYPTION_NONE]
 				],
-				'expected_error' => 'Incorrect value for field "tls_subject": should be empty.'
+				'expected_error' => 'Invalid parameter "/1/tls_subject": value must be empty.'
 			],
 			'Field "tls_subject" only default value is allowed when host "tls_accept" != HOST_ENCRYPTION_CERTIFICATE' => [
 				'host' => [
 					['hostid' => ':host:psk4.example.com', 'tls_subject' => 'psk4.example.com', 'tls_accept' => HOST_ENCRYPTION_NONE]
 				],
-				'expected_error' => 'Incorrect value for field "tls_subject": should be empty.'
+				'expected_error' => 'Invalid parameter "/1/tls_subject": value must be empty.'
 			]
 		];
 	}

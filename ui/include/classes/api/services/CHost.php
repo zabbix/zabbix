@@ -809,9 +809,7 @@ class CHost extends CHostGeneral {
 		}
 		unset($host);
 
-		$hosts = $this->extendObjectsByKey($hosts, $db_hosts, 'hostid', ['tls_connect', 'tls_accept', 'tls_issuer',
-			'tls_subject', 'tls_psk_identity', 'tls_psk'
-		]);
+		$tls_psk_fields = array_flip(['tls_psk_identity', 'tls_psk']);
 
 		foreach ($hosts as $host) {
 			// Extend host inventory with the required data.
@@ -824,9 +822,13 @@ class CHost extends CHostGeneral {
 				}
 			}
 
+			if ($host['tls_connect'] == HOST_ENCRYPTION_PSK || $host['tls_accept'] & HOST_ENCRYPTION_PSK) {
+				$host += array_intersect_key($db_hosts[$host['hostid']], $tls_psk_fields);
+			}
+
 			$data = $host;
 			$data['hosts'] = ['hostid' => $host['hostid']];
-			$result = $this->massUpdate($data);
+			$result = $this->massUpdate($data, ['skip_tls_psk_pair_check' => true]);
 
 			if (!$result) {
 				self::exception(ZBX_API_ERROR_INTERNAL, _('Host update failed.'));
@@ -898,7 +900,23 @@ class CHost extends CHostGeneral {
 	 *
 	 * @return boolean
 	 */
-	public function massUpdate($data) {
+	public function massUpdate(array $data, array $options = []): array {
+		$tls_fields =
+			array_flip(['tls_connect', 'tls_accept', 'tls_psk_identity', 'tls_psk', 'tls_issuer', 'tls_subject']);
+
+		if (array_intersect_key($data, $tls_fields)
+				&& (!array_key_exists('tls_connect', $data) || !array_key_exists('tls_accept', $data))) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS,
+				_('Cannot update host encryption settings. Connection settings for both directions should be specified.')
+			);
+		}
+
+		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => self::getValidationFields(true, true)];
+
+		if (!CApiInputValidator::validate($api_input_rules, $data, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
 		if (!array_key_exists('hosts', $data) || !is_array($data['hosts'])) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Field "%1$s" is mandatory.', 'hosts'));
 		}
@@ -909,20 +927,27 @@ class CHost extends CHostGeneral {
 
 		sort($hostids);
 
-		$db_hosts = $this->get([
-			'output' => ['hostid', 'proxy_hostid', 'host', 'status', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username',
-				'ipmi_password', 'name', 'description', 'tls_connect', 'tls_accept', 'tls_issuer', 'tls_subject',
-				'tls_psk_identity', 'tls_psk', 'inventory_mode'
-			],
+		$count = $this->get([
+			'countOutput' => true,
 			'hostids' => $hostids,
-			'editable' => true,
-			'preservekeys' => true
+			'editable' => true
 		]);
 
-		foreach ($hosts as $host) {
-			if (!array_key_exists($host['hostid'], $db_hosts)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
-			}
+		if ($count != count($hostids)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+
+		$db_hosts = DBfetchArrayAssoc(DBselect(
+			'SELECT h.hostid,h.proxy_hostid,h.host,h.status,h.ipmi_authtype,h.ipmi_privilege,h.ipmi_username,'.
+				'h.ipmi_password,h.name,h.description,h.tls_connect,h.tls_accept,h.tls_psk_identity,h.tls_psk,'.
+				'h.tls_issuer,h.tls_subject,hi.inventory_mode'.
+			' FROM hosts h'.
+			' LEFT JOIN host_inventory hi ON h.hostid=hi.hostid'.
+			' WHERE '.dbConditionId('h.hostid', $hostids)
+		), 'hostid');
+
+		if (!$options || !array_key_exists('skip_tls_psk_pair_check', $options)) {
+			$this->checkTlsPskPair($data, $db_hosts);
 		}
 
 		// Check inventory mode value.
@@ -936,16 +961,7 @@ class CHost extends CHostGeneral {
 			$this->checkValidator($data['inventory_mode'], $inventory_mode);
 		}
 
-		// Check connection fields only for massupdate action.
-		if (array_key_exists('tls_connect', $data) || array_key_exists('tls_accept', $data)
-				|| array_key_exists('tls_psk_identity', $data) || array_key_exists('tls_psk', $data)
-				|| array_key_exists('tls_issuer', $data) || array_key_exists('tls_subject', $data)) {
-			if (!array_key_exists('tls_connect', $data) || !array_key_exists('tls_accept', $data)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _(
-					'Cannot update host encryption settings. Connection settings for both directions should be specified.'
-				));
-			}
-
+		if (array_key_exists('tls_connect', $data)) {
 			// Clean PSK fields.
 			if ($data['tls_connect'] != HOST_ENCRYPTION_PSK && !($data['tls_accept'] & HOST_ENCRYPTION_PSK)) {
 				$data['tls_psk_identity'] = '';
@@ -959,8 +975,6 @@ class CHost extends CHostGeneral {
 				$data['tls_subject'] = '';
 			}
 		}
-
-		$this->validateEncryption([$data]);
 
 		if (array_key_exists('groups', $data) && !$data['groups'] && $db_hosts) {
 			$host = reset($db_hosts);
@@ -1758,133 +1772,6 @@ class CHost extends CHostGeneral {
 	}
 
 	/**
-	 * Validate connections from/to host and PSK fields.
-	 *
-	 * @param array  $hosts
-	 * @param string $hosts[]['hostid']                    (optional if $db_hosts is null)
-	 * @param int    $hosts[]['tls_connect']               (optionsl)
-	 * @param int    $hosts[]['tls_accept']                (optional)
-	 * @param string $hosts[]['tls_psk_identity']          (optional)
-	 * @param string $hosts[]['tls_psk']                   (optional)
-	 * @param string $hosts[]['tls_issuer']                (optional)
-	 * @param string $hosts[]['tls_subject']               (optional)
-	 * @param array  $db_hosts                             (optional)
-	 * @param int    $hosts[<hostid>]['tls_connect']
-	 * @param int    $hosts[<hostid>]['tls_accept']
-	 * @param string $hosts[<hostid>]['tls_psk_identity']
-	 * @param string $hosts[<hostid>]['tls_psk']
-	 * @param string $hosts[<hostid>]['tls_issuer']
-	 * @param string $hosts[<hostid>]['tls_subject']
-	 *
-	 * @throws APIException if incorrect encryption options.
-	 */
-	protected function validateEncryption(array $hosts, array $db_hosts = null) {
-		$available_connect_types = [HOST_ENCRYPTION_NONE, HOST_ENCRYPTION_PSK, HOST_ENCRYPTION_CERTIFICATE];
-		$min_accept_type = HOST_ENCRYPTION_NONE;
-		$max_accept_type = HOST_ENCRYPTION_NONE | HOST_ENCRYPTION_PSK | HOST_ENCRYPTION_CERTIFICATE;
-		$psk_pairs = [];
-		$psk_hostids = $db_hosts !== null ? [] : null;
-
-		foreach ($hosts as $i => $host) {
-			foreach (['tls_connect', 'tls_accept'] as $field_name) {
-				$$field_name = array_key_exists($field_name, $host)
-					? $host[$field_name]
-					: ($db_hosts !== null ? $db_hosts[$host['hostid']][$field_name] : HOST_ENCRYPTION_NONE);
-			}
-
-			if (!in_array($tls_connect, $available_connect_types)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'tls_connect',
-					_s('unexpected value "%1$s"', $tls_connect)
-				));
-			}
-
-			if ($tls_accept < $min_accept_type || $tls_accept > $max_accept_type) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'tls_accept',
-					_s('unexpected value "%1$s"', $tls_accept)
-				));
-			}
-
-			foreach (['tls_psk_identity', 'tls_psk', 'tls_issuer', 'tls_subject'] as $field_name) {
-				$$field_name = array_key_exists($field_name, $host)
-					? $host[$field_name]
-					: ($db_hosts !== null ? $db_hosts[$host['hostid']][$field_name] : '');
-			}
-
-			// PSK validation.
-			if ($tls_connect == HOST_ENCRYPTION_PSK || ($tls_accept & HOST_ENCRYPTION_PSK)) {
-				if ($tls_psk_identity === '') {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Incorrect value for field "%1$s": %2$s.', 'tls_psk_identity', _('cannot be empty'))
-					);
-				}
-
-				if ($tls_psk === '') {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Incorrect value for field "%1$s": %2$s.', 'tls_psk', _('cannot be empty'))
-					);
-				}
-
-				if (!preg_match('/^([0-9a-f]{2})+$/i', $tls_psk)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'tls_psk',
-						_('an even number of hexadecimal characters is expected')
-					));
-				}
-
-				if (strlen($tls_psk) < PSK_MIN_LEN) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'tls_psk',
-						_s('minimum length is %1$s characters', PSK_MIN_LEN)
-					));
-				}
-
-				if (array_key_exists('tls_psk_identity', $host) || array_key_exists('tls_psk', $host)) {
-					$psk_pairs[$i] = [
-						'tls_psk_identity' => $tls_psk_identity,
-						'tls_psk' => $tls_psk
-					];
-
-					if ($db_hosts !== null) {
-						$psk_hostids[] = $host['hostid'];
-					}
-				}
-			}
-			else {
-				if ($tls_psk_identity !== '') {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Incorrect value for field "%1$s": %2$s.', 'tls_psk_identity', _('should be empty'))
-					);
-				}
-
-				if ($tls_psk !== '') {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Incorrect value for field "%1$s": %2$s.', 'tls_psk', _('should be empty'))
-					);
-				}
-			}
-
-			// Certificate validation.
-			if ($tls_connect != HOST_ENCRYPTION_CERTIFICATE && !($tls_accept & HOST_ENCRYPTION_CERTIFICATE)) {
-				if ($tls_issuer !== '') {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Incorrect value for field "%1$s": %2$s.', 'tls_issuer', _('should be empty'))
-					);
-				}
-
-				if ($tls_subject !== '') {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Incorrect value for field "%1$s": %2$s.', 'tls_subject', _('should be empty'))
-					);
-				}
-			}
-		}
-
-		if ($psk_pairs) {
-			CApiPskHelper::checkPskOfIdentitiesAmongGivenPairs($psk_pairs);
-			CApiPskHelper::checkPskOfIdentitiesInAutoregistration($psk_pairs);
-			CApiPskHelper::checkPskOfIdentitiesAmongHostsAndProxies($psk_pairs, $psk_hostids);
-		}
-	}
-
-	/**
 	 * Validates the input parameters for the create() method.
 	 *
 	 * @param array $hosts		hosts data array
@@ -1892,11 +1779,13 @@ class CHost extends CHostGeneral {
 	 * @throws APIException if the input is invalid.
 	 */
 	protected function validateCreate(array &$hosts) {
-		$hosts = zbx_toArray($hosts);
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'fields' => self::getValidationFields()];
 
-		if (!$hosts) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+		if (!CApiInputValidator::validate($api_input_rules, $hosts, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
+
+		self::checkTlsPskPairs($hosts);
 
 		$macro_rules = ['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['macro']], 'fields' => [
 			'macro' =>			['type' => API_USER_MACRO, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('hostmacro', 'macro')],
@@ -2104,8 +1993,6 @@ class CHost extends CHostGeneral {
 				);
 			}
 		}
-
-		$this->validateEncryption($hosts);
 	}
 
 	/**
@@ -2117,11 +2004,44 @@ class CHost extends CHostGeneral {
 	 * @throws APIException if the input is invalid.
 	 */
 	protected function validateUpdate(array &$hosts, array &$db_hosts = null) {
-		$hosts = zbx_toArray($hosts);
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['hostid']], 'fields' => [
+			'hostid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
+			'tls_connect' =>	['type' => API_INT32, 'in' => implode(',', [HOST_ENCRYPTION_NONE, HOST_ENCRYPTION_PSK, HOST_ENCRYPTION_CERTIFICATE])],
+			'tls_accept' =>		['type' => API_INT32, 'in' => implode(':', [HOST_ENCRYPTION_NONE, HOST_ENCRYPTION_NONE | HOST_ENCRYPTION_PSK | HOST_ENCRYPTION_CERTIFICATE])]
+		]];
 
-		if (!$hosts) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+		if (!CApiInputValidator::validate($api_input_rules, $hosts, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
+
+		$count = $this->get([
+			'countOutput' => true,
+			'hostids' => array_column($hosts, 'hostid'),
+			'editable' => true
+		]);
+
+		if ($count != count($hosts)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+
+		$db_hosts = DB::select('hosts', [
+			'output' => ['hostid', 'host', 'flags', 'tls_connect', 'tls_accept', 'tls_psk_identity', 'tls_psk',
+				'tls_issuer', 'tls_subject'
+			],
+			'hostids' => array_column($hosts, 'hostid'),
+			'preservekeys' => true
+		]);
+
+		$hosts = $this->extendObjectsByKey($hosts, $db_hosts, 'hostid', ['tls_connect', 'tls_accept']);
+
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => self::getValidationFields(true)];
+
+		if (!CApiInputValidator::validate($api_input_rules, $hosts, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		self::addFieldDefaultsByTls($hosts, $db_hosts);
+		self::checkTlsPskPairs($hosts, $db_hosts);
 
 		$macro_rules = ['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['hostmacroid']], 'fields' => [
 			'hostmacroid' =>	['type' => API_ID],
@@ -2131,44 +2051,10 @@ class CHost extends CHostGeneral {
 			'description' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'description')]
 		]];
 
-		$db_hosts = $this->get([
-			'output' => ['hostid', 'host', 'flags', 'tls_connect', 'tls_accept', 'tls_issuer', 'tls_subject'],
-			'hostids' => array_column($hosts, 'hostid'),
-			'editable' => true,
-			'preservekeys' => true
-		]);
-
-		// Load existing values of PSK fields of hosts independently from APP mode.
-		$hosts_psk_fields = DB::select($this->tableName(), [
-			'output' => ['tls_psk_identity', 'tls_psk'],
-			'hostids' => array_keys($db_hosts),
-			'preservekeys' => true
-		]);
-
-		foreach ($hosts_psk_fields as $hostid => $psk_fields) {
-			$db_hosts[$hostid] += $psk_fields;
-		}
-
-		$host_db_fields = ['hostid' => null];
-
 		foreach ($hosts as $index => &$host) {
-			// Validate mandatory fields.
-			if (!check_db_fields($host_db_fields, $host)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Wrong fields for host "%1$s".', array_key_exists('host', $host) ? $host['host'] : '')
-				);
-			}
-
 			// Property 'auto_compress' is not supported for hosts.
 			if (array_key_exists('auto_compress', $host)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect input parameters.'));
-			}
-
-			// Validate host permissions.
-			if (!array_key_exists($host['hostid'], $db_hosts)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _(
-					'No permissions to referred object or it does not exist!'
-				));
 			}
 
 			// Validate "groups" field.
@@ -2300,31 +2186,6 @@ class CHost extends CHostGeneral {
 				$host_names['name'][$host['name']] = $host['hostid'];
 			}
 
-			if (array_key_exists('tls_connect', $host) || array_key_exists('tls_accept', $host)) {
-				$tls_connect = array_key_exists('tls_connect', $host) ? $host['tls_connect'] : $db_host['tls_connect'];
-				$tls_accept = array_key_exists('tls_accept', $host) ? $host['tls_accept'] : $db_host['tls_accept'];
-
-				// Clean PSK fields.
-				if ($tls_connect != HOST_ENCRYPTION_PSK && !($tls_accept & HOST_ENCRYPTION_PSK)) {
-					if (!array_key_exists('tls_psk_identity', $host)) {
-						$host['tls_psk_identity'] = '';
-					}
-					if (!array_key_exists('tls_psk', $host)) {
-						$host['tls_psk'] = '';
-					}
-				}
-
-				// Clean certificate fields.
-				if ($tls_connect != HOST_ENCRYPTION_CERTIFICATE && !($tls_accept & HOST_ENCRYPTION_CERTIFICATE)) {
-					if (!array_key_exists('tls_issuer', $host)) {
-						$host['tls_issuer'] = '';
-					}
-					if (!array_key_exists('tls_subject', $host)) {
-						$host['tls_subject'] = '';
-					}
-				}
-			}
-
 			// Validate tags.
 			if (array_key_exists('tags', $host)) {
 				$this->validateTags($host);
@@ -2394,9 +2255,131 @@ class CHost extends CHostGeneral {
 			}
 		}
 
-		$this->validateEncryption($hosts, $db_hosts);
-
 		return $hosts;
+	}
+
+	private static function getValidationFields(bool $is_update = false, $is_mass_update = false): array {
+		$api_required = !$is_update || $is_mass_update ? API_REQUIRED : 0;
+
+		$specific_fields = !$is_update || $is_mass_update
+			? []
+			: [
+				'hostid' =>			['type' => API_ANY],
+				'tls_connect' =>	['type' => API_ANY],
+				'tls_accept' =>		['type' => API_ANY]
+			];
+
+		if ($is_mass_update) {
+			$psk_accepted = static function (array $data): bool {
+				return (array_key_exists('tls_connect', $data) && $data['tls_connect'] == HOST_ENCRYPTION_PSK)
+					|| (array_key_exists('tls_accept', $data) && ($data['tls_accept'] & HOST_ENCRYPTION_PSK) != 0);
+			};
+
+			$certificate_accepted = static function (array $data): bool {
+				return (array_key_exists('tls_connect', $data) && $data['tls_connect'] == HOST_ENCRYPTION_CERTIFICATE)
+					|| (array_key_exists('tls_accept', $data)
+						&& ($data['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE) != 0);
+			};
+		}
+		else {
+			$psk_accepted = static function (array $data): bool {
+				return $data['tls_connect'] == HOST_ENCRYPTION_PSK
+					|| ($data['tls_accept'] & HOST_ENCRYPTION_PSK) != 0;
+			};
+
+			$certificate_accepted = static function (array $data): bool {
+				return $data['tls_connect'] == HOST_ENCRYPTION_CERTIFICATE
+					|| ($data['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE) != 0;
+			};
+		}
+
+		return $specific_fields + [
+			'tls_connect' =>		['type' => API_INT32, 'in' => implode(',', [HOST_ENCRYPTION_NONE, HOST_ENCRYPTION_PSK, HOST_ENCRYPTION_CERTIFICATE])] + ($is_update ? [] : ['default' => DB::getDefault('hosts', 'tls_connect')]),
+			'tls_accept' =>			['type' => API_INT32, 'in' => implode(':', [HOST_ENCRYPTION_NONE, HOST_ENCRYPTION_NONE | HOST_ENCRYPTION_PSK | HOST_ENCRYPTION_CERTIFICATE])] + ($is_update ? [] : ['default' => DB::getDefault('hosts', 'tls_accept')]),
+			'tls_psk_identity' =>	['type' => API_MULTIPLE, 'rules' => [
+										['if' => $psk_accepted, 'type' => API_STRING_UTF8, 'flags' => $api_required | API_NOT_EMPTY, 'length' => DB::getFieldLength('hosts', 'tls_psk_identity')],
+										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('hosts', 'tls_psk_identity')]
+			]],
+			'tls_psk' =>			['type' => API_MULTIPLE, 'rules' => [
+										['if' => $psk_accepted, 'type' => API_PSK, 'flags' => $api_required | API_NOT_EMPTY, 'length' => DB::getFieldLength('hosts', 'tls_psk')],
+										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('hosts', 'tls_psk')]
+			]],
+			'tls_issuer' =>			['type' => API_MULTIPLE, 'rules' => [
+										['if' => $certificate_accepted, 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hosts', 'tls_issuer')],
+										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('hosts', 'tls_issuer')]
+			]],
+			'tls_subject' =>		['type' => API_MULTIPLE, 'rules' => [
+										['if' => $certificate_accepted, 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hosts', 'tls_subject')],
+										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('hosts', 'tls_subject')]
+			]]
+		];
+	}
+
+	private static function addFieldDefaultsByTls(array &$hosts, array $db_hosts): void {
+		foreach ($hosts as &$host) {
+			if ($host['tls_connect'] != HOST_ENCRYPTION_PSK && ($host['tls_accept'] & HOST_ENCRYPTION_PSK) == 0
+					&& ($db_hosts[$host['hostid']]['tls_connect'] == HOST_ENCRYPTION_PSK
+						|| $db_hosts[$host['hostid']]['tls_accept'] & HOST_ENCRYPTION_PSK)) {
+				$host += [
+					'tls_psk_identity' => DB::getDefault('hosts', 'tls_psk_identity'),
+					'tls_psk' => DB::getDefault('hosts', 'tls_psk')
+				];
+			}
+
+			if ($host['tls_connect'] != HOST_ENCRYPTION_CERTIFICATE
+					&& ($host['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE) == 0
+					&& ($db_hosts[$host['hostid']]['tls_connect'] == HOST_ENCRYPTION_CERTIFICATE
+						|| $db_hosts[$host['hostid']]['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE)) {
+				$host += [
+					'tls_issuer' => DB::getDefault('hosts', 'tls_issuer'),
+					'tls_subject' => DB::getDefault('hosts', 'tls_subject')
+				];
+			}
+		}
+		unset($host);
+	}
+
+	private static function checkTlsPskPairs(array $hosts, array $db_hosts = null): void {
+		$psk_pairs = [];
+		$tls_psk_fields = array_flip(['tls_psk_identity', 'tls_psk']);
+		$psk_hostids = $db_hosts !== null ? [] : null;
+
+		foreach ($hosts as $i => $host) {
+			$psk_pair = array_intersect_key($host, $tls_psk_fields);
+
+			if ($psk_pair) {
+				if ($host['tls_connect'] == HOST_ENCRYPTION_PSK || $host['tls_accept'] & HOST_ENCRYPTION_PSK) {
+					if ($db_hosts !== null) {
+						$psk_pair += array_intersect_key($db_hosts[$host['hostid']], $tls_psk_fields);
+						$psk_hostids[] = $host['hostid'];
+					}
+
+					$psk_pairs[$i] = $psk_pair;
+				}
+				elseif ($db_hosts !== null
+						&& ($db_hosts[$host['hostid']]['tls_connect'] == HOST_ENCRYPTION_PSK
+							|| $db_hosts[$host['hostid']]['tls_accept'] & HOST_ENCRYPTION_PSK)) {
+					$psk_hostids[] = $host['hostid'];
+				}
+			}
+		}
+
+		if ($psk_pairs) {
+			CApiPskHelper::checkPskOfIdentitiesAmongGivenPairs($psk_pairs);
+			CApiPskHelper::checkPskOfIdentitiesInAutoregistration($psk_pairs);
+			CApiPskHelper::checkPskOfIdentitiesAmongHostsAndProxies($psk_pairs, $psk_hostids);
+		}
+	}
+
+	private function checkTlsPskPair(array $data, array $db_hosts): void {
+		$psk_pair = array_intersect_key($data, array_flip(['tls_psk_identity', 'tls_psk']));
+
+		if (!$psk_pair) {
+			return;
+		}
+
+		CApiPskHelper::checkPskOfIdentityInAutoregistration($psk_pair);
+		CApiPskHelper::checkPskOfIdentityAmongHostsAndProxies($psk_pair, array_keys($db_hosts));
 	}
 
 	protected function requiresPostSqlFiltering(array $options) {
