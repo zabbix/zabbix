@@ -11,10 +11,10 @@ New features:
 .........T [ZBXNEXT-7936] updated VMware templates (akotsegubov)
 .........T [ZBXNEXT-9248] added GitHub repository by HTTP template (drasikhov)
 ........S. [ZBXNEXT-9408] updated max supported TimescaleDB version to 2.16 (mprihodko)
-.........T [ZBXNEXT-8937] added support IMDSv2 in role base authorization for AWS templates (egordymov)
-.........T [ZBXNEXT-9245] added proxy group discovery in Zabbix server health template (knaglis)
+.........T [ZBXNEXT-8937] added support for IMDSv2 for role based authentication to AWS templates (egordymov)
+.........T [ZBXNEXT-9245] added proxy group discovery to Zabbix server health template (knaglis)
 .........T [ZBXNEXT-9398] added new mediatype webhook MS Teams Workflow (abiba)
-.........T [ZBXNEXT-9341] added assume role authorization in AWS templates (egordymov)
+.........T [ZBXNEXT-9341] added AssumeRole authentication to AWS templates (egordymov)
 
 Bug fixes:
 ........S. [ZBX-25238] fixed crash when deleting proxy group and proxy at same moment (vso)
