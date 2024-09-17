@@ -106,6 +106,8 @@ func GetTLSConfig(options *AgentOptions) (cfg *tls.Config, err error) {
 		if options.TLSAccept != "" ||
 			options.TLSConnect != "" ||
 			options.TLSPSKFile != "" ||
+			options.TLSKeyFile != "" ||
+			options.TLSCertFile != "" ||
 			options.TLSPSKIdentity != "" {
 			return nil, errors.New(tls.SupportedErrMsg())
 		}
@@ -193,14 +195,6 @@ func GetTLSConfig(options *AgentOptions) (cfg *tls.Config, err error) {
 		} else {
 			return nil, errors.New("missing TLSPSKFile configuration parameter")
 		}
-
-		if options.TLSCipherPSK != "" {
-			c.CipherPSK = options.TLSCipherPSK
-		}
-		if options.TLSCipherPSK13 != "" {
-			c.CipherPSK13 = options.TLSCipherPSK13
-		}
-
 	} else {
 		if options.TLSPSKIdentity != "" {
 			return nil, errors.New("TLSPSKIdentity configuration parameter set without PSK being used")
@@ -236,13 +230,12 @@ func GetTLSConfig(options *AgentOptions) (cfg *tls.Config, err error) {
 		c.ServerCertSubject = options.TLSServerCertSubject
 		c.CRLFile = options.TLSCRLFile
 
-		if options.TLSCipherCert != "" {
+		if c.CipherAll == "" {
 			c.CipherAll = options.TLSCipherCert
 		}
-		if options.TLSCipherCert13 != "" {
+		if c.CipherAll13 == "" {
 			c.CipherAll13 = options.TLSCipherCert13
 		}
-
 	} else {
 		if options.TLSCAFile != "" {
 			return nil, errors.New("TLSCAFile configuration parameter set without certificates being used")
