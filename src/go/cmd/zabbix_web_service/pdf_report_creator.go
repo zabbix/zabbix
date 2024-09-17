@@ -290,8 +290,8 @@ func parseUrl(u string) (*url.URL, error) {
 	return parsed, nil
 }
 
-// networkErrEvtListener listens errC channel for error messages, and processes them with logAndWriteError
-func networkErrEvtListener(errC <-chan string, ctxCancel context.CancelFunc, url string, w http.ResponseWriter) {
+// networkErrEvtListener listens errC channel for error messages, and processes them with logAndWriteError.
+func networkErrEvtListener(errC <-chan string, ctxCancel context.CancelFunc, addr string, w http.ResponseWriter) {
 	for errStr := range errC {
 		switch errStr {
 		case netErrCertAuthorityInvalid:
@@ -299,7 +299,7 @@ func networkErrEvtListener(errC <-chan string, ctxCancel context.CancelFunc, url
 				"Invalid certificate authority detected while loading dashboard: '%s'. Fix TLS "+
 					"configuration or configure Zabbix web service to ignore TLS certificate "+
 					"errors when accessing frontend URL.",
-				url,
+				addr,
 			)
 		case "":
 			errStr = "network.EventLoadingFailed event with empty ErrorText was received while loading " +
@@ -317,7 +317,7 @@ func networkErrEvtListener(errC <-chan string, ctxCancel context.CancelFunc, url
 	}
 }
 
-// handleNetworkErrEvt returns a function that handles network.EventLoadingFailed events
+// handleNetworkErrEvt returns a function that handles network.EventLoadingFailed events.
 func handleNetworkErrEvt(errEvtC chan string) func(ev any) {
 	return func(ev any) {
 		failEvent, ok := ev.(*network.EventLoadingFailed)
