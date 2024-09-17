@@ -2440,7 +2440,6 @@ class testDashboardWidgetCommunication extends testWidgets {
 
 	public function getWidgetData() {
 		return [
-			// #0.
 			'Broadcasting hostgroups from map - initial selection' => [
 				[
 					'page' => 'Hostgroups page',
@@ -2502,7 +2501,6 @@ class testDashboardWidgetCommunication extends testWidgets {
 					]
 				]
 			],
-			// #1.
 			'Broadcasting hostgroups from map - selecting another value' => [
 				[
 					'page' => 'Hostgroups page',
@@ -2564,7 +2562,6 @@ class testDashboardWidgetCommunication extends testWidgets {
 					]
 				]
 			],
-			// #2.
 			'Check that clicking on host in broadcasting map resets the selection in hostgroup listeners' => [
 				[
 					'page' => 'Hostgroups page',
@@ -2572,7 +2569,6 @@ class testDashboardWidgetCommunication extends testWidgets {
 					'select_element' => self::SECOND_HOST_NAME
 				]
 			],
-			// #3.
 			'Broadcasting hostgroups from problem hosts widget - initial selection' => [
 				[
 					'page' => 'Hostgroups page',
@@ -2634,7 +2630,6 @@ class testDashboardWidgetCommunication extends testWidgets {
 					]
 				]
 			],
-			// #4.
 			'Broadcasting hostgroups from problem hosts widget - selecting another value' => [
 				[
 					'page' => 'Hostgroups page',
@@ -2696,7 +2691,6 @@ class testDashboardWidgetCommunication extends testWidgets {
 					]
 				]
 			],
-			// #5.
 			'Broadcasting hostgroups from problems by severity widget - initial selection' => [
 				[
 					'page' => 'Hostgroups page',
@@ -2758,7 +2752,6 @@ class testDashboardWidgetCommunication extends testWidgets {
 					]
 				]
 			],
-			// #6.
 			'Broadcasting hostgroups from problems by severity widget - selecting another value' => [
 				[
 					'page' => 'Hostgroups page',
@@ -2820,7 +2813,6 @@ class testDashboardWidgetCommunication extends testWidgets {
 					]
 				]
 			],
-			// #7.
 			'Broadcasting hostgroups from web monitoring widget - initial selection' => [
 				[
 					'page' => 'Hostgroups page',
@@ -2882,7 +2874,6 @@ class testDashboardWidgetCommunication extends testWidgets {
 					]
 				]
 			],
-			// #8.
 			'Broadcasting hostgroups from web monitoring widget - selecting another value' => [
 				[
 					'page' => 'Hostgroups page',
@@ -2944,7 +2935,6 @@ class testDashboardWidgetCommunication extends testWidgets {
 					]
 				]
 			],
-			// #9.
 			'Broadcasting hosts from geomap widget - initial selection' => [
 				[
 					'page' => 'Hosts page',
@@ -2992,7 +2982,6 @@ class testDashboardWidgetCommunication extends testWidgets {
 					]
 				]
 			],
-			// #10.
 			'Broadcasting hosts from geomap widget - selecting another value' => [
 				[
 					'page' => 'Hosts page',
@@ -3040,7 +3029,6 @@ class testDashboardWidgetCommunication extends testWidgets {
 					]
 				]
 			],
-			// #11.
 			'Broadcasting hosts from honeycomb widget - initial selection' => [
 				[
 					'page' => 'Hosts page',
@@ -3088,7 +3076,6 @@ class testDashboardWidgetCommunication extends testWidgets {
 					]
 				]
 			],
-			// #12.
 			'Broadcasting hosts from honeycomb widget - selecting another value' => [
 				[
 					'page' => 'Hosts page',
@@ -3136,7 +3123,6 @@ class testDashboardWidgetCommunication extends testWidgets {
 					]
 				]
 			],
-			// #13.
 			'Broadcasting hosts from map widget - initial selection' => [
 				[
 					'page' => 'Hosts page',
@@ -3184,7 +3170,6 @@ class testDashboardWidgetCommunication extends testWidgets {
 					]
 				]
 			],
-			// #14.
 			'Broadcasting hosts from map widget - selecting another value' => [
 				[
 					'page' => 'Hosts page',
@@ -3232,7 +3217,6 @@ class testDashboardWidgetCommunication extends testWidgets {
 					]
 				]
 			],
-			// #15.
 			'Clicking on hostgroup in broadcasting map should reset selection in host listeners' => [
 				[
 					'page' => 'Hosts page',
@@ -3240,7 +3224,6 @@ class testDashboardWidgetCommunication extends testWidgets {
 					'select_element' => self::SECOND_HOSTGROUP_NAME
 				]
 			],
-			// #16.
 			'Broadcasting hosts from top hosts widget - initial selection' => [
 				[
 					'page' => 'Hosts page',
@@ -3288,7 +3271,6 @@ class testDashboardWidgetCommunication extends testWidgets {
 					]
 				]
 			],
-			// #17.
 			'Broadcasting hosts from top hosts widget - selecting another value' => [
 				[
 					'page' => 'Hosts page',
@@ -3336,7 +3318,6 @@ class testDashboardWidgetCommunication extends testWidgets {
 					]
 				]
 			],
-			// #18.
 			'Broadcasting hosts from host navigator widget - initial selection' => [
 				[
 					'page' => 'Hosts page',
@@ -3384,7 +3365,6 @@ class testDashboardWidgetCommunication extends testWidgets {
 					]
 				]
 			],
-			// #19.
 			'Broadcasting hosts from host navigator widget - selecting another value' => [
 				[
 					'page' => 'Hosts page',
@@ -3432,7 +3412,6 @@ class testDashboardWidgetCommunication extends testWidgets {
 					]
 				]
 			],
-			// #20.
 			'Broadcasting items from honeycomb widget - initial selection' => [
 				[
 					'page' => 'Items page',
@@ -3461,7 +3440,6 @@ class testDashboardWidgetCommunication extends testWidgets {
 					]
 				]
 			],
-			// #21.
 			'Broadcasting items from honeycomb widget - selecting another value' => [
 				[
 					'page' => 'Items page',
@@ -3490,7 +3468,6 @@ class testDashboardWidgetCommunication extends testWidgets {
 					]
 				]
 			],
-			// #22.
 			'Broadcasting items from item history widget - initial selection' => [
 				[
 					'page' => 'Items page',
@@ -3519,7 +3496,6 @@ class testDashboardWidgetCommunication extends testWidgets {
 					]
 				]
 			],
-			// #23.
 			'Broadcasting items from item history widget - selecting another value' => [
 				[
 					'page' => 'Items page',
@@ -3548,7 +3524,6 @@ class testDashboardWidgetCommunication extends testWidgets {
 					]
 				]
 			],
-			// #24.
 			'Broadcasting items from item navigator widget - initial selection' => [
 				[
 					'page' => 'Items page',
@@ -3577,7 +3552,6 @@ class testDashboardWidgetCommunication extends testWidgets {
 					]
 				]
 			],
-			// #25.
 			'Broadcasting items from item history widget - selecting another value' => [
 				[
 					'page' => 'Items page',
