@@ -53,9 +53,11 @@ use Fcntl qw(O_WRONLY O_APPEND O_CREAT);
 use POSIX qw(strftime);
 use NetSNMP::TrapReceiver;
 
-sub get_header_regex {
+sub get_header_regex
+{
 	my $format = shift;
 	my $regex = $format;
+
 	$regex =~ s/%Y/[0-9]{4}/g;
 	$regex =~ s/%m/[0-9]{2}/g;
 	$regex =~ s/%d/[0-9]{2}/g;
@@ -75,8 +77,10 @@ sub zabbix_receiver
 	my $r = get_header_regex $DateTimeFormat;
 
 	# fail if received vars clearly contain injection
-	foreach my $x (@varbinds) {
-		if ($x->[1] =~ /$r/) {
+	foreach my $x (@varbinds)
+	{
+		if ($x->[1] =~ /$r/)
+		{
 			return NETSNMPTRAPD_HANDLER_FAIL;
 		}
 	}
