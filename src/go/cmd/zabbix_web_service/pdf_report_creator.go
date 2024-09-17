@@ -184,17 +184,11 @@ func (h *handler) report(w http.ResponseWriter, r *http.Request) {
 		cookieParams = append(cookieParams, &cookieParam)
 	}
 
-	errEvtC := make(chan string, 1)
+	errEvtC := make(chan string)
 
-	chromedp.ListenTarget(ctx, func(ev any) {
-		failEvent, ok := ev.(*network.EventLoadingFailed)
-		if !ok {
-			return
-		}
+	go networkErrEvtListener(errEvtC, cancel, u.String(), w)
 
-		errEvtC <- failEvent.ErrorText
-		cancel()
-	})
+	chromedp.ListenTarget(ctx, handleNetworkErrEvt(errEvtC))
 
 	var buf []byte
 
@@ -217,38 +211,20 @@ func (h *handler) report(w http.ResponseWriter, r *http.Request) {
 		}),
 	})
 
-	if errors.Is(err, context.Canceled) && len(errEvtC) > 0 {
-		errStr := <-errEvtC
-
-		switch errStr {
-		case netErrCertAuthorityInvalid:
-			errStr = fmt.Sprintf(
-				"Invalid certificate authority detected while loading dashboard: '%s'. Fix TLS "+
-					"configuration or configure Zabbix web service to ignore TLS certificate "+
-					"errors when accessing frontend URL.",
-				u.String(),
-			)
-		case "":
-			errStr = "network.EventLoadingFailed event with empty ErrorText was received while loading " +
-				"dashboard."
-		default:
-			errStr = fmt.Sprintf(
-				"network.EventLoadingFailed event with ErrorText = '%s' was received while loading "+
-					"dashboard.",
-				errStr,
-			)
+	if err != nil {
+		if errors.Is(err, context.Canceled) {
+			// error is written by networkEvtLoadingFailedListener, errEvtC channel is closed
+			return
 		}
 
-		logAndWriteError(w, errStr, http.StatusInternalServerError)
+		close(errEvtC)
 
-		return
-	}
-
-	if err != nil {
 		logAndWriteError(w, zbxerr.ErrorCannotFetchData.Wrap(err).Error(), http.StatusInternalServerError)
 
 		return
 	}
+
+	close(errEvtC)
 
 	log.Infof("writing response for report request from %s", r.RemoteAddr)
 
@@ -312,4 +288,44 @@ func parseUrl(u string) (*url.URL, error) {
 	}
 
 	return parsed, nil
+}
+
+// networkErrEvtListener listens errC channel for error messages, and processes them with logAndWriteError
+func networkErrEvtListener(errC <-chan string, ctxCancel context.CancelFunc, url string, w http.ResponseWriter) {
+	for errStr := range errC {
+		switch errStr {
+		case netErrCertAuthorityInvalid:
+			errStr = fmt.Sprintf(
+				"Invalid certificate authority detected while loading dashboard: '%s'. Fix TLS "+
+					"configuration or configure Zabbix web service to ignore TLS certificate "+
+					"errors when accessing frontend URL.",
+				url,
+			)
+		case "":
+			errStr = "network.EventLoadingFailed event with empty ErrorText was received while loading " +
+				"dashboard."
+		default:
+			errStr = fmt.Sprintf(
+				"network.EventLoadingFailed event with ErrorText = '%s' was received while loading "+
+					"dashboard.",
+				errStr,
+			)
+		}
+
+		logAndWriteError(w, errStr, http.StatusInternalServerError)
+		ctxCancel()
+	}
+}
+
+// handleNetworkErrEvt returns a function that handles network.EventLoadingFailed events
+func handleNetworkErrEvt(errEvtC chan string) func(ev any) {
+	return func(ev any) {
+		failEvent, ok := ev.(*network.EventLoadingFailed)
+		if !ok {
+			return
+		}
+
+		errEvtC <- failEvent.ErrorText
+		close(errEvtC)
+	}
 }
