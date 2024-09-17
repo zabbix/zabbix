@@ -59,7 +59,7 @@ zabbix_export:
               parameters:
                 - $.archived_count
           master_item:
-            key: 'pgsql.archive["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
+            key: 'pgsql.archive["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]'
           tags:
             - tag: component
               value: archive
@@ -75,7 +75,7 @@ zabbix_export:
               parameters:
                 - $.count_files
           master_item:
-            key: 'pgsql.archive["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
+            key: 'pgsql.archive["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]'
           tags:
             - tag: component
               value: archive
@@ -91,7 +91,7 @@ zabbix_export:
               parameters:
                 - $.failed_count
           master_item:
-            key: 'pgsql.archive["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
+            key: 'pgsql.archive["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]'
           tags:
             - tag: component
               value: archive
@@ -107,13 +107,13 @@ zabbix_export:
               parameters:
                 - $.size_files
           master_item:
-            key: 'pgsql.archive["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
+            key: 'pgsql.archive["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]'
           tags:
             - tag: component
               value: archive
         - uuid: e9f4284fd3a1459e9c519dbdd8ee3425
           name: 'Get archive'
-          key: 'pgsql.archive["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
+          key: 'pgsql.archive["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]'
           history: '0'
           value_type: TEXT
           trends: '0'
@@ -144,7 +144,7 @@ zabbix_export:
               parameters:
                 - ''
           master_item:
-            key: 'pgsql.bgwriter["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
+            key: 'pgsql.bgwriter["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]'
           tags:
             - tag: component
               value: bgwriter
@@ -163,7 +163,7 @@ zabbix_export:
               parameters:
                 - ''
           master_item:
-            key: 'pgsql.bgwriter["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
+            key: 'pgsql.bgwriter["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]'
           tags:
             - tag: component
               value: bgwriter
@@ -182,7 +182,7 @@ zabbix_export:
               parameters:
                 - ''
           master_item:
-            key: 'pgsql.bgwriter["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
+            key: 'pgsql.bgwriter["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]'
           tags:
             - tag: component
               value: bgwriter
@@ -201,7 +201,7 @@ zabbix_export:
               parameters:
                 - ''
           master_item:
-            key: 'pgsql.bgwriter["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
+            key: 'pgsql.bgwriter["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]'
           tags:
             - tag: component
               value: bgwriter
@@ -220,7 +220,7 @@ zabbix_export:
               parameters:
                 - ''
           master_item:
-            key: 'pgsql.bgwriter["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
+            key: 'pgsql.bgwriter["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]'
           tags:
             - tag: component
               value: bgwriter
@@ -239,7 +239,7 @@ zabbix_export:
               parameters:
                 - ''
           master_item:
-            key: 'pgsql.bgwriter["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
+            key: 'pgsql.bgwriter["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]'
           tags:
             - tag: component
               value: bgwriter
@@ -258,7 +258,7 @@ zabbix_export:
               parameters:
                 - ''
           master_item:
-            key: 'pgsql.bgwriter["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
+            key: 'pgsql.bgwriter["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]'
           tags:
             - tag: component
               value: bgwriter
@@ -281,7 +281,7 @@ zabbix_export:
               parameters:
                 - ''
           master_item:
-            key: 'pgsql.bgwriter["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
+            key: 'pgsql.bgwriter["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]'
           tags:
             - tag: component
               value: bgwriter
@@ -304,7 +304,7 @@ zabbix_export:
               parameters:
                 - ''
           master_item:
-            key: 'pgsql.bgwriter["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
+            key: 'pgsql.bgwriter["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]'
           tags:
             - tag: component
               value: bgwriter
@@ -323,13 +323,13 @@ zabbix_export:
               parameters:
                 - ''
           master_item:
-            key: 'pgsql.bgwriter["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
+            key: 'pgsql.bgwriter["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]'
           tags:
             - tag: component
               value: bgwriter
         - uuid: 6020e17c25104cbfba182e9cddfe6336
           name: 'Get bgwriter'
-          key: 'pgsql.bgwriter["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
+          key: 'pgsql.bgwriter["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]'
           history: '0'
           value_type: TEXT
           trends: '0'
@@ -361,7 +361,7 @@ zabbix_export:
               parameters:
                 - $.active
           master_item:
-            key: 'pgsql.connections["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
+            key: 'pgsql.connections["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]'
           tags:
             - tag: component
               value: connections
@@ -376,7 +376,7 @@ zabbix_export:
               parameters:
                 - $.disabled
           master_item:
-            key: 'pgsql.connections["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
+            key: 'pgsql.connections["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]'
           tags:
             - tag: component
               value: connections
@@ -391,7 +391,7 @@ zabbix_export:
               parameters:
                 - $.fastpath_function_call
           master_item:
-            key: 'pgsql.connections["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
+            key: 'pgsql.connections["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]'
           tags:
             - tag: component
               value: connections
@@ -406,7 +406,7 @@ zabbix_export:
               parameters:
                 - $.idle
           master_item:
-            key: 'pgsql.connections["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
+            key: 'pgsql.connections["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]'
           tags:
             - tag: component
               value: connections
@@ -421,7 +421,7 @@ zabbix_export:
               parameters:
                 - $.idle_in_transaction
           master_item:
-            key: 'pgsql.connections["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
+            key: 'pgsql.connections["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]'
           tags:
             - tag: component
               value: connections
@@ -436,7 +436,7 @@ zabbix_export:
               parameters:
                 - $.idle_in_transaction_aborted
           master_item:
-            key: 'pgsql.connections["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
+            key: 'pgsql.connections["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]'
           tags:
             - tag: component
               value: connections
@@ -453,7 +453,7 @@ zabbix_export:
               parameters:
                 - $.prepared
           master_item:
-            key: 'pgsql.connections["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
+            key: 'pgsql.connections["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]'
           tags:
             - tag: component
               value: connections
@@ -468,7 +468,7 @@ zabbix_export:
               parameters:
                 - $.total
           master_item:
-            key: 'pgsql.connections["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
+            key: 'pgsql.connections["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]'
           tags:
             - tag: component
               value: connections
@@ -484,7 +484,7 @@ zabbix_export:
               parameters:
                 - $.total_pct
           master_item:
-            key: 'pgsql.connections["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
+            key: 'pgsql.connections["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]'
           tags:
             - tag: component
               value: connections
@@ -511,13 +511,13 @@ zabbix_export:
               parameters:
                 - $.waiting
           master_item:
-            key: 'pgsql.connections["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
+            key: 'pgsql.connections["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]'
           tags:
             - tag: component
               value: connections
         - uuid: e926ecd967f342bf90e9923825147d64
           name: 'Get connections sum'
-          key: 'pgsql.connections["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
+          key: 'pgsql.connections["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]'
           history: '0'
           value_type: TEXT
           trends: '0'
@@ -529,7 +529,7 @@ zabbix_export:
               value: raw
         - uuid: 1cab825fac8a49ba96dfbf7a696be729
           name: 'Custom queries'
-          key: 'pgsql.custom.query["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}",""]'
+          key: 'pgsql.custom.query["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}",""]'
           history: 1h
           value_type: TEXT
           trends: '0'
@@ -553,7 +553,7 @@ zabbix_export:
               parameters:
                 - ''
           master_item:
-            key: 'pgsql.dbstat.sum["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
+            key: 'pgsql.dbstat.sum["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]'
           tags:
             - tag: component
               value: cache
@@ -572,7 +572,7 @@ zabbix_export:
               parameters:
                 - ''
           master_item:
-            key: 'pgsql.dbstat.sum["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
+            key: 'pgsql.dbstat.sum["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]'
           tags:
             - tag: component
               value: storage
@@ -592,7 +592,7 @@ zabbix_export:
               parameters:
                 - '0.001'
           master_item:
-            key: 'pgsql.dbstat.sum["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
+            key: 'pgsql.dbstat.sum["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]'
           tags:
             - tag: component
               value: storage
@@ -612,7 +612,7 @@ zabbix_export:
               parameters:
                 - '0.001'
           master_item:
-            key: 'pgsql.dbstat.sum["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
+            key: 'pgsql.dbstat.sum["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]'
           tags:
             - tag: component
               value: storage
@@ -640,7 +640,7 @@ zabbix_export:
               error_handler: CUSTOM_VALUE
               error_handler_params: '-1'
           master_item:
-            key: 'pgsql.dbstat.sum["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
+            key: 'pgsql.dbstat.sum["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]'
           tags:
             - tag: component
               value: system
@@ -670,7 +670,7 @@ zabbix_export:
               parameters:
                 - ''
           master_item:
-            key: 'pgsql.dbstat.sum["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
+            key: 'pgsql.dbstat.sum["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]'
           tags:
             - tag: component
               value: queries
@@ -689,7 +689,7 @@ zabbix_export:
               parameters:
                 - ''
           master_item:
-            key: 'pgsql.dbstat.sum["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
+            key: 'pgsql.dbstat.sum["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]'
           tags:
             - tag: component
               value: deadlocks
@@ -704,7 +704,7 @@ zabbix_export:
               parameters:
                 - $.numbackends
           master_item:
-            key: 'pgsql.dbstat.sum["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
+            key: 'pgsql.dbstat.sum["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]'
           tags:
             - tag: component
               value: backends
@@ -724,7 +724,7 @@ zabbix_export:
               parameters:
                 - ''
           master_item:
-            key: 'pgsql.dbstat.sum["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
+            key: 'pgsql.dbstat.sum["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]'
           tags:
             - tag: component
               value: storage
@@ -743,7 +743,7 @@ zabbix_export:
               parameters:
                 - ''
           master_item:
-            key: 'pgsql.dbstat.sum["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
+            key: 'pgsql.dbstat.sum["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]'
           tags:
             - tag: component
               value: storage
@@ -762,7 +762,7 @@ zabbix_export:
               parameters:
                 - ''
           master_item:
-            key: 'pgsql.dbstat.sum["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
+            key: 'pgsql.dbstat.sum["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]'
           tags:
             - tag: component
               value: queries
@@ -781,7 +781,7 @@ zabbix_export:
               parameters:
                 - ''
           master_item:
-            key: 'pgsql.dbstat.sum["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
+            key: 'pgsql.dbstat.sum["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]'
           tags:
             - tag: component
               value: queries
@@ -800,7 +800,7 @@ zabbix_export:
               parameters:
                 - ''
           master_item:
-            key: 'pgsql.dbstat.sum["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
+            key: 'pgsql.dbstat.sum["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]'
           tags:
             - tag: component
               value: queries
@@ -819,7 +819,7 @@ zabbix_export:
               parameters:
                 - ''
           master_item:
-            key: 'pgsql.dbstat.sum["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
+            key: 'pgsql.dbstat.sum["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]'
           tags:
             - tag: component
               value: queries
@@ -838,7 +838,7 @@ zabbix_export:
               parameters:
                 - ''
           master_item:
-            key: 'pgsql.dbstat.sum["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
+            key: 'pgsql.dbstat.sum["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]'
           tags:
             - tag: component
               value: queries
@@ -857,7 +857,7 @@ zabbix_export:
               parameters:
                 - ''
           master_item:
-            key: 'pgsql.dbstat.sum["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
+            key: 'pgsql.dbstat.sum["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]'
           tags:
             - tag: component
               value: transactions
@@ -876,13 +876,13 @@ zabbix_export:
               parameters:
                 - ''
           master_item:
-            key: 'pgsql.dbstat.sum["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
+            key: 'pgsql.dbstat.sum["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]'
           tags:
             - tag: component
               value: transactions
         - uuid: ddddde3084d54f55838b970f44290523
           name: 'Get dbstat sum'
-          key: 'pgsql.dbstat.sum["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
+          key: 'pgsql.dbstat.sum["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]'
           history: '0'
           value_type: TEXT
           trends: '0'
@@ -894,7 +894,7 @@ zabbix_export:
               value: raw
         - uuid: 3be06ec14cba44d0892f3271a599c473
           name: 'Get dbstat'
-          key: 'pgsql.dbstat["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
+          key: 'pgsql.dbstat["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]'
           history: '0'
           value_type: TEXT
           trends: '0'
@@ -906,7 +906,7 @@ zabbix_export:
               value: raw
         - uuid: 7112eeb300c14d959c79715462bf9563
           name: 'Get locks'
-          key: 'pgsql.locks["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
+          key: 'pgsql.locks["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]'
           history: '0'
           value_type: TEXT
           trends: '0'
@@ -958,7 +958,7 @@ zabbix_export:
                   value: availability
         - uuid: 01123126fcd54adc84c3bbfa227d9c0c
           name: 'Get queries'
-          key: 'pgsql.queries["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}","{$PG.QUERY_ETIME.MAX.WARN}"]'
+          key: 'pgsql.queries["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}","{$PG.QUERY_ETIME.MAX.WARN}"]'
           history: '0'
           value_type: TEXT
           trends: '0'
@@ -991,7 +991,7 @@ zabbix_export:
               value: replication
         - uuid: 4120befb754d47e9a931f868c28badb9
           name: 'Get replication'
-          key: 'pgsql.replication.process["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
+          key: 'pgsql.replication.process["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]'
           history: '0'
           value_type: TEXT
           trends: '0'
@@ -1038,7 +1038,7 @@ zabbix_export:
                   value: notice
         - uuid: 523528aad175455fbd1daba161365651
           name: Version
-          key: 'pgsql.version["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
+          key: 'pgsql.version["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]'
           delay: 15m
           value_type: CHAR
           trends: '0'
@@ -1052,7 +1052,7 @@ zabbix_export:
               value: application
           triggers:
             - uuid: 6b3ac2a19e114e1390e6e0793728f576
-              expression: 'last(/PostgreSQL by Zabbix agent 2/pgsql.version["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"],#1)<>last(/PostgreSQL by Zabbix agent 2/pgsql.version["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"],#2) and length(last(/PostgreSQL by Zabbix agent 2/pgsql.version["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]))>0'
+              expression: 'last(/PostgreSQL by Zabbix agent 2/pgsql.version["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"],#1)<>last(/PostgreSQL by Zabbix agent 2/pgsql.version["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"],#2) and length(last(/PostgreSQL by Zabbix agent 2/pgsql.version["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]))>0'
               name: 'Version has changed'
               event_name: 'Version has changed (new version value received: {ITEM.VALUE})'
               priority: INFO
@@ -1070,7 +1070,7 @@ zabbix_export:
               parameters:
                 - $.count
           master_item:
-            key: 'pgsql.wal.stat["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
+            key: 'pgsql.wal.stat["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]'
           tags:
             - tag: component
               value: wal
@@ -1089,13 +1089,13 @@ zabbix_export:
               parameters:
                 - ''
           master_item:
-            key: 'pgsql.wal.stat["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
+            key: 'pgsql.wal.stat["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]'
           tags:
             - tag: component
               value: wal
         - uuid: c3d96741af454f6b9a3a49b6117c31be
           name: 'Get WAL'
-          key: 'pgsql.wal.stat["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
+          key: 'pgsql.wal.stat["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]'
           delay: 5m
           history: '0'
           value_type: TEXT
@@ -1119,7 +1119,7 @@ zabbix_export:
               parameters:
                 - ''
           master_item:
-            key: 'pgsql.wal.stat["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
+            key: 'pgsql.wal.stat["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]'
           tags:
             - tag: component
               value: wal
@@ -1381,7 +1381,7 @@ zabbix_export:
                     - '$[''{#DBNAME}'']'
                   error_handler: DISCARD_VALUE
               master_item:
-                key: 'pgsql.dbstat["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
+                key: 'pgsql.dbstat["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]'
               tags:
                 - tag: component
                   value: raw
@@ -1658,7 +1658,7 @@ zabbix_export:
                     - '$[''{#DBNAME}'']'
                   error_handler: DISCARD_VALUE
               master_item:
-                key: 'pgsql.locks["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
+                key: 'pgsql.locks["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]'
               tags:
                 - tag: component
                   value: raw
@@ -1782,7 +1782,7 @@ zabbix_export:
                     - '$[''{#DBNAME}'']'
                   error_handler: DISCARD_VALUE
               master_item:
-                key: 'pgsql.queries["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}","{$PG.QUERY_ETIME.MAX.WARN}"]'
+                key: 'pgsql.queries["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}","{$PG.QUERY_ETIME.MAX.WARN}"]'
               tags:
                 - tag: component
                   value: raw
@@ -2173,7 +2173,7 @@ zabbix_export:
                     - '$[''{#APPLICATION_NAME}'']'
                   error_handler: DISCARD_VALUE
               master_item:
-                key: 'pgsql.replication.process["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]'
+                key: 'pgsql.replication.process["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]'
               tags:
                 - tag: application
                   value: '{#APPLICATION_NAME}'
