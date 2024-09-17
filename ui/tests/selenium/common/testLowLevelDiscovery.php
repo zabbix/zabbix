@@ -215,7 +215,7 @@ class testLowLevelDiscovery extends CWebTest {
 							->filter(new CElementFilter(CElementFilter::CLICKABLE))->count()
 					);
 					$filter_table = $filters_container->query('id:conditions')->asTable()->one();
-					$this->assertEquals(['Label', 'Macro', '', 'Regular expression', 'Action'],
+					$this->assertEquals(['Label', 'Macro', '', 'Regular expression', ''],
 							$filter_table->getHeadersText()
 					);
 					$this->assertFalse($filters_container->query('id:evaltype')->exists());

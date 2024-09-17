@@ -64,7 +64,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 		$server_table = [
 			'Servers' => [
 				'id' => 'ldap-servers',
-				'headers' => ['Name', 'Host', 'User groups', 'Default', '']
+				'headers' => ['Name', 'Host', 'User groups', 'Default', 'Action']
 			]
 		];
 
@@ -510,7 +510,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 		}
 
 		// Check headers.
-		$this->assertEquals(['Name', 'Host', 'User groups', 'Default', ''], $table->getHeadersText());
+		$this->assertEquals(['Name', 'Host', 'User groups', 'Default', 'Action'], $table->getHeadersText());
 
 		// Check that LDAP server added in DB.
 		$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM userdirectory_ldap'));
@@ -581,7 +581,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 		$form->selectTab('LDAP settings');
 
 		// Find default LDAP server, delete it and check that another LDAP server set as default.
-		$table->findRow('Host', $hostname)->getColumn('')->query('button:Remove')->one()->click();
+		$table->findRow('Host', $hostname)->getColumn('Action')->query('button:Remove')->one()->click();
 		$form->submit();
 		$this->assertMessage(TEST_GOOD, 'Authentication settings updated');
 		$new_hostname = CDBHelper::getValue('SELECT host FROM userdirectory_ldap udl INNER JOIN config co ON '.
