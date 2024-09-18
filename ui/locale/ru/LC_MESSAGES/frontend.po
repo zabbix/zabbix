@@ -3415,23 +3415,23 @@ msgstr[2] "Не удалось импортировать шаблон \"%1$s\",
 
 #: include/classes/api/services/CItemGeneral.php:689
 #, c-format
-msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
-msgstr "Не удалось унаследовать LLD правила с ключом \"%1$s\" с обоих шаблонов \"%2$s\" и \"%3$s\", так как ключ должен быть уникален на узле сети \"%4$s\"."
+msgid "Cannot inherit LDD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
+msgstr "Не удалось унаследовать LDD правила с ключом \"%1$s\" с обоих шаблонов \"%2$s\" и \"%3$s\", так как ключ должен быть уникален на узле сети \"%4$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:690
 #, c-format
-msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
-msgstr "Не удалось унаследовать LLD правила с ключом \"%1$s\" с обоих шаблонов \"%2$s\" и \"%3$s\", так как ключ должен быть уникален у шаблона \"%4$s\"."
+msgid "Cannot inherit LDD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
+msgstr "Не удалось унаследовать LDD правила с ключом \"%1$s\" с обоих шаблонов \"%2$s\" и \"%3$s\", так как ключ должен быть уникален у шаблона \"%4$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:819
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a discovered item with the same key already exists."
-msgstr "Не удалось унаследовать LLD правило с ключом \"%1$s\" шаблона \"%2$s\" к узлу сети \"%3$s\", так как уже существует обнаруженный элемент данных с таким же ключом."
+msgstr "Не удалось унаследовать LDD правило с ключом \"%1$s\" шаблона \"%2$s\" к узлу сети \"%3$s\", так как уже существует обнаруженный элемент данных с таким же ключом."
 
 #: include/classes/api/services/CItemGeneral.php:1230
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a host interface of type \"%4$s\" is required."
-msgstr "Не удалось унаследовать LLD правило с ключом \"%1$s\" шаблона \"%2$s\" к узлу сети \"%3$s\", так как требуется наличие интерфейса узла \"%4$s\" типа."
+msgstr "Не удалось унаследовать LDD правило с ключом \"%1$s\" шаблона \"%2$s\" к узлу сети \"%3$s\", так как требуется наличие интерфейса узла \"%4$s\" типа."
 
 #: include/classes/api/services/CItemGeneral.php:874
 #, c-format
@@ -3441,17 +3441,17 @@ msgstr "Не удалось унаследовать низкоуровнево�
 #: include/classes/api/services/CItemGeneral.php:813
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item prototype with the same key already exists."
-msgstr "Не удалось унаследовать LLD правило с ключом \"%1$s\" шаблона \"%2$s\" к узлу сети \"%3$s\", так как прототип элемента данных с таким же ключом уже существует."
+msgstr "Не удалось унаследовать LDD правило с ключом \"%1$s\" шаблона \"%2$s\" к узлу сети \"%3$s\", так как прототип элемента данных с таким же ключом уже существует."
 
 #: include/classes/api/services/CItemGeneral.php:807
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item with the same key already exists."
-msgstr "Не удалось унаследовать LLD правило с ключом \"%1$s\" шаблона \"%2$s\" к узлу сети \"%3$s\", так как элемент данных с таким же ключом уже существует."
+msgstr "Не удалось унаследовать LDD правило с ключом \"%1$s\" шаблона \"%2$s\" к узлу сети \"%3$s\", так как элемент данных с таким же ключом уже существует."
 
 #: include/classes/api/services/CItemGeneral.php:820
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because a discovered item with the same key already exists."
-msgstr "Не удалось унаследовать LLD правило с ключом \"%1$s\" шаблона \"%2$s\" к шаблону \"%3$s\", так как уже существует обнаруженный элемент данных с таким же ключом."
+msgstr "Не удалось унаследовать LDD правило с ключом \"%1$s\" шаблона \"%2$s\" к шаблону \"%3$s\", так как уже существует обнаруженный элемент данных с таким же ключом."
 
 #: include/classes/api/services/CItemGeneral.php:875
 #, c-format
@@ -3461,12 +3461,22 @@ msgstr "Не удалось унаследовать низкоуровнево�
 #: include/classes/api/services/CItemGeneral.php:814
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item prototype with the same key already exists."
-msgstr "Не удалось унаследовать LLD правило с ключом \"%1$s\" шаблона \"%2$s\" к шаблону \"%3$s\", так как прототип элементов данных с таким же ключом уже существует."
+msgstr "Не удалось унаследовать LDD правило с ключом \"%1$s\" шаблона \"%2$s\" к шаблону \"%3$s\", так как прототип элементов данных с таким же ключом уже существует."
 
 #: include/classes/api/services/CItemGeneral.php:808
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item with the same key already exists."
-msgstr "Не удалось унаследовать LLD правило с ключом \"%1$s\" шаблона \"%2$s\" к шаблону \"%3$s\", так как элемент данных с таким же ключом уже существует."
+msgstr "Не удалось унаследовать LDD правило с ключом \"%1$s\" шаблона \"%2$s\" к шаблону \"%3$s\", так как элемент данных с таким же ключом уже существует."
+
+#: include/classes/api/services/CItemGeneral.php:684
+#, c-format
+msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:685
+#, c-format
+msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
+msgstr ""
 
 #: include/classes/api/services/CItemPrototype.php:1220
 #, c-format
