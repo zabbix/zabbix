@@ -58,6 +58,7 @@
 #include "zbxpgservice.h"
 #include "zbxinterface.h"
 #include "zbxhistory.h"
+#include "zbx_expression_constants.h"
 
 ZBX_PTR_VECTOR_IMPL(inventory_value_ptr, zbx_inventory_value_t *)
 ZBX_PTR_VECTOR_IMPL(hc_item_ptr, zbx_hc_item_t *)
@@ -10588,6 +10589,35 @@ void	zbx_dc_config_get_preprocessable_items(zbx_hashset_t *items, zbx_dc_um_shar
 		*um_handle = um_handle_new;
 }
 
+int	zbx_dc_get_host_value(zbx_uint64_t itemid, char **replace_to, int request)
+{
+	int		ret;
+	zbx_dc_host_t	host;
+
+	zbx_dc_config_get_hosts_by_itemids(&host, &itemid, &ret, 1);
+
+	if (FAIL == ret)
+		return FAIL;
+
+	switch (request)
+	{
+		case ZBX_REQUEST_HOST_ID:
+			*replace_to = zbx_dsprintf(*replace_to, ZBX_FS_UI64, host.hostid);
+			break;
+		case ZBX_REQUEST_HOST_HOST:
+			*replace_to = zbx_strdup(*replace_to, host.host);
+			break;
+		case ZBX_REQUEST_HOST_NAME:
+			*replace_to = zbx_strdup(*replace_to, host.name);
+			break;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+			ret = FAIL;
+	}
+
+	return ret;
+}
+
 void	zbx_dc_config_get_hosts_by_itemids(zbx_dc_host_t *hosts, const zbx_uint64_t *itemids, int *errcodes, size_t num)
 {
 	size_t			i;
@@ -11483,6 +11513,62 @@ int	zbx_dc_config_get_interface(zbx_dc_interface_t *interface, zbx_uint64_t host
 
 unlock:
 	UNLOCK_CACHE;
+
+	return res;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: retrieve a particular value associated with the interface.        *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *               otherwise FAIL                                               *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dc_get_interface_value(zbx_uint64_t hostid, zbx_uint64_t itemid, char **replace_to, int request)
+{
+	int			res;
+	zbx_dc_interface_t	interface;
+
+	if (SUCCEED != (res = zbx_dc_config_get_interface(&interface, hostid, itemid)))
+	{
+		*replace_to = zbx_strdup(*replace_to, STR_UNKNOWN_VARIABLE);
+		return SUCCEED;
+	}
+
+	switch (request)
+	{
+		case ZBX_REQUEST_HOST_IP:
+			if ('\0' != *interface.ip_orig && FAIL == zbx_is_ip(interface.ip_orig))
+				return FAIL;
+
+			*replace_to = zbx_strdup(*replace_to, interface.ip_orig);
+			break;
+		case ZBX_REQUEST_HOST_DNS:
+			if ('\0' != *interface.dns_orig && FAIL == zbx_is_ip(interface.dns_orig) &&
+					FAIL == zbx_validate_hostname(interface.dns_orig))
+			{
+				return FAIL;
+			}
+
+			*replace_to = zbx_strdup(*replace_to, interface.dns_orig);
+			break;
+		case ZBX_REQUEST_HOST_CONN:
+			if (FAIL == zbx_is_ip(interface.addr) &&
+					FAIL == zbx_validate_hostname(interface.addr))
+			{
+				return FAIL;
+			}
+
+			*replace_to = zbx_strdup(*replace_to, interface.addr);
+			break;
+		case ZBX_REQUEST_HOST_PORT:
+			*replace_to = zbx_strdup(*replace_to, interface.port_orig);
+			break;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+			res = FAIL;
+	}
 
 	return res;
 }
