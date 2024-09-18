@@ -19,7 +19,7 @@ require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
 /**
  * @backup sysmaps
  */
-class testFormMap extends CLegacyWebTest {
+class testFormMapConstructor extends CLegacyWebTest {
 
 	const MAP_NAME = 'Map for form testing';
 
@@ -35,7 +35,7 @@ class testFormMap extends CLegacyWebTest {
 			if (!isset($DB['DB'])) {
 				DBconnect($error);
 			}
-			CDataHelper::load('MapWithLinks');
+			CDataHelper::load('Maps');
 
 			$data = CDBHelper::getDataProvider('SELECT * FROM sysmaps');
 		}
@@ -81,7 +81,7 @@ class testFormMap extends CLegacyWebTest {
 	 *
 	 * @browsers chrome
 	 */
-	public function testFormMap_SimpleUpdateConstructor($map) {
+	public function testFormMapConstructor_SimpleUpdateConstructor($map) {
 		$sysmapid = $map['sysmapid'];
 
 		$sql_maps_elements = 'SELECT * FROM sysmaps sm INNER JOIN sysmaps_elements sme ON'.
@@ -131,7 +131,7 @@ class testFormMap extends CLegacyWebTest {
 	 *
 	 * @dataProvider possibleGridOptions
 	 */
-	public function testFormMap_UpdateGridOptions($gridSize, $showGrid, $autoAlign) {
+	public function testFormMapConstructor_UpdateGridOptions($gridSize, $showGrid, $autoAlign) {
 
 		$map_name = self::MAP_NAME;
 
@@ -214,9 +214,9 @@ class testFormMap extends CLegacyWebTest {
 	/**
 	 * Check the screenshot of the trigger container in trigger map element.
 	 */
-	public function testFormMap_MapElementScreenshot() {
+	public function testFormMapConstructor_MapElementScreenshot() {
 		// Open map in edit mode.
-		$this->page->login()->open('sysmap.php?sysmapid='.CDataHelper::get('MapWithLinks.form_test_mapid'))->waitUntilReady();
+		$this->page->login()->open('sysmap.php?sysmapid='.CDataHelper::get('Maps.form_test_mapid'))->waitUntilReady();
 
 		// Click on map element 'Trigger for map' (in prepareMapData this trigger has icon id = 146).
 		$this->query('xpath://div[contains(@class, "sysmap_iconid_146")]')->waitUntilVisible()->one()->click();

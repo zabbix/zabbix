@@ -23,7 +23,10 @@ use Facebook\WebDriver\WebDriverBy;
 /**
  * @backup sysmaps
  */
-class testFormSysmap extends CLegacyWebTest {
+class testFormMapProperties extends CLegacyWebTest {
+
+	const MAP_NAME = 'Test map for Properties';
+	const EDIT_MAP_NAME = 'Local network';
 
 	/**
 	 * Attach MessageBehavior and TableBehavior to the test.
@@ -37,14 +40,27 @@ class testFormSysmap extends CLegacyWebTest {
 		];
 	}
 
-	public $mapName = 'Test map 1';
-	public $edit_map_name = 'Local network';
-
+	/**
+	 * This function creates maps before the whole tests build, so that getDataProvider method can use created maps.
+	 *
+	 * @return array
+	 */
 	public static function allMaps() {
-		return CDBHelper::getDataProvider('SELECT * FROM sysmaps');
+		static $data = null;
+		if ($data === null) {
+			global $DB;
+			if (!isset($DB['DB'])) {
+				DBconnect($error);
+			}
+			CDataHelper::load('Maps');
+
+			$data = CDBHelper::getDataProvider('SELECT * FROM sysmaps');
+		}
+
+		return $data;
 	}
 
-	public function testFormSysmap_Layout() {
+	public function testFormMapProperties_Layout() {
 		$this->zbxTestLogin('sysmaps.php?form=Create+map');
 		$this->zbxTestCheckTitle('Configuration of network maps');
 		$this->zbxTestCheckHeader('Network maps');
@@ -150,12 +166,11 @@ class testFormSysmap extends CLegacyWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'name' => 'Test map 1',
+					'name' => 'Test map for Properties',
 					'error_msg' => 'Cannot add network map',
 					'errors' => [
-						'Map "Test map 1" already exists.'
+						'Map "Test map for Properties" already exists.'
 					]
-
 				]
 			],
 			[
@@ -258,7 +273,7 @@ class testFormSysmap extends CLegacyWebTest {
 	/**
 	 * @dataProvider create
 	 */
-	public function testFormSysmapCreate($data) {
+	public function testFormMapPropertiesCreate($data) {
 		$this->zbxTestLogin('sysmaps.php?form=Create+map');
 		$this->zbxTestInputTypeWait('name', $data['name']);
 		$this->zbxTestAssertElementValue('name', $data['name']);
@@ -347,7 +362,7 @@ class testFormSysmap extends CLegacyWebTest {
 		}
 	}
 
-	public function testFormSysmap_CancelCreate() {
+	public function testFormMapProperties_CancelCreate() {
 		$old_hash = CDBHelper::getHash('SELECT * FROM sysmaps ORDER BY sysmapid');
 		$this->page->login()->open('sysmaps.php');
 		$this->query('button:Create map')->waitUntilClickable()->one()->click();
@@ -365,7 +380,7 @@ class testFormSysmap extends CLegacyWebTest {
 	/**
 	 * @dataProvider allMaps
 	 */
-	public function testFormSysmap_SimpleUpdateProperties($map) {
+	public function testFormMapProperties_SimpleUpdateProperties($map) {
 		$sql_maps_elements = 'SELECT * FROM sysmaps sm INNER JOIN sysmaps_elements sme ON'.
 				' sme.sysmapid = sm.sysmapid ORDER BY sme.selementid';
 		$sql_links_triggers = 'SELECT * FROM sysmaps_links sl INNER JOIN sysmaps_link_triggers slt ON'.
@@ -390,46 +405,50 @@ class testFormSysmap extends CLegacyWebTest {
 		}
 	}
 
-	public function testFormSysmap_UpdateMapName() {
+	public function testFormMapProperties_UpdateMapName() {
 		$new_map_name = 'Map name changed';
 
 		$this->zbxTestLogin('sysmaps.php');
-		$this->zbxTestClickXpathWait("//a[text()='$this->edit_map_name']/../..//a[text()='Properties']");
+		$this->zbxTestClickXpathWait('//a[text()='.CXPathHelper::escapeQuotes(self::EDIT_MAP_NAME).
+				']/../..//a[text()="Properties"]'
+		);
 
 		$this->zbxTestInputTypeOverwrite('name', $new_map_name);
 		$this->zbxTestClickWait('update');
 
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Network map updated');
 		$this->zbxTestTextPresent($new_map_name);
-		$this->assertEquals(1, CDBHelper::getCount("SELECT sysmapid FROM sysmaps WHERE name='".$new_map_name."'"));
-		$this->assertEquals(0, CDBHelper::getCount("SELECT sysmapid FROM sysmaps WHERE name='$this->edit_map_name'"));
+		$this->assertEquals(1, CDBHelper::getCount('SELECT sysmapid FROM sysmaps WHERE name='.zbx_dbstr($new_map_name)));
+		$this->assertEquals(0, CDBHelper::getCount('SELECT sysmapid FROM sysmaps WHERE name='.zbx_dbstr(self::EDIT_MAP_NAME)));
 	}
 
-	public function testFormSysmap_CloneMap() {
+	public function testFormMapProperties_CloneMap() {
 		$mapName = 'Cloned map';
 
 		$this->zbxTestLogin('sysmaps.php');
-		$this->zbxTestClickXpathWait("//a[text()='$this->mapName']/../..//a[text()='Properties']");
+		$this->zbxTestClickXpathWait('//a[text()='.CXPathHelper::escapeQuotes(self::MAP_NAME).
+				']/../..//a[text()="Properties"]'
+		);
 		$this->zbxTestClickWait('clone');
 		$this->zbxTestInputTypeOverwrite('name', $mapName);
 		$this->zbxTestClickWait('add');
 		$this->zbxTestCheckTitle('Configuration of network maps');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Network map added');
-		$this->assertEquals(1, CDBHelper::getCount("SELECT sysmapid FROM sysmaps WHERE name='".$mapName."'"));
+		$this->assertEquals(1, CDBHelper::getCount('SELECT sysmapid FROM sysmaps WHERE name='.zbx_dbstr($mapName)));
 		$this->zbxTestTextPresent($mapName);
 		return $mapName;
 	}
 
 	/**
-	 * @depends testFormSysmap_CloneMap
+	 * @depends testFormMapProperties_CloneMap
 	 */
-	public function testFormSysmap_DeleteClonedMap($mapName = 'Cloned map') {
+	public function testFormMapProperties_DeleteClonedMap($mapName = 'Cloned map') {
 		// Delete Map if it was created
 		$this->zbxTestLogin('sysmaps.php');
-		$this->zbxTestClickXpathWait("//a[text()='".$mapName."']/../..//a[text()='Properties']");
+		$this->zbxTestClickXpathWait('//a[text()='.CXPathHelper::escapeQuotes($mapName).']/../..//a[text()="Properties"]');
 		$this->zbxTestClickWait('delete');
 		$this->zbxTestAcceptAlert();
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Network map deleted');
-		$this->assertEquals(0, CDBHelper::getCount("SELECT sysmapid FROM sysmaps WHERE name='".$mapName."'"));
+		$this->assertEquals(0, CDBHelper::getCount('SELECT sysmapid FROM sysmaps WHERE name='.zbx_dbstr($mapName)));
 	}
 }

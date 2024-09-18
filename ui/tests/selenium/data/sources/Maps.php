@@ -14,7 +14,7 @@
 **/
 
 
-class MapWithLinks {
+class Maps {
 
 	public static function load() {
 		$hostgroupid = CDataHelper::call('hostgroup.create', [['name' => 'Group with maps']])['groupids'][0];
@@ -44,6 +44,15 @@ class MapWithLinks {
 						'value_type' => ITEM_VALUE_TYPE_UINT64
 					]
 				]
+			],
+			// Hosts for Map Properties test.
+			[
+				'host' => 'Host_1',
+				'groups' => ['groupid' => 4], // Zabbix servers.
+			],
+			[
+				'host' => 'Host_2',
+				'groups' => ['groupid' => 4], // Zabbix servers.
 			]
 		]);
 
@@ -215,7 +224,7 @@ class MapWithLinks {
 				'selements' => [
 					// Host 1.
 					[
-						'selementid' => 11,
+						'selementid' => 6,
 						'elements' => [['hostid' => $result['hostids']['Host for map for form testing']]],
 						'elementtype' => SYSMAP_ELEMENT_TYPE_HOST,
 						'iconid_off' => 186,
@@ -224,7 +233,7 @@ class MapWithLinks {
 					],
 					// Image.
 					[
-						'selementid' => 13,
+						'selementid' => 7,
 						'elementtype' => SYSMAP_ELEMENT_TYPE_IMAGE,
 						'iconid_off' => 6,
 						'x' => 250,
@@ -232,7 +241,7 @@ class MapWithLinks {
 					],
 					// Trigger.
 					[
-						'selementid' => 14,
+						'selementid' => 8,
 						'elementtype' => SYSMAP_ELEMENT_TYPE_TRIGGER,
 						'iconid_off' => 146,
 						'elements' => [['triggerid' => $map_form_triggerid]],
@@ -243,8 +252,49 @@ class MapWithLinks {
 				'links' => [
 					// Link between Host and Image.
 					[
-						'selementid1' => 11,
-						'selementid2' => 13,
+						'selementid1' => 6,
+						'selementid2' => 7,
+						'label' => 'Link label'
+					]
+				]
+			],
+			[
+				'name' => 'Test map for Properties',
+				'width' => 500,
+				'height' => 500,
+				'selements' => [
+					// Host 1.
+					[
+						'selementid' => 9,
+						'elements' => [['hostid' => $result['hostids']['Host_1']]],
+						'elementtype' => SYSMAP_ELEMENT_TYPE_HOST,
+						'iconid_off' => 186,
+						'x' => 139,
+						'y' => 27
+					],
+					// Host 2.
+					[
+						'selementid' => 10,
+						'elements' => [['hostid' => $result['hostids']['Host_2']]],
+						'elementtype' => SYSMAP_ELEMENT_TYPE_HOST,
+						'iconid_off' => 151,
+						'x' => 89,
+						'y' => 377
+					],
+					// Image.
+					[
+						'selementid' => 11,
+						'elementtype' => SYSMAP_ELEMENT_TYPE_IMAGE,
+						'iconid_off' => 6,
+						'x' => 250,
+						'y' => 350
+					]
+				],
+				'links' => [
+					// Link between Host_1 and Host_2.
+					[
+						'selementid1' => 9,
+						'selementid2' => 10,
 						'label' => 'Link label'
 					]
 				]
@@ -253,7 +303,8 @@ class MapWithLinks {
 
 		$mapids = [
 			'links_mapid' => $maps['sysmapids'][0],
-			'form_test_mapid' => $maps['sysmapids'][1]
+			'form_test_mapid' => $maps['sysmapids'][1],
+			'properties_mapid' => $maps['sysmapids'][2],
 		];
 
 		return $mapids;

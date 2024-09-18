@@ -19,7 +19,7 @@ require_once dirname(__FILE__).'/../include/CWebTest.php';
 use Facebook\WebDriver\WebDriverKeys;
 
 /**
- * @dataSource Actions, MapWithLinks, Proxies
+ * @dataSource Actions, Maps, Proxies
  *
  * @backup profiles, module, services, token, connector
  *
@@ -2811,7 +2811,7 @@ class testDocumentationLinks extends CWebTest {
 	 * @dataProvider getMapDocumentationLinkData
 	 */
 	public function testDocumentationLinks_checkMapElementLinks($data) {
-		$this->page->login()->open('sysmap.php?sysmapid='.CDataHelper::get('MapWithLinks.links_mapid'))->waitUntilReady();
+		$this->page->login()->open('sysmap.php?sysmapid='.CDataHelper::get('Maps.links_mapid'))->waitUntilReady();
 
 		// Checking element selection documentation links requires pressing control key when selecting elements.
 		if (is_array($data['element'])) {
