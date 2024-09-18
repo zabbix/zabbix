@@ -3380,12 +3380,12 @@ msgstr "No es pot pas heretar la regla LDD amb la clau \"%1$s\" de la plantilla 
 #: include/classes/api/services/CItemGeneral.php:684
 #, c-format
 msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
-msgstr ""
+msgstr "No es poden pas heretar les regles LLD la clau \"%1$s\" dels models \"%2$s\" i \"%3$s\", doncs la clau ha d'ésser única a l'equip \"%4$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:685
 #, c-format
 msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
-msgstr ""
+msgstr "No es poden pas heretar les regles LLD la clau \"%1$s\" dels models \"%2$s\" i \"%3$s\", doncs la clau ha d'ésser única a la plantilla \"%4$s\"."
 
 #: include/classes/api/services/CItemPrototype.php:1220
 #, c-format

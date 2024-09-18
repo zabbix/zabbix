@@ -3291,12 +3291,12 @@ msgstr "Không thể kế thừa LLD rule với key \"%1$s\" của template \"%2
 #: include/classes/api/services/CItemGeneral.php:684
 #, c-format
 msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
-msgstr ""
+msgstr "Không thể kế thừa LLD rules với key \"%1$s\" của cả \"%2$s\" và \"%3$s\" mẫu, bởi vì key phải là duy nhất trên host \"%4$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:685
 #, c-format
 msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
-msgstr ""
+msgstr "Không thể kế thừa LLD rules với key \"%1$s\" của cả hai templates \"%2$s\" và \"%3$s\", bởi vì key phải là duy nhất trên template \"%4$s\"."
 
 #: include/classes/api/services/CItemPrototype.php:1220
 #, c-format

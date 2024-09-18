@@ -3291,12 +3291,12 @@ msgstr "동일한 키를 가진 항목이 이미 있기 때문에 템플릿 \"%2
 #: include/classes/api/services/CItemGeneral.php:684
 #, c-format
 msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
-msgstr ""
+msgstr "키가 호스트 \"%4$s\"에서 고유해야 하므로 \"%2$s\" 및 \"%3$s\" 템플릿의 \"%1$s\" 키를 사용하여 LLD 규칙을 상속할 수 없습니다."
 
 #: include/classes/api/services/CItemGeneral.php:685
 #, c-format
 msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
-msgstr ""
+msgstr "키가 템플릿 \"%4$s\"에서 고유해야 하므로 \"%2$s\" 및 \"%3$s\" 템플릿의 \"%1$s\" 키가 있는 LLD 규칙을 상속할 수 없습니다."
 
 #: include/classes/api/services/CItemPrototype.php:1220
 #, c-format
