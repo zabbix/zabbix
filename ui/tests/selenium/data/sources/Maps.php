@@ -16,6 +16,11 @@
 
 class Maps {
 
+	/**
+	 * Create data for map related test.
+	 *
+	 * @return array
+	 */
 	public static function load() {
 		$hostgroupid = CDataHelper::call('hostgroup.create', [['name' => 'Group with maps']])['groupids'][0];
 
@@ -48,11 +53,11 @@ class Maps {
 			// Hosts for Map Properties test.
 			[
 				'host' => 'Host_1',
-				'groups' => ['groupid' => 4], // Zabbix servers.
+				'groups' => ['groupid' => 4] // Zabbix servers.
 			],
 			[
 				'host' => 'Host_2',
-				'groups' => ['groupid' => 4], // Zabbix servers.
+				'groups' => ['groupid' => 4] // Zabbix servers.
 			]
 		]);
 
@@ -117,7 +122,7 @@ class Maps {
 						'label' => 'Host group element (Linux servers)',
 						'x' => 301,
 						'y' => 351,
-						'elements' => [['groupid' => 4]], // Zabbix servers.
+						'elements' => [['groupid' => 4]] // Zabbix servers.
 					],
 					// Host (Disk array symbol).
 					[
@@ -304,7 +309,7 @@ class Maps {
 		$mapids = [
 			'links_mapid' => $maps['sysmapids'][0],
 			'form_test_mapid' => $maps['sysmapids'][1],
-			'properties_mapid' => $maps['sysmapids'][2],
+			'properties_mapid' => $maps['sysmapids'][2]
 		];
 
 		return $mapids;
