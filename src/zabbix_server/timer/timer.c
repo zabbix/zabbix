@@ -24,6 +24,7 @@
 #include "daemon.h"
 #include "zbxself.h"
 #include "service_protocol.h"
+#include "zbxserialize.h"
 
 #define ZBX_TIMER_DELAY		SEC_PER_MIN
 
@@ -160,22 +161,27 @@ static void	db_update_host_maintenances(const zbx_vector_ptr_t *updates)
 	zbx_free(sql);
 }
 
-static void     service_send_suppression_data(const zbx_vector_uint64_t *eventids, int suppressed)
+static void     service_send_suppression_data(const zbx_vector_uint64_pair_t *event_maintenance, int suppressed)
 {
-	unsigned char   *data = NULL;
-	size_t          data_alloc = 0, data_offset = 0;
+	unsigned char   *data, *ptr;
 	int             i;
+	zbx_uint32_t	data_len;
 
-	for (i = 0; i < eventids->values_num; i++)
-		zbx_service_serialize_id(&data, &data_alloc, &data_offset, eventids->values[i]);
+	data_len = (zbx_uint32_t)(event_maintenance->values_num * sizeof(zbx_uint64_pair_t) + sizeof(int));
+	ptr = data = zbx_malloc(NULL, data_len);
 
-	if (NULL == data)
-		return;
+	ptr += zbx_serialize_value(ptr, event_maintenance->values_num);
+	for (i = 0; i < event_maintenance->values_num; i++)
+	{
+		ptr += zbx_serialize_value(ptr, event_maintenance->values[i].first);
+		ptr += zbx_serialize_value(ptr, event_maintenance->values[i].second);
+	}
 
 	if (suppressed == 0)
-		zbx_service_flush(ZBX_IPC_SERVICE_SERVICE_EVENTS_UNSUPPRESS, data, (zbx_uint32_t)data_offset);
+		zbx_service_flush(ZBX_IPC_SERVICE_SERVICE_EVENTS_UNSUPPRESS, data, data_len);
 	else
-		zbx_service_flush(ZBX_IPC_SERVICE_SERVICE_EVENTS_SUPPRESS, data, (zbx_uint32_t)data_offset);
+		zbx_service_flush(ZBX_IPC_SERVICE_SERVICE_EVENTS_SUPPRESS, data, data_len);
+
 	zbx_free(data);
 }
 
@@ -187,20 +193,22 @@ static void     service_send_suppression_data(const zbx_vector_uint64_t *eventid
  ******************************************************************************/
 static void	db_remove_expired_event_suppress_data(int now)
 {
-	zbx_vector_uint64_t	eventids;
-	DB_ROW			row;
-	DB_RESULT		result;
+	zbx_vector_uint64_pair_t	event_maintenance;
+	DB_ROW				row;
+	DB_RESULT			result;
 
-	zbx_vector_uint64_create(&eventids);
+	zbx_vector_uint64_pair_create(&event_maintenance);
 
-	result = DBselect("select eventid from event_suppress where suppress_until<%d", now);
+	result = DBselect("select eventid,maintenanceid from event_suppress where suppress_until<%d", now);
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		zbx_uint64_t	eventid;
-		ZBX_STR2UINT64(eventid, row[0]);
+		zbx_uint64_pair_t	pair;
 
-		zbx_vector_uint64_append(&eventids, eventid);
+		ZBX_STR2UINT64(pair.first, row[0]);
+		ZBX_DBROW2UINT64(pair.second, row[1]);
+
+		zbx_vector_uint64_pair_append(&event_maintenance, pair);
 	}
 	DBfree_result(result);
 
@@ -208,9 +216,10 @@ static void	db_remove_expired_event_suppress_data(int now)
 	DBexecute("delete from event_suppress where suppress_until<%d", now);
 	DBcommit();
 
-	service_send_suppression_data(&eventids, 0);
+	if (0 != event_maintenance.values_num && 0 != zbx_dc_get_itservices_num())
+		service_send_suppression_data(&event_maintenance, 0);
 
-	zbx_vector_uint64_destroy(&eventids);
+	zbx_vector_uint64_pair_destroy(&event_maintenance);
 }
 
 /******************************************************************************
@@ -393,13 +402,11 @@ static void	db_get_query_events(zbx_vector_ptr_t *event_queries, zbx_vector_ptr_
 static void	db_update_event_suppress_data(int *suppressed_num)
 {
 	zbx_vector_ptr_t	event_queries, event_data;
-	zbx_vector_uint64_t	s_eventids;
 
 	*suppressed_num = 0;
 
 	zbx_vector_ptr_create(&event_queries);
 	zbx_vector_ptr_create(&event_data);
-	zbx_vector_uint64_create(&s_eventids);
 
 	db_get_query_events(&event_queries, &event_data);
 
@@ -411,12 +418,13 @@ static void	db_update_event_suppress_data(int *suppressed_num)
 		int				i, j, k;
 		zbx_event_suppress_query_t	*query;
 		zbx_event_suppress_data_t	*data;
-		zbx_vector_uint64_pair_t	del_event_maintenances;
-		zbx_vector_uint64_t		maintenanceids, eventids;
+		zbx_vector_uint64_pair_t	del_event_maintenances, suppressed;
+		zbx_vector_uint64_t		maintenanceids;
 		zbx_uint64_pair_t		pair;
 
 		zbx_vector_uint64_create(&maintenanceids);
 		zbx_vector_uint64_pair_create(&del_event_maintenances);
+		zbx_vector_uint64_pair_create(&suppressed);
 
 		zbx_dc_get_running_maintenanceids(&maintenanceids);
 
@@ -466,6 +474,10 @@ static void	db_update_event_suppress_data(int *suppressed_num)
 									(int)query->maintenances.values[k].second);
 
 							(*suppressed_num)++;
+
+							pair.first = query->eventid;
+							pair.second = query->maintenances.values[k].first;
+							zbx_vector_uint64_pair_append(&suppressed, pair);
 						}
 
 						k++;
@@ -507,12 +519,14 @@ static void	db_update_event_suppress_data(int *suppressed_num)
 							(int)query->maintenances.values[k].second);
 
 					(*suppressed_num)++;
-					zbx_vector_uint64_append(&s_eventids, query->eventid);
+
+					pair.first = query->eventid;
+					pair.second = query->maintenances.values[k].first;
+					zbx_vector_uint64_pair_append(&suppressed, pair);
 				}
 			}
 		}
 
-		zbx_vector_uint64_create(&eventids);
 		for (i = 0; i < del_event_maintenances.values_num; i++)
 		{
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
@@ -521,14 +535,10 @@ static void	db_update_event_suppress_data(int *suppressed_num)
 						" and maintenanceid=" ZBX_FS_UI64 ";\n",
 						del_event_maintenances.values[i].first,
 						del_event_maintenances.values[i].second);
-			zbx_vector_uint64_append(&eventids, del_event_maintenances.values[i].first);
 
 			if (FAIL == DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
 				goto cleanup;
 		}
-		service_send_suppression_data(&eventids, 0);
-
-		zbx_vector_uint64_destroy(&eventids);
 
 		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
@@ -543,13 +553,25 @@ static void	db_update_event_suppress_data(int *suppressed_num)
 cleanup:
 		DBcommit();
 
+		if (0 != del_event_maintenances.values_num || 0 != suppressed.values_num)
+		{
+			if (0 != zbx_dc_get_itservices_num())
+			{
+				if (0 != del_event_maintenances.values_num)
+					service_send_suppression_data(&del_event_maintenances, 0);
+
+				if (0 != suppressed.values_num)
+					service_send_suppression_data(&suppressed, 1);
+			}
+		}
+
 		zbx_db_insert_clean(&db_insert);
 		zbx_free(sql);
 
 		zbx_vector_uint64_pair_destroy(&del_event_maintenances);
 		zbx_vector_uint64_destroy(&maintenanceids);
 
-		service_send_suppression_data(&s_eventids, 1);
+		zbx_vector_uint64_pair_destroy(&suppressed);
 	}
 
 	zbx_vector_ptr_clear_ext(&event_data, (zbx_clean_func_t)event_suppress_data_free);
@@ -557,8 +579,6 @@ cleanup:
 
 	zbx_vector_ptr_clear_ext(&event_queries, (zbx_clean_func_t)zbx_event_suppress_query_free);
 	zbx_vector_ptr_destroy(&event_queries);
-
-	zbx_vector_uint64_destroy(&s_eventids);
 }
 
 /******************************************************************************
