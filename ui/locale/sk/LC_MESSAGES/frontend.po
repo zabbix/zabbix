@@ -3472,12 +3472,12 @@ msgstr "Pravidlo LLD s kľúčom \"%1$s\" šablóny \"%2$s\" nemožno zdediť na
 #: include/classes/api/services/CItemGeneral.php:684
 #, c-format
 msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
-msgstr "Nie je možné zdediť pravidlá LLD s kľúčom „%1$s“ zo šablón „%2$s“ aj „%3$s“, pretože kľúč musí byť na hostiteľovi „%4$s“ jedinečný."
+msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:685
 #, c-format
 msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
-msgstr "Nie je možné zdediť pravidlá LLD s kľúčom „%1$s“ zo šablón „%2$s“ aj „%3$s“, pretože kľúč musí byť jedinečný v šablóne „%4$s“."
+msgstr ""
 
 #: include/classes/api/services/CItemPrototype.php:1220
 #, c-format

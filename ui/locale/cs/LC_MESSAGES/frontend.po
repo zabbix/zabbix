@@ -3471,12 +3471,12 @@ msgstr "Nelze zdědit pravidlo LLD s klíčem \"%1$s\" ze šablony \"%2$s\" na �
 #: include/classes/api/services/CItemGeneral.php:684
 #, c-format
 msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
-msgstr "Nelze zdědit LLD pravidla s klíčem \"%1$s\" z obou šablon \"%2$s\" a \"%3$s\", protože klíč musí být unikátní na hostu \"%4$s\"."
+msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:685
 #, c-format
 msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
-msgstr "Nelze zdědit LLD pravidla s klíčem \"%1$s\" z obou šablon \"%2$s\" a \"%3$s\", protože klíč musí být unikátní na šabloně \"%4$s\"."
+msgstr ""
 
 #: include/classes/api/services/CItemPrototype.php:1220
 #, c-format

@@ -3471,12 +3471,12 @@ msgstr "Не удалось унаследовать LDD правило с кл�
 #: include/classes/api/services/CItemGeneral.php:684
 #, c-format
 msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
-msgstr "Не удалось унаследовать LLD правила с ключом \"%1$s\" с обоих шаблонов \"%2$s\" и \"%3$s\", так как ключ должен быть уникален на узле сети \"%4$s\"."
+msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:685
 #, c-format
 msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
-msgstr "Не удалось унаследовать LLD правила с ключом \"%1$s\" с обоих шаблонов \"%2$s\" и \"%3$s\", так как ключ должен быть уникален у шаблона \"%4$s\"."
+msgstr ""
 
 #: include/classes/api/services/CItemPrototype.php:1220
 #, c-format
