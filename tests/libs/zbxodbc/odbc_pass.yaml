@@ -92,7 +92,7 @@ in:
   pwd: 'pass word'
 
 out:
-  value: 'UID=test;PWD={pass word}'
+  value: 'UID=test;PWD=pass word'
 
 ---
 test case: pass= word
@@ -101,7 +101,7 @@ in:
   pwd: 'pass= word'
 
 out:
-  value: 'UID=test;PWD={pass= word}'
+  value: 'UID=test;PWD=pass= word'
 
 ---
 test case: password;}
@@ -146,6 +146,6 @@ in:
   pwd: '='
 
 out:
-  value: 'UID=test;PWD={=}'
+  value: 'UID=test;PWD=='
 
 ...

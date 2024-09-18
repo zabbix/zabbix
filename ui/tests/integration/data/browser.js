@@ -1,22 +1,62 @@
-parameters = JSON.parse(value);
-
 var	opts = Browser.chromeOptions();
 var	optsFirefox = Browser.firefoxOptions();
 var	optsSafari = Browser.safariOptions();
 var	optsEdge = Browser.edgeOptions()
 
+// uncomment for foreground
+// opts.capabilities.alwaysMatch['goog:chromeOptions'].args = []
+
+parameters = JSON.parse(value);
+
 Zabbix.log(5, JSON.stringify(optsFirefox))
 Zabbix.log(5, JSON.stringify(optsSafari))
 Zabbix.log(5, JSON.stringify(optsEdge))
 
-// uncomment for foreground
-// opts.capabilities.alwaysMatch['goog:chromeOptions'].args = []
+function clickElement(browser, strategy, selector) {
+
+	var el;
+
+	try {
+		el = browser.findElement(strategy, selector);
+	}
+	catch (error) {
+		throw Error("cannot findElement "+ strategy + " " + selector);
+	}
+
+	if (el === null)
+	{
+		throw Error("cannot find "+ strategy + " " + selector);
+	}
+
+	try {
+		el.click();
+	}
+	catch (error) {
+		throw Error("cannot click "+ strategy + " " + selector);
+	}
+}
+
+function findElementStrict(browser, strategy, selector) {
+
+	var el;
+
+	try {
+		el = browser.findElement(strategy, selector);
+	}
+	catch (error) {
+		throw Error("cannot findElement "+ strategy + " " + selector);
+	}
+
+	return el;
+}
 
 var browser = new Browser(opts)
 
 try
 {
-	browser.setScreenSize(800, 600);
+	Zabbix.log(3, "navigate");
+
+	browser.setScreenSize(1280, 720);
 	browser.navigate(parameters.url);
 
 	Zabbix.log(5, "getUrl: '"+ browser.getUrl()+"'")
@@ -24,6 +64,7 @@ try
 	browser.setScriptTimeout(5000);
 	browser.setSessionTimeout(1000);
 
+	Zabbix.log(3, "test error handling");
 	try
 	{
 		var elEarly = browser.findElements("text", "Web");
@@ -61,7 +102,7 @@ try
 		Zabbix.log(5, "invalid arguments error handled: " + error);
 	}
 	try {
-		var elEarly = browser.findElement(null,null);
+		var elEarly = browser.findElement(null, null);
 	}
 	catch (error) {
 		Zabbix.log(5, "invalid null arguments error handled: " + error);
@@ -82,11 +123,10 @@ try
 		Zabbix.log(5, "missing elements handled");
 	}
 
-
-
 	source = browser.getPageSource()
 	Zabbix.log(5, "source: " + source);
 
+	Zabbix.log(3, "login");
 	browser.setElementWaitTimeout(5000);
 
 	el = browser.findElement("xpath", "//input[@id='name']");
@@ -124,52 +164,21 @@ try
 		}
 	}
 
-	el = browser.findElement("xpath", "//button[@id='enter']");
-
-	if (el === null)
-	{
-		throw Error("cannot find login button");
-	}
+	el = findElementStrict(browser, "xpath", "//button[@id='enter']");
 
 	Zabbix.log(5, "getText " + el.getText())
 
 	el.click();
 
-	el = browser.findElement("link text", "Data collection");
+	Zabbix.log(3, "dismiss alert when disabling hosts");
 
-	if (el === null)
-	{
-		throw Error("cannot find Data collection");
-	}
-	el.click();
+	clickElement(browser, "link text", "Data collection");
 
-	el = browser.findElement("xpath", "//li[@id='config' and @class='has-submenu is-expanded']");
-	if (el === null)
-	{
-		throw Error("cannot find //li[@id='config' and @class='has-submenu is-expanded']");
-	}
+	findElementStrict(browser,"xpath", "//li[@id='config' and @class='has-submenu is-expanded']");
 
-	el = browser.findElement("link text", "Hosts");
-	if (el === null)
-	{
-		throw Error("cannot find Hosts");
-	}
-	el.click();
-
-	el = browser.findElement("xpath", "//input[@id='all_hosts']");
-	if (el === null)
-	{
-		throw Error("cannot find //input[@id='all_hosts']");
-	}
-	el.click();
-
-	el = browser.findElement("xpath", "//button[text()='Disable']");
-
-	if (el === null)
-	{
-		throw Error("cannot find //button[text()='Disable']");
-	}
-	el.click();
+	clickElement(browser, "link text", "Hosts");
+	clickElement(browser, "xpath", "//input[@id='all_hosts']");
+	clickElement(browser, "xpath", "//button[text()='Disable']");
 
 	alert_window = browser.getAlert();
 
@@ -178,53 +187,24 @@ try
 	el = browser.findElements("link text", "Web");
 	Zabbix.log(5, "Web length: " + el.length)
 
-	el = browser.findElement("link text", "Alerts");
-	if (el === null)
-	{
-		throw Error("cannot find Alerts");
-	}
-	el.click();
+	clickElement(browser, "link text", "Alerts");
 
-	el = browser.findElement("xpath", "//li[@id='alerts' and contains(@class,'is-expanded')]");
-	if (el === null)
-	{
-		throw Error("cannot find //li[@id='alerts' and contains(@class,'is-expanded')]");
-	}
+	findElementStrict(browser, "xpath", "//li[@id='alerts' and contains(@class,'is-expanded')]");
 
+	Zabbix.log(3, "accept alert when enabling media types");
 	Zabbix.sleep(250); // Alerts is clicked and Media Types slide up
 
-	el = browser.findElement("link text", "Media types");
-
-	if (el === null)
-	{
-		throw Error("cannot find Media types");
-	}
-	el.click();
-
-	el = browser.findElement("xpath", "//input[@id='all_media_types']");
-	if (el === null)
-	{
-		throw Error("cannot find //input[@id='all_media_types']");
-	}
-	el.click();
-
-	el = browser.findElement("xpath", "//button[text()='Enable']");
-	if (el === null)
-	{
-		throw Error("cannot find //button[text()='Enable']");
-	}
-	el.click();
+	clickElement(browser, "link text", "Media types");
+	clickElement(browser, "xpath", "//input[@id='all_media_types']");
+	clickElement(browser,"xpath", "//button[text()='Enable']");
 
 	alert_window = browser.getAlert();
 
 	alert_window.accept();
 
-	el = browser.findElement("xpath", "//a[text()='Enabled']");
-	if (null === el)
-	{
-		throw Error("couldn't enable Media types");
-	}
+	findElementStrict(browser, "xpath", "//a[text()='Enabled']");
 
+	Zabbix.log(3, "get cookies");
 	cookies = browser.getCookies()
 
 	for (i = 0; i < cookies.length; i++)
@@ -234,6 +214,8 @@ try
 			break;
 	}
 
+	Zabbix.log(3, "collect performance entries");
+
 	browser.collectPerfEntries();
 
 	// start second browser, reuse zbx_session cookie and sign out
@@ -241,30 +223,59 @@ try
 
 	try
 	{
+		Zabbix.log(3, "use cookies for second connection");
+
 		Zabbix.log(5, "cookie: " + JSON.stringify(cookies[i]));
 		browser2.navigate(parameters.url);
-		browser2.setScreenSize(800, 600);
+		browser2.setScreenSize(1280, 720);
 		browser2.addCookie(cookies[i]);
 
 		browser2.navigate(parameters.url);
 
+		Zabbix.log(3, "finished navigation");
+
 		browser2.setElementWaitTimeout(3000);
-		el = browser2.findElement("xpath", "//div[@class='dashboard is-ready']");
-		if (el === null)
-		{
-			throw Error("cannot find dashboard is-ready");
-		}
+		findElementStrict(browser2, "xpath", "//div[@class='dashboard is-ready']");
+
 		browser2.setElementWaitTimeout(0);
-		el = browser2.findElement("xpath", "//div[@class='no-data-message']");
-		if (el === null)
-		{
-			throw Error("cannot find no data message");
-		}
+
+		findElementStrict(browser2, "xpath", "//div[@class='no-data-message']");
+
+		browser2.setElementWaitTimeout(3000);
+
+		Zabbix.log(3, "click Dashboards");
+
+		clickElement(browser2, "link text", "Dashboards");
+		clickElement(browser2, "xpath", "//button[contains(.,'Edit dashboard')]");
+		clickElement(browser2, "xpath", "//button[contains(.,'Add')]");
+		clickElement(browser2, "xpath", "//button[@id='label-type']");
+		clickElement(browser2, "xpath", "//li[@value='url']");
+		el = findElementStrict(browser2, "xpath", "//input[@id='url']");
+		el.sendKeys(parameters.url + "zabbix.php?action=queue.overview");
+
+		clickElement(browser2, "xpath", "//button[@class='dialogue-widget-save']");
+
+		el = findElementStrict(browser2, "xpath", "//iframe");
+		browser2.switchFrame(el);
+
+		findElementStrict(browser2, "xpath", "//h1[contains(.,'Queue overview')]");
+
+		browser2.switchFrame();
+		browser2.switchFrame(0);
+
+		findElementStrict(browser2, "xpath", "//h1[contains(.,'Queue overview')]");
+
+		browser2.switchFrame();
+
+		clickElement(browser2, "xpath", "//a[contains(.,'Cancel')]");
+
+		Zabbix.log(3, "get screenshot");
 
 		Zabbix.log(5, "screenshot: " + browser2.getScreenshot());
 
 		el = browser2.findElement("link text", "Sign out");
 
+		Zabbix.log(3, "collect performance entries");
 		browser2.collectPerfEntries();
 
 		try
@@ -316,13 +327,18 @@ try
 	}
 	el.click();
 
+	Zabbix.log(3, "logging out");
+
 	browser2.navigate(parameters.url);
+	browser2.setElementWaitTimeout(100);
 	elSignOut = browser2.findElement("link text", "Sign out");
 
 	if (elSignOut != null)
 	{
 		throw Error("logged in without password after sign out");
 	}
+
+	Zabbix.log(3, "logged out");
 
 	var bypass = {};
 
@@ -362,6 +378,24 @@ try
 	{
 		Zabbix.log(5, "alert click handled " + error);
 	}
+	var elTest = new Object();
+
+	try
+	{
+		browser2.switchFrame(elTest);
+	}
+	catch (error)
+	{
+		Zabbix.log(5, "invalid parameter handled " + error);
+	}
+	try
+	{
+		browser2.switchFrame(0);
+	}
+	catch (error)
+	{
+		Zabbix.log(5, "missing frame error handled " + error);
+	}
 }
 catch (err)
 {
@@ -383,4 +417,6 @@ catch (err)
 
 result = browser.getResult();
 result.browserDashboard = browserDashboardResult;
+
+Zabbix.log(3, "finished");
 return JSON.stringify(result);

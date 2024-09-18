@@ -102,12 +102,14 @@ ZBX_DC_FUNCTION;
 typedef struct
 {
 	zbx_vector_uint64_pair_t	dep_itemids;
+	zbx_uint64_t			revision;
 }
 ZBX_DC_MASTERITEM;
 
 typedef struct
 {
 	zbx_vector_ptr_t	preproc_ops;
+	zbx_uint64_t		revision;
 }
 ZBX_DC_PREPROCITEM;
 
@@ -964,6 +966,7 @@ typedef struct
 	unsigned int		auto_registration_actions;	/* number of enabled auto resistration actions */
 
 	zbx_dc_revision_t	revision;
+	int		        itservices_num;
 
 	/* maintenance processing management */
 	unsigned char		maintenance_update;		/* flag to trigger maintenance update by timers  */

@@ -21,11 +21,12 @@
 
 <script>
 	const view = {
-		init({checkbox_hash, checkbox_object, context, parent_discoveryid}) {
+		init({checkbox_hash, checkbox_object, context, parent_discoveryid, form_name}) {
 			this.checkbox_hash = checkbox_hash;
 			this.checkbox_object = checkbox_object;
 			this.context = context;
 			this.is_discovery = parent_discoveryid !== null;
+			this.form = document.forms[form_name];
 
 			this._initActions();
 		},
@@ -54,6 +55,17 @@
 					});
 				});
 			}
+
+			this.form.addEventListener('click', (e) => {
+				const target = e.target;
+
+				if (target.classList.contains('js-edit-host')) {
+					this.editHost(e, target.dataset.hostid);
+				}
+				else if (target.classList.contains('js-edit-template')) {
+					this.editTemplate(e, target.dataset.hostid);
+				}
+			});
 		},
 
 		openCopyPopup() {
