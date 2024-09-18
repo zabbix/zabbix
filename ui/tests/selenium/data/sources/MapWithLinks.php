@@ -32,17 +32,35 @@ class MapWithLinks {
 						'value_type' => ITEM_VALUE_TYPE_UINT64
 					]
 				]
+			],
+			[
+				'host' => 'Host for map for form testing',
+				'groups' => ['groupid' => 4], // Zabbix servers.
+				'items' => [
+					[
+						'name' => 'Trap',
+						'key_' => 'trap',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_UINT64
+					]
+				]
 			]
 		]);
 
 		$triggers = CDataHelper::call('trigger.create', [
 			[
-				'description' => 'Trigger for map',
+				'description' => 'Trigger for map with links',
 				'expression' => 'last(/Host for map with links/trap)=0',
+				'priority' => TRIGGER_SEVERITY_AVERAGE
+			],
+			[
+				'description' => 'Trigger for map for form testing',
+				'expression' => 'last(/Host for map for form testing/trap)=0',
 				'priority' => TRIGGER_SEVERITY_AVERAGE
 			]
 		]);
-		$triggerid = $triggers['triggerids'][0];
+		$map_links_triggerid = $triggers['triggerids'][0];
+		$map_form_triggerid = $triggers['triggerids'][1];
 
 		$maps = CDataHelper::call('map.create', [
 			[
@@ -53,7 +71,7 @@ class MapWithLinks {
 				'selements' => [
 					// Image (Crypto-router symbol small).
 					[
-						'selementid' => 11,
+						'selementid' => 1,
 						'elementtype' => SYSMAP_ELEMENT_TYPE_IMAGE,
 						'iconid_off' => 7,
 						'label' => 'Test phone icon',
@@ -62,7 +80,7 @@ class MapWithLinks {
 					],
 					// Map (Cloud symbol small).
 					[
-						'selementid' => 12,
+						'selementid' => 2,
 						'elementtype' => SYSMAP_ELEMENT_TYPE_MAP,
 						'iconid_off' => 3,
 						'label' => 'Map element (Local network)',
@@ -73,18 +91,18 @@ class MapWithLinks {
 					],
 					// Trigger (Crypto-router symbol big).
 					[
-						'selementid' => 13,
+						'selementid' => 3,
 						'elementtype' => SYSMAP_ELEMENT_TYPE_TRIGGER,
 						'iconid_off' => 15,
 						'label' => 'Trigger element (CPU load)',
 						'x' => 101,
 						'y' => 301,
-						'elements' => [['triggerid' => $triggerid]],
+						'elements' => [['triggerid' => $map_links_triggerid]],
 						'urls' => [['name' => 'www.wikipedia.org', 'url' => 'http://www.wikipedia.org']]
 					],
 					// Host group (Cloud symbol big).
 					[
-						'selementid' => 14,
+						'selementid' => 4,
 						'elementtype' => SYSMAP_ELEMENT_TYPE_HOST_GROUP,
 						'iconid_off' => 1,
 						'label' => 'Host group element (Linux servers)',
@@ -94,7 +112,7 @@ class MapWithLinks {
 					],
 					// Host (Disk array symbol).
 					[
-						'selementid' => 15,
+						'selementid' => 5,
 						'elementtype' => SYSMAP_ELEMENT_TYPE_HOST,
 						'iconid_off' => 19,
 						'label' => 'Host element (Zabbix Server)',
@@ -147,52 +165,97 @@ class MapWithLinks {
 				],
 				'links' => [
 					[
-						'selementid1' => 11,
-						'selementid2' => 12,
+						'selementid1' => 1,
+						'selementid2' => 2,
 						'drawtype' => 2,
 						'color' => '00CC00',
 						'label' => 'CPU load: {?last(/Zabbix Server/system.cpu.load[])}'
 					],
 					[
+						'selementid1' => 1,
+						'selementid2' => 3,
+						'color' => '00CC00'
+					],
+					[
+						'selementid1' => 4,
+						'selementid2' => 3,
+						'color' => '00CC00'
+					],
+					[
+						'selementid1' => 5,
+						'selementid2' => 4,
+						'color' => '00CC00'
+					],
+					[
+						'selementid1' => 2,
+						'selementid2' => 5,
+						'color' => '00CC00'
+					],
+					[
+						'selementid1' => 2,
+						'selementid2' => 3,
+						'color' => '00CC00'
+					],
+					[
+						'selementid1' => 1,
+						'selementid2' => 4,
+						'color' => '00CC00'
+					],
+					[
+						'selementid1' => 5,
+						'selementid2' => 1,
+						'color' => '00CC00'
+					]
+				]
+			],
+			[
+				'name' => 'Map for form testing',
+				'width' => 500,
+				'height' => 500,
+				'selements' => [
+					// Host 1.
+					[
+						'selementid' => 11,
+						'elements' => [['hostid' => $result['hostids']['Host for map for form testing']]],
+						'elementtype' => SYSMAP_ELEMENT_TYPE_HOST,
+						'iconid_off' => 186,
+						'x' => 139,
+						'y' => 27
+					],
+					// Image.
+					[
+						'selementid' => 13,
+						'elementtype' => SYSMAP_ELEMENT_TYPE_IMAGE,
+						'iconid_off' => 6,
+						'x' => 250,
+						'y' => 350
+					],
+					// Trigger.
+					[
+						'selementid' => 14,
+						'elementtype' => SYSMAP_ELEMENT_TYPE_TRIGGER,
+						'iconid_off' => 146,
+						'elements' => [['triggerid' => $map_form_triggerid]],
+						'x' => 350,
+						'y' => 200
+					]
+				],
+				'links' => [
+					// Link between Host and Image.
+					[
 						'selementid1' => 11,
 						'selementid2' => 13,
-						'color' => '00CC00'
-					],
-					[
-						'selementid1' => 14,
-						'selementid2' => 13,
-						'color' => '00CC00'
-					],
-					[
-						'selementid1' => 15,
-						'selementid2' => 14,
-						'color' => '00CC00'
-					],
-					[
-						'selementid1' => 12,
-						'selementid2' => 15,
-						'color' => '00CC00'
-					],
-					[
-						'selementid1' => 12,
-						'selementid2' => 13,
-						'color' => '00CC00'
-					],
-					[
-						'selementid1' => 11,
-						'selementid2' => 14,
-						'color' => '00CC00'
-					],
-					[
-						'selementid1' => 15,
-						'selementid2' => 11,
-						'color' => '00CC00'
+						'label' => 'Link label'
 					]
 				]
 			]
 		]);
-		$mapid = $maps['sysmapids'][0];
 
-		return $mapid;
+		$mapids = [
+			'links_mapid' => $maps['sysmapids'][0],
+			'form_test_mapid' => $maps['sysmapids'][1]
+		];
+
+		return $mapids;
 	}
 }

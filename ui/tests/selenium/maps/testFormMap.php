@@ -20,6 +20,29 @@ require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
  * @backup sysmaps
  */
 class testFormMap extends CLegacyWebTest {
+
+	const MAP_NAME = 'Map for form testing';
+
+	/**
+	 * This function creates maps before the whole tests build, so that getDataProvider method can use created maps.
+	 *
+	 * @return array
+	 */
+	public static function allMaps() {
+		static $data = null;
+		if ($data === null) {
+			global $DB;
+			if (!isset($DB['DB'])) {
+				DBconnect($error);
+			}
+			CDataHelper::load('MapWithLinks');
+
+			$data = CDBHelper::getDataProvider('SELECT * FROM sysmaps');
+		}
+
+		return $data;
+	}
+
 	/**
 	 * Possible combinations of grid settings
 	 * @return array
@@ -51,10 +74,6 @@ class testFormMap extends CLegacyWebTest {
 			['75x75', SYSMAP_GRID_SHOW_OFF, SYSMAP_GRID_ALIGN_OFF],
 			['100x100', SYSMAP_GRID_SHOW_OFF, SYSMAP_GRID_ALIGN_OFF]
 		];
-	}
-
-	public static function allMaps() {
-		return CDBHelper::getDataProvider('SELECT * FROM sysmaps');
 	}
 
 	/**
@@ -114,7 +133,7 @@ class testFormMap extends CLegacyWebTest {
 	 */
 	public function testFormMap_UpdateGridOptions($gridSize, $showGrid, $autoAlign) {
 
-		$map_name = 'Test map 1';
+		$map_name = self::MAP_NAME;
 
 		// getting map options from DB as they are at the beginning of the test
 		$db_map = CDBHelper::getRow('SELECT * FROM sysmaps WHERE name='.zbx_dbstr($map_name));
@@ -196,11 +215,11 @@ class testFormMap extends CLegacyWebTest {
 	 * Check the screenshot of the trigger container in trigger map element.
 	 */
 	public function testFormMap_MapElementScreenshot() {
-		// Open map "Test map 1" in edit mode.
-		$this->page->login()->open('sysmap.php?sysmapid=3')->waitUntilReady();
+		// Open map in edit mode.
+		$this->page->login()->open('sysmap.php?sysmapid='.CDataHelper::get('MapWithLinks.form_test_mapid'))->waitUntilReady();
 
-		// Click on map element "Trigger element (CPU load)".
-		$this->query('xpath://div[@data-id="5"]')->waitUntilVisible()->one()->click();
+		// Click on map element 'Trigger for map' (in prepareMapData this trigger has icon id = 146).
+		$this->query('xpath://div[contains(@class, "sysmap_iconid_146")]')->waitUntilVisible()->one()->click();
 
 		$form = $this->query('id:map-window')->asForm()->one()->waitUntilVisible();
 		$form->getField('New triggers')->selectMultiple([
