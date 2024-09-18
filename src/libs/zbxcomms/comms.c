@@ -2179,7 +2179,7 @@ ssize_t	zbx_tcp_recv_context(zbx_socket_t *s, zbx_tcp_recv_context_t *context, u
 		}
 		else
 		{
-			zbx_set_socket_strerror("message has invalid size");
+			zbx_set_socket_strerror("message length does not match expected length");
 			if (context->buf_stat_bytes + context->buf_dyn_bytes < context->expected_len)
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "Message from %s is shorter than expected " ZBX_FS_UI64
