@@ -17,31 +17,13 @@
 require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
 
 /**
+ * @dataSource Maps
+ *
  * @backup sysmaps
  */
 class testFormMapConstructor extends CLegacyWebTest {
 
 	const MAP_NAME = 'Map for form testing';
-
-	/**
-	 * This function creates maps before the whole tests build, so that getDataProvider method can use created maps.
-	 *
-	 * @return array
-	 */
-	public static function allMaps() {
-		static $data = null;
-		if ($data === null) {
-			global $DB;
-			if (!isset($DB['DB'])) {
-				DBconnect($error);
-			}
-			CDataHelper::load('Maps');
-
-			$data = CDBHelper::getDataProvider('SELECT * FROM sysmaps');
-		}
-
-		return $data;
-	}
 
 	/**
 	 * Possible combinations of grid settings
@@ -76,13 +58,25 @@ class testFormMapConstructor extends CLegacyWebTest {
 		];
 	}
 
+	public static function getSimpleUpdateData() {
+		return [
+			[['name' => 'Local network']],
+			[['name' => 'Map for form testing']],
+			[['name' => 'Map for widget copies']],
+			[['name' => 'Map with icon mapping']],
+			[['name' => 'Map with links']],
+			[['name' => 'Public map with image']],
+			[['name' => 'Test map for Properties']]
+		];
+	}
+
 	/**
-	 * @dataProvider allMaps
+	 * @dataProvider getSimpleUpdateData
 	 *
 	 * @browsers chrome
 	 */
 	public function testFormMapConstructor_SimpleUpdateConstructor($map) {
-		$sysmapid = $map['sysmapid'];
+		$sysmapid = CDBHelper::getValue('SELECT sysmapid FROM sysmaps WHERE name='.zbx_dbstr($map['name']));
 
 		$sql_maps_elements = 'SELECT * FROM sysmaps sm INNER JOIN sysmaps_elements sme ON'.
 				' sme.sysmapid = sm.sysmapid ORDER BY sme.selementid';
@@ -122,6 +116,7 @@ class testFormMapConstructor extends CLegacyWebTest {
 		];
 
 		foreach ($hash_data as $old => $new) {
+			$this->assertEquals($old, CDBHelper::getHash($new));
 			$this->assertEquals($old, CDBHelper::getHash($new));
 		}
 	}

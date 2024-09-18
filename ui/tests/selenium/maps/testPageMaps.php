@@ -22,7 +22,6 @@ require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
  * @backup sysmaps
  *
  * @onBefore prepareMapsData
- *
  */
 class testPageMaps extends CWebTest {
 

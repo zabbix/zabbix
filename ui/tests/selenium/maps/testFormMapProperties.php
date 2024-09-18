@@ -21,6 +21,8 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 use Facebook\WebDriver\WebDriverBy;
 
 /**
+ * @dataSource Maps
+ *
  * @backup sysmaps
  */
 class testFormMapProperties extends CLegacyWebTest {
@@ -38,26 +40,6 @@ class testFormMapProperties extends CLegacyWebTest {
 			CMessageBehavior::class,
 			CTableBehavior::class
 		];
-	}
-
-	/**
-	 * This function creates maps before the whole tests build, so that getDataProvider method can use created maps.
-	 *
-	 * @return array
-	 */
-	public static function allMaps() {
-		static $data = null;
-		if ($data === null) {
-			global $DB;
-			if (!isset($DB['DB'])) {
-				DBconnect($error);
-			}
-			CDataHelper::load('Maps');
-
-			$data = CDBHelper::getDataProvider('SELECT * FROM sysmaps');
-		}
-
-		return $data;
 	}
 
 	public function testFormMapProperties_Layout() {
@@ -377,8 +359,20 @@ class testFormMapProperties extends CLegacyWebTest {
 		$this->assertEquals($old_hash, CDBHelper::getHash('SELECT * FROM sysmaps ORDER BY sysmapid'));
 	}
 
+	public static function getSimpleUpdateData() {
+		return [
+			[['name' => 'Local network']],
+			[['name' => 'Map for form testing']],
+			[['name' => 'Map for widget copies']],
+			[['name' => 'Map with icon mapping']],
+			[['name' => 'Map with links']],
+			[['name' => 'Public map with image']],
+			[['name' => 'Test map for Properties']]
+		];
+	}
+
 	/**
-	 * @dataProvider allMaps
+	 * @dataProvider getSimpleUpdateData
 	 */
 	public function testFormMapProperties_SimpleUpdateProperties($map) {
 		$sql_maps_elements = 'SELECT * FROM sysmaps sm INNER JOIN sysmaps_elements sme ON'.
