@@ -3381,12 +3381,12 @@ msgstr "Impossible d'hériter de la règle LLD avec la clé \"%1$s\" du modèle 
 #: include/classes/api/services/CItemGeneral.php:684
 #, c-format
 msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
-msgstr ""
+msgstr "Impossible d'hériter des règles LLD avec la clé \"%1$s\" des modèles \"%2$s\" et \"%3$s\", car la clé doit être unique sur l'hôte \"%4$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:685
 #, c-format
 msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
-msgstr ""
+msgstr "Impossible d'hériter des règles LLD avec la clé \"%1$s\" des modèles \"%2$s\" et \"%3$s\", car la clé doit être unique sur le modèle \"%4$s\"."
 
 #: include/classes/api/services/CItemPrototype.php:1220
 #, c-format

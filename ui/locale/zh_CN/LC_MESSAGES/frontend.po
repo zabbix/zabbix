@@ -3294,12 +3294,12 @@ msgstr "无法将模板“%2$s”的密钥“%1$s”的 LLD 规则继承到模�
 #: include/classes/api/services/CItemGeneral.php:684
 #, c-format
 msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
-msgstr ""
+msgstr "无法使用“%2$s”和“%3$s”模板的键“%1$s”继承 LLD 规则，键在主机“%4$s”上必须是唯一的。"
 
 #: include/classes/api/services/CItemGeneral.php:685
 #, c-format
 msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
-msgstr ""
+msgstr "无法使用“%2$s”和“%3$s”模板的键“%1$s”继承 LLD 规则，键在模板“%4$s”上必须是唯一的。"
 
 #: include/classes/api/services/CItemPrototype.php:1220
 #, c-format
