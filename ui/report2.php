@@ -406,7 +406,7 @@ else {
 
 		CArrayHelper::sort($data['filter']['hostids'], ['name']);
 
-		$groupids = getSubGroups($data['filter']['groups'], $data['filter']['groups'],
+		$groupids = getSubGroups($data['filter']['groups'], $data['filter']['groups'], 'host',
 			['with_monitored_hosts' => true]
 		);
 		CArrayHelper::sort($data['filter']['groups'], ['name']);
