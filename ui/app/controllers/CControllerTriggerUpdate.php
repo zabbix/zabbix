@@ -27,7 +27,7 @@ class CControllerTriggerUpdate extends CController {
 			'event_name' =>				'db triggers.event_name',
 			'opdata' =>					'db triggers.opdata',
 			'priority' =>				'db triggers.priority|in 0,1,2,3,4,5',
-			'expression' =>				'string|required|not_empty',
+			'expression' =>				'required|string|not_empty',
 			'recovery_mode' =>			'db triggers.recovery_mode|in '.implode(',', [ZBX_RECOVERY_MODE_EXPRESSION, ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION, ZBX_RECOVERY_MODE_NONE]),
 			'recovery_expression' =>	'string',
 			'type' =>					'db triggers.type|in 0,1',
