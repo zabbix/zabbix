@@ -634,7 +634,7 @@ class CProxy extends CApiService {
 	}
 
 	/**
-	 * Check there are no multiple proxies having same value of tls_psk_identity, but different value of tls_psk.
+	 * Check tls_psk_identity have same tls_psk value across all hosts, proxies and autoregistration.
 	 *
 	 * @param array      $proxies
 	 * @param array|null $db_proxies

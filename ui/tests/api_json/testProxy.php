@@ -343,7 +343,7 @@ class testProxy extends CAPITest {
 						'tls_psk' => 'fb48829a6f9ebbb70294a75ca0916772'
 					]
 				],
-				'expected_error' => 'Incorrect value for field "/2/tls_psk": another value of tls_psk exists for same tls_psk_identity.'
+				'expected_error' => 'Invalid parameter "/2/tls_psk": another tls_psk value is already associated with given tls_psk_identity.'
 			],
 			'Field "tls_psk" cannot have different values for same "tls_psk_identity" with database check' => [
 				'proxy' => [
@@ -355,7 +355,7 @@ class testProxy extends CAPITest {
 						'tls_psk' => '5fce1b3e34b520afeffb37ce08c7cd66'
 					]
 				],
-				'expected_error' => 'Incorrect value for field "/1/tls_psk": another value of tls_psk exists for same tls_psk_identity.'
+				'expected_error' => 'Invalid parameter "/1/tls_psk": another tls_psk value is already associated with given tls_psk_identity.'
 			],
 			'Field "tls_psk_identity" should have same value of "tls_psk" across all proxies and hosts' => [
 				'proxy' => [
@@ -367,7 +367,7 @@ class testProxy extends CAPITest {
 						'tls_psk' => '5fce1b3e34b520afeffb37ce08c7cd66'
 					]
 				],
-				'expected_error' => 'Incorrect value for field "/1/tls_psk": another value of tls_psk exists for same tls_psk_identity.'
+				'expected_error' => 'Invalid parameter "/1/tls_psk": another tls_psk value is already associated with given tls_psk_identity.'
 			],
 			'Field "tls_psk_identity" should have same value of "tls_psk" across all proxies and autoregistration' => [
 				'proxy' => [
@@ -379,7 +379,7 @@ class testProxy extends CAPITest {
 						'tls_psk' => '5fce1b3e34b520afeffb37ce08c7cd66'
 					]
 				],
-				'expected_error' => 'Incorrect value for field "/1/tls_psk": another value of tls_psk exists for same tls_psk_identity.'
+				'expected_error' => 'Invalid parameter "/1/tls_psk": another tls_psk value is already associated with given tls_psk_identity.'
 			]
 		];
 	}
@@ -444,7 +444,7 @@ class testProxy extends CAPITest {
 				'proxy' => [
 					['proxyid' => ':proxy:psk3.example.com', 'tls_psk_identity' => 'example.com']
 				],
-				'expected_error' => 'Incorrect value for field "/1/tls_psk": another value of tls_psk exists for same tls_psk_identity.'
+				'expected_error' => 'Invalid parameter "/1/tls_psk": another tls_psk value is already associated with given tls_psk_identity.'
 			],
 			'Field "tls_psk" cannot be empty when "tls_connect" is HOST_ENCRYPTION_PSK' => [
 				'proxy' => [
@@ -456,19 +456,19 @@ class testProxy extends CAPITest {
 				'proxy' => [
 					['proxyid' => ':proxy:psk1.example.com', 'tls_psk' => 'de4f735c561e5444b0932f7ebd636b85']
 				],
-				'expected_error' => 'Incorrect value for field "/1/tls_psk": another value of tls_psk exists for same tls_psk_identity.'
+				'expected_error' => 'Invalid parameter "/1/tls_psk": another tls_psk value is already associated with given tls_psk_identity.'
 			],
 			'Field "tls_psk_identity" should have same value of "tls_psk" across all proxies and hosts' => [
 				'proxy' => [
 					['proxyid' => ':proxy:psk1.example.com', 'tls_psk_identity' => 'psk4.example.com']
 				],
-				'expected_error' => 'Incorrect value for field "/1/tls_psk": another value of tls_psk exists for same tls_psk_identity.'
+				'expected_error' => 'Invalid parameter "/1/tls_psk": another tls_psk value is already associated with given tls_psk_identity.'
 			],
 			'Field "tls_psk_identity" should have same value of "tls_psk" across all proxies and autoregistration' => [
 				'proxy' => [
 					['proxyid' => ':proxy:psk1.example.com', 'tls_psk_identity' => 'autoregistration']
 				],
-				'expected_error' => 'Incorrect value for field "/1/tls_psk": another value of tls_psk exists for same tls_psk_identity.'
+				'expected_error' => 'Invalid parameter "/1/tls_psk": another tls_psk value is already associated with given tls_psk_identity.'
 			]
 		];
 	}

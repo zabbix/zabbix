@@ -940,7 +940,8 @@ class CHost extends CHostGeneral {
 		$db_hosts = DBfetchArrayAssoc(DBselect(
 			'SELECT h.hostid,h.proxy_hostid,h.host,h.status,h.ipmi_authtype,h.ipmi_privilege,h.ipmi_username,'.
 				'h.ipmi_password,h.name,h.description,h.tls_connect,h.tls_accept,h.tls_psk_identity,h.tls_psk,'.
-				'h.tls_issuer,h.tls_subject,hi.inventory_mode'.
+				'h.tls_issuer,h.tls_subject,'.
+				dbConditionCoalesce('hi.inventory_mode', HOST_INVENTORY_MANUAL, 'inventory_mode').
 			' FROM hosts h'.
 			' LEFT JOIN host_inventory hi ON h.hostid=hi.hostid'.
 			' WHERE '.dbConditionId('h.hostid', $hostids)
@@ -2339,6 +2340,14 @@ class CHost extends CHostGeneral {
 		unset($host);
 	}
 
+	/**
+	 * Check tls_psk_identity have same tls_psk value across all hosts, proxies and autoregistration.
+	 *
+	 * @param array      $hosts
+	 * @param array|null $db_hosts
+	 *
+	 * @throws CAPIException
+	 */
 	private static function checkTlsPskPairs(array $hosts, array $db_hosts = null): void {
 		$psk_pairs = [];
 		$tls_psk_fields = array_flip(['tls_psk_identity', 'tls_psk']);

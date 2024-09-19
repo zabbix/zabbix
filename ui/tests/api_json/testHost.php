@@ -654,7 +654,7 @@ class testHost extends CAPITest {
 			],
 			'Can update "tls_psk"' => [
 				'host' => [
-					['hostid' => ':host:psk1.example.com', 'tls_psk' => '11111111111111111111111111111111']
+					['hostid' => ':host:psk3.example.com', 'tls_psk' => '11111111111111111111111111111111']
 				]
 			],
 			'Can update "tls_psk_identity"' => [
@@ -769,7 +769,7 @@ class testHost extends CAPITest {
 						['hostid' => ':host:host.massupdate.psk5']
 					]
 				],
-				'expected_error' => 'Incorrect value for field "tls_psk": should be empty.'
+				'expected_error' => 'Invalid parameter "/tls_psk": value must be empty.'
 			],
 			'Field "tls_psk_identity" only default value is allowed when host "tls_accept" and "tls_connect" != HOST_ENCRYPTION_PSK' => [
 				[
@@ -780,7 +780,7 @@ class testHost extends CAPITest {
 						['hostid' => ':host:host.massupdate.psk5']
 					]
 				],
-				'expected_error' => 'Incorrect value for field "tls_psk_identity": should be empty.'
+				'expected_error' => 'Invalid parameter "/tls_psk_identity": value must be empty.'
 			],
 			'Field "tls_issuer" only default value is allowed when host "tls_accept" and "tls_connect" != HOST_ENCRYPTION_CERTIFICATE' => [
 				[
@@ -791,7 +791,7 @@ class testHost extends CAPITest {
 						['hostid' => ':host:host.massupdate.psk5']
 					]
 				],
-				'expected_error' => 'Incorrect value for field "tls_issuer": should be empty.'
+				'expected_error' => 'Invalid parameter "/tls_issuer": value must be empty.'
 			],
 			'Field "tls_subject" only default value is allowed when host "tls_accept" and "tls_connect" != HOST_ENCRYPTION_CERTIFICATE' => [
 				[
@@ -802,7 +802,7 @@ class testHost extends CAPITest {
 						['hostid' => ':host:host.massupdate.psk5']
 					]
 				],
-				'expected_error' => 'Incorrect value for field "tls_subject": should be empty.'
+				'expected_error' => 'Invalid parameter "/tls_subject": value must be empty.'
 			]
 		];
 	}

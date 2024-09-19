@@ -50,7 +50,7 @@ class CApiPskHelper {
 		}
 
 		$row = DBfetch(DBselect(
-			'SELECT NULL'.
+			'SELECT tls_psk_identity'.
 			' FROM config_autoreg_tls'.
 			' WHERE ('.implode(') OR (', $psk_conditions).')'
 		));
