@@ -83,16 +83,16 @@ type perfCounter struct {
 // Plugin -
 type Plugin struct {
 	plugin.Base
-	cpus         []*cpuUnit
-	collector    *pdhCollector
-	mutex        sync.Mutex
-	historyMutex sync.Mutex
-	counters     map[perfCounterIndex]*perfCounter
-	countersErr  map[perfCounterIndex]*perfCounterErrorInfo
-	addCounters  []perfCounterAddInfo
-	query        win32.PDH_HQUERY
-	collectError error
-	stop         chan bool
+	cpus             []*cpuUnit
+	collector        *pdhCollector
+	historyPerfMutex sync.Mutex
+	historyCpuMutex  sync.Mutex
+	counters         map[perfCounterIndex]*perfCounter
+	countersErr      map[perfCounterIndex]*perfCounterErrorInfo
+	addCounters      []perfCounterAddInfo
+	query            win32.PDH_HQUERY
+	collectError     error
+	stop             chan bool
 }
 
 func init() {
@@ -171,6 +171,9 @@ func (p *Plugin) getCpuLoad(params []string) (result interface{}, err error) {
 		return nil, zbxerr.ErrorTooManyParameters
 	}
 
+	p.historyCpuMutex.Lock()
+	defer p.historyCpuMutex.Unlock()
+
 	return p.cpus[0].counterAverage(counterLoad, period, split), nil
 }
 
@@ -189,6 +192,7 @@ func (p *Plugin) collectCpuData() (err error) {
 		}
 		slot.util += p.collector.cpuUtil(i)
 
+		p.historyCpuMutex.Lock()
 		if cpu.tail = cpu.tail.inc(maxHistory); cpu.tail == cpu.head {
 			cpu.head = cpu.head.inc(maxHistory)
 		}
@@ -196,6 +200,7 @@ func (p *Plugin) collectCpuData() (err error) {
 		// can be added to it resulting in incrementing counter
 		nextSlot := &cpu.history[cpu.tail]
 		*nextSlot = *slot
+		p.historyCpuMutex.Unlock()
 	}
 	return
 }
@@ -320,8 +325,8 @@ func (p *Plugin) export_perf(key string, params []string, ctx plugin.ContextProv
 	}
 
 	index := perfCounterIndex{path, lang}
-	p.historyMutex.Lock()
-	defer p.historyMutex.Unlock()
+	p.historyPerfMutex.Lock()
+	defer p.historyPerfMutex.Unlock()
 	counter, ok := p.counters[index]
 	if !ok {
 		counterErr, ok := p.countersErr[index]
@@ -350,9 +355,6 @@ func (p *Plugin) export_perf(key string, params []string, ctx plugin.ContextProv
 }
 
 func (p *Plugin) collectCounterData() error {
-	p.mutex.Lock()
-	defer p.mutex.Unlock()
-
 	if len(p.counters) == 0 && len(p.addCounters) == 0 {
 		return nil
 	}
@@ -367,7 +369,7 @@ func (p *Plugin) collectCounterData() error {
 
 	expireTime := time.Now().Add(-maxInactivityPeriod)
 
-	p.historyMutex.Lock()
+	p.historyPerfMutex.Lock()
 	addCountersLocal := p.addCounters
 	p.addCounters = nil
 	p.collectError = nil
@@ -377,13 +379,13 @@ func (p *Plugin) collectCounterData() error {
 			delete(p.countersErr, index)
 		}
 	}
-	p.historyMutex.Unlock()
+	p.historyPerfMutex.Unlock()
 
 	for i := len(addCountersLocal) - 1; i >= 0; i-- {
 		addInfo := addCountersLocal[i]
 		err = p.addCounter(addInfo.index, addInfo.interval)
 		if err != nil {
-			p.historyMutex.Lock()
+			p.historyPerfMutex.Lock()
 
 			p.countersErr[addInfo.index] = &perfCounterErrorInfo{
 				lastAccess: time.Now(),
@@ -391,7 +393,7 @@ func (p *Plugin) collectCounterData() error {
 					addInfo.index.lang)),
 			}
 
-			p.historyMutex.Unlock()
+			p.historyPerfMutex.Unlock()
 		}
 	}
 
@@ -403,9 +405,9 @@ func (p *Plugin) collectCounterData() error {
 	if err != nil {
 		p.Debugf("reset counter query: '%s'", err)
 
-		p.historyMutex.Lock()
+		p.historyPerfMutex.Lock()
 		p.collectError = err
-		p.historyMutex.Unlock()
+		p.historyPerfMutex.Unlock()
 
 		err2 := win32.PdhCloseQuery(p.query)
 		if err2 != nil {
@@ -435,9 +437,9 @@ func (p *Plugin) setCounterData() error {
 				p.Warningf("error while removing counter '%s': %s", index.path, err2)
 			}
 
-			p.historyMutex.Lock()
+			p.historyPerfMutex.Lock()
 			delete(p.counters, index)
-			p.historyMutex.Unlock()
+			p.historyPerfMutex.Unlock()
 
 			continue
 		}
@@ -445,7 +447,7 @@ func (p *Plugin) setCounterData() error {
 		c.err = nil
 
 		histValue, err := win32.PdhGetFormattedCounterValueDouble(c.handle, 1)
-		p.historyMutex.Lock()
+		p.historyPerfMutex.Lock()
 		if err != nil {
 			zbxErr := zbxerr.New(
 				fmt.Sprintf("failed to retrieve pdh counter value double for index %s", index.path),
@@ -462,7 +464,7 @@ func (p *Plugin) setCounterData() error {
 		if c.tail = c.tail.inc(c.interval); c.tail == c.head {
 			c.head = c.head.inc(c.interval)
 		}
-		p.historyMutex.Unlock()
+		p.historyPerfMutex.Unlock()
 	}
 
 	return errCollect

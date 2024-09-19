@@ -71,7 +71,7 @@ var (
 	pdhEnumObjectItems          = hPdh.mustGetProcAddress("PdhEnumObjectItemsW")
 	pdhEnumObjects              = hPdh.mustGetProcAddress("PdhEnumObjectsW")
 
-	pdhMu sync.Mutex
+	pdhMu sync.RWMutex
 )
 
 type Instance struct {
@@ -79,8 +79,8 @@ type Instance struct {
 }
 
 func PdhOpenQuery(dataSource *string, userData uintptr) (query PDH_HQUERY, err error) {
-	pdhMu.Lock()
-	defer pdhMu.Unlock()
+	pdhMu.RLock()
+	defer pdhMu.RUnlock()
 	return pdhOpenQueryHelper(dataSource, userData)
 }
 
@@ -99,8 +99,8 @@ func pdhOpenQueryHelper(dataSource *string, userData uintptr) (query PDH_HQUERY,
 }
 
 func PdhCloseQuery(query PDH_HQUERY) (err error) {
-	pdhMu.Lock()
-	defer pdhMu.Unlock()
+	pdhMu.RLock()
+	defer pdhMu.RUnlock()
 	return pdhCloseQueryHelper(query)
 }
 
@@ -113,8 +113,8 @@ func pdhCloseQueryHelper(query PDH_HQUERY) (err error) {
 }
 
 func PdhAddCounter(query PDH_HQUERY, path string, userData uintptr) (counter PDH_HCOUNTER, err error) {
-	pdhMu.Lock()
-	defer pdhMu.Unlock()
+	pdhMu.RLock()
+	defer pdhMu.RUnlock()
 	return pdhAddCounterHelper(query, path, userData)
 }
 
@@ -130,8 +130,8 @@ func pdhAddCounterHelper(query PDH_HQUERY, path string, userData uintptr) (count
 }
 
 func PdhAddEnglishCounter(query PDH_HQUERY, path string, userData uintptr) (counter PDH_HCOUNTER, err error) {
-	pdhMu.Lock()
-	defer pdhMu.Unlock()
+	pdhMu.RLock()
+	defer pdhMu.RUnlock()
 	return pdhAddEnglishCounterHelper(query, path, userData)
 }
 
@@ -147,8 +147,8 @@ func pdhAddEnglishCounterHelper(query PDH_HQUERY, path string, userData uintptr)
 }
 
 func PdhCollectQueryData(query PDH_HQUERY) (err error) {
-	pdhMu.Lock()
-	defer pdhMu.Unlock()
+	pdhMu.RLock()
+	defer pdhMu.RUnlock()
 	return pdhCollectQueryDataHelper(query)
 }
 
@@ -161,8 +161,8 @@ func pdhCollectQueryDataHelper(query PDH_HQUERY) (err error) {
 }
 
 func PdhGetFormattedCounterValueDouble(counter PDH_HCOUNTER, tryCount int) (*float64, error) {
-	pdhMu.Lock()
-	defer pdhMu.Unlock()
+	pdhMu.RLock()
+	defer pdhMu.RUnlock()
 	return pdhGetFormattedCounterValueDoubleHelper(counter, tryCount)
 }
 
@@ -188,8 +188,8 @@ func pdhGetFormattedCounterValueDoubleHelper(counter PDH_HCOUNTER, tryCount int)
 }
 
 func PdhGetFormattedCounterValueInt64(counter PDH_HCOUNTER) (value *int64, err error) {
-	pdhMu.Lock()
-	defer pdhMu.Unlock()
+	pdhMu.RLock()
+	defer pdhMu.RUnlock()
 	return pdhGetFormattedCounterValueInt64Helper(counter, true)
 }
 
@@ -214,8 +214,8 @@ func pdhGetFormattedCounterValueInt64Helper(counter PDH_HCOUNTER, retry bool) (v
 }
 
 func PdhRemoveCounter(counter PDH_HCOUNTER) (err error) {
-	pdhMu.Lock()
-	defer pdhMu.Unlock()
+	pdhMu.RLock()
+	defer pdhMu.RUnlock()
 	return pdhRemoveCounterHelper(counter)
 }
 
@@ -228,8 +228,8 @@ func pdhRemoveCounterHelper(counter PDH_HCOUNTER) (err error) {
 }
 
 func PdhParseCounterPath(path string) (elements *PDH_COUNTER_PATH_ELEMENTS, err error) {
-	pdhMu.Lock()
-	defer pdhMu.Unlock()
+	pdhMu.RLock()
+	defer pdhMu.RUnlock()
 	return pdhParseCounterPathHelper(path)
 }
 
@@ -252,8 +252,8 @@ func pdhParseCounterPathHelper(path string) (elements *PDH_COUNTER_PATH_ELEMENTS
 }
 
 func PdhMakeCounterPath(elements *PDH_COUNTER_PATH_ELEMENTS) (path string, err error) {
-	pdhMu.Lock()
-	defer pdhMu.Unlock()
+	pdhMu.RLock()
+	defer pdhMu.RUnlock()
 	return pdhMakeCounterPathHelper(elements)
 }
 
@@ -269,8 +269,8 @@ func pdhMakeCounterPathHelper(elements *PDH_COUNTER_PATH_ELEMENTS) (path string,
 }
 
 func PdhLookupPerfNameByIndex(index int) (path string, err error) {
-	pdhMu.Lock()
-	defer pdhMu.Unlock()
+	pdhMu.RLock()
+	defer pdhMu.RUnlock()
 	return pdhLookupPerfNameByIndexHelper(index)
 }
 
