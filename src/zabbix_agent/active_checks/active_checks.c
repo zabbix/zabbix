@@ -935,6 +935,12 @@ static int	refresh_active_checks(zbx_vector_addr_ptr_t *addrs, const zbx_config_
 	ret = zbx_comms_exchange_with_redirect(config_source_ip, addrs, config_timeout, config_timeout, 0, level,
 			config_tls, json.buffer, NULL, NULL, &data, NULL);
 
+	if (SUCCEED == ret && '\0' == *data)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Received empty response from active check configuration update");
+		ret = FAIL;
+	}
+
 	if (SUCCEED == ret)
 	{
 		int	rc;
