@@ -499,7 +499,10 @@ static int	parse_list_of_checks(char *str, const char *host, unsigned short port
 	if (SUCCEED != zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_DATA, &jp_data))
 	{
 		if (0 != *config_revision_local)
+		{
+			ret = SUCCEED;
 			goto out;
+		}
 
 		zabbix_log(LOG_LEVEL_ERR, "cannot parse list of active checks: %s", zbx_json_strerror());
 
@@ -680,7 +683,7 @@ out:
 	zbx_free(delay);
 	zbx_free(name);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
@@ -689,7 +692,7 @@ static int	parse_list_of_commands(char *str, int config_timeout)
 {
 	const char		*p;
 	char			*cmd = NULL, tmp[MAX_STRING_LEN], error[MAX_STRING_LEN], *key = NULL;
-	int			timeout, commands_num = 0, ret = FAIL;
+	int			timeout, ret = FAIL;
 	zbx_uint64_t		command_id;
 	struct zbx_json_parse	jp, jp_data, jp_row;
 	size_t			cmd_alloc = 0, key_alloc;
@@ -768,8 +771,6 @@ static int	parse_list_of_commands(char *str, int config_timeout)
 			}
 
 			add_command(key, command_id, timeout);
-
-			commands_num++;
 		}
 	}
 
@@ -778,7 +779,7 @@ out:
 	zbx_free(key);
 	zbx_free(cmd);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
@@ -863,7 +864,7 @@ static int	refresh_active_checks(zbx_vector_addr_ptr_t *addrs, const zbx_config_
 		int config_buffer_size)
 {
 	static ZBX_THREAD_LOCAL int	last_ret = SUCCEED;
-	int				ret, level, rc;
+	int				ret, level;
 	struct zbx_json			json;
 	char				*data = NULL;
 
@@ -926,6 +927,8 @@ static int	refresh_active_checks(zbx_vector_addr_ptr_t *addrs, const zbx_config_
 
 	if (SUCCEED == ret)
 	{
+		int	rc;
+
 		if (SUCCEED != last_ret)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Active check configuration update from [%s:%hu]"
@@ -940,10 +943,8 @@ static int	refresh_active_checks(zbx_vector_addr_ptr_t *addrs, const zbx_config_
 
 		rc |= parse_list_of_commands(data, config_timeout);
 
-		if (SUCCEED != ret)
+		if (SUCCEED != rc)
 			zbx_addrs_failover(addrs);
-
-		parse_list_of_commands(data, config_timeout);
 
 		zbx_free(data);
 	}
