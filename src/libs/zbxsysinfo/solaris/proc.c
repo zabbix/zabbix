@@ -335,12 +335,12 @@ static int	proc_match_user(const zbx_sysinfo_proc_t *proc, const struct passwd *
  * Purpose: checks if process command line matches filter                     *
  *                                                                            *
  ******************************************************************************/
-static int	proc_match_cmdline(const zbx_sysinfo_proc_t *proc, const zbx_regexp_t *cmdline)
+static int	proc_match_cmdline(const zbx_sysinfo_proc_t *proc, const zbx_regexp_t *cmdline_rxp)
 {
-	if (NULL == cmdline)
+	if (NULL == cmdline_rxp)
 		return SUCCEED;
 
-	if (NULL != proc->cmdline && 0 == zbx_regexp_match_precompiled(proc->cmdline, cmdline))
+	if (NULL != proc->cmdline && 0 == zbx_regexp_match_precompiled(proc->cmdline, cmdline_rxp))
 		return SUCCEED;
 
 	return FAIL;
@@ -370,7 +370,7 @@ static int	proc_match_zone(const zbx_sysinfo_proc_t *proc, zbx_uint64_t flags, z
  *                                                                            *
  ******************************************************************************/
 static int	proc_match_props(const zbx_sysinfo_proc_t *proc, const struct passwd *usrinfo, const char *procname,
-		const zbx_regexp_t *cmdline)
+		const zbx_regexp_t *cmdline_rxp)
 {
 	if (SUCCEED != proc_match_user(proc, usrinfo))
 		return FAIL;
@@ -378,7 +378,7 @@ static int	proc_match_props(const zbx_sysinfo_proc_t *proc, const struct passwd 
 	if (SUCCEED != proc_match_name(proc, procname))
 		return FAIL;
 
-	if (SUCCEED != proc_match_cmdline(proc, cmdline))
+	if (SUCCEED != proc_match_cmdline(proc, cmdline_rxp))
 		return FAIL;
 
 	return SUCCEED;
@@ -903,6 +903,8 @@ void	zbx_proc_get_matching_pids(const zbx_vector_ptr_t *processes, const char *p
 #ifdef HAVE_ZONE_H
 	zoneid_t		zoneid;
 #endif
+	zbx_regexp_t		*proccomm_rxp = NULL;
+	char			*rxp_error = NULL;
 
 	zabbix_log(LOG_LEVEL_TRACE, "In %s() procname:%s username:%s cmdline:%s zone:%llu", __func__,
 			ZBX_NULL2EMPTY_STR(procname), ZBX_NULL2EMPTY_STR(username), ZBX_NULL2EMPTY_STR(cmdline),
@@ -917,6 +919,13 @@ void	zbx_proc_get_matching_pids(const zbx_vector_ptr_t *processes, const char *p
 	else
 		usrinfo = NULL;
 
+	if (NULL != cmdline && SUCCEED != zbx_regexp_compile(cmdline, &proccomm_rxp, &rxp_error))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() Invalid regular expression: %s", __func__, rxp_error);
+		zbx_free(rxp_error);
+		goto out;
+	}
+
 #ifdef HAVE_ZONE_H
 	zoneid = getzoneid();
 #endif
@@ -925,7 +934,7 @@ void	zbx_proc_get_matching_pids(const zbx_vector_ptr_t *processes, const char *p
 	{
 		proc = (zbx_sysinfo_proc_t *)processes->values[i];
 
-		if (SUCCEED != proc_match_props(proc, usrinfo, procname, cmdline))
+		if (SUCCEED != proc_match_props(proc, usrinfo, procname, proccomm_rxp))
 			continue;
 
 #ifdef HAVE_ZONE_H

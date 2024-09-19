@@ -1335,6 +1335,8 @@ struct zbx_json	*zbx_json_clone(const struct zbx_json *src)
 		dst->buffer = (char *)zbx_malloc(NULL, dst->buffer_allocated);
 		memcpy(dst->buffer, src->buffer, src->buffer_size);
 	}
+	else
+		dst->buffer = dst->buf_stat;
 
 	return dst;
 }
