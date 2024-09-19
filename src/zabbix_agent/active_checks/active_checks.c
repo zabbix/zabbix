@@ -1875,8 +1875,6 @@ static void	send_heartbeat_msg(zbx_vector_addr_ptr_t *addrs, const zbx_config_tl
 				((zbx_addr_t *)addrs->values[0])->ip, ((zbx_addr_t *)addrs->values[0])->port, error);
 
 		zbx_free(error);
-
-		zbx_addrs_failover(addrs);
 	}
 
 	last_ret = ret;
