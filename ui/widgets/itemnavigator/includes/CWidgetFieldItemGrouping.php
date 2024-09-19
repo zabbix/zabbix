@@ -51,8 +51,8 @@ class CWidgetFieldItemGrouping extends CWidgetField {
 		$group_by = $this->getValue();
 
 		$result = array_filter($group_by, static function(array $row): bool {
-			return $row['tag_name'] !== ''
-				|| ($row['attribute'] != self::GROUP_BY_HOST_TAG && $row['attribute'] != self::GROUP_BY_ITEM_TAG);
+			return $row['attribute'] != self::GROUP_BY_HOST_TAG && $row['attribute'] != self::GROUP_BY_ITEM_TAG
+				|| $row['tag_name'] !== '';
 		});
 
 		if (count($result) < count($group_by)) {

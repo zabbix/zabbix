@@ -50,7 +50,7 @@ class CWidgetFieldHostGrouping extends CWidgetField {
 		$group_by = $this->getValue();
 
 		$result = array_filter($group_by, static function(array $row): bool {
-			return $row['tag_name'] !== '' || $row['attribute'] != self::GROUP_BY_TAG_VALUE;
+			return $row['attribute'] != self::GROUP_BY_TAG_VALUE || $row['tag_name'] !== '';
 		});
 
 		if (count($result) < count($group_by)) {
