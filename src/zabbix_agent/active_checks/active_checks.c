@@ -463,7 +463,17 @@ static int	parse_list_of_checks(char *str, const char *host, unsigned short port
 
 	if (SUCCEED != zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_RESPONSE, tmp, sizeof(tmp), NULL))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "cannot parse list of active checks: %s", zbx_json_strerror());
+		if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_ERROR, tmp, sizeof(tmp), NULL))
+		{
+			zabbix_log(LOG_LEVEL_ERR, "cannot parse list of active checks from [%s:%hu]: %s", host, port,
+					tmp);
+		}
+		else
+		{
+			zabbix_log(LOG_LEVEL_ERR, "cannot parse list of active checks: cannot find tag: %s",
+					ZBX_PROTO_TAG_RESPONSE);
+		}
+
 		goto out;
 	}
 
