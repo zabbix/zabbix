@@ -178,6 +178,7 @@ void	zbx_event_get_json_actions(const zbx_db_acknowledge *ack, const char *tz, c
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_NEWSEVERITY, cfg.severity_name[ack->new_severity],
 				ZBX_JSON_TYPE_STRING);
 	}
+
 	zbx_json_adduint64(&json, ZBX_PROTO_TAG_UPDATE_MESSAGE, ack->action & ZBX_PROBLEM_UPDATE_MESSAGE ? 1 : 0);
 
 	if (ack->action & ZBX_PROBLEM_UPDATE_MESSAGE)
@@ -186,14 +187,9 @@ void	zbx_event_get_json_actions(const zbx_db_acknowledge *ack, const char *tz, c
 	}
 
 	zbx_json_adduint64(&json, ZBX_PROTO_TAG_ACKNOWLEDGE, ack->action & ZBX_PROBLEM_UPDATE_ACKNOWLEDGE ? 1 : 0);
-
-	if (ack->action & ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE)
-		zbx_json_adduint64(&json, ZBX_PROTO_TAG_UNACKNOWLEDGE, 1);
-
+	zbx_json_adduint64(&json, ZBX_PROTO_TAG_UNACKNOWLEDGE, 1);
 	zbx_json_adduint64(&json, ZBX_PROTO_TAG_UPDATE_SUPPPRESS, ack->action & ZBX_PROBLEM_UPDATE_SUPPRESS ? 1 : 0);
-
-	if (ack->action & ZBX_PROBLEM_UPDATE_UNSUPPRESS)
-		zbx_json_adduint64(&json, ZBX_PROTO_TAG_UPDATE_UNSUPPPRESS, 1);
+	zbx_json_adduint64(&json, ZBX_PROTO_TAG_UPDATE_UNSUPPPRESS, 1);
 
 	if (ack->action & ZBX_PROBLEM_UPDATE_SUPPRESS)
 	{
