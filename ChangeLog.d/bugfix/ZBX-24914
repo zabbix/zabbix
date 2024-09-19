@@ -1,0 +1,1 @@
+........S. [ZBX-24914] fixed conditional jumps error in cacheconfig when non-numeric item types are used with trends (arimdjonoks)
