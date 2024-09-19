@@ -17,7 +17,7 @@
 #include "zbxstr.h"
 #include "zbxnum.h"
 
-/******************************************************************************
+/******************************************************************************zz
  *                                                                            *
  * Purpose: converts variant value to type compatible with requested value    *
  *          type                                                              *
@@ -32,14 +32,14 @@
  ******************************************************************************/
 int	zbx_variant_to_value_type(zbx_variant_t *value, unsigned char value_type, char **errmsg)
 {
-#define ZBX_MAX_ERROR_DESC_BUFF	10
+#define Z_MAX 240
 	int	ret;
-	char	*value_desc, *error_ptr;
-	char	error_buffer[ZBX_MAX_ERROR_DESC_BUFF];
-	size_t	char_max = ZBX_MAX_ERROR_DESC_BUFF - 1;
+	char	*value_desc, *err_val_tostring;
+	const char	*err_val;
+	char	key_short[Z_MAX * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
 
 	zbx_free(*errmsg);
-	memset(error_buffer, 0, sizeof(error_buffer));
+
 
 	switch (value_type)
 	{
@@ -74,15 +74,23 @@ int	zbx_variant_to_value_type(zbx_variant_t *value, unsigned char value_type, ch
 	if (FAIL == ret && NULL == *errmsg)
 	{
 		value_desc = zbx_strdup(NULL ,zbx_variant_value_desc(value));
-		zbx_strlcat(error_buffer, value_desc, char_max);
-		zbx_replace_invalid_utf8(error_buffer);
-		//Serror_ptr = strstr(error_buffer, '\0');
+		err_val = zbx_truncate_value(value_desc, Z_MAX, key_short, sizeof(key_short));
+		err_val_tostring = zbx_str_printable_dyn(err_val);
+		if(strlen(value_desc) > strlen(err_val))
+		{
 		*errmsg = zbx_dsprintf(NULL, "Value of type \"%s\" is not suitable for value type \"%s\". Value "
-				"\"%s...\"", zbx_variant_type_desc(value), zbx_item_value_type_string(value_type),
-				error_buffer);
+				"\"%s(truncated)\"", zbx_variant_type_desc(value), zbx_item_value_type_string(value_type),
+				err_val_tostring);
+		}
+		else
+		{
+		*errmsg = zbx_dsprintf(NULL, "Value of type \"%s\" is not suitable for value type \"%s\". Value "
+				"\"%s\"", zbx_variant_type_desc(value), zbx_item_value_type_string(value_type),
+				err_val_tostring);
+		}
 		zbx_free(value_desc);
 	}
 
 	return ret;
-#undef ZBX_MAX_ERROR_DESC_BUFF
+#undef Z_MAX
 }
