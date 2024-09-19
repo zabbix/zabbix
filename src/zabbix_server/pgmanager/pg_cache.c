@@ -475,7 +475,7 @@ static int	pg_cache_group_distribute_hosts(zbx_pg_cache_t *cache, zbx_pg_group_t
  *           - it has unassigned hosts                                        *
  *           - an online proxy has no assigned hosts                          *
  *           - the number of hosts assigned to a proxy differs from the       *
- *             average (withing the group) by at least 10 hosts and           *
+ *             average (within the group) by at least 10 hosts and            *
  *             factor of 2.                                                   *
  *                                                                            *
  ******************************************************************************/
@@ -1031,7 +1031,8 @@ void	pg_cache_update_proxies(zbx_pg_cache_t *cache, int flags)
 		if (proxy->revision == cache->proxy_revision)
 			continue;
 
-		pg_cache_group_remove_proxy(cache, proxy, PG_REMOVE_DELETED_PROXY);
+		if (NULL != proxy->group)
+			pg_cache_group_remove_proxy(cache, proxy, PG_REMOVE_DELETED_PROXY);
 		pg_proxy_clear(proxy);
 		zbx_hashset_iter_remove(&iter);
 	}

@@ -742,6 +742,7 @@ zabbix_export:
           type: INTERNAL
           key: 'zabbix[version]'
           value_type: CHAR
+          trends: '0'
           description: 'A version of Zabbix proxy.'
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -839,6 +840,8 @@ zabbix_export:
             The number of processed numeric (float) values.
           preprocessing:
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           tags:
             - tag: component
               value: nvps
@@ -855,6 +858,8 @@ zabbix_export:
             The number of processed log values.
           preprocessing:
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           tags:
             - tag: component
               value: nvps
@@ -871,6 +876,8 @@ zabbix_export:
             The number of times the item processing resulted in an item becoming unsupported or keeping that state.
           preprocessing:
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           tags:
             - tag: component
               value: nvps
@@ -887,6 +894,8 @@ zabbix_export:
             The number of processed character values.
           preprocessing:
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           tags:
             - tag: component
               value: nvps
@@ -903,6 +912,8 @@ zabbix_export:
             The number of processed text values.
           preprocessing:
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           tags:
             - tag: component
               value: nvps
@@ -919,6 +930,8 @@ zabbix_export:
             The number of processed numeric (unsigned) values.
           preprocessing:
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           tags:
             - tag: component
               value: nvps
@@ -935,6 +948,8 @@ zabbix_export:
             The total number of values processed by Zabbix server or Zabbix proxy, except unsupported items.
           preprocessing:
             - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           tags:
             - tag: component
               value: nvps

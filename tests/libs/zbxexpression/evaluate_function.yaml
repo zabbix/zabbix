@@ -3806,7 +3806,7 @@ out:
   return: FAIL
   value: 0
 ---
-test case: Evaluate rate() without 2 DOUBLE backet
+test case: Evaluate rate() without 2 DOUBLE bucket
 in:
   history:
   - itemid: 1
@@ -4064,7 +4064,7 @@ out:
   return: SUCCEED
   value: 1
 ---
-test case: Evaluate changecount() with STR data (all valus are different)
+test case: Evaluate changecount() with STR data (all values are different)
 in:
   history:
   - itemid: 1

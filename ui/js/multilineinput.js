@@ -94,7 +94,7 @@
 			$line_numbers.append(li);
 
 			while (diff < 0) {
-				$line_numbers.find('li:eq(0)').remove();
+				$line_numbers[0].querySelector('li:last-child').remove();
 				diff++;
 			}
 
@@ -164,6 +164,26 @@
 
 		$textarea[0].setSelectionRange(0, 0);
 
+		if (obj.options.use_tab) {
+			$textarea[0].addEventListener('keydown', e => {
+				if (e.key === 'Tab' && !e.shiftKey) {
+					e.preventDefault();
+
+					const input = e.target;
+					const value = input.value;
+
+					if (value.length < obj.options.maxlength) {
+						const startSelection = input.selectionStart;
+
+						input.value = value.substring(0, startSelection) + "\t" + value.substring(input.selectionEnd);
+
+						input.selectionStart = input.selectionEnd;
+						input.selectionEnd = startSelection + 1;
+					}
+				}
+			});
+		}
+
 		$textarea
 			.on('change contextmenu keydown keyup paste scroll', function() {
 				var value = $(this).val();
@@ -198,7 +218,8 @@
 							disabled: false,
 							autofocus: false,
 							line_numbers: true,
-							monospace_font: true
+							monospace_font: true,
+							use_tab: true
 						}, options)
 					};
 
