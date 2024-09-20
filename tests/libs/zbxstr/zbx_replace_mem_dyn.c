@@ -34,7 +34,7 @@ void	zbx_mock_test_entry(void **state)
 	int		exp_result = atoi(zbx_mock_get_parameter_string("out.exp_result"));
 	int		act_result = zbx_replace_mem_dyn(&data, &data_alloc, &data_len, offset, sz_to, from, sz_from);
 
-	zbx_mock_assert_int_eq("Unexpected error message int X", exp_result, act_result);
-	zbx_mock_assert_str_eq("Unexpected error message str X", data_out, data);
+	zbx_mock_assert_int_eq("Unexpected error message int", exp_result, act_result);
+	zbx_mock_assert_str_eq("Unexpected error message str", data_out, data);
 	zbx_free(data);
 }
