@@ -328,7 +328,17 @@ static int	parse_list_of_checks(char *str, const char *host, unsigned short port
 
 	if (SUCCEED != zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_RESPONSE, tmp, sizeof(tmp), NULL))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "cannot parse list of active checks: %s", zbx_json_strerror());
+		if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_ERROR, tmp, sizeof(tmp), NULL))
+		{
+			zabbix_log(LOG_LEVEL_ERR, "cannot parse list of active checks from [%s:%hu]: %s", host, port,
+					tmp);
+		}
+		else
+		{
+			zabbix_log(LOG_LEVEL_ERR, "cannot parse list of active checks: cannot find tag: %s",
+					ZBX_PROTO_TAG_RESPONSE);
+		}
+
 		goto out;
 	}
 
@@ -643,39 +653,46 @@ static int	refresh_active_checks(zbx_vector_ptr_t *addrs)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "sending [%s]", json.buffer);
 
-		if (SUCCEED == (ret = zbx_tcp_send(&s, json.buffer)))
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "before read");
-
-			if (SUCCEED == (ret = zbx_tcp_recv(&s)))
-			{
-				zabbix_log(LOG_LEVEL_DEBUG, "got [%s]", s.buffer);
-
-				if (SUCCEED != last_ret)
-				{
-					zabbix_log(LOG_LEVEL_WARNING, "Active check configuration update from [%s:%hu]"
-							" is working again", ((zbx_addr_t *)addrs->values[0])->ip,
-							((zbx_addr_t *)addrs->values[0])->port);
-				}
-				ret = parse_list_of_checks(s.buffer, ((zbx_addr_t *)addrs->values[0])->ip,
-						((zbx_addr_t *)addrs->values[0])->port);
-			}
-			else
-			{
-				zabbix_log(level, "Unable to receive from [%s]:%d [%s]",
-						((zbx_addr_t *)addrs->values[0])->ip,
-						((zbx_addr_t *)addrs->values[0])->port, zbx_socket_strerror());
-			}
-		}
-		else
+		if (SUCCEED != (ret = zbx_tcp_send(&s, json.buffer)))
 		{
 			zabbix_log(level, "Unable to send to [%s]:%d [%s]",
 					((zbx_addr_t *)addrs->values[0])->ip, ((zbx_addr_t *)addrs->values[0])->port,
 					zbx_socket_strerror());
+			goto out;
 		}
 
-		zbx_tcp_close(&s);
+		zabbix_log(LOG_LEVEL_DEBUG, "before read");
 
+		if (SUCCEED != (ret = zbx_tcp_recv(&s)))
+		{
+			zabbix_log(level, "Unable to receive from [%s]:%d [%s]",
+					((zbx_addr_t *)addrs->values[0])->ip,
+					((zbx_addr_t *)addrs->values[0])->port, zbx_socket_strerror());
+
+			goto out;
+		}
+
+		zabbix_log(LOG_LEVEL_DEBUG, "got [%s]", s.buffer);
+
+		if ('\0' == *s.buffer)
+		{
+			zabbix_log(level, "Received empty response from active check configuration update");
+			ret = FAIL;
+
+			goto out;
+		}
+
+		if (SUCCEED != last_ret)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Active check configuration update from [%s:%hu]"
+					" is working again", ((zbx_addr_t *)addrs->values[0])->ip,
+					((zbx_addr_t *)addrs->values[0])->port);
+		}
+
+		ret = parse_list_of_checks(s.buffer, ((zbx_addr_t *)addrs->values[0])->ip,
+				((zbx_addr_t *)addrs->values[0])->port);
+out:
+		zbx_tcp_close(&s);
 
 		if (SUCCEED != ret)
 		{

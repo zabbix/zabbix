@@ -197,10 +197,10 @@ func (c *Connector) refreshActiveChecks() {
 	}
 
 	var response activeChecksResponse
-	parse_success := false
+	parseSuccess := false
 
 	defer func() {
-		if !parse_success {
+		if !parseSuccess {
 			zbxcomms.Failover(&c.addresses)
 		}
 	}()
@@ -305,7 +305,7 @@ func (c *Connector) refreshActiveChecks() {
 		}
 	}
 
-	parse_success = true
+	parseSuccess = true
 
 	c.taskManager.UpdateTasks(c.clientID, c.resultCache.(plugin.ResultWriter), c.firstActiveChecksRefreshed,
 		response.Expressions, response.Data)

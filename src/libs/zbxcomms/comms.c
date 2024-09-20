@@ -1968,7 +1968,7 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, int timeout, unsigned char flags)
 				" Message ignored.", s->peer, protocol_version);
 		nbytes = ZBX_PROTO_ERROR;
 	}
-	else if (ZBX_TCP_EXPECT_HEADER == expect)
+	else if (0 != buf_stat_bytes)
 	{
 		zbx_set_socket_strerror("message is missing header");
 		zabbix_log(LOG_LEVEL_WARNING, "Message from %s is missing header. Message ignored.", s->peer);
