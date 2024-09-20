@@ -255,7 +255,7 @@ class testFormMapProperties extends CLegacyWebTest {
 	/**
 	 * @dataProvider create
 	 */
-	public function testFormMapPropertiesCreate($data) {
+	public function testFormMapProperties_Create($data) {
 		$this->zbxTestLogin('sysmaps.php?form=Create+map');
 		$this->zbxTestInputTypeWait('name', $data['name']);
 		$this->zbxTestAssertElementValue('name', $data['name']);

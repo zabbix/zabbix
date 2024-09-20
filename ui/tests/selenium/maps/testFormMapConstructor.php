@@ -117,7 +117,6 @@ class testFormMapConstructor extends CLegacyWebTest {
 
 		foreach ($hash_data as $old => $new) {
 			$this->assertEquals($old, CDBHelper::getHash($new));
-			$this->assertEquals($old, CDBHelper::getHash($new));
 		}
 	}
 
