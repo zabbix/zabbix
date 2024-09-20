@@ -17,7 +17,7 @@
 #include "zbxstr.h"
 #include "zbxnum.h"
 
-/******************************************************************************zz
+/******************************************************************************
  *                                                                            *
  * Purpose: converts variant value to type compatible with requested value    *
  *          type                                                              *
@@ -89,6 +89,7 @@ int	zbx_variant_to_value_type(zbx_variant_t *value, unsigned char value_type, ch
 				err_val_tostring);
 		}
 		zbx_free(value_desc);
+		zbx_free(err_val_tostring);
 	}
 
 	return ret;
