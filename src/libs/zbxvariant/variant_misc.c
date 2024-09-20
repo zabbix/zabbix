@@ -36,7 +36,7 @@ int	zbx_variant_to_value_type(zbx_variant_t *value, unsigned char value_type, ch
 	int	ret;
 	char	*value_desc, *err_val_tostring;
 	const char	*err_val;
-	char	short_value[CHAR_MAX * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
+	char	short_value[ERROR_VALUE_MAX_CHAR  * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
 
 	zbx_free(*errmsg);
 
