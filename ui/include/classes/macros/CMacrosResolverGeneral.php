@@ -1208,8 +1208,6 @@ class CMacrosResolverGeneral {
 				// Searching context coincidence, if regex array not empty.
 				elseif ($context !== null && count($host_macros[$hostid][$macro]['regex'])) {
 					foreach ($host_macros[$hostid][$macro]['regex'] as $regex => $val) {
-						sdff('/'.preg_replace('/\\\?\//', '\/', $regex).'/');
-
 						if (preg_match('/'.preg_replace('/\\\?\//', '\/', $regex).'/', $context) === 1) {
 							return [
 								'value' => $val,
