@@ -44,6 +44,25 @@ type requestBody struct {
 	Parameters map[string]string `json:"parameters"`
 }
 
+// Report size in pixels.
+type reportSize struct {
+	width  int64
+	height int64
+}
+
+// PDF report generation request parameters.
+type reportReqParams struct {
+	cookieParams []*network.CookieParam
+	size         reportSize
+	url          string
+}
+
+// Report generation request parameters.
+type chromedpResp struct {
+	data []byte
+	err  error
+}
+
 func newRequestBody() *requestBody {
 	return &requestBody{"", make(map[string]string), make(map[string]string)}
 }
@@ -184,54 +203,103 @@ func (h *handler) report(w http.ResponseWriter, r *http.Request) {
 		cookieParams = append(cookieParams, &cookieParam)
 	}
 
-	errEvtC := make(chan string)
+	cdpReqParams := reportReqParams{
+		cookieParams: cookieParams,
+		size: reportSize{
+			height: height,
+			width:  width,
+		},
+		url: u.String(),
+	}
 
-	go networkErrEvtListener(errEvtC, cancel, u.String(), w)
+	respChan := make(chan chromedpResp)
+	defer close(respChan)
 
-	chromedp.ListenTarget(ctx, handleNetworkErrEvt(errEvtC))
+	go runCDP(ctx, cancel, cdpReqParams, respChan)
 
-	var buf []byte
+	// should never deadlock as chromedp.Run has it's own timeout and we should always get a response
+	resp := <-respChan
 
-	err = chromedp.Run(ctx, chromedp.Tasks{
-		network.SetCookies(cookieParams),
-		emulation.SetDeviceMetricsOverride(width, height, 1, false),
-		prepareDashboard(u.String()),
+	if resp.err != nil {
+		logAndWriteError(
+			w,
+			errs.WrapConst(resp.err, zbxerr.ErrorCannotFetchData).Error(),
+			http.StatusInternalServerError,
+		)
+
+		return
+	}
+
+	log.Infof("writing response to report request from %s", r.RemoteAddr)
+
+	w.Header().Set("Content-type", "application/pdf")
+
+	_, err = w.Write(resp.data)
+	if err != nil {
+		log.Errf("failed to write response to report request from %s: %s", r.RemoteAddr, err.Error())
+	}
+}
+
+func runCDP(
+	ctx context.Context,
+	cancel context.CancelFunc,
+	req reportReqParams,
+	resp chan<- chromedpResp,
+) {
+	var (
+		out         []byte
+		listenerErr error
+	)
+
+	chromedp.ListenTarget(
+		ctx,
+		func(ev any) {
+			failEvent, ok := ev.(*network.EventLoadingFailed)
+			if !ok {
+				return
+			}
+
+			listenerErr = handleErr(failEvent.ErrorText)
+
+			cancel()
+		},
+	)
+
+	err := chromedp.Run(ctx, chromedp.Tasks{
+		network.SetCookies(req.cookieParams),
+		emulation.SetDeviceMetricsOverride(req.size.width, req.size.height, 1, false),
+		prepareDashboard(req.url),
 		chromedp.ActionFunc(func(ctx context.Context) error {
 			timeoutContext, cancel := context.WithTimeout(ctx, time.Duration(options.Timeout)*time.Second)
 			defer cancel()
 			var err error
-			buf, _, err = page.PrintToPDF().
+			out, _, err = page.PrintToPDF().
 				WithPrintBackground(true).
 				WithPreferCSSPageSize(true).
-				WithPaperWidth(pixels2inches(width)).
-				WithPaperHeight(pixels2inches(height)).
+				WithPaperWidth(pixels2inches(req.size.width)).
+				WithPaperHeight(pixels2inches(req.size.height)).
 				Do(timeoutContext)
 
 			return err
 		}),
 	})
 
-	if err != nil {
-		if errors.Is(err, context.Canceled) {
-			// error is written by networkEvtLoadingFailedListener, errEvtC channel is closed
-			return
-		}
-
-		close(errEvtC)
-
-		logAndWriteError(w, zbxerr.ErrorCannotFetchData.Wrap(err).Error(), http.StatusInternalServerError)
+	if listenerErr != nil {
+		// error is logged since in case of listenerErr chromedp error might be nil or some other error,
+		// and it is good for debugging.
+		log.Tracef("chromedp.Run exited, with err: %v", err)
+		resp <- chromedpResp{err: listenerErr}
 
 		return
 	}
 
-	close(errEvtC)
+	if err != nil {
+		resp <- chromedpResp{err: err}
 
-	log.Infof("writing response for report request from %s", r.RemoteAddr)
+		return
+	}
 
-	w.Header().Set("Content-type", "application/pdf")
-	w.Write(buf)
-
-	return
+	resp <- chromedpResp{data: out}
 }
 
 func pixels2inches(value int64) float64 {
@@ -290,42 +358,23 @@ func parseUrl(u string) (*url.URL, error) {
 	return parsed, nil
 }
 
-// networkErrEvtListener listens errC channel for error messages, and processes them with logAndWriteError.
-func networkErrEvtListener(errC <-chan string, ctxCancel context.CancelFunc, addr string, w http.ResponseWriter) {
-	for errStr := range errC {
-		switch errStr {
-		case netErrCertAuthorityInvalid:
-			errStr = fmt.Sprintf(
-				"Invalid certificate authority detected while loading dashboard: '%s'. Fix TLS "+
-					"configuration or configure Zabbix web service to ignore TLS certificate "+
-					"errors when accessing frontend URL.",
-				addr,
-			)
-		case "":
-			errStr = "network.EventLoadingFailed event with empty ErrorText was received while loading " +
-				"dashboard."
-		default:
-			errStr = fmt.Sprintf(
-				"network.EventLoadingFailed event with ErrorText = '%s' was received while loading "+
-					"dashboard.",
-				errStr,
-			)
-		}
-
-		logAndWriteError(w, errStr, http.StatusInternalServerError)
-		ctxCancel()
-	}
-}
-
-// handleNetworkErrEvt returns a function that handles network.EventLoadingFailed events.
-func handleNetworkErrEvt(errEvtC chan string) func(ev any) {
-	return func(ev any) {
-		failEvent, ok := ev.(*network.EventLoadingFailed)
-		if !ok {
-			return
-		}
-
-		errEvtC <- failEvent.ErrorText
-		close(errEvtC)
+// handleErr returns a user friendly error message for network.EventLoadingFailed errors.
+func handleErr(errStr string) error {
+	switch errStr {
+	case netErrCertAuthorityInvalid:
+		return errs.Errorf(
+			"Invalid certificate authority detected while loading dashboard. Fix TLS configuration or " +
+				"configure Zabbix web service to ignore TLS certificate errors when accessing " +
+				"frontend URL.",
+		)
+	case "":
+		return errs.New(
+			"network.EventLoadingFailed event with empty ErrorText was received while loading dashboard.",
+		)
+	default:
+		return errs.Errorf(
+			"network.EventLoadingFailed event with ErrorText = '%s' was received while loading dashboard.",
+			errStr,
+		)
 	}
 }
