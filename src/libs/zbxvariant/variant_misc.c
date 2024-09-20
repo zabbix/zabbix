@@ -78,15 +78,15 @@ int	zbx_variant_to_value_type(zbx_variant_t *value, unsigned char value_type, ch
 		err_val_tostring = zbx_str_printable_dyn(err_val);
 		if(strlen(value_desc) > strlen(err_val))
 		{
-		*errmsg = zbx_dsprintf(NULL, "Value of type \"%s\" is not suitable for value type \"%s\". Value "
-				"\"%s(truncated)\"", zbx_variant_type_desc(value), zbx_item_value_type_string(value_type),
-				err_val_tostring);
+				*errmsg = zbx_dsprintf(NULL, "Value of type \"%s\" is not suitable for value"
+						" type \"%s\". Value \"%s(truncated)\"", zbx_variant_type_desc(value)
+						, zbx_item_value_type_string(value_type), err_val_tostring);
 		}
 		else
 		{
-		*errmsg = zbx_dsprintf(NULL, "Value of type \"%s\" is not suitable for value type \"%s\". Value "
-				"\"%s\"", zbx_variant_type_desc(value), zbx_item_value_type_string(value_type),
-				err_val_tostring);
+				*errmsg = zbx_dsprintf(NULL, "Value of type \"%s\" is not suitable for value"
+						" type \"%s\". Value ""\"%s\"", zbx_variant_type_desc(value)
+						, zbx_item_value_type_string(value_type),err_val_tostring);
 		}
 		zbx_free(value_desc);
 		zbx_free(err_val_tostring);
