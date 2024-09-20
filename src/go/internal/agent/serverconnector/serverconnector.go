@@ -222,6 +222,7 @@ func (c *Connector) refreshActiveChecks() {
 	}
 
 	var response activeChecksResponse
+
 	parseSuccess := false
 
 	defer func() {
