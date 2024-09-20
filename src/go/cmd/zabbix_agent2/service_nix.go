@@ -35,7 +35,7 @@ func fatalCloseOSItems() {}
 
 func eventLogInfo(msg string) error { return nil }
 
-func eventLogErr(err error) error { return nil }
+func eventLogErr(err error) error { return err }
 
 func confirmService() {}
 

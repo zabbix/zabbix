@@ -1,0 +1,151 @@
+---
+test case: password
+in:
+  connection: 'UID=test;'
+  pwd: 'password'
+
+out:
+  value: 'UID=test;PWD=password'
+---
+test case: pass;word
+in:
+  connection: 'UID=test;'
+  pwd: 'pass;word'
+
+out:
+  value: 'UID=test;PWD={pass;word}'
+---
+test case: backward compatibility for already enclosed {} with ;
+in:
+  connection: 'UID=test;'
+  pwd: '{pass;word}'
+
+out:
+  value: 'UID=test;PWD={pass;word}'
+---
+test case: in }{ with ;
+in:
+  connection: 'UID=test;'
+  pwd: '}pass;word{'
+
+out:
+  value: 'UID=test;PWD={}}pass;word{}'
+
+---
+test case: pass;}word
+in:
+  connection: 'UID=test;'
+  pwd: 'pass;}word'
+
+out:
+  value: 'UID=test;PWD={pass;}}word}'
+
+---
+test case: pass;}}word
+in:
+  connection: 'UID=test;'
+  pwd: 'pass;}}word'
+
+out:
+  value: 'UID=test;PWD={pass;}}}}word}'
+
+---
+test case: Zj;Fp&f`2BjWIX|YhWC9*PS!$c0obJR5
+in:
+  connection: 'UID=test;'
+  pwd: 'Zj;Fp&f`2BjWIX|YhWC9*PS!$c0obJR5'
+
+out:
+  value: 'UID=test;PWD={Zj;Fp&f`2BjWIX|YhWC9*PS!$c0obJR5}'
+
+---
+test case: Zj;Fp&f`2BjWIX|}YhWC9*PS!$c0obJR5
+in:
+  connection: 'UID=test;'
+  pwd: 'Zj;Fp&f`2BjWIX|}YhWC9*PS!$c0obJR5'
+
+out:
+  value: 'UID=test;PWD={Zj;Fp&f`2BjWIX|}}YhWC9*PS!$c0obJR5}'
+
+---
+test case: connection without ;
+in:
+  connection: 'UID=test'
+  pwd: 'pass;}}word'
+
+out:
+  value: 'UID=test;PWD={pass;}}}}word}'
+
+---
+test case: ; after }}}
+in:
+  connection: 'UID=test'
+  pwd: '}}}};'
+
+out:
+  value: 'UID=test;PWD={}}}}}}}};}'
+
+---
+test case: pass word
+in:
+  connection: 'UID=test;'
+  pwd: 'pass word'
+
+out:
+  value: 'UID=test;PWD=pass word'
+
+---
+test case: pass= word
+in:
+  connection: 'UID=test;'
+  pwd: 'pass= word'
+
+out:
+  value: 'UID=test;PWD=pass= word'
+
+---
+test case: password;}
+in:
+  connection: 'UID=test;'
+  pwd: 'password;}'
+
+out:
+  value: 'UID=test;PWD={password;}}}'
+
+---
+test case: only }
+in:
+  connection: 'UID=test;'
+  pwd: '}'
+
+out:
+  value: 'UID=test;PWD=}'
+
+---
+test case: only {
+in:
+  connection: 'UID=test;'
+  pwd: '{'
+
+out:
+  value: 'UID=test;PWD={'
+
+---
+test case: ;
+in:
+  connection: 'UID=test;'
+  pwd: ';'
+
+out:
+  value: 'UID=test;PWD={;}'
+
+---
+test case: =
+in:
+  connection: 'UID=test;'
+  pwd: '='
+
+out:
+  value: 'UID=test;PWD=='
+
+...

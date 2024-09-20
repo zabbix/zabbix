@@ -26,33 +26,86 @@ class testFormMap extends CLegacyWebTest {
 	 */
 	public function possibleGridOptions() {
 		return [
-			// grid size, show grid, auto align
-			['20x20', 1, 1],
-			['40x40', 1, 1],
-			['50x50', 1, 1],
-			['75x75', 1, 1],
-			['100x100', 1, 1],
+			// Array value description: grid dimensions, show grid, auto align.
+			['20x20', SYSMAP_GRID_SHOW_ON, SYSMAP_GRID_ALIGN_ON],
+			['40x40', SYSMAP_GRID_SHOW_ON, SYSMAP_GRID_ALIGN_ON],
+			['50x50', SYSMAP_GRID_SHOW_ON, SYSMAP_GRID_ALIGN_ON],
+			['75x75', SYSMAP_GRID_SHOW_ON, SYSMAP_GRID_ALIGN_ON],
+			['100x100', SYSMAP_GRID_SHOW_ON, SYSMAP_GRID_ALIGN_ON],
 
-			['20x20', 1, 0],
-			['40x40', 1, 0],
-			['50x50', 1, 0],
-			['75x75', 1, 0],
-			['100x100', 1, 0],
+			['20x20', SYSMAP_GRID_SHOW_ON, SYSMAP_GRID_ALIGN_OFF],
+			['40x40', SYSMAP_GRID_SHOW_ON, SYSMAP_GRID_ALIGN_OFF],
+			['50x50', SYSMAP_GRID_SHOW_ON, SYSMAP_GRID_ALIGN_OFF],
+			['75x75', SYSMAP_GRID_SHOW_ON, SYSMAP_GRID_ALIGN_OFF],
+			['100x100', SYSMAP_GRID_SHOW_ON, SYSMAP_GRID_ALIGN_OFF],
 
-			['20x20', 0, 1],
-			['40x40', 0, 1],
-			['50x50', 0, 1],
-			['75x75', 0, 1],
-			['100x100', 0, 1],
+			['20x20', SYSMAP_GRID_SHOW_OFF, SYSMAP_GRID_ALIGN_ON],
+			['40x40', SYSMAP_GRID_SHOW_OFF, SYSMAP_GRID_ALIGN_ON],
+			['50x50', SYSMAP_GRID_SHOW_OFF, SYSMAP_GRID_ALIGN_ON],
+			['75x75', SYSMAP_GRID_SHOW_OFF, SYSMAP_GRID_ALIGN_ON],
+			['100x100', SYSMAP_GRID_SHOW_OFF, SYSMAP_GRID_ALIGN_ON],
 
-			['20x20', 0, 0],
-			['40x40', 0, 0],
-			['50x50', 0, 0],
-			['75x75', 0, 0],
-			['100x100', 0, 0]
+			['20x20', SYSMAP_GRID_SHOW_OFF, SYSMAP_GRID_ALIGN_OFF],
+			['40x40', SYSMAP_GRID_SHOW_OFF, SYSMAP_GRID_ALIGN_OFF],
+			['50x50', SYSMAP_GRID_SHOW_OFF, SYSMAP_GRID_ALIGN_OFF],
+			['75x75', SYSMAP_GRID_SHOW_OFF, SYSMAP_GRID_ALIGN_OFF],
+			['100x100', SYSMAP_GRID_SHOW_OFF, SYSMAP_GRID_ALIGN_OFF]
 		];
 	}
 
+	public static function allMaps() {
+		return CDBHelper::getDataProvider('SELECT * FROM sysmaps');
+	}
+
+	/**
+	 * @dataProvider allMaps
+	 *
+	 * @browsers chrome
+	 */
+	public function testFormMap_SimpleUpdateConstructor($map) {
+		$sysmapid = $map['sysmapid'];
+
+		$sql_maps_elements = 'SELECT * FROM sysmaps sm INNER JOIN sysmaps_elements sme ON'.
+				' sme.sysmapid = sm.sysmapid ORDER BY sme.selementid';
+		$sql_links_triggers = 'SELECT * FROM sysmaps_links sl INNER JOIN sysmaps_link_triggers slt ON'.
+				' slt.linkid = sl.linkid ORDER BY slt.linktriggerid';
+		$hash_maps_elements = CDBHelper::getHash($sql_maps_elements);
+		$hash_links_triggers = CDBHelper::getHash($sql_links_triggers);
+
+		$this->page->login()->open('sysmaps.php')->waitUntilReady();
+		$this->query('link', $map['name'])->one()->click();
+		$this->page->waitUntilReady();
+
+		$element = $this->query('xpath://div[@id="flickerfreescreen_mapimg"]/div/*[name()="svg"]')
+				->waitUntilPresent()->one();
+
+		$exclude = [
+			'query'	=> 'class:map-timestamp',
+			'color'	=> '#ffffff'
+		];
+		$this->assertScreenshotExcept($element, $exclude, 'view_'.$sysmapid);
+
+		$this->query('button:Edit map')->one()->click();
+		$this->page->waitUntilReady();
+		$this->assertScreenshot($this->query('id:map-area')->waitUntilPresent()->one(), 'edit_'.$sysmapid);
+		$this->query('button:Update')->one()->click();
+
+		$this->page->waitUntilAlertIsPresent();
+		$this->assertEquals('Map is updated! Return to map list?', $this->page->getAlertText());
+		$this->page->acceptAlert();
+
+		$this->page->waitUntilReady();
+		$this->assertStringContainsString('sysmaps.php', $this->page->getCurrentUrl());
+
+		$hash_data = [
+			$hash_maps_elements => $sql_maps_elements,
+			$hash_links_triggers => $sql_links_triggers
+		];
+
+		foreach ($hash_data as $old => $new) {
+			$this->assertEquals($old, CDBHelper::getHash($new));
+		}
+	}
 
 	/**
 	 * Test setting of grid options for map
