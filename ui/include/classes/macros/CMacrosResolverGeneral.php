@@ -2628,10 +2628,7 @@ class CMacrosResolverGeneral {
 							}
 							elseif ($data['context'] !== null && count($global_macros[$data['macro']]['regex'])) {
 								foreach ($global_macros[$data['macro']]['regex'] as $regex => $val) {
-									// Escape '/' characters that are not already escaped.
-									$regex = preg_replace('/\\\?\//', '\/', trim($regex, '/'));
-
-									if (preg_match('/'.$regex.'/', $data['context'])) {
+									if (preg_match('/'.preg_replace('/\\\?\//', '\/', $regex).'/', $data['context'])) {
 										$data['value']['value'] = $val;
 										break;
 									}
@@ -2718,10 +2715,7 @@ class CMacrosResolverGeneral {
 				// Searching context coincidence, if regex array not empty.
 				elseif ($context !== null && count($host_macros[$hostid][$macro]['regex'])) {
 					foreach ($host_macros[$hostid][$macro]['regex'] as $regex => $val) {
-						// Escape '/' characters that are not already escaped.
-						$regex = preg_replace('/\\\?\//', '\/', trim($regex, '/'));
-
-						if (preg_match('/'.$regex.'/', $context) === 1) {
+						if (preg_match('/'.preg_replace('/\\\?\//', '\/', $regex).'/', $context) === 1) {
 							return [
 								'value' => $val,
 								'value_default' => $value_default
