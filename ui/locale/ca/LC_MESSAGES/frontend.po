@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-08-28 08:57+0000\n"
+"PO-Revision-Date: 2024-09-18 09:08+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -3324,58 +3324,68 @@ msgstr[1] "No es pot pas importar la plantilla \"%1$s\", doncs les plantilles en
 
 #: include/classes/api/services/CItemGeneral.php:689
 #, c-format
-msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
+msgid "Cannot inherit LDD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
 msgstr "No es poden pas heretar les regles LLD la clau \"%1$s\" dels models \"%2$s\" i \"%3$s\", doncs la clau ha d'ésser única a l'equip \"%4$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:690
 #, c-format
-msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
+msgid "Cannot inherit LDD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
 msgstr "No es poden pas heretar les regles LLD la clau \"%1$s\" dels models \"%2$s\" i \"%3$s\", doncs la clau ha d'ésser única a la plantilla \"%4$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:819
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a discovered item with the same key already exists."
-msgstr "No es pot pas heretar la regla LLD amb la clau \"%1$s\" de la plantilla \"%2$s\" a l'equip \"%3$s\", doncs ja hi ha un element descobert amb la mateixa clau."
+msgstr "No es pot pas heretar la regla LDD amb la clau \"%1$s\" de la plantilla \"%2$s\" a l'equip \"%3$s\", doncs ja hi ha un element descobert amb la mateixa clau."
 
 #: include/classes/api/services/CItemGeneral.php:1230
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a host interface of type \"%4$s\" is required."
-msgstr "No es pot pas heretar la regla LLD amb la clau \"%1$s\" de la plantilla \"%2$s\" a l'equip \"%3$s\", doncs es requereix una interfície d'equip del tipus \"%4$s\"."
+msgstr "No es pot pas heretar la regla LDD amb la clau \"%1$s\" de la plantilla \"%2$s\" a l'equip \"%3$s\", doncs es requereix una interfície d'equip del tipus \"%4$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:874
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule with the same key is already inherited from template \"%4$s\"."
-msgstr "No es pot pas heretar la regla LLD amb la clau \"%1$s\" de la plantilla \"%2$s\" a l'equip \"%3$s\", doncs ja hi ha una regla LLD amb la mateixa clau heretat de la plantilla \"%4$s\"."
+msgstr "No es pot pas heretar la regla LDD amb la clau \"%1$s\" de la plantilla \"%2$s\" a l'equip \"%3$s\", doncs ja hi ha una regla LLD amb la mateixa clau heretat de la plantilla \"%4$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:813
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item prototype with the same key already exists."
-msgstr "No es pot pas heretar la regla LLD amb la clau \"%1$s\" de la plantilla \"%2$s\" a l'equip \"%3$s\", doncs ja hi ha un prototip d'element amb la mateixa clau."
+msgstr "No es pot pas heretar la regla LDD amb la clau \"%1$s\" de la plantilla \"%2$s\" a l'equip \"%3$s\", doncs ja hi ha un prototip d'element amb la mateixa clau."
 
 #: include/classes/api/services/CItemGeneral.php:807
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item with the same key already exists."
-msgstr "No es pot pas heretar la regla LLD amb la clau \"%1$s\" de la plantilla \"%2$s\" a l'equip \"%3$s\", doncs ja hi ha un element amb la mateixa clau."
+msgstr "No es pot pas heretar la regla LDD amb la clau \"%1$s\" de la plantilla \"%2$s\" a l'equip \"%3$s\", doncs ja hi ha un element amb la mateixa clau."
 
 #: include/classes/api/services/CItemGeneral.php:820
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because a discovered item with the same key already exists."
-msgstr "No es pot pas heretar la regla LLD amb la clau \"%1$s\" de la plantilla \"%2$s\" a la plantilla \"%3$s\", doncs ja hi ha un element descobert amb la mateixa clau."
+msgstr "No es pot pas heretar la regla LDD amb la clau \"%1$s\" de la plantilla \"%2$s\" a la plantilla \"%3$s\", doncs ja hi ha un element descobert amb la mateixa clau."
 
 #: include/classes/api/services/CItemGeneral.php:875
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule with the same key is already inherited from template \"%4$s\"."
-msgstr "No es pot pas heretar la regla LLD amb la clau \"%1$s\" de la plantilla \"%2$s\" a la plantilla \"%3$s\", doncs ja hi ha una regla LLD amb la mateixa clau heretat de la plantilla \"%4$s\"."
+msgstr "No es pot pas heretar la regla LDD amb la clau \"%1$s\" de la plantilla \"%2$s\" a la plantilla \"%3$s\", doncs ja hi ha una regla LLD amb la mateixa clau heretat de la plantilla \"%4$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:814
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item prototype with the same key already exists."
-msgstr "No es pot pas heretar la regla LLD amb la clau \"%1$s\" de la plantilla \"%2$s\" a la plantilla \"%3$s\", doncs ja hi ha un prototip d'element amb la mateixa clau."
+msgstr "No es pot pas heretar la regla LDD amb la clau \"%1$s\" de la plantilla \"%2$s\" a la plantilla \"%3$s\", doncs ja hi ha un prototip d'element amb la mateixa clau."
 
 #: include/classes/api/services/CItemGeneral.php:808
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item with the same key already exists."
-msgstr "No es pot pas heretar la regla LLD amb la clau \"%1$s\" de la plantilla \"%2$s\" a la plantilla \"%3$s\", doncs ja hi ha un element amb la mateixa clau."
+msgstr "No es pot pas heretar la regla LDD amb la clau \"%1$s\" de la plantilla \"%2$s\" a la plantilla \"%3$s\", doncs ja hi ha un element amb la mateixa clau."
+
+#: include/classes/api/services/CItemGeneral.php:684
+#, c-format
+msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
+msgstr "No es poden pas heretar les regles LLD la clau \"%1$s\" dels models \"%2$s\" i \"%3$s\", doncs la clau ha d'ésser única a l'equip \"%4$s\"."
+
+#: include/classes/api/services/CItemGeneral.php:685
+#, c-format
+msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
+msgstr "No es poden pas heretar les regles LLD la clau \"%1$s\" dels models \"%2$s\" i \"%3$s\", doncs la clau ha d'ésser única a la plantilla \"%4$s\"."
 
 #: include/classes/api/services/CItemPrototype.php:1220
 #, c-format
@@ -20353,8 +20363,8 @@ msgstr "Els paràmetre es passaran a l'script com arguments de línia de comande
 #, c-format
 msgid "This check cannot be removed, as it is used as a condition in %1$s discovery action."
 msgid_plural "This check cannot be removed, as it is used as a condition in %1$s discovery actions."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Aquesta comprovació no es pot pas eliminar, ja que s'empra com a condició en l'acció de descoberta de %1$s."
+msgstr[1] "Aquesta comprovació no es pot eliminar, ja que s'empra com a condició a les accions de descoberta de %1$s."
 
 #: include/func.inc.php:2566
 msgid "This day last week"
@@ -22436,7 +22446,7 @@ msgstr "Sensor acumulatiu d'estat de salut de l'hipervisor de VMware, \"url\" - 
 
 #: include/classes/data/CItemData.php:2237
 msgid "VMware hypervisor maintenance status, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns 0 - not in maintenance; 1 - in maintenance"
-msgstr ""
+msgstr "Estat de manteniment de l'hipervisor de VMware, \"url\" - URL del servei de VMware, \"uuid\" - identificador únic global de l'hipervisor de VMware. Retorna 0 - no en manteniment; 1 - en manteniment"
 
 #: include/classes/data/CItemData.php:2051
 msgid "VMware hypervisor model, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
@@ -22576,7 +22586,7 @@ msgstr "Ús de memòria convidada de la màquina virtual de VMware, \"url\" - UR
 
 #: include/classes/data/CItemData.php:2482
 msgid "VMware virtual machine hypervisor maintenance status, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier. Returns 0 - not in maintenance; 1 - in maintenance"
-msgstr ""
+msgstr "Estat de manteniment de l'hipervisor de màquines virtuals VMware, \"url\" - URL del servei de VMware, \"uuid\" - identificador únic global de l'hipervisor de màquines virtuals VMware. Retorna 0 - no en manteniment; 1 - en manteniment"
 
 #: include/classes/data/CItemData.php:2331
 msgid "VMware virtual machine hypervisor name, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"

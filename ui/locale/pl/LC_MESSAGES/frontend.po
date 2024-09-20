@@ -3415,13 +3415,13 @@ msgstr[2] "Nie można zaimportować szablonu \"%1$s\", nie istnieją podłączon
 
 #: include/classes/api/services/CItemGeneral.php:689
 #, c-format
-msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
-msgstr "Nie można dziedziczyć reguł LLD z kluczem „%1$s” szablonów „%2$s” i „%3$s”, ponieważ klucz musi być unikalny na hoście „%4$s”."
+msgid "Cannot inherit LDD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
+msgstr "Nie można dziedziczyć reguł LDD z kluczem „%1$s” szablonów „%2$s” i „%3$s”, ponieważ klucz musi być unikalny na hoście „%4$s”."
 
 #: include/classes/api/services/CItemGeneral.php:690
 #, c-format
-msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
-msgstr "Nie można dziedziczyć reguł LLD z kluczem „%1$s” szablonów „%2$s” i „%3$s”, ponieważ klucz musi być unikalny na hoście „%4$s”."
+msgid "Cannot inherit LDD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
+msgstr "Nie można dziedziczyć reguł LDD z kluczem „%1$s” szablonów „%2$s” i „%3$s”, ponieważ klucz musi być unikalny na hoście „%4$s”."
 
 #: include/classes/api/services/CItemGeneral.php:819
 #, c-format
@@ -3467,6 +3467,16 @@ msgstr "Nie można odziedziczyć reguły LLD z kluczem „%1$s” szablonu „%2
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item with the same key already exists."
 msgstr "Nie można odziedziczyć reguły LLD z kluczem „%1$s” szablonu „%2$s” do szablonu „%3$s”, ponieważ pozycja z takim samym kluczem już istnieje."
+
+#: include/classes/api/services/CItemGeneral.php:684
+#, c-format
+msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:685
+#, c-format
+msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
+msgstr ""
 
 #: include/classes/api/services/CItemPrototype.php:1220
 #, c-format

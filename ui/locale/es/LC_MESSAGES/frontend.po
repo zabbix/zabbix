@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-08-26 11:25+0000\n"
+"PO-Revision-Date: 2024-09-16 20:26+0000\n"
 "Last-Translator: Vicente Salvador <vicentesalvadorcubedo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
@@ -3325,13 +3325,13 @@ msgstr[1] "No se pudo importar la plantilla \"%1$s\" porque las plantillas enlaz
 
 #: include/classes/api/services/CItemGeneral.php:689
 #, c-format
-msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
-msgstr "No se pueden heredar reglas LLD con la clave \"%1$s\" de las plantillas \"%2$s\" y \"%3$s\", porque la clave debe ser única en el equipo \"%4$s\"."
+msgid "Cannot inherit LDD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
+msgstr "No se pueden heredar reglas LDD con la clave \"%1$s\" de las plantillas \"%2$s\" y \"%3$s\", porque la clave debe ser única en el equipo \"%4$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:690
 #, c-format
-msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
-msgstr "No se pueden heredar reglas LLD con la clave \"%1$s\" de las plantillas \"%2$s\" y \"%3$s\", porque la clave debe ser única en la plantilla \"%4$s\"."
+msgid "Cannot inherit LDD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
+msgstr "No se pueden heredar reglas LDD con la clave \"%1$s\" de las plantillas \"%2$s\" y \"%3$s\", porque la clave debe ser única en la plantilla \"%4$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:819
 #, c-format
@@ -3377,6 +3377,16 @@ msgstr "No se puede heredar la regla LLD con la clave \"%1$s\" de la plantilla \
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item with the same key already exists."
 msgstr "No se puede heredar la regla LLD con la clave \"%1$s\" de la plantilla \"%2$s\" a la plantilla \"%3$s\", porque ya existe una métrica con la misma clave."
+
+#: include/classes/api/services/CItemGeneral.php:684
+#, c-format
+msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:685
+#, c-format
+msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
+msgstr ""
 
 #: include/classes/api/services/CItemPrototype.php:1220
 #, c-format
@@ -20354,8 +20364,8 @@ msgstr "Estos parámetros se pasarán al script como argumentos de línea de com
 #, c-format
 msgid "This check cannot be removed, as it is used as a condition in %1$s discovery action."
 msgid_plural "This check cannot be removed, as it is used as a condition in %1$s discovery actions."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Esta verificación no se puede eliminar, ya que se utiliza como condición en la acción de descubrimiento de %1$s."
+msgstr[1] "Estas verificaciones no se pueden eliminar, ya que se utilizan como condición en la acción de descubrimiento de %1$s."
 
 #: include/func.inc.php:2566
 msgid "This day last week"
@@ -22437,7 +22447,7 @@ msgstr "Sensor acumulativo del estado de salud del hipervisor de VMware, \"url\"
 
 #: include/classes/data/CItemData.php:2237
 msgid "VMware hypervisor maintenance status, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns 0 - not in maintenance; 1 - in maintenance"
-msgstr ""
+msgstr "Estado de mantenimiento del hipervisor de VMware, \"url\": URL del servicio de VMware, \"uuid\": identificador único global del hipervisor de VMware. Devuelve 0: no está en mantenimiento; 1: está en mantenimiento"
 
 #: include/classes/data/CItemData.php:2051
 msgid "VMware hypervisor model, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
@@ -22577,7 +22587,7 @@ msgstr "Uso de memoria del equipo de la máquina virtual VMware, \"url\": URL de
 
 #: include/classes/data/CItemData.php:2482
 msgid "VMware virtual machine hypervisor maintenance status, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier. Returns 0 - not in maintenance; 1 - in maintenance"
-msgstr ""
+msgstr "Estado de mantenimiento del hipervisor de la máquina virtual VMware, \"url\": URL del servicio VMware, \"uuid\": identificador único global de la máquina virtual VMware. Devuelve 0: no está en mantenimiento; 1: está en mantenimiento"
 
 #: include/classes/data/CItemData.php:2331
 msgid "VMware virtual machine hypervisor name, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"

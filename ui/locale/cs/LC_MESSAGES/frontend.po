@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-08-26 10:48+0000\n"
+"PO-Revision-Date: 2024-09-17 08:56+0000\n"
 "Last-Translator: Tomáš Heřmánek <tomas.hermanek@initmax.cz>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: cs\n"
@@ -3415,12 +3415,12 @@ msgstr[2] "Není možné importovat šablonu \"%1$s\", připojené šablony \"%2
 
 #: include/classes/api/services/CItemGeneral.php:689
 #, c-format
-msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
+msgid "Cannot inherit LDD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
 msgstr "Nelze zdědit LLD pravidla s klíčem \"%1$s\" z obou šablon \"%2$s\" a \"%3$s\", protože klíč musí být unikátní na hostu \"%4$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:690
 #, c-format
-msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
+msgid "Cannot inherit LDD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
 msgstr "Nelze zdědit LLD pravidla s klíčem \"%1$s\" z obou šablon \"%2$s\" a \"%3$s\", protože klíč musí být unikátní na šabloně \"%4$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:819
@@ -3467,6 +3467,16 @@ msgstr "Nelze zdědit pravidlo LLD s klíčem \"%1$s\" ze šablony \"%2$s\" na �
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item with the same key already exists."
 msgstr "Nelze zdědit pravidlo LLD s klíčem \"%1$s\" ze šablony \"%2$s\" na šablonu \"%3$s\", protože item se stejným klíčem již existuje."
+
+#: include/classes/api/services/CItemGeneral.php:684
+#, c-format
+msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:685
+#, c-format
+msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
+msgstr ""
 
 #: include/classes/api/services/CItemPrototype.php:1220
 #, c-format
@@ -20525,9 +20535,9 @@ msgstr "Tyto parametry budou předány do skriptu jako argumenty příkazového 
 #, c-format
 msgid "This check cannot be removed, as it is used as a condition in %1$s discovery action."
 msgid_plural "This check cannot be removed, as it is used as a condition in %1$s discovery actions."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Tuto kontrolu nelze odstranit, protože se používá jako podmínka v akci zjišťování %1$s."
+msgstr[1] "Tuto kontrolu nelze odstranit, protože se používá jako podmínka v akciích zjišťování %1$s."
+msgstr[2] "Tuto kontrolu nelze odstranit, protože se používá jako podmínka v akciích zjišťování %1$s."
 
 #: include/func.inc.php:2566
 msgid "This day last week"
@@ -22622,7 +22632,7 @@ msgstr "Stav senzoru rollupu hypervizoru VMware, \"url\" – URL služby VMware,
 
 #: include/classes/data/CItemData.php:2237
 msgid "VMware hypervisor maintenance status, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns 0 - not in maintenance; 1 - in maintenance"
-msgstr ""
+msgstr "Stav údržby hypervisoru VMware, \"url\" – URL služby VMware, \"uuid\" – globální unikátní identifikátor hypervizoru VMware. Vrátí 0 – není v údržbě; 1 - je v údržbě"
 
 #: include/classes/data/CItemData.php:2051
 msgid "VMware hypervisor model, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
@@ -22762,7 +22772,7 @@ msgstr "Velikost využité paměti virtuálního stroje VMware, \"url\" - URL sl
 
 #: include/classes/data/CItemData.php:2482
 msgid "VMware virtual machine hypervisor maintenance status, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier. Returns 0 - not in maintenance; 1 - in maintenance"
-msgstr ""
+msgstr "Stav údržby virtálního stroje hypervisoru VMware, \"url\" – URL služby VMware, \"uuid\" – globální unikátní identifikátor hypervizoru VMware. Vrátí 0 – není v údržbě; 1 - je v údržbě"
 
 #: include/classes/data/CItemData.php:2331
 msgid "VMware virtual machine hypervisor name, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
