@@ -123,7 +123,7 @@ if (count($data['tags']) > 0) {
 					->addClass(ZBX_STYLE_SUBFILTER)
 					->addClass(ZBX_STYLE_SUBFILTER_ENABLED);
 
-				$selected_tags[$tag_name][] = $element['name'];
+				$selected_tags[urlencode($tag_name)][] = $element['name'];
 			}
 			else {
 				if ($element['count'] == 0) {

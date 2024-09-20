@@ -87,7 +87,8 @@
 </script>
 
 <script type="text/x-jquery-tmpl" id="preprocessing-steps-parameters-multiline-tmpl">
-	<?= (new CMultilineInput('preprocessing[#{rowNum}][params][0]', '', ['add_post_js' => false])) ?>
+	<?= (new CMultilineInput('preprocessing[#{rowNum}][params][0]', '', ['add_post_js' => false, 'use_tab' => false]))
+	?>
 </script>
 
 <script type="text/x-jquery-tmpl" id="preprocessing-steps-parameters-custom-width-chkbox-tmpl">
@@ -539,23 +540,26 @@
 					case '<?= ZBX_PREPROC_STR_REPLACE ?>':
 						$on_fail
 							.prop('checked', false)
-							.prop('disabled', true)
-							.trigger('change');
+							.prop('disabled', true);
 						$row.find('[name*="[test]"]').prop('disabled', false);
 						break;
 
 					case '<?= ZBX_PREPROC_VALIDATE_NOT_SUPPORTED ?>':
 						$on_fail
 							.prop('checked', true)
-							.prop('readonly', true)
-							.trigger('change');
+							.prop('readonly', true);
 						break;
 
 					default:
-						$on_fail.prop('disabled', false);
+						$on_fail
+							.prop('checked', false)
+							.prop('disabled', false)
+							.prop('readonly', false);
 						$row.find('[name*="[test]"]').prop('disabled', false);
 						break;
 				}
+
+				$on_fail.trigger('change');
 			})
 			.on('change', 'input[type="text"][name*="params"]', function() {
 				$(this).attr('title', $(this).val());

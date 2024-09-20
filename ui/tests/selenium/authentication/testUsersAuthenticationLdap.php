@@ -518,7 +518,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 		// Check that the last server can't be removed while LDAP authentication is still on.
 		$table->query('button:Remove')->one()->click();
 		$form->submit();
-		$this->assertMessage(TEST_BAD, 'Cannot update authentication', 'Cannot delete default user directory.');
+		$this->assertMessage(TEST_BAD, 'Cannot update authentication', 'At least one LDAP server must exist');
 		$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM userdirectory_ldap'));
 
 		// Uncheck LDAP authentication and try saving again. Make sure the server is not deleted from DB before saving.

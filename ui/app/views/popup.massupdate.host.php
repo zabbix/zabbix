@@ -227,7 +227,7 @@ $tags_tab->addRow(
 $hostInventoryTable = DB::getSchema('host_inventory');
 foreach ($data['inventories'] as $field => $fieldInfo) {
 
-	if ($hostInventoryTable['fields'][$field]['type'] == DB::FIELD_TYPE_TEXT) {
+	if ($hostInventoryTable['fields'][$field]['type'] & DB::FIELD_TYPE_TEXT) {
 		$fieldInput = (new CTextArea('host_inventory['.$field.']', ''))
 			->setAdaptiveWidth(ZBX_TEXTAREA_BIG_WIDTH);
 	}
