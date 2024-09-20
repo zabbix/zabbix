@@ -32,11 +32,11 @@
  ******************************************************************************/
 int	zbx_variant_to_value_type(zbx_variant_t *value, unsigned char value_type, char **errmsg)
 {
-#define Z_MAX 240
+#define CHAR_MAX 240
 	int	ret;
 	char	*value_desc, *err_val_tostring;
 	const char	*err_val;
-	char	key_short[Z_MAX * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
+	char	short_value[CHAR_MAX * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
 
 	zbx_free(*errmsg);
 
@@ -74,7 +74,7 @@ int	zbx_variant_to_value_type(zbx_variant_t *value, unsigned char value_type, ch
 	if (FAIL == ret && NULL == *errmsg)
 	{
 		value_desc = zbx_strdup(NULL ,zbx_variant_value_desc(value));
-		err_val = zbx_truncate_value(value_desc, Z_MAX, key_short, sizeof(key_short));
+		err_val = zbx_truncate_value(value_desc, CHAR_MAX, short_value, sizeof(short_value));
 		err_val_tostring = zbx_str_printable_dyn(err_val);
 		if(strlen(value_desc) > strlen(err_val))
 		{
@@ -93,5 +93,5 @@ int	zbx_variant_to_value_type(zbx_variant_t *value, unsigned char value_type, ch
 	}
 
 	return ret;
-#undef Z_MAX
+#undef CHAR_MAX
 }
