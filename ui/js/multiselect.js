@@ -1002,7 +1002,7 @@
 			if (ms.options.limit == 0 || objectSize(ms.values.available) < ms.options.limit) {
 				if (typeof ms.values.available[item.id] === 'undefined'
 						&& typeof ms.values.selected[item.id] === 'undefined'
-						&& ms.options.excludeids.indexOf(item.id) === -1) {
+						&& (ms.options.popup.parameters?.disableids || []).indexOf(item.id) === -1) {
 					ms.values.available[item.id] = item;
 				}
 			}
