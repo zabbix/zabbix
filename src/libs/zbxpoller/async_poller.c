@@ -298,7 +298,7 @@ static void	async_initiate_queued_checks(zbx_poller_config_t *poller_config, con
 				errcodes[i] = zbx_async_check_snmp(&items[i], &results[i], process_snmp_result,
 						poller_config, poller_config, poller_config->base,
 						poller_config->dnsbase, poller_config->config_source_ip,
-						ZABBIX_ASYNC_RESOLVE_REVERSE_DNS_NO);
+						ZABBIX_ASYNC_RESOLVE_REVERSE_DNS_NO, ZBX_SNMP_DEFAULT_NUMBER_OF_RETRIES);
 	#else
 				errcodes[i] = NOTSUPPORTED;
 				SET_MSG_RESULT(&results[i], zbx_strdup(NULL, "Support for SNMP checks was not compiled"
@@ -642,6 +642,8 @@ ZBX_THREAD_ENTRY(zbx_async_poller_thread, args)
 		}
 #undef SNMP_ENGINEID_HK_INTERVAL
 #endif
+		if (ZBX_POLLER_TYPE_HTTPAGENT != poller_type)
+			zbx_async_dns_update_host_addresses(poller_config.dnsbase);
 	}
 
 	if (ZBX_POLLER_TYPE_HTTPAGENT != poller_type)

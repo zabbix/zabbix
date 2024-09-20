@@ -2097,6 +2097,7 @@ select {
 	.multilineinput-textarea {
 		flex: 1;
 		line-height: $line-height;
+		tab-size: 4;
 		resize: none;
 		white-space: pre;
 		padding: 0 5px;

@@ -946,7 +946,7 @@ class CAudit {
 			return false;
 		}
 
-		if ($schema_fields[$field_name]['type'] === DB::FIELD_TYPE_ID && $schema_fields[$field_name]['null']
+		if ($schema_fields[$field_name]['type'] & DB::FIELD_TYPE_ID && $schema_fields[$field_name]['null']
 				&& $value == 0) {
 			return true;
 		}

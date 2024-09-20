@@ -28,6 +28,7 @@
 #include "zbxdb.h"
 #include "zbxdbhigh.h"
 #include "zbxipcservice.h"
+#include "zbxcacheconfig.h"
 
 static void	housekeep_service_problems(const zbx_vector_uint64_t *eventids)
 {
@@ -40,7 +41,8 @@ static void	housekeep_service_problems(const zbx_vector_uint64_t *eventids)
 	if (NULL == data)
 		return;
 
-	zbx_service_flush(ZBX_IPC_SERVICE_SERVICE_PROBLEMS_DELETE, data, (zbx_uint32_t)data_offset);
+	if (0 != zbx_dc_get_itservices_num())
+		zbx_service_flush(ZBX_IPC_SERVICE_SERVICE_PROBLEMS_DELETE, data, (zbx_uint32_t)data_offset);
 	zbx_free(data);
 }
 

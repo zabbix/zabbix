@@ -20,8 +20,10 @@
 #include "zbxstr.h"
 #include "zbxtime.h"
 #include "zbxcurl.h"
+#include "zbxnum.h"
 
 #define WEBDRIVER_INVALID_SESSIONID_ERROR	"invalid session id"
+#define WEBDRIVER_ELEMENT_ID			"element-6066-11e4-a52e-4f735466cecf"
 
 static size_t	curl_write_cb(void *ptr, size_t size, size_t nmemb, void *userdata)
 {
@@ -1211,6 +1213,52 @@ int	webdriver_accept_alert(zbx_webdriver_t *wd, char **error)
 int	webdriver_dismiss_alert(zbx_webdriver_t *wd, char **error)
 {
 	return webdriver_session_query(wd, "POST", "alert/dismiss", "{}", NULL, error);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: swtich to frame                                                   *
+ *                                                                            *
+ * Parameters: wd    - [IN] webdriver object                                  *
+ *             frame - [OUT] target frame                                     *
+ *             error - [OUT] error message                                    *
+ *                                                                            *
+ * Return value: SUCCEED - operation was performed successfully               *
+ *               FAIL   - otherwise                                           *
+ *                                                                            *
+ * Comments: The switching depends on frame contents:                         *
+ *             NULL - switch to top level browsing context                    *
+ *             number - switch to the frame by index                          *
+ *             otherwise - switch to the frame by element                     *
+ *                                                                            *
+ ******************************************************************************/
+int	webdriver_switch_frame(zbx_webdriver_t *wd, const char *frame, char **error)
+{
+	struct zbx_json	json;
+	int		ret;
+	zbx_uint64_t	id;
+
+	zbx_json_init(&json, 128);
+
+	if (NULL == frame)
+	{
+		zbx_json_addraw(&json, "id", "null");
+	}
+	else if (SUCCEED == zbx_is_uint64(frame, &id))
+	{
+		zbx_json_adduint64(&json, "id", id);
+	}
+	else
+	{
+		zbx_json_addobject(&json, "id");
+		zbx_json_addstring(&json, WEBDRIVER_ELEMENT_ID, frame, ZBX_JSON_TYPE_STRING);
+	}
+
+	ret = webdriver_session_query(wd, "POST", "frame", json.buffer, NULL, error);
+
+	zbx_json_free(&json);
+
+	return ret;
 }
 
 #endif

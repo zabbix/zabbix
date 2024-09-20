@@ -30,7 +30,6 @@
 #include "zbxtime.h"
 #include "zbx_expression_constants.h"
 #include "zbxexpr.h"
-#include "zbxexpr.h"
 
 #ifdef HAVE_LIBCURL
 

@@ -34,6 +34,7 @@ ZBX_VECTOR_DECL(pp_step_history, zbx_pp_step_history_t)
 typedef struct
 {
 	zbx_vector_pp_step_history_t	step_history;
+	unsigned int			refcount;
 }
 zbx_pp_history_t;
 
@@ -44,6 +45,7 @@ void	zbx_pp_history_free(zbx_pp_history_t *history);
 void	zbx_pp_history_reserve(zbx_pp_history_t *history, int history_num);
 void	zbx_pp_history_add(zbx_pp_history_t *history, int index, zbx_variant_t *value, zbx_timespec_t ts);
 void	zbx_pp_history_pop(zbx_pp_history_t *history, int index, zbx_variant_t *value, zbx_timespec_t *ts);
+zbx_pp_history_t	*zbx_pp_history_clone(zbx_pp_history_t *history);
 
 typedef enum
 {
@@ -72,6 +74,8 @@ typedef struct
 	zbx_uint64_t		hostid;
 	int			steps_num;
 	zbx_pp_step_t		*steps;
+
+	zbx_uint64_t		pp_revision;
 
 	int			dep_itemids_num;
 	zbx_uint64_t		*dep_itemids;

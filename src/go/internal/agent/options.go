@@ -143,6 +143,36 @@ func GetTLSConfig(options *AgentOptions) (cfg *tls.Config, err error) {
 		c.Accept = tls.ConnUnencrypted
 	}
 
+	if c.Accept&(tls.ConnPSK|tls.ConnCert) == tls.ConnPSK|tls.ConnCert {
+		if options.TLSCipherCert != "" {
+			return nil, errors.New(`TLSCipherCert configuration parameter cannot be used when the combined list of` +
+				` certificate and PSK ciphersuites are used. Use TLSCipherAll to configure certificate ciphers`)
+		}
+		if options.TLSCipherCert13 != "" {
+			return nil, errors.New(`TLSCipherCert13 configuration parameter cannot be used when the combined list of` +
+				` certificate and PSK ciphersuites are used. Use TLSCipherAll13 to configure certificate ciphers`)
+		}
+		c.CipherAll = options.TLSCipherAll
+		c.CipherAll13 = options.TLSCipherAll13
+	} else {
+		if options.TLSCipherAll != "" {
+			return nil, errors.New(`parameter "TLSCipherAll" cannot be applied: the combined list of certificate` +
+				` and PSK ciphersuites is not used. Most likely parameters "TLSCipherCert" and/or "TLSCipherPSK"` +
+				` are sufficient`)
+		}
+
+		if options.TLSCipherAll13 != "" {
+			return nil, errors.New(`parameter "TLSCipherAll13" cannot be applied: the combined list of certificate` +
+				` and PSK ciphersuites is not used. Most likely parameters "TLSCipherCert13" and/or "TLSCipherPSK13"` +
+				` are sufficient`)
+		}
+
+		c.CipherAll = options.TLSCipherCert
+		c.CipherAll13 = options.TLSCipherCert13
+	}
+	c.CipherPSK = options.TLSCipherPSK
+	c.CipherPSK13 = options.TLSCipherPSK13
+
 	if (c.Accept|c.Connect)&tls.ConnPSK != 0 {
 		if options.TLSPSKIdentity != "" {
 			c.PSKIdentity = options.TLSPSKIdentity
@@ -163,12 +193,26 @@ func GetTLSConfig(options *AgentOptions) (cfg *tls.Config, err error) {
 		} else {
 			return nil, errors.New("missing TLSPSKFile configuration parameter")
 		}
+
+		if options.TLSCipherPSK != "" {
+			c.CipherPSK = options.TLSCipherPSK
+		}
+		if options.TLSCipherPSK13 != "" {
+			c.CipherPSK13 = options.TLSCipherPSK13
+		}
+
 	} else {
 		if options.TLSPSKIdentity != "" {
 			return nil, errors.New("TLSPSKIdentity configuration parameter set without PSK being used")
 		}
 		if options.TLSPSKFile != "" {
 			return nil, errors.New("TLSPSKFile configuration parameter set without PSK being used")
+		}
+		if options.TLSCipherPSK != "" {
+			return nil, errors.New("TLSCipherPSK configuration parameter set without PSK being used")
+		}
+		if options.TLSCipherPSK13 != "" {
+			return nil, errors.New("TLSCipherPSK13 configuration parameter set without PSK being used")
 		}
 	}
 
@@ -191,6 +235,14 @@ func GetTLSConfig(options *AgentOptions) (cfg *tls.Config, err error) {
 		c.ServerCertIssuer = options.TLSServerCertIssuer
 		c.ServerCertSubject = options.TLSServerCertSubject
 		c.CRLFile = options.TLSCRLFile
+
+		if options.TLSCipherCert != "" {
+			c.CipherAll = options.TLSCipherCert
+		}
+		if options.TLSCipherCert13 != "" {
+			c.CipherAll13 = options.TLSCipherCert13
+		}
+
 	} else {
 		if options.TLSCAFile != "" {
 			return nil, errors.New("TLSCAFile configuration parameter set without certificates being used")
@@ -209,6 +261,12 @@ func GetTLSConfig(options *AgentOptions) (cfg *tls.Config, err error) {
 		}
 		if options.TLSCRLFile != "" {
 			return nil, errors.New("TLSCRLFile configuration parameter set without certificates being used")
+		}
+		if options.TLSCipherCert != "" {
+			return nil, errors.New("TLSCipherCert configuration parameter set without certificates being used")
+		}
+		if options.TLSCipherCert13 != "" {
+			return nil, errors.New("TLSCipherCert13 configuration parameter set without certificates being used")
 		}
 	}
 	return c, nil

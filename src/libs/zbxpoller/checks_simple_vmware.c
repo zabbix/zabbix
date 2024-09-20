@@ -702,9 +702,9 @@ static int	custquery_read_result(zbx_vmware_cust_query_t *custom_query, AGENT_RE
 		{
 			custom_query->state &= (unsigned char)~ZBX_VMWARE_CQ_SEPARATE;
 		}
-
-		custom_query->last_pooled = time(NULL);
 	}
+
+	custom_query->last_pooled = time(NULL);
 
 	return SYSINFO_RET_OK;
 }

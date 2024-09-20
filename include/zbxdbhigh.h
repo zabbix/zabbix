@@ -221,6 +221,8 @@ typedef struct
 	int			severity;
 	unsigned char		suppressed;
 
+	zbx_vector_uint64_t	*maintenanceids;
+
 	zbx_vector_tags_ptr_t	tags;
 
 #define ZBX_FLAGS_DB_EVENT_UNSET		0x0000
@@ -691,10 +693,10 @@ typedef struct
 	int			ns;
 	int			value;
 	int			severity;
-
-	zbx_vector_tags_ptr_t	tags;
-	int			suppressed;
 	int			mtime;
+	zbx_vector_tags_ptr_t	tags;
+
+	zbx_vector_uint64_t	*maintenanceids;
 }
 zbx_event_t;
 

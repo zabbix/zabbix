@@ -419,6 +419,7 @@ out:
 	if (-1 != err_index)
 		return duk_throw(ctx);
 
+	/* request->data already contains valid utf-8 string, sto it can be pushed directly */
 	duk_push_lstring(ctx, request->data, request->data_offset);
 
 	return 1;
@@ -619,7 +620,7 @@ static void	es_put_header(duk_context *ctx, int idx, char *header)
 	if (FAIL == parse_header(header, &value))
 		return;
 
-	duk_push_string(ctx, value);
+	es_push_result_string(ctx, value, strlen(value));
 
 	/* duk_put_prop_string() throws error on failure, no need to check return code */
 	(void)duk_put_prop_string(ctx, idx, header);
@@ -735,7 +736,7 @@ static duk_ret_t	get_headers_as_arrays(duk_context *ctx, zbx_es_httprequest_t *r
 
 		for (j = 0; j < h->values.values_num; j++)
 		{
-			duk_push_string(ctx, h->values.values[j]);
+			es_push_result_string(ctx, h->values.values[j], strlen(h->values.values[j]));
 			duk_put_prop_index(ctx, arr_idx, (duk_uarridx_t)j);
 		}
 
