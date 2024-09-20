@@ -739,26 +739,26 @@ class testHost extends CAPITest {
 			],
 			'Field "tls_psk" cannot have different values for same "tls_psk_identity" on change "tls_psk_identity"' => [
 				[
-					'tls_psk_identity' => 'host.massupdate.psk1',
 					'tls_accept' => HOST_ENCRYPTION_PSK,
 					'tls_connect' => HOST_ENCRYPTION_PSK,
+					'tls_psk_identity' => 'host.massupdate.psk1',
 					'hosts' => [
 						['hostid' => ':host:host.massupdate.psk1'],
 						['hostid' => ':host:host.massupdate.psk2']
 					]
 				],
-				'Incorrect value for field "/2/tls_psk": another value of tls_psk exists for same tls_psk_identity.'
+				'Invalid parameter "/": both tls_psk_identity and tls_psk must be specified.'
 			],
 			'Field "tls_psk" cannot have different values for same "tls_psk_identity" on change "tls_psk"' => [
 				[
-					'tls_psk' => '11111111111111111111111111111111',
 					'tls_accept' => HOST_ENCRYPTION_PSK,
 					'tls_connect' => HOST_ENCRYPTION_PSK,
+					'tls_psk' => '11111111111111111111111111111111',
 					'hosts' => [
 						['hostid' => ':host:host.massupdate.psk3']
 					]
 				],
-				'Incorrect value for field "/1/tls_psk": another value of tls_psk exists for same tls_psk_identity.'
+				'Invalid parameter "/": both tls_psk_identity and tls_psk must be specified.'
 			],
 			'Field "tls_psk" only default value is allowed when host "tls_accept" and "tls_connect" != HOST_ENCRYPTION_PSK' => [
 				[
@@ -821,32 +821,24 @@ class testHost extends CAPITest {
 					]
 				]
 			],
-			'Can update "tls_psk"' => [
+			'Can update "tls_psk" and "tls_psk_identity" for multiple hosts having same values of "tls_psk"' => [
 				[
-					'tls_psk' => 'dc773e30385b5248b67c29988812d876',
 					'tls_accept' => HOST_ENCRYPTION_PSK,
 					'tls_connect' => HOST_ENCRYPTION_PSK,
-					'hosts' => [
-						['hostid' => ':host:host.massupdate.psk5']
-					]
-				]
-			],
-			'Can update "tls_psk_identity" for multiple hosts having same values of "tls_psk"' => [
-				[
 					'tls_psk_identity' => 'massupdate.tls_psk_identity',
-					'tls_accept' => HOST_ENCRYPTION_PSK,
-					'tls_connect' => HOST_ENCRYPTION_PSK,
+					'tls_psk' => '11111111111111111111111111111111',
 					'hosts' => [
 						['hostid' => ':host:host.massupdate.psk3'],
 						['hostid' => ':host:host.massupdate.psk4']
 					]
 				]
 			],
-			'Can update "tls_psk" for multiple hosts having same values of "tls_psk_identity"' => [
+			'Can update certificate fields for multiple hosts' => [
 				[
-					'tls_psk' => '11111111111111111111111111111111',
-					'tls_accept' => HOST_ENCRYPTION_PSK,
-					'tls_connect' => HOST_ENCRYPTION_PSK,
+					'tls_accept' => HOST_ENCRYPTION_CERTIFICATE,
+					'tls_connect' => HOST_ENCRYPTION_CERTIFICATE,
+					'tls_issuer' => 'abc',
+					'tls_subject' => 'def',
 					'hosts' => [
 						['hostid' => ':host:host.massupdate.psk3'],
 						['hostid' => ':host:host.massupdate.psk4']

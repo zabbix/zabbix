@@ -904,11 +904,19 @@ class CHost extends CHostGeneral {
 		$tls_fields =
 			array_flip(['tls_connect', 'tls_accept', 'tls_psk_identity', 'tls_psk', 'tls_issuer', 'tls_subject']);
 
-		if (array_intersect_key($data, $tls_fields)
-				&& (!array_key_exists('tls_connect', $data) || !array_key_exists('tls_accept', $data))) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS,
-				_('Cannot update host encryption settings. Connection settings for both directions should be specified.')
-			);
+		if (array_intersect_key($data, $tls_fields)) {
+			if (!array_key_exists('tls_connect', $data) || !array_key_exists('tls_accept', $data)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('Cannot update host encryption settings. Connection settings for both directions should be specified.')
+				);
+			}
+
+			if (($data['tls_connect'] == HOST_ENCRYPTION_PSK || $data['tls_accept'] & HOST_ENCRYPTION_PSK)
+					&& (!array_key_exists('tls_psk_identity', $data) || !array_key_exists('tls_psk', $data))) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', '/',
+					_('both tls_psk_identity and tls_psk must be specified')
+				));
+			}
 		}
 
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => self::getValidationFields(true, true)];
@@ -2260,7 +2268,7 @@ class CHost extends CHostGeneral {
 	}
 
 	private static function getValidationFields(bool $is_update = false, $is_mass_update = false): array {
-		$api_required = !$is_update || $is_mass_update ? API_REQUIRED : 0;
+		$api_required = $is_update ? 0 : API_REQUIRED;
 
 		$specific_fields = !$is_update || $is_mass_update
 			? []
