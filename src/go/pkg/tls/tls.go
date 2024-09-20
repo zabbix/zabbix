@@ -1431,7 +1431,9 @@ func Init(config *Config) (err error) {
 		C.tls_free_context(C.SSL_CTX_LP(defaultContext))
 	}
 
-	var cErr, cCaFile, cCrlFile, cCertFile, cKeyFile, cCipherCert, cCipherCert13, cCipherPSK, cCipherPSK13, cNULL *C.char
+	var cErr, cCaFile, cCrlFile, cCertFile, cKeyFile, cCipherCert, cCipherCert13, cCipherPSK, cCipherPSK13,
+		cNULL *C.char
+
 	if (config.Accept|config.Connect)&ConnCert != 0 {
 		cCaFile = C.CString(config.CAFile)
 		cCertFile = C.CString(config.CertFile)
@@ -1489,8 +1491,8 @@ func Init(config *Config) (err error) {
 	}
 
 	log.Tracef("Calling C function \"tls_new_context()\"")
-	defaultContext = unsafe.Pointer(C.tls_new_context(cCaFile, cCrlFile, cCertFile, cKeyFile, cCipherCert,
-		cCipherCert13, &cErr))
+	defaultContext = C.tls_new_context(cCaFile, cCrlFile, cCertFile, cKeyFile, cCipherCert, cCipherCert13, &cErr)
+
 	if defaultContext == nil {
 		err = fmt.Errorf("cannot initialize default TLS context: %s", C.GoString(cErr))
 		log.Tracef("Calling C function \"free()\"")
@@ -1499,7 +1501,8 @@ func Init(config *Config) (err error) {
 	}
 
 	log.Tracef("Calling C function \"tls_new_context()\"")
-	pskContext = unsafe.Pointer(C.tls_new_context(cNULL, cNULL, cNULL, cNULL, cCipherPSK, cCipherPSK13, &cErr))
+	pskContext = C.tls_new_context(cNULL, cNULL, cNULL, cNULL, cCipherPSK, cCipherPSK13, &cErr)
+
 	if pskContext == nil {
 		err = fmt.Errorf("cannot initialize PSK TLS context: %s", C.GoString(cErr))
 		log.Tracef("Calling C function \"free()\"")
