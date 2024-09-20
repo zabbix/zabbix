@@ -229,13 +229,6 @@ func GetTLSConfig(options *AgentOptions) (cfg *tls.Config, err error) {
 		c.ServerCertIssuer = options.TLSServerCertIssuer
 		c.ServerCertSubject = options.TLSServerCertSubject
 		c.CRLFile = options.TLSCRLFile
-
-		if c.CipherAll == "" {
-			c.CipherAll = options.TLSCipherCert
-		}
-		if c.CipherAll13 == "" {
-			c.CipherAll13 = options.TLSCipherCert13
-		}
 	} else {
 		if options.TLSCAFile != "" {
 			return nil, errors.New("TLSCAFile configuration parameter set without certificates being used")
