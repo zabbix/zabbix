@@ -69,6 +69,7 @@ int	__wrap_zbx_preprocessor_test(unsigned char value_type, const char *value, co
 		*preproc->history = *history;
 		preproc->history_num = 1;
 		memset(history, 0, sizeof(zbx_pp_history_t));
+		history->refcount = 1;
 	}
 
 	zbx_variant_set_none(&value_out);
