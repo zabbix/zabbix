@@ -222,10 +222,10 @@ func (c *Connector) refreshActiveChecks() {
 	}
 
 	var response activeChecksResponse
-	parse_success := false
+	parseSuccess := false
 
 	defer func() {
-		if !parse_success {
+		if !parseSuccess {
 			c.address.Next()
 		}
 	}()
@@ -265,7 +265,7 @@ func (c *Connector) refreshActiveChecks() {
 			log.Errf("[%d] cannot parse list of active checks from [%s]: data array is missing", c.clientID,
 				c.address.Get())
 		} else {
-			parse_success = true
+			parseSuccess = true
 		}
 		return
 	}
@@ -351,7 +351,7 @@ func (c *Connector) refreshActiveChecks() {
 	c.taskManager.UpdateTasks(c.clientID, c.resultCache.(resultcache.Writer), c.firstActiveChecksRefreshed,
 		response.Expressions, response.Data, now)
 
-	parse_success = true
+	parseSuccess = true
 	c.firstActiveChecksRefreshed = true
 }
 
