@@ -7939,7 +7939,7 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 
 	/* sync global configuration settings */
 	START_SYNC;
-	
+
 	DCsync_config(&config_sync, new_revision, &flags);
 
 	/* must be done in the same cache locking with config sync */

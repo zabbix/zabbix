@@ -776,7 +776,7 @@ void	zbx_dbsync_init(zbx_dbsync_t *sync, const char *name, unsigned char mode)
 	dbsync_init(sync, mode);
 	sync->from = name;
 	zbx_vector_dbsync_append(&dbsync_env.dbsyncs, sync);
-	
+
 	sync->type = ZBX_DBSYNC_TYPE_DIFF;
 }
 
@@ -1021,11 +1021,11 @@ int	zbx_dbsync_compare_autoreg_psk(zbx_dbsync_t *sync)
 	zbx_dcsync_sql_end(sync);
 
 	dbsync_prepare(sync, CONFIG_AUTOREG_TLS_FIELD_COUNT, NULL);
-	
+
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
 		sync->dbresult = result;
-		
+
 		return SUCCEED;
 	}
 
@@ -3545,7 +3545,7 @@ int	zbx_dbsync_compare_maintenance_tags(zbx_dbsync_t *sync)
 	zbx_hashset_iter_t		iter;
 	zbx_uint64_t			rowid;
 	zbx_dc_maintenance_tag_t	*maintenance_tag;
-	
+
 	zbx_dcsync_sql_start(sync);
 
 	if (NULL == (result = zbx_db_select("select maintenancetagid,maintenanceid,operator,tag,value"
