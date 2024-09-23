@@ -40,7 +40,7 @@ typedef enum
 	DBCONN_TYPE_UNMANAGED,
 	DBCONN_TYPE_MANAGED
 }
-zbx_db_conn_type_t;
+zbx_dbconn_type_t;
 
 struct zbx_dbconn
 {
@@ -56,7 +56,7 @@ struct zbx_dbconn
 
 	int			connect_options;
 
-	zbx_db_conn_type_t	managed;	/* managed by connection pool */
+	zbx_dbconn_type_t	managed;	/* managed by connection pool */
 
 	const zbx_db_config_t	*config;
 
