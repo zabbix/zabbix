@@ -61,6 +61,7 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
 	sec = zbx_time();
+
 	zbx_setproctitle("%s [syncing configuration]", get_process_type_string(process_type));
 	zbx_dc_sync_configuration(ZBX_DBSYNC_INIT, ZBX_SYNCED_NEW_CONFIG_NO, NULL, dbconfig_args_in->config_vault,
 			dbconfig_args_in->proxyconfig_frequency);

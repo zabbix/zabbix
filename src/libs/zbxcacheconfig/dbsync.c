@@ -4445,8 +4445,6 @@ void	zbx_dcsync_stats_dump(void)
 	double		sync_time_total = 0, sql_time_total = 0;
 	zbx_int64_t	total_used = 0;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() statistics for tables with changelog", __func__);
-
 	for (int i = 0; i < dbsync_env.changelog_dbsyncs.values_num; i++)
 	{
 		const zbx_dbsync_t *sync = dbsync_env.changelog_dbsyncs.values[i];
@@ -4456,8 +4454,6 @@ void	zbx_dcsync_stats_dump(void)
 		sync_time_total += sync->sync_time;
 		total_used += sync->sync_size;
 	}
-
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() statistics for tables without changelog", __func__);
 
 	for (int i = 0; i < dbsync_env.dbsyncs.values_num; i++)
 	{
