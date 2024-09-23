@@ -1121,20 +1121,19 @@ class CMediatype extends CApiService {
 
 		$action_options = [
 			'output' => $options['selectActions'],
-			'actionids' => array_keys($action_mediatypeids)
+			'actionids' => array_keys($action_mediatypeids),
+			'sortfield' => 'name',
 		];
 
-		$db_actions = DBselect(DB::makeSql('actions', $action_options));
+		$actions = API::Action()->get($action_options);
 
 		foreach ($result as $mediatype) {
 			$result[$mediatype['mediatypeid']]['actions'] = [];
 		}
 
-		while ($action = DBfetch($db_actions)) {
+		foreach ($actions as $action) {
 			foreach ($action_mediatypeids[$action['actionid']] as $mediatypeid) {
 				$result[$mediatypeid]['actions'][] = $action;
-
-				CArrayHelper::sort($result[$mediatypeid]['actions'], ['name']);
 			}
 		}
 	}
