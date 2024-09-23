@@ -695,6 +695,16 @@ out:
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: set connection as managed by connection pool                      *
+ *                                                                            *
+ ******************************************************************************/
+void	dbconn_set_managed(zbx_dbconn_t *db)
+{
+	db->managed = DBCONN_TYPE_MANAGED;
+}
+
 int	db_is_escape_sequence(char c)
 {
 #if defined(HAVE_MYSQL)
@@ -1216,6 +1226,12 @@ static zbx_db_result_t	dbconn_select_n(zbx_dbconn_t *db, const char *query, int 
  ******************************************************************************/
 int	zbx_dbconn_set_connect_options(zbx_dbconn_t *db, int options)
 {
+	if (0 != db->managed)
+	{
+		THIS_SHOULD_NEVER_HAPPEN_MSG("Cannot change connection options for managed connections");
+		return ZBX_DB_CONNECT_NORMAL;
+	}
+
 	int	old_options = db->connect_options;
 
 	db->connect_options = options;
@@ -1245,6 +1261,7 @@ zbx_dbconn_t	*zbx_dbconn_create(void)
 	db = (zbx_dbconn_t *)zbx_malloc(NULL, sizeof(zbx_dbconn_t));
 	memset(db, 0, sizeof(zbx_dbconn_t));
 
+	db->managed = DBCONN_TYPE_UNMANAGED;
 	db->config = db_config;
 	db->txn_error = ZBX_DB_OK;
 	db->txn_end_error = ZBX_DB_OK;
@@ -1284,9 +1301,9 @@ int	zbx_dbconn_open(zbx_dbconn_t *db)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() options:%d", __func__, db->connect_options);
 
-	if (0 != db->managed)
+	if (DBCONN_TYPE_MANAGED == db->managed)
 	{
-		THIS_SHOULD_NEVER_HAPPEN;
+		THIS_SHOULD_NEVER_HAPPEN_MSG("Cannot open managed connections");
 		err = ZBX_DB_FAIL;
 
 		goto out;
@@ -1328,8 +1345,8 @@ void 	zbx_dbconn_close(zbx_dbconn_t *db)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (0 != db->managed)
-		THIS_SHOULD_NEVER_HAPPEN;
+	if (DBCONN_TYPE_MANAGED == db->managed)
+		THIS_SHOULD_NEVER_HAPPEN_MSG("Cannot close managed connections");
 	else
 		dbconn_close(db);
 

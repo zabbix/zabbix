@@ -35,6 +35,13 @@
 #	include <zbxmutexs.h>
 #endif
 
+typedef enum
+{
+	DBCONN_TYPE_UNMANAGED,
+	DBCONN_TYPE_MANAGED
+}
+zbx_db_conn_type_t;
+
 struct zbx_dbconn
 {
 	int			txn_level;	/* transaction level, nested transactions are not supported */
@@ -45,11 +52,11 @@ struct zbx_dbconn
 	char			*last_db_strerror;	/* last database error message */
 	zbx_err_codes_t		last_db_errcode;
 
-	int			autoincrement;	/* TODO: - must be initialized for proxy, store in config ? */
+	int			autoincrement;
 
 	int			connect_options;
 
-	int			managed;	/* managed by connection pool */
+	zbx_db_conn_type_t	managed;	/* managed by connection pool */
 
 	const zbx_db_config_t	*config;
 
@@ -67,6 +74,8 @@ struct zbx_dbconn
 
 int	dbconn_init(char **error);
 void	dbconn_deinit(void);
+
+void	dbconn_set_managed(zbx_dbconn_t *db);
 
 char	*db_dyn_escape_string(const char *src, size_t max_bytes, size_t max_chars, zbx_escape_sequence_t flag);
 char	*db_dyn_escape_field_len(const zbx_db_field_t *field, const char *src, zbx_escape_sequence_t flag);
