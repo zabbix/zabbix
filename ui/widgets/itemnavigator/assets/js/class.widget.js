@@ -36,6 +36,13 @@ class CWidgetItemNavigator extends CWidget {
 	 */
 	#contents_scroll_top = 0;
 
+	/**
+	 * CSRF token for navigation.tree.toggle action.
+	 *
+	 * @type {string|null}
+	 */
+	#csrf_token = null;
+
 	onActivate() {
 		this._contents.scrollTop = this.#contents_scroll_top;
 	}
@@ -65,6 +72,8 @@ class CWidgetItemNavigator extends CWidget {
 
 			return;
 		}
+
+		this.#csrf_token = response[CSRF_TOKEN_NAME];
 
 		if (this.#item_navigator === null) {
 			this.clearContents();
@@ -124,7 +133,7 @@ class CWidgetItemNavigator extends CWidget {
 		fetch(curl.getUrl(), {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
-			body: JSON.stringify({is_open, group_identifier, widgetid})
+			body: JSON.stringify({is_open, group_identifier, widgetid, [CSRF_TOKEN_NAME]: this.#csrf_token})
 		})
 			.then((response) => response.json())
 			.then((response) => {

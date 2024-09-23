@@ -1863,9 +1863,23 @@ class CConfigurationImport {
 		$triggers_to_process_dependencies = [];
 
 		foreach ($this->getFormattedTriggers() as $trigger) {
-			$triggerid = null;
+			$hostids = $this->extractHostids($trigger);
 
-			$is_template_trigger = $this->isTemplateTrigger($trigger);
+			if (!$hostids) {
+				continue;
+			}
+
+			$triggerid = null;
+			$is_template_trigger = false;
+
+			foreach ($hostids as $hostid) {
+				if ($this->importedObjectContainer->isTemplateProcessed($hostid)) {
+					$is_template_trigger = true;
+				}
+				elseif (!$this->importedObjectContainer->isHostProcessed($hostid)) {
+					continue 2;
+				}
+			}
 
 			if ($is_template_trigger && array_key_exists('uuid', $trigger)) {
 				$triggerid = $this->referencer->findTriggeridByUuid($trigger['uuid']);
@@ -1916,35 +1930,35 @@ class CConfigurationImport {
 		$this->processTriggerDependencies($triggers_to_process_dependencies);
 	}
 
-	private function isTemplateTrigger(array $trigger): bool {
+	private function extractHostids(array $trigger): array {
 		$expression_parser = new CExpressionParser(['usermacros' => true]);
 
 		if ($expression_parser->parse($trigger['expression']) != CParser::PARSE_SUCCESS) {
-			return false;
+			return [];
 		}
 
-		foreach ($expression_parser->getResult()->getHosts() as $host) {
-			$host = $this->referencer->findTemplateidByHost($host);
+		$hosts = $expression_parser->getResult()->getHosts();
 
-			if ($host !== null) {
-				return true;
+		if ($trigger['recovery_expression'] !== '') {
+			if ($expression_parser->parse($trigger['recovery_expression']) != CParser::PARSE_SUCCESS) {
+				return [];
 			}
+
+			$hosts = array_merge($hosts, $expression_parser->getResult()->getHosts());
 		}
 
-		if ($trigger['recovery_expression'] === ''
-				|| $expression_parser->parse($trigger['recovery_expression']) != CParser::PARSE_SUCCESS) {
-			return false;
-		}
+		$hostids = [];
+		foreach (array_unique($hosts) as $host) {
+			$hostid = $this->referencer->findTemplateidOrHostidByHost($host);
 
-		foreach ($expression_parser->getResult()->getHosts() as $host) {
-			$host = $this->referencer->findTemplateidByHost($host);
-
-			if ($host !== null) {
-				return true;
+			if ($hostid === null) {
+				return [];
 			}
+
+			$hostids[] = $hostid;
 		}
 
-		return false;
+		return $hostids;
 	}
 
 	/**

@@ -10,10 +10,10 @@ This template uses the GetMetricData CloudWatch API calls to list and retrieve m
 For more information, please refer to the [CloudWatch pricing](https://aws.amazon.com/cloudwatch/pricing/) page.
 
 Additional information about metrics and used API methods:
-* Full metrics list related to EBS: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using_cloudwatch_ebs.html
-* Full metrics list related to EC2: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/viewing_metrics_with_cloudwatch.html
-* DescribeAlarms API method: https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_DescribeAlarms.html
-* DescribeVolumes API method: https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeVolumes.html
+* [Full metrics list related to EBS](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using_cloudwatch_ebs.html)
+* [Full metrics list related to EC2](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/viewing_metrics_with_cloudwatch.html)
+* [DescribeAlarms API method](https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_DescribeAlarms.html)
+* [DescribeVolumes API method](https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeVolumes.html)
 
 
 ## Requirements
@@ -52,7 +52,43 @@ Add the following required permissions to your Zabbix IAM policy in order to col
     ]
   }
   ```
-
+For using assume role authorization, add the appropriate permissions to the role you are using:
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": "sts:AssumeRole",
+            "Resource": "arn:aws:iam::{Account}:user/{UserName}"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ec2:DescribeVolumes",
+                "cloudwatch:"DescribeAlarms",
+                "cloudwatch:GetMetricData"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+```
+Next, add a principal to the trust relationships of the role you are using:
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "arn:aws:iam::{Account}:user/{UserName}"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+```
 If you are using role-based authorization, set the appropriate permissions:
 ```json
 {
@@ -78,22 +114,38 @@ If you are using role-based authorization, set the appropriate permissions:
     ]
 }
 ```
+Next, add a principal to the trust relationships of the role you are using:
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": {
+                "Service": [
+                    "ec2.amazonaws.com"
+                ]
+            },
+            "Action": [
+                "sts:AssumeRole"
+            ]
+        }
+    ]
+}
+```
+**Note**, Using role-based authorization is only possible when you use a Zabbix server or proxy inside AWS.
 
 For more information, see the [EC2 policies](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/security-iam.html) on the AWS website.
 
-Set macros "{$AWS.AUTH_TYPE}", "{$AWS.REGION}", "{$AWS.EC2.INSTANCE.ID}".
+Set the macros: `{$AWS.AUTH_TYPE}`, `{$AWS.REGION}`, `{$AWS.EC2.INSTANCE.ID}`.
 
-If you are using access key-based authorization, set the following macros "{$AWS.ACCESS.KEY.ID}", "{$AWS.SECRET.ACCESS.KEY}"
+If you are using access key-based authorization, set the following macros: `{$AWS.ACCESS.KEY.ID}`, `{$AWS.SECRET.ACCESS.KEY}`.
+
+If you are using access assume role authorization, set the following macros: `{$AWS.ACCESS.KEY.ID}`, `{$AWS.SECRET.ACCESS.KEY}`, `{$AWS.STS.REGION}`, `{$AWS.ASSUME.ROLE.ARN}`.
 
 For more information about manage access keys, see [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys)
 
 Also, see the Macros section for a list of macros used for LLD filters.
-
-Additional information about metrics and used API methods:
-* Full metrics list related to EBS: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using_cloudwatch_ebs.html
-* Full metrics list related to EC2: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/viewing_metrics_with_cloudwatch.html
-* DescribeAlarms API method: https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_DescribeAlarms.html
-* DescribeVolumes API method: https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeVolumes.html
 
 
 ### Macros used
@@ -104,7 +156,9 @@ Additional information about metrics and used API methods:
 |{$AWS.ACCESS.KEY.ID}|<p>Access key ID.</p>||
 |{$AWS.SECRET.ACCESS.KEY}|<p>Secret access key.</p>||
 |{$AWS.REGION}|<p>Amazon EC2 Region code.</p>|`us-west-1`|
-|{$AWS.AUTH_TYPE}|<p>Authorization method. Possible values: role_base, access_key.</p>|`access_key`|
+|{$AWS.AUTH_TYPE}|<p>Authorization method. Possible values: `access_key`, `assume_role`, `role_base`.</p>|`access_key`|
+|{$AWS.STS.REGION}|<p>Region used in assume role request.</p>|`us-east-1`|
+|{$AWS.ASSUME.ROLE.ARN}|<p>ARN assume role; add when using the `assume_role` authorization method.</p>||
 |{$AWS.EC2.INSTANCE.ID}|<p>EC2 instance ID.</p>||
 |{$AWS.EC2.LLD.FILTER.VOLUME_TYPE.MATCHES}|<p>Filter of discoverable volumes by type.</p>|`.*`|
 |{$AWS.EC2.LLD.FILTER.VOLUME_TYPE.NOT_MATCHES}|<p>Filter to exclude discovered volumes by type.</p>|`CHANGE_IF_NEEDED`|
@@ -146,7 +200,7 @@ Additional information about metrics and used API methods:
 |EBS: Write, rate|<p>Completed write operations to all EBS volumes attached to the instance in a specified period of time.</p>|Dependent item|aws.ec2.ebs.write_ops.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.Label == "EBSWriteOps")].Values.first().first()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 |Metadata: No token|<p>The number of times the instance metadata service was successfully accessed using a method that does not use a token.</p><p>This metric is used to determine if there are any processes accessing instance metadata that are using Instance Metadata Service Version 1, which does not use a token.</p><p>If all requests use token-backed sessions, i.e., Instance Metadata Service Version 2, the value is 0.</p>|Dependent item|aws.ec2.metadata.no_token<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.Label == "MetadataNoToken")].Values.first().first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Network: Bytes in, rate|<p>The number of bytes received on all network interfaces by the instance.</p><p>This metric identifies the volume of incoming network traffic to a single instance.</p>|Dependent item|aws.ec2.network_in.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.Label == "NetworkIn")].Values.first().first()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
-|Network: Bytes out, rate|<p>The number of bytes sent out on all network interfaces by the instance. </p><p>This metric identifies the volume of outgoing network traffic from a single instance.</p>|Dependent item|aws.ec2.network_out.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.Label == "NetworkOut")].Values.first().first()`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Network: Bytes out, rate|<p>The number of bytes sent out on all network interfaces by the instance.</p><p>This metric identifies the volume of outgoing network traffic from a single instance.</p>|Dependent item|aws.ec2.network_out.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.Label == "NetworkOut")].Values.first().first()`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 |Network: Packets in, rate|<p>The number of packets received on all network interfaces by the instance.</p><p>This metric identifies the volume of incoming traffic in terms of the number of packets on a single instance.</p><p>This metric is available for basic monitoring only.</p>|Dependent item|aws.ec2.packets_in.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.Label == "NetworkPacketsIn")].Values.first().first()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 |Network: Packets out, rate|<p>The number of packets sent out on all network interfaces by the instance.</p><p>This metric identifies the volume of outgoing traffic in terms of the number of packets on a single instance.</p><p>This metric is available for basic monitoring only.</p>|Dependent item|aws.ec2.packets_out.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.Label == "NetworkPacketsOut")].Values.first().first()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 |Status: Check failed|<p>Reports whether the instance has passed both the instance status check and the system status check in the last minute.</p><p>This metric can be either 0 (passed) or 1 (failed).</p>|Dependent item|aws.ec2.status_check_failed<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.Label == "StatusCheckFailed")].Values.first().first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
@@ -157,9 +211,9 @@ Additional information about metrics and used API methods:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Failed to get metrics data||`length(last(/AWS EC2 by HTTP/aws.ec2.metrics.check))>0`|Warning||
-|Failed to get alarms data||`length(last(/AWS EC2 by HTTP/aws.ec2.alarms.check))>0`|Warning||
-|Failed to get volumes info||`length(last(/AWS EC2 by HTTP/aws.ec2.volumes.check))>0`|Warning||
+|Failed to get metrics data|<p>Failed to get CloudWatch metrics for EC2.</p>|`length(last(/AWS EC2 by HTTP/aws.ec2.metrics.check))>0`|Warning||
+|Failed to get alarms data|<p>Failed to get CloudWatch alarms for EC2.</p>|`length(last(/AWS EC2 by HTTP/aws.ec2.alarms.check))>0`|Warning||
+|Failed to get volumes info|<p>Failed to get CloudWatch volumes for EC2.</p>|`length(last(/AWS EC2 by HTTP/aws.ec2.volumes.check))>0`|Warning||
 |Instance CPU Credit balance is too low|<p>The number of earned CPU credits has been less than {$AWS.EC2.CPU.CREDIT.BALANCE.MIN.WARN} in the last 5 minutes.</p>|`max(/AWS EC2 by HTTP/aws.ec2.cpu.credit_balance,5m)<{$AWS.EC2.CPU.CREDIT.BALANCE.MIN.WARN}`|Warning||
 |Instance has spent too many CPU surplus credits|<p>The number of spent surplus credits that are not paid down and which thus incur an additional charge is over {$AWS.EC2.CPU.CREDIT.SURPLUS.BALANCE.MAX.WARN}.</p>|`last(/AWS EC2 by HTTP/aws.ec2.cpu.surplus_credit_charged)>{$AWS.EC2.CPU.CREDIT.SURPLUS.BALANCE.MAX.WARN}`|Warning||
 |High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/AWS EC2 by HTTP/aws.ec2.cpu_utilization,15m)>{$AWS.EC2.CPU.UTIL.WARN.MAX}`|Warning||
@@ -186,8 +240,8 @@ Additional information about metrics and used API methods:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|[{#ALARM_NAME}] has 'Alarm' state|<p>Alarm "{#ALARM_NAME}" has 'Alarm' state. <br>Reason: {ITEM.LASTVALUE2}</p>|`last(/AWS EC2 by HTTP/aws.ec2.alarm.state["{#ALARM_NAME}"])=2 and length(last(/AWS EC2 by HTTP/aws.ec2.alarm.state_reason["{#ALARM_NAME}"]))>0`|Average||
-|[{#ALARM_NAME}] has 'Insufficient data' state||`last(/AWS EC2 by HTTP/aws.ec2.alarm.state["{#ALARM_NAME}"])=1`|Info||
+|[{#ALARM_NAME}] has 'Alarm' state|<p>Alarm "{#ALARM_NAME}" has 'Alarm' state.<br>Reason: {ITEM.LASTVALUE2}</p>|`last(/AWS EC2 by HTTP/aws.ec2.alarm.state["{#ALARM_NAME}"])=2 and length(last(/AWS EC2 by HTTP/aws.ec2.alarm.state_reason["{#ALARM_NAME}"]))>0`|Average||
+|[{#ALARM_NAME}] has 'Insufficient data' state|<p>Either the alarm has just started, the metric is not available, or not enough data is available for the metric to determine the alarm state.</p>|`last(/AWS EC2 by HTTP/aws.ec2.alarm.state["{#ALARM_NAME}"])=1`|Info||
 
 ### LLD rule Instance Volumes discovery
 
@@ -210,13 +264,13 @@ Additional information about metrics and used API methods:
 |[{#VOLUME_ID}]: Write, bytes|<p>Provides information on the write operations in a specified period of time.</p><p>The average size of each write operation during the period, except on volumes attached to a Nitro-based instance, where the average represents the average over the specified period.</p><p>For Xen instances, data is reported only when there is write activity on the volume.</p>|Dependent item|aws.ec2.ebs.volume.write_bytes["{#VOLUME_ID}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.Label == "VolumeWriteBytes")].Values.first().first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |[{#VOLUME_ID}]: Write, ops|<p>The total number of write operations in a specified period of time. Note: write operations are counted on completion.</p>|Dependent item|aws.ec2.ebs.volume.write_ops["{#VOLUME_ID}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.Label == "VolumeWriteOps")].Values.first().first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |[{#VOLUME_ID}]: Read, ops|<p>The total number of read operations in a specified period of time. Note: read operations are counted on completion.</p>|Dependent item|aws.ec2.ebs.volume.read_ops["{#VOLUME_ID}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.Label == "VolumeReadOps")].Values.first().first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|[{#VOLUME_ID}]: Read time, total|<p>This metric is not supported with Multi-Attach enabled volumes.</p><p>The total number of seconds spent by all read operations that completed in a specified period of time.</p><p>If multiple requests are submitted at the same time, this total could be greater than the length of the period. </p><p>For example, for a period of 1 minutes (60 seconds): if 150 operations completed during that period, and each operation took 1 second, the value would be 150 seconds. </p><p>For Xen instances, data is reported only when there is read activity on the volume.</p>|Dependent item|aws.ec2.ebs.volume.total_read_time["{#VOLUME_ID}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|[{#VOLUME_ID}]: Write time, total|<p>This metric is not supported with Multi-Attach enabled volumes.</p><p>The total number of seconds spent by all write operations that completed in a specified period of time.</p><p>If multiple requests are submitted at the same time, this total could be greater than the length of the period.</p><p>For example, for a period of 1 minute (60 seconds): if 150 operations completed during that period, and each operation took 1 second, the value would be 150 seconds. </p><p>For Xen instances, data is reported only when there is write activity on the volume.</p>|Dependent item|aws.ec2.ebs.volume.total_write_time["{#VOLUME_ID}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|[{#VOLUME_ID}]: Read time, total|<p>This metric is not supported with Multi-Attach enabled volumes.</p><p>The total number of seconds spent by all read operations that completed in a specified period of time.</p><p>If multiple requests are submitted at the same time, this total could be greater than the length of the period.</p><p>For example, for a period of 1 minutes (60 seconds): if 150 operations completed during that period, and each operation took 1 second, the value would be 150 seconds.</p><p>For Xen instances, data is reported only when there is read activity on the volume.</p>|Dependent item|aws.ec2.ebs.volume.total_read_time["{#VOLUME_ID}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|[{#VOLUME_ID}]: Write time, total|<p>This metric is not supported with Multi-Attach enabled volumes.</p><p>The total number of seconds spent by all write operations that completed in a specified period of time.</p><p>If multiple requests are submitted at the same time, this total could be greater than the length of the period.</p><p>For example, for a period of 1 minute (60 seconds): if 150 operations completed during that period, and each operation took 1 second, the value would be 150 seconds.</p><p>For Xen instances, data is reported only when there is write activity on the volume.</p>|Dependent item|aws.ec2.ebs.volume.total_write_time["{#VOLUME_ID}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |[{#VOLUME_ID}]: Idle time|<p>This metric is not supported with Multi-Attach enabled volumes.</p><p>The total number of seconds in a specified period of time when no read or write operations were submitted.</p>|Dependent item|aws.ec2.ebs.volume.idle_time["{#VOLUME_ID}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.Label == "VolumeIdleTime")].Values.first().first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |[{#VOLUME_ID}]: Queue length|<p>The number of read and write operation requests waiting to be completed in a specified period of time.</p>|Dependent item|aws.ec2.ebs.volume.queue_length["{#VOLUME_ID}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.Label == "VolumeQueueLength")].Values.first().first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |[{#VOLUME_ID}]: Throughput, pct|<p>This metric is not supported with Multi-Attach enabled volumes.</p><p>Used with Provisioned IOPS SSD volumes only. The percentage of I/O operations per second (IOPS) delivered of the total IOPS provisioned for an Amazon EBS volume.</p><p>Provisioned IOPS SSD volumes deliver their provisioned performance 99.9 percent of the time.</p><p>During a write, if there are no other pending I/O requests in a minute, the metric value will be 100 percent.</p><p>Also, a volume's I/O performance may become degraded temporarily due to an action you have taken (for example, creating a snapshot of a volume during peak usage, running the volume on a non-EBS-optimized instance, or accessing data on the volume for the first time).</p>|Dependent item|aws.ec2.ebs.volume.throughput_percentage["{#VOLUME_ID}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|[{#VOLUME_ID}]: Consumed Read/Write, ops|<p>Used with Provisioned IOPS SSD volumes only.</p><p>The total amount of read and write operations (normalized to 256K capacity units) consumed in a specified period of time.</p><p>I/O operations that are smaller than 256K each count as 1 consumed IOPS. I/O operations that are larger than 256K are counted in 256K capacity units. </p><p>For example, a 1024K I/O would count as 4 consumed IOPS.</p>|Dependent item|aws.ec2.ebs.volume.consumed_read_write_ops["{#VOLUME_ID}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|[{#VOLUME_ID}]: Burst balance|<p>Used with General Purpose SSD (gp2), Throughput Optimized HDD (st1), and Cold HDD (sc1) volumes only.</p><p>Provides information about the percentage of I/O credits (for gp2) or throughput credits (for st1 and sc1) remaining in the burst bucket. </p><p>Data is reported to CloudWatch only when the volume is active. If the volume is not attached, no data is reported.</p>|Dependent item|aws.ec2.ebs.volume.burst_balance["{#VOLUME_ID}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.Label == "BurstBalance")].Values.first().first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|[{#VOLUME_ID}]: Consumed Read/Write, ops|<p>Used with Provisioned IOPS SSD volumes only.</p><p>The total amount of read and write operations (normalized to 256K capacity units) consumed in a specified period of time.</p><p>I/O operations that are smaller than 256K each count as 1 consumed IOPS. I/O operations that are larger than 256K are counted in 256K capacity units.</p><p>For example, a 1024K I/O would count as 4 consumed IOPS.</p>|Dependent item|aws.ec2.ebs.volume.consumed_read_write_ops["{#VOLUME_ID}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|[{#VOLUME_ID}]: Burst balance|<p>Used with General Purpose SSD (gp2), Throughput Optimized HDD (st1), and Cold HDD (sc1) volumes only.</p><p>Provides information about the percentage of I/O credits (for gp2) or throughput credits (for st1 and sc1) remaining in the burst bucket.</p><p>Data is reported to CloudWatch only when the volume is active. If the volume is not attached, no data is reported.</p>|Dependent item|aws.ec2.ebs.volume.burst_balance["{#VOLUME_ID}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.Label == "BurstBalance")].Values.first().first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 
 ### Trigger prototypes for Instance Volumes discovery
 
