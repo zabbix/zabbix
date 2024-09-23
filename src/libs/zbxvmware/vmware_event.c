@@ -821,7 +821,7 @@ static int	vmware_service_parse_event_data(zbx_vector_vmware_event_ptr_t *events
 
 		if (key <= last_key)
 		{
-			if (xml_event.created_time <= last_ts)
+			if (xml_event.created_time <= last_ts || 0 != events->values_num + ids.values_num)
 			{
 				zabbix_log(LOG_LEVEL_TRACE, "skipping event key '" ZBX_FS_UI64 "', has been processed",
 						key);
