@@ -12,14 +12,14 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#include "zbx_variant_common.h"
-
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
 #include "zbxmockassert.h"
 #include "zbxmockutil.h"
 
 #include "zbxvariant.h"
+
+#include "zbx_variant_common.h"
 
 void	zbx_mock_test_entry(void **state)
 {
