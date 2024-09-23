@@ -339,7 +339,6 @@ static char	*zbx_config_snmptrap_file	= NULL;
 static char	*config_java_gateway		= NULL;
 static int	config_java_gateway_port	= ZBX_DEFAULT_GATEWAY_PORT;
 static char	*config_ssh_key_location	= NULL;
-static int	config_log_slow_queries		= 0;	/* ms; 0 - disable */
 
 /* how often Zabbix server sends configuration data to passive proxy, in seconds */
 static int	config_proxyconfig_frequency	= 10;
@@ -1015,7 +1014,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 				ZBX_CONF_PARM_OPT,	0,			0},
 		{"SSHKeyLocation",		&config_ssh_key_location,		ZBX_CFG_TYPE_STRING,
 				ZBX_CONF_PARM_OPT,	0,			0},
-		{"LogSlowQueries",		&config_log_slow_queries,		ZBX_CFG_TYPE_INT,
+		{"LogSlowQueries",		&(zbx_db_config->log_slow_queries),	ZBX_CFG_TYPE_INT,
 				ZBX_CONF_PARM_OPT,	0,			3600000},
 		{"StartProxyPollers",		&config_forks[ZBX_PROCESS_TYPE_PROXYPOLLER],
 											ZBX_CFG_TYPE_INT,

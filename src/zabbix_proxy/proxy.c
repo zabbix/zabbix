@@ -297,8 +297,7 @@ static char	*config_hostname_item		= NULL;
 static char	*zbx_config_snmptrap_file	= NULL;
 static char	*config_java_gateway		= NULL;
 static int	config_java_gateway_port	= ZBX_DEFAULT_GATEWAY_PORT;
-static char	*config_ssh_key_location	 = NULL;
-static int	config_log_slow_queries		= 0;	/* ms; 0 - disable */
+static char	*config_ssh_key_location	= NULL;
 static char	*config_load_module_path	= NULL;
 static char	**config_load_module		= NULL;
 static char	*config_user			= NULL;
@@ -996,7 +995,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 				ZBX_CONF_PARM_OPT,	0,			0},
 		{"SSHKeyLocation",		&config_ssh_key_location,		ZBX_CFG_TYPE_STRING,
 				ZBX_CONF_PARM_OPT,	0,			0},
-		{"LogSlowQueries",		&config_log_slow_queries,		ZBX_CFG_TYPE_INT,
+		{"LogSlowQueries",		&(zbx_db_config->log_slow_queries),	ZBX_CFG_TYPE_INT,
 				ZBX_CONF_PARM_OPT,	0,			3600000},
 		{"LoadModulePath",		&config_load_module_path,		ZBX_CFG_TYPE_STRING,
 				ZBX_CONF_PARM_OPT,	0,			0},
