@@ -1040,8 +1040,11 @@ out:
 	zbx_free(event_session);
 	zbx_xml_doc_free(doc);
 
-	if (SUCCEED == ret && 10 == soap_count && 0 == events->values_num && 0 == *skip_old)
+	if (SUCCEED == ret && 10 == soap_count && 0 == events->values_num && 0 == *skip_old &&
+			0 == service->eventlog.severity)
+	{
 		zabbix_log(LOG_LEVEL_WARNING, "vmware events collector returned empty result");
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s events:%d skip_old:%hhu memory:" ZBX_FS_UI64, __func__,
 			zbx_result_string(ret), events->values_num, *skip_old,
