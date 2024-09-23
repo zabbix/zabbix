@@ -269,6 +269,7 @@ out:
  *                                                                            *
  * Parameters: service       - [IN] vmware service                            *
  *             easyhandle    - [IN] CURL handle                               *
+ *             evt_severity  - [IN] event severities                          *
  *             event_session - [OUT] pointer to output variable               *
  *             error         - [OUT] error message in case of failure         *
  *                                                                            *
@@ -277,7 +278,7 @@ out:
  *                                                                            *
  ******************************************************************************/
 static int	vmware_service_get_event_session(const zbx_vmware_service_t *service, CURL *easyhandle,
-		char **event_session, char **error)
+		const unsigned char evt_severity, char **event_session, char **error)
 {
 #	define ZBX_POST_VMWARE_CREATE_EVENT_COLLECTOR				\
 		ZBX_POST_VSPHERE_HEADER						\
@@ -300,7 +301,7 @@ static int	vmware_service_get_event_session(const zbx_vmware_service_t *service,
 
 	for (size_t i = 0; i < ARRSIZE(levels); i++)
 	{
-		if (0 != ((1 << i) & service->eventlog.severity))
+		if (0 != ((1 << i) & evt_severity))
 		{
 			zbx_snprintf_alloc(&filter, &alloc_len, &offset, ZBX_POST_VMWARE_EVENT_FILTER_SPEC_CATEGORY,
 					levels[i]);
@@ -735,22 +736,23 @@ static time_t	vmware_service_parse_event_ts(xmlDoc *doc, xmlNode *node, zbx_uint
  *                                                                            *
  * Purpose: parses multiple events data                                       *
  *                                                                            *
- * Parameters: events     - [IN/OUT] array of parsed events                   *
- *             last_key   - [IN] key of last parsed event                     *
- *             last_ts    - [IN] the timestamp of last parsed event           *
- *             is_prop    - [IN] read events from RetrieveProperties xml      *
- *             xdoc       - [IN] xml document with eventlog records           *
- *             eventlog   - [IN] VMware event log state                       *
- *             strpool_sz - [OUT] estimated shared memory size for events     *
- *             node_count - [OUT] count of xml event nodes                    *
- *             skip_old   - [OUT] detected event key reset                    *
+ * Parameters: events       - [IN/OUT] array of parsed events                 *
+ *             last_key     - [IN] key of last parsed event                   *
+ *             last_ts      - [IN] the timestamp of last parsed event         *
+ *             is_prop      - [IN] read events from RetrieveProperties xml    *
+ *             xdoc         - [IN] xml document with eventlog records         *
+ *             eventlog     - [IN] VMware event log state                     *
+ *             evt_severity - [IN] event severities                           *
+ *             strpool_sz   - [OUT] estimated shared memory size for events   *
+ *             node_count   - [OUT] count of xml event nodes                  *
+ *             skip_old     - [OUT] detected event key reset                  *
  *                                                                            *
  * Return value: count of events successfully parsed                          *
  *                                                                            *
  ******************************************************************************/
 static int	vmware_service_parse_event_data(zbx_vector_vmware_event_ptr_t *events, zbx_uint64_t last_key,
 		time_t last_ts, const int is_prop, xmlDoc *xdoc, const zbx_vmware_eventlog_state_t *eventlog,
-		zbx_uint64_t *strpool_sz, int *node_count, unsigned char *skip_old)
+		const unsigned char evt_severity, zbx_uint64_t *strpool_sz, int *node_count, unsigned char *skip_old)
 {
 #	define LAST_KEY(evs)	(evs->values[evs->values_num - 1]->key)
 
@@ -851,11 +853,11 @@ static int	vmware_service_parse_event_data(zbx_vector_vmware_event_ptr_t *events
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() events:%d is_clear:%d id gap:%d severity:%d", __func__,
 					events->values_num, is_clear,
 					(int)(LAST_KEY(events) - (ids.values[ids.values_num -1].id + 1)),
-					(int)eventlog->severity);
+					(int)evt_severity);
 
 			/* if sequence of events is not continuous, ignore events from "latestPage" property */
 			/* except when events are filtered by severity */
-			if (0 != is_clear && 0 == eventlog->severity)
+			if (0 != is_clear && 0 == evt_severity)
 			{
 				zbx_vector_vmware_event_ptr_clear_ext(events, vmware_event_free);
 				*strpool_sz = 0;
@@ -877,11 +879,11 @@ static int	vmware_service_parse_event_data(zbx_vector_vmware_event_ptr_t *events
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() events:%d is_clear:%d last_key id gap:%d severity:%d", __func__,
 				events->values_num, is_clear, (int)(LAST_KEY(events) - (last_key + 1)),
-				(int)eventlog->severity);
+				(int)evt_severity);
 
 		/* if sequence of events is not continuous, ignore events from "latestPage" property */
 		/* except when events are filtered by severity */
-		if (0 != is_clear && 0 == eventlog->severity)
+		if (0 != is_clear && 0 == evt_severity)
 		{
 			zbx_vector_vmware_event_ptr_clear_ext(events, vmware_event_free);
 			*strpool_sz = 0;
@@ -936,6 +938,7 @@ static	void vmware_service_clear_event_data_mem(const zbx_uint64_t max_mem, zbx_
  *             last_key      - [IN] ID of last processed event                *
  *             last_ts       - [IN] the create time of last processed event   *
  *             shmem_free_sz - [IN] free size of shared memory                *
+ *             evt_severity  - [IN] event severities                          *
  *             skip_old      - [IN/OUT] reset last_key of event               *
  *             events        - [OUT] pointer to output variable               *
  *             strpool_sz    - [OUT] allocated memory size for events         *
@@ -947,7 +950,8 @@ static	void vmware_service_clear_event_data_mem(const zbx_uint64_t max_mem, zbx_
  ******************************************************************************/
 static int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CURL *easyhandle,
 		const zbx_uint64_t last_key, const time_t last_ts, const zbx_uint64_t shmem_free_sz,
-		unsigned char *skip_old, zbx_vector_vmware_event_ptr_t *events, zbx_uint64_t *strpool_sz, char **error)
+		const unsigned char evt_severity, unsigned char *skip_old, zbx_vector_vmware_event_ptr_t *events,
+		zbx_uint64_t *strpool_sz, char **error)
 {
 #	define ATTEMPTS_NUM	4
 #	define EVENT_TAG	1
@@ -961,7 +965,7 @@ static int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CU
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() shmem_free_sz:" ZBX_FS_UI64, __func__, shmem_free_sz);
 
-	if (SUCCEED != vmware_service_get_event_session(service, easyhandle, &event_session, error))
+	if (SUCCEED != vmware_service_get_event_session(service, easyhandle, evt_severity, &event_session, error))
 		goto out;
 
 	if (SUCCEED != vmware_service_reset_event_history_collector(easyhandle, event_session, error))
@@ -971,7 +975,7 @@ static int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CU
 		goto end_session;
 
 	if (0 < vmware_service_parse_event_data(events, last_key, last_ts, EVENT_TAG, doc,
-			&service->eventlog, strpool_sz, NULL, skip_old) &&
+			&service->eventlog, evt_severity, strpool_sz, NULL, skip_old) &&
 			(0 != *skip_old || LAST_KEY(events) == last_key + 1))
 	{
 		zabbix_log(LOG_LEVEL_TRACE, "%s() latestPage events:%d", __func__, events->values_num);
@@ -1015,7 +1019,7 @@ static int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CU
 		}
 	}
 	while ((0 < (parsed_count = vmware_service_parse_event_data(events, last_key, last_ts, RETURNVAL_TAG, doc,
-			&service->eventlog, strpool_sz, &node_count, skip_old)) ||
+			&service->eventlog, evt_severity, strpool_sz, &node_count, skip_old)) ||
 			(0 == node_count && 0 < soap_retry--)) && 0 == *skip_old &&
 			(0 == events->values_num || LAST_KEY(events) != last_key + 1));
 
@@ -1040,11 +1044,8 @@ out:
 	zbx_free(event_session);
 	zbx_xml_doc_free(doc);
 
-	if (SUCCEED == ret && 10 == soap_count && 0 == events->values_num && 0 == *skip_old &&
-			0 == service->eventlog.severity)
-	{
+	if (SUCCEED == ret && 10 == soap_count && 0 == events->values_num && 0 == *skip_old && 0 == evt_severity)
 		zabbix_log(LOG_LEVEL_WARNING, "vmware events collector returned empty result");
-	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s events:%d skip_old:%hhu memory:" ZBX_FS_UI64, __func__,
 			zbx_result_string(ret), events->values_num, *skip_old,
@@ -1196,7 +1197,7 @@ int	zbx_vmware_service_eventlog_update(zbx_vmware_service_t *service, const char
 	zbx_vmware_eventlog_data_t	*evt_data;
 	int				ret = FAIL;
 	ZBX_HTTPPAGE			page;	/* 347K/87K */
-	unsigned char			evt_pause = 0, evt_skip_old;
+	unsigned char			evt_pause = 0, evt_skip_old, evt_severity;
 	zbx_uint64_t			evt_last_key, events_sz = 0, shmem_free_sz = 0;
 	time_t				evt_last_ts;
 	char				msg[MAX_STRING_LEN / 8];
@@ -1214,6 +1215,7 @@ int	zbx_vmware_service_eventlog_update(zbx_vmware_service_t *service, const char
 	evt_last_key = service->eventlog.last_key;
 	evt_skip_old = service->eventlog.skip_old;
 	evt_last_ts = service->eventlog.last_ts;
+	evt_severity = service->eventlog.severity;
 
 	if (NULL != service->eventlog.data && 0 != service->eventlog.data->events.values_num && 0 == evt_skip_old &&
 			service->eventlog.data->events.values[0]->key > evt_last_key)
@@ -1254,7 +1256,8 @@ int	zbx_vmware_service_eventlog_update(zbx_vmware_service_t *service, const char
 		/* we stopped last time or item can't accept values 	*/
 		if (ZBX_VMWARE_EVENT_KEY_UNINITIALIZED != evt_last_key && 0 == evt_skip_old && 0 != shmem_free_sz &&
 				SUCCEED != vmware_service_get_event_data(service, easyhandle, evt_last_key, evt_last_ts,
-				shmem_free_sz, &evt_skip_old, &evt_data->events, &events_sz, &evt_data->error))
+				shmem_free_sz, evt_severity, &evt_skip_old, &evt_data->events, &events_sz,
+				&evt_data->error))
 		{
 			goto clean;
 		}
