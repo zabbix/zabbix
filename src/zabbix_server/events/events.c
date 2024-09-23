@@ -223,6 +223,7 @@ zbx_db_event	*zbx_add_event(unsigned char source, unsigned char object, zbx_uint
 	event->flags = ZBX_FLAGS_DB_EVENT_CREATE;
 	event->severity = TRIGGER_SEVERITY_NOT_CLASSIFIED;
 	event->suppressed = ZBX_PROBLEM_SUPPRESSED_FALSE;
+	event->maintenanceids = NULL;
 
 	if (EVENT_SOURCE_TRIGGERS == source)
 	{
@@ -1728,6 +1729,12 @@ static void	zbx_clean_event(zbx_db_event *event)
 		zbx_vector_tags_ptr_destroy(&event->tags);
 	}
 
+	if (NULL != event->maintenanceids)
+	{
+		zbx_vector_uint64_destroy(event->maintenanceids);
+		zbx_free(event->maintenanceids);
+	}
+
 	zbx_free(event);
 }
 
@@ -2000,9 +2007,9 @@ void	zbx_events_update_itservices(void)
 		values_num = recovery->r_event->tags.values_num;
 		recovery->r_event->tags.values_num = 0;
 
-		zbx_service_serialize(&data, &data_alloc, &data_offset, recovery->eventid, recovery->r_event->clock,
+		zbx_service_serialize_event(&data, &data_alloc, &data_offset, recovery->eventid, recovery->r_event->clock,
 				recovery->r_event->ns, recovery->r_event->value, recovery->r_event->severity,
-				&recovery->r_event->tags, 0);
+				&recovery->r_event->tags, NULL);
 
 		recovery->r_event->tags.values_num = values_num;
 	}
@@ -2017,14 +2024,15 @@ void	zbx_events_update_itservices(void)
 		if (TRIGGER_VALUE_PROBLEM != event->value)
 			continue;
 
-		zbx_service_serialize(&data, &data_alloc, &data_offset, event->eventid, event->clock, event->ns,
-				event->value, event->severity, &event->tags, event->suppressed);
+		zbx_service_serialize_event(&data, &data_alloc, &data_offset, event->eventid, event->clock, event->ns,
+				event->value, event->severity, &event->tags, event->maintenanceids);
 	}
 
 	if (NULL == data)
 		return;
 
-	zbx_service_flush(ZBX_IPC_SERVICE_SERVICE_PROBLEMS, data, (zbx_uint32_t)data_offset);
+	if (0 != zbx_dc_get_itservices_num())
+		zbx_service_flush(ZBX_IPC_SERVICE_SERVICE_PROBLEMS, data, (zbx_uint32_t)data_offset);
 	zbx_free(data);
 }
 
@@ -2076,6 +2084,8 @@ static void	add_event_suppress_data(zbx_vector_ptr_t *event_refs, zbx_vector_uin
 
 			for (int j = 0; j < event_queries.values_num; j++)
 			{
+				zbx_db_event	*event = (zbx_db_event *)event_refs->values[j];
+
 				query = event_queries.values[j];
 
 				for (int i = 0; i < query->maintenances.values_num; i++)
@@ -2093,8 +2103,7 @@ static void	add_event_suppress_data(zbx_vector_ptr_t *event_refs, zbx_vector_uin
 							query->maintenances.values[i].first,
 							(int)query->maintenances.values[i].second);
 
-					((zbx_db_event *)event_refs->values[j])->suppressed =
-							ZBX_PROBLEM_SUPPRESSED_TRUE;
+					zbx_db_event_add_maintenanceid(event, query->maintenances.values[i].first);
 				}
 			}
 

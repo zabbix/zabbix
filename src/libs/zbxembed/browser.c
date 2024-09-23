@@ -24,10 +24,13 @@
 #include "browser_error.h"
 #include "browser_perf.h"
 #include "webdriver.h"
-
 #include "zbxalgo.h"
+#include "zbxcommon.h"
+#include "zbxjson.h"
 #include "zbxtime.h"
+#include "zbxtypes.h"
 #include "zbxvariant.h"
+#include "zbxstr.h"
 
 /******************************************************************************
  *                                                                            *
@@ -36,8 +39,9 @@
  ******************************************************************************/
 static zbx_webdriver_t *es_webdriver(duk_context *ctx)
 {
-	zbx_webdriver_t		*wd;
-	zbx_es_env_t		*env;
+	zbx_webdriver_t	*wd;
+	zbx_es_env_t	*env;
+	void		*objptr;
 
 	if (NULL == (env = zbx_es_get_env(ctx)))
 	{
@@ -46,7 +50,11 @@ static zbx_webdriver_t *es_webdriver(duk_context *ctx)
 		return NULL;
 	}
 
-	if (NULL == (wd = (zbx_webdriver_t *)es_obj_get_data(env, ES_OBJ_BROWSER)))
+	duk_push_this(ctx);
+	objptr = duk_require_heapptr(ctx, -1);
+	duk_pop(ctx);
+
+	if (NULL == (wd = (zbx_webdriver_t *)es_obj_get_data(env, objptr, ES_OBJ_BROWSER)))
 		(void)duk_push_error_object(ctx, DUK_RET_EVAL_ERROR, "cannot find native data attached to object");
 
 	return wd;
@@ -233,7 +241,7 @@ static duk_ret_t	es_browser_get_url(duk_context *ctx)
 		return duk_throw(ctx);
 	}
 
-	duk_push_string(ctx, url);
+	es_push_result_string(ctx, url, strlen(url));
 	zbx_free(url);
 
 	return 1;
@@ -454,7 +462,7 @@ static void	es_browser_push_error(duk_context *ctx, zbx_webdriver_t *wd)
 	duk_put_prop_string(ctx, -2, "http_status");
 	duk_push_string(ctx, error_code);
 	duk_put_prop_string(ctx, -2, "code");
-	duk_push_string(ctx, wd->last_error_message);
+	es_push_result_string(ctx, wd->last_error_message, strlen(wd->last_error_message));
 	duk_put_prop_string(ctx, -2, "message");
 }
 
@@ -671,7 +679,7 @@ static duk_ret_t	es_browser_get_cookies(duk_context *ctx)
 		goto out;
 	}
 	duk_push_heapptr(ctx, wd->env->json_parse);
-	duk_push_string(ctx, cookies);
+	es_push_result_string(ctx, cookies, strlen(cookies));
 	duk_pcall(ctx, 1);
 out:
 	zbx_free(cookies);
@@ -753,7 +761,7 @@ static duk_ret_t	es_browser_get_screenshot(duk_context *ctx)
 		return duk_throw(ctx);
 	}
 
-	duk_push_string(ctx, screenshot);
+	es_push_result_string(ctx, screenshot, strlen(screenshot));
 	zbx_free(screenshot);
 
 	return 1;
@@ -887,7 +895,7 @@ static duk_ret_t	es_browser_get_page_source(duk_context *ctx)
 		return duk_throw(ctx);
 	}
 
-	duk_push_string(ctx, source);
+	es_push_result_string(ctx, source, strlen(source));
 	zbx_free(source);
 
 	return 1;
@@ -919,6 +927,7 @@ static duk_ret_t	es_browser_get_alert(duk_context *ctx)
 
 	if (NULL != alert)
 	{
+		zbx_replace_invalid_utf8(alert);
 		wd_alert_create(ctx, wd, alert);
 		zbx_free(alert);
 	}
@@ -983,7 +992,7 @@ out:
 static duk_ret_t	es_browser_get_raw_perf_entries(duk_context *ctx)
 {
 	zbx_webdriver_t		*wd;
-	char			*error = NULL;
+	char			*error = NULL, *result = NULL;
 	struct zbx_json_parse	jp;
 
 	if (NULL == (wd = es_webdriver(ctx)))
@@ -998,7 +1007,12 @@ static duk_ret_t	es_browser_get_raw_perf_entries(duk_context *ctx)
 	}
 
 	duk_push_heapptr(ctx, wd->env->json_parse);
-	duk_push_lstring(ctx, jp.start, jp.end - jp.start + 1);
+
+	result = zbx_substr(wd->data, jp.start - wd->data, jp.end - wd->data);
+	zbx_replace_invalid_utf8(result);
+	es_push_result_string(ctx, result, strlen(result));
+	zbx_free(result);
+
 	duk_pcall(ctx, 1);
 
 	return 1;
@@ -1048,8 +1062,15 @@ static duk_ret_t	es_browser_get_raw_perf_entries_by_type(duk_context *ctx)
 	}
 	else
 	{
+		char	*result = NULL;
+
 		duk_push_heapptr(ctx, wd->env->json_parse);
-		duk_push_lstring(ctx, jp.start, jp.end - jp.start + 1);
+
+		result = zbx_substr(wd->data, jp.start - wd->data, jp.end - wd->data);
+		zbx_replace_invalid_utf8(result);
+		es_push_result_string(ctx, result, strlen(result));
+		zbx_free(result);
+
 		duk_pcall(ctx, 1);
 	}
 
@@ -1059,6 +1080,76 @@ static duk_ret_t	es_browser_get_raw_perf_entries_by_type(duk_context *ctx)
 		return duk_throw(ctx);
 
 	return 1;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get browser element id                                            *
+ *                                                                            *
+ * Parameters: ctx - [IN]                                                     *
+ *             idx - [IN] element object index on stack                       *
+ *                                                                            *
+ * Return value: Allocated element id string or NULL                          *
+ *                                                                            *
+ ******************************************************************************/
+static char	*es_browser_get_element_id(duk_context *ctx, duk_idx_t idx)
+{
+	zbx_es_env_t	*env;
+	void		*el;
+
+	if (duk_get_type(ctx, 0) != DUK_TYPE_OBJECT)
+		return NULL;
+
+	if (NULL == (env = zbx_es_get_env(ctx)))
+		return NULL;
+
+	if (NULL == (el = es_obj_get_data(env, duk_require_heapptr(ctx, idx), ES_OBJ_ELEMENT)))
+		return NULL;
+
+	return zbx_strdup(NULL, wd_element_get_id(el));
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: set custom error                                                  *
+ *                                                                            *
+ * Stack 0 - script                                                           *
+ *                                                                            *
+ ******************************************************************************/
+static duk_ret_t	es_browser_switch_frame(duk_context *ctx)
+{
+	zbx_webdriver_t	*wd;
+	char		*frame = NULL, *error = NULL;
+	int		err_index = -1;
+
+	if (NULL == (wd = es_webdriver(ctx)))
+		return duk_throw(ctx);
+
+	if (!duk_is_null(ctx, 0) && !duk_is_undefined(ctx, 0))
+	{
+		if (duk_get_type(ctx, 0) == DUK_TYPE_NUMBER)
+		{
+			frame = zbx_dsprintf(NULL, "%.0f", duk_get_number(ctx, 0));
+		}
+		else if (NULL == (frame = es_browser_get_element_id(ctx, 0)))
+		{
+			(void)browser_push_error(ctx, wd, "invalid parameter");
+			return duk_throw(ctx);
+		}
+	}
+
+	if (SUCCEED != webdriver_switch_frame(wd, frame, &error))
+	{
+		err_index = browser_push_error(ctx, wd, "cannot switch frame: %s", error);
+		zbx_free(error);
+	}
+
+	zbx_free(frame);
+
+	if (-1 != err_index)
+		return duk_throw(ctx);
+
+	return 0;
 }
 
 #ifdef BROWSER_EXECUTE_SCRIPT
@@ -1143,6 +1234,7 @@ static const duk_function_list_entry	browser_methods[] = {
 	{"getRawPerfEntriesByType", es_browser_get_raw_perf_entries_by_type, 1},
 	{"getPageSource", es_browser_get_page_source, 0},
 	{"getAlert", es_browser_get_alert, 0},
+	{"switchFrame", es_browser_switch_frame, 1},
 #ifdef BROWSER_EXECUTE_SCRIPT
 	{"executeScript", es_browser_execute_script, 1},
 #endif

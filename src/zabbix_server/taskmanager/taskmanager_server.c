@@ -42,6 +42,7 @@
 #include "zbxdbhigh.h"
 #include "zbxipcservice.h"
 #include "zbxstr.h"
+#include "zbxserialize.h"
 
 zbx_export_file_t		*problems_export = NULL;
 static zbx_export_file_t	*get_problems_export(void)
@@ -1011,18 +1012,20 @@ static void	tm_process_passive_proxy_cache_reload_request(zbx_ipc_async_socket_t
 #define ZBX_TM_TEMP_SUPPRESION_INDEFINITE_TIME		0
 static void	tm_service_manager_send_suppression_action(zbx_uint64_t eventid, zbx_uint64_t action)
 {
-	unsigned char	*data = NULL;
-	size_t          data_alloc = 0, data_offset = 0;
+	unsigned char	*data = NULL, *ptr;
+	zbx_uint64_t	maintenanceid = 0;
+	zbx_uint32_t	data_len = 2 * sizeof(zbx_uint64_t) + sizeof(int);
+	int		events_num = 1;
 
-	zbx_service_serialize_id(&data, &data_alloc, &data_offset, eventid);
-
-	if (NULL == data)
-		return;
+	ptr = data = (unsigned char *)zbx_malloc(NULL, (size_t)data_len);
+	ptr += zbx_serialize_value(ptr, events_num);
+	ptr += zbx_serialize_value(ptr, eventid);
+	(void)zbx_serialize_value(ptr, maintenanceid);
 
 	if (action == ZBX_TM_TEMP_SUPPRESION_ACTION_UNSUPPRESS)
-		zbx_service_flush(ZBX_IPC_SERVICE_SERVICE_EVENTS_UNSUPPRESS, data, (zbx_uint32_t)data_offset);
+		zbx_service_flush(ZBX_IPC_SERVICE_SERVICE_EVENTS_UNSUPPRESS, data, data_len);
 	else if (action == ZBX_TM_TEMP_SUPPRESION_ACTION_SUPPRESS)
-		zbx_service_flush(ZBX_IPC_SERVICE_SERVICE_EVENTS_SUPPRESS, data, (zbx_uint32_t)data_offset);
+		zbx_service_flush(ZBX_IPC_SERVICE_SERVICE_EVENTS_SUPPRESS, data, data_len);
 	else
 		THIS_SHOULD_NEVER_HAPPEN;
 

@@ -34,6 +34,7 @@ static zbx_wd_element_t *wd_element(duk_context *ctx)
 {
 	zbx_wd_element_t	*el;
 	zbx_es_env_t		*env;
+	void			*objptr;
 
 	if (NULL == (env = zbx_es_get_env(ctx)))
 	{
@@ -42,7 +43,11 @@ static zbx_wd_element_t *wd_element(duk_context *ctx)
 		return NULL;
 	}
 
-	if (NULL == (el = (zbx_wd_element_t *)es_obj_get_data(env, ES_OBJ_ELEMENT)))
+	duk_push_this(ctx);
+	objptr = duk_require_heapptr(ctx, -1);
+	duk_pop(ctx);
+
+	if (NULL == (el = (zbx_wd_element_t *)es_obj_get_data(env, objptr, ES_OBJ_ELEMENT)))
 		(void)duk_push_error_object(ctx, DUK_RET_EVAL_ERROR, "cannot find native data attached to object");
 
 	return el;
@@ -97,6 +102,11 @@ static duk_ret_t	wd_element_ctor(duk_context *ctx, zbx_webdriver_t *wd, const ch
 
 	duk_push_object(ctx);
 	es_obj_attach_data(env, duk_require_heapptr(ctx, -1), el, ES_OBJ_ELEMENT);
+
+	duk_push_string(ctx, "browser");
+	duk_push_heapptr(ctx, wd->browser);
+	duk_def_prop(ctx, -3, DUK_DEFPROP_HAVE_VALUE | DUK_DEFPROP_CLEAR_WRITABLE | DUK_DEFPROP_HAVE_ENUMERABLE |
+			DUK_DEFPROP_HAVE_CONFIGURABLE);
 
 	duk_push_c_function(ctx, wd_element_dtor, 1);
 	duk_set_finalizer(ctx, -2);
@@ -246,7 +256,7 @@ static duk_ret_t	wd_element_get_attribute(duk_context *ctx)
 		goto out;
 	}
 
-	duk_push_string(ctx, value);
+	es_push_result_string(ctx, value, strlen(value));
 out:
 	zbx_free(value);
 	zbx_free(name);
@@ -299,7 +309,7 @@ static duk_ret_t	wd_element_get_property(duk_context *ctx)
 		goto out;
 	}
 
-	duk_push_string(ctx, value);
+	es_push_result_string(ctx, value, strlen(value));
 out:
 	zbx_free(value);
 	zbx_free(name);
@@ -332,7 +342,7 @@ static duk_ret_t	wd_element_get_text(duk_context *ctx)
 		goto out;
 	}
 
-	duk_push_string(ctx, value);
+	es_push_result_string(ctx, value, strlen(value));
 out:
 	zbx_free(value);
 
@@ -389,6 +399,16 @@ void	wd_element_create_array(duk_context *ctx, zbx_webdriver_t *wd, const zbx_ve
 		wd_element_create(ctx, wd, elements->values[i]);
 		duk_put_prop_index(ctx, arr, (duk_uarridx_t)i);
 	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get element id                                                    *
+ *                                                                            *
+ ******************************************************************************/
+const char	*wd_element_get_id(void *wd)
+{
+	return ((zbx_wd_element_t *)wd)->id;
 }
 
 #endif

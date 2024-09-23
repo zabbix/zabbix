@@ -450,8 +450,8 @@ static int	httpstep_load_pairs(zbx_dc_host_t *host, zbx_httpstep_t *httpstep)
 		/* keys and values of query fields / post fields should be encoded */
 		if (ZBX_HTTPFIELD_QUERY_FIELD == type || ZBX_HTTPFIELD_POST_FIELD == type)
 		{
-			zbx_http_url_encode(key, &key);
-			zbx_http_url_encode(value, &value);
+			zbx_url_encode(key, &key);
+			zbx_url_encode(value, &value);
 		}
 
 		switch (type)

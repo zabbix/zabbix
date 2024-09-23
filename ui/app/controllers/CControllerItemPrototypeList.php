@@ -132,7 +132,8 @@ class CControllerItemPrototypeList extends CControllerItemPrototype {
 		$interval_parser = new CUpdateIntervalParser(['usermacros' => true, 'lldmacros' => true]);
 
 		foreach ($items as &$item) {
-			if (in_array($item['value_type'], [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT])) {
+			if (in_array($item['value_type'], [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT,
+					ITEM_VALUE_TYPE_BINARY])) {
 				$item['trends'] = '';
 			}
 
