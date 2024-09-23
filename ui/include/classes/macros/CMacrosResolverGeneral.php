@@ -1131,7 +1131,9 @@ class CMacrosResolverGeneral {
 							}
 							elseif ($context !== null && count($global_macros[$macro]['regex'])) {
 								foreach ($global_macros[$macro]['regex'] as $regex => $val) {
-									if (preg_match('/'.preg_replace('/\\\?\//', '\/', $regex).'/', $context) === 1) {
+									$formatted_regex = $this->handleSlashEscaping($regex);
+
+									if (preg_match('/'.$formatted_regex.'/', $context) === 1) {
 										$value['value'] = $val;
 										break;
 									}
@@ -1208,7 +1210,9 @@ class CMacrosResolverGeneral {
 				// Searching context coincidence, if regex array not empty.
 				elseif ($context !== null && count($host_macros[$hostid][$macro]['regex'])) {
 					foreach ($host_macros[$hostid][$macro]['regex'] as $regex => $val) {
-						if (preg_match('/'.preg_replace('/\\\?\//', '\/', $regex).'/', $context) === 1) {
+						$formatted_regex = $this->handleSlashEscaping($regex);
+
+						if (preg_match('/'.$formatted_regex.'/', $context) === 1) {
 							return [
 								'value' => $val,
 								'value_default' => $value_default
@@ -1252,6 +1256,35 @@ class CMacrosResolverGeneral {
 		}
 
 		return ['value' => null, 'value_default' => $value_default];
+	}
+
+	/**
+	 * Escape slashes in the regular expression based on preceding backslashes.
+	 *
+	 * @param string $regex
+	 *
+	 * @return string
+	 */
+	private function handleSlashEscaping(string $regex): string {
+		$formatted_regex = '';
+		$length = strlen($regex);
+
+		for ($i = 0; $i < $length; $i++) {
+			$backslash_count = 0;
+
+			if ($regex[$i] === '/') {
+				for ($j = $i - 1; $j >= 0 && $regex[$j] === '\\'; $j--) {
+					$backslash_count++;
+				}
+
+				$formatted_regex .= ($backslash_count % 2 === 0) ? '\\/' : '/';
+			}
+			else {
+				$formatted_regex .= $regex[$i];
+			}
+		}
+
+		return $formatted_regex;
 	}
 
 	/**
