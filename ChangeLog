@@ -44,6 +44,7 @@ A.F.I..PS. [ZBXNEXT-9176] removed support of Oracle DB (agriscenko, sboidenko)
 .......PS. [ZBXNEXT-8990] extended VMware event log with username (asestakovs)
 
 Bug fixes:
+........S. [ZBX-24914] fixed conditional jumps error in cacheconfig when non-numeric item types are used with trends (arimdjonoks)
 .......PS. [ZBX-25176] added retry to asynchronous SNMP pollers to avoid failure if one of packets is lost (vso)
 ........S. [ZBX-25238] fixed crash when deleting proxy group and proxy at same moment (vso)
 ..F....... [ZBX-25239] fixed translation strings (averza)

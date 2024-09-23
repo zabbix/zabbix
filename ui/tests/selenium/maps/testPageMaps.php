@@ -22,7 +22,6 @@ require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
  * @backup sysmaps
  *
  * @onBefore prepareMapsData
- *
  */
 class testPageMaps extends CWebTest {
 
@@ -290,16 +289,19 @@ class testPageMaps extends CWebTest {
 						self::SYSMAP_NAME_HIGH_NUMBER,
 						self::SYSMAP_FIRST_A,
 						'Local network',
+						'Map for form testing',
+						'Map for widget copies',
 						self::SYSMAP_SPACES_NAME,
 						self::SYSMAP_HIGH_HEIGHT,
 						self::SYSMAP_HIGH_WIDTH,
 						'Map with icon mapping',
+						'Map with links',
 						self::SYSMAP_LOW_HEIGHT,
 						self::SYSMAP_LOW_WIDTH,
 						self::SYSMAP_NAME_WITH_SYMBOLS,
 						'Public map with image',
 						self::SYSMAP_TO_DELETE,
-						'Test map 1',
+						'Test map for Properties',
 						'testZBX6840',
 						self::SYSMAP_FIRST_Z
 					]
@@ -389,6 +391,7 @@ class testPageMaps extends CWebTest {
 						self::SYSMAP_HIGH_HEIGHT,
 						self::SYSMAP_HIGH_WIDTH,
 						'Map with icon mapping',
+						'Map with links',
 						self::SYSMAP_LOW_HEIGHT,
 						self::SYSMAP_LOW_WIDTH,
 						'Public map with image'

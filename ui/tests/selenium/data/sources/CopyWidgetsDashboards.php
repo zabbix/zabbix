@@ -38,9 +38,32 @@ class CopyWidgetsDashboards {
 						'value_type' => ITEM_VALUE_TYPE_UINT64
 					]
 				]
+			],
+			[
+				'host' => 'Host with map for copy widgets',
+				'groups' => ['groupid' => CDataHelper::call('hostgroup.create',
+						[['name' => 'Group with maps for copy']])['groupids'][0]
+				]
 			]
 		]);
 		$itemid = $hosts['itemids']['Host with widgets items:key[1]'];
+		$hostid = $hosts['hostids']['Host with map for copy widgets'];
+
+		$maps = CDataHelper::call('map.create', [
+			[
+				'name' => 'Map for widget copies',
+				'width' => 500,
+				'height' => 500,
+				'selements' => [
+					[
+						'elements' => [['hostid' => $hostid]],
+						'elementtype' => SYSMAP_ELEMENT_TYPE_HOST,
+						'iconid_off' => 186
+					]
+				]
+			]
+		]);
+		$mapid = $maps['sysmapids'][0];
 
 		$templates = CDataHelper::createTemplates([
 			[
@@ -386,7 +409,7 @@ class CopyWidgetsDashboards {
 									[
 										'type' => 8,
 										'name' => 'sysmapid',
-										'value' => 3
+										'value' => $mapid
 									]
 								]
 							],
