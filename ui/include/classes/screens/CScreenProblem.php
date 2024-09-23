@@ -1833,10 +1833,14 @@ class CScreenProblem extends CScreenBase {
 		}
 
 		if ($html) {
+			$hint_container = (new CDiv())
+				->addClass('hintbox-wrap-vertical')
+				->addItem($hint_table);
+
 			array_pop($latest_values);
 			array_unshift($latest_values, (new CDiv())
 				->addClass('main-hint')
-				->setHint($hint_table)
+				->setHint($hint_container)
 			);
 
 			return $latest_values;

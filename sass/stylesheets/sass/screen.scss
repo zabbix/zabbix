@@ -1927,8 +1927,15 @@ select {
 		@extend %webkit-scrollbar;
 	}
 
-	.hintbox-wrap {
+	.hintbox-wrap,
+	.hintbox-wrap-vertical {
 		max-height: 240px;
+	}
+
+	.hintbox-wrap-vertical {
+		overflow: hidden;
+		overflow-y: auto;
+		@extend %webkit-scrollbar;
 	}
 
 	.msg-bad,
