@@ -24,8 +24,8 @@ void	zbx_mock_test_entry(void **state)
 
 	const char	*s1 = zbx_mock_get_parameter_string("in.string1");
 	const char	*s2 = zbx_mock_get_parameter_string("in.string2");
-	char		*returned_result;
-	int			exp_result = zbx_mock_get_parameter_string("out.val");
+	const char	*returned_result;
+	const char	*exp_result = zbx_mock_get_parameter_string("out.val");
 	int			act_value = zbx_strcmp_natural(s1, s2);
 
 	if (act_value < 0)

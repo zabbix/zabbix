@@ -20,14 +20,16 @@
 
 void	zbx_mock_test_entry(void **state)
 {
-	ZBX_UNUSED(state);
 	const char	*src = zbx_mock_get_parameter_string("in.src");
 	size_t		size = zbx_mock_get_parameter_uint64("in.size");
-    char		dst[size];
-    size_t		size2 = size - 1;
+	char		dst[size];
+	size_t		size2 = size - 1;
 	const char	*exp_result = zbx_mock_get_parameter_string("out.result");
-    memset(dst, 0, sizeof(dst));
+
+	ZBX_UNUSED(state);
+
+	memset(dst, 0, sizeof(dst));
 	zbx_strlcat(dst, src, size2);
-    zbx_replace_invalid_utf8(dst);
+	zbx_replace_invalid_utf8(dst);
 	zbx_mock_assert_str_eq("return value",  exp_result, dst);
 }
