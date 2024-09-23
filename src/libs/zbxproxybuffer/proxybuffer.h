@@ -169,4 +169,7 @@ zbx_uint64_t	pb_register_handle(zbx_pb_t *pb, zbx_vector_uint64_t *handleids);
 void	pb_deregister_handle(zbx_vector_uint64_t *handleids, zbx_uint64_t handleid);
 void	pb_wait_handles(const zbx_vector_uint64_t *handleids);
 
+void	pb_add_json_field(struct zbx_json *j, zbx_history_table_t *history_table, const char *fld_name, void *value,
+		int type);
+
 #endif

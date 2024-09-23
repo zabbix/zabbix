@@ -95,8 +95,8 @@ golang.org/x/tools v0.11.0/go.mod h1:anzJrxPjNtfgiYQYirP2CPGzGLxrH2u2QBhn6Bf3qY8
 golang.org/x/xerrors v0.0.0-20191011141410-1b5146add898/go.mod h1:I/5z698sn9Ka8TeJc9MKroUUfqBBauWjQqLJ2OPfmY0=
 golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 h1:H2TDz8ibqkAF6YGhCdN3jS9O0/s90v0rJh3X/OLHEUk=
 golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2/go.mod h1:K8+ghG5WaK9qNqU5K3HdILfMLy1f3aNYFI/wnl100a8=
-golang.zabbix.com/sdk v1.2.2-0.20240902075650-5af4d234e682 h1:B0bUQfgawpz/vKEQayLybiABRkEjamCGOq9XmZtWlWY=
-golang.zabbix.com/sdk v1.2.2-0.20240902075650-5af4d234e682/go.mod h1:KFfJAnUsBIfLemmPVz7TJPliJAwYUSuj4v3n5W1qrCQ=
+golang.zabbix.com/sdk v1.2.2-0.20240905081610-a301935214d5 h1:EADJ8qLAbMDfBV985ZcMuUp3m/ohXsWATk1bFGZKhuw=
+golang.zabbix.com/sdk v1.2.2-0.20240905081610-a301935214d5/go.mod h1:KFfJAnUsBIfLemmPVz7TJPliJAwYUSuj4v3n5W1qrCQ=
 google.golang.org/protobuf v1.34.1 h1:9ddQBjfCyZPOHPUiPxpYESBLc+T8P3E+Vo4IbKZgFWg=
 google.golang.org/protobuf v1.34.1/go.mod h1:c6P6GXX6sHbq/GpV6MGZEdwhWPcYBgnhAHhKbcUYpos=
 gopkg.in/asn1-ber.v1 v1.0.0-20181015200546-f715ec2f112d h1:TxyelI5cVkbREznMhfzycHdkp5cLA7DpE+GKjSslYhM=
