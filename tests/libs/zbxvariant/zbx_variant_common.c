@@ -12,8 +12,6 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#include "zbx_variant_common.h"
-
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
 #include "zbxmockassert.h"
@@ -21,7 +19,8 @@
 
 #include "zbxnum.h"
 #include "zbxvariant.h"
-#include "zbxmockdata.h"
+
+#include "zbx_variant_common.h"
 
 static unsigned int	hex2num(char c)
 {
