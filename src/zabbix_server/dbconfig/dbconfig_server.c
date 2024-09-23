@@ -16,6 +16,7 @@
 
 #include "../dbconfigworker/dbconfigworker.h"
 
+#include "zbxcommon.h"
 #include "zbxnix.h"
 #include "zbxself.h"
 #include "zbxlog.h"
@@ -58,7 +59,7 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 
 	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
-
+	
 	sec = zbx_time();
 	zbx_setproctitle("%s [syncing configuration]", get_process_type_string(process_type));
 	zbx_dc_sync_configuration(ZBX_DBSYNC_INIT, ZBX_SYNCED_NEW_CONFIG_NO, NULL, dbconfig_args_in->config_vault,

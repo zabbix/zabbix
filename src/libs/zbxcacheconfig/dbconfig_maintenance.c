@@ -70,6 +70,8 @@ void	DCsync_maintenances(zbx_dbsync_t *sync)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
+	zbx_dcsync_sync_start(sync, dbconfig_used_size());
+
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
 	{
 		config->maintenance_update |= ZBX_FLAG_MAINTENANCE_UPDATE_MAINTENANCE;
@@ -120,6 +122,8 @@ void	DCsync_maintenances(zbx_dbsync_t *sync)
 		zbx_hashset_remove_direct(&config->maintenances, maintenance);
 	}
 
+	zbx_dcsync_sync_end(sync, dbconfig_used_size());
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
@@ -163,6 +167,8 @@ void	DCsync_maintenance_tags(zbx_dbsync_t *sync)
 	zbx_dc_config_t			*config = get_dc_config();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_dcsync_sync_start(sync, dbconfig_used_size());
 
 	zbx_vector_ptr_create(&maintenances);
 
@@ -237,6 +243,8 @@ void	DCsync_maintenance_tags(zbx_dbsync_t *sync)
 
 	zbx_vector_ptr_destroy(&maintenances);
 
+	zbx_dcsync_sync_end(sync, dbconfig_used_size());
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
@@ -271,6 +279,8 @@ void	DCsync_maintenance_periods(zbx_dbsync_t *sync)
 	zbx_dc_config_t			*config = get_dc_config();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_dcsync_sync_start(sync, dbconfig_used_size());
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
 	{
@@ -328,6 +338,8 @@ void	DCsync_maintenance_periods(zbx_dbsync_t *sync)
 		zbx_hashset_remove_direct(&config->maintenance_periods, period);
 	}
 
+	zbx_dcsync_sync_end(sync, dbconfig_used_size());
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
@@ -353,6 +365,8 @@ void	DCsync_maintenance_groups(zbx_dbsync_t *sync)
 	zbx_dc_config_t		*config = get_dc_config();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_dcsync_sync_start(sync, dbconfig_used_size());
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
 	{
@@ -400,6 +414,8 @@ void	DCsync_maintenance_groups(zbx_dbsync_t *sync)
 		zbx_vector_uint64_remove_noorder(&maintenance->groupids, index);
 	}
 
+	zbx_dcsync_sync_end(sync, dbconfig_used_size());
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
@@ -426,6 +442,8 @@ void	DCsync_maintenance_hosts(zbx_dbsync_t *sync)
 	zbx_dc_config_t		*config = get_dc_config();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_dcsync_sync_start(sync, dbconfig_used_size());
 
 	zbx_vector_ptr_create(&maintenances);
 
@@ -487,6 +505,8 @@ void	DCsync_maintenance_hosts(zbx_dbsync_t *sync)
 	}
 
 	zbx_vector_ptr_destroy(&maintenances);
+
+	zbx_dcsync_sync_end(sync, dbconfig_used_size());
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
