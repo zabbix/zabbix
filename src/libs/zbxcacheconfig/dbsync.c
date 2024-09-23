@@ -4454,6 +4454,7 @@ void	zbx_dcsync_stats_dump(void)
 		dcsync_log_stats(sync);
 		sql_time_total += sync->sql_time;
 		sync_time_total += sync->sync_time;
+		total_used += sync->sync_size;
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() statistics for tables without changelog", __func__);
