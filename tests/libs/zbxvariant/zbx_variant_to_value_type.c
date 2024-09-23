@@ -24,9 +24,9 @@
 void	zbx_mock_test_entry(void **state)
 {
 	zbx_variant_t	value;
-	int		ret;
+	int				ret;
 	unsigned char	value_type;
-	char	*error = NULL;
+	char			*error = NULL;
 
 	ZBX_UNUSED(state);
 
