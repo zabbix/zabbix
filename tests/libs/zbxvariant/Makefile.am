@@ -23,6 +23,7 @@ VARIANT_COMPILER_FLAGS = \
 
 zbx_variant_compare_SOURCES = \
 	zbx_variant_compare.c \
+	zbx_variant_common.c \
 	$(COMMON_SRC_FILES)
 
 zbx_variant_compare_LDADD = \
@@ -38,6 +39,7 @@ zbx_variant_compare_CFLAGS = $(VARIANT_COMPILER_FLAGS)
 
 zbx_variant_to_value_type_SOURCES = \
 	zbx_variant_to_value_type.c \
+	zbx_variant_common.c \
 	$(COMMON_SRC_FILES)
 
 zbx_variant_to_value_type_LDADD = \
