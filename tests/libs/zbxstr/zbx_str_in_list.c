@@ -21,13 +21,13 @@
 
 void	zbx_mock_test_entry(void **state)
 {
-	ZBX_UNUSED(state);
-
 	const char	*list = zbx_mock_get_parameter_string("in.list");
 	const char	*value = zbx_mock_get_parameter_string("in.value");
 	char		delimiter = *zbx_mock_get_parameter_string("in.delimiter");
 	int		exp_result = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
 	int		act_result = zbx_str_in_list(list, value, delimiter);
+
+	ZBX_UNUSED(state);
 
 	zbx_mock_assert_int_eq("return value", exp_result, act_result);
 }

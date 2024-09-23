@@ -21,12 +21,12 @@
 
 void	zbx_mock_test_entry(void **state)
 {
-	ZBX_UNUSED(state);
-
 	size_t		in_buffer_length = zbx_mock_get_parameter_uint64("in.buffer_length");
 	char		*in_buffer = zbx_yaml_assemble_binary_sequence("in.buffer", &in_buffer_length);
 	size_t		exp_result = zbx_mock_get_parameter_uint64("out.return");
 	size_t		act_result = zbx_utf8_char_len(in_buffer);
+
+	ZBX_UNUSED(state);
 
 	zbx_mock_assert_uint64_eq("return value",  exp_result, act_result);
 }

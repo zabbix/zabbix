@@ -20,11 +20,11 @@
 
 void	zbx_mock_test_entry(void **state)
 {
-	ZBX_UNUSED(state);
-
 	char		*list = zbx_strdup(NULL ,zbx_mock_get_parameter_string("in.string"));
 	char		delimiter = *zbx_mock_get_parameter_string("in.del");
 	const char	*exp_result = zbx_mock_get_parameter_string("out.string");
+
+	ZBX_UNUSED(state);
 
 	zbx_trim_str_list(list, delimiter);
 

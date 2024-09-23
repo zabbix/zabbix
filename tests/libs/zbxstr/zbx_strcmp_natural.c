@@ -20,13 +20,13 @@
 
 void	zbx_mock_test_entry(void **state)
 {
-	ZBX_UNUSED(state);
-
 	const char	*s1 = zbx_mock_get_parameter_string("in.string1");
 	const char	*s2 = zbx_mock_get_parameter_string("in.string2");
 	const char	*returned_result;
 	const char	*exp_result = zbx_mock_get_parameter_string("out.val");
 	int			act_value = zbx_strcmp_natural(s1, s2);
+
+	ZBX_UNUSED(state);
 
 	if (act_value < 0)
 		returned_result = "less";
