@@ -1113,7 +1113,7 @@ int	zbx_regexp_repl(const char *string, const char *pattern, const char *output_
 		else
 		{
 			replace = regexp_sub_replace(string, output_template, groups, ZBX_REGEXP_GROUPS_MAX,
-					MAX_EXECUTE_OUTPUT_LEN);
+					MAX_EXECUTE_OUTPUT_LEN, ZBX_REGEXP_GROUP_CHECK_DISABLE);
 		}
 
 		if (NULL != replace)
@@ -1191,7 +1191,7 @@ out:
  *********************************************************************************/
 int	zbx_regexp_sub(const char *string, const char *pattern, const char *output_template, char **out)
 {
-	return regexp_sub(string, pattern, output_template, ZBX_REGEXP_MULTILINE, 0, out);
+	return regexp_sub(string, pattern, output_template, ZBX_REGEXP_MULTILINE, ZBX_REGEXP_GROUP_CHECK_DISABLE, out);
 }
 
 /*********************************************************************************
@@ -1214,7 +1214,7 @@ int	zbx_mregexp_sub(const char *string, const char *pattern, const char *output_
  *********************************************************************************/
 int	zbx_iregexp_sub(const char *string, const char *pattern, const char *output_template, char **out)
 {
-	return regexp_sub(string, pattern, output_template, ZBX_REGEXP_CASELESS, 0, out);
+	return regexp_sub(string, pattern, output_template, ZBX_REGEXP_CASELESS, ZBX_REGEXP_GROUP_CHECK_DISABLE, out);
 }
 
 /******************************************************************************
@@ -1307,7 +1307,8 @@ static int	regexp_match_ex_regsub(const char *string, const char *pattern, int c
 	}
 	else
 	{
-		if (SUCCEED == regexp_sub(string, pattern, output_template, regexp_flags, 0, output))
+		if (SUCCEED == regexp_sub(string, pattern, output_template, regexp_flags,
+				ZBX_REGEXP_GROUP_CHECK_DISABLE, output))
 		{
 			ret = (NULL != *output ? ZBX_REGEXP_MATCH : ZBX_REGEXP_NO_MATCH);
 		}
