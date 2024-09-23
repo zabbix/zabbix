@@ -21,8 +21,8 @@
 void	zbx_mock_test_entry(void **state)
 {
 	const char	*src, *charlist;
-	int	act_result, exp_result, len;
-	char	*dst;
+	int			act_result, exp_result, len;
+	char		*dst;
 
 	ZBX_UNUSED(state);
 
