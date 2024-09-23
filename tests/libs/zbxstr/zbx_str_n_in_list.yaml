@@ -1,5 +1,5 @@
 ---
-test case: "a,b,ccc,ddd - succeed"
+test case: "1. a,b,ccc,ddd - succeed"
 in:
   list: "a,b,ccc,ddd"
   value: "ccc"
@@ -8,7 +8,7 @@ in:
 out:
   return: SUCCEED
 ---
-test case: "a,b,ccc,ddd - fail"
+test case: "2. a,b,ccc,ddd - fail"
 in:
   list: "a,b,cc,ddd"
   value: "ccc"
@@ -17,7 +17,7 @@ in:
 out:
   return: FAIL
 ---
-test case: "aa.aaa.aaaa.aaaaa - succeed"
+test case: "3. aa.aaa.aaaa.aaaaa - succeed"
 in:
   list: "aa.aaa.aaaa.aaaaa"
   value: "aaaa"
@@ -26,7 +26,7 @@ in:
 out:
   return: SUCCEED
 ---
-test case: "a,b,ccc,ddd - wrong length"
+test case: "4. a,b,ccc,ddd - wrong length"
 in:
   list: "a,b,ccc,ddd"
   value: "ccc"
@@ -35,7 +35,7 @@ in:
 out:
   return: FAIL
 ---
-test case: "%%%!%%%%%!%%%%%!%%% - succeed"
+test case: "5. %%%!%%%%%!%%%%%!%%% - succeed"
 in:
   list: "%%%!%%%%%!%%%%%!%%%"
   value: "%%%%%"
@@ -44,10 +44,37 @@ in:
 out:
   return: SUCCEED
 ---
-test case: "aa.bbb.bbbb.bbbbb - wrong lenght"
+test case: "6. aa.bbb.bbbb.bbbbb - wrong lenght"
 in:
   list: "aa.bbb.bbbb.bbbbb"
   value: "aaaa"
+  len: 2
+  delimiter: '.'
+out:
+  return: SUCCEED
+---
+test case: "7. 3-bytes characters"
+in:
+  list: "社.社社.社社社.社社社社社社"
+  value: "社"
+  len: 3
+  delimiter: '.'
+out:
+  return: SUCCEED
+---
+test case: "8. Emoji"
+in:
+  list: "❤️.❤️❤️.❤️❤️❤️.❤️❤️❤️❤️"
+  value: "❤️❤️"
+  len: 12
+  delimiter: '.'
+out:
+  return: SUCCEED
+---
+test case: "8. Unicode characters"
+in:
+  list: "Å.Í.Î.Ï.˝Ó.ÔÒÚÆ☃"
+  value: "Î"
   len: 2
   delimiter: '.'
 out:

@@ -1,53 +1,53 @@
 ---
-test case: "succeed 0123456789"
+test case: "1. succeed 0123456789"
 in:
   string: "0123456789"
 out:
   return: SUCCEED
 ---
-test case: "fail ы"
+test case: "2. fail ы"
 in:
   string: "ы"
 out:
   return: FAIL
 ---
-test case: "succeed qwert"
+test case: "3. succeed qwert"
 in:
   string: "qwert"
 out:
   return: SUCCEED
 ---
-test case: "succeed ()_+-="
+test case: "4. succeed ()_+-="
 in:
   string: "()_+-="
 out:
   return: SUCCEED
 ---
-test case: "succeed ABCD"
+test case: "5. succeed ABCD"
 in:
   string: "ABCD"
 out:
   return: SUCCEED
 ---
-test case: "succeed ;;2::"
+test case: "6. succeed ;;2::"
 in:
   string: ";;2::"
 out:
   return: SUCCEED
 ---
-test case: "fail abcыsss"
+test case: "7. fail abcыsss"
 in:
   string: "abcыsss"
 out:
   return: FAIL
 ---
-test case: "fail 诶"
+test case: "8. fail 诶"
 in:
   string: "诶"
 out:
   return: FAIL
 ---
-test case: "succeed empty string"
+test case: "9. succeed empty string"
 in:
   string: ""
 out:

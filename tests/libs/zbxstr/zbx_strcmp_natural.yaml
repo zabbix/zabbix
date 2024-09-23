@@ -12,4 +12,11 @@ in:
   string2: "apple"
 out:
   val: SUCCEED
+---
+test case: " apple apple "
+in:
+  string1: "appl"
+  string2: "apple"
+out:
+  val: SUCCEED
 ...

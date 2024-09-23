@@ -1,36 +1,43 @@
 ---
-test case: "abc c"
+test case: "1. abc c"
 in:
   string: "abc"
   list: "c"
 out:
   return: "ab"
 ---
-test case: "abc b"
+test case: "2. abc b"
 in:
   string: "abc"
   list: "b"
 out:
   return: "ac"
 ---
-test case: "abc a"
+test case: "3. abc a"
 in:
   string: "abc"
   list: "a"
 out:
   return: "bc"
 ---
-test case: "$123$ $"
+test case: "4. $123$ $"
 in:
   string: "$123$"
   list: "$"
 out:
   return: "123"
 ---
-test case: "empty string"
+test case: "5. empty string"
 in:
   string: ""
   list: ""
 out:
   return: ""
+---
+test case: "5. Unicode Symbols"
+in:
+  string: "Ω≈ç√∫˜µ≤≥÷"
+  list: "Ω"
+out:
+  return: "≈ç√∫˜µ≤≥÷"
 ...

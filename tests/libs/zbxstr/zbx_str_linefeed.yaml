@@ -1,5 +1,5 @@
 ---
-test case: "Delimiter (|)"
+test case: "1. Delimiter (|)"
 in:
   scr: "HelloWorldHelloWorldHelloWorld"
   delim: "|"
@@ -7,7 +7,7 @@ in:
 out:
   string: "Hello|World|Hello|World|Hello|World"
 ---
-test case: "Wrapping a Short String (No Wrapping Needed)"
+test case: "2. Wrapping a Short String (No Wrapping Needed)"
 in:
   scr: "Short"
   delim: "|"
@@ -15,7 +15,7 @@ in:
 out:
   string: "Short"
 ---
-test case: "Empty String"
+test case: "3. Empty String"
 in:
   scr: ""
   delim: "|"
@@ -23,7 +23,7 @@ in:
 out:
   string: ""
 ---
-test case: "Delimiter (%)"
+test case: "4. Delimiter (%)"
 in:
   scr: "HelloWorldHelloWorldHelloWorld"
   delim: "%"
@@ -31,11 +31,27 @@ in:
 out:
   string: "Hello%World%Hello%World%Hello%World"
 ---
-test case: "Delimiter (' ')"
+test case: "5. Delimiter (' ')"
 in:
   scr: "HelloWorldHelloWorldHelloWorld"
   delim: ' '
   maxline: 5
 out:
   string: "Hello World Hello World Hello World"
+---
+test case: "6. Emoji"
+in:
+  scr: "❤️❤️❤️❤️❤️❤️❤️❤️❤️"
+  delim: ' '
+  maxline: 6
+out:
+  string: "❤️ ❤️ ❤️ ❤️ ❤️ ❤️ ❤️ ❤️ ❤️"
+---
+test case: "7. 3-bytes symbols"
+in:
+  scr: "社會科學院語學研究所"
+  delim: '/'
+  maxline: 3
+out:
+  string: "社/會/科/學/院/語/學/研/究/所"
 ...

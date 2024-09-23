@@ -24,8 +24,16 @@ void	zbx_mock_test_entry(void **state)
 
 	const char	*s1 = zbx_mock_get_parameter_string("in.string1");
 	const char	*s2 = zbx_mock_get_parameter_string("in.string2");
-	int		exp_result = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.val"));
-	int		act_value = zbx_strcmp_natural(s1, s2);
+	char		*returned_result;
+	int			exp_result = zbx_mock_get_parameter_string("out.val");
+	int			act_value = zbx_strcmp_natural(s1, s2);
 
-	zbx_mock_assert_int_eq("return value",  exp_result, act_value);
+	if (act_value < 0)
+		returned_result = "less";
+	else if (act_value > 0)
+		returned_result = "greater";
+	else
+		returned_result = "equal";
+
+	zbx_mock_assert_str_eq("return value",  exp_result, returned_result);
 }
