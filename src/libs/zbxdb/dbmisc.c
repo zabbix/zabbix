@@ -115,6 +115,7 @@ static zbx_uint64_t	dbconn_get_cached_nextid(zbx_dbconn_t *db, size_t index, zbx
 
 		if (NULL == (table = zbx_db_get_table(table_name)))
 		{
+			lastid = 0;
 			nextid = 0;
 			goto out;
 		}
@@ -124,6 +125,7 @@ static zbx_uint64_t	dbconn_get_cached_nextid(zbx_dbconn_t *db, size_t index, zbx
 
 		if (NULL == result)
 		{
+			lastid = 0;
 			nextid = 0;
 			goto out;
 		}
