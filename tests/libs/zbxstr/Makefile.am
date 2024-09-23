@@ -30,7 +30,8 @@ BINARIES_tests = \
 	zbx_replace_string\
 	zbx_str_printable_dyn\
 	zbx_str_linefeed \
-	zbx_strlcat
+	zbx_strlcat \
+	zbx_escape_string
 
 
 noinst_PROGRAMS = $(BINARIES_tests)
@@ -492,5 +493,20 @@ zbx_strlcat_LDADD += @SERVER_LIBS@
 zbx_strlcat_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
 
 zbx_strlcat_CFLAGS = $(STR_COMPILER_FLAGS)
+
+#zbx_escape_string
+
+zbx_escape_string_SOURCES = \
+	zbx_escape_string.c \
+	$(COMMON_SRC_FILES)
+
+zbx_escape_string_LDADD = \
+	$(STR_LIBS)
+
+zbx_escape_string_LDADD += @SERVER_LIBS@
+
+zbx_escape_string_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
+
+zbx_escape_string_CFLAGS = $(STR_COMPILER_FLAGS)
 
 #endif

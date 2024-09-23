@@ -21,7 +21,6 @@
 void	zbx_mock_test_entry(void **state)
 {
 	ZBX_UNUSED(state);
-//zbx_strlcat(char *dst, const char *src, size_t siz)
 	const char	*src = zbx_mock_get_parameter_string("in.src");
 	size_t		size = zbx_mock_get_parameter_uint64("in.size");
     char		dst[size];
