@@ -539,6 +539,31 @@ class testUserRolesPermissions extends CWebTest {
 	}
 
 	/**
+	 * Check cause and symptom context menu options when 'Change problem ranking' flag is disabled/enabled on 'User roles' page.
+	 */
+	public function testUserRolesPermissions_ChangeProblemRanking() {
+		$this->page->userLogin('user_for_role', 'zabbixzabbix');
+
+		foreach ([true, false] as $action_access) {
+			$this->page->open('zabbix.php?action=problem.view');
+			$this->query('link', 'Test trigger with tag')->waitUntilPresent()->one()->click();
+			$context_menu = CPopupMenuElement::find()->waitUntilVisible()->one();
+			$popup = CPopupMenuElement::find()->waitUntilVisible()->one();
+
+			if ($action_access) {
+				$this->assertTrue($popup->hasItems(['Mark as cause', 'Mark selected as symptoms']));
+				$this->assertTrue($context_menu->hasTitles(['PROBLEM']));
+				$this->changeRoleRule(['Change problem ranking' => false]);
+			}
+			else {
+				$this->assertFalse($popup->hasItems(['Mark as cause', 'Mark selected as symptoms']));
+				$this->assertFalse($context_menu->hasTitles(['PROBLEM']));
+				$this->changeRoleRule(['Change problem ranking' => true]);
+			}
+		}
+	}
+
+	/**
 	 * Module enable/disable.
 	 */
 	public function testUserRolesPermissions_Module() {
