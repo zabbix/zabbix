@@ -1,6 +1,7 @@
 Changes for 7.2.0alpha1
 
 New features:
+..F....... [ZBXNEXT-9375] added/removed and modified table titles related to the action column and fixed broken layouts in multiple tables (rgontarski)
 ..F....... [ZBXNEXT-9221] added links to host configuration forms in entity lists (esekace)
 ..F.I..... [ZBXNEXT-466] added the ability to filter audit log entries by IP (Ivo)
 .........T [ZBXNEXT-9418] split {$PG.CONNSTRING} macro in PostgreSQL templates (abrosimovs)
@@ -3275,6 +3276,7 @@ Changes for 6.0.34rc2
 New features:
 
 Bug fixes:
+..F....... [ZBX-21663] fixed timeselector display in problem list on PHP 7.4 (vmurzins)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.34rc1
