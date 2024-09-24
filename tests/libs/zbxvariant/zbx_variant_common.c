@@ -91,7 +91,7 @@ void	mock_read_variant(const char *path, zbx_variant_t *variant)
 		for (i = 0; i < size; i++)
 		{
 			data[i] = (char)(hex2num(*ptr++) << 4);
-			data[i] |= (char)(hex2num(*ptr++));
+			data[i] |= (char)hex2num(*ptr++);
 			ptr++;
 		}
 		zbx_variant_set_bin(variant, zbx_variant_data_bin_create(data, size));
