@@ -160,6 +160,7 @@ Additional resources:
 |{$VMWARE.VM.FS.PFREE.MIN.WARN}|<p>VMware guest free space threshold for the warning trigger.</p>|`20`|
 |{$VMWARE.VM.FS.PFREE.MIN.CRIT}|<p>VMware guest free space threshold for the critical trigger.</p>|`10`|
 |{$VMWARE.VM.FS.TRIGGER.USED}|<p>VMware guest used free space trigger. Set to "1"/"0" to enable or disable the trigger.</p>|`0`|
+|{$VMWARE.HYPERVISOR.MAINTENANCE}|<p>If the hypervisor is in maintenance mode, all other problems on the VM will be suppressed automatically. Set to "1"/"0" to enable or disable this feature.</p>|`1`|
 
 ### Items
 
@@ -178,6 +179,7 @@ Additional resources:
 |CPU usage|<p>Current upper-bound on CPU usage. The upper-bound is based on the host the VM is current running on, as well as limits configured on the VM itself or any parent resource pool. Valid while the VM is running.</p>|Simple check|vmware.vm.cpu.usage[{$VMWARE.URL},{$VMWARE.VM.UUID}]|
 |Datacenter name|<p>Datacenter name of the guest VM.</p>|Simple check|vmware.vm.datacenter.name[{$VMWARE.URL},{$VMWARE.VM.UUID}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 |Hypervisor name|<p>Hypervisor name of the guest VM.</p>|Simple check|vmware.vm.hv.name[{$VMWARE.URL},{$VMWARE.VM.UUID}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Hypervisor maintenance mode|<p>Hypervisor maintenance mode. One of the following:</p><p>- Normal mode;</p><p>- Maintenance mode.</p>|Simple check|vmware.vm.hv.maintenance[{$VMWARE.URL},{$VMWARE.VM.UUID}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Ballooned memory|<p>The amount of guest physical memory that is currently reclaimed through the balloon driver.</p>|Simple check|vmware.vm.memory.size.ballooned[{$VMWARE.URL},{$VMWARE.VM.UUID}]|
 |Compressed memory|<p>The amount of memory currently in the compression cache for this VM.</p>|Simple check|vmware.vm.memory.size.compressed[{$VMWARE.URL},{$VMWARE.VM.UUID}]|
 |Private memory|<p>Amount of memory backed by host memory and not being shared.</p>|Simple check|vmware.vm.memory.size.private[{$VMWARE.URL},{$VMWARE.VM.UUID}]|
@@ -204,10 +206,11 @@ Additional resources:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Snapshot consolidation needed|<p>Snapshot consolidation needed.</p>|`last(/VMware Guest/vmware.vm.consolidationneeded[{$VMWARE.URL},{$VMWARE.VM.UUID}])=0`|Average|**Manual close**: Yes|
-|VM is not running|<p>VMware virtual machine is not running.</p>|`last(/VMware Guest/vmware.vm.state[{$VMWARE.URL},{$VMWARE.VM.UUID}]) <> 2`|Average||
-|VMware Tools is not running|<p>VMware Tools is not running on the VM.</p>|`last(/VMware Guest/vmware.vm.tools[{$VMWARE.URL},{$VMWARE.VM.UUID},status]) = 1`|Warning|**Depends on**:<br><ul><li>VM is not running</li></ul>|
-|VM has been restarted|<p>Uptime is less than 10 minutes.</p>|`(between(last(/VMware Guest/vmware.vm.guest.osuptime[{$VMWARE.URL},{$VMWARE.VM.UUID}]),1,10m)=1 or between(last(/VMware Guest/vmware.vm.uptime[{$VMWARE.URL},{$VMWARE.VM.UUID}]),1,10m)=1) and last(/VMware Guest/vmware.vm.powerstate[{$VMWARE.URL},{$VMWARE.VM.UUID}]) = 1`|Warning|**Manual close**: Yes|
+|Snapshot consolidation needed|<p>Snapshot consolidation needed.</p>|`last(/VMware Guest/vmware.vm.consolidationneeded[{$VMWARE.URL},{$VMWARE.VM.UUID}])=0`|Average|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Hypervisor is in the maintenance mode</li></ul>|
+|VM is not running|<p>VMware virtual machine is not running.</p>|`last(/VMware Guest/vmware.vm.state[{$VMWARE.URL},{$VMWARE.VM.UUID}]) <> 2`|Average|**Depends on**:<br><ul><li>Hypervisor is in the maintenance mode</li></ul>|
+|VMware Tools is not running|<p>VMware Tools is not running on the VM.</p>|`last(/VMware Guest/vmware.vm.tools[{$VMWARE.URL},{$VMWARE.VM.UUID},status]) = 1`|Warning|**Depends on**:<br><ul><li>VM is not running</li><li>Hypervisor is in the maintenance mode</li></ul>|
+|Hypervisor is in the maintenance mode|<p>Hypervisor is in the maintenance mode. All other problem on the host will be suppressed.</p>|`last(/VMware Guest/vmware.vm.hv.maintenance[{$VMWARE.URL},{$VMWARE.VM.UUID}])=1 and {$VMWARE.HYPERVISOR.MAINTENANCE}=1`|Info||
+|VM has been restarted|<p>Uptime is less than 10 minutes.</p>|`(between(last(/VMware Guest/vmware.vm.guest.osuptime[{$VMWARE.URL},{$VMWARE.VM.UUID}]),1,10m)=1 or between(last(/VMware Guest/vmware.vm.uptime[{$VMWARE.URL},{$VMWARE.VM.UUID}]),1,10m)=1) and last(/VMware Guest/vmware.vm.powerstate[{$VMWARE.URL},{$VMWARE.VM.UUID}]) = 1`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Hypervisor is in the maintenance mode</li></ul>|
 
 ### LLD rule Network device discovery
 
@@ -263,8 +266,8 @@ Additional resources:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|[{#FSNAME}]: Disk space is critically low|<p>The disk free space on [{#FSNAME}] has been less than `{$VMWARE.VM.FS.PFREE.MIN.CRIT:"{#FSNAME}"}`% for 5m.</p>|`max(/VMware Guest/vmware.vm.vfs.fs.size[{$VMWARE.URL},{$VMWARE.VM.UUID},{#FSNAME},pfree],5m)<{$VMWARE.VM.FS.PFREE.MIN.CRIT:"{#FSNAME}"} and {$VMWARE.VM.FS.TRIGGER.USED:"{#FSNAME}"}=1`|Average|**Manual close**: Yes|
-|[{#FSNAME}]: Disk space is low|<p>The disk free space on [{#FSNAME}] has been less than `{$VMWARE.VM.FS.PFREE.MIN.WARN:"{#FSNAME}"}`% for 5m.</p>|`max(/VMware Guest/vmware.vm.vfs.fs.size[{$VMWARE.URL},{$VMWARE.VM.UUID},{#FSNAME},pfree],5m)<{$VMWARE.VM.FS.PFREE.MIN.WARN:"{#FSNAME}"} and {$VMWARE.VM.FS.TRIGGER.USED:"{#FSNAME}"}=1`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>[{#FSNAME}]: Disk space is critically low</li></ul>|
+|[{#FSNAME}]: Disk space is critically low|<p>The disk free space on [{#FSNAME}] has been less than `{$VMWARE.VM.FS.PFREE.MIN.CRIT:"{#FSNAME}"}`% for 5m.</p>|`max(/VMware Guest/vmware.vm.vfs.fs.size[{$VMWARE.URL},{$VMWARE.VM.UUID},{#FSNAME},pfree],5m)<{$VMWARE.VM.FS.PFREE.MIN.CRIT:"{#FSNAME}"} and {$VMWARE.VM.FS.TRIGGER.USED:"{#FSNAME}"}=1`|Average|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Hypervisor is in the maintenance mode</li></ul>|
+|[{#FSNAME}]: Disk space is low|<p>The disk free space on [{#FSNAME}] has been less than `{$VMWARE.VM.FS.PFREE.MIN.WARN:"{#FSNAME}"}`% for 5m.</p>|`max(/VMware Guest/vmware.vm.vfs.fs.size[{$VMWARE.URL},{$VMWARE.VM.UUID},{#FSNAME},pfree],5m)<{$VMWARE.VM.FS.PFREE.MIN.WARN:"{#FSNAME}"} and {$VMWARE.VM.FS.TRIGGER.USED:"{#FSNAME}"}=1`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>[{#FSNAME}]: Disk space is critically low</li><li>Hypervisor is in the maintenance mode</li></ul>|
 
 # VMware Hypervisor
 
