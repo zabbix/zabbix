@@ -5275,8 +5275,10 @@ class testDashboardTopHostsWidget extends testWidgets {
 	protected function createTopHostsWidget($data, $dashboardid, $widget_name = null) {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.$dashboardid);
 		$dashboard = CDashboardElement::find()->one();
-		$fields = array_key_exists('main_fields', $data) ? $data['main_fields'] : ['Name' => $widget_name];
-		$form = $this->openWidgetAndFill($dashboard, 'Top hosts', $fields);
+		if ($widget_name !== null) {
+			$data['main_fields'] = ['Name' => $widget_name];
+		}
+		$form = $this->openWidgetAndFill($dashboard, 'Top hosts', CTestArrayHelper::get($data, 'main_fields', []));
 
 		// Fill Tags.
 		if (array_key_exists('Tags', $data)) {

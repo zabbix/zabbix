@@ -1,0 +1,74 @@
+[
+    {
+        "value": "Test The Value",
+        "macrofunc": {
+            "function": "uppercase",
+            "parameters": []
+        },
+        "result": "TEST THE VALUE"
+    },
+    {
+        "value": "lowercase123",
+        "macrofunc": {
+            "function": "uppercase",
+            "parameters": []
+        },
+        "result": "LOWERCASE123"
+    },
+    {
+        "value": "çşğü",
+        "macrofunc": {
+            "function": "uppercase",
+            "parameters": []
+        },
+        "result": "çşğü"
+    },
+    {
+        "value": "pārbaude",
+        "macrofunc": {
+            "function": "uppercase",
+            "parameters": []
+        },
+        "result": "PāRBAUDE"
+    },
+    {
+        "value": "тест",
+        "macrofunc": {
+            "function": "uppercase",
+            "parameters": []
+        },
+        "result": "тест"
+    },
+    {
+        "value": "",
+        "macrofunc": {
+            "function": "uppercase",
+            "parameters": []
+        },
+        "result": ""
+    },
+    {
+        "value": "Testing",
+        "macrofunc": {
+            "function": "uppercase",
+            "parameters": ["123"]
+        },
+        "result": "*UNKNOWN*"
+    },
+    {
+        "value": "12345",
+        "macrofunc": {
+            "function": "uppercase",
+            "parameters": []
+        },
+        "result": "12345"
+    },
+    {
+        "value": "12345",
+        "macrofunc": {
+            "function": "uppercase",
+            "parameters": [" "]
+        },
+        "result": "*UNKNOWN*"
+    }
+]
