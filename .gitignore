@@ -234,6 +234,8 @@ tests/libs/zbxstr/zbx_remove_chars
 tests/libs/zbxstr/zbx_replace_invalid_utf8
 tests/libs/zbxstr/zbx_replace_mem_dyn
 tests/libs/zbxstr/zbx_replace_string
+tests/libs/zbxstr/zbx_srdcatf
+tests/libs/zbxstr/zbx_strcasestr
 tests/libs/zbxstr/zbx_str_extract
 tests/libs/zbxstr/zbx_str_in_list
 tests/libs/zbxstr/zbx_str_linefeed
@@ -241,6 +243,7 @@ tests/libs/zbxstr/zbx_str_n_in_list
 tests/libs/zbxstr/zbx_str_printable_dyn
 tests/libs/zbxstr/zbx_strcmp_natural
 tests/libs/zbxstr/zbx_strcmp_null
+tests/libs/zbxstr/zbx_strlcat
 tests/libs/zbxstr/zbx_strlcpy_utf8
 tests/libs/zbxstr/zbx_strlen_utf8_nchars
 tests/libs/zbxstr/zbx_strsplit_first

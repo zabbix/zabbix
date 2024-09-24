@@ -1,0 +1,42 @@
+---
+test case: "1. Deafault string"
+in:
+  haystack: "Hello, World!"
+  needle: "world"
+out:
+  string: "World!"
+---
+test case: "2. Empty string"
+in:
+  haystack: ""
+  needle: ""
+out:
+  string: ""
+---
+test case: "3. Numeric string"
+in:
+  haystack: "-2147483648/-1"
+  needle: "4"
+out:
+  string: "47483648/-1"
+---
+test case: "5. Special characters string"
+in:
+  haystack: ",./;'[]-="
+  needle: "[]"
+out:
+  string: "[]-="
+---
+test case: "6. Two-bytes characters string"
+in:
+  haystack: "사회과학원 어학연구소"
+  needle: "학"
+out:
+  string: "학원 어학연구소"
+---
+test case: "7. Emoji"
+in:
+  haystack: "❤️ 💔 💌 💕 💞 💓 💗 💖 💘 💝 💟 💜 💛 💚 💙"
+  needle: "💝"
+out:
+  string: "💝 💟 💜 💛 💚 💙"

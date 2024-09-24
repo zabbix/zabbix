@@ -32,7 +32,9 @@ BINARIES_tests = \
 	zbx_str_linefeed \
 	zbx_strlcat \
 	zbx_escape_string \
-	zbx_strdcatf
+	zbx_strdcatf \
+	zbx_strcasestr \
+	zbx_dyn_escape_shell_single_quote
 
 
 noinst_PROGRAMS = $(BINARIES_tests)
@@ -524,5 +526,35 @@ zbx_strdcatf_LDADD += @SERVER_LIBS@
 zbx_strdcatf_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
 
 zbx_strdcatf_CFLAGS = $(STR_COMPILER_FLAGS)
+
+#zbx_strcasestr
+
+zbx_strcasestr_SOURCES = \
+	zbx_strcasestr.c \
+	$(COMMON_SRC_FILES)
+
+zbx_strcasestr_LDADD = \
+	$(STR_LIBS)
+
+zbx_strcasestr_LDADD += @SERVER_LIBS@
+
+zbx_strcasestr_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
+
+zbx_strcasestr_CFLAGS = $(STR_COMPILER_FLAGS)
+
+#zbx_dyn_escape_shell_single_quote
+
+zbx_dyn_escape_shell_single_quote_SOURCES = \
+	zbx_dyn_escape_shell_single_quote.c \
+	$(COMMON_SRC_FILES)
+
+zbx_dyn_escape_shell_single_quote_LDADD = \
+	$(STR_LIBS)
+
+zbx_dyn_escape_shell_single_quote_LDADD += @SERVER_LIBS@
+
+zbx_dyn_escape_shell_single_quote_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
+
+zbx_dyn_escape_shell_single_quote_CFLAGS = $(STR_COMPILER_FLAGS)
 
 #endif

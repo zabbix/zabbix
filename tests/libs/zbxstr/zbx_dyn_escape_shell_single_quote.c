@@ -21,9 +21,9 @@
 
 void	zbx_mock_test_entry(void **state)
 {
-	const char	*text = zbx_mock_get_parameter_string("in.string");
+	const char	*arg = zbx_mock_get_parameter_string("in.arg");
 	const char	*exp_result = zbx_mock_get_parameter_string("out.string");
-	char		*act_result = zbx_str_printable_dyn(text);
+	char		*act_result = zbx_dyn_escape_shell_single_quote(arg);
 
 	ZBX_UNUSED(state);
 
