@@ -52,4 +52,16 @@ in:
   string: ""
 out:
   return: SUCCEED
+---
+test case: "10. succeed newline"
+in:
+  string: "\n"
+out:
+  return: SUCCEED
+---
+test case: "11. succeed Apostrophe"
+in:
+  string: "'"
+out:
+  return: SUCCEED
 ...
