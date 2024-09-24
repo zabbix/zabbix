@@ -40,7 +40,7 @@ GRANT pg_monitor TO zbx_monitor;
 
 For more information please read the PostgreSQL documentation `https://www.postgresql.org/docs/current/auth-pg-hba-conf.html`.
 
-4. Set the connection string for the PostgreSQL instance in the `{$PG.CONNSTRING}` macro as URI, such as `<protocol(host:port)>`, or specify the named session - `<sessionname>`.
+4. Set the connection string for the PostgreSQL instance in the `{$PG.CONNSTRING.AGENT2}` macro as URI, such as `<protocol(host:port)>`, or specify the named session - `<sessionname>`.
 
 **Note:** if you want to use SSL/TLS encryption to protect communications with the remote PostgreSQL instance, a named session must be used. In that case, the instance URI should be specified in the `Plugins.PostgreSQL.Sessions.*.Uri` parameter in the PostgreSQL plugin configuration files alongside all the encryption parameters (type, cerfiticate/key filepaths if needed etc.).
 
@@ -57,7 +57,7 @@ Plugins.PostgreSQL.Sessions.myconn.Uri=tcp://<instanceip>:5432
 Plugins.PostgreSQL.Sessions.myconn.TLSConnect=required
 ```
 
-Then set the `{$PG.CONNSTRING}` macro to `myconn` to use this named session.
+Then set the `{$PG.CONNSTRING.AGENT2}` macro to `myconn` to use this named session.
 
 5. Set the password that you specified in step 2 in the macro `{$PG.PASSWORD}`.
 
@@ -66,7 +66,7 @@ Then set the `{$PG.CONNSTRING}` macro to `myconn` to use this named session.
 |Name|Description|Default|
 |----|-----------|-------|
 |{$PG.PASSWORD}|<p>PostgreSQL user password.</p>|`<Put the password here>`|
-|{$PG.CONNSTRING}|<p>URI or named session of the PostgreSQL instance.</p>|`tcp://localhost:5432`|
+|{$PG.CONNSTRING.AGENT2}|<p>URI or named session of the PostgreSQL instance.</p>|`tcp://localhost:5432`|
 |{$PG.USER}|<p>PostgreSQL username.</p>|`zbx_monitor`|
 |{$PG.LLD.FILTER.DBNAME}|<p>Filter of discoverable databases.</p>|`.+`|
 |{$PG.CONN_TOTAL_PCT.MAX.WARN}|<p>Maximum percentage of current connections for trigger expression.</p>|`90`|
@@ -136,16 +136,16 @@ Then set the `{$PG.CONNSTRING}` macro to `myconn` to use this named session.
 |Connections sum: Waiting|<p>Total number of waiting connections:</p><p>https://www.postgresql.org/docs/current/monitoring-stats.html#WAIT-EVENT-TABLE</p>|Dependent item|pgsql.connections.sum.waiting<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.waiting`</p></li></ul>|
 |Connections sum: Idle in transaction (aborted)|<p>Total number of connections in a transaction state but not executing a query, and where one of the statements in the transaction caused an error.</p>|Dependent item|pgsql.connections.sum.idle_in_transaction_aborted<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.idle_in_transaction_aborted`</p></li></ul>|
 |Connections sum: Disabled|<p>Total number of disabled connections.</p>|Dependent item|pgsql.connections.sum.disabled<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.disabled`</p></li></ul>|
-|Age of oldest xid|<p>Age of oldest xid.</p>|Zabbix agent|pgsql.oldest.xid["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]|
-|Count of autovacuum workers|<p>Number of autovacuum workers.</p>|Zabbix agent|pgsql.autovacuum.count["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]|
+|Age of oldest xid|<p>Age of oldest xid.</p>|Zabbix agent|pgsql.oldest.xid["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]|
+|Count of autovacuum workers|<p>Number of autovacuum workers.</p>|Zabbix agent|pgsql.autovacuum.count["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]|
 |Cache hit ratio, %|<p>Cache hit ratio.</p>|Calculated|pgsql.cache.hit|
-|Uptime|<p>Time since the server started.</p>|Zabbix agent|pgsql.uptime["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]|
-|Replication: Lag in bytes|<p>Replication lag with master, in bytes.</p>|Zabbix agent|pgsql.replication.lag.b["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]|
-|Replication: Lag in seconds|<p>Replication lag with master, in seconds.</p>|Zabbix agent|pgsql.replication.lag.sec["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]|
-|Replication: Recovery role|<p>Replication role: 1 — recovery is still in progress (standby mode), 0 — master mode.</p>|Zabbix agent|pgsql.replication.recovery_role["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]|
-|Replication: Standby count|<p>Number of standby servers.</p>|Zabbix agent|pgsql.replication.count["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]|
-|Replication: Status|<p>Replication status: 0 — streaming is down, 1 — streaming is up, 2 — master mode.</p>|Zabbix agent|pgsql.replication.status["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]|
-|Ping|<p>Used to test a connection to see if it is alive. It is set to 0 if the query is unsuccessful.</p>|Zabbix agent|pgsql.ping["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Uptime|<p>Time since the server started.</p>|Zabbix agent|pgsql.uptime["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]|
+|Replication: Lag in bytes|<p>Replication lag with master, in bytes.</p>|Zabbix agent|pgsql.replication.lag.b["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]|
+|Replication: Lag in seconds|<p>Replication lag with master, in seconds.</p>|Zabbix agent|pgsql.replication.lag.sec["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]|
+|Replication: Recovery role|<p>Replication role: 1 — recovery is still in progress (standby mode), 0 — master mode.</p>|Zabbix agent|pgsql.replication.recovery_role["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]|
+|Replication: Standby count|<p>Number of standby servers.</p>|Zabbix agent|pgsql.replication.count["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]|
+|Replication: Status|<p>Replication status: 0 — streaming is down, 1 — streaming is up, 2 — master mode.</p>|Zabbix agent|pgsql.replication.status["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]|
+|Ping|<p>Used to test a connection to see if it is alive. It is set to 0 if the query is unsuccessful.</p>|Zabbix agent|pgsql.ping["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Triggers
 
@@ -154,15 +154,15 @@ Then set the `{$PG.CONNSTRING}` macro to `myconn` to use this named session.
 |Version has changed||`last(/PostgreSQL by Zabbix agent 2/pgsql.version["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"],#1)<>last(/PostgreSQL by Zabbix agent 2/pgsql.version["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"],#2) and length(last(/PostgreSQL by Zabbix agent 2/pgsql.version["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]))>0`|Info||
 |Dbstat: Checksum failures detected|<p>Data page checksum failures were detected on that DB instance:<br>https://www.postgresql.org/docs/current/checksums.html</p>|`last(/PostgreSQL by Zabbix agent 2/pgsql.dbstat.sum.checksum_failures.rate)>0`|Average||
 |Total number of connections is too high|<p>Total number of current connections exceeds the limit of {$PG.CONN_TOTAL_PCT.MAX.WARN}% out of the maximum number of concurrent connections to the database server (the "max_connections" setting).</p>|`min(/PostgreSQL by Zabbix agent 2/pgsql.connections.sum.total_pct,5m) > {$PG.CONN_TOTAL_PCT.MAX.WARN}`|Average||
-|Oldest xid is too big||`last(/PostgreSQL by Zabbix agent 2/pgsql.oldest.xid["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]) > 18000000`|Average||
-|Service has been restarted|<p>PostgreSQL uptime is less than 10 minutes.</p>|`last(/PostgreSQL by Zabbix agent 2/pgsql.uptime["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]) < 10m`|Average||
-|Service is down|<p>Last test of a connection was unsuccessful.</p>|`last(/PostgreSQL by Zabbix agent 2/pgsql.ping["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"])=0`|High||
+|Oldest xid is too big||`last(/PostgreSQL by Zabbix agent 2/pgsql.oldest.xid["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]) > 18000000`|Average||
+|Service has been restarted|<p>PostgreSQL uptime is less than 10 minutes.</p>|`last(/PostgreSQL by Zabbix agent 2/pgsql.uptime["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]) < 10m`|Average||
+|Service is down|<p>Last test of a connection was unsuccessful.</p>|`last(/PostgreSQL by Zabbix agent 2/pgsql.ping["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"])=0`|High||
 
 ### LLD rule Replication discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Replication discovery|<p>Discovers replication lag metrics.</p>|Zabbix agent|pgsql.replication.process.discovery["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]|
+|Replication discovery|<p>Discovers replication lag metrics.</p>|Zabbix agent|pgsql.replication.process.discovery["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]|
 
 ### Item prototypes for Replication discovery
 
@@ -177,7 +177,7 @@ Then set the `{$PG.CONNSTRING}` macro to `myconn` to use this named session.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Database discovery|<p>Discovers databases (DB) in the database management system (DBMS), except:</p><p>- templates;</p><p>- DBs that do not allow connections.</p>|Zabbix agent|pgsql.db.discovery["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}"]|
+|Database discovery|<p>Discovers databases (DB) in the database management system (DBMS), except:</p><p>- templates;</p><p>- DBs that do not allow connections.</p>|Zabbix agent|pgsql.db.discovery["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}"]|
 
 ### Item prototypes for Database discovery
 
@@ -186,9 +186,9 @@ Then set the `{$PG.CONNSTRING}` macro to `myconn` to use this named session.
 |DB [{#DBNAME}]: Get dbstat|<p>Get dbstat metrics for database "{#DBNAME}".</p>|Dependent item|pgsql.dbstat.get_metrics["{#DBNAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$['{#DBNAME}']`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |DB [{#DBNAME}]: Get locks|<p>Get locks metrics for database "{#DBNAME}".</p>|Dependent item|pgsql.locks.get_metrics["{#DBNAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$['{#DBNAME}']`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |DB [{#DBNAME}]: Get queries|<p>Get queries metrics for database "{#DBNAME}".</p>|Dependent item|pgsql.queries.get_metrics["{#DBNAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$['{#DBNAME}']`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|DB [{#DBNAME}]: Database age|<p>Database age.</p>|Zabbix agent|pgsql.db.age["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}","{#DBNAME}"]|
-|DB [{#DBNAME}]: Bloating tables|<p>Number of bloating tables.</p>|Zabbix agent|pgsql.db.bloating_tables["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}","{#DBNAME}"]|
-|DB [{#DBNAME}]: Database size|<p>Database size.</p>|Zabbix agent|pgsql.db.size["{$PG.CONNSTRING}","{$PG.USER}","{$PG.PASSWORD}","{#DBNAME}"]|
+|DB [{#DBNAME}]: Database age|<p>Database age.</p>|Zabbix agent|pgsql.db.age["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}","{#DBNAME}"]|
+|DB [{#DBNAME}]: Bloating tables|<p>Number of bloating tables.</p>|Zabbix agent|pgsql.db.bloating_tables["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}","{#DBNAME}"]|
+|DB [{#DBNAME}]: Database size|<p>Database size.</p>|Zabbix agent|pgsql.db.size["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}","{#DBNAME}"]|
 |DB [{#DBNAME}]: Blocks hit per second|<p>Total number of times per second disk blocks were found already in the buffer cache, so that a read was not necessary.</p>|Dependent item|pgsql.dbstat.blks_hit.rate["{#DBNAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.blks_hit`</p></li><li>Change per second</li></ul>|
 |DB [{#DBNAME}]: Disk blocks read per second|<p>Total number of disk blocks read per second in this database.</p>|Dependent item|pgsql.dbstat.blks_read.rate["{#DBNAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.blks_read`</p></li><li>Change per second</li></ul>|
 |DB [{#DBNAME}]: Detected conflicts per second|<p>Total number of queries canceled due to conflicts with recovery in this database per second.</p>|Dependent item|pgsql.dbstat.conflicts.rate["{#DBNAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.conflicts`</p></li><li>Change per second</li></ul>|

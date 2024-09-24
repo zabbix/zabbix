@@ -69,6 +69,7 @@ struct zbx_es_env
 zbx_es_env_t	*zbx_es_get_env(duk_context *ctx);
 
 int	es_duktape_string_decode(const char *duk_str, char **out_str);
+void	es_push_result_string(duk_context *ctx, char *str, size_t size);
 
 duk_ret_t	es_super(duk_context *ctx, const char *base, int args);
 int	es_is_chained_constructor_call(duk_context *ctx);
@@ -83,7 +84,7 @@ typedef enum
 zbx_es_obj_type_t;
 
 void	es_obj_attach_data(zbx_es_env_t *env, void *objptr, void *data, zbx_es_obj_type_t type);
-void	*es_obj_get_data(zbx_es_env_t *env, zbx_es_obj_type_t type);
+void	*es_obj_get_data(zbx_es_env_t *env, const void *objptr, zbx_es_obj_type_t type);
 void	*es_obj_detach_data(zbx_es_env_t *env, void *objptr, zbx_es_obj_type_t type);
 
 #endif /* ZABBIX_EMBED_H */

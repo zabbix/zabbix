@@ -1,1 +1,0 @@
-A......... [ZBX-24792] fixed query generation error in retrieval of alerts by non-Superadmin users without user group (jfreibergs)
