@@ -41,7 +41,7 @@ void	zbx_mock_test_entry(void **state)
 			break;
 		default:
 			fail_msg("Expected argument_number 1-3");
-		    break;
+			break;
 	}
 
 	zbx_mock_assert_str_eq("return value",  exp_result, dest);
