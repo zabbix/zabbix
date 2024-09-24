@@ -273,24 +273,21 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$show = $this->fields_values['show'];
 
 			if (in_array(Widget::SHOW_DATE, $show)) {
-				$cells['date'] = [
-					'size' => $this->fields_values['date_size'],
+				$cells[Widget::SHOW_DATE] = [
 					'bold' => ($this->fields_values['date_bold'] == 1),
 					'color' => $this->fields_values['date_color']
 				];
 			}
 
 			if (in_array(Widget::SHOW_TIME, $show)) {
-				$cells['time'] = [
-					'size' => $this->fields_values['time_size'],
+				$cells[Widget::SHOW_TIME] = [
 					'bold' => ($this->fields_values['time_bold'] == 1),
 					'color' => $this->fields_values['time_color']
 				];
 			}
 
 			if (in_array(Widget::SHOW_TIMEZONE, $show)) {
-				$cells['timezone'] = [
-					'size' => $this->fields_values['tzone_size'],
+				$cells[Widget::SHOW_TIMEZONE] = [
 					'bold' => ($this->fields_values['tzone_bold'] == 1),
 					'color' => $this->fields_values['tzone_color']
 				];

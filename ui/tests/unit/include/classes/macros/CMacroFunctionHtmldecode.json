@@ -1,0 +1,58 @@
+[
+    {
+        "value": "&amp;&quot;&lt;&gt;&#39;&#039;",
+        "macrofunc": {
+            "function": "htmldecode",
+            "parameters": []
+        },
+        "result": "&\"<>''"
+    },
+    {
+        "value": "&gt;",
+        "macrofunc": {
+            "function": "htmldecode",
+            "parameters": []
+        },
+        "result": ">"
+    },
+    {
+        "value": "",
+        "macrofunc": {
+            "function": "htmldecode",
+            "parameters": ["111"]
+        },
+        "result": "*UNKNOWN*"
+    },
+    {
+        "value": "value",
+        "macrofunc": {
+            "function": "htmldecode",
+            "parameters": ["111", "222", "333"]
+        },
+        "result": "*UNKNOWN*"
+    },
+    {
+        "value": "ÁÖ©",
+        "macrofunc": {
+            "function": "htmldecode",
+            "parameters": []
+        },
+        "result": "ÁÖ©"
+    },
+    {
+        "value": "",
+        "macrofunc": {
+            "function": "htmldecode",
+            "parameters": []
+        },
+        "result": ""
+    },
+    {
+        "value": "12345",
+        "macrofunc": {
+            "function": "htmldecode",
+            "parameters": [" "]
+        },
+        "result": "*UNKNOWN*"
+    }
+]

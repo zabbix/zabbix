@@ -33,8 +33,6 @@
 #define ZBX_RETRIEVE_MODE_BOTH		2
 
 int	zbx_http_punycode_encode_url(char **url);
-void	zbx_http_url_encode(const char *source, char **result);
-int	zbx_http_url_decode(const char *source, char **result);
 char	*zbx_determine_charset(const char *content_type, char *body, size_t size);
 
 #ifdef HAVE_LIBCURL
@@ -91,7 +89,8 @@ int	zbx_http_get(const char *url, const char *header, long timeout, const char *
 
 void	zbx_http_context_create(zbx_http_context_t *context);
 void	zbx_http_context_destroy(zbx_http_context_t *context);
-int	zbx_http_request_prepare(zbx_http_context_t *context, unsigned char request_method, const char *url, const char *query_fields, char *headers,
+int	zbx_http_request_prepare(zbx_http_context_t *context, unsigned char request_method, const char *url,
+		const char *query_fields, char *headers,
 		const char *posts, unsigned char retrieve_mode, const char *http_proxy, unsigned char follow_redirects,
 		int timeout, int max_attempts, const char *ssl_cert_file, const char *ssl_key_file,
 		const char *ssl_key_password, unsigned char verify_peer, unsigned char verify_host,

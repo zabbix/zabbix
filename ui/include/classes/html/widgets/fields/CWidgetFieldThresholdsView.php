@@ -28,8 +28,8 @@ class CWidgetFieldThresholdsView extends CWidgetFieldView {
 			->addClass(ZBX_STYLE_TABLE_FORMS)
 			->setHeader([
 				'',
-				(new CColHeader(_('Threshold')))->setWidth('100%'),
-				_('Action')
+				_('Threshold'),
+				(new CColHeader(''))->setWidth('100%')
 			])
 			->setFooter(new CRow(
 				new CCol(

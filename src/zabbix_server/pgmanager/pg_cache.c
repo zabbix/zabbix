@@ -1031,7 +1031,8 @@ void	pg_cache_update_proxies(zbx_pg_cache_t *cache, int flags)
 		if (proxy->revision == cache->proxy_revision)
 			continue;
 
-		pg_cache_group_remove_proxy(cache, proxy, PG_REMOVE_DELETED_PROXY);
+		if (NULL != proxy->group)
+			pg_cache_group_remove_proxy(cache, proxy, PG_REMOVE_DELETED_PROXY);
 		pg_proxy_clear(proxy);
 		zbx_hashset_iter_remove(&iter);
 	}

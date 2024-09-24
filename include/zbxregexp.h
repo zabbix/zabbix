@@ -50,7 +50,7 @@ int	zbx_mregexp_sub(const char *string, const char *pattern, const char *output_
 int	zbx_iregexp_sub(const char *string, const char *pattern, const char *output_template, char **out);
 int	zbx_mregexp_sub_precompiled(const char *string, const zbx_regexp_t *regexp, const char *output_template,
 		size_t limit, char **out);
-
+int	zbx_regexp_repl(const char *string, const char *pattern, const char *repl_template, char **out);
 void	zbx_regexp_clean_expressions(zbx_vector_expression_t *expressions);
 
 void	zbx_add_regexp_ex(zbx_vector_expression_t *regexps, const char *name, const char *expression,

@@ -51,6 +51,7 @@ EXPR_DEPS = \
 	$(top_srcdir)/src/libs/zbxregexp/libzbxregexp.a \
 	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
 	$(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
+	$(top_srcdir)/src/libs/zbxcrypto/libzbxcrypto.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
 
 JSON_DEPS = \

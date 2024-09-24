@@ -174,8 +174,8 @@ require_once dirname(__FILE__).'/macros/testFormMacrosHostPrototype.php';
 require_once dirname(__FILE__).'/macros/testFormMacrosTemplate.php';
 
 // Maps.
-require_once dirname(__FILE__).'/maps/testFormMap.php';
-require_once dirname(__FILE__).'/maps/testFormSysmap.php';
+require_once dirname(__FILE__).'/maps/testFormMapConstructor.php';
+require_once dirname(__FILE__).'/maps/testFormMapProperties.php';
 require_once dirname(__FILE__).'/maps/testPageMaps.php';
 
 // Maintenance
@@ -312,6 +312,7 @@ require_once dirname(__FILE__).'/users/testFormUserGroups.php';
 require_once dirname(__FILE__).'/users/testFormUserMedia.php';
 require_once dirname(__FILE__).'/users/testFormUserPermissions.php';
 require_once dirname(__FILE__).'/users/testFormUserProfile.php';
+require_once dirname(__FILE__).'/users/testAlarmNotification.php';
 require_once dirname(__FILE__).'/users/testPageUserGroups.php';
 require_once dirname(__FILE__).'/users/testPageUsers.php';
 
@@ -514,8 +515,8 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageMaintenance');
 
 		// Maps.
-		$suite->addTestSuite('testFormMap');
-		$suite->addTestSuite('testFormSysmap');
+		$suite->addTestSuite('testFormMapConstructor');
+		$suite->addTestSuite('testFormMapProperties');
 		$suite->addTestSuite('testPageMaps');
 
 		// Media types.
@@ -647,6 +648,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormUserGroups');
 		$suite->addTestSuite('testFormUserMedia');
 		$suite->addTestSuite('testFormUserPermissions');
+		$suite->addTestSuite('testAlarmNotification');
 		$suite->addTestSuite('testFormUserProfile');
 		$suite->addTestSuite('testPageUserGroups');
 		$suite->addTestSuite('testPageUsers');

@@ -512,7 +512,28 @@ var hintBox = {
 			jQuery(target).data('return-control', jQuery(e.target));
 
 			if (resizeAfterLoad) {
+				const resetSize = () => {
+					for (const css_property of ['width', 'height']) {
+						target.hintBoxItem[0].style[css_property] = null;
+					}
+				};
+
+				resetSize();
+
+				const preloader = document.createElement('div');
+				preloader.id = 'hintbox-preloader';
+				preloader.className = 'is-loading hintbox-preloader';
+
+				target.hintBoxItem[0].append(preloader);
+
+				hintText[0].style.display = 'none';
+
 				hintText.one('load', function(e) {
+					resetSize();
+
+					preloader.remove();
+					hintText[0].style.display = null;
+
 					hintBox.positionElement(e, target, target.hintBoxItem);
 				});
 			}
