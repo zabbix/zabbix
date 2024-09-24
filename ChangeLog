@@ -24,7 +24,7 @@ Bug fixes:
 ...G...PS. [ZBX-25127] fixed crash in JSON library due to null pointer arithmetic (vso)
 A......... [ZBX-24485] fixed undefined index error when importing host with technical name already in use by a template (jfreibergs, vmaksimovs)
 ...G...... [ZBX-24245] fixed Zabbix agent 2 and loadable plugin protocol mismatch error (esneiders)
-........S. [ZBX-22557] fixed time zones conflict leading to report sheduling errors (sboidenko)
+........S. [ZBX-22557] fixed time zones conflict leading to report scheduling errors (sboidenko)
 ..F....... [ZBX-21618] fixed layout for multiple lists when long names are used (esekace)
 ..F....... [ZBX-25026] fixed percentile line being displayed outside of classic graph (Ivo)
 .......PS. [ZBX-22754] fixed 'Too old events' error for vmware.eventlog item (MVekslers)
