@@ -43,6 +43,7 @@
 #include "zbxrtc.h"
 #include "zbxjson.h"
 #include "zbxhttp.h"
+#include "zbxexpr.h"
 #include "zbxlog.h"
 #include "zbxavailability.h"
 #include "zbx_availability_constants.h"
@@ -205,7 +206,7 @@ static int	parse_query_fields(const zbx_dc_item_t *item, char **query_fields, un
 			zbx_substitute_simple_macros(NULL, NULL, NULL,NULL, NULL, &item->host, item, NULL, NULL, NULL,
 					NULL, NULL, &data, ZBX_MACRO_TYPE_HTTP_RAW, NULL, 0);
 		}
-		zbx_http_url_encode(data, &data);
+		zbx_url_encode(data, &data);
 		zbx_strcpy_alloc(&str, &alloc_len, &offset, data);
 		zbx_chrcpy_alloc(&str, &alloc_len, &offset, '=');
 
@@ -216,7 +217,7 @@ static int	parse_query_fields(const zbx_dc_item_t *item, char **query_fields, un
 					NULL, NULL, NULL, NULL, &data, ZBX_MACRO_TYPE_HTTP_RAW, NULL, 0);
 		}
 
-		zbx_http_url_encode(data, &data);
+		zbx_url_encode(data, &data);
 		zbx_strcpy_alloc(&str, &alloc_len, &offset, data);
 
 		free(data);
