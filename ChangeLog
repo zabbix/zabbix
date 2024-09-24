@@ -3004,6 +3004,7 @@ Changes for 6.0.34rc2
 New features:
 
 Bug fixes:
+..F....... [ZBX-21663] fixed timeselector display in problem list on PHP 7.4 (vmurzins)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.34rc1
