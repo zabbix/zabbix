@@ -58,9 +58,9 @@ test case: 6. Empty line
 in:
   value:
     type: ZBX_VARIANT_STR
-    value:
+    value: ""
   value_type: ITEM_VALUE_TYPE_FLOAT
 out:
-  return: Value of type "string" is not suitable for value type "Numeric (float)". Value "~"
+  return: Value of type "string" is not suitable for value type "Numeric (float)". Value ""
   ret: FAIL
 ...
