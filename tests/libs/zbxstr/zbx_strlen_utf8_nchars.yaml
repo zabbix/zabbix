@@ -26,4 +26,25 @@ in:
   size: 0
 out:
   result: 0
+---
+test case: "Newlines"
+in:
+  text: "\n\n\n"
+  size: 3
+out:
+  result: 3
+---
+test case: "Three-Byte Characters"
+in:
+  text: "田中さんにあげて下さい"
+  size: 3
+out:
+  result: 9
+---
+test case: "Emoji"
+in:
+  text: "❤️💔💌💕💞💓💗💖💘💝💟💜💛💚💙"
+  size: 4
+out:
+  result: 14
 ...

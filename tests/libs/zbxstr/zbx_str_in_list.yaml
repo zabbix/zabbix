@@ -46,6 +46,36 @@ in:
   delimiter: '.'
 out:
   return: FAIL
+---
+test case: "Special characters"
+in:
+  list: "Ω.≈.ç√∫˜µ≤≥÷"
+  value: "≈"
+  delimiter: '.'
+out:
+  return: SUCCEED
+---
+test case: "2-bytes characters"
+in:
+  list: "社會科學/院/語學研究所"
+  value: "院"
+  delimiter: '/'
+out:
+  return: SUCCEED
+---
+test case: "Newlines"
+in:
+  list: "\n\n.\n\n.\n\n\n"
+  value: "\n\n"
+  delimiter: '.'
+out:
+  return: SUCCEED
+---
+test case: "Emoji"
+in:
+  list: "❤️ 💔 💌 💕 💞 💓 💗 💖 #💘# 💝 💟 💜 💛 💚 💙"
+  value: "💘"
+  delimiter: '#'
+out:
+  return: SUCCEED
 ...
-
-

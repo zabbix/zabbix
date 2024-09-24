@@ -38,4 +38,28 @@ in:
 out:
   result_left: ""
   result_right: "11111"
+---
+test case: "Special characters"
+in:
+  src: "!@#$%^&*()`~"
+  delimiter: '&'
+out:
+  result_left: "!@#$%^"
+  result_right: "*()`~"
+---
+test case: "Newlines"
+in:
+  src: "Newlines\nNewlines\nNewlines"
+  delimiter: "\n"
+out:
+  result_left: "Newlines\nNewlines"
+  result_right: "Newlines"
+---
+test case: "Emoji and Quotation marks"
+in:
+  src: ❤️"❤️❤️❤️❤️"❤️❤️
+  delimiter: '"'
+out:
+  result_left: ❤️"❤️❤️❤️❤️
+  result_right: ❤️❤️
 ...

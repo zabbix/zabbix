@@ -13,10 +13,31 @@ in:
 out:
   string: "apple.banana.cherry.date"
 ---
-test case: "  a  "
+test case: "One letter"
 in:
   string: "  a  "
   del: 'a'
 out:
   string: "a"
-
+---
+test case: "Emoji"
+in:
+  string: "🆗 / 🆗 / 🆗 / 🆗 / 🆗"
+  del: '/'
+out:
+  string: "🆗/🆗/🆗/🆗/🆗"
+---
+test case: "Two-Byte Characters"
+in:
+  string: "田 . 中 . さ . ん"
+  del: '.'
+out:
+  string: "田.中.さ.ん"
+---
+test case: "Newlines and Tabs"
+in:
+  string: "\n \t \n \t \n \t \n"
+  del: "\t"
+out:
+  string: "\n\t\n\t\n\t\n"
+...

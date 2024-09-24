@@ -40,4 +40,11 @@ in:
   list: "Ω"
 out:
   return: "≈ç√∫˜µ≤≥÷"
+---
+test case: "5. Newlines"
+in:
+  string: "\nNewlines\n"
+  list: "\n"
+out:
+  return: "Newlines"
 ...

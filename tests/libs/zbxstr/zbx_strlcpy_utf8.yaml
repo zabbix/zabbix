@@ -30,3 +30,20 @@ in:
   size: 10
 out:
   result: 0
+---
+test case: "Copy Emoji"
+in:
+  src: "❤️ 💔 💌 💕 💞 💓 💗 💖 💘 💝 💟 💜 💛 💚 💙"
+  dst: "❤️ 💔 💌 💕 💞 💓 💗 💖 💘 💝"
+  size: 40
+out:
+  result: 37
+---
+test case: "Copy Newlines"
+in:
+  src: "\n\n\n\n\n"
+  dst: "\n\n"
+  size: 10
+out:
+  result: 5
+...

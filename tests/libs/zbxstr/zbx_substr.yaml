@@ -30,4 +30,28 @@ in:
   right: 6
 out:
   return: "@#$%^&"
+---
+test case: "Emoji"
+in:
+  string: "❤️💔💌💕💞"
+  left: 6
+  right: 9
+out:
+  return: "💔"
+---
+test case: "Newlines"
+in:
+  string: "Newlines\nNewlines\nNewlines\nNewlines"
+  left: 9
+  right: 17
+out:
+  return: "Newlines\n"
+---
+test case: "Quotation marks"
+in:
+  string: 'sasa"""sasa'
+  left: 4
+  right: 6
+out:
+  return: '"""'
 ...

@@ -43,4 +43,22 @@ in:
   r: 2
 out:
   return: "Greetings, everyone!"
+---
+test case: "Special characters replace"
+in:
+  data: "@@@@@"
+  value: "!"
+  l: 0
+  r: 2
+out:
+  return: "!@@"
+---
+test case: "Emoji replace"
+in:
+  data: ❤️ 💔 💌 💕 💞 💓 💗 💖 💘 💝 💟 💜 💛 💚 💙
+  value: "💌"
+  l: 7
+  r: 10
+out:
+  return: ❤️ 💌 💌 💕 💞 💓 💗 💖 💘 💝 💟 💜 💛 💚 💙
 ...

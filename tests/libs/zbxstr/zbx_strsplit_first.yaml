@@ -38,4 +38,28 @@ in:
 out:
   result_left: "usr|bin"
   result_right: ""
+---
+test case: "Special characters"
+in:
+  src: "!@#$%^&*()`~"
+  delimiter: '&'
+out:
+  result_left: "!@#$%^"
+  result_right: "*()`~"
+---
+test case: "Newlines"
+in:
+  src: "Newlines\nNewlines\nNewlines"
+  delimiter: "\n"
+out:
+  result_left: "Newlines"
+  result_right: "Newlines\nNewlines"
+---
+test case: "Emoji and Quotation marks"
+in:
+  src: ❤️"❤️❤️❤️❤️"❤️❤️
+  delimiter: '"'
+out:
+  result_left: "❤️"
+  result_right: ❤️❤️❤️❤️"❤️❤️
 ...

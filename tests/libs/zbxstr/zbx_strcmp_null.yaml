@@ -26,3 +26,31 @@ in:
   string2: "!@#"
 out:
   val: SUCCEED
+---
+test case: " Newline & Newline "
+in:
+  string1: "\n"
+  string2: "\n"
+out:
+  val: SUCCEED
+---
+test case: " Apostrophe "
+in:
+  string1: "''''''"
+  string2: "''''''"
+out:
+  val: SUCCEED
+---
+test case: " Emoji "
+in:
+  string1: ❤️ 💔 💌 💕 💞 💓 💗 💖 💘 💝 💟 💜 💛 💚 💙
+  string2: ❤️ 💔 💌 💕 💞 💓 💗 💖 💘 💝 💟 💜 💛 💚 💙
+out:
+  val: SUCCEED
+---
+test case: " 2-bytes characters "
+in:
+  string1: "田中さんにあげて下さい"
+  string2: "田中さんにあげて下さい"
+out:
+  val: SUCCEED

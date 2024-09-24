@@ -47,4 +47,18 @@ in:
   charlist: ";"
 out:
   return: 10
+---
+test case: "8. Newlines"
+in:
+  src: "Newlines \n\n"
+  charlist: "\n"
+out:
+  return: 13
+---
+test case: "9. Apostrophe"
+in:
+  src: "'Apostrophe'"
+  charlist: "'"
+out:
+  return: 14
 ...
