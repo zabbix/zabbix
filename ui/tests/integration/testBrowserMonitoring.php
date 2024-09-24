@@ -73,6 +73,7 @@ class testBrowserMonitoring extends CIntegrationTest {
 		return [
 			self::COMPONENT_SERVER => [
 				'LogFileSize' => 0,
+				'DebugLevel' => 4,
 				'WebDriverURL' => PHPUNIT_DRIVER_ADDRESS
 			]
 		];

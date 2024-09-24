@@ -181,7 +181,7 @@ class CAlert extends CApiService {
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			if ($options['eventobject'] == EVENT_OBJECT_TRIGGER) {
 				if (self::$userData['ugsetid'] == 0) {
-					return $options['countOutput'] ? '0' : [];
+					$sql_parts['where'][] = '1=0';
 				}
 
 				$sql_parts['from']['e'] = 'events e';
@@ -213,7 +213,7 @@ class CAlert extends CApiService {
 			}
 			elseif (in_array($options['eventobject'], [EVENT_OBJECT_ITEM, EVENT_OBJECT_LLDRULE])) {
 				if (self::$userData['ugsetid'] == 0) {
-					return $options['countOutput'] ? '0' : [];
+					$sql_parts['where'][] = '1=0';
 				}
 
 				$sql_parts['from']['e'] = 'events e';
@@ -427,6 +427,12 @@ class CAlert extends CApiService {
 	private function addRelatedMediatypes(array $options, array &$result): void {
 		if ($options['selectMediatypes'] === null) {
 			return;
+		}
+
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			$options['selectMediatypes'] = $options['selectMediatypes'] === API_OUTPUT_EXTEND
+				? CMediatype::LIMITED_OUTPUT_FIELDS
+				: array_intersect($options['selectMediatypes'], CMediatype::LIMITED_OUTPUT_FIELDS);
 		}
 
 		$relation_map = $this->createRelationMap($result, 'alertid', 'mediatypeid');

@@ -26,15 +26,20 @@ class DB {
 	const TABLE_TYPE_CONFIG = 1;
 	const TABLE_TYPE_HISTORY = 2;
 
-	const FIELD_TYPE_INT = 'int';
-	const FIELD_TYPE_CHAR = 'char';
-	const FIELD_TYPE_ID = 'id';
-	const FIELD_TYPE_FLOAT = 'float';
-	const FIELD_TYPE_UINT = 'uint';
-	const FIELD_TYPE_BLOB = 'blob';
-	const FIELD_TYPE_TEXT = 'text';
-	const FIELD_TYPE_NCLOB = 'nclob';
-	const FIELD_TYPE_CUID = 'cuid';
+	const FIELD_TYPE_INT = 0x0001;
+	const FIELD_TYPE_CHAR = 0x0002;
+	const FIELD_TYPE_ID = 0x0004;
+	const FIELD_TYPE_FLOAT = 0x0008;
+	const FIELD_TYPE_UINT = 0x0010;
+	const FIELD_TYPE_BLOB = 0x0020;
+	const FIELD_TYPE_TEXT = 0x0040;
+	const FIELD_TYPE_CUID = 0x0080;
+	const FIELD_TYPE_NCLOB = 0x0100;
+
+	const SUPPORTED_FILTER_TYPES = self::FIELD_TYPE_INT | self::FIELD_TYPE_CHAR | self::FIELD_TYPE_ID |
+		self::FIELD_TYPE_FLOAT | self::FIELD_TYPE_UINT | self::FIELD_TYPE_CUID;
+	const SUPPORTED_SEARCH_TYPES = self::FIELD_TYPE_CHAR | self::FIELD_TYPE_TEXT | self::FIELD_TYPE_CUID |
+		self::FIELD_TYPE_NCLOB;
 
 	private static $schema = null;
 
@@ -271,11 +276,11 @@ class DB {
 
 		$schema = self::getSchema($table_name);
 
-		if ($schema['fields'][$field_name]['type'] == self::FIELD_TYPE_TEXT) {
+		if ($schema['fields'][$field_name]['type'] & self::FIELD_TYPE_TEXT) {
 			return ($DB['TYPE'] == ZBX_DB_ORACLE) ? 2048 : 65535;
 		}
 
-		if ($schema['fields'][$field_name]['type'] == self::FIELD_TYPE_NCLOB) {
+		if ($schema['fields'][$field_name]['type'] & self::FIELD_TYPE_NCLOB) {
 			return 65535;
 		}
 
@@ -322,7 +327,7 @@ class DB {
 		$updated_values = [];
 
 		// Discard field names not existing in the target table.
-		$fields = array_intersect_key(DB::getSchema($table_name)['fields'], $new_values);
+		$fields = array_intersect_key(self::getSchema($table_name)['fields'], $new_values);
 
 		foreach ($fields as $name => $spec) {
 			if (!array_key_exists($name, $old_values)) {
@@ -330,26 +335,18 @@ class DB {
 				continue;
 			}
 
-			switch ($spec['type']) {
-				case DB::FIELD_TYPE_ID:
-					if (bccomp($new_values[$name], $old_values[$name]) != 0) {
-						$updated_values[$name] = $new_values[$name];
-					}
-					break;
-
-				case DB::FIELD_TYPE_INT:
-				case DB::FIELD_TYPE_UINT:
-				case DB::FIELD_TYPE_FLOAT:
-					if ($new_values[$name] != $old_values[$name]) {
-						$updated_values[$name] = $new_values[$name];
-					}
-					break;
-
-				default:
-					if ($new_values[$name] !== $old_values[$name]) {
-						$updated_values[$name] = $new_values[$name];
-					}
-					break;
+			if ($spec['type'] & self::FIELD_TYPE_ID) {
+				if (bccomp($new_values[$name], $old_values[$name]) != 0) {
+					$updated_values[$name] = $new_values[$name];
+				}
+			}
+			elseif ($spec['type'] & (self::FIELD_TYPE_INT | self::FIELD_TYPE_UINT | self::FIELD_TYPE_FLOAT)) {
+				if ($new_values[$name] != $old_values[$name]) {
+					$updated_values[$name] = $new_values[$name];
+				}
+			}
+			elseif ($new_values[$name] !== $old_values[$name]) {
+				$updated_values[$name] = $new_values[$name];
 			}
 		}
 
@@ -385,77 +382,68 @@ class DB {
 				}
 			}
 			else {
-				switch ($tableSchema['fields'][$field]['type']) {
-					case self::FIELD_TYPE_CUID:
-					case self::FIELD_TYPE_CHAR:
+				if ($tableSchema['fields'][$field]['type'] & (self::FIELD_TYPE_CUID | self::FIELD_TYPE_CHAR)) {
+					$length = mb_strlen($values[$field]);
+
+					if ($length > $tableSchema['fields'][$field]['length']) {
+						self::exception(self::SCHEMA_ERROR, _s('Value "%1$s" is too long for field "%2$s" - %3$d characters. Allowed length is %4$d characters.',
+							$values[$field], $field, $length, $tableSchema['fields'][$field]['length']));
+					}
+					$values[$field] = zbx_dbstr($values[$field]);
+				}
+				elseif ($tableSchema['fields'][$field]['type'] & (self::FIELD_TYPE_ID | self::FIELD_TYPE_UINT)) {
+					if (!zbx_ctype_digit($values[$field])) {
+						self::exception(self::DBEXECUTE_ERROR, _s('Incorrect value "%1$s" for unsigned int field "%2$s".', $values[$field], $field));
+					}
+					$values[$field] = zbx_dbstr($values[$field]);
+				}
+				elseif ($tableSchema['fields'][$field]['type'] & self::FIELD_TYPE_INT) {
+					if (!zbx_is_int($values[$field])) {
+						self::exception(self::DBEXECUTE_ERROR, _s('Incorrect value "%1$s" for int field "%2$s".', $values[$field], $field));
+					}
+					$values[$field] = zbx_dbstr($values[$field]);
+				}
+				elseif ($tableSchema['fields'][$field]['type'] & self::FIELD_TYPE_FLOAT) {
+					if (!is_numeric($values[$field])) {
+						self::exception(self::DBEXECUTE_ERROR, _s('Incorrect value "%1$s" for float field "%2$s".', $values[$field], $field));
+					}
+					$values[$field] = zbx_dbstr($values[$field]);
+				}
+				elseif ($tableSchema['fields'][$field]['type'] & self::FIELD_TYPE_TEXT) {
+					if ($DB['TYPE'] == ZBX_DB_ORACLE) {
 						$length = mb_strlen($values[$field]);
 
-						if ($length > $tableSchema['fields'][$field]['length']) {
+						if ($length > 2048) {
 							self::exception(self::SCHEMA_ERROR, _s('Value "%1$s" is too long for field "%2$s" - %3$d characters. Allowed length is %4$d characters.',
-								$values[$field], $field, $length, $tableSchema['fields'][$field]['length']));
+								$values[$field], $field, $length, 2048));
 						}
+					}
+					$values[$field] = zbx_dbstr($values[$field]);
+				}
+				elseif ($tableSchema['fields'][$field]['type'] & self::FIELD_TYPE_NCLOB) {
+					// Using strlen because 4000 bytes is largest possible string literal in oracle query.
+					if ($DB['TYPE'] == ZBX_DB_ORACLE && strlen($values[$field]) > ORACLE_MAX_STRING_SIZE) {
+						$chunks = zbx_dbstr(self::chunkMultibyteStr($values[$field], ORACLE_MAX_STRING_SIZE));
+						$values[$field] = 'TO_NCLOB('.implode(') || TO_NCLOB(', $chunks).')';
+					}
+					else {
 						$values[$field] = zbx_dbstr($values[$field]);
-						break;
-
-					case self::FIELD_TYPE_ID:
-					case self::FIELD_TYPE_UINT:
-						if (!zbx_ctype_digit($values[$field])) {
-							self::exception(self::DBEXECUTE_ERROR, _s('Incorrect value "%1$s" for unsigned int field "%2$s".', $values[$field], $field));
-						}
-						$values[$field] = zbx_dbstr($values[$field]);
-						break;
-
-					case self::FIELD_TYPE_INT:
-						if (!zbx_is_int($values[$field])) {
-							self::exception(self::DBEXECUTE_ERROR, _s('Incorrect value "%1$s" for int field "%2$s".', $values[$field], $field));
-						}
-						$values[$field] = zbx_dbstr($values[$field]);
-						break;
-
-					case self::FIELD_TYPE_FLOAT:
-						if (!is_numeric($values[$field])) {
-							self::exception(self::DBEXECUTE_ERROR, _s('Incorrect value "%1$s" for float field "%2$s".', $values[$field], $field));
-						}
-						$values[$field] = zbx_dbstr($values[$field]);
-						break;
-
-					case self::FIELD_TYPE_TEXT:
-						if ($DB['TYPE'] == ZBX_DB_ORACLE) {
-							$length = mb_strlen($values[$field]);
-
-							if ($length > 2048) {
-								self::exception(self::SCHEMA_ERROR, _s('Value "%1$s" is too long for field "%2$s" - %3$d characters. Allowed length is %4$d characters.',
-									$values[$field], $field, $length, 2048));
-							}
-						}
-						$values[$field] = zbx_dbstr($values[$field]);
-						break;
-
-					case self::FIELD_TYPE_NCLOB:
-						// Using strlen because 4000 bytes is largest possible string literal in oracle query.
-						if ($DB['TYPE'] == ZBX_DB_ORACLE && strlen($values[$field]) > ORACLE_MAX_STRING_SIZE) {
-							$chunks = zbx_dbstr(self::chunkMultibyteStr($values[$field], ORACLE_MAX_STRING_SIZE));
-							$values[$field] = 'TO_NCLOB('.implode(') || TO_NCLOB(', $chunks).')';
-						}
-						else {
+					}
+				}
+				elseif ($tableSchema['fields'][$field]['type'] & self::FIELD_TYPE_BLOB) {
+					switch ($DB['TYPE']) {
+						case ZBX_DB_MYSQL:
 							$values[$field] = zbx_dbstr($values[$field]);
-						}
-						break;
+							break;
 
-					case self::FIELD_TYPE_BLOB:
-						switch ($DB['TYPE']) {
-							case ZBX_DB_MYSQL:
-								$values[$field] = zbx_dbstr($values[$field]);
-								break;
+						case ZBX_DB_POSTGRESQL:
+							$values[$field] = "'".pg_escape_bytea($DB['DB'], $values[$field])."'";
+							break;
 
-							case ZBX_DB_POSTGRESQL:
-								$values[$field] = "'".pg_escape_bytea($DB['DB'], $values[$field])."'";
-								break;
-
-							case ZBX_DB_ORACLE:
-								// Do nothing; Check CImage.php to see how to update BLOB data with ORACLE DB.
-								break;
-						}
+						case ZBX_DB_ORACLE:
+							// Do nothing; Check CImage.php to see how to update BLOB data with ORACLE DB.
+							break;
+					}
 				}
 			}
 		}
@@ -555,7 +543,7 @@ class DB {
 		switch ($DB['TYPE']) {
 			case ZBX_DB_MYSQL:
 				foreach ($table_schema['fields'] as $name => $field) {
-					if ($field['type'] == self::FIELD_TYPE_TEXT || $field['type'] == self::FIELD_TYPE_NCLOB) {
+					if ($field['type'] & self::FIELD_TYPE_TEXT || $field['type'] & self::FIELD_TYPE_NCLOB) {
 						$mandatory_fields += [$name => $field['default']];
 					}
 				}
@@ -563,7 +551,7 @@ class DB {
 
 			case ZBX_DB_ORACLE:
 				foreach ($table_schema['fields'] as $name => $field) {
-					if ($field['type'] == self::FIELD_TYPE_BLOB) {
+					if ($field['type'] & self::FIELD_TYPE_BLOB) {
 						$mandatory_fields += [$name => 'EMPTY_BLOB()'];
 					}
 				}
@@ -584,23 +572,20 @@ class DB {
 		$table_schema = self::getSchema($table);
 		$resultids = [];
 
-		if ($table_schema['fields'][$table_schema['key']]['type'] === DB::FIELD_TYPE_ID) {
+		if ($table_schema['fields'][$table_schema['key']]['type'] & self::FIELD_TYPE_ID) {
 			$id = self::reserveIds($table, count($values));
 		}
 
 		foreach ($values as $key => &$row) {
-			switch ($table_schema['fields'][$table_schema['key']]['type']) {
-				case DB::FIELD_TYPE_ID:
-					$resultids[$key] = $id;
-					$row = [$table_schema['key'] => $id] + $row;
-					$id = bcadd($id, 1, 0);
-					break;
-
-				case DB::FIELD_TYPE_CUID:
-					$id = CCuid::generate();
-					$resultids[$key] = $id;
-					$row = [$table_schema['key'] => $id] + $row;
-					break;
+			if ($table_schema['fields'][$table_schema['key']]['type'] & self::FIELD_TYPE_ID) {
+				$resultids[$key] = $id;
+				$row = [$table_schema['key'] => $id] + $row;
+				$id = bcadd($id, 1, 0);
+			}
+			elseif ($table_schema['fields'][$table_schema['key']]['type'] & self::FIELD_TYPE_CUID) {
+				$id = CCuid::generate();
+				$resultids[$key] = $id;
+				$row = [$table_schema['key'] => $id] + $row;
 			}
 		}
 		unset($row);
@@ -804,7 +789,7 @@ class DB {
 
 		// delete remaining records
 		if ($oldRecords) {
-			DB::delete($tableName, [
+			self::delete($tableName, [
 				$pk => array_keys($oldRecords)
 			]);
 		}
@@ -1102,18 +1087,14 @@ class DB {
 			$field_schema = $table_schema['fields'][$pk];
 			$field_name = self::fieldId($pk, $table_alias);
 
-			switch ($field_schema['type']) {
-				case self::FIELD_TYPE_ID:
-					$sql_parts['where'][] = dbConditionId($field_name, $options[$pk_option]);
-					break;
-
-				case self::FIELD_TYPE_INT:
-				case self::FIELD_TYPE_UINT:
-					$sql_parts['where'][] = dbConditionInt($field_name, $options[$pk_option]);
-					break;
-
-				default:
-					$sql_parts['where'][] = dbConditionString($field_name, $options[$pk_option]);
+			if ($field_schema['type'] & self::FIELD_TYPE_ID) {
+				$sql_parts['where'][] = dbConditionId($field_name, $options[$pk_option]);
+			}
+			elseif ($field_schema['type'] & (self::FIELD_TYPE_INT | self::FIELD_TYPE_UINT)) {
+				$sql_parts['where'][] = dbConditionInt($field_name, $options[$pk_option]);
+			}
+			else {
+				$sql_parts['where'][] = dbConditionString($field_name, $options[$pk_option]);
 			}
 		}
 
@@ -1143,10 +1124,7 @@ class DB {
 	private static function applyQuerySearchOptions($table_name, array $options, $table_alias, array $sql_parts) {
 		global $DB;
 
-		$table_schema = DB::getSchema($table_name);
-		$unsupported_types = [self::FIELD_TYPE_INT, self::FIELD_TYPE_ID, self::FIELD_TYPE_FLOAT, self::FIELD_TYPE_UINT,
-			self::FIELD_TYPE_BLOB
-		];
+		$table_schema = self::getSchema($table_name);
 
 		$start = $options['startSearch'] ? '' : '%';
 		$glue = $options['searchByAny'] ? ' OR ' : ' AND ';
@@ -1162,7 +1140,7 @@ class DB {
 
 			$field_schema = $table_schema['fields'][$field_name];
 
-			if (in_array($field_schema['type'], $unsupported_types)) {
+			if (($field_schema['type'] & self::SUPPORTED_SEARCH_TYPES) == 0) {
 				self::exception(self::SCHEMA_ERROR,
 					vsprintf('%s: field "%s.%s" has an unsupported type.', [__FUNCTION__, $table_name, $field_name])
 				);
@@ -1177,9 +1155,9 @@ class DB {
 				$pattern = mb_strtoupper(strtr($pattern, ['!' => '!!', '%' => '!%', '_' => '!_']));
 				$pattern = $start.$pattern.'%';
 
-				if ($DB['TYPE'] == ZBX_DB_ORACLE && $field_schema['type'] === DB::FIELD_TYPE_NCLOB
+				if ($DB['TYPE'] == ZBX_DB_ORACLE && $field_schema['type'] & self::FIELD_TYPE_NCLOB
 						&& strlen($pattern) > ORACLE_MAX_STRING_SIZE) {
-					$chunks = zbx_dbstr(DB::chunkMultibyteStr($pattern, ORACLE_MAX_STRING_SIZE));
+					$chunks = zbx_dbstr(self::chunkMultibyteStr($pattern, ORACLE_MAX_STRING_SIZE));
 					$pattern = 'TO_NCLOB('.implode(') || TO_NCLOB(', $chunks).')';
 				}
 				else {
@@ -1224,7 +1202,7 @@ class DB {
 
 			$field_schema = $table_schema['fields'][$field_name];
 
-			if ($field_schema['type'] == self::FIELD_TYPE_TEXT || $field_schema['type'] == self::FIELD_TYPE_NCLOB) {
+			if (($field_schema['type'] & self::SUPPORTED_FILTER_TYPES) == 0) {
 				self::exception(self::SCHEMA_ERROR,
 					vsprintf('%s: field "%s.%s" has an unsupported type.', [__FUNCTION__, $table_name, $field_name])
 				);
@@ -1238,18 +1216,14 @@ class DB {
 				$value = [$value];
 			}
 
-			switch ($field_schema['type']) {
-				case self::FIELD_TYPE_ID:
-					$filter[] = dbConditionId(self::fieldId($field_name, $table_alias), $value);
-					break;
-
-				case self::FIELD_TYPE_INT:
-				case self::FIELD_TYPE_UINT:
-					$filter[] = dbConditionInt(self::fieldId($field_name, $table_alias), $value);
-					break;
-
-				default:
-					$filter[] = dbConditionString(self::fieldId($field_name, $table_alias), $value);
+			if ($field_schema['type'] & self::FIELD_TYPE_ID) {
+				$filter[] = dbConditionId(self::fieldId($field_name, $table_alias), $value);
+			}
+			elseif ($field_schema['type'] & (self::FIELD_TYPE_INT | self::FIELD_TYPE_UINT)) {
+				$filter[] = dbConditionInt(self::fieldId($field_name, $table_alias), $value);
+			}
+			else {
+				$filter[] = dbConditionString(self::fieldId($field_name, $table_alias), $value);
 			}
 		}
 
