@@ -34,4 +34,31 @@ in:
 out:
   return: SUCCEED
   result: ""
+---
+test case: 4. Common string with newline
+in:
+  src: "abc\nd"
+  charlist: 'b'
+  len: 10
+out:
+  return: SUCCEED
+  result: "a\\bc\nd"
+---
+test case: 5. Common string with escapings
+in:
+  src: abc\d
+  charlist: 'b'
+  len: 10
+out:
+  return: SUCCEED
+  result: a\bc\d
+---
+test case: 5. Common string with quotation marks
+in:
+  src: a"b"cd
+  charlist: 'b'
+  len: 10
+out:
+  return: SUCCEED
+  result: a"\b"cd
 ...
