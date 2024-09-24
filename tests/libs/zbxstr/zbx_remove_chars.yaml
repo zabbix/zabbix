@@ -40,4 +40,11 @@ in:
   list: "Ω"
 out:
   return: "≈ç√∫˜µ≤≥÷"
+---
+test case: "TEST"
+in:
+  string:
+  list: "Ω"
+out:
+  return: "≈ç√∫˜µ≤≥÷"
 ...
