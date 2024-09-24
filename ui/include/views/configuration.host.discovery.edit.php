@@ -123,7 +123,7 @@ $parameters_table = (new CTable())
 	->setHeader([
 		(new CColHeader(_('Name')))->setWidth('50%'),
 		(new CColHeader(_('Value')))->setWidth('50%'),
-		_('Action')
+		''
 	])
 	->setAttribute('style', 'width: 100%;');
 
@@ -633,7 +633,7 @@ $item_tab
 // Append delay_flex to form list.
 $delayFlexTable = (new CTable())
 	->setId('delayFlexTable')
-	->setHeader([_('Type'), _('Interval'), _('Period'), _('Action')])
+	->setHeader([_('Type'), _('Interval'), _('Period'), ''])
 	->setAttribute('style', 'width: 100%;');
 
 foreach ($data['delay_flex'] as $i => $delay_flex) {
@@ -817,7 +817,7 @@ $condition_tab->addItem([
 $condition_table = (new CTable())
 	->setId('conditions')
 	->addStyle('width: 100%;')
-	->setHeader([_('Label'), _('Macro'), '', _('Regular expression'), _('Action')]);
+	->setHeader([_('Label'), _('Macro'), '', _('Regular expression'), '']);
 
 $operators = CSelect::createOptionsFromArray([
 	CONDITION_OPERATOR_REGEXP => _('matches'),

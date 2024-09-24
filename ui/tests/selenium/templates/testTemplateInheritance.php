@@ -175,7 +175,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 		$table = $form->query('id:linked-templates')->asTable()->one()->waitUntilVisible();
 		$table->findRow('Name', $template)
-				->getColumn('Action')->query('button:Unlink and clear')->one()->click();
+				->getColumn('Actions')->query('button:Unlink and clear')->one()->click();
 		$this->assertFalse($table->findRow('Name', $template)->isValid());
 		$form->submit();
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host updated');
