@@ -2628,9 +2628,7 @@ class CMacrosResolverGeneral {
 							}
 							elseif ($data['context'] !== null && count($global_macros[$data['macro']]['regex'])) {
 								foreach ($global_macros[$data['macro']]['regex'] as $regex => $val) {
-									$formatted_regex = self::handleSlashEscaping($regex);
-
-									if (preg_match('/'.$formatted_regex.'/', $data['context'])) {
+									if (preg_match('/'.self::handleSlashEscaping($regex).'/', $data['context'])) {
 										$data['value']['value'] = $val;
 										break;
 									}
@@ -2717,9 +2715,7 @@ class CMacrosResolverGeneral {
 				// Searching context coincidence, if regex array not empty.
 				elseif ($context !== null && count($host_macros[$hostid][$macro]['regex'])) {
 					foreach ($host_macros[$hostid][$macro]['regex'] as $regex => $val) {
-						$formatted_regex = self::handleSlashEscaping($regex);
-
-						if (preg_match('/'.$formatted_regex.'/', $context) === 1) {
+						if (preg_match('/'.self::handleSlashEscaping($regex).'/', $context) === 1) {
 							return [
 								'value' => $val,
 								'value_default' => $value_default
