@@ -3,8 +3,6 @@ test case: "user@example.com - @"
 in:
   src: "user@example.com"
   delimiter: '@'
-  left: NULL
-  right: NULL
 out:
   result_left: "user"
   result_right: "example.com"
@@ -13,8 +11,6 @@ test case: "usr/test/smth - /"
 in:
   src: "usr/test/smth"
   delimiter: '/'
-  left: NULL
-  right: NULL
 out:
   result_left: "usr"
   result_right: "test/smth"
@@ -23,8 +19,6 @@ test case: "00000/////0000 - /"
 in:
   src: "00000/////0000"
   delimiter: '/'
-  left: NULL
-  right: NULL
 out:
   result_left: "00000"
   result_right: "////0000"
@@ -33,8 +27,6 @@ test case: "/usr/bin - /"
 in:
   src: "/usr/bin"
   delimiter: '/'
-  left: NULL
-  right: NULL
 out:
   result_left: ""
   result_right: "usr/bin"
@@ -43,8 +35,6 @@ test case: "usr|bin/ - /"
 in:
   src: "usr|bin/"
   delimiter: '/'
-  left: NULL
-  right: NULL
 out:
   result_left: "usr|bin"
   result_right: ""

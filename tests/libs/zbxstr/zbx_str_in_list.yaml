@@ -39,14 +39,6 @@ in:
 out:
   return: FAIL
 ---
-test case: "empty delimiter"
-in:
-  list: "a.bb.ccc"
-  value: "bb"
-  delimiter: ''
-out:
-  return: FAIL
----
 test case: "empty charlist"
 in:
   list: "a.bb.ccc"

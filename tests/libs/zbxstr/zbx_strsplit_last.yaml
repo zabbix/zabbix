@@ -3,8 +3,6 @@ test case: "/path/to/file.txt - /"
 in:
   src: "/path/to/file.txt"
   delimiter: '/'
-  left: NULL
-  right: NULL
 out:
   result_left: "/path/to"
   result_right: "file.txt"
@@ -13,8 +11,6 @@ test case: "1111!1111!11- !"
 in:
   src: "1111!1111!11"
   delimiter: '!'
-  left: NULL
-  right: NULL
 out:
   result_left: "1111!1111"
   result_right: "11"
@@ -23,8 +19,6 @@ test case: "00000/////0000 - /"
 in:
   src: "00000/////0000"
   delimiter: '/'
-  left: NULL
-  right: NULL
 out:
   result_left: "00000////"
   result_right: "0000"
@@ -33,8 +27,6 @@ test case: "00000///// - /"
 in:
   src: "00000/////"
   delimiter: '/'
-  left: NULL
-  right: NULL
 out:
   result_left: "00000////"
   result_right: ""
@@ -43,9 +35,7 @@ test case: "!11111"
 in:
   src: "!11111"
   delimiter: '!'
-  left: NULL
-  right: NULL
 out:
   result_left: ""
   result_right: "11111"
-
+...
