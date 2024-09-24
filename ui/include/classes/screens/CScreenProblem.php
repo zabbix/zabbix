@@ -1834,7 +1834,7 @@ class CScreenProblem extends CScreenBase {
 
 		if ($html) {
 			$hint_container = (new CDiv())
-				->addClass('hintbox-wrap-vertical')
+				->addClass(ZBX_STYLE_HINTBOX_WRAP)
 				->addItem($hint_table);
 
 			array_pop($latest_values);
