@@ -54,3 +54,4 @@ in:
   string2: "田中さんにあげて下さい"
 out:
   val: SUCCEED
+...
