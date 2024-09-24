@@ -215,7 +215,7 @@ zabbix_export:
           triggers:
             - uuid: 741e1271a7454b9ab0214ae39b04f9cb
               expression: 'length(last(/Nutanix Cluster Prism Element by HTTP/nutanix.cluster.alert.get.check))>0'
-              name: 'Failed to get alert data from API'
+              name: 'Nutanix Cluster: Failed to get alert data from API'
               priority: HIGH
               description: 'Failed to get data from API. Check the debug log for more information.'
               tags:
@@ -266,7 +266,6 @@ zabbix_export:
           type: DEPENDENT
           key: nutanix.cluster.content.cache.dedup.ref.num
           delay: '0'
-          units: '!pph'
           description: 'Average number of content cache references.'
           preprocessing:
             - type: JSONPATH
@@ -282,7 +281,7 @@ zabbix_export:
             - tag: component
               value: application
         - uuid: e1696a8e6028406e8e9005ebc295a4fa
-          name: 'Content Cache: Hit Rate, %'
+          name: 'Content Cache: Hit rate, %'
           type: DEPENDENT
           key: nutanix.cluster.content.cache.hit.percent
           delay: '0'
@@ -352,7 +351,7 @@ zabbix_export:
         - uuid: 91b14b7aec844e38805b003b89059304
           name: 'Content Cache: Number of lookups'
           type: DEPENDENT
-          key: nutanix.cluster.content.cache.num.lookups
+          key: nutanix.cluster.content.cache.lookups.num
           delay: '0'
           description: 'Number of lookups on the content cache.'
           preprocessing:
@@ -459,7 +458,7 @@ zabbix_export:
         - uuid: c107dffc846940f2b32e1d7d01a22cb6
           name: 'Controller: Random IO'
           type: DEPENDENT
-          key: nutanix.cluster.controller.random_io.num
+          key: nutanix.cluster.controller.io.random
           delay: '0'
           description: 'The controller number of random Input/Output operations.'
           preprocessing:
@@ -478,11 +477,11 @@ zabbix_export:
         - uuid: eea230e867044336a10f8308f05b5c32
           name: 'Controller: Random IO, %'
           type: DEPENDENT
-          key: nutanix.cluster.controller.random_io.percent
+          key: nutanix.cluster.controller.io.random.percent
           delay: '0'
           value_type: FLOAT
           units: '%'
-          description: 'The controller number of random Input/Output PPM.'
+          description: 'The controller percent of random Input/Output.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -502,7 +501,7 @@ zabbix_export:
         - uuid: ef919d4e2bff4cbc94bd59be2cfb50f4
           name: 'Controller: Sequence IO'
           type: DEPENDENT
-          key: nutanix.cluster.controller.seq_io.num
+          key: nutanix.cluster.controller.io.sequence
           delay: '0'
           description: 'The controller number of sequential Input/Output operations.'
           preprocessing:
@@ -521,11 +520,11 @@ zabbix_export:
         - uuid: 058564b6e59f470c9ef74a9d6b68d8d9
           name: 'Controller: Sequence IO, %'
           type: DEPENDENT
-          key: nutanix.cluster.controller.seq_io.percent
+          key: nutanix.cluster.controller.io.sequence.percent
           delay: '0'
           value_type: FLOAT
           units: '%'
-          description: 'The controller number of sequential I/O PPM.'
+          description: 'The controller percent of sequential Input/Output.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -542,123 +541,6 @@ zabbix_export:
           tags:
             - tag: component
               value: application
-        - uuid: 1d4367a1f30a46818871cd4a105c73dc
-          name: 'Storage Controller: Timespan'
-          type: DEPENDENT
-          key: nutanix.cluster.controller.timespan
-          delay: '0'
-          value_type: FLOAT
-          units: s
-          description: 'The controller Timespan.'
-          preprocessing:
-            - type: JSONPATH
-              parameters:
-                - $.stats.controller_timespan_usecs
-              error_handler: DISCARD_VALUE
-            - type: MULTIPLIER
-              parameters:
-                - '1.0E-6'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
-          master_item:
-            key: nutanix.cluster.metric.get
-          tags:
-            - tag: component
-              value: storage
-        - uuid: cb3d76f22bec49959d17f827e1fda1b5
-          name: 'Storage Controller: IO total, bytes'
-          type: DEPENDENT
-          key: nutanix.cluster.controller.total.io.bytes
-          delay: '0'
-          units: B
-          description: 'The controller total Input/Output size.'
-          preprocessing:
-            - type: JSONPATH
-              parameters:
-                - $.stats.controller_total_io_size_kbytes
-              error_handler: DISCARD_VALUE
-            - type: MULTIPLIER
-              parameters:
-                - '1024'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
-          master_item:
-            key: nutanix.cluster.metric.get
-          tags:
-            - tag: component
-              value: storage
-        - uuid: a5716932dcc3468f812c77b28f29bf01
-          name: 'Storage Controller: IO total, sec'
-          type: DEPENDENT
-          key: nutanix.cluster.controller.total.io.time
-          delay: '0'
-          units: s
-          description: 'The controller total Input/Output time.'
-          preprocessing:
-            - type: JSONPATH
-              parameters:
-                - $.stats.controller_total_io_time_usecs
-              error_handler: DISCARD_VALUE
-            - type: MULTIPLIER
-              parameters:
-                - '1.0E-6'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
-          master_item:
-            key: nutanix.cluster.metric.get
-          tags:
-            - tag: component
-              value: storage
-        - uuid: dc7f96ef1c814eb6900bd0bb41405c4f
-          name: 'Storage Controller: IO total read, bytes'
-          type: DEPENDENT
-          key: nutanix.cluster.controller.total.read.io.bytes
-          delay: '0'
-          units: B
-          description: 'The controller total read Input/Output size.'
-          preprocessing:
-            - type: JSONPATH
-              parameters:
-                - $.stats.controller_total_read_io_size_kbytes
-              error_handler: DISCARD_VALUE
-            - type: MULTIPLIER
-              parameters:
-                - '1024'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
-          master_item:
-            key: nutanix.cluster.metric.get
-          tags:
-            - tag: component
-              value: storage
-        - uuid: 9084bbeefa514342bc6550b20145ae87
-          name: 'Storage Controller: IO total read, sec'
-          type: DEPENDENT
-          key: nutanix.cluster.controller.total.read.io.time
-          delay: '0'
-          value_type: FLOAT
-          units: s
-          description: 'The controller total read Input/Output time.'
-          preprocessing:
-            - type: JSONPATH
-              parameters:
-                - $.stats.controller_total_read_io_time_usecs
-              error_handler: DISCARD_VALUE
-            - type: MULTIPLIER
-              parameters:
-                - '1.0E-6'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
-          master_item:
-            key: nutanix.cluster.metric.get
-          tags:
-            - tag: component
-              value: storage
         - uuid: f9a5a272fad04acb8d5fc1d806e01d60
           name: 'General: IO'
           type: DEPENDENT
@@ -679,12 +561,12 @@ zabbix_export:
             - tag: component
               value: application
         - uuid: 642236ff71de4ead98e8f738e8524694
-          name: 'General: IO, Bandwidth'
+          name: 'General: IO, bandwidth'
           type: DEPENDENT
           key: nutanix.cluster.general.io.bandwidth
           delay: '0'
           units: Bps
-          description: 'Data transferred per second in B/second from disk.'
+          description: 'Data transferred in B/sec from disk.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -708,7 +590,7 @@ zabbix_export:
           delay: '0'
           value_type: FLOAT
           units: s
-          description: 'Input/Output latency in milliseconds from disk.'
+          description: 'Input/Output latency from disk.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -725,14 +607,33 @@ zabbix_export:
           tags:
             - tag: component
               value: application
+        - uuid: ee2c4b096f0f4ac1b60b6441094fe076
+          name: 'General: Random IO'
+          type: DEPENDENT
+          key: nutanix.cluster.general.io.random
+          delay: '0'
+          description: 'The number of random Input/Output.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.stats.num_random_io
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: nutanix.cluster.metric.get
+          tags:
+            - tag: component
+              value: application
         - uuid: c03b24dc56ae4c23a82578479ae2eb6d
           name: 'General: Random IO, %'
           type: DEPENDENT
-          key: nutanix.cluster.general.io.percent
+          key: nutanix.cluster.general.io.random.percent
           delay: '0'
           value_type: FLOAT
           units: '%'
-          description: 'The number of random Input/Output PPM.'
+          description: 'The percent of random Input/Output.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -774,7 +675,7 @@ zabbix_export:
           key: nutanix.cluster.general.io.read.bandwidth
           delay: '0'
           units: Bps
-          description: 'Read data transferred per second in B/second from disk.'
+          description: 'Read data transferred in B/sec from disk.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -798,7 +699,7 @@ zabbix_export:
           delay: '0'
           value_type: FLOAT
           units: s
-          description: 'Average I/O read latency.'
+          description: 'Average Input/Output read latency.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -839,30 +740,6 @@ zabbix_export:
           tags:
             - tag: component
               value: application
-        - uuid: 30a67ff848484e4e9552a1bcd66c1f68
-          name: 'General: IO total read, sec'
-          type: DEPENDENT
-          key: nutanix.cluster.general.io.read.total
-          delay: '0'
-          value_type: FLOAT
-          units: s
-          description: 'The total read Input/Output operations time.'
-          preprocessing:
-            - type: JSONPATH
-              parameters:
-                - $.stats.total_read_io_time_usecs
-              error_handler: DISCARD_VALUE
-            - type: MULTIPLIER
-              parameters:
-                - '1.0E-6'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
-          master_item:
-            key: nutanix.cluster.metric.get
-          tags:
-            - tag: component
-              value: application
         - uuid: ba49928014e64b8d8f90dbc76c2b6b57
           name: 'General: IO total read, bytes'
           type: DEPENDENT
@@ -886,22 +763,65 @@ zabbix_export:
           tags:
             - tag: component
               value: application
-        - uuid: 108356c5fd5c49c79840b7a6d9de8659
-          name: 'General: IO total, sec'
+        - uuid: 30a67ff848484e4e9552a1bcd66c1f68
+          name: 'General: IO total read, sec'
           type: DEPENDENT
-          key: nutanix.cluster.general.io.total
+          key: nutanix.cluster.general.io.read.total.sec
           delay: '0'
           value_type: FLOAT
           units: s
-          description: 'The total Input/Output operations time.'
+          description: 'The total read Input/Output operations time.'
           preprocessing:
             - type: JSONPATH
               parameters:
-                - $.stats.total_io_time_usecs
+                - $.stats.total_read_io_time_usecs
               error_handler: DISCARD_VALUE
             - type: MULTIPLIER
               parameters:
                 - '1.0E-6'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: nutanix.cluster.metric.get
+          tags:
+            - tag: component
+              value: application
+        - uuid: 9ce271586ac249d2b2fa27fa9b3e3878
+          name: 'General: Sequence IO'
+          type: DEPENDENT
+          key: nutanix.cluster.general.io.sequence
+          delay: '0'
+          description: 'The number of sequential Input/Output operations.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.stats.num_seq_io
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: nutanix.cluster.metric.get
+          tags:
+            - tag: component
+              value: application
+        - uuid: 97990e2fb53b464cadc13d0038f21199
+          name: 'General: Sequence IO, %'
+          type: DEPENDENT
+          key: nutanix.cluster.general.io.sequence.percent
+          delay: '0'
+          value_type: FLOAT
+          units: '%'
+          description: 'The percent of sequential Input/Output.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.stats.seq_io_ppm
+              error_handler: DISCARD_VALUE
+            - type: MULTIPLIER
+              parameters:
+                - '0.0001'
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
@@ -925,6 +845,30 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1024'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: nutanix.cluster.metric.get
+          tags:
+            - tag: component
+              value: application
+        - uuid: 108356c5fd5c49c79840b7a6d9de8659
+          name: 'General: IO total, sec'
+          type: DEPENDENT
+          key: nutanix.cluster.general.io.total.sec
+          delay: '0'
+          value_type: FLOAT
+          units: s
+          description: 'The total Input/Output operations time.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.stats.total_io_time_usecs
+              error_handler: DISCARD_VALUE
+            - type: MULTIPLIER
+              parameters:
+                - '1.0E-6'
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
@@ -958,7 +902,7 @@ zabbix_export:
           key: nutanix.cluster.general.io.write.bandwidth
           delay: '0'
           units: Bps
-          description: 'Write data transferred per second in B/second from disk.'
+          description: 'Write data transferred in B/sec from disk.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1084,72 +1028,10 @@ zabbix_export:
           tags:
             - tag: component
               value: application
-        - uuid: ee2c4b096f0f4ac1b60b6441094fe076
-          name: 'General: Random IO'
-          type: DEPENDENT
-          key: nutanix.cluster.general.random.io.num
-          delay: '0'
-          description: 'The number of random Input/Output.'
-          preprocessing:
-            - type: JSONPATH
-              parameters:
-                - $.stats.num_random_io
-              error_handler: DISCARD_VALUE
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
-          master_item:
-            key: nutanix.cluster.metric.get
-          tags:
-            - tag: component
-              value: application
-        - uuid: 9ce271586ac249d2b2fa27fa9b3e3878
-          name: 'General: Sequence IO'
-          type: DEPENDENT
-          key: nutanix.cluster.general.sequence.io
-          delay: '0'
-          description: 'The number of sequential Input/Output operations.'
-          preprocessing:
-            - type: JSONPATH
-              parameters:
-                - $.stats.num_seq_io
-              error_handler: DISCARD_VALUE
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
-          master_item:
-            key: nutanix.cluster.metric.get
-          tags:
-            - tag: component
-              value: application
-        - uuid: 97990e2fb53b464cadc13d0038f21199
-          name: 'General: Sequence IO, %'
-          type: DEPENDENT
-          key: nutanix.cluster.general.sequence.io.percent
-          delay: '0'
-          value_type: FLOAT
-          units: '%'
-          description: 'The number of sequential Input/Output PPM.'
-          preprocessing:
-            - type: JSONPATH
-              parameters:
-                - $.stats.seq_io_ppm
-              error_handler: DISCARD_VALUE
-            - type: MULTIPLIER
-              parameters:
-                - '0.0001'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
-          master_item:
-            key: nutanix.cluster.metric.get
-          tags:
-            - tag: component
-              value: application
         - uuid: f9433014206a42d3aecf207448f6dee0
-          name: 'General: Storage Capacity, bytes'
+          name: 'General: Storage capacity, bytes'
           type: DEPENDENT
-          key: nutanix.cluster.general.storage.capacity
+          key: nutanix.cluster.general.storage.capacity.bytes
           delay: '0'
           units: B
           description: 'Total size of the datastores used by this system in bytes.'
@@ -1166,9 +1048,9 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 702544e35ca1490cb401d7730df044fd
-          name: 'General: Storage Free, bytes'
+          name: 'General: Storage free, bytes'
           type: DEPENDENT
-          key: nutanix.cluster.general.storage.free
+          key: nutanix.cluster.general.storage.free.bytes
           delay: '0'
           units: B
           description: 'Total free space of all the datastores used by this system in bytes.'
@@ -1187,7 +1069,7 @@ zabbix_export:
         - uuid: 87a495b3a7e246e187d034166ec9e19d
           name: 'General: Storage logical usage, bytes'
           type: DEPENDENT
-          key: nutanix.cluster.general.storage.logical.usage
+          key: nutanix.cluster.general.storage.logical.usage.bytes
           delay: '0'
           units: B
           description: 'Total logical used space of the datastores by this system in bytes.'
@@ -1206,7 +1088,7 @@ zabbix_export:
         - uuid: 02809b0e347d49eeb1f8a8deac32af86
           name: 'General: Storage usage, bytes'
           type: DEPENDENT
-          key: nutanix.cluster.general.storage.usage
+          key: nutanix.cluster.general.storage.usage.bytes
           delay: '0'
           units: B
           description: 'Total physical datastore space used by this host and all its snapshots on the datastores.'
@@ -1223,9 +1105,9 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 4df3faff926b4d92bffd46949e6443bf
-          name: 'General: Timespan'
+          name: 'General: Timespan, sec'
           type: DEPENDENT
-          key: nutanix.cluster.general.timespan
+          key: nutanix.cluster.general.timespan.sec
           delay: '0'
           value_type: FLOAT
           units: s
@@ -1247,9 +1129,9 @@ zabbix_export:
             - tag: component
               value: application
         - uuid: 9b9d93d4a09c45d2bd61a530f5e35fe9
-          name: 'General: Total transformed usage'
+          name: 'General: Total transformed usage, bytes'
           type: DEPENDENT
-          key: nutanix.cluster.general.transformed.usage
+          key: nutanix.cluster.general.transformed.usage.total.bytes
           delay: '0'
           units: B
           description: 'Actual usage of storage.'
@@ -1267,9 +1149,9 @@ zabbix_export:
             - tag: component
               value: application
         - uuid: 1d7c83bbf00149b2a37c1f983d44f403
-          name: 'General: Total untransformed usage'
+          name: 'General: Total untransformed usage, bytes'
           type: DEPENDENT
-          key: nutanix.cluster.general.untransformed.usage
+          key: nutanix.cluster.general.untransformed.usage.total.bytes
           delay: '0'
           units: B
           description: 'Logical usage of storage (physical usage divided by replication factor).'
@@ -1334,7 +1216,7 @@ zabbix_export:
             - tag: component
               value: application
         - uuid: 4f03001a7caa42d29cc2213137fbbb16
-          name: 'Hypervisor: CPU Usage, %'
+          name: 'Hypervisor: CPU usage, %'
           type: DEPENDENT
           key: nutanix.cluster.hypervisor.cpu.usage.percent
           delay: '0'
@@ -1357,21 +1239,18 @@ zabbix_export:
           tags:
             - tag: component
               value: cpu
-        - uuid: 1f56c2405992402e8897cde88f36284e
-          name: 'Hypervisor: IO, bandwidth'
+        - uuid: a5338864811a4e5795ead521cbcf875e
+          name: 'Hypervisor: IO'
           type: DEPENDENT
-          key: nutanix.cluster.hypervisor.io.bandwidth
+          key: nutanix.cluster.hypervisor.io
           delay: '0'
-          units: Bps
-          description: 'Data transferred per second in B/second from Hypervisor.'
+          value_type: FLOAT
+          description: 'The number of the Input/Output operations from Hypervisor.'
           preprocessing:
             - type: JSONPATH
               parameters:
-                - $.stats.hypervisor_io_bandwidth_kBps
+                - $.stats.hypervisor_num_io
               error_handler: DISCARD_VALUE
-            - type: MULTIPLIER
-              parameters:
-                - '1024'
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
@@ -1380,17 +1259,17 @@ zabbix_export:
           tags:
             - tag: component
               value: application
-        - uuid: 91517ef954de4a0892bac9091b0ac09a
-          name: 'Hypervisor: IO total, bytes'
+        - uuid: 1f56c2405992402e8897cde88f36284e
+          name: 'Hypervisor: IO, bandwidth'
           type: DEPENDENT
-          key: nutanix.cluster.hypervisor.io.bytes
+          key: nutanix.cluster.hypervisor.io.bandwidth
           delay: '0'
-          units: B
-          description: 'The total Input/Output operations size from Hypervisor.'
+          units: Bps
+          description: 'Data transferred in B/sec from Hypervisor.'
           preprocessing:
             - type: JSONPATH
               parameters:
-                - $.stats.hypervisor_total_io_size_kbytes
+                - $.stats.hypervisor_io_bandwidth_kBps
               error_handler: DISCARD_VALUE
             - type: MULTIPLIER
               parameters:
@@ -1427,26 +1306,6 @@ zabbix_export:
           tags:
             - tag: component
               value: application
-        - uuid: a5338864811a4e5795ead521cbcf875e
-          name: 'Hypervisor: IO'
-          type: DEPENDENT
-          key: nutanix.cluster.hypervisor.io.num
-          delay: '0'
-          value_type: FLOAT
-          description: 'The number of the Input/Output operations from Hypervisor.'
-          preprocessing:
-            - type: JSONPATH
-              parameters:
-                - $.stats.hypervisor_num_io
-              error_handler: DISCARD_VALUE
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
-          master_item:
-            key: nutanix.cluster.metric.get
-          tags:
-            - tag: component
-              value: application
         - uuid: 58fe88d634a045f0ba0259ea2e55e757
           name: 'Hypervisor: Read IO'
           type: DEPENDENT
@@ -1472,7 +1331,7 @@ zabbix_export:
           key: nutanix.cluster.hypervisor.io.read.bandwidth
           delay: '0'
           units: Bps
-          description: 'Read data transferred per second in KB/second from Hypervisor.'
+          description: 'Read data transferred in B/sec from Hypervisor.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1513,30 +1372,6 @@ zabbix_export:
           tags:
             - tag: component
               value: application
-        - uuid: e60bc882d8024ca59b9b6719be60fb65
-          name: 'Hypervisor: IO total read, sec'
-          type: DEPENDENT
-          key: nutanix.cluster.hypervisor.io.read.total
-          delay: '0'
-          value_type: FLOAT
-          units: s
-          description: 'The total read Input/Output operations time from Hypervisor.'
-          preprocessing:
-            - type: JSONPATH
-              parameters:
-                - $.stats.hypervisor_total_read_io_time_usecs
-              error_handler: DISCARD_VALUE
-            - type: MULTIPLIER
-              parameters:
-                - '1.0E-6'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
-          master_item:
-            key: nutanix.cluster.metric.get
-          tags:
-            - tag: component
-              value: application
         - uuid: 7b43893117524aaf823baafa3dd42e0a
           name: 'Hypervisor: IO total read, bytes'
           type: DEPENDENT
@@ -1560,10 +1395,57 @@ zabbix_export:
           tags:
             - tag: component
               value: application
+        - uuid: e60bc882d8024ca59b9b6719be60fb65
+          name: 'Hypervisor: IO total read, sec'
+          type: DEPENDENT
+          key: nutanix.cluster.hypervisor.io.read.total.sec
+          delay: '0'
+          value_type: FLOAT
+          units: s
+          description: 'The total read Input/Output operations time from Hypervisor.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.stats.hypervisor_total_read_io_time_usecs
+              error_handler: DISCARD_VALUE
+            - type: MULTIPLIER
+              parameters:
+                - '1.0E-6'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: nutanix.cluster.metric.get
+          tags:
+            - tag: component
+              value: application
+        - uuid: 91517ef954de4a0892bac9091b0ac09a
+          name: 'Hypervisor: IO total, bytes'
+          type: DEPENDENT
+          key: nutanix.cluster.hypervisor.io.total.bytes
+          delay: '0'
+          units: B
+          description: 'The total Input/Output operations size from Hypervisor.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.stats.hypervisor_total_io_size_kbytes
+              error_handler: DISCARD_VALUE
+            - type: MULTIPLIER
+              parameters:
+                - '1024'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: nutanix.cluster.metric.get
+          tags:
+            - tag: component
+              value: application
         - uuid: dcc89d2d7d2e4d0c9c46b369af90b17a
           name: 'Hypervisor: IO total, sec'
           type: DEPENDENT
-          key: nutanix.cluster.hypervisor.io.total
+          key: nutanix.cluster.hypervisor.io.total.sec
           delay: '0'
           value_type: FLOAT
           units: s
@@ -1609,7 +1491,7 @@ zabbix_export:
           key: nutanix.cluster.hypervisor.io.write.bandwidth
           delay: '0'
           units: Bps
-          description: 'Write data transferred per second in KB/second from Hypervisor.'
+          description: 'Write data transferred in B/sec from Hypervisor.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1710,7 +1592,7 @@ zabbix_export:
             - tag: component
               value: application
         - uuid: 6c7717cbf8f44c0dbc69f6b4bd845d65
-          name: 'Hypervisor: Memory Usage, %'
+          name: 'Hypervisor: Memory usage, %'
           type: DEPENDENT
           key: nutanix.cluster.hypervisor.memory.usage.percent
           delay: '0'
@@ -1734,9 +1616,9 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 41f4cfc6eb7746799e4bb05306527995
-          name: 'Hypervisor: Timespan'
+          name: 'Hypervisor: Timespan, sec'
           type: DEPENDENT
-          key: nutanix.cluster.hypervisor.timespan
+          key: nutanix.cluster.hypervisor.timespan.sec
           delay: '0'
           value_type: FLOAT
           units: s
@@ -1947,7 +1829,7 @@ zabbix_export:
           triggers:
             - uuid: 5ac8ddec162b4668b1df1493216792d6
               expression: 'length(last(/Nutanix Cluster Prism Element by HTTP/nutanix.cluster.metric.get.check))>0'
-              name: 'Failed to get metric data from API'
+              name: 'Nutanix Cluster: Failed to get metric data from API'
               priority: HIGH
               description: 'Failed to get data from API. Check the debug log for more information.'
               tags:
@@ -2016,7 +1898,7 @@ zabbix_export:
           key: nutanix.cluster.storage.controller.io.bandwidth
           delay: '0'
           units: Bps
-          description: 'Data transferred in B/second from the Storage Controller.'
+          description: 'Data transferred in B/sec from the Storage Controller.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -2040,7 +1922,7 @@ zabbix_export:
           delay: '0'
           value_type: FLOAT
           units: s
-          description: 'I/O latency in milliseconds from the Storage Controller.'
+          description: 'Input/Output latency from the Storage Controller.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -2082,7 +1964,7 @@ zabbix_export:
           key: nutanix.cluster.storage.controller.io.read.bandwidth
           delay: '0'
           units: Bps
-          description: 'Read data transferred per second in KB/second from the Storage Controller.'
+          description: 'Read data transferred in B/sec from the Storage Controller.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -2170,6 +2052,99 @@ zabbix_export:
           tags:
             - tag: component
               value: storage
+        - uuid: dc7f96ef1c814eb6900bd0bb41405c4f
+          name: 'Storage Controller: IO total read, bytes'
+          type: DEPENDENT
+          key: nutanix.cluster.storage.controller.io.read.total.bytes
+          delay: '0'
+          units: B
+          description: 'The controller total read Input/Output size.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.stats.controller_total_read_io_size_kbytes
+              error_handler: DISCARD_VALUE
+            - type: MULTIPLIER
+              parameters:
+                - '1024'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: nutanix.cluster.metric.get
+          tags:
+            - tag: component
+              value: storage
+        - uuid: 9084bbeefa514342bc6550b20145ae87
+          name: 'Storage Controller: IO total read, sec'
+          type: DEPENDENT
+          key: nutanix.cluster.storage.controller.io.read.total.sec
+          delay: '0'
+          value_type: FLOAT
+          units: s
+          description: 'The controller total read Input/Output time.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.stats.controller_total_read_io_time_usecs
+              error_handler: DISCARD_VALUE
+            - type: MULTIPLIER
+              parameters:
+                - '1.0E-6'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: nutanix.cluster.metric.get
+          tags:
+            - tag: component
+              value: storage
+        - uuid: cb3d76f22bec49959d17f827e1fda1b5
+          name: 'Storage Controller: IO total, bytes'
+          type: DEPENDENT
+          key: nutanix.cluster.storage.controller.io.total.bytes
+          delay: '0'
+          units: B
+          description: 'The controller total Input/Output size.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.stats.controller_total_io_size_kbytes
+              error_handler: DISCARD_VALUE
+            - type: MULTIPLIER
+              parameters:
+                - '1024'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: nutanix.cluster.metric.get
+          tags:
+            - tag: component
+              value: storage
+        - uuid: a5716932dcc3468f812c77b28f29bf01
+          name: 'Storage Controller: IO total, sec'
+          type: DEPENDENT
+          key: nutanix.cluster.storage.controller.io.total.sec
+          delay: '0'
+          units: s
+          description: 'The controller total Input/Output time.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.stats.controller_total_io_time_usecs
+              error_handler: DISCARD_VALUE
+            - type: MULTIPLIER
+              parameters:
+                - '1.0E-6'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: nutanix.cluster.metric.get
+          tags:
+            - tag: component
+              value: storage
         - uuid: ecde6b6bd4344b819a39b0d3e2d4e3dc
           name: 'Storage Controller: Write IO'
           type: DEPENDENT
@@ -2195,7 +2170,7 @@ zabbix_export:
           key: nutanix.cluster.storage.controller.io.write.bandwidth
           delay: '0'
           units: Bps
-          description: 'Write data transferred per second in B/second to the Storage Controller.'
+          description: 'Write data transferred in B/sec to the Storage Controller.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -2344,9 +2319,9 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 3d48b9ed84164fabb18db28be446c933
-          name: 'Storage Tier: Das-sata Capacity, bytes'
+          name: 'Storage Tier: Das-sata capacity, bytes'
           type: DEPENDENT
-          key: nutanix.cluster.storage.controller.tier.das_sata.capacity
+          key: nutanix.cluster.storage.controller.tier.das_sata.capacity.bytes
           delay: '0'
           units: B
           description: 'The total capacity of Das-sata in bytes.'
@@ -2363,9 +2338,9 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: b3b933a4a7284d788095f2f98700a75a
-          name: 'Storage Tier: Das-sata Free, bytes'
+          name: 'Storage Tier: Das-sata free, bytes'
           type: DEPENDENT
-          key: nutanix.cluster.storage.controller.tier.das_sata.free
+          key: nutanix.cluster.storage.controller.tier.das_sata.free.bytes
           delay: '0'
           units: B
           description: 'The free space of Das-sata in bytes.'
@@ -2382,9 +2357,9 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 81e208fb9c4949919091c18325557fd9
-          name: 'Storage Tier: Das-sata Usage, bytes'
+          name: 'Storage Tier: Das-sata usage, bytes'
           type: DEPENDENT
-          key: nutanix.cluster.storage.controller.tier.das_sata.usage
+          key: nutanix.cluster.storage.controller.tier.das_sata.usage.bytes
           delay: '0'
           units: B
           description: 'The used space of Das-sata in bytes.'
@@ -2401,9 +2376,9 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 95c826ea031b462ea1e1ae79e3f4966d
-          name: 'Storage Tier: SSD Capacity, bytes'
+          name: 'Storage Tier: SSD capacity, bytes'
           type: DEPENDENT
-          key: nutanix.cluster.storage.controller.tier.ssd.capacity
+          key: nutanix.cluster.storage.controller.tier.ssd.capacity.bytes
           delay: '0'
           units: B
           description: 'The total capacity of SSD in bytes.'
@@ -2420,9 +2395,9 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: a17766d845a1410b9b4fe20044d79217
-          name: 'Storage Tier: SSD Free, bytes'
+          name: 'Storage Tier: SSD free, bytes'
           type: DEPENDENT
-          key: nutanix.cluster.storage.controller.tier.ssd.free
+          key: nutanix.cluster.storage.controller.tier.ssd.free.bytes
           delay: '0'
           units: B
           description: 'The free space of SSD in bytes.'
@@ -2439,9 +2414,9 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 9a10e8850e5f419d8e600757598435bf
-          name: 'Storage Tier: SSD Usage, bytes'
+          name: 'Storage Tier: SSD usage, bytes'
           type: DEPENDENT
-          key: nutanix.cluster.storage.controller.tier.ssd.usage
+          key: nutanix.cluster.storage.controller.tier.ssd.usage.bytes
           delay: '0'
           units: B
           description: 'The used space of SSD in bytes.'
@@ -2457,10 +2432,34 @@ zabbix_export:
           tags:
             - tag: component
               value: storage
-        - uuid: eb510c9fa96947b9a3d83ce6ab87d217
-          name: 'Storage Controller: Total transformed usage'
+        - uuid: 1d4367a1f30a46818871cd4a105c73dc
+          name: 'Storage Controller: Timespan, sec'
           type: DEPENDENT
-          key: nutanix.cluster.storage.controller.transformed.usage
+          key: nutanix.cluster.storage.controller.timespan.sec
+          delay: '0'
+          value_type: FLOAT
+          units: s
+          description: 'The controller Timespan.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.stats.controller_timespan_usecs
+              error_handler: DISCARD_VALUE
+            - type: MULTIPLIER
+              parameters:
+                - '1.0E-6'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: nutanix.cluster.metric.get
+          tags:
+            - tag: component
+              value: storage
+        - uuid: eb510c9fa96947b9a3d83ce6ab87d217
+          name: 'Storage Controller: Total transformed usage, bytes'
+          type: DEPENDENT
+          key: nutanix.cluster.storage.controller.transformed.usage.total.bytes
           delay: '0'
           units: B
           description: 'Actual usage of Storage Controller.'
@@ -2490,7 +2489,7 @@ zabbix_export:
             - uuid: 0bc36bd639ed43548a3d223abecfc9aa
               name: 'Alert [{#ALERT.NAME}]: Count alerts'
               type: DEPENDENT
-              key: 'nutanix.cluster.alert.count.[{#ALERT.KEY}]'
+              key: 'nutanix.cluster.alert.count["{#ALERT.KEY}"]'
               delay: '0'
               description: 'The number of times this alert was triggered.'
               preprocessing:
@@ -2508,7 +2507,7 @@ zabbix_export:
             - uuid: eafc52b6bb6741b1b7ac2b55bfcf5150
               name: 'Alert [{#ALERT.NAME}]: Create datetime'
               type: DEPENDENT
-              key: 'nutanix.cluster.alert.created.[{#ALERT.KEY}]'
+              key: 'nutanix.cluster.alert.created["{#ALERT.KEY}"]'
               delay: '0'
               units: unixtime
               description: 'The alert creation date and time.'
@@ -2530,7 +2529,7 @@ zabbix_export:
             - uuid: b5b880f906d24f16a7a6f9eaf301d2f0
               name: 'Alert [{#ALERT.NAME}]: Last alert ID'
               type: DEPENDENT
-              key: 'nutanix.cluster.alert.last_id.[{#ALERT.KEY}]'
+              key: 'nutanix.cluster.alert.last_id["{#ALERT.KEY}"]'
               delay: '0'
               value_type: CHAR
               trends: '0'
@@ -2550,7 +2549,7 @@ zabbix_export:
             - uuid: ae18c1bc06ea4a429a753b9c6d989cc0
               name: 'Alert [{#ALERT.NAME}]: Detailed message'
               type: DEPENDENT
-              key: 'nutanix.cluster.alert.message.[{#ALERT.KEY}]'
+              key: 'nutanix.cluster.alert.message["{#ALERT.KEY}"]'
               delay: '0'
               value_type: TEXT
               trends: '0'
@@ -2570,7 +2569,7 @@ zabbix_export:
             - uuid: 6b72da2095154db1b7561a2bedca8b33
               name: 'Alert [{#ALERT.NAME}]: Severity'
               type: DEPENDENT
-              key: 'nutanix.cluster.alert.severity.[{#ALERT.KEY}]'
+              key: 'nutanix.cluster.alert.severity["{#ALERT.KEY}"]'
               delay: '0'
               description: |
                 The alert severity. One of the following:
@@ -2595,7 +2594,7 @@ zabbix_export:
             - uuid: 269d93010a5c453e9361a15827325743
               name: 'Alert [{#ALERT.NAME}]: State'
               type: DEPENDENT
-              key: 'nutanix.cluster.alert.state.[{#ALERT.KEY}]'
+              key: 'nutanix.cluster.alert.state["{#ALERT.KEY}"]'
               delay: '0'
               description: |
                 The alert state. One of the following:
@@ -2618,7 +2617,7 @@ zabbix_export:
             - uuid: d9c2ca71d1a041af83a1b4e9d1df46f2
               name: 'Alert [{#ALERT.NAME}]: Full title'
               type: DEPENDENT
-              key: 'nutanix.cluster.alert.title.[{#ALERT.KEY}]'
+              key: 'nutanix.cluster.alert.title["{#ALERT.KEY}"]'
               delay: '0'
               value_type: TEXT
               trends: '0'
@@ -2833,7 +2832,7 @@ zabbix_export:
                       name: ds.0.itemids.1
                       value:
                         host: 'Nutanix Cluster Prism Element by HTTP'
-                        key: nutanix.cluster.hypervisor.io.num
+                        key: nutanix.cluster.hypervisor.io
                     - type: ITEM
                       name: ds.0.itemids.2
                       value:
@@ -2881,9 +2880,6 @@ zabbix_export:
                       name: show.1
                       value: '2'
                     - type: INTEGER
-                      name: show.2
-                      value: '4'
-                    - type: INTEGER
                       name: value_bold
                       value: '0'
                 - type: item
@@ -2899,16 +2895,13 @@ zabbix_export:
                       name: itemid.0
                       value:
                         host: 'Nutanix Cluster Prism Element by HTTP'
-                        key: nutanix.cluster.general.timespan
+                        key: nutanix.cluster.general.timespan.sec
                     - type: INTEGER
                       name: show.0
                       value: '1'
                     - type: INTEGER
                       name: show.1
                       value: '2'
-                    - type: INTEGER
-                      name: show.2
-                      value: '4'
                     - type: INTEGER
                       name: units_bold
                       value: '0'
@@ -2980,21 +2973,18 @@ zabbix_export:
                       value: '45'
                     - type: STRING
                       name: description
-                      value: 'General: Storage Capacity'
+                      value: 'General: Storage capacity'
                     - type: ITEM
                       name: itemid.0
                       value:
                         host: 'Nutanix Cluster Prism Element by HTTP'
-                        key: nutanix.cluster.general.storage.capacity
+                        key: nutanix.cluster.general.storage.capacity.bytes
                     - type: INTEGER
                       name: show.0
                       value: '1'
                     - type: INTEGER
                       name: show.1
                       value: '2'
-                    - type: INTEGER
-                      name: show.2
-                      value: '4'
                     - type: INTEGER
                       name: units_bold
                       value: '0'
@@ -3013,21 +3003,18 @@ zabbix_export:
                       value: '45'
                     - type: STRING
                       name: description
-                      value: 'General: Storage Free'
+                      value: 'General: Storage free'
                     - type: ITEM
                       name: itemid.0
                       value:
                         host: 'Nutanix Cluster Prism Element by HTTP'
-                        key: nutanix.cluster.general.storage.free
+                        key: nutanix.cluster.general.storage.free.bytes
                     - type: INTEGER
                       name: show.0
                       value: '1'
                     - type: INTEGER
                       name: show.1
                       value: '2'
-                    - type: INTEGER
-                      name: show.2
-                      value: '4'
                     - type: INTEGER
                       name: units_bold
                       value: '0'
@@ -3051,16 +3038,13 @@ zabbix_export:
                       name: itemid.0
                       value:
                         host: 'Nutanix Cluster Prism Element by HTTP'
-                        key: nutanix.cluster.general.storage.logical.usage
+                        key: nutanix.cluster.general.storage.logical.usage.bytes
                     - type: INTEGER
                       name: show.0
                       value: '1'
                     - type: INTEGER
                       name: show.1
                       value: '2'
-                    - type: INTEGER
-                      name: show.2
-                      value: '4'
                     - type: INTEGER
                       name: units_bold
                       value: '0'
@@ -3084,16 +3068,13 @@ zabbix_export:
                       name: itemid.0
                       value:
                         host: 'Nutanix Cluster Prism Element by HTTP'
-                        key: nutanix.cluster.general.storage.usage
+                        key: nutanix.cluster.general.storage.usage.bytes
                     - type: INTEGER
                       name: show.0
                       value: '1'
                     - type: INTEGER
                       name: show.1
                       value: '2'
-                    - type: INTEGER
-                      name: show.2
-                      value: '4'
                     - type: INTEGER
                       name: units_bold
                       value: '0'
@@ -3502,9 +3483,6 @@ zabbix_export:
                       name: show.1
                       value: '2'
                     - type: INTEGER
-                      name: show.2
-                      value: '4'
-                    - type: INTEGER
                       name: units_bold
                       value: '0'
                     - type: INTEGER
@@ -3594,9 +3572,6 @@ zabbix_export:
                       name: show.1
                       value: '2'
                     - type: INTEGER
-                      name: show.2
-                      value: '4'
-                    - type: INTEGER
                       name: units_bold
                       value: '0'
                     - type: INTEGER
@@ -3626,9 +3601,6 @@ zabbix_export:
                     - type: INTEGER
                       name: show.1
                       value: '2'
-                    - type: INTEGER
-                      name: show.2
-                      value: '4'
                     - type: INTEGER
                       name: units_bold
                       value: '0'
@@ -3660,9 +3632,6 @@ zabbix_export:
                       name: show.1
                       value: '2'
                     - type: INTEGER
-                      name: show.2
-                      value: '4'
-                    - type: INTEGER
                       name: units_bold
                       value: '0'
                     - type: INTEGER
@@ -3692,9 +3661,6 @@ zabbix_export:
                     - type: INTEGER
                       name: show.1
                       value: '2'
-                    - type: INTEGER
-                      name: show.2
-                      value: '4'
                     - type: INTEGER
                       name: units_bold
                       value: '0'
@@ -3726,16 +3692,13 @@ zabbix_export:
                       name: show.1
                       value: '2'
                     - type: INTEGER
-                      name: show.2
-                      value: '4'
-                    - type: INTEGER
                       name: units_bold
                       value: '0'
                     - type: INTEGER
                       name: value_bold
                       value: '0'
                 - type: gauge
-                  name: 'Content Cache: Hit Rate'
+                  name: 'Content Cache: Hit rate'
                   x: '54'
                   width: '18'
                   height: '4'
@@ -3756,7 +3719,7 @@ zabbix_export:
                       name: value_arc_color
                       value: 0040FF
                 - type: svggraph
-                  name: 'Content Cache: Hit Rate'
+                  name: 'Content Cache: Hit rate'
                   x: '54'
                   'y': '4'
                   width: '18'
@@ -3823,16 +3786,13 @@ zabbix_export:
                       name: itemid.0
                       value:
                         host: 'Nutanix Cluster Prism Element by HTTP'
-                        key: nutanix.cluster.content.cache.num.lookups
+                        key: nutanix.cluster.content.cache.lookups.num
                     - type: INTEGER
                       name: show.0
                       value: '1'
                     - type: INTEGER
                       name: show.1
                       value: '2'
-                    - type: INTEGER
-                      name: show.2
-                      value: '4'
                     - type: INTEGER
                       name: units_bold
                       value: '0'
@@ -3863,9 +3823,6 @@ zabbix_export:
                     - type: INTEGER
                       name: show.1
                       value: '2'
-                    - type: INTEGER
-                      name: show.2
-                      value: '4'
                     - type: INTEGER
                       name: units_bold
                       value: '0'
@@ -4552,12 +4509,12 @@ zabbix_export:
                       name: ds.0.itemids.0
                       value:
                         host: 'Nutanix Cluster Prism Element by HTTP'
-                        key: nutanix.cluster.storage.controller.tier.das_sata.free
+                        key: nutanix.cluster.storage.controller.tier.das_sata.free.bytes
                     - type: ITEM
                       name: ds.0.itemids.1
                       value:
                         host: 'Nutanix Cluster Prism Element by HTTP'
-                        key: nutanix.cluster.storage.controller.tier.ssd.free
+                        key: nutanix.cluster.storage.controller.tier.ssd.free.bytes
                     - type: INTEGER
                       name: ds.0.missingdatafunc
                       value: '3'
@@ -4583,7 +4540,7 @@ zabbix_export:
                       name: righty
                       value: '0'
                 - type: item
-                  name: 'Storage Tier: Das-sata Free'
+                  name: 'Storage Tier: Das-sata free'
                   'y': '4'
                   width: '25'
                   hide_header: 'YES'
@@ -4593,21 +4550,18 @@ zabbix_export:
                       value: '45'
                     - type: STRING
                       name: description
-                      value: 'Storage Tier: Das-sata Free'
+                      value: 'Storage Tier: Das-sata free'
                     - type: ITEM
                       name: itemid.0
                       value:
                         host: 'Nutanix Cluster Prism Element by HTTP'
-                        key: nutanix.cluster.storage.controller.tier.das_sata.free
+                        key: nutanix.cluster.storage.controller.tier.das_sata.free.bytes
                     - type: INTEGER
                       name: show.0
                       value: '1'
                     - type: INTEGER
                       name: show.1
                       value: '2'
-                    - type: INTEGER
-                      name: show.2
-                      value: '4'
                     - type: INTEGER
                       name: units_bold
                       value: '0'
@@ -4636,12 +4590,12 @@ zabbix_export:
                       name: ds.0.itemids.0
                       value:
                         host: 'Nutanix Cluster Prism Element by HTTP'
-                        key: nutanix.cluster.storage.controller.tier.das_sata.usage
+                        key: nutanix.cluster.storage.controller.tier.das_sata.usage.bytes
                     - type: ITEM
                       name: ds.0.itemids.1
                       value:
                         host: 'Nutanix Cluster Prism Element by HTTP'
-                        key: nutanix.cluster.storage.controller.tier.ssd.usage
+                        key: nutanix.cluster.storage.controller.tier.ssd.usage.bytes
                     - type: INTEGER
                       name: ds.0.missingdatafunc
                       value: '3'
@@ -4667,7 +4621,7 @@ zabbix_export:
                       name: righty
                       value: '0'
                 - type: item
-                  name: 'Storage Tier: Das-sata Usage'
+                  name: 'Storage Tier: Das-sata usage'
                   'y': '10'
                   width: '25'
                   hide_header: 'YES'
@@ -4677,12 +4631,12 @@ zabbix_export:
                       value: '45'
                     - type: STRING
                       name: description
-                      value: 'Storage Tier: Das-sata Usage'
+                      value: 'Storage Tier: Das-sata usage'
                     - type: ITEM
                       name: itemid.0
                       value:
                         host: 'Nutanix Cluster Prism Element by HTTP'
-                        key: nutanix.cluster.storage.controller.tier.das_sata.usage
+                        key: nutanix.cluster.storage.controller.tier.das_sata.usage.bytes
                     - type: INTEGER
                       name: show.0
                       value: '1'
@@ -4690,16 +4644,13 @@ zabbix_export:
                       name: show.1
                       value: '2'
                     - type: INTEGER
-                      name: show.2
-                      value: '4'
-                    - type: INTEGER
                       name: units_bold
                       value: '0'
                     - type: INTEGER
                       name: value_bold
                       value: '0'
                 - type: item
-                  name: 'Storage Tier: SSD Free'
+                  name: 'Storage Tier: SSD free'
                   x: '25'
                   'y': '4'
                   width: '25'
@@ -4710,12 +4661,12 @@ zabbix_export:
                       value: '45'
                     - type: STRING
                       name: description
-                      value: 'Storage Tier: SSD Free'
+                      value: 'Storage Tier: SSD free'
                     - type: ITEM
                       name: itemid.0
                       value:
                         host: 'Nutanix Cluster Prism Element by HTTP'
-                        key: nutanix.cluster.storage.controller.tier.ssd.free
+                        key: nutanix.cluster.storage.controller.tier.ssd.free.bytes
                     - type: INTEGER
                       name: show.0
                       value: '1'
@@ -4723,16 +4674,13 @@ zabbix_export:
                       name: show.1
                       value: '2'
                     - type: INTEGER
-                      name: show.2
-                      value: '4'
-                    - type: INTEGER
                       name: units_bold
                       value: '0'
                     - type: INTEGER
                       name: value_bold
                       value: '0'
                 - type: item
-                  name: 'Storage Tier: SSD Usage'
+                  name: 'Storage Tier: SSD usage'
                   x: '25'
                   'y': '10'
                   width: '25'
@@ -4743,21 +4691,18 @@ zabbix_export:
                       value: '45'
                     - type: STRING
                       name: description
-                      value: 'Storage Tier: SSD Usage'
+                      value: 'Storage Tier: SSD usage'
                     - type: ITEM
                       name: itemid.0
                       value:
                         host: 'Nutanix Cluster Prism Element by HTTP'
-                        key: nutanix.cluster.storage.controller.tier.ssd.usage
+                        key: nutanix.cluster.storage.controller.tier.ssd.usage.bytes
                     - type: INTEGER
                       name: show.0
                       value: '1'
                     - type: INTEGER
                       name: show.1
                       value: '2'
-                    - type: INTEGER
-                      name: show.2
-                      value: '4'
                     - type: INTEGER
                       name: units_bold
                       value: '0'
@@ -4786,12 +4731,12 @@ zabbix_export:
                       name: ds.0.itemids.0
                       value:
                         host: 'Nutanix Cluster Prism Element by HTTP'
-                        key: nutanix.cluster.storage.controller.tier.ssd.capacity
+                        key: nutanix.cluster.storage.controller.tier.ssd.capacity.bytes
                     - type: ITEM
                       name: ds.0.itemids.1
                       value:
                         host: 'Nutanix Cluster Prism Element by HTTP'
-                        key: nutanix.cluster.storage.controller.tier.ssd.usage
+                        key: nutanix.cluster.storage.controller.tier.ssd.usage.bytes
                     - type: INTEGER
                       name: ds.0.type.0
                       value: '1'
@@ -4833,12 +4778,12 @@ zabbix_export:
                       name: ds.0.itemids.0
                       value:
                         host: 'Nutanix Cluster Prism Element by HTTP'
-                        key: nutanix.cluster.storage.controller.tier.das_sata.capacity
+                        key: nutanix.cluster.storage.controller.tier.das_sata.capacity.bytes
                     - type: ITEM
                       name: ds.0.itemids.1
                       value:
                         host: 'Nutanix Cluster Prism Element by HTTP'
-                        key: nutanix.cluster.storage.controller.tier.das_sata.usage
+                        key: nutanix.cluster.storage.controller.tier.das_sata.usage.bytes
                     - type: INTEGER
                       name: ds.0.type.0
                       value: '1'
@@ -4920,25 +4865,6 @@ zabbix_export:
       groups:
         - name: Templates/Applications
       items:
-        - uuid: 9d0f46350adc468ca4160b7a7e7e85a6
-          name: 'Storage Controller: IO'
-          type: DEPENDENT
-          key: nutanix.cluster.storage.controller.io
-          delay: '0'
-          description: 'Input/Output operations from the Storage Controller.'
-          preprocessing:
-            - type: JSONPATH
-              parameters:
-                - $.stats.controller_num_io
-              error_handler: DISCARD_VALUE
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
-          master_item:
-            key: nutanix.host.metric.get
-          tags:
-            - tag: component
-              value: storage
         - uuid: 48c5f1f6ea454fd69756268cd613129e
           name: 'Get alert'
           type: SCRIPT
@@ -5127,7 +5053,7 @@ zabbix_export:
           triggers:
             - uuid: 6dbb467d463e47dca35970591ef1446f
               expression: 'length(last(/Nutanix Host Prism Element by HTTP/nutanix.host.alert.get.check))>0'
-              name: 'Failed to get alert data from API'
+              name: 'Nutanix Host: Failed to get alert data from API'
               priority: HIGH
               description: 'Failed to get data from API. Check the debug log for more information.'
               tags:
@@ -5138,7 +5064,6 @@ zabbix_export:
           type: DEPENDENT
           key: nutanix.host.content.cache.dedup.ref.num
           delay: '0'
-          units: '!pph'
           description: 'Average number of content cache references.'
           preprocessing:
             - type: JSONPATH
@@ -5154,7 +5079,7 @@ zabbix_export:
             - tag: component
               value: application
         - uuid: f350acf8979145aca8bff3c26454e2b9
-          name: 'Content Cache: Hit Rate, %'
+          name: 'Content Cache: Hit rate, %'
           type: DEPENDENT
           key: nutanix.host.content.cache.hit.percent
           delay: '0'
@@ -5224,7 +5149,7 @@ zabbix_export:
         - uuid: 8589d38473b04d06a3a7f58dc2513560
           name: 'Content Cache: Number of lookups'
           type: DEPENDENT
-          key: nutanix.host.content.cache.num.lookups
+          key: nutanix.host.content.cache.lookups.num
           delay: '0'
           description: 'Number of lookups on the content cache.'
           preprocessing:
@@ -5331,7 +5256,7 @@ zabbix_export:
         - uuid: 634b72675f5346079d4f3c962a3316b9
           name: 'Controller: Random IO'
           type: DEPENDENT
-          key: nutanix.host.controller.random_io.num
+          key: nutanix.host.controller.io.random
           delay: '0'
           description: 'The controller number of random Input/Output operations.'
           preprocessing:
@@ -5350,11 +5275,11 @@ zabbix_export:
         - uuid: d51746d0f49a4631930f7200543254dd
           name: 'Controller: Random IO, %'
           type: DEPENDENT
-          key: nutanix.host.controller.random_io.percent
+          key: nutanix.host.controller.io.random.percent
           delay: '0'
           value_type: FLOAT
           units: '%'
-          description: 'The controller number of random Input/Output PPM.'
+          description: 'The controller percent of random Input/Output.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -5374,7 +5299,7 @@ zabbix_export:
         - uuid: 4df61338cb7e4044b029187665103b3e
           name: 'Controller: Sequence IO'
           type: DEPENDENT
-          key: nutanix.host.controller.seq_io.num
+          key: nutanix.host.controller.io.sequence
           delay: '0'
           description: 'The controller number of sequential Input/Output operations.'
           preprocessing:
@@ -5393,11 +5318,11 @@ zabbix_export:
         - uuid: 946f9ef792c547edb275c7ad08532278
           name: 'Controller: Sequence IO, %'
           type: DEPENDENT
-          key: nutanix.host.controller.seq_io.percent
+          key: nutanix.host.controller.io.sequence.percent
           delay: '0'
           value_type: FLOAT
           units: '%'
-          description: 'The controller number of sequential I/O PPM.'
+          description: 'The controller percent of sequential Input/Output.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -5414,177 +5339,6 @@ zabbix_export:
           tags:
             - tag: component
               value: application
-        - uuid: c290ab59bfe24e00b7b54d35e039d08b
-          name: 'Storage Controller: Timespan'
-          type: DEPENDENT
-          key: nutanix.host.controller.timespan
-          delay: '0'
-          value_type: FLOAT
-          units: s
-          description: 'The controller Timespan.'
-          preprocessing:
-            - type: JSONPATH
-              parameters:
-                - $.stats.controller_timespan_usecs
-              error_handler: DISCARD_VALUE
-            - type: MULTIPLIER
-              parameters:
-                - '1.0E-6'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
-          master_item:
-            key: nutanix.host.metric.get
-          tags:
-            - tag: component
-              value: storage
-        - uuid: c9e37cc8765d4492ae579029fddfe9a6
-          name: 'Storage Controller: IO total, bytes'
-          type: DEPENDENT
-          key: nutanix.host.controller.total.io.bytes
-          delay: '0'
-          units: B
-          description: 'The controller total Input/Output size.'
-          preprocessing:
-            - type: JSONPATH
-              parameters:
-                - $.stats.controller_total_io_size_kbytes
-              error_handler: DISCARD_VALUE
-            - type: MULTIPLIER
-              parameters:
-                - '1024'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
-          master_item:
-            key: nutanix.host.metric.get
-          tags:
-            - tag: component
-              value: storage
-        - uuid: df7e8de51d1e4c309ace840439dc944e
-          name: 'Storage Controller: IO total, sec'
-          type: DEPENDENT
-          key: nutanix.host.controller.total.io.time
-          delay: '0'
-          units: s
-          description: 'The controller total Input/Output time.'
-          preprocessing:
-            - type: JSONPATH
-              parameters:
-                - $.stats.controller_total_io_time_usecs
-              error_handler: DISCARD_VALUE
-            - type: MULTIPLIER
-              parameters:
-                - '1.0E-6'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
-          master_item:
-            key: nutanix.host.metric.get
-          tags:
-            - tag: component
-              value: storage
-        - uuid: 7266e0a734b94612b77da9173f247391
-          name: 'Storage Controller: IO total read, bytes'
-          type: DEPENDENT
-          key: nutanix.host.controller.total.read.io.bytes
-          delay: '0'
-          units: B
-          description: 'The controller total read Input/Output size.'
-          preprocessing:
-            - type: JSONPATH
-              parameters:
-                - $.stats.controller_total_read_io_size_kbytes
-              error_handler: DISCARD_VALUE
-            - type: MULTIPLIER
-              parameters:
-                - '1024'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
-          master_item:
-            key: nutanix.host.metric.get
-          tags:
-            - tag: component
-              value: storage
-        - uuid: d49ffc420dee4731bf28f9835bb8e46d
-          name: 'Storage Controller: IO total read, sec'
-          type: DEPENDENT
-          key: nutanix.host.controller.total.read.io.time
-          delay: '0'
-          value_type: FLOAT
-          units: s
-          description: 'The controller total read Input/Output time.'
-          preprocessing:
-            - type: JSONPATH
-              parameters:
-                - $.stats.controller_total_read_io_time_usecs
-              error_handler: DISCARD_VALUE
-            - type: MULTIPLIER
-              parameters:
-                - '1.0E-6'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
-          master_item:
-            key: nutanix.host.metric.get
-          tags:
-            - tag: component
-              value: storage
-        - uuid: 52aa85553198433298dbbac196ebf66a
-          name: 'Number of CPU cores'
-          type: DEPENDENT
-          key: nutanix.host.cpu.cores
-          delay: '0'
-          description: 'The number of CPU cores.'
-          preprocessing:
-            - type: JSONPATH
-              parameters:
-                - $.num_cpu_cores
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 12h
-          master_item:
-            key: nutanix.host.metric.get
-          tags:
-            - tag: component
-              value: cpu
-        - uuid: fc3b3850f7c4440cb9ff50194204e68f
-          name: 'Number of CPU sockets'
-          type: DEPENDENT
-          key: nutanix.host.cpu.sockets
-          delay: '0'
-          description: 'The number of CPU sockets.'
-          preprocessing:
-            - type: JSONPATH
-              parameters:
-                - $.num_cpu_sockets
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 12h
-          master_item:
-            key: nutanix.host.metric.get
-          tags:
-            - tag: component
-              value: cpu
-        - uuid: 674aff8c3c764f1aa9571789f3c8d938
-          name: 'Number of CPU threads'
-          type: DEPENDENT
-          key: nutanix.host.cpu.threads
-          delay: '0'
-          description: 'The number of CPU threads.'
-          preprocessing:
-            - type: JSONPATH
-              parameters:
-                - $.num_cpu_threads
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 12h
-          master_item:
-            key: nutanix.host.metric.get
-          tags:
-            - tag: component
-              value: cpu
         - uuid: a3a11c42c9da4eecb0aefa20792d4514
           name: 'Get disk'
           type: SCRIPT
@@ -5778,7 +5532,7 @@ zabbix_export:
           triggers:
             - uuid: a105b91b5d48438b93abc257b238e2c9
               expression: 'length(last(/Nutanix Host Prism Element by HTTP/nutanix.host.disk.get.check))>0'
-              name: 'Failed to get disk data from API'
+              name: 'Nutanix Host: Failed to get disk data from API'
               priority: HIGH
               description: 'Failed to get data from API. Check the debug log for more information.'
               tags:
@@ -5809,7 +5563,7 @@ zabbix_export:
         - uuid: 15b33f72661e4d5180460966d11a71d0
           name: 'General: Total CPU capacity'
           type: DEPENDENT
-          key: nutanix.host.general.cpu.capacity
+          key: nutanix.host.general.cpu.capacity.hz
           delay: '0'
           value_type: FLOAT
           units: Hz
@@ -5867,7 +5621,7 @@ zabbix_export:
             - tag: component
               value: cpu
         - uuid: a7d620e525264ccfa790f6b4f46591f1
-          name: 'General: Degrade Status'
+          name: 'General: Degrade status'
           type: DEPENDENT
           key: nutanix.host.general.degraded
           delay: '0'
@@ -5918,12 +5672,12 @@ zabbix_export:
             - tag: component
               value: application
         - uuid: e0ab22c1d8aa49dc9625ba4876e6a7c2
-          name: 'General: IO, Bandwidth'
+          name: 'General: IO, bandwidth'
           type: DEPENDENT
           key: nutanix.host.general.io.bandwidth
           delay: '0'
           units: Bps
-          description: 'Data transferred per second in B/second from disk.'
+          description: 'Data transferred in B/sec from disk.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -5947,7 +5701,7 @@ zabbix_export:
           delay: '0'
           value_type: FLOAT
           units: s
-          description: 'Input/Output latency in milliseconds from disk.'
+          description: 'Input/Output latency from disk.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -5964,14 +5718,33 @@ zabbix_export:
           tags:
             - tag: component
               value: application
+        - uuid: 80245fcfc1554a178d1a636c9356da77
+          name: 'General: Random IO'
+          type: DEPENDENT
+          key: nutanix.host.general.io.random
+          delay: '0'
+          description: 'The number of random Input/Output.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.stats.num_random_io
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: nutanix.host.metric.get
+          tags:
+            - tag: component
+              value: application
         - uuid: fcbabfd55e37442b85913f7efdabab91
           name: 'General: Random IO, %'
           type: DEPENDENT
-          key: nutanix.host.general.io.percent
+          key: nutanix.host.general.io.random.percent
           delay: '0'
           value_type: FLOAT
           units: '%'
-          description: 'The number of random Input/Output PPM.'
+          description: 'The percent of random Input/Output.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -6013,7 +5786,7 @@ zabbix_export:
           key: nutanix.host.general.io.read.bandwidth
           delay: '0'
           units: Bps
-          description: 'Read data transferred per second in B/second from disk.'
+          description: 'Read data transferred in B/sec from disk.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -6037,7 +5810,7 @@ zabbix_export:
           delay: '0'
           value_type: FLOAT
           units: s
-          description: 'Average I/O read latency.'
+          description: 'Average Input/Output read latency.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -6078,30 +5851,6 @@ zabbix_export:
           tags:
             - tag: component
               value: application
-        - uuid: 68e37c5e0ecf4d32bb9d8bff4fbc860d
-          name: 'General: IO total read, sec'
-          type: DEPENDENT
-          key: nutanix.host.general.io.read.total
-          delay: '0'
-          value_type: FLOAT
-          units: s
-          description: 'The total read Input/Output operations time.'
-          preprocessing:
-            - type: JSONPATH
-              parameters:
-                - $.stats.total_read_io_time_usecs
-              error_handler: DISCARD_VALUE
-            - type: MULTIPLIER
-              parameters:
-                - '1.0E-6'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
-          master_item:
-            key: nutanix.host.metric.get
-          tags:
-            - tag: component
-              value: application
         - uuid: 9ff70ba2c78145b7a34d6d1c01a0305f
           name: 'General: IO total read, bytes'
           type: DEPENDENT
@@ -6125,22 +5874,65 @@ zabbix_export:
           tags:
             - tag: component
               value: application
-        - uuid: 31ec053fb9074612aec2f390c3297922
-          name: 'General: IO total, sec'
+        - uuid: 68e37c5e0ecf4d32bb9d8bff4fbc860d
+          name: 'General: IO total read, sec'
           type: DEPENDENT
-          key: nutanix.host.general.io.total
+          key: nutanix.host.general.io.read.total.sec
           delay: '0'
           value_type: FLOAT
           units: s
-          description: 'The total Input/Output operations time.'
+          description: 'The total read Input/Output operations time.'
           preprocessing:
             - type: JSONPATH
               parameters:
-                - $.stats.total_io_time_usecs
+                - $.stats.total_read_io_time_usecs
               error_handler: DISCARD_VALUE
             - type: MULTIPLIER
               parameters:
                 - '1.0E-6'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: nutanix.host.metric.get
+          tags:
+            - tag: component
+              value: application
+        - uuid: 1685e6e8655d4b438d9a62057413360b
+          name: 'General: Sequence IO'
+          type: DEPENDENT
+          key: nutanix.host.general.io.sequence
+          delay: '0'
+          description: 'The number of sequential Input/Output operations.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.stats.num_seq_io
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: nutanix.host.metric.get
+          tags:
+            - tag: component
+              value: application
+        - uuid: 67c05bbcbe564fe894d4f0c630b0df36
+          name: 'General: Sequence IO, %'
+          type: DEPENDENT
+          key: nutanix.host.general.io.sequence.percent
+          delay: '0'
+          value_type: FLOAT
+          units: '%'
+          description: 'The percent of sequential Input/Output.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.stats.seq_io_ppm
+              error_handler: DISCARD_VALUE
+            - type: MULTIPLIER
+              parameters:
+                - '0.0001'
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
@@ -6164,6 +5956,30 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1024'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: nutanix.host.metric.get
+          tags:
+            - tag: component
+              value: application
+        - uuid: 31ec053fb9074612aec2f390c3297922
+          name: 'General: IO total, sec'
+          type: DEPENDENT
+          key: nutanix.host.general.io.total.sec
+          delay: '0'
+          value_type: FLOAT
+          units: s
+          description: 'The total Input/Output operations time.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.stats.total_io_time_usecs
+              error_handler: DISCARD_VALUE
+            - type: MULTIPLIER
+              parameters:
+                - '1.0E-6'
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
@@ -6197,7 +6013,7 @@ zabbix_export:
           key: nutanix.host.general.io.write.bandwidth
           delay: '0'
           units: Bps
-          description: 'Write data transferred per second in B/second from disk.'
+          description: 'Write data transferred in B/sec from disk.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -6353,9 +6169,9 @@ zabbix_export:
             - tag: component
               value: application
         - uuid: 19f7001acc8e45c49b6d5734322ee05d
-          name: 'General: Total memory'
+          name: 'General: Total memory, bytes'
           type: DEPENDENT
-          key: nutanix.host.general.memory.total
+          key: nutanix.host.general.memory.total.bytes
           delay: '0'
           units: B
           description: 'The total host memory in bytes.'
@@ -6371,25 +6187,6 @@ zabbix_export:
           tags:
             - tag: component
               value: memory
-        - uuid: 80245fcfc1554a178d1a636c9356da77
-          name: 'General: Random IO'
-          type: DEPENDENT
-          key: nutanix.host.general.random.io.num
-          delay: '0'
-          description: 'The number of random Input/Output.'
-          preprocessing:
-            - type: JSONPATH
-              parameters:
-                - $.stats.num_random_io
-              error_handler: DISCARD_VALUE
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
-          master_item:
-            key: nutanix.host.metric.get
-          tags:
-            - tag: component
-              value: application
         - uuid: e67d32de7523428d959c29a653a0647b
           name: 'General: Reboot pending'
           type: DEPENDENT
@@ -6407,49 +6204,6 @@ zabbix_export:
                 - ''
               error_handler: CUSTOM_VALUE
               error_handler_params: '2'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
-          master_item:
-            key: nutanix.host.metric.get
-          tags:
-            - tag: component
-              value: application
-        - uuid: 1685e6e8655d4b438d9a62057413360b
-          name: 'General: Sequence IO'
-          type: DEPENDENT
-          key: nutanix.host.general.sequence.io
-          delay: '0'
-          description: 'The number of sequential Input/Output operations.'
-          preprocessing:
-            - type: JSONPATH
-              parameters:
-                - $.stats.num_seq_io
-              error_handler: DISCARD_VALUE
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
-          master_item:
-            key: nutanix.host.metric.get
-          tags:
-            - tag: component
-              value: application
-        - uuid: 67c05bbcbe564fe894d4f0c630b0df36
-          name: 'General: Sequence IO, %'
-          type: DEPENDENT
-          key: nutanix.host.general.sequence.io.percent
-          delay: '0'
-          value_type: FLOAT
-          units: '%'
-          description: 'The number of sequential Input/Output PPM.'
-          preprocessing:
-            - type: JSONPATH
-              parameters:
-                - $.stats.seq_io_ppm
-              error_handler: DISCARD_VALUE
-            - type: MULTIPLIER
-              parameters:
-                - '0.0001'
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
@@ -6495,9 +6249,9 @@ zabbix_export:
             - tag: component
               value: application
         - uuid: 2e52146c43cd46cba3ad350528e5c277
-          name: 'General: Storage Capacity, bytes'
+          name: 'General: Storage capacity, bytes'
           type: DEPENDENT
-          key: nutanix.host.general.storage.capacity
+          key: nutanix.host.general.storage.capacity.bytes
           delay: '0'
           units: B
           description: 'Total size of the datastores used by this system in bytes.'
@@ -6514,9 +6268,9 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 7917e0babb4b433da73a3d8f5a872bd1
-          name: 'General: Storage Free, bytes'
+          name: 'General: Storage free, bytes'
           type: DEPENDENT
-          key: nutanix.host.general.storage.free
+          key: nutanix.host.general.storage.free.bytes
           delay: '0'
           units: B
           description: 'Total free space of all the datastores used by this system in bytes.'
@@ -6535,7 +6289,7 @@ zabbix_export:
         - uuid: 51be63c3691049a683be08546387ab7a
           name: 'General: Storage logical usage, bytes'
           type: DEPENDENT
-          key: nutanix.host.general.storage.logical.usage
+          key: nutanix.host.general.storage.logical.usage.bytes
           delay: '0'
           units: B
           description: 'Total logical used space of the datastores by this system in bytes.'
@@ -6554,7 +6308,7 @@ zabbix_export:
         - uuid: ca11026b4f3e411588eea1eab0c8c299
           name: 'General: Storage usage, bytes'
           type: DEPENDENT
-          key: nutanix.host.general.storage.usage
+          key: nutanix.host.general.storage.usage.bytes
           delay: '0'
           units: B
           description: 'Total physical datastore space used by this host and all its snapshots on the datastores.'
@@ -6571,9 +6325,9 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: c603fce582d64d5abe2f5863640c9f58
-          name: 'General: Timespan'
+          name: 'General: Timespan, sec'
           type: DEPENDENT
-          key: nutanix.host.general.timespan
+          key: nutanix.host.general.timespan.sec
           delay: '0'
           value_type: FLOAT
           units: s
@@ -6595,9 +6349,9 @@ zabbix_export:
             - tag: component
               value: application
         - uuid: 229e67e4300143a5b1ff1f5e0738785f
-          name: 'General: Total transformed usage'
+          name: 'General: Total transformed usage, bytes'
           type: DEPENDENT
-          key: nutanix.host.general.transformed.usage
+          key: nutanix.host.general.transformed.usage.total.bytes
           delay: '0'
           units: B
           description: 'Actual usage of storage.'
@@ -6647,9 +6401,9 @@ zabbix_export:
             - tag: component
               value: application
         - uuid: b46931e9874342bb9071170235db1523
-          name: 'General: Total untransformed usage'
+          name: 'General: Total untransformed usage, bytes'
           type: DEPENDENT
-          key: nutanix.host.general.untransformed.usage
+          key: nutanix.host.general.untransformed.usage.total.bytes
           delay: '0'
           units: B
           description: 'Logical usage of storage (physical usage divided by replication factor).'
@@ -6667,11 +6421,11 @@ zabbix_export:
             - tag: component
               value: application
         - uuid: 044d58d7c3394f6fa62dd6390218f5ea
-          name: 'General: Number of Virtual Machines'
+          name: 'General: Number of virtual machines'
           type: DEPENDENT
           key: nutanix.host.general.vms.num
           delay: '0'
-          description: 'Number of Virtual machines running on this Host.'
+          description: 'Number of virtual machines running on this Host.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -6684,8 +6438,62 @@ zabbix_export:
           tags:
             - tag: component
               value: application
+        - uuid: 52aa85553198433298dbbac196ebf66a
+          name: 'Hypervisor: Number of CPU cores'
+          type: DEPENDENT
+          key: nutanix.host.hypervisor.cpu.cores.num
+          delay: '0'
+          description: 'The number of CPU cores.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.num_cpu_cores
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 12h
+          master_item:
+            key: nutanix.host.metric.get
+          tags:
+            - tag: component
+              value: cpu
+        - uuid: fc3b3850f7c4440cb9ff50194204e68f
+          name: 'Hypervisor: Number of CPU sockets'
+          type: DEPENDENT
+          key: nutanix.host.hypervisor.cpu.sockets.num
+          delay: '0'
+          description: 'The number of CPU sockets.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.num_cpu_sockets
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 12h
+          master_item:
+            key: nutanix.host.metric.get
+          tags:
+            - tag: component
+              value: cpu
+        - uuid: 674aff8c3c764f1aa9571789f3c8d938
+          name: 'Hypervisor: Number of CPU threads'
+          type: DEPENDENT
+          key: nutanix.host.hypervisor.cpu.threads.num
+          delay: '0'
+          description: 'The number of CPU threads.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.num_cpu_threads
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 12h
+          master_item:
+            key: nutanix.host.metric.get
+          tags:
+            - tag: component
+              value: cpu
         - uuid: a7153c897dd64d0a9b523401380d5074
-          name: 'Hypervisor: CPU Usage, %'
+          name: 'Hypervisor: CPU usage, %'
           type: DEPENDENT
           key: nutanix.host.hypervisor.cpu.usage.percent
           delay: '0'
@@ -6708,21 +6516,18 @@ zabbix_export:
           tags:
             - tag: component
               value: cpu
-        - uuid: d3c5c2f3aac9497c82db53b22fef99bc
-          name: 'Hypervisor: IO, bandwidth'
+        - uuid: 9b943b7fbdb14ea88a755c048dbcd42d
+          name: 'Hypervisor: IO'
           type: DEPENDENT
-          key: nutanix.host.hypervisor.io.bandwidth
+          key: nutanix.host.hypervisor.io
           delay: '0'
-          units: Bps
-          description: 'Data transferred per second in B/second from Hypervisor.'
+          value_type: FLOAT
+          description: 'The number of the Input/Output operations from Hypervisor.'
           preprocessing:
             - type: JSONPATH
               parameters:
-                - $.stats.hypervisor_io_bandwidth_kBps
+                - $.stats.hypervisor_num_io
               error_handler: DISCARD_VALUE
-            - type: MULTIPLIER
-              parameters:
-                - '1024'
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
@@ -6731,17 +6536,17 @@ zabbix_export:
           tags:
             - tag: component
               value: application
-        - uuid: 4f2081e28140438d94103dd709f45d9a
-          name: 'Hypervisor: IO total, bytes'
+        - uuid: d3c5c2f3aac9497c82db53b22fef99bc
+          name: 'Hypervisor: IO, bandwidth'
           type: DEPENDENT
-          key: nutanix.host.hypervisor.io.bytes
+          key: nutanix.host.hypervisor.io.bandwidth
           delay: '0'
-          units: B
-          description: 'The total Input/Output operations size from Hypervisor.'
+          units: Bps
+          description: 'Data transferred in B/sec from Hypervisor.'
           preprocessing:
             - type: JSONPATH
               parameters:
-                - $.stats.hypervisor_total_io_size_kbytes
+                - $.stats.hypervisor_io_bandwidth_kBps
               error_handler: DISCARD_VALUE
             - type: MULTIPLIER
               parameters:
@@ -6778,26 +6583,6 @@ zabbix_export:
           tags:
             - tag: component
               value: application
-        - uuid: 9b943b7fbdb14ea88a755c048dbcd42d
-          name: 'Hypervisor: IO'
-          type: DEPENDENT
-          key: nutanix.host.hypervisor.io.num
-          delay: '0'
-          value_type: FLOAT
-          description: 'The number of the Input/Output operations from Hypervisor.'
-          preprocessing:
-            - type: JSONPATH
-              parameters:
-                - $.stats.hypervisor_num_io
-              error_handler: DISCARD_VALUE
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
-          master_item:
-            key: nutanix.host.metric.get
-          tags:
-            - tag: component
-              value: application
         - uuid: 34b8a6a9dff44c858cff7762f8f6f129
           name: 'Hypervisor: Read IO'
           type: DEPENDENT
@@ -6823,7 +6608,7 @@ zabbix_export:
           key: nutanix.host.hypervisor.io.read.bandwidth
           delay: '0'
           units: Bps
-          description: 'Read data transferred per second in KB/second from Hypervisor.'
+          description: 'Read data transferred in B/sec from Hypervisor.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -6847,35 +6632,11 @@ zabbix_export:
           delay: '0'
           value_type: FLOAT
           units: s
-          description: 'I/O read latency in milliseconds from Hypervisor.'
+          description: 'Input/Output read latency from Hypervisor.'
           preprocessing:
             - type: JSONPATH
               parameters:
                 - $.stats.hypervisor_avg_read_io_latency_usecs
-              error_handler: DISCARD_VALUE
-            - type: MULTIPLIER
-              parameters:
-                - '1.0E-6'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
-          master_item:
-            key: nutanix.host.metric.get
-          tags:
-            - tag: component
-              value: application
-        - uuid: 7cc44b50da26404a8a95a94f9640e259
-          name: 'Hypervisor: IO total read, sec'
-          type: DEPENDENT
-          key: nutanix.host.hypervisor.io.read.total
-          delay: '0'
-          value_type: FLOAT
-          units: s
-          description: 'The total read Input/Output operations time from Hypervisor.'
-          preprocessing:
-            - type: JSONPATH
-              parameters:
-                - $.stats.hypervisor_total_read_io_time_usecs
               error_handler: DISCARD_VALUE
             - type: MULTIPLIER
               parameters:
@@ -6911,10 +6672,57 @@ zabbix_export:
           tags:
             - tag: component
               value: application
+        - uuid: 7cc44b50da26404a8a95a94f9640e259
+          name: 'Hypervisor: IO total read, sec'
+          type: DEPENDENT
+          key: nutanix.host.hypervisor.io.read.total.sec
+          delay: '0'
+          value_type: FLOAT
+          units: s
+          description: 'The total read Input/Output operations time from Hypervisor.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.stats.hypervisor_total_read_io_time_usecs
+              error_handler: DISCARD_VALUE
+            - type: MULTIPLIER
+              parameters:
+                - '1.0E-6'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: nutanix.host.metric.get
+          tags:
+            - tag: component
+              value: application
+        - uuid: 4f2081e28140438d94103dd709f45d9a
+          name: 'Hypervisor: IO total, bytes'
+          type: DEPENDENT
+          key: nutanix.host.hypervisor.io.total.bytes
+          delay: '0'
+          units: B
+          description: 'The total Input/Output operations size from Hypervisor.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.stats.hypervisor_total_io_size_kbytes
+              error_handler: DISCARD_VALUE
+            - type: MULTIPLIER
+              parameters:
+                - '1024'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: nutanix.host.metric.get
+          tags:
+            - tag: component
+              value: application
         - uuid: 08a7564943fd4d608b5b57299ca52956
           name: 'Hypervisor: IO total, sec'
           type: DEPENDENT
-          key: nutanix.host.hypervisor.io.total
+          key: nutanix.host.hypervisor.io.total.sec
           delay: '0'
           value_type: FLOAT
           units: s
@@ -6960,7 +6768,7 @@ zabbix_export:
           key: nutanix.host.hypervisor.io.write.bandwidth
           delay: '0'
           units: Bps
-          description: 'Write data transferred per second in KB/second from Hypervisor.'
+          description: 'Write data transferred in B/sec from Hypervisor.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -7061,7 +6869,7 @@ zabbix_export:
             - tag: component
               value: application
         - uuid: 6cea713941644a389591598d0a17ab9a
-          name: 'Hypervisor: Memory Usage, %'
+          name: 'Hypervisor: Memory usage, %'
           type: DEPENDENT
           key: nutanix.host.hypervisor.memory.usage.percent
           delay: '0'
@@ -7110,7 +6918,7 @@ zabbix_export:
           key: nutanix.host.hypervisor.received.bytes
           delay: '0'
           units: B
-          description: 'Network transmitted bytes reported by the hypervisor.'
+          description: 'Network received bytes reported by the hypervisor.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -7125,9 +6933,9 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: d99a423ebf124816ba85a2493500004c
-          name: 'Hypervisor: Timespan'
+          name: 'Hypervisor: Timespan, sec'
           type: DEPENDENT
-          key: nutanix.host.hypervisor.timespan
+          key: nutanix.host.hypervisor.timespan.sec
           delay: '0'
           value_type: FLOAT
           units: s
@@ -7154,7 +6962,7 @@ zabbix_export:
           key: nutanix.host.hypervisor.transmitted.bytes
           delay: '0'
           units: B
-          description: 'Write data transferred per second in B/second.'
+          description: 'Network transmitted bytes reported by the hypervisor.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -7358,19 +7166,38 @@ zabbix_export:
           triggers:
             - uuid: f23095d512e845ae846a2b774b97de51
               expression: 'length(last(/Nutanix Host Prism Element by HTTP/nutanix.host.metric.get.check))>0'
-              name: 'Failed to get metric data from API'
+              name: 'Nutanix Host: Failed to get metric data from API'
               priority: HIGH
               description: 'Failed to get data from API. Check the debug log for more information.'
               tags:
                 - tag: scope
                   value: availability
+        - uuid: 9d0f46350adc468ca4160b7a7e7e85a6
+          name: 'Storage Controller: IO'
+          type: DEPENDENT
+          key: nutanix.host.storage.controller.io
+          delay: '0'
+          description: 'Input/Output operations from the Storage Controller.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.stats.controller_num_io
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: nutanix.host.metric.get
+          tags:
+            - tag: component
+              value: storage
         - uuid: f927375ff1394485922c56df0146d17b
           name: 'Storage Controller: IO, bandwidth'
           type: DEPENDENT
           key: nutanix.host.storage.controller.io.bandwidth
           delay: '0'
           units: Bps
-          description: 'Data transferred in B/second from the Storage Controller.'
+          description: 'Data transferred in B/sec from the Storage Controller.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -7394,7 +7221,7 @@ zabbix_export:
           delay: '0'
           value_type: FLOAT
           units: s
-          description: 'I/O latency in milliseconds from the Storage Controller.'
+          description: 'Input/Output latency from the Storage Controller.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -7436,7 +7263,7 @@ zabbix_export:
           key: nutanix.host.storage.controller.io.read.bandwidth
           delay: '0'
           units: Bps
-          description: 'Read data transferred per second in KB/second from the Storage Controller.'
+          description: 'Read data transferred in B/sec from the Storage Controller.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -7524,6 +7351,99 @@ zabbix_export:
           tags:
             - tag: component
               value: storage
+        - uuid: 7266e0a734b94612b77da9173f247391
+          name: 'Storage Controller: IO total read, bytes'
+          type: DEPENDENT
+          key: nutanix.host.storage.controller.io.read.total.bytes
+          delay: '0'
+          units: B
+          description: 'The controller total read Input/Output size.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.stats.controller_total_read_io_size_kbytes
+              error_handler: DISCARD_VALUE
+            - type: MULTIPLIER
+              parameters:
+                - '1024'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: nutanix.host.metric.get
+          tags:
+            - tag: component
+              value: storage
+        - uuid: d49ffc420dee4731bf28f9835bb8e46d
+          name: 'Storage Controller: IO total read, sec'
+          type: DEPENDENT
+          key: nutanix.host.storage.controller.io.read.total.sec
+          delay: '0'
+          value_type: FLOAT
+          units: s
+          description: 'The controller total read Input/Output time.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.stats.controller_total_read_io_time_usecs
+              error_handler: DISCARD_VALUE
+            - type: MULTIPLIER
+              parameters:
+                - '1.0E-6'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: nutanix.host.metric.get
+          tags:
+            - tag: component
+              value: storage
+        - uuid: c9e37cc8765d4492ae579029fddfe9a6
+          name: 'Storage Controller: IO total, bytes'
+          type: DEPENDENT
+          key: nutanix.host.storage.controller.io.total.bytes
+          delay: '0'
+          units: B
+          description: 'The controller total Input/Output size.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.stats.controller_total_io_size_kbytes
+              error_handler: DISCARD_VALUE
+            - type: MULTIPLIER
+              parameters:
+                - '1024'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: nutanix.host.metric.get
+          tags:
+            - tag: component
+              value: storage
+        - uuid: df7e8de51d1e4c309ace840439dc944e
+          name: 'Storage Controller: IO total, sec'
+          type: DEPENDENT
+          key: nutanix.host.storage.controller.io.total.sec
+          delay: '0'
+          units: s
+          description: 'The controller total Input/Output time.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.stats.controller_total_io_time_usecs
+              error_handler: DISCARD_VALUE
+            - type: MULTIPLIER
+              parameters:
+                - '1.0E-6'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: nutanix.host.metric.get
+          tags:
+            - tag: component
+              value: storage
         - uuid: b7b1af82edeb4852a3febd9d29404e16
           name: 'Storage Controller: Write IO'
           type: DEPENDENT
@@ -7549,7 +7469,7 @@ zabbix_export:
           key: nutanix.host.storage.controller.io.write.bandwidth
           delay: '0'
           units: Bps
-          description: 'Write data transferred per second in B/second to the Storage Controller.'
+          description: 'Write data transferred in B/sec to the Storage Controller.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -7698,9 +7618,9 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 476b129cba244a5b8bb96ccc78de397d
-          name: 'Storage Tier: Das-sata Capacity, bytes'
+          name: 'Storage Tier: Das-sata capacity, bytes'
           type: DEPENDENT
-          key: nutanix.host.storage.controller.tier.das_sata.capacity
+          key: nutanix.host.storage.controller.tier.das_sata.capacity.bytes
           delay: '0'
           units: B
           description: 'The total capacity of Das-sata in bytes.'
@@ -7717,9 +7637,9 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: eb23e35b137241f5a9b7142957aec07c
-          name: 'Storage Tier: Das-sata Free, bytes'
+          name: 'Storage Tier: Das-sata free, bytes'
           type: DEPENDENT
-          key: nutanix.host.storage.controller.tier.das_sata.free
+          key: nutanix.host.storage.controller.tier.das_sata.free.bytes
           delay: '0'
           units: B
           description: 'The free space of Das-sata in bytes.'
@@ -7736,9 +7656,9 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 05273aaa28c74743b1bd57a528f575b6
-          name: 'Storage Tier: Das-sata Usage, bytes'
+          name: 'Storage Tier: Das-sata usage, bytes'
           type: DEPENDENT
-          key: nutanix.host.storage.controller.tier.das_sata.usage
+          key: nutanix.host.storage.controller.tier.das_sata.usage.bytes
           delay: '0'
           units: B
           description: 'The used space of Das-sata in bytes.'
@@ -7755,9 +7675,9 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 92a3a023365848a988be29f5ad8e3bfe
-          name: 'Storage Tier: SSD Capacity, bytes'
+          name: 'Storage Tier: SSD capacity, bytes'
           type: DEPENDENT
-          key: nutanix.host.storage.controller.tier.ssd.capacity
+          key: nutanix.host.storage.controller.tier.ssd.capacity.bytes
           delay: '0'
           units: B
           description: 'The total capacity of SSD in bytes.'
@@ -7774,9 +7694,9 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: f4bd200a2cae4cc898718d138a57083a
-          name: 'Storage Tier: SSD Free, bytes'
+          name: 'Storage Tier: SSD free, bytes'
           type: DEPENDENT
-          key: nutanix.host.storage.controller.tier.ssd.free
+          key: nutanix.host.storage.controller.tier.ssd.free.bytes
           delay: '0'
           units: B
           description: 'The free space of SSD in bytes.'
@@ -7793,9 +7713,9 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 6cb0e31dcefd4354908feba5396b3959
-          name: 'Storage Tier: SSD Usage, bytes'
+          name: 'Storage Tier: SSD usage, bytes'
           type: DEPENDENT
-          key: nutanix.host.storage.controller.tier.ssd.usage
+          key: nutanix.host.storage.controller.tier.ssd.usage.bytes
           delay: '0'
           units: B
           description: 'The used space of SSD in bytes.'
@@ -7811,10 +7731,34 @@ zabbix_export:
           tags:
             - tag: component
               value: storage
-        - uuid: 85c0a08944454f5d9d60f3124dd834e0
-          name: 'Storage Controller: Total transformed usage'
+        - uuid: c290ab59bfe24e00b7b54d35e039d08b
+          name: 'Storage Controller: Timespan, sec'
           type: DEPENDENT
-          key: nutanix.host.storage.controller.transformed.usage
+          key: nutanix.host.storage.controller.timespan.sec
+          delay: '0'
+          value_type: FLOAT
+          units: s
+          description: 'The controller Timespan.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.stats.controller_timespan_usecs
+              error_handler: DISCARD_VALUE
+            - type: MULTIPLIER
+              parameters:
+                - '1.0E-6'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: nutanix.host.metric.get
+          tags:
+            - tag: component
+              value: storage
+        - uuid: 85c0a08944454f5d9d60f3124dd834e0
+          name: 'Storage Controller: Total transformed usage, bytes'
+          type: DEPENDENT
+          key: nutanix.host.storage.controller.transformed.usage.total.bytes
           delay: '0'
           units: B
           description: 'Actual usage of Storage Controller.'
@@ -7844,7 +7788,7 @@ zabbix_export:
             - uuid: 8fa4a777a3eb4be5a0030193743ee589
               name: 'Alert [{#ALERT.NAME}]: Count alerts'
               type: DEPENDENT
-              key: 'nutanix.host.alert.count.[{#ALERT.KEY}]'
+              key: 'nutanix.host.alert.count["{#ALERT.KEY}"]'
               delay: '0'
               description: 'The number of times this alert was triggered.'
               preprocessing:
@@ -7862,7 +7806,7 @@ zabbix_export:
             - uuid: 2bcb76c0eafd49738c0fb055ab3c9142
               name: 'Alert [{#ALERT.NAME}]: Create datetime'
               type: DEPENDENT
-              key: 'nutanix.host.alert.created.[{#ALERT.KEY}]'
+              key: 'nutanix.host.alert.created["{#ALERT.KEY}"]'
               delay: '0'
               units: unixtime
               description: 'The alert creation date and time.'
@@ -7884,7 +7828,7 @@ zabbix_export:
             - uuid: a489cfb61a3d4eb8a0faf7c8f6abd449
               name: 'Alert [{#ALERT.NAME}]: Last alert ID'
               type: DEPENDENT
-              key: 'nutanix.host.alert.last_id.[{#ALERT.KEY}]'
+              key: 'nutanix.host.alert.last_id["{#ALERT.KEY}"]'
               delay: '0'
               value_type: CHAR
               trends: '0'
@@ -7904,7 +7848,7 @@ zabbix_export:
             - uuid: 4ea82682f355440ba35372e506a5531d
               name: 'Alert [{#ALERT.NAME}]: Detailed message'
               type: DEPENDENT
-              key: 'nutanix.host.alert.message.[{#ALERT.KEY}]'
+              key: 'nutanix.host.alert.message["{#ALERT.KEY}"]'
               delay: '0'
               value_type: TEXT
               trends: '0'
@@ -7924,7 +7868,7 @@ zabbix_export:
             - uuid: 4cb36a2694c04c3caae239752551a963
               name: 'Alert [{#ALERT.NAME}]: Severity'
               type: DEPENDENT
-              key: 'nutanix.host.alert.severity.[{#ALERT.KEY}]'
+              key: 'nutanix.host.alert.severity["{#ALERT.KEY}"]'
               delay: '0'
               description: |
                 The alert severity. One of the following:
@@ -7949,7 +7893,7 @@ zabbix_export:
             - uuid: 35c0d10c39f445f0a0d0df07588495b9
               name: 'Alert [{#ALERT.NAME}]: State'
               type: DEPENDENT
-              key: 'nutanix.host.alert.state.[{#ALERT.KEY}]'
+              key: 'nutanix.host.alert.state["{#ALERT.KEY}"]'
               delay: '0'
               description: |
                 The alert state. One of the following:
@@ -7972,7 +7916,7 @@ zabbix_export:
             - uuid: 80a264a6ce9846fba559bc43a587710e
               name: 'Alert [{#ALERT.NAME}]: Full title'
               type: DEPENDENT
-              key: 'nutanix.host.alert.title.[{#ALERT.KEY}]'
+              key: 'nutanix.host.alert.title["{#ALERT.KEY}"]'
               delay: '0'
               value_type: TEXT
               trends: '0'
@@ -8017,10 +7961,60 @@ zabbix_export:
           delay: '0'
           description: 'Discovery of all disk.'
           item_prototypes:
+            - uuid: 660ca0265176460090413cd91a29c821
+              name: 'Disk [{#DISK.SERIAL}]: Capacity, bytes'
+              type: DEPENDENT
+              key: 'nutanix.host.disk.capacity.bytes["{#DISK.SERIAL}"]'
+              delay: '0'
+              units: B
+              description: 'The total disk space in bytes.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$..["{#DISK.ID}"].usage_stats.[''storage.capacity_bytes''].first()'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+              master_item:
+                key: nutanix.host.disk.get
+              tags:
+                - tag: component
+                  value: disk
+                - tag: location
+                  value: '{#DISK.LOCATION}'
+                - tag: path
+                  value: '{#DISK.MOUNT.PATH}'
+                - tag: serial
+                  value: '{#DISK.SERIAL}'
+            - uuid: e7a8aadc572648f38fdcba9eaaa9ef78
+              name: 'Disk [{#DISK.SERIAL}]: Free space, bytes'
+              type: DEPENDENT
+              key: 'nutanix.host.disk.free.bytes["{#DISK.SERIAL}"]'
+              delay: '0'
+              units: B
+              description: 'The free disk space in bytes.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$..["{#DISK.ID}"].usage_stats.[''storage.free_bytes''].first()'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: nutanix.host.disk.get
+              tags:
+                - tag: component
+                  value: disk
+                - tag: location
+                  value: '{#DISK.LOCATION}'
+                - tag: path
+                  value: '{#DISK.MOUNT.PATH}'
+                - tag: serial
+                  value: '{#DISK.SERIAL}'
             - uuid: a28563a3464c4fef8ff05b7683495efd
               name: 'Disk [{#DISK.SERIAL}]: IO, latency'
               type: DEPENDENT
-              key: 'nutanix.host.disk.[{#DISK.SERIAL},avg_io_latency_usecs]'
+              key: 'nutanix.host.disk.io.avg.latency["{#DISK.SERIAL}"]'
               delay: '0'
               value_type: FLOAT
               units: s
@@ -8046,20 +8040,104 @@ zabbix_export:
                   value: '{#DISK.MOUNT.PATH}'
                 - tag: serial
                   value: '{#DISK.SERIAL}'
-            - uuid: 660ca0265176460090413cd91a29c821
-              name: 'Disk [{#DISK.SERIAL}]: Capacity, bytes'
+            - uuid: 21c81453cc8c44daaa50b1e5f45c1f4b
+              name: 'Disk [{#DISK.SERIAL}]: Bandwidth'
               type: DEPENDENT
-              key: 'nutanix.host.disk.[{#DISK.SERIAL},capacity_bytes]'
+              key: 'nutanix.host.disk.io.bandwidth["{#DISK.SERIAL}"]'
               delay: '0'
-              units: B
-              description: 'The total disk space in bytes.'
+              units: Bps
+              description: 'Bandwidth of the disk in B/sec.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$..["{#DISK.ID}"].usage_stats.[''storage.capacity_bytes''].first()'
+                    - '$..["{#DISK.ID}"].stats.io_bandwidth_kBps.first()'
+                - type: MULTIPLIER
+                  parameters:
+                    - '1024'
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 12h
+                    - 1h
+              master_item:
+                key: nutanix.host.disk.get
+              tags:
+                - tag: component
+                  value: disk
+                - tag: location
+                  value: '{#DISK.LOCATION}'
+                - tag: path
+                  value: '{#DISK.MOUNT.PATH}'
+                - tag: serial
+                  value: '{#DISK.SERIAL}'
+            - uuid: 324f5d2658b34cc3ab4fcc4a6e2008fe
+              name: 'Disk [{#DISK.SERIAL}]: IOPS'
+              type: DEPENDENT
+              key: 'nutanix.host.disk.iops["{#DISK.SERIAL}"]'
+              delay: '0'
+              units: '!iops'
+              description: 'The number of Input/Output operations from disk.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$..["{#DISK.ID}"].stats.num_iops.first()'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: nutanix.host.disk.get
+              tags:
+                - tag: component
+                  value: disk
+                - tag: location
+                  value: '{#DISK.LOCATION}'
+                - tag: path
+                  value: '{#DISK.MOUNT.PATH}'
+                - tag: serial
+                  value: '{#DISK.SERIAL}'
+            - uuid: 2517600fc093419eab9cc822fa1454a6
+              name: 'Disk [{#DISK.SERIAL}]: Logical usage, bytes'
+              type: DEPENDENT
+              key: 'nutanix.host.disk.logical.usage.bytes["{#DISK.SERIAL}"]'
+              delay: '0'
+              units: B
+              description: 'The logical used disk space in bytes.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$..["{#DISK.ID}"].usage_stats.[''storage.logical_usage_bytes''].first()'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: nutanix.host.disk.get
+              tags:
+                - tag: component
+                  value: disk
+                - tag: location
+                  value: '{#DISK.LOCATION}'
+                - tag: path
+                  value: '{#DISK.MOUNT.PATH}'
+                - tag: serial
+                  value: '{#DISK.SERIAL}'
+            - uuid: 673be2469f634e4cb992550d6665f0e9
+              name: 'Disk [{#DISK.SERIAL}]: Online'
+              type: DEPENDENT
+              key: 'nutanix.host.disk.online["{#DISK.SERIAL}"]'
+              delay: '0'
+              description: 'Whether the disk is online.'
+              valuemap:
+                name: 'Nutanix: True / False'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$..["{#DISK.ID}"].online.first()'
+                - type: BOOL_TO_DECIMAL
+                  parameters:
+                    - ''
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: '2'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
               master_item:
                 key: nutanix.host.disk.get
               tags:
@@ -8074,7 +8152,7 @@ zabbix_export:
             - uuid: d0ecf7b9e9cd4a7687ff9fd8adc8e7e3
               name: 'Disk [{#DISK.SERIAL}]: Status'
               type: DEPENDENT
-              key: 'nutanix.host.disk.[{#DISK.SERIAL},disk_status]'
+              key: 'nutanix.host.disk.status["{#DISK.SERIAL}"]'
               delay: '0'
               description: |
                 The current disk status. One of the following:
@@ -8113,144 +8191,10 @@ zabbix_export:
                   value: '{#DISK.MOUNT.PATH}'
                 - tag: serial
                   value: '{#DISK.SERIAL}'
-            - uuid: e7a8aadc572648f38fdcba9eaaa9ef78
-              name: 'Disk [{#DISK.SERIAL}]: Free space, bytes'
-              type: DEPENDENT
-              key: 'nutanix.host.disk.[{#DISK.SERIAL},free_bytes]'
-              delay: '0'
-              units: B
-              description: 'The free disk space in bytes.'
-              preprocessing:
-                - type: JSONPATH
-                  parameters:
-                    - '$..["{#DISK.ID}"].usage_stats.[''storage.free_bytes''].first()'
-                - type: DISCARD_UNCHANGED_HEARTBEAT
-                  parameters:
-                    - 1h
-              master_item:
-                key: nutanix.host.disk.get
-              tags:
-                - tag: component
-                  value: disk
-                - tag: location
-                  value: '{#DISK.LOCATION}'
-                - tag: path
-                  value: '{#DISK.MOUNT.PATH}'
-                - tag: serial
-                  value: '{#DISK.SERIAL}'
-            - uuid: 21c81453cc8c44daaa50b1e5f45c1f4b
-              name: 'Disk [{#DISK.SERIAL}]: Bandwidth'
-              type: DEPENDENT
-              key: 'nutanix.host.disk.[{#DISK.SERIAL},io_bandwidth_kBps]'
-              delay: '0'
-              units: Bps
-              description: 'Bandwidth of the disk.'
-              preprocessing:
-                - type: JSONPATH
-                  parameters:
-                    - '$..["{#DISK.ID}"].stats.io_bandwidth_kBps.first()'
-                - type: MULTIPLIER
-                  parameters:
-                    - '1024'
-                - type: DISCARD_UNCHANGED_HEARTBEAT
-                  parameters:
-                    - 1h
-              master_item:
-                key: nutanix.host.disk.get
-              tags:
-                - tag: component
-                  value: disk
-                - tag: location
-                  value: '{#DISK.LOCATION}'
-                - tag: path
-                  value: '{#DISK.MOUNT.PATH}'
-                - tag: serial
-                  value: '{#DISK.SERIAL}'
-            - uuid: 2517600fc093419eab9cc822fa1454a6
-              name: 'Disk [{#DISK.SERIAL}]: Logical usage, bytes'
-              type: DEPENDENT
-              key: 'nutanix.host.disk.[{#DISK.SERIAL},logical_usage_bytes]'
-              delay: '0'
-              units: B
-              description: 'The logical used disk space in bytes.'
-              preprocessing:
-                - type: JSONPATH
-                  parameters:
-                    - '$..["{#DISK.ID}"].usage_stats.[''storage.logical_usage_bytes''].first()'
-                - type: DISCARD_UNCHANGED_HEARTBEAT
-                  parameters:
-                    - 1h
-              master_item:
-                key: nutanix.host.disk.get
-              tags:
-                - tag: component
-                  value: disk
-                - tag: location
-                  value: '{#DISK.LOCATION}'
-                - tag: path
-                  value: '{#DISK.MOUNT.PATH}'
-                - tag: serial
-                  value: '{#DISK.SERIAL}'
-            - uuid: 324f5d2658b34cc3ab4fcc4a6e2008fe
-              name: 'Disk [{#DISK.SERIAL}]: IO'
-              type: DEPENDENT
-              key: 'nutanix.host.disk.[{#DISK.SERIAL},num_iops]'
-              delay: '0'
-              units: '!iops'
-              description: 'The number of Input/Output operations from disk.'
-              preprocessing:
-                - type: JSONPATH
-                  parameters:
-                    - '$..["{#DISK.ID}"].stats.num_iops.first()'
-                - type: DISCARD_UNCHANGED_HEARTBEAT
-                  parameters:
-                    - 1h
-              master_item:
-                key: nutanix.host.disk.get
-              tags:
-                - tag: component
-                  value: disk
-                - tag: location
-                  value: '{#DISK.LOCATION}'
-                - tag: path
-                  value: '{#DISK.MOUNT.PATH}'
-                - tag: serial
-                  value: '{#DISK.SERIAL}'
-            - uuid: 673be2469f634e4cb992550d6665f0e9
-              name: 'Disk [{#DISK.SERIAL}]: Online'
-              type: DEPENDENT
-              key: 'nutanix.host.disk.[{#DISK.SERIAL},online]'
-              delay: '0'
-              description: 'Whether the disk is online.'
-              valuemap:
-                name: 'Nutanix: True / False'
-              preprocessing:
-                - type: JSONPATH
-                  parameters:
-                    - '$..["{#DISK.ID}"].online.first()'
-                - type: BOOL_TO_DECIMAL
-                  parameters:
-                    - ''
-                  error_handler: CUSTOM_VALUE
-                  error_handler_params: '2'
-                - type: DISCARD_UNCHANGED_HEARTBEAT
-                  parameters:
-                    - 1h
-              master_item:
-                key: nutanix.host.disk.get
-              tags:
-                - tag: component
-                  value: disk
-                - tag: location
-                  value: '{#DISK.LOCATION}'
-                - tag: path
-                  value: '{#DISK.MOUNT.PATH}'
-                - tag: serial
-                  value: '{#DISK.SERIAL}'
             - uuid: 904596dcd2db4721bd923e325b8b889e
               name: 'Disk [{#DISK.SERIAL}]: Used space, bytes'
               type: DEPENDENT
-              key: 'nutanix.host.disk.[{#DISK.SERIAL},usage_bytes]'
+              key: 'nutanix.host.disk.usage.bytes["{#DISK.SERIAL}"]'
               delay: '0'
               units: B
               description: 'The used disk space in bytes.'
@@ -8448,16 +8392,13 @@ zabbix_export:
                       name: itemid.0
                       value:
                         host: 'Nutanix Host Prism Element by HTTP'
-                        key: nutanix.host.general.cpu.capacity
+                        key: nutanix.host.general.cpu.capacity.hz
                     - type: INTEGER
                       name: show.0
                       value: '1'
                     - type: INTEGER
                       name: show.1
                       value: '2'
-                    - type: INTEGER
-                      name: show.2
-                      value: '4'
                     - type: INTEGER
                       name: units_bold
                       value: '0'
@@ -8477,16 +8418,13 @@ zabbix_export:
                       name: itemid.0
                       value:
                         host: 'Nutanix Host Prism Element by HTTP'
-                        key: nutanix.host.general.memory.total
+                        key: nutanix.host.general.memory.total.bytes
                     - type: INTEGER
                       name: show.0
                       value: '1'
                     - type: INTEGER
                       name: show.1
                       value: '2'
-                    - type: INTEGER
-                      name: show.2
-                      value: '4'
                     - type: INTEGER
                       name: units_bold
                       value: '0'
@@ -8510,9 +8448,6 @@ zabbix_export:
                     - type: INTEGER
                       name: show.1
                       value: '2'
-                    - type: INTEGER
-                      name: show.2
-                      value: '4'
                     - type: STRING
                       name: thresholds.0.color
                       value: 47A76A
@@ -8553,9 +8488,6 @@ zabbix_export:
                       name: show.1
                       value: '2'
                     - type: INTEGER
-                      name: show.2
-                      value: '4'
-                    - type: INTEGER
                       name: units_bold
                       value: '0'
                     - type: INTEGER
@@ -8578,16 +8510,13 @@ zabbix_export:
                       name: itemid.0
                       value:
                         host: 'Nutanix Host Prism Element by HTTP'
-                        key: nutanix.host.general.timespan
+                        key: nutanix.host.general.timespan.sec
                     - type: INTEGER
                       name: show.0
                       value: '1'
                     - type: INTEGER
                       name: show.1
                       value: '2'
-                    - type: INTEGER
-                      name: show.2
-                      value: '4'
                     - type: INTEGER
                       name: units_bold
                       value: '0'
@@ -8611,9 +8540,6 @@ zabbix_export:
                     - type: INTEGER
                       name: show.1
                       value: '2'
-                    - type: INTEGER
-                      name: show.2
-                      value: '4'
                     - type: STRING
                       name: thresholds.0.color
                       value: 47A76A
@@ -8636,7 +8562,7 @@ zabbix_export:
                       name: value_bold
                       value: '0'
                 - type: item
-                  name: 'General: Storage Capacity'
+                  name: 'General: Storage capacity'
                   x: '36'
                   'y': '8'
                   width: '18'
@@ -8647,21 +8573,18 @@ zabbix_export:
                       value: '45'
                     - type: STRING
                       name: description
-                      value: 'General: Storage Capacity'
+                      value: 'General: Storage capacity'
                     - type: ITEM
                       name: itemid.0
                       value:
                         host: 'Nutanix Host Prism Element by HTTP'
-                        key: nutanix.host.general.storage.capacity
+                        key: nutanix.host.general.storage.capacity.bytes
                     - type: INTEGER
                       name: show.0
                       value: '1'
                     - type: INTEGER
                       name: show.1
                       value: '2'
-                    - type: INTEGER
-                      name: show.2
-                      value: '4'
                     - type: INTEGER
                       name: units_bold
                       value: '0'
@@ -8685,7 +8608,7 @@ zabbix_export:
                       name: itemid.0
                       value:
                         host: 'Nutanix Host Prism Element by HTTP'
-                        key: nutanix.host.general.storage.logical.usage
+                        key: nutanix.host.general.storage.logical.usage.bytes
                     - type: INTEGER
                       name: show.0
                       value: '1'
@@ -8693,16 +8616,13 @@ zabbix_export:
                       name: show.1
                       value: '2'
                     - type: INTEGER
-                      name: show.2
-                      value: '4'
-                    - type: INTEGER
                       name: units_bold
                       value: '0'
                     - type: INTEGER
                       name: value_bold
                       value: '0'
                 - type: item
-                  name: 'General: Degrade Status'
+                  name: 'General: Degrade status'
                   x: '54'
                   width: '18'
                   hide_header: 'YES'
@@ -8718,9 +8638,6 @@ zabbix_export:
                     - type: INTEGER
                       name: show.1
                       value: '2'
-                    - type: INTEGER
-                      name: show.2
-                      value: '4'
                     - type: STRING
                       name: thresholds.0.color
                       value: 47A76A
@@ -8743,7 +8660,7 @@ zabbix_export:
                       name: value_bold
                       value: '0'
                 - type: item
-                  name: 'General: Number of Virtual Machines'
+                  name: 'General: Number of virtual machines'
                   x: '54'
                   'y': '2'
                   width: '18'
@@ -8788,9 +8705,6 @@ zabbix_export:
                       name: show.1
                       value: '2'
                     - type: INTEGER
-                      name: show.2
-                      value: '4'
-                    - type: INTEGER
                       name: units_bold
                       value: '0'
                     - type: INTEGER
@@ -8818,9 +8732,6 @@ zabbix_export:
                       name: show.1
                       value: '2'
                     - type: INTEGER
-                      name: show.2
-                      value: '4'
-                    - type: INTEGER
                       name: units_bold
                       value: '0'
                     - type: INTEGER
@@ -8830,7 +8741,7 @@ zabbix_export:
                       name: value_size
                       value: '30'
                 - type: item
-                  name: 'General: Storage Free'
+                  name: 'General: Storage free'
                   x: '54'
                   'y': '8'
                   width: '18'
@@ -8841,21 +8752,18 @@ zabbix_export:
                       value: '45'
                     - type: STRING
                       name: description
-                      value: 'General: Storage Free'
+                      value: 'General: Storage free'
                     - type: ITEM
                       name: itemid.0
                       value:
                         host: 'Nutanix Host Prism Element by HTTP'
-                        key: nutanix.host.general.storage.free
+                        key: nutanix.host.general.storage.free.bytes
                     - type: INTEGER
                       name: show.0
                       value: '1'
                     - type: INTEGER
                       name: show.1
                       value: '2'
-                    - type: INTEGER
-                      name: show.2
-                      value: '4'
                     - type: INTEGER
                       name: units_bold
                       value: '0'
@@ -8879,16 +8787,13 @@ zabbix_export:
                       name: itemid.0
                       value:
                         host: 'Nutanix Host Prism Element by HTTP'
-                        key: nutanix.host.general.storage.usage
+                        key: nutanix.host.general.storage.usage.bytes
                     - type: INTEGER
                       name: show.0
                       value: '1'
                     - type: INTEGER
                       name: show.1
                       value: '2'
-                    - type: INTEGER
-                      name: show.2
-                      value: '4'
                     - type: INTEGER
                       name: units_bold
                       value: '0'
@@ -8947,7 +8852,7 @@ zabbix_export:
                       name: righty
                       value: '0'
                 - type: svggraph
-                  name: 'Hypervisor: Memory Usage'
+                  name: 'Hypervisor: Memory usage'
                   'y': '5'
                   width: '48'
                   height: '5'
@@ -9009,7 +8914,7 @@ zabbix_export:
                       name: itemid.0
                       value:
                         host: 'Nutanix Host Prism Element by HTTP'
-                        key: nutanix.host.cpu.cores
+                        key: nutanix.host.hypervisor.cpu.cores.num
                     - type: INTEGER
                       name: show.0
                       value: '1'
@@ -9039,7 +8944,7 @@ zabbix_export:
                       name: itemid.0
                       value:
                         host: 'Nutanix Host Prism Element by HTTP'
-                        key: nutanix.host.cpu.sockets
+                        key: nutanix.host.hypervisor.cpu.sockets.num
                     - type: INTEGER
                       name: show.0
                       value: '1'
@@ -9114,7 +9019,7 @@ zabbix_export:
                       name: itemid.0
                       value:
                         host: 'Nutanix Host Prism Element by HTTP'
-                        key: nutanix.host.general.cpu.capacity
+                        key: nutanix.host.general.cpu.capacity.hz
                     - type: INTEGER
                       name: show.0
                       value: '1'
@@ -9122,16 +9027,13 @@ zabbix_export:
                       name: show.1
                       value: '2'
                     - type: INTEGER
-                      name: show.2
-                      value: '4'
-                    - type: INTEGER
                       name: units_bold
                       value: '0'
                     - type: INTEGER
                       name: value_bold
                       value: '0'
                 - type: gauge
-                  name: 'Hypervisor: Memory Usage'
+                  name: 'Hypervisor: Memory usage'
                   x: '48'
                   'y': '5'
                   width: '24'
@@ -9190,16 +9092,13 @@ zabbix_export:
                       name: itemid.0
                       value:
                         host: 'Nutanix Host Prism Element by HTTP'
-                        key: nutanix.host.general.memory.total
+                        key: nutanix.host.general.memory.total.bytes
                     - type: INTEGER
                       name: show.0
                       value: '1'
                     - type: INTEGER
                       name: show.1
                       value: '2'
-                    - type: INTEGER
-                      name: show.2
-                      value: '4'
                     - type: INTEGER
                       name: units_bold
                       value: '0'
@@ -9220,7 +9119,7 @@ zabbix_export:
                       name: itemid.0
                       value:
                         host: 'Nutanix Host Prism Element by HTTP'
-                        key: nutanix.host.cpu.threads
+                        key: nutanix.host.hypervisor.cpu.threads.num
                     - type: INTEGER
                       name: show.0
                       value: '1'
@@ -9638,9 +9537,6 @@ zabbix_export:
                       name: show.1
                       value: '2'
                     - type: INTEGER
-                      name: show.2
-                      value: '4'
-                    - type: INTEGER
                       name: units_bold
                       value: '0'
                     - type: INTEGER
@@ -9730,9 +9626,6 @@ zabbix_export:
                       name: show.1
                       value: '2'
                     - type: INTEGER
-                      name: show.2
-                      value: '4'
-                    - type: INTEGER
                       name: units_bold
                       value: '0'
                     - type: INTEGER
@@ -9762,9 +9655,6 @@ zabbix_export:
                     - type: INTEGER
                       name: show.1
                       value: '2'
-                    - type: INTEGER
-                      name: show.2
-                      value: '4'
                     - type: INTEGER
                       name: units_bold
                       value: '0'
@@ -9796,9 +9686,6 @@ zabbix_export:
                       name: show.1
                       value: '2'
                     - type: INTEGER
-                      name: show.2
-                      value: '4'
-                    - type: INTEGER
                       name: units_bold
                       value: '0'
                     - type: INTEGER
@@ -9828,9 +9715,6 @@ zabbix_export:
                     - type: INTEGER
                       name: show.1
                       value: '2'
-                    - type: INTEGER
-                      name: show.2
-                      value: '4'
                     - type: INTEGER
                       name: units_bold
                       value: '0'
@@ -9862,16 +9746,13 @@ zabbix_export:
                       name: show.1
                       value: '2'
                     - type: INTEGER
-                      name: show.2
-                      value: '4'
-                    - type: INTEGER
                       name: units_bold
                       value: '0'
                     - type: INTEGER
                       name: value_bold
                       value: '0'
                 - type: gauge
-                  name: 'Content Cache: Hit Rate'
+                  name: 'Content Cache: Hit rate'
                   x: '54'
                   width: '18'
                   height: '4'
@@ -9892,7 +9773,7 @@ zabbix_export:
                       name: value_arc_color
                       value: 0040FF
                 - type: svggraph
-                  name: 'Content Cache: Hit Rate'
+                  name: 'Content Cache: Hit rate'
                   x: '54'
                   'y': '4'
                   width: '18'
@@ -9959,16 +9840,13 @@ zabbix_export:
                       name: itemid.0
                       value:
                         host: 'Nutanix Host Prism Element by HTTP'
-                        key: nutanix.host.content.cache.num.lookups
+                        key: nutanix.host.content.cache.lookups.num
                     - type: INTEGER
                       name: show.0
                       value: '1'
                     - type: INTEGER
                       name: show.1
                       value: '2'
-                    - type: INTEGER
-                      name: show.2
-                      value: '4'
                     - type: INTEGER
                       name: units_bold
                       value: '0'
@@ -9999,9 +9877,6 @@ zabbix_export:
                     - type: INTEGER
                       name: show.1
                       value: '2'
-                    - type: INTEGER
-                      name: show.2
-                      value: '4'
                     - type: INTEGER
                       name: units_bold
                       value: '0'
@@ -10226,16 +10101,13 @@ zabbix_export:
                       name: itemid.0
                       value:
                         host: 'Nutanix Host Prism Element by HTTP'
-                        key: nutanix.host.hypervisor.timespan
+                        key: nutanix.host.hypervisor.timespan.sec
                     - type: INTEGER
                       name: show.0
                       value: '1'
                     - type: INTEGER
                       name: show.1
                       value: '2'
-                    - type: INTEGER
-                      name: show.2
-                      value: '4'
                     - type: INTEGER
                       name: units_bold
                       value: '0'
@@ -10406,7 +10278,7 @@ zabbix_export:
                       name: ds.0.itemids.0
                       value:
                         host: 'Nutanix Host Prism Element by HTTP'
-                        key: nutanix.cluster.storage.controller.io
+                        key: nutanix.host.storage.controller.io
                     - type: ITEM
                       name: ds.0.itemids.1
                       value:
@@ -10626,12 +10498,12 @@ zabbix_export:
                       name: ds.0.itemids.0
                       value:
                         host: 'Nutanix Host Prism Element by HTTP'
-                        key: nutanix.host.storage.controller.tier.das_sata.free
+                        key: nutanix.host.storage.controller.tier.das_sata.free.bytes
                     - type: ITEM
                       name: ds.0.itemids.1
                       value:
                         host: 'Nutanix Host Prism Element by HTTP'
-                        key: nutanix.host.storage.controller.tier.ssd.free
+                        key: nutanix.host.storage.controller.tier.ssd.free.bytes
                     - type: INTEGER
                       name: ds.0.missingdatafunc
                       value: '3'
@@ -10657,7 +10529,7 @@ zabbix_export:
                       name: righty
                       value: '0'
                 - type: item
-                  name: 'Storage Tier: Das-sata Free'
+                  name: 'Storage Tier: Das-sata free'
                   'y': '4'
                   width: '25'
                   hide_header: 'YES'
@@ -10667,21 +10539,18 @@ zabbix_export:
                       value: '45'
                     - type: STRING
                       name: description
-                      value: 'Storage Tier: Das-sata Free'
+                      value: 'Storage Tier: Das-sata free'
                     - type: ITEM
                       name: itemid.0
                       value:
                         host: 'Nutanix Host Prism Element by HTTP'
-                        key: nutanix.host.storage.controller.tier.das_sata.free
+                        key: nutanix.host.storage.controller.tier.das_sata.free.bytes
                     - type: INTEGER
                       name: show.0
                       value: '1'
                     - type: INTEGER
                       name: show.1
                       value: '2'
-                    - type: INTEGER
-                      name: show.2
-                      value: '4'
                     - type: INTEGER
                       name: units_bold
                       value: '0'
@@ -10710,12 +10579,12 @@ zabbix_export:
                       name: ds.0.itemids.0
                       value:
                         host: 'Nutanix Host Prism Element by HTTP'
-                        key: nutanix.host.storage.controller.tier.das_sata.usage
+                        key: nutanix.host.storage.controller.tier.das_sata.usage.bytes
                     - type: ITEM
                       name: ds.0.itemids.1
                       value:
                         host: 'Nutanix Host Prism Element by HTTP'
-                        key: nutanix.host.storage.controller.tier.ssd.usage
+                        key: nutanix.host.storage.controller.tier.ssd.usage.bytes
                     - type: INTEGER
                       name: ds.0.missingdatafunc
                       value: '3'
@@ -10741,7 +10610,7 @@ zabbix_export:
                       name: righty
                       value: '0'
                 - type: item
-                  name: 'Storage Tier: Das-sata Usage'
+                  name: 'Storage Tier: Das-sata usage'
                   'y': '10'
                   width: '25'
                   hide_header: 'YES'
@@ -10751,12 +10620,12 @@ zabbix_export:
                       value: '45'
                     - type: STRING
                       name: description
-                      value: 'Storage Tier: Das-sata Usage'
+                      value: 'Storage Tier: Das-sata usage'
                     - type: ITEM
                       name: itemid.0
                       value:
                         host: 'Nutanix Host Prism Element by HTTP'
-                        key: nutanix.host.storage.controller.tier.das_sata.usage
+                        key: nutanix.host.storage.controller.tier.das_sata.usage.bytes
                     - type: INTEGER
                       name: show.0
                       value: '1'
@@ -10764,16 +10633,13 @@ zabbix_export:
                       name: show.1
                       value: '2'
                     - type: INTEGER
-                      name: show.2
-                      value: '4'
-                    - type: INTEGER
                       name: units_bold
                       value: '0'
                     - type: INTEGER
                       name: value_bold
                       value: '0'
                 - type: item
-                  name: 'Storage Tier: SSD Free'
+                  name: 'Storage Tier: SSD free'
                   x: '25'
                   'y': '4'
                   width: '25'
@@ -10784,12 +10650,12 @@ zabbix_export:
                       value: '45'
                     - type: STRING
                       name: description
-                      value: 'Storage Tier: SSD Free'
+                      value: 'Storage Tier: SSD free'
                     - type: ITEM
                       name: itemid.0
                       value:
                         host: 'Nutanix Host Prism Element by HTTP'
-                        key: nutanix.host.storage.controller.tier.ssd.free
+                        key: nutanix.host.storage.controller.tier.ssd.free.bytes
                     - type: INTEGER
                       name: show.0
                       value: '1'
@@ -10797,16 +10663,13 @@ zabbix_export:
                       name: show.1
                       value: '2'
                     - type: INTEGER
-                      name: show.2
-                      value: '4'
-                    - type: INTEGER
                       name: units_bold
                       value: '0'
                     - type: INTEGER
                       name: value_bold
                       value: '0'
                 - type: item
-                  name: 'Storage Tier: SSD Usage'
+                  name: 'Storage Tier: SSD usage'
                   x: '25'
                   'y': '10'
                   width: '25'
@@ -10817,21 +10680,18 @@ zabbix_export:
                       value: '45'
                     - type: STRING
                       name: description
-                      value: 'Storage Tier: SSD Usage'
+                      value: 'Storage Tier: SSD usage'
                     - type: ITEM
                       name: itemid.0
                       value:
                         host: 'Nutanix Host Prism Element by HTTP'
-                        key: nutanix.host.storage.controller.tier.ssd.usage
+                        key: nutanix.host.storage.controller.tier.ssd.usage.bytes
                     - type: INTEGER
                       name: show.0
                       value: '1'
                     - type: INTEGER
                       name: show.1
                       value: '2'
-                    - type: INTEGER
-                      name: show.2
-                      value: '4'
                     - type: INTEGER
                       name: units_bold
                       value: '0'
@@ -10860,12 +10720,12 @@ zabbix_export:
                       name: ds.0.itemids.0
                       value:
                         host: 'Nutanix Host Prism Element by HTTP'
-                        key: nutanix.host.storage.controller.tier.ssd.capacity
+                        key: nutanix.host.storage.controller.tier.ssd.capacity.bytes
                     - type: ITEM
                       name: ds.0.itemids.1
                       value:
                         host: 'Nutanix Host Prism Element by HTTP'
-                        key: nutanix.host.storage.controller.tier.ssd.usage
+                        key: nutanix.host.storage.controller.tier.ssd.usage.bytes
                     - type: INTEGER
                       name: ds.0.type.0
                       value: '1'
@@ -10907,12 +10767,12 @@ zabbix_export:
                       name: ds.0.itemids.0
                       value:
                         host: 'Nutanix Host Prism Element by HTTP'
-                        key: nutanix.host.storage.controller.tier.das_sata.capacity
+                        key: nutanix.host.storage.controller.tier.das_sata.capacity.bytes
                     - type: ITEM
                       name: ds.0.itemids.1
                       value:
                         host: 'Nutanix Host Prism Element by HTTP'
-                        key: nutanix.host.storage.controller.tier.das_sata.usage
+                        key: nutanix.host.storage.controller.tier.das_sata.usage.bytes
                     - type: INTEGER
                       name: ds.0.type.0
                       value: '1'
@@ -10984,7 +10844,7 @@ zabbix_export:
                       name: itemid.0
                       value:
                         host: 'Nutanix Host Prism Element by HTTP'
-                        key: 'nutanix.host.disk.[{#DISK.SERIAL},capacity_bytes]'
+                        key: 'nutanix.host.disk.capacity.bytes["{#DISK.SERIAL}"]'
                     - type: STRING
                       name: reference
                       value: MLSDN
@@ -11004,7 +10864,7 @@ zabbix_export:
                       name: itemid.0
                       value:
                         host: 'Nutanix Host Prism Element by HTTP'
-                        key: 'nutanix.host.disk.[{#DISK.SERIAL},logical_usage_bytes]'
+                        key: 'nutanix.host.disk.logical.usage.bytes["{#DISK.SERIAL}"]'
                     - type: STRING
                       name: reference
                       value: MLSDA
@@ -11064,7 +10924,7 @@ zabbix_export:
                       name: itemid.0
                       value:
                         host: 'Nutanix Host Prism Element by HTTP'
-                        key: 'nutanix.host.disk.[{#DISK.SERIAL},free_bytes]'
+                        key: 'nutanix.host.disk.free.bytes["{#DISK.SERIAL}"]'
                     - type: STRING
                       name: reference
                       value: MLSDX
@@ -11085,7 +10945,7 @@ zabbix_export:
                       name: itemid.0
                       value:
                         host: 'Nutanix Host Prism Element by HTTP'
-                        key: 'nutanix.host.disk.[{#DISK.SERIAL},usage_bytes]'
+                        key: 'nutanix.host.disk.usage.bytes["{#DISK.SERIAL}"]'
                     - type: STRING
                       name: reference
                       value: MLSDB
@@ -11383,7 +11243,7 @@ zabbix_export:
           triggers:
             - uuid: baf3ae722bd44a09a628f9c81c541259
               expression: 'length(last(/Nutanix Prism Element by HTTP/nutanix.cluster.get.check))>0'
-              name: 'Failed to get cluster data from API'
+              name: 'Nutanix: Failed to get cluster data from API'
               priority: HIGH
               description: 'Failed to get data from API. Check the debug log for more information.'
               tags:
@@ -11576,7 +11436,7 @@ zabbix_export:
           triggers:
             - uuid: 56e915c86d4640c3b073cb8309bf1d6e
               expression: 'length(last(/Nutanix Prism Element by HTTP/nutanix.host.get.check))>0'
-              name: 'Failed to get host data from API'
+              name: 'Nutanix: Failed to get host data from API'
               priority: HIGH
               description: 'Failed to get data from API. Check the debug log for more information.'
               tags:
@@ -11774,7 +11634,7 @@ zabbix_export:
           triggers:
             - uuid: f46c6213084c4afe88065beb6cdcef33
               expression: 'length(last(/Nutanix Prism Element by HTTP/nutanix.storage.container.get.check))>0'
-              name: 'Failed to get storage container data from API'
+              name: 'Nutanix: Failed to get storage container data from API'
               priority: HIGH
               description: 'Failed to get data from API. Check the debug log for more information.'
               tags:
@@ -11870,14 +11730,14 @@ zabbix_export:
             - uuid: f0a6602489f54d5c8be85bb75ebd3e6f
               name: 'Container [{#STORAGE.CONTAINER.NAME}]: Capacity, bytes'
               type: DEPENDENT
-              key: 'nutanix.storage.container.[{#STORAGE.CONTAINTER.UUID},storage.capacity_bytes]'
+              key: 'nutanix.storage.container.capacity.bytes["{#STORAGE.CONTAINER.UUID}"]'
               delay: '0'
               units: B
               description: 'The total space of the storage container.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$..["{#STORAGE.CONTAINTER.UUID}"].usage_stats.[''storage.capacity_bytes''].first()'
+                    - '$..["{#STORAGE.CONTAINER.UUID}"].usage_stats.[''storage.capacity_bytes''].first()'
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
@@ -11891,14 +11751,14 @@ zabbix_export:
             - uuid: dac6fb1aa0ee4d93ab67e1bd3374c412
               name: 'Container [{#STORAGE.CONTAINER.NAME}]: Free space, bytes'
               type: DEPENDENT
-              key: 'nutanix.storage.container.[{#STORAGE.CONTAINTER.UUID},storage.free_bytes]'
+              key: 'nutanix.storage.container.free.bytes["{#STORAGE.CONTAINER.UUID}"]'
               delay: '0'
               units: B
               description: 'The free space of the storage container.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$..["{#STORAGE.CONTAINTER.UUID}"].usage_stats.[''storage.free_bytes''].first()'
+                    - '$..["{#STORAGE.CONTAINER.UUID}"].usage_stats.[''storage.free_bytes''].first()'
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
@@ -11912,13 +11772,13 @@ zabbix_export:
             - uuid: dc76d8405d204e90bd6213f34344dcb6
               name: 'Container [{#STORAGE.CONTAINER.NAME}]: Replication factor'
               type: DEPENDENT
-              key: 'nutanix.storage.container.[{#STORAGE.CONTAINTER.UUID},storage.replication_factor]'
+              key: 'nutanix.storage.container.replication.factor["{#STORAGE.CONTAINER.UUID}"]'
               delay: '0'
               description: 'The replication factor of the storage container.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$..["{#STORAGE.CONTAINTER.UUID}"].replication_factor.first()'
+                    - '$..["{#STORAGE.CONTAINER.UUID}"].replication_factor.first()'
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
@@ -11932,14 +11792,14 @@ zabbix_export:
             - uuid: 5d40812ff4f14146a5199edf271be1ec
               name: 'Container [{#STORAGE.CONTAINER.NAME}]: Used space, bytes'
               type: DEPENDENT
-              key: 'nutanix.storage.container.[{#STORAGE.CONTAINTER.UUID},storage.usage_bytes]'
+              key: 'nutanix.storage.container.usage.bytes["{#STORAGE.CONTAINER.UUID}"]'
               delay: '0'
               units: B
               description: 'The used space of the storage container.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$..["{#STORAGE.CONTAINTER.UUID}"].usage_stats.[''storage.usage_bytes''].first()'
+                    - '$..["{#STORAGE.CONTAINER.UUID}"].usage_stats.[''storage.usage_bytes''].first()'
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
@@ -11961,7 +11821,7 @@ zabbix_export:
                   
                   for (var entity in jsonData) {
                   	outputData.push({
-                  		"{#STORAGE.CONTAINTER.UUID}": jsonData[entity].storage_container_uuid,
+                  		"{#STORAGE.CONTAINER.UUID}": jsonData[entity].storage_container_uuid,
                   		"{#STORAGE.CONTAINER.NAME}": jsonData[entity].name
                   	});
                   }
@@ -12011,7 +11871,7 @@ zabbix_export:
                       name: itemid.0
                       value:
                         host: 'Nutanix Prism Element by HTTP'
-                        key: 'nutanix.storage.container.[{#STORAGE.CONTAINTER.UUID},storage.capacity_bytes]'
+                        key: 'nutanix.storage.container.capacity.bytes["{#STORAGE.CONTAINER.UUID}"]'
                     - type: STRING
                       name: reference
                       value: MLSDY
@@ -12031,7 +11891,7 @@ zabbix_export:
                       name: itemid.0
                       value:
                         host: 'Nutanix Prism Element by HTTP'
-                        key: 'nutanix.storage.container.[{#STORAGE.CONTAINTER.UUID},storage.free_bytes]'
+                        key: 'nutanix.storage.container.free.bytes["{#STORAGE.CONTAINER.UUID}"]'
                     - type: STRING
                       name: reference
                       value: MLSDW
@@ -12079,7 +11939,7 @@ zabbix_export:
                       name: itemid.0
                       value:
                         host: 'Nutanix Prism Element by HTTP'
-                        key: 'nutanix.storage.container.[{#STORAGE.CONTAINTER.UUID},storage.usage_bytes]'
+                        key: 'nutanix.storage.container.usage.bytes["{#STORAGE.CONTAINER.UUID}"]'
                     - type: STRING
                       name: reference
                       value: MLSDB
@@ -12088,7 +11948,7 @@ zabbix_export:
                       value: '3'
   graphs:
     - uuid: 65515b97fe634d65a85a1d364887c67b
-      name: 'Content Cache: Hit Rate, %'
+      name: 'Content Cache: Hit rate, %'
       graph_items:
         - drawtype: GRADIENT_LINE
           color: 0040FF
@@ -12096,7 +11956,7 @@ zabbix_export:
             host: 'Nutanix Cluster Prism Element by HTTP'
             key: nutanix.cluster.content.cache.hit.percent
     - uuid: 10cc868569aa457194f23f000d76c42c
-      name: 'Content Cache: Hit Rate, %'
+      name: 'Content Cache: Hit rate, %'
       graph_items:
         - drawtype: GRADIENT_LINE
           color: 0040FF
@@ -12104,7 +11964,7 @@ zabbix_export:
             host: 'Nutanix Host Prism Element by HTTP'
             key: nutanix.host.content.cache.hit.percent
     - uuid: 47934bfa13084fa4a3986796298e0b47
-      name: 'Content Cache: Memory'
+      name: 'Content Cache: Memory, bytes'
       graph_items:
         - drawtype: GRADIENT_LINE
           color: 00BFFF
@@ -12124,7 +11984,7 @@ zabbix_export:
             host: 'Nutanix Cluster Prism Element by HTTP'
             key: nutanix.cluster.content.cache.physical.memory.usage.bytes
     - uuid: 7573a56ef8c147b7af2a3d6208af7169
-      name: 'Content Cache: Memory'
+      name: 'Content Cache: Memory, bytes'
       graph_items:
         - drawtype: GRADIENT_LINE
           color: 00BFFF
@@ -12144,7 +12004,7 @@ zabbix_export:
             host: 'Nutanix Host Prism Element by HTTP'
             key: nutanix.host.content.cache.physical.memory.usage.bytes
     - uuid: d044e823d54444c4985f653685b9b438
-      name: 'Content Cache: SSD usage'
+      name: 'Content Cache: SSD usage, bytes'
       graph_items:
         - drawtype: GRADIENT_LINE
           color: 00BFFF
@@ -12164,7 +12024,7 @@ zabbix_export:
             host: 'Nutanix Cluster Prism Element by HTTP'
             key: nutanix.cluster.content.cache.saved.ssd.usage.bytes
     - uuid: 6ec9ec1bcf17441fbe2fa2130a154f4e
-      name: 'Content Cache: SSD usage'
+      name: 'Content Cache: SSD usage, bytes'
       graph_items:
         - drawtype: GRADIENT_LINE
           color: 00BFFF
@@ -12184,7 +12044,7 @@ zabbix_export:
             host: 'Nutanix Host Prism Element by HTTP'
             key: nutanix.host.content.cache.saved.ssd.usage.bytes
     - uuid: 3ef6efe82e004c9bb274e8f653a1ae9e
-      name: 'General: IO, Bandwidth'
+      name: 'General: IO, bandwidth'
       graph_items:
         - drawtype: GRADIENT_LINE
           color: 00BFFF
@@ -12204,7 +12064,7 @@ zabbix_export:
             host: 'Nutanix Cluster Prism Element by HTTP'
             key: nutanix.cluster.general.io.write.bandwidth
     - uuid: 75c38f9f8c1c4760bff3f73f97de2f81
-      name: 'General: IO, Bandwidth'
+      name: 'General: IO, bandwidth'
       graph_items:
         - drawtype: GRADIENT_LINE
           color: 00BFFF
@@ -12330,7 +12190,7 @@ zabbix_export:
             host: 'Nutanix Host Prism Element by HTTP'
             key: nutanix.host.general.io.read.percent
     - uuid: 2eb73e5623dc444d9296efb721b44534
-      name: 'Hypervisor: CPU Usage, %'
+      name: 'Hypervisor: CPU usage, %'
       ymin_type_1: FIXED
       ymax_type_1: FIXED
       graph_items:
@@ -12340,7 +12200,7 @@ zabbix_export:
             host: 'Nutanix Cluster Prism Element by HTTP'
             key: nutanix.cluster.hypervisor.cpu.usage.percent
     - uuid: d81d699dcc8f40928fc200919a6d18ca
-      name: 'Hypervisor: CPU Usage, %'
+      name: 'Hypervisor: CPU usage, %'
       ymin_type_1: FIXED
       ymax_type_1: FIXED
       graph_items:
@@ -12470,7 +12330,7 @@ zabbix_export:
             host: 'Nutanix Host Prism Element by HTTP'
             key: nutanix.host.hypervisor.iops.write
     - uuid: 9da8e4c6642d4150ac5d45f1cb817253
-      name: 'Hypervisor: Memory Usage, %'
+      name: 'Hypervisor: Memory usage, %'
       ymin_type_1: FIXED
       ymax_type_1: FIXED
       graph_items:
@@ -12480,7 +12340,7 @@ zabbix_export:
             host: 'Nutanix Cluster Prism Element by HTTP'
             key: nutanix.cluster.hypervisor.memory.usage.percent
     - uuid: d95d9844425b4db5af1346aeac315021
-      name: 'Hypervisor: Memory Usage, %'
+      name: 'Hypervisor: Memory usage, %'
       ymin_type_1: FIXED
       ymax_type_1: FIXED
       graph_items:
@@ -12518,7 +12378,7 @@ zabbix_export:
           color: FF0080
           item:
             host: 'Nutanix Cluster Prism Element by HTTP'
-            key: nutanix.cluster.hypervisor.io.num
+            key: nutanix.cluster.hypervisor.io
         - sortorder: '2'
           drawtype: GRADIENT_LINE
           color: 0040FF
@@ -12592,7 +12452,7 @@ zabbix_export:
           color: 00BFFF
           item:
             host: 'Nutanix Host Prism Element by HTTP'
-            key: nutanix.cluster.storage.controller.io
+            key: nutanix.host.storage.controller.io
         - sortorder: '1'
           drawtype: GRADIENT_LINE
           color: FF0080
@@ -12716,58 +12576,58 @@ zabbix_export:
             host: 'Nutanix Host Prism Element by HTTP'
             key: nutanix.host.storage.controller.io.write.percent
     - uuid: 1edd2ff1710649ed9e037b2a00dc9f22
-      name: 'Storage Tier: Free'
+      name: 'Storage Tier: Free, bytes'
       graph_items:
         - drawtype: GRADIENT_LINE
           color: 00BFFF
           item:
             host: 'Nutanix Cluster Prism Element by HTTP'
-            key: nutanix.cluster.storage.controller.tier.das_sata.free
+            key: nutanix.cluster.storage.controller.tier.das_sata.free.bytes
         - sortorder: '1'
           drawtype: GRADIENT_LINE
           color: 0040FF
           item:
             host: 'Nutanix Cluster Prism Element by HTTP'
-            key: nutanix.cluster.storage.controller.tier.ssd.free
+            key: nutanix.cluster.storage.controller.tier.ssd.free.bytes
     - uuid: c0740b2c536646ceb85aabeca052e2cb
-      name: 'Storage Tier: Free'
+      name: 'Storage Tier: Free, bytes'
       graph_items:
         - drawtype: GRADIENT_LINE
           color: 00BFFF
           item:
             host: 'Nutanix Host Prism Element by HTTP'
-            key: nutanix.host.storage.controller.tier.das_sata.free
+            key: nutanix.host.storage.controller.tier.das_sata.free.bytes
         - sortorder: '1'
           drawtype: GRADIENT_LINE
           color: 0040FF
           item:
             host: 'Nutanix Host Prism Element by HTTP'
-            key: nutanix.host.storage.controller.tier.ssd.free
+            key: nutanix.host.storage.controller.tier.ssd.free.bytes
     - uuid: 0a45550d55c24cfdb7d45fc98dd305d8
-      name: 'Storage Tier: Usage'
+      name: 'Storage Tier: Usage, bytes'
       graph_items:
         - drawtype: GRADIENT_LINE
           color: 00BFFF
           item:
             host: 'Nutanix Cluster Prism Element by HTTP'
-            key: nutanix.cluster.storage.controller.tier.das_sata.usage
+            key: nutanix.cluster.storage.controller.tier.das_sata.usage.bytes
         - sortorder: '1'
           drawtype: GRADIENT_LINE
           color: 0040FF
           item:
             host: 'Nutanix Cluster Prism Element by HTTP'
-            key: nutanix.cluster.storage.controller.tier.ssd.usage
+            key: nutanix.cluster.storage.controller.tier.ssd.usage.bytes
     - uuid: 955f507dc01b4ec0842b998e33061b09
-      name: 'Storage Tier: Usage'
+      name: 'Storage Tier: Usage, bytes'
       graph_items:
         - drawtype: GRADIENT_LINE
           color: 00BFFF
           item:
             host: 'Nutanix Host Prism Element by HTTP'
-            key: nutanix.host.storage.controller.tier.das_sata.usage
+            key: nutanix.host.storage.controller.tier.das_sata.usage.bytes
         - sortorder: '1'
           drawtype: GRADIENT_LINE
           color: 0040FF
           item:
             host: 'Nutanix Host Prism Element by HTTP'
-            key: nutanix.host.storage.controller.tier.ssd.usage
+            key: nutanix.host.storage.controller.tier.ssd.usage.bytes
