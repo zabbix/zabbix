@@ -21,23 +21,23 @@
 void	zbx_mock_test_entry(void **state)
 {
 	char		*dest = NULL;
-	const char	*f = zbx_mock_get_parameter_string("in.f");
-	const char  *argument_str = zbx_mock_get_parameter_string("in.arg_str");
-	int			argument_int = zbx_mock_get_parameter_uint64("in.arg_int");
+	const char 	*argument_str = zbx_mock_get_parameter_string("in.arg_str");
+	int		argument_int = atoi(zbx_mock_get_parameter_string("in.arg_int"));
 	const char	*exp_result = zbx_mock_get_parameter_string("out.val");
-	int			argument_number = zbx_mock_get_parameter_uint64("in.arg_number");
+	int		argument_number = atoi(zbx_mock_get_parameter_string("in.arg_number"));
 
 	ZBX_UNUSED(state);
 
 	switch(argument_number){
 		case 1:
-			dest = zbx_strdcatf(dest, f, argument_str);
+			dest = zbx_strdcatf(dest, "This is string - %s", argument_str);
 			break;
 		case 2:
-			dest = zbx_strdcatf(dest, f, argument_str, argument_int);
+			dest = zbx_strdcatf(dest, "This is a %s, there are %d rooms", argument_str, argument_int);
 			break;
 		case 3:
-			dest = zbx_strdcatf(dest, f, argument_str, argument_int, argument_str);
+			dest = zbx_strdcatf(dest, "I have a %s. He is %d years old. This is a big %s", argument_str,
+				argument_int, argument_str);
 			break;
 		default:
 			fail_msg("Expected argument_number 1-3");

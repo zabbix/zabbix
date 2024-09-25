@@ -21,7 +21,7 @@
 void	zbx_mock_test_entry(void **state)
 {
 	char		*src = zbx_strdup(NULL ,zbx_mock_get_parameter_string("in.string"));
-	const char 	*list =  zbx_mock_get_parameter_string("in.list");
+	const char 	*list = zbx_mock_get_parameter_string("in.list");
 	const char 	*exp_result = zbx_mock_get_parameter_string("out.return");
 
 	ZBX_UNUSED(state);

@@ -42,7 +42,7 @@ out:
 test case: "Copy Newlines"
 in:
   src: "\n\n\n\n\n"
-  dst: "\n\n"
+  dst: "\n\n\n\n\n"
   size: 10
 out:
   result: 5

@@ -44,7 +44,7 @@ in:
 out:
   return: SUCCEED
 ---
-test case: "6. aa.bbb.bbbb.bbbbb - wrong lenght"
+test case: "6. aa.bbb.bbbb.bbbbb - wrong length"
 in:
   list: "aa.bbb.bbbb.bbbbb"
   value: "aaaa"

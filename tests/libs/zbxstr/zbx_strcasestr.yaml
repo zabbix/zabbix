@@ -1,5 +1,5 @@
 ---
-test case: "1. Deafault string"
+test case: "1. Default string"
 in:
   haystack: "Hello, World!"
   needle: "world"

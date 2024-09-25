@@ -21,19 +21,17 @@
 void	zbx_mock_test_entry(void **state)
 {
 	const char	*src, *charlist, *char_result;
-	int			act_result, exp_result;
-	size_t 		len;
+	char 		destination[30];
+	int		act_result, exp_result;;
 
 	ZBX_UNUSED(state);
 
 	src = zbx_mock_get_parameter_string("in.src");
 	charlist = zbx_mock_get_parameter_string("in.charlist");
-	len = zbx_mock_get_parameter_uint64("in.len");
-	char dst[len];
 	exp_result = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
 	char_result = zbx_mock_get_parameter_string("out.result");
-	act_result = zbx_escape_string(dst, sizeof(dst), src, charlist);
+	act_result = zbx_escape_string(destination, sizeof(destination), src, charlist);
 
 	zbx_mock_assert_int_eq("return value", exp_result, act_result);
-	zbx_mock_assert_str_eq("return string", char_result, dst);
+	zbx_mock_assert_str_eq("return string", char_result, destination);
 }

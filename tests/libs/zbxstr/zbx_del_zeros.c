@@ -27,6 +27,6 @@ void	zbx_mock_test_entry(void **state)
 
 	zbx_del_zeros(src);
 
-	zbx_mock_assert_str_eq("return value",  exp_result, src);
+	zbx_mock_assert_str_eq("return value", exp_result, src);
 	zbx_free(src);
 }

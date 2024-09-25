@@ -256,7 +256,6 @@ tests/libs/zbxstr/zbx_truncate_value
 tests/libs/zbxstr/zbx_utf8_char_len
 tests/libs/zbxexpression/zbx_evaluate_function
 tests/libs/zbxodbc/odbc_pass
-tests/libs/zbxsysinfo/linux/system_process
 tests/libs/zbxsysinfo/zbx_parse_item_key_check_get_fqdn
 tests/libs/zbxsysinfo/zbx_check_key_access_rules
 tests/libs/zbxsysinfo/zbx_check_service_default_addr
@@ -276,6 +275,7 @@ tests/libs/zbxsysinfo/linux/system_cpu_switches
 tests/libs/zbxsysinfo/linux/system_hw_chassis
 tests/libs/zbxsysinfo/linux/system_sw_packages_get
 tests/libs/zbxsysinfo/linux/system_sw_software
+tests/libs/zbxsysinfo/linux/system_process
 tests/libs/zbxsysinfo/linux/vfs_fs_discovery
 tests/libs/zbxsysinfo/zbx_parse_item_key
 tests/libs/zbxsysinfo/process
