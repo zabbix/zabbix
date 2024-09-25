@@ -61,4 +61,22 @@ in:
   r: 10
 out:
   return: ❤️ 💌 💌 💕 💞 💓 💗 💖 💘 💝 💟 💜 💛 💚 💙
+---
+test case: "Newlines replace"
+in:
+  data: "\n\n\n\n\n\n"
+  value: "N"
+  l: 3
+  r: 4
+out:
+  return: "\n\n\nN\n"
+---
+test case: "Backslash and quotation mark replace"
+in:
+  data: '\\"\\\"\'
+  value: "N"
+  l: 3
+  r: 4
+out:
+  return: '\\"N\"\'
 ...

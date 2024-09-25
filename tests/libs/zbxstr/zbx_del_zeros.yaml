@@ -46,4 +46,16 @@ in:
   string: ""
 out:
   string: ""
+---
+test case: \\100.100 -> \\100.1
+in:
+  string: \\100.100
+out:
+  string: \\100.1
+---
+test case: '\n-100.200'
+in:
+  string: "\n-100.200"
+out:
+  string: "\n-100.2"
 ...

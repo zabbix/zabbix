@@ -40,3 +40,25 @@ in:
   needle: "💝"
 out:
   string: "💝 💟 💜 💛 💚 💙"
+---
+test case: "8. Backslash"
+in:
+  haystack: 'adad\adad'
+  needle: '\'
+out:
+  string: '\adad'
+---
+test case: "9. Quotation mark"
+in:
+  haystack: 'Quotation mark"Quotation mark'
+  needle: '"'
+out:
+  string: '"Quotation mark'
+---
+test case: "10. Newline"
+in:
+  haystack: "NewlineNewline\nNewline"
+  needle: "\n"
+out:
+  string: "\nNewline"
+...

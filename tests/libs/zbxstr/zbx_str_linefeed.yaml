@@ -54,4 +54,28 @@ in:
   maxline: 3
 out:
   string: "社/會/科/學/院/語/學/研/究/所"
+---
+test case: "8. Newlines"
+in:
+  scr: "\n\n\n"
+  delim: '.'
+  maxline: 1
+out:
+  string: "\n.\n.\n"
+---
+test case: "8. Backslashes"
+in:
+  scr: '\\\\\\'
+  delim: '.'
+  maxline: 1
+out:
+  string: '\.\.\.\.\.\'
+---
+test case: "9. Quotation marks"
+in:
+  scr: '"""'
+  delim: '#'
+  maxline: 1
+out:
+  string: '"#"#"'
 ...

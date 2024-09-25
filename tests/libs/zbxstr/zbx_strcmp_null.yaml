@@ -54,4 +54,11 @@ in:
   string2: "田中さんにあげて下さい"
 out:
   val: SUCCEED
+---
+test case: " Backslash"
+in:
+  string1: '\\\\\\\\\\\'
+  string2: '\\\\\\\\\\\'
+out:
+  val: SUCCEED
 ...

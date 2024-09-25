@@ -41,10 +41,24 @@ in:
 out:
   return: "≈ç√∫˜µ≤≥÷"
 ---
-test case: "5. Newlines"
+test case: "6. Newlines"
 in:
   string: "\nNewlines\n"
   list: "\n"
 out:
   return: "Newlines"
+---
+test case: "7. Bascksleshes"
+in:
+  string: \\\\\Something\\\\\\
+  list: \
+out:
+  return: "Something"
+---
+test case: "8. Quotation mark"
+in:
+  string: '"""t"""'
+  list: '"'
+out:
+  return: "t"
 ...

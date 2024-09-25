@@ -55,3 +55,10 @@ in:
   string: "⁰	⁴	⁵	₀	₁	₂	"
 out:
   string: ⁰\t⁴\t⁵\t₀\t₁\t₂\t
+---
+test case: "Backslashes and Quotation marks"
+in:
+  string: '\\\"	"\\\\'
+out:
+  string: \\\"\t"\\\\
+...
