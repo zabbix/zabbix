@@ -37,7 +37,7 @@ void	zbx_mock_test_entry(void **state)
 			dest = zbx_strdcatf(dest, "This is a %s, there are %d rooms", argument_str, argument_int);
 			break;
 		case 3:
-			dest = zbx_strdcatf(dest, "I have a %s. He is %d years old. This is a big %s", argument_str,
+			dest = zbx_strdcatf(dest, "I have a %s. It is %d years old. This is a big %s", argument_str,
 				argument_int, argument_str);
 			break;
 		default:
