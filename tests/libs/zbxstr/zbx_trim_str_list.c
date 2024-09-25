@@ -11,6 +11,7 @@
 ** You should have received a copy of the GNU Affero General Public License along with this program.
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
+
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
 #include "zbxmockutil.h"
@@ -28,6 +29,6 @@ void	zbx_mock_test_entry(void **state)
 
 	zbx_trim_str_list(list, delimiter);
 
-	zbx_mock_assert_str_eq("return value",  exp_result, list);
+	zbx_mock_assert_str_eq("return value", exp_result, list);
 	zbx_free(list);
 }

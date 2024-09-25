@@ -11,6 +11,7 @@
 ** You should have received a copy of the GNU Affero General Public License along with this program.
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
+
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
 #include "zbxmockutil.h"

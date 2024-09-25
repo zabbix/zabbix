@@ -29,7 +29,7 @@ void	zbx_mock_test_entry(void **state)
 	ZBX_UNUSED(state);
 
 	zbx_replace_invalid_utf8(in_buffer);
-	zbx_mock_assert_str_eq("Unexpected error message X", out_buffer, in_buffer);
+	zbx_mock_assert_str_eq("return value", out_buffer, in_buffer);
 	zbx_free(in_buffer);
 	zbx_free(out_buffer);
 }

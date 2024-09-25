@@ -28,5 +28,5 @@ void	zbx_mock_test_entry(void **state)
 
 	ZBX_UNUSED(state);
 
-	zbx_mock_assert_uint64_eq("return value",  exp_result, act_result);
+	zbx_mock_assert_uint64_eq("return value", exp_result, act_result);
 }

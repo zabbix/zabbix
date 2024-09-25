@@ -31,6 +31,6 @@ void	zbx_mock_test_entry(void **state)
 	memset(dest, 0, size2);
 	zbx_strlcat(dest, src, size2);
 	zbx_replace_invalid_utf8(dest);
-	zbx_mock_assert_str_eq("return value",  exp_result, dest);
+	zbx_mock_assert_str_eq("return value", exp_result, dest);
 	zbx_free(dest);
 }

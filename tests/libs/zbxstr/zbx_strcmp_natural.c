@@ -11,6 +11,7 @@
 ** You should have received a copy of the GNU Affero General Public License along with this program.
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
+
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
 #include "zbxmockutil.h"
@@ -24,7 +25,7 @@ void	zbx_mock_test_entry(void **state)
 	const char	*s2 = zbx_mock_get_parameter_string("in.string2");
 	const char	*returned_result;
 	const char	*exp_result = zbx_mock_get_parameter_string("out.val");
-	int			act_value = zbx_strcmp_natural(s1, s2);
+	int		act_value = zbx_strcmp_natural(s1, s2);
 
 	ZBX_UNUSED(state);
 
@@ -35,5 +36,5 @@ void	zbx_mock_test_entry(void **state)
 	else
 		returned_result = "equal";
 
-	zbx_mock_assert_str_eq("return value",  exp_result, returned_result);
+	zbx_mock_assert_str_eq("return value", exp_result, returned_result);
 }
