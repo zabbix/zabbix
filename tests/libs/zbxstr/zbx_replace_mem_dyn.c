@@ -30,8 +30,8 @@ void	zbx_mock_test_entry(void **state)
 	size_t		offset = zbx_mock_get_parameter_uint64("in.offset");
 	size_t		sz_to = zbx_mock_get_parameter_uint64("in.sz_to");
 	size_t		sz_from = zbx_mock_get_parameter_uint64("in.sz_from");
-	int			exp_result = atoi(zbx_mock_get_parameter_string("out.exp_result"));
-	int			act_result = zbx_replace_mem_dyn(&data, &data_alloc, &data_len, offset, sz_to, from, sz_from);
+	int		exp_result = atoi(zbx_mock_get_parameter_string("out.exp_result"));
+	int		act_result = zbx_replace_mem_dyn(&data, &data_alloc, &data_len, offset, sz_to, from, sz_from);
 
 	ZBX_UNUSED(state);
 
