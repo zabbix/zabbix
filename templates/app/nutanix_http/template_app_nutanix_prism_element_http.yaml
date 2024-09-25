@@ -868,7 +868,7 @@ zabbix_export:
           type: DEPENDENT
           key: nutanix.cluster.general.io.write.bandwidth
           units: Bps
-          description: 'Write data transferred per second in B/second from disk.'
+          description: 'Write data transferred in B/sec from disk.'
           preprocessing:
             - type: JSONPATH
               parameters:
