@@ -44,6 +44,6 @@ void	zbx_mock_test_entry(void **state)
 			break;
 	}
 
-	zbx_mock_assert_str_eq("return value",  exp_result, dest);
+	zbx_mock_assert_str_eq("return value", exp_result, dest);
 	zbx_free(dest);
 }
