@@ -498,7 +498,7 @@ zabbix_export:
             - uuid: d65649266623411d88d7087c2dd396fb
               name: 'BBU [{#ID}] on [{#LOCATION}]: Running status'
               type: DEPENDENT
-              key: 'huawei.oceanstor.v6.bbu.runnnig_status["{#ID}:{#LOCATION}"]'
+              key: 'huawei.oceanstor.v6.bbu.running_status["{#ID}:{#LOCATION}"]'
               delay: '0'
               description: 'Running status of a BBU.'
               valuemap:
@@ -524,7 +524,7 @@ zabbix_export:
                   value: '{#LOCATION}'
               trigger_prototypes:
                 - uuid: 9819288b70734d3ea81cf4b4c8649861
-                  expression: 'last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.bbu.runnnig_status["{#ID}:{#LOCATION}"])<>27'
+                  expression: 'last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.bbu.running_status["{#ID}:{#LOCATION}"])<>27'
                   name: 'BBU [{#ID}] on [{#LOCATION}]: Running status is not Online'
                   opdata: 'Current status: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -681,7 +681,7 @@ zabbix_export:
             - uuid: 3a0e447c0a454f0aaf54ccc17dc7ff60
               name: 'Controller [{#ID}]: Running status'
               type: DEPENDENT
-              key: 'huawei.oceanstor.v6.controller.runnnig_status["{#ID}"]'
+              key: 'huawei.oceanstor.v6.controller.running_status["{#ID}"]'
               delay: '0'
               description: 'Controller running status.'
               valuemap:
@@ -703,7 +703,7 @@ zabbix_export:
                   value: '{#ID}'
               trigger_prototypes:
                 - uuid: 3b1fdea2c8bb4c63b38713476ff8131e
-                  expression: 'last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.controller.runnnig_status["{#ID}"])<>27'
+                  expression: 'last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.controller.running_status["{#ID}"])<>27'
                   name: 'Controller [{#ID}]: Running status is not Online'
                   opdata: 'Current status: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -776,7 +776,7 @@ zabbix_export:
             - uuid: e93cb24c47294fd5854e5eef53a7b1de
               name: 'Disk [{#MODEL}] on [{#LOCATION}]: Running status'
               type: DEPENDENT
-              key: 'huawei.oceanstor.v6.disk.runnnig_status["{#ID}"]'
+              key: 'huawei.oceanstor.v6.disk.running_status["{#ID}"]'
               delay: '0'
               description: 'Disk running status.'
               valuemap:
@@ -800,7 +800,7 @@ zabbix_export:
                   value: '{#LOCATION}'
               trigger_prototypes:
                 - uuid: 43604005baf44569a85a1bfe84e3e550
-                  expression: 'last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.disk.runnnig_status["{#ID}"])<>27'
+                  expression: 'last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.disk.running_status["{#ID}"])<>27'
                   name: 'Disk [{#MODEL}] on [{#LOCATION}]: Running status is not Online'
                   opdata: 'Current status: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -899,7 +899,7 @@ zabbix_export:
             - uuid: 6109abefad0e47bf806b2c8c1d5cecb6
               name: 'Enclosure [{#NAME}]: Running status'
               type: DEPENDENT
-              key: 'huawei.oceanstor.v6.enclosure.runnnig_status["{#NAME}"]'
+              key: 'huawei.oceanstor.v6.enclosure.running_status["{#NAME}"]'
               delay: '0'
               description: 'Enclosure running status.'
               valuemap:
@@ -921,7 +921,7 @@ zabbix_export:
                   value: '{#NAME}'
               trigger_prototypes:
                 - uuid: d98542189b9b406d842ed4f1afd1c423
-                  expression: 'last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.enclosure.runnnig_status["{#NAME}"])<>27'
+                  expression: 'last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.enclosure.running_status["{#NAME}"])<>27'
                   name: 'Enclosure [{#NAME}]: Running status is not Online'
                   opdata: 'Current status: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -1014,7 +1014,7 @@ zabbix_export:
             - uuid: 333fec4bf1e5404e9a76e76231d6415c
               name: 'FAN [{#ID}] on [{#LOCATION}]: Running status'
               type: DEPENDENT
-              key: 'huawei.oceanstor.v6.fan.runnnig_status["{#ID}:{#LOCATION}"]'
+              key: 'huawei.oceanstor.v6.fan.running_status["{#ID}:{#LOCATION}"]'
               delay: '0'
               description: 'Operating status of a fan.'
               valuemap:
@@ -1038,7 +1038,7 @@ zabbix_export:
                   value: '{#LOCATION}'
               trigger_prototypes:
                 - uuid: 95ea84d081d94fe583c16bc48291d680
-                  expression: 'last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.fan.runnnig_status["{#ID}:{#LOCATION}"])<>2'
+                  expression: 'last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.fan.running_status["{#ID}:{#LOCATION}"])<>2'
                   name: 'FAN [{#ID}] on [{#LOCATION}]: Running status is not Running'
                   opdata: 'Current status: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -1687,7 +1687,7 @@ zabbix_export:
             - uuid: 93d705a0ac84420ba35a54753652eacf
               name: 'Storage pool [{#NAME}]: Running status'
               type: DEPENDENT
-              key: 'huawei.oceanstor.v6.pool.runnnig_status["{#NAME}"]'
+              key: 'huawei.oceanstor.v6.pool.running_status["{#NAME}"]'
               delay: '0'
               description: 'Operating status of a storage pool.'
               valuemap:
@@ -1709,7 +1709,7 @@ zabbix_export:
                   value: '{#NAME}'
               trigger_prototypes:
                 - uuid: 1921c51b36374cd4b9efe7e49f8cd2da
-                  expression: 'last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.pool.runnnig_status["{#NAME}"])<>27'
+                  expression: 'last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.pool.running_status["{#NAME}"])<>27'
                   name: 'Storage pool [{#NAME}]: Running status is not Online'
                   opdata: 'Current status: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -1993,7 +1993,7 @@ zabbix_export:
             - value: '6'
               newvalue: Starting
             - value: '7'
-              newvalue: 'Power failure rotection'
+              newvalue: 'Power failure protection'
             - value: '8'
               newvalue: 'Spin down'
             - value: '9'
