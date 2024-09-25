@@ -21,5 +21,5 @@ in:
   arg_int: "7"
   arg_number: "3"
 out:
-  val: "I have a cat. He is 7 years old. This is a big cat"
+  val: "I have a cat. It is 7 years old. This is a big cat"
 ...
