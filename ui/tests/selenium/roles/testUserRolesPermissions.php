@@ -489,7 +489,7 @@ class testUserRolesPermissions extends CWebTest {
 					'state' => false
 				]
 			],
-			// Super Admin user with default 'Change problem ranking' => true.
+			// User with 'Change problem ranking' => true.
 			[
 				[
 					'user' => 'problem_ranking_true',
