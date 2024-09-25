@@ -92,7 +92,7 @@ This template has been tested on:
 |Controller [{#ID}]: CPU utilization|<p>CPU usage of a controller {#ID}.</p>|SNMP agent|huawei.oceanstor.v6.controller.cpu["{#ID}"]|
 |Controller [{#ID}]: Memory utilization|<p>Memory usage of a controller {#ID}.</p>|SNMP agent|huawei.oceanstor.v6.controller.memory["{#ID}"]|
 |Controller [{#ID}]: Health status|<p>Controller health status.</p>|SNMP agent|huawei.oceanstor.v6.controller.health_status["{#ID}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
-|Controller [{#ID}]: Running status|<p>Controller running status.</p>|SNMP agent|huawei.oceanstor.v6.controller.runnnig_status["{#ID}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Controller [{#ID}]: Running status|<p>Controller running status.</p>|SNMP agent|huawei.oceanstor.v6.controller.running_status["{#ID}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 |Controller [{#ID}]: Role|<p>Controller role.</p>|SNMP agent|huawei.oceanstor.v6.controller.role["{#ID}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 
 ### Trigger prototypes for Controller discovery
@@ -102,7 +102,7 @@ This template has been tested on:
 |Controller [{#ID}]: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.controller.cpu["{#ID}"],5m)>{$CPU.UTIL.CRIT}`|Warning||
 |Controller [{#ID}]: Memory usage is too high||`min(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.controller.memory["{#ID}"],{$HUAWEI.OCEANSTOR_V6.MEM.MAX.TIME})>{$HUAWEI.OCEANSTOR_V6.MEM.MAX.WARN}`|Average||
 |Controller [{#ID}]: Health status is not Normal||`last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.controller.health_status["{#ID}"])<>1`|High||
-|Controller [{#ID}]: Running status is not Online||`last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.controller.runnnig_status["{#ID}"])<>27`|Average||
+|Controller [{#ID}]: Running status is not Online||`last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.controller.running_status["{#ID}"])<>27`|Average||
 |Controller [{#ID}]: Role has been changed||`last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.controller.role["{#ID}"],#1)<>last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.controller.role["{#ID}"],#2)`|Warning|**Manual close**: Yes|
 
 ### LLD rule Enclosure discovery
@@ -116,7 +116,7 @@ This template has been tested on:
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |Enclosure [{#NAME}]: Health status|<p>Enclosure health status.</p>|SNMP agent|huawei.oceanstor.v6.enclosure.health_status["{#NAME}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
-|Enclosure [{#NAME}]: Running status|<p>Enclosure running status.</p>|SNMP agent|huawei.oceanstor.v6.enclosure.runnnig_status["{#NAME}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Enclosure [{#NAME}]: Running status|<p>Enclosure running status.</p>|SNMP agent|huawei.oceanstor.v6.enclosure.running_status["{#NAME}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 |Enclosure [{#NAME}]: Temperature|<p>Enclosure temperature.</p>|SNMP agent|huawei.oceanstor.v6.enclosure.temperature["{#NAME}"]|
 
 ### Trigger prototypes for Enclosure discovery
@@ -124,7 +124,7 @@ This template has been tested on:
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
 |Enclosure [{#NAME}]: Health status is not Normal||`last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.enclosure.health_status["{#NAME}"])<>1`|High||
-|Enclosure [{#NAME}]: Running status is not Online||`last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.enclosure.runnnig_status["{#NAME}"])<>27`|Average||
+|Enclosure [{#NAME}]: Running status is not Online||`last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.enclosure.running_status["{#NAME}"])<>27`|Average||
 |Enclosure [{#NAME}]: Temperature is too high||`min(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.enclosure.temperature["{#NAME}"],{$HUAWEI.OCEANSTOR_V6.TEMP.MAX.TIME})>{$HUAWEI.OCEANSTOR_V6.TEMP.MAX.WARN}`|High||
 
 ### LLD rule Fan discovery
@@ -138,14 +138,14 @@ This template has been tested on:
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |FAN [{#ID}] on [{#LOCATION}]: Health status|<p>Health status of a fan.</p>|SNMP agent|huawei.oceanstor.v6.fan.health_status["{#ID}:{#LOCATION}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
-|FAN [{#ID}] on [{#LOCATION}]: Running status|<p>Operating status of a fan.</p>|SNMP agent|huawei.oceanstor.v6.fan.runnnig_status["{#ID}:{#LOCATION}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|FAN [{#ID}] on [{#LOCATION}]: Running status|<p>Operating status of a fan.</p>|SNMP agent|huawei.oceanstor.v6.fan.running_status["{#ID}:{#LOCATION}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 
 ### Trigger prototypes for Fan discovery
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
 |FAN [{#ID}] on [{#LOCATION}]: Health status is not Normal||`last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.fan.health_status["{#ID}:{#LOCATION}"])<>1`|High||
-|FAN [{#ID}] on [{#LOCATION}]: Running status is not Running||`last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.fan.runnnig_status["{#ID}:{#LOCATION}"])<>2`|Average||
+|FAN [{#ID}] on [{#LOCATION}]: Running status is not Running||`last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.fan.running_status["{#ID}:{#LOCATION}"])<>2`|Average||
 
 ### LLD rule BBU discovery
 
@@ -158,14 +158,14 @@ This template has been tested on:
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |BBU [{#ID}] on [{#LOCATION}]: Health status|<p>Health status of a BBU.</p>|SNMP agent|huawei.oceanstor.v6.bbu.health_status["{#ID}:{#LOCATION}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
-|BBU [{#ID}] on [{#LOCATION}]: Running status|<p>Running status of a BBU.</p>|SNMP agent|huawei.oceanstor.v6.bbu.runnnig_status["{#ID}:{#LOCATION}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|BBU [{#ID}] on [{#LOCATION}]: Running status|<p>Running status of a BBU.</p>|SNMP agent|huawei.oceanstor.v6.bbu.running_status["{#ID}:{#LOCATION}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 
 ### Trigger prototypes for BBU discovery
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
 |BBU [{#ID}] on [{#LOCATION}]: Health status is not Normal||`last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.bbu.health_status["{#ID}:{#LOCATION}"])<>1`|High||
-|BBU [{#ID}] on [{#LOCATION}]: Running status is not Online||`last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.bbu.runnnig_status["{#ID}:{#LOCATION}"])<>27`|Average||
+|BBU [{#ID}] on [{#LOCATION}]: Running status is not Online||`last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.bbu.running_status["{#ID}:{#LOCATION}"])<>27`|Average||
 
 ### LLD rule Disk discovery
 
@@ -178,7 +178,7 @@ This template has been tested on:
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |Disk [{#MODEL}] on [{#LOCATION}]: Health status|<p>Disk health status.</p>|SNMP agent|huawei.oceanstor.v6.disk.health_status["{#ID}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
-|Disk [{#MODEL}] on [{#LOCATION}]: Running status|<p>Disk running status.</p>|SNMP agent|huawei.oceanstor.v6.disk.runnnig_status["{#ID}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Disk [{#MODEL}] on [{#LOCATION}]: Running status|<p>Disk running status.</p>|SNMP agent|huawei.oceanstor.v6.disk.running_status["{#ID}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 |Disk [{#MODEL}] on [{#LOCATION}]: Temperature|<p>Disk temperature.</p>|SNMP agent|huawei.oceanstor.v6.disk.temperature["{#ID}"]|
 
 ### Trigger prototypes for Disk discovery
@@ -186,7 +186,7 @@ This template has been tested on:
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
 |Disk [{#MODEL}] on [{#LOCATION}]: Health status is not Normal||`last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.disk.health_status["{#ID}"])<>1`|High||
-|Disk [{#MODEL}] on [{#LOCATION}]: Running status is not Online||`last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.disk.runnnig_status["{#ID}"])<>27`|Average||
+|Disk [{#MODEL}] on [{#LOCATION}]: Running status is not Online||`last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.disk.running_status["{#ID}"])<>27`|Average||
 |Disk [{#MODEL}] on [{#LOCATION}]: Temperature is too high||`min(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.disk.temperature["{#ID}"],{$HUAWEI.OCEANSTOR_V6.DISK.TEMP.MAX.TIME})>{$HUAWEI.OCEANSTOR_V6.DISK.TEMP.MAX.WARN:"{#MODEL}"}`|High||
 
 ### LLD rule Node performance discovery
@@ -253,7 +253,7 @@ This template has been tested on:
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |Storage pool [{#NAME}]: Health status|<p>Health status of a storage pool.</p>|SNMP agent|huawei.oceanstor.v6.pool.health_status["{#NAME}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
-|Storage pool [{#NAME}]: Running status|<p>Operating status of a storage pool.</p>|SNMP agent|huawei.oceanstor.v6.pool.runnnig_status["{#NAME}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Storage pool [{#NAME}]: Running status|<p>Operating status of a storage pool.</p>|SNMP agent|huawei.oceanstor.v6.pool.running_status["{#NAME}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 |Storage pool [{#NAME}]: Capacity total|<p>Total capacity of a storage pool.</p>|SNMP agent|huawei.oceanstor.v6.pool.capacity.total["{#NAME}"]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1048576`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 |Storage pool [{#NAME}]: Capacity free|<p>Available capacity of a storage pool.</p>|SNMP agent|huawei.oceanstor.v6.pool.capacity.free["{#NAME}"]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1048576`</p></li></ul>|
 
@@ -262,7 +262,7 @@ This template has been tested on:
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
 |Storage pool [{#NAME}]: Health status is not Normal||`last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.pool.health_status["{#NAME}"])<>1`|High||
-|Storage pool [{#NAME}]: Running status is not Online||`last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.pool.runnnig_status["{#NAME}"])<>27`|Average||
+|Storage pool [{#NAME}]: Running status is not Online||`last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.pool.running_status["{#NAME}"])<>27`|Average||
 
 ## Feedback
 
