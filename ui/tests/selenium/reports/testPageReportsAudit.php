@@ -73,7 +73,7 @@ class testPageReportsAudit extends CWebTest {
 		}
 
 		// Check form labels.
-		$this->assertEquals(['Users', 'Actions', 'Resource', 'Resource ID', 'Recordset ID'], $form->getLabels()->asText());
+		$this->assertEquals(['Users', 'Actions', 'Resource', 'Resource ID', 'Recordset ID', 'IP'], $form->getLabels()->asText());
 
 		// Check that resource values set as All by default.
 		$this->assertTrue($form->checkValue(['Resource' => 'All']));
@@ -458,6 +458,60 @@ class testPageReportsAudit extends CWebTest {
 					],
 					'no_data' => true
 				]
+			],
+			// #16 IPv4 address
+			[
+				[
+					'fields' => [
+						'IP' => '111.222.33.44'
+					],
+					'result_count' => 1
+				]
+			],
+			// #17 Another correct IP
+			[
+				[
+					'fields' => [
+						'IP' => '111.222.33.4'
+					],
+					'result_count' => 4
+				]
+			],
+			// #18 Part of correct IP
+			[
+				[
+					'fields' => [
+						'IP' => '111.222'
+					],
+					'no_data' => true
+				]
+			],
+			// #19 IP is not in the list
+			[
+				[
+					'fields' => [
+						'IP' => '66.66.66.66'
+					],
+					'no_data' => true
+				]
+			],
+			// #20 IPv6 address
+			[
+				[
+					'fields' => [
+						'IP' => 'fe80::fd4a:c2bd:74e:99ab'
+					],
+					'result_count' => 2
+				]
+			],
+			// #21 Domain address
+			[
+				[
+					'fields' => [
+						'IP' => 'domain'
+					],
+					'result_count' => 6
+				]
 			]
 			// TODO: uncomment after ZBX-21097 fix
 			// #16
@@ -482,12 +536,21 @@ class testPageReportsAudit extends CWebTest {
 	}
 
 	/**
+	 * Set IP addresses in database rows.
+	 */
+	protected function setIpAddressValues() {
+		foreach (['3' => '111.222.33.4', '15' => '111.222.33.44', '0' => 'domain', '40' => 'fe80::fd4a:c2bd:74e:99ab'] as $type => $ip) {
+			DBexecute("UPDATE auditlog SET ip=".zbx_dbstr($ip)." WHERE resourcetype=".zbx_dbstr($type));
+		}
+	}
+
+	/**
 	 * Check audit filter. This checks can be executed only after all other scenarios completed.
 	 * There are used values and data that was created before in this autotest.
 	 *
 	 * @dataProvider getCheckFilterData
 	 *
-	 * @onBeforeOnce prepareLoginData
+	 * @onBeforeOnce prepareLoginData, setIpAddressValues
 	 *
 	 * @depends testPageReportsAudit_Add
 	 * @depends testPageReportsAudit_Update
@@ -545,24 +608,57 @@ class testPageReportsAudit extends CWebTest {
 		}
 	}
 
+	public static function getClickableTablePlaces() {
+		return [
+			// #0
+			[
+				[
+					'table_column' => 'IP',
+					'sql' => 'SELECT NULL FROM auditlog WHERE ip=',
+					'label' => 'IP'
+				]
+			],
+			// #1
+			[
+				[
+					'table_column' => 'ID',
+					'sql' => 'SELECT NULL FROM auditlog WHERE resourceid=',
+					'label' => 'Resource ID'
+				]
+			],
+			// #2
+			[
+				[
+					'table_column' => 'Recordset ID',
+					'sql' => 'SELECT NULL FROM auditlog WHERE recordsetid=',
+					'label' => 'Recordset ID'
+				]
+			]
+		];
+	}
+
 	/**
-	 * Check that audit log can be filtered by recordsetid.
+	 * Check that audit log can be filtered by IP, ID and Recordset ID column values.
+	 *
+	 * @dataProvider getClickableTablePlaces
+	 *
+	 * @depends testPageReportsAudit_CheckFilter
 	 */
-	public function testPageReportsAudit_CheckRecordsetFilter() {
+	public function testPageReportsAudit_CheckClickableTable($data) {
 		$this->page->login()->open('zabbix.php?action=auditlog.list&filter_rst=1')->waitUntilReady();
 		$form = $this->query('name:zbx_filter')->asForm()->one();
 		$table = $this->query('class:list-table')->asTable()->one();
 		$form->query('button:Reset')->one()->click();
 
-		// Click on Recordset ID in first row.
-		$table->getRow(0)->getColumn('Recordset ID')->query('xpath:.//a')->one()->click();
-		$recordsetid = $table->getRow(0)->getColumn('Recordset ID')->getText();
+		// Click on the link in the first row of the table.
+		$table->getRow(0)->getColumn($data['table_column'])->query('xpath:.//a')->one()->click();
+		$column = $table->getRow(0)->getColumn($data['table_column'])->getText();
 
-		// Check that correct Recordset ID displayed in filter form.
-		$this->assertTrue($form->checkValue(['Recordset ID' => $recordsetid]));
+		// Check that correct column value displayed in filter form.
+		$this->assertTrue($form->checkValue([$data['label'] => $column]));
 
 		// Compare result cout on page and in DB.
-		$recordsetid_count = CDBHelper::getCount('SELECT NULL FROM auditlog WHERE recordsetid='.zbx_dbstr($recordsetid));
+		$recordsetid_count = CDBHelper::getCount($data['sql'].zbx_dbstr($column));
 		$this->assertEquals($recordsetid_count, $table->getRows()->count());
 	}
 

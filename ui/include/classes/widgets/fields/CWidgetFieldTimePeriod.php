@@ -217,6 +217,10 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 		switch ($this->getDataSource()) {
 			case self::DATA_SOURCE_DEFAULT:
 				foreach (['from', 'to'] as $name) {
+					if (!array_key_exists($name, $value)) {
+						return;
+					}
+
 					if (array_key_exists(self::FOREIGN_REFERENCE_KEY, $default) || $value[$name] !== $default[$name]) {
 						$widget_fields[] = [
 							'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -229,6 +233,10 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 
 			case self::DATA_SOURCE_WIDGET:
 			case self::DATA_SOURCE_DASHBOARD:
+				if (!array_key_exists(self::FOREIGN_REFERENCE_KEY, $value)) {
+					return;
+				}
+
 				if (!array_key_exists(self::FOREIGN_REFERENCE_KEY, $default)
 						|| $value[self::FOREIGN_REFERENCE_KEY] !== $default[self::FOREIGN_REFERENCE_KEY]) {
 					$widget_fields[] = [
@@ -252,7 +260,7 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 			return $reference === self::REFERENCE_DASHBOARD ? self::DATA_SOURCE_DASHBOARD : self::DATA_SOURCE_WIDGET;
 		}
 		elseif (array_key_exists('data_source', $value)) {
-			return $value['data_source'];
+			return (int) $value['data_source'];
 		}
 		else {
 			return self::DATA_SOURCE_DEFAULT;

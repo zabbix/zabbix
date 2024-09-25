@@ -15,6 +15,7 @@
 #include "zbxregexp.h"
 
 #include "zbxstr.h"
+#include "zbxtime.h"
 
 #ifdef HAVE_PCRE_H
 #ifdef HAVE_PCRE2_H
@@ -67,8 +68,25 @@ zbx_regmatch_t;
 #define ZBX_REGEXP_GROUPS_MAX	10	/* Max number of supported capture groups in regular expressions. */
 					/* Group \0 contains the matching part of string, groups \1 ...\9 */
 					/* contain captured groups (substrings).                          */
+#define ZBX_REGEX_REPL_TIMEOUT	3	/* Regex matches processing timeout in seconds */
 
 ZBX_PTR_VECTOR_IMPL(expression, zbx_expression_t *)
+
+typedef struct
+{
+	zbx_regmatch_t groups[ZBX_REGEXP_GROUPS_MAX];
+}
+zbx_match_t;
+
+ZBX_PTR_VECTOR_DECL(match, zbx_match_t *)
+ZBX_PTR_VECTOR_IMPL(match, zbx_match_t *)
+
+#ifdef HAVE_PCRE2_H
+static void	zbx_match_free(zbx_match_t *match)
+{
+	zbx_free(match);
+}
+#endif
 
 #if defined(HAVE_PCRE2_H)
 static char	*decode_pcre2_compile_error(int error_code, PCRE2_SIZE error_offset, int flags)
@@ -375,6 +393,7 @@ static char	*decode_pcre2_match_error(int error_code)
  *     matches        - [OUT] matches (can be NULL if matching results are         *
  *                      not required)                                              *
  *     err_msg        - [OUT] dynamically allocated error message (can be NULL).   *
+ *     offset         - [IN] offset in the string at which to start matching       *
  *                                                                                 *
  * Return value: ZBX_REGEXP_MATCH     - successful match                           *
  *               ZBX_REGEXP_NO_MATCH  - no match                                   *
@@ -382,7 +401,7 @@ static char	*decode_pcre2_match_error(int error_code)
  *                                                                                 *
  ***********************************************************************************/
 static int	regexp_exec(const char *string, const zbx_regexp_t *regexp, int flags, int count,
-		zbx_regmatch_t *matches, char **err_msg)
+		zbx_regmatch_t *matches, char **err_msg, int offset)
 {
 #ifdef HAVE_PCRE_H
 #define MATCHES_BUFF_SIZE	(ZBX_REGEXP_GROUPS_MAX * 3)		/* see pcre_exec() in "man pcreapi" why 3 */
@@ -411,7 +430,8 @@ static int	regexp_exec(const char *string, const zbx_regexp_t *regexp, int flags
 	pextra->match_limit_recursion = compute_recursion_limit();
 #endif
 	/* see "man pcreapi" about pcre_exec() return value and 'ovector' size and layout */
-	if (0 <= (r = pcre_exec(regexp->pcre_regexp, pextra, string, (int)strlen(string), flags, 0, ovector, ovecsize)))
+	if (0 <= (r = pcre_exec(regexp->pcre_regexp, pextra, string, (int)strlen(string), flags,
+		offset, ovector, ovecsize)))
 	{
 		if (NULL != matches)
 			memcpy(matches, ovector, (size_t)((0 < r) ? MIN(r, count) : count) * sizeof(zbx_regmatch_t));
@@ -461,8 +481,8 @@ static int	regexp_exec(const char *string, const zbx_regexp_t *regexp, int flags
 		flags |= PCRE2_NO_UTF_CHECK;
 #endif
 
-		if (0 <= (r = pcre2_match(regexp->pcre2_regexp, (PCRE2_SPTR)string, PCRE2_ZERO_TERMINATED, 0, flags,
-			match_data, regexp->match_ctx)))
+		if (0 <= (r = pcre2_match(regexp->pcre2_regexp, (PCRE2_SPTR)string, PCRE2_ZERO_TERMINATED, offset,
+			flags, match_data, regexp->match_ctx)))
 		{
 			if (NULL != matches)
 			{
@@ -541,7 +561,7 @@ void	zbx_regexp_free(zbx_regexp_t *regexp)
  ******************************************************************************/
 int	zbx_regexp_match_precompiled(const char *string, const zbx_regexp_t *regexp)
 {
-	return (ZBX_REGEXP_MATCH == regexp_exec(string, regexp, 0, 0, NULL, NULL)) ? 0 : -1;
+	return (ZBX_REGEXP_MATCH == regexp_exec(string, regexp, 0, 0, NULL, NULL, 0)) ? 0 : -1;
 }
 
 /******************************************************************************
@@ -563,7 +583,7 @@ int	zbx_regexp_match_precompiled(const char *string, const zbx_regexp_t *regexp)
  ******************************************************************************/
 int	zbx_regexp_match_precompiled2(const char *string, const zbx_regexp_t *regexp, char **err_msg)
 {
-	return regexp_exec(string, regexp, 0, 0, NULL, err_msg);
+	return regexp_exec(string, regexp, 0, 0, NULL, err_msg, 0);
 }
 
 /****************************************************************************************************
@@ -604,7 +624,7 @@ static char	*zbx_regexp(const char *string, const char *pattern, int flags, int 
 	{
 		int	r;
 
-		if (ZBX_REGEXP_MATCH == (r = regexp_exec(string, regexp, 0, 1, &match, NULL)))
+		if (ZBX_REGEXP_MATCH == (r = regexp_exec(string, regexp, 0, 1, &match, NULL, 0)))
 		{
 			c = (char *)string + match.rm_so;
 
@@ -650,7 +670,7 @@ static int	zbx_regexp2(const char *string, const char *pattern, int flags, char 
 
 	/* 'regexp' ownership was taken by regexp_prepare(), do not cleanup */
 
-	if (ZBX_REGEXP_MATCH == (r = regexp_exec(string, regexp, 0, 1, &match, err_msg)))
+	if (ZBX_REGEXP_MATCH == (r = regexp_exec(string, regexp, 0, 1, &match, err_msg, 0)))
 	{
 		if (NULL != matched_pos)
 			*matched_pos = (char *)(uintptr_t)string + match.rm_so;
@@ -740,7 +760,7 @@ static char	*regexp_sub_replace(const char *text, const char *output_template, z
 		switch (*(++pgroup))
 		{
 			case '\\':
-				strncpy_alloc(&ptr, &size, &offset, pstart, pgroup - pstart, limit);
+				strncpy_alloc(&ptr, &size, &offset, pstart, (size_t)(pgroup - pstart), limit);
 				pstart = pgroup + 1;
 				continue;
 
@@ -754,33 +774,34 @@ static char	*regexp_sub_replace(const char *text, const char *output_template, z
 			case '7':
 			case '8':
 			case '9':
-				strncpy_alloc(&ptr, &size, &offset, pstart, pgroup - pstart - 1, limit);
+				strncpy_alloc(&ptr, &size, &offset, pstart, (size_t)(pgroup - pstart - 1), limit);
 				group_index = *pgroup - '0';
 				if (group_index < nmatch && -1 != match[group_index].rm_so)
 				{
 					strncpy_alloc(&ptr, &size, &offset, text + match[group_index].rm_so,
-							match[group_index].rm_eo - match[group_index].rm_so, limit);
+							(size_t)(match[group_index].rm_eo - match[group_index].rm_so),
+							limit);
 				}
 				pstart = pgroup + 1;
 				continue;
 
 			case '@':
-				/* artificial construct to replace the first captured group or fail */
-				/* if the regular expression pattern contains no groups             */
-				if (-1 == match[1].rm_so)
-				{
-					zbx_free(ptr);
-					goto out;
-				}
+					/* artificial construct to replace the first captured group or fail */
+					/* if the regular expression pattern contains no groups             */
+					if (-1 == match[1].rm_so)
+					{
+						zbx_free(ptr);
+						goto out;
+					}
 
-				strncpy_alloc(&ptr, &size, &offset, text + match[1].rm_so,
-						match[1].rm_eo - match[1].rm_so, limit);
+					strncpy_alloc(&ptr, &size, &offset, text + match[1].rm_so,
+							(size_t)(match[1].rm_eo - match[1].rm_so), limit);
 
-				pstart = pgroup + 1;
-				continue;
+					pstart = pgroup + 1;
+					continue;
 
 			default:
-				strncpy_alloc(&ptr, &size, &offset, pstart, pgroup - pstart, limit);
+				strncpy_alloc(&ptr, &size, &offset, pstart, (size_t)(pgroup - pstart), limit);
 				pstart = pgroup;
 		}
 
@@ -878,11 +899,10 @@ static int	regexp_sub(const char *string, const char *pattern, const char *outpu
 	for (i = 0; i < ARRSIZE(match); i++)
 		match[i].rm_so = match[i].rm_eo = -1;
 
-	if (ZBX_REGEXP_MATCH == regexp_exec(string, regexp, 0, ZBX_REGEXP_GROUPS_MAX, match, NULL))
+	if (ZBX_REGEXP_MATCH == regexp_exec(string, regexp, 0, ZBX_REGEXP_GROUPS_MAX, match, NULL, 0))
 		*out = regexp_sub_replace(string, output_template, match, ZBX_REGEXP_GROUPS_MAX, 0);
 
 	return SUCCEED;
-#undef MATCH_SIZE
 }
 
 /*********************************************************************************
@@ -940,14 +960,13 @@ static int	regexp_sub2(const char *string, const char *pattern, const char *outp
 
 	/* 'regexp' ownership was taken by regexp_prepare(), do not cleanup */
 
-	if (ZBX_REGEXP_MATCH == (ret = regexp_exec(string, regexp, 0, ZBX_REGEXP_GROUPS_MAX, match, err_msg)))
+	if (ZBX_REGEXP_MATCH == (ret = regexp_exec(string, regexp, 0, ZBX_REGEXP_GROUPS_MAX, match, err_msg, 0)))
 		*out = regexp_sub_replace(string, output_template, match, ZBX_REGEXP_GROUPS_MAX, 0);
 
 	if (FAIL == ret)
 		ret = ZBX_REGEXP_RUNTIME_FAIL;
 
 	return ret;	/* ZBX_REGEXP_MATCH, ZBX_REGEXP_NO_MATCH or ZBX_REGEXP_RUNTIME_FAIL */
-#undef MATCH_SIZE
 }
 
 /*********************************************************************************
@@ -989,7 +1008,7 @@ int	zbx_mregexp_sub_precompiled(const char *string, const zbx_regexp_t *regexp, 
 	for (i = 0; i < ARRSIZE(match); i++)
 		match[i].rm_so = match[i].rm_eo = -1;
 
-	if (ZBX_REGEXP_MATCH == regexp_exec(string, regexp, 0, ZBX_REGEXP_GROUPS_MAX, match, NULL) &&
+	if (ZBX_REGEXP_MATCH == regexp_exec(string, regexp, 0, ZBX_REGEXP_GROUPS_MAX, match, NULL, 0) &&
 			NULL != (*out = regexp_sub_replace(string, output_template, match, ZBX_REGEXP_GROUPS_MAX,
 			limit)))
 	{
@@ -997,6 +1016,157 @@ int	zbx_mregexp_sub_precompiled(const char *string, const zbx_regexp_t *regexp, 
 	}
 
 	return FAIL;
+}
+
+/*********************************************************************************
+ *                                                                               *
+ * Purpose: Test if a string matches the specified regular expression. If yes    *
+ *          then all matches in incoming string are replaced with values based   *
+ *          on repleacement template. For each match replacement value created   *
+ *          by substituting '\<n>' sequences in output template with the mtach   *
+ *          captured groups.                                                     *
+ *                                                                               *
+ * Parameters: string          - [IN] the string to replace                      *
+ *             pattern         - [IN] the regular expression                     *
+ *             repl_template   - [IN] the repleacement template used to          *
+ *                                    construct replacement string for each      *
+ *                                    match. If output template is NULL then     *
+ *                                    empty string is used as template.          *
+ *             out             - [OUT] the output string with replaced matches   *
+ *                                                                               *
+ * Return value: SUCCEED - the regular expression match was done                 *
+ *               FAIL    - failed to compile regexp                              *
+ *                                                                               *
+ * Comments: This function performs case sensitive match                         *
+ *                                                                               *
+ *********************************************************************************/
+int	zbx_regexp_repl(const char *string, const char *pattern, const char *output_template, char **out)
+{
+#ifdef HAVE_PCRE2_H
+	zbx_regexp_t		*regexp = NULL;
+	int			mi, shift = 0, ret = FAIL, len = strlen(string);
+	char			*out_str, *error = NULL;
+	zbx_vector_match_t	matches;
+	size_t			i;
+	double			starttime = zbx_time();
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() len:%d", __func__, len);
+
+	if ('\0' == *pattern)
+	{
+		*out = zbx_strdup(*out, string);
+		return SUCCEED;
+	}
+
+	if (FAIL == regexp_prepare(pattern, ZBX_REGEXP_MULTILINE, &regexp, &error))
+	{
+		zbx_free(error);
+		return FAIL;
+	}
+
+	zbx_vector_match_create(&matches);
+
+	/* collect all matches */
+	for (;;)
+	{
+		zbx_match_t	*match;
+
+		match = zbx_malloc(NULL, sizeof(zbx_match_t));
+		/* -1 is special pcre value for unused patterns */
+		for (i = 0; i < ARRSIZE(match->groups); i++)
+			match->groups[i].rm_so = match->groups[i].rm_eo = -1;
+
+		if (ZBX_REGEXP_MATCH != regexp_exec(string, regexp, 0, ZBX_REGEXP_GROUPS_MAX, match->groups, NULL,
+				shift))
+		{
+			zbx_free(match);
+			break;
+		}
+
+		shift = match->groups[0].rm_eo;
+
+		zbx_vector_match_append(&matches, match);
+		if (shift >= len)
+			break;
+
+		if (shift == match->groups[0].rm_so)
+			shift++;
+
+		if (ZBX_REGEX_REPL_TIMEOUT < zbx_time() - starttime)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "timeout after %d matches %s()",
+					matches.values_num, __func__);
+			goto out;
+		}
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "replacing:%d matches %s()", matches.values_num, __func__);
+	out_str = zbx_strdup(NULL, string);
+	/* create pattern based string for each match and relplace matched string with this string */
+	for (mi = matches.values_num - 1; 0 <= mi; mi--)
+	{
+		zbx_regmatch_t	*groups = matches.values[mi]->groups;
+		char		*replace, *ptr;
+
+		if ('\0' == *output_template)
+		{
+			replace = zbx_strdup(NULL, output_template);
+		}
+		else
+		{
+			replace = regexp_sub_replace(string, output_template, groups, ZBX_REGEXP_GROUPS_MAX,
+					MAX_EXECUTE_OUTPUT_LEN);
+		}
+
+		if (NULL != replace)
+		{
+			size_t	replen = strlen(replace), outlen = strlen(out_str), length = outlen + replen + 1,
+				eo = (size_t)groups[0].rm_eo;
+
+			if (MAX_EXECUTE_OUTPUT_LEN <= length)
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "macro function output exceeded limit of %d Kb",
+						MAX_EXECUTE_OUTPUT_LEN / ZBX_KIBIBYTE);
+				zbx_free(out_str);
+				zbx_free(replace);
+				goto out;
+			}
+			ptr = (char *)zbx_malloc(NULL, length);
+			if (0 != (size_t)groups[0].rm_so)
+				memcpy(ptr, out_str, (size_t)groups[0].rm_so);
+			if (0 != replen)
+				memcpy(ptr + groups[0].rm_so, replace, replen);
+			memcpy(ptr + groups[0].rm_so + replen, out_str + eo, outlen - eo + 1);
+
+			zbx_free(out_str);
+			out_str = ptr;
+			zbx_free(replace);
+		}
+		else
+		{
+			zbx_free(out_str);
+			goto out;
+		}
+	}
+	ret = SUCCEED;
+	zbx_free(*out);
+	*out = out_str;
+
+out:
+	zbx_vector_match_clear_ext(&matches, zbx_match_free);
+	zbx_vector_match_destroy(&matches);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+#else
+	ZBX_UNUSED(string);
+	ZBX_UNUSED(pattern);
+	ZBX_UNUSED(output_template);
+	ZBX_UNUSED(out);
+
+	return FAIL;
+#endif
 }
 
 /*********************************************************************************
@@ -1751,7 +1921,7 @@ void	zbx_wildcard_minimize(char *str)
 	char	*p1, *p2;
 	int	w = 0;
 
-	for(p1 = p2 = str; '\0' != *p2; p2++)
+	for (p1 = p2 = str; '\0' != *p2; p2++)
 	{
 		if ('*' == *p2)
 		{
@@ -1786,13 +1956,13 @@ int	zbx_wildcard_match(const char *value, const char *wildcard)
 {
 	const char *s_pivot = value, *w_pivot = wildcard;
 
-	while('\0' != *value && '*' != *wildcard)
+	while ('\0' != *value && '*' != *wildcard)
 	{
 		if (*value++ != *wildcard++)
 			return 0;
 	}
 
-	while('\0' != *value)
+	while ('\0' != *value)
 	{
 		if ('*' == *wildcard)
 		{
@@ -1816,7 +1986,7 @@ int	zbx_wildcard_match(const char *value, const char *wildcard)
 		}
 	}
 
-	while('*' == *wildcard)
+	while ('*' == *wildcard)
 		wildcard++;
 
 	return '\0' == *wildcard;

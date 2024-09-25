@@ -13,8 +13,8 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-define('ZABBIX_VERSION',		'7.0.3rc1');
-define('ZABBIX_API_VERSION',	'7.0.3');
+define('ZABBIX_VERSION',		'7.0.5rc1');
+define('ZABBIX_API_VERSION',	'7.0.5');
 define('ZABBIX_EXPORT_VERSION',	'7.0');
 
 define('ZABBIX_DB_VERSION',		7000000);
@@ -2212,6 +2212,7 @@ define('ZBX_STYLE_TOTALS_LIST', 'totals-list');
 define('ZBX_STYLE_TOTALS_LIST_HORIZONTAL', 'totals-list-horizontal');
 define('ZBX_STYLE_TOTALS_LIST_VERTICAL', 'totals-list-vertical');
 define('ZBX_STYLE_TOTALS_LIST_COUNT', 'count');
+define('ZBX_STYLE_TOTALS_LIST_NAME', 'name');
 define('ZBX_STYLE_TREEVIEW', 'treeview');
 define('ZBX_STYLE_UPPERCASE', 'uppercase');
 define('ZBX_STYLE_WARNING_BG', 'warning-bg');

@@ -254,8 +254,6 @@ static void	zbx_odbc_connection_pwd_append(char **connection_str, const char *va
 					*dst++ = *src++;
 					break;
 				case ';':
-				case '=':
-				case ' ':
 					need_replacement = 1;
 					ZBX_FALLTHROUGH;
 				default:

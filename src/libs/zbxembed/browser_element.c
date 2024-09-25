@@ -24,13 +24,6 @@
 
 #ifdef HAVE_LIBCURL
 
-typedef struct
-{
-	char		*id;
-	zbx_webdriver_t	*wd;
-}
-zbx_wd_element_t;
-
 /******************************************************************************
  *                                                                            *
  * Purpose: return backing C structure embedded in element object             *
@@ -40,6 +33,7 @@ static zbx_wd_element_t *wd_element(duk_context *ctx)
 {
 	zbx_wd_element_t	*el;
 	zbx_es_env_t		*env;
+	void			*objptr;
 
 	if (NULL == (env = zbx_es_get_env(ctx)))
 	{
@@ -48,10 +42,21 @@ static zbx_wd_element_t *wd_element(duk_context *ctx)
 		return NULL;
 	}
 
-	if (NULL == (el = (zbx_wd_element_t *)es_obj_get_data(env, ES_OBJ_ELEMENT)))
+	duk_push_this(ctx);
+	objptr = duk_require_heapptr(ctx, -1);
+	duk_pop(ctx);
+
+	if (NULL == (el = (zbx_wd_element_t *)es_obj_get_data(env, objptr, ES_OBJ_ELEMENT)))
 		(void)duk_push_error_object(ctx, DUK_RET_EVAL_ERROR, "cannot find native data attached to object");
 
 	return el;
+}
+
+void	wd_element_free(zbx_wd_element_t *el)
+{
+	webdriver_release(el->wd);
+	zbx_free(el->id);
+	zbx_free(el);
 }
 
 /******************************************************************************
@@ -69,12 +74,8 @@ static duk_ret_t	wd_element_dtor(duk_context *ctx)
 	if (NULL == (env = zbx_es_get_env(ctx)))
 		return duk_error(ctx, DUK_RET_EVAL_ERROR, "cannot access internal environment");
 
-	if (NULL != (el = (zbx_wd_element_t *)es_obj_detach_data(env, ES_OBJ_ELEMENT)))
-	{
-		webdriver_release(el->wd);
-		zbx_free(el->id);
-		zbx_free(el);
-	}
+	if (NULL != (el = (zbx_wd_element_t *)es_obj_detach_data(env, duk_require_heapptr(ctx, -1), ES_OBJ_ELEMENT)))
+		wd_element_free(el);
 
 	return 0;
 }
@@ -99,7 +100,12 @@ static duk_ret_t	wd_element_ctor(duk_context *ctx, zbx_webdriver_t *wd, const ch
 	el->id = zbx_strdup(NULL, elementid);
 
 	duk_push_object(ctx);
-	es_obj_attach_data(env, el, ES_OBJ_ELEMENT);
+	es_obj_attach_data(env, duk_require_heapptr(ctx, -1), el, ES_OBJ_ELEMENT);
+
+	duk_push_string(ctx, "browser");
+	duk_push_heapptr(ctx, wd->browser);
+	duk_def_prop(ctx, -3, DUK_DEFPROP_HAVE_VALUE | DUK_DEFPROP_CLEAR_WRITABLE | DUK_DEFPROP_HAVE_ENUMERABLE |
+			DUK_DEFPROP_HAVE_CONFIGURABLE);
 
 	duk_push_c_function(ctx, wd_element_dtor, 1);
 	duk_set_finalizer(ctx, -2);
@@ -119,18 +125,22 @@ static duk_ret_t	wd_element_send_keys(duk_context *ctx)
 	zbx_wd_element_t	*el;
 	char			*error = NULL, *keys = NULL;
 	int			err_index = -1;
+	const char		*keys_cesu = NULL;
+
+	if (!duk_is_null(ctx, 0) && !duk_is_undefined(ctx, 0))
+		keys_cesu = duk_safe_to_string(ctx, 0);
 
 	if (NULL == (el = wd_element(ctx)))
 		return duk_throw(ctx);
 
-	if (duk_is_null(ctx, 0) || duk_is_undefined(ctx, 0))
+	if (NULL == keys_cesu)
 	{
 		err_index = browser_push_error(ctx,  el->wd, "missing keys parameter");
 
 		goto out;
 	}
 
-	if (SUCCEED != es_duktape_string_decode(duk_safe_to_string(ctx, 0), &keys))
+	if (SUCCEED != es_duktape_string_decode(keys_cesu, &keys))
 	{
 		err_index = browser_push_error(ctx,  el->wd, "cannot convert keys parameter to utf8");
 
@@ -215,18 +225,22 @@ static duk_ret_t	wd_element_get_attribute(duk_context *ctx)
 	zbx_wd_element_t	*el;
 	char			*error = NULL, *name = NULL, *value = NULL;
 	int			err_index = -1;
+	const char		*name_cesu = NULL;
+
+	if (!duk_is_null(ctx, 0) && !duk_is_undefined(ctx, 0))
+		name_cesu = duk_safe_to_string(ctx, 0);
 
 	if (NULL == (el = wd_element(ctx)))
 		return duk_throw(ctx);
 
-	if (duk_is_null(ctx, 0) || duk_is_undefined(ctx, 0))
+	if (NULL == name_cesu)
 	{
 		err_index = browser_push_error(ctx,  el->wd, "missing name parameter");
 
 		goto out;
 	}
 
-	if (SUCCEED != es_duktape_string_decode(duk_safe_to_string(ctx, 0), &name))
+	if (SUCCEED != es_duktape_string_decode(name_cesu, &name))
 	{
 		err_index = browser_push_error(ctx, el->wd, "cannot convert name parameter to utf8");
 
@@ -241,7 +255,7 @@ static duk_ret_t	wd_element_get_attribute(duk_context *ctx)
 		goto out;
 	}
 
-	duk_push_string(ctx, value);
+	es_push_result_string(ctx, value, strlen(value));
 out:
 	zbx_free(value);
 	zbx_free(name);
@@ -264,18 +278,22 @@ static duk_ret_t	wd_element_get_property(duk_context *ctx)
 	zbx_wd_element_t	*el;
 	char			*error = NULL, *name = NULL, *value = NULL;
 	int			err_index = -1;
+	const char		*name_cesu = NULL;
+
+	if (!duk_is_null(ctx, 0) && !duk_is_undefined(ctx, 0))
+		name_cesu = duk_safe_to_string(ctx, 0);
 
 	if (NULL == (el = wd_element(ctx)))
 		return duk_throw(ctx);
 
-	if (duk_is_null(ctx, 0) || duk_is_undefined(ctx, 0))
+	if (NULL == name_cesu)
 	{
 		err_index = browser_push_error(ctx,  el->wd, "missing name parameter");
 
 		goto out;
 	}
 
-	if (SUCCEED != es_duktape_string_decode(duk_safe_to_string(ctx, 0), &name))
+	if (SUCCEED != es_duktape_string_decode(name_cesu, &name))
 	{
 		err_index = browser_push_error(ctx, el->wd, "cannot convert name parameter to utf8");
 
@@ -290,7 +308,7 @@ static duk_ret_t	wd_element_get_property(duk_context *ctx)
 		goto out;
 	}
 
-	duk_push_string(ctx, value);
+	es_push_result_string(ctx, value, strlen(value));
 out:
 	zbx_free(value);
 	zbx_free(name);
@@ -323,7 +341,7 @@ static duk_ret_t	wd_element_get_text(duk_context *ctx)
 		goto out;
 	}
 
-	duk_push_string(ctx, value);
+	es_push_result_string(ctx, value, strlen(value));
 out:
 	zbx_free(value);
 
@@ -380,6 +398,16 @@ void	wd_element_create_array(duk_context *ctx, zbx_webdriver_t *wd, const zbx_ve
 		wd_element_create(ctx, wd, elements->values[i]);
 		duk_put_prop_index(ctx, arr, (duk_uarridx_t)i);
 	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get element id                                                    *
+ *                                                                            *
+ ******************************************************************************/
+const char	*wd_element_get_id(void *wd)
+{
+	return ((zbx_wd_element_t *)wd)->id;
 }
 
 #endif
