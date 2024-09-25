@@ -9,26 +9,26 @@ BINARIES_tests = \
 	zbx_ltrim_utf8 \
 	zbx_rtrim_utf8 \
 	zbx_is_ascii_string\
-	zbx_remove_chars\
-	zbx_del_zeros\
-	zbx_str_n_in_list\
-	zbx_get_escape_string_len\
-	zbx_str_in_list\
-	zbx_strsplit_first\
-	zbx_strsplit_last\
-	zbx_strlcpy_utf8\
-	zbx_utf8_char_len\
-	zbx_strlen_utf8_nchars\
-	zbx_charcount_utf8_nbytes\
-	zbx_is_utf8\
-	zbx_replace_invalid_utf8\
-	zbx_trim_str_list\
-	zbx_strcmp_null\
-	zbx_strcmp_natural\
-	zbx_replace_mem_dyn\
-	zbx_substr\
-	zbx_replace_string\
-	zbx_str_printable_dyn\
+	zbx_remove_chars \
+	zbx_del_zeros \
+	zbx_str_n_in_list \
+	zbx_get_escape_string_len \
+	zbx_str_in_list \
+	zbx_strsplit_first \
+	zbx_strsplit_last \
+	zbx_strlcpy_utf8 \
+	zbx_utf8_char_len \
+	zbx_strlen_utf8_nchars \
+	zbx_charcount_utf8_nbytes \
+	zbx_is_utf8 \
+	zbx_replace_invalid_utf8 \
+	zbx_trim_str_list \
+	zbx_strcmp_null \
+	zbx_strcmp_natural \
+	zbx_replace_mem_dyn \
+	zbx_substr \
+	zbx_replace_string \
+	zbx_str_printable_dyn \
 	zbx_str_linefeed \
 	zbx_strlcat \
 	zbx_escape_string \
