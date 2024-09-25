@@ -1787,33 +1787,33 @@ class CScreenProblem extends CScreenBase {
 
 			if ($html) {
 				$hint_table->addRow([
-					new CCol($item['name']),
-					new CCol(
+					(new CCol($item['name']))->addStyle('max-width: 300px'),
+					(new CCol(
 						($last_value['clock'] !== null)
 							? zbx_date2str(DATE_TIME_FORMAT_SECONDS, $last_value['clock'])
 							: UNRESOLVED_MACRO_STRING
-					),
+					))->addClass(ZBX_STYLE_NOWRAP),
 					(new CCol($item['value_type'] == ITEM_VALUE_TYPE_BINARY
 						? italic(_('binary value'))->addClass(ZBX_STYLE_GREY)
 						: $last_value['original_value']
-					))->addStyle('max-width: 500px'),
-					new CCol(
+					))->addStyle('max-width: 300px'),
+					(new CCol(
 						($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64)
 							? (CWebUser::checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA)
-								? new CLink(_('Graph'), (new CUrl('history.php'))
-									->setArgument('action', HISTORY_GRAPH)
-									->setArgument('itemids[]', $itemid)
-									->getUrl()
-								)
-								: _('Graph'))
+							? new CLink(_('Graph'), (new CUrl('history.php'))
+								->setArgument('action', HISTORY_GRAPH)
+								->setArgument('itemids[]', $itemid)
+								->getUrl()
+							)
+							: _('Graph'))
 							: (CWebUser::checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA)
-								? new CLink(_('History'), (new CUrl('history.php'))
-									->setArgument('action', HISTORY_VALUES)
-									->setArgument('itemids[]', $itemid)
-									->getUrl()
-								)
-								: _('History'))
-					)
+							? new CLink(_('History'), (new CUrl('history.php'))
+								->setArgument('action', HISTORY_VALUES)
+								->setArgument('itemids[]', $itemid)
+								->getUrl()
+							)
+							: _('History'))
+					))->addClass(ZBX_STYLE_NOWRAP)
 				]);
 
 				$latest_values[] = (new CLinkAction(

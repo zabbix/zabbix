@@ -1,1 +1,1 @@
-..F....... [ZBXNEXT-8397] changed display of the problem value in the popup by removed truncation of value (rgontarski)
+..F....... [ZBXNEXT-8397] changed the display of operational data in the pop-up by removing the truncation of the date and ensuring full-width display, added a max-width for columns with text wrapping and removed text breaking in some columns (rgontarski)
