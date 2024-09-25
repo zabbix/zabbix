@@ -1441,7 +1441,27 @@ static int	rm_writer_process_job(zbx_rm_writer_t *writer, zbx_rm_job_t *job, cha
 
 	if (0 == dsts.values_num)
 	{
-		*error = zbx_dsprintf(NULL, "No media configured for the report recipients");
+		char	*userid = NULL;
+
+		if (1 != job->userids.values_num)
+		{
+			*error = zbx_dsprintf(NULL, "No media configured for the report recipients");
+			goto out;
+		}
+
+		/* It is important to know the username when testing a scheduled report from Zabbix frontend. */
+		/* A report is requested for only one user in this case, which is the user who runs the test. */
+		sql = zbx_dsprintf(sql, "select username from users where userid=" ZBX_FS_UI64, job->userids.values[0]);
+
+		result = zbx_db_select("%s", sql);
+
+		/* errors should never happen while getting user name */
+		if (NULL != (row = zbx_db_fetch(result)))
+			userid = row[0];
+
+		*error = zbx_dsprintf(NULL, "No media configured for the report recipient '%s'", ZBX_NULL2STR(userid));
+		zbx_db_free_result(result);
+
 		goto out;
 	}
 
