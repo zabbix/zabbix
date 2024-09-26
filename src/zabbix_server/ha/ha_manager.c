@@ -36,6 +36,7 @@
 #include "zbxalgo.h"
 #include "zbxlog.h"
 #include "zbxself.h"
+#include "zbxtimekeeper.h"
 
 #define ZBX_HA_POLL_PERIOD	5
 
