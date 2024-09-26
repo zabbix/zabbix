@@ -726,7 +726,7 @@ class testHost extends CAPITest {
 						['hostid' => ':host:host.massupdate.psk2']
 					]
 				],
-				'Cannot update host encryption settings. Connection settings for both directions should be specified.'
+				'Both "tls_connect" and "tls_accept" fields must be specified when changing settings of connection encryption.'
 			],
 			'Field "tls_connect" is required when "tls_accept" is set' => [
 				[
@@ -735,7 +735,7 @@ class testHost extends CAPITest {
 						['hostid' => ':host:host.massupdate.psk1']
 					]
 				],
-				'Cannot update host encryption settings. Connection settings for both directions should be specified.'
+				'Both "tls_connect" and "tls_accept" fields must be specified when changing settings of connection encryption.'
 			],
 			'Field "tls_psk" cannot have different values for same "tls_psk_identity" on change "tls_psk_identity"' => [
 				[
@@ -747,7 +747,7 @@ class testHost extends CAPITest {
 						['hostid' => ':host:host.massupdate.psk2']
 					]
 				],
-				'Invalid parameter "/": both tls_psk_identity and tls_psk must be specified.'
+				'Both "tls_psk_identity" and "tls_psk" fields must be specified when changing the PSK for connection encryption.'
 			],
 			'Field "tls_psk" cannot have different values for same "tls_psk_identity" on change "tls_psk"' => [
 				[
@@ -758,7 +758,7 @@ class testHost extends CAPITest {
 						['hostid' => ':host:host.massupdate.psk3']
 					]
 				],
-				'Invalid parameter "/": both tls_psk_identity and tls_psk must be specified.'
+				'Both "tls_psk_identity" and "tls_psk" fields must be specified when changing the PSK for connection encryption.'
 			],
 			'Field "tls_psk" only default value is allowed when host "tls_accept" and "tls_connect" != HOST_ENCRYPTION_PSK' => [
 				[

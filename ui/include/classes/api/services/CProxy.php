@@ -221,6 +221,8 @@ class CProxy extends CApiService {
 
 		$this->validateUpdate($proxies, $db_proxies);
 
+		self::addFieldDefaultsByTls($proxies, $db_proxies);
+
 		$upd_proxies = [];
 
 		foreach ($proxies as $proxy) {
@@ -857,6 +859,9 @@ class CProxy extends CApiService {
 		}
 
 		self::addFieldDefaultsByStatus($proxies, $db_proxies);
+		$proxies = $this->extendObjectsByKey($proxies, $db_proxies, 'proxyid', ['tls_connect', 'tls_accept']);
+
+		self::addRequiredFieldsByTls($proxies, $db_proxies);
 
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
 			'tls_connect' =>		['type' => API_ANY],
@@ -884,30 +889,38 @@ class CProxy extends CApiService {
 		}
 
 		self::checkDuplicates($proxies, $db_proxies);
-
-		self::addFieldDefaultsByTls($proxies, $db_proxies);
 		self::checkTlsPskPairs($proxies, $db_proxies);
 
 		self::addAffectedObjects($proxies, $db_proxies);
-
 		self::checkInterface($proxies, 'update');
 		self::checkHosts($proxies, $db_proxies);
 	}
 
 	private static function addFieldDefaultsByStatus(array &$proxies, array $db_proxies): void {
 		foreach ($proxies as &$proxy) {
-			if ($proxy['status'] == HOST_STATUS_PROXY_ACTIVE) {
-				$proxy += [
-					'tls_connect' => DB::getDefault('hosts', 'tls_connect'),
-					'tls_accept' => $db_proxies[$proxy['proxyid']]['tls_accept']
-				];
+			if ($proxy['status'] != $db_proxies[$proxy['proxyid']]['status']) {
+				if ($proxy['status'] != HOST_STATUS_PROXY_ACTIVE) {
+					$proxy += [
+						'proxy_address' => DB::getDefault('hosts', 'proxy_address'),
+						'tls_accept' => DB::getDefault('hosts', 'tls_accept')
+					];
+				}
+				else {
+					$proxy += ['tls_connect' => DB::getDefault('hosts', 'tls_connect')];
+				}
 			}
-			else {
-				$proxy += [
-					'proxy_address' => DB::getDefault('hosts', 'proxy_address'),
-					'tls_connect' => $db_proxies[$proxy['proxyid']]['tls_connect'],
-					'tls_accept' => DB::getDefault('hosts', 'tls_accept')
-				];
+		}
+		unset($proxy);
+	}
+
+	private static function addRequiredFieldsByTls(array &$proxies, array $db_proxies): void {
+		$tls_psk_fields = array_flip(['tls_psk_identity', 'tls_psk']);
+
+		foreach ($proxies as &$proxy) {
+			if (($proxy['tls_connect'] == HOST_ENCRYPTION_PSK || $proxy['tls_accept'] & HOST_ENCRYPTION_PSK)
+					&& $db_proxies[$proxy['proxyid']]['tls_connect'] != HOST_ENCRYPTION_PSK
+					&& ($db_proxies[$proxy['proxyid']]['tls_accept'] & HOST_ENCRYPTION_PSK) == 0) {
+				$proxy += array_intersect_key($db_proxies[$proxy['proxyid']], $tls_psk_fields);
 			}
 		}
 		unset($proxy);

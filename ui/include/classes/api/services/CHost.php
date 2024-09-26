@@ -901,25 +901,28 @@ class CHost extends CHostGeneral {
 	 * @return boolean
 	 */
 	public function massUpdate(array $data, array $options = []): array {
-		$tls_fields =
-			array_flip(['tls_connect', 'tls_accept', 'tls_psk_identity', 'tls_psk', 'tls_issuer', 'tls_subject']);
+		self::checkTlsFields($data);
 
-		if (array_intersect_key($data, $tls_fields)) {
-			if (!array_key_exists('tls_connect', $data) || !array_key_exists('tls_accept', $data)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('Cannot update host encryption settings. Connection settings for both directions should be specified.')
-				);
-			}
-
-			if (($data['tls_connect'] == HOST_ENCRYPTION_PSK || $data['tls_accept'] & HOST_ENCRYPTION_PSK)
-					&& (!array_key_exists('tls_psk_identity', $data) || !array_key_exists('tls_psk', $data))) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', '/',
-					_('both tls_psk_identity and tls_psk must be specified')
-				));
-			}
-		}
-
-		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => self::getValidationFields(true, true)];
+		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
+			'tls_connect' =>		['type' => API_INT32, 'in' => implode(',', [HOST_ENCRYPTION_NONE, HOST_ENCRYPTION_PSK, HOST_ENCRYPTION_CERTIFICATE])],
+			'tls_accept' =>			['type' => API_INT32, 'in' => implode(':', [HOST_ENCRYPTION_NONE, HOST_ENCRYPTION_NONE | HOST_ENCRYPTION_PSK | HOST_ENCRYPTION_CERTIFICATE])],
+			'tls_psk_identity' =>	['type' => API_MULTIPLE, 'rules' => [
+										['if' => static fn (array $data): bool => (array_key_exists('tls_connect', $data) && $data['tls_connect'] == HOST_ENCRYPTION_PSK) || (array_key_exists('tls_accept', $data) && ($data['tls_accept'] & HOST_ENCRYPTION_PSK) != 0), 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('hosts', 'tls_psk_identity')],
+										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('hosts', 'tls_psk_identity')]
+			]],
+			'tls_psk' =>			['type' => API_MULTIPLE, 'rules' => [
+										['if' => static fn (array $data): bool => (array_key_exists('tls_connect', $data) && $data['tls_connect'] == HOST_ENCRYPTION_PSK) || (array_key_exists('tls_accept', $data) && ($data['tls_accept'] & HOST_ENCRYPTION_PSK) != 0), 'type' => API_PSK, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('hosts', 'tls_psk')],
+										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('hosts', 'tls_psk')]
+			]],
+			'tls_issuer' =>			['type' => API_MULTIPLE, 'rules' => [
+										['if' => static fn (array $data): bool => (array_key_exists('tls_connect', $data) && $data['tls_connect'] == HOST_ENCRYPTION_CERTIFICATE) || (array_key_exists('tls_accept', $data) && ($data['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE) != 0), 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hosts', 'tls_issuer')],
+										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('hosts', 'tls_issuer')]
+			]],
+			'tls_subject' =>		['type' => API_MULTIPLE, 'rules' => [
+										['if' => static fn (array $data): bool => (array_key_exists('tls_connect', $data) && $data['tls_connect'] == HOST_ENCRYPTION_CERTIFICATE) || (array_key_exists('tls_accept', $data) && ($data['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE) != 0), 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hosts', 'tls_subject')],
+										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('hosts', 'tls_subject')]
+			]]
+		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $data, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
@@ -1296,6 +1299,26 @@ class CHost extends CHostGeneral {
 		$this->addAuditBulk(CAudit::ACTION_UPDATE, CAudit::RESOURCE_HOST, $new_hosts, $db_hosts);
 
 		return ['hostids' => $inputHostIds];
+	}
+
+	private static function checkTlsFields(array $data): void {
+		$tls_fields =
+			array_flip(['tls_connect', 'tls_accept', 'tls_psk_identity', 'tls_psk', 'tls_issuer', 'tls_subject']);
+
+		if (array_intersect_key($data, $tls_fields)) {
+			if (!array_key_exists('tls_connect', $data) || !array_key_exists('tls_accept', $data)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('Both "tls_connect" and "tls_accept" fields must be specified when changing settings of connection encryption.')
+				);
+			}
+
+			if (($data['tls_connect'] == HOST_ENCRYPTION_PSK || $data['tls_accept'] & HOST_ENCRYPTION_PSK)
+					&& (!array_key_exists('tls_psk_identity', $data) || !array_key_exists('tls_psk', $data))) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_('Both "tls_psk_identity" and "tls_psk" fields must be specified when changing the PSK for connection encryption.')
+				);
+			}
+		}
 	}
 
 	/**
@@ -1788,7 +1811,26 @@ class CHost extends CHostGeneral {
 	 * @throws APIException if the input is invalid.
 	 */
 	protected function validateCreate(array &$hosts) {
-		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'fields' => self::getValidationFields()];
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'fields' => [
+			'tls_connect' =>		['type' => API_INT32, 'in' => implode(',', [HOST_ENCRYPTION_NONE, HOST_ENCRYPTION_PSK, HOST_ENCRYPTION_CERTIFICATE]), 'default' => DB::getDefault('hosts', 'tls_connect')],
+			'tls_accept' =>			['type' => API_INT32, 'in' => implode(':', [HOST_ENCRYPTION_NONE, HOST_ENCRYPTION_NONE | HOST_ENCRYPTION_PSK | HOST_ENCRYPTION_CERTIFICATE]), 'default' => DB::getDefault('hosts', 'tls_accept')],
+			'tls_psk_identity' =>	['type' => API_MULTIPLE, 'rules' => [
+										['if' => static fn (array $data): bool => $data['tls_connect'] == HOST_ENCRYPTION_PSK || ($data['tls_accept'] & HOST_ENCRYPTION_PSK) != 0, 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('hosts', 'tls_psk_identity')],
+										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('hosts', 'tls_psk_identity')]
+			]],
+			'tls_psk' =>			['type' => API_MULTIPLE, 'rules' => [
+										['if' => static fn (array $data): bool => $data['tls_connect'] == HOST_ENCRYPTION_PSK || ($data['tls_accept'] & HOST_ENCRYPTION_PSK) != 0, 'type' => API_PSK, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('hosts', 'tls_psk')],
+										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('hosts', 'tls_psk')]
+			]],
+			'tls_issuer' =>			['type' => API_MULTIPLE, 'rules' => [
+										['if' => static fn (array $data): bool => $data['tls_connect'] == HOST_ENCRYPTION_CERTIFICATE || ($data['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE) != 0, 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hosts', 'tls_issuer')],
+										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('hosts', 'tls_issuer')]
+			]],
+			'tls_subject' =>		['type' => API_MULTIPLE, 'rules' => [
+										['if' => static fn (array $data): bool => $data['tls_connect'] == HOST_ENCRYPTION_CERTIFICATE || ($data['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE) != 0, 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hosts', 'tls_subject')],
+										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('hosts', 'tls_subject')]
+			]]
+		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $hosts, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
@@ -2041,15 +2083,38 @@ class CHost extends CHostGeneral {
 			'preservekeys' => true
 		]);
 
+		$this->checkDiscoveredFields($hosts, $db_hosts);
+
 		$hosts = $this->extendObjectsByKey($hosts, $db_hosts, 'hostid', ['tls_connect', 'tls_accept']);
 
-		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => self::getValidationFields(true)];
+		self::addRequiredFieldsByTls($hosts, $db_hosts);
+
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
+			'hostid' =>				['type' => API_ANY],
+			'tls_connect' =>		['type' => API_ANY],
+			'tls_accept' =>			['type' => API_ANY],
+			'tls_psk_identity' =>	['type' => API_MULTIPLE, 'rules' => [
+										['if' => static fn (array $data): bool => $data['tls_connect'] == HOST_ENCRYPTION_PSK || ($data['tls_accept'] & HOST_ENCRYPTION_PSK) != 0, 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('hosts', 'tls_psk_identity')],
+										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('hosts', 'tls_psk_identity')]
+			]],
+			'tls_psk' =>			['type' => API_MULTIPLE, 'rules' => [
+										['if' => static fn (array $data): bool => $data['tls_connect'] == HOST_ENCRYPTION_PSK || ($data['tls_accept'] & HOST_ENCRYPTION_PSK) != 0, 'type' => API_PSK, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('hosts', 'tls_psk')],
+										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('hosts', 'tls_psk')]
+			]],
+			'tls_issuer' =>			['type' => API_MULTIPLE, 'rules' => [
+										['if' => static fn (array $data): bool => $data['tls_connect'] == HOST_ENCRYPTION_CERTIFICATE || ($data['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE) != 0, 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hosts', 'tls_issuer')],
+										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('hosts', 'tls_issuer')]
+			]],
+			'tls_subject' =>		['type' => API_MULTIPLE, 'rules' => [
+										['if' => static fn (array $data): bool => $data['tls_connect'] == HOST_ENCRYPTION_CERTIFICATE || ($data['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE) != 0, 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hosts', 'tls_subject')],
+										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('hosts', 'tls_subject')]
+			]]
+		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $hosts, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		self::addFieldDefaultsByTls($hosts, $db_hosts);
 		self::checkTlsPskPairs($hosts, $db_hosts);
 
 		$macro_rules = ['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['hostmacroid']], 'fields' => [
@@ -2115,11 +2180,6 @@ class CHost extends CHostGeneral {
 			'messageInvalid' => _('Incorrect status for host "%1$s".')
 		]);
 
-		$update_discovered_validator = new CUpdateDiscoveredValidator([
-			'allowed' => ['hostid', 'status', 'inventory', 'description'],
-			'messageAllowedField' => _('Cannot update "%2$s" for a discovered host "%1$s".')
-		]);
-
 		$host_name_parser = new CHostNameParser();
 
 		$host_names = [];
@@ -2150,10 +2210,6 @@ class CHost extends CHostGeneral {
 					}
 				}
 			}
-
-			// cannot update certain fields for discovered hosts
-			$update_discovered_validator->setObjectName($host_name);
-			$this->checkPartialValidator($host, $update_discovered_validator, $db_host);
 
 			if (array_key_exists('interfaces', $host) && $host['interfaces'] !== null
 					&& !is_array($host['interfaces'])) {
@@ -2267,81 +2323,29 @@ class CHost extends CHostGeneral {
 		return $hosts;
 	}
 
-	private static function getValidationFields(bool $is_update = false, $is_mass_update = false): array {
-		$api_required = $is_update ? 0 : API_REQUIRED;
+	private function checkDiscoveredFields(array $hosts, array $db_hosts): void {
+		$update_discovered_validator = new CUpdateDiscoveredValidator([
+			'allowed' => ['hostid', 'status', 'inventory', 'description'],
+			'messageAllowedField' => _('Cannot update "%2$s" for a discovered host "%1$s".')
+		]);
 
-		$specific_fields = !$is_update || $is_mass_update
-			? []
-			: [
-				'hostid' =>			['type' => API_ANY],
-				'tls_connect' =>	['type' => API_ANY],
-				'tls_accept' =>		['type' => API_ANY]
-			];
+		foreach ($hosts as $host) {
+			$db_host = $db_hosts[$host['hostid']];
+			$host_name = array_key_exists('host', $host) ? $host['host'] : $db_host['host'];
 
-		if ($is_mass_update) {
-			$psk_accepted = static function (array $data): bool {
-				return (array_key_exists('tls_connect', $data) && $data['tls_connect'] == HOST_ENCRYPTION_PSK)
-					|| (array_key_exists('tls_accept', $data) && ($data['tls_accept'] & HOST_ENCRYPTION_PSK) != 0);
-			};
-
-			$certificate_accepted = static function (array $data): bool {
-				return (array_key_exists('tls_connect', $data) && $data['tls_connect'] == HOST_ENCRYPTION_CERTIFICATE)
-					|| (array_key_exists('tls_accept', $data)
-						&& ($data['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE) != 0);
-			};
+			$update_discovered_validator->setObjectName($host_name);
+			$this->checkPartialValidator($host, $update_discovered_validator, $db_host);
 		}
-		else {
-			$psk_accepted = static function (array $data): bool {
-				return $data['tls_connect'] == HOST_ENCRYPTION_PSK
-					|| ($data['tls_accept'] & HOST_ENCRYPTION_PSK) != 0;
-			};
-
-			$certificate_accepted = static function (array $data): bool {
-				return $data['tls_connect'] == HOST_ENCRYPTION_CERTIFICATE
-					|| ($data['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE) != 0;
-			};
-		}
-
-		return $specific_fields + [
-			'tls_connect' =>		['type' => API_INT32, 'in' => implode(',', [HOST_ENCRYPTION_NONE, HOST_ENCRYPTION_PSK, HOST_ENCRYPTION_CERTIFICATE])] + ($is_update ? [] : ['default' => DB::getDefault('hosts', 'tls_connect')]),
-			'tls_accept' =>			['type' => API_INT32, 'in' => implode(':', [HOST_ENCRYPTION_NONE, HOST_ENCRYPTION_NONE | HOST_ENCRYPTION_PSK | HOST_ENCRYPTION_CERTIFICATE])] + ($is_update ? [] : ['default' => DB::getDefault('hosts', 'tls_accept')]),
-			'tls_psk_identity' =>	['type' => API_MULTIPLE, 'rules' => [
-										['if' => $psk_accepted, 'type' => API_STRING_UTF8, 'flags' => $api_required | API_NOT_EMPTY, 'length' => DB::getFieldLength('hosts', 'tls_psk_identity')],
-										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('hosts', 'tls_psk_identity')]
-			]],
-			'tls_psk' =>			['type' => API_MULTIPLE, 'rules' => [
-										['if' => $psk_accepted, 'type' => API_PSK, 'flags' => $api_required | API_NOT_EMPTY, 'length' => DB::getFieldLength('hosts', 'tls_psk')],
-										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('hosts', 'tls_psk')]
-			]],
-			'tls_issuer' =>			['type' => API_MULTIPLE, 'rules' => [
-										['if' => $certificate_accepted, 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hosts', 'tls_issuer')],
-										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('hosts', 'tls_issuer')]
-			]],
-			'tls_subject' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => $certificate_accepted, 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hosts', 'tls_subject')],
-										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('hosts', 'tls_subject')]
-			]]
-		];
 	}
 
-	private static function addFieldDefaultsByTls(array &$hosts, array $db_hosts): void {
+	private static function addRequiredFieldsByTls(array &$hosts, array $db_hosts): void {
 		foreach ($hosts as &$host) {
-			if ($host['tls_connect'] != HOST_ENCRYPTION_PSK && ($host['tls_accept'] & HOST_ENCRYPTION_PSK) == 0
-					&& ($db_hosts[$host['hostid']]['tls_connect'] == HOST_ENCRYPTION_PSK
-						|| $db_hosts[$host['hostid']]['tls_accept'] & HOST_ENCRYPTION_PSK)) {
+			if (($host['tls_connect'] == HOST_ENCRYPTION_PSK || $host['tls_accept'] & HOST_ENCRYPTION_PSK)
+					&& $db_hosts[$host['hostid']]['tls_connect'] != HOST_ENCRYPTION_PSK
+					&& ($db_hosts[$host['hostid']]['tls_accept'] & HOST_ENCRYPTION_PSK) == 0) {
 				$host += [
-					'tls_psk_identity' => DB::getDefault('hosts', 'tls_psk_identity'),
-					'tls_psk' => DB::getDefault('hosts', 'tls_psk')
-				];
-			}
-
-			if ($host['tls_connect'] != HOST_ENCRYPTION_CERTIFICATE
-					&& ($host['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE) == 0
-					&& ($db_hosts[$host['hostid']]['tls_connect'] == HOST_ENCRYPTION_CERTIFICATE
-						|| $db_hosts[$host['hostid']]['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE)) {
-				$host += [
-					'tls_issuer' => DB::getDefault('hosts', 'tls_issuer'),
-					'tls_subject' => DB::getDefault('hosts', 'tls_subject')
+					'tls_psk_identity' => $db_hosts[$host['hostid']]['tls_psk_identity'],
+					'tls_psk' => $db_hosts[$host['hostid']]['tls_psk']
 				];
 			}
 		}
