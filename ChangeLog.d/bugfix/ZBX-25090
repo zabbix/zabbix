@@ -1,1 +1,1 @@
-A.F.....S. [ZBX-25090] fixed missing binary data type in real-time data export and when streaming data to external systems (asestakovs)
+A.F.....S. [ZBX-25090] fixed missing binary data type when streaming data to external systems (asestakovs)

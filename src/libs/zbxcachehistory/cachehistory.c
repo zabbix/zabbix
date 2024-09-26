@@ -1324,9 +1324,12 @@ static void	DCexport_history(const zbx_dc_history_t *history, int history_num, z
 							connector_filters->values[k].connectorid);
 				}
 			}
+		}
 
-			if (0 == connector_object.ids.values_num && FAIL == history_export_enabled)
-				continue;
+		if (0 == connector_object.ids.values_num &&
+				(FAIL == history_export_enabled || ITEM_VALUE_TYPE_BIN == h->value_type))
+		{
+			continue;
 		}
 
 		zbx_json_clean(&json);
@@ -1405,7 +1408,7 @@ static void	DCexport_history(const zbx_dc_history_t *history, int history_num, z
 			zbx_vector_uint64_clear(&connector_object.ids);
 		}
 
-		if (SUCCEED == history_export_enabled)
+		if (SUCCEED == history_export_enabled && ITEM_VALUE_TYPE_BIN != h->value_type)
 			zbx_history_export_write(json.buffer, json.buffer_size);
 	}
 
