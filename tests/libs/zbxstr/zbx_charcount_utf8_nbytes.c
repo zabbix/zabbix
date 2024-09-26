@@ -24,9 +24,10 @@ void	zbx_mock_test_entry(void **state)
 	const char	*text = zbx_mock_get_parameter_string("in.text");
 	size_t		utf8_maxlen = zbx_mock_get_parameter_uint64("in.size");
 	size_t		exp_result = zbx_mock_get_parameter_uint64("out.result");
-	size_t		act_result = zbx_charcount_utf8_nbytes(text, utf8_maxlen);
 
 	ZBX_UNUSED(state);
+
+	size_t		act_result = zbx_charcount_utf8_nbytes(text, utf8_maxlen);
 
 	zbx_mock_assert_uint64_eq("return value", exp_result, act_result);
 }

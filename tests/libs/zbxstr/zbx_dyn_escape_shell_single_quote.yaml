@@ -40,4 +40,10 @@ in:
   arg: \\'\\\'\\\
 out:
   string: \\'\''\\\'\''\\\
+---
+test case: "7. Quote on second line"
+in:
+  arg: "Hello\nit's me"
+out:
+  string: "Hello\nit'\\''s me"
 ...

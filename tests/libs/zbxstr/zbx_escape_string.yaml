@@ -61,4 +61,13 @@ in:
 out:
   return: SUCCEED
   result: a"\b"cd
+---
+test case: 8. Charlist is backslash
+in:
+  src: src\lib
+  charlist: '\'
+  len: 10
+out:
+  return: SUCCEED
+  result: src\\lib
 ...

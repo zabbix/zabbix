@@ -79,4 +79,22 @@ in:
   delimiter: '.'
 out:
   return: SUCCEED
+---
+test case: "9. Space as delimiter"
+in:
+  list: "a aa aaa aa aaa"
+  value: "a"
+  len: 1
+  delimiter: ' '
+out:
+  return: SUCCEED
+---
+test case: "9. Single quote as delimiter"
+in:
+  list: "a'aa'aaa'aa'aaa"
+  value: "aa"
+  len: 2
+  delimiter: "'"
+out:
+  return: SUCCEED
 ...

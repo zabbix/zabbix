@@ -1,65 +1,42 @@
 ---
-test case: "1. succeed 0123456789"
+test case: "1. All ASCII characters"
 in:
-  string: "0123456789"
+  string: |
+   !"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}
 out:
   return: SUCCEED
 ---
-test case: "2. fail ы"
+test case: "2.  ы"
 in:
   string: "ы"
 out:
   return: FAIL
 ---
-test case: "3. succeed qwert"
-in:
-  string: "qwert"
-out:
-  return: SUCCEED
----
-test case: "4. succeed ()_+-="
-in:
-  string: "()_+-="
-out:
-  return: SUCCEED
----
-test case: "5. succeed ABCD"
-in:
-  string: "ABCD"
-out:
-  return: SUCCEED
----
-test case: "6. succeed ;;2::"
-in:
-  string: ";;2::"
-out:
-  return: SUCCEED
----
-test case: "7. fail abcыsss"
+test case: "3. abcыsss"
 in:
   string: "abcыsss"
 out:
   return: FAIL
 ---
-test case: "8. fail 诶"
+test case: "4. 诶"
 in:
   string: "诶"
 out:
   return: FAIL
 ---
-test case: "9. succeed empty string"
+test case: "5. empty string"
 in:
   string: ""
 out:
   return: SUCCEED
 ---
-test case: "10. succeed newline"
+test case: "6. newline"
 in:
   string: "\n"
 out:
   return: SUCCEED
 ---
-test case: "11. succeed Apostrophe"
+test case: "7. Apostrophe"
 in:
   string: "'"
 out:

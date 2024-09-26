@@ -26,4 +26,18 @@ in:
   size: 0
 out:
   result: 0
+---
+test case: "5. Newline"
+in:
+  text: "\n"
+  size: 1
+out:
+  result: 1
+---
+test case: "5. Newlines and spaces"
+in:
+  text: "\n  $"
+  size: 5
+out:
+  result: 4
 ...

@@ -25,9 +25,10 @@ void	zbx_mock_test_entry(void **state)
 	const char	*haystack = zbx_mock_get_parameter_string("in.haystack");
 	const char	*needle = zbx_mock_get_parameter_string("in.needle");
 	const char	*exp_result = zbx_mock_get_parameter_string("out.string");
-	char		*act_result = zbx_strcasestr(haystack, needle);
 
 	ZBX_UNUSED(state);
+
+	char		*act_result = zbx_strcasestr(haystack, needle);
 
 	zbx_mock_assert_str_eq("return value", exp_result, act_result);
 }

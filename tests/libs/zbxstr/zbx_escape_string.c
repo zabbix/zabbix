@@ -23,7 +23,7 @@ void	zbx_mock_test_entry(void **state)
 {
 	const char	*src, *charlist, *char_result;
 	char 		destination[30];
-	int		act_result, exp_result;;
+	int		act_result, exp_result;
 
 	ZBX_UNUSED(state);
 

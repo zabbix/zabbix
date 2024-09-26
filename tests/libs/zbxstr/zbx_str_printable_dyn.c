@@ -24,9 +24,10 @@ void	zbx_mock_test_entry(void **state)
 {
 	const char	*text = zbx_mock_get_parameter_string("in.string");
 	const char	*exp_result = zbx_mock_get_parameter_string("out.string");
-	char		*act_result = zbx_str_printable_dyn(text);
 
 	ZBX_UNUSED(state);
+
+	char		*act_result = zbx_str_printable_dyn(text);
 
 	zbx_mock_assert_str_eq("return value", exp_result, act_result);
 	zbx_free(act_result);

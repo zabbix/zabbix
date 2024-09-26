@@ -26,9 +26,10 @@ void	zbx_mock_test_entry(void **state)
 	size_t		len = zbx_mock_get_parameter_uint64("in.len");
 	char		delimiter = *zbx_mock_get_parameter_string("in.delimiter");
 	int		exp_result = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
-	int		act_result = zbx_str_n_in_list(list, value, len, delimiter);
 
 	ZBX_UNUSED(state);
+
+	int		act_result = zbx_str_n_in_list(list, value, len, delimiter);
 
 	zbx_mock_assert_int_eq("return value", exp_result, act_result);
 }

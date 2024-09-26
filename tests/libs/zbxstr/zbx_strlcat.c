@@ -24,13 +24,13 @@ void	zbx_mock_test_entry(void **state)
 	const char	*src = zbx_mock_get_parameter_string("in.src");
 	size_t		size = zbx_mock_get_parameter_uint64("in.size");
 	char		*dest = (char *)zbx_malloc(NULL, size * sizeof(char));
-	size_t		size2 = size - 1;
+	size_t		buffer_size  = size - 1;
 	const char	*exp_result = zbx_mock_get_parameter_string("out.result");
 
 	ZBX_UNUSED(state);
 
-	memset(dest, 0, size2);
-	zbx_strlcat(dest, src, size2);
+	memset(dest, 0, buffer_size );
+	zbx_strlcat(dest, src, buffer_size );
 	zbx_replace_invalid_utf8(dest);
 	zbx_mock_assert_str_eq("return value", exp_result, dest);
 	zbx_free(dest);

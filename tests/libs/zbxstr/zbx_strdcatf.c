@@ -29,7 +29,8 @@ void	zbx_mock_test_entry(void **state)
 
 	ZBX_UNUSED(state);
 
-	switch(argument_number){
+	switch(argument_number)
+	{
 		case 1:
 			dest = zbx_strdcatf(dest, "This is string - %s", argument_str);
 			break;

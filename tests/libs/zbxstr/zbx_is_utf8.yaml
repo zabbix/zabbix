@@ -1,5 +1,5 @@
 ---
-test case: "Invalid 1 - FAIL"
+test case: "Invalid 1"
 in:
   buffer_length: 4
   buffer: &buffer
@@ -7,7 +7,7 @@ in:
 out:
   return: 'FAIL'
 ---
-test case: "Invalid 2 - FAIL"
+test case: "Invalid 2"
 in:
   buffer_length: 5
   buffer: &buffer
@@ -15,7 +15,7 @@ in:
 out:
   return: 'FAIL'
 ---
-test case: "a- SUCCEED"
+test case: "a"
 in:
   buffer_length: 2
   buffer: &buffer
@@ -23,11 +23,19 @@ in:
 out:
   return: 'SUCCEED'
 ---
-test case: "Hello world- SUCCEED"
+test case: "Hello world"
 in:
   buffer_length: 13
   buffer: &buffer
     - '\x48\x65\x6c\x6c\x6f\x20\x77\x6f\x72\x6c\x64\x21\x00'
 out:
   return: 'SUCCEED'
+---
+test case: "Empty buffer"
+in:
+  buffer_length: 0
+  buffer: &buffer
+    - ''
+out:
+  return: 'FAIL'
 ...

@@ -36,7 +36,6 @@ BINARIES_tests = \
 	zbx_strcasestr \
 	zbx_dyn_escape_shell_single_quote
 
-
 noinst_PROGRAMS = $(BINARIES_tests)
 
 COMMON_SRC_FILES = \

@@ -25,9 +25,10 @@ void	zbx_mock_test_entry(void **state)
 	int	expected_result = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
 	size_t	in_buffer_length = zbx_mock_get_parameter_uint64("in.buffer_length");
 	char	*in_buffer = zbx_yaml_assemble_binary_sequence("in.buffer", &in_buffer_length);
-	int	result = zbx_is_utf8(in_buffer);
 
 	ZBX_UNUSED(state);
+
+	int	result = zbx_is_utf8(in_buffer);
 
 	zbx_mock_assert_int_eq("return value", expected_result, result);
 	zbx_free(in_buffer);
