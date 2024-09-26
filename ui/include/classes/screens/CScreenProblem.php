@@ -1787,7 +1787,7 @@ class CScreenProblem extends CScreenBase {
 
 			if ($html) {
 				$hint_table->addRow([
-					(new CCol($item['name']))->addStyle('max-width: 300px'),
+					(new CCol($item['name']))->addClass(ZBX_STYLE_HINT_BOX_COLUMN_MAX_WIDTH),
 					(new CCol(
 						($last_value['clock'] !== null)
 							? zbx_date2str(DATE_TIME_FORMAT_SECONDS, $last_value['clock'])
@@ -1796,7 +1796,7 @@ class CScreenProblem extends CScreenBase {
 					(new CCol($item['value_type'] == ITEM_VALUE_TYPE_BINARY
 						? italic(_('binary value'))->addClass(ZBX_STYLE_GREY)
 						: $last_value['original_value']
-					))->addStyle('max-width: 300px'),
+					))->addClass(ZBX_STYLE_HINT_BOX_COLUMN_MAX_WIDTH),
 					(new CCol(
 						($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64)
 							? (CWebUser::checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA)

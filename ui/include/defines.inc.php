@@ -2290,6 +2290,10 @@ define('ZBX_STYLE_ZSELECT_HOST_INTERFACE', 'z-select-host-interface');
 define('ZBX_STYLE_DASHBOARD_LIST', 'dashboard-list');
 define('ZBX_STYLE_DASHBOARD_LIST_ITEM', 'dashboard-list-item');
 
+// Hint box styles.
+
+define('ZBX_STYLE_HINT_BOX_COLUMN_MAX_WIDTH', 'hint-box-column-max-width');
+
 // Icons.
 define('ZBX_ICON_ADMINISTRATION', 'zi-administration');
 define('ZBX_ICON_ALERT', 'zi-alert');
