@@ -575,8 +575,8 @@ button {
 				background-color: #d3d3d3 !important;
 			}
 
-			&[readonly]:checked:not(:focus) + label {
-				background-color: #B2B4BB !important;
+			&[readonly]:checked + label {
+				background-color: #b2b4bb !important;
 				-webkit-text-fill-color: #292929;
 			}
 		}
