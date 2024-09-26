@@ -1729,6 +1729,8 @@ define('ZBX_ACTIONS_POPUP_MAX_WIDTH',			800);
 
 define('ZBX_HINTBOX_CONTENT_LIMIT',				8192);
 
+define('ZBX_OPDATA_HINTBOX_COLUMN_MAX_WIDTH', 	500);
+
 // Dashboard widget types supported in templates (used only in import converters).
 define('WIDGET_CLOCK',				'clock');
 define('WIDGET_GRAPH',				'graph');
@@ -2289,10 +2291,6 @@ define('ZBX_STYLE_ZSELECT_HOST_INTERFACE', 'z-select-host-interface');
 // Dashboard list table classes.
 define('ZBX_STYLE_DASHBOARD_LIST', 'dashboard-list');
 define('ZBX_STYLE_DASHBOARD_LIST_ITEM', 'dashboard-list-item');
-
-// Hint box styles.
-
-define('ZBX_STYLE_HINT_BOX_COLUMN_MAX_WIDTH', 'hint-box-column-max-width');
 
 // Icons.
 define('ZBX_ICON_ADMINISTRATION', 'zi-administration');
