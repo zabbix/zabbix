@@ -7738,8 +7738,8 @@ a.btn-icon:link, a.btn-icon:hover, a.btn-icon:focus, a.btn-icon:visited,
   color: #ffffff; }
 .radio-list-control li input[type="radio"]:checked[disabled] + label {
   background-color: #d3d3d3 !important; }
-.radio-list-control li input[type="radio"][readonly]:checked:not(:focus) + label {
-  background-color: #B2B4BB !important;
+.radio-list-control li input[type="radio"][readonly]:checked + label {
+  background-color: #b2b4bb !important;
   -webkit-text-fill-color: #292929; }
 
 a:link {
