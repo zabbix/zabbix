@@ -3905,7 +3905,7 @@ static int	dc_function_calculate_trends_nextcheck(time_t from, const char *perio
 		if (*nextcheck > from)
 			return SUCCEED;
 
-		zbx_tm_add(&tm, 1, base);
+		zbx_tm_add(&tm, 1, base, NULL);
 		if (-1 == (next = mktime(&tm)))
 		{
 			*error = zbx_strdup(*error, zbx_strerror(errno));
@@ -3945,7 +3945,7 @@ static int	dc_function_calculate_nextcheck(const zbx_trigger_timer_t *timer, tim
 		if (ZBX_TIME_UNIT_HOUR == timer->trend_base)
 		{
 			localtime_r(&from, &tm);
-			zbx_tm_round_up(&tm, timer->trend_base);
+			zbx_tm_round_up(&tm, timer->trend_base, NULL);
 
 			if (-1 == (nextcheck = mktime(&tm)))
 			{
@@ -7326,6 +7326,8 @@ int	init_configuration_cache(char **error)
 	}
 	else
 		config->session_token = NULL;
+
+	config->itservices_num = 0;
 
 #undef CREATE_HASHSET
 #undef CREATE_HASHSET_EXT
@@ -13938,6 +13940,25 @@ int	zbx_dc_maintenance_has_tags(void)
 
 	return ret;
 }
+
+void	zbx_dc_set_itservices_num(int num)
+{
+	WRLOCK_CACHE;
+	config->itservices_num = num;
+	UNLOCK_CACHE;
+}
+
+int	zbx_dc_get_itservices_num(void)
+{
+	int	num;
+
+	RDLOCK_CACHE;
+	num = config->itservices_num;
+	UNLOCK_CACHE;
+
+	return num;
+}
+
 
 #ifdef HAVE_TESTS
 #	include "../../../tests/libs/zbxdbcache/dc_item_poller_type_update_test.c"
