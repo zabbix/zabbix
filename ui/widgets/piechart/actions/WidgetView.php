@@ -544,8 +544,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		$formatted_total_value = convertUnitsRaw([
 			'value' => $raw_total_value,
-			'units' => $chart_units,
-			'power' => $units_config['units_show'] == self::SHOW_UNITS_ON ? null : 0,
 			'decimals' => $total_config['decimal_places'],
 			'decimals_exact' => true,
 			'small_scientific' => false,
