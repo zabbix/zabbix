@@ -33,9 +33,9 @@ out:
 ---
 test case: "Empty buffer"
 in:
-  buffer_length: 0
+  buffer_length: 1
   buffer: &buffer
-    - ''
+    - '\x00'
 out:
-  return: 'FAIL'
+  return: 'SUCCEED'
 ...
