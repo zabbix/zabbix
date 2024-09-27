@@ -24,7 +24,6 @@ class CLineGraphDraw extends CGraphDraw {
 	private $drawExLegend;
 	private $drawItemsLegend;
 	private $intervals;
-	private $is_binary;
 	private $itemsHost;
 	private $outer;
 	private $oxy;
@@ -85,7 +84,6 @@ class CLineGraphDraw extends CGraphDraw {
 
 		$this->intervals = [];
 		$this->power = [];
-		$this->is_binary = [];
 
 		$this->drawItemsLegend = false; // draw items legend
 		$this->drawExLegend = false; // draw percentile and triggers legend
@@ -1202,7 +1200,7 @@ class CLineGraphDraw extends CGraphDraw {
 
 			$scale_values = calculateGraphScaleValues($this->m_minY[$side], $this->m_maxY[$side],
 				$this->ymin_type == GRAPH_YAXIS_TYPE_CALCULATED, $this->ymax_type == GRAPH_YAXIS_TYPE_CALCULATED,
-				$this->intervals[$side], $units, $this->is_binary[$side], $this->power[$side], 10
+				$this->intervals[$side], $units, $this->power[$side], 10
 			);
 
 			$line_color = $this->getColor($this->graphtheme['gridcolor'], 0);
@@ -1903,17 +1901,18 @@ class CLineGraphDraw extends CGraphDraw {
 				$min = min(0, $min);
 			}
 
-			$is_binary = false;
-			$calc_power = false;
+			$units = '';
 
 			foreach ($this->items as $item) {
 				if ($item['yaxisside'] == $side) {
-					$is_binary = $is_binary || in_array($item['units'], ['B', 'Bps']);
-					$calc_power = $calc_power || $item['units'] === '' || $item['units'][0] !== '!';
+					$units = $item['units'];
+					break;
 				}
 			}
 
-			$result = calculateGraphScaleExtremes($min, $max, $is_binary, $calc_power, $calc_min, $calc_max, $rows_min,
+			$calc_power = $units === '' || $units[0] !== '!';
+
+			$result = calculateGraphScaleExtremes($min, $max, $units, $calc_power, $calc_min, $calc_max, $rows_min,
 				$rows_max
 			);
 
@@ -1928,8 +1927,6 @@ class CLineGraphDraw extends CGraphDraw {
 				'interval' => $this->intervals[$side],
 				'power' => $this->power[$side]
 			] = $result;
-
-			$this->is_binary[$side] = $is_binary;
 
 			if ($calc_min && $calc_max) {
 				$rows_min = $rows_max = $result['rows'];

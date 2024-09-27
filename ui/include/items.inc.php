@@ -1207,46 +1207,75 @@ function formatHistoryValueRaw($value, array $item, bool $trim = true, array $co
 }
 
 /**
- * Converts seconds to the biggest unit of measure with decimals.
+ * Get power to time-unit relation in descending order of power.
  *
- * @param int|float|string  $value            Time period in seconds
- * @param bool              $ignore_millisec  Ignores milliseconds
- * @param int               $decimals         Max number of first non-zero decimals to display
- * @param bool              $decimals_exact   Display exactly this number of decimals instead of first non-zeros
- *
- * @return string
+ * @return array
  */
-function convertUnitSWithDecimals($value, bool $ignore_millisec = false, int $decimals = ZBX_UNITS_ROUNDOFF_SUFFIXED,
-		bool $decimals_exact = false): string {
-	$value = (float)$value;
-	$part = '';
-	$result = 0;
+function getUnitsSPowerData(): array {
+	return [
+		5	=> ['suffix' => 'y',	'base' => SEC_PER_YEAR],
+		4	=> ['suffix' => 'M',	'base' => SEC_PER_MONTH],
+		3	=> ['suffix' => 'd',	'base' => SEC_PER_DAY],
+		2	=> ['suffix' => 'h',	'base' => SEC_PER_HOUR],
+		1	=> ['suffix' => 'm',	'base' => SEC_PER_MIN],
+		0	=> ['suffix' => 's',	'base' => 1],
+		-1	=> ['suffix' => 'ms',	'base' => 0.001]
+	];
+}
 
-	foreach ([
-		'y' => SEC_PER_YEAR,
-		'M' => SEC_PER_MONTH,
-		'd' => SEC_PER_DAY,
-		'h' => SEC_PER_HOUR,
-		'm' => SEC_PER_MIN,
-		's' => 1
-	] as $key => $sec_per_part) {
-		if (floor($value / $sec_per_part) > 0) {
-			$part = $key;
-			$result = $value / $sec_per_part;
-			break;
+/**
+ * Convert seconds to a single time unit with decimals.
+ *
+ * @param int|float|string $value                           Number of seconds.
+ * @param array            $options
+ *        int|null         $options['power']                Use exact time unit power or calculate the highest
+ *                                                          automatically, if option is set to null.
+ *                                                          Default: null.
+ *        bool             $options['ignore_milliseconds']  Do not use milliseconds (unless forced by power option).
+ *                                                          Default: false.
+ *        int              $options['decimals']             Max number of first non-zero decimals to display.
+ *                                                          Default: ZBX_UNITS_ROUNDOFF_SUFFIXED.
+ *        bool             $options['decimals_exact']       Display exactly this number of decimals instead of first
+ *                                                          non-zeros.
+ *                                                          Default: false.
+ */
+function convertUnitsSWithDecimalsRaw($value, array $options = []): array {
+	$power_data = getUnitsSPowerData();
+
+	$options += [
+		'power' => null,
+		'ignore_milliseconds' => false,
+		'decimals' => ZBX_UNITS_ROUNDOFF_SUFFIXED,
+		'decimals_exact' => false
+	];
+
+	$value = (float) $value;
+
+	if ($options['power'] === null) {
+		$power = -1;
+
+		foreach ($power_data as $_power => $power_datum) {
+			if ($value >= $power_datum['base']) {
+				$power = $_power;
+				break;
+			}
+		}
+
+		if ($power === -1 && $options['ignore_milliseconds']) {
+			$power = 0;
 		}
 	}
-
-	if ($part === '' && $ignore_millisec) {
-		$part = 's';
-		$result = $value;
-	}
-	elseif ($part === '') {
-		$part = 'ms';
-		$result = $value * 1000;
+	else {
+		$power = $options['power'];
 	}
 
-	return formatFloat($result, ['decimals' => $decimals, 'decimals_exact' => $decimals_exact]).$part;
+	return [
+		'value' => formatFloat($value / $power_data[$power]['base'], [
+			'decimals' => $options['decimals'],
+			'decimals_exact' => $options['decimals_exact']
+		]),
+		'units' => $power_data[$power]['suffix']
+	];
 }
 
 /**
@@ -1258,6 +1287,55 @@ function convertUnitSWithDecimals($value, bool $ignore_millisec = false, int $de
  */
 function isBinaryUnits(string $units): bool {
 	return $units === 'B' || $units === 'Bps';
+}
+
+/**
+ * Get units value base for specified power.
+ *
+ * Examples: 'Bps', 0 => 1; 'Bps', 1 => 1024; 's', 0 => 1; 's', 1 => 60; 's', 2 => 3600; '', 3 => 1000000000.
+ *
+ * @param string $units
+ * @param int    $power
+ *
+ * @return float
+ */
+function getUnitsBase(string $units, int $power): float {
+	switch ($units) {
+		case 's':
+			return getUnitsSPowerData()[$power]['base'];
+
+		default:
+			return pow(isBinaryUnits($units) ? ZBX_KIBIBYTE : 1000, $power);
+	}
+}
+
+/**
+ * Get units power for specified value.
+ *
+ * Used for displaying multiple values at fixed power.
+ * @see convertUnits
+ *
+ * Examples: 1023 B => 0; 1024 B => 1; 999 => 0; 1000 => 1; 1000000 => 2; 59s => 0, 60s => 1, 0.9s => 0.1.
+ *
+ * @param string $units  Units, like 's', 'Bps', 'uptime' or empty string.
+ * @param float  $value  Numeric value, for which power will be calculated.
+ *
+ * @return int
+ */
+function getUnitsPower(string $units, float $value): int {
+	switch ($units) {
+		case 's':
+			foreach (getUnitsSPowerData() as $power => $power_datum) {
+				if ($value >= $power_datum['base']) {
+					return $power;
+				}
+			}
+
+			return -1;
+
+		default:
+			return (int) min(8, max(0, floor(log($value, isBinaryUnits($units) ? ZBX_KIBIBYTE : 1000))));
+	}
 }
 
 /**
