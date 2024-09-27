@@ -238,6 +238,7 @@ int	config_forks[ZBX_PROCESS_TYPE_COUNT] = {
 	0, /* ZBX_PROCESS_TYPE_DBCONFIGWORKER */
 	0, /* ZBX_PROCESS_TYPE_PG_MANAGER */
 	1, /* ZBX_PROCESS_TYPE_BROWSERPOLLER */
+	0 /* ZBX_PROCESS_TYPE_HA_MANAGER */
 };
 
 static int	get_config_forks(unsigned char process_type)
