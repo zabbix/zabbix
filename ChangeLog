@@ -1,6 +1,8 @@
 Changes for 7.2.0alpha1
 
 New features:
+........S. [ZBXNEXT-9246] added monitoring of HA manager process utilization (mprihodko)
+.........T [ZBXNEXT-8139] added 'Hypervisor maintenance mode' item to the VMware Guest template (akotsegubov)
 ..F....... [ZBXNEXT-9375] added/removed and modified table titles related to the action column and fixed broken layouts in multiple tables (rgontarski)
 ..F....... [ZBXNEXT-9221] added links to host configuration forms in entity lists (esekace)
 ..F.I..... [ZBXNEXT-466] added the ability to filter audit log entries by IP (Ivo)
@@ -45,6 +47,17 @@ A.F.I..PS. [ZBXNEXT-9176] removed support of Oracle DB (agriscenko, sboidenko)
 .......PS. [ZBXNEXT-8990] extended VMware event log with username (asestakovs)
 
 Bug fixes:
+..F....... [ZBX-25072] fixed splitting of a trigger expression in the expression builder (Sasha)
+.........T [ZBX-22918] added database name macro for connection to all agent keys in PostgreSQL by Zabbix agent 2 (drasikhov)
+.........T [ZBX-25199] updated filesystem space metrics JavaScript preprocessing in Linux by SNMP template with manual value type conversion (drasikhov)
+.........T [ZBX-25255] fixed macro in PostgreSQL by Zabbix agent 2 template (abrosimovs)
+........S. [ZBX-24702] improved certificate related error messages while loading dashboard (mprihodko)
+..F....... [ZBX-24902] fixed disappearing graph type filter options when changing view mode from values back to graph (Ivo)
+A......... [ZBX-24922] prevented attempt to update trigger or graph prototypes while importing discovery rules without "update existing" option specified (jfreibergs)
+..F....... [ZBX-25156] fixed runtime error in trigger expression constructor if non-existent function was used in the expression field (Ivo)
+........S. [ZBX-23010] allowed execution of files symlinked to AlertScriptsPath directory (wiper)
+.........T [ZBX-25280] fixed trigger expression in Kubernetes cluster state by HTTP (egordymov)
+........S. [ZBX-25098] fixed regsub with backshash and At sign output pattern (sboidenko)
 ........S. [ZBX-24914] fixed conditional jumps error in cacheconfig when non-numeric item types are used with trends (arimdjonoks)
 .......PS. [ZBX-25176] added retry to asynchronous SNMP pollers to avoid failure if one of packets is lost (vso)
 ........S. [ZBX-25238] fixed crash when deleting proxy group and proxy at same moment (vso)
@@ -273,8 +286,22 @@ A......... [ZBX-24299] fixed possibility to alter readonly error fields with Hos
 Changes for 7.0.5rc1
 
 New features:
+........S. [ZBXNEXT-9246] added monitoring of HA manager process utilization (mprihodko)
 
 Bug fixes:
+..F....... [ZBX-25072] fixed splitting of a trigger expression in the expression builder (Sasha)
+.........T [ZBX-22918] added database name macro for connection to all agent keys in PostgreSQL by Zabbix agent 2 (drasikhov)
+.........T [ZBX-25199] updated filesystem space metrics JavaScript preprocessing in Linux by SNMP template with manual value type conversion (drasikhov)
+..F....... [ZBX-24366] fixed host group filters on availability report to show correct items (jfreibergs, vmaksimovs)
+.........T [ZBX-25255] fixed macro in PostgreSQL by Zabbix agent 2 template (abrosimovs)
+........S. [ZBX-24702] improved certificate related error messages while loading dashboard (mprihodko)
+..F....... [ZBX-24902] fixed disappearing graph type filter options when changing view mode from values back to graph (Ivo)
+A......... [ZBX-24922] prevented attempt to update trigger or graph prototypes while importing discovery rules without "update existing" option specified (jfreibergs)
+..F....... [ZBX-25156] fixed runtime error in trigger expression constructor if non-existent function was used in the expression field (Ivo)
+........S. [ZBX-25098] fixed regsub with backshash and At sign output pattern (sboidenko)
+.........T [ZBX-25280] fixed trigger expression in Kubernetes cluster state by HTTP (egordymov)
+........S. [ZBX-23010] allowed execution of files symlinked to AlertScriptsPath directory (wiper)
+........S. [ZBX-24914] fixed conditional jumps error in cacheconfig when non-numeric item types are used with trends (arimdjonoks)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.4
@@ -3288,8 +3315,18 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 Changes for 6.0.35rc1
 
 New features:
+........S. [ZBXNEXT-9246] added monitoring of HA manager process utilization (mprihodko)
 
 Bug fixes:
+.........T [ZBX-22918] added database name macro for connection to all agent keys in PostgreSQL by Zabbix agent 2 (drasikhov)
+.........T [ZBX-24979] removed uncompatible proxy last seen threshold macro from Zabbix health templates (drasikhov)
+..F....... [ZBX-24366] fixed host group filters on availability report to show correct items (jfreibergs, vmaksimovs)
+..F....... [ZBX-25072] fixed splitting of a trigger expression in the expression builder (Sasha)
+.........T [ZBX-25255] fixed macro in PostgreSQL by Zabbix agent 2 template (abrosimovs)
+........S. [ZBX-25098] fixed regsub with backshash and At sign output pattern (sboidenko)
+A......... [ZBX-24922] prevented attempt to update trigger or graph prototypes while importing discovery rules without "update existing" option specified (jfreibergs)
+..F....... [ZBX-25156] fixed runtime error in trigger expression constructor if non-existent function was used in the expression field (Ivo)
+.........T [ZBX-25280] fixed trigger expression in Kubernetes cluster state by HTTP (egordymov)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.34
