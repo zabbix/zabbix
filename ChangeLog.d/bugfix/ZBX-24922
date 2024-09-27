@@ -1,0 +1,1 @@
+A......... [ZBX-24922] prevented attempt to update trigger or graph prototypes while importing discovery rules without "update existing" option specified (jfreibergs)
