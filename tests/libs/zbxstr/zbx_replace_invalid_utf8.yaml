@@ -1,5 +1,5 @@
 ---
-test case: "Test1"
+test case: "1. Replaced invalid  UTF-8 characters '\xfe\xfe\xfe\x00'"
 in:
   buffer_length: 4
   buffer: &buffer
@@ -9,7 +9,7 @@ out:
   buffer: &buffer
     - '\x3f\x3f\x3f\x00'
 ---
-test case: "null terminated"
+test case: "2. null terminated"
 in:
   buffer_length: 1
   buffer: &buffer
@@ -19,7 +19,7 @@ out:
   buffer: &buffer
     - '\x00'
 ---
-test case: "Hello world! - with invalid"
+test case: "3. Hello world! - with invalid"
 in:
   buffer_length: 13
   buffer: &buffer
@@ -29,7 +29,7 @@ out:
   buffer: &buffer
     - '\x48\x65\x6c\x6c\x6f\x20\x77\x6f\x72\x6c\x64\x3f\x00'
 ---
-test case: "test without invalid"
+test case: "4. test without invalid"
 in:
   buffer_length: 5
   buffer: &buffer

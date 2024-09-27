@@ -1,5 +1,5 @@
 ---
-test case: "Invalid 1"
+test case: "1. Invalid UTF-8 character"
 in:
   buffer_length: 4
   buffer: &buffer
@@ -7,7 +7,7 @@ in:
 out:
   return: 'FAIL'
 ---
-test case: "Invalid 2"
+test case: "2. Invalid UTF-8 character"
 in:
   buffer_length: 5
   buffer: &buffer
@@ -15,7 +15,7 @@ in:
 out:
   return: 'FAIL'
 ---
-test case: "a"
+test case: "3. a"
 in:
   buffer_length: 2
   buffer: &buffer
@@ -23,7 +23,7 @@ in:
 out:
   return: 'SUCCEED'
 ---
-test case: "Hello world"
+test case: "4. Hello world"
 in:
   buffer_length: 13
   buffer: &buffer
@@ -31,7 +31,7 @@ in:
 out:
   return: 'SUCCEED'
 ---
-test case: "Empty buffer"
+test case: "5. Empty buffer"
 in:
   buffer_length: 1
   buffer: &buffer

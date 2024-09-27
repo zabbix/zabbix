@@ -4,54 +4,61 @@ in:
   src: "undefined"
   size: 7
 out:
-  result: "undef"
+  result: "undefi"
 ---
 test case: "2. Numeric string"
 in:
   src: "1E02 1E+02"
   size: 6
 out:
-  result: "1E02"
+  result: "1E02 "
 ---
 test case: "3. Special characters string"
 in:
   src: "!@#$%^&*()`~"
   size: 6
 out:
-  result: "!@#$"
+  result: "!@#$%"
 ---
 test case: "4. Unicode characters string"
 in:
   src: "œ∑´®†¥¨ˆøπ“‘"
   size: 6
 out:
-  result: "œ?"
+  result: "œ∑"
 ---
 test case: "5. Two-byte string"
 in:
   src: "田中さんにあげて下さい"
   size: 8
 out:
-  result: "田中"
+  result: "田中?"
 ---
 test case: "6. String emotions"
 in:
   src: "ﾟ･✿ヾ╲(｡◕‿◕｡)╱✿･ﾟ"
   size: 8
 out:
-  result: "ﾟ･"
+  result: "ﾟ･?"
 ---
 test case: "7. Emoji string"
 in:
   src: "❤️ 💔 💌 💕 💞 💓 💗 💖 💘 💝 💟 💜 💛 💚 💙"
   size: 8
 out:
-  result: "❤️"
+  result: "❤️ "
 ---
 test case: "7. Algo text string"
 in:
   src: "Ṱ̺̺̕o͞ ̷i̲̬͇̪͙n̝̗͕v̟̜̘̦͟o̶̙̰̠kè͚̮̺̪̹̱̤ ̖t̝͕̳̣̻̪͞h̼͓̲̦̳̘̲e͇̣̰̦̬͎ ̢̼̻̱̘h͚͎͙̜̣̲ͅi̦̲̣̰̤v̻͍e̺̭̳̪̰-m̢iͅn̖̺̞̲̯̰d̵̼̟͙̩̼̘̳ ̞̥̱̳̭r̛̗̘e͙p͠r̼̞̻̭̗e̺̠̣͟s̘͇̳͍̝͉e͉̥̯̞̲͚̬͜ǹ̬͎͎̟̖͇̤t͍̬̤͓̼̭͘ͅi̪̱n͠g̴͉ ͏͉ͅc̬̟h͡a̫̻̯͘o̫̟̖͍̙̝͉s̗̦̲.̨̹͈̣"
   size: 8
 out:
-  result: "Ṱ̺?"
+  result: "Ṱ̺̺"
+---
+test case: "8. Empty string"
+in:
+  src: ''
+  size: 1
+out:
+  result: ''
 ...

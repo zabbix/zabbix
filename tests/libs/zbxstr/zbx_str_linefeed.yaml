@@ -63,7 +63,7 @@ in:
 out:
   string: "\n.\n.\n"
 ---
-test case: "8. Backslashes"
+test case: "9. Backslashes"
 in:
   scr: '\\\\\\'
   delim: '.'
@@ -71,7 +71,7 @@ in:
 out:
   string: '\.\.\.\.\.\'
 ---
-test case: "9. Quotation marks"
+test case: "10. Quotation marks"
 in:
   scr: '"""'
   delim: '#'

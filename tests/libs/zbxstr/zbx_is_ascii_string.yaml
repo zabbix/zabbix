@@ -1,5 +1,5 @@
 ---
-test case: "1. All ASCII characters"
+test case: "1. All printable ASCII characters"
 in:
   string: |
    !"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}

@@ -31,9 +31,10 @@ void	zbx_mock_test_entry(void **state)
 	act_value = zbx_strcmp_natural(s1,s2);
 
 	const char	*returned_result;
-	if (act_value < 0)
+
+	if (0 > act_value)
 		returned_result = "less";
-	else if (act_value > 0)
+	else if (0 < act_value)
 		returned_result = "greater";
 	else
 		returned_result = "equal";

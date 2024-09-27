@@ -1,47 +1,47 @@
 ---
-test case: "Input with Tab"
+test case: "1. Input with Tab"
 in:
   string: "Hello\tWorld!"
 out:
   string: "Hello\\tWorld!"
 ---
-test case: "Input with Newline"
+test case: "2. Input with Newline"
 in:
   string: "Hello\nWorld!"
 out:
   string: "Hello\\nWorld!"
 ---
-test case: "Input with Carriage Return"
+test case: "3. Input with Carriage Return"
 in:
   string: "Hello\rWorld!"
 out:
   string: "Hello\\rWorld!"
 ---
-test case: "Input with Mixed Special Characters"
+test case: "4. Input with Mixed Special Characters"
 in:
   string: "Line1\nLine2\tLine3\rEnd"
 out:
   string: "Line1\\nLine2\\tLine3\\rEnd"
 ---
-test case: "Input with No Special Characters"
+test case: "5. Input with No Special Characters"
 in:
   string: "SimpleText"
 out:
   string: "SimpleText"
 ---
-test case: "Empty String"
+test case: "6. Empty String"
 in:
   string: ""
 out:
   string: ""
 ---
-test case: "Emoji with tabs"
+test case: "7. Emoji with tabs"
 in:
   string: "😀	😀	😀	😀"
 out:
   string: 😀\t😀\t😀\t😀
 ---
-test case: "Big text"
+test case: "8. Big text"
 in:
   string: |
    Hello world!
@@ -50,13 +50,13 @@ in:
 out:
   string: Hello world!\nFrom smart homes to multi-tenant enterprise environments, Zabbix is scalable to any infrastructure\nDeploy\tand\tscale\ta\tZabbix\tinfrastructure\tfrom\ta\tcentral\tWeb\tUI\twith\tnative\tencryption\tbetween\tcomponents\n
 ---
-test case: "Subscript and superscript with tabs"
+test case: "9. Subscript and superscript with tabs"
 in:
   string: "⁰	⁴	⁵	₀	₁	₂	"
 out:
   string: ⁰\t⁴\t⁵\t₀\t₁\t₂\t
 ---
-test case: "Backslashes and Quotation marks"
+test case: "10. Backslashes and Quotation marks"
 in:
   string: '\\\"	"\\\\'
 out:
