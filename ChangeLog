@@ -1,23 +1,47 @@
+Changes for 6.0.35rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 6.0.34
+
+6.0.34rc2 was released as 6.0.34 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 6.0.34rc2
+
+Bug fixes:
+..F....... [ZBX-21663] fixed timeselector display in problem list on PHP 7.4 (vmurzins)
+
+--------------------------------------------------------------------------------
 Changes for 6.0.34rc1
 
 New features:
+.........T [ZBXNEXT-9418] split {$PG.CONNSTRING} macro in PostgreSQL templates (abrosimovs)
 .......PS. [ZBXNEXT-9416] updated max supported MariaDB version to 11.5 (mprihodko)
 .........T [ZBXNEXT-9318] added Microsoft 365 reports by HTTP template (abrosimovs)
 .........T [ZBXNEXT-9248] added GitHub repository by HTTP template (drasikhov)
 ........S. [ZBXNEXT-9408] updated max supported TimescaleDB version to 2.16 (mprihodko)
-.........T [ZBXNEXT-8937] added support IMDSv2 in role base authorization for AWS templates (egordymov)
+.........T [ZBXNEXT-8937] added support of IMDSv2 in role-based authorization for AWS templates (egordymov)
 .........T [ZBXNEXT-9398] added new mediatype webhook MS Teams Workflow (abiba)
 .........T [ZBXNEXT-9341] added assume role authorization in AWS templates (egordymov)
 
 Bug fixes:
+..F....... [ZBX-24030] fixed manually closed problem action icon visibility in high-contrast theme (esekace)
+.......PS. [ZBX-21843] fixed "Check for not supported value" preprocessing step for dependent items (askolmeisters)
+........S. [ZBX-25154] added deactivation of service manager problem cache if no services are configured (wiper)
+..F....... [ZBX-24997] fixed script execution status in Action log page (esekace)
+...G...PS. [ZBX-25127] fixed crash in JSON library due to null pointer arithmetic (vso)
 A......... [ZBX-24485] fixed undefined index error when importing host with technical name already in use by a template (jfreibergs, vmaksimovs)
 ...G...... [ZBX-24245] fixed Zabbix agent 2 and loadable plugin protocol mismatch error (esneiders)
-........S. [ZBX-22557] fixed time zones conflict lead to report sheduling errors (sboidenko)
+........S. [ZBX-22557] fixed time zones conflict leading to report scheduling errors (sboidenko)
 ..F....... [ZBX-21618] fixed layout for multiple lists when long names are used (esekace)
 ..F....... [ZBX-25026] fixed percentile line being displayed outside of classic graph (Ivo)
 .......PS. [ZBX-22754] fixed 'Too old events' error for vmware.eventlog item (MVekslers)
 ...G...... [ZBX-23535] added alternative data source parsing for key ceph.status (rzvejs)
-...G...... [ZBX-24418] fix Zabbix agent 2 build on mips architectures (rzvejs)
+...G...... [ZBX-24418] fixed Zabbix agent 2 build on MIPS architectures (rzvejs)
 ...G...... [ZBX-24471] fixed system.run[,nowait] to include double quotes the same way as system.run[,wait] (asestakovs)
 ...G...... [ZBX-24619] updated atomic variables to be more safe (esneiders)
 ..F....... [ZBX-24052] fixed the error when applying subfilter by tag on graph page if item tag contains special characters (wczerneha)
@@ -3228,9 +3252,19 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
 
 --------------------------------------------------------------------------------
-Changes for 5.0.44rc1
+Changes for 5.0.45rc1
 
 New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 5.0.44
+
+5.0.44rc1 was released as 5.0.44 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 5.0.44rc1
 
 Bug fixes:
 ..F....... [ZBX-24966] fixed sorting in Map navigation tree widget (apoga)
