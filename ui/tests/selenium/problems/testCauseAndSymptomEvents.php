@@ -149,18 +149,7 @@ class testCauseAndSymptomEvents extends CWebTest {
 		self::$triggerids = CDataHelper::getIds('description');
 
 		// Create problems.
-		$triggers = [
-			'Problem trap>10 [Symptom]',
-			'Problem trap>150 [Cause]',
-			'Information trap<100 [Cause]',
-			'Information trap<75 [Cause]',
-			'Battery problem trap [Cause]',
-			'Battery problem trap2 [Cause]',
-			'Battery problem linked [Cause]',
-			'Battery problem linked [Symptom]',
-			'Battery problem linked [Symptom2]'
-		];
-		CDBHelper::setTriggerProblem($triggers);
+		CDBHelper::setTriggerProblem(array_keys(self::$triggerids));
 
 		// Set cause and symptom(s) for predefined problems.
 		$problems = [
@@ -212,7 +201,7 @@ class testCauseAndSymptomEvents extends CWebTest {
 
 		$this->page->navigateBack();
 		$symptom = $table->findRow('Problem', 'Problem trap>10 [Symptom]');
-		$this->isCollapsed($cause, $symptom,true);
+		$this->isCollapsed($cause, $symptom, true);
 		$cause->query(self::EXPAND_XPATH)->one()->click();
 		$this->isCollapsed($cause, $symptom);
 
@@ -221,8 +210,7 @@ class testCauseAndSymptomEvents extends CWebTest {
 				self::$triggerids['Problem trap>10 [Symptom]'].'&eventid")]')->one()->click();
 		$this->page->waitUntilReady();
 		$this->assertEquals('Symptom (Problem trap>150 [Cause])', $event_table->getRow(7)->getColumn(1)->getText());
-		$this->assertTrue($event_table->query('link:Problem trap>150 [Cause]')->one()->isClickable());
-		$event_table->query('link:Problem trap>150 [Cause]')->one()->Click();
+		$event_table->query('link:Problem trap>150 [Cause]')->one()->click();
 		$this->page->waitUntilReady();
 		$this->assertEquals('Cause', $event_table->findRow('Name', 'Rank')->getColumn('Value')->getText());
 
@@ -230,7 +218,7 @@ class testCauseAndSymptomEvents extends CWebTest {
 		$this->page->open('zabbix.php?action=problem.view&hostids[]='.
 				self::$hostsids['hostids']['Host for Cause and Symptom check']
 		);
-		$this->isCollapsed($cause, $symptom,true);
+		$this->isCollapsed($cause, $symptom, true);
 		$cause->query(self::EXPAND_XPATH)->one()->click();
 		$this->isCollapsed($cause, $symptom);
 		$cause->query(self::COLLAPSE_XPATH)->one()->click();
@@ -240,9 +228,9 @@ class testCauseAndSymptomEvents extends CWebTest {
 	/**
 	 * Check 'cause and symptom' elements collapsed/expanded state.
 	 *
-	 * @param boolean $collapsed	are symptom events in collapsed state or not
-	 * @param CTableRowElement $symptom		symptom row by column value
 	 * @param CTableRowElement $cause		cause row by column value
+	 * @param CTableRowElement $symptom		symptom row by column value
+	 * @param boolean $collapsed	are symptom events in collapsed state or not
 	 */
 	protected function isCollapsed($cause, $symptom, $collapsed = false) {
 		$chevron = $cause->getColumn(2)->query('tag:button')->one();
@@ -454,9 +442,8 @@ class testCauseAndSymptomEvents extends CWebTest {
 			$table->findRow('Problem', $data['problems'][0])->query('link:Update')->waitUntilClickable()->one()->click();
 		}
 
-		$form = COverlayDialogElement::find()->one()->waitUntilReady()->query('id:acknowledge_form')->asForm()->one();
-
 		// Check 'Problem' field value and 'Convert to cause' checkbox state.
+		$form = COverlayDialogElement::find()->waitUntilReady()->one()->asForm();
 		$problem = ($count > 1) ? $count.' problems selected.' : $data['problems'][0];
 		$this->assertEquals($problem, ($form->getField('Problem')->getText()));
 		$this->assertTrue($form->getField('Convert to cause')->isEnabled($data['state']));
@@ -615,9 +602,8 @@ class testCauseAndSymptomEvents extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=problem.view&filter_reset=1&sort=clock&sortorder=ASC');
 
 		// Check headers when Cause and Symptoms problems present in table and 'Show timeline' = true (default state).
-		$this->assertEquals(['', '', '', 'Time', '', '', 'Severity', 'Recovery time', 'Status', 'Info',
-				'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags'], $this->query('class:list-table')
-				->asTable()->waitUntilPresent()->one()->getHeadersText()
+		$this->assertEquals(['', '', '', 'Time', '', '', 'Severity', 'Recovery time', 'Status', 'Info', 'Host', 'Problem',
+				'Duration', 'Update', 'Actions', 'Tags'], $this->getTable()->getHeadersText()
 		);
 
 		$this->page->open('zabbix.php?action=problem.view&hostids[]='.

@@ -46,6 +46,7 @@ class testUserRolesPermissions extends CWebTest {
 	 * @var integer
 	 */
 	protected static $super_roleid;
+	protected static $super_roleid2;
 
 	/**
 	 * Id of user that created for future checks.
@@ -72,10 +73,15 @@ class testUserRolesPermissions extends CWebTest {
 				'rules' => [
 					'services.write.mode' => 1
 				]
+			],
+			[
+				'name' => 'super_role_for_problem_ranking',
+				'type' => 3
 			]
 		]);
 		$this->assertArrayHasKey('roleids', $role);
 		self::$super_roleid = $role['roleids'][0];
+		self::$super_roleid2 = $role['roleids'][1];
 
 		$user = CDataHelper::call('user.create', [
 			[
@@ -89,19 +95,9 @@ class testUserRolesPermissions extends CWebTest {
 				]
 			],
 			[
-				'username' => 'problem_ranking_false',
+				'username' => 'problem_ranking',
 				'passwd' => 'zabbixzabbix',
-				'roleid' => self::$super_roleid,
-				'usrgrps' => [
-					[
-						'usrgrpid' => '7'
-					]
-				]
-			],
-			[
-				'username' => 'problem_ranking_true',
-				'passwd' => 'zabbixzabbix',
-				'roleid' => self::$super_roleid,
+				'roleid' => self::$super_roleid2,
 				'usrgrps' => [
 					[
 						'usrgrpid' => '7'
@@ -240,11 +236,7 @@ class testUserRolesPermissions extends CWebTest {
 		]);
 
 		// Create problems.
-		$triggers = [
-			'Problem trap>10 [Symptom]',
-			'Problem trap>150 [Cause]'
-		];
-		CDBHelper::setTriggerProblem($triggers);
+		CDBHelper::setTriggerProblem(['Problem trap>10 [Symptom]', 'Problem trap>150 [Cause]']);
 
 		// Set cause and symptom(s) for predefined problems.
 		foreach (['Problem trap>150 [Cause]' => ['Problem trap>10 [Symptom]']] as $cause => $symptoms) {
@@ -482,17 +474,15 @@ class testUserRolesPermissions extends CWebTest {
 
 	public static function getCauseAndSymptomData() {
 		return [
-			// User with 'Change problem ranking' => false.
+			// User role flag 'Change problem ranking' => false.
 			[
 				[
-					'user' => 'problem_ranking_false',
 					'state' => false
 				]
 			],
-			// User with 'Change problem ranking' => true.
+			// User role flag 'Change problem ranking' => true.
 			[
 				[
-					'user' => 'problem_ranking_true',
 					'state' => true
 				]
 			]
@@ -505,14 +495,14 @@ class testUserRolesPermissions extends CWebTest {
 	 * @dataProvider getCauseAndSymptomData
 	 */
 	public function testUserRolesPermissions_ChangeProblemRanking($data) {
-		$this->page->userLogin($data['user'], 'zabbixzabbix');
-		$this->changeRoleRule(['Change problem ranking' => $data['state']]);
+		$this->page->userLogin('problem_ranking', 'zabbixzabbix');
+		$this->changeRoleRule(['Change problem ranking' => $data['state']], self::$super_roleid2);
 		$this->page->open('zabbix.php?action=problem.view&name=Problem trap>150 [Cause]');
 
 		// Check context menu 'Mark as cause' & 'Mark selected as symptoms' options accessibility.
-		$this->query('link', 'Problem trap>150 [Cause]')->waitUntilPresent()->one()->click();
-		$context_menu = CPopupMenuElement::find()->waitUntilVisible()->one();
 		$table = $this->getTable();
+		$table->query('link', 'Problem trap>150 [Cause]')->waitUntilVisible()->one()->click();
+		$context_menu = CPopupMenuElement::find()->waitUntilVisible()->one();
 
 		if ($data['state'] === false) {
 			$this->assertFalse($context_menu->hasItems(['Mark as cause', 'Mark selected as symptoms']));
@@ -527,9 +517,18 @@ class testUserRolesPermissions extends CWebTest {
 		$context_menu->close();
 		$table->findRow('Problem', 'Problem trap>150 [Cause]')->query('xpath:.//button[@title="Expand"]')->one()->click();
 		$table->findRow('Problem', 'Problem trap>10 [Symptom]')->query('link:Update')->waitUntilClickable()->one()->click();
-		$this->assertTrue(COverlayDialogElement::find()->one()->waitUntilReady()->query('id:acknowledge_form')->asForm()
-				->one()->getField('Convert to cause')->isEnabled($data['state'])
+		$this->assertTrue(COverlayDialogElement::find()->waitUntilReady()->one()->asForm()
+				->getField('Convert to cause')->isEnabled($data['state'])
 		);
+		COverlayDialogElement::closeAll();
+
+		// Check 'Convert to cause' checkbox state via mass update form.
+		$this->selectTableRows();
+		$this->query('button:Mass update')->waitUntilClickable()->one()->click();
+		$this->assertTrue(COverlayDialogElement::find()->waitUntilReady()->one()->asForm()
+				->getField('Convert to cause')->isEnabled($data['state'])
+		);
+		COverlayDialogElement::closeAll();
 	}
 
 	/**
@@ -1912,9 +1911,14 @@ class testUserRolesPermissions extends CWebTest {
 	 * Enable/disable actions and UI.
 	 *
 	 * @param array $action		action with true/false status or UI section with page
+	 * @param string $roleid    Id of role that is created for access changes
 	 */
-	private function changeRoleRule($action) {
-		$this->page->open('zabbix.php?action=userrole.edit&roleid='.self::$super_roleid)->waitUntilReady();
+	private function changeRoleRule($action, $roleid = null) {
+		if ($roleid === null) {
+			$roleid = self::$super_roleid;
+		}
+
+		$this->page->open('zabbix.php?action=userrole.edit&roleid='.$roleid)->waitUntilReady();
 		$this->query('id:userrole-form')->waitUntilPresent()->asForm()->one()->fill($action)->submit();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'User role updated');
