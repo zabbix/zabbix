@@ -3581,6 +3581,8 @@ form.is-loading {
   display: inline-block;
   padding: 5px;
   position: relative; }
+  .table-forms-separator .wordbreak {
+    white-space: normal; }
 
 .border-left {
   border-left: 1px solid #333333; }
@@ -4635,6 +4637,9 @@ z-select[readonly] .focusable,
     border-left: 1px solid #666666;
     transform: rotate(45deg); }
 
+div .overlay-dialogue.wordbreak {
+  white-space: normal; }
+
 .overlay-dialogue {
   display: table;
   position: absolute;
@@ -4644,6 +4649,8 @@ z-select[readonly] .focusable,
   border: 1px solid #666666;
   border-bottom-color: #636363;
   box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.5); }
+  .overlay-dialogue .wordbreak {
+    white-space: normal; }
   .overlay-dialogue.modal {
     position: fixed;
     overflow: hidden;
