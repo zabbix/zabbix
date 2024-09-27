@@ -1,4 +1,4 @@
-# for golanci-lint version 1.55.2
+# for golanci-lint version 1.61.0
 # everything (linter definitions) should be sorted in alphabetical order by name
 
 run:
@@ -92,7 +92,7 @@ linters-settings:
 
       # disabled
 
-      # like gomnd, annoying#
+      # like gomnd, annoying
       - name: add-constant
         disabled: true
       - name: banned-characters # useless, as every char needs to be configured
@@ -113,7 +113,7 @@ linters-settings:
       # duplicate
       - name: file-header
         disabled: true
-      # cool idea, but warning about ever bool param is not acceptable
+      # cool idea, but warning about every bool param is not acceptable
       - name: flag-parameter
         disabled: true
       # cyclomatic complexety checks are enough
@@ -125,7 +125,7 @@ linters-settings:
       # duplicate
       - name: unhandled-error
         disabled: true
-      # duplicate, + we have goheader
+      # duplicate
       - name: package-comments
         disabled: true
 
@@ -174,10 +174,8 @@ linters-settings:
       - .WithMessage(
       - .WithMessagef(
       - .WithStack(
-      # zabbix'es custom errors
+      # zabbix custom errors
       - errs.New(
-      - errs.WrapConst(
-      - errs.Wrap(
 
 linters:
   enable-all: true
@@ -198,8 +196,8 @@ linters:
     # no need to count lines.
     - funlen
 
-    # conflicts with gci and goimports. the formatter should still be used, only
-    # lint can't enforce it.
+    # conflicts with gci and goimports. the formatter should still be used,
+    # only lint can't enforce it.
     - gofumpt
 
     # conflicts with gofumpt and gci. the tool still should be used but gci
@@ -207,32 +205,21 @@ linters:
     - goimports
 
     # not many cases when this is helpful were observed
-    - gomnd
-
-    # don't use shorthand ifs
-    - ifshort
+    - mnd
 
     # revive warns about this
     - nakedret
 
-    # current unit test situation is bad enough as it is. no need to introduce new
-    # unit testing practices.
+    # we don't do black box testing in unit tests.
     - testpackage
 
     # having one length vars is fine.
     - varnamelen
 
     # deprecated
-    - deadcode
-    - exhaustivestruct
-    - golint
-    - ifshort
-    - interfacer
-    - maligned
-    - nosnakecase
-    - scopelint
-    - structcheck
-    - varcheck
+    - execinquery
+    - exportloopref
+    - gomnd
 
 issues:
   exclude-use-default: false
@@ -241,12 +228,13 @@ issues:
   exclude-rules:
     - path: _test\.go
       linters:
+        - dupl
+        - err113
         - errcheck
         - gocritic
-        - goerr113
+        - maintidx
         - revive
         - wrapcheck
-        - maintidx
 
 severity:
   default-severity: error
