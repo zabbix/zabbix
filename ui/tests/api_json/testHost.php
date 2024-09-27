@@ -4190,7 +4190,7 @@ class testHost extends CAPITest {
 			'Can update "tls_psk" for multiple hosts having same value of "tls_psk_identity"' => [
 				'host' => [
 					['hostid' => ':host:psk1.example.com', 'tls_psk_identity' => 'example.com', 'tls_psk' => '11111111111111111111111111111111'],
-					['hostid' => ':host:psk2.example.com', 'tls_psk_identity' => 'example.com', 'tls_psk' => '11111111111111111111111111111111'],
+					['hostid' => ':host:psk2.example.com', 'tls_psk_identity' => 'example.com', 'tls_psk' => '11111111111111111111111111111111']
 				]
 			]
 		];
