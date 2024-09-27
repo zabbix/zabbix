@@ -504,7 +504,7 @@ a.btn-icon,
 				background-color: $ui-bg-selected-color !important;
 			}
 
-			&:focus + label {
+			&:not([readonly]):focus + label {
 				background-color: darken($btn-bg-color, 10%) !important;
 				box-shadow: 0 0 0 2px $btn-focus-outline-color !important;
 				color: $white;
