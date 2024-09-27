@@ -204,7 +204,7 @@ foreach ($data['proxies'] as $proxyid => $proxy) {
 			(new CLink($proxy['name']))
 				->addClass('js-edit-proxy')
 				->setAttribute('data-proxyid', $proxyid)
-		]))->addClass(ZBX_STYLE_NOWRAP),
+		]))->addClass(ZBX_STYLE_WORDBREAK),
 		$proxy['operating_mode'] == PROXY_OPERATING_MODE_ACTIVE ? _('Active') : _('Passive'),
 		$encryption,
 		$state,
@@ -215,7 +215,7 @@ foreach ($data['proxies'] as $proxyid => $proxy) {
 		array_key_exists('item_count', $proxy) ? $proxy['item_count'] : '',
 		array_key_exists('vps_total', $proxy) ? $proxy['vps_total'] : '',
 		(new CCol($host_count_total))->addClass(ZBX_STYLE_CELL_WIDTH),
-		$hosts
+		(new CCol($hosts))->addClass(ZBX_STYLE_WORDBREAK)
 	]);
 }
 

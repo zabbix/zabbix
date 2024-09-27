@@ -134,7 +134,7 @@ class testLowLevelDiscovery extends CWebTest {
 			'id:enabled_lifetime_type' => ['labels' => ['Never', 'Immediately', 'After'], 'value' => 'Immediately'],
 			'Enable trapping' => ['value' => false],
 			'id:trapper_hosts' => ['maxlength' => 255],
-			'Description' => ['value' => ''],
+			'Description' => ['value' => '', 'maxlength' => 65535],
 			'Enabled' => ['value' => true],
 
 			// Preprocessing tab.
@@ -146,7 +146,7 @@ class testLowLevelDiscovery extends CWebTest {
 			'id:lld_macro_paths_0_path' => ['placeholder' => '$.path.to.node', 'maxlength' => 255],
 
 			// Filters tab.
-			'Filters' => ['value' => [['macro' => '', 'operator' => 'matches']]],
+			'Filters' => ['value' => [['macro' => '']]],
 			'id:conditions_0_macro' => ['placeholder' => '{#MACRO}', 'maxlength' => 64],
 			'name:conditions[0][operator]' => ['options' => ['matches', 'does not match', 'exists', 'does not exist'],
 				'value' => 'matches'
@@ -215,7 +215,7 @@ class testLowLevelDiscovery extends CWebTest {
 							->filter(new CElementFilter(CElementFilter::CLICKABLE))->count()
 					);
 					$filter_table = $filters_container->query('id:conditions')->asTable()->one();
-					$this->assertEquals(['Label', 'Macro', '', 'Regular expression', 'Action'],
+					$this->assertEquals(['Label', 'Macro', '', 'Regular expression', ''],
 							$filter_table->getHeadersText()
 					);
 					$this->assertFalse($filters_container->query('id:evaltype')->exists());

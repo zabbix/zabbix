@@ -32,6 +32,7 @@ ZBX_VECTOR_IMPL(pp_step_history, zbx_pp_step_history_t)
 zbx_pp_history_t	*zbx_pp_history_create(int history_num)
 {
 	zbx_pp_history_t	*history = (zbx_pp_history_t *)zbx_malloc(NULL, sizeof(zbx_pp_history_t));
+	history->refcount = 1;
 
 	zbx_vector_pp_step_history_create(&history->step_history);
 
@@ -48,10 +49,14 @@ zbx_pp_history_t	*zbx_pp_history_create(int history_num)
  ******************************************************************************/
 void	zbx_pp_history_free(zbx_pp_history_t *history)
 {
+	if (NULL == history || 0 != --history->refcount)
+		return;
+
 	for (int i = 0; i < history->step_history.values_num; i++)
 		zbx_variant_clear(&history->step_history.values[i].value);
 
 	zbx_vector_pp_step_history_destroy(&history->step_history);
+
 	zbx_free(history);
 }
 
@@ -136,4 +141,12 @@ void	zbx_pp_history_clear(zbx_pp_history_t *history)
 		zbx_variant_clear(&history->step_history.values[i].value);
 
 	zbx_vector_pp_step_history_destroy(&history->step_history);
+}
+
+zbx_pp_history_t	*zbx_pp_history_clone(zbx_pp_history_t *history)
+{
+	if (NULL != history)
+		history->refcount++;
+
+	return history;
 }
