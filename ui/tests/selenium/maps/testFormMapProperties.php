@@ -363,7 +363,6 @@ class testFormMapProperties extends CLegacyWebTest {
 		return [
 			[['name' => 'Local network']],
 			[['name' => 'Map for form testing']],
-			[['name' => 'Map for widget copies']],
 			[['name' => 'Map with icon mapping']],
 			[['name' => 'Map with links']],
 			[['name' => 'Public map with image']],

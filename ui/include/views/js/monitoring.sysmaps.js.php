@@ -301,7 +301,7 @@ function createFontSelect(string $name): CSelect {
 					->addRow(_('URLs'),
 						(new CDiv([
 							(new CTable())
-								->setHeader([_('Name'), _('URL'), _('Action')])
+								->setHeader([_('Name'), _('URL'), ''])
 								->setId('urlContainer')
 								->setAttribute('style', 'width: 100%;'),
 							(new CButtonLink(_('Add')))->setId('newSelementUrl')
@@ -809,7 +809,7 @@ function createFontSelect(string $name): CSelect {
 					->addRow(_('Link indicators'),
 						(new CDiv([
 							(new CTable())
-								->setHeader([_('Trigger'), _('Type'), _('Color'), _('Action')])
+								->setHeader([_('Trigger'), _('Type'), _('Color'), ''])
 								->setAttribute('style', 'width: 100%;')
 								->setId('linkTriggerscontainer'),
 							(new CButtonLink(_('Add')))->onClick(

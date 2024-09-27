@@ -421,4 +421,8 @@
 #	include"malloc.h"
 #endif
 
+#ifdef HAVE_LIBGEN_H
+#	include <libgen.h>
+#endif
+
 #endif

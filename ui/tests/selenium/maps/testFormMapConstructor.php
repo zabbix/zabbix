@@ -62,7 +62,6 @@ class testFormMapConstructor extends CLegacyWebTest {
 		return [
 			[['name' => 'Local network']],
 			[['name' => 'Map for form testing']],
-			[['name' => 'Map for widget copies']],
 			[['name' => 'Map with icon mapping']],
 			[['name' => 'Map with links']],
 			[['name' => 'Public map with image']],
@@ -76,8 +75,6 @@ class testFormMapConstructor extends CLegacyWebTest {
 	 * @browsers chrome
 	 */
 	public function testFormMapConstructor_SimpleUpdateConstructor($map) {
-		$sysmapid = CDBHelper::getValue('SELECT sysmapid FROM sysmaps WHERE name='.zbx_dbstr($map['name']));
-
 		$sql_maps_elements = 'SELECT * FROM sysmaps sm INNER JOIN sysmaps_elements sme ON'.
 				' sme.sysmapid = sm.sysmapid ORDER BY sme.selementid';
 		$sql_links_triggers = 'SELECT * FROM sysmaps_links sl INNER JOIN sysmaps_link_triggers slt ON'.
@@ -96,11 +93,11 @@ class testFormMapConstructor extends CLegacyWebTest {
 			'query'	=> 'class:map-timestamp',
 			'color'	=> '#ffffff'
 		];
-		$this->assertScreenshotExcept($element, $exclude, 'view_'.$sysmapid);
+		$this->assertScreenshotExcept($element, $exclude, 'view_'.$map['name']);
 
 		$this->query('button:Edit map')->one()->click();
 		$this->page->waitUntilReady();
-		$this->assertScreenshot($this->query('id:map-area')->waitUntilPresent()->one(), 'edit_'.$sysmapid);
+		$this->assertScreenshot($this->query('id:map-area')->waitUntilPresent()->one(), 'edit_'.$map['name']);
 		$this->query('button:Update')->one()->click();
 
 		$this->page->waitUntilAlertIsPresent();
@@ -225,7 +222,6 @@ class testFormMapConstructor extends CLegacyWebTest {
 		$form->query('button:Add')->one()->click();
 
 		// Take a screenshot to test draggable object position for triggers of trigger type map element.
-		// TODO: screenshot should be changed after fix ZBX-22528
 		$this->page->removeFocus();
 		$this->assertScreenshot($this->query('id:triggerContainer')->waitUntilVisible()->one(), 'Map element');
 	}
