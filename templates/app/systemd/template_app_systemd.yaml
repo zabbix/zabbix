@@ -143,6 +143,28 @@ zabbix_export:
                   tags:
                     - tag: scope
                       value: notice
+            - uuid: d411b9e00d3e4564b2f3bac714555028
+              name: '{#UNIT.NAME}: Inactive time'
+              type: DEPENDENT
+              key: 'systemd.service.downtime["{#UNIT.NAME}"]'
+              delay: '0'
+              value_type: FLOAT
+              units: s
+              description: 'Number of seconds since unit entered the inactive state.'
+              preprocessing:
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      data = JSON.parse(value);
+                      if (data.InactiveEnterTimestamp > data.InactiveExitTimestamp) {
+                        return Math.floor(Date.now() / 1000) - Number(data.InactiveEnterTimestamp) / 1000000;
+                      }
+                      return null;
+              master_item:
+                key: 'systemd.unit.get["{#UNIT.NAME}"]'
+              tags:
+                - tag: component
+                  value: service
             - uuid: bdb94d1182114985a8734de7d5d92380
               name: '{#UNIT.NAME}: Get unit info'
               key: 'systemd.unit.get["{#UNIT.NAME}"]'
