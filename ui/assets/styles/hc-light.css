@@ -7233,7 +7233,7 @@ button:focus {
   color: #ffffff; }
 .radio-list-control li input[type="radio"]:checked + label {
   background-color: #333333 !important; }
-.radio-list-control li input[type="radio"]:focus + label {
+.radio-list-control li input[type="radio"]:not([readonly]):focus + label {
   background-color: #6f6f6f !important;
   box-shadow: 0 0 0 2px #111111 !important;
   color: #ffffff; }
