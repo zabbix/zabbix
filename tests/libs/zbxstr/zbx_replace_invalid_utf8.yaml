@@ -1,5 +1,5 @@
 ---
-test case: "1. Replaced invalid  UTF-8 characters '\xfe\xfe\xfe\x00'"
+test case: "1. Replaced invalid  UTF-8 characters"
 in:
   buffer_length: 4
   buffer: &buffer
