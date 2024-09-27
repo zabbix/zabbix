@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-09-17 08:49+0000\n"
+"PO-Revision-Date: 2024-09-27 08:24+0000\n"
 "Last-Translator: Tomáš Heřmánek <tomas.hermanek@initmax.cz>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
@@ -3472,12 +3472,12 @@ msgstr "Pravidlo LLD s kľúčom \"%1$s\" šablóny \"%2$s\" nemožno zdediť na
 #: include/classes/api/services/CItemGeneral.php:684
 #, c-format
 msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
-msgstr ""
+msgstr "Nie je možné zdediť pravidlá LDD s kľúčom \"%1$s\" zo šablón \"%2$s\" aj \"%3$s\", pretože kľúč musí byť na hostiteľovi \"%4$s\" jedinečný."
 
 #: include/classes/api/services/CItemGeneral.php:685
 #, c-format
 msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
-msgstr ""
+msgstr "Nie je možné zdediť pravidlá LDD s kľúčom \"%1$s\" zo šablón \"%2$s\" aj \"%3$s\", pretože kľúč musí byť jedinečný v šablóne \"%4$s\"."
 
 #: include/classes/api/services/CItemPrototype.php:1220
 #, c-format
