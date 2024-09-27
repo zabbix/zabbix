@@ -558,19 +558,19 @@ class CProxy extends CApiService {
 										['else' => true, 'type' => API_INT32, 'in' => DB::getDefault('hosts', 'tls_accept')]
 			]],
 			'tls_psk_identity' =>	['type' => API_MULTIPLE, 'rules' => [
-										['if' => static fn (array $data): bool => $data['tls_connect'] == HOST_ENCRYPTION_PSK || ($data['tls_accept'] & HOST_ENCRYPTION_PSK) != 0, 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('hosts', 'tls_psk_identity')],
+										['if' => static function(array $data): bool { return $data['tls_connect'] == HOST_ENCRYPTION_PSK || ($data['tls_accept'] & HOST_ENCRYPTION_PSK) != 0; }, 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('hosts', 'tls_psk_identity')],
 										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('hosts', 'tls_psk_identity')]
 			]],
 			'tls_psk' =>			['type' => API_MULTIPLE, 'rules' => [
-										['if' => static fn (array $data): bool => $data['tls_connect'] == HOST_ENCRYPTION_PSK || ($data['tls_accept'] & HOST_ENCRYPTION_PSK) != 0, 'type' => API_PSK, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('hosts', 'tls_psk')],
+										['if' => static function(array $data): bool { return $data['tls_connect'] == HOST_ENCRYPTION_PSK || ($data['tls_accept'] & HOST_ENCRYPTION_PSK) != 0; }, 'type' => API_PSK, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('hosts', 'tls_psk')],
 										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('hosts', 'tls_psk')]
 			]],
 			'tls_issuer' =>			['type' => API_MULTIPLE, 'rules' => [
-										['if' => static fn (array $data): bool => $data['tls_connect'] == HOST_ENCRYPTION_CERTIFICATE || ($data['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE) != 0, 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hosts', 'tls_issuer')],
+										['if' => static function(array $data): bool { return $data['tls_connect'] == HOST_ENCRYPTION_CERTIFICATE || ($data['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE) != 0; }, 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hosts', 'tls_issuer')],
 										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('hosts', 'tls_issuer')]
 			]],
 			'tls_subject' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => static fn (array $data): bool => $data['tls_connect'] == HOST_ENCRYPTION_CERTIFICATE || ($data['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE) != 0, 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hosts', 'tls_subject')],
+										['if' => static function(array $data): bool { return $data['tls_connect'] == HOST_ENCRYPTION_CERTIFICATE || ($data['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE) != 0; }, 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hosts', 'tls_subject')],
 										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('hosts', 'tls_subject')]
 			]],
 			'interface' =>			['type' => API_OBJECT, 'fields' => [
@@ -867,19 +867,19 @@ class CProxy extends CApiService {
 			'tls_connect' =>		['type' => API_ANY],
 			'tls_accept' =>			['type' => API_ANY],
 			'tls_psk_identity' =>	['type' => API_MULTIPLE, 'rules' => [
-										['if' => static fn (array $data): bool => $data['tls_connect'] == HOST_ENCRYPTION_PSK || ($data['tls_accept'] & HOST_ENCRYPTION_PSK) != 0, 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('hosts', 'tls_psk_identity')],
+										['if' => static function(array $data): bool { return $data['tls_connect'] == HOST_ENCRYPTION_PSK || ($data['tls_accept'] & HOST_ENCRYPTION_PSK) != 0; }, 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('hosts', 'tls_psk_identity')],
 										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('hosts', 'tls_psk_identity')]
 			]],
 			'tls_psk' =>			['type' => API_MULTIPLE, 'rules' => [
-										['if' => static fn (array $data): bool => $data['tls_connect'] == HOST_ENCRYPTION_PSK || ($data['tls_accept'] & HOST_ENCRYPTION_PSK) != 0, 'type' => API_PSK, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('hosts', 'tls_psk')],
+										['if' => static function(array $data): bool { return $data['tls_connect'] == HOST_ENCRYPTION_PSK || ($data['tls_accept'] & HOST_ENCRYPTION_PSK) != 0; }, 'type' => API_PSK, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('hosts', 'tls_psk')],
 										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('hosts', 'tls_psk')]
 			]],
 			'tls_issuer' =>			['type' => API_MULTIPLE, 'rules' => [
-										['if' => static fn (array $data): bool => $data['tls_connect'] == HOST_ENCRYPTION_CERTIFICATE || ($data['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE) != 0, 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hosts', 'tls_issuer')],
+										['if' => static function(array $data): bool { return $data['tls_connect'] == HOST_ENCRYPTION_CERTIFICATE || ($data['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE) != 0; }, 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hosts', 'tls_issuer')],
 										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('hosts', 'tls_issuer')]
 			]],
 			'tls_subject' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => static fn (array $data): bool => $data['tls_connect'] == HOST_ENCRYPTION_CERTIFICATE || ($data['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE) != 0, 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hosts', 'tls_subject')],
+										['if' => static function(array $data): bool { return $data['tls_connect'] == HOST_ENCRYPTION_CERTIFICATE || ($data['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE) != 0; }, 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hosts', 'tls_subject')],
 										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('hosts', 'tls_subject')]
 			]]
 		]];
