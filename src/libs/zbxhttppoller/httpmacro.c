@@ -129,11 +129,9 @@ static int	httpmacro_append_pair(zbx_httptest_t *httptest, const char *pkey, siz
 	zbx_strncpy_alloc(&value_str, &value_size, &value_offset, pvalue, nvalue);
 	if (0 == strncmp(REGEXP_PREFIX, value_str, REGEXP_PREFIX_SIZE))
 	{
-		/* The value contains regexp pattern, retrieve the first captured group or fail.  */
-		/* The \@ sequence is a special construct to fail if the pattern matches but does */
-		/* not contain groups to capture.                                                 */
-
-		zbx_mregexp_sub(data, value_str + REGEXP_PREFIX_SIZE, "\\@", (char **)&pair.second);
+		/* The value contains regexp pattern, retrieve the first captured group or fail. */
+		zbx_mregexp_sub(data, value_str + REGEXP_PREFIX_SIZE, "\\1", ZBX_REGEXP_GROUP_CHECK_ENABLE,
+				(char **)&pair.second);
 		zbx_free(value_str);
 	}
 	else if (0 == strncmp(JSONPATH_PREFIX, value_str, JSONPATH_PREFIX_SIZE))

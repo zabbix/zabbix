@@ -296,12 +296,17 @@ static int	config_forks[ZBX_PROCESS_TYPE_COUNT] = {
 	0, /* ZBX_PROCESS_TYPE_SERVICEMAN */
 	0, /* ZBX_PROCESS_TYPE_TRIGGERHOUSEKEEPER */
 	0, /* ZBX_PROCESS_TYPE_ODBCPOLLER */
+	0, /* ZBX_PROCESS_TYPE_CONNECTORMANAGER */
 	0, /* ZBX_PROCESS_TYPE_CONNECTORWORKER*/
+	0, /* ZBX_PROCESS_TYPE_DISCOVERYMANAGER */
 	0, /* ZBX_PROCESS_TYPE_HTTPAGENT_POLLER */
 	0, /* ZBX_PROCESS_TYPE_AGENT_POLLER */
+	0, /* ZBX_PROCESS_TYPE_SNMP_POLLER */
+	0, /* ZBX_PROCESS_TYPE_INTERNAL_POLLER */
 	0, /* ZBX_PROCESS_TYPE_DBCONFIGWORKER */
 	0, /* ZBX_PROCESS_TYPE_PG_MANAGER */
-	0 /* ZBX_PROCESS_TYPE_BROWSERPOLLER */
+	0, /* ZBX_PROCESS_TYPE_BROWSERPOLLER */
+	0 /* ZBX_PROCESS_TYPE_HA_MANAGER */
 };
 
 static char	*config_file	= NULL;
@@ -1222,7 +1227,7 @@ static void	signal_redirect_cb(int flags, zbx_signal_handler_f sigusr_handler)
 			}
 			else
 			{
-				if (scope < ZBX_PROCESS_TYPE_EXT_FIRST)
+				if (scope < ZBX_PROCESS_TYPE_COUNT)
 				{
 					zbx_signal_process_by_type(ZBX_RTC_GET_SCOPE(flags), ZBX_RTC_GET_DATA(flags),
 							flags, NULL);

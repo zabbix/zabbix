@@ -208,7 +208,7 @@ AC_CHECK_HEADERS([sys/ipc.h sys/resource.h sys/sem.h sys/shm.h sys/socket.h  \
                   sys/times.h sys/types.h sys/un.h sys/utsname.h sys/wait.h  \
                   arpa/inet.h fcntl.h grp.h netdb.h netinet/in.h poll.h      \
                   pthread.h pwd.h strings.h syslog.h termios.h unistd.h      \
-                  utmpx.h                                                    \
+                  utmpx.h libgen.h                                           \
 ])
 
 dnl X/Open and SUS

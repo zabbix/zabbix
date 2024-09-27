@@ -1,6 +1,7 @@
 Changes for 7.2.0alpha1
 
 New features:
+..F....... [ZBXNEXT-9375] added/removed and modified table titles related to the action column and fixed broken layouts in multiple tables (rgontarski)
 ..F....... [ZBXNEXT-9221] added links to host configuration forms in entity lists (esekace)
 ..F.I..... [ZBXNEXT-466] added the ability to filter audit log entries by IP (Ivo)
 .........T [ZBXNEXT-9418] split {$PG.CONNSTRING} macro in PostgreSQL templates (abrosimovs)
@@ -68,7 +69,7 @@ A......... [ZBX-24485] fixed undefined index error when importing host with tech
 ...G...... [ZBX-24801] made frequency of active checks updates in Zabbix agent 2 better correspond to RefreshActiveChecks configuration parameter (arimdjonoks)
 ..F....... [ZBX-21618] fixed layout for multiple lists when long names are used (esekace)
 A......... [ZBX-24526] fixed notice when importing a non-template configuration file via the Templates page (jfreibergs)
-........S. [ZBX-22557] fixed time zones conflict lead to report sheduling errors (sboidenko)
+........S. [ZBX-22557] fixed time zones conflict lead to report scheduling errors (sboidenko)
 ...G...... [ZBX-24245] fixed Zabbix agent 2 and loadable plugin protocol mismatch error (esneiders)
 A......... [ZBX-24792] fixed query generation error in retrieval of alerts by non-Superadmin users without user group (jfreibergs)
 ..F....... [ZBX-25026] fixed percentile line being displayed outside of classic graph (Ivo)
@@ -269,6 +270,18 @@ A......... [ZBX-24299] fixed possibility to alter readonly error fields with Hos
 ........S. [ZBX-25019] introduced limits to WebDriver performance data collection (dgoloscapov)
 
 --------------------------------------------------------------------------------
+Changes for 7.0.5rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 7.0.4
+
+7.0.4rc1 was released as 7.0.4 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 7.0.4rc1
 
 New features:
@@ -310,7 +323,7 @@ A......... [ZBX-24485] fixed undefined index error when importing host with tech
 ...G...... [ZBX-24801] made frequency of active checks updates in Zabbix agent 2 better correspond to RefreshActiveChecks configuration parameter (arimdjonoks)
 A......... [ZBX-24526] fixed notice when importing a non-template configuration file via the Templates page (jfreibergs)
 ...G...... [ZBX-24245] fixed Zabbix agent 2 and loadable plugin protocol mismatch error (esneiders)
-........S. [ZBX-22557] fixed time zones conflict lead to report sheduling errors (sboidenko)
+........S. [ZBX-22557] fixed time zones conflict lead to report scheduling errors (sboidenko)
 A......... [ZBX-24792] fixed query generation error in retrieval of alerts by non-Superadmin users without user group (jfreibergs)
 ..F....... [ZBX-25026] fixed percentile line being displayed outside of classic graph (Ivo)
 A......... [ZBX-24099] prevented ability to enable LDAP authentication without specifying a user directory (jfreibergs)
@@ -1332,6 +1345,18 @@ Bug fixes:
 ...G...... [ZBX-22147] updated default buffer size to 1000 in Zabbix agent 2 (esneiders)
 .......PS. [ZBX-22587] fixed JSON validation not detecting invalid unicode characters and out-of-bounds access with JSONPath on invalid unicode character (vso)
 A.F....... [ZBX-21976] added support of OneLogin and Azure SCIM, fixed some issues with provisioning (epulke)
+
+--------------------------------------------------------------------------------
+Changes for 6.4.20rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 6.4.19
+
+6.4.19rc1 was released as 6.4.19 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 6.4.19rc1
@@ -3260,6 +3285,24 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 ..F....... [ZBXNEXT-7138] added modal form for API tokens in User settings->API tokens and Administration->General->API tokens (epulke)
 
 --------------------------------------------------------------------------------
+Changes for 6.0.35rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 6.0.34
+
+6.0.34rc2 was released as 6.0.34 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 6.0.34rc2
+
+Bug fixes:
+..F....... [ZBX-21663] fixed timeselector display in problem list on PHP 7.4 (vmurzins)
+
+--------------------------------------------------------------------------------
 Changes for 6.0.34rc1
 
 New features:
@@ -3280,7 +3323,7 @@ Bug fixes:
 ...G...PS. [ZBX-25127] fixed crash in JSON library due to null pointer arithmetic (vso)
 A......... [ZBX-24485] fixed undefined index error when importing host with technical name already in use by a template (jfreibergs, vmaksimovs)
 ...G...... [ZBX-24245] fixed Zabbix agent 2 and loadable plugin protocol mismatch error (esneiders)
-........S. [ZBX-22557] fixed time zones conflict leading to report sheduling errors (sboidenko)
+........S. [ZBX-22557] fixed time zones conflict leading to report scheduling errors (sboidenko)
 ..F....... [ZBX-21618] fixed layout for multiple lists when long names are used (esekace)
 ..F....... [ZBX-25026] fixed percentile line being displayed outside of classic graph (Ivo)
 .......PS. [ZBX-22754] fixed 'Too old events' error for vmware.eventlog item (MVekslers)
@@ -6494,6 +6537,13 @@ Bug fixes:
 ..F....... [ZBXNEXT-6054] moved Configuration -> Applications to MVC (talbergs)
 A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.create and user.update API methods (talbergs)
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.45rc1
+
+New features:
+
+Bug fixes:
 
 --------------------------------------------------------------------------------
 Changes for 5.0.44

@@ -1157,7 +1157,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 									'field_locator' => 'id:thresholds-table',
 									'type' => 'table',
 									'value' => true,
-									'headers' => ['', 'Threshold', 'Action'],
+									'headers' => ['', 'Threshold', ''],
 									'buttons' => ['', 'Remove', 'Add']
 								],
 								[
@@ -1610,7 +1610,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 						[
 							'field' => 'Thresholds',
 							'type' => 'table',
-							'headers' => ['', 'Threshold', 'Action'],
+							'headers' => ['', 'Threshold', ''],
 							'buttons' => ['Add']
 						],
 						[
@@ -1704,7 +1704,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 						[
 							'field' => 'Columns',
 							'type' => 'table',
-							'headers' => ['', 'Name', 'Data', 'Action'],
+							'headers' => ['', 'Name', 'Data', 'Actions'],
 							'buttons' => ['Add'],
 							'mandatory' => true
 						],
