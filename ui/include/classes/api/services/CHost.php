@@ -838,8 +838,6 @@ class CHost extends CHostGeneral {
 		$inventories = $this->extendObjects('host_inventory', $inventories, ['inventory_mode']);
 		$inventories = zbx_toHash($inventories, 'hostid');
 
-		$tls_psk_fields = array_flip(['tls_psk_identity', 'tls_psk']);
-
 		foreach ($hosts as $host) {
 			$host = array_diff_key($host, array_flip(['groups', 'tags', 'macros', 'templates', 'templates_clear']));
 
@@ -853,9 +851,21 @@ class CHost extends CHostGeneral {
 				}
 			}
 
+			if (array_key_exists('monitored_by', $host)) {
+				if ($host['monitored_by'] == ZBX_MONITORED_BY_PROXY) {
+					$host += ['proxyid' => $db_hosts[$host['hostid']]['proxyid']];
+				}
+				elseif ($host['monitored_by'] == ZBX_MONITORED_BY_PROXY_GROUP) {
+					$host += ['proxy_groupid' => $db_hosts[$host['hostid']]['proxy_groupid']];
+				}
+			}
+
 			if (array_key_exists('tls_connect', $host)
 					&& ($host['tls_connect'] == HOST_ENCRYPTION_PSK || $host['tls_accept'] & HOST_ENCRYPTION_PSK)) {
-				$host += array_intersect_key($db_hosts[$host['hostid']], $tls_psk_fields);
+				$host += [
+					'tls_psk_identity' => $db_hosts[$host['hostid']]['tls_psk_identity'],
+					'tls_psk' => $db_hosts[$host['hostid']]['tls_psk']
+				];
 			}
 
 			$data = array_diff_key($host, array_flip(['hostid']));
@@ -1287,19 +1297,19 @@ class CHost extends CHostGeneral {
 			'tls_connect' =>		['type' => API_INT32, 'in' => implode(',', [HOST_ENCRYPTION_NONE, HOST_ENCRYPTION_PSK, HOST_ENCRYPTION_CERTIFICATE])],
 			'tls_accept' =>			['type' => API_INT32, 'in' => implode(':', [HOST_ENCRYPTION_NONE, HOST_ENCRYPTION_NONE | HOST_ENCRYPTION_PSK | HOST_ENCRYPTION_CERTIFICATE])],
 			'tls_psk_identity' =>	['type' => API_MULTIPLE, 'rules' => [
-										['if' => static fn(array $data): bool => (array_key_exists('tls_connect', $data) && $data['tls_connect'] == HOST_ENCRYPTION_PSK) || (array_key_exists('tls_accept', $data) && ($data['tls_accept'] & HOST_ENCRYPTION_PSK) != 0), 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('hosts', 'tls_psk_identity')],
+										['if' => static fn(array $_data): bool => (array_key_exists('tls_connect', $_data) && $_data['tls_connect'] == HOST_ENCRYPTION_PSK) || (array_key_exists('tls_accept', $_data) && ($_data['tls_accept'] & HOST_ENCRYPTION_PSK) != 0), 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('hosts', 'tls_psk_identity')],
 										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('hosts', 'tls_psk_identity')]
 			]],
 			'tls_psk' =>			['type' => API_MULTIPLE, 'rules' => [
-										['if' => static fn(array $data): bool => (array_key_exists('tls_connect', $data) && $data['tls_connect'] == HOST_ENCRYPTION_PSK) || (array_key_exists('tls_accept', $data) && ($data['tls_accept'] & HOST_ENCRYPTION_PSK) != 0), 'type' => API_PSK, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('hosts', 'tls_psk')],
+										['if' => static fn(array $_data): bool => (array_key_exists('tls_connect', $_data) && $_data['tls_connect'] == HOST_ENCRYPTION_PSK) || (array_key_exists('tls_accept', $_data) && ($_data['tls_accept'] & HOST_ENCRYPTION_PSK) != 0), 'type' => API_PSK, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('hosts', 'tls_psk')],
 										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('hosts', 'tls_psk')]
 			]],
 			'tls_issuer' =>			['type' => API_MULTIPLE, 'rules' => [
-										['if' => static fn(array $data): bool => (array_key_exists('tls_connect', $data) && $data['tls_connect'] == HOST_ENCRYPTION_CERTIFICATE) || (array_key_exists('tls_accept', $data) && ($data['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE) != 0), 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hosts', 'tls_issuer')],
+										['if' => static fn(array $_data): bool => (array_key_exists('tls_connect', $_data) && $_data['tls_connect'] == HOST_ENCRYPTION_CERTIFICATE) || (array_key_exists('tls_accept', $_data) && ($_data['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE) != 0), 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hosts', 'tls_issuer')],
 										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('hosts', 'tls_issuer')]
 			]],
 			'tls_subject' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => static fn(array $data): bool => (array_key_exists('tls_connect', $data) && $data['tls_connect'] == HOST_ENCRYPTION_CERTIFICATE) || (array_key_exists('tls_accept', $data) && ($data['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE) != 0), 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hosts', 'tls_subject')],
+										['if' => static fn(array $_data): bool => (array_key_exists('tls_connect', $_data) && $_data['tls_connect'] == HOST_ENCRYPTION_CERTIFICATE) || (array_key_exists('tls_accept', $_data) && ($_data['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE) != 0), 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hosts', 'tls_subject')],
 										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('hosts', 'tls_subject')]
 			]],
 			'groups' =>				['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['groupid']], 'fields' => [
@@ -2275,6 +2285,10 @@ class CHost extends CHostGeneral {
 		];
 
 		foreach ($hosts as $i => $host) {
+			if ($db_hosts !== null && $db_hosts[$host['hostid']]['flags'] != ZBX_FLAG_DISCOVERY_NORMAL) {
+				continue;
+			}
+
 			if ($host['monitored_by'] == ZBX_MONITORED_BY_PROXY) {
 				if (!array_key_exists('proxyid', $host)) {
 					continue;
@@ -2360,10 +2374,7 @@ class CHost extends CHostGeneral {
 	 */
 	protected function validateUpdate(array &$hosts, array &$db_hosts = null): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['hostid']], 'fields' => [
-			'hostid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
-			'monitored_by' =>	['type' => API_INT32, 'in' => implode(',', [ZBX_MONITORED_BY_SERVER, ZBX_MONITORED_BY_PROXY, ZBX_MONITORED_BY_PROXY_GROUP])],
-			'tls_connect' =>	['type' => API_INT32, 'in' => implode(',', [HOST_ENCRYPTION_NONE, HOST_ENCRYPTION_PSK, HOST_ENCRYPTION_CERTIFICATE])],
-			'tls_accept' =>		['type' => API_INT32, 'in' => implode(':', [HOST_ENCRYPTION_NONE, HOST_ENCRYPTION_NONE | HOST_ENCRYPTION_PSK | HOST_ENCRYPTION_CERTIFICATE])]
+			'hostid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $hosts, '/', $error)) {
@@ -2390,66 +2401,26 @@ class CHost extends CHostGeneral {
 
 		$this->checkDiscoveredFields($hosts, $db_hosts);
 
-		$hosts = $this->extendObjectsByKey($hosts, $db_hosts, 'hostid', ['monitored_by', 'tls_connect', 'tls_accept']);
+		foreach ($hosts as $i => &$host) {
+			$db_host = $db_hosts[$host['hostid']];
 
-		self::addRequiredFieldsByMonitoredBy($hosts, $db_hosts);
-		self::addRequiredFieldsByTls($hosts, $db_hosts);
+			if ($db_host['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+				$api_input_rules = self::getDiscoveredValidationRules();
+			}
+			else {
+				$host += array_intersect_key($db_host, array_flip(['monitored_by', 'tls_connect', 'tls_accept']));
 
-		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'fields' => [
-			'hostid' =>				['type' => API_ANY],
-			'monitored_by' =>		['type' => API_ANY],
-			'proxyid' =>			['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'monitored_by', 'in' => ZBX_MONITORED_BY_PROXY], 'type' => API_ID],
-										['else' => true, 'type' => API_ID, 'in' => '0']
-			]],
-			'proxy_groupid' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'monitored_by', 'in' => ZBX_MONITORED_BY_PROXY_GROUP], 'type' => API_ID],
-										['else' => true, 'type' => API_ID, 'in' => '0']
-			]],
-			'tls_connect' =>		['type' => API_ANY],
-			'tls_accept' =>			['type' => API_ANY],
-			'tls_psk_identity' =>	['type' => API_MULTIPLE, 'rules' => [
-										['if' => static fn(array $data): bool => $data['tls_connect'] == HOST_ENCRYPTION_PSK || ($data['tls_accept'] & HOST_ENCRYPTION_PSK) != 0, 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('hosts', 'tls_psk_identity')],
-										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('hosts', 'tls_psk_identity')]
-			]],
-			'tls_psk' =>			['type' => API_MULTIPLE, 'rules' => [
-										['if' => static fn(array $data): bool => $data['tls_connect'] == HOST_ENCRYPTION_PSK || ($data['tls_accept'] & HOST_ENCRYPTION_PSK) != 0, 'type' => API_PSK, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('hosts', 'tls_psk')],
-										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('hosts', 'tls_psk')]
-			]],
-			'tls_issuer' =>			['type' => API_MULTIPLE, 'rules' => [
-										['if' => static fn(array $data): bool => $data['tls_connect'] == HOST_ENCRYPTION_CERTIFICATE || ($data['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE) != 0, 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hosts', 'tls_issuer')],
-										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('hosts', 'tls_issuer')]
-			]],
-			'tls_subject' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => static fn(array $data): bool => $data['tls_connect'] == HOST_ENCRYPTION_CERTIFICATE || ($data['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE) != 0, 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hosts', 'tls_subject')],
-										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('hosts', 'tls_subject')]
-			]],
-			'groups' =>				['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['groupid']], 'fields' => [
-				'groupid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
-			]],
-			'templates' =>			['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['templateid']], 'fields' => [
-				'templateid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
-			]],
-			'templates_clear' =>	['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['templateid']], 'fields' => [
-				'templateid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
-			]],
-			'tags' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['tag', 'value']], 'fields' => [
-				'tag' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('host_tag', 'tag')],
-				'value' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('host_tag', 'value'), 'default' => DB::getDefault('host_tag', 'value')]
-			]],
-			'macros' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['hostmacroid']], 'fields' => [
-				'hostmacroid' =>		['type' => API_ID],
-				'macro' =>				['type' => API_USER_MACRO, 'length' => DB::getFieldLength('hostmacro', 'macro')],
-				'type' =>				['type' => API_INT32, 'in' => implode(',', [ZBX_MACRO_TYPE_TEXT, ZBX_MACRO_TYPE_SECRET, ZBX_MACRO_TYPE_VAULT])],
-				'value' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'value')],
-				'description' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'description')],
-				'automatic' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_USERMACRO_MANUAL])]
-			]]
-		]];
+				self::addRequiredFieldsByMonitoredBy($host, $db_host);
+				self::addRequiredFieldsByTls($host, $db_host);
 
-		if (!CApiInputValidator::validate($api_input_rules, $hosts, '/', $error)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+				$api_input_rules = self::getValidationRules();
+			}
+
+			if (!CApiInputValidator::validate($api_input_rules, $host, '/'.($i + 1), $error)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+			}
 		}
+		unset($host);
 
 		self::checkProxiesAndProxyGroups($hosts, $db_hosts);
 		self::checkTlsPskPairs($hosts, $db_hosts);
@@ -2636,32 +2607,104 @@ class CHost extends CHostGeneral {
 		}
 	}
 
-	private static function addRequiredFieldsByMonitoredBy(array &$hosts, array $db_hosts): void {
-		foreach ($hosts as &$host) {
-			if ($host['monitored_by'] != $db_hosts[$host['hostid']]['monitored_by']) {
-				if ($host['monitored_by'] == ZBX_MONITORED_BY_PROXY) {
-					$host += array_intersect_key($db_hosts[$host['hostid']], array_flip(['proxyid']));
-				}
-				elseif ($host['monitored_by'] == ZBX_MONITORED_BY_PROXY_GROUP) {
-					$host += array_intersect_key($db_hosts[$host['hostid']], array_flip(['proxy_groupid']));
-				}
-			}
-		}
-		unset($host);
+	private static function getValidationRules(): array {
+		return ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
+			'hostid' =>				['type' => API_ANY],
+			'monitored_by' =>		['type' => API_INT32, 'in' => implode(',', [ZBX_MONITORED_BY_SERVER, ZBX_MONITORED_BY_PROXY, ZBX_MONITORED_BY_PROXY_GROUP])],
+			'proxyid' =>			['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'monitored_by', 'in' => ZBX_MONITORED_BY_PROXY], 'type' => API_ID],
+										['else' => true, 'type' => API_ID, 'in' => '0']
+			]],
+			'proxy_groupid' =>		['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'monitored_by', 'in' => ZBX_MONITORED_BY_PROXY_GROUP], 'type' => API_ID],
+										['else' => true, 'type' => API_ID, 'in' => '0']
+			]],
+			'tls_connect' =>		['type' => API_INT32, 'in' => implode(',', [HOST_ENCRYPTION_NONE, HOST_ENCRYPTION_PSK, HOST_ENCRYPTION_CERTIFICATE])],
+			'tls_accept' =>			['type' => API_INT32, 'in' => implode(':', [HOST_ENCRYPTION_NONE, HOST_ENCRYPTION_NONE | HOST_ENCRYPTION_PSK | HOST_ENCRYPTION_CERTIFICATE])],
+			'tls_psk_identity' =>	['type' => API_MULTIPLE, 'rules' => [
+										['if' => static fn(array $data): bool => $data['tls_connect'] == HOST_ENCRYPTION_PSK || ($data['tls_accept'] & HOST_ENCRYPTION_PSK) != 0, 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('hosts', 'tls_psk_identity')],
+										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('hosts', 'tls_psk_identity')]
+			]],
+			'tls_psk' =>			['type' => API_MULTIPLE, 'rules' => [
+										['if' => static fn(array $data): bool => $data['tls_connect'] == HOST_ENCRYPTION_PSK || ($data['tls_accept'] & HOST_ENCRYPTION_PSK) != 0, 'type' => API_PSK, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('hosts', 'tls_psk')],
+										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('hosts', 'tls_psk')]
+			]],
+			'tls_issuer' =>			['type' => API_MULTIPLE, 'rules' => [
+										['if' => static fn(array $data): bool => $data['tls_connect'] == HOST_ENCRYPTION_CERTIFICATE || ($data['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE) != 0, 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hosts', 'tls_issuer')],
+										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('hosts', 'tls_issuer')]
+			]],
+			'tls_subject' =>		['type' => API_MULTIPLE, 'rules' => [
+										['if' => static fn(array $data): bool => $data['tls_connect'] == HOST_ENCRYPTION_CERTIFICATE || ($data['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE) != 0, 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hosts', 'tls_subject')],
+										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('hosts', 'tls_subject')]
+			]],
+			'groups' =>				['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['groupid']], 'fields' => [
+				'groupid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
+			]],
+			'templates' =>			['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['templateid']], 'fields' => [
+				'templateid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
+			]],
+			'templates_clear' =>	['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['templateid']], 'fields' => [
+				'templateid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
+			]],
+			'tags' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['tag', 'value']], 'fields' => [
+				'tag' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('host_tag', 'tag')],
+				'value' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('host_tag', 'value'), 'default' => DB::getDefault('host_tag', 'value')]
+			]],
+			'macros' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['hostmacroid']], 'fields' => [
+				'hostmacroid' =>		['type' => API_ID],
+				'macro' =>				['type' => API_USER_MACRO, 'length' => DB::getFieldLength('hostmacro', 'macro')],
+				'type' =>				['type' => API_INT32, 'in' => implode(',', [ZBX_MACRO_TYPE_TEXT, ZBX_MACRO_TYPE_SECRET, ZBX_MACRO_TYPE_VAULT])],
+				'value' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'value')],
+				'description' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'description')],
+				'automatic' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_USERMACRO_MANUAL])]
+			]]
+		]];
 	}
 
-	private static function addRequiredFieldsByTls(array &$hosts, array $db_hosts): void {
-		foreach ($hosts as &$host) {
-			if (($host['tls_connect'] == HOST_ENCRYPTION_PSK || $host['tls_accept'] & HOST_ENCRYPTION_PSK)
-					&& $db_hosts[$host['hostid']]['tls_connect'] != HOST_ENCRYPTION_PSK
-					&& ($db_hosts[$host['hostid']]['tls_accept'] & HOST_ENCRYPTION_PSK) == 0) {
-				$host += [
-					'tls_psk_identity' => $db_hosts[$host['hostid']]['tls_psk_identity'],
-					'tls_psk' => $db_hosts[$host['hostid']]['tls_psk']
-				];
+	private static function getDiscoveredValidationRules(): array {
+		return ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
+			'hostid' =>				['type' => API_ANY],
+			'templates' =>			['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['templateid']], 'fields' => [
+				'templateid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
+			]],
+			'templates_clear' =>	['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['templateid']], 'fields' => [
+				'templateid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
+			]],
+			'tags' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['tag', 'value']], 'fields' => [
+				'tag' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('host_tag', 'tag')],
+				'value' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('host_tag', 'value'), 'default' => DB::getDefault('host_tag', 'value')]
+			]],
+			'macros' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['hostmacroid']], 'fields' => [
+				'hostmacroid' =>		['type' => API_ID],
+				'macro' =>				['type' => API_USER_MACRO, 'length' => DB::getFieldLength('hostmacro', 'macro')],
+				'type' =>				['type' => API_INT32, 'in' => implode(',', [ZBX_MACRO_TYPE_TEXT, ZBX_MACRO_TYPE_SECRET, ZBX_MACRO_TYPE_VAULT])],
+				'value' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'value')],
+				'description' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'description')],
+				'automatic' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_USERMACRO_MANUAL])]
+			]]
+		]];
+	}
+
+	private static function addRequiredFieldsByMonitoredBy(array &$host, array $db_host): void {
+		if ($host['monitored_by'] != $db_host['monitored_by']) {
+			if ($host['monitored_by'] == ZBX_MONITORED_BY_PROXY) {
+				$host += array_intersect_key($db_host, array_flip(['proxyid']));
+			}
+			elseif ($host['monitored_by'] == ZBX_MONITORED_BY_PROXY_GROUP) {
+				$host += array_intersect_key($db_host, array_flip(['proxy_groupid']));
 			}
 		}
-		unset($host);
+	}
+
+	private static function addRequiredFieldsByTls(array &$host, array $db_host): void {
+		if (($host['tls_connect'] == HOST_ENCRYPTION_PSK || $host['tls_accept'] & HOST_ENCRYPTION_PSK)
+				&& $db_host['tls_connect'] != HOST_ENCRYPTION_PSK
+				&& ($db_host['tls_accept'] & HOST_ENCRYPTION_PSK) == 0) {
+			$host += [
+				'tls_psk_identity' => $db_host['tls_psk_identity'],
+				'tls_psk' => $db_host['tls_psk']
+			];
+		}
 	}
 
 	protected function addAffectedObjects(array $hosts, array &$db_hosts): void {
@@ -2685,6 +2728,10 @@ class CHost extends CHostGeneral {
 		$psk_hostids = $db_hosts !== null ? [] : null;
 
 		foreach ($hosts as $i => $host) {
+			if ($db_hosts !== null && $db_hosts[$host['hostid']]['flags'] != ZBX_FLAG_DISCOVERY_NORMAL) {
+				continue;
+			}
+
 			$psk_pair = array_intersect_key($host, $tls_psk_fields);
 
 			if ($psk_pair) {
