@@ -58,7 +58,7 @@ class testUserParametersReload extends CIntegrationTest {
 		[
 			'key' => self::ITEM_NAME_03,
 			'component' => self::COMPONENT_AGENT2
-		],
+		]
 	];
 
 	/**
