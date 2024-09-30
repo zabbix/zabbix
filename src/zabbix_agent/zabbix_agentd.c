@@ -1430,7 +1430,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zbx_thread_info_t		*thread_info;
 		zbx_thread_listener_args	listener_args = {&listen_sock, zbx_config_tls, get_zbx_program_type,
 								config_file, zbx_config_timeout,
-								zbx_config_hosts_allowed, config_user_parameters};
+								zbx_config_hosts_allowed};
 
 		thread_args = (zbx_thread_args_t *)zbx_malloc(NULL, sizeof(zbx_thread_args_t));
 		thread_info = &thread_args->info;
