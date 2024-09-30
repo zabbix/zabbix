@@ -1713,7 +1713,8 @@ class testMassUpdateItems extends CWebTest{
 					],
 					'Preprocessing steps' => [
 						['type' => 'Check for not supported value', 'parameter_1' => 'error matches','parameter_2' => '^test.*$',
-								'on_fail' => true, 'error_handler' => 'Set value to', 'error_handler_params' => 'custom value'],
+								'on_fail' => true, 'error_handler' => 'Set value to', 'error_handler_params' => 'custom value'
+						],
 						['type' => 'Replace', 'parameter_1' => 'text', 'parameter_2' => 'REPLACEMENT'],
 						['type' => 'Right trim', 'parameter_1' => 'abc'],
 						['type' => 'Left trim', 'parameter_1' => 'def'],

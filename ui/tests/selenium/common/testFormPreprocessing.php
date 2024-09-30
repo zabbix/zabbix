@@ -923,7 +923,8 @@ abstract class testFormPreprocessing extends CWebTest {
 						['type' => 'Check for error using regular expression', 'parameter_1' => 'test', 'parameter_2' => 'abc'],
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '5'],
 						['type' => 'Prometheus pattern', 'parameter_1' => 'cpu_usage_system', 'parameter_2' => 'label',
-								'parameter_3' => 'label_name']
+								'parameter_3' => 'label_name'
+						]
 					]
 				]
 			],
