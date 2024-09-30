@@ -425,8 +425,7 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 						['attribute' => 'Tag value']
 					],
 					'error' => [
-						'Invalid parameter "Group by": tag cannot be empty.',
-						'Invalid parameter "Group by": rows must be unique.'
+						'Invalid parameter "Group by": tag cannot be empty.'
 					]
 				]
 			],
@@ -443,7 +442,6 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 					],
 					'error' => [
 						'Invalid parameter "Group by": tag cannot be empty.',
-						'Invalid parameter "Group by": rows must be unique.',
 						'Invalid parameter "Host limit": value must be one of 1-9999.'
 					]
 				]
@@ -703,6 +701,32 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 						['name' => 'Check tag with operator - Does not equal', 'operator' => 'Does not equal', 'value' => 'Average'],
 						['name' => 'Check tag with operator - Does not contain', 'operator' => 'Does not contain', 'value' => 'Disaster']
 					]
+				]
+			],
+			// #30.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [],
+					'group_by' => [
+						['attribute' => 'Host group'],
+						['attribute' => 'Tag value', 'tag' => 'windows' ],
+						['attribute' => 'Host group']
+					],
+					'error' => 'Invalid parameter "Group by": rows must be unique.'
+				]
+			],
+			// #31.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [],
+					'group_by' => [
+						['attribute' => 'Severity'],
+						['attribute' => 'Tag value', 'tag' => 'windows' ],
+						['attribute' => 'Severity']
+					],
+					'error' => 'Invalid parameter "Group by": rows must be unique.'
 				]
 			]
 		];

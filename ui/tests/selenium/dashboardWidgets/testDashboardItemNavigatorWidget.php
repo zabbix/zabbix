@@ -429,10 +429,7 @@ class testDashboardItemNavigatorWidget extends testWidgets {
 						['attribute' => 'Host tag value'],
 						['attribute' => 'Host tag value']
 					],
-					'error' => [
-						'Invalid parameter "Group by": tag cannot be empty.',
-						'Invalid parameter "Group by": rows must be unique.'
-					]
+					'error' => 'Invalid parameter "Group by": tag cannot be empty.'
 				]
 			],
 			// #10.
@@ -448,7 +445,6 @@ class testDashboardItemNavigatorWidget extends testWidgets {
 					],
 					'error' => [
 						'Invalid parameter "Group by": tag cannot be empty.',
-						'Invalid parameter "Group by": rows must be unique.',
 						'Invalid parameter "Item limit": value must be one of 1-9999.'
 					]
 				]
@@ -731,6 +727,58 @@ class testDashboardItemNavigatorWidget extends testWidgets {
 							['name' => 'Check item tag with operator - Does not contain', 'operator' => 'Does not contain', 'value' => 'Disaster']
 						]
 					]
+				]
+			],
+			// #31.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [],
+					'group_by' => [
+						['attribute' => 'Item tag value', 'tag' => 'memory'],
+						['attribute' => 'Host name'],
+						['attribute' => 'Item tag value', 'tag' => 'memory']
+					],
+					'error' => 'Invalid parameter "Group by": rows must be unique.'
+				]
+			],
+			// #32.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [],
+					'group_by' => [
+						['attribute' => 'Host name'],
+						['attribute' => 'Item tag value', 'tag' => 'memory'],
+						['attribute' => 'Host name']
+					],
+					'error' => 'Invalid parameter "Group by": rows must be unique.'
+				]
+			],
+			// #33.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [],
+					'group_by' => [
+						['attribute' => 'Host group'],
+						['attribute' => 'Item tag value', 'tag' => 'memory'],
+						['attribute' => 'Host group']
+					],
+					'error' => 'Invalid parameter "Group by": rows must be unique.'
+				]
+			],
+			// #34.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [],
+					'group_by' => [
+						['attribute' => 'Host group'],
+						['attribute' => 'Item tag value', 'tag' => 'memory'],
+						['attribute' => 'Host group']
+					],
+					'error' => 'Invalid parameter "Group by": rows must be unique.'
 				]
 			]
 		];
