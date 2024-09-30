@@ -2155,6 +2155,7 @@ func Test_runner_parseOutput(t *testing.T) {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
+
 			r := &runner{
 				devices:     tt.fields.devices,
 				jsonDevices: tt.fields.jsonDevices,
