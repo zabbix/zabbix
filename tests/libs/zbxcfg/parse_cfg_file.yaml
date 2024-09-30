@@ -120,11 +120,11 @@ in:
     - name: UserParameter
       type: string list
       mandatory: no
-      expect: [ping, echo 1, echo2]
+      expect: [ping, echo 1, echo2,]
 files:
   user_param.conf: |
     # whitespace should not matter
-    UserParameter=ping,echo 1,echo2
+    UserParameter=ping,echo 1,echo2,
 ---
 test case: user parameters, 3 user parameters
 in:

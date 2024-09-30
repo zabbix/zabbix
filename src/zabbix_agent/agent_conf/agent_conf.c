@@ -216,13 +216,13 @@ void	load_perf_counters(const char **def_lines, const char **eng_lines)
  * Purpose: loads user parameters from configuration file                     *
  *                                                                            *
  ******************************************************************************/
-static int	load_config_user_params(const char *config_file, char ***config_user_parameters)
+static int	load_config_user_params(const char *config_file, char **config_user_parameters)
 {
 	zbx_cfg_line_t	cfg[] =
 	{
 		/* PARAMETER,			VAR,					TYPE,
 				MANDATORY,		MIN,			MAX */
-		{"UserParameter",		config_user_parameters,		ZBX_CFG_TYPE_MULTISTRING,
+		{"UserParameter",		&config_user_parameters,		ZBX_CFG_TYPE_MULTISTRING,
 				ZBX_CONF_PARM_OPT,	0,			0},
 		{0}
 	};
@@ -237,7 +237,7 @@ void	reload_user_parameters(unsigned char process_type, int process_num, const c
 
 	zbx_strarr_init(&config_user_parameters);
 
-	if (FAIL == load_config_user_params(config_file, &config_user_parameters))
+	if (FAIL == load_config_user_params(config_file, config_user_parameters))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "cannot reload user parameters [%s #%d]: error processing configuration file",
 				get_process_type_string(process_type), process_num);
