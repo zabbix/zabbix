@@ -74,6 +74,7 @@ class CHistory extends CApiService {
 	 *                                                         be matched to the corresponding property given in the
 	 *                                                         sortfield parameter.
 	 * @param int    $options['limit']                         Limit the number of records returned.
+	 * @param int    $options['offset']                        The number of items to skip before returning results.
 	 * @param bool   $options['editable']                      If set to true return only objects that the user has
 	 *                                                         write permissions to.
 	 *
@@ -116,10 +117,12 @@ class CHistory extends CApiService {
 			'sortfield' =>				['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', $this->sortColumns), 'uniq' => true, 'default' => []],
 			'sortorder' =>				['type' => API_SORTORDER, 'default' => []],
 			'limit' =>					['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null],
+			'offset' =>					['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null],
 			// flags
 			'editable' =>				['type' => API_BOOLEAN, 'default' => false]
 		]];
 
+		
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
@@ -142,7 +145,6 @@ class CHistory extends CApiService {
 			case ZBX_HISTORY_SOURCE_ELASTIC:
 				$result = $this->getFromElasticsearch($options);
 				break;
-
 			default:
 				if (CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL) == 1) {
 					$hk_history = timeUnitToSeconds(CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY));
@@ -209,7 +211,7 @@ class CHistory extends CApiService {
 		$sql_parts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sql_parts);
 		$sql_parts = $this->applyQuerySortOptions($this->tableName, $this->tableAlias(), $options, $sql_parts);
 
-		$db_res = DBselect(self::createSelectQueryFromParts($sql_parts), $options['limit']);
+		$db_res = DBselect(self::createSelectQueryFromParts($sql_parts), $options['limit'], $options["offset"] ?? 0);
 
 		while ($data = DBfetch($db_res)) {
 			if ($options['countOutput']) {

@@ -83,6 +83,7 @@ class CItem extends CItemGeneral {
 	 * @param bool   $options['count']
 	 * @param string $options['pattern']
 	 * @param int    $options['limit']
+	 * @param int    $options['offset']
 	 * @param string $options['order']
 	 *
 	 * @return array|int item data as array or false if error
@@ -143,6 +144,7 @@ class CItem extends CItemGeneral {
 			'sortfield'					=> '',
 			'sortorder'					=> '',
 			'limit'						=> null,
+			'offset'					=> null,
 			'limitSelects'				=> null
 		];
 		$options = zbx_array_merge($defOptions, $options);
@@ -409,7 +411,7 @@ class CItem extends CItemGeneral {
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-		$res = DBselect(self::createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
+		$res = DBselect(self::createSelectQueryFromParts($sqlParts), $sqlParts['limit'], $options["offset"] ?? 0);
 		while ($item = DBfetch($res)) {
 			// Items share table with item prototypes. Therefore remove item unrelated fields.
 			unset($item['discover']);
