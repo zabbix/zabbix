@@ -37,11 +37,8 @@ This template has been tested on:
 |{$HUAWEI.OCEANSTOR_V6.TEMP.MAX.TIME}|<p>The time during which temperature of enclosure may exceed the threshold.</p>|`3m`|
 |{$HUAWEI.OCEANSTOR_V6.DISK.TEMP.MAX.WARN}|<p>Maximum temperature of disk. Can be used with {#MODEL} as context.</p>|`45`|
 |{$HUAWEI.OCEANSTOR_V6.DISK.TEMP.MAX.TIME}|<p>The time during which temperature of disk may exceed the threshold.</p>|`5m`|
-|{$HUAWEI.OCEANSTOR_V6.NODE.IO.DELAY.MAX.WARN}|<p>Maximum average I/O latency of node in milliseconds.</p>|`20`|
-|{$HUAWEI.OCEANSTOR_V6.NODE.IO.DELAY.MAX.TIME}|<p>The time during which average I/O latency of node may exceed the threshold.</p>|`5m`|
 |{$HUAWEI.OCEANSTOR_V6.LUN.IO.TIME.MAX.WARN}|<p>Maximum average I/O response time of LUN in seconds.</p>|`0.0001`|
 |{$HUAWEI.OCEANSTOR_V6.LUN.IO.TIME.MAX.TIME}|<p>The time during which average I/O response time of LUN may exceed the threshold.</p>|`5m`|
-|{$HUAWEI.OCEANSTOR_V6.POOL.CAPACITY.THRESH.TIME}|<p>The time during which free capacity may exceed the {#THRESHOLD} from hwInfoStoragePoolFullThreshold.</p>|`5m`|
 |{$SNMP.TIMEOUT}|<p>Time interval for the SNMP availability trigger.</p>|`5m`|
 |{$ICMP_LOSS_WARN}|<p>Warning threshold of ICMP packet loss in %.</p>|`20`|
 |{$ICMP_RESPONSE_TIME_WARN}|<p>Warning threshold of the average ICMP response time in seconds.</p>|`0.15`|
@@ -79,7 +76,7 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|OceanStor V6: Storage version has been changed|<p>OceanStor V6 version has changed.</p>|`last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.version,#1)<>last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.version,#2) and length(last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.version))>0`|Info|**Manual close**: Yes|
+|Huawei OceanStor V6: Storage version has changed.||`last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.version,#1)<>last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.version,#2) and length(last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.version))>0`|Info|**Manual close**: Yes|
 |Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`(last(/Huawei OceanStor V6 by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Huawei OceanStor V6 by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Huawei OceanStor V6 by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Huawei OceanStor V6 by SNMP/system.net.uptime[sysUpTime.0])<10m)`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>No SNMP data collection</li></ul>|
 |System name has changed|<p>The name of the system has changed. Acknowledge to close the problem manually.</p>|`last(/Huawei OceanStor V6 by SNMP/system.name,#1)<>last(/Huawei OceanStor V6 by SNMP/system.name,#2) and length(last(/Huawei OceanStor V6 by SNMP/system.name))>0`|Info|**Manual close**: Yes|
 |No SNMP data collection|<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p>|`max(/Huawei OceanStor V6 by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0`|Warning|**Depends on**:<br><ul><li>Unavailable by ICMP ping</li></ul>|

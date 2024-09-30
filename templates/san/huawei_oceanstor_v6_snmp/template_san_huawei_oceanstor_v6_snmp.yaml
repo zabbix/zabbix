@@ -4,7 +4,7 @@ zabbix_export:
     - uuid: 7c2cb727f85b492d88cd56e17127c64d
       name: Templates/SAN
   templates:
-    - uuid: a756ba32e05944a6a0dbc1121c66ee47
+    - uuid: 521d864fe8574f19b350f7ddbe259042
       template: 'Huawei OceanStor V6 by SNMP'
       name: 'Huawei OceanStor V6 by SNMP'
       description: |
@@ -31,7 +31,7 @@ zabbix_export:
           tags:
             - tag: component
               value: raw
-        - uuid: afe9634aa31644e3834166c32c34c31e
+        - uuid: 5966b59ae96c4044a2c53d84728aa385
           name: 'Capacity total'
           type: SNMP_AGENT
           snmp_oid: 'get[1.3.6.1.4.1.34774.4.1.1.5.0]'
@@ -48,7 +48,7 @@ zabbix_export:
           tags:
             - tag: component
               value: storage
-        - uuid: 59f611414b0e4bc292819068c0138a9e
+        - uuid: 0bb56fda578e44b28dfaca63e37c6026
           name: 'Capacity used'
           type: SNMP_AGENT
           snmp_oid: 'get[1.3.6.1.4.1.34774.4.1.1.4.0]'
@@ -146,7 +146,7 @@ zabbix_export:
           tags:
             - tag: component
               value: raw
-        - uuid: 41eb993590fb47de997a2305e463f2a8
+        - uuid: 4ad5a10227d74eaaaaf3678a6884b67d
           name: Status
           type: SNMP_AGENT
           snmp_oid: 'get[1.3.6.1.4.1.34774.4.1.1.3.0]'
@@ -161,7 +161,7 @@ zabbix_export:
               value: health
             - tag: component
               value: system
-        - uuid: b9718573a3894948b33cd7992fb70793
+        - uuid: 3ed972a612394bf285f816debcd8e89a
           name: Version
           type: SNMP_AGENT
           snmp_oid: 'get[1.3.6.1.4.1.34774.4.1.1.6.0]'
@@ -177,17 +177,16 @@ zabbix_export:
             - tag: component
               value: system
           triggers:
-            - uuid: bb9b6ef427c144b2a0b5ce6a08ad8e03
+            - uuid: eb140be38e9c4f51b105347ddffa6997
               expression: 'last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.version,#1)<>last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.version,#2) and length(last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.version))>0'
-              name: 'OceanStor V6: Storage version has been changed'
-              event_name: 'OceanStor V6: Version has changed (new version: {ITEM.VALUE})'
+              name: 'Huawei OceanStor V6: Storage version has changed.'
+              event_name: 'Huawei OceanStor V6: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
-              description: 'OceanStor V6 version has changed.'
               manual_close: 'YES'
               tags:
                 - tag: scope
                   value: notice
-        - uuid: 70979704d42c4a1f81a7a41c612d895f
+        - uuid: 590714e7fb3f4d468c19385146f76433
           name: 'ICMP ping'
           type: SIMPLE
           key: icmpping
@@ -199,7 +198,7 @@ zabbix_export:
             - tag: component
               value: network
           triggers:
-            - uuid: 9ce3b07c13cf44609680d98cc8c7f916
+            - uuid: 914602a8433444a18ac0672f776b836e
               expression: 'max(/Huawei OceanStor V6 by SNMP/icmpping,#3)=0'
               name: 'Unavailable by ICMP ping'
               priority: HIGH
@@ -207,7 +206,7 @@ zabbix_export:
               tags:
                 - tag: scope
                   value: availability
-        - uuid: 37d0ea29ec4940968f97f56fd45fcef7
+        - uuid: 3bcc87c0fee74e64be9b66cc9080008e
           name: 'ICMP loss'
           type: SIMPLE
           key: icmppingloss
@@ -219,7 +218,7 @@ zabbix_export:
             - tag: component
               value: network
           triggers:
-            - uuid: 9fd65c90c53642f6ab22ec6ee640c1e5
+            - uuid: 60f0ddb37f534c5baf4a7ad254d57ea7
               expression: 'min(/Huawei OceanStor V6 by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Huawei OceanStor V6 by SNMP/icmppingloss,5m)<100'
               name: 'High ICMP ping loss'
               opdata: 'Loss: {ITEM.LASTVALUE1}'
@@ -232,7 +231,7 @@ zabbix_export:
                   value: availability
                 - tag: scope
                   value: performance
-        - uuid: d4c8792f16b741aa9dc08b35aef55d58
+        - uuid: 137b8177ba0b4949a895be9dde23400c
           name: 'ICMP response time'
           type: SIMPLE
           key: icmppingsec
@@ -244,7 +243,7 @@ zabbix_export:
             - tag: component
               value: network
           triggers:
-            - uuid: 3c819e8ddd8e436180114a3d192b9f78
+            - uuid: 9af7c5ff0d974d0abb51cd483e46e537
               expression: 'avg(/Huawei OceanStor V6 by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
               name: 'High ICMP ping response time'
               opdata: 'Value: {ITEM.LASTVALUE1}'
@@ -260,7 +259,7 @@ zabbix_export:
                   value: availability
                 - tag: scope
                   value: performance
-        - uuid: c53b75b3ecca43cd81dbe6fee6377f98
+        - uuid: 2959893b639d457abb18a2b7e9abda23
           name: 'SNMP traps (fallback)'
           type: SNMP_TRAP
           key: snmptrap.fallback
@@ -272,7 +271,7 @@ zabbix_export:
           tags:
             - tag: component
               value: network
-        - uuid: d96da8b691b4445897e45542b978cf1c
+        - uuid: f80391019ebb4b18beb7a987c3a20830
           name: 'System contact details'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.4.0
@@ -291,7 +290,7 @@ zabbix_export:
           tags:
             - tag: component
               value: system
-        - uuid: 9bf994453c3e4b0a872eacf228d22081
+        - uuid: e7ddfe4774ad4ed7959d2e2200b50e8f
           name: 'System description'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.1.0
@@ -311,7 +310,7 @@ zabbix_export:
           tags:
             - tag: component
               value: system
-        - uuid: 83a04e971273423bb472ce598eb09073
+        - uuid: 35b225e3dff343b0a0b82b8239d6bea3
           name: 'Uptime (hardware)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.25.1.1.0
@@ -334,7 +333,7 @@ zabbix_export:
           tags:
             - tag: component
               value: system
-        - uuid: 7ff0083f2a05468f8f74019c13c34fe7
+        - uuid: f0fa4b45ea2b41d0b0f40630680fb532
           name: 'System location'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.6.0
@@ -353,7 +352,7 @@ zabbix_export:
           tags:
             - tag: component
               value: system
-        - uuid: 42f49f401dbc47f18dd53237036ff025
+        - uuid: 494d880ba7be4d9fb641b148597f805d
           name: 'System name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.5.0
@@ -373,7 +372,7 @@ zabbix_export:
             - tag: component
               value: system
           triggers:
-            - uuid: bfd3caf24c2d4cfeaf1f762bb1a37b33
+            - uuid: 6beeaf5594eb46e183db9e725277e0b6
               expression: 'last(/Huawei OceanStor V6 by SNMP/system.name,#1)<>last(/Huawei OceanStor V6 by SNMP/system.name,#2) and length(last(/Huawei OceanStor V6 by SNMP/system.name))>0'
               name: 'System name has changed'
               event_name: 'System name has changed (new name: {ITEM.VALUE})'
@@ -385,7 +384,7 @@ zabbix_export:
                   value: notice
                 - tag: scope
                   value: security
-        - uuid: fa41835191fb4d84945fd3eff3af85b9
+        - uuid: 4371c836612f4456a6ce191af79a23a2
           name: 'Uptime (network)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.3.0
@@ -403,7 +402,7 @@ zabbix_export:
           tags:
             - tag: component
               value: system
-        - uuid: 2070bbe5f74d43ba954ab94c2fd425d7
+        - uuid: 634f6b6a4e724c158ba4726f063a1684
           name: 'System object ID'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.2.0
@@ -421,7 +420,7 @@ zabbix_export:
           tags:
             - tag: component
               value: system
-        - uuid: 81bc0e11253f4b9a82741339de528307
+        - uuid: 6816cad193a64edcbcf3f09d736eab9b
           name: 'SNMP agent availability'
           type: INTERNAL
           key: 'zabbix[host,snmp,available]'
@@ -439,7 +438,7 @@ zabbix_export:
             - tag: component
               value: network
           triggers:
-            - uuid: d102d1454e4849f7b28e7b9c9e56ae32
+            - uuid: 4c9c747fc91c493b9b35db7d1dcc1461
               expression: 'max(/Huawei OceanStor V6 by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
               name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
@@ -452,14 +451,14 @@ zabbix_export:
                 - tag: scope
                   value: availability
       discovery_rules:
-        - uuid: cea22e4b397e4d2381689ba1cc05309f
+        - uuid: 362c06913f594e868ed1c8c90e29dfb3
           name: 'BBU discovery'
           type: DEPENDENT
           key: huawei.oceanstor.v6.bbu.discovery
           delay: '0'
           description: 'Discovery of BBU.'
           item_prototypes:
-            - uuid: 50dbaf3a551048fcb44c7561306d01b8
+            - uuid: 1e9048a8d6884ad6a69af5a3d82e55b2
               name: 'BBU [{#ID}] on [{#LOCATION}]: Health status'
               type: DEPENDENT
               key: 'huawei.oceanstor.v6.bbu.health_status["{#ID}:{#LOCATION}"]'
@@ -487,7 +486,7 @@ zabbix_export:
                 - tag: location
                   value: '{#LOCATION}'
               trigger_prototypes:
-                - uuid: ebfc0e6462a441c0bf0b4b7b2dab7499
+                - uuid: 0870e96a18244b1a856ed22109c30120
                   expression: 'last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.bbu.health_status["{#ID}:{#LOCATION}"])<>1'
                   name: 'BBU [{#ID}] on [{#LOCATION}]: Health status is not Normal'
                   opdata: 'Current status: {ITEM.LASTVALUE1}'
@@ -495,7 +494,7 @@ zabbix_export:
                   tags:
                     - tag: scope
                       value: availability
-            - uuid: d65649266623411d88d7087c2dd396fb
+            - uuid: d426241b0e884e8d9b13a954435ba906
               name: 'BBU [{#ID}] on [{#LOCATION}]: Running status'
               type: DEPENDENT
               key: 'huawei.oceanstor.v6.bbu.running_status["{#ID}:{#LOCATION}"]'
@@ -523,7 +522,7 @@ zabbix_export:
                 - tag: location
                   value: '{#LOCATION}'
               trigger_prototypes:
-                - uuid: 9819288b70734d3ea81cf4b4c8649861
+                - uuid: cd796c86d0784168864b50a3c710fe4a
                   expression: 'last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.bbu.running_status["{#ID}:{#LOCATION}"])<>27'
                   name: 'BBU [{#ID}] on [{#LOCATION}]: Running status is not Online'
                   opdata: 'Current status: {ITEM.LASTVALUE1}'
@@ -545,14 +544,14 @@ zabbix_export:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
-        - uuid: 54e4999dca8246aa8656ae0778227f74
+        - uuid: 82033f0c72c1424eb606ad2cc9573015
           name: 'Controller discovery'
           type: DEPENDENT
           key: huawei.oceanstor.v6.controller.discovery
           delay: '0'
           description: 'Discovery of controllers.'
           item_prototypes:
-            - uuid: b42945ca7edd495cb15c106b6daa3da0
+            - uuid: 6862050dda61467c9bb2f754441a7e75
               name: 'Controller [{#ID}]: CPU utilization'
               type: DEPENDENT
               key: 'huawei.oceanstor.v6.controller.cpu["{#ID}"]'
@@ -573,7 +572,7 @@ zabbix_export:
                 - tag: controller
                   value: '{#ID}'
               trigger_prototypes:
-                - uuid: 5a4f1cd9436840d4ab1312d049af9261
+                - uuid: c24df0ffa9b04f22b0507abe1f600c61
                   expression: 'min(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.controller.cpu["{#ID}"],5m)>{$CPU.UTIL.CRIT}'
                   name: 'Controller [{#ID}]: High CPU utilization'
                   event_name: 'Controller [{#ID}]: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
@@ -583,7 +582,7 @@ zabbix_export:
                   tags:
                     - tag: scope
                       value: performance
-            - uuid: 53c1d59c4ac940d88cc9214fe1089725
+            - uuid: ab427b8e87444481a6ab84630a1ff0f0
               name: 'Controller [{#ID}]: Health status'
               type: DEPENDENT
               key: 'huawei.oceanstor.v6.controller.health_status["{#ID}"]'
@@ -607,7 +606,7 @@ zabbix_export:
                 - tag: controller
                   value: '{#ID}'
               trigger_prototypes:
-                - uuid: 74b86cceb52d404391d2ebfd50023c59
+                - uuid: c9abbb0c329b4fdfba9e10cd2edacbc0
                   expression: 'last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.controller.health_status["{#ID}"])<>1'
                   name: 'Controller [{#ID}]: Health status is not Normal'
                   opdata: 'Current status: {ITEM.LASTVALUE1}'
@@ -615,7 +614,7 @@ zabbix_export:
                   tags:
                     - tag: scope
                       value: availability
-            - uuid: 58defbb4f905496795d71fe1c0b6eb72
+            - uuid: 7e1f6c169dda4b7baed033a40c20a3f7
               name: 'Controller [{#ID}]: Memory utilization'
               type: DEPENDENT
               key: 'huawei.oceanstor.v6.controller.memory["{#ID}"]'
@@ -636,7 +635,7 @@ zabbix_export:
                 - tag: controller
                   value: '{#ID}'
               trigger_prototypes:
-                - uuid: 30ed10a742c3491685cdc06395e779b9
+                - uuid: 7c5da0319c4f47e3a96f6d088bb29627
                   expression: 'min(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.controller.memory["{#ID}"],{$HUAWEI.OCEANSTOR_V6.MEM.MAX.TIME})>{$HUAWEI.OCEANSTOR_V6.MEM.MAX.WARN}'
                   name: 'Controller [{#ID}]: Memory usage is too high'
                   event_name: 'Controller [{#ID}]: Memory usage is too high (over {$HUAWEI.OCEANSTOR_V6.MEM.MAX.WARN} for {$HUAWEI.OCEANSTOR_V6.MEM.MAX.TIME})'
@@ -645,7 +644,7 @@ zabbix_export:
                   tags:
                     - tag: scope
                       value: performance
-            - uuid: cf15979a3a304d708c8ba363eab25efe
+            - uuid: 6de50a16225c43b9b1f9b36980e30ee8
               name: 'Controller [{#ID}]: Role'
               type: DEPENDENT
               key: 'huawei.oceanstor.v6.controller.role["{#ID}"]'
@@ -669,7 +668,7 @@ zabbix_export:
                 - tag: controller
                   value: '{#ID}'
               trigger_prototypes:
-                - uuid: aa73b5b57517428aaae377014ae29183
+                - uuid: b0952e778f38497eb1ea54e64d036bdd
                   expression: 'last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.controller.role["{#ID}"],#1)<>last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.controller.role["{#ID}"],#2)'
                   name: 'Controller [{#ID}]: Role has been changed'
                   opdata: 'Current role: {ITEM.LASTVALUE1}'
@@ -678,7 +677,7 @@ zabbix_export:
                   tags:
                     - tag: scope
                       value: notice
-            - uuid: 3a0e447c0a454f0aaf54ccc17dc7ff60
+            - uuid: 935c5f5526a8456c941a1d8f2d5c6cb4
               name: 'Controller [{#ID}]: Running status'
               type: DEPENDENT
               key: 'huawei.oceanstor.v6.controller.running_status["{#ID}"]'
@@ -702,7 +701,7 @@ zabbix_export:
                 - tag: controller
                   value: '{#ID}'
               trigger_prototypes:
-                - uuid: 3b1fdea2c8bb4c63b38713476ff8131e
+                - uuid: ecb968841d8e4a1781da9a095bd87582
                   expression: 'last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.controller.running_status["{#ID}"])<>27'
                   name: 'Controller [{#ID}]: Running status is not Online'
                   opdata: 'Current status: {ITEM.LASTVALUE1}'
@@ -711,7 +710,7 @@ zabbix_export:
                     - tag: scope
                       value: availability
           graph_prototypes:
-            - uuid: 711df28e1d2b476cb38268a52c8a57b7
+            - uuid: edfad14e047a49769c363c76f176e295
               name: 'Controller [{#ID}]: CPU utilization'
               ymin_type_1: FIXED
               ymax_type_1: FIXED
@@ -732,14 +731,14 @@ zabbix_export:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
-        - uuid: ee761856e9b9451f80326dd819446b98
+        - uuid: a19ac722e1d846b5ab1458891e9146a3
           name: 'Disk discovery'
           type: DEPENDENT
           key: huawei.oceanstor.v6.disk.discovery
           delay: '0'
           description: 'Discovery of disks.'
           item_prototypes:
-            - uuid: 260efff2e30e44668454f16b8b639488
+            - uuid: fce3691a4029427b86d6475f45a562ba
               name: 'Disk [{#MODEL}] on [{#LOCATION}]: Health status'
               type: DEPENDENT
               key: 'huawei.oceanstor.v6.disk.health_status["{#ID}"]'
@@ -765,7 +764,7 @@ zabbix_export:
                 - tag: location
                   value: '{#LOCATION}'
               trigger_prototypes:
-                - uuid: 7d51c46ed1f3451d89b72ed4defeb430
+                - uuid: 88bc0077cf754fe9beee20b00234ce9d
                   expression: 'last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.disk.health_status["{#ID}"])<>1'
                   name: 'Disk [{#MODEL}] on [{#LOCATION}]: Health status is not Normal'
                   opdata: 'Current status: {ITEM.LASTVALUE1}'
@@ -773,7 +772,7 @@ zabbix_export:
                   tags:
                     - tag: scope
                       value: availability
-            - uuid: e93cb24c47294fd5854e5eef53a7b1de
+            - uuid: 6462dd9890f9492399d39472eaca42e0
               name: 'Disk [{#MODEL}] on [{#LOCATION}]: Running status'
               type: DEPENDENT
               key: 'huawei.oceanstor.v6.disk.running_status["{#ID}"]'
@@ -799,7 +798,7 @@ zabbix_export:
                 - tag: location
                   value: '{#LOCATION}'
               trigger_prototypes:
-                - uuid: 43604005baf44569a85a1bfe84e3e550
+                - uuid: 568c21eb9f2744e183ab6dcd15493277
                   expression: 'last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.disk.running_status["{#ID}"])<>27'
                   name: 'Disk [{#MODEL}] on [{#LOCATION}]: Running status is not Online'
                   opdata: 'Current status: {ITEM.LASTVALUE1}'
@@ -807,7 +806,7 @@ zabbix_export:
                   tags:
                     - tag: scope
                       value: availability
-            - uuid: 1a40aabfc7284b6a848b9d5b9834d11b
+            - uuid: cd6759e70695454783dd7c0a68ed2739
               name: 'Disk [{#MODEL}] on [{#LOCATION}]: Temperature'
               type: DEPENDENT
               key: 'huawei.oceanstor.v6.disk.temperature["{#ID}"]'
@@ -829,7 +828,7 @@ zabbix_export:
                 - tag: location
                   value: '{#LOCATION}'
               trigger_prototypes:
-                - uuid: 9067dcdd47a84a02be87de5fff13ebad
+                - uuid: aaf26be9ddff459692cd83187e66b5d4
                   expression: 'min(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.disk.temperature["{#ID}"],{$HUAWEI.OCEANSTOR_V6.DISK.TEMP.MAX.TIME})>{$HUAWEI.OCEANSTOR_V6.DISK.TEMP.MAX.WARN:"{#MODEL}"}'
                   name: 'Disk [{#MODEL}] on [{#LOCATION}]: Temperature is too high'
                   event_name: 'Disk [{#MODEL}] on [{#LOCATION}]: Temperature is too high (over {$HUAWEI.OCEANSTOR_V6.DISK.TEMP.MAX.WARN:"{#MODEL}"} for {$HUAWEI.OCEANSTOR_V6.DISK.TEMP.MAX.TIME})'
@@ -857,14 +856,14 @@ zabbix_export:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
-        - uuid: fe6e9ac0f6e94e31b16ce5f8b19c4a00
+        - uuid: a4abd7c7f02a425a9fed40a9adbda88d
           name: 'Enclosure discovery'
           type: DEPENDENT
           key: huawei.oceanstor.v6.enclosure.discovery
           delay: '0'
           description: 'Discovery of enclosures.'
           item_prototypes:
-            - uuid: 5438437c4dca4105b16229c3f6446b10
+            - uuid: 7babf3c5b33b4a6096fb4dc30d0fb930
               name: 'Enclosure [{#NAME}]: Health status'
               type: DEPENDENT
               key: 'huawei.oceanstor.v6.enclosure.health_status["{#NAME}"]'
@@ -888,7 +887,7 @@ zabbix_export:
                 - tag: enclosure
                   value: '{#NAME}'
               trigger_prototypes:
-                - uuid: 7d5de7084c6b4298967679dc371d83da
+                - uuid: 2df422b9873044b58246384d439077e0
                   expression: 'last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.enclosure.health_status["{#NAME}"])<>1'
                   name: 'Enclosure [{#NAME}]: Health status is not Normal'
                   opdata: 'Current status: {ITEM.LASTVALUE1}'
@@ -896,7 +895,7 @@ zabbix_export:
                   tags:
                     - tag: scope
                       value: availability
-            - uuid: 6109abefad0e47bf806b2c8c1d5cecb6
+            - uuid: 7b084bb85c1c45cc951f798ef10cb749
               name: 'Enclosure [{#NAME}]: Running status'
               type: DEPENDENT
               key: 'huawei.oceanstor.v6.enclosure.running_status["{#NAME}"]'
@@ -920,7 +919,7 @@ zabbix_export:
                 - tag: enclosure
                   value: '{#NAME}'
               trigger_prototypes:
-                - uuid: d98542189b9b406d842ed4f1afd1c423
+                - uuid: 3878efb681404801b078e68d03c1f422
                   expression: 'last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.enclosure.running_status["{#NAME}"])<>27'
                   name: 'Enclosure [{#NAME}]: Running status is not Online'
                   opdata: 'Current status: {ITEM.LASTVALUE1}'
@@ -928,7 +927,7 @@ zabbix_export:
                   tags:
                     - tag: scope
                       value: availability
-            - uuid: 646bb3b045fa4c6a874c10d870f40149
+            - uuid: 67c17f51ee7e4ad696aa95b9d590c299
               name: 'Enclosure [{#NAME}]: Temperature'
               type: DEPENDENT
               key: 'huawei.oceanstor.v6.enclosure.temperature["{#NAME}"]'
@@ -948,7 +947,7 @@ zabbix_export:
                 - tag: enclosure
                   value: '{#NAME}'
               trigger_prototypes:
-                - uuid: a991a89865e749feb615434670101ccd
+                - uuid: 84056bbf218a43ccbf6a3c94fff53973
                   expression: 'min(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.enclosure.temperature["{#NAME}"],{$HUAWEI.OCEANSTOR_V6.TEMP.MAX.TIME})>{$HUAWEI.OCEANSTOR_V6.TEMP.MAX.WARN}'
                   name: 'Enclosure [{#NAME}]: Temperature is too high'
                   event_name: 'Enclosure [{#NAME}]: Temperature is too high (over {$HUAWEI.OCEANSTOR_V6.TEMP.MAX.WARN} for {$HUAWEI.OCEANSTOR_V6.TEMP.MAX.TIME})'
@@ -970,14 +969,14 @@ zabbix_export:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
-        - uuid: 777c9cd7b2584ef0888048c0618a8b8d
+        - uuid: a03f01844ebd4b44afd45614c7e5ed22
           name: 'Fan discovery'
           type: DEPENDENT
           key: huawei.oceanstor.v6.fan.discovery
           delay: '0'
           description: 'Discovery of FANs.'
           item_prototypes:
-            - uuid: e57f7ac41b444f1988e401a78d18b8cc
+            - uuid: 4a08efa163e5448ab8d01e69535979a1
               name: 'FAN [{#ID}] on [{#LOCATION}]: Health status'
               type: DEPENDENT
               key: 'huawei.oceanstor.v6.fan.health_status["{#ID}:{#LOCATION}"]'
@@ -1003,7 +1002,7 @@ zabbix_export:
                 - tag: location
                   value: '{#LOCATION}'
               trigger_prototypes:
-                - uuid: 294360f7e14e410a85bbb7b62b298a06
+                - uuid: 61b916bc59964edaab00fb2f7fba7bdb
                   expression: 'last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.fan.health_status["{#ID}:{#LOCATION}"])<>1'
                   name: 'FAN [{#ID}] on [{#LOCATION}]: Health status is not Normal'
                   opdata: 'Current status: {ITEM.LASTVALUE1}'
@@ -1011,7 +1010,7 @@ zabbix_export:
                   tags:
                     - tag: scope
                       value: availability
-            - uuid: 333fec4bf1e5404e9a76e76231d6415c
+            - uuid: 22c3254048bc4973a62069fe9ff35dab
               name: 'FAN [{#ID}] on [{#LOCATION}]: Running status'
               type: DEPENDENT
               key: 'huawei.oceanstor.v6.fan.running_status["{#ID}:{#LOCATION}"]'
@@ -1037,7 +1036,7 @@ zabbix_export:
                 - tag: location
                   value: '{#LOCATION}'
               trigger_prototypes:
-                - uuid: 95ea84d081d94fe583c16bc48291d680
+                - uuid: 6fbecb53cd334f65a8fba8d1ab0d9218
                   expression: 'last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.fan.running_status["{#ID}:{#LOCATION}"])<>2'
                   name: 'FAN [{#ID}] on [{#LOCATION}]: Running status is not Running'
                   opdata: 'Current status: {ITEM.LASTVALUE1}'
@@ -1059,14 +1058,14 @@ zabbix_export:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
-        - uuid: 4af979a7917649dd970dfcbb9f5990e3
+        - uuid: 9ae2d586c6fd49dfa0e64bce7ed2f249
           name: 'LUN discovery'
           type: DEPENDENT
           key: huawei.oceanstor.v6.lun.discovery
           delay: '0'
           description: 'Discovery of LUNs.'
           item_prototypes:
-            - uuid: 85006d842ce645a7a6b85578aa0b5c63
+            - uuid: 3e6998def6124b32840002022139e540
               name: 'LUN [{#NAME}]: Read traffic per second'
               type: DEPENDENT
               key: 'huawei.oceanstor.v6.lun.bps.read["{#NAME}"]'
@@ -1085,10 +1084,10 @@ zabbix_export:
                 key: huawei.oceanstor.v6.lun.snmp.walk
               tags:
                 - tag: component
-                  value: traffic
+                  value: network
                 - tag: lun
                   value: '{#NAME}'
-            - uuid: d395c29f22b54012af1e51e41c96ba8b
+            - uuid: c43287cfec514dc1a5062b4acf6fa495
               name: 'LUN [{#NAME}]: Total traffic per second'
               type: DEPENDENT
               key: 'huawei.oceanstor.v6.lun.bps.total["{#NAME}"]'
@@ -1107,10 +1106,10 @@ zabbix_export:
                 key: huawei.oceanstor.v6.lun.snmp.walk
               tags:
                 - tag: component
-                  value: traffic
+                  value: network
                 - tag: lun
                   value: '{#NAME}'
-            - uuid: 80a049954ea545f8a76b96b9ba3ae9cd
+            - uuid: c69a608ac519491cab8596fd4bfff1fb
               name: 'LUN [{#NAME}]: Write traffic per second'
               type: DEPENDENT
               key: 'huawei.oceanstor.v6.lun.bps.write["{#NAME}"]'
@@ -1129,10 +1128,10 @@ zabbix_export:
                 key: huawei.oceanstor.v6.lun.snmp.walk
               tags:
                 - tag: component
-                  value: traffic
+                  value: network
                 - tag: lun
                   value: '{#NAME}'
-            - uuid: ae93f24cf27343c1a9777155adb0ab2d
+            - uuid: ec45b31280a2414d91ce7aa7fcf44615
               name: 'LUN [{#NAME}]: Capacity'
               type: DEPENDENT
               key: 'huawei.oceanstor.v6.lun.capacity["{#NAME}"]'
@@ -1154,10 +1153,10 @@ zabbix_export:
                 key: huawei.oceanstor.v6.lun.snmp.walk
               tags:
                 - tag: component
-                  value: traffic
+                  value: network
                 - tag: lun
                   value: '{#NAME}'
-            - uuid: b5919a8515054bb2ba85810d5b22747b
+            - uuid: e180a7a129a34ee3b8d2784cd892075b
               name: 'LUN [{#NAME}]: Read operations per second'
               type: DEPENDENT
               key: 'huawei.oceanstor.v6.lun.iops.read["{#NAME}"]'
@@ -1176,7 +1175,7 @@ zabbix_export:
                   value: operations
                 - tag: lun
                   value: '{#NAME}'
-            - uuid: adfb46812a3848a79e7fd2f9ae8678d4
+            - uuid: 2353b672d2aa4a06804589419c5602e0
               name: 'LUN [{#NAME}]: Total I/O per second'
               type: DEPENDENT
               key: 'huawei.oceanstor.v6.lun.iops.total["{#NAME}"]'
@@ -1195,7 +1194,7 @@ zabbix_export:
                   value: operations
                 - tag: lun
                   value: '{#NAME}'
-            - uuid: a44e74402e2647ecb7a812ddad334c73
+            - uuid: 21c76754695e4f09ae9907c6ca181fe7
               name: 'LUN [{#NAME}]: Write operations per second'
               type: DEPENDENT
               key: 'huawei.oceanstor.v6.lun.iops.write["{#NAME}"]'
@@ -1214,7 +1213,7 @@ zabbix_export:
                   value: operations
                 - tag: lun
                   value: '{#NAME}'
-            - uuid: f2796e5a03ae442ebdfb45b6e4d635f6
+            - uuid: 7cf0c90782b744a584e411bf3295a4fd
               name: 'LUN [{#NAME}]: Average read I/O latency'
               type: DEPENDENT
               key: 'huawei.oceanstor.v6.lun.latency.read["{#NAME}"]'
@@ -1237,11 +1236,12 @@ zabbix_export:
                   value: operations
                 - tag: lun
                   value: '{#NAME}'
-            - uuid: 3b7745d0226148538ecf23dfe3956263
+            - uuid: beacd28febb1411ab77074fe5a344b3a
               name: 'LUN [{#NAME}]: Average total I/O latency'
               type: DEPENDENT
               key: 'huawei.oceanstor.v6.lun.latency.total["{#NAME}"]'
               delay: '0'
+              value_type: FLOAT
               units: s
               description: 'Average I/O latency of the node.'
               preprocessing:
@@ -1260,7 +1260,7 @@ zabbix_export:
                 - tag: lun
                   value: '{#NAME}'
               trigger_prototypes:
-                - uuid: 2b398eb6be0f4e7e992273b5fb6118ce
+                - uuid: 919c9c661e3f42dcba7cbceaebc05617
                   expression: 'min(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.lun.latency.total["{#NAME}"],{$HUAWEI.OCEANSTOR_V6.LUN.IO.TIME.MAX.TIME})>{$HUAWEI.OCEANSTOR_V6.LUN.IO.TIME.MAX.WARN}'
                   name: 'LUN [{#NAME}]: Average I/O response time is too high'
                   event_name: 'LUN [{#NAME}]: Average I/O response time is too high (over {$HUAWEI.OCEANSTOR_V6.LUN.IO.TIME.MAX.WARN}μs for {$HUAWEI.OCEANSTOR_V6.LUN.IO.TIME.MAX.TIME})'
@@ -1269,7 +1269,7 @@ zabbix_export:
                   tags:
                     - tag: scope
                       value: performance
-            - uuid: c770c7bc88034436a71374138e1f4feb
+            - uuid: 18edb1b0b27e4be4badf566ff6973dbb
               name: 'LUN [{#NAME}]: Average write I/O latency'
               type: DEPENDENT
               key: 'huawei.oceanstor.v6.lun.latency.write["{#NAME}"]'
@@ -1292,7 +1292,7 @@ zabbix_export:
                   value: operations
                 - tag: lun
                   value: '{#NAME}'
-            - uuid: ad79e6cf340c4bd49f6b8bc8e11053d5
+            - uuid: e66dc4118b8043ca9be590ae1fc509ef
               name: 'LUN [{#NAME}]: Status'
               type: DEPENDENT
               key: 'huawei.oceanstor.v6.lun.status["{#NAME}"]'
@@ -1316,7 +1316,7 @@ zabbix_export:
                 - tag: lun
                   value: '{#NAME}'
               trigger_prototypes:
-                - uuid: 876fa1bad1c94add9de79d09684ce30c
+                - uuid: 3ea80d4ef5294e9b86d9b500681b4816
                   expression: 'last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.lun.status["{#NAME}"])<>1'
                   name: 'LUN [{#NAME}]: Status is not Normal'
                   opdata: 'Current status: {ITEM.LASTVALUE1}'
@@ -1325,7 +1325,7 @@ zabbix_export:
                     - tag: scope
                       value: availability
           graph_prototypes:
-            - uuid: 21d62c59e5d84b808c7fa716fef1c5d8
+            - uuid: e6e60a64dc2540ab963a910ed4de7a51
               name: 'LUN [{#NAME}]: LUN I/O'
               graph_items:
                 - color: 199C0D
@@ -1342,7 +1342,7 @@ zabbix_export:
                   item:
                     host: 'Huawei OceanStor V6 by SNMP'
                     key: 'huawei.oceanstor.v6.lun.iops.write["{#NAME}"]'
-            - uuid: 0e52a46c224b4ef89f9b061d4f1985be
+            - uuid: 46bdcee9618d4074b3ac6367146951a5
               name: 'LUN [{#NAME}]: LUN I/O latency'
               graph_items:
                 - color: 199C0D
@@ -1359,7 +1359,7 @@ zabbix_export:
                   item:
                     host: 'Huawei OceanStor V6 by SNMP'
                     key: 'huawei.oceanstor.v6.lun.latency.write["{#NAME}"]'
-            - uuid: cf6fba4833ac47bca5329694658440c1
+            - uuid: 2ac150dce55249e3951edf46eb1cb0df
               name: 'LUN [{#NAME}]: LUN traffic'
               graph_items:
                 - color: 199C0D
@@ -1384,14 +1384,14 @@ zabbix_export:
                 - '{#NAME}'
                 - 1.3.6.1.4.1.34774.4.1.19.9.4.1.2
                 - '0'
-        - uuid: 62bfd7649837462a96b090e52543939b
+        - uuid: f7fad4cdd7e74a449318e31900c58dbb
           name: 'Node performance discovery'
           type: DEPENDENT
           key: huawei.oceanstor.v6.node.discovery
           delay: '0'
           description: 'Discovery of nodes performance counters.'
           item_prototypes:
-            - uuid: 5c05041d4aae465e9b60f010b1a0e506
+            - uuid: f95b67c8d5d34f9da3ed1491c353b33b
               name: 'Node [{#NODE}]: Read traffic per second'
               type: DEPENDENT
               key: 'huawei.oceanstor.v6.node.bps.read["{#NODE}"]'
@@ -1410,10 +1410,10 @@ zabbix_export:
                 key: huawei.oceanstor.v6.node.snmp.walk
               tags:
                 - tag: component
-                  value: traffic
+                  value: network
                 - tag: node
                   value: '{#NODE}'
-            - uuid: e7a15a70ffc24bbda13467a58e91b943
+            - uuid: 1f3bb492970b4027884b92b505629c6e
               name: 'Node [{#NODE}]: Total traffic per second'
               type: DEPENDENT
               key: 'huawei.oceanstor.v6.node.bps.total["{#NODE}"]'
@@ -1432,10 +1432,10 @@ zabbix_export:
                 key: huawei.oceanstor.v6.node.snmp.walk
               tags:
                 - tag: component
-                  value: traffic
+                  value: network
                 - tag: node
                   value: '{#NODE}'
-            - uuid: d6d47f333259490d82e94a3e64d13fe5
+            - uuid: af7c068d5134442bb09b38c767cbc631
               name: 'Node [{#NODE}]: Write traffic per second'
               type: DEPENDENT
               key: 'huawei.oceanstor.v6.node.bps.write["{#NODE}"]'
@@ -1454,10 +1454,10 @@ zabbix_export:
                 key: huawei.oceanstor.v6.node.snmp.walk
               tags:
                 - tag: component
-                  value: traffic
+                  value: network
                 - tag: node
                   value: '{#NODE}'
-            - uuid: f16b59b7b91c469ca4cb77d6c44cd04a
+            - uuid: e853a21f897346e0a1756dad24ac1283
               name: 'Node [{#NODE}]: CPU utilization'
               type: DEPENDENT
               key: 'huawei.oceanstor.v6.node.cpu["{#NODE}"]'
@@ -1478,7 +1478,7 @@ zabbix_export:
                 - tag: node
                   value: '{#NODE}'
               trigger_prototypes:
-                - uuid: 9b40267671594690b6ab5c99631a1eee
+                - uuid: c72396c32e084414baadfb348d3a1cea
                   expression: 'min(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.node.cpu["{#NODE}"],5m)>{$CPU.UTIL.CRIT}'
                   name: 'Node [{#NODE}]: High CPU utilization'
                   event_name: 'Node [{#NODE}]: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
@@ -1488,7 +1488,7 @@ zabbix_export:
                   tags:
                     - tag: scope
                       value: performance
-            - uuid: 420e2952d2b84fcda893a0d5cfb871a5
+            - uuid: c71f8355bde14dceb229fba492b9ac91
               name: 'Node [{#NODE}]: Read operations per second'
               type: DEPENDENT
               key: 'huawei.oceanstor.v6.node.iops.read["{#NODE}"]'
@@ -1507,7 +1507,7 @@ zabbix_export:
                   value: operations
                 - tag: node
                   value: '{#NODE}'
-            - uuid: 57ea057db20547b2979eff47e5065d12
+            - uuid: 51439886809745208877caa660a5e953
               name: 'Node [{#NODE}]: Total I/O per second'
               type: DEPENDENT
               key: 'huawei.oceanstor.v6.node.iops.total["{#NODE}"]'
@@ -1526,7 +1526,7 @@ zabbix_export:
                   value: operations
                 - tag: node
                   value: '{#NODE}'
-            - uuid: 6df44586b9014881b50c159236130712
+            - uuid: fd9755ff4ef346c1a6e3ce43891fd6eb
               name: 'Node [{#NODE}]: Write operations per second'
               type: DEPENDENT
               key: 'huawei.oceanstor.v6.node.iops.write["{#NODE}"]'
@@ -1546,7 +1546,7 @@ zabbix_export:
                 - tag: node
                   value: '{#NODE}'
           graph_prototypes:
-            - uuid: cd7495ef5bac44688ffaebdfac066b0c
+            - uuid: 26e44f9399fd4d1f8504d8cbccab3a56
               name: 'Node [{#NODE}]: CPU utilization'
               ymin_type_1: FIXED
               ymax_type_1: FIXED
@@ -1556,7 +1556,7 @@ zabbix_export:
                   item:
                     host: 'Huawei OceanStor V6 by SNMP'
                     key: 'huawei.oceanstor.v6.node.cpu["{#NODE}"]'
-            - uuid: f8024933811d453b99b46a954cfbae27
+            - uuid: 5909816dcac74dd492cde0b964ac0705
               name: 'Node [{#NODE}]: Node I/O'
               graph_items:
                 - color: 199C0D
@@ -1573,7 +1573,7 @@ zabbix_export:
                   item:
                     host: 'Huawei OceanStor V6 by SNMP'
                     key: 'huawei.oceanstor.v6.node.iops.write["{#NODE}"]'
-            - uuid: 7388f14809844d39ac7423de46ee3937
+            - uuid: d69a0f1bf42a4fe6bdcd4bb10318effb
               name: 'Node [{#NODE}]: Node traffic'
               graph_items:
                 - color: 199C0D
@@ -1598,14 +1598,14 @@ zabbix_export:
                 - '{#NODE}'
                 - 1.3.6.1.4.1.34774.4.1.21.3.1.1
                 - '0'
-        - uuid: c3b461bcd7634792acbbfa37675cf607
+        - uuid: eb0e35cdc3014b3898ad5a6720715ce6
           name: 'Storage pool discovery'
           type: DEPENDENT
           key: huawei.oceanstor.v6.pool.discovery
           delay: '0'
           description: 'Discovery of storage pools.'
           item_prototypes:
-            - uuid: 4c1c3bc8869a4775b7f6a4c21edb1850
+            - uuid: a3c342459f1c4c6dbdb58ff48efd1d9b
               name: 'Storage pool [{#NAME}]: Capacity free'
               type: DEPENDENT
               key: 'huawei.oceanstor.v6.pool.capacity.free["{#NAME}"]'
@@ -1627,7 +1627,7 @@ zabbix_export:
                   value: storage
                 - tag: pool
                   value: '{#NAME}'
-            - uuid: b9c12a8ea2604bb9bbb30bfdd899fe3a
+            - uuid: 15d4e63a8295458cb17f873bff59791f
               name: 'Storage pool [{#NAME}]: Capacity total'
               type: DEPENDENT
               key: 'huawei.oceanstor.v6.pool.capacity.total["{#NAME}"]'
@@ -1652,7 +1652,7 @@ zabbix_export:
                   value: storage
                 - tag: pool
                   value: '{#NAME}'
-            - uuid: 9ca654ec54f0471c8e59959a792c7604
+            - uuid: 1fea3b68249e475c97ff7e14645d5fda
               name: 'Storage pool [{#NAME}]: Health status'
               type: DEPENDENT
               key: 'huawei.oceanstor.v6.pool.health_status["{#NAME}"]'
@@ -1676,7 +1676,7 @@ zabbix_export:
                 - tag: pool
                   value: '{#NAME}'
               trigger_prototypes:
-                - uuid: cb33cfc443bd49cfb0e8862515f8c481
+                - uuid: 86016fd601704dd6943e952aa5f4bff6
                   expression: 'last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.pool.health_status["{#NAME}"])<>1'
                   name: 'Storage pool [{#NAME}]: Health status is not Normal'
                   opdata: 'Current status: {ITEM.LASTVALUE1}'
@@ -1684,7 +1684,7 @@ zabbix_export:
                   tags:
                     - tag: scope
                       value: availability
-            - uuid: 93d705a0ac84420ba35a54753652eacf
+            - uuid: 5d4c872c88864dcd9e19ea603914f8fb
               name: 'Storage pool [{#NAME}]: Running status'
               type: DEPENDENT
               key: 'huawei.oceanstor.v6.pool.running_status["{#NAME}"]'
@@ -1708,7 +1708,7 @@ zabbix_export:
                 - tag: pool
                   value: '{#NAME}'
               trigger_prototypes:
-                - uuid: 1921c51b36374cd4b9efe7e49f8cd2da
+                - uuid: 462a2775a1c144eb9854bccab7d38ca0
                   expression: 'last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.pool.running_status["{#NAME}"])<>27'
                   name: 'Storage pool [{#NAME}]: Running status is not Online'
                   opdata: 'Current status: {ITEM.LASTVALUE1}'
@@ -1717,7 +1717,7 @@ zabbix_export:
                     - tag: scope
                       value: availability
           graph_prototypes:
-            - uuid: 4660952f212447d6b8a0819693688415
+            - uuid: 7c57d0ba8e4144ba903104648709590e
               name: 'Storage pool [{#NAME}]: Capacity'
               graph_items:
                 - color: 199C0D
@@ -1736,9 +1736,6 @@ zabbix_export:
               parameters:
                 - '{#NAME}'
                 - 1.3.6.1.4.1.34774.4.1.23.4.2.1.2
-                - '0'
-                - '{#THRESHOLD}'
-                - 1.3.6.1.4.1.34774.4.1.23.4.2.1.14
                 - '0'
       tags:
         - tag: class
@@ -1771,15 +1768,6 @@ zabbix_export:
         - macro: '{$HUAWEI.OCEANSTOR_V6.MEM.MAX.WARN}'
           value: '90'
           description: 'Maximum percentage of memory used.'
-        - macro: '{$HUAWEI.OCEANSTOR_V6.NODE.IO.DELAY.MAX.TIME}'
-          value: 5m
-          description: 'The time during which average I/O latency of node may exceed the threshold.'
-        - macro: '{$HUAWEI.OCEANSTOR_V6.NODE.IO.DELAY.MAX.WARN}'
-          value: '20'
-          description: 'Maximum average I/O latency of node in milliseconds.'
-        - macro: '{$HUAWEI.OCEANSTOR_V6.POOL.CAPACITY.THRESH.TIME}'
-          value: 5m
-          description: 'The time during which free capacity may exceed the {#THRESHOLD} from hwInfoStoragePoolFullThreshold.'
         - macro: '{$HUAWEI.OCEANSTOR_V6.TEMP.MAX.TIME}'
           value: 3m
           description: 'The time during which temperature of enclosure may exceed the threshold.'
@@ -1796,13 +1784,13 @@ zabbix_export:
           value: 5m
           description: 'Time interval for the SNMP availability trigger.'
       dashboards:
-        - uuid: 903ed81af3f44d79843555a48a52c069
-          name: 'OceanStor V6: Overview'
+        - uuid: 7660a71516b84b47b104ab4f976a13ef
+          name: Overview
           pages:
             - name: 'Capacity total'
               widgets:
                 - type: graph
-                  name: 'OceanStor V6: Capacity total'
+                  name: 'Capacity total'
                   width: '72'
                   height: '4'
                   fields:
@@ -1810,7 +1798,7 @@ zabbix_export:
                       name: graphid.0
                       value:
                         host: 'Huawei OceanStor V6 by SNMP'
-                        name: 'OceanStor V6: Capacity'
+                        name: Capacity
                     - type: STRING
                       name: reference
                       value: EFDAA
@@ -1920,7 +1908,7 @@ zabbix_export:
                       name: reference
                       value: CFFDA
       valuemaps:
-        - uuid: f5e1e39d571c4924a3bc790a68655d57
+        - uuid: 98ea0c82a56a434ea9cd02ddb31eef6a
           name: 'Huawei storage: Controller role'
           mappings:
             - value: '0'
@@ -1929,7 +1917,7 @@ zabbix_export:
               newvalue: Master
             - value: '2'
               newvalue: Slave
-        - uuid: 75dadef1eb89477e98a720f565b22fb2
+        - uuid: 7ef6825cca084ab9a3250448596fac32
           name: 'Huawei storage: Health status'
           mappings:
             - value: '0'
@@ -1964,7 +1952,7 @@ zabbix_export:
               newvalue: Invalid
             - value: '15'
               newvalue: 'Write protect'
-        - uuid: bc8c328c71284602a6f20cfab9ac3671
+        - uuid: 654d5d768ff041c6abc0a438be5698f4
           name: 'Huawei storage: LUN status'
           mappings:
             - value: '1'
@@ -1975,7 +1963,7 @@ zabbix_export:
               newvalue: Unformatted
             - value: '4'
               newvalue: Formatting
-        - uuid: 63c504430f6a4aad9259711d3d78f168
+        - uuid: e03d03289e84401b8c7e2ba1ddc67ba7
           name: 'Huawei storage: Running status'
           mappings:
             - value: '0'
@@ -2198,14 +2186,14 @@ zabbix_export:
               newvalue: 'Running(clearing data)'
             - value: '109'
               newvalue: 'Running(synchronizing data)'
-        - uuid: 9401229bcb7e412fb1978cdfd66b038a
+        - uuid: f8cf9fe95cc54dcba96d4bfe8d8ec34b
           name: 'Service state'
           mappings:
             - value: '0'
               newvalue: Down
             - value: '1'
               newvalue: Up
-        - uuid: 0e0faaaa506a4667a4878accd9ce5040
+        - uuid: da38017b841a4c17adff896fe2cbc9fe
           name: zabbix.host.available
           mappings:
             - value: '0'
@@ -2215,7 +2203,7 @@ zabbix_export:
             - value: '2'
               newvalue: unknown
   triggers:
-    - uuid: bad9ca0c690e4a44a6f6c5ab63b3068f
+    - uuid: 41d6237c6623468ba232930318f7a335
       expression: '(last(/Huawei OceanStor V6 by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Huawei OceanStor V6 by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Huawei OceanStor V6 by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Huawei OceanStor V6 by SNMP/system.net.uptime[sysUpTime.0])<10m)'
       name: 'Host has been restarted'
       event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
@@ -2229,8 +2217,8 @@ zabbix_export:
         - tag: scope
           value: notice
   graphs:
-    - uuid: 8710f4b2733a41d4aa713bbb9117a9e6
-      name: 'OceanStor V6: Capacity'
+    - uuid: b4c9351df38148929d02371a49b751e4
+      name: Capacity
       graph_items:
         - color: 199C0D
           item:
