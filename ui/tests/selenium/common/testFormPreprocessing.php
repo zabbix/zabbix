@@ -338,7 +338,11 @@ abstract class testFormPreprocessing extends CWebTest {
 						'Key' => 'snmp-walk-value-unchanged[{#KEY}]'
 					],
 					'preprocessing' => [
-						['type' => 'SNMP walk value', 'parameter_1' => '1.3.6.1.2.1.1.1', 'parameter_2' => 'Unchanged']
+						[
+							'type' => 'SNMP walk value',
+							'parameter_1' => '1.3.6.1.2.1.1.1',
+							'parameter_2' => 'Unchanged'
+						]
 					]
 				]
 			],
@@ -350,7 +354,11 @@ abstract class testFormPreprocessing extends CWebTest {
 						'Key' => 'snmp-walk-value-utf8-hex[{#KEY}]'
 					],
 					'preprocessing' => [
-						['type' => 'SNMP walk value', 'parameter_1' => 'SNMPv2-MIB::sysName.0', 'parameter_2' => 'UTF-8 from Hex-STRING']
+						[
+							'type' => 'SNMP walk value',
+							'parameter_1' => 'SNMPv2-MIB::sysName.0',
+							'parameter_2' => 'UTF-8 from Hex-STRING'
+						]
 					]
 				]
 			],
@@ -362,7 +370,11 @@ abstract class testFormPreprocessing extends CWebTest {
 						'Key' => 'snmp-walk-value-mac-hex[{#KEY}]'
 					],
 					'preprocessing' => [
-						['type' => 'SNMP walk value', 'parameter_1' => 'iso.org.dod.internet.mgmt.mib-2.system.sysDescr', 'parameter_2' => 'MAC from Hex-STRING']
+						[
+							'type' => 'SNMP walk value',
+							'parameter_1' => 'iso.org.dod.internet.mgmt.mib-2.system.sysDescr',
+							'parameter_2' => 'MAC from Hex-STRING'
+						]
 					]
 				]
 			],
@@ -374,7 +386,11 @@ abstract class testFormPreprocessing extends CWebTest {
 						'Key' => 'snmp-walk-value-int-bits[{#KEY}]'
 					],
 					'preprocessing' => [
-						['type' => 'SNMP walk value', 'parameter_1' => '1.2.3.4.5.6.7.8.9', 'parameter_2' => 'Integer from BITS']
+						[
+							'type' => 'SNMP walk value',
+							'parameter_1' => '1.2.3.4.5.6.7.8.9',
+							'parameter_2' => 'Integer from BITS'
+						]
 					]
 				]
 			],
