@@ -44,13 +44,21 @@ class testUserParametersReload extends CIntegrationTest {
 			'component' => self::COMPONENT_AGENT
 		],
 		[
+			'key' => self::ITEM_NAME_03,
+			'component' => self::COMPONENT_AGENT
+		],
+		[
 			'key' => self::ITEM_NAME_01,
 			'component' => self::COMPONENT_AGENT2
 		],
 		[
 			'key' => self::ITEM_NAME_02,
 			'component' => self::COMPONENT_AGENT2
-		]
+		],
+		[
+			'key' => self::ITEM_NAME_03,
+			'component' => self::COMPONENT_AGENT2
+		],
 	];
 
 	/**
