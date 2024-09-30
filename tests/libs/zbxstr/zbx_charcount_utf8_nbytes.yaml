@@ -34,7 +34,7 @@ in:
 out:
   result: 1
 ---
-test case: "5. Newlines and spaces"
+test case: "6. Newlines and spaces"
 in:
   text: "\n  $"
   size: 5

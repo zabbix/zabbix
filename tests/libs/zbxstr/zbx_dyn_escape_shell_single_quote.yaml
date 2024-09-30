@@ -41,7 +41,7 @@ in:
 out:
   string: \\'\''\\\'\''\\\
 ---
-test case: "7. Quote on second line"
+test case: "8. Quote on second line"
 in:
   arg: "Hello\nit's me"
 out:
