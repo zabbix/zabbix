@@ -2103,13 +2103,14 @@ button {
 .dashboard-grid-iterator-contents.is-loading::before {
   margin: calc(.25rem + 1px); }
 
-.dashboard-list .dashboard-list-item {
+.dashboard-list .dashboard-tags {
   display: flex;
-  justify-content: space-between; }
-  .dashboard-list .dashboard-list-item .status-green {
+  justify-content: flex-end;
+  column-gap: 4px; }
+  .dashboard-list .dashboard-tags .status-green {
     background-color: #555555;
     border-color: #555555; }
-  .dashboard-list .dashboard-list-item .status-yellow {
+  .dashboard-list .dashboard-tags .status-yellow {
     background-color: #555555;
     border-color: #555555; }
 
@@ -2458,13 +2459,10 @@ button {
     .list-table.compact-view .tag {
       max-width: 133px; } }
 
-.list-table .tag,
 .hintbox-wrap .tag {
-  margin-right: 0;
   cursor: pointer; }
-  .list-table .tag:not(:first-child),
-  .hintbox-wrap .tag:not(:first-child) {
-    margin-left: 3px; }
+  .hintbox-wrap .tag:last-child {
+    margin-right: 0; }
 
 .list-table .timeline-date,
 .list-table .timeline-axis,
@@ -5567,6 +5565,8 @@ form.is-loading {
   display: inline-block;
   padding: 5px;
   position: relative; }
+  .table-forms-separator .wordbreak {
+    white-space: normal; }
 
 .border-left {
   border-left: 1px solid #888888; }
@@ -5650,6 +5650,9 @@ select {
   select[readonly] {
     color: #000000 !important;
     pointer-events: none; }
+
+div .overlay-dialogue.wordbreak {
+  white-space: normal; }
 
 .form-fields-inline label {
   margin: 0 8px 0 3px; }
@@ -6115,6 +6118,8 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
   border: 1px solid #383838;
   border-bottom-color: #353535;
   box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.5); }
+  .overlay-dialogue .wordbreak {
+    white-space: normal; }
   .overlay-dialogue .overlay-dialogue-header {
     margin: -8px -10px 6px -10px;
     padding: 8px 10px;

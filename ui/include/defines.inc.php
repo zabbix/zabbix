@@ -2294,7 +2294,6 @@ define('ZBX_STYLE_ZSELECT_HOST_INTERFACE', 'z-select-host-interface');
 
 // Dashboard list table classes.
 define('ZBX_STYLE_DASHBOARD_LIST', 'dashboard-list');
-define('ZBX_STYLE_DASHBOARD_LIST_ITEM', 'dashboard-list-item');
 
 // Icons.
 define('ZBX_ICON_ADMINISTRATION', 'zi-administration');

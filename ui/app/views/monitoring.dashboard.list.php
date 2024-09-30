@@ -82,7 +82,8 @@ $table = (new CTableInfo())
 		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'],
 			(new CUrl('zabbix.php'))
 				->setArgument('action', 'dashboard.list')
-				->getUrl())
+				->getUrl()),
+		new CColHeader()
 	])
 	->setPageNavigation($data['paging']);
 
@@ -109,8 +110,8 @@ foreach ($data['dashboards'] as $dashboard) {
 					->setArgument('dashboardid', $dashboard['dashboardid'])
 					->getUrl()
 			))->addClass(ZBX_STYLE_WORDBREAK),
-			$tags ? new CDiv($tags) : null
-		]))->addClass(ZBX_STYLE_DASHBOARD_LIST_ITEM)
+		])),
+		$tags ? (new CCol($tags))->addClass(ZBX_STYLE_LIST_TABLE_ACTIONS) : null
 	]);
 }
 
