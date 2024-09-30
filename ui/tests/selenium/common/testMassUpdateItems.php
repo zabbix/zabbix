@@ -1730,7 +1730,8 @@ class testMassUpdateItems extends CWebTest{
 						['type' => 'In range', 'parameter_1' => '-5', 'parameter_2' => '9.5'],
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '5'],
 						['type' => 'Prometheus pattern', 'parameter_1' => 'cpu_usage_system', 'parameter_2' => 'label',
-								'parameter_3' => 'label_name']
+								'parameter_3' => 'label_name'
+						]
 					],
 					'Screenshot' => true
 				]

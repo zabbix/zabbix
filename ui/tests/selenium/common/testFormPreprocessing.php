@@ -954,7 +954,8 @@ abstract class testFormPreprocessing extends CWebTest {
 						['type' => 'In range', 'parameter_1' => '-5', 'parameter_2' => '9.5'],
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '5'],
 						['type' => 'Prometheus pattern', 'parameter_1' => 'cpu_usage_system', 'parameter_2' => 'label',
-								'parameter_3' => 'label_name']
+								'parameter_3' => 'label_name'
+						]
 					],
 					'screenshot' => true
 				]
@@ -1529,7 +1530,7 @@ abstract class testFormPreprocessing extends CWebTest {
 						['type' => 'Simple change']
 					],
 					'error' => 'Invalid parameter "/1/preprocessing/2": only one object can exist within '.
-						'the combinations of (type)=((9, 10)).'
+							'the combinations of (type)=((9, 10)).'
 				]
 			],
 			// Change - Change per second.
@@ -1545,7 +1546,7 @@ abstract class testFormPreprocessing extends CWebTest {
 						['type' => 'Change per second']
 					],
 					'error' => 'Invalid parameter "/1/preprocessing/2": only one object can exist within '.
-						'the combinations of (type)=((9, 10)).'
+							'the combinations of (type)=((9, 10)).'
 				]
 			],
 			[
@@ -1560,7 +1561,7 @@ abstract class testFormPreprocessing extends CWebTest {
 						['type' => 'Change per second']
 					],
 					'error' => 'Invalid parameter "/1/preprocessing/2": only one object can exist within '.
-						'the combinations of (type)=((9, 10)).'
+							'the combinations of (type)=((9, 10)).'
 				]
 			],
 			// Validation - In range.
@@ -1627,7 +1628,7 @@ abstract class testFormPreprocessing extends CWebTest {
 						['type' => 'In range', 'parameter_1' => '8', 'parameter_2' => '-8']
 					],
 					'error' => 'Invalid parameter "/1/preprocessing/1/params/2": cannot be less than or equal '.
-						'to the value of parameter "/1/preprocessing/1/params/1".'
+							'to the value of parameter "/1/preprocessing/1/params/1".'
 				]
 			],
 			// Validation - Matches regular expression.
@@ -1726,7 +1727,7 @@ abstract class testFormPreprocessing extends CWebTest {
 						['type' => 'Discard unchanged']
 					],
 					'error' => 'Invalid parameter "/1/preprocessing/2": only one object can exist within '.
-						'the combinations of (type)=((19, 20)).'
+							'the combinations of (type)=((19, 20)).'
 				]
 			],
 			// Throttling - Discard unchanged with heartbeat.
@@ -1742,7 +1743,7 @@ abstract class testFormPreprocessing extends CWebTest {
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '1']
 					],
 					'error' => 'Invalid parameter "/1/preprocessing/2": only one object can exist within '.
-						'the combinations of (type)=((19, 20)).'
+							'the combinations of (type)=((19, 20)).'
 				]
 			],
 			[
@@ -1757,7 +1758,7 @@ abstract class testFormPreprocessing extends CWebTest {
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '1']
 					],
 					'error' => 'Invalid parameter "/1/preprocessing/2": only one object can exist within '.
-						'the combinations of (type)=((19, 20)).'
+							'the combinations of (type)=((19, 20)).'
 				]
 			]
 		]);
