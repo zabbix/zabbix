@@ -197,8 +197,7 @@ abstract class testFormPreprocessing extends CWebTest {
 	 * {Preprocessing step category} - {Preprocessing step name}.
 	 * The category is shown in UI.
 	 */
-	public static function getCommonPreprocessingCreateData()
-	{
+	public static function getCommonPreprocessingCreateData() {
 		return [
 			// Text - Regular expression.
 			[
