@@ -2331,7 +2331,8 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 			}
 			else if (0 == strcmp(m, MVAR_HOST_CONN))
 			{
-				ret = zbx_dc_get_interface_value(dc_host->hostid, 0, &replace_to, ZBX_REQUEST_HOST_CONN);
+				ret = zbx_dc_get_interface_value(dc_host->hostid, 0, &replace_to,
+						ZBX_REQUEST_HOST_CONN);
 			}
 			else if (0 == strncmp(m, MVAR_INVENTORY, ZBX_CONST_STRLEN(MVAR_INVENTORY)))
 			{
