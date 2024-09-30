@@ -679,4 +679,11 @@ class CPage {
 		$this->getDriver()->executeScript('document.getElementsByClassName(\'wrapper\')[0].scrollTo(0,'.
 				' document.body.scrollHeight)');
 	}
+
+	/**
+	 * Navigates back to the previous page.
+	 */
+	public function navigateBack() {
+		$this->driver->navigate()->back();
+	}
 }
