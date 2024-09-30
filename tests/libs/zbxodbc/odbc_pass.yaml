@@ -13,7 +13,7 @@ in:
   pwd: 'pass;word'
 
 out:
-  value: 'UID=test;PWD={pass;word}'
+  value: 'UID=test;PWD={pass;word};'
 ---
 test case: backward compatibility for already enclosed {} with ;
 in:
@@ -29,7 +29,7 @@ in:
   pwd: '}pass;word{'
 
 out:
-  value: 'UID=test;PWD={}}pass;word{}'
+  value: 'UID=test;PWD={}}pass;word{};'
 
 ---
 test case: pass;}word
@@ -38,7 +38,7 @@ in:
   pwd: 'pass;}word'
 
 out:
-  value: 'UID=test;PWD={pass;}}word}'
+  value: 'UID=test;PWD={pass;}}word};'
 
 ---
 test case: pass;}}word
@@ -47,7 +47,7 @@ in:
   pwd: 'pass;}}word'
 
 out:
-  value: 'UID=test;PWD={pass;}}}}word}'
+  value: 'UID=test;PWD={pass;}}}}word};'
 
 ---
 test case: Zj;Fp&f`2BjWIX|YhWC9*PS!$c0obJR5
@@ -56,7 +56,7 @@ in:
   pwd: 'Zj;Fp&f`2BjWIX|YhWC9*PS!$c0obJR5'
 
 out:
-  value: 'UID=test;PWD={Zj;Fp&f`2BjWIX|YhWC9*PS!$c0obJR5}'
+  value: 'UID=test;PWD={Zj;Fp&f`2BjWIX|YhWC9*PS!$c0obJR5};'
 
 ---
 test case: Zj;Fp&f`2BjWIX|}YhWC9*PS!$c0obJR5
@@ -65,7 +65,7 @@ in:
   pwd: 'Zj;Fp&f`2BjWIX|}YhWC9*PS!$c0obJR5'
 
 out:
-  value: 'UID=test;PWD={Zj;Fp&f`2BjWIX|}}YhWC9*PS!$c0obJR5}'
+  value: 'UID=test;PWD={Zj;Fp&f`2BjWIX|}}YhWC9*PS!$c0obJR5};'
 
 ---
 test case: connection without ;
@@ -74,7 +74,7 @@ in:
   pwd: 'pass;}}word'
 
 out:
-  value: 'UID=test;PWD={pass;}}}}word}'
+  value: 'UID=test;PWD={pass;}}}}word};'
 
 ---
 test case: ; after }}}
@@ -83,7 +83,7 @@ in:
   pwd: '}}}};'
 
 out:
-  value: 'UID=test;PWD={}}}}}}}};}'
+  value: 'UID=test;PWD={}}}}}}}};};'
 
 ---
 test case: pass word
@@ -110,7 +110,7 @@ in:
   pwd: 'password;}'
 
 out:
-  value: 'UID=test;PWD={password;}}}'
+  value: 'UID=test;PWD={password;}}};'
 
 ---
 test case: only }
@@ -137,7 +137,26 @@ in:
   pwd: ';'
 
 out:
-  value: 'UID=test;PWD={;}'
+  value: 'UID=test;PWD={;};'
+
+---
+test case: semicolon at the end {pass};
+in:
+  connection: 'UID=test;'
+  pwd: '{pass};'
+
+out:
+  value: 'UID=test;PWD={pass};'
+
+---
+test case: semicolon at the end {pa;ss};
+in:
+  connection: 'UID=test;'
+  pwd: '{pa;ss};'
+
+out:
+  value: 'UID=test;PWD={pa;ss};'
+
 
 ---
 test case: =
