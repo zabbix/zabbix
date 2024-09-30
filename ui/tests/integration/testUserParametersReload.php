@@ -211,6 +211,22 @@ class testUserParametersReload extends CIntegrationTest {
 			$this->checkItemState($component.':'.self::ITEM_NAME_01, ITEM_STATE_NOTSUPPORTED);
 			$this->checkItemState($component.':'.self::ITEM_NAME_02, ITEM_STATE_NOTSUPPORTED);
 		}
+
+		$config = [
+			self::COMPONENT_AGENT => [
+				'UserParameter' => self::ITEM_NAME_01.',echo A, echo B, echo C'
+			],
+			self::COMPONENT_AGENT2 => [
+				'UserParameter' => self::ITEM_NAME_01.',echo A, echo B, echo C'
+			]
+		];
+
+		$this->executeUserParamReload($config);
+
+		foreach ([self::COMPONENT_AGENT, self::COMPONENT_AGENT2] as $component) {
+			$this->checkItemState($component.':'.self::ITEM_NAME_01, ITEM_STATE_NORMAL, ',echo A, echo B, echo C');
+			$this->checkItemState($component.':'.self::ITEM_NAME_02, ITEM_STATE_NOTSUPPORTED);
+		}
 	}
 
 	/**
