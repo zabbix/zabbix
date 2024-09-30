@@ -84,8 +84,8 @@ $table = (new CTableInfo())
 		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'],
 			(new CUrl('zabbix.php'))
 				->setArgument('action', 'dashboard.list')
-				->getUrl()),
-		new CColHeader()
+				->getUrl()
+		)->setColSpan(2)
 	]);
 
 foreach ($data['dashboards'] as $dashboard) {
@@ -112,7 +112,7 @@ foreach ($data['dashboards'] as $dashboard) {
 					->getUrl()
 			))->addClass(ZBX_STYLE_WORDBREAK),
 		])),
-		$tags ? (new CCol($tags))->addClass(ZBX_STYLE_LIST_TABLE_ACTIONS) : null
+		(new CCol($tags))->addClass(ZBX_STYLE_LIST_TABLE_ACTIONS)
 	]);
 }
 
