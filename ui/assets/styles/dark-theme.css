@@ -1469,16 +1469,12 @@ footer {
 .dashboard-grid-iterator-content.is-loading::before {
   margin: calc(.25rem + 1px); }
 
-.dashboard-list .dashboard-tags {
-  display: flex;
-  justify-content: flex-end;
-  column-gap: 4px; }
-  .dashboard-list .dashboard-tags .status-green {
-    background-color: #2f9f5e;
-    border-color: #2f9f5e; }
-  .dashboard-list .dashboard-tags .status-yellow {
-    background-color: #e79e0b;
-    border-color: #e79e0b; }
+.dashboard-list .status-green {
+  background-color: #2f9f5e;
+  border-color: #2f9f5e; }
+.dashboard-list .status-yellow {
+  background-color: #e79e0b;
+  border-color: #e79e0b; }
 
 .wrapper.layout-kioskmode .dashboard-navigation {
   display: none; }

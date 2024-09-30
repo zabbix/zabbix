@@ -112,7 +112,7 @@ foreach ($data['dashboards'] as $dashboard) {
 					->getUrl()
 			))->addClass(ZBX_STYLE_WORDBREAK),
 		])),
-		$tags ? (new CDiv($tags))->addClass('dashboard-tags') : null
+		$tags ? (new CCol($tags))->addClass(ZBX_STYLE_LIST_TABLE_ACTIONS) : null
 	]);
 }
 

@@ -1456,16 +1456,12 @@ footer {
 .dashboard-grid-iterator-content.is-loading::before {
   margin: calc(.25rem + 1px); }
 
-.dashboard-list .dashboard-tags {
-  display: flex;
-  justify-content: flex-end;
-  column-gap: 4px; }
-  .dashboard-list .dashboard-tags .status-green {
-    background-color: #e0e0e0;
-    border-color: #e0e0e0; }
-  .dashboard-list .dashboard-tags .status-yellow {
-    background-color: #e0e0e0;
-    border-color: #e0e0e0; }
+.dashboard-list .status-green {
+  background-color: #e0e0e0;
+  border-color: #e0e0e0; }
+.dashboard-list .status-yellow {
+  background-color: #e0e0e0;
+  border-color: #e0e0e0; }
 
 .wrapper.layout-kioskmode .dashboard-navigation {
   display: none; }
