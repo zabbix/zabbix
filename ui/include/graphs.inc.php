@@ -654,11 +654,9 @@ function find_period_end($periods, $time, $max_time) {
 *
 * @return iterable
 */
-function yieldGraphScaleInterval(float $min, float $max, string $units, int $power, int $rows): iterable {
+function yieldGraphScaleInterval(float $min, float $max, string $units, int $power, int $rows): Generator {
 	if ($units === 's') {
-		yield from yieldGraphScaleIntervalForSUnits($min, $max, $power, $rows);
-
-		return;
+		return yield from yieldGraphScaleIntervalForSUnits($min, $max, $power, $rows);
 	}
 
 	$is_binary = isBinaryUnits($units);
@@ -703,9 +701,8 @@ function yieldGraphScaleInterval(float $min, float $max, string $units, int $pow
 *
 * @return iterable
 */
-function yieldGraphScaleIntervalForSUnits(float $min, float $max, int $power, int $rows): iterable {
+function yieldGraphScaleIntervalForSUnits(float $min, float $max, int $power, int $rows): Generator {
 	static $power_multipliers = [
-		-1 => [1, 2, 5, 10, 20, 50, 100, 200, 500],
 		0 => [1, 2, 5, 10, 15, 20, 30],
 		1 => [1, 2, 5, 10, 15, 20, 30],
 		2 => [1, 2, 3, 4, 6, 12],
@@ -718,33 +715,37 @@ function yieldGraphScaleIntervalForSUnits(float $min, float $max, int $power, in
 
 	while (true) {
 		$use_power = $power == 5 ? 5 : getUnitsPower('s', $interval);
-		$use_power_base = getUnitsBase('s', $use_power);
+		$base = getUnitsBase('s', $use_power);
 
-		if ($use_power == 5) {
-			$exponent = max(0, floor(log10($interval / $use_power_base)));
+		if (array_key_exists($use_power, $power_multipliers)) {
+			foreach ($power_multipliers[$use_power] as $multiplier) {
+				$candidate = truncateFloat($base * $multiplier);
 
-			while (true) {
-				foreach ([1, 2, 5] as $multiplier) {
-					$candidate = truncateFloat($use_power_base * pow(10, $exponent) * $multiplier);
-
-					if ($candidate >= $interval) {
-						yield $candidate;
-					}
+				if ($candidate >= $interval) {
+					yield $candidate;
 				}
-
-				$exponent++;
 			}
+
+			$interval = getUnitsBase('s', $use_power + 1);
+
+			continue;
 		}
 
-		foreach ($power_multipliers[$use_power] as $multiplier) {
-			$candidate = truncateFloat($use_power_base * $multiplier);
+		$exponent = floor(log10($interval / $base));
+
+		if ($exponent < 0 && $use_power == 5) {
+			$exponent = 0;
+		}
+
+		foreach ([1, 2, 5] as $multiplier) {
+			$candidate = truncateFloat($base * pow(10, $exponent) * $multiplier);
 
 			if ($candidate >= $interval) {
 				yield $candidate;
 			}
 		}
 
-		$interval = getUnitsBase('s', $use_power + 1);
+		$interval = truncateFloat($base * pow(10, $exponent + 1));
 	}
 }
 
@@ -915,7 +916,7 @@ function calculateGraphScaleValues(float $min, float $max, bool $min_calculated,
 
 	$pre_conversion = convertUnitsRaw($options);
 
-	if ($pre_conversion['is_numeric']) {
+	if ($pre_conversion['is_numeric'] || ($units === 's' && $power == -1)) {
 		$precision = max(3,
 			$pre_conversion['units'] !== ''
 				? $precision_max - 1 - mb_strlen($pre_conversion['units'])
