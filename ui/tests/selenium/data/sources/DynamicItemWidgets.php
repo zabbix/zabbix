@@ -107,7 +107,7 @@ class DynamicItemWidgets {
 		$itemids = CDataHelper::getIds('name');
 
 		// Create graphs.
-		$graphs = CDataHelper::call('graph.create', [
+		CDataHelper::call('graph.create', [
 			[
 				'name' => 'Dynamic widgets H1 G1 (I1)',
 				'width' => 900,
@@ -232,7 +232,7 @@ class DynamicItemWidgets {
 		$prototype_itemids = CDataHelper::getIds('name');
 
 		// Create graph prototypes.
-		CDataHelper::call('graphprototype.create', [
+		$prototype_graphids = CDataHelper::call('graphprototype.create', [
 			[
 				'name' => 'Dynamic widgets GP1 (IP1)',
 				'width' => 900,
@@ -290,7 +290,7 @@ class DynamicItemWidgets {
 				]
 			],
 			[
-				'name' => 'Dynamic widgets H2 GP1 (IP1)',
+				'name' => 'Dynamic widgets GP1 (IP1)',
 				'width' => 900,
 				'height' => 200,
 				'gitems' => [
@@ -301,7 +301,7 @@ class DynamicItemWidgets {
 				]
 			],
 			[
-				'name' => 'Dynamic widgets H2 GP2 (I1, IP1, H1I2)',
+				'name' => 'Dynamic widgets GP2 (I1, IP1, H1I2)',
 				'width' => 900,
 				'height' => 200,
 				'gitems' => [
@@ -327,7 +327,6 @@ class DynamicItemWidgets {
 				]
 			]
 		]);
-		$prototype_graphids = CDataHelper::getIds('name');
 
 		// Create dashboard with widgets.
 		CDataHelper::call('dashboard.create', [
@@ -342,7 +341,7 @@ class DynamicItemWidgets {
 								'x' => 0,
 								'y' => 0,
 								'width' => 24,
-								'height' => 5,
+								'height' => 3,
 								'fields' => [
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
@@ -361,7 +360,7 @@ class DynamicItemWidgets {
 								'x' => 24,
 								'y' => 0,
 								'width' => 24,
-								'height' => 5,
+								'height' => 3,
 								'fields' => [
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
@@ -385,7 +384,7 @@ class DynamicItemWidgets {
 								'x' => 48,
 								'y' => 0,
 								'width' => 24,
-								'height' => 5,
+								'height' => 3,
 								'fields' => [
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
@@ -407,9 +406,9 @@ class DynamicItemWidgets {
 							[
 								'type' => 'graph',
 								'x' => 0,
-								'y' => 5,
+								'y' => 3,
 								'width' => 24,
-								'height' => 5,
+								'height' => 3,
 								'fields' => [
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_GRAPH,
@@ -421,9 +420,9 @@ class DynamicItemWidgets {
 							[
 								'type' => 'graph',
 								'x' => 24,
-								'y' => 5,
+								'y' => 3,
 								'width' => 24,
-								'height' => 5,
+								'height' => 3,
 								'fields' => [
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_GRAPH,
@@ -440,9 +439,9 @@ class DynamicItemWidgets {
 							[
 								'type' => 'graph',
 								'x' => 48,
-								'y' => 5,
+								'y' => 3,
 								'width' => 24,
-								'height' => 5,
+								'height' => 3,
 								'fields' => [
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_GRAPH,
@@ -459,9 +458,9 @@ class DynamicItemWidgets {
 							[
 								'type' => 'graph',
 								'x' => 0,
-								'y' => 10,
+								'y' => 6,
 								'width' => 24,
-								'height' => 5,
+								'height' => 3,
 								'fields' => [
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_GRAPH,
@@ -478,9 +477,9 @@ class DynamicItemWidgets {
 							[
 								'type' => 'graph',
 								'x' => 24,
-								'y' => 10,
+								'y' => 6,
 								'width' => 24,
-								'height' => 5,
+								'height' => 3,
 								'fields' => [
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_GRAPH,
@@ -497,9 +496,9 @@ class DynamicItemWidgets {
 							[
 								'type' => 'gauge',
 								'x' => 0,
-								'y' => 15,
+								'y' => 9,
 								'width' => 24,
-								'height' => 5,
+								'height' => 3,
 								'fields' => [
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
@@ -516,9 +515,9 @@ class DynamicItemWidgets {
 							[
 								'type' => 'gauge',
 								'x' => 24,
-								'y' => 15,
+								'y' => 9,
 								'width' => 24,
-								'height' => 5,
+								'height' => 3,
 								'fields' => [
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
@@ -536,9 +535,9 @@ class DynamicItemWidgets {
 								'type' => 'url',
 								'name' => 'Dynamic URL',
 								'x' => 0,
-								'y' => 20,
+								'y' => 12,
 								'width' => 24,
-								'height' => 5,
+								'height' => 3,
 								'fields' => [
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -555,9 +554,9 @@ class DynamicItemWidgets {
 							[
 								'type' => 'graphprototype',
 								'x' => 0,
-								'y' => 25,
+								'y' => 15,
 								'width' => 24,
-								'height' => 5,
+								'height' => 3,
 								'fields' => [
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
@@ -574,9 +573,9 @@ class DynamicItemWidgets {
 							[
 								'type' => 'graphprototype',
 								'x' => 24,
-								'y' => 25,
+								'y' => 15,
 								'width' => 24,
-								'height' => 5,
+								'height' => 3,
 								'fields' => [
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
@@ -598,9 +597,9 @@ class DynamicItemWidgets {
 							[
 								'type' => 'graphprototype',
 								'x' => 48,
-								'y' => 25,
+								'y' => 15,
 								'width' => 24,
-								'height' => 5,
+								'height' => 3,
 								'fields' => [
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
@@ -622,28 +621,28 @@ class DynamicItemWidgets {
 							[
 								'type' => 'graphprototype',
 								'x' => 0,
-								'y' => 30,
+								'y' => 18,
 								'width' => 24,
-								'height' => 5,
+								'height' => 3,
 								'fields' => [
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE,
 										'name' => 'graphid',
-										'value' => $prototype_graphids['Dynamic widgets GP1 (IP1)']
+										'value' => $prototype_graphids['graphids'][0] // Dynamic widgets GP1 (IP1)
 									]
 								]
 							],
 							[
 								'type' => 'graphprototype',
 								'x' => 24,
-								'y' => 30,
+								'y' => 18,
 								'width' => 24,
-								'height' => 5,
+								'height' => 3,
 								'fields' => [
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE,
 										'name' => 'graphid',
-										'value' => $prototype_graphids['Dynamic widgets H2 GP1 (IP1)']
+										'value' => $prototype_graphids['graphids'][0] // Dynamic widgets GP1 (IP1)
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -655,14 +654,14 @@ class DynamicItemWidgets {
 							[
 								'type' => 'graphprototype',
 								'x' => 48,
-								'y' => 30,
+								'y' => 18,
 								'width' => 24,
-								'height' => 5,
+								'height' => 3,
 								'fields' => [
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE,
 										'name' => 'graphid',
-										'value' => $prototype_graphids['Dynamic widgets GP2 (I1, IP1, H1I2)']
+										'value' => $prototype_graphids['graphids'][1] // Dynamic widgets GP2 (I1, IP1, H1I2)
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -674,14 +673,14 @@ class DynamicItemWidgets {
 							[
 								'type' => 'graphprototype',
 								'x' => 0,
-								'y' => 35,
+								'y' => 21,
 								'width' => 24,
-								'height' => 5,
+								'height' => 3,
 								'fields' => [
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE,
 										'name' => 'graphid',
-										'value' => $prototype_graphids['Dynamic widgets H1 GP3 (H1IP1)']
+										'value' => $prototype_graphids['graphids'][2] // Dynamic widgets H1 GP3 (H1IP1)
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -693,14 +692,14 @@ class DynamicItemWidgets {
 							[
 								'type' => 'graphprototype',
 								'x' => 24,
-								'y' => 35,
+								'y' => 21,
 								'width' => 24,
-								'height' => 5,
+								'height' => 3,
 								'fields' => [
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE,
 										'name' => 'graphid',
-										'value' => $prototype_graphids['Dynamic widgets H1 GP4 (H1IP1 and H2I1)']
+										'value' => $prototype_graphids['graphids'][3] // Dynamic widgets H1 GP4 (H1IP1 and H2I1)
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -712,15 +711,15 @@ class DynamicItemWidgets {
 							[
 								'type' => 'itemhistory',
 								'x' => 0,
-								'y' => 40,
+								'y' => 24,
 								'width' => 24,
-								'height' => 5,
-								'name' => 'Test 1',
+								'height' => 3,
+								'name' => 'Dynamic widgets H1I2 - without host override',
 								'fields' => [
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'columns.0.name',
-										'value' => 'Test 1'
+										'value' => 'Dynamic widgets H1I2'
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
@@ -742,15 +741,15 @@ class DynamicItemWidgets {
 							[
 								'type' => 'itemhistory',
 								'x' => 24,
-								'y' => 40,
+								'y' => 24,
 								'width' => 24,
-								'height' => 5,
-								'name' => 'Test 2',
+								'height' => 3,
+								'name' => 'Dynamic widgets H1I1 - with host override',
 								'fields' => [
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'columns.0.name',
-										'value' => 'Test 2'
+										'value' => 'Dynamic widgets H1I1'
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
@@ -777,15 +776,15 @@ class DynamicItemWidgets {
 							[
 								'type' => 'itemhistory',
 								'x' => 48,
-								'y' => 40,
+								'y' => 24,
 								'width' => 24,
-								'height' => 5,
-								'name' => 'Test 3',
+								'height' => 3,
+								'name' => 'Dynamic widgets H1I2 - with host override',
 								'fields' => [
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'columns.0.name',
-										'value' => 'Test 3'
+										'value' => 'Dynamic widgets H1I2'
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
@@ -812,15 +811,15 @@ class DynamicItemWidgets {
 							[
 								'type' => 'itemhistory',
 								'x' => 0,
-								'y' => 45,
+								'y' => 27,
 								'width' => 24,
-								'height' => 5,
-								'name' => 'Test two items',
+								'height' => 3,
+								'name' => 'Dynamic widgets H1I1 & Dynamic widgets H1I2 - with host override',
 								'fields' => [
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'columns.0.name',
-										'value' => 'Test 4'
+										'value' => 'Dynamic widgets H1I1'
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
@@ -835,7 +834,7 @@ class DynamicItemWidgets {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'columns.1.name',
-										'value' => 'Test 5'
+										'value' => 'Dynamic widgets H1I2'
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,

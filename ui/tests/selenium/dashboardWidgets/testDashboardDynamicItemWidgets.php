@@ -17,7 +17,7 @@
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 
 /**
- * @backup profiles, dashboard, hosts
+ * @backup profiles
  *
  * @dataSource DynamicItemWidgets
  *
@@ -58,42 +58,42 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets H1IP1'],
 						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets H1IP2'],
 						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets GP1 (IP1)'],
-						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H2: Dynamic widgets H2 GP1 (IP1)'],
+						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets GP1 (IP1)'],
 						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets GP2 (I1, IP1, H1I2)'],
 						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets H1 GP3 (H1IP1)'],
 						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets H1 GP4 (H1IP1 and H2I1)'],
 						[
 							'type' => 'Item history',
-							'header' => 'Test 1',
-							'expected' => ['Test 1' => '12']
+							'header' => 'Dynamic widgets H1I2 - without host override',
+							'expected' => ['Dynamic widgets H1I2' => '12']
 						],
 						[
 							'type' => 'Item history',
-							'header' => 'Test 2',
-							'expected' => ['Test 2' => '11']
+							'header' => 'Dynamic widgets H1I1 - with host override',
+							'expected' => ['Dynamic widgets H1I1' => '11']
 						],
 						[
 							'type' => 'Item history',
-							'header' => 'Test 3',
-							'expected' => ['Test 3' => '12']
+							'header' => 'Dynamic widgets H1I2 - with host override',
+							'expected' => ['Dynamic widgets H1I2' => '12']
 						],
 						[
 							'type' => 'Item history',
-							'header' => 'Test two items',
+							'header' => 'Dynamic widgets H1I1 & Dynamic widgets H1I2 - with host override',
 							'expected' => [
-								'Test 4' => '11',
-								'Test 5' => '12'
+								'Dynamic widgets H1I1' => '11',
+								'Dynamic widgets H1I2' => '12'
 							]
 						]
 					],
 					'item_data' => [
 						[
-							'name' => 'Dynamic widgets H1I2', // Dynamic widgets H1I2.
+							'name' => 'Dynamic widgets H1I2',
 							'value' => '12',
 							'time' => 'now'
 						],
 						[
-							'name' => 'Dynamic widgets H1I1', // Dynamic widgets H1I1.
+							'name' => 'Dynamic widgets H1I1',
 							'value' => '11',
 							'time' => 'now'
 						]
@@ -127,31 +127,31 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets H1IP1'],
 						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets H1IP2'],
 						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets GP1 (IP1)'],
-						['type' => 'Graph prototype', 'header' => 'Graph prototype'],
+						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets GP1 (IP1)'],
 						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets GP2 (I1, IP1, H1I2)'],
 						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets H1 GP3 (H1IP1)'],
 						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets H1 GP4 (H1IP1 and H2I1)'],
 						[
 							'type' => 'Item history',
-							'header' => 'Test 1',
-							'expected' => ['Test 1' => '12']
+							'header' => 'Dynamic widgets H1I2 - without host override',
+							'expected' => ['Dynamic widgets H1I2' => '12']
 						],
 						[
 							'type' => 'Item history',
-							'header' => 'Test 2',
-							'expected' => ['Test 2' => '11']
+							'header' => 'Dynamic widgets H1I1 - with host override',
+							'expected' => ['Dynamic widgets H1I1' => '11']
 						],
 						[
 							'type' => 'Item history',
-							'header' => 'Test 3',
-							'expected' => ['Test 3' => '12']
+							'header' => 'Dynamic widgets H1I2 - with host override',
+							'expected' => ['Dynamic widgets H1I2' => '12']
 						],
 						[
 							'type' => 'Item history',
-							'header' => 'Test two items',
+							'header' => 'Dynamic widgets H1I1 & Dynamic widgets H1I2 - with host override',
 							'expected' => [
-								'Test 4' => '11',
-								'Test 5' => '12'
+								'Dynamic widgets H1I1' => '11',
+								'Dynamic widgets H1I2' => '12'
 							]
 						]
 					],
@@ -193,28 +193,28 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H2: Dynamic widgets H2IP1'],
 						['type' => 'Graph prototype', 'header' => 'Graph prototype'],
 						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets GP1 (IP1)'],
-						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H2: Dynamic widgets H2 GP1 (IP1)'],
-						['type' => 'Graph prototype', 'header' => 'Graph prototype'],
+						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H2: Dynamic widgets GP1 (IP1)'],
+						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H2: Dynamic widgets GP2 (I1, IP1, H1I2)'],
 						['type' => 'Graph prototype', 'header' => 'Graph prototype'],
 						['type' => 'Graph prototype', 'header' => 'Graph prototype'],
 						[
 							'type' => 'Item history',
-							'header' => 'Test 1',
-							'expected' => ['Test 1' => '12']
+							'header' => 'Dynamic widgets H1I2 - without host override',
+							'expected' => ['Dynamic widgets H1I2' => '12']
 						],
 						[
 							'type' => 'Item history',
-							'header' => 'Test 2',
-							'expected' => ['Test 2' => '21']
+							'header' => 'Dynamic widgets H1I1 - with host override',
+							'expected' => ['Dynamic widgets H1I1' => '21']
 						],
 						[
 							'type' => 'Item history',
-							'header' => 'Test 3'
+							'header' => 'Dynamic widgets H1I2 - with host override'
 						],
 						[
 							'type' => 'Item history',
-							'header' => 'Test two items',
-							'expected' => ['Test 4' => '21']
+							'header' => 'Dynamic widgets H1I1 & Dynamic widgets H1I2 - with host override',
+							'expected' => ['Dynamic widgets H1I1' => '21']
 						]
 					],
 					'item_data' => [
@@ -261,22 +261,22 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 						['type' => 'Graph prototype', 'header' => 'Graph prototype'],
 						[
 							'type' => 'Item history',
-							'header' => 'Test 1',
-							'expected' => ['Test 1' => '12']
+							'header' => 'Dynamic widgets H1I2 - without host override',
+							'expected' => ['Dynamic widgets H1I2' => '12']
 						],
 						[
 							'type' => 'Item history',
-							'header' => 'Test 2',
-							'expected' => ['Test 2' => '31']
+							'header' => 'Dynamic widgets H1I1 - with host override',
+							'expected' => ['Dynamic widgets H1I1' => '31']
 						],
 						[
 							'type' => 'Item history',
-							'header' => 'Test 3'
+							'header' => 'Dynamic widgets H1I2 - with host override'
 						],
 						[
 							'type' => 'Item history',
-							'header' => 'Test two items',
-							'expected' => ['Test 4' => '31']
+							'header' => 'Dynamic widgets H1I1 & Dynamic widgets H1I2 - with host override',
+							'expected' => ['Dynamic widgets H1I1' => '31']
 						]
 					],
 					'item_data' => [
@@ -323,20 +323,20 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 						['type' => 'Graph prototype', 'header' => 'Graph prototype'],
 						[
 							'type' => 'Item history',
-							'header' => 'Test 1',
-							'expected' => ['Test 1' => '12']
+							'header' => 'Dynamic widgets H1I2 - without host override',
+							'expected' => ['Dynamic widgets H1I2' => '12']
 						],
 						[
 							'type' => 'Item history',
-							'header' => 'Test 2'
+							'header' => 'Dynamic widgets H1I1 - with host override'
 						],
 						[
 							'type' => 'Item history',
-							'header' => 'Test 3'
+							'header' => 'Dynamic widgets H1I2 - with host override'
 						],
 						[
 							'type' => 'Item history',
-							'header' => 'Test two items'
+							'header' => 'Dynamic widgets H1I1 & Dynamic widgets H1I2 - with host override'
 						]
 					],
 					'item_data' => [
