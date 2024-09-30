@@ -1041,9 +1041,10 @@
 
 // Dashboard list table.
 .dashboard-list {
-	.dashboard-list-item {
+	.dashboard-tags {
 		display: flex;
-		justify-content: space-between;
+		justify-content: flex-end;
+		column-gap: 4px;
 
 		.status-green {
 			background-color: $dashboard-my-bg-color;

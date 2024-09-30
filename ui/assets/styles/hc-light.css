@@ -1456,13 +1456,14 @@ footer {
 .dashboard-grid-iterator-content.is-loading::before {
   margin: calc(.25rem + 1px); }
 
-.dashboard-list .dashboard-list-item {
+.dashboard-list .dashboard-tags {
   display: flex;
-  justify-content: space-between; }
-  .dashboard-list .dashboard-list-item .status-green {
+  justify-content: flex-end;
+  column-gap: 4px; }
+  .dashboard-list .dashboard-tags .status-green {
     background-color: #555555;
     border-color: #555555; }
-  .dashboard-list .dashboard-list-item .status-yellow {
+  .dashboard-list .dashboard-tags .status-yellow {
     background-color: #555555;
     border-color: #555555; }
 
