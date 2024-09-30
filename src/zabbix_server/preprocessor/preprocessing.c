@@ -222,6 +222,10 @@ static int	preprocessor_pack_variant(zbx_packed_field_t *fields, const zbx_varia
 			fields[offset++] = PACKED_FIELD(value->data.str, 0);
 			break;
 
+		case ZBX_VARIANT_ERR:
+			fields[offset++] = PACKED_FIELD(value->data.err, 0);
+			break;
+
 		case ZBX_VARIANT_BIN:
 			fields[offset++] = PACKED_FIELD(value->data.bin, sizeof(zbx_uint32_t) +
 					zbx_variant_data_bin_get(value->data.bin, NULL));
@@ -341,6 +345,10 @@ static int	preprocesser_unpack_variant(const unsigned char *data, zbx_variant_t 
 
 		case ZBX_VARIANT_STR:
 			offset += zbx_deserialize_str(offset, &value->data.str, value_len);
+			break;
+
+		case ZBX_VARIANT_ERR:
+			offset += zbx_deserialize_str(offset, &value->data.err, value_len);
 			break;
 
 		case ZBX_VARIANT_BIN:
@@ -570,7 +578,7 @@ void	zbx_preprocessor_pack_dep_request(const zbx_variant_t *value, const zbx_tim
 		fields_num += deps[i].history.values_num * 5;
 	}
 
-	fields = (zbx_packed_field_t *)zbx_malloc(NULL, (size_t)fields_num * sizeof(zbx_packed_field_t));
+	fields = (zbx_packed_field_t *)zbx_calloc(NULL, (size_t)fields_num, sizeof(zbx_packed_field_t));
 
 	offset = fields;
 	offset += preprocessor_pack_variant(offset, value);
@@ -1240,6 +1248,12 @@ static void	agent_result_set_value(zbx_variant_t *value, zbx_item_value_type_t v
 		default:
 			/* ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_LOG */
 			type = ZBX_VARIANT_STR;
+	}
+
+	if (ZBX_VARIANT_ERR == value->type)
+	{
+		*error = zbx_strdup(NULL, value->data.err);
+		return;
 	}
 
 	if (FAIL == zbx_variant_convert(value, type))

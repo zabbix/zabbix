@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-04-12T06:55:08Z'
+  date: '2024-09-24T07:23:12Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -849,7 +849,9 @@ zabbix_export:
                   value: healthy
               trigger_prototypes:
                 - uuid: 58828a692aa2418ba98c6d66a23f1506
-                  expression: 'count(/Kubernetes cluster state by HTTP/kube.componentstatuses.healthy[{#NAME}],#3,,"True")<2 and length(last(/Kubernetes cluster state by HTTP/kube.componentstatuses.healthy[{#NAME}]))>0'
+                  expression: 'count(/Kubernetes cluster state by HTTP/kube.componentstatuses.healthy[{#NAME}],#2,"ne","True")=2 and length(last(/Kubernetes cluster state by HTTP/kube.componentstatuses.healthy[{#NAME}]))>0'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: 'count(/Kubernetes cluster state by HTTP/kube.componentstatuses.healthy[{#NAME}],#3,"eq","True")=3'
                   name: 'Kubernetes: Component [{#NAME}] is unhealthy'
                   priority: WARNING
                   tags:
@@ -1822,7 +1824,9 @@ zabbix_export:
                   value: '{#NAME}'
               trigger_prototypes:
                 - uuid: 9fcb23d29ac3481a8613515cc2cccfcf
-                  expression: 'count(/Kubernetes cluster state by HTTP/kube.livez.healthcheck[{#NAME}],#3,,"ok")<2 and length(last(/Kubernetes cluster state by HTTP/kube.livez.healthcheck[{#NAME}]))>0'
+                  expression: 'count(/Kubernetes cluster state by HTTP/kube.livez.healthcheck[{#NAME}],#2,"ne","ok")=2 and length(last(/Kubernetes cluster state by HTTP/kube.livez.healthcheck[{#NAME}]))>0'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: 'count(/Kubernetes cluster state by HTTP/kube.livez.healthcheck[{#NAME}],#3,"eq","ok")=3'
                   name: 'Kubernetes: Livez [{#NAME}] is unhealthy'
                   priority: WARNING
                   tags:
@@ -3143,7 +3147,9 @@ zabbix_export:
                   value: '{#NAME}'
               trigger_prototypes:
                 - uuid: 1a88c2cf94d3444c9e5320776b323ce6
-                  expression: 'count(/Kubernetes cluster state by HTTP/kube.readyz.healthcheck[{#NAME}],#3,,"ok")<2 and length(last(/Kubernetes cluster state by HTTP/kube.readyz.healthcheck[{#NAME}]))>0'
+                  expression: 'count(/Kubernetes cluster state by HTTP/kube.readyz.healthcheck[{#NAME}],#2,"ne","ok")=2 and length(last(/Kubernetes cluster state by HTTP/kube.readyz.healthcheck[{#NAME}]))>0'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: 'count(/Kubernetes cluster state by HTTP/kube.readyz.healthcheck[{#NAME}],#3,"eq","ok")=3'
                   name: 'Kubernetes: Readyz [{#NAME}] is unhealthy'
                   priority: WARNING
                   tags:

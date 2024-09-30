@@ -236,6 +236,7 @@ int	CONFIG_REPORTWRITER_FORKS	= 0;
 int	CONFIG_SERVICEMAN_FORKS		= 1;
 int	CONFIG_TRIGGERHOUSEKEEPER_FORKS = 1;
 int	CONFIG_ODBCPOLLER_FORKS		= 1;
+int	CONFIG_HAMANAGER_FORKS		= 1;
 
 int	CONFIG_LISTEN_PORT		= ZBX_DEFAULT_SERVER_PORT;
 char	*CONFIG_LISTEN_IP		= NULL;
@@ -280,6 +281,7 @@ char	*CONFIG_DBNAME			= NULL;
 char	*CONFIG_DBSCHEMA		= NULL;
 char	*CONFIG_DBUSER			= NULL;
 char	*CONFIG_DBPASSWORD		= NULL;
+int	CONFIG_DBREAD_ONLY_RECOVERABLE	= 0;
 char	*CONFIG_VAULTTOKEN		= NULL;
 char	*CONFIG_VAULTURL		= NULL;
 char	*CONFIG_VAULTDBPATH		= NULL;
@@ -580,6 +582,9 @@ static void	zbx_set_defaults(void)
 
 	if (NULL == CONFIG_DBHOST)
 		CONFIG_DBHOST = zbx_strdup(CONFIG_DBHOST, "localhost");
+
+	if (NULL != CONFIG_HA_NODE_NAME && '\0' != *CONFIG_HA_NODE_NAME)
+		CONFIG_DBREAD_ONLY_RECOVERABLE = 1;
 
 	if (NULL == CONFIG_SNMPTRAP_FILE)
 		CONFIG_SNMPTRAP_FILE = zbx_strdup(CONFIG_SNMPTRAP_FILE, "/tmp/zabbix_traps.tmp");
@@ -1219,13 +1224,6 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 		return FAIL;
 	}
 
-	if (SUCCEED != init_selfmon_collector(&error))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize self-monitoring: %s", error);
-		zbx_free(error);
-		return FAIL;
-	}
-
 	if (0 != CONFIG_VMWARE_FORKS && SUCCEED != zbx_vmware_init(&error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize VMware cache: %s", error);
@@ -1537,7 +1535,6 @@ static void	server_teardown(zbx_rtc_t *rtc, zbx_socket_t *listen_sock)
 	zbx_tfc_destroy();
 	zbx_vc_destroy();
 	zbx_vmware_destroy();
-	free_selfmon_collector();
 	free_configuration_cache();
 	free_database_cache(ZBX_SYNC_NONE);
 
@@ -1794,6 +1791,13 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
+	if (SUCCEED != init_selfmon_collector(&error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize self-monitoring: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
+
 	zbx_unset_exit_on_terminate();
 
 	if (SUCCEED != zbx_ha_start(&rtc, ZBX_NODE_STATUS_UNKNOWN, &error))
@@ -2029,9 +2033,9 @@ void	zbx_on_exit(int ret, void *on_exit_args)
 
 		/* free vmware support */
 		zbx_vmware_destroy();
-
-		free_selfmon_collector();
 	}
+
+	free_selfmon_collector();
 
 	zbx_uninitialize_events();
 

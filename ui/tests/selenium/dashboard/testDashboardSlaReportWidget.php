@@ -1952,7 +1952,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 					]
 				]
 			],
-			// Months are excluded as strtotime() calculates month subtraction incorrectly on he last days on the month.
+			// Months are excluded as strtotime() calculates month subtraction incorrectly on the last days on the month.
 			[
 				[
 					'fields' => [
@@ -2032,7 +2032,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 					]
 				]
 			],
-			// Months are excluded as strtotime() calculates month subtraction incorrectly on he last days on the month.
+			// Months are excluded as strtotime() calculates month subtraction incorrectly on the last days on the month.
 			[
 				[
 					'fields' => [

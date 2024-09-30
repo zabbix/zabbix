@@ -67,7 +67,7 @@ class testFormAdministrationUserGroups extends CLegacyWebTest {
 					'user' => 'Admin',
 					'enabled' => false,
 					'error_msg' => 'Cannot add user group',
-					'error' => 'User cannot add himself to a disabled group or a group with disabled GUI access.'
+					'error' => 'User cannot add oneself to a disabled group or a group with disabled GUI access.'
 				]
 			],
 			[
@@ -78,7 +78,7 @@ class testFormAdministrationUserGroups extends CLegacyWebTest {
 					'user' => 'Admin',
 					'frontend_access' => 'Disabled',
 					'error_msg' => 'Cannot add user group',
-					'error' => 'User cannot add himself to a disabled group or a group with disabled GUI access.'
+					'error' => 'User cannot add oneself to a disabled group or a group with disabled GUI access.'
 				]
 			],
 			[
@@ -179,7 +179,7 @@ class testFormAdministrationUserGroups extends CLegacyWebTest {
 					'user' => 'Admin',
 					'enabled' => false,
 					'error_msg' => 'Cannot update user group',
-					'error' => 'User cannot add himself to a disabled group or a group with disabled GUI access.'
+					'error' => 'User cannot add oneself to a disabled group or a group with disabled GUI access.'
 				]
 			],
 			[
@@ -190,7 +190,7 @@ class testFormAdministrationUserGroups extends CLegacyWebTest {
 					'user' => 'Admin',
 					'frontend_access' => 'Disabled',
 					'error_msg' => 'Cannot update user group',
-					'error' => 'User cannot add himself to a disabled group or a group with disabled GUI access.'
+					'error' => 'User cannot add oneself to a disabled group or a group with disabled GUI access.'
 				]
 			],
 			[

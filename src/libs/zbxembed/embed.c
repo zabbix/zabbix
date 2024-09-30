@@ -135,7 +135,7 @@ static void	es_free(void *udata, void *ptr)
  * Purpose: decodes 3-byte utf-8 sequence                                     *
  *                                                                            *
  * Parameters: ptr - [IN] pointer to the 3 byte sequence                      *
- *             out - [OUT] the decoded value                                  *
+ *             out - [OUT] decoded value                                      *
  *                                                                            *
  * Return value: SUCCEED                                                      *
  *               FAIL                                                         *
@@ -249,6 +249,19 @@ fail:
 	zbx_free(*out_str);
 
 	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: push result string on duktape value stack                         *
+ *                                                                            *
+ * Comments: The string might be modified by this function.                   *
+ *                                                                            *
+ ******************************************************************************/
+void	es_push_result_string(duk_context *ctx, char *str, size_t size)
+{
+	zbx_replace_invalid_utf8(str);
+	duk_push_lstring(ctx, str, size);
 }
 
 /******************************************************************************
@@ -371,6 +384,20 @@ out:
 	return ret;
 }
 
+static void	es_objmap_destroy(zbx_hashset_t *objmap)
+{
+#ifdef HAVE_LIBCURL
+	zbx_hashset_iter_t	iter;
+	zbx_es_obj_data_t	*obj;
+
+	zbx_hashset_iter_reset(objmap, &iter);
+	while (NULL != (obj = (zbx_es_obj_data_t *)zbx_hashset_iter_next(&iter)))
+		es_httprequest_free(obj->data);
+#endif
+
+	zbx_hashset_destroy(objmap);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: destroys initialized embedded scripting engine environment        *
@@ -396,8 +423,9 @@ int	zbx_es_destroy_env(zbx_es_t *es, char **error)
 	}
 
 	duk_destroy_heap(es->env->ctx);
+	es_objmap_destroy(&es->env->objmap);
+
 	zbx_es_debug_disable(es);
-	zbx_hashset_destroy(&es->env->objmap);
 	zbx_free(es->env->error);
 	zbx_free(es->env);
 
@@ -810,15 +838,14 @@ zbx_es_env_t	*zbx_es_get_env(duk_context *ctx)
  *                                                                            *
  * Purpose: attach data pointer to current object                             *
  *                                                                            *
- * Comments: The object must be on the top of the stack (-1)                  *
- *           This function must be used only from object constructor          *
+ * Comments: This function must be used only from object constructor          *
  *                                                                            *
  ******************************************************************************/
-void	es_obj_attach_data(zbx_es_env_t *env, void *data)
+void	es_obj_attach_data(zbx_es_env_t *env, void *objptr, void *data)
 {
 	zbx_es_obj_data_t	obj_local;
 
-	obj_local.heapptr = duk_require_heapptr(env->ctx, -1);
+	obj_local.heapptr = objptr;
 
 	obj_local.data = data;
 	zbx_hashset_insert(&env->objmap, &obj_local, sizeof(obj_local));
@@ -853,8 +880,8 @@ void	*es_obj_get_data(zbx_es_env_t *env)
  *                                                                            *
  * Purpose: detach data pointer from current object                           *
  *                                                                            *
- * Parameters: env - [IN]                                                     *
- *             ref - [IN] pointer reference, returned by es_put_ptr()         *
+ * Parameters: env    - [IN]                                                  *
+ *             objptr - [IN] object js heap pointer                           *
  *                                                                            *
  * Return value: detached data pointer                                        *
  *                                                                            *
@@ -864,18 +891,23 @@ void	*es_obj_get_data(zbx_es_env_t *env)
  *           This function must be used only from object destructor.          *
  *                                                                            *
  ******************************************************************************/
-void	*es_obj_detach_data(zbx_es_env_t *env)
+void	*es_obj_detach_data(zbx_es_env_t *env, void *objptr)
 {
-	zbx_es_obj_data_t	obj_local, *obj;
-	void			*data;
+	if (NULL != objptr)
+	{
+		zbx_es_obj_data_t	obj_local, *obj;
+		void			*data;
 
-	obj_local.heapptr = duk_require_heapptr(env->ctx, -1);
+		obj_local.heapptr = objptr;
 
-	if (NULL == (obj = zbx_hashset_search(&env->objmap, &obj_local)))
+		if (NULL == (obj = zbx_hashset_search(&env->objmap, &obj_local)))
+			return NULL;
+
+		data = obj->data;
+		zbx_hashset_remove_direct(&env->objmap, obj);
+
+		return data;
+	}
+	else
 		return NULL;
-
-	data = obj->data;
-	zbx_hashset_remove_direct(&env->objmap, obj);
-
-	return data;
 }

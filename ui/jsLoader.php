@@ -126,13 +126,13 @@ $translate_strings = [
 	'gtlc.js' => [
 		'S_MINUTE_SHORT' => _x('m', 'minute short')
 	],
-	'class.overlay.js' => [
-		'Operation details' => _('Operation details')
-	],
 	'class.dashboard.js' => [
 		'Actions' => _('Actions'),
-		'Cannot add dashboard page: maximum number of %1$d dashboard pages has been added.' => _('Cannot add dashboard page: maximum number of %1$d dashboard pages has been added.'),
-		'Cannot add widget: not enough free space on the dashboard.' => _('Cannot add widget: not enough free space on the dashboard.'),
+		'Add widget' => _('Add widget'),
+		'Cannot add dashboard page: maximum number of %1$d dashboard pages has been added.' =>
+			_('Cannot add dashboard page: maximum number of %1$d dashboard pages has been added.'),
+		'Cannot add widget: not enough free space on the dashboard.' =>
+			_('Cannot add widget: not enough free space on the dashboard.'),
 		'Copy' => _('Copy'),
 		'Delete' => _('Delete'),
 		'Failed to paste dashboard page.' => _('Failed to paste dashboard page.'),
@@ -195,7 +195,8 @@ $translate_strings = [
 		'Cancel' => _s('Cancel'),
 		'Edit' => _s('Edit'),
 		'Edit tree element' => _s('Edit tree element'),
-		'Remove' => _s('Remove')
+		'Remove' => _s('Remove'),
+		'root' => _('root')
 	],
 	'class.widget.svggraph.js' => [
 		'Actions' => _s('Actions'),
@@ -273,26 +274,37 @@ $translate_strings = [
 		'S_PASTE' => _('Paste'),
 		'S_PASTE_SIMPLE' => _('Paste without external links'),
 		'S_INCORRECT_ELEMENT_MAP_LINK' => _('All links should have "Name" and "URL" specified'),
-		'S_EACH_URL_SHOULD_HAVE_UNIQUE' => _('Each URL should have a unique name. Please make sure there is only one URL named'),
+		'S_EACH_URL_SHOULD_HAVE_UNIQUE' =>
+			_('Each URL should have a unique name. Please make sure there is only one URL named'),
 		'S_DELETE_LINKS_BETWEEN_SELECTED_ELEMENTS_Q' => _('Delete links between selected elements?'),
 		'S_MACRO_EXPAND_ERROR' => _('Cannot expand macros.'),
-		'S_NO_IMAGES' => 'You need to have at least one image uploaded to create map element. Images can be uploaded in Administration->General->Images section.',
-		'S_COLOR_IS_NOT_CORRECT' => _('Color "%1$s" is not correct: expecting hexadecimal color code (6 symbols).')
+		'S_NO_IMAGES' =>
+			_('You need to have at least one image uploaded to create map element. Images can be uploaded in Administration->General->Images section.'),
+		'S_COLOR_IS_NOT_CORRECT' => _('Color "%1$s" is not correct: expecting hexadecimal color code (6 symbols).'),
+		'Host is not selected.' => _('Host is not selected.'),
+		'Map is not selected.' => _('Map is not selected.'),
+		'Trigger is not selected.' => _('Trigger is not selected.'),
+		'Host group is not selected.' => _('Host group is not selected.')
 	],
-	'class.notifications.js' => [
+	'class.notification.js' => [
 		'S_PROBLEM_ON' => _('Problem on'),
-		'S_RESOLVED' => _('Resolved'),
+		'S_RESOLVED' => _('Resolved')
+	],
+	'class.notification.collection.js' => [
 		'S_MUTE' => _('Mute'),
 		'S_CANNOT_SUPPORT_NOTIFICATION_AUDIO' => _('Cannot support notification audio for this device.'),
 		'S_UNMUTE' => _('Unmute'),
 		'S_CLOSE' => _('Close'),
 		'S_SNOOZE' => _('Snooze')
 	],
+	'class.overlay.js' => [
+		'S_CLOSE' => _('Close')
+	],
 	'class.cookie.js' => [
-		'S_MAX_COOKIE_SIZE_REACHED' => _('We are sorry, the maximum possible number of elements to remember has been reached.')
+		'S_MAX_COOKIE_SIZE_REACHED' =>
+			_('We are sorry, the maximum possible number of elements to remember has been reached.')
 	],
 	'class.coverride.js' => [
-		'S_COLOR' => _('color'),
 		'S_TIME_SHIFT' => _('time shift')
 	],
 	'class.cverticalaccordion.js' => [
@@ -334,10 +346,12 @@ $translate_strings = [
 		'%1$s, read only' => _x('%1$s, read only', 'screen reader'),
 		'Cannot be removed' => _x('Cannot be removed', 'screen reader'),
 		'Selected, %1$s in position %2$d of %3$d' => _x('Selected, %1$s in position %2$d of %3$d', 'screen reader'),
-		'Selected, %1$s, read only, in position %2$d of %3$d' => _x('Selected, %1$s, read only, in position %2$d of %3$d', 'screen reader'),
+		'Selected, %1$s, read only, in position %2$d of %3$d' =>
+			_x('Selected, %1$s, read only, in position %2$d of %3$d', 'screen reader'),
 		'More than %1$d matches for %2$s found' => _x('More than %1$d matches for %2$s found', 'screen reader'),
 		'%1$d matches for %2$s found' => _x('%1$d matches for %2$s found', 'screen reader'),
-		'%1$s preselected, use down,up arrow keys and enter to select' => _x('%1$s preselected, use down,up arrow keys and enter to select', 'screen reader')
+		'%1$s preselected, use down,up arrow keys and enter to select' =>
+			_x('%1$s preselected, use down,up arrow keys and enter to select', 'screen reader')
 	],
 	'menupopup.js' => [
 		'500 latest values' => _('500 latest values'),
@@ -346,18 +360,17 @@ $translate_strings = [
 		'Configuration' => _('Configuration'),
 		'Clone' => _('Clone'),
 		'Create new' => _('Create new'),
+		'Create new report' => _('Create new report'),
 		'Create trigger' => _('Create trigger'),
 		'Create dependent item' => _('Create dependent item'),
 		'Create dependent discovery rule' => _('Create dependent discovery rule'),
+		'Create trigger prototype' => _('Create trigger prototype'),
 		'Dashboards' => _('Dashboards'),
 		'Delete' => _('Delete'),
 		'Delete dashboard?' => _('Delete dashboard?'),
 		'Do you wish to replace the conditional expression?' => _('Do you wish to replace the conditional expression?'),
 		'Item' => _('Item'),
 		'Insert expression' => _('Insert expression'),
-		'Sharing' => _('Sharing'),
-		'Trigger status "OK"' => _('Trigger status "OK"'),
-		'Trigger status "Problem"' => _('Trigger status "Problem"'),
 		'Go to' => _('Go to'),
 		'Graph' => _('Graph'),
 		'Graphs' => _('Graphs'),
@@ -369,13 +382,19 @@ $translate_strings = [
 		'Last hour graph' => _('Last hour graph'),
 		'Last month graph' => _('Last month graph'),
 		'Last week graph' => _('Last week graph'),
+		'Links' => _('Links'),
 		'Problems' => _('Problems'),
 		'Scripts' => _('Scripts'),
+		'Sharing' => _('Sharing'),
 		'Submap' => _('Submap'),
 		'S_TRIGGER' => _('Trigger'),
-		'URL' => _('URL'),
+		'Triggers' => _('Triggers'),
+		'Trigger status "OK"' => _('Trigger status "OK"'),
+		'Trigger status "Problem"' => _('Trigger status "Problem"'),
+		'Trigger prototypes' => _('Trigger prototypes'),
 		'URLs' => _('URLs'),
 		'Values' => _('Values'),
+		'View related reports' => _('View related reports'),
 		'Web' => _('Web'),
 		'S_SELECTED_SR' => _x('%1$s, selected', 'screen reader')
 	],
@@ -384,7 +403,8 @@ $translate_strings = [
 		'Hide debug' => _('Hide debug')
 	],
 	'items.js' => [
-		'To set a host interface select a single item type for all items' => _('To set a host interface select a single item type for all items'),
+		'To set a host interface select a single item type for all items' =>
+			_('To set a host interface select a single item type for all items'),
 		'No interface found' => _('No interface found'),
 		'Item type does not use interface' => _('Item type does not use interface')
 	],
@@ -400,9 +420,6 @@ $translate_strings = [
 	'common.js' => [
 		'Cancel' => _('Cancel'),
 		'Ok' => _('Ok')
-	],
-	'component.z-select.js' => [
-		'All' => _('All')
 	],
 	'macrovalue.js' => [
 		'Set new value' => _('Set new value'),

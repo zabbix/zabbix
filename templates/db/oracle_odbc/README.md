@@ -42,7 +42,6 @@ This template has been tested on:
     GRANT SELECT ON v_$recovery_file_dest TO c##zabbix_mon;
     GRANT SELECT ON v_$active_session_history TO c##zabbix_mon;
     GRANT SELECT ON v_$osstat TO c##zabbix_mon;
-    GRANT SELECT ON v_$restore_point TO c##zabbix_mon;
     GRANT SELECT ON v_$process TO c##zabbix_mon;
     GRANT SELECT ON v_$datafile TO c##zabbix_mon;
     GRANT SELECT ON v_$pgastat TO c##zabbix_mon;
@@ -50,9 +49,7 @@ This template has been tested on:
     GRANT SELECT ON v_$log TO c##zabbix_mon;
     GRANT SELECT ON v_$archive_dest TO c##zabbix_mon;
     GRANT SELECT ON v_$asm_diskgroup TO c##zabbix_mon;
-    GRANT SELECT ON sys.dba_data_files TO c##zabbix_mon;
-    GRANT SELECT ON DBA_TABLESPACES TO c##zabbix_mon;
-    GRANT SELECT ON DBA_TABLESPACE_USAGE_METRICS TO c##zabbix_mon;
+    GRANT SELECT ON v_$asm_diskgroup_stat TO c##zabbix_mon;
     GRANT SELECT ON DBA_USERS TO c##zabbix_mon;
     ```
     This is needed because the template uses `CDB_*` views to monitor tablespaces from the CDB and different PDBs - the monitoring user therefore needs access to the container data objects on all PDBs.
@@ -72,7 +69,6 @@ This template has been tested on:
     GRANT SELECT ON v_$recovery_file_dest TO zabbix_mon;
     GRANT SELECT ON v_$active_session_history TO zabbix_mon;
     GRANT SELECT ON v_$osstat TO zabbix_mon;
-    GRANT SELECT ON v_$restore_point TO zabbix_mon;
     GRANT SELECT ON v_$process TO zabbix_mon;
     GRANT SELECT ON v_$datafile TO zabbix_mon;
     GRANT SELECT ON v_$pgastat TO zabbix_mon;
@@ -80,12 +76,74 @@ This template has been tested on:
     GRANT SELECT ON v_$log TO zabbix_mon;
     GRANT SELECT ON v_$archive_dest TO zabbix_mon;
     GRANT SELECT ON v_$asm_diskgroup TO zabbix_mon;
-    GRANT SELECT ON sys.dba_data_files TO zabbix_mon;
-    GRANT SELECT ON DBA_TABLESPACES TO zabbix_mon;
-    GRANT SELECT ON DBA_TABLESPACE_USAGE_METRICS TO zabbix_mon;
+    GRANT SELECT ON v_$asm_diskgroup_stat TO zabbix_mon;
     GRANT SELECT ON DBA_USERS TO zabbix_mon;
     ```
     **Important! Ensure that the ODBC connection to Oracle includes the session parameter `NLS_NUMERIC_CHARACTERS= '.,'`. It is important for displaying the float numbers in Zabbix correctly.**
+
+    **Important! These privileges grant the monitoring user `SELECT_CATALOG_ROLE`, which, in turn, gives access to thousands of tables in the database.**
+    This role is required to access the `V$RESTORE_POINT` dynamic performance view.
+    However, there are ways to go around this, if the `SELECT_CATALOG_ROLE` assigned to a monitoring user raises any security issues.
+    One way to do this is using **pipelined table functions**:
+
+      1. Log into your database as the `SYS` user or make sure that your administration user has the required privileges to execute the steps below;
+
+      2. Create types for the table function:
+
+          ```sql
+          CREATE OR REPLACE TYPE zbx_mon_restore_point_row AS OBJECT (
+            SCN                           NUMBER,
+            DATABASE_INCARNATION#         NUMBER,
+            GUARANTEE_FLASHBACK_DATABASE  VARCHAR2(3),
+            STORAGE_SIZE                  NUMBER,
+            TIME                          TIMESTAMP(9),
+            RESTORE_POINT_TIME            TIMESTAMP(9),
+            PRESERVED                     VARCHAR2(3),
+            NAME                          VARCHAR2(128),
+            PDB_RESTORE_POINT             VARCHAR2(3),
+            CLEAN_PDB_RESTORE_POINT       VARCHAR2(3),
+            PDB_INCARNATION#              NUMBER,
+            REPLICATED                    VARCHAR2(3),
+            CON_ID                        NUMBER
+          );
+          CREATE OR REPLACE TYPE zbx_mon_restore_point_tab IS TABLE OF zbx_mon_restore_point_row;
+          ```
+
+      3. Create the pipelined table function:
+
+          ```sql
+          CREATE OR REPLACE FUNCTION zbx_mon_restore_point RETURN zbx_mon_restore_point_tab PIPELINED AS
+          BEGIN
+            FOR i IN (SELECT * FROM V$RESTORE_POINT) LOOP
+              PIPE ROW (zbx_mon_restore_point_row(i.SCN, i.DATABASE_INCARNATION#, i.GUARANTEE_FLASHBACK_DATABASE, i.STORAGE_SIZE, i.TIME, i.RESTORE_POINT_TIME, i.PRESERVED, i.NAME, i.PDB_RESTORE_POINT, i.CLEAN_PDB_RESTORE_POINT, i.PDB_INCARNATION#, i.REPLICATED, i.CON_ID));
+            END LOOP;
+            RETURN;
+          END;
+          ```
+
+      4. Grant the Zabbix monitoring user the Execute privilege on the created pipelined table function and replace the monitoring user `V$RESTORE_POINT` view with the `SYS` user function (in this example, the `SYS` user is used to create DB types and function):
+
+          ```sql
+          GRANT EXECUTE ON zbx_mon_restore_point TO c##zabbix_mon;
+          CREATE OR REPLACE VIEW c##zabbix_mon.V$RESTORE_POINT AS SELECT * FROM TABLE(SYS.zbx_mon_restore_point);
+          ```
+
+      5. Finally, revoke the `SELECT_CATALOG_ROLE` and grant additional permissions that were previously covered by the `SELECT_CATALOG_ROLE`.
+
+          ```sql
+          REVOKE SELECT_CATALOG_ROLE FROM c##zabbix_mon;
+          GRANT SELECT ON v_$pdbs TO c##zabbix_mon;
+          GRANT SELECT ON v_$sort_segment TO c##zabbix_mon;
+          GRANT SELECT ON v_$parameter TO c##zabbix_mon;
+          GRANT SELECT ON CDB_TABLESPACES TO c##zabbix_mon;
+          GRANT SELECT ON CDB_DATA_FILES TO c##zabbix_mon;
+          GRANT SELECT ON CDB_FREE_SPACE TO c##zabbix_mon;
+          GRANT SELECT ON CDB_TEMP_FILES TO c##zabbix_mon;
+          ```
+
+      > Note that in these examples, the monitoring user is named `c##zabbix_mon` and the system user - `SYS`. Change these example usernames to ones that are appropriate for your environment.
+    
+    If this workaround does not work for you, there are more options available, such as __materialized views__, but look out for data refresh as `V$RESTORE_POINT` is a dynamic performance view.
 
 2. Install the ODBC driver on Zabbix server or Zabbix proxy.
   See the [Oracle documentation](https://www.oracle.com/database/technologies/releasenote-odbc-ic.html) for instructions.

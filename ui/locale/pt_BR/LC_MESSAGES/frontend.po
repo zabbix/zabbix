@@ -4472,6 +4472,10 @@ msgstr "Criar tipo de mídia"
 msgid "Create new"
 msgstr "Criar novo"
 
+#: jsLoader.php:363
+msgid "Create new report"
+msgstr ""
+
 #: app/views/administration.proxy.list.php:37
 msgid "Create proxy"
 msgstr "Criar proxy"
@@ -6877,6 +6881,10 @@ msgstr "Falha ao atualizar as propriedades da página do painel."
 msgid "Failed to update dashboard properties."
 msgstr "Falha ao atualizar as propriedades do painel."
 
+#: app/views/js/popup.dashboard.share.edit.js.php:86
+msgid "Failed to update dashboard sharing."
+msgstr ""
+
 #: jsLoader.php:142
 msgid "Failed to update widget properties."
 msgstr "Falha ao atualizar as propriedades do widget."
@@ -7998,6 +8006,10 @@ msgstr "O grupo de hosts \"%1$s\" é interno e não pode ser excluído."
 msgid "Host group elements"
 msgstr "Elementos do grupo de hosts"
 
+#: jsLoader.php:287
+msgid "Host group is not selected."
+msgstr ""
+
 #: include/views/monitoring.sysmap.edit.php:165
 msgid "Host group label type"
 msgstr "Tipo de rótulo do grupo de hosts"
@@ -8071,6 +8083,10 @@ msgstr "Inventário do host"
 #: hostinventoriesoverview.php:26 hostinventoriesoverview.php:146
 msgid "Host inventory overview"
 msgstr "Visão geral do inventário de host"
+
+#: jsLoader.php:284
+msgid "Host is not selected."
+msgstr ""
 
 #: include/views/monitoring.sysmap.edit.php:180
 msgid "Host label type"
@@ -11264,6 +11280,10 @@ msgstr "Localização do rótulo do elemento no mapa"
 msgid "Map element label type"
 msgstr "Tipo de rótulo no elemento do mapa"
 
+#: jsLoader.php:285
+msgid "Map is not selected."
+msgstr ""
+
 #: sysmap.php:128
 msgid "Map is updated! Return to map list?"
 msgstr "O mapa foi atualizado! Voltar à lista de mapas?"
@@ -13203,6 +13223,18 @@ msgstr "Um"
 #: app/views/popup.maintenance.period.php:75 include/maintenances.inc.php:25
 msgid "One time only"
 msgstr "Apenas uma vez"
+
+#: include/classes/api/services/CUser.php:800
+#: include/classes/api/services/CUser.php:807
+#, c-format
+msgid "Only Super admin or Admin users can update \"%1$s\" parameter."
+msgstr ""
+
+#: include/classes/api/services/CUser.php:725
+#: include/classes/api/services/CUser.php:766
+#, c-format
+msgid "Only Super admin users can update \"%1$s\" parameter."
+msgstr ""
 
 #: include/classes/api/services/CDRule.php:488
 msgid "Only Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 checks can be made unique."
@@ -18119,6 +18151,10 @@ msgstr "A trigger está no estado \"desconhecido\""
 msgid "Trigger in template \"%1$s\" has dependency with trigger in template \"%2$s\"."
 msgstr "Existe trigger no template \"%1$s\" que possui dependência com trigger no template \"%2$s\"."
 
+#: jsLoader.php:286
+msgid "Trigger is not selected."
+msgstr ""
+
 #: include/views/monitoring.sysmap.edit.php:195
 msgid "Trigger label type"
 msgstr "Tipo de rótulo de trigger"
@@ -19003,6 +19039,11 @@ msgstr "Mensagem do agente de usuário"
 msgid "User cannot add himself to a disabled group or a group with disabled GUI access."
 msgstr "Um usuário não pode se adicionar em um grupo desativado ou em um grupo com acesso à interface web desativado."
 
+#: include/classes/api/services/CUserGroup.php:534
+#: include/classes/api/services/CUser.php:756
+msgid "User cannot add oneself to a disabled group or a group with disabled GUI access."
+msgstr ""
+
 #: app/views/administration.user.edit.php:421
 #: include/classes/api/services/CUser.php:951
 msgid "User cannot change own role."
@@ -19102,6 +19143,10 @@ msgstr "Grupos de usuários"
 #: include/classes/api/services/CUser.php:1225
 msgid "User is not allowed to delete himself."
 msgstr "Um usuário não pode excluir a si mesmo."
+
+#: include/classes/api/services/CUser.php:1291
+msgid "User is not allowed to delete oneself."
+msgstr ""
 
 #: include/classes/widgets/views/widget.item.form.view.php:62
 msgid "User macros"
@@ -19766,6 +19811,10 @@ msgstr "Visualizar"
 msgid "View as"
 msgstr "Ver como"
 
+#: jsLoader.php:397
+msgid "View related reports"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1234
 msgid "Virtual space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr "Espaço virtual em bytes ou percentual do total. Retorna inteiro para bytes; Ponto flutuante para percentual"
@@ -20304,6 +20353,10 @@ msgstr "Você não possui permissão para acessar esta página."
 #: include/func.inc.php:1724
 msgid "You must login to view this page."
 msgstr "Você deve logar para ver esta página."
+
+#: jsLoader.php:282
+msgid "You need to have at least one image uploaded to create map element. Images can be uploaded in Administration->General->Images section."
+msgstr ""
 
 #: include/classes/db/DB.php:135
 msgid "Your database is not working properly. Please wait a few minutes and try to repeat this action. If the problem still persists, please contact system administrator. The problem might be caused by long running transaction or row level lock accomplished by your database management system."
@@ -22025,6 +22078,10 @@ msgstr "direita"
 #: app/controllers/CControllerPopupTriggerExpr.php:924
 msgid "right() - Returns the rightmost count characters"
 msgstr "right() - Retorna a contagem de caracteres mais à direita"
+
+#: jsLoader.php:199
+msgid "root"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:937
 msgid "round() - Rounds a value to decimal places"

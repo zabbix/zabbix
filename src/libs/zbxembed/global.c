@@ -51,21 +51,25 @@ char	*es_get_buffer_dyn(duk_context *ctx, int index, duk_size_t *len)
 
 	switch (type)
 	{
-		case DUK_TYPE_BUFFER:
-		case DUK_TYPE_OBJECT:
-			ptr = duk_require_buffer_data(ctx, index, len);
-			buf = zbx_malloc(NULL, *len);
-			memcpy(buf, ptr, *len);
-			break;
 		case DUK_TYPE_UNDEFINED:
 		case DUK_TYPE_NONE:
 		case DUK_TYPE_NULL:
-			break;
-		default:
-			if (SUCCEED == es_duktape_string_decode(duk_to_string(ctx, index), &buf))
-				*len = strlen(buf);
-			break;
+			return NULL;
 	}
+
+	if (NULL != (ptr = duk_get_buffer_data(ctx, index, len)))
+	{
+		buf = zbx_malloc(NULL, *len);
+		memcpy(buf, ptr, *len);
+
+		return buf;
+	}
+
+	if (type == DUK_TYPE_BUFFER)
+		return NULL;
+
+	if (SUCCEED == es_duktape_string_decode(duk_safe_to_string(ctx, index), &buf))
+		*len = strlen(buf);
 
 	return buf;
 }
@@ -90,7 +94,7 @@ static duk_ret_t	es_btoa(duk_context *ctx)
 		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot obtain parameter");
 
 	str_base64_encode_dyn(str, &b64str, (int)len);
-	duk_push_string(ctx, b64str);
+	es_push_result_string(ctx, b64str, strlen(b64str));
 	zbx_free(str);
 	zbx_free(b64str);
 
@@ -110,7 +114,7 @@ static duk_ret_t	es_btoa(duk_context *ctx)
  ******************************************************************************/
 static duk_ret_t	es_atob(duk_context *ctx)
 {
-	char	*buffer = NULL, *str = NULL;
+	char	*buffer = NULL, *str = NULL, *ptr;
 	int	out_size, buffer_size;
 
 	if (SUCCEED != es_duktape_string_decode(duk_require_string(ctx, 0), &str))
@@ -119,9 +123,13 @@ static duk_ret_t	es_atob(duk_context *ctx)
 	buffer_size = (int)strlen(str) * 3 / 4 + 1;
 	buffer = zbx_malloc(buffer, (size_t)buffer_size);
 	str_base64_decode(str, buffer, buffer_size, &out_size);
-	duk_push_lstring(ctx, buffer, (duk_size_t)out_size);
+
+	ptr = duk_push_fixed_buffer(ctx, out_size);
+	memcpy(ptr, buffer, out_size);
+
 	zbx_free(str);
 	zbx_free(buffer);
+
 	return 1;
 }
 
@@ -161,10 +169,9 @@ static void	es_bin_to_hex(const unsigned char *bin, size_t len, char *out)
  ******************************************************************************/
 static duk_ret_t	es_md5(duk_context *ctx)
 {
-	char		*str;
+	char		*str, *md5sum;
 	md5_state_t	state;
 	md5_byte_t	hash[MD5_DIGEST_SIZE];
-	char		*md5sum;
 	duk_size_t	len;
 
 	if (NULL == (str = es_get_buffer_dyn(ctx, 0, &len)))
@@ -178,7 +185,7 @@ static duk_ret_t	es_md5(duk_context *ctx)
 
 	es_bin_to_hex(hash, MD5_DIGEST_SIZE, md5sum);
 
-	duk_push_string(ctx, md5sum);
+	es_push_result_string(ctx, md5sum, MD5_DIGEST_SIZE * 2);
 	zbx_free(md5sum);
 	zbx_free(str);
 
@@ -208,7 +215,7 @@ static duk_ret_t	es_sha256(duk_context *ctx)
 	zbx_sha256_hash_len(str, len, hash_res);
 	es_bin_to_hex((const unsigned char *)hash_res, ZBX_SHA256_DIGEST_SIZE, hash_res_stringhexes);
 
-	duk_push_string(ctx, hash_res_stringhexes);
+	es_push_result_string(ctx, hash_res_stringhexes, ZBX_SHA256_DIGEST_SIZE * 2);
 
 	zbx_free(str);
 
@@ -259,7 +266,7 @@ static duk_ret_t	es_hmac(duk_context *ctx)
 	if (SUCCEED != ret)
 		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot calculate HMAC");
 
-	duk_push_string(ctx, out);
+	es_push_result_string(ctx, out, strlen(out));
 	zbx_free(out);
 
 	return 1;

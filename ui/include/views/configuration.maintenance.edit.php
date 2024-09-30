@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 require_once dirname(__FILE__).'/js/configuration.maintenance.edit.js.php';
@@ -142,7 +143,8 @@ $tag_table = (new CTable())
 				->addValue(_('And/Or'), MAINTENANCE_TAG_EVAL_TYPE_AND_OR)
 				->addValue(_('Or'), MAINTENANCE_TAG_EVAL_TYPE_OR)
 				->setModern(true)
-				->setEnabled($data['maintenance_type'] == MAINTENANCE_TYPE_NODATA ? false : $data['allowed_edit'])
+				->setEnabled($data['maintenance_type'] != MAINTENANCE_TYPE_NODATA)
+				->setReadonly(!$data['allowed_edit'] && $data['maintenance_type'] != MAINTENANCE_TYPE_NODATA)
 		))->setColSpan(4)
 	);
 
@@ -179,7 +181,7 @@ foreach ($tags as $tag) {
 				->addValue(_('Contains'), MAINTENANCE_TAG_OPERATOR_LIKE)
 				->addValue(_('Equals'), MAINTENANCE_TAG_OPERATOR_EQUAL)
 				->setModern(true)
-				->setEnabled($data['allowed_edit']),
+				->setReadonly(!$data['allowed_edit']),
 			(new CTextBox('tags['.$i.'][value]', $tag['value']))
 				->setAttribute('placeholder', _('value'))
 				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
@@ -211,7 +213,7 @@ $table
 			'name' => 'groupids[]',
 			'object_name' => 'hostGroup',
 			'data' => $data['groups_ms'],
-			'disabled' => !$data['allowed_edit'],
+			'readonly' => !$data['allowed_edit'],
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'host_groups',
@@ -228,7 +230,7 @@ $table
 			'name' => 'hostids[]',
 			'object_name' => 'hosts',
 			'data' => $data['hosts_ms'],
-			'disabled' => !$data['allowed_edit'],
+			'readonly' => !$data['allowed_edit'],
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'hosts',
@@ -253,6 +255,7 @@ $table
 	->addRow(_('Description'),
 		(new CTextArea('description', $data['description']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setMaxlength(DB::getFieldLength('maintenances', 'description'))
 			->setReadonly(!$data['allowed_edit'])
 	);
 
