@@ -345,14 +345,12 @@
 	}
 }
 
-.list-table,
 .hintbox-wrap {
 	.tag {
-		margin-right: 0;
 		cursor: pointer;
 
-		&:not(:first-child) {
-			margin-left: 3px;
+		&:last-child {
+			margin-right: 0;
 		}
 	}
 }
