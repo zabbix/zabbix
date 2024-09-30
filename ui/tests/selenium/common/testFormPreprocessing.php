@@ -195,7 +195,7 @@ abstract class testFormPreprocessing extends CWebTest {
 	 *
 	 * Comments are formatted like this:
 	 * {Preprocessing step category} - {Preprocessing step name}.
-	 * The category is show in UI.
+	 * The category is shown in UI.
 	 */
 	public static function getCommonPreprocessingCreateData()
 	{
@@ -571,7 +571,7 @@ abstract class testFormPreprocessing extends CWebTest {
 	 *
 	 * Comments are formatted like this:
 	 * {Preprocessing step category} - {Preprocessing step name}.
-	 * The category is show in UI.
+	 * The category is shown in UI.
 	 */
 	public function getItemPreprocessingCreateData() {
 		return array_merge($this->getCommonPreprocessingCreateData(), [
@@ -1107,7 +1107,7 @@ abstract class testFormPreprocessing extends CWebTest {
 	 *
 	 * Comments are formatted like this:
 	 * {Preprocessing step category} - {Preprocessing step name}.
-	 * The category is show in UI.
+	 * The category is shown in UI.
 	 */
 	public static function getCommonPreprocessingValidationData() {
 		return [
@@ -1417,7 +1417,7 @@ abstract class testFormPreprocessing extends CWebTest {
 	 *
 	 * Comments are formatted like this:
 	 * {Preprocessing step category} - {Preprocessing step name}.
-	 * The category is show in UI.
+	 * The category is shown in UI.
 	 */
 	public function getItemPreprocessingValidationData() {
 		return array_merge($this->getCommonPreprocessingValidationData(), [
