@@ -12,7 +12,7 @@
 #	Port to listen on.
 #
 # Mandatory: no
-# Range: 1024-32767
+# Range: 1024-65535
 # Default:
 # LISTEN_PORT=10052
 
