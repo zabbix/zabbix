@@ -1471,8 +1471,8 @@ class CConfigurationImport {
 
 			foreach ($discovery_rules as $discovery_rule) {
 				// If rule was not processed we should not create/update any of its prototypes.
-				if (array_key_exists($hostid, $processed_discovery_rules)
-						&& !array_key_exists($discovery_rule['key_'], $processed_discovery_rules[$hostid])) {
+				if (!array_key_exists($hostid, $processed_discovery_rules)
+						|| !array_key_exists($discovery_rule['key_'], $processed_discovery_rules[$hostid])) {
 					continue;
 				}
 
