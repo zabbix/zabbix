@@ -110,12 +110,12 @@ Note: You can use the context macros `{$MSSQL.BACKUP_FULL.USED}`, `{$MSSQL.BACKU
 |Get performance counters|<p>The item gets server global status information.</p>|Database monitor|db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]|
 |Get availability groups|<p>The item gets availability group states - name, primary and secondary health, synchronization health.</p>|Database monitor|db.odbc.get[get_availability_group,"{$MSSQL.DSN}"]|
 |Get local DB|<p>Getting the states of the local availability database.</p>|Database monitor|db.odbc.get[get_local_db,"{$MSSQL.DSN}"]|
-|Get DB mirroring|<p>Getting DB mirroring.</p>|Database monitor|db.odbc.get[get_db_mirroring","{$MSSQL.DSN}"]|
+|Get DB mirroring|<p>Getting DB mirroring.</p>|Database monitor|db.odbc.get[get_db_mirroring,"{$MSSQL.DSN}"]|
 |Get non-local DB|<p>Getting the non-local availability database.</p>|Database monitor|db.odbc.get[get_non_local_db,"{$MSSQL.DSN}"]|
-|Get replica|<p>Getting the database replica.</p>|Database monitor|db.odbc.get[get_replica","{$MSSQL.DSN}"]|
-|Get quorum|<p>Getting quorum - cluster name, type, and state.</p>|Database monitor|db.odbc.get[get_quorum,{$MSSQL.DSN}]|
-|Get quorum member|<p>Getting quorum members - member name, type, state, and number of quorum votes.</p>|Database monitor|db.odbc.get[get_quorum_member,{$MSSQL.DSN}]|
-|Get database|<p>Getting databases - database name and recovery model.</p>|Database monitor|db.odbc.get[get_database,{$MSSQL.DSN}]|
+|Get replica|<p>Getting the database replica.</p>|Database monitor|db.odbc.get[get_replica,"{$MSSQL.DSN}"]|
+|Get quorum|<p>Getting quorum - cluster name, type, and state.</p>|Database monitor|db.odbc.get[get_quorum,"{$MSSQL.DSN}"]|
+|Get quorum member|<p>Getting quorum members - member name, type, state, and number of quorum votes.</p>|Database monitor|db.odbc.get[get_quorum_member,"{$MSSQL.DSN}"]|
+|Get database|<p>Getting databases - database name and recovery model.</p>|Database monitor|db.odbc.get[get_database,"{$MSSQL.DSN}"]|
 |Version|<p>MSSQL Server version.</p>|Dependent item|mssql.version<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.counter_name=='Version')].instance_name.first()`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 |Uptime|<p>MSSQL Server uptime in the format "N days, hh:mm:ss".</p>|Dependent item|mssql.uptime<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.counter_name=='Uptime')].cntr_value.first()`</p></li></ul>|
 |Get Access Methods counters|<p>The item gets server information about access methods.</p>|Dependent item|mssql.access_methods.raw<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.object_name=~'.*Access Methods')]`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|

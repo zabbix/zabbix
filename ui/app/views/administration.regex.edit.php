@@ -48,7 +48,7 @@ $table = (new CTable())
 		_('Expression'),
 		_('Delimiter'),
 		_('Case sensitive'),
-		_('Action')
+		''
 	]);
 
 foreach ($data['expressions'] as $i => $expression) {

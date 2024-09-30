@@ -740,12 +740,14 @@ static void	strncpy_alloc(char **str, size_t *alloc_len, size_t *offset, const c
  *             nmatch          - [IN] the number of items in captured group data *
  *             limit           - [IN] size limit for memory allocation           *
  *                                    0 means no limit                           *
+ *             group_check     - [IN] check if pattern matches but does not      *
+ *                                    contain group to capture and return NULL   *
  *                                                                               *
  * Return value: Allocated string containing output value                        *
  *                                                                               *
  *********************************************************************************/
 static char	*regexp_sub_replace(const char *text, const char *output_template, zbx_regmatch_t *match, int nmatch,
-		size_t limit)
+		size_t limit, zbx_regexp_group_check_t group_check)
 {
 	char		*ptr = NULL;
 	const char	*pstart = output_template, *pgroup;
@@ -782,23 +784,13 @@ static char	*regexp_sub_replace(const char *text, const char *output_template, z
 							(size_t)(match[group_index].rm_eo - match[group_index].rm_so),
 							limit);
 				}
+				else if (ZBX_REGEXP_GROUP_CHECK_ENABLE == group_check)
+				{
+					zbx_free(ptr);
+					goto out;
+				}
 				pstart = pgroup + 1;
 				continue;
-
-			case '@':
-					/* artificial construct to replace the first captured group or fail */
-					/* if the regular expression pattern contains no groups             */
-					if (-1 == match[1].rm_so)
-					{
-						zbx_free(ptr);
-						goto out;
-					}
-
-					strncpy_alloc(&ptr, &size, &offset, text + match[1].rm_so,
-							(size_t)(match[1].rm_eo - match[1].rm_so), limit);
-
-					pstart = pgroup + 1;
-					continue;
 
 			default:
 				strncpy_alloc(&ptr, &size, &offset, pstart, (size_t)(pgroup - pstart), limit);
@@ -860,6 +852,8 @@ out:
  *                                    is used as output value.                   *
  *            flags            - [IN] the pcre_compile() function flags.         *
  *                                    See pcre_compile() manual.                 *
+ *            group_check      - [IN] check if pattern matches but does not      *
+ *                                    contain group to capture                   *
  *            out              - [OUT] the output value if the input string      *
  *                                     matches the specified regular expression  *
  *                                     or NULL otherwise                         *
@@ -868,7 +862,8 @@ out:
  *               FAIL    - failed to compile regexp                              *
  *                                                                               *
  *********************************************************************************/
-static int	regexp_sub(const char *string, const char *pattern, const char *output_template, int flags, char **out)
+static int	regexp_sub(const char *string, const char *pattern, const char *output_template, int flags,
+		zbx_regexp_group_check_t group_check, char **out)
 {
 	char		*error = NULL;
 	zbx_regexp_t	*regexp = NULL;
@@ -900,7 +895,7 @@ static int	regexp_sub(const char *string, const char *pattern, const char *outpu
 		match[i].rm_so = match[i].rm_eo = -1;
 
 	if (ZBX_REGEXP_MATCH == regexp_exec(string, regexp, 0, ZBX_REGEXP_GROUPS_MAX, match, NULL, 0))
-		*out = regexp_sub_replace(string, output_template, match, ZBX_REGEXP_GROUPS_MAX, 0);
+		*out = regexp_sub_replace(string, output_template, match, ZBX_REGEXP_GROUPS_MAX, 0, group_check);
 
 	return SUCCEED;
 }
@@ -961,7 +956,10 @@ static int	regexp_sub2(const char *string, const char *pattern, const char *outp
 	/* 'regexp' ownership was taken by regexp_prepare(), do not cleanup */
 
 	if (ZBX_REGEXP_MATCH == (ret = regexp_exec(string, regexp, 0, ZBX_REGEXP_GROUPS_MAX, match, err_msg, 0)))
-		*out = regexp_sub_replace(string, output_template, match, ZBX_REGEXP_GROUPS_MAX, 0);
+	{
+		*out = regexp_sub_replace(string, output_template, match, ZBX_REGEXP_GROUPS_MAX, 0,
+				ZBX_REGEXP_GROUP_CHECK_DISABLE);
+	}
 
 	if (FAIL == ret)
 		ret = ZBX_REGEXP_RUNTIME_FAIL;
@@ -1010,7 +1008,7 @@ int	zbx_mregexp_sub_precompiled(const char *string, const zbx_regexp_t *regexp, 
 
 	if (ZBX_REGEXP_MATCH == regexp_exec(string, regexp, 0, ZBX_REGEXP_GROUPS_MAX, match, NULL, 0) &&
 			NULL != (*out = regexp_sub_replace(string, output_template, match, ZBX_REGEXP_GROUPS_MAX,
-			limit)))
+			limit, ZBX_REGEXP_GROUP_CHECK_DISABLE)))
 	{
 		return SUCCEED;
 	}
@@ -1115,7 +1113,7 @@ int	zbx_regexp_repl(const char *string, const char *pattern, const char *output_
 		else
 		{
 			replace = regexp_sub_replace(string, output_template, groups, ZBX_REGEXP_GROUPS_MAX,
-					MAX_EXECUTE_OUTPUT_LEN);
+					MAX_EXECUTE_OUTPUT_LEN, ZBX_REGEXP_GROUP_CHECK_DISABLE);
 		}
 
 		if (NULL != replace)
@@ -1193,7 +1191,7 @@ out:
  *********************************************************************************/
 int	zbx_regexp_sub(const char *string, const char *pattern, const char *output_template, char **out)
 {
-	return regexp_sub(string, pattern, output_template, ZBX_REGEXP_MULTILINE, out);
+	return regexp_sub(string, pattern, output_template, ZBX_REGEXP_MULTILINE, ZBX_REGEXP_GROUP_CHECK_DISABLE, out);
 }
 
 /*********************************************************************************
@@ -1202,9 +1200,10 @@ int	zbx_regexp_sub(const char *string, const char *pattern, const char *output_t
  *          multiline matches are accepted.                                      *
  *                                                                               *
  *********************************************************************************/
-int	zbx_mregexp_sub(const char *string, const char *pattern, const char *output_template, char **out)
+int	zbx_mregexp_sub(const char *string, const char *pattern, const char *output_template,
+		zbx_regexp_group_check_t group_check, char **out)
 {
-	return regexp_sub(string, pattern, output_template, 0, out);
+	return regexp_sub(string, pattern, output_template, 0, group_check, out);
 }
 
 /*********************************************************************************
@@ -1215,7 +1214,7 @@ int	zbx_mregexp_sub(const char *string, const char *pattern, const char *output_
  *********************************************************************************/
 int	zbx_iregexp_sub(const char *string, const char *pattern, const char *output_template, char **out)
 {
-	return regexp_sub(string, pattern, output_template, ZBX_REGEXP_CASELESS, out);
+	return regexp_sub(string, pattern, output_template, ZBX_REGEXP_CASELESS, ZBX_REGEXP_GROUP_CHECK_DISABLE, out);
 }
 
 /******************************************************************************
@@ -1308,7 +1307,8 @@ static int	regexp_match_ex_regsub(const char *string, const char *pattern, int c
 	}
 	else
 	{
-		if (SUCCEED == regexp_sub(string, pattern, output_template, regexp_flags, output))
+		if (SUCCEED == regexp_sub(string, pattern, output_template, regexp_flags,
+				ZBX_REGEXP_GROUP_CHECK_DISABLE, output))
 		{
 			ret = (NULL != *output ? ZBX_REGEXP_MATCH : ZBX_REGEXP_NO_MATCH);
 		}

@@ -174,11 +174,11 @@ require_once dirname(__FILE__).'/macros/testFormMacrosHostPrototype.php';
 require_once dirname(__FILE__).'/macros/testFormMacrosTemplate.php';
 
 // Maps.
-require_once dirname(__FILE__).'/maps/testFormMap.php';
-require_once dirname(__FILE__).'/maps/testFormSysmap.php';
+require_once dirname(__FILE__).'/maps/testFormMapConstructor.php';
+require_once dirname(__FILE__).'/maps/testFormMapProperties.php';
 require_once dirname(__FILE__).'/maps/testPageMaps.php';
 
-// Maintenance
+// Maintenance.
 require_once dirname(__FILE__).'/maintenance/testFormMaintenance.php';
 require_once dirname(__FILE__).'/maintenance/testPageMaintenance.php';
 
@@ -213,6 +213,7 @@ require_once dirname(__FILE__).'/preprocessing/testFormPreprocessingLowLevelDisc
 require_once dirname(__FILE__).'/preprocessing/testFormPreprocessingTest.php';
 
 // Problems.
+require_once dirname(__FILE__).'/problems/testCauseAndSymptomEvents.php';
 require_once dirname(__FILE__).'/problems/testFormUpdateProblem.php';
 require_once dirname(__FILE__).'/problems/testPageProblems.php';
 
@@ -515,8 +516,8 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageMaintenance');
 
 		// Maps.
-		$suite->addTestSuite('testFormMap');
-		$suite->addTestSuite('testFormSysmap');
+		$suite->addTestSuite('testFormMapConstructor');
+		$suite->addTestSuite('testFormMapProperties');
 		$suite->addTestSuite('testPageMaps');
 
 		// Media types.
@@ -550,6 +551,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormPreprocessingTest');
 
 		// Problems.
+		$suite->addTestSuite('testCauseAndSymptomEvents');
 		$suite->addTestSuite('testPageProblems');
 		$suite->addTestSuite('testFormUpdateProblem');
 

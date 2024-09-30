@@ -19,7 +19,7 @@ require_once dirname(__FILE__).'/../include/CWebTest.php';
 use Facebook\WebDriver\WebDriverKeys;
 
 /**
- * @dataSource Proxies, Actions
+ * @dataSource Actions, Maps, Proxies
  *
  * @backup profiles, module, services, token, connector
  *
@@ -2773,28 +2773,34 @@ class testDocumentationLinks extends CWebTest {
 			// #0 Edit element form.
 			[
 				[
-					'element' => 'xpath://div[@data-id="3"]',
+					'element' => 'xpath://div[contains(@class, "sysmap_iconid_7")]',
 					'doc_link' => '/en/manual/config/visualization/maps/map#adding-elements'
 				]
 			],
 			// #1 Edit shape form.
 			[
 				[
-					'element' => 'xpath://div[@data-id="101"]',
+					'element' => 'xpath://div[contains(@style, "top: 82px")]',
 					'doc_link' => '/en/manual/config/visualization/maps/map#adding-shapes'
 				]
 			],
 			// #2 Edit element selection.
 			[
 				[
-					'element' => ['xpath://div[@data-id="7"]', 'xpath://div[@data-id="5"]'],
+					'element' => [
+						'xpath://div[contains(@class, "sysmap_iconid_19")]',
+						'xpath://div[contains(@class, "sysmap_iconid_7")]'
+					],
 					'doc_link' => '/en/manual/config/visualization/maps/map#selecting-elements'
 				]
 			],
 			// #3 Edit shape selection.
 			[
 				[
-					'element' => ['xpath://div[@data-id="100"]', 'xpath://div[@data-id="101"]'],
+					'element' => [
+						'xpath://div[contains(@style, "top: 257px")]',
+						'xpath://div[contains(@style, "top: 82px")]'
+					],
 					'doc_link' => '/en/manual/config/visualization/maps/map#adding-shapes'
 				]
 			]
@@ -2805,7 +2811,7 @@ class testDocumentationLinks extends CWebTest {
 	 * @dataProvider getMapDocumentationLinkData
 	 */
 	public function testDocumentationLinks_checkMapElementLinks($data) {
-		$this->page->login()->open('sysmap.php?sysmapid=3')->waitUntilReady();
+		$this->page->login()->open('sysmap.php?sysmapid='.CDataHelper::get('Maps.links_mapid'))->waitUntilReady();
 
 		// Checking element selection documentation links requires pressing control key when selecting elements.
 		if (is_array($data['element'])) {
