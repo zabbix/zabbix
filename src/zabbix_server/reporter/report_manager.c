@@ -1457,11 +1457,10 @@ static int	rm_writer_process_job(zbx_rm_writer_t *writer, zbx_rm_job_t *job, cha
 		/* username of the user who tests a scheduled report should always be present */
 		if (NULL != (row = zbx_db_fetch(result)))
 			username = row[0];
+		zbx_db_free_result(result);
 
 		*error = zbx_dsprintf(NULL, "No media configured for the report recipient '%s'",
 				ZBX_NULL2STR(username));
-		zbx_db_free_result(result);
-
 		goto out;
 	}
 
