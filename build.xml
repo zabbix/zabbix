@@ -402,6 +402,29 @@
 	<target name="init-dast-postgresql" depends="create-frontend-configs,make-dbschema,create-db-postgresql"/>
 
 	<target name="make-binaries-mysql">
+
+		<exec executable="./bootstrap.sh" failonerror="on"/>
+		<exec executable="./configure" failonerror="on">
+			<arg line="--quiet"/>
+			<arg line="--enable-agent2"/>
+			<arg line="--prefix=${basedir}"/>
+			<arg line="--with-libcurl"/>
+			<arg line="--with-stacksize=128"/>
+			<arg line="--with-openssl"/>
+			<arg line="--with-net-snmp"/>
+			<arg line="--with-ssh2"/>
+		</exec>
+		<exec executable="make" failonerror="on">
+			<arg line="-j4"/>
+			<arg line="-s"/>
+			<arg line="dbschema"/>
+		</exec>
+		<exec executable="make" failonerror="on">
+			<arg line="-j4"/>
+			<arg line="-s"/>
+			<arg line="install"/>
+		</exec>
+
 		<!-- Binaries for integration tests -->
 		<exec executable="./bootstrap.sh" failonerror="on"/>
 		<exec executable="./configure" failonerror="on">
@@ -412,7 +435,6 @@
 			<arg line="--enable-server"/>
 			<arg line="--enable-proxy"/>
 			<arg line="--enable-agent"/>
-			<arg line="--enable-agent2"/>
 			<arg line="--with-mysql"/>
 			<arg line="--prefix=${basedir}"/>
 			<arg line="--with-libcurl"/>
