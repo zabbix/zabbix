@@ -2134,7 +2134,7 @@ define('ZBX_STYLE_HOST_INTERFACE_INPUT_EXPAND', 'interface-input-expand');
 
 define('ZBX_STYLE_ZSELECT_HOST_INTERFACE', 'z-select-host-interface');
 
-// Dashboard list table classes.
+// Dashboard list table class.
 define('ZBX_STYLE_DASHBOARD_LIST', 'dashboard-list');
 
 // server variables
