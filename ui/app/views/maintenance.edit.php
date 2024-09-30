@@ -33,7 +33,7 @@ $form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 $timeperiods = (new CTable())
 	->setId('timeperiods')
 	->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-	->setHeader(new CRowHeader([_('Period type'), _('Schedule'), _('Period'), _('Action')]))
+	->setHeader(new CRowHeader([_('Period type'), _('Schedule'), _('Period'), _('Actions')]))
 	->addItem(
 		(new CTag('tfoot', true))
 			->addItem(
@@ -219,6 +219,7 @@ $form->addItem(
 				(new CTextArea('description', $data['description']))
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 					->setReadonly(!$data['allowed_edit'])
+					->setMaxlength(DB::getFieldLength('maintenances', 'description'))
 			)
 		])
 	);

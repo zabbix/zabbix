@@ -82,7 +82,7 @@ void	expr_db_get_escalation_history(zbx_uint64_t actionid, const zbx_db_event *e
 int	expr_db_get_action_value(const char *macro, zbx_uint64_t actionid, char **replace_to);
 int	expr_get_history_log_value(const char *m, const zbx_db_trigger *trigger, char **replace_to, int N_functionid,
 		int clock, int ns, const char *tz);
-void	expr_db_get_event_symptoms(const zbx_db_event *event, char **replace_to);
+int	expr_db_get_event_symptoms(const zbx_db_event *event, char **replace_to);
 void	expr_db_get_rootcause(const zbx_db_service *service, char **replace_to);
 
 int	expr_dc_get_interface_value(zbx_uint64_t hostid, zbx_uint64_t itemid, char **replace_to, int request);

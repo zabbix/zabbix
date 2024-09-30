@@ -2214,9 +2214,9 @@ class testFormHost extends CWebTest {
 					$hint->waitUntilNotPresent();
 
 					$host_templates = [
-						['Name' => self::TEMPLATE_NAMES[0], 'Action' => 'UnlinkUnlink and clear'],
-						['Name' => self::TEMPLATE_NAMES[1], 'Action' => 'UnlinkUnlink and clear'],
-						['Name' => self::TEMPLATE_NAMES[2], 'Action' => 'UnlinkUnlink and clear']
+						['Name' => self::TEMPLATE_NAMES[0], 'Actions' => 'UnlinkUnlink and clear'],
+						['Name' => self::TEMPLATE_NAMES[1], 'Actions' => 'UnlinkUnlink and clear'],
+						['Name' => self::TEMPLATE_NAMES[2], 'Actions' => 'UnlinkUnlink and clear']
 					];
 					$this->assertTableData($host_templates, 'id:linked-templates');
 

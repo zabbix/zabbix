@@ -86,7 +86,7 @@ $scriptsTable = (new CTableInfo())
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
 		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $url),
 		_('Scope'),
-		_('Used in actions'),
+		(new CColHeader(_('Used in actions')))->setColSpan(2),
 		_('Type'),
 		_('Execute on'),
 		make_sorting_header(_('Commands'), 'command', $data['sort'], $data['sortorder'], $url),
@@ -97,6 +97,7 @@ $scriptsTable = (new CTableInfo())
 	->setPageNavigation($data['paging']);
 
 foreach ($data['scripts'] as $script) {
+	$action_count_total = '';
 	$actions = [];
 
 	switch ($script['scope']) {
@@ -104,50 +105,24 @@ foreach ($data['scripts'] as $script) {
 			$scope = _('Action operation');
 
 			if ($script['actions']) {
-				$i = 0;
+				$action_count_total = (new CSpan($script['action_count_total']))->addClass(ZBX_STYLE_ENTITY_COUNT);
 
 				foreach ($script['actions'] as $action) {
-					$i++;
-
-					if ($i > $data['config']['max_in_table']) {
-						$actions[] = [' ', HELLIP()];
-
-						break;
-					}
-
-					if ($actions) {
-						$actions[] = ', ';
-					}
-
-					switch ($action['eventsource']) {
-						case EVENT_SOURCE_TRIGGERS:
-							$has_access = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TRIGGER_ACTIONS);
-							break;
-						case EVENT_SOURCE_SERVICE:
-							$has_access = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_SERVICE_ACTIONS);
-							break;
-						case EVENT_SOURCE_DISCOVERY:
-							$has_access = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_DISCOVERY_ACTIONS);
-							break;
-						case EVENT_SOURCE_AUTOREGISTRATION:
-							$has_access = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_AUTOREGISTRATION_ACTIONS);
-							break;
-						case EVENT_SOURCE_INTERNAL:
-							$has_access = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_INTERNAL_ACTIONS);
-							break;
-					}
-
-					if ($has_access) {
-						$actions[] = (new CLink($action['name']))
+					$actions[] = $action['is_editable']
+						? (new CLink($action['name']))
 							->addClass('js-action-edit')
 							->setAttribute('data-actionid', $action['actionid'])
 							->setAttribute('data-eventsource', $action['eventsource'])
 							->addClass(ZBX_STYLE_LINK_ALT)
-							->addClass(ZBX_STYLE_GREY);
-					}
-					else {
-						$actions[] = (new CSpan($action['name']))->addClass(ZBX_STYLE_GREY);
-					}
+							->addClass(ZBX_STYLE_GREY)
+						: (new CSpan($action['name']))->addClass(ZBX_STYLE_GREY);
+					$actions[] = ', ';
+				}
+
+				array_pop($actions);
+
+				if ($script['action_count_total'] > count($script['actions'])) {
+					$actions[] = [', ', HELLIP()];
 				}
 			}
 			break;
@@ -212,14 +187,21 @@ foreach ($data['scripts'] as $script) {
 
 	$scriptsTable->addRow([
 		new CCheckBox('scriptids['.$script['scriptid'].']', $script['scriptid']),
-		(new CCol($script['menu_path'] === '' ? $link : [$script['menu_path'].'/', $link]))->addClass(ZBX_STYLE_NOWRAP),
+		(new CCol($script['menu_path'] === '' ? $link : [$script['menu_path'].'/', $link]))
+			->addClass(ZBX_STYLE_WORDBREAK),
 		$scope,
-		$actions,
+		(new CCol($action_count_total))->addClass(ZBX_STYLE_CELL_WIDTH),
+		(new CCol($actions))->addClass(ZBX_STYLE_WORDBREAK),
 		$type,
 		$execute_on,
-		(new CCol(zbx_nl2br($script['command'])))->addClass(ZBX_STYLE_MONOSPACE_FONT),
-		($script['userGroupName'] === null) ? _('All') : $script['userGroupName'],
-		($script['hostGroupName'] === null) ? _('All') : $script['hostGroupName'],
+		(new CCol(zbx_nl2br($script['command'])))
+			->addClass(ZBX_STYLE_MONOSPACE_FONT)
+			->addClass(ZBX_STYLE_WORDBREAK)
+			->addStyle('max-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;'),
+		(new CCol($script['userGroupName'] === null ? _('All') : $script['userGroupName']))
+			->addClass(ZBX_STYLE_WORDBREAK),
+		(new CCol($script['hostGroupName'] === null ? _('All') : $script['hostGroupName']))
+			->addClass(ZBX_STYLE_WORDBREAK),
 		($script['host_access'] == PERM_READ_WRITE) ? _('Write') : _('Read')
 	]);
 }

@@ -115,10 +115,11 @@ foreach ($data['correlations'] as $correlation) {
 
 	$table->addRow([
 		new CCheckBox('correlationids['.$correlation['correlationid'].']', $correlation['correlationid']),
-		(new CLink($correlation['name']))
+		(new CCol((new CLink($correlation['name']))
 			->addClass('js-edit')
-			->setAttribute('data-correlationid', $correlation['correlationid']),
-		$conditions,
+			->setAttribute('data-correlationid', $correlation['correlationid'])
+		))->addClass(ZBX_STYLE_WORDBREAK),
+		(new CCol($conditions))->addClass(ZBX_STYLE_WORDBREAK),
 		$operations,
 		$status
 	]);

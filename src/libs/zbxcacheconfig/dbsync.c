@@ -1501,14 +1501,8 @@ int	zbx_dbsync_compare_host_macros(zbx_dbsync_t *sync)
 	zbx_uint64_t		rowid, *prowid = &rowid;
 	zbx_um_macro_t		**pmacro;
 
-	if (NULL == (result = zbx_db_select(
-			"select m.hostmacroid,m.hostid,m.macro,m.value,m.type"
-			" from hostmacro m"
-			" inner join hosts h on m.hostid=h.hostid"
-			" where h.flags<>%d", ZBX_FLAG_DISCOVERY_PROTOTYPE)))
-	{
+	if (NULL == (result = zbx_db_select("select hostmacroid,hostid,macro,value,type from hostmacro")))
 		return FAIL;
-	}
 
 	dbsync_prepare(sync, 5, NULL);
 
@@ -1838,7 +1832,7 @@ int	zbx_dbsync_compare_items(zbx_dbsync_t *sync)
 				"i.request_method,i.output_format,i.ssl_cert_file,i.ssl_key_file,i.ssl_key_password,"
 				"i.verify_peer,i.verify_host,i.allow_traps,i.templateid,null"
 			" from items i"
-			" join item_rtdata ir on i.itemid=ir.itemid");
+			" left join item_rtdata ir on i.itemid=ir.itemid");
 
 	dbsync_prepare(sync, 50, dbsync_item_preproc_row);
 
@@ -1927,122 +1921,6 @@ int	zbx_dbsync_compare_item_discovery(zbx_dbsync_t *sync)
 	zbx_db_free_result(result);
 
 	return SUCCEED;
-}
-
-static int	dbsync_compare_template_item(const ZBX_DC_TEMPLATE_ITEM *item, const zbx_db_row_t dbrow)
-{
-	if (FAIL == dbsync_compare_uint64(dbrow[1], item->hostid))
-		return FAIL;
-
-	if (FAIL == dbsync_compare_uint64(dbrow[2], item->templateid))
-		return FAIL;
-
-	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: compares items that belong to templates with configuration cache  *
- *                                                                            *
- * Return value: SUCCEED - the changeset was successfully calculated          *
- *               FAIL    - otherwise                                          *
- *                                                                            *
- ******************************************************************************/
-int	zbx_dbsync_compare_template_items(zbx_dbsync_t *sync)
-{
-	zbx_db_row_t		dbrow;
-	zbx_db_result_t		result;
-	zbx_hashset_t		ids;
-	zbx_hashset_iter_t	iter;
-	zbx_uint64_t		rowid;
-	ZBX_DC_TEMPLATE_ITEM	*item;
-	char			**row;
-
-	if (NULL == (result = zbx_db_select(
-			"select i.itemid,i.hostid,i.templateid from items i inner join hosts h on i.hostid=h.hostid"
-			" where h.status=%d", HOST_STATUS_TEMPLATE)))
-	{
-		return FAIL;
-	}
-
-	dbsync_prepare(sync, 3, NULL);
-
-	if (ZBX_DBSYNC_INIT == sync->mode)
-	{
-		sync->dbresult = result;
-		return SUCCEED;
-	}
-
-	zbx_hashset_create(&ids, (size_t)dbsync_env.cache->template_items.num_data, ZBX_DEFAULT_UINT64_HASH_FUNC,
-			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
-	while (NULL != (dbrow = zbx_db_fetch(result)))
-	{
-		unsigned char	tag = ZBX_DBSYNC_ROW_NONE;
-
-		ZBX_STR2UINT64(rowid, dbrow[0]);
-		zbx_hashset_insert(&ids, &rowid, sizeof(rowid));
-
-		row = dbsync_preproc_row(sync, dbrow);
-
-		if (NULL == (item = (ZBX_DC_TEMPLATE_ITEM *)zbx_hashset_search(&dbsync_env.cache->template_items,
-				&rowid)))
-		{
-			tag = ZBX_DBSYNC_ROW_ADD;
-		}
-		else if (FAIL == dbsync_compare_template_item(item, row))
-			tag = ZBX_DBSYNC_ROW_UPDATE;
-
-		if (ZBX_DBSYNC_ROW_NONE != tag)
-			dbsync_add_row(sync, rowid, tag, row);
-	}
-
-	zbx_hashset_iter_reset(&dbsync_env.cache->template_items, &iter);
-	while (NULL != (item = (ZBX_DC_TEMPLATE_ITEM *)zbx_hashset_iter_next(&iter)))
-	{
-		if (NULL == zbx_hashset_search(&ids, &item->itemid))
-			dbsync_add_row(sync, item->itemid, ZBX_DBSYNC_ROW_REMOVE, NULL);
-	}
-
-	zbx_hashset_destroy(&ids);
-	zbx_db_free_result(result);
-
-	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: compares lld item prototypes with configuration cache             *
- *                                                                            *
- * Return value: SUCCEED - the changeset was successfully calculated          *
- *               FAIL    - otherwise                                          *
- *                                                                            *
- ******************************************************************************/
-int	zbx_dbsync_compare_prototype_items(zbx_dbsync_t *sync)
-{
-	char	*sql = NULL;
-	size_t	sql_alloc = 0, sql_offset = 0;
-	int	ret = SUCCEED;
-
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select i.itemid,i.hostid,i.templateid from items i where i.flags=%d",
-				ZBX_FLAG_DISCOVERY_PROTOTYPE);
-
-	dbsync_prepare(sync, 3, NULL);
-
-	if (ZBX_DBSYNC_INIT == sync->mode)
-	{
-		if (NULL == (sync->dbresult = zbx_db_select("%s", sql)))
-			ret = FAIL;
-		goto out;
-	}
-
-	ret = dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "i.itemid", "and", NULL,
-			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_ITEM)]);
-out:
-	zbx_free(sql);
-
-	return ret;
 }
 
 /******************************************************************************

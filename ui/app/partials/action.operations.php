@@ -24,10 +24,10 @@ $operations_table = (new CTable())
 	->setAttribute('style', 'width: 100%;');
 
 if (in_array($data['eventsource'], [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE])) {
-	$operations_table->setHeader([_('Steps'), _('Details'), _('Start in'), _('Duration'), _('Action')]);
+	$operations_table->setHeader([_('Steps'), _('Details'), _('Start in'), _('Duration'), _('Actions')]);
 }
 else {
-	$operations_table->setHeader([_('Details'), _('Action')]);
+	$operations_table->setHeader([_('Details'), _('Actions')]);
 }
 
 if (array_key_exists('descriptions', $data)) {

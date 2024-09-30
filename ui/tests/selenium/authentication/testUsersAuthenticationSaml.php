@@ -116,7 +116,7 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 			],
 			'Media type mapping' => [
 				'id' => 'saml-media-type-mapping-table',
-				'headers' => ['Name', 'Media type', 'Attribute', '']
+				'headers' => ['Name', 'Media type', 'Attribute', 'Action']
 			]
 		];
 

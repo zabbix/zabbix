@@ -27,12 +27,15 @@
 	const view = {
 		applied_filter_groupids: [],
 
-		init({applied_filter_groupids}) {
+		init({applied_filter_groupids, csrf_token}) {
 			this.applied_filter_groupids = applied_filter_groupids;
+			this.csrf_token = csrf_token;
 
 			this.initFilter();
 
-			document.addEventListener('click', (e) => {
+			const form = document.forms['hosts'];
+
+			form.addEventListener('click', e => {
 				if (e.target.classList.contains('js-edit-template')) {
 					this.editTemplate({templateid: e.target.dataset.templateid});
 				}
@@ -42,7 +45,101 @@
 				else if (e.target.classList.contains('js-edit-proxy-group')) {
 					this.editProxyGroup(e.target.dataset.proxy_groupid);
 				}
+				else if (e.target.classList.contains('js-enable-host')) {
+					if (window.confirm(<?= json_encode(_('Enable selected host?')) ?>)) {
+						this.enable(e.target, {hostids: [e.target.dataset.hostid]});
+					}
+				}
+				else if (e.target.classList.contains('js-disable-host')) {
+					if (window.confirm(<?= json_encode(_('Disable selected host?')) ?>)) {
+						this.disable(e.target, {hostids: [e.target.dataset.hostid]});
+					}
+				}
 			});
+
+			form.querySelector('.js-massenable-host').addEventListener('click', e => {
+				const hostids = Object.keys(chkbxRange.getSelectedIds());
+
+				const message = hostids.length > 1
+					? <?= json_encode(_('Enable selected hosts?')) ?>
+					: <?= json_encode(_('Enable selected host?')) ?>;
+
+				if (window.confirm(message)) {
+					this.enable(e.target, {hostids});
+				}
+			});
+
+			form.querySelector('.js-massdisable-host').addEventListener('click', e => {
+				const hostids = Object.keys(chkbxRange.getSelectedIds());
+
+				const message = hostids.length > 1
+					? <?= json_encode(_('Disable selected hosts?')) ?>
+					: <?= json_encode(_('Disable selected host?')) ?>;
+
+				if (window.confirm(message)) {
+					this.disable(e.target, {hostids});
+				}
+			});
+
+			form.querySelector('.js-massupdate-host').addEventListener('click', e => {
+				openMassupdatePopup('popup.massupdate.host', {
+					[CSRF_TOKEN_NAME]: this.csrf_token
+				}, {
+					dialogue_class: 'modal-popup-static',
+					trigger_element: e.target
+				})
+			});
+
+			form.querySelector('.js-massdelete-host').addEventListener('click', e => {
+				this.massDeleteHosts(e.target);
+			});
+		},
+
+		enable(target, parameters) {
+			const curl = new Curl('zabbix.php');
+			curl.setArgument('action', 'host.enable');
+
+			target.classList.add('is-loading');
+
+			this.postAction(curl, parameters)
+				.then(response => this.reload(response))
+				.finally(() => {
+					target.classList.remove('is-loading');
+					target.blur();
+				});
+		},
+
+		disable(target, parameters) {
+			const curl = new Curl('zabbix.php');
+			curl.setArgument('action', 'host.disable');
+
+			target.classList.add('is-loading');
+
+			this.postAction(curl, parameters)
+				.then(response => this.reload(response))
+				.finally(() => {
+					target.classList.remove('is-loading');
+					target.blur();
+				});
+		},
+
+		postAction(curl, data) {
+			return fetch(curl.getUrl(), {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({
+					...data,
+					[CSRF_TOKEN_NAME]: this.csrf_token
+				})
+			})
+				.then(response => response.json())
+				.catch(() => {
+					clearMessages();
+
+					const message_box = makeMessageBox('bad', [<?= json_encode(_('Unexpected server error.')) ?>]);
+
+					addMessage(message_box);
+				});
 		},
 
 		editTemplate(parameters) {
@@ -52,7 +149,7 @@
 				prevent_navigation: true
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => this.reload(e.detail.success));
+			overlay.$dialogue[0].addEventListener('dialogue.submit', e => this.reload({success: e.detail.success}));
 		},
 
 		editProxy(proxyid) {
@@ -62,7 +159,7 @@
 				prevent_navigation: true
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => this.reload(e.detail.success));
+			overlay.$dialogue[0].addEventListener('dialogue.submit', e => this.reload({success: e.detail.success}));
 		},
 
 		editProxyGroup(proxy_groupid) {
@@ -72,17 +169,28 @@
 				prevent_navigation: true
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => this.reload(e.detail.success));
+			overlay.$dialogue[0].addEventListener('dialogue.submit', e => this.reload({success: e.detail.success}));
 		},
 
-		reload(success) {
-			postMessageOk(success.title);
+		reload(result) {
+			if ('error' in result) {
+				if ('title' in result.error) {
+					postMessageError(result.error.title);
+				}
 
-			if ('messages' in success) {
-				postMessageDetails('success', success.messages);
+				postMessageDetails('error', result.error.messages);
+
+				uncheckTableRows('hosts', result.keepids ?? []);
 			}
+			else if ('success' in result) {
+				postMessageOk(result.success.title);
 
-			uncheckTableRows('hosts');
+				if ('messages' in result.success) {
+					postMessageDetails('success', result.success.messages);
+				}
+
+				uncheckTableRows('hosts');
+			}
 
 			location.href = location.href;
 		},
@@ -165,36 +273,15 @@
 
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'host.massdelete');
-			curl.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('host')) ?>);
+			curl.setArgument(CSRF_TOKEN_NAME, this.csrf_token);
 
 			fetch(curl.getUrl(), {
 				method: 'POST',
 				headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
 				body: urlEncodeData({hostids: Object.keys(chkbxRange.getSelectedIds())})
 			})
-				.then((response) => response.json())
-				.then((response) => {
-					if ('error' in response) {
-						if ('title' in response.error) {
-							postMessageError(response.error.title);
-						}
-
-						postMessageDetails('error', response.error.messages);
-
-						uncheckTableRows('hosts', response.keepids ?? []);
-					}
-					else if ('success' in response) {
-						postMessageOk(response.success.title);
-
-						if ('messages' in response.success) {
-							postMessageDetails('success', response.success.messages);
-						}
-
-						uncheckTableRows('hosts');
-					}
-
-					location.href = location.href;
-				})
+				.then(response => response.json())
+				.then(response => this.reload(response))
 				.catch(() => {
 					clearMessages();
 

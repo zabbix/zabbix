@@ -930,7 +930,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 
 		// Threshold table with adding and removing lines.
 		$table = $form->query('id:thresholds-table')->asTable()->one();
-		$this->assertEquals(['', 'Threshold', 'Action'], $table->getHeadersText());
+		$this->assertEquals(['', 'Threshold', ''], $table->getHeadersText());
 
 		// Check added threshold colors.
 		$table->query('button:Add')->one()->click();
