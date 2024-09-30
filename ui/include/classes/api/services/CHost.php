@@ -2086,7 +2086,7 @@ class CHost extends CHostGeneral {
 		$this->checkDiscoveredFields($hosts, $db_hosts);
 
 		foreach ($hosts as $i => &$host) {
-			if ($db_hosts[$host['hostid']] != ZBX_FLAG_DISCOVERY_NORMAL) {
+			if ($db_hosts[$host['hostid']]['flags'] != ZBX_FLAG_DISCOVERY_NORMAL) {
 				continue;
 			}
 
