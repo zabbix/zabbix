@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-07-02T09:48:30Z'
+  date: '2024-09-17T05:29:40Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -1797,9 +1797,6 @@ zabbix_export:
         - tag: target
           value: zabbix
       macros:
-        - macro: '{$PROXY.LAST_SEEN.MAX}'
-          value: '600'
-          description: 'The maximum number of seconds that Zabbix proxy has not been seen.'
         - macro: '{$ZABBIX.SERVER.ADDRESS}'
           description: 'IP/DNS/network mask list of servers to be remotely queried (default is 127.0.0.1).'
         - macro: '{$ZABBIX.SERVER.NODATA_TIMEOUT}'
