@@ -186,6 +186,7 @@ tests/libs/zbxexpr/zbx_validate_interval
 tests/libs/zbxexpr/macro_fmttime
 tests/libs/zbxexpr/zbx_substitute_macros
 tests/libs/zbxexpr/zbx_substitute_macros1
+tests/libs/zbxexpr/zbx_substitute_macros_um
 tests/libs/zbxexpression/zbx_evaluate
 tests/libs/zbxexpression/zbx_evaluate_unknown
 tests/libs/zbxexpression/evaluate_function

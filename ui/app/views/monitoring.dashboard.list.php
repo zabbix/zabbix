@@ -103,12 +103,12 @@ foreach ($data['dashboards'] as $dashboard) {
 		(new CCheckBox('dashboardids['.$dashboard['dashboardid'].']', $dashboard['dashboardid']))
 			->setEnabled($dashboard['editable']),
 		(new CDiv([
-			new CLink($dashboard['name'],
+			(new CLink($dashboard['name'],
 				(new CUrl('zabbix.php'))
 					->setArgument('action', 'dashboard.view')
 					->setArgument('dashboardid', $dashboard['dashboardid'])
 					->getUrl()
-			),
+			))->addClass(ZBX_STYLE_WORDBREAK),
 			$tags ? new CDiv($tags) : null
 		]))->addClass(ZBX_STYLE_DASHBOARD_LIST_ITEM)
 	]);

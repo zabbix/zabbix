@@ -1,0 +1,246 @@
+---
+test case: converts all letters to uppercase
+in:
+  data: 'ABCabc123'
+  param1: '[a-z]'
+  param2: '[A-Z]'
+out:
+  value: 'ABCABC123'
+  return: SUCCEED
+---
+test case: converts all letters to lowercase
+in:
+  data: 'ABCabc123'
+  param1: 'A-Z'
+  param2: 'a-z'
+out:
+  value: 'abcabc123'
+  return: SUCCEED
+---
+test case: replaces all numbers with *
+in:
+  data: 'ABCabc123'
+  param1: '0-9'
+  param2: '*'
+out:
+  value: 'ABCabc***'
+  return: SUCCEED
+---
+test case: replaces all numbers and uppercase latters with *
+in:
+  data: 'ABCabc123'
+  param1: 'A-Z0-9'
+  param2: '*'
+out:
+  value: '***abc***'
+  return: SUCCEED
+---
+test case: replaces all numbers and latters with *
+in:
+  data: 'ABCabc123'
+  param1: 'A-Z0-9a-z'
+  param2: '*'
+out:
+  value: '*********'
+  return: SUCCEED
+---
+test case: converts all uppercase to lowercase and lowercase to uppercase
+in:
+  data: 'ABCabc123'
+  param1: 'A-Za-z'
+  param2: 'a-zA-Z'
+out:
+  value: 'abcABC123'
+  return: SUCCEED
+---
+test case: empty parameter 1
+in:
+  data: 'A*'
+  param1: '""'
+  param2: '*'
+out:
+  value: 'A*'
+  return: SUCCEED
+---
+test case: empty parameter 2
+in:
+  data: 'A*'
+  param1: 'A*'
+  param2: '""'
+out:
+  value: 'A*'
+  return: SUCCEED
+---
+test case: empty input data
+in:
+  data: ''
+  param1: '*'
+  param2: '*'
+out:
+  value: ''
+  return: SUCCEED
+---
+test case: wrong parameter 1 range
+in:
+  data: 'ABCabc123'
+  param1: 'b-a'
+  param2: '*'
+out:
+  value: ''
+  return: FAIL
+---
+test case: wrong parameter 2 range
+in:
+  data: 'ABCabc123'
+  param1: 'a'
+  param2: '2-0'
+out:
+  value: ''
+  return: FAIL
+---
+test case: escaped character backslash
+in:
+  data: 'a\b'
+  param1: '\\'
+  param2: '\/'
+out:
+  value: 'a/b'
+  return: SUCCEED
+---
+test case: escaped character "
+in:
+  data: 'a"b'
+  param1: '\"'
+  param2: 'b'
+out:
+  value: 'abb'
+  return: SUCCEED
+---
+test case: escaped character '
+in:
+  data: 'a''b'
+  param1: '\'''
+  param2: 'b'
+out:
+  value: 'abb'
+  return: SUCCEED
+---
+test case: mixed long string with mixed patterns
+in:
+  data: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ111222333444555666777888999000'
+  param1: 'a-z0-9ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+  param2: 'A-Zabcdefghijklmnopqrstuvwxyz'
+out:
+  value: "ABCDEFGHIJKLMNOPQRSTUVWXYZklmnopqrstuvwxyzzzzzzzzzzzbbbcccdddeeefffggghhhiiijjjaaa"
+  return: SUCCEED
+---
+test case: mixed long string with mixed patterns extended
+in:
+  data: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ111222333444555666777888999000'
+  param1: 'a-z0-9ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+  param2: '0-9*'
+out:
+  value: "0123456789************************************************************************"
+  return: SUCCEED
+---
+test case: overridden pattern
+in:
+  data: '[0123456789]'
+  param1: '0-9a-z0-9'
+  param2: '**********A-Za-z'
+out:
+  value: "[abcdefghij]"
+  return: SUCCEED
+---
+test case: unfinished range pattern
+in:
+  data: '$0123456789$'
+  param1: '0-7'
+  param2: 'a-c'
+out:
+  value: "$abcccccc89$"
+  return: SUCCEED
+---
+test case: parameter 1 pattern overflow
+in:
+  data: '0'
+  param1: 'a-Z -} -} -} -} -} -} -} -}'
+  param2: '*'
+out:
+  value: ""
+  return: FAIL
+---
+test case: parameter 2 pattern overflow
+in:
+  data: '0'
+  param1: '*'
+  param2: 'a-Z -} -} -} -} -} -} -} -}'
+out:
+  value: ""
+  return: FAIL
+---
+test case: parameter range pattern finished with escaped char
+in:
+  data: '0zA'
+  param1: '0-\\'
+  param2: '*'
+out:
+  value: "*z*"
+  return: SUCCEED
+---
+test case: parameter range pattern started with escaped char
+in:
+  data: 'bcA'
+  param1: '\\-z'
+  param2: '*'
+out:
+  value: "**A"
+  return: SUCCEED
+
+---
+test case: replace escaped - to *
+in:
+  data: '---'
+  param1: '\-'
+  param2: '*'
+out:
+  value: "***"
+  return: SUCCEED
+---
+test case: replace * to escaped -
+in:
+  data: '*A*'
+  param1: '*'
+  param2: '\-'
+
+out:
+  value: "-A-"
+  return: SUCCEED
+---
+test case: triple range spechar usage
+in:
+  data: '1234567890'
+  param1: '0-9'
+  param2: '*---a-z'
+out:
+  value: '+,--abcde*'
+  return: SUCCEED
+---
+test case: backslash at end of pattern
+in:
+  data: 'ABCabc123'
+  param1: '\'
+  param2: '\\-'
+out:
+  value: 'ABCabc123'
+  return: SUCCEED
+---
+test case: different characters
+in:
+  data: 'ыABCabc123ыы'
+  param1: 'ы'
+  param2: 'в'
+out:
+  value: 'вABCabc123вв'
+  return: SUCCEED
+...

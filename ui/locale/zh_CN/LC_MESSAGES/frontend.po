@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-08-06 01:58+0000\n"
+"PO-Revision-Date: 2024-09-20 03:45+0000\n"
 "Last-Translator: NoYoWiFi <1284524409@qq.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_CN\n"
@@ -3290,6 +3290,16 @@ msgstr "无法将模板“%2$s”的密钥“%1$s”的 LLD 规则继承到模�
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item with the same key already exists."
 msgstr "无法将模板“%2$s”的密钥“%1$s”的 LLD 规则继承到模板“%3$s”，已存在相同密钥的监控项。"
+
+#: include/classes/api/services/CItemGeneral.php:684
+#, c-format
+msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
+msgstr "无法使用“%2$s”和“%3$s”模板的键“%1$s”继承 LLD 规则，键在主机“%4$s”上必须是唯一的。"
+
+#: include/classes/api/services/CItemGeneral.php:685
+#, c-format
+msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
+msgstr "无法使用“%2$s”和“%3$s”模板的键“%1$s”继承 LLD 规则，键在模板“%4$s”上必须是唯一的。"
 
 #: include/classes/api/services/CItemPrototype.php:1220
 #, c-format
@@ -20182,6 +20192,12 @@ msgstr "主题"
 msgid "These parameters will be passed to the script as command-line arguments in the specified order."
 msgstr "这些参数将按指定顺序作为命令行参数传递给脚本。"
 
+#: app/controllers/CControllerDiscoveryEdit.php:175
+#, c-format
+msgid "This check cannot be removed, as it is used as a condition in %1$s discovery action."
+msgid_plural "This check cannot be removed, as it is used as a condition in %1$s discovery actions."
+msgstr[0] ""
+
 #: include/func.inc.php:2566
 msgid "This day last week"
 msgstr "上周的这一天"
@@ -21790,7 +21806,7 @@ msgstr "用户不能将自己加进一个取消的群组或已关闭图形接口
 #: include/classes/api/services/CUserGroup.php:673
 #: include/classes/api/services/CUser.php:843
 msgid "User cannot add oneself to a disabled group or a group with disabled GUI access."
-msgstr ""
+msgstr "用户无法将自己添加到已禁用的组或图形用户界面访问已禁用的组中。"
 
 #: app/views/administration.user.edit.php:461
 #: include/classes/api/services/CUser.php:980
@@ -21927,7 +21943,7 @@ msgstr "用户是不允许删除自己"
 
 #: include/classes/api/services/CUser.php:1837
 msgid "User is not allowed to delete oneself."
-msgstr ""
+msgstr "用户不允许删除自己。"
 
 #: app/views/administration.authentication.edit.php:462
 #: app/views/popup.ldap.edit.php:222
@@ -22247,6 +22263,10 @@ msgstr "VMware 虚拟机管理程序数据存储列表，“url”- VMware 服�
 msgid "VMware hypervisor health state rollup sensor, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns 0 - gray; 1 - green; 2 - yellow; 3 - red"
 msgstr "VMware 虚拟机管理程序健康状态汇总传感器，“url”- VMware 服务 URL，“uuid”- VMware 虚拟机管理程序全局唯一标识符。返回 0 - 灰色； 1 - 绿色； 2-黄色； 3 - 红色"
 
+#: include/classes/data/CItemData.php:2237
+msgid "VMware hypervisor maintenance status, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns 0 - not in maintenance; 1 - in maintenance"
+msgstr "VMware 虚拟机管理程序维护状态，“url”- VMware 服务 URL，“uuid”- VMware 虚拟机管理程序全局唯一标识符。返回值 0 - 不在维护中； 1 - 维护中"
+
 #: include/classes/data/CItemData.php:2051
 msgid "VMware hypervisor model, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
 msgstr "VMware 虚拟机管理程序模型，“url”- VMware 服务 URL，“uuid”- VMware 虚拟机管理程序全局唯一标识符"
@@ -22382,6 +22402,10 @@ msgstr "VMware 虚拟机访客内存使用情况，“url”- VMware 服务 URL�
 #: include/classes/data/CItemData.php:2387
 msgid "VMware virtual machine host memory usage, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
 msgstr "VMware虚拟机主机内存使用情况，“url”-VMware服务URL，“uuid”-VMware虚拟机全局唯一标识符"
+
+#: include/classes/data/CItemData.php:2482
+msgid "VMware virtual machine hypervisor maintenance status, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier. Returns 0 - not in maintenance; 1 - in maintenance"
+msgstr "VMware虚拟机管理程序维护状态，“url” - VMware服务网址，“uuid” - VMware虚拟机全局唯一标识符。返回值 0 - 不在维护中；1 - 在维护中。"
 
 #: include/classes/data/CItemData.php:2331
 msgid "VMware virtual machine hypervisor name, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"

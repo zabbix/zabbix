@@ -252,11 +252,10 @@ class testExpandExpressionMacros extends CWebTest {
 							['hostid' => self::$data['hostids']['min']]
 						],
 						'elementtype' => 0,
-						'iconid_off' => 151,
+						'iconid_off' => 141,
 						'label' => '{?min(/{HOST.HOST}/trapper,1d)}',
 						'x' => 89,
-						'y' => 377,
-						'iconid_off' => 141
+						'y' => 377
 					]
 				],
 				'links' => [

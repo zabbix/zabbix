@@ -94,7 +94,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM sysmaps',
-					'link' => 'sysmaps.php?form=update&sysmapid=3',
+					'link' => 'sysmaps.php?form=update&sysmapid=1',
 					'incorrect_request' => true
 				]
 			],

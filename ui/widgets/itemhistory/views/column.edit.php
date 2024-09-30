@@ -96,8 +96,8 @@ $form_grid->addItem([
 // Highlights table
 $highlight_header_row = [
 	'',
-	(new CColHeader(_('Regular expression')))->setWidth('100%'),
-	_('Action')
+	_('Regular expression'),
+	(new CColHeader(''))->setWidth('100%')
 ];
 
 $highlights = (new CDiv(
@@ -178,8 +178,8 @@ $form_grid->addItem([
 // Thresholds table.
 $threshold_header_row = [
 	'',
-	(new CColHeader(_('Threshold')))->setWidth('100%'),
-	_('Action')
+	_('Threshold'),
+	(new CColHeader(''))->setWidth('100%')
 ];
 
 $thresholds = (new CDiv(

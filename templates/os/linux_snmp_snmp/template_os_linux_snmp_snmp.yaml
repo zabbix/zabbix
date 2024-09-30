@@ -1597,10 +1597,12 @@ zabbix_export:
                 - type: JAVASCRIPT
                   parameters:
                     - |
-                      var portionHigh = 4294967296;
-                      var obj = JSON.parse(value);
-                      var dskAvailHigh = obj['dskAvailHigh'],
-                      	dskAvailLow = obj['dskAvailLow'];
+                      const portionHigh = 4294967296;
+                      
+                      const obj = JSON.parse(value);
+                      
+                      const dskAvailHigh = parseInt(obj['dskAvailHigh'], 10),
+                      	  dskAvailLow = parseInt(obj['dskAvailLow'], 10);
                       
                       return (dskAvailHigh * portionHigh + dskAvailLow) * 1024;
               master_item:
@@ -1675,21 +1677,23 @@ zabbix_export:
                 - type: JAVASCRIPT
                   parameters:
                     - |
-                      var portionHigh = 4294967296;
-                      var obj = JSON.parse(value);
-                      var dskAvailHigh = obj['dskAvailHigh'],
-                      	dskAvailLow = obj['dskAvailLow'];
-                      var dskUsedHigh = obj['dskUsedHigh'],
-                      	dskUsedLow = obj['dskUsedLow'];
+                      const portionHigh = 4294967296;
                       
-                      var available = (dskAvailHigh * portionHigh + dskAvailLow) * 1024;
-                      var used = (dskUsedHigh * portionHigh + dskUsedLow) * 1024;
+                      const obj = JSON.parse(value);
+                      
+                      const dskAvailHigh = parseInt(obj['dskAvailHigh'], 10),
+                      	  dskAvailLow = parseInt(obj['dskAvailLow'], 10),
+                      	  dskUsedHigh = parseInt(obj['dskUsedHigh'], 10),
+                      	  dskUsedLow = parseInt(obj['dskUsedLow'], 10);
+                      
+                      const available = (dskAvailHigh * portionHigh + dskAvailLow) * 1024,
+                      	  used = (dskUsedHigh * portionHigh + dskUsedLow) * 1024;
                       
                       if ((available + used) <= 0) {
                       	return 0;
-                      } else {
-                      	return (100 * used / (used + available));
                       }
+                      
+                      return used / (used + available) * 100;
               master_item:
                 key: 'vfs.fs.walk.data[dskEntry.{#SNMPINDEX}]'
               tags:
@@ -1749,10 +1753,12 @@ zabbix_export:
                 - type: JAVASCRIPT
                   parameters:
                     - |
-                      var portionHigh = 4294967296;
-                      var obj = JSON.parse(value);
-                      var dskTotalHigh = obj['dskTotalHigh'],
-                      	dskTotalLow = obj['dskTotalLow'];
+                      const portionHigh = 4294967296;
+                      
+                      const obj = JSON.parse(value);
+                      
+                      const dskTotalHigh = parseInt(obj['dskTotalHigh'], 10),
+                      	  dskTotalLow = parseInt(obj['dskTotalLow'], 10);
                       
                       return (dskTotalHigh * portionHigh + dskTotalLow) * 1024;
               master_item:
@@ -1779,10 +1785,12 @@ zabbix_export:
                 - type: JAVASCRIPT
                   parameters:
                     - |
-                      var portionHigh = 4294967296;
-                      var obj = JSON.parse(value);
-                      var dskUsedHigh = obj['dskUsedHigh'],
-                      	dskUsedLow = obj['dskUsedLow'];
+                      const portionHigh = 4294967296;
+                      
+                      const obj = JSON.parse(value);
+                      
+                      const dskUsedHigh = parseInt(obj['dskUsedHigh'], 10),
+                      	  dskUsedLow = parseInt(obj['dskUsedLow'], 10);
                       
                       return (dskUsedHigh * portionHigh + dskUsedLow) * 1024;
               master_item:

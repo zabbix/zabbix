@@ -17,51 +17,114 @@
 require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
 
 /**
+ * @dataSource Maps
+ *
  * @backup sysmaps
  */
-class testFormMap extends CLegacyWebTest {
+class testFormMapConstructor extends CLegacyWebTest {
+
+	const MAP_NAME = 'Map for form testing';
+
 	/**
 	 * Possible combinations of grid settings
 	 * @return array
 	 */
 	public function possibleGridOptions() {
 		return [
-			// grid size, show grid, auto align
-			['20x20', 1, 1],
-			['40x40', 1, 1],
-			['50x50', 1, 1],
-			['75x75', 1, 1],
-			['100x100', 1, 1],
+			// Array value description: grid dimensions, show grid, auto align.
+			['20x20', SYSMAP_GRID_SHOW_ON, SYSMAP_GRID_ALIGN_ON],
+			['40x40', SYSMAP_GRID_SHOW_ON, SYSMAP_GRID_ALIGN_ON],
+			['50x50', SYSMAP_GRID_SHOW_ON, SYSMAP_GRID_ALIGN_ON],
+			['75x75', SYSMAP_GRID_SHOW_ON, SYSMAP_GRID_ALIGN_ON],
+			['100x100', SYSMAP_GRID_SHOW_ON, SYSMAP_GRID_ALIGN_ON],
 
-			['20x20', 1, 0],
-			['40x40', 1, 0],
-			['50x50', 1, 0],
-			['75x75', 1, 0],
-			['100x100', 1, 0],
+			['20x20', SYSMAP_GRID_SHOW_ON, SYSMAP_GRID_ALIGN_OFF],
+			['40x40', SYSMAP_GRID_SHOW_ON, SYSMAP_GRID_ALIGN_OFF],
+			['50x50', SYSMAP_GRID_SHOW_ON, SYSMAP_GRID_ALIGN_OFF],
+			['75x75', SYSMAP_GRID_SHOW_ON, SYSMAP_GRID_ALIGN_OFF],
+			['100x100', SYSMAP_GRID_SHOW_ON, SYSMAP_GRID_ALIGN_OFF],
 
-			['20x20', 0, 1],
-			['40x40', 0, 1],
-			['50x50', 0, 1],
-			['75x75', 0, 1],
-			['100x100', 0, 1],
+			['20x20', SYSMAP_GRID_SHOW_OFF, SYSMAP_GRID_ALIGN_ON],
+			['40x40', SYSMAP_GRID_SHOW_OFF, SYSMAP_GRID_ALIGN_ON],
+			['50x50', SYSMAP_GRID_SHOW_OFF, SYSMAP_GRID_ALIGN_ON],
+			['75x75', SYSMAP_GRID_SHOW_OFF, SYSMAP_GRID_ALIGN_ON],
+			['100x100', SYSMAP_GRID_SHOW_OFF, SYSMAP_GRID_ALIGN_ON],
 
-			['20x20', 0, 0],
-			['40x40', 0, 0],
-			['50x50', 0, 0],
-			['75x75', 0, 0],
-			['100x100', 0, 0]
+			['20x20', SYSMAP_GRID_SHOW_OFF, SYSMAP_GRID_ALIGN_OFF],
+			['40x40', SYSMAP_GRID_SHOW_OFF, SYSMAP_GRID_ALIGN_OFF],
+			['50x50', SYSMAP_GRID_SHOW_OFF, SYSMAP_GRID_ALIGN_OFF],
+			['75x75', SYSMAP_GRID_SHOW_OFF, SYSMAP_GRID_ALIGN_OFF],
+			['100x100', SYSMAP_GRID_SHOW_OFF, SYSMAP_GRID_ALIGN_OFF]
 		];
 	}
 
+	public static function getSimpleUpdateData() {
+		return [
+			[['name' => 'Local network']],
+			[['name' => 'Map for form testing']],
+			[['name' => 'Map with icon mapping']],
+			[['name' => 'Map with links']],
+			[['name' => 'Public map with image']],
+			[['name' => 'Test map for Properties']]
+		];
+	}
+
+	/**
+	 * @dataProvider getSimpleUpdateData
+	 *
+	 * @browsers chrome
+	 */
+	public function testFormMapConstructor_SimpleUpdateConstructor($map) {
+		$sql_maps_elements = 'SELECT * FROM sysmaps sm INNER JOIN sysmaps_elements sme ON'.
+				' sme.sysmapid = sm.sysmapid ORDER BY sme.selementid';
+		$sql_links_triggers = 'SELECT * FROM sysmaps_links sl INNER JOIN sysmaps_link_triggers slt ON'.
+				' slt.linkid = sl.linkid ORDER BY slt.linktriggerid';
+		$hash_maps_elements = CDBHelper::getHash($sql_maps_elements);
+		$hash_links_triggers = CDBHelper::getHash($sql_links_triggers);
+
+		$this->page->login()->open('sysmaps.php')->waitUntilReady();
+		$this->query('link', $map['name'])->one()->click();
+		$this->page->waitUntilReady();
+
+		$element = $this->query('xpath://div[@id="flickerfreescreen_mapimg"]/div/*[name()="svg"]')
+				->waitUntilPresent()->one();
+
+		$exclude = [
+			'query'	=> 'class:map-timestamp',
+			'color'	=> '#ffffff'
+		];
+		$this->assertScreenshotExcept($element, $exclude, 'view_'.$map['name']);
+
+		$this->query('button:Edit map')->one()->click();
+		$this->page->waitUntilReady();
+		$this->assertScreenshot($this->query('id:map-area')->waitUntilPresent()->one(), 'edit_'.$map['name']);
+		$this->query('button:Update')->one()->click();
+
+		$this->page->waitUntilAlertIsPresent();
+		$this->assertEquals('Map is updated! Return to map list?', $this->page->getAlertText());
+		$this->page->acceptAlert();
+
+		$this->page->waitUntilReady();
+		$this->assertStringContainsString('sysmaps.php', $this->page->getCurrentUrl());
+
+		$hash_data = [
+			$hash_maps_elements => $sql_maps_elements,
+			$hash_links_triggers => $sql_links_triggers
+		];
+
+		foreach ($hash_data as $old => $new) {
+			$this->assertEquals($old, CDBHelper::getHash($new));
+		}
+	}
 
 	/**
 	 * Test setting of grid options for map
 	 *
 	 * @dataProvider possibleGridOptions
 	 */
-	public function testFormMap_UpdateGridOptions($gridSize, $showGrid, $autoAlign) {
+	public function testFormMapConstructor_UpdateGridOptions($gridSize, $showGrid, $autoAlign) {
 
-		$map_name = 'Test map 1';
+		$map_name = self::MAP_NAME;
 
 		// getting map options from DB as they are at the beginning of the test
 		$db_map = CDBHelper::getRow('SELECT * FROM sysmaps WHERE name='.zbx_dbstr($map_name));
@@ -142,12 +205,12 @@ class testFormMap extends CLegacyWebTest {
 	/**
 	 * Check the screenshot of the trigger container in trigger map element.
 	 */
-	public function testFormMap_MapElementScreenshot() {
-		// Open map "Test map 1" in edit mode.
-		$this->page->login()->open('sysmap.php?sysmapid=3')->waitUntilReady();
+	public function testFormMapConstructor_MapElementScreenshot() {
+		// Open map in edit mode.
+		$this->page->login()->open('sysmap.php?sysmapid='.CDataHelper::get('Maps.form_test_mapid'))->waitUntilReady();
 
-		// Click on map element "Trigger element (CPU load)".
-		$this->query('xpath://div[@data-id="5"]')->waitUntilVisible()->one()->click();
+		// Click on map element 'Trigger for map' (in prepareMapData this trigger has icon id = 146).
+		$this->query('xpath://div[contains(@class, "sysmap_iconid_146")]')->waitUntilVisible()->one()->click();
 
 		$form = $this->query('id:map-window')->asForm()->one()->waitUntilVisible();
 		$form->getField('New triggers')->selectMultiple([
@@ -159,7 +222,6 @@ class testFormMap extends CLegacyWebTest {
 		$form->query('button:Add')->one()->click();
 
 		// Take a screenshot to test draggable object position for triggers of trigger type map element.
-		// TODO: screenshot should be changed after fix ZBX-22528
 		$this->page->removeFocus();
 		$this->assertScreenshot($this->query('id:triggerContainer')->waitUntilVisible()->one(), 'Map element');
 	}

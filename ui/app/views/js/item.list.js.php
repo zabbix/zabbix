@@ -117,6 +117,12 @@
 				else if (target.classList.contains('js-massdelete-item')) {
 					this.#delete(target, {itemids: itemids, context: this.context});
 				}
+				else if (target.classList.contains('js-edit-host')) {
+					this.editHost(e, target.dataset.hostid);
+				}
+				else if (target.classList.contains('js-edit-template')) {
+					this.editTemplate(e, target.dataset.hostid);
+				}
 			});
 			document.addEventListener('click', e => {
 				const target = e.target;

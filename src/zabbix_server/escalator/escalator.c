@@ -121,6 +121,63 @@ static void	add_message_alert(const zbx_db_event *event, const zbx_db_event *r_e
 		const zbx_db_acknowledge *ack, const zbx_service_alarm_t *service_alarm, const zbx_db_service *service,
 		int err_type, const char *tz);
 
+typedef enum
+{
+	ALERTER_NOTIFY,
+	ALERTER_FLUSH,
+	ALERTER_LAZY_FLUSH,
+	ALERTER_CLOSE,
+}
+zbx_alerter_notify_mode_t;
+
+static void	notify_alerter(zbx_alerter_notify_mode_t mode)
+{
+	static zbx_ipc_socket_t	alerter;
+	static time_t		notify_time;
+	static int		alerts_num;
+	time_t			now;
+
+	now = time(NULL);
+
+	switch (mode)
+	{
+		case ALERTER_CLOSE:
+			zbx_ipc_socket_close(&alerter);
+			return;
+		case ALERTER_NOTIFY:
+			if (notify_time == now && INT_MAX > alerts_num)
+			{
+				alerts_num++;
+				return;
+			}
+			break;
+		case ALERTER_LAZY_FLUSH:
+			if (notify_time == now)
+				return;
+			ZBX_FALLTHROUGH;
+		case ALERTER_FLUSH:
+			if (0 == alerts_num)
+				return;
+	}
+
+	if (0 == alerter.fd)
+	{
+		char	*error = NULL;
+
+		if (SUCCEED != zbx_ipc_socket_open(&alerter, ZBX_IPC_SERVICE_ALERTER, SEC_PER_MIN, &error))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "cannot open IPC connection to alert manager: %s", error);
+			zbx_free(error);
+			exit(EXIT_FAILURE);
+		}
+	}
+
+	notify_time = now;
+	alerts_num = 0;
+
+	(void)zbx_ipc_socket_write(&alerter, ZBX_IPC_ALERTER_SYNC_ALERTS, NULL, 0);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: checks user access to event by tags                               *
@@ -1090,32 +1147,35 @@ static void	add_command_alert(zbx_db_insert_t *db_insert, int alerts_num, zbx_ui
 		const zbx_db_event *event, const zbx_db_event *r_event, zbx_uint64_t actionid, int esc_step,
 		const char *message, zbx_alert_status_t status, const char *error)
 {
-	int	now, alerttype = ALERT_TYPE_COMMAND, alert_status = status;
-	char	*tmp = NULL;
+	int		now, alerttype = ALERT_TYPE_COMMAND, alert_status = status;
+	char		*tmp = NULL;
+	zbx_uint64_t	eventid, p_eventid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (0 == alerts_num)
 	{
 		zbx_db_insert_prepare(db_insert, "alerts", "alertid", "actionid", "eventid", "clock", "message",
-				"status", "error", "esc_step", "alerttype", (NULL != r_event ? "p_eventid" : NULL),
-				(char *)NULL);
+				"status", "error", "esc_step", "alerttype", "p_eventid", (char *)NULL);
+	}
+
+	if (NULL == r_event)
+	{
+		eventid = event->eventid;
+		p_eventid = 0;
+	}
+	else
+	{
+		eventid = r_event->eventid;
+		p_eventid = event->eventid;
 	}
 
 	now = (int)time(NULL);
 
 	tmp = zbx_dsprintf(tmp, "%s:%s", host, message);
 
-	if (NULL == r_event)
-	{
-		zbx_db_insert_add_values(db_insert, alertid, actionid, event->eventid, now, tmp, alert_status,
-				error, esc_step, (int)alerttype);
-	}
-	else
-	{
-		zbx_db_insert_add_values(db_insert, alertid, actionid, r_event->eventid, now, tmp, alert_status,
-				error, esc_step, (int)alerttype, event->eventid);
-	}
+	zbx_db_insert_add_values(db_insert, alertid, actionid, eventid, now, tmp, alert_status,
+			error, esc_step, (int)alerttype, p_eventid);
 
 	zbx_free(tmp);
 
@@ -1618,7 +1678,7 @@ static void	add_message_alert(const zbx_db_event *event, const zbx_db_event *r_e
 	zbx_db_row_t	row;
 	int		now, priority, have_alerts = 0;
 	zbx_db_insert_t	db_insert;
-	zbx_uint64_t	ackid;
+	zbx_uint64_t	ackid, eventid, p_eventid;
 	char		*period = NULL;
 	const char	*error;
 
@@ -1626,6 +1686,17 @@ static void	add_message_alert(const zbx_db_event *event, const zbx_db_event *r_e
 
 	now = time(NULL);
 	ackid = (NULL == ack ? 0 : ack->acknowledgeid);
+
+	if (NULL == r_event)
+	{
+		eventid = event->eventid;
+		p_eventid = 0;
+	}
+	else
+	{
+		eventid = r_event->eventid;
+		p_eventid = event->eventid;
+	}
 
 	if (ZBX_ALERT_MESSAGE_ERR_USR == err_type)
 		goto err_alert;
@@ -1719,8 +1790,8 @@ static void	add_message_alert(const zbx_db_event *event, const zbx_db_event *r_e
 			have_alerts = 1;
 			zbx_db_insert_prepare(&db_insert, "alerts", "alertid", "actionid", "eventid", "userid",
 					"clock", "mediatypeid", "sendto", "subject", "message", "status", "error",
-					"esc_step", "alerttype", "acknowledgeid", "parameters",
-					(NULL != r_event ? "p_eventid" : NULL), (char *)NULL);
+					"esc_step", "alerttype", "acknowledgeid", "parameters", "p_eventid",
+					(char *)NULL);
 		}
 
 		if (MEDIA_TYPE_EXEC == type)
@@ -1734,18 +1805,9 @@ static void	add_message_alert(const zbx_db_event *event, const zbx_db_event *r_e
 					message, ack, service_alarm, service, &params, tz);
 		}
 
-		if (NULL != r_event)
-		{
-			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), actionid, r_event->eventid, userid,
-					now, mediatypeid, row[1], subject, message, status, perror, esc_step,
-					(int)ALERT_TYPE_MESSAGE, ackid, params, event->eventid);
-		}
-		else
-		{
-			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), actionid, event->eventid, userid,
-					now, mediatypeid, row[1], subject, message, status, perror, esc_step,
-					(int)ALERT_TYPE_MESSAGE, ackid, params);
-		}
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), actionid, eventid, userid,
+				now, mediatypeid, row[1], subject, message, status, perror, esc_step,
+				(int)ALERT_TYPE_MESSAGE, ackid, params, p_eventid);
 
 		zbx_free(params);
 	}
@@ -1762,22 +1824,16 @@ err_alert:
 
 		zbx_db_insert_prepare(&db_insert, "alerts", "alertid", "actionid", "eventid", "userid", "clock",
 				"subject", "message", "status", "retries", "error", "esc_step", "alerttype",
-				"acknowledgeid", (NULL != r_event ? "p_eventid" : NULL), (char *)NULL);
+				"acknowledgeid", "p_eventid", (char *)NULL);
 
-		if (NULL != r_event)
-		{
 /* max number of retries for alerts */
 #define ALERT_MAX_RETRIES	3
-			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), actionid, r_event->eventid, userid,
-					now, subject, message, (int)ALERT_STATUS_FAILED, (int)ALERT_MAX_RETRIES, error,
-					esc_step, (int)ALERT_TYPE_MESSAGE, ackid, event->eventid);
-		}
-		else
-		{
-			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), actionid, event->eventid, userid,
-					now, subject, message, (int)ALERT_STATUS_FAILED, (int)ALERT_MAX_RETRIES, error,
-					esc_step, (int)ALERT_TYPE_MESSAGE, ackid);
-		}
+
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), actionid, eventid, userid,
+				now, subject, message, (int)ALERT_STATUS_FAILED, (int)ALERT_MAX_RETRIES, error,
+				esc_step, (int)ALERT_TYPE_MESSAGE, ackid, p_eventid);
+
+#undef ALERT_MAX_RETRIES
 	}
 
 	if (0 != have_alerts)
@@ -1785,6 +1841,10 @@ err_alert:
 		zbx_db_insert_autoincrement(&db_insert, "alertid");
 		zbx_db_insert_execute(&db_insert);
 		zbx_db_insert_clean(&db_insert);
+
+		/* because alerts are inserted without transaction there no need to wait for */
+		/* commit and alerter notification can be sent immediately                   */
+		notify_alerter(ALERTER_NOTIFY);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -3432,7 +3492,6 @@ out:
  *             get_config_forks        - [IN]                                   *
  *             program_type            - [IN]                                   *
  *             escalationids           - [IN]                                   *
- *             triggerids              - [IN]                                   *
  *                                                                              *
  * Return value: count of deleted escalations                                   *
  *                                                                              *
@@ -3447,7 +3506,7 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 		const char *default_timezone, int process_num, int config_timeout, int config_trapper_timeout,
 		const char *config_source_ip, const char *config_ssh_key_location,
 		zbx_get_config_forks_f get_config_forks, int config_enable_global_scripts, unsigned char program_type,
-		zbx_vector_uint64_t *escalationids, zbx_vector_uint64_t *triggerids)
+		zbx_vector_uint64_t *escalationids)
 {
 	int				ret = 0;
 	zbx_db_result_t			result;
@@ -3465,14 +3524,10 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 	zbx_vector_uint64_create(&eventids);
 	zbx_vector_uint64_create(&problem_eventids);
 
-	if (((NULL != escalationids) && (NULL != triggerids)) && ((0 != escalationids->values_num) ||
-			(0 != triggerids->values_num)))
+	if (NULL != escalationids && 0 != escalationids->values_num)
 	{
 		zbx_db_add_condition_alloc(&filter, &filter_alloc, &filter_offset, "escalationid",
 				escalationids->values, escalationids->values_num);
-		zbx_strcpy_alloc(&filter, &filter_alloc, &filter_offset, " and ");
-		zbx_db_add_condition_alloc(&filter, &filter_alloc, &filter_offset, "triggerid",
-				triggerids->values, triggerids->values_num);
 	}
 	else
 	{
@@ -3621,6 +3676,21 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 	return ret;	/* performance metric */
 }
 
+static	void deserialize_escalationids(zbx_vector_uint64_t *escalationids, const unsigned char *data)
+{
+	zbx_uint64_t		escalationid;
+	int			size;
+	const unsigned char	*ptr = data;
+
+	ptr += zbx_deserialize_value(ptr, &size);
+
+	for (int i = 0; i < size; i++)
+	{
+		ptr += zbx_deserialize_value(ptr, &escalationid);
+		zbx_vector_uint64_append(escalationids, escalationid);
+	}
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: periodically checks table escalations and generates alerts        *
@@ -3630,10 +3700,12 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
  ******************************************************************************/
 ZBX_THREAD_ENTRY(escalator_thread, args)
 {
+#define ESCALATOR_BATCH_SIZE	1000
+
 	zbx_thread_escalator_args	*escalator_args_in = (zbx_thread_escalator_args *)
 							(((zbx_thread_args_t *)args)->args);
-	int				sleeptime = -1, sleeptime_after_notify = 0, escalations_count = 0,
-					old_escalations_count = 0, notify = 0;
+	int				sleeptime = -1, escalations_count = 0,
+					old_escalations_count = 0;
 	double				total_sec = 0.0, old_total_sec = 0.0;
 	time_t				last_stat_time;
 	const zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
@@ -3644,6 +3716,7 @@ ZBX_THREAD_ENTRY(escalator_thread, args)
 	zbx_ipc_async_socket_t		rtc;
 	zbx_ipc_socket_t		alerter;
 	char				*error = NULL;
+	zbx_vector_uint64_t		escalationids;
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
@@ -3669,20 +3742,17 @@ ZBX_THREAD_ENTRY(escalator_thread, args)
 	zbx_rtc_subscribe(process_type, process_num, rtc_msgs, ARRSIZE(rtc_msgs), escalator_args_in->config_timeout,
 			&rtc);
 
+	zbx_vector_uint64_create(&escalationids);
+
 	while (ZBX_IS_RUNNING())
 	{
-		int			now, nextcheck, ret;
+		int			now, nextcheck;
 		double			sec;
 		zbx_config_t		cfg;
 		zbx_uint32_t		rtc_cmd;
-		time_t			wait_start_time;
-		zbx_vector_uint64_t	escalationids, triggerids;
 
 #		define STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not */
 						/* faster than once in STAT_INTERVAL seconds */
-
-		zbx_vector_uint64_create(&escalationids);
-		zbx_vector_uint64_create(&triggerids);
 
 		sec = zbx_time();
 		zbx_update_env(get_process_type_string(process_type), sec);
@@ -3696,58 +3766,37 @@ ZBX_THREAD_ENTRY(escalator_thread, args)
 
 		zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_DEFAULT_TIMEZONE);
 
-		if (NULL != rtc_data && 0 != notify)
-		{
-			zbx_uint64_t	escalationid, triggerid;
-			zbx_uint32_t	notify_size;
-			unsigned char	*ptr = rtc_data;
-
-			ptr += zbx_deserialize_value(ptr, &notify_size);
-
-			for (zbx_uint32_t i = 0; i < notify_size; i++)
-			{
-				ptr += zbx_deserialize_value(ptr, &escalationid);
-				zbx_vector_uint64_append(&escalationids, escalationid);
-				ptr += zbx_deserialize_value(ptr, &triggerid);
-				zbx_vector_uint64_append(&triggerids, triggerid);
-			}
-
-			zbx_free(rtc_data);
-		}
-
 		nextcheck = time(NULL) + CONFIG_ESCALATOR_FREQUENCY;
 		escalations_count += process_escalations(time(NULL), &nextcheck, ZBX_ESCALATION_SOURCE_TRIGGER,
 				cfg.default_timezone, process_num, escalator_args_in->config_timeout,
 				escalator_args_in->config_trapper_timeout, escalator_args_in->config_source_ip,
 				escalator_args_in->config_ssh_key_location, escalator_args_in->get_process_forks_cb_arg,
-				escalator_args_in->config_enable_global_scripts, info->program_type, &escalationids,
-				&triggerids);
+				escalator_args_in->config_enable_global_scripts, info->program_type, &escalationids);
 		escalations_count += process_escalations(time(NULL), &nextcheck, ZBX_ESCALATION_SOURCE_ITEM,
 				cfg.default_timezone, process_num, escalator_args_in->config_timeout,
 				escalator_args_in->config_trapper_timeout, escalator_args_in->config_source_ip,
 				escalator_args_in->config_ssh_key_location, escalator_args_in->get_process_forks_cb_arg,
-				escalator_args_in->config_enable_global_scripts, info->program_type, NULL, NULL);
+				escalator_args_in->config_enable_global_scripts, info->program_type, NULL);
 		escalations_count += process_escalations(time(NULL), &nextcheck, ZBX_ESCALATION_SOURCE_SERVICE,
 				cfg.default_timezone, process_num, escalator_args_in->config_timeout,
 				escalator_args_in->config_trapper_timeout, escalator_args_in->config_source_ip,
 				escalator_args_in->config_ssh_key_location, escalator_args_in->get_process_forks_cb_arg,
-				escalator_args_in->config_enable_global_scripts, info->program_type, NULL, NULL);
+				escalator_args_in->config_enable_global_scripts, info->program_type, NULL);
 		escalations_count += process_escalations(time(NULL), &nextcheck, ZBX_ESCALATION_SOURCE_DEFAULT,
 				cfg.default_timezone, process_num, escalator_args_in->config_timeout,
 				escalator_args_in->config_trapper_timeout, escalator_args_in->config_source_ip,
 				escalator_args_in->config_ssh_key_location, escalator_args_in->get_process_forks_cb_arg,
-				escalator_args_in->config_enable_global_scripts, info->program_type, NULL, NULL);
+				escalator_args_in->config_enable_global_scripts, info->program_type, NULL);
 
-		zbx_vector_uint64_destroy(&escalationids);
-		zbx_vector_uint64_destroy(&triggerids);
-
-		if (0 != notify)
-			(void)zbx_ipc_socket_write(&alerter, ZBX_IPC_ALERTER_SYNC_ALERTS, NULL, 0);
+		zbx_vector_uint64_clear(&escalationids);
 
 		zbx_config_clean(&cfg);
 		total_sec += zbx_time() - sec;
 
 		sleeptime = zbx_calculate_sleeptime(nextcheck, CONFIG_ESCALATOR_FREQUENCY);
+
+		/* throttle notification flushing if escalator is not going to sleep */
+		notify_alerter(0 == sleeptime ? ALERTER_LAZY_FLUSH : ALERTER_FLUSH);
 
 		now = time(NULL);
 
@@ -3774,40 +3823,40 @@ ZBX_THREAD_ENTRY(escalator_thread, args)
 			last_stat_time = now;
 		}
 
-		notify = 0;
-		wait_start_time = time(NULL);
-
 		do
 		{
-			if (0 == sleeptime_after_notify)
-				sleeptime_after_notify = sleeptime;
-			zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
-			ret = zbx_rtc_wait(&rtc, info, &rtc_cmd, &rtc_data, sleeptime_after_notify);
-			zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
-			sleeptime_after_notify -= (int)(time(NULL) - wait_start_time);
-			if (0 > sleeptime_after_notify)
-				sleeptime_after_notify = 0;
+			if (SUCCEED != zbx_rtc_wait(&rtc, info, &rtc_cmd, &rtc_data, sleeptime))
+				break;
 
-			if (SUCCEED == ret && 0 != rtc_cmd)
+			switch (rtc_cmd)
 			{
-				if (ZBX_RTC_SHUTDOWN == rtc_cmd)
-					goto end_loop;
-
-				if (ZBX_RTC_ESCALATOR_NOTIFY == rtc_cmd)
-				{
-					notify = 1;
+				case ZBX_RTC_SHUTDOWN:
+					zbx_set_exiting_with_succeed();
 					break;
-				}
+				case ZBX_RTC_ESCALATOR_NOTIFY:
+					deserialize_escalationids(&escalationids, rtc_data);
+					zbx_free(rtc_data);
+
+					sleeptime = 0;
+
+					if (ESCALATOR_BATCH_SIZE <= escalationids.values_num)
+						rtc_cmd = 0;
+					break;
 			}
+
 		}
-		while (0 != sleeptime_after_notify);
+		while (0 != rtc_cmd);
 
 #		undef STAT_INTERVAL
 	}
-end_loop:
-	zbx_ipc_socket_close(&alerter);
+
+	zbx_vector_uint64_destroy(&escalationids);
+	notify_alerter(ALERTER_CLOSE);
+
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 
 	while (1)
 		zbx_sleep(SEC_PER_MIN);
+
+#undef ESCALATOR_BATCH_SIZE
 }

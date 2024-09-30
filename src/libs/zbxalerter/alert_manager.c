@@ -1339,13 +1339,21 @@ static void	am_sync_watchdog(zbx_am_t *manager, zbx_am_media_t **medias, int med
 
 static int	check_allowed_path(const char *allowed, const char *path, char **error)
 {
-	char	*absolute_path = NULL, *absolute_allowed = NULL;
+	char	*absolute_path = NULL, *absolute_allowed = NULL, *directory_name;
 	int	absolute_path_len, absolute_allowed_len, ret = FAIL;
 
-	if (NULL == (absolute_path = realpath(path, NULL)))
+	directory_name = zbx_strdup(NULL, path);
+
+#if defined(HAVE_LIBGEN_H)
+	absolute_path = realpath(dirname(directory_name), NULL);
+#else
+	absolute_path = realpath(directory_name, NULL);
+#endif
+
+	if (NULL == absolute_path)
 	{
 		*error = zbx_dsprintf(*error, "cannot resolve path %s", zbx_strerror(errno));
-		return ret;
+		goto out;
 	}
 
 	if (NULL == (absolute_allowed = realpath(allowed, NULL)))
@@ -1374,6 +1382,7 @@ static int	check_allowed_path(const char *allowed, const char *path, char **erro
 out:
 	zbx_free(absolute_path);
 	zbx_free(absolute_allowed);
+	zbx_free(directory_name);
 
 	return ret;
 }
@@ -2303,7 +2312,7 @@ ZBX_THREAD_ENTRY(zbx_alert_manager_thread, args)
 	double				time_stat, time_idle = 0;
 	int				server_num = ((zbx_thread_args_t *)args)->info.server_num,
 					process_num = ((zbx_thread_args_t *)args)->info.process_num,
-					time_ping = 0, time_watchdog = 0, time_mediatype = 0;
+					time_ping = 0, time_watchdog = 0, time_mediatype = 0, syncer_is_ready = 0;
 	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
 	const zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
 
@@ -2421,9 +2430,10 @@ ZBX_THREAD_ENTRY(zbx_alert_manager_thread, args)
 					break;
 				case ZBX_IPC_ALERT_SYNCER_REGISTER:
 					am_register_alert_syncer(&manager, client, message);
-					break;
+					syncer_is_ready = 1;
+					ZBX_FALLTHROUGH;
 				case ZBX_IPC_ALERTER_SYNC_ALERTS:
-					if (FAIL == zbx_ipc_client_send(manager.syncer_client,
+					if (1 == syncer_is_ready && FAIL == zbx_ipc_client_send(manager.syncer_client,
 							ZBX_IPC_ALERTER_SYNC_ALERTS, NULL, 0))
 					{
 						zabbix_log(LOG_LEVEL_ERR, "failed to send message to sync alerts");

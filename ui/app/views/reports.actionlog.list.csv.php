@@ -61,8 +61,10 @@ foreach ($data['alerts'] as $alert) {
 		$status = ($alert['alerttype'] == ALERT_TYPE_MESSAGE) ? _('Sent') : _('Executed');
 	}
 	elseif ($alert['status'] == ALERT_STATUS_NOT_SENT || $alert['status'] == ALERT_STATUS_NEW) {
-		$status = _('In progress').': '
-			._n('%1$s retry left', '%1$s retries left', $mediatype['maxattempts'] - $alert['retries']);
+		$status = $alert['alerttype'] == ALERT_TYPE_MESSAGE
+			? _('In progress').': '.
+				_n('%1$s retry left', '%1$s retries left', $mediatype['maxattempts'] - $alert['retries'])
+			: _('In progress');
 	}
 	else {
 		$status = _('Failed');

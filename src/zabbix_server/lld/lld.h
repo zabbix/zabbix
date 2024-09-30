@@ -32,8 +32,6 @@ int	lld_item_compare_func(const void *d1, const void *d2);
 
 ZBX_PTR_VECTOR_DECL(lld_item_ptr, zbx_lld_item_t*)
 
-int	lld_item_proto_compare_func(const void *d1, const void *d2);
-
 typedef struct
 {
 	zbx_uint64_t	parent_itemid;

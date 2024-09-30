@@ -204,7 +204,7 @@ class testFormMaintenance extends CLegacyWebTest {
 
 		// Remove "One time only".
 		$table = $this->query($this->periods_table)->asTable()->one();
-		$table->findRow('Period type', 'One time only')->getColumn('Action')->query('button:Remove')->one()->click()->waitUntilNotvisible();
+		$table->findRow('Period type', 'One time only')->getColumn('Actions')->query('button:Remove')->one()->click()->waitUntilNotvisible();
 
 		$periods = [
 			[
@@ -226,7 +226,7 @@ class testFormMaintenance extends CLegacyWebTest {
 			]
 		];
 		foreach ($periods as $period) {
-			$table->findRow('Period type', $period['schedule'])->getColumn('Action')->query('button:Edit')->one()->click();
+			$table->findRow('Period type', $period['schedule'])->getColumn('Actions')->query('button:Edit')->one()->click();
 			$period_overlay = COverlayDialogElement::find()->waitUntilReady()->all()->last()->asForm();
 			$period_overlay->fill($period['fields']);
 
