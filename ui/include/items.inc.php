@@ -1226,56 +1226,33 @@ function getUnitsSPowerData(): array {
 /**
  * Convert seconds to a single time unit with decimals.
  *
- * @param int|float|string $value                           Number of seconds.
- * @param array            $options
- *        int|null         $options['power']                Use exact time unit power or calculate the highest
- *                                                          automatically, if option is set to null.
- *                                                          Default: null.
- *        bool             $options['ignore_milliseconds']  Do not use milliseconds (unless forced by power option).
- *                                                          Default: false.
- *        int              $options['decimals']             Max number of first non-zero decimals to display.
- *                                                          Default: ZBX_UNITS_ROUNDOFF_SUFFIXED.
- *        bool             $options['decimals_exact']       Display exactly this number of decimals instead of first
- *                                                          non-zeros.
- *                                                          Default: false.
+ * @param int|float|string $value                Number of seconds.
+ * @param bool             $ignore_milliseconds  Do not use milliseconds.
+ * @param int              $decimals             Max number of first non-zero decimals to display.
+ * @param bool             $decimals_exact       Display exactly this number of decimals instead of first non-zeros.
  */
-function convertUnitsSWithDecimalsRaw($value, array $options = []): array {
+function convertUnitsSWithDecimals($value, bool $ignore_milliseconds, int $decimals, bool $decimals_exact): string {
 	$power_data = getUnitsSPowerData();
-
-	$options += [
-		'power' => null,
-		'ignore_milliseconds' => false,
-		'decimals' => ZBX_UNITS_ROUNDOFF_SUFFIXED,
-		'decimals_exact' => false
-	];
 
 	$value = (float) $value;
 
-	if ($options['power'] === null) {
-		$power = -1;
+	$power = -1;
 
-		foreach ($power_data as $_power => $power_datum) {
-			if ($value >= $power_datum['base']) {
-				$power = $_power;
-				break;
-			}
-		}
-
-		if ($power === -1 && $options['ignore_milliseconds']) {
-			$power = 0;
+	foreach ($power_data as $_power => $power_datum) {
+		if ($value >= $power_datum['base']) {
+			$power = $_power;
+			break;
 		}
 	}
-	else {
-		$power = $options['power'];
+
+	if ($power === -1 && $ignore_milliseconds) {
+		$power = 0;
 	}
 
-	return [
-		'value' => formatFloat($value / $power_data[$power]['base'], [
-			'decimals' => $options['decimals'],
-			'decimals_exact' => $options['decimals_exact']
-		]),
-		'units' => $power_data[$power]['suffix']
-	];
+	return formatFloat($value / $power_data[$power]['base'], [
+		'decimals' => $decimals,
+		'decimals_exact' => $decimals_exact
+	]).$power_data[$power]['suffix'];
 }
 
 /**

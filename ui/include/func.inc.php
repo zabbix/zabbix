@@ -739,16 +739,11 @@ function convertUnitsRaw(array $options): array {
 
 	if ($units === 's') {
 		if ($options['decimals'] !== null && $options['decimals'] != 0) {
-			$conversion = convertUnitsSWithDecimalsRaw($value, [
-				'power' => $options['power'],
-				'ignore_milliseconds' => $options['ignore_milliseconds'],
-				'decimals' => $options['decimals'],
-				'decimals_exact' => $options['decimals_exact']
-			]);
-
 			return [
-				'value' => $conversion['value'],
-				'units' => $conversion['units'],
+				'value' => convertUnitsSWithDecimals($value, $options['ignore_milliseconds'], $options['decimals'],
+					$options['decimals_exact']
+				),
+				'units' => '',
 				'is_numeric' => false
 			];
 		}
