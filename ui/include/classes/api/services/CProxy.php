@@ -712,7 +712,7 @@ class CProxy extends CApiService {
 	 * @param array      $proxies
 	 * @param array|null $db_proxies
 	 *
-	 * @throws CAPIException
+	 * @throws APIException
 	 */
 	private static function checkTlsPskPairs(array $proxies, array $db_proxies = null): void {
 		$tls_psk_fields = array_flip(['tls_psk_identity', 'tls_psk']);
@@ -977,11 +977,10 @@ class CProxy extends CApiService {
 
 	private static function addRequiredFieldsByProxyGroupid(array &$proxies, array $db_proxies): void {
 		foreach ($proxies as &$proxy) {
-			if ($proxy['proxy_groupid'] !== $db_proxies[$proxy['proxyid']]['proxy_groupid']
+			if (bccomp($proxy['proxy_groupid'], $db_proxies[$proxy['proxyid']]['proxy_groupid']) != 0
 					&& $proxy['proxy_groupid'] != 0) {
-				$proxy += array_intersect_key($db_proxies[$proxy['proxyid']], array_flip(['local_address',
-					'local_port'
-				]));
+				$proxy +=
+					array_intersect_key($db_proxies[$proxy['proxyid']], array_flip(['local_address', 'local_port']));
 			}
 		}
 		unset($proxy);
@@ -1066,7 +1065,7 @@ class CProxy extends CApiService {
 		$db_defaults = DB::getDefaults('proxy');
 
 		foreach ($proxies as &$proxy) {
-			if ($proxy['proxy_groupid'] !== $db_proxies[$proxy['proxyid']]['proxy_groupid']
+			if (bccomp($proxy['proxy_groupid'], $db_proxies[$proxy['proxyid']]['proxy_groupid']) != 0
 					&& $proxy['proxy_groupid'] == 0) {
 				$proxy += array_intersect_key($db_defaults, array_flip(['local_address', 'local_port']));
 			}

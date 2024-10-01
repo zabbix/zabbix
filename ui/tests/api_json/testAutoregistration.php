@@ -14,7 +14,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../include/CAPITest.php';
+require_once __DIR__.'/../include/CAPITest.php';
 
 /**
  * @onBefore prepareTestData
@@ -31,7 +31,7 @@ class testAutoregistration extends CAPITest {
 	public static function prepareTestData(): void {
 		$hostgroups = [];
 		// dataProviderInvalidAutoregistrationWithHostEncryptionUpdate
-		$hostgroups[] = ['name' => 'API tests hosts group'];
+		$hostgroups[] = ['name' => 'API autoregistration tests hosts group'];
 		$result = CDataHelper::call('hostgroup.create', $hostgroups);
 		self::$data['hostgroup'] = array_combine(array_column($hostgroups, 'name'), $result['groupids']);
 
@@ -39,7 +39,7 @@ class testAutoregistration extends CAPITest {
 		// dataProviderInvalidAutoregistrationWithHostEncryptionUpdate
 		$hosts[] = [
 			'host' => 'test.example.com',
-			'groups' => [['groupid' => ':hostgroup:API tests hosts group']],
+			'groups' => [['groupid' => ':hostgroup:API autoregistration tests hosts group']],
 			'tls_accept' => HOST_ENCRYPTION_PSK,
 			'tls_psk_identity' => 'hostidentity',
 			'tls_psk' => '0d59887b3a4f2a2e6866985491699034'
@@ -50,14 +50,14 @@ class testAutoregistration extends CAPITest {
 		$proxies = [];
 		// dataProviderInvalidAutoregistrationWithHostEncryptionUpdate
 		$proxies[] = [
-			'host' => 'test.example.com',
-			'status' => HOST_STATUS_PROXY_ACTIVE,
+			'name' => 'test.example.com',
+			'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
 			'tls_accept' => HOST_ENCRYPTION_PSK,
 			'tls_psk_identity' => 'proxyidentity',
 			'tls_psk' => '486a9e7b43740b3619e42636cb1c24bf'
 		];
 		$result = CDataHelper::call('proxy.create', $proxies);
-		self::$data['proxy'] = array_combine(array_column($proxies, 'host'), $result['proxyids']);
+		self::$data['proxy'] = array_combine(array_column($proxies, 'name'), $result['proxyids']);
 
 		CDataHelper::call('autoregistration.update', [
 			'tls_accept' => HOST_ENCRYPTION_NONE,
@@ -133,11 +133,11 @@ class testAutoregistration extends CAPITest {
 		return [
 			'Cannot update "tls_psk_identity" when host uses same "tls_psk_identity" with different tls_psk key' => [
 				'data' => ['tls_psk_identity' => 'hostidentity'],
-				'expected_error' => 'Incorrect value for field "/1/tls_psk": another value of tls_psk exists for same tls_psk_identity.'
+				'expected_error' => 'Invalid parameter "/tls_psk": another tls_psk value is already associated with given tls_psk_identity.'
 			],
 			'Cannot update "tls_psk_identity" when proxy uses same "tls_psk_identity" with different tls_psk key' => [
 				'data' => ['tls_psk_identity' => 'proxyidentity'],
-				'expected_error' => 'Incorrect value for field "/1/tls_psk": another value of tls_psk exists for same tls_psk_identity.'
+				'expected_error' => 'Invalid parameter "/tls_psk": another tls_psk value is already associated with given tls_psk_identity.'
 			]
 		];
 	}

@@ -1014,6 +1014,7 @@ class CHost extends CHostGeneral {
 	 * @param int    $hosts['fields']['ipmi_privilege']	IPMI privilege. OPTIONAL
 	 * @param string $hosts['fields']['ipmi_username']	IPMI username. OPTIONAL
 	 * @param string $hosts['fields']['ipmi_password']	IPMI password. OPTIONAL
+	 * @param array  $options
 	 *
 	 * @return boolean
 	 */
@@ -2302,7 +2303,7 @@ class CHost extends CHostGeneral {
 					));
 				}
 
-				if (($db_hosts === null || $host['proxyid'] !== $db_hosts[$host['hostid']]['proxyid'])
+				if (($db_hosts === null || bccomp($host['proxyid'], $db_hosts[$host['hostid']]['proxyid']) != 0)
 						&& !array_key_exists($host['proxyid'], $host_indexes['proxyids'])) {
 					$host_indexes['proxyids'][$host['proxyid']] = $i;
 				}
@@ -2320,7 +2321,7 @@ class CHost extends CHostGeneral {
 					));
 				}
 
-				if (($db_hosts === null || $host['proxy_groupid'] !== $db_hosts[$host['hostid']]['proxy_groupid'])
+				if (($db_hosts === null || bccomp($host['proxy_groupid'], $db_hosts[$host['hostid']]['proxy_groupid']) != 0)
 						&& !array_key_exists($host['proxy_groupid'], $host_indexes['proxy_groupids'])) {
 					$host_indexes['proxy_groupids'][$host['proxy_groupid']] = $i;
 				}
@@ -2720,7 +2721,7 @@ class CHost extends CHostGeneral {
 	 * @param array      $hosts
 	 * @param array|null $db_hosts
 	 *
-	 * @throws CAPIException
+	 * @throws APIException
 	 */
 	private static function checkTlsPskPairs(array $hosts, array $db_hosts = null): void {
 		$psk_pairs = [];
