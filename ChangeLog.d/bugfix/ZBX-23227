@@ -1,1 +1,1 @@
-A......... [ZBX-23227] fixed using an empty array or string as a value for filtering parameters in get methods returns all records (agriscenko)
+A.F....... [ZBX-23227] fixed using an empty array or string as a value for filtering parameters in get methods returns all records (agriscenko, jfreibergs)
