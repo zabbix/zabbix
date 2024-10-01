@@ -437,7 +437,7 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 					'group_by' => [
 						['attribute' => 'Tag value', 'tag' => 'windows'],
 						['attribute' => 'Tag value', 'tag' => 'cpu'],
-						['attribute' => 'Tag value', 'tag' => 'windows'],
+						['attribute' => 'Tag value', 'tag' => 'windows']
 					],
 					'error' => 'Invalid parameter "Group by": rows must be unique.'
 				]
