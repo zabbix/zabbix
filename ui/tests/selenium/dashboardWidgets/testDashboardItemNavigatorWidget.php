@@ -429,7 +429,7 @@ class testDashboardItemNavigatorWidget extends testWidgets {
 					'fields' => [],
 					'group_by' => [
 						['attribute' => 'Item tag value', 'tag' => 'memory'],
-						['attribute' => 'Host name'],
+						['attribute' => 'Item tag value', 'tag' => 'cpu'],
 						['attribute' => 'Item tag value', 'tag' => 'memory']
 					],
 					'error' => 'Invalid parameter "Group by": rows must be unique.'
