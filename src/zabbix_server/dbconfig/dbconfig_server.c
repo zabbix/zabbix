@@ -16,7 +16,6 @@
 
 #include "../dbconfigworker/dbconfigworker.h"
 
-#include "zbxcommon.h"
 #include "zbxnix.h"
 #include "zbxself.h"
 #include "zbxlog.h"
