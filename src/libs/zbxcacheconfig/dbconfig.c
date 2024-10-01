@@ -7816,6 +7816,7 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 			httpstep_field_sync, autoreg_host_sync, connector_sync, connector_tag_sync, proxy_sync,
 			proxy_group_sync, hp_sync, autoreg_config_sync;
 	zbx_uint64_t	update_flags = 0;
+	zbx_int64_t	used_size, update_size;
 	unsigned char	changelog_sync_mode = mode;	/* sync mode for objects using incremental sync */
 
 	zbx_hashset_t			trend_queue;
@@ -8190,6 +8191,7 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 	dc_sync_httpstep_fields(&httpstep_field_sync, new_revision);
 
 	sec = zbx_time();
+	used_size = dbconfig_used_size();
 
 	if (0 != hosts_sync.add_num + hosts_sync.update_num + hosts_sync.remove_num)
 		update_flags |= ZBX_DBSYNC_UPDATE_HOSTS;
@@ -8234,6 +8236,7 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 	}
 
 	update_sec = zbx_time() - sec;
+	update_size = dbconfig_used_size() - used_size;
 
 	config->revision.config = new_revision;
 
@@ -8242,7 +8245,8 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() changelog  : sql:" ZBX_FS_DBL " sec (%d records)",
 				__func__, changelog_sec, changelog_num);
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() reindex    : " ZBX_FS_DBL " sec.", __func__, update_sec);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() reindex    : " ZBX_FS_DBL " sec " ZBX_FS_I64 " bytes.", __func__,
+				update_sec, update_size);
 
 		zbx_dcsync_stats_dump();
 

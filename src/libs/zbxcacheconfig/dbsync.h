@@ -108,7 +108,7 @@ struct zbx_dbsync
 	double		start;
 	double		sql_time;
 	double		sync_time;
-	zbx_int64_t	used;
+	zbx_uint64_t	used;
 	zbx_int64_t	sync_size;
 };
 
