@@ -641,7 +641,7 @@ class CProxy extends CApiService {
 	 * @param array      $proxies
 	 * @param array|null $db_proxies
 	 *
-	 * @throws CAPIException
+	 * @throws APIException
 	 */
 	private static function checkTlsPskPairs(array $proxies, array $db_proxies = null): void {
 		$tls_psk_fields = array_flip(['tls_psk_identity', 'tls_psk']);

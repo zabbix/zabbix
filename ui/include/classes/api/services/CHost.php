@@ -899,6 +899,7 @@ class CHost extends CHostGeneral {
 	 * @param int    $hosts['fields']['ipmi_privilege']	IPMI privilege. OPTIONAL
 	 * @param string $hosts['fields']['ipmi_username']	IPMI username. OPTIONAL
 	 * @param string $hosts['fields']['ipmi_password']	IPMI password. OPTIONAL
+	 * @param array  $options
 	 *
 	 * @return boolean
 	 */
@@ -2368,7 +2369,7 @@ class CHost extends CHostGeneral {
 	 * @param array      $hosts
 	 * @param array|null $db_hosts
 	 *
-	 * @throws CAPIException
+	 * @throws APIException
 	 */
 	private static function checkTlsPskPairs(array $hosts, array $db_hosts = null): void {
 		$psk_pairs = [];

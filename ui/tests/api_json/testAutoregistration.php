@@ -19,7 +19,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../include/CAPITest.php';
+require_once __DIR__.'/../include/CAPITest.php';
 
 /**
  * @onBefore prepareTestData
@@ -138,11 +138,11 @@ class testAutoregistration extends CAPITest {
 		return [
 			'Cannot update "tls_psk_identity" when host uses same "tls_psk_identity" with different tls_psk key' => [
 				'data' => ['tls_psk_identity' => 'hostidentity'],
-				'expected_error' => 'Incorrect value for field "/1/tls_psk": another value of tls_psk exists for same tls_psk_identity.'
+				'expected_error' => 'Invalid parameter "/tls_psk": another tls_psk value is already associated with given tls_psk_identity.'
 			],
 			'Cannot update "tls_psk_identity" when proxy uses same "tls_psk_identity" with different tls_psk key' => [
 				'data' => ['tls_psk_identity' => 'proxyidentity'],
-				'expected_error' => 'Incorrect value for field "/1/tls_psk": another value of tls_psk exists for same tls_psk_identity.'
+				'expected_error' => 'Invalid parameter "/tls_psk": another tls_psk value is already associated with given tls_psk_identity.'
 			]
 		];
 	}
