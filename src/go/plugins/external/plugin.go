@@ -241,7 +241,7 @@ func (p *Plugin) startPlugin(initial bool) (<-chan error, error) {
 
 				pluginExit <- errs.New("timeout while waiting for plugin process to exit, killed process")
 			case <-p.cmdWait:
-				p.Infof("plugin %q process exited", p.Path)
+				p.Debugf("plugin %q process exited", p.Path)
 
 				pluginExit <- nil
 			}

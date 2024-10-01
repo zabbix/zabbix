@@ -60,6 +60,8 @@
 #include "zbx_item_constants.h"
 #include "zbxpreproc.h"
 #include "zbxsysinfo.h"
+#include "zbx_expression_constants.h"
+#include "zbxinterface.h"
 
 static zbx_get_progname_f	zbx_get_progname_cb = NULL;
 
@@ -234,6 +236,111 @@ static int	parse_query_fields(const zbx_dc_item_t *item, char **query_fields, un
 	*query_fields = str;
 
 	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: resolves macros in JMX endpoint context                           *
+ *                                                                            *
+ * Parameters: p            - [IN] macro resolver data structure              *
+ *             args         - [IN] list of variadic parameters                *
+ *                                 Expected content:                          *
+ *                                  - zbx_dc_um_handle_t *um_handle: user     *
+ *                                      macro cache handle                    *
+ *                                  - const zbx_dc_item_t *dc_item: item      *
+ *                                      information                           *
+ *             replace_with - [OUT] pointer to value to replace macro with    *
+ *             data         - [IN/OUT] pointer to original input raw string   *
+ *                                  (for macro in macro resolving), not used  *
+ *             error        - [OUT] pointer to pre-allocated error message    *
+ *                                  buffer (can be NULL), not used            *
+ *             maxerrlen    - [IN] size of error message buffer (can be 0 if  *
+ *                                 'error' is NULL), not used                 *
+ *                                                                            *
+ * Return value: SUCCEED if macro data were resolved successfully.            *
+ *               Otherwise FAIL.                                              *
+ *                                                                            *
+ ******************************************************************************/
+static int	macro_jmx_endpoint_resolv(zbx_macro_resolv_data_t *p, va_list args, char **replace_with, char **data,
+		char *error, size_t maxerrlen)
+{
+	int			ret = SUCCEED;
+
+	/* Passed arguments */
+	zbx_dc_um_handle_t	*um_handle = va_arg(args, zbx_dc_um_handle_t *);
+	zbx_dc_item_t		*dc_item = va_arg(args, zbx_dc_item_t *);
+
+	ZBX_UNUSED(data);
+	ZBX_UNUSED(error);
+	ZBX_UNUSED(maxerrlen);
+
+	if (0 == p->indexed)
+	{
+		if (ZBX_TOKEN_USER_MACRO == p->token.type || (ZBX_TOKEN_USER_FUNC_MACRO == p->token.type &&
+				0 == strncmp(p->macro, MVAR_USER_MACRO, ZBX_CONST_STRLEN(MVAR_USER_MACRO))))
+		{
+			zbx_dc_get_user_macro(um_handle, p->macro, &dc_item->host.hostid, 1, replace_with);
+			p->pos = p->token.loc.r;
+		}
+		else if (0 == strcmp(p->macro, MVAR_HOST_HOST) || 0 == strcmp(p->macro, MVAR_HOSTNAME))
+		{
+			*replace_with = zbx_strdup(*replace_with, dc_item->host.host);
+		}
+		else if (0 == strcmp(p->macro, MVAR_HOST_NAME))
+		{
+			*replace_with = zbx_strdup(*replace_with, dc_item->host.name);
+		}
+		else if (0 == strcmp(p->macro, MVAR_HOST_IP) || 0 == strcmp(p->macro, MVAR_IPADDRESS))
+		{
+			if (INTERFACE_TYPE_UNKNOWN != dc_item->interface.type)
+			{
+				*replace_with = zbx_strdup(*replace_with, dc_item->interface.ip_orig);
+			}
+			else
+			{
+				ret = zbx_dc_get_interface_value(dc_item->host.hostid, dc_item->itemid, replace_with,
+						ZBX_REQUEST_HOST_IP);
+			}
+		}
+		else if	(0 == strcmp(p->macro, MVAR_HOST_DNS))
+		{
+			if (INTERFACE_TYPE_UNKNOWN != dc_item->interface.type)
+			{
+				*replace_with = zbx_strdup(*replace_with, dc_item->interface.dns_orig);
+			}
+			else
+			{
+				ret = zbx_dc_get_interface_value(dc_item->host.hostid, dc_item->itemid, replace_with,
+						ZBX_REQUEST_HOST_DNS);
+			}
+		}
+		else if (0 == strcmp(p->macro, MVAR_HOST_CONN))
+		{
+			if (INTERFACE_TYPE_UNKNOWN != dc_item->interface.type)
+			{
+				*replace_with = zbx_strdup(*replace_with, dc_item->interface.addr);
+			}
+			else
+			{
+				ret = zbx_dc_get_interface_value(dc_item->host.hostid, dc_item->itemid, replace_with,
+						ZBX_REQUEST_HOST_CONN);
+			}
+		}
+		else if (0 == strcmp(p->macro, MVAR_HOST_PORT))
+		{
+			if (INTERFACE_TYPE_UNKNOWN != dc_item->interface.type)
+			{
+				*replace_with = zbx_dsprintf(*replace_with, "%u", dc_item->interface.port);
+			}
+			else
+			{
+				ret = zbx_dc_get_interface_value(dc_item->host.hostid, dc_item->itemid, replace_with,
+					ZBX_REQUEST_HOST_PORT);
+			}
+		}
+	}
+
+	return ret;
 }
 
 void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESULT *results,
@@ -431,9 +538,8 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 				zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, &items[i].host.hostid,
 						NULL, NULL, NULL, NULL, NULL, NULL, NULL, &items[i].password,
 						ZBX_MACRO_TYPE_COMMON, NULL, 0);
-				zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, &items[i], NULL, NULL,
-						NULL, NULL, NULL, &items[i].jmx_endpoint, ZBX_MACRO_TYPE_JMX_ENDPOINT,
-						NULL, 0);
+				zbx_substitute_macros(&items[i].jmx_endpoint, NULL, 0, &macro_jmx_endpoint_resolv,
+						um_handle, &items[i]);
 				break;
 			case ITEM_TYPE_HTTPAGENT:
 				if (ZBX_MACRO_EXPAND_YES == expand_macros)
