@@ -1213,13 +1213,13 @@ function formatHistoryValueRaw($value, array $item, bool $trim = true, array $co
  */
 function getUnitsSPowerData(): array {
 	return [
-		5	=> ['suffix' => 'y',	'base' => SEC_PER_YEAR],
-		4	=> ['suffix' => 'M',	'base' => SEC_PER_MONTH],
-		3	=> ['suffix' => 'd',	'base' => SEC_PER_DAY],
-		2	=> ['suffix' => 'h',	'base' => SEC_PER_HOUR],
-		1	=> ['suffix' => 'm',	'base' => SEC_PER_MIN],
-		0	=> ['suffix' => 's',	'base' => 1],
-		-1	=> ['suffix' => 'ms',	'base' => 0.001]
+		5	=> ['suffix' => _x('y', 'year short'),			'base' => SEC_PER_YEAR],
+		4	=> ['suffix' => _x('M', 'month short'),			'base' => SEC_PER_MONTH],
+		3	=> ['suffix' => _x('d', 'day short'),			'base' => SEC_PER_DAY],
+		2	=> ['suffix' => _x('h', 'hour short'),			'base' => SEC_PER_HOUR],
+		1	=> ['suffix' => _x('m', 'minute short'),		'base' => SEC_PER_MIN],
+		0	=> ['suffix' => _x('s', 'second short'),		'base' => 1],
+		-1	=> ['suffix' => _x('ms', 'millisecond short'),	'base' => 0.001]
 	];
 }
 
