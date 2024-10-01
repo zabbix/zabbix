@@ -1232,10 +1232,13 @@ function getUnitsSPowerData(): array {
  * @param bool             $decimals_exact       Display exactly this number of decimals instead of first non-zeros.
  */
 function convertUnitsSWithDecimals($value, bool $ignore_milliseconds, int $decimals, bool $decimals_exact): string {
-	$power_data = getUnitsSPowerData();
-
 	$value = (float) $value;
 
+	if ($value == 0) {
+		return '0';
+	}
+
+	$power_data = getUnitsSPowerData();
 	$power = -1;
 
 	foreach ($power_data as $_power => $power_datum) {
