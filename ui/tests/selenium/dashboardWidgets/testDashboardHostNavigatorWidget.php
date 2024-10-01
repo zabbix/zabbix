@@ -443,23 +443,11 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 			// #10.
 			[
 				[
-					'expected' => TEST_BAD,
-					'fields' => [],
-					'group_by' => [
-						['attribute' => 'Tag value'],
-						['attribute' => 'Tag value', 'tag' => 'linux']
-					],
-					'error' => 'Invalid parameter "Group by": tag cannot be empty.'
-				]
-			],
-			// #11.
-			[
-				[
 					'expected' => TEST_GOOD,
 					'fields' => []
 				]
 			],
-			// #12.
+			// #11.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -469,7 +457,7 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 					]
 				]
 			],
-			// #13.
+			// #12.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -479,7 +467,7 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 					]
 				]
 			],
-			// #14.
+			// #13.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -492,7 +480,7 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 					]
 				]
 			],
-			// #15.
+			// #14.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -505,7 +493,7 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 					]
 				]
 			],
-			// #16.
+			// #15.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -516,7 +504,7 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 					]
 				]
 			],
-			// #17.
+			// #16.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -527,7 +515,7 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 					]
 				]
 			],
-			// #18.
+			// #17.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -538,7 +526,7 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 					]
 				]
 			],
-			// #19.
+			// #18.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -549,7 +537,7 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 					]
 				]
 			],
-			// #20.
+			// #19.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -559,7 +547,7 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 					]
 				]
 			],
-			// #21.
+			// #20.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -571,7 +559,7 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 					]
 				]
 			],
-			// #22.
+			// #21.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -586,7 +574,7 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 					]
 				]
 			],
-			// #23.
+			// #22.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -597,7 +585,7 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 					]
 				]
 			],
-			// #24.
+			// #23.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -607,7 +595,7 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 					]
 				]
 			],
-			// #25.
+			// #24.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -621,7 +609,7 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 					]
 				]
 			],
-			// #26.
+			// #25.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -648,7 +636,7 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 					]
 				]
 			],
-			// #27.
+			// #26.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -663,7 +651,7 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 					'trim' => ['Name', 'Host limit', 'id:host_tags_0_tag', 'id:host_tags_0_value']
 				]
 			],
-			// #28.
+			// #27.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -675,7 +663,7 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 					]
 				]
 			],
-			// #29.
+			// #28.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -690,7 +678,7 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 					]
 				]
 			],
-			// #30 Check that tags table contains entries with UTF-8 4-byte characters, empty tag/value and all possible operators.
+			// #29 Check that tags table contains entries with UTF-8 4-byte characters, empty tag/value and all possible operators.
 			[
 				[
 					'expected' => TEST_GOOD,

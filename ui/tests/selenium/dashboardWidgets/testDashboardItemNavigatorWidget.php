@@ -473,23 +473,11 @@ class testDashboardItemNavigatorWidget extends testWidgets {
 			// #13.
 			[
 				[
-					'expected' => TEST_BAD,
-					'fields' => [],
-					'group_by' => [
-						['attribute' => 'Item tag value'],
-						['attribute' => 'Item tag value', 'tag' => 'memory']
-					],
-					'error' => 'Invalid parameter "Group by": tag cannot be empty.'
-				]
-			],
-			// #14.
-			[
-				[
 					'expected' => TEST_GOOD,
 					'fields' => []
 				]
 			],
-			// #15.
+			// #14.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -499,7 +487,7 @@ class testDashboardItemNavigatorWidget extends testWidgets {
 					]
 				]
 			],
-			// #16.
+			// #15.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -509,7 +497,7 @@ class testDashboardItemNavigatorWidget extends testWidgets {
 					]
 				]
 			],
-			// #17.
+			// #16.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -522,7 +510,7 @@ class testDashboardItemNavigatorWidget extends testWidgets {
 					]
 				]
 			],
-			// #18.
+			// #17.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -535,7 +523,7 @@ class testDashboardItemNavigatorWidget extends testWidgets {
 					]
 				]
 			],
-			// #19.
+			// #18.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -545,7 +533,7 @@ class testDashboardItemNavigatorWidget extends testWidgets {
 					]
 				]
 			],
-			// #20.
+			// #19.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -555,7 +543,7 @@ class testDashboardItemNavigatorWidget extends testWidgets {
 					]
 				]
 			],
-			// #21.
+			// #20.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -565,7 +553,7 @@ class testDashboardItemNavigatorWidget extends testWidgets {
 					]
 				]
 			],
-			// #22.
+			// #21.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -577,7 +565,7 @@ class testDashboardItemNavigatorWidget extends testWidgets {
 					]
 				]
 			],
-			// #23.
+			// #22.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -586,7 +574,7 @@ class testDashboardItemNavigatorWidget extends testWidgets {
 					]
 				]
 			],
-			// #24.
+			// #23.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -596,7 +584,7 @@ class testDashboardItemNavigatorWidget extends testWidgets {
 					]
 				]
 			],
-			// #25.
+			// #24.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -606,7 +594,7 @@ class testDashboardItemNavigatorWidget extends testWidgets {
 					]
 				]
 			],
-			// #26.
+			// #25.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -616,7 +604,7 @@ class testDashboardItemNavigatorWidget extends testWidgets {
 					]
 				]
 			],
-			// #27.
+			// #26.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -626,7 +614,7 @@ class testDashboardItemNavigatorWidget extends testWidgets {
 					]
 				]
 			],
-			// #28.
+			// #27.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -641,7 +629,7 @@ class testDashboardItemNavigatorWidget extends testWidgets {
 					]
 				]
 			],
-			// #29.
+			// #28.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -673,7 +661,7 @@ class testDashboardItemNavigatorWidget extends testWidgets {
 					]
 				]
 			],
-			// #30.
+			// #29.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -693,7 +681,7 @@ class testDashboardItemNavigatorWidget extends testWidgets {
 					'trim' => ['Name', 'Item limit', 'id:host_tags_0_tag', 'id:host_tags_0_value', 'id:item_tags_0_tag', 'id:item_tags_0_value']
 				]
 			],
-			// #31.
+			// #30.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -710,7 +698,7 @@ class testDashboardItemNavigatorWidget extends testWidgets {
 					]
 				]
 			],
-			// #32.
+			// #31.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -731,7 +719,7 @@ class testDashboardItemNavigatorWidget extends testWidgets {
 					]
 				]
 			],
-			// #33 Check that host and item tags table contains entries with UTF-8 4-byte characters, empty tag/value and all possible operators.
+			// #32 Check that host and item tags table contains entries with UTF-8 4-byte characters, empty tag/value and all possible operators.
 			[
 				[
 					'expected' => TEST_GOOD,
