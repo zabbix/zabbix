@@ -950,10 +950,8 @@ class CApiService {
 
 		$filter = [];
 		foreach ($options['filter'] as $field => $value) {
-			// Skip missing fields, text and BLOB fields, and NULL values.
-			if (!array_key_exists($field, $tableSchema['fields'])
-					|| ($tableSchema['fields'][$field]['type'] & DB::SUPPORTED_FILTER_TYPES) == 0
-					|| $value === null) {
+			if ($value === null || !array_key_exists($field, $tableSchema['fields'])
+					|| ($tableSchema['fields'][$field]['type'] & DB::SUPPORTED_FILTER_TYPES) == 0) {
 				continue;
 			}
 
