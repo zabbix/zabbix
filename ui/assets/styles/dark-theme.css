@@ -5186,7 +5186,7 @@ div.dashboard-widget-web .list-table tr[data-hostgroupid] {
   .link-external::after {
     content: "";
     position: absolute;
-    top: 0;
+    bottom: 1px;
     right: calc(-12px - 2px);
     font-size: 12px; }
 

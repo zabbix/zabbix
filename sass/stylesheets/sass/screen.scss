@@ -161,7 +161,7 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 
 		content: $zi-link-external-small;
 		position: absolute;
-		top: 0;
+		bottom: 1px;
 		right: calc(-#{$icon-small-size} - 2px);
 		font-size: $icon-small-size;
 	}
