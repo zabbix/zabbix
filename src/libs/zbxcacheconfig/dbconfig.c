@@ -1061,7 +1061,7 @@ static int	DCsync_config(zbx_dbsync_t *sync, zbx_uint64_t revision, int *flags)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_dcsync_sync_start(sync, config_mem->used_size);
+	zbx_dcsync_sync_start(sync, dbconfig_used_size());
 
 	*flags = 0;
 
@@ -1402,7 +1402,7 @@ static int	DCsync_config(zbx_dbsync_t *sync, zbx_uint64_t revision, int *flags)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
-	zbx_dcsync_sync_end(sync, config_mem->used_size);
+	zbx_dcsync_sync_end(sync, dbconfig_used_size());
 
 	return SUCCEED;
 }
@@ -1439,7 +1439,7 @@ static void	DCsync_autoreg_config(zbx_dbsync_t *sync, zbx_uint64_t revision)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_dcsync_sync_start(sync, config_mem->used_size);
+	zbx_dcsync_sync_start(sync, dbconfig_used_size());
 
 	if (SUCCEED == zbx_dbsync_next(sync, &rowid, &db_row, &tag))
 	{
@@ -1462,7 +1462,7 @@ static void	DCsync_autoreg_config(zbx_dbsync_t *sync, zbx_uint64_t revision)
 		config->revision.autoreg_tls = revision;
 	}
 
-	zbx_dcsync_sync_end(sync, config_mem->used_size);
+	zbx_dcsync_sync_end(sync, dbconfig_used_size());
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -1475,7 +1475,7 @@ static void	DCsync_autoreg_host(zbx_dbsync_t *sync)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_dcsync_sync_start(sync, config_mem->used_size);
+	zbx_dcsync_sync_start(sync, dbconfig_used_size());
 
 	while (SUCCEED == zbx_dbsync_next(sync, &rowid, &row, &tag))
 	{
@@ -1505,7 +1505,7 @@ static void	DCsync_autoreg_host(zbx_dbsync_t *sync)
 		autoreg_host->timestamp = 0;
 	}
 
-	zbx_dcsync_sync_end(sync, config_mem->used_size);
+	zbx_dcsync_sync_end(sync, dbconfig_used_size());
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
