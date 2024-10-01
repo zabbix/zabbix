@@ -397,9 +397,8 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 					'expected' => TEST_BAD,
 					'fields' => [],
 					'group_by' => [
-						['attribute' => 'Host group'],
-						['attribute' => 'Severity'],
-						['attribute' => 'Host group']
+						['attribute' => 'Tag value', 'tag' => 'linux'],
+						['attribute' => 'Tag value', 'tag' => 'linux']
 					],
 					'error' => 'Invalid parameter "Group by": rows must be unique.'
 				]
@@ -410,9 +409,11 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 					'expected' => TEST_BAD,
 					'fields' => [],
 					'group_by' => [
-						['attribute' => 'Tag value']
+						['attribute' => 'Severity'],
+						['attribute' => 'Tag value', 'tag' => 'windows'],
+						['attribute' => 'Severity']
 					],
-					'error' => 'Invalid parameter "Group by": tag cannot be empty.'
+					'error' => 'Invalid parameter "Group by": rows must be unique.'
 				]
 			],
 			// #8.
@@ -421,39 +422,44 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 					'expected' => TEST_BAD,
 					'fields' => [],
 					'group_by' => [
-						['attribute' => 'Tag value'],
-						['attribute' => 'Tag value']
+						['attribute' => 'Host group'],
+						['attribute' => 'Tag value', 'tag' => 'windows'],
+						['attribute' => 'Host group']
 					],
-					'error' => [
-						'Invalid parameter "Group by": tag cannot be empty.'
-					]
+					'error' => 'Invalid parameter "Group by": rows must be unique.'
 				]
 			],
 			// #9.
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' => [
-						'Host limit' => '0'
-					],
+					'fields' => [],
 					'group_by' => [
-						['attribute' => 'Tag value'],
 						['attribute' => 'Tag value']
 					],
-					'error' => [
-						'Invalid parameter "Group by": tag cannot be empty.',
-						'Invalid parameter "Host limit": value must be one of 1-9999.'
-					]
+					'error' => 'Invalid parameter "Group by": tag cannot be empty.'
 				]
 			],
 			// #10.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [],
+					'group_by' => [
+						['attribute' => 'Tag value'],
+						['attribute' => 'Tag value', 'tag' => 'linux']
+					],
+					'error' => 'Invalid parameter "Group by": tag cannot be empty.'
+				]
+			],
+			// #11.
 			[
 				[
 					'expected' => TEST_GOOD,
 					'fields' => []
 				]
 			],
-			// #11.
+			// #12.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -463,7 +469,7 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 					]
 				]
 			],
-			// #12.
+			// #13.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -473,7 +479,7 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 					]
 				]
 			],
-			// #13.
+			// #14.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -486,7 +492,7 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 					]
 				]
 			],
-			// #14.
+			// #15.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -499,7 +505,7 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 					]
 				]
 			],
-			// #15.
+			// #16.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -510,7 +516,7 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 					]
 				]
 			],
-			// #16.
+			// #17.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -521,7 +527,7 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 					]
 				]
 			],
-			// #17.
+			// #18.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -532,7 +538,7 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 					]
 				]
 			],
-			// #18.
+			// #19.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -543,7 +549,7 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 					]
 				]
 			],
-			// #19.
+			// #20.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -553,7 +559,7 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 					]
 				]
 			],
-			// #20.
+			// #21.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -565,7 +571,7 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 					]
 				]
 			],
-			// #21.
+			// #22.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -580,7 +586,7 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 					]
 				]
 			],
-			// #22.
+			// #23.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -591,7 +597,7 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 					]
 				]
 			],
-			// #23.
+			// #24.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -601,7 +607,7 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 					]
 				]
 			],
-			// #24.
+			// #25.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -615,7 +621,7 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 					]
 				]
 			],
-			// #25.
+			// #26.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -642,7 +648,7 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 					]
 				]
 			],
-			// #26.
+			// #27.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -657,7 +663,7 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 					'trim' => ['Name', 'Host limit', 'id:host_tags_0_tag', 'id:host_tags_0_value']
 				]
 			],
-			// #27.
+			// #28.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -669,7 +675,7 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 					]
 				]
 			],
-			// #28.
+			// #29.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -684,7 +690,7 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 					]
 				]
 			],
-			// #29 Check that tags table contains entries with UTF-8 4-byte characters, empty tag/value and all possible operators.
+			// #30 Check that tags table contains entries with UTF-8 4-byte characters, empty tag/value and all possible operators.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -701,32 +707,6 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 						['name' => 'Check tag with operator - Does not equal', 'operator' => 'Does not equal', 'value' => 'Average'],
 						['name' => 'Check tag with operator - Does not contain', 'operator' => 'Does not contain', 'value' => 'Disaster']
 					]
-				]
-			],
-			// #30.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [],
-					'group_by' => [
-						['attribute' => 'Host group'],
-						['attribute' => 'Tag value', 'tag' => 'windows' ],
-						['attribute' => 'Host group']
-					],
-					'error' => 'Invalid parameter "Group by": rows must be unique.'
-				]
-			],
-			// #31.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [],
-					'group_by' => [
-						['attribute' => 'Severity'],
-						['attribute' => 'Tag value', 'tag' => 'windows' ],
-						['attribute' => 'Severity']
-					],
-					'error' => 'Invalid parameter "Group by": rows must be unique.'
 				]
 			]
 		];
