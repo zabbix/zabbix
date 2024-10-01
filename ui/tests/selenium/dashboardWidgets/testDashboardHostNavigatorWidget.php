@@ -435,19 +435,32 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 					'expected' => TEST_BAD,
 					'fields' => [],
 					'group_by' => [
+						['attribute' => 'Tag value', 'tag' => 'windows'],
+						['attribute' => 'Tag value', 'tag' => 'cpu'],
+						['attribute' => 'Tag value', 'tag' => 'windows'],
+					],
+					'error' => 'Invalid parameter "Group by": rows must be unique.'
+				]
+			],
+			// #10.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [],
+					'group_by' => [
 						['attribute' => 'Tag value']
 					],
 					'error' => 'Invalid parameter "Group by": tag cannot be empty.'
 				]
 			],
-			// #10.
+			// #11.
 			[
 				[
 					'expected' => TEST_GOOD,
 					'fields' => []
 				]
 			],
-			// #11.
+			// #12.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -457,7 +470,7 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 					]
 				]
 			],
-			// #12.
+			// #13.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -467,7 +480,7 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 					]
 				]
 			],
-			// #13.
+			// #14.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -480,7 +493,7 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 					]
 				]
 			],
-			// #14.
+			// #15.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -493,7 +506,7 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 					]
 				]
 			],
-			// #15.
+			// #16.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -504,7 +517,7 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 					]
 				]
 			],
-			// #16.
+			// #17.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -515,7 +528,7 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 					]
 				]
 			],
-			// #17.
+			// #18.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -526,7 +539,7 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 					]
 				]
 			],
-			// #18.
+			// #19.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -537,7 +550,7 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 					]
 				]
 			],
-			// #19.
+			// #20.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -547,7 +560,7 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 					]
 				]
 			],
-			// #20.
+			// #21.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -559,7 +572,7 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 					]
 				]
 			],
-			// #21.
+			// #22.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -574,7 +587,7 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 					]
 				]
 			],
-			// #22.
+			// #23.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -585,7 +598,7 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 					]
 				]
 			],
-			// #23.
+			// #24.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -595,7 +608,7 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 					]
 				]
 			],
-			// #24.
+			// #25.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -609,7 +622,7 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 					]
 				]
 			],
-			// #25.
+			// #26.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -636,7 +649,7 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 					]
 				]
 			],
-			// #26.
+			// #27.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -651,7 +664,7 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 					'trim' => ['Name', 'Host limit', 'id:host_tags_0_tag', 'id:host_tags_0_value']
 				]
 			],
-			// #27.
+			// #28.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -663,7 +676,7 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 					]
 				]
 			],
-			// #28.
+			// #29.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -678,7 +691,7 @@ class testDashboardHostNavigatorWidget extends testWidgets {
 					]
 				]
 			],
-			// #29 Check that tags table contains entries with UTF-8 4-byte characters, empty tag/value and all possible operators.
+			// #30 Check that tags table contains entries with UTF-8 4-byte characters, empty tag/value and all possible operators.
 			[
 				[
 					'expected' => TEST_GOOD,
