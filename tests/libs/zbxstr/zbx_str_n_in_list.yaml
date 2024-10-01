@@ -26,7 +26,7 @@ in:
 out:
   return: SUCCEED
 ---
-test case: "4. a,b,ccc,ddd - wrong length"
+test case: "4. a,b,ccc,ddd - value limited to few initial characters"
 in:
   list: "a,b,ccc,ddd"
   value: "ccc"
@@ -44,7 +44,7 @@ in:
 out:
   return: SUCCEED
 ---
-test case: "6. aa.bbb.bbbb.bbbbb - wrong length"
+test case: "6. aa.bbb.bbbb.bbbbb - value limited to few initial characters"
 in:
   list: "aa.bbb.bbbb.bbbbb"
   value: "aaaa"
@@ -71,7 +71,7 @@ in:
 out:
   return: SUCCEED
 ---
-test case: "8. Unicode characters"
+test case: "9. Unicode characters"
 in:
   list: "Å.Í.Î.Ï.˝Ó.ÔÒÚÆ☃"
   value: "Î"
@@ -80,7 +80,7 @@ in:
 out:
   return: SUCCEED
 ---
-test case: "9. Space as delimiter"
+test case: "10. Space as delimiter"
 in:
   list: "a aa aaa aa aaa"
   value: "a"
@@ -89,7 +89,7 @@ in:
 out:
   return: SUCCEED
 ---
-test case: "9. Single quote as delimiter"
+test case: "11. Single quote as delimiter"
 in:
   list: "a'aa'aaa'aa'aaa"
   value: "aa"
