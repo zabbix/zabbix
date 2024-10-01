@@ -4375,9 +4375,9 @@ void	zbx_dcsync_sync_end(zbx_dbsync_t *sync, zbx_uint64_t used_size)
 
 static void	dcsync_log_stats(const zbx_dbsync_t *sync)
 {
-	zabbix_log(LOG_LEVEL_DEBUG, "%16s: sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec " ZBX_FS_I64 " bytes ("
-			ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").", sync->from, sync->sql_time, sync->sync_time,
-			sync->sync_size, sync->add_num, sync->update_num, sync->remove_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() %16s: sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec " ZBX_FS_I64 " bytes ("
+			ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").", __func__, sync->from, sync->sql_time,
+			sync->sync_time, sync->sync_size, sync->add_num, sync->update_num, sync->remove_num);
 }
 
 void	zbx_dcsync_stats_dump(void)
