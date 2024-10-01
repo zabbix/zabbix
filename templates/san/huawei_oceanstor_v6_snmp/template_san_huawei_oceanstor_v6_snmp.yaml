@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-09-29T18:43:28Z'
+  date: '2024-10-01T07:48:19Z'
   groups:
     - uuid: 7c2cb727f85b492d88cd56e17127c64d
       name: Templates/SAN
@@ -85,7 +85,7 @@ zabbix_export:
           triggers:
             - uuid: eb140be38e9c4f51b105347ddffa6997
               expression: 'last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.version,#1)<>last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.version,#2) and length(last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.version))>0'
-              name: 'Huawei OceanStor V6: Storage version has changed.'
+              name: 'Huawei OceanStor V6: Storage version has changed'
               event_name: 'Huawei OceanStor V6: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               manual_close: 'YES'
