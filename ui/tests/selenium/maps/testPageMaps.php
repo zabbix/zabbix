@@ -284,7 +284,7 @@ class testPageMaps extends CWebTest {
 
 	public function getFilterData() {
 		return [
-			// #0 View results with empty Name.
+			// #0. View results with empty Name.
 			[
 				[
 					'filter' => [
