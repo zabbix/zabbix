@@ -27,6 +27,7 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 @import "base/common";
 
 @import "utils/indicator";
+@import "utils/locale";
 @import "utils/resizable";
 @import "utils/scrollable";
 @import "utils/sortable";
