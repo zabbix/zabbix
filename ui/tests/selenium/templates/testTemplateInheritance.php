@@ -500,7 +500,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestTextPresent($this->templateName.': testInheritanceItem1');
 
 		$this->zbxTestClickWait('add');
-		$this->zbxTestTextPresent('Graph prototype added');
+		$this->assertMessage(TEST_GOOD,'Graph prototype added');
 		$this->zbxTestTextPresent('Test LLD graph');
 
 		// check that the inherited graph matches the original
