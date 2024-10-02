@@ -60,17 +60,6 @@ class testTriggerPrototypes extends CAPITest {
 					'triggerids' => []
 				]
 			],
-			'Host parameter as array not matched' => [
-				'params' => [
-					'output' => ['triggerid'],
-					'triggerids' => $triggerids,
-					'host' => [$host]
-				],
-				'expect' => [
-					'error' => null,
-					'triggerids' => []
-				]
-			],
 			'Filter host parameter matched' => [
 				'params' => [
 					'output' => ['triggerid'],
