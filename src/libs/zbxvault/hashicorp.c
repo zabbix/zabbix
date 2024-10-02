@@ -169,7 +169,7 @@ void	zbx_hashicorp_renew_token(const char *vault_url, const char *token, const c
 					response_code);
 			goto out;
 		}
-		zabbix_log(LOG_LEVEL_INFORMATION, "out '%s'", out);
+
 		if (SUCCEED != zbx_json_open(out, &jp))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "%s %s", ZBX_VAULT_RENEW_ERROR, zbx_json_strerror());
