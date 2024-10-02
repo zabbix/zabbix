@@ -9260,6 +9260,7 @@ int	zbx_init_configuration_cache(zbx_get_program_type_f get_program_type, zbx_ge
 	else
 		config->session_token = NULL;
 
+	config->itservices_num = 0;
 	config->proxy_hostname = (NULL != hostname ? dc_strdup(hostname) : NULL);
 	config->proxy_failover_delay_raw = NULL;
 	config->proxy_failover_delay = ZBX_PG_DEFAULT_FAILOVER_DELAY;
@@ -9832,14 +9833,6 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 
 			if (NULL != snmp)
 			{
-				if ('\0' != *src_item->timeout &&
-						0 != strncmp(src_item->itemtype.snmpitem->snmp_oid, "walk[",
-						ZBX_CONST_STRLEN("walk[")))
-				{
-					zbx_strscpy(dst_item->timeout_orig,
-							dc_get_global_item_type_timeout(src_item->type));
-				}
-
 				zbx_strscpy(dst_item->snmp_community_orig, snmp->community);
 				zbx_strscpy(dst_item->snmp_oid_orig, src_item->itemtype.snmpitem->snmp_oid);
 				zbx_strscpy(dst_item->snmpv3_securityname_orig, snmp->securityname);
@@ -17336,4 +17329,32 @@ zbx_dc_um_shared_handle_t	*zbx_dc_um_shared_handle_copy(zbx_dc_um_shared_handle_
 	handle->refcount++;
 
 	return handle;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: update number of IT services in configuration cache               *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dc_set_itservices_num(int num)
+{
+	WRLOCK_CACHE;
+	config->itservices_num = num;
+	UNLOCK_CACHE;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get number of IT services in configuration cache                  *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dc_get_itservices_num(void)
+{
+	int	num;
+
+	RDLOCK_CACHE;
+	num = config->itservices_num;
+	UNLOCK_CACHE;
+
+	return num;
 }

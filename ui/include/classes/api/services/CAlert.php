@@ -429,6 +429,12 @@ class CAlert extends CApiService {
 			return;
 		}
 
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			$options['selectMediatypes'] = $options['selectMediatypes'] === API_OUTPUT_EXTEND
+				? CMediatype::LIMITED_OUTPUT_FIELDS
+				: array_intersect($options['selectMediatypes'], CMediatype::LIMITED_OUTPUT_FIELDS);
+		}
+
 		$relation_map = $this->createRelationMap($result, 'alertid', 'mediatypeid');
 
 		$mediatypes = API::getApiService()->select('media_type', [

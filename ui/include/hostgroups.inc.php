@@ -66,14 +66,14 @@ function isWritableHostGroups(array $groupids) {
  *
  * @return array
  */
-function getSubGroups(array $groupids, array &$ms_groups = null, string $context = 'host') {
+function getSubGroups(array $groupids, array &$ms_groups = null, string $context = 'host', array $options = []) {
 	$entity = $context === 'host' ? API::HostGroup() : API::TemplateGroup();
 	$db_groups = $groupids
 		? $entity->get([
 			'output' => ['groupid', 'name'],
 			'groupids' => $groupids,
 			'preservekeys' => true
-		])
+		] + $options)
 		: [];
 
 	if ($ms_groups !== null) {
@@ -93,7 +93,7 @@ function getSubGroups(array $groupids, array &$ms_groups = null, string $context
 			'searchByAny' => true,
 			'startSearch' => true,
 			'preservekeys' => true
-		]);
+		] + $options);
 	}
 
 	return array_keys($db_groups);

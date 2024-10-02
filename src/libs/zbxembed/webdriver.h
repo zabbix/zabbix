@@ -106,6 +106,8 @@ int	webdriver_get_raw_perf_data(zbx_webdriver_t *wd, const char *type, struct zb
 int	webdriver_execute_script(zbx_webdriver_t *wd, const char *script, struct zbx_json_parse *jp,
 		char **error);
 
+int	webdriver_switch_frame(zbx_webdriver_t *wd, const char *frame, char **error);
+
 #endif
 
 #endif
