@@ -13,6 +13,7 @@
 **/
 
 #include "hashicorp.h"
+#include "zbxcommon.h"
 
 #ifdef HAVE_LIBCURL
 #	include "zbxhttp.h"
@@ -137,7 +138,7 @@ void	zbx_hashicorp_renew_token(const char *vault_url, const char *token, const c
 	ZBX_UNUSED(timeout);
 #else
 #define ZBX_VAULT_RENEW_ERROR "cannot renew vault token:"
-	char			*out = NULL, *error = NULL, header[MAX_STRING_LEN], *urlstat = NULL, *value = NULL;
+	char			*out = NULL, *error = NULL, header[MAX_STRING_LEN], *url = NULL, *value = NULL;
 	size_t			value_alloc = 0;
 	struct zbx_json_parse	jp, jp_data;
 	long			response_code;
@@ -151,9 +152,9 @@ void	zbx_hashicorp_renew_token(const char *vault_url, const char *token, const c
 
 	if (0 == next_renew)
 	{
-		urlstat = zbx_dsprintf(NULL, "%s%s", vault_url, "/v1/auth/token/lookup-self");
+		url = zbx_dsprintf(NULL, "%s%s", vault_url, "/v1/auth/token/lookup-self");
 
-		if (SUCCEED != zbx_http_req(urlstat, header, timeout, ssl_cert_file, ssl_key_file, config_source_ip,
+		if (SUCCEED != zbx_http_req(url, header, timeout, ssl_cert_file, ssl_key_file, config_source_ip,
 				config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location, &out, NULL,
 				&response_code, &error))
 		{
@@ -168,7 +169,7 @@ void	zbx_hashicorp_renew_token(const char *vault_url, const char *token, const c
 					response_code);
 			goto out;
 		}
-
+		zabbix_log(LOG_LEVEL_INFORMATION, "out '%s'", out);
 		if (SUCCEED != zbx_json_open(out, &jp))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "%s %s", ZBX_VAULT_RENEW_ERROR, zbx_json_strerror());
@@ -198,19 +199,18 @@ void	zbx_hashicorp_renew_token(const char *vault_url, const char *token, const c
 		}
 
 		renewable = 1;
-		zbx_free(urlstat);
 		zbx_free(out);
 	}
 
 	if (0 != renewable && zbx_time() >= next_renew)
 	{
-		zbx_uint64_t ttl;
+		zbx_uint64_t	ttl;
 
-		urlstat = zbx_dsprintf(NULL, "%s%s", vault_url, "/v1/auth/token/renew-self");
+		url = zbx_dsprintf(url, "%s%s", vault_url, "/v1/auth/token/renew-self");
 
-		if (SUCCEED != zbx_http_req(urlstat, header, timeout, ssl_cert_file, ssl_key_file,
+		if (SUCCEED != zbx_http_req(url, header, timeout, ssl_cert_file, ssl_key_file,
 				config_source_ip, config_ssl_ca_location, config_ssl_cert_location,
-				config_ssl_key_location, &out, "{}",  &response_code, &error))
+				config_ssl_key_location, &out, "{}", &response_code, &error))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "%s %s", ZBX_VAULT_RENEW_ERROR, error);
 			zbx_free(error);
@@ -237,24 +237,28 @@ void	zbx_hashicorp_renew_token(const char *vault_url, const char *token, const c
 			goto out;
 		}
 
-		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_data, "lease_duration", &value, &value_alloc, NULL) &&
-				SUCCEED == zbx_is_uint64(value, &ttl))
+		if (FAIL == zbx_json_value_by_name_dyn(&jp_data, ZBX_PROTO_TAG_LEASE_DURATION, &value, &value_alloc,
+				NULL))
 		{
-			next_renew = zbx_time() + ttl * 2 / 3;
-		}
-		else
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "%s \"lease_duration\" not found or wrong in the received"
-					" JSON object", ZBX_VAULT_RENEW_ERROR);
+			zabbix_log(LOG_LEVEL_WARNING, "%s cannot find the \"%s\" object in the received JSON object",
+					ZBX_VAULT_RENEW_ERROR, ZBX_PROTO_TAG_LEASE_DURATION);
 			goto out;
 		}
 
+		if (FAIL == zbx_is_uint64(value, &ttl))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "%s \"%s\" is not a valid numeric", ZBX_VAULT_RENEW_ERROR,
+					ZBX_PROTO_TAG_LEASE_DURATION);
+			goto out;
+		}
+
+		next_renew = zbx_time() + (double)ttl * 2 / 3;
+
 		zabbix_log(LOG_LEVEL_DEBUG, "Vault token renewed");
 	}
-
 out:
 	zbx_free(value);
-	zbx_free(urlstat);
+	zbx_free(url);
 	zbx_free(out);
 #undef ZBX_VAULT_RENEW_ERROR
 #endif
