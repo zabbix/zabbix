@@ -38,13 +38,6 @@ my %postgresql = (
 	"exec_cmd"	=>	";\n"
 );
 
-my %sqlite3 = (
-	"database"	=>	"sqlite3",
-	"before"	=>	"BEGIN TRANSACTION;\n",
-	"after"		=>	"COMMIT;\n",
-	"exec_cmd"	=>	";\n"
-);
-
 # Maximum line length that SQL*Plus can read from .sql file is 2499 characters.
 # Splitting long entries in 'media_type' table have to happen before SQL*Plus limit has been reached and end-of-line
 # character has to stay intact in one line.
@@ -249,7 +242,7 @@ sub flush_bulk_insert
 
 sub usage
 {
-	print "Usage: $0 [mysql|oracle|postgresql|sqlite3]\n";
+	print "Usage: $0 [mysql|oracle|postgresql]\n";
 	print "The script generates Zabbix SQL data files for different database engines.\n";
 	exit;
 }
@@ -276,7 +269,6 @@ sub main
 	if ($ARGV[0] eq 'mysql')		{ %output = %mysql; }
 	elsif ($ARGV[0] eq 'oracle')		{ %output = %oracle; }
 	elsif ($ARGV[0] eq 'postgresql')	{ %output = %postgresql; }
-	elsif ($ARGV[0] eq 'sqlite3')		{ %output = %sqlite3; }
 	else					{ usage(); }
 
 	print $output{"before"};
