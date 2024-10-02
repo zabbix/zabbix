@@ -215,6 +215,7 @@
 #define ZBX_PROTO_TAG_DEL_HOSTPROXYIDS		"del_hostproxyids"
 #define ZBX_PROTO_TAG_RESET			"reset"
 #define ZBX_PROTO_TAG_VARIANT			"variant"
+#define ZBX_PROTO_TAG_AUTH			"auth"
 
 #define ZBX_PROTO_VALUE_FAILED		"failed"
 #define ZBX_PROTO_VALUE_SUCCESS		"success"

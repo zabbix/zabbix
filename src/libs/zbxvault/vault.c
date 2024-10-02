@@ -22,6 +22,12 @@
 
 #define ZBX_VAULT_TIMEOUT	SEC_PER_MIN
 
+typedef enum
+{
+	ZBX_VAULT_TYPE_HASHICORP = 0,
+	ZBX_VAULT_TYPE_CYBERARK
+}
+zbx_vault_type_t;
 typedef	int (*zbx_vault_kvs_get_cb_t)(const char *vault_url, const char *prefix, const char *token,
 		const char *ssl_cert_file, const char *ssl_key_file, const char *config_source_ip,
 		const char *config_ssl_ca_location, const char *config_ssl_cert_location,
@@ -29,6 +35,7 @@ typedef	int (*zbx_vault_kvs_get_cb_t)(const char *vault_url, const char *prefix,
 
 static zbx_vault_kvs_get_cb_t	zbx_vault_kvs_get_cb;
 static const char		*zbx_vault_dbuser_key, *zbx_vault_dbpassword_key;
+static zbx_vault_type_t		vault_type;
 
 int	zbx_vault_init(const zbx_config_vault_t *config_vault, char **error)
 {
@@ -52,6 +59,7 @@ int	zbx_vault_init(const zbx_config_vault_t *config_vault, char **error)
 		zbx_vault_kvs_get_cb = zbx_hashicorp_kvs_get;
 		zbx_vault_dbuser_key = ZBX_HASHICORP_DBUSER_KEY;
 		zbx_vault_dbpassword_key = ZBX_HASHICORP_DBPASSWORD_KEY;
+		vault_type = ZBX_VAULT_TYPE_HASHICORP;
 	}
 	else if (0 == strcmp(config_vault->name, ZBX_CYBERARK_NAME))
 	{
@@ -66,6 +74,7 @@ int	zbx_vault_init(const zbx_config_vault_t *config_vault, char **error)
 		zbx_vault_kvs_get_cb = zbx_cyberark_kvs_get;
 		zbx_vault_dbuser_key = ZBX_CYBERARK_DBUSER_KEY;
 		zbx_vault_dbpassword_key = ZBX_CYBERARK_DBPASSWORD_KEY;
+		vault_type = ZBX_VAULT_TYPE_CYBERARK;
 	}
 	else
 	{
@@ -81,6 +90,18 @@ int	zbx_vault_init(const zbx_config_vault_t *config_vault, char **error)
 #undef ZBX_CYBERARK_NAME
 #undef ZBX_CYBERARK_DBUSER_KEY
 #undef ZBX_CYBERARK_DBPASSWORD_KEY
+}
+
+void	zbx_vault_renew_token(const zbx_config_vault_t *config_vault,
+		const char *config_source_ip, const char *config_ssl_ca_location,
+		const char *config_ssl_cert_location, const char *config_ssl_key_location)
+{
+
+	if (vault_type == ZBX_VAULT_TYPE_HASHICORP)
+		zbx_hashicorp_renew_token(config_vault->url, config_vault->token,
+			config_vault->tls_cert_file, config_vault->tls_key_file, config_source_ip,
+			config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location,
+			ZBX_VAULT_TIMEOUT);
 }
 
 int	zbx_vault_kvs_get(const char *path, zbx_kvs_t *kvs, const zbx_config_vault_t *config_vault,

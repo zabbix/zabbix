@@ -85,6 +85,10 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 		unsigned char	*rtc_data;
 
 		sleeptime = nextcheck - (int)time(NULL);
+		zbx_vault_renew_token(dbconfig_args_in->config_vault, dbconfig_args_in->config_source_ip,
+					dbconfig_args_in->config_ssl_ca_location,
+					dbconfig_args_in->config_ssl_cert_location,
+					dbconfig_args_in->config_ssl_key_location);
 
 		while (SUCCEED == zbx_rtc_wait(&rtc, info, &rtc_cmd, &rtc_data, sleeptime) && 0 != rtc_cmd)
 		{
