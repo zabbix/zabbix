@@ -183,16 +183,10 @@ void	zbx_hashicorp_renew_token(const char *vault_url, const char *token, const c
 			goto out;
 		}
 
-		if (SUCCEED != zbx_json_value_by_name_dyn(&jp_data, "renewable", &value, &value_alloc, NULL))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "%s cant find renewable object in the received JSON object",
-					ZBX_VAULT_RENEW_ERROR);
-			goto out;
-		}
-
 		next_renew = zbx_time(); /* skip lookup for next calls */
 
-		if (0 != strcmp(value, "true"))
+		if (SUCCEED != zbx_json_value_by_name_dyn(&jp_data, "renewable", &value, &value_alloc, NULL) ||
+				0 != strcmp(value, "true"))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "%s token is not renewable", ZBX_VAULT_RENEW_ERROR);
 			goto out;
