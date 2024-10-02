@@ -388,7 +388,7 @@ class testPageReportsAudit extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Resource ID' => CDataHelper::get('DynamicItemWidgets.itemids.Dynamic widgets H3I1')
+						'Resource ID' => CDataHelper::get('DynamicItemWidgets.itemids')['Dynamic widgets H3I1']
 					],
 					'result_count' => 1
 				]
@@ -399,7 +399,7 @@ class testPageReportsAudit extends CWebTest {
 					'fields' => [
 						'Users' => 'Admin',
 						'Resource' => 'Item',
-						'Resource ID' => CDataHelper::get('DynamicItemWidgets.itemids.Dynamic widgets H3I1'),
+						'Resource ID' => CDataHelper::get('DynamicItemWidgets.itemids')['Dynamic widgets H3I1'],
 						'Actions' => 'History clear'
 					],
 					'result_count' => 1
@@ -560,10 +560,6 @@ class testPageReportsAudit extends CWebTest {
 	 * @depends testPageReportsAudit_DisabledEnabled
 	 */
 	public function testPageReportsAudit_CheckFilter($data) {
-		if (CTestArrayHelper::get($data['fields'], 'Resource ID') === 'replace') {
-			$data['fields']['Resource ID'] = CDataHelper::get('DynamicItemWidgets.itemids.Dynamic widgets H3I1');
-		}
-
 		$this->page->login()->open('zabbix.php?action=auditlog.list&filter_rst=1')->waitUntilReady();
 		$form = $this->query('name:zbx_filter')->asForm()->one();
 		$table = $this->query('class:list-table')->asTable()->one();
