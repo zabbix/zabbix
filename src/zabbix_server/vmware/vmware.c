@@ -5040,7 +5040,8 @@ static int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CU
 			soap_retry = ATTEMPTS_NUM;
 	}
 	while ((0 < vmware_service_parse_event_data(events, eventlog_last_key, eventlog_last_ts, RETURNVAL_TAG, doc,
-			alloc_sz, &node_count, skip_old) || (0 == node_count && 0 < soap_retry--)) && 0 == *skip_old);
+			alloc_sz, &node_count, skip_old) || (0 == node_count && 0 < soap_retry--)) &&
+			0 == *skip_old && (0 == events->values_num || LAST_KEY(events) != eventlog_last_key + 1));
 
 	if (0 != eventlog_last_key && 0 != events->values_num && LAST_KEY(events) != eventlog_last_key + 1)
 	{

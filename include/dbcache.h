@@ -1128,4 +1128,8 @@ void	zbx_db_trigger_explain_expression(const DB_TRIGGER *trigger, char **express
 void	zbx_db_trigger_get_function_value(const DB_TRIGGER *trigger, int index, char **value,
 		int (*eval_func_cb)(zbx_variant_t *, DC_EVALUATE_ITEM *, const char *, const char *, const zbx_timespec_t *,
 		char **), int recovery);
+
+void	zbx_dc_set_itservices_num(int num);
+int	zbx_dc_get_itservices_num(void);
+
 #endif

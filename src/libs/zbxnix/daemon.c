@@ -259,7 +259,7 @@ static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 			}
 			else
 			{
-				if (scope < ZBX_PROCESS_TYPE_EXT_FIRST)
+				if (scope < ZBX_PROCESS_TYPE_COUNT)
 				{
 					zbx_signal_process_by_type(ZBX_RTC_GET_SCOPE(flags), ZBX_RTC_GET_DATA(flags),
 							flags, NULL);

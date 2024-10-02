@@ -99,7 +99,7 @@
 			$line_numbers.append(li);
 
 			while (diff < 0) {
-				$line_numbers.find('li:eq(0)').remove();
+				$line_numbers[0].querySelector('li:last-child').remove();
 				diff++;
 			}
 
@@ -107,7 +107,7 @@
 			$textarea.css('margin-left', $line_numbers.outerWidth());
 		}
 
-		var height_offset = 190,
+		var height_offset = 220,
 			$content = $('<div>', {class: 'multilineinput-container'}),
 			monospace_font = obj.options.monospace_font ? ' monospace-font' : '',
 			$textarea = $('<textarea>', {
