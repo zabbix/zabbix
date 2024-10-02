@@ -301,7 +301,8 @@ class testFormSysmap extends CLegacyWebTest {
 			$user_id = $this->zbxTestGetAttributeValue("//div[@id='userid']//li[@data-id]", 'data-id');
 		}
 
-		$this->zbxTestDoubleClickBeforeMessage('add', 'filter_name');
+		$this->query('xpath://div[contains(@class, tfoot-buttons)]/button[@id="add"]')->waitUntilClickable()->one()->click();
+		$this->assertMessage($data['expected']);
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
