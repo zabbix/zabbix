@@ -1,0 +1,1 @@
+A......... [ZBX-24975] fixed "username", "name" and "surname" cannot be retrieved by "selectAcknowledges" parameter of event.get API (agriscenko)
