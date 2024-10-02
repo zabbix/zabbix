@@ -388,7 +388,7 @@ class testPageReportsAudit extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Resource ID' => CDataHelper::get('DynamicItemWidgets.itemids.Dynamic widgets H3I1'),
+						'Resource ID' => CDataHelper::get('DynamicItemWidgets.itemids.Dynamic widgets H3I1')
 					],
 					'result_count' => 1
 				]
