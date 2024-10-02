@@ -1475,6 +1475,103 @@
       }
     }
   },
+  "manually_created_2_basic_devices": {
+    "version": {},
+    "all_devices_scan": {
+      "json_format_version": [1, 0],
+      "smartctl": {
+        "version": [7, 1],
+        "platform_info": "xstas",
+        "build_info": "(2001)",
+        "argv": ["smartctl", "--scan", "-j"],
+        "exit_status": 0
+      },
+      "devices": [
+        {
+          "name": "/dev/sda",
+          "info_name": "/dev/sda",
+          "type": "nvme",
+          "protocol": "NVMe"
+        },
+        {
+          "name": "/dev/sdb",
+          "info_name": "/dev/sdb",
+          "type": "nvme",
+          "protocol": "NVMe"
+        }
+      ]
+    },
+    "raid_devices_scan": {},
+    "all_smart_info_scans": {
+      "-a /dev/sda -j": {
+        "json_format_version": [1, 0],
+        "smartctl": {
+          "version": [7, 1],
+          "platform_info": "xstas",
+          "argv": ["smartctl", "-a", "/dev/sda", "-j"],
+          "exit_status": 0
+        },
+        "device": {
+          "name": "/dev/sda",
+          "info_name": "/dev/sda",
+          "type": "nvme",
+          "protocol": "NVMe"
+        },
+        "model_name": "RIGHT LEG",
+        "serial_number": "42069",
+        "firmware_version": "OUTDATED",
+        "smart_status": {
+          "passed": true
+        }
+      },
+      "-a /dev/sdb -j": {
+        "json_format_version": [1, 0],
+        "smartctl": {
+          "version": [7, 1],
+          "platform_info": "xstas",
+          "build_info": "(2001)",
+          "argv": ["smartctl", "-a", "/dev/sdb", "-j"],
+          "exit_status": 0
+        },
+        "device": {
+          "name": "/dev/sdb",
+          "info_name": "/dev/sdb",
+          "type": "nvme",
+          "protocol": "NVMe"
+        },
+        "model_name": "LEFT LEG",
+        "serial_number": "42070",
+        "firmware_version": "NEW",
+        "smart_status": {
+          "passed": true
+        }
+      }
+    }
+  },
+  "WSL_with_no_permissions": {
+    "version": {},
+    "all_devices_scan": {},
+    "raid_devices_scan": {},
+    "all_smart_info_scans": {
+      "-a /dev/sda -j": {
+        "json_format_version": [1, 0],
+        "smartctl": {
+          "version": [7, 2],
+          "svn_revision": "5155",
+          "platform_info": "x86_64-linux-5.15.153.1-microsoft-standard-WSL2",
+          "build_info": "(local build)",
+          "argv": ["smartctl", "-a", "/dev/sda", "-j"],
+          "messages": [
+            {
+              "string": "Smartctl open device: /dev/sda failed: Permission denied",
+              "severity": "error"
+            }
+          ],
+          "exit_status": 2
+        }
+      }
+    }
+  },
   "template": {
     "version": {},
     "all_devices_scan": {},
