@@ -31,13 +31,6 @@ my %postgresql = (
 	"exec_cmd"	=>	";\n"
 );
 
-my %sqlite3 = (
-	"database"	=>	"sqlite3",
-	"before"	=>	"BEGIN TRANSACTION;\n",
-	"after"		=>	"COMMIT;\n",
-	"exec_cmd"	=>	";\n"
-);
-
 sub process_table
 {
 	my $line = $_[0];
@@ -174,7 +167,7 @@ sub flush_bulk_insert
 
 sub usage
 {
-	print "Usage: $0 [mysql|postgresql|sqlite3]\n";
+	print "Usage: $0 [mysql|postgresql]\n";
 	print "The script generates Zabbix SQL data files for different database engines.\n";
 	exit;
 }
@@ -200,7 +193,6 @@ sub main
 
 	if ($ARGV[0] eq 'mysql')		{ %output = %mysql; }
 	elsif ($ARGV[0] eq 'postgresql')	{ %output = %postgresql; }
-	elsif ($ARGV[0] eq 'sqlite3')		{ %output = %sqlite3; }
 	else					{ usage(); }
 
 	print $output{"before"};

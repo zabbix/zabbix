@@ -10,9 +10,8 @@ imagefile="images.sql"
 
 imagefile_mysql="$sqlbasedir/mysql/$imagefile"
 imagefile_pgsql="$sqlbasedir/postgresql/$imagefile"
-imagefile_sqlite3="$sqlbasedir/sqlite3/$imagefile"
 
-for imagefile in "$imagefile_mysql" "$imagefile_pgsql" "$imagefile_sqlite3"; do
+for imagefile in "$imagefile_mysql" "$imagefile_pgsql"; do
 	[[ -s "$imagefile" ]] && {
 		echo "Non-empty $imagefile already exists, stopping"
 		exit 1
@@ -35,10 +34,7 @@ for imagefile in $pngdir/*.png; do
 	echo "INSERT INTO \`images\` (\`imageid\`,\`imagetype\`,\`name\`,\`image\`) VALUES ($imagesdone,1,'$imagename',0x$image_data);" >> "$imagefile_mysql"
 	# ----- PostgreSQL
 	echo "INSERT INTO images (imageid,imagetype,name,image) VALUES ($imagesdone,1,'$imagename',decode('$image_data','hex'));" >> "$imagefile_pgsql"
-	# ----- SQLite
-	echo "INSERT INTO images (imageid,imagetype,name,image) VALUES ($imagesdone,1,'$imagename','$image_data');" >> "$imagefile_sqlite3"
 
 	echo -ne "\b\b\b\b$[$imagesdone*100/$imagecount]% "
-	
 done
 echo
