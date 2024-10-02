@@ -31,6 +31,16 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 	public static function prepareData() {
 		self::$dashboardids = CDataHelper::get('DynamicItemWidgets.dashboardids');
 		self::$itemids = CDataHelper::get('DynamicItemWidgets.itemids');
+
+		$items_data = [
+			'Dynamic widgets H1I1' => 11,
+			'Dynamic widgets H1I2' => 12,
+			'Dynamic widgets H2I1' => 21,
+			'Dynamic widgets H3I1' => 31
+		];
+		foreach ($items_data as $name => $value) {
+			CDataHelper::addItemData(self::$itemids [$name], $value);
+		}
 	}
 
 	public static function getWidgetsData() {
@@ -209,7 +219,8 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 						],
 						[
 							'type' => 'Item history',
-							'header' => 'Dynamic widgets H1I2 - with host override'
+							'header' => 'Dynamic widgets H1I2 - with host override',
+							'empty' => true
 						],
 						[
 							'type' => 'Item history',
@@ -271,7 +282,8 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 						],
 						[
 							'type' => 'Item history',
-							'header' => 'Dynamic widgets H1I2 - with host override'
+							'header' => 'Dynamic widgets H1I2 - with host override',
+							'empty' => true
 						],
 						[
 							'type' => 'Item history',
@@ -328,15 +340,18 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 						],
 						[
 							'type' => 'Item history',
-							'header' => 'Dynamic widgets H1I1 - with host override'
+							'header' => 'Dynamic widgets H1I1 - with host override',
+							'empty' => true
 						],
 						[
 							'type' => 'Item history',
-							'header' => 'Dynamic widgets H1I2 - with host override'
+							'header' => 'Dynamic widgets H1I2 - with host override',
+							'empty' => true
 						],
 						[
 							'type' => 'Item history',
-							'header' => 'Dynamic widgets H1I1 & Dynamic widgets H1I2 - with host override'
+							'header' => 'Dynamic widgets H1I1 & Dynamic widgets H1I2 - with host override',
+							'empty' => true
 						]
 					],
 					'item_data' => [
@@ -358,13 +373,6 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 	 * @dataProvider getWidgetsData
 	 */
 	public function testDashboardDynamicItemWidgets_Layout($data) {
-		if (array_key_exists('item_data', $data)) {
-			foreach ($data['item_data'] as $params) {
-				$params['time'] = strtotime($params['time']);
-				CDataHelper::addItemData(self::$itemids[$params['name']], $params['value'], $params['time']);
-			}
-		}
-
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
 				self::$dashboardids['Dashboard for Dynamic item']);
 		$dashboard = CDashboardElement::find()->one();
@@ -381,6 +389,7 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 			$this->page->waitUntilReady();
 		}
 		$this->query('xpath://div[contains(@class, "is-loading")]')->waitUntilNotPresent();
+
 		// Show hidden headings of graph prototype.
 		$this->page->getDriver()->executeScript('var elements = document.getElementsByClassName("dashboard-grid-iterator");'.
 				' for (var i = 0; i < elements.length; i++) elements[i].className+=" dashboard-grid-iterator-focus";'
@@ -409,9 +418,18 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 			if ($expected['header'] === '' || $expected['header'] === $expected['type']
 						|| CTestArrayHelper::get($expected, 'empty', false)) {
 				$content = $widget_content->query('class:no-data-message')->one()->getText();
-				$message = ($expected['type'] === 'URL')
-					? 'No host selected.'
-					: 'No permissions to referred object or it does not exist!';
+
+				switch ($expected['type']) {
+					case 'Item history':
+						$message = 'No data.';
+						break;
+					case 'URL':
+						$message = 'No host selected.';
+						break;
+					default:
+						$message = 'No permissions to referred object or it does not exist!';
+				}
+
 				$this->assertEquals($message, $content);
 				continue;
 			}
@@ -423,17 +441,11 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 
 			switch ($expected['type']) {
 				case 'Item history':
+					$data = $widget_content->asTable()->index('Name');
 
-					if (!array_key_exists('expected', $expected)) {
-						$this->assertEquals('No data.', $widget_content->query('class:no-data-message')->one()->getText());
-					}
-					else {
-						$data = $widget_content->asTable()->index('Name');
-
-						foreach ($expected['expected'] as $item => $value) {
-							$row = $data[$item];
-							$this->assertEquals($value, $row['Value']);
-						}
+					foreach ($expected['expected'] as $item => $value) {
+						$row = $data[$item];
+						$this->assertEquals($value, $row['Value']);
 					}
 
 					break;

@@ -27,16 +27,6 @@ class DynamicItemWidgets {
 		$hosts = CDataHelper::createHosts([
 			[
 				'host' => 'Dynamic widgets H1',
-				'interfaces' => [
-					[
-						'type' => INTERFACE_TYPE_AGENT,
-						'main' => INTERFACE_PRIMARY,
-						'useip' => INTERFACE_USE_IP,
-						'ip' => '127.0.0.1',
-						'dns' => '',
-						'port' => '10050'
-					]
-				],
 				'groups' => [
 					'groupid' => $groupids['Dynamic widgets HG1 (H1 and H2)']
 				],
@@ -57,16 +47,6 @@ class DynamicItemWidgets {
 			],
 			[
 				'host' => 'Dynamic widgets H2',
-				'interfaces' => [
-					[
-						'type' => INTERFACE_TYPE_AGENT,
-						'main' => INTERFACE_PRIMARY,
-						'useip' => INTERFACE_USE_IP,
-						'ip' => '127.0.0.1',
-						'dns' => '',
-						'port' => '10050'
-					]
-				],
 				'groups' => [
 					'groupid' => $groupids['Dynamic widgets HG1 (H1 and H2)']
 				],
@@ -81,16 +61,6 @@ class DynamicItemWidgets {
 			],
 			[
 				'host' => 'Dynamic widgets H3',
-				'interfaces' => [
-					[
-						'type' => INTERFACE_TYPE_AGENT,
-						'main' => INTERFACE_PRIMARY,
-						'useip' => INTERFACE_USE_IP,
-						'ip' => '127.0.0.1',
-						'dns' => '',
-						'port' => '10050'
-					]
-				],
 				'groups' => [
 					'groupid' => $groupids['Dynamic widgets HG2 (H3)']
 				],

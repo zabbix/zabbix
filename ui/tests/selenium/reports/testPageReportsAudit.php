@@ -221,11 +221,9 @@ class testPageReportsAudit extends CWebTest {
 	 */
 	public function testPageReportsAudit_HistoryClear() {
 		// Check that audit info displayed correctly on frontend.
-		self::$id = CDataHelper::get('DynamicItemWidgets.itemids');
-		CDataHelper::call('history.clear', [self::$id['Dynamic widgets H3I1']]);
-		$this->checkAuditValues('Item', self::$id['Dynamic widgets H3I1'],
-				['History clear' => 'Description: Dynamic widgets H3I1']
-		);
+		self::$id = CDataHelper::get('DynamicItemWidgets.itemids.Dynamic widgets H3I1');
+		CDataHelper::call('history.clear', [self::$id]);
+		$this->checkAuditValues('Item', self::$id, ['History clear' => 'Description: Dynamic widgets H3I1']);
 	}
 
 	/**
@@ -390,7 +388,7 @@ class testPageReportsAudit extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Resource ID' => 'replace'
+						'Resource ID' => CDataHelper::get('DynamicItemWidgets.itemids.Dynamic widgets H3I1'),
 					],
 					'result_count' => 1
 				]
@@ -401,7 +399,7 @@ class testPageReportsAudit extends CWebTest {
 					'fields' => [
 						'Users' => 'Admin',
 						'Resource' => 'Item',
-						'Resource ID' => 'replace',
+						'Resource ID' => CDataHelper::get('DynamicItemWidgets.itemids.Dynamic widgets H3I1'),
 						'Actions' => 'History clear'
 					],
 					'result_count' => 1
@@ -462,7 +460,7 @@ class testPageReportsAudit extends CWebTest {
 					'no_data' => true
 				]
 			],
-			// #16 IPv4 address
+			// #16 IPv4 address.
 			[
 				[
 					'fields' => [
@@ -471,7 +469,7 @@ class testPageReportsAudit extends CWebTest {
 					'result_count' => 1
 				]
 			],
-			// #17 Another correct IP
+			// #17 Another correct IP.
 			[
 				[
 					'fields' => [
@@ -480,7 +478,7 @@ class testPageReportsAudit extends CWebTest {
 					'result_count' => 4
 				]
 			],
-			// #18 Part of correct IP
+			// #18 Part of correct IP.
 			[
 				[
 					'fields' => [
@@ -489,7 +487,7 @@ class testPageReportsAudit extends CWebTest {
 					'no_data' => true
 				]
 			],
-			// #19 IP is not in the list
+			// #19 IP is not in the list.
 			[
 				[
 					'fields' => [
@@ -498,7 +496,7 @@ class testPageReportsAudit extends CWebTest {
 					'no_data' => true
 				]
 			],
-			// #20 IPv6 address
+			// #20 IPv6 address.
 			[
 				[
 					'fields' => [
@@ -507,7 +505,7 @@ class testPageReportsAudit extends CWebTest {
 					'result_count' => 2
 				]
 			],
-			// #21 Domain address
+			// #21 Domain address.
 			[
 				[
 					'fields' => [
@@ -515,26 +513,25 @@ class testPageReportsAudit extends CWebTest {
 					],
 					'result_count' => 6
 				]
+			],
+			// #22.
+			[
+				[
+					'fields' => [
+						'Resource ID' => 'aaaaaaaa'
+					],
+					'no_data' => true
+				]
+			],
+			// #23.
+			[
+				[
+					'fields' => [
+						'Recordset ID' => 'aaaaaaaa'
+					],
+					'no_data' => true
+				]
 			]
-			// TODO: uncomment after ZBX-21097 fix
-			// #16.
-//			[
-//				[
-//					'fields' => [
-//						'Resource ID' => 'aaaaaaaa'
-//					],
-//					'no_data' => true
-//				]
-//			],
-			// #17.
-//			[
-//				[
-//					'fields' => [
-//						'Recordset ID' => 'aaaaaaaa'
-//					],
-//					'no_data' => true
-//				]
-//			]
 		];
 	}
 
@@ -564,7 +561,7 @@ class testPageReportsAudit extends CWebTest {
 	 */
 	public function testPageReportsAudit_CheckFilter($data) {
 		if (CTestArrayHelper::get($data['fields'], 'Resource ID') === 'replace') {
-			$data['fields']['Resource ID'] = CDataHelper::get('DynamicItemWidgets.itemids')['Dynamic widgets H3I1'];
+			$data['fields']['Resource ID'] = CDataHelper::get('DynamicItemWidgets.itemids.Dynamic widgets H3I1');
 		}
 
 		$this->page->login()->open('zabbix.php?action=auditlog.list&filter_rst=1')->waitUntilReady();
