@@ -151,7 +151,7 @@ void	zbx_hashicorp_renew_token(const char *vault_url, const char *token, const c
 
 	if (mtime == 0)
 	{
-		urlstat = zbx_dsprintf(NULL, "%s%s", vault_url, "v1/auth/token/lookup-self");
+		urlstat = zbx_dsprintf(NULL, "%s%s", vault_url, "/v1/auth/token/lookup-self");
 
 		if (SUCCEED != zbx_http_req(urlstat, header, timeout, ssl_cert_file, ssl_key_file, config_source_ip,
 				config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location, &out, NULL,
@@ -195,7 +195,9 @@ void	zbx_hashicorp_renew_token(const char *vault_url, const char *token, const c
 
 	if (0 != renew_possible && zbx_time() >= mtime)
 	{
-		urlstat = zbx_dsprintf(NULL, "%s%s", vault_url, "v1/auth/token/renew-self");
+		zbx_uint64_t ttl;
+
+		urlstat = zbx_dsprintf(NULL, "%s%s", vault_url, "/v1/auth/token/renew-self");
 
 		if (SUCCEED != zbx_http_req(urlstat, header, timeout, ssl_cert_file, ssl_key_file,
 				config_source_ip, config_ssl_ca_location, config_ssl_cert_location,
@@ -225,14 +227,15 @@ void	zbx_hashicorp_renew_token(const char *vault_url, const char *token, const c
 			goto out;
 		}
 
-		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_data, "lease_duration", &value, &value_alloc, NULL))
+		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_data, "lease_duration", &value, &value_alloc, NULL) &&
+			SUCCEED == zbx_is_uint64(value, &ttl))
 		{
-			mtime = zbx_time() + atoi(value) * 2 / 3;
+			mtime = zbx_time() + ttl * 2 / 3;
 		}
 		else
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "%s \"lease_duration\" not found in the received JSON object",
-				errormsg);
+			zabbix_log(LOG_LEVEL_WARNING,
+				"%s \"lease_duration\" not found or wrong in the received JSON object", errormsg);
 		}
 
 		zabbix_log(LOG_LEVEL_DEBUG, "Vault token renewed");
