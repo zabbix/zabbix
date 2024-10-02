@@ -290,19 +290,11 @@ static int	get_mount_paths(zbx_vector_ptr_t *mount_paths, char **error)
 	{
 		while (FALSE == GetVolumePathNamesForVolumeName(volume_name, buffer, size_dw, &size_dw))
 		{
-			char	*volume;
-
 			if (ERROR_MORE_DATA != (last_error = GetLastError()))
-				volume = zbx_unicode_to_utf8(volume_name);
+			{
+				char	*volume = zbx_unicode_to_utf8(volume_name);
 
-			if (ERROR_FILE_NOT_FOUND == last_error)
-			{
-				zabbix_log(LOG_LEVEL_DEBUG, "Volume is not mounted or is damaged: %s", volume);
-				zbx_free(volume);
-			}
-			else if (ERROR_MORE_DATA != last_error)
-			{
-				*error = zbx_dsprintf(*error, "Cannot obtain a list of filesystems for volume: %s. Error: %s",
+				*error = zbx_dsprintf(*error, "Cannot obtain a list of filesystems. Volume: %s Error: %s",
 						volume, zbx_strerror_from_system(last_error));
 				zbx_free(volume);
 				goto out;
