@@ -325,7 +325,7 @@ class testFormAdministrationDMProxies extends CLegacyWebTest  {
 
 		$this->zbxTestInputTypeOverwrite('host', $newname);
 		$this->zbxTestClickButton('proxy.update');
-		$this->zbxTestTextPresent('Proxy updated');
+		$this->assertMessage(TEST_GOOD, 'Proxy updated');
 		$this->zbxTestCheckTitle('Configuration of proxies');
 		$this->zbxTestCheckHeader('Proxies');
 		$this->zbxTestTextPresent($newname);
