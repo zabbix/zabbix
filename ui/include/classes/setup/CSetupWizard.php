@@ -206,13 +206,15 @@ class CSetupWizard extends CForm {
 					);
 					$this->setConfig('DB_VAULT_CERTIFICATES', $vault_certificates);
 
-					$this->setConfig('DB_VAULT_CERT_FILE', getRequest('vault_cert_file',
-						$this->getConfig('DB_VAULT_CERT_FILE', '')
-					));
+					$vault_cert_file = $vault_certificates
+						? getRequest('vault_cert_file', $this->getConfig('DB_VAULT_CERT_FILE', ''))
+						: '';
+					$this->setConfig('DB_VAULT_CERT_FILE', $vault_cert_file);
 
-					$this->setConfig('DB_VAULT_KEY_FILE', getRequest('vault_key_file',
-						$this->getConfig('DB_VAULT_KEY_FILE', '')
-					));
+					$vault_key_file = $vault_certificates
+						? getRequest('vault_key_file', $this->getConfig('DB_VAULT_KEY_FILE', ''))
+						: '';
+					$this->setConfig('DB_VAULT_KEY_FILE', $vault_key_file);
 
 					$this->unsetConfig(['DB_USER', 'DB_PASSWORD', 'DB_VAULT_TOKEN']);
 					break;
@@ -222,8 +224,8 @@ class CSetupWizard extends CForm {
 					$this->setConfig('DB_PASSWORD', getRequest('password', $this->getConfig('DB_PASSWORD', '')));
 
 					$this->unsetConfig(['DB_VAULT_URL', 'DB_VAULT_DB_PATH', 'DB_VAULT_TOKEN', 'DB_VAULT_CERTIFICATES',
-						'DB_VAULT_CERT_FILE', 'DB_VAULT_KEY_FILE']
-					);
+						'DB_VAULT_CERT_FILE', 'DB_VAULT_KEY_FILE'
+					]);
 					break;
 			}
 
