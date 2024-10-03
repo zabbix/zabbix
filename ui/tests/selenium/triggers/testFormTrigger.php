@@ -28,6 +28,8 @@ use Facebook\WebDriver\WebDriverKeys;
 class testFormTrigger extends CLegacyWebTest {
 	const HOST = 'Host for Triggers test';
 
+	protected static $long_key_hostid;
+
 	/**
 	 * Attach MessageBehavior to the test.
 	 *
@@ -1286,6 +1288,66 @@ class testFormTrigger extends CLegacyWebTest {
 				COverlayDialogElement::find()->one()->close();
 			}
 		}
+	}
+
+	/**
+	 * Create a host with a long name and an item with a long key for the following testcase.
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	protected function prepareCreateWithLongItemKey() {
+		$hosts = CDataHelper::call('host.create', [
+			'host' => STRING_128,
+			'groups' => [['groupid' => 6]]
+		]);
+		self::$long_key_hostid = $hosts['hostids'][0];
+		CDataHelper::call('item.create', [
+			[
+				'hostid' => self::$long_key_hostid,
+				'name' => 'test',
+				'key_' => STRING_2048,
+				'type' => ITEM_TYPE_TRAPPER,
+				'value_type' => ITEM_VALUE_TYPE_FLOAT
+			]
+		]);
+	}
+
+	/**
+	 * Test the special case where the host's name and item's key are very long.
+	 * The trigger expression is saved in a different format, so this should work.
+	 * See ZBX-25182 for more information.
+	 *
+	 * @onBefore prepareCreateWithLongItemKey
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function testFormTrigger_CreateWithLongItemKey() {
+		$trigger_name = 'Trigger for a long item key';
+
+		$this->page->login()->open('zabbix.php?action=trigger.list&filter_set=1&context=host&filter_hostids[0]='.
+				self::$long_key_hostid
+		);
+		$this->page->waitUntilReady();
+
+		$this->page->query('button:Create trigger')->one()->click();
+		$dialog = COverlayDialogElement::find()->one();
+		$dialog->asForm()->fill([
+			'Name' => $trigger_name,
+			'Expression' => 'last(/'.STRING_128.'/'.STRING_2048.')=0 and last(/'.STRING_128.'/'.STRING_2048.')=0'
+		]);
+		$dialog->getFooter()->query('button:Add')->one()->click();
+		COverlayDialogElement::ensureNotPresent();
+
+
+		// Get the new trigger's ID from UI.
+		$triggerid = $this->page->query('link', $trigger_name)->one()->getAttribute('data-triggerid');
+		// Get the newly saved trigger's expression, as it is saved in the DB.
+		$db_expression = CDBHelper::getValue('SELECT expression FROM triggers WHERE triggerid = '.$triggerid);
+
+		// Assert that the trigger expression is saved in DB like this: "{100253}=0 and {100253}=0".
+		$this->assertEquals(1, preg_match('/^\{\d+\}=0.*\{\d+\}=0$/', $db_expression));
 	}
 
 	/**
