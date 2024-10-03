@@ -333,11 +333,6 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 						get_process_type_string(process_type), zbx_time() - sec);
 			}
 
-			zbx_vault_renew_token(proxyconfig_args_in->config_vault, proxyconfig_args_in->config_source_ip,
-					proxyconfig_args_in->config_ssl_ca_location,
-					proxyconfig_args_in->config_ssl_cert_location,
-					proxyconfig_args_in->config_ssl_key_location);
-
 			continue;
 		}
 
@@ -359,11 +354,6 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 			proxyconfig_remove_unused_templates();
 			last_template_cleanup_sec = sec;
 		}
-
-		zbx_vault_renew_token(proxyconfig_args_in->config_vault, proxyconfig_args_in->config_source_ip,
-				proxyconfig_args_in->config_ssl_ca_location,
-				proxyconfig_args_in->config_ssl_cert_location,
-				proxyconfig_args_in->config_ssl_key_location);
 	}
 stop:
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
