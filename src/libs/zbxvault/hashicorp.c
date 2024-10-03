@@ -137,15 +137,18 @@ void	zbx_hashicorp_renew_token(const char *vault_url, const char *token, const c
 	ZBX_UNUSED(config_ssl_key_location);
 	ZBX_UNUSED(timeout);
 #else
-#define ZBX_VAULT_RENEW_ERROR "cannot renew vault token:"
 	char			*out = NULL, *error = NULL, header[MAX_STRING_LEN], *url = NULL, *value = NULL;
 	size_t			value_alloc = 0;
 	struct zbx_json_parse	jp, jp_data;
 	long			response_code;
-	static int		renewable = 0;
-	static double		next_renew = 0;
+	int			status = FAIL;
+	static int		renewable, previouse_status = SUCCEED;
+	static double		next_renew, next_try_after_error;
 
 	if (NULL == token)
+		return;
+
+	if (SUCCEED != previouse_status && zbx_time() < next_try_after_error)
 		return;
 
 	zbx_snprintf(header, sizeof(header), "X-Vault-Token: %s", token);
@@ -158,28 +161,25 @@ void	zbx_hashicorp_renew_token(const char *vault_url, const char *token, const c
 				config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location, &out, NULL,
 				&response_code, &error))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "%s %s", ZBX_VAULT_RENEW_ERROR, error);
-			zbx_free(error);
 			goto out;
 		}
 
 		if (200 != response_code && 204 != response_code)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "%s unsuccessful response code \"%ld\"", ZBX_VAULT_RENEW_ERROR,
-					response_code);
+			error = zbx_dsprintf(NULL, "unsuccessful response code \"%ld\"", response_code);
 			goto out;
 		}
 
 		if (SUCCEED != zbx_json_open(out, &jp))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "%s %s", ZBX_VAULT_RENEW_ERROR, zbx_json_strerror());
+			error = zbx_dsprintf(NULL, "%s", zbx_json_strerror());
 			goto out;
 		}
 
 		if (SUCCEED != zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_DATA, &jp_data))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "%s cannot find the \"%s\" object in the received JSON object",
-					ZBX_VAULT_RENEW_ERROR, ZBX_PROTO_TAG_DATA);
+			error = zbx_dsprintf(NULL, "cannot find the \"%s\" object in the received JSON object",
+					ZBX_PROTO_TAG_DATA);
 			goto out;
 		}
 
@@ -188,7 +188,8 @@ void	zbx_hashicorp_renew_token(const char *vault_url, const char *token, const c
 		if (SUCCEED != zbx_json_value_by_name_dyn(&jp_data, "renewable", &value, &value_alloc, NULL) ||
 				0 != strcmp(value, "true"))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "%s token is not renewable", ZBX_VAULT_RENEW_ERROR);
+			zabbix_log(LOG_LEVEL_WARNING, "cannot renew vault token: token is not renewable");
+			status = SUCCEED;
 			goto out;
 		}
 
@@ -206,55 +207,70 @@ void	zbx_hashicorp_renew_token(const char *vault_url, const char *token, const c
 				config_source_ip, config_ssl_ca_location, config_ssl_cert_location,
 				config_ssl_key_location, &out, "{}", &response_code, &error))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "%s %s", ZBX_VAULT_RENEW_ERROR, error);
-			zbx_free(error);
 			goto out;
 		}
 
 		if (200 != response_code && 204 != response_code)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "%s unsuccessful response code \"%ld\"", ZBX_VAULT_RENEW_ERROR,
-					response_code);
+			error = zbx_dsprintf(NULL, "unsuccessful response code \"%ld\"", response_code);
 			goto out;
 		}
 
 		if (SUCCEED != zbx_json_open(out, &jp))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "%s %s", ZBX_VAULT_RENEW_ERROR, zbx_json_strerror());
+			error = zbx_dsprintf(NULL, "%s", zbx_json_strerror());
 			goto out;
 		}
 
 		if (SUCCEED != zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_AUTH, &jp_data))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "%s cannot find the \"%s\" object in the received JSON object",
-					ZBX_VAULT_RENEW_ERROR, ZBX_PROTO_TAG_AUTH);
+			error = zbx_dsprintf(NULL, "cannot find the \"%s\" object in the received JSON object",
+					ZBX_PROTO_TAG_AUTH);
 			goto out;
 		}
 
 		if (FAIL == zbx_json_value_by_name_dyn(&jp_data, ZBX_PROTO_TAG_LEASE_DURATION, &value, &value_alloc,
 				NULL))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "%s cannot find the \"%s\" object in the received JSON object",
-					ZBX_VAULT_RENEW_ERROR, ZBX_PROTO_TAG_LEASE_DURATION);
+			error = zbx_dsprintf(NULL, "cannot find the \"%s\" object in the received JSON object",
+					ZBX_PROTO_TAG_LEASE_DURATION);
 			goto out;
 		}
 
 		if (FAIL == zbx_is_uint64(value, &ttl))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "%s \"%s\" is not a valid numeric", ZBX_VAULT_RENEW_ERROR,
+			error = zbx_dsprintf(NULL, "\"%s\" is not a valid numeric",
 					ZBX_PROTO_TAG_LEASE_DURATION);
 			goto out;
 		}
 
 		next_renew = zbx_time() + (double)ttl * 2 / 3;
+	}
 
+	if (FAIL == previouse_status)
+	{
+		zabbix_log(LOG_LEVEL_INFORMATION, "Vault token renew is working again");
+	}
+	else
+	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Vault token renewed");
 	}
+	status = SUCCEED;
+
 out:
+
+	if (FAIL == status)
+	{
+		next_try_after_error = zbx_time() + 10;
+		if (SUCCEED == previouse_status && NULL != error)
+			zabbix_log(LOG_LEVEL_WARNING, "cannot renew vault token: %s", error);
+	}
+
+	previouse_status = status;
 	zbx_free(value);
 	zbx_free(url);
 	zbx_free(out);
-#undef ZBX_VAULT_RENEW_ERROR
+	zbx_free(error);
 #endif
 }
 
