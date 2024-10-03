@@ -32,7 +32,7 @@ typedef	void (*zbx_vault_kvs_renew_cb_t)(const char *vault_url, const char *toke
 		const char *config_ssl_cert_location, const char *config_ssl_key_location, long timeout);
 
 static zbx_vault_kvs_get_cb_t	zbx_vault_kvs_get_cb;
-static zbx_vault_kvs_renew_cb_t	zbx_vault_kvs_renew_cb = NULL;
+static zbx_vault_kvs_renew_cb_t	zbx_vault_kvs_renew_cb;
 static const char		*zbx_vault_dbuser_key, *zbx_vault_dbpassword_key;
 
 int	zbx_vault_init(const zbx_config_vault_t *config_vault, char **error)
