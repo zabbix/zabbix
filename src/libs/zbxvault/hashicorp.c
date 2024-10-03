@@ -142,13 +142,13 @@ void	zbx_hashicorp_renew_token(const char *vault_url, const char *token, const c
 	struct zbx_json_parse	jp, jp_data;
 	long			response_code;
 	int			status = FAIL;
-	static int		renewable, previouse_status = SUCCEED;
+	static int		renewable, last_status = SUCCEED;
 	static double		next_renew, next_try_after_error;
 
 	if (NULL == token)
 		return;
 
-	if (SUCCEED != previouse_status && zbx_time() < next_try_after_error)
+	if (SUCCEED != last_status && zbx_time() < next_try_after_error)
 		return;
 
 	zbx_snprintf(header, sizeof(header), "X-Vault-Token: %s", token);
@@ -247,7 +247,7 @@ void	zbx_hashicorp_renew_token(const char *vault_url, const char *token, const c
 		next_renew = zbx_time() + (double)ttl * 2 / 3;
 	}
 
-	if (FAIL == previouse_status)
+	if (FAIL == last_status)
 	{
 		zabbix_log(LOG_LEVEL_INFORMATION, "Vault token renew is working again");
 	}
@@ -262,11 +262,11 @@ out:
 	if (FAIL == status)
 	{
 		next_try_after_error = zbx_time() + 10;
-		if (SUCCEED == previouse_status && NULL != error)
+		if (SUCCEED == last_status && NULL != error)
 			zabbix_log(LOG_LEVEL_WARNING, "cannot renew vault token: %s", error);
 	}
 
-	previouse_status = status;
+	last_status = status;
 	zbx_free(value);
 	zbx_free(url);
 	zbx_free(out);
