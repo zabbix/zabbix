@@ -735,15 +735,15 @@ class testPageHostGraph extends CLegacyWebTest {
 		$filter->submit();
 
 		if ($data['host'] === 'all') {
-			$this->zbxTestAssertElementPresentXpath(
-					'//button[@id="form"][@disabled][text()="Create graph (select host first)"]'
+			$this->assertTrue($this->query('xpath://button[@id="form"][@disabled][text()="Create graph (select host first)"]')
+					->one()->isVisible()
 			);
 		}
 
 		if (array_key_exists('graph', $data)) {
 			foreach ($data['graph'] as $graph) {
-				$this->zbxTestAssertElementPresentXpath(
-						'//a[contains(@href,"graphs.php?form=update")][text()="'.$graph.'"]'
+				$this->assertTrue($this->query('xpath://a[contains(@href,"graphs.php?form=update")][text()="'.$graph.'"]')
+					->one()->isVisible()
 				);
 			}
 		}
