@@ -301,8 +301,6 @@ class testGeomapWidgetScreenshots extends CWebTest {
 			'Geomap for screenshots, 3'
 		];
 		foreach ($widgets as $widget) {
-			$widget->waitUntilReady();
-
 			// Wait until loader disappears.
 			$this->query("xpath://h4[text()=".CXPathHelper::escapeQuotes($widget).
 					"]/../../div[not(contains(@class,\"is-loading\"))]")->waitUntilPresent()->one();
@@ -330,6 +328,7 @@ class testGeomapWidgetScreenshots extends CWebTest {
 		});
 
 		foreach ($widgets as $widget) {
+			CDashboardElement::find()->one()->getWidget($widget)->waitUntilReady();
 			$id = $widget.' '.$data['Tile provider'];
 			$element = $this->query("xpath://div[@class=\"dashboard-grid-widget\"]//h4[text()=".
 					CXPathHelper::escapeQuotes($widget)."]/../..")->waitUntilVisible()->one();
