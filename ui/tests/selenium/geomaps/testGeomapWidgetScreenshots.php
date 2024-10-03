@@ -301,6 +301,8 @@ class testGeomapWidgetScreenshots extends CWebTest {
 			'Geomap for screenshots, 3'
 		];
 		foreach ($widgets as $widget) {
+			$widget->waitUntilReady();
+
 			// Wait until loader disappears.
 			$this->query("xpath://h4[text()=".CXPathHelper::escapeQuotes($widget).
 					"]/../../div[not(contains(@class,\"is-loading\"))]")->waitUntilPresent()->one();

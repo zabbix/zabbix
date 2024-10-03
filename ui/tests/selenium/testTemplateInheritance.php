@@ -129,7 +129,8 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestInputType('description', 'description');
 		$this->assertTrue($this->zbxTestCheckboxSelected('status'));
 
-		$this->zbxTestDoubleClickBeforeMessage('add', 'filter_name');
+		$this->query('xpath://div[contains(@class, tfoot-buttons)]/button[@id="add"]')->waitUntilClickable()->one()->click();
+		$this->assertMessage($result);
 
 		switch ($result) {
 			case TEST_GOOD:
