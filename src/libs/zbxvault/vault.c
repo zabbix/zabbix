@@ -93,7 +93,7 @@ void	zbx_vault_renew_token(const zbx_config_vault_t *config_vault,
 		const char *config_source_ip, const char *config_ssl_ca_location,
 		const char *config_ssl_cert_location, const char *config_ssl_key_location)
 {
-	if (zbx_vault_kvs_renew_cb == NULL)
+	if (NULL == zbx_vault_kvs_renew_cb)
 		return;
 
 	zbx_vault_kvs_renew_cb(config_vault->url, config_vault->token, config_vault->tls_cert_file,

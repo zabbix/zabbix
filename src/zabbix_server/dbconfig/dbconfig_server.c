@@ -168,11 +168,6 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 			zabbix_log(LOG_LEVEL_WARNING, "finished forced reloading of the secrets");
 		}
 
-		zbx_vault_renew_token(dbconfig_args_in->config_vault, dbconfig_args_in->config_source_ip,
-				dbconfig_args_in->config_ssl_ca_location,
-				dbconfig_args_in->config_ssl_cert_location,
-				dbconfig_args_in->config_ssl_key_location);
-
 		sec = zbx_time() - sec;
 
 		zbx_setproctitle("%s [synced configuration in " ZBX_FS_DBL " sec, idle %d sec]",
